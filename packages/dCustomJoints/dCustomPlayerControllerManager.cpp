@@ -291,6 +291,11 @@ void dCustomPlayerController::SetPlayerVelocity (dFloat forwardSpeed, dFloat lat
 	}
 }
 
+void dCustomPlayerController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dAssert(0);
+}
+
 
 dFloat dCustomPlayerController::CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contactInfo) const
 {

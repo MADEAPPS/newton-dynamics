@@ -30,14 +30,6 @@ dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransform
 	return controller;
 }
 
-void dCustomActiveCharacterManager::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-	for (dCustomActiveCharacterManager::dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		node->GetInfo().Debug(debugContext);
-	}
-}
-
-
 
 /*
 void dCustomActiveCharacterManager::OnUpdateTransform(const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const

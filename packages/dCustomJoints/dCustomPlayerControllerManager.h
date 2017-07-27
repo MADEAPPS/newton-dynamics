@@ -66,6 +66,8 @@ class dCustomPlayerController: public dCustomControllerBase
 	{
 	}
 
+	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+
 	CUSTOM_JOINTS_API void SetPlayerOrigin (dFloat originHigh);
 
 	CUSTOM_JOINTS_API dVector CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const;

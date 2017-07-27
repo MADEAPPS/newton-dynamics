@@ -397,7 +397,6 @@ class dCustomVehicleController: public dCustomControllerBase
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	const CUSTOM_JOINTS_API dBodyPart* GetChassis() const;
-//	const CUSTOM_JOINTS_API dMatrix& GetLocalFrame() const;
 
 	CUSTOM_JOINTS_API dMatrix GetTransform() const;
 	CUSTOM_JOINTS_API void SetTransform(const dMatrix& matrix);
@@ -430,10 +429,12 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void SetWeightDistribution(dFloat weightDistribution);
 
 	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
+	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+	
 
 	bool ControlStateChanged() const;
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag);
@@ -443,8 +444,9 @@ class dCustomVehicleController: public dCustomControllerBase
 	void ApplySuspensionForces (dFloat timestep) const;
 	dVector GetLastLateralForce(dBodyPartTire* const tire) const;
 	void Cleanup();
+
 	
-//	dMatrix m_localFrame;
+	
 	dBodyPartChassis m_chassis;
 	dList<dBodyPartTire> m_tireList;
 	dList<dBodyPartDifferential> m_differentialList;
@@ -457,7 +459,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	dEngineController* m_engineControl;
 	dBrakeController* m_handBrakesControl;
 	dSteeringController* m_steeringControl; 
-//	dLateralDynamicsJoint* m_lateralDynamicControl;
 	dBodyPartTire::dFrictionModel* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorqueCallback;
 
@@ -494,7 +495,7 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, dCustomVehicleController::dBodyPartTire* const tire, const NewtonBody* const otherBody, dFloat timestep);
 	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const dCustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
 	CUSTOM_JOINTS_API int OnContactGeneration (const dCustomVehicleController::dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
-
+	
 	int Collide (dCustomVehicleController::dBodyPartTire* const tire, int threadIndex) const;
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);

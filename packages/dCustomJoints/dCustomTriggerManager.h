@@ -34,6 +34,8 @@ class dCustomTriggerController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+
+	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	
 	private:
 	dTree<NewtonBody*,NewtonBody*> m_manifest;

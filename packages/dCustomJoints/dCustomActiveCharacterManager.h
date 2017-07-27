@@ -151,8 +151,6 @@ class dCustomActiveCharacterManager: public dCustomControllerManager<dCustomActi
 	CUSTOM_JOINTS_API dCustomActiveCharacterManager(NewtonWorld* const world, const char* const name = DYNAMIC_RAGDOLL_PLUGIN_NAME);
 	CUSTOM_JOINTS_API virtual ~dCustomActiveCharacterManager();
 
-	CUSTOM_JOINTS_API virtual void Debug (dCustomJoint::dDebugDisplay* const debugContext) const;
-
 	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController ();
 	
 //	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;

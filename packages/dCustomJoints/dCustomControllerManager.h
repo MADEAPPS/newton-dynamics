@@ -136,6 +136,9 @@ class dCustomControllerBase
 
 	virtual void PreUpdate (dFloat timestep, int threadIndex) = 0;
 	virtual void PostUpdate (dFloat timestep, int threadIndex) = 0;
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+	}
 
 	void* m_userData;
 	NewtonBody* m_body;
@@ -166,7 +169,6 @@ class dCustomControllerManager: public dList<CONTROLLER_BASE>
 	}
 
 	public:
-    virtual void Debug (dCustomJoint::dDebugDisplay* const debugContext) const;
 	virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep);
 
@@ -217,10 +219,6 @@ void dCustomControllerManager<CONTROLLER_BASE>::DestroyAllController ()
 	}
 }
 
-template<class CONTROLLER_BASE>
-void dCustomControllerManager<CONTROLLER_BASE>::Debug (dCustomJoint::dDebugDisplay* const debugContext) const
-{
-}
 
 template<class CONTROLLER_BASE>
 void dCustomControllerManager<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
@@ -262,7 +260,9 @@ template<class CONTROLLER_BASE>
 void dCustomControllerManager<CONTROLLER_BASE>::Debug (const NewtonWorld* const world, void* const listenerUserData, void* const debugContext)
 {
 	dCustomControllerManager* const me = (dCustomControllerManager*) listenerUserData;
-	me->Debug((dCustomJoint::dDebugDisplay*) debugContext);
+	for (dCustomControllerManager<CONTROLLER_BASE>::dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
+		node->GetInfo().Debug((dCustomJoint::dDebugDisplay*) debugContext);
+	}
 }
 
 template<class CONTROLLER_BASE>

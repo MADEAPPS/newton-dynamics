@@ -112,6 +112,11 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		m_castingVisualEntity = new ClosestDistanceEntity (scene, matrix, materialID, castingShapeType);
 	}
 
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
 
 	private:
 	void CreatCasterBody(dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID)

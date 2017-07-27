@@ -41,6 +41,11 @@ class dCustomInputController: public dCustomControllerBase
 	{
 		//do nothing;
 	}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
 };
 
 

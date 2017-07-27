@@ -191,7 +191,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 class dConvexCastRecord: public dCustomControllerBase
 {
-public:
+	public:
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
 		(void)timestep;
@@ -203,6 +203,12 @@ public:
 		(void)timestep;
 		(void)threadIndex;
 	}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
 };
 
 

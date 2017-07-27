@@ -1504,6 +1504,7 @@ dCustomVehicleControllerManager::~dCustomVehicleControllerManager()
 	NewtonDestroyCollision(m_tireShapeTemplate);
 }
 
+
 void dCustomVehicleControllerManager::DestroyController(dCustomVehicleController* const controller)
 {
 	controller->Cleanup();
@@ -2534,6 +2535,12 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		fprintf(file_xxx, "%f, %f, %f,\n", engineOmega, engineTorque, m_engine->GetNominalTorque());
 #endif
 	}
+}
+
+
+void dCustomVehicleController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dAssert(0);
 }
 
 

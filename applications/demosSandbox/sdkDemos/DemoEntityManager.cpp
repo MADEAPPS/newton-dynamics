@@ -921,28 +921,6 @@ void DemoEntityManager::RenderFrame ()
 		RenderNormalForces (GetNewton());
 	}
 
-	if (m_mainWindow->m_showNormalForces) {
-//	if (1) {
-		// see if there is a vehicle controller and 
-		void* const vehListerNode = NewtonWorldGetListener(GetNewton(), VEHICLE_PLUGIN_NAME);
-		if (vehListerNode) {
-			dAssert (0);
-			// this is to be removed
-//			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
-//			manager->Debug();
-		}
-
-		void* const characterListerNode = NewtonWorldGetListener(GetNewton(), PLAYER_PLUGIN_NAME);
-		if (characterListerNode) {
-			dAssert(0);
-			// this is to be removed
-//			dCustomPlayerControllerManager* const manager = (dCustomPlayerControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
-//			manager->Debug();
-		}
-	}
-
-
-
 	if (m_mainWindow->m_showAABB) {
 		RenderAABB (GetNewton());
 	}

@@ -133,6 +133,11 @@ void dCustomTriggerController::Init (NewtonCollision* const convexShape, const d
 	NewtonCollisionSetMode(collision, 0);
 }
 
+void dCustomTriggerController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dAssert(0);
+}
+
 
 void dCustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
 {

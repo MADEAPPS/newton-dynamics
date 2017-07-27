@@ -98,13 +98,16 @@ class dCustomArticulatedTransformController: public dCustomControllerBase
 
 	CUSTOM_JOINTS_API NewtonBody* GetBoneBody (int index) const;
 	CUSTOM_JOINTS_API NewtonBody* GetBoneBody (const dSkeletonBone* const bone) const;
-
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
-
-	CUSTOM_JOINTS_API void LinkCycleBones(dCustomJoint* ) const;
 
 	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
 	
 	protected:
 	CUSTOM_JOINTS_API void Init (void* const userData);

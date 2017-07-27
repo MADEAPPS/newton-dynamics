@@ -58,6 +58,12 @@ class dRayCastRecord: public dCustomControllerBase
 		m_p1 = m_p0 + (matrix.m_posit - m_p0).Scale (parameter);
 	}
 
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
+
 	dVector m_p0;
 	dVector m_p1;
 	NewtonBody* m_target;
