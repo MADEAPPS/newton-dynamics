@@ -384,7 +384,7 @@ void dgWorld::AddSentinelBody()
 	instance->Release();
 }
 
-dgBody* dgWorld::GetSentinelBody() const
+dgDynamicBody* dgWorld::GetSentinelBody() const
 {
 	return m_sentinelBody;
 }

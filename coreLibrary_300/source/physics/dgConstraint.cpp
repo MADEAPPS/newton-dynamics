@@ -65,12 +65,12 @@ void dgConstraint::InitInfo (dgConstraintInfo* const info) const
 	info->m_attachBody_0 = GetBody0();
 	dgAssert (info->m_attachBody_0);
 	dgWorld* const world = info->m_attachBody_0->GetWorld();
-	if (info->m_attachBody_0  == world->GetSentinelBody()) {
+	if (info->m_attachBody_0  == (dgBody*)world->GetSentinelBody()) {
 		info->m_attachBody_0  = NULL;
 	}
 
 	info->m_attachBody_1 = GetBody1();
-	if (info->m_attachBody_1  == world->GetSentinelBody()) {
+	if (info->m_attachBody_1  == (dgBody*)world->GetSentinelBody()) {
 		info->m_attachBody_1  = NULL;
 	}
 

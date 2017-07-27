@@ -184,7 +184,6 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 				}
 			}
 		}
-		
 
 		controller->Finalize();
 	}

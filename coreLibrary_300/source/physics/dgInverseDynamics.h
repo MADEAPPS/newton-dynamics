@@ -38,14 +38,16 @@ class dgInverseDynamics
 	class dgLoopingJoint
 	{
 		public: 
-		dgLoopingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1)
+		dgLoopingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1, dgInt32 infoIndex)
 			:m_joint(joint)
+			,m_infoIndex(infoIndex)
 			,m_m0(dgInt16 (index0))
 			,m_m1(dgInt16 (index1))
 		{
 		}
 
 		dgBilateralConstraint* m_joint;
+		dgInt32 m_infoIndex;
 		dgInt16 m_m0;
 		dgInt16 m_m1;
 	};
@@ -79,7 +81,9 @@ class dgInverseDynamics
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
 	
 	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
+	DG_INLINE dgInt32 GetJacobianDerivatives (dgBilateralConstraint* const constraint, dgContraintDescritor& constraintParams) const;
 	DG_INLINE void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
+	DG_INLINE void GetRowJacobianDerivatives(dgInt32 index, const dgVector& invMass0, const dgVector& invMass1, const dgMatrix& invInertia0, const dgMatrix& invInertia1, const dgContraintDescritor& constraintParams, dgJacobianMatrixElement* const row) const;
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
@@ -87,7 +91,9 @@ class dgInverseDynamics
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
 
 	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
-	dgInt32 GetJacobianDerivatives(dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep, dgInt32 threadIndex) const;
+
+	
+	dgInt32 GetJacobianDerivatives(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep, dgInt32 threadIndex) const;
 	
 	void CalculateExternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	void CalculateLoopAndExternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
