@@ -409,7 +409,7 @@ dgInverseDynamics::~dgInverseDynamics()
 	dgList<dgLoopingJoint>::dgListNode* ptr1 = NULL;
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		ptr1 = ptr->GetNext();
-		RemoveEffector(ptr);
+		RemoveLoopJoint(ptr);
 	}
 	dgAssert(m_loopingJoints.GetCount() == 0);
 
@@ -532,7 +532,7 @@ void dgInverseDynamics::RemoveLoopJoint(dgBilateralConstraint* const joint)
 }
 */
 
-void dgInverseDynamics::AddEffector(dgBilateralConstraint* const joint, dgNode* const node)
+void dgInverseDynamics::AddLoopJoint(dgBilateralConstraint* const joint, dgNode* const node)
 {
 	dgLoopingJoint cyclicEntry(joint, 0, 0);
 	m_loopingJoints.Append(cyclicEntry);
@@ -550,7 +550,7 @@ dgList<dgInverseDynamics::dgLoopingJoint>::dgListNode* dgInverseDynamics::FindEf
 	return NULL;
 }
 
-void dgInverseDynamics::RemoveEffector(dgList<dgLoopingJoint>::dgListNode* const node)
+void dgInverseDynamics::RemoveLoopJoint(dgList<dgLoopingJoint>::dgListNode* const node)
 {
 	dgBilateralConstraint* const joint = node->GetInfo().m_joint;
 	m_loopingJoints.Remove(node);
@@ -558,11 +558,11 @@ void dgInverseDynamics::RemoveEffector(dgList<dgLoopingJoint>::dgListNode* const
 }
 
 
-void dgInverseDynamics::RemoveEffector(dgBilateralConstraint* const joint)
+void dgInverseDynamics::RemoveLoopJoint(dgBilateralConstraint* const joint)
 {
 	dgList<dgLoopingJoint>::dgListNode* const node = FindEffector(joint);
 	if (node) {
-		RemoveEffector(node);
+		RemoveLoopJoint(node);
 	}
 }
 

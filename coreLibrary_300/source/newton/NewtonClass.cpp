@@ -279,10 +279,10 @@ NewtonUserJointInverseDynamicsEffector::NewtonUserJointInverseDynamicsEffector(d
 	,m_invDynSolver(invDynSolver)
 	,m_invDynNode (invDynNode)
 {
-	m_invDynSolver->AddEffector (this, m_invDynNode);
+	m_invDynSolver->AddLoopJoint (this, m_invDynNode);
 }
 
 NewtonUserJointInverseDynamicsEffector::~NewtonUserJointInverseDynamicsEffector()
 {
-	m_invDynSolver->RemoveEffector (this);
+	m_invDynSolver->RemoveLoopJoint (this);
 }
