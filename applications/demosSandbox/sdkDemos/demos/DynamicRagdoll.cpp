@@ -176,8 +176,8 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 					dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(newtonJoint);
 					if (customJoint->IsType(dCustomRagdollMotor::GetType())) {
 						dCustomRagdollMotor* const ragDollMotor = (dCustomRagdollMotor*)customJoint;
-						ragDollMotor->SetMode(true);
 						void* const bone = controller->AddBone(ragDollMotor, node);
+						ragDollMotor->SetMode(true);
 						stackPool[stack] = bone;
 						stack ++;
 					}

@@ -398,8 +398,6 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 		glVertex3f (g_debugDisplayCallback[i+1].m_x, g_debugDisplayCallback[i+1].m_y, g_debugDisplayCallback[i+1].m_z);
 	}
 	glEnd();
-
-	NewtonWorldListenerDebug(world);
 }
 
 void DebugDrawPoint (const dVector& p, dFloat size)
@@ -461,7 +459,6 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 {
 	glDisable(GL_TEXTURE_2D);
 	glDisable (GL_LIGHTING);
-	glBegin(GL_LINES);
 
 	dJointDebugDisplay jointDebug;
 
@@ -472,5 +469,5 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 			customJoint->Debug(&jointDebug);
 		}
 	}
-	glEnd();
+	NewtonWorldListenerDebug(world, &jointDebug);
 }

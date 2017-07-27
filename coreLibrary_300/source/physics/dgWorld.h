@@ -174,7 +174,7 @@ class dgWorld
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
 	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listener);
-	typedef void (dgApi *OnListenerDebugCallback) (const dgWorld* const world, void* const listener);
+	typedef void (dgApi *OnListenerDebugCallback) (const dgWorld* const world, void* const listener, void* const debugContext);
 
 //	typedef void (dgApi *OnSerialize) (void* const userData, dgSerialize funt, void* const serilalizeObject);
 //	typedef void (dgApi *OnDeserialize) (void* const userData, dgDeserialize funt, void* const serilalizeObject);
@@ -287,7 +287,7 @@ class dgWorld
 
 	void SetFrictionThreshold (dgFloat32 acceletion);
 
-	void ListenersDebug();
+	void ListenersDebug(void* const debugContext);
 	void* GetListenerUserData (void* const listener) const;
 	void* FindListener (const char* const nameid) const;
 

@@ -1,4 +1,4 @@
-nodesCount: 7
+nodesCount: 2
 rootBone: Bip01_Pelvis
 
 node: Bip01_Pelvis
@@ -27,118 +27,7 @@ node: Bip01_L_Thigh
     shapeEulerAngle: 0.000000 90.000000 0.000000
 nodeEnd:
 
-node: Bip01_R_Thigh
-  mass: 14.000000
-  position: -10.020128 1.897650 -0.105090
-  eulerAngles: -129.999695 -0.004392 174.270477
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
-
-node: Bip01_R_Calf
-  mass: 10.000000
-  position: -10.050591 1.594229 -0.360967
-  eulerAngles: -129.433350 7.332437 -176.902954
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
-
-node: Bip01_R_Foot
-  mass: 3.000000
-  position: -10.001757 1.288960 -0.611751
-  eulerAngles: -129.858795 3.674889 178.665649
-  shapeType: convexHull
-    points: 25
-    convexHullPoint: -0.003232 -0.010903 -0.011682
-    convexHullPoint: 0.016709 -0.000000 -0.011682
-    convexHullPoint: 0.005028 -0.015420 -0.011682
-    convexHullPoint: 0.013288 -0.010903 -0.011682
-    convexHullPoint: -0.003232 0.010903 -0.011682
-    convexHullPoint: -0.006654 0.000000 -0.011682
-    convexHullPoint: 0.013288 0.010903 -0.011682
-    convexHullPoint: 0.005028 -0.000000 -0.016520
-    convexHullPoint: 0.005028 0.015420 -0.011682
-    convexHullPoint: -0.029280 -0.051203 0.091752
-    convexHullPoint: -0.035196 -0.051203 0.076171
-    convexHullPoint: -0.013619 -0.037752 0.021462
-    convexHullPoint: -0.023068 -0.028726 0.026363
-    convexHullPoint: -0.035196 0.052023 0.076171
-    convexHullPoint: -0.013619 0.038572 0.021462
-    convexHullPoint: -0.029377 0.052023 0.091752
-    convexHullPoint: -0.023068 0.029546 0.026363
-    convexHullPoint: 0.060606 -0.051491 0.056712
-    convexHullPoint: 0.116177 -0.051492 0.092188
-    convexHullPoint: 0.025222 -0.037752 0.021546
-    convexHullPoint: 0.117831 -0.051492 0.080844
-    convexHullPoint: 0.025222 0.038571 0.021546
-    convexHullPoint: 0.117831 0.052309 0.080844
-    convexHullPoint: 0.060606 0.052310 0.056712
-    convexHullPoint: 0.116177 0.052309 0.092188
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.000000
-    shapeEulerAngle: 0.000000 -0.000000 0.000000
-nodeEnd:
-
-node: Bip01_L_Calf
-  mass: 10.000000
-  position: -10.050538 1.594228 0.360978
-  eulerAngles: -50.567398 -7.341220 -176.902878
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
-
-node: Bip01_L_Foot
-  mass: 3.000000
-  position: -10.001664 1.288959 0.611752
-  eulerAngles: -50.141266 -3.683698 178.665649
-  shapeType: convexHull
-    points: 25
-    convexHullPoint: -0.003232 -0.010903 -0.011682
-    convexHullPoint: 0.016709 -0.000000 -0.011682
-    convexHullPoint: 0.005028 -0.015420 -0.011682
-    convexHullPoint: 0.013288 -0.010903 -0.011682
-    convexHullPoint: -0.003232 0.010903 -0.011682
-    convexHullPoint: -0.006654 0.000000 -0.011682
-    convexHullPoint: 0.013288 0.010903 -0.011682
-    convexHullPoint: 0.005028 -0.000000 -0.016520
-    convexHullPoint: 0.005028 0.015420 -0.011682
-    convexHullPoint: -0.029280 -0.051203 0.091752
-    convexHullPoint: -0.035196 -0.051203 0.076171
-    convexHullPoint: -0.013619 -0.037752 0.021462
-    convexHullPoint: -0.023068 -0.028726 0.026363
-    convexHullPoint: -0.035196 0.052023 0.076171
-    convexHullPoint: -0.013619 0.038572 0.021462
-    convexHullPoint: -0.029377 0.052023 0.091752
-    convexHullPoint: -0.023068 0.029546 0.026363
-    convexHullPoint: 0.060606 -0.051491 0.056712
-    convexHullPoint: 0.116177 -0.051492 0.092188
-    convexHullPoint: 0.025222 -0.037752 0.021546
-    convexHullPoint: 0.117831 -0.051492 0.080844
-    convexHullPoint: 0.025222 0.038571 0.021546
-    convexHullPoint: 0.117831 0.052309 0.080844
-    convexHullPoint: 0.060606 0.052310 0.056712
-    convexHullPoint: 0.116177 0.052309 0.092188
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.000000
-    shapeEulerAngle: 0.000000 -0.000000 0.000000
-nodeEnd:
-
-jointsCount: 6
+jointsCount: 1
 joint: dCustomRagdollMotor_3dof
   childBody: Bip01_L_Thigh
   parentBody: Bip01_Pelvis
@@ -149,59 +38,5 @@ joint: dCustomRagdollMotor_3dof
   minTwistAngle: -45.000000
   maxTwistAngle: 45.000000
   coneAngle: 119.999992
-jointEnd:
-
-joint: dCustomRagdollMotor_3dof
-  childBody: Bip01_R_Thigh
-  parentBody: Bip01_Pelvis
-  childPivot: 0.000000 0.000000 0.000000
-  childEulers: 0.000000 -90.000000 -0.000001
-  parentPivot: 0.000007 -0.105093 0.000000
-  parentEulers: 98.871910 49.659988 -83.210678
-  minTwistAngle: -45.000000
-  maxTwistAngle: 45.000000
-  coneAngle: 119.999992
-jointEnd:
-
-joint: dCustomRagdollMotor_1dof
-  childBody: Bip01_R_Calf
-  parentBody: Bip01_R_Thigh
-  childPivot: 0.000000 0.000000 0.000000
-  childEulers: 0.000000 -90.000000 180.000000
-  parentPivot: 0.000000 -0.000001 0.398078
-  parentEulers: -0.000026 -78.540810 180.000046
-  minTwistAngle: -5.000000
-  maxTwistAngle: 140.000000
-jointEnd:
-
-joint: dCustomRagdollMotor_2dof
-  childBody: Bip01_R_Foot
-  parentBody: Bip01_R_Calf
-  childPivot: 0.000000 0.000000 0.000000
-  childEulers: 0.000000 -90.000000 -0.000001
-  parentPivot: -0.000000 0.000000 0.398078
-  parentEulers: 0.000000 -84.270309 -0.000051
-  coneAngle: 45.000000
-jointEnd:
-
-joint: dCustomRagdollMotor_1dof
-  childBody: Bip01_L_Calf
-  parentBody: Bip01_L_Thigh
-  childPivot: 0.000000 0.000000 0.000000
-  childEulers: 0.000000 -90.000000 180.000000
-  parentPivot: 0.000000 -0.000001 0.398078
-  parentEulers: -0.000034 -78.540947 -180.000031
-  minTwistAngle: -5.000000
-  maxTwistAngle: 140.000000
-jointEnd:
-
-joint: dCustomRagdollMotor_2dof
-  childBody: Bip01_L_Foot
-  parentBody: Bip01_L_Calf
-  childPivot: 0.000000 0.000000 0.000000
-  childEulers: 0.000000 -90.000000 0.000000
-  parentPivot: 0.000000 0.000000 0.398078
-  parentEulers: -0.000017 -84.270622 0.000034
-  coneAngle: 45.000000
 jointEnd:
 

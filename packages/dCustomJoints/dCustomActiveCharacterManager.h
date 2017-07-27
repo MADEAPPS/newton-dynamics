@@ -136,8 +136,11 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
+	CUSTOM_JOINTS_API virtual void Debug (dCustomJoint::dDebugDisplay* const debugContext) const;
+
 	protected:
 	NewtonInverseDynamics* m_kinemativSolver;
+	dList<dCustomRagdollMotor_EndEffector*> m_effectorList;
 	friend class dCustomActiveCharacterManager;
 };
 
@@ -148,7 +151,7 @@ class dCustomActiveCharacterManager: public dCustomControllerManager<dCustomActi
 	CUSTOM_JOINTS_API dCustomActiveCharacterManager(NewtonWorld* const world, const char* const name = DYNAMIC_RAGDOLL_PLUGIN_NAME);
 	CUSTOM_JOINTS_API virtual ~dCustomActiveCharacterManager();
 
-	CUSTOM_JOINTS_API virtual void Debug () const;
+	CUSTOM_JOINTS_API virtual void Debug (dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController ();
 	

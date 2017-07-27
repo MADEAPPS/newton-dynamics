@@ -24,12 +24,20 @@ dCustomActiveCharacterManager::~dCustomActiveCharacterManager()
 {
 }
 
-
 dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransformController()
 {
 	dCustomActiveCharacterController* const controller = (dCustomActiveCharacterController*)CreateController();
 	return controller;
 }
+
+void dCustomActiveCharacterManager::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	for (dCustomActiveCharacterManager::dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		node->GetInfo().Debug(debugContext);
+	}
+}
+
+
 
 /*
 void dCustomActiveCharacterManager::OnUpdateTransform(const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
@@ -137,8 +145,8 @@ dCustomRagdollMotor_EndEffector* dCustomActiveCharacterController::AddEndEffecto
 	dAssert (m_kinemativSolver);
 
 	dMatrix matrix (dGetIdentityMatrix());
-	NewtonBody* const body = GetBody(node);
 	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinemativSolver, node, matrix);
+	m_effectorList.Append(effector);
 	return effector;
 }
 
@@ -152,8 +160,10 @@ void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadInde
 	}
 }
 
-void dCustomActiveCharacterManager::Debug() const
+void dCustomActiveCharacterController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-//	dAssert(0);
+	for (dList<dCustomRagdollMotor_EndEffector*>::dListNode* node = m_effectorList.GetFirst(); node; node = node->GetNext()) {
+		dCustomJoint* const joint = node->GetInfo();
+		joint->Debug(debugContext);
+	}
 }
-

@@ -1023,6 +1023,11 @@ dMatrix dCustomRagdollMotor_EndEffector::GetTargetMatrix() const
 	return dMatrix(m_targetRot, m_targetPosit);
 }
 
+void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dMatrix matrix (GetTargetMatrix());
+	debugDisplay->DrawFrame(this, matrix);
+}
 
 void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int threadIndex)
 {
@@ -1061,6 +1066,7 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	NewtonUserJointSetRowAcceleration(m_joint, relAccel.DotProduct3(matrix0.m_right));
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+return;
 
 	dQuaternion rotation;
 	NewtonBodyGetRotation(m_body0, &rotation.m_q0);

@@ -165,7 +165,8 @@ class dCustomControllerManager: public dList<CONTROLLER_BASE>
 	{
 	}
 
-    virtual void Debug () const;
+	public:
+    virtual void Debug (dCustomJoint::dDebugDisplay* const debugContext) const;
 	virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep);
 
@@ -173,8 +174,8 @@ class dCustomControllerManager: public dList<CONTROLLER_BASE>
 	private:
 	void DestroyAllController ();
 
-	static void Debug (const NewtonWorld* const world, void* const listenerUserData);
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
+	static void Debug (const NewtonWorld* const world, void* const listenerUserData, void* const debugContext);
 	static void PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
 	static void PostUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
 	static void OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
@@ -217,7 +218,7 @@ void dCustomControllerManager<CONTROLLER_BASE>::DestroyAllController ()
 }
 
 template<class CONTROLLER_BASE>
-void dCustomControllerManager<CONTROLLER_BASE>::Debug () const
+void dCustomControllerManager<CONTROLLER_BASE>::Debug (dCustomJoint::dDebugDisplay* const debugContext) const
 {
 }
 
@@ -258,10 +259,10 @@ void dCustomControllerManager<CONTROLLER_BASE>::PostUpdate (const NewtonWorld* c
 
 
 template<class CONTROLLER_BASE>
-void dCustomControllerManager<CONTROLLER_BASE>::Debug (const NewtonWorld* const world, void* const listenerUserData)
+void dCustomControllerManager<CONTROLLER_BASE>::Debug (const NewtonWorld* const world, void* const listenerUserData, void* const debugContext)
 {
 	dCustomControllerManager* const me = (dCustomControllerManager*) listenerUserData;
-	me->Debug();
+	me->Debug((dCustomJoint::dDebugDisplay*) debugContext);
 }
 
 template<class CONTROLLER_BASE>

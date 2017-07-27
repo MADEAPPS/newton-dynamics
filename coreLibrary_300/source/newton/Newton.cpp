@@ -1039,11 +1039,11 @@ void NewtonWorldListenerSetDebugCallback (const NewtonWorld* const newtonWorld, 
 	return world->SetListenerBodyDebugCallback (listener, (dgWorld::OnListenerDebugCallback) debugCallback);
 }
 
-void NewtonWorldListenerDebug(const NewtonWorld* const newtonWorld)
+void NewtonWorldListenerDebug(const NewtonWorld* const newtonWorld, void* const context)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->ListenersDebug();
+	return world->ListenersDebug(context);
 }
 
 /*!

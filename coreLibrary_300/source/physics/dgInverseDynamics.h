@@ -80,7 +80,7 @@ class dgInverseDynamics
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
 	
-	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
+	DG_INLINE void CalculateOpenLoopForce (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE dgInt32 GetJacobianDerivatives (dgBilateralConstraint* const constraint, dgContraintDescritor& constraintParams) const;
 	DG_INLINE void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 	DG_INLINE void GetRowJacobianDerivatives(dgInt32 index, const dgVector& invMass0, const dgVector& invMass1, const dgMatrix& invInertia0, const dgMatrix& invInertia1, const dgContraintDescritor& constraintParams, dgJacobianMatrixElement* const row) const;
@@ -95,8 +95,8 @@ class dgInverseDynamics
 	
 	dgInt32 GetJacobianDerivatives(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep, dgInt32 threadIndex) const;
 	
-	void CalculateExternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
-	void CalculateLoopAndExternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
+	void CalculateInternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
+	void CalculateCloseLoopsForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const;
 	void RemoveLoopJoint(dgList<dgLoopingJoint>::dgListNode* const node);
 	dgList<dgLoopingJoint>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;

@@ -651,12 +651,12 @@ dgWorld::OnListenerBodyDestroyCallback dgWorld::GetListenerBodyDestroyCallback (
 }
 
 
-void dgWorld::ListenersDebug()
+void dgWorld::ListenersDebug(void* const debugContext)
 {
 	for (dgListenerList::dgListNode* node = m_listeners.GetFirst(); node; node = node->GetNext()) {
 		dgListener& listener = node->GetInfo();
 		if (listener.m_onDebugCallback) {
-			listener.m_onDebugCallback (this, listener.m_userData);
+			listener.m_onDebugCallback (this, listener.m_userData, debugContext);
 		}
 	}
 }
