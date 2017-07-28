@@ -102,12 +102,6 @@ class dCustomArticulatedTransformController: public dCustomControllerBase
 
 	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}
-
-	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-	{
-		dAssert(0);
-	}
-
 	
 	protected:
 	CUSTOM_JOINTS_API void Init (void* const userData);
