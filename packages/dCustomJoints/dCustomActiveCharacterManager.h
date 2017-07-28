@@ -27,6 +27,15 @@ class dCustomRagdollMotor;
 class dCustomActiveCharacterController: public dCustomControllerBase
 {
 	public:
+
+	class dPoseController: public dList<dCustomRagdollMotor_EndEffector*>
+	{
+		public:
+		dPoseController() {}
+		virtual ~dPoseController() {}
+		virtual bool Update(dCustomActiveCharacterController* const controller, dFloat timestep) = 0;
+	};
+
 /*
 	class dSelfCollisionBitmask
 	{

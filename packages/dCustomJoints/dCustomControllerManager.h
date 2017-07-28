@@ -278,17 +278,7 @@ void dCustomControllerManager<CONTROLLER_BASE>::OnBodyDestroy (const NewtonWorld
 {
 	dCustomControllerManager* const me = (dCustomControllerManager*) NewtonWorldGetListenerUserData(world, listener);
 	me->OnDestroyBody(body);
-/*
-	for (typename dList<CONTROLLER_BASE>::dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-		CONTROLLER_BASE& controller = node->GetInfo();
-		if (controller.GetBody() == body) {
-			me->DestroyController (&controller);
-		}
-	}
-*/
 }
-
-
 
 template<class CONTROLLER_BASE>
 void dCustomControllerManager<CONTROLLER_BASE>::PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
