@@ -78,10 +78,10 @@ class dCustomJoint: public dCustomAlloc
 		dDebugDisplay () {}
 		virtual ~dDebugDisplay () {}
 
-		virtual void SetColor(const dCustomJoint* const joint, const dVector& color) = 0;
-		virtual void DrawLine(const dCustomJoint* const joint, const dVector& p0, const dVector& p1) = 0;
+		virtual void SetColor(const dVector& color) = 0;
+		virtual void DrawLine(const dVector& p0, const dVector& p1) = 0;
 
-		CUSTOM_JOINTS_API void DrawFrame(const dCustomJoint* const joint, const dMatrix& matrix);
+		CUSTOM_JOINTS_API void DrawFrame(const dMatrix& matrix);
 	};
 
 

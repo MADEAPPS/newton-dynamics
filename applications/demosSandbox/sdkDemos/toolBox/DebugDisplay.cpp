@@ -35,12 +35,12 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 		glEnd();;
 	}
 
-	void SetColor(const dCustomJoint* const joint, const dVector& color)
+	void SetColor(const dVector& color)
 	{
 		glColor3f(color.m_x, color.m_y, color.m_z);
 	}
 
-	void DrawLine(const dCustomJoint* const joint, const dVector& p0, const dVector& p1)
+	void DrawLine(const dVector& p0, const dVector& p1)
 	{
 		glVertex3f(p0.m_x, p0.m_y, p0.m_z);
 		glVertex3f(p1.m_x, p1.m_y, p1.m_z);

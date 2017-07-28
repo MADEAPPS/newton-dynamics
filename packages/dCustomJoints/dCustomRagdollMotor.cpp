@@ -510,16 +510,16 @@ void dCustomRagdollMotor_1dof::Debug(dDebugDisplay* const debugDisplay) const
 	dFloat angle0 = m_minTwistAngle;
 
 	dVector arch[subdiv + 1];
-	debugDisplay->SetColor(this, dVector (1.0f, 1.0f, 0.0f, 0.0f));
+	debugDisplay->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
 		dVector p (matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point)));
 		arch[i] = p;
-		debugDisplay->DrawLine(this, matrix1.m_posit, p);
+		debugDisplay->DrawLine(matrix1.m_posit, p);
 		angle0 += angleStep;
 	}
 
 	for (int i = 0; i < subdiv; i++) {
-		debugDisplay->DrawLine(this, arch[i], arch[i + 1]);
+		debugDisplay->DrawLine(arch[i], arch[i + 1]);
 	}
 }
 
@@ -643,16 +643,16 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	dFloat angle0 = 0.0f;
 
 	dVector arch[subdiv + 1];
-	debugDisplay->SetColor(this, dVector(1.0f, 1.0f, 0.0f, 0.0f));
+	debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
 		dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
 		arch[i] = p;
-		debugDisplay->DrawLine(this, matrix1.m_posit, p);
+		debugDisplay->DrawLine(matrix1.m_posit, p);
 		angle0 += angleStep;
 	}
 
 	for (int i = 0; i < subdiv; i++) {
-		debugDisplay->DrawLine(this, arch[i], arch[i + 1]);
+		debugDisplay->DrawLine(arch[i], arch[i + 1]);
 	}
 }
 
@@ -812,16 +812,16 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 	dFloat angle0 = 0.0f;
 
 	dVector arch[subdiv + 1];
-	debugDisplay->SetColor(this, dVector(1.0f, 1.0f, 0.0f, 0.0f));
+	debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
 		dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
 		arch[i] = p;
-		debugDisplay->DrawLine(this, matrix1.m_posit, p);
+		debugDisplay->DrawLine(matrix1.m_posit, p);
 		angle0 += angleStep;
 	}
 
 	for (int i = 0; i < subdiv; i++) {
-		debugDisplay->DrawLine(this, arch[i], arch[i + 1]);
+		debugDisplay->DrawLine(arch[i], arch[i + 1]);
 	}
 
 	// select an axis for the twist. 
@@ -839,8 +839,8 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 		matrix1.m_posit = posit;
 	}
 	
-	debugDisplay->SetColor(this, dVector(1.0f, 0.0f, 1.0f, 0.0f));
-	debugDisplay->DrawLine(this, matrix0.m_posit, matrix0.m_posit - matrix0.m_up.Scale (radius * 1.25f));
+	debugDisplay->SetColor(dVector(1.0f, 0.0f, 1.0f, 0.0f));
+	debugDisplay->DrawLine(matrix0.m_posit, matrix0.m_posit - matrix0.m_up.Scale (radius * 1.25f));
 
 	matrix1 = dRollMatrix(-90.0f * 3.141592f / 180.0f) * matrix1;
 	const int subdiv1 = 12;
@@ -849,16 +849,16 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 	angle0 = m_minTwistAngle;
 
 	dVector arch1[subdiv + 1];
-	debugDisplay->SetColor(this, dVector(0.0f, 1.0f, 1.0f, 0.0f));
+	debugDisplay->SetColor(dVector(0.0f, 1.0f, 1.0f, 0.0f));
 	for (int i = 0; i <= subdiv1; i++) {
 		dVector p(matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point)));
 		arch[i] = p;
-		debugDisplay->DrawLine(this, matrix1.m_posit, p);
+		debugDisplay->DrawLine(matrix1.m_posit, p);
 		angle0 += angleStep;
 	}
 
 	for (int i = 0; i < subdiv1; i++) {
-		debugDisplay->DrawLine(this, arch[i], arch[i + 1]);
+		debugDisplay->DrawLine(arch[i], arch[i + 1]);
 	}
 }
 
@@ -1026,7 +1026,7 @@ dMatrix dCustomRagdollMotor_EndEffector::GetTargetMatrix() const
 void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) const
 {
 	dMatrix matrix (GetTargetMatrix());
-	debugDisplay->DrawFrame(this, matrix);
+	debugDisplay->DrawFrame(matrix);
 }
 
 void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int threadIndex)

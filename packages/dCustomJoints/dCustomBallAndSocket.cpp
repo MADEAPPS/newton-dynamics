@@ -173,8 +173,8 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	debugDisplay->DrawFrame(this, matrix0);
-	debugDisplay->DrawFrame(this, matrix1);
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
 }
 
 void dCustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)

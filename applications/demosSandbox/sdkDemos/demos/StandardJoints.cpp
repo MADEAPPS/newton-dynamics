@@ -559,8 +559,8 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 					p1 = frame->TransformVector (p1);
 				}
 				dVector color (r,g,b,1.0f);
-				debugDisplay->SetColor(0, color);
-				debugDisplay->DrawLine (0, p0, p1);
+				debugDisplay->SetColor(color);
+				debugDisplay->DrawLine (p0, p1);
 			}
 
 			static void Vector (dDebugDisplay* const debugDisplay, dVector o, dVector v, float r, float g, float b, dMatrix *frame = 0)
@@ -612,9 +612,11 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		{
 			float t = float(i) / float(subdiv);
 			dVector c = Vis::ToCartesian (dVector (radius, M_PI * 2.0f * t, yAngle));
-			dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
+			dVector nt = ortho.TransformVector (c); 
+			Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
 			c[1] *= -1;
-			dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
+			dVector nb = ortho.TransformVector (c); 
+			Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
 		}
 
 		ot = matrix1[3];
