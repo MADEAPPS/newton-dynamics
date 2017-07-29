@@ -1148,6 +1148,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 
 				dgUnsigned32 key = (group1_ID << 16) + group0_ID;
 				const dgBodyMaterialList* const materialList = m_world;  
+				dgAssert (materialList->Find (key));
 				const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
 				if (material->m_flags & dgContactMaterial::m_collisionEnable) {

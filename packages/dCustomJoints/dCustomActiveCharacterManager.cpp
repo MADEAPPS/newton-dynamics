@@ -97,11 +97,11 @@ NewtonBody* dCustomActiveCharacterController::GetBody(void* const node) const
 	return m_kinemativSolver ? NewtonInverseDynamicsGetBody (m_kinemativSolver, node) : NULL;
 }
 
-dCustomRagdollMotor* const dCustomActiveCharacterController::GetJoint(void* const node) const
+dCustomJoint* const dCustomActiveCharacterController::GetJoint(void* const node) const
 {
 	NewtonJoint* const joint = m_kinemativSolver ? NewtonInverseDynamicsGetJoint (m_kinemativSolver, node) : NULL;
-	dAssert(!joint || ((dCustomRagdollMotor*)NewtonJointGetUserData(joint))->IsType(dCustomRagdollMotor::GetType()));
-	return joint ? (dCustomRagdollMotor*) NewtonJointGetUserData(joint) : NULL;
+	//dAssert(!joint || ((dCustomRagdollMotor*)NewtonJointGetUserData(joint))->IsType(dCustomRagdollMotor::GetType()));
+	return joint ? (dCustomJoint*) NewtonJointGetUserData(joint) : NULL;
 }
 
 void* dCustomActiveCharacterController::AddRoot(NewtonBody* const rootBody)
@@ -132,12 +132,10 @@ void dCustomActiveCharacterController::Finalize ()
 	}
 }
 
-dCustomRagdollMotor_EndEffector* dCustomActiveCharacterController::AddEndEffector(void* const node)
+dCustomRagdollMotor_EndEffector* dCustomActiveCharacterController::AddEndEffector(void* const node, const dMatrix& pinAndPivot)
 {
 	dAssert (m_kinemativSolver);
-
-	dMatrix matrix (dGetIdentityMatrix());
-	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinemativSolver, node, matrix);
+	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinemativSolver, node, pinAndPivot);
 	m_effectorList.Append(effector);
 	return effector;
 }

@@ -34,10 +34,8 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
 		//NewtonMaterialSetCallbackUserData (scene->GetNewton(), m_material, m_material, this);
 		//NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
-
 		scene->Set2DDisplayRenderFunction (Debug, this);
 	}
-
 
 	static void Debug (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
@@ -84,8 +82,9 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 	class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
 	{
 		public:
-		MySaveLoad(NewtonWorld* const world)
+		MySaveLoad(NewtonWorld* const world, int material)
 			:dCustomRagdollMotor::dSaveLoad(world)
+			,m_material(material)
 		{
 		}
 
@@ -114,7 +113,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 			NewtonBodySetUserData(body, entity);
 
 			// assign the wood id
-			//NewtonBodySetMaterialGroupID(rigidBody, materialId);
+			NewtonBodySetMaterialGroupID(body, m_material);
 
 			//set continuous collision mode
 			//NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
@@ -128,6 +127,8 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 			// set the force and torque call back function
 			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 		}
+
+		int m_material;
 	};
 	
 
@@ -136,7 +137,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-		MySaveLoad saveLoad(GetWorld());
+		MySaveLoad saveLoad(GetWorld(), m_material);
 		NewtonBody* const rootBone = saveLoad.Load (fileName);
 		return rootBone;
 	}
@@ -155,22 +156,71 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		bodyMatrix.m_posit.m_w = 1.0f;
 		NewtonBodySetMatrixRecursive (root, &bodyMatrix[0][0]);
 
-		void* const rootNode = controller->AddRoot(root);
+dCustomHinge* xxx = new dCustomHinge(bodyMatrix, root);
+xxx->SetFriction (20000.0f);
+xxx->SetLimits(0.0f, 0.0f);
 
-		// add an end effector to the root node.
-		dCustomRagdollMotor_EndEffector* const rootEffector = controller->AddEndEffector(rootNode);
+		void* const rootNode = controller->AddRoot(root);
 
 		int stack = 1;
 		void* stackPool[128];
 		stackPool[0] = rootNode;
 
+		dString pevisEffector ("Bip01_Pelvis"); 
+		dString leftFootEffector ("Bip01_L_Foot");
+		dString rightFootEffector ("Bip01_R_Foot");
+
 		dTree<int, NewtonJoint*> filter; 
 		while (stack) {
 			stack --;
 			void* const node = stackPool[stack];
-			NewtonBody* const rootBody = controller->GetBody(node);
+			NewtonBody* const body = controller->GetBody(node);
+			DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
 
-			for (NewtonJoint* newtonJoint = NewtonBodyGetFirstJoint(rootBody); newtonJoint; newtonJoint = NewtonBodyGetNextJoint(rootBody, newtonJoint)) {
+
+			// add the end effectors.
+			if (entity->GetName() == pevisEffector) {
+				// root effect has it pivot at the center of mass 
+				dVector com;
+				dMatrix matrix;
+				NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+				NewtonBodyGetCentreOfMass(body, &com[0]);
+				matrix.m_posit = matrix.TransformVector(com);
+				controller->AddEndEffector(node, matrix);
+
+			} else if (entity->GetName() == leftFootEffector) {
+
+				// all other effector are centered and oriented a the joint pivot 
+				dMatrix matrix;
+				NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+				dCustomJoint* const joint = controller->GetJoint(node);
+				dAssert (joint->GetBody0() == body);
+				matrix = joint->GetMatrix0() * matrix;
+				dCustomRagdollMotor_EndEffector* const effector = controller->AddEndEffector(node, matrix);
+				matrix.m_posit.m_z -= 0.4f;
+				matrix.m_posit.m_x -= 0.2f;
+				matrix.m_posit.m_y += 0.1f;
+				effector->SetTargetMatrix(matrix);
+
+			} else if (entity->GetName() == rightFootEffector) {
+				// all other effector are centered and oriented a the joint pivot 
+				dMatrix matrix;
+				NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+				dCustomJoint* const joint = controller->GetJoint(node);
+				dAssert(joint->GetBody0() == body);
+				matrix = joint->GetMatrix0() * matrix;
+				dCustomRagdollMotor_EndEffector* const effector = controller->AddEndEffector(node, matrix);
+				matrix.m_posit.m_z += 0.4f;
+				matrix.m_posit.m_x += 0.2f;
+				matrix.m_posit.m_y += 0.1f;
+				effector->SetTargetMatrix(matrix);
+			}
+
+
+			for (NewtonJoint* newtonJoint = NewtonBodyGetFirstJoint(body); newtonJoint; newtonJoint = NewtonBodyGetNextJoint(body, newtonJoint)) {
 				if (!filter.Find(newtonJoint)) {
 					filter.Insert(newtonJoint);
 					dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(newtonJoint);

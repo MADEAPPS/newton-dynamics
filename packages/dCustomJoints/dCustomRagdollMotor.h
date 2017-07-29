@@ -173,7 +173,6 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
-	dVector m_localHandle;
 	dVector m_targetPosit;
 	dQuaternion m_targetRot;
 	dFloat m_maxLinearFriction;

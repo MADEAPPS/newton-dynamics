@@ -369,7 +369,6 @@ void dCustomRagdollMotor::dSaveLoad::ParseJoint(FILE* const file, const dTree<Ne
 		dAssert (0);
 		new dCustomRagdollMotor (parentPinAndPivotInGlobalSpace, child, parent);
 	}
-
 }
 
 void dCustomRagdollMotor::dSaveLoad::GetBodyList (dList<BodyJointPair>& list, NewtonBody* const rootBody)
@@ -404,7 +403,7 @@ void dCustomRagdollMotor::dSaveLoad::GetBodyList (dList<BodyJointPair>& list, Ne
 
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
-	,m_torque(1000.0f)
+	,m_torque(1.0f)
 	,m_motorMode(0)
 {
 }
@@ -951,19 +950,15 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 }
 
 
-
-
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint (invDynSolver, invDynNode)
-	,m_localHandle(0.0f)
 	,m_targetPosit(0.0f)
 	,m_targetRot()
-	,m_maxLinearFriction(1000.0f)
+	,m_maxLinearFriction(10000.0f)
 	,m_maxAngularFriction(1000.0f)
 {
-	dMatrix matrix;
-	NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
-	SetTargetMatrix(matrix);
+	CalculateLocalMatrix(attachmentPointInGlobalSpace, m_localMatrix0, m_localMatrix1);
+	SetTargetMatrix(attachmentPointInGlobalSpace);
 }
 
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
@@ -975,7 +970,6 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* con
 dCustomRagdollMotor_EndEffector::~dCustomRagdollMotor_EndEffector()
 {
 }
-
 
 void dCustomRagdollMotor_EndEffector::SetMaxLinearFriction(dFloat accel)
 {
@@ -1032,40 +1026,43 @@ void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) c
 void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
-	dVector v(0.0f);
-	dVector w(0.0f);
-	dVector cg(0.0f);
+	dMatrix matrix1;
+	dVector veloc(0.0f);
+	dVector omega(0.0f);
+	dVector com(0.0f);
+	dVector pointVeloc(0.0f);
 
 	dFloat invTimestep = 1.0f / timestep;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	NewtonBodyGetOmega(m_body0, &w[0]);
-	NewtonBodyGetVelocity(m_body0, &v[0]);
-	NewtonBodyGetCentreOfMass(m_body0, &cg[0]);
-	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-
-	dVector p0(matrix0.TransformVector(m_localHandle));
-
-	dVector pointVeloc(v + w.CrossProduct(matrix0.RotateVector(m_localHandle - cg)));
-	dVector relPosit(m_targetPosit - p0);
+	CalculateGlobalMatrix(matrix0, matrix1);
+	NewtonBodyGetOmega(m_body0, &omega[0]);
+	NewtonBodyGetVelocity(m_body0, &veloc[0]);
+//	NewtonBodyGetCentreOfMass(m_body0, &com[0]);
+//	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
+//	dVector pointVeloc(veloc + omega.CrossProduct(matrix0.RotateVector(m_localHandle - com)));
+	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &pointVeloc[0]);
+	
+	dVector relPosit(m_targetPosit - matrix0.m_posit);
 	dVector relVeloc(relPosit.Scale(invTimestep) - pointVeloc);
 	dVector relAccel(relVeloc.Scale(invTimestep * 0.3f));
 
 	// Restrict the movement on the pivot point along all tree orthonormal direction
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &m_targetPosit[0], &matrix0.m_front[0]);
-	NewtonUserJointSetRowAcceleration(m_joint, relAccel.DotProduct3(matrix0.m_front));
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &m_targetPosit[0], &matrix0.m_front[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, -relAccel.DotProduct3(matrix0.m_front));
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &m_targetPosit[0], &matrix0.m_up[0]);
-	NewtonUserJointSetRowAcceleration(m_joint, relAccel.DotProduct3(matrix0.m_up));
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &m_targetPosit[0], &matrix0.m_up[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, -relAccel.DotProduct3(matrix0.m_up));
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &m_targetPosit[0], &matrix0.m_right[0]);
-	NewtonUserJointSetRowAcceleration(m_joint, relAccel.DotProduct3(matrix0.m_right));
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &m_targetPosit[0], &matrix0.m_right[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, -relAccel.DotProduct3(matrix0.m_right));
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+
 return;
 
 	dQuaternion rotation;
@@ -1077,7 +1074,7 @@ return;
 		rotation.m_q3 *= -1.0f;
 	}
 
-	dVector relOmega(rotation.CalcAverageOmega(m_targetRot, invTimestep) - w);
+	dVector relOmega(rotation.CalcAverageOmega(m_targetRot, invTimestep) - omega);
 	dFloat mag = relOmega.DotProduct3(relOmega);
 	if (mag > 1.0e-6f) {
 		dVector pin(relOmega.Scale(1.0f / mag));
@@ -1102,7 +1099,7 @@ return;
 
 	} else {
 
-		dVector relAlpha(w.Scale(-invTimestep));
+		dVector relAlpha(omega.Scale(-invTimestep));
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, relAlpha.DotProduct3(matrix0.m_front));
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
@@ -1118,4 +1115,5 @@ return;
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
 	}
+
 }

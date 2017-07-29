@@ -404,7 +404,7 @@ dgInverseDynamics::dgInverseDynamics(dgWorld* const world)
 dgInverseDynamics::~dgInverseDynamics()
 {
 	dgList<dgLoopingJoint>::dgListNode* ptr1 = NULL;
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr1) {
 		ptr1 = ptr->GetNext();
 		RemoveLoopJoint(ptr);
 	}
