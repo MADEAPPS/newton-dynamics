@@ -200,7 +200,9 @@ void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 		dCustomJoint* const joint = (dCustomJoint*) NewtonJointGetUserData (me);  
 
 		// call the constraint call back
-		joint->SubmitConstraints(timestep, threadIndex);
+		if (joint) {
+			joint->SubmitConstraints(timestep, threadIndex);
+		}
 	}
 }
 

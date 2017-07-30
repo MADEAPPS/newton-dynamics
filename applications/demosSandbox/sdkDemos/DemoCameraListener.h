@@ -69,6 +69,7 @@ class DemoCameraListener: public DemoListenerBase
 	dVector m_pickedBodyLocalAtachmentPoint;
 	dVector m_pickedBodyLocalAtachmentNormal;
 	NewtonBody* m_targetPicked;
+	dCustomKinematicController* m_pickJoint;
 	NewtonBodyDestructor m_bodyDestructor;
 	friend class DemoCamera;
 };

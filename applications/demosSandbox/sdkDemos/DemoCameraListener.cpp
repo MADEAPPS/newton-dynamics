@@ -25,6 +25,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+//#define USE_PICK_BODY_BY_FORCE
+
 
 #define D_CAMERA_LISTENER_NAMNE "cameraListener"
 
@@ -46,6 +48,7 @@ DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 	,m_pickedBodyLocalAtachmentPoint(0.0f)
 	,m_pickedBodyLocalAtachmentNormal(0.0f)
 	,m_targetPicked(NULL)
+	,m_pickJoint(NULL)
 	,m_bodyDestructor(NULL)
 {
 }
@@ -169,27 +172,6 @@ void DemoCameraListener::OnBodyDestroy (NewtonBody* const body)
 	m_bodyDestructor = NULL;
 }
 
-/*
-void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
-{
-	NewtonWorld* const world =  NewtonBodyGetWorld(body);
-	dAssert (world);
-
-	void* const preListenerHandle = NewtonWorldGetPreListener (world, D_CAMERA_LISTENER_NAMNE);
-	dAssert (preListenerHandle);
-
-	DemoCameraListener* const camManager = (DemoCameraListener*) NewtonWorldGetListenerUserData (world, preListenerHandle);
-	dAssert (camManager);
-
-	if (camManager->m_bodyDestructor) {
-		camManager->m_bodyDestructor (body);
-	}
-
-	// the body was destroyed, set the pointer and call back to NULL
-	camManager->m_targetPicked = NULL;
-	camManager->m_bodyDestructor = NULL;
-}
-*/
 
 void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
 {
@@ -207,22 +189,26 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 			dFloat y = dFloat (m_mousePosY);
 			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
-			NewtonBody* const body = MousePickByForce (scene->GetNewton(), p0, p1, param, posit, normal);
+			NewtonBody* const body = MousePickBody (scene->GetNewton(), p0, p1, param, posit, normal);
 			if (body) {
-				m_targetPicked = body;
 				dMatrix matrix;
+				m_targetPicked = body;
 				NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
 
-				// save point local to the body matrix
 				m_pickedBodyParam = param;
+				#ifdef USE_PICK_BODY_BY_FORCE
+				// save point local to the body matrix
 				m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
 
 				// convert normal to local space
 				m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
-
-				// link the a destructor callback
-				//m_bodyDestructor = NewtonBodyGetDestructorCallback(m_targetPicked);
-				//NewtonBodySetDestructorCallback(m_targetPicked, OnPickedBodyDestroyedNotify);
+				#else
+					if(m_pickJoint) {
+						delete m_pickJoint;
+					}
+					m_pickJoint = new dCustomKinematicController (body, posit);
+					m_pickJoint->SetMaxLinearFriction(1000.0f);
+				#endif
 			}
 		}
 
@@ -234,17 +220,24 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 
+			#ifdef USE_PICK_BODY_BY_FORCE
 			dMatrix matrix;
 			NewtonBodyGetMatrix (m_targetPicked, &matrix[0][0]);
 			dVector point (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
 			CalculatePickForceAndTorque (m_targetPicked, point, m_pickedBodyTargetPosition, timestep);
+			#else 
+				dAssert (m_pickJoint);
+				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+			#endif
 		} else {
 			if (m_targetPicked) {
 				NewtonBodySetSleepState (m_targetPicked, 0);
 			}
+			if (m_pickJoint) {
+				delete m_pickJoint;
+			}
 
-			// unchain the callbacks
-			//NewtonBodySetDestructorCallback(m_targetPicked, m_bodyDestructor);
+			m_pickJoint = NULL;
 			m_targetPicked = NULL; 
 			m_bodyDestructor = NULL;
 		}

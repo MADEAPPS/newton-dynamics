@@ -116,6 +116,17 @@ dMatrix dCustomKinematicController::GetTargetMatrix () const
 }
 
 
+void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	matrix1 = dMatrix (m_targetRot, m_targetPosit);
+
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
+}
+
 void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	// check if this is an impulsive time step
@@ -143,54 +154,47 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 
 	dVector relPosit (m_targetPosit - matrix0.m_posit);
 	dFloat mag2 = relPosit.DotProduct3(relPosit);
-	if (mag2 > 1.0e-6f) {
-		NewtonBodyGetPointVelocity(m_body0, &m_targetPosit[0], &pointVeloc[0]);
+	if (mag2 > 1.0e-4f) {
 		dMatrix dirMatrix (dGrammSchmidt(relPosit));
-		pointVeloc = dirMatrix.UnrotateVector (pointVeloc);
+
+		NewtonBodyGetPointVelocity(m_body0, &m_targetPosit[0], &pointVeloc[0]);
 		
-		dVector relVeloc(relPosit.Scale(invTimestep) - pointVeloc);
-		dVector relAccel(relVeloc.Scale(invTimestep * 0.3f));
+		dFloat speed = pointVeloc.DotProduct3(dirMatrix.m_front);
+		dFloat dist = relPosit.DotProduct3(dirMatrix.m_front) * 0.3f;
+		
+		dFloat relSpeed = dist * invTimestep - speed;
+		dFloat relAccel = relSpeed * invTimestep;
 
 		// Restrict the movement on the pivot point along all tree orthonormal direction
 		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_front[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, relAccel.DotProduct3(dirMatrix.m_front));
+		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
-		//NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_up[0]);
-		//NewtonUserJointSetRowAcceleration(m_joint, relAccel.DotProduct3(dirMatrix.m_up));
-		//NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-		//NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_up[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
-		//NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_right[0]);
-		//NewtonUserJointSetRowAcceleration(m_joint, relAccel.DotProduct3(dirMatrix.m_right));
-		//NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-		//NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_right[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
 	} else {
-		dAssert (0);
-/*
-		dVector relVeloc (relPosit.Scale (invTimestep) - pointVeloc);
-		dVector relAccel (relVeloc.Scale (invTimestep * 0.3f)); 
-			
 		// Restrict the movement on the pivot point along all tree orthonormal direction
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &m_targetPosit[0], &matrix0.m_front[0]);
-		NewtonUserJointSetRowAcceleration (m_joint, relAccel.DotProduct3(matrix0.m_front));
+		NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &m_targetPosit[0], &matrix0.m_front[0]);
 		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxLinearFriction);
 
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &m_targetPosit[0], &matrix0.m_up[0]);
-		NewtonUserJointSetRowAcceleration (m_joint, relAccel.DotProduct3(matrix0.m_up));
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &m_targetPosit[0], &matrix0.m_up[0]);
 		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxLinearFriction);
 
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &m_targetPosit[0], &matrix0.m_right[0]);
-		NewtonUserJointSetRowAcceleration (m_joint, relAccel.DotProduct3(matrix0.m_right));
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &m_targetPosit[0], &matrix0.m_right[0]);
 		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxLinearFriction);
-*/
 	}
 
+/*
 	if (m_pickMode) {
 		dQuaternion rotation;
 
@@ -263,6 +267,7 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction * 0.025f);
 		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction * 0.025f);
 	}
+*/
 }
 
 

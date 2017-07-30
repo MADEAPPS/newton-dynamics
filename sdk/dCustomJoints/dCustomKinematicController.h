@@ -43,9 +43,10 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const {dAssert (0);} 
 
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
 	void Init (NewtonBody* const body, const dMatrix& matrix);
 
-//	dVector m_localHandle;
 	dVector m_targetPosit;
 	dQuaternion m_targetRot;
 	int m_pickMode;
