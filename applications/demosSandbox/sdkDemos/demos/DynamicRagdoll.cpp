@@ -200,6 +200,7 @@ xxx->SetLimits(0.0f, 0.0f);
 				matrix = joint->GetMatrix0() * matrix;
 				dCustomRagdollMotor_EndEffector* const effector = controller->AddEndEffector(node, matrix);
 
+dCustomKinematicController* xxx = new dCustomKinematicController (body, matrix.m_posit);
 				matrix.m_posit.m_z -= 0.4f;
 				//matrix.m_posit.m_x -= 0.2f;
 				//matrix.m_posit.m_y += 0.1f;
