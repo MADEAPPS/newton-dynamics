@@ -233,7 +233,7 @@ xxx->SetMaxLinearFriction (1000.0f);
 					if (customJoint->IsType(dCustomRagdollMotor::GetType())) {
 						dCustomRagdollMotor* const ragDollMotor = (dCustomRagdollMotor*)customJoint;
 						void* const bone = controller->AddBone(ragDollMotor, node);
-//						ragDollMotor->SetMode(true);
+			ragDollMotor->SetMode(true);
 						stackPool[stack] = bone;
 						stack ++;
 					}
@@ -288,9 +288,9 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 */
 
-	origin.m_x = -8.0f;
+	origin.m_x = -5.0f;
 //	origin.m_x -= 2.0f;
-	origin.m_y  = 1.5f;
+	origin.m_y  = 0.5f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }

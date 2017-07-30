@@ -481,8 +481,8 @@ void dCustomRagdollMotor_1dof::Serialize(NewtonSerializeCallback callback, void*
 
 void dCustomRagdollMotor_1dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
-	m_minTwistAngle = dMax(-dAbs(minAngle), -170.0f * 3.141582f / 180.0f);
-	m_maxTwistAngle = dMin( dAbs(maxAngle),  170.0f * 3.141582f / 180.0f);
+	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-170.0f * 3.141582f / 180.0f));
+	m_maxTwistAngle = dMin( dAbs(maxAngle), dFloat( 170.0f * 3.141582f / 180.0f));
 }
 
 void dCustomRagdollMotor_1dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
@@ -574,7 +574,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	// do a regular cone constraint from that
 	dVector planeDir (matrix1.RotateVector(cone));
 	dVector swingAxis (planeDir.CrossProduct(matrix1.m_up));
-	float swingAngle = CalculateAngle (matrix0.m_front, planeDir, swingAxis);
+	dFloat swingAngle = CalculateAngle (matrix0.m_front, planeDir, swingAxis);
 	NewtonUserJointAddAngularRow(m_joint, swingAngle, &swingAxis[0]);
 
 	swingAngle = -CalculateAngle (planeDir, matrix1.m_front, matrix1.m_up);
@@ -617,7 +617,7 @@ void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void*
 
 void dCustomRagdollMotor_2dof::SetConeAngle(dFloat angle)
 {
-	m_coneAngle = dMin(dAbs(angle), 150.0f * 3.141582f / 180.0f);
+	m_coneAngle = dMin(dAbs(angle), dFloat(150.0f * 3.141582f / 180.0f));
 }
 
 dFloat dCustomRagdollMotor_2dof::GetConeAngle() const
@@ -695,7 +695,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
 	}
 
-	dFloat coneAngle = dAcos(dClamp (dot, -1.0f, 1.0f));
+	dFloat coneAngle = dAcos(dClamp (dot, dFloat(-1.0f), dFloat(1.0f)));
 	dFloat angle = coneAngle - m_coneAngle;
 	if (angle > 0.0f) {
 		dVector swingAxis (coneDir0.CrossProduct(coneDir1));
@@ -774,8 +774,8 @@ void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void*
 
 void dCustomRagdollMotor_3dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
-	m_minTwistAngle = dMax(-dAbs(minAngle), -60.0f * 3.141582f / 180.0f);
-	m_maxTwistAngle = dMin( dAbs(maxAngle),  60.0f * 3.141582f / 180.0f);
+	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-60.0f * 3.141582f / 180.0f));
+	m_maxTwistAngle = dMin( dAbs(maxAngle), dFloat( 60.0f * 3.141582f / 180.0f));
 }
 
 void dCustomRagdollMotor_3dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
@@ -786,7 +786,7 @@ void dCustomRagdollMotor_3dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle)
 
 void dCustomRagdollMotor_3dof::SetConeAngle(dFloat angle)
 {
-	m_coneAngle = dMin(dAbs(angle), 150.0f * 3.141582f / 180.0f);
+	m_coneAngle = dMin(dAbs(angle), dFloat(150.0f * 3.141582f / 180.0f));
 }
 
 dFloat dCustomRagdollMotor_3dof::GetConeAngle() const
@@ -831,7 +831,7 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 	if (dot < 0.999f) {
 		dVector pin (coneDir1.CrossProduct(coneDir0));
 		dVector axis = pin.Scale (1.0f / dSqrt (pin.DotProduct3(pin)));
-		dFloat angle = dAcos(dClamp(dot, -1.0f, 1.0f));
+		dFloat angle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
 		dQuaternion rot (axis, angle);
 		dVector posit (matrix1.m_posit);
 		matrix1 = matrix1 * dMatrix (rot, dVector(0.0f, 0.0f, 0.0f, 1.0f));
@@ -874,7 +874,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 	const dVector& coneDir1 = matrix1.m_front;
 	dFloat dot = coneDir0.DotProduct3(coneDir1);
 
-	dFloat coneAngle = dAcos(dClamp(dot, -1.0f, 1.0f));
+	dFloat coneAngle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
 	dFloat angle = coneAngle - m_coneAngle;
 	if (angle > 0.0f) {
 		dVector swingAxis(coneDir0.CrossProduct(coneDir1));
@@ -926,7 +926,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 	if (dot < 0.999f) {
 		dVector pin(coneDir1.CrossProduct(coneDir0));
 		dVector axis = pin.Scale(1.0f / dSqrt(pin.DotProduct3(pin)));
-		dFloat angle = dAcos(dClamp(dot, -1.0f, 1.0f));
+		dFloat angle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
 		dQuaternion rot(axis, angle);
 		matrix1 = matrix1 * dMatrix(rot, dVector(0.0f, 0.0f, 0.0f, 1.0f));
 	}

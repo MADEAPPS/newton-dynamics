@@ -414,11 +414,11 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 			if (m_maxTwistAngle >= m_minTwistAngle) // twist restricted?
 			{
 				dQuaternion quat0(matrix0), quat1(matrix1);      
-				float *q0 = (float*)&quat0;
-				float *q1 = (float*)&quat1;
+				dFloat *q0 = (dFloat*)&quat0;
+				dFloat *q1 = (dFloat*)&quat1;
 
 				// factor rotation about x axis between quat0 and quat1. Code is an optimization of this: qt = q0.Inversed() * q1; halfTwistAngle = atan (qt.x / qt.w);
-				float twistAngle = 2.0f * atan (
+				dFloat twistAngle = 2.0f * dAtan (
 					( ( ( (q0[0] * q1[1]) + (-q0[1] * q1[0]) ) + (-q0[2] * q1[3]) ) - (-q0[3] * q1[2]) ) /
 					( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) );
 
@@ -428,16 +428,16 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 
 				if (m_maxTwistAngle == m_minTwistAngle) // no freedom for any twist
 				{
-					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (dFloat*)&twistAxis);
 				}
 				else if (twistAngle > m_maxTwistAngle)
 				{
-					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (dFloat*)&twistAxis);
 					NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 				}
 				else if (twistAngle < m_minTwistAngle)
 				{
-					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_minTwistAngle, (float*)&twistAxis);
+					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_minTwistAngle, (dFloat*)&twistAxis);
 					NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 				}
 			}
@@ -454,7 +454,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 					dFloat sql = swingAxis.DotProduct3(swingAxis);
 					if (sql > E) 
 					{
-						NewtonUserJointAddAngularRow (m_joint, angle, (float*)&swingAxis);
+						NewtonUserJointAddAngularRow (m_joint, angle, (dFloat*)&swingAxis);
 						NewtonUserJointSetRowMinimumFriction (m_joint, 0.0);
 					}
 				}
@@ -482,7 +482,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 					if (sql > E) 
 					{
 						swingAxis =  swingAxis.Scale (1.0f / sqrt (sql));
-						NewtonUserJointAddAngularRow (m_joint, angle, (float*)&swingAxis);
+						NewtonUserJointAddAngularRow (m_joint, angle, (dFloat*)&swingAxis);
 						NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 					}
 				}	
@@ -663,9 +663,9 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		Vis::Line (debugDisplay, matrix1[3], ot, 1,1,0);
 
 		dQuaternion quat0(matrix0), quat1(matrix1);      
-		float *q0 = (float*)&quat0;
-		float *q1 = (float*)&quat1;
-		float twistAngle = 2.0f * atan (
+		dFloat *q0 = (dFloat*)&quat0;
+		dFloat *q1 = (dFloat*)&quat1;
+		dFloat twistAngle = 2.0f * dAtan (
 			( ( ( (q0[0] * q1[1]) + (-q0[1] * q1[0]) ) + (-q0[2] * q1[3]) ) - (-q0[3] * q1[2]) ) /
 			( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) );
 

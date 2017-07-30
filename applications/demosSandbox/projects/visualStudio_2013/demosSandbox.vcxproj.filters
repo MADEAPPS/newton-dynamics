@@ -160,7 +160,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagDoll.cpp">
+    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagdoll.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>
