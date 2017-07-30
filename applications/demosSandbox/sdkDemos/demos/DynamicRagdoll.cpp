@@ -199,10 +199,15 @@ xxx->SetLimits(0.0f, 0.0f);
 				dAssert (joint->GetBody0() == body);
 				matrix = joint->GetMatrix0() * matrix;
 				dCustomRagdollMotor_EndEffector* const effector = controller->AddEndEffector(node, matrix);
+
 				matrix.m_posit.m_z -= 0.4f;
-				matrix.m_posit.m_x -= 0.2f;
-				matrix.m_posit.m_y += 0.1f;
+				//matrix.m_posit.m_x -= 0.2f;
+				//matrix.m_posit.m_y += 0.1f;
 				effector->SetTargetMatrix(matrix);
+
+xxx->SetTargetMatrix(matrix);
+xxx->SetMaxLinearFriction (1000.0f);
+				
 
 			} else if (entity->GetName() == rightFootEffector) {
 				// all other effector are centered and oriented a the joint pivot 
@@ -227,7 +232,7 @@ xxx->SetLimits(0.0f, 0.0f);
 					if (customJoint->IsType(dCustomRagdollMotor::GetType())) {
 						dCustomRagdollMotor* const ragDollMotor = (dCustomRagdollMotor*)customJoint;
 						void* const bone = controller->AddBone(ragDollMotor, node);
-						ragDollMotor->SetMode(true);
+//						ragDollMotor->SetMode(true);
 						stackPool[stack] = bone;
 						stack ++;
 					}
