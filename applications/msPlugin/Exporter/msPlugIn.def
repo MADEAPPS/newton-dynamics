@@ -1,7 +1,0 @@
-DESCRIPTION 'MilkShape Netwon Plugin'
-
-VERSION     1.0
-
-LIBRARY      "msNewtonExport"
-EXPORTS
-    CreatePlugIn
