@@ -344,7 +344,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 	dFloat m_arcAngleCos;
 	dFloat m_arcAngleSin;
 
-	float const E = 1.0E-16f;//0.01f;//
+	#define E 1.0E-16f
 
 	
 	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world, bool isLimitJoint = false)

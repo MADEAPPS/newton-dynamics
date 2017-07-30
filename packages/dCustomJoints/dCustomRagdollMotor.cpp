@@ -1038,15 +1038,24 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	CalculateGlobalMatrix(matrix0, matrix1);
 	NewtonBodyGetOmega(m_body0, &omega[0]);
 	NewtonBodyGetVelocity(m_body0, &veloc[0]);
-//	NewtonBodyGetCentreOfMass(m_body0, &com[0]);
-//	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-//	dVector pointVeloc(veloc + omega.CrossProduct(matrix0.RotateVector(m_localHandle - com)));
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &pointVeloc[0]);
 	
+
 	dVector relPosit(m_targetPosit - matrix0.m_posit);
 	dVector relVeloc(relPosit.Scale(invTimestep) - pointVeloc);
 	dVector relAccel(relVeloc.Scale(invTimestep * 0.3f));
 
+	dFloat dir2 = relPosit.DotProduct3(relPosit);
+	if (dir2 > 1.0e-6f) {
+		dVector pin (relPosit.Scale (1.0f / dSqrt(dir2))); 
+		dFloat accel = relAccel.DotProduct3(pin);
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &pin[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, -accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+
+	} else {
+/*
 	// Restrict the movement on the pivot point along all tree orthonormal direction
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &m_targetPosit[0], &matrix0.m_front[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, -relAccel.DotProduct3(matrix0.m_front));
@@ -1062,6 +1071,8 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	NewtonUserJointSetRowAcceleration(m_joint, -relAccel.DotProduct3(matrix0.m_right));
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+*/
+}
 
 return;
 
