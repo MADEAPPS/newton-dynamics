@@ -72,9 +72,9 @@ bld/
 
 
 # third party
-packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
-packages/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
-packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
+sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
+sdk/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
+sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 
 #
 # Ignore auxiliary output from Doxygen and Sphinx
