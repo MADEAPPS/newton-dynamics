@@ -69,26 +69,14 @@ void dCustomKinematicController::SetPickMode (int mode)
 	m_pickMode = mode ? 1 : 0;
 }
 
-void dCustomKinematicController::SetMaxLinearFriction(dFloat accel)
+void dCustomKinematicController::SetMaxLinearFriction(dFloat frictionForce)
 {
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-
-	NewtonBodyGetMass (m_body0, &mass, &Ixx, &Iyy, &Izz);
-	m_maxLinearFriction = dAbs (accel) * mass;
+	m_maxLinearFriction = dAbs (frictionForce);
 }
 
-void dCustomKinematicController::SetMaxAngularFriction(dFloat alpha)
+void dCustomKinematicController::SetMaxAngularFriction(dFloat frictionTorque)
 {
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-
-	NewtonBodyGetMass (m_body0, &mass, &Ixx, &Iyy, &Izz);
-	m_maxAngularFriction = dAbs (alpha) * mass;
+	m_maxAngularFriction = dAbs (frictionTorque);
 }
 
 
@@ -144,14 +132,6 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-//	NewtonBodyGetOmega (m_body0, &omega[0]);
-//	NewtonBodyGetVelocity (m_body0, &veloc[0]);
-//	NewtonBodyGetCentreOfMass (m_body0, &com[0]);
-//	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &pointVeloc[0]);
-//	NewtonBodyGetMatrix (m_body0, &matrix0[0][0]);
-//	dVector p0 (matrix0.TransformVector (m_localHandle));
-//	dVector pointVeloc (veloc + omega.CrossProduct(matrix0.RotateVector (m_localHandle - com)));
-
 	dVector relPosit (m_targetPosit - matrix0.m_posit);
 	dFloat mag2 = relPosit.DotProduct3(relPosit);
 	if (mag2 > 1.0e-4f) {

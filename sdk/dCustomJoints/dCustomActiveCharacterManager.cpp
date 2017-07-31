@@ -140,6 +140,16 @@ dCustomRagdollMotor_EndEffector* dCustomActiveCharacterController::AddEndEffecto
 	return effector;
 }
 
+
+void dCustomActiveCharacterController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	for (dList<dCustomRagdollMotor_EndEffector*>::dListNode* node = m_effectorList.GetFirst(); node; node = node->GetNext()) {
+		dCustomJoint* const joint = node->GetInfo();
+		joint->Debug(debugContext);
+	}
+}
+
+
 void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	//	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
@@ -150,10 +160,3 @@ void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadInde
 	}
 }
 
-void dCustomActiveCharacterController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-	for (dList<dCustomRagdollMotor_EndEffector*>::dListNode* node = m_effectorList.GetFirst(); node; node = node->GetNext()) {
-		dCustomJoint* const joint = node->GetInfo();
-		joint->Debug(debugContext);
-	}
-}

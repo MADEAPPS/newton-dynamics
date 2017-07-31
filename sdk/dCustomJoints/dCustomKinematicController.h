@@ -29,8 +29,8 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomKinematicController();
 
 	CUSTOM_JOINTS_API void SetPickMode (int mode);
-	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat accel); 
-	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat alpha); 
+	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
+	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
 	
 	CUSTOM_JOINTS_API void SetTargetRotation (const dQuaternion& rotation); 
 	CUSTOM_JOINTS_API void SetTargetPosit (const dVector& posit); 
