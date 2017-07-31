@@ -66,8 +66,8 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 //{"Bip01_L_Thigh",    "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -120.0f,  120.0f,  -120.0f,  0.0f,  -90.0f,  -0.0f},
 
 	{"Bip01_L_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f},
-	{"Bip01_L_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,    -5.0f, 140.0f,     0.0f, 180.0f,  -90.0f,   0.0f}, 
-	{"Bip01_L_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     45.0f,	 0.0f,  -90.0f,  -0.0f}, 
+//	{"Bip01_L_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,    -5.0f, 140.0f,     0.0f, 180.0f,  -90.0f,   0.0f}, 
+//	{"Bip01_L_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     45.0f,	 0.0f,  -90.0f,  -0.0f}, 
 
 //	{"Bip01_R_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f},
 //	{"Bip01_R_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,    -5.0f, 140.0f,     0.0f, 180.0f,  -90.0f,   0.0f}, 
@@ -439,7 +439,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 		MySaveLoad saveLoad(GetWorld(), m_material);
 //xxx
-		saveLoad.Save (fileName, controller->GetBoneBody(controller->GetBone(0)));
+		//saveLoad.Save (fileName, controller->GetBoneBody(controller->GetBone(0)));
 	}
 
 	int m_material;
