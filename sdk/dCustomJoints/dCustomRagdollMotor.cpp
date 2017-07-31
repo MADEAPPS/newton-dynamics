@@ -646,6 +646,8 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
@@ -681,18 +683,29 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
 	}
 
-	dFloat coneAngle = dAcos(dClamp (dot, dFloat(-1.0f), dFloat(1.0f)));
+
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	dVector relOmega(omega1 - omega0);
+
+	dFloat accel = 0.0f;
+	dFloat correctionFactor = 0.3f;
+	dFloat invTimestep = 1.0f / timestep;
+	dFloat coneAngle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
 	dFloat angle = coneAngle - m_coneAngle;
 	if (angle > 0.0f) {
-		dVector swingAxis (coneDir0.CrossProduct(coneDir1));
-		dAssert (swingAxis.DotProduct3(swingAxis) > 0.0f);
+		dVector swingAxis(coneDir0.CrossProduct(coneDir1));
+		dAssert(swingAxis.DotProduct3(swingAxis) > 0.0f);
 		swingAxis = swingAxis.Scale(1.0f / dSqrt(swingAxis.DotProduct3(swingAxis)));
 		NewtonUserJointAddAngularRow(m_joint, angle, &swingAxis[0]);
+		accel = (correctionFactor * angle * invTimestep + relOmega.DotProduct3(swingAxis)) * invTimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		if (m_motorMode) {
-			dVector sideDir (swingAxis.CrossProduct(coneDir0));
+			dVector sideDir(swingAxis.CrossProduct(coneDir0));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
@@ -700,16 +713,15 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	} else if (m_motorMode) {
 		if (coneAngle > 1.0f * 3.141592f / 180.0f) {
 			dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
-			dAssert (swingAxis.DotProduct3(swingAxis) > 0.0f);
+			dAssert(swingAxis.DotProduct3(swingAxis) > 0.0f);
 			swingAxis = swingAxis.Scale(1.0f / dSqrt(swingAxis.DotProduct3(swingAxis)));
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &swingAxis[0]);
-			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 
-			
 			dVector sideDir(swingAxis.CrossProduct(coneDir0));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
 			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
@@ -718,7 +730,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		} else {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_right[0]);
-			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
