@@ -938,6 +938,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 	} else if (twistAngle > m_maxTwistAngle) {
 		twistAngle = twistAngle - m_maxTwistAngle;
+//dTrace (("%f\n", twistAngle * 180.0f / 3.141592f));
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 	} else if (m_motorMode) {

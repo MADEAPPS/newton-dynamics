@@ -218,7 +218,7 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
 					
 					m_pickJoint = new dCustomKinematicController (body, posit);
-					m_pickJoint->SetPickMode (1);
+					m_pickJoint->SetPickMode (0);
 					m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
 					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 				#endif
@@ -239,8 +239,9 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 			dVector point (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
 			CalculatePickForceAndTorque (m_targetPicked, point, m_pickedBodyTargetPosition, timestep);
 			#else 
-				dAssert (m_pickJoint);
-				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+				if (m_pickJoint) {
+					m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+				}
 			#endif
 		} else {
 			if (m_targetPicked) {
@@ -249,7 +250,6 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 			if (m_pickJoint) {
 				delete m_pickJoint;
 			}
-
 			m_pickJoint = NULL;
 			m_targetPicked = NULL; 
 			m_bodyDestructor = NULL;
