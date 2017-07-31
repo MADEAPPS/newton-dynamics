@@ -206,8 +206,21 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 					if(m_pickJoint) {
 						delete m_pickJoint;
 					}
+					
+					dFloat Ixx;
+					dFloat Iyy;
+					dFloat Izz;
+					dFloat mass;
+					NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
+					const dFloat angularFritionAccel = 100.0f;
+					const dFloat linearFrictionAccel = 10.0f * dAbs (dMax (DEMO_GRAVITY, 10.0f));
+					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
+					
 					m_pickJoint = new dCustomKinematicController (body, posit);
-					m_pickJoint->SetMaxLinearFriction(1000.0f);
+					m_pickJoint->SetPickMode (1);
+					m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
+					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 				#endif
 			}
 		}

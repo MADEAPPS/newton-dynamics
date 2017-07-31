@@ -194,80 +194,43 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxLinearFriction);
 	}
 
-/*
 	if (m_pickMode) {
-		dQuaternion rotation;
-
-		NewtonBodyGetRotation (m_body0, &rotation.m_q0);
+		dQuaternion rotation (matrix0);
 		if (m_targetRot.DotProduct (rotation) < 0.0f) {
-			rotation.m_q0 *= -1.0f; 
-			rotation.m_q1 *= -1.0f; 
-			rotation.m_q2 *= -1.0f; 
-			rotation.m_q3 *= -1.0f; 
+			rotation.Scale(-1.0f);
 		}
 
-		dVector relOmega (rotation.CalcAverageOmega (m_targetRot, invTimestep) - omega);
-		dFloat mag = relOmega.DotProduct3(relOmega);
-		if (mag > 1.0e-6f) {
-			dVector pin (relOmega.Scale (1.0f / mag));
-			dMatrix basis (dGrammSchmidt (pin)); 	
-			dFloat relSpeed = dSqrt (relOmega.DotProduct3(relOmega));
-			dFloat relAlpha = relSpeed * invTimestep;
+		dFloat dot = rotation.DotProduct(m_targetRot);
+		if (dot < 0.9995f) {
+			dMatrix rot (dGrammSchmidt(dVector (rotation.m_q1, rotation.m_q2, rotation.m_q3)));
+			dFloat angle = 2.0f * dAcos(dClamp(rotation.m_q0, dFloat(-1.0f), dFloat(1.0f)));
 
-			NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis.m_front[0]);
-			NewtonUserJointSetRowAcceleration (m_joint, relAlpha);
+			NewtonUserJointAddAngularRow (m_joint, -angle, &rot.m_front[0]);
 			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
 
-			NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis.m_up[0]);
-			NewtonUserJointSetRowAcceleration (m_joint, 0.0f);
+			NewtonUserJointAddAngularRow (m_joint, 0.0f, &rot.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
 
-			NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis.m_right[0]);
-			NewtonUserJointSetRowAcceleration (m_joint, 0.0f);
+			NewtonUserJointAddAngularRow (m_joint, 0.0f, &rot.m_right[0]);
 			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
 
 		} else {
-
-			dVector relAlpha (omega.Scale (-invTimestep));
 			NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_front[0]);
-			NewtonUserJointSetRowAcceleration (m_joint, relAlpha.DotProduct3(matrix0.m_front));
 			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
 
 			NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_up[0]);
-			NewtonUserJointSetRowAcceleration (m_joint, relAlpha.DotProduct3(matrix0.m_up));
 			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
 
 			NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_right[0]);
-			NewtonUserJointSetRowAcceleration (m_joint, relAlpha.DotProduct3(matrix0.m_right));
 			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
 		}
-
-	} else {
-		// this is the single handle pick mode, add some angular friction
-
-		dVector relAlpha = omega.Scale (-invTimestep);
-		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_front[0]);
-		NewtonUserJointSetRowAcceleration (m_joint, relAlpha.DotProduct3(matrix0.m_front));
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction * 0.025f);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction * 0.025f);
-
-		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_up[0]);
-		NewtonUserJointSetRowAcceleration (m_joint, relAlpha.DotProduct3(matrix0.m_up));
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction * 0.025f);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction * 0.025f);
-
-		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_right[0]);
-		NewtonUserJointSetRowAcceleration (m_joint, relAlpha.DotProduct3(matrix0.m_right));
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction * 0.025f);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction * 0.025f);
 	}
-*/
 }
 
 
