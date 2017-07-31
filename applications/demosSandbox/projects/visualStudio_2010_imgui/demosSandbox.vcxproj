@@ -57,7 +57,7 @@
     <ClCompile Include="..\..\sdkDemos___\demos\ContinueCollision1.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\ConvexApproximation.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\ConvexCast.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\DynamicRagDoll.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\DynamicRagdoll.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\HeavyVehicles.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\HeighFieldCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\KinematicBodies.cpp" />

@@ -32,9 +32,6 @@ class DemoListenerBase
 	static void PostUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
-
-//	protected:
-//	DemoEntityManager* m_scene; 
 };
 
 

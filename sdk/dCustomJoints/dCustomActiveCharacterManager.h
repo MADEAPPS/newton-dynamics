@@ -22,6 +22,7 @@
 #define DYNAMIC_RAGDOLL_PLUGIN_NAME	"__dynamicRagDollManager__"
 
 class dCustomRagdollMotor;
+class dCustomRagdollMotor_EndEffector;
 
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
 class dCustomActiveCharacterController: public dCustomControllerBase
