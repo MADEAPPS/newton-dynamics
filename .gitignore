@@ -70,17 +70,15 @@ bld/
 *.lastbuildstate
 *.unsuccessfulbuild
 
-#
+
+# script language
+sdk/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
+sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
+
 # Ignore auxiliary output from Doxygen and Sphinx
-#
 doc/xml
 doc/html
 
-
 # third party
 sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
-sdk/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
-sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
-sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/vc_lib/mswud/wx/msw/rcdefs.h
-
 sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/vc_lib/mswud/wx/msw/rcdefs.h
