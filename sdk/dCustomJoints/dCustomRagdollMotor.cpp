@@ -683,7 +683,6 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
 	}
 
-
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
 
