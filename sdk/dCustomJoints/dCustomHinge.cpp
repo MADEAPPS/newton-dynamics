@@ -172,7 +172,7 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	m_curJointAngle.Update(cosAngle, sinAngle);
 
 	// save the current joint Omega
-	dVector omega0(0.0);
+	dVector omega0(0.0f);
 	dVector omega1(0.0f);
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	if (m_body1) {

@@ -504,14 +504,14 @@ void dCustomRagdollMotor_1dof::Debug(dDebugDisplay* const debugDisplay) const
 	const int subdiv = 16;
 	const float radius = 0.25f;
 
-	dVector point (radius, 0.0f, 0.0f, 0.0f);
+	dVector point (0.0f, radius, 0.0f, 0.0f);
 	dFloat angleStep = (m_maxTwistAngle - m_minTwistAngle) / subdiv;
 	dFloat angle0 = m_minTwistAngle;
 
 	dVector arch[subdiv + 1];
 	debugDisplay->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
-		dVector p (matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point)));
+		dVector p (matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
 		arch[i] = p;
 		debugDisplay->DrawLine(matrix1.m_posit, p);
 		angle0 += angleStep;
@@ -533,7 +533,11 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
-/*
+	// two rows to restrict rotation around around the parent coordinate system
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
 
@@ -543,83 +547,38 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	dFloat correctionFactor = 0.3f;
 	dFloat invTimestep = 1.0f / timestep;
 
+	dFloat angle = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix1.m_front);
+	if (angle < m_minTwistAngle) {
+		angle = angle - m_minTwistAngle;
 
-	// do the twist
-	dQuaternion quat0(matrix0);
-	dQuaternion quat1(matrix1);
+		// tell joint error will minimize the exceeded angle error
+		NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1.m_front[0]);
 
-	if (quat0.DotProduct(quat1) < 0.0f) {
-		quat0.Scale (-1.0f);
-	}
-
-	// factor rotation about x axis between quat0 and quat1. 
-	// Code is an optimization of this: qt = q0.Inversed() * q1; 
-	// halfTwistAngle = atan (qt.x / qt.w);
-	dFloat* const q0 = &quat0.m_q0;
-	dFloat* const q1 = &quat1.m_q0;
-	dFloat num = (q0[0] * q1[1]) + (-q0[1] * q1[0]) + (-q0[2] * q1[3]) - (-q0[3] * q1[2]);
-	dFloat den = (q0[0] * q1[0]) - (-q0[1] * q1[1]) - (-q0[2] * q1[2]) - (-q0[3] * q1[3]);
-	dFloat twistAngle = 2.0f * dAtan2(num, den);
-
-	// select an axis for the twist. 
-	// any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
-	dFloat dot = coneDir0.DotProduct3(coneDir1);
-	if (dot > -0.999f) {
-		dVector twistAxis = coneDir0 + coneDir1;
-		twistAxis = twistAxis.Scale(1.0f / dSqrt(twistAxis.DotProduct3(twistAxis)));
-		NewtonUserJointAddAngularRow(m_joint, twistAngle, &twistAxis[0]);
-		accel = (correctionFactor * twistAngle * invTimestep + relOmega.DotProduct3(twistAxis)) * invTimestep;
+		dFloat accel = (-correctionFactor * angle * invTimestep + relOmega.DotProduct3(matrix1.m_front)) * invTimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
-	} else {
-		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
-	}
 
-	// do the swing
-	// cone on arc limit - think of an piece of pizza (arc) and an allowed max distance from it (cone):
-	// project current axis to the arc plane (y)
-	dVector d (matrix1.UnrotateVector(matrix0.m_front));
-	dVector cone (d); 
-	cone.m_y = 0;
-			
-	dAssert (cone.DotProduct3(cone) > 0.0f);
-	cone = cone.Scale(1.0f / dSqrt(cone.DotProduct3(cone)));
-
-	// do a regular cone constraint from that
-	dVector planeDir (matrix1.RotateVector(cone));
-	dVector swingAxis (planeDir.CrossProduct(matrix1.m_up));
-	dFloat swingAngle0 = CalculateAngle (matrix0.m_front, planeDir, swingAxis);
-	NewtonUserJointAddAngularRow(m_joint, swingAngle0, &swingAxis[0]);
-
-	dFloat swingAngle1 = -CalculateAngle (planeDir, matrix1.m_front, matrix1.m_up);
-	if (swingAngle1 < m_minTwistAngle) {
-		swingAngle1 = swingAngle1 - m_minTwistAngle;
-if (swingAngle1 < -0.1f)
-swingAngle1 *=1;
-		NewtonUserJointAddAngularRow(m_joint, swingAngle1, &matrix1.m_up[0]);
-dFloat xxx0 = NewtonUserCalculateRowZeroAccelaration(m_joint);
-dFloat xxx1 = (swingAngle1 * invTimestep + relOmega.DotProduct3(matrix1.m_up)) * invTimestep;
-		accel = (correctionFactor * swingAngle1 * invTimestep + relOmega.DotProduct3(matrix1.m_up)) * invTimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, xxx0);
+		// allow the joint to move back freely 
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-	} else if (swingAngle1 > m_maxTwistAngle) {
-		swingAngle1 = swingAngle1 - m_maxTwistAngle;
-		NewtonUserJointAddAngularRow(m_joint, swingAngle1, &matrix1.m_up[0]);
 
-		dFloat accel1 = NewtonUserCalculateRowZeroAccelaration(m_joint);
-		//accel = (correctionFactor * twistAngle * invTimestep + relOmega.DotProduct3(twistAxis)) * invTimestep;
-		accel = (swingAngle1 * invTimestep + relOmega.DotProduct3(matrix1.m_up)) * invTimestep;
+	} else if (angle > m_maxTwistAngle) {
+		angle = angle - m_maxTwistAngle;
+
+		// tell joint error will minimize the exceeded angle error
+		NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1.m_front[0]);
+
+		accel = (-correctionFactor * angle * invTimestep + relOmega.DotProduct3(matrix1.m_front)) * invTimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
+
+		// allow the joint to move back freely
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+
 	} else if (m_motorMode) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
 		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
-*/
 }
 
 
