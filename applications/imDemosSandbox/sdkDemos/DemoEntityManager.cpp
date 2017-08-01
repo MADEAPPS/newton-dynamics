@@ -28,7 +28,7 @@
 #endif
 
 #define MAX_PHYSICS_FPS				120.0f
-#define PROJECTILE_INITIAL_SPEED	        20.0f
+#define PROJECTILE_INITIAL_SPEED	 20.0f
 
 #define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
