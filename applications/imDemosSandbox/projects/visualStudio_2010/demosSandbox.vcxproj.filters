@@ -90,9 +90,6 @@
     <ClCompile Include="..\..\sdkDemos\toolBox\OpenGlUtil.cpp">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp">
-      <Filter>utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -183,9 +180,6 @@
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h">
-      <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h">
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\SkyBox.h">
