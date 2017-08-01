@@ -1,7 +1,7 @@
 #
 # ignore settings for Xcode
 #
-build/
+#build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -36,7 +36,7 @@ bld/
 *.sdf
 *.pdb
 *.dll
-#*.lib
+*.lib
 *.dat
 *.log
 *.exp
