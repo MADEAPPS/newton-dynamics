@@ -34,9 +34,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp">
-      <Filter>tooBox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -176,9 +173,6 @@
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h">
       <Filter>mainLogic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h">
-      <Filter>tooBox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h">
       <Filter>tooBox</Filter>
