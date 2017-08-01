@@ -35,57 +35,57 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\sdkDemos___\DemoCamera.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\DemoCameraListener.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\DemoEntity.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\DemoEntityListener.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\DemoEntityManager.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\DemoListenerBase.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\DemoMesh.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\AdvancedPlayerController.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ArchimedesBuoyancy.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ArticulatedJoints.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\BasicCar.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\BasicFriction.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\BasicPlayerController.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\BasicRagdoll.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\BasicRestitution.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\BasicStacking.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ClosestDistance.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\CompoundCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ContinueCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ContinueCollision1.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ConvexApproximation.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ConvexCast.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\DynamicRagdoll.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\HeavyVehicles.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\HeighFieldCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\KinematicBodies.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\MeshCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\MultiRayCasting.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\PrecessingTops.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\PrimitiveCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\PuckSlide.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\ScaledCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\SceneCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\SimpleBooleans.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\SimpleConvexFracturing.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\SoftBodies.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\StandardJoints.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\StructuredConvexFracturing.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\SuperCar.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\UserStaticCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\UsingNewtonMeshTool.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\main.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\DebugDisplay.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\dHighResolutionTimer.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\HeightFieldPrimitive.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\MousePick.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\OpenGlUtil.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\PhysicsUtils.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\SkyBox.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\TargaToOpenGl.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.cpp">
+    <ClCompile Include="..\..\sdkDemos\DemoCamera.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicRagdoll.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicRestitution.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicStacking.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ClosestDistance.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\CompoundCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision1.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ConvexApproximation.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagdoll.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\HeighFieldCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\PrecessingTops.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\SimpleBooleans.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\StandardJoints.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\UserStaticCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\UsingNewtonMeshTool.cpp" />
+    <ClCompile Include="..\..\sdkDemos\main.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\OpenGlUtil.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\PhysicsUtils.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\SkyBox.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\TargaToOpenGl.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\toolbox_stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -95,26 +95,26 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\UserPlaneCollision.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\sdkDemos___\DemoCamera.h" />
-    <ClInclude Include="..\..\sdkDemos___\DemoCameraListener.h" />
-    <ClInclude Include="..\..\sdkDemos___\DemoEntity.h" />
-    <ClInclude Include="..\..\sdkDemos___\DemoEntityListener.h" />
-    <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
-    <ClInclude Include="..\..\sdkDemos___\DemoListenerBase.h" />
-    <ClInclude Include="..\..\sdkDemos___\DemoMesh.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\DebugDisplay.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\dHighResolutionTimer.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\HeightFieldPrimitive.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\MousePick.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\OpenGlUtil.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\PhysicsUtils.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\SkyBox.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\TargaToOpenGl.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoCamera.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoEntity.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoMesh.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\PhysicsUtils.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\SkyBox.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\TargaToOpenGl.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\UserPlaneCollision.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2010_static_mt\dContainers.vcxproj">
@@ -276,7 +276,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -292,7 +292,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -308,7 +308,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -324,7 +324,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -342,7 +342,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -362,7 +362,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -382,7 +382,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -402,7 +402,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
