@@ -348,37 +348,28 @@ DemoCamera* DemoEntityManager::GetCamera() const
 
 bool DemoEntityManager::GetKeyState(int key) const
 {
-//	return wxGetKeyState(wxKeyCode(key & 0xff));
-	//	return m_key[m_keyMap[key & 0xff]] ? true : false;
-	dAssert (0);
-	return false;
+	const ImGuiIO& io = ImGui::GetIO();
+	return io.KeysDown[key];
 }
 
 bool DemoEntityManager::IsShiftKeyDown () const
 {
-//	return m_shiftKey;
-	dAssert (0);
-	return false;
+	const ImGuiIO& io = ImGui::GetIO();
+	bool state = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+	return state;
 }
 
 bool DemoEntityManager::IsControlKeyDown () const
 {
-//	return m_controlKey;
-	dAssert (0);
-	return false;
+	const ImGuiIO& io = ImGui::GetIO();
+	bool state = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+	return state;
 }
-
-
 
 bool DemoEntityManager::GetMouseKeyState (int button) const
 {
-	dAssert (0);
-/*
-	if ((button >= 0) && (button <= 2)) {
-		return m_key[m_keyMap[button]] ? true : false;
-	}
-*/
-	return false;
+	ImGuiIO& io = ImGui::GetIO();
+	return io.MouseDown[button];
 }
 
 
@@ -663,7 +654,7 @@ void DemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
 
 bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 {
-	ImGuiIO& io = ImGui::GetIO();
+	const ImGuiIO& io = ImGui::GetIO();
 	posX = int (io.MousePos.x);
 	posY = int (io.MousePos.y);
 	return true;
