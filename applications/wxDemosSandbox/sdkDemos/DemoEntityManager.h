@@ -8,15 +8,12 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-
 #ifndef __DEMO_ENTITY_MANAGER_H__
 #define __DEMO_ENTITY_MANAGER_H__
 
 #include "DemoMesh.h"
 #include "DemoEntityListener.h"
 #include "DemoListenerBase.h"
-#include "dHighResolutionTimer.h"
-//#include "DemoVisualDebugerListener.h"
 
 //class DemoMesh;
 class DemoEntity;
@@ -25,12 +22,11 @@ class NewtonDemos;
 class DemoEntityManager;
 class DemoCameraListener;
 
-
-typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context, int lineNumber);
-
 class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 {
-	public:
+    public:
+typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context, int lineNumber);
+
     class TransparentMesh
     {
         public: 

@@ -115,9 +115,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp">
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp">
-      <Filter>mainLogic\listeners</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp">
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
@@ -211,9 +208,6 @@
       <Filter>tooBox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h">
-      <Filter>mainLogic\listeners</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h">
       <Filter>mainLogic\listeners</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h">

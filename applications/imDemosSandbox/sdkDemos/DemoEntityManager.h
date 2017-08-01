@@ -27,30 +27,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
 	typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context, int lineNumber);
 
-
-	class ButtonKey
-	{
-		public:
-		ButtonKey (bool initialState);
-
-		bool UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode);
-		bool UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode);
-		bool GetPushButtonState() const { return m_state;}
-
-		bool UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask);
-		//bool IsMouseKeyDown (const DemoEntityManager* const mainWin, int key);
-		//bool IsKeyDown (const DemoEntityManager* const mainWin, int key);
-
-		private:
-		bool m_state;
-		bool m_memory0;
-		bool m_memory1;
-	};
-
-	class EntityDictionary: public dTree<DemoEntity*, dScene::dTreeNode*>
-	{
-	};
-
 	class TransparentMesh
 	{
 		public: 
@@ -87,6 +63,29 @@ class DemoEntityManager: public dList <DemoEntity*>
 		LaunchSDKDemoCallback m_launchDemoCallback;
 	};
 
+	class ButtonKey
+	{
+		public:
+		ButtonKey (bool initialState);
+
+		bool UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode);
+		bool UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode);
+		bool GetPushButtonState() const { return m_state;}
+
+
+		bool UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask);
+//		bool IsMouseKeyDown (const DemoEntityManager* const mainWin, int key);
+//		bool IsKeyDown (const DemoEntityManager* const mainWin, int key);
+
+		private:
+		bool m_state;
+		bool m_memory0;
+		bool m_memory1;
+	};
+
+	class EntityDictionary: public dTree<DemoEntity*, dScene::dTreeNode*>
+	{
+	};
 
 	DemoEntityManager ();
 	~DemoEntityManager ();
@@ -114,6 +113,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
 	void Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context);
 
+	bool IsShiftKeyDown () const;
+	bool IsControlKeyDown () const;
 	bool GetKeyState(int key) const;
 	bool GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const;
 

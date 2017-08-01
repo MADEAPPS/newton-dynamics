@@ -9,7 +9,7 @@
 * freely
 */
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"

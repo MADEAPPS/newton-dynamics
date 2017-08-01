@@ -9,11 +9,9 @@
 * freely
 */
 
-
 #include "toolbox_stdafx.h"
 #include "DemoListenerBase.h"
 #include "DemoEntityManager.h"
-
 
 DemoListenerBase::DemoListenerBase(DemoEntityManager* const scene, const char* const listenerName)
 {

@@ -9,7 +9,7 @@
 * freely
 */
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
@@ -20,7 +20,7 @@
 #include "dCustomBallAndSocket.h"
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
-#include "dCustomActiveCharacterManager.h"
+
 
 
 

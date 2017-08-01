@@ -14,7 +14,7 @@
 // stdafx.obj will contain the pre-compiled type information
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
@@ -108,7 +108,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 
 	#else
-		#error  "error: need to implement \"GetWorkingFileName\" here for this platform"
+		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
 }
 

@@ -13,7 +13,7 @@
 #ifndef AFX_DEBUG_DISPLAY_H___H
 #define AFX_DEBUG_DISPLAY_H___H
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include <dVector.h>
 #include <dMatrix.h>
 

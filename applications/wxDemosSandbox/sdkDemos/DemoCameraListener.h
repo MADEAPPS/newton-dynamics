@@ -17,10 +17,11 @@
 #ifndef __DEMO_CAMERA_LISTENER_H__
 #define __DEMO_CAMERA_LISTENER_H__
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "DemoEntity.h"
+#include "DemoListenerBase.h"
 
-
+class DemoCamera;
 class DemoCameraListener: public DemoListenerBase
 {
 	public:
@@ -32,13 +33,7 @@ class DemoCameraListener: public DemoListenerBase
 		return m_camera;
 	}
 
-	void SetCameraMatrix (DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
-	{
-		m_camera->SetMatrix(*scene, rotation, position);
-		m_camera->SetMatrix(*scene, rotation, position);
-		m_yaw = m_camera->GetYawAngle();
-		m_pitch = m_camera->GetPichAngle();
-	}
+	void SetCameraMatrix (DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position);
 
 	void SetCameraMouseLock (bool loockState);
 

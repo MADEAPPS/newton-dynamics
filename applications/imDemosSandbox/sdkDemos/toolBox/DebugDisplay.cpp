@@ -18,6 +18,35 @@
 
 static int g_debugMode = 0;
 
+class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
+{
+	public:
+	dJointDebugDisplay()
+		:dCustomJoint::dDebugDisplay()
+	{
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+	}
+
+	~dJointDebugDisplay()
+	{
+		glEnd();;
+	}
+
+	void SetColor(const dVector& color)
+	{
+		glColor3f(color.m_x, color.m_y, color.m_z);
+	}
+
+	void DrawLine(const dVector& p0, const dVector& p1)
+	{
+		glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+	}
+};
+
 int DebugDisplayOn()
 {
 	return g_debugMode;
@@ -426,93 +455,19 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 #endif
 }
 
-
-
 void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 {
 	glDisable(GL_TEXTURE_2D);
 	glDisable (GL_LIGHTING);
-	glBegin(GL_LINES);
+
+	dJointDebugDisplay jointDebug;
 
 	// this will go over the joint list twice, 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {	
 		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
-			NewtonJointRecord info;
-			NewtonJointGetInfo (joint, &info);
-
-			if (strcmp (info.m_descriptionType, "customJointNotInfo")) {
-
-				// draw first frame
-				dMatrix matrix0;
-				NewtonBodyGetMatrix (info.m_attachBody_0, &matrix0[0][0]);
-				matrix0 = dMatrix (&info.m_attachmenMatrix_0[0][0]) * matrix0;
-				dVector o0 (matrix0.m_posit);
-
-				dVector x (o0 + matrix0.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f)));
-				glColor3f (1.0f, 0.0f, 0.0f);
-				glVertex3f(GLfloat(o0.m_x), GLfloat(o0.m_y), GLfloat(o0.m_z));
-				glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
-
-				dVector y (o0 + matrix0.RotateVector (dVector (0.0f, size, 0.0f, 0.0f)));
-				glColor3f (0.0f, 1.0f, 0.0f);
-				glVertex3f(GLfloat(o0.m_x), GLfloat(o0.m_y), GLfloat(o0.m_z));
-				glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
-
-				dVector z (o0 + matrix0.RotateVector (dVector (0.0f, 0.0f, size, 0.0f)));
-				glColor3f (0.0f, 0.0f, 1.0f);
-				glVertex3f(GLfloat(o0.m_x), GLfloat(o0.m_y), GLfloat(o0.m_z));
-				glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
-
-				// draw second frame
-				dMatrix matrix1 (dGetIdentityMatrix());
-				if (info.m_attachBody_1) {
-					NewtonBodyGetMatrix (info.m_attachBody_1, &matrix1[0][0]);
-				}
-				matrix1 = dMatrix (&info.m_attachmenMatrix_1[0][0]) * matrix1;
-				dVector o1 (matrix1.m_posit);
-
-				x = o1 + matrix1.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f));
-				glColor3f (1.0f, 0.0f, 0.0f);
-				glVertex3f(GLfloat(o1.m_x), GLfloat(o1.m_y), GLfloat(o1.m_z));
-				glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
-
-				y = o1 + matrix1.RotateVector (dVector (0.0f, size, 0.0f, 0.0f));
-				glColor3f (0.0f, 1.0f, 0.0f);
-				glVertex3f(GLfloat(o1.m_x), GLfloat(o1.m_y), GLfloat(o1.m_z));
-				glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
-
-
-				z = o1 + matrix1.RotateVector (dVector (0.0f, 0.0f, size, 0.0f));
-				glColor3f (0.0f, 0.0f, 1.0f);
-				glVertex3f(GLfloat(o1.m_x), GLfloat(o1.m_y), GLfloat(o1.m_z));
-				glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
-
-				if (!strcmp (info.m_descriptionType, "limitballsocket")) {
-					// draw the cone limit of this joint
-					int steps = 12;
-					dMatrix coneMatrix (dRollMatrix(info.m_maxAngularDof[1]));
-					dMatrix ratationStep (dPitchMatrix(2.0f * 3.14151693f / steps));
-
-					dVector p0 (coneMatrix.RotateVector(dVector (size * 0.5f, 0.0f, 0.0f, 0.0f)));
-					dVector q0 (matrix1.TransformVector(p0));
-
-					glColor3f (1.0f, 1.0f, 0.0f);
-					for (int i = 0; i < (steps + 1); i ++) {
-						dVector p1 (ratationStep.RotateVector(p0));
-						dVector q1 (matrix1.TransformVector(p1));
-
-						glVertex3f(GLfloat(o0.m_x), GLfloat(o0.m_y), GLfloat(o0.m_z));
-						glVertex3f(GLfloat(q1.m_x), GLfloat(q1.m_y), GLfloat(q1.m_z));
-				
-						glVertex3f(GLfloat(q0.m_x), GLfloat(q0.m_y), GLfloat(q0.m_z));
-						glVertex3f(GLfloat(q1.m_x), GLfloat(q1.m_y), GLfloat(q1.m_z));
-
-						p0 = p1;
-						q0 = q1;
+			dCustomJoint* const customJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
+			customJoint->Debug(&jointDebug);
 					}
 				}
-			}
-		}
-	}
-	glEnd();
+	NewtonWorldListenerDebug(world, &jointDebug);
 }

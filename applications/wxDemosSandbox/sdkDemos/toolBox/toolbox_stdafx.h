@@ -22,7 +22,6 @@
 
 #define DOMMY_API 
 
-
 typedef char dInt8;
 typedef unsigned char dUnsigned8;
 
@@ -53,6 +52,7 @@ typedef long long unsigned64;
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 	#include <windows.h>
 	#include <Commctrl.h>
+	#include <stdio.h>
 	#include <stdlib.h>
 	#include <malloc.h>
 	#include <memory.h>
@@ -144,6 +144,7 @@ typedef long long unsigned64;
 #include <dCustomTriggerManager.h>
 #include <dCustomControllerManager.h>
 #include <dCustomKinematicController.h>
+#include <dCustomActiveCharacterManager.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
@@ -192,7 +193,7 @@ typedef long long unsigned64;
 #ifdef _NEWTON_USE_DOUBLE
 inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 {
-	GLfloat tmp[4] = {params[0], params[1], params[2], params[3]};
+	GLfloat tmp[4] = {GLfloat(params[0]), GLfloat(params[1]), GLfloat(params[2]), GLfloat(params[3])};
 	glMaterialfv (face, pname, &tmp[0]);
 }
 #define glMultMatrix(x) glMultMatrixd(x)

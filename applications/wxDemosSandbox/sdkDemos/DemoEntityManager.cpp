@@ -10,32 +10,26 @@
 */
 
 #include "toolbox_stdafx.h"
-#include "NewtonDemos.h"
-
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoEntity.h"
 #include "DemoCamera.h"
-#include "OpenGlUtil.h"
+#include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
+#include "DemoCameraListener.h"
 #include "DemoEntityListener.h"
 #include "DemoCameraListener.h"
-//#include "DemoVisualDebugerListener.h"
-#include "dCustomPlayerControllerManager.h"
-#include "dCustomVehicleControllerManager.h"
-
+#include "dHighResolutionTimer.h"
 
 #ifdef _MACOSX_VER
 	#include "CocoaOpenglGlue.h"
 #endif
 
 #define MAX_PHYSICS_FPS				120.0f
-
-
-#define PROJECTILE_INITIAL_SPEED	20.0f
+#define PROJECTILE_INITIAL_SPEED	        20.0f
 
 BEGIN_EVENT_TABLE (DemoEntityManager, wxGLCanvas)
 	EVT_KEY_UP(DemoEntityManager::OnKeyUp)	
@@ -142,8 +136,7 @@ for (int ii = 0; ii < 10000; ii++) {
 
 }
 
-
-DemoEntityManager::~DemoEntityManager(void)
+DemoEntityManager::~DemoEntityManager()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
 	if (m_world) {
@@ -223,7 +216,6 @@ void DemoEntityManager::Cleanup ()
 
 	// Set the Newton world user data
 	NewtonWorldSetUserData(m_world, this);
-
 
 	// we start without 2d render
 	m_renderUI = NULL;

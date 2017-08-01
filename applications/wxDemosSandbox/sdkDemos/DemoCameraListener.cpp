@@ -14,7 +14,7 @@
 // RenderPrimitive.cpp: implementation of the RenderPrimitive class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "DemoCamera.h"
 #include "MousePick.h"
 #include "NewtonDemos.h"
@@ -57,6 +57,15 @@ DemoCameraListener::~DemoCameraListener()
 {
 	m_camera->Release();
 }
+
+void DemoCameraListener::SetCameraMatrix(DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
+{
+	m_camera->SetMatrix(*scene, rotation, position);
+	m_camera->SetMatrix(*scene, rotation, position);
+	m_yaw = m_camera->GetYawAngle();
+	m_pitch = m_camera->GetPichAngle();
+}
+
 
 void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat timestep)
 {

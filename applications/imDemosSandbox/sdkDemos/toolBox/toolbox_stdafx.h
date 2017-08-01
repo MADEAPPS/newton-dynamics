@@ -131,7 +131,6 @@ typedef long long unsigned64;
 #include <dCustomBallAndSocket.h>
 #include <dCustomSliderActuator.h>
 #include <dCustomSlidingContact.h>
-
 #include <dCustomUniversalActuator.h>
 
 #include <dCustomInputManager.h>
@@ -168,7 +167,6 @@ typedef long long unsigned64;
 #include <dCollisionSphereNodeInfo.h>
 #include <dCollisionConvexHullNodeInfo.h>
 #include <dGeometryNodeSkinModifierInfo.h>
-		 
 #include <dgTimeTracker.h>
 
 

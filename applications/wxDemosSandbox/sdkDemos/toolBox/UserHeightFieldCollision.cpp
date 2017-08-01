@@ -14,7 +14,7 @@
 // UserHeightFieldCollision.cpp: implementation of the UserHeightFieldCollision class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
 #include "DemoMesh.h"

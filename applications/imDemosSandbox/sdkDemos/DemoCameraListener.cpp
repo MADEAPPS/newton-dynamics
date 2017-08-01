@@ -16,14 +16,16 @@
 //////////////////////////////////////////////////////////////////////
 #include <toolbox_stdafx.h>
 #include "DemoCamera.h"
-//#include "MousePick.h"
-#include "OpenGlUtil.h"
+#include "MousePick.h"
+//#include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "DemoCameraListener.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
+
+//#define USE_PICK_BODY_BY_FORCE
 
 
 #define D_CAMERA_LISTENER_NAMNE "cameraListener"
@@ -46,6 +48,7 @@ DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 	,m_pickedBodyLocalAtachmentPoint(0.0f)
 	,m_pickedBodyLocalAtachmentNormal(0.0f)
 	,m_targetPicked(NULL)
+	,m_pickJoint(NULL)
 	,m_bodyDestructor(NULL)
 {
 }
@@ -54,6 +57,15 @@ DemoCameraListener::~DemoCameraListener()
 {
 	m_camera->Release();
 }
+
+void DemoCameraListener::SetCameraMatrix(DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
+{
+	m_camera->SetMatrix(*scene, rotation, position);
+	m_camera->SetMatrix(*scene, rotation, position);
+	m_yaw = m_camera->GetYawAngle();
+	m_pitch = m_camera->GetPichAngle();
+}
+
 
 void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat timestep)
 {
@@ -65,34 +77,34 @@ void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat times
 	int mouseX;
 	int mouseY;
 	scene->GetMousePosition (mouseX, mouseY);
-/*
+
 	// slow down the Camera if we have a Body
-	dFloat slowDownFactor = mainWin->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
+	dFloat slowDownFactor = scene->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
 
 	// do camera translation
-	if (mainWin->GetKeyState ('W')) {
+	if (scene->GetKeyState ('W')) {
 		targetMatrix.m_posit += targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
 	}
-	if (mainWin->GetKeyState ('S')) {
+	if (scene->GetKeyState ('S')) {
 		targetMatrix.m_posit -= targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
 	}
-	if (mainWin->GetKeyState ('A')) {
+	if (scene->GetKeyState ('A')) {
 		targetMatrix.m_posit -= targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
-	if (mainWin->GetKeyState ('D')) {
+	if (scene->GetKeyState ('D')) {
 		targetMatrix.m_posit += targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-	if (mainWin->GetKeyState ('Q')) {
+	if (scene->GetKeyState ('Q')) {
 		targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-	if (mainWin->GetKeyState ('E')) {
+	if (scene->GetKeyState ('E')) {
 		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
 	// do camera rotation, only if we do not have anything picked
-	bool buttonState = m_mouseLockState || mainWin->GetMouseKeyState(0);
+	bool buttonState = m_mouseLockState || scene->GetMouseKeyState(0);
 	if (!m_targetPicked && buttonState) {
 		int mouseSpeedX = mouseX - m_mousePosX;
 		int mouseSpeedY = mouseY - m_mousePosY;
@@ -119,7 +131,6 @@ void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat times
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
 	UpdatePickBody(scene, timestep);
-*/
 }
 
 void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat timestep)
@@ -168,27 +179,6 @@ void DemoCameraListener::OnBodyDestroy (NewtonBody* const body)
 	m_bodyDestructor = NULL;
 }
 
-/*
-void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
-{
-	NewtonWorld* const world =  NewtonBodyGetWorld(body);
-	dAssert (world);
-
-	void* const preListenerHandle = NewtonWorldGetPreListener (world, D_CAMERA_LISTENER_NAMNE);
-	dAssert (preListenerHandle);
-
-	DemoCameraListener* const camManager = (DemoCameraListener*) NewtonWorldGetListenerUserData (world, preListenerHandle);
-	dAssert (camManager);
-
-	if (camManager->m_bodyDestructor) {
-		camManager->m_bodyDestructor (body);
-	}
-
-	// the body was destroyed, set the pointer and call back to NULL
-	camManager->m_targetPicked = NULL;
-	camManager->m_bodyDestructor = NULL;
-}
-*/
 
 void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
 {

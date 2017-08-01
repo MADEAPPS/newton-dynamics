@@ -9,19 +9,26 @@
 * freely
 */
 
-
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
+#include "DemoEntity.h"
+#include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
 #include "DemoCameraListener.h"
 #include "DemoEntityListener.h"
+#include "DemoCameraListener.h"
 #include "dHighResolutionTimer.h"
 
-#define MAX_PHYSICS_FPS				60.0f
-#define MAX_PHYSICS_SUB_STEPS		2
+#ifdef _MACOSX_VER
+	#include "CocoaOpenglGlue.h"
+#endif
+
+#define MAX_PHYSICS_FPS				120.0f
+#define PROJECTILE_INITIAL_SPEED	        20.0f
 
 #define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
@@ -272,6 +279,39 @@ m_synchronousPhysicsUpdateMode = false;
 	ResetTimer();
 
 	dTimeTrackerSetThreadName ("mainThread");
+
+
+/*
+	dFloat A[2][2];
+	dFloat x[2];
+	dFloat b[2];
+	dFloat l[2];
+	dFloat h[2];
+
+	A[0][0] = 2.0f;
+	A[0][1] = 1.0f;
+	A[1][0] = 1.0f;
+	A[1][1] = 2.0f;
+	b[0] = 1.0f;
+	b[1] = 1.0f;
+	x[0] = 1;
+	x[1] = 2;
+	
+	l[0] = 0.0f;
+	l[1] = 0.0f;
+	h[0] = 0.25f;
+	h[1] = 1.0f;
+	
+	dMatrixTimeVector(2, &A[0][0], x, b);
+	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
+*/
+
+/*
+for (int ii = 0; ii < 10000; ii++) {
+	NewtonDestroy(NewtonCreate());
+}
+*/
+
 }
 
 DemoEntityManager::~DemoEntityManager ()
@@ -313,6 +353,21 @@ bool DemoEntityManager::GetKeyState(int key) const
 	dAssert (0);
 	return false;
 }
+
+bool DemoEntityManager::IsShiftKeyDown () const
+{
+//	return m_shiftKey;
+	dAssert (0);
+	return false;
+}
+
+bool DemoEntityManager::IsControlKeyDown () const
+{
+//	return m_controlKey;
+	dAssert (0);
+	return false;
+}
+
 
 
 bool DemoEntityManager::GetMouseKeyState (int button) const
@@ -410,9 +465,6 @@ void DemoEntityManager::Cleanup ()
 	new DemoEntityListener (this);
 	m_cameraManager = new DemoCameraListener(this);
 	//	m_postListenerManager.Append (new DemoAIListener("aiManager"));
-
-	// set number of internal sub steps
-	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
 	// set the default parameters for the newton world
 	// set the simplified solver mode (faster but less accurate)

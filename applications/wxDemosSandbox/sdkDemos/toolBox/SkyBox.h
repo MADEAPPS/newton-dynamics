@@ -17,7 +17,7 @@
 #ifndef __SKY_BOX_H_
 #define __SKY_BOX_H_
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "../DemoEntity.h"
 
 class DemoEntityManager;

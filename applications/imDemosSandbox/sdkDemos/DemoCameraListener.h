@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -19,9 +19,9 @@
 
 #include <toolbox_stdafx.h>
 #include "DemoEntity.h"
-#include "DemoCamera.h"
 #include "DemoListenerBase.h"
 
+class DemoCamera;
 class DemoCameraListener: public DemoListenerBase
 {
 	public:
@@ -33,13 +33,7 @@ class DemoCameraListener: public DemoListenerBase
 		return m_camera;
 	}
 
-	void SetCameraMatrix (DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
-	{
-		m_camera->SetMatrix(*scene, rotation, position);
-		m_camera->SetMatrix(*scene, rotation, position);
-		m_yaw = m_camera->GetYawAngle();
-		m_pitch = m_camera->GetPichAngle();
-	}
+	void SetCameraMatrix (DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position);
 
 	void SetCameraMouseLock (bool loockState);
 
@@ -70,6 +64,7 @@ class DemoCameraListener: public DemoListenerBase
 	dVector m_pickedBodyLocalAtachmentPoint;
 	dVector m_pickedBodyLocalAtachmentNormal;
 	NewtonBody* m_targetPicked;
+	dCustomKinematicController* m_pickJoint;
 	NewtonBodyDestructor m_bodyDestructor;
 	friend class DemoCamera;
 };
