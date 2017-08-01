@@ -12,7 +12,7 @@
 // dGeometry.cpp: implementation of the dGeometry class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "DebugDisplay.h"
 #include "PhysicsUtils.h"
 

@@ -10,7 +10,7 @@
 */
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "TargaToOpenGl.h"
 
 

@@ -28,8 +28,8 @@
 	#include "CocoaOpenglGlue.h"
 #endif
 
-#define MAX_PHYSICS_FPS				120.0f
-#define PROJECTILE_INITIAL_SPEED	        20.0f
+#define MAX_PHYSICS_FPS					120.0f
+#define PROJECTILE_INITIAL_SPEED	     20.0f
 
 BEGIN_EVENT_TABLE (DemoEntityManager, wxGLCanvas)
 	EVT_KEY_UP(DemoEntityManager::OnKeyUp)	

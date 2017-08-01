@@ -14,10 +14,9 @@
 // RenderPrimitive.cpp: implementation of the RenderPrimitive class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "DemoCamera.h"
 #include "MousePick.h"
-//#include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "DemoCameraListener.h"
 
@@ -182,11 +181,8 @@ void DemoCameraListener::OnBodyDestroy (NewtonBody* const body)
 
 void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
 {
-dAssert (0);
-/*
-
 	// handle pick body from the screen
-	bool mousePickState = mainWin->GetMouseKeyState(0);
+	bool mousePickState = scene->GetMouseKeyState(0);
 	if (!m_targetPicked) {
 		if (!m_prevMouseState && mousePickState) {
 			dFloat param;
@@ -197,51 +193,74 @@ dAssert (0);
 			dFloat y = dFloat (m_mousePosY);
 			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
-			NewtonBody* const body = MousePickByForce (scene->GetNewton(), p0, p1, param, posit, normal);
+			NewtonBody* const body = MousePickBody (scene->GetNewton(), p0, p1, param, posit, normal);
 			if (body) {
-				m_targetPicked = body;
 				dMatrix matrix;
+				m_targetPicked = body;
 				NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
 
-				// save point local to the body matrix
 				m_pickedBodyParam = param;
+				#ifdef USE_PICK_BODY_BY_FORCE
+				// save point local to the body matrix
 				m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
 
 				// convert normal to local space
 				m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
+				#else
+					if(m_pickJoint) {
+						delete m_pickJoint;
+					}
+					
+					dFloat Ixx;
+					dFloat Iyy;
+					dFloat Izz;
+					dFloat mass;
+					NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 
-				// link the a destructor callback
-				//m_bodyDestructor = NewtonBodyGetDestructorCallback(m_targetPicked);
-				//NewtonBodySetDestructorCallback(m_targetPicked, OnPickedBodyDestroyedNotify);
+					const dFloat angularFritionAccel = 100.0f;
+					const dFloat linearFrictionAccel = 10.0f * dAbs (dMax (DEMO_GRAVITY, 10.0f));
+					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
+
+					m_pickJoint = new dCustomKinematicController (body, posit);
+					m_pickJoint->SetPickMode (0);
+					m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
+					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
+				#endif
 			}
 		}
 
 	} else {
-		if (mainWin->GetMouseKeyState(0)) {
+		if (scene->GetMouseKeyState(0)) {
 			dFloat x = dFloat (m_mousePosX);
 			dFloat y = dFloat (m_mousePosY);
 			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 
+			#ifdef USE_PICK_BODY_BY_FORCE
 			dMatrix matrix;
 			NewtonBodyGetMatrix (m_targetPicked, &matrix[0][0]);
 			dVector point (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
 			CalculatePickForceAndTorque (m_targetPicked, point, m_pickedBodyTargetPosition, timestep);
+			#else 
+				if (m_pickJoint) {
+					m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+				}
+			#endif
 		} else {
 			if (m_targetPicked) {
 				NewtonBodySetSleepState (m_targetPicked, 0);
 			}
-
-			// unchain the callbacks
-			//NewtonBodySetDestructorCallback(m_targetPicked, m_bodyDestructor);
+			if (m_pickJoint) {
+				delete m_pickJoint;
+			}
+			m_pickJoint = NULL;
 			m_targetPicked = NULL; 
 			m_bodyDestructor = NULL;
 		}
 	}
 
 	m_prevMouseState = mousePickState;
-*/
 }
 
 

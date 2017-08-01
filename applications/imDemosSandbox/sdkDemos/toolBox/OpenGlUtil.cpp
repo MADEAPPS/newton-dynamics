@@ -14,7 +14,7 @@
 // OpenGlUtil.cpp: implementation of the OpenGlUtil class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "OpenGlUtil.h"
 #include "TargaToOpenGl.h"
 

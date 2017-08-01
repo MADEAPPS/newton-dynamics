@@ -14,7 +14,7 @@
 // RenderPrimitive.cpp: implementation of the RenderPrimitive class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "TargaToOpenGl.h"
 #include "SkyBox.h"
 

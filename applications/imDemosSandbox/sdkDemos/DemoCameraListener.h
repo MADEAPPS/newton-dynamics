@@ -17,7 +17,7 @@
 #ifndef __DEMO_CAMERA_LISTENER_H__
 #define __DEMO_CAMERA_LISTENER_H__
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "DemoEntity.h"
 #include "DemoListenerBase.h"
 

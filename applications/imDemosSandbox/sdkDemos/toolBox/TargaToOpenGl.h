@@ -14,7 +14,7 @@
 #ifndef __TARGA_TO_OPENGL__ 
 #define __TARGA_TO_OPENGL__ 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 
 
 enum TextureImageFormat
