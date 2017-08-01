@@ -16,8 +16,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "toolbox_stdafx.h"
 #include "DemoCamera.h"
-#include "MousePick.h"
 #include "NewtonDemos.h"
+#include "OpenGlUtil.h"
 #include "PhysicsUtils.h"
 #include "DemoCameraListener.h"
 
