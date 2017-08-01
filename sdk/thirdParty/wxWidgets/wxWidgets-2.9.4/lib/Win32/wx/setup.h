@@ -578,13 +578,13 @@
 #define wxUSE_ARCHIVE_STREAMS     1
 
 // Set to 1 to compile wxZipInput/OutputStream classes.
-#define wxUSE_ZIPSTREAM     1
+#define wxUSE_ZIPSTREAM     0
 
 // Set to 1 to compile wxTarInput/OutputStream classes.
 #define wxUSE_TARSTREAM     1
 
 // Set to 1 to compile wxZlibInput/OutputStream classes. Also required by
-#define wxUSE_ZLIB          1
+#define wxUSE_ZLIB          0
 
 // If enabled, the code written by Apple will be used to write, in a portable
 // way, float on the disk. See extended.c for the license which is different
