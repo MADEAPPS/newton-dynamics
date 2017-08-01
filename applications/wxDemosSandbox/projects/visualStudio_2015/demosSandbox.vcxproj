@@ -441,7 +441,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UserStaticCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp" />
@@ -485,7 +484,6 @@
     <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h" />
-    <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h" />

@@ -112,15 +112,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp">
-      <Filter>mainLogic\listeners</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp">
-      <Filter>mainLogic\listeners</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp">
-      <Filter>mainLogic\listeners</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -129,9 +120,6 @@
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp">
       <Filter>demos</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp">
-      <Filter>mainLogic\listeners</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp">
       <Filter>demos</Filter>
@@ -162,6 +150,15 @@
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\DynamicRagDoll.cpp">
       <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp">
+      <Filter>mainLogic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -210,17 +207,14 @@
     <ClInclude Include="..\..\sdkDemos\toolBox\UserPlaneCollision.h">
       <Filter>tooBox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h">
-      <Filter>mainLogic\listeners</Filter>
+    <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h">
+      <Filter>mainLogic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h">
-      <Filter>mainLogic\listeners</Filter>
+    <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h">
+      <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h">
-      <Filter>mainLogic\listeners</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h">
-      <Filter>mainLogic\listeners</Filter>
+      <Filter>mainLogic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -232,9 +226,6 @@
     </Filter>
     <Filter Include="mainLogic">
       <UniqueIdentifier>{c23f6d15-858a-4b77-b7d9-71402b1e6b7d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="mainLogic\listeners">
-      <UniqueIdentifier>{018b799f-0d42-482a-9dca-52fcf73f1f4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
