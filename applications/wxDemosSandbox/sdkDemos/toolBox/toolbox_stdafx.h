@@ -149,7 +149,6 @@ typedef long long unsigned64;
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
-
 #include <dCustomArcticulatedTransformManager.h>
 
 #include <dCRC.h>
@@ -258,8 +257,6 @@ void dGetWorkingFileName (const char* const name, char* const outPathName);
 unsigned SWAP_INT32(unsigned x);
 unsigned short SWAP_INT16(unsigned short x);
 void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count);
-
-
 
 #endif 
 

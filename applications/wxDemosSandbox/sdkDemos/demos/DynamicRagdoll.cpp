@@ -22,8 +22,6 @@
 #include "HeightFieldPrimitive.h"
 
 
-
-
 class DynamicRagdollManager: public dCustomActiveCharacterManager
 {
 	public: 
@@ -137,10 +135,18 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-		dAssert (0);
-//		MySaveLoad saveLoad(GetWorld(), m_material);
-//		NewtonBody* const rootBone = saveLoad.Load (fileName);
-//		return rootBone;
+		char* const oldloc = setlocale(LC_ALL, 0);
+		setlocale(LC_ALL, "C");
+		FILE* const imputFile = fopen(fileName, "rt");
+		dAssert(imputFile);
+
+		MySaveLoad saveLoad(GetWorld(), imputFile, m_material);
+		NewtonBody* const rootBone = saveLoad.Load ();
+
+		fclose(imputFile);
+		setlocale(LC_ALL, oldloc);
+
+		return rootBone;
 		return NULL;
 	}
 

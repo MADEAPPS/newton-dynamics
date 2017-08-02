@@ -142,6 +142,8 @@ jointsCount: 6
 joint: dCustomRagdollMotor_3dof
   childBody: Bip01_L_Thigh
   parentBody: Bip01_Pelvis
+  degreesOfFreedom: 6
+  solverModel: 0
   body0_position: 0.000000 0.000000 0.000000
   body1_position: -0.000007 0.105093 0.000000
   body0_rotation: 0.000000 -90.000000 0.000001
@@ -157,6 +159,8 @@ jointEnd:
 joint: dCustomRagdollMotor_3dof
   childBody: Bip01_R_Thigh
   parentBody: Bip01_Pelvis
+  degreesOfFreedom: 6
+  solverModel: 0
   body0_position: 0.000000 0.000000 0.000000
   body1_position: 0.000007 -0.105093 0.000000
   body0_rotation: 0.000000 -90.000000 -0.000001
@@ -172,6 +176,8 @@ jointEnd:
 joint: dCustomRagdollMotor_1dof
   childBody: Bip01_R_Calf
   parentBody: Bip01_R_Thigh
+  degreesOfFreedom: 6
+  solverModel: 0
   body0_position: 0.000000 0.000000 0.000000
   body1_position: 0.000000 -0.000001 0.398078
   body0_rotation: 90.000000 0.000002 90.000000
@@ -186,6 +192,8 @@ jointEnd:
 joint: dCustomRagdollMotor_2dof
   childBody: Bip01_R_Foot
   parentBody: Bip01_R_Calf
+  degreesOfFreedom: 6
+  solverModel: 0
   body0_position: 0.000000 0.000000 0.000000
   body1_position: -0.000000 0.000000 0.398078
   body0_rotation: 0.000000 -90.000000 -0.000001
@@ -199,6 +207,8 @@ jointEnd:
 joint: dCustomRagdollMotor_1dof
   childBody: Bip01_L_Calf
   parentBody: Bip01_L_Thigh
+  degreesOfFreedom: 6
+  solverModel: 0
   body0_position: 0.000000 0.000000 0.000000
   body1_position: 0.000000 -0.000001 0.398078
   body0_rotation: 90.000000 0.000002 90.000000
@@ -213,6 +223,8 @@ jointEnd:
 joint: dCustomRagdollMotor_2dof
   childBody: Bip01_L_Foot
   parentBody: Bip01_L_Calf
+  degreesOfFreedom: 6
+  solverModel: 0
   body0_position: 0.000000 0.000000 0.000000
   body1_position: 0.000000 0.000000 0.398078
   body0_rotation: 0.000000 -90.000000 0.000000

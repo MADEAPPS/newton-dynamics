@@ -24,7 +24,8 @@ dCustomJoint::dSerializeMetaData m_metaData_CustomJoint("dCustomJoint");
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 dCustomJoint::dCustomJoint ()
-	:m_userData(NULL)
+	:dCustomAlloc()
+	,m_userData(NULL)
 	,m_body0(NULL)
 	,m_body1(NULL)
 	,m_joint(NULL)
@@ -37,11 +38,13 @@ dCustomJoint::dCustomJoint ()
 }
 
 dCustomJoint::dCustomJoint (int maxDOF, NewtonBody* const body0, NewtonBody* const body1)
+	:dCustomAlloc()
 {
 	Init (maxDOF, body0, body1);
 }
 
 dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* const invDynNode)
+	:dCustomAlloc()
 {
 	m_joint = NULL;
 	m_body1 = NULL;
@@ -61,7 +64,8 @@ dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* cons
 }
 
 dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
-	:m_userData(NULL)
+	:dCustomAlloc()
+	,m_userData(NULL)
 	,m_body0(body0)
 	,m_body1(body1)
 	,m_joint(NULL)
@@ -79,6 +83,59 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	callback(userData, &solverModel, sizeof(solverModel));
 
 	Init (m_maxDof, body0, body1);
+	SetSolverModel(solverModel);
+}
+
+
+dCustomJoint::dCustomJoint(dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)
+	:dCustomAlloc()
+	,m_userData(NULL)
+	,m_body0(body0)
+	,m_body1(body1)
+	,m_joint(NULL)
+	,m_world(NULL)
+	,m_userDestructor(NULL)
+	,m_stiffness(1.0f)
+	,m_maxDof(0)
+	,m_autoDestroy(0)
+{
+	char buffer[256];
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "degreesOfFreedom:"));
+	m_maxDof = fileLoader->LoadInt();
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "solverModel:"));
+	int solverModel = fileLoader->LoadInt();
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "body0_position:"));
+	dVector posit0 (fileLoader->LoadVector());
+	posit0.m_w = 1.0f;
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "body1_position:"));
+	dVector posit1(fileLoader->LoadVector());
+	posit1.m_w = 1.0f;
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "body0_rotation:"));
+	dVector euler0(fileLoader->LoadVector());
+	euler0 = euler0.Scale (3.14159213f / 180.0f);
+	
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "body1_rotation:"));
+	dVector euler1(fileLoader->LoadVector());
+	euler1 = euler1.Scale(3.14159213f / 180.0f);
+
+	m_localMatrix0 = dMatrix (euler0, posit0);
+	m_localMatrix1 = dMatrix (euler1, posit1);
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "stiffness:"));
+	m_stiffness = fileLoader->LoadFloat();
+
+	Init(m_maxDof, body0, body1);
 	SetSolverModel(solverModel);
 }
 
@@ -236,6 +293,22 @@ void dCustomJoint::Deserialize (NewtonBody* const body0, NewtonBody* const body1
 	}
 }
 
+dCustomJoint* dCustomJoint::Load(dCustomJointSaveLoad* const fileLoader, const char* const jointType, NewtonBody* const body0, NewtonBody* const body1)
+{
+	dCRCTYPE key (dCRC64 (jointType));
+	const dSerializeMetaDataDictionary& dictionary = GetDictionary();
+	dCustomJoint* joint = NULL;
+	dSerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
+	dAssert (node);
+	if (node) {
+		dSerializeMetaData* const meta = node->GetInfo();
+		joint = meta->Load(fileLoader, body0, body1);
+	}
+
+	return joint;
+}
+
+
 void dCustomJoint::CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const
 {
 	dMatrix matrix0;
@@ -333,6 +406,12 @@ dCustomJoint* dCustomJoint::dSerializeMetaData::DeserializeJoint (NewtonBody* co
 	return NULL;
 }
 
+dCustomJoint* dCustomJoint::dSerializeMetaData::Load (dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)
+{
+	dAssert(0);
+	return NULL;
+}
+
 dCustomJoint::dSerializeMetaDataDictionary& dCustomJoint::GetDictionary()
 {
 	static dSerializeMetaDataDictionary dictionary;
@@ -384,6 +463,8 @@ void dCustomJoint::Save(dCustomJointSaveLoad* const save) const
 	childEuler = childEuler.Scale (180.0f / 3.141592f);
 	parentEuler = parentEuler.Scale (180.0f / 3.141592f);
 
+	save->SaveInt ("degreesOfFreedom", m_maxDof);
+	save->SaveInt ("solverModel", GetSolverModel());
 	save->SaveVector("body0_position", childMatrix.m_posit);
 	save->SaveVector("body1_position", parentMatrix.m_posit);
 
@@ -391,4 +472,10 @@ void dCustomJoint::Save(dCustomJointSaveLoad* const save) const
 	save->SaveVector("body1_rotation", parentEuler);
 
 	save->SaveFloat("stiffness", m_stiffness);
+}
+
+
+void dCustomJoint::Load(dCustomJointSaveLoad* const loader)
+{
+	dAssert (0);
 }

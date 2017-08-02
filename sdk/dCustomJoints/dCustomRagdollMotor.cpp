@@ -54,6 +54,11 @@ void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* cons
 	callback(userData, &m_torque, sizeof(dFloat));
 }
 
+void dCustomRagdollMotor::Load(dCustomJointSaveLoad* const loader)
+{
+	dAssert (0);
+}
+
 void dCustomRagdollMotor::Save(dCustomJointSaveLoad* const save) const
 {
 	dCustomBallAndSocket::Save(save);

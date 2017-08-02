@@ -107,7 +107,7 @@ void AdvancedPlayerController (DemoEntityManager* const scene);
 void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
-void PassiveRagDoll (DemoEntityManager* const scene);
+void PassiveRagdoll (DemoEntityManager* const scene);
 void DynamicRagDoll (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
@@ -145,7 +145,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
 	{"Standard Joints", "show some of the common joints", StandardJoints},
 	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
-	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagDoll},
+	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
 	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
 	{"Super car", "implement a hight performance sport car", SuperCar},
