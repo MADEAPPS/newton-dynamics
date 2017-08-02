@@ -318,20 +318,10 @@ void dCustomJointSaveLoad::ParseRigidBody(dTree<NewtonBody*, const dString>& bod
 
 void dCustomJointSaveLoad::ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap)
 {
-/*
-	dVector childPivot(0.0f);
-	dVector parentPivot(0.0f);
-	dVector childEuler(0.0f);
-	dVector parentEuler(0.0f);
-	dFloat coneAngle = 0.0f;
-	dFloat minTwistAngle = 0.0f;
-	dFloat maxTwistAngle = 0.0f;
-*/
 	char tokenBuffer[256];
 	char jointType[256];
 	char childName[256];
 	char parentName[256];
-
 
 	const char* const token = NextToken(tokenBuffer);
 	dAssert(!strcmp(token, "joint:"));
@@ -348,85 +338,7 @@ void dCustomJointSaveLoad::ParseJoint(const dTree<NewtonBody*, const dString>& b
 	NewtonBody* const parent = bodyMap.Find(parentName)->GetInfo();
 
 	dCustomJoint* const joint = dCustomJoint::Load(this, jointType, child, parent);
-/*
-	while (!feof(file)) {
-		fscanf(file, "%s", token);
-		if (!strcmp(token, "joint:")) {
-			fscanf(file, "%s", &jointType);
-		}
-		else if (!strcmp(token, "childBody:")) {
-			fscanf(file, "%s", childName);
-			child = bodyMap.Find(childName)->GetInfo();
-		}
-		else if (!strcmp(token, "parentBody:")) {
-			fscanf(file, "%s", parentName);
-			parent = bodyMap.Find(parentName)->GetInfo();
-		}
-		else if (!strcmp(token, "childPivot:")) {
-			fscanf(file, "%f %f %f", &childPivot.m_x, &childPivot.m_y, &childPivot.m_z);
-		}
-		else if (!strcmp(token, "childEulers:")) {
-			fscanf(file, "%f %f %f", &childEuler.m_x, &childEuler.m_y, &childEuler.m_z);
-		}
-		else if (!strcmp(token, "parentPivot:")) {
-			fscanf(file, "%f %f %f", &parentPivot.m_x, &parentPivot.m_y, &parentPivot.m_z);
-		}
-		else if (!strcmp(token, "parentEulers:")) {
-			fscanf(file, "%f %f %f", &parentEuler.m_x, &parentEuler.m_y, &parentEuler.m_z);
-		}
-		else if (!strcmp(token, "coneAngle:")) {
-			fscanf(file, "%f", &coneAngle);
-		}
-		else if (!strcmp(token, "minTwistAngle:")) {
-			fscanf(file, "%f", &minTwistAngle);
-		}
-		else if (!strcmp(token, "maxTwistAngle:")) {
-			fscanf(file, "%f", &maxTwistAngle);
-		}
-		else if (!strcmp(token, "jointEnd:")) {
-			break;
-		}
-		else {
-			dAssert(0);
-		}
-	}
-
-	dAssert(child);
-	dAssert(parent);
-
-	dMatrix childBodyMatrix;
-	dMatrix parentBodyMatrix;
-
-	childEuler = childEuler.Scale(3.141592f / 180.0f);
-	parentEuler = parentEuler.Scale(3.141592f / 180.0f);
-
-	NewtonBodyGetMatrix(child, &childBodyMatrix[0][0]);
-	NewtonBodyGetMatrix(parent, &parentBodyMatrix[0][0]);
-	dMatrix childPinAndPivotInGlobalSpace(childEuler.m_x, childEuler.m_y, childEuler.m_z, childPivot);
-	dMatrix parentPinAndPivotInGlobalSpace(parentEuler.m_x, parentEuler.m_y, parentEuler.m_z, parentPivot);
-
-	childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * childBodyMatrix;
-	parentPinAndPivotInGlobalSpace = parentPinAndPivotInGlobalSpace * parentBodyMatrix;
-
-	if (!strcmp(jointType, "dCustomRagdollMotor_1dof")) {
-		dCustomRagdollMotor_1dof* const ragdollJoint = new dCustomRagdollMotor_1dof(parentPinAndPivotInGlobalSpace, child, parent);
-		ragdollJoint->SetTwistAngle(minTwistAngle * 3.141592f / 180.0f, maxTwistAngle * 3.141592f / 180.0f);
-	}
-	else if (!strcmp(jointType, "dCustomRagdollMotor_2dof")) {
-		dCustomRagdollMotor_2dof* const ragdollJoint = new dCustomRagdollMotor_2dof(parentPinAndPivotInGlobalSpace, child, parent);
-		ragdollJoint->SetConeAngle(coneAngle * 3.141592f / 180.0f);
-	}
-	else if (!strcmp(jointType, "dCustomRagdollMotor_3dof")) {
-		dCustomRagdollMotor_3dof* const ragdollJoint = new dCustomRagdollMotor_3dof(parentPinAndPivotInGlobalSpace, child, parent);
-		ragdollJoint->SetConeAngle(coneAngle * 3.141592f / 180.0f);
-		ragdollJoint->SetTwistAngle(minTwistAngle * 3.141592f / 180.0f, maxTwistAngle * 3.141592f / 180.0f);
-	}
-	else {
-
-		dAssert(0);
-		new dCustomRagdollMotor(parentPinAndPivotInGlobalSpace, child, parent);
-	}
-*/
+	while (strcmp(NextToken(tokenBuffer), "jointEnd:"));
 }
 
 

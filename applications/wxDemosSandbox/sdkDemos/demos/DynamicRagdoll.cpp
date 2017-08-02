@@ -147,7 +147,6 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		setlocale(LC_ALL, oldloc);
 
 		return rootBone;
-		return NULL;
 	}
 
 
@@ -155,7 +154,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 	{
 		dCustomActiveCharacterController* const controller = CreateTransformController();
 		NewtonBody* const root = ParseRagdollFile("balancingGait.txt", controller);
-
+return;
 		dMatrix bodyMatrix;
 		NewtonBodyGetMatrix (root, &bodyMatrix[0][0]);
 

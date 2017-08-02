@@ -39,8 +39,8 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	CUSTOM_JOINTS_API dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const loader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const save) const;
+	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_torque;
@@ -64,7 +64,8 @@ class dCustomRagdollMotor_1dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const save) const;
+	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_minTwistAngle;
@@ -87,7 +88,8 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const save) const;
+	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_coneAngle;
@@ -112,7 +114,8 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const save) const;
+	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_coneAngle;
@@ -141,7 +144,8 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const save) const;
+	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const { dAssert(0); }
 

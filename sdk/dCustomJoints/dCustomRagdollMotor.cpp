@@ -54,16 +54,23 @@ void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* cons
 	callback(userData, &m_torque, sizeof(dFloat));
 }
 
-void dCustomRagdollMotor::Load(dCustomJointSaveLoad* const loader)
+void dCustomRagdollMotor::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	dAssert (0);
+	char buffer[256];
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "frictionTorque:"));
+	m_torque = fileLoader->LoadFloat();
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "motorMode:"));
+	m_motorMode = fileLoader->LoadInt();
 }
 
-void dCustomRagdollMotor::Save(dCustomJointSaveLoad* const save) const
+void dCustomRagdollMotor::Save(dCustomJointSaveLoad* const fileSaver) const
 {
-	dCustomBallAndSocket::Save(save);
-	save->SaveFloat("frictionTorque", m_torque);
-	save->SaveInt("motorMode", m_motorMode);
+	dCustomBallAndSocket::Save(fileSaver);
+	fileSaver->SaveFloat("frictionTorque", m_torque);
+	fileSaver->SaveInt("motorMode", m_motorMode);
 }
 
 bool dCustomRagdollMotor::GetMode() const
@@ -116,13 +123,25 @@ void dCustomRagdollMotor_1dof::Serialize(NewtonSerializeCallback callback, void*
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
 }
 
-void dCustomRagdollMotor_1dof::Save(dCustomJointSaveLoad* const save) const
+void dCustomRagdollMotor_1dof::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	dCustomRagdollMotor::Save(save);
-	save->SaveFloat("minTwistAngle", m_minTwistAngle * 180.0f / 3.141592f);
-	save->SaveFloat("maxTwistAngle", m_maxTwistAngle * 180.0f / 3.141592f);
+	char buffer[256];
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "minTwistAngle:"));
+	m_minTwistAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "maxTwistAngle:"));
+	m_maxTwistAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
 }
 
+void dCustomRagdollMotor_1dof::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dCustomRagdollMotor::Save(fileSaver);
+	fileSaver->SaveFloat("minTwistAngle", m_minTwistAngle * 180.0f / 3.141592f);
+	fileSaver->SaveFloat("maxTwistAngle", m_maxTwistAngle * 180.0f / 3.141592f);
+}
 
 void dCustomRagdollMotor_1dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
@@ -240,12 +259,19 @@ dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(NewtonBody* const child, Newt
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 }
 
-void dCustomRagdollMotor_2dof::Save(dCustomJointSaveLoad* const save) const
+void dCustomRagdollMotor_2dof::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	dCustomRagdollMotor::Save(save);
-	save->SaveFloat ("coneAngle", m_coneAngle * 180.0f / 3.141592f);
+	char buffer[256];
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "coneAngle:"));
+	m_coneAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
 }
 
+void dCustomRagdollMotor_2dof::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dCustomRagdollMotor::Save(fileSaver);
+	fileSaver->SaveFloat ("coneAngle", m_coneAngle * 180.0f / 3.141592f);
+}
 
 void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
@@ -412,12 +438,29 @@ dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(NewtonBody* const child, Newt
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
 }
 
-void dCustomRagdollMotor_3dof::Save(dCustomJointSaveLoad* const save) const
+
+void dCustomRagdollMotor_3dof::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	dCustomRagdollMotor::Save(save);
-	save->SaveFloat ("coneAngle", m_coneAngle * 180.0f / 3.141592f);
-	save->SaveFloat ("minTwistAngle", m_minTwistAngle * 180.0f / 3.141592f);
-	save->SaveFloat ("maxTwistAngle", m_maxTwistAngle * 180.0f / 3.141592f);
+	char buffer[256];
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "coneAngle:"));
+	m_coneAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "minTwistAngle:"));
+	m_minTwistAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "maxTwistAngle:"));
+	m_maxTwistAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+}
+
+void dCustomRagdollMotor_3dof::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dCustomRagdollMotor::Save(fileSaver);
+	fileSaver->SaveFloat ("coneAngle", m_coneAngle * 180.0f / 3.141592f);
+	fileSaver->SaveFloat ("minTwistAngle", m_minTwistAngle * 180.0f / 3.141592f);
+	fileSaver->SaveFloat ("maxTwistAngle", m_maxTwistAngle * 180.0f / 3.141592f);
 }
 
 void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -695,9 +738,18 @@ void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) c
 	debugDisplay->DrawFrame(matrix);
 }
 
-void dCustomRagdollMotor_EndEffector::Save(dCustomJointSaveLoad* const save) const
+void dCustomRagdollMotor_EndEffector::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	dCustomJoint::Save(save);
+	char buffer[256];
+	fileLoader->NextToken(buffer);
+	dAssert(!strcmp(buffer, "stiffness:"));
+	m_stiffness = fileLoader->LoadFloat();
+}
+
+
+void dCustomRagdollMotor_EndEffector::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dCustomJoint::Save(fileSaver);
 	dAssert(0);
 }
 
