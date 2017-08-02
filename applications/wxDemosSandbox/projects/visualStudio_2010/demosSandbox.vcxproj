@@ -435,11 +435,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\StandardJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UserStaticCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp" />
-    <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\OpenGlUtil.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\PhysicsUtils.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\SkyBox.cpp" />
@@ -479,11 +477,9 @@
     <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h" />
-    <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h" />
-    <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\PhysicsUtils.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\SkyBox.h" />

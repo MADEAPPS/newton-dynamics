@@ -82,3 +82,4 @@ doc/html
 # third party
 sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 #sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/vc_lib/mswud/wx/msw/rcdefs.h
+sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/vc_lib/mswud/wx/msw/rcdefs.h
