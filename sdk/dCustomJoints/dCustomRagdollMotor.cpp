@@ -194,7 +194,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 		// tell joint error will minimize the exceeded angle error
 		NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1.m_front[0]);
 
-		dFloat accel = (-correctionFactor * angle * invTimestep + relOmega.DotProduct3(matrix1.m_front)) * invTimestep;
+		accel = (-correctionFactor * angle * invTimestep + relOmega.DotProduct3(matrix1.m_front)) * invTimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
 
 		// allow the joint to move back freely 
@@ -214,7 +214,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 	} else if (m_motorMode) {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+		accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
@@ -589,7 +589,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 	if (dot < 0.999f) {
 		dVector pin(coneDir1.CrossProduct(coneDir0));
 		dVector axis = pin.Scale(1.0f / dSqrt(pin.DotProduct3(pin)));
-		dFloat angle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
+		angle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
 		dQuaternion rot(axis, angle);
 		matrix1 = matrix1 * dMatrix(rot, dVector(0.0f, 0.0f, 0.0f, 1.0f));
 	}

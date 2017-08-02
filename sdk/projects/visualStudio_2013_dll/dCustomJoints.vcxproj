@@ -59,6 +59,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\dCustomKinematicController.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomModelLoadSave.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPathFollow.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPlane.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomKinematicController.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomModelLoadSave.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPathFollow.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPlane.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />
