@@ -21,32 +21,36 @@
 
 
 
-class dSaveLoad : public dCustomAlloc
+class dCustomJointSaveLoad: public dCustomAlloc
 {
 	public:
-	class BodyJointPair;
-
-	dSaveLoad(NewtonWorld* const world)
-		:m_world(world) 
+	dCustomJointSaveLoad(NewtonWorld* const world, FILE* const file)
+		:m_file(file)
+		,m_world(world)
 	{
 	}
 
-	virtual ~dSaveLoad() 
+	virtual ~dCustomJointSaveLoad() 
 	{
 	}
+
+	void SaveInt (const char* const token, int val) const;
+	void SaveFloat (const char* const token, dFloat val) const;
+	void SaveVector (const char* const token, const dVector& v) const;
 
 	virtual const char* GetBodyUniqueName(const NewtonBody* const body) const = 0;
 	virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const = 0;
 
-	CUSTOM_JOINTS_API virtual void Load(const char* const name);
-	CUSTOM_JOINTS_API virtual void Save(NewtonBody* const rootbody, const char* const name);
+	CUSTOM_JOINTS_API virtual void Load();
+	CUSTOM_JOINTS_API virtual void Save(NewtonBody* const rootbody);
 
 	private:
 	NewtonCollision* ParseCollisonShape(FILE* const file);
-	void GetBodyList (dList<BodyJointPair>& list, NewtonBody* const rootbody);
+	void GetBodiesAndJointsList (dList<const NewtonBody*>& bodylist, dList<const dCustomJoint*>& jointlist, NewtonBody* const rootbody);
 	void ParseRigidBody(FILE* const file, dTree<NewtonBody*, const dString>& bodyMap);
 	void ParseJoint(FILE* const file, const dTree<NewtonBody*, const dString>& bodyMap);
 
+	FILE* m_file;
 	NewtonWorld* m_world;
 };
 

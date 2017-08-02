@@ -79,11 +79,11 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 
 
 
-	class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
+	class MySaveLoad: public dCustomJointSaveLoad
 	{
 		public:
-		MySaveLoad(NewtonWorld* const world, int material)
-			:dCustomRagdollMotor::dSaveLoad(world)
+		MySaveLoad(NewtonWorld* const world, FILE* const file, int material)
+			:dCustomJointSaveLoad(world, file)
 			,m_material(material)
 		{
 		}
@@ -137,9 +137,11 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-		MySaveLoad saveLoad(GetWorld(), m_material);
-		NewtonBody* const rootBone = saveLoad.Load (fileName);
-		return rootBone;
+		dAssert (0);
+//		MySaveLoad saveLoad(GetWorld(), m_material);
+//		NewtonBody* const rootBone = saveLoad.Load (fileName);
+//		return rootBone;
+		return NULL;
 	}
 
 

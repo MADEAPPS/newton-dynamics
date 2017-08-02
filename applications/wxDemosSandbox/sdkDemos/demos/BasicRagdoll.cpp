@@ -379,11 +379,12 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 	}
 
 
-	class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
+	//class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
+	class MySaveLoad: public dCustomJointSaveLoad
 	{
 		public:
-		MySaveLoad(NewtonWorld* const world, int materialID)
-			:dCustomRagdollMotor::dSaveLoad(world)
+		MySaveLoad(NewtonWorld* const world, FILE* const file, int materialID)
+			:dCustomJointSaveLoad(world, file)
 			,m_material(materialID)
 		{
 		}
@@ -435,9 +436,18 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-		MySaveLoad saveLoad(GetWorld(), m_material);
+		
 //xxx
-//		saveLoad.Save (fileName, controller->GetBoneBody(controller->GetBone(0)));
+		char* const oldloc = setlocale(LC_ALL, 0);
+		setlocale(LC_ALL, "C");
+		FILE* const outputFile = fopen(fileName, "wt");
+		dAssert(outputFile);
+
+		MySaveLoad saveLoad(GetWorld(), outputFile, m_material);
+		saveLoad.Save(controller->GetBoneBody(controller->GetBone(0)));
+
+		fclose(outputFile);
+		setlocale(LC_ALL, oldloc);
 	}
 
 	int m_material;

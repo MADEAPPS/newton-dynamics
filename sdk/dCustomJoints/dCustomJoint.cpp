@@ -15,6 +15,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomJoint.h"
+#include "dCustomModelLoadSave.h"
 
 dCRCTYPE dCustomJoint::m_key = dCRC64 ("dCustomJoint");
 dCustomJoint::dSerializeMetaData m_metaData_CustomJoint("dCustomJoint");
@@ -365,4 +366,29 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 	dVector z(matrix.m_posit + matrix.RotateVector(dVector(0.0f, 0.0f, size, 0.0f)));
 	SetColor(dVector (0.0f, 0.0f, 1.0f));
 	DrawLine (matrix.m_posit, z);
+}
+
+
+void dCustomJoint::Save(dCustomJointSaveLoad* const save) const
+{
+	dMatrix childMatrix(GetMatrix0());
+	dMatrix parentMatrix(GetMatrix1());
+
+	dVector euler;
+	dVector childEuler;
+	dVector parentEuler;
+
+	childMatrix.GetEulerAngles(childEuler, euler);
+	parentMatrix.GetEulerAngles(parentEuler, euler);
+
+	childEuler = childEuler.Scale (180.0f / 3.141592f);
+	parentEuler = parentEuler.Scale (180.0f / 3.141592f);
+
+	save->SaveVector("body0_position", childMatrix.m_posit);
+	save->SaveVector("body1_position", parentMatrix.m_posit);
+
+	save->SaveVector("body0_rotation", childEuler);
+	save->SaveVector("body1_rotation", parentEuler);
+
+	save->SaveFloat("stiffness", m_stiffness);
 }

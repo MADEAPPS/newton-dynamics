@@ -25,6 +25,7 @@
 #include "dCustomAlloc.h"
 
 class dCustomJoint;
+class dCustomJointSaveLoad;
 typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);	
 
 
@@ -207,6 +208,8 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
+
+
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 
 	CUSTOM_JOINTS_API static void Destructor (const NewtonJoint* me);	
@@ -221,6 +224,7 @@ class dCustomJoint: public dCustomAlloc
 	// the application needs to implement this function for each derived joint. See examples for more detail
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
+	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const save) const;
 
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 
@@ -242,6 +246,8 @@ class dCustomJoint: public dCustomAlloc
 	int m_autoDestroy;
 	CUSTOM_JOINTS_API static dCRCTYPE m_key;
 	CUSTOM_JOINTS_API static dSerializeMetaData m_metaData_CustomJoint;
+
+	friend class dCustomJointSaveLoad;
 };
 
 
