@@ -361,7 +361,8 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		dMatrix worldMatrix (rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
 
-		PrintRagdoll (controller, "balancingGait.txt");
+		//xxx
+		//PrintRagdoll (controller, "balancingGait.txt");
 	}
 
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
@@ -435,8 +436,6 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-		
-//xxx
 		char* const oldloc = setlocale(LC_ALL, 0);
 		setlocale(LC_ALL, "C");
 		FILE* const outputFile = fopen(fileName, "wt");

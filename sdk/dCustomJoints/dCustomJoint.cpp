@@ -127,8 +127,8 @@ dCustomJoint::dCustomJoint(dCustomJointSaveLoad* const fileLoader, NewtonBody* c
 	dVector euler1(fileLoader->LoadVector());
 	euler1 = euler1.Scale(3.14159213f / 180.0f);
 
-	m_localMatrix0 = dMatrix (euler0, posit0);
-	m_localMatrix1 = dMatrix (euler1, posit1);
+	m_localMatrix0 = dMatrix (euler0.m_x, euler0.m_y, euler0.m_z, posit0);
+	m_localMatrix1 = dMatrix (euler1.m_x, euler1.m_y, euler1.m_z, posit1);
 
 	token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "stiffness:"));

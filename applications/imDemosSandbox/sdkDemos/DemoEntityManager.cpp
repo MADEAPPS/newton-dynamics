@@ -375,7 +375,6 @@ bool DemoEntityManager::GetMouseKeyState (int button) const
 
 void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context)
 {
-	dAssert (0);
 	m_renderHood = callback;
 	m_renderHoodContext = context;
 }

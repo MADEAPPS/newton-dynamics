@@ -154,7 +154,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 	{
 		dCustomActiveCharacterController* const controller = CreateTransformController();
 		NewtonBody* const root = ParseRagdollFile("balancingGait.txt", controller);
-return;
+
 		dMatrix bodyMatrix;
 		NewtonBodyGetMatrix (root, &bodyMatrix[0][0]);
 
@@ -163,6 +163,7 @@ return;
 		bodyMatrix.m_posit.m_w = 1.0f;
 		NewtonBodySetMatrixRecursive (root, &bodyMatrix[0][0]);
 
+return;
 dCustomHinge* xxx = new dCustomHinge(bodyMatrix, root);
 xxx->SetFriction (20000.0f);
 xxx->SetLimits(0.0f, 0.0f);
