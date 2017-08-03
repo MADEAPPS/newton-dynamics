@@ -209,6 +209,7 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 				#else
 					if(m_pickJoint) {
 						delete m_pickJoint;
+						m_pickJoint = NULL;
 					}
 					
 					dFloat Ixx;

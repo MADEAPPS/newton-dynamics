@@ -66,10 +66,10 @@ void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<const NewtonBody*>& bod
 }
 
 
-const char* dCustomJointSaveLoad::NextToken(char* const token) const
+const char* dCustomJointSaveLoad::NextToken() const
 {
-	fscanf(m_file, "%s:", token);
-	return token;
+	fscanf(m_file, "%s:", m_token);
+	return m_token;
 }
 
 int dCustomJointSaveLoad::LoadInt() const
@@ -102,17 +102,27 @@ void dCustomJointSaveLoad::LoadName(char* const name) const
 
 void dCustomJointSaveLoad::SaveInt (const char* const token, int val) const
 {
-	fprintf(m_file, "  %s: %d\n", token, val);
+	fprintf(m_file, "%s: %d\n", token, val);
 }
 
 void dCustomJointSaveLoad::SaveFloat (const char* const token, dFloat val) const
 {
-	fprintf(m_file, "  %s: %f\n", token, val);
+	fprintf(m_file, "%s: %f\n", token, val);
 }
 
 void dCustomJointSaveLoad::SaveVector (const char* const token, const dVector& v) const
 {
-	fprintf(m_file, "  %s: %f %f %f\n", token, v.m_x, v.m_y, v.m_z);
+	fprintf(m_file, "%s: %f %f %f\n", token, v.m_x, v.m_y, v.m_z);
+}
+
+void dCustomJointSaveLoad::SaveName (const char* const token, const char* const name) const
+{
+	fprintf(m_file, "%s: %s\n", token, name);
+}
+
+void dCustomJointSaveLoad::Newline () const
+{
+	fprintf(m_file, "\n");
 }
 
 
@@ -122,8 +132,10 @@ void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
 	dList<const dCustomJoint*> jointList;
 	GetBodiesAndJointsList(bodyList, jointList, rootbody);
 
-	fprintf(m_file, "rootBone: %s\n\n", GetBodyUniqueName(rootbody));
-	fprintf(m_file, "nodesCount: %d\n", bodyList.GetCount());
+	SaveName ("rootBone", GetBodyUniqueName(rootbody));
+	Newline ();
+
+	SaveInt ("nodesCount", bodyList.GetCount());
 	for (dList<const NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dMatrix boneMatrix;
 		dVector euler0;
@@ -141,41 +153,38 @@ void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		NewtonCollisionGetInfo(collision, &collisionInfo);
 
-		fprintf(m_file, "node: %s\n", GetBodyUniqueName(body));
-
-		fprintf(m_file, "  mass: %f\n", mass);
-		fprintf(m_file, "  position: %f %f %f\n", boneMatrix.m_posit.m_x, boneMatrix.m_posit.m_y, boneMatrix.m_posit.m_z);
-		fprintf(m_file, "  eulerAngles: %f %f %f\n", euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f);
+		SaveName ("node", GetBodyUniqueName(body));
+		SaveFloat ("\tmass", mass);
+		SaveVector ("\tposition", boneMatrix.m_posit);
+		SaveVector ("\teulerAngles", euler0.Scale (180.0f / 3.141592f));
 
 		switch (collisionInfo.m_collisionType) 
 		{
 			case SERIALIZE_ID_SPHERE:
 			{
-				fprintf(m_file, "  shapeType: sphere\n");
-				fprintf(m_file, "    radio: %f\n", collisionInfo.m_sphere.m_radio);
+				SaveName ("\tshapeType", "sphere");
+				SaveFloat ("\t\tradio", collisionInfo.m_sphere.m_radio);
 				break;
 			}
 
 			case SERIALIZE_ID_CAPSULE:
 			{
-				fprintf(m_file, "  shapeType: capsule\n");
-				fprintf(m_file, "    radio0: %f\n", collisionInfo.m_capsule.m_radio0);
-				fprintf(m_file, "    radio1: %f\n", collisionInfo.m_capsule.m_radio1);
-				fprintf(m_file, "    height: %f\n", collisionInfo.m_capsule.m_height);
+				SaveName ("\tshapeType", "capsule");
+				SaveFloat ("\t\tradio0", collisionInfo.m_capsule.m_radio0);
+				SaveFloat ("\t\tradio1", collisionInfo.m_capsule.m_radio1);
+				SaveFloat ("\t\theight", collisionInfo.m_capsule.m_height);
 				break;
 			}
 
 			case SERIALIZE_ID_CONVEXHULL:
 			{
-				fprintf(m_file, "  shapeType: convexHull\n");
-				fprintf(m_file, "    points: %d\n", collisionInfo.m_convexHull.m_vertexCount);
+				SaveName ("\tshapeType", "convexHull");
+				SaveInt ("\t\tpoints", collisionInfo.m_convexHull.m_vertexCount);
 				const int stride = collisionInfo.m_convexHull.m_vertexStrideInBytes / sizeof(dFloat);
 				const dFloat* points = collisionInfo.m_convexHull.m_vertex;
 				for (int i = 0; i < collisionInfo.m_convexHull.m_vertexCount; i++) {
-					dFloat x = points[i * stride + 0];
-					dFloat y = points[i * stride + 1];
-					dFloat z = points[i * stride + 2];
-					fprintf(m_file, "    v%d: %f %f %f\n", i, x, y, z);
+					dVector p (points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], 0.0f);
+					SaveVector ("\t\tv", p);
 				}
 				break;
 			}
@@ -188,34 +197,31 @@ void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
 
 		dMatrix shapeMatrix(&collisionInfo.m_offsetMatrix[0][0]);
 		shapeMatrix.GetEulerAngles(euler0, euler1);
-		fprintf(m_file, "    shapeScale: %f %f %f\n", 1.0f, 1.0f, 1.0f);
-		fprintf(m_file, "    shapePosition: %f %f %f\n", shapeMatrix.m_posit.m_x, shapeMatrix.m_posit.m_y, shapeMatrix.m_posit.m_z);
-		fprintf(m_file, "    shapeEulerAngle: %f %f %f\n", euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f);
 
-		fprintf(m_file, "nodeEnd:\n\n");
+		SaveVector ("\tshapeScale", dVector (1.0f, 1.0f, 1.0f, 1.0f));
+		SaveVector ("\tshapePosition", shapeMatrix.m_posit);
+		SaveVector ("\tshapeEulerAngle", euler0.Scale (180.0f / 3.141592f));
+		SaveName ("nodeEnd", "\n");
 	}
 
-
-	fprintf(m_file, "jointsCount: %d\n", jointList.GetCount());
+	SaveInt ("jointsCount", jointList.GetCount());
 	for (dList<const dCustomJoint*>::dListNode* ptr = jointList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		const dCustomJoint* const joint = ptr->GetInfo();
 
-		fprintf(m_file, "joint: %s\n", joint->GetTypeName());
-		fprintf(m_file, "  childBody: %s\n", GetBodyUniqueName(joint->GetBody0()));
-		fprintf(m_file, "  parentBody: %s\n", GetBodyUniqueName(joint->GetBody1()));
-
+		SaveName ("joint", joint->GetTypeName());
+		SaveName ("\tchildBody", GetBodyUniqueName(joint->GetBody0()));
+		SaveName ("\tparentBody", GetBodyUniqueName(joint->GetBody1()));
 		joint->Save (this);
-		fprintf(m_file, "jointEnd:\n\n");
+		SaveName ("jointEnd", "\n");
 	}
 }
 
 
 NewtonCollision* dCustomJointSaveLoad::ParseCollisonShape()
 {
-	char tokenBuffer[256];
 	NewtonCollision* collision = NULL;
 
-	const char* const token = NextToken(tokenBuffer);
+	const char* token = NextToken();
 
 	if (!strcmp(token, "sphere")) {
 		dAssert(0);
@@ -225,15 +231,15 @@ NewtonCollision* dCustomJointSaveLoad::ParseCollisonShape()
 		collision = NewtonCreateSphere(m_world, radio, 0, NULL);
 */
 	} else if (!strcmp(token, "capsule")) {
-		NextToken(tokenBuffer);
+		token = NextToken();
 		dAssert (!strcmp(token, "radio0:"));
 		dFloat radio0 = LoadFloat();
 
-		NextToken(tokenBuffer);
+		token = NextToken();
 		dAssert(!strcmp(token, "radio1:"));
 		dFloat radio1 = LoadFloat();
 
-		NextToken(tokenBuffer);
+		token = NextToken();
 		dAssert(!strcmp(token, "height:"));
 		dFloat height = LoadFloat();
 		collision = NewtonCreateCapsule(m_world, radio0, radio1, height, 0, NULL);
@@ -241,12 +247,12 @@ NewtonCollision* dCustomJointSaveLoad::ParseCollisonShape()
 	} else if (!strcmp(token, "convexHull")) {
 		dVector array[1024* 4];
 		
-		NextToken(tokenBuffer);
+		token = NextToken();
 		dAssert(!strcmp(token, "points:"));
 
 		int pointCount = LoadInt();
 		for (int i = 0; i < pointCount; i++) {
-			NextToken(tokenBuffer);
+			token = NextToken();
 			array[i] = LoadVector();
 		}
 		collision = NewtonCreateConvexHull(m_world, pointCount, &array[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
@@ -255,16 +261,16 @@ NewtonCollision* dCustomJointSaveLoad::ParseCollisonShape()
 	}
 
 
-	NextToken(tokenBuffer);
+	token = NextToken();
 	dAssert(!strcmp(token, "shapeScale:"));
 	dVector scale (LoadVector());
 
-	NextToken(tokenBuffer);
+	token = NextToken();
 	dAssert(!strcmp(token, "shapePosition:"));
 	dVector posit(LoadVector());
 	posit.m_w = 1.0f;
 
-	NextToken(tokenBuffer);
+	token = NextToken();
 	dAssert(!strcmp(token, "shapeEulerAngle:"));
 	dVector euler(LoadVector());
 	euler = euler.Scale(3.141592f / 180.0f);
@@ -284,9 +290,8 @@ void dCustomJointSaveLoad::ParseRigidBody(dTree<NewtonBody*, const dString>& bod
 	NewtonCollision* collision = NULL;
 	dFloat mass = 0.0f;
 	char nodeName[256];
-	char tokenBuffer[256];
 
-	for (const char* token = NextToken (tokenBuffer); strcmp(token, "nodeEnd:"); token = NextToken (tokenBuffer)) { 
+	for (const char* token = NextToken (); strcmp(token, "nodeEnd:"); token = NextToken ()) { 
 
 		if (!strcmp(token, "node:")) {
 			LoadName (nodeName);
@@ -318,42 +323,40 @@ void dCustomJointSaveLoad::ParseRigidBody(dTree<NewtonBody*, const dString>& bod
 
 void dCustomJointSaveLoad::ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap)
 {
-	char tokenBuffer[256];
 	char jointType[256];
 	char childName[256];
 	char parentName[256];
 
-	const char* const token = NextToken(tokenBuffer);
+	const char* token = NextToken();
 	dAssert(!strcmp(token, "joint:"));
 	LoadName (jointType);
 	
-	NextToken(tokenBuffer);
-	dAssert(!strcmp(tokenBuffer, "childBody:"));
+	token = NextToken();
+	dAssert(!strcmp(token, "childBody:"));
 	LoadName (childName);
 	NewtonBody* const child = bodyMap.Find(childName)->GetInfo();
 
-	NextToken(tokenBuffer);
-	dAssert(!strcmp(tokenBuffer, "parentBody:"));
+	token = NextToken();
+	dAssert(!strcmp(token, "parentBody:"));
 	LoadName(parentName);
 	NewtonBody* const parent = bodyMap.Find(parentName)->GetInfo();
 
 	dCustomJoint* const joint = dCustomJoint::Load(this, jointType, child, parent);
-	while (strcmp(NextToken(tokenBuffer), "jointEnd:"));
+	while (strcmp(NextToken(), "jointEnd:"));
 }
 
 
 NewtonBody* dCustomJointSaveLoad::Load()
 {
-	char token[256];
 	char rootBodyName[256];
 
 	dTree<NewtonBody*, const dString> bodyMap;
 
-	NextToken(token);
+	const char* token = NextToken();
 	dAssert (!strcmp(token, "rootBone:"));
 	LoadName (rootBodyName);
 
-	NextToken(token);
+	token = NextToken();
 	dAssert (!strcmp(token, "nodesCount:"));
 	int nodesCount = LoadInt ();
 
@@ -362,7 +365,7 @@ NewtonBody* dCustomJointSaveLoad::Load()
 	}
 
 
-	NextToken(token);
+	token = NextToken();
 	dAssert (!strcmp(token, "jointsCount:"));
 	int jointsCount = LoadInt ();
 	for (int i = 0; i < jointsCount; i++) {

@@ -34,20 +34,21 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	{
 	}
 
-	const char* NextToken (char* const buffer) const;
-	int LoadInt () const;
-	dFloat LoadFloat () const;
-	dVector LoadVector () const;
-	void LoadName (char* const name) const;
-	
-	void SaveInt (const char* const token, int val) const;
-	void SaveFloat (const char* const token, dFloat val) const;
-	void SaveVector (const char* const token, const dVector& v) const;
-
-
-
 	virtual const char* GetBodyUniqueName(const NewtonBody* const body) const = 0;
 	virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const = 0;
+
+	CUSTOM_JOINTS_API virtual const char* NextToken () const;
+	CUSTOM_JOINTS_API virtual int LoadInt () const;
+	CUSTOM_JOINTS_API virtual dFloat LoadFloat () const;
+	CUSTOM_JOINTS_API virtual dVector LoadVector () const;
+	CUSTOM_JOINTS_API virtual void LoadName (char* const name) const;
+	
+	CUSTOM_JOINTS_API virtual void Newline () const;
+	CUSTOM_JOINTS_API virtual void SaveInt (const char* const token, int val) const;
+	CUSTOM_JOINTS_API virtual void SaveFloat (const char* const token, dFloat val) const;
+	CUSTOM_JOINTS_API virtual void SaveVector (const char* const token, const dVector& v) const;
+	CUSTOM_JOINTS_API virtual void SaveName (const char* const token, const char* const name) const;
+	
 
 	CUSTOM_JOINTS_API virtual NewtonBody* Load();
 	CUSTOM_JOINTS_API virtual void Save(NewtonBody* const rootbody);
@@ -58,9 +59,9 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	void ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap);
 	void GetBodiesAndJointsList (dList<const NewtonBody*>& bodylist, dList<const dCustomJoint*>& jointlist, NewtonBody* const rootbody);
 	
-
 	FILE* m_file;
 	NewtonWorld* m_world;
+	char m_token[128];
 };
 
 

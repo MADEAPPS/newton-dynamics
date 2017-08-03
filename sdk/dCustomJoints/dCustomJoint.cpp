@@ -99,40 +99,39 @@ dCustomJoint::dCustomJoint(dCustomJointSaveLoad* const fileLoader, NewtonBody* c
 	,m_maxDof(0)
 	,m_autoDestroy(0)
 {
-	char buffer[256];
-	fileLoader->NextToken(buffer);
-	dAssert(!strcmp(buffer, "degreesOfFreedom:"));
+	const char* token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "degreesOfFreedom:"));
 	m_maxDof = fileLoader->LoadInt();
 
-	fileLoader->NextToken(buffer);
-	dAssert(!strcmp(buffer, "solverModel:"));
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "solverModel:"));
 	int solverModel = fileLoader->LoadInt();
 
-	fileLoader->NextToken(buffer);
-	dAssert(!strcmp(buffer, "body0_position:"));
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "body0_position:"));
 	dVector posit0 (fileLoader->LoadVector());
 	posit0.m_w = 1.0f;
 
-	fileLoader->NextToken(buffer);
-	dAssert(!strcmp(buffer, "body1_position:"));
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "body1_position:"));
 	dVector posit1(fileLoader->LoadVector());
 	posit1.m_w = 1.0f;
 
-	fileLoader->NextToken(buffer);
-	dAssert(!strcmp(buffer, "body0_rotation:"));
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "body0_rotation:"));
 	dVector euler0(fileLoader->LoadVector());
 	euler0 = euler0.Scale (3.14159213f / 180.0f);
 	
-	fileLoader->NextToken(buffer);
-	dAssert(!strcmp(buffer, "body1_rotation:"));
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "body1_rotation:"));
 	dVector euler1(fileLoader->LoadVector());
 	euler1 = euler1.Scale(3.14159213f / 180.0f);
 
 	m_localMatrix0 = dMatrix (euler0, posit0);
 	m_localMatrix1 = dMatrix (euler1, posit1);
 
-	fileLoader->NextToken(buffer);
-	dAssert(!strcmp(buffer, "stiffness:"));
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "stiffness:"));
 	m_stiffness = fileLoader->LoadFloat();
 
 	Init(m_maxDof, body0, body1);
@@ -463,15 +462,15 @@ void dCustomJoint::Save(dCustomJointSaveLoad* const save) const
 	childEuler = childEuler.Scale (180.0f / 3.141592f);
 	parentEuler = parentEuler.Scale (180.0f / 3.141592f);
 
-	save->SaveInt ("degreesOfFreedom", m_maxDof);
-	save->SaveInt ("solverModel", GetSolverModel());
-	save->SaveVector("body0_position", childMatrix.m_posit);
-	save->SaveVector("body1_position", parentMatrix.m_posit);
+	save->SaveInt ("\tdegreesOfFreedom", m_maxDof);
+	save->SaveInt ("\tsolverModel", GetSolverModel());
+	save->SaveVector("\tbody0_position", childMatrix.m_posit);
+	save->SaveVector("\tbody1_position", parentMatrix.m_posit);
 
-	save->SaveVector("body0_rotation", childEuler);
-	save->SaveVector("body1_rotation", parentEuler);
+	save->SaveVector("\tbody0_rotation", childEuler);
+	save->SaveVector("\tbody1_rotation", parentEuler);
 
-	save->SaveFloat("stiffness", m_stiffness);
+	save->SaveFloat("\tstiffness", m_stiffness);
 }
 
 

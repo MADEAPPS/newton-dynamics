@@ -81,6 +81,12 @@ class dKinematicPlacement: public dCustomControllerBase
 	void PostUpdate(dFloat timestep, int threadIndex)
 	{
 	}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
 };
 
 

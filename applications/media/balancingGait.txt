@@ -2,236 +2,236 @@ rootBone: Bip01_Pelvis
 
 nodesCount: 7
 node: Bip01_Pelvis
-  mass: 30.000000
-  position: -10.020121 1.897650 0.000003
-  eulerAngles: 90.000000 -0.000057 -180.000015
-  shapeType: capsule
-    radio0: 0.070000
-    radio1: 0.070000
-    height: 0.160000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.010000
-    shapeEulerAngle: 0.000000 -0.000000 -90.000000
-nodeEnd:
+	mass: 30.000000
+	position: -10.020121 1.897650 0.000003
+	eulerAngles: 90.000000 -0.000057 -180.000015
+	shapeType: capsule
+		radio0: 0.070000
+		radio1: 0.070000
+		height: 0.160000
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.010000
+	shapeEulerAngle: 0.000000 -0.000000 -90.000000
+nodeEnd: 
 
 node: Bip01_R_Thigh
-  mass: 14.000000
-  position: -10.020128 1.897650 -0.105090
-  eulerAngles: -129.999695 -0.004392 174.270477
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
+	mass: 14.000000
+	position: -10.020128 1.897650 -0.105090
+	eulerAngles: -129.999695 -0.004392 174.270477
+	shapeType: capsule
+		radio0: 0.050000
+		radio1: 0.050000
+		height: 0.340000
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.190000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd: 
 
 node: Bip01_R_Calf
-  mass: 10.000000
-  position: -10.050591 1.594229 -0.360967
-  eulerAngles: -129.433350 7.332437 -176.902954
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
+	mass: 10.000000
+	position: -10.050591 1.594229 -0.360967
+	eulerAngles: -129.433350 7.332438 -176.902954
+	shapeType: capsule
+		radio0: 0.050000
+		radio1: 0.050000
+		height: 0.340000
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.190000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd: 
 
 node: Bip01_R_Foot
-  mass: 3.000000
-  position: -10.001757 1.288960 -0.611751
-  eulerAngles: -129.858795 3.674889 178.665649
-  shapeType: convexHull
-    points: 25
-    v0: -0.003232 -0.010903 -0.011682
-    v1: 0.016709 -0.000000 -0.011682
-    v2: 0.005028 -0.015420 -0.011682
-    v3: 0.013288 -0.010903 -0.011682
-    v4: -0.003232 0.010903 -0.011682
-    v5: -0.006654 0.000000 -0.011682
-    v6: 0.013288 0.010903 -0.011682
-    v7: 0.005028 -0.000000 -0.016520
-    v8: 0.005028 0.015420 -0.011682
-    v9: -0.029280 -0.051203 0.091752
-    v10: -0.035196 -0.051203 0.076171
-    v11: -0.013619 -0.037752 0.021462
-    v12: -0.023068 -0.028726 0.026363
-    v13: -0.035196 0.052023 0.076171
-    v14: -0.013619 0.038572 0.021462
-    v15: -0.029377 0.052023 0.091752
-    v16: -0.023068 0.029546 0.026363
-    v17: 0.060606 -0.051491 0.056712
-    v18: 0.116177 -0.051492 0.092188
-    v19: 0.025222 -0.037752 0.021546
-    v20: 0.117831 -0.051492 0.080844
-    v21: 0.025222 0.038571 0.021546
-    v22: 0.117831 0.052309 0.080844
-    v23: 0.060606 0.052310 0.056712
-    v24: 0.116177 0.052309 0.092188
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.000000
-    shapeEulerAngle: 0.000000 -0.000000 0.000000
-nodeEnd:
+	mass: 3.000000
+	position: -10.001757 1.288960 -0.611751
+	eulerAngles: -129.858795 3.674889 178.665649
+	shapeType: convexHull
+		points: 25
+		v: -0.003232 -0.010903 -0.011682
+		v: 0.016709 -0.000000 -0.011682
+		v: 0.005028 -0.015420 -0.011682
+		v: 0.013288 -0.010903 -0.011682
+		v: -0.003232 0.010903 -0.011682
+		v: -0.006654 0.000000 -0.011682
+		v: 0.013288 0.010903 -0.011682
+		v: 0.005028 -0.000000 -0.016520
+		v: 0.005028 0.015420 -0.011682
+		v: -0.029280 -0.051203 0.091752
+		v: -0.035196 -0.051203 0.076171
+		v: -0.013619 -0.037752 0.021462
+		v: -0.023068 -0.028726 0.026363
+		v: -0.035196 0.052023 0.076171
+		v: -0.013619 0.038572 0.021462
+		v: -0.029377 0.052023 0.091752
+		v: -0.023068 0.029546 0.026363
+		v: 0.060606 -0.051491 0.056712
+		v: 0.116177 -0.051492 0.092188
+		v: 0.025222 -0.037752 0.021546
+		v: 0.117831 -0.051492 0.080844
+		v: 0.025222 0.038571 0.021546
+		v: 0.117831 0.052309 0.080844
+		v: 0.060606 0.052310 0.056712
+		v: 0.116177 0.052309 0.092188
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
+nodeEnd: 
 
 node: Bip01_L_Thigh
-  mass: 14.000000
-  position: -10.020114 1.897650 0.105096
-  eulerAngles: -49.999691 -0.004392 174.270477
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
+	mass: 14.000000
+	position: -10.020114 1.897650 0.105096
+	eulerAngles: -49.999695 -0.004392 174.270477
+	shapeType: capsule
+		radio0: 0.050000
+		radio1: 0.050000
+		height: 0.340000
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.190000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd: 
 
 node: Bip01_L_Calf
-  mass: 10.000000
-  position: -10.050538 1.594228 0.360978
-  eulerAngles: -50.567398 -7.341220 -176.902878
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
+	mass: 10.000000
+	position: -10.050538 1.594228 0.360978
+	eulerAngles: -50.567398 -7.341220 -176.902878
+	shapeType: capsule
+		radio0: 0.050000
+		radio1: 0.050000
+		height: 0.340000
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.190000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd: 
 
 node: Bip01_L_Foot
-  mass: 3.000000
-  position: -10.001664 1.288959 0.611752
-  eulerAngles: -50.141266 -3.683698 178.665649
-  shapeType: convexHull
-    points: 25
-    v0: -0.003232 -0.010903 -0.011682
-    v1: 0.016709 -0.000000 -0.011682
-    v2: 0.005028 -0.015420 -0.011682
-    v3: 0.013288 -0.010903 -0.011682
-    v4: -0.003232 0.010903 -0.011682
-    v5: -0.006654 0.000000 -0.011682
-    v6: 0.013288 0.010903 -0.011682
-    v7: 0.005028 -0.000000 -0.016520
-    v8: 0.005028 0.015420 -0.011682
-    v9: -0.029280 -0.051203 0.091752
-    v10: -0.035196 -0.051203 0.076171
-    v11: -0.013619 -0.037752 0.021462
-    v12: -0.023068 -0.028726 0.026363
-    v13: -0.035196 0.052023 0.076171
-    v14: -0.013619 0.038572 0.021462
-    v15: -0.029377 0.052023 0.091752
-    v16: -0.023068 0.029546 0.026363
-    v17: 0.060606 -0.051491 0.056712
-    v18: 0.116177 -0.051492 0.092188
-    v19: 0.025222 -0.037752 0.021546
-    v20: 0.117831 -0.051492 0.080844
-    v21: 0.025222 0.038571 0.021546
-    v22: 0.117831 0.052309 0.080844
-    v23: 0.060606 0.052310 0.056712
-    v24: 0.116177 0.052309 0.092188
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.000000
-    shapeEulerAngle: 0.000000 -0.000000 0.000000
-nodeEnd:
+	mass: 3.000000
+	position: -10.001664 1.288959 0.611752
+	eulerAngles: -50.141266 -3.683698 178.665649
+	shapeType: convexHull
+		points: 25
+		v: -0.003232 -0.010903 -0.011682
+		v: 0.016709 -0.000000 -0.011682
+		v: 0.005028 -0.015420 -0.011682
+		v: 0.013288 -0.010903 -0.011682
+		v: -0.003232 0.010903 -0.011682
+		v: -0.006654 0.000000 -0.011682
+		v: 0.013288 0.010903 -0.011682
+		v: 0.005028 -0.000000 -0.016520
+		v: 0.005028 0.015420 -0.011682
+		v: -0.029280 -0.051203 0.091752
+		v: -0.035196 -0.051203 0.076171
+		v: -0.013619 -0.037752 0.021462
+		v: -0.023068 -0.028726 0.026363
+		v: -0.035196 0.052023 0.076171
+		v: -0.013619 0.038572 0.021462
+		v: -0.029377 0.052023 0.091752
+		v: -0.023068 0.029546 0.026363
+		v: 0.060606 -0.051491 0.056712
+		v: 0.116177 -0.051492 0.092188
+		v: 0.025222 -0.037752 0.021546
+		v: 0.117831 -0.051492 0.080844
+		v: 0.025222 0.038571 0.021546
+		v: 0.117831 0.052309 0.080844
+		v: 0.060606 0.052310 0.056712
+		v: 0.116177 0.052309 0.092188
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
+nodeEnd: 
 
 jointsCount: 6
 joint: dCustomRagdollMotor_3dof
-  childBody: Bip01_L_Thigh
-  parentBody: Bip01_Pelvis
-  degreesOfFreedom: 6
-  solverModel: 0
-  body0_position: 0.000000 0.000000 0.000000
-  body1_position: -0.000007 0.105093 0.000000
-  body0_rotation: 0.000000 -90.000000 0.000001
-  body1_rotation: -98.871941 49.660183 83.219345
-  stiffness: 1.000000
-  frictionTorque: 1.000000
-  motorMode: 0
-  coneAngle: 119.999992
-  minTwistAngle: -45.000000
-  maxTwistAngle: 45.000000
-jointEnd:
+	childBody: Bip01_L_Thigh
+	parentBody: Bip01_Pelvis
+	degreesOfFreedom: 6
+	solverModel: 0
+	body0_position: 0.000000 0.000000 0.000000
+	body1_position: -0.000007 0.105093 0.000000
+	body0_rotation: 0.000000 -90.000000 0.000001
+	body1_rotation: -98.871941 49.660183 83.219345
+	stiffness: 1.000000
+	frictionTorque: 1.000000
+	motorMode: 0
+	coneAngle: 119.999992
+	minTwistAngle: -45.000000
+	maxTwistAngle: 45.000000
+jointEnd: 
 
 joint: dCustomRagdollMotor_3dof
-  childBody: Bip01_R_Thigh
-  parentBody: Bip01_Pelvis
-  degreesOfFreedom: 6
-  solverModel: 0
-  body0_position: 0.000000 0.000000 0.000000
-  body1_position: 0.000007 -0.105093 0.000000
-  body0_rotation: 0.000000 -90.000000 -0.000001
-  body1_rotation: 98.871910 49.659988 -83.210678
-  stiffness: 1.000000
-  frictionTorque: 1.000000
-  motorMode: 0
-  coneAngle: 119.999992
-  minTwistAngle: -45.000000
-  maxTwistAngle: 45.000000
-jointEnd:
+	childBody: Bip01_R_Thigh
+	parentBody: Bip01_Pelvis
+	degreesOfFreedom: 6
+	solverModel: 0
+	body0_position: 0.000000 0.000000 0.000000
+	body1_position: 0.000007 -0.105093 0.000000
+	body0_rotation: 0.000000 -90.000000 -0.000001
+	body1_rotation: 98.871910 49.659988 -83.210678
+	stiffness: 1.000000
+	frictionTorque: 1.000000
+	motorMode: 0
+	coneAngle: 119.999992
+	minTwistAngle: -45.000000
+	maxTwistAngle: 45.000000
+jointEnd: 
 
 joint: dCustomRagdollMotor_1dof
-  childBody: Bip01_R_Calf
-  parentBody: Bip01_R_Thigh
-  degreesOfFreedom: 6
-  solverModel: 0
-  body0_position: 0.000000 0.000000 0.000000
-  body1_position: 0.000000 -0.000001 0.398078
-  body0_rotation: 90.000000 0.000002 90.000000
-  body1_rotation: 78.540840 -0.000002 90.000000
-  stiffness: 1.000000
-  frictionTorque: 1.000000
-  motorMode: 0
-  minTwistAngle: -140.000000
-  maxTwistAngle: 10.000000
-jointEnd:
+	childBody: Bip01_R_Calf
+	parentBody: Bip01_R_Thigh
+	degreesOfFreedom: 6
+	solverModel: 0
+	body0_position: 0.000000 0.000000 0.000000
+	body1_position: 0.000000 -0.000001 0.398078
+	body0_rotation: 90.000000 0.000002 90.000000
+	body1_rotation: 78.540840 -0.000002 90.000000
+	stiffness: 1.000000
+	frictionTorque: 1.000000
+	motorMode: 0
+	minTwistAngle: -140.000000
+	maxTwistAngle: 10.000000
+jointEnd: 
 
 joint: dCustomRagdollMotor_2dof
-  childBody: Bip01_R_Foot
-  parentBody: Bip01_R_Calf
-  degreesOfFreedom: 6
-  solverModel: 0
-  body0_position: 0.000000 0.000000 0.000000
-  body1_position: -0.000000 0.000000 0.398078
-  body0_rotation: 0.000000 -90.000000 -0.000001
-  body1_rotation: 0.000000 -84.270309 -0.000051
-  stiffness: 1.000000
-  frictionTorque: 1.000000
-  motorMode: 0
-  coneAngle: 75.000000
-jointEnd:
+	childBody: Bip01_R_Foot
+	parentBody: Bip01_R_Calf
+	degreesOfFreedom: 6
+	solverModel: 0
+	body0_position: 0.000000 0.000000 0.000000
+	body1_position: -0.000000 0.000000 0.398078
+	body0_rotation: 0.000000 -90.000000 -0.000001
+	body1_rotation: 0.000000 -84.270309 -0.000051
+	stiffness: 1.000000
+	frictionTorque: 1.000000
+	motorMode: 0
+	coneAngle: 75.000000
+jointEnd: 
 
 joint: dCustomRagdollMotor_1dof
-  childBody: Bip01_L_Calf
-  parentBody: Bip01_L_Thigh
-  degreesOfFreedom: 6
-  solverModel: 0
-  body0_position: 0.000000 0.000000 0.000000
-  body1_position: 0.000000 -0.000001 0.398078
-  body0_rotation: 90.000000 0.000002 90.000000
-  body1_rotation: 78.540848 -0.000003 90.000000
-  stiffness: 1.000000
-  frictionTorque: 1.000000
-  motorMode: 0
-  minTwistAngle: -140.000000
-  maxTwistAngle: 10.000000
-jointEnd:
+	childBody: Bip01_L_Calf
+	parentBody: Bip01_L_Thigh
+	degreesOfFreedom: 6
+	solverModel: 0
+	body0_position: 0.000000 0.000000 0.000000
+	body1_position: 0.000000 -0.000001 0.398078
+	body0_rotation: 90.000000 0.000002 90.000000
+	body1_rotation: 78.540848 -0.000003 90.000000
+	stiffness: 1.000000
+	frictionTorque: 1.000000
+	motorMode: 0
+	minTwistAngle: -140.000000
+	maxTwistAngle: 10.000000
+jointEnd: 
 
 joint: dCustomRagdollMotor_2dof
-  childBody: Bip01_L_Foot
-  parentBody: Bip01_L_Calf
-  degreesOfFreedom: 6
-  solverModel: 0
-  body0_position: 0.000000 0.000000 0.000000
-  body1_position: 0.000000 0.000000 0.398078
-  body0_rotation: 0.000000 -90.000000 0.000000
-  body1_rotation: -0.000017 -84.270622 0.000034
-  stiffness: 1.000000
-  frictionTorque: 1.000000
-  motorMode: 0
-  coneAngle: 75.000000
-jointEnd:
+	childBody: Bip01_L_Foot
+	parentBody: Bip01_L_Calf
+	degreesOfFreedom: 6
+	solverModel: 0
+	body0_position: 0.000000 0.000000 0.000000
+	body1_position: 0.000000 0.000000 0.398078
+	body0_rotation: 0.000000 -90.000000 0.000000
+	body1_rotation: -0.000017 -84.270622 0.000034
+	stiffness: 1.000000
+	frictionTorque: 1.000000
+	motorMode: 0
+	coneAngle: 75.000000
+jointEnd: 
 

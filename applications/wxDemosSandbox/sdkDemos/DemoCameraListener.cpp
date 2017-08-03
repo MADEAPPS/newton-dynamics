@@ -206,14 +206,15 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 
 				m_pickedBodyParam = param;
 				#ifdef USE_PICK_BODY_BY_FORCE
-				// save point local to the body matrix
-				m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
+					// save point local to the body matrix
+					m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
 
-				// convert normal to local space
-				m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
+					// convert normal to local space
+					m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
 				#else
 					if(m_pickJoint) {
 						delete m_pickJoint;
+						m_pickJoint = NULL;
 					}
 					
 					dFloat Ixx;
