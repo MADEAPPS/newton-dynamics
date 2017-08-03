@@ -61,9 +61,8 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	
 	FILE* m_file;
 	NewtonWorld* m_world;
-//	dTree<int, const NewtonBody*> m_bodyMap;
 	dTree<int, const NewtonBody*> m_bodyFilter;
-	char m_token[128];
+	mutable  char m_token[128];
 };
 
 

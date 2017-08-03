@@ -70,7 +70,7 @@ void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<const NewtonBody*>& bod
 
 const char* dCustomJointSaveLoad::NextToken() const
 {
-	fscanf(m_file, "%s:", m_token);
+	fscanf(m_file, "%s:", &m_token[0]);
 	return m_token;
 }
 

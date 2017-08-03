@@ -527,7 +527,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
-		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
+		m_controller->AddEnginePart (engineInfo.m_mass, engineInfo.m_radio);
 		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
@@ -1320,20 +1320,50 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	class MySaveLoad: public dCustomJointSaveLoad
 	{
 		public:
-		MySaveLoad(NewtonWorld* const world, FILE* const file, int materialID)
+		MySaveLoad(NewtonWorld* const world, dCustomVehicleController* const vehicle, FILE* const file, int materialID)
 			:dCustomJointSaveLoad(world, file)
 			,m_material(materialID)
+			,m_vehicle(vehicle)
 		{
 		}
 
 		const char* GetUserDataName(const NewtonBody* const body) const
 		{
+			static char* tire = "tireMesh";
+			static char* engine = "engineMesh";
+			static char* chassis = "chassisMesh";
+			static char* differential = "differentialMesh";
+
+			if (m_vehicle->GetChassis()->GetBody() == body) {
+				return chassis;
+			}
+
+			if (m_vehicle->GetEnginePart()->GetBody() == body) {
+				return engine;
+			}
+			
+			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
+				const dCustomVehicleController::dBodyPartTire& tirePart = node->GetInfo();
+				if (tirePart.GetBody() == body) {
+					return tire;
+				}
+			}
+
+			for (dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
+				const dCustomVehicleController::dBodyPartDifferential& differentialPart = node->GetInfo();
+				if (differentialPart.GetBody() == body) {
+					return differential;
+				}
+			}
+
 			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
 			return entity ? entity->GetName().GetStr() : NULL;
 		}
 
 		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
 		{
+			dAssert(0);
+/*
 			dMatrix matrix;
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
@@ -1363,9 +1393,11 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 			// set the force and torque call back function
 			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+*/
 		}
 
 		int m_material;
+		dCustomVehicleController* m_vehicle;
 	};
 
 
@@ -1379,7 +1411,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		FILE* const outputFile = fopen(fileName, "wt");
 		dAssert(outputFile);
 
-		MySaveLoad saveLoad(GetWorld(), outputFile, 0);
+		MySaveLoad saveLoad(GetWorld(), vehicle, outputFile, 0);
 		vehicle->Save(&saveLoad);
 
 		fclose(outputFile);

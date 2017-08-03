@@ -1766,6 +1766,17 @@ dList<dCustomVehicleController::dBodyPartTire>::dListNode* dCustomVehicleControl
 	return tireNode->GetNext();
 }
 
+dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* dCustomVehicleController::GetFirstDifferential() const
+{
+	return m_differentialList.GetFirst();
+}
+
+dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* dCustomVehicleController::GetNextDifferential(dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* const differentialNode) const
+{
+	return differentialNode->GetNext();
+}
+
+
 dList<dCustomVehicleController::dBodyPart*>::dListNode* dCustomVehicleController::GetFirstBodyPart() const
 {
 	return m_bodyPartsList.GetFirst();
@@ -1775,6 +1786,7 @@ dList<dCustomVehicleController::dBodyPart*>::dListNode* dCustomVehicleController
 {
 	return part->GetNext();
 }
+
 
 void dCustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter)
 {
@@ -1984,7 +1996,12 @@ void dCustomVehicleController::LinkTiresKinematically(dBodyPartTire* const tire0
 	new dCustomGear(gearRatio, tireMatrix0.m_front, tireMatrix1.m_front.Scale (-1.0f), tire0->GetBody(), tire1->GetBody());
 }
 
-dCustomVehicleController::dBodyPartEngine* dCustomVehicleController::AddEngine (dFloat mass, dFloat armatureRadius)
+dCustomVehicleController::dBodyPartEngine* dCustomVehicleController::GetEnginePart() const
+{
+	return m_engine;
+}
+
+dCustomVehicleController::dBodyPartEngine* dCustomVehicleController::AddEnginePart (dFloat mass, dFloat armatureRadius)
 {
 	m_engine = new dBodyPartEngine (this, mass, armatureRadius);
 

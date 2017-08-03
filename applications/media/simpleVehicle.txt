@@ -2,7 +2,7 @@ rootNode: 0
 
 nodesCount: 7
 node: 0
-	userData: car_body
+	userData: chassisMesh
 	mass: 1534.520020
 	position: -13.444667 0.999977 102.108154
 	eulerAngles: 0.000000 0.753740 0.000020
@@ -198,7 +198,7 @@ node: 0
 nodeEnd: 
 
 node: 1
-	userData: (null)
+	userData: engineMesh
 	mass: 100.000000
 	position: -13.444667 0.999977 102.108154
 	eulerAngles: 0.000000 0.753740 0.000020
@@ -210,7 +210,7 @@ node: 1
 nodeEnd: 
 
 node: 2
-	userData: (null)
+	userData: differentialMesh
 	mass: 40.000000
 	position: -13.444667 0.999977 102.108154
 	eulerAngles: 0.000000 0.753740 0.000020
@@ -222,7 +222,7 @@ node: 2
 nodeEnd: 
 
 node: 3
-	userData: (null)
+	userData: tireMesh
 	mass: 40.000000
 	position: -14.656964 1.005706 102.856575
 	eulerAngles: 0.000000 -89.245949 -0.000000
@@ -235,7 +235,7 @@ node: 3
 nodeEnd: 
 
 node: 4
-	userData: (null)
+	userData: tireMesh
 	mass: 40.000000
 	position: -14.667200 1.005706 101.391899
 	eulerAngles: 0.000000 -89.245949 -0.000000
@@ -248,7 +248,7 @@ node: 4
 nodeEnd: 
 
 node: 5
-	userData: (null)
+	userData: tireMesh
 	mass: 40.000000
 	position: -12.269349 1.005707 102.799767
 	eulerAngles: 0.000000 -89.245949 -0.000000
@@ -261,7 +261,7 @@ node: 5
 nodeEnd: 
 
 node: 6
-	userData: (null)
+	userData: tireMesh
 	mass: 40.000000
 	position: -12.278916 1.005707 101.385880
 	eulerAngles: 0.000000 -89.245949 -0.000000
@@ -316,14 +316,14 @@ jointEnd:
 joint: dCustomGear
 	childBody: 4
 	parentBody: 2
-	parentReference: car_body
+	parentReference: chassisMesh
 	pintOnParentReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
 joint: dCustomGear
 	childBody: 3
 	parentBody: 2
-	parentReference: car_body
+	parentReference: chassisMesh
 	pintOnParentReference: 0.000000 0.000000 1.000000
 jointEnd: 
 

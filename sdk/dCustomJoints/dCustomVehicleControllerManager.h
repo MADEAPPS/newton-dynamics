@@ -393,7 +393,8 @@ class dCustomVehicleController: public dCustomControllerBase
 
 	CUSTOM_JOINTS_API void LinkTiresKinematically(dBodyPartTire* const tire0, dBodyPartTire* const tire1);
 
-	CUSTOM_JOINTS_API dBodyPartEngine* AddEngine (dFloat mass, dFloat armatureRadius);
+	CUSTOM_JOINTS_API dBodyPartEngine* GetEnginePart() const;
+	CUSTOM_JOINTS_API dBodyPartEngine* AddEnginePart (dFloat mass, dFloat armatureRadius);
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	const CUSTOM_JOINTS_API dBodyPart* GetChassis() const;
@@ -404,8 +405,12 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dList<dBodyPartTire>::dListNode* GetFirstTire() const;
 	CUSTOM_JOINTS_API dList<dBodyPartTire>::dListNode* GetNextTire (dList<dBodyPartTire>::dListNode* const tireNode) const;
 
+	CUSTOM_JOINTS_API dList<dBodyPartDifferential>::dListNode* GetFirstDifferential() const;
+	CUSTOM_JOINTS_API dList<dBodyPartDifferential>::dListNode* GetNextDifferential(dList<dBodyPartDifferential>::dListNode* const differentialNode) const;
+
 	CUSTOM_JOINTS_API dList<dBodyPart*>::dListNode* GetFirstBodyPart() const;
 	CUSTOM_JOINTS_API dList<dBodyPart*>::dListNode* GetNextBodyPart(dList<dBodyPart*>::dListNode* const partNode) const;
+
 
 	CUSTOM_JOINTS_API dVector GetTireNormalForce(const dBodyPartTire* const tire) const;
 	CUSTOM_JOINTS_API dVector GetTireLateralForce(const dBodyPartTire* const tire) const;
