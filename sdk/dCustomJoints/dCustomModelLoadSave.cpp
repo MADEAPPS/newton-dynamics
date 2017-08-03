@@ -24,17 +24,19 @@
 
 void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<const NewtonBody*>& bodylist, dList<const dCustomJoint*>& jointlist, NewtonBody* const rootbody)
 {
-	dTree<int, const NewtonBody*> bodyFilter;
 	dTree<int, const dCustomJoint*> jointFilter;
 	const NewtonBody* stackMem[256];
+	m_bodyFilter.RemoveAll();
 
 	int stack = 1;
 	stackMem[0] = rootbody;
+	int enumeration = 0;
 	while (stack) {
 		stack--;
 		const NewtonBody* const root = stackMem[stack];
 
-		if (bodyFilter.Insert(0, root)) {
+		if (m_bodyFilter.Insert(enumeration, root)) {
+			enumeration ++;
 			bodylist.Append(root);
 		}
 
@@ -50,13 +52,13 @@ void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<const NewtonBody*>& bod
 			}
 
 			if (body0 == root) {
-				if (!bodyFilter.Find(body1)) {
+				if (!m_bodyFilter.Find(body1)) {
 					stackMem[stack] = body1;
 					stack ++;
 				}
 			} else {
 				dAssert (body1 == root);
-				if (!bodyFilter.Find(body0)) {
+				if (!m_bodyFilter.Find(body0)) {
 					stackMem[stack] = body0;
 					stack++;
 				}
@@ -126,95 +128,6 @@ void dCustomJointSaveLoad::Newline () const
 }
 
 
-void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
-{
-	dList<const NewtonBody*> bodyList;
-	dList<const dCustomJoint*> jointList;
-	GetBodiesAndJointsList(bodyList, jointList, rootbody);
-
-	SaveName ("rootBone", GetBodyUniqueName(rootbody));
-	Newline ();
-
-	SaveInt ("nodesCount", bodyList.GetCount());
-	for (dList<const NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		dMatrix boneMatrix;
-		dVector euler0;
-		dVector euler1;
-		NewtonCollisionInfoRecord collisionInfo;
-		dFloat mass;
-		dFloat ixx;
-
-		const NewtonBody* const body = ptr->GetInfo();
-
-		NewtonBodyGetMatrix(body, &boneMatrix[0][0]);
-		boneMatrix.GetEulerAngles(euler0, euler1);
-
-		NewtonBodyGetMass(body, &mass, &ixx, &ixx, &ixx);
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		NewtonCollisionGetInfo(collision, &collisionInfo);
-
-		SaveName ("node", GetBodyUniqueName(body));
-		SaveFloat ("\tmass", mass);
-		SaveVector ("\tposition", boneMatrix.m_posit);
-		SaveVector ("\teulerAngles", euler0.Scale (180.0f / 3.141592f));
-
-		switch (collisionInfo.m_collisionType) 
-		{
-			case SERIALIZE_ID_SPHERE:
-			{
-				SaveName ("\tshapeType", "sphere");
-				SaveFloat ("\t\tradio", collisionInfo.m_sphere.m_radio);
-				break;
-			}
-
-			case SERIALIZE_ID_CAPSULE:
-			{
-				SaveName ("\tshapeType", "capsule");
-				SaveFloat ("\t\tradio0", collisionInfo.m_capsule.m_radio0);
-				SaveFloat ("\t\tradio1", collisionInfo.m_capsule.m_radio1);
-				SaveFloat ("\t\theight", collisionInfo.m_capsule.m_height);
-				break;
-			}
-
-			case SERIALIZE_ID_CONVEXHULL:
-			{
-				SaveName ("\tshapeType", "convexHull");
-				SaveInt ("\t\tpoints", collisionInfo.m_convexHull.m_vertexCount);
-				const int stride = collisionInfo.m_convexHull.m_vertexStrideInBytes / sizeof(dFloat);
-				const dFloat* points = collisionInfo.m_convexHull.m_vertex;
-				for (int i = 0; i < collisionInfo.m_convexHull.m_vertexCount; i++) {
-					dVector p (points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], 0.0f);
-					SaveVector ("\t\tv", p);
-				}
-				break;
-			}
-
-			default:
-			{
-				dAssert(0);
-			}
-		}
-
-		dMatrix shapeMatrix(&collisionInfo.m_offsetMatrix[0][0]);
-		shapeMatrix.GetEulerAngles(euler0, euler1);
-
-		SaveVector ("\tshapeScale", dVector (1.0f, 1.0f, 1.0f, 1.0f));
-		SaveVector ("\tshapePosition", shapeMatrix.m_posit);
-		SaveVector ("\tshapeEulerAngle", euler0.Scale (180.0f / 3.141592f));
-		SaveName ("nodeEnd", "\n");
-	}
-
-	SaveInt ("jointsCount", jointList.GetCount());
-	for (dList<const dCustomJoint*>::dListNode* ptr = jointList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const dCustomJoint* const joint = ptr->GetInfo();
-
-		SaveName ("joint", joint->GetTypeName());
-		SaveName ("\tchildBody", GetBodyUniqueName(joint->GetBody0()));
-		SaveName ("\tparentBody", GetBodyUniqueName(joint->GetBody1()));
-		joint->Save (this);
-		SaveName ("jointEnd", "\n");
-	}
-}
 
 
 NewtonCollision* dCustomJointSaveLoad::ParseCollisonShape()
@@ -349,7 +262,7 @@ void dCustomJointSaveLoad::ParseJoint(const dTree<NewtonBody*, const dString>& b
 NewtonBody* dCustomJointSaveLoad::Load()
 {
 	char rootBodyName[256];
-
+//	m_bodyMap.RemoveAll();
 	dTree<NewtonBody*, const dString> bodyMap;
 
 	const char* token = NextToken();
@@ -359,11 +272,9 @@ NewtonBody* dCustomJointSaveLoad::Load()
 	token = NextToken();
 	dAssert (!strcmp(token, "nodesCount:"));
 	int nodesCount = LoadInt ();
-
 	for (int i = 0; i < nodesCount; i++) {
 		ParseRigidBody(bodyMap);
 	}
-
 
 	token = NextToken();
 	dAssert (!strcmp(token, "jointsCount:"));
@@ -373,4 +284,104 @@ NewtonBody* dCustomJointSaveLoad::Load()
 	}
 
 	return bodyMap.Find(rootBodyName)->GetInfo();
+}
+
+
+void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
+{
+	dList<const NewtonBody*> bodyList;
+	dList<const dCustomJoint*> jointList;
+	GetBodiesAndJointsList(bodyList, jointList, rootbody);
+
+	SaveInt("rootNode", m_bodyFilter.Find(rootbody)->GetInfo());
+	Newline();
+
+	SaveInt("nodesCount", bodyList.GetCount());
+	for (dList<const NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		dMatrix boneMatrix;
+		dVector euler0;
+		dVector euler1;
+		NewtonCollisionInfoRecord collisionInfo;
+		dFloat mass;
+		dFloat ixx;
+
+		const NewtonBody* const body = ptr->GetInfo();
+
+		NewtonBodyGetMatrix(body, &boneMatrix[0][0]);
+		boneMatrix.GetEulerAngles(euler0, euler1);
+
+		NewtonBodyGetMass(body, &mass, &ixx, &ixx, &ixx);
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		NewtonCollisionGetInfo(collision, &collisionInfo);
+
+		SaveInt("node", m_bodyFilter.Find(body)->GetInfo());
+		SaveName("\tuserData", GetUserDataName(body));
+		SaveFloat("\tmass", mass);
+		SaveVector("\tposition", boneMatrix.m_posit);
+		SaveVector("\teulerAngles", euler0.Scale(180.0f / 3.141592f));
+
+		switch (collisionInfo.m_collisionType) 
+		{
+			case SERIALIZE_ID_SPHERE:
+			{
+				SaveName("\tshapeType", "sphere");
+				SaveFloat("\t\tradio", collisionInfo.m_sphere.m_radio);
+				break;
+			}
+
+			case SERIALIZE_ID_CAPSULE:
+			{
+				SaveName("\tshapeType", "capsule");
+				SaveFloat("\t\tradio0", collisionInfo.m_capsule.m_radio0);
+				SaveFloat("\t\tradio1", collisionInfo.m_capsule.m_radio1);
+				SaveFloat("\t\theight", collisionInfo.m_capsule.m_height);
+				break;
+			}
+
+			case SERIALIZE_ID_CHAMFERCYLINDER:
+			{
+				SaveName("\tshapeType", "chamferCylinder");
+				SaveFloat("\t\tradio", collisionInfo.m_chamferCylinder.m_radio);
+				SaveFloat("\t\theight", collisionInfo.m_chamferCylinder.m_height);
+				break;
+			}
+
+			case SERIALIZE_ID_CONVEXHULL:
+			{
+				SaveName("\tshapeType", "convexHull");
+				SaveInt("\t\tpoints", collisionInfo.m_convexHull.m_vertexCount);
+				const int stride = collisionInfo.m_convexHull.m_vertexStrideInBytes / sizeof(dFloat);
+				const dFloat* points = collisionInfo.m_convexHull.m_vertex;
+				for (int i = 0; i < collisionInfo.m_convexHull.m_vertexCount; i++) {
+					dVector p(points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], 0.0f);
+					SaveVector("\t\tv", p);
+				}
+				break;
+			}
+
+			default:
+			{
+				dAssert(0);
+			}
+		}
+
+		dMatrix shapeMatrix(&collisionInfo.m_offsetMatrix[0][0]);
+		shapeMatrix.GetEulerAngles(euler0, euler1);
+
+		SaveVector("\tshapeScale", dVector(1.0f, 1.0f, 1.0f, 1.0f));
+		SaveVector("\tshapePosition", shapeMatrix.m_posit);
+		SaveVector("\tshapeEulerAngle", euler0.Scale(180.0f / 3.141592f));
+		SaveName("nodeEnd", "\n");
+	}
+
+	SaveInt("jointsCount", jointList.GetCount());
+	for (dList<const dCustomJoint*>::dListNode* ptr = jointList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		const dCustomJoint* const joint = ptr->GetInfo();
+
+		SaveName("joint", joint->GetTypeName());
+		SaveInt("\tchildBody", m_bodyFilter.Find(joint->GetBody0())->GetInfo());
+		SaveInt("\tparentBody", m_bodyFilter.Find(joint->GetBody1())->GetInfo());
+		joint->Save(this);
+		SaveName("jointEnd", "\n");
+	}
 }

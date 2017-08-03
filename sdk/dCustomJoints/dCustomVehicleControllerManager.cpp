@@ -15,6 +15,7 @@
 #include "dCustomGear.h"
 #include "dCustomHinge.h"
 #include "dCustomUniversal.h"
+#include "dCustomModelLoadSave.h"
 #include "dCustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE
@@ -76,7 +77,7 @@ class dCustomVehicleControllerManager::dTireFilter: public dCustomControllerConv
 class dCustomVehicleController::dEngineJoint: public dCustomHinge
 {
 	public:
-		dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
+	dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 		:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
 		,m_maxrmp(50.0f)
 	{
@@ -147,6 +148,22 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 		}
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+	}
+
+	void Load(dCustomJointSaveLoad* const fileLoader)
+	{
+		dAssert(0);
+	}
+
+	void Save(dCustomJointSaveLoad* const fileSaver) const
+	{
+		dVector euler0;
+		dVector euler1;
+		m_baseOffsetMatrix.GetEulerAngles(euler0, euler1);
+		euler0 = euler0.Scale (180.0f / 3.141592f);
+		fileSaver->SaveFloat("\tmaxRMP", m_maxrmp);
+		fileSaver->SaveVector("\tbaseOffsetPosit", m_baseOffsetMatrix.m_posit);
+		fileSaver->SaveVector("\tbaseOffsetRotation", euler0);
 	}
 
 	dMatrix m_baseOffsetMatrix;
@@ -243,6 +260,17 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 			}
 		}
 	}
+
+	void Load(dCustomJointSaveLoad* const fileLoader)
+	{
+		dAssert(0);
+	}
+
+	void Save(dCustomJointSaveLoad* const fileSaver) const
+	{
+		// nothing really to save;
+	}
+
 
 	dMatrix m_baseOffsetMatrix;
 //	dFloat m_slipDifferentialSpeed;
@@ -400,6 +428,16 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 		return m_lateralDir.Scale(NewtonUserJointGetRowForce(m_joint, 0));
 	}
 
+	void Load(dCustomJointSaveLoad* const fileLoader)
+	{
+		dAssert (0);
+	}
+
+	void Save(dCustomJointSaveLoad* const fileSaver) const
+	{
+		// nothing really to save;
+	}
+
 	dVector m_lateralDir;
 	dVector m_longitudinalDir;
 	dBodyPartTire* m_tire;
@@ -442,6 +480,17 @@ class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 			}
 		}
 	}
+
+	void Load(dCustomJointSaveLoad* const fileLoader)
+	{
+		dAssert(0);
+	}
+
+	void Save(dCustomJointSaveLoad* const fileSaver) const
+	{
+		fileSaver->SaveFloat("\tclutchFrictionTorque", m_cluthFrictionTorque);
+	}
+
 
 	dFloat m_param;
 	dFloat m_cluthFrictionTorque;
@@ -521,6 +570,17 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 		dFloat relAccel = -0.5f * relOmega * invTimestep;
 		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+	}
+
+	void Load(dCustomJointSaveLoad* const fileLoader)
+	{
+		dAssert(0);
+	}
+
+	void Save(dCustomJointSaveLoad* const fileSaver) const
+	{
+		fileSaver->SaveName("\tparentReference", fileSaver->GetUserDataName (m_parentReference));
+		fileSaver->SaveVector("\tpintOnParentReference", m_pintOnReference);
 	}
 
 	dVector m_pintOnReference;
@@ -2540,7 +2600,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void dCustomVehicleController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	dAssert(0);
+	dTrace (("Remember vehicle debug !!!\n"));
 }
 
 
@@ -2574,3 +2634,13 @@ void dCustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		}
 	}
 }
+
+void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader) const
+{
+}
+
+void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	fileSaver->Save(m_chassis.GetBody());
+}
+

@@ -447,7 +447,7 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 }
 
 
-void dCustomJoint::Save(dCustomJointSaveLoad* const save) const
+void dCustomJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dMatrix childMatrix(GetMatrix0());
 	dMatrix parentMatrix(GetMatrix1());
@@ -462,15 +462,15 @@ void dCustomJoint::Save(dCustomJointSaveLoad* const save) const
 	childEuler = childEuler.Scale (180.0f / 3.141592f);
 	parentEuler = parentEuler.Scale (180.0f / 3.141592f);
 
-	save->SaveInt ("\tdegreesOfFreedom", m_maxDof);
-	save->SaveInt ("\tsolverModel", GetSolverModel());
-	save->SaveVector("\tbody0_position", childMatrix.m_posit);
-	save->SaveVector("\tbody1_position", parentMatrix.m_posit);
+	fileSaver->SaveInt ("\tdegreesOfFreedom", m_maxDof);
+	fileSaver->SaveInt ("\tsolverModel", GetSolverModel());
+	fileSaver->SaveVector("\tbody0_position", childMatrix.m_posit);
+	fileSaver->SaveVector("\tbody1_position", parentMatrix.m_posit);
 
-	save->SaveVector("\tbody0_rotation", childEuler);
-	save->SaveVector("\tbody1_rotation", parentEuler);
+	fileSaver->SaveVector("\tbody0_rotation", childEuler);
+	fileSaver->SaveVector("\tbody1_rotation", parentEuler);
 
-	save->SaveFloat("\tstiffness", m_stiffness);
+	fileSaver->SaveFloat("\tstiffness", m_stiffness);
 }
 
 

@@ -34,7 +34,7 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	{
 	}
 
-	virtual const char* GetBodyUniqueName(const NewtonBody* const body) const = 0;
+	virtual const char* GetUserDataName(const NewtonBody* const body) const = 0;
 	virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const = 0;
 
 	CUSTOM_JOINTS_API virtual const char* NextToken () const;
@@ -61,6 +61,8 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	
 	FILE* m_file;
 	NewtonWorld* m_world;
+//	dTree<int, const NewtonBody*> m_bodyMap;
+	dTree<int, const NewtonBody*> m_bodyFilter;
 	char m_token[128];
 };
 

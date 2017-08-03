@@ -431,10 +431,12 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
+	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
+	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader) const;
+
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
-	
 
 	bool ControlStateChanged() const;
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag);

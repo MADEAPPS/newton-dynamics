@@ -1314,6 +1314,76 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		glDisable (GL_BLEND);
 	}
 
+
+	class MySaveLoad: public dCustomJointSaveLoad
+	{
+		public:
+		MySaveLoad(NewtonWorld* const world, FILE* const file, int materialID)
+			:dCustomJointSaveLoad(world, file)
+			,m_material(materialID)
+		{
+		}
+
+		const char* GetUserDataName(const NewtonBody* const body) const
+		{
+			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+			return entity ? entity->GetName().GetStr() : NULL;
+		}
+
+		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
+		{
+			dMatrix matrix;
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+			DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			DemoEntity* const entity = new DemoEntity(matrix, NULL);
+			entity->SetMesh(mesh, dGetIdentityMatrix());
+			scene->Append(entity);
+			mesh->Release();
+
+			// save the pointer to the graphic object with the body.
+			NewtonBodySetUserData(body, entity);
+
+			// assign the wood id
+			NewtonBodySetMaterialGroupID(body, m_material);
+
+			//set continuous collision mode
+			//NewtonBodySetContinuousCollisionMode (body, continueCollisionMode);
+
+			// set a destructor for this rigid body
+			NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
+
+			// set the transform call back function
+			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+			// set the force and torque call back function
+			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		}
+
+		int m_material;
+	};
+
+
+	void SaveVehicle (const char* const name, dCustomVehicleController* const vehicle)
+	{
+		char fileName[2048];
+		dGetWorkingFileName(name, fileName);
+
+		char* const oldloc = setlocale(LC_ALL, 0);
+		setlocale(LC_ALL, "C");
+		FILE* const outputFile = fopen(fileName, "wt");
+		dAssert(outputFile);
+
+		MySaveLoad saveLoad(GetWorld(), outputFile, 0);
+		vehicle->Save(&saveLoad);
+
+		fclose(outputFile);
+		setlocale(LC_ALL, oldloc);
+	}
+
 	void SetAsPlayer (SuperCarEntity* const player)
 	{
 		dCustomVehicleController::dEngineController* const engine = player->m_controller->GetEngine();
@@ -1321,6 +1391,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			engine->SetIgnition(false);
 		}
 		m_player = player;
+
+		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
 	}
 
 	void SetNextPlayer() 
