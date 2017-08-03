@@ -85,10 +85,10 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		{
 		}
 
-		const char* GetBodyUniqueName(const NewtonBody* const body) const
+		const char* GetUserDataName(const NewtonBody* const body) const
 		{
 			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-			return entity->GetName().GetStr();
+			return entity ? entity->GetName().GetStr() : NULL;
 		}
 
 		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
