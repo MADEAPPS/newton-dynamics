@@ -19,8 +19,6 @@
 
 #include "dCustomJoint.h"
 
-
-
 class dCustomJointSaveLoad: public dCustomAlloc
 {
 	public:
@@ -55,10 +53,10 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	CUSTOM_JOINTS_API int FindBodyId(NewtonBody* const body) const;
 
 	private:
-	NewtonCollision* ParseCollisonShape();
+	void LoadRigidBodyList(dTree<const NewtonBody*, int>& bodyList);
+
 	void SaveRigidBodyList(dList<const NewtonBody*>& bodyList);
 	void SaveRigidJointList(dList<const dCustomJoint*>& jointList);
-	void ParseRigidBody(dTree<NewtonBody*, const dString>& bodyMap);
 	void ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap);
 	void GetBodiesAndJointsList (dList<const NewtonBody*>& bodylist, dList<const dCustomJoint*>& jointlist, NewtonBody* const rootbody);
 	

@@ -133,110 +133,6 @@ int dCustomJointSaveLoad::FindBodyId(NewtonBody* const body) const
 }
 
 
-NewtonCollision* dCustomJointSaveLoad::ParseCollisonShape()
-{
-	NewtonCollision* collision = NULL;
-
-	const char* token = NextToken();
-
-	if (!strcmp(token, "sphere")) {
-		dAssert(0);
-/*
-		dFloat radio;
-		fscanf(file, "%s %f", token, &radio);
-		collision = NewtonCreateSphere(m_world, radio, 0, NULL);
-*/
-	} else if (!strcmp(token, "capsule")) {
-		token = NextToken();
-		dAssert (!strcmp(token, "radio0:"));
-		dFloat radio0 = LoadFloat();
-
-		token = NextToken();
-		dAssert(!strcmp(token, "radio1:"));
-		dFloat radio1 = LoadFloat();
-
-		token = NextToken();
-		dAssert(!strcmp(token, "height:"));
-		dFloat height = LoadFloat();
-		collision = NewtonCreateCapsule(m_world, radio0, radio1, height, 0, NULL);
-
-	} else if (!strcmp(token, "convexHull")) {
-		dVector array[1024* 4];
-		
-		token = NextToken();
-		dAssert(!strcmp(token, "points:"));
-
-		int pointCount = LoadInt();
-		for (int i = 0; i < pointCount; i++) {
-			token = NextToken();
-			array[i] = LoadVector();
-		}
-		collision = NewtonCreateConvexHull(m_world, pointCount, &array[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
-	} else {
-		dAssert(0);
-	}
-
-
-	token = NextToken();
-	dAssert(!strcmp(token, "shapeScale:"));
-	dVector scale (LoadVector());
-
-	token = NextToken();
-	dAssert(!strcmp(token, "shapePosition:"));
-	dVector posit(LoadVector());
-	posit.m_w = 1.0f;
-
-	token = NextToken();
-	dAssert(!strcmp(token, "shapeEulerAngle:"));
-	dVector euler(LoadVector());
-	euler = euler.Scale(3.141592f / 180.0f);
-
-	dMatrix matrix(euler.m_x, euler.m_y, euler.m_z, posit);
-	NewtonCollisionSetMatrix(collision, &matrix[0][0]);
-//NewtonCollisionSetMode(collision, 0);
-	return collision;
-}
-
-
-void dCustomJointSaveLoad::ParseRigidBody(dTree<NewtonBody*, const dString>& bodyMap)
-{
-	dVector posit(0.0f);
-	dVector euler(0.0f);
-	NewtonBody* body = NULL;
-	NewtonCollision* collision = NULL;
-	dFloat mass = 0.0f;
-	char nodeName[256];
-
-	for (const char* token = NextToken (); strcmp(token, "nodeEnd:"); token = NextToken ()) { 
-
-		if (!strcmp(token, "node:")) {
-			LoadName (nodeName);
-		} else if (!strcmp(token, "mass:")) {
-			mass = LoadFloat ();
-		} else if (!strcmp(token, "position:")) {
-			posit = LoadVector();
-			posit.m_w = 1.0f;
-		} else if (!strcmp(token, "eulerAngles:")) {
-			euler = LoadVector();
-			euler = euler.Scale(3.141592f / 180.0f);
-		} else if (!strcmp(token, "shapeType:")) {
-			collision = ParseCollisonShape();
-		} else {
-			dAssert(0);
-		}
-	}
-
-	dMatrix matrix(euler.m_x, euler.m_y, euler.m_z, posit);
-	body = NewtonCreateDynamicBody(m_world, collision, &matrix[0][0]);
-	NewtonBodySetMassProperties(body, mass, collision);
-
-	InitRigiBody(body, nodeName);
-	NewtonDestroyCollision(collision);
-	bodyMap.Insert(body, nodeName);
-}
-
-
-
 void dCustomJointSaveLoad::ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap)
 {
 	char jointType[256];
@@ -263,32 +159,6 @@ void dCustomJointSaveLoad::ParseJoint(const dTree<NewtonBody*, const dString>& b
 }
 
 
-NewtonBody* dCustomJointSaveLoad::Load()
-{
-	char rootBodyName[256];
-//	m_bodyMap.RemoveAll();
-	dTree<NewtonBody*, const dString> bodyMap;
-
-	const char* token = NextToken();
-	dAssert (!strcmp(token, "rootBone:"));
-	LoadName (rootBodyName);
-
-	token = NextToken();
-	dAssert (!strcmp(token, "nodesCount:"));
-	int nodesCount = LoadInt ();
-	for (int i = 0; i < nodesCount; i++) {
-		ParseRigidBody(bodyMap);
-	}
-
-	token = NextToken();
-	dAssert (!strcmp(token, "jointsCount:"));
-	int jointsCount = LoadInt ();
-	for (int i = 0; i < jointsCount; i++) {
-		ParseJoint(bodyMap);
-	}
-
-	return bodyMap.Find(rootBodyName)->GetInfo();
-}
 
 void dCustomJointSaveLoad::SaveRigidBodyList(dList<const NewtonBody*>& bodyList)
 {
@@ -408,6 +278,137 @@ void dCustomJointSaveLoad::SaveRigidBodyList(dList<const NewtonBody*>& bodyList)
 	}
 }
 
+
+void dCustomJointSaveLoad::LoadRigidBodyList(dTree<const NewtonBody*, int>& bodyList)
+{
+	dTree<NewtonCollision*, int> collisionMap;
+
+	const char* token = NextToken();
+	dAssert(!strcmp(token, "shapeCount:"));
+	int collisionCount = LoadInt();
+	for (int i = 0; i < collisionCount; i++) {
+		char shapeTypeName[128];
+		token = NextToken();
+		dAssert(!strcmp(token, "collision:"));
+		int collisionIndex = LoadInt();
+
+		token = NextToken();
+		dAssert(!strcmp(token, "shapeType:"));
+		LoadName(shapeTypeName);
+
+		NewtonCollision* collision = NULL;
+		if (!strcmp(shapeTypeName, "sphere")) {
+			token = NextToken();
+			dAssert(!strcmp(token, "radio:"));
+			dFloat radio = LoadFloat();
+			collision = NewtonCreateSphere(m_world, radio, 0, NULL);
+		} else if (!strcmp(shapeTypeName, "capsule")) {
+			token = NextToken();
+			dAssert(!strcmp(token, "radio0:"));
+			dFloat radio0 = LoadFloat();
+
+			token = NextToken();
+			dAssert(!strcmp(token, "radio1:"));
+			dFloat radio1 = LoadFloat();
+
+			token = NextToken();
+			dAssert(!strcmp(token, "height:"));
+			dFloat height = LoadFloat();
+			collision = NewtonCreateCapsule(m_world, radio0, radio1, height, 0, NULL);
+
+		} else if (!strcmp(shapeTypeName, "chamferCylinder")) {
+			token = NextToken();
+			dAssert(!strcmp(token, "radio:"));
+			dFloat radio = LoadFloat();
+
+			token = NextToken();
+			dAssert(!strcmp(token, "height:"));
+			dFloat height = LoadFloat();
+			collision = NewtonCreateChamferCylinder(m_world, radio, height, 0, NULL);
+
+		} else if (!strcmp(shapeTypeName, "convexHull")) {
+			dVector array[1024 * 4];
+
+			token = NextToken();
+			dAssert(!strcmp(token, "points:"));
+
+			int pointCount = LoadInt();
+			for (int j = 0; j < pointCount; j++) {
+				token = NextToken();
+				array[j] = LoadVector();
+			}
+			collision = NewtonCreateConvexHull(m_world, pointCount, &array[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
+		} else {
+			dAssert(0);
+		}
+
+
+		token = NextToken();
+		dAssert(!strcmp(token, "shapeScale:"));
+		dVector scale(LoadVector());
+
+		token = NextToken();
+		dAssert(!strcmp(token, "shapePosition:"));
+		dVector posit(LoadVector());
+		posit.m_w = 1.0f;
+
+		token = NextToken();
+		dAssert(!strcmp(token, "shapeEulerAngle:"));
+		dVector euler(LoadVector());
+		euler = euler.Scale(3.141592f / 180.0f);
+
+		token = NextToken();
+		dAssert(!strcmp(token, "collisionEnd:"));
+
+		dMatrix matrix(euler.m_x, euler.m_y, euler.m_z, posit);
+		NewtonCollisionSetMatrix(collision, &matrix[0][0]);
+
+		collisionMap.Insert(collision, collisionIndex);
+	}
+
+/*
+dVector posit(0.0f);
+dVector euler(0.0f);
+NewtonBody* body = NULL;
+NewtonCollision* collision = NULL;
+dFloat mass = 0.0f;
+char nodeName[256];
+
+for (const char* token = NextToken(); strcmp(token, "nodeEnd:"); token = NextToken()) {
+
+	if (!strcmp(token, "node:")) {
+		LoadName(nodeName);
+	} else if (!strcmp(token, "mass:")) {
+		mass = LoadFloat();
+	} else if (!strcmp(token, "position:")) {
+		posit = LoadVector();
+		posit.m_w = 1.0f;
+	} else if (!strcmp(token, "eulerAngles:")) {
+		euler = LoadVector();
+		euler = euler.Scale(3.141592f / 180.0f);
+	} else if (!strcmp(token, "shapeType:")) {
+		collision = ParseCollisonShape();
+	} else {
+		dAssert(0);
+	}
+}
+
+dMatrix matrix(euler.m_x, euler.m_y, euler.m_z, posit);
+body = NewtonCreateDynamicBody(m_world, collision, &matrix[0][0]);
+NewtonBodySetMassProperties(body, mass, collision);
+
+InitRigiBody(body, nodeName);
+NewtonDestroyCollision(collision);
+bodyMap.Insert(body, nodeName);
+*/
+
+	dTree<NewtonCollision*, int>::Iterator iter(collisionMap);
+	for (iter.Begin(); iter; iter++) {
+		NewtonCollision* const collision = *iter;
+		NewtonDestroyCollision(collision);
+	}
+}
+
 void dCustomJointSaveLoad::SaveRigidJointList(dList<const dCustomJoint*>& jointList)
 {
 	int index = 0;
@@ -437,4 +438,36 @@ void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
 
 	SaveRigidBodyList(bodyList);
 	SaveRigidJointList(jointList);
+}
+
+
+NewtonBody* dCustomJointSaveLoad::Load()
+{
+	dTree<const NewtonBody*, int> bodyMap;
+
+	const char* token = NextToken();
+	dAssert(!strcmp(token, "rootNode:"));
+	int rootBodyIndex = LoadInt();
+
+	LoadRigidBodyList(bodyMap);
+
+/*
+	token = NextToken();
+	dAssert(!strcmp(token, "nodesCount:"));
+	int nodesCount = LoadInt();
+	for (int i = 0; i < nodesCount; i++) {
+		ParseRigidBody(bodyMap);
+	}
+
+	token = NextToken();
+	dAssert(!strcmp(token, "jointsCount:"));
+	int jointsCount = LoadInt();
+	for (int i = 0; i < jointsCount; i++) {
+		ParseJoint(bodyMap);
+	}
+
+	return bodyMap.Find(rootBodyName)->GetInfo();
+*/
+
+	return NULL;
 }
