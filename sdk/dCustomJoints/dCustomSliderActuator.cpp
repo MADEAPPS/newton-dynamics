@@ -46,8 +46,7 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, d
 	EnableLimits(false);
 }
 
-dCustomSliderActuator::dCustomSliderActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomSlider(child, parent, callback, userData)
+void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_posit, sizeof(dFloat));
 	callback(userData, &m_minPosit, sizeof(dFloat));

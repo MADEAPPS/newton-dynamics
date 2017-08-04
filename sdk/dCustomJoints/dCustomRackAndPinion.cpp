@@ -46,8 +46,7 @@ dCustomRackAndPinion::~dCustomRackAndPinion()
 {
 }
 
-dCustomRackAndPinion::dCustomRackAndPinion (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomRackAndPinion::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }

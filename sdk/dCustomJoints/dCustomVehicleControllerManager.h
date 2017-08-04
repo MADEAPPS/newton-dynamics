@@ -23,18 +23,17 @@
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 
-
+class dAxelJoint;
+class dWheelJoint;
+class dEngineJoint;
+class dGearBoxJoint;
+class dDifferentialJoint;
 class dCustomVehicleController;
 
 class dCustomVehicleController: public dCustomControllerBase
 {
 	public:
-	class dAxelJoint;
-	class dWheelJoint;
-	class dEngineJoint;
-	class dGearBoxJoint;
 	class dEngineController;
-	class dDifferentialJoint;
 	class dSteeringController;
 //	class dLateralDynamicsJoint;
 

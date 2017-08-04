@@ -34,8 +34,7 @@ dCustomPlane5DOF::dCustomPlane5DOF(const dVector& pivot, const dVector& normal, 
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-dCustomPlane5DOF::dCustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomPlane5DOF::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 }
 
@@ -75,8 +74,7 @@ dCustomPlane3DOF::dCustomPlane3DOF (const dVector& pivot, const dVector& normal,
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-dCustomPlane3DOF::dCustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomPlane3DOF::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 }
 

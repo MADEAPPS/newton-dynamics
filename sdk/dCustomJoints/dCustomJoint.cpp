@@ -428,6 +428,11 @@ void dCustomJoint::Serialize (NewtonSerializeCallback callback, void* const user
 	callback(userData, &solverModel, sizeof(solverModel));
 }
 
+void dCustomJoint::Deserialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	dAssert (0);
+}
+
 void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 {
 	dVector o0(matrix.m_posit);

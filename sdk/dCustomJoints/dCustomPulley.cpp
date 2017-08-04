@@ -47,8 +47,7 @@ dCustomPulley::~dCustomPulley()
 {
 }
 
-dCustomPulley::dCustomPulley (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomPulley::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }

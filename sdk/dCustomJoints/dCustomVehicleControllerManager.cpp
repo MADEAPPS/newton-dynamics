@@ -41,6 +41,7 @@ static FILE* file_xxx;
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
 
+
 class dCustomVehicleControllerManager::dTireFilter: public dCustomControllerConvexCastPreFilter
 {
 	public:
@@ -74,7 +75,7 @@ class dCustomVehicleControllerManager::dTireFilter: public dCustomControllerConv
 };
 
 
-class dCustomVehicleController::dEngineJoint: public dCustomHinge
+class dEngineJoint: public dCustomHinge
 {
 	public:
 	dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
@@ -153,6 +154,7 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 	void Load(dCustomJointSaveLoad* const fileLoader)
 	{
 		dAssert(0);
+		dCustomHinge::Save (fileLoader);
 	}
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
@@ -168,10 +170,13 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 
 	dMatrix m_baseOffsetMatrix;
 	dFloat m_maxrmp;
+
+	DECLARE_CUSTOM_JOINT(dEngineJoint, dCustomHinge)
 };
+IMPLEMENT_CUSTOM_JOINT(dEngineJoint);
 
 
-class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
+class dDifferentialJoint: public dCustomUniversal
 {
 	public:
 	dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
@@ -269,6 +274,7 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
 		// nothing really to save;
+		dCustomUniversal::Save(fileSaver);
 	}
 
 
@@ -277,13 +283,16 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 //	bool m_slipDifferentialOn;
 	dFloat m_turnSpeed;
 	bool m_isTractionDifferential;
+
+	DECLARE_CUSTOM_JOINT(dDifferentialJoint, dCustomUniversal)
 };
+IMPLEMENT_CUSTOM_JOINT(dDifferentialJoint);
 
 
-class dCustomVehicleController::dWheelJoint: public dCustomJoint
+class dWheelJoint: public dCustomJoint
 {
 	public:
-	dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, dBodyPartTire* const tireData)
+	dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, dCustomVehicleController::dBodyPartTire* const tireData)
 		:dCustomJoint(6, tireBody, chassisBody)
 		,m_lateralDir(0.0f)
 		,m_longitudinalDir(0.0f)
@@ -391,7 +400,7 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 		} else if (param <= 0.0f) {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (m_tire->m_data.m_suspentionType == dBodyPartTire::Info::m_roller) {
+		} else if (m_tire->m_data.m_suspentionType == dCustomVehicleController::dBodyPartTire::Info::m_roller) {
 			dAssert(0);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 		}
@@ -436,19 +445,23 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
 		// nothing really to save;
+		dCustomJoint::Save(fileSaver);
 	}
 
 	dVector m_lateralDir;
 	dVector m_longitudinalDir;
-	dBodyPartTire* m_tire;
+	dCustomVehicleController::dBodyPartTire* m_tire;
 	dFloat m_tireLoad;
 	dFloat m_steerRate;
 	dFloat m_steerAngle0;
 	dFloat m_steerAngle1;
 	dFloat m_brakeTorque;
-};
 
-class dCustomVehicleController::dGearBoxJoint: public dCustomGear
+	DECLARE_CUSTOM_JOINT(dWheelJoint, dCustomJoint)
+};
+IMPLEMENT_CUSTOM_JOINT(dWheelJoint);
+
+class dGearBoxJoint: public dCustomGear
 {
 	public:
 	dGearBoxJoint(const dVector& childPin, NewtonBody* const differential, NewtonBody* const engine, dFloat maxFrictionToque)
@@ -488,15 +501,17 @@ class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
+		dCustomGear::Save(fileSaver);
 		fileSaver->SaveFloat("\tclutchFrictionTorque", m_cluthFrictionTorque);
 	}
 
-
 	dFloat m_param;
 	dFloat m_cluthFrictionTorque;
+	DECLARE_CUSTOM_JOINT(dGearBoxJoint, dCustomGear)
 };
+IMPLEMENT_CUSTOM_JOINT(dGearBoxJoint);
 
-class dCustomVehicleController::dAxelJoint: public dCustomGear
+class dAxelJoint: public dCustomGear
 {
 	public:
 	dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
@@ -579,13 +594,16 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
-		fileSaver->SaveName("\tparentReference", fileSaver->GetUserDataName (m_parentReference));
+		fileSaver->SaveInt("\tparentReference", fileSaver->FindBodyId(m_parentReference));
 		fileSaver->SaveVector("\tpintOnParentReference", m_pintOnReference);
+		dCustomGear::Save(fileSaver);
 	}
 
 	dVector m_pintOnReference;
 	NewtonBody* m_parentReference;
+	DECLARE_CUSTOM_JOINT(dAxelJoint, dCustomGear)
 };
+IMPLEMENT_CUSTOM_JOINT(dAxelJoint);
 
 /*
 class dCustomVehicleController::dLateralDynamicsJoint: public dCustomJoint
@@ -2324,7 +2342,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 	NewtonBody* const tireBody = tire->GetBody();
 	dAssert((tireBody == NewtonJointGetBody0(contactJoint)) || (tireBody == NewtonJointGetBody1(contactJoint)));
 	const dCustomVehicleController* const controller = tire->GetController();
-	dCustomVehicleController::dWheelJoint* const tireJoint = (dCustomVehicleController::dWheelJoint*) tire->GetJoint();
+	dWheelJoint* const tireJoint = (dWheelJoint*) tire->GetJoint();
 
 	dAssert(tireJoint->GetBody0() == tireBody);
 	tireJoint->CalculateGlobalMatrix(tireMatrix, chassisMatrix);

@@ -31,7 +31,8 @@ class dCustomCorkScrew: public dCustomJoint
 	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
 	protected:
-	CUSTOM_JOINTS_API dCustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	//CUSTOM_JOINTS_API dCustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);

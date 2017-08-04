@@ -28,7 +28,8 @@ class dCustomPlane3DOF: public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomPlane3DOF();
 
 	protected:
-	CUSTOM_JOINTS_API dCustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	//CUSTOM_JOINTS_API dCustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
@@ -44,7 +45,8 @@ class dCustomPlane5DOF : public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomPlane5DOF();
 
 	protected:
-	CUSTOM_JOINTS_API dCustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	//CUSTOM_JOINTS_API dCustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);

@@ -39,8 +39,7 @@ dCustomRagdollMotor::~dCustomRagdollMotor()
 {
 }
 
-dCustomRagdollMotor::dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomBallAndSocket(child, parent, callback, userData)
+void dCustomRagdollMotor::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_motorMode, sizeof(int));
 	callback(userData, &m_torque, sizeof(dFloat));
@@ -106,11 +105,11 @@ dCustomRagdollMotor_1dof::dCustomRagdollMotor_1dof(const dMatrix& pinAndPivotFra
 {
 }
 
-dCustomRagdollMotor_1dof::dCustomRagdollMotor_1dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomRagdollMotor(child, parent, callback, userData)
-	,m_minTwistAngle(0.0f)
-	,m_maxTwistAngle(0.0f)
+void dCustomRagdollMotor_1dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
+	m_minTwistAngle = 0.0f;
+	m_maxTwistAngle = 0.0f;
+
 	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
 }
@@ -249,10 +248,9 @@ dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFra
 {
 }
 
-dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomRagdollMotor(child, parent, callback, userData)
-	,m_coneAngle(0.0f)
+void dCustomRagdollMotor_2dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
+	m_coneAngle = 0.0f;
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 }
 
@@ -427,8 +425,7 @@ dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFra
 {
 }
 
-dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomRagdollMotor(child, parent, callback, userData)
+void dCustomRagdollMotor_3dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
@@ -672,8 +669,12 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDy
 	SetTargetMatrix(attachmentPointInGlobalSpace);
 }
 
-dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomRagdollMotor_EndEffector::Deserialize (NewtonDeserializeCallback callback, void* const userData)
+{
+	dAssert(0);
+}
+
+void dCustomRagdollMotor_EndEffector::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dAssert(0);
 }

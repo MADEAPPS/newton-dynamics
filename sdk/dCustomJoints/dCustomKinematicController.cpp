@@ -37,8 +37,12 @@ dCustomKinematicController::dCustomKinematicController (NewtonBody* const body, 
 	Init (body, attachmentMatrixInGlobalSpace);
 }
 
-dCustomKinematicController::dCustomKinematicController(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomKinematicController::Deserialize (NewtonDeserializeCallback callback, void* const userData)
+{
+	dAssert (0);
+}
+
+void dCustomKinematicController::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dAssert (0);
 }

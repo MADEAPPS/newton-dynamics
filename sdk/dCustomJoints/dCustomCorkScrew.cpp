@@ -47,8 +47,7 @@ dCustomCorkScrew::~dCustomCorkScrew()
 {
 }
 
-dCustomCorkScrew::dCustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomCorkScrew::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback (userData, &m_minLinearDist, sizeof (dFloat));
 	callback (userData, &m_maxLinearDist, sizeof (dFloat));

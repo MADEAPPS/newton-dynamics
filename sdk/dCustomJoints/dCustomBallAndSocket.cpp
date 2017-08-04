@@ -52,8 +52,7 @@ dCustomPointToPoint::~dCustomPointToPoint()
 }
 
 
-dCustomPointToPoint::dCustomPointToPoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomPointToPoint::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 }
 
@@ -155,8 +154,7 @@ dCustomBallAndSocket::~dCustomBallAndSocket()
 {
 }
 
-dCustomBallAndSocket::dCustomBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomBallAndSocket::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 }
 
@@ -269,8 +267,7 @@ dCustomLimitBallAndSocket::~dCustomLimitBallAndSocket()
 {
 }
 
-dCustomLimitBallAndSocket::dCustomLimitBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomBallAndSocket (child, parent, callback, userData)
+void dCustomLimitBallAndSocket::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback (userData, &m_rotationOffset, sizeof (dMatrix));
 	callback (userData, &m_minTwistAngle, sizeof (dFloat));
@@ -404,8 +401,7 @@ dCustomControlledBallAndSocket::dCustomControlledBallAndSocket(const dMatrix& pi
 {
 }
 
-dCustomControlledBallAndSocket::dCustomControlledBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomBallAndSocket(child, parent, callback, userData)
+void dCustomControlledBallAndSocket::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	dAssert (0);
 }

@@ -48,13 +48,16 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	CUSTOM_JOINTS_API virtual void SaveFloat (const char* const token, dFloat val) const;
 	CUSTOM_JOINTS_API virtual void SaveVector (const char* const token, const dVector& v) const;
 	CUSTOM_JOINTS_API virtual void SaveName (const char* const token, const char* const name) const;
-	
 
 	CUSTOM_JOINTS_API virtual NewtonBody* Load();
 	CUSTOM_JOINTS_API virtual void Save(NewtonBody* const rootbody);
 
+	CUSTOM_JOINTS_API int FindBodyId(NewtonBody* const body) const;
+
 	private:
 	NewtonCollision* ParseCollisonShape();
+	void SaveRigidBodyList(dList<const NewtonBody*>& bodyList);
+	void SaveRigidJointList(dList<const dCustomJoint*>& jointList);
 	void ParseRigidBody(dTree<NewtonBody*, const dString>& bodyMap);
 	void ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap);
 	void GetBodiesAndJointsList (dList<const NewtonBody*>& bodylist, dList<const dCustomJoint*>& jointlist, NewtonBody* const rootbody);

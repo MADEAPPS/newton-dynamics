@@ -45,11 +45,9 @@ dCustomDryRollingFriction::~dCustomDryRollingFriction()
 {
 }
 
-dCustomDryRollingFriction::dCustomDryRollingFriction (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomDryRollingFriction::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	dAssert (0);
-	
 }
 
 void dCustomDryRollingFriction::Serialize (NewtonSerializeCallback callback, void* const userData) const

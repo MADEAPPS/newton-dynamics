@@ -59,10 +59,9 @@ dCustomGear::~dCustomGear()
 {
 }
 
-dCustomGear::dCustomGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
-	,m_gearRatio(1.0f)
+void dCustomGear::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
+	m_gearRatio = 1.0f;
 	// set as kinematic loop
 	SetSolverModel(1);
 
@@ -141,8 +140,7 @@ dCustomGearAndSlide::~dCustomGearAndSlide()
 {
 }
 
-dCustomGearAndSlide::dCustomGearAndSlide (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomGear(child, parent, callback, userData)
+void dCustomGearAndSlide::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	// set as kinematic loop
 	SetSolverModel(1);
@@ -237,15 +235,14 @@ dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector
 	SetSolverModel(1);
 }
 
-dCustomDifferentialGear::dCustomDifferentialGear(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomGear(child, parent, callback, userData)
+void dCustomDifferentialGear::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	// remember to get referenceBody from the world 
 	int refeBodyID;
 	callback(userData, &m_pintOnReference, sizeof(dVector));
 	callback(userData, &refeBodyID, sizeof(int));
 
-	NewtonWorld* const world = NewtonBodyGetWorld(child);
+	NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
 	m_parentReference = NewtonFindSerializedBody(world, refeBodyID);
 
 	// set as kinematic loop

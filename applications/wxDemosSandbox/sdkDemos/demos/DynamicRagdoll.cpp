@@ -162,7 +162,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		bodyMatrix.m_posit = posit;
 		bodyMatrix.m_posit.m_w = 1.0f;
 		NewtonBodySetMatrixRecursive (root, &bodyMatrix[0][0]);
-
+/*
 return;
 dCustomHinge* xxx = new dCustomHinge(bodyMatrix, root);
 xxx->SetFriction (20000.0f);
@@ -259,6 +259,7 @@ xxx->SetMaxAngularFriction(5000.0f);
 		}
 
 		controller->Finalize();
+*/
 	}
 
 	int m_material;

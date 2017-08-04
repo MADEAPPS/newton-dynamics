@@ -42,8 +42,7 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 }
 
 
-dCustomSlider::dCustomSlider (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomSlider::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback (userData, &m_speed, sizeof (dFloat));
 	callback (userData, &m_posit, sizeof (dFloat));

@@ -53,8 +53,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 	m_maxAngle_1 =  45.0f * 3.141592f / 180.0f;
 }
 
-dCustomUniversal::dCustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomUniversal::Deserialize (NewtonDeserializeCallback callback, void* const userData) 
 {
 	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
 	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));

@@ -46,8 +46,7 @@ dCustom6DOF::~dCustom6DOF()
 {
 }
 
-dCustom6DOF::dCustom6DOF (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustom6DOF::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback (userData, &m_minLinearLimits, sizeof (dVector));
 	callback (userData, &m_maxLinearLimits, sizeof (dVector));

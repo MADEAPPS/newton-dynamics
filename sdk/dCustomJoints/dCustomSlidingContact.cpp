@@ -41,8 +41,7 @@ dCustomSlidingContact::dCustomSlidingContact (const dMatrix& pinAndPivotFrame, N
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-dCustomSlidingContact::dCustomSlidingContact(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomJoint(child, parent, callback, userData)
+void dCustomSlidingContact::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_curJointAngle, sizeof(dAngularIntegration));
 	callback(userData, &m_speed, sizeof(dFloat));

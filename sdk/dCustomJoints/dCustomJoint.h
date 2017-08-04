@@ -40,10 +40,15 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 		}																													\
 		return baseClass::IsType(type);																						\
 	}																														\
+	className(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)	\
+		:baseClass(child, parent, callback, userData)																		\
+	{																														\
+		dAssert (0);																								\
+	}																														\
 	className(dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)						\
 		:baseClass(fileLoader, body0, body1)																				\
 	{																														\
-		Load(fileLoader);																										\
+		Load(fileLoader);																									\
 	}																														\
 	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
 	static dCRCTYPE GetType () { return m_metaData_##className.m_key_##className; }										    \
@@ -188,6 +193,7 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API static void Initalize(NewtonWorld* const world);
 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void Deserialize (NewtonSerializeCallback callback, void* const userData) const;
 	
 	CUSTOM_JOINTS_API void SetBodiesCollisionState (int state);
 	CUSTOM_JOINTS_API int GetBodiesCollisionState () const;
