@@ -346,7 +346,7 @@ class dWheelJoint: public dCustomJoint
 		,m_brakeTorque(0.0f)
 		,m_suspentionType(dCustomVehicleController::dBodyPartTire::Info::m_offroad)
 		,m_suspensionLength(tireData->m_data.m_suspesionlenght)
-		,m_tire____(tireData)
+		,m_tire(tireData)
 	{
 		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
@@ -373,7 +373,7 @@ class dWheelJoint: public dCustomJoint
 
 		NewtonBody* const tire = m_body0;
 		NewtonBody* const chassis = m_body1;
-		dAssert(m_body0 == m_tire____->m_joint->GetBody0());
+		dAssert(m_body0 == m_tire->m_joint->GetBody0());
 
 		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 		chassisMatrix = dYawMatrix(m_steerAngle0) * chassisMatrix;
@@ -413,8 +413,8 @@ class dWheelJoint: public dCustomJoint
 
 		NewtonBody* const tire = m_body0;
 		NewtonBody* const chassis = m_body1;
-		dAssert(!m_tire____ || m_body0 == m_tire____->GetBody());
-		dAssert(!m_tire____ || m_body1 == m_tire____->GetParent()->GetBody());
+		dAssert(!m_tire || m_body0 == m_tire->GetBody());
+		dAssert(!m_tire || m_body1 == m_tire->GetParent()->GetBody());
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
@@ -484,7 +484,7 @@ class dWheelJoint: public dCustomJoint
 
 	void Load(dCustomJointSaveLoad* const fileLoader)
 	{
-		m_tire____ = NULL;
+		m_tire = NULL;
 		m_lateralDir = dVector (0.0f);
 		m_longitudinalDir = dVector (0.0f);
 		m_tireLoad = 0.0f;
@@ -518,7 +518,7 @@ class dWheelJoint: public dCustomJoint
 	dFloat m_brakeTorque;
 	dFloat m_suspensionLength;
 	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_suspentionType;
-	dCustomVehicleController::dBodyPartTire* m_tire____;
+	dCustomVehicleController::dBodyPartTire* m_tire;
 
 	DECLARE_CUSTOM_JOINT(dWheelJoint, dCustomJoint)
 };
