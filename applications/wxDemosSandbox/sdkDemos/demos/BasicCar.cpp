@@ -34,50 +34,22 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 		const char* GetUserDataName(const NewtonBody* const body) const
 		{
-/*
-			static char* tire = "tireMesh";
-			static char* engine = "engineMesh";
-			static char* chassis = "chassisMesh";
-			static char* differential = "differentialMesh";
-
-			if (m_vehicle->GetChassis()->GetBody() == body) {
-				return chassis;
-			}
-
-			if (m_vehicle->GetEnginePart()->GetBody() == body) {
-				return engine;
-			}
-
-			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
-				const dCustomVehicleController::dBodyPartTire& tirePart = node->GetInfo();
-				if (tirePart.GetBody() == body) {
-					return tire;
-				}
-			}
-
-			for (dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
-				const dCustomVehicleController::dBodyPartDifferential& differentialPart = node->GetInfo();
-				if (differentialPart.GetBody() == body) {
-					return differential;
-				}
-			}
-
-			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-			return entity ? entity->GetName().GetStr() : NULL;
-*/
 			dAssert(0);
 			return NULL;
 		}
 
 		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
 		{
-			dAssert(0);
-			/*
 			dMatrix matrix;
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
 			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-			DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			DemoMesh* mesh;
+			if (!strcmp (bodyName, "tireMesh")) {
+				mesh = new DemoMesh(bodyName, collision, "wood_4.tga", "wood_4.tga", "wood_4.tga");
+			} else {
+				mesh = new DemoMesh(bodyName, collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+			}
 
 			NewtonBodyGetMatrix(body, &matrix[0][0]);
 			DemoEntity* const entity = new DemoEntity(matrix, NULL);
@@ -102,7 +74,6 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 			// set the force and torque call back function
 			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-			*/
 		}
 
 		int m_material;
@@ -155,7 +126,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
 	{
-		dAssert(0);
+//		dAssert(0);
 /*
 		if (m_player) {
 			// set to transparent color
@@ -204,7 +175,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 	virtual void PreUpdate (dFloat timestep)
 	{
-		dAssert(0);
+//		dAssert(0);
 /*
 		// apply the vehicle controls, and all simulation time effect
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
@@ -229,7 +200,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 	virtual void PostUpdate (dFloat timestep)
 	{
-		dAssert(0);
+//		dAssert(0);
 /*
 		// do the base class post update
 		dCustomVehicleControllerManager::PostUpdate(timestep);
@@ -431,7 +402,10 @@ void BasicCar (DemoEntityManager* const scene)
 
 //	dMatrix camMatrix (manager->m_player->GetNextMatrix());
 //	scene->SetCameraMouseLock (true);
-//	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
+
+	dMatrix camMatrix(dGetIdentityMatrix());
+	camMatrix.m_posit = dVector (-20.0f, 1.5f, 102.f, 1.0f);
+	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 //
 	//	dVector location (origin);

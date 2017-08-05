@@ -53,10 +53,10 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	CUSTOM_JOINTS_API int FindBodyId(NewtonBody* const body) const;
 
 	private:
-	void LoadRigidBodyList(dTree<const NewtonBody*, int>& bodyList);
+	void LoadBodyList(dTree<const NewtonBody*, int>& bodyList);
 
-	void SaveRigidBodyList(dList<const NewtonBody*>& bodyList);
-	void SaveRigidJointList(dList<const dCustomJoint*>& jointList);
+	void SaveBodyList(dList<const NewtonBody*>& bodyList);
+	void SaveJointList(dList<const dCustomJoint*>& jointList);
 	void ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap);
 	void GetBodiesAndJointsList (dList<const NewtonBody*>& bodylist, dList<const dCustomJoint*>& jointlist, NewtonBody* const rootbody);
 	

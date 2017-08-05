@@ -1,14 +1,6 @@
 rootNode: 0
 
 shapeCount: 3
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
-	shapeScale: 1.000000 1.000000 1.000000
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
-collisionEnd: 
-
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -196,75 +188,102 @@ collision: 0
 	v: 1.922243 0.182667 0.553142
 	v: 1.786454 0.212294 0.715100
 	v: 1.794518 0.324298 0.552648
-	shapeScale: 1.000000 1.000000 1.000000
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+collisionEnd: 
+
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
 collisionEnd: 
 
 collision: 2
 	shapeType: chamferCylinder
 	radio: 0.500000
 	height: 1.000000
-	shapeScale: 1.000000 1.000000 1.000000
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
 collisionEnd: 
 
 nodesCount: 7
 node: 0
 	userData: chassisMesh
 	mass: 1534.520020
-	collision: 0
+	centerOfMass: 0.237629 0.000000 0.000006
 	position: -13.444667 0.999977 102.108154
 	eulerAngles: 0.000000 0.753740 0.000020
+	collision: 0
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
 nodeEnd: 
 
 node: 1
 	userData: engineMesh
 	mass: 100.000000
-	collision: 1
+	centerOfMass: 0.000000 0.000000 0.000000
 	position: -13.444667 0.999977 102.108154
 	eulerAngles: 0.000000 0.753740 0.000020
+	collision: 1
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
 nodeEnd: 
 
 node: 2
 	userData: differentialMesh
 	mass: 40.000000
-	collision: 1
+	centerOfMass: 0.000000 0.000000 0.000000
 	position: -13.444667 0.999977 102.108154
 	eulerAngles: 0.000000 0.753740 0.000020
+	collision: 1
+	shapeScale: 1.000000 1.000000 1.000000
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
 nodeEnd: 
 
 node: 3
 	userData: tireMesh
 	mass: 40.000000
-	collision: 2
+	centerOfMass: 0.000000 0.000000 0.000000
 	position: -14.656964 1.005706 102.856575
 	eulerAngles: 0.000000 -89.245949 -0.000000
+	collision: 2
+	shapeScale: 0.319073 0.329154 0.329154
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
 nodeEnd: 
 
 node: 4
 	userData: tireMesh
 	mass: 40.000000
-	collision: 2
+	centerOfMass: 0.000000 0.000000 0.000000
 	position: -14.667200 1.005706 101.391899
 	eulerAngles: 0.000000 -89.245949 -0.000000
+	collision: 2
+	shapeScale: 0.319073 0.329154 0.329154
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
 nodeEnd: 
 
 node: 5
 	userData: tireMesh
 	mass: 40.000000
-	collision: 2
+	centerOfMass: 0.000000 0.000000 0.000000
 	position: -12.269349 1.005707 102.799767
 	eulerAngles: 0.000000 -89.245949 -0.000000
+	collision: 2
+	shapeScale: 0.319073 0.329154 0.329154
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
 nodeEnd: 
 
 node: 6
 	userData: tireMesh
 	mass: 40.000000
-	collision: 2
+	centerOfMass: 0.000000 0.000000 0.000000
 	position: -12.278916 1.005707 101.385880
 	eulerAngles: 0.000000 -89.245949 -0.000000
+	collision: 2
+	shapeScale: 0.319073 0.329154 0.329154
+	shapePosition: 0.000000 0.000000 0.000000
+	shapeEulerAngle: 0.000000 -0.000000 0.000000
 nodeEnd: 
 
 jointsCount: 9
