@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomHinge.h"
+#include "dCustomModelLoadSave.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -33,6 +34,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.6f)
+	,m_flags(0)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
 	,m_actuatorFlag(false)
@@ -53,6 +55,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.6f)
+	,m_flags(0)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
 	,m_actuatorFlag(false)
@@ -283,4 +286,54 @@ void dCustomHinge::ApplySpringDamper (dFloat timestep, const dMatrix& matrix0, c
 	m_lastRowWasUsed = true;
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
 	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
+}
+
+
+void dCustomHinge::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	const char* token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "minAngle:"));
+	m_minAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "maxAngle:"));
+	m_maxAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "friction:"));
+	m_friction = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "jointOmega:"));
+	m_jointOmega = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "spring:"));
+	m_spring = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "damper:"));
+	m_damper = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "springDamperRelaxation:"));
+	m_springDamperRelaxation = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "flags:"));
+	m_flags = fileLoader->LoadInt();
+}
+
+void dCustomHinge::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dCustomJoint::Save(fileSaver);
+
+	fileSaver->SaveFloat("\tminAngle", m_minAngle * 180.0f / 3.141592f);
+	fileSaver->SaveFloat("\tmaxAngle", m_maxAngle * 180.0f / 3.141592f);
+	fileSaver->SaveFloat("\tfriction", m_friction);
+	fileSaver->SaveFloat("\tjointOmega", m_jointOmega);
+	fileSaver->SaveFloat("\tspring", m_spring);
+	fileSaver->SaveFloat("\tdamper", m_damper);
+	fileSaver->SaveFloat("\tspringDamperRelaxation", m_springDamperRelaxation);
+	fileSaver->SaveInt("\tflags", m_flags);
 }

@@ -55,11 +55,13 @@ class dCustomUniversal: public dCustomJoint
 	CUSTOM_JOINTS_API void SetDamp_1(dFloat damp);
 
 	protected:
-	//CUSTOM_JOINTS_API dCustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+
+	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dAngularIntegration m_curJointAngle_0;
 	dAngularIntegration m_curJointAngle_1;

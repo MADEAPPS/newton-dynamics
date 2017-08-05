@@ -80,7 +80,7 @@ class dEngineJoint: public dCustomHinge
 	public:
 	dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 		:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
-		,m_maxrmp(50.0f)
+		,m_maxRPM(50.0f)
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
@@ -95,7 +95,7 @@ class dEngineJoint: public dCustomHinge
 
 	void SetRedLineRPM(dFloat redLineRmp)
 	{
-		m_maxrmp = dAbs(redLineRmp);
+		m_maxRPM = dAbs(redLineRmp);
 	}
 
 	void SetDryFriction(dFloat friction)
@@ -140,8 +140,8 @@ class dEngineJoint: public dCustomHinge
 			dFloat idleAlpha = - m_jointOmega / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, idleAlpha);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		} else if (m_jointOmega >= m_maxrmp) {
-			dFloat redLineAlpha = (m_maxrmp - m_jointOmega) / timestep;
+		} else if (m_jointOmega >= m_maxRPM) {
+			dFloat redLineAlpha = (m_maxRPM - m_jointOmega) / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, redLineAlpha);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 		} else {
@@ -153,23 +153,37 @@ class dEngineJoint: public dCustomHinge
 
 	void Load(dCustomJointSaveLoad* const fileLoader)
 	{
-		dAssert(0);
-		dCustomHinge::Save (fileLoader);
+		const char* token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "maxRPM:"));
+		m_maxRPM = fileLoader->LoadFloat();
+
+		token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "baseOffsetPosit:"));
+		dVector posit0(fileLoader->LoadVector());
+		posit0.m_w = 1.0f;
+
+		token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "baseOffsetRotation:"));
+		dVector euler0(fileLoader->LoadVector());
+		euler0 = euler0.Scale(3.14159213f / 180.0f);
+		m_baseOffsetMatrix = dMatrix(euler0.m_x, euler0.m_y, euler0.m_z, posit0);
 	}
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
 		dVector euler0;
 		dVector euler1;
+		dCustomHinge::Save (fileSaver);
+
 		m_baseOffsetMatrix.GetEulerAngles(euler0, euler1);
 		euler0 = euler0.Scale (180.0f / 3.141592f);
-		fileSaver->SaveFloat("\tmaxRMP", m_maxrmp);
+		fileSaver->SaveFloat("\tmaxRPM", m_maxRPM);
 		fileSaver->SaveVector("\tbaseOffsetPosit", m_baseOffsetMatrix.m_posit);
 		fileSaver->SaveVector("\tbaseOffsetRotation", euler0);
 	}
 
 	dMatrix m_baseOffsetMatrix;
-	dFloat m_maxrmp;
+	dFloat m_maxRPM;
 
 	DECLARE_CUSTOM_JOINT(dEngineJoint, dCustomHinge)
 };
@@ -268,15 +282,44 @@ class dDifferentialJoint: public dCustomUniversal
 
 	void Load(dCustomJointSaveLoad* const fileLoader)
 	{
-		dAssert(0);
+		const char* token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "baseOffset_position:"));
+		dVector posit0(fileLoader->LoadVector());
+		posit0.m_w = 1.0f;
+
+		token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "baseOffset_rotation:"));
+		dVector euler0(fileLoader->LoadVector());
+		euler0 = euler0.Scale(3.14159213f / 180.0f);
+
+		m_baseOffsetMatrix = dMatrix (euler0.m_x, euler0.m_y, euler0.m_z, posit0);
+
+		token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "turnSpeed:"));
+		m_turnSpeed = fileLoader->LoadFloat();
+
+		token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "isTractionDifferential:"));
+		m_isTractionDifferential = fileLoader->LoadInt() ? true : false;
 	}
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
 		// nothing really to save;
 		dCustomUniversal::Save(fileSaver);
-	}
 
+		dVector euler0;
+		dVector euler1;
+		
+		m_baseOffsetMatrix.GetEulerAngles(euler0, euler1);
+		euler0 = euler0.Scale(180.0f / 3.141592f);
+
+		fileSaver->SaveVector("\tbaseOffset_position", m_baseOffsetMatrix.m_posit);
+		fileSaver->SaveVector("\tbaseOffset_rotation", euler0);
+
+		fileSaver->SaveFloat ("\tturnSpeed", m_turnSpeed);
+		fileSaver->SaveInt ("\tisTractionDifferential", int (m_isTractionDifferential));
+	}
 
 	dMatrix m_baseOffsetMatrix;
 //	dFloat m_slipDifferentialSpeed;
@@ -296,12 +339,14 @@ class dWheelJoint: public dCustomJoint
 		:dCustomJoint(6, tireBody, chassisBody)
 		,m_lateralDir(0.0f)
 		,m_longitudinalDir(0.0f)
-		,m_tire(tireData)
 		,m_tireLoad(0.0f)
 		,m_steerRate(0.5f * 3.1416f)
 		,m_steerAngle0(0.0f)
 		,m_steerAngle1(0.0f)
 		,m_brakeTorque(0.0f)
+		,m_suspentionType(dCustomVehicleController::dBodyPartTire::Info::m_offroad)
+		,m_suspensionLength(tireData->m_data.m_suspesionlenght)
+		,m_tire____(tireData)
 	{
 		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
@@ -309,7 +354,7 @@ class dWheelJoint: public dCustomJoint
 	dFloat CalculateTireParametricPosition(const dMatrix& tireMatrix, const dMatrix& chassisMatrix) const
 	{
 		const dVector& chassisP0 = chassisMatrix.m_posit;
-		dVector chassisP1(chassisMatrix.m_posit + chassisMatrix.m_up.Scale(m_tire->m_data.m_suspesionlenght));
+		dVector chassisP1(chassisMatrix.m_posit + chassisMatrix.m_up.Scale(m_suspensionLength));
 		dVector p1p0(chassisP1 - chassisP0);
 		dVector q1p0(tireMatrix.m_posit - chassisP0);
 		dFloat num = q1p0.DotProduct3(p1p0);
@@ -328,7 +373,7 @@ class dWheelJoint: public dCustomJoint
 
 		NewtonBody* const tire = m_body0;
 		NewtonBody* const chassis = m_body1;
-		dAssert(m_body0 == m_tire->m_joint->GetBody0());
+		dAssert(m_body0 == m_tire____->m_joint->GetBody0());
 
 		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 		chassisMatrix = dYawMatrix(m_steerAngle0) * chassisMatrix;
@@ -368,8 +413,8 @@ class dWheelJoint: public dCustomJoint
 
 		NewtonBody* const tire = m_body0;
 		NewtonBody* const chassis = m_body1;
-		dAssert(m_body0 == m_tire->GetBody());
-		dAssert(m_body1 == m_tire->GetParent()->GetBody());
+		dAssert(!m_tire____ || m_body0 == m_tire____->GetBody());
+		dAssert(!m_tire____ || m_body1 == m_tire____->GetParent()->GetBody());
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
@@ -394,13 +439,13 @@ class dWheelJoint: public dCustomJoint
 
 		dFloat param = CalculateTireParametricPosition(tireMatrix, chassisMatrix);
 		if (param >= 1.0f) {
-			dVector posit(chassisMatrix.m_posit + m_tire->m_data.m_suspesionlenght);
+			dVector posit(chassisMatrix.m_posit + chassisMatrix.m_up.Scale (m_suspensionLength));
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (param <= 0.0f) {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (m_tire->m_data.m_suspentionType == dCustomVehicleController::dBodyPartTire::Info::m_roller) {
+		} else if (m_suspensionLength == dCustomVehicleController::dBodyPartTire::Info::m_roller) {
 			dAssert(0);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 		}
@@ -439,23 +484,41 @@ class dWheelJoint: public dCustomJoint
 
 	void Load(dCustomJointSaveLoad* const fileLoader)
 	{
-		dAssert (0);
+		m_tire____ = NULL;
+		m_lateralDir = dVector (0.0f);
+		m_longitudinalDir = dVector (0.0f);
+		m_tireLoad = 0.0f;
+		m_steerRate = 0.0f;
+		m_steerAngle0 = 0.0f;
+		m_steerAngle1 = 0.0f;
+		m_brakeTorque = 0.0f;
+
+		const char* token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "suspensionLength:"));
+		m_suspensionLength = fileLoader->LoadFloat();
+
+		token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "suspentionType:"));
+		m_suspentionType = dCustomVehicleController::dBodyPartTire::Info::SuspensionType(fileLoader->LoadInt());
 	}
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
-		// nothing really to save;
 		dCustomJoint::Save(fileSaver);
+		fileSaver->SaveFloat("\tsuspensionLength", m_suspensionLength);
+		fileSaver->SaveInt("suspentionType", m_suspentionType);
 	}
 
 	dVector m_lateralDir;
 	dVector m_longitudinalDir;
-	dCustomVehicleController::dBodyPartTire* m_tire;
 	dFloat m_tireLoad;
 	dFloat m_steerRate;
 	dFloat m_steerAngle0;
 	dFloat m_steerAngle1;
 	dFloat m_brakeTorque;
+	dFloat m_suspensionLength;
+	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_suspentionType;
+	dCustomVehicleController::dBodyPartTire* m_tire____;
 
 	DECLARE_CUSTOM_JOINT(dWheelJoint, dCustomJoint)
 };
@@ -496,7 +559,10 @@ class dGearBoxJoint: public dCustomGear
 
 	void Load(dCustomJointSaveLoad* const fileLoader)
 	{
-		dAssert(0);
+		m_param = 0.0f;
+		const char* token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "clutchFrictionTorque:"));
+		m_cluthFrictionTorque = fileLoader->LoadFloat();
 	}
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
@@ -550,6 +616,7 @@ class dAxelJoint: public dCustomGear
 		dFloat jacobian0[6];
 		dFloat jacobian1[6];
 
+		dAssert (m_parentReference);
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(matrix0, matrix1);
 		NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
@@ -589,14 +656,21 @@ class dAxelJoint: public dCustomGear
 
 	void Load(dCustomJointSaveLoad* const fileLoader)
 	{
-		dAssert(0);
+		const char* token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "parentReference:"));
+		int parentIndex = fileLoader->LoadInt();
+		m_parentReference = fileLoader->FindBodyId(parentIndex);
+
+		token = fileLoader->NextToken();
+		dAssert(!strcmp(token, "pintOnParentReference:"));
+		m_pintOnReference = fileLoader->LoadVector();
 	}
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
 	{
+		dCustomGear::Save(fileSaver);
 		fileSaver->SaveInt("\tparentReference", fileSaver->FindBodyId(m_parentReference));
 		fileSaver->SaveVector("\tpintOnParentReference", m_pintOnReference);
-		dCustomGear::Save(fileSaver);
 	}
 
 	dVector m_pintOnReference;
@@ -797,7 +871,7 @@ void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart,
 	dFloat inertia = 2.0f * m_data.m_mass * m_data.m_radio * m_data.m_radio / 5.0f;
 	NewtonBodySetMassMatrix (m_body, m_data.m_mass, inertia, inertia, inertia);
 
-	matrix = dYawMatrix(-90.0f * 3.131582 / 180.0f) * matrix;
+	matrix = dYawMatrix(-90.0f * 3.141592f / 180.0f) * matrix;
 	matrix.m_posit += matrix.m_front.Scale(m_data.m_pivotOffset);
 	m_joint = new dWheelJoint (matrix, m_body, parentPart->m_body, this);
 	

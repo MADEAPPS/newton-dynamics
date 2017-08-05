@@ -22,10 +22,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<const NewtonBody*>& bodylist, dList<const dCustomJoint*>& jointlist, NewtonBody* const rootbody)
+void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<NewtonBody*>& bodylist, dList<dCustomJoint*>& jointlist, NewtonBody* const rootbody)
 {
 	dTree<int, const dCustomJoint*> jointFilter;
-	const NewtonBody* stackMem[256];
+	NewtonBody* stackMem[256];
 	m_bodyFilter.RemoveAll();
 
 	int stack = 1;
@@ -33,7 +33,7 @@ void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<const NewtonBody*>& bod
 	int enumeration = 0;
 	while (stack) {
 		stack--;
-		const NewtonBody* const root = stackMem[stack];
+		NewtonBody* const root = stackMem[stack];
 
 		if (m_bodyFilter.Insert(enumeration, root)) {
 			enumeration ++;
@@ -42,8 +42,8 @@ void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<const NewtonBody*>& bod
 
 		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(root); joint; joint = NewtonBodyGetNextJoint(root, joint)) {
 			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-			const NewtonBody* const body0 = customJoint->GetBody0();
-			const NewtonBody* const body1 = customJoint->GetBody1();
+			NewtonBody* const body0 = customJoint->GetBody0();
+			NewtonBody* const body1 = customJoint->GetBody1();
 			dAssert (body0);
 			dAssert (body1);
 
@@ -132,54 +132,38 @@ int dCustomJointSaveLoad::FindBodyId(NewtonBody* const body) const
 	return m_bodyFilter.Find(body)->GetInfo();
 }
 
-
-void dCustomJointSaveLoad::ParseJoint(const dTree<NewtonBody*, const dString>& bodyMap)
+NewtonBody* dCustomJointSaveLoad::FindBodyId(int id) const
 {
-	char jointType[256];
-	char childName[256];
-	char parentName[256];
-
-	const char* token = NextToken();
-	dAssert(!strcmp(token, "joint:"));
-	LoadName (jointType);
-	
-	token = NextToken();
-	dAssert(!strcmp(token, "childBody:"));
-	LoadName (childName);
-	NewtonBody* const child = bodyMap.Find(childName)->GetInfo();
-
-	token = NextToken();
-	dAssert(!strcmp(token, "parentBody:"));
-	LoadName(parentName);
-	NewtonBody* const parent = bodyMap.Find(parentName)->GetInfo();
-
-	//dCustomJoint* const joint = dCustomJoint::Load(this, jointType, child, parent);
-	dCustomJoint::Load(this, jointType, child, parent);
-	while (strcmp(NextToken(), "jointEnd:"));
+	dTree<int, NewtonBody*>::Iterator iter (m_bodyFilter);
+	for (iter.Begin(); iter; iter ++) {
+		if (*iter == id) {
+			return iter.GetKey();
+		}
+	}
+	return NULL;
 }
 
 
-
-void dCustomJointSaveLoad::SaveBodyList(dList<const NewtonBody*>& bodyList)
+void dCustomJointSaveLoad::SaveBodyList(dList<NewtonBody*>& bodyList)
 {
 	class dEntry
 	{
 		public:
-		dEntry(int id, const NewtonCollision* const collision)
+		dEntry(int id, NewtonCollision* const collision)
 			:m_id (id)
 			,m_collision (collision)
 		{
 		}
 
 		int m_id;
-		const NewtonCollision* m_collision;
+		NewtonCollision* m_collision;
 	};
 
 	dTree<dEntry, const void*> collisionList;
 	int id = 0;
-	for (dList<const NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const NewtonBody* const body = ptr->GetInfo();
-		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
+	for (dList<NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		NewtonBody* const body = ptr->GetInfo();
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		if (collisionList.Insert(dEntry (id, collision), NewtonCollisionDataPointer(collision))) {
 			id ++;
 		}
@@ -244,8 +228,7 @@ void dCustomJointSaveLoad::SaveBodyList(dList<const NewtonBody*>& bodyList)
 	}
 
 	SaveInt("nodesCount", bodyList.GetCount());
-	for (dList<const NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const NewtonBody* const body = ptr->GetInfo();
+	for (dList<NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dMatrix bodyMatrix;
 		dMatrix shapeMatrix;
 		dVector euler0;
@@ -255,6 +238,7 @@ void dCustomJointSaveLoad::SaveBodyList(dList<const NewtonBody*>& bodyList)
 		dFloat mass;
 		dFloat ixx;
 
+		NewtonBody* const body = ptr->GetInfo();
 		NewtonBodyGetMatrix(body, &bodyMatrix[0][0]);
 		NewtonBodyGetMass(body, &mass, &ixx, &ixx, &ixx);
 		NewtonBodyGetCentreOfMass(body, &com.m_x);
@@ -285,7 +269,7 @@ void dCustomJointSaveLoad::SaveBodyList(dList<const NewtonBody*>& bodyList)
 }
 
 
-void dCustomJointSaveLoad::LoadBodyList(dTree<const NewtonBody*, int>& bodyList)
+void dCustomJointSaveLoad::LoadBodyList(dTree<NewtonBody*, int>& bodyList)
 {
 	dTree<NewtonCollision*, int> collisionMap;
 
@@ -406,7 +390,7 @@ void dCustomJointSaveLoad::LoadBodyList(dTree<const NewtonBody*, int>& bodyList)
 		dMatrix shapeMatrix(shapeEuler.m_x, shapeEuler.m_y, shapeEuler.m_z, shapePosit);
 		NewtonCollisionSetMatrix(collision, &shapeMatrix[0][0]);
 		NewtonCollisionSetScale(collision, shapeScale.m_x, shapeScale.m_y, shapeScale.m_z);
-NewtonCollisionSetMode(collision, 0);
+//NewtonCollisionSetMode(collision, 0);
 
 		dMatrix matrix(euler.m_x, euler.m_y, euler.m_z, posit);
 		body = NewtonCreateDynamicBody(m_world, collision, &matrix[0][0]);
@@ -414,6 +398,7 @@ NewtonCollisionSetMode(collision, 0);
 		NewtonBodySetCentreOfMass(body, &com.m_x);
 		InitRigiBody(body, userDataName);
 		bodyList.Insert(body, bodyIndex);
+		m_bodyFilter.Insert(bodyIndex, body);
 	}
 
 
@@ -424,12 +409,12 @@ NewtonCollisionSetMode(collision, 0);
 	}
 }
 
-void dCustomJointSaveLoad::SaveJointList(dList<const dCustomJoint*>& jointList)
+void dCustomJointSaveLoad::SaveJointList(dList<dCustomJoint*>& jointList)
 {
 	int index = 0;
 	SaveInt("jointsCount", jointList.GetCount());
-	for (dList<const dCustomJoint*>::dListNode* ptr = jointList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const dCustomJoint* const joint = ptr->GetInfo();
+	for (dList<dCustomJoint*>::dListNode* ptr = jointList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		dCustomJoint* const joint = ptr->GetInfo();
 
 		SaveInt("joint", index);
 		SaveName("\tjointType", joint->GetTypeName());
@@ -441,11 +426,43 @@ void dCustomJointSaveLoad::SaveJointList(dList<const dCustomJoint*>& jointList)
 	}
 }
 
+void dCustomJointSaveLoad::LoadJointList(const dTree<NewtonBody*, int>& bodyList, dTree<dCustomJoint*, int> jointMap)
+{
+	const char* token = NextToken();
+	dAssert(!strcmp(token, "jointsCount:"));
+	int jointsCount = LoadInt();
+	for (int i = 0; i < jointsCount; i++) {
+		char jointType[128];
+
+		token = NextToken();
+		dAssert(!strcmp(token, "joint:"));
+		int jointIndex = LoadInt();
+
+		token = NextToken();
+		dAssert(!strcmp(token, "jointType:"));
+		LoadName(jointType);
+
+		token = NextToken();
+		dAssert(!strcmp(token, "childBody:"));
+		int childIndex = LoadInt();
+		NewtonBody* const child = bodyList.Find(childIndex)->GetInfo();
+
+		token = NextToken();
+		dAssert(!strcmp(token, "parentBody:"));
+		int parentIndex = LoadInt();
+		NewtonBody* const parent = bodyList.Find(parentIndex)->GetInfo();
+		dCustomJoint* const joint = dCustomJoint::Load(this, jointType, child, parent);
+
+		jointMap.Insert (joint, jointIndex);
+		while (strcmp(NextToken(), "jointEnd:"));
+	}
+}
+
 
 void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
 {
-	dList<const NewtonBody*> bodyList;
-	dList<const dCustomJoint*> jointList;
+	dList<NewtonBody*> bodyList;
+	dList<dCustomJoint*> jointList;
 	GetBodiesAndJointsList(bodyList, jointList, rootbody);
 
 	SaveInt("rootNode", m_bodyFilter.Find(rootbody)->GetInfo());
@@ -458,31 +475,15 @@ void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
 
 NewtonBody* dCustomJointSaveLoad::Load()
 {
-	dTree<const NewtonBody*, int> bodyMap;
+	dTree<NewtonBody*, int> bodyMap;
+	dTree<dCustomJoint*, int> jointMap;
 
 	const char* token = NextToken();
 	dAssert(!strcmp(token, "rootNode:"));
 	int rootBodyIndex = LoadInt();
 
 	LoadBodyList(bodyMap);
+	LoadJointList(bodyMap, jointMap);
 
-/*
-	token = NextToken();
-	dAssert(!strcmp(token, "nodesCount:"));
-	int nodesCount = LoadInt();
-	for (int i = 0; i < nodesCount; i++) {
-		ParseRigidBody(bodyMap);
-	}
-
-	token = NextToken();
-	dAssert(!strcmp(token, "jointsCount:"));
-	int jointsCount = LoadInt();
-	for (int i = 0; i < jointsCount; i++) {
-		ParseJoint(bodyMap);
-	}
-
-	return bodyMap.Find(rootBodyName)->GetInfo();
-*/
-
-	return NULL;
+	return bodyMap.Find(rootBodyIndex)->GetInfo();
 }

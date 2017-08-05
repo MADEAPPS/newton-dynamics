@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomGear.h"
+#include "dCustomModelLoadSave.h"
 
 IMPLEMENT_CUSTOM_JOINT(dCustomGear);
 IMPLEMENT_CUSTOM_JOINT(dCustomGearAndSlide);
@@ -114,6 +115,20 @@ void dCustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat relAccel = -0.5f * relOmega * invTimestep;
 	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+}
+
+
+void dCustomGear::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	const char* token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "gearRatio:"));
+	m_gearRatio = fileLoader->LoadFloat();
+}
+
+void dCustomGear::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dCustomJoint::Save(fileSaver);
+	fileSaver->SaveFloat("\tgearRatio", m_gearRatio);
 }
 
 

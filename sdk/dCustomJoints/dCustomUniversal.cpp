@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomUniversal.h"
+#include "dCustomModelLoadSave.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -348,3 +349,69 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 }
 
+void dCustomUniversal::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	const char* token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "minAngle_0:"));
+	m_minAngle_0 = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "maxAngle_0:"));
+	m_maxAngle_0 = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "jointOmega_0:"));
+	m_jointOmega_0 = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "angularDamp_0:"));
+	m_angularDamp_0 = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "angularAccel_0:"));
+	m_angularAccel_0 = fileLoader->LoadFloat();
+
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "minAngle_1:"));
+	m_minAngle_1 = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "maxAngle_1:"));
+	m_maxAngle_1 = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "jointOmega_1:"));
+	m_jointOmega_1 = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "angularDamp_1:"));
+	m_angularDamp_1 = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "angularAccel_1:"));
+	m_angularAccel_1 = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "flags:"));
+	m_flags = fileLoader->LoadInt();
+}
+
+void dCustomUniversal::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dCustomJoint::Save(fileSaver);
+
+	fileSaver->SaveFloat("\tminAngle_0", m_minAngle_0 * 180.0f / 3.141592f);
+	fileSaver->SaveFloat("\tmaxAngle_0", m_maxAngle_0 * 180.0f / 3.141592f); 
+	fileSaver->SaveFloat("\tjointOmega_0", m_jointOmega_0);
+	fileSaver->SaveFloat("\tangularDamp_0", m_angularDamp_0);
+	fileSaver->SaveFloat("\tangularAccel_0",m_angularAccel_0);
+
+	fileSaver->SaveFloat("\tminAngle_1", m_minAngle_1 * 180.0f / 3.141592f);
+	fileSaver->SaveFloat("\tmaxAngle_1", m_maxAngle_1 * 180.0f / 3.141592f);
+	fileSaver->SaveFloat("\tjointOmega_1", m_jointOmega_1);
+	fileSaver->SaveFloat("\tangularDamp_1", m_angularDamp_1);
+	fileSaver->SaveFloat("\tangularAccel_1", m_angularAccel_1);
+
+	fileSaver->SaveInt ("\tflags", m_flags);
+}

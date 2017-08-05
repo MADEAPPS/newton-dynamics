@@ -6,12 +6,6 @@ collision: 1
 	radio: 0.100000
 collisionEnd: 
 
-collision: 2
-	shapeType: chamferCylinder
-	radio: 0.500000
-	height: 1.000000
-collisionEnd: 
-
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -201,6 +195,12 @@ collision: 0
 	v: 1.794518 0.324298 0.552648
 collisionEnd: 
 
+collision: 2
+	shapeType: chamferCylinder
+	radio: 0.500000
+	height: 1.000000
+collisionEnd: 
+
 nodesCount: 7
 node: 0
 	userData: chassisMesh
@@ -293,11 +293,13 @@ joint: 0
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.001251 0.000000 0.250000
-	body1_position: 1.176402 0.005729 -0.456879
+	body0_position: 0.000000 0.000000 0.250000
+	body1_position: 1.175151 0.005729 -0.456879
 	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
+	suspensionLength: 0.250000
+suspentionType: 0
 jointEnd: 
 
 joint: 1
@@ -306,11 +308,13 @@ joint: 1
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: -0.001251 0.000000 -0.250000
-	body1_position: 1.164866 0.005729 0.457016
+	body0_position: 0.000000 0.000000 -0.250000
+	body1_position: 1.166118 0.005729 0.457016
 	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
+	suspensionLength: 0.250000
+suspentionType: 0
 jointEnd: 
 
 joint: 2
@@ -324,6 +328,8 @@ joint: 2
 	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
+	suspensionLength: 0.250000
+suspentionType: 0
 jointEnd: 
 
 joint: 3
@@ -337,6 +343,8 @@ joint: 3
 	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
+	suspensionLength: 0.250000
+suspentionType: 0
 jointEnd: 
 
 joint: 4
@@ -350,13 +358,43 @@ joint: 4
 	body0_rotation: 90.000023 -0.000000 0.000020
 	body1_rotation: 90.000023 -0.000000 0.000020
 	stiffness: 1.000000
+	minAngle_0: -45.000000
+	maxAngle_0: 45.000000
+	jointOmega_0: 0.000000
+	angularDamp_0: 0.500000
+	angularAccel_0: -4.000000
+	minAngle_1: -45.000000
+	maxAngle_1: 45.000000
+	jointOmega_1: 0.000000
+	angularDamp_1: 0.300000
+	angularAccel_1: -4.000000
+	flags: 0
+	baseOffset_position: 0.000000 0.000000 0.000000
+	baseOffset_rotation: 0.000000 -0.000000 0.000020
+	turnSpeed: 0.000000
+	isTractionDifferential: 0
 jointEnd: 
 
 joint: 5
 	jointType: dEngineJoint
 	childBody: 1
 	parentBody: 0
-	maxRMP: 50.000000
+	degreesOfFreedom: 6
+	solverModel: 0
+	body0_position: 0.000000 0.000000 0.000000
+	body1_position: 0.000000 0.000000 0.000000
+	body0_rotation: 0.000000 -90.000000 -0.000000
+	body1_rotation: 0.000000 -90.000000 -0.000000
+	stiffness: 1.000000
+	minAngle: -45.000000
+	maxAngle: 45.000000
+	friction: 0.000000
+	jointOmega: 0.000000
+	spring: 0.000000
+	damper: 0.000000
+	springDamperRelaxation: 0.600000
+	flags: 0
+	maxRPM: 50.000000
 	baseOffsetPosit: 0.000000 0.000000 0.000000
 	baseOffsetRotation: 0.000000 -0.000000 0.000020
 jointEnd: 
@@ -372,6 +410,7 @@ joint: 6
 	body0_rotation: 0.000000 -90.000000 -0.000000
 	body1_rotation: 0.000000 -90.000000 -0.000000
 	stiffness: 1.000000
+	gearRatio: 1.000000
 	clutchFrictionTorque: 2000.000000
 jointEnd: 
 
@@ -379,8 +418,6 @@ joint: 7
 	jointType: dAxelJoint
 	childBody: 4
 	parentBody: 2
-	parentReference: 0
-	pintOnParentReference: 0.000000 0.000000 1.000000
 	degreesOfFreedom: 1
 	solverModel: 1
 	body0_position: 0.000000 0.000000 0.000000
@@ -388,14 +425,15 @@ joint: 7
 	body0_rotation: 0.000000 -90.000000 0.000000
 	body1_rotation: 0.000000 -0.000000 -180.000015
 	stiffness: 1.000000
+	gearRatio: 1.000000
+	parentReference: 0
+	pintOnParentReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
 joint: 8
 	jointType: dAxelJoint
 	childBody: 3
 	parentBody: 2
-	parentReference: 0
-	pintOnParentReference: 0.000000 0.000000 1.000000
 	degreesOfFreedom: 1
 	solverModel: 1
 	body0_position: 0.000000 0.000000 0.000000
@@ -403,5 +441,8 @@ joint: 8
 	body0_rotation: 0.000000 -90.000000 0.000000
 	body1_rotation: -0.000000 0.000000 0.000020
 	stiffness: 1.000000
+	gearRatio: 1.000000
+	parentReference: 0
+	pintOnParentReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
