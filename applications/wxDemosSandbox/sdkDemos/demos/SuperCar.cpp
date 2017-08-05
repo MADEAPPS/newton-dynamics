@@ -365,7 +365,8 @@ class SuperCarEntity: public DemoEntity
 		tireMatrix.m_posit.m_y += definition.m_tirePivotOffset;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
-		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dGetIdentityMatrix() : dYawMatrix(3.141592f));
+		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dYawMatrix(-0.5f * 3.141592f) : dYawMatrix(0.5f * 3.141592f));
+
 
 		TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix);
 		tirePart->SetUserData(m_ligmentMatrix);

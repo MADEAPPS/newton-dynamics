@@ -778,7 +778,7 @@ void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart,
 	NewtonCollisionSetScale(manager->m_tireShapeTemplate, m_data.m_width, m_data.m_radio, m_data.m_radio);
 
 	// create the rigid body that will make this bone
-	dMatrix matrix (dYawMatrix(-0.5f * 3.1415927f) * locationInGlobalSpase);
+	dMatrix matrix (locationInGlobalSpase);
 	m_body = NewtonCreateDynamicBody(world, manager->m_tireShapeTemplate, &matrix[0][0]);
 	NewtonCollision* const collision = NewtonBodyGetCollision(m_body);
 	NewtonCollisionSetUserData1 (collision, this);
@@ -797,6 +797,7 @@ void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart,
 	dFloat inertia = 2.0f * m_data.m_mass * m_data.m_radio * m_data.m_radio / 5.0f;
 	NewtonBodySetMassMatrix (m_body, m_data.m_mass, inertia, inertia, inertia);
 
+	matrix = dYawMatrix(-90.0f * 3.131582 / 180.0f) * matrix;
 	matrix.m_posit += matrix.m_front.Scale(m_data.m_pivotOffset);
 	m_joint = new dWheelJoint (matrix, m_body, parentPart->m_body, this);
 	
@@ -1564,8 +1565,9 @@ dCustomVehicleControllerManager::dCustomVehicleControllerManager(NewtonWorld* co
 	,m_tireMaterial(NewtonMaterialCreateGroupID(world))
 {
 	// create the normalized size tire shape
-	m_tireShapeTemplate = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
-	m_tireShapeTemplateData = NewtonCollisionDataPointer(m_tireShapeTemplate);
+	dMatrix alignment (dYawMatrix(90.0f * 3.141592f / 180.0f));
+	m_tireShapeTemplate = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, &alignment[0][0]);
+	m_tireShapeTemplateData____ = NewtonCollisionDataPointer(m_tireShapeTemplate);
 
 	// create a tire material and associate with the material the vehicle new to collide 
 	for (int i = 0; i < materialCount; i ++) {
@@ -1906,7 +1908,6 @@ dCustomVehicleController::dBodyPartTire* dCustomVehicleController::AddTire(const
 	// calculate the tire matrix location,
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
-//	matrix = m_localFrame * matrix;
 	matrix.m_posit = matrix.TransformVector (tireInfo.m_location);
 	matrix.m_posit.m_w = 1.0f;
 
@@ -2078,14 +2079,14 @@ int dCustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* con
 
 	const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 	const void* const data0 = NewtonCollisionDataPointer(collision0);
-	if (data0 == manager->m_tireShapeTemplateData) {
+	if (data0 == manager->m_tireShapeTemplateData____) {
 		const NewtonBody* const otherBody = body1;
 		const dCustomVehicleController::dBodyPartTire* const tire = (dCustomVehicleController::dBodyPartTire*) NewtonCollisionGetUserData1(collision0);
 		dAssert(tire->GetParent()->GetBody() != otherBody);
 		return manager->OnTireAABBOverlap(material, tire, otherBody);
 	} 
 	const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-	dAssert (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData) ;
+	dAssert (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData____) ;
 	const NewtonBody* const otherBody = body0;
 	const dCustomVehicleController::dBodyPartTire* const tire = (dCustomVehicleController::dBodyPartTire*) NewtonCollisionGetUserData1(collision1);
 	dAssert(tire->GetParent()->GetBody() != otherBody);
@@ -2108,10 +2109,10 @@ int dCustomVehicleControllerManager::OnContactGeneration (const NewtonMaterial* 
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*) NewtonMaterialGetMaterialPairUserData(material);
 	const void* const data0 = NewtonCollisionDataPointer(collision0);
 //	const void* const data1 = NewtonCollisionDataPointer(collision1);
-	dAssert ((data0 == manager->m_tireShapeTemplateData) || (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData));
-	dAssert (!((data0 == manager->m_tireShapeTemplateData) && (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData)));
+	dAssert ((data0 == manager->m_tireShapeTemplateData____) || (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData____));
+	dAssert (!((data0 == manager->m_tireShapeTemplateData____) && (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData____)));
 
-	if (data0 == manager->m_tireShapeTemplateData) {
+	if (data0 == manager->m_tireShapeTemplateData____) {
 		const NewtonBody* const otherBody = body1;
 		const NewtonCollision* const tireCollision = collision0;
 		const NewtonCollision* const otherCollision = collision1;
@@ -2119,7 +2120,7 @@ int dCustomVehicleControllerManager::OnContactGeneration (const NewtonMaterial* 
 		dAssert (tire->GetBody() == body0);
 		return manager->OnContactGeneration (tire, otherBody, otherCollision, contactBuffer, maxCount, threadIndex);
 	} 
-	dAssert (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData);
+	dAssert (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData____);
 	const NewtonBody* const otherBody = body0;
 	const NewtonCollision* const tireCollision = collision1;
 	const NewtonCollision* const otherCollision = collision0;
@@ -2288,7 +2289,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* 
 	const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
 	const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 	const void* const data0 = NewtonCollisionDataPointer(collision0);
-	if (data0 == manager->m_tireShapeTemplateData) {
+	if (data0 == manager->m_tireShapeTemplateData____) {
 		const NewtonBody* const otherBody = body1;
 		dCustomVehicleController::dBodyPartTire* const tire = (dCustomVehicleController::dBodyPartTire*) NewtonCollisionGetUserData1(collision0);
 		dAssert(tire->GetParent()->GetBody() != otherBody);
@@ -2296,9 +2297,9 @@ void dCustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* 
 	} else {
 		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 		const void* const data1 = NewtonCollisionDataPointer(collision1);
-		if (data1 == manager->m_tireShapeTemplateData) {
+		if (data1 == manager->m_tireShapeTemplateData____) {
 			const NewtonCollision* const collision2 = NewtonBodyGetCollision(body1);
-			dAssert(NewtonCollisionDataPointer(collision2) == manager->m_tireShapeTemplateData);
+			dAssert(NewtonCollisionDataPointer(collision2) == manager->m_tireShapeTemplateData____);
 			const NewtonBody* const otherBody = body0;
 			dCustomVehicleController::dBodyPartTire* const tire = (dCustomVehicleController::dBodyPartTire*) NewtonCollisionGetUserData1(collision2);
 			dAssert(tire->GetParent()->GetBody() != otherBody);

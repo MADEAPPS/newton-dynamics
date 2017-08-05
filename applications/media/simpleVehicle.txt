@@ -1,6 +1,17 @@
 rootNode: 0
 
 shapeCount: 3
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
+collisionEnd: 
+
+collision: 2
+	shapeType: chamferCylinder
+	radio: 0.500000
+	height: 1.000000
+collisionEnd: 
+
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -190,17 +201,6 @@ collision: 0
 	v: 1.794518 0.324298 0.552648
 collisionEnd: 
 
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
-collisionEnd: 
-
-collision: 2
-	shapeType: chamferCylinder
-	radio: 0.500000
-	height: 1.000000
-collisionEnd: 
-
 nodesCount: 7
 node: 0
 	userData: chassisMesh
@@ -243,11 +243,11 @@ node: 3
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
 	position: -14.656964 1.005706 102.856575
-	eulerAngles: 0.000000 -89.245949 -0.000000
+	eulerAngles: 0.000000 0.753740 0.000020
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
 	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
 nodeEnd: 
 
 node: 4
@@ -255,11 +255,11 @@ node: 4
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
 	position: -14.667200 1.005706 101.391899
-	eulerAngles: 0.000000 -89.245949 -0.000000
+	eulerAngles: 0.000000 0.753740 0.000020
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
 	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
 nodeEnd: 
 
 node: 5
@@ -267,11 +267,11 @@ node: 5
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
 	position: -12.269349 1.005707 102.799767
-	eulerAngles: 0.000000 -89.245949 -0.000000
+	eulerAngles: 0.000000 0.753740 0.000020
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
 	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
 nodeEnd: 
 
 node: 6
@@ -279,11 +279,11 @@ node: 6
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
 	position: -12.278916 1.005707 101.385880
-	eulerAngles: 0.000000 -89.245949 -0.000000
+	eulerAngles: 0.000000 0.753740 0.000020
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
 	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+	shapeEulerAngle: 0.000000 90.000000 0.000000
 nodeEnd: 
 
 jointsCount: 9
@@ -293,9 +293,9 @@ joint: 0
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.250000 0.000000 0.000000
-	body1_position: 1.175150 0.005729 -0.456879
-	body0_rotation: -0.000020 -0.000000 -0.000000
+	body0_position: 0.001251 0.000000 0.250000
+	body1_position: 1.176402 0.005729 -0.456879
+	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
 jointEnd: 
@@ -306,9 +306,9 @@ joint: 1
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: -0.250000 0.000000 -0.000001
-	body1_position: 1.166119 0.005729 0.457016
-	body0_rotation: -0.000020 -0.000000 -0.000000
+	body0_position: -0.001251 0.000000 -0.250000
+	body1_position: 1.164866 0.005729 0.457016
+	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
 jointEnd: 
@@ -321,7 +321,7 @@ joint: 2
 	solverModel: 0
 	body0_position: 0.000000 0.000000 0.000000
 	body1_position: -1.213006 0.005729 -0.732277
-	body0_rotation: -0.000020 -0.000000 -0.000000
+	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
 jointEnd: 
@@ -334,7 +334,7 @@ joint: 3
 	solverModel: 0
 	body0_position: 0.000000 0.000000 0.000000
 	body1_position: -1.222037 0.005729 0.732407
-	body0_rotation: -0.000020 -0.000000 -0.000000
+	body0_rotation: 0.000000 -90.000000 0.000020
 	body1_rotation: 0.000000 -90.000000 0.000020
 	stiffness: 1.000000
 jointEnd: 
@@ -385,7 +385,7 @@ joint: 7
 	solverModel: 1
 	body0_position: 0.000000 0.000000 0.000000
 	body1_position: 0.000000 0.000000 0.000000
-	body0_rotation: -0.000020 -0.000000 -0.000000
+	body0_rotation: 0.000000 -90.000000 0.000000
 	body1_rotation: 0.000000 -0.000000 -180.000015
 	stiffness: 1.000000
 jointEnd: 
@@ -400,7 +400,7 @@ joint: 8
 	solverModel: 1
 	body0_position: 0.000000 0.000000 0.000000
 	body1_position: 0.000000 0.000000 0.000000
-	body0_rotation: -0.000020 -0.000000 -0.000000
+	body0_rotation: 0.000000 -90.000000 0.000000
 	body1_rotation: -0.000000 0.000000 0.000020
 	stiffness: 1.000000
 jointEnd: 

@@ -507,7 +507,7 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 	static int OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex);
 
-	const void* m_tireShapeTemplateData;
+	const void* m_tireShapeTemplateData____;
 	NewtonCollision* m_tireShapeTemplate;
 	int m_tireMaterial;
 

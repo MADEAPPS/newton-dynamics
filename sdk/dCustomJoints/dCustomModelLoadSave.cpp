@@ -397,7 +397,7 @@ void dCustomJointSaveLoad::LoadBodyList(dTree<const NewtonBody*, int>& bodyList)
 				shapePosit.m_w = 1.0f;
 			} else if (!strcmp(token, "shapeEulerAngle:")) {
 				shapeEuler = LoadVector();
-				euler = euler.Scale(3.141592f / 180.0f);
+				shapeEuler = shapeEuler.Scale(3.141592f / 180.0f);
 			} else {
 				dAssert(0);
 			}
