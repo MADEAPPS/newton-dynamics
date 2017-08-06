@@ -256,6 +256,18 @@ class dCustomVehicleController: public dCustomControllerBase
 		class dInfo
 		{
 			public:
+			class dTorqueNode
+			{	
+				public:
+				dTorqueNode () {}
+				dTorqueNode (dFloat rpm, dFloat torque)
+					:m_rpm(rpm)
+					,m_torque(torque)
+				{}
+				dFloat m_rpm;
+				dFloat m_torque;
+			};
+
 			dInfo()
 			{
 				memset(this, 0, sizeof (dInfo));
@@ -289,12 +301,10 @@ class dCustomVehicleController: public dCustomControllerBase
 			private:
 			void ConvertToMetricSystem();
 
+			dTorqueNode m_torqueCurve[6];
+			dFloat m_viscousDrag;
 			dFloat m_crownGearRatio;
-			dFloat m_idleFriction;
 			dFloat m_peakPowerTorque;
-			dFloat m_viscousDrag0;
-			dFloat m_viscousDrag1;
-			dFloat m_viscousDrag2;
 			friend class dEngineController;
 		};
 
@@ -330,16 +340,16 @@ class dCustomVehicleController: public dCustomControllerBase
 		CUSTOM_JOINTS_API bool GetDifferentialLock () const;
 		CUSTOM_JOINTS_API void SetDifferentialLock (bool mode);
 		CUSTOM_JOINTS_API void SetClutchParam (dFloat cluthParam);
-
+				
 		CUSTOM_JOINTS_API void PlotEngineCurve () const;
 
 		protected:
 		dFloat GetTopGear() const;
 		dFloat GetRadiansPerSecond() const;
 		void InitEngineTorqueCurve();
-		void CalculateCrownGear();
 		dFloat GetGearRatio () const;
 		virtual void Update(dFloat timestep);
+		dFloat IntepolateTorque(dFloat rpm) const;
 		void UpdateAutomaticGearBox(dFloat timestep, dFloat omega);
 
 		dInfo m_info;

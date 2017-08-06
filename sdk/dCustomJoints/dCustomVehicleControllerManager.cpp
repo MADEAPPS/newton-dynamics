@@ -36,7 +36,6 @@ static FILE* file_xxx;
 #define D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS		dFloat(10.0f)
 
 #define D_VEHICLE_ENGINE_IDLE_GAS_VALVE				dFloat(0.1f)
-#define D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT	dFloat(0.25f)
 
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
@@ -81,13 +80,14 @@ class dEngineJoint: public dCustomHinge
 	dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 		:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
 		,m_maxRPM(50.0f)
+		,m_minFriction(-10.0f)
+		,m_maxFriction( 10.0f)
+
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
 
 		EnableLimits(false);
-		SetDryFriction(0.0f);
-
 		NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
 		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 		m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
@@ -96,12 +96,6 @@ class dEngineJoint: public dCustomHinge
 	void SetRedLineRPM(dFloat redLineRmp)
 	{
 		m_maxRPM = dAbs(redLineRmp);
-	}
-
-	void SetDryFriction(dFloat friction)
-	{
-		friction = dAbs(friction);
-		SetFriction(friction > 1.0f ? friction : 0.0f);
 	}
 
 	void ProjectError()
@@ -137,16 +131,14 @@ class dEngineJoint: public dCustomHinge
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, -alpha);
 		if (m_jointOmega <= 0.0f) {
-			dFloat idleAlpha = - m_jointOmega / timestep;
-			NewtonUserJointSetRowAcceleration(m_joint, idleAlpha);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		} else if (m_jointOmega >= m_maxRPM) {
 			dFloat redLineAlpha = (m_maxRPM - m_jointOmega) / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, redLineAlpha);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else {
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, m_minFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxFriction);
 		}
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 	}
@@ -184,6 +176,8 @@ class dEngineJoint: public dCustomHinge
 
 	dMatrix m_baseOffsetMatrix;
 	dFloat m_maxRPM;
+	dFloat m_minFriction;
+	dFloat m_maxFriction;
 
 	DECLARE_CUSTOM_JOINT(dEngineJoint, dCustomHinge)
 };
@@ -270,8 +264,7 @@ class dDifferentialJoint: public dCustomUniversal
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
 				NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-			}
-			else if (differentailOmega < -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+			} else if (differentailOmega < -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
 				dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
 				NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
@@ -548,6 +541,7 @@ class dGearBoxJoint: public dCustomGear
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
+m_param = 0.0f;
 		if (m_param > 0.1f) {
 			dCustomGear::SubmitConstraints(timestep, threadIndex);
 			if (m_param < 0.9f) {
@@ -679,59 +673,6 @@ class dAxelJoint: public dCustomGear
 };
 IMPLEMENT_CUSTOM_JOINT(dAxelJoint);
 
-/*
-class dCustomVehicleController::dLateralDynamicsJoint: public dCustomJoint
-{
-	public:
-	dLateralDynamicsJoint(dCustomVehicleController* const vehicle)
-		:dCustomJoint(2, vehicle->m_chassis.GetBody(), NULL)
-		,m_vehicle (vehicle)
-		,m_sideSlipAngle(0.0f)
-		,m_maxSideSlipAngle(35.0f * 3.1416f / 180.0f)
-		,m_maxSideSlipAngleRate(15.0f * 3.1416f / 180.0f)
-	{
-		SetSolverModel(1);
-	}
-
-	~dLateralDynamicsJoint()
-	{
-	}
-	
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		dMatrix matrix;
-		dVector veloc;
-
-		NewtonBody* const chassisBody = m_vehicle->m_chassis.GetBody();
-		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
-
-		dFloat speed_x = veloc.DotProduct3(matrix.m_front);
-		dFloat speed_z = veloc.DotProduct3(matrix.m_right);
-		if (dAbs(speed_x) > 1.0f) {
-
-			dFloat beta = dAtan2(speed_z, dAbs(speed_x));
-			dFloat betaRate = (beta - m_sideSlipAngle) / timestep;
-			m_sideSlipAngle = beta;
-			dTrace(("b(%f) rate(%f)\n", beta * 180.0f / 3.1416f, betaRate * 180.0f / 3.1416f));
-
-			if ((dAbs(beta) > m_maxSideSlipAngle)) {
-				dVector xxx(matrix.m_up.Scale(-8000.0f * dSign(beta)));
-				NewtonBodyAddTorque(chassisBody, &xxx[0]);
-			} else if (dAbs(betaRate) > m_maxSideSlipAngleRate) {
-				dVector xxx(matrix.m_up.Scale(-8000.0f * dSign(betaRate)));
-				NewtonBodyAddTorque(chassisBody, &xxx[0]);
-			}
-		}
-	}
-
-	dCustomVehicleController* m_vehicle;
-	
-	dFloat m_sideSlipAngle;
-	dFloat m_maxSideSlipAngle;
-	dFloat m_maxSideSlipAngleRate;
-};
-*/
 
 void dCustomVehicleController::dBodyPartChassis::ApplyDownForce ()
 {
@@ -1014,15 +955,6 @@ void dCustomVehicleController::dBodyPartDifferential::Init(dCustomVehicleControl
 	// get engine location (place at the body center of mass)
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-/*
-static int xxx;
-origin.m_y += 1.0f;
-if (xxx == 0)
-origin.m_x -= 1.0f;
-else if (xxx == 1)
-origin.m_x += 1.0f;
-xxx++;
-*/
 	matrix.m_posit = matrix.TransformVector(origin);
 
 	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
@@ -1112,7 +1044,6 @@ dCustomVehicleController::dEngineController::dEngineController(dCustomVehicleCon
 	dMatrix differentialMatrix;
 	NewtonBody* const chassisBody = controller->m_chassis.GetBody();
 	NewtonBodyGetMatrix (chassisBody, &chassisMatrix[0][0]);
-//	chassisMatrix = controller->m_localFrame * chassisMatrix;
 	
 	NewtonBody* const engineBody = controller->m_engine->GetBody();
 	dAssert (engineBody == controller->m_engine->GetJoint()->GetBody0());
@@ -1172,8 +1103,10 @@ dFloat dCustomVehicleController::dEngineController::GetTopGear() const
 	return m_info.m_gearRatios[m_info.m_gearsCount - 1];
 }
 
-void dCustomVehicleController::dEngineController::CalculateCrownGear()
+void dCustomVehicleController::dEngineController::InitEngineTorqueCurve()
 {
+	m_info.ConvertToMetricSystem();
+
 	dAssert(m_info.m_vehicleTopSpeed >= 0.0f);
 	dAssert(m_info.m_vehicleTopSpeed < 100.0f);
 
@@ -1197,37 +1130,26 @@ void dCustomVehicleController::dEngineController::CalculateCrownGear()
 	dFloat tireRadio = tire->GetInfo().m_radio;
 	m_info.m_crownGearRatio = tireRadio * m_info.m_rpmAtPeakHorsePower / (m_info.m_vehicleTopSpeed * topGearRatio);
 
-	// bake crown gear with the engine pwer curve
-	m_info.m_idleFriction *= m_info.m_crownGearRatio;
+	// bake crown gear with the engine power curve
+	//m_info.m_idleFriction *= m_info.m_crownGearRatio;
 	m_info.m_idleTorque *= m_info.m_crownGearRatio;
-	m_info.m_peakPowerTorque *= m_info.m_crownGearRatio;
 	m_info.m_peakTorque *= m_info.m_crownGearRatio;
+	m_info.m_peakPowerTorque *= m_info.m_crownGearRatio;
+
 	m_info.m_rpmAtIdleTorque /= m_info.m_crownGearRatio;
 	m_info.m_rpmAtPeakTorque /= m_info.m_crownGearRatio;
 	m_info.m_rpmAtPeakHorsePower /= m_info.m_crownGearRatio;
 	m_info.m_rpmAtRedLine /= m_info.m_crownGearRatio;
-}
-
-
-void dCustomVehicleController::dEngineController::InitEngineTorqueCurve()
-{
-	m_info.ConvertToMetricSystem();
-
-	CalculateCrownGear();
-
-	m_info.m_idleFriction = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT;
 
 	dFloat rpmStep = m_info.m_rpmAtIdleTorque;
-	dFloat torqueLose = m_info.m_idleTorque + (m_info.m_peakTorque - m_info.m_idleTorque) * rpmStep / m_info.m_rpmAtPeakTorque - m_info.m_idleFriction;
-	m_info.m_viscousDrag0 = torqueLose / (rpmStep * rpmStep);
+	m_info.m_viscousDrag = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE / (rpmStep * rpmStep);
 
-	torqueLose = m_info.m_peakTorque - m_info.m_peakPowerTorque - m_info.m_idleFriction;
-	rpmStep = m_info.m_rpmAtPeakHorsePower - m_info.m_rpmAtPeakTorque;
-	m_info.m_viscousDrag1 = torqueLose / (rpmStep * rpmStep);
-
-	torqueLose = m_info.m_peakPowerTorque - m_info.m_idleFriction;
-	rpmStep = m_info.m_rpmAtRedLine - m_info.m_rpmAtPeakHorsePower;
-	m_info.m_viscousDrag2 = torqueLose / (rpmStep * rpmStep);
+	m_info.m_torqueCurve[0] = dInfo::dTorqueNode (0.0f, m_info.m_idleTorque);
+	m_info.m_torqueCurve[1] = dInfo::dTorqueNode (m_info.m_rpmAtIdleTorque, m_info.m_idleTorque);
+	m_info.m_torqueCurve[2] = dInfo::dTorqueNode (m_info.m_rpmAtPeakTorque, m_info.m_peakTorque);
+	m_info.m_torqueCurve[3] = dInfo::dTorqueNode (m_info.m_rpmAtPeakHorsePower, m_info.m_peakPowerTorque);
+	m_info.m_torqueCurve[4] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, 0.0f);
+	m_info.m_torqueCurve[5] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, 0.0f);
 }
 
 void dCustomVehicleController::dEngineController::PlotEngineCurve() const
@@ -1250,12 +1172,10 @@ void dCustomVehicleController::dEngineController::PlotEngineCurve() const
 #endif
 }
 
-
 dFloat dCustomVehicleController::dEngineController::GetGearRatio () const
 {
 	return m_info.m_crownGearRatio * m_info.m_gearRatios[m_currentGear];
 }
-
 
 void dCustomVehicleController::dEngineController::UpdateAutomaticGearBox(dFloat timestep, dFloat omega)
 {
@@ -1298,6 +1218,27 @@ void dCustomVehicleController::dEngineController::ApplyTorque(dFloat torque)
 	m_controller->m_engine->ApplyTorque(torque);
 }
 
+dFloat dCustomVehicleController::dEngineController::IntepolateTorque(dFloat rpm) const
+{
+	dAssert (rpm >= -0.1f);
+	const int maxIndex = sizeof (m_info.m_torqueCurve) / sizeof (m_info.m_torqueCurve[0]) - 1;
+	rpm = dClamp (rpm, dFloat (0.0f), m_info.m_torqueCurve[maxIndex - 1].m_rpm);
+
+	for(int i = 1; i < maxIndex; i ++) {
+		if (m_info.m_torqueCurve[i].m_rpm >= rpm) {
+			dFloat rpm0 = m_info.m_torqueCurve[i - 1].m_rpm;
+			dFloat rpm1 = m_info.m_torqueCurve[i].m_rpm;
+
+			dFloat torque0 = m_info.m_torqueCurve[i - 1].m_torque;
+			dFloat torque1 = m_info.m_torqueCurve[i].m_torque;
+			dFloat torque = torque0 + (rpm - rpm0) * (torque1 - torque0) / (rpm1 - rpm0);
+			return torque;
+		}
+	}
+
+	return m_info.m_torqueCurve[maxIndex - 1].m_rpm;
+}
+
 void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 {
 	dFloat omega = GetRadiansPerSecond();
@@ -1305,26 +1246,21 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 		UpdateAutomaticGearBox (timestep, omega);
 	}
 
-	dFloat engineTorque = 0.0f;
+	dEngineJoint* const engineJoint = (dEngineJoint*) m_controller->m_engine->m_joint;
 	if (m_ignitionKey) {
-		engineTorque = m_info.m_idleTorque + (m_info.m_peakTorque - m_info.m_idleTorque) * m_param;
+		const dFloat param = dMax (D_VEHICLE_ENGINE_IDLE_GAS_VALVE, m_param);
 		dFloat rpmIdleStep = dMin(omega, m_info.m_rpmAtIdleTorque);
-		engineTorque -= m_info.m_viscousDrag0 * rpmIdleStep * rpmIdleStep;
-		if (omega > m_info.m_rpmAtPeakTorque) {
-			dFloat rpmStep1 = dMin(omega, m_info.m_rpmAtPeakHorsePower) - m_info.m_rpmAtPeakTorque;
-			engineTorque -= m_info.m_viscousDrag1 * rpmStep1 * rpmStep1;
-			if (omega > m_info.m_rpmAtPeakHorsePower) {
-				dFloat rpmStep2 = omega - m_info.m_rpmAtPeakHorsePower;
-				engineTorque = dMax (engineTorque - m_info.m_viscousDrag2 * rpmStep2 * rpmStep2, dFloat(0.0f));
-			}
-		}
+		dFloat engineTorque = m_info.m_peakTorque * param - (IntepolateTorque(omega) * param - m_info.m_viscousDrag * rpmIdleStep * rpmIdleStep);
+		engineJoint->m_minFriction = -engineTorque;
+		ApplyTorque(m_info.m_peakTorque * param);
+	} else {
+		ApplyTorque(0.0f);
+		engineJoint->m_minFriction = -m_info.m_peakTorque;
 	}
 
-	dEngineJoint* const engineJoint = (dEngineJoint*) m_controller->m_engine->m_joint;
-
+	engineJoint->m_maxFriction = m_info.m_peakTorque;
 	engineJoint->SetRedLineRPM(m_info.m_rpmAtRedLine);
-	engineJoint->SetDryFriction(m_info.m_idleFriction);
-	ApplyTorque(engineTorque);
+	
 }
 
 bool dCustomVehicleController::dEngineController::GetTransmissionMode() const
@@ -1486,8 +1422,6 @@ void dCustomVehicleController::dBrakeController::Update(dFloat timestep)
 	}
 }
 
-
-
 void dCustomVehicleControllerManager::DrawSchematic (const dCustomVehicleController* const controller, dFloat scale) const
 {
 	controller->DrawSchematic(scale);
@@ -1524,7 +1458,6 @@ void dCustomVehicleController::DrawSchematic(dFloat scale) const
 	matrix0.m_posit = matrix0.TransformVector(com);
 
 	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
-//	dMatrix chassisMatrix(GetLocalFrame() * matrix0);
 	dMatrix chassisMatrix(matrix0);
 	dMatrix worldToComMatrix(chassisMatrix.Inverse() * projectionMatrix);
 	{
@@ -1658,7 +1591,6 @@ dCustomVehicleControllerManager::~dCustomVehicleControllerManager()
 	NewtonDestroyCollision(m_tireShapeTemplate);
 }
 
-
 void dCustomVehicleControllerManager::DestroyController(dCustomVehicleController* const controller)
 {
 	controller->Cleanup();
@@ -1709,7 +1641,6 @@ void dCustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehic
 	m_finalized = false;
 	m_gravityMag = gravityMag;
 	m_weightDistribution = 0.5f;
-//	m_lateralDynamicControl = NULL;
 	m_forceAndTorqueCallback = forceAndTorque;
 
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
@@ -1757,7 +1688,6 @@ void dCustomVehicleController::Cleanup()
 	SetSteering(NULL);
 	SetHandBrakes(NULL);
 	SetContactFilter(NULL);
-//	m_lateralDynamicControl = NULL;
 }
 
 const dCustomVehicleController::dBodyPart* dCustomVehicleController::GetChassis() const
@@ -1950,11 +1880,6 @@ void dCustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 		NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
 		m_totalMass = totalMass;
 	}
-
-//	if (m_lateralDynamicControl) {
-//		delete m_lateralDynamicControl;
-//	}
-//	m_lateralDynamicControl = new dLateralDynamicsJoint(this);
 }
 
 void dCustomVehicleController::Finalize()
