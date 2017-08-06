@@ -103,6 +103,11 @@ class dCustomVehicleController: public dCustomControllerBase
 		void* GetUserData() const {return m_userData;}
 		dCustomVehicleController* GetController() const{return m_controller;}
 		virtual void ProjectError() {}
+
+		virtual void Save (dCustomJointSaveLoad* const fileSaver) const 
+		{
+			dAssert (0);
+		}
 		
 		protected:
 		dBodyPart* m_parent;
@@ -135,6 +140,7 @@ class dCustomVehicleController: public dCustomControllerBase
 		}
 
 		CUSTOM_JOINTS_API void ApplyDownForce ();
+		CUSTOM_JOINTS_API void Save (dCustomJointSaveLoad* const fileSaver) const ;
 
 		dFloat m_aerodynamicsDownForce0;
 		dFloat m_aerodynamicsDownForce1;
@@ -460,8 +466,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	void ApplySuspensionForces (dFloat timestep) const;
 	dVector GetLastLateralForce(dBodyPartTire* const tire) const;
 	void Cleanup();
-
-	
 	
 	dBodyPartChassis m_chassis;
 	dList<dBodyPartTire> m_tireList;

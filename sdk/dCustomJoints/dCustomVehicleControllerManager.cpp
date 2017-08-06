@@ -697,6 +697,22 @@ void dCustomVehicleController::dBodyPartChassis::ApplyDownForce ()
 	NewtonBodyAddForce(body, &downforce[0]);
 }
 
+void dCustomVehicleController::dBodyPartChassis::Save (dCustomJointSaveLoad* const fileSaver) const 
+{
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+
+	NewtonBody* const body = GetBody();
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
+	fileSaver->SaveName("Chassis", "");
+	fileSaver->SaveFloat("\taerodynamicsDownForce0", m_aerodynamicsDownForce0 / mass);
+	fileSaver->SaveFloat("\taerodynamicsDownForce1", m_aerodynamicsDownForce1 / mass);
+	fileSaver->SaveFloat("\taerodynamicsDownSpeedCutOff", m_aerodynamicsDownSpeedCutOff);
+	fileSaver->SaveFloat("\taerodynamicsDownForceCoefficient", m_aerodynamicsDownForceCoefficient / mass);
+}
 
 dCustomVehicleController::dBodyPartTire::dBodyPartTire()
 	:dBodyPart()
@@ -2688,5 +2704,17 @@ void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader) cons
 void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	fileSaver->Save(m_chassis.GetBody());
+
+	fileSaver->SaveName("vehicleSpecifications", "");
+	fileSaver->SaveFloat("\tgravityMag", m_gravityMag);
+	fileSaver->SaveFloat("\tweightDistribution", m_weightDistribution);
+
+	m_chassis.Save(fileSaver);
+	fileSaver->SaveInt("tiresCount", m_tireList.GetCount());
+	for (dList<dBodyPartTire>::dListNode* ptr = GetFirstTire(); ptr; ptr = ptr->GetNext()) {
+//		ptr->GetInfo().Save (fileSaver);
+	} 
+
+	fileSaver->SaveName("vehicleEnd", "");
 }
 
