@@ -881,11 +881,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 					body->m_veloc += velocStep;
 					body->m_omega += omegaStep;
 
-if (body->m_uniqueID == 9){
-dgTrace(("t(%f %f %f) w(%f %f %f)\n", torque.m_x, torque.m_y, torque.m_z, body->m_omega.m_x, body->m_omega.m_y, body->m_omega.m_z));
-}
-
-
 					dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
 					dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
 				}
