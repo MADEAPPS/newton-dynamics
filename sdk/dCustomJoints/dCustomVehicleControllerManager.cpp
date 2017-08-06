@@ -337,8 +337,8 @@ class dWheelJoint: public dCustomJoint
 		,m_steerAngle0(0.0f)
 		,m_steerAngle1(0.0f)
 		,m_brakeTorque(0.0f)
-		,m_suspentionType(dCustomVehicleController::dBodyPartTire::Info::m_offroad)
-		,m_suspensionLength(tireData->m_data.m_suspesionlenght)
+		,m_suspentionType(dCustomVehicleController::dBodyPartTire::dInfo::m_offroad)
+		,m_suspensionLength(tireData->m_data.m_suspensionLength)
 		,m_tire(tireData)
 	{
 		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -438,7 +438,7 @@ class dWheelJoint: public dCustomJoint
 		} else if (param <= 0.0f) {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (m_suspensionLength == dCustomVehicleController::dBodyPartTire::Info::m_roller) {
+		} else if (m_suspensionLength == dCustomVehicleController::dBodyPartTire::dInfo::m_roller) {
 			dAssert(0);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 		}
@@ -492,7 +492,7 @@ class dWheelJoint: public dCustomJoint
 
 		token = fileLoader->NextToken();
 		dAssert(!strcmp(token, "suspentionType:"));
-		m_suspentionType = dCustomVehicleController::dBodyPartTire::Info::SuspensionType(fileLoader->LoadInt());
+		m_suspentionType = dCustomVehicleController::dBodyPartTire::dInfo::SuspensionType(fileLoader->LoadInt());
 	}
 
 	void Save(dCustomJointSaveLoad* const fileSaver) const
@@ -510,7 +510,7 @@ class dWheelJoint: public dCustomJoint
 	dFloat m_steerAngle1;
 	dFloat m_brakeTorque;
 	dFloat m_suspensionLength;
-	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_suspentionType;
+	dCustomVehicleController::dBodyPartTire::dInfo::SuspensionType m_suspentionType;
 	dCustomVehicleController::dBodyPartTire* m_tire;
 
 	DECLARE_CUSTOM_JOINT(dWheelJoint, dCustomJoint)
@@ -791,7 +791,7 @@ void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrict
 	aligningTorqueCoef = 0.0f;
 }
 
-void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info)
+void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const dInfo& info)
 {
 	m_data = info;
 	m_parent = parentPart;
@@ -886,6 +886,25 @@ dFloat dCustomVehicleController::dBodyPartTire::GetLongitudinalSlip () const
 	return m_longitudinalSlip;
 }
 
+void dCustomVehicleController::dBodyPartTire::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	fileSaver->SaveInt("tire", m_index);
+	fileSaver->SaveVector("\tlocation", m_data.m_location);
+	fileSaver->SaveFloat("\tmass", m_data.m_mass);
+	fileSaver->SaveFloat("\tradio", m_data.m_radio);
+	fileSaver->SaveFloat("\twidth", m_data.m_width);
+	fileSaver->SaveFloat("\tpivotOffset", m_data.m_pivotOffset);
+	fileSaver->SaveFloat("\tmaxSteeringAngle", m_data.m_maxSteeringAngle);
+	fileSaver->SaveFloat("\tdampingRatio", m_data.m_dampingRatio);
+	fileSaver->SaveFloat("\tspringStrength", m_data.m_springStrength);
+	fileSaver->SaveFloat("\tsuspensionLength", m_data.m_suspensionLength);
+	fileSaver->SaveFloat("\tlateralStiffness", m_data.m_lateralStiffness);
+	fileSaver->SaveFloat("\tlongitudialStiffness", m_data.m_longitudialStiffness);
+	fileSaver->SaveFloat("\taligningMomentTrail", m_data.m_aligningMomentTrail);
+	fileSaver->SaveInt("\thasFender", m_data.m_hasFender);
+	fileSaver->SaveInt("\tsuspentionType", m_data.m_suspentionType);
+}
+
 
 dCustomVehicleController::dBodyPartEngine::dBodyPartEngine(dCustomVehicleController* const controller, dFloat mass, dFloat armatureRadius)
 	:dBodyPart()
@@ -929,6 +948,7 @@ dCustomVehicleController::dBodyPartEngine::dBodyPartEngine(dCustomVehicleControl
 	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
 	m_joint = new dEngineJoint(pinMatrix, m_body, chassisBody);
 }
+
 
 dCustomVehicleController::dBodyPartEngine::~dBodyPartEngine()
 {
@@ -1926,7 +1946,7 @@ bool dCustomVehicleController::ControlStateChanged() const
 	return inputChanged;
 }
 
-dCustomVehicleController::dBodyPartTire* dCustomVehicleController::AddTire(const dBodyPartTire::Info& tireInfo)
+dCustomVehicleController::dBodyPartTire* dCustomVehicleController::AddTire(const dBodyPartTire::dInfo& tireInfo)
 {
 	dList<dBodyPartTire>::dListNode* const tireNode = m_tireList.Append();
 	dBodyPartTire& tire = tireNode->GetInfo();
@@ -2182,7 +2202,7 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 	chassisMatrix.m_posit = chassisMatrix.TransformVector(tire->m_data.m_location) - tireSidePin.Scale (tire->m_data.m_pivotOffset);
 	chassisMatrix.m_posit.m_w = 1.0f;
 
-	dVector suspensionSpan (chassisMatrix.m_up.Scale(tire->m_data.m_suspesionlenght));
+	dVector suspensionSpan (chassisMatrix.m_up.Scale(tire->m_data.m_suspensionLength));
 
 	dMatrix tireSweeptMatrix;
 	tireSweeptMatrix.m_up = chassisMatrix.m_up;
@@ -2243,11 +2263,11 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 
 	if (count) {
 		timeOfImpact = 1.0f - timeOfImpact;
-		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_up.Scale (0.25f * tire->m_data.m_suspesionlenght) - chassisMatrix.m_posit).DotProduct3(suspensionSpan);
-		dFloat tireParam = dMax (num / (tire->m_data.m_suspesionlenght * tire->m_data.m_suspesionlenght), dFloat(0.0f));
+		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_up.Scale (0.25f * tire->m_data.m_suspensionLength) - chassisMatrix.m_posit).DotProduct3(suspensionSpan);
+		dFloat tireParam = dMax (num / (tire->m_data.m_suspensionLength * tire->m_data.m_suspensionLength), dFloat(0.0f));
 
 		if (tireParam <= timeOfImpact) {
-			tireSweeptMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
+			tireSweeptMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspensionLength);
 			for (int i = count - 1; i >= 0; i --) {
 				dVector p (tireSweeptMatrix.UntransformVector (dVector (tire->m_contactInfo[i].m_point[0], tire->m_contactInfo[i].m_point[1], tire->m_contactInfo[i].m_point[2], 1.0f)));
 				if ((p.m_y >= -(tire->m_data.m_radio * 0.5f)) || (dAbs (p.m_x / p.m_y) > 0.4f)) {
@@ -2273,7 +2293,7 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 					NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
 				}
 */
-				dFloat x = timeOfImpact * tire->m_data.m_suspesionlenght;
+				dFloat x = timeOfImpact * tire->m_data.m_suspensionLength;
 				dFloat step = (tireSweeptMatrix.m_posit - tireMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 				if (step < -1.0f / 32.0f) {
 					count = 0;
@@ -2509,7 +2529,7 @@ void dCustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 	for (dList<dBodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 		dBodyPartTire& tire = tireNode->GetInfo();
 
-		if (tire.m_data.m_suspentionType != dBodyPartTire::Info::m_roller) {
+		if (tire.m_data.m_suspentionType != dBodyPartTire::dInfo::m_roller) {
 			tires[tireCount] = &tire;
 
 			const dWheelJoint* const joint = (dWheelJoint*)tire.GetJoint();
@@ -2529,19 +2549,19 @@ void dCustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 			dFloat param = joint->CalculateTireParametricPosition(tireMatrix, chassisMatrix);
 			param = dClamp(param, dFloat(-0.25f), dFloat(1.0f));
 
-			dFloat x = tire.m_data.m_suspesionlenght * param;
+			dFloat x = tire.m_data.m_suspensionLength * param;
 			dFloat v = ((tireVeloc - chassisPivotVeloc).DotProduct3(chassisMatrix.m_up));
 
 			dFloat weight = 1.0f;
 			switch (tire.m_data.m_suspentionType)
 			{
-				case dBodyPartTire::Info::m_offroad:
+				case dBodyPartTire::dInfo::m_offroad:
 					weight = 0.9f;
 					break;
-				case dBodyPartTire::Info::m_confort:
+				case dBodyPartTire::dInfo::m_confort:
 					weight = 1.0f;
 					break;
-				case dBodyPartTire::Info::m_race:
+				case dBodyPartTire::dInfo::m_race:
 					weight = 1.1f;
 					break;
 			}
@@ -2712,7 +2732,7 @@ void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
 	m_chassis.Save(fileSaver);
 	fileSaver->SaveInt("tiresCount", m_tireList.GetCount());
 	for (dList<dBodyPartTire>::dListNode* ptr = GetFirstTire(); ptr; ptr = ptr->GetNext()) {
-//		ptr->GetInfo().Save (fileSaver);
+		ptr->GetInfo().Save (fileSaver);
 	} 
 
 	fileSaver->SaveName("vehicleEnd", "");

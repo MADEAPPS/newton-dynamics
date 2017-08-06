@@ -173,7 +173,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	class dBodyPartTire: public dBodyPart
 	{
 		public:
-		class Info
+		class dInfo
 		{
 			public:
 			enum SuspensionType
@@ -184,9 +184,9 @@ class dCustomVehicleController: public dCustomControllerBase
 				m_roller,
 			};
 
-			Info ()
+			dInfo ()
 			{
-				memset (this, 0, sizeof (Info));
+				memset (this, 0, sizeof (dInfo));
 			}
 
 			dVector m_location;
@@ -197,7 +197,7 @@ class dCustomVehicleController: public dCustomControllerBase
 			dFloat m_maxSteeringAngle;
 			dFloat m_dampingRatio;
 			dFloat m_springStrength;
-			dFloat m_suspesionlenght;
+			dFloat m_suspensionLength;
 			dFloat m_lateralStiffness;
 			dFloat m_longitudialStiffness;
 			dFloat m_aligningMomentTrail;
@@ -234,17 +234,18 @@ class dCustomVehicleController: public dCustomControllerBase
 		CUSTOM_JOINTS_API dFloat GetLateralSlip () const;
 		CUSTOM_JOINTS_API dFloat GetLongitudinalSlip () const;
 
-		CUSTOM_JOINTS_API Info GetInfo() const {return m_data;}
-		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};
+		CUSTOM_JOINTS_API dInfo GetInfo() const {return m_data;}
+		CUSTOM_JOINTS_API void SetInfo(const dInfo& info) {};
 
 		protected:
-		void Init(dBodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info);
+		void Init(dBodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const dInfo& info);
 
 		void ProjectError();
 		void SetBrakeTorque(dFloat torque);
 		void SetSteerAngle(dFloat angleParam, dFloat timestep);
+		virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 
-		Info m_data;
+		dInfo m_data;
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
 		dFloat m_aligningTorque;
@@ -402,7 +403,7 @@ class dCustomVehicleController: public dCustomControllerBase
 
 
 	CUSTOM_JOINTS_API void Finalize();
-	CUSTOM_JOINTS_API dBodyPartTire* AddTire (const dBodyPartTire::Info& tireInfo);
+	CUSTOM_JOINTS_API dBodyPartTire* AddTire (const dBodyPartTire::dInfo& tireInfo);
 	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPartTire* const leftTire, dBodyPartTire* const rightTire);
 	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPartDifferential* const leftDifferential, dBodyPartDifferential* const rightDifferential);
 

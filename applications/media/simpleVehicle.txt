@@ -1,6 +1,17 @@
 rootNode: 0
 
 shapeCount: 3
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
+collisionEnd: 
+
+collision: 2
+	shapeType: chamferCylinder
+	radio: 0.500000
+	height: 1.000000
+collisionEnd: 
+
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -188,17 +199,6 @@ collision: 0
 	v: 1.922243 0.182667 0.553142
 	v: 1.786454 0.212294 0.715100
 	v: 1.794518 0.324298 0.552648
-collisionEnd: 
-
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
-collisionEnd: 
-
-collision: 2
-	shapeType: chamferCylinder
-	radio: 0.500000
-	height: 1.000000
 collisionEnd: 
 
 nodesCount: 7
@@ -446,3 +446,73 @@ joint: 8
 	pintOnParentReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
+vehicleSpecifications: 
+	gravityMag: 10.000000
+	weightDistribution: 0.600000
+Chassis: 
+	aerodynamicsDownForce0: 10.000000
+	aerodynamicsDownForce1: 20.000000
+	aerodynamicsDownSpeedCutOff: 22.240000
+	aerodynamicsDownForceCoefficient: 0.020218
+tiresCount: 4
+tire: 0
+	location: 1.175152 0.005729 -0.456878
+	mass: 40.000000
+	radio: 0.329154
+	width: 0.319073
+	pivotOffset: 0.250000
+	maxSteeringAngle: 0.436333
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
+	suspensionLength: 0.250000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	aligningMomentTrail: 0.500000
+	hasFender: 1
+	suspentionType: 1
+tire: 1
+	location: 1.166117 0.005729 0.457015
+	mass: 40.000000
+	radio: 0.329154
+	width: 0.319073
+	pivotOffset: -0.250000
+	maxSteeringAngle: 0.436333
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
+	suspensionLength: 0.250000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	aligningMomentTrail: 0.500000
+	hasFender: 1
+	suspentionType: 1
+tire: 2
+	location: -1.213005 0.005729 -0.732275
+	mass: 40.000000
+	radio: 0.329154
+	width: 0.319073
+	pivotOffset: 0.000000
+	maxSteeringAngle: 0.000000
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
+	suspensionLength: 0.250000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	aligningMomentTrail: 0.500000
+	hasFender: 1
+	suspentionType: 1
+tire: 3
+	location: -1.222038 0.005729 0.732408
+	mass: 40.000000
+	radio: 0.329154
+	width: 0.319073
+	pivotOffset: 0.000000
+	maxSteeringAngle: 0.000000
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
+	suspensionLength: 0.250000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	aligningMomentTrail: 0.500000
+	hasFender: 1
+	suspentionType: 1
+vehicleEnd: 

@@ -50,7 +50,7 @@ struct VehicleParameters
 	dFloat m_tireSuspensionSpringConstant;
 	dFloat m_tireSuspensionDamperConstant;
 	dFloat m_tireSuspensionLength;
-	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_TireSuspensionType;
+	dCustomVehicleController::dBodyPartTire::dInfo::SuspensionType m_TireSuspensionType;
 	dFloat m_tireBrakesTorque;
 	dFloat m_chassisYaxisComBias;
 	dFloat m_transmissionGearRatio0;
@@ -100,7 +100,7 @@ static VehicleParameters heavyTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::dBodyPartTire::dInfo::m_offroad, //TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -152,7 +152,7 @@ static VehicleParameters lightTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::dBodyPartTire::dInfo::m_offroad, //TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -239,7 +239,7 @@ static VehicleParameters m1a1Param =
 	2000.0f,							// SUSPENSION_SPRING
 	100.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::dBodyPartTire::dInfo::m_offroad, //TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -725,7 +725,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tirePart->SetUserData(aligmentTransform);
 
 		// add the tire to the vehicle
-		dCustomVehicleController::dBodyPartTire::Info  tireInfo;
+		dCustomVehicleController::dBodyPartTire::dInfo  tireInfo;
 
 		tireInfo.m_userData = tirePart;
 		tireInfo.m_location = tireMatrix.m_posit;
@@ -735,7 +735,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416 / 180.0f;
 		tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
 		tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
-		tireInfo.m_suspesionlenght = definition.m_tireSuspensionLength;
+		tireInfo.m_suspensionLength = definition.m_tireSuspensionLength;
 		tireInfo.m_lateralStiffness = definition.m_tireLaretalStiffeness;
 		tireInfo.m_longitudialStiffness = definition.m_tireLongitudinalStiffness;
 		tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
