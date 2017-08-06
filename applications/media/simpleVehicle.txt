@@ -1,11 +1,6 @@
 rootNode: 0
 
 shapeCount: 3
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
-collisionEnd: 
-
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -193,6 +188,11 @@ collision: 0
 	v: 1.922243 0.182667 0.553142
 	v: 1.786454 0.212294 0.715100
 	v: 1.794518 0.324298 0.552648
+collisionEnd: 
+
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
 collisionEnd: 
 
 collision: 2

@@ -340,6 +340,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 
 	const dgBody* const body0 = bodyInfoArray[m0].m_body;
 	const dgBody* const body1 = bodyInfoArray[m1].m_body;
+	const bool isBilateral = jointInfo->m_joint->IsBilateral();
 
 	const dgVector invMass0(body0->m_invMass[3]);
 	const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
@@ -369,7 +370,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 	forceAcc0.m_angular = dgVector::m_zero;
 	forceAcc1.m_linear = dgVector::m_zero;
 	forceAcc1.m_angular = dgVector::m_zero;
-
+	
 	for (dgInt32 i = 0; i < count; i++) {
 		dgJacobianMatrixElement* const row = &matrixRow[index + i];
 		dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
@@ -390,10 +391,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 		row->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 		row->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dgAssert(row->m_jointFeebackForce);
-		row->m_force = row->m_jointFeebackForce->m_force * forceImpulseScale;
-#ifdef _DEBUG
-//row->m_force = 0.0f;
-#endif
+		const dgFloat32 force = row->m_jointFeebackForce->m_force * forceImpulseScale; 
+		row->m_force = isBilateral ? dgClamp(force, row->m_lowerBoundFrictionCoefficent, row->m_upperBoundFrictionCoefficent) : force;
 		row->m_maxImpact = dgFloat32(0.0f);
 
 		dgVector jMinvM0linear (scale0.CompProduct4(row->m_JMinv.m_jacobianM0.m_linear));
@@ -881,6 +880,11 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 					dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)).CompProduct4(timestep4));
 					body->m_veloc += velocStep;
 					body->m_omega += omegaStep;
+
+if (body->m_uniqueID == 9){
+dgTrace(("t(%f %f %f) w(%f %f %f)\n", torque.m_x, torque.m_y, torque.m_z, body->m_omega.m_x, body->m_omega.m_y, body->m_omega.m_z));
+}
+
 
 					dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
 					dgAssert(body->m_omega.m_w == dgFloat32(0.0f));

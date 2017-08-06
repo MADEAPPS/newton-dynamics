@@ -1148,8 +1148,8 @@ void dCustomVehicleController::dEngineController::InitEngineTorqueCurve()
 	m_info.m_torqueCurve[1] = dInfo::dTorqueNode (m_info.m_rpmAtIdleTorque, m_info.m_idleTorque);
 	m_info.m_torqueCurve[2] = dInfo::dTorqueNode (m_info.m_rpmAtPeakTorque, m_info.m_peakTorque);
 	m_info.m_torqueCurve[3] = dInfo::dTorqueNode (m_info.m_rpmAtPeakHorsePower, m_info.m_peakPowerTorque);
-	m_info.m_torqueCurve[4] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, 0.0f);
-	m_info.m_torqueCurve[5] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, 0.0f);
+	m_info.m_torqueCurve[4] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
+	m_info.m_torqueCurve[5] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
 }
 
 void dCustomVehicleController::dEngineController::PlotEngineCurve() const
@@ -1248,11 +1248,23 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 
 	dEngineJoint* const engineJoint = (dEngineJoint*) m_controller->m_engine->m_joint;
 	if (m_ignitionKey) {
-		const dFloat param = dMax (D_VEHICLE_ENGINE_IDLE_GAS_VALVE, m_param);
-		dFloat rpmIdleStep = dMin(omega, m_info.m_rpmAtIdleTorque);
-		dFloat engineTorque = m_info.m_peakTorque * param - (IntepolateTorque(omega) * param - m_info.m_viscousDrag * rpmIdleStep * rpmIdleStep);
-		engineJoint->m_minFriction = -engineTorque;
-		ApplyTorque(m_info.m_peakTorque * param);
+		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
+			// handle idle gas valve 
+			dFloat gasEngineTorque = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE;
+			if (omega < m_info.m_rpmAtIdleTorque) {
+				engineJoint->m_minFriction = - m_info.m_viscousDrag * omega * omega;
+			} else {
+				gasEngineTorque = 0.0f;
+				engineJoint->m_minFriction = - IntepolateTorque(omega);
+			}
+			ApplyTorque(gasEngineTorque);
+
+		} else {
+			dFloat rpmIdleStep = dMin(omega, m_info.m_rpmAtIdleTorque);
+			dFloat engineTorque = m_info.m_peakTorque * m_param - (IntepolateTorque(omega) - m_info.m_viscousDrag * rpmIdleStep * rpmIdleStep);
+			engineJoint->m_minFriction = -engineTorque;
+			ApplyTorque(m_info.m_peakTorque * m_param);
+		}
 	} else {
 		ApplyTorque(0.0f);
 		engineJoint->m_minFriction = -m_info.m_peakTorque;
@@ -1260,7 +1272,6 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 
 	engineJoint->m_maxFriction = m_info.m_peakTorque;
 	engineJoint->SetRedLineRPM(m_info.m_rpmAtRedLine);
-	
 }
 
 bool dCustomVehicleController::dEngineController::GetTransmissionMode() const
@@ -2635,7 +2646,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void dCustomVehicleController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	dTrace (("Remember vehicle debug !!!\n"));
+//	dTrace (("Remember vehicle debug !!!\n"));
 }
 
 

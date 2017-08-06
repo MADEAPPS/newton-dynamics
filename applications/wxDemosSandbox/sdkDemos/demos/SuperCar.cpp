@@ -137,7 +137,7 @@ static CarDefinition viper =
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
 	0.6f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
-	200.0f,										// IDLE_TORQUE
+	100.0f,										// IDLE_TORQUE
 	800.0f,										// IDLE_TORQUE_RPM
 	500.0f,										// PEAK_TORQUE
 	3000.0f,									// PEAK_TORQUE_RPM
@@ -1691,6 +1691,7 @@ void SuperCar (DemoEntityManager* const scene)
 //camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+/*
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
@@ -1711,6 +1712,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+*/
 }
 

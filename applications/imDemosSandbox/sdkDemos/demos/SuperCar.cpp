@@ -1027,8 +1027,60 @@ class SuperCarEntity: public DemoEntity
 
 class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 {
+	class VehicleSaver : public dCustomJointSaveLoad
+	{
 	public:
+		VehicleSaver(NewtonWorld* const world, dCustomVehicleController* const vehicle, FILE* const file, int materialID)
+			:dCustomJointSaveLoad(world, file)
+			, m_material(materialID)
+			, m_vehicle(vehicle)
+		{
+		}
 
+		const char* GetUserDataName(const NewtonBody* const body) const
+		{
+			static char* tire = "tireMesh";
+			static char* engine = "engineMesh";
+			static char* chassis = "chassisMesh";
+			static char* differential = "differentialMesh";
+
+			if (m_vehicle->GetChassis()->GetBody() == body) {
+				return chassis;
+			}
+
+			if (m_vehicle->GetEnginePart()->GetBody() == body) {
+				return engine;
+			}
+
+			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
+				const dCustomVehicleController::dBodyPartTire& tirePart = node->GetInfo();
+				if (tirePart.GetBody() == body) {
+					return tire;
+				}
+			}
+
+			for (dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
+				const dCustomVehicleController::dBodyPartDifferential& differentialPart = node->GetInfo();
+				if (differentialPart.GetBody() == body) {
+					return differential;
+				}
+			}
+
+			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+			return entity ? entity->GetName().GetStr() : NULL;
+		}
+
+		const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
+		{
+		}
+
+		int m_material;
+		dCustomVehicleController* m_vehicle;
+	};
+
+
+
+	public:
 	SuperCarVehicleControllerManager (NewtonWorld* const world, int materialsCount, int* const materialList)
 		:dCustomVehicleControllerManager (world, materialsCount, materialList)
 		,m_externalView(true)
@@ -1314,91 +1366,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		glDisable (GL_BLEND);
 	}
 
-
-	class MySaveLoad: public dCustomJointSaveLoad
-	{
-		public:
-		MySaveLoad(NewtonWorld* const world, dCustomVehicleController* const vehicle, FILE* const file, int materialID)
-			:dCustomJointSaveLoad(world, file)
-			,m_material(materialID)
-			,m_vehicle(vehicle)
-		{
-		}
-
-		const char* GetUserDataName(const NewtonBody* const body) const
-		{
-			static char* tire = "tireMesh";
-			static char* engine = "engineMesh";
-			static char* chassis = "chassisMesh";
-			static char* differential = "differentialMesh";
-
-			if (m_vehicle->GetChassis()->GetBody() == body) {
-				return chassis;
-			}
-
-			if (m_vehicle->GetEnginePart()->GetBody() == body) {
-				return engine;
-			}
-			
-			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
-				const dCustomVehicleController::dBodyPartTire& tirePart = node->GetInfo();
-				if (tirePart.GetBody() == body) {
-					return tire;
-				}
-			}
-
-			for (dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
-				const dCustomVehicleController::dBodyPartDifferential& differentialPart = node->GetInfo();
-				if (differentialPart.GetBody() == body) {
-					return differential;
-				}
-			}
-
-			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-			return entity ? entity->GetName().GetStr() : NULL;
-		}
-
-		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
-		{
-			dAssert(0);
-/*
-			dMatrix matrix;
-			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-
-			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-			DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
-			DemoEntity* const entity = new DemoEntity(matrix, NULL);
-			entity->SetMesh(mesh, dGetIdentityMatrix());
-			scene->Append(entity);
-			mesh->Release();
-
-			// save the pointer to the graphic object with the body.
-			NewtonBodySetUserData(body, entity);
-
-			// assign the wood id
-			NewtonBodySetMaterialGroupID(body, m_material);
-
-			//set continuous collision mode
-			//NewtonBodySetContinuousCollisionMode (body, continueCollisionMode);
-
-			// set a destructor for this rigid body
-			NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
-
-			// set the transform call back function
-			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-			// set the force and torque call back function
-			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-*/
-		}
-
-		int m_material;
-		dCustomVehicleController* m_vehicle;
-	};
-
-
 	void SaveVehicle (const char* const name, dCustomVehicleController* const vehicle)
 	{
 		char fileName[2048];
@@ -1409,7 +1376,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		FILE* const outputFile = fopen(fileName, "wt");
 		dAssert(outputFile);
 
-		MySaveLoad saveLoad(GetWorld(), vehicle, outputFile, 0);
+		VehicleSaver saveLoad(GetWorld(), vehicle, outputFile, 0);
 		vehicle->Save(&saveLoad);
 
 		fclose(outputFile);
@@ -1721,6 +1688,7 @@ void SuperCar (DemoEntityManager* const scene)
 //camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+/*
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
@@ -1741,6 +1709,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+*/
 }
 
