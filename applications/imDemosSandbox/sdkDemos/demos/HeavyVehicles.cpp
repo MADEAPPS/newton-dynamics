@@ -49,7 +49,7 @@ struct VehicleParameters
 	dFloat m_tireSuspensionSpringConstant;
 	dFloat m_tireSuspensionDamperConstant;
 	dFloat m_tireSuspensionLength;
-	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_TireSuspensionType;
+	dCustomVehicleController::SuspensionType m_TireSuspensionType;
 	dFloat m_tireBrakesTorque;
 	dFloat m_chassisYaxisComBias;
 	dFloat m_transmissionGearRatio0;
@@ -99,7 +99,7 @@ static VehicleParameters heavyTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::m_offroad, //TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -151,7 +151,7 @@ static VehicleParameters lightTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::m_offroad, //TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -238,7 +238,7 @@ static VehicleParameters m1a1Param =
 	2000.0f,							// SUSPENSION_SPRING
 	100.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::m_offroad, //TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -312,6 +312,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat GetTireRadius (DemoEntity* const tire) const
 		{
+			dAssert (0);
+/*
 			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
 				const dCustomVehicleController::dBodyPartTire* const part = &node->GetInfo();
 				if (part->GetUserData() == tire) {
@@ -319,11 +321,14 @@ class HeavyVehicleEntity: public DemoEntity
 				}
 			}
 			dAssert (0);
+*/
 			return 0.0f;
 		}
 
 		void CalculaterBinding()
 		{
+			dAssert (0);
+/*
 			m_controlPointCount = m_bezierMesh->m_curve.GetControlPointCount();
 			m_controlPointsOffset = new dVector[m_controlPointCount];
 			m_controlPointBindIndex = new int[m_controlPointCount];
@@ -369,6 +374,7 @@ class HeavyVehicleEntity: public DemoEntity
 					m_controlPointsOffset[i] -= tireMatrix[index].m_posit;
 				}
 			}
+*/
 		}
 
 		void CalculaterUniformSpaceSamples()
@@ -430,8 +436,10 @@ class HeavyVehicleEntity: public DemoEntity
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
 		}
 
-		void Init (HeavyVehicleEntity* const me, const char* const name, dCustomVehicleController::dBodyPartTire* const tire)
+		void Init (HeavyVehicleEntity* const me, const char* const name, dWheelJoint* const tire)
 		{
+			dAssert (0);
+/*
 			m_vehicle = me;
 			m_tire = tire;
 			m_parameter = 0.0f;
@@ -449,6 +457,7 @@ class HeavyVehicleEntity: public DemoEntity
 			NewtonWorld* const world = NewtonBodyGetWorld (m_tire->GetController()->GetBody());
 			AnimateThread (*((DemoEntityManager*)NewtonWorldGetUserData(world)), 0.0f);
 			AnimateThread (*((DemoEntityManager*)NewtonWorldGetUserData(world)), 0.0f);
+*/
 		}
 
 		dFloat CalculateKnotParam (dFloat t) const
@@ -490,6 +499,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 		void AnimateThread (DemoEntityManager& world, dFloat timestep) 
 		{
+			dAssert (0);
+/*
 			dVector matrixPalette[8];
 			for (int i = 0; i < 8; i ++) {
 				matrixPalette[i] = (m_bindingTires[i]->GetMeshMatrix() * m_bindingTires[i]->GetCurrentMatrix()).m_posit;
@@ -537,6 +548,7 @@ class HeavyVehicleEntity: public DemoEntity
 				q0 = q1;
 				u0 = u1;
 			}
+*/
 		}
 
 		dMatrix m_shapeMatrix;
@@ -545,7 +557,7 @@ class HeavyVehicleEntity: public DemoEntity
 		HeavyVehicleEntity* m_vehicle;
 		DemoEntity* m_bezierEntity;
 		DemoBezierCurve* m_bezierMesh;
-		dCustomVehicleController::dBodyPartTire* m_tire;
+		dWheelJoint* m_tire;
 		ConstantSpeedKnotInterpolant* m_intepolants;
 		DemoEntity* m_bindingTires[8];
 		DemoEntity** m_linksEntity;
@@ -609,7 +621,10 @@ class HeavyVehicleEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.m_vehicleMass, PhysicsApplyGravityForce, this, dAbs(DEMO_GRAVITY));
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.m_vehicleMass, PhysicsApplyGravityForce, dAbs(DEMO_GRAVITY));
+		NewtonBody* const chassis = m_controller->GetBody();
+		NewtonBodySetUserData(chassis, this);
+
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -700,14 +715,14 @@ class HeavyVehicleEntity: public DemoEntity
 	}
 
 
-	dCustomVehicleController::dBodyPartTire* AddTire(const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const VehicleParameters& definition) 
+	dWheelJoint* AddTire(const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const VehicleParameters& definition) 
 	{
-		NewtonBody* const body = m_controller->GetBody();
-		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
-		DemoEntity* const tirePart = entity->Find (tireName);
+		NewtonBody* const chassis = m_controller->GetBody();
+		DemoEntity* const chassisEntiry = (DemoEntity*) NewtonBodyGetUserData(chassis);
+		DemoEntity* const tirePart = chassisEntiry->Find (tireName);
 
 		// add this tire, get local position and rise it by the suspension length 
-		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
+		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(chassisEntiry));
 
 		// add the offset location
 		tireMatrix.m_posit.m_y += definition.m_tirePivotOffset;
@@ -722,24 +737,26 @@ class HeavyVehicleEntity: public DemoEntity
 		tirePart->SetUserData(aligmentTransform);
 
 		// add the tire to the vehicle
-		dCustomVehicleController::dBodyPartTire::Info  tireInfo;
+		dCustomVehicleController::dTireInfo tireInfo;
 
-		tireInfo.m_userData = tirePart;
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
-		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f;
+		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.141592f / 180.0f;
 		tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
 		tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
-		tireInfo.m_suspesionlenght = definition.m_tireSuspensionLength;
+		tireInfo.m_suspensionLength = definition.m_tireSuspensionLength;
 		tireInfo.m_lateralStiffness = definition.m_tireLaretalStiffeness;
 		tireInfo.m_longitudialStiffness = definition.m_tireLongitudinalStiffness;
 		tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
 		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 
-		return m_controller->AddTire (tireInfo);
+		dWheelJoint* const tireJoint = m_controller->AddTire(tireInfo);
+		NewtonBody* const tireBody = m_controller->GetTireBody(tireJoint);
+		NewtonBodySetUserData(tireBody, tirePart);
+		return tireJoint;
 	}
 
 
@@ -1195,6 +1212,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void BuildTrackedVehicle(const VehicleParameters& definition)
 	{
+		dAssert (0);
+#if 0
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity(dVector(0.0f, definition.m_chassisYaxisComBias, 0.0f, 0.0f));
 
@@ -1280,9 +1299,10 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+#endif
 	}
 
-	void SetTracks(dCustomVehicleController::dBodyPartTire* const leftTire, dCustomVehicleController::dBodyPartTire* const rightTire)
+	void SetTracks(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
 	{
 		m_leftTrack.Init(this, "leftTrackPath", leftTire);
 		m_rightTrack.Init(this, "rightTrackPath", rightTire);
@@ -1294,9 +1314,9 @@ class HeavyVehicleEntity: public DemoEntity
 	{
 		DemoEntity::InterpolateMatrix(world, param);
 		if (m_controller) {
-			for (dList<dCustomVehicleController::dBodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
-				dCustomVehicleController::dBodyPart* const part = node->GetInfo();
-				DemoEntity* const entPart = (DemoEntity*)part->GetUserData();
+			for (dList<NewtonBody*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
+				NewtonBody* const body = node->GetInfo();
+				DemoEntity* const entPart = (DemoEntity*)NewtonBodyGetUserData (body);
 				if (entPart) {
 					entPart->InterpolateMatrix(world, param);
 				}
@@ -1312,6 +1332,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void UpdateTireTransforms(dFloat timestep)
 	{
+		dAssert (0);
+/*
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
@@ -1340,6 +1362,7 @@ class HeavyVehicleEntity: public DemoEntity
 			m_leftTrack.AnimateThread(*scene, timestep);
 			m_rightTrack.AnimateThread(*scene, timestep);
 		}
+*/
 	}
 
 	TrackSystem m_leftTrack;

@@ -66,7 +66,7 @@ struct CarDefinition
 	dFloat m_TireSuspensionSpringConstant;
 	dFloat m_TireSuspensionDamperConstant;
 	dFloat m_TireSuspensionLength;
-	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_TireSuspensionType;
+	dCustomVehicleController::SuspensionType m_TireSuspensionType;
 	dFloat m_TireBrakesTorque;
 	dFloat m_tirePivotOffset;
 	dFloat m_transmissionGearRatio0;
@@ -108,7 +108,7 @@ static CarDefinition monsterTruck =
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::m_confort,		//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -136,7 +136,7 @@ static CarDefinition viper =
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
 	0.6f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
-	200.0f,										// IDLE_TORQUE
+	100.0f,										// IDLE_TORQUE
 	800.0f,										// IDLE_TORQUE_RPM
 	500.0f,										// PEAK_TORQUE
 	3000.0f,									// PEAK_TORQUE_RPM
@@ -150,7 +150,7 @@ static CarDefinition viper =
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::m_confort,		//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -233,8 +233,7 @@ class SuperCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		//m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.VEHICLE_MASS, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, dAbs (DEMO_GRAVITY));
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -300,9 +299,9 @@ class SuperCarEntity: public DemoEntity
 	{
 		DemoEntity::InterpolateMatrix (world, param);
 		if (m_controller){
-			for (dList<dCustomVehicleController::dBodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
-				dCustomVehicleController::dBodyPart* const part = node->GetInfo();
-				DemoEntity* const entPart = (DemoEntity*) part->GetUserData();
+			for (dList<NewtonBody*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
+				NewtonBody* const body = node->GetInfo();
+				DemoEntity* const entPart = (DemoEntity*)NewtonBodyGetUserData(body);
 				if (entPart) {
 					entPart->InterpolateMatrix(world, param);
 				}
@@ -351,26 +350,27 @@ class SuperCarEntity: public DemoEntity
 		NewtonDestroyCollision (collision);	
 	}
 
-	dCustomVehicleController::dBodyPartTire* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat pivotOffset, dFloat maxSteerAngle, const CarDefinition& definition)
+	dWheelJoint* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat pivotOffset, dFloat maxSteerAngle, const CarDefinition& definition)
 	{
-		NewtonBody* const body = m_controller->GetBody();
-		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
-		DemoEntity* const tirePart = entity->Find (tireName);
+		NewtonBody* const chassisBody = m_controller->GetBody();
+		DemoEntity* const chassisEntity = (DemoEntity*) NewtonBodyGetUserData(chassisBody);
+		DemoEntity* const tirePart = chassisEntity->Find (tireName);
 
 		// the tire is located at position of the tire mesh relative to the chassis mesh
-		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
+		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(chassisEntity));
 
 		// add the offset location
 		tireMatrix.m_posit.m_y += definition.m_tirePivotOffset;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
-		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dGetIdentityMatrix() : dYawMatrix(3.141592f));
+		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dYawMatrix(-0.5f * 3.141592f) : dYawMatrix(0.5f * 3.141592f));
+
 
 		TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix);
 		tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
-		dCustomVehicleController::dBodyPartTire::Info tireInfo;
+		dCustomVehicleController::dTireInfo tireInfo;
 
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.m_tireMass;
@@ -380,36 +380,37 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f; 
 		tireInfo.m_dampingRatio = definition.m_TireSuspensionDamperConstant;
 		tireInfo.m_springStrength = definition.m_TireSuspensionSpringConstant;
-		tireInfo.m_suspesionlenght = definition.m_TireSuspensionLength;
+		tireInfo.m_suspensionLength = definition.m_TireSuspensionLength;
 		tireInfo.m_lateralStiffness = dAbs (definition.m_tireLaretalStiffeness);
 		tireInfo.m_longitudialStiffness = dAbs (definition.m_tireLongitudinalStiffness);
 		tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
-		tireInfo.m_userData = tirePart;
 
-		return m_controller->AddTire (tireInfo);
+		dWheelJoint* const tireJoint = m_controller->AddTire (tireInfo);
+		NewtonBody* const tireBody = m_controller->GetTireBody (tireJoint); 
+		NewtonBodySetUserData (tireBody, tirePart);
+
+		return tireJoint;
 	}
 
 
 	void UpdateTireTransforms()
 	{
-		NewtonBody* const body = m_controller->GetBody();
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+		NewtonBody* const chassisBody = m_controller->GetBody();
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(chassisBody));
 
-		for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const dCustomVehicleController::dBodyPartTire* const part = &node->GetInfo();
-			dCustomVehicleController::dBodyPart* const parent = part->GetParent();
-
-			NewtonBody* const body = part->GetBody();
-			NewtonBody* const parentBody = parent->GetBody();
-
+		for (dList<dWheelJoint*>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 			dMatrix matrix;
 			dMatrix parentMatrix;
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
-			NewtonBodyGetMatrix(parentBody, &parentMatrix[0][0]);
 
-			DemoEntity* const tirePart = (DemoEntity*) part->GetUserData();
+			const dWheelJoint* const part = node->GetInfo();
+			NewtonBody* const body = m_controller->GetTireBody (part);
+
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			NewtonBodyGetMatrix(chassisBody, &parentMatrix[0][0]);
+
+			DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(body);
 			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
 			matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
 
@@ -432,15 +433,16 @@ class SuperCarEntity: public DemoEntity
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-		dCustomVehicleController::dBodyPartTire* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
-		dCustomVehicleController::dBodyPartTire* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
+		dWheelJoint* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
+		dWheelJoint* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
 
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		dCustomVehicleController::dBodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
-		dCustomVehicleController::dBodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
+		dWheelJoint* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
+		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		
+/*
 		// add vehicle brakes
 		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
@@ -540,6 +542,7 @@ class SuperCarEntity: public DemoEntity
 
 		// set the gear look up table
 		SetGearMap(engineControl);
+*/
 
 		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (definition.m_vehicleWeightDistribution);
@@ -783,6 +786,9 @@ class SuperCarEntity: public DemoEntity
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
 	dFloat CalculateNPCControlSteerinValue (dFloat distanceAhead, dFloat pathWidth, DemoEntity* const pathEntity)
 	{
+		dAssert (0);
+		return 0;
+/*
 		const dCustomVehicleController::dBodyPart& chassis = *m_controller->GetChassis();
 		//CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
 
@@ -842,6 +848,7 @@ class SuperCarEntity: public DemoEntity
 		}
 		dFloat param = steering->GetParam();
 		return param + (-angle / maxAngle - param) * 0.25f;
+*/
 	}
 
 	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity)
@@ -899,6 +906,7 @@ class SuperCarEntity: public DemoEntity
 
 	void Debug (DemoEntity* const m_aiPath) const 
 	{
+/*
 		dMatrix matrix;
 		dVector com(0.0f);
 		dFloat Ixx;
@@ -1039,6 +1047,9 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		const char* GetUserDataName(const NewtonBody* const body) const
 		{
+			dAssert (0);
+			return NULL;
+/*
 			static char* tire = "tireMesh";
 			static char* engine = "engineMesh";
 			static char* chassis = "chassisMesh";
@@ -1068,6 +1079,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
 			return entity ? entity->GetName().GetStr() : NULL;
+*/
 		}
 
 		const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
@@ -1391,7 +1403,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		}
 		m_player = player;
 
-		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
+//xxxx
+//		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
 	}
 
 	void SetNextPlayer() 
