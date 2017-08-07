@@ -994,8 +994,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			dgJacobianMatrixElement* const row = &matrixRow[first + index];
 			f[auxiliaryIndex + primaryCount] = dgFloat32 (0.0f);
 			b[auxiliaryIndex] = -dgFloat32(accelSpatial[primaryDof + j]);
-			dgAssert (row->m_force * dgFloat32 (0.99f) >= row->m_lowerBoundFrictionCoefficent);
-			dgAssert (row->m_force * dgFloat32 (0.99f) <= row->m_upperBoundFrictionCoefficent);
+			dgAssert (row->m_force >= row->m_lowerBoundFrictionCoefficent * dgFloat32 (2.0f));
+			dgAssert (row->m_force <= row->m_upperBoundFrictionCoefficent * dgFloat32 (2.0f));
 			low[auxiliaryIndex] = dgClamp (row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_MAX_BOUND, dgFloat32 (0.0f));
 			high[auxiliaryIndex] = dgClamp (row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32 (0.0f), DG_MAX_BOUND);
 			auxiliaryIndex++;
@@ -1021,8 +1021,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 						 row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
 			b[auxiliaryIndex] = row->m_coordenateAccel - (acc.AddHorizontal()).GetScalar();
 
-			dgAssert(row->m_force * dgFloat32 (0.99f) >= row->m_lowerBoundFrictionCoefficent);
-			dgAssert(row->m_force * dgFloat32 (0.99f) <= row->m_upperBoundFrictionCoefficent);
+			dgAssert(row->m_force >= row->m_lowerBoundFrictionCoefficent * dgFloat32(2.0f));
+			dgAssert(row->m_force <= row->m_upperBoundFrictionCoefficent * dgFloat32(2.0f));
 			low[auxiliaryIndex] = dgClamp (row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_MAX_BOUND, dgFloat32 (0.0f));
 			high[auxiliaryIndex] = dgClamp (row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32 (0.0f), DG_MAX_BOUND);
 			auxiliaryIndex++;
@@ -1303,8 +1303,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
 			b[auxiliaryIndex] = -dgFloat32(accelSpatial[primaryDof + j]);
 
-			dgAssert(row->m_force * dgFloat32 (0.99f) >= row->m_lowerBoundFrictionCoefficent);
-			dgAssert(row->m_force * dgFloat32 (0.99f) <= row->m_upperBoundFrictionCoefficent);
+			dgAssert(row->m_force >= row->m_lowerBoundFrictionCoefficent * dgFloat32(2.0f));
+			dgAssert(row->m_force <= row->m_upperBoundFrictionCoefficent * dgFloat32(2.0f));
 			low[auxiliaryIndex] = dgClamp(row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_MAX_BOUND, dgFloat32(0.0f));
 			high[auxiliaryIndex] = dgClamp(row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32(0.0f), DG_MAX_BOUND);
 			auxiliaryIndex++;
@@ -1330,8 +1330,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 						  row->m_Jt.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
 			b[auxiliaryIndex] = row->m_penetrationStiffness - (diag.AddHorizontal()).GetScalar();
 
-			dgAssert(row->m_force * dgFloat32 (0.99f) >= row->m_lowerBoundFrictionCoefficent);
-			dgAssert(row->m_force * dgFloat32 (0.99f) <= row->m_upperBoundFrictionCoefficent);
+			dgAssert(row->m_force >= row->m_lowerBoundFrictionCoefficent * dgFloat32(2.0f));
+			dgAssert(row->m_force <= row->m_upperBoundFrictionCoefficent * dgFloat32(2.0f));
 			low[auxiliaryIndex] = dgClamp(row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_MAX_BOUND, dgFloat32(0.0f));
 			high[auxiliaryIndex] = dgClamp(row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32(0.0f), DG_MAX_BOUND);
 			auxiliaryIndex++;

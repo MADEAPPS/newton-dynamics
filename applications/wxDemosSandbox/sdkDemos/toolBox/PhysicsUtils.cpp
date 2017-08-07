@@ -292,8 +292,6 @@ void SetShowIslands (SceneManager& me, int mode)
 }
 
 
-//static void CalculateAABB (const NewtonBody* body, dVector& minP, dVector& maxP)
-
 int PhysicsIslandUpdate (const NewtonWorld* world, const void* islandHandle, int bodyCount)
 {
 	if (showIslans) {

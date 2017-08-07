@@ -1859,15 +1859,21 @@ void dCustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 		dMatrix tireMatrix;
 		dVector origin(0.0f);
 		dVector totalMassOrigin (0.0f);
-		dVector minBox;
-		dVector maxBox;
-		//dFloat xMin = 1.0e10f;
-		//dFloat xMax = -1.0e10f;
-		NewtonBodyGetAABB (m_body, &minBox[0], &maxBox[0]);
+		
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 		NewtonBodyGetCentreOfMass(m_body, &origin[0]);
 		matrix.m_posit = matrix.TransformVector(origin);
 		totalMassOrigin = origin.Scale (totalMass);
+
+		NewtonCollision* const collision = NewtonBodyGetCollision(m_body);
+		dVector support(0.0f);
+		dVector localDir(1.0f, 0.0f, 0.0f, 0.0f);
+		NewtonCollisionSupportVertex(collision, &localDir[0], &support[0]);
+		dFloat minX = support[0];
+
+		localDir.m_x = -1.0f;
+		NewtonCollisionSupportVertex(collision, &localDir[0], &support[0]);
+		dFloat maxX = support[0];
 
 		matrix = matrix.Inverse();
 		if (m_engine) {
@@ -1889,14 +1895,14 @@ void dCustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 			totalMass += mass;
 			tireMatrix = tireMatrix * matrix;
 			totalMassOrigin += tireMatrix.m_posit.Scale (mass);
-			minBox.m_x = dMin (minBox.m_x, tireMatrix.m_posit.m_x); 
-			maxBox.m_x = dMax (maxBox.m_x, tireMatrix.m_posit.m_x); 
+			minX = dMin (minX, tireMatrix.m_posit.m_x); 
+			maxX = dMax (maxX, tireMatrix.m_posit.m_x); 
 		}
 		origin = totalMassOrigin.Scale (1.0f / totalMass);
 
 		dVector vehCom (0.0f);
 		NewtonBodyGetCentreOfMass(m_body, &vehCom[0]);
-		vehCom.m_x = origin.m_x + (maxBox.m_x - minBox.m_x) * factor;
+		vehCom.m_x = origin.m_x + (maxX - minX) * factor;
 		vehCom.m_z = origin.m_z;
 		NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
 		m_totalMass = totalMass;

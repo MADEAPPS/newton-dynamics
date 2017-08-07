@@ -302,14 +302,11 @@ class SuperCarEntity: public DemoEntity
 		if (m_controller){
 //			for (dList<dCustomVehicleController::dBodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
 			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-				dAssert (0);
-/*
 				dCustomVehicleController::dBodyPartTire& part = node->GetInfo();
-				DemoEntity* const entPart = (DemoEntity*) part->GetUserData();
+				DemoEntity* const entPart = (DemoEntity*) part.GetUserData();
 				if (entPart) {
 					entPart->InterpolateMatrix(world, param);
 				}
-*/
 			}
 		}
 	}
@@ -437,14 +434,14 @@ class SuperCarEntity: public DemoEntity
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-//		dCustomVehicleController::dBodyPartTire* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
-//		dCustomVehicleController::dBodyPartTire* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
+		dCustomVehicleController::dBodyPartTire* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
+		dCustomVehicleController::dBodyPartTire* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
 
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-//		dCustomVehicleController::dBodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
-//		dCustomVehicleController::dBodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
+		dCustomVehicleController::dBodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
+		dCustomVehicleController::dBodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 
 /*
 		// add vehicle brakes

@@ -149,28 +149,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	};
 */
 
-	class dBodyPartEngine: public dBodyPart
-	{
-		public:
-		dBodyPartEngine(dCustomVehicleController* const controller, dFloat mass, dFloat amatureRadius);
-		~dBodyPartEngine();
-
-		void ApplyTorque(dFloat torque);
-		void ProjectError();
-	};
-
-	class dBodyPartDifferential: public dBodyPart
-	{
-		public:
-		dBodyPartDifferential();
-		void Init(dCustomVehicleController* const controller, dFloat mass, dFloat inertia);
-		~dBodyPartDifferential();
-
-		void SetTrackMode(bool mode, dFloat differentialSpeed);
-		void ProjectError();
-		dFloat m_differentialSpeed;
-	};
-
 	class dBodyPartTire: public dBodyPart
 	{
 		public:
@@ -257,6 +235,29 @@ class dCustomVehicleController: public dCustomControllerBase
 		friend class dCustomVehicleController;
 		friend class dCustomVehicleControllerManager;
 	};
+
+	class dBodyPartEngine: public dBodyPart
+	{
+		public:
+		dBodyPartEngine(dCustomVehicleController* const controller, dFloat mass, dFloat amatureRadius);
+		~dBodyPartEngine();
+
+		void ApplyTorque(dFloat torque);
+		void ProjectError();
+	};
+
+	class dBodyPartDifferential: public dBodyPart
+	{
+		public:
+		dBodyPartDifferential();
+		void Init(dCustomVehicleController* const controller, dFloat mass, dFloat inertia);
+		~dBodyPartDifferential();
+
+		void SetTrackMode(bool mode, dFloat differentialSpeed);
+		void ProjectError();
+		dFloat m_differentialSpeed;
+	};
+
 
 	class dEngineController: public dController
 	{
