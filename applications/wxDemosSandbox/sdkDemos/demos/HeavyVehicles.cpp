@@ -612,7 +612,10 @@ class HeavyVehicleEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.m_vehicleMass, PhysicsApplyGravityForce, this, dAbs(DEMO_GRAVITY));
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.m_vehicleMass, PhysicsApplyGravityForce, dAbs(DEMO_GRAVITY));
+		NewtonBody* const chassis = m_controller->GetBody();
+		NewtonBodySetUserData(chassis, this);
+
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
