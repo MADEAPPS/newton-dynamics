@@ -443,7 +443,14 @@ class SuperCarEntity: public DemoEntity
 		dWheelJoint* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 
-/*
+		// add a steering Wheel component
+		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller);
+		steering->AddTire(leftFrontTire);
+		steering->AddTire(rightFrontTire);
+		steering->AddTire(leftRearTire);
+		steering->AddTire(rightRearTire);
+		m_controller->SetSteering(steering);
+
 		// add vehicle brakes
 		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
@@ -452,12 +459,14 @@ class SuperCarEntity: public DemoEntity
 		brakes->AddTire (rightRearTire);
 		m_controller->SetBrakes(brakes);
 
+
 		// add vehicle hand brakes
 		dCustomVehicleController::dBrakeController* const handBrakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
+/*
 		// add the engine, differential and transmission 
 		dCustomVehicleController::dEngineController::dInfo engineInfo;
 		engineInfo.m_mass = definition.m_engineMass; 
@@ -512,14 +521,6 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 		dAssert(differential);
-
-		// add a steering Wheel component
-		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller, differential);
-		steering->AddTire(leftFrontTire);
-		steering->AddTire(rightFrontTire);
-		steering->AddTire(leftRearTire);
-		steering->AddTire(rightRearTire);
-		m_controller->SetSteering(steering);
 
 
 		engineInfo.m_differentialLock = 0;
