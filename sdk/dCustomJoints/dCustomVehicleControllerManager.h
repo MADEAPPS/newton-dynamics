@@ -31,41 +31,102 @@ class dDifferentialJoint;
 class dCustomVehicleController;
 class dCustomVehicleControllerManager;
 
+
+enum dSuspensionType
+{
+	m_offroad,
+	m_confort,
+	m_race,
+	m_roller,
+};
+
+class dTireInfo
+{
+	public:
+	dTireInfo()
+	{
+		memset(this, 0, sizeof(dTireInfo));
+	}
+
+	dVector m_location;
+	dFloat m_mass;
+	dFloat m_radio;
+	dFloat m_width;
+	dFloat m_pivotOffset;
+	dFloat m_maxSteeringAngle;
+	dFloat m_dampingRatio;
+	dFloat m_springStrength;
+	dFloat m_suspensionLength;
+	dFloat m_lateralStiffness;
+	dFloat m_longitudialStiffness;
+	dFloat m_aligningMomentTrail;
+	int m_hasFender;
+	dSuspensionType m_suspentionType;
+};
+
+
+class dTorqueNode
+{
+	public:
+	dTorqueNode() {}
+	dTorqueNode(dFloat rpm, dFloat torque)
+		:m_rpm(rpm)
+		,m_torque(torque)
+	{
+	}
+	dFloat m_rpm;
+	dFloat m_torque;
+};
+
+class dEngineInfo
+{
+	public:
+	dEngineInfo()
+	{
+		memset(this, 0, sizeof(dEngineInfo));
+	}
+
+	dVector m_location;
+	dFloat m_mass;
+	dFloat m_radio;
+	dFloat m_idleTorque;
+	dFloat m_rpmAtIdleTorque;
+	dFloat m_peakTorque;
+	dFloat m_rpmAtPeakTorque;
+	dFloat m_peakHorsePower;
+	dFloat m_rpmAtPeakHorsePower;
+	dFloat m_rpmAtRedLine;
+
+	dFloat m_vehicleTopSpeed;
+	dFloat m_reverseGearRatio;
+	dFloat m_gearRatios[10];
+	dFloat m_gearRatiosSign;
+	dFloat m_clutchFrictionTorque;
+
+	dFloat m_aerodynamicDownforceFactor;
+	dFloat m_aerodynamicDownforceFactorAtTopSpeed;
+	dFloat m_aerodynamicDownForceSurfaceCoeficident;
+
+	int m_gearsCount;
+	int m_differentialLock;
+	void* m_userData;
+
+	private:
+	void ConvertToMetricSystem();
+
+	dTorqueNode m_torqueCurve[6];
+	dFloat m_viscousDrag;
+	dFloat m_crownGearRatio;
+	dFloat m_peakPowerTorque;
+	friend class dEngineController;
+	friend class dCustomVehicleController;
+	friend class dCustomVehicleControllerManager;
+};
+
+
 class dWheelJoint: public dCustomJoint
 {
 	public:
-	enum dSuspensionType
-	{
-		m_offroad,
-		m_confort,
-		m_race,
-		m_roller,
-	};
-
-	class dTireInfo
-	{
-		public:
-		dTireInfo()
-		{
-			memset(this, 0, sizeof(dTireInfo));
-		}
-
-		dVector m_location;
-		dFloat m_mass;
-		dFloat m_radio;
-		dFloat m_width;
-		dFloat m_pivotOffset;
-		dFloat m_maxSteeringAngle;
-		dFloat m_dampingRatio;
-		dFloat m_springStrength;
-		dFloat m_suspensionLength;
-		dFloat m_lateralStiffness;
-		dFloat m_longitudialStiffness;
-		dFloat m_aligningMomentTrail;
-		int m_hasFender;
-		dSuspensionType m_suspentionType;
-	};
-
 	CUSTOM_JOINTS_API dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, dCustomVehicleController* const controller, const dTireInfo& tireInfo);
 
 	NewtonBody* GetTireBody() const
@@ -316,62 +377,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	class dEngineController: public dController
 	{
 		public:
-		class dEngineInfo
-		{
-			public:
-			class dTorqueNode
-			{
-			public:
-				dTorqueNode() {}
-				dTorqueNode(dFloat rpm, dFloat torque)
-					:m_rpm(rpm)
-					,m_torque(torque)
-				{
-				}
-				dFloat m_rpm;
-				dFloat m_torque;
-			};
-
-			dEngineInfo()
-			{
-				memset(this, 0, sizeof(dEngineInfo));
-			}
-
-			dVector m_location;
-			dFloat m_mass;
-			dFloat m_radio;
-			dFloat m_idleTorque;
-			dFloat m_rpmAtIdleTorque;
-			dFloat m_peakTorque;
-			dFloat m_rpmAtPeakTorque;
-			dFloat m_peakHorsePower;
-			dFloat m_rpmAtPeakHorsePower;
-			dFloat m_rpmAtRedLine;
-
-			dFloat m_vehicleTopSpeed;
-			dFloat m_reverseGearRatio;
-			dFloat m_gearRatios[10];
-			dFloat m_gearRatiosSign;
-			dFloat m_clutchFrictionTorque;
-
-			dFloat m_aerodynamicDownforceFactor;
-			dFloat m_aerodynamicDownforceFactorAtTopSpeed;
-			dFloat m_aerodynamicDownForceSurfaceCoeficident;
-
-			int m_gearsCount;
-			int m_differentialLock;
-			void* m_userData;
-
-			private:
-			void ConvertToMetricSystem();
-
-			dTorqueNode m_torqueCurve[6];
-			dFloat m_viscousDrag;
-			dFloat m_crownGearRatio;
-			dFloat m_peakPowerTorque;
-			friend class dEngineController;
-		};
-
 		CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator);
 		CUSTOM_JOINTS_API ~dEngineController();
 
@@ -455,7 +460,6 @@ class dCustomVehicleController: public dCustomControllerBase
 		friend class dCustomVehicleController;
 	};
 
-
 	class dBrakeController: public dController
 	{
 		public:
@@ -471,7 +475,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	};
 
 	CUSTOM_JOINTS_API void Finalize();
-	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dWheelJoint::dTireInfo& tireInfo);
+	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dTireInfo& tireInfo);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential);
 

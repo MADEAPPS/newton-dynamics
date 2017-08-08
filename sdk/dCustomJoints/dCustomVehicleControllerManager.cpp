@@ -42,6 +42,37 @@ IMPLEMENT_CUSTOM_JOINT(dDifferentialJoint);
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
 
 
+void dEngineInfo::ConvertToMetricSystem()
+{
+	const dFloat horsePowerToWatts = 735.5f;
+	const dFloat kmhToMetersPerSecunds = 0.278f;
+	const dFloat rpmToRadiansPerSecunds = 0.105f;
+	const dFloat poundFootToNewtonMeters = 1.356f;
+
+	m_idleTorque *= poundFootToNewtonMeters;
+	m_peakTorque *= poundFootToNewtonMeters;
+
+	m_rpmAtPeakTorque *= rpmToRadiansPerSecunds;
+	m_rpmAtPeakHorsePower *= rpmToRadiansPerSecunds;
+	m_rpmAtRedLine *= rpmToRadiansPerSecunds;
+	m_rpmAtIdleTorque *= rpmToRadiansPerSecunds;
+
+	m_peakHorsePower *= horsePowerToWatts;
+	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
+
+	m_peakPowerTorque = m_peakHorsePower / m_rpmAtPeakHorsePower;
+
+	dAssert(m_rpmAtIdleTorque > 0.0f);
+	dAssert(m_rpmAtIdleTorque < m_rpmAtPeakHorsePower);
+	dAssert(m_rpmAtPeakTorque < m_rpmAtPeakHorsePower);
+	dAssert(m_rpmAtPeakHorsePower < m_rpmAtRedLine);
+
+	dAssert(m_idleTorque > 0.0f);
+	dAssert(m_peakTorque > m_peakPowerTorque);
+	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
+}
+
+
 dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 	:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
 	,m_maxRPM(50.0f)
@@ -829,35 +860,6 @@ void dCustomVehicleController::dBodyPartDifferential::ProjectError()
 */
 
 
-void dCustomVehicleController::dEngineController::dEngineInfo::ConvertToMetricSystem()
-{
-	const dFloat horsePowerToWatts = 735.5f;
-	const dFloat kmhToMetersPerSecunds = 0.278f;
-	const dFloat rpmToRadiansPerSecunds = 0.105f;
-	const dFloat poundFootToNewtonMeters = 1.356f;
-
-	m_idleTorque *= poundFootToNewtonMeters;
-	m_peakTorque *= poundFootToNewtonMeters;
-
-	m_rpmAtPeakTorque *= rpmToRadiansPerSecunds;
-	m_rpmAtPeakHorsePower *= rpmToRadiansPerSecunds;
-	m_rpmAtRedLine *= rpmToRadiansPerSecunds;
-	m_rpmAtIdleTorque *= rpmToRadiansPerSecunds;
-
-	m_peakHorsePower *= horsePowerToWatts;
-	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
-
-	m_peakPowerTorque = m_peakHorsePower / m_rpmAtPeakHorsePower;
-
-	dAssert(m_rpmAtIdleTorque > 0.0f);
-	dAssert(m_rpmAtIdleTorque < m_rpmAtPeakHorsePower);
-	dAssert(m_rpmAtPeakTorque < m_rpmAtPeakHorsePower);
-	dAssert(m_rpmAtPeakHorsePower < m_rpmAtRedLine);
-
-	dAssert(m_idleTorque > 0.0f);
-	dAssert(m_peakTorque > m_peakPowerTorque);
-	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
-}
 
 dCustomVehicleController::dEngineController::dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator)
 	:dController(controller)
@@ -894,7 +896,7 @@ dCustomVehicleController::dEngineController::~dEngineController()
 {
 }
 
-dCustomVehicleController::dEngineController::dEngineInfo dCustomVehicleController::dEngineController::GetInfo() const
+dEngineInfo dCustomVehicleController::dEngineController::GetInfo() const
 {
 	return m_infoCopy;
 }
@@ -1835,7 +1837,7 @@ bool dCustomVehicleController::ControlStateChanged() const
 	return inputChanged;
 }
 
-dWheelJoint* dCustomVehicleController::AddTire(const dWheelJoint::dTireInfo& tireInfo)
+dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
 {
 	dVector drag(0.0f);
 
@@ -2441,7 +2443,7 @@ void dCustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 	for (dList<dWheelJoint*>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 		dWheelJoint* const tire = tireNode->GetInfo();
 
-		if (tire->m_suspentionType != dWheelJoint::m_roller) {
+		if (tire->m_suspentionType != dSuspensionType::m_roller) {
 			tires[tireCount] = tire;
 
 			NewtonBody* const tireBody = tire->GetTireBody();
@@ -2466,13 +2468,13 @@ void dCustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 			dFloat weight = 1.0f;
 			switch (tire->m_suspentionType)
 			{
-				case dWheelJoint::m_offroad:
+				case dSuspensionType::m_offroad:
 					weight = 0.9f;
 					break;
-				case dWheelJoint::m_confort:
+				case dSuspensionType::m_confort:
 					weight = 1.0f;
 					break;
-				case dWheelJoint::m_race:
+				case dSuspensionType::m_race:
 					weight = 1.1f;
 					break;
 			}

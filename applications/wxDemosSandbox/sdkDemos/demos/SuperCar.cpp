@@ -67,7 +67,7 @@ struct CarDefinition
 	dFloat m_TireSuspensionSpringConstant;
 	dFloat m_TireSuspensionDamperConstant;
 	dFloat m_TireSuspensionLength;
-	dWheelJoint::dSuspensionType m_TireSuspensionType;
+	dSuspensionType m_TireSuspensionType;
 	dFloat m_TireBrakesTorque;
 	dFloat m_tirePivotOffset;
 	dFloat m_transmissionGearRatio0;
@@ -109,7 +109,7 @@ static CarDefinition monsterTruck =
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dWheelJoint::m_confort,						//TIRE_SUSPENSION_TYPE
+	dSuspensionType::m_confort,					//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -151,7 +151,7 @@ static CarDefinition viper =
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dWheelJoint::m_confort,						//TIRE_SUSPENSION_TYPE
+	dSuspensionType::m_confort,					//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -371,7 +371,7 @@ class SuperCarEntity: public DemoEntity
 		tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
-		dWheelJoint::dTireInfo tireInfo;
+		dTireInfo tireInfo;
 
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.m_tireMass;
