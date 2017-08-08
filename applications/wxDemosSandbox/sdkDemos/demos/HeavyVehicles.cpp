@@ -50,7 +50,7 @@ struct VehicleParameters
 	dFloat m_tireSuspensionSpringConstant;
 	dFloat m_tireSuspensionDamperConstant;
 	dFloat m_tireSuspensionLength;
-	dCustomVehicleController::SuspensionType m_TireSuspensionType;
+	dWheelJoint::dSuspensionType m_TireSuspensionType;
 	dFloat m_tireBrakesTorque;
 	dFloat m_chassisYaxisComBias;
 	dFloat m_transmissionGearRatio0;
@@ -100,7 +100,7 @@ static VehicleParameters heavyTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::m_offroad, //TIRE_SUSPENSION_TYPE
+	dWheelJoint::m_offroad,				//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -152,7 +152,7 @@ static VehicleParameters lightTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::m_offroad, //TIRE_SUSPENSION_TYPE
+	dWheelJoint::m_offroad,				//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -239,7 +239,7 @@ static VehicleParameters m1a1Param =
 	2000.0f,							// SUSPENSION_SPRING
 	100.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dCustomVehicleController::m_offroad, //TIRE_SUSPENSION_TYPE
+	dWheelJoint::m_offroad,				//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -740,7 +740,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tirePart->SetUserData(aligmentTransform);
 
 		// add the tire to the vehicle
-		dCustomVehicleController::dTireInfo tireInfo;
+		dWheelJoint::dTireInfo tireInfo;
 
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.m_tireMass;
@@ -757,7 +757,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 
 		dWheelJoint* const tireJoint = m_controller->AddTire(tireInfo);
-		NewtonBody* const tireBody = m_controller->GetTireBody(tireJoint);
+		NewtonBody* const tireBody = tireJoint->GetTireBody();
 		NewtonBodySetUserData(tireBody, tirePart);
 		return tireJoint;
 	}

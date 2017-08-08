@@ -67,7 +67,7 @@ struct CarDefinition
 	dFloat m_TireSuspensionSpringConstant;
 	dFloat m_TireSuspensionDamperConstant;
 	dFloat m_TireSuspensionLength;
-	dCustomVehicleController::SuspensionType m_TireSuspensionType;
+	dWheelJoint::dSuspensionType m_TireSuspensionType;
 	dFloat m_TireBrakesTorque;
 	dFloat m_tirePivotOffset;
 	dFloat m_transmissionGearRatio0;
@@ -109,7 +109,7 @@ static CarDefinition monsterTruck =
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dCustomVehicleController::m_confort,		//TIRE_SUSPENSION_TYPE
+	dWheelJoint::m_confort,						//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -151,7 +151,7 @@ static CarDefinition viper =
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dCustomVehicleController::m_confort,		//TIRE_SUSPENSION_TYPE
+	dWheelJoint::m_confort,						//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -371,7 +371,7 @@ class SuperCarEntity: public DemoEntity
 		tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
-		dCustomVehicleController::dTireInfo tireInfo;
+		dWheelJoint::dTireInfo tireInfo;
 
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.m_tireMass;
@@ -389,7 +389,7 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
 		
 		dWheelJoint* const tireJoint = m_controller->AddTire (tireInfo);
-		NewtonBody* const tireBody = m_controller->GetTireBody (tireJoint); 
+		NewtonBody* const tireBody = tireJoint->GetTireBody (); 
 		NewtonBodySetUserData (tireBody, tirePart);
 
 		return tireJoint;
@@ -405,13 +405,13 @@ class SuperCarEntity: public DemoEntity
 			dMatrix matrix;
 			dMatrix parentMatrix;
 
-			const dWheelJoint* const part = node->GetInfo();
-			NewtonBody* const body = m_controller->GetTireBody (part);
+			const dWheelJoint* const tire = node->GetInfo();
+			NewtonBody* const tireBody = tire->GetTireBody ();
 
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 			NewtonBodyGetMatrix(chassisBody, &parentMatrix[0][0]);
 
-			DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(body);
+			DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(tireBody);
 			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
 			matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
 
@@ -1050,39 +1050,35 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		const char* GetUserDataName(const NewtonBody* const body) const
 		{
-			dAssert (0);
-			return NULL;
-/*
 			static char* tire = "tireMesh";
 			static char* engine = "engineMesh";
 			static char* chassis = "chassisMesh";
 			static char* differential = "differentialMesh";
 
-			if (m_vehicle->GetChassis()->GetBody() == body) {
+			if (m_vehicle->GetBody() == body) {
 				return chassis;
 			}
 
-			if (m_vehicle->GetEnginePart()->GetBody() == body) {
+			if (m_vehicle->GetEngineJoint()->GetEngineBody() == body) {
 				return engine;
 			}
 
-			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
-				const dCustomVehicleController::dBodyPartTire& tirePart = node->GetInfo();
-				if (tirePart.GetBody() == body) {
+			for (dList<dWheelJoint*>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
+				const dWheelJoint* const tirePart = node->GetInfo();
+				if (tirePart->GetTireBody() == body) {
 					return tire;
 				}
 			}
 
-			for (dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
-				const dCustomVehicleController::dBodyPartDifferential& differentialPart = node->GetInfo();
-				if (differentialPart.GetBody() == body) {
+			for (dList<dDifferentialJoint*>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
+				const dDifferentialJoint* const differentialPart = node->GetInfo();
+				if (differentialPart->GetDifferentialBody() == body) {
 					return differential;
 				}
 			}
 
 			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
 			return entity ? entity->GetName().GetStr() : NULL;
-*/
 		}
 
 		const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
