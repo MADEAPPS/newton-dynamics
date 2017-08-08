@@ -868,7 +868,7 @@ void dCustomVehicleController::dBodyPartEngine::ApplyTorque(dFloat torqueMag)
 	dVector torque(matrix.m_right.Scale(torqueMag));
 	NewtonBodyAddTorque(engine, &torque[0]);
 }
-*/
+
 
 dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential()
 	:dBodyPart()
@@ -879,7 +879,6 @@ dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential()
 void dCustomVehicleController::dBodyPartDifferential::Init(dCustomVehicleController* const controller, dFloat mass, dFloat inertia)
 {
 	dAssert (0);
-/*
 	dMatrix matrix;
 	dVector origin;
 
@@ -913,7 +912,7 @@ void dCustomVehicleController::dBodyPartDifferential::Init(dCustomVehicleControl
 	pinMatrix.m_up = matrix.m_right;
 	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
 	m_joint = new dDifferentialJoint(pinMatrix, m_body, chassisBody);
-*/
+
 }
 
 dCustomVehicleController::dBodyPartDifferential::~dBodyPartDifferential()
@@ -932,7 +931,7 @@ void dCustomVehicleController::dBodyPartDifferential::ProjectError()
 	dDifferentialJoint* const joint = (dDifferentialJoint*)m_joint;
 	joint->ProjectError();
 }
-
+*/
 
 void dCustomVehicleController::dEngineInfo::ConvertToMetricSystem()
 {
@@ -964,7 +963,7 @@ void dCustomVehicleController::dEngineInfo::ConvertToMetricSystem()
 	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
 }
 
-dCustomVehicleController::dEngineController::dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dBodyPartDifferential* const differential, dWheelJoint* const crownGearCalculator)
+dCustomVehicleController::dEngineController::dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator)
 	:dController(controller)
 	,m_info(info)
 	,m_infoCopy(info)
@@ -1377,8 +1376,9 @@ void dCustomVehicleController::dSteeringController::AddTire (dWheelJoint* const 
 	m_tires.Append(tire);
 }
 
-dCustomVehicleController::dTractionSteeringController::dTractionSteeringController(dCustomVehicleController* const controller, dBodyPartDifferential* const differential)
+dCustomVehicleController::dTractionSteeringController::dTractionSteeringController(dCustomVehicleController* const controller, dDifferentialJoint* const differential)
 	:dSteeringController(controller)
+	,m_differential(differential)
 {
 	dAssert(0);
 }
@@ -1817,12 +1817,12 @@ dList<dWheelJoint*>::dListNode* dCustomVehicleController::GetNextTire(dList<dWhe
 	return tireNode->GetNext();
 }
 
-dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* dCustomVehicleController::GetFirstDifferential() const
+dList<dDifferentialJoint*>::dListNode* dCustomVehicleController::GetFirstDifferential() const
 {
 	return m_differentialList.GetFirst();
 }
 
-dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* dCustomVehicleController::GetNextDifferential(dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* const differentialNode) const
+dList<dDifferentialJoint*>::dListNode* dCustomVehicleController::GetNextDifferential(dList<dDifferentialJoint*>::dListNode* const differentialNode) const
 {
 	return differentialNode->GetNext();
 }
@@ -1984,7 +1984,7 @@ NewtonBody* dCustomVehicleController::GetTireBody(const dWheelJoint* const tireJ
 }
 
 
-dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
+dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
 {
 	dAssert (0);
 	return NULL;
@@ -2026,7 +2026,7 @@ dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDi
 */
 }
 
-dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDifferential(dBodyPartDifferential* const leftDifferential, dBodyPartDifferential* const rightDifferential)
+dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential)
 {
 	dAssert(0);
 	return NULL;
@@ -2697,10 +2697,6 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
-//		for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
-//			dBodyPart* const bodyPart = bodyPartNode->GetInfo();
-//			bodyPart->ProjectError();
-//		}
 		if (m_engine) {
 			dAssert (0);
 			m_engine->ProjectError();
