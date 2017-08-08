@@ -2253,23 +2253,23 @@ int dCustomVehicleControllerManager::Collide(dWheelJoint* const tire, int thread
 
 	const NewtonWorld* const world = GetWorld();
 	const NewtonBody* const tireBody = tire->GetBody0();
-//	const NewtonBody* const vehicleBody = tire->GetBody1();
+	const NewtonBody* const vehicleBody = tire->GetBody1();
 	dAssert (tireBody == tire->GetTireBody());
 	dCustomVehicleController* const controller = tire->GetController();
 
-//	NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
-//	NewtonBodyGetMatrix(vehicleBody, &chassisMatrix[0][0]);
-	tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-
+	NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
+	NewtonBodyGetMatrix(vehicleBody, &chassisMatrix[0][0]);
+//	tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 //	const dVector& tireSidePin = tireMatrix.m_front;
-//	chassisMatrix.m_posit = chassisMatrix.TransformVector(tire->m_data.m_location) - tireSidePin.Scale (tire->m_data.m_pivotOffset);
-//	chassisMatrix.m_posit.m_w = 1.0f;
+	const dVector tireSidePin (tireMatrix.RotateVector(tire->GetMatrix0().m_front));
+	chassisMatrix = tire->GetMatrix1() * chassisMatrix;
+	chassisMatrix.m_posit += tireSidePin.Scale(tireSidePin.DotProduct3(tireMatrix.m_posit - chassisMatrix.m_posit));
 
 	dVector suspensionSpan (chassisMatrix.m_up.Scale(tire->m_suspensionLength));
 
 	dMatrix tireSweeptMatrix;
 	tireSweeptMatrix.m_up = chassisMatrix.m_up;
-	tireSweeptMatrix.m_right = tireMatrix.m_front.CrossProduct(chassisMatrix.m_up);
+	tireSweeptMatrix.m_right = tireSidePin.CrossProduct(chassisMatrix.m_up);
 	tireSweeptMatrix.m_right = tireSweeptMatrix.m_right.Scale(1.0f / dSqrt(tireSweeptMatrix.m_right.DotProduct3(tireSweeptMatrix.m_right)));
 	tireSweeptMatrix.m_front = tireSweeptMatrix.m_up.CrossProduct(tireSweeptMatrix.m_right);
 	tireSweeptMatrix.m_posit = chassisMatrix.m_posit + suspensionSpan;
@@ -2743,7 +2743,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 			for (dList<dWheelJoint*>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 				dWheelJoint* const tire = tireNode->GetInfo();
 				tire->ProjectError();
-//				manager->Collide(tire, threadIndex);
+				manager->Collide(tire, threadIndex);
 			}
 		}
 
