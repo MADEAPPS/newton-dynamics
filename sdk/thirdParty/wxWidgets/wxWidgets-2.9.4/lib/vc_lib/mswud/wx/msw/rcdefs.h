@@ -18,7 +18,6 @@
 
 
 
-#define WX_CPU_AMD64
 
 
 
@@ -31,6 +30,7 @@
 
 
 
+#define WX_CPU_X86
 
 
 

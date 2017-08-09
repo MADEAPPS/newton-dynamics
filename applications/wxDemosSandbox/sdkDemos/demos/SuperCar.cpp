@@ -531,8 +531,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
-/*
-		m_controller->AddEnginePart (engineInfo.m_mass, engineInfo.m_radio);
+		m_controller->AddEngineJoint (engineInfo.m_mass, engineInfo.m_radio);
 		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
@@ -546,7 +545,7 @@ class SuperCarEntity: public DemoEntity
 
 		// set the gear look up table
 		SetGearMap(engineControl);
-*/
+
 
 		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (definition.m_vehicleWeightDistribution);

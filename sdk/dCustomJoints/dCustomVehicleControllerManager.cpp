@@ -102,6 +102,7 @@ void dEngineJoint::ProjectError()
 
 	NewtonBody* const engineBody = GetBody0();
 	NewtonBody* const chassisBody = GetBody1();
+	dAssert (engineBody == GetEngineBody());
 		
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	dMatrix engineMatrix(m_baseOffsetMatrix * chassisMatrix);
@@ -501,7 +502,7 @@ dGearBoxJoint::dGearBoxJoint(const dVector& childPin, NewtonBody* const differen
 
 void dGearBoxJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
-dAssert (0);
+//xxxxx
 m_param = 0.0f;
 	if (m_param > 0.1f) {
 		dCustomGear::SubmitConstraints(timestep, threadIndex);
@@ -625,7 +626,6 @@ void dAxelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 
 
 /*
-
 dFloat dCustomVehicleController::dBodyPartTire::GetRPM() const
 {
 	dVector omega(0.0f); 
@@ -651,18 +651,6 @@ void dCustomVehicleController::dBodyPartTire::SetSteerAngle (dFloat angleParam, 
 			tire->m_steerAngle0 = tire->m_steerAngle1;
 		}
 	}
-}
-
-void dCustomVehicleController::dBodyPartTire::SetBrakeTorque(dFloat torque)
-{
-	dWheelJoint* const tire = (dWheelJoint*)m_joint;
-	tire->m_brakeTorque = dMax (torque, tire->m_brakeTorque);
-}
-
-void dCustomVehicleController::dBodyPartTire::ProjectError()
-{
-	dWheelJoint* const tire = (dWheelJoint*)m_joint;
-	tire->ProjectError();
 }
 
 dFloat dCustomVehicleController::dBodyPartTire::GetLateralSlip () const
@@ -735,86 +723,13 @@ void dCustomVehicleController::dFrictionModel::CalculateTireFrictionCoefficents(
 }
 
 /*
-dCustomVehicleController::dBodyPartEngine::dBodyPartEngine(dCustomVehicleController* const controller, dFloat mass, dFloat armatureRadius)
-	:dBodyPart()
-{
-	dAssert (0);
-
-	dMatrix matrix;
-	dVector origin;
-
-	m_parent = &controller->m_chassis;
-	m_controller = controller;
-
-	NewtonBody* const chassisBody = m_controller->GetBody();
-	NewtonWorld* const world = ((dCustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
-
-	// get engine location (place at the body center of mass)
-	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
-	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-
-//origin.m_y += 2.0f;
-	matrix.m_posit = matrix.TransformVector(origin);
-
-	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
-	NewtonCollisionSetMode(collision, 0);
-	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
-	NewtonDestroyCollision(collision);
-
-	// make engine inertia spherical (also make scale inertia but twice the radio for more stability)
-	const dFloat engineInertiaScale = 9.0f;
-	const dFloat inertia = 2.0f * engineInertiaScale * mass * armatureRadius * armatureRadius / 5.0f;
-	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
-
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_body, 0);
-	NewtonBodySetAngularDamping(m_body, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f * 2.0f);
-	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorqueCallback);
-
-	dMatrix pinMatrix (matrix);
-	pinMatrix.m_front = matrix.m_right;
-	pinMatrix.m_up = matrix.m_up;
-	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
-	m_joint = new dEngineJoint(pinMatrix, m_body, chassisBody);
-}
-
-dCustomVehicleController::dBodyPartEngine::~dBodyPartEngine()
-{
-}
-
-void dCustomVehicleController::dBodyPartEngine::ProjectError()
-{
-	dEngineJoint* const joint = (dEngineJoint*)m_joint;
-	joint->ProjectError();
-}
-
-void dCustomVehicleController::dBodyPartEngine::ApplyTorque(dFloat torqueMag)
-{
-	dMatrix matrix;
-	NewtonBody* const chassis = m_controller->GetBody();
-	NewtonBody* const engine = m_controller->m_engine->GetBody();
-	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
-	dVector torque(matrix.m_right.Scale(torqueMag));
-	NewtonBodyAddTorque(engine, &torque[0]);
-}
-
 void dCustomVehicleController::dBodyPartDifferential::SetTrackMode(bool mode, dFloat trackTurnSpeed)
 {
 	dDifferentialJoint* const joint = (dDifferentialJoint*)m_joint;
 	joint->m_isTractionDifferential = mode;
 	m_differentialSpeed = trackTurnSpeed;
 }
-
-void dCustomVehicleController::dBodyPartDifferential::ProjectError()
-{
-	dDifferentialJoint* const joint = (dDifferentialJoint*)m_joint;
-	joint->ProjectError();
-}
 */
-
-
 
 dCustomVehicleController::dEngineController::dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator)
 	:dController(controller)
@@ -830,21 +745,20 @@ dCustomVehicleController::dEngineController::dEngineController(dCustomVehicleCon
 	,m_ignitionKey(false)
 	,m_automaticTransmissionMode(true)
 {
-	dAssert (0);
-/*
 	dMatrix chassisMatrix;
 	dMatrix differentialMatrix;
-	NewtonBody* const chassisBody = controller->m_chassis.GetBody();
+
+	NewtonBody* const chassisBody = controller->GetBody();
 	NewtonBodyGetMatrix (chassisBody, &chassisMatrix[0][0]);
 	
-	NewtonBody* const engineBody = controller->m_engine->GetBody();
-	dAssert (engineBody == controller->m_engine->GetJoint()->GetBody0());
+	NewtonBody* const engineBody = controller->m_engine->GetBody0();
+	dAssert (engineBody == controller->m_engine->GetEngineBody());
 
-	NewtonBody* const differentialBody = m_differential->GetBody();
+	NewtonBody* const differentialBody = m_differential->GetBody0();
+	dAssert (differentialBody == m_differential->GetDifferentialBody());
 	NewtonBodyGetMatrix (engineBody, &differentialMatrix[0][0]);
 	m_gearBoxJoint = new dGearBoxJoint(chassisMatrix.m_right, differentialBody, engineBody, m_info.m_clutchFrictionTorque);
 	SetInfo(info);
-*/
 }
 
 dCustomVehicleController::dEngineController::~dEngineController()
@@ -858,8 +772,6 @@ dEngineInfo dCustomVehicleController::dEngineController::GetInfo() const
 
 void dCustomVehicleController::dEngineController::SetInfo(const dEngineInfo& info)
 {
-	dAssert (0);
-/*
 	m_info = info;
 	m_infoCopy = info;
 	m_info.m_clutchFrictionTorque = dMax (dFloat(10.0f), dAbs (m_info.m_clutchFrictionTorque));
@@ -875,13 +787,12 @@ void dCustomVehicleController::dEngineController::SetInfo(const dEngineInfo& inf
 		m_info.m_gearRatios[i + D_VEHICLE_FIRST_GEAR] = dAbs(info.m_gearRatios[i]);
 	}
 
-	for (dList<dBodyPartTire>::dListNode* tireNode = m_controller->m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-		dBodyPartTire& tire = tireNode->GetInfo();
-		dFloat angle = (1.0f / 30.0f) * (0.277778f) * info.m_vehicleTopSpeed / tire.m_data.m_radio;
-		NewtonBodySetMaxRotationPerStep(tire.GetBody(), angle);
+	for (dList<dWheelJoint*>::dListNode* tireNode = m_controller->m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+		dWheelJoint* const tire = tireNode->GetInfo();
+		dFloat angle = (1.0f / 30.0f) * (0.277778f) * info.m_vehicleTopSpeed / tire->m_radio;
+		NewtonBodySetMaxRotationPerStep(tire->GetTireBody(), angle);
 	}
 	m_controller->SetAerodynamicsDownforceCoefficient (info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
-*/
 }
 
 bool dCustomVehicleController::dEngineController::GetDifferentialLock() const
@@ -901,15 +812,13 @@ dFloat dCustomVehicleController::dEngineController::GetTopGear() const
 
 void dCustomVehicleController::dEngineController::InitEngineTorqueCurve()
 {
-	dAssert (0);
-/*
 	m_info.ConvertToMetricSystem();
 
 	dAssert(m_info.m_vehicleTopSpeed >= 0.0f);
 	dAssert(m_info.m_vehicleTopSpeed < 100.0f);
 
 	m_info.m_crownGearRatio = 1.0f;
-	dBodyPartTire* const tire = m_crownGearCalculator;
+	dWheelJoint* const tire = m_crownGearCalculator;
 	dAssert(tire);
 
 	// drive train geometrical relations
@@ -925,7 +834,7 @@ void dCustomVehicleController::dEngineController::InitEngineTorqueCurve()
 	// G0 = r * we / (G1 * s)
 	// using the top gear and the optimal engine torque for the calculations
 	dFloat topGearRatio = GetTopGear();
-	dFloat tireRadio = tire->GetInfo().m_radio;
+	dFloat tireRadio = tire->m_radio;
 	m_info.m_crownGearRatio = tireRadio * m_info.m_rpmAtPeakHorsePower / (m_info.m_vehicleTopSpeed * topGearRatio);
 
 	// bake crown gear with the engine power curve
@@ -942,13 +851,12 @@ void dCustomVehicleController::dEngineController::InitEngineTorqueCurve()
 	dFloat rpmStep = m_info.m_rpmAtIdleTorque;
 	m_info.m_viscousDrag = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE / (rpmStep * rpmStep);
 
-	m_info.m_torqueCurve[0] = dInfo::dTorqueNode (0.0f, m_info.m_idleTorque);
-	m_info.m_torqueCurve[1] = dInfo::dTorqueNode (m_info.m_rpmAtIdleTorque, m_info.m_idleTorque);
-	m_info.m_torqueCurve[2] = dInfo::dTorqueNode (m_info.m_rpmAtPeakTorque, m_info.m_peakTorque);
-	m_info.m_torqueCurve[3] = dInfo::dTorqueNode (m_info.m_rpmAtPeakHorsePower, m_info.m_peakPowerTorque);
-	m_info.m_torqueCurve[4] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
-	m_info.m_torqueCurve[5] = dInfo::dTorqueNode (m_info.m_rpmAtRedLine, m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
-*/
+	m_info.m_torqueCurve[0] = dTorqueNode (0.0f, m_info.m_idleTorque);
+	m_info.m_torqueCurve[1] = dTorqueNode (m_info.m_rpmAtIdleTorque, m_info.m_idleTorque);
+	m_info.m_torqueCurve[2] = dTorqueNode (m_info.m_rpmAtPeakTorque, m_info.m_peakTorque);
+	m_info.m_torqueCurve[3] = dTorqueNode (m_info.m_rpmAtPeakHorsePower, m_info.m_peakPowerTorque);
+	m_info.m_torqueCurve[4] = dTorqueNode (m_info.m_rpmAtRedLine, m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
+	m_info.m_torqueCurve[5] = dTorqueNode (m_info.m_rpmAtRedLine, m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
 }
 
 void dCustomVehicleController::dEngineController::PlotEngineCurve() const
@@ -1015,9 +923,9 @@ m_info.m_gearsCount = 4;
 void dCustomVehicleController::dEngineController::ApplyTorque(dFloat torqueMag)
 {
 	dMatrix matrix;
-	NewtonBody* const engine = m_engineJoint->GetBody0();
-	NewtonBody* const chassis = m_engineJoint->GetBody1();
-dAssert (0);
+	dEngineJoint* const engineJoint = m_controller->m_engine;
+	NewtonBody* const engine = engineJoint->GetBody0();
+	NewtonBody* const chassis = engineJoint->GetBody1();
 	dAssert (m_controller->GetBody() == chassis);
 	
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
@@ -1050,14 +958,12 @@ dFloat dCustomVehicleController::dEngineController::IntepolateTorque(dFloat rpm)
 
 void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 {
-	dAssert (0);
-/*
 	dFloat omega = GetRadiansPerSecond();
 	if (m_automaticTransmissionMode) {
 		UpdateAutomaticGearBox (timestep, omega);
 	}
 
-	dEngineJoint* const engineJoint = m_engineJoint;
+	dEngineJoint* const engineJoint = m_controller->m_engine;
 	if (m_ignitionKey) {
 		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
 			// handle idle gas valve 
@@ -1083,7 +989,7 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 
 	engineJoint->m_maxFriction = m_info.m_peakTorque;
 	engineJoint->SetRedLineRPM(m_info.m_rpmAtRedLine);
-*/
+
 }
 
 bool dCustomVehicleController::dEngineController::GetTransmissionMode() const
@@ -1155,10 +1061,12 @@ dFloat dCustomVehicleController::dEngineController::GetRadiansPerSecond() const
 
 //	NewtonBody* const chassis = m_controller->GetBody();
 //	NewtonBody* const engine = m_controller->m_engine->GetBody();
-dAssert(0);
-	NewtonBody* const engine = m_engineJoint->GetBody0();
-	NewtonBody* const chassis = m_engineJoint->GetBody1();
+
+	dEngineJoint* const engineJoint = m_controller->m_engine;
+	NewtonBody* const engine = engineJoint->GetBody0();
+	NewtonBody* const chassis = engineJoint->GetBody1();
 	dAssert(m_controller->GetBody() == chassis);
+	dAssert(engineJoint->GetEngineBody() == engine);
 
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
 	NewtonBodyGetOmega(engine, &omega[0]);
@@ -2008,15 +1916,53 @@ dEngineJoint* dCustomVehicleController::GetEngineJoint() const
 
 dEngineJoint* dCustomVehicleController::AddEngineJoint (dFloat mass, dFloat armatureRadius)
 {
-	dAssert(0);
-	return NULL;
-/*
-	m_engine = new dBodyPartEngine (this, mass, armatureRadius);
+	dMatrix matrix;
+	dVector origin;
 
-	m_bodyPartsList_____________.Append(m_engine);
-	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
+//	m_engine = new dBodyPartEngine (this, mass, armatureRadius);
+//	m_parent = &controller->m_chassis;
+//	m_controller = controller;
+//	NewtonBody* const chassisBody = m_controller->GetBody();
+//	NewtonWorld* const world = ((dCustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
+
+	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
+	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
+
+	// get engine location (place at the body center of mass)
+	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
+	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+
+	//origin.m_y += 2.0f;
+	matrix.m_posit = matrix.TransformVector(origin);
+
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+	NewtonCollisionSetMode(collision, 0);
+	NewtonBody* const engineBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+
+	// make engine inertia spherical (also make scale inertia but twice the radio for more stability)
+	const dFloat engineInertiaScale = 9.0f;
+	const dFloat inertia = 2.0f * engineInertiaScale * mass * armatureRadius * armatureRadius / 5.0f;
+	NewtonBodySetMassMatrix(engineBody, mass, inertia, inertia, inertia);
+
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(engineBody, 0);
+	NewtonBodySetAngularDamping(engineBody, &drag[0]);
+	NewtonBodySetMaxRotationPerStep(engineBody, 3.141692f * 2.0f);
+	NewtonBodySetForceAndTorqueCallback(engineBody, m_forceAndTorqueCallback);
+	NewtonDestroyCollision(collision);
+
+	dMatrix pinMatrix(matrix);
+	pinMatrix.m_front = matrix.m_right;
+	pinMatrix.m_up = matrix.m_up;
+	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
+	m_engine = new dEngineJoint(pinMatrix, engineBody, m_body);
+
+//	m_bodyPartsList.Append(m_engine);
+//	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
+	m_bodyList.Append(engineBody);
+	NewtonCollisionAggregateAddBody(m_collisionAggregate, engineBody);
 	return m_engine;
-*/
 }
 
 dVector dCustomVehicleController::GetTireNormalForce(const dWheelJoint* const tire) const
@@ -2613,7 +2559,6 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		if (!NewtonBodyGetSleepState(m_body)) {
 
 			if (m_engine) {
-				dAssert(0);
 				m_engine->ProjectError();
 			}
 

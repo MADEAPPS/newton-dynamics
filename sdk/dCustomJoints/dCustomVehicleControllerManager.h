@@ -422,7 +422,7 @@ class dCustomVehicleController: public dCustomControllerBase
 
 		dEngineInfo m_info;
 		dEngineInfo m_infoCopy;
-		dEngineJoint* m_engineJoint;
+		//dEngineJoint* m_engineJoint;
 		dCustomVehicleController* m_controller;
 		//dBodyPartTire* m_crownGearCalculator;
 		dWheelJoint* m_crownGearCalculator;
