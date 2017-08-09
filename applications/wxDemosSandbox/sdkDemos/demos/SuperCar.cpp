@@ -466,9 +466,9 @@ class SuperCarEntity: public DemoEntity
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
-/*
+
 		// add the engine, differential and transmission 
-		dCustomVehicleController::dEngineController::dInfo engineInfo;
+		dEngineInfo engineInfo;
 		engineInfo.m_mass = definition.m_engineMass; 
 		engineInfo.m_radio = definition.m_engineRotorRadio; 
 		engineInfo.m_vehicleTopSpeed = definition.m_vehicleTopSpeed;
@@ -492,7 +492,8 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_reverseGearRatio = definition.m_transmissionRevereGearRatio;
 		engineInfo.m_gearRatiosSign = 1.0f;
 
-		dCustomVehicleController::dBodyPartDifferential* differential = NULL;
+
+		dDifferentialJoint* differential = NULL;
 		switch (definition.m_differentialType) 
 		{
 			case 0:
@@ -513,8 +514,8 @@ class SuperCarEntity: public DemoEntity
 
 			default:
 			{
-				dCustomVehicleController::dBodyPartDifferential* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
-				dCustomVehicleController::dBodyPartDifferential* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
+				dDifferentialJoint* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
+				dDifferentialJoint* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
 				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
 
 				engineInfo.m_gearRatiosSign = -1.0f;
@@ -530,6 +531,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
+/*
 		m_controller->AddEnginePart (engineInfo.m_mass, engineInfo.m_radio);
 		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
@@ -992,9 +994,6 @@ class SuperCarEntity: public DemoEntity
 			glColor3f(0.0f, 1.0f, 0.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
-//if (!xxx)
-//dTrace(("%f ", tire.GetAligningTorque()));
-//xxx ++;
 		}
 		
 		glEnd();

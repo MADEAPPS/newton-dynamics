@@ -795,56 +795,6 @@ void dCustomVehicleController::dBodyPartEngine::ApplyTorque(dFloat torqueMag)
 	NewtonBodyAddTorque(engine, &torque[0]);
 }
 
-
-dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential()
-	:dBodyPart()
-	,m_differentialSpeed(0.0f)
-{
-}
-
-void dCustomVehicleController::dBodyPartDifferential::Init(dCustomVehicleController* const controller, dFloat mass, dFloat inertia)
-{
-	dAssert (0);
-	dMatrix matrix;
-	dVector origin;
-
-	m_parent = &controller->m_chassis;
-	m_controller = controller;
-
-	NewtonBody* const chassisBody = m_controller->GetBody();
-	NewtonWorld* const world = ((dCustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
-
-	// get engine location (place at the body center of mass)
-	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
-	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-	matrix.m_posit = matrix.TransformVector(origin);
-
-	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
-	NewtonCollisionSetMode(collision, 0);
-	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
-	NewtonDestroyCollision(collision);
-
-	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
-
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_body, 0);
-	NewtonBodySetAngularDamping(m_body, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f * 2.0f);
-	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorqueCallback);
-
-	dMatrix pinMatrix(matrix);
-	pinMatrix.m_front = matrix.m_front;
-	pinMatrix.m_up = matrix.m_right;
-	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
-	m_joint = new dDifferentialJoint(pinMatrix, m_body, chassisBody);
-
-}
-
-dCustomVehicleController::dBodyPartDifferential::~dBodyPartDifferential()
-{
-}
-
 void dCustomVehicleController::dBodyPartDifferential::SetTrackMode(bool mode, dFloat trackTurnSpeed)
 {
 	dDifferentialJoint* const joint = (dDifferentialJoint*)m_joint;
@@ -1880,91 +1830,151 @@ dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
 }
 
 
-
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
 {
-	dAssert (0);
-	return NULL;
-/*
+	dMatrix matrix;
+	dVector origin;
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
+
+//	dList<dBodyPartDifferential>::dListNode* const differentialNode = m_differentialList.Append();
+//	dBodyPartDifferential* const differential = &differentialNode->GetInfo();
+//	differential->Init(this, mass, Ixx);
+//	m_parent = &controller->m_chassis;
+//	m_controller = controller;
+//	NewtonBody* const chassisBody = m_controller->GetBody();
+//	NewtonWorld* const world = ((dCustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
+
+	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
+	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
+
+	// get engine location (place at the body center of mass)
+	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
+	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+	matrix.m_posit = matrix.TransformVector(origin);
+
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
+	NewtonCollisionSetMode(collision, 0);
+	NewtonBody* const differentialBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+
+	// use the tire mass to set the mass of the differential	
 	NewtonBodyGetMass(leftTire->GetBody0(), &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodySetMassMatrix(differentialBody, mass, Ixx, Ixx, Ixx);
 
-	dList<dBodyPartDifferential>::dListNode* const differentialNode = m_differentialList.Append();
-	dBodyPartDifferential* const differential = &differentialNode->GetInfo();
-	differential->Init(this, mass, Ixx);
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(differentialBody, 0);
+	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
+	NewtonBodySetMaxRotationPerStep(differentialBody, 3.141692f * 2.0f);
+	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
+	NewtonDestroyCollision(collision);
 
-	NewtonBody* const chassisBody = GetBody();
-	NewtonBody* const differentialBody = differential->GetBody();
+	dMatrix pinMatrix(matrix);
+	pinMatrix.m_front = matrix.m_front;
+	pinMatrix.m_up = matrix.m_right;
+	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
+	dDifferentialJoint* const differentialJoint = new dDifferentialJoint(pinMatrix, differentialBody, m_body);
+	m_differentialList.Append(differentialJoint);
 
-	m_bodyPartsList_____________.Append(differential);
+//	NewtonBody* const chassisBody = GetBody();
+//	NewtonBody* const differentialBody = differential->GetBody();
+//	m_bodyPartsList.Append(differential);
+
+	m_bodyList.Append(differentialBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
 
 	dMatrix chassisMatrix;
 	dMatrix differentialMatrix;
-	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
 	NewtonBodyGetMatrix(differentialBody, &differentialMatrix[0][0]);
 	
 	dMatrix leftTireMatrix;
 	NewtonBody* const leftTireBody = leftTire->GetBody0();
 	NewtonBodyGetMatrix(leftTireBody, &leftTireMatrix[0][0]);
 	leftTireMatrix = leftTire->GetMatrix0() * leftTireMatrix;
-	new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftTireBody, differentialBody, chassisBody);
+	new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftTireBody, differentialBody, m_body);
 
 	dMatrix rightTireMatrix;
 	NewtonBody* const rightTireBody = rightTire->GetBody0();
 	NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 	rightTireMatrix = rightTire->GetMatrix0() * rightTireMatrix;
-	new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightTireBody, differentialBody, chassisBody);
+	new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightTireBody, differentialBody, m_body);
 
-	return differential;
-*/
+	return differentialJoint;
 }
 
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential)
 {
-	dAssert(0);
-	return NULL;
-/*
+	dMatrix matrix;
+	dVector origin;
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
-	NewtonBodyGetMass(leftDifferential->GetBody(), &mass, &Ixx, &Iyy, &Izz);
 
-	dList<dBodyPartDifferential>::dListNode* const differentialNode = m_differentialList.Append();
-	dBodyPartDifferential* const differential = &differentialNode->GetInfo();
-	differential->Init(this, mass, Ixx);
+//	dList<dBodyPartDifferential>::dListNode* const differentialNode = m_differentialList.Append();
+//	dBodyPartDifferential* const differential = &differentialNode->GetInfo();
+//	differential->Init(this, mass, Ixx);
 
-	NewtonBody* const chassisBody = GetBody();
-	NewtonBody* const differentialBody = differential->GetBody();
+	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
+	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
 
-	m_bodyPartsList_____________.Append(differential);
+	// get engine location (place at the body center of mass)
+	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
+	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+	matrix.m_posit = matrix.TransformVector(origin);
+
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
+	NewtonCollisionSetMode(collision, 0);
+	NewtonBody* const differentialBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+
+	// use the tire mass to set the mass of the differential	
+	NewtonBodyGetMass(leftDifferential->GetBody0(), &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodySetMassMatrix(differentialBody, mass, Ixx, Ixx, Ixx);
+
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(differentialBody, 0);
+	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
+	NewtonBodySetMaxRotationPerStep(differentialBody, 3.141692f * 2.0f);
+	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
+	NewtonDestroyCollision(collision);
+
+	dMatrix pinMatrix(matrix);
+	pinMatrix.m_front = matrix.m_front;
+	pinMatrix.m_up = matrix.m_right;
+	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
+	dDifferentialJoint* const differentialJoint = new dDifferentialJoint(pinMatrix, differentialBody, m_body);
+	m_differentialList.Append(differentialJoint);
+
+//	NewtonBody* const chassisBody = GetBody();
+//	NewtonBody* const differentialBody = differential->GetBody();
+//	m_bodyPartsList.Append(differential);
+//	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
+
+	m_bodyList.Append(differentialBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
 
 	dMatrix chassisMatrix;
 	dMatrix differentialMatrix;
-	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
 	NewtonBodyGetMatrix(differentialBody, &differentialMatrix[0][0]);
 
 	dMatrix leftDifferentialMatrix;
-	NewtonBody* const leftDifferentialBody = leftDifferential->GetBody();
-	dAssert(leftDifferentialBody == leftDifferential->GetJoint()->GetBody0());
+	NewtonBody* const leftDifferentialBody = leftDifferential->GetBody0();
 	NewtonBodyGetMatrix(leftDifferentialBody, &leftDifferentialMatrix[0][0]);
-	leftDifferentialMatrix = leftDifferential->GetJoint()->GetMatrix0() * leftDifferentialMatrix;
-	new dAxelJoint(leftDifferentialMatrix[1], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftDifferentialBody, differentialBody, chassisBody);
+	leftDifferentialMatrix = leftDifferential->GetMatrix0() * leftDifferentialMatrix;
+	new dAxelJoint(leftDifferentialMatrix[1], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftDifferentialBody, differentialBody, m_body);
 
 	dMatrix rightDifferentialMatrix;
-	NewtonBody* const rightDifferentialBody = rightDifferential->GetBody();
-	dAssert(rightDifferentialBody == rightDifferential->GetJoint()->GetBody0());
+	NewtonBody* const rightDifferentialBody = rightDifferential->GetBody0();
 	NewtonBodyGetMatrix(rightDifferentialBody, &rightDifferentialMatrix[0][0]);
-	rightDifferentialMatrix = rightDifferential->GetJoint()->GetMatrix0() * rightDifferentialMatrix;
-	new dAxelJoint(rightDifferentialMatrix[1], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightDifferentialBody, differentialBody, chassisBody);
+	rightDifferentialMatrix = rightDifferential->GetMatrix0() * rightDifferentialMatrix;
+	new dAxelJoint(rightDifferentialMatrix[1], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightDifferentialBody, differentialBody, m_body);
 
-	return differential;
-*/
+	return differentialJoint;
 }
 
 
@@ -2594,12 +2604,19 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
-		if (m_engine) {
-			dAssert (0);
-			m_engine->ProjectError();
-		}
 
 		if (!NewtonBodyGetSleepState(m_body)) {
+
+			if (m_engine) {
+				dAssert(0);
+				m_engine->ProjectError();
+			}
+
+			for (dList<dDifferentialJoint*>::dListNode* diffNode = m_differentialList.GetFirst(); diffNode; diffNode = diffNode->GetNext()) {
+				dDifferentialJoint* const diff = diffNode->GetInfo();
+				diff->ProjectError();
+			}
+
 			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 			for (dList<dWheelJoint*>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 				dWheelJoint* const tire = tireNode->GetInfo();
