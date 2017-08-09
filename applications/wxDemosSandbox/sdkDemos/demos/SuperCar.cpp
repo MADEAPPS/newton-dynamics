@@ -492,7 +492,6 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_reverseGearRatio = definition.m_transmissionRevereGearRatio;
 		engineInfo.m_gearRatiosSign = 1.0f;
 
-
 		dDifferentialJoint* differential = NULL;
 		switch (definition.m_differentialType) 
 		{

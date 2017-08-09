@@ -66,7 +66,7 @@ struct CarDefinition
 	dFloat m_TireSuspensionSpringConstant;
 	dFloat m_TireSuspensionDamperConstant;
 	dFloat m_TireSuspensionLength;
-	dCustomVehicleController::SuspensionType m_TireSuspensionType;
+	dSuspensionType m_TireSuspensionType;
 	dFloat m_TireBrakesTorque;
 	dFloat m_tirePivotOffset;
 	dFloat m_transmissionGearRatio0;
@@ -108,7 +108,7 @@ static CarDefinition monsterTruck =
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dCustomVehicleController::m_confort,		//TIRE_SUSPENSION_TYPE
+	dSuspensionType::m_confort,					//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -150,7 +150,7 @@ static CarDefinition viper =
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dCustomVehicleController::m_confort,		//TIRE_SUSPENSION_TYPE
+	dSuspensionType::m_confort,					//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -370,7 +370,7 @@ class SuperCarEntity: public DemoEntity
 		tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
-		dCustomVehicleController::dTireInfo tireInfo;
+		dTireInfo tireInfo;
 
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.m_tireMass;
@@ -388,7 +388,7 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
 
 		dWheelJoint* const tireJoint = m_controller->AddTire (tireInfo);
-		NewtonBody* const tireBody = m_controller->GetTireBody (tireJoint); 
+		NewtonBody* const tireBody = tireJoint->GetTireBody (); 
 		NewtonBodySetUserData (tireBody, tirePart);
 
 		return tireJoint;
@@ -404,13 +404,13 @@ class SuperCarEntity: public DemoEntity
 			dMatrix matrix;
 			dMatrix parentMatrix;
 
-			const dWheelJoint* const part = node->GetInfo();
-			NewtonBody* const body = m_controller->GetTireBody (part);
+			const dWheelJoint* const tire = node->GetInfo();
+			NewtonBody* const tireBody = tire->GetTireBody ();
 
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 			NewtonBodyGetMatrix(chassisBody, &parentMatrix[0][0]);
 
-			DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(body);
+			DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(tireBody);
 			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
 			matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
 
@@ -442,7 +442,14 @@ class SuperCarEntity: public DemoEntity
 		dWheelJoint* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		
-/*
+		// add a steering Wheel component
+		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller);
+		steering->AddTire(leftFrontTire);
+		steering->AddTire(rightFrontTire);
+		steering->AddTire(leftRearTire);
+		steering->AddTire(rightRearTire);
+		m_controller->SetSteering(steering);
+
 		// add vehicle brakes
 		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
@@ -451,14 +458,16 @@ class SuperCarEntity: public DemoEntity
 		brakes->AddTire (rightRearTire);
 		m_controller->SetBrakes(brakes);
 
+
 		// add vehicle hand brakes
 		dCustomVehicleController::dBrakeController* const handBrakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
+
 		// add the engine, differential and transmission 
-		dCustomVehicleController::dEngineController::dInfo engineInfo;
+		dEngineInfo engineInfo;
 		engineInfo.m_mass = definition.m_engineMass; 
 		engineInfo.m_radio = definition.m_engineRotorRadio; 
 		engineInfo.m_vehicleTopSpeed = definition.m_vehicleTopSpeed;
@@ -482,7 +491,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_reverseGearRatio = definition.m_transmissionRevereGearRatio;
 		engineInfo.m_gearRatiosSign = 1.0f;
 
-		dCustomVehicleController::dBodyPartDifferential* differential = NULL;
+		dDifferentialJoint* differential = NULL;
 		switch (definition.m_differentialType) 
 		{
 			case 0:
@@ -503,22 +512,14 @@ class SuperCarEntity: public DemoEntity
 
 			default:
 			{
-				dCustomVehicleController::dBodyPartDifferential* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
-				dCustomVehicleController::dBodyPartDifferential* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
+				dDifferentialJoint* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
+				dDifferentialJoint* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
 				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
 
 				engineInfo.m_gearRatiosSign = -1.0f;
 			}
 		}
 		dAssert(differential);
-
-		// add a steering Wheel component
-		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller, differential);
-		steering->AddTire(leftFrontTire);
-		steering->AddTire(rightFrontTire);
-		steering->AddTire(leftRearTire);
-		steering->AddTire(rightRearTire);
-		m_controller->SetSteering(steering);
 
 
 		engineInfo.m_differentialLock = 0;
@@ -528,7 +529,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
-		m_controller->AddEnginePart (engineInfo.m_mass, engineInfo.m_radio);
+		m_controller->AddEngineJoint (engineInfo.m_mass, engineInfo.m_radio);
 		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
@@ -542,7 +543,7 @@ class SuperCarEntity: public DemoEntity
 
 		// set the gear look up table
 		SetGearMap(engineControl);
-*/
+
 
 		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (definition.m_vehicleWeightDistribution);
