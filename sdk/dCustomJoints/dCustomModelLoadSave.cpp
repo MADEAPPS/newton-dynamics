@@ -478,8 +478,12 @@ NewtonBody* dCustomJointSaveLoad::Load()
 	dTree<NewtonBody*, int> bodyMap;
 	dTree<dCustomJoint*, int> jointMap;
 
+#ifdef _DEBUG
 	const char* token = NextToken();
 	dAssert(!strcmp(token, "rootNode:"));
+#else
+	NextToken();
+#endif
 	int rootBodyIndex = LoadInt();
 
 	LoadBodyList(bodyMap);

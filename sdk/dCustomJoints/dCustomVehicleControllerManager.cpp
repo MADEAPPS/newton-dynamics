@@ -515,8 +515,13 @@ m_param = 0.0f;
 void dGearBoxJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
 	m_param = 0.0f;
+#ifdef _DEBUG
 	const char* token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "clutchFrictionTorque:"));
+#else
+	fileLoader->NextToken();
+#endif
+
 	m_cluthFrictionTorque = fileLoader->LoadFloat();
 }
 

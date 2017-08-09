@@ -120,8 +120,12 @@ void dCustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 
 void dCustomGear::Load(dCustomJointSaveLoad* const fileLoader)
 {
+#ifdef _DEBUG
 	const char* token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "gearRatio:"));
+#else
+	fileLoader->NextToken();
+#endif
 	m_gearRatio = fileLoader->LoadFloat();
 }
 
