@@ -261,7 +261,7 @@ class SuperCarEntity: public DemoEntity
 		((dCustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
-	void SetGearMap(dCustomVehicleController::dEngineController* const engine)
+	void SetGearMap(dEngineController* const engine)
 	{
 		int start = engine->GetFirstGear();
 		int count = engine->GetLastGear() - start;
@@ -444,7 +444,7 @@ class SuperCarEntity: public DemoEntity
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 
 		// add a steering Wheel component
-		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller);
+		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
 		steering->AddTire(rightFrontTire);
 		steering->AddTire(leftRearTire);
@@ -452,7 +452,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
-		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
+		dBrakeController* const brakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
 		brakes->AddTire (rightFrontTire);
 		brakes->AddTire (leftRearTire);
@@ -461,7 +461,7 @@ class SuperCarEntity: public DemoEntity
 
 
 		// add vehicle hand brakes
-		dCustomVehicleController::dBrakeController* const handBrakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
+		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
@@ -531,7 +531,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
 		m_controller->AddEngineJoint (engineInfo.m_mass, engineInfo.m_radio);
-		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
+		dEngineController* const engineControl = new dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -566,10 +566,10 @@ class SuperCarEntity: public DemoEntity
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
-		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
-		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
-		dCustomVehicleController::dBrakeController* const handBrakes = m_controller->GetHandBrakes();
-		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
+		dEngineController* const engine = m_controller->GetEngine();
+		dBrakeController* const brakes = m_controller->GetBrakes();
+		dBrakeController* const handBrakes = m_controller->GetHandBrakes();
+		dSteeringController* const steering = m_controller->GetSteering();
 
 		// get the throttler input
 		dFloat joyPosX;
@@ -792,10 +792,10 @@ class SuperCarEntity: public DemoEntity
 		dAssert (0);
 		return 0;
 /*
-		const dCustomVehicleController::dBodyPart& chassis = *m_controller->GetChassis();
+		const dBodyPart& chassis = *m_controller->GetChassis();
 		//CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
 
-		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
+		dSteeringController* const steering = m_controller->GetSteering();
 
 		dMatrix matrix;
 		dVector veloc(0.0f);
@@ -862,11 +862,11 @@ class SuperCarEntity: public DemoEntity
 		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		//NewtonDemos* const mainWindow = scene->GetRootWindow();
 		 
-		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
-		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
+		dEngineController* const engine = m_controller->GetEngine();
+		dSteeringController* const steering = m_controller->GetSteering();
 		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
-		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
-		dCustomVehicleController::dBrakeController* const handBrakes = m_controller->GetHandBrakes();
+		dBrakeController* const brakes = m_controller->GetBrakes();
+		dBrakeController* const handBrakes = m_controller->GetHandBrakes();
 		if (!engine) {
 			return;
 		}
@@ -918,7 +918,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat Izz;
 		dFloat mass;
 
-		const dCustomVehicleController::dBodyPart* const chassis = m_controller->GetChassis ();
+		const dBodyPart* const chassis = m_controller->GetChassis ();
 		NewtonBody* const chassisBody = chassis->GetBody();
 		
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
@@ -960,8 +960,8 @@ class SuperCarEntity: public DemoEntity
 		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
 
 //int xxx = 0;
-		for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const dCustomVehicleController::dBodyPartTire* const tire = &node->GetInfo();
+		for (dList<dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const dBodyPartTire* const tire = &node->GetInfo();
 			NewtonBody* const tireBody = tire->GetBody();
 
 			dMatrix tireMatrix;
@@ -1344,7 +1344,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if (m_player) {
-			dCustomVehicleController::dEngineController* const engine = m_player->m_controller->GetEngine();
+			dEngineController* const engine = m_player->m_controller->GetEngine();
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
@@ -1392,7 +1392,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 	void SetAsPlayer (SuperCarEntity* const player)
 	{
-		dCustomVehicleController::dEngineController* const engine = player->m_controller->GetEngine();
+		dEngineController* const engine = player->m_controller->GetEngine();
 		if (engine) {
 			engine->SetIgnition(false);
 		}
