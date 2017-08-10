@@ -298,8 +298,6 @@ void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	fileSaver->SaveInt ("\tisTractionDifferential", int (m_isTractionDifferential));
 }
 
-
-
 dWheelJoint::dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, dCustomVehicleController* const controller, const dTireInfo& tireInfo)
 	:dCustomJoint(6, tireBody, chassisBody)
 	,m_lateralDir(0.0f)
@@ -488,8 +486,6 @@ void dWheelJoint::Debug(dDebugDisplay* const debugDisplay) const
 	debugDisplay->DrawFrame(matrix1);
 }
 
-
-
 dGearBoxJoint::dGearBoxJoint(const dVector& childPin, NewtonBody* const differential, NewtonBody* const engine, dFloat maxFrictionToque)
 	:dCustomGear(1, differential, engine)
 	,m_param (1.0f)
@@ -531,8 +527,6 @@ void dGearBoxJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	dCustomGear::Save(fileSaver);
 	fileSaver->SaveFloat("\tclutchFrictionTorque", m_cluthFrictionTorque);
 }
-
-
 
 dAxelJoint::dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
 	:dCustomGear(1.0f, childPin, parentPin, child, parent)
@@ -624,7 +618,6 @@ void dAxelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 }
 
 
-
 /*
 dFloat dBodyPartTire::GetRPM() const
 {
@@ -634,24 +627,6 @@ dFloat dBodyPartTire::GetRPM() const
 	return joint->m_lateralDir.DotProduct3(omega) * 9.55f;
 }
 
-
-void dBodyPartTire::SetSteerAngle (dFloat angleParam, dFloat timestep)
-{
-	dWheelJoint* const tire = (dWheelJoint*)m_joint;
-	tire->m_steerAngle1 = -angleParam * m_data.m_maxSteeringAngle;
-
-	if (tire->m_steerAngle0 < tire->m_steerAngle1) {
-		tire->m_steerAngle0 += tire->m_steerRate * timestep;
-		if (tire->m_steerAngle0 > tire->m_steerAngle1) {
-			tire->m_steerAngle0 = tire->m_steerAngle1;
-		}
-	} else if (tire->m_steerAngle0 > tire->m_steerAngle1) {
-		tire->m_steerAngle0 -= tire->m_steerRate * timestep;
-		if (tire->m_steerAngle0 < tire->m_steerAngle1) {
-			tire->m_steerAngle0 = tire->m_steerAngle1;
-		}
-	}
-}
 
 dFloat dBodyPartTire::GetLateralSlip () const
 {
@@ -1187,7 +1162,6 @@ void dCustomVehicleControllerManager::DrawSchematicCallback (const dCustomVehicl
 {
 }
 
-
 void dCustomVehicleController::DrawSchematic(dFloat scale) const
 {
 //	dAssert (0);
@@ -1489,24 +1463,6 @@ void dCustomVehicleController::Cleanup()
 	SetContactFilter(NULL);
 }
 
-/*
-const dBodyPart* dCustomVehicleController::GetChassis() const
-{
-	return &m_chassis;
-}
-
-dMatrix dCustomVehicleController::GetTransform() const
-{
-	dMatrix matrix;
-	NewtonBodyGetMatrix (m_chassis.GetBody(), &matrix[0][0]);
-	return matrix;
-}
-
-void dCustomVehicleController::SetTransform(const dMatrix& matrix)
-{
-	NewtonBodySetMatrixRecursive (m_chassis.GetBody(), &matrix[0][0]);
-}
-*/
 
 dEngineController* dCustomVehicleController::GetEngine() const
 {
@@ -1590,7 +1546,6 @@ dList<dDifferentialJoint*>::dListNode* dCustomVehicleController::GetNextDifferen
 {
 	return differentialNode->GetNext();
 }
-
 
 dList<NewtonBody*>::dListNode* dCustomVehicleController::GetFirstBodyPart() const
 {
@@ -1741,7 +1696,6 @@ dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, tireBody);
 	return joint;
 }
-
 
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
 {

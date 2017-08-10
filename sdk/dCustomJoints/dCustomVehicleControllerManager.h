@@ -367,10 +367,9 @@ class dVehicleController: public dCustomAlloc
 	mutable dFloat m_timer;
 };
 
-
 class dEngineController: public dVehicleController
 {
-public:
+	public:
 	CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator);
 	CUSTOM_JOINTS_API ~dEngineController();
 
@@ -405,7 +404,7 @@ public:
 
 	CUSTOM_JOINTS_API void PlotEngineCurve() const;
 
-protected:
+	protected:
 	dFloat GetTopGear() const;
 	dFloat GetRadiansPerSecond() const;
 	void InitEngineTorqueCurve();
@@ -468,11 +467,9 @@ class dBrakeController: public dVehicleController
 	friend class dCustomVehicleController;
 };
 
-
 class dCustomVehicleController: public dCustomControllerBase
 {
 	public:
-
 	CUSTOM_JOINTS_API void Finalize();
 	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dTireInfo& tireInfo);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire);
@@ -598,7 +595,6 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 
 	friend class dCustomVehicleController;
 };
-
 
 #endif 
 
