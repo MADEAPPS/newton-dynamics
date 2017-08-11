@@ -100,7 +100,7 @@ static VehicleParameters heavyTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dSuspensionType::m_offroad,			//TIRE_SUSPENSION_TYPE
+	m_offroad,							//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -152,7 +152,7 @@ static VehicleParameters lightTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dSuspensionType::m_offroad,			//TIRE_SUSPENSION_TYPE
+	m_offroad,						//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -239,7 +239,7 @@ static VehicleParameters m1a1Param =
 	2000.0f,							// SUSPENSION_SPRING
 	100.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dSuspensionType::m_offroad,			//TIRE_SUSPENSION_TYPE
+	m_offroad,							//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET

@@ -100,6 +100,17 @@ class dgTemplateVector
 		return (*this = dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 	}
 
+	DG_INLINE dgTemplateVector<T> operator* (const dgTemplateVector<T>& B) const
+	{
+		return dgTemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w * B.m_w);
+	}
+
+	DG_INLINE dgTemplateVector<T> operator*= (const dgTemplateVector<T>& B) const
+	{
+		return (*this = dgTemplateVector<T>(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
+	}
+
+
 	DG_INLINE dgTemplateVector<T> AddHorizontal() const
 	{
 		T val(m_x + m_y + m_z + m_w);
@@ -1167,6 +1178,11 @@ class dgVector
 		return _mm_sub_ps (m_type, A.m_type);	
 	}
 
+	DG_INLINE dgVector operator* (const dgVector& A) const
+	{
+		return _mm_mul_ps(m_type, A.m_type);
+	}
+
 	DG_INLINE dgVector &operator+= (const dgVector& A)
 	{
 		return (*this = _mm_add_ps (m_type, A.m_type));
@@ -1177,6 +1193,11 @@ class dgVector
 		return (*this = _mm_sub_ps (m_type, A.m_type));
 	}
 
+	DG_INLINE dgVector &operator*= (const dgVector& A)
+	{
+		return (*this = _mm_mul_ps(m_type, A.m_type));
+	}
+
 	// return dot product
 	DG_INLINE dgFloat32 DotProduct3 (const dgVector& A) const
 	{
@@ -1185,7 +1206,8 @@ class dgVector
 		#else
 			dgVector tmp (A & m_triplexMask);
 			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-			return CompProduct4(tmp).AddHorizontal().GetScalar();
+			//return CompProduct4(tmp).AddHorizontal().GetScalar();
+			return (*this * tmp).AddHorizontal().GetScalar();
 		#endif
 	}
 
@@ -1193,7 +1215,7 @@ class dgVector
 	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
 	{
 		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 1, 0, 2))),
-			_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
+			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
 	}
 
 	DG_INLINE dgVector DotProduct4(const dgVector& A) const
@@ -1201,7 +1223,8 @@ class dgVector
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return _mm_dp_ps(m_type, A.m_type, 0xff);
 		#else 
-			return CompProduct4(A).AddHorizontal();
+			//return CompProduct4(A).AddHorizontal();
+			return (*this * A).AddHorizontal().GetScalar();
 		#endif
 	}
 
@@ -1258,7 +1281,8 @@ class dgVector
 	// component wise multiplication
 	DG_INLINE dgVector CompProduct4 (const dgVector& A) const
 	{
-		return _mm_mul_ps (m_type, A.m_type);
+		//return _mm_mul_ps (m_type, A.m_type);
+		return *this * A;
 	}
 
 	DG_INLINE dgVector AddHorizontal () const
@@ -1315,7 +1339,8 @@ class dgVector
 	DG_INLINE dgVector InvSqrt () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
-		return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
+		//return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
+		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
 	}
 
 	DG_INLINE dgVector InvMagSqrt () const

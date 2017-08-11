@@ -122,9 +122,12 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector &front, const dgVector &up, const d
 }
 
 DG_INLINE dgMatrix::dgMatrix (const dgVector& p, const dgVector& q)
-	:m_front(q.CompProduct4(p.BroadcastX()))
-	,m_up(q.CompProduct4(p.BroadcastY()))
-	,m_right(q.CompProduct4(p.BroadcastZ()))
+//	:m_front(q.CompProduct4(p.BroadcastX()))
+//	,m_up(q.CompProduct4(p.BroadcastY()))
+//	,m_right(q.CompProduct4(p.BroadcastZ()))
+	:m_front(q * p.BroadcastX())
+	,m_up   (q * p.BroadcastY())
+	,m_right(q * p.BroadcastZ())
 	,m_posit (dgVector::m_wOne)
 {
 }
@@ -185,7 +188,8 @@ DG_INLINE dgMatrix dgMatrix::Transpose4X4 () const
 
 DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 {
-	return m_front.CompProduct4 (v.BroadcastX()) + m_up.CompProduct4 (v.BroadcastY()) + m_right.CompProduct4 (v.BroadcastZ());
+//	return m_front.CompProduct4 (v.BroadcastX()) + m_up.CompProduct4 (v.BroadcastY()) + m_right.CompProduct4 (v.BroadcastZ());
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ();
 }
 
 

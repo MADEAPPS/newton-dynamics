@@ -94,7 +94,8 @@ DG_INLINE dgPlane::dgPlane (const dgVector &P0, const dgVector &P1, const dgVect
 
 DG_INLINE dgPlane dgPlane::Scale (dgFloat32 s)	const
 {
-	return dgPlane (CompProduct4 (dgVector (s)));
+//	return dgPlane (CompProduct4 (dgVector (s)));
+	return dgPlane(*this * dgVector(s));
 }
 
 
