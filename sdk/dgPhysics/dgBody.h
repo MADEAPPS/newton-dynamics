@@ -598,7 +598,7 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 
 DG_INLINE void dgBody::ApplyGyroTorque ()
 {
-	dgVector gyroTorque (m_omega.CrossProduct3(m_matrix.RotateVector(m_mass.CompProduct4(m_matrix.UnrotateVector(m_omega)))));
+	dgVector gyroTorque (m_omega.CrossProduct3(m_matrix.RotateVector(m_mass * m_matrix.UnrotateVector(m_omega))));
 	SetTorque (GetTorque() - gyroTorque);
 }
 

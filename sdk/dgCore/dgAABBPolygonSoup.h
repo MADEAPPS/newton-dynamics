@@ -118,14 +118,14 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dgAssert(maxBox.m_y >= minBox.m_y);
 			dgAssert(maxBox.m_z >= minBox.m_z);
 
-			dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector::m_zero);
+			dgVector mask ((minBox * maxBox) < dgVector::m_zero);
 			dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 			dist = dist.GetMin(dist.ShiftTripleRight());
 			dist = dist.GetMin(dist.ShiftTripleRight());
 
 			if (dist.GetScalar() > dgFloat32 (0.0f)) {
-				dgVector origin ((p1 + p0).CompProduct4(dgVector::m_half));
-				dgVector size ((p1 - p0).CompProduct4(dgVector::m_half));
+				dgVector origin (dgVector::m_half * (p1 + p0));
+				dgVector size (dgVector::m_half * (p1 - p0));
 
 				origin = obb.UntransformVector(origin);
 				size = obb.m_absDir.RotateVector(size);
@@ -136,7 +136,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				dgAssert(maxBox1.m_x >= minBox1.m_x);
 				dgAssert(maxBox1.m_y >= minBox1.m_y);
 				dgAssert(maxBox1.m_z >= minBox1.m_z);
-				dgVector mask1 ((minBox1.CompProduct4(maxBox1)) < dgVector::m_zero);
+				dgVector mask1 ((minBox1 * maxBox1) < dgVector::m_zero);
 				dgVector dist1 (maxBox1.GetMin (minBox1.Abs()) & mask1);
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
@@ -144,7 +144,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			} else {
 				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
 				dist = p1p0.DotProduct4(p1p0);
-				dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
+				dist = dist.Sqrt() * dgVector::m_negOne;
 			}
 			return	dist.GetScalar();
 		}
@@ -157,8 +157,8 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dgVector maxBox (p1 - obb.m_p0);
 			dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
 			if (dist < dgFloat32 (1.0f)) {
-				dgVector origin ((p1 + p0).CompProduct4(dgVector::m_half));
-				dgVector size ((p1 - p0).CompProduct4(dgVector::m_half));
+				dgVector origin (dgVector::m_half * (p1 + p0));
+				dgVector size (dgVector::m_half * (p1 - p0));
 
 				origin = obb.UntransformVector(origin);
 				size = obb.m_absDir.RotateVector(size);
