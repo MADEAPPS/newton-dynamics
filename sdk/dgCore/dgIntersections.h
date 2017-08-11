@@ -107,7 +107,7 @@ DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxB
 	dgAssert(maxBox.m_y >= minBox.m_y);
 	dgAssert(maxBox.m_z >= minBox.m_z);
 
-	dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector::m_zero);
+	dgVector mask ((minBox * maxBox) < dgVector::m_zero);
 	dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 	dist = dist.GetMin(dist.ShiftTripleRight());
 	dist = dist.GetMin(dist.ShiftTripleRight());
@@ -119,7 +119,7 @@ DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVect
 	dgAssert(maxBox.m_x >= minBox.m_x);
 	dgAssert(maxBox.m_y >= minBox.m_y);
 	dgAssert(maxBox.m_z >= minBox.m_z);
-	dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector::m_zero);
+	dgVector mask ((minBox * maxBox) > dgVector::m_zero);
 	dgVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
 	return dist.DotProduct4(dist).GetScalar();
 }
@@ -161,8 +161,10 @@ class dgFastRayTest
 		if (test.GetSignMask() & 0x07) {
 			return 0;
 		}
-		dgVector tt0((minBox - m_p0).CompProduct4(m_dpInv));
-		dgVector tt1((maxBox - m_p0).CompProduct4(m_dpInv));
+
+		dgVector tt0(m_dpInv * (minBox - m_p0));
+		dgVector tt1(m_dpInv * (maxBox - m_p0));
+
 		dgVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
 		dgVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
 		t0 = t0.GetMax(t0.ShiftTripleRight());
@@ -209,8 +211,8 @@ class dgFastRayTest
 		if (test.GetSignMask() & 0x07) {
 			return dgFloat32(1.2f);
 		}
-		dgVector tt0((minBox - m_p0).CompProduct4(m_dpInv));
-		dgVector tt1((maxBox - m_p0).CompProduct4(m_dpInv));
+		dgVector tt0(m_dpInv * (minBox - m_p0));
+		dgVector tt1(m_dpInv * (maxBox - m_p0));
 		dgVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
 		dgVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
 		t0 = t0.GetMax(t0.ShiftTripleRight());
@@ -261,13 +263,14 @@ class dgFastAABBInfo: public dgObb
 	}
 
 	DG_INLINE dgFastAABBInfo(const dgVector& p0, const dgVector& p1)
-		:dgObb(dgGetIdentityMatrix(), (p1 - p0).CompProduct4(dgVector::m_half))
+		:dgObb(dgGetIdentityMatrix(), dgVector::m_half * (p1 - p0))
 		,m_separationDistance(dgFloat32(1.0e10f))
 		,m_absDir(dgGetIdentityMatrix())
 		,m_p0(p0)
 		,m_p1(p1)
 	{
-		m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
+		//m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
+		m_posit = ((dgVector::m_half * (p1 + p0)) & dgVector::m_triplexMask) | dgVector::m_wOne;
 	}
 
 	DG_INLINE void SetTransposeAbsMatrix (const dgMatrix& matrix)
@@ -303,8 +306,7 @@ class dgFastAABBInfo: public dgObb
 		dgVector minBox;
 		dgVector maxBox;
 		MakeBox1 (indexCount, indexArray, stride, vertexArray, minBox, maxBox);
-//		dgFloat32 dist0 = BoxPenetration (minBox, maxBox);
-		dgVector mask((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
+		dgVector mask(minBox * maxBox < dgVector(dgFloat32(0.0f)));
 		dgVector dist(maxBox.GetMin(minBox.Abs()) & mask);
 		dist = dist.GetMin(dist.ShiftTripleRight());
 		dist = dist.GetMin(dist.ShiftTripleRight());
@@ -312,8 +314,7 @@ class dgFastAABBInfo: public dgObb
 		if (dist0 > dgFloat32 (0.0f)) {
 			dgMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
 			MakeBox2 (faceMatrix, indexCount, indexArray, stride, vertexArray, minBox, maxBox);
-			//dgFloat32 dist1 = BoxPenetration (minBox, maxBox);
-			dgVector mask2((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
+			dgVector mask2(minBox * maxBox < dgVector(dgFloat32(0.0f)));
 			dgVector dist2(maxBox.GetMin(minBox.Abs()) & mask2);
 			dist2 = dist2.GetMin(dist2.ShiftTripleRight());
 			dist2 = dist2.GetMin(dist2.ShiftTripleRight());
@@ -322,13 +323,13 @@ class dgFastAABBInfo: public dgObb
 			if (dist0 <= dgFloat32(0.0f)) {
 				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask2));
 				dist2 = p1p0.DotProduct4(p1p0);
-				dist2 = (dist2.Sqrt()).CompProduct4(dgVector::m_negOne);
+				dist2 = dist2.Sqrt() * dgVector::m_negOne;
 				dist0 = dist2.GetScalar();
 			}
 		} else {
 			dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
 			dist = p1p0.DotProduct4(p1p0);
-			dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
+			dist = dist.Sqrt() * dgVector::m_negOne;
 			dist0 = dist.GetScalar();
 		}
 		return	dist0;
@@ -378,7 +379,7 @@ class dgFastAABBInfo: public dgObb
 
 		faceMatrix[0] = faceNormal;
 		faceMatrix[1] = dgVector (&vertexArray[indexArray[1] * stride]) - origin;
-		faceMatrix[1] = faceMatrix[1].CompProduct4 (faceMatrix[1].DotProduct4(faceMatrix[1]).InvSqrt());
+		faceMatrix[1] = faceMatrix[1] * (faceMatrix[1].DotProduct4(faceMatrix[1]).InvSqrt());
 		faceMatrix[2] = faceMatrix[0].CrossProduct3(faceMatrix[1]);
 		faceMatrix[3] = origin | dgVector::m_wOne; 
 		return faceMatrix.Inverse();
