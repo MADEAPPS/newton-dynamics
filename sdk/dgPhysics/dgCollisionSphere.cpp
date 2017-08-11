@@ -160,9 +160,9 @@ void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, co
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
 
-		p01 = p01.CompProduct4(p01.InvMagSqrt());
-		p12 = p12.CompProduct4(p12.InvMagSqrt());
-		p20 = p20.CompProduct4(p20.InvMagSqrt());
+		p01 = p01 * p01.InvMagSqrt();
+		p12 = p12 * p12.InvMagSqrt();
+		p20 = p20 * p20.InvMagSqrt();
 
 		dgAssert (dgAbsf (p01.DotProduct3(p01) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgAssert (dgAbsf (p12.DotProduct3(p12) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
