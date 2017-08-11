@@ -176,6 +176,9 @@ void dCustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const 
 	m_maxDof = maxDOF;
 	m_autoDestroy = 0;
 	m_stiffness = 1.0f;
+	m_localMatrix0 = dGetIdentityMatrix();
+	m_localMatrix1 = dGetIdentityMatrix();
+
 	m_world	= body0 ? NewtonBodyGetWorld (body0) : NewtonBodyGetWorld (body1);
 	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, m_body0, m_body1); 
 

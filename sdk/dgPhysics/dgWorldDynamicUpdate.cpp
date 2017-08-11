@@ -611,12 +611,21 @@ dgInt32 dgWorldDynamicUpdate::CompareClusters(const dgBodyCluster* const cluster
 
 dgInt32 dgWorldDynamicUpdate::CompareJointByInvMass (const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed)
 {
-	dgFloat32 invMass0 = dgMin (jointA->GetBody0()->m_invMass.m_w, jointA->GetBody1()->m_invMass.m_w);
-	dgFloat32 invMass1 = dgMin (jointB->GetBody0()->m_invMass.m_w, jointB->GetBody1()->m_invMass.m_w);
-	if (invMass0 < invMass1) {
+	dgInt32 modeA = jointA->m_solverModel;
+	dgInt32 modeB = jointB->m_solverModel;
+
+	if (modeA < modeB) {
 		return -1;
-	} else if (invMass0 > invMass1) {
+	} else if (modeA > modeB) {
 		return 1;
+	} else {
+		dgFloat32 invMassA = dgMin (jointA->GetBody0()->m_invMass.m_w, jointA->GetBody1()->m_invMass.m_w);
+		dgFloat32 invMassB = dgMin (jointB->GetBody0()->m_invMass.m_w, jointB->GetBody1()->m_invMass.m_w);
+		if (invMassA < invMassB) {
+			return -1;
+		} else if (invMassA > invMassB) {
+			return 1;
+		}
 	}
 	return 0;
 }

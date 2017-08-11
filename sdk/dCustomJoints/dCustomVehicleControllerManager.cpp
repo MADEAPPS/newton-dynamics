@@ -29,6 +29,7 @@ IMPLEMENT_CUSTOM_JOINT(dAxelJoint);
 IMPLEMENT_CUSTOM_JOINT(dWheelJoint);
 IMPLEMENT_CUSTOM_JOINT(dEngineJoint);
 IMPLEMENT_CUSTOM_JOINT(dGearBoxJoint);
+IMPLEMENT_CUSTOM_JOINT(dEngineMountJoint);
 IMPLEMENT_CUSTOM_JOINT(dDifferentialJoint);
 
 #define D_VEHICLE_NEUTRAL_GEAR						0
@@ -74,10 +75,91 @@ void dEngineInfo::ConvertToMetricSystem()
 
 
 dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
-	:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
+	:dCustomJoint(1, engineBody, NULL)
 	,m_maxRPM(50.0f)
 	,m_minFriction(-10.0f)
 	,m_maxFriction( 10.0f)
+{
+	SetSolverModel(1);
+	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+}
+
+void dEngineJoint::SetRedLineRPM(dFloat redLineRmp)
+{
+	m_maxRPM = dAbs(redLineRmp);
+}
+
+
+void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix engineMatrix;
+	dVector omega;
+
+	NewtonBody* const engineBody = GetEngineBody();
+
+	NewtonBodyGetOmega(engineBody, &omega[0]);
+	NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
+	
+	dVector pin (engineMatrix.RotateVector(GetMatrix0().m_front));
+	dFloat jointOmega = omega.DotProduct3(pin);
+
+	dFloat alpha = jointOmega / timestep;
+	NewtonUserJointAddAngularRow(m_joint, 0, &pin[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, -alpha);
+	if (jointOmega <= 0.0f) {
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+	} else if (jointOmega >= m_maxRPM) {
+		dFloat redLineAlpha = (m_maxRPM - jointOmega) / timestep;
+		NewtonUserJointSetRowAcceleration(m_joint, redLineAlpha);
+		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+	} else {
+		NewtonUserJointSetRowMinimumFriction(m_joint, m_minFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxFriction);
+	}
+	NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+}
+
+
+void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	dAssert (0);
+/*
+	const char* token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "maxRPM:"));
+	m_maxRPM = fileLoader->LoadFloat();
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "baseOffsetPosit:"));
+	dVector posit0(fileLoader->LoadVector());
+	posit0.m_w = 1.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "baseOffsetRotation:"));
+	dVector euler0(fileLoader->LoadVector());
+	euler0 = euler0.Scale(3.14159213f / 180.0f);
+	m_baseOffsetMatrix = dMatrix(euler0.m_x, euler0.m_y, euler0.m_z, posit0);
+*/
+}
+
+void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	dAssert (0);
+/*
+	dVector euler0;
+	dVector euler1;
+	dCustomHinge::Save (fileSaver);
+
+	m_baseOffsetMatrix.GetEulerAngles(euler0, euler1);
+	euler0 = euler0.Scale (180.0f / 3.141592f);
+	fileSaver->SaveFloat("\tmaxRPM", m_maxRPM);
+	fileSaver->SaveVector("\tbaseOffsetPosit", m_baseOffsetMatrix.m_posit);
+	fileSaver->SaveVector("\tbaseOffsetRotation", euler0);
+*/
+}
+
+
+dEngineMountJoint::dEngineMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
+	:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
 {
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
@@ -88,12 +170,8 @@ dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const en
 	m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
 }
 
-void dEngineJoint::SetRedLineRPM(dFloat redLineRmp)
-{
-	m_maxRPM = dAbs(redLineRmp);
-}
 
-void dEngineJoint::ProjectError()
+void dEngineMountJoint::ProjectError()
 {
 	dMatrix chassisMatrix;
 	dVector engineOmega(0.0f);
@@ -102,7 +180,6 @@ void dEngineJoint::ProjectError()
 
 	NewtonBody* const engineBody = GetBody0();
 	NewtonBody* const chassisBody = GetBody1();
-	dAssert (engineBody == GetEngineBody());
 		
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	dMatrix engineMatrix(m_baseOffsetMatrix * chassisMatrix);
@@ -121,26 +198,14 @@ void dEngineJoint::ProjectError()
 	NewtonBodySetOmegaNoSleep(engineBody, &projectOmega[0]);
 }
 
-void dEngineJoint::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
+void dEngineMountJoint::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	dFloat alpha = m_jointOmega / timestep;
-	NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
-	NewtonUserJointSetRowAcceleration(m_joint, -alpha);
-	if (m_jointOmega <= 0.0f) {
-		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-	} else if (m_jointOmega >= m_maxRPM) {
-		dFloat redLineAlpha = (m_maxRPM - m_jointOmega) / timestep;
-		NewtonUserJointSetRowAcceleration(m_joint, redLineAlpha);
-		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-	} else {
-		NewtonUserJointSetRowMinimumFriction(m_joint, m_minFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxFriction);
-	}
-	NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 }
 
-void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
+void dEngineMountJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
+	dAssert (0);
+/*
 	const char* token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "maxRPM:"));
 	m_maxRPM = fileLoader->LoadFloat();
@@ -155,10 +220,13 @@ void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
 	dVector euler0(fileLoader->LoadVector());
 	euler0 = euler0.Scale(3.14159213f / 180.0f);
 	m_baseOffsetMatrix = dMatrix(euler0.m_x, euler0.m_y, euler0.m_z, posit0);
+*/
 }
 
-void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
+void dEngineMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
+	dAssert (0);
+/*
 	dVector euler0;
 	dVector euler1;
 	dCustomHinge::Save (fileSaver);
@@ -168,8 +236,8 @@ void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	fileSaver->SaveFloat("\tmaxRPM", m_maxRPM);
 	fileSaver->SaveVector("\tbaseOffsetPosit", m_baseOffsetMatrix.m_posit);
 	fileSaver->SaveVector("\tbaseOffsetRotation", euler0);
+*/
 }
-
 
 dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
 	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
@@ -900,14 +968,12 @@ void dEngineController::ApplyTorque(dFloat torqueMag)
 	dMatrix matrix;
 	dEngineJoint* const engineJoint = m_controller->m_engine;
 	NewtonBody* const engine = engineJoint->GetBody0();
-	NewtonBody* const chassis = engineJoint->GetBody1();
-	dAssert (m_controller->GetBody() == chassis);
 	
-	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
-	dVector torque(matrix.m_right.Scale(torqueMag));
-	NewtonBodyAddTorque(engine, &torque[0]);
+	NewtonBodyGetMatrix(engine, &matrix[0][0]);
+	dVector pin (matrix.RotateVector (engineJoint->GetMatrix0().m_front));
 
-//	m_controller->m_engine->ApplyTorque(torque);
+	dVector torque(pin.Scale(torqueMag));
+	NewtonBodyAddTorque(engine, &torque[0]);
 }
 
 dFloat dEngineController::IntepolateTorque(dFloat rpm) const
@@ -1034,18 +1100,14 @@ dFloat dEngineController::GetRadiansPerSecond() const
 	dMatrix matrix;
 	dVector omega(0.0f);
 
-//	NewtonBody* const chassis = m_controller->GetBody();
-//	NewtonBody* const engine = m_controller->m_engine->GetBody();
-
 	dEngineJoint* const engineJoint = m_controller->m_engine;
 	NewtonBody* const engine = engineJoint->GetBody0();
-	NewtonBody* const chassis = engineJoint->GetBody1();
-	dAssert(m_controller->GetBody() == chassis);
 	dAssert(engineJoint->GetEngineBody() == engine);
 
-	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
 	NewtonBodyGetOmega(engine, &omega[0]);
-	return omega.DotProduct3(matrix.m_right);
+	NewtonBodyGetMatrix(engine, &matrix[0][0]);
+	dVector pin (matrix.RotateVector (engineJoint->GetMatrix0().m_front));
+	return omega.DotProduct3(pin);
 }
 
 dFloat dEngineController::GetRPM() const
@@ -1071,10 +1133,7 @@ dFloat dEngineController::GetSpeed() const
 
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
 	NewtonBodyGetVelocity(chassis, &veloc[0]);
-
-//	dVector pin (matrix.RotateVector (m_controller->m_localFrame.m_front));
-	dVector pin (matrix.m_front);
-	return pin.DotProduct3(veloc);
+	return veloc.DotProduct3(matrix.m_front);
 }
 
 dFloat dEngineController::GetTopSpeed() const
@@ -1438,8 +1497,6 @@ void dCustomVehicleController::Init(NewtonBody* const body, NewtonApplyForceAndT
 	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, m_body);
 
-//	m_chassis.Init(this, userData);
-//	m_bodyPartsList.Append(&m_chassis);
 	m_bodyList.Append(m_body);
 
 	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
@@ -1745,10 +1802,6 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 	dDifferentialJoint* const differentialJoint = new dDifferentialJoint(pinMatrix, differentialBody, m_body);
 	m_differentialList.Append(differentialJoint);
 
-//	NewtonBody* const chassisBody = GetBody();
-//	NewtonBody* const differentialBody = differential->GetBody();
-//	m_bodyPartsList.Append(differential);
-
 	m_bodyList.Append(differentialBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
 
@@ -1815,11 +1868,6 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint
 	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
 	dDifferentialJoint* const differentialJoint = new dDifferentialJoint(pinMatrix, differentialBody, m_body);
 	m_differentialList.Append(differentialJoint);
-
-//	NewtonBody* const chassisBody = GetBody();
-//	NewtonBody* const differentialBody = differential->GetBody();
-//	m_bodyPartsList.Append(differential);
-//	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
 
 	m_bodyList.Append(differentialBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
@@ -1911,9 +1959,8 @@ dEngineJoint* dCustomVehicleController::AddEngineJoint (dFloat mass, dFloat arma
 	pinMatrix.m_up = matrix.m_up;
 	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
 	m_engine = new dEngineJoint(pinMatrix, engineBody, m_body);
+	m_engine->m_engineMount = new dEngineMountJoint (pinMatrix, engineBody, m_body);
 
-//	m_bodyPartsList.Append(m_engine);
-//	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
 	m_bodyList.Append(engineBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, engineBody);
 	return m_engine;
@@ -2513,7 +2560,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		if (!NewtonBodyGetSleepState(m_body)) {
 
 			if (m_engine) {
-				m_engine->ProjectError();
+				m_engine->m_engineMount->ProjectError();
 			}
 
 			for (dList<dDifferentialJoint*>::dListNode* diffNode = m_differentialList.GetFirst(); diffNode; diffNode = diffNode->GetNext()) {

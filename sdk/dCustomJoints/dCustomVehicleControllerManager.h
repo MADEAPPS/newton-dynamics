@@ -27,6 +27,7 @@ class dAxelJoint;
 class dWheelJoint;
 class dEngineJoint;
 class dGearBoxJoint;
+class dEngineMountJoint;
 class dDifferentialJoint;
 class dCustomVehicleController;
 class dCustomVehicleControllerManager;
@@ -214,7 +215,27 @@ class dWheelJoint: public dCustomJoint
 	DECLARE_CUSTOM_JOINT(dWheelJoint, dCustomJoint)
 };
 
-class dEngineJoint: public dCustomHinge
+
+class dEngineMountJoint: public dCustomHinge
+{
+	public:
+	CUSTOM_JOINTS_API dEngineMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody);
+
+	protected:
+	CUSTOM_JOINTS_API void ProjectError();
+	CUSTOM_JOINTS_API void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
+	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
+
+	dMatrix m_baseOffsetMatrix;
+	friend class dEngineController;
+	friend class dCustomVehicleController;
+	friend class dCustomVehicleControllerManager;
+	DECLARE_CUSTOM_JOINT(dEngineMountJoint, dCustomHinge)
+};
+
+
+class dEngineJoint: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody);
@@ -225,21 +246,21 @@ class dEngineJoint: public dCustomHinge
 
 	protected:
 	CUSTOM_JOINTS_API void SetRedLineRPM(dFloat redLineRmp);
-	CUSTOM_JOINTS_API void ProjectError();
-	CUSTOM_JOINTS_API void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
+	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
-	dMatrix m_baseOffsetMatrix;
 	dFloat m_maxRPM;
 	dFloat m_minFriction;
 	dFloat m_maxFriction;
+	dEngineMountJoint* m_engineMount;
 
 	friend class dEngineController;
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;
-	DECLARE_CUSTOM_JOINT(dEngineJoint, dCustomHinge)
+	DECLARE_CUSTOM_JOINT(dEngineJoint, dCustomJoint)
 };
+
 
 class dGearBoxJoint: public dCustomGear
 {
@@ -415,9 +436,7 @@ class dEngineController: public dVehicleController
 
 	dEngineInfo m_info;
 	dEngineInfo m_infoCopy;
-	//dEngineJoint* m_engineJoint;
 	dCustomVehicleController* m_controller;
-	//dBodyPartTire* m_crownGearCalculator;
 	dWheelJoint* m_crownGearCalculator;
 	dDifferentialJoint* m_differential;
 	dGearBoxJoint* m_gearBoxJoint;
