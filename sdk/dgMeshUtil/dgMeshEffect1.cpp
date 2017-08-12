@@ -492,7 +492,7 @@ void dgMeshEffect::dgMeshBVH::dgMeshBVHNode::SetBox (const dgVector& p0, const d
 {
 	m_p0 = p0 & dgVector::m_triplexMask;
 	m_p1 = p1 & dgVector::m_triplexMask;
-	dgVector size ((m_p1 - m_p0).CompProduct4(dgVector::m_half));
+	dgVector size (dgVector::m_half * (m_p1 - m_p0));
 	dgVector size1(size.ShiftTripleLeft());
 	m_area = size.DotProduct3(size1);
 }

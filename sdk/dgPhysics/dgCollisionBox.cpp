@@ -196,7 +196,7 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir0, dgInt32* const ver
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
 	if (vertexIndex) {
-		dgVector index (m_indexMark.CompProduct4(mask & dgVector::m_one));
+		dgVector index (m_indexMark * (mask & dgVector::m_one));
 		index = (index.AddHorizontal()).GetInt();
 		*vertexIndex = dgInt32 (index.m_ix);
 	}
@@ -211,9 +211,8 @@ dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir0, dgInt32* con
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
 	dgVector mask(dir < dgVector(dgFloat32(0.0f)));
-//	dgAssert(vertexIndex);
 	if (vertexIndex) {
-		dgVector index(m_indexMark.CompProduct4(mask & dgVector::m_one));
+		dgVector index(m_indexMark * (mask & dgVector::m_one));
 		index = (index.AddHorizontal()).GetInt();
 		*vertexIndex = dgInt32 (index.m_ix);
 	}
@@ -372,15 +371,15 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	{
 		case 1:
 		{
-			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - point));
+			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - point);
 			count = 1;
 			break;
 		}
 
 		case 2:
 		{
-			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - point));
-			contactsOut[1] = support[1] - normal.CompProduct4(normal.DotProduct4(support[1] - point));
+			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - point);
+			contactsOut[1] = support[1] - normal * normal.DotProduct4(support[1] - point);
 			count = 2;
 			break;
 		}

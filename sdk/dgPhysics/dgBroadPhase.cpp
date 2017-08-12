@@ -83,12 +83,12 @@ class dgBroadPhase::dgSpliteInfo
 				dgAssert (node->IsLeafNode());
 				minP = minP.GetMin (node->m_minBox); 
 				maxP = maxP.GetMax (node->m_maxBox); 
-				dgVector p ((node->m_minBox + node->m_maxBox).CompProduct4(dgVector::m_half));
+				dgVector p (dgVector::m_half * (node->m_minBox + node->m_maxBox));
 				median += p;
-				varian += p.CompProduct4(p);
+				varian += p * p;
 			}
 
-			varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
+			varian = varian.Scale4 (dgFloat32 (boxCount)) - median * median;
 
 			dgInt32 index = 0;
 			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
@@ -1040,13 +1040,13 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 	dgBody* const body1 = contact->GetBody1();
 
 	dgVector deltaTime(timestep);
-	dgVector positStep((body0->m_veloc - body1->m_veloc).CompProduct4(deltaTime));
+	dgVector positStep(deltaTime * (body0->m_veloc - body1->m_veloc));
 	positStep = ((positStep.DotProduct4(positStep)) > m_velocTol) & positStep;
 	contact->m_positAcc += positStep;
 
 	dgVector positError2(contact->m_positAcc.DotProduct4(contact->m_positAcc));
 	if ((positError2 < m_linearContactError2).GetSignMask()) {
-		dgVector rotationStep((body0->m_omega - body1->m_omega).CompProduct4(deltaTime));
+		dgVector rotationStep(deltaTime * (body0->m_omega - body1->m_omega));
 		rotationStep = ((rotationStep.DotProduct4(rotationStep)) > m_velocTol) & rotationStep;
 		contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion(dgFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
 

@@ -809,10 +809,10 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
 
 			if (equilibrium) {
-				dgVector veloc (body->m_veloc.CompProduct4(velocDragVect));
-				dgVector omega = body->m_omega.CompProduct4 (velocDragVect);
-				body->m_veloc = (dgVector (veloc.CompProduct4(veloc)) > m_velocTol) & veloc;
-				body->m_omega = (dgVector (omega.CompProduct4(omega)) > m_velocTol) & omega;
+				dgVector veloc (body->m_veloc * velocDragVect);
+				dgVector omega (body->m_omega * velocDragVect);
+				body->m_veloc = (veloc * veloc > m_velocTol) & veloc;
+				body->m_omega = (omega * omega > m_velocTol) & omega;
 			}
 
 			body->m_equilibrium = dgUnsigned32 (equilibrium);

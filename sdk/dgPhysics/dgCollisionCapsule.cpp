@@ -342,7 +342,7 @@ void dgCollisionCapsule::SetCollisionBBox (const dgVector& p0__, const dgVector&
 
 dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* const vertexIndex) const
 {
-	dgVector dir (direction.CompProduct4(m_transform));
+	dgVector dir (direction * m_transform);
 	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgVector p0(dir.Scale4 (m_radio0));
@@ -354,12 +354,12 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 	if (dir1 > dir0) {
 		p0 = p1;
 	}
-	return p0.CompProduct4(m_transform);
+	return p0 * m_transform;
 }
 
 dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgInt32* const vertexIndex) const
 {
-	dgVector dir(direction.CompProduct4(m_transform));
+	dgVector dir(direction * m_transform);
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	dgVector p0(dgVector::m_zero);
@@ -371,16 +371,16 @@ dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgI
 	if (dir1 > dir0) {
 		p0 = p1;
 	}
-	return p0.CompProduct4(m_transform);
+	return p0 * m_transform;
 }
 
 
 dgVector dgCollisionCapsule::SupportVertexSpecialProjectPoint (const dgVector& testPoint, const dgVector& direction) const
 {
-	dgVector dir(direction.CompProduct4(m_transform));
-	dgVector point(testPoint.CompProduct4(m_transform));
+	dgVector dir(direction * m_transform);
+	dgVector point(testPoint * m_transform);
 	point += dir.Scale4(m_radio0 - DG_PENETRATION_TOL);
-	return m_transform.CompProduct4(point);
+	return m_transform * point;
 }
 
 
@@ -412,15 +412,15 @@ void dgCollisionCapsule::Serialize(dgSerialize callback, void* const userData) c
 
 dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& direction, const dgVector& point, dgVector* const contactsOut) const
 {
-	dgVector normal(direction.CompProduct4(m_transform));
-	dgVector origin(point.CompProduct4(m_transform));
+	dgVector normal(direction * m_transform);
+	dgVector origin(point * m_transform);
 	
 	dgInt32 count = 0;
 	dgVector p0 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir0 (p0 - origin);
 	dgFloat32 dist0 = dir0.DotProduct4(normal).GetScalar();
 	if ((dist0 * dist0 - dgFloat32 (5.0e-5f)) < (m_radio0 * m_radio0)) {
-		contactsOut[count] = m_transform.CompProduct4 (p0 - normal.Scale4 (dist0));
+		contactsOut[count] = m_transform * (p0 - normal.Scale4 (dist0));
 		count ++;
 	}
 
@@ -428,7 +428,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgVector dir1 (p1 - origin);
 	dgFloat32 dist1 = dir1.DotProduct4(normal).GetScalar();
 	if ((dist1 * dist1 - dgFloat32 (5.0e-5f)) < (m_radio1 * m_radio1)) {
-		contactsOut[count] = m_transform.CompProduct4(p1 - normal.Scale4 (dist1));
+		contactsOut[count] = m_transform * (p1 - normal.Scale4 (dist1));
 		count ++;
 	}
 	return count;
@@ -436,8 +436,8 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 
 dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
-	dgVector q0(r0.CompProduct4(m_transform));
-	dgVector q1(r1.CompProduct4(m_transform));
+	dgVector q0(r0 * m_transform);
+	dgVector q1(r1 * m_transform);
 
 	dgVector origin0 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector origin1 ( m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -448,13 +448,13 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 			dgVector q (q0 + (q1 - q0).Scale4 (t0));
 			dgVector n(q - origin0);
 			dgAssert(n.m_w == dgFloat32(0.0f));
-			contactOut.m_normal = m_transform.CompProduct4(n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
 			return t0;
 		} else {
 			dgVector q (q0 + (q1 - q0).Scale4 (t1));
 			dgVector n(q - origin1);
 			dgAssert(n.m_w == dgFloat32(0.0f));
-			contactOut.m_normal = m_transform.CompProduct4(n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
 			return t1;
 		}
 	} else if (t1 < maxT) {
@@ -462,7 +462,7 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 		if (q.m_x >= m_p1.m_x) {
 			dgVector n (q - origin1); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));
-			contactOut.m_normal = m_transform.CompProduct4 (n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
 			return t1;
 		}
 	} else if (t0 < maxT) {
@@ -470,14 +470,14 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 		if (q.m_x <= m_p0.m_x) {
 			dgVector n (q - origin0); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));
-			contactOut.m_normal = m_transform.CompProduct4 (n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
 			return t0;
 		}
 	}
 
 	dgFloat32 ret = dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, body, NULL, NULL);
 	if (ret <= dgFloat32 (1.0f)) {
-		contactOut.m_normal = m_transform.CompProduct4 (contactOut.m_normal);
+		contactOut.m_normal = m_transform * contactOut.m_normal;
 	}
 	return ret;
 }

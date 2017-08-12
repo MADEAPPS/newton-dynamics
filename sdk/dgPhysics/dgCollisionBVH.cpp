@@ -301,7 +301,7 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 		for (dgInt32 i = 0; i < indexCount; i ++ ) {
 			//dgVector p (&polygon[indexArray[i] * stride]);
 			//p = matrix.TransformVector(scale.CompProduct4(p));
-			dgVector p (matrix.TransformVector(scale.CompProduct4(dgVector(&polygon[indexArray[i] * stride])))); 
+			dgVector p (matrix.TransformVector(scale * dgVector(&polygon[indexArray[i] * stride]))); 
 			triplex[i].m_x = p.m_x;
 			triplex[i].m_y = p.m_y;
 			triplex[i].m_z = p.m_z;

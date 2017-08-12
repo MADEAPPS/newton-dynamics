@@ -62,10 +62,8 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 
 	DG_INLINE void SetDistanceTravel (const dgVector& distanceInGlobalSpace)
 	{
-		//const dgMatrix& soupMatrix = data.m_polySoupCollision->GetGlobalMatrix();
 		const dgMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
-		//data.m_boxDistanceTravelInMeshSpace = data.m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(data.m_objCollision->GetInvScale())));
-		m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(distanceInGlobalSpace.CompProduct4(m_convexInstance->GetInvScale())));
+		m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale() * soupMatrix.UnrotateVector(distanceInGlobalSpace * m_convexInstance->GetInvScale());
 	}
 
 
