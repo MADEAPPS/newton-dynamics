@@ -123,8 +123,10 @@ class dgCollisionHeightField: public dgCollisionMesh
 	dgCollisionHeightFieldRayCastCallback m_userRayCastCallback;
 	dgElevationType m_elevationDataType;
 
+	
 	static dgVector m_yMask;
 	static dgVector m_padding;
+	static dgVector m_elevationPadding;
 	static dgInt32 m_cellIndices[][4];
 	static dgInt32 m_verticalEdgeMap[][7];
 	static dgInt32 m_horizontalEdgeMap[][7];

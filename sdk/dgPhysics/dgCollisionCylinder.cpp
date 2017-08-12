@@ -288,7 +288,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 			dgVector scale(m_radio0);
 			const int n = sizeof (m_unitCircle) / sizeof (m_unitCircle[0]);
 			for (dgInt32 i = 0; i < n; i++) {
-				contactsOut[i] = matrix.TransformVector(m_unitCircle[i].CompProduct4(scale)) & dgVector::m_triplexMask;
+				contactsOut[i] = matrix.TransformVector(m_unitCircle[i] * scale) & dgVector::m_triplexMask;
 			}
 			count = RectifyConvexSlice(n, normal, contactsOut);
 		} else {
@@ -331,7 +331,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 			dgVector scale(m_radio1);
 			const int n = sizeof (m_unitCircle) / sizeof (m_unitCircle[0]);
 			for (dgInt32 i = 0; i < n; i++) {
-				contactsOut[i] = matrix.TransformVector(m_unitCircle[i].CompProduct4(scale)) & dgVector::m_triplexMask;
+				contactsOut[i] = matrix.TransformVector(m_unitCircle[i] * scale) & dgVector::m_triplexMask;
 			}
 			count = RectifyConvexSlice(n, normal, contactsOut);
 		} else {
@@ -381,7 +381,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 		dgVector test0((m_profile[i0] - origin1).DotProduct4(normal1));
 		for (int i = 0; (i < 4) && (count < 2); i++) {
 			dgVector test1((m_profile[i] - origin1).DotProduct4(normal1));
-			dgVector acrossPlane(test0.CompProduct4(test1));
+			dgVector acrossPlane(test0 * test1);
 			if (acrossPlane.m_x < 0.0f) {
 				dgVector step(m_profile[i] - m_profile[i0]);
 				contactsOut[count] = m_profile[i0] - step.Scale4(test0.m_x / (step.DotProduct4(normal1).m_x));

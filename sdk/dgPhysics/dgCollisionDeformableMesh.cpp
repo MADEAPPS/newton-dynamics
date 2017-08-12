@@ -164,14 +164,14 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	}
 
 	dgVector invMass(dgFloat32(1.0f / m_totalMass));
-	comVeloc = comVeloc.CompProduct4(invMass);
-	m_body->m_accel = invTimestep.CompProduct4(comVeloc - m_body->m_veloc);
+	comVeloc = comVeloc * invMass;
+	m_body->m_accel = invTimestep * (comVeloc - m_body->m_veloc);
 	m_body->m_veloc = comVeloc;
 	m_body->m_alpha = dgVector::m_zero;
 	m_body->m_omega = dgVector::m_zero;
 	m_body->m_invWorldInertiaMatrix = dgGetIdentityMatrix();
 
-	dgVector localCom(xMassSum.CompProduct4(invMass));
+	dgVector localCom(xMassSum * invMass);
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		posit[i] -= localCom;
 	}

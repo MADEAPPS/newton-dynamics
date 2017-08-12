@@ -123,16 +123,17 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	dgVector dir (m_localPoly[1] - m_localPoly[0]);
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgAssert (dir.DotProduct3(dir) > dgFloat32 (1.0e-8f));
-	dir = dir.CompProduct4 (dir.InvMagSqrt());
+	//dir = dir.CompProduct4 (dir.InvMagSqrt());
+	dir = dir.Normalize();
 
 	dgFloat32 distH = origin.DotProduct4(dir).GetScalar();
 	planes[0] = dgPlane (dir, dist - distH);
-	planes[2] = dgPlane (dir.CompProduct4 (dgVector::m_negOne), dist + distH);
+	planes[2] = dgPlane (dir * dgVector::m_negOne, dist + distH);
 
 	dir = m_normal.CrossProduct3(dir);
 	dgFloat32 distV = origin.DotProduct4(dir).GetScalar();
 	planes[1] = dgPlane (dir, dist - distV);
-	planes[3] = dgPlane (dir.CompProduct4 (dgVector::m_negOne), dist + distV);
+	planes[3] = dgPlane (dir * dgVector::m_negOne, dist + distV);
 
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
@@ -472,9 +473,10 @@ dgVector dgCollisionConvexPolygon::CalculateGlobalNormal (const dgCollisionInsta
 	const dgMatrix& aligmentMatrix = parentMesh->m_aligmentMatrix;
 
 	dgVector normal (aligmentMatrix.RotateVector(localNormal));
-	normal = normal.CompProduct4(invScale);
+	normal = normal * invScale;
 	dgAssert(normal.m_w == dgFloat32(0.0f));
-	normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+	//normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+	normal = normal.Normalize();
 	dgAssert (dgAbsf(normal.DotProduct3(normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 	return globalMatrix.RotateVector(normal);
 }
@@ -507,7 +509,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 
 	dgMatrix polygonMatrix;
 	dgVector right (m_localPoly[1] - m_localPoly[0]);
-	polygonMatrix[0] = right.CompProduct4(right.InvMagSqrt());
+	//polygonMatrix[0] = right.CompProduct4(right.InvMagSqrt());
+	polygonMatrix[0] = right.Normalize();
 	polygonMatrix[1] = m_normal;
 	polygonMatrix[2] = polygonMatrix[0].CrossProduct3(m_normal);
 	polygonMatrix[3] = dgVector::m_wOne;
@@ -535,11 +538,11 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	if (distance < dgFloat32(1.0f)) {
 		bool inside = false;
 
-		dgVector boxSize((hullBoxP1 - hullBoxP0).CompProduct4(dgVector::m_half));
+		dgVector boxSize(dgVector::m_half * (hullBoxP1 - hullBoxP0));
 		dgVector sphereMag2 (boxSize.DotProduct4(boxSize));
 		boxSize = sphereMag2.Sqrt();
 
-		dgVector pointInPlane (polygonMatrix.RotateVector(hullBoxP1 + hullBoxP0).CompProduct4(dgVector::m_half));
+		dgVector pointInPlane (polygonMatrix.RotateVector(hullBoxP1 + hullBoxP0) * dgVector::m_half);
 		dgFloat32 distToPlane = m_normal.DotProduct3(m_localPoly[0] - pointInPlane);
 
 		dgFloat32 timeToPlane0 = (distToPlane + boxSize.GetScalar()) * den;
@@ -547,8 +550,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 
 		dgVector boxOrigin0 (pointInPlane + relativeVelocity.Scale4(timeToPlane0));
 		dgVector boxOrigin1 (pointInPlane + relativeVelocity.Scale4(timeToPlane1));
-		dgVector boxOrigin ((boxOrigin0 + boxOrigin1).CompProduct4(dgVector::m_half)); 
-		dgVector boxProjectSize (((boxOrigin0 - boxOrigin1).CompProduct4(dgVector::m_half))); 
+		dgVector boxOrigin (dgVector::m_half * (boxOrigin0 + boxOrigin1)); 
+		dgVector boxProjectSize (dgVector::m_half * (boxOrigin0 - boxOrigin1)); 
 		sphereMag2 = boxProjectSize.DotProduct4(boxProjectSize);
 		boxSize = sphereMag2.Sqrt();
 
@@ -712,7 +715,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		dgVector boxP0;
 		dgVector boxP1;
 		hull->CalcAABB (hullMatrix, boxP0, boxP1);
-		dgVector origin (dgVector::m_half.CompProduct4 (boxP1 + boxP1));
+		dgVector origin (dgVector::m_half * (boxP1 + boxP1));
 
 		//BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
 		BeamClipping(origin, convexSphapeUmbra);
@@ -755,7 +758,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 					dgFloat32 val0 = sideDir.DotProduct4(normal.CrossProduct3(m_normal)).GetScalar();
 					dgFloat32 val1 = sideDir.DotProduct4(normal.CrossProduct3(adjacentNormal)).GetScalar();
 					if (((val0 * val1) > dgFloat32(0.0f)) && (val0 < dgFloat32(0.0f)) && (val1 < dgFloat32(0.0f))) {
-						dgVector lateral(sideDir.CompProduct4(sideDir.DotProduct4(adjacentNormal).GetScalar() / (sideDir.DotProduct4(sideDir).GetScalar())));
+						dgVector lateral(sideDir * (sideDir.DotProduct4(adjacentNormal).GetScalar() / (sideDir.DotProduct4(sideDir).GetScalar())));
 						dgVector diff(adjacentNormal - lateral);
 						dgAssert(diff.m_w == dgFloat32(0.0f));
 						dgVector longitudinal(adjacentNormal.Scale4(dgSqrt(diff.DotProduct4(diff).GetScalar())));
