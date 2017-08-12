@@ -1032,7 +1032,8 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
             dgMatrix inertia0 (chunkCollision0->CalculateInertia());
             dgMatrix inertia1 (chunkCollision1->CalculateInertia());
             dgVector normal (inertia1.m_posit - inertia0.m_posit);
-            normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+            //normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+			normal = normal.Normalize();
             edgeNode->GetInfo().m_edgeData.m_normal = normal; 
 		}
 	}
@@ -1398,7 +1399,8 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 			dgAssert (val > dgFloat32 (-1.0f));
 			dgFloat32 angle = dgAcos (val) - dgFloat32 (3.141592f * 90.0f / 180.0f) + dgFloat32 (3.141592f * 15.0f / 180.0f);
 			dgVector axis (himespherePlane.CrossProduct3(directionsMap[i]));
-			axis = axis.CompProduct4(axis.DotProduct4(axis).InvSqrt());
+			//axis = axis.CompProduct4(axis.DotProduct4(axis).InvSqrt());
+			axis = axis.Normalize();
 			dgQuaternion rot (axis, angle);
 			himespherePlane = dgMatrix (rot, dgVector::m_wOne).RotateVector(himespherePlane);
 
@@ -1436,7 +1438,7 @@ bool dgCollisionCompoundFractured::IsAbovePlane (dgConectivityGraph::dgListNode*
 	dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
 	dgCollisionInstance* const instance = nodeInfo.m_shapeNode->GetInfo()->GetShape();
 
-	dgVector dir ((plane & dgVector::m_triplexMask).CompProduct4(dgVector::m_negOne));
+	dgVector dir (dgVector::m_negOne * (plane & dgVector::m_triplexMask));
 
 	const dgMatrix& matrix = instance->GetLocalMatrix(); 
 	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir))));
@@ -1488,14 +1490,14 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 {
 	dgConectivityGraph::dgListNode* startNode = m_conectivity.GetFirst();
 	if (IsAbovePlane (startNode, plane)) {
-		startNode = FirstAcrossPlane (startNode, plane.CompProduct4(dgVector::m_negOne));
+		startNode = FirstAcrossPlane (startNode, plane * dgVector::m_negOne);
 	} else if (IsBelowPlane (startNode, plane)) {
 		startNode = FirstAcrossPlane (startNode, plane);
 	}
 
 	if (startNode) {
 		dgVector posgDir (plane & dgVector::m_triplexMask);
-		dgVector negDir (posgDir.CompProduct4(dgVector::m_negOne));
+		dgVector negDir (posgDir * dgVector::m_negOne);
 		dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*> upperSide (GetAllocator());
 
 		dgInt32 stack = 1;

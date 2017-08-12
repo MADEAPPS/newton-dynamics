@@ -232,8 +232,8 @@ void dgCollisionCompound::dgNodeBase::SetBox (const dgVector& p0, const dgVector
 	m_p1 = p1;
 	dgAssert (m_p0.m_w == dgFloat32 (0.0f));
 	dgAssert (m_p1.m_w == dgFloat32 (0.0f));
-	m_size = (m_p1 - m_p0).CompProduct4 (dgVector::m_half);
-	m_origin = (m_p1 + m_p0).CompProduct4 (dgVector::m_half);
+	m_size = dgVector::m_half * (m_p1 - m_p0);
+	m_origin = dgVector::m_half * (m_p1 + m_p0);
 	m_area = m_size.DotProduct4(m_size.ShiftTripleRight()).m_x;
 }
 
@@ -267,13 +267,13 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 			bool ret = true;
 			for (dgInt32 i = 0; (i < 3) && ret; i ++) {
 				const dgInt32 j = i * 3;
-				dgVector c (origin_x.CompProduct4(data.m_crossAxis[j + 0]) + origin_y.CompProduct4(data.m_crossAxis[j + 1]) + origin_z.CompProduct4(data.m_crossAxis[j + 2]));
-				dgVector d (size_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding); 
+				dgVector c (origin_x * data.m_crossAxis[j + 0] + origin_y * data.m_crossAxis[j + 1] + origin_z * data.m_crossAxis[j + 2]);
+				dgVector d (size_x * data.m_crossAxisAbs[j + 0] + size_y * data.m_crossAxisAbs[j + 1] + size_z * data.m_crossAxisAbs[j + 2] + m_padding); 
 				dgVector x0 (c - d);
 				dgVector x1 (c + d);
 				dgVector box0 (x0 - data.m_extendsMaxX[i]);
 				dgVector box1 (x1 - data.m_extendsMinX[i]);
-				dgVector test (box0.CompProduct4((box1)));
+				dgVector test (box0 * box1);
 				ret = (test.GetSignMask() & 0x0f) == 0x0f;
 			}
 			return ret;
@@ -318,19 +318,19 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 
 			bool ret = true;
 			for (dgInt32 j = 0; (j < 9) && ret; j += 3) {
-				dgVector c0 (origin0_x.CompProduct4(data.m_crossAxis[j + 0]) + origin0_y.CompProduct4(data.m_crossAxis[j + 1]) + origin0_z.CompProduct4(data.m_crossAxis[j + 2]));
-				dgVector d0 (size0_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size0_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size0_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding); 
+				dgVector c0 (origin0_x * data.m_crossAxis[j + 0] + origin0_y * data.m_crossAxis[j + 1] + origin0_z * data.m_crossAxis[j + 2]);
+				dgVector d0 (size0_x * data.m_crossAxisAbs[j + 0] + size0_y * data.m_crossAxisAbs[j + 1] + size0_z * data.m_crossAxisAbs[j + 2] + m_padding); 
 				dgVector x0 (c0 - d0);
 				dgVector x1 (c0 + d0);
 
-				dgVector c1 (origin1_x.CompProduct4(data.m_crossAxis[j + 0]) + origin1_y.CompProduct4(data.m_crossAxis[j + 1]) + origin1_z.CompProduct4(data.m_crossAxis[j + 2]));
-				dgVector d1 (size1_x.CompProduct4(data.m_crossAxisDotAbs[j + 0]) + size1_y.CompProduct4(data.m_crossAxisDotAbs[j + 1]) + size1_z.CompProduct4(data.m_crossAxisDotAbs[j + 2]) + m_padding); 
+				dgVector c1 (origin1_x * data.m_crossAxis[j + 0] + origin1_y * data.m_crossAxis[j + 1] + origin1_z * data.m_crossAxis[j + 2]);
+				dgVector d1 (size1_x * data.m_crossAxisDotAbs[j + 0] + size1_y * data.m_crossAxisDotAbs[j + 1] + size1_z * data.m_crossAxisDotAbs[j + 2] + m_padding); 
 				dgVector z0 (c1 - d1);
 				dgVector z1 (c1 + d1);
 
 				dgVector box0 (x0 - z1);
 				dgVector box1 (x1 - z0);
-				dgVector test (box0.CompProduct4((box1)));
+				dgVector test (box0 * box1);
 				ret = (test.GetSignMask() & 0x0f) == 0x0f;
 			}
 			return ret;
@@ -388,12 +388,12 @@ class dgCollisionCompound::dgSpliteInfo
 				dgAssert (node->m_type == m_leaf);
 				minP = minP.GetMin (node->m_p0); 
 				maxP = maxP.GetMax (node->m_p1); 
-				dgVector p ((node->m_p0 + node->m_p1).CompProduct4(dgVector::m_half));
+				dgVector p (dgVector::m_half * (node->m_p0 + node->m_p1));
 				median += p;
-				varian += p.CompProduct4(p);
+				varian += p * p;
 			}
 
-			varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
+			varian = varian.Scale4 (dgFloat32 (boxCount)) - median * median;
 
 			dgInt32 index = 0;
 			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
@@ -1371,7 +1371,7 @@ dgFloat32 dgCollisionCompound::CalculateSurfaceArea (dgNodeBase* const node0, dg
 {
 	minBox = node0->m_p0.GetMin(node1->m_p0);
 	maxBox = node0->m_p1.GetMax(node1->m_p1);
-	dgVector side0 ((maxBox - minBox).CompProduct4 (dgVector::m_half));
+	dgVector side0 (dgVector::m_half * (maxBox - minBox));
 	return side0.DotProduct4(side0.ShiftTripleRight()).GetScalar();
 }
 
@@ -1956,8 +1956,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 		terrainCollision->GetLocalAABB (p0, p1, nodeProxi.m_p0, nodeProxi.m_p1);
 		//nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
 		//nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
-		nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).CompProduct4(dgVector::m_half);
-		nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).CompProduct4(dgVector::m_half);
+		nodeProxi.m_size = dgVector::m_half * (nodeProxi.m_p1 - nodeProxi.m_p0);
+		nodeProxi.m_origin = dgVector::m_half * (nodeProxi.m_p1 + nodeProxi.m_p0);
 
 		if (me->BoxTest (data, &nodeProxi)) {
 			if (me->m_type == m_leaf) {
@@ -2281,11 +2281,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 		dgVector p1;
 
 		treeCollision->GetNodeAABB(other, p0, p1);
-		nodeProxi.m_p0 = p0.CompProduct4(treeScale);
-		nodeProxi.m_p1 = p1.CompProduct4(treeScale);
+		nodeProxi.m_p0 = p0 * treeScale;
+		nodeProxi.m_p1 = p1 * treeScale;
 
-		p0 = nodeProxi.m_p0.CompProduct4(dgVector::m_half);
-		p1 = nodeProxi.m_p1.CompProduct4(dgVector::m_half);
+		p0 = nodeProxi.m_p0 * dgVector::m_half;
+		p1 = nodeProxi.m_p1 * dgVector::m_half;
 		nodeProxi.m_size = p1 - p0;
 		nodeProxi.m_origin = p1 + p0;
 		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct4(nodeProxi.m_size).GetScalar();
@@ -2868,11 +2868,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 		dgVector p1;
 
 		treeCollision->GetNodeAABB(other, p0, p1);
-		nodeProxi.m_p0 = p0.CompProduct4(treeScale);
-		nodeProxi.m_p1 = p1.CompProduct4(treeScale);
+		nodeProxi.m_p0 = p0 * treeScale;
+		nodeProxi.m_p1 = p1 * treeScale;
 
-		p0 = nodeProxi.m_p0.CompProduct4(dgVector::m_half);
-		p1 = nodeProxi.m_p1.CompProduct4(dgVector::m_half);
+		p0 = nodeProxi.m_p0 * dgVector::m_half;
+		p1 = nodeProxi.m_p1 * dgVector::m_half;
 		nodeProxi.m_size = p1 - p0;
 		nodeProxi.m_origin = p1 + p0;
 		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct4(nodeProxi.m_size).GetScalar();

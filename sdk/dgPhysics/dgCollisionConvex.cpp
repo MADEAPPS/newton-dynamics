@@ -363,14 +363,14 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatri
 		}
 		case dgCollisionInstance::m_nonUniform:
 		{
-			localPlane = localPlane.CompProduct4 (scale | dgVector::m_wOne);
+			localPlane = localPlane * (scale | dgVector::m_wOne);
 			dgFloat32 mag2 = localPlane.DotProduct3(localPlane);
 			localPlane = localPlane.Scale4 (dgRsqrt(mag2));
 			break;
 		}
 		default:
 		{
-			localPlane = localPlane.CompProduct4 (scale | dgVector::m_wOne);
+			localPlane = localPlane * (scale | dgVector::m_wOne);
 			dgFloat32 mag2 = localPlane.DotProduct3(localPlane);
 			localPlane = localPlane.Scale4 (dgRsqrt(mag2));
 			localPlane = parentScale.m_aligmentMatrix.UntransformPlane (localPlane);
@@ -381,7 +381,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatri
 	
 	dgFloat32 volume = cg.m_w * scale.m_x * scale.m_y * scale.m_z;
 	cg = parentScale.m_aligmentMatrix.RotateVector (cg);
-	cg = cg.CompProduct4(scale);
+	cg = cg * scale;
 	cg = globalMatrix.TransformVector (cg);
 	cg.m_w = volume;
 	return cg;
@@ -803,13 +803,13 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	switch (featureCount)
 	{
 		case 1:
-			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - origin));
+			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - origin);
 			count = 1;
 			break;
 
 		case 2:
-			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - origin));
-			contactsOut[1] = support[1] - normal.CompProduct4(normal.DotProduct4(support[1] - origin));
+			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - origin);
+			contactsOut[1] = support[1] - normal * normal.DotProduct4(support[1] - origin);
 			count = 2;
 			break;
 

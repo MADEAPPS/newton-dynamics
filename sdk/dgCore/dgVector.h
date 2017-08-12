@@ -1223,8 +1223,9 @@ class dgVector
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return _mm_dp_ps(m_type, A.m_type, 0xff);
 		#else 
-			//return CompProduct4(A).AddHorizontal();
-			return (*this * A).AddHorizontal().GetScalar();
+		//return CompProduct4(A).AddHorizontal();
+		//return (*this * A).AddHorizontal().GetScalar();
+		return (*this * A).AddHorizontal();
 		#endif
 	}
 
@@ -1346,6 +1347,11 @@ class dgVector
 	DG_INLINE dgVector InvMagSqrt () const
 	{
 		return DotProduct4(*this).InvSqrt();
+	}
+
+	DG_INLINE dgVector Normalize () const
+	{
+		return *this * InvMagSqrt ();
 	}
 
 	// relational operators
