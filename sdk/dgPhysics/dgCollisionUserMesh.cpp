@@ -224,7 +224,7 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 						dgInt32 index = vertexFaceIndex[j];
 						dgVector q (&vertex[index * stride]);
 						//dgVector p (matrix.TransformVector(q));
-						dgVector p (matrix.TransformVector(scale.CompProduct4(dgVector(&vertex[index * stride])))); 
+						dgVector p (matrix.TransformVector(scale * dgVector(&vertex[index * stride]))); 
 						triplex[j].m_x = p.m_x;
 						triplex[j].m_y = p.m_y;
 						triplex[j].m_z = p.m_z;

@@ -74,17 +74,17 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			convexMatrix[0][0] = invScale.GetScalar();
 			convexMatrix[1][1] = invScale.GetScalar();
 			convexMatrix[2][2] = invScale.GetScalar();
-			matrix.m_posit = matrix.m_posit.CompProduct4(invScale | dgVector::m_wOne);
+			matrix.m_posit = matrix.m_posit * (invScale | dgVector::m_wOne);
 			break;
 		}
 
 		case dgCollisionInstance::m_nonUniform:
 		{
 			const dgVector& invScale = m_polySoupInstance->GetInvScale();
-			dgMatrix tmp (matrix[0].CompProduct4(invScale), matrix[1].CompProduct4(invScale), matrix[2].CompProduct4(invScale), dgVector::m_wOne);
+			dgMatrix tmp (matrix[0] * invScale, matrix[1] * invScale, matrix[2] * invScale, dgVector::m_wOne);
 			convexMatrix = tmp * matrix.Inverse();
 			convexMatrix.m_posit = dgVector::m_wOne;
-			matrix.m_posit = matrix.m_posit.CompProduct4(invScale | dgVector::m_wOne);
+			matrix.m_posit = matrix.m_posit * (invScale | dgVector::m_wOne);
 			break;
 		}
 
@@ -102,11 +102,11 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 	dgVector p1;
 	SetTransposeAbsMatrix(matrix);
 	m_convexInstance->CalcAABB(convexMatrix, p0, p1);
-	m_size = (p1 - p0).CompProduct4(dgVector::m_half);
-	m_posit = matrix.TransformVector((p1 + p0).CompProduct4(dgVector::m_half));
+	m_size = dgVector::m_half * (p1 - p0);
+	//m_posit = matrix.TransformVector((p1 + p0).CompProduct4(dgVector::m_half));
+	m_posit = matrix.TransformVector(dgVector::m_half * (p1 + p0));
+	dgAssert (m_posit.m_w == dgFloat32 (1.0f));
 }
-
-
 
 void dgPolygonMeshDesc::SortFaceArray ()
 {

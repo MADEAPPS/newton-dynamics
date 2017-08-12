@@ -1628,8 +1628,10 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	const dgMatrix polySoupGlobalMatrix = polySoupInstance->m_globalMatrix;
 	const dgMatrix polySoupGlobalAligmentMatrix = polySoupInstance->m_aligmentMatrix;
 
-	dgMatrix polySoupScaledMatrix (polySoupGlobalAligmentMatrix[0].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[1].CompProduct4(polygonInstanceScale),
-								   polySoupGlobalAligmentMatrix[2].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[3]);
+	dgMatrix polySoupScaledMatrix (polySoupGlobalAligmentMatrix[0] * polygonInstanceScale, 
+								   polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
+								   polySoupGlobalAligmentMatrix[2] * polygonInstanceScale, 
+								   polySoupGlobalAligmentMatrix[3]);
 	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
 
 	dgAssert (proxy.m_contactJoint);
@@ -1713,7 +1715,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		proxy.m_intersectionTestOnly = true;
 		dgContactSolver contactSolver (&proxy);
 		contactSolver.CalculateConvexToConvexContacts();
-		dgVector normal = contactSolver.GetNormal().CompProduct4(dgVector::m_negOne);
+		dgVector normal (contactSolver.GetNormal() * dgVector::m_negOne);
 		for (dgInt32 i = 0; i < count; i ++) {
 			contactOut[i].m_normal = normal;
 		}
@@ -1793,8 +1795,10 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 	const dgMatrix polySoupGlobalMatrix = polySoupInstance->m_globalMatrix;
 	const dgMatrix polySoupGlobalAligmentMatrix = polySoupInstance->m_aligmentMatrix;
 
-	dgMatrix polySoupScaledMatrix (polySoupGlobalAligmentMatrix[0].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[1].CompProduct4(polygonInstanceScale),
-								   polySoupGlobalAligmentMatrix[2].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[3]);
+	dgMatrix polySoupScaledMatrix (polySoupGlobalAligmentMatrix[0] * polygonInstanceScale, 
+								   polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
+								   polySoupGlobalAligmentMatrix[2] * polygonInstanceScale, 
+								   polySoupGlobalAligmentMatrix[3]);
 	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
 
 	dgAssert (proxy.m_contactJoint);

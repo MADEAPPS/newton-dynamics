@@ -781,8 +781,8 @@ DG_INLINE void dgContactSolver::CalculateContactFromFeacture(dgInt32 featureType
 		}
 	}
 
-	m_closestPoint0 = dgVector::m_half.CompProduct4(s + d);
-	m_closestPoint1 = dgVector::m_half.CompProduct4(s - d);
+	m_closestPoint0 = dgVector::m_half * (s + d);
+	m_closestPoint1 = dgVector::m_half * (s - d);
 	dgAssert(dgAbsf(m_normal.DotProduct3(m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 	m_proxy->m_contactJoint->m_separtingVector = m_normal;
 }
@@ -1180,7 +1180,8 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 	memset (m_hullSum, 0, 4 * sizeof (m_hullSum[0]));
 	const dgCollisionConvex* const collision = (dgCollisionConvex*)m_instance0->GetChildShape();
 
-	dgVector dir1(p0p1.CompProduct4(p0p1.DotProduct4(p0p1).InvSqrt()));
+	//dgVector dir1(p0p1.CompProduct4(p0p1.DotProduct4(p0p1).InvSqrt()));
+	dgVector dir1 (p0p1.Normalize());
 	m_hullDiff[0] = collision->SupportVertex (dir1, NULL) - point;
 	dgBigVector v (m_hullDiff[0]);
 	index = 1;
@@ -1604,7 +1605,7 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 			count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
 		}
 		//dgAssert(count1);
-		step = matrix1.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
+		step = matrix1.UnrotateVector(normal * ((alternatePoint - origin).DotProduct4(normal)));
 		for (dgInt32 i = 0; i < count1; i++) {
 			shape1[i] -= step;
 		}
@@ -1633,7 +1634,7 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 				count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, alternatePointOnInstance0, shape0);
 			}
 			dgAssert(count0);
-			step = matrix0.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
+			step = matrix0.UnrotateVector(normal * ((alternatePoint - origin).DotProduct4(normal)));
 			for (dgInt32 i = 0; i < count0; i++) {
 				shape0[i] -= step;
 			}

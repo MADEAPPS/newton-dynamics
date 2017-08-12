@@ -268,7 +268,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	dgVector* const diagonal = &normalDir[m_particlesCount];
 	dgFloat32* const frictionCoeffecient = (dgFloat32*)&diagonal[m_particlesCount];
 
-	dgVector unitAccel(m_body->m_externalForce.CompProduct4(m_body->m_invMass.m_w));
+	dgVector unitAccel(m_body->m_externalForce * dgVector(m_body->m_invMass.m_w));
 
 	// here I need to add all other external acceleration like wind and pressure, friction and collision.
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
@@ -285,7 +285,8 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	//dgFloat32 kd_dt0 = -timestep * kDamper;
 	//dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
 
-	dgFloat32 dtRK4 = timestep / iter;
+	//dgFloat32 dtRK4__ = timestep / iter;
+	dgVector dtRK4 (timestep / iter);
 	dgVector epsilon(dgFloat32(1.0e-14f));
 
 //	dtRK4 = dtRK4 & dgVector::m_triplexMask;
@@ -331,7 +332,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			const dgInt32 j1 = links[i].m_m1;
 			const dgVector p0p1(posit[j0] - posit[j1]);
 			const dgVector v0v1(veloc[j0] - veloc[j1]);
-			const dgVector dvdp(v0v1.CompProduct4(p0p1));
+			const dgVector dvdp(v0v1 * p0p1);
 
 			const dgVector p0p1Mag2(p0p1.DotProduct4(p0p1));
 			const dgVector p0p1Mask(p0p1Mag2 > m_smallestLenght2);
@@ -342,9 +343,9 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 
 			const dgFloat32 k01 = -links[i].m_spring * (p0p1Length - links[i].m_restlength) * p0p1InvMag;
 			const dgFloat32 d01 = -links[i].m_damper * dvdp.GetScalar() * p0p1InvMag * p0p1InvMag;
-			const dgFloat32 h01dt = - dtRK4 * links[i].m_spring * links[i].m_restlength * p0p1InvMag * p0p1InvMag * p0p1InvMag;
+			const dgFloat32 h01dt = - dtRK4.GetScalar() * links[i].m_spring * links[i].m_restlength * p0p1InvMag * p0p1InvMag * p0p1InvMag;
 
-			const dgVector diag ((p0p1.CompProduct4(p0p1)).Scale4(h01dt * dtRK4));
+			const dgVector diag ((p0p1 * p0p1).Scale4(h01dt * dtRK4.GetScalar()));
 
 			const dgFloat32 dtdfp0dx0 = h01dt * v0v1.DotProduct4(p0p1).GetScalar();
 			const dgVector netForce (p0p1.Scale4(k01 + d01 + dtdfp0dx0));
@@ -363,19 +364,18 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			//tmp0[i] = accel[i] + collidingAccel[i] - dirAccel0 - dirAccel1 - dirAccel2;
 
 			dgVector netAccel (accel[i] + extAccel[i]);
-			dgVector tangentDir(veloc[i] - normalDir[i].CompProduct4(normalDir[i].DotProduct4(veloc[i])));
+			dgVector tangentDir(veloc[i] - normalDir[i] * (normalDir[i].DotProduct4(veloc[i])));
 			dgVector mag(tangentDir.DotProduct4(tangentDir) + epsilon);
 			
 			dgFloat32 tangentFrictionAccel = dgAbsf(netAccel.DotProduct4(normalDir[i]).GetScalar());
 			dgVector friction(tangentDir.Scale4(frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt(mag.GetScalar())));
 
 			//dgVector particleAccel (accel[i] + normalAccel[i] - normalDirAccel);
-			dgVector normalDirAccel(normalDir[i].CompProduct4(netAccel.DotProduct4(normalDir[i])));
+			dgVector normalDirAccel(normalDir[i] * (netAccel.DotProduct4(normalDir[i])));
 			//accel[i] = accel[i] + normalAccel[i] - normalDirAccel - friction;
 			netAccel = netAccel + normalAccel[i] - normalDirAccel - friction;
-			veloc[i] += netAccel.CompProduct4(dtRK4);
-			posit[i] += veloc[i].CompProduct4(dtRK4);
-
+			veloc[i] += netAccel * dtRK4;
+			posit[i] += veloc[i] * dtRK4;
 		}
 	}
 }

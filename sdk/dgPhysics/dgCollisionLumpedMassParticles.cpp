@@ -107,8 +107,8 @@ void dgCollisionLumpedMassParticles::FinalizeBuild()
 	}
 
 	// for now use a fix size box
-	m_boxSize = (maxp - minp).CompProduct4(dgVector::m_half);
-	m_boxOrigin = (maxp + minp).CompProduct4(dgVector::m_half);
+	m_boxSize = dgVector::m_half * (maxp - minp);
+	m_boxOrigin = dgVector::m_half * (maxp + minp);
 }
 
 void dgCollisionLumpedMassParticles::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
@@ -149,7 +149,7 @@ void dgCollisionLumpedMassParticles::SetOwnerAndMassPraperties (dgDynamicBody* c
 	body->m_collision->SetLocalMatrix (dgGetIdentityMatrix());
 	matrix.m_posit = position;
 	body->m_matrix = matrix;
-	body->m_localCentreOfMass = xMassSum.CompProduct4(invMass);
+	body->m_localCentreOfMass = xMassSum * invMass;
 
 	//dgVector inertia (xxMassSum.Scale4(invMass) - body->m_localCentreOfMass); 
 	//inertia += dgVector (inertiaSum);
@@ -252,11 +252,11 @@ dgMatrix dgCollisionLumpedMassParticles::CalculateInertiaAndCenterOfMass(const d
 {
 	dgVector com(dgFloat32(0.0f));
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		com = matrix.RotateVector(m_posit[i].CompProduct4(localScale));
+		com = matrix.RotateVector(m_posit[i] * localScale);
 	}
 	dgVector den(dgFloat32(1.0f / m_particlesCount));
 	dgMatrix inertia(dgGetIdentityMatrix());
-	inertia.m_posit = com.CompProduct4(den);
+	inertia.m_posit = com * den;
 	inertia.m_posit.m_w = dgFloat32(1.0f);
 	return inertia;
 }
@@ -313,7 +313,7 @@ xxx ++;
 
 		dgFloat32 frictionCoef = dgFloat32(0.0f);
 		if (contactNormal.m_w > dgFloat32 (0.0f)) {
-			dgVector projectedVelocity(veloc[i] + (accel[i] + extAccel[i]).CompProduct4(timestepV));
+			dgVector projectedVelocity(veloc[i] + timestepV * (accel[i] + extAccel[i]));
 			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct3(projectedVelocity);
 			if (projectedNormalSpeed < DG_MINIMIM_ZERO_SPEED) {
 				if (contactNormal.m_w > DG_MINIMIM_ZERO_SURFACE) {
