@@ -210,8 +210,6 @@ class dgTemplateVector
 
 
 #ifdef DG_SCALAR_VECTOR_CLASS
-
-
 // *****************************************************************************************
 //
 // 4 x 1 single precision vector class declaration
@@ -260,14 +258,11 @@ class dgVector
 
 #ifndef  _NEWTON_USE_DOUBLE 
 	DG_INLINE dgVector (const dgBigVector& copy)
-		//		:m_x(dgFloat32 (copy.m_x)), m_y(dgFloat32 (copy.m_y)), m_z(dgFloat32 (copy.m_z)), m_w(dgFloat32 (copy.m_w))
+		:m_x(dgFloat32 (((dgFloat64*)&copy)[0])) 
+		,m_y(dgFloat32 (((dgFloat64*)&copy)[1])) 
+		,m_z(dgFloat32 (((dgFloat64*)&copy)[2])) 
+		,m_w(dgFloat32 (((dgFloat64*)&copy)[3])) 
 	{
-		dgAssert (0);
-		const dgFloat64* const ptr = (dgFloat64*) &copy;
-		m_x = dgFloat32 (ptr[0]);
-		m_y = dgFloat32 (ptr[1]);
-		m_z = dgFloat32 (ptr[2]);
-		m_w = dgFloat32 (ptr[3]);
 		dgAssert (dgCheckVector ((*this)));
 	}
 #endif
@@ -330,6 +325,11 @@ class dgVector
 		return dgVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
+	DG_INLINE dgVector operator* (const dgVector& A) const
+	{
+		return dgVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
+	}
+
 	DG_INLINE dgVector& operator+= (const dgVector& A)
 	{
 		return (*this = dgVector (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
@@ -339,6 +339,13 @@ class dgVector
 	{
 		return (*this = dgVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 	}
+
+	DG_INLINE dgVector& operator*= (const dgVector& A)
+	{
+		return (*this = dgVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
+	}
+
+
 
 	DG_INLINE dgVector AddHorizontal () const
 	{
@@ -438,10 +445,10 @@ class dgVector
 		return dgVector (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-	DG_INLINE dgVector InvMagSqrt () const
-	{
-		return dgVector (dgRsqrt (DotProduct4(*this).m_x));
-	}
+//	DG_INLINE dgVector InvMagSqrt () const
+//	{
+//		return dgVector (dgRsqrt (DotProduct4(*this).m_x));
+//	}
 
 	DG_INLINE dgVector Reciproc () const
 	{
@@ -456,6 +463,11 @@ class dgVector
 	DG_INLINE dgVector InvSqrt () const
 	{
 		return dgVector (dgRsqrt (m_x), dgRsqrt (m_y), dgRsqrt (m_z), dgRsqrt (m_w));
+	}
+
+	DG_INLINE dgVector Normalize () const
+	{
+		return *this * dgVector (dgRsqrt (DotProduct4(*this).m_x));
 	}
 
 	dgVector Abs () const
@@ -733,6 +745,11 @@ class dgBigVector
 		return dgBigVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
+	DG_INLINE dgBigVector operator* (const dgBigVector& A) const
+	{
+		return dgBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
+	}
+
 	DG_INLINE dgBigVector& operator+= (const dgBigVector& A)
 	{
 		return (*this = dgBigVector (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
@@ -741,6 +758,11 @@ class dgBigVector
 	DG_INLINE dgBigVector& operator-= (const dgBigVector& A)
 	{
 		return (*this = dgBigVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
+	}
+
+	DG_INLINE dgBigVector& operator*= (const dgBigVector& A)
+	{
+		return (*this = dgBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
 	}
 
 	DG_INLINE dgBigVector AddHorizontal () const
@@ -839,9 +861,14 @@ class dgBigVector
 		return dgBigVector (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-	DG_INLINE dgBigVector InvMagSqrt () const
+//	DG_INLINE dgBigVector InvMagSqrt () const
+//	{
+//		return dgBigVector (dgFloat64 (1.0f) / sqrt (DotProduct4(*this).m_x));
+//	}
+
+	DG_INLINE dgVector Normalize() const
 	{
-		return dgBigVector (dgFloat64 (1.0f) / sqrt (DotProduct4(*this).m_x));
+		return *this * dgVector(dgRsqrt(DotProduct4(*this).m_x));
 	}
 
 	DG_INLINE dgBigVector Reciproc () const
@@ -1024,8 +1051,88 @@ class dgBigVector
 } DG_GCC_VECTOR_ALIGMENT;
 
 
+DG_MSC_VECTOR_ALIGMENT
+class dgSpatialVector
+{
+	public:
+	DG_INLINE dgSpatialVector()
+	{
+	}
 
+	DG_INLINE dgSpatialVector(const dgFloat32 a)
+	{
+		for (dgInt32 i = 0; i < 6; i ++) {
+			m_d[i] = a;
+		}
+	}
 
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+	{
+		for (dgInt32 i = 0; i < 3; i ++) {
+			m_d[i] = low[i];
+			m_d[i + 3] = high[i];
+		}
+	}
+
+	DG_INLINE dgSpatialVector(const dgSpatialVector& src)
+	{
+		for (dgInt32 i = 0; i < 6; i++) {
+			m_d[i] = src[i];
+		}
+	}
+
+	DG_INLINE dgFloat64& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_d[i];
+	}
+
+	DG_INLINE const dgFloat64& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_d[i];
+	}
+
+	DG_INLINE dgSpatialVector operator+ (const dgSpatialVector& A) const
+	{
+		dgSpatialVector tmp;
+		for (dgInt32 i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] + A.m_d[i];
+		}
+		return tmp;
+	}
+
+	DG_INLINE dgSpatialVector operator* (const dgSpatialVector& A) const
+	{
+		dgSpatialVector tmp;
+		for (dgInt32 i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] * A.m_d[i];
+		}
+		return tmp;
+	}
+
+	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
+	{
+		dgFloat64 ret = dgFloat64 (0.0f);
+		for (dgInt32 i = 0; i < 6; i++) {
+			ret += m_d[i] * v.m_d[i];
+		}
+		return ret;
+	}
+
+	DG_INLINE dgSpatialVector Scale(dgFloat64 s) const
+	{
+		dgSpatialVector tmp;
+		for (dgInt32 i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] * s;
+		}
+		return tmp;
+	}
+
+	dgFloat64 m_d[6];
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 #else
@@ -1309,20 +1416,15 @@ class dgVector
 		return dgVector (_mm_sqrt_ps(m_type));
 	}
 
-	DG_INLINE dgVector InvSqrt () const
+	DG_INLINE dgVector InvSqrt___ () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
 		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
 	}
 
-	DG_INLINE dgVector InvMagSqrt () const
-	{
-		return DotProduct4(*this).InvSqrt();
-	}
-
 	DG_INLINE dgVector Normalize () const
 	{
-		return *this * InvMagSqrt ();
+		return *this * (DotProduct4(*this).InvSqrt___());
 	}
 
 	// relational operators
@@ -1440,8 +1542,6 @@ class dgVector
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 #endif
-
-
 
 
 // *****************************************************************************************
@@ -1677,14 +1777,10 @@ class dgBigVector
 		return Sqrt().Reciproc();
 	}
 
-	DG_INLINE dgBigVector InvMagSqrt() const
-	{
-		return (DotProduct4(*this)).InvSqrt();
-	}
 
 	DG_INLINE dgBigVector Normalize() const
 	{
-		return *this * InvMagSqrt();
+		return *this * (DotProduct4(*this).InvSqrt());
 	}
 
 	dgBigVector GetMax(const dgBigVector& data) const
@@ -1888,9 +1984,6 @@ class dgBigVector
 } DG_GCC_VECTOR_ALIGMENT;
 
 
-#endif
-
-
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialVector
 {
@@ -1901,17 +1994,17 @@ class dgSpatialVector
 
 	DG_INLINE dgSpatialVector(const dgFloat32 a)
 		:m_d0(_mm_set1_pd(a))
-		,m_d1(_mm_set1_pd(a))
-		,m_d2(_mm_set1_pd(a))
+		, m_d1(_mm_set1_pd(a))
+		, m_d2(_mm_set1_pd(a))
 	{
 	}
 
 #ifdef _NEWTON_USE_DOUBLE
-	#define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
+#define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
 	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
 		:m_d0(low.m_typeLow)
-		,m_d1(_mm_shuffle_pd (low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
-		,m_d2(_mm_shuffle_pd (high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
+		, m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
+		, m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
 	{
 	}
 #else 
@@ -1925,8 +2018,8 @@ class dgSpatialVector
 
 	DG_INLINE dgSpatialVector(const __m128d d0, const __m128d d1, const __m128d d2)
 		:m_d0(d0)
-		,m_d1(d1)
-		,m_d2(d2)
+		, m_d1(d1)
+		, m_d2(d2)
 	{
 	}
 
@@ -1949,7 +2042,7 @@ class dgSpatialVector
 		return dgSpatialVector(_mm_add_pd(m_d0, A.m_d0), _mm_add_pd(m_d1, A.m_d1), _mm_add_pd(m_d2, A.m_d2));
 	}
 
-	DG_INLINE dgSpatialVector CompProduct(const dgSpatialVector& A) const
+	DG_INLINE dgSpatialVector operator*(const dgSpatialVector& A) const
 	{
 		return dgSpatialVector(_mm_mul_pd(m_d0, A.m_d0), _mm_mul_pd(m_d1, A.m_d1), _mm_mul_pd(m_d2, A.m_d2));
 	}
@@ -1957,7 +2050,7 @@ class dgSpatialVector
 	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
 	{
 		dgFloat64 ret;
-		dgSpatialVector tmp(v.CompProduct(*this));
+		dgSpatialVector tmp(*this * v);
 		__m128d tmp2(_mm_add_pd(tmp.m_d0, _mm_add_pd(tmp.m_d1, tmp.m_d2)));
 		__m128d dot(_mm_hadd_pd(tmp2, tmp2));
 		_mm_store_sd(&ret, dot);
@@ -1975,4 +2068,5 @@ class dgSpatialVector
 	__m128d m_d2;
 } DG_GCC_VECTOR_ALIGMENT;
 
+#endif
 #endif

@@ -375,7 +375,8 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
 			dgVector dir1 (m_scale * dir);
-			dir1 = dir1 * dir1.InvMagSqrt();
+			//dir1 = dir1 * dir1.InvMagSqrt();
+			dir1 = dir1.Normalize();
 			return m_scale * m_childShape->SupportVertex (dir1, NULL);
 		}
 
@@ -383,7 +384,8 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 		default:	
 		{
 			dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale * dir));
-			dir1 = dir1 * dir1.InvMagSqrt();
+			//dir1 = dir1 * dir1.InvMagSqrt();
+			dir1 = dir1.Normalize();
 			return m_scale * m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL));
 		}
 	}

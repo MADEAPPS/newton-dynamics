@@ -448,13 +448,15 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 			dgVector q (q0 + (q1 - q0).Scale4 (t0));
 			dgVector n(q - origin0);
 			dgAssert(n.m_w == dgFloat32(0.0f));
-			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			contactOut.m_normal = m_transform * n.Normalize();
 			return t0;
 		} else {
 			dgVector q (q0 + (q1 - q0).Scale4 (t1));
 			dgVector n(q - origin1);
 			dgAssert(n.m_w == dgFloat32(0.0f));
-			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			contactOut.m_normal = m_transform * n.Normalize();
 			return t1;
 		}
 	} else if (t1 < maxT) {
@@ -462,7 +464,8 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 		if (q.m_x >= m_p1.m_x) {
 			dgVector n (q - origin1); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));
-			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			contactOut.m_normal = m_transform * n.Normalize();
 			return t1;
 		}
 	} else if (t0 < maxT) {
@@ -470,7 +473,8 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 		if (q.m_x <= m_p0.m_x) {
 			dgVector n (q - origin0); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));
-			contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			contactOut.m_normal = m_transform * n.Normalize();
 			return t0;
 		}
 	}
