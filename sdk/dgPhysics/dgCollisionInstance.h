@@ -369,22 +369,25 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 		}
 		case m_uniform:
 		{
-			return m_scale.CompProduct4 (m_childShape->SupportVertex (dir, NULL));
+			return m_scale * m_childShape->SupportVertex (dir, NULL);
 		}
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
-			dgVector dir1 (m_scale.CompProduct4(dir));
-			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_childShape->SupportVertex (dir1, NULL));
+			dgVector dir1 (m_scale * dir);
+			dir1 = dir1 * dir1.InvMagSqrt();
+			return m_scale * m_childShape->SupportVertex (dir1, NULL);
 		}
 
 		case m_global:
 		default:	
 		{
-			dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale.CompProduct4(dir)));
-			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL)));
+			//dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale.CompProduct4(dir)));
+			//dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
+			//return m_scale.CompProduct4(m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL)));
+			dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale * dir));
+			dir1 = dir1 * dir1.InvMagSqrt();
+			return m_scale * m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL));
 		}
 	}
 }
@@ -401,7 +404,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 		}
 		case m_uniform:
 		{
-			return m_scale.CompProduct4(m_childShape->SupportVertexSpecial(dir, vertexIndex));
+			return m_scale * m_childShape->SupportVertexSpecial(dir, vertexIndex);
 		}
 
 		default:
@@ -438,7 +441,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const 
 		}
 		case m_uniform:
 		{
-			return m_scale.CompProduct4(m_childShape->SupportVertexSpecialProjectPoint(point.CompProduct4(m_invScale), dir));
+			return m_scale * m_childShape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
 		}
 
 		default:
@@ -488,11 +491,11 @@ DG_INLINE dgVector dgCollisionInstance::GetBoxSize() const
 		case m_unit:
 		case m_uniform:
 		case m_nonUniform:
-			return m_childShape->m_boxSize.CompProduct4(m_scale);
+			return m_childShape->m_boxSize * m_scale;
 
 		case m_global:
 		default:
-			return m_childShape->m_boxSize.CompProduct4(m_maxScale);
+			return m_childShape->m_boxSize * m_maxScale;
 	}
 }
 
@@ -503,11 +506,11 @@ DG_INLINE dgVector dgCollisionInstance::GetBoxOrigin() const
 		case m_unit:
 		case m_uniform:
 		case m_nonUniform:
-			return m_childShape->m_boxOrigin.CompProduct4(m_scale);
+			return m_childShape->m_boxOrigin * m_scale;
 
 		case m_global:
 		default:
-			return m_aligmentMatrix.TransformVector(m_childShape->m_boxOrigin).CompProduct4(m_scale);
+			return m_aligmentMatrix.TransformVector(m_childShape->m_boxOrigin) * m_scale;
 	}
 }
 
@@ -552,8 +555,8 @@ DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) c
 		case m_uniform:
 		case m_nonUniform:
 		{
-			size = size.CompProduct4(m_scale) + m_padding;
-			origin = origin.CompProduct4(m_scale);
+			size = size * m_scale + m_padding;
+			origin = origin * m_scale;
 			break;
 		}
 		case m_global:
@@ -569,8 +572,8 @@ DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) c
 			dgVector p0;
 			dgVector p1;
 			m_childShape->CalcAABB(m_aligmentMatrix, p0, p1);
-			size = ((p1 - p0).CompProduct4(dgVector::m_half).CompProduct4(m_scale) + m_padding) & dgVector::m_triplexMask;
-			origin = ((p1 + p0).CompProduct4(dgVector::m_half).CompProduct4(m_scale)) & dgVector::m_triplexMask;;
+			size = (dgVector::m_half * (p1 - p0) * m_scale + m_padding) & dgVector::m_triplexMask;
+			origin = (dgVector::m_half * (p1 + p0) * m_scale) & dgVector::m_triplexMask;;
 			break;
 		}
 	}

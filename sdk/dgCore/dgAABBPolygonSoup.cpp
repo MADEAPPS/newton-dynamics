@@ -165,13 +165,13 @@ class dgAABBPolygonSoup::dgSpliteInfo
 
 				minP = minP.GetMin (p0); 
 				maxP = maxP.GetMax (p1); 
-				dgVector p ((p0 + p1).CompProduct4(dgVector::m_half));
+				dgVector p (dgVector::m_half * (p0 + p1));
 
 				median += p;
-				varian += p.CompProduct4(p);
+				varian += p * p;
 			}
 
-			varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
+			varian = varian.Scale4 (dgFloat32 (boxCount)) - median * median;
 
 			dgInt32 index = 0;
 			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);

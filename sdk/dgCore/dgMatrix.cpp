@@ -127,18 +127,18 @@ dgMatrix::dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, cons
 
 dgMatrix dgMatrix::Multiply3X3 (const dgMatrix &B) const
 {
-	return dgMatrix (B.m_front.CompProduct4(m_front.BroadcastX()) + B.m_up.CompProduct4(m_front.BroadcastY()) + B.m_right.CompProduct4(m_front.BroadcastZ()), 
-					 B.m_front.CompProduct4(m_up.BroadcastX())    + B.m_up.CompProduct4(m_up.BroadcastY())    + B.m_right.CompProduct4(m_up.BroadcastZ()), 
-					 B.m_front.CompProduct4(m_right.BroadcastX()) + B.m_up.CompProduct4(m_right.BroadcastY()) + B.m_right.CompProduct4(m_right.BroadcastZ()), 
+	return dgMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ(), 
+					 B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ(), 
+					 B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ(), 
 					 dgVector::m_wOne); 
 }
 
 dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 {
-	return dgMatrix (B.m_front.CompProduct4(m_front.BroadcastX()) + B.m_up.CompProduct4(m_front.BroadcastY()) + B.m_right.CompProduct4(m_front.BroadcastZ()) + B.m_posit.CompProduct4 (m_front.BroadcastW()), 
-					 B.m_front.CompProduct4(m_up.BroadcastX())    + B.m_up.CompProduct4(m_up.BroadcastY())    + B.m_right.CompProduct4(m_up.BroadcastZ())    + B.m_posit.CompProduct4 (m_up.BroadcastW()), 
-					 B.m_front.CompProduct4(m_right.BroadcastX()) + B.m_up.CompProduct4(m_right.BroadcastY()) + B.m_right.CompProduct4(m_right.BroadcastZ()) + B.m_posit.CompProduct4 (m_right.BroadcastW()), 
-					 B.m_front.CompProduct4(m_posit.BroadcastX()) + B.m_up.CompProduct4(m_posit.BroadcastY()) + B.m_right.CompProduct4(m_posit.BroadcastZ()) + B.m_posit.CompProduct4 (m_posit.BroadcastW())); 
+	return dgMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ() + B.m_posit * m_front.BroadcastW(), 
+					 B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ()    + B.m_posit * m_up.BroadcastW(), 
+					 B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ() + B.m_posit * m_right.BroadcastW(), 
+					 B.m_front * m_posit.BroadcastX() + B.m_up * m_posit.BroadcastY() + B.m_right * m_posit.BroadcastZ() + B.m_posit * m_posit.BroadcastW()); 
 }
 
 
@@ -264,13 +264,13 @@ dgMatrix dgMatrix::Symetric3by3Inverse () const
 	dgMatrix inverse(dgGetIdentityMatrix());
 	for (dgInt32 i = 0; i < 3; i++) {
 		dgVector den(dgFloat32(1.0f) / copy[i][i]);
-		copy[i] = copy[i].CompProduct4(den);
-		inverse[i] = inverse[i].CompProduct4(den);
+		copy[i] = copy[i] * den;
+		inverse[i] = inverse[i] * den;
 		for (dgInt32 j = 0; j < 3; j++) {
 			if (j != i) {
 				dgVector pivot(copy[j][i]);
-				copy[j] -= copy[i].CompProduct4(pivot);
-				inverse[j] -= inverse[i].CompProduct4(pivot);
+				copy[j] -= copy[i] * pivot;
+				inverse[j] -= inverse[i] * pivot;
 			}
 		}
 	}
@@ -601,8 +601,8 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 					dgVector tauv (tau);
 					dgVector gv (eigenVectors[ip]);
 					dgVector hv (eigenVectors[iq]);
-					eigenVectors[ip] -= sv.CompProduct4 (hv + gv.CompProduct4(tauv)); 
-					eigenVectors[iq] += sv.CompProduct4 (gv - hv.CompProduct4(tauv));
+					eigenVectors[ip] -= sv * (hv + gv * tauv); 
+					eigenVectors[iq] += sv * (gv - hv * tauv);
 				}
 			}
 		}
