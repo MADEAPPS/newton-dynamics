@@ -1682,6 +1682,11 @@ class dgBigVector
 		return (DotProduct4(*this)).InvSqrt();
 	}
 
+	DG_INLINE dgBigVector Normalize() const
+	{
+		return *this * InvMagSqrt();
+	}
+
 	dgBigVector GetMax(const dgBigVector& data) const
 	{
 		return dgBigVector(_mm_max_pd(m_typeLow, data.m_typeLow), _mm_max_pd(m_typeHigh, data.m_typeHigh));
