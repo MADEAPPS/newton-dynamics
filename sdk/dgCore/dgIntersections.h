@@ -269,7 +269,6 @@ class dgFastAABBInfo: public dgObb
 		,m_p0(p0)
 		,m_p1(p1)
 	{
-		//m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
 		m_posit = ((dgVector::m_half * (p1 + p0)) & dgVector::m_triplexMask) | dgVector::m_wOne;
 	}
 

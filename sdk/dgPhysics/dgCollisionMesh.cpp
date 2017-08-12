@@ -103,7 +103,6 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 	SetTransposeAbsMatrix(matrix);
 	m_convexInstance->CalcAABB(convexMatrix, p0, p1);
 	m_size = dgVector::m_half * (p1 - p0);
-	//m_posit = matrix.TransformVector((p1 + p0).CompProduct4(dgVector::m_half));
 	m_posit = matrix.TransformVector(dgVector::m_half * (p1 + p0));
 	dgAssert (m_posit.m_w == dgFloat32 (1.0f));
 }

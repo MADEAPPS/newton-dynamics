@@ -139,8 +139,8 @@ void dgCollisionLumpedMassParticles::SetOwnerAndMassPraperties (dgDynamicBody* c
 		//inertiaSum += mass[i] * radius2;
 		posit[i] = scaledTranform.TransformVector(posit[i]) & dgVector::m_triplexMask;
 		xMassSum += posit[i].Scale4 (mass[i]);
-		//xxMassSum += posit[i].CompProduct4(posit[i]).Scale4 (mass[i]);
-		//xyMassSum += posit[i].CompProduct4(posit[i].ShiftTripleRight()).Scale4 (mass[i]);
+		//xxMassSum += posit[i] * posit[i].Scale4 (mass[i]);
+		//xyMassSum += posit[i] * (posit[i].ShiftTripleRight()).Scale4 (mass[i]);
 	}
 	m_totalMass = massSum;
 	dgFloat32 invMass = dgFloat32(1.0f) / massSum;

@@ -1032,7 +1032,6 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
             dgMatrix inertia0 (chunkCollision0->CalculateInertia());
             dgMatrix inertia1 (chunkCollision1->CalculateInertia());
             dgVector normal (inertia1.m_posit - inertia0.m_posit);
-            //normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 			normal = normal.Normalize();
             edgeNode->GetInfo().m_edgeData.m_normal = normal; 
 		}
@@ -1399,7 +1398,6 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 			dgAssert (val > dgFloat32 (-1.0f));
 			dgFloat32 angle = dgAcos (val) - dgFloat32 (3.141592f * 90.0f / 180.0f) + dgFloat32 (3.141592f * 15.0f / 180.0f);
 			dgVector axis (himespherePlane.CrossProduct3(directionsMap[i]));
-			//axis = axis.CompProduct4(axis.DotProduct4(axis).InvSqrt());
 			axis = axis.Normalize();
 			dgQuaternion rot (axis, angle);
 			himespherePlane = dgMatrix (rot, dgVector::m_wOne).RotateVector(himespherePlane);

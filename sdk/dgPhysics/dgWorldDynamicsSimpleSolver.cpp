@@ -549,22 +549,6 @@ void dgWorldDynamicUpdate::IntegrateExternalForce(const dgBodyCluster* const clu
 	}
 }
 
-/*
-void dgWorldDynamicUpdate::ApplyForceAndTorque(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2) const
-{
-	dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-	dgVector force(body->m_externalForce + forceAndTorque.m_linear);
-	dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
-
-	dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
-	dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)).CompProduct4(timestep4));
-	body->m_veloc += velocStep;
-	body->m_omega += omegaStep;
-
-	dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
-	dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
-}
-*/
 
 void dgWorldDynamicUpdate::CalculateNetAcceleration(dgBody* const body, const dgVector& invTimeStep, const dgVector& maxAccNorm2) const
 {

@@ -382,9 +382,6 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 		case m_global:
 		default:	
 		{
-			//dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale.CompProduct4(dir)));
-			//dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			//return m_scale.CompProduct4(m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL)));
 			dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale * dir));
 			dir1 = dir1 * dir1.InvMagSqrt();
 			return m_scale * m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL));

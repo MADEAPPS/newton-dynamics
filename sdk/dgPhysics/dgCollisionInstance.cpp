@@ -478,7 +478,6 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 			// support((p * S), n) = S * support (p, n * transp(S)) 
 			dgVector point1 (m_invScale * point);
 			dgVector normal1 (m_scale * normal);
-			//normal1 = normal1.CompProduct4(normal1.InvMagSqrt());
 			normal1 = normal1.Normalize();
 			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
@@ -492,7 +491,6 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 		{
 			dgVector point1 (m_aligmentMatrix.UntransformVector (m_invScale * point));
 			dgVector normal1 (m_aligmentMatrix.UntransformVector (m_scale * normal));
-			//normal1 = normal1.CompProduct4(normal1.InvMagSqrt());
 			normal1 = normal1.Normalize();
 			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
@@ -597,7 +595,6 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 						contactOut.m_shapeId0 = GetUserDataID();
 						contactOut.m_shapeId1 = GetUserDataID();
 						dgVector n (m_invScale * contactOut.m_normal);
-						//contactOut.m_normal = n.CompProduct4(n.InvMagSqrt());
 						contactOut.m_normal = n.Normalize();
 					}
 					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
@@ -619,7 +616,6 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 						contactOut.m_shapeId0 = GetUserDataID();
 						contactOut.m_shapeId1 = GetUserDataID();
 						dgVector n (m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
-						//contactOut.m_normal = n.CompProduct4(n.InvMagSqrt());
 						contactOut.m_normal = n.Normalize();
 					}
 					if (!(m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {

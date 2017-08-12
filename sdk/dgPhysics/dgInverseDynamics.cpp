@@ -149,8 +149,8 @@ class dgInverseDynamics::dgNode
 				const dgJacobianMatrixElement* const row = &matrixRow[start + k];
 				jointMass[i] = dgSpatialVector(dgFloat32(0.0f));
 				jointMass[i][i] = -row->m_diagDamp;
-				bodyJt[i] = dgSpatialVector (row->m_Jt.m_jacobianM0.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM0.m_angular.CompProduct4(dgVector::m_negOne));
-				jointJ[i] = dgSpatialVector (row->m_Jt.m_jacobianM1.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM1.m_angular.CompProduct4(dgVector::m_negOne));
+				bodyJt[i] = dgSpatialVector (row->m_Jt.m_jacobianM0.m_linear * dgVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * dgVector::m_negOne);
+				jointJ[i] = dgSpatialVector (row->m_Jt.m_jacobianM1.m_linear * dgVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * dgVector::m_negOne);
 			}
 		} else {
 			for (dgInt32 i = 0; i < m_dof; i++) {
@@ -158,8 +158,8 @@ class dgInverseDynamics::dgNode
 				const dgJacobianMatrixElement* const row = &matrixRow[start + k];
 				jointMass[i] = dgSpatialVector(dgFloat32(0.0f));
 				jointMass[i][i] = -row->m_diagDamp;
-				bodyJt[i] = dgSpatialVector(row->m_Jt.m_jacobianM1.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM1.m_angular.CompProduct4(dgVector::m_negOne));
-				jointJ[i] = dgSpatialVector(row->m_Jt.m_jacobianM0.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM0.m_angular.CompProduct4(dgVector::m_negOne));
+				bodyJt[i] = dgSpatialVector(row->m_Jt.m_jacobianM1.m_linear * dgVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * dgVector::m_negOne);
+				jointJ[i] = dgSpatialVector(row->m_Jt.m_jacobianM0.m_linear * dgVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * dgVector::m_negOne);
 			}
 		}
 	}
@@ -706,8 +706,8 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 			dgJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
 			dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
 
-			dgVector element(JMinvM0.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM0.m_linear) + JMinvM0.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM0.m_angular) +
-							 JMinvM1.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM1.m_angular));
+			dgVector element(JMinvM0.m_linear * row_i->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_i->m_Jt.m_jacobianM0.m_angular +
+							 JMinvM1.m_linear * row_i->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_i->m_Jt.m_jacobianM1.m_angular);
 			element = element.AddHorizontal();
 
 			// I know I am doubling the matrix regularize, but this makes the solution more robust.
@@ -723,15 +723,15 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 				const dgInt32 k = auxiliaryBase + j;
 				dgVector acc(dgVector::m_zero);
 				if (m0 == m_pairs[k].m_m0) {
-					acc += JMinvM0.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM0.m_linear) + JMinvM0.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM0.m_angular);
+					acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
 				} else if (m0 == m_pairs[k].m_m1) {
-					acc += JMinvM0.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM1.m_linear) + JMinvM0.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM1.m_angular);
+					acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
 				}
 
 				if (m1 == m_pairs[k].m_m1) {
-					acc += JMinvM1.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM1.m_angular);
+					acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
 				} else if (m1 == m_pairs[k].m_m0) {
-					acc += JMinvM1.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM0.m_linear) + JMinvM1.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM0.m_angular);
+					acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
 				}
 				acc = acc.AddHorizontal();
 				dgFloat32 offDiagValue = acc.GetScalar();
@@ -745,15 +745,15 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 
 				dgVector acc(dgVector::m_zero);
 				if (m0 == m_pairs[j].m_m0) {
-					acc += JMinvM0.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM0.m_linear) + JMinvM0.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM0.m_angular);
+					acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
 				} else if (m0 == m_pairs[j].m_m1) {
-					acc += JMinvM0.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM1.m_linear) + JMinvM0.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM1.m_angular);
+					acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
 				}
 
 				if (m1 == m_pairs[j].m_m1) {
-					acc += JMinvM1.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM1.m_angular);
+					acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
 				} else if (m1 == m_pairs[j].m_m0) {
-					acc += JMinvM1.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM0.m_linear) + JMinvM1.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM0.m_angular);
+					acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
 				}
 				acc = acc.AddHorizontal();
 				dgFloat32 val = acc.GetScalar();
@@ -969,10 +969,10 @@ DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const exte
 
 			row->m_force += dgFloat32(f[j]);
 			dgVector jointForce = dgFloat32(f[j]);
-			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(jointForce);
-			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(jointForce);
-			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(jointForce);
-			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(jointForce);
+			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
+			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
+			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
+			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
 		}
 
 		const dgInt32 m0 = node->m_swapJacobianBodiesIndex ? node->m_parent->m_index : i;
@@ -1042,8 +1042,8 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalAcce
 		for (dgInt32 i = 0; i < auxiliaryDof; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[first + i];
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
-			//dgVector diag(row->m_Jt.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
-			//			  row->m_Jt.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
+			//dgVector diag(row->m_Jt.m_jacobianM0.m_linear * y0.m_linear) + row->m_Jt.m_jacobianM0.m_angular * y0.m_angular) +
+			//			  row->m_Jt.m_jacobianM1.m_linear * y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular * y1.m_angular));
 			//b[auxiliaryIndex] = row->m_penetrationStiffness - (diag.AddHorizontal()).GetScalar();
 			b[auxiliaryIndex] = row->m_penetrationStiffness;
 			low[auxiliaryIndex] = dgClamp(row->m_lowerBoundFrictionCoefficent, -DG_MAX_BOUND, dgFloat32(0.0f));
@@ -1092,10 +1092,10 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalAcce
 
 		row->m_force += f[i];
 		dgVector jointForce(f[i]);
-		externalAccel[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(jointForce);
-		externalAccel[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(jointForce);
-		externalAccel[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(jointForce);
-		externalAccel[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(jointForce);
+		externalAccel[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
+		externalAccel[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
+		externalAccel[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
+		externalAccel[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
 	}
 }
 
@@ -1124,14 +1124,14 @@ DG_INLINE void dgInverseDynamics::GetRowJacobianDerivatives (dgInt32 index, cons
 	dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
 	dgAssert(row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32(0.0f));
 
-	row->m_JMinv.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear.CompProduct4(invMass0);
+	row->m_JMinv.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear * invMass0;
 	row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
-	row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear.CompProduct4(invMass1);
+	row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
 	row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
-	dgVector tmpDiag(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(row->m_Jt.m_jacobianM0.m_linear) +
-		row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(row->m_Jt.m_jacobianM0.m_angular) +
-		row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(row->m_Jt.m_jacobianM1.m_linear) +
-		row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(row->m_Jt.m_jacobianM1.m_angular));
+	dgVector tmpDiag(row->m_JMinv.m_jacobianM0.m_linear * row->m_Jt.m_jacobianM0.m_linear +
+					 row->m_JMinv.m_jacobianM0.m_angular * row->m_Jt.m_jacobianM0.m_angular +
+					 row->m_JMinv.m_jacobianM1.m_linear * row->m_Jt.m_jacobianM1.m_linear +
+					 row->m_JMinv.m_jacobianM1.m_angular * row->m_Jt.m_jacobianM1.m_angular);
 
 	dgAssert(tmpDiag.m_w == dgFloat32(0.0f));
 	dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
@@ -1258,7 +1258,7 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 		dgDynamicBody* const body = node->m_body;
 
 		dgVector velocStep(externalForce[i].m_linear.Scale4(timestep * body->m_invMass.m_w));
-		dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(externalForce[i].m_angular)).CompProduct4(timestep4));
+		dgVector omegaStep(body->m_invWorldInertiaMatrix.RotateVector(externalForce[i].m_angular) * timestep4);
 
 		velocity[i].m_linear = body->m_veloc + velocStep;
 		velocity[i].m_angular = body->m_omega + omegaStep;
@@ -1283,10 +1283,10 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 		for (dgInt32 j = 0; j < dof; j++) {
 			dgInt32 k = node->m_sourceJacobianIndex[j];
 			dgJacobianMatrixElement* const row = &matrixRow[first + k];
-			dgVector relVeloc(veloc0.m_linear.CompProduct4(row->m_Jt.m_jacobianM0.m_linear) +
-							  veloc0.m_angular.CompProduct4(row->m_Jt.m_jacobianM0.m_angular) +
-							  veloc1.m_linear.CompProduct4(row->m_Jt.m_jacobianM1.m_linear) +
-							  veloc1.m_angular.CompProduct4(row->m_Jt.m_jacobianM1.m_angular));
+			dgVector relVeloc(veloc0.m_linear * row->m_Jt.m_jacobianM0.m_linear +
+							  veloc0.m_angular * row->m_Jt.m_jacobianM0.m_angular +
+							  veloc1.m_linear * row->m_Jt.m_jacobianM1.m_linear +
+							  veloc1.m_angular * row->m_Jt.m_jacobianM1.m_angular);
 
 
 			dgFloat32 a = relVeloc.AddHorizontal().GetScalar() * invTimestep; 

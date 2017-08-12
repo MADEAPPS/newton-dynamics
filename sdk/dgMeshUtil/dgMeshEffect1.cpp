@@ -62,7 +62,7 @@ dgInt32 dgMeshEffect::dgFormat::GetSortIndex (const dgChannel<dgBigVector, m_poi
 	for (dgInt32 i = 0; i < points.m_count; i++) {
 		dgBigVector x(points[i]);
 		xc += x;
-		x2c += x.CompProduct4(x);
+		x2c += x * x;
 		minP = minP.GetMin(x);
 		maxP = maxP.GetMax(x);
 	}
@@ -74,7 +74,7 @@ dgInt32 dgMeshEffect::dgFormat::GetSortIndex (const dgChannel<dgBigVector, m_poi
 	}
 
 	dgInt32 firstSortAxis = 0;
-	x2c = x2c.Scale4(points.m_count) - xc.CompProduct4(xc);
+	x2c = x2c.Scale4(points.m_count) - xc * xc;
 	if ((x2c.m_y >= x2c.m_x) && (x2c.m_y >= x2c.m_z)) {
 		firstSortAxis = 1;
 	}

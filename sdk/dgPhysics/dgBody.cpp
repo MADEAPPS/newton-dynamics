@@ -586,9 +586,10 @@ dgMatrix dgBody::CalculateInertiaMatrix () const
 {
 #if 0
 	dgMatrix tmp (m_matrix.Transpose4X4());
-	tmp[0] = tmp[0].CompProduct4 (m_mass);
-	tmp[1] = tmp[1].CompProduct4 (m_mass);
-	tmp[2] = tmp[2].CompProduct4 (m_mass);
+	dgVector mass (m_mass & dgVector::m_triplexMask);
+	tmp[0] = tmp[0] * mass;
+	tmp[1] = tmp[1] * mass;
+	tmp[2] = tmp[2] * mass;
 	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
 #else
 	const dgVector Ixx(m_mass[0]);

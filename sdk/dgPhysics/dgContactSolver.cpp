@@ -1180,7 +1180,6 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 	memset (m_hullSum, 0, 4 * sizeof (m_hullSum[0]));
 	const dgCollisionConvex* const collision = (dgCollisionConvex*)m_instance0->GetChildShape();
 
-	//dgVector dir1(p0p1.CompProduct4(p0p1.DotProduct4(p0p1).InvSqrt()));
 	dgVector dir1 (p0p1.Normalize());
 	m_hullDiff[0] = collision->SupportVertex (dir1, NULL) - point;
 	dgBigVector v (m_hullDiff[0]);
@@ -1210,7 +1209,6 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 			}
 
 			dgVector dir (v.Scale4 (-dgRsqrt(dgFloat32 (distance))));
-			//dgVector dir (v.CompProduct4(dist.InvSqrt().CompProduct4(dgVector::m_negOne)));
 			dgAssert (dir.m_w == dgFloat32 (0.0f));
 			m_hullDiff[index] = collision->SupportVertex (dir, NULL) - point;
 			const dgBigVector w (m_hullDiff[index]);

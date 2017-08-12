@@ -182,11 +182,6 @@ class dgTemplateVector
 		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
 
-	// component wise 4d multiplication
-	DG_INLINE dgTemplateVector<T> CompProduct4 (const dgTemplateVector<T>& A) const
-	{
-		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
-	}
 
 	DG_INLINE dgTemplateVector<T> GetMax(const dgTemplateVector<T>& data) const
 	{
@@ -335,12 +330,12 @@ class dgVector
 		return dgVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	DG_INLINE dgVector &operator+= (const dgVector& A)
+	DG_INLINE dgVector& operator+= (const dgVector& A)
 	{
 		return (*this = dgVector (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
 	}
 
-	DG_INLINE dgVector &operator-= (const dgVector& A)
+	DG_INLINE dgVector& operator-= (const dgVector& A)
 	{
 		return (*this = dgVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 	}
@@ -365,13 +360,6 @@ class dgVector
 	{
 		return dgVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
-
-	// component wise 4d multiplication
-	DG_INLINE dgVector CompProduct4 (const dgVector& A) const
-	{
-		return dgVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
-	}
-
 
 	// return dot product
 	DG_INLINE dgFloat32 DotProduct3 (const dgVector& A) const
@@ -745,12 +733,12 @@ class dgBigVector
 		return dgBigVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	DG_INLINE dgBigVector &operator+= (const dgBigVector& A)
+	DG_INLINE dgBigVector& operator+= (const dgBigVector& A)
 	{
 		return (*this = dgBigVector (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
 	}
 
-	DG_INLINE dgBigVector &operator-= (const dgBigVector& A)
+	DG_INLINE dgBigVector& operator-= (const dgBigVector& A)
 	{
 		return (*this = dgBigVector (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 	}
@@ -775,13 +763,6 @@ class dgBigVector
 	{
 		return dgBigVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
-
-	// component wise 4d multiplication
-	DG_INLINE dgBigVector CompProduct4 (const dgBigVector& A) const
-	{
-		return dgBigVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
-	}
-
 
 	// return dot product
 	DG_INLINE dgFloat64 DotProduct3 (const dgBigVector& A) const
@@ -1183,17 +1164,17 @@ class dgVector
 		return _mm_mul_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgVector &operator+= (const dgVector& A)
+	DG_INLINE dgVector& operator+= (const dgVector& A)
 	{
 		return (*this = _mm_add_ps (m_type, A.m_type));
 	}
 
-	DG_INLINE dgVector &operator-= (const dgVector& A)
+	DG_INLINE dgVector& operator-= (const dgVector& A)
 	{
 		return (*this = _mm_sub_ps (m_type, A.m_type));
 	}
 
-	DG_INLINE dgVector &operator*= (const dgVector& A)
+	DG_INLINE dgVector& operator*= (const dgVector& A)
 	{
 		return (*this = _mm_mul_ps(m_type, A.m_type));
 	}
@@ -1206,7 +1187,6 @@ class dgVector
 		#else
 			dgVector tmp (A & m_triplexMask);
 			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-			//return CompProduct4(tmp).AddHorizontal().GetScalar();
 			return (*this * tmp).AddHorizontal().GetScalar();
 		#endif
 	}
@@ -1223,7 +1203,6 @@ class dgVector
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return _mm_dp_ps(m_type, A.m_type, 0xff);
 		#else 
-		//return CompProduct4(A).AddHorizontal();
 		//return (*this * A).AddHorizontal().GetScalar();
 		return (*this * A).AddHorizontal();
 		#endif
@@ -1277,13 +1256,6 @@ class dgVector
 	DG_INLINE dgVector Reciproc () const
 	{
 		return _mm_div_ps (m_one.m_type, m_type);
-	}
-
-	// component wise multiplication
-	DG_INLINE dgVector CompProduct4 (const dgVector& A) const
-	{
-		//return _mm_mul_ps (m_type, A.m_type);
-		return *this * A;
 	}
 
 	DG_INLINE dgVector AddHorizontal () const
@@ -1340,7 +1312,6 @@ class dgVector
 	DG_INLINE dgVector InvSqrt () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
-		//return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
 		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
 	}
 
@@ -1582,17 +1553,29 @@ class dgBigVector
 		return dgBigVector(_mm_sub_pd(m_typeLow, A.m_typeLow), _mm_sub_pd(m_typeHigh, A.m_typeHigh));
 	}
 
-	DG_INLINE dgBigVector &operator+= (const dgBigVector& A)
+	DG_INLINE dgBigVector operator* (const dgBigVector& A) const
+	{
+		return dgBigVector(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
+	}
+
+	DG_INLINE dgBigVector& operator+= (const dgBigVector& A)
 	{
 		m_typeLow = _mm_add_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_add_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
 	}
 
-	DG_INLINE dgBigVector &operator-= (const dgBigVector& A)
+	DG_INLINE dgBigVector& operator-= (const dgBigVector& A)
 	{
 		m_typeLow = _mm_sub_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_sub_pd(m_typeHigh, A.m_typeHigh);
+		return *this;
+	}
+
+	DG_INLINE dgBigVector& operator*= (const dgBigVector& A)
+	{
+		m_typeLow = _mm_mul_pd(m_typeLow, A.m_typeLow);
+		m_typeHigh = _mm_mul_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
 	}
 
@@ -1615,7 +1598,7 @@ class dgBigVector
 		dgBigVector tmp1(B.ShiftTripleRight());
 		dgBigVector tmp2(ShiftTripleRight());
 		dgBigVector tmp3(B.ShiftTripleLeft());
-		return tmp0.CompProduct4(tmp1) - tmp2.CompProduct4(tmp3);
+		return tmp0 * tmp1 - tmp2 * tmp3;
 	}
 
 	DG_INLINE dgBigVector DotProduct4(const dgBigVector& A) const
@@ -1638,12 +1621,6 @@ class dgBigVector
 	DG_INLINE dgBigVector CompProduct3(const dgBigVector& A) const
 	{
 		return dgBigVector(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_and_pd(_mm_mul_pd(m_typeHigh, A.m_typeHigh), m_triplexMask.m_typeHigh));
-	}
-
-	// component wide multiplication
-	DG_INLINE dgBigVector CompProduct4(const dgBigVector& A) const
-	{
-		return dgBigVector(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
 	}
 
 	DG_INLINE dgBigVector BroadcastX() const
@@ -1907,156 +1884,6 @@ class dgBigVector
 
 
 #endif
-
-
-
-/*
-DG_MSC_VECTOR_ALIGMENT
-class dgSpatialVector
-{
-	public:
-	DG_INLINE dgSpatialVector()
-	{
-		SetZero();
-	}
-
-	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
-	{
-		m_v[0] = low[0];
-		m_v[1] = low[1];
-		m_v[2] = low[2];
-		m_v[3] = high[0];
-		m_v[4] = high[1];
-		m_v[5] = high[2];
-	}
-
-	DG_INLINE dgFloat32& operator[] (dgInt32 i)
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return m_v[i];
-	}
-
-	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return m_v[i];
-	}
-
-	DG_INLINE void SetZero()
-	{
-		m_v[0] = dgFloat32(0.0f);
-		m_v[1] = dgFloat32(0.0f);
-		m_v[2] = dgFloat32(0.0f);
-		m_v[3] = dgFloat32(0.0f);
-		m_v[4] = dgFloat32(0.0f);
-		m_v[5] = dgFloat32(0.0f);
-	}
-
-	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
-	{
-		return m_v[0] * v[0] + m_v[1] * v[1] + m_v[2] * v[2] + m_v[3] * v[3] + m_v[4] * v[4] + m_v[5] * v[5];
-	}
-
-	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
-	{
-		dst.m_v[0] = m_v[0] * s;
-		dst.m_v[1] = m_v[1] * s;
-		dst.m_v[2] = m_v[2] * s;
-		dst.m_v[3] = m_v[3] * s;
-		dst.m_v[4] = m_v[4] * s;
-		dst.m_v[5] = m_v[5] * s;
-	}
-
-	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
-	{
-		dst.m_v[0] = b[0] + m_v[0] * s;
-		dst.m_v[1] = b[1] + m_v[1] * s;
-		dst.m_v[2] = b[2] + m_v[2] * s;
-		dst.m_v[3] = b[3] + m_v[3] * s;
-		dst.m_v[4] = b[4] + m_v[4] * s;
-		dst.m_v[5] = b[5] + m_v[5] * s;
-	}
-
-	dgFloat32 m_v[6];
-} DG_GCC_VECTOR_ALIGMENT;
-*/
-
-
-/*
-// *****************************************************************************************
-//
-// 6 x 1 vector class declaration
-//
-// *****************************************************************************************
-DG_MSC_VECTOR_ALIGMENT
-class dgSpatialVector
-{
-	public:
-	DG_INLINE dgSpatialVector()
-	{
-	}
-
-	DG_INLINE dgSpatialVector(const dgFloat32 a)
-		:m_l(a)
-		,m_h(a)
-	{
-	}
-
-	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high, int x)
-		:m_l(low)
-		,m_h(dgVector::m_zero)
-	{
-		m_l[3] = high[0];
-		m_h[0] = high[1];
-		m_h[1] = high[2];
-	}
-
-	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
-		:m_l(low)
-		,m_h(high)
-	{
-	}
-
-	DG_INLINE dgFloat32& operator[] (dgInt32 i)
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return (&m_l.m_x)[i];
-	}
-
-	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return (&m_l.m_x)[i];
-	}
-
-	DG_INLINE dgSpatialVector operator+ (const dgSpatialVector& A) const
-	{
-		return dgSpatialVector(m_l + A.m_l, m_h + A.m_h);
-	}
-
-	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
-	{
-		dgAssert (v.m_h[2] == dgFloat32 (0.0f));
-		dgAssert (v.m_h[3] == dgFloat32 (0.0f));
-		dgVector p (m_l.CompProduct4(v.m_l) + m_h.CompProduct4(v.m_h));
-		return (p.AddHorizontal()).GetScalar(); 
-	}
-
-	DG_INLINE dgSpatialVector Scale(dgFloat32 s) const
-	{
-		return dgSpatialVector(m_l.Scale4(s), m_h.Scale4(s));
-	}
-
-	dgVector m_l;
-	dgVector m_h;
-
-} DG_GCC_VECTOR_ALIGMENT;
-*/
-
 
 
 DG_MSC_VECTOR_ALIGMENT

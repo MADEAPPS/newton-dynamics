@@ -540,10 +540,10 @@ dgConvexHull4dAABBTreeNode* dgConvexHull4d::BuildTree (dgConvexHull4dAABBTreeNod
 			maxP.m_w = dgMax (p.m_w, maxP.m_w); 
 
 			median = median + p;
-			varian = varian + p.CompProduct4(p);
+			varian = varian + p * p;
 		}
 
-		varian = varian.Scale4 (dgFloat32 (count)) - median.CompProduct4(median);
+		varian = varian.Scale4 (dgFloat32 (count)) - median * median;
 
 		dgInt32 index = 0;
 		dgFloat64 maxVarian = dgFloat64 (-1.0e10f);

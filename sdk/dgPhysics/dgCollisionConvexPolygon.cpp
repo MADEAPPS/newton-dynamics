@@ -123,7 +123,6 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	dgVector dir (m_localPoly[1] - m_localPoly[0]);
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgAssert (dir.DotProduct3(dir) > dgFloat32 (1.0e-8f));
-	//dir = dir.CompProduct4 (dir.InvMagSqrt());
 	dir = dir.Normalize();
 
 	dgFloat32 distH = origin.DotProduct4(dir).GetScalar();
@@ -475,7 +474,6 @@ dgVector dgCollisionConvexPolygon::CalculateGlobalNormal (const dgCollisionInsta
 	dgVector normal (aligmentMatrix.RotateVector(localNormal));
 	normal = normal * invScale;
 	dgAssert(normal.m_w == dgFloat32(0.0f));
-	//normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 	normal = normal.Normalize();
 	dgAssert (dgAbsf(normal.DotProduct3(normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 	return globalMatrix.RotateVector(normal);
@@ -509,7 +507,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 
 	dgMatrix polygonMatrix;
 	dgVector right (m_localPoly[1] - m_localPoly[0]);
-	//polygonMatrix[0] = right.CompProduct4(right.InvMagSqrt());
 	polygonMatrix[0] = right.Normalize();
 	polygonMatrix[1] = m_normal;
 	polygonMatrix[2] = polygonMatrix[0].CrossProduct3(m_normal);

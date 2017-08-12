@@ -220,7 +220,7 @@ bool dgDynamicBody::IsInEquilibrium() const
 		if (deltaAccel2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
-		dgVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque).CompProduct4(m_invMass));
+		dgVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque) * m_invMass);
 		dgAssert(deltaAlpha.m_w == 0.0f);
 		dgFloat32 deltaAlpha2 = deltaAlpha.DotProduct4(deltaAlpha).GetScalar();
 		if (deltaAlpha2 > DG_ERR_TOLERANCE2) {
@@ -269,13 +269,13 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_netAlpha = alpha;
 
 			dgVector timeStepVect(timestep);
-			m_veloc += accel.CompProduct4(timeStepVect);
+			m_veloc += accel * timeStepVect;
 
 #if 0
 			// Using forward half step Euler integration 
 			// (not enough to cope with high angular velocities)
 			dgVector correction(alpha.CrossProduct3(m_omega));
-			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
+			m_omega += alpha * timeStepVect * dgVector::m_half + correction * timeStepVect * timeStepVect * m_eulerTaylorCorrection;
 #else
 			// Using forward and backward Euler integration
 			// (good to resolve high angular velocity precession) 
@@ -288,8 +288,8 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				// get forward derivative
 				dgVector localOmega(matrix.UnrotateVector(m_omega));
 				dgVector localTorque(matrix.UnrotateVector(m_externalTorque));
-				dgVector predictDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
-				dgVector predictOmega(omega + predictDerivative.CompProduct4(timeStepVect));
+				dgVector predictDerivative(matrix.RotateVector(m_invMass * (localTorque - localOmega.CrossProduct3(localOmega * m_mass))));
+				dgVector predictOmega(omega + predictDerivative * timeStepVect);
 
 				// calculate new rotation matrix at time (dw, dt) 
 				dgFloat32 omegaMag2 = predictOmega.DotProduct3(predictOmega);
@@ -302,12 +302,12 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				// get backward derivative
 				localOmega = matrix.UnrotateVector(predictOmega);
 				localTorque = matrix.UnrotateVector(m_externalTorque);
-				dgVector correctionDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
+				dgVector correctionDerivative(matrix.RotateVector(m_invMass * (localTorque - localOmega.CrossProduct3(localOmega * m_mass))));
 
 				// calculate omega as the average of forward and backward derivatives.
 				// In theory since alpha is a quadratic function of omega, this should converge to an eact value
 				// in one at most two steps.
-				omega = m_omega + halfStep.CompProduct4(correctionDerivative + predictDerivative);
+				omega = m_omega + halfStep * (correctionDerivative + predictDerivative);
 			}
 			m_omega = omega;
 #endif

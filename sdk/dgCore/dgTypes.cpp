@@ -176,15 +176,6 @@ static inline dgInt32 cmp_vertex (const dgFloat64* const v1, const dgFloat64* co
 
 static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt32 compareCount, dgInt32 vertexCount, dgFloat64 tolerance)
 {
-//	dgFloat64 xc = dgFloat64 (0.0f);
-//	dgFloat64 yc = dgFloat64 (0.0f);
-//	dgFloat64 zc = dgFloat64 (0.0f);
-//	dgFloat64 x2c = dgFloat64 (0.0f);
-//	dgFloat64 y2c = dgFloat64 (0.0f);
-//	dgFloat64 z2c = dgFloat64 (0.0f);
-//	dgBigVector minP (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
-//	dgBigVector maxP (dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (0.0f));
-
 	dgBigVector xc(dgFloat64(0.0f));
 	dgBigVector x2c(dgFloat64(0.0f));
 	dgBigVector minP (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
@@ -194,43 +185,10 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 
 		dgBigVector x(vertexList[k + 2], vertexList[k + 3], vertexList[k + 4], dgFloat64(0.0f));
 		xc += x;
-		x2c += x.CompProduct4(x);
+		x2c += x * x;
 		minP = minP.GetMin(x);
 		maxP = maxP.GetMax(x);
 		k += stride;
-/*
-		dgFloat64 x  = vertexList[k + 2];
-		dgFloat64 y  = vertexList[k + 3];
-		dgFloat64 z  = vertexList[k + 4];
-		xc += x;
-		yc += y;
-		zc += z;
-		x2c += x * x;
-		y2c += y * y; 
-		z2c += z * z;
-
-		if (x < minP.m_x) {
-			minP.m_x = x; 
-		}
-		if (y < minP.m_y) {
-			minP.m_y = y; 
-		}
-
-		if (z < minP.m_z) {
-			minP.m_z = z; 
-		}
-
-		if (x > maxP.m_x) {
-			maxP.m_x = x; 
-		}
-		if (y > maxP.m_y) {
-			maxP.m_y = y; 
-		}
-
-		if (z > maxP.m_z) {
-			maxP.m_z = z; 
-		}
-*/
 	}
 
 	dgBigVector del (maxP - minP);
@@ -243,17 +201,9 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 	dgFloat64 sweptWindow = dgFloat64 (2.0f) * tol;
 	sweptWindow += dgFloat64 (1.0e-4f);
 
-	x2c = x2c.Scale4 (dgFloat32 (vertexCount)) - xc.CompProduct4(xc);
-//	x2c = vertexCount * x2c - xc * xc;
-//	y2c = vertexCount * y2c - yc * yc;
-//	z2c = vertexCount * z2c - zc * zc;
+	x2c = x2c.Scale4 (dgFloat32 (vertexCount)) - xc * xc;
 
 	dgInt32 firstSortAxis = 2;
-//	if ((y2c >= x2c) && (y2c >= z2c)) {
-//		firstSortAxis = 3;
-//	} else if ((z2c >= x2c) && (z2c >= y2c)) {
-//		firstSortAxis = 4;
-//	}
 	if ((x2c.m_y >= x2c.m_x) && (x2c.m_y >= x2c.m_z)) {
 		firstSortAxis = 3;
 	} else if ((x2c.m_z >= x2c.m_x) && (x2c.m_z >= x2c.m_y)) {
