@@ -201,7 +201,7 @@ DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 	if (m_angularDampOn) {
 		dgVector omegaDamp(dgPow(dgFloat32(1.0f) - m_dampCoef.m_x, tau), dgPow(dgFloat32(1.0f) - m_dampCoef.m_y, tau), dgPow(dgFloat32(1.0f) - m_dampCoef.m_z, tau), 0.0f);
 		dgVector omega(m_matrix.UnrotateVector(m_omega));
-		omega = omega.CompProduct4(omegaDamp);
+		omega = omega * omegaDamp;
 		m_omega = m_matrix.RotateVector(omega);
 	}
 }

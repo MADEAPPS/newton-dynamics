@@ -100,11 +100,11 @@ class dgBroadPhaseNode
 		dgAssert(minBox.m_y <= maxBox.m_y);
 		dgAssert(minBox.m_z <= maxBox.m_z);
 
-		dgVector p0(minBox.CompProduct4(m_broadPhaseScale));
-		dgVector p1(maxBox.CompProduct4(m_broadPhaseScale) + dgVector::m_one);
+		dgVector p0(minBox * m_broadPhaseScale);
+		dgVector p1(maxBox * m_broadPhaseScale + dgVector::m_one);
 
-		m_minBox = p0.Floor().CompProduct4(m_broadInvPhaseScale);
-		m_maxBox = p1.Floor().CompProduct4(m_broadInvPhaseScale);
+		m_minBox = p0.Floor() * m_broadInvPhaseScale;
+		m_maxBox = p1.Floor() * m_broadInvPhaseScale;
 
 		dgAssert(m_minBox.m_w == dgFloat32(0.0f));
 		dgAssert(m_maxBox.m_w == dgFloat32(0.0f));
