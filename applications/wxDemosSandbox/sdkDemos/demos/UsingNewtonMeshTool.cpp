@@ -107,7 +107,7 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	dBigVector scale1 (scale);
 	for (int i = 0; i < 8; i ++) {
 		dBigVector p(&BoxPoints[i * 4]);
-		array[i] = scale1.CompProduct(p);
+		array[i] = scale1 * p;
 	}
 
 	NewtonMeshVertexFormat vertexFormat;

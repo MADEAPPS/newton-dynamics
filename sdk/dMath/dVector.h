@@ -33,14 +33,13 @@ class TemplateVector
 
 	TemplateVector operator+ (const TemplateVector &A) const; 
 	TemplateVector operator- (const TemplateVector &A) const; 
-	TemplateVector &operator+= (const TemplateVector &A);
-	TemplateVector &operator-= (const TemplateVector &A); 
+	TemplateVector operator* (const TemplateVector &A) const; 
+	TemplateVector& operator+= (const TemplateVector &A);
+	TemplateVector& operator-= (const TemplateVector &A); 
+	TemplateVector& operator*= (const TemplateVector &A); 
 
 	T DotProduct3 (const TemplateVector &A) const; 
 	TemplateVector CrossProduct (const TemplateVector &A) const; 
-
-	// component wise multiplication
-	TemplateVector CompProduct(const TemplateVector &A) const;
 
 	T m_x;
 	T m_y;
@@ -164,6 +163,13 @@ TemplateVector<T> TemplateVector<T>::operator+ (const TemplateVector<T>& B) cons
 }
 
 template<class T>
+TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T>& B) const
+{
+	return TemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w);
+}
+
+
+template<class T>
 TemplateVector<T>& TemplateVector<T>::operator+= (const TemplateVector<T>& A) 
 {
 	m_x += A.m_x;
@@ -188,6 +194,17 @@ TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T>& A)
 }
 
 template<class T>
+TemplateVector<T>& TemplateVector<T>::operator*= (const TemplateVector<T>& A)
+{
+	m_x *= A.m_x;
+	m_y *= A.m_y;
+	m_z *= A.m_z;
+	//m_w *= A.m_w;
+	return *this;
+}
+
+
+template<class T>
 T TemplateVector<T>::DotProduct3 (const TemplateVector<T>& A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
@@ -198,14 +215,6 @@ TemplateVector<T> TemplateVector<T>::CrossProduct (const TemplateVector<T>& A) c
 {
 	return TemplateVector<T> (m_y * A.m_z - m_z * A.m_y, m_z * A.m_x - m_x * A.m_z, m_x * A.m_y - m_y * A.m_x, m_w);
 }
-
-template<class T>
-TemplateVector<T> TemplateVector<T>::CompProduct (const TemplateVector<T>& A) const
-{
-	return TemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
-}
-
-
 
 
 class dSpatialVector
@@ -255,7 +264,8 @@ class dSpatialVector
 		return tmp;
 	}
 
-	inline dSpatialVector CompProduct(const dSpatialVector& A) const
+	//inline dSpatialVector CompProduct(const dSpatialVector& A) const
+	inline dSpatialVector operator* (const dSpatialVector& A) const
 	{
 		dSpatialVector tmp;
 		for (int i = 0; i < 6; i++) {

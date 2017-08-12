@@ -76,7 +76,7 @@ void dCollisionBoxNodeInfo::BakeTransform (const dMatrix& transform)
 	dMatrix stretchAxis;
 	dMatrix transformMatrix;
 	transform.PolarDecomposition (transformMatrix, scale, stretchAxis);
-	m_size = m_size.CompProduct(scale);
+	m_size = m_size * scale;
 }
 
 

@@ -231,14 +231,14 @@ void dComplentaritySolver::dBodyState::UpdateInertia()
 {
 	dMatrix tmpMatrix (dGetZeroMatrix());
 
-	tmpMatrix[0] = m_localInertia.CompProduct (dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f));
-	tmpMatrix[1] = m_localInertia.CompProduct (dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f));
-	tmpMatrix[2] = m_localInertia.CompProduct (dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f));
+	tmpMatrix[0] = m_localInertia * dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f);
+	tmpMatrix[1] = m_localInertia * dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f);
+	tmpMatrix[2] = m_localInertia * dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f);
 	m_inertia = tmpMatrix * m_matrix;
 
-	tmpMatrix[0] = m_localInvInertia.CompProduct (dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f));
-	tmpMatrix[1] = m_localInvInertia.CompProduct (dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f));
-	tmpMatrix[2] = m_localInvInertia.CompProduct (dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f));
+	tmpMatrix[0] = m_localInvInertia * dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f);
+	tmpMatrix[1] = m_localInvInertia * dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f);
+	tmpMatrix[2] = m_localInvInertia * dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f);
 	m_invInertia = tmpMatrix * m_matrix;
 }
 
@@ -299,7 +299,7 @@ void dComplentaritySolver::dBodyState::ApplyNetForceAndTorque (dFloat invTimeste
 
 	m_externalForce = accel.Scale(m_mass);
 	alpha = m_matrix.UnrotateVector(alpha);
-	m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
+	m_externalTorque = m_matrix.RotateVector(alpha * m_localInertia);
 }
 
 
@@ -492,10 +492,10 @@ void dComplentaritySolver::dBilateralJoint::JointAccelerations (dJointAccelerati
 			jacobianColElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianColElements[k].m_deltaAccel;
 		} else {
 			const dJacobianPair& Jt = jacobianRowElements[k];
-			dVector relVeloc (Jt.m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0) +
-				Jt.m_jacobian_IM0.m_angular.CompProduct(bodyOmega0) + 
-				Jt.m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1) +
-				Jt.m_jacobian_IM1.m_angular.CompProduct(bodyOmega1));
+			dVector relVeloc (Jt.m_jacobian_IM0.m_linear * bodyVeloc0 +
+							  Jt.m_jacobian_IM0.m_angular * bodyOmega0 + 
+							  Jt.m_jacobian_IM1.m_linear * bodyVeloc1 +
+							  Jt.m_jacobian_IM1.m_angular * bodyOmega1);
 
 			dFloat vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 			dFloat aRel = jacobianColElements[k].m_deltaAccel;
@@ -622,7 +622,7 @@ void dComplentaritySolver::dFrictionLessContactJoint::JointAccelerations (dJoint
 		const dJacobianPair& Jt = rowMatrix[k];
 		dJacobianColum& element = jacobianColElements[k];
 
-		dVector relVeloc (Jt.m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0) + Jt.m_jacobian_IM0.m_angular.CompProduct(bodyOmega0) + Jt.m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1) + Jt.m_jacobian_IM1.m_angular.CompProduct(bodyOmega1));
+		dVector relVeloc (Jt.m_jacobian_IM0.m_linear * bodyVeloc0 + Jt.m_jacobian_IM0.m_angular * bodyOmega0 + Jt.m_jacobian_IM1.m_linear * bodyVeloc1 + Jt.m_jacobian_IM1.m_angular * bodyOmega1);
 
 		dFloat vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dFloat aRel = element.m_deltaAccel;
@@ -675,8 +675,8 @@ int dComplentaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 			dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
 			dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
 
-			dVector tmpDiag (JMinvIM0linear.CompProduct(row->m_jacobian_IM0.m_linear) + JMinvIM0angular.CompProduct(row->m_jacobian_IM0.m_angular) + JMinvIM1linear.CompProduct(row->m_jacobian_IM1.m_linear) + JMinvIM1angular.CompProduct(row->m_jacobian_IM1.m_angular));
-			dVector tmpAccel (JMinvIM0linear.CompProduct (state0->m_externalForce) + JMinvIM0angular.CompProduct(state0->m_externalTorque) + JMinvIM1linear.CompProduct (state1->m_externalForce) + JMinvIM1angular.CompProduct(state1->m_externalTorque));
+			dVector tmpDiag (JMinvIM0linear * row->m_jacobian_IM0.m_linear + JMinvIM0angular * row->m_jacobian_IM0.m_angular + JMinvIM1linear * row->m_jacobian_IM1.m_linear + JMinvIM1angular * row->m_jacobian_IM1.m_angular);
+			dVector tmpAccel (JMinvIM0linear * state0->m_externalForce + JMinvIM0angular * state0->m_externalTorque + JMinvIM1linear * state1->m_externalForce + JMinvIM1angular * state1->m_externalTorque);
 			dFloat extenalAcceleration = -(tmpAccel[0] + tmpAccel[1] + tmpAccel[2]);
 
 			col->m_diagDamp = 1.0f;
@@ -807,7 +807,7 @@ void dComplentaritySolver::CalculateReactionsForces (int bodyCount, dBodyState**
 					dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
 					dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
 					dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
-					dVector acc (JMinvIM0linear.CompProduct(linearM0) + JMinvIM0angular.CompProduct(angularM0) + JMinvIM1linear.CompProduct(linearM1) + JMinvIM1angular.CompProduct(angularM1));
+					dVector acc (JMinvIM0linear * linearM0 + JMinvIM0angular * angularM0 + JMinvIM1linear * linearM1 + JMinvIM1angular * angularM1);
 
 					dFloat a = col->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - col->m_force * col->m_diagDamp;
 					dFloat f = col->m_force + col->m_invDJMinvJt * a;
