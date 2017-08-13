@@ -563,230 +563,60 @@ class SuperCarEntity: public DemoEntity
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
-		dEngineController* const engine = m_controller->GetEngine();
-		dBrakeController* const brakes = m_controller->GetBrakes();
-		dBrakeController* const handBrakes = m_controller->GetHandBrakes();
-		dSteeringController* const steering = m_controller->GetSteering();
-
+/*
 		// get the throttler input
 		dFloat joyPosX;
 		dFloat joyPosY;
 		int joyButtons;
 
 		int gear = engine ? engine->GetGear() : 0;
-		int engineIgnitionKey = 0;
-		int engineDifferentialLock = 0;
-		int automaticTransmission = engine ? engine->GetTransmissionMode() : 1;
-		dFloat cluthPedal = 1.0f;
-		dFloat steeringVal = 0.0f;
-		dFloat reverseGasPedal = 0.0f;
-		dFloat forwardGasPedal = 0.0f;
-		dFloat handBrakePedal = 0.0f;
-		
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
-/*
 			// apply a cubic attenuation to the joystick inputs
-			joyPosX = joyPosX * joyPosX * joyPosX;
-			joyPosY = joyPosY * joyPosY * joyPosY;
-
-			steeringVal = joyPosX;
-			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
-			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
-
-			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
-			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
-*/
-		} else {
-
-			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
-			engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
-			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
-			steeringVal = (dFloat(mainWindow->GetKeyState('D')) - dFloat(mainWindow->GetKeyState('A')));
-			gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
-
-			if (mainWindow->GetKeyState ('W')) {
-				forwardGasPedal = 1.0f;
-			}
-
-			if (mainWindow->GetKeyState('S')) {
-				reverseGasPedal = 1.0f;
-			}
-
-			if (mainWindow->GetKeyState(' ')) {
-				handBrakePedal = 1.0f;
-			}
-
-			if (mainWindow->GetKeyState ('K')) {
- 				cluthPedal = 0.0f;
-			}
+//			joyPosX = joyPosX * joyPosX * joyPosX;
+//			joyPosY = joyPosY * joyPosY * joyPosY;
+//			steeringVal = joyPosX;
+//			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
+//			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
+//			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
+//			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
 		}
+*/
 
-//xxxxxxx
+		dVehicleDriverInput driverInput;
+
+		driverInput.m_gasPedal = mainWindow->GetKeyState('W') ? 1.0f : 0.0f;
+		driverInput.m_brakePedal = mainWindow->GetKeyState('S') ? 1.0f : 0.0f;
+		driverInput.m_cluthPedal = mainWindow->GetKeyState('K') ? 1.0f : 0.0f;
+		driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
+		driverInput.m_steeringValue = (dFloat(mainWindow->GetKeyState('D')) - dFloat(mainWindow->GetKeyState('A')));
+		//gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
+			
+		driverInput.m_handBrakeValue = mainWindow->GetKeyState(' ') ? 1.0f : 0.0f;
+		driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
+		driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
+
 #if 0
 	#if 0
-		static FILE* file = fopen ("log.bin", "wb");                                         
-		if (file) {
-			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
-			fwrite (&engineDifferentialLock, sizeof (int), 1, file);
-			fwrite (&automaticTransmission, sizeof (int), 1, file);
-			fwrite (&gear, sizeof (int), 1, file);
-			fwrite (&steeringVal, sizeof (dFloat), 1, file);
-			fwrite (&cluthPedal, sizeof (dFloat), 1, file);
-			fwrite (&forwardGasPedal, sizeof (dFloat), 1, file);
-			fwrite (&reverseGasPedal, sizeof (dFloat), 1, file);
-			fwrite (&handBrakePedal, sizeof (dFloat), 1, file);
-			fflush(file);
-		}
+			static FILE* file = fopen("log.bin", "wb");
+			if (file) {
+				fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+				fflush(file);
+			}
 	#else 
-		static FILE* file = fopen ("log.bin", "rb");
-		if (file) {		
-			fread (&engineIgnitionKey, sizeof (int), 1, file);
-			fread (&engineDifferentialLock, sizeof (int), 1, file);
-		 	fread (&automaticTransmission, sizeof (int), 1, file);
-			fread (&gear, sizeof (int), 1, file);
-			fread (&steeringVal, sizeof (dFloat), 1, file);
-			fread (&cluthPedal, sizeof (dFloat), 1, file);
-			fread (&forwardGasPedal, sizeof (dFloat), 1, file);
-			fread (&reverseGasPedal, sizeof (dFloat), 1, file);
-			fread (&handBrakePedal, sizeof (dFloat), 1, file);
-		}
+			static FILE* file = fopen("log.bin", "rb");
+			if (file) {
+				fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+			}
 	#endif
 #endif
 
-		if (steering) {
-			steering->SetParam(steeringVal);
-		}
-		if (engine) {
-			engine->SetDifferentialLock (engineDifferentialLock ? true : false);
-	
-			switch (m_drivingState)
-			{
-				case m_engineOff:
-				{
-					if (engineIgnitionKey) {
-						m_drivingState = m_engineIdle;
-						engine->SetIgnition (true);
-						handBrakes->SetParam(0.0f);
-						engine->SetGear (engine->GetNeutralGear());
-					} else {
-						engine->SetIgnition (false);
-						engine->SetGear(engine->GetFirstGear());
-						handBrakes->SetParam(1.0f);
-					}
-					break;
-				}
-
-				case m_engineIdle:
-				{
-					brakes->SetParam(0.0f);
-					engine->SetClutchParam(0.0f);
-					handBrakes->SetParam(handBrakePedal);
-					if (!engineIgnitionKey) {
-						m_drivingState = m_engineOff;
-					} else {
-						if (forwardGasPedal) {
-							m_drivingState = m_preDriveForward;
-						} else if (reverseGasPedal) {
-							m_drivingState = m_preDriveReverse;
-						}
-					}
-					break;
-				}
-
-				case m_engineStop:
-				{
-					engine->SetClutchParam(0.0f);
-					if (forwardGasPedal || reverseGasPedal) {
-						brakes->SetParam(1.0f);
-					} else {
-						m_drivingState = m_engineIdle;
-					}
-					break;
-				}
-
-				case m_preDriveForward:
-				{
-					if (engine->GetSpeed() < -5.0f) {
-						brakes->SetParam(0.5f);
-						engine->SetClutchParam(0.0f);
-						engine->SetGear(engine->GetNeutralGear());
-					} else {
-						m_drivingState = m_driveForward;
-						engine->SetGear(engine->GetFirstGear());
-					}
-					break;
-				}	
-
-				case m_driveForward:
-				{
-					engine->SetParam(forwardGasPedal);
-					engine->SetClutchParam(cluthPedal);
-					handBrakes->SetParam(handBrakePedal);
-					if (reverseGasPedal) {
-						brakes->SetParam(reverseGasPedal * 0.25f);
-						if (engine->GetSpeed() < 5.0f) {
-							engine->SetGear(engine->GetNeutralGear());
-							m_drivingState = m_engineStop;
-						}
-					} else {
-						if (handBrakePedal && (engine->GetSpeed() < 2.0f)) {
-							engine->SetClutchParam(0.0f);
-						}
-						brakes->SetParam(0.0f);
-					}
-
-					if (!engineIgnitionKey) {
-						m_drivingState = m_engineStop;
-					}
-
-					break;
-				}
-
-				case m_preDriveReverse:
-				{
-					if (engine->GetSpeed() > 5.0f) {
-						brakes->SetParam(0.5f);
-						engine->SetClutchParam(0.0f);
-						engine->SetGear(engine->GetNeutralGear());
-					} else {
-						m_drivingState = m_driveReverse;
-						engine->SetGear(engine->GetReverseGear());
-					}
-					break;
-				}
-
-				case m_driveReverse:
-				{
-					engine->SetParam(reverseGasPedal);
-					engine->SetClutchParam(cluthPedal);
-					handBrakes->SetParam(handBrakePedal);
-					if (forwardGasPedal) {
-						brakes->SetParam(forwardGasPedal * 0.25f);
-						if (engine->GetSpeed() > -5.0f) {
-							engine->SetGear(engine->GetNeutralGear());
-							m_drivingState = m_engineStop;
-						}
-					} else {
-						brakes->SetParam(0.0f);
-					}
-
-					if (!engineIgnitionKey) {
-						m_drivingState = m_engineStop;
-					}
-					break;
-				}
-			}
-
-		} else if (handBrakes) {
-			handBrakes->SetParam(handBrakePedal);
-		}
+		m_controller->ApplyDefualtDriver(driverInput);
 	}
 
-	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
 	dFloat CalculateNPCControlSteerinValue (dFloat distanceAhead, dFloat pathWidth, DemoEntity* const pathEntity)
 	{
 		dAssert (0);
@@ -1418,6 +1248,20 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	}
 */
 
+	void UpdateDriverInput(dCustomVehicleController* const vehicle, dFloat timestep) const
+	{
+		NewtonBody* const body = vehicle->GetBody();
+		SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData(body);
+
+		if (vehicleEntity == m_player) {
+			// do player control
+			vehicleEntity->ApplyPlayerControl();
+		} else {
+			// do no player control
+			//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
+		}
+	}
+
 	virtual void PreUpdate (dFloat timestep)
 	{
 		// apply the vehicle controls, and all simulation time effect
@@ -1426,25 +1270,9 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		// set the help key
 		m_helpKey.UpdatePushButton (scene->GetRootWindow(), 'H');
-		
-		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dCustomVehicleController* const controller = &ptr->GetInfo();
-		
-			NewtonBody* const body = controller->GetBody();
-			SuperCarEntity* const vehicleEntity = (SuperCarEntity*) NewtonBodyGetUserData(body);
-
-			if (vehicleEntity == m_player) {
-				// do player control
-				vehicleEntity->ApplyPlayerControl ();
-			} else {
-				// do no player control
-				//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
-			}
-		}
 
 		// do the base class post update
 		dCustomVehicleControllerManager::PreUpdate(timestep);
-
 	}
 
 	virtual void PostUpdate (dFloat timestep)

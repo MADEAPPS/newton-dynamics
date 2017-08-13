@@ -32,6 +32,33 @@ class dDifferentialJoint;
 class dCustomVehicleController;
 class dCustomVehicleControllerManager;
 
+class dVehicleDriverInput
+{
+	public:
+	dVehicleDriverInput()
+		:m_gasPedal(0.0f)
+		,m_brakePedal(0.0f)
+		,m_cluthPedal(0.0f)
+		,m_steeringValue(0.0f)
+		,m_handBrakeValue(0.0f)
+		,m_gear(0)
+		,m_ignitionKey(0)
+		,m_lockDifferential(0)
+		,m_manualTransmission(0)
+	{
+	}
+
+	dFloat m_gasPedal;
+	dFloat m_brakePedal;
+	dFloat m_cluthPedal;
+	dFloat m_steeringValue;
+	dFloat m_handBrakeValue;
+	int m_gear;
+	int m_ignitionKey;
+	int m_lockDifferential;
+	int m_manualTransmission;
+};
+
 enum dSuspensionType
 {
 	m_offroad,
@@ -391,6 +418,19 @@ class dVehicleController: public dCustomAlloc
 class dEngineController: public dVehicleController
 {
 	public:
+	enum dDrivingState
+	{
+		m_engineOff,
+		m_engineIdle,
+		m_engineStop,
+		m_driveForward,
+		m_preDriveForward,
+		m_driveReverse,
+		m_preDriveReverse,
+	};
+
+
+
 	CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator);
 	CUSTOM_JOINTS_API ~dEngineController();
 
@@ -443,6 +483,7 @@ class dEngineController: public dVehicleController
 	dFloat m_clutchParam;
 	int m_gearTimer;
 	int m_currentGear;
+	dDrivingState m_drivingState;
 	bool m_ignitionKey;
 	bool m_automaticTransmissionMode;
 	friend class dCustomVehicleController;
@@ -489,6 +530,9 @@ class dBrakeController: public dVehicleController
 class dCustomVehicleController: public dCustomControllerBase
 {
 	public:
+	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs);
+
+
 	CUSTOM_JOINTS_API void Finalize();
 	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dTireInfo& tireInfo);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire);
@@ -588,6 +632,7 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	public:
 	CUSTOM_JOINTS_API dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials);
 	CUSTOM_JOINTS_API virtual ~dCustomVehicleControllerManager();
+	CUSTOM_JOINTS_API virtual void UpdateDriverInput(dCustomVehicleController* const vehicle, dFloat timestep) const {}
 
 	CUSTOM_JOINTS_API virtual dCustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	CUSTOM_JOINTS_API virtual dCustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
@@ -597,6 +642,8 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
 	CUSTOM_JOINTS_API void DrawSchematic (const dCustomVehicleController* const controller, dFloat scale) const;
+
+	
 
 	protected:
 	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);
