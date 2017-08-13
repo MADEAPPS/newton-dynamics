@@ -80,7 +80,6 @@ class dBasicVehicleLoader: public dCustomJointSaveLoad
 };
 
 
-
 class BasicCarControllerManager: public dCustomVehicleControllerManager
 {
 	public:

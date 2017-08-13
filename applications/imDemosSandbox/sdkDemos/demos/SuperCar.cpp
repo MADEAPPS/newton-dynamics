@@ -1217,7 +1217,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		dAssert(outputFile);
 
 		VehicleSaver saveLoad(GetWorld(), vehicle, outputFile, 0);
-		vehicle->Save(&saveLoad);
+		//vehicle->Save(&saveLoad);
+		Save(vehicle, &saveLoad);
 
 		fclose(outputFile);
 		setlocale(LC_ALL, oldloc);
@@ -1251,6 +1252,20 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	}
 */
 
+	void UpdateDriverInput(dCustomVehicleController* const vehicle, dFloat timestep) const
+	{
+		NewtonBody* const body = vehicle->GetBody();
+		SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData(body);
+
+		if (vehicleEntity == m_player) {
+			// do player control
+			vehicleEntity->ApplyPlayerControl();
+		} else {
+			// do no player control
+			//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
+		}
+	}
+
 	virtual void PreUpdate (dFloat timestep)
 	{
 		// apply the vehicle controls, and all simulation time effect
@@ -1259,25 +1274,9 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		// set the help key
 		m_helpKey.UpdatePushButton (scene, 'H');
-		
-		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dCustomVehicleController* const controller = &ptr->GetInfo();
-		
-			NewtonBody* const body = controller->GetBody();
-			SuperCarEntity* const vehicleEntity = (SuperCarEntity*) NewtonBodyGetUserData(body);
-
-			if (vehicleEntity == m_player) {
-				// do player control
-				vehicleEntity->ApplyPlayerControl ();
-			} else {
-				// do no player control
-				//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
-			}
-		}
 
 		// do the base class post update
 		dCustomVehicleControllerManager::PreUpdate(timestep);
-
 	}
 
 	virtual void PostUpdate (dFloat timestep)
