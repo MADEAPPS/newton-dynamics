@@ -1229,7 +1229,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		m_player = player;
 
 //xxxx
-//		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
+		//SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
 	}
 
 	void SetNextPlayer() 

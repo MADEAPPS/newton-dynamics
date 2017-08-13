@@ -457,30 +457,13 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 
 void dCustomJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
-	dMatrix childMatrix(GetMatrix0());
-	dMatrix parentMatrix(GetMatrix1());
-
-	dVector euler;
-	dVector childEuler;
-	dVector parentEuler;
-
-	childMatrix.GetEulerAngles(childEuler, euler);
-	parentMatrix.GetEulerAngles(parentEuler, euler);
-
-	childEuler = childEuler.Scale (180.0f / 3.141592f);
-	parentEuler = parentEuler.Scale (180.0f / 3.141592f);
-
 	fileSaver->SaveInt ("\tdegreesOfFreedom", m_maxDof);
 	fileSaver->SaveInt ("\tsolverModel", GetSolverModel());
-	fileSaver->SaveVector("\tbody0_position", childMatrix.m_posit);
-	fileSaver->SaveVector("\tbody1_position", parentMatrix.m_posit);
 
-	fileSaver->SaveVector("\tbody0_rotation", childEuler);
-	fileSaver->SaveVector("\tbody1_rotation", parentEuler);
-
+	fileSaver->SaveMatrix ("\tlocalMatrix0", m_localMatrix0);
+	fileSaver->SaveMatrix ("\tlocalMatrix1", m_localMatrix1);
 	fileSaver->SaveFloat("\tstiffness", m_stiffness);
 }
-
 
 void dCustomJoint::Load(dCustomJointSaveLoad* const loader)
 {

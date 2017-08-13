@@ -143,18 +143,13 @@ void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
 
 void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
-	dAssert (0);
-/*
-	dVector euler0;
-	dVector euler1;
-	dCustomHinge::Save (fileSaver);
+	dCustomJoint::Save (fileSaver);
 
-	m_baseOffsetMatrix.GetEulerAngles(euler0, euler1);
-	euler0 = euler0.Scale (180.0f / 3.141592f);
-	fileSaver->SaveFloat("\tmaxRPM", m_maxRPM);
-	fileSaver->SaveVector("\tbaseOffsetPosit", m_baseOffsetMatrix.m_posit);
-	fileSaver->SaveVector("\tbaseOffsetRotation", euler0);
-*/
+	SAVE_BEGIN(fileSaver);
+	SAVE_FLOAT(maxRPM);
+	SAVE_FLOAT(minFriction);
+	SAVE_FLOAT(maxFriction);
+	SAVE_END();
 }
 
 
@@ -225,18 +220,11 @@ void dEngineMountJoint::Load(dCustomJointSaveLoad* const fileLoader)
 
 void dEngineMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
-	dAssert (0);
-/*
-	dVector euler0;
-	dVector euler1;
 	dCustomHinge::Save (fileSaver);
 
-	m_baseOffsetMatrix.GetEulerAngles(euler0, euler1);
-	euler0 = euler0.Scale (180.0f / 3.141592f);
-	fileSaver->SaveFloat("\tmaxRPM", m_maxRPM);
-	fileSaver->SaveVector("\tbaseOffsetPosit", m_baseOffsetMatrix.m_posit);
-	fileSaver->SaveVector("\tbaseOffsetRotation", euler0);
-*/
+	SAVE_BEGIN(fileSaver);
+	SAVE_MATRIX(baseOffsetMatrix);
+	SAVE_END();
 }
 
 dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
@@ -353,17 +341,14 @@ void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	// nothing really to save;
 	dCustomUniversal::Save(fileSaver);
 
-	dVector euler0;
-	dVector euler1;
-		
-	m_baseOffsetMatrix.GetEulerAngles(euler0, euler1);
-	euler0 = euler0.Scale(180.0f / 3.141592f);
-
-	fileSaver->SaveVector("\tbaseOffset_position", m_baseOffsetMatrix.m_posit);
-	fileSaver->SaveVector("\tbaseOffset_rotation", euler0);
-
 	fileSaver->SaveFloat ("\tturnSpeed", m_turnSpeed);
 	fileSaver->SaveInt ("\tisTractionDifferential", int (m_isTractionDifferential));
+
+	SAVE_BEGIN(fileSaver);
+	SAVE_MATRIX(baseOffsetMatrix);
+	SAVE_FLOAT(turnSpeed);
+	SAVE_INT(isTractionDifferential);
+	SAVE_END();
 }
 
 dWheelJoint::dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, dCustomVehicleController* const controller, const dTireInfo& tireInfo)
@@ -537,10 +522,31 @@ dAssert (0);
 
 void dWheelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
-dAssert (0);
-//		dCustomJoint::Save(fileSaver);
-//		fileSaver->SaveFloat("\tsuspensionLength", m_suspensionLength);
-//		fileSaver->SaveInt("suspentionType", m_suspentionType);
+	dCustomJoint::Save(fileSaver);
+
+	SAVE_BEGIN(fileSaver);
+	SAVE_VECTOR(lateralDir);
+	SAVE_VECTOR(longitudinalDir);
+	SAVE_FLOAT(tireLoad);
+	SAVE_FLOAT(radio);
+	SAVE_FLOAT(steerRate);
+	SAVE_FLOAT(steerAngle0);
+	SAVE_FLOAT(steerAngle1);
+	SAVE_FLOAT(brakeTorque);
+	SAVE_FLOAT(dampingRatio);
+	SAVE_FLOAT(springStrength);
+	SAVE_FLOAT(suspensionLength);
+	SAVE_FLOAT(lateralSlip);
+	SAVE_FLOAT(aligningTorque);
+	SAVE_FLOAT(longitudinalSlip);
+	SAVE_FLOAT(aligningMomentTrail);
+	SAVE_FLOAT(lateralStiffness);
+	SAVE_FLOAT(longitudialStiffness);
+	SAVE_FLOAT(maxSteeringAngle);
+	SAVE_INT(suspentionType);
+	SAVE_INT(hasFender);
+
+	SAVE_END();
 }
 
 void dWheelJoint::Debug(dDebugDisplay* const debugDisplay) const
@@ -2598,55 +2604,38 @@ void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader) cons
 {
 }
 
-void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
+void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver)
 {
 	fileSaver->Save(GetBody());
 
-/*
-	void dCustomVehicleController::dBodyPartChassis::Save(dCustomJointSaveLoad* const fileSaver) const
-	{
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		dFloat mass;
+	fileSaver->SaveName("VehicleController", "");
 
-		NewtonBody* const body = GetBody();
-		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-		fileSaver->SaveName("Chassis", "");
-		fileSaver->SaveFloat("\taerodynamicsDownForce0", m_aerodynamicsDownForce0 / mass);
-		fileSaver->SaveFloat("\taerodynamicsDownForce1", m_aerodynamicsDownForce1 / mass);
-		fileSaver->SaveFloat("\taerodynamicsDownSpeedCutOff", m_aerodynamicsDownSpeedCutOff);
-		fileSaver->SaveFloat("\taerodynamicsDownForceCoefficient", m_aerodynamicsDownForceCoefficient / mass);
-	}
-*/
-
-/*
 	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
 	dFloat mass;
+	NewtonBodyGetMass(m_body, &mass, &Ixx, &Ixx, &Ixx);
+	dFloat aerodynamicsDownForce0 = m_aerodynamicsDownForce0;
+	dFloat aerodynamicsDownForce1 = m_aerodynamicsDownForce1;
 
-	NewtonBody* const body = GetBody();
-	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+	m_aerodynamicsDownForce0 /= (mass * m_gravityMag);
+	m_aerodynamicsDownForce1 /= (mass * m_gravityMag);
 
-	fileSaver->SaveName("vehicleSpecifications", "");
-//	fileSaver->SaveName("Chassis", "");
-	fileSaver->SaveFloat("\tgravityMag", m_gravityMag);
-	fileSaver->SaveFloat("\tweightDistribution", m_weightDistribution);
-	fileSaver->SaveFloat("\taerodynamicsDownForce0", m_aerodynamicsDownForce0 / mass);
-	fileSaver->SaveFloat("\taerodynamicsDownForce1", m_aerodynamicsDownForce1 / mass);
-	fileSaver->SaveFloat("\taerodynamicsDownSpeedCutOff", m_aerodynamicsDownSpeedCutOff);
-	fileSaver->SaveFloat("\taerodynamicsDownForceCoefficient", m_aerodynamicsDownForceCoefficient / mass);
 
-//	m_chassis.Save(fileSaver);
-	fileSaver->SaveInt("tiresCount", m_tireList.GetCount());
-	for (dList<dBodyPartTire>::dListNode* ptr = GetFirstTire(); ptr; ptr = ptr->GetNext()) {
-		ptr->GetInfo().Save (fileSaver);
-	} 
+	SAVE_BEGIN(fileSaver);
+	SAVE_FLOAT(speed);
+	SAVE_FLOAT(totalMass);
+	SAVE_FLOAT(gravityMag);
+//	SAVE_FLOAT(sideSlip);
+//	SAVE_FLOAT(prevSideSlip);
+	SAVE_FLOAT(weightDistribution);
+	SAVE_FLOAT(aerodynamicsDownForce0);
+	SAVE_FLOAT(aerodynamicsDownForce1);
+	SAVE_FLOAT(aerodynamicsDownSpeedCutOff);
+	SAVE_FLOAT(aerodynamicsDownForceCoefficient);
+	SAVE_END();
+	fileSaver->SaveName("VehicleEnd", "");
 
-	fileSaver->SaveName("vehicleEnd", "");
-*/
+	m_aerodynamicsDownForce0 = aerodynamicsDownForce0;
+	m_aerodynamicsDownForce1 = aerodynamicsDownForce1;
 }
 
 void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& driveInputs)

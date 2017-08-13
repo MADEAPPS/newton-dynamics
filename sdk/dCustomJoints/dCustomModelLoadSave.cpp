@@ -44,23 +44,22 @@ void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<NewtonBody*>& bodylist,
 			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
 			NewtonBody* const body0 = customJoint->GetBody0();
 			NewtonBody* const body1 = customJoint->GetBody1();
-			dAssert (body0);
-			dAssert (body1);
 
 			if (jointFilter.Insert (0, customJoint)) {
 				jointlist.Append(customJoint);
 			}
 
-			if (body0 == root) {
-				if (!m_bodyFilter.Find(body1)) {
-					stackMem[stack] = body1;
-					stack ++;
-				}
-			} else {
-				dAssert (body1 == root);
-				if (!m_bodyFilter.Find(body0)) {
-					stackMem[stack] = body0;
-					stack++;
+			if (body0 && body1) {
+				if (body0 == root) {
+					if (!m_bodyFilter.Find(body1)) {
+						stackMem[stack] = body1;
+						stack ++;
+					}
+				} else if (body1){
+					if (!m_bodyFilter.Find(body0)) {
+						stackMem[stack] = body0;
+						stack++;
+					}
 				}
 			}
 		}
@@ -117,6 +116,16 @@ void dCustomJointSaveLoad::SaveVector (const char* const token, const dVector& v
 	fprintf(m_file, "%s: %f %f %f\n", token, v.m_x, v.m_y, v.m_z);
 }
 
+void dCustomJointSaveLoad::SaveMatrix (const char* const token, const dMatrix& matrix) const
+{
+	dVector euler0;
+	dVector euler1;
+	matrix.GetEulerAngles(euler0, euler1);
+	euler0 = euler0.Scale (180.0f / 3.141592f);
+	fprintf(m_file, "%s_euler: %f %f %f\n", token, euler0.m_x, euler0.m_y, euler0.m_z);
+	fprintf(m_file, "%s_posit: %f %f %f\n", token, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z);
+}
+
 void dCustomJointSaveLoad::SaveName (const char* const token, const char* const name) const
 {
 	fprintf(m_file, "%s: %s\n", token, name);
@@ -129,7 +138,8 @@ void dCustomJointSaveLoad::Newline () const
 
 int dCustomJointSaveLoad::FindBodyId(NewtonBody* const body) const
 {
-	return m_bodyFilter.Find(body)->GetInfo();
+	dTree<int, NewtonBody*>::dTreeNode* const node = m_bodyFilter.Find(body);
+	return node ? node->GetInfo() : -1;
 }
 
 NewtonBody* dCustomJointSaveLoad::FindBodyId(int id) const

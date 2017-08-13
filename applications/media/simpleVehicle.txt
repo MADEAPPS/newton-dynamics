@@ -1,11 +1,6 @@
 rootNode: 0
 
 shapeCount: 3
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
-collisionEnd: 
-
 collision: 2
 	shapeType: chamferCylinder
 	radio: 0.500000
@@ -201,6 +196,11 @@ collision: 0
 	v: 1.794518 0.324298 0.552648
 collisionEnd: 
 
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
+collisionEnd: 
+
 nodesCount: 7
 node: 0
 	userData: chassisMesh
@@ -286,20 +286,38 @@ node: 6
 	shapeEulerAngle: 0.000000 90.000000 0.000000
 nodeEnd: 
 
-jointsCount: 9
+jointsCount: 10
 joint: 0
 	jointType: dWheelJoint
 	childBody: 6
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.000000 0.000000 0.250000
-	body1_position: 1.175151 0.005729 -0.456879
-	body0_rotation: 0.000000 -90.000000 0.000020
-	body1_rotation: 0.000000 -90.000000 0.000020
+	localMatrix0_euler: 0.000000 -90.000000 0.000020
+	localMatrix0_posit: 0.000000 0.000000 0.250000
+	localMatrix1_euler: 0.000000 -90.000000 0.000020
+	localMatrix1_posit: 1.175151 0.005729 -0.456879
 	stiffness: 1.000000
+	lateralDir: 0.000000 0.000000 0.000000
+	longitudinalDir: 0.000000 0.000000 0.000000
+	tireLoad: 0.000000
+	radio: 0.329154
+	steerRate: 1.570800
+	steerAngle0: 0.000000
+	steerAngle1: 0.000000
+	brakeTorque: 0.000000
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
 	suspensionLength: 0.250000
-suspentionType: 0
+	lateralSlip: 0.000000
+	aligningTorque: 0.000000
+	longitudinalSlip: 0.000000
+	aligningMomentTrail: 0.500000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	maxSteeringAngle: 0.436333
+	suspentionType: 0
+	hasFender: 1
 jointEnd: 
 
 joint: 1
@@ -308,13 +326,31 @@ joint: 1
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.000000 0.000000 -0.250000
-	body1_position: 1.166118 0.005729 0.457016
-	body0_rotation: 0.000000 -90.000000 0.000020
-	body1_rotation: 0.000000 -90.000000 0.000020
+	localMatrix0_euler: 0.000000 -90.000000 0.000020
+	localMatrix0_posit: 0.000000 0.000000 -0.250000
+	localMatrix1_euler: 0.000000 -90.000000 0.000020
+	localMatrix1_posit: 1.166118 0.005729 0.457016
 	stiffness: 1.000000
+	lateralDir: 0.000000 0.000000 0.000000
+	longitudinalDir: 0.000000 0.000000 0.000000
+	tireLoad: 0.000000
+	radio: 0.329154
+	steerRate: 1.570800
+	steerAngle0: 0.000000
+	steerAngle1: 0.000000
+	brakeTorque: 0.000000
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
 	suspensionLength: 0.250000
-suspentionType: 0
+	lateralSlip: 0.000000
+	aligningTorque: 0.000000
+	longitudinalSlip: 0.000000
+	aligningMomentTrail: 0.500000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	maxSteeringAngle: 0.436333
+	suspentionType: 0
+	hasFender: 1
 jointEnd: 
 
 joint: 2
@@ -323,13 +359,31 @@ joint: 2
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.000000 0.000000 0.000000
-	body1_position: -1.213006 0.005729 -0.732277
-	body0_rotation: 0.000000 -90.000000 0.000020
-	body1_rotation: 0.000000 -90.000000 0.000020
+	localMatrix0_euler: 0.000000 -90.000000 0.000020
+	localMatrix0_posit: 0.000000 0.000000 0.000000
+	localMatrix1_euler: 0.000000 -90.000000 0.000020
+	localMatrix1_posit: -1.213006 0.005729 -0.732277
 	stiffness: 1.000000
+	lateralDir: 0.000000 0.000000 0.000000
+	longitudinalDir: 0.000000 0.000000 0.000000
+	tireLoad: 0.000000
+	radio: 0.329154
+	steerRate: 1.570800
+	steerAngle0: 0.000000
+	steerAngle1: 0.000000
+	brakeTorque: 0.000000
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
 	suspensionLength: 0.250000
-suspentionType: 0
+	lateralSlip: 0.000000
+	aligningTorque: 0.000000
+	longitudinalSlip: 0.000000
+	aligningMomentTrail: 0.500000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	maxSteeringAngle: 0.000000
+	suspentionType: 0
+	hasFender: 1
 jointEnd: 
 
 joint: 3
@@ -338,13 +392,31 @@ joint: 3
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.000000 0.000000 0.000000
-	body1_position: -1.222037 0.005729 0.732407
-	body0_rotation: 0.000000 -90.000000 0.000020
-	body1_rotation: 0.000000 -90.000000 0.000020
+	localMatrix0_euler: 0.000000 -90.000000 0.000020
+	localMatrix0_posit: 0.000000 0.000000 0.000000
+	localMatrix1_euler: 0.000000 -90.000000 0.000020
+	localMatrix1_posit: -1.222037 0.005729 0.732407
 	stiffness: 1.000000
+	lateralDir: 0.000000 0.000000 0.000000
+	longitudinalDir: 0.000000 0.000000 0.000000
+	tireLoad: 0.000000
+	radio: 0.329154
+	steerRate: 1.570800
+	steerAngle0: 0.000000
+	steerAngle1: 0.000000
+	brakeTorque: 0.000000
+	dampingRatio: 700.000000
+	springStrength: 30000.000000
 	suspensionLength: 0.250000
-suspentionType: 0
+	lateralSlip: 0.000000
+	aligningTorque: 0.000000
+	longitudinalSlip: 0.000000
+	aligningMomentTrail: 0.500000
+	lateralStiffness: 1.000000
+	longitudialStiffness: 1.000000
+	maxSteeringAngle: 0.000000
+	suspentionType: 0
+	hasFender: 1
 jointEnd: 
 
 joint: 4
@@ -353,10 +425,10 @@ joint: 4
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.000000 0.000000 0.000000
-	body1_position: 0.000000 0.000000 0.000000
-	body0_rotation: 90.000023 -0.000000 0.000020
-	body1_rotation: 90.000023 -0.000000 0.000020
+	localMatrix0_euler: 90.000023 -0.000000 0.000020
+	localMatrix0_posit: 0.000000 0.000000 0.000000
+	localMatrix1_euler: 90.000023 -0.000000 0.000020
+	localMatrix1_posit: 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	minAngle_0: -45.000000
 	maxAngle_0: 45.000000
@@ -369,22 +441,24 @@ joint: 4
 	angularDamp_1: 0.300000
 	angularAccel_1: -4.000000
 	flags: 0
-	baseOffset_position: 0.000000 0.000000 0.000000
-	baseOffset_rotation: 0.000000 -0.000000 0.000020
+	turnSpeed: 0.000000
+	isTractionDifferential: 0
+	baseOffsetMatrix_euler: 0.000000 -0.000000 0.000020
+	baseOffsetMatrix_posit: 0.000000 0.000000 0.000000
 	turnSpeed: 0.000000
 	isTractionDifferential: 0
 jointEnd: 
 
 joint: 5
-	jointType: dEngineJoint
+	jointType: dEngineMountJoint
 	childBody: 1
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	body0_position: 0.000000 0.000000 0.000000
-	body1_position: 0.000000 0.000000 0.000000
-	body0_rotation: 0.000000 -90.000000 -0.000000
-	body1_rotation: 0.000000 -90.000000 -0.000000
+	localMatrix0_euler: 0.000000 -90.000000 -0.000000
+	localMatrix0_posit: 0.000000 0.000000 0.000000
+	localMatrix1_euler: 0.000000 -90.000000 -0.000000
+	localMatrix1_posit: 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	minAngle: -45.000000
 	maxAngle: 45.000000
@@ -394,125 +468,80 @@ joint: 5
 	damper: 0.000000
 	springDamperRelaxation: 0.600000
 	flags: 0
-	maxRPM: 50.000000
-	baseOffsetPosit: 0.000000 0.000000 0.000000
-	baseOffsetRotation: 0.000000 -0.000000 0.000020
+	baseOffsetMatrix_euler: 0.000000 -0.000000 0.000020
+	baseOffsetMatrix_posit: 0.000000 0.000000 0.000000
 jointEnd: 
 
 joint: 6
+	jointType: dEngineJoint
+	childBody: 1
+	parentBody: -1
+	degreesOfFreedom: 1
+	solverModel: 1
+	localMatrix0_euler: 0.000000 -90.000000 -0.000000
+	localMatrix0_posit: 0.000000 0.000000 0.000000
+	localMatrix1_euler: 0.000000 -89.245949 0.000000
+	localMatrix1_posit: -13.444667 0.999977 102.108154
+	stiffness: 1.000000
+	maxRPM: 50.000000
+	minFriction: -10.000000
+	maxFriction: 10.000000
+jointEnd: 
+
+joint: 7
 	jointType: dGearBoxJoint
 	childBody: 2
 	parentBody: 1
 	degreesOfFreedom: 1
 	solverModel: 1
-	body0_position: 14.786721 -0.999977 -101.922447
-	body1_position: 14.786721 -0.999977 -101.922447
-	body0_rotation: 0.000000 -90.000000 -0.000000
-	body1_rotation: 0.000000 -90.000000 -0.000000
+	localMatrix0_euler: 0.000000 -90.000000 -0.000000
+	localMatrix0_posit: 14.786721 -0.999977 -101.922447
+	localMatrix1_euler: 0.000000 -90.000000 -0.000000
+	localMatrix1_posit: 14.786721 -0.999977 -101.922447
 	stiffness: 1.000000
 	gearRatio: 1.000000
 	clutchFrictionTorque: 2000.000000
 jointEnd: 
 
-joint: 7
+joint: 8
 	jointType: dAxelJoint
 	childBody: 4
 	parentBody: 2
 	degreesOfFreedom: 1
 	solverModel: 1
-	body0_position: 0.000000 0.000000 0.000000
-	body1_position: 0.000000 0.000000 0.000000
-	body0_rotation: 0.000000 -90.000000 0.000000
-	body1_rotation: 0.000000 -0.000000 -180.000015
+	localMatrix0_euler: 0.000000 -90.000000 0.000000
+	localMatrix0_posit: 0.000000 0.000000 0.000000
+	localMatrix1_euler: 0.000000 -0.000000 -180.000015
+	localMatrix1_posit: 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	gearRatio: 1.000000
 	parentReference: 0
 	pintOnParentReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
-joint: 8
+joint: 9
 	jointType: dAxelJoint
 	childBody: 3
 	parentBody: 2
 	degreesOfFreedom: 1
 	solverModel: 1
-	body0_position: 0.000000 0.000000 0.000000
-	body1_position: 0.000000 0.000000 0.000000
-	body0_rotation: 0.000000 -90.000000 0.000000
-	body1_rotation: -0.000000 0.000000 0.000020
+	localMatrix0_euler: 0.000000 -90.000000 0.000000
+	localMatrix0_posit: 0.000000 0.000000 0.000000
+	localMatrix1_euler: -0.000000 0.000000 0.000020
+	localMatrix1_posit: 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	gearRatio: 1.000000
 	parentReference: 0
 	pintOnParentReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
-vehicleSpecifications: 
+VehicleController: 
+	speed: 0.000000
+	totalMass: 1794.520020
 	gravityMag: 10.000000
 	weightDistribution: 0.600000
-Chassis: 
-	aerodynamicsDownForce0: 10.000000
-	aerodynamicsDownForce1: 20.000000
+	aerodynamicsDownForce0: 1.000000
+	aerodynamicsDownForce1: 2.000000
 	aerodynamicsDownSpeedCutOff: 22.240000
-	aerodynamicsDownForceCoefficient: 0.020218
-tiresCount: 4
-tire: 0
-	location: 1.175152 0.005729 -0.456878
-	mass: 40.000000
-	radio: 0.329154
-	width: 0.319073
-	pivotOffset: 0.250000
-	maxSteeringAngle: 0.436333
-	dampingRatio: 700.000000
-	springStrength: 30000.000000
-	suspensionLength: 0.250000
-	lateralStiffness: 1.000000
-	longitudialStiffness: 1.000000
-	aligningMomentTrail: 0.500000
-	hasFender: 1
-	suspentionType: 1
-tire: 1
-	location: 1.166117 0.005729 0.457015
-	mass: 40.000000
-	radio: 0.329154
-	width: 0.319073
-	pivotOffset: -0.250000
-	maxSteeringAngle: 0.436333
-	dampingRatio: 700.000000
-	springStrength: 30000.000000
-	suspensionLength: 0.250000
-	lateralStiffness: 1.000000
-	longitudialStiffness: 1.000000
-	aligningMomentTrail: 0.500000
-	hasFender: 1
-	suspentionType: 1
-tire: 2
-	location: -1.213005 0.005729 -0.732275
-	mass: 40.000000
-	radio: 0.329154
-	width: 0.319073
-	pivotOffset: 0.000000
-	maxSteeringAngle: 0.000000
-	dampingRatio: 700.000000
-	springStrength: 30000.000000
-	suspensionLength: 0.250000
-	lateralStiffness: 1.000000
-	longitudialStiffness: 1.000000
-	aligningMomentTrail: 0.500000
-	hasFender: 1
-	suspentionType: 1
-tire: 3
-	location: -1.222038 0.005729 0.732408
-	mass: 40.000000
-	radio: 0.329154
-	width: 0.319073
-	pivotOffset: 0.000000
-	maxSteeringAngle: 0.000000
-	dampingRatio: 700.000000
-	springStrength: 30000.000000
-	suspensionLength: 0.250000
-	lateralStiffness: 1.000000
-	longitudialStiffness: 1.000000
-	aligningMomentTrail: 0.500000
-	hasFender: 1
-	suspentionType: 1
-vehicleEnd: 
+	aerodynamicsDownForceCoefficient: 31.024372
+VehicleEnd: 

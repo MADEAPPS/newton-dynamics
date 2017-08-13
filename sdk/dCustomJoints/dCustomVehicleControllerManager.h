@@ -578,7 +578,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
+	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader) const;
 
 	protected:

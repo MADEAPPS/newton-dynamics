@@ -19,6 +19,17 @@
 
 #include "dCustomJoint.h"
 
+#define SAVE_BEGIN(className) {	dCustomJointSaveLoad* const __saver__ = className;
+
+#define SAVE_INT(name) __saver__->SaveInt ("\t" #name, m_##name);
+#define SAVE_FLOAT(name) __saver__->SaveFloat ("\t" #name, m_##name);
+#define SAVE_VECTOR(name) __saver__->SaveVector ("\t" #name, m_##name);
+#define SAVE_MATRIX(name) __saver__->SaveMatrix ("\t" #name, m_##name);
+
+
+#define SAVE_END() }
+
+
 class dCustomJointSaveLoad: public dCustomAlloc
 {
 	public:
@@ -45,6 +56,7 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	CUSTOM_JOINTS_API virtual void SaveInt (const char* const token, int val) const;
 	CUSTOM_JOINTS_API virtual void SaveFloat (const char* const token, dFloat val) const;
 	CUSTOM_JOINTS_API virtual void SaveVector (const char* const token, const dVector& v) const;
+	CUSTOM_JOINTS_API virtual void SaveMatrix (const char* const token, const dMatrix& v) const;
 	CUSTOM_JOINTS_API virtual void SaveName (const char* const token, const char* const name) const;
 
 	CUSTOM_JOINTS_API virtual NewtonBody* Load();
