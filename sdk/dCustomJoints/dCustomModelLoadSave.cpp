@@ -353,6 +353,7 @@ void dCustomJointSaveLoad::LoadBodyList(dTree<NewtonBody*, int>& bodyList)
 	token = NextToken();
 	dAssert(!strcmp(token, "nodesCount:"));
 	int nodeCount = LoadInt();
+	m_bodyFilter.RemoveAll();
 	for (int i = 0; i < nodeCount; i ++) {
 
 		dMatrix matrix(dGetIdentityMatrix());
@@ -428,11 +429,12 @@ void dCustomJointSaveLoad::SaveJointList(dList<dCustomJoint*>& jointList)
 	}
 }
 
-void dCustomJointSaveLoad::LoadJointList(const dTree<NewtonBody*, int>& bodyList, dTree<dCustomJoint*, int> jointMap)
+void dCustomJointSaveLoad::LoadJointList(const dTree<NewtonBody*, int>& bodyList)
 {
 	const char* token = NextToken();
 	dAssert(!strcmp(token, "jointsCount:"));
 	int jointsCount = LoadInt();
+	m_jointFilter.RemoveAll();
 	for (int i = 0; i < jointsCount; i++) {
 		char jointType[128];
 
@@ -454,7 +456,8 @@ void dCustomJointSaveLoad::LoadJointList(const dTree<NewtonBody*, int>& bodyList
 		int parentIndex = LoadInt();
 		NewtonBody* const parent = (parentIndex != -1) ? bodyList.Find(parentIndex)->GetInfo() : NULL;
 		dCustomJoint* const joint = dCustomJoint::Load(this, jointType, child, parent);
-		jointMap.Insert (joint, jointIndex);
+		//jointMap.Insert (joint, jointIndex);
+		m_jointFilter.Insert(joint, jointIndex);
 		while (strcmp(NextToken(), "jointEnd:"));
 	}
 }
@@ -477,7 +480,6 @@ void dCustomJointSaveLoad::Save(NewtonBody* const rootbody)
 NewtonBody* dCustomJointSaveLoad::Load()
 {
 	dTree<NewtonBody*, int> bodyMap;
-	dTree<dCustomJoint*, int> jointMap;
 
 #ifdef _DEBUG
 	const char* token = NextToken();
@@ -488,7 +490,7 @@ NewtonBody* dCustomJointSaveLoad::Load()
 	int rootBodyIndex = LoadInt();
 
 	LoadBodyList(bodyMap);
-	LoadJointList(bodyMap, jointMap);
+	LoadJointList(bodyMap);
 
 	return bodyMap.Find(rootBodyIndex)->GetInfo();
 }

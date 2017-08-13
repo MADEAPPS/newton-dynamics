@@ -1381,6 +1381,18 @@ dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonC
 	return controller;
 }
 
+dCustomVehicleController* dCustomVehicleControllerManager::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	dCustomVehicleController* const controller = CreateController();
+	controller->Load(fileLoader);
+	return controller;
+}
+
+void dCustomVehicleControllerManager::Save(dCustomVehicleController* const vehicle, dCustomJointSaveLoad* const fileSaver)
+{
+	vehicle->Save(fileSaver);
+}
+
 
 class dCustomVehicleControllerManager::dTireFilter: public dCustomControllerConvexCastPreFilter
 {
@@ -1977,8 +1989,8 @@ void dCustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat downWe
 	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 	dFloat topSpeed = m_engineControl ? m_engineControl->GetTopSpeed() : 25.0f;
 	m_aerodynamicsDownSpeedCutOff = topSpeed * speedFactor;
-	m_aerodynamicsDownForce0 = mass * downWeightRatioAtSpeedFactor * dAbs(m_gravityMag);
-	m_aerodynamicsDownForce1 = mass * maxWeightAtTopSpeed * dAbs(m_gravityMag);
+	m_aerodynamicsDownForce0 = downWeightRatioAtSpeedFactor * mass * dAbs(m_gravityMag);
+	m_aerodynamicsDownForce1 = maxWeightAtTopSpeed * mass * dAbs(m_gravityMag);
 	m_aerodynamicsDownForceCoefficient = m_aerodynamicsDownForce0 / (m_aerodynamicsDownSpeedCutOff * m_aerodynamicsDownSpeedCutOff);
 }
 
@@ -2566,11 +2578,94 @@ void dCustomVehicleController::Debug(dCustomJoint::dDebugDisplay* const debugCon
 
 
 
-void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader) const
+void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader)
 {
+	m_body = fileLoader->Load();
+
+	m_speed = 0.0f;
+	m_sideSlip = 0.0f;
+	m_prevSideSlip = 0.0f;
+	m_finalized = false;
+	m_gravityMag = 0.0f;
+	m_weightDistribution = 0.5f;
+	m_aerodynamicsDownForce0 = 0.0f;
+	m_aerodynamicsDownForce1 = 0.0f;
+	m_aerodynamicsDownSpeedCutOff = 0.0f;
+	m_aerodynamicsDownForceCoefficient = 0.0f;
+	m_forceAndTorqueCallback = NewtonBodyGetForceAndTorqueCallback(m_body);
+
+	m_contactFilter = new dTireFrictionModel(this);
+
+	m_engine = NULL;
+	m_brakesControl = NULL;
+	m_engineControl = NULL;
+	m_handBrakesControl = NULL;
+	m_steeringControl = NULL;
+
+
+	dFloat m_aeroDownForce0;
+	dFloat m_aeroDownForce1;
+
+	fileLoader->NextToken();
+
+	LOAD_BEGIN(fileLoader);
+	LOAD_FLOAT(speed);
+	LOAD_FLOAT(totalMass);
+	LOAD_FLOAT(gravityMag);
+	LOAD_FLOAT(weightDistribution);
+	LOAD_FLOAT(aeroDownForce0);
+	LOAD_FLOAT(aeroDownForce1);
+	LOAD_FLOAT(aerodynamicsDownSpeedCutOff);
+	LOAD_FLOAT(aerodynamicsDownForceCoefficient);
+	LOAD_END();
+	fileLoader->NextToken();
+
+	dFloat Ixx;
+	dFloat mass;
+	NewtonBodyGetMass(m_body, &mass, &Ixx, &Ixx, &Ixx);
+	m_aerodynamicsDownForce0 = m_aeroDownForce0 * mass * m_gravityMag;
+	m_aerodynamicsDownForce1 = m_aeroDownForce1 * mass * m_gravityMag;
+
+	NewtonWorld* const world = NewtonBodyGetWorld(m_body);
+	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
+	NewtonCollisionAggregateSetSelfCollision(m_collisionAggregate, 0);
+
+	dTree<int, NewtonBody*>::Iterator bodyIter (fileLoader->GetBodyList());
+	for (bodyIter.Begin(); bodyIter; bodyIter ++) {
+		NewtonBody* const body = bodyIter.GetKey();
+		NewtonCollisionAggregateAddBody(m_collisionAggregate, body);
+		m_bodyList.Append(body);
+	}
+
+	dGearBoxJoint* gearBox = NULL;
+	dEngineMountJoint* engineMount = NULL;
+	dTree<dCustomJoint*, int>::Iterator jointIter (fileLoader->GetJointList());
+	for (jointIter.Begin(); jointIter; jointIter ++) {
+		dCustomJoint* const joint = jointIter.GetNode()->GetInfo();
+		if (joint->IsType(dWheelJoint::GetType())) {
+			m_tireList.Append((dWheelJoint*)joint);
+		} else if (joint->IsType(dEngineMountJoint::GetType())) {
+			engineMount = (dEngineMountJoint*)joint;
+		} else if (joint->IsType(dEngineJoint::GetType())) {
+			m_engine = (dEngineJoint*)joint;
+		} else if (joint->IsType(dDifferentialJoint::GetType())) {
+			m_differentialList.Append((dDifferentialJoint*)joint);
+		} else if (joint->IsType(dGearBoxJoint::GetType())) {
+			gearBox = (dGearBoxJoint*)joint;
+		} else if (joint->IsType(dAxelJoint::GetType())) {
+			// nothing
+		} else {
+			dAssert (0);
+		}
+	}
+
+	if (m_engine) {
+		dAssert (engineMount);
+		m_engine->m_engineMount = engineMount;
+	}
 }
 
-void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver)
+void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	fileSaver->Save(GetBody());
 
@@ -2579,12 +2674,8 @@ void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver)
 	dFloat Ixx;
 	dFloat mass;
 	NewtonBodyGetMass(m_body, &mass, &Ixx, &Ixx, &Ixx);
-	dFloat aerodynamicsDownForce0 = m_aerodynamicsDownForce0;
-	dFloat aerodynamicsDownForce1 = m_aerodynamicsDownForce1;
-
-	m_aerodynamicsDownForce0 /= (mass * m_gravityMag);
-	m_aerodynamicsDownForce1 /= (mass * m_gravityMag);
-
+	dFloat m_aeroDownForce0 = m_aerodynamicsDownForce0 / (mass * m_gravityMag);
+	dFloat m_aeroDownForce1 = m_aerodynamicsDownForce1 / (mass * m_gravityMag);
 
 	SAVE_BEGIN(fileSaver);
 	SAVE_FLOAT(speed);
@@ -2593,15 +2684,12 @@ void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver)
 //	SAVE_FLOAT(sideSlip);
 //	SAVE_FLOAT(prevSideSlip);
 	SAVE_FLOAT(weightDistribution);
-	SAVE_FLOAT(aerodynamicsDownForce0);
-	SAVE_FLOAT(aerodynamicsDownForce1);
+	SAVE_FLOAT(aeroDownForce0);
+	SAVE_FLOAT(aeroDownForce1);
 	SAVE_FLOAT(aerodynamicsDownSpeedCutOff);
 	SAVE_FLOAT(aerodynamicsDownForceCoefficient);
 	SAVE_END();
 	fileSaver->SaveName("VehicleEnd", "");
-
-	m_aerodynamicsDownForce0 = aerodynamicsDownForce0;
-	m_aerodynamicsDownForce1 = aerodynamicsDownForce1;
 }
 
 void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& driveInputs)

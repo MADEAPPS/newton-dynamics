@@ -71,9 +71,19 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	CUSTOM_JOINTS_API NewtonBody* FindBodyId(int id) const;
 	CUSTOM_JOINTS_API int FindBodyId(NewtonBody* const body) const;
 
+	dTree<int, NewtonBody*>& GetBodyList() 
+	{
+		return m_bodyFilter;
+	}
+
+	dTree<dCustomJoint*, int>& GetJointList()
+	{
+		return m_jointFilter;
+	}
+
 	private:
 	void LoadBodyList(dTree<NewtonBody*, int>& bodyList);
-	void LoadJointList(const dTree<NewtonBody*, int>& bodyList, dTree<dCustomJoint*, int> jointMap);
+	void LoadJointList(const dTree<NewtonBody*, int>& bodyList);
 
 	void SaveBodyList(dList<NewtonBody*>& bodyList);
 	void SaveJointList(dList<dCustomJoint*>& jointList);
@@ -82,6 +92,7 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	FILE* m_file;
 	NewtonWorld* m_world;
 	dTree<int, NewtonBody*> m_bodyFilter;
+	dTree<dCustomJoint*, int> m_jointFilter;
 	mutable  char m_token[128];
 };
 

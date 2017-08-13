@@ -175,27 +175,15 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 	virtual void PreUpdate (dFloat timestep)
 	{
-//		dAssert(0);
-/*
 		// apply the vehicle controls, and all simulation time effect
-		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dCustomVehicleController* const controller = &ptr->GetInfo();
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-			NewtonBody* const body = controller->GetBody();
-			BasicCarEntity* const vehicleEntity = (BasicCarEntity*) NewtonBodyGetUserData(body);
-
-			if (vehicleEntity == m_player) {
-				// do player control
-				vehicleEntity->ApplyPlayerControl ();
-			} else {
-				// do no player control
-				vehicleEntity->ApplyNPCControl ();
-			}
-		}
+		// set the help key
+		//m_helpKey.UpdatePushButton(scene->GetRootWindow(), 'H');
 
 		// do the base class post update
 		dCustomVehicleControllerManager::PreUpdate(timestep);
-*/
 	}
 
 	virtual void PostUpdate (dFloat timestep)
@@ -268,12 +256,12 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 		dAssert(inputFile);
 		
 		dBasicVehicleLoader loader(GetWorld(), inputFile, 0);
-		loader.Load();
+		dCustomVehicleController* const vehicle = Load(&loader);
 
 		fclose(inputFile);
 		setlocale(LC_ALL, oldloc);
 
-		return NULL;
+		return vehicle;
 	}
 
 	bool m_externalView;
@@ -306,11 +294,7 @@ void BasicCar (DemoEntityManager* const scene)
 	BasicCarControllerManager* const manager = new BasicCarControllerManager (world, 1, materialList);
 	
 	// load 
-//	basicCarParameters.m_differentialType = BasciCarParameters::m_RWD;
-//	BasicCarEntity* const basicVehicle = new BasicCarEntity (scene, manager, location, basicCarParameters);
-//	basicVehicle->BuildBasicCar (basicCarParameters);
 	manager->LoadVehicle("simpleVehicle.txt");
-
 
 	// set this vehicle as the player
 //	manager->SetAsPlayer(basicVehicle);

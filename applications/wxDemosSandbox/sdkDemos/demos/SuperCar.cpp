@@ -1214,7 +1214,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		dAssert(outputFile);
 
 		VehicleSaver saveLoad(GetWorld(), vehicle, outputFile, 0);
-		vehicle->Save(&saveLoad);
+		//vehicle->Save(&saveLoad);
+		Save(vehicle, &saveLoad);
 
 		fclose(outputFile);
 		setlocale(LC_ALL, oldloc);

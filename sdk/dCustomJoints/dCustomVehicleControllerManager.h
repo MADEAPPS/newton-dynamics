@@ -261,7 +261,6 @@ class dEngineMountJoint: public dCustomHinge
 	DECLARE_CUSTOM_JOINT(dEngineMountJoint, dCustomHinge)
 };
 
-
 class dEngineJoint: public dCustomJoint
 {
 	public:
@@ -429,8 +428,6 @@ class dEngineController: public dVehicleController
 		m_preDriveReverse,
 	};
 
-
-
 	CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator);
 	CUSTOM_JOINTS_API ~dEngineController();
 
@@ -578,12 +575,12 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader) const;
-
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+
+	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	bool ControlStateChanged() const;
 	void Init (NewtonBody* const body, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
@@ -638,12 +635,13 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	CUSTOM_JOINTS_API virtual dCustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	CUSTOM_JOINTS_API virtual void DestroyController (dCustomVehicleController* const controller);
 
+	CUSTOM_JOINTS_API virtual dCustomVehicleController* Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API virtual void Save(dCustomVehicleController* const vehicle, dCustomJointSaveLoad* const fileSaver);
+
 	CUSTOM_JOINTS_API virtual int OnTireAABBOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const;
 
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
 	CUSTOM_JOINTS_API void DrawSchematic (const dCustomVehicleController* const controller, dFloat scale) const;
-
-	
 
 	protected:
 	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);

@@ -7,6 +7,11 @@ collision: 2
 	height: 1.000000
 collisionEnd: 
 
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
+collisionEnd: 
+
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -194,11 +199,6 @@ collision: 0
 	v: 1.922243 0.182667 0.553142
 	v: 1.786454 0.212294 0.715100
 	v: 1.794518 0.324298 0.552648
-collisionEnd: 
-
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
 collisionEnd: 
 
 nodesCount: 7
@@ -502,8 +502,8 @@ VehicleController:
 	totalMass: 1794.520020
 	gravityMag: 10.000000
 	weightDistribution: 0.600000
-	aerodynamicsDownForce0: 1.000000
-	aerodynamicsDownForce1: 2.000000
+	aeroDownForce0: 1.000000
+	aeroDownForce1: 2.000000
 	aerodynamicsDownSpeedCutOff: 22.240000
 	aerodynamicsDownForceCoefficient: 31.024372
 VehicleEnd: 
