@@ -21,68 +21,68 @@
 #include "DebugDisplay.h"
 
 
+class dBasicVehicleLoader: public dCustomJointSaveLoad
+{
+	public:
+	dBasicVehicleLoader(NewtonWorld* const world, FILE* const file, int materialID)
+		:dCustomJointSaveLoad(world, file)
+		, m_material(materialID)
+	{
+	}
+
+	const char* GetUserDataName(const NewtonBody* const body) const
+	{
+		dAssert(0);
+		return NULL;
+	}
+
+	virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
+	{
+		dMatrix matrix;
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		DemoMesh* mesh;
+		if (!strcmp(bodyName, "tireMesh")) {
+			mesh = new DemoMesh(bodyName, collision, "wood_4.tga", "wood_4.tga", "wood_4.tga");
+		}
+		else {
+			mesh = new DemoMesh(bodyName, collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+		}
+
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
+		DemoEntity* const entity = new DemoEntity(matrix, NULL);
+		entity->SetMesh(mesh, dGetIdentityMatrix());
+		scene->Append(entity);
+		mesh->Release();
+
+		// save the pointer to the graphic object with the body.
+		NewtonBodySetUserData(body, entity);
+
+		// assign the wood id
+		NewtonBodySetMaterialGroupID(body, m_material);
+
+		//set continuous collision mode
+		//NewtonBodySetContinuousCollisionMode (body, continueCollisionMode);
+
+		// set a destructor for this rigid body
+		NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
+
+		// set the transform call back function
+		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+		// set the force and torque call back function
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+	}
+
+	int m_material;
+	dCustomVehicleController* m_vehicle;
+};
+
+
+
 class BasicCarControllerManager: public dCustomVehicleControllerManager
 {
-	class VehicleLoader : public dCustomJointSaveLoad
-	{
-		public:
-		VehicleLoader(NewtonWorld* const world, FILE* const file, int materialID)
-			:dCustomJointSaveLoad(world, file)
-			,m_material(materialID)
-		{
-		}
-
-		const char* GetUserDataName(const NewtonBody* const body) const
-		{
-			dAssert(0);
-			return NULL;
-		}
-
-		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
-		{
-			dMatrix matrix;
-			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-
-			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-			DemoMesh* mesh;
-			if (!strcmp (bodyName, "tireMesh")) {
-				mesh = new DemoMesh(bodyName, collision, "wood_4.tga", "wood_4.tga", "wood_4.tga");
-			} else {
-				mesh = new DemoMesh(bodyName, collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
-			}
-
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
-			DemoEntity* const entity = new DemoEntity(matrix, NULL);
-			entity->SetMesh(mesh, dGetIdentityMatrix());
-			scene->Append(entity);
-			mesh->Release();
-
-			// save the pointer to the graphic object with the body.
-			NewtonBodySetUserData(body, entity);
-
-			// assign the wood id
-			NewtonBodySetMaterialGroupID(body, m_material);
-
-			//set continuous collision mode
-			//NewtonBodySetContinuousCollisionMode (body, continueCollisionMode);
-
-			// set a destructor for this rigid body
-			NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
-
-			// set the transform call back function
-			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-			// set the force and torque call back function
-			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-		}
-
-		int m_material;
-		dCustomVehicleController* m_vehicle;
-	};
-
-
-
-
 	public:
 	BasicCarControllerManager (NewtonWorld* const world, int materialsCount, int* const materialList)
 		:dCustomVehicleControllerManager (world, materialsCount, materialList)
@@ -254,91 +254,6 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 		}
 	}
 
-	void DrawSchematicCallback(const dCustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
-	{
-		if (!strcmp(partName, "chassis")) {
-			glLineWidth(3.0f);
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[pointCount - 1]);
-			for (int i = 0; i < pointCount; i++) {
-				dVector p1(lines[i]);
-				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-				p0 = p1;
-			}
-			glEnd();
-		}
-
-		if (!strcmp(partName, "tire")) {
-			glLineWidth(2.0f);
-			glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[pointCount - 1]);
-			for (int i = 0; i < pointCount; i++) {
-				dVector p1(lines[i]);
-				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-				p0 = p1;
-			}
-			glEnd();
-		}
-
-		if (!strcmp(partName, "velocity")) {
-			glLineWidth(2.0f);
-			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[0]);
-			dVector p1(lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-			glEnd();
-		}
-
-		if (!strcmp(partName, "omega")) {
-			glLineWidth(2.0f);
-			glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[0]);
-			dVector p1(lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-			glEnd();
-		}
-
-		if (!strcmp(partName, "lateralForce")) {
-			glLineWidth(2.0f);
-			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[0]);
-			dVector p1(lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-			glEnd();
-		}
-
-		if (!strcmp(partName, "lateralForce")) {
-			glLineWidth(2.0f);
-			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[0]);
-			dVector p1(lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-			glEnd();
-		}
-
-		if (!strcmp(partName, "longitudinalForce")) {
-			glLineWidth(2.0f);
-			glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[0]);
-			dVector p1(lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-			glEnd();
-		}
-	}
 */
 
 
@@ -352,7 +267,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 		FILE* const inputFile = fopen(fileName, "rt");
 		dAssert(inputFile);
 		
-		VehicleLoader loader(GetWorld(), inputFile, 0);
+		dBasicVehicleLoader loader(GetWorld(), inputFile, 0);
 		loader.Load();
 
 		fclose(inputFile);

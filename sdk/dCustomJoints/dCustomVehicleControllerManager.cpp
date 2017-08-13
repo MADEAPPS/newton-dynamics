@@ -122,23 +122,13 @@ void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	dAssert (0);
-/*
-	const char* token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "maxRPM:"));
-	m_maxRPM = fileLoader->LoadFloat();
+	LOAD_BEGIN(fileLoader);
+	LOAD_FLOAT(maxRPM);
+	LOAD_FLOAT(minFriction);
+	LOAD_FLOAT(maxFriction);
+	LOAD_END();
 
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "baseOffsetPosit:"));
-	dVector posit0(fileLoader->LoadVector());
-	posit0.m_w = 1.0f;
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "baseOffsetRotation:"));
-	dVector euler0(fileLoader->LoadVector());
-	euler0 = euler0.Scale(3.14159213f / 180.0f);
-	m_baseOffsetMatrix = dMatrix(euler0.m_x, euler0.m_y, euler0.m_z, posit0);
-*/
+	m_engineMount = NULL;
 }
 
 void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
@@ -199,23 +189,9 @@ void dEngineMountJoint::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix&
 
 void dEngineMountJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	dAssert (0);
-/*
-	const char* token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "maxRPM:"));
-	m_maxRPM = fileLoader->LoadFloat();
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "baseOffsetPosit:"));
-	dVector posit0(fileLoader->LoadVector());
-	posit0.m_w = 1.0f;
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "baseOffsetRotation:"));
-	dVector euler0(fileLoader->LoadVector());
-	euler0 = euler0.Scale(3.14159213f / 180.0f);
-	m_baseOffsetMatrix = dMatrix(euler0.m_x, euler0.m_y, euler0.m_z, posit0);
-*/
+	LOAD_BEGIN(fileLoader);
+	LOAD_MATRIX(baseOffsetMatrix);
+	LOAD_END();
 }
 
 void dEngineMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
@@ -315,34 +291,17 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dDifferentialJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	const char* token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "baseOffset_position:"));
-	dVector posit0(fileLoader->LoadVector());
-	posit0.m_w = 1.0f;
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "baseOffset_rotation:"));
-	dVector euler0(fileLoader->LoadVector());
-	euler0 = euler0.Scale(3.14159213f / 180.0f);
-
-	m_baseOffsetMatrix = dMatrix (euler0.m_x, euler0.m_y, euler0.m_z, posit0);
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "turnSpeed:"));
-	m_turnSpeed = fileLoader->LoadFloat();
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "isTractionDifferential:"));
-	m_isTractionDifferential = fileLoader->LoadInt() ? true : false;
+	LOAD_BEGIN(fileLoader);
+	LOAD_MATRIX(baseOffsetMatrix);
+	LOAD_FLOAT(turnSpeed);
+	LOAD_INT(isTractionDifferential);
+	LOAD_END();
 }
 
 void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	// nothing really to save;
 	dCustomUniversal::Save(fileSaver);
-
-	fileSaver->SaveFloat ("\tturnSpeed", m_turnSpeed);
-	fileSaver->SaveInt ("\tisTractionDifferential", int (m_isTractionDifferential));
 
 	SAVE_BEGIN(fileSaver);
 	SAVE_MATRIX(baseOffsetMatrix);
@@ -499,25 +458,33 @@ void dWheelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dWheelJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
-dAssert (0);
-/*
-	m_tire = NULL;
-	m_lateralDir = dVector (0.0f);
-	m_longitudinalDir = dVector (0.0f);
-	m_tireLoad = 0.0f;
-	m_steerRate = 0.0f;
-	m_steerAngle0 = 0.0f;
-	m_steerAngle1 = 0.0f;
-	m_brakeTorque = 0.0f;
+	LOAD_BEGIN(fileLoader);
 
-	const char* token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "suspensionLength:"));
-	m_suspensionLength = fileLoader->LoadFloat();
+	LOAD_VECTOR(lateralDir);
+	LOAD_VECTOR(longitudinalDir);
+	LOAD_FLOAT(tireLoad);
+	LOAD_FLOAT(radio);
+	LOAD_FLOAT(steerRate);
+	LOAD_FLOAT(steerAngle0);
+	LOAD_FLOAT(steerAngle1);
+	LOAD_FLOAT(brakeTorque);
+	LOAD_FLOAT(dampingRatio);
+	LOAD_FLOAT(springStrength);
+	LOAD_FLOAT(suspensionLength);
+	LOAD_FLOAT(lateralSlip);
+	LOAD_FLOAT(aligningTorque);
+	LOAD_FLOAT(longitudinalSlip);
+	LOAD_FLOAT(aligningMomentTrail);
+	LOAD_FLOAT(lateralStiffness);
+	LOAD_FLOAT(longitudialStiffness);
+	LOAD_FLOAT(maxSteeringAngle);
+	LOAD_INT(suspentionType);
+	LOAD_INT(hasFender);
 
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "suspentionType:"));
-	m_suspentionType = dBodyPartTire::dInfo::SuspensionType(fileLoader->LoadInt());
-*/
+	LOAD_END();
+
+	m_controller = NULL;
+	m_collidingCount = 0;
 }
 
 void dWheelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
@@ -525,6 +492,7 @@ void dWheelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	dCustomJoint::Save(fileSaver);
 
 	SAVE_BEGIN(fileSaver);
+
 	SAVE_VECTOR(lateralDir);
 	SAVE_VECTOR(longitudinalDir);
 	SAVE_FLOAT(tireLoad);
@@ -585,21 +553,18 @@ m_param = 0.0f;
 
 void dGearBoxJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
+	LOAD_BEGIN(fileLoader);
+	LOAD_FLOAT(cluthFrictionTorque);
+	LOAD_END();
 	m_param = 0.0f;
-#ifdef _DEBUG
-	const char* token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "clutchFrictionTorque:"));
-#else
-	fileLoader->NextToken();
-#endif
-
-	m_cluthFrictionTorque = fileLoader->LoadFloat();
 }
 
 void dGearBoxJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dCustomGear::Save(fileSaver);
-	fileSaver->SaveFloat("\tclutchFrictionTorque", m_cluthFrictionTorque);
+	SAVE_BEGIN(fileSaver);
+	SAVE_FLOAT(cluthFrictionTorque);
+	SAVE_END();
 }
 
 dAxelJoint::dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
@@ -674,21 +639,22 @@ void dAxelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dAxelJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	const char* token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "parentReference:"));
-	int parentIndex = fileLoader->LoadInt();
-	m_parentReference = fileLoader->FindBodyId(parentIndex);
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "pintOnParentReference:"));
-	m_pintOnReference = fileLoader->LoadVector();
+	int m_parentReferenceIndex;
+	LOAD_BEGIN(fileLoader);
+	LOAD_INT(parentReferenceIndex);
+	LOAD_VECTOR(pintOnReference);
+	LOAD_END();
+	m_parentReference = fileLoader->FindBodyId(m_parentReferenceIndex);
 }
 
 void dAxelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dCustomGear::Save(fileSaver);
-	fileSaver->SaveInt("\tparentReference", fileSaver->FindBodyId(m_parentReference));
-	fileSaver->SaveVector("\tpintOnParentReference", m_pintOnReference);
+	int m_parentReferenceIndex = fileSaver->FindBodyId(m_parentReference);
+	SAVE_BEGIN(fileSaver);
+	SAVE_INT(parentReferenceIndex);
+	SAVE_VECTOR(pintOnReference);
+	SAVE_END();
 }
 
 

@@ -229,7 +229,7 @@ class dWheelJoint: public dCustomJoint
 	dFloat m_maxSteeringAngle;
 
 	dCustomVehicleController* m_controller;
-	dSuspensionType m_suspentionType;
+	int m_suspentionType;
 	int m_hasFender;
 	int m_collidingCount;
 	NewtonWorldConvexCastReturnInfo m_contactInfo[4];
@@ -337,7 +337,7 @@ class dDifferentialJoint: public dCustomUniversal
 //	dFloat m_slipDifferentialSpeed;
 //	bool m_slipDifferentialOn;
 	dFloat m_turnSpeed;
-	bool m_isTractionDifferential;
+	int m_isTractionDifferential;
 
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;

@@ -206,84 +206,70 @@ node: 0
 	userData: chassisMesh
 	mass: 1534.520020
 	centerOfMass: 0.237629 0.000000 0.000006
-	position: -13.444667 0.999977 102.108154
-	eulerAngles: 0.000000 0.753740 0.000020
+	matrix: 0.000000 0.753740 0.000020 -13.444667 0.999977 102.108154
 	collision: 0
 	shapeScale: 1.000000 1.000000 1.000000
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+	shapeMatrix: 0.000000 -0.000000 0.000000 0.000000 0.000000 0.000000
 nodeEnd: 
 
 node: 1
 	userData: engineMesh
 	mass: 100.000000
 	centerOfMass: 0.000000 0.000000 0.000000
-	position: -13.444667 0.999977 102.108154
-	eulerAngles: 0.000000 0.753740 0.000020
+	matrix: 0.000000 0.753740 0.000020 -13.444667 0.999977 102.108154
 	collision: 1
 	shapeScale: 1.000000 1.000000 1.000000
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+	shapeMatrix: 0.000000 -0.000000 0.000000 0.000000 0.000000 0.000000
 nodeEnd: 
 
 node: 2
 	userData: differentialMesh
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
-	position: -13.444667 0.999977 102.108154
-	eulerAngles: 0.000000 0.753740 0.000020
+	matrix: 0.000000 0.753740 0.000020 -13.444667 0.999977 102.108154
 	collision: 1
 	shapeScale: 1.000000 1.000000 1.000000
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 -0.000000 0.000000
+	shapeMatrix: 0.000000 -0.000000 0.000000 0.000000 0.000000 0.000000
 nodeEnd: 
 
 node: 3
 	userData: tireMesh
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
-	position: -14.656964 1.005706 102.856575
-	eulerAngles: 0.000000 0.753740 0.000020
+	matrix: 0.000000 0.753740 0.000020 -14.656964 1.005706 102.856575
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 90.000000 0.000000
+	shapeMatrix: 0.000000 90.000000 0.000000 0.000000 0.000000 0.000000
 nodeEnd: 
 
 node: 4
 	userData: tireMesh
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
-	position: -14.667200 1.005706 101.391899
-	eulerAngles: 0.000000 0.753740 0.000020
+	matrix: 0.000000 0.753740 0.000020 -14.667200 1.005706 101.391899
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 90.000000 0.000000
+	shapeMatrix: 0.000000 90.000000 0.000000 0.000000 0.000000 0.000000
 nodeEnd: 
 
 node: 5
 	userData: tireMesh
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
-	position: -12.269349 1.005707 102.799767
-	eulerAngles: 0.000000 0.753740 0.000020
+	matrix: 0.000000 0.753740 0.000020 -12.269349 1.005707 102.799767
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 90.000000 0.000000
+	shapeMatrix: 0.000000 90.000000 0.000000 0.000000 0.000000 0.000000
 nodeEnd: 
 
 node: 6
 	userData: tireMesh
 	mass: 40.000000
 	centerOfMass: 0.000000 0.000000 0.000000
-	position: -12.278916 1.005707 101.385880
-	eulerAngles: 0.000000 0.753740 0.000020
+	matrix: 0.000000 0.753740 0.000020 -12.278916 1.005707 101.385880
 	collision: 2
 	shapeScale: 0.319073 0.329154 0.329154
-	shapePosition: 0.000000 0.000000 0.000000
-	shapeEulerAngle: 0.000000 90.000000 0.000000
+	shapeMatrix: 0.000000 90.000000 0.000000 0.000000 0.000000 0.000000
 nodeEnd: 
 
 jointsCount: 10
@@ -293,10 +279,8 @@ joint: 0
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0_euler: 0.000000 -90.000000 0.000020
-	localMatrix0_posit: 0.000000 0.000000 0.250000
-	localMatrix1_euler: 0.000000 -90.000000 0.000020
-	localMatrix1_posit: 1.175151 0.005729 -0.456879
+	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 0.250000
+	localMatrix1: 0.000000 -90.000000 0.000020 1.175151 0.005729 -0.456879
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -326,10 +310,8 @@ joint: 1
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0_euler: 0.000000 -90.000000 0.000020
-	localMatrix0_posit: 0.000000 0.000000 -0.250000
-	localMatrix1_euler: 0.000000 -90.000000 0.000020
-	localMatrix1_posit: 1.166118 0.005729 0.457016
+	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 -0.250000
+	localMatrix1: 0.000000 -90.000000 0.000020 1.166118 0.005729 0.457016
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -359,10 +341,8 @@ joint: 2
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0_euler: 0.000000 -90.000000 0.000020
-	localMatrix0_posit: 0.000000 0.000000 0.000000
-	localMatrix1_euler: 0.000000 -90.000000 0.000020
-	localMatrix1_posit: -1.213006 0.005729 -0.732277
+	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 0.000000
+	localMatrix1: 0.000000 -90.000000 0.000020 -1.213006 0.005729 -0.732277
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -392,10 +372,8 @@ joint: 3
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0_euler: 0.000000 -90.000000 0.000020
-	localMatrix0_posit: 0.000000 0.000000 0.000000
-	localMatrix1_euler: 0.000000 -90.000000 0.000020
-	localMatrix1_posit: -1.222037 0.005729 0.732407
+	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 0.000000
+	localMatrix1: 0.000000 -90.000000 0.000020 -1.222037 0.005729 0.732407
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -425,10 +403,8 @@ joint: 4
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0_euler: 90.000023 -0.000000 0.000020
-	localMatrix0_posit: 0.000000 0.000000 0.000000
-	localMatrix1_euler: 90.000023 -0.000000 0.000020
-	localMatrix1_posit: 0.000000 0.000000 0.000000
+	localMatrix0: 90.000023 -0.000000 0.000020 0.000000 0.000000 0.000000
+	localMatrix1: 90.000023 -0.000000 0.000020 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	minAngle_0: -45.000000
 	maxAngle_0: 45.000000
@@ -441,10 +417,7 @@ joint: 4
 	angularDamp_1: 0.300000
 	angularAccel_1: -4.000000
 	flags: 0
-	turnSpeed: 0.000000
-	isTractionDifferential: 0
-	baseOffsetMatrix_euler: 0.000000 -0.000000 0.000020
-	baseOffsetMatrix_posit: 0.000000 0.000000 0.000000
+	baseOffsetMatrix: 0.000000 -0.000000 0.000020 0.000000 0.000000 0.000000
 	turnSpeed: 0.000000
 	isTractionDifferential: 0
 jointEnd: 
@@ -455,10 +428,8 @@ joint: 5
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0_euler: 0.000000 -90.000000 -0.000000
-	localMatrix0_posit: 0.000000 0.000000 0.000000
-	localMatrix1_euler: 0.000000 -90.000000 -0.000000
-	localMatrix1_posit: 0.000000 0.000000 0.000000
+	localMatrix0: 0.000000 -90.000000 -0.000000 0.000000 0.000000 0.000000
+	localMatrix1: 0.000000 -90.000000 -0.000000 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	minAngle: -45.000000
 	maxAngle: 45.000000
@@ -468,8 +439,7 @@ joint: 5
 	damper: 0.000000
 	springDamperRelaxation: 0.600000
 	flags: 0
-	baseOffsetMatrix_euler: 0.000000 -0.000000 0.000020
-	baseOffsetMatrix_posit: 0.000000 0.000000 0.000000
+	baseOffsetMatrix: 0.000000 -0.000000 0.000020 0.000000 0.000000 0.000000
 jointEnd: 
 
 joint: 6
@@ -478,10 +448,8 @@ joint: 6
 	parentBody: -1
 	degreesOfFreedom: 1
 	solverModel: 1
-	localMatrix0_euler: 0.000000 -90.000000 -0.000000
-	localMatrix0_posit: 0.000000 0.000000 0.000000
-	localMatrix1_euler: 0.000000 -89.245949 0.000000
-	localMatrix1_posit: -13.444667 0.999977 102.108154
+	localMatrix0: 0.000000 -90.000000 -0.000000 0.000000 0.000000 0.000000
+	localMatrix1: 0.000000 -89.245949 0.000000 -13.444667 0.999977 102.108154
 	stiffness: 1.000000
 	maxRPM: 50.000000
 	minFriction: -10.000000
@@ -494,13 +462,11 @@ joint: 7
 	parentBody: 1
 	degreesOfFreedom: 1
 	solverModel: 1
-	localMatrix0_euler: 0.000000 -90.000000 -0.000000
-	localMatrix0_posit: 14.786721 -0.999977 -101.922447
-	localMatrix1_euler: 0.000000 -90.000000 -0.000000
-	localMatrix1_posit: 14.786721 -0.999977 -101.922447
+	localMatrix0: 0.000000 -90.000000 -0.000000 14.786721 -0.999977 -101.922447
+	localMatrix1: 0.000000 -90.000000 -0.000000 14.786721 -0.999977 -101.922447
 	stiffness: 1.000000
 	gearRatio: 1.000000
-	clutchFrictionTorque: 2000.000000
+	cluthFrictionTorque: 2000.000000
 jointEnd: 
 
 joint: 8
@@ -509,14 +475,12 @@ joint: 8
 	parentBody: 2
 	degreesOfFreedom: 1
 	solverModel: 1
-	localMatrix0_euler: 0.000000 -90.000000 0.000000
-	localMatrix0_posit: 0.000000 0.000000 0.000000
-	localMatrix1_euler: 0.000000 -0.000000 -180.000015
-	localMatrix1_posit: 0.000000 0.000000 0.000000
+	localMatrix0: 0.000000 -90.000000 0.000000 0.000000 0.000000 0.000000
+	localMatrix1: 0.000000 -0.000000 -180.000015 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	gearRatio: 1.000000
-	parentReference: 0
-	pintOnParentReference: 0.000000 0.000000 1.000000
+	parentReferenceIndex: 0
+	pintOnReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
 joint: 9
@@ -525,14 +489,12 @@ joint: 9
 	parentBody: 2
 	degreesOfFreedom: 1
 	solverModel: 1
-	localMatrix0_euler: 0.000000 -90.000000 0.000000
-	localMatrix0_posit: 0.000000 0.000000 0.000000
-	localMatrix1_euler: -0.000000 0.000000 0.000020
-	localMatrix1_posit: 0.000000 0.000000 0.000000
+	localMatrix0: 0.000000 -90.000000 0.000000 0.000000 0.000000 0.000000
+	localMatrix1: -0.000000 0.000000 0.000020 0.000000 0.000000 0.000000
 	stiffness: 1.000000
 	gearRatio: 1.000000
-	parentReference: 0
-	pintOnParentReference: 0.000000 0.000000 1.000000
+	parentReferenceIndex: 0
+	pintOnReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
 VehicleController: 

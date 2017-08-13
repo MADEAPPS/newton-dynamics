@@ -25,6 +25,8 @@ dCustomJoint::dSerializeMetaData m_metaData_CustomJoint("dCustomJoint");
 //////////////////////////////////////////////////////////////////////
 dCustomJoint::dCustomJoint ()
 	:dCustomAlloc()
+	,m_localMatrix0(dGetIdentityMatrix())
+	,m_localMatrix1(dGetIdentityMatrix())
 	,m_userData(NULL)
 	,m_body0(NULL)
 	,m_body1(NULL)
@@ -45,6 +47,8 @@ dCustomJoint::dCustomJoint (int maxDOF, NewtonBody* const body0, NewtonBody* con
 
 dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* const invDynNode)
 	:dCustomAlloc()
+	,m_localMatrix0(dGetIdentityMatrix())
+	,m_localMatrix1(dGetIdentityMatrix())
 {
 	m_joint = NULL;
 	m_body1 = NULL;
@@ -65,6 +69,8 @@ dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* cons
 
 dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomAlloc()
+	,m_localMatrix0(dGetIdentityMatrix())
+	,m_localMatrix1(dGetIdentityMatrix())
 	,m_userData(NULL)
 	,m_body0(body0)
 	,m_body1(body1)
@@ -89,6 +95,8 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 
 dCustomJoint::dCustomJoint(dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)
 	:dCustomAlloc()
+	,m_localMatrix0(dGetIdentityMatrix())
+	,m_localMatrix1(dGetIdentityMatrix())
 	,m_userData(NULL)
 	,m_body0(body0)
 	,m_body1(body1)
@@ -108,27 +116,12 @@ dCustomJoint::dCustomJoint(dCustomJointSaveLoad* const fileLoader, NewtonBody* c
 	int solverModel = fileLoader->LoadInt();
 
 	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "body0_position:"));
-	dVector posit0 (fileLoader->LoadVector());
-	posit0.m_w = 1.0f;
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "body1_position:"));
-	dVector posit1(fileLoader->LoadVector());
-	posit1.m_w = 1.0f;
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "body0_rotation:"));
-	dVector euler0(fileLoader->LoadVector());
-	euler0 = euler0.Scale (3.14159213f / 180.0f);
+	dAssert(!strcmp(token, "localMatrix0:"));
+	m_localMatrix0 = fileLoader->LoadMatrix();
 	
 	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "body1_rotation:"));
-	dVector euler1(fileLoader->LoadVector());
-	euler1 = euler1.Scale(3.14159213f / 180.0f);
-
-	m_localMatrix0 = dMatrix (euler0.m_x, euler0.m_y, euler0.m_z, posit0);
-	m_localMatrix1 = dMatrix (euler1.m_x, euler1.m_y, euler1.m_z, posit1);
+	dAssert(!strcmp(token, "localMatrix1:"));
+	m_localMatrix1 = fileLoader->LoadMatrix();
 
 	token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "stiffness:"));
@@ -176,8 +169,6 @@ void dCustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const 
 	m_maxDof = maxDOF;
 	m_autoDestroy = 0;
 	m_stiffness = 1.0f;
-	m_localMatrix0 = dGetIdentityMatrix();
-	m_localMatrix1 = dGetIdentityMatrix();
 
 	m_world	= body0 ? NewtonBodyGetWorld (body0) : NewtonBodyGetWorld (body1);
 	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, m_body0, m_body1); 

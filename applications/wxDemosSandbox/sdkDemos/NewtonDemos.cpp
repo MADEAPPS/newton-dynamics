@@ -55,8 +55,8 @@
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// passive rag doll
 //#define DEFAULT_SCENE	31			// dynamic rag doll
-//#define DEFAULT_SCENE	32			// basic Car
-#define DEFAULT_SCENE	33			// super Car
+#define DEFAULT_SCENE	32			// basic Car
+//#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller

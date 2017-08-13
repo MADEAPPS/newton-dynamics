@@ -66,7 +66,6 @@ void dCustomJointSaveLoad::GetBodiesAndJointsList (dList<NewtonBody*>& bodylist,
 	}
 }
 
-
 const char* dCustomJointSaveLoad::NextToken() const
 {
 	fscanf(m_file, "%s:", &m_token[0]);
@@ -94,6 +93,16 @@ dVector dCustomJointSaveLoad::LoadVector() const
 	return val;
 }
 
+dMatrix dCustomJointSaveLoad::LoadMatrix () const
+{
+	dVector euler;
+	dVector posit;
+	fscanf(m_file, "%f %f %f %f %f %f", &euler.m_x, &euler.m_y, &euler.m_z, &posit.m_x, &posit.m_y, &posit.m_z);
+
+	posit.m_w = 1.0f;
+	euler = euler.Scale(3.141592f / 180.0f);
+	return dMatrix (euler.m_x, euler.m_y, euler.m_z, posit);
+}
 
 void dCustomJointSaveLoad::LoadName(char* const name) const
 {
@@ -122,8 +131,7 @@ void dCustomJointSaveLoad::SaveMatrix (const char* const token, const dMatrix& m
 	dVector euler1;
 	matrix.GetEulerAngles(euler0, euler1);
 	euler0 = euler0.Scale (180.0f / 3.141592f);
-	fprintf(m_file, "%s_euler: %f %f %f\n", token, euler0.m_x, euler0.m_y, euler0.m_z);
-	fprintf(m_file, "%s_posit: %f %f %f\n", token, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z);
+	fprintf(m_file, "%s: %f %f %f %f %f %f\n", token, euler0.m_x, euler0.m_y, euler0.m_z, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z);
 }
 
 void dCustomJointSaveLoad::SaveName (const char* const token, const char* const name) const
@@ -241,8 +249,6 @@ void dCustomJointSaveLoad::SaveBodyList(dList<NewtonBody*>& bodyList)
 	for (dList<NewtonBody*>::dListNode* ptr = bodyList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dMatrix bodyMatrix;
 		dMatrix shapeMatrix;
-		dVector euler0;
-		dVector euler1;
 		dVector scale;
 		dVector com;
 		dFloat mass;
@@ -263,16 +269,12 @@ void dCustomJointSaveLoad::SaveBodyList(dList<NewtonBody*>& bodyList)
 
 		SaveFloat("\tmass", mass);
 		SaveVector("\tcenterOfMass", com);
-		SaveVector("\tposition", bodyMatrix.m_posit);
-		bodyMatrix.GetEulerAngles(euler0, euler1);
-		SaveVector("\teulerAngles", euler0.Scale(180.0f / 3.141592f));
+		SaveMatrix("\tmatrix", bodyMatrix);
 
 		SaveInt("\tcollision", entry.m_id);
 
 		SaveVector("\tshapeScale", scale);
-		SaveVector("\tshapePosition", shapeMatrix.m_posit);
-		shapeMatrix.GetEulerAngles(euler0, euler1);
-		SaveVector("\tshapeEulerAngle", euler0.Scale(180.0f / 3.141592f));
+		SaveMatrix("\tshapeMatrix", shapeMatrix);
 
 		SaveName("nodeEnd", "\n");
 	}
@@ -353,12 +355,12 @@ void dCustomJointSaveLoad::LoadBodyList(dTree<NewtonBody*, int>& bodyList)
 	int nodeCount = LoadInt();
 	for (int i = 0; i < nodeCount; i ++) {
 
-		dVector posit(0.0f);
-		dVector euler(0.0f);
+		dMatrix matrix(dGetIdentityMatrix());
+		dMatrix shapeMatrix(dGetIdentityMatrix());
 		dVector com(0.0f);
 		dVector shapeScale(1.0f);
 		dVector shapePosit(1.0f);
-		dVector shapeEuler(0.0f);
+		
 		NewtonBody* body = NULL;
 		NewtonCollision* collision = NULL;
 		dFloat mass = 0.0f;
@@ -375,34 +377,24 @@ void dCustomJointSaveLoad::LoadBodyList(dTree<NewtonBody*, int>& bodyList)
 				mass = LoadFloat();
 			} else if (!strcmp(token, "centerOfMass:")) {
 				com = LoadVector();
-			} else if (!strcmp(token, "position:")) {
-				posit = LoadVector();
-				posit.m_w = 1.0f;
-			} else if (!strcmp(token, "eulerAngles:")) {
-				euler = LoadVector();
-				euler = euler.Scale(3.141592f / 180.0f);
+			} else if (!strcmp(token, "matrix:")) {
+				matrix = LoadMatrix();
 			} else if (!strcmp(token, "collision:")) {
 				int coolIndex = LoadInt();
 				collision = collisionMap.Find(coolIndex)->GetInfo();
 			} else if (!strcmp(token, "shapeScale:")) {
 				shapeScale = LoadVector();
-			} else if (!strcmp(token, "shapePosition:")) {
-				shapePosit = LoadVector();
-				shapePosit.m_w = 1.0f;
-			} else if (!strcmp(token, "shapeEulerAngle:")) {
-				shapeEuler = LoadVector();
-				shapeEuler = shapeEuler.Scale(3.141592f / 180.0f);
+			} else if (!strcmp(token, "shapeMatrix:")) {
+				shapeMatrix = LoadMatrix();
 			} else {
 				dAssert(0);
 			}
 		}
 
-		dMatrix shapeMatrix(shapeEuler.m_x, shapeEuler.m_y, shapeEuler.m_z, shapePosit);
 		NewtonCollisionSetMatrix(collision, &shapeMatrix[0][0]);
 		NewtonCollisionSetScale(collision, shapeScale.m_x, shapeScale.m_y, shapeScale.m_z);
 //NewtonCollisionSetMode(collision, 0);
 
-		dMatrix matrix(euler.m_x, euler.m_y, euler.m_z, posit);
 		body = NewtonCreateDynamicBody(m_world, collision, &matrix[0][0]);
 		NewtonBodySetMassProperties(body, mass, collision);
 		NewtonBodySetCentreOfMass(body, &com.m_x);
@@ -460,9 +452,8 @@ void dCustomJointSaveLoad::LoadJointList(const dTree<NewtonBody*, int>& bodyList
 		token = NextToken();
 		dAssert(!strcmp(token, "parentBody:"));
 		int parentIndex = LoadInt();
-		NewtonBody* const parent = bodyList.Find(parentIndex)->GetInfo();
+		NewtonBody* const parent = (parentIndex != -1) ? bodyList.Find(parentIndex)->GetInfo() : NULL;
 		dCustomJoint* const joint = dCustomJoint::Load(this, jointType, child, parent);
-
 		jointMap.Insert (joint, jointIndex);
 		while (strcmp(NextToken(), "jointEnd:"));
 	}
