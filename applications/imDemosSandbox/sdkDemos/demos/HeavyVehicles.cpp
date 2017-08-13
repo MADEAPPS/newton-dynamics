@@ -99,7 +99,7 @@ static VehicleParameters heavyTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dSuspensionType::m_offroad,			//TIRE_SUSPENSION_TYPE
+	m_offroad,							//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -151,7 +151,7 @@ static VehicleParameters lightTruck =
 	100.0f,								// SUSPENSION_SPRING
 	10.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dSuspensionType::m_offroad,			//TIRE_SUSPENSION_TYPE
+	m_offroad,						//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -201,7 +201,7 @@ static VehicleParameters m1a1Param =
 	350.0f,									// SUSPENSION_SPRING
 	20.0f,									// SUSPENSION_DAMPER
 	0.10f,									// TIRE_PIVOT_OFFSET_Y
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
 	(5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
 	(5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
 	1.5f,									// ALIGNING_MOMENT_TRAIL
@@ -238,7 +238,7 @@ static VehicleParameters m1a1Param =
 	2000.0f,							// SUSPENSION_SPRING
 	100.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
-	dSuspensionType::m_offroad,			//TIRE_SUSPENSION_TYPE
+	m_offroad,							//TIRE_SUSPENSION_TYPE
 
 	10000.0f,							// BRAKE_TORQUE
 	-0.6f,								// COM_Y_OFFSET
@@ -314,8 +314,8 @@ class HeavyVehicleEntity: public DemoEntity
 		{
 			dAssert (0);
 /*
-			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
-				const dCustomVehicleController::dBodyPartTire* const part = &node->GetInfo();
+			for (dList<dBodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
+				const dBodyPartTire* const part = &node->GetInfo();
 				if (part->GetUserData() == tire) {
 					return part->GetInfo().m_radio;
 				}
@@ -924,10 +924,10 @@ class HeavyVehicleEntity: public DemoEntity
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
-		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
-		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
-		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
-		//CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
+		dEngineController* const engine = m_controller->GetEngine();
+		dSteeringController* const steering = m_controller->GetSteering();
+		dBrakeController* const brakes = m_controller->GetBrakes();
+		//BrakeController* const handBrakes = m_controller->GetHandBrakes();
 
 		//int gear = engine->GetGear();
 		int engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');

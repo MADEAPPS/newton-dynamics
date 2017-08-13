@@ -108,7 +108,7 @@ static CarDefinition monsterTruck =
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dSuspensionType::m_confort,					//TIRE_SUSPENSION_TYPE
+	m_confort,									//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -150,7 +150,7 @@ static CarDefinition viper =
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	dSuspensionType::m_confort,					//TIRE_SUSPENSION_TYPE
+	m_confort,									//TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -260,7 +260,7 @@ class SuperCarEntity: public DemoEntity
 		((dCustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
-	void SetGearMap(dCustomVehicleController::dEngineController* const engine)
+	void SetGearMap(dEngineController* const engine)
 	{
 		int start = engine->GetFirstGear();
 		int count = engine->GetLastGear() - start;
@@ -443,7 +443,7 @@ class SuperCarEntity: public DemoEntity
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		
 		// add a steering Wheel component
-		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller);
+		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
 		steering->AddTire(rightFrontTire);
 		steering->AddTire(leftRearTire);
@@ -451,7 +451,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
-		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
+		dBrakeController* const brakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
 		brakes->AddTire (rightFrontTire);
 		brakes->AddTire (leftRearTire);
@@ -460,7 +460,7 @@ class SuperCarEntity: public DemoEntity
 
 
 		// add vehicle hand brakes
-		dCustomVehicleController::dBrakeController* const handBrakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
+		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
@@ -530,7 +530,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
 		m_controller->AddEngineJoint (engineInfo.m_mass, engineInfo.m_radio);
-		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
+		dEngineController* const engineControl = new dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -564,227 +564,57 @@ class SuperCarEntity: public DemoEntity
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
-		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
-		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
-		dCustomVehicleController::dBrakeController* const handBrakes = m_controller->GetHandBrakes();
-		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
-
+/*
 		// get the throttler input
 		dFloat joyPosX;
 		dFloat joyPosY;
 		int joyButtons;
 
 		int gear = engine ? engine->GetGear() : 0;
-		int engineIgnitionKey = 0;
-		int engineDifferentialLock = 0;
-		int automaticTransmission = engine ? engine->GetTransmissionMode() : 1;
-		dFloat cluthPedal = 1.0f;
-		dFloat steeringVal = 0.0f;
-		dFloat reverseGasPedal = 0.0f;
-		dFloat forwardGasPedal = 0.0f;
-		dFloat handBrakePedal = 0.0f;
-		
-		bool hasJopytick = scene->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
+		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
-/*
 			// apply a cubic attenuation to the joystick inputs
-			joyPosX = joyPosX * joyPosX * joyPosX;
-			joyPosY = joyPosY * joyPosY * joyPosY;
-
-			steeringVal = joyPosX;
-			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
-			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
-
-			gear += int (m_gearUpKey.UpdateTriggerJoystick(scene, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(scene, joyButtons & 4));
-			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
+//			joyPosX = joyPosX * joyPosX * joyPosX;
+//			joyPosY = joyPosY * joyPosY * joyPosY;
+//			steeringVal = joyPosX;
+//			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
+//			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
+//			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
+//			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
+			}
 */
-		} else {
 
-			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
-			engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
-			automaticTransmission = m_automaticTransmission.UpdatePushButton (scene, 0x0d);
-			steeringVal = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
-			gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
+		dVehicleDriverInput driverInput;
 
-			if (scene->GetKeyState ('W')) {
-				forwardGasPedal = 1.0f;
-			}
+		driverInput.m_gasPedal = scene->GetKeyState('W') ? 1.0f : 0.0f;
+		driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
+		driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
+		driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
+		driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
+		//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
 
-			if (scene->GetKeyState('S')) {
-				reverseGasPedal = 1.0f;
-			}
+		driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+		driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
+		driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
 
-			if (scene->GetKeyState(' ')) {
-				handBrakePedal = 1.0f;
-			}
-
-			if (scene->GetKeyState ('K')) {
- 				cluthPedal = 0.0f;
-			}
-		}
-
-//xxxxxxx
 #if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
-			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
-			fwrite (&engineDifferentialLock, sizeof (int), 1, file);
-			fwrite (&automaticTransmission, sizeof (int), 1, file);
-			fwrite (&gear, sizeof (int), 1, file);
-			fwrite (&steeringVal, sizeof (dFloat), 1, file);
-			fwrite (&cluthPedal, sizeof (dFloat), 1, file);
-			fwrite (&forwardGasPedal, sizeof (dFloat), 1, file);
-			fwrite (&reverseGasPedal, sizeof (dFloat), 1, file);
-			fwrite (&handBrakePedal, sizeof (dFloat), 1, file);
+				fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
 			fflush(file);
 		}
 	#else 
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
-			fread (&engineIgnitionKey, sizeof (int), 1, file);
-			fread (&engineDifferentialLock, sizeof (int), 1, file);
-		 	fread (&automaticTransmission, sizeof (int), 1, file);
-			fread (&gear, sizeof (int), 1, file);
-			fread (&steeringVal, sizeof (dFloat), 1, file);
-			fread (&cluthPedal, sizeof (dFloat), 1, file);
-			fread (&forwardGasPedal, sizeof (dFloat), 1, file);
-			fread (&reverseGasPedal, sizeof (dFloat), 1, file);
-			fread (&handBrakePedal, sizeof (dFloat), 1, file);
+				fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
 		}
 	#endif
 #endif
 
-		if (steering) {
-			steering->SetParam(steeringVal);
-		}
-		if (engine) {
-			engine->SetDifferentialLock (engineDifferentialLock ? true : false);
-	
-			switch (m_drivingState)
-			{
-				case m_engineOff:
-				{
-					if (engineIgnitionKey) {
-						m_drivingState = m_engineIdle;
-						engine->SetIgnition (true);
-						handBrakes->SetParam(0.0f);
-						engine->SetGear (engine->GetNeutralGear());
-					} else {
-						engine->SetIgnition (false);
-						engine->SetGear(engine->GetFirstGear());
-						handBrakes->SetParam(1.0f);
-					}
-					break;
-				}
-
-				case m_engineIdle:
-				{
-					brakes->SetParam(0.0f);
-					engine->SetClutchParam(0.0f);
-					handBrakes->SetParam(handBrakePedal);
-					if (!engineIgnitionKey) {
-						m_drivingState = m_engineOff;
-					} else {
-						if (forwardGasPedal) {
-							m_drivingState = m_preDriveForward;
-						} else if (reverseGasPedal) {
-							m_drivingState = m_preDriveReverse;
-						}
-					}
-					break;
-				}
-
-				case m_engineStop:
-				{
-					engine->SetClutchParam(0.0f);
-					if (forwardGasPedal || reverseGasPedal) {
-						brakes->SetParam(1.0f);
-					} else {
-						m_drivingState = m_engineIdle;
-					}
-					break;
-				}
-
-				case m_preDriveForward:
-				{
-					if (engine->GetSpeed() < -5.0f) {
-						brakes->SetParam(0.5f);
-						engine->SetClutchParam(0.0f);
-						engine->SetGear(engine->GetNeutralGear());
-					} else {
-						m_drivingState = m_driveForward;
-						engine->SetGear(engine->GetFirstGear());
-					}
-					break;
-				}	
-
-				case m_driveForward:
-				{
-					engine->SetParam(forwardGasPedal);
-					engine->SetClutchParam(cluthPedal);
-					handBrakes->SetParam(handBrakePedal);
-					if (reverseGasPedal) {
-						brakes->SetParam(reverseGasPedal * 0.25f);
-						if (engine->GetSpeed() < 5.0f) {
-							engine->SetGear(engine->GetNeutralGear());
-							m_drivingState = m_engineStop;
-						}
-					} else {
-						if (handBrakePedal && (engine->GetSpeed() < 2.0f)) {
-							engine->SetClutchParam(0.0f);
-						}
-						brakes->SetParam(0.0f);
+		m_controller->ApplyDefualtDriver(driverInput);
 					}
 
-					if (!engineIgnitionKey) {
-						m_drivingState = m_engineStop;
-					}
-
-					break;
-				}
-
-				case m_preDriveReverse:
-				{
-					if (engine->GetSpeed() > 5.0f) {
-						brakes->SetParam(0.5f);
-						engine->SetClutchParam(0.0f);
-						engine->SetGear(engine->GetNeutralGear());
-					} else {
-						m_drivingState = m_driveReverse;
-						engine->SetGear(engine->GetReverseGear());
-					}
-					break;
-				}
-
-				case m_driveReverse:
-				{
-					engine->SetParam(reverseGasPedal);
-					engine->SetClutchParam(cluthPedal);
-					handBrakes->SetParam(handBrakePedal);
-					if (forwardGasPedal) {
-						brakes->SetParam(forwardGasPedal * 0.25f);
-						if (engine->GetSpeed() > -5.0f) {
-							engine->SetGear(engine->GetNeutralGear());
-							m_drivingState = m_engineStop;
-						}
-					} else {
-						brakes->SetParam(0.0f);
-					}
-
-					if (!engineIgnitionKey) {
-						m_drivingState = m_engineStop;
-					}
-					break;
-				}
-			}
-
-		} else if (handBrakes) {
-			handBrakes->SetParam(handBrakePedal);
-		}
-	}
-
-	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
 	dFloat CalculateNPCControlSteerinValue (dFloat distanceAhead, dFloat pathWidth, DemoEntity* const pathEntity)
 	{
 		dAssert (0);
@@ -858,12 +688,13 @@ class SuperCarEntity: public DemoEntity
 		//NewtonBody* const body = m_controller->GetBody();
 		//NewtonWorld* const world = NewtonBodyGetWorld(body);
 		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//NewtonDemos* const mainWindow = scene->GetRootWindow();
 		 
-		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
-		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
+		dEngineController* const engine = m_controller->GetEngine();
+		dSteeringController* const steering = m_controller->GetSteering();
 		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
-		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
-		dCustomVehicleController::dBrakeController* const handBrakes = m_controller->GetHandBrakes();
+		dBrakeController* const brakes = m_controller->GetBrakes();
+		dBrakeController* const handBrakes = m_controller->GetHandBrakes();
 		if (!engine) {
 			return;
 		}
@@ -915,7 +746,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat Izz;
 		dFloat mass;
 
-		const dCustomVehicleController::dBodyPart* const chassis = m_controller->GetChassis ();
+		const dBodyPart* const chassis = m_controller->GetChassis ();
 		NewtonBody* const chassisBody = chassis->GetBody();
 		
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
@@ -1048,39 +879,35 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		const char* GetUserDataName(const NewtonBody* const body) const
 		{
-			dAssert (0);
-			return NULL;
-/*
 			static char* tire = "tireMesh";
 			static char* engine = "engineMesh";
 			static char* chassis = "chassisMesh";
 			static char* differential = "differentialMesh";
 
-			if (m_vehicle->GetChassis()->GetBody() == body) {
+			if (m_vehicle->GetBody() == body) {
 				return chassis;
 			}
 
-			if (m_vehicle->GetEnginePart()->GetBody() == body) {
+			if (m_vehicle->GetEngineJoint()->GetEngineBody() == body) {
 				return engine;
 			}
 
-			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
-				const dCustomVehicleController::dBodyPartTire& tirePart = node->GetInfo();
-				if (tirePart.GetBody() == body) {
+			for (dList<dWheelJoint*>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
+				const dWheelJoint* const tirePart = node->GetInfo();
+				if (tirePart->GetTireBody() == body) {
 					return tire;
 				}
 			}
 
-			for (dList<dCustomVehicleController::dBodyPartDifferential>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
-				const dCustomVehicleController::dBodyPartDifferential& differentialPart = node->GetInfo();
-				if (differentialPart.GetBody() == body) {
+			for (dList<dDifferentialJoint*>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
+				const dDifferentialJoint* const differentialPart = node->GetInfo();
+				if (differentialPart->GetDifferentialBody() == body) {
 					return differential;
 				}
 			}
 
 			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
 			return entity ? entity->GetName().GetStr() : NULL;
-*/
 		}
 
 		const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
@@ -1350,7 +1177,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if (m_player) {
-			dCustomVehicleController::dEngineController* const engine = m_player->m_controller->GetEngine();
+			dEngineController* const engine = m_player->m_controller->GetEngine();
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
@@ -1398,7 +1225,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 	void SetAsPlayer (SuperCarEntity* const player)
 	{
-		dCustomVehicleController::dEngineController* const engine = player->m_controller->GetEngine();
+		dEngineController* const engine = player->m_controller->GetEngine();
 		if (engine) {
 			engine->SetIgnition(false);
 		}
