@@ -55,8 +55,8 @@
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// passive rag doll
 //#define DEFAULT_SCENE	31			// dynamic rag doll
-#define DEFAULT_SCENE	32			// basic Car
-//#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	32			// basic Car
+#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
@@ -214,7 +214,7 @@ class NewtonDemosApp: public wxApp
 		frame->GetEventHandler()->ProcessEvent(loadDemo);
 
 		// select solve mode
-		wxMenuEvent solverMode (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_SOLVER_MODE + 3);
+		wxMenuEvent solverMode (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_SOLVER_MODE + 2);
 		frame->GetEventHandler()->ProcessEvent(solverMode);
 
 		return true;
@@ -840,7 +840,8 @@ void NewtonDemos::OnUseParallelSolver(wxCommandEvent& event)
 void NewtonDemos::OnSelectSolverMode(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
-	m_solverModeIndex = dClamp (event.GetId() - ID_SOLVER_MODE, 0, int (sizeof (m_solverModes)/sizeof (m_solverModes[0])));
+	int index = event.GetId() - ID_SOLVER_MODE;
+	m_solverModeIndex = dClamp (index, 0, int (sizeof (m_solverModes)/sizeof (m_solverModes[0])));
 	END_MENU_OPTION();
 }
 

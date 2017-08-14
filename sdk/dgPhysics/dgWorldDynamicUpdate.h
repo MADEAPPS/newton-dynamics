@@ -220,10 +220,12 @@ class dgJacobianMatrixElement
 	dgFloat32 m_restitution;
 	dgFloat32 m_penetration;
 	dgFloat32 m_coordenateAccel;
-	dgFloat32 m_penetrationStiffness;
 
+	dgFloat32 m_force0;
+	dgFloat32 m_penetrationStiffness;
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
+
 	dgFloat32 m_stiffness;
 	dgFloat32 m_maxImpact;
 
@@ -285,9 +287,12 @@ class dgWorldDynamicUpdate
 	void ResolveClusterForces (dgBodyCluster* const cluste, dgInt32 threadID, dgFloat32 timestep) const;
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateClusterReactionForces (const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
+	void CalculateClusterReactionForces_1 (const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateClusterReactionForcesExperimental(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, const dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
-	
+
+	void CalculateJointForceJacobi0(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	dgFloat32 CalculateJointForceJacobi1(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const;
 	dgFloat32 CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const;
 	dgFloat32 CalculateJointForceGaussSeidel(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const;
 
