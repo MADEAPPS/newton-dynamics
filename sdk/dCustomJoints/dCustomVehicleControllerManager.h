@@ -405,7 +405,19 @@ class dVehicleController: public dCustomAlloc
 
 	virtual void Update(dFloat timestep)
 	{
+		dAssert(0);
 	}
+
+	virtual void Load(dCustomJointSaveLoad* const fileLoader)
+	{
+		dAssert(0);
+	}
+
+	virtual void Save(dCustomJointSaveLoad* const fileSaver) const
+	{
+		dAssert(0);
+	}
+
 
 	dCustomVehicleController* m_controller;
 
@@ -494,6 +506,9 @@ class dSteeringController: public dVehicleController
 
 	protected:
 	virtual void Update(dFloat timestep);
+	virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
+
 	dList<dWheelJoint*> m_tires;
 	bool m_isSleeping;
 	friend class dCustomVehicleController;
@@ -518,6 +533,8 @@ class dBrakeController: public dVehicleController
 
 	protected:
 	virtual void Update(dFloat timestep);
+	virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dList<dWheelJoint*> m_tires;
 	dFloat m_maxTorque;

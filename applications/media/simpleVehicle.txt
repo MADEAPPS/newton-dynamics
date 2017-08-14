@@ -1,17 +1,6 @@
 rootNode: 0
 
 shapeCount: 3
-collision: 2
-	shapeType: chamferCylinder
-	radio: 0.500000
-	height: 1.000000
-collisionEnd: 
-
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
-collisionEnd: 
-
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -199,6 +188,17 @@ collision: 0
 	v: 1.922243 0.182667 0.553142
 	v: 1.786454 0.212294 0.715100
 	v: 1.794518 0.324298 0.552648
+collisionEnd: 
+
+collision: 2
+	shapeType: chamferCylinder
+	radio: 0.500000
+	height: 1.000000
+collisionEnd: 
+
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
 collisionEnd: 
 
 nodesCount: 7
@@ -507,3 +507,26 @@ VehicleController:
 	aerodynamicsDownSpeedCutOff: 22.240000
 	aerodynamicsDownForceCoefficient: 31.024372
 VehicleEnd: 
+
+SteeringController: 2
+	tireIndex: 0
+	tireIndex: 1
+SteeringEnd: 
+
+BrakesController: 4
+	maxTorque: 20000.000000
+	tireIndex: 0
+	tireIndex: 1
+	tireIndex: 2
+	tireIndex: 3
+BrakesEnd: 
+
+HandBrakesController: 2
+	maxTorque: 5000.000000
+	tireIndex: 2
+	tireIndex: 3
+HandBrakesEnd: 
+
+EngineController: 2
+EngineEnd: 
+

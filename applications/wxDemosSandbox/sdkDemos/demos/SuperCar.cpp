@@ -447,8 +447,8 @@ class SuperCarEntity: public DemoEntity
 		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
 		steering->AddTire(rightFrontTire);
-		steering->AddTire(leftRearTire);
-		steering->AddTire(rightRearTire);
+		//steering->AddTire(leftRearTire);
+		//steering->AddTire(rightRearTire);
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
@@ -1230,7 +1230,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		m_player = player;
 
 //xxxx
-//		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
+		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
 	}
 
 	void SetNextPlayer() 

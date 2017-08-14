@@ -667,7 +667,6 @@ dFloat dBodyPartTire::GetRPM() const
 	return joint->m_lateralDir.DotProduct3(omega) * 9.55f;
 }
 
-
 dFloat dBodyPartTire::GetLateralSlip () const
 {
 	return m_lateralSlip;
@@ -678,24 +677,6 @@ dFloat dBodyPartTire::GetLongitudinalSlip () const
 	return m_longitudinalSlip;
 }
 
-void dBodyPartTire::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	fileSaver->SaveInt("tire", m_index);
-	fileSaver->SaveVector("\tlocation", m_data.m_location);
-	fileSaver->SaveFloat("\tmass", m_data.m_mass);
-	fileSaver->SaveFloat("\tradio", m_data.m_radio);
-	fileSaver->SaveFloat("\twidth", m_data.m_width);
-	fileSaver->SaveFloat("\tpivotOffset", m_data.m_pivotOffset);
-	fileSaver->SaveFloat("\tmaxSteeringAngle", m_data.m_maxSteeringAngle);
-	fileSaver->SaveFloat("\tdampingRatio", m_data.m_dampingRatio);
-	fileSaver->SaveFloat("\tspringStrength", m_data.m_springStrength);
-	fileSaver->SaveFloat("\tsuspensionLength", m_data.m_suspensionLength);
-	fileSaver->SaveFloat("\tlateralStiffness", m_data.m_lateralStiffness);
-	fileSaver->SaveFloat("\tlongitudialStiffness", m_data.m_longitudialStiffness);
-	fileSaver->SaveFloat("\taligningMomentTrail", m_data.m_aligningMomentTrail);
-	fileSaver->SaveInt("\thasFender", m_data.m_hasFender);
-	fileSaver->SaveInt("\tsuspentionType", m_data.m_suspentionType);
-}
 */
 
 
@@ -1142,6 +1123,31 @@ void dSteeringController::Update(dFloat timestep)
 	}
 }
 
+void dSteeringController::Load(dCustomJointSaveLoad* const fileSaver)
+{
+	dAssert(0);
+}
+
+void dSteeringController::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	SAVE_BEGIN(fileSaver);
+	dTree<dCustomJoint*, int>& jointList = fileSaver->GetJointList();
+	for (dList<dWheelJoint*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		dWheelJoint* const tireJoint = node->GetInfo();
+		dTree<dCustomJoint*, int>::Iterator iter(jointList);
+		for (iter.Begin(); iter; iter++) {
+			dCustomJoint* const joint = iter.GetNode()->GetInfo();
+			if (joint == tireJoint) {
+				int m_tireIndex = iter.GetKey();
+				SAVE_INT(tireIndex);
+				break;
+			}
+		}
+	}
+	SAVE_END();
+}
+
+
 void dSteeringController::AddTire (dWheelJoint* const tire)
 {
 	m_tires.Append(tire);
@@ -1184,6 +1190,32 @@ void dBrakeController::Update(dFloat timestep)
 		tire->m_brakeTorque = dMax(torque, tire->m_brakeTorque);
 	}
 }
+
+void dBrakeController::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	dAssert(0);
+}
+
+void dBrakeController::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	SAVE_BEGIN(fileSaver);
+	SAVE_FLOAT(maxTorque);
+	dTree<dCustomJoint*, int>& jointList = fileSaver->GetJointList();
+	for (dList<dWheelJoint*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		dWheelJoint* const tireJoint = node->GetInfo();
+		dTree<dCustomJoint*, int>::Iterator iter(jointList);
+		for (iter.Begin(); iter; iter++) {
+			dCustomJoint* const joint = iter.GetNode()->GetInfo();
+			if (joint == tireJoint) {
+				int m_tireIndex = iter.GetKey();
+				SAVE_INT(tireIndex);
+				break;
+			}
+		}
+	}
+	SAVE_END();
+}
+
 
 void dCustomVehicleControllerManager::DrawSchematic (const dCustomVehicleController* const controller, dFloat scale) const
 {
@@ -2689,7 +2721,32 @@ void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_FLOAT(aerodynamicsDownSpeedCutOff);
 	SAVE_FLOAT(aerodynamicsDownForceCoefficient);
 	SAVE_END();
-	fileSaver->SaveName("VehicleEnd", "");
+	fileSaver->SaveName("VehicleEnd", "\n");
+
+	if (m_steeringControl) {
+		fileSaver->SaveInt("SteeringController", m_steeringControl->m_tires.GetCount());
+		m_steeringControl->Save(fileSaver);
+		fileSaver->SaveName("SteeringEnd", "\n");
+	}
+
+	if (m_brakesControl) {
+		fileSaver->SaveInt("BrakesController", m_brakesControl->m_tires.GetCount());
+		m_brakesControl->Save(fileSaver);
+		fileSaver->SaveName("BrakesEnd", "\n");
+	}
+
+	if (m_handBrakesControl) {
+		fileSaver->SaveInt("HandBrakesController", m_handBrakesControl->m_tires.GetCount());
+		m_handBrakesControl->Save(fileSaver);
+		fileSaver->SaveName("HandBrakesEnd", "\n");
+	}
+
+	if (m_engineControl) {
+		fileSaver->SaveInt("EngineController", m_handBrakesControl->m_tires.GetCount());
+		//m_handBrakesControl->Save(fileSaver);
+		fileSaver->SaveName("EngineEnd", "\n");
+	}
+
 }
 
 void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& driveInputs)

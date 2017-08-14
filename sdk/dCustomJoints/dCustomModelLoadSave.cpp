@@ -368,24 +368,24 @@ void dCustomJointSaveLoad::LoadBodyList(dTree<NewtonBody*, int>& bodyList)
 		int bodyIndex = -1;
 		char userDataName[128];
 
-		for (const char* token = NextToken(); strcmp(token, "nodeEnd:"); token = NextToken()) {
+		for (const char* token1 = NextToken(); strcmp(token1, "nodeEnd:"); token1 = NextToken()) {
 
-			if (!strcmp(token, "node:")) {
+			if (!strcmp(token1, "node:")) {
 				bodyIndex = LoadInt();
-			} else if (!strcmp(token, "userData:")) {
+			} else if (!strcmp(token1, "userData:")) {
 				LoadName(userDataName);
-			} else if (!strcmp(token, "mass:")) {
+			} else if (!strcmp(token1, "mass:")) {
 				mass = LoadFloat();
-			} else if (!strcmp(token, "centerOfMass:")) {
+			} else if (!strcmp(token1, "centerOfMass:")) {
 				com = LoadVector();
-			} else if (!strcmp(token, "matrix:")) {
+			} else if (!strcmp(token1, "matrix:")) {
 				matrix = LoadMatrix();
-			} else if (!strcmp(token, "collision:")) {
+			} else if (!strcmp(token1, "collision:")) {
 				int coolIndex = LoadInt();
 				collision = collisionMap.Find(coolIndex)->GetInfo();
-			} else if (!strcmp(token, "shapeScale:")) {
+			} else if (!strcmp(token1, "shapeScale:")) {
 				shapeScale = LoadVector();
-			} else if (!strcmp(token, "shapeMatrix:")) {
+			} else if (!strcmp(token1, "shapeMatrix:")) {
 				shapeMatrix = LoadMatrix();
 			} else {
 				dAssert(0);
@@ -415,11 +415,13 @@ void dCustomJointSaveLoad::LoadBodyList(dTree<NewtonBody*, int>& bodyList)
 void dCustomJointSaveLoad::SaveJointList(dList<dCustomJoint*>& jointList)
 {
 	int index = 0;
+	m_jointFilter.RemoveAll();
 	SaveInt("jointsCount", jointList.GetCount());
 	for (dList<dCustomJoint*>::dListNode* ptr = jointList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dCustomJoint* const joint = ptr->GetInfo();
 
 		SaveInt("joint", index);
+		m_jointFilter.Insert(joint, index);
 		SaveName("\tjointType", joint->GetTypeName());
 		SaveInt("\tchildBody", FindBodyId(joint->GetBody0()));
 		SaveInt("\tparentBody", FindBodyId(joint->GetBody1()));
