@@ -19,6 +19,10 @@
 #include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
 
+#define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
+#define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
+#define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
+
 
 class dBasicVehicleLoader: public dCustomJointSaveLoad
 {
@@ -133,9 +137,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 			//print controllers help 
 			DrawHelp(scene, lineNumber);
-
-
-		
+	
 			glDisable(GL_LIGHTING);
 			glDisable(GL_TEXTURE_2D);
 			glDisable(GL_DEPTH_TEST);
@@ -163,19 +165,88 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 */
 	}
 
-/*
-	void SetAsPlayer (BasicCarEntity* const player)
+
+	void ApplyPlayerControl () const 
 	{
-		dAssert(0);
+		NewtonBody* const body = m_player->GetBody();
+		NewtonWorld* const world = NewtonBodyGetWorld(body);
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+
+/*
+		// get the throttler input
+		dFloat joyPosX;
+		dFloat joyPosY;
+		int joyButtons;
+
+		int gear = engine ? engine->GetGear() : 0;
+		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
+		if (hasJopytick) {
+			// apply a cubic attenuation to the joystick inputs
+//			joyPosX = joyPosX * joyPosX * joyPosX;
+//			joyPosY = joyPosY * joyPosY * joyPosY;
+//			steeringVal = joyPosX;
+//			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
+//			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
+//			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
+//			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
+			}
+*/
+
+		dVehicleDriverInput driverInput;
+
+		driverInput.m_gasPedal = scene->GetKeyState('W') ? 1.0f : 0.0f;
+		driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
+		driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
+		//driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
+		driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
+		//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
+
+		driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+		//driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
+		//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
+
+#if 0
+	#if 0
+		static FILE* file = fopen ("log.bin", "wb");                                         
+		if (file) {
+				fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen ("log.bin", "rb");
+		if (file) {		
+				fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+		}
+	#endif
+#endif
+
+		m_player->ApplyDefualtDriver(driverInput);
+	}
+
+	void UpdateDriverInput(dCustomVehicleController* const vehicle, dFloat timestep) const
+	{
+		//NewtonBody* const body = vehicle->GetBody();
+		//DemoEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData(body);
+
+		if (vehicle == m_player) {
+			// do player control
+			ApplyPlayerControl();
+		} else {
+			// do no player control
+			//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
+		}
+	}
+
+	void SetAsPlayer (dCustomVehicleController* const player)
+	{
 		m_player = player;
 	}
-*/
 
 	virtual void PreUpdate (dFloat timestep)
 	{
 		// apply the vehicle controls, and all simulation time effect
-		NewtonWorld* const world = GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		//NewtonWorld* const world = GetWorld();
+		//DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		// set the help key
 		//m_helpKey.UpdatePushButton(scene->GetRootWindow(), 'H');
@@ -186,32 +257,25 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 	virtual void PostUpdate (dFloat timestep)
 	{
-//		dAssert(0);
-/*
 		// do the base class post update
 		dCustomVehicleControllerManager::PostUpdate(timestep);
 
-		// update the visual transformation matrices for all vehicle tires
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			dCustomVehicleController* const controller = &node->GetInfo();
-			BasicCarEntity* const vehicleEntity = (BasicCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-			vehicleEntity->UpdateTireTransforms();
-		}
-
+		// update the camera 
 		UpdateCamera (timestep);
-*/
 	}
 
 
 	void UpdateCamera (dFloat timestep)
 	{
-		dAssert(0);
-/*
 		if (m_player) {
+
 			DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 			DemoCamera* const camera = scene->GetCamera();
 			dMatrix camMatrix (camera->GetNextMatrix ());
-			dMatrix playerMatrix (m_player->GetNextMatrix());
+
+			DemoEntity* const vehicleEntity = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+
+			dMatrix playerMatrix (vehicleEntity->GetNextMatrix());
 
 			dVector frontDir (camMatrix[0]);
 			dVector camOrigin(0.0f); 
@@ -220,28 +284,19 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 				camOrigin -= frontDir.Scale (VEHICLE_THIRD_PERSON_VIEW_DIST);
 			} else {
 				dAssert (0);
-				//            camMatrix = camMatrix * playerMatrix;
-				//            camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+				//camMatrix = camMatrix * playerMatrix;
+				//camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
 			}
 
 			camera->SetNextMatrix (*scene, camMatrix, camOrigin);
 		}
-*/
 	}
 
-/*
+
 	// use this to display debug information about vehicle 
 	void Debug () const
 	{
-		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dCustomVehicleController* const controller = &ptr->GetInfo();
-			BasicCarEntity* const vehicleEntity = (BasicCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-			vehicleEntity->Debug();
-		}
 	}
-
-*/
-
 
 	dCustomVehicleController* LoadVehicle(const char* const name)
 	{
@@ -263,10 +318,8 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 	}
 
 	bool m_externalView;
-//	BasicCarEntity* m_player;
+	dCustomVehicleController* m_player;
 };
-
-
 
 void BasicCar (DemoEntityManager* const scene)
 {
@@ -292,16 +345,17 @@ void BasicCar (DemoEntityManager* const scene)
 	BasicCarControllerManager* const manager = new BasicCarControllerManager (world, 1, materialList);
 	
 	// load 
-	manager->LoadVehicle("simpleVehicle.txt");
+	dCustomVehicleController* const player = manager->LoadVehicle("simpleVehicle.txt");
 
 	// set this vehicle as the player
-//	manager->SetAsPlayer(basicVehicle);
+	manager->SetAsPlayer(player);
 
-//	dMatrix camMatrix (manager->m_player->GetNextMatrix());
-//	scene->SetCameraMouseLock (true);
+	DemoEntity* const vehicleEntity = (DemoEntity*)NewtonBodyGetUserData(player->GetBody());
+	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
+	//	scene->SetCameraMouseLock (true);
 
-	dMatrix camMatrix(dGetIdentityMatrix());
-	camMatrix.m_posit = dVector (-20.0f, 1.5f, 102.f, 1.0f);
+	camMatrix.m_posit.m_x -= 5.0f;
+	//camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 //

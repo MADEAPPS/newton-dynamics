@@ -2774,7 +2774,9 @@ void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader)
 	for (jointIter.Begin(); jointIter; jointIter ++) {
 		dCustomJoint* const joint = jointIter.GetNode()->GetInfo();
 		if (joint->IsType(dWheelJoint::GetType())) {
-			m_tireList.Append((dWheelJoint*)joint);
+			dWheelJoint* const wheel = (dWheelJoint*)joint;
+			wheel->m_controller = this;
+			m_tireList.Append(wheel);
 		} else if (joint->IsType(dEngineMountJoint::GetType())) {
 			engineMount = (dEngineMountJoint*)joint;
 		} else if (joint->IsType(dEngineJoint::GetType())) {
@@ -2845,6 +2847,7 @@ void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader)
 
 		fileLoader->NextToken();
 	}
+		
 
 	Finalize();
 }
