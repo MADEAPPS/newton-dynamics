@@ -523,7 +523,7 @@ class SuperCarEntity: public DemoEntity
 
 
 		engineInfo.m_differentialLock = 0;
-		engineInfo.m_userData = this;
+		//engineInfo.m_userData = this;
 
 		engineInfo.m_aerodynamicDownforceFactor = definition.m_aerodynamicsDownForceWeightCoeffecient0;
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
@@ -820,15 +820,11 @@ class SuperCarEntity: public DemoEntity
 			glColor3f(0.0f, 1.0f, 0.0f);
 			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 			glVertex3f(GLfloat(p3.m_x), GLfloat(p3.m_y), GLfloat(p3.m_z));
-//if (!xxx)
-//dTrace(("%f ", tire.GetAligningTorque()));
-//xxx ++;
 		}
 		
 		glEnd();
 		glLineWidth(1.0f);
 
-/*
 		// render AI information
 		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
 		dBigVector q; 
@@ -849,7 +845,6 @@ class SuperCarEntity: public DemoEntity
 		glEnd();
 */
 	}
-
 
 	dCustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_gearUpKey;
@@ -1233,7 +1228,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		m_player = player;
 
 //xxxx
-//		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
+		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
 	}
 
 	void SetNextPlayer() 

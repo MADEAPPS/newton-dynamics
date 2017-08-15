@@ -161,6 +161,18 @@ NewtonBody* dCustomJointSaveLoad::FindBodyId(int id) const
 	return NULL;
 }
 
+int dCustomJointSaveLoad::FindJointId(dCustomJoint* const joint) const
+{
+	dTree<dCustomJoint*, int>::Iterator iter (m_jointFilter);
+	for (iter.Begin(); iter; iter ++) {
+		if (iter.GetNode()->GetInfo() == joint) {
+			return iter.GetKey();
+		}
+	}
+	return -1;
+}
+
+
 
 void dCustomJointSaveLoad::SaveBodyList(dList<NewtonBody*>& bodyList)
 {

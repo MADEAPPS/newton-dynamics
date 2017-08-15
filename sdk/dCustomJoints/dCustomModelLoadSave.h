@@ -70,6 +70,7 @@ class dCustomJointSaveLoad: public dCustomAlloc
 
 	CUSTOM_JOINTS_API NewtonBody* FindBodyId(int id) const;
 	CUSTOM_JOINTS_API int FindBodyId(NewtonBody* const body) const;
+	CUSTOM_JOINTS_API int FindJointId (dCustomJoint* const joint) const;
 
 	dTree<int, NewtonBody*>& GetBodyList() 
 	{

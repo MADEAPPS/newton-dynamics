@@ -157,10 +157,11 @@ class dEngineInfo
 
 	int m_gearsCount;
 	int m_differentialLock;
-	void* m_userData;
 
 	private:
 	void ConvertToMetricSystem();
+	void Load(dCustomJointSaveLoad* const fileLoader);
+	void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dEngineTorqueNode m_torqueCurve[6];
 	dFloat m_viscousDrag;
@@ -475,11 +476,16 @@ class dEngineController: public dVehicleController
 	CUSTOM_JOINTS_API void PlotEngineCurve() const;
 
 	protected:
+	virtual void Update(dFloat timestep);
+	virtual void Load(dCustomJointSaveLoad* const fileLoader);
+	virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
+
 	dFloat GetTopGear() const;
 	dFloat GetRadiansPerSecond() const;
 	void InitEngineTorqueCurve();
 	dFloat GetGearRatio() const;
-	virtual void Update(dFloat timestep);
+
+
 	dFloat IntepolateTorque(dFloat rpm) const;
 	void UpdateAutomaticGearBox(dFloat timestep, dFloat omega);
 
@@ -492,9 +498,9 @@ class dEngineController: public dVehicleController
 	dFloat m_clutchParam;
 	int m_gearTimer;
 	int m_currentGear;
-	dDrivingState m_drivingState;
-	bool m_ignitionKey;
-	bool m_automaticTransmissionMode;
+	int m_drivingState;
+	int m_ignitionKey;
+	int m_automaticTransmissionMode;
 	friend class dCustomVehicleController;
 };
 
@@ -545,7 +551,6 @@ class dCustomVehicleController: public dCustomControllerBase
 {
 	public:
 	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs);
-
 
 	CUSTOM_JOINTS_API void Finalize();
 	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dTireInfo& tireInfo);

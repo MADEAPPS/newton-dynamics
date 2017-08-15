@@ -1,6 +1,11 @@
 rootNode: 0
 
 shapeCount: 3
+collision: 1
+	shapeType: sphere
+	radio: 0.100000
+collisionEnd: 
+
 collision: 0
 	shapeType: convexHull
 	points: 184
@@ -196,11 +201,6 @@ collision: 2
 	height: 1.000000
 collisionEnd: 
 
-collision: 1
-	shapeType: sphere
-	radio: 0.100000
-collisionEnd: 
-
 nodesCount: 7
 node: 0
 	userData: chassisMesh
@@ -279,8 +279,8 @@ joint: 0
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 0.250000
-	localMatrix1: 0.000000 -90.000000 0.000020 1.175151 0.005729 -0.456879
+	localMatrix0: 0.000000 -90.000000 0.000020 0.000001 0.000000 0.250002
+	localMatrix1: 0.000000 -90.000000 0.000020 1.175151 0.005729 -0.456877
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -310,8 +310,8 @@ joint: 1
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 -0.250000
-	localMatrix1: 0.000000 -90.000000 0.000020 1.166118 0.005729 0.457016
+	localMatrix0: 0.000000 -90.000000 0.000020 -0.000000 0.000000 -0.250000
+	localMatrix1: 0.000000 -90.000000 0.000020 1.166117 0.005729 0.457016
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -341,8 +341,8 @@ joint: 2
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 0.000000
-	localMatrix1: 0.000000 -90.000000 0.000020 -1.213006 0.005729 -0.732277
+	localMatrix0: 0.000000 -90.000000 0.000020 -0.000000 0.000000 0.000003
+	localMatrix1: 0.000000 -90.000000 0.000020 -1.213005 0.005729 -0.732274
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -372,8 +372,8 @@ joint: 3
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0: 0.000000 -90.000000 0.000020 0.000000 0.000000 0.000000
-	localMatrix1: 0.000000 -90.000000 0.000020 -1.222037 0.005729 0.732407
+	localMatrix0: 0.000000 -90.000000 0.000020 -0.000001 0.000000 0.000003
+	localMatrix1: 0.000000 -90.000000 0.000020 -1.222038 0.005729 0.732409
 	stiffness: 1.000000
 	lateralDir: 0.000000 0.000000 0.000000
 	longitudinalDir: 0.000000 0.000000 0.000000
@@ -403,8 +403,8 @@ joint: 4
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0: 90.000023 -0.000000 0.000020 0.000000 0.000000 0.000000
-	localMatrix1: 90.000023 -0.000000 0.000020 0.000000 0.000000 0.000000
+	localMatrix0: 90.000023 -0.000000 0.000020 -0.000000 0.000000 0.000001
+	localMatrix1: 90.000023 -0.000000 0.000020 -0.000000 0.000000 0.000001
 	stiffness: 1.000000
 	minAngle_0: -45.000000
 	maxAngle_0: 45.000000
@@ -417,7 +417,7 @@ joint: 4
 	angularDamp_1: 0.300000
 	angularAccel_1: -4.000000
 	flags: 0
-	baseOffsetMatrix: 0.000000 -0.000000 0.000020 0.000000 0.000000 0.000000
+	baseOffsetMatrix: 0.000000 -0.000000 0.000020 -0.000000 0.000000 0.000001
 	turnSpeed: 0.000000
 	isTractionDifferential: 0
 jointEnd: 
@@ -428,8 +428,8 @@ joint: 5
 	parentBody: 0
 	degreesOfFreedom: 6
 	solverModel: 0
-	localMatrix0: 0.000000 -90.000000 -0.000000 0.000000 0.000000 0.000000
-	localMatrix1: 0.000000 -90.000000 -0.000000 0.000000 0.000000 0.000000
+	localMatrix0: 0.000000 -90.000000 -0.000000 -0.000000 0.000000 0.000001
+	localMatrix1: 0.000000 -90.000000 -0.000000 -0.000000 0.000000 0.000001
 	stiffness: 1.000000
 	minAngle: -45.000000
 	maxAngle: 45.000000
@@ -439,7 +439,7 @@ joint: 5
 	damper: 0.000000
 	springDamperRelaxation: 0.600000
 	flags: 0
-	baseOffsetMatrix: 0.000000 -0.000000 0.000020 0.000000 0.000000 0.000000
+	baseOffsetMatrix: 0.000000 -0.000000 0.000020 -0.000000 0.000000 0.000001
 jointEnd: 
 
 joint: 6
@@ -448,7 +448,7 @@ joint: 6
 	parentBody: -1
 	degreesOfFreedom: 1
 	solverModel: 1
-	localMatrix0: 0.000000 -90.000000 -0.000000 0.000000 0.000000 0.000000
+	localMatrix0: 0.000000 -90.000000 -0.000000 -0.000000 0.000000 0.000001
 	localMatrix1: 0.000000 -89.245949 0.000000 -13.444667 0.999977 102.108154
 	stiffness: 1.000000
 	maxRPM: 50.000000
@@ -508,9 +508,11 @@ VehicleController:
 	aerodynamicsDownForceCoefficient: 31.024372
 VehicleEnd: 
 
-SteeringController: 2
+SteeringController: 4
 	tireIndex: 0
 	tireIndex: 1
+	tireIndex: 2
+	tireIndex: 3
 SteeringEnd: 
 
 BrakesController: 4
@@ -528,5 +530,44 @@ HandBrakesController: 2
 HandBrakesEnd: 
 
 EngineController: 2
+	location: 0.000000 0.000000 0.000000
+	mass: 100.000000
+	radio: 0.125000
+	idleTorque: 664.097961
+	rpmAtIdleTorque: 17.151684
+	peakTorque: 3320.490234
+	rpmAtPeakTorque: 64.318817
+	peakHorsePower: 294200.000000
+	rpmAtPeakHorsePower: 111.485947
+	rpmAtRedLine: 128.637634
+	vehicleTopSpeed: 73.391998
+	reverseGearRatio: 2.900000
+	gearRatiosSign: 1.000000
+	clutchFrictionTorque: 2000.000000
+	aerodynamicDownforceFactor: 1.000000
+	aerodynamicDownforceFactorAtTopSpeed: 2.000000
+	aerodynamicDownForceSurfaceCoeficident: 0.303030
+	viscousDrag: 0.225745
+	crownGearRatio: 4.897478
+	peakPowerTorque: 2638.897461
+	differentialLock: 0
+	gearsCount: 8
+	ratio: 0.000000
+	ratio: -2.900000
+	ratio: 2.660000
+	ratio: 1.780000
+	ratio: 1.300000
+	ratio: 1.000000
+	ratio: 0.740000
+	ratio: 0.500000
+	crownGear: 3
+	diffJoint: 4
+	gearJoint: 7
+	clutchParam: 1.000000
+	gearTimer: 0
+	currentGear: 0
+	drivingState: 0
+	ignitionKey: 0
+	automaticTransmissionMode: 1
 EngineEnd: 
 
