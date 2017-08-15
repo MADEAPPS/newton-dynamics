@@ -446,8 +446,8 @@ class SuperCarEntity: public DemoEntity
 		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
 		steering->AddTire(rightFrontTire);
-		steering->AddTire(leftRearTire);
-		steering->AddTire(rightRearTire);
+		//steering->AddTire(leftRearTire);
+		//steering->AddTire(rightRearTire);
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes

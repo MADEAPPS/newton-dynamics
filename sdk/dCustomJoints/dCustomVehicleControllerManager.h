@@ -159,7 +159,9 @@ class dEngineInfo
 	int m_differentialLock;
 
 	private:
+	void SetTorqueRPMTable();
 	void ConvertToMetricSystem();
+	
 	void Load(dCustomJointSaveLoad* const fileLoader);
 	void Save(dCustomJointSaveLoad* const fileSaver) const;
 
@@ -441,6 +443,7 @@ class dEngineController: public dVehicleController
 		m_preDriveReverse,
 	};
 
+	CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller);
 	CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator);
 	CUSTOM_JOINTS_API ~dEngineController();
 
@@ -485,13 +488,11 @@ class dEngineController: public dVehicleController
 	void InitEngineTorqueCurve();
 	dFloat GetGearRatio() const;
 
-
 	dFloat IntepolateTorque(dFloat rpm) const;
 	void UpdateAutomaticGearBox(dFloat timestep, dFloat omega);
 
 	dEngineInfo m_info;
 	dEngineInfo m_infoCopy;
-	dCustomVehicleController* m_controller;
 	dWheelJoint* m_crownGearCalculator;
 	dDifferentialJoint* m_differential;
 	dGearBoxJoint* m_gearBoxJoint;
@@ -534,7 +535,7 @@ class dTractionSteeringController: public dSteeringController
 class dBrakeController: public dVehicleController
 {
 	public:
-	CUSTOM_JOINTS_API dBrakeController(dCustomVehicleController* const controller, dFloat maxBrakeTorque);
+	CUSTOM_JOINTS_API dBrakeController(dCustomVehicleController* const controller, dFloat maxBrakeTorque = 10.0f);
 	CUSTOM_JOINTS_API void AddTire(dWheelJoint* const tire);
 
 	protected:

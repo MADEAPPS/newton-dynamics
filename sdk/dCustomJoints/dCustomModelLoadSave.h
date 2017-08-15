@@ -68,7 +68,9 @@ class dCustomJointSaveLoad: public dCustomAlloc
 	CUSTOM_JOINTS_API virtual NewtonBody* Load();
 	CUSTOM_JOINTS_API virtual void Save(NewtonBody* const rootbody);
 
-	CUSTOM_JOINTS_API NewtonBody* FindBodyId(int id) const;
+	CUSTOM_JOINTS_API NewtonBody* FindBody(int id) const;
+	CUSTOM_JOINTS_API dCustomJoint* FindJoint (int id) const;
+
 	CUSTOM_JOINTS_API int FindBodyId(NewtonBody* const body) const;
 	CUSTOM_JOINTS_API int FindJointId (dCustomJoint* const joint) const;
 

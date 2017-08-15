@@ -497,6 +497,7 @@ joint: 9
 	pintOnReference: 0.000000 0.000000 1.000000
 jointEnd: 
 
+ControllersCount: 5
 VehicleController: 
 	speed: 0.000000
 	totalMass: 1794.520020
@@ -508,11 +509,9 @@ VehicleController:
 	aerodynamicsDownForceCoefficient: 31.024372
 VehicleEnd: 
 
-SteeringController: 4
+SteeringController: 2
 	tireIndex: 0
 	tireIndex: 1
-	tireIndex: 2
-	tireIndex: 3
 SteeringEnd: 
 
 BrakesController: 4
@@ -529,7 +528,7 @@ HandBrakesController: 2
 	tireIndex: 3
 HandBrakesEnd: 
 
-EngineController: 2
+EngineController: 
 	location: 0.000000 0.000000 0.000000
 	mass: 100.000000
 	radio: 0.125000

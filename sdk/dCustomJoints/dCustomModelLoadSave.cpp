@@ -150,7 +150,7 @@ int dCustomJointSaveLoad::FindBodyId(NewtonBody* const body) const
 	return node ? node->GetInfo() : -1;
 }
 
-NewtonBody* dCustomJointSaveLoad::FindBodyId(int id) const
+NewtonBody* dCustomJointSaveLoad::FindBody(int id) const
 {
 	dTree<int, NewtonBody*>::Iterator iter (m_bodyFilter);
 	for (iter.Begin(); iter; iter ++) {
@@ -160,6 +160,13 @@ NewtonBody* dCustomJointSaveLoad::FindBodyId(int id) const
 	}
 	return NULL;
 }
+
+dCustomJoint* dCustomJointSaveLoad::FindJoint(int id) const
+{
+	dTree<dCustomJoint*, int>::dTreeNode* const node = m_jointFilter.Find(id);
+	return node ? node->GetInfo() : NULL;
+}
+
 
 int dCustomJointSaveLoad::FindJointId(dCustomJoint* const joint) const
 {
