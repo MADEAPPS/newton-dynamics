@@ -218,6 +218,8 @@ m_synchronousPhysicsUpdateMode = false;
 
 	glfwInit();
 
+	int xxx = glfwJoystickPresent(0);
+
 	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
 
