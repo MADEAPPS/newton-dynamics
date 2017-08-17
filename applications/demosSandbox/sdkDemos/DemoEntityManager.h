@@ -116,7 +116,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool IsShiftKeyDown () const;
 	bool IsControlKeyDown () const;
 	bool GetKeyState(int key) const;
-	bool GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const;
+	int GetJoystickAxis (dFloat* const axisValues, int maxAxis = 8) const;
+	int GetJoystickButtons (char* const axisbuttons, int maxButton = 32) const;
 
 	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
 	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);

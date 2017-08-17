@@ -382,27 +382,34 @@ void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback,
 }
 
 
-bool DemoEntityManager::GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const
+//bool DemoEntityManager::GetJoystickAxis (dFloat& posX, dFloat& posY, int& buttonsMask) const
+int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
 {
+	int axisCount = 0;
 	if (m_hasJoytick) {
-		int axisCount;
 		int buttonsCount;
-		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-		posX = axis[1];
-		posY = axis[0];
-
-		int bits = 0;
-		for (int i = 0; i < buttonsCount; i ++) {
-			int value = buttons[i] ? 1 : 0;
-			bits |= value<< (buttonsCount - i - 1);
+		const float* const axis = glfwGetJoystickAxes(0, &buttonsCount);
+		axisCount = dMin (axisCount, maxAxis);
+		for (int i = 0; i < axisCount; i ++) {
+			axisValues[i] = axis[i];
 		}
-		buttonsMask = bits;
-		//dTrace (("%x %f %f %f %f\n", bits, axis[0], axis[1], axis[2], axis[3]));
 	}
-	return m_hasJoytick;
+	return axisCount;
 }
 
+int DemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxButton) const
+{
+	int buttonsCount = 0;
+	if (m_hasJoytick) {
+		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
+
+		buttonsCount = dMin (buttonsCount, maxButton);
+		for (int i = 0; i < buttonsCount; i ++) {
+			axisbuttons[i] = buttons[i];
+		}
+	}
+	return buttonsCount;
+}
 
 
 void DemoEntityManager::ResetTimer()

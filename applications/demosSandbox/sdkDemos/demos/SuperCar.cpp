@@ -618,9 +618,6 @@ class SuperCarEntity: public DemoEntity
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
 		// get the throttler input
-		dFloat joyPosX;
-		dFloat joyPosY;
-		int joyButtons;
 /*
 		int gear = engine ? engine->GetGear() : 0;
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
@@ -637,8 +634,16 @@ class SuperCarEntity: public DemoEntity
 */
 
 		dVehicleDriverInput driverInput;
-		bool hasJopytick = scene->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
-		if (hasJopytick) {
+		dFloat axis[32];
+		int axisCount = scene->GetJoystickAxis (axis);
+		if (axisCount) {
+			dFloat joyPosX;
+			dFloat joyPosY;
+			char buttons[32];
+			int joyButtons = scene->GetJoystickButtons (buttons);
+			dAssert(joyButtons);
+			joyPosX = axis[0];
+			joyPosY = axis[1];
 			driverInput.m_gasPedal = joyPosX > 0.0f ? joyPosX : 0.0f;
 			driverInput.m_brakePedal = joyPosX < 0.0f ? joyPosX : 0.0f;
 			driverInput.m_steeringValue = joyPosY;
