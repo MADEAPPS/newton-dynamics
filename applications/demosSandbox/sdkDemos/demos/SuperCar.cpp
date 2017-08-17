@@ -617,12 +617,11 @@ class SuperCarEntity: public DemoEntity
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
-/*
 		// get the throttler input
 		dFloat joyPosX;
 		dFloat joyPosY;
 		int joyButtons;
-
+/*
 		int gear = engine ? engine->GetGear() : 0;
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
@@ -638,17 +637,25 @@ class SuperCarEntity: public DemoEntity
 */
 
 		dVehicleDriverInput driverInput;
+		bool hasJopytick = scene->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
+		if (hasJopytick) {
+			driverInput.m_gasPedal = joyPosX > 0.0f ? joyPosX : 0.0f;
+			driverInput.m_brakePedal = joyPosX < 0.0f ? joyPosX : 0.0f;
+			driverInput.m_steeringValue = joyPosY;
 
-		driverInput.m_gasPedal = scene->GetKeyState('W') ? 1.0f : 0.0f;
-		driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
-		driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
-		driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
-		driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
-		//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
+		} else {
+			driverInput.m_gasPedal = scene->GetKeyState('W') ? 1.0f : 0.0f;
+			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
+			driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
+			driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
+			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
+			//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
 
-		driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
-		driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
-		driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
+			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
+			driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
+		}
+
 
 #if 0
 	#if 0
@@ -1163,7 +1170,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		// draw the player physics model
 		if (m_drawShematic) {
-			RenderVehicleSchematic (scene);
+//			RenderVehicleSchematic (scene);
 		}
 		//m_drawShematic = false;
 
@@ -1195,7 +1202,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		}
 
 		//print controllers help 
-		DrawHelp(scene, lineNumber);
+		//DrawHelp(scene, lineNumber);
 
 		// restore color and blend mode
 		glDisable (GL_BLEND);

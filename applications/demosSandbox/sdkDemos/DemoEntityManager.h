@@ -130,11 +130,13 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	private:
 	void BeginFrame();
-	void RenderUI();
+	void RenderStats();
 	void LoadFont();
 	void Cleanup();
 
+	void RenderUI();
 	void RenderScene();
+	
 	void UpdatePhysics(dFloat timestep);
 	dFloat CalculateInteplationParam () const;
 
@@ -158,8 +160,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	DemoEntity* m_sky;
 	NewtonWorld* m_world;
 	DemoCameraListener* m_cameraManager;
-	void* m_renderHoodContext;
-	RenderHoodCallback m_renderHood;
+	void* m_renderUIContext;
+	RenderHoodCallback m_renderUI;
 
 	unsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
@@ -177,6 +179,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_showStats;
 	bool m_synchronousPhysicsUpdateMode;
 	bool m_hideVisualMeshes;
+	bool m_hasJoytick;
 
 
 	static SDKDemos m_demosSelection[];
@@ -207,26 +210,14 @@ inline void DemoEntityManager::Unlock(unsigned& atomicLock)
 
 inline int DemoEntityManager::GetWidth() const 
 { 
-	dAssert (0);
-	return 0;
-/*
-	int width;
-	int height;
-	GetSize (&width, &height);
-	return width; 
-*/
+	ImGuiIO& io = ImGui::GetIO();
+	return (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 }
 
 inline int DemoEntityManager::GetHeight() const 
 { 
-	dAssert (0);
-	return 0;
-/*
-	int width;
-	int height;
-	GetSize (&width, &height);
-	return height; 
-*/
+	ImGuiIO& io = ImGui::GetIO();
+	return (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 }
 
 inline int DemoEntityManager::GetDebugDisplay() const

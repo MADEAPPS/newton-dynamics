@@ -62,8 +62,8 @@
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
-#define DEFAULT_SCENE	32			// basic Car
-//#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	32			// basic Car
+#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
@@ -195,8 +195,8 @@ DemoEntityManager::DemoEntityManager ()
 	,m_sky(NULL)
 	,m_world(NULL)
 	,m_cameraManager(NULL)
-	,m_renderHoodContext(NULL)
-	,m_renderHood(NULL)
+	,m_renderUIContext(NULL)
+	,m_renderUI(NULL)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
 	,m_currentScene(DEFAULT_SCENE)
@@ -218,7 +218,7 @@ m_synchronousPhysicsUpdateMode = false;
 
 	glfwInit();
 
-	int xxx = glfwJoystickPresent(0);
+	m_hasJoytick = glfwJoystickPresent(0) ?  true : false;
 
 	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
@@ -377,19 +377,30 @@ bool DemoEntityManager::GetMouseKeyState (int button) const
 
 void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context)
 {
-	m_renderHood = callback;
-	m_renderHoodContext = context;
+	m_renderUI = callback;
+	m_renderUIContext = context;
 }
 
 
 bool DemoEntityManager::GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const
 {
-	dAssert (0);
-	return false;
-//	buttonsMask = m_joytickButtonMask;
-//	posX = dFloat (m_joytickX - 32767) / 32768.0f;
-//	posY = -dFloat (m_joytickY - 32767) / 32768.0f;
-//	return m_hasJoysticController;
+	if (m_hasJoytick) {
+		int axisCount;
+		int buttonsCount;
+		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
+		posX = axis[1];
+		posY = axis[0];
+
+		int bits = 0;
+		for (int i = 0; i < buttonsCount; i ++) {
+			int value = buttons[i] ? 1 : 0;
+			bits |= value<< (buttonsCount - i - 1);
+		}
+		buttonsMask = bits;
+		//dTrace (("%x %f %f %f %f\n", bits, axis[0], axis[1], axis[2], axis[3]));
+	}
+	return m_hasJoytick;
 }
 
 
@@ -480,8 +491,8 @@ void DemoEntityManager::Cleanup ()
 	NewtonSetPerformanceClock (m_world, dGetTimeInMicrosenconds);
 
 	// we start without 2d render
-	m_renderHood = NULL;
-	m_renderHoodContext = NULL;
+	m_renderUI = NULL;
+	m_renderUIContext = NULL;
 }
 
 
@@ -711,7 +722,7 @@ void DemoEntityManager::BeginFrame()
 	ImGui::NewFrame();
 }
 
-void DemoEntityManager::RenderUI()
+void DemoEntityManager::RenderStats()
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
@@ -1102,12 +1113,15 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
 
 	window->RenderScene();
+	if (window->m_renderUI) {
+		window->RenderUI();
+	}
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-	glDisable (GL_LIGHTING);
+	glDisable(GL_LIGHTING);
 	glEnable(GL_SCISSOR_TEST);
 	glEnable(GL_TEXTURE_2D);
 	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
@@ -1167,7 +1181,6 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPopMatrix();
 	glPopAttrib();
 }
-
 
 void DemoEntityManager::RenderScene()
 {
@@ -1291,6 +1304,40 @@ void DemoEntityManager::RenderScene()
 	glPopMatrix();
 }
 
+void DemoEntityManager::RenderUI()
+{
+	int width = GetWidth();
+	int height = GetHeight();
+
+	glColor3f(1.0, 1.0, 1.0);
+
+	glPushMatrix();
+	glMatrixMode(GL_PROJECTION);
+
+	glLoadIdentity();
+	gluOrtho2D(0, width, 0, height);
+
+	glPushMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glDisable(GL_LIGHTING);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);	
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	// render 2d display
+	m_renderUI (this, m_renderUIContext, 0);
+
+	// restore display mode
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
 
 void DemoEntityManager::Run()
 {
@@ -1301,7 +1348,7 @@ void DemoEntityManager::Run()
 
 		BeginFrame();
 
-		RenderUI();
+		RenderStats();
 
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);
