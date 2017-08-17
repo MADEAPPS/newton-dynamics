@@ -447,7 +447,6 @@ class SuperCarEntity: public DemoEntity
 		return tireJoint;
 	}
 
-
 	void UpdateTireTransforms()
 	{
 		NewtonBody* const chassisBody = m_controller->GetBody();
@@ -609,75 +608,6 @@ class SuperCarEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
-	}
-
-	void ApplyPlayerControl ()
-	{
-		NewtonBody* const body = m_controller->GetBody();
-		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-
-		// get the throttler input
-/*
-		int gear = engine ? engine->GetGear() : 0;
-		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
-		if (hasJopytick) {
-			// apply a cubic attenuation to the joystick inputs
-//			joyPosX = joyPosX * joyPosX * joyPosX;
-//			joyPosY = joyPosY * joyPosY * joyPosY;
-//			steeringVal = joyPosX;
-//			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
-//			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
-//			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
-//			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
-			}
-*/
-
-		dVehicleDriverInput driverInput;
-		dFloat axis[32];
-		int axisCount = scene->GetJoystickAxis (axis);
-		if (axisCount) {
-			dFloat joyPosX;
-			dFloat joyPosY;
-			char buttons[32];
-			int joyButtons = scene->GetJoystickButtons (buttons);
-			dAssert(joyButtons);
-			joyPosX = axis[0];
-			joyPosY = axis[1];
-			driverInput.m_gasPedal = joyPosX > 0.0f ? joyPosX : 0.0f;
-			driverInput.m_brakePedal = joyPosX < 0.0f ? joyPosX : 0.0f;
-			driverInput.m_steeringValue = joyPosY;
-
-		} else {
-			driverInput.m_gasPedal = scene->GetKeyState('W') ? 1.0f : 0.0f;
-			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
-			driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
-			driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
-			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
-			//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
-
-			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
-			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
-			driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
-		}
-
-
-#if 0
-	#if 0
-		static FILE* file = fopen ("log.bin", "wb");                                         
-		if (file) {
-				fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
-			fflush(file);
-		}
-	#else 
-		static FILE* file = fopen ("log.bin", "rb");
-		if (file) {		
-				fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
-		}
-	#endif
-#endif
-
-		m_controller->ApplyDefualtDriver(driverInput);
 	}
 
 	dFloat CalculateNPCControlSteerinValue (dFloat distanceAhead, dFloat pathWidth, DemoEntity* const pathEntity)
@@ -1259,6 +1189,77 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	}
 */
 
+	void ApplyPlayerControl (dCustomVehicleController* const vehicle) const
+	{
+		NewtonBody* const body = vehicle->GetBody();
+		NewtonWorld* const world = NewtonBodyGetWorld(body);
+		//SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData(body);
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+
+		// get the throttler input
+/*
+		int gear = engine ? engine->GetGear() : 0;
+		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
+		if (hasJopytick) {
+			// apply a cubic attenuation to the joystick inputs
+//			joyPosX = joyPosX * joyPosX * joyPosX;
+//			joyPosY = joyPosY * joyPosY * joyPosY;
+//			steeringVal = joyPosX;
+//			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
+//			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
+//			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
+//			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
+			}
+*/
+
+		dVehicleDriverInput driverInput;
+		dFloat axis[32];
+		int axisCount = scene->GetJoystickAxis (axis);
+		if (axisCount) {
+			dFloat joyPosX;
+			dFloat joyPosY;
+			char buttons[32];
+			int joyButtons = scene->GetJoystickButtons (buttons);
+			dAssert(joyButtons);
+			joyPosX = axis[0];
+			joyPosY = axis[1];
+			driverInput.m_gasPedal = joyPosX > 0.0f ? joyPosX : 0.0f;
+			driverInput.m_brakePedal = joyPosX < 0.0f ? joyPosX : 0.0f;
+			driverInput.m_steeringValue = joyPosY;
+
+		} else {
+			driverInput.m_gasPedal = scene->GetKeyState('W') ? 1.0f : 0.0f;
+			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
+			driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
+			//driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
+			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
+			//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
+
+			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+			//driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
+			//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
+		}
+
+
+#if 0
+	#if 0
+		static FILE* file = fopen ("log.bin", "wb");                                         
+		if (file) {
+				fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen ("log.bin", "rb");
+		if (file) {		
+				fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+		}
+	#endif
+#endif
+
+		vehicle->ApplyDefualtDriver(driverInput);
+	}
+
+
 	void UpdateDriverInput(dCustomVehicleController* const vehicle, dFloat timestep) const
 	{
 		NewtonBody* const body = vehicle->GetBody();
@@ -1266,7 +1267,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		if (vehicleEntity == m_player) {
 			// do player control
-			vehicleEntity->ApplyPlayerControl();
+			ApplyPlayerControl(vehicle);
 		} else {
 			// do no player control
 			//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
