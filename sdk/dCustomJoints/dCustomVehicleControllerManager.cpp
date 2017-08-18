@@ -2927,12 +2927,13 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 					m_engineControl->SetIgnition(false);
 					m_engineControl->SetGear(m_engineControl->GetFirstGear());
 					if (m_handBrakesControl) {
-						m_handBrakesControl->SetParam(1.0f);
+						m_handBrakesControl->SetParam(1.0f - driveInputs.m_handBrakeValue);
 					}
 				}
 				break;
 			}
 
+/*
 			case dEngineController::m_engineIdle:
 			{
 				if (m_brakesControl) {
@@ -3057,7 +3058,7 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 				}
 				break;
 			}
-
+*/
 			default:
 				dAssert (0);
 		}

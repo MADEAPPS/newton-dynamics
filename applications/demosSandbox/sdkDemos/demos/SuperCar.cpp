@@ -1262,7 +1262,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
 
 			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
-			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
+			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, scene->GetKeyState ('I'));
 			//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
 		}
 
