@@ -2985,7 +2985,7 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 				}
 				if (driveInputs.m_brakePedal > 1.0e-3f) {
 					if (m_brakesControl) {
-						m_brakesControl->SetParam(driveInputs.m_brakePedal * 0.25f);
+						m_brakesControl->SetParam(driveInputs.m_brakePedal);
 					}
 					if (m_engineControl->GetSpeed() < 5.0f) {
 						m_engineControl->SetGear(m_engineControl->GetNeutralGear());
@@ -3031,7 +3031,7 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 
 				if (driveInputs.m_throttle > 1.0e-3f) {
 					if (m_brakesControl) {
-						m_brakesControl->SetParam(driveInputs.m_throttle * 0.25f);
+						m_brakesControl->SetParam(driveInputs.m_throttle);
 					}
 					if (m_engineControl->GetSpeed() < 5.0f) {
 						m_engineControl->SetGear(m_engineControl->GetNeutralGear());

@@ -108,8 +108,8 @@ static CarDefinition monsterTruck =
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	m_confort,									//TIRE_SUSPENSION_TYPE
-	20000.0f,									// TIRE_BRAKE_TORQUE
+	m_confort,									// TIRE_SUSPENSION_TYPE
+	2000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
@@ -150,8 +150,8 @@ static CarDefinition viper =
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	m_confort,									//TIRE_SUSPENSION_TYPE
-	20000.0f,									// TIRE_BRAKE_TORQUE
+	m_confort,									// TIRE_SUSPENSION_TYPE
+	2000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
@@ -511,7 +511,7 @@ class SuperCarEntity: public DemoEntity
 
 
 		// add vehicle hand brakes
-		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
+		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
@@ -1250,7 +1250,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, ignitionButton);
 
-			//dTrace (("%f %f\n", driverInput.m_steeringValue, joyPosX));
+			dTrace (("%f %f\n", driverInput.m_throttle, driverInput.m_brakePedal));
 			//dTrace (("%d %d\n", ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 
 		} else {
