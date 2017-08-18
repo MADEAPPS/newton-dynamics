@@ -646,9 +646,8 @@ void dGearBoxJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_END();
 }
 
-dAxelJoint::dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
+dAxelJoint::dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomGear(1.0f, childPin, parentPin, child, parent)
-	,m_parentReference(parentReference)
 {
 	dMatrix dommyMatrix;
 	// calculate the local matrix for body body0
@@ -661,10 +660,6 @@ dAxelJoint::dAxelJoint(const dVector& childPin, const dVector& parentPin, const 
 	dMatrix pinAndPivot1(dGrammSchmidt(parentPin));
 	CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
-
-	dMatrix referenceMatrix;
-	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
-	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
 }
 
 
@@ -678,16 +673,16 @@ void dAxelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 
-	dAssert (m_parentReference);
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 
 	// calculate the angular velocity for both bodies
 	dVector dir0(matrix0.m_front);
 	dVector dir2(matrix1.m_front);
-	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
+//	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
+	dVector dir3(matrix1.m_right);
 	dVector dir1(dir2 + dir3);
+//dTrace (("(%f %f %f) (%f %f %f)\n",  dir3.m_x,  dir3.m_y,  dir3.m_z,  matrix1[2].m_x,  matrix1[2].m_y,  matrix1[2].m_z));
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;
@@ -718,22 +713,22 @@ void dAxelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dAxelJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	int m_parentReferenceIndex;
-	LOAD_BEGIN(fileLoader);
-	LOAD_INT(parentReferenceIndex);
-	LOAD_VECTOR(pintOnReference);
-	LOAD_END();
-	m_parentReference = fileLoader->FindBody(m_parentReferenceIndex);
+//	int m_parentReferenceIndex;
+//	LOAD_BEGIN(fileLoader);
+//	LOAD_INT(parentReferenceIndex);
+//	LOAD_VECTOR(pintOnReference);
+//	LOAD_END();
+//	m_parentReference = fileLoader->FindBody(m_parentReferenceIndex);
 }
 
 void dAxelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dCustomGear::Save(fileSaver);
-	int m_parentReferenceIndex = fileSaver->FindBodyId(m_parentReference);
-	SAVE_BEGIN(fileSaver);
-	SAVE_INT(parentReferenceIndex);
-	SAVE_VECTOR(pintOnReference);
-	SAVE_END();
+//	int m_parentReferenceIndex = fileSaver->FindBodyId(m_parentReference);
+//	SAVE_BEGIN(fileSaver);
+//	SAVE_INT(parentReferenceIndex);
+//	SAVE_VECTOR(pintOnReference);
+//	SAVE_END();
 }
 
 
@@ -1959,13 +1954,13 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 	NewtonBody* const leftTireBody = leftTire->GetBody0();
 	NewtonBodyGetMatrix(leftTireBody, &leftTireMatrix[0][0]);
 	leftTireMatrix = leftTire->GetMatrix0() * leftTireMatrix;
-	new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftTireBody, differentialBody, m_body);
+	new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftTireBody, differentialBody);
 
 	dMatrix rightTireMatrix;
 	NewtonBody* const rightTireBody = rightTire->GetBody0();
 	NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 	rightTireMatrix = rightTire->GetMatrix0() * rightTireMatrix;
-	new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightTireBody, differentialBody, m_body);
+	new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightTireBody, differentialBody);
 
 	return differentialJoint;
 }
@@ -2026,13 +2021,13 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint
 	NewtonBody* const leftDifferentialBody = leftDifferential->GetBody0();
 	NewtonBodyGetMatrix(leftDifferentialBody, &leftDifferentialMatrix[0][0]);
 	leftDifferentialMatrix = leftDifferential->GetMatrix0() * leftDifferentialMatrix;
-	new dAxelJoint(leftDifferentialMatrix[1], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftDifferentialBody, differentialBody, m_body);
+	new dAxelJoint(leftDifferentialMatrix[1], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftDifferentialBody, differentialBody);
 
 	dMatrix rightDifferentialMatrix;
 	NewtonBody* const rightDifferentialBody = rightDifferential->GetBody0();
 	NewtonBodyGetMatrix(rightDifferentialBody, &rightDifferentialMatrix[0][0]);
 	rightDifferentialMatrix = rightDifferential->GetMatrix0() * rightDifferentialMatrix;
-	new dAxelJoint(rightDifferentialMatrix[1], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightDifferentialBody, differentialBody, m_body);
+	new dAxelJoint(rightDifferentialMatrix[1], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightDifferentialBody, differentialBody);
 
 	return differentialJoint;
 }

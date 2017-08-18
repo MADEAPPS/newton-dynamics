@@ -349,7 +349,7 @@ class dDifferentialJoint: public dCustomUniversal
 class dAxelJoint: public dCustomGear
 {
 	public:
-	CUSTOM_JOINTS_API dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference);
+	CUSTOM_JOINTS_API dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent);
 
 	void SetGear(dFloat gearRatio)
 	{
@@ -360,9 +360,6 @@ class dAxelJoint: public dCustomGear
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
-
-	dVector m_pintOnReference;
-	NewtonBody* m_parentReference;
 
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;
