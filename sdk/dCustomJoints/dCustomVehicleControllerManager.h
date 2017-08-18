@@ -336,8 +336,6 @@ class dDifferentialJoint: public dCustomUniversal
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dMatrix m_baseOffsetMatrix;
-//	dFloat m_slipDifferentialSpeed;
-//	bool m_slipDifferentialOn;
 	dFloat m_turnSpeed;
 	int m_isTractionDifferential;
 

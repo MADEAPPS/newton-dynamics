@@ -284,8 +284,6 @@ void dEngineMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 
 dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
 	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
-//		,m_slipDifferentialSpeed(0.0f)
-//		,m_slipDifferentialOn(true)
 	,m_turnSpeed(0.0f)
 	,m_isTractionDifferential(false)
 {
