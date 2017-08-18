@@ -164,23 +164,28 @@ DemoEntityManager::ButtonKey::ButtonKey (bool state)
 {
 }
 
+bool DemoEntityManager::ButtonKey::UpdateTrigger (const DemoEntityManager* const mainWin, bool triggerValue)
+{
+
+	m_memory0 = m_memory1;
+	m_memory1 = triggerValue;
+	return !m_memory0 & m_memory1;
+
+}
+
 bool DemoEntityManager::ButtonKey::UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode)
 {
-	m_memory0 = m_memory1;
-	m_memory1 = mainWin->GetKeyState (keyCode);
-	return !m_memory0 & m_memory1;
+	return UpdateTrigger (mainWin, mainWin->GetKeyState (keyCode) ? true: false);
 }
 
 bool DemoEntityManager::ButtonKey::UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask)
 {
-	m_memory0 = m_memory1;
-	m_memory1 = buttonMask ? true : false;
-	return !m_memory0 & m_memory1;
+	return UpdateTrigger (mainWin, buttonMask ? true: false);
 }
 
 bool DemoEntityManager::ButtonKey::UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode)
 {
-	if (UpdateTriggerButton (mainWin, keyCode)) {
+	if (UpdateTrigger (mainWin, keyCode ? true : false)) {
 		m_state = ! m_state;
 	}
 	return m_state;
@@ -387,8 +392,7 @@ int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) c
 {
 	int axisCount = 0;
 	if (m_hasJoytick) {
-		int buttonsCount;
-		const float* const axis = glfwGetJoystickAxes(0, &buttonsCount);
+		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
 		axisCount = dMin (axisCount, maxAxis);
 		for (int i = 0; i < axisCount; i ++) {
 			axisValues[i] = axis[i];
@@ -402,7 +406,6 @@ int DemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxButto
 	int buttonsCount = 0;
 	if (m_hasJoytick) {
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-
 		buttonsCount = dMin (buttonsCount, maxButton);
 		for (int i = 0; i < buttonsCount; i ++) {
 			axisbuttons[i] = buttons[i];

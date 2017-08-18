@@ -2952,7 +2952,7 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 				if (!driveInputs.m_ignitionKey) {
 					m_engineControl->m_drivingState = dEngineController::m_engineOff;
 				} else {
-					if (driveInputs.m_gasPedal > 1.0e-3f) {
+					if (driveInputs.m_throttle > 1.0e-3f) {
 						m_engineControl->m_drivingState = dEngineController::m_preDriveForward;
 					} else if (driveInputs.m_brakePedal > 1.0e-3f) {
 						m_engineControl->m_drivingState = dEngineController::m_preDriveReverse;
@@ -2978,9 +2978,9 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 
 			case dEngineController::m_driveForward:
 			{
-				m_engineControl->SetParam(driveInputs.m_gasPedal);
+				m_engineControl->SetParam(driveInputs.m_throttle);
 				m_engineControl->SetClutchParam(driveInputs.m_cluthPedal);
-				if (m_brakesControl) {
+				if (m_handBrakesControl) {
 					m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
 				}
 				if (driveInputs.m_brakePedal > 1.0e-3f) {
@@ -3029,9 +3029,9 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 					m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
 				}
 
-				if (driveInputs.m_gasPedal > 1.0e-3f) {
+				if (driveInputs.m_throttle > 1.0e-3f) {
 					if (m_brakesControl) {
-						m_brakesControl->SetParam(driveInputs.m_gasPedal * 0.25f);
+						m_brakesControl->SetParam(driveInputs.m_throttle * 0.25f);
 					}
 					if (m_engineControl->GetSpeed() < 5.0f) {
 						m_engineControl->SetGear(m_engineControl->GetNeutralGear());
@@ -3055,7 +3055,7 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 			case dEngineController::m_engineStop:
 			{
 				m_engineControl->SetClutchParam(0.0f);
-				if ((driveInputs.m_gasPedal > 1.0e-3f) || (driveInputs.m_brakePedal > 1.0e-3f)) {
+				if ((driveInputs.m_throttle > 1.0e-3f) || (driveInputs.m_brakePedal > 1.0e-3f)) {
 					if (m_brakesControl) {
 						m_brakesControl->SetParam(1.0f);
 					}

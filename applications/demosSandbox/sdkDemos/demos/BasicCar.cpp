@@ -194,7 +194,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 		dVehicleDriverInput driverInput;
 
-		driverInput.m_gasPedal = scene->GetKeyState('W') ? 1.0f : 0.0f;
+		driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
 		driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
 		driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
 		//driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);

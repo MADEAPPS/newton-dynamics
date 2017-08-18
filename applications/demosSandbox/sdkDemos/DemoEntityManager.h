@@ -71,13 +71,11 @@ class DemoEntityManager: public dList <DemoEntity*>
 		bool UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode);
 		bool UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode);
 		bool GetPushButtonState() const { return m_state;}
-
-
 		bool UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask);
-//		bool IsMouseKeyDown (const DemoEntityManager* const mainWin, int key);
-//		bool IsKeyDown (const DemoEntityManager* const mainWin, int key);
 
 		private:
+		bool UpdateTrigger (const DemoEntityManager* const mainWin, bool triggerValue);
+
 		bool m_state;
 		bool m_memory0;
 		bool m_memory1;
