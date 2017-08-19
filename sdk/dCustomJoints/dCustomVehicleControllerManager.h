@@ -29,6 +29,7 @@ class dEngineJoint;
 class dGearBoxJoint;
 class dEngineMountJoint;
 class dDifferentialJoint;
+class dDifferentialMountJoint;
 class dCustomVehicleController;
 class dCustomVehicleControllerManager;
 
@@ -38,7 +39,7 @@ class dVehicleDriverInput
 	dVehicleDriverInput()
 		:m_throttle(0.0f)
 		,m_brakePedal(0.0f)
-		,m_cluthPedal(0.0f)
+		,m_clutchPedal(0.0f)
 		,m_steeringValue(0.0f)
 		,m_handBrakeValue(0.0f)
 		,m_gear(0)
@@ -50,7 +51,7 @@ class dVehicleDriverInput
 
 	dFloat m_throttle;
 	dFloat m_brakePedal;
-	dFloat m_cluthPedal;
+	dFloat m_clutchPedal;
 	dFloat m_steeringValue;
 	dFloat m_handBrakeValue;
 	int m_gear;
@@ -279,10 +280,11 @@ class dEngineJoint: public dCustomJoint
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
+	dEngineMountJoint* m_engineMount;
 	dFloat m_maxRPM;
 	dFloat m_minFriction;
 	dFloat m_maxFriction;
-	dEngineMountJoint* m_engineMount;
+	
 
 	friend class dEngineController;
 	friend class dCustomVehicleController;
@@ -319,7 +321,24 @@ class dGearBoxJoint: public dCustomGear
 	DECLARE_CUSTOM_JOINT(dGearBoxJoint, dCustomGear)
 };
 
-class dDifferentialJoint: public dCustomUniversal
+
+class dDifferentialMountJoint: public dCustomUniversal
+{
+	public:
+	CUSTOM_JOINTS_API dDifferentialMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody);
+
+	protected:
+	CUSTOM_JOINTS_API void ProjectError();
+	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
+
+	dMatrix m_baseOffsetMatrix;
+	friend class dCustomVehicleController;
+	friend class dCustomVehicleControllerManager;
+	DECLARE_CUSTOM_JOINT(dDifferentialMountJoint, dCustomUniversal)
+};
+
+class dDifferentialJoint: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody);
@@ -330,19 +349,20 @@ class dDifferentialJoint: public dCustomUniversal
 	}
 
 	protected:
-	CUSTOM_JOINTS_API void ProjectError();
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
-	dMatrix m_baseOffsetMatrix;
+//	dMatrix m_baseOffsetMatrix;
+	dDifferentialMountJoint* m_differentialMount;
 	dFloat m_turnSpeed;
 	int m_isTractionDifferential;
 
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;
-	DECLARE_CUSTOM_JOINT(dDifferentialJoint, dCustomUniversal)
+	DECLARE_CUSTOM_JOINT(dDifferentialJoint, dCustomJoint)
 };
+
 
 class dAxelJoint: public dCustomGear
 {

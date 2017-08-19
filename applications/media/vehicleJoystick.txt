@@ -1,4 +1,5 @@
-throttleAxis: 1
 steeringAxis: 0
+throttleAxis: 1
+clutchAxis:	  3
 ignitionButton: 1 
 handBrakeButton: 0 

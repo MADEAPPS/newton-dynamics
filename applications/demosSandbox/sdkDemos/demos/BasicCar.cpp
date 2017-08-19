@@ -196,7 +196,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 		driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
 		driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
-		driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
+		driverInput.m_clutchPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
 		//driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
 		driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
 		//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));

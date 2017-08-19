@@ -31,6 +31,7 @@ IMPLEMENT_CUSTOM_JOINT(dEngineJoint);
 IMPLEMENT_CUSTOM_JOINT(dGearBoxJoint);
 IMPLEMENT_CUSTOM_JOINT(dEngineMountJoint);
 IMPLEMENT_CUSTOM_JOINT(dDifferentialJoint);
+IMPLEMENT_CUSTOM_JOINT(dDifferentialMountJoint);
 
 #define D_VEHICLE_NEUTRAL_GEAR						0
 #define D_VEHICLE_REVERSE_GEAR						1
@@ -155,6 +156,7 @@ void dEngineInfo::Save(dCustomJointSaveLoad* const fileSaver) const
 
 dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 	:dCustomJoint(1, engineBody, NULL)
+	,m_engineMount (new dEngineMountJoint (pinAndPivotFrame, engineBody, chassisBody))
 	,m_maxRPM(50.0f)
 	,m_minFriction(-10.0f)
 	,m_maxFriction( 10.0f)
@@ -282,10 +284,9 @@ void dEngineMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_END();
 }
 
-dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
+
+dDifferentialMountJoint::dDifferentialMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
 	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
-	,m_turnSpeed(0.0f)
-	,m_isTractionDifferential(false)
 {
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
@@ -297,7 +298,7 @@ dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBo
 	m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
 }
 
-void dDifferentialJoint::ProjectError()
+void dDifferentialMountJoint::ProjectError()
 {
 	dMatrix chassisMatrix;
 	dVector chassisOmega(0.0f);
@@ -324,6 +325,36 @@ void dDifferentialJoint::ProjectError()
 	NewtonBodySetOmegaNoSleep(differentialBody, &differentialOmega[0]);
 }
 
+
+void dDifferentialMountJoint::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	LOAD_BEGIN(fileLoader);
+	LOAD_MATRIX(baseOffsetMatrix);
+	LOAD_END();
+}
+
+void dDifferentialMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
+{
+	// nothing really to save;
+	dCustomUniversal::Save(fileSaver);
+
+	SAVE_BEGIN(fileSaver);
+	SAVE_MATRIX(baseOffsetMatrix);
+	SAVE_END();
+}
+
+
+dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
+	:dCustomJoint(1, differentialBody, NULL)
+	,m_differentialMount (new dDifferentialMountJoint(pinAndPivotFrame, differentialBody, chassisBody))
+	,m_turnSpeed(0.0f)
+	,m_isTractionDifferential(false)
+{
+	SetSolverModel(1);
+	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+}
+
+
 void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix chassisMatrix;
@@ -331,17 +362,23 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector chassisOmega(0.0f);
 	dVector differentialOmega(0.0f);
 
-	dCustomUniversal::SubmitConstraints(timestep, threadIndex);
+//	dCustomUniversal::SubmitConstraints(timestep, threadIndex);
 
 	// y axis controls the slip differential feature.
-	NewtonBody* const chassisBody = GetBody1();
 	NewtonBody* const diffentialBody = GetBody0();
+	NewtonBody* const chassisBody = m_differentialMount->GetBody1();
 
-	NewtonBodyGetOmega(diffentialBody, &differentialOmega[0]);
 	NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+	NewtonBodyGetOmega(diffentialBody, &differentialOmega[0]);
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(differentialMatrix, chassisMatrix);
+//	CalculateGlobalMatrix(differentialMatrix, chassisMatrix);
+	// Get the global matrices of each rigid body.
+	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	NewtonBodyGetMatrix(diffentialBody, &differentialMatrix[0][0]);
+	differentialMatrix = m_localMatrix0 * differentialMatrix;
+	chassisMatrix = m_localMatrix1 * chassisMatrix;
+
 	dVector relOmega(differentialOmega - chassisOmega);
 
 	// apply differential
@@ -368,15 +405,20 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dDifferentialJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
+dAssert (0);
+/*
 	LOAD_BEGIN(fileLoader);
 	LOAD_MATRIX(baseOffsetMatrix);
 	LOAD_FLOAT(turnSpeed);
 	LOAD_INT(isTractionDifferential);
 	LOAD_END();
+*/
 }
 
 void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
+	dAssert (0);
+	/*
 	// nothing really to save;
 	dCustomUniversal::Save(fileSaver);
 
@@ -385,6 +427,7 @@ void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_FLOAT(turnSpeed);
 	SAVE_INT(isTractionDifferential);
 	SAVE_END();
+*/
 }
 
 dWheelJoint::dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, dCustomVehicleController* const controller, const dTireInfo& tireInfo)
@@ -1901,14 +1944,6 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 	dFloat Izz;
 	dFloat mass;
 
-//	dList<dBodyPartDifferential>::dListNode* const differentialNode = m_differentialList.Append();
-//	dBodyPartDifferential* const differential = &differentialNode->GetInfo();
-//	differential->Init(this, mass, Ixx);
-//	m_parent = &controller->m_chassis;
-//	m_controller = controller;
-//	NewtonBody* const chassisBody = m_controller->GetBody();
-//	NewtonWorld* const world = ((dCustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
-
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
 
@@ -1971,10 +2006,6 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
-
-//	dList<dBodyPartDifferential>::dListNode* const differentialNode = m_differentialList.Append();
-//	dBodyPartDifferential* const differential = &differentialNode->GetInfo();
-//	differential->Init(this, mass, Ixx);
 
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
@@ -2097,7 +2128,6 @@ dEngineJoint* dCustomVehicleController::AddEngineJoint (dFloat mass, dFloat arma
 	pinMatrix.m_up = matrix.m_up;
 	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
 	m_engine = new dEngineJoint(pinMatrix, engineBody, m_body);
-	m_engine->m_engineMount = new dEngineMountJoint (pinMatrix, engineBody, m_body);
 
 	m_bodyList.Append(engineBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, engineBody);
@@ -2703,7 +2733,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 			for (dList<dDifferentialJoint*>::dListNode* diffNode = m_differentialList.GetFirst(); diffNode; diffNode = diffNode->GetNext()) {
 				dDifferentialJoint* const diff = diffNode->GetInfo();
-				diff->ProjectError();
+				diff->m_differentialMount->ProjectError();
 			}
 
 			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
@@ -2910,19 +2940,24 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 		m_steeringControl->SetParam(driveInputs.m_steeringValue);
 	}
 
+	if (m_brakesControl) {
+		m_brakesControl->SetParam(driveInputs.m_brakePedal);
+	}
+
 	if (m_engineControl) {
 		m_engineControl->SetDifferentialLock(driveInputs.m_lockDifferential ? true : false);
+
 		switch (m_engineControl->m_drivingState) 
 		{
 			case dEngineController::m_engineOff:
 			{
 				if (driveInputs.m_ignitionKey) {
-					m_engineControl->m_drivingState = dEngineController::m_engineIdle;
 					m_engineControl->SetIgnition(true);
-					if (m_handBrakesControl) {
-						m_handBrakesControl->SetParam(0.0f);
-					}
 					m_engineControl->SetGear(m_engineControl->GetNeutralGear());
+					m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+					if (m_handBrakesControl) {
+						m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+					}
 				} else {
 					m_engineControl->SetIgnition(false);
 					m_engineControl->SetGear(m_engineControl->GetFirstGear());
@@ -2933,28 +2968,33 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 				break;
 			}
 
-/*
 			case dEngineController::m_engineIdle:
 			{
-				if (m_brakesControl) {
-					m_brakesControl->SetParam(0.0f);
-				}
-				m_engineControl->SetClutchParam(0.0f);
-				if (m_handBrakesControl) {
-					m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
-				}
 				if (!driveInputs.m_ignitionKey) {
 					m_engineControl->m_drivingState = dEngineController::m_engineOff;
 				} else {
-					if (driveInputs.m_throttle > 1.0e-3f) {
-						m_engineControl->m_drivingState = dEngineController::m_preDriveForward;
-					} else if (driveInputs.m_brakePedal > 1.0e-3f) {
-						m_engineControl->m_drivingState = dEngineController::m_preDriveReverse;
+					if (m_engineControl->m_automaticTransmissionMode) {
+						m_engineControl->SetClutchParam(0.0f);
+					} else {
+						m_engineControl->SetClutchParam(1.0f - driveInputs.m_clutchPedal);
 					}
+					if (m_handBrakesControl) {
+						m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+					}
+
+	/*
+					} else {
+						if (driveInputs.m_throttle > 1.0e-3f) {
+							m_engineControl->m_drivingState = dEngineController::m_preDriveForward;
+						} else if (driveInputs.m_brakePedal > 1.0e-3f) {
+							m_engineControl->m_drivingState = dEngineController::m_preDriveReverse;
+						}
+					}
+	*/
 				}
 				break;
 			}
-
+/*
 			case dEngineController::m_preDriveForward:
 			{
 				if (m_engineControl->GetSpeed() < -5.0f) {

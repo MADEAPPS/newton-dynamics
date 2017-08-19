@@ -862,8 +862,9 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		,m_externalView(true)
 		,m_player (NULL) 
 		//,m_debugVehicle (NULL) 
-		,m_throttleAxis(0)
 		,m_steeringAxis(0)
+		,m_throttleAxis(1)
+		,m_clutchAxis(2)
 		,m_ignitionButton(0)
 		,m_handBrakeButton(1)
 		,m_drawShematic(true)
@@ -887,8 +888,9 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		FILE* const joysticMapping = fopen (joystickMappingName, "rt");
 		dAssert (joysticMapping);
 
-		fscanf (joysticMapping, "throttleAxis:%d\n", &m_throttleAxis);
 		fscanf (joysticMapping, "steeringAxis:%d\n", &m_steeringAxis);
+		fscanf (joysticMapping, "throttleAxis:%d\n", &m_throttleAxis);
+		fscanf (joysticMapping, "clutchAxis:%d\n", &m_clutchAxis);
 		fscanf (joysticMapping, "ignitionButton:%d\n", &m_ignitionButton);
 		fscanf (joysticMapping, "handBrakeButton:%d\n", &m_handBrakeButton);
 
@@ -1234,6 +1236,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		if (axisCount) {
 			dFloat joyPosX;
 			dFloat joyPosY;
+			dFloat joyPosZ;
 			
 			char buttons[32];
 			int joyButtons = scene->GetJoystickButtons (buttons);
@@ -1241,22 +1244,26 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 			joyPosX = axis[m_steeringAxis];
 			joyPosY = -axis[m_throttleAxis];
+			joyPosZ = axis[m_clutchAxis];
 			int ignitionButton = buttons[m_ignitionButton];
 			int handBreakButton = buttons[m_handBrakeButton];
+			
 
+			driverInput.m_clutchPedal = dAbs (joyPosZ * joyPosZ * joyPosZ);
+			driverInput.m_steeringValue = joyPosX * joyPosX * joyPosX;
 			driverInput.m_throttle = joyPosY > 0.0f ? dAbs(joyPosY * joyPosY * joyPosY) : 0.0f;
 			driverInput.m_brakePedal = joyPosY < 0.0f ? dAbs (joyPosY * joyPosY * joyPosY) : 0.0f;
-			driverInput.m_steeringValue = joyPosX * joyPosX * joyPosX;
 
 			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, ignitionButton);
+			driverInput.m_handBrakeValue = handBreakButton ? 1.0f : 0.0f;
 
-			dTrace (("%f %f\n", driverInput.m_throttle, driverInput.m_brakePedal));
+			//dTrace (("%f %f %f %f\n", driverInput.m_steeringValue, driverInput.m_throttle, driverInput.m_brakePedal, driverInput.m_clutchPedal));
 			//dTrace (("%d %d\n", ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 
 		} else {
 			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
-			driverInput.m_cluthPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
+			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
 			//driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
 			//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
@@ -1466,8 +1473,9 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	GLuint m_tachometer;
 	GLuint m_needle;
 	int m_soundsCount;
-	int m_throttleAxis;
 	int m_steeringAxis;
+	int m_throttleAxis;
+	int m_clutchAxis;
 	int m_ignitionButton;
 	int m_handBrakeButton;
 	mutable bool m_drawShematic;
