@@ -343,7 +343,7 @@ void dDifferentialMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_END();
 }
 
-
+#ifdef VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
 dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
 	:dCustomJoint(1, differentialBody, NULL)
 	,m_differentialMount (new dDifferentialMountJoint(pinAndPivotFrame, differentialBody, chassisBody))
@@ -354,6 +354,10 @@ dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBo
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
+void dDifferentialJoint::ProjectError()
+{
+	m_differentialMount->ProjectError();
+}
 
 void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
@@ -362,8 +366,6 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector chassisOmega(0.0f);
 	dVector differentialOmega(0.0f);
 
-//	dCustomUniversal::SubmitConstraints(timestep, threadIndex);
-
 	// y axis controls the slip differential feature.
 	NewtonBody* const diffentialBody = GetBody0();
 	NewtonBody* const chassisBody = m_differentialMount->GetBody1();
@@ -371,8 +373,6 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
 	NewtonBodyGetOmega(diffentialBody, &differentialOmega[0]);
 
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-//	CalculateGlobalMatrix(differentialMatrix, chassisMatrix);
 	// Get the global matrices of each rigid body.
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	NewtonBodyGetMatrix(diffentialBody, &differentialMatrix[0][0]);
@@ -406,19 +406,121 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 void dDifferentialJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
 dAssert (0);
-/*
+
 	LOAD_BEGIN(fileLoader);
-	LOAD_MATRIX(baseOffsetMatrix);
 	LOAD_FLOAT(turnSpeed);
 	LOAD_INT(isTractionDifferential);
 	LOAD_END();
-*/
 }
 
 void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dAssert (0);
-	/*
+	// nothing really to save;
+	dCustomJoint::Save(fileSaver);
+
+	SAVE_BEGIN(fileSaver);
+	SAVE_FLOAT(turnSpeed);
+	SAVE_INT(isTractionDifferential);
+	SAVE_END();
+}
+
+#else
+dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
+	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
+	,m_turnSpeed(0.0f)
+	,m_isTractionDifferential(false)
+{
+	dMatrix engineMatrix;
+	dMatrix chassisMatrix;
+
+	EnableLimit_0(false);
+	EnableLimit_1(false);
+	NewtonBodyGetMatrix(differentialBody, &engineMatrix[0][0]);
+	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
+}
+
+void dDifferentialJoint::ProjectError()
+{
+	dMatrix chassisMatrix;
+	dVector chassisOmega(0.0f);
+	dVector differentialOmega(0.0f);
+	dVector differentialVelocity(0.0f);
+
+	NewtonBody* const chassisBody = GetBody1();
+	NewtonBody* const differentialBody = GetBody0();
+
+	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	dMatrix differentialMatrix(m_baseOffsetMatrix * chassisMatrix);
+	NewtonBodySetMatrixNoSleep(differentialBody, &differentialMatrix[0][0]);
+
+	NewtonBodyGetPointVelocity(chassisBody, &differentialMatrix.m_posit[0], &differentialVelocity[0]);
+	NewtonBodySetVelocityNoSleep(differentialBody, &differentialVelocity[0]);
+
+	NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+	NewtonBodyGetOmega(differentialBody, &differentialOmega[0]);
+
+	chassisMatrix = GetMatrix1() * chassisMatrix;
+	dVector projectOmega(chassisMatrix.m_front.Scale(differentialOmega.DotProduct3(chassisMatrix.m_front)) +
+					 	 chassisMatrix.m_up.Scale(differentialOmega.DotProduct3(chassisMatrix.m_up)) +
+						 chassisMatrix.m_right.Scale(chassisOmega.DotProduct3(chassisMatrix.m_right)));
+	NewtonBodySetOmegaNoSleep(differentialBody, &differentialOmega[0]);
+}
+
+void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix chassisMatrix;
+	dMatrix differentialMatrix;
+	dVector chassisOmega(0.0f);
+	dVector differentialOmega(0.0f);
+
+	dCustomUniversal::SubmitConstraints(timestep, threadIndex);
+
+	// y axis controls the slip differential feature.
+	NewtonBody* const chassisBody = GetBody1();
+	NewtonBody* const diffentialBody = GetBody0();
+
+	NewtonBodyGetOmega(diffentialBody, &differentialOmega[0]);
+	NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(differentialMatrix, chassisMatrix);
+	dVector relOmega(differentialOmega - chassisOmega);
+
+	// apply differential
+	dFloat differentailOmega = differentialMatrix.m_front.DotProduct3(relOmega);
+
+	if (m_isTractionDifferential) {
+		dFloat wAlpha = (m_turnSpeed - differentailOmega) / timestep;
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+	} else {
+		if (differentailOmega > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+			dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (differentailOmega < -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+			dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		}
+	}
+}
+
+void dDifferentialJoint::Load(dCustomJointSaveLoad* const fileLoader)
+{
+	LOAD_BEGIN(fileLoader);
+	LOAD_MATRIX(baseOffsetMatrix);
+	LOAD_FLOAT(turnSpeed);
+	LOAD_INT(isTractionDifferential);
+	LOAD_END();
+}
+
+void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
+{
 	// nothing really to save;
 	dCustomUniversal::Save(fileSaver);
 
@@ -427,8 +529,8 @@ void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_FLOAT(turnSpeed);
 	SAVE_INT(isTractionDifferential);
 	SAVE_END();
-*/
 }
+#endif
 
 dWheelJoint::dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, dCustomVehicleController* const controller, const dTireInfo& tireInfo)
 	:dCustomJoint(6, tireBody, chassisBody)
@@ -2733,7 +2835,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 			for (dList<dDifferentialJoint*>::dListNode* diffNode = m_differentialList.GetFirst(); diffNode; diffNode = diffNode->GetNext()) {
 				dDifferentialJoint* const diff = diffNode->GetInfo();
-				diff->m_differentialMount->ProjectError();
+				diff->ProjectError();
 			}
 
 			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();

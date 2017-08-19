@@ -22,6 +22,7 @@
 #include "dCustomControllerManager.h"
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
+//#define VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
 
 class dAxelJoint;
 class dWheelJoint;
@@ -333,11 +334,13 @@ class dDifferentialMountJoint: public dCustomUniversal
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dMatrix m_baseOffsetMatrix;
+	friend class dDifferentialJoint;
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;
 	DECLARE_CUSTOM_JOINT(dDifferentialMountJoint, dCustomUniversal)
 };
 
+#ifdef VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
 class dDifferentialJoint: public dCustomJoint
 {
 	public:
@@ -352,6 +355,7 @@ class dDifferentialJoint: public dCustomJoint
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
+	CUSTOM_JOINTS_API void ProjectError();
 
 //	dMatrix m_baseOffsetMatrix;
 	dDifferentialMountJoint* m_differentialMount;
@@ -363,6 +367,33 @@ class dDifferentialJoint: public dCustomJoint
 	DECLARE_CUSTOM_JOINT(dDifferentialJoint, dCustomJoint)
 };
 
+#else
+class dDifferentialJoint: public dCustomUniversal
+{
+	public:
+	CUSTOM_JOINTS_API dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody);
+
+	NewtonBody* GetDifferentialBody() const
+	{
+		return GetBody0();
+	}
+
+	protected:
+	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
+	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
+	CUSTOM_JOINTS_API void ProjectError();
+
+	dMatrix m_baseOffsetMatrix;
+	dFloat m_turnSpeed;
+	int m_isTractionDifferential;
+
+	friend class dCustomVehicleController;
+	friend class dCustomVehicleControllerManager;
+	DECLARE_CUSTOM_JOINT(dDifferentialJoint, dCustomUniversal)
+};
+
+#endif
 
 class dAxelJoint: public dCustomGear
 {
