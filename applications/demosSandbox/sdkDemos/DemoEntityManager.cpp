@@ -164,15 +164,14 @@ DemoEntityManager::ButtonKey::ButtonKey (bool state)
 {
 }
 
-bool DemoEntityManager::ButtonKey::UpdateTrigger (const DemoEntityManager* const mainWin, bool triggerValue)
+int DemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
 {
-
 	m_memory0 = m_memory1;
 	m_memory1 = triggerValue;
-	return !m_memory0 & m_memory1;
-
+	return (!m_memory0 & m_memory1) ? 1 : 0;
 }
 
+/*
 bool DemoEntityManager::ButtonKey::UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode)
 {
 	return UpdateTrigger (mainWin, mainWin->GetKeyState (keyCode) ? true: false);
@@ -182,13 +181,14 @@ bool DemoEntityManager::ButtonKey::UpdateTriggerJoystick (const DemoEntityManage
 {
 	return UpdateTrigger (mainWin, buttonMask ? true: false);
 }
+*/
 
-bool DemoEntityManager::ButtonKey::UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode)
+int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 {
-	if (UpdateTrigger (mainWin, keyCode ? true : false)) {
+	if (UpdateTrigger (triggerValue)) {
 		m_state = ! m_state;
 	}
-	return m_state;
+	return m_state ? 1 : 0;
 }
 
 

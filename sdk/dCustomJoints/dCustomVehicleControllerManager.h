@@ -23,7 +23,6 @@
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 //#define VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
-//#define VEHICLE_OLD_ENGINE
 
 class dAxelJoint;
 class dWheelJoint;
@@ -169,9 +168,6 @@ class dEngineInfo
 	void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dEngineTorqueNode m_torqueCurve[6];
-#ifdef VEHICLE_OLD_ENGINE
-	dFloat m_viscousDrag___;
-#endif
 	dFloat m_crownGearRatio;
 	dFloat m_peakPowerTorque;
 	friend class dEngineController;
@@ -279,23 +275,14 @@ class dEngineJoint: public dCustomJoint
 	}
 
 	protected:
-#ifdef VEHICLE_OLD_ENGINE
-	CUSTOM_JOINTS_API void SetRedLineRPM(dFloat redLineRmp);
-#endif
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dEngineMountJoint* m_engineMount;
-#ifdef VEHICLE_OLD_ENGINE
-	dFloat m_maxRPM;
-	dFloat m_minFriction;
-	dFloat m_maxFriction;
-#else
 	dFloat m_torque;
 	dFloat m_rpm;
 	dFloat m_targetRpm;
-#endif
 
 	friend class dEngineController;
 	friend class dCustomVehicleController;
@@ -494,9 +481,8 @@ class dEngineController: public dVehicleController
 		m_engineIdle,
 		m_engineStop,
 		m_driveForward,
-		m_preDriveForward,
 		m_driveReverse,
-		m_preDriveReverse,
+		m_engineStopDelay,
 	};
 
 	CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller);
@@ -558,6 +544,7 @@ class dEngineController: public dVehicleController
 	int m_drivingState;
 	int m_ignitionKey;
 	int m_automaticTransmissionMode;
+	int m_stopDelay;
 	friend class dCustomVehicleController;
 };
 
@@ -607,7 +594,7 @@ class dBrakeController: public dVehicleController
 class dCustomVehicleController: public dCustomControllerBase
 {
 	public:
-	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs);
+	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs, dFloat timestep);
 
 	CUSTOM_JOINTS_API void Finalize();
 	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dTireInfo& tireInfo);

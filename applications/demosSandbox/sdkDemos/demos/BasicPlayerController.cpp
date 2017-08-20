@@ -198,6 +198,8 @@ class BasicPlayerInputManager: public dCustomInputManager
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
 	{
+		dAssert(0);
+		/*
 		BasicPlayerEntity::InputRecord inputs;
 
 		DemoCamera* const camera = m_scene->GetCamera();
@@ -240,6 +242,7 @@ class BasicPlayerInputManager: public dCustomInputManager
 #endif
 
 		m_player->SetInput(inputs);
+*/
 	}
 
 	void OnEndUpdate (dFloat timestepInSecunds)

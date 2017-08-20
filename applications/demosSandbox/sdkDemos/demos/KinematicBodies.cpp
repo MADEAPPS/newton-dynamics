@@ -301,6 +301,8 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 
 	virtual void PreUpdate (dFloat timestep)
 	{
+		dAssert (0);
+/*
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		DemoCamera* const camera = scene->GetCamera();
@@ -351,6 +353,7 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		} else {
 			m_selectionToIgnore.RemoveAll();
 		}
+*/
 	}
 
 	virtual void PostUpdate (dFloat timestep)

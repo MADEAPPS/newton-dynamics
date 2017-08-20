@@ -255,8 +255,6 @@ class SuperCarEntity: public DemoEntity
 	SuperCarEntity (DemoEntityManager* const scene, dCustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath, const CarDefinition& definition)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_controller(NULL)
-		,m_gearUpKey (false)
-		,m_gearDownKey (false)
 		,m_engineDifferentialLock(false)
 		,m_automaticTransmission(true)
 		,m_engineRPMOn(false)
@@ -584,7 +582,7 @@ class SuperCarEntity: public DemoEntity
 		dEngineController* const engineControl = new dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
-		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState() ? true : false);
 		engineControl->SetIgnition(true);
 
 		m_controller->SetEngine(engineControl);
@@ -841,9 +839,6 @@ class SuperCarEntity: public DemoEntity
 	}
 
 	dCustomVehicleController* m_controller;
-	DemoEntityManager::ButtonKey m_gearUpKey;
-	DemoEntityManager::ButtonKey m_gearDownKey;
-
 	DemoEntityManager::ButtonKey m_engineDifferentialLock;
 	DemoEntityManager::ButtonKey m_automaticTransmission;
 	int m_gearMap[10];
@@ -867,9 +862,13 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		,m_clutchAxis(2)
 		,m_ignitionButton(0)
 		,m_handBrakeButton(1)
+		,m_gearUpButton(2)
+		,m_gearDonwButton(3)
 		,m_drawShematic(true)
 		,m_helpKey (true)
 		,m_nexVehicle (true)
+		,m_gearUpKey(false)
+		,m_gearDownKey(false)
 		,m_engineKeySwitch(false)
 	{
 		// hook a callback for 2d help display
@@ -893,6 +892,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		fscanf (joysticMapping, "clutchAxis:%d\n", &m_clutchAxis);
 		fscanf (joysticMapping, "ignitionButton:%d\n", &m_ignitionButton);
 		fscanf (joysticMapping, "handBrakeButton:%d\n", &m_handBrakeButton);
+		fscanf (joysticMapping, "gearUpButton:%d\n", &m_gearUpButton);
+		fscanf (joysticMapping, "gearDonwButton:%d\n", &m_gearDonwButton);
 
 		fclose (joysticMapping);
 	}
@@ -999,10 +1000,11 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help                 : 'H'");
 		}
 
-		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene, 'V');
-		if (engineIgnitionKey) {
-			SetNextPlayer();
-		}
+		dAssert (0);
+		//bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene, 'V');
+		//if (engineIgnitionKey) {
+		//	SetNextPlayer();
+		//}
 	}
 
 
@@ -1207,12 +1209,13 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	}
 */
 
-	void ApplyPlayerControl (dCustomVehicleController* const vehicle)
+	void ApplyPlayerControl (dCustomVehicleController* const vehicle, dFloat timestep)
 	{
 		NewtonBody* const body = vehicle->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		//SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		dEngineController* const engine = vehicle->GetEngine();
 
 		// get the throttler input
 /*
@@ -1230,6 +1233,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			}
 */
 
+		int gear = engine ? engine->GetGear() : 0;
+
 		dVehicleDriverInput driverInput;
 		dFloat axis[32];
 		int axisCount = scene->GetJoystickAxis (axis);
@@ -1245,23 +1250,28 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			joyPosX = axis[m_steeringAxis];
 			joyPosY = -axis[m_throttleAxis];
 			joyPosZ = axis[m_clutchAxis];
-			int ignitionButton = buttons[m_ignitionButton];
-			int handBreakButton = buttons[m_handBrakeButton];
+			bool ignitionButton = buttons[m_ignitionButton] ? true : false;
+			bool handBreakButton = buttons[m_handBrakeButton] ? true : false;
+			bool gearUpButton = buttons[m_gearUpButton] ? true : false;
+			bool gearDonwButton = buttons[m_gearDonwButton] ? true : false;
+
+			gear += (int (m_gearUpKey.UpdateTrigger(gearUpButton)) - int (m_gearDownKey.UpdateTrigger(gearDonwButton))); 
 			
 			driverInput.m_clutchPedal = dAbs (joyPosZ * joyPosZ * joyPosZ);
 			driverInput.m_steeringValue = joyPosX * joyPosX * joyPosX;
 			driverInput.m_throttle = joyPosY > 0.0f ? dAbs(joyPosY * joyPosY * joyPosY) : 0.0f;
 			driverInput.m_brakePedal = joyPosY < 0.0f ? dAbs (joyPosY * joyPosY * joyPosY) : 0.0f;
 
-			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, ignitionButton);
+			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(ignitionButton);
 			driverInput.m_handBrakeValue = handBreakButton ? 1.0f : 0.0f;
+			driverInput.m_gear = gear;
 
-			for (int i = 0; i < joyButtons; i ++) {
-				dTrace(("%d ", buttons[i]));
-			}
-			dTrace(("\n"));
+			//for (int i = 0; i < joyButtons; i ++) {
+			//	dTrace(("%d ", buttons[i]));
+			//}
+			//dTrace(("\n"));
 			//dTrace (("%f %f %f %f\n", driverInput.m_steeringValue, driverInput.m_throttle, driverInput.m_brakePedal, driverInput.m_clutchPedal));
-			//dTrace (("%d %d\n", ignitionButton, m_engineKeySwitch.GetPushButtonState()));
+			//dTrace (("%d %d %d\n", gear, ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 
 		} else {
 			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
@@ -1272,27 +1282,27 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
 
 			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
-			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, scene->GetKeyState ('I'));
+			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState ('I'));
 			//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
 		}
 
 
-#if 0
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
-				fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+			fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
 			fflush(file);
 		}
 	#else 
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
-				fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+			fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
 		}
 	#endif
 #endif
 
-		vehicle->ApplyDefualtDriver(driverInput);
+		vehicle->ApplyDefualtDriver(driverInput, timestep);
 	}
 
 
@@ -1303,7 +1313,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		if (vehicleEntity == m_player) {
 			// do player control
-			ApplyPlayerControl(vehicle);
+			ApplyPlayerControl(vehicle, timestep);
 		} else {
 			dAssert (0);
 			// do no player control
@@ -1318,7 +1328,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
 		// set the help key
-		m_helpKey.UpdatePushButton (scene, 'H');
+		m_helpKey.UpdatePushButton (scene->GetKeyState('H'));
 
 		// do the base class post update
 		dCustomVehicleControllerManager::PreUpdate(timestep);
@@ -1481,10 +1491,14 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	int m_clutchAxis;
 	int m_ignitionButton;
 	int m_handBrakeButton;
+	int m_gearUpButton;
+	int m_gearDonwButton;
 	mutable bool m_drawShematic;
 	
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_nexVehicle;
+	DemoEntityManager::ButtonKey m_gearUpKey;
+	DemoEntityManager::ButtonKey m_gearDownKey;
 	DemoEntityManager::ButtonKey m_engineKeySwitch;
 	void* m_engineSounds[16];
 };

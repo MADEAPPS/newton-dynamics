@@ -33,13 +33,11 @@ IMPLEMENT_CUSTOM_JOINT(dEngineMountJoint);
 IMPLEMENT_CUSTOM_JOINT(dDifferentialJoint);
 IMPLEMENT_CUSTOM_JOINT(dDifferentialMountJoint);
 
-#define D_VEHICLE_NEUTRAL_GEAR						0
-#define D_VEHICLE_REVERSE_GEAR						1
+#define D_VEHICLE_REVERSE_GEAR						0
+#define D_VEHICLE_NEUTRAL_GEAR						1
 #define D_VEHICLE_FIRST_GEAR						2
-#define D_VEHICLE_MAX_DRIVETRAIN_DOF				32
-#define D_VEHICLE_REGULARIZER						dFloat(1.0001f)
+#define D_VEHICLE_MAX_ENGINE_LOAD					100.0f
 #define D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS		dFloat(10.0f)
-//#define D_VEHICLE_ENGINE_IDLE_GAS_VALVE				dFloat(0.1f)
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
 
@@ -80,13 +78,8 @@ void dEngineInfo::SetTorqueRPMTable()
 	m_torqueCurve[1] = dEngineTorqueNode (m_rpmAtIdleTorque, m_idleTorque);
 	m_torqueCurve[2] = dEngineTorqueNode (m_rpmAtPeakTorque, m_peakTorque);
 	m_torqueCurve[3] = dEngineTorqueNode (m_rpmAtPeakHorsePower, m_peakPowerTorque);
-#ifdef VEHICLE_OLD_ENGINE
-	m_torqueCurve[4] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
-	m_torqueCurve[5] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
-#else
 	m_torqueCurve[4] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque);
 	m_torqueCurve[5] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque);
-#endif
 }
 
 void dEngineInfo::Load(dCustomJointSaveLoad* const fileLoader)
@@ -110,9 +103,6 @@ void dEngineInfo::Load(dCustomJointSaveLoad* const fileLoader)
 	LOAD_FLOAT (aerodynamicDownforceFactor);
 	LOAD_FLOAT (aerodynamicDownforceFactorAtTopSpeed);
 	LOAD_FLOAT (aerodynamicDownForceSurfaceCoeficident);
-#ifdef VEHICLE_OLD_ENGINE
-	LOAD_FLOAT (viscousDrag);
-#endif
 	LOAD_FLOAT (crownGearRatio);
 	LOAD_FLOAT (peakPowerTorque);
 	LOAD_INT  (differentialLock);
@@ -148,9 +138,6 @@ void dEngineInfo::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_FLOAT (aerodynamicDownforceFactor);
 	SAVE_FLOAT (aerodynamicDownforceFactorAtTopSpeed);
 	SAVE_FLOAT (aerodynamicDownForceSurfaceCoeficident);
-#ifdef VEHICLE_OLD_ENGINE
-	SAVE_FLOAT (viscousDrag);
-#endif
 	SAVE_FLOAT (crownGearRatio);
 	SAVE_FLOAT (peakPowerTorque);
 	SAVE_INT  (differentialLock);
@@ -166,57 +153,17 @@ void dEngineInfo::Save(dCustomJointSaveLoad* const fileSaver) const
 dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 	:dCustomJoint(1, engineBody, NULL)
 	,m_engineMount (new dEngineMountJoint (pinAndPivotFrame, engineBody, chassisBody))
-#ifdef VEHICLE_OLD_ENGINE
-	,m_maxRPM(50.0f)
-	,m_minFriction(-10.0f)
-	,m_maxFriction( 10.0f)
-#else
 	,m_torque (0.0f)
 	,m_rpm (0.0f)
 	,m_targetRpm (0.0f)
-#endif
 {
 	SetSolverModel(1);
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-#ifdef VEHICLE_OLD_ENGINE
-void dEngineJoint::SetRedLineRPM(dFloat redLineRmp)
-{
-	m_maxRPM = dAbs(redLineRmp);
-}
-#endif
 
 void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
-#ifdef VEHICLE_OLD_ENGINE
-	dMatrix engineMatrix;
-	dVector omega;
-
-	NewtonBody* const engineBody = GetEngineBody();
-
-	NewtonBodyGetOmega(engineBody, &omega[0]);
-	NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
-	
-	dVector pin (engineMatrix.RotateVector(GetMatrix0().m_front));
-	dFloat jointOmega = omega.DotProduct3(pin);
-
-	dFloat alpha = jointOmega / timestep;
-	NewtonUserJointAddAngularRow(m_joint, 0, &pin[0]);
-	NewtonUserJointSetRowAcceleration(m_joint, -alpha);
-	if (jointOmega <= 0.0f) {
-		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-	} else if (jointOmega >= m_maxRPM) {
-		dFloat redLineAlpha = (m_maxRPM - jointOmega) / timestep;
-		NewtonUserJointSetRowAcceleration(m_joint, redLineAlpha);
-		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-	} else {
-		NewtonUserJointSetRowMinimumFriction(m_joint, m_minFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxFriction);
-	}
-	NewtonUserJointSetRowStiffness(m_joint, 1.0f);
-#else
-
 	dMatrix engineMatrix;
 	dVector omega;
 
@@ -227,27 +174,26 @@ void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	dVector pin (engineMatrix.RotateVector(GetMatrix0().m_front));
 	m_rpm = omega.DotProduct3(pin);
+	dFloat alpha = dClamp ((m_targetRpm - m_rpm) / timestep, -D_VEHICLE_MAX_ENGINE_LOAD, D_VEHICLE_MAX_ENGINE_LOAD);
 
-	dFloat alpha = 0.33f * (m_targetRpm - m_rpm) / timestep;
+static int xxx;
+xxx ++;
+dTrace (("%d %f %f %f\n", xxx, m_targetRpm, m_rpm, alpha));
+if(xxx >= 5455)
+xxx *=1;
+
 	NewtonUserJointAddAngularRow(m_joint, 0, &pin[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	NewtonUserJointSetRowMinimumFriction(m_joint, (m_rpm > 0.1f) ? -m_torque : -m_torque * 100.0f);
-	NewtonUserJointSetRowMaximumFriction(m_joint,  m_torque);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+	NewtonUserJointSetRowMaximumFriction(m_joint, (m_rpm > 1.0f) ? m_torque : m_torque * 100.0f);
 	NewtonUserJointSetRowStiffness(m_joint, 1.0f);
-#endif
 }
 
 
 void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
 	LOAD_BEGIN(fileLoader);
-#ifdef VEHICLE_OLD_ENGINE
-	LOAD_FLOAT(maxRPM);
-	LOAD_FLOAT(minFriction);
-	LOAD_FLOAT(maxFriction);
-#else
 	dAssert (0);
-#endif
 	LOAD_END();
 
 	m_engineMount = NULL;
@@ -258,13 +204,7 @@ void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	dCustomJoint::Save (fileSaver);
 
 	SAVE_BEGIN(fileSaver);
-#ifdef VEHICLE_OLD_ENGINE
-	SAVE_FLOAT(maxRPM);
-	SAVE_FLOAT(minFriction);
-	SAVE_FLOAT(maxFriction);
-#else
 dAssert (0);
-#endif
 	SAVE_END();
 }
 
@@ -808,7 +748,7 @@ dGearBoxJoint::dGearBoxJoint(const dVector& childPin, NewtonBody* const differen
 void dGearBoxJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 //xxxxx
-m_param = 0.0f;
+//m_param = 0.0f;
 	if (m_param > 0.1f) {
 		dCustomGear::SubmitConstraints(timestep, threadIndex);
 		if (m_param < 0.9f) {
@@ -1005,8 +945,9 @@ dEngineController::dEngineController(dCustomVehicleController* const controller,
 	,m_gearTimer(0)
 	,m_currentGear(D_VEHICLE_NEUTRAL_GEAR)
 	,m_drivingState(m_engineOff)
-	,m_ignitionKey(false)
-	,m_automaticTransmissionMode(true)
+	,m_ignitionKey(0)
+	,m_automaticTransmissionMode(0)
+	,m_stopDelay(0)
 {
 	dMatrix chassisMatrix;
 	dMatrix differentialMatrix;
@@ -1111,11 +1052,6 @@ void dEngineController::InitEngineTorqueCurve()
 	m_info.m_rpmAtPeakHorsePower /= m_info.m_crownGearRatio;
 	m_info.m_rpmAtRedLine /= m_info.m_crownGearRatio;
 
-#ifdef VEHICLE_OLD_ENGINE
-	dFloat rpmStep = m_info.m_rpmAtIdleTorque;
-	m_info.m_viscousDrag = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE / (rpmStep * rpmStep);
-#endif
-
 	m_info.SetTorqueRPMTable();
 }
 
@@ -1146,7 +1082,7 @@ dFloat dEngineController::GetGearRatio () const
 
 void dEngineController::UpdateAutomaticGearBox(dFloat timestep, dFloat omega)
 {
-m_info.m_gearsCount = 4;
+m_info.m_gearsCount = 3;
 
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
@@ -1182,21 +1118,9 @@ m_info.m_gearsCount = 4;
 
 void dEngineController::ApplyTorque(dFloat torque, dFloat rpm)
 {
-#ifdef VEHICLE_OLD_ENGINE
-	dMatrix matrix;
-	dEngineJoint* const engineJoint = m_controller->m_engine;
-	NewtonBody* const engine = engineJoint->GetBody0();
-	
-	NewtonBodyGetMatrix(engine, &matrix[0][0]);
-	dVector pin (matrix.RotateVector (engineJoint->GetMatrix0().m_front));
-
-	dVector torqueVector(pin.Scale(torque));
-	NewtonBodyAddTorque(engine, &torqueVector[0]);
-#else
 	dEngineJoint* const engineJoint = m_controller->m_engine;
 	engineJoint->m_targetRpm = dAbs (rpm);
 	engineJoint->m_torque = dAbs (torque);
-#endif
 }
 
 dFloat dEngineController::IntepolateTorque(dFloat rpm) const
@@ -1227,35 +1151,6 @@ void dEngineController::Update(dFloat timestep)
 		UpdateAutomaticGearBox (timestep, omega);
 	}
 
-#ifdef VEHICLE_OLD_ENGINE
-	dEngineJoint* const engineJoint = m_controller->m_engine;
-	if (m_ignitionKey) {
-		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
-			// handle idle gas valve 
-			dFloat gasEngineTorque = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE;
-			if (omega < m_info.m_rpmAtIdleTorque) {
-				engineJoint->m_minFriction = - m_info.m_viscousDrag * omega * omega;
-			} else {
-				gasEngineTorque = 0.0f;
-				engineJoint->m_minFriction = - IntepolateTorque(omega);
-			}
-			ApplyTorque(gasEngineTorque);
-
-		} else {
-			dFloat rpmIdleStep = dMin(omega, m_info.m_rpmAtIdleTorque);
-			dFloat engineTorque = m_info.m_peakTorque * m_param - (IntepolateTorque(omega) - m_info.m_viscousDrag * rpmIdleStep * rpmIdleStep);
-			engineJoint->m_minFriction = -engineTorque;
-			ApplyTorque(m_info.m_peakTorque * m_param);
-		}
-	} else {
-		ApplyTorque(0.0f);
-		engineJoint->m_minFriction = -m_info.m_peakTorque;
-	}
-
-	engineJoint->m_maxFriction = m_info.m_peakTorque;
-	engineJoint->SetRedLineRPM(m_info.m_rpmAtRedLine);
-
-#else
 	if (m_ignitionKey) {
 		dFloat targetOmega = dClamp (m_info.m_rpmAtRedLine * m_param, m_info.m_rpmAtIdleTorque, m_info.m_rpmAtRedLine);
 		//dFloat engineTorque = IntepolateTorque(targetOmega);
@@ -1264,7 +1159,6 @@ void dEngineController::Update(dFloat timestep)
 	} else {
 		ApplyTorque(m_info.m_peakTorque, 0.0f);
 	}
-#endif
 }
 
 void dEngineController::Load(dCustomJointSaveLoad* const fileLoader)
@@ -1380,22 +1274,8 @@ int dEngineController::GetLastGear() const
 
 dFloat dEngineController::GetRadiansPerSecond() const
 {
-#ifdef VEHICLE_OLD_ENGINE
-	dMatrix matrix;
-	dVector omega(0.0f);
-
-	dEngineJoint* const engineJoint = m_controller->m_engine;
-	NewtonBody* const engine = engineJoint->GetBody0();
-	dAssert(engineJoint->GetEngineBody() == engine);
-
-	NewtonBodyGetOmega(engine, &omega[0]);
-	NewtonBodyGetMatrix(engine, &matrix[0][0]);
-	dVector pin (matrix.RotateVector (engineJoint->GetMatrix0().m_front));
-	return omega.DotProduct3(pin);
-#else
 	dEngineJoint* const engineJoint = m_controller->m_engine;
 	return engineJoint->m_rpm;
-#endif
 }
 
 dFloat dEngineController::GetRPM() const
@@ -3106,7 +2986,7 @@ void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
 	}
 }
 
-void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& driveInputs)
+CUSTOM_JOINTS_API void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& driveInputs, dFloat timestep)
 {
 	if (m_steeringControl) {
 		m_steeringControl->SetParam(driveInputs.m_steeringValue);
@@ -3140,12 +3020,42 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 				break;
 			}
 
+			case dEngineController::m_engineStop:
+			{
+				m_engineControl->SetParam(0.0f);
+				m_engineControl->SetClutchParam(1.0f);
+				if (dAbs (m_engineControl->GetSpeed()) < 4.0f) {
+					m_engineControl->m_stopDelay = int (2.0f / timestep);
+					m_engineControl->m_drivingState = dEngineController::m_engineStopDelay;
+				}
+				if (m_brakesControl) {
+					m_engineControl->SetGear(m_engineControl->GetNeutralGear());
+					m_brakesControl->SetParam(1.0f);
+					m_brakesControl->SetParam(1.0f);
+				}
+				break;
+			}
+
+			case dEngineController::m_engineStopDelay:
+			{
+				m_engineControl->m_stopDelay --;
+				if ((m_engineControl->m_stopDelay < 0) || driveInputs.m_ignitionKey) {
+					m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+				}
+				m_engineControl->SetGear(m_engineControl->GetNeutralGear());
+				m_brakesControl->SetParam(1.0f);
+				m_brakesControl->SetParam(1.0f);
+				break;
+			}
+
 			case dEngineController::m_engineIdle:
 			{
 				if (!driveInputs.m_ignitionKey) {
 					m_engineControl->m_drivingState = dEngineController::m_engineOff;
 				} else {
+					m_engineControl->SetGear(driveInputs.m_gear);
 					m_engineControl->SetParam(driveInputs.m_throttle);
+		
 					if (m_engineControl->m_automaticTransmissionMode) {
 						m_engineControl->SetClutchParam(0.0f);
 					} else {
@@ -3155,30 +3065,11 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 						m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
 					}
 
-	/*
-					} else {
-						if (driveInputs.m_throttle > 1.0e-3f) {
-							m_engineControl->m_drivingState = dEngineController::m_preDriveForward;
-						} else if (driveInputs.m_brakePedal > 1.0e-3f) {
-							m_engineControl->m_drivingState = dEngineController::m_preDriveReverse;
-						}
+					if (m_engineControl->GetGear() == m_engineControl->GetReverseGear()) {
+						m_engineControl->m_drivingState = dEngineController::m_driveReverse;
+					} else if (m_engineControl->GetGear() != m_engineControl->GetNeutralGear()) {
+						m_engineControl->m_drivingState = dEngineController::m_driveForward;
 					}
-	*/
-				}
-				break;
-			}
-/*
-			case dEngineController::m_preDriveForward:
-			{
-				if (m_engineControl->GetSpeed() < -5.0f) {
-					if (m_brakesControl) {
-						m_brakesControl->SetParam(0.5f);
-					}
-					m_engineControl->SetClutchParam(0.0f);
-					m_engineControl->SetGear(m_engineControl->GetNeutralGear());
-				} else {
-					m_engineControl->m_drivingState = dEngineController::m_driveForward;
-					m_engineControl->SetGear(m_engineControl->GetFirstGear());
 				}
 				break;
 			}
@@ -3186,92 +3077,40 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 			case dEngineController::m_driveForward:
 			{
 				m_engineControl->SetParam(driveInputs.m_throttle);
-				m_engineControl->SetClutchParam(driveInputs.m_cluthPedal);
+
+				if ((driveInputs.m_brakePedal > 0.1f) && (m_engineControl->GetRPM() < 1.1f * m_engineControl->GetIdleRPM())) {
+					m_engineControl->SetClutchParam(0.0f);
+				} else {
+					m_engineControl->SetClutchParam(driveInputs.m_clutchPedal);
+				}
 				if (m_handBrakesControl) {
 					m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
 				}
-				if (driveInputs.m_brakePedal > 1.0e-3f) {
-					if (m_brakesControl) {
-						m_brakesControl->SetParam(driveInputs.m_brakePedal);
-					}
-					if (m_engineControl->GetSpeed() < 5.0f) {
-						m_engineControl->SetGear(m_engineControl->GetNeutralGear());
-						m_engineControl->m_drivingState = dEngineController::m_engineStop;
-					}
+
+				if (!m_engineControl->GetTransmissionMode()) {
+					dAssert (0);
+					//m_engineControl->SetGear(driveInputs.m_gear);
 				} else {
-					if (m_brakesControl && (m_engineControl->GetSpeed() < 2.0f)) {
-						m_engineControl->SetClutchParam(0.0f);
-					}
-					if (m_brakesControl) {
-						m_brakesControl->SetParam(0.0f);
+					if (m_engineControl->GetSpeed() < 5.0f) {
+						if (driveInputs.m_gear == m_engineControl->GetReverseGear()) {
+							m_engineControl->SetGear(driveInputs.m_gear);
+							if (m_brakesControl) {
+								m_brakesControl->SetParam(1.0f);
+								m_brakesControl->SetParam(1.0f);
+							}
+							m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+						} else if (driveInputs.m_gear == m_engineControl->GetNeutralGear()) {
+							m_engineControl->SetGear(driveInputs.m_gear);
+							m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+						} 
 					}
 				}
-
 				if (!driveInputs.m_ignitionKey) {
 					m_engineControl->m_drivingState = dEngineController::m_engineStop;
 				}
 				break;
 			}
 
-			case dEngineController::m_preDriveReverse:
-			{
-				if (m_engineControl->GetSpeed() > 5.0f) {
-					if (m_brakesControl) {
-						m_brakesControl->SetParam(0.5f);
-					}
-					m_engineControl->SetClutchParam(0.0f);
-					m_engineControl->SetGear(m_engineControl->GetNeutralGear());
-				} else {
-					m_engineControl->m_drivingState = dEngineController::m_driveReverse;
-					m_engineControl->SetGear(m_engineControl->GetReverseGear());
-				}
-				break;
-			}
-
-			case dEngineController::m_driveReverse:
-			{
-				m_engineControl->SetParam(driveInputs.m_brakePedal);
-				m_engineControl->SetClutchParam(driveInputs.m_cluthPedal);
-				if (m_brakesControl) {
-					m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
-				}
-
-				if (driveInputs.m_throttle > 1.0e-3f) {
-					if (m_brakesControl) {
-						m_brakesControl->SetParam(driveInputs.m_throttle);
-					}
-					if (m_engineControl->GetSpeed() < 5.0f) {
-						m_engineControl->SetGear(m_engineControl->GetNeutralGear());
-						m_engineControl->m_drivingState = dEngineController::m_engineStop;
-					}
-				} else {
-					if (m_brakesControl && (m_engineControl->GetSpeed() < 2.0f)) {
-						m_engineControl->SetClutchParam(0.0f);
-					}
-					if (m_brakesControl) {
-						m_brakesControl->SetParam(0.0f);
-					}
-				}
-
-				if (!driveInputs.m_ignitionKey) {
-					m_engineControl->m_drivingState = dEngineController::m_engineStop;
-				}
-				break;
-			}
-
-			case dEngineController::m_engineStop:
-			{
-				m_engineControl->SetClutchParam(0.0f);
-				if ((driveInputs.m_throttle > 1.0e-3f) || (driveInputs.m_brakePedal > 1.0e-3f)) {
-					if (m_brakesControl) {
-						m_brakesControl->SetParam(1.0f);
-					}
-				} else {
-					m_engineControl->m_drivingState = dEngineController::m_engineIdle;
-				}
-				break;
-			}
-*/
 			default:
 				dAssert (0);
 		}

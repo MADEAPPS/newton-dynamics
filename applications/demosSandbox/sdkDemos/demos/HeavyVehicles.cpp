@@ -920,6 +920,9 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void ApplyPlayerControl ()
 	{
+		dAssert(0);
+		/*
+
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -1113,6 +1116,7 @@ class HeavyVehicleEntity: public DemoEntity
 		} else if (brakes) {
  			brakes->SetParam(handBrakePedal);
 		}
+*/
 	}
 
 
@@ -1587,6 +1591,8 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 
 	virtual void PreUpdate(dFloat timestep)
 	{
+		dAssert(0);
+		/*
 		// apply the vehicle controls, and all simulation time effect
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -1628,6 +1634,7 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 
 		// do the base class post update
 		dCustomVehicleControllerManager::PreUpdate(timestep);
+*/
 	}
 
 

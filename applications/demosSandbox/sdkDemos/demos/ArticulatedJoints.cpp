@@ -1457,6 +1457,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 	void OnEndUpdate (dFloat timestepInSecunds)
 	{
+		dAssert(0);
+		/*
 		DemoCamera* const camera = m_scene->GetCamera();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
@@ -1479,6 +1481,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 		}
 
 		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
+*/
 	}
 
 	void AddPlayer(dCustomArticulatedTransformController* const player)

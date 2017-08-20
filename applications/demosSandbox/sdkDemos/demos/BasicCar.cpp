@@ -166,7 +166,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 	}
 
 
-	void ApplyPlayerControl () const 
+	void ApplyPlayerControl (dFloat timestep) const 
 	{
 		NewtonBody* const body = m_player->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -220,7 +220,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 	#endif
 #endif
 
-		m_player->ApplyDefualtDriver(driverInput);
+		m_player->ApplyDefualtDriver(driverInput, timestep);
 	}
 
 	void UpdateDriverInput(dCustomVehicleController* const vehicle, dFloat timestep) const
@@ -230,7 +230,7 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 		if (vehicle == m_player) {
 			// do player control
-			ApplyPlayerControl();
+			ApplyPlayerControl(timestep);
 		} else {
 			// do no player control
 			//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);

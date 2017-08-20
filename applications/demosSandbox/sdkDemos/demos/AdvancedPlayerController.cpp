@@ -301,6 +301,9 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
 	{
+		dAssert(0);
+		/*
+
         if (m_player) {
 		    AdvancePlayerEntity::InputRecord inputs;
 
@@ -344,6 +347,7 @@ class AdvancedPlayerInputManager: public dCustomInputManager
     #endif
 		    m_player->SetInput(inputs);
         }
+*/
 	}
 
 	void OnEndUpdate (dFloat timestepInSecunds)
