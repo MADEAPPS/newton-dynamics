@@ -19,7 +19,7 @@
 
 #include "dCustomJoint.h"
 
-#define SAVE_BEGIN(className) {	dCustomJointSaveLoad* const __saver__ = className;
+#define SAVE_BEGIN(className) {	dCustomJointSaveLoad* const __saver__ = className; __saver__;
 #define SAVE_INT(name) __saver__->SaveInt ("\t" #name, m_##name);
 #define SAVE_FLOAT(name) __saver__->SaveFloat ("\t" #name, m_##name);
 #define SAVE_VECTOR(name) __saver__->SaveVector ("\t" #name, m_##name);
@@ -27,7 +27,7 @@
 #define SAVE_END() }
 
 
-#define LOAD_BEGIN(className) {	dCustomJointSaveLoad* const __loader__ = className; const char* __token__ = NULL;
+#define LOAD_BEGIN(className) {	dCustomJointSaveLoad* const __loader__ = className; const char* __token__ = NULL; __loader__; __token__;
 #define LOAD_INT(name) { __token__ = __loader__->NextToken(); dAssert(!strcmp(__token__, #name ":")); m_##name = __loader__->LoadInt(); }
 #define LOAD_FLOAT(name) { __token__ = __loader__->NextToken(); dAssert(!strcmp(__token__, #name ":")); m_##name = __loader__->LoadFloat(); }
 #define LOAD_VECTOR(name) { __token__ = __loader__->NextToken(); dAssert(!strcmp(__token__, #name ":")); m_##name = __loader__->LoadVector(); }

@@ -1248,7 +1248,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			int ignitionButton = buttons[m_ignitionButton];
 			int handBreakButton = buttons[m_handBrakeButton];
 			
-
 			driverInput.m_clutchPedal = dAbs (joyPosZ * joyPosZ * joyPosZ);
 			driverInput.m_steeringValue = joyPosX * joyPosX * joyPosX;
 			driverInput.m_throttle = joyPosY > 0.0f ? dAbs(joyPosY * joyPosY * joyPosY) : 0.0f;
@@ -1257,6 +1256,10 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene, ignitionButton);
 			driverInput.m_handBrakeValue = handBreakButton ? 1.0f : 0.0f;
 
+			for (int i = 0; i < joyButtons; i ++) {
+				dTrace(("%d ", buttons[i]));
+			}
+			dTrace(("\n"));
 			//dTrace (("%f %f %f %f\n", driverInput.m_steeringValue, driverInput.m_throttle, driverInput.m_brakePedal, driverInput.m_clutchPedal));
 			//dTrace (("%d %d\n", ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 

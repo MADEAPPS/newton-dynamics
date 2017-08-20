@@ -23,6 +23,7 @@
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 //#define VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
+//#define VEHICLE_OLD_ENGINE
 
 class dAxelJoint;
 class dWheelJoint;
@@ -168,7 +169,9 @@ class dEngineInfo
 	void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dEngineTorqueNode m_torqueCurve[6];
-	dFloat m_viscousDrag;
+#ifdef VEHICLE_OLD_ENGINE
+	dFloat m_viscousDrag___;
+#endif
 	dFloat m_crownGearRatio;
 	dFloat m_peakPowerTorque;
 	friend class dEngineController;
@@ -276,16 +279,23 @@ class dEngineJoint: public dCustomJoint
 	}
 
 	protected:
+#ifdef VEHICLE_OLD_ENGINE
 	CUSTOM_JOINTS_API void SetRedLineRPM(dFloat redLineRmp);
+#endif
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dEngineMountJoint* m_engineMount;
+#ifdef VEHICLE_OLD_ENGINE
 	dFloat m_maxRPM;
 	dFloat m_minFriction;
 	dFloat m_maxFriction;
-	
+#else
+	dFloat m_torque;
+	dFloat m_rpm;
+	dFloat m_targetRpm;
+#endif
 
 	friend class dEngineController;
 	friend class dCustomVehicleController;
@@ -493,7 +503,7 @@ class dEngineController: public dVehicleController
 	CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dEngineInfo& info, dDifferentialJoint* const differential, dWheelJoint* const crownGearCalculator);
 	CUSTOM_JOINTS_API ~dEngineController();
 
-	CUSTOM_JOINTS_API void ApplyTorque(dFloat torque);
+	CUSTOM_JOINTS_API void ApplyTorque(dFloat torque, dFloat rpm);
 
 	CUSTOM_JOINTS_API dEngineInfo GetInfo() const;
 	CUSTOM_JOINTS_API void SetInfo(const dEngineInfo& info);

@@ -39,7 +39,7 @@ IMPLEMENT_CUSTOM_JOINT(dDifferentialMountJoint);
 #define D_VEHICLE_MAX_DRIVETRAIN_DOF				32
 #define D_VEHICLE_REGULARIZER						dFloat(1.0001f)
 #define D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS		dFloat(10.0f)
-#define D_VEHICLE_ENGINE_IDLE_GAS_VALVE				dFloat(0.1f)
+//#define D_VEHICLE_ENGINE_IDLE_GAS_VALVE				dFloat(0.1f)
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
 
@@ -80,8 +80,13 @@ void dEngineInfo::SetTorqueRPMTable()
 	m_torqueCurve[1] = dEngineTorqueNode (m_rpmAtIdleTorque, m_idleTorque);
 	m_torqueCurve[2] = dEngineTorqueNode (m_rpmAtPeakTorque, m_peakTorque);
 	m_torqueCurve[3] = dEngineTorqueNode (m_rpmAtPeakHorsePower, m_peakPowerTorque);
+#ifdef VEHICLE_OLD_ENGINE
 	m_torqueCurve[4] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
 	m_torqueCurve[5] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE);
+#else
+	m_torqueCurve[4] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque);
+	m_torqueCurve[5] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque);
+#endif
 }
 
 void dEngineInfo::Load(dCustomJointSaveLoad* const fileLoader)
@@ -105,7 +110,9 @@ void dEngineInfo::Load(dCustomJointSaveLoad* const fileLoader)
 	LOAD_FLOAT (aerodynamicDownforceFactor);
 	LOAD_FLOAT (aerodynamicDownforceFactorAtTopSpeed);
 	LOAD_FLOAT (aerodynamicDownForceSurfaceCoeficident);
+#ifdef VEHICLE_OLD_ENGINE
 	LOAD_FLOAT (viscousDrag);
+#endif
 	LOAD_FLOAT (crownGearRatio);
 	LOAD_FLOAT (peakPowerTorque);
 	LOAD_INT  (differentialLock);
@@ -141,7 +148,9 @@ void dEngineInfo::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_FLOAT (aerodynamicDownforceFactor);
 	SAVE_FLOAT (aerodynamicDownforceFactorAtTopSpeed);
 	SAVE_FLOAT (aerodynamicDownForceSurfaceCoeficident);
+#ifdef VEHICLE_OLD_ENGINE
 	SAVE_FLOAT (viscousDrag);
+#endif
 	SAVE_FLOAT (crownGearRatio);
 	SAVE_FLOAT (peakPowerTorque);
 	SAVE_INT  (differentialLock);
@@ -157,22 +166,30 @@ void dEngineInfo::Save(dCustomJointSaveLoad* const fileSaver) const
 dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 	:dCustomJoint(1, engineBody, NULL)
 	,m_engineMount (new dEngineMountJoint (pinAndPivotFrame, engineBody, chassisBody))
+#ifdef VEHICLE_OLD_ENGINE
 	,m_maxRPM(50.0f)
 	,m_minFriction(-10.0f)
 	,m_maxFriction( 10.0f)
+#else
+	,m_torque (0.0f)
+	,m_rpm (0.0f)
+	,m_targetRpm (0.0f)
+#endif
 {
 	SetSolverModel(1);
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
+#ifdef VEHICLE_OLD_ENGINE
 void dEngineJoint::SetRedLineRPM(dFloat redLineRmp)
 {
 	m_maxRPM = dAbs(redLineRmp);
 }
-
+#endif
 
 void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+#ifdef VEHICLE_OLD_ENGINE
 	dMatrix engineMatrix;
 	dVector omega;
 
@@ -198,15 +215,39 @@ void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxFriction);
 	}
 	NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+#else
+
+	dMatrix engineMatrix;
+	dVector omega;
+
+	NewtonBody* const engineBody = GetEngineBody();
+
+	NewtonBodyGetOmega(engineBody, &omega[0]);
+	NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
+
+	dVector pin (engineMatrix.RotateVector(GetMatrix0().m_front));
+	m_rpm = omega.DotProduct3(pin);
+
+	dFloat alpha = 0.33f * (m_targetRpm - m_rpm) / timestep;
+	NewtonUserJointAddAngularRow(m_joint, 0, &pin[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	NewtonUserJointSetRowMinimumFriction(m_joint, (m_rpm > 0.1f) ? -m_torque : -m_torque * 100.0f);
+	NewtonUserJointSetRowMaximumFriction(m_joint,  m_torque);
+	NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+#endif
 }
 
 
 void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
 {
 	LOAD_BEGIN(fileLoader);
+#ifdef VEHICLE_OLD_ENGINE
 	LOAD_FLOAT(maxRPM);
 	LOAD_FLOAT(minFriction);
 	LOAD_FLOAT(maxFriction);
+#else
+	dAssert (0);
+#endif
 	LOAD_END();
 
 	m_engineMount = NULL;
@@ -217,9 +258,13 @@ void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	dCustomJoint::Save (fileSaver);
 
 	SAVE_BEGIN(fileSaver);
+#ifdef VEHICLE_OLD_ENGINE
 	SAVE_FLOAT(maxRPM);
 	SAVE_FLOAT(minFriction);
 	SAVE_FLOAT(maxFriction);
+#else
+dAssert (0);
+#endif
 	SAVE_END();
 }
 
@@ -1066,8 +1111,10 @@ void dEngineController::InitEngineTorqueCurve()
 	m_info.m_rpmAtPeakHorsePower /= m_info.m_crownGearRatio;
 	m_info.m_rpmAtRedLine /= m_info.m_crownGearRatio;
 
+#ifdef VEHICLE_OLD_ENGINE
 	dFloat rpmStep = m_info.m_rpmAtIdleTorque;
 	m_info.m_viscousDrag = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_GAS_VALVE / (rpmStep * rpmStep);
+#endif
 
 	m_info.SetTorqueRPMTable();
 }
@@ -1133,8 +1180,9 @@ m_info.m_gearsCount = 4;
 	}
 }
 
-void dEngineController::ApplyTorque(dFloat torqueMag)
+void dEngineController::ApplyTorque(dFloat torque, dFloat rpm)
 {
+#ifdef VEHICLE_OLD_ENGINE
 	dMatrix matrix;
 	dEngineJoint* const engineJoint = m_controller->m_engine;
 	NewtonBody* const engine = engineJoint->GetBody0();
@@ -1142,8 +1190,13 @@ void dEngineController::ApplyTorque(dFloat torqueMag)
 	NewtonBodyGetMatrix(engine, &matrix[0][0]);
 	dVector pin (matrix.RotateVector (engineJoint->GetMatrix0().m_front));
 
-	dVector torque(pin.Scale(torqueMag));
-	NewtonBodyAddTorque(engine, &torque[0]);
+	dVector torqueVector(pin.Scale(torque));
+	NewtonBodyAddTorque(engine, &torqueVector[0]);
+#else
+	dEngineJoint* const engineJoint = m_controller->m_engine;
+	engineJoint->m_targetRpm = dAbs (rpm);
+	engineJoint->m_torque = dAbs (torque);
+#endif
 }
 
 dFloat dEngineController::IntepolateTorque(dFloat rpm) const
@@ -1174,6 +1227,7 @@ void dEngineController::Update(dFloat timestep)
 		UpdateAutomaticGearBox (timestep, omega);
 	}
 
+#ifdef VEHICLE_OLD_ENGINE
 	dEngineJoint* const engineJoint = m_controller->m_engine;
 	if (m_ignitionKey) {
 		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
@@ -1200,6 +1254,17 @@ void dEngineController::Update(dFloat timestep)
 
 	engineJoint->m_maxFriction = m_info.m_peakTorque;
 	engineJoint->SetRedLineRPM(m_info.m_rpmAtRedLine);
+
+#else
+	if (m_ignitionKey) {
+		dFloat targetOmega = dClamp (m_info.m_rpmAtRedLine * m_param, m_info.m_rpmAtIdleTorque, m_info.m_rpmAtRedLine);
+		//dFloat engineTorque = IntepolateTorque(targetOmega);
+		dFloat engineTorque = IntepolateTorque(omega);
+		ApplyTorque(engineTorque, targetOmega);
+	} else {
+		ApplyTorque(m_info.m_peakTorque, 0.0f);
+	}
+#endif
 }
 
 void dEngineController::Load(dCustomJointSaveLoad* const fileLoader)
@@ -1315,6 +1380,7 @@ int dEngineController::GetLastGear() const
 
 dFloat dEngineController::GetRadiansPerSecond() const
 {
+#ifdef VEHICLE_OLD_ENGINE
 	dMatrix matrix;
 	dVector omega(0.0f);
 
@@ -1326,6 +1392,10 @@ dFloat dEngineController::GetRadiansPerSecond() const
 	NewtonBodyGetMatrix(engine, &matrix[0][0]);
 	dVector pin (matrix.RotateVector (engineJoint->GetMatrix0().m_front));
 	return omega.DotProduct3(pin);
+#else
+	dEngineJoint* const engineJoint = m_controller->m_engine;
+	return engineJoint->m_rpm;
+#endif
 }
 
 dFloat dEngineController::GetRPM() const
@@ -3075,6 +3145,7 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 				if (!driveInputs.m_ignitionKey) {
 					m_engineControl->m_drivingState = dEngineController::m_engineOff;
 				} else {
+					m_engineControl->SetParam(driveInputs.m_throttle);
 					if (m_engineControl->m_automaticTransmissionMode) {
 						m_engineControl->SetClutchParam(0.0f);
 					} else {
