@@ -132,7 +132,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void RenderUI();
 	void RenderScene();
 	
-	void SetAutoSleepMode();
+	void ApplyOptions();
 	void UpdatePhysics(dFloat timestep);
 	dFloat CalculateInteplationParam () const;
 
@@ -171,13 +171,15 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat m_mainThreadPhysicsTime;
 	dFloat m_mainThreadPhysicsTimeAcc;
 
+	int m_broadPhaseType;
 	int m_debugDisplayMode;
+	
 	bool m_showStats;
 	bool m_autoSleepMode;
-	bool m_autoSleepModeMemory;
 	bool m_synchronousPhysicsUpdateMode;
 	bool m_hideVisualMeshes;
 	bool m_hasJoytick;
+	bool m_menuUpdate;
 
 
 	static SDKDemos m_demosSelection[];

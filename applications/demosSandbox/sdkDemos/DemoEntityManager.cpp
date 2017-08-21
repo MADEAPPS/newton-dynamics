@@ -212,19 +212,18 @@ DemoEntityManager::DemoEntityManager ()
 	,m_currentListenerTimestep(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_mainThreadPhysicsTimeAcc(0.0f)
+	,m_broadPhaseType(0)
 	,m_debugDisplayMode(0)
 	,m_showStats(true)
 	,m_autoSleepMode(true)
-	,m_autoSleepModeMemory(!m_autoSleepMode)
 	,m_synchronousPhysicsUpdateMode(true)
 	,m_hideVisualMeshes(false)
+	,m_hasJoytick(false)
+	,m_menuUpdate(true)
+
 {
-	m_autoSleepMode = true;
-
-
-	m_autoSleepModeMemory = !m_autoSleepMode;
-
-
+//	m_autoSleepMode = true;
+//	m_broadPhaseType = 0;
 m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -606,16 +605,15 @@ void DemoEntityManager::ShowMainMenuBar()
 		}
 
 		if (ImGui::BeginMenu("Options")) {
-			
+			m_menuUpdate = true;
+
 			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
 			ImGui::Checkbox("Show stats", &m_showStats);
 			ImGui::Separator();
 
-			int xxx = 0;
-			ImGui::RadioButton("default broad phase", &xxx, 0);
-			ImGui::RadioButton("persistence broad phase", &xxx, 1);
+			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
+			ImGui::RadioButton("persistence broad phase", &m_broadPhaseType, 1);
 			ImGui::Separator();
-			
 
 			ImGui::EndMenu();
 		}
@@ -1054,14 +1052,21 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 }
 
 
-void DemoEntityManager::SetAutoSleepMode()
+void DemoEntityManager::ApplyOptions()
 {
-	if (m_autoSleepMode != m_autoSleepModeMemory) {
-		m_autoSleepModeMemory = m_autoSleepMode;
+	if (m_menuUpdate) {
+		m_menuUpdate = false;
+
+		NewtonWaitForUpdateToFinish (m_world);
+		//NewtonSetSolverModel (m_scene->GetNewton(), m_solverModes[m_solverModeIndex]);
+		//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
+		
 		int state = m_autoSleepMode ? 1 : 0;
 		for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
 			NewtonBodySetAutoSleep(body, state);
 		}
+
+		NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
 	}
 }
 
@@ -1091,7 +1096,7 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 			ClearDebugDisplay(m_world);
 
 			// apply engine options
-			SetAutoSleepMode ();
+			ApplyOptions ();
 
 			if (m_synchronousPhysicsUpdateMode) {
 				NewtonUpdate (m_world, timestepInSecunds);
