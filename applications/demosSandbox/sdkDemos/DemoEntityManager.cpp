@@ -213,17 +213,18 @@ DemoEntityManager::DemoEntityManager ()
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_broadPhaseType(0)
+	,m_solverPasses(1)
 	,m_debugDisplayMode(0)
 	,m_showStats(true)
 	,m_autoSleepMode(true)
 	,m_synchronousPhysicsUpdateMode(true)
 	,m_hideVisualMeshes(false)
 	,m_hasJoytick(false)
-	,m_menuUpdate(true)
-
+	,m_updateMenuOptions(true)
 {
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 0;
+//	m_solverPasses = 1;
 m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -604,8 +605,9 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Options")) {
-			m_menuUpdate = true;
+		bool optionsOn = ImGui::BeginMenu("Options");
+		if (optionsOn) {
+			m_updateMenuOptions = true;
 
 			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
 			ImGui::Checkbox("Show stats", &m_showStats);
@@ -613,6 +615,12 @@ void DemoEntityManager::ShowMainMenuBar()
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
 			ImGui::RadioButton("persistence broad phase", &m_broadPhaseType, 1);
+			ImGui::Separator();
+
+			ImGui::RadioButton("Iterative solver one passes", &m_solverPasses, 1);
+			ImGui::RadioButton("Iterative solver tow passes", &m_solverPasses, 2);
+			ImGui::RadioButton("Iterative solver four passes", &m_solverPasses, 4);
+			ImGui::RadioButton("Iterative solver eight passes", &m_solverPasses, 8);
 			ImGui::Separator();
 
 			ImGui::EndMenu();
@@ -623,6 +631,20 @@ void DemoEntityManager::ShowMainMenuBar()
 		}
 
 		ImGui::EndMainMenuBar();
+
+		if (!optionsOn && m_updateMenuOptions) {
+			m_updateMenuOptions = false;
+
+			NewtonWaitForUpdateToFinish (m_world);
+			NewtonSetSolverModel (m_world, m_solverPasses);
+
+			int state = m_autoSleepMode ? 1 : 0;
+			for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
+				NewtonBodySetAutoSleep(body, state);
+			}
+			NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
+			//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
+		}
 	}
 
 	if (m_currentScene != -1) {
@@ -1052,25 +1074,6 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 }
 
 
-void DemoEntityManager::ApplyOptions()
-{
-	if (m_menuUpdate) {
-		m_menuUpdate = false;
-
-		NewtonWaitForUpdateToFinish (m_world);
-		//NewtonSetSolverModel (m_scene->GetNewton(), m_solverModes[m_solverModeIndex]);
-		//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
-		
-		int state = m_autoSleepMode ? 1 : 0;
-		for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
-			NewtonBodySetAutoSleep(body, state);
-		}
-
-		NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
-	}
-}
-
-
 void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
@@ -1094,9 +1097,6 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 			dTimeTrackerEvent(__FUNCTION__);
 			newUpdate = true;
 			ClearDebugDisplay(m_world);
-
-			// apply engine options
-			ApplyOptions ();
 
 			if (m_synchronousPhysicsUpdateMode) {
 				NewtonUpdate (m_world, timestepInSecunds);
