@@ -67,9 +67,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	{
 		public:
 		ButtonKey (bool initialState);
-
-		//bool UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode);
-		//bool UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask);
 		int UpdateTrigger (bool triggerValue);
 		int UpdatePushButton (bool triggerValue);
 		int GetPushButtonState() const { return m_state ? 1 : 0;}
@@ -135,6 +132,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void RenderUI();
 	void RenderScene();
 	
+	void SetAutoSleepMode();
 	void UpdatePhysics(dFloat timestep);
 	dFloat CalculateInteplationParam () const;
 
@@ -175,6 +173,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	int m_debugDisplayMode;
 	bool m_showStats;
+	bool m_autoSleepMode;
+	bool m_autoSleepModeMemory;
 	bool m_synchronousPhysicsUpdateMode;
 	bool m_hideVisualMeshes;
 	bool m_hasJoytick;

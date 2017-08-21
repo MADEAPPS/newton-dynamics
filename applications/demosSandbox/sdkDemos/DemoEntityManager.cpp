@@ -214,9 +214,17 @@ DemoEntityManager::DemoEntityManager ()
 	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_debugDisplayMode(0)
 	,m_showStats(true)
+	,m_autoSleepMode(true)
+	,m_autoSleepModeMemory(!m_autoSleepMode)
 	,m_synchronousPhysicsUpdateMode(true)
 	,m_hideVisualMeshes(false)
 {
+	m_autoSleepMode = true;
+
+
+	m_autoSleepModeMemory = !m_autoSleepMode;
+
+
 m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -599,9 +607,15 @@ void DemoEntityManager::ShowMainMenuBar()
 
 		if (ImGui::BeginMenu("Options")) {
 			
-			if (ImGui::Checkbox("Show stats", &m_showStats)) {
-//				m_showStats = ! m_showStats;
-			}
+			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
+			ImGui::Checkbox("Show stats", &m_showStats);
+			ImGui::Separator();
+
+			int xxx = 0;
+			ImGui::RadioButton("default broad phase", &xxx, 0);
+			ImGui::RadioButton("persistence broad phase", &xxx, 1);
+			ImGui::Separator();
+			
 
 			ImGui::EndMenu();
 		}
@@ -1040,6 +1054,18 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 }
 
 
+void DemoEntityManager::SetAutoSleepMode()
+{
+	if (m_autoSleepMode != m_autoSleepModeMemory) {
+		m_autoSleepModeMemory = m_autoSleepMode;
+		int state = m_autoSleepMode ? 1 : 0;
+		for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
+			NewtonBodySetAutoSleep(body, state);
+		}
+	}
+}
+
+
 void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
@@ -1063,6 +1089,9 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 			dTimeTrackerEvent(__FUNCTION__);
 			newUpdate = true;
 			ClearDebugDisplay(m_world);
+
+			// apply engine options
+			SetAutoSleepMode ();
 
 			if (m_synchronousPhysicsUpdateMode) {
 				NewtonUpdate (m_world, timestepInSecunds);

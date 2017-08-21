@@ -1270,8 +1270,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
 		}
 
-
-#if 0
+//xxxxxx
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
