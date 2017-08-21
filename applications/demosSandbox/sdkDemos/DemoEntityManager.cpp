@@ -215,6 +215,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_broadPhaseType(0)
 	,m_solverPasses(1)
 	,m_debugDisplayMode(0)
+	,m_collisionDisplayMode(0)
 	,m_showStats(true)
 	,m_autoSleepMode(true)
 	,m_synchronousPhysicsUpdateMode(true)
@@ -622,6 +623,22 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("Iterative solver four passes", &m_solverPasses, 4);
 			ImGui::RadioButton("Iterative solver eight passes", &m_solverPasses, 8);
 			ImGui::Separator();
+
+			ImGui::RadioButton("Hide collision Mesh", &m_collisionDisplayMode, 0);
+			ImGui::RadioButton("Show solid collision Mesh", &m_collisionDisplayMode, 1);
+			ImGui::RadioButton("Show wire frame collision Mesh", &m_collisionDisplayMode, 2);
+			ImGui::Separator();
+
+			bool xxx;
+			ImGui::Checkbox("Hide visual meshes", &xxx);
+			ImGui::Checkbox("Show contact points", &xxx);
+			ImGui::Checkbox("Show normal forces", &xxx);
+			ImGui::Checkbox("Show aabb", &xxx);
+			ImGui::Checkbox("Show center of mass", &xxx);
+			ImGui::Checkbox("show Joint debug info", &xxx);
+			ImGui::Separator();
+			
+
 
 			ImGui::EndMenu();
 		}
@@ -1326,6 +1343,13 @@ void DemoEntityManager::RenderScene()
 			glPopMatrix();
 		}
 	}
+
+	DEBUG_DRAW_MODE mode = m_solid;
+	if (m_collisionDisplayMode) {
+		mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
+		DebugRenderWorldCollision (GetNewton(), mode);
+	}
+
 
 	if (m_tranparentHeap.GetCount()) {
 		//dMatrix modelView;

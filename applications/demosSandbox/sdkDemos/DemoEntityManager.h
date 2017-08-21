@@ -173,6 +173,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	int m_solverPasses;
 	int m_broadPhaseType;
 	int m_debugDisplayMode;
+	int m_collisionDisplayMode;
 	
 	bool m_showStats;
 	bool m_autoSleepMode;
