@@ -137,7 +137,7 @@ static CarDefinition viper =
 	0.6f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
 	100.0f,										// IDLE_TORQUE
-	800.0f,										// IDLE_TORQUE_RPM
+	450.0f,										// IDLE_TORQUE_RPM
 	500.0f,										// PEAK_TORQUE
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
@@ -1217,22 +1217,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		dEngineController* const engine = vehicle->GetEngine();
 
-		// get the throttler input
-/*
-		int gear = engine ? engine->GetGear() : 0;
-		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
-		if (hasJopytick) {
-			// apply a cubic attenuation to the joystick inputs
-//			joyPosX = joyPosX * joyPosX * joyPosX;
-//			joyPosY = joyPosY * joyPosY * joyPosY;
-//			steeringVal = joyPosX;
-//			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
-//			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
-//			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
-//			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
-			}
-*/
-
 		int gear = engine ? engine->GetGear() : 0;
 
 		dVehicleDriverInput driverInput;
@@ -1249,7 +1233,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 			joyPosX = axis[m_steeringAxis];
 			joyPosY = -axis[m_throttleAxis];
-			joyPosZ = axis[m_clutchAxis];
+			joyPosZ = dMax (axis[m_clutchAxis], 0.0f);
 			bool ignitionButton = buttons[m_ignitionButton] ? true : false;
 			bool handBreakButton = buttons[m_handBrakeButton] ? true : false;
 			bool gearUpButton = buttons[m_gearUpButton] ? true : false;
@@ -1257,7 +1241,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 			gear += (int (m_gearUpKey.UpdateTrigger(gearUpButton)) - int (m_gearDownKey.UpdateTrigger(gearDonwButton))); 
 			
-			driverInput.m_clutchPedal = dAbs (joyPosZ * joyPosZ * joyPosZ);
+			driverInput.m_clutchPedal = joyPosZ * joyPosZ * joyPosZ;
 			driverInput.m_steeringValue = joyPosX * joyPosX * joyPosX;
 			driverInput.m_throttle = joyPosY > 0.0f ? dAbs(joyPosY * joyPosY * joyPosY) : 0.0f;
 			driverInput.m_brakePedal = joyPosY < 0.0f ? dAbs (joyPosY * joyPosY * joyPosY) : 0.0f;
@@ -1287,7 +1271,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		}
 
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
