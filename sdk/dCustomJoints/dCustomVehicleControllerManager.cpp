@@ -178,7 +178,7 @@ void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 static int xxx;
 xxx ++;
-dTrace (("%d %f %f %f\n", xxx, m_targetRpm, m_rpm, alpha));
+//dTrace (("%d %f %f %f\n", xxx, m_targetRpm, m_rpm, alpha));
 if(xxx >= 5455)
 xxx *=1;
 
@@ -3101,6 +3101,45 @@ CUSTOM_JOINTS_API void dCustomVehicleController::ApplyDefualtDriver(const dVehic
 							m_engineControl->m_drivingState = dEngineController::m_engineIdle;
 						} else if (driveInputs.m_gear == m_engineControl->GetNeutralGear()) {
 							m_engineControl->SetGear(driveInputs.m_gear);
+							m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+						} 
+					}
+				}
+				if (!driveInputs.m_ignitionKey) {
+					m_engineControl->m_drivingState = dEngineController::m_engineStop;
+				}
+				break;
+			}
+
+			case dEngineController::m_driveReverse:
+			{
+				m_engineControl->SetParam(driveInputs.m_throttle);
+
+				if ((driveInputs.m_brakePedal > 0.1f) && (m_engineControl->GetRPM() < 1.1f * m_engineControl->GetIdleRPM())) {
+					m_engineControl->SetClutchParam(0.0f);
+				}
+				else {
+					m_engineControl->SetClutchParam(driveInputs.m_clutchPedal);
+				}
+				if (m_handBrakesControl) {
+					m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+				}
+
+				if (!m_engineControl->GetTransmissionMode()) {
+					dAssert(0);
+					//m_engineControl->SetGear(driveInputs.m_gear);
+				}
+				else {
+					if (m_engineControl->GetSpeed() < 5.0f) {
+						if (driveInputs.m_gear == m_engineControl->GetNeutralGear()) {
+							m_engineControl->SetGear(driveInputs.m_gear);
+							m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+						} else if (driveInputs.m_gear != m_engineControl->GetReverseGear()) {
+							m_engineControl->SetGear(driveInputs.m_gear);
+							if (m_brakesControl) {
+								m_brakesControl->SetParam(1.0f);
+								m_brakesControl->SetParam(1.0f);
+							}
 							m_engineControl->m_drivingState = dEngineController::m_engineIdle;
 						} 
 					}
