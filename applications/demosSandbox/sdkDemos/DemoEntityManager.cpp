@@ -610,8 +610,11 @@ void DemoEntityManager::ShowMainMenuBar()
 		if (optionsOn) {
 			m_updateMenuOptions = true;
 
+			bool xxx = false;
+
 			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
 			ImGui::Checkbox("Show stats", &m_showStats);
+			ImGui::Checkbox("concurrent physics update", &xxx);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
@@ -629,7 +632,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("Show wire frame collision Mesh", &m_collisionDisplayMode, 2);
 			ImGui::Separator();
 
-			bool xxx;
+			
 			ImGui::Checkbox("Hide visual meshes", &xxx);
 			ImGui::Checkbox("Show contact points", &xxx);
 			ImGui::Checkbox("Show normal forces", &xxx);
@@ -638,7 +641,15 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show Joint debug info", &xxx);
 			ImGui::Separator();
 			
-
+			int xxx1 = 1;
+			ImGui::Text ("select worker threads");
+			ImGui::RadioButton("one", &xxx1, 1);
+			ImGui::RadioButton("two", &xxx1, 2);
+			ImGui::RadioButton("three", &xxx1, 3);
+			ImGui::RadioButton("four", &xxx1, 4);
+			ImGui::RadioButton("eight", &xxx1, 8);
+			ImGui::RadioButton("sixteen", &xxx1, 16);
+			
 
 			ImGui::EndMenu();
 		}
