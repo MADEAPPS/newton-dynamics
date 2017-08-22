@@ -213,6 +213,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_broadPhaseType(0)
+	,m_workerThreades(1)
 	,m_solverPasses(1)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
@@ -222,10 +223,16 @@ DemoEntityManager::DemoEntityManager ()
 	,m_hideVisualMeshes(false)
 	,m_hasJoytick(false)
 	,m_updateMenuOptions(true)
+	,m_showAABB(false)
+	,m_showContactPoints(false)
 {
+//	m_showAABB = false;
+//	m_showContactPoints = false;
+//	m_hideVisualMeshes = false;
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 0;
 //	m_solverPasses = 1;
+//	m_workerThreades = 1;
 m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -632,24 +639,21 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("Show wire frame collision Mesh", &m_collisionDisplayMode, 2);
 			ImGui::Separator();
 
-			
-			ImGui::Checkbox("Hide visual meshes", &xxx);
-			ImGui::Checkbox("Show contact points", &xxx);
+			ImGui::Checkbox("Show aabb", &m_showAABB);
+			ImGui::Checkbox("Hide visual meshes", &m_hideVisualMeshes);
+			ImGui::Checkbox("Show contact points", &m_showContactPoints);
 			ImGui::Checkbox("Show normal forces", &xxx);
-			ImGui::Checkbox("Show aabb", &xxx);
 			ImGui::Checkbox("Show center of mass", &xxx);
 			ImGui::Checkbox("show Joint debug info", &xxx);
 			ImGui::Separator();
 			
-			int xxx1 = 1;
 			ImGui::Text ("select worker threads");
-			ImGui::RadioButton("one", &xxx1, 1);
-			ImGui::RadioButton("two", &xxx1, 2);
-			ImGui::RadioButton("three", &xxx1, 3);
-			ImGui::RadioButton("four", &xxx1, 4);
-			ImGui::RadioButton("eight", &xxx1, 8);
-			ImGui::RadioButton("sixteen", &xxx1, 16);
-			
+			ImGui::RadioButton("one", &m_workerThreades, 1);
+			ImGui::RadioButton("two", &m_workerThreades, 2);
+			ImGui::RadioButton("three", &m_workerThreades, 3);
+			ImGui::RadioButton("four", &m_workerThreades, 4);
+			ImGui::RadioButton("eight", &m_workerThreades, 8);
+			ImGui::RadioButton("sixteen", &m_workerThreades, 16);
 
 			ImGui::EndMenu();
 		}
@@ -665,6 +669,7 @@ void DemoEntityManager::ShowMainMenuBar()
 
 			NewtonWaitForUpdateToFinish (m_world);
 			NewtonSetSolverModel (m_world, m_solverPasses);
+			NewtonSetThreadsCount(m_world, m_workerThreades);
 
 			int state = m_autoSleepMode ? 1 : 0;
 			for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
@@ -1359,6 +1364,14 @@ void DemoEntityManager::RenderScene()
 	if (m_collisionDisplayMode) {
 		mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
 		DebugRenderWorldCollision (GetNewton(), mode);
+	}
+
+	if (m_showAABB) {
+		RenderAABB (GetNewton());
+	}
+
+	if (m_showContactPoints) {
+		RenderContactPoints (GetNewton());
 	}
 
 

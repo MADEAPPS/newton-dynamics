@@ -172,7 +172,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	int m_solverPasses;
 	int m_broadPhaseType;
+	int m_workerThreades;
 	int m_debugDisplayMode;
+	
 	int m_collisionDisplayMode;
 	
 	bool m_showStats;
@@ -181,6 +183,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_hideVisualMeshes;
 	bool m_hasJoytick;
 	bool m_updateMenuOptions;
+	bool m_showAABB;
+	bool m_showContactPoints;
 
 
 	static SDKDemos m_demosSelection[];
