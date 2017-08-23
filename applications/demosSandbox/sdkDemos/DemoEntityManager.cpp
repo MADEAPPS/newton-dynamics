@@ -171,18 +171,6 @@ int DemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
 	return (!m_memory0 & m_memory1) ? 1 : 0;
 }
 
-/*
-bool DemoEntityManager::ButtonKey::UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode)
-{
-	return UpdateTrigger (mainWin, mainWin->GetKeyState (keyCode) ? true: false);
-}
-
-bool DemoEntityManager::ButtonKey::UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask)
-{
-	return UpdateTrigger (mainWin, buttonMask ? true: false);
-}
-*/
-
 int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 {
 	if (UpdateTrigger (triggerValue)) {
@@ -214,7 +202,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_broadPhaseType(0)
 	,m_workerThreades(1)
-	,m_solverPasses(1)
+	,m_solverPasses(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
 	,m_showStats(true)
@@ -230,8 +218,8 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showContactPoints = false;
 //	m_hideVisualMeshes = false;
 //	m_autoSleepMode = true;
-//	m_broadPhaseType = 0;
-//	m_solverPasses = 1;
+//	m_broadPhaseType = 1;
+//	m_solverPasses = 4;
 //	m_workerThreades = 1;
 m_synchronousPhysicsUpdateMode = false;
 	// Setup window
@@ -495,20 +483,7 @@ void DemoEntityManager::Cleanup ()
 	m_cameraManager = new DemoCameraListener(this);
 	//	m_postListenerManager.Append (new DemoAIListener("aiManager"));
 
-	// set the default parameters for the newton world
-	// set the simplified solver mode (faster but less accurate)
-	NewtonSetSolverModel (m_world, 4);
-
-	// newton 300 does not have world size, this is better controlled by the client application
-	//dVector minSize (-500.0f, -500.0f, -500.0f);
-	//dVector maxSize ( 500.0f,  500.0f,  500.0f);
-	//NewtonSetWorldSize (m_world, &minSize[0], &maxSize[0]); 
-
-	// set the performance track function
-	//NewtonSetPerformanceClock (m_world, dRuntimeProfiler::GetTimeInMicrosenconds);
-
-	// clean up all caches the engine have saved
-	NewtonInvalidateCache (m_world);
+	ApplyMenuOptions();
 
 	// Set the Newton world user data
 	NewtonWorldSetUserData(m_world, this);
@@ -563,6 +538,24 @@ void DemoEntityManager::LoadFont()
 
 	// Restore state
 	glBindTexture(GL_TEXTURE_2D, last_texture);
+}
+
+void DemoEntityManager::ApplyMenuOptions()
+{
+	NewtonWaitForUpdateToFinish(m_world);
+
+	// clean up all caches the engine have saved
+	NewtonInvalidateCache(m_world);
+	NewtonSetSolverModel(m_world, m_solverPasses);
+	NewtonSetThreadsCount(m_world, m_workerThreades);
+
+	int state = m_autoSleepMode ? 1 : 0;
+	for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
+		NewtonBodySetAutoSleep(body, state);
+	}
+
+	NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
+	//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
 }
 
 void DemoEntityManager::ShowMainMenuBar()
@@ -666,43 +659,15 @@ void DemoEntityManager::ShowMainMenuBar()
 
 		if (!optionsOn && m_updateMenuOptions) {
 			m_updateMenuOptions = false;
-
-			NewtonWaitForUpdateToFinish (m_world);
-			NewtonSetSolverModel (m_world, m_solverPasses);
-			NewtonSetThreadsCount(m_world, m_workerThreades);
-
-			int state = m_autoSleepMode ? 1 : 0;
-			for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
-				NewtonBodySetAutoSleep(body, state);
-			}
-			NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
-			//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
+			ApplyMenuOptions();
 		}
 	}
 
 	if (m_currentScene != -1) {
-		//BEGIN_MENU_OPTION();
-		//NewtonWaitForUpdateToFinish (m_world);
-
 		Cleanup();
-
 		m_demosSelection[m_currentScene].m_launchDemoCallback (this);
-
-		//RestoreSettings ();
+		ApplyMenuOptions();
 		ResetTimer();
-
-		// clean up all caches the engine have saved
-		NewtonInvalidateCache(m_world);
-
-		//dAssert (0);
-		//END_MENU_OPTION();
-		//NewtonWaitForUpdateToFinish (m_world);
-		//SetAutoSleepMode (m_world, !m_autoSleepState);
-		//NewtonSetSolverModel (m_world, m_solverModes[m_solverModeIndex]);
-		//NewtonSetSolverConvergenceQuality (m_world, m_solverModeQuality ? 1 : 0);
-		//NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_useParallelSolver ? 1 : 0);	
-		//NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
-
 		m_currentScene = -1;
 	}
 }

@@ -1516,9 +1516,10 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	const dgInt32 lastDirtyCount = m_dirtyNodesCount;
+
     m_lru = m_lru + 1;
-	m_pendingSoftBodyPairsCount = 0;
 	m_dirtyNodesCount = 0;
+	m_pendingSoftBodyPairsCount = 0;
 
 	m_recursiveChunks = true;
 	dgInt32 threadsCount = m_world->GetThreadCount();

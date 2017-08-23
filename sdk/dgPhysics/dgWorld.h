@@ -453,7 +453,7 @@ class dgWorld
 	bool AreBodyConnectedByJoints (dgBody* const origin, dgBody* const target);
 	
 	void UpdateSkeletons();
-	void UpdateContacts(dgFloat32 timestep);
+	void UpdateBroadphase(dgFloat32 timestep);
 	
 	void AddSentinelBody();
 	void InitConvexCollision ();

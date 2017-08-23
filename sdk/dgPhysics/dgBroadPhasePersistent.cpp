@@ -95,14 +95,14 @@ void dgBroadPhasePersistent::Add(dgBody* const body)
 	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
 	dgAssert (m_rootNode->IsPersistentRoot());
 
-	if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
+	if (body->GetCollision()->IsType(dgCollision::dgCollisionMesh_RTTI) || (body->GetInvMass().m_w == dgFloat32(0.0f))) {
 		m_staticNeedsUpdate = true;
 		if (root->m_right) {
 			dgBroadPhaseTreeNode* const node = InsertNode(root->m_right, new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body));
 			node->m_fitnessNode = m_staticFitness.Append(node);
 		} else {
 			root->m_right = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
-			root->m_right->m_parent = m_rootNode;
+			root->m_right->m_parent = root;
 		}
 	} else {
 		dgBroadPhaseBodyNode* const newNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
@@ -111,7 +111,7 @@ void dgBroadPhasePersistent::Add(dgBody* const body)
 			node->m_fitnessNode = m_dynamicsFitness.Append(node);
 		} else {
 			root->m_left = newNode;
-			root->m_left->m_parent = m_rootNode;
+			root->m_left->m_parent = root;
 		}
 		newNode->m_updateNode = m_updateList.Append(newNode);
 	}
@@ -459,6 +459,7 @@ dgInt32 dgBroadPhasePersistent::ConvexCast(dgCollisionInstance* const shape, con
 			}
 		}
 
+		*param = dgFloat32 (1.0f);
 		totalCount = dgBroadPhase::ConvexCast(stackPool, distance, 2, velocA, velocB, ray, shape, matrix, target, param, prefilter, userData, info, maxContacts, threadIndex);
 	}
 	return totalCount;

@@ -136,7 +136,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat CalculateInteplationParam () const;
 
 	void CalculateFPS(dFloat timestep);
-
 	
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
@@ -148,6 +147,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
 	static void ErrorCallback(int error, const char* const description);
+
+	void ApplyMenuOptions();
+
 	GLFWwindow* m_mainFrame;
 	int	m_defaultFont;
 	bool m_mousePressed[3];

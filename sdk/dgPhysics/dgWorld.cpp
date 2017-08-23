@@ -915,7 +915,7 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	m_inUpdate ++;
 
 	UpdateSkeletons();
-	UpdateContacts(timestep);
+	UpdateBroadphase(timestep);
 	UpdateDynamics (timestep);
 
 	if (m_listeners.GetCount()) {
@@ -1183,7 +1183,7 @@ void dgDeadBodies::DestroyBodies(dgWorld& world)
 	dgSpinUnlock(&m_lock);
 }
 
-void dgWorld::UpdateContacts(dgFloat32 timestep)
+void dgWorld::UpdateBroadphase(dgFloat32 timestep)
 {
 	m_broadPhase->UpdateContacts (timestep);
 }
