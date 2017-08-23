@@ -214,6 +214,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_updateMenuOptions(true)
 	,m_showAABB(false)
 	,m_showContactPoints(false)
+	,m_showNormalForces(false)
 {
 //	m_showAABB = false;
 //	m_showContactPoints = false;
@@ -392,7 +393,6 @@ void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback,
 }
 
 
-//bool DemoEntityManager::GetJoystickAxis (dFloat& posX, dFloat& posY, int& buttonsMask) const
 int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
 {
 	int axisCount = 0;
@@ -465,7 +465,6 @@ void DemoEntityManager::Cleanup ()
 		m_world = NULL;
 	}
 
-	//	memset (&demo, 0, sizeof (demo));
 	// check that there are no memory leak on exit
 	dAssert (NewtonGetMemoryUsed () == 0);
 
@@ -639,7 +638,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("Show aabb", &m_showAABB);
 			ImGui::Checkbox("Hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("Show contact points", &m_showContactPoints);
-			ImGui::Checkbox("Show normal forces", &xxx);
+			ImGui::Checkbox("Show normal forces", &m_showNormalForces);
 			ImGui::Checkbox("Show center of mass", &xxx);
 			ImGui::Checkbox("show Joint debug info", &xxx);
 			ImGui::Separator();
@@ -700,7 +699,6 @@ void DemoEntityManager::MouseButtonCallback(GLFWwindow*, int button, int action,
 void DemoEntityManager::MouseScrollCallback(GLFWwindow* const window, double x, double y)
 {
 	ImGuiIO& io = ImGui::GetIO();
-//	DemosMainFrame* me = (DemosMainFrame*) glfwGetWindowUserPointer(window);
 	io.MouseWheel += float (y);
 }
 
@@ -756,14 +754,6 @@ void DemoEntityManager::BeginFrame()
 	io.DisplaySize = ImVec2((float)w, (float)h);
 	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 
-	// Setup time step
-	//double current_time =  glfwGetTime();
-	//io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
-	//g_Time = current_time;
-
-	// Hide OS mouse cursor if ImGui is drawing it
-	//glfwSetInputMode(g_Window, GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
-
 	// Start the frame
 	ImGui::NewFrame();
 }
@@ -776,10 +766,6 @@ void DemoEntityManager::RenderStats()
 		bool dommy;
 		char text[1024];
 		
-		//ImVec2 size ( 100, 400);
-		//int flags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoResize;
-		//bool ImGui::Begin(const char* name, bool* p_open, const ImVec2& size_on_first_use, float bg_alpha, ImGuiWindowFlags flags)
-		//if (ImGui::Begin("statistics", &dommy, size, -1.0f, flags)){
 		if (ImGui::Begin("statistics", &dommy)){
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text);
@@ -1319,7 +1305,6 @@ void DemoEntityManager::RenderScene()
 			m_sky->Render(timestep, this);
 			glPopMatrix();
 		}
-
 	} else {
 		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 			DemoEntity* const entity = node->GetInfo();
@@ -1341,6 +1326,24 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showContactPoints) {
 		RenderContactPoints (GetNewton());
+	}
+
+	if (m_showNormalForces) {
+		RenderNormalForces (GetNewton());
+		// see if there is a vehicle controller and 
+/*
+		void* const vehListerNode =  NewtonWorldGetPreListener (GetNewton(), VEHICLE_PLUGIN_NAME);
+		if (vehListerNode) {
+			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
+			manager->Debug();
+		}
+
+		void* const characterListerNode =  NewtonWorldGetPreListener (GetNewton(), PLAYER_PLUGIN_NAME);
+		if (characterListerNode) {
+			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
+			manager->Debug();
+		}
+*/
 	}
 
 

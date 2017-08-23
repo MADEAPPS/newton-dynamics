@@ -187,6 +187,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_updateMenuOptions;
 	bool m_showAABB;
 	bool m_showContactPoints;
+	bool m_showNormalForces;
 
 
 	static SDKDemos m_demosSelection[];
