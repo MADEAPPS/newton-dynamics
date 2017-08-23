@@ -239,9 +239,10 @@ class SuperCarEntity: public DemoEntity
 	class TireAligmentTransform: public UserData
 	{
 		public: 
-		TireAligmentTransform (const dMatrix& matrix)
+		TireAligmentTransform (const dMatrix& matrix, dCustomVehicleController* const controller)
 			:UserData()
-			,m_matrix( matrix)
+			,m_matrix(matrix)
+			,m_controller(controller)
 		{
 		}
 
@@ -249,6 +250,7 @@ class SuperCarEntity: public DemoEntity
 		virtual void OnInterpolateMatrix (DemoEntityManager& world, dFloat param) const{};
 
 		dMatrix m_matrix;
+		dCustomVehicleController* m_controller;
 	};
 
 
@@ -415,8 +417,7 @@ class SuperCarEntity: public DemoEntity
 		// add and alignment matrix,to match visual mesh to physics collision shape
 		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dYawMatrix(-0.5f * 3.141592f) : dYawMatrix(0.5f * 3.141592f));
 
-
-		TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix);
+		TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix, m_controller);
 		tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
@@ -439,34 +440,33 @@ class SuperCarEntity: public DemoEntity
 
 		dWheelJoint* const tireJoint = m_controller->AddTire (tireInfo);
 		NewtonBody* const tireBody = tireJoint->GetTireBody (); 
-		NewtonBodySetUserData (tireBody, tirePart);
 
+		// add the user data and a tire transform callback that calclate the tire local space matrix
+		NewtonBodySetUserData (tireBody, tirePart);
+		NewtonBodySetTransformCallback (tireBody, TireTransformCallback);
 		return tireJoint;
 	}
 
-	void UpdateTireTransforms()
+
+	// this transform make sure the tire matrix is relative to the chassis 
+	static void TireTransformCallback(const NewtonBody* tireBody, const dFloat* tireMatrix, int threadIndex)
 	{
-		NewtonBody* const chassisBody = m_controller->GetBody();
+		DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(tireBody);
+		TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
+		dCustomVehicleController* const controller = aligmentMatrix->m_controller;
+		NewtonBody* const chassisBody = controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(chassisBody));
 
-		for (dList<dWheelJoint*>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			dMatrix matrix;
-			dMatrix parentMatrix;
+		//DemoEntity::TransformCallback(tireBody, tireMatrix, threadIndex);
 
-			const dWheelJoint* const tire = node->GetInfo();
-			NewtonBody* const tireBody = tire->GetTireBody ();
-
-			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
-			NewtonBodyGetMatrix(chassisBody, &parentMatrix[0][0]);
-
-			DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(tireBody);
-			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
-			matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
-
-			dQuaternion rot (matrix);
-			tirePart->SetMatrix(*scene, rot, matrix.m_posit);
-		}
+		dMatrix parentMatrix;
+		dMatrix matrix (tireMatrix);
+		NewtonBodyGetMatrix(chassisBody, &parentMatrix[0][0]);
+		matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
+		dQuaternion rot (matrix);
+		tirePart->SetMatrix(*scene, rot, matrix.m_posit);
 	}
+
 
 	// this function is an example of how to make a high performance super car
 	void BuildWheelCar (const CarDefinition& definition)
@@ -1322,13 +1322,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		// do the base class post update
 		dCustomVehicleControllerManager::PostUpdate(timestep);
-		
-		// update the visual transformation matrices for all vehicle tires
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			dCustomVehicleController* const controller = &node->GetInfo();
-			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-			vehicleEntity->UpdateTireTransforms();
-		}
 
 		if (m_player) {
 			UpdateCamera (m_player, timestep);
