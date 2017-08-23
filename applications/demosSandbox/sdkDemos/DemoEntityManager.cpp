@@ -28,7 +28,8 @@
 #endif
 
 #define MAX_PHYSICS_FPS				120.0f
-#define PROJECTILE_INITIAL_SPEED	 20.0f
+#define MAX_PHYSICS_SUB_STEPS		1
+#define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
@@ -487,6 +488,9 @@ void DemoEntityManager::Cleanup ()
 
 	// Set the Newton world user data
 	NewtonWorldSetUserData(m_world, this);
+
+	// set the number of sub steps
+	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
 	// for debugging time spend on phys update
 	NewtonSetPerformanceClock (m_world, dGetTimeInMicrosenconds);
