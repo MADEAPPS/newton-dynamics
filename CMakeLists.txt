@@ -1,4 +1,4 @@
-# Copyright (c) <2014> <Newton Game Dynamics>
+# Copyright (c) <2014-2017> <Newton Game Dynamics>
 #
 # This software is provided 'as-is', without any express or implied
 # warranty. In no event will the authors be held liable for any damages
@@ -88,8 +88,8 @@ else ()
   set(BUILD_64 FALSE)
 endif ()
 
-option("DOUBLE_PRECISION" "Use Double Precision" OFF)
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
+option("DOUBLE_PRECISION" "Use Double Precision" OFF)
 option("THREAD_EMULATION" "Use single thread only" OFF)
 
 
@@ -105,6 +105,5 @@ if(NEWTON_DEMOS_SANDBOX)
   add_subdirectory("${NewtonSDK_SOURCE_DIR}/applications/demosSandbox")
 endif()
 
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages/thirdParty")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/coreLibrary_300")
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk")
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk/thirdParty")
