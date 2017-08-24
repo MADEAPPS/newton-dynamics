@@ -349,7 +349,7 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 				body->m_equilibrium = true;
 
 				// update collision matrix by calling the transform callback for all kinematic bodies
-				body->UpdateMatrix(timestep, threadID);
+				body->UpdateCollisionMatrix(timestep, threadID);
 			}
 		}
 
@@ -1522,7 +1522,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	m_pendingSoftBodyPairsCount = 0;
 
 	m_recursiveChunks = true;
-	dgInt32 threadsCount = m_world->GetThreadCount();
+	const dgInt32 threadsCount = m_world->GetThreadCount();
 
 	const dgBodyMasterList* const masterList = m_world;
 	dgBroadphaseSyncDescriptor syncPoints(timestep, m_world);

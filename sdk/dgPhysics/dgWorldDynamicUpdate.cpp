@@ -824,7 +824,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 				sleepCounter = dgMin (sleepCounter, ((dgDynamicBody*)body)->m_sleepingCounter);
 			}
 
-			body->UpdateMatrix (timestep, threadID);
+			body->UpdateCollisionMatrix (timestep, threadID);
 		}
 	}
 

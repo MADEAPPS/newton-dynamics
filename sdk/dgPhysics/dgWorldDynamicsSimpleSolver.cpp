@@ -278,14 +278,14 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 					dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
 					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 						body->IntegrateVelocity(timeRemaining);
-						body->UpdateMatrix (timeRemaining, threadID);
+						body->UpdateCollisionMatrix (timeRemaining, threadID);
 					}
 				}
 			} else {
 				for (dgInt32 j = 1; j < bodyCount; j ++) {
 					dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
 					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-						body->UpdateMatrix (timestep, threadID);
+						body->UpdateCollisionMatrix (timestep, threadID);
 					}
 				}
 			}

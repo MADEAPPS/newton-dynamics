@@ -76,6 +76,7 @@ dgBody::dgBody()
 {
 	m_autoSleep = true;
 	m_collidable = true;
+	m_transformIsDirty = true;
 	m_collideWithLinkedBodies = true;
 	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 }
@@ -118,6 +119,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 {
 	m_autoSleep = true;
 	m_collidable = true;
+	m_transformIsDirty = true;
 	m_collideWithLinkedBodies = true;
 	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 
@@ -243,6 +245,7 @@ void dgBody::UpdateWorlCollisionMatrix() const
 
 void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 {
+	m_transformIsDirty = true;
 	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
 	m_collision->CalcAABB (m_collision->GetGlobalMatrix(), m_minAABB, m_maxAABB);
 
@@ -305,15 +308,15 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 	return maxT;
 }
 
-
-void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
+/*
+void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	if (m_matrixUpdate) {
-		m_matrixUpdate (*this, m_matrix, threadIndex);
-	}
+//	if (m_matrixUpdate) {
+//		m_matrixUpdate (*this, m_matrix, threadIndex);
+//	}
 	UpdateCollisionMatrix (timestep, threadIndex);
 }
-
+*/
 
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {

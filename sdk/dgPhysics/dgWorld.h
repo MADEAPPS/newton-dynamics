@@ -424,6 +424,13 @@ class dgWorld
 	dgInt32 GetSubsteps () const;
 	
 	private:
+	class dgAdressDistPair
+	{
+		public:
+		dgInt32 m_adress;
+		dgFloat32 m_dist;
+	};
+
 	void RunStep ();
 	void CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
@@ -457,17 +464,15 @@ class dgWorld
 	
 	void AddSentinelBody();
 	void InitConvexCollision ();
-	static dgUnsigned32 dgApi GetPerformanceCount ();
+	
 
 	virtual void Execute (dgInt32 threadID);
 	virtual void TickCallback (dgInt32 threadID);
 
-	class dgAdressDistPair
-	{
-		public:
-		dgInt32 m_adress;
-		dgFloat32 m_dist;
-	};
+	void UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID);
+
+	static dgUnsigned32 dgApi GetPerformanceCount ();
+	static void UpdateTransforms(void* const context, void* const node, dgInt32 threadID);
 	static dgInt32 SortFaces (const dgAdressDistPair* const A, const dgAdressDistPair* const B, void* const context);
 
 	dgUnsigned32 m_numberOfSubsteps;

@@ -27,8 +27,8 @@
 	#include "CocoaOpenglGlue.h"
 #endif
 
-#define MAX_PHYSICS_FPS				120.0f
-#define MAX_PHYSICS_SUB_STEPS		1
+#define MAX_PHYSICS_FPS				60.0f
+#define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool

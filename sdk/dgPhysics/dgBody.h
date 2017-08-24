@@ -219,7 +219,7 @@ class dgBody
 
 	protected:
 	void UpdateWorlCollisionMatrix() const;
-	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
+	//void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 		
 	// member variables:
@@ -259,6 +259,7 @@ class dgBody
 			dgUnsigned32 m_spawnnedFromCallback		: 1;
 			dgUnsigned32 m_continueCollisionMode	: 1;
 			dgUnsigned32 m_collideWithLinkedBodies	: 1;
+			dgUnsigned32 m_transformIsDirty			: 1;
 		};
 	};
 

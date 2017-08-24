@@ -813,7 +813,7 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 		body1->SetVelocity (matrix1.RotateVector (body1->GetVelocity()));
 		
 		body1->SetMatrix (matrix1);
-		body1->UpdateMatrix (dgFloat32 (0.0f), 0);
+		body1->UpdateCollisionMatrix (dgFloat32 (0.0f), 0);
 		body1->SetSleepState(false);
 
 		for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
@@ -956,6 +956,29 @@ void dgWorld::Sync ()
 	}
 }
 
+void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID)
+{
+	const dgInt32 threadsCount = GetThreadCount();
+	while (node) {
+		dgBody* const body = node->GetInfo().GetBody();
+		if (body->m_transformIsDirty && body->m_matrixUpdate) {
+			body->m_matrixUpdate (*body, body->m_matrix, threadID);
+		}
+		body->m_transformIsDirty = false;
+
+		for (dgInt32 i = 0; i < threadsCount; i++) {
+			node = node ? node->GetNext() : NULL;
+		}
+	}
+}
+
+void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32 threadID)
+{
+	dTimeTrackerEvent(__FUNCTION__);
+	dgWorld* const world = (dgWorld*)context;
+	dgBodyMasterList::dgListNode* node = (dgBodyMasterList::dgListNode*) nodePtr;
+	world->UpdateTransforms(node, threadID);
+}
 
 void dgWorld::RunStep ()
 {
@@ -972,6 +995,16 @@ void dgWorld::RunStep ()
 		jointList.DestroyJoints (*this);
 		bodyList.DestroyBodies (*this);
 	}
+
+	const dgBodyMasterList* const masterList = this;
+	dgBodyMasterList::dgListNode* node = masterList->GetFirst();
+	const dgInt32 threadsCount = GetThreadCount();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		QueueJob(UpdateTransforms, this, node);
+		node = node ? node->GetNext() : NULL;
+	}
+	SynchronizationBarrier();
+
 	m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
 }
 
