@@ -107,7 +107,7 @@ class dgTemplateVector
 
 	DG_INLINE dgTemplateVector<T> operator*= (const dgTemplateVector<T>& B) const
 	{
-		return (*this = dgTemplateVector<T>(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
+		return (*this = dgTemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w * B.m_w));
 	}
 
 

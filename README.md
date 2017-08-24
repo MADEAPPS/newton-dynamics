@@ -23,10 +23,8 @@ There are Unix makefiles in the project folders mentioned above, but it is *high
 Newton Core does not have any third party dependencies.
 
 To build the demo sandbox the following packages need to be installed:
-* wxWidgets 2.8 or 2.9
-* Freetype
 * OpenGL
-* GLEW
+* glfw3
 * OpenAL
 * TinyXML
 

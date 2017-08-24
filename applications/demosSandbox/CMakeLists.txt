@@ -25,18 +25,10 @@ list(REMOVE_ITEM sandbox_srcs "sdkDemos/toolBox/ShaderPrograms.cpp")
 
 add_executable(demosSandbox ${sandbox_srcs})
 
-target_link_libraries(demosSandbox dMath dScene dCustomJoints dContainers dAnimation)
+target_link_libraries(demosSandbox dMath dScene dCustomJoints dContainers dAnimation imgui)
 
 
 # 3rd party dependencies
-
-find_package(wxWidgets REQUIRED gl core base)
-include(${wxWidgets_USE_FILE})
-target_link_libraries(demosSandbox ${wxWidgets_LIBRARIES})
-
-find_package(Freetype REQUIRED)
-include_directories(${FREETYPE_INCLUDE_DIRS})
-target_link_libraries(demosSandbox ${FREETYPE_LIBRARIES})
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
@@ -50,10 +42,8 @@ find_package(OpenAL REQUIRED)
 include_directories(${OPENAL_INCLUDE_DIR})
 target_link_libraries(demosSandbox ${OPENAL_LIBRARY})
 
-find_package(GLEW)
-include_directories(${GLEW_INCLUDE_DIR})
-target_link_libraries(demosSandbox ${GLEW_LIBRARY})
-
+find_package(glfw3 REQUIRED)
+target_link_libraries(demosSandbox glfw)
 
 if (UNIX)
   add_definitions(-DD_JOINTLIBRARY_STATIC_LIB)

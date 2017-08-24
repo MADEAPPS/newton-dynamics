@@ -8,13 +8,6 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-# timeTracker
-file(GLOB timeTracker_srcs timeTracker/dTimeTracker.cpp)
-add_library(timeTracker ${timeTracker_srcs})
-
-target_include_directories(timeTracker PUBLIC timeTracker/)
-target_link_libraries(timeTracker dMath dContainers)
-
 # imgui
 file(GLOB imgui_srcs imgui/*.cpp)
 add_library(imgui ${imgui_srcs})
