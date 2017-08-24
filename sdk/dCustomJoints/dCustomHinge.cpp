@@ -35,12 +35,11 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.6f)
 	,m_flags(0)
-// prevent "error: initializations for multiple members"
-//	,m_limitsOn(false)
-//	,m_setAsSpringDamper(false)
-//	,m_actuatorFlag(false)
-//	,m_lastRowWasUsed(false)
 {
+	m_limitsOn = false;
+	m_actuatorFlag = false;
+	m_lastRowWasUsed = false;
+	m_setAsSpringDamper = false;
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -57,13 +56,12 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.6f)
 	,m_flags(0)
-// prevent "error: initializations for multiple members"
-//	,m_limitsOn(false)
-//	,m_setAsSpringDamper(false)
-//	,m_actuatorFlag(false)
-//	,m_lastRowWasUsed(false)
 {
 	dMatrix	dummy;
+	m_limitsOn = false;
+	m_actuatorFlag = false;
+	m_lastRowWasUsed = false;
+	m_setAsSpringDamper = false;
 	CalculateLocalMatrix (pinAndPivotFrameChild, m_localMatrix0, dummy);
 	CalculateLocalMatrix (pinAndPivotFrameParent, dummy, m_localMatrix1);
 }
