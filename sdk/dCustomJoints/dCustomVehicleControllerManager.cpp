@@ -1433,15 +1433,6 @@ void dBrakeController::Save(dCustomJointSaveLoad* const fileSaver) const
 }
 
 
-void dCustomVehicleControllerManager::DrawSchematic (const dCustomVehicleController* const controller, dFloat scale) const
-{
-	controller->DrawSchematic(scale);
-}
-
-void dCustomVehicleControllerManager::DrawSchematicCallback (const dCustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
-{
-}
-
 void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
 	for (dCustomControllerManager<dCustomVehicleController>::dListNode* vehicleNode = GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
@@ -1450,18 +1441,22 @@ void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const
 	}
 }
 
-
-void dCustomVehicleController::DrawSchematic(dFloat scale) const
+void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
 {
 //	dAssert (0);
-/*
-	dMatrix projectionMatrix(dGetIdentityMatrix());
-	projectionMatrix[0][0] = scale;
-	projectionMatrix[1][1] = 0.0f;
-	projectionMatrix[2][1] = -scale;
-	projectionMatrix[2][2] = 0.0f;
+//	debugContext->PushRenderContext();
+//	dMatrix projectionMatrix(dGetIdentityMatrix());
+	//projectionMatrix[0][0] = scale;
+	//projectionMatrix[1][1] = 1.0f;
+	//projectionMatrix[2][1] = -scale;
+	//projectionMatrix[2][2] = 1.0f;
+//	debugContext->LoadMatrix(projectionMatrix) ;
+
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 
+debugContext->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
+debugContext->DrawLine(dVector (100.0f, 100.0f, 100.0f, 0.0f), dVector (10.0f, 10.0f, 10.0f, 0.0f));
+/*
 	dMatrix matrix0;
 	dVector com(0.0f);
 	dFloat arrayPtr[32][4];
@@ -1587,6 +1582,7 @@ void dCustomVehicleController::DrawSchematic(dFloat scale) const
 		}
 	}
 */
+//	debugContext->PopRenderContext();
 }
 
 dCustomVehicleControllerManager::dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const materialsList)

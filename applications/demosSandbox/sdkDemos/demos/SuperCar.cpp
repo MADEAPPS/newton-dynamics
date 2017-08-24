@@ -747,7 +747,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		:dCustomVehicleControllerManager (world, materialsCount, materialList)
 		,m_externalView(true)
 		,m_player (NULL) 
-		//,m_debugVehicle (NULL) 
 		,m_steeringAxis(0)
 		,m_throttleAxis(1)
 		,m_clutchAxis(2)
@@ -755,7 +754,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		,m_handBrakeButton(1)
 		,m_gearUpButton(2)
 		,m_gearDonwButton(3)
-		,m_drawShematic(true)
 		,m_helpKey (true)
 		,m_nexVehicle (true)
 		,m_gearUpKey(false)
@@ -898,7 +896,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		//}
 	}
 
-
+/*
 	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
 		if (m_player) {
@@ -923,7 +921,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			glEnable(GL_TEXTURE_2D);
 		}
 	}
-
 
 	void DrawSchematicCallback (const dCustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
 	{
@@ -1011,15 +1008,10 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			glEnd();
 		}
 	}
+*/
 
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber)
 	{
-		// draw the player physics model
-		if (m_drawShematic) {
-//			RenderVehicleSchematic (scene);
-		}
-		//m_drawShematic = false;
-
 		// set to transparent color
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1093,12 +1085,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		SuperCarEntity* const player = (SuperCarEntity*) NewtonBodyGetUserData(vehicleBody);
 		SetAsPlayer (player);
 	}
-/*
-	void SetDebugVehicle (SuperCarEntity* const player)
-	{
-		m_debugVehicle = player;
-	}
-*/
 
 	void ApplyPlayerControl (dCustomVehicleController* const vehicle, dFloat timestep)
 	{
@@ -1332,12 +1318,13 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
+		//draw the schematic (laterals forces diagram for the player vehicle) 
+		m_player->m_controller->DrawSchematic(debugContext, 1.0f);
 		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}
 
 	bool m_externalView;
 	SuperCarEntity* m_player;
-	//SuperCarEntity* m_debugVehicle;
 	DemoEntity* m_raceTrackPath;
 
 	GLuint m_gears;
@@ -1354,7 +1341,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	int m_handBrakeButton;
 	int m_gearUpButton;
 	int m_gearDonwButton;
-	mutable bool m_drawShematic;
 	
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_nexVehicle;

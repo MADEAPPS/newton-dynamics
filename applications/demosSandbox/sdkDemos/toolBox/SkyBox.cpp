@@ -54,7 +54,6 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
-	
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 

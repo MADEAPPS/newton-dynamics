@@ -638,8 +638,8 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dFloat GetWeightDistribution() const;
 	CUSTOM_JOINTS_API void SetWeightDistribution(dFloat weightDistribution);
 
-	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	CUSTOM_JOINTS_API void DrawSchematic (dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const;	
 
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
@@ -709,11 +709,9 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	CUSTOM_JOINTS_API virtual int OnTireAABBOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const;
 
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
-	CUSTOM_JOINTS_API void DrawSchematic (const dCustomVehicleController* const controller, dFloat scale) const;
 
 	protected:
 	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);
-	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const dCustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
 	CUSTOM_JOINTS_API int OnContactGeneration (const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
 	
 	int Collide (dWheelJoint* const tire, int threadIndex) const;
