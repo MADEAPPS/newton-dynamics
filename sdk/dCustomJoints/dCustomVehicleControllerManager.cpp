@@ -1442,6 +1442,15 @@ void dCustomVehicleControllerManager::DrawSchematicCallback (const dCustomVehicl
 {
 }
 
+void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+{
+	for (dCustomControllerManager<dCustomVehicleController>::dListNode* vehicleNode = GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
+		dCustomVehicleController* const vehicle = &vehicleNode->GetInfo();
+		vehicle->Debug(debugContext);
+	}
+}
+
+
 void dCustomVehicleController::DrawSchematic(dFloat scale) const
 {
 //	dAssert (0);
@@ -2805,12 +2814,77 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	}
 }
 
-
 void dCustomVehicleController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-//	dTrace (("Remember vehicle debug !!!\n"));
-}
+	dMatrix matrix;
+	dVector com(0.0f);
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
 
+	NewtonBody* const chassisBody = GetBody();
+	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
+	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+	matrix.m_posit = matrix.TransformVector(com);
+
+	dFloat scale = -4.0f / (mass * m_gravityMag);
+	dVector p0 (matrix.m_posit);
+
+	//glLineWidth(3.0f);
+	//glBegin(GL_LINES);
+
+	// draw vehicle weight at the center of mass
+	dFloat lenght = scale * mass * m_gravityMag;
+	debugContext->SetColor(dVector (0.0f, 0.0f, 1.0f, 0.0f));
+	debugContext->DrawLine(p0, p0 - matrix.m_up.Scale (lenght));
+		
+	// draw vehicle front dir
+	debugContext->SetColor(dVector (1.0f, 1.0f, 1.0f, 0.0f));
+	dVector r0 (p0 + matrix[1].Scale (1.0f));
+	dVector r1 (r0 + matrix[0].Scale (2.0f));
+	debugContext->DrawLine(r0, r1);
+
+	// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
+	dVector veloc(0.0f);
+	NewtonBodyGetVelocity(chassisBody, &veloc[0]);
+	dVector q0 (p0 + matrix[1].Scale (1.0f));
+	dVector q1 (q0 + veloc.Scale (0.25f));
+	debugContext->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
+	debugContext->DrawLine(q0, q1);
+
+	for (dList<dWheelJoint*>::dListNode* node = GetFirstTire(); node; node = GetNextTire(node)) {
+		dWheelJoint* const jointJont = node->GetInfo();
+		NewtonBody* const tireBody = jointJont->GetTireBody();
+
+		dMatrix tireMatrix;
+		NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
+
+		dFloat sign = dSign ((tireMatrix.m_posit - matrix.m_posit).DotProduct3(matrix.m_right));
+		tireMatrix.m_posit += matrix.m_right.Scale (sign * 0.25f);
+
+		// draw the tire load 
+		dVector normalLoad (GetTireNormalForce(jointJont));
+		dVector p0 (tireMatrix.m_posit);
+		dVector p1 (p0 + normalLoad.Scale (scale));
+
+		debugContext->SetColor(dVector (0.0f, 0.0f, 1.0f, 0.0f));
+		debugContext->DrawLine(p0, p1);
+
+		// show tire lateral force
+		dVector lateralForce (GetTireLateralForce(jointJont));
+		dVector p2 (p0 - lateralForce.Scale (scale));
+		debugContext->SetColor(dVector (1.0f, 0.0f, 0.0f, 0.0f));
+		debugContext->DrawLine(p0, p2);
+
+		// show tire longitudinal force
+		dVector longitudinalForce (GetTireLongitudinalForce(jointJont));
+		dVector p3 (p0 - longitudinalForce.Scale (scale));
+		debugContext->SetColor(dVector (0.0f, 1.0f, 0.0f, 0.0f));
+		debugContext->DrawLine(p0, p3);
+	}
+}
 
 
 void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader)

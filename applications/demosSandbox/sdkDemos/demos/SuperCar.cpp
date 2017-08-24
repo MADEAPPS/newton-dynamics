@@ -728,115 +728,6 @@ class SuperCarEntity: public DemoEntity
 	}
 
 
-	void Debug (DemoEntity* const m_aiPath) const 
-	{
-/*
-		dMatrix matrix;
-		dVector com(0.0f);
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		dFloat mass;
-
-		const dBodyPart* const chassis = m_controller->GetChassis ();
-		NewtonBody* const chassisBody = chassis->GetBody();
-		
-		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
-		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
-		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-		matrix.m_posit = matrix.TransformVector(com);
-		//matrix = m_controller->GetLocalFrame() * matrix;
-		//matrix = matrix;
-
-		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
-		dVector p0 (matrix.m_posit);
-
-		glDisable (GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
-
-		glLineWidth(3.0f);
-		glBegin(GL_LINES);
-
-		// draw vehicle weight at the center of mass
-		dFloat lenght = scale * mass * DEMO_GRAVITY;
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y - lenght), GLfloat(p0.m_z));
-
-		// draw vehicle front dir
-		glColor3f(1.0f, 1.0f, 1.0f);
-		dVector r0 (p0 + matrix[1].Scale (1.0f));
-		dVector r1 (r0 + matrix[0].Scale (2.0f));
-		glVertex3f(GLfloat(r0.m_x), GLfloat(r0.m_y), GLfloat(r0.m_z));
-		glVertex3f(GLfloat(r1.m_x), GLfloat(r1.m_y), GLfloat(r1.m_z));
-
-		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
-		dVector veloc(0.0f);
-		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
-		dVector q0 (p0 + matrix[1].Scale (1.0f));
-		dVector q1 (q0 + veloc.Scale (0.25f));
-		glColor3f(1.0f, 1.0f, 0.0f);
-		glVertex3f(GLfloat(q0.m_x), GLfloat(q0.m_y), GLfloat(q0.m_z));
-		glVertex3f(GLfloat(q1.m_x), GLfloat(q1.m_y), GLfloat(q1.m_z));
-
-//int xxx = 0;
-		for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const dCustomVehicleController::dBodyPartTire* const tire = &node->GetInfo();
-			NewtonBody* const tireBody = tire->GetBody();
-
-			dMatrix tireMatrix;
-			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
-
-			dFloat sign = dSign ((tireMatrix.m_posit - matrix.m_posit).DotProduct3(matrix.m_right));
-			tireMatrix.m_posit += matrix.m_right.Scale (sign * 0.25f);
-
-			// draw the tire load 
-			dVector normalLoad (m_controller->GetTireNormalForce(tire));
-			dVector p0 (tireMatrix.m_posit);
-			dVector p1 (p0 + normalLoad.Scale (scale));
-
-			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-			// show tire lateral force
-			dVector lateralForce (m_controller->GetTireLateralForce(tire));
-			dVector p2 (p0 - lateralForce.Scale (scale));
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p2.m_x), GLfloat(p2.m_y), GLfloat(p2.m_z));
-
-			// show tire longitudinal force
-			dVector longitudinalForce (m_controller->GetTireLongitudinalForce(tire));
-			dVector p3 (p0 - longitudinalForce.Scale (scale));
-			glColor3f(0.0f, 1.0f, 0.0f);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p3.m_x), GLfloat(p3.m_y), GLfloat(p3.m_z));
-		}
-		
-		glEnd();
-		glLineWidth(1.0f);
-
-		// render AI information
-		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
-		dBigVector q; 
-		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
-		path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
-		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
-
-		glBegin(GL_LINES);
-		glColor3f (1.0f, 0.0f, 1.0f);
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
-		glEnd();
-
-		glBegin(GL_LINES);
-		glColor3f (1.0f, 0.0f, 1.0f);
-		glVertex3f (p0.m_x, p0.m_y + 1.0f, p0.m_z);
-		glVertex3f (m_debugTargetHeading.m_x, m_debugTargetHeading.m_y + 1.0f, m_debugTargetHeading.m_z);
-		glEnd();
-*/
-	}
 
 	dCustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_engineDifferentialLock;
@@ -1439,17 +1330,10 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		path->SetRenderResolution (500);
 	}
 
-	// use this to display debug information about vehicle 
-	void Debug () const
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
-		m_drawShematic = true;
-		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dCustomVehicleController* const controller = &ptr->GetInfo();
-			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-			vehicleEntity->Debug(m_raceTrackPath);
-		}
+		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}
-
 
 	bool m_externalView;
 	SuperCarEntity* m_player;

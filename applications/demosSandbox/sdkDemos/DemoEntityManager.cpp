@@ -206,15 +206,17 @@ DemoEntityManager::DemoEntityManager ()
 	,m_solverPasses(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
-	,m_showStats(true)
-	,m_autoSleepMode(true)
-	,m_synchronousPhysicsUpdateMode(true)
-	,m_hideVisualMeshes(false)
-	,m_hasJoytick(false)
-	,m_updateMenuOptions(true)
 	,m_showAABB(false)
-	,m_showContactPoints(false)
+	,m_showStats(true)
+	,m_hasJoytick(false)
+	,m_autoSleepMode(true)
+	,m_hideVisualMeshes(false)
 	,m_showNormalForces(false)
+	,m_showCenterOfMass(false)
+	,m_updateMenuOptions(true)
+	,m_showContactPoints(false)
+	,m_showJointDebugInfo(false)
+	,m_synchronousPhysicsUpdateMode(true)
 {
 //	m_showAABB = false;
 //	m_showContactPoints = false;
@@ -223,7 +225,10 @@ DemoEntityManager::DemoEntityManager ()
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
 //	m_workerThreades = 1;
-m_synchronousPhysicsUpdateMode = false;
+//	m_showNormalForces = false;
+//	m_showCenterOfMass = false;
+//	m_showJointDebugInfo = false;
+//m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 
@@ -318,13 +323,6 @@ m_synchronousPhysicsUpdateMode = false;
 	dMatrixTimeVector(2, &A[0][0], x, b);
 	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
 */
-
-/*
-for (int ii = 0; ii < 10000; ii++) {
-	NewtonDestroy(NewtonCreate());
-}
-*/
-
 }
 
 DemoEntityManager::~DemoEntityManager ()
@@ -558,7 +556,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	}
 
 	NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
-	//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
+	//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->m_world, m_useParallelSolver ? 1 : 0);	
 }
 
 void DemoEntityManager::ShowMainMenuBar()
@@ -613,11 +611,9 @@ void DemoEntityManager::ShowMainMenuBar()
 		if (optionsOn) {
 			m_updateMenuOptions = true;
 
-			bool xxx = false;
-
 			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
 			ImGui::Checkbox("Show stats", &m_showStats);
-			ImGui::Checkbox("concurrent physics update", &xxx);
+			ImGui::Checkbox("concurrent physics update", &m_synchronousPhysicsUpdateMode);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
@@ -639,8 +635,8 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("Hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("Show contact points", &m_showContactPoints);
 			ImGui::Checkbox("Show normal forces", &m_showNormalForces);
-			ImGui::Checkbox("Show center of mass", &xxx);
-			ImGui::Checkbox("show Joint debug info", &xxx);
+			ImGui::Checkbox("Show center of mass", &m_showCenterOfMass);
+			ImGui::Checkbox("show Joint debug info", &m_showJointDebugInfo);
 			ImGui::Separator();
 			
 			ImGui::Text ("select worker threads");
@@ -877,7 +873,7 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 
 void DemoEntityManager::LoadScene (const char* const fileName)
 {
-	dScene database (GetNewton());
+	dScene database (m_world);
 
 	database.Deserialize(fileName);
 
@@ -1317,30 +1313,38 @@ void DemoEntityManager::RenderScene()
 	DEBUG_DRAW_MODE mode = m_solid;
 	if (m_collisionDisplayMode) {
 		mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
-		DebugRenderWorldCollision (GetNewton(), mode);
+		DebugRenderWorldCollision (m_world, mode);
 	}
 
 	if (m_showAABB) {
-		RenderAABB (GetNewton());
+		RenderAABB (m_world);
 	}
 
 	if (m_showContactPoints) {
-		RenderContactPoints (GetNewton());
+		RenderContactPoints (m_world);
+	}
+
+	if (m_showCenterOfMass) {
+		RenderCenterOfMass(m_world);
+	}
+
+	if (m_showJointDebugInfo) {
+		RenderJointsDebugInfo(m_world, 0.5f);
 	}
 
 	if (m_showNormalForces) {
-		RenderNormalForces (GetNewton());
+		RenderNormalForces (m_world);
 		// see if there is a vehicle controller and 
 /*
-		void* const vehListerNode =  NewtonWorldGetPreListener (GetNewton(), VEHICLE_PLUGIN_NAME);
+		void* const vehListerNode =  NewtonWorldGetPreListener (m_world, VEHICLE_PLUGIN_NAME);
 		if (vehListerNode) {
-			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
+			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonWorldGetListenerUserData(m_world, vehListerNode);
 			manager->Debug();
 		}
 
-		void* const characterListerNode =  NewtonWorldGetPreListener (GetNewton(), PLAYER_PLUGIN_NAME);
+		void* const characterListerNode =  NewtonWorldGetPreListener (m_world, PLAYER_PLUGIN_NAME);
 		if (characterListerNode) {
-			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
+			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) NewtonWorldGetListenerUserData(m_world, characterListerNode);
 			manager->Debug();
 		}
 */

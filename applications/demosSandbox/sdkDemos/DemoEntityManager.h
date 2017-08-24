@@ -179,16 +179,17 @@ class DemoEntityManager: public dList <DemoEntity*>
 	
 	int m_collisionDisplayMode;
 	
-	bool m_showStats;
-	bool m_autoSleepMode;
-	bool m_synchronousPhysicsUpdateMode;
-	bool m_hideVisualMeshes;
-	bool m_hasJoytick;
-	bool m_updateMenuOptions;
 	bool m_showAABB;
-	bool m_showContactPoints;
+	bool m_showStats;
+	bool m_hasJoytick;
+	bool m_autoSleepMode;
+	bool m_hideVisualMeshes;
 	bool m_showNormalForces;
-
+	bool m_showCenterOfMass;
+	bool m_updateMenuOptions;
+	bool m_showContactPoints;
+	bool m_showJointDebugInfo;
+	bool m_synchronousPhysicsUpdateMode;
 
 	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;

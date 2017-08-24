@@ -171,7 +171,7 @@ class dCustomControllerManager: public dList<CONTROLLER_BASE>
 	public:
 	virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep);
-
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 
 	private:
 	void DestroyAllController ();
@@ -257,12 +257,15 @@ void dCustomControllerManager<CONTROLLER_BASE>::PostUpdate (const NewtonWorld* c
 
 
 template<class CONTROLLER_BASE>
+void dCustomControllerManager<CONTROLLER_BASE>::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+{
+}
+
+template<class CONTROLLER_BASE>
 void dCustomControllerManager<CONTROLLER_BASE>::Debug (const NewtonWorld* const world, void* const listenerUserData, void* const debugContext)
 {
 	dCustomControllerManager* const me = (dCustomControllerManager*) listenerUserData;
-	for (dCustomControllerManager<CONTROLLER_BASE>::dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-		node->GetInfo().Debug((dCustomJoint::dDebugDisplay*) debugContext);
-	}
+	me->OnDebug((dCustomJoint::dDebugDisplay*) debugContext);
 }
 
 template<class CONTROLLER_BASE>

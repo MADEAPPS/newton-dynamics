@@ -463,11 +463,11 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 	dJointDebugDisplay jointDebug;
 
 	// this will go over the joint list twice, 
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {	
+	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
-			dCustomJoint* const customJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
+			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
 			customJoint->Debug(&jointDebug);
-					}
-				}
+		}
+	}
 	NewtonWorldListenerDebug(world, &jointDebug);
 }

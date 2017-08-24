@@ -644,7 +644,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
-
+	
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
@@ -695,6 +695,8 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	public:
 	CUSTOM_JOINTS_API dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials);
 	CUSTOM_JOINTS_API virtual ~dCustomVehicleControllerManager();
+
+	CUSTOM_JOINTS_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 	CUSTOM_JOINTS_API virtual void UpdateDriverInput(dCustomVehicleController* const vehicle, dFloat timestep) {}
 
 	CUSTOM_JOINTS_API virtual dCustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
