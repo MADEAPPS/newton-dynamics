@@ -222,6 +222,13 @@ void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int 
 	world->SetBroadPhaseType(algorithmType);
 }
 
+NEWTON_API void NewtonResetBroadphase(const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	return world->ResetBroadPhase();
+}
+
 
 dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld)
 {

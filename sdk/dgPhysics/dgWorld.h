@@ -414,6 +414,7 @@ class dgWorld
 
 	dgInt32 GetBroadPhaseType() const;
 	void SetBroadPhaseType (dgInt32 type);
+	void ResetBroadPhase();
 	
 	dgFloat32 GetContactMergeTolerance() const;
 	void SetContactMergeTolerance(dgFloat32 tolerenace);

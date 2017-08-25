@@ -1089,6 +1089,27 @@ void dgWorld::SetBroadPhaseType(dgInt32 type)
 	}
 }
 
+void dgWorld::ResetBroadPhase()
+{
+	dgBroadPhase* newBroadPhase = NULL;
+
+	switch (GetBroadPhaseType())
+	{
+		case m_persistentBroadphase:
+			newBroadPhase = new (m_allocator) dgBroadPhasePersistent(this);
+			break;
+
+		case m_defaultBroadphase:
+		default:
+			newBroadPhase = new (m_allocator) dgBroadPhaseDefault(this);
+			break;
+	}
+
+	m_broadPhase->MoveNodes(newBroadPhase);
+	delete m_broadPhase;
+	m_broadPhase = newBroadPhase;
+}
+
 
 dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootBone)
 {
