@@ -69,7 +69,7 @@
 	#pragma warning (disable: 4505) // unreferenced local function has been removed
 
 #endif
-
+/*
 #ifndef _MSC_VER
 
 	#ifndef stricmp
@@ -92,6 +92,7 @@
 		#define strlwr(a) _strlwr_ (a) 
 	#endif
 #endif
+*/
 
 #include <dStdAfxMath.h>
 #include <dAnimationStdAfx.h>
