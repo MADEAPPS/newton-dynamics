@@ -884,6 +884,33 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, dgCollision
 	}
 }
 
+void dgCollisionHeightField::CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1, const dgFloat32* const elevation, dgFloat32& minHeight, dgFloat32& maxHeight) const
+{
+	dgInt32 base = z0 * m_width;
+	for (dgInt32 z = z0; z <= z1; z++) {
+		for (dgInt32 x = x0; x <= x1; x++) {
+			dgFloat32 high = elevation[base + x];
+			minHeight = dgMin(high, minHeight);
+			maxHeight = dgMax(high, maxHeight);
+		}
+		base += m_width;
+	}
+}
+
+void dgCollisionHeightField::CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1, const dgInt16* const elevation, dgFloat32& minHeight, dgFloat32& maxHeight) const
+{
+	dgInt32 base = z0 * m_width;
+	for (dgInt32 z = z0; z <= z1; z++) {
+		for (dgInt32 x = x0; x <= x1; x++) {
+			dgFloat32 high = dgFloat32 (elevation[base + x]);
+			minHeight = dgMin(high, minHeight);
+			maxHeight = dgMax(high, maxHeight);
+		}
+		base += m_width;
+	}
+}
+
+
 void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q1, dgVector& boxP0, dgVector& boxP1) const
 {
 	// the user data is the pointer to the collision geometry
@@ -904,34 +931,18 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 
 	dgFloat32 minHeight = dgFloat32 (1.0e10f);
 	dgFloat32 maxHeight = dgFloat32 (-1.0e10f);
-	dgInt32 base = z0 * m_width;
+	//dgInt32 base = z0 * m_width;
 	switch (m_elevationDataType) 
 	{
 		case m_float32Bit:
 		{
-			const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
-			for (dgInt32 z = z0; z <= z1; z ++) {
-				for (dgInt32 x = x0; x <= x1; x ++) {
-					dgFloat32 high = elevation[base + x];
-					minHeight = dgMin(high, minHeight);
-					maxHeight = dgMax(high, maxHeight);
-				}
-				base += m_width;
-			}
+			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgFloat32*)m_elevationMap, minHeight, maxHeight);
 			break;
 		}
 
 		case m_unsigned16Bit:
 		{
-			const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
-			for (dgInt32 z = z0; z <= z1; z ++) {
-				for (dgInt32 x = x0; x <= x1; x ++) {
-					dgFloat32 high = dgFloat32 (elevation[base + x]);
-					minHeight = dgMin(high, minHeight);
-					maxHeight = dgMax(high, maxHeight);
-				}
-				base += m_width;
-			}
+			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgInt16*)m_elevationMap, minHeight, maxHeight);
 			break;
 		}
 	}

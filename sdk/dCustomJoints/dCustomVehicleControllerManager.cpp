@@ -1562,7 +1562,7 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 	}
 
 	{
-		dFloat scale1(2.0f / (mass * 10.0f));
+		//dFloat scale1(2.0f / (mass * 10.0f));
 		// draw vehicle forces
 		for (dList<dWheelJoint*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			dMatrix matrix;
@@ -2886,11 +2886,11 @@ void dCustomVehicleController::Debug(dCustomJoint::dDebugDisplay* const debugCon
 
 		// draw the tire load 
 		dVector normalLoad (GetTireNormalForce(jointJont));
-		dVector p0 (tireMatrix.m_posit);
-		dVector p1 (p0 + normalLoad.Scale (scale));
+		//dVector p0 (tireMatrix.m_posit);
+		//dVector p1 (p0 + normalLoad.Scale (scale));
 
-		debugContext->SetColor(dVector (0.0f, 0.0f, 1.0f, 0.0f));
-		debugContext->DrawLine(p0, p1);
+		//debugContext->SetColor(dVector (0.0f, 0.0f, 1.0f, 0.0f));
+		//debugContext->DrawLine(p0, p1);
 
 		// show tire lateral force
 		dVector lateralForce (GetTireLateralForce(jointJont));
