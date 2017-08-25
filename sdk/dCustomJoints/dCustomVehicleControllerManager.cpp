@@ -1526,6 +1526,7 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 			array[2] = projectionMatrix.TransformVector(array[2]);
 			array[3] = projectionMatrix.TransformVector(array[3]);
 
+			debugContext->SetColor(dVector (0.0f, 0.0f, 0.0f, 1.0f));
 			debugContext->DrawLine(array[0], array[1]);
 			debugContext->DrawLine(array[1], array[2]);
 			debugContext->DrawLine(array[2], array[3]);
@@ -1533,7 +1534,6 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 		}
 	}
 
-/*
 	{
 		dFloat velocityScale = 0.125f;
 		// draw vehicle velocity
@@ -1546,28 +1546,38 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 		dVector localVelocity(chassisMatrix.UnrotateVector(veloc));
 		localVelocity.m_y = 0.0f;
 
-		localVelocity = projectionMatrix.RotateVector(localVelocity);
 		array[0] = dVector(0.0f);
 		array[1] = localVelocity.Scale(velocityScale);
-		manager->DrawSchematicCallback(this, "velocity", 0, 2, array);
 
-		dVector localOmega(chassisMatrix.UnrotateVector(omega));
-		array[0] = dVector(0.0f);
-		array[1] = dVector(0.0f, localOmega.m_y * 10.0f, 0.0f, 0.0f);
-		manager->DrawSchematicCallback(this, "omega", 0, 2, array);
+		array[0] = projectionMatrix.TransformVector(array[0]);
+		array[1] = projectionMatrix.TransformVector(array[1]);
+
+		debugContext->SetColor(dVector (1.0f, 1.0f, 0.0f, 1.0f));
+		debugContext->DrawLine(array[0], array[1]);
+
+		//dVector localOmega(chassisMatrix.UnrotateVector(omega));
+		//array[0] = dVector(0.0f);
+		//array[1] = dVector(0.0f, localOmega.m_y * 10.0f, 0.0f, 0.0f);
+		//manager->DrawSchematicCallback(this, "omega", 0, 2, array);
 	}
 
 	{
 		dFloat scale1(2.0f / (mass * 10.0f));
 		// draw vehicle forces
-		for (dList<dBodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			dBodyPartTire* const tire = &node->GetInfo();
+		for (dList<dWheelJoint*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			dMatrix matrix;
-			NewtonBody* const tireBody = tire->GetBody();
+			dWheelJoint* const tire = node->GetInfo();
+			
+			NewtonBody* const tireBody = tire->GetTireBody();
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
+			dMatrix offset(tire->GetMatrix0());
+			offset.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+			matrix = offset * matrix;
 			matrix.m_up = chassisMatrix.m_up;
-			matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
+			matrix.m_right = (matrix.m_front.CrossProduct(matrix.m_up)).Normalize();
+			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
 
+/*
 			dVector origin(worldToComMatrix.TransformVector(matrix.m_posit));
 
 			dVector lateralForce(chassisMatrix.UnrotateVector(GetTireLateralForce(tire)));
@@ -1594,10 +1604,9 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 			array[0] = origin;
 			array[1] = origin + veloc.Scale(velocityScale);
 			manager->DrawSchematicCallback(this, "tireVelocity", 0, 2, array);
+*/
 		}
 	}
-*/
-//	debugContext->PopRenderContext();
 }
 
 dCustomVehicleControllerManager::dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const materialsList)
