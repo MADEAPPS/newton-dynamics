@@ -227,8 +227,8 @@ DemoEntityManager::DemoEntityManager ()
 //	m_workerThreades = 1;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
-//	m_showJointDebugInfo = false;
-//m_synchronousPhysicsUpdateMode = false;
+	m_showJointDebugInfo = true;
+//	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 
@@ -1049,9 +1049,6 @@ int DemoEntityManager::Print (const dVector& color, int x, int y, const char *fm
 */
 }
 
-
-
-
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
@@ -1329,7 +1326,8 @@ void DemoEntityManager::RenderScene()
 	}
 
 	if (m_showJointDebugInfo) {
-		RenderJointsDebugInfo(m_world, 0.5f);
+		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
+		RenderJointsDebugInfo(m_world, &jointDebugRender, 0.5f);
 	}
 
 	if (m_showNormalForces) {

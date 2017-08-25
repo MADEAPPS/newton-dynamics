@@ -39,7 +39,9 @@ class TemplateVector
 	TemplateVector& operator*= (const TemplateVector &A); 
 
 	T DotProduct3 (const TemplateVector &A) const; 
+	TemplateVector Normalize () const; 
 	TemplateVector CrossProduct (const TemplateVector &A) const; 
+	
 
 	T m_x;
 	T m_y;
@@ -208,6 +210,13 @@ template<class T>
 T TemplateVector<T>::DotProduct3 (const TemplateVector<T>& A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
+}
+
+template<class T>
+TemplateVector<T> TemplateVector<T>::Normalize () const
+{
+	T mag (DotProduct3(*this));
+	return Scale (1.0f / T(sqrt (mag)));
 }
 
 template<class T>

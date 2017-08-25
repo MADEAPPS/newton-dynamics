@@ -217,6 +217,7 @@ class dWheelJoint: public dCustomJoint
 	dVector m_longitudinalDir;
 	dFloat m_tireLoad;
 	dFloat m_radio;
+	dFloat m_width;
 	dFloat m_steerRate;
 	dFloat m_steerAngle0;
 	dFloat m_steerAngle1;

@@ -24,6 +24,36 @@ enum DEBUG_DRAW_MODE
 	m_solid,
 };
 
+class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
+{
+	public:
+	dJointDebugDisplay(const dMatrix& cameraMatrix)
+		:dCustomJoint::dDebugDisplay(cameraMatrix)
+	{
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+	}
+
+	~dJointDebugDisplay()
+	{
+		glEnd();;
+	}
+
+	void SetColor(const dVector& color)
+	{
+		glColor3f(color.m_x, color.m_y, color.m_z);
+	}
+
+	void DrawLine(const dVector& p0, const dVector& p1)
+	{
+		glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+	}
+};
+
+
 int DebugDisplayOn();
 void SetDebugDisplayMode(int state);
 
@@ -31,7 +61,7 @@ void RenderAABB (NewtonWorld* const world);
 void RenderCenterOfMass (NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
 void RenderContactPoints (NewtonWorld* const world); 
-void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size);
+void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug, dFloat size);
 
 void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int faceId);
 

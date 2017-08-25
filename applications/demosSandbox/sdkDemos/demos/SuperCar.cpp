@@ -896,120 +896,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		//}
 	}
 
-/*
-	void RenderVehicleSchematic (DemoEntityManager* const scene) const
-	{
-		if (m_player) {
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_DEPTH_TEST);
-			glDisable (GL_BLEND);
-
-			dFloat scale = 100.0f;
-			dFloat width = dFloat(scene->GetWidth());
-			dFloat height = dFloat(scene->GetHeight());
-
-			dMatrix origin (dGetIdentityMatrix());
-			origin.m_posit = dVector(width - 300, height - 200, 0.0f, 1.0f);
-
-			glPushMatrix();
-			glMultMatrix (&origin[0][0]);
-			DrawSchematic (m_player->m_controller, scale);
-			glPopMatrix();
-
-			glLineWidth(1.0f);
-			glEnable(GL_TEXTURE_2D);
-		}
-	}
-
-	void DrawSchematicCallback (const dCustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
-	{
-		if (!strcmp (partName, "chassis")) {
-			glLineWidth(3.0f);
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0 (lines[pointCount - 1]);
-			for (int i = 0; i < pointCount; i ++) {
-				dVector p1 (lines[i]);
-				glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-				glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-				p0 = p1;
-			}
-			glEnd();
-		}
-
-		if (!strcmp (partName, "tire")) {
-			glLineWidth(2.0f);
-			glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0 (lines[pointCount - 1]);
-			for (int i = 0; i < pointCount; i ++) {
-				dVector p1 (lines[i]);
-				glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-				glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-				p0 = p1;
-			}
-			glEnd();
-		}
-
-		if (!strcmp (partName, "velocity")) {
-			glLineWidth(2.0f);
-			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0 (lines[0]);
-			dVector p1 (lines[1]);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-			glEnd();
-		}
-
-		if (!strcmp(partName, "tireVelocity")) {
-			glLineWidth(2.0f);
-			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[0]);
-			dVector p1(lines[1]);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-			glEnd();
-		}
-
-		if (!strcmp(partName, "omega")) {
-			glLineWidth(2.0f);
-			glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0(lines[0]);
-			dVector p1(lines[1]);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-			glEnd();
-		}
-
-		if (!strcmp (partName, "lateralForce")) {
-			glLineWidth(2.0f);
-			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0 (lines[0]);
-			dVector p1 (lines[1]);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-			glEnd();
-		}
-
-		if (!strcmp (partName, "longitudinalForce")) {
-			glLineWidth(2.0f);
-			glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-			glBegin(GL_LINES);
-			dVector p0 (lines[0]);
-			dVector p1 (lines[1]);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-			glEnd();
-		}
-	}
-*/
-
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber)
 	{
 		// set to transparent color
@@ -1319,7 +1205,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		//draw the schematic (laterals forces diagram for the player vehicle) 
-		m_player->m_controller->DrawSchematic(debugContext, 1.0f);
+		m_player->m_controller->DrawSchematic(debugContext, 1.0f / 64.0f);
 		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}
 

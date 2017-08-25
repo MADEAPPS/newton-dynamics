@@ -523,6 +523,7 @@ dWheelJoint::dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tire
 	,m_longitudinalDir(0.0f)
 	,m_tireLoad(0.0f)
 	,m_radio(tireInfo.m_radio)
+	,m_width(tireInfo.m_width)
 	,m_steerRate(0.5f * 3.1416f)
 	,m_steerAngle0(0.0f)
 	,m_steerAngle1(0.0f)
@@ -671,6 +672,7 @@ void dWheelJoint::Load(dCustomJointSaveLoad* const fileLoader)
 	LOAD_VECTOR(longitudinalDir);
 	LOAD_FLOAT(tireLoad);
 	LOAD_FLOAT(radio);
+	LOAD_FLOAT(width);
 	LOAD_FLOAT(steerRate);
 	LOAD_FLOAT(steerAngle0);
 	LOAD_FLOAT(steerAngle1);
@@ -704,6 +706,7 @@ void dWheelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_VECTOR(longitudinalDir);
 	SAVE_FLOAT(tireLoad);
 	SAVE_FLOAT(radio);
+	SAVE_FLOAT(width);
 	SAVE_FLOAT(steerRate);
 	SAVE_FLOAT(steerAngle0);
 	SAVE_FLOAT(steerAngle1);
@@ -1443,84 +1446,96 @@ void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const
 
 void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
 {
-//	dAssert (0);
-//	debugContext->PushRenderContext();
-//	dMatrix projectionMatrix(dGetIdentityMatrix());
-	//projectionMatrix[0][0] = scale;
-	//projectionMatrix[1][1] = 1.0f;
-	//projectionMatrix[2][1] = -scale;
-	//projectionMatrix[2][2] = 1.0f;
-//	debugContext->LoadMatrix(projectionMatrix) ;
-
-	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
-
-debugContext->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
-debugContext->DrawLine(dVector (100.0f, 100.0f, 100.0f, 0.0f), dVector (10.0f, 10.0f, 10.0f, 0.0f));
-/*
-	dMatrix matrix0;
+	dMatrix chassisMatrix;
 	dVector com(0.0f);
-	dFloat arrayPtr[32][4];
-	dVector* const array = (dVector*)arrayPtr;
+	dVector array[32];
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
-	NewtonBody* const chassisBody = m_chassis.GetBody();
-
-	dFloat velocityScale = 0.125f;
+	NewtonBody* const chassisBody = GetBody();
 
 	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
-	NewtonBodyGetMatrix(chassisBody, &matrix0[0][0]);
-	matrix0.m_posit = matrix0.TransformVector(com);
+	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	chassisMatrix.m_posit = chassisMatrix.TransformVector(com);
 
 	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
-	dMatrix chassisMatrix(matrix0);
-	dMatrix worldToComMatrix(chassisMatrix.Inverse() * projectionMatrix);
+	dMatrix chassisInvMatrix(chassisMatrix.Inverse());
+
+	dMatrix scaleMatrix (dGetIdentityMatrix());
+	scaleMatrix[0][0] = scale;
+	scaleMatrix[1][1] = scale;
+	scaleMatrix[2][2] = scale;
+	dMatrix placementMatrix (scaleMatrix * dRollMatrix(90.0f * 3.141592f / 180.0f) * dPitchMatrix(90.0f * 3.141592f / 180.0f));
+	placementMatrix.m_posit.m_x = 10.0f * scale;
+	placementMatrix.m_posit.m_y =  3.0f * scale;
+	placementMatrix.m_posit.m_z =  6.0f * scale;
+
+	dMatrix projectionMatrix(placementMatrix * debugContext->GetCameraMatrix());
 	{
 		// draw vehicle chassis
 		dVector p0(D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, 0.0f);
 		dVector p1(-D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, 0.0f);
 
-		for (dList<dBodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dWheelJoint*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			dMatrix matrix;
-			dBodyPartTire* const tire = &node->GetInfo();
-			NewtonBody* const tireBody = tire->GetBody();
+			dWheelJoint* const tireJoint = node->GetInfo();
+			NewtonBody* const tireBody = tireJoint->GetTireBody();
 			
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
-			//dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
-			dVector p(worldToComMatrix.TransformVector(matrix.m_posit));
+			dVector p(chassisInvMatrix.TransformVector(matrix.m_posit));
 			p0 = dVector(dMin(p.m_x, p0.m_x), dMin(p.m_y, p0.m_y), dMin(p.m_z, p0.m_z), 1.0f);
 			p1 = dVector(dMax(p.m_x, p1.m_x), dMax(p.m_y, p1.m_y), dMax(p.m_z, p1.m_z), 1.0f);
 		}
 
-		array[0] = dVector(p0.m_x, p0.m_y, p0.m_z, 1.0f);
-		array[1] = dVector(p1.m_x, p0.m_y, p0.m_z, 1.0f);
-		array[2] = dVector(p1.m_x, p1.m_y, p0.m_z, 1.0f);
-		array[3] = dVector(p0.m_x, p1.m_y, p0.m_z, 1.0f);
-		manager->DrawSchematicCallback(this, "chassis", 0, 4, array);
+		debugContext->SetColor(dVector (1.0f, 1.0f, 1.0f, 1.0f));
+		array[0] = projectionMatrix.TransformVector (dVector(p0.m_x, p0.m_y, p0.m_z, 1.0f));
+		array[1] = projectionMatrix.TransformVector (dVector(p1.m_x, p0.m_y, p0.m_z, 1.0f));
+		array[2] = projectionMatrix.TransformVector (dVector(p1.m_x, p0.m_y, p1.m_z, 1.0f));
+		array[3] = projectionMatrix.TransformVector (dVector(p0.m_x, p0.m_y, p1.m_z, 1.0f));
+
+		debugContext->DrawLine(array[0], array[1]);
+		debugContext->DrawLine(array[1], array[2]);
+		debugContext->DrawLine(array[2], array[3]);
+		debugContext->DrawLine(array[3], array[0]);
 	}
 
 	{
 		// draw vehicle tires
-		for (dList<dBodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dWheelJoint*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			dMatrix matrix;
-			dBodyPartTire* const tire = &node->GetInfo();
-			dFloat width = tire->m_data.m_width * 0.5f;
-			dFloat radio = tire->m_data.m_radio;
-			NewtonBody* const tireBody = tire->GetBody();
+			dWheelJoint* const tireJoint = node->GetInfo();
+			dFloat width = tireJoint->m_width * 0.5f;
+			dFloat radio = tireJoint->m_radio;
+			NewtonBody* const tireBody = tireJoint->GetTireBody();
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
+			dMatrix offset (tireJoint->GetMatrix0());
+			offset.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+			matrix = offset * matrix;
 			matrix.m_up = chassisMatrix.m_up;
-			matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
+			matrix.m_right = (matrix.m_front.CrossProduct(matrix.m_up)).Normalize();
+			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
 
-			array[0] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(width, 0.0f, radio, 0.0f)));
-			array[1] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(width, 0.0f, -radio, 0.0f)));
-			array[2] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f, -radio, 0.0f)));
-			array[3] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f, radio, 0.0f)));
-			manager->DrawSchematicCallback(this, "tire", 0, 4, array);
+			array[0] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector( width, 0.0f,  radio, 0.0f)));
+			array[1] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector( width, 0.0f, -radio, 0.0f)));
+			array[2] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f, -radio, 0.0f)));
+			array[3] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f,  radio, 0.0f)));
+
+			array[0] = projectionMatrix.TransformVector(array[0]);
+			array[1] = projectionMatrix.TransformVector(array[1]);
+			array[2] = projectionMatrix.TransformVector(array[2]);
+			array[3] = projectionMatrix.TransformVector(array[3]);
+
+			debugContext->DrawLine(array[0], array[1]);
+			debugContext->DrawLine(array[1], array[2]);
+			debugContext->DrawLine(array[2], array[3]);
+			debugContext->DrawLine(array[3], array[0]);
 		}
 	}
 
+/*
 	{
+		dFloat velocityScale = 0.125f;
 		// draw vehicle velocity
 		dVector veloc(0.0f);
 		dVector omega(0.0f);

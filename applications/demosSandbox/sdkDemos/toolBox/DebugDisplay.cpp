@@ -18,34 +18,6 @@
 
 static int g_debugMode = 0;
 
-class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
-{
-	public:
-	dJointDebugDisplay()
-		:dCustomJoint::dDebugDisplay()
-	{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glBegin(GL_LINES);
-	}
-
-	~dJointDebugDisplay()
-	{
-		glEnd();;
-	}
-
-	void SetColor(const dVector& color)
-	{
-		glColor3f(color.m_x, color.m_y, color.m_z);
-	}
-
-	void DrawLine(const dVector& p0, const dVector& p1)
-	{
-		glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-		glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-	}
-};
 
 int DebugDisplayOn()
 {
@@ -455,19 +427,17 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 #endif
 }
 
-void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
+void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug, dFloat size)
 {
 	glDisable(GL_TEXTURE_2D);
 	glDisable (GL_LIGHTING);
-
-	dJointDebugDisplay jointDebug;
 
 	// this will go over the joint list twice, 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
 			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-			customJoint->Debug(&jointDebug);
+			customJoint->Debug(jointDebug);
 		}
 	}
-	NewtonWorldListenerDebug(world, &jointDebug);
+	NewtonWorldListenerDebug(world, jointDebug);
 }
