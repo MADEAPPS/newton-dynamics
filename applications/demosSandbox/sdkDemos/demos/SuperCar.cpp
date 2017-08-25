@@ -991,8 +991,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			dFloat joyPosZ;
 			
 			char buttons[32];
-			int joyButtons = scene->GetJoystickButtons (buttons);
-			dAssert(joyButtons);
+			scene->GetJoystickButtons (buttons);
 
 			joyPosX = axis[m_steeringAxis];
 			joyPosY = -axis[m_throttleAxis];
