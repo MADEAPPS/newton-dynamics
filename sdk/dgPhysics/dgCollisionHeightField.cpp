@@ -913,12 +913,8 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 			for (dgInt32 z = z0; z <= z1; z ++) {
 				for (dgInt32 x = x0; x <= x1; x ++) {
 					dgFloat32 high = elevation[base + x];
-					if (high < minHeight) {
-						minHeight = high;
-					}
-					if (high > maxHeight) {
-						maxHeight = high;
-					}
+					minHeight = dgMin(high, minHeight);
+					maxHeight = dgMax(high, maxHeight);
 				}
 				base += m_width;
 			}
@@ -931,12 +927,8 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 			for (dgInt32 z = z0; z <= z1; z ++) {
 				for (dgInt32 x = x0; x <= x1; x ++) {
 					dgFloat32 high = dgFloat32 (elevation[base + x]);
-					if (high < minHeight) {
-						minHeight = high;
-					}
-					if (high > maxHeight) {
-						maxHeight = high;
-					}
+					minHeight = dgMin(high, minHeight);
+					maxHeight = dgMax(high, maxHeight);
 				}
 				base += m_width;
 			}
