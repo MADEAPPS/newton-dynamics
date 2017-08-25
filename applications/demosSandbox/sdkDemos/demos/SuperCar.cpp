@@ -1204,7 +1204,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		//draw the schematic (laterals forces diagram for the player vehicle) 
-		m_player->m_controller->DrawSchematic(debugContext, 1.0f / 64.0f);
+		m_player->m_controller->DrawSchematic(debugContext, 6.0f, 3.0f, 0.125f);
 		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}
 

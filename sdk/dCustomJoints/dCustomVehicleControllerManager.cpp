@@ -1444,7 +1444,7 @@ void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const
 	}
 }
 
-void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
+void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const debugContext, dFloat x, dFloat y, dFloat scale) const
 {
 	dMatrix chassisMatrix;
 	dVector com(0.0f);
@@ -1467,9 +1467,9 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 	scaleMatrix[1][1] = scale;
 	scaleMatrix[2][2] = scale;
 	dMatrix placementMatrix (scaleMatrix * dRollMatrix(90.0f * 3.141592f / 180.0f) * dPitchMatrix(90.0f * 3.141592f / 180.0f));
-	placementMatrix.m_posit.m_x = 10.0f * scale;
-	placementMatrix.m_posit.m_y =  3.0f * scale;
-	placementMatrix.m_posit.m_z =  6.0f * scale;
+	placementMatrix.m_posit.m_x = 1.0f;
+	placementMatrix.m_posit.m_y =  y * scale;
+	placementMatrix.m_posit.m_z =  x * scale;
 
 	dMatrix projectionMatrix(placementMatrix * debugContext->GetCameraMatrix());
 	{

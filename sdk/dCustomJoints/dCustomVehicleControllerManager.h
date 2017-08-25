@@ -640,7 +640,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void SetWeightDistribution(dFloat weightDistribution);
 
 	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-	CUSTOM_JOINTS_API void DrawSchematic (dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const;	
+	CUSTOM_JOINTS_API void DrawSchematic (dCustomJoint::dDebugDisplay* const debugContext, dFloat x, dFloat y, dFloat scale) const;	
 
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
