@@ -21,7 +21,7 @@
 #include "dScene.h"
 #include "dDrawUtils.h"
 #include "dCollisionBoxNodeInfo.h"
-
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dCollisionBoxNodeInfo);
 

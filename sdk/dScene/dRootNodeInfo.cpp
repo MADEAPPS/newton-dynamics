@@ -19,7 +19,7 @@
 
 #include "dSceneStdafx.h"
 #include "dRootNodeInfo.h"
-
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dRootNodeInfo);
 

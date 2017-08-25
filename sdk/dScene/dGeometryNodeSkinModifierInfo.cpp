@@ -23,6 +23,7 @@
 #include "dSceneNodeInfo.h"
 #include "dGeometryNodeModifierInfo.h"
 #include "dGeometryNodeSkinModifierInfo.h"
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dGeometryNodeSkinModifierInfo);
 

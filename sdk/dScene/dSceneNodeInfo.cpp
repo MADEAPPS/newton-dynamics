@@ -23,7 +23,7 @@
 #include "dSceneRender.h"
 #include "dSceneNodeInfo.h"
 #include "dGeometryNodeInfo.h"
-
+#include <tinyxml.h>
 
 
 

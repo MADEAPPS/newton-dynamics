@@ -20,7 +20,7 @@
 #include "dSceneStdafx.h"
 #include "dScene.h"
 #include "dSceneCacheInfo.h"
-
+#include <tinyxml.h>
 
 
 D_IMPLEMENT_CLASS_NODE(dSceneCacheInfo);

@@ -19,6 +19,7 @@
 
 
 #include "dSceneStdafx.h"
+#include <tinyxml.h>
 
 #ifdef _DSCENE_DLL
 	void* operator new (size_t size) 

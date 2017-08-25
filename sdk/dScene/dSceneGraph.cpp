@@ -22,7 +22,7 @@
 #include "dNodeInfo.h"
 #include "dSceneNodeInfo.h"
 #include "dSceneGraph.h"
-
+#include <tinyxml.h>
 
 
 

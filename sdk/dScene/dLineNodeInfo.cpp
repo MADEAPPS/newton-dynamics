@@ -21,6 +21,7 @@
 #include "dScene.h"
 #include "dSceneRender.h"
 #include "dLineNodeInfo.h"
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dLineNodeInfo);
 

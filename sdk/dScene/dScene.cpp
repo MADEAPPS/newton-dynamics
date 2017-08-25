@@ -38,7 +38,7 @@
 #include "dCollisionConvexHullNodeInfo.h"
 #include "dGeometryNodeSkinModifierInfo.h"
 #include "dCollisionChamferCylinderNodeInfo.h"
-
+#include <tinyxml.h>
 
 
 // revision 101:  change SceneNodeMatrix Matrix from global to local

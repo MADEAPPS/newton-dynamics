@@ -136,17 +136,11 @@
     <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\newton.vcxproj">
       <Project>{f8604c1c-867d-4efd-afac-15404f17084e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\thirdParty\glew\build\VS_2015_static_mt\glew.vcxproj">
-      <Project>{0c9707f5-dec7-42eb-8ea1-a484df1e515b}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\sdk\thirdParty\glfw\vs2015\glfw.vcxproj">
       <Project>{71de04d1-e371-4a45-9694-2aa647d65451}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\sdk\thirdParty\imgui\vs2015\imgui.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\thirdParty\tinyxml\vs2015_static_mt\tinyxml.vcxproj">
-      <Project>{152b6a93-8825-419f-9fad-f20570949bea}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -282,7 +276,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -298,7 +292,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -314,7 +308,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -330,7 +324,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -348,7 +342,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -368,7 +362,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -388,7 +382,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -408,7 +402,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/tinyxml;../../../../sdk/thirdParty/glew/include;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

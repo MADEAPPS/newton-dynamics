@@ -22,6 +22,7 @@
 #include "dGeometryNodeInfo.h"
 #include "dTextureNodeInfo.h"
 #include "dMaterialNodeInfo.h"
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dGeometryNodeInfo);
 

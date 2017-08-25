@@ -24,9 +24,9 @@
 #include "dTextureNodeInfo.h"
 #include "dMaterialNodeInfo.h"
 #include "dGeometryNodeModifierInfo.h"
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dMeshNodeInfo);
-
 
 
 dMeshNodeInfo::dMeshNodeInfo()

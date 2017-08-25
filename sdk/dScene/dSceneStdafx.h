@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <locale.h>
-#include <tinyxml.h>
+
 
 #if _MSC_VER
 	#include <windows.h>
@@ -111,11 +111,10 @@
 #include <dClassInfo.h>
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>
-
-
 #include <dBezierSpline.h>
-
 #include <Newton.h>
+
+class TiXmlElement;
 
 
 #ifdef _DSCENE_DLL

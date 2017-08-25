@@ -19,7 +19,7 @@
 
 #include "dSceneStdafx.h"
 #include "dMaterialNodeInfo.h"
-
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dMaterialNodeInfo);
 

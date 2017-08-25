@@ -19,9 +19,9 @@
 
 #include "dSceneStdafx.h"
 #include "dNodeInfo.h"
+#include <tinyxml.h>
 
 dInitRtti(dNodeInfo);
-
 
 
 unsigned dNodeInfo::m_uniqueIDCounter = 0;

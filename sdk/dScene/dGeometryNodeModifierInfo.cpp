@@ -20,6 +20,7 @@
 #include "dSceneStdafx.h"
 #include "dScene.h"
 #include "dGeometryNodeModifierInfo.h"
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dGeometryNodeModifierInfo);
 

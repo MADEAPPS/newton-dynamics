@@ -23,6 +23,7 @@
 #include "dSceneNodeInfo.h"
 #include "dRigidbodyNodeInfo.h"
 #include "dCollisionNodeInfo.h"
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dRigidbodyNodeInfo);
 

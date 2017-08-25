@@ -19,7 +19,7 @@
 
 #include "dSceneStdafx.h"
 #include "dVariable.h"
-
+#include <tinyxml.h>
 
 
 dVariable::dVariable ()

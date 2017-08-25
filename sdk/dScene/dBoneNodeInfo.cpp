@@ -19,6 +19,7 @@
 
 #include "dSceneStdafx.h"
 #include "dBoneNodeInfo.h"
+#include <tinyxml.h>
 
 D_IMPLEMENT_CLASS_NODE(dBoneNodeInfo);
 
