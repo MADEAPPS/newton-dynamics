@@ -2,14 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "dScene.vcxproj", "{B5EEC82D-938F-44C9-89BB-4A058581750B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{152B6A93-8825-419F-9FAD-F20570949BEA} = {152B6A93-8825-419F-9FAD-F20570949BEA}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dNewton", "dNewton.vcxproj", "{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{152B6A93-8825-419F-9FAD-F20570949BEA} = {152B6A93-8825-419F-9FAD-F20570949BEA}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dCustomJoints", "dCustomJoints.vcxproj", "{721C99CE-4716-4146-9817-59BC2671B844}"
 EndProject
@@ -24,11 +18,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dMath", "dMath.vcxproj", "{2928F15F-0650-4261-B759-36C7792267DC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "dContainers.vcxproj", "{E6A31C39-173F-4000-97E0-F086DB68DD42}"
-	ProjectSection(ProjectDependencies) = postProject
-		{152B6A93-8825-419F-9FAD-F20570949BEA} = {152B6A93-8825-419F-9FAD-F20570949BEA}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj", "{152B6A93-8825-419F-9FAD-F20570949BEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -186,22 +175,6 @@ Global
 		{E6A31C39-173F-4000-97E0-F086DB68DD42}.release|Win32.Build.0 = Release|Win32
 		{E6A31C39-173F-4000-97E0-F086DB68DD42}.release|x64.ActiveCfg = Release|x64
 		{E6A31C39-173F-4000-97E0-F086DB68DD42}.release|x64.Build.0 = Release|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug_double|Win32.ActiveCfg = debug_double|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug_double|Win32.Build.0 = debug_double|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug_double|x64.ActiveCfg = debug_double|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug_double|x64.Build.0 = debug_double|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug|Win32.ActiveCfg = Debug|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug|Win32.Build.0 = Debug|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug|x64.ActiveCfg = Debug|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.debug|x64.Build.0 = Debug|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release_double|Win32.ActiveCfg = release_double|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release_double|Win32.Build.0 = release_double|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release_double|x64.ActiveCfg = release_double|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release_double|x64.Build.0 = release_double|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release|Win32.ActiveCfg = Release|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release|Win32.Build.0 = Release|Win32
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release|x64.ActiveCfg = Release|x64
-		{152B6A93-8825-419F-9FAD-F20570949BEA}.release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

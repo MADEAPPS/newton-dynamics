@@ -44,9 +44,6 @@
     <ClCompile Include="..\..\thirdParty\tinyxml\tinyxmlparser.cpp">
       <Filter>tinyxml</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\thirdParty\tinyxml\xmltest.cpp">
-      <Filter>tinyxml</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dScene\dBoneNodeInfo.h" />

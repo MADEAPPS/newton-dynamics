@@ -86,7 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tinyxml">
-      <UniqueIdentifier>{282ac968-f8a8-4b14-a817-fb43770dc9ea}</UniqueIdentifier>
+      <UniqueIdentifier>{621a1f35-62e0-4244-8aa6-df08f660315f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
