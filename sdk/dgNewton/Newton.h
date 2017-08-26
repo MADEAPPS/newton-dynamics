@@ -466,6 +466,7 @@ extern "C" {
 
 	NEWTON_API int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int algorithmType);
+	NEWTON_API void NewtonResetBroadphase(const NewtonWorld* const newtonWorld);
 	
 	NEWTON_API void NewtonUpdate (const NewtonWorld* const newtonWorld, dFloat timestep);
 	NEWTON_API void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep);
