@@ -174,13 +174,11 @@ void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	dVector pin (engineMatrix.RotateVector(GetMatrix0().m_front));
 	m_rpm = omega.DotProduct3(pin);
-	dFloat alpha = dClamp ((m_targetRpm - m_rpm) / timestep, -D_VEHICLE_MAX_ENGINE_LOAD, D_VEHICLE_MAX_ENGINE_LOAD);
 
-static int xxx;
-xxx ++;
-//dTrace (("%d %f %f %f\n", xxx, m_targetRpm, m_rpm, alpha));
-if(xxx >= 5455)
-xxx *=1;
+	dFloat alpha = (m_targetRpm - m_rpm) / timestep;
+	if (m_rpm >= -0.1f) {
+		alpha = dClamp (alpha, -D_VEHICLE_MAX_ENGINE_LOAD, D_VEHICLE_MAX_ENGINE_LOAD);
+	}
 
 	NewtonUserJointAddAngularRow(m_joint, 0, &pin[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, alpha);
