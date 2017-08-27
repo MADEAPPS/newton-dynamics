@@ -279,8 +279,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						const dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
 						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
 
-						//constraintArray[jointIndex].m_isSkeleton = sourceSkel && constraint->IsBilateral() && (sourceSkel == linkBody->GetSkeleton());
-						constraintArray[jointIndex].m_isSkeleton = constraint->IsSkeleton();
+						//constraintArray[jointIndex].m_isSkeleton = constraint->IsSkeleton();
 						constraintArray[jointIndex].m_isFrontier = equilibrium0 ^ linkBody->m_equilibrium;
 
 						const bool isEquilibrium = equilibrium0 & linkBody->m_equilibrium & !linkBody->GetSkeleton();
@@ -479,11 +478,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 	if (queue.IsEmpty()) {
 		dgAssert(heaviestBody);
 		queue.Insert(heaviestBody);
-		//if (heaviestBody->m_isSkeleton) {
-		//	dgSkeletonContainer* const container = heaviestBody->m_joint->m_body0->GetSkeleton();
-		//	dgAssert (container == heaviestBody->m_joint->m_body1->GetSkeleton());
-		//}
-		dgAssert(!heaviestBody->m_isSkeleton || (heaviestBody->m_joint->m_body0->GetSkeleton() == heaviestBody->m_joint->m_body1->GetSkeleton()));
+		dgAssert(heaviestBody->m_joint->m_body0->GetSkeleton() == heaviestBody->m_joint->m_body1->GetSkeleton());
 		heaviestBody->m_isInQueueFrontier = -1;
 	}
 
@@ -492,7 +487,6 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 
-	bool hasSkel = false;
 	while (!queue.IsEmpty()) {
 		dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
 		if (count < 0) {
@@ -515,11 +509,9 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 
 				const dgInt32 m0 = jointInfo->m_m0;
 				const dgBody* const body0 = bodyArray[m0].m_body;
-				hasSkel = hasSkel || body0->GetSkeleton();
 
 				const dgInt32 m1 = jointInfo->m_m1;
 				const dgBody* const body1 = bodyArray[m1].m_body;
-				hasSkel = hasSkel || body1->GetSkeleton();
 
 				//if (infoIndex == island->m_jointCount) {
 				if (infoIndex == cluster->m_activeJointCount) {
@@ -562,6 +554,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 		}
 	}
 
+/*
 	if (hasSkel) {
 		dgInt32 j = 0;
 		for (dgInt32 i = 0; (i < cluster->m_activeJointCount) && (j < cluster->m_activeJointCount); i ++) {
@@ -579,6 +572,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 			}
 		}
 	}
+*/
 	dgAssert(infoIndex == cluster->m_activeJointCount);
 }
 

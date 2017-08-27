@@ -59,12 +59,12 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	28          // standard joints
+#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
-#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
@@ -216,6 +216,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_updateMenuOptions(true)
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
+	,m_suspendPhysicsUpdate(false)
 	,m_synchronousPhysicsUpdateMode(true)
 {
 //	m_showAABB = false;
@@ -561,9 +562,12 @@ void DemoEntityManager::ApplyMenuOptions()
 
 void DemoEntityManager::ShowMainMenuBar()
 {
+	m_suspendPhysicsUpdate = false;
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) {
+			m_suspendPhysicsUpdate = true;
+
 			if (ImGui::MenuItem("About", "")) {
 				dAssert (0);
 			}
@@ -596,7 +600,9 @@ void DemoEntityManager::ShowMainMenuBar()
 
 			ImGui::EndMenu();
 		}
+
 		if (ImGui::BeginMenu("Demos")) {
+			m_suspendPhysicsUpdate = true;
 			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
 			for (int i = 0; i < demosCount; i ++) {
 				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) {
@@ -610,6 +616,7 @@ void DemoEntityManager::ShowMainMenuBar()
 		bool optionsOn = ImGui::BeginMenu("Options");
 		if (optionsOn) {
 			m_updateMenuOptions = true;
+			m_suspendPhysicsUpdate = true;
 
 			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
 			ImGui::Checkbox("Show stats", &m_showStats);
@@ -651,6 +658,7 @@ void DemoEntityManager::ShowMainMenuBar()
 		}
 
 		if (ImGui::BeginMenu("Help")) {
+			m_suspendPhysicsUpdate = true;
 			ImGui::EndMenu();
 		}
 
@@ -1058,7 +1066,7 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
-	if (m_world) {
+	if (m_world && !m_suspendPhysicsUpdate) {
 
 		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);

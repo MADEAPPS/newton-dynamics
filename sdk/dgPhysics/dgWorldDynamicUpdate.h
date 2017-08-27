@@ -104,7 +104,7 @@ class dgJointInfo
 	dgInt32 m_pairCount;
 	dgInt32 m_isFrontier		: 1;
 	dgInt32 m_isInQueueFrontier : 1;
-	dgInt32 m_isSkeleton		: 1;
+	dgInt32 m_isSkeleton___		: 1;
 };
 
 
