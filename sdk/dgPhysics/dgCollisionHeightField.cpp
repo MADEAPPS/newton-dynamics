@@ -999,42 +999,18 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 	data->m_separationDistance = dgFloat32 (0.0f);
 	dgFloat32 minHeight = dgFloat32 (1.0e10f);
 	dgFloat32 maxHeight = dgFloat32 (-1.0e10f);
-	dgInt32 base = z0 * m_width;
+//	dgInt32 base = z0 * m_width;
 	switch (m_elevationDataType) 
 	{
 		case m_float32Bit:
 		{
-			const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
-			for (dgInt32 z = z0; z <= z1; z ++) {
-				for (dgInt32 x = x0; x <= x1; x ++) {
-					dgFloat32 high = elevation[base + x];
-					if (high < minHeight) {
-						minHeight = high;
-					}
-					if (high > maxHeight) {
-						maxHeight = high;
-					}
-				}
-				base += m_width;
-			}
+			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgFloat32*)m_elevationMap, minHeight, maxHeight);
 			break;
 		}
 
 		case m_unsigned16Bit:
 		{
-			const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
-			for (dgInt32 z = z0; z <= z1; z ++) {
-				for (dgInt32 x = x0; x <= x1; x ++) {
-					dgFloat32 high = dgFloat32 (elevation[base + x]);
-					if (high < minHeight) {
-						minHeight = high;
-					}
-					if (high > maxHeight) {
-						maxHeight = high;
-					}
-				}
-				base += m_width;
-			}
+			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgInt16*)m_elevationMap, minHeight, maxHeight);
 			break;
 		}
 	}
@@ -1044,7 +1020,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) {
 		// scan the vertices's intersected by the box extend
-		base = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
+		dgInt32 base = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
 		while (base > m_instanceData->m_vertexCount[data->m_threadNumber]) {
 			AllocateVertex(world, data->m_threadNumber);
 		}
