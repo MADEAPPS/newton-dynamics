@@ -467,7 +467,8 @@ class dgVector
 
 	DG_INLINE dgVector Normalize () const
 	{
-		return *this * dgVector (dgRsqrt (DotProduct4(*this).m_x));
+		//return *this * dgVector (dgRsqrt (DotProduct4(*this).m_x));
+		return Scale4 (dgRsqrt (DotProduct4(*this).GetScalar()));
 	}
 
 	dgVector Abs () const
@@ -1416,7 +1417,7 @@ class dgVector
 		return dgVector (_mm_sqrt_ps(m_type));
 	}
 
-	DG_INLINE dgVector InvSqrt___ () const
+	DG_INLINE dgVector InvSqrt () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
 		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
@@ -1424,7 +1425,7 @@ class dgVector
 
 	DG_INLINE dgVector Normalize () const
 	{
-		return *this * (DotProduct4(*this).InvSqrt___());
+		return *this * (DotProduct4(*this).InvSqrt());
 	}
 
 	// relational operators
@@ -1994,8 +1995,8 @@ class dgSpatialVector
 
 	DG_INLINE dgSpatialVector(const dgFloat32 a)
 		:m_d0(_mm_set1_pd(a))
-		, m_d1(_mm_set1_pd(a))
-		, m_d2(_mm_set1_pd(a))
+		,m_d1(_mm_set1_pd(a))
+		,m_d2(_mm_set1_pd(a))
 	{
 	}
 
@@ -2018,8 +2019,8 @@ class dgSpatialVector
 
 	DG_INLINE dgSpatialVector(const __m128d d0, const __m128d d1, const __m128d d2)
 		:m_d0(d0)
-		, m_d1(d1)
-		, m_d2(d2)
+		,m_d1(d1)
+		,m_d2(d2)
 	{
 	}
 
@@ -2049,12 +2050,13 @@ class dgSpatialVector
 
 	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
 	{
-		dgFloat64 ret;
+		//dgFloat64 ret;
 		dgSpatialVector tmp(*this * v);
 		__m128d tmp2(_mm_add_pd(tmp.m_d0, _mm_add_pd(tmp.m_d1, tmp.m_d2)));
 		__m128d dot(_mm_hadd_pd(tmp2, tmp2));
-		_mm_store_sd(&ret, dot);
-		return ret;
+		//_mm_store_sd(&ret, dot);
+		//return ret;
+		return dot.m128d_f64[0];
 	}
 
 	DG_INLINE dgSpatialVector Scale(dgFloat64 s) const
