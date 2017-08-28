@@ -40,14 +40,14 @@
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
-// This is correct.The weighting coefficients of any RK method comes for fixing arbitrary criteria
-// solving a set of linear equation on the coefficients. 
-// the standard coefficients just happen to lead to an accurate result because they are optimal with respect to a second order solution. 
-// for differential equations higher than second order then is not clear if the traditional weigh factors are any better than 
-// any other set of weighting factors.
-// However a different set of coefficient generates results that are not much different than the optimal set, 
+// This is correct.The weighting coefficients of any RK method comes from an arbitrary criteria
+// solving for a set of linear equation on the coefficients. 
+// The standard coefficients just happen to lead to an accurate result because they are optimal 
+// with respect to a second order solution.For differential equations of higher order, then is not 
+// clear if the traditional weigh factors are any better than any other set of weighting factors.
+// A different set of coefficient generates results that are not much different than the optimal set, 
 // but it allows for simpler calculation of the intermediate derivatives and also for less intermediate memory.
-// for more detail on the derivation of the Runge Kutta coefficients you can go to:  
+// For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
 

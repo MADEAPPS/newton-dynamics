@@ -1042,7 +1042,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
-	//	const dgInt32 jointCount = island->m_jointCount;
+	//const dgInt32 jointCount = island->m_jointCount;
 	const dgInt32 jointCount = cluster->m_activeJointCount;
 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
@@ -1070,7 +1070,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
-
 		for (dgInt32 i = 0; i < jointCount; i++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const constraint = jointInfo->m_joint;
@@ -1096,7 +1095,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 				dgAssert(body->m_index == i);
 				dgAssert (body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-				//if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				const dgJacobian& forceAndTorque = internalForces[i];
 				dgVector force(body->m_externalForce + forceAndTorque.m_linear);
 				dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
@@ -1108,7 +1106,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 
 				dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
 				dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
-//				}
 			}
 		} else {
 			for (dgInt32 i = 1; i < bodyCount; i++) {

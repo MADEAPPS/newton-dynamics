@@ -201,11 +201,11 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 
 				m_pickedBodyParam = param;
 				#ifdef USE_PICK_BODY_BY_FORCE
-				// save point local to the body matrix
-				m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
+					// save point local to the body matrix
+					m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
 
-				// convert normal to local space
-				m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
+					// convert normal to local space
+					m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
 				#else
 					if(m_pickJoint) {
 						delete m_pickJoint;
@@ -219,7 +219,7 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 					NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 
 					const dFloat angularFritionAccel = 100.0f;
-					const dFloat linearFrictionAccel = 10.0f * dAbs (dMax (DEMO_GRAVITY, 10.0f));
+					const dFloat linearFrictionAccel = 100.0f * dAbs (dMax (DEMO_GRAVITY, 10.0f));
 					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
 
 					m_pickJoint = new dCustomKinematicController (body, posit);
