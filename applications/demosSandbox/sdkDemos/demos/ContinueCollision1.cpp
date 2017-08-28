@@ -36,7 +36,7 @@ static dVector GetLookAtDirction(DemoEntityManager* const scene)
 	dFloat y2 = f.m_y * f.m_y;
 	dFloat z2 = f.m_z * f.m_z;
 
-	dFloat u = sqrt(x2 + y2 + z2);
+	dFloat u = dSqrt(x2 + y2 + z2);
 
 	return dVector(f.m_x / u, f.m_y / u, f.m_z / u);
 }

@@ -222,7 +222,7 @@ freq *= 0.5f;
 
 	static dFloat GetElevation (int size, dFloat elevation, dFloat maxH, dFloat minH, dFloat roughness)
 	{
-		dFloat h = pow (dFloat (size) * elevation, 1.0f + roughness);
+		dFloat h = dFloat (pow (dFloat (size) * elevation, 1.0f + roughness));
 		if (h > maxH) {
 			h = maxH;	
 		} else if (h < minH){

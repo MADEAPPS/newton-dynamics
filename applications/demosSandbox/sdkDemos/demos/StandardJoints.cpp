@@ -372,9 +372,9 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		if (m_anim_speed != 0.0f) // some animation to illustrate purpose
 		{
 			m_anim_time += timestep * m_anim_speed;
-			dFloat a0 = sin(m_anim_time);
+			dFloat a0 = dSin(m_anim_time);
 			dFloat a1 = m_anim_offset * 3.14f;
-			dVector axis(sin(a1), 0.0f, cos(a1));
+			dVector axis(dSin(a1), 0.0f, dCos(a1));
 			//dVector axis (1,0,0);
 			m_target = dQuaternion(axis, a0 * 0.5f);
 		}
@@ -386,7 +386,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
 		qErr.Normalize();
 
-		dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
+		dFloat errorAngle = 2.0f * dAcos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
 		dVector errorAngVel(0, 0, 0);
 
 		dMatrix basis;

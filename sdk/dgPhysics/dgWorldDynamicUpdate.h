@@ -33,6 +33,7 @@
 
 #define	DG_BODY_LRU_STEP				2	
 #define	DG_MAX_SKELETON_JOINT_COUNT		256
+#define DG_MAX_CONTINUE_COLLISON_STEPS	8
 
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
 #define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_MAG * dgFloat32 (0.5f))
@@ -50,10 +51,6 @@
 // For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
-
-//#define DG_EXPERIMENTAL_SOLVER
-
-#define DG_MAX_CONTINUE_COLLISON_STEPS	8
 
 class dgBody;
 class dgDynamicBody;
@@ -104,7 +101,6 @@ class dgJointInfo
 	dgInt32 m_pairCount;
 	dgInt32 m_isFrontier		: 1;
 	dgInt32 m_isInQueueFrontier : 1;
-	dgInt32 m_isSkeleton___		: 1;
 };
 
 
@@ -288,7 +284,6 @@ class dgWorldDynamicUpdate
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateClusterReactionForces (const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateClusterReactionForces_1 (const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void CalculateClusterReactionForcesExperimental(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, const dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
 
 	void CalculateJointForceJacobi0(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
