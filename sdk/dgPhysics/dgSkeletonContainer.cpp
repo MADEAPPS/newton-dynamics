@@ -615,6 +615,10 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 	m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 	m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
+	dgForcePair* const forcePair = dgAlloca(dgForcePair, m_nodeCount);
+	dgForcePair* const accelPair = dgAlloca(dgForcePair, m_nodeCount);
+	dgFloat32* const diagDamp = dgAlloca(dgFloat32, m_auxiliaryRowCount);
+
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		const dgNode* const node = m_nodesOrder[i];
 		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
@@ -663,7 +667,7 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
-	dgFloat32* const diagDamp = dgAlloca(dgFloat32, m_auxiliaryRowCount);
+	
 	const dgInt32 auxiliaryCount = m_rowCount - m_auxiliaryRowCount;
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgJacobianMatrixElement* const row_i = m_rowArray[primaryCount + i];
@@ -727,8 +731,6 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
-	dgForcePair* const forcePair = dgAlloca(dgForcePair, m_nodeCount);
-	dgForcePair* const accelPair = dgAlloca(dgForcePair, m_nodeCount);
 	accelPair[m_nodeCount - 1].m_body = dgSpatialVector(dgFloat32(0.0f));
 	accelPair[m_nodeCount - 1].m_joint = dgSpatialVector(dgFloat32(0.0f));
 
@@ -807,8 +809,8 @@ bool dgSkeletonContainer::SanityCheck(const dgForcePair* const force, const dgFo
 	return true;
 }
 
-//DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
-void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
+DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
+//void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgNode* const node = m_nodesOrder[i];
