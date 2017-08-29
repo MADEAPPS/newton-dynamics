@@ -88,10 +88,11 @@ else ()
   set(BUILD_64 FALSE)
 endif ()
 
+
+# options
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
 option("DOUBLE_PRECISION" "Use Double Precision" OFF)
 option("THREAD_EMULATION" "Use single thread only" OFF)
-
 
 if(THREAD_EMULATION)
   add_definitions(-DDG_USE_THREAD_EMULATION)
@@ -101,9 +102,12 @@ if(DOUBLE_PRECISION)
  add_definitions(-D_NEWTON_USE_DOUBLE)
 endif()
 
+
+# Newton core library
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk")
+
+# demos sandbox
 if(NEWTON_DEMOS_SANDBOX)
+  add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk/thirdParty")
   add_subdirectory("${NewtonSDK_SOURCE_DIR}/applications/demosSandbox")
 endif()
-
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk/thirdParty")
