@@ -320,6 +320,9 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 {
 	T* const offDiag = dgAlloca(T, size);
 	T* const matrix = dgAlloca(T, size * size);
+	dgCheckAligment(offDiag);
+	dgCheckAligment(matrix);
+
 	memcpy(matrix, choleskyMatrix, sizeof(T) * size * size);
 
 	for (dgInt32 i = size - 1; i > 0; i--) {
@@ -463,6 +466,7 @@ void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, con
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dgAlloca(T, size);
+	dgCheckAligment(invDiag1);
 
 	dgInt32 base = 0;
 	for (dgInt32 i = 0; i < size; i++) {
@@ -666,6 +670,14 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 	T* const tmp0 = dgAlloca(T, size);
 	T* const tmp1 = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
+
+	dgCheckAligment(x0);
+	dgCheckAligment(r0);
+	dgCheckAligment(tmp0);
+	dgCheckAligment(tmp1);
+	dgCheckAligment(delta_r);
+	dgCheckAligment(delta_x);
+	dgCheckAligment(permute);
 
 	dgInt32 index = 0;
 	dgInt32 count = size;
@@ -878,6 +890,8 @@ template <class T>
 bool dgSolveDantzigLCP(dgInt32 size, T* const symetricMatrix, T* const x, T* const b, T* const low, T* const high)
 {
 	T* const choleskyMatrix = dgAlloca(T, size * size);
+	dgCheckAligment(choleskyMatrix);
+
 	memcpy (choleskyMatrix, symetricMatrix, sizeof (T) * size * size);
 	dgCholeskyFactorization(size, choleskyMatrix);
 	for (dgInt32 i = 0; i < size; i ++) {
@@ -910,6 +924,7 @@ template <class T>
 bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* const x, T* const b, T* const low, T* const high)
 {
 	dgInt16* const permute = dgAlloca(short, size);
+	dgCheckAligment(permute);
 
 	for (dgInt32 i = 0; i < size; i++) {
 		x[i] = b[i];
@@ -962,6 +977,13 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 		T* const u = dgAlloca(T, boundedSize);
 		T* const a11 = dgAlloca(T, boundedSize * boundedSize);
 		T* const a10 = dgAlloca(T, boundedSize * unboundedSize);
+
+		dgCheckAligment(l);
+		dgCheckAligment(h);
+		dgCheckAligment(c);
+		dgCheckAligment(u);
+		dgCheckAligment(a10);
+		dgCheckAligment(a11);
 
 		for (dgInt32 i = 0; i < boundedSize; i++) {
 			T* const g = &a10[i * unboundedSize];
