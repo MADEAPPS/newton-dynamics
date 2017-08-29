@@ -530,6 +530,19 @@ void dgSkeletonContainer::RemoveLoopJoint(dgBilateralConstraint* const joint)
 	}
 }
 
+void dgSkeletonContainer::xxxxxxxx(dgNode* const root, int level)
+{
+	char space[256];
+	for (int i = 0; i < level; i ++) space[i] = ' '; 
+	space[level] = 0; 
+	dgTrace (("%s %d\n", space, root->m_index));
+
+	level += 2;;
+	for (dgNode* child = root->m_child; child; child = child->m_sibling) {
+		xxxxxxxx(child, level);
+	}
+}
+
 void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstraint** const loopJointArray)
 {
 	dgAssert(m_nodeCount >= 1);
@@ -542,6 +555,13 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 
 	dgInt32 index = 0;
 	SortGraph(m_skeleton, index);
+//xxxxxxxx(m_skeleton, 0);
+//for (int i = 0; i < m_nodeCount; i ++) {
+//const dgNode* const node = m_nodesOrder[i];
+//dgTrace (("%d ", node->m_index));
+//}
+//dgTrace (("\n"));
+
 	dgAssert(index == m_nodeCount);
 
 	if (loopJointsCount) {
