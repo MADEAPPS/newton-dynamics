@@ -809,8 +809,7 @@ bool dgSkeletonContainer::SanityCheck(const dgForcePair* const force, const dgFo
 	return true;
 }
 
-DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
-//void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
+DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const dgForcePair* const accel) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgNode* const node = m_nodesOrder[i];
@@ -819,7 +818,7 @@ DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, co
 		dgForcePair& f = force[i];
 		const dgForcePair& a = accel[i];
 		f.m_body = a.m_body;
-		f.m_joint = a.m_joint; 
+		f.m_joint = a.m_joint;
 		for (dgNode* child = node->m_child; child; child = child->m_sibling) {
 			dgAssert(child->m_joint);
 			dgAssert(child->m_parent->m_index == i);
@@ -827,7 +826,10 @@ DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, co
 		}
 		node->JointJacobianTimeMassForward(f);
 	}
+}
 
+DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const
+{
 	force[m_nodeCount - 1] = accel[m_nodeCount - 1];
 	for (dgNode* child = m_nodesOrder[m_nodeCount - 1]->m_child; child; child = child->m_sibling) {
 		child->BodyJacobianTimeMassForward(force[child->m_index], force[child->m_parent->m_index]);
@@ -843,9 +845,15 @@ DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, co
 		node->BodyDiagInvTimeSolution(f);
 		node->BodyJacobianTimeSolutionBackward(f);
 	}
-//	dgAssert (SanityCheck(force, accel));
 }
 
+
+//DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
+void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
+{
+	SolveForward(force, accel);
+	SolveBackward(force, accel);
+}
 
 DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const
 {
