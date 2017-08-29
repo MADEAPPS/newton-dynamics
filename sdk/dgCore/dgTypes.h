@@ -334,7 +334,8 @@ typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void
 //#define dgAlloca(type, size) (type*) alloca ((size) * sizeof (type))
 #define dgAlloca(type, size) (type*) ((dgVector*) alloca (DG_ALLOCA_SIZE * ((size * sizeof (type) + DG_ALLOCA_SIZE - 1) / DG_ALLOCA_SIZE)))
 
-#define dgCheckAligment(x) dgAssert (!(dgUnsigned64 (x) & 0xf))
+//#define dgCheckAligment(x) dgAssert (!(dgUnsigned64 (x) & 0xf))
+#define dgCheckAligment(x) 
 
 DG_INLINE dgInt32 dgExp2 (dgInt32 x)
 {

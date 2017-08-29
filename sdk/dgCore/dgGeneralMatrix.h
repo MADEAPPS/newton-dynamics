@@ -49,12 +49,19 @@ class dgSymmetricBiconjugateGradientSolve
 };
 
 
+
 template<class T>
 void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T* const out)
 {
+	dgCheckAligment(v);
+	dgCheckAligment(out);
+	dgCheckAligment(matrix);
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
-		out[i] = dgDotProduct(size, &matrix[stride], v);
+		dgGetRow(const T* const matrix, dgInt32 size, dgInt32 index)
+		const T* const row = &matrix[stride];
+		dgCheckAligment(row);
+		out[i] = dgDotProduct(size, row, v);
 		stride += size;
 	}
 }
@@ -62,8 +69,12 @@ void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T
 template<class T>
 void dgMatrixTimeMatrix(dgInt32 size, const T* const matrixA, const T* const matrixB, T* const out)
 {
+	dgCheckAligment(out);
+	dgCheckAligment(matrixA);
+	dgCheckAligment(matrixB);
 	for (dgInt32 i = 0; i < size; i++) {
 		const T* const rowA = &matrixA[i * size];
+		dgCheckAligment(rowA);
 		T* const rowOut = &out[i * size];
 		for (dgInt32 j = 0; j < size; j++) {
 			T acc = T(0.0f);
@@ -174,6 +185,7 @@ DG_INLINE void dgSolveCholesky(dgInt32 size, dgInt32 n, const T* const choleskyM
 	for (dgInt32 i = 0; i < n; i++) {
 		T acc(0.0f);
 		const T* const row = &choleskyMatrix[stride];
+		dgCheckAligment(row);
 		for (dgInt32 j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
 		}
