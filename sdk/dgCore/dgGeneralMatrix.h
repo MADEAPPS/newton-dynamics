@@ -556,42 +556,7 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 {
 	if (row != colum) {
 		dgAssert (row < colum);
-#if 0
-		// using Givens rotations, is much faster since Hessenberg matrices are very space, 
-		// however this is far more numerically unstable, I may have to use Householder
-		for (dgInt32 i = row; i < size - 1; i ++) {
-			T* const rowI = &choleskyMatrix[size * i];
-			for (dgInt32 j = colum; j > i; j--) {
-				T x1 = rowI[j];
-				if (T(fabs (x1)) > T(dgFloat32(1.0e-6f))) {
-					T x0 = rowI[i];
-					T den = T (1.0f) / T (sqrt (x1 * x1 + x0 * x0));
-					x0 *= den;
-					x1 *= den;
 
-					for (dgInt32 k = i; k < size; k ++) {
-						T* const rowk = &choleskyMatrix[size * k];
-						T a0 (rowk[i]);
-						T a1 (rowk[j]);
-						rowk[i] = a0 * x0 + a1 * x1;
-						rowk[j] = a1 * x0 - a0 * x1;
-					}
-					rowI[j] = T (dgFloat32 (0.0f));
-					dgAssert(rowI[i] > T(dgFloat32(0.0f)));
-					if (choleskyMatrix[size * j + j] < T (dgFloat32 (0.0f))) {
-						for (dgInt32 k = j; k < size; k++) {
-							choleskyMatrix[size * k + j] = -choleskyMatrix[size * k + j];
-						}
-					}
-				} else {
-					rowI[j] = T(dgFloat32(0.0f));
-				}
-			}
-			dgAssert (rowI[i] > T (dgFloat32 (1.0e-5f)));
-		}
-		dgAssert (choleskyMatrix[size * size - 1] > T (dgFloat32 (1.0e-5f)));
-
-#else
 		// using Householder rotations, much more stable than Givens rotations
 		for (dgInt32 i = row; i < size; i ++) {
 			T* const rowI = &choleskyMatrix[size * i];
@@ -640,7 +605,6 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 		for (dgInt32 i = row; i < size; i ++) {
 			choleskyMatrix[size * i + i] = dgMax(choleskyMatrix[size * i + i], T (dgFloat32 (1.0e-6f)));
 		}
-#endif
 	}
 }
 
@@ -665,19 +629,25 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 {
 	T* const x0 = dgAlloca(T, size);
 	T* const r0 = dgAlloca(T, size);
-	T* const delta_r = dgAlloca(T, size);
-	T* const delta_x = dgAlloca(T, size);
 	T* const tmp0 = dgAlloca(T, size);
 	T* const tmp1 = dgAlloca(T, size);
+	T* const delta_r = dgAlloca(T, size);
+	T* const delta_x = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 
+	dgCheckAligment(x);
+	dgCheckAligment(b);
 	dgCheckAligment(x0);
 	dgCheckAligment(r0);
+	dgCheckAligment(low);
+	dgCheckAligment(high);
 	dgCheckAligment(tmp0);
 	dgCheckAligment(tmp1);
 	dgCheckAligment(delta_r);
 	dgCheckAligment(delta_x);
 	dgCheckAligment(permute);
+	dgCheckAligment(symmetricMatrixPSD);
+	dgCheckAligment(lowerTriangularMatrix);
 
 	dgInt32 index = 0;
 	dgInt32 count = size;
