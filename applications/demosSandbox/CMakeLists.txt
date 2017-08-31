@@ -33,9 +33,10 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
 target_link_libraries(demosSandbox ${OPENGL_LIBRARIES})
 
-find_package(OpenAL REQUIRED)
-include_directories(${OPENAL_INCLUDE_DIR})
-target_link_libraries(demosSandbox ${OPENAL_LIBRARY})
+# julio commented this out for now
+#find_package(OpenAL REQUIRED)
+#include_directories(${OPENAL_INCLUDE_DIR})
+#target_link_libraries(demosSandbox ${OPENAL_LIBRARY})
 
 if (WIN32 OR APPLE)
   target_link_libraries(demosSandbox glfw tinyxml)
