@@ -335,8 +335,9 @@ class dgSpatialMatrix
 
 	DG_INLINE dgSpatialMatrix(dgFloat32 val)
 	{
+		const dgSpatialVector row (val);
 		for (dgInt32 i = 0; i < 6; i++) {
-			m_rows[i] = dgSpatialVector(val);
+			m_rows[i] = row;
 		}
 	}
 

@@ -277,9 +277,10 @@ class dgSkeletonContainer::dgNode
 		dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
 
 		dgSpatialMatrix copy;
+		dgSpatialVector zero (dgSpatialVector::m_zero);
 		for (dgInt32 i = 0; i < m_dof; i++) {
 			copy[i] = jointJ[i];
-			jointJ[i] = dgSpatialVector(dgFloat32(0.0f));
+			jointJ[i] = zero;
 		}
 
 		const dgSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
@@ -618,15 +619,13 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 	}
 }
 
-
-
 void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	
-	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
+
 	dgInt32 primaryIndex = 0;
 	dgInt32 auxiliaryIndex = 0;
+	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 
 	m_rowArray = (dgJacobianMatrixElement**)memoryBuffer;
 	m_pairs = (dgNodePair*)&m_rowArray[m_rowCount];
@@ -687,7 +686,6 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
-	
 	const dgInt32 auxiliaryCount = m_rowCount - m_auxiliaryRowCount;
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgJacobianMatrixElement* const row_i = m_rowArray[primaryCount + i];
@@ -751,8 +749,9 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
-	accelPair[m_nodeCount - 1].m_body = dgSpatialVector(dgFloat32(0.0f));
-	accelPair[m_nodeCount - 1].m_joint = dgSpatialVector(dgFloat32(0.0f));
+	
+	accelPair[m_nodeCount - 1].m_body = dgSpatialVector::m_zero;
+	accelPair[m_nodeCount - 1].m_joint = dgSpatialVector::m_zero;
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
@@ -761,7 +760,7 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
 			const dgNode* const node = m_nodesOrder[j];
 			const dgInt32 index = node->m_index;
-			accelPair[index].m_body = dgSpatialVector(dgFloat32(0.0f));
+			accelPair[index].m_body = dgSpatialVector::m_zero;
 			dgSpatialVector& a = accelPair[index].m_joint;
 
 			const int count = node->m_dof;
@@ -784,7 +783,11 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 				entry++;
 			}
 		}
+	}
 
+	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
+		dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
+		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		dgFloat32* const matrixRow11 = &m_massMatrix11[i * m_auxiliaryRowCount];
 		dgFloat32 diagonal = matrixRow11[i];
 		for (dgInt32 k = 0; k < primaryCount; k++) {
@@ -917,7 +920,7 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 
 DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const
 {
-	dgSpatialVector zero(dgFloat32(0.0f));
+	dgSpatialVector zero(dgSpatialVector::m_zero);
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgNode* const node = m_nodesOrder[i];
 		dgAssert(i == node->m_index);

@@ -599,15 +599,15 @@ dgMatrix dgBody::CalculateInertiaMatrix () const
 	const dgVector Iyy(m_mass[1]);
 	const dgVector Izz(m_mass[2]);
 	return dgMatrix (m_matrix.m_front.Scale4(m_matrix.m_front[0]) * Ixx +
-					 m_matrix.m_up.Scale4(m_matrix.m_up[0]) * Iyy +
+					 m_matrix.m_up.Scale4(m_matrix.m_up[0])		  * Iyy +
 					 m_matrix.m_right.Scale4(m_matrix.m_right[0]) * Izz,
 
 					 m_matrix.m_front.Scale4(m_matrix.m_front[1]) * Ixx +
-					 m_matrix.m_up.Scale4(m_matrix.m_up[1]) * Iyy +
+					 m_matrix.m_up.Scale4(m_matrix.m_up[1])       * Iyy +
 					 m_matrix.m_right.Scale4(m_matrix.m_right[1]) * Izz,
 
 					 m_matrix.m_front.Scale4(m_matrix.m_front[2]) * Ixx +
-					 m_matrix.m_up.Scale4(m_matrix.m_up[2]) * Iyy +
+					 m_matrix.m_up.Scale4(m_matrix.m_up[2])       * Iyy +
 					 m_matrix.m_right.Scale4(m_matrix.m_right[2]) * Izz,
 					 dgVector::m_wOne);
 #endif
@@ -626,15 +626,15 @@ dgMatrix dgBody::CalculateInvInertiaMatrix () const
 	const dgVector invIyy(m_invMass[1]);
 	const dgVector invIzz(m_invMass[2]);
 	return dgMatrix(m_matrix.m_front.Scale4(m_matrix.m_front[0]) * invIxx +
-					m_matrix.m_up.Scale4(m_matrix.m_up[0]) * invIyy +
+					m_matrix.m_up.Scale4(m_matrix.m_up[0])		 * invIyy +
 					m_matrix.m_right.Scale4(m_matrix.m_right[0]) * invIzz,
 
 					m_matrix.m_front.Scale4(m_matrix.m_front[1]) * invIxx +
-					m_matrix.m_up.Scale4(m_matrix.m_up[1]) * invIyy +
+					m_matrix.m_up.Scale4(m_matrix.m_up[1])		 * invIyy +
 					m_matrix.m_right.Scale4(m_matrix.m_right[1]) * invIzz,
 
 					m_matrix.m_front.Scale4(m_matrix.m_front[2]) * invIxx +
-					m_matrix.m_up.Scale4(m_matrix.m_up[2]) * invIyy +
+					m_matrix.m_up.Scale4(m_matrix.m_up[2])		 * invIyy +
 					m_matrix.m_right.Scale4(m_matrix.m_right[2]) * invIzz,
 					dgVector::m_wOne);
 #endif

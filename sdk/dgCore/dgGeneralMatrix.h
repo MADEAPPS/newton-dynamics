@@ -49,7 +49,6 @@ class dgSymmetricBiconjugateGradientSolve
 };
 
 
-
 template<class T>
 void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T* const out)
 {

@@ -2068,6 +2068,8 @@ class dgSpatialVector
 	__m128d m_d0;
 	__m128d m_d1;
 	__m128d m_d2;
+
+	static dgSpatialVector m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
 #endif

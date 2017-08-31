@@ -38,6 +38,8 @@ dgBigVector dgBigVector::m_yMask (dgInt32 ( 0), dgInt32 (-1),	dgInt32 ( 0), dgIn
 dgBigVector dgBigVector::m_zMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 (-1), dgInt32 ( 0));
 dgBigVector dgBigVector::m_wMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 (-1));
 
+dgSpatialVector dgSpatialVector::m_zero (dgFloat32 (0.0f));
+
 
 #ifndef _NEWTON_USE_DOUBLE
 
