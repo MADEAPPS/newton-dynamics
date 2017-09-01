@@ -1133,6 +1133,7 @@ class dgSpatialVector
 	}
 
 	dgFloat64 m_d[6];
+	static dgSpatialVector m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -2016,6 +2017,13 @@ class dgSpatialVector
 	{
 	}
 #endif
+
+	DG_INLINE dgSpatialVector(const dgSpatialVector& copy)
+		:m_d0(copy.m_d0)
+		,m_d1(copy.m_d1)
+		,m_d2(copy.m_d2)
+	{
+	}
 
 	DG_INLINE dgSpatialVector(const __m128d d0, const __m128d d1, const __m128d d2)
 		:m_d0(d0)
