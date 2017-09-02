@@ -562,6 +562,7 @@ void DemoEntityManager::ApplyMenuOptions()
 
 void DemoEntityManager::ShowMainMenuBar()
 {
+	int mainMenu = 0;
 	m_suspendPhysicsUpdate = false;
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -577,7 +578,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("New", "")) {
-				dAssert (0);
+				mainMenu = 1;
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Open", "")) {
@@ -588,6 +589,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Serialize", "")) {
+				//mainMenu = 2;
 				dAssert (0);
 			}
 			if (ImGui::MenuItem("Deserialize", "")) {
@@ -670,12 +672,36 @@ void DemoEntityManager::ShowMainMenuBar()
 		}
 	}
 
-	if (m_currentScene != -1) {
-		Cleanup();
-		m_demosSelection[m_currentScene].m_launchDemoCallback (this);
-		ApplyMenuOptions();
-		ResetTimer();
-		m_currentScene = -1;
+	switch (mainMenu)
+	{
+		case 1:
+		{
+			Cleanup();
+			ApplyMenuOptions();
+			ResetTimer();
+			m_currentScene = -1;
+			break;
+		}
+
+		case 2:
+		{
+			Cleanup();
+			ApplyMenuOptions();
+			ResetTimer();
+			m_currentScene = -1;
+			break;
+		}
+
+		default:
+		{
+			if (m_currentScene != -1) {
+				Cleanup();
+				m_demosSelection[m_currentScene].m_launchDemoCallback(this);
+				ApplyMenuOptions();
+				ResetTimer();
+				m_currentScene = -1;
+			}
+		}
 	}
 }
 

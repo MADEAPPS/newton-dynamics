@@ -339,12 +339,16 @@ void dgWorld::DestroyAllBodies()
 	for (dgInverseDynamicsList::dgListNode* ptr = ikList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		delete ptr->GetInfo();
 	}
+	ikList.RemoveAll();
 
-	dgSkeletonList::Iterator iter(*this);
+
+	dgSkeletonList& skelList = *this;
+	dgSkeletonList::Iterator iter(skelList);
 	for (iter.Begin(); iter; iter++) {
 		dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
 		delete skeleton;
 	}
+	skelList.RemoveAll();
 
 	while (m_disableBodies.GetRoot()) {
 		dgBody* const body = m_disableBodies.GetRoot()->GetKey();

@@ -48,7 +48,6 @@ class dgSkeletonContainer::dgMatriData
 {
 	public:
 	dgSpatialMatrix m_jt;
-	dgSpatialMatrix m_mass;
 	dgSpatialMatrix m_invMass;
 } DG_GCC_VECTOR_ALIGMENT;
 
@@ -113,29 +112,31 @@ class dgSkeletonContainer::dgNode
 		}
 	}
 
-	DG_INLINE void CalculateInertiaMatrix()
+	DG_INLINE void CalculateInertiaMatrix(dgSpatialMatrix* const bodyMassArray) const
 	{
-		dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
+		dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
 
-        dgFloat32 mass = m_body->GetMass().m_w;
-		dgAssert(mass < dgFloat32(1.0e10f));
-		dgMatrix inertia(m_body->CalculateInertiaMatrix());
-		for (dgInt32 i = 0; i < 3; i++) {
-			bodyMass[i][i] = mass;
-			for (dgInt32 j = 0; j < 3; j++) {
-				bodyMass[i + 3][j + 3] = inertia[i][j];
+		bodyMass = dgSpatialMatrix(dgFloat32(0.0f));
+		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
+			const dgFloat32 mass = m_body->GetMass().m_w;
+			dgMatrix inertia(m_body->CalculateInertiaMatrix());
+			for (dgInt32 i = 0; i < 3; i++) {
+				bodyMass[i][i] = mass;
+				for (dgInt32 j = 0; j < 3; j++) {
+					bodyMass[i + 3][j + 3] = inertia[i][j];
+				}
 			}
 		}
 	}
 
-	DG_INLINE void GetJacobians(const dgJointInfo* const jointInfo, const dgJacobianMatrixElement* const matrixRow)
+	DG_INLINE void GetJacobians(const dgJointInfo* const jointInfo, const dgJacobianMatrixElement* const matrixRow, dgSpatialMatrix* const jointMassArray)
 	{
 		dgAssert(m_parent);
 		dgAssert(jointInfo->m_joint == m_joint);
 
 		dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 		dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
-		dgSpatialMatrix& jointMass = m_data.m_joint.m_mass;
+		dgSpatialMatrix& jointMass = jointMassArray[m_index];
 
 		const dgInt32 start = jointInfo->m_pairStart;
 		const dgSpatialVector zero (dgSpatialVector::m_zero);
@@ -161,15 +162,9 @@ class dgSkeletonContainer::dgNode
 	}
 
 	//DG_INLINE dgInt32 Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow)
-	dgInt32 Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow)
+	dgInt32 Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
 	{
-		dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
-		dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
-
-		bodyMass = dgSpatialMatrix(dgFloat32(0.0f));
-        if (m_body->GetInvMass().m_w != dgFloat32 (0.0f)) {
-			CalculateInertiaMatrix();
-		}
+		CalculateInertiaMatrix(bodyMassArray);
 
 		m_ordinals = m_ordinalInit;
 		dgInt32 boundedDof = 0;
@@ -195,12 +190,14 @@ class dgSkeletonContainer::dgNode
 			dgAssert (m_dof > 0);
 			dgAssert (m_dof <= 6);
 			boundedDof += jointInfo->m_pairCount - count;
-			GetJacobians(jointInfo, matrixRow);
+			GetJacobians(jointInfo, matrixRow, jointMassArray);
 		}
 
+		dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
+		const dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
 		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
 			for (dgNode* child = m_child; child; child = child->m_sibling) {
-				CalculateBodyDiagonal(child);
+				CalculateBodyDiagonal(child, bodyMassArray, jointMassArray);
 			}
 			bodyInvMass = bodyMass.Inverse(6);
 		} else {
@@ -213,20 +210,20 @@ class dgSkeletonContainer::dgNode
 			for (dgInt32 i = 0; i < m_dof; i++) {
 				bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
 			}
-			CalculateJointDiagonal();
+			CalculateJointDiagonal(bodyMassArray, jointMassArray);
 			CalculateJacobianBlock();
 		}
 		return boundedDof;
 	}
 
-	DG_INLINE void CalculateBodyDiagonal(dgNode* const child)
+	DG_INLINE void CalculateBodyDiagonal(dgNode* const child, dgSpatialMatrix* const bodyMassArray, const dgSpatialMatrix* const jointMassArray)
 	{
 		dgAssert(child->m_joint);
 		
 		dgSpatialMatrix copy (dgSpatialMatrix(dgFloat32(0.0f)));
 		const dgInt32 dof = child->m_dof;
 		const dgSpatialMatrix& jacobianMatrix = child->m_data.m_joint.m_jt;
-		const dgSpatialMatrix& childDiagonal = child->m_data.m_joint.m_mass;
+		const dgSpatialMatrix& childDiagonal = jointMassArray[child->m_index];
 		for (dgInt32 i = 0; i < dof ; i++) {
 			const dgSpatialVector& jacobian = jacobianMatrix[i];
 			for (dgInt32 j = 0; j < dof ; j++) {
@@ -236,7 +233,7 @@ class dgSkeletonContainer::dgNode
 			}
 		}
 
-		dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
+		dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
 		for (dgInt32 i = 0; i < dof; i++) {
 			const dgSpatialVector& Jacobian = copy[i];
 			const dgSpatialVector& JacobianTranspose = jacobianMatrix[i];
@@ -247,9 +244,9 @@ class dgSkeletonContainer::dgNode
 		}
 	}
 
-	DG_INLINE void CalculateJointDiagonal ()
+	DG_INLINE void CalculateJointDiagonal (const dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
 	{
-		const dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
+		const dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
 		const dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 
 		dgSpatialMatrix tmp;
@@ -257,7 +254,7 @@ class dgSkeletonContainer::dgNode
 			tmp[i] = bodyMass.VectorTimeMatrix(bodyJt[i]);
 		}
 
-		dgSpatialMatrix& jointMass = m_data.m_joint.m_mass;
+		dgSpatialMatrix& jointMass = jointMassArray[m_index];
 		for (dgInt32 i = 0; i < m_dof; i++) {
 			dgFloat64 a = bodyJt[i].DotProduct(tmp[i]);
 			jointMass[i][i] -= a;
@@ -1102,16 +1099,19 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	dgInt32 primaryStart = 0;
 	dgInt32 auxiliaryStart = 0;
 
+	dgSpatialMatrix* const bodyMassArray = dgAlloca (dgSpatialMatrix, m_nodeCount);
+	dgSpatialMatrix* const jointMassArray = dgAlloca (dgSpatialMatrix, m_nodeCount);
+
 	if (m_nodesOrder) {
 		for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 			dgNode* const node = m_nodesOrder[i];
 			rowCount += jointInfoArray[node->m_joint->m_index].m_pairCount;
 			node->m_auxiliaryStart = dgInt16 (auxiliaryStart);
 			node->m_primaryStart = dgInt16 (primaryStart);
-			auxiliaryStart += node->Factorize(jointInfoArray, matrixRow);
+			auxiliaryStart += node->Factorize(jointInfoArray, matrixRow, bodyMassArray, jointMassArray);
 			primaryStart += node->m_dof;
 		}
-		m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, matrixRow);
+		m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, matrixRow, bodyMassArray, jointMassArray);
 	}
 	m_rowCount = dgInt16 (rowCount);
 	m_auxiliaryRowCount = dgInt16 (auxiliaryStart);
