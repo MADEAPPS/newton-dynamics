@@ -751,9 +751,9 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 	accelPair[m_nodeCount - 1].m_joint = zero;
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
-
 		dgInt32 entry = 0;
+		dgInt32 startjoint = m_nodeCount;
+		const dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
 			const dgNode* const node = m_nodesOrder[j];
 			const dgInt32 index = node->m_index;
@@ -762,13 +762,19 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 
 			const int count = node->m_dof;
 			for (dgInt32 k = 0; k < count; k++) {
-				a[k] = matrixRow10[entry];
+				const dgFloat32 value = matrixRow10[entry];
+				a[k] = value;
+				startjoint = (value == 0.0f) ? startjoint : dgMin (startjoint, index);
 				entry++;
 			}
 		}
 
 		entry = 0;
-		CalculateForce(forcePair, accelPair);
+		startjoint = (startjoint == m_nodeCount) ? 0 : startjoint;
+		dgAssert (startjoint < m_nodeCount);
+		SolveForward(forcePair, accelPair, startjoint);
+		SolveBackward(forcePair, forcePair);
+
 		dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
 		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
 			const dgNode* const node = m_nodesOrder[j];
@@ -782,10 +788,12 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
+	dgInt16* const indexList = dgAlloca(dgInt16, primaryCount);
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-		dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
-		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
+		const dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
+		const dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
 		dgFloat32* const matrixRow11 = &m_massMatrix11[i * m_auxiliaryRowCount];
+#if 0
 		dgFloat32 diagonal = matrixRow11[i];
 		for (dgInt32 k = 0; k < primaryCount; k++) {
 			diagonal += deltaForcePtr[k] * matrixRow10[k];
@@ -801,6 +809,32 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 			matrixRow11[j] += offDiagonal;
 			m_massMatrix11[j * m_auxiliaryRowCount + i] += offDiagonal;
 		}
+#else
+
+		dgInt32 indexCount = 0;
+		for (dgInt32 k = 0; k < primaryCount; k++) {
+			indexList[indexCount] = dgInt16(k);
+			indexCount += (matrixRow10[k] != dgFloat32(0.0f)) ? 1 : 0;
+		}
+
+		dgFloat32 diagonal = matrixRow11[i];
+		for (dgInt32 k = 0; k < indexCount; k++) {
+			dgInt32 index = indexList[k];
+			diagonal += matrixRow10[index] * deltaForcePtr[index];
+		}
+		matrixRow11[i] = dgMax(diagonal, diagDamp[i]);
+
+		for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
+			dgFloat32 offDiagonal = matrixRow11[j];
+			const dgFloat32* const row10 = &m_deltaForce[j * primaryCount];
+			for (dgInt32 k = 0; k < indexCount; k++) {
+				dgInt32 index = indexList[k];
+				offDiagonal += matrixRow10[index] * row10[index];
+			}
+			matrixRow11[j] = offDiagonal;
+			m_massMatrix11[j * m_auxiliaryRowCount + i] = offDiagonal;
+		}
+#endif
 	}
 
 	bool isPsdMatrix = false;
@@ -829,6 +863,43 @@ bool dgSkeletonContainer::SanityCheck(const dgForcePair* const force, const dgFo
 	return true;
 }
 
+DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const dgForcePair* const accel, dgInt32 startNode) const
+{
+	dgSpatialVector zero (dgSpatialVector::m_zero);
+	for (dgInt32 i = 0; i < startNode; i++) {
+		force[i].m_body = zero;
+		force[i].m_joint = zero;
+	}
+	for (dgInt32 i = startNode; i < m_nodeCount - 1; i++) {
+		dgNode* const node = m_nodesOrder[i];
+		dgAssert(node->m_joint);
+		dgAssert(node->m_index == i);
+		dgForcePair& f = force[i];
+		const dgForcePair& a = accel[i];
+		f.m_body = a.m_body;
+		f.m_joint = a.m_joint;
+		for (dgNode* child = node->m_child; child; child = child->m_sibling) {
+			dgAssert(child->m_joint);
+			dgAssert(child->m_parent->m_index == i);
+			child->BodyJacobianTimeMassForward(force[child->m_index], f);
+		}
+		node->JointJacobianTimeMassForward(f);
+	}
+
+	force[m_nodeCount - 1] = accel[m_nodeCount - 1];
+	for (dgNode* child = m_nodesOrder[m_nodeCount - 1]->m_child; child; child = child->m_sibling) {
+		child->BodyJacobianTimeMassForward(force[child->m_index], force[child->m_parent->m_index]);
+	}
+
+	for (dgInt32 i = startNode; i < m_nodeCount - 1; i++) {
+		dgNode* const node = m_nodesOrder[i];
+		dgForcePair& f = force[i];
+		node->BodyDiagInvTimeSolution(f);
+		node->JointDiagInvTimeSolution(f);
+	}
+	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
+}
+
 DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const dgForcePair* const accel) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -846,30 +917,34 @@ DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const
 		}
 		node->JointJacobianTimeMassForward(f);
 	}
-}
 
-DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const
-{
 	force[m_nodeCount - 1] = accel[m_nodeCount - 1];
 	for (dgNode* child = m_nodesOrder[m_nodeCount - 1]->m_child; child; child = child->m_sibling) {
 		child->BodyJacobianTimeMassForward(force[child->m_index], force[child->m_parent->m_index]);
 	}
 
+	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+		dgNode* const node = m_nodesOrder[i];
+		dgForcePair& f = force[i];
+		node->BodyDiagInvTimeSolution(f);
+		node->JointDiagInvTimeSolution(f);
+	}
 	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
+}
+
+DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const
+{
 	for (dgInt32 i = m_nodeCount - 2; i >= 0; i--) {
 		dgNode* const node = m_nodesOrder[i];
 		dgAssert(node->m_index == i);
 		dgForcePair& f = force[i];
-		node->JointDiagInvTimeSolution(f);
 		node->JointJacobianTimeSolutionBackward(f, force[node->m_parent->m_index]);
-		node->BodyDiagInvTimeSolution(f);
 		node->BodyJacobianTimeSolutionBackward(f);
 	}
 }
 
 
-//DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
-void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
+DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
 {
 	SolveForward(force, accel);
 	SolveBackward(force, accel);

@@ -74,6 +74,7 @@ class dgSkeletonContainer
 	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void SolveForward(dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const;
+	DG_INLINE void SolveForward(dgForcePair* const force, const dgForcePair* const accel, dgInt32 startNode) const;
 	DG_INLINE void UpdateForces(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 
