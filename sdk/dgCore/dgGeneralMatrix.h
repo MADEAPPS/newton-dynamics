@@ -110,7 +110,7 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 
 			rowN[n] = T(sqrt(diag));
 		} else {
-			rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
+			rowN[j] = (rowN[j] - s) / rowJ[j];
 		}
 
 		stride += size;

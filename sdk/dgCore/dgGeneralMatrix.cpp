@@ -190,7 +190,7 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, dgFloat32*
 
 			rowN[n] = dgFloat32(sqrt(diag));
 		} else {
-			rowN[j] = ((dgFloat32(1.0f) / rowJ[j]) * (rowN[j] - s));
+			rowN[j] = (rowN[j] - s) / rowJ[j];
 		}
 
 		stride += rowStride;
