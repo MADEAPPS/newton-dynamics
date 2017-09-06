@@ -536,14 +536,14 @@ DG_INLINE void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, T* const matrix
 }
 
 template<class T>
-DG_INLINE void dgCalculateDelta_x(dgInt32 size, T dir, dgInt32 n, const T* const matrix, const T* const choleskyMatrix, T* const delta_x)
+DG_INLINE void dgCalculateDelta_x(dgInt32 size, dgInt32 n, const T* const matrix, const T* const choleskyMatrix, T* const delta_x)
 {
 	const T* const row = &matrix[size * n];
 	for (dgInt32 i = 0; i < n; i++) {
-		delta_x[i] = -row[i] * dir;
+		delta_x[i] = -row[i];
 	}
 	dgSolveCholesky(size, n, choleskyMatrix, delta_x);
-	delta_x[n] = dir;
+	delta_x[n] = T(1.0f);
 }
 
 // calculate delta_r = A * delta_x
@@ -551,8 +551,10 @@ template<class T>
 DG_INLINE void dgCalculateDelta_r(dgInt32 size, dgInt32 n, const T* const matrix, const T* const delta_x, T* const delta_r)
 {
 	dgInt32 stride = n * size;
+	const dgInt32 size1 = n + 1;
 	for (dgInt32 i = n; i < size; i++) {
-		delta_r[i] = dgDotProduct(size, &matrix[stride], delta_x);
+		//delta_r[i] = dgDotProduct(size, &matrix[stride], delta_x);
+		delta_r[i] = dgDotProduct(size1, &matrix[stride], delta_x);
 		stride += size;
 	}
 }
@@ -566,7 +568,7 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 		// using Householder rotations, much more stable than Givens rotations
 		for (dgInt32 i = row; i < size; i ++) {
 			T* const rowI = &choleskyMatrix[size * i];
-			T mag (T (dgFloat32 (0.0f)));
+			T mag (dgFloat32 (0.0f));
 			for (dgInt32 j = i + 1; j < size; j ++) {
 				mag += rowI[j] * rowI[j];
 				reflexion[j] = rowI[j];
@@ -730,8 +732,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 
 			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
 				if (calculateDelta_x) {
-					T dir(dgFloat32(1.0f));
-					dgCalculateDelta_x(size, dir, index, symmetricMatrixPSD, lowerTriangularMatrix, delta_x);
+					dgCalculateDelta_x(size, index, symmetricMatrixPSD, lowerTriangularMatrix, delta_x);
 				}
 
 				calculateDelta_x = true;
