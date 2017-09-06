@@ -165,3 +165,46 @@ dgFloat64 dgSymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 to
 	dgAssert (iter < size);
 	return num;
 }
+
+
+
+DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, dgFloat32* const matrix, dgInt32 rowStride)
+{
+	dgFloat32* const rowN = &matrix[rowStride * n];
+	dgCheckAligment(rowN);
+
+	dgInt32 stride = 0;
+	for (dgInt32 j = 0; j <= n; j++) {
+		dgFloat32 s = dgFloat32(0.0f);
+		dgFloat32* const rowJ = &matrix[stride];
+		dgCheckAligment(rowJ);
+		for (dgInt32 k = 0; k < j; k++) {
+			s += rowN[k] * rowJ[k];
+		}
+
+		if (n == j) {
+			dgFloat32 diag = rowN[n] - s;
+			if (diag < dgFloat32(dgFloat32(1.0e-6f))) {
+				return false;
+			}
+
+			rowN[n] = dgFloat32(sqrt(diag));
+		} else {
+			rowN[j] = ((dgFloat32(1.0f) / rowJ[j]) * (rowN[j] - s));
+		}
+
+		stride += rowStride;
+	}
+
+	return true;
+}
+
+
+bool dgCholeskyFactorization(dgInt32 size, dgFloat32* const psdMatrix, dgInt32 rowStride)
+{
+	bool state = true;
+	for (dgInt32 i = 0; (i < size) && state; i++) {
+		state = state && dgCholeskyFactorizationAddRow(size, i, psdMatrix, rowStride);
+	}
+	return state;
+}

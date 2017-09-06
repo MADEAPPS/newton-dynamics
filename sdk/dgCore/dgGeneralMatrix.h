@@ -30,6 +30,9 @@
 
 #define DG_LCP_MAX_VALUE dgFloat32 (1.0e10f)
 
+
+bool dgCholeskyFactorization(dgInt32 size, dgFloat32* const psdMatrix, dgInt32 rowStride);
+
 class dgSymmetricBiconjugateGradientSolve
 {
 	public:
@@ -103,14 +106,6 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 			T diag = rowN[n] - s;
 			if (diag < T(dgFloat32(1.0e-6f))) {
 				return false;
-/*
-				// hack to prevent explosions when round error make the diagonal a small negative value
-				if (diag < T(dgFloat32(-1.0e3f))) {
- 					dgAssert (0);
-					return false;
-				}
-				diag = dgFloat32(1.0e-12f);
-*/
 			}
 
 			rowN[n] = T(sqrt(diag));
