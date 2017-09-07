@@ -78,7 +78,11 @@ class dgSkeletonContainer
 	DG_INLINE void UpdateForces(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 
-	void xxxxxxxx(dgNode* const root, int level);
+	DG_INLINE void CalculateMassMatrixCoeffBruteForce(dgInt32 loopStart, dgFloat32* const diagDamp);
+	DG_INLINE void CalculateBlock_GijGij(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, dgFloat32* const diagDamp);
+	DG_INLINE void CalculateBlock_GijGkj(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNodeI, const dgNode* const auxiliaryNodej);
+	DG_INLINE void CalculateBlock_JijGij(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, const dgNode* const primaryNode);
+	DG_INLINE void CalculateBlock_JijGkj(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, const dgNode* const primaryNode);
 	static void ResetUniqueId(dgInt32 id);
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
