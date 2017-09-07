@@ -916,8 +916,6 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
-	dgInt32 primaryIndex = 0;
-	dgInt32 auxiliaryIndex = 0;
 	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 
 	m_rowArray = (dgJacobianMatrixElement**)memoryBuffer;
@@ -931,6 +929,8 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 	dgForcePair* const accelPair = dgAlloca(dgForcePair, m_nodeCount);
 	dgFloat32* const diagDamp = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 
+	dgInt32 primaryIndex = 0;
+	dgInt32 auxiliaryIndex = 0;
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		const dgNode* const node = m_nodesOrder[i];
 		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
@@ -960,7 +960,7 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
-	const dgInt32 loopingStart = auxiliaryIndex;
+	const dgInt32 loopingStart = auxiliaryIndex + primaryIndex;
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		const dgLoopingJoint& entry = ptr->GetInfo();
 		const dgConstraint* const joint = entry.m_joint;
@@ -983,7 +983,7 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 	memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(dgFloat32));
 	memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(dgFloat32));
 
-#if 0
+#if 1
 	CalculateMassMatrixCoeffBruteForce(0, diagDamp);
 #else
 	dgAssert(primaryIndex == primaryCount);
