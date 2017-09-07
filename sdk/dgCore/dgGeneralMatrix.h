@@ -874,7 +874,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symetricMatrix, T* const x, T* con
 	for (dgInt32 i = 0; i < size; i ++) {
 		T* const row = &choleskyMatrix[i * size];
 		for (dgInt32 j = i + 1; j < size; j ++) {
-			row[j] = T(dgFloat32 (0.0));
+			row[j] = T(dgFloat32 (0.0f));
 		}
 	}
 	return dgSolveDantzigLCP(size, symetricMatrix, choleskyMatrix, x, b, low, high);
@@ -905,7 +905,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 
 	for (dgInt32 i = 0; i < size; i++) {
 		x[i] = b[i];
-		permute[i] = short(i);
+		permute[i] = dgInt16(i);
 	}
 
 	dgInt32 unboundedSize = size;
