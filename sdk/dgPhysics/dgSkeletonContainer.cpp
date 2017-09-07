@@ -599,9 +599,8 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 }
 
 
-DG_INLINE void dgSkeletonContainer::CalculateBlock_JijGij(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, const dgNode* const primaryNode)
+DG_INLINE void dgSkeletonContainer::CalculateBlock_GijJij(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, const dgNode* const primaryNode)
 {
-//	const dgJointInfo* const primaryInfo = &jointInfoArray[primaryNode->m_joint->m_index];
 	const dgJointInfo* const auxiliaryInfo = &jointInfoArray[auxiliaryNode->m_joint->m_index];
 
 	const dgInt32 primaryDof = primaryNode->m_dof;
@@ -630,7 +629,7 @@ DG_INLINE void dgSkeletonContainer::CalculateBlock_JijGij(const dgJointInfo* con
 	}
 }
 
-DG_INLINE void dgSkeletonContainer::CalculateBlock_JijGkj(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, const dgNode* const primaryNode)
+DG_INLINE void dgSkeletonContainer::CalculateBlock_GikJkj(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, const dgNode* const primaryNode)
 {
 	const dgJointInfo* const primaryInfo = &jointInfoArray[primaryNode->m_joint->m_index];
 	const dgJointInfo* const auxiliaryInfo = &jointInfoArray[auxiliaryNode->m_joint->m_index];
@@ -744,7 +743,7 @@ DG_INLINE void dgSkeletonContainer::CalculateBlock_GijGij(const dgJointInfo* con
 	}
 }
 
-void dgSkeletonContainer::CalculateBlock_GijGkj(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNodeI, const dgNode* const auxiliaryNodeJ)
+void dgSkeletonContainer::CalculateBlock_GikGkj(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNodeI, const dgNode* const auxiliaryNodeJ)
 {
 	const dgJointInfo* const jointInfo_i = &jointInfoArray[auxiliaryNodeI->m_joint->m_index];
 	const dgJointInfo* const jointInfo_j = &jointInfoArray[auxiliaryNodeJ->m_joint->m_index];
@@ -914,35 +913,36 @@ DG_INLINE void dgSkeletonContainer::CalculateMassMatrixCoeffBruteForce(dgInt32 l
 	}
 }
 
-DG_INLINE void dgSkeletonContainer::CalculateMassMatrixCoeff(const dgJointInfo* const jointInfoArray, dgFloat32* const diagDamp)
+//DG_INLINE void dgSkeletonContainer::CalculateMassMatrixCoeff(const dgJointInfo* const jointInfoArray, dgFloat32* const diagDamp)
+void dgSkeletonContainer::CalculateMassMatrixCoeff(const dgJointInfo* const jointInfoArray, dgFloat32* const diagDamp)
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		const dgNode* const node = m_nodesOrder[i];
 
 		CalculateBlock_GijGij(jointInfoArray, node, diagDamp);
 		if (node->m_parent->m_joint) {
-			CalculateBlock_GijGkj(jointInfoArray, node, node->m_parent);
+			CalculateBlock_GikGkj(jointInfoArray, node, node->m_parent);
 		}
 		for (const dgNode* childNode = node->m_parent->m_child; childNode; childNode = childNode->m_sibling) {
 			if (childNode->m_index > node->m_index) {
-				CalculateBlock_GijGkj(jointInfoArray, node, childNode);
+				CalculateBlock_GikGkj(jointInfoArray, node, childNode);
 			}
 		}
 
 		for (const dgNode* childNode = node->m_child; childNode; childNode = childNode->m_sibling) {
-			CalculateBlock_JijGkj(jointInfoArray, node, childNode);
+			CalculateBlock_GikJkj(jointInfoArray, node, childNode);
 		}
 
 		for (const dgNode* childNode = node->m_parent->m_child; childNode; childNode = childNode->m_sibling) {
 			if (childNode != node) {
-				CalculateBlock_JijGkj(jointInfoArray, node, childNode);
+				CalculateBlock_GikJkj(jointInfoArray, node, childNode);
 			} else {
-				CalculateBlock_JijGij(jointInfoArray, node, childNode);
+				CalculateBlock_GijJij(jointInfoArray, node, childNode);
 			}
 		}
 
 		if (node->m_parent->m_joint) {
-			CalculateBlock_JijGkj(jointInfoArray, node, node->m_parent);
+			CalculateBlock_GikJkj(jointInfoArray, node, node->m_parent);
 		}
 	}
 	CalculateMassMatrixCoeffBruteForce(m_auxiliaryRowCount - m_loopRowCount, diagDamp);
