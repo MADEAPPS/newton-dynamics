@@ -79,6 +79,7 @@ class dgSkeletonContainer
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 
 	DG_INLINE void CalculateMassMatrixCoeffBruteForce(dgInt32 loopStart, dgFloat32* const diagDamp);
+	DG_INLINE void CalculateMassMatrixCoeff(const dgJointInfo* const jointInfoArray, dgFloat32* const diagDamp);
 	DG_INLINE void CalculateBlock_GijGij(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, dgFloat32* const diagDamp);
 	DG_INLINE void CalculateBlock_GijGkj(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNodeI, const dgNode* const auxiliaryNodej);
 	DG_INLINE void CalculateBlock_JijGij(const dgJointInfo* const jointInfoArray, const dgNode* const auxiliaryNode, const dgNode* const primaryNode);
@@ -109,6 +110,7 @@ class dgSkeletonContainer
 	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
+	dgInt16 m_loopRowCount;
 	dgInt16 m_auxiliaryRowCount;
 	static dgInt32 m_uniqueID;
 	static dgInt32 m_lruMarker;

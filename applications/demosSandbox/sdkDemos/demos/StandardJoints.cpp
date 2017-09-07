@@ -1032,10 +1032,11 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//FunnyAddDistance(scene, dVector(0.0f, 0.0f, -15.0f));
+FunnyAddDistance(scene, dVector(0.0f, 0.0f, -15.0f));
 //AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+//AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 
-#if 1
+#if 0
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
@@ -1043,7 +1044,6 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  10.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
-
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
@@ -1060,6 +1060,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+
 #endif
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
