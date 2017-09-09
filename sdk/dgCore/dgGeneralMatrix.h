@@ -542,13 +542,14 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 				}
 				reflexion[i] = rowI[i] - T (sqrt(mag + rowI[i] * rowI[i]));
 
-				T vMag2 (mag + reflexion[i] * reflexion[i]);
-				T den (dgFloat32 (1.0f) / T (sqrt (vMag2)));
-				for (dgInt32 j = 0; j < width; j ++) {
-					dgInt32 index = activeColumns[j];
-					reflexion[index] *= den;
-				}
+				const T vMag2 (mag + reflexion[i] * reflexion[i]);
+				//const T den (dgFloat32 (1.0f) / T (sqrt (vMag2)));
+				//for (dgInt32 j = 0; j < width; j ++) {
+				//	dgInt32 index = activeColumns[j];
+				//	reflexion[index] *= den;
+				//}
 
+				const T den (dgFloat32 (2.0f) / vMag2);
 				for (dgInt32 j = i; j < size; j ++) {
 					T acc (0.0f);
 					T* const rowJ = &choleskyMatrix[size * j];
@@ -556,18 +557,20 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 						dgInt32 index = activeColumns[k];
 						acc += rowJ[index] * reflexion[index];
 					}
-					tmp[j] = acc * T (dgFloat32 (2.0f));
+					tmp[j] = acc;
 				}
 
 				for (dgInt32 j = i + 1; j < size; j++) {
 					T* const rowJ = &choleskyMatrix[size * j];
-					const dgFloat32 a = tmp[j];
+					//const T a = tmp[j] * T (dgFloat32 (2.0f));
+					const T a = tmp[j] * den;
 					for (dgInt32 k = 0; k < width; k ++) {
 						dgInt32 index = activeColumns[k];
 						rowJ[index] -= a * reflexion[index];
 					}
 				}
-				rowI[i] -= tmp[i] * reflexion[i];
+				//rowI[i] -= tmp[i] * reflexion[i] * T (dgFloat32 (2.0f));
+				rowI[i] -= tmp[i] * reflexion[i] * den;
 			}
 		
 			for (dgInt32 k = i + 1; k < size; k++) {

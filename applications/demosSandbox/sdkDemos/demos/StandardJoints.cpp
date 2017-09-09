@@ -1033,7 +1033,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 FunnyAddDistance(scene, dVector(0.0f, 0.0f, -15.0f));
-//AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
 AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 
 #if 0

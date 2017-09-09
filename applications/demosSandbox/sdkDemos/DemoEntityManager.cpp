@@ -830,6 +830,17 @@ void DemoEntityManager::RenderStats()
 			ImGui::End();
 		}
 	}
+
+	if (m_renderUI) {
+//		bool xxxx;
+//		if (ImGui::Begin("xxxxxxxxxx", &xxxx)){
+//			m_renderUI (this, m_renderUIContext, 0);
+//			ImGui::End();
+//		}
+	}
+
+
+
 	ShowMainMenuBar();
 }
 
