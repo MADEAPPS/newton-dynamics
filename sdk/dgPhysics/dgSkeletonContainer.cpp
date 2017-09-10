@@ -1162,37 +1162,6 @@ DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const
 	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
 }
 
-DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const dgForcePair* const accel) const
-{
-	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
-		dgNode* const node = m_nodesOrder[i];
-		dgAssert(node->m_joint);
-		dgAssert(node->m_index == i);
-		dgForcePair& f = force[i];
-		const dgForcePair& a = accel[i];
-		f.m_body = a.m_body;
-		f.m_joint = a.m_joint;
-		for (dgNode* child = node->m_child; child; child = child->m_sibling) {
-			dgAssert(child->m_joint);
-			dgAssert(child->m_parent->m_index == i);
-			child->BodyJacobianTimeMassForward(force[child->m_index], f);
-		}
-		node->JointJacobianTimeMassForward(f);
-	}
-
-	force[m_nodeCount - 1] = accel[m_nodeCount - 1];
-	for (dgNode* child = m_nodesOrder[m_nodeCount - 1]->m_child; child; child = child->m_sibling) {
-		child->BodyJacobianTimeMassForward(force[child->m_index], force[child->m_parent->m_index]);
-	}
-
-	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
-		dgNode* const node = m_nodesOrder[i];
-		dgForcePair& f = force[i];
-		node->BodyDiagInvTimeSolution(f);
-		node->JointDiagInvTimeSolution(f);
-	}
-	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
-}
 
 DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const
 {
