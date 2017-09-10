@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -20,7 +20,7 @@
 
 #define newtonHeaderPath	"../../../coreLibrary_300/source/newton/newton.h"
 
-char* NewtonBinding::m_licence =	"/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>\n"
+char* NewtonBinding::m_licence =	"/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>\n"
 									"* \n"
 									"* This software is provided 'as-is', without any express or implied\n"
 									"* warranty. In no event will the authors be held liable for any damages\n"
