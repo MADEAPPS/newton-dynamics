@@ -99,7 +99,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		:dCustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
 		,m_castDir (0.0f, -1.0f, 0.0f, 0.0f)
 		,m_phantomEntity(NULL)
-		,m_helpKey (true)
 		,m_selectShape (true)
 		,m_placeInstance (false)
 		,m_hitParam(0.0f)
@@ -114,21 +113,19 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		m_contactJoint.Init (&m_body, &m_static);
 	}
 
-	static void RenderHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderHelp (DemoEntityManager* const scene, void* const context)
 	{
 		dKinematicPlacementManager* const me = (dKinematicPlacementManager*) context;
-		me->RenderHelp (scene, lineNumber);
+		me->RenderHelp (scene);
 	}
 
-	void RenderHelp (DemoEntityManager* const scene, int lineNumber)
+	void RenderHelp (DemoEntityManager* const scene)
 	{
-		if (m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Right click and drag the location where you want to place a dynamic body");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Left click while Right click down place a dynamics body if the location is free of intersection");
-			//lineNumber = scene->Print (color, 10, lineNumber + 20, "space      : change casting shape");
-			//lineNumber = scene->Print (color, 10, lineNumber + 20, "h          : hide help");
-		}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "Right click and drag the location where you want to place a dynamic body");
+		scene->Print (color, "Left click while Right click down place a dynamics body if the location is free of intersection");
+		//scene->Print (color, "space      : change casting shape");
+		//scene->Print (color, "h          : hide help");
 	}
 
 	virtual void Debug () const 
@@ -438,7 +435,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 	dVector m_castDir;
 	PhantomPlacement* m_phantomEntity;
 	dList<NewtonBody*> m_selectionToIgnore;
-	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_selectShape;
 	DemoEntityManager::ButtonKey m_placeInstance;
     dFloat m_hitParam;

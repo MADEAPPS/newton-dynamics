@@ -25,7 +25,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 {
 	public:
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
-	typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context, int lineNumber);
+	typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context);
 
 	class TransparentMesh
 	{
@@ -119,7 +119,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
 
 	bool GetMouseKeyState (int button ) const;
-	int Print (const dVector& color, int x, int y, const char *fmt, ... ) const;
+	int Print (const dVector& color, const char *fmt, ... ) const;
 	int GetDebugDisplay() const;
 	void SetDebugDisplay(int mode) const;
 
@@ -129,7 +129,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void LoadFont();
 	void Cleanup();
 
-	void RenderUI();
+	//void RenderUI();
 	void RenderScene();
 	
 	void UpdatePhysics(dFloat timestep);
@@ -176,9 +176,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	int m_broadPhaseType;
 	int m_workerThreades;
 	int m_debugDisplayMode;
-	
 	int m_collisionDisplayMode;
 	
+	bool m_showUI;
 	bool m_showAABB;
 	bool m_showStats;
 	bool m_hasJoytick;
@@ -190,7 +190,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_showContactPoints;
 	bool m_showJointDebugInfo;
 	bool m_suspendPhysicsUpdate;
-	bool m_synchronousPhysicsUpdateMode;
+	bool m_asynchronousPhysicsUpdate;
 
 	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;

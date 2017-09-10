@@ -754,7 +754,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		,m_handBrakeButton(1)
 		,m_gearUpButton(2)
 		,m_gearDonwButton(3)
-		,m_helpKey (true)
 		,m_nexVehicle (true)
 		,m_gearUpKey(false)
 		,m_gearDownKey(false)
@@ -797,10 +796,11 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	}
 	
 
-	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context)
 	{
 		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*) context;
-		me->RenderVehicleHud (scene, lineNumber);
+		//me->RenderVehicleHud (scene, lineNumber);
+		me->DrawHelp(scene);
 	}
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size) const
@@ -869,34 +869,26 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		glPopMatrix();
 	}
 
-	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
+	void DrawHelp(DemoEntityManager* const scene)
 	{
-		if (m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch             : 'I'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator               : 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes                    : 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left                 : 'A'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right                : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch             : 'K'           button 5");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage differential lock  : 'L'           button 5");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up                   : '>'           button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down                 : '<'           button 3");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission       : enter         button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes               : space         button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle              : 'V'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help                 : 'H'");
-		}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "Vehicle driving keyboard control:   Joystick control");
+		scene->Print (color, "engine switch             : 'I'           start engine");
+		scene->Print (color, "accelerator               : 'W'           stick forward");
+		scene->Print (color, "brakes                    : 'S'           stick back");
+		scene->Print (color, "turn left                 : 'A'           stick left");
+		scene->Print (color, "turn right                : 'D'           stick right");
+		scene->Print (color, "engage clutch             : 'K'           button 5");
+		scene->Print (color, "engage differential lock  : 'L'           button 5");
+		scene->Print (color, "gear up                   : '>'           button 2");
+		scene->Print (color, "gear down                 : '<'           button 3");
+		scene->Print (color, "manual transmission       : enter         button 4");
+		scene->Print (color, "hand brakes               : space         button 1");
+		scene->Print (color, "next vehicle              : 'V'");
+		scene->Print (color, "hide help                 : 'H'");
+	}				
 
-		dAssert (0);
-		//bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene, 'V');
-		//if (engineIgnitionKey) {
-		//	SetNextPlayer();
-		//}
-	}
-
-	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber)
+	void RenderVehicleHud (DemoEntityManager* const scene)
 	{
 		// set to transparent color
 		glEnable (GL_BLEND);
@@ -1070,11 +1062,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	virtual void PreUpdate (dFloat timestep)
 	{
 		// apply the vehicle controls, and all simulation time effect
-		NewtonWorld* const world = GetWorld(); 
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-
-		// set the help key
-		m_helpKey.UpdatePushButton (scene->GetKeyState('H'));
+		//NewtonWorld* const world = GetWorld(); 
+		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
 		// do the base class post update
 		dCustomVehicleControllerManager::PreUpdate(timestep);
@@ -1227,7 +1216,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	int m_gearUpButton;
 	int m_gearDonwButton;
 	
-	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_nexVehicle;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;

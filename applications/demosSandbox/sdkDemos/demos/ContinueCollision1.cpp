@@ -94,15 +94,14 @@ class CCDInputManager : public dCustomInputManager
 		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
 	}
 
-	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to the wall");
+		scene->Print (color, "Hit R key to shot  boxes to the wall");
 	}
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
-
         int key = 0;
         static dLong timer = dGetTimeInMicrosenconds() + 100000;
         if (dGetTimeInMicrosenconds() > timer) {

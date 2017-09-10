@@ -206,6 +206,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_solverPasses(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
+	,m_showUI(true)
 	,m_showAABB(false)
 	,m_showStats(true)
 	,m_hasJoytick(false)
@@ -217,7 +218,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
 	,m_suspendPhysicsUpdate(false)
-	,m_synchronousPhysicsUpdateMode(true)
+	,m_asynchronousPhysicsUpdate(false)
 {
 //	m_showAABB = false;
 //	m_showContactPoints = false;
@@ -621,8 +622,9 @@ void DemoEntityManager::ShowMainMenuBar()
 			m_suspendPhysicsUpdate = true;
 
 			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
+			ImGui::Checkbox("Show UI", &m_showUI);
 			ImGui::Checkbox("Show stats", &m_showStats);
-			ImGui::Checkbox("concurrent physics update", &m_synchronousPhysicsUpdateMode);
+			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
@@ -793,10 +795,9 @@ void DemoEntityManager::RenderStats()
 	dTimeTrackerEvent(__FUNCTION__);
 
 	if (m_showStats) {
-		bool dommy;
 		char text[1024];
 		
-		if (ImGui::Begin("statistics", &dommy)){
+		if (ImGui::Begin("statistics", &m_showStats)){
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text);
 
@@ -812,9 +813,6 @@ void DemoEntityManager::RenderStats()
 			sprintf (text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
 			ImGui::Text(text);
 
-			//sprintf (text, "auto sleep: %s", m_autoSleepState ? "on") : "off"));
-			//m_statusbar->SetStatusText (statusText, 5);
-
 /*
 			wxString statusText;
 			NewtonWorld* const world = m_world;
@@ -826,20 +824,16 @@ void DemoEntityManager::RenderStats()
 			statusText.Printf (wxT ("instructions: %s",  wxString::FromAscii(floatMode).wc_str());
 			m_statusbar->SetStatusText (statusText, 6);
 */
-
 			ImGui::End();
 		}
 	}
 
-	if (m_renderUI) {
-//		bool xxxx;
-//		if (ImGui::Begin("xxxxxxxxxx", &xxxx)){
-//			m_renderUI (this, m_renderUIContext, 0);
-//			ImGui::End();
-//		}
+	if (m_showUI && m_renderUI) {
+		if (ImGui::Begin("User Interface", &m_showUI)){
+			m_renderUI (this, m_renderUIContext);
+			ImGui::End();
+		}
 	}
-
-
 
 	ShowMainMenuBar();
 }
@@ -1036,62 +1030,16 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	mesh->Release();
 }
 
-int DemoEntityManager::Print (const dVector& color, int x, int y, const char *fmt, ... ) const
+int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 {
-	dAssert (0);
-	return 0;
-/*
-	glColor3f(color.m_x, color.m_y, color.m_z);
-
-	glPushMatrix();
-
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0, GetWidth(), GetHeight(), 0.0, 0.0, 1.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glTranslated(x, y, 0);
-	//	glRasterPos2f(x, y + 16);
-
 	va_list argptr;
 	char string[1024];
 
 	va_start (argptr, fmt);
 	vsprintf (string, fmt, argptr);
 	va_end( argptr );
-
-	glDisable(GL_LIGHTING);
-	glEnable(GL_TEXTURE_2D);
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc (GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);      
-
-	glBindTexture(GL_TEXTURE_2D, m_fontImage);
-
-	glPushAttrib(GL_LIST_BIT);
-	glListBase(m_font - 32);	
-	int lenght = (int) strlen (string);
-	glCallLists (lenght, GL_UNSIGNED_BYTE, string);	
-	glPopAttrib();				
-
-	glDisable(GL_BLEND);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glLoadIdentity();
-
-	return y;
-*/
+	ImGui::Text(string);
+	return 0;
 }
 
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
@@ -1124,7 +1072,7 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 			newUpdate = true;
 			ClearDebugDisplay(m_world);
 
-			if (m_synchronousPhysicsUpdateMode) {
+			if (m_asynchronousPhysicsUpdate) {
 				NewtonUpdate (m_world, timestepInSecunds);
 			} else {
 				NewtonUpdateAsync(m_world, timestepInSecunds);
@@ -1183,9 +1131,6 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
 
 	window->RenderScene();
-	if (window->m_renderUI) {
-		window->RenderUI();
-	}
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1415,6 +1360,7 @@ void DemoEntityManager::RenderScene()
 	glPopMatrix();
 }
 
+/*
 void DemoEntityManager::RenderUI()
 {
 	int width = GetWidth();
@@ -1448,7 +1394,7 @@ void DemoEntityManager::RenderUI()
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 }
-
+*/
 
 void DemoEntityManager::Run()
 {

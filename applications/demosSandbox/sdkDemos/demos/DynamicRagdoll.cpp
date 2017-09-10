@@ -34,13 +34,11 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		scene->Set2DDisplayRenderFunction (Debug, this);
 	}
 
-	static void Debug (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void Debug (DemoEntityManager* const scene, void* const context)
 	{
 //		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*) context;
 //		me->RenderVehicleHud (scene, lineNumber);
 	}
-
-
 
 #if 0
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)

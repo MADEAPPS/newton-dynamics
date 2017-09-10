@@ -100,36 +100,34 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 	{
 	}
 
-	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context)
 	{
 		BasicCarControllerManager* const me = (BasicCarControllerManager*) context;
-		me->RenderVehicleHud (scene, lineNumber);
-		
+		//me->RenderVehicleHud (scene);
+		me->DrawHelp (scene);
 	}
 
-	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
+	void DrawHelp(DemoEntityManager* const scene) const
 	{
-		dAssert(0);
-/*
-		if (m_player->m_helpKey.GetPushButtonState()) {
+//		if (m_player->m_helpKey.GetPushButtonState()) 
+		{
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch          : 'I'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "reverse             : 'S'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left           : 'A'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch       : 'K'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : 'space'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
+			scene->Print (color, "Vehicle driving keyboard control");
+			scene->Print (color, "key switch          : 'I'");
+			scene->Print (color, "accelerator         : 'W'");
+			scene->Print (color, "reverse             : 'S'");
+			scene->Print (color, "turn left           : 'A'");
+			scene->Print (color, "turn right          : 'D'");
+			scene->Print (color, "engage clutch       : 'K'");
+			scene->Print (color, "hand brakes         : 'space'");
+			scene->Print (color, "hide help           : 'H'");
 		}
-*/
 	}
-
-	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
+/*
+	void RenderVehicleHud (DemoEntityManager* const scene) const
 	{
 //		dAssert(0);
-/*
+
 		if (m_player) {
 			// set to transparent color
 			glEnable (GL_BLEND);
@@ -162,9 +160,8 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 			glEnable(GL_LIGHTING);
 			glDisable(GL_BLEND);
 		}
-*/
 	}
-
+*/
 
 	void ApplyPlayerControl (dFloat timestep) const 
 	{

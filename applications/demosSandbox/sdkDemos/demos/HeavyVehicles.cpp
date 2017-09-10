@@ -1392,7 +1392,6 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 		,m_externalView(true)
 		,m_changeVehicle(false)
 		,m_player (NULL) 
-		,m_helpKey (true)
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -1404,12 +1403,13 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 	}
 
 
-	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context)
 	{
 		HeavyVehicleControllerManager* const me = (HeavyVehicleControllerManager*) context;
-		me->RenderVehicleHud (scene, me, lineNumber);
+		//me->RenderVehicleHud (scene, me);
+		me->DrawHelp(scene);
 	}
-
+/*
 	void RenderVehicleHud (DemoEntityManager* const scene, HeavyVehicleControllerManager* const manager, int lineNumber) const
 	{
 		if (m_player) {
@@ -1425,34 +1425,25 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 		}
 		//TestSpline();
 	}
-
-	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
+*/
+	void DrawHelp(DemoEntityManager* const scene)
 	{
-		if (m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:               Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch                   : 'I'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator                     : 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes                          : 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left                       : 'A'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right                      : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch                   : 'K'           button 5");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage differential lock        : 'L'           button 5");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up                         : '>'           button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down                       : '<'           button 3");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission             : enter         button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes                     : space         button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle                    : 'V'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help                       : 'H'");
-		}
-
-//		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene, 'V');
-//		if (engineIgnitionKey) {
-//			SetNextPlayer();
-//		}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "Vehicle driving keyboard control:               Joystick control");
+		scene->Print (color, "engine switch                   : 'I'           start engine");
+		scene->Print (color, "accelerator                     : 'W'           stick forward");
+		scene->Print (color, "brakes                          : 'S'           stick back");
+		scene->Print (color, "turn left                       : 'A'           stick left");
+		scene->Print (color, "turn right                      : 'D'           stick right");
+		scene->Print (color, "engage clutch                   : 'K'           button 5");
+		scene->Print (color, "engage differential lock        : 'L'           button 5");
+		scene->Print (color, "gear up                         : '>'           button 2");
+		scene->Print (color, "gear down                       : '<'           button 3");
+		scene->Print (color, "manual transmission             : enter         button 4");
+		scene->Print (color, "hand brakes                     : space         button 1");
+		scene->Print (color, "next vehicle                    : 'V'");
+		scene->Print (color, "hide help                       : 'H'");
 	}
-
-
 
 #if 0
 	void TestSpline () const
@@ -1656,7 +1647,6 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 	bool m_externalView;
 	DemoEntityManager::ButtonKey m_changeVehicle;
 	HeavyVehicleEntity* m_player;
-	DemoEntityManager::ButtonKey m_helpKey;
 };
 
 

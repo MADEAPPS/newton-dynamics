@@ -1457,7 +1457,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 	void OnEndUpdate (dFloat timestepInSecunds)
 	{
-		dAssert(0);
+//		dAssert(0);
 		/*
 		DemoCamera* const camera = m_scene->GetCamera();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
@@ -1490,32 +1490,31 @@ class AriculatedJointInputManager: public dCustomInputManager
 		m_playersCount ++;
 	}
 
-	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
+	void RenderPlayerHelp (DemoEntityManager* const scene) const
 	{
 		//		if (m_player->m_helpKey.GetPushButtonState()) {
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "drive forward:           W");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "drive backward:          S");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right:              D");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left:               A");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "open palette:            F");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "close palette            G");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "lift palette:            E");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "lower palette            Q");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt forward:            Z");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt backward:           X");
-		lineNumber = scene->Print(color, 10,  lineNumber + 20, "turn base left:          R");
-		lineNumber = scene->Print(color, 10,  lineNumber + 20, "turn base right:         T");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "switch vehicle:          P");
-	}
+		scene->Print (color, "Navigation Keys");
+		scene->Print (color, "drive forward:           W");
+		scene->Print (color, "drive backward:          S");
+		scene->Print (color, "turn right:              D");
+		scene->Print (color, "turn left:               A");
+		scene->Print (color, "open palette:            F");
+		scene->Print (color, "close palette            G");
+		scene->Print (color, "lift palette:            E");
+		scene->Print (color, "lower palette            Q");
+		scene->Print (color, "tilt forward:            Z");
+		scene->Print (color, "tilt backward:           X");
+		scene->Print (color, "turn base left:          R");
+		scene->Print (color, "turn base right:         T");
+		scene->Print (color, "toggle camera mode:      C");
+		scene->Print (color, "switch vehicle:          P");
+	}				
 
-
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
 	{
 		AriculatedJointInputManager* const me = (AriculatedJointInputManager*) context;
-		me->RenderPlayerHelp (scene, lineNumber);
+		me->RenderPlayerHelp (scene);
 	}
 
 

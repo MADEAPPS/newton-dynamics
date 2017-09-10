@@ -262,7 +262,6 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 		,m_player(NULL)
 		,m_jumpKey(false)
 		,m_cameraMode(true)
-		,m_helpKey(true)
 		,m_shootProp(false)
 		,m_shootState(0)
 	{
@@ -390,27 +389,25 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 		m_player = player;
 	}
 
-	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
+	void RenderPlayerHelp (DemoEntityManager* const scene) const
 	{
-		if (m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk forward:            W");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk backward:           S");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe right:            D");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe left:             A");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "throw solids at player:  Enter");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
-		}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "Navigation Keys");
+		scene->Print (color, "walk forward:            W");
+		scene->Print (color, "walk backward:           S");
+		scene->Print (color, "strafe right:            D");
+		scene->Print (color, "strafe left:             A");
+		scene->Print (color, "toggle camera mode:      C");
+		scene->Print (color, "jump:                    Space");
+		scene->Print (color, "throw solids at player:  Enter");
+		scene->Print (color, "hide help:               H");
+		scene->Print (color, "change player direction: Left mouse button");
 	}
 
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
 	{
 		AdvancedPlayerInputManager* const me = (AdvancedPlayerInputManager*) context;
-		me->RenderPlayerHelp (scene, lineNumber);
+		me->RenderPlayerHelp (scene);
 	}
 
 
@@ -418,7 +415,6 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 	AdvancePlayerEntity* m_player;
 	DemoEntityManager::ButtonKey m_jumpKey;
 	DemoEntityManager::ButtonKey m_cameraMode;
-	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_shootProp;
 
 	int m_shootState;

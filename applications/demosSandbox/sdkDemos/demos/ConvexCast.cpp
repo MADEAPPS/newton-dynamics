@@ -210,28 +210,25 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
 	:dCustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
-	,m_helpKey (true)
 	,m_selectShape (true)
 	,m_stupidLevel(stupidLevel)
 	{
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
 	}
 
-	static void RenderHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderHelp (DemoEntityManager* const scene, void* const context)
 	{
 		dConvexCastManager* const me = (dConvexCastManager*) context;
-		me->RenderHelp (scene, lineNumber);
+		me->RenderHelp (scene);
 	}
 
-	void RenderHelp (DemoEntityManager* const scene, int lineNumber)
+	void RenderHelp (DemoEntityManager* const scene)
 	{
-		if (m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "mouse point and right click to cast current convex shape");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "space	   : change casting shape");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "h		   : hide help");
-		}
-	}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "mouse point and right click to cast current convex shape");
+		scene->Print (color, "space	   : change casting shape");
+		scene->Print (color, "h		   : hide help");
+	}				
 
 	virtual void Debug () const
 	{
@@ -297,7 +294,6 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 */
 	}
 
-	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_selectShape;
 	StupidComplexOfConvexShapes* m_stupidLevel;
 };
