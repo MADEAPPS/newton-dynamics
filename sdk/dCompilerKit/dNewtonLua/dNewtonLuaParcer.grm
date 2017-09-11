@@ -1,0 +1,285 @@
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+/*
+ *------------------------------------------------------------------
+ *
+ * This grammar only have one shift reduce conflict, which is the standard dangling else in if-then-else of almost all high level programming languages.
+ * I resolve it in favor of shift as it is is the custom tradition for languages like C, C++, java and c#
+ *
+ *------------------------------------------------------------------
+ */
+
+ 
+%{
+// Newton Tool embedded Lua script Language
+// based of https://www.lua.org/manual/5.3/manual.html#9
+//
+
+#include "dNewtonLuaStdafx.h"
+#include "dNewtonLuaLex.h"
+#include "dNewtonLuaParcer.h"
+//#include "dLittleScriptCompiler.h"
+%}
+
+
+%union 
+{
+	class dUserVariable: public dDefualtUserVariable
+	{
+		public:
+		dUserVariable () 
+			:dDefualtUserVariable (), m_node(NULL)
+		{
+		}
+		
+		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
+			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
+			,m_node(NULL)
+		{
+		}
+		class dDAG* m_node;
+	};
+}
+
+/*
+%token ABSTRACT
+%token BYVALUE
+%token CAST CATCH CONST 
+%token EXTENDS
+%token  FINALLY  FUTURE
+%token GENERIC GOTO
+%token IMPLEMENTS  INNER INSTANCEOF  
+
+%token NATIVE JNULL
+%token OPERATOR OUTER
+%token PROTECTED 
+%token REST 
+%token SUPER SYNCHRONIZED
+%token THROW THROWS TRANSIENT TRY
+%token VAR  VOLATILE
+%token LITERAL BOOLLIT
+*/
+
+/*
+// language supported Keywords
+%token _BYTE
+%token _INT
+%token _SHORT
+%token _LONG
+%token _BOOLEAN 
+%token _FLOAT
+%token _DOUBLE
+%token _CONST 
+%token _VOID
+%token _CLASS
+%token _IMPORT
+%token _FINAL
+%token _PUBLIC
+%token _PRIVATE
+%token _STATIC
+%token _NATIVE
+%token _PACKAGE
+%token _INTERFACE
+%token _IDENTIFIER
+%token _OP_DIM
+
+
+%token _IF
+%token _ELSE
+%token _SWITCH
+%token _CASE
+%token _DEFAULT
+%token _BREAK
+%token _CONTINUE
+%token _DO
+%token _FOR
+%token _WHILE
+%token _RETURN
+%token _IDENTICAL
+%token _DIFFERENT
+%token _LESS_EQUAL 
+%token _GREATHER_EQUAL
+%token _SHIFT_RIGHT 
+%token _SHIFT_LEFT
+%token _LOGIC_OR 
+%token _LOGIC_AND 
+
+%token _NEW
+%token _THIS
+%token _FLOAT_CONST
+%token _INTEGER_CONST
+
+
+%token _OP_INC _OP_DEC
+%token _ASS_MUL _ASS_DIV _ASS_MOD _ASS_ADD _ASS_SUB
+%token _ASS_SHL _ASS_SHR _ASS_AND _ASS_XOR _ASS_OR
+
+%right _ELSE
+%right _IF
+%right '=' _ASS_MUL _ASS_DIV _ASS_MOD _ASS_ADD _ASS_SUB _ASS_SHL _ASS_SHR _ASS_AND _ASS_XOR _ASS_OR
+%right '?' ':'
+%left _LOGIC_OR 
+%left _LOGIC_AND 
+%left '|'
+%left '^'
+%left '&'
+%left _IDENTICAL _DIFFERENT
+%left _LESS_EQUAL _GREATHER_EQUAL '<' '>' 
+%left _SHIFT_RIGHT _SHIFT_LEFT
+%left '+' '-'
+%left '*' '/' '%'
+%right _NEW
+%right _THIS
+%right '~'
+%right '!' 
+%right _OP_INC _OP_DEC
+*/
+
+
+%token            _AND
+%token            _BREAK
+%token            _DO
+%token            _ELSE
+%token            _ELSEIF
+%token            _END
+%token            _FALSE
+%token            _FOR
+%token            _FUNCTION
+%token            _GOTO
+%token            _IF
+%token            _IN
+%token            _LOCAL
+%token            _NIL
+%token            _NOT
+%token            _OR
+%token            _REPEAT
+%token            _RETURN
+%token            _THEN
+%token            _TRUE
+%token            _UNTIL
+%token            _WHILE
+%token            _LEFT_SHIFT
+%token            _RIGHT_SHIFT
+%token            _DOUBLE_DIVIDE
+%token            _IDENTICAL
+%token            _DIFFERENT
+%token            _LEFT_EQUAL
+%token            _GREATHER_EQUAL
+%token            _DOUBLE_COLUMN
+%token            _DOUBLE_DOT
+%token            _TRIPLE_DOT
+%token            _INTEGER
+%token            _FLOAT
+%token            _LABEL
+%token            _STRING
+
+
+%left _IDENTICAL _DIFFERENT
+%left '+' '-'
+%left '*' '/' '%'
+
+
+%{
+	#define MyModule ((dScriptCompiler*) this)
+%}
+
+%start chunk
+
+%%
+chunk
+	: block
+	;
+
+block
+	: statement
+	| returnStatement
+	| statement returnStatement
+	;
+
+returnStatement
+	 : _RETURN 
+	 | _RETURN ';'
+	 | _RETURN expressionList
+	 | _RETURN expressionList ';'
+	 ;
+
+statement 
+	: ';' 
+	| variableList '=' expressionList
+	| functionDefinition
+	| ifStatement
+	;
+
+functionDefinition
+	: _FUNCTION functionName functionBody
+	;
+
+ifStatement
+	: _IF expression _THEN block _END
+	| _IF expression _THEN block _ELSE block _END
+	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE block _END
+	;
+
+functionName
+	: _LABEL
+	| _LABEL '.' _LABEL
+	;
+
+functionBody 
+	: '(' ')' block _END
+	| '(' parameterList ')' block _END
+	;
+
+parameterList
+	: namelist
+	;
+
+namelist
+	: _LABEL
+	| _LABEL ',' _LABEL
+	;
+
+expressionList
+	: expression
+	| expressionList ',' expression
+	;
+
+variableList
+	: variable
+	| variableList ',' variable
+	; 
+
+variable
+	: _LABEL
+	;
+
+expression
+	: expression '+' expression
+	| expression '-' expression
+	| expression '*' expression
+	| expression '/' expression
+	| expression '%' expression
+	| expression _IDENTICAL expression
+	| _NIL
+	| _TRUE
+	| _FALSE
+	| _FLOAT
+	| _LABEL
+	| _INTEGER
+	;
+
+%%
+
+
+
+
+

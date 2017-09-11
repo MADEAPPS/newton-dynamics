@@ -6,7 +6,6 @@ bool CheckDependency(const char* const target, const char* const source)
 {
 	struct _stat sourceStat;
 	struct _stat targetStat;
-
 	int result = _stat (target, &targetStat);
 	if( result == 0 ) {
 		result = _stat (source, &sourceStat);

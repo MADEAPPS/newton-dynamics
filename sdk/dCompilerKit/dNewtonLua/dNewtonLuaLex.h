@@ -11,11 +11,11 @@
 
 
 //
-//Auto generated Lexical Analyzer class: $(className).h
+//Auto generated Lexical Analyzer class: dNewtonLuaLex.h
 //
 
-#ifndef __$(className)_h__
-#define __$(className)_h__
+#ifndef __dNewtonLuaLex_h__
+#define __dNewtonLuaLex_h__
 
 #ifdef _MSC_VER
 #pragma warning (disable: 4702) // warning C4702: unreachable code
@@ -26,11 +26,11 @@
 #include "dString.h"
 
 
-class $(className)
+class dNewtonLuaLex
 {
 	public:
-	$(className)(const char* const data);
-	virtual ~$(className)();
+	dNewtonLuaLex(const char* const data);
+	virtual ~dNewtonLuaLex();
 
 	virtual int NextToken ();
 

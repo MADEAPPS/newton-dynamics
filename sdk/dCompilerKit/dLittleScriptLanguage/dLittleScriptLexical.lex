@@ -1,5 +1,4 @@
-
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -74,8 +73,8 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 "\%\="				{return dLittleScriptParser::_ASS_MOD;}
 "\+\="				{return dLittleScriptParser::_ASS_ADD;}
 "\-\="				{return dLittleScriptParser::_ASS_SUB;}
-"<\<\="				{return dLittleScriptParser::_ASS_SHL;}
-">\>\="				{return dLittleScriptParser::_ASS_SHR;}
+"\<\<\="			{return dLittleScriptParser::_ASS_SHL;}
+"\>\>\="			{return dLittleScriptParser::_ASS_SHR;}
 "\&\="				{return dLittleScriptParser::_ASS_AND;}
 "\^\="				{return dLittleScriptParser::_ASS_XOR;}
 "\|\="				{return dLittleScriptParser::_ASS_OR;}
@@ -140,8 +139,4 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 "static"			{return dLittleScriptParser::_STATIC;}
 "native"			{return dLittleScriptParser::_NATIVE;}
 "interface"			{return dLittleScriptParser::_INTERFACE;}
-
-
-
-
 

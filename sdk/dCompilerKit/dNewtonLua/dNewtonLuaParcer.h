@@ -10,11 +10,11 @@
 */
 
 //
-// Auto generated Parser Generator class: $(className).h
+// Auto generated Parser Generator class: dNewtonLuaParcer.h
 //
 
-#ifndef __$(className)_h__
-#define __$(className)_h__
+#ifndef __dNewtonLuaParcer_h__
+#define __dNewtonLuaParcer_h__
 
 #ifdef _MSC_VER
 #pragma warning (disable: 4702) // warning C4702: unreachable code
@@ -26,14 +26,51 @@
 #include <dList.h>
 #include <dString.h>
 
-class $(scannerClass);
+class dNewtonLuaLex;
 
-class $(className)
+class dNewtonLuaParcer
 {
 	public:
 	enum dToken
 	{
-$(Tokens)
+		ACCEPTING_TOKEN = 254, 
+		ERROR_TOKEN = 255, 
+		_AND = 256, 
+		_BREAK,
+		_DO,
+		_ELSE,
+		_ELSEIF,
+		_END,
+		_FALSE,
+		_FOR,
+		_FUNCTION,
+		_GOTO,
+		_IF,
+		_IN,
+		_LOCAL,
+		_NIL,
+		_NOT,
+		_OR,
+		_REPEAT,
+		_RETURN,
+		_THEN,
+		_TRUE,
+		_UNTIL,
+		_WHILE,
+		_LEFT_SHIFT,
+		_RIGHT_SHIFT,
+		_DOUBLE_DIVIDE,
+		_IDENTICAL,
+		_DIFFERENT,
+		_LEFT_EQUAL,
+		_GREATHER_EQUAL,
+		_DOUBLE_COLUMN,
+		_DOUBLE_DOT,
+		_TRIPLE_DOT,
+		_INTEGER,
+		_FLOAT,
+		_LABEL,
+		_STRING
 	};
 
 	enum ActionType;
@@ -68,20 +105,36 @@ $(Tokens)
 		int m_scannerIndex;
 		dToken m_token;
 		dString m_data;
-		//friend $(className);
+		//friend dNewtonLuaParcer;
 	};
 
 
-$(userVariableClass)
 
-	$(className)();
-	virtual ~$(className)();
-	virtual bool Parse($(scannerClass)& scanner);
+	class dUserVariable: public dDefualtUserVariable
+	{
+		public:
+		dUserVariable () 
+			:dDefualtUserVariable (), m_node(NULL)
+		{
+		}
+		
+		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
+			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
+			,m_node(NULL)
+		{
+		}
+		class dDAG* m_node;
+	};
+
+
+	dNewtonLuaParcer();
+	virtual ~dNewtonLuaParcer();
+	virtual bool Parse(dNewtonLuaLex& scanner);
 
 	private:
 	const dGotoEntry* FindGoto (const dGotoEntry* const gotoList, int count, dToken token) const;
 	const dActionEntry* FindAction (const dActionEntry* const list, int count, dToken token) const;
-	const dActionEntry* GetNextAction (dList<dStackPair>& stack, dToken token, $(scannerClass)& scanner) const;
+	const dActionEntry* GetNextAction (dList<dStackPair>& stack, dToken token, dNewtonLuaLex& scanner) const;
 
 	bool m_grammarError;
 };
