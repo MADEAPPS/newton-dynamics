@@ -158,7 +158,6 @@ void dLexScannerGenerator::LoadTemplateFile(const char* const templateName, dStr
 		//	int bytes = MIN(readlink(szTmp, pBuf, len), len - 1); 
 		//	if(bytes >= 0)
 		//		pBuf[bytes] = '\0'; 
-
 		char* const ptr = strrchr (path, '\\') + 1;
 		sprintf (ptr, templateName);
 

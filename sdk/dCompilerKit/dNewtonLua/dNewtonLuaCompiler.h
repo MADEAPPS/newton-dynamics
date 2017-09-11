@@ -126,8 +126,14 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 	dList<dDAGScopeBlockNode*> m_scopeStack;
 	dList<dDAG*> m_allNodes;
 	
-	friend class dLittleScriptParser;
+	
 */
+
+	protected:
+	dUserVariable AddFunction(const dUserVariable& name);
+	dTree<dCIL::dListNode*, dString> m_funtions;
+
+	friend class dNewtonLuaParcer;
 };
 
 #endif

@@ -16,10 +16,9 @@
 #include <io.h>
 #include <direct.h>
 
-
+#include <dCIL.h>
 #include <dString.h>
 /*
-#include <dCIL.h>
 #include <dCRC.h>
 #include <dTree.h>
 #include <dList.h>

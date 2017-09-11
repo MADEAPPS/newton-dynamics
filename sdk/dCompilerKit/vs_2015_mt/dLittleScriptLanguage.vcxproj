@@ -222,47 +222,39 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptLexical.lex">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(FullPath) %(FullPath)/../%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(FullPath) %(FullPath)/../%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(FullPath) %(FullPath)/../%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(FullPath) %(FullPath)/../%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Filename).h</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptParser.grm">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(Directory)%(Filename)%(Extension) dLittleScriptLexical %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(FullPath) dLittleScriptLexical %(FullPath)\..\%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dParserGenerator.exe %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dParserGenerator.exe %(Directory)%(Filename)%(Extension) dLittleScriptLexical %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dParserGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dParserGenerator.exe %(FullPath) dLittleScriptLexical %(FullPath)\..\%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(Directory)%(Filename)%(Extension) dLittleScriptLexical %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(FullPath) dLittleScriptLexical %(FullPath)\..\%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dParserGenerator.exe %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dParserGenerator.exe %(Directory)%(Filename)%(Extension) dLittleScriptLexical %(Directory)%(Filename).cpp
-</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dParserGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dParserGenerator.exe %(FullPath) dLittleScriptLexical %(FullPath)\..\%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Filename).h</Outputs>
     </CustomBuild>
   </ItemGroup>

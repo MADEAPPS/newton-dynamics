@@ -85,3 +85,4 @@ sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/vc_lib/mswud/wx/msw/rcdefs.h
 *.ipdb
 *.iobj
+sdk/dCompilerKit/dNewtonLua/dNewtonLuaParcer.cpp.txt

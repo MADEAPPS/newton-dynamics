@@ -14,7 +14,7 @@
 #include "dNewtonLuaLex.h"
 #include "dNewtonLuaParcer.h"
 #include "dNewtonLuaCompiler.h"
-//#include "dLSCstdafx.h"
+
 /*
 #include "dDAG.h"
 #include "dDAGTypeNode.h"
@@ -53,6 +53,7 @@
 //dNewtonLuaCompiler::dNewtonLuaCompiler(const char* const pakacgesRootNameDirectory)
 dNewtonLuaCompiler::dNewtonLuaCompiler()
 	:dNewtonLuaParcer ()
+	,m_funtions()
 //	,m_packageRootDirectory (pakacgesRootNameDirectory)
 //	,m_currentPackage(NULL)
 //	//,m_currentFunction(NULL)
@@ -82,8 +83,13 @@ dNewtonLuaCompiler::~dNewtonLuaCompiler()
 
 int dNewtonLuaCompiler::CompileSource (const char* const source)
 {
+	dCIL cil;
 	dNewtonLuaLex scanner(source);
+	m_funtions.RemoveAll();
 	bool status = Parse(scanner);
+
+	
+
 
 #if 0
 	if (status) {
@@ -952,3 +958,10 @@ void dNewtonLuaCompiler::OpenPackage (const dString& packageName)
 }
 
 #endif
+
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::AddFunction(const dUserVariable& name)
+{
+	dUserVariable xxx;
+	return xxx;
+}

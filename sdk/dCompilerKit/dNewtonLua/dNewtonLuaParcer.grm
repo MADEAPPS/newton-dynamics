@@ -27,6 +27,7 @@
 #include "dNewtonLuaStdafx.h"
 #include "dNewtonLuaLex.h"
 #include "dNewtonLuaParcer.h"
+#include "dNewtonLuaCompiler.h"
 %}
 
 
@@ -105,7 +106,7 @@
 
 
 %{
-	#define MyModule ((dScriptCompiler*) this)
+	#define MyModule ((dNewtonLuaCompiler*) this)
 %}
 
 %start chunk
@@ -170,7 +171,11 @@ args
 	;
 
 functionDefinition
-	: _FUNCTION functionName functionBody
+	: functionDefinitionRegister functionBody
+	;
+
+functionDefinitionRegister
+	: _FUNCTION functionName															{$$ = MyModule->AddFunction($2);} 
 	;
 
 ifStatement
@@ -180,7 +185,7 @@ ifStatement
 	;
 
 functionName
-	: _LABEL
+	: _LABEL																			{$$ = $1;} 
 	| _LABEL '.' _LABEL
 	;
 
@@ -210,7 +215,7 @@ expressionList
 
 expression
 	: expression _OR expression
-	| expression AND expression
+	| expression _AND expression
 	| expression '>' expression
 	| expression '<' expression
 	| expression _LEFT_EQUAL expression
