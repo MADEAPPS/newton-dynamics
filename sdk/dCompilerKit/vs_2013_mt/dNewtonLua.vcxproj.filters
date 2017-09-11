@@ -9,6 +9,7 @@
     <ClCompile Include="..\dNewtonLua\dNewtonLuaParcer.cpp">
       <Filter>grammar</Filter>
     </ClCompile>
+    <ClCompile Include="..\dNewtonLua\dNewtonLuaCompiler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dNewtonLua\dNewtonLuaStdafx.h" />
@@ -18,6 +19,7 @@
     <ClInclude Include="..\dNewtonLua\dNewtonLuaParcer.h">
       <Filter>grammar</Filter>
     </ClInclude>
+    <ClInclude Include="..\dNewtonLua\dNewtonLuaCompiler.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Lexical">

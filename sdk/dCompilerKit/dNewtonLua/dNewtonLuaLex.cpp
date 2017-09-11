@@ -573,7 +573,7 @@ int dNewtonLuaLex::NextToken ()
 				case 1:
 				{
 					GetLexString ();
-					{/* skip is a white space*/}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -661,7 +661,7 @@ int dNewtonLuaLex::NextToken ()
 				case 12:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -669,7 +669,7 @@ int dNewtonLuaLex::NextToken ()
 				case 13:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -677,7 +677,7 @@ int dNewtonLuaLex::NextToken ()
 				case 14:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -685,7 +685,7 @@ int dNewtonLuaLex::NextToken ()
 				case 15:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -693,7 +693,7 @@ int dNewtonLuaLex::NextToken ()
 				case 16:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -701,7 +701,7 @@ int dNewtonLuaLex::NextToken ()
 				case 17:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -709,7 +709,7 @@ int dNewtonLuaLex::NextToken ()
 				case 18:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -717,7 +717,7 @@ int dNewtonLuaLex::NextToken ()
 				case 19:
 				{
 					GetLexString ();
-					{/* skip commnets */}
+					{}
 					state = 0;
 					ch = NextChar();
 					break;
@@ -757,7 +757,7 @@ int dNewtonLuaLex::NextToken ()
 				case 24:
 				{
 					GetLexString ();
-					{return dNewtonLuaParcer::_DOUBLE_DIVIDE;}
+					{return dNewtonLuaParcer::_INTEGER_DIVIDE;}
 					state = 0;
 					ch = NextChar();
 					break;

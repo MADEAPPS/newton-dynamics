@@ -38,15 +38,15 @@ Float							{Integer1}[\.][0-9]+([eE]\-?{Integer1})?
 Label							[A-Za-z_][A-Za-z0-9_]*
 
 %%
-{whiteSpace}					{/* skip is a white space*/}
-{Comment}						{/* skip commnets */}
+{whiteSpace}					{}
+{Comment}						{}
 
 {string}						{return dNewtonLuaParcer::_STRING;}
 {Integer}						{return dNewtonLuaParcer::_INTEGER;}
 {Float}							{return dNewtonLuaParcer::_FLOAT;}
 {Label}							{return dNewtonLuaParcer::_LABEL;}
 
- "and"							{return dNewtonLuaParcer::_AND;}
+"and"							{return dNewtonLuaParcer::_AND;}
 "break"							{return dNewtonLuaParcer::_BREAK;}
 "do"							{return dNewtonLuaParcer::_DO;}
 "else"							{return dNewtonLuaParcer::_ELSE;}
@@ -70,7 +70,7 @@ Label							[A-Za-z_][A-Za-z0-9_]*
 "while"							{return dNewtonLuaParcer::_WHILE;}
 "\<\<"							{return dNewtonLuaParcer::_LEFT_SHIFT;}
 "\>\>"							{return dNewtonLuaParcer::_RIGHT_SHIFT;}
-"\/\/"							{return dNewtonLuaParcer::_DOUBLE_DIVIDE;}
+"\/\/"							{return dNewtonLuaParcer::_INTEGER_DIVIDE;}
 "\=\="							{return dNewtonLuaParcer::_IDENTICAL;}
 "\~\="							{return dNewtonLuaParcer::_DIFFERENT;}
 "\<\="							{return dNewtonLuaParcer::_LEFT_EQUAL;}
@@ -79,15 +79,16 @@ Label							[A-Za-z_][A-Za-z0-9_]*
 "\.\."							{return dNewtonLuaParcer::_DOUBLE_DOT;}
 "\.\.\."						{return dNewtonLuaParcer::_TRIPLE_DOT;}
 
+
 "\+"                            {return '+';}
 "\-"                            {return '-';}
 "\*"                            {return '*';}
 "\/"                            {return '/';}
 "\%"                            {return '%';}
 "\^"                            {return '^';}
-"\#"                            {return '#';}
 "\&"                            {return '&';}
 "\~"                            {return '~';}
+"\#"                            {return '#';}
 "\|"                            {return '|';}
 "\<"							{return '<';}
 "\>"							{return '>';}
@@ -102,7 +103,6 @@ Label							[A-Za-z_][A-Za-z0-9_]*
 "\:"							{return ':';}
 "\,"							{return ',';}
 "\."							{return '.';}
-
 
 
 

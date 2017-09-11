@@ -620,6 +620,7 @@ void dParserCompiler::ScanGrammarFile(
 				}
 
 				for (token = dToken(lexical.NextToken()); (token == LITERAL) || ((token < 256) && !isalnum (token)); token = dToken(lexical.NextToken())) {
+					dAssert (token != -1);
 					association.Append(dCRC64 (lexical.GetTokenString()));
 				}
 				break;

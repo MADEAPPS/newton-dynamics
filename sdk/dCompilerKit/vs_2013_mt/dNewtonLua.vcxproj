@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dNewtonLua\dNewtonLua.cpp" />
+    <ClCompile Include="..\dNewtonLua\dNewtonLuaCompiler.cpp" />
     <ClCompile Include="..\dNewtonLua\dNewtonLuaLex.cpp" />
     <ClCompile Include="..\dNewtonLua\dNewtonLuaParcer.cpp" />
     <ClCompile Include="..\dNewtonLua\dNewtonLuaStdafx.cpp">
@@ -20,6 +21,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dNewtonLua\dNewtonLuaCompiler.h" />
     <ClInclude Include="..\dNewtonLua\dNewtonLuaLex.h" />
     <ClInclude Include="..\dNewtonLua\dNewtonLuaParcer.h" />
     <ClInclude Include="..\dNewtonLua\dNewtonLuaStdafx.h" />

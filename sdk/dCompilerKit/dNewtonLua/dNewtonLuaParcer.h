@@ -59,7 +59,7 @@ class dNewtonLuaParcer
 		_WHILE,
 		_LEFT_SHIFT,
 		_RIGHT_SHIFT,
-		_DOUBLE_DIVIDE,
+		_INTEGER_DIVIDE,
 		_IDENTICAL,
 		_DIFFERENT,
 		_LEFT_EQUAL,

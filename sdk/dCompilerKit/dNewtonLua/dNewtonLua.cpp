@@ -8,7 +8,7 @@
 #include <tchar.h>
 
 #include "dNewtonLuaLex.h"
-#include "dNewtonLuaParcer.h"
+#include "dNewtonLuaCompiler.h"
 //#include <dVirtualMachine.h>
 //#include <dLittleScriptCompiler.h>
 
@@ -61,12 +61,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	fclose (sourceFile);
 
 //	const char* const packacgeName = "demos";
-//	dScriptCompiler compiler(packacgeName);
+//	dNewtonLuaCompiler compiler(packacgeName);
 //	compiler.CompileSource (source.GetStr());
 
-	dNewtonLuaLex scanner(source.GetStr());
-	dNewtonLuaParcer parcel;
-	bool status = parcel.Parse(scanner);
+	dNewtonLuaCompiler compiler;
+	compiler.CompileSource (source.GetStr());
+
+//	dNewtonLuaLex scanner(source.GetStr());
+//	dNewtonLuaParcer parcel;
+//	bool status = parcel.Parse(scanner);
 
 	return 0;
 }
