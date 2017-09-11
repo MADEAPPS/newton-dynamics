@@ -58,10 +58,10 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 	m_expression->CompileCIL(cil); 
 	if (m_leftVariable->m_dimExpressions.GetCount()) {
 		
-		dDAGDimensionNode* const dim = m_leftVariable->m_dimExpressions.GetFirst()->GetInfo();
-		dim->CompileCIL(cil);
+		dDAGDimensionNode* const dimOuter = m_leftVariable->m_dimExpressions.GetFirst()->GetInfo();
+		dimOuter->CompileCIL(cil);
 
-		dString result = dim->m_result.m_label;
+		dString result = dimOuter->m_result.m_label;
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_leftVariable->m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
 			dAssert (0);
 			dDAGDimensionNode* const dim = node->GetInfo();

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -23,31 +23,32 @@
     <ProjectGuid>{B27AF501-3F19-49FF-9DB0-FF60B17508F6}</ProjectGuid>
     <RootNamespace>dParcerGenerator</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -67,17 +68,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -194,17 +195,17 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\dParserGenerator\dParserLexical.lex">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe  %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Filename).h</Outputs>
     </CustomBuild>
   </ItemGroup>

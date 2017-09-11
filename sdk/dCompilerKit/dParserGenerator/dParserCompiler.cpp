@@ -760,12 +760,12 @@ dParserCompiler::dToken dParserCompiler::ScanGrammarRule(
 			}
 		}
 		for (dList<dTokenStringPair>::dListNode* node = ruleTokens.GetFirst(); node && (node != lastNode); node = node->GetNext()) {
-			dTokenStringPair& pair = node->GetInfo();
+			dTokenStringPair& pairOuter = node->GetInfo();
 
-			if (pair.m_token == LITERAL) {
+			if (pairOuter.m_token == LITERAL) {
 				dSymbol& symbol = currentRule->Append()->GetInfo();
-				symbol.m_token = pair.m_token;
-				symbol.m_name = pair.m_info;
+				symbol.m_token = pairOuter.m_token;
+				symbol.m_name = pairOuter.m_info;
 				symbol.m_nameCRC = dCRC64 (symbol.m_name.GetStr());
 
 				dTree<dTokenInfo, dCRCTYPE>::dTreeNode* symbolNode = symbolList.Find(symbol.m_nameCRC);
@@ -775,17 +775,17 @@ dParserCompiler::dToken dParserCompiler::ScanGrammarRule(
 				}
 				symbol.m_type = symbolNode->GetInfo().m_type;
 
-			} else if (pair.m_token < 256) {
-				dAssert (pair.m_info.Size() == 1);
+			} else if (pairOuter.m_token < 256) {
+				dAssert (pairOuter.m_info.Size() == 1);
 				dSymbol& symbol = currentRule->Append()->GetInfo();
-				symbol.m_name = pair.m_info;
+				symbol.m_name = pairOuter.m_info;
 				symbol.m_nameCRC = dCRC64 (symbol.m_name.GetStr());
 
 				symbol.m_type = TERMINAL;
 				symbol.m_token = LITERAL;
-				symbolList.Insert(dTokenInfo (pair.m_token, TERMINAL, symbol.m_name), symbol.m_nameCRC);
+				symbolList.Insert(dTokenInfo (pairOuter.m_token, TERMINAL, symbol.m_name), symbol.m_nameCRC);
 
-			} else if (pair.m_token == PREC) {
+			} else if (pairOuter.m_token == PREC) {
 				node = node->GetNext();
 				for (dRuleInfo::dListNode* ruleNode = currentRule->GetLast(); ruleNode; ruleNode = ruleNode->GetPrev()) {
 					dSymbol& symbol = ruleNode->GetInfo();
@@ -856,13 +856,13 @@ void dParserCompiler::CanonicalItemSets (
 
 
 	// find the closure for the first this item set with only the first rule
-	dState* const state = Closure (itemSet, symbolList, ruleMap);
-	operatorPrecedence.SaveLastOperationSymbol (state);
+	dState* const stateOuter = Closure (itemSet, symbolList, ruleMap);
+	operatorPrecedence.SaveLastOperationSymbol (stateOuter);
 
-	stateMap.Insert(state, state->GetKey());
-	stateList.Append(state);
+	stateMap.Insert(stateOuter, stateOuter->GetKey());
+	stateList.Append(stateOuter);
 
-	state->Trace(debugFile);
+	stateOuter->Trace(debugFile);
 
 	// now for each state found 
 	int stateNumber = 1;
@@ -917,21 +917,21 @@ dParserCompiler::dState* dParserCompiler::Closure (
 	const dTree<dList<void*>, dCRCTYPE>& ruleMap) const
 {
 	dState* const state = new dState (itemSet);
-	for (dState::dListNode* itemNode = state->GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
-		dItem& item = itemNode->GetInfo();
+	for (dState::dListNode* itemNodeOuter = state->GetFirst(); itemNodeOuter; itemNodeOuter = itemNodeOuter->GetNext()) {
+		dItem& item = itemNodeOuter->GetInfo();
 
 		dRuleInfo::dListNode* const symbolNode = item.m_ruleNode->GetInfo().GetSymbolNodeByIndex (item.m_indexMarker);
 		if (symbolNode) {
 			// get Beta token dString
 			const dRuleInfo& rule = item.m_ruleNode->GetInfo();
-			dRuleInfo::dListNode* ruleNode = rule.GetFirst();
+			dRuleInfo::dListNode* ruleNodeOuter = rule.GetFirst();
 			for (int i = 0; i < item.m_indexMarker; i ++) {
-				ruleNode = ruleNode->GetNext();
+				ruleNodeOuter = ruleNodeOuter->GetNext();
 			}
 
 			dList<dCRCTYPE> firstSymbolList;
-			for (ruleNode = ruleNode->GetNext(); ruleNode; ruleNode = ruleNode->GetNext()) {
-				const dSymbol& symbol = ruleNode->GetInfo();
+			for (ruleNodeOuter = ruleNodeOuter->GetNext(); ruleNodeOuter; ruleNodeOuter = ruleNodeOuter->GetNext()) {
+				const dSymbol& symbol = ruleNodeOuter->GetInfo();
 				firstSymbolList.Append(symbol.m_nameCRC);
 			}
 
@@ -982,12 +982,12 @@ void dParserCompiler::First (
 		dList<dCRCTYPE>::dListNode* node = symbolSet.GetFirst();
 		bool deriveEmpty = true;
 		while ((deriveEmpty) && node) {
-			dCRCTYPE symbol = node->GetInfo();
+			dCRCTYPE symbolOuter = node->GetInfo();
 			node = node->GetNext();
 
 			dTree<int, dCRCTYPE> tmpFirst;
 			dTree<int, dCRCTYPE> symbolListMark; 
-			First (symbol, symbolListMark, symbolList, ruleMap, tmpFirst);
+			First (symbolOuter, symbolListMark, symbolList, ruleMap, tmpFirst);
 			dTree<int, dCRCTYPE>::Iterator iter (tmpFirst);
 			deriveEmpty = false;  
 			for (iter.Begin(); iter; iter ++) {
@@ -1012,26 +1012,26 @@ void dParserCompiler::First (
 
 
 void dParserCompiler::First (
-	dCRCTYPE symbol, 
+	dCRCTYPE symbolOuter,
 	dTree<int, dCRCTYPE>& symbolListMark, 
 	const dTree<dTokenInfo, dCRCTYPE>& symbolList, 
 	const dTree<dList<void*>, dCRCTYPE>& ruleMap,
 	dTree<int, dCRCTYPE>& firstSetOut) const
 {
-	if (symbolListMark.Find(symbol)) {
+	if (symbolListMark.Find(symbolOuter)) {
 		return;
 	}
-	symbolListMark.Insert(0, symbol);
+	symbolListMark.Insert(0, symbolOuter);
 
-	dTree<dTokenInfo, dCRCTYPE>::dTreeNode* const node = symbolList.Find(symbol);
-	dAssert (node);
-	if (node->GetInfo().m_type == TERMINAL) {
-		firstSetOut.Insert(0, symbol);
-	} else if (DoesSymbolDeriveEmpty (symbol, ruleMap)) {
+	dTree<dTokenInfo, dCRCTYPE>::dTreeNode* const nodeOuter = symbolList.Find(symbolOuter);
+	dAssert (nodeOuter);
+	if (nodeOuter->GetInfo().m_type == TERMINAL) {
+		firstSetOut.Insert(0, symbolOuter);
+	} else if (DoesSymbolDeriveEmpty (symbolOuter, ruleMap)) {
 		firstSetOut.Insert(0, 0);
 	} else {
 
-		dTree<dList<void*>, dCRCTYPE>::dTreeNode* const ruleNodes = ruleMap.Find(symbol);
+		dTree<dList<void*>, dCRCTYPE>::dTreeNode* const ruleNodes = ruleMap.Find(symbolOuter);
 		if (ruleNodes) {
 			const dList<void*>& matchingRulesList = ruleNodes->GetInfo();
 			for (dList<void*>::dListNode* node = matchingRulesList.GetFirst(); node; node = node->GetNext()) {
@@ -1223,10 +1223,9 @@ void dParserCompiler::GenerateParserCode (
 	ReplaceAllMacros (templateHeader, className, "$(className)");
 	ReplaceAllMacros (templateHeader, scannerClassName, "$(scannerClass)");
 
-
-	char text[256];
-	sprintf (text, "%d", lastTerminalTokenEnum);
-	ReplaceMacro (templateHeader, text, "&(lastTerminalToken)");
+	char textOuter[256];
+	sprintf (textOuter, "%d", lastTerminalTokenEnum);
+	ReplaceMacro (templateHeader, textOuter, "&(lastTerminalToken)");
 
 	dTree<dState*, dCRCTYPE> sortedStates;
 	dTree<dState*, dCRCTYPE>::Iterator stateIter (stateList);
@@ -1247,7 +1246,6 @@ void dParserCompiler::GenerateParserCode (
 	int newLineCount = 0;
 	int starAndCountIndex = 0;
 	dTree<dState*, dCRCTYPE>::Iterator sortStateIter (sortedStates);
-
 
 	const char* const caseTabs0 = "\t\t\t\t\t\t";
 	//const char* const caseTabs1 = "\t\t\t\t\t\t\t";
@@ -1350,8 +1348,8 @@ void dParserCompiler::GenerateParserCode (
 		dTree<dActionEntry, int>::Iterator iter (actionSort);
 		for (iter.Begin(); iter; iter ++) {
 			const dActionEntry& entry = iter.GetNode()->GetInfo();
-			sprintf (text, "%d, %d, %d, %d, %d, %d, ", entry.m_token, entry.m_errorRule, entry.m_stateType, entry.m_nextState, entry.m_ruleSymbols, entry.m_ruleIndex);
-			stateActions += text; 
+			sprintf (textOuter, "%d, %d, %d, %d, %d, %d, ", entry.m_token, entry.m_errorRule, entry.m_stateType, entry.m_nextState, entry.m_ruleSymbols, entry.m_ruleIndex);
+			stateActions += textOuter;
 			entriesCount ++;
 		}
 
@@ -1368,8 +1366,8 @@ void dParserCompiler::GenerateParserCode (
 				}
 				newLineCount ++;
 				const dActionEntry& entry = iter.GetNode()->GetInfo();
-				sprintf (text, "dActionEntry (%d, %d, %d, %d, %d, %d), ", entry.m_token, entry.m_errorRule, entry.m_stateType, entry.m_nextState, entry.m_ruleSymbols, entry.m_ruleIndex);
-				nextActionsStateList += text; 
+				sprintf (textOuter, "dActionEntry (%d, %d, %d, %d, %d, %d), ", entry.m_token, entry.m_errorRule, entry.m_stateType, entry.m_nextState, entry.m_ruleSymbols, entry.m_ruleIndex);
+				nextActionsStateList += textOuter;
 			}
 		}
 
@@ -1379,11 +1377,11 @@ void dParserCompiler::GenerateParserCode (
 		}
 		starAndCountIndex ++;
 
-		sprintf (text, "%d, ", actionIndex);
-		stateActionsStart += text;
+		sprintf (textOuter, "%d, ", actionIndex);
+		stateActionsStart += textOuter;
 
-		sprintf (text, "%d, ", count);
-		stateActionsCount += text;
+		sprintf (textOuter, "%d, ", count);
+		stateActionsCount += textOuter;
 	}
 	nextActionsStateList.Replace(nextActionsStateList.Size()-2, 2, "");
 	stateActionsCount.Replace(stateActionsCount.Size()-2, 2, "");

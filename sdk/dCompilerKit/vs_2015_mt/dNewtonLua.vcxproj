@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -37,8 +37,8 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </DeploymentContent>
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(Directory)%(Filename)%(Extension) %(Directory)%(Filename).cpp</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
@@ -53,10 +53,10 @@
   <ItemGroup>
     <CustomBuild Include="..\dNewtonLua\dNewtonLuaParcer.grm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dNewtonLuaLex %(RelativeDir)%(Filename).cpp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dNewtonLuaLex %(RelativeDir)%(Filename).cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(Directory)%(Filename)%(Extension) dLittleScriptLexical %(Directory)%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(Directory)%(Filename)%(Extension) dLittleScriptLexical %(Directory)%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(Directory)%(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
     </CustomBuild>
@@ -70,13 +70,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -96,7 +96,7 @@
     <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
   </PropertyGroup>

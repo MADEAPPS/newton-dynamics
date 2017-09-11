@@ -81,9 +81,9 @@ void dDeterministicFiniteAutonata::CopySet (const dNonDeterministicFiniteAutonat
 
 
 
-void dDeterministicFiniteAutonata::MoveSymbol (int symbol, const dAutomataState* const state, dTree<dAutomataState*,dAutomataState*>& ouput) const
+void dDeterministicFiniteAutonata::MoveSymbol (int symbol, const dAutomataState* const stateSrc, dTree<dAutomataState*,dAutomataState*>& ouput) const
 {
-	for (dList<dAutomataState*>::dListNode* stateNode = state->m_myNFANullStates.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
+	for (dList<dAutomataState*>::dListNode* stateNode = stateSrc->m_myNFANullStates.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
 		const dAutomataState* const state = stateNode->GetInfo();
 		for (dList<dAutomataState::dTransition>::dListNode* transitionNode = state->m_transtions.GetFirst(); transitionNode; transitionNode = transitionNode->GetNext()) {
 			dAutomataState::dTransition& thans = transitionNode->GetInfo();
@@ -181,17 +181,16 @@ void dDeterministicFiniteAutonata::CreateDeterministicFiniteAutomaton (const dNo
 		}
 
 
-		dTree<dAutomataState*,dAutomataState*> NFAmap;
-		dTree<dAutomataState*,dAutomataState*> subSet;
+		dTree<dAutomataState*,dAutomataState*> NFAmap1;
+		dTree<dAutomataState*,dAutomataState*> subSet1;
 
 		int stateID = 0;
-		NFAmap.Insert(nfa.GetStartState(), nfa.GetStartState());
+		NFAmap1.Insert(nfa.GetStartState(), nfa.GetStartState());
 
 		dAutomataState* stackPool[2048];
 
-		EmptyTransitionClosure (NFAmap, subSet);
-	//	dAutomataState* const startState = new dAutomataState(subSet, stateID ++);
-		dAutomataState* const startState = CreateTargetState(subSet, stateID ++);
+		EmptyTransitionClosure (NFAmap1, subSet1);
+		dAutomataState* const startState = CreateTargetState(subSet1, stateID ++);
 
 		dList<dAutomataState*> newStatesList;
 		int stack = 1;
@@ -201,14 +200,14 @@ void dDeterministicFiniteAutonata::CreateDeterministicFiniteAutomaton (const dNo
 
 		while (stack) {
 			stack --;
-			dAutomataState* const state = stackPool[stack];
+			dAutomataState* const stateOuter = stackPool[stack];
 
 			dTree<int, int>::Iterator iter (symbolsList);
 			for (iter.Begin(); iter; iter ++) {
 				int ch = iter.GetNode()->GetInfo();
 
 				dTree<dAutomataState*,dAutomataState*> moveSet;
-				MoveSymbol (ch, state, moveSet);
+				MoveSymbol (ch, stateOuter, moveSet);
 
 				if (moveSet.GetCount()) {
 
@@ -226,7 +225,7 @@ void dDeterministicFiniteAutonata::CreateDeterministicFiniteAutomaton (const dNo
 					}
 
 					if (foundState) {
-						state->m_transtions.Append(dAutomataState::dTransition(ch, foundState));
+						stateOuter->m_transtions.Append(dAutomataState::dTransition(ch, foundState));
 
 					} else {
 
@@ -236,7 +235,7 @@ void dDeterministicFiniteAutonata::CreateDeterministicFiniteAutomaton (const dNo
 						dAssert (stack < sizeof (stackPool)/sizeof (stackPool[0]));
 
 						newStatesList.Append(targetState);
-						state->m_transtions.Append(dAutomataState::dTransition(ch, targetState));
+						stateOuter->m_transtions.Append(dAutomataState::dTransition(ch, targetState));
 					}
 				}
 			}

@@ -480,18 +480,18 @@ void dLexCompiler::ParseDefinitions (dExpandedNFA& nfa, dString& preHeaderCode, 
 
 			// until I get the balance expression feature working
 			m_grammarTokenStart += m_grammarTokenLength;
-			const char* const str = &m_grammar[m_grammarTokenStart];
-			int length = 0;
-			for (int ch = str[length]; ch && (ch != '{') ; ch = str[length]) {
+			const char* const strOuter = &m_grammar[m_grammarTokenStart];
+			int lengthOuter = 0;
+			for (int ch = strOuter[lengthOuter]; ch && (ch != '{') ; ch = strOuter[lengthOuter]) {
 				if (ch == '\n') {
 					m_lineNumber ++;
 				}
-				length ++;
+				lengthOuter++;
 			}
 
-			if (str[length] == '{') {
+			if (strOuter[lengthOuter] == '{') {
 
-				m_grammarTokenStart += length;
+				m_grammarTokenStart += lengthOuter;
 				const char* const str = &m_grammar[m_grammarTokenStart];
 				int length = 1;
 

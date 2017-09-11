@@ -38,10 +38,10 @@ void dConvertToSSASolver::BuildDomicanceFrontier(const dBasicBlock* const root)
 	}
 
 	for (dList<const dBasicBlock*>::dListNode* node = root->m_children.GetFirst(); node; node = node->GetNext()) {
-		const dBasicBlock* const childBlock = node->GetInfo();
-		BuildDomicanceFrontier(childBlock);
+		const dBasicBlock* const childBlockOuter = node->GetInfo();
+		BuildDomicanceFrontier(childBlockOuter);
 		
-		dAssert (m_dominanceFrontier.Find(childBlock));
+		dAssert (m_dominanceFrontier.Find(childBlockOuter));
 		dFrontierList& childFrontierList = m_dominanceFrontier.Find(root)->GetInfo();
 		for (dList<const dBasicBlock*>::dListNode* childFrontierNode = childFrontierList.GetFirst(); childFrontierNode; childFrontierNode = childFrontierNode->GetNext()) {
 			const dBasicBlock* const childBlock = childFrontierNode->GetInfo();
@@ -160,8 +160,8 @@ void dConvertToSSASolver::Solve()
 	BuildDomicanceFrontier();
 
 	dTree <dStatementBucket, dString> variableList;
-	for (dBasicBlocksGraph::dListNode* node = m_graph->GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block = node->GetInfo();
+	for (dBasicBlocksGraph::dListNode* nodeOuter = m_graph->GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
+		dBasicBlock& block = nodeOuter->GetInfo();
 
 		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
 			dCILInstr* const instruction = node->GetInfo();
@@ -272,8 +272,8 @@ m_graph->Trace();
 //m_graph->Trace();
 
 	variableList.RemoveAll ();
-	for (dBasicBlocksGraph::dListNode* node = m_graph->GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block = node->GetInfo();
+	for (dBasicBlocksGraph::dListNode* nodeOuter = m_graph->GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
+		dBasicBlock& block = nodeOuter->GetInfo();
 
 		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
 			dCILInstr* const instruction = node->GetInfo();

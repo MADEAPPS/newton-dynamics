@@ -163,6 +163,7 @@ void dLexScannerGenerator::LoadTemplateFile(const char* const templateName, dStr
 		sprintf (ptr, templateName);
 
 		FILE* const templateFile = fopen (path, "rb");
+		dTrace((path));
 		dAssert (templateFile);
 
 		templateOuput.LoadFile(templateFile);

@@ -74,10 +74,10 @@ void dAutomataState::GetStateArray (dList<dAutomataState*>& statesList)
 
 	while (stack) {
 		stack --;
-		dAutomataState* const state = pool[stack];
-		statesList.Append(state);
+		dAutomataState* const stateOuter = pool[stack];
+		statesList.Append(stateOuter);
 
-		for (dList<dAutomataState::dTransition>::dListNode* node = state->m_transtions.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dAutomataState::dTransition>::dListNode* node = stateOuter->m_transtions.GetFirst(); node; node = node->GetNext()) {
 			dAutomataState* const state = node->GetInfo().GetState();
 			if (!filter.Find (state)) {
 				pool[stack] = state;
