@@ -290,11 +290,14 @@ void dLexScannerGenerator::CreateCodeFile (const char* const fileName, const dSt
 			AddText (semanticAction, "\tcase %d:\n", state->m_id);
 			AddText (semanticAction, "\t{\n");
 			AddText (semanticAction, "\t\tGetLexString ();\n");
-			AddText (semanticAction, "\t\t%s\n", state->m_userAction.GetStr());
-			AddText (semanticAction, "\t\tstate = 0;\n");
-			AddText (semanticAction, "\t\tch = NextChar();\n");
-			AddText (semanticAction, "\t\tbreak;\n");
-			AddText (semanticAction, "\t}\n");
+			const char* const userAction = state->m_userAction.GetStr();
+			AddText(semanticAction, "\t\t%s\n", userAction);
+			if (!strstr(userAction, "return")) {
+				AddText(semanticAction, "\t\tstate = 0;\n");
+				AddText(semanticAction, "\t\tch = NextChar();\n");
+				AddText(semanticAction, "\t\tbreak;\n");
+			}
+			AddText(semanticAction, "\t}\n");
 		}
 
 		int count = 0;

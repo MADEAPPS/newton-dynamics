@@ -523,7 +523,7 @@ void dLexCompiler::ParseDefinitions (dExpandedNFA& nfa, dString& preHeaderCode, 
 					}
 				}
 
-				dString userAction (str, length);
+				dString userAction (str + 1, length - 2);
 				switch (expresionToken) 
 				{
 					case m_quatedString:
