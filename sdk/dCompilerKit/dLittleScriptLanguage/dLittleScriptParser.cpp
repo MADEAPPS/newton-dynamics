@@ -3413,8 +3413,8 @@ const dLittleScriptParser::dActionEntry* dLittleScriptParser::GetNextAction (dLi
 			dActionEntry (125, 0, 1, 24, 9, 82), dActionEntry (277, 0, 1, 24, 9, 82), dActionEntry (279, 0, 1, 24, 9, 82), dActionEntry (280, 0, 1, 24, 9, 82)};
 
 	bool errorMode = false;
-	const dStackPair& stackTop = stack.GetLast()->GetInfo();
-	int state = stackTop.m_state;
+	const dStackPair& stackTopOuter = stack.GetLast()->GetInfo();
+	int state = stackTopOuter.m_state;
 	int start = actionsStart[state];
 	int count = actionsCount[state];
 

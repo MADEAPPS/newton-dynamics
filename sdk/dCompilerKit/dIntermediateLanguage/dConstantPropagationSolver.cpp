@@ -182,22 +182,22 @@ m_graph->Trace();
 	while (m_blockWorklist.GetCount() || m_instructionsWorklist.GetCount()) {
 Trace();
 		while (m_instructionsWorklist.GetCount()) {
-			dList<dCILInstr*>::dListNode* const node = m_instructionsWorklist.GetFirst();
-			dCILInstr* const instruction = node->GetInfo();
-			m_instructionsWorklist.Remove(node);
+			dList<dCILInstr*>::dListNode* const nodeOuter = m_instructionsWorklist.GetFirst();
+			dCILInstr* const instruction = nodeOuter->GetInfo();
+			m_instructionsWorklist.Remove(nodeOuter);
 instruction->Trace();
 			instruction->ApplyConstantPropagationSSA(*this);
 		}
 
 		while (m_blockWorklist.GetCount()) {
-			dList<dBasicBlock*>::dListNode* const node = m_blockWorklist.GetFirst();
-			dBasicBlock* const block = node->GetInfo();
-			m_blockWorklist.Remove(node);
+			dList<dBasicBlock*>::dListNode* const nodeOuter = m_blockWorklist.GetFirst();
+			dBasicBlock* const block = nodeOuter->GetInfo();
+			m_blockWorklist.Remove(nodeOuter);
 block->Trace();
 
-			bool done = false;
-			for (dCIL::dListNode* node = block->m_begin; !done; node = node->GetNext()) {
-				done = (node == block->m_end);
+			bool doneOuter = false;
+			for (dCIL::dListNode* node = block->m_begin; !doneOuter; node = node->GetNext()) {
+				doneOuter = (node == block->m_end);
 				dCILInstrPhy* const phy = node->GetInfo()->GetAsPhi();
 				if (phy) {
 //phy->Trace();

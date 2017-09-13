@@ -9,20 +9,16 @@
 * freely
 */
 
-
 %{
 #include <dParserCompiler.h>
 %}
-
 				
 WhiteSpace			[ \t\n\r]+
-
 AnyButAstr			[^\*]
 AnyButSlash			[^\/]
 Comment1			[\/][\/].*
 Comment2			[\/][\*]({AnyButAstr}|[\*]{AnyButSlash})*[\*][\/]
 Comment				({Comment1}|{Comment2})
-
 
 AnyButPercent		[^\%]
 AnyButCloseCurly	[^\}]

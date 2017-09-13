@@ -289,15 +289,15 @@ void dLexScannerGenerator::CreateCodeFile (const char* const fileName, const dSt
 		if (state->m_exitState) {
 			AddText (semanticAction, "\tcase %d:\n", state->m_id);
 			AddText (semanticAction, "\t{\n");
-			AddText (semanticAction, "\t\tGetLexString ();\n");
+			//AddText (semanticAction, "\t\tGetLexString ();\n");
 			const char* const userAction = state->m_userAction.GetStr();
 			AddText(semanticAction, "\t\t%s\n", userAction);
 			if (!strstr(userAction, "return")) {
-				AddText(semanticAction, "\t\tstate = 0;\n");
-				AddText(semanticAction, "\t\tch = NextChar();\n");
-				AddText(semanticAction, "\t\tbreak;\n");
+				AddText (semanticAction, "\t\tstate = 0;\n");
+				AddText (semanticAction, "\t\tch = NextChar();\n");
+				AddText (semanticAction, "\t\tbreak;\n");
 			}
-			AddText(semanticAction, "\t}\n");
+			AddText (semanticAction, "\t}\n");
 		}
 
 		int count = 0;
@@ -310,7 +310,7 @@ void dLexScannerGenerator::CreateCodeFile (const char* const fileName, const dSt
 			dAutomataState::dCharacter ch (sourceTransition.GetCharater());
 			dAssert (ch.m_type == dAutomataState::CHARACTER);
 			symbols[count].m_symbol = char (GetScapeChar(ch.m_info));
-			symbols[count]. m_nextState = targetState->m_id;
+			symbols[count].m_nextState = targetState->m_id;
 			count ++;
 		}
 

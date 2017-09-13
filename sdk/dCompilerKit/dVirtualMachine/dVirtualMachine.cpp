@@ -137,6 +137,7 @@ bool dVirtualMachine::ExecuteFunction(int entryPoint, const char* const paramFor
 
 bool dVirtualMachine::ExecuteFunction (int entryPoint, const char* const paramFormat, va_list argList)
 {
+	paramFormat;
 //	unsigned int i = 0;
 	for (int i = 0; i < 1; i++)
 	{

@@ -53,6 +53,7 @@
 //dNewtonLuaCompiler::dNewtonLuaCompiler(const char* const pakacgesRootNameDirectory)
 dNewtonLuaCompiler::dNewtonLuaCompiler()
 	:dNewtonLuaParcer ()
+	,m_cil()
 	,m_funtions()
 //	,m_packageRootDirectory (pakacgesRootNameDirectory)
 //	,m_currentPackage(NULL)
@@ -83,7 +84,7 @@ dNewtonLuaCompiler::~dNewtonLuaCompiler()
 
 int dNewtonLuaCompiler::CompileSource (const char* const source)
 {
-	dCIL cil;
+	m_cil.RemoveAll();
 	dNewtonLuaLex scanner(source);
 	m_funtions.RemoveAll();
 	bool status = Parse(scanner);
@@ -960,8 +961,159 @@ void dNewtonLuaCompiler::OpenPackage (const dString& packageName)
 #endif
 
 
-dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::AddFunction(const dUserVariable& name)
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionDeclaration(const dUserVariable& functionName)
 {
-	dUserVariable xxx;
-	return xxx;
+//	dAssert(m_body);
+//	dDAGClassNode* const myClass = GetClass();
+
+	m_cil.ResetTemporaries();
+//	dString returnVariable(m_cil.NewTemp());
+//	dString functionName(myClass->GetFunctionName(m_name, m_parameters));
+//	dCILInstrFunction* const function = new dCILInstrFunction(m_cil, functionName.GetString(), m_returnType->GetArgType());
+
+/*
+	m_functionStart = function->GetNode();
+
+	if (!m_isStatic) {
+		dAssert(0);
+		//		dList<dDAGParameterNode*>::dListNode* const argNode = m_parameters.GetFirst();
+		//		dDAGParameterNode* const arg = argNode->GetInfo();
+		//		m_opertatorThis = arg->m_result.m_label;
+	}
+
+	// emit the function arguments
+	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
+		dDAGParameterNode* const arg = argNode->GetInfo();
+		arg->m_result = function->AddParameter(arg->m_name, arg->m_type->GetArgType())->GetInfo();
+	}
+	function->Trace();
+
+	dCILInstrLabel* const entryPoint = new dCILInstrLabel(cil, cil.NewLabel());
+	entryPoint->Trace();
+
+	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
+		dDAGParameterNode* const arg = argNode->GetInfo();
+
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
+		dAssert(varNameNode);
+		dCILInstrArgument* const localVariable = new dCILInstrArgument(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
+		localVariable->Trace();
+	}
+
+
+	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
+		dDAGParameterNode* const arg = argNode->GetInfo();
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
+		dAssert(varNameNode);
+		//dCILInstrStore* const store = new dCILInstrStore(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType(), arg->m_name, arg->GetType()->GetArgType());
+		dString localVariableAliasName(cil.NewTemp());
+		dCILInstrMove* const store = new dCILInstrMove(cil, localVariableAliasName, arg->GetType()->GetArgType(), varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
+		//arg->m_result =  store->GetArg0();
+		varNameNode->GetInfo().m_label = localVariableAliasName;
+		store->Trace();
+	}
+
+	//cil.Trace();
+	m_body->CompileCIL(cil);
+	//cil.Trace();
+	if (!m_returnType->GetArgType().m_isPointer && (m_returnType->GetArgType().m_intrinsicType == dCILInstr::m_void)) {
+		if (!cil.GetLast()->GetInfo()->GetAsReturn()) {
+			dCILInstrReturn* const ret = new dCILInstrReturn(cil, "", dCILInstr::dArgType(dCILInstr::m_void));
+			ret->Trace();
+		}
+	}
+
+	dCILInstrFunctionEnd* const end = new dCILInstrFunctionEnd(function);
+
+	dCILInstrReturn* const ret = end->GetNode()->GetPrev()->GetInfo()->GetAsReturn();
+	dAssert(ret);
+	dCILInstr::dArg returnArg(ret->GetArg0());
+
+	dString exitLabel(cil.NewLabel());
+	dCILInstrLabel* const returnLabel = new dCILInstrLabel(cil, exitLabel);
+	cil.InsertAfter(ret->GetNode()->GetPrev(), returnLabel->GetNode());
+
+	dCILInstrGoto* const jumpToReturn = new dCILInstrGoto(cil, exitLabel);
+	cil.InsertAfter(returnLabel->GetNode()->GetPrev(), jumpToReturn->GetNode());
+	jumpToReturn->SetTarget(returnLabel);
+
+	dCIL::dListNode* prev;
+	for (dCIL::dListNode* node = returnLabel->GetNode(); node && !node->GetInfo()->GetAsFunction(); node = prev) {
+		dCILInstrReturn* const ret = node->GetInfo()->GetAsReturn();
+		prev = node->GetPrev();
+		if (ret) {
+			dCILInstrLabel* const dommyLabel = new dCILInstrLabel(cil, cil.NewLabel());
+			cil.InsertAfter(ret->GetNode()->GetPrev(), dommyLabel->GetNode());
+
+			dCILInstrGoto* const jumpToReturn = new dCILInstrGoto(cil, exitLabel);
+			cil.InsertAfter(dommyLabel->GetNode()->GetPrev(), jumpToReturn->GetNode());
+			jumpToReturn->SetTarget(returnLabel);
+
+			if (returnArg.m_isPointer || returnArg.GetType().m_intrinsicType != dCILInstr::m_void) {
+				dCILInstrMove* const move = new dCILInstrMove(cil, returnArg.m_label, returnArg.GetType(), ret->GetArg0().m_label, returnArg.GetType());
+				cil.InsertAfter(jumpToReturn->GetNode()->GetPrev(), move->GetNode());
+			}
+			cil.Remove(node);
+		}
+	}
+
+	m_basicBlocks.Build(m_functionStart);
+	m_basicBlocks.ConvertToSSA();
+*/
+
+	dCILInstrFunction* const function = new dCILInstrFunction(m_cil, functionName.GetString(), dCILInstr::dArgType(dCILInstr::m_luaType));
+	m_funtions.Insert(function->GetNode(), functionName.GetString());
+
+	dUserVariable variable(functionName);
+	variable.m_node = function->GetNode();
+	function->Trace();
+	return variable;
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionParameter(const dUserVariable& parameter)
+{
+	dCILInstrArgument* const localVariable = new dCILInstrArgument(m_cil, parameter.GetString(), dCILInstr::dArgType(dCILInstr::m_luaType));
+	dUserVariable variable(parameter);
+	variable.m_node = localVariable->GetNode();
+	localVariable->Trace();
+	return variable;
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitParametersToLocalVariables(const dUserVariable& parameterList)
+{
+//	dCILInstrArgument* const localVariable = new dCILInstrArgument(m_cil, parameter.GetString(), dCILInstr::dArgType(dCILInstr::m_luaType));
+//	dUserVariable variable(parameter);
+//	variable.m_node = localVariable->GetNode();
+//	variable.m_next = predecessor;
+//	localVariable->Trace();
+/*
+	for (dList<dDAGParameterNode*>::dListNode* argNode = parameterList; argNode; argNode = argNode->GetNext()) {
+		dDAGParameterNode* const arg = argNode->GetInfo();
+//		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
+//		dAssert(varNameNode);
+		dCILInstrArgument* const localVariable = new dCILInstrArgument(m_cil, varNameNode->GetInfo().m_label, dCILInstr::dArgType(dCILInstr::m_luaType));
+		localVariable->Trace();
+	}
+
+	for (dCIL::dListNode* argNode = parameterList.m_node; argNode; argNode = argNode->GetInfo()->) {
+		dDAGParameterNode* const arg = argNode->GetInfo();
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
+		dAssert(varNameNode);
+		//dCILInstrStore* const store = new dCILInstrStore(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType(), arg->m_name, arg->GetType()->GetArgType());
+		dString localVariableAliasName(cil.NewTemp());
+		dCILInstrMove* const store = new dCILInstrMove(cil, localVariableAliasName, arg->GetType()->GetArgType(), varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
+		//arg->m_result =  store->GetArg0();
+		varNameNode->GetInfo().m_label = localVariableAliasName;
+		store->Trace();
+	}
+*/
+
+	return parameterList;
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1)
+{
+	dUserVariable variable;
+
+	return variable;
 }

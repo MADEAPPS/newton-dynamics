@@ -23,8 +23,8 @@ void dStatementBlockDictionary::BuildUsedVariableWorklist(dBasicBlocksGraph& lis
 {
 	RemoveAll();
 
-	for (dBasicBlocksGraph::dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block = node->GetInfo();
+	for (dBasicBlocksGraph::dListNode* nodeOuter = list.GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
+		dBasicBlock& block = nodeOuter->GetInfo();
 
 		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
 			dCILInstr* const instruction = node->GetInfo();
@@ -311,19 +311,19 @@ void dBasicBlocksGraph::BuildDominatorTree ()
 	while (change) {
 		change = false;
 		for (dListNode* node = GetFirst()->GetNext(); node; node = node->GetNext()) {
-			dBasicBlock& block = node->GetInfo();
+			dBasicBlock& blockOuter = node->GetInfo();
 
 //block.Trace();
 			dTree<int, const dBasicBlock*> predIntersection;
-			const dBasicBlock& predBlock = *block.m_predecessors.GetFirst()->GetInfo();
+			const dBasicBlock& predBlockOuter = *blockOuter.m_predecessors.GetFirst()->GetInfo();
 
-			dTree<int, const dBasicBlock*>::Iterator domIter (predBlock.m_dominators);
+			dTree<int, const dBasicBlock*>::Iterator domIter (predBlockOuter.m_dominators);
 			for (domIter.Begin(); domIter; domIter ++) {
 				const dBasicBlock* const block = domIter.GetKey();
 				predIntersection.Insert (0, block);
 			}
 
-			for (dList<const dBasicBlock*>::dListNode* predNode = block.m_predecessors.GetFirst()->GetNext(); predNode; predNode = predNode->GetNext()) {
+			for (dList<const dBasicBlock*>::dListNode* predNode = blockOuter.m_predecessors.GetFirst()->GetNext(); predNode; predNode = predNode->GetNext()) {
 				const dBasicBlock& predBlock = *predNode->GetInfo();
 				dTree<int, const dBasicBlock*>::Iterator predIter (predIntersection);
 				for (predIter.Begin(); predIter; ) {
@@ -335,12 +335,12 @@ void dBasicBlocksGraph::BuildDominatorTree ()
 				}
 			}
 
-			dAssert (!predIntersection.Find(&block));
-			predIntersection.Insert(&block);
+			dAssert (!predIntersection.Find(&blockOuter));
+			predIntersection.Insert(&blockOuter);
 
-			bool dominatorChanged = block.ComparedDominator (predIntersection);
+			bool dominatorChanged = blockOuter.ComparedDominator (predIntersection);
 			if (dominatorChanged) {
-				block.ReplaceDominator (predIntersection);
+				blockOuter.ReplaceDominator (predIntersection);
 				//block.Trace();
 			}
 			change |= dominatorChanged;
@@ -511,9 +511,9 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 		dCILInstr* const instruction = node->GetInfo();
 //instruction->Trace();
 		if (!instruction->GetAsCall()) {
-			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
-			if (variable) {
-				dStatementBlockDictionary::dTreeNode* const usesNodeBuckect = usedVariablesList.Find(variable->m_label);
+			const dCILInstr::dArg* const variableOuter = instruction->GetGeneratedVariable();
+			if (variableOuter) {
+				dStatementBlockDictionary::dTreeNode* const usesNodeBuckect = usedVariablesList.Find(variableOuter->m_label);
 				dAssert(!usesNodeBuckect || usesNodeBuckect->GetInfo().GetCount());
 				if (!usesNodeBuckect) {
 					anyChanges = true;

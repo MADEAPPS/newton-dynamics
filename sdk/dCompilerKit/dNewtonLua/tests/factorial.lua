@@ -1,5 +1,7 @@
-    -- defines a factorial function
-    function fact (n)
+    
+	
+	-- defines a factorial function
+    function fact (n, m, w)
       if n == 0 then
         return 1
       else

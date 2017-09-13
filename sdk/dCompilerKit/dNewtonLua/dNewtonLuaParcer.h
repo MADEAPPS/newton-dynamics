@@ -16,13 +16,6 @@
 #ifndef __dNewtonLuaParcer_h__
 #define __dNewtonLuaParcer_h__
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4702) // warning C4702: unreachable code
-#pragma warning (disable: 4100) // warning C4100: unreferenced formal parameter
-#pragma warning (disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
-#endif
-
-
 #include <dList.h>
 #include <dString.h>
 
@@ -114,7 +107,8 @@ class dNewtonLuaParcer
 	{
 		public:
 		dUserVariable () 
-			:dDefualtUserVariable (), m_node(NULL)
+			:dDefualtUserVariable ()
+			,m_node(NULL)
 		{
 		}
 		
@@ -123,7 +117,7 @@ class dNewtonLuaParcer
 			,m_node(NULL)
 		{
 		}
-		class dDAG* m_node;
+		dCIL::dListNode* m_node;
 	};
 
 

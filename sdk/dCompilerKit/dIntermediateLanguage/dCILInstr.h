@@ -55,6 +55,7 @@ class dCILInstr
 		m_classPointer,
 		m_constInt,
 		m_constFloat,
+		m_luaType,
 	};
 
 	class dMapTable 

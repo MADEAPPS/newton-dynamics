@@ -130,7 +130,19 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 */
 
 	protected:
-	dUserVariable AddFunction(const dUserVariable& name);
+	class LuaFunction: dList<dCIL::dListNode*>
+	{
+		public:
+		protected:
+		private:
+	};
+
+	dUserVariable EmitFunctionDeclaration(const dUserVariable& name);
+	dUserVariable EmitFunctionParameter(const dUserVariable& parameter);
+	dUserVariable EmitParametersToLocalVariables(const dUserVariable& parameterList);
+	dUserVariable EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1);
+
+	dCIL m_cil;
 	dTree<dCIL::dListNode*, dString> m_funtions;
 
 	friend class dNewtonLuaParcer;

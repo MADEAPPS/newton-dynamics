@@ -568,1069 +568,570 @@ int dNewtonLuaLex::NextToken ()
 			state = stateArray[nextStateIndex];
 		} else {
 			UnGetChar ();
+			GetLexString ();
 			switch (state) 
 			{
 				case 1:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 2:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_STRING;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_STRING;
 				}
 				case 3:
 				{
-					GetLexString ();
-					{return '#';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '#';
 				}
 				case 4:
 				{
-					GetLexString ();
-					{return '%';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '%';
 				}
 				case 5:
 				{
-					GetLexString ();
-					{return '&';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '&';
 				}
 				case 6:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_STRING;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_STRING;
 				}
 				case 7:
 				{
-					GetLexString ();
-					{return '(';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '(';
 				}
 				case 8:
 				{
-					GetLexString ();
-					{return ')';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ')';
 				}
 				case 9:
 				{
-					GetLexString ();
-					{return '*';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '*';
 				}
 				case 10:
 				{
-					GetLexString ();
-					{return '+';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '+';
 				}
 				case 11:
 				{
-					GetLexString ();
-					{return ',';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ',';
 				}
 				case 12:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 13:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 14:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 15:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 16:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 17:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 18:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 19:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 20:
 				{
-					GetLexString ();
-					{return '-';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '-';
 				}
 				case 21:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_TRIPLE_DOT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_TRIPLE_DOT;
 				}
 				case 22:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_DOUBLE_DOT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_DOUBLE_DOT;
 				}
 				case 23:
 				{
-					GetLexString ();
-					{return '.';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '.';
 				}
 				case 24:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_INTEGER_DIVIDE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_INTEGER_DIVIDE;
 				}
 				case 25:
 				{
-					GetLexString ();
-					{return '/';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '/';
 				}
 				case 26:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_INTEGER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_INTEGER;
 				}
 				case 27:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_INTEGER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_INTEGER;
 				}
 				case 28:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_INTEGER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_INTEGER;
 				}
 				case 29:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_INTEGER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_INTEGER;
 				}
 				case 30:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_FLOAT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_FLOAT;
 				}
 				case 31:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_FLOAT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_FLOAT;
 				}
 				case 32:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_INTEGER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_INTEGER;
 				}
 				case 33:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_DOUBLE_COLUMN;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_DOUBLE_COLUMN;
 				}
 				case 34:
 				{
-					GetLexString ();
-					{return ':';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ':';
 				}
 				case 35:
 				{
-					GetLexString ();
-					{return ';';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ';';
 				}
 				case 36:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LEFT_SHIFT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LEFT_SHIFT;
 				}
 				case 37:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LEFT_EQUAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LEFT_EQUAL;
 				}
 				case 38:
 				{
-					GetLexString ();
-					{return '<';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '<';
 				}
 				case 39:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_IDENTICAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_IDENTICAL;
 				}
 				case 40:
 				{
-					GetLexString ();
-					{return '=';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '=';
 				}
 				case 41:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_GREATHER_EQUAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_GREATHER_EQUAL;
 				}
 				case 42:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_RIGHT_SHIFT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_RIGHT_SHIFT;
 				}
 				case 43:
 				{
-					GetLexString ();
-					{return '>';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '>';
 				}
 				case 44:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 45:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_STRING;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_STRING;
 				}
 				case 46:
 				{
-					GetLexString ();
-					{return '[';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '[';
 				}
 				case 47:
 				{
-					GetLexString ();
-					{return ']';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ']';
 				}
 				case 48:
 				{
-					GetLexString ();
-					{return '^';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '^';
 				}
 				case 49:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_AND;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_AND;
 				}
 				case 50:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 51:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 52:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_BREAK;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_BREAK;
 				}
 				case 53:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 54:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 55:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 56:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 57:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_DO;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_DO;
 				}
 				case 58:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 59:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_ELSEIF;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_ELSEIF;
 				}
 				case 60:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 61:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_ELSE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_ELSE;
 				}
 				case 62:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 63:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 64:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_END;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_END;
 				}
 				case 65:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 66:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 67:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_FALSE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_FALSE;
 				}
 				case 68:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 69:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 70:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 71:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_FOR;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_FOR;
 				}
 				case 72:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 73:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_FUNCTION;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_FUNCTION;
 				}
 				case 74:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 75:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 76:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 77:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 78:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 79:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 80:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 81:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_GOTO;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_GOTO;
 				}
 				case 82:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 83:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 84:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 85:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_IF;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_IF;
 				}
 				case 86:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_IN;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_IN;
 				}
 				case 87:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 88:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LOCAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LOCAL;
 				}
 				case 89:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 90:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 91:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 92:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 93:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_NIL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_NIL;
 				}
 				case 94:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 95:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_NOT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_NOT;
 				}
 				case 96:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 97:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 98:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_OR;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_OR;
 				}
 				case 99:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 100:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_REPEAT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_REPEAT;
 				}
 				case 101:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 102:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 103:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 104:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_RETURN;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_RETURN;
 				}
 				case 105:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 106:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 107:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 108:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 109:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 110:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_THEN;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_THEN;
 				}
 				case 111:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 112:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 113:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_TRUE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_TRUE;
 				}
 				case 114:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 115:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 116:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 117:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_UNTIL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_UNTIL;
 				}
 				case 118:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 119:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 120:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 121:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 122:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 123:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_WHILE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_WHILE;
 				}
 				case 124:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 125:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 126:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 127:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_LABEL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_LABEL;
 				}
 				case 128:
 				{
-					GetLexString ();
-					{return '{';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '{';
 				}
 				case 129:
 				{
-					GetLexString ();
-					{return '|';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '|';
 				}
 				case 130:
 				{
-					GetLexString ();
-					{return '}';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '}';
 				}
 				case 131:
 				{
-					GetLexString ();
-					{return dNewtonLuaParcer::_DIFFERENT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dNewtonLuaParcer::_DIFFERENT;
 				}
 				case 132:
 				{
-					GetLexString ();
-					{return '~';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '~';
 				}
 
 
 				default:
 				{
 					// Lexical error
+					dTrace (("error %s\n", m_tokenString.GetStr()));
 					return -1;
 				}
 			}

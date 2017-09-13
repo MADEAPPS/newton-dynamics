@@ -79,7 +79,6 @@ Label							[A-Za-z_][A-Za-z0-9_]*
 "\.\."							{return dNewtonLuaParcer::_DOUBLE_DOT;}
 "\.\.\."						{return dNewtonLuaParcer::_TRIPLE_DOT;}
 
-
 "\+"                            {return '+';}
 "\-"                            {return '-';}
 "\*"                            {return '*';}

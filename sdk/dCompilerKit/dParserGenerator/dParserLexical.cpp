@@ -208,389 +208,215 @@ int dParserLexical::NextToken ()
 			state = stateArray[nextStateIndex];
 		} else {
 			UnGetChar ();
+			GetLexString ();
 			switch (state) 
 			{
 				case 1:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 2:
 				{
-					GetLexString ();
-					{ return dParserCompiler::GRAMMAR_SEGMENT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::GRAMMAR_SEGMENT;
 				}
 				case 3:
 				{
-					GetLexString ();
-					{ return dParserCompiler::EXPECT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::EXPECT;
 				}
 				case 4:
 				{
-					GetLexString ();
-					{ return dParserCompiler::LEFT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::LEFT;
 				}
 				case 5:
 				{
-					GetLexString ();
-					{ return dParserCompiler::PREC;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::PREC;
 				}
 				case 6:
 				{
-					GetLexString ();
-					{ return dParserCompiler::RIGHT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::RIGHT;
 				}
 				case 7:
 				{
-					GetLexString ();
-					{ return dParserCompiler::START;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::START;
 				}
 				case 8:
 				{
-					GetLexString ();
-					{ return dParserCompiler::TOKEN;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::TOKEN;
 				}
 				case 9:
 				{
-					GetLexString ();
-					{ return dParserCompiler::UNION;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::UNION;
 				}
 				case 10:
 				{
-					GetLexString ();
-					{ m_tokenString.Replace(0, 2, ""); m_tokenString.Replace(m_tokenString.Size() - 2, 2, ""); return dParserCompiler::CODE_BLOCK;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString.Replace(0, 2, ""); m_tokenString.Replace(m_tokenString.Size() - 2, 2, ""); return dParserCompiler::CODE_BLOCK;
 				}
 				case 11:
 				{
-					GetLexString ();
-					{ m_tokenString = "!"; return('!'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "!"; return('!'); 
 				}
 				case 12:
 				{
-					GetLexString ();
-					{ m_tokenString = "#"; return('#'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "#"; return('#'); 
 				}
 				case 13:
 				{
-					GetLexString ();
-					{ m_tokenString = "%"; return('%'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "%"; return('%'); 
 				}
 				case 14:
 				{
-					GetLexString ();
-					{ m_tokenString = "&"; return('&'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "&"; return('&'); 
 				}
 				case 15:
 				{
-					GetLexString ();
-					{ m_tokenString = "("; return('('); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "("; return('('); 
 				}
 				case 16:
 				{
-					GetLexString ();
-					{ m_tokenString = ")"; return(')'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = ")"; return(')'); 
 				}
 				case 17:
 				{
-					GetLexString ();
-					{ m_tokenString = "*"; return('*'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "*"; return('*'); 
 				}
 				case 18:
 				{
-					GetLexString ();
-					{ m_tokenString = "+"; return('+'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "+"; return('+'); 
 				}
 				case 19:
 				{
-					GetLexString ();
-					{ m_tokenString = ","; return(','); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = ","; return(','); 
 				}
 				case 20:
 				{
-					GetLexString ();
-					{ m_tokenString = "-"; return('-'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "-"; return('-'); 
 				}
 				case 21:
 				{
-					GetLexString ();
-					{ m_tokenString = "."; return('.'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "."; return('.'); 
 				}
 				case 22:
 				{
-					GetLexString ();
-					{ m_tokenString = "/"; return('/'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "/"; return('/'); 
 				}
 				case 23:
 				{
-					GetLexString ();
-					{ m_tokenString = ":"; return(':'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = ":"; return(':'); 
 				}
 				case 24:
 				{
-					GetLexString ();
-					{ m_tokenString = ";"; return(';'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = ";"; return(';'); 
 				}
 				case 25:
 				{
-					GetLexString ();
-					{ m_tokenString = "<"; return('<'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "<"; return('<'); 
 				}
 				case 26:
 				{
-					GetLexString ();
-					{ m_tokenString = "="; return('='); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "="; return('='); 
 				}
 				case 27:
 				{
-					GetLexString ();
-					{ m_tokenString = ">"; return('>'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = ">"; return('>'); 
 				}
 				case 28:
 				{
-					GetLexString ();
-					{ m_tokenString = "?"; return('?'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "?"; return('?'); 
 				}
 				case 29:
 				{
-					GetLexString ();
-					{ m_tokenString = m_tokenString.SubString (1, 1); return(m_tokenString[0]); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = m_tokenString.SubString (1, 1); return(m_tokenString[0]); 
 				}
 				case 30:
 				{
-					GetLexString ();
-					{ m_tokenString = "["; return('['); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "["; return('['); 
 				}
 				case 31:
 				{
-					GetLexString ();
-					{ m_tokenString = "\\"; return('\\'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "\\"; return('\\'); 
 				}
 				case 32:
 				{
-					GetLexString ();
-					{ m_tokenString = "]"; return(']'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "]"; return(']'); 
 				}
 				case 33:
 				{
-					GetLexString ();
-					{ m_tokenString = "^"; return('^'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "^"; return('^'); 
 				}
 				case 34:
 				{
-					GetLexString ();
-					{ m_tokenString = "{"; return('{'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "{"; return('{'); 
 				}
 				case 35:
 				{
-					GetLexString ();
-					{ m_tokenString = "|"; return('|'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "|"; return('|'); 
 				}
 				case 36:
 				{
-					GetLexString ();
-					{ m_tokenString = "}"; return('}'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "}"; return('}'); 
 				}
 				case 37:
 				{
-					GetLexString ();
-					{ m_tokenString = "~"; return('~'); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 m_tokenString = "~"; return('~'); 
 				}
 				case 38:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 39:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 40:
 				{
-					GetLexString ();
-					{}
+					
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 41:
 				{
-					GetLexString ();
-					{ return dParserCompiler::INTEGER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::INTEGER;
 				}
 				case 42:
 				{
-					GetLexString ();
-					{ return(dParserCompiler::COLOM); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 return(dParserCompiler::COLOM); 
 				}
 				case 43:
 				{
-					GetLexString ();
-					{ return(dParserCompiler::SIMICOLOM); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 return(dParserCompiler::SIMICOLOM); 
 				}
 				case 44:
 				{
-					GetLexString ();
-					{ return dParserCompiler::LITERAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::LITERAL;
 				}
 				case 45:
 				{
-					GetLexString ();
-					{ return dParserCompiler::LITERAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 return dParserCompiler::LITERAL;
 				}
 				case 46:
 				{
-					GetLexString ();
-					{ ReadBalancedExpresion ('{', '}'); return dParserCompiler::SEMANTIC_ACTION;}
-					state = 0;
-					ch = NextChar();
-					break;
+					 ReadBalancedExpresion ('{', '}'); return dParserCompiler::SEMANTIC_ACTION;
 				}
 				case 47:
 				{
-					GetLexString ();
-					{ return(dParserCompiler::OR); }
-					state = 0;
-					ch = NextChar();
-					break;
+					 return(dParserCompiler::OR); 
 				}
 
 
 				default:
 				{
 					// Lexical error
+					dTrace (("error %s\n", m_tokenString.GetStr()));
 					return -1;
 				}
 			}

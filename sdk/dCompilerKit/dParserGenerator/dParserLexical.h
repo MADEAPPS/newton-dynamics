@@ -17,14 +17,7 @@
 #ifndef __dParserLexical_h__
 #define __dParserLexical_h__
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4702) // warning C4702: unreachable code
-#pragma warning (disable: 4100) // warning C4100: unreferenced formal parameter
-#pragma warning (disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
-#endif
-
 #include "dString.h"
-
 
 class dParserLexical
 {

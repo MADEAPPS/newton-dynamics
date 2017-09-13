@@ -31,7 +31,8 @@ dCILInstr::dMapTable dCILInstr::m_maptable[] =
 	{dCILInstr::m_double, "double"}, 
 	{dCILInstr::m_classPointer, "classPointer"},
 	{dCILInstr::m_constInt, "constInt"},
-	{dCILInstr::m_constFloat, "constFloat"}
+	{dCILInstr::m_constFloat, "constFloat"},
+	{dCILInstr::m_luaType, "luaType"}
 };
 
 void dCILInstr::dArgType::SetType (const dCILInstr::dArgType& type)

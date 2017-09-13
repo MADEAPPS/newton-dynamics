@@ -118,6 +118,7 @@ int $(className)::NextToken ()
 			state = stateArray[nextStateIndex];
 		} else {
 			UnGetChar ();
+			GetLexString ();
 			switch (state) 
 			{
 $(semanticActionCode)

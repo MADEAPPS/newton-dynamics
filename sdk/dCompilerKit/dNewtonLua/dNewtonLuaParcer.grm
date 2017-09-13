@@ -37,7 +37,8 @@
 	{
 		public:
 		dUserVariable () 
-			:dDefualtUserVariable (), m_node(NULL)
+			:dDefualtUserVariable ()
+			,m_node(NULL)
 		{
 		}
 		
@@ -46,7 +47,7 @@
 			,m_node(NULL)
 		{
 		}
-		class dDAG* m_node;
+		dCIL::dListNode* m_node;
 	};
 }
 
@@ -175,32 +176,37 @@ functionDefinition
 	;
 
 functionDefinitionRegister
-	: _FUNCTION functionName															{$$ = MyModule->AddFunction($2);} 
-	;
-
-ifStatement
-	: _IF expression _THEN block _END
-	| _IF expression _THEN block _ELSE block _END
-	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE block _END
+	: _FUNCTION functionName															{$$ = MyModule->EmitFunctionDeclaration($2);} 
 	;
 
 functionName
 	: _LABEL																			{$$ = $1;} 
-	| _LABEL '.' _LABEL
+	| _LABEL '.' _LABEL																	{dAssert (0); $$ = $1;} 
 	;
 
 functionBody 
-	: '(' ')' block _END
-	| '(' parameterList ')' block _END   
+	: '(' ')' blockEnd
+	| '(' functionEmitParameters ')' blockEnd											{dAssert (0); } 
+	;
+
+functionEmitParameters
+	: parameterList																		{$$ = MyModule->EmitParametersToLocalVariables($1);} 
 	;
 
 parameterList
-	: namelist
+	: _LABEL																			{$$ = MyModule->EmitFunctionParameter($1);} 
+	| parameterList ',' _LABEL															{$$ = MyModule->EmitFunctionParameter($3);} 
 	;
 
-namelist
-	: _LABEL
-	| _LABEL ',' _LABEL
+ifStatement
+	: _IF expression _THEN blockEnd
+	| _IF expression _THEN block _ELSE blockEnd
+	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE blockEnd
+	;
+
+
+blockEnd
+	: block _END
 	;
 
 variableList
@@ -214,40 +220,40 @@ expressionList
 	;
 
 expression
-	: expression _OR expression
-//	| expression AND expression
-//	| expression '>' expression
-//	| expression '<' expression
-//	| expression _LEFT_EQUAL expression
-//	| expression _GREATHER_EQUAL expression
-	| expression _IDENTICAL expression
-//	| expression _DIFFERENT expression
-//	| expression '|' expression
-//	| expression '~' expression
-//	| expression '&' expression
-//	| expression _LEFT_SHIFT expression
-//	| expression _RIGHT_SHIFT expression
-//	| expression _DOUBLE_DOT expression
-	| expression '+' expression
-	| expression '-' expression
-	| expression '*' expression
-	| expression '/' expression
-	| expression _INTEGER_DIVIDE expression
-//	| expression '%' expression
-//	| expression '^' expression
+	: expression _OR expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression AND expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '>' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+//	| expression '<' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _LEFT_EQUAL expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _GREATHER_EQUAL expression											{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression _IDENTICAL expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _DIFFERENT expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '|' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '~' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '&' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _LEFT_SHIFT expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _RIGHT_SHIFT expression											{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _DOUBLE_DOT expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '+' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '-' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '*' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+	| expression '/' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression _INTEGER_DIVIDE expression											{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+//	| expression '%' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '^' expression														{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 //	| '+' expression %prec '^'
 //	| '-' expression %prec '^'
 //	| '#' expression %prec '^'
 //	| '~' expression %prec '^'
 	| '(' expression ')'
 	| functionCall
-	| _NIL
-	| _TRUE
-	| _FALSE
-	| _FLOAT
-	| _LABEL
-	| _STRING
-	| _INTEGER
+	| _NIL																	{$$ = $1;}
+	| _TRUE																	{$$ = $1;}
+	| _FALSE																{$$ = $1;}
+	| _FLOAT																{$$ = $1;}
+	| _LABEL																{$$ = $1;}
+	| _STRING																{$$ = $1;}
+	| _INTEGER																{$$ = $1;}
 	;
 
 %%

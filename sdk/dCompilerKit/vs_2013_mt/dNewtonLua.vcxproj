@@ -37,10 +37,10 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </DeploymentContent>
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(FullPath) %(FullPath)/../%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(FullPath) %(FullPath)/../%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
     </CustomBuild>
@@ -49,14 +49,20 @@
     <ProjectReference Include="..\..\projects\visualStudio_2013_static_mt\dContainers.vcxproj">
       <Project>{e6a31c39-173f-4000-97e0-f086db68dd42}</Project>
     </ProjectReference>
+    <ProjectReference Include="dIntermediateLanguage.vcxproj">
+      <Project>{0bf56f49-1c3c-4d8c-9209-052e70919fe5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dVirtualMachine.vcxproj">
+      <Project>{61d6a343-3a8f-440e-8fa6-2c342abb6896}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\dNewtonLua\dNewtonLuaParcer.grm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dNewtonLuaLex %(RelativeDir)%(Filename).cpp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dNewtonLuaLex %(RelativeDir)%(Filename).cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(FullPath) dNewtonLuaLex %(FullPath)\..\%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(FullPath) dNewtonLuaLex %(FullPath)\..\%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(FullPath) %(Filename).h %(Filename).cpp </Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
     </CustomBuild>
