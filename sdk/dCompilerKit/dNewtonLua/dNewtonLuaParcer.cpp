@@ -1811,11 +1811,11 @@ break;
 break;
 
 						case 55:// expression : _INTEGER 
-{entry.m_value = parameter[0].m_value;}
+{entry.m_value = MyModule->EmitLoadConstant(parameter[0].m_value);}
 break;
 
 						case 53:// expression : _LABEL 
-{entry.m_value = parameter[0].m_value;}
+{entry.m_value = MyModule->EmitLoadVariable(parameter[0].m_value);}
 break;
 
 						case 52:// expression : _FLOAT 

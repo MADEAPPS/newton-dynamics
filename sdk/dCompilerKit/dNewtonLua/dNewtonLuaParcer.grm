@@ -251,9 +251,9 @@ expression
 	| _TRUE																	{$$ = $1;}
 	| _FALSE																{$$ = $1;}
 	| _FLOAT																{$$ = $1;}
-	| _LABEL																{$$ = $1;}
+	| _LABEL																{$$ = MyModule->EmitLoadVariable($1);}
 	| _STRING																{$$ = $1;}
-	| _INTEGER																{$$ = $1;}
+	| _INTEGER																{$$ = MyModule->EmitLoadConstant($1);}
 	;
 
 %%

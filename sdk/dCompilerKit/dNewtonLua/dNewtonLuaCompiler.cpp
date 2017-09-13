@@ -54,7 +54,7 @@
 dNewtonLuaCompiler::dNewtonLuaCompiler()
 	:dNewtonLuaParcer ()
 	,m_cil()
-	,m_funtions()
+//	,m_funtions()
 //	,m_packageRootDirectory (pakacgesRootNameDirectory)
 //	,m_currentPackage(NULL)
 //	//,m_currentFunction(NULL)
@@ -86,7 +86,7 @@ int dNewtonLuaCompiler::CompileSource (const char* const source)
 {
 	m_cil.RemoveAll();
 	dNewtonLuaLex scanner(source);
-	m_funtions.RemoveAll();
+//	m_funtions.RemoveAll();
 	bool status = Parse(scanner);
 
 	
@@ -1062,7 +1062,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionDeclaration(co
 */
 
 	dCILInstrFunction* const function = new dCILInstrFunction(m_cil, functionName.GetString(), dCILInstr::dArgType(dCILInstr::m_luaType));
-	m_funtions.Insert(function->GetNode(), functionName.GetString());
+//	m_funtions.Insert(function->GetNode(), functionName.GetString());
 
 	dUserVariable variable(functionName);
 	variable.m_node = function->GetNode();
@@ -1107,13 +1107,71 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitParametersToLocalVaria
 		store->Trace();
 	}
 */
-
 	return parameterList;
 }
 
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadConstant(const dUserVariable& constName)
+{
+	dUserVariable variable(constName);
+	dString localVariableAliasName(m_cil.NewTemp());
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+	dCILInstrMove* const move = new dCILInstrMove(m_cil, localVariableAliasName, type, constName.GetString(), type);
+	variable.m_data = localVariableAliasName;
+	variable.m_node = move->GetNode();
+	move->Trace();
+	return variable;
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUserVariable& varName)
+{
+	dUserVariable variable(varName);
+
+	dCILInstrArgument* definition = NULL;
+	for (dCIL::dListNode* node = m_cil.GetFirst(); node; node = node->GetNext()) {
+		dCILInstrArgument* const intruction = node->GetInfo()->GetAsArgument();
+		if (intruction) {
+			dCILInstr::dArg* const argName = intruction->GetGeneratedVariable();
+			if (argName->m_label == varName.GetString()) {
+				definition = intruction;
+				break;
+			}
+		}
+	}
+
+	dAssert(definition);
+	dString outVarName(m_cil.NewTemp());
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+	dCILInstrMove* const move = new dCILInstrMove(m_cil, outVarName, type, varName.GetString(), type);
+	variable.m_data = outVarName;
+	variable.m_node = move->GetNode();
+	move->Trace();
+	return variable;
+}
+
+
+
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1)
 {
-	dUserVariable variable;
+	int token = binaryOperator.GetToken();
+	dCILThreeArgInstr::dOperator operation = dCILThreeArgInstr::m_operatorsCount;
+	switch (token)
+	{
+		case _IDENTICAL:
+			operation = dCILThreeArgInstr::m_identical;
+			break;
+		default:
+			dAssert(0);
+	}
 
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+	dAssert (operation != dCILThreeArgInstr::m_operatorsCount);
+
+	dString outVarName(m_cil.NewTemp());
+	dCILInstrIntergerLogical* const instruction = new dCILInstrIntergerLogical(m_cil, operation, outVarName, type, arg0.GetString(), type, arg1.GetString(), type);
+
+	dUserVariable variable(arg0);
+	variable.m_data = outVarName;
+	variable.m_node = instruction->GetNode();
+	instruction->Trace();
 	return variable;
 }
