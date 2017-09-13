@@ -1131,7 +1131,6 @@ int dNewtonLuaLex::NextToken ()
 				default:
 				{
 					// Lexical error
-					dTrace (("error %s\n", m_tokenString.GetStr()));
 					return -1;
 				}
 			}

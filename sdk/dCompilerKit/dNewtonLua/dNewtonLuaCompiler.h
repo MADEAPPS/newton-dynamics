@@ -40,7 +40,6 @@ class dNewtonLuaLex;
 class dNewtonLuaCompiler: public dNewtonLuaParcer
 {
 	public:
-//	dNewtonLuaCompiler(const char* const pakacgesRootNameDirectory);
 	dNewtonLuaCompiler();
 	virtual ~dNewtonLuaCompiler();
 
@@ -130,13 +129,21 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 */
 
 	protected:
-	class LuaFunction: dList<dCIL::dListNode*>
+	class dLuaClosure: public dCIL
 	{
 		public:
-		protected:
+		dLuaClosure();
+		~dLuaClosure();
+
+		void RemoveAll();
+		dLuaClosure* AddClosure(dLuaClosure* const parent);
+
 		private:
+		dLuaClosure* m_parent;
+		dList<dLuaClosure> m_children;
 	};
 
+	dUserVariable EmitIf(const dUserVariable& expression);
 	dUserVariable EmitLoadVariable(const dUserVariable& varName);
 	dUserVariable EmitLoadConstant(const dUserVariable& constName);
 	dUserVariable EmitFunctionDeclaration(const dUserVariable& name);
@@ -144,8 +151,8 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 	dUserVariable EmitParametersToLocalVariables(const dUserVariable& parameterList);
 	dUserVariable EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1);
 
-	dCIL m_cil;
-//	dTree<dCIL::dListNode*, dString> m_funtions;
+	dLuaClosure m_closures;
+	dLuaClosure* m_currentClosure;
 
 	friend class dNewtonLuaParcer;
 };

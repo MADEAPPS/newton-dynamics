@@ -118,7 +118,7 @@ void dCILInstrConditional::SetLabels (const dString& label0, const dString& labe
 void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1)
 {
 	dAssert(target0);
-	dAssert (target0->GetArg0().m_label == GetArg1().m_label);
+//	dAssert (target0->GetArg0().m_label == GetArg1().m_label);
 	m_targetNode0 = target0->GetNode();
 
 	if (target1) {

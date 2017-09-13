@@ -124,10 +124,10 @@ block
 	;
 
 returnStatement
-	 : _RETURN 
-	 | _RETURN ';'
-	 | _RETURN expressionList
-	 | _RETURN expressionList ';'
+	 : _RETURN																						{dAssert(0);}
+	 | _RETURN ';'																					{dAssert(0);}
+	 | _RETURN expressionList																		{dAssert(0);}
+	 | _RETURN expressionList ';'																	{dAssert(0);}
 	 ;
 
 statementList
@@ -199,11 +199,15 @@ parameterList
 	;
 
 ifStatement
-	: _IF expression _THEN blockEnd
-	| _IF expression _THEN block _ELSE blockEnd
-	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE blockEnd
+	: if _THEN blockEnd																	{dAssert(0);}
+	| if _THEN block _ELSE blockEnd														{dAssert(0);}
+	| if _THEN block _ELSEIF expression _THEN block _ELSE blockEnd						{dAssert(0);}
 	;
 
+if	
+	: _IF expression																	{$$ = MyModule->EmitIf($2);}
+	;
+	
 
 blockEnd
 	: block _END
