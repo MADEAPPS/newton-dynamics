@@ -122,6 +122,9 @@ class dCILInstr
 	dBasicBlock* GetBasicBlock() const {return m_basicBlock; }
 	dList<dCILInstr*>::dListNode* GetNode() const { return m_myNode; }
 
+	dCILInstr* GetPrevius() const;
+	void LinkPrevius(dCILInstr* const previus);
+
 	virtual int GetByteCodeSize() const { return 1; }
 	virtual int GetByteCodeOffset () const { return m_byteCodeOffset; }
 	virtual void SetByteCodeOffset (int offset) { m_byteCodeOffset = offset; }
@@ -191,6 +194,7 @@ class dCILInstr
 	dCIL* m_cil;
 	dBasicBlock* m_basicBlock;
 	dList<dCILInstr*>::dListNode* m_myNode;
+	dCILInstr* m_prevNode;
 	int m_byteCodeOffset;
 	static dMapTable m_maptable[];
 	static dString m_ssaPosfix;

@@ -194,8 +194,8 @@ functionEmitParameters
 	;
 
 parameterList
-	: _LABEL																			{$$ = MyModule->EmitFunctionParameter($1);} 
-	| parameterList ',' _LABEL															{$$ = MyModule->EmitFunctionParameter($3);} 
+	: _LABEL																			{$$ = MyModule->EmitFunctionParameter(dUserVariable(), $1);} 
+	| parameterList ',' _LABEL															{$$ = MyModule->EmitFunctionParameter($1, $3);} 
 	;
 
 ifStatement

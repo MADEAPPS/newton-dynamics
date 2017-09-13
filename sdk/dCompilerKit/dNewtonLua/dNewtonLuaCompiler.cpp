@@ -1050,17 +1050,16 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionDeclaration(co
 */
 
 	dCILInstrFunction* const function = new dCILInstrFunction(*m_currentClosure, functionName.GetString(), dCILInstr::dArgType(dCILInstr::m_luaType));
-//	m_funtions.Insert(function->GetNode(), functionName.GetString());
-
 	dUserVariable variable(functionName);
 	variable.m_node = function->GetNode();
 	function->Trace();
 	return variable;
 }
 
-dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionParameter(const dUserVariable& parameter)
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionParameter(const dUserVariable& prevParameter, const dUserVariable& parameter)
 {
 	dCILInstrArgument* const localVariable = new dCILInstrArgument(*m_currentClosure, parameter.GetString(), dCILInstr::dArgType(dCILInstr::m_luaType));
+	localVariable->LinkPrevius(prevParameter.m_node ? prevParameter.m_node->GetInfo() : NULL);
 	dUserVariable variable(parameter);
 	variable.m_node = localVariable->GetNode();
 	localVariable->Trace();
@@ -1095,6 +1094,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitParametersToLocalVaria
 		store->Trace();
 	}
 */
+dAssert(0);
 	return parameterList;
 }
 
@@ -1191,29 +1191,15 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIfElse(const dUserVariable& ifStatement)
 {
-/*
-	dCILInstr::dArgType type(dCILInstr::m_luaType);
-
-	dString label1(m_currentClosure->NewLabel());
-	dString label2(m_currentClosure->NewLabel());
-
-	dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstrConditional::m_ifnot, expression.GetString(), type, label1, label2);
-	dCILInstrLabel* const taget2 = new dCILInstrLabel(*m_currentClosure, label2);
-	conditional->SetTargets(taget2, taget2);
-*/
 	dAssert(ifStatement.m_node);
 	dCILInstrConditional* const conditional = ifStatement.m_node->GetInfo()->GetAsIF();
 	dAssert(conditional);
-
-//	dList<dCILInstr*>::dListNode* GetTrueTarget() const;
-//	dList<dCILInstr*>::dListNode* GetFalseTarget() const;
 
 	dCILInstrLabel* const target = new dCILInstrLabel(*m_currentClosure, conditional->GetArg1().m_label);
 	conditional->SetTargets(target, conditional->GetTrueTarget()->GetInfo()->GetAsLabel());
 
 	dUserVariable variable;
 	variable.m_node = target->GetNode();
-//	conditional->Trace();
 	target->Trace();
 	return variable;
 }

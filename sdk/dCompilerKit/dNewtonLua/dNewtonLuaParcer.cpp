@@ -1878,7 +1878,7 @@ break;
 break;
 
 						case 30:// parameterList : _LABEL 
-{entry.m_value = MyModule->EmitFunctionParameter(parameter[0].m_value);}
+{entry.m_value = MyModule->EmitFunctionParameter(dUserVariable(), parameter[0].m_value);}
 break;
 
 						case 29:// functionEmitParameters : parameterList 
@@ -1942,7 +1942,7 @@ break;
 break;
 
 						case 31:// parameterList : parameterList , _LABEL 
-{entry.m_value = MyModule->EmitFunctionParameter(parameter[2].m_value);}
+{entry.m_value = MyModule->EmitFunctionParameter(parameter[0].m_value, parameter[2].m_value);}
 break;
 
 						case 34:// ifStatement : ifelse _ELSEIF expression _THEN block _ELSE blockEnd 

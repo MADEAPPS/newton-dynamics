@@ -84,6 +84,7 @@ void dCILInstr::dArg::SetType (dIntrisicType intrinsicType, bool pointer)
 dCILInstr::dCILInstr (dCIL& program)
 	:m_cil(&program)
 	,m_myNode (NULL)
+	, m_prevNode(NULL)
 	,m_basicBlock (NULL)
 {
 	m_myNode = program.Append (this);
@@ -95,6 +96,17 @@ dCILInstr::~dCILInstr ()
 		m_cil->Remove(m_myNode);
 	}
 }
+
+dCILInstr* dCILInstr::GetPrevius() const
+{
+	return m_prevNode;
+}
+
+void dCILInstr::LinkPrevius(dCILInstr* const previus)
+{
+	m_prevNode = previus;
+}
+
 
 dString dCILInstr::MakeSSAName(const dString& name, int ssaPostfix) const
 {
