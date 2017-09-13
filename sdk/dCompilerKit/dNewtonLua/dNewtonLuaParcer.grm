@@ -215,30 +215,30 @@ expressionList
 
 expression
 	: expression _OR expression
-	| expression _AND expression
-	| expression '>' expression
-	| expression '<' expression
-	| expression _LEFT_EQUAL expression
-	| expression _GREATHER_EQUAL expression
+//	| expression AND expression
+//	| expression '>' expression
+//	| expression '<' expression
+//	| expression _LEFT_EQUAL expression
+//	| expression _GREATHER_EQUAL expression
 	| expression _IDENTICAL expression
-	| expression _DIFFERENT expression
-	| expression '|' expression
-	| expression '~' expression
-	| expression '&' expression
-	| expression _LEFT_SHIFT expression
-	| expression _RIGHT_SHIFT expression
-	| expression _DOUBLE_DOT expression
+//	| expression _DIFFERENT expression
+//	| expression '|' expression
+//	| expression '~' expression
+//	| expression '&' expression
+//	| expression _LEFT_SHIFT expression
+//	| expression _RIGHT_SHIFT expression
+//	| expression _DOUBLE_DOT expression
 	| expression '+' expression
 	| expression '-' expression
 	| expression '*' expression
 	| expression '/' expression
 	| expression _INTEGER_DIVIDE expression
-	| expression '%' expression
-	| expression '^' expression
-	| '+' expression %prec '^'
-	| '-' expression %prec '^'
-	| '#' expression %prec '^'
-	| '~' expression %prec '^'
+//	| expression '%' expression
+//	| expression '^' expression
+//	| '+' expression %prec '^'
+//	| '-' expression %prec '^'
+//	| '#' expression %prec '^'
+//	| '~' expression %prec '^'
 	| '(' expression ')'
 	| functionCall
 	| _NIL
