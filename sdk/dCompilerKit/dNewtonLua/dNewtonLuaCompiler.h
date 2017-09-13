@@ -141,9 +141,14 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 		private:
 		dLuaClosure* m_parent;
 		dList<dLuaClosure> m_children;
+		dString m_returnLabel;
+		dString m_returnVariable;
+		friend class dNewtonLuaCompiler;
 	};
 
 	dUserVariable EmitIf(const dUserVariable& expression);
+	dUserVariable EmitIfElse(const dUserVariable& ifStatement);
+	dUserVariable EmitReturn(const dUserVariable& expression);
 	dUserVariable EmitLoadVariable(const dUserVariable& varName);
 	dUserVariable EmitLoadConstant(const dUserVariable& constName);
 	dUserVariable EmitFunctionDeclaration(const dUserVariable& name);

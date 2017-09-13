@@ -19,6 +19,8 @@
 dNewtonLuaCompiler::dLuaClosure::dLuaClosure()
 	:dCIL()
 	,m_parent(NULL)
+	,m_returnLabel(NewLabel())
+	,m_returnVariable(NewTemp())
 {
 }
 
@@ -1144,6 +1146,14 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const
 		case _IDENTICAL:
 			operation = dCILThreeArgInstr::m_identical;
 			break;
+		case _DIFFERENT:
+			operation = dCILThreeArgInstr::m_different;
+			break;
+
+		case '-':
+			operation = dCILThreeArgInstr::m_sub;
+			break;
+
 		default:
 			dAssert(0);
 	}
@@ -1173,9 +1183,53 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 	conditional->SetTargets(taget2, taget2);
 	
 	dUserVariable variable;
-//	variable.m_data = outVarName;
 	variable.m_node = conditional->GetNode();
 	conditional->Trace();
 	taget2->Trace();
+	return variable;
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIfElse(const dUserVariable& ifStatement)
+{
+/*
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+
+	dString label1(m_currentClosure->NewLabel());
+	dString label2(m_currentClosure->NewLabel());
+
+	dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstrConditional::m_ifnot, expression.GetString(), type, label1, label2);
+	dCILInstrLabel* const taget2 = new dCILInstrLabel(*m_currentClosure, label2);
+	conditional->SetTargets(taget2, taget2);
+*/
+	dAssert(ifStatement.m_node);
+	dCILInstrConditional* const conditional = ifStatement.m_node->GetInfo()->GetAsIF();
+	dAssert(conditional);
+
+//	dList<dCILInstr*>::dListNode* GetTrueTarget() const;
+//	dList<dCILInstr*>::dListNode* GetFalseTarget() const;
+
+	dCILInstrLabel* const target = new dCILInstrLabel(*m_currentClosure, conditional->GetArg1().m_label);
+	conditional->SetTargets(target, conditional->GetTrueTarget()->GetInfo()->GetAsLabel());
+
+	dUserVariable variable;
+	variable.m_node = target->GetNode();
+//	conditional->Trace();
+	target->Trace();
+	return variable;
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitReturn(const dUserVariable& expression)
+{
+	dAssert(expression.m_node);
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, m_currentClosure->m_returnVariable, type, expression.GetString(), type);
+	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, m_currentClosure->m_returnLabel);
+
+	dUserVariable variable;
+//	variable.m_data = outVarName;
+	variable.m_node = move->GetNode();
+	move->Trace();
+	gotoJump->Trace();
 	return variable;
 }

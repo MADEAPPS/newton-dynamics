@@ -124,10 +124,10 @@ block
 	;
 
 returnStatement
-	 : _RETURN																						{dAssert(0);}
-	 | _RETURN ';'																					{dAssert(0);}
-	 | _RETURN expressionList																		{dAssert(0);}
-	 | _RETURN expressionList ';'																	{dAssert(0);}
+	 : _RETURN																						{$$ = MyModule->EmitReturn(dUserVariable());} 
+	 | _RETURN ';'																					{$$ = MyModule->EmitReturn(dUserVariable());} 
+	 | _RETURN expressionList																		{$$ = MyModule->EmitReturn($2);} 
+	 | _RETURN expressionList ';'																	{$$ = MyModule->EmitReturn($2);} 
 	 ;
 
 statementList
@@ -200,12 +200,16 @@ parameterList
 
 ifStatement
 	: if _THEN blockEnd																	{dAssert(0);}
-	| if _THEN block _ELSE blockEnd														{dAssert(0);}
-	| if _THEN block _ELSEIF expression _THEN block _ELSE blockEnd						{dAssert(0);}
+	| ifelse _ELSE blockEnd														{dAssert(0);}
+	| ifelse _ELSEIF expression _THEN block _ELSE blockEnd						{dAssert(0);}
 	;
 
 if	
-	: _IF expression																	{$$ = MyModule->EmitIf($2);}
+	: _IF expression 																	{$$ = MyModule->EmitIf($2);}
+	;
+
+ifelse
+	: if _THEN block																	{$$ = MyModule->EmitIfElse($1);}	
 	;
 	
 
@@ -219,8 +223,8 @@ variableList
 	; 
 
 expressionList
-	: expression
-	| expressionList ',' expression
+	: expression																	{$$ = $1;}
+	| expressionList ',' expression													{$$ = $1;}
 	;
 
 expression
@@ -250,7 +254,7 @@ expression
 //	| '#' expression %prec '^'
 //	| '~' expression %prec '^'
 	| '(' expression ')'
-	| functionCall
+	| functionCall															{dAssert(0);}
 	| _NIL																	{$$ = $1;}
 	| _TRUE																	{$$ = $1;}
 	| _FALSE																{$$ = $1;}
