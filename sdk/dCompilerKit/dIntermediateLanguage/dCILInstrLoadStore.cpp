@@ -424,7 +424,7 @@ bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementB
 
 void dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
-dAssert (0);
+//dAssert (0);
 /*
 	dList<dArg> constList;
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {

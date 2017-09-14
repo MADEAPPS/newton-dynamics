@@ -405,29 +405,16 @@ void dBasicBlocksGraph::ConvertToSSA ()
 //void dCIL::OptimizeSSA(dListNode* const functionStart)
 void dBasicBlocksGraph::OptimizeSSA ()
 {
-//	dDataFlowGraph dataFlow(this, functionStart);
-	Trace();
-
 	bool pass = true;
 	while (pass) {
 		pass = false;
-//ApplyDeadCodeEliminationSSA ();
-		//pass |= ApplyConstantPropagationSSA();
-//		pass |= ApplyConstantPropagationSSA();
-
-		//Trace();
-//		pass |= ApplyDeadCodeEliminationSSA ();
-//		Trace();
-		
-		//Trace();
-		//pass |= ApplyConstantConditionalSSA();
-		//Trace();
-		//pass |= ApplyCopyPropagationSSA ();
-		//Trace();
+		pass |= ApplyConstantPropagationSSA();
+		pass |= ApplyDeadCodeEliminationSSA ();
+		pass |= ApplyConstantConditionalSSA();
+		pass |= ApplyCopyPropagationSSA ();
 		//pass |= dataFlow.ApplyConditionalConstantPropagationSSA();
+break;
 	}
-
-Trace();
 }
 
 
