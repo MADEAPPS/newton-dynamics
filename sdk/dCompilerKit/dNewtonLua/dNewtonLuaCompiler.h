@@ -143,6 +143,7 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 		dList<dLuaClosure> m_children;
 		dString m_returnLabel;
 		dString m_returnVariable;
+		dList<dCILInstrMove*> m_argumnets;
 		friend class dNewtonLuaCompiler;
 	};
 

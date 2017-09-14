@@ -1094,7 +1094,17 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitParametersToLocalVaria
 		store->Trace();
 	}
 */
-dAssert(0);
+
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+	for (dCILInstr* instruction = parameterList.m_node->GetInfo(); instruction; instruction = instruction->GetPrevius()) {
+		dCILInstrArgument* const argumnet = instruction->GetAsArgument();
+		dAssert(argumnet);
+		dString local(m_currentClosure->NewTemp());
+		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, local, type, argumnet->GetArg0().m_label, type);
+		m_currentClosure->m_argumnets.Append(move);
+		move->Trace();
+	}
+
 	return parameterList;
 }
 
@@ -1114,12 +1124,12 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 {
 	dUserVariable variable(varName);
 
-	dCILInstrArgument* definition = NULL;
-	for (dCIL::dListNode* node = m_currentClosure->GetFirst(); node; node = node->GetNext()) {
-		dCILInstrArgument* const intruction = node->GetInfo()->GetAsArgument();
+	dCILInstrMove* definition = NULL;
+	for (dList<dCILInstrMove*>::dListNode* node = m_currentClosure->m_argumnets.GetFirst(); node; node = node->GetNext()) {
+		dCILInstrMove* const intruction = node->GetInfo()->GetAsMove();
 		if (intruction) {
-			dCILInstr::dArg* const argName = intruction->GetGeneratedVariable();
-			if (argName->m_label == varName.GetString()) {
+			const dCILInstr::dArg& argName = intruction->GetArg1();
+			if (argName.m_label == varName.GetString()) {
 				definition = intruction;
 				break;
 			}
@@ -1129,7 +1139,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 	dAssert(definition);
 	dString outVarName(m_currentClosure->NewTemp());
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, definition->GetArg0().m_label, type);
 	variable.m_data = outVarName;
 	variable.m_node = move->GetNode();
 	move->Trace();
