@@ -1,5 +1,13 @@
-// dTestAssembler.cpp : Defines the entry point for the console application.
-//
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
+*
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+*
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
 
 #include "dNewtonLuaStdafx.h"
 #include <stdio.h>
@@ -10,7 +18,6 @@
 #include "dNewtonLuaLex.h"
 #include "dNewtonLuaCompiler.h"
 //#include <dVirtualMachine.h>
-//#include <dLittleScriptCompiler.h>
 
 
 #ifdef _MSC_VER
@@ -45,7 +52,7 @@ void operator delete (void* ptr)
 int _tmain(int argc, _TCHAR* argv[])
 {
 	if (argc < 2) {
-		fprintf (stdout, "usage: dNewtonScriptCompiler filename\n");
+		fprintf (stdout, "usage: dNewtonLuaCompiler filename\n");
 		exit (0);
 	}
 

@@ -144,7 +144,7 @@ statement
 	;
 
 assigment
-	: variableList '=' expressionList
+	: variableList '=' expressionList										{dAssert(0);}
 	;
 
 functionCall
@@ -173,21 +173,17 @@ args
 	;
 
 functionDefinition
-	: functionDefinitionRegister functionBody								{dAssert(0);}
+	: functionStatemenBegin '(' ')' blockEnd								{MyModule->CloseFunctionDeclaration();} 
+	| functionStatemenBegin '(' functionEmitParameters ')' blockEnd			{MyModule->CloseFunctionDeclaration();} 
 	;
 
-functionDefinitionRegister
+functionStatemenBegin
 	: _FUNCTION functionName												{$$ = MyModule->EmitFunctionDeclaration($2);} 
 	;
 
 functionName
 	: _LABEL																{$$ = $1;}
 	| _LABEL '.' _LABEL														{dAssert (0); $$ = $1;} 
-	;
-
-functionBody 
-	: '(' ')' blockEnd														{MyModule->CloseFunctionDeclaration();} 
-	| '(' functionEmitParameters ')' blockEnd								{MyModule->CloseFunctionDeclaration();} 
 	;
 
 functionEmitParameters
@@ -219,8 +215,8 @@ blockEnd
 	;
 
 variableList
-	: variable
-	| variableList ',' variable
+	: variable																{dAssert(0);}
+	| variableList ',' variable												{dAssert(0);}		
 	; 
 
 expressionList
