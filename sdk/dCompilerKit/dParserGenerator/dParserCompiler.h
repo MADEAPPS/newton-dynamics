@@ -28,7 +28,7 @@
 #include <dContainersStdAfx.h>
 
 
-
+//#define D_WRITE_STATE_TRANSITION_GRAPH
 
 class dParserLexical;
 
@@ -75,7 +75,6 @@ class dParserCompiler
 	class dOperatorsPrecedence;
 	class dOperatorsAssociation;
 
-	
 	dParserCompiler(const dString& inputRules, const char* const outputFileName, const char* const scannerClassName);
 	~dParserCompiler();
 
@@ -98,7 +97,7 @@ class dParserCompiler
 	dState* Goto (const dState* const state, dCRCTYPE symbol, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
 	dState* Closure (const dList<dItem>& itemSet, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
 	void BuildParsingTable (const dTree<dState*, dCRCTYPE>& stateList, dCRCTYPE startSymbol, const dOperatorsPrecedence& operatorPrecence) const;
-	void CanonicalItemSets (dTree<dState*, dCRCTYPE>& states, const dProductionRule& rules, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dOperatorsPrecedence& operatorPrecence, FILE* const debugFile);
+	void CanonicalItemSets (dTree<dState*, dCRCTYPE>& states, const dProductionRule& rules, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dOperatorsPrecedence& operatorPrecence, const dString& fileName);
 
 	void GenerateHeaderFile (const dString& className, const dString& scannerClassName, const char* const outputFileName, 
 							 const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dString& userVariableClass); 
@@ -108,7 +107,6 @@ class dParserCompiler
 	void DisplayError (const char* format, ...) const;
 
 	mutable int m_shiftReduceExpectedWarnings;
-
 };
 
 

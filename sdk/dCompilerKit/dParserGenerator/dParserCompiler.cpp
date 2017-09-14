@@ -87,8 +87,6 @@ class dParserCompiler::dActionEntry
 	short m_ruleIndex;
 };
 
-
-
 class dParserCompiler::dSymbol
 {
 	public:
@@ -328,36 +326,38 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 
 	void Trace(FILE* const debugFile) const
 	{
-		fprintf (debugFile, "state %d:\n", m_number);
-		for (dState::dListNode* itemNode = GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
-			dItem& item = itemNode->GetInfo();
-			fprintf (debugFile, "%s -> ", item.m_ruleNode->GetInfo().m_name.GetStr());
+		if (debugFile) {
+			fprintf(debugFile, "state %d:\n", m_number);
+			for (dState::dListNode* itemNode = GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
+				dItem& item = itemNode->GetInfo();
+				fprintf(debugFile, "%s -> ", item.m_ruleNode->GetInfo().m_name.GetStr());
 
-			int index = 0;
-			bool hasIndex = false;
-			dRuleInfo::dListNode* node = item.m_ruleNode->GetInfo().GetFirst();
-			for (; node; node = node->GetNext()) {
+				int index = 0;
+				bool hasIndex = false;
+				dRuleInfo::dListNode* node = item.m_ruleNode->GetInfo().GetFirst();
+				for (; node; node = node->GetNext()) {
 
-				if (index == item.m_indexMarker) {
-					fprintf (debugFile, ". ");
-					hasIndex = true;
-					break;
+					if (index == item.m_indexMarker) {
+						fprintf(debugFile, ". ");
+						hasIndex = true;
+						break;
+					}
+					const dSymbol& info = node->GetInfo();
+					fprintf(debugFile, "%s ", info.m_name.GetStr());
+					index++;
 				}
-				const dSymbol& info = node->GetInfo();
-				fprintf (debugFile, "%s ", info.m_name.GetStr());
-				index ++;
-			}
 
-			for (; node; node = node->GetNext()) {
-				const dSymbol& info = node->GetInfo();
-				fprintf (debugFile, "%s ", info.m_name.GetStr());
+				for (; node; node = node->GetNext()) {
+					const dSymbol& info = node->GetInfo();
+					fprintf(debugFile, "%s ", info.m_name.GetStr());
+				}
+				if (!hasIndex) {
+					fprintf(debugFile, ". ");
+				}
+				fprintf(debugFile, ":: %s\n", item.m_lookAheadSymbolName.GetStr());
 			}
-			if (!hasIndex) {
-				fprintf (debugFile, ". ");
-			}
-			fprintf (debugFile, ":: %s\n", item.m_lookAheadSymbolName.GetStr());
+			fprintf(debugFile, "\n");
 		}
-		fprintf (debugFile, "\n");
 	}
 
 	dCRCTYPE m_key;
@@ -451,14 +451,9 @@ dParserCompiler::dParserCompiler(const dString& inputRules, const char* const ou
 	ScanGrammarFile(inputRules, ruleList, symbolList, operatorPrecedence, userCodeBlock, userVariableClass, endUserCode, lastTerminalToken);
 
 	// convert the rules into a NFA.
-	dString debugFileName (outputFileName);
-	debugFileName += ".txt";
-	FILE* const debugFile = fopen (debugFileName.GetStr(), "w");
-
 	dTree<dState*, dCRCTYPE> stateList;
-	CanonicalItemSets (stateList, ruleList, symbolList, operatorPrecedence, debugFile);
-	fclose (debugFile);
-
+	CanonicalItemSets (stateList, ruleList, symbolList, operatorPrecedence, outputFileName);
+//	fclose (debugFile);
 
 	// create a LR(1) parsing table from the NFA graphs
 	const dString& startSymbol = ruleList.GetFirst()->GetInfo().m_name;
@@ -829,10 +824,18 @@ void dParserCompiler::CanonicalItemSets (
 	const dProductionRule& ruleList, 
 	const dTree<dTokenInfo, dCRCTYPE>& symbolList, 
 	const dOperatorsPrecedence& operatorPrecedence,
-	FILE* const debugFile)
+	const dString& fileName)
 {
 	dList<dItem> itemSet;
 	dList<dState*> stateList;
+	FILE* debugFile = NULL;
+
+	fileName;
+	#ifdef D_WRITE_STATE_TRANSITION_GRAPH
+	dString debugFileName(fileName);
+	debugFileName += ".txt";
+	debugFile = fopen(debugFileName.GetStr(), "w");
+	#endif
 
 	// start by building an item set with only the first rule
 	dItem& item = itemSet.Append()->GetInfo();
@@ -904,8 +907,11 @@ void dParserCompiler::CanonicalItemSets (
 				delete newState;
 			}
 		}
-
 		dTrace (("state#:%d   items: %d   transitions: %d\n", state->m_number, state->GetCount(), state->m_transitions.GetCount()));
+	}
+
+	if (debugFile) {
+		fclose(debugFile);
 	}
 }
 
