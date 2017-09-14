@@ -10,6 +10,17 @@
 	  return inner(n)
 	end
 
+	-- Tail-optimized recursive
+	function Fibonacci.tail_call(n)
+	  local function inner(m, a, b)
+		if m == 0 then
+		  return a
+		end
+		return inner(m-1, b, a+b)
+	  end
+	  return inner(n, 0, 1)
+	end
+
 	-- Iterative
 	function Fibonacci.iterative(n)
 	  a, b = 0, 1
@@ -18,3 +29,4 @@
 	  end
 	  return a
 	end
+
