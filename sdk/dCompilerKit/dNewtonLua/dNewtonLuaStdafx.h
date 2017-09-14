@@ -19,6 +19,7 @@
 #include <dCIL.h>
 #include <dString.h>
 #include <dCILInstrBranch.h>
+#include <dBasicBlocksGraph.h>
 #include <dCILInstrLoadStore.h>
 #include <dCILInstrArithmetic.h>
 #include <dCILInstrMiscellaneous.h>
@@ -28,16 +29,11 @@
 #include <dTree.h>
 #include <dList.h>
 #include <dRtti.h>
-
 #include <dCILstdafx.h>
 #include <dCILInstr.h>
 #include <dRefCounter.h>
 #include <dDataFlowGraph.h>
 #include <dVirtualMachine.h>
-#include <dBasicBlocksGraph.h>
-#include <dContainersStdAfx.h>
-
-
 #define D_DEBUG_PARCEL
 */
 

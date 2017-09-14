@@ -1,4 +1,3 @@
-    
 	
 	-- defines a factorial function
     function fact (n)

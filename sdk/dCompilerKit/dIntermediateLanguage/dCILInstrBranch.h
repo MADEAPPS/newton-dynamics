@@ -152,13 +152,13 @@ class dCILInstrReturn: public dCILSingleArgInstr
 class dCILInstrCall: public dCILTwoArgInstr
 {
 	public:
-	dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& target, dList<dArg>& parameters);
-//	dCILInstrCall(dCIL& program, const dString& name, const dArgType& type, dList<dArg>& parameters);
+//	dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& target, dList<dArg>& parameters);
+	dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& functionName);
 	void Serialize(char* const textOut) const;
 	void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
+	void AddArgument (const dArg& argument);
 	void SetTarget(dList<dCILInstr*>::dListNode* const node) {m_tagetNode = node; }
-	//dList<dCILInstr*>::dListNode* GetFalseTarget() const;
 
 	virtual dCILInstrCall* GetAsCall() { return this; }
 

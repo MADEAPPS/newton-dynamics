@@ -403,18 +403,7 @@ void dCILInstrReturn::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) co
 	code.m_type2.m_imm2 = 0;
 }
 
-
-
 /*
-dCILInstrCall::dCILInstrCall(dCIL& program, const dString& name, const dArgType& type, dList<dArg>& parameters)
-	:dCILSingleArgInstr (program, dArg (name, type))
-{
-	for (dList<dArg>::dListNode* node = parameters.GetFirst(); node; node = node->GetNext()) {
-		m_parameters.Append (node->GetInfo());
-	}
-}
-*/
-
 dCILInstrCall::dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& target, dList<dArg>& parameters)
 	:dCILTwoArgInstr (program, dArg (returnValue, type), dArg (target, dArgType()))
 	,m_tagetNode(NULL)
@@ -422,6 +411,19 @@ dCILInstrCall::dCILInstrCall(dCIL& program, const dString& returnValue, const dA
 	for (dList<dArg>::dListNode* node = parameters.GetFirst(); node; node = node->GetNext()) {
 		m_parameters.Append (node->GetInfo());
 	}
+}
+*/
+
+dCILInstrCall::dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& functionName)
+	:dCILTwoArgInstr(program, dArg(returnValue, type), dArg(functionName, dArgType()))
+	,m_tagetNode(NULL)
+{
+}
+
+
+void dCILInstrCall::AddArgument (const dArg& argument)
+{
+	m_parameters.Append (argument);
 }
 
 void dCILInstrCall::Serialize(char* const textOut) const
@@ -503,8 +505,6 @@ dCILInstr::dArg* dCILInstrCall::GetGeneratedVariable()
 		return NULL;
 	}
 }
-
-
 
 void dCILInstrCall::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
 { 

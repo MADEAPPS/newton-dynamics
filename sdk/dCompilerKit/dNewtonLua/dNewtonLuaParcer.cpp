@@ -1817,16 +1817,24 @@ bool dNewtonLuaParcer::Parse(dNewtonLuaLex& scanner)
 					switch (action->m_ruleIndex) 
 					{
 						//do user semantic Actions
+						case 18:// prefixExpression : variable 
+{entry.m_value = parameter[0].m_value;}
+break;
+
 						case 5:// returnStatement : _RETURN 
 {entry.m_value = MyModule->EmitReturn(dUserVariable());}
 break;
 
-						case 52:// expression : _TRUE 
+						case 19:// variable : _LABEL 
 {entry.m_value = parameter[0].m_value;}
 break;
 
+						case 52:// expression : _TRUE 
+{dAssert(0);}
+break;
+
 						case 53:// expression : _FALSE 
-{entry.m_value = parameter[0].m_value;}
+{dAssert(0);}
 break;
 
 						case 35:// if : _IF expression 
@@ -1834,15 +1842,15 @@ break;
 break;
 
 						case 50:// expression : functionCall 
-{dAssert(0);}
+{entry.m_value = parameter[0].m_value;}
 break;
 
 						case 51:// expression : _NIL 
-{entry.m_value = parameter[0].m_value;}
+{dAssert(0);}
 break;
 
 						case 56:// expression : _STRING 
-{entry.m_value = parameter[0].m_value;}
+{dAssert(0);}
 break;
 
 						case 57:// expression : _INTEGER 
@@ -1854,7 +1862,15 @@ break;
 break;
 
 						case 54:// expression : _FLOAT 
-{entry.m_value = parameter[0].m_value;}
+{dAssert(0);}
+break;
+
+						case 17:// functionCall : prefixExpression args 
+{entry.m_value = MyModule->EmitFunctionCall(parameter[0].m_value, parameter[1].m_value);}
+break;
+
+						case 23:// functionDefinition : functionDefinitionRegister functionBody 
+{dAssert(0);}
 break;
 
 						case 40:// expressionList : expression 
@@ -1877,6 +1893,10 @@ break;
 {entry.m_value = parameter[0].m_value;}
 break;
 
+						case 21:// args : ( ) 
+{entry.m_value = dUserVariable();}
+break;
+
 						case 30:// parameterList : _LABEL 
 {entry.m_value = MyModule->EmitFunctionParameter(dUserVariable(), parameter[0].m_value);}
 break;
@@ -1886,7 +1906,7 @@ break;
 break;
 
 						case 33:// ifStatement : ifelse _ELSE blockEnd 
-{dAssert(0);}
+{entry.m_value = parameter[0].m_value;}
 break;
 
 						case 8:// returnStatement : _RETURN expressionList ; 
@@ -1898,6 +1918,10 @@ break;
 break;
 
 						case 32:// ifStatement : if _THEN blockEnd 
+{dAssert(0);}
+break;
+
+						case 49:// expression : ( expression ) 
 {dAssert(0);}
 break;
 
@@ -1929,8 +1953,20 @@ break;
 {entry.m_value = MyModule->EmitBinaryExpression(parameter[0].m_value, parameter[1].m_value, parameter[2].m_value);}
 break;
 
-						case 41:// expressionList : expressionList , expression 
+						case 22:// args : ( expressionList ) 
+{entry.m_value = parameter[1].m_value;}
+break;
+
+						case 27:// functionBody : ( ) blockEnd 
+{MyModule->CloseFunctionDeclaration();}
+break;
+
+						case 37:// blockEnd : block _END 
 {entry.m_value = parameter[0].m_value;}
+break;
+
+						case 41:// expressionList : expressionList , expression 
+{entry.m_value = MyModule->LinkExpresion(parameter[0].m_value, parameter[2].m_value);}
 break;
 
 						case 26:// functionName : _LABEL . _LABEL 
@@ -1938,7 +1974,7 @@ break;
 break;
 
 						case 28:// functionBody : ( functionEmitParameters ) blockEnd 
-{dAssert (0); }
+{MyModule->CloseFunctionDeclaration();}
 break;
 
 						case 31:// parameterList : parameterList , _LABEL 

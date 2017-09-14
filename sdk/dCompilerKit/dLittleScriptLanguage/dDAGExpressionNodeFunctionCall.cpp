@@ -89,7 +89,11 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	dDAGTypeNode* const returnType = function->m_returnType;
 	dString tmp (cil.NewTemp());
 	m_result.SetType (returnType->GetArgType());
-	dCILInstrCall* const instr = new dCILInstrCall(cil, tmp, m_result.GetType(), name, paramList);
+	dCILInstrCall* const instr = new dCILInstrCall(cil, tmp, m_result.GetType(), name);
+	for (dList<dCILInstr::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
+		instr->AddArgument(node->GetInfo());
+	}
+
 	instr->Trace();
 
 	if (returnType->GetArgType().m_isPointer || (returnType->GetArgType().m_intrinsicType != dCILInstr::m_void)) {
