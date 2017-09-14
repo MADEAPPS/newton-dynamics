@@ -229,9 +229,9 @@ bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBloc
 			dStatementBlockBucket::Iterator iter(node->GetInfo());
 			for (iter.Begin(); iter; iter++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-//instrution->Trace();
+instrution->Trace();
 				instrution->ReplaceArgument(m_arg0, m_arg1);
-//instrution->Trace();
+instrution->Trace();
 				workList.Insert(instrution->GetNode());
 			}
 		}
