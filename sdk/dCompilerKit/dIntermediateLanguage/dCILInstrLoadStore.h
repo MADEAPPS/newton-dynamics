@@ -137,7 +137,7 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
-	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg) {}
+	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg);
 	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 

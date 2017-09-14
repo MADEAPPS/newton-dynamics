@@ -398,6 +398,17 @@ void dCILInstrPhy::GetUsedVariables (dList<dArg*>& variablesList)
 }
 
 
+void dCILInstrPhy::ReplaceArgument(const dArg& arg, const dArg& newArg)
+{
+	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
+		dArgPair& pair = node->GetInfo();
+		if (arg.m_label == pair.m_arg.m_label) {
+			pair.m_arg.m_label = newArg.m_label;
+			break;
+		}
+	}
+}
+
 /*
 bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {

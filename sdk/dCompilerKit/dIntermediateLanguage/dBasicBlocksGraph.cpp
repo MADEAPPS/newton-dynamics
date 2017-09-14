@@ -406,14 +406,19 @@ void dBasicBlocksGraph::ConvertToSSA ()
 void dBasicBlocksGraph::OptimizeSSA ()
 {
 	bool pass = true;
+int xxx = 0;
+Trace();
 	while (pass) {
 		pass = false;
 		pass |= ApplyConstantPropagationSSA();
-		pass |= ApplyDeadCodeEliminationSSA ();
-		pass |= ApplyConstantConditionalSSA();
-		pass |= ApplyCopyPropagationSSA ();
-		//pass |= dataFlow.ApplyConditionalConstantPropagationSSA();
-break;
+Trace();
+		pass |= ApplyCopyPropagationSSA();
+Trace();
+//		pass |= ApplyDeadCodeEliminationSSA();
+Trace();
+//		pass |= ApplyConstantConditionalSSA();
+Trace();
+xxx++;
 	}
 }
 
