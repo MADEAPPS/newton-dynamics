@@ -361,12 +361,10 @@ void dCILInstrPhy::Serialize(char* const textOut) const
 		char tmp[1024]; 
 
 		dArgPair& pair = node->GetInfo();
-		dCILInstrLabel* const block = pair.m_block->m_begin->GetInfo()->GetAsLabel();
-		dAssert(block);
 		if (node->GetNext()) {
-			sprintf(tmp, "[%s %s, %s], ", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr(), block->GetArg0().m_label.GetStr());
+			sprintf(tmp, "[%s %s], ", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr());
 		} else {
-			sprintf(tmp, "[%s %s, %s]", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr(), block->GetArg0().m_label.GetStr());
+			sprintf(tmp, "[%s %s]", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr());
 		}
 		strcat(textOut, tmp);
 	}

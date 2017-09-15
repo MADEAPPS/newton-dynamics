@@ -102,7 +102,7 @@ void dConvertToSSASolver::RenameVariables(const dBasicBlock* const root, dTree <
 		for (dCIL::dListNode* node1 = successor->m_begin; !terminate1; node1 = node1->GetNext()) {
 			terminate1 = (node1 == successor->m_end);
 			dCILInstr* const instruction1 = node1->GetInfo();
-//instruction1->Trace();
+instruction1->Trace();
 			if (instruction1->GetAsPhi()) {
 				dCILInstrPhy* const phyInstruction = instruction1->GetAsPhi();
 
@@ -115,10 +115,11 @@ void dConvertToSSASolver::RenameVariables(const dBasicBlock* const root, dTree <
 						dStatementBucket& topStack = stack.Find(name)->GetInfo();
 						int stackLevel = topStack.m_stack.GetLast() ? topStack.m_stack.GetLast()->GetInfo() : 0;
 						pair.m_arg.m_label = phyInstruction->MakeSSAName(name, stackLevel);
-//instruction1->Trace();
+instruction1->Trace();
 						break;
 					}
 				}
+
 			}
 		}
 	}
@@ -296,15 +297,4 @@ m_graph->Trace();
 //m_graph->Trace();
 	m_graph->ApplyDeadCodeEliminationSSA ();
 //m_graph->Trace();
-}
-
-
-
-dRemovePhyFunctionsSolver::dRemovePhyFunctionsSolver(dBasicBlocksGraph* const SSAgraph)
-{
-	dAssert (0);
-}
-
-void dRemovePhyFunctionsSolver::Solve()
-{
 }

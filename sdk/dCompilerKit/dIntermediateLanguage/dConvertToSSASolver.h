@@ -57,12 +57,4 @@ class dConvertToSSASolver
 	dTree<dFrontierList, const dBasicBlock*> m_dominanceFrontier; 
 };
 
-
-class dRemovePhyFunctionsSolver
-{
-	public:
-	dRemovePhyFunctionsSolver(dBasicBlocksGraph* const SSAgraph);
-	void Solve();
-};
-
 #endif

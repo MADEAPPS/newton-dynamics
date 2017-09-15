@@ -99,7 +99,7 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	class dArgPair
 	{
 		public:
-		dArgPair (const dArg& arg, const dBasicBlock* block)
+		dArgPair (const dArg& arg, const dBasicBlock* const block)
 			:m_block(block) 
 			,m_arg (arg)
 		{

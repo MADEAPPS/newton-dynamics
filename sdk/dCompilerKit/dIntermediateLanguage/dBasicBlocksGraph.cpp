@@ -401,8 +401,31 @@ void dBasicBlocksGraph::ConvertToSSA ()
 
 void dBasicBlocksGraph::RemovePhyFunctions ()
 {
-	dRemovePhyFunctionsSolver removePhy(this);
-	removePhy.Solve();
+	for (dBasicBlocksGraph::dListNode* nodeOuter = GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
+		dBasicBlock& block = nodeOuter->GetInfo();
+		if (block.m_predecessors.GetCount() > 1) {
+			for (dCIL::dListNode* node = block.m_begin; node != block.m_end; node = node->GetNext()) {
+				dCILInstrPhy* const phyInstruction = node->GetInfo()->GetAsPhi();
+				if (phyInstruction) {
+					dCIL* const cil = phyInstruction->m_cil;
+					dAssert(block.m_predecessors.GetCount() == phyInstruction->m_sources.GetCount());
+
+					dList<dCILInstrPhy::dArgPair>::dListNode* pairNode = phyInstruction->m_sources.GetFirst();
+					dList<const dBasicBlock*>::dListNode* predecessorsNode = block.m_predecessors.GetFirst();
+					for (int i = 0; i < block.m_predecessors.GetCount(); i++) {
+						dCILInstrPhy::dArgPair& var = pairNode->GetInfo();
+						const dBasicBlock* const predecessor = predecessorsNode->GetInfo();
+						dCILInstrMove* const move = new dCILInstrMove(*cil, phyInstruction->GetArg0().m_label, phyInstruction->GetArg0().GetType(), pairNode->GetInfo().m_arg.m_label, pairNode->GetInfo().m_arg.GetType());
+						cil->InsertAfter(predecessor->m_end->GetPrev(), move->GetNode());
+						pairNode = pairNode->GetNext();
+						predecessorsNode = predecessorsNode->GetNext();
+					}
+					phyInstruction->Nullify();
+					cil->Trace();
+				}
+			}
+		}
+	}
 }
 
 

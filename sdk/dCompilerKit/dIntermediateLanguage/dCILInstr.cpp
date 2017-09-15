@@ -135,11 +135,13 @@ void dCILInstr::ReplaceInstruction (dCILInstr* const newIntruction)
 {
 	newIntruction->GetCil()->Remove(newIntruction->GetNode());
 	dCIL* const cil = m_cil;
+	int uniqueId = m_uniqueId;
 	dList<dCILInstr*>::dListNode* const node = m_myNode;
 	m_myNode = NULL;
 	delete this;
 	node->GetInfo() = newIntruction;
 	newIntruction->m_cil = cil;
+	newIntruction->m_uniqueId = uniqueId;
 	newIntruction->m_myNode = node;
 }
 
