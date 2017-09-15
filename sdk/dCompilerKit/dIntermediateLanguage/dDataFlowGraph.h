@@ -172,7 +172,6 @@ class dDataFlowGraph
 	dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function);
 	virtual ~dDataFlowGraph(void);
 /*
-	void ConvertToSSA ();
 	void ApplyLocalOptimizations();
 	void RegistersAllocation (int registerCount);
 	private:
@@ -210,7 +209,6 @@ class dDataFlowGraph
 	dInstructionVariableDictionary m_variableUsed;
 	dInstructionVariableDictionary m_variableDefinitions;
 
-
 	friend dCILInstrMove;
 	friend dCILSingleArgInstr;
 	friend dRegisterInterferenceGraph;
@@ -218,7 +216,6 @@ class dDataFlowGraph
 
 
 	private:
-	//void BuildBasicBlockGraph();
 	//void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
 	//void GeneratedVariableWorklist (dTree <int, dCIL::dListNode*>& list) const;
 
@@ -233,6 +230,5 @@ class dDataFlowGraph
 	friend class dBasicBlock;
 	friend class dBasicBlocksGraph;
 };
-
 
 #endif

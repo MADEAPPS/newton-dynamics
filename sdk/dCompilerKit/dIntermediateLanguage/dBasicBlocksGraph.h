@@ -80,13 +80,12 @@ class dBasicBlocksGraph: public dList<dBasicBlock>
 {
 	public:
 	dBasicBlocksGraph();
-
 	void Trace() const;
 
 	void Build (dCIL::dListNode* const functionNode);
-
 	void OptimizeSSA ();
 	void ConvertToSSA ();
+	void RemovePhyFunctions ();
 
 	private:
 	void GetStatementsWorklist (dWorkList& workList) const;

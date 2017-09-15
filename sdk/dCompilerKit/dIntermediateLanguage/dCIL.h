@@ -68,8 +68,6 @@ class dCIL: public dList<dCILInstr*>
 	dListNode* NewStatement();
 
 	int GetInstructionUniqurID();
-
-	//void OptimizeSSA (dListNode* const functionNode);
 	void RegisterAllocation (dListNode* const functionNode);
 
 	private:

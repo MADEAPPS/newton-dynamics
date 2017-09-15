@@ -27,9 +27,6 @@ dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function
 	,m_function(function)
 	,m_mark (0)
 {
-//	BuildBasicBlockGraph();
-
-//m_basicBlocks.Trace();
 }
 
 dDataFlowGraph::~dDataFlowGraph(void)
@@ -177,21 +174,6 @@ void dDataFlowGraph::DeleteUnreachedBlocks()
 }
 */
 
-/*
-void dDataFlowGraph::BuildBasicBlockGraph()
-{
-	m_basicBlocks.Build (m_function);
-}
-
-
-void dDataFlowGraph::ConvertToSSA ()
-{
-//m_cil->Trace();
-	m_basicBlocks.ConvertToSSA (this);
-//m_cil->Trace();
-//m_basicBlocks.Trace();
-}
-*/
 
 #if 0
 

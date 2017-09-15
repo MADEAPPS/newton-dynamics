@@ -212,7 +212,7 @@ bool dConstantPropagationSolver::Solve ()
 					done = (node == block->m_end);
 					dCILInstr* const instruction = node->GetInfo();
 					
-//instruction->Trace();
+instruction->Trace();
 					instruction->ApplyConstantPropagationSSA (*this);
 				}
 			}

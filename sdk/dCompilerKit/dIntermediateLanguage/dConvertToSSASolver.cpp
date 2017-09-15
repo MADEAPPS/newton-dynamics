@@ -299,3 +299,12 @@ m_graph->Trace();
 }
 
 
+
+dRemovePhyFunctionsSolver::dRemovePhyFunctionsSolver(dBasicBlocksGraph* const SSAgraph)
+{
+	dAssert (0);
+}
+
+void dRemovePhyFunctionsSolver::Solve()
+{
+}

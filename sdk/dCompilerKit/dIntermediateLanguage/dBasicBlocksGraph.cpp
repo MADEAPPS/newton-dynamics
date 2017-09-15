@@ -399,10 +399,13 @@ void dBasicBlocksGraph::ConvertToSSA ()
 	ssa.Solve();
 }
 
+void dBasicBlocksGraph::RemovePhyFunctions ()
+{
+	dRemovePhyFunctionsSolver removePhy(this);
+	removePhy.Solve();
+}
 
 
-
-//void dCIL::OptimizeSSA(dListNode* const functionStart)
 void dBasicBlocksGraph::OptimizeSSA ()
 {
 	bool pass = true;
@@ -414,7 +417,7 @@ Trace();
 Trace();
 		pass |= ApplyCopyPropagationSSA();
 Trace();
-//		pass |= ApplyDeadCodeEliminationSSA();
+		pass |= ApplyDeadCodeEliminationSSA();
 Trace();
 //		pass |= ApplyConstantConditionalSSA();
 Trace();
@@ -544,18 +547,12 @@ bool dBasicBlocksGraph::ApplyCopyPropagationSSA()
 	dStatementBlockDictionary usedVariablesList;
 	usedVariablesList.BuildUsedVariableWorklist (*this);
 
-int xxx = 0;
 	GetStatementsWorklist(workList);
 	while (workList.GetCount()) {
 		dCIL::dListNode* const node = workList.GetRoot()->GetInfo();
 		workList.Remove(workList.GetRoot());
 		dCILInstr* const instruction = node->GetInfo();
-instruction->Trace();
 		anyChanges |= instruction->ApplyCopyPropagationSSA(workList, usedVariablesList);
-if ((xxx == 2) || (xxx == 3)) {
-//Trace();
-}
-xxx++;
 	}
 	return anyChanges;
 }

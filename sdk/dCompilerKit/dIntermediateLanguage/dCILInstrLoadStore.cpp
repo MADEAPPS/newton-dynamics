@@ -225,17 +225,13 @@ bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBloc
 	if (!((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat))) {
 		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
 		if (node) {
-//Trace();
 			dStatementBlockBucket::Iterator iter(node->GetInfo());
 			for (iter.Begin(); iter; iter++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-//instrution->Trace();
 				instrution->ReplaceArgument(m_arg0, m_arg1);
-//instrution->Trace();
 				workList.Insert(instrution);
 			}
 		}
-		Nullify();
 		ret = true;
 	}
 	return ret;

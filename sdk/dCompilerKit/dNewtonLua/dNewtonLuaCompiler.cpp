@@ -139,6 +139,9 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	basicBlocks.OptimizeSSA();
 	basicBlocks.Trace();
 
+	basicBlocks.RemovePhyFunctions();
+	basicBlocks.Trace();
+
 	m_currentClosure = m_currentClosure->m_parent;
 }
 

@@ -45,21 +45,24 @@ class dConvertToSSASolver
 		}
 	};
 
-
 	dConvertToSSASolver (dBasicBlocksGraph* const graph);
 	void Solve();
-	void BuildDomicanceFrontier();
-
+	
 	private:
+	void BuildDomicanceFrontier();
 	void BuildDomicanceFrontier(const dBasicBlock* const root);
 	void RenameVariables (const dBasicBlock* const root, dTree <dStatementBucket, dString>& stack) const;
 
-//	void Trace();
-
 	dBasicBlocksGraph* m_graph; 
 	dTree<dFrontierList, const dBasicBlock*> m_dominanceFrontier; 
+};
 
 
+class dRemovePhyFunctionsSolver
+{
+	public:
+	dRemovePhyFunctionsSolver(dBasicBlocksGraph* const SSAgraph);
+	void Solve();
 };
 
 #endif
