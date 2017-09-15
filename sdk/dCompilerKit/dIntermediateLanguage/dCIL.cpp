@@ -26,8 +26,9 @@ dString dCIL::m_pointerSize (int (sizeof (int)));
 dCIL::dCIL()
 	:dList()
 	,m_mark(1)
-	,m_tempIndex (0)
-	,m_labelIndex (0)
+	,m_tempIndex(0)
+	,m_labelIndex(0)
+	,m_cilUniqueID(0)
 {
 	memset (m_conditionals, 0, sizeof (m_conditionals));
 	m_conditionals[dCILThreeArgInstr::m_identical] = dCILThreeArgInstr::m_identical;
@@ -57,6 +58,12 @@ dCIL::~dCIL(void)
 	Clear();
 }
 
+int dCIL::GetInstructionUniqurID()
+{
+	m_cilUniqueID++;
+	return m_cilUniqueID;
+}
+
 
 void dCIL::Clear()
 {
@@ -70,6 +77,7 @@ void dCIL::ResetTemporaries()
 {
 	m_tempIndex = 0;
 	m_labelIndex = 0;
+	m_cilUniqueID = 0;
 }
 
 dString dCIL::NewTemp ()

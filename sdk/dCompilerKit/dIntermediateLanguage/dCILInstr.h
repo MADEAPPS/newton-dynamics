@@ -119,8 +119,11 @@ class dCILInstr
 	virtual ~dCILInstr ();
 
 	dCIL* GetCil() const { return m_cil; }
+	int GetUniqueID() const { return m_uniqueId; }
 	dBasicBlock* GetBasicBlock() const {return m_basicBlock; }
 	dList<dCILInstr*>::dListNode* GetNode() const { return m_myNode; }
+
+
 
 	dCILInstr* GetPrevius() const;
 	void LinkPrevius(dCILInstr* const previus);
@@ -196,9 +199,10 @@ class dCILInstr
 	dList<dCILInstr*>::dListNode* m_myNode;
 	dCILInstr* m_prevNode;
 	int m_byteCodeOffset;
+	int m_uniqueId;
 	static dMapTable m_maptable[];
 	static dString m_ssaPosfix;
-
+	
 	friend class dBasicBlock;
 	friend class dBasicBlocksGraph;
 };

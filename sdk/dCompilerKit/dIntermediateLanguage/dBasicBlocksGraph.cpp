@@ -423,10 +423,10 @@ xxx++;
 }
 
 
-void dBasicBlocksGraph::GetStatementsWorklist(dTree <int, dCIL::dListNode*>& list) const
+void dBasicBlocksGraph::GetStatementsWorklist(dWorkList& workList) const
 {
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
-		list.Insert(0, node);
+		workList.Insert(node->GetInfo());
 	}
 }
 
@@ -498,7 +498,7 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 
 	GetStatementsWorklist(workList);
 	while (workList.GetCount()) {
-		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		dCIL::dListNode* const node = workList.GetRoot()->GetInfo();
 		workList.Remove(workList.GetRoot());
 		dCILInstr* const instruction = node->GetInfo();
 //instruction->Trace();
@@ -520,7 +520,7 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 							buckect.Remove(node);
 							dAssert(map.Find(variable->m_label) || instruction->GetAsPhi());
 							if (map.Find(variable->m_label)) {
-								workList.Insert(map.Find(variable->m_label)->GetInfo());
+								workList.Insert(map.Find(variable->m_label)->GetInfo()->GetInfo());
 								if (!buckect.GetCount()) {
 									usedVariablesList.Remove(usesNodeBuckect);
 								}
@@ -547,7 +547,7 @@ bool dBasicBlocksGraph::ApplyCopyPropagationSSA()
 int xxx = 0;
 	GetStatementsWorklist(workList);
 	while (workList.GetCount()) {
-		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		dCIL::dListNode* const node = workList.GetRoot()->GetInfo();
 		workList.Remove(workList.GetRoot());
 		dCILInstr* const instruction = node->GetInfo();
 instruction->Trace();

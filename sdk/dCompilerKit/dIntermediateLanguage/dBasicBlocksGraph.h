@@ -61,6 +61,20 @@ class dStatementBlockDictionary: public dTree <dStatementBlockBucket, dString>
 	void BuildUsedVariableWorklist(dBasicBlocksGraph& list);
 };
 
+class dWorkList : public dTree <dCIL::dListNode*, int>
+{
+	public:
+	dWorkList()
+		:dTree <dCIL::dListNode*, int>()
+	{
+	}
+
+	void Insert(dCILInstr* const instruction)
+	{
+		dTree <dCIL::dListNode*, int>::Insert(instruction->GetNode(), instruction->GetUniqueID());
+	}
+};
+
 
 class dBasicBlocksGraph: public dList<dBasicBlock> 
 {
@@ -75,7 +89,7 @@ class dBasicBlocksGraph: public dList<dBasicBlock>
 	void ConvertToSSA ();
 
 	private:
-	void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
+	void GetStatementsWorklist (dWorkList& workList) const;
 
 	void BuildDominatorTree ();
 	void DeleteUnreachedBlocks();

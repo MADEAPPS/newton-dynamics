@@ -153,14 +153,6 @@ class dInstructionVariableDictionary: public dTree<dList<dCIL::dListNode*>, dStr
 
 
 
-class dWorkList: public dTree <int, dCIL::dListNode*>
-{
-	public:
-	dWorkList ()
-		:dTree <int, dCIL::dListNode*>()
-	{
-	}
-};
 
 class dDataFlowGraph 
 {

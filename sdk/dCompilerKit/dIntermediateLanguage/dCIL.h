@@ -67,6 +67,8 @@ class dCIL: public dList<dCILInstr*>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
+	int GetInstructionUniqurID();
+
 	//void OptimizeSSA (dListNode* const functionNode);
 	void RegisterAllocation (dListNode* const functionNode);
 
@@ -74,6 +76,7 @@ class dCIL: public dList<dCILInstr*>
 	int m_mark;
 	int m_tempIndex;
 	int m_labelIndex;
+	int m_cilUniqueID;
 	bool m_commutativeOperator[dCILThreeArgInstr::m_operatorsCount];
 	dCILThreeArgInstr::dOperator m_conditionals[dCILThreeArgInstr::m_operatorsCount];
 	dCILThreeArgInstr::dOperator m_operatorComplement[dCILThreeArgInstr::m_operatorsCount];
@@ -84,7 +87,6 @@ class dCIL: public dList<dCILInstr*>
 	static dString m_pointerDecoration;
 	static dString m_variableUndercore;
 	static dString m_functionArgument;
-
 	static dString m_ssaPosifix;
 	
 	friend class dDataFlowGraph;
