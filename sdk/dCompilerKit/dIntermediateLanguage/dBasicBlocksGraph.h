@@ -18,6 +18,12 @@
 #include "dCILInstr.h"
 
 
+inline int RegisterToIndex(const dString& reg)
+{
+	return dString(reg.GetStr() + strlen(D_REGISTER_SYMBOL)).ToInteger();
+}
+
+
 class dBasicBlock
 {
 	public:
@@ -85,11 +91,13 @@ class dBasicBlocksGraph: public dList<dBasicBlock>
 	void Build (dCIL::dListNode* const functionNode);
 	void OptimizeSSA ();
 	void ConvertToSSA ();
-	void RemovePhyFunctions ();
+
+	void RegistersAllocations ();
 
 	private:
 	void GetStatementsWorklist (dWorkList& workList) const;
 
+	void RemovePhyFunctions ();
 	void BuildDominatorTree ();
 	void DeleteUnreachedBlocks();
 	void CalculateSuccessorsAndPredecessors ();

@@ -584,7 +584,8 @@ void dDAGFunctionNode::BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functi
 
 void dDAGFunctionNode::ConvertToTarget (dCIL& cil)
 {
-	cil.RegisterAllocation (m_functionStart);
+	dAssert (0);
+//	cil.RegisterAllocation (m_functionStart);
 }
 
 

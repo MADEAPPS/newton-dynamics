@@ -88,7 +88,8 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 		int m_loopUseCount;
 	};
 
-	dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
+	//dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
+	dRegisterInterferenceGraph (dBasicBlocksGraph* const graph, int registerCount);
 
 /*
 	dString GetRegisterName(const dString& varName) const;
@@ -117,6 +118,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int m_registerCount;
 	int m_spillPenatryFactor;
 */
+	dBasicBlocksGraph* m_graph;
 };
 
 #endif

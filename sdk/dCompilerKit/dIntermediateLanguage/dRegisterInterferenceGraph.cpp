@@ -11,7 +11,6 @@
 
 #include "dCILstdafx.h"
 #include "dCIL.h"
-#include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
 #include "dCILInstrLoadStore.h"
 #include "dCILInstrMiscellaneous.h"
@@ -22,6 +21,7 @@
 #define D_SPILL_WEIGHT_FACTOR	10
 #define D_MOVE_WEIGHT_FACTOR	20
 
+#if 0
 dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount)
 	:dTree<dRegisterInterferenceNode, dString>()
 //	,m_spillPenalty()
@@ -85,7 +85,7 @@ m_flowGraph->m_cil->Trace();
 */
 }
 
-#if 0
+
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
 	for (dCIL::dListNode* node = m_flowGraph->m_basicBlocks.m_begin; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
@@ -998,3 +998,69 @@ void dRegisterInterferenceGraph::InsertEpilogAndProlog()
 }
 
 #endif
+
+
+
+dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const graph, int registerCount)
+	:dTree<dRegisterInterferenceNode, dString>()
+	,m_graph(graph)
+//	,m_spillPenalty()
+//	,m_coalescedNodes()
+//	,m_flowGraph(flowGraph)
+//	,m_spillCount(0)
+//	,m_registerCount(registerCount)
+//	,m_spillPenatryFactor(0)
+{
+	dAssert (0);
+/*
+	m_flowGraph->ApplySemanticInstructionReordering();
+	m_flowGraph->BuildBasicBlockGraph();
+
+	m_flowGraph->CalculateLiveInputLiveOutput();
+	for (bool optimized = true; optimized;) {
+		optimized = false;
+		optimized |= m_flowGraph->ApplyCopyPropagation();
+//m_flowGraph->m_cil->Trace();
+		optimized |= m_flowGraph->ApplyRemoveDeadCode();
+//m_flowGraph->m_cil->Trace();
+	}
+
+	//m_flowGraph->CalculateLiveInputLiveOutput();
+	Build();
+	while (ColorGraph () > m_registerCount) {
+		// we have a spill, find a good spill node and try graph coloring again
+dAssert (0);
+		SelectSpillVariableAndReWriteFunction();
+	}
+
+	AllocateRegisters();
+//m_flowGraph->m_cil->Trace();
+
+	m_flowGraph->BuildBasicBlockGraph();
+	for (bool optimized = true; optimized;) {
+		optimized = false;
+//		m_flowGraph->CalculateLiveInputLiveOutput();
+//		m_flowGraph->UpdateReachingDefinitions();
+//		optimized |= m_flowGraph->ApplyCopyPropagation();
+//m_flowGraph->m_cil->Trace();
+//		m_flowGraph->CalculateLiveInputLiveOutput();
+//m_flowGraph->m_cil->Trace();
+		optimized |= m_flowGraph->ApplyRemoveDeadCode();
+//m_flowGraph->m_cil->Trace();
+	}
+
+//m_flowGraph->m_cil->Trace();	
+	while (m_flowGraph->RemoveRedundantJumps());
+//m_flowGraph->m_cil->Trace();
+
+	m_flowGraph->ApplyRemoveDeadCode();
+//m_flowGraph->m_cil->Trace();
+	m_flowGraph->RemoveDeadInstructions();
+//m_flowGraph->m_cil->Trace();
+
+	m_flowGraph->RemoveNop();
+
+	InsertEpilogAndProlog();
+m_flowGraph->m_cil->Trace();
+*/
+}

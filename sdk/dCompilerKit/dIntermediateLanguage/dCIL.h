@@ -66,9 +66,7 @@ class dCIL: public dList<dCILInstr*>
 	dString NewLabel (); 
 	void ResetTemporaries();
 	dListNode* NewStatement();
-
 	int GetInstructionUniqurID();
-	void RegisterAllocation (dListNode* const functionNode);
 
 	private:
 	int m_mark;

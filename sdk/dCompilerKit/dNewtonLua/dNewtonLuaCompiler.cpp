@@ -104,8 +104,8 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionDeclaration(co
 
 	dUserVariable variable(functionName);
 	variable.m_node = function->GetNode();
-	function->Trace();
-	startBlock->Trace();
+	//function->Trace();
+	//startBlock->Trace();
 	return variable;
 }
 
@@ -139,10 +139,8 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	basicBlocks.OptimizeSSA();
 	//basicBlocks.Trace();
 
-	basicBlocks.RemovePhyFunctions();
-	basicBlocks.Trace();
-
-	m_currentClosure->RegisterAllocation(m_currentClosure->GetFirst());
+	basicBlocks.RegistersAllocations();
+basicBlocks.Trace();
 
 	m_currentClosure = m_currentClosure->m_parent;
 }
@@ -153,7 +151,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionParameter(cons
 	localVariable->LinkPrevius(prevParameter.m_node ? prevParameter.m_node->GetInfo() : NULL);
 	dUserVariable variable(parameter);
 	variable.m_node = localVariable->GetNode();
-	localVariable->Trace();
+	//localVariable->Trace();
 	return variable;
 }
 
@@ -172,7 +170,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitParametersToLocalVaria
 		dString local(m_currentClosure->NewTemp());
 		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, local, type, argumnet->GetArg0().m_label, type);
 		m_currentClosure->m_argumnets.Append(move);
-		move->Trace();
+		//move->Trace();
 	}
 
 	return parameterList;
@@ -190,7 +188,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionCall(const dUs
 		functionCall->AddArgument(parameter->GetArg0());
 	}
 
-	functionCall->Trace();
+	//functionCall->Trace();
 	dUserVariable variable(functionName);
 	variable.m_data = result;
 	variable.m_node = functionCall->GetNode();
@@ -217,7 +215,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadConstant(const dUs
 	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, localVariableAliasName, dCILInstr::dArgType(variableType), constName.GetString(), dCILInstr::dArgType (constType));
 	variable.m_data = localVariableAliasName;
 	variable.m_node = move->GetNode();
-	move->Trace();
+	//move->Trace();
 	return variable;
 }
 
@@ -243,7 +241,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, definition->GetArg0().m_label, type);
 	variable.m_data = outVarName;
 	variable.m_node = move->GetNode();
-	move->Trace();
+	//move->Trace();
 	return variable;
 }
 
@@ -282,7 +280,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const
 	dUserVariable variable(arg0);
 	variable.m_data = outVarName;
 	variable.m_node = instruction->GetNode();
-	instruction->Trace();
+	//instruction->Trace();
 	return variable;
 }
 
@@ -299,8 +297,8 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 	
 	dUserVariable variable;
 	variable.m_node = conditional->GetNode();
-	conditional->Trace();
-	taget2->Trace();
+	//conditional->Trace();
+	//taget2->Trace();
 	return variable;
 }
 
@@ -315,7 +313,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIfElse(const dUserVari
 
 	dUserVariable variable;
 	variable.m_node = target->GetNode();
-	target->Trace();
+	//target->Trace();
 	return variable;
 }
 
@@ -328,10 +326,9 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitReturn(const dUserVari
 	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, m_currentClosure->m_returnLabel);
 
 	dUserVariable variable;
-//	variable.m_data = outVarName;
 	variable.m_node = move->GetNode();
-	move->Trace();
-	gotoJump->Trace();
+	//move->Trace();
+	//gotoJump->Trace();
 	return variable;
 }
 

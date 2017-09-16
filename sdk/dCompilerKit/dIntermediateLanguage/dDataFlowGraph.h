@@ -24,10 +24,6 @@ inline dString IndexToRegister(int index)
 	return regName;			
 }
 
-inline int RegisterToIndex (const dString& reg)
-{
-	return dString(reg.GetStr() + strlen(D_REGISTER_SYMBOL)).ToInteger();
-}
 
 inline dString IndexToLocal(int index)
 {

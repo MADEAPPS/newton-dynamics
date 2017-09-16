@@ -12,7 +12,6 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
-#include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
 #include "dCILInstrLoadStore.h"
 #include "dConstantPropagationSolver.h"
