@@ -12,10 +12,8 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
-#include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
 #include "dCILInstrMiscellaneous.h"
-
 
 dString dCIL::m_variableUndercore ("_");
 dString dCIL::m_pointerDecoration ("*");
@@ -177,46 +175,4 @@ instr->Trace();
 
 	return program;
 }
-
-
-void dCIL::RegisterAllocation(dListNode* const functionNode)
-{
-	dAssert(0);
-/*
-	// remove all redundant newly generate extra jumps 
-	//RemoveRedundantJumps(functionNode);
-
-	// create float control for inteBlock optimization
-	dDataFlowGraph datFlowGraph (this, functionNode, returnType);
-
-	// apply all basic blocks peephole optimizations 
-	datFlowGraph.ApplyLocalOptimizations();
-
-	// do register allocation before removing dead jumps and nops
-	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
-
-	for (bool isDirty = true; isDirty; ) {
-		isDirty = false;
-		// remove all redundant newly generate extra jumps 
-		isDirty |= RemoveRedundantJumps(functionNode);
-//Trace();
-
-		// clean up all nop instruction added by the optimizer
-		isDirty |= RemoveNop(functionNode);
-//Trace();
-	}
-
-//	Trace();
-*/
-
-
-	//	dDataFlowGraph datFlowGraph (this, functionNode);
-	//	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
-}
-
-
-
-
-
-
 
