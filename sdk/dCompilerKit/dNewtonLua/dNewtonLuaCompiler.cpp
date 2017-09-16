@@ -124,23 +124,25 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	dCILInstrReturn* const ret = new dCILInstrReturn(*m_currentClosure, m_currentClosure->m_returnVariable, type);
 	dCILInstrFunctionEnd* const functionEnd = new dCILInstrFunctionEnd (m_currentClosure->GetFirst()->GetInfo()->GetAsFunction());
 
-	label->Trace();
-	ret->Trace();
-	functionEnd->Trace();
-	m_currentClosure->Trace();
+	//label->Trace();
+	//ret->Trace();
+	//functionEnd->Trace();
+	//m_currentClosure->Trace();
 
 	dBasicBlocksGraph basicBlocks;
 	basicBlocks.Build(m_currentClosure->GetFirst());
-	basicBlocks.Trace();
+	//basicBlocks.Trace();
 
 	basicBlocks.ConvertToSSA();
-	basicBlocks.Trace();
+	//basicBlocks.Trace();
 
 	basicBlocks.OptimizeSSA();
-	basicBlocks.Trace();
+	//basicBlocks.Trace();
 
 	basicBlocks.RemovePhyFunctions();
 	basicBlocks.Trace();
+
+	m_currentClosure->RegisterAllocation(m_currentClosure->GetFirst());
 
 	m_currentClosure = m_currentClosure->m_parent;
 }

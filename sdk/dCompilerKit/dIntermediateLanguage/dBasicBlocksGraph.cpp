@@ -421,7 +421,7 @@ void dBasicBlocksGraph::RemovePhyFunctions ()
 						predecessorsNode = predecessorsNode->GetNext();
 					}
 					phyInstruction->Nullify();
-					cil->Trace();
+					//cil->Trace();
 				}
 			}
 		}
@@ -432,19 +432,17 @@ void dBasicBlocksGraph::RemovePhyFunctions ()
 void dBasicBlocksGraph::OptimizeSSA ()
 {
 	bool pass = true;
-int xxx = 0;
-Trace();
+//Trace();
 	while (pass) {
 		pass = false;
 		pass |= ApplyConstantPropagationSSA();
-Trace();
+//Trace();
 		pass |= ApplyCopyPropagationSSA();
-Trace();
+//Trace();
 		pass |= ApplyDeadCodeEliminationSSA();
-Trace();
+//Trace();
 //		pass |= ApplyConstantConditionalSSA();
-Trace();
-xxx++;
+//Trace();
 	}
 }
 

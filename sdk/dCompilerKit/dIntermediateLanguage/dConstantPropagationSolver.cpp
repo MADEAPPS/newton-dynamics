@@ -17,7 +17,6 @@
 #include "dCILInstrLoadStore.h"
 #include "dConstantPropagationSolver.h"
 
-
 dConstantPropagationSolver::dInstructionMap::dInstructionMap():dTree<int, dCILInstr*>()
 {
 }
@@ -36,15 +35,11 @@ dConstantPropagationSolver::dVariable& dConstantPropagationSolver::dVariable::op
 	return *this;
 }
 
-
-
 dConstantPropagationSolver::dBlockEdgeKey::dBlockEdgeKey(const dBasicBlock* const blockHigh, const dBasicBlock* const blockLow)
 	:m_blockHigh(blockHigh)
 	,m_blockLow(blockLow)
 {
 }
-
-
 
 bool dConstantPropagationSolver::dBlockEdgeKey::operator<(const dBlockEdgeKey& src) const
 {
@@ -62,15 +57,11 @@ bool dConstantPropagationSolver::dBlockEdgeKey::operator>(const dBlockEdgeKey& s
 	return m_blockLow > src.m_blockLow;
 }
 
-
-
-
 dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const graph)
 	:m_graph(graph)
 {
 	for (dCIL::dListNode* node = m_graph->m_begin; node != m_graph->m_end; node = node->GetNext()) {
 		dCILInstr* const instruction = node->GetInfo();
-//instruction->Trace();
 		dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
 		if (variable) {
 			m_variablesList.Insert(dVariable(instruction, variable), variable->m_label);
@@ -104,7 +95,6 @@ dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const
 		}
 	}
 
-
 	dTree<int, dBlockEdgeKey> blockEdges;
 	for (dBasicBlocksGraph::dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		const dBasicBlock* const block = &node->GetInfo();
@@ -117,8 +107,6 @@ dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const
 	}
 */
 }
-
-
 
 void dConstantPropagationSolver::Trace()
 {
@@ -164,28 +152,22 @@ void dConstantPropagationSolver::UpdateLatice (const dCILInstr::dArg& arg, const
 			dInstructionMap::Iterator iter(usesNode->GetInfo());
 			for (iter.Begin(); iter; iter++) {
 				dCILInstr* const instruction = iter.GetKey();
-//		instruction->Trace();
 				m_instructionsWorklist.Append (instruction);
 			}
 		}
-//		Trace();
 	}
 }
 
 
 bool dConstantPropagationSolver::Solve ()
 {
-//m_graph->Trace();
-
 	m_blockWorklist.Append(&m_graph->GetFirst()->GetInfo());
 
 	while (m_blockWorklist.GetCount() || m_instructionsWorklist.GetCount()) {
-//Trace();
 		while (m_instructionsWorklist.GetCount()) {
 			dList<dCILInstr*>::dListNode* const nodeOuter = m_instructionsWorklist.GetFirst();
 			dCILInstr* const instruction = nodeOuter->GetInfo();
 			m_instructionsWorklist.Remove(nodeOuter);
-//instruction->Trace();
 			instruction->ApplyConstantPropagationSSA(*this);
 		}
 
@@ -193,14 +175,11 @@ bool dConstantPropagationSolver::Solve ()
 			dList<dBasicBlock*>::dListNode* const nodeOuter = m_blockWorklist.GetFirst();
 			dBasicBlock* const block = nodeOuter->GetInfo();
 			m_blockWorklist.Remove(nodeOuter);
-//block->Trace();
-
 			bool doneOuter = false;
 			for (dCIL::dListNode* node = block->m_begin; !doneOuter; node = node->GetNext()) {
 				doneOuter = (node == block->m_end);
 				dCILInstrPhy* const phy = node->GetInfo()->GetAsPhi();
 				if (phy) {
-//phy->Trace();
 					phy->ApplyConstantPropagationSSA (*this);
 				}
 			}
@@ -211,8 +190,6 @@ bool dConstantPropagationSolver::Solve ()
 				for (dCIL::dListNode* node = block->m_begin; !done; node = node->GetNext()) {
 					done = (node == block->m_end);
 					dCILInstr* const instruction = node->GetInfo();
-					
-instruction->Trace();
 					instruction->ApplyConstantPropagationSSA (*this);
 				}
 			}
@@ -220,8 +197,3 @@ instruction->Trace();
 	}
 	return false;
 }
-
-
-
-
-
