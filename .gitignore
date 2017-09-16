@@ -59,6 +59,8 @@ bld/
 *.json
 *.ipch
 *.hmap
+*.ipdb
+*.iobj
 *.cache
 *.ib_tag
 *.opendb
@@ -70,21 +72,14 @@ bld/
 *.lastbuildstate
 *.unsuccessfulbuild
 
-
-# script language
-sdk/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
-sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
-
 # Ignore auxiliary output from Doxygen and Sphinx
 doc/xml
 doc/html
 
-# third party
-sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
-#sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/vc_lib/mswud/wx/msw/rcdefs.h
-sdk/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/vc_lib/mswud/wx/msw/rcdefs.h
-*.ipdb
-*.iobj
+# script language
 sdk/dCompilerKit/dNewtonLua/dNewtonLuaParcer.cpp.txt
-sdk/dCompilerKit/dNewtonLua/dNewtonLuaParcer.cpp.txt
-sdk/dCompilerKit/dNewtonLua/dNewtonLuaParcer.cpp.txt
+sdk/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
+sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
+
+
+
