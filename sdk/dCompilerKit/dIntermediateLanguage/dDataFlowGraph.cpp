@@ -18,10 +18,6 @@
 #include "dRegisterInterferenceGraph.h"
 
 
-
-
-
-
 dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function)
 	:m_cil (cil)
 	,m_function(function)

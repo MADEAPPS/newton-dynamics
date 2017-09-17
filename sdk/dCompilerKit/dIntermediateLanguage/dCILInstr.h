@@ -151,6 +151,8 @@ class dCILInstr
 	virtual dCILSingleArgInstr* GetAsSingleArg()  { return NULL; }
 	virtual dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic() { return NULL; }
 
+	virtual bool IsDefineOrUsedVariable() { return true; }
+
 
 	//virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const = 0;
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const 

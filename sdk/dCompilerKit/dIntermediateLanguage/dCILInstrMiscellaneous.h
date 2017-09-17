@@ -103,6 +103,8 @@ class dCILInstrNop: public dCILInstr
 	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg) {}
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {}
 
+	virtual bool IsDefineOrUsedVariable() { return false; }
+
 	dString m_comment;
 };
 

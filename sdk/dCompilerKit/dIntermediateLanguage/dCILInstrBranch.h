@@ -37,6 +37,8 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	virtual bool IsBasicBlockBegin() const;
 	virtual dCILInstrLabel* GetAsLabel();
 
+	virtual bool IsDefineOrUsedVariable() { return false; }
+
 	// ***********************
 	virtual dArg* GetGeneratedVariable () {return NULL;}
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
@@ -71,6 +73,8 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
+
+	virtual bool IsDefineOrUsedVariable() { return false; }
 
 };
 

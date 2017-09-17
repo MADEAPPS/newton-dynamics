@@ -45,21 +45,27 @@ void dStatementBlockDictionary::BuildUsedVariableWorklist(dBasicBlocksGraph& lis
 	}
 }
 
-
-
 dBasicBlock::dBasicBlock (dCIL::dListNode* const begin)
-	:m_mark (0)
-	,m_begin (begin)
+	:m_begin (begin)
 	,m_end(NULL)
 	,m_idom(NULL)
+	,m_children()
+	,m_dominators()
+	,m_successors()
+	,m_predecessors()
+	,m_mark(0)
 {
 }
 
 dBasicBlock::dBasicBlock(const dBasicBlock& src)
-	:m_mark(0)
-	,m_begin(src.m_begin)
+	:m_begin(src.m_begin)
 	,m_end(NULL)
 	,m_idom(NULL)
+	,m_children()
+	,m_dominators()
+	,m_successors()
+	,m_predecessors()
+	,m_mark(0)
 {
 	for (m_end = m_begin; m_end && !m_end->GetInfo()->IsBasicBlockEnd(); m_end = m_end->GetNext()) {
 		m_end->GetInfo()->m_basicBlock = this;
@@ -143,8 +149,109 @@ void dBasicBlock::ReplaceDominator (const dTree<int, const dBasicBlock*>& newdom
 }
 
 
+dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
+	:m_graph(graph)
+{
+	dList<const dBasicBlock*> reverseOrderBlocks;
+	for (dBasicBlocksList::dListNode* blockNode = m_graph->GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		const dBasicBlock& block = blockNode->GetInfo();
+		block.m_mark = m_graph->m_mark;
+	}
+	m_graph->m_mark++;
+	BuildReverseOrdeBlockList(reverseOrderBlocks, &m_graph->GetFirst()->GetInfo());
+
+	dTree<dListNode*, const dBasicBlock*> lastStatement;
+	dTree<dListNode*, const dBasicBlock*> firstStatement;
+	for (dList<const dBasicBlock*>::dListNode* blockNode = reverseOrderBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		const dBasicBlock* const block = blockNode->GetInfo();
+
+		dListNode* lastPointNode = NULL;
+		for (dCIL::dListNode* instNode = block->m_end; instNode != block->m_begin; instNode = instNode->GetPrev()) {
+			dCILInstr* const instruction = instNode->GetInfo();
+			if (instruction->IsDefineOrUsedVariable()) {
+				dLiveInLiveOut& entry = Addtop()->GetInfo();
+				if (!lastPointNode) {
+					lastPointNode = GetFirst();
+				}
+				entry.m_instruction = instruction;
+			}
+		}
+		lastStatement.Insert(lastPointNode, block);
+		firstStatement.Insert(GetFirst(), block);
+				
+		for (dListNode* node = GetFirst(); node != lastPointNode; node = node->GetNext()) {
+			dLiveInLiveOut& point = node->GetInfo();
+			point.m_successors.Append(&node->GetNext()->GetInfo());
+		}
+	}
+
+	for (dList<const dBasicBlock*>::dListNode* blockNode = reverseOrderBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		const dBasicBlock* const block = blockNode->GetInfo();
+		dAssert (lastStatement.Find(block));
+		dListNode* const lastInstruction = lastStatement.Find(block)->GetInfo();
+		for (dList<const dBasicBlock*>::dListNode* successorsNode = block->m_successors.GetFirst(); successorsNode; successorsNode = successorsNode->GetNext()) {
+			const dBasicBlock* const succesorBlock = successorsNode->GetInfo();
+			dAssert (firstStatement.Find(succesorBlock));
+			dListNode* const succesorInstruction = firstStatement.Find(succesorBlock)->GetInfo();
+			lastInstruction->GetInfo().m_successors.Append(&succesorInstruction->GetInfo());
+		}
+	}
+
+	bool someSetChanged = false;
+	while (!someSetChanged) {
+		someSetChanged = true;
+		for (dListNode* pointNode = GetLast(); pointNode; pointNode = pointNode->GetPrev()) {
+			dLiveInLiveOut& point = pointNode->GetInfo();
+			dVariableSet<dString> oldInput(point.m_liveInputSet);
+			dVariableSet<dString> oldOutput(point.m_liveOutputSet);
+
+			point.m_liveInputSet.RemoveAll();
+			point.m_liveInputSet.Union(point.m_liveOutputSet);
+			dCILInstr::dArg* const generatedVar = point.m_instruction->GetGeneratedVariable();
+			if (generatedVar) {
+				point.m_liveInputSet.Remove(generatedVar->m_label);
+			}
+			dList<dCILInstr::dArg*> usedVariables;
+			point.m_instruction->GetUsedVariables(usedVariables);
+			point.m_liveInputSet.Union(usedVariables);
+			point.m_liveOutputSet.RemoveAll();
+
+			for (dList<dLiveInLiveOut*>::dListNode* successorNode = point.m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {
+				dLiveInLiveOut* const successorInfo = successorNode->GetInfo();
+				point.m_liveOutputSet.Union(successorInfo->m_liveInputSet);
+			}
+			someSetChanged = (someSetChanged && oldOutput.Compare(point.m_liveOutputSet) && oldInput.Compare(point.m_liveInputSet));
+		}
+	}
+
+	Trace();
+}
+
+void dLiveInLiveOutSolver::Trace()
+{
+	for (dListNode* pointNode = GetFirst(); pointNode; pointNode = pointNode->GetNext()) {
+		dLiveInLiveOut& point = pointNode->GetInfo();
+		point.m_instruction->Trace();
+		point.m_liveInputSet.Trace();
+		point.m_liveOutputSet.Trace();
+	}
+}
+
+void dLiveInLiveOutSolver::BuildReverseOrdeBlockList(dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const
+{
+	if (block->m_mark != m_graph->m_mark) {
+		block->m_mark = m_graph->m_mark;
+		for (dList<const dBasicBlock*>::dListNode* successorNode = block->m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {
+			BuildReverseOrdeBlockList(reverseOrderList, successorNode->GetInfo());
+		}
+		reverseOrderList.Append(block);
+	}
+}
+
+
+
 dBasicBlocksGraph::dBasicBlocksGraph()
-	:dList<dBasicBlock> ()
+	:dBasicBlocksList()
 	,m_dominatorTree(NULL)
 	,m_mark(0)
 {
@@ -399,22 +506,6 @@ void dBasicBlocksGraph::ConvertToSSA ()
 	ssa.Solve();
 }
 
-void dBasicBlocksGraph::OptimizeSSA ()
-{
-	bool pass = true;
-//Trace();
-	while (pass) {
-		pass = false;
-		pass |= ApplyConstantPropagationSSA();
-//Trace();
-		pass |= ApplyCopyPropagationSSA();
-//Trace();
-		pass |= ApplyDeadCodeEliminationSSA();
-//Trace();
-//		pass |= ApplyConstantConditionalSSA();
-//Trace();
-	}
-}
 
 
 void dBasicBlocksGraph::GetStatementsWorklist(dWorkList& workList) const
@@ -470,7 +561,6 @@ bool dBasicBlocksGraph::ApplyConstantConditionalSSA()
 
 	return anyChanges;
 }
-
 
 
 bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
@@ -651,3 +741,118 @@ void dBasicBlocksGraph::RegistersAllocations ()
 	//	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
 
 }
+
+void dBasicBlocksGraph::OptimizeSSA()
+{
+	bool actionFound = true;
+	for (int i = 0; actionFound && i < 32; i ++) {
+		actionFound = false;
+		actionFound |= ApplyConstantPropagationSSA();
+//Trace();
+		actionFound |= ApplyCopyPropagationSSA();
+//Trace();
+		actionFound |= ApplyDeadCodeEliminationSSA();
+//Trace();
+//		actionFound |= ApplyConstantConditionalSSA();
+//Trace();
+	}
+	dAssert (!actionFound);
+}
+
+
+#if 0
+void dBasicBlocksGraph::BuildGeneratedAndUsedVariableSets(dList<dDefineAndUsedRecord>& definedAndUsed)
+{
+//	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
+//	for (iter.Begin(); iter; iter ++) {
+//		dDataFlowPoint& point = iter.GetNode()->GetInfo();
+//		point.m_usedVariableSet.RemoveAll();
+//	}
+	m_variableUsed.RemoveAll();
+	for (iter.Begin(); iter; iter ++) {
+		dDataFlowPoint& point = iter.GetNode()->GetInfo();
+		point.m_generatedVariable.Empty();
+		dCILInstr* const instruc = point.m_statement->GetInfo();
+//instruc->Trace();
+		instruc->AddUsedVariable (m_variableUsed);
+		instruc->AddGeneratedAndUsedSymbols(point);	
+
+/*
+		dThreeAdressStmt& stmt = point.m_statement->GetInfo();	
+//DTRACE_INTRUCTION (&stmt);		
+
+		point.m_generatedVariable.Empty();
+		switch (stmt.m_instruction)
+		{
+			case dThreeAdressStmt::m_argument:
+			{
+				point.m_generatedVariable = stmt.m_arg0.m_label;
+				break;
+			}
+
+			case dThreeAdressStmt::m_load:
+			{
+				dAssert (0);
+				point.m_generatedVariable = stmt.m_arg0.m_label;
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
+				break;
+			}
+
+			case dThreeAdressStmt::m_store:
+			{
+				dAssert (0);
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
+				break;
+			}
+
+
+			case dThreeAdressStmt::m_new:
+			{
+				point.m_generatedVariable = stmt.m_arg0.m_label;
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+				break;
+			}
+
+			case dThreeAdressStmt::m_release:
+			{
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+				break;
+			}
+
+			case dThreeAdressStmt::m_ifnot:
+			{
+				if (stmt.m_arg0.GetType().m_intrinsicType == dThreeAdressStmt::m_int) {
+					point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+				} else {
+					dAssert (0);
+				}
+				break;
+			}
+
+//			case dThreeAdressStmt::m_push:
+//			{
+//				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+//				break;
+//			}
+
+
+//			case dThreeAdressStmt::m_pop:
+			case dThreeAdressStmt::m_nop:
+			case dThreeAdressStmt::m_goto:
+			case dThreeAdressStmt::m_label:
+			//case dThreeAdressStmt::m_enter:
+			//case dThreeAdressStmt::m_leave:
+			case dThreeAdressStmt::m_function:
+				break;
+
+			default:
+				dAssert (0);
+		}
+*/
+	}
+}
+#endif
+

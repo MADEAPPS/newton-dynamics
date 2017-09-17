@@ -12,6 +12,7 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstrBranch.h"
+#include "dBasicBlocksGraph.h"
 #include "dCILInstrLoadStore.h"
 #include "dCILInstrMiscellaneous.h"
 #include "dRegisterInterferenceGraph.h"
@@ -1001,6 +1002,7 @@ void dRegisterInterferenceGraph::InsertEpilogAndProlog()
 
 
 
+
 dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const graph, int registerCount)
 	:dTree<dRegisterInterferenceNode, dString>()
 	,m_graph(graph)
@@ -1011,12 +1013,13 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const
 //	,m_registerCount(registerCount)
 //	,m_spillPenatryFactor(0)
 {
+//	m_flowGraph->ApplySemanticInstructionReordering();
+//	m_flowGraph->BuildBasicBlockGraph();
+
+	dLiveInLiveOutSolver liveInLiveOut(graph);
+
 	dAssert (0);
 /*
-	m_flowGraph->ApplySemanticInstructionReordering();
-	m_flowGraph->BuildBasicBlockGraph();
-
-	m_flowGraph->CalculateLiveInputLiveOutput();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
 		optimized |= m_flowGraph->ApplyCopyPropagation();
