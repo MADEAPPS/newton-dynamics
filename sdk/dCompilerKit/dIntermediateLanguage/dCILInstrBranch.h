@@ -140,6 +140,7 @@ class dCILInstrReturn: public dCILSingleArgInstr
 
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
+	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg);
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }

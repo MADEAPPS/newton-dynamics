@@ -188,15 +188,12 @@ void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr
 	code.m_type2.m_imm2 = m_targetNode0->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
 }
 
-
 void dCILInstrConditional::ReplaceArgument (const dArg& arg, const dArg& newArg)
 {
-//Trace ();
 	if (arg.m_label == m_arg0.m_label) {
 		m_arg0 = newArg;
 	}
 }
-
 
 void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
@@ -263,6 +260,14 @@ void dCILInstrReturn::Serialize(char* const textOut) const
 bool dCILInstrReturn::IsBasicBlockEnd() const
 {
 	return true;
+}
+
+void dCILInstrReturn::ReplaceArgument(const dArg& arg, const dArg& newArg)
+{
+	//Trace ();
+	if (arg.m_label == m_arg0.m_label) {
+		m_arg0 = newArg;
+	}
 }
 
 
