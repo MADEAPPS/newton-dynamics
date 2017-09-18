@@ -1,6 +1,2 @@
-	-- defines a factorial function
-    function RegisterAllocation (a, b, c, d)
-		a = b + c	
-		return d;
-    end
+10 + 15, 20 + 30
     
