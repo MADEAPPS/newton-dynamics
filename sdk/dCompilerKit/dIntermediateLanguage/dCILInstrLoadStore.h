@@ -49,6 +49,7 @@ class dCILInstrLocal: public dCILSingleArgInstr
 	public:
 	dCILInstrLocal (dCIL& program, const dString& name, const dArgType& type);
 	void Serialize(char* const textOut) const;
+	virtual dCILInstrLocal* GetAsLocal() { return this; }
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;

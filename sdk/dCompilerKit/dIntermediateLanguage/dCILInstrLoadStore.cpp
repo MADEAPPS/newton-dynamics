@@ -49,13 +49,11 @@ bool dCILInstrArgument::ApplyDeadElimination (dDataFlowGraph& dataFlow)
 dCILInstrLocal::dCILInstrLocal (dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr (program, dArg (name, type))
 {
-	dAssert(0);
 }
 
 
 void dCILInstrLocal::Serialize(char* const textOut) const
 {
-	dAssert(0);
 	sprintf (textOut, "\tlocal %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 }
 

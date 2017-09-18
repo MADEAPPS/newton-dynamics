@@ -49,6 +49,7 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 		dString m_returnLabel;
 		dString m_returnVariable;
 		dList<dCILInstrMove*> m_argumnets;
+		dList<dCILInstrLocal*> m_localVariables;
 		friend class dNewtonLuaCompiler;
 	};
 
@@ -61,10 +62,13 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 	
 	dUserVariable EmitLoadVariable(const dUserVariable& varName);
 	dUserVariable EmitLoadConstant(const dUserVariable& constName);
+
 	dUserVariable EmitFunctionDeclaration(const dUserVariable& name);
+	dUserVariable EmitLocalVariableDeclaration(const dUserVariable& varName);
 	dUserVariable EmitParametersToLocalVariables(const dUserVariable& parameterList);
 	dUserVariable EmitFunctionCall(const dUserVariable& functionName, const dUserVariable& argumentsList);
 	dUserVariable EmitFunctionParameter(const dUserVariable& prevParameter, const dUserVariable& parameter);
+	dUserVariable EmitAssigmentStatement(const dUserVariable& nameList, const dUserVariable& expresionList);
 	dUserVariable EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1);
 
 

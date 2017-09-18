@@ -18,6 +18,7 @@ class dCILInstrPhy;
 class dCILInstrCall;
 class dCILInstrMove;
 class dCILInstrGoto;
+class dCILInstrLocal;
 class dCILInstrLeave;
 class dCILInstrEnter;
 class dCILInstrLabel;
@@ -123,8 +124,6 @@ class dCILInstr
 	dBasicBlock* GetBasicBlock() const {return m_basicBlock; }
 	dList<dCILInstr*>::dListNode* GetNode() const { return m_myNode; }
 
-
-
 	dCILInstr* GetPrevius() const;
 	void LinkPrevius(dCILInstr* const previus);
 
@@ -145,6 +144,7 @@ class dCILInstr
 	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
 	virtual dCILInstrLabel* GetAsLabel() { return NULL; }
 	virtual dCILInstrReturn* GetAsReturn() { return NULL; }
+	virtual dCILInstrLocal* GetAsLocal() { return NULL; }
 	virtual dCILInstrArgument* GetAsArgument() { return NULL; }
 	virtual dCILInstrFunction* GetAsFunction() { return NULL; }
 	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return NULL; }
