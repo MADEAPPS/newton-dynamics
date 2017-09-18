@@ -47,8 +47,11 @@ dNewtonLuaCompiler::dLuaClosure* dNewtonLuaCompiler::dLuaClosure::AddClosure(dLu
 dNewtonLuaCompiler::dNewtonLuaCompiler()
 	:dNewtonLuaParcer()
 	,m_closures()
-	,m_currentClosure(&m_closures)
+	,m_currentClosure(NULL)
 {
+	dUserVariable functionName;
+	functionName.m_data = "luaMain";
+	EmitFunctionDeclaration(functionName);
 }
 
 dNewtonLuaCompiler::~dNewtonLuaCompiler()
@@ -57,8 +60,6 @@ dNewtonLuaCompiler::~dNewtonLuaCompiler()
 
 int dNewtonLuaCompiler::CompileSource (const char* const source)
 {
-	m_closures.RemoveAll();
-	m_currentClosure = &m_closures;
 	dNewtonLuaLex scanner(source);
 	bool status = Parse(scanner);
 

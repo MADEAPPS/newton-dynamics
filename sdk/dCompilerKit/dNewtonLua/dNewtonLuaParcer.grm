@@ -126,12 +126,6 @@ block
 	| statementList returnStatement
 	;
 
-returnStatement
-	 : _RETURN																{$$ = MyModule->EmitReturn(dUserVariable());} 
-	 | _RETURN ';'															{$$ = MyModule->EmitReturn(dUserVariable());} 
-	 | _RETURN expressionList												{$$ = MyModule->EmitReturn($2);} 
-	 | _RETURN expressionList ';'											{$$ = MyModule->EmitReturn($2);} 
-	 ;
 
 statementList
 	: statement 
@@ -236,52 +230,74 @@ variableList
 	; 
 */
 
-
 expression
-	: expression _OR expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression AND expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '>' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
-//	| expression '<' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _LEFT_EQUAL expression										{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _GREATHER_EQUAL expression									{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression _IDENTICAL expression										{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _DIFFERENT expression										{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '|' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '~' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '&' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _LEFT_SHIFT expression										{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _RIGHT_SHIFT expression									{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _DOUBLE_DOT expression										{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression '+' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression '-' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression '*' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
-	| expression '/' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression _INTEGER_DIVIDE expression									{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
-//	| expression '%' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '^' expression												{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| '+' expression %prec '^'												{dAssert(0);}
-//	| '-' expression %prec '^'												{dAssert(0);}
-//	| '#' expression %prec '^'												{dAssert(0);}	
-//	| '~' expression %prec '^'												{dAssert(0);}
-	| '(' expression ')'													{dAssert(0);}
-//	| functionCall															{$$ = $1;}
-	| _NIL																	{dAssert(0);}
-	| _TRUE																	{dAssert(0);}
-	| _FALSE																{dAssert(0);}
-	| _FLOAT																{dAssert(0);}
-	| _LABEL																{$$ = MyModule->EmitLoadVariable($1);}
-	| _STRING																{dAssert(0);}
-	| _INTEGER																{$$ = MyModule->EmitLoadConstant($1);}
+	: expression _OR expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression AND expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '>' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+//	| expression '<' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _LEFT_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _GREATHER_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression _IDENTICAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _DIFFERENT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '|' expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '~' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '&' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _LEFT_SHIFT expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _RIGHT_SHIFT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _DOUBLE_DOT expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '+' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '-' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '*' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+	| expression '/' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '%' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '^' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression _INTEGER_DIVIDE expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+//	| '+' expression %prec '^' {dAssert(0);}
+//	| '-' expression %prec '^'{dAssert(0);}
+//	| '#' expression %prec '^'{dAssert(0);}	
+//	| '~' expression %prec '^'{dAssert(0);}
+	| '(' expression ')' {dAssert(0);}
+//	| functionCall {$$ = $1;}
+	| _NIL {dAssert(0);}
+	| _TRUE	{dAssert(0);}
+	| _FALSE {dAssert(0);}
+	| _FLOAT {dAssert(0);}
+	| _LABEL {$$ = MyModule->EmitLoadVariable($1);}
+	| _STRING {dAssert(0);}
+	| _INTEGER {$$ = MyModule->EmitLoadConstant($1);}
+	;
+
+statement 
+	: ';' 
+	;
+
+
+statementList
+	: statement 
+	| statementList statement 
 	;
 
 expressionList
-	: expression															{$$ = $1;}
-	| expressionList ',' expression											{$$ = MyModule->LinkExpresion($1, $3);}
+	: expression {$$ = $1;}
+	| expressionList ',' expression {$$ = MyModule->LinkExpresion($1, $3);}
 	;
 
-chunk
-	: expressionList
+returnStatement
+	 : _RETURN {$$ = MyModule->EmitReturn(dUserVariable());} 
+	 | _RETURN ';' {$$ = MyModule->EmitReturn(dUserVariable());} 
+	 | _RETURN expressionList {$$ = MyModule->EmitReturn($2);} 
+	 | _RETURN expressionList ';' {$$ = MyModule->EmitReturn($2);} 
+	 ;
+
+block	
+	: statementList 
+	| statementList returnStatement 
 	;
+
+chunk	
+	: block {MyModule->CloseFunctionDeclaration();} 
+	;
+
 
 %%
 

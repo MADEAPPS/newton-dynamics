@@ -1,82 +1,82 @@
-%type <Statement*> block
-%type <Statement*> chunk
-%type <Statement*> chunk2
-%type <Statement*> stat
-%type <Statement*> laststat
+%type block
+%type chunk
+%type chunk2
+%type stat
+%type laststat
 
-%type <Statement*> ifblock
-%type <Statement*> iflist
-%type <Statement*> if
-%type <Statement*> elseif
-%type <Statement*> else
+%type ifblock
+%type iflist
+%type if
+%type elseif
+%type else
 
-%type <Statement*> forblock
-%type <Statement*> whileblock
+%type forblock
+%type whileblock
 
-%type <Expression*> var
-%type <std::list<Expression*>> varlist
+%type var
+%type varlist
 
-%type <Expression*> exp
-%type <std::list<Expression*>> explist
-%type <Expression*> prefixexp
+%type exp
+%type explist
+%type prefixexp
 
-%type <std::string> funcname
-%type <std::string> funcname2
-%type <std::list<std::string>> namelist
+%type funcname
+%type funcname2
+%type namelist
 
-%type <Statement*> function
-%type <Statement*> funcbody
-%type <Expression*> functioncall
-%type <std::list<Expression*>> parlist
-%type <std::list<Expression*>> args
+%type function
+%type funcbody
+%type functioncall
+%type parlist
+%type args
 
-%type <Statement*> tableconstructor
+%type tableconstructor
 
-%type <Expression*> field
-%type <Statement*> fieldlist
-%type <Statement*> fieldlist2
-%type <std::string> optfieldsep
-%type <std::string> fieldsep
+%type field
+%type fieldlist
+%type fieldlist2
+%type optfieldsep
+%type fieldsep
 
-%type <Expression*> string
+%type string
 
-%type <Expression*> op
-%type <Expression*> op_1
-%type <Expression*> op_2
-%type <Expression*> op_3
-%type <Expression*> op_4
-%type <Expression*> op_5
-%type <Expression*> op_6
-%type <Expression*> op_7
-%type <Expression*> op_8
-%type <Expression*> op_9
+%type op
+%type op_1
+%type op_2
+%type op_3
+%type op_4
+%type op_5
+%type op_6
+%type op_7
+%type op_8
+%type op_9
 
-%token <std::string> DO
-%token <std::string> WHILE
-%token <std::string> FOR
-%token <std::string> UNTIL
-%token <std::string> REPEAT
-%token <std::string> END
-%token <std::string> IN
+%token DO
+%token WHILE
+%token FOR
+%token UNTIL
+%token REPEAT
+%token END
+%token IN
 
-%token <std::string> IF
-%token <std::string> THEN
-%token <std::string> ELSEIF
-%token <std::string> ELSE
+%token IF
+%token THEN
+%token ELSEIF
+%token ELSE
 
-%token <std::string> LOCAL
+%token LOCAL
 
-%token <std::string> FUNCTION
-%token <std::string> RETURN
-%token <std::string> BREAK
+%token FUNCTION
+%token RETURN
+%token BREAK
 
-%token <std::string> NIL
-%token <std::string> FALSE
-%token <std::string> TRUE
-%token <std::string> NUMBER
-%token <std::string> STRING
-%token <std::string> TDOT
-%token <std::string> NAME
+%token NIL
+%token FALSE
+%token TRUE
+%token NUMBER
+%token STRING
+%token TDOT
+%token NAME
 
 %token <char> PLUS
 %token <char> MINUS
@@ -99,20 +99,20 @@
 
 %token <char> APPEND
 
-%token <std::string> ASSIGN
-%token <std::string> DOT
-%token <std::string> COLON
-%token <std::string> COMMA
-%token <std::string> SEMICOLON
+%token ASSIGN
+%token DOT
+%token COLON
+%token COMMA
+%token SEMICOLON
 
-%token <std::string> BRACES_L
-%token <std::string> BRACES_R
+%token BRACES_L
+%token BRACES_R
 
-%token <std::string> BRACKET_L
-%token <std::string> BRACKET_R
+%token BRACKET_L
+%token BRACKET_R
 
-%token <std::string> PARANTHESES_L
-%token <std::string> PARANTHESES_R
+%token PARANTHESES_L
+%token PARANTHESES_R
 
 %token QUIT 0 "end of file"
 
