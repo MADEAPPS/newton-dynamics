@@ -267,19 +267,34 @@ expression
 	| _INTEGER {$$ = MyModule->EmitLoadConstant($1);}
 	;
 
-statement 
-	: ';' 
+expressionList
+	: expression {$$ = $1;}
+	| expressionList ',' expression {$$ = MyModule->LinkExpresion($1, $3);}
 	;
 
+variable
+	: _LABEL {$$ = $1;}
+//	| prefixexp BRACKET_L exp BRACKET_R {dAssert(0);}
+//	| prefixexp DOT NAME {dAssert(0);}
+	;
+
+variableList
+	: variable {$$ = $1;}
+	| variableList ',' variable {$$ = MyModule->LinkExpresion($1, $3);}
+	;
+
+assigment
+	: variableList '=' expressionList {$$ = MyModule->EmitAssigmentStatement($1, $3);}
+	;
+
+statement 
+	: ';' 
+	| assigment
+	;
 
 statementList
 	: statement 
 	| statementList statement 
-	;
-
-expressionList
-	: expression {$$ = $1;}
-	| expressionList ',' expression {$$ = MyModule->LinkExpresion($1, $3);}
 	;
 
 returnStatement
