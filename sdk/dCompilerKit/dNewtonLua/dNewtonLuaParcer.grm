@@ -137,6 +137,7 @@ statementList
 	 
 statement 
 	: ';' 
+	| local 
 	| assigment
 	| ifStatement
 	| functionCall
@@ -146,6 +147,19 @@ statement
 assigment
 	: variableList '=' expressionList										{dAssert(0);}
 	;
+
+local
+	: localDefine															{dAssert(0);}
+	| localDefine '=' expressionList										{dAssert(0);}
+	;
+
+localDefine
+	: _LOCAL nameList														{dAssert(0);}
+	;
+
+nameList
+	: _LABEL																{$$ = $1;}	
+	| _LABEL ',' _LABEL														{dAssert(0);}
 
 functionCall
 	: prefixExpression args													{$$ = MyModule->EmitFunctionCall($1, $2);}
