@@ -31,7 +31,6 @@
 %}
 
 
-
 %union 
 {
 	class dUserVariable: public dDefualtUserVariable
@@ -40,38 +39,51 @@
 		dUserVariable () 
 			:dDefualtUserVariable ()
 			,m_tokenList()
-			,m_node(NULL)
+			,m_nodeList()
 		{
 		}
 
-		dUserVariable (const dUserVariable& copy) 
-			:dDefualtUserVariable (copy)
+		dUserVariable (dCILInstr* const instruction) 
+			:dDefualtUserVariable ()
 			,m_tokenList()
-			,m_node(copy.m_node)
+			,m_nodeList()
 		{
-			for (dList<dString>::dListNode* ptr = copy.m_tokenList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-				m_tokenList.Append (ptr->GetInfo());
-			}
-			m_tokenList.RemoveAll();
+			m_nodeList.Append (instruction->GetNode());
+		}
+
+
+		dUserVariable (const dUserVariable& src) 
+			:dDefualtUserVariable (src)
+			,m_tokenList()
+			,m_nodeList()
+		{
+			src.m_tokenList.TranferDataToTarget (m_tokenList);
+			src.m_nodeList.TranferDataToTarget (m_nodeList);
 		}
 
 		dUserVariable& operator= (const dUserVariable& src)
 		{
-			dAssert (0);
+			dDefualtUserVariable& me = *this;
+			me = src;
+
+			src.m_nodeList.TranferDataToTarget (m_nodeList);
+			src.m_tokenList.TranferDataToTarget (m_tokenList);
 			return *this;
 		}
 		
 		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
 			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
 			,m_tokenList()
-			,m_node(NULL)
+			,m_nodeList()
 		{
 		}
 
-		dList<dString> m_tokenList;
-		dCIL::dListNode* m_node;
+		mutable dList<dString> m_tokenList;
+		mutable dList<dCIL::dListNode*> m_nodeList;
 	};
 }
+
+
 
 %token            _AND
 %token            _BREAK
@@ -244,7 +256,7 @@ variable
 
 nameList
 	: _LABEL																{$$ = $1;}	
-	| _LABEL ',' _LABEL														{$$ = MyModule->LinkExpresion($1, $3);}
+	| _LABEL ',' _LABEL														{dAssert(0);}
 
 variableList
 	: variable																{dAssert(0);}
@@ -291,7 +303,7 @@ expression
 
 expressionList
 	: expression {$$ = $1;}
-	| expressionList ',' expression {$$ = MyModule->LinkExpresion($1, $3);}
+	| expressionList ',' expression {$$ = $1; $$.m_nodeList.Append ($3.m_nodeList.GetFirst()->GetInfo());}
 	;
 
 namelist
@@ -307,7 +319,7 @@ variable
 
 variableList
 	: variable {$$ = $1;}
-	| variableList ',' variable {$$ = MyModule->LinkExpresion($1, $3);}
+	| variableList ',' variable {dAssert(0);}
 	;
 
 assigment
@@ -320,7 +332,7 @@ localDeclaration
 
 local
 	: localDeclaration {$$ = $1;} 
-	| localDeclaration '=' expressionList {dAssert(0);}
+	| localDeclaration '=' expressionList {$$ = MyModule->EmitAssigmentStatement($1, $3);}
 	;
 
 statement 

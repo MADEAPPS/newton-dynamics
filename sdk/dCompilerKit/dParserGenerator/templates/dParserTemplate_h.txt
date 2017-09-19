@@ -51,6 +51,15 @@ $(Tokens)
 		{
 		}
 
+		dDefualtUserVariable& operator= (const dDefualtUserVariable& src)
+		{
+			m_scannerLine = src.m_scannerLine;  
+			m_scannerIndex = src.m_scannerIndex;
+			m_token = src.m_token;
+			m_data = src.m_data;
+			return *this;
+		}
+
 		dToken GetToken() const 
 		{
 			return m_token;

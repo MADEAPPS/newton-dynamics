@@ -596,7 +596,7 @@ break;
 break;
 
 						case 22:// variableList : variableList , variable 
-{entry.m_value = MyModule->LinkExpresion(parameter[0].m_value, parameter[2].m_value);}
+{dAssert(0);}
 break;
 
 						case 34:// returnStatement : _RETURN expressionList 
@@ -608,7 +608,7 @@ break;
 break;
 
 						case 26:// local : localDeclaration = expressionList 
-{dAssert(0);}
+{entry.m_value = MyModule->EmitAssigmentStatement(parameter[0].m_value, parameter[2].m_value);}
 break;
 
 						case 35:// returnStatement : _RETURN expressionList ; 
@@ -652,7 +652,7 @@ break;
 break;
 
 						case 17:// expressionList : expressionList , expression 
-{entry.m_value = MyModule->LinkExpresion(parameter[0].m_value, parameter[2].m_value);}
+{entry.m_value = parameter[0].m_value; entry.m_value.m_nodeList.Append (parameter[2].m_value.m_nodeList.GetFirst()->GetInfo());}
 break;
 
 

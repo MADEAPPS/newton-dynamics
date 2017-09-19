@@ -83,7 +83,6 @@ dCILInstr::dCILInstr (dCIL& program)
 	:m_cil(&program)
 	,m_basicBlock(NULL)
 	,m_myNode (NULL)
-	,m_prevNode(NULL)
 	,m_byteCodeOffset(0)
 	,m_uniqueId(program.GetInstructionUniqurID())
 {
@@ -95,16 +94,6 @@ dCILInstr::~dCILInstr ()
 	if (m_myNode) {
 		m_cil->Remove(m_myNode);
 	}
-}
-
-dCILInstr* dCILInstr::GetPrevius() const
-{
-	return m_prevNode;
-}
-
-void dCILInstr::LinkPrevius(dCILInstr* const previus)
-{
-	m_prevNode = previus;
 }
 
 

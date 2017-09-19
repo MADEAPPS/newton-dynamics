@@ -88,6 +88,15 @@ class dNewtonLuaParcer
 		{
 		}
 
+		dDefualtUserVariable& operator= (const dDefualtUserVariable& src)
+		{
+			m_scannerLine = src.m_scannerLine;  
+			m_scannerIndex = src.m_scannerIndex;
+			m_token = src.m_token;
+			m_data = src.m_data;
+			return *this;
+		}
+
 		dToken GetToken() const 
 		{
 			return m_token;
@@ -114,36 +123,47 @@ class dNewtonLuaParcer
 		dUserVariable () 
 			:dDefualtUserVariable ()
 			,m_tokenList()
-			,m_node(NULL)
+			,m_nodeList()
 		{
 		}
 
-		dUserVariable (const dUserVariable& copy) 
-			:dDefualtUserVariable (copy)
+		dUserVariable (dCILInstr* const instruction) 
+			:dDefualtUserVariable ()
 			,m_tokenList()
-			,m_node(copy.m_node)
+			,m_nodeList()
 		{
-			for (dList<dString>::dListNode* ptr = copy.m_tokenList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-				m_tokenList.Append (ptr->GetInfo());
-			}
-			m_tokenList.RemoveAll();
+			m_nodeList.Append (instruction->GetNode());
+		}
+
+
+		dUserVariable (const dUserVariable& src) 
+			:dDefualtUserVariable (src)
+			,m_tokenList()
+			,m_nodeList()
+		{
+			src.m_tokenList.TranferDataToTarget (m_tokenList);
+			src.m_nodeList.TranferDataToTarget (m_nodeList);
 		}
 
 		dUserVariable& operator= (const dUserVariable& src)
 		{
-			dAssert (0);
+			dDefualtUserVariable& me = *this;
+			me = src;
+
+			src.m_nodeList.TranferDataToTarget (m_nodeList);
+			src.m_tokenList.TranferDataToTarget (m_tokenList);
 			return *this;
 		}
 		
 		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
 			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
 			,m_tokenList()
-			,m_node(NULL)
+			,m_nodeList()
 		{
 		}
 
-		dList<dString> m_tokenList;
-		dCIL::dListNode* m_node;
+		mutable dList<dString> m_tokenList;
+		mutable dList<dCIL::dListNode*> m_nodeList;
 	};
 
 

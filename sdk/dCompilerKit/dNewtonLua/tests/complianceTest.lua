@@ -1,2 +1,2 @@
-local a , b = 2, 3 
+local a , b = 2
 return a    

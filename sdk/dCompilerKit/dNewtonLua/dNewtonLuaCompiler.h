@@ -54,7 +54,6 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 	};
 
 	void CloseFunctionDeclaration();
-	dUserVariable LinkExpresion(const dUserVariable& expression0, const dUserVariable& expression1);
 
 	dUserVariable EmitIf(const dUserVariable& expression);
 	dUserVariable EmitIfElse(const dUserVariable& ifStatement);

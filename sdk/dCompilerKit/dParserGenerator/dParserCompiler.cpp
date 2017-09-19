@@ -306,20 +306,20 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 
 	dListNode* FindItem (dProductionRule::dListNode* const rule, int marker, dCRCTYPE lookAheadSymbol) const
 	{
-		dItemKey key (lookAheadSymbol, rule);
-		dTree<dList<dState::dListNode*>, dItemKey>::dTreeNode* const mapNode = m_itemMap.Find (key);
+		dItemKey key(lookAheadSymbol, rule);
+		dTree<dList<dState::dListNode*>, dItemKey>::dTreeNode* const mapNode = m_itemMap.Find(key);
 		if (mapNode) {
 			dList<dState::dListNode*>& bucket = mapNode->GetInfo();
-				for (dList<dState::dListNode*>::dListNode* node = bucket.GetFirst(); node; node = node->GetNext()) {
-					dState::dListNode* const nodeItem = node->GetInfo();
-					const dItem& item = nodeItem->GetInfo();
+			for (dList<dState::dListNode*>::dListNode* node = bucket.GetFirst(); node; node = node->GetNext()) {
+				dState::dListNode* const nodeItem = node->GetInfo();
+				const dItem& item = nodeItem->GetInfo();
 				if (item.m_indexMarker == marker) {
-					dAssert (item.m_ruleNode == rule);
-						dAssert (item.m_lookAheadSymbolCRC == lookAheadSymbol);
-						return nodeItem;
-					}
+					dAssert(item.m_ruleNode == rule);
+					dAssert(item.m_lookAheadSymbolCRC == lookAheadSymbol);
+					return nodeItem;
 				}
 			}
+		}
 		return NULL;
 	}
 

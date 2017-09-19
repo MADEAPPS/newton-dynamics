@@ -214,6 +214,9 @@ class dList: public dContainersAlloc
 	void Remove (const T &element);
 	void RemoveAll ();
 	
+	// special routines
+	// move the data to the target list and set to zero m_count, m_first and m_last
+	void TranferDataToTarget (dList& target);
 
 	// ***********************************************************
 	// member variables
@@ -462,6 +465,18 @@ void dList<T, poolSize>::RemoveAll ()
 	dAssert (!m_count);
 }
 
+template<class T, int poolSize>
+void dList<T, poolSize>::TranferDataToTarget (dList& target)
+{
+	dAssert (target.m_count == 0);
+	target.m_count = m_count;
+	target.m_first = m_first;
+	target.m_last = m_last;
+
+	m_count = 0;
+	m_first = NULL;
+	m_last = NULL;
+}
 
 #endif
 
