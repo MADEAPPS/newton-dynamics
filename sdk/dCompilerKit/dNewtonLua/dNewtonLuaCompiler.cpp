@@ -252,13 +252,28 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLocalVariableDeclaration(const dUserVariable& varNameList)
 {
 	dAssert (!varNameList.m_node);
-	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dCILInstrLocal* const localVariable = new dCILInstrLocal(*m_currentClosure, varNameList.GetString(), type);
-	m_currentClosure->m_localVariables.Append(localVariable);
+	dAssert(0);
+	for (dCILInstr* instruction = varNameList.m_node->GetInfo(); instruction; instruction = instruction->GetPrevius()) {
 
+//		dCILInstrArgument* const argumnet = instruction->GetAsArgument();
+//		dAssert(argumnet);
+//		dString local(m_currentClosure->NewTemp());
+//		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, local, type, argumnet->GetArg0().m_label, type);
+//		m_currentClosure->m_argumnets.Append(move);
+//		TRACE_INSTRUCTION(move);
+
+
+
+
+		dCILInstr::dArgType type(dCILInstr::m_luaType);
+		dCILInstrLocal* const localVariable = new dCILInstrLocal(*m_currentClosure, varNameList.GetString(), type);
+		m_currentClosure->m_localVariables.Append(localVariable);
+
+		dUserVariable outVarName(varNameList);
+		outVarName.m_node = localVariable->GetNode();
+		TRACE_INSTRUCTION(localVariable);
+	}
 	dUserVariable outVarName(varNameList);
-	outVarName.m_node = localVariable->GetNode();
-	TRACE_INSTRUCTION(localVariable);
 	return outVarName;
 }
 

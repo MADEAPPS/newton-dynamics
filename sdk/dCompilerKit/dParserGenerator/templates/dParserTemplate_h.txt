@@ -41,6 +41,11 @@ $(Tokens)
 		{
 		}
 
+		dDefualtUserVariable (const dDefualtUserVariable& copy) 
+			:m_scannerLine(copy.m_scannerLine), m_scannerIndex(copy.m_scannerIndex), m_token(copy.m_token), m_data(copy.m_data)
+		{
+		}
+
 		dDefualtUserVariable (dToken token, const char* const data, int scannerLine, int scannerIndex)
 			:m_scannerLine (scannerLine), m_scannerIndex(scannerIndex), m_token(token), m_data (data) 
 		{

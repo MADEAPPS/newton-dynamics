@@ -6,6 +6,11 @@
 		{
 		}
 
+		dUserVariable (const dUserVariable& copy) 
+			:dDefualtUserVariable (copy)
+		{
+		}
+
 		dUserVariable (dToken token, const char* const data, int scannerLine, int scannerIndex)
 			:dDefualtUserVariable  (token, data, scannerLine, scannerIndex)
 		{

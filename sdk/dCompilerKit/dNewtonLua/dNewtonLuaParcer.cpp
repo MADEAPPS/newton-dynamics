@@ -154,90 +154,102 @@ const dNewtonLuaParcer::dGotoEntry* dNewtonLuaParcer::FindGoto (const dGotoEntry
 const dNewtonLuaParcer::dActionEntry* dNewtonLuaParcer::GetNextAction (dList<dStackPair>& stack, dToken token, dNewtonLuaLex& scanner) const
 {
 	static short actionsCount[] = {
-			2, 2, 1, 2, 4, 4, 4, 4, 2, 1, 8, 1, 2, 1, 4, 10, 8, 12, 12, 12, 5, 12, 12, 12, 
-			12, 12, 2, 8, 10, 10, 10, 3, 10, 1, 10, 10, 10, 10, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
-			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 8, 8, 8, 8, 8, 8, 8, 8, 
-			12, 8, 12, 12, 12, 12, 12, 12, 12, 8, 12, 12, 12, 12, 12, 12, 12, 12, 10, 10, 10, 10, 10, 10, 
-			10, 10, 8, 10, 10, 10, 10, 10, 10, 10, 10, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
-			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 12, 12, 12, 12, 12, 12, 12, 10, 10, 10, 10, 10, 
-			10, 10, 10};
+			3, 2, 1, 2, 5, 5, 5, 5, 1, 5, 2, 6, 1, 8, 1, 2, 1, 5, 10, 7, 7, 8, 8, 13, 
+			13, 13, 6, 13, 13, 13, 13, 13, 2, 8, 10, 10, 10, 3, 10, 1, 10, 10, 10, 10, 1, 6, 8, 8, 
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 
+			8, 7, 8, 8, 8, 8, 8, 8, 8, 13, 8, 13, 13, 13, 13, 13, 13, 13, 8, 13, 13, 13, 13, 13, 
+			13, 13, 13, 10, 10, 10, 10, 10, 10, 10, 10, 8, 10, 10, 10, 10, 10, 10, 10, 10, 8, 8, 8, 8, 
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 13, 13, 13, 13, 
+			13, 13, 13, 13, 10, 10, 10, 10, 10, 10, 10, 10};
 	static short actionsStart[] = {
-			0, 2, 4, 5, 7, 11, 15, 19, 23, 25, 26, 34, 2, 35, 36, 40, 50, 58, 70, 82, 94, 99, 111, 123, 
-			135, 147, 159, 50, 161, 171, 181, 191, 194, 204, 205, 215, 225, 235, 50, 245, 253, 261, 269, 277, 285, 293, 301, 26, 
-			26, 26, 26, 26, 26, 26, 309, 317, 325, 325, 325, 325, 325, 325, 325, 333, 334, 342, 50, 50, 50, 50, 50, 50, 
-			350, 50, 362, 374, 386, 398, 410, 422, 434, 50, 58, 70, 446, 99, 111, 123, 135, 147, 458, 468, 478, 488, 498, 508, 
-			518, 528, 50, 161, 171, 538, 194, 205, 215, 225, 235, 548, 556, 564, 572, 580, 588, 596, 604, 612, 309, 309, 309, 309, 
-			309, 309, 309, 620, 334, 334, 334, 334, 334, 334, 334, 350, 362, 374, 628, 640, 652, 422, 664, 458, 468, 478, 676, 686, 
-			696, 518, 706};
+			0, 3, 5, 6, 8, 13, 18, 23, 28, 29, 34, 36, 42, 43, 51, 3, 52, 53, 58, 68, 75, 43, 82, 90, 
+			103, 116, 129, 135, 148, 161, 174, 187, 200, 82, 202, 212, 222, 232, 235, 245, 246, 256, 266, 276, 286, 287, 82, 293, 
+			301, 309, 317, 325, 333, 341, 349, 43, 43, 43, 43, 43, 43, 43, 357, 365, 373, 373, 373, 373, 373, 373, 373, 381, 
+			382, 390, 397, 82, 82, 82, 82, 82, 82, 405, 82, 418, 431, 444, 457, 470, 483, 496, 82, 90, 103, 509, 135, 148, 
+			161, 174, 187, 522, 532, 542, 552, 562, 572, 582, 592, 82, 202, 212, 602, 235, 246, 256, 266, 276, 612, 620, 628, 636, 
+			644, 652, 660, 668, 676, 357, 357, 357, 357, 357, 357, 357, 684, 382, 382, 382, 382, 382, 382, 382, 405, 418, 431, 692, 
+			705, 718, 483, 731, 522, 532, 542, 744, 754, 764, 582, 774};
 	static dActionEntry actionTable[] = {
-			dActionEntry (59, 0, 0, 5, 0, 0), dActionEntry (290, 0, 0, 8, 0, 0), dActionEntry (44, 0, 0, 11, 0, 0), dActionEntry (61, 0, 0, 10, 0, 0), 
-			dActionEntry (254, 0, 1, 9, 1, 32), dActionEntry (44, 0, 1, 3, 1, 19), dActionEntry (61, 0, 1, 3, 1, 19), dActionEntry (59, 0, 0, 5, 0, 0), 
-			dActionEntry (254, 0, 1, 8, 1, 30), dActionEntry (273, 0, 0, 15, 0, 0), dActionEntry (290, 0, 0, 8, 0, 0), dActionEntry (59, 0, 1, 5, 1, 22), 
-			dActionEntry (254, 0, 1, 5, 1, 22), dActionEntry (273, 0, 1, 5, 1, 22), dActionEntry (290, 0, 1, 5, 1, 22), dActionEntry (59, 0, 1, 6, 1, 24), 
-			dActionEntry (254, 0, 1, 6, 1, 24), dActionEntry (273, 0, 1, 6, 1, 24), dActionEntry (290, 0, 1, 6, 1, 24), dActionEntry (59, 0, 1, 5, 1, 23), 
-			dActionEntry (254, 0, 1, 5, 1, 23), dActionEntry (273, 0, 1, 5, 1, 23), dActionEntry (290, 0, 1, 5, 1, 23), dActionEntry (44, 0, 1, 2, 1, 18), 
-			dActionEntry (61, 0, 1, 2, 1, 18), dActionEntry (254, 0, 2, 0, 0, 0), dActionEntry (40, 0, 0, 16, 0, 0), dActionEntry (262, 0, 0, 18, 0, 0), 
-			dActionEntry (269, 0, 0, 21, 0, 0), dActionEntry (275, 0, 0, 17, 0, 0), dActionEntry (288, 0, 0, 23, 0, 0), dActionEntry (289, 0, 0, 25, 0, 0), 
-			dActionEntry (290, 0, 0, 24, 0, 0), dActionEntry (291, 0, 0, 22, 0, 0), dActionEntry (290, 0, 0, 8, 0, 0), dActionEntry (254, 0, 1, 8, 2, 31), 
-			dActionEntry (59, 0, 1, 6, 2, 25), dActionEntry (254, 0, 1, 6, 2, 25), dActionEntry (273, 0, 1, 6, 2, 25), dActionEntry (290, 0, 1, 6, 2, 25), 
-			dActionEntry (40, 0, 0, 27, 0, 0), dActionEntry (59, 0, 0, 33, 0, 0), dActionEntry (254, 0, 1, 7, 1, 26), dActionEntry (262, 0, 0, 29, 0, 0), 
-			dActionEntry (269, 0, 0, 32, 0, 0), dActionEntry (275, 0, 0, 28, 0, 0), dActionEntry (288, 0, 0, 35, 0, 0), dActionEntry (289, 0, 0, 37, 0, 0), 
-			dActionEntry (290, 0, 0, 36, 0, 0), dActionEntry (291, 0, 0, 34, 0, 0), dActionEntry (40, 0, 0, 38, 0, 0), dActionEntry (262, 0, 0, 40, 0, 0), 
-			dActionEntry (269, 0, 0, 42, 0, 0), dActionEntry (275, 0, 0, 39, 0, 0), dActionEntry (288, 0, 0, 44, 0, 0), dActionEntry (289, 0, 0, 46, 0, 0), 
-			dActionEntry (290, 0, 0, 45, 0, 0), dActionEntry (291, 0, 0, 43, 0, 0), dActionEntry (42, 0, 1, 0, 1, 10), dActionEntry (43, 0, 1, 0, 1, 10), 
+			dActionEntry (59, 0, 0, 6, 0, 0), dActionEntry (268, 0, 0, 8, 0, 0), dActionEntry (290, 0, 0, 10, 0, 0), dActionEntry (44, 0, 0, 14, 0, 0), 
+			dActionEntry (61, 0, 0, 13, 0, 0), dActionEntry (254, 0, 1, 12, 1, 38), dActionEntry (44, 0, 1, 4, 1, 21), dActionEntry (61, 0, 1, 4, 1, 21), 
+			dActionEntry (59, 0, 0, 6, 0, 0), dActionEntry (254, 0, 1, 11, 1, 36), dActionEntry (268, 0, 0, 8, 0, 0), dActionEntry (273, 0, 0, 18, 0, 0), 
+			dActionEntry (290, 0, 0, 10, 0, 0), dActionEntry (59, 0, 1, 8, 1, 29), dActionEntry (254, 0, 1, 8, 1, 29), dActionEntry (268, 0, 1, 8, 1, 29), 
+			dActionEntry (273, 0, 1, 8, 1, 29), dActionEntry (290, 0, 1, 8, 1, 29), dActionEntry (59, 0, 1, 8, 1, 27), dActionEntry (254, 0, 1, 8, 1, 27), 
+			dActionEntry (268, 0, 1, 8, 1, 27), dActionEntry (273, 0, 1, 8, 1, 27), dActionEntry (290, 0, 1, 8, 1, 27), dActionEntry (59, 0, 1, 9, 1, 30), 
+			dActionEntry (254, 0, 1, 9, 1, 30), dActionEntry (268, 0, 1, 9, 1, 30), dActionEntry (273, 0, 1, 9, 1, 30), dActionEntry (290, 0, 1, 9, 1, 30), 
+			dActionEntry (290, 0, 0, 19, 0, 0), dActionEntry (59, 0, 1, 8, 1, 28), dActionEntry (254, 0, 1, 8, 1, 28), dActionEntry (268, 0, 1, 8, 1, 28), 
+			dActionEntry (273, 0, 1, 8, 1, 28), dActionEntry (290, 0, 1, 8, 1, 28), dActionEntry (44, 0, 1, 3, 1, 20), dActionEntry (61, 0, 1, 3, 1, 20), 
+			dActionEntry (59, 0, 1, 7, 1, 25), dActionEntry (61, 0, 0, 21, 0, 0), dActionEntry (254, 0, 1, 7, 1, 25), dActionEntry (268, 0, 1, 7, 1, 25), 
+			dActionEntry (273, 0, 1, 7, 1, 25), dActionEntry (290, 0, 1, 7, 1, 25), dActionEntry (254, 0, 2, 0, 0, 0), dActionEntry (40, 0, 0, 22, 0, 0), 
+			dActionEntry (262, 0, 0, 24, 0, 0), dActionEntry (269, 0, 0, 27, 0, 0), dActionEntry (275, 0, 0, 23, 0, 0), dActionEntry (288, 0, 0, 29, 0, 0), 
+			dActionEntry (289, 0, 0, 31, 0, 0), dActionEntry (290, 0, 0, 30, 0, 0), dActionEntry (291, 0, 0, 28, 0, 0), dActionEntry (290, 0, 0, 10, 0, 0), 
+			dActionEntry (254, 0, 1, 11, 2, 37), dActionEntry (59, 0, 1, 9, 2, 31), dActionEntry (254, 0, 1, 9, 2, 31), dActionEntry (268, 0, 1, 9, 2, 31), 
+			dActionEntry (273, 0, 1, 9, 2, 31), dActionEntry (290, 0, 1, 9, 2, 31), dActionEntry (40, 0, 0, 33, 0, 0), dActionEntry (59, 0, 0, 39, 0, 0), 
+			dActionEntry (254, 0, 1, 10, 1, 32), dActionEntry (262, 0, 0, 35, 0, 0), dActionEntry (269, 0, 0, 38, 0, 0), dActionEntry (275, 0, 0, 34, 0, 0), 
+			dActionEntry (288, 0, 0, 41, 0, 0), dActionEntry (289, 0, 0, 43, 0, 0), dActionEntry (290, 0, 0, 42, 0, 0), dActionEntry (291, 0, 0, 40, 0, 0), 
+			dActionEntry (44, 0, 1, 2, 1, 18), dActionEntry (59, 0, 1, 2, 1, 18), dActionEntry (61, 0, 1, 2, 1, 18), dActionEntry (254, 0, 1, 2, 1, 18), 
+			dActionEntry (268, 0, 1, 2, 1, 18), dActionEntry (273, 0, 1, 2, 1, 18), dActionEntry (290, 0, 1, 2, 1, 18), dActionEntry (44, 0, 0, 44, 0, 0), 
+			dActionEntry (59, 0, 1, 6, 2, 24), dActionEntry (61, 0, 1, 6, 2, 24), dActionEntry (254, 0, 1, 6, 2, 24), dActionEntry (268, 0, 1, 6, 2, 24), 
+			dActionEntry (273, 0, 1, 6, 2, 24), dActionEntry (290, 0, 1, 6, 2, 24), dActionEntry (40, 0, 0, 46, 0, 0), dActionEntry (262, 0, 0, 48, 0, 0), 
+			dActionEntry (269, 0, 0, 50, 0, 0), dActionEntry (275, 0, 0, 47, 0, 0), dActionEntry (288, 0, 0, 52, 0, 0), dActionEntry (289, 0, 0, 54, 0, 0), 
+			dActionEntry (290, 0, 0, 53, 0, 0), dActionEntry (291, 0, 0, 51, 0, 0), dActionEntry (42, 0, 1, 0, 1, 10), dActionEntry (43, 0, 1, 0, 1, 10), 
 			dActionEntry (44, 0, 1, 0, 1, 10), dActionEntry (45, 0, 1, 0, 1, 10), dActionEntry (47, 0, 1, 0, 1, 10), dActionEntry (59, 0, 1, 0, 1, 10), 
-			dActionEntry (254, 0, 1, 0, 1, 10), dActionEntry (271, 0, 1, 0, 1, 10), dActionEntry (273, 0, 1, 0, 1, 10), dActionEntry (280, 0, 1, 0, 1, 10), 
-			dActionEntry (281, 0, 1, 0, 1, 10), dActionEntry (290, 0, 1, 0, 1, 10), dActionEntry (42, 0, 1, 0, 1, 11), dActionEntry (43, 0, 1, 0, 1, 11), 
-			dActionEntry (44, 0, 1, 0, 1, 11), dActionEntry (45, 0, 1, 0, 1, 11), dActionEntry (47, 0, 1, 0, 1, 11), dActionEntry (59, 0, 1, 0, 1, 11), 
-			dActionEntry (254, 0, 1, 0, 1, 11), dActionEntry (271, 0, 1, 0, 1, 11), dActionEntry (273, 0, 1, 0, 1, 11), dActionEntry (280, 0, 1, 0, 1, 11), 
-			dActionEntry (281, 0, 1, 0, 1, 11), dActionEntry (290, 0, 1, 0, 1, 11), dActionEntry (42, 0, 0, 48, 0, 0), dActionEntry (43, 0, 0, 49, 0, 0), 
-			dActionEntry (44, 0, 1, 1, 1, 16), dActionEntry (45, 0, 0, 51, 0, 0), dActionEntry (47, 0, 0, 47, 0, 0), dActionEntry (59, 0, 1, 1, 1, 16), 
-			dActionEntry (254, 0, 1, 1, 1, 16), dActionEntry (271, 0, 0, 50, 0, 0), dActionEntry (273, 0, 1, 1, 1, 16), dActionEntry (280, 0, 0, 52, 0, 0), 
-			dActionEntry (281, 0, 0, 53, 0, 0), dActionEntry (290, 0, 1, 1, 1, 16), dActionEntry (44, 0, 0, 54, 0, 0), dActionEntry (59, 0, 1, 4, 3, 21), 
-			dActionEntry (254, 0, 1, 4, 3, 21), dActionEntry (273, 0, 1, 4, 3, 21), dActionEntry (290, 0, 1, 4, 3, 21), dActionEntry (42, 0, 1, 0, 1, 9), 
+			dActionEntry (254, 0, 1, 0, 1, 10), dActionEntry (268, 0, 1, 0, 1, 10), dActionEntry (271, 0, 1, 0, 1, 10), dActionEntry (273, 0, 1, 0, 1, 10), 
+			dActionEntry (280, 0, 1, 0, 1, 10), dActionEntry (281, 0, 1, 0, 1, 10), dActionEntry (290, 0, 1, 0, 1, 10), dActionEntry (42, 0, 1, 0, 1, 11), 
+			dActionEntry (43, 0, 1, 0, 1, 11), dActionEntry (44, 0, 1, 0, 1, 11), dActionEntry (45, 0, 1, 0, 1, 11), dActionEntry (47, 0, 1, 0, 1, 11), 
+			dActionEntry (59, 0, 1, 0, 1, 11), dActionEntry (254, 0, 1, 0, 1, 11), dActionEntry (268, 0, 1, 0, 1, 11), dActionEntry (271, 0, 1, 0, 1, 11), 
+			dActionEntry (273, 0, 1, 0, 1, 11), dActionEntry (280, 0, 1, 0, 1, 11), dActionEntry (281, 0, 1, 0, 1, 11), dActionEntry (290, 0, 1, 0, 1, 11), 
+			dActionEntry (42, 0, 0, 56, 0, 0), dActionEntry (43, 0, 0, 57, 0, 0), dActionEntry (44, 0, 1, 1, 1, 16), dActionEntry (45, 0, 0, 59, 0, 0), 
+			dActionEntry (47, 0, 0, 55, 0, 0), dActionEntry (59, 0, 1, 1, 1, 16), dActionEntry (254, 0, 1, 1, 1, 16), dActionEntry (268, 0, 1, 1, 1, 16), 
+			dActionEntry (271, 0, 0, 58, 0, 0), dActionEntry (273, 0, 1, 1, 1, 16), dActionEntry (280, 0, 0, 60, 0, 0), dActionEntry (281, 0, 0, 61, 0, 0), 
+			dActionEntry (290, 0, 1, 1, 1, 16), dActionEntry (44, 0, 0, 62, 0, 0), dActionEntry (59, 0, 1, 5, 3, 23), dActionEntry (254, 0, 1, 5, 3, 23), 
+			dActionEntry (268, 0, 1, 5, 3, 23), dActionEntry (273, 0, 1, 5, 3, 23), dActionEntry (290, 0, 1, 5, 3, 23), dActionEntry (42, 0, 1, 0, 1, 9), 
 			dActionEntry (43, 0, 1, 0, 1, 9), dActionEntry (44, 0, 1, 0, 1, 9), dActionEntry (45, 0, 1, 0, 1, 9), dActionEntry (47, 0, 1, 0, 1, 9), 
-			dActionEntry (59, 0, 1, 0, 1, 9), dActionEntry (254, 0, 1, 0, 1, 9), dActionEntry (271, 0, 1, 0, 1, 9), dActionEntry (273, 0, 1, 0, 1, 9), 
-			dActionEntry (280, 0, 1, 0, 1, 9), dActionEntry (281, 0, 1, 0, 1, 9), dActionEntry (290, 0, 1, 0, 1, 9), dActionEntry (42, 0, 1, 0, 1, 14), 
-			dActionEntry (43, 0, 1, 0, 1, 14), dActionEntry (44, 0, 1, 0, 1, 14), dActionEntry (45, 0, 1, 0, 1, 14), dActionEntry (47, 0, 1, 0, 1, 14), 
-			dActionEntry (59, 0, 1, 0, 1, 14), dActionEntry (254, 0, 1, 0, 1, 14), dActionEntry (271, 0, 1, 0, 1, 14), dActionEntry (273, 0, 1, 0, 1, 14), 
-			dActionEntry (280, 0, 1, 0, 1, 14), dActionEntry (281, 0, 1, 0, 1, 14), dActionEntry (290, 0, 1, 0, 1, 14), dActionEntry (42, 0, 1, 0, 1, 15), 
-			dActionEntry (43, 0, 1, 0, 1, 15), dActionEntry (44, 0, 1, 0, 1, 15), dActionEntry (45, 0, 1, 0, 1, 15), dActionEntry (47, 0, 1, 0, 1, 15), 
-			dActionEntry (59, 0, 1, 0, 1, 15), dActionEntry (254, 0, 1, 0, 1, 15), dActionEntry (271, 0, 1, 0, 1, 15), dActionEntry (273, 0, 1, 0, 1, 15), 
-			dActionEntry (280, 0, 1, 0, 1, 15), dActionEntry (281, 0, 1, 0, 1, 15), dActionEntry (290, 0, 1, 0, 1, 15), dActionEntry (42, 0, 1, 0, 1, 13), 
-			dActionEntry (43, 0, 1, 0, 1, 13), dActionEntry (44, 0, 1, 0, 1, 13), dActionEntry (45, 0, 1, 0, 1, 13), dActionEntry (47, 0, 1, 0, 1, 13), 
-			dActionEntry (59, 0, 1, 0, 1, 13), dActionEntry (254, 0, 1, 0, 1, 13), dActionEntry (271, 0, 1, 0, 1, 13), dActionEntry (273, 0, 1, 0, 1, 13), 
+			dActionEntry (59, 0, 1, 0, 1, 9), dActionEntry (254, 0, 1, 0, 1, 9), dActionEntry (268, 0, 1, 0, 1, 9), dActionEntry (271, 0, 1, 0, 1, 9), 
+			dActionEntry (273, 0, 1, 0, 1, 9), dActionEntry (280, 0, 1, 0, 1, 9), dActionEntry (281, 0, 1, 0, 1, 9), dActionEntry (290, 0, 1, 0, 1, 9), 
+			dActionEntry (42, 0, 1, 0, 1, 14), dActionEntry (43, 0, 1, 0, 1, 14), dActionEntry (44, 0, 1, 0, 1, 14), dActionEntry (45, 0, 1, 0, 1, 14), 
+			dActionEntry (47, 0, 1, 0, 1, 14), dActionEntry (59, 0, 1, 0, 1, 14), dActionEntry (254, 0, 1, 0, 1, 14), dActionEntry (268, 0, 1, 0, 1, 14), 
+			dActionEntry (271, 0, 1, 0, 1, 14), dActionEntry (273, 0, 1, 0, 1, 14), dActionEntry (280, 0, 1, 0, 1, 14), dActionEntry (281, 0, 1, 0, 1, 14), 
+			dActionEntry (290, 0, 1, 0, 1, 14), dActionEntry (42, 0, 1, 0, 1, 15), dActionEntry (43, 0, 1, 0, 1, 15), dActionEntry (44, 0, 1, 0, 1, 15), 
+			dActionEntry (45, 0, 1, 0, 1, 15), dActionEntry (47, 0, 1, 0, 1, 15), dActionEntry (59, 0, 1, 0, 1, 15), dActionEntry (254, 0, 1, 0, 1, 15), 
+			dActionEntry (268, 0, 1, 0, 1, 15), dActionEntry (271, 0, 1, 0, 1, 15), dActionEntry (273, 0, 1, 0, 1, 15), dActionEntry (280, 0, 1, 0, 1, 15), 
+			dActionEntry (281, 0, 1, 0, 1, 15), dActionEntry (290, 0, 1, 0, 1, 15), dActionEntry (42, 0, 1, 0, 1, 13), dActionEntry (43, 0, 1, 0, 1, 13), 
+			dActionEntry (44, 0, 1, 0, 1, 13), dActionEntry (45, 0, 1, 0, 1, 13), dActionEntry (47, 0, 1, 0, 1, 13), dActionEntry (59, 0, 1, 0, 1, 13), 
+			dActionEntry (254, 0, 1, 0, 1, 13), dActionEntry (268, 0, 1, 0, 1, 13), dActionEntry (271, 0, 1, 0, 1, 13), dActionEntry (273, 0, 1, 0, 1, 13), 
 			dActionEntry (280, 0, 1, 0, 1, 13), dActionEntry (281, 0, 1, 0, 1, 13), dActionEntry (290, 0, 1, 0, 1, 13), dActionEntry (42, 0, 1, 0, 1, 12), 
 			dActionEntry (43, 0, 1, 0, 1, 12), dActionEntry (44, 0, 1, 0, 1, 12), dActionEntry (45, 0, 1, 0, 1, 12), dActionEntry (47, 0, 1, 0, 1, 12), 
-			dActionEntry (59, 0, 1, 0, 1, 12), dActionEntry (254, 0, 1, 0, 1, 12), dActionEntry (271, 0, 1, 0, 1, 12), dActionEntry (273, 0, 1, 0, 1, 12), 
-			dActionEntry (280, 0, 1, 0, 1, 12), dActionEntry (281, 0, 1, 0, 1, 12), dActionEntry (290, 0, 1, 0, 1, 12), dActionEntry (44, 0, 1, 3, 3, 20), 
-			dActionEntry (61, 0, 1, 3, 3, 20), dActionEntry (42, 0, 1, 0, 1, 10), dActionEntry (43, 0, 1, 0, 1, 10), dActionEntry (44, 0, 1, 0, 1, 10), 
-			dActionEntry (45, 0, 1, 0, 1, 10), dActionEntry (47, 0, 1, 0, 1, 10), dActionEntry (59, 0, 1, 0, 1, 10), dActionEntry (254, 0, 1, 0, 1, 10), 
-			dActionEntry (271, 0, 1, 0, 1, 10), dActionEntry (280, 0, 1, 0, 1, 10), dActionEntry (281, 0, 1, 0, 1, 10), dActionEntry (42, 0, 1, 0, 1, 11), 
-			dActionEntry (43, 0, 1, 0, 1, 11), dActionEntry (44, 0, 1, 0, 1, 11), dActionEntry (45, 0, 1, 0, 1, 11), dActionEntry (47, 0, 1, 0, 1, 11), 
-			dActionEntry (59, 0, 1, 0, 1, 11), dActionEntry (254, 0, 1, 0, 1, 11), dActionEntry (271, 0, 1, 0, 1, 11), dActionEntry (280, 0, 1, 0, 1, 11), 
-			dActionEntry (281, 0, 1, 0, 1, 11), dActionEntry (42, 0, 0, 57, 0, 0), dActionEntry (43, 0, 0, 58, 0, 0), dActionEntry (44, 0, 1, 1, 1, 16), 
-			dActionEntry (45, 0, 0, 60, 0, 0), dActionEntry (47, 0, 0, 56, 0, 0), dActionEntry (59, 0, 1, 1, 1, 16), dActionEntry (254, 0, 1, 1, 1, 16), 
-			dActionEntry (271, 0, 0, 59, 0, 0), dActionEntry (280, 0, 0, 61, 0, 0), dActionEntry (281, 0, 0, 62, 0, 0), dActionEntry (44, 0, 0, 64, 0, 0), 
-			dActionEntry (59, 0, 0, 63, 0, 0), dActionEntry (254, 0, 1, 7, 2, 28), dActionEntry (42, 0, 1, 0, 1, 9), dActionEntry (43, 0, 1, 0, 1, 9), 
-			dActionEntry (44, 0, 1, 0, 1, 9), dActionEntry (45, 0, 1, 0, 1, 9), dActionEntry (47, 0, 1, 0, 1, 9), dActionEntry (59, 0, 1, 0, 1, 9), 
-			dActionEntry (254, 0, 1, 0, 1, 9), dActionEntry (271, 0, 1, 0, 1, 9), dActionEntry (280, 0, 1, 0, 1, 9), dActionEntry (281, 0, 1, 0, 1, 9), 
-			dActionEntry (254, 0, 1, 7, 2, 27), dActionEntry (42, 0, 1, 0, 1, 14), dActionEntry (43, 0, 1, 0, 1, 14), dActionEntry (44, 0, 1, 0, 1, 14), 
-			dActionEntry (45, 0, 1, 0, 1, 14), dActionEntry (47, 0, 1, 0, 1, 14), dActionEntry (59, 0, 1, 0, 1, 14), dActionEntry (254, 0, 1, 0, 1, 14), 
-			dActionEntry (271, 0, 1, 0, 1, 14), dActionEntry (280, 0, 1, 0, 1, 14), dActionEntry (281, 0, 1, 0, 1, 14), dActionEntry (42, 0, 1, 0, 1, 15), 
-			dActionEntry (43, 0, 1, 0, 1, 15), dActionEntry (44, 0, 1, 0, 1, 15), dActionEntry (45, 0, 1, 0, 1, 15), dActionEntry (47, 0, 1, 0, 1, 15), 
-			dActionEntry (59, 0, 1, 0, 1, 15), dActionEntry (254, 0, 1, 0, 1, 15), dActionEntry (271, 0, 1, 0, 1, 15), dActionEntry (280, 0, 1, 0, 1, 15), 
-			dActionEntry (281, 0, 1, 0, 1, 15), dActionEntry (42, 0, 1, 0, 1, 13), dActionEntry (43, 0, 1, 0, 1, 13), dActionEntry (44, 0, 1, 0, 1, 13), 
-			dActionEntry (45, 0, 1, 0, 1, 13), dActionEntry (47, 0, 1, 0, 1, 13), dActionEntry (59, 0, 1, 0, 1, 13), dActionEntry (254, 0, 1, 0, 1, 13), 
-			dActionEntry (271, 0, 1, 0, 1, 13), dActionEntry (280, 0, 1, 0, 1, 13), dActionEntry (281, 0, 1, 0, 1, 13), dActionEntry (42, 0, 1, 0, 1, 12), 
-			dActionEntry (43, 0, 1, 0, 1, 12), dActionEntry (44, 0, 1, 0, 1, 12), dActionEntry (45, 0, 1, 0, 1, 12), dActionEntry (47, 0, 1, 0, 1, 12), 
-			dActionEntry (59, 0, 1, 0, 1, 12), dActionEntry (254, 0, 1, 0, 1, 12), dActionEntry (271, 0, 1, 0, 1, 12), dActionEntry (280, 0, 1, 0, 1, 12), 
-			dActionEntry (281, 0, 1, 0, 1, 12), dActionEntry (41, 0, 1, 0, 1, 10), dActionEntry (42, 0, 1, 0, 1, 10), dActionEntry (43, 0, 1, 0, 1, 10), 
+			dActionEntry (59, 0, 1, 0, 1, 12), dActionEntry (254, 0, 1, 0, 1, 12), dActionEntry (268, 0, 1, 0, 1, 12), dActionEntry (271, 0, 1, 0, 1, 12), 
+			dActionEntry (273, 0, 1, 0, 1, 12), dActionEntry (280, 0, 1, 0, 1, 12), dActionEntry (281, 0, 1, 0, 1, 12), dActionEntry (290, 0, 1, 0, 1, 12), 
+			dActionEntry (44, 0, 1, 4, 3, 22), dActionEntry (61, 0, 1, 4, 3, 22), dActionEntry (42, 0, 1, 0, 1, 10), dActionEntry (43, 0, 1, 0, 1, 10), 
+			dActionEntry (44, 0, 1, 0, 1, 10), dActionEntry (45, 0, 1, 0, 1, 10), dActionEntry (47, 0, 1, 0, 1, 10), dActionEntry (59, 0, 1, 0, 1, 10), 
+			dActionEntry (254, 0, 1, 0, 1, 10), dActionEntry (271, 0, 1, 0, 1, 10), dActionEntry (280, 0, 1, 0, 1, 10), dActionEntry (281, 0, 1, 0, 1, 10), 
+			dActionEntry (42, 0, 1, 0, 1, 11), dActionEntry (43, 0, 1, 0, 1, 11), dActionEntry (44, 0, 1, 0, 1, 11), dActionEntry (45, 0, 1, 0, 1, 11), 
+			dActionEntry (47, 0, 1, 0, 1, 11), dActionEntry (59, 0, 1, 0, 1, 11), dActionEntry (254, 0, 1, 0, 1, 11), dActionEntry (271, 0, 1, 0, 1, 11), 
+			dActionEntry (280, 0, 1, 0, 1, 11), dActionEntry (281, 0, 1, 0, 1, 11), dActionEntry (42, 0, 0, 65, 0, 0), dActionEntry (43, 0, 0, 66, 0, 0), 
+			dActionEntry (44, 0, 1, 1, 1, 16), dActionEntry (45, 0, 0, 68, 0, 0), dActionEntry (47, 0, 0, 64, 0, 0), dActionEntry (59, 0, 1, 1, 1, 16), 
+			dActionEntry (254, 0, 1, 1, 1, 16), dActionEntry (271, 0, 0, 67, 0, 0), dActionEntry (280, 0, 0, 69, 0, 0), dActionEntry (281, 0, 0, 70, 0, 0), 
+			dActionEntry (44, 0, 0, 72, 0, 0), dActionEntry (59, 0, 0, 71, 0, 0), dActionEntry (254, 0, 1, 10, 2, 34), dActionEntry (42, 0, 1, 0, 1, 9), 
+			dActionEntry (43, 0, 1, 0, 1, 9), dActionEntry (44, 0, 1, 0, 1, 9), dActionEntry (45, 0, 1, 0, 1, 9), dActionEntry (47, 0, 1, 0, 1, 9), 
+			dActionEntry (59, 0, 1, 0, 1, 9), dActionEntry (254, 0, 1, 0, 1, 9), dActionEntry (271, 0, 1, 0, 1, 9), dActionEntry (280, 0, 1, 0, 1, 9), 
+			dActionEntry (281, 0, 1, 0, 1, 9), dActionEntry (254, 0, 1, 10, 2, 33), dActionEntry (42, 0, 1, 0, 1, 14), dActionEntry (43, 0, 1, 0, 1, 14), 
+			dActionEntry (44, 0, 1, 0, 1, 14), dActionEntry (45, 0, 1, 0, 1, 14), dActionEntry (47, 0, 1, 0, 1, 14), dActionEntry (59, 0, 1, 0, 1, 14), 
+			dActionEntry (254, 0, 1, 0, 1, 14), dActionEntry (271, 0, 1, 0, 1, 14), dActionEntry (280, 0, 1, 0, 1, 14), dActionEntry (281, 0, 1, 0, 1, 14), 
+			dActionEntry (42, 0, 1, 0, 1, 15), dActionEntry (43, 0, 1, 0, 1, 15), dActionEntry (44, 0, 1, 0, 1, 15), dActionEntry (45, 0, 1, 0, 1, 15), 
+			dActionEntry (47, 0, 1, 0, 1, 15), dActionEntry (59, 0, 1, 0, 1, 15), dActionEntry (254, 0, 1, 0, 1, 15), dActionEntry (271, 0, 1, 0, 1, 15), 
+			dActionEntry (280, 0, 1, 0, 1, 15), dActionEntry (281, 0, 1, 0, 1, 15), dActionEntry (42, 0, 1, 0, 1, 13), dActionEntry (43, 0, 1, 0, 1, 13), 
+			dActionEntry (44, 0, 1, 0, 1, 13), dActionEntry (45, 0, 1, 0, 1, 13), dActionEntry (47, 0, 1, 0, 1, 13), dActionEntry (59, 0, 1, 0, 1, 13), 
+			dActionEntry (254, 0, 1, 0, 1, 13), dActionEntry (271, 0, 1, 0, 1, 13), dActionEntry (280, 0, 1, 0, 1, 13), dActionEntry (281, 0, 1, 0, 1, 13), 
+			dActionEntry (42, 0, 1, 0, 1, 12), dActionEntry (43, 0, 1, 0, 1, 12), dActionEntry (44, 0, 1, 0, 1, 12), dActionEntry (45, 0, 1, 0, 1, 12), 
+			dActionEntry (47, 0, 1, 0, 1, 12), dActionEntry (59, 0, 1, 0, 1, 12), dActionEntry (254, 0, 1, 0, 1, 12), dActionEntry (271, 0, 1, 0, 1, 12), 
+			dActionEntry (280, 0, 1, 0, 1, 12), dActionEntry (281, 0, 1, 0, 1, 12), dActionEntry (290, 0, 0, 73, 0, 0), dActionEntry (44, 0, 0, 62, 0, 0), 
+			dActionEntry (59, 0, 1, 7, 3, 26), dActionEntry (254, 0, 1, 7, 3, 26), dActionEntry (268, 0, 1, 7, 3, 26), dActionEntry (273, 0, 1, 7, 3, 26), 
+			dActionEntry (290, 0, 1, 7, 3, 26), dActionEntry (41, 0, 1, 0, 1, 10), dActionEntry (42, 0, 1, 0, 1, 10), dActionEntry (43, 0, 1, 0, 1, 10), 
 			dActionEntry (45, 0, 1, 0, 1, 10), dActionEntry (47, 0, 1, 0, 1, 10), dActionEntry (271, 0, 1, 0, 1, 10), dActionEntry (280, 0, 1, 0, 1, 10), 
 			dActionEntry (281, 0, 1, 0, 1, 10), dActionEntry (41, 0, 1, 0, 1, 11), dActionEntry (42, 0, 1, 0, 1, 11), dActionEntry (43, 0, 1, 0, 1, 11), 
 			dActionEntry (45, 0, 1, 0, 1, 11), dActionEntry (47, 0, 1, 0, 1, 11), dActionEntry (271, 0, 1, 0, 1, 11), dActionEntry (280, 0, 1, 0, 1, 11), 
-			dActionEntry (281, 0, 1, 0, 1, 11), dActionEntry (41, 0, 0, 72, 0, 0), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 0, 68, 0, 0), 
-			dActionEntry (45, 0, 0, 70, 0, 0), dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 0, 69, 0, 0), dActionEntry (280, 0, 0, 71, 0, 0), 
-			dActionEntry (281, 0, 0, 73, 0, 0), dActionEntry (41, 0, 1, 0, 1, 9), dActionEntry (42, 0, 1, 0, 1, 9), dActionEntry (43, 0, 1, 0, 1, 9), 
+			dActionEntry (281, 0, 1, 0, 1, 11), dActionEntry (41, 0, 0, 81, 0, 0), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 0, 77, 0, 0), 
+			dActionEntry (45, 0, 0, 79, 0, 0), dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 0, 78, 0, 0), dActionEntry (280, 0, 0, 80, 0, 0), 
+			dActionEntry (281, 0, 0, 82, 0, 0), dActionEntry (41, 0, 1, 0, 1, 9), dActionEntry (42, 0, 1, 0, 1, 9), dActionEntry (43, 0, 1, 0, 1, 9), 
 			dActionEntry (45, 0, 1, 0, 1, 9), dActionEntry (47, 0, 1, 0, 1, 9), dActionEntry (271, 0, 1, 0, 1, 9), dActionEntry (280, 0, 1, 0, 1, 9), 
 			dActionEntry (281, 0, 1, 0, 1, 9), dActionEntry (41, 0, 1, 0, 1, 14), dActionEntry (42, 0, 1, 0, 1, 14), dActionEntry (43, 0, 1, 0, 1, 14), 
 			dActionEntry (45, 0, 1, 0, 1, 14), dActionEntry (47, 0, 1, 0, 1, 14), dActionEntry (271, 0, 1, 0, 1, 14), dActionEntry (280, 0, 1, 0, 1, 14), 
@@ -247,44 +259,48 @@ const dNewtonLuaParcer::dActionEntry* dNewtonLuaParcer::GetNextAction (dList<dSt
 			dActionEntry (45, 0, 1, 0, 1, 13), dActionEntry (47, 0, 1, 0, 1, 13), dActionEntry (271, 0, 1, 0, 1, 13), dActionEntry (280, 0, 1, 0, 1, 13), 
 			dActionEntry (281, 0, 1, 0, 1, 13), dActionEntry (41, 0, 1, 0, 1, 12), dActionEntry (42, 0, 1, 0, 1, 12), dActionEntry (43, 0, 1, 0, 1, 12), 
 			dActionEntry (45, 0, 1, 0, 1, 12), dActionEntry (47, 0, 1, 0, 1, 12), dActionEntry (271, 0, 1, 0, 1, 12), dActionEntry (280, 0, 1, 0, 1, 12), 
-			dActionEntry (281, 0, 1, 0, 1, 12), dActionEntry (40, 0, 0, 81, 0, 0), dActionEntry (262, 0, 0, 83, 0, 0), dActionEntry (269, 0, 0, 85, 0, 0), 
-			dActionEntry (275, 0, 0, 82, 0, 0), dActionEntry (288, 0, 0, 87, 0, 0), dActionEntry (289, 0, 0, 89, 0, 0), dActionEntry (290, 0, 0, 88, 0, 0), 
-			dActionEntry (291, 0, 0, 86, 0, 0), dActionEntry (41, 0, 0, 90, 0, 0), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 0, 68, 0, 0), 
-			dActionEntry (45, 0, 0, 70, 0, 0), dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 0, 69, 0, 0), dActionEntry (280, 0, 0, 71, 0, 0), 
-			dActionEntry (281, 0, 0, 73, 0, 0), dActionEntry (40, 0, 0, 27, 0, 0), dActionEntry (262, 0, 0, 29, 0, 0), dActionEntry (269, 0, 0, 32, 0, 0), 
-			dActionEntry (275, 0, 0, 28, 0, 0), dActionEntry (288, 0, 0, 35, 0, 0), dActionEntry (289, 0, 0, 37, 0, 0), dActionEntry (290, 0, 0, 36, 0, 0), 
-			dActionEntry (291, 0, 0, 34, 0, 0), dActionEntry (254, 0, 1, 7, 3, 29), dActionEntry (40, 0, 0, 98, 0, 0), dActionEntry (262, 0, 0, 100, 0, 0), 
-			dActionEntry (269, 0, 0, 102, 0, 0), dActionEntry (275, 0, 0, 99, 0, 0), dActionEntry (288, 0, 0, 104, 0, 0), dActionEntry (289, 0, 0, 106, 0, 0), 
-			dActionEntry (290, 0, 0, 105, 0, 0), dActionEntry (291, 0, 0, 103, 0, 0), dActionEntry (41, 0, 0, 107, 0, 0), dActionEntry (42, 0, 0, 67, 0, 0), 
-			dActionEntry (43, 0, 0, 68, 0, 0), dActionEntry (45, 0, 0, 70, 0, 0), dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 0, 69, 0, 0), 
-			dActionEntry (280, 0, 0, 71, 0, 0), dActionEntry (281, 0, 0, 73, 0, 0), dActionEntry (42, 0, 1, 0, 3, 8), dActionEntry (43, 0, 1, 0, 3, 8), 
-			dActionEntry (44, 0, 1, 0, 3, 8), dActionEntry (45, 0, 1, 0, 3, 8), dActionEntry (47, 0, 1, 0, 3, 8), dActionEntry (59, 0, 1, 0, 3, 8), 
-			dActionEntry (254, 0, 1, 0, 3, 8), dActionEntry (271, 0, 1, 0, 3, 8), dActionEntry (273, 0, 1, 0, 3, 8), dActionEntry (280, 0, 1, 0, 3, 8), 
+			dActionEntry (281, 0, 1, 0, 1, 12), dActionEntry (40, 0, 0, 90, 0, 0), dActionEntry (262, 0, 0, 92, 0, 0), dActionEntry (269, 0, 0, 94, 0, 0), 
+			dActionEntry (275, 0, 0, 91, 0, 0), dActionEntry (288, 0, 0, 96, 0, 0), dActionEntry (289, 0, 0, 98, 0, 0), dActionEntry (290, 0, 0, 97, 0, 0), 
+			dActionEntry (291, 0, 0, 95, 0, 0), dActionEntry (41, 0, 0, 99, 0, 0), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 0, 77, 0, 0), 
+			dActionEntry (45, 0, 0, 79, 0, 0), dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 0, 78, 0, 0), dActionEntry (280, 0, 0, 80, 0, 0), 
+			dActionEntry (281, 0, 0, 82, 0, 0), dActionEntry (40, 0, 0, 33, 0, 0), dActionEntry (262, 0, 0, 35, 0, 0), dActionEntry (269, 0, 0, 38, 0, 0), 
+			dActionEntry (275, 0, 0, 34, 0, 0), dActionEntry (288, 0, 0, 41, 0, 0), dActionEntry (289, 0, 0, 43, 0, 0), dActionEntry (290, 0, 0, 42, 0, 0), 
+			dActionEntry (291, 0, 0, 40, 0, 0), dActionEntry (254, 0, 1, 10, 3, 35), dActionEntry (40, 0, 0, 107, 0, 0), dActionEntry (262, 0, 0, 109, 0, 0), 
+			dActionEntry (269, 0, 0, 111, 0, 0), dActionEntry (275, 0, 0, 108, 0, 0), dActionEntry (288, 0, 0, 113, 0, 0), dActionEntry (289, 0, 0, 115, 0, 0), 
+			dActionEntry (290, 0, 0, 114, 0, 0), dActionEntry (291, 0, 0, 112, 0, 0), dActionEntry (44, 0, 1, 2, 3, 19), dActionEntry (59, 0, 1, 2, 3, 19), 
+			dActionEntry (61, 0, 1, 2, 3, 19), dActionEntry (254, 0, 1, 2, 3, 19), dActionEntry (268, 0, 1, 2, 3, 19), dActionEntry (273, 0, 1, 2, 3, 19), 
+			dActionEntry (290, 0, 1, 2, 3, 19), dActionEntry (41, 0, 0, 116, 0, 0), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 0, 77, 0, 0), 
+			dActionEntry (45, 0, 0, 79, 0, 0), dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 0, 78, 0, 0), dActionEntry (280, 0, 0, 80, 0, 0), 
+			dActionEntry (281, 0, 0, 82, 0, 0), dActionEntry (42, 0, 1, 0, 3, 8), dActionEntry (43, 0, 1, 0, 3, 8), dActionEntry (44, 0, 1, 0, 3, 8), 
+			dActionEntry (45, 0, 1, 0, 3, 8), dActionEntry (47, 0, 1, 0, 3, 8), dActionEntry (59, 0, 1, 0, 3, 8), dActionEntry (254, 0, 1, 0, 3, 8), 
+			dActionEntry (268, 0, 1, 0, 3, 8), dActionEntry (271, 0, 1, 0, 3, 8), dActionEntry (273, 0, 1, 0, 3, 8), dActionEntry (280, 0, 1, 0, 3, 8), 
 			dActionEntry (281, 0, 1, 0, 3, 8), dActionEntry (290, 0, 1, 0, 3, 8), dActionEntry (42, 0, 1, 0, 3, 6), dActionEntry (43, 0, 1, 0, 3, 6), 
 			dActionEntry (44, 0, 1, 0, 3, 6), dActionEntry (45, 0, 1, 0, 3, 6), dActionEntry (47, 0, 1, 0, 3, 6), dActionEntry (59, 0, 1, 0, 3, 6), 
-			dActionEntry (254, 0, 1, 0, 3, 6), dActionEntry (271, 0, 1, 0, 3, 6), dActionEntry (273, 0, 1, 0, 3, 6), dActionEntry (280, 0, 1, 0, 3, 6), 
-			dActionEntry (281, 0, 1, 0, 3, 6), dActionEntry (290, 0, 1, 0, 3, 6), dActionEntry (42, 0, 1, 0, 3, 5), dActionEntry (43, 0, 1, 0, 3, 5), 
-			dActionEntry (44, 0, 1, 0, 3, 5), dActionEntry (45, 0, 1, 0, 3, 5), dActionEntry (47, 0, 1, 0, 3, 5), dActionEntry (59, 0, 1, 0, 3, 5), 
-			dActionEntry (254, 0, 1, 0, 3, 5), dActionEntry (271, 0, 1, 0, 3, 5), dActionEntry (273, 0, 1, 0, 3, 5), dActionEntry (280, 0, 1, 0, 3, 5), 
-			dActionEntry (281, 0, 1, 0, 3, 5), dActionEntry (290, 0, 1, 0, 3, 5), dActionEntry (42, 0, 0, 48, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), 
-			dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), dActionEntry (47, 0, 0, 47, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), 
-			dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (271, 0, 1, 0, 3, 3), dActionEntry (273, 0, 1, 0, 3, 3), dActionEntry (280, 0, 0, 52, 0, 0), 
-			dActionEntry (281, 0, 1, 0, 3, 3), dActionEntry (290, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 48, 0, 0), dActionEntry (43, 0, 0, 49, 0, 0), 
-			dActionEntry (44, 0, 1, 0, 3, 1), dActionEntry (45, 0, 0, 51, 0, 0), dActionEntry (47, 0, 0, 47, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), 
-			dActionEntry (254, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (273, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 52, 0, 0), 
-			dActionEntry (281, 0, 0, 53, 0, 0), dActionEntry (290, 0, 1, 0, 3, 1), dActionEntry (42, 0, 0, 48, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), 
-			dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), dActionEntry (47, 0, 0, 47, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), 
-			dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), dActionEntry (273, 0, 1, 0, 3, 4), dActionEntry (280, 0, 0, 52, 0, 0), 
-			dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (290, 0, 1, 0, 3, 4), dActionEntry (42, 0, 1, 0, 3, 7), dActionEntry (43, 0, 1, 0, 3, 7), 
-			dActionEntry (44, 0, 1, 0, 3, 7), dActionEntry (45, 0, 1, 0, 3, 7), dActionEntry (47, 0, 1, 0, 3, 7), dActionEntry (59, 0, 1, 0, 3, 7), 
-			dActionEntry (254, 0, 1, 0, 3, 7), dActionEntry (271, 0, 1, 0, 3, 7), dActionEntry (273, 0, 1, 0, 3, 7), dActionEntry (280, 0, 1, 0, 3, 7), 
-			dActionEntry (281, 0, 1, 0, 3, 7), dActionEntry (290, 0, 1, 0, 3, 7), dActionEntry (42, 0, 0, 48, 0, 0), dActionEntry (43, 0, 0, 49, 0, 0), 
-			dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 51, 0, 0), dActionEntry (47, 0, 0, 47, 0, 0), dActionEntry (59, 0, 1, 0, 3, 2), 
-			dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (271, 0, 1, 0, 3, 2), dActionEntry (273, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 52, 0, 0), 
-			dActionEntry (281, 0, 1, 0, 3, 2), dActionEntry (290, 0, 1, 0, 3, 2), dActionEntry (42, 0, 0, 117, 0, 0), dActionEntry (43, 0, 0, 118, 0, 0), 
-			dActionEntry (44, 0, 1, 1, 3, 17), dActionEntry (45, 0, 0, 120, 0, 0), dActionEntry (47, 0, 0, 116, 0, 0), dActionEntry (59, 0, 1, 1, 3, 17), 
-			dActionEntry (254, 0, 1, 1, 3, 17), dActionEntry (271, 0, 0, 119, 0, 0), dActionEntry (273, 0, 1, 1, 3, 17), dActionEntry (280, 0, 0, 121, 0, 0), 
-			dActionEntry (281, 0, 0, 122, 0, 0), dActionEntry (290, 0, 1, 1, 3, 17), dActionEntry (42, 0, 1, 0, 3, 8), dActionEntry (43, 0, 1, 0, 3, 8), 
+			dActionEntry (254, 0, 1, 0, 3, 6), dActionEntry (268, 0, 1, 0, 3, 6), dActionEntry (271, 0, 1, 0, 3, 6), dActionEntry (273, 0, 1, 0, 3, 6), 
+			dActionEntry (280, 0, 1, 0, 3, 6), dActionEntry (281, 0, 1, 0, 3, 6), dActionEntry (290, 0, 1, 0, 3, 6), dActionEntry (42, 0, 1, 0, 3, 5), 
+			dActionEntry (43, 0, 1, 0, 3, 5), dActionEntry (44, 0, 1, 0, 3, 5), dActionEntry (45, 0, 1, 0, 3, 5), dActionEntry (47, 0, 1, 0, 3, 5), 
+			dActionEntry (59, 0, 1, 0, 3, 5), dActionEntry (254, 0, 1, 0, 3, 5), dActionEntry (268, 0, 1, 0, 3, 5), dActionEntry (271, 0, 1, 0, 3, 5), 
+			dActionEntry (273, 0, 1, 0, 3, 5), dActionEntry (280, 0, 1, 0, 3, 5), dActionEntry (281, 0, 1, 0, 3, 5), dActionEntry (290, 0, 1, 0, 3, 5), 
+			dActionEntry (42, 0, 0, 56, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
+			dActionEntry (47, 0, 0, 55, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (268, 0, 1, 0, 3, 3), 
+			dActionEntry (271, 0, 1, 0, 3, 3), dActionEntry (273, 0, 1, 0, 3, 3), dActionEntry (280, 0, 0, 60, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), 
+			dActionEntry (290, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 56, 0, 0), dActionEntry (43, 0, 0, 57, 0, 0), dActionEntry (44, 0, 1, 0, 3, 1), 
+			dActionEntry (45, 0, 0, 59, 0, 0), dActionEntry (47, 0, 0, 55, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), dActionEntry (254, 0, 1, 0, 3, 1), 
+			dActionEntry (268, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (273, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 60, 0, 0), 
+			dActionEntry (281, 0, 0, 61, 0, 0), dActionEntry (290, 0, 1, 0, 3, 1), dActionEntry (42, 0, 0, 56, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), 
+			dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), dActionEntry (47, 0, 0, 55, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), 
+			dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (268, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), dActionEntry (273, 0, 1, 0, 3, 4), 
+			dActionEntry (280, 0, 0, 60, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (290, 0, 1, 0, 3, 4), dActionEntry (42, 0, 1, 0, 3, 7), 
+			dActionEntry (43, 0, 1, 0, 3, 7), dActionEntry (44, 0, 1, 0, 3, 7), dActionEntry (45, 0, 1, 0, 3, 7), dActionEntry (47, 0, 1, 0, 3, 7), 
+			dActionEntry (59, 0, 1, 0, 3, 7), dActionEntry (254, 0, 1, 0, 3, 7), dActionEntry (268, 0, 1, 0, 3, 7), dActionEntry (271, 0, 1, 0, 3, 7), 
+			dActionEntry (273, 0, 1, 0, 3, 7), dActionEntry (280, 0, 1, 0, 3, 7), dActionEntry (281, 0, 1, 0, 3, 7), dActionEntry (290, 0, 1, 0, 3, 7), 
+			dActionEntry (42, 0, 0, 56, 0, 0), dActionEntry (43, 0, 0, 57, 0, 0), dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 59, 0, 0), 
+			dActionEntry (47, 0, 0, 55, 0, 0), dActionEntry (59, 0, 1, 0, 3, 2), dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (268, 0, 1, 0, 3, 2), 
+			dActionEntry (271, 0, 1, 0, 3, 2), dActionEntry (273, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 60, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2), 
+			dActionEntry (290, 0, 1, 0, 3, 2), dActionEntry (42, 0, 0, 126, 0, 0), dActionEntry (43, 0, 0, 127, 0, 0), dActionEntry (44, 0, 1, 1, 3, 17), 
+			dActionEntry (45, 0, 0, 129, 0, 0), dActionEntry (47, 0, 0, 125, 0, 0), dActionEntry (59, 0, 1, 1, 3, 17), dActionEntry (254, 0, 1, 1, 3, 17), 
+			dActionEntry (268, 0, 1, 1, 3, 17), dActionEntry (271, 0, 0, 128, 0, 0), dActionEntry (273, 0, 1, 1, 3, 17), dActionEntry (280, 0, 0, 130, 0, 0), 
+			dActionEntry (281, 0, 0, 131, 0, 0), dActionEntry (290, 0, 1, 1, 3, 17), dActionEntry (42, 0, 1, 0, 3, 8), dActionEntry (43, 0, 1, 0, 3, 8), 
 			dActionEntry (44, 0, 1, 0, 3, 8), dActionEntry (45, 0, 1, 0, 3, 8), dActionEntry (47, 0, 1, 0, 3, 8), dActionEntry (59, 0, 1, 0, 3, 8), 
 			dActionEntry (254, 0, 1, 0, 3, 8), dActionEntry (271, 0, 1, 0, 3, 8), dActionEntry (280, 0, 1, 0, 3, 8), dActionEntry (281, 0, 1, 0, 3, 8), 
 			dActionEntry (42, 0, 1, 0, 3, 6), dActionEntry (43, 0, 1, 0, 3, 6), dActionEntry (44, 0, 1, 0, 3, 6), dActionEntry (45, 0, 1, 0, 3, 6), 
@@ -292,63 +308,64 @@ const dNewtonLuaParcer::dActionEntry* dNewtonLuaParcer::GetNextAction (dList<dSt
 			dActionEntry (280, 0, 1, 0, 3, 6), dActionEntry (281, 0, 1, 0, 3, 6), dActionEntry (42, 0, 1, 0, 3, 5), dActionEntry (43, 0, 1, 0, 3, 5), 
 			dActionEntry (44, 0, 1, 0, 3, 5), dActionEntry (45, 0, 1, 0, 3, 5), dActionEntry (47, 0, 1, 0, 3, 5), dActionEntry (59, 0, 1, 0, 3, 5), 
 			dActionEntry (254, 0, 1, 0, 3, 5), dActionEntry (271, 0, 1, 0, 3, 5), dActionEntry (280, 0, 1, 0, 3, 5), dActionEntry (281, 0, 1, 0, 3, 5), 
-			dActionEntry (42, 0, 0, 57, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
-			dActionEntry (47, 0, 0, 56, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (271, 0, 1, 0, 3, 3), 
-			dActionEntry (280, 0, 0, 61, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 57, 0, 0), dActionEntry (43, 0, 0, 58, 0, 0), 
-			dActionEntry (44, 0, 1, 0, 3, 1), dActionEntry (45, 0, 0, 60, 0, 0), dActionEntry (47, 0, 0, 56, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), 
-			dActionEntry (254, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 61, 0, 0), dActionEntry (281, 0, 0, 62, 0, 0), 
-			dActionEntry (42, 0, 0, 57, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), 
-			dActionEntry (47, 0, 0, 56, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), 
-			dActionEntry (280, 0, 0, 61, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (42, 0, 1, 0, 3, 7), dActionEntry (43, 0, 1, 0, 3, 7), 
+			dActionEntry (42, 0, 0, 65, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
+			dActionEntry (47, 0, 0, 64, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (271, 0, 1, 0, 3, 3), 
+			dActionEntry (280, 0, 0, 69, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 65, 0, 0), dActionEntry (43, 0, 0, 66, 0, 0), 
+			dActionEntry (44, 0, 1, 0, 3, 1), dActionEntry (45, 0, 0, 68, 0, 0), dActionEntry (47, 0, 0, 64, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), 
+			dActionEntry (254, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 69, 0, 0), dActionEntry (281, 0, 0, 70, 0, 0), 
+			dActionEntry (42, 0, 0, 65, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), 
+			dActionEntry (47, 0, 0, 64, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), 
+			dActionEntry (280, 0, 0, 69, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (42, 0, 1, 0, 3, 7), dActionEntry (43, 0, 1, 0, 3, 7), 
 			dActionEntry (44, 0, 1, 0, 3, 7), dActionEntry (45, 0, 1, 0, 3, 7), dActionEntry (47, 0, 1, 0, 3, 7), dActionEntry (59, 0, 1, 0, 3, 7), 
 			dActionEntry (254, 0, 1, 0, 3, 7), dActionEntry (271, 0, 1, 0, 3, 7), dActionEntry (280, 0, 1, 0, 3, 7), dActionEntry (281, 0, 1, 0, 3, 7), 
-			dActionEntry (42, 0, 0, 57, 0, 0), dActionEntry (43, 0, 0, 58, 0, 0), dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 60, 0, 0), 
-			dActionEntry (47, 0, 0, 56, 0, 0), dActionEntry (59, 0, 1, 0, 3, 2), dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (271, 0, 1, 0, 3, 2), 
-			dActionEntry (280, 0, 0, 61, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2), dActionEntry (42, 0, 0, 125, 0, 0), dActionEntry (43, 0, 0, 126, 0, 0), 
-			dActionEntry (44, 0, 1, 1, 3, 17), dActionEntry (45, 0, 0, 128, 0, 0), dActionEntry (47, 0, 0, 124, 0, 0), dActionEntry (59, 0, 1, 1, 3, 17), 
-			dActionEntry (254, 0, 1, 1, 3, 17), dActionEntry (271, 0, 0, 127, 0, 0), dActionEntry (280, 0, 0, 129, 0, 0), dActionEntry (281, 0, 0, 130, 0, 0), 
+			dActionEntry (42, 0, 0, 65, 0, 0), dActionEntry (43, 0, 0, 66, 0, 0), dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 68, 0, 0), 
+			dActionEntry (47, 0, 0, 64, 0, 0), dActionEntry (59, 0, 1, 0, 3, 2), dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (271, 0, 1, 0, 3, 2), 
+			dActionEntry (280, 0, 0, 69, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2), dActionEntry (42, 0, 0, 134, 0, 0), dActionEntry (43, 0, 0, 135, 0, 0), 
+			dActionEntry (44, 0, 1, 1, 3, 17), dActionEntry (45, 0, 0, 137, 0, 0), dActionEntry (47, 0, 0, 133, 0, 0), dActionEntry (59, 0, 1, 1, 3, 17), 
+			dActionEntry (254, 0, 1, 1, 3, 17), dActionEntry (271, 0, 0, 136, 0, 0), dActionEntry (280, 0, 0, 138, 0, 0), dActionEntry (281, 0, 0, 139, 0, 0), 
 			dActionEntry (41, 0, 1, 0, 3, 8), dActionEntry (42, 0, 1, 0, 3, 8), dActionEntry (43, 0, 1, 0, 3, 8), dActionEntry (45, 0, 1, 0, 3, 8), 
 			dActionEntry (47, 0, 1, 0, 3, 8), dActionEntry (271, 0, 1, 0, 3, 8), dActionEntry (280, 0, 1, 0, 3, 8), dActionEntry (281, 0, 1, 0, 3, 8), 
 			dActionEntry (41, 0, 1, 0, 3, 6), dActionEntry (42, 0, 1, 0, 3, 6), dActionEntry (43, 0, 1, 0, 3, 6), dActionEntry (45, 0, 1, 0, 3, 6), 
 			dActionEntry (47, 0, 1, 0, 3, 6), dActionEntry (271, 0, 1, 0, 3, 6), dActionEntry (280, 0, 1, 0, 3, 6), dActionEntry (281, 0, 1, 0, 3, 6), 
 			dActionEntry (41, 0, 1, 0, 3, 5), dActionEntry (42, 0, 1, 0, 3, 5), dActionEntry (43, 0, 1, 0, 3, 5), dActionEntry (45, 0, 1, 0, 3, 5), 
 			dActionEntry (47, 0, 1, 0, 3, 5), dActionEntry (271, 0, 1, 0, 3, 5), dActionEntry (280, 0, 1, 0, 3, 5), dActionEntry (281, 0, 1, 0, 3, 5), 
-			dActionEntry (41, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
-			dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 1, 0, 3, 3), dActionEntry (280, 0, 0, 71, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), 
-			dActionEntry (41, 0, 1, 0, 3, 1), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 0, 68, 0, 0), dActionEntry (45, 0, 0, 70, 0, 0), 
-			dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 71, 0, 0), dActionEntry (281, 0, 0, 73, 0, 0), 
-			dActionEntry (41, 0, 1, 0, 3, 4), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), 
-			dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 1, 0, 3, 4), dActionEntry (280, 0, 0, 71, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), 
+			dActionEntry (41, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
+			dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 1, 0, 3, 3), dActionEntry (280, 0, 0, 80, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), 
+			dActionEntry (41, 0, 1, 0, 3, 1), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 0, 77, 0, 0), dActionEntry (45, 0, 0, 79, 0, 0), 
+			dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 80, 0, 0), dActionEntry (281, 0, 0, 82, 0, 0), 
+			dActionEntry (41, 0, 1, 0, 3, 4), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), 
+			dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 1, 0, 3, 4), dActionEntry (280, 0, 0, 80, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), 
 			dActionEntry (41, 0, 1, 0, 3, 7), dActionEntry (42, 0, 1, 0, 3, 7), dActionEntry (43, 0, 1, 0, 3, 7), dActionEntry (45, 0, 1, 0, 3, 7), 
 			dActionEntry (47, 0, 1, 0, 3, 7), dActionEntry (271, 0, 1, 0, 3, 7), dActionEntry (280, 0, 1, 0, 3, 7), dActionEntry (281, 0, 1, 0, 3, 7), 
-			dActionEntry (41, 0, 1, 0, 3, 2), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 0, 68, 0, 0), dActionEntry (45, 0, 0, 70, 0, 0), 
-			dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 71, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2), 
-			dActionEntry (41, 0, 0, 131, 0, 0), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 0, 68, 0, 0), dActionEntry (45, 0, 0, 70, 0, 0), 
-			dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 0, 69, 0, 0), dActionEntry (280, 0, 0, 71, 0, 0), dActionEntry (281, 0, 0, 73, 0, 0), 
-			dActionEntry (41, 0, 0, 139, 0, 0), dActionEntry (42, 0, 0, 67, 0, 0), dActionEntry (43, 0, 0, 68, 0, 0), dActionEntry (45, 0, 0, 70, 0, 0), 
-			dActionEntry (47, 0, 0, 66, 0, 0), dActionEntry (271, 0, 0, 69, 0, 0), dActionEntry (280, 0, 0, 71, 0, 0), dActionEntry (281, 0, 0, 73, 0, 0), 
-			dActionEntry (42, 0, 0, 117, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
-			dActionEntry (47, 0, 0, 116, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (271, 0, 1, 0, 3, 3), 
-			dActionEntry (273, 0, 1, 0, 3, 3), dActionEntry (280, 0, 0, 121, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), dActionEntry (290, 0, 1, 0, 3, 3), 
-			dActionEntry (42, 0, 0, 117, 0, 0), dActionEntry (43, 0, 0, 118, 0, 0), dActionEntry (44, 0, 1, 0, 3, 1), dActionEntry (45, 0, 0, 120, 0, 0), 
-			dActionEntry (47, 0, 0, 116, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), dActionEntry (254, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), 
-			dActionEntry (273, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 121, 0, 0), dActionEntry (281, 0, 0, 122, 0, 0), dActionEntry (290, 0, 1, 0, 3, 1), 
-			dActionEntry (42, 0, 0, 117, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), 
-			dActionEntry (47, 0, 0, 116, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), 
-			dActionEntry (273, 0, 1, 0, 3, 4), dActionEntry (280, 0, 0, 121, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (290, 0, 1, 0, 3, 4), 
-			dActionEntry (42, 0, 0, 117, 0, 0), dActionEntry (43, 0, 0, 118, 0, 0), dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 120, 0, 0), 
-			dActionEntry (47, 0, 0, 116, 0, 0), dActionEntry (59, 0, 1, 0, 3, 2), dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (271, 0, 1, 0, 3, 2), 
-			dActionEntry (273, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 121, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2), dActionEntry (290, 0, 1, 0, 3, 2), 
-			dActionEntry (42, 0, 0, 125, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
-			dActionEntry (47, 0, 0, 124, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (271, 0, 1, 0, 3, 3), 
-			dActionEntry (280, 0, 0, 129, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 125, 0, 0), dActionEntry (43, 0, 0, 126, 0, 0), 
-			dActionEntry (44, 0, 1, 0, 3, 1), dActionEntry (45, 0, 0, 128, 0, 0), dActionEntry (47, 0, 0, 124, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), 
-			dActionEntry (254, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 129, 0, 0), dActionEntry (281, 0, 0, 130, 0, 0), 
-			dActionEntry (42, 0, 0, 125, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), 
-			dActionEntry (47, 0, 0, 124, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), 
-			dActionEntry (280, 0, 0, 129, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (42, 0, 0, 125, 0, 0), dActionEntry (43, 0, 0, 126, 0, 0), 
-			dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 128, 0, 0), dActionEntry (47, 0, 0, 124, 0, 0), dActionEntry (59, 0, 1, 0, 3, 2), 
-			dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (271, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 129, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2)};
+			dActionEntry (41, 0, 1, 0, 3, 2), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 0, 77, 0, 0), dActionEntry (45, 0, 0, 79, 0, 0), 
+			dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 80, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2), 
+			dActionEntry (41, 0, 0, 140, 0, 0), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 0, 77, 0, 0), dActionEntry (45, 0, 0, 79, 0, 0), 
+			dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 0, 78, 0, 0), dActionEntry (280, 0, 0, 80, 0, 0), dActionEntry (281, 0, 0, 82, 0, 0), 
+			dActionEntry (41, 0, 0, 148, 0, 0), dActionEntry (42, 0, 0, 76, 0, 0), dActionEntry (43, 0, 0, 77, 0, 0), dActionEntry (45, 0, 0, 79, 0, 0), 
+			dActionEntry (47, 0, 0, 75, 0, 0), dActionEntry (271, 0, 0, 78, 0, 0), dActionEntry (280, 0, 0, 80, 0, 0), dActionEntry (281, 0, 0, 82, 0, 0), 
+			dActionEntry (42, 0, 0, 126, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
+			dActionEntry (47, 0, 0, 125, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (268, 0, 1, 0, 3, 3), 
+			dActionEntry (271, 0, 1, 0, 3, 3), dActionEntry (273, 0, 1, 0, 3, 3), dActionEntry (280, 0, 0, 130, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), 
+			dActionEntry (290, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 126, 0, 0), dActionEntry (43, 0, 0, 127, 0, 0), dActionEntry (44, 0, 1, 0, 3, 1), 
+			dActionEntry (45, 0, 0, 129, 0, 0), dActionEntry (47, 0, 0, 125, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), dActionEntry (254, 0, 1, 0, 3, 1), 
+			dActionEntry (268, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (273, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 130, 0, 0), 
+			dActionEntry (281, 0, 0, 131, 0, 0), dActionEntry (290, 0, 1, 0, 3, 1), dActionEntry (42, 0, 0, 126, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), 
+			dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), dActionEntry (47, 0, 0, 125, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), 
+			dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (268, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), dActionEntry (273, 0, 1, 0, 3, 4), 
+			dActionEntry (280, 0, 0, 130, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (290, 0, 1, 0, 3, 4), dActionEntry (42, 0, 0, 126, 0, 0), 
+			dActionEntry (43, 0, 0, 127, 0, 0), dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 129, 0, 0), dActionEntry (47, 0, 0, 125, 0, 0), 
+			dActionEntry (59, 0, 1, 0, 3, 2), dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (268, 0, 1, 0, 3, 2), dActionEntry (271, 0, 1, 0, 3, 2), 
+			dActionEntry (273, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 130, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2), dActionEntry (290, 0, 1, 0, 3, 2), 
+			dActionEntry (42, 0, 0, 134, 0, 0), dActionEntry (43, 0, 1, 0, 3, 3), dActionEntry (44, 0, 1, 0, 3, 3), dActionEntry (45, 0, 1, 0, 3, 3), 
+			dActionEntry (47, 0, 0, 133, 0, 0), dActionEntry (59, 0, 1, 0, 3, 3), dActionEntry (254, 0, 1, 0, 3, 3), dActionEntry (271, 0, 1, 0, 3, 3), 
+			dActionEntry (280, 0, 0, 138, 0, 0), dActionEntry (281, 0, 1, 0, 3, 3), dActionEntry (42, 0, 0, 134, 0, 0), dActionEntry (43, 0, 0, 135, 0, 0), 
+			dActionEntry (44, 0, 1, 0, 3, 1), dActionEntry (45, 0, 0, 137, 0, 0), dActionEntry (47, 0, 0, 133, 0, 0), dActionEntry (59, 0, 1, 0, 3, 1), 
+			dActionEntry (254, 0, 1, 0, 3, 1), dActionEntry (271, 0, 1, 0, 3, 1), dActionEntry (280, 0, 0, 138, 0, 0), dActionEntry (281, 0, 0, 139, 0, 0), 
+			dActionEntry (42, 0, 0, 134, 0, 0), dActionEntry (43, 0, 1, 0, 3, 4), dActionEntry (44, 0, 1, 0, 3, 4), dActionEntry (45, 0, 1, 0, 3, 4), 
+			dActionEntry (47, 0, 0, 133, 0, 0), dActionEntry (59, 0, 1, 0, 3, 4), dActionEntry (254, 0, 1, 0, 3, 4), dActionEntry (271, 0, 1, 0, 3, 4), 
+			dActionEntry (280, 0, 0, 138, 0, 0), dActionEntry (281, 0, 1, 0, 3, 4), dActionEntry (42, 0, 0, 134, 0, 0), dActionEntry (43, 0, 0, 135, 0, 0), 
+			dActionEntry (44, 0, 1, 0, 3, 2), dActionEntry (45, 0, 0, 137, 0, 0), dActionEntry (47, 0, 0, 133, 0, 0), dActionEntry (59, 0, 1, 0, 3, 2), 
+			dActionEntry (254, 0, 1, 0, 3, 2), dActionEntry (271, 0, 1, 0, 3, 2), dActionEntry (280, 0, 0, 138, 0, 0), dActionEntry (281, 0, 1, 0, 3, 2)};
 
 	bool errorMode = false;
 	const dStackPair& stackTop = stack.GetLast()->GetInfo();
@@ -409,34 +426,36 @@ const dNewtonLuaParcer::dActionEntry* dNewtonLuaParcer::GetNextAction (dList<dSt
 bool dNewtonLuaParcer::Parse(dNewtonLuaLex& scanner)
 {
 	static short gotoCount[] = {
-			7, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
-			1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 
-			0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 
-			1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0};
+			9, 0, 0, 0, 7, 0, 0, 0, 1, 0, 0, 0, 0, 2, 1, 0, 0, 0, 2, 0, 0, 2, 1, 0, 
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
+			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 
+			1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+			0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	static short gotoStart[] = {
-			0, 7, 7, 7, 7, 12, 12, 12, 12, 12, 12, 14, 15, 15, 15, 15, 17, 18, 18, 18, 18, 18, 18, 18, 
-			18, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
-			21, 22, 23, 24, 25, 26, 27, 28, 28, 29, 30, 31, 32, 33, 34, 35, 35, 36, 36, 37, 38, 39, 40, 41, 
-			42, 42, 43, 43, 43, 43, 43, 43, 43, 43, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 
-			44, 44, 44, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 46, 47, 48, 
-			49, 50, 51, 52, 52, 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 
-			59, 59, 59};
+			0, 9, 9, 9, 9, 16, 16, 16, 16, 17, 17, 17, 17, 17, 19, 20, 20, 20, 20, 22, 22, 22, 24, 25, 
+			25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 27, 
+			27, 27, 27, 27, 27, 27, 27, 27, 28, 29, 30, 31, 32, 33, 34, 35, 35, 36, 37, 38, 39, 40, 41, 42, 
+			42, 43, 43, 43, 44, 45, 46, 47, 48, 49, 49, 50, 50, 50, 50, 50, 50, 50, 50, 51, 51, 51, 51, 51, 
+			51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 
+			52, 52, 52, 52, 52, 52, 53, 54, 55, 56, 57, 58, 59, 59, 60, 61, 62, 63, 64, 65, 66, 66, 66, 66, 
+			66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66};
 	static dGotoEntry gotoTable[] = {
-			dGotoEntry (294, 3), dGotoEntry (295, 1), dGotoEntry (296, 7), dGotoEntry (297, 6), dGotoEntry (298, 4), 
-			dGotoEntry (300, 2), dGotoEntry (301, 9), dGotoEntry (294, 3), dGotoEntry (295, 12), dGotoEntry (296, 7), 
-			dGotoEntry (297, 14), dGotoEntry (299, 13), dGotoEntry (292, 19), dGotoEntry (293, 20), dGotoEntry (294, 26), 
-			dGotoEntry (292, 30), dGotoEntry (293, 31), dGotoEntry (292, 41), dGotoEntry (292, 55), dGotoEntry (292, 65), 
-			dGotoEntry (292, 74), dGotoEntry (292, 75), dGotoEntry (292, 76), dGotoEntry (292, 77), dGotoEntry (292, 78), 
-			dGotoEntry (292, 79), dGotoEntry (292, 80), dGotoEntry (292, 84), dGotoEntry (292, 91), dGotoEntry (292, 92), 
-			dGotoEntry (292, 93), dGotoEntry (292, 94), dGotoEntry (292, 95), dGotoEntry (292, 96), dGotoEntry (292, 97), 
-			dGotoEntry (292, 101), dGotoEntry (292, 108), dGotoEntry (292, 109), dGotoEntry (292, 110), dGotoEntry (292, 111), 
-			dGotoEntry (292, 112), dGotoEntry (292, 113), dGotoEntry (292, 114), dGotoEntry (292, 115), dGotoEntry (292, 123), 
-			dGotoEntry (292, 132), dGotoEntry (292, 133), dGotoEntry (292, 134), dGotoEntry (292, 135), dGotoEntry (292, 136), 
-			dGotoEntry (292, 137), dGotoEntry (292, 138), dGotoEntry (292, 140), dGotoEntry (292, 141), dGotoEntry (292, 142), 
-			dGotoEntry (292, 143), dGotoEntry (292, 144), dGotoEntry (292, 145), dGotoEntry (292, 146)};
+			dGotoEntry (295, 3), dGotoEntry (296, 1), dGotoEntry (297, 9), dGotoEntry (298, 11), dGotoEntry (299, 5), 
+			dGotoEntry (300, 7), dGotoEntry (301, 4), dGotoEntry (303, 2), dGotoEntry (304, 12), dGotoEntry (295, 3), 
+			dGotoEntry (296, 15), dGotoEntry (297, 9), dGotoEntry (298, 11), dGotoEntry (299, 5), dGotoEntry (300, 17), 
+			dGotoEntry (302, 16), dGotoEntry (294, 20), dGotoEntry (292, 25), dGotoEntry (293, 26), dGotoEntry (295, 32), 
+			dGotoEntry (292, 36), dGotoEntry (293, 37), dGotoEntry (292, 25), dGotoEntry (293, 45), dGotoEntry (292, 49), 
+			dGotoEntry (292, 63), dGotoEntry (292, 74), dGotoEntry (292, 83), dGotoEntry (292, 84), dGotoEntry (292, 85), 
+			dGotoEntry (292, 86), dGotoEntry (292, 87), dGotoEntry (292, 88), dGotoEntry (292, 89), dGotoEntry (292, 93), 
+			dGotoEntry (292, 100), dGotoEntry (292, 101), dGotoEntry (292, 102), dGotoEntry (292, 103), dGotoEntry (292, 104), 
+			dGotoEntry (292, 105), dGotoEntry (292, 106), dGotoEntry (292, 110), dGotoEntry (292, 117), dGotoEntry (292, 118), 
+			dGotoEntry (292, 119), dGotoEntry (292, 120), dGotoEntry (292, 121), dGotoEntry (292, 122), dGotoEntry (292, 123), 
+			dGotoEntry (292, 124), dGotoEntry (292, 132), dGotoEntry (292, 141), dGotoEntry (292, 142), dGotoEntry (292, 143), 
+			dGotoEntry (292, 144), dGotoEntry (292, 145), dGotoEntry (292, 146), dGotoEntry (292, 147), dGotoEntry (292, 149), 
+			dGotoEntry (292, 150), dGotoEntry (292, 151), dGotoEntry (292, 152), dGotoEntry (292, 153), dGotoEntry (292, 154), 
+			dGotoEntry (292, 155)};
 
 	dList<dStackPair> stack;
 	const int lastToken = 292;
@@ -512,20 +531,32 @@ bool dNewtonLuaParcer::Parse(dNewtonLuaLex& scanner)
 					switch (action->m_ruleIndex) 
 					{
 						//do user semantic Actions
-						case 32:// chunk : block 
+						case 38:// chunk : block 
 {MyModule->CloseFunctionDeclaration();}
 break;
 
-						case 19:// variableList : variable 
+						case 21:// variableList : variable 
 {entry.m_value = parameter[0].m_value;}
 break;
 
-						case 18:// variable : _LABEL 
+						case 20:// variable : _LABEL 
 {entry.m_value = parameter[0].m_value;}
 break;
 
-						case 26:// returnStatement : _RETURN 
+						case 25:// local : localDeclaration 
+{entry.m_value = parameter[0].m_value;}
+break;
+
+						case 32:// returnStatement : _RETURN 
 {entry.m_value = MyModule->EmitReturn(dUserVariable());}
+break;
+
+						case 18:// namelist : _LABEL 
+{entry.m_value = parameter[0].m_value; entry.m_value.m_tokenList.Append (parameter[0].m_value.GetString());}
+break;
+
+						case 24:// localDeclaration : _LOCAL namelist 
+{entry.m_value = MyModule->EmitLocalVariableDeclaration(parameter[1].m_value);}
 break;
 
 						case 10:// expression : _TRUE 
@@ -540,7 +571,7 @@ break;
 {entry.m_value = parameter[0].m_value;}
 break;
 
-						case 21:// assigment : variableList = expressionList 
+						case 23:// assigment : variableList = expressionList 
 {entry.m_value = MyModule->EmitAssigmentStatement(parameter[0].m_value, parameter[2].m_value);}
 break;
 
@@ -564,20 +595,28 @@ break;
 {dAssert(0);}
 break;
 
-						case 20:// variableList : variableList , variable 
+						case 22:// variableList : variableList , variable 
 {entry.m_value = MyModule->LinkExpresion(parameter[0].m_value, parameter[2].m_value);}
 break;
 
-						case 28:// returnStatement : _RETURN expressionList 
+						case 34:// returnStatement : _RETURN expressionList 
 {entry.m_value = MyModule->EmitReturn(parameter[1].m_value);}
 break;
 
-						case 27:// returnStatement : _RETURN ; 
+						case 33:// returnStatement : _RETURN ; 
 {entry.m_value = MyModule->EmitReturn(dUserVariable());}
 break;
 
-						case 29:// returnStatement : _RETURN expressionList ; 
+						case 26:// local : localDeclaration = expressionList 
+{dAssert(0);}
+break;
+
+						case 35:// returnStatement : _RETURN expressionList ; 
 {entry.m_value = MyModule->EmitReturn(parameter[1].m_value);}
+break;
+
+						case 19:// namelist : namelist , _LABEL 
+{entry.m_value = parameter[0].m_value; entry.m_value.m_tokenList.Append (parameter[2].m_value.GetString());}
 break;
 
 						case 8:// expression : ( expression ) 

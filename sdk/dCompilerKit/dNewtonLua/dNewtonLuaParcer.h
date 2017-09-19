@@ -78,6 +78,11 @@ class dNewtonLuaParcer
 		{
 		}
 
+		dDefualtUserVariable (const dDefualtUserVariable& copy) 
+			:m_scannerLine(copy.m_scannerLine), m_scannerIndex(copy.m_scannerIndex), m_token(copy.m_token), m_data(copy.m_data)
+		{
+		}
+
 		dDefualtUserVariable (dToken token, const char* const data, int scannerLine, int scannerIndex)
 			:m_scannerLine (scannerLine), m_scannerIndex(scannerIndex), m_token(token), m_data (data) 
 		{
@@ -108,15 +113,36 @@ class dNewtonLuaParcer
 		public:
 		dUserVariable () 
 			:dDefualtUserVariable ()
+			,m_tokenList()
 			,m_node(NULL)
 		{
+		}
+
+		dUserVariable (const dUserVariable& copy) 
+			:dDefualtUserVariable (copy)
+			,m_tokenList()
+			,m_node(copy.m_node)
+		{
+			for (dList<dString>::dListNode* ptr = copy.m_tokenList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+				m_tokenList.Append (ptr->GetInfo());
+			}
+			m_tokenList.RemoveAll();
+		}
+
+		dUserVariable& operator= (const dUserVariable& src)
+		{
+			dAssert (0);
+			return *this;
 		}
 		
 		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
 			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
+			,m_tokenList()
 			,m_node(NULL)
 		{
 		}
+
+		dList<dString> m_tokenList;
 		dCIL::dListNode* m_node;
 	};
 
