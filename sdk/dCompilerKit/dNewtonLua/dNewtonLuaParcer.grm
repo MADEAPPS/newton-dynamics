@@ -264,27 +264,27 @@ variableList
 */
 
 expression
-	: expression _OR expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression AND expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '>' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
-//	| expression '<' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _LEFT_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _GREATHER_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression _IDENTICAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _DIFFERENT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '|' expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '~' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '&' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _LEFT_SHIFT expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _RIGHT_SHIFT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _DOUBLE_DOT expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression '+' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	: expression '+' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 	| expression '-' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 	| expression '*' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
 	| expression '/' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '%' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression '^' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-	| expression _INTEGER_DIVIDE expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+	| expression '%' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '^' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression '>' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
+	| expression '<' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '|' expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '~' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression '&' expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression _IDENTICAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _DIFFERENT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression _OR expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _AND expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _LEFT_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _GREATHER_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _LEFT_SHIFT expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _RIGHT_SHIFT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _DOUBLE_DOT expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+//	| expression _INTEGER_DIVIDE expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}	
 //	| '+' expression %prec '^' {dAssert(0);}
 //	| '-' expression %prec '^'{dAssert(0);}
 //	| '#' expression %prec '^'{dAssert(0);}	
