@@ -12,11 +12,8 @@
 #ifndef _DCIL_INSTRUC_LOAD_STORE_H_
 #define _DCIL_INSTRUC_LOAD_STORE_H_
 
-
 #include "dCIL.h"
 #include "dCILInstr.h"
-
-
 
 class dCILInstrArgument: public dCILSingleArgInstr
 {
@@ -58,8 +55,12 @@ class dCILInstrLocal: public dCILSingleArgInstr
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
-	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
+	// ***********************
+	virtual bool ApplyDeadElimination(dDataFlowGraph& dataFlow) { return false; }
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst) { return false; }
+
+	virtual dArg* GetGeneratedVariable() { return &m_arg0; }
+	virtual void GetUsedVariables(dList<dArg*>& variablesList) {}
 };
 
 

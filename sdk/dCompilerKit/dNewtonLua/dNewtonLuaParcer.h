@@ -134,8 +134,7 @@ class dNewtonLuaParcer
 		{
 			m_nodeList.Append (instruction->GetNode());
 		}
-
-
+		
 		dUserVariable (const dUserVariable& src) 
 			:dDefualtUserVariable (src)
 			,m_tokenList()

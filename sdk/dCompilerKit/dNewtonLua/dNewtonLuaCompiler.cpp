@@ -214,6 +214,9 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadConstant(const dUs
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUserVariable& varName)
 {
+/*
+	// search for the defintions 
+	// note: lua does no requred this
 	dCILInstrMove* definition = NULL;
 	for (dList<dCILInstrMove*>::dListNode* node = m_currentClosure->m_argumnets.GetFirst(); node; node = node->GetNext()) {
 		dCILInstrMove* const intruction = node->GetInfo()->GetAsMove();
@@ -225,11 +228,11 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 			}
 		}
 	}
-dAssert (0);
 	dAssert(definition);
+*/
 	dString outVarName(m_currentClosure->NewTemp());
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, definition->GetArg0().m_label, type);
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);
 	TRACE_INSTRUCTION(move);
 	return dUserVariable(move);
 }
@@ -361,9 +364,9 @@ dAssert(0);
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitReturn(const dUserVariable& expression)
 {
-dAssert(0);
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, m_currentClosure->m_returnVariable, type, expression.GetString(), type);
+	dCILSingleArgInstr* const exp = expression.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsSingleArg();
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, m_currentClosure->m_returnVariable, type, exp->GetArg0().m_label, exp->GetArg0().GetType());
 	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, m_currentClosure->m_returnLabel);
 
 	TRACE_INSTRUCTION(move);
