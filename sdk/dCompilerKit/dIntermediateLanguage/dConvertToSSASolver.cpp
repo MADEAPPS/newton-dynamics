@@ -153,8 +153,9 @@ void dConvertToSSASolver::BuildDomicanceFrontier()
 
 void dConvertToSSASolver::Solve()
 {
+//m_graph->Trace();
 	BuildDomicanceFrontier();
-
+//m_graph->Trace();
 	dTree <dStatementBucket, dString> variableList;
 	for (dBasicBlocksGraph::dListNode* nodeOuter = m_graph->GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
 		dBasicBlock& block = nodeOuter->GetInfo();
@@ -286,10 +287,5 @@ m_graph->Trace();
 			}
 		}
 	}
-	
-//m_graph->Trace();
 	RenameVariables (&m_graph->GetFirst()->GetInfo(), variableList);
-//m_graph->Trace();
-	m_graph->ApplyDeadCodeEliminationSSA ();
-//m_graph->Trace();
 }

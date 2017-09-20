@@ -499,14 +499,11 @@ void dBasicBlocksGraph::BuildDominatorTree ()
 //Trace();
 }
 
-
 void dBasicBlocksGraph::ConvertToSSA ()
 {
 	dConvertToSSASolver ssa (this);
 	ssa.Solve();
 }
-
-
 
 void dBasicBlocksGraph::GetStatementsWorklist(dWorkList& workList) const
 {
@@ -585,7 +582,7 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 		dCIL::dListNode* const node = workList.GetRoot()->GetInfo();
 		workList.Remove(workList.GetRoot());
 		dCILInstr* const instruction = node->GetInfo();
-//instruction->Trace();
+		//instruction->Trace();
 		if (!instruction->GetAsCall()) {
 			const dCILInstr::dArg* const variableOuter = instruction->GetGeneratedVariable();
 			if (variableOuter) {
@@ -606,7 +603,8 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 							if (map.Find(variable->m_label)) {
 								workList.Insert(map.Find(variable->m_label)->GetInfo()->GetInfo());
 								if (!buckect.GetCount()) {
-									usedVariablesList.Remove(usesNodeBuckect);
+									//usedVariablesList.Remove(usesNodeBuckect);
+									usedVariablesList.Remove(entry);
 								}
 							}
 						}

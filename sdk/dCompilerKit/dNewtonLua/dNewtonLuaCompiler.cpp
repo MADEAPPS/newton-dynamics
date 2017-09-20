@@ -140,6 +140,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	basicBlocks.OptimizeSSA();
 	//basicBlocks.Trace();
 
+basicBlocks.Trace();
 	basicBlocks.RegistersAllocations();
 basicBlocks.Trace();
 
@@ -254,7 +255,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLocalVariableDeclarati
 }
 
 
-dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1)
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const dUserVariable& arg0Variable, const dUserVariable& binaryOperator, const dUserVariable& arg1Variable)
 {
 	int token = binaryOperator.GetToken();
 	dCILThreeArgInstr::dOperator operation = dCILThreeArgInstr::m_operatorsCount;
@@ -283,15 +284,24 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const
 			dAssert(0);
 	}
 
-	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dAssert (operation != dCILThreeArgInstr::m_operatorsCount);
+	dAssert (arg0Variable.m_nodeList.GetCount() == 1);
+	dAssert (arg1Variable.m_nodeList.GetCount() == 1);
+	dList<dCIL::dListNode*>::dListNode* arg0Node = arg0Variable.m_nodeList.GetFirst();
+	dList<dCIL::dListNode*>::dListNode* arg1Node = arg1Variable.m_nodeList.GetFirst();
+
+	dCILSingleArgInstr* const arg0Instruction = arg0Node->GetInfo()->GetInfo()->GetAsSingleArg();
+	dCILSingleArgInstr* const arg1Instruction = arg1Node->GetInfo()->GetInfo()->GetAsSingleArg();
+	dAssert(arg0Instruction);
+	dAssert(arg1Instruction);
+	const dCILInstr::dArg& arg0 = arg0Instruction->GetArg0();
+	const dCILInstr::dArg& arg1 = arg1Instruction->GetArg0();
 
 	dString outVarName(m_currentClosure->NewTemp());
-	dCILInstrIntergerLogical* const instruction = new dCILInstrIntergerLogical(*m_currentClosure, operation, outVarName, type, arg0.GetString(), type, arg1.GetString(), type);
 
-//	dUserVariable variable(arg0);
-//	variable.m_data = outVarName;
-//	variable.m_node = instruction->GetNode();
+	// for now just make result make the result a lua type, later for better optimization add type promotion
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+	dCILInstrIntergerLogical* const instruction = new dCILInstrIntergerLogical(*m_currentClosure, operation, outVarName, type, arg0.m_label, arg0.GetType(), arg1.m_label, arg1.GetType());
+
 	TRACE_INSTRUCTION(instruction);
 	return dUserVariable(instruction);
 }
@@ -323,9 +333,9 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 		dCILSingleArgInstr* const src = expressionListNode->GetInfo()->GetInfo()->GetAsSingleArg(); 
 		dAssert(src);
 		dAssert(dst);
-		const dCILInstr::dArg destArg = dst->GetArg0();
+		const dCILInstr::dArg& dstArg = dst->GetArg0();
 		const dCILInstr::dArg& srcArg = src->GetArg0();
-		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, destArg.m_label, destArg.GetType(), srcArg.m_label, srcArg.GetType());
+		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, dstArg.m_label, dstArg.GetType(), srcArg.m_label, srcArg.GetType());
 		TRACE_INSTRUCTION(move);
 
 		nameListNode = nameListNode->GetNext();

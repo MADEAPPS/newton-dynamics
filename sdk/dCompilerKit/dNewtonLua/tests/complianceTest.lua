@@ -1,2 +1,13 @@
-local a , b = 2
-return a    
+	local a, b, c, d	
+	local e = d + a
+	local f = b + c
+
+	f = f + b
+--[[
+	if f == 0 then
+		d = e + f
+	else
+		d = e - f
+	end
+]]
+	return d;
