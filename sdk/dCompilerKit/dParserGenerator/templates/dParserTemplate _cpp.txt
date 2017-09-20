@@ -147,13 +147,11 @@ const $(className)::dActionEntry* $(className)::GetNextAction (dList<dStackPair>
 	static dActionEntry actionTable[] = {$(actionTable)};
 
 	bool errorMode = false;
-	const dStackPair& stackTop = stack.GetLast()->GetInfo();
-	int state = stackTop.m_state;
-	int start = actionsStart[state];
-	int count = actionsCount[state];
-
-	const dActionEntry* const table = &actionTable[start];
-	const dActionEntry* action = FindAction (table, count, token);
+	int stateOuter = stack.GetLast()->GetInfo().m_state;
+	int startOuter = actionsStart[stateOuter];
+	int countOuter = actionsCount[stateOuter];
+	const dActionEntry* const tableOuter = &actionTable[startOuter];
+	const dActionEntry* action = FindAction (tableOuter, countOuter, token);
 	while (!action && (stack.GetCount() > 1)) {
 		errorMode = true; 
 

@@ -10,9 +10,7 @@
 */
 
 #include "dLSCstdafx.h"
-#include "dDAGClassNode.h"
 #include "dScriptPackage.h"
-
 
 dScriptPackage::dScriptPackage(void)
 {
@@ -32,6 +30,7 @@ void dScriptPackage::Save (const char* const packageFileName)
 
 }
 
+/*
 void dScriptPackage::AddClass (dDAGClassNode* const classSymbols, dCIL& classCode)
 {
 	dString name (classSymbols->m_name);
@@ -42,3 +41,4 @@ void dScriptPackage::AddClass (dDAGClassNode* const classSymbols, dCIL& classCod
 	dTree<dScriptClass, dString>::dTreeNode* const node = m_classList.Insert(name);
 	node->GetInfo().AddCode(classSymbols, classCode);
 }
+*/

@@ -18,7 +18,7 @@
  *------------------------------------------------------------------
  */
 
- 
+  
 %{
 // Newton Little Scripting Language specification 1.0.0
 // loosely based on a subset of Java and C sharp
@@ -36,16 +36,17 @@
 	{
 		public:
 		dUserVariable () 
-			:dDefualtUserVariable (), m_node(NULL)
+			:dDefualtUserVariable ()
+			//,m_node(NULL)
 		{
 		}
 		
 		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
 			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
-			,m_node(NULL)
+			//,m_node(NULL)
 		{
 		}
-		class dDAG* m_node;
+		//class dDAG* m_node;
 	};
 }
 

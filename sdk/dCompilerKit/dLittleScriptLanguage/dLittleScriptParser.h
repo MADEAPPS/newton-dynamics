@@ -16,13 +16,6 @@
 #ifndef __dLittleScriptParser_h__
 #define __dLittleScriptParser_h__
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4702) // warning C4702: unreachable code
-#pragma warning (disable: 4100) // warning C4100: unreferenced formal parameter
-#pragma warning (disable: 4201) // warning C4201: nonstandard extension used : nameless struct/union
-#endif
-
-
 #include <dList.h>
 #include <dString.h>
 
@@ -104,9 +97,23 @@ class dLittleScriptParser
 		{
 		}
 
+		dDefualtUserVariable (const dDefualtUserVariable& copy) 
+			:m_scannerLine(copy.m_scannerLine), m_scannerIndex(copy.m_scannerIndex), m_token(copy.m_token), m_data(copy.m_data)
+		{
+		}
+
 		dDefualtUserVariable (dToken token, const char* const data, int scannerLine, int scannerIndex)
 			:m_scannerLine (scannerLine), m_scannerIndex(scannerIndex), m_token(token), m_data (data) 
 		{
+		}
+
+		dDefualtUserVariable& operator= (const dDefualtUserVariable& src)
+		{
+			m_scannerLine = src.m_scannerLine;  
+			m_scannerIndex = src.m_scannerIndex;
+			m_token = src.m_token;
+			m_data = src.m_data;
+			return *this;
 		}
 
 		dToken GetToken() const 
@@ -133,16 +140,17 @@ class dLittleScriptParser
 	{
 		public:
 		dUserVariable () 
-			:dDefualtUserVariable (), m_node(NULL)
+			:dDefualtUserVariable ()
+			//,m_node(NULL)
 		{
 		}
 		
 		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
 			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
-			,m_node(NULL)
+			//,m_node(NULL)
 		{
 		}
-		class dDAG* m_node;
+		//class dDAG* m_node;
 	};
 
 

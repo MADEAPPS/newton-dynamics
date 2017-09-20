@@ -21,16 +21,10 @@
 #include <dRtti.h>
 #include <dRefCounter.h>
 #include <dContainersStdAfx.h>
-
-#include "dDAG.h"
 #include "dLittleScriptParser.h"
 
-class dDAG;
-class dDAGClassNode;
 class dScriptPackage;
 class dSyntaxTreeCode;
-class dDAGFunctionNode;
-class dDAGScopeBlockNode;
 class dLittleScriptLexical;
 
 class dScriptCompiler: public dLittleScriptParser
@@ -50,8 +44,8 @@ class dScriptCompiler: public dLittleScriptParser
 	void OpenPackage (const dString& packageName);
 
 
-	dDAGClassNode* GetCurrentClass() const;
-	dDAGScopeBlockNode* GetCurrentScope() const;
+//	dDAGClassNode* GetCurrentClass() const;
+//	dDAGScopeBlockNode* GetCurrentScope() const;
 
 	dUserVariable CreateClass (const dString& visibility, const dString& classType, const dString& className, const dString& superClassName, const dString& interfaces);
 
@@ -115,11 +109,6 @@ class dScriptCompiler: public dLittleScriptParser
 	dString m_packageFileName;
 	dString m_packageRootDirectory;
 	dScriptPackage* m_currentPackage;
-	//dDAGFunctionNode* m_currentFunction;
-	dList<dDAGClassNode*> m_classList;
-	dList<dDAGScopeBlockNode*> m_scopeStack;
-	dList<dDAG*> m_allNodes;
-	
 	friend class dLittleScriptParser;
 };
 

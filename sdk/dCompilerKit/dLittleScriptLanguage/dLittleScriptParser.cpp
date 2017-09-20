@@ -3413,13 +3413,11 @@ const dLittleScriptParser::dActionEntry* dLittleScriptParser::GetNextAction (dLi
 			dActionEntry (125, 0, 1, 24, 9, 82), dActionEntry (277, 0, 1, 24, 9, 82), dActionEntry (279, 0, 1, 24, 9, 82), dActionEntry (280, 0, 1, 24, 9, 82)};
 
 	bool errorMode = false;
-	const dStackPair& stackTopOuter = stack.GetLast()->GetInfo();
-	int state = stackTopOuter.m_state;
-	int start = actionsStart[state];
-	int count = actionsCount[state];
-
-	const dActionEntry* const table = &actionTable[start];
-	const dActionEntry* action = FindAction (table, count, token);
+	int stateOuter = stack.GetLast()->GetInfo().m_state;
+	int startOuter = actionsStart[stateOuter];
+	int countOuter = actionsCount[stateOuter];
+	const dActionEntry* const tableOuter = &actionTable[startOuter];
+	const dActionEntry* action = FindAction (tableOuter, countOuter, token);
 	while (!action && (stack.GetCount() > 1)) {
 		errorMode = true; 
 

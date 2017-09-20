@@ -26,7 +26,7 @@ class dScriptPackage
 	void Load (const char* const packageFileName);
 	void Save (const char* const packageFileName);
 
-	void AddClass (dDAGClassNode* const classSymbols, dCIL& classCode);
+//	void AddClass (dDAGClassNode* const classSymbols, dCIL& classCode);
 
 	dTree<dScriptClass, dString> m_classList;
 };
