@@ -4,11 +4,6 @@
 %type stat
 %type laststat
 
-%type ifblock
-%type iflist
-%type if
-%type elseif
-%type else
 
 %type forblock
 %type whileblock
@@ -59,10 +54,6 @@
 %token END
 %token IN
 
-%token IF
-%token THEN
-%token ELSEIF
-%token ELSE
 
 %token LOCAL
 
@@ -140,15 +131,12 @@ laststat: RETURN explist optsemi
 		;
 
 stat	: varlist ASSIGN explist 
-		| LOCAL namelist ASSIGN explist 
-		| LOCAL namelist 
-		| FUNCTION funcname funcbody 
 		| LOCAL FUNCTION NAME funcbody 
+		| FUNCTION funcname funcbody 
 		| functioncall 
 		| DO block END 
         | whileblock 
 		| REPEAT block UNTIL exp 
-		| ifblock 
 		| forblock 
 	 	;
 
@@ -164,22 +152,6 @@ forblock: FOR NAME ASSIGN exp COMMA exp DO block END
 whileblock: WHILE exp DO block END 
         ;
 
-ifblock	: iflist else END 
-		;
-		
-
-iflist: if 
-		;
-
-if		: IF exp THEN block 
-		;
-
-elseif	: ELSEIF exp THEN block 
-		;
-
-else	: ELSE block 
-		| /* empty */ 
-		;
 
 var		: NAME 
 		| prefixexp BRACKET_L exp BRACKET_R 
