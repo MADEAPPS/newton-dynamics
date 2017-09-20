@@ -30,7 +30,6 @@
 #include "dNewtonLuaCompiler.h"
 %}
 
-
 %union 
 {
 	class dUserVariable: public dDefualtUserVariable
@@ -334,10 +333,17 @@ local
 	| localDeclaration '=' expressionList {$$ = MyModule->EmitAssigmentStatement($1, $3);}
 	;
 
+ifBlock	
+	: _IF expression _THEN block _END	{dAssert(0);}
+	| _IF expression _THEN block _ELSE block _END {dAssert(0);}
+	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE block _END {dAssert(0);}
+	;
+
 statement 
 	: ';' 
 	| assigment
 	| local
+	| ifBlock	
 	;
 
 statementList
@@ -360,7 +366,6 @@ block
 chunk	
 	: block {MyModule->CloseFunctionDeclaration();} 
 	;
-
 
 %%
 
