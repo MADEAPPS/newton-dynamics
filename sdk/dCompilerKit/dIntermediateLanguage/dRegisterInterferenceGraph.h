@@ -48,17 +48,11 @@ class dRegisterInterferenceNode
 	{
 	}
 
-	dRegisterInterferenceNodeEdge* FindEdge(const dString& varB) const
-	{
-		dAssert(!m_interferanceEdge.GetCount());
-		return NULL;
-	}
-
+	dRegisterInterferenceNodeEdge* FindEdge(const dString& var);
 
 	dString m_name;
 	dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
 	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_coalescedParent;
-
 
 	int m_registerIndex;
 	bool m_inSet;

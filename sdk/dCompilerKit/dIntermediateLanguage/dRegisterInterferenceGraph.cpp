@@ -993,7 +993,7 @@ void dRegisterInterferenceGraph::Build()
 
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
 		dLiveInLiveOut& point = node->GetInfo();
-point.m_instruction->Trace();
+//point.m_instruction->Trace();
 		const dVariableSet<dString>& liveIntSet = point.m_liveInputSet;
 
 		dVariableSet<dString>::Iterator iterA(liveIntSet);
@@ -1011,14 +1011,15 @@ point.m_instruction->Trace();
 					dRegisterInterferenceNodeEdge edgeBA(varAnodeNode);
 					varAnode.m_interferanceEdge.Append(edgeAB);
 					varBnode.m_interferanceEdge.Append(edgeBA);
+					dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
 				}
 			}
 		}
 	}
 
+	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+	}
 /*
-	//m_flowGraph->m_cil->Trace();
-
 	dList<dTreeNode*> moveNodes;
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& info = iter.GetNode()->GetInfo();
@@ -1051,6 +1052,19 @@ point.m_instruction->Trace();
 		}
 	}
 */
+}
+
+
+dRegisterInterferenceNodeEdge* dRegisterInterferenceNode::FindEdge(const dString& var)
+{
+	for (dList<dRegisterInterferenceNodeEdge>::dListNode* node = m_interferanceEdge.GetFirst(); node; node = node->GetNext()) {
+		dRegisterInterferenceNodeEdge& info = node->GetInfo();
+		const dString& edgeVar = info.m_incidentNode->GetKey();
+		if (edgeVar == var) {
+			return &info;
+		}
+	}
+	return NULL;
 }
 
 
