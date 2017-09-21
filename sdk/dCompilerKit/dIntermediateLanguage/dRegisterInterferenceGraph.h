@@ -23,13 +23,13 @@ class dRegisterInterferenceNodeEdge
 {
 	public:
 	dRegisterInterferenceNodeEdge (dTree<dRegisterInterferenceNode, dString>::dTreeNode* const m_incidentNode)
-		:m_twin(NULL)
-		,m_incidentNode(m_incidentNode)
+		//:m_twin(NULL)
+		:m_incidentNode(m_incidentNode)
 		,m_mark (false)
 	{
 	}
 	
-	dList<dRegisterInterferenceNodeEdge>::dListNode* m_twin;
+//	dList<dRegisterInterferenceNodeEdge>::dListNode* m_twin;
 	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_incidentNode;
 	bool m_mark;
 };
@@ -48,9 +48,18 @@ class dRegisterInterferenceNode
 	{
 	}
 
+	dRegisterInterferenceNodeEdge* FindEdge(const dString& varB) const
+	{
+		dAssert(!m_interferanceEdge.GetCount());
+		return NULL;
+	}
+
+
 	dString m_name;
 	dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
 	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_coalescedParent;
+
+
 	int m_registerIndex;
 	bool m_inSet;
 	bool m_isMove;
