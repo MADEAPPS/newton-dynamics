@@ -247,10 +247,10 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLocalVariableDeclarati
 		const dString& varName = node->GetInfo();
 		dCILInstrLocal* const localVariable = new dCILInstrLocal(*m_currentClosure, varName, type);
 		m_currentClosure->m_localVariables.Append(localVariable);
-		outVarName.m_nodeList.Append(localVariable->GetNode());
+		//outVarName.m_nodeList.Append(localVariable->GetNode());
+		outVarName.m_tokenList.Append(localVariable->GetArg0().m_label);
 		TRACE_INSTRUCTION(localVariable);
 	}
-
 	return outVarName;
 }
 
@@ -313,7 +313,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 	dList<dCIL::dListNode*>::dListNode* expressionListNode = expresionList.m_nodeList.GetFirst();
 	dAssert(nameList.m_tokenList.GetCount() >= 1);
 	dAssert(expresionList.m_nodeList.GetCount() >= 1);
-	int count = dMin (nameList.m_nodeList.GetCount(), expresionList.m_nodeList.GetCount());
+	int count = dMin (nameList.m_tokenList.GetCount(), expresionList.m_nodeList.GetCount());
 	for (int i = 0; i < count; i ++) {
 		//dCILSingleArgInstr* const dst = nameListNode->GetInfo(); 
 		const dString& dstName = nameListNode->GetInfo();

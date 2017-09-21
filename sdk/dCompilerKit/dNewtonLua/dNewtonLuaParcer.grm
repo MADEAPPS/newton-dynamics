@@ -310,7 +310,7 @@ namelist
 	;
 
 variable
-	: _LABEL {$$ = $1; dAssert (0); $$.m_tokenList.Append ($1.GetString());}
+	: _LABEL {$$ = $1; $$.m_tokenList.Append ($1.GetString());}
 //	| prefixexp BRACKET_L exp BRACKET_R {dAssert(0);}
 //	| prefixexp DOT NAME {dAssert(0);}
 	;
@@ -333,18 +333,18 @@ local
 	| localDeclaration '=' expressionList {$$ = MyModule->EmitAssigmentStatement($1, $3);}
 	;
 
-ifDeclaration
+ifExpression
 	: _IF expression {$$ = MyModule->EmitIf($2);}
 	;
 
-thenBlock
-	: _THEN block {dAssert(0);}
+ifExpressionThenBlock
+	: ifExpression _THEN block {dAssert(0);}
 	;
 
 ifBlock
-	: ifDeclaration thenBlock _END {dAssert(0);}
-	| ifDeclaration thenBlock _ELSE block _END {dAssert(0);}
-	| ifDeclaration thenBlock _ELSEIF expression _THEN block _ELSE block _END {dAssert(0);}
+	: ifExpressionThenBlock _END {dAssert(0);}
+	| ifExpressionThenBlock _ELSE block _END {dAssert(0);}
+	| ifExpressionThenBlock _ELSEIF expression _THEN block _ELSE block _END {dAssert(0);}
 	;
 
 statement 
