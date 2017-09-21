@@ -96,10 +96,10 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 
 	private:
 	void Build();
-
+	int ColorGraph();
 	bool IsSpilledVariable (const dString& name) const;
 /*
-	int ColorGraph ();
+	
 	void CoalesceNodes();
 	dTreeNode* GetBestNode();
 	void AllocateRegisters ();
