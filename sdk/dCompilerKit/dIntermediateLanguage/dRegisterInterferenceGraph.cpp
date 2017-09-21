@@ -122,13 +122,6 @@ dString dRegisterInterferenceGraph::GetRegisterName (const dString& varName) con
 	}
 }
 
-bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
-{
-    int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
-//    return (name[0] != '_') && strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
-	return strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
-}
-
 
 dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode()
 {
@@ -818,6 +811,12 @@ void dRegisterInterferenceGraph::InsertEpilogAndProlog()
 }
 #endif
 
+bool dRegisterInterferenceGraph::IsSpilledVariable (const dString& name) const
+{
+	static int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
+	//return (name[0] != '_') && strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
+	return strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize) ? false : true;
+}
 
 void dRegisterInterferenceGraph::Build()
 {
@@ -826,13 +825,18 @@ void dRegisterInterferenceGraph::Build()
 //	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	//for (iter.Begin(); iter; iter ++) {
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-/*
-		dDataFlowPoint& point = iter.GetNode()->GetInfo();
+		dList<dCILInstr::dArg*> usedVariables;
+		dLiveInLiveOut& point = node->GetInfo();
+		point.m_instruction->GetUsedVariables(usedVariables);
+//point.m_instruction->Trace();
 
-		dDataFlowPoint::dVariableSet<dString>::Iterator definedIter (point.m_usedVariableSet);
-		for (definedIter.Begin(); definedIter; definedIter ++) {
-			const dString& variable = definedIter.GetKey();
-			if (IsTempVariable(variable)) {
+//		dDataFlowPoint::dVariableSet<dString>::Iterator definedIter (point.m_usedVariableSet);
+//		for (definedIter.Begin(); definedIter; definedIter ++) {
+		for (dList<dCILInstr::dArg*>::dListNode* usedVarNode = usedVariables.GetFirst(); usedVarNode; usedVarNode = usedVarNode->GetNext()) {	
+			//const dString& variable = definedIter.GetKey();
+			const dString& variable = usedVarNode->GetInfo()->m_label;
+			if (IsSpilledVariable(variable)) {
+				dAssert (0);
 				dTreeNode* interferanceGraphNode = Find(variable);
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
@@ -841,17 +845,19 @@ void dRegisterInterferenceGraph::Build()
 				}
 			}
 		}
-*/
 	}
 
-/*
 	// pre-color some special nodes
 	int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX; 
-	for (dCIL::dListNode* node = m_flowGraph->m_basicBlocks.m_begin; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
-		dCILInstr* const instr = node->GetInfo();
-		//instr->Trace();
+	//for (dCIL::dListNode* node = m_flowGraph->m_basicBlocks.m_begin; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
+	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+		dLiveInLiveOut& point = node->GetInfo();
+		dCILInstr* const instr = point.m_instruction;
+		instr->Trace();
 
 		if (instr->GetAsArgument()) {
+			dAssert(0);
+/*
 			dCILInstrArgument* const argInst = instr->GetAsArgument();
 			const dCILInstr::dArg& arg = argInst->GetArg0();
 			switch (arg.GetType().m_intrinsicType)
@@ -875,7 +881,10 @@ void dRegisterInterferenceGraph::Build()
 			default:
 				dAssert(0);
 			}
+*/
 		} else if (instr->GetAsReturn()) {
+			dAssert(0);
+/*
 			dCILInstrReturn* const retInstr = instr->GetAsReturn();
 
 			const dCILInstr::dArg& arg = retInstr->GetArg0();
@@ -897,8 +906,10 @@ void dRegisterInterferenceGraph::Build()
 				}
 				}
 			}
-
+*/
 		} else if (instr->GetAsCall()) {
+			dAssert(0);
+/*
 			dCILInstrCall* const callInstr = instr->GetAsCall();
 
 			const dCILInstr::dArg& arg = callInstr->GetArg0();
@@ -929,9 +940,11 @@ void dRegisterInterferenceGraph::Build()
 				index ++;
 				dAssert (index < D_CALLER_SAVE_REGISTER_COUNT);
 			}
+*/
 		}
 	}
 
+/*
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& info = iter.GetNode()->GetInfo();
 		if (info.m_generatedVariable.Size()) {

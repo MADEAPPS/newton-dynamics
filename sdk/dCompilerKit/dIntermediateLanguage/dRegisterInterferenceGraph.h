@@ -94,6 +94,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	private:
 	void Build();
 
+	bool IsSpilledVariable (const dString& name) const;
 /*
 	int ColorGraph ();
 	void CoalesceNodes();
@@ -101,7 +102,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	void AllocateRegisters ();
 	void InsertEpilogAndProlog();
 	void SelectSpillVariableAndReWriteFunction();
-    bool IsTempVariable (const dString& name) const;
+    
 	int GetRegisterIndex (const dString& varName) const;
 	
 	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
