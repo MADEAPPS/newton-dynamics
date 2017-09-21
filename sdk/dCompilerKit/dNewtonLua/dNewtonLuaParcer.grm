@@ -320,7 +320,7 @@ variableList
 	| variableList ',' variable {dAssert(0);}
 	;
 
-assigment
+assignment
 	: variableList '=' expressionList {$$ = MyModule->EmitAssigmentStatement($1, $3);}
 	;
 
@@ -349,7 +349,7 @@ ifBlock
 
 statement 
 	: ';' 
-	| assigment
+	| assignment
 	| local
 	| ifBlock	
 	;
