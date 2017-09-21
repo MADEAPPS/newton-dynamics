@@ -308,11 +308,15 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(const dUserVariable& nameList, const dUserVariable& expresionList)
 {
-	dList<dCIL::dListNode*>::dListNode* nameListNode = nameList.m_nodeList.GetFirst();
+	//dList<dCIL::dListNode*>::dListNode* nameListNode = nameList.m_nodeList.GetFirst();
+	dList<dString>::dListNode* nameListNode = nameList.m_tokenList.GetFirst();
 	dList<dCIL::dListNode*>::dListNode* expressionListNode = expresionList.m_nodeList.GetFirst();
+	dAssert(nameList.m_tokenList.GetCount() >= 1);
+	dAssert(expresionList.m_nodeList.GetCount() >= 1);
 	int count = dMin (nameList.m_nodeList.GetCount(), expresionList.m_nodeList.GetCount());
 	for (int i = 0; i < count; i ++) {
-		dCILSingleArgInstr* const dst = nameListNode->GetInfo()->GetInfo()->GetAsSingleArg(); 
+		//dCILSingleArgInstr* const dst = nameListNode->GetInfo(); 
+		const dString& dstName = nameListNode->GetInfo();
 
 /*
 		if (dest->GetAsLocal()) {
@@ -332,10 +336,10 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 
 		dCILSingleArgInstr* const src = expressionListNode->GetInfo()->GetInfo()->GetAsSingleArg(); 
 		dAssert(src);
-		dAssert(dst);
-		const dCILInstr::dArg& dstArg = dst->GetArg0();
+		//dAssert(dst);
+		//const dCILInstr::dArg& dstArg = dst->GetArg0();
 		const dCILInstr::dArg& srcArg = src->GetArg0();
-		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, dstArg.m_label, dstArg.GetType(), srcArg.m_label, srcArg.GetType());
+		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, dstName, srcArg.GetType(), srcArg.m_label, srcArg.GetType());
 		TRACE_INSTRUCTION(move);
 
 		nameListNode = nameListNode->GetNext();
@@ -346,12 +350,15 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable& expression)
 {
-	dCILInstr::dArgType type(dCILInstr::m_luaType);
-dAssert(0);
 	dString label2(m_currentClosure->NewLabel());
 	dString label1(m_currentClosure->NewLabel());
 
-	dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstrConditional::m_ifnot, expression.GetString(), type, label1, label2);
+	dList<dCIL::dListNode*>::dListNode* const expressionListNode = expression.m_nodeList.GetFirst();
+	dCILSingleArgInstr* const expressionInstruction = expressionListNode->GetInfo()->GetInfo()->GetAsSingleArg();
+	dAssert(expressionInstruction);
+	const dCILInstr::dArg& expressionArg = expressionInstruction->GetArg0();
+
+	dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstrConditional::m_ifnot, expressionArg.m_label, expressionArg.GetType(), label1, label2);
 	dCILInstrLabel* const taget2 = new dCILInstrLabel(*m_currentClosure, label2);
 	conditional->SetTargets(taget2, taget2);
 	
