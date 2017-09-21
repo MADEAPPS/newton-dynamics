@@ -160,28 +160,38 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 	m_graph->m_mark++;
 	BuildReverseOrdeBlockList(reverseOrderBlocks, &m_graph->GetFirst()->GetInfo());
 
+//m_graph->Trace();
 	dTree<dListNode*, const dBasicBlock*> lastStatement;
 	dTree<dListNode*, const dBasicBlock*> firstStatement;
 	for (dList<const dBasicBlock*>::dListNode* blockNode = reverseOrderBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		const dBasicBlock* const block = blockNode->GetInfo();
+//block->Trace();
 
-		dListNode* lastPointNode = NULL;
+		dListNode* lastNode = GetFirst();
 		for (dCIL::dListNode* instNode = block->m_end; instNode != block->m_begin; instNode = instNode->GetPrev()) {
 			dCILInstr* const instruction = instNode->GetInfo();
+//instruction->Trace();
 			if (instruction->IsDefineOrUsedVariable()) {
 				dLiveInLiveOut& entry = Addtop()->GetInfo();
-				if (!lastPointNode) {
-					lastPointNode = GetFirst();
-				}
 				entry.m_instruction = instruction;
 			}
 		}
-		lastStatement.Insert(lastPointNode, block);
+		if (lastNode == GetFirst()) {
+			dLiveInLiveOut& entry = Addtop()->GetInfo();
+			entry.m_instruction = block->m_begin->GetInfo();
+		}
+		if (!lastNode) {
+			lastNode = GetLast();
+		} else {
+			lastNode = lastNode->GetPrev();
+		}
+		lastStatement.Insert(lastNode, block);
 		firstStatement.Insert(GetFirst(), block);
-				
-		for (dListNode* node = GetFirst(); node != lastPointNode; node = node->GetNext()) {
-			dLiveInLiveOut& point = node->GetInfo();
-			point.m_successors.Append(&node->GetNext()->GetInfo());
+		if (GetFirst() != lastNode) {
+			for (dListNode* node = GetFirst(); node != lastNode; node = node->GetNext()) {
+				dLiveInLiveOut& point = node->GetInfo();
+				point.m_successors.Append(&node->GetNext()->GetInfo());
+			}
 		}
 	}
 
@@ -224,16 +234,19 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 		}
 	}
 
-	Trace();
+//	Trace();
 }
 
 void dLiveInLiveOutSolver::Trace()
 {
 	for (dListNode* pointNode = GetFirst(); pointNode; pointNode = pointNode->GetNext()) {
 		dLiveInLiveOut& point = pointNode->GetInfo();
-		point.m_instruction->Trace();
+		dTrace (("liveIn: "));
 		point.m_liveInputSet.Trace();
+		point.m_instruction->Trace();
+		dTrace (("liveOut: "));
 		point.m_liveOutputSet.Trace();
+		dTrace (("\n"));
 	}
 }
 
@@ -247,8 +260,6 @@ void dLiveInLiveOutSolver::BuildReverseOrdeBlockList(dList<const dBasicBlock*>& 
 		reverseOrderList.Append(block);
 	}
 }
-
-
 
 dBasicBlocksGraph::dBasicBlocksGraph()
 	:dBasicBlocksList()
@@ -742,6 +753,7 @@ void dBasicBlocksGraph::RegistersAllocations ()
 
 void dBasicBlocksGraph::OptimizeSSA()
 {
+Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;

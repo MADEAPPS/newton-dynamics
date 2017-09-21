@@ -154,37 +154,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptLexical.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptParser.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAG.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGClassNode.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGDimensionNode.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNode.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeNew.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionModifier.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionNode.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatement.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementDO.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementIF.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGParamerNode.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGScopeBlockNode.cpp" />
-    <ClCompile Include="..\dLittleScriptLanguage\dDAGTypeNode.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptCompiler.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dLSCstdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -196,37 +167,8 @@
     <ClCompile Include="..\dLittleScriptLanguage\dScriptPackage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptLexical.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptParser.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAG.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGClassNode.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGDimensionNode.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNode.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeNew.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionModifier.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionNode.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatement.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementDO.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementIF.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGParameterNode.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGScopeBlockNode.h" />
-    <ClInclude Include="..\dLittleScriptLanguage\dDAGTypeNode.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptCompiler.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dLSCstdafx.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dScriptClass.h" />

@@ -49,6 +49,7 @@ class dCILInstrGoto: public dCILSingleArgInstr
 {
 	public:
 	dCILInstrGoto(dCIL& program, const dString& label);
+	dCILInstrGoto(dCIL& program, dCILInstrLabel* const target0);
 	void Serialize(char* const textOut) const;
 
 	virtual bool IsBasicBlockEnd() const;
@@ -88,6 +89,7 @@ class dCILInstrConditional: public dCILThreeArgInstr
 	};
 
 	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
+	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1);
 	void Serialize(char* const textOut) const;
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 

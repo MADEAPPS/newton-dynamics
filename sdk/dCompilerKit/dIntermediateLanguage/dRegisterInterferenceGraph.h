@@ -88,14 +88,13 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 		int m_loopUseCount;
 	};
 
-	//dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
 	dRegisterInterferenceGraph (dBasicBlocksGraph* const graph, int registerCount);
-
-/*
-	dString GetRegisterName(const dString& varName) const;
+//	dString GetRegisterName(const dString& varName) const;
 
 	private:
 	void Build();
+
+/*
 	int ColorGraph ();
 	void CoalesceNodes();
 	dTreeNode* GetBestNode();

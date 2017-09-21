@@ -42,6 +42,13 @@ dCILInstrGoto::dCILInstrGoto(dCIL& program, const dString& label)
 {
 }
 
+dCILInstrGoto::dCILInstrGoto(dCIL& program, dCILInstrLabel* const target0)
+	:dCILSingleArgInstr (program, target0->GetArg0())
+	,m_tagetNode(NULL)
+{
+	SetTarget (target0);
+}
+
 bool dCILInstrGoto::IsBasicBlockEnd() const
 {
 	return true;
@@ -91,6 +98,13 @@ dCILInstrConditional::dCILInstrConditional(dCIL& program, dBranchMode mode, cons
 {
 }
 
+dCILInstrConditional::dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
+	:dCILThreeArgInstr (program, dArg (name, type), target0->GetArg0(), target1->GetArg0())
+	,m_mode (mode)
+{
+	SetTargets (target0, target1);
+}
+
 void dCILInstrConditional::Serialize(char* const textOut) const
 {
 	if (m_targetNode1) {
@@ -117,7 +131,6 @@ void dCILInstrConditional::SetLabels (const dString& label0, const dString& labe
 void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1)
 {
 	dAssert(target0);
-//	dAssert (target0->GetArg0().m_label == GetArg1().m_label);
 	m_targetNode0 = target0->GetNode();
 
 	if (target1) {

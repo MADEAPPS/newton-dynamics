@@ -95,18 +95,15 @@ int dNewtonLuaCompiler::CompileSource (const char* const source)
 	return 0;
 }
 
-
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionDeclaration(const dUserVariable& functionName)
 {
 	m_currentClosure = m_closures.AddClosure(m_currentClosure);
-
 	dCILInstrFunction* const function = new dCILInstrFunction(*m_currentClosure, functionName.GetString(), dCILInstr::dArgType(dCILInstr::m_luaType));
 
-	dString label(m_currentClosure->NewLabel());
-	dCILInstrLabel* const startBlock = new dCILInstrLabel(*m_currentClosure, label);
-
+	//dString label(m_currentClosure->NewLabel());
+	//dCILInstrLabel* const startBlock = new dCILInstrLabel(*m_currentClosure, label);
 	TRACE_INSTRUCTION(function);
-	TRACE_INSTRUCTION(startBlock);
+	//TRACE_INSTRUCTION(startBlock);
 	return dUserVariable(function);
 }
 
@@ -128,23 +125,30 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	TRACE_INSTRUCTION(label);
 	TRACE_INSTRUCTION(ret);
 	TRACE_INSTRUCTION(functionEnd);
-	//m_currentClosure->Trace();
+//m_currentClosure->Trace();
 
 	dBasicBlocksGraph basicBlocks;
 	basicBlocks.Build(m_currentClosure->GetFirst());
-	//basicBlocks.Trace();
+//basicBlocks.Trace();
 
 	basicBlocks.ConvertToSSA();
-	//basicBlocks.Trace();
+//basicBlocks.Trace();
 
 	basicBlocks.OptimizeSSA();
 	//basicBlocks.Trace();
 
-basicBlocks.Trace();
 	basicBlocks.RegistersAllocations();
 basicBlocks.Trace();
 
 	m_currentClosure = m_currentClosure->m_parent;
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBlockBeginning()
+{
+	dString label(m_currentClosure->NewLabel());
+	dCILInstrLabel* const blockBegin = new dCILInstrLabel(*m_currentClosure, label);
+	TRACE_INSTRUCTION(blockBegin);
+	return dUserVariable(blockBegin);
 }
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionParameter(const dUserVariable& prevParameter, const dUserVariable& parameter)
@@ -348,35 +352,43 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 	return dUserVariable();
 }
 
-dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable& expression)
-{
-	dString label2(m_currentClosure->NewLabel());
-	dString label1(m_currentClosure->NewLabel());
 
-	dList<dCIL::dListNode*>::dListNode* const expressionListNode = expression.m_nodeList.GetFirst();
-	dCILSingleArgInstr* const expressionInstruction = expressionListNode->GetInfo()->GetInfo()->GetAsSingleArg();
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable& expression, const dUserVariable& thenBlock, const dUserVariable& elseBlock)
+{
+	dCIL::dListNode* const expresionNode = expression.m_nodeList.GetFirst()->GetInfo();
+	dCILSingleArgInstr* const expressionInstruction = expresionNode->GetInfo()->GetAsSingleArg();
 	dAssert(expressionInstruction);
 	const dCILInstr::dArg& expressionArg = expressionInstruction->GetArg0();
 
-	dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstrConditional::m_ifnot, expressionArg.m_label, expressionArg.GetType(), label1, label2);
-	dCILInstrLabel* const taget2 = new dCILInstrLabel(*m_currentClosure, label2);
-	conditional->SetTargets(taget2, taget2);
-	
-	TRACE_INSTRUCTION(conditional);
-	TRACE_INSTRUCTION(taget2);
-	return dUserVariable(conditional);
-}
+	dString label(m_currentClosure->NewLabel());
+	dCILInstrLabel* const exitLabel = new dCILInstrLabel(*m_currentClosure, label);
+	TRACE_INSTRUCTION(exitLabel);
 
-dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIfElse(const dUserVariable& ifStatement)
-{
-dAssert(0);
-//	dCILInstrConditional* const conditional = ifStatement.m_node->GetInfo()->GetAsIF();
-//	dAssert(conditional);
-//	dCILInstrLabel* const target = new dCILInstrLabel(*m_currentClosure, conditional->GetArg1().m_label);
-//	conditional->SetTargets(target, conditional->GetTrueTarget()->GetInfo()->GetAsLabel());
-//	TRACE_INSTRUCTION(target);
-//	return dUserVariable(target);
-	return dUserVariable();
+	dCIL::dListNode* const thenBlockNode = thenBlock.m_nodeList.GetFirst()->GetInfo();
+	dCILInstrLabel* const thenBlockInstruction = thenBlockNode->GetInfo()->GetAsLabel();
+	if (elseBlock.m_nodeList.GetCount()) {
+		// this is an: if exp then block else block end
+		dCIL::dListNode* const elseBlockNode = elseBlock.m_nodeList.GetFirst()->GetInfo();
+		dCILInstrLabel* const elseBlockInstruction = elseBlockNode->GetInfo()->GetAsLabel();
+		dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, exitLabel);
+		TRACE_INSTRUCTION(gotoJump);
+		m_currentClosure->InsertAfter(elseBlockNode->GetPrev(), gotoJump->GetNode());
+
+		dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstrConditional::m_ifnot, expressionArg.m_label, expressionArg.GetType(), elseBlockInstruction, thenBlockInstruction);
+		m_currentClosure->InsertAfter (expresionNode, conditional->GetNode());
+		TRACE_INSTRUCTION(conditional);
+
+		dCILInstrGoto* const gotoJump1 = new dCILInstrGoto(*m_currentClosure, exitLabel);
+		m_currentClosure->InsertAfter(exitLabel->GetNode()->GetPrev(), gotoJump1->GetNode());
+		TRACE_INSTRUCTION(gotoJump1);
+
+		//m_currentClosure->Trace();
+		return dUserVariable(conditional);
+
+	} else {
+		dAssert (0);
+		return dUserVariable();
+	}
 }
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitReturn(const dUserVariable& expression)

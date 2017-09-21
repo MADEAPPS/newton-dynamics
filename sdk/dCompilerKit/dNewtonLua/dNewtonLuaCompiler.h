@@ -55,13 +55,13 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 
 	void CloseFunctionDeclaration();
 
-	dUserVariable EmitIf(const dUserVariable& expression);
-	dUserVariable EmitIfElse(const dUserVariable& ifStatement);
 	dUserVariable EmitReturn(const dUserVariable& expression);
+	dUserVariable EmitIf(const dUserVariable& expression, const dUserVariable& thenBlock, const dUserVariable& elseBlock);
 	
 	dUserVariable EmitLoadVariable(const dUserVariable& varName);
 	dUserVariable EmitLoadConstant(const dUserVariable& constName);
 
+	dUserVariable EmitBlockBeginning();
 	dUserVariable EmitFunctionDeclaration(const dUserVariable& name);
 	dUserVariable EmitLocalVariableDeclaration(const dUserVariable& nameList);
 	dUserVariable EmitParametersToLocalVariables(const dUserVariable& parameterList);
