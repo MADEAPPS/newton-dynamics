@@ -97,11 +97,12 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	private:
 	void Build();
 	int ColorGraph();
+	dTreeNode* GetBestNode(int& edgeCount);
 	bool IsSpilledVariable (const dString& name) const;
 /*
 	
 	void CoalesceNodes();
-	dTreeNode* GetBestNode();
+	
 	void AllocateRegisters ();
 	void InsertEpilogAndProlog();
 	void SelectSpillVariableAndReWriteFunction();
