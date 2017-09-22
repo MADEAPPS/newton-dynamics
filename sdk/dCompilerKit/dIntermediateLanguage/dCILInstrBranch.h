@@ -17,7 +17,7 @@
 #include "dCILInstr.h"
 
 
-class dCILInstrLabel: public dCILSingleArgInstr
+class dCILInstrLabel: public dCILInstr
 {
 	public:
 	dCILInstrLabel(dCIL& program, const dString& label);
@@ -35,7 +35,9 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual bool IsBasicBlockBegin() const;
+
 	virtual dCILInstrLabel* GetAsLabel();
+	const dString GetLabel() const { return m_label; }
 
 	virtual bool IsDefineOrUsedVariable() { return false; }
 
@@ -43,6 +45,8 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	virtual dArg* GetGeneratedVariable () {return NULL;}
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {}
+
+	dString m_label;
 };
 
 class dCILInstrGoto: public dCILSingleArgInstr
@@ -68,7 +72,6 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
-	dList<dCILInstr*>::dListNode* m_tagetNode;
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
@@ -77,6 +80,7 @@ class dCILInstrGoto: public dCILSingleArgInstr
 
 	virtual bool IsDefineOrUsedVariable() { return false; }
 
+	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
 class dCILInstrConditional: public dCILThreeArgInstr

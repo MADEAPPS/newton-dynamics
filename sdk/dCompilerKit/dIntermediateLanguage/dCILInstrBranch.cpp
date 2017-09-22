@@ -17,7 +17,8 @@
 #include "dConstantPropagationSolver.h"
 
 dCILInstrLabel::dCILInstrLabel(dCIL& program, const dString& label)
-	:dCILSingleArgInstr (program, dArg (label, dArgType()))
+	:dCILInstr(program)
+	,m_label(label)
 {
 }
 
@@ -33,7 +34,7 @@ dCILInstrLabel* dCILInstrLabel::GetAsLabel()
 
 void dCILInstrLabel::Serialize(char* const textOut) const
 {
-	sprintf (textOut, "%s:\n", m_arg0.m_label.GetStr());
+	sprintf (textOut, "%s:\n", GetLabel().GetStr());
 }
 
 dCILInstrGoto::dCILInstrGoto(dCIL& program, const dString& label)
@@ -42,11 +43,11 @@ dCILInstrGoto::dCILInstrGoto(dCIL& program, const dString& label)
 {
 }
 
-dCILInstrGoto::dCILInstrGoto(dCIL& program, dCILInstrLabel* const target0)
-	:dCILSingleArgInstr (program, target0->GetArg0())
+dCILInstrGoto::dCILInstrGoto(dCIL& program, dCILInstrLabel* const target)
+	:dCILSingleArgInstr (program, dArg(target->GetLabel(), dArgType()))
 	,m_tagetNode(NULL)
 {
-	SetTarget (target0);
+	SetTarget (target);
 }
 
 bool dCILInstrGoto::IsBasicBlockEnd() const
@@ -67,7 +68,7 @@ void dCILInstrGoto::SetLabel (const dString& label)
 void dCILInstrGoto::SetTarget (dCILInstrLabel* const target)
 {
 	m_tagetNode = target->GetNode();
-	dAssert (target->GetArg0().m_label == GetArg0().m_label);
+	dAssert (target->GetLabel() == GetArg0().m_label);
 }
 
 dList<dCILInstr*>::dListNode* dCILInstrGoto::GetTarget () const
@@ -99,7 +100,7 @@ dCILInstrConditional::dCILInstrConditional(dCIL& program, dBranchMode mode, cons
 }
 
 dCILInstrConditional::dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
-	:dCILThreeArgInstr (program, dArg (name, type), target0->GetArg0(), target1->GetArg0())
+	:dCILThreeArgInstr (program, dArg (name, type), dArg(target0->GetLabel(), dArgType()), dArg(target1->GetLabel(), dArgType()))
 	,m_mode (mode)
 {
 	SetTargets (target0, target1);
@@ -134,7 +135,7 @@ void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrL
 	m_targetNode0 = target0->GetNode();
 
 	if (target1) {
-		dAssert(target1->GetArg0().m_label == GetArg2().m_label);
+		dAssert(target1->GetLabel() == GetArg2().m_label);
 		m_targetNode1 = target1->GetNode();
 	} else {
 		m_targetNode1 = NULL;

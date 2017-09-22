@@ -555,13 +555,13 @@ bool dBasicBlocksGraph::ApplyConstantConditionalSSA()
 				dCILInstrLabel* label;
 				if (condition) {
 					label = conditinal->GetTrueTarget()->GetInfo()->GetAsLabel();
-				}
-				else {
+				} else {
 					label = conditinal->GetFalseTarget()->GetInfo()->GetAsLabel();
 				}
 
-				dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label->GetArg0().m_label);
-				jump->SetTarget(label);
+				//dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label->GetLabel);
+				//jump->SetTarget(label);
+				dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label);
 				conditinal->ReplaceInstruction(jump);
 				anyChanges = true;
 			}
