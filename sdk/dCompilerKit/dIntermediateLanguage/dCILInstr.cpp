@@ -188,28 +188,26 @@ bool dCILSingleArgInstr::DeadElimination (dDataFlowGraph& dataFlow)
 
 void dCILSingleArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	dAssert (0);
-//	m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
+	m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
 }
 
 void dCILTwoArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	dAssert (0);
-/*
-	m_arg1.m_label = interferenceGraph.GetRegisterName(m_arg1.m_label);
+//	dList<dArg*> variablesList;
+//	GetUsedVariables(variablesList);
+//	if (variablesList.GetCount()) {
+	if ((m_arg1.m_intrinsicType != m_constInt) && (m_arg1.m_intrinsicType != m_constFloat)) {
+		m_arg1.m_label = interferenceGraph.GetRegisterName(m_arg1.m_label);
+	}
 	dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
-*/
 }
 
 void dCILThreeArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	dAssert (0);
-/*
 	if ((m_arg2.m_intrinsicType != m_constInt) && (m_arg2.m_intrinsicType != m_constFloat)) {
 		m_arg2.m_label = interferenceGraph.GetRegisterName(m_arg2.m_label);
 	}
 	dCILTwoArgInstr::AssignRegisterName(interferenceGraph);
-*/
 }
 
 

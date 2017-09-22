@@ -21,6 +21,13 @@ inline int RegisterToIndex(const dString& reg)
 	return dString(reg.GetStr() + strlen(D_REGISTER_SYMBOL)).ToInteger();
 }
 
+inline dString IndexToRegister(int index)
+{
+	char regName[256];
+	sprintf(regName, "%s%d", D_REGISTER_SYMBOL, index);
+	return regName;
+}
+
 
 template <class SET_TYPE>
 class dVariableSet: public dTree<int, SET_TYPE>
@@ -243,6 +250,7 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	dCIL::dListNode* m_begin;
 	dCIL::dListNode* m_end;
 	dBasicBlock* m_dominatorTree;
+	int m_savedRegistersMask;
 	mutable int m_mark;
 
 	friend class dBasicBlocksList;

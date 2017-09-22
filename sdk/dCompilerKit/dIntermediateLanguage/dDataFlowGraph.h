@@ -17,12 +17,6 @@
 #include "dCILInstr.h"
 #include "dBasicBlocksGraph.h"
 
-inline dString IndexToRegister(int index)
-{
-	char regName[256];
-	sprintf (regName, "%s%d", D_REGISTER_SYMBOL, index);
-	return regName;			
-}
 
 
 inline dString IndexToLocal(int index)

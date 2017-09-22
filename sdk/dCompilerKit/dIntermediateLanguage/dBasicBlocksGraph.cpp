@@ -265,6 +265,7 @@ dBasicBlocksGraph::dBasicBlocksGraph()
 	:dBasicBlocksList()
 	,m_dominatorTree(NULL)
 	,m_mark(0)
+	,m_savedRegistersMask(0)
 {
 }
 
@@ -717,6 +718,7 @@ void dBasicBlocksGraph::RegistersAllocations ()
 
 	int regCount = 16;
 	dRegisterInterferenceGraph interferenceGraph(this, regCount);
+Trace();
 	dAssert(0);
 /*
 	// remove all redundant newly generate extra jumps 

@@ -29,7 +29,6 @@ class dRegisterInterferenceNodeEdge
 	{
 	}
 	
-//	dList<dRegisterInterferenceNodeEdge>::dListNode* m_twin;
 	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_incidentNode;
 	bool m_mark;
 };
@@ -43,7 +42,7 @@ class dRegisterInterferenceNode
 		,m_coalescedParent(NULL)
 		,m_registerIndex (-1)
 		,m_inSet (false)
-		,m_isMove(false)
+		, m_isPrecolored(false)
 		,m_saveRegisterOnEntry(false)
 	{
 	}
@@ -56,7 +55,7 @@ class dRegisterInterferenceNode
 
 	int m_registerIndex;
 	bool m_inSet;
-	bool m_isMove;
+	bool m_isPrecolored;
 	bool m_saveRegisterOnEntry;
 };
 
@@ -92,35 +91,23 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	};
 
 	dRegisterInterferenceGraph (dBasicBlocksGraph* const graph, int registerCount);
-//	dString GetRegisterName(const dString& varName) const;
+	dString GetRegisterName(const dString& varName) const;
 
 	private:
 	void Build();
 	int ColorGraph();
+	void AllocateRegisters();
 	dTreeNode* GetBestNode(int& edgeCount);
+	int GetRegisterIndex(const dString& varName) const;
 	bool IsSpilledVariable (const dString& name) const;
+	
 /*
-	
-	void CoalesceNodes();
-	
-	void AllocateRegisters ();
 	void InsertEpilogAndProlog();
-	void SelectSpillVariableAndReWriteFunction();
-    
-	int GetRegisterIndex (const dString& varName) const;
 	
-	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
-	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	void ReWriteFunctionSpillingVarible(const dString& spillVariable);
 	void SaveSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory);
 	void LoadSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory);
-	
-	dTree<int, dString> m_spillPenalty;
-	dList<dCoalescedNodePair> m_coalescedNodes;
-	dDataFlowGraph* m_flowGraph;
-	int m_spillCount;
-	int m_registerCount;
-	int m_spillPenatryFactor;
+
 */
 	dBasicBlocksGraph* m_graph;
 };
