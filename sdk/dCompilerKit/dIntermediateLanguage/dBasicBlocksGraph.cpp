@@ -714,9 +714,11 @@ void dBasicBlocksGraph::RemovePhyFunctions()
 
 void dBasicBlocksGraph::RegistersAllocations ()
 {
-	RemovePhyFunctions();
-
 	int regCount = 16;
+
+Trace();
+	RemovePhyFunctions();
+Trace();
 	dRegisterInterferenceGraph interferenceGraph(this, regCount);
 Trace();
 	dAssert(0);

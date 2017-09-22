@@ -15,7 +15,7 @@
 #include "dCILInstrMiscellaneous.h"
 #include "dRegisterInterferenceGraph.h"
 
-dString dCILInstr::m_ssaPosfix ("__ssa");
+dString dCILInstr::m_ssaPosfix ("_ssa");
 
 dCILInstr::dMapTable dCILInstr::m_maptable[] = 
 {

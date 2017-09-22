@@ -359,9 +359,9 @@ void dCILInstrPhy::Serialize(char* const textOut) const
 
 		dArgPair& pair = node->GetInfo();
 		if (node->GetNext()) {
-			sprintf(tmp, "[%s %s], ", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr());
+			sprintf(tmp, "%s %s, ", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr());
 		} else {
-			sprintf(tmp, "[%s %s]", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr());
+			sprintf(tmp, "%s %s", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr());
 		}
 		strcat(textOut, tmp);
 	}
