@@ -547,6 +547,8 @@ bool dBasicBlocksGraph::ApplyConstantConditionalSSA()
 			if ((arg0.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg0.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
 				dAssert(conditinal->GetTrueTarget());
 				dAssert(conditinal->GetFalseTarget());
+				dAssert(0);
+/*
 				int condition = arg0.m_label.ToInteger();
 				if (conditinal->m_mode == dCILInstrConditional::m_ifnot) {
 					condition = !condition;
@@ -564,6 +566,7 @@ bool dBasicBlocksGraph::ApplyConstantConditionalSSA()
 				dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label);
 				conditinal->ReplaceInstruction(jump);
 				anyChanges = true;
+*/
 			}
 		}
 	}

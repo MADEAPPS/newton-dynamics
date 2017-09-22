@@ -87,17 +87,13 @@ class dCILInstrGoto: public dCILInstr
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
-class dCILInstrConditional: public dCILThreeArgInstr
+class dCILInstrConditional: public dCILTwoArgInstr
 {
 	public:
-	enum dBranchMode
-	{
-		m_if,
-		m_ifnot,
-	};
-
-	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
-	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1);
+	dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, const dString& target0, const dString& target1);
+	dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, dCILInstrLabel* const target0, dCILInstrLabel* const target1);
+//	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
+//	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1);
 	void Serialize(char* const textOut) const;
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
@@ -128,9 +124,11 @@ class dCILInstrConditional: public dCILThreeArgInstr
 	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg);
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 
-	dBranchMode m_mode;
+	dString m_label0;
+	dString m_label1;
 	dList<dCILInstr*>::dListNode* m_targetNode0;
 	dList<dCILInstr*>::dListNode* m_targetNode1;
+	dOperator m_operator;
 };
 
 
@@ -167,7 +165,6 @@ class dCILInstrReturn: public dCILSingleArgInstr
 class dCILInstrCall: public dCILTwoArgInstr
 {
 	public:
-//	dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& target, dList<dArg>& parameters);
 	dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& functionName);
 	void Serialize(char* const textOut) const;
 	void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;

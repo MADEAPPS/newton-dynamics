@@ -103,23 +103,32 @@ void dCILInstrGoto::ApplyConstantPropagationSSA (dConstantPropagationSolver& sol
 	}
 }
 
-dCILInstrConditional::dCILInstrConditional(dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1)
-	:dCILThreeArgInstr (program, dArg (name, type), dArg (target0, dArgType()), dArg (target1, dArgType()))
-	,m_mode (mode)
+
+dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, const dString& target0, const dString& target1)
+	:dCILTwoArgInstr(program, dArg (name0, type0), dArg(name1, type1))
+	,m_label0(target0)
+	,m_label1(target1)
 	,m_targetNode0(NULL)
 	,m_targetNode1(NULL)
+	,m_operator(operation)
 {
 }
 
-dCILInstrConditional::dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
-	:dCILThreeArgInstr (program, dArg (name, type), dArg(target0->GetLabel(), dArgType()), dArg(target1->GetLabel(), dArgType()))
-	,m_mode (mode)
+//dCILInstrConditional::dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
+dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
+	:dCILTwoArgInstr(program, dArg(name0, type0), dArg(name1, type1))
+	,m_label0(target0->GetLabel())
+	,m_label1(target1->GetLabel())
+	,m_targetNode0(target0->GetNode())
+	,m_targetNode1(target1->GetNode())
+	,m_operator(operation)
 {
-	SetTargets (target0, target1);
 }
 
 void dCILInstrConditional::Serialize(char* const textOut) const
 {
+	dAssert(0);
+/*
 	if (m_targetNode1) {
 		if (m_mode == m_ifnot) {
 			sprintf(textOut, "\tifnot (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
@@ -133,12 +142,13 @@ void dCILInstrConditional::Serialize(char* const textOut) const
 			sprintf(textOut, "\tif (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 		}
 	}
+*/
 }
 
 void dCILInstrConditional::SetLabels (const dString& label0, const dString& label1)
 {
-	m_arg1.m_label = label0;
-	m_arg2.m_label = label1;
+	m_label0 = label0;
+	m_label1 = label1;
 }
 
 void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1)
@@ -147,7 +157,7 @@ void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrL
 	m_targetNode0 = target0->GetNode();
 
 	if (target1) {
-		dAssert(target1->GetLabel() == GetArg2().m_label);
+		dAssert(target1->GetLabel() == m_label1);
 		m_targetNode1 = target1->GetNode();
 	} else {
 		m_targetNode1 = NULL;
@@ -208,10 +218,13 @@ void dCILInstrConditional::AssignRegisterName(const dRegisterInterferenceGraph& 
 
 void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
+	dAssert(0);
+/*
 	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
 	code.m_type2.m_opcode = m_mode == m_ifnot ? unsigned(dVirtualMachine::m_bneq) : unsigned(dVirtualMachine::m_beq);
 	code.m_type2.m_reg0 = RegisterToIndex(m_arg0.m_label);
 	code.m_type2.m_imm2 = m_targetNode0->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
+*/
 }
 
 void dCILInstrConditional::ReplaceArgument (const dArg& arg, const dArg& newArg)
@@ -224,6 +237,8 @@ void dCILInstrConditional::ReplaceArgument (const dArg& arg, const dArg& newArg)
 void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
 //Trace();
+	dAssert(0);
+/*
 	if ((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat)) {
 		dAssert (0);
 		return;
@@ -269,8 +284,8 @@ void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolv
 //		} else if (variable.m_type == dConstantPropagationSolver::dVariable::m_variableValue) {
 //			dAssert(0);
 		}
-
 	}
+*/
 }
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)
