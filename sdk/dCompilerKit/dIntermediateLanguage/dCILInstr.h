@@ -43,6 +43,23 @@ class dInstructionVariableDictionary;
 class dCILInstr
 {
 	public:
+	enum dOperator
+	{
+		m_add,
+		m_sub,
+		m_mul,
+		m_div,
+		m_mod,
+		m_equal,
+		m_identical,
+		m_different,
+		m_less,
+		m_lessEqual,
+		m_greather,
+		m_greatherEqual,
+		m_operatorsCount,
+	};
+
 	enum dIntrisicType
 	{
 		m_void,
@@ -262,23 +279,6 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 class dCILThreeArgInstr: public dCILTwoArgInstr
 {
 	public:
-	enum dOperator
-	{
-		m_add,
-		m_sub,
-		m_mul,
-		m_div,
-		m_mod,
-		m_equal,
-		m_identical,
-		m_different,
-		m_less,
-		m_lessEqual,
-		m_greather,
-		m_greatherEqual,
-		m_operatorsCount,
-	};
-
 	dCILThreeArgInstr (dCIL& program, const dArg& arg0, const dArg& arg1, const dArg& arg2)
 		:dCILTwoArgInstr (program, arg0, arg1)
 		,m_arg2(arg2)

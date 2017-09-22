@@ -36,8 +36,9 @@ class dCILInstrLabel: public dCILInstr
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual bool IsBasicBlockBegin() const;
 
+	const dString& GetLabel() const;
 	virtual dCILInstrLabel* GetAsLabel();
-	const dString GetLabel() const { return m_label; }
+	
 
 	virtual bool IsDefineOrUsedVariable() { return false; }
 
@@ -49,18 +50,20 @@ class dCILInstrLabel: public dCILInstr
 	dString m_label;
 };
 
-class dCILInstrGoto: public dCILSingleArgInstr
+class dCILInstrGoto: public dCILInstr
 {
 	public:
 	dCILInstrGoto(dCIL& program, const dString& label);
-	dCILInstrGoto(dCIL& program, dCILInstrLabel* const target0);
+	dCILInstrGoto(dCIL& program, dCILInstrLabel* const target);
 	void Serialize(char* const textOut) const;
 
 	virtual bool IsBasicBlockEnd() const;
 	virtual dCILInstrGoto* GetAsGoto();
 
+	const dString& GetLabel() const;
 	void SetLabel (const dString& label);
-	void SetTarget (dCILInstrLabel* const target0);
+
+	void SetTarget (dCILInstrLabel* const target);
 	dList<dCILInstr*>::dListNode* GetTarget () const;
 
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {}
@@ -80,6 +83,7 @@ class dCILInstrGoto: public dCILSingleArgInstr
 
 	virtual bool IsDefineOrUsedVariable() { return false; }
 
+	dString m_label;
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 

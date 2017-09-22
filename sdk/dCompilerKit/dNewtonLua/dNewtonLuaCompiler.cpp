@@ -114,7 +114,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	for (dLuaClosure::dListNode* node = m_currentClosure->GetFirst(); node; node = node->GetNext()) {
 		dCILInstrGoto* const gotoJump = node->GetInfo()->GetAsGoto();
 		if (gotoJump) {
-			if (gotoJump->GetArg0().m_label == m_currentClosure->m_returnLabel) {
+			if (gotoJump->GetLabel() == m_currentClosure->m_returnLabel) {
 				gotoJump->SetTarget(label);
 			}
 		}

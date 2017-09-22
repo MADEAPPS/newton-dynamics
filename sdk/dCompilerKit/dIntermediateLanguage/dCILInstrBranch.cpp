@@ -32,22 +32,29 @@ dCILInstrLabel* dCILInstrLabel::GetAsLabel()
 	return this;
 }
 
+const dString& dCILInstrLabel::GetLabel() const
+{
+	return m_label;
+}
+
+
 void dCILInstrLabel::Serialize(char* const textOut) const
 {
 	sprintf (textOut, "%s:\n", GetLabel().GetStr());
 }
 
 dCILInstrGoto::dCILInstrGoto(dCIL& program, const dString& label)
-	:dCILSingleArgInstr (program, dArg (label, dArgType()))
+	:dCILInstr(program)
+	,m_label(label)
 	,m_tagetNode(NULL)
 {
 }
 
 dCILInstrGoto::dCILInstrGoto(dCIL& program, dCILInstrLabel* const target)
-	:dCILSingleArgInstr (program, dArg(target->GetLabel(), dArgType()))
-	,m_tagetNode(NULL)
+	:dCILInstr(program)
+	,m_label(target->GetLabel())
+	,m_tagetNode(target->GetNode())
 {
-	SetTarget (target);
 }
 
 bool dCILInstrGoto::IsBasicBlockEnd() const
@@ -57,18 +64,23 @@ bool dCILInstrGoto::IsBasicBlockEnd() const
 
 void dCILInstrGoto::Serialize(char* const textOut) const
 {
-	sprintf (textOut, "\tgoto %s\n", m_arg0.m_label.GetStr());
+	sprintf (textOut, "\tgoto %s\n", m_label.GetStr());
 }
 
 void dCILInstrGoto::SetLabel (const dString& label)
 {
-	m_arg0.m_label = label;
+	m_label = label;
+}
+
+const dString& dCILInstrGoto::GetLabel() const 
+{ 
+	return m_label; 
 }
 
 void dCILInstrGoto::SetTarget (dCILInstrLabel* const target)
 {
 	m_tagetNode = target->GetNode();
-	dAssert (target->GetLabel() == GetArg0().m_label);
+	dAssert (m_label == target->GetLabel());
 }
 
 dList<dCILInstr*>::dListNode* dCILInstrGoto::GetTarget () const
