@@ -28,13 +28,11 @@ class dCILInstrFunction;
 class dCILSingleArgInstr;
 class dCILInstrFunctionEnd;
 class dCILInstrConditional;
-class dConstantPropagationSolver;
+class dConditionalConstantPropagationSolver;
 class dCILInstrThreeArgArithmetic;
 
 class dWorkList;
 class dBasicBlock;
-class dDataFlowPoint;
-class dDataFlowGraph;
 class dVariablesDictionary;
 class dStatementBlockDictionary;
 class dRegisterInterferenceGraph;
@@ -177,11 +175,7 @@ class dCILInstr
 	virtual bool ApplySemanticReordering () = 0;
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
-	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
-
-	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  = 0;
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) = 0;
 	
 	virtual void Serialize(char* const textOut) const;
@@ -201,16 +195,13 @@ class dCILInstr
 	virtual bool ApplyConstantFoldingSSA () {return false;}
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
 	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
-	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {}
+	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver) {}
 
 	dString RemoveSSAPostfix(const dString& name) const;
 	dString MakeSSAName(const dString& name, int ssaPostfix) const;
 
 	protected:
-	virtual void AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
-
 	const char* GetOperatorString(dOperator operatotion) const;
-	
 
 	dCIL* m_cil;
 	dBasicBlock* m_basicBlock;
@@ -244,7 +235,6 @@ class dCILSingleArgInstr: public dCILInstr
 		return false;
 	}
 
-	virtual bool DeadElimination (dDataFlowGraph& dataFlow);
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	const dArg& GetArg0 () const 
 	{
@@ -265,9 +255,6 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 
 	virtual bool ApplySemanticReordering () = 0;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
-	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
-
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	const dArg& GetArg1 () const 
@@ -294,8 +281,6 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 
 	virtual bool ApplySemanticReordering () = 0;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
-	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dArg m_arg2;

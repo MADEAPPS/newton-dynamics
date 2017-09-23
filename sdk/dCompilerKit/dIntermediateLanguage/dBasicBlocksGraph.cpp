@@ -16,7 +16,7 @@
 #include "dCILInstrLoadStore.h"
 #include "dConvertToSSASolver.h"
 #include "dRegisterInterferenceGraph.h"
-#include "dConstantPropagationSolver.h"
+#include "dConditionalConstantPropagationSolver.h"
 
 
 void dStatementBlockDictionary::BuildUsedVariableWorklist(dBasicBlocksGraph& list)
@@ -678,9 +678,9 @@ bool dBasicBlocksGraph::ApplyConstantPropagationSSA()
 }
 */
 
-bool dBasicBlocksGraph::ApplyConstantPropagationSSA()
+bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
 {
-	dConstantPropagationSolver constantPropagation(this);
+	dConditionalConstantPropagationSolver constantPropagation(this);
 	return constantPropagation.Solve();
 }
 
@@ -764,7 +764,7 @@ Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
-		actionFound |= ApplyConstantPropagationSSA();
+		actionFound |= ApplyConditionalConstantPropagationSSA();
 Trace();
 //		actionFound |= ApplyCopyPropagationSSA();
 //Trace();
@@ -777,99 +777,4 @@ Trace();
 }
 
 
-#if 0
-void dBasicBlocksGraph::BuildGeneratedAndUsedVariableSets(dList<dDefineAndUsedRecord>& definedAndUsed)
-{
-//	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
-//	for (iter.Begin(); iter; iter ++) {
-//		dDataFlowPoint& point = iter.GetNode()->GetInfo();
-//		point.m_usedVariableSet.RemoveAll();
-//	}
-	m_variableUsed.RemoveAll();
-	for (iter.Begin(); iter; iter ++) {
-		dDataFlowPoint& point = iter.GetNode()->GetInfo();
-		point.m_generatedVariable.Empty();
-		dCILInstr* const instruc = point.m_statement->GetInfo();
-//instruc->Trace();
-		instruc->AddUsedVariable (m_variableUsed);
-		instruc->AddGeneratedAndUsedSymbols(point);	
-
-/*
-		dThreeAdressStmt& stmt = point.m_statement->GetInfo();	
-//DTRACE_INTRUCTION (&stmt);		
-
-		point.m_generatedVariable.Empty();
-		switch (stmt.m_instruction)
-		{
-			case dThreeAdressStmt::m_argument:
-			{
-				point.m_generatedVariable = stmt.m_arg0.m_label;
-				break;
-			}
-
-			case dThreeAdressStmt::m_load:
-			{
-				dAssert (0);
-				point.m_generatedVariable = stmt.m_arg0.m_label;
-				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
-				break;
-			}
-
-			case dThreeAdressStmt::m_store:
-			{
-				dAssert (0);
-				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
-				break;
-			}
-
-
-			case dThreeAdressStmt::m_new:
-			{
-				point.m_generatedVariable = stmt.m_arg0.m_label;
-				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				break;
-			}
-
-			case dThreeAdressStmt::m_release:
-			{
-				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				break;
-			}
-
-			case dThreeAdressStmt::m_ifnot:
-			{
-				if (stmt.m_arg0.GetType().m_intrinsicType == dThreeAdressStmt::m_int) {
-					point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				} else {
-					dAssert (0);
-				}
-				break;
-			}
-
-//			case dThreeAdressStmt::m_push:
-//			{
-//				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-//				break;
-//			}
-
-
-//			case dThreeAdressStmt::m_pop:
-			case dThreeAdressStmt::m_nop:
-			case dThreeAdressStmt::m_goto:
-			case dThreeAdressStmt::m_label:
-			//case dThreeAdressStmt::m_enter:
-			//case dThreeAdressStmt::m_leave:
-			case dThreeAdressStmt::m_function:
-				break;
-
-			default:
-				dAssert (0);
-		}
-*/
-	}
-}
-#endif
 

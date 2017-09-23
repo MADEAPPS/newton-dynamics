@@ -14,7 +14,7 @@
 #include "dCILInstr.h"
 #include "dCILInstrBranch.h"
 #include "dCILInstrLoadStore.h"
-#include "dConstantPropagationSolver.h"
+#include "dConditionalConstantPropagationSolver.h"
 
 dCILInstrArgument::dCILInstrArgument(dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr(program, dArg(name, type))
@@ -27,22 +27,11 @@ void dCILInstrArgument::Serialize(char* const textOut) const
 }
 
 
-void dCILInstrArgument::AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-//	datFloatPoint.m_generatedVariable = m_arg0.m_label;
-}
-
 void dCILInstrArgument::AddDefinedVariable(dInstructionVariableDictionary& dictionary) const 
 { 
 	dAssert(0);
 //	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
 //	node->GetInfo().Append(m_myNode);
-}
-
-bool dCILInstrArgument::ApplyDeadElimination (dDataFlowGraph& dataFlow) 
-{
-	return DeadElimination (dataFlow);
 }
 
 
@@ -55,12 +44,6 @@ dCILInstrLocal::dCILInstrLocal (dCIL& program, const dString& name, const dArgTy
 void dCILInstrLocal::Serialize(char* const textOut) const
 {
 	sprintf (textOut, "\tlocal %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
-}
-
-void dCILInstrLocal::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-//	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 }
 
 void dCILInstrLocal::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const  
@@ -80,16 +63,6 @@ dCILInstrMove::dCILInstrMove (dCIL& program, const dString& name0, const dArgTyp
 void dCILInstrMove::Serialize(char* const textOut) const
 {
 	sprintf(textOut, "\t%s %s = %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
-}
-
-void dCILInstrMove::AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-/*
-	datFloatPoint.m_generatedVariable = m_arg0.m_label;
-	dAssert(m_arg1.GetType().m_intrinsicType != m_constInt);
-	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
-*/
 }
 
 void dCILInstrMove::AddDefinedVariable(dInstructionVariableDictionary& dictionary) const
@@ -123,27 +96,6 @@ void dCILInstrMove::AddUsedVariable (dInstructionVariableDictionary& dictionary)
 */
 }
 
-
-void dCILInstrMove::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-//	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
-}
-
-
-bool dCILInstrMove::ApplyDeadElimination (dDataFlowGraph& dataFlow)
-{ 
-	dAssert(0);
-	return 0;
-/*
-	if (m_arg0.m_label == m_arg1.m_label) {
-		Nullify();
-		dataFlow.UpdateLiveInputLiveOutput();
-		return true;
-	}
-	return DeadElimination (dataFlow);
-*/
-}
 
 void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 {
@@ -193,20 +145,20 @@ bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatement
 }
 */
 
-void dCILInstrMove::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrMove::ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver)
 {
-	dConstantPropagationSolver::dVariable::dValueTypes type = dConstantPropagationSolver::dVariable::m_undefined;
+	dConditionalConstantPropagationSolver::dVariable::dValueTypes type = dConditionalConstantPropagationSolver::dVariable::m_undefined;
 	dString value ("");
 	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
-		type = dConstantPropagationSolver::dVariable::m_constant;
+		type = dConditionalConstantPropagationSolver::dVariable::m_constant;
 		value = m_arg1.m_label;
 	} else {
-		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
+		dConditionalConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
 		type = variable.m_type;
 		value = variable.m_constValue;
 	}
 
-	if (type != dConstantPropagationSolver::dVariable::m_undefined) {
+	if (type != dConditionalConstantPropagationSolver::dVariable::m_undefined) {
 		solver.UpdateLatice (m_arg0, value, type);
 	}
 }
@@ -250,14 +202,6 @@ void dCILInstrLoad::Serialize(char* const textOut) const
 	sprintf (textOut, "\t%s %s = [%s %s]\n", m_arg0.GetTypeName().GetStr(),  m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
 }
 
-void dCILInstrLoad::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-/*
-	datFloatPoint.m_generatedVariable = m_arg0.m_label;
-	datFloatPoint.m_usedVariableSet.Insert (m_arg1.m_label);
-*/
-}
 
 void dCILInstrLoad::GetUsedVariables (dList<dArg*>& variablesList)
 {
@@ -282,15 +226,6 @@ void dCILInstrLoad::AddUsedVariable (dInstructionVariableDictionary& dictionary)
 */
 }
 
-void dCILInstrLoad::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
-{ 
-	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
-}
-
-bool dCILInstrLoad::ApplyDeadElimination (dDataFlowGraph& dataFlow)
-{
-	return DeadElimination (dataFlow);
-}
 
 dCILInstrStore::dCILInstrStore (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
@@ -327,13 +262,6 @@ void dCILInstrStore::GetUsedVariables(dList<dArg*>& variablesList)
 	variablesList.Append(&m_arg1);
 }
 
-
-void dCILInstrStore::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-//	datFloatPoint.m_usedVariableSet.Insert(m_arg0.m_label);
-//	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
-}
 
 
 dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& type, const dBasicBlock* const basicBlock, dList<const dBasicBlock*>& sources)
@@ -419,7 +347,7 @@ bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementB
 }
 */
 
-void dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrPhy::ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver)
 {
 //dAssert (0);
 /*

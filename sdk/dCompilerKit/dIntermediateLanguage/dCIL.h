@@ -32,8 +32,6 @@ inline dString GetReturnVariableName()
 }
 
 class dCILInstr;
-class dDataFlowGraph; 
-
 class dCIL: public dList<dCILInstr*>
 {
 	public:
@@ -84,8 +82,7 @@ class dCIL: public dList<dCILInstr*>
 	static dString m_variableUndercore;
 	static dString m_functionArgument;
 	static dString m_ssaPosifix;
-	
-	friend class dDataFlowGraph;
+
 	friend class dCILInstrIntergerLogical;
 };
 

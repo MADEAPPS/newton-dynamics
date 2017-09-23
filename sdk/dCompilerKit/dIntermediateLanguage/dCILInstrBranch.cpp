@@ -14,7 +14,7 @@
 #include "dCILInstr.h"
 #include "dCILInstrBranch.h"
 #include "dRegisterInterferenceGraph.h"
-#include "dConstantPropagationSolver.h"
+#include "dConditionalConstantPropagationSolver.h"
 
 dCILInstrLabel::dCILInstrLabel(dCIL& program, const dString& label)
 	:dCILInstr(program)
@@ -93,10 +93,10 @@ dCILInstrGoto* dCILInstrGoto::GetAsGoto()
 	return this;
 }
 
-void dCILInstrGoto::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrGoto::ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver)
 {
 	dCILInstrLabel* const target = GetTarget()->GetInfo()->GetAsLabel();
-	dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), target->GetBasicBlock());
+	dConditionalConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), target->GetBasicBlock());
 	if (!solver.m_executableEdges.Find(key1)) {
 		solver.m_executableEdges.Insert(1, key1);
 		solver.m_blockWorklist.Append(target->GetBasicBlock());
@@ -196,15 +196,6 @@ void dCILInstrConditional::AddUsedVariable (dInstructionVariableDictionary& dict
 */
 }
 
-void dCILInstrConditional::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-/*
-	dAssert (m_arg0.GetType().m_intrinsicType == m_int);
-	datFloatPoint.m_usedVariableSet.Insert (m_arg0.m_label);
-*/
-}
-
 
 void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
@@ -234,7 +225,7 @@ void dCILInstrConditional::AssignRegisterName(const dRegisterInterferenceGraph& 
 	}
 }
 
-void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrConditional::ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver)
 {
 //Trace();
 /*
@@ -289,13 +280,13 @@ void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolv
 	if (!((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat))) {
 		dAssert(solver.m_variablesList.Find(m_arg0.m_label));
 		//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
-		dConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
+		dConditionalConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
 		if (!solver.m_executableEdges.Find(key0)) {
 			solver.m_executableEdges.Insert(1, key0);
 			solver.m_blockWorklist.Append(m_targetNode0->GetInfo()->GetBasicBlock());
 		}
 
-		dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
+		dConditionalConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
 		if (!solver.m_executableEdges.Find(key1)) {
 			solver.m_executableEdges.Insert(1, key1);
 			solver.m_blockWorklist.Append(m_targetNode1->GetInfo()->GetBasicBlock());
@@ -305,13 +296,13 @@ void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolv
 	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat))) {
 		dAssert(solver.m_variablesList.Find(m_arg1.m_label));
 		//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
-		dConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
+		dConditionalConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
 		if (!solver.m_executableEdges.Find(key0)) {
 			solver.m_executableEdges.Insert(1, key0);
 			solver.m_blockWorklist.Append(m_targetNode0->GetInfo()->GetBasicBlock());
 		}
 
-		dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
+		dConditionalConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
 		if (!solver.m_executableEdges.Find(key1)) {
 			solver.m_executableEdges.Insert(1, key1);
 			solver.m_blockWorklist.Append(m_targetNode1->GetInfo()->GetBasicBlock());
@@ -372,28 +363,6 @@ void dCILInstrReturn::AddUsedVariable (dInstructionVariableDictionary& dictionar
 */
 }
 
-void dCILInstrReturn::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-/*
-	dAssert (!m_arg0.GetType().m_isPointer);
-	switch (m_arg0.GetType().m_intrinsicType)
-	{
-		case m_int:
-		{
-			datFloatPoint.m_usedVariableSet.Insert(m_arg0.m_label);
-			break;
-		}
-
-		case m_void:
-		case m_constInt:
-			break;
-
-		default:	
-			dAssert (0);
-	}
-*/
-}
 
 void dCILInstrReturn::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
@@ -530,21 +499,6 @@ void dCILInstrCall::AddUsedVariable (dInstructionVariableDictionary& dictionary)
 */
 }
 
-void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-/*
-	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
-		datFloatPoint.m_generatedVariable = m_arg0.m_label;
-	}
-
-	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) { 
-		const dArg& arg = node->GetInfo();
-		datFloatPoint.m_usedVariableSet.Insert (arg.m_label);
-	}
-*/	
-}
-
 
 void dCILInstrCall::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const 
 {
@@ -572,18 +526,6 @@ dCILInstr::dArg* dCILInstrCall::GetGeneratedVariable()
 		return &m_arg0;
 	} else {
 		return NULL;
-	}
-}
-
-void dCILInstrCall::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
-{ 
-	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
-		dCILInstr::AddKilledStatementLow (m_arg0, dictionary, datFloatPoint);
-	}
-
-	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) {
-		const dArg& arg = node->GetInfo();
-		dCILInstr::AddKilledStatementLow (arg, dictionary, datFloatPoint);
 	}
 }
 

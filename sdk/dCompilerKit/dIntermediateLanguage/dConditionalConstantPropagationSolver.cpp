@@ -14,13 +14,13 @@
 #include "dCILInstrBranch.h"
 #include "dBasicBlocksGraph.h"
 #include "dCILInstrLoadStore.h"
-#include "dConstantPropagationSolver.h"
+#include "dConditionalConstantPropagationSolver.h"
 
-dConstantPropagationSolver::dInstructionMap::dInstructionMap():dTree<int, dCILInstr*>()
+dConditionalConstantPropagationSolver::dInstructionMap::dInstructionMap():dTree<int, dCILInstr*>()
 {
 }
 
-dConstantPropagationSolver::dVariable::dVariable(dCILInstr* const instruction, dCILInstr::dArg* const variable)
+dConditionalConstantPropagationSolver::dVariable::dVariable(dCILInstr* const instruction, dCILInstr::dArg* const variable)
 	:m_type(m_undefined)
 	,m_constValue("")
 	,m_instruction(instruction)
@@ -28,19 +28,19 @@ dConstantPropagationSolver::dVariable::dVariable(dCILInstr* const instruction, d
 {
 }
 
-dConstantPropagationSolver::dVariable& dConstantPropagationSolver::dVariable::operator=(const dVariable& copy)
+dConditionalConstantPropagationSolver::dVariable& dConditionalConstantPropagationSolver::dVariable::operator=(const dVariable& copy)
 {
 	dAssert(0);
 	return *this;
 }
 
-dConstantPropagationSolver::dBlockEdgeKey::dBlockEdgeKey(const dBasicBlock* const blockHigh, const dBasicBlock* const blockLow)
+dConditionalConstantPropagationSolver::dBlockEdgeKey::dBlockEdgeKey(const dBasicBlock* const blockHigh, const dBasicBlock* const blockLow)
 	:m_blockHigh(blockHigh)
 	,m_blockLow(blockLow)
 {
 }
 
-bool dConstantPropagationSolver::dBlockEdgeKey::operator<(const dBlockEdgeKey& src) const
+bool dConditionalConstantPropagationSolver::dBlockEdgeKey::operator<(const dBlockEdgeKey& src) const
 {
 	if (m_blockHigh < src.m_blockHigh) {
 		return true;
@@ -48,7 +48,7 @@ bool dConstantPropagationSolver::dBlockEdgeKey::operator<(const dBlockEdgeKey& s
 	return m_blockLow < src.m_blockLow;
 }
 
-bool dConstantPropagationSolver::dBlockEdgeKey::operator>(const dBlockEdgeKey& src) const
+bool dConditionalConstantPropagationSolver::dBlockEdgeKey::operator>(const dBlockEdgeKey& src) const
 {
 	if (m_blockHigh > src.m_blockHigh) {
 		return true;
@@ -56,7 +56,7 @@ bool dConstantPropagationSolver::dBlockEdgeKey::operator>(const dBlockEdgeKey& s
 	return m_blockLow > src.m_blockLow;
 }
 
-dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const graph)
+dConditionalConstantPropagationSolver::dConditionalConstantPropagationSolver (dBasicBlocksGraph* const graph)
 	:m_graph(graph)
 {
 	for (dCIL::dListNode* node = m_graph->m_begin; node != m_graph->m_end; node = node->GetNext()) {
@@ -107,7 +107,7 @@ dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const
 */
 }
 
-void dConstantPropagationSolver::Trace()
+void dConditionalConstantPropagationSolver::Trace()
 {
 	for (dCIL::dListNode* node = m_graph->m_begin; node != m_graph->m_end; node = node->GetNext()) {
 		dCILInstr* const instruction = node->GetInfo();
@@ -138,7 +138,7 @@ void dConstantPropagationSolver::Trace()
 	dTrace (("\n"));
 }
 
-void dConstantPropagationSolver::UpdateLatice (const dCILInstr::dArg& arg, const dString& newValue, dVariable::dValueTypes type)
+void dConditionalConstantPropagationSolver::UpdateLatice (const dCILInstr::dArg& arg, const dString& newValue, dVariable::dValueTypes type)
 {
 	dAssert (m_variablesList.Find(arg.m_label));
 	dVariable& variable = m_variablesList.Find(arg.m_label)->GetInfo();
@@ -158,7 +158,7 @@ void dConstantPropagationSolver::UpdateLatice (const dCILInstr::dArg& arg, const
 }
 
 
-bool dConstantPropagationSolver::Solve ()
+bool dConditionalConstantPropagationSolver::Solve ()
 {
 	m_blockWorklist.Append(&m_graph->GetFirst()->GetInfo());
 
@@ -167,7 +167,7 @@ bool dConstantPropagationSolver::Solve ()
 			dList<dCILInstr*>::dListNode* const nodeOuter = m_instructionsWorklist.GetFirst();
 			dCILInstr* const instruction = nodeOuter->GetInfo();
 			m_instructionsWorklist.Remove(nodeOuter);
-			instruction->ApplyConstantPropagationSSA(*this);
+			instruction->ApplyConditionalConstantPropagationSSA(*this);
 		}
 
 		while (m_blockWorklist.GetCount()) {
@@ -179,7 +179,7 @@ bool dConstantPropagationSolver::Solve ()
 				doneOuter = (node == block->m_end);
 				dCILInstrPhy* const phy = node->GetInfo()->GetAsPhi();
 				if (phy) {
-					phy->ApplyConstantPropagationSSA (*this);
+					phy->ApplyConditionalConstantPropagationSSA (*this);
 				}
 			}
 
@@ -189,7 +189,7 @@ bool dConstantPropagationSolver::Solve ()
 				for (dCIL::dListNode* node = block->m_begin; !done; node = node->GetNext()) {
 					done = (node == block->m_end);
 					dCILInstr* const instruction = node->GetInfo();
-					instruction->ApplyConstantPropagationSSA (*this);
+					instruction->ApplyConditionalConstantPropagationSSA (*this);
 				}
 			}
 		}

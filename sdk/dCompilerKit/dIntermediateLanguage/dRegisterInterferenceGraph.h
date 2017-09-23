@@ -16,7 +16,7 @@
 #include "dCILstdafx.h"
 #include "dCILInstr.h"
 
-class dDataFlowGraph;
+
 class dRegisterInterferenceNode;
 
 class dRegisterInterferenceNodeEdge

@@ -203,9 +203,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\dIntermediateLanguage\dConstantPropagationSolver.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dConditionalConstantPropagationSolver.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dConvertToSSASolver.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILInstr.cpp" />
   </ItemGroup>
@@ -217,9 +216,8 @@
     <ClInclude Include="..\dIntermediateLanguage\dCILInstrLoadStore.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dConstantPropagationSolver.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dConditionalConstantPropagationSolver.h" />
     <ClInclude Include="..\dIntermediateLanguage\dConvertToSSASolver.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILInstr.h" />
   </ItemGroup>

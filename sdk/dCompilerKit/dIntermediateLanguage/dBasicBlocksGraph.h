@@ -28,6 +28,13 @@ inline dString IndexToRegister(int index)
 	return regName;
 }
 
+inline dString IndexToLocal(int index)
+{
+	char regName[256];
+	sprintf(regName, "%s%d", D_SPILL_REGISTER_SYMBOL, index);
+	return regName;
+}
+
 
 template <class SET_TYPE>
 class dVariableSet: public dTree<int, SET_TYPE>
@@ -165,38 +172,6 @@ class dBasicBlocksList: public dList<dBasicBlock>
 {
 };
 
-/*
-class dDataFlowPoint
-{
-	public:
-
-	void Init(dCIL::dListNode* const statementNode, dBasicBlocksList::dListNode* const basicBlock)
-	{
-		//m_mark = 0;
-		//m_generateStmt = false;
-		m_basicBlockNode = basicBlock;
-		m_statement = statementNode;
-	}
-
-	dList<dDataFlowPoint*> m_successors;
-	dList<dDataFlowPoint*> m_predecessors;
-
-	dCIL::dListNode* m_statement;
-	dBasicBlocksList::dListNode* m_basicBlockNode;
-
-	dString m_generatedVariable;
-	dVariableSet<dString> m_liveInputSet;
-	dVariableSet<dString> m_liveOutputSet;
-	dVariableSet<dString> m_usedVariableSet;
-
-	int m_mark;
-	bool m_generateStmt;
-
-	dVariableSet<dCIL::dListNode*> m_killStmtSet;
-	dVariableSet<dCIL::dListNode*> m_reachStmtInputSet;
-	dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
-};
-*/
 
 class dLiveInLiveOut
 {
@@ -243,7 +218,7 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	//bool ApplyConstantPropagationSSA();
 	bool ApplyDeadCodeEliminationSSA();
 	bool ApplyConstantConditionalSSA();
-	bool ApplyConstantPropagationSSA();
+	bool ApplyConditionalConstantPropagationSSA();
 
 	// Non Single Static transformation assignments passes
 
@@ -257,7 +232,7 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	friend class dConvertToSSASolver;
 	friend class dLiveInLiveOutSolver;
 	friend class dRegisterInterferenceGraph;
-	friend class dConstantPropagationSolver;
+	friend class dConditionalConstantPropagationSolver;
 };
 
 

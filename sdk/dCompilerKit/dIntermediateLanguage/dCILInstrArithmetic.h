@@ -49,13 +49,8 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	virtual bool ApplySemanticReordering ();
-	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
-	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
-
-	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow);
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 
 	// ***********************
@@ -64,7 +59,7 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg);
 
 	virtual bool ApplyConstantFoldingSSA ();
-	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
+	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver);
 
 	dString Evalue (const dString& arg1, const dString& arg2) const;
 

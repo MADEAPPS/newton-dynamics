@@ -19,7 +19,7 @@
 #include "dBasicBlocksGraph.h"
 
 
-class dConstantPropagationSolver
+class dConditionalConstantPropagationSolver
 {
 	public:
 	class dInstructionMap: public dTree<int, dCILInstr*>
@@ -59,7 +59,7 @@ class dConstantPropagationSolver
 	};
 
 
-	dConstantPropagationSolver (dBasicBlocksGraph* const graph);
+	dConditionalConstantPropagationSolver (dBasicBlocksGraph* const graph);
 	bool Solve();
 	void UpdateLatice (const dCILInstr::dArg& arg, const dString& value, dVariable::dValueTypes type);
 

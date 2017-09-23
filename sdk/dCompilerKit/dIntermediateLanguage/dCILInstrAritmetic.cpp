@@ -14,8 +14,8 @@
 #include "dCILInstr.h"
 #include "dCILInstrLoadStore.h"
 #include "dCILInstrArithmetic.h"
-#include "dConstantPropagationSolver.h"
-#include "dConstantPropagationSolver.h"
+#include "dConditionalConstantPropagationSolver.h"
+#include "dConditionalConstantPropagationSolver.h"
 
 
 dCILInstrIntergerLogical::dCILInstrIntergerLogical (dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2)
@@ -65,38 +65,6 @@ bool dCILInstrIntergerLogical::ApplySemanticReordering ()
 }
 
 
-void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert(0);
-/*
-	datFloatPoint.m_generatedVariable = m_arg0.m_label;
-
-	dAssert (m_arg1.GetType().m_intrinsicType != m_constInt);
-	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
-	
-	switch (m_arg2.GetType().m_intrinsicType)
-	{
-		case m_int:
-		//case dThreeAdressStmt::m_classPointer:
-		{
-			datFloatPoint.m_usedVariableSet.Insert (m_arg2.m_label);
-			break;
-		}
-
-		case m_constInt:
-			break;
-
-		default:	
-			dAssert (0);
-	}
-*/	
-}
-
-
-bool dCILInstrIntergerLogical::ApplyDeadElimination (dDataFlowGraph& dataFlow)
-{
-	return DeadElimination (dataFlow);
-}
 
 void dCILInstrIntergerLogical::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const 
 {
@@ -160,10 +128,6 @@ bool dCILInstrIntergerLogical::ApplyCopyPropagation(dCILInstrMove* const moveIns
 	return ret; 
 }
 
-void dCILInstrIntergerLogical::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
-{ 
-	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
-}
 
 
 void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
@@ -318,27 +282,27 @@ bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
 }
 
 
-void dCILInstrIntergerLogical::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrIntergerLogical::ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver)
 {
 	dArg arg1(m_arg1);
-	dConstantPropagationSolver::dVariable::dValueTypes type1 = dConstantPropagationSolver::dVariable::m_constant;
+	dConditionalConstantPropagationSolver::dVariable::dValueTypes type1 = dConditionalConstantPropagationSolver::dVariable::m_constant;
 	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat))) {
-		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
+		dConditionalConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
 		type1 = variable.m_type;
 		arg1.m_label = variable.m_constValue;
 	}
 
 	dArg arg2(m_arg2);
-	dConstantPropagationSolver::dVariable::dValueTypes type2 = dConstantPropagationSolver::dVariable::m_constant;
+	dConditionalConstantPropagationSolver::dVariable::dValueTypes type2 = dConditionalConstantPropagationSolver::dVariable::m_constant;
 	if (!((m_arg2.GetType().m_intrinsicType == m_constInt) || (m_arg2.GetType().m_intrinsicType == m_constFloat))) {
-		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg2.m_label)->GetInfo();
+		dConditionalConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg2.m_label)->GetInfo();
 		type2 = variable.m_type;
 		arg2.m_label = variable.m_constValue;
 	}
 
-	if ((type1 == dConstantPropagationSolver::dVariable::m_constant) && (type2 == dConstantPropagationSolver::dVariable::m_constant)) {
-		solver.UpdateLatice (m_arg0, Evalue(arg1.m_label, arg2.m_label), dConstantPropagationSolver::dVariable::m_constant);
+	if ((type1 == dConditionalConstantPropagationSolver::dVariable::m_constant) && (type2 == dConditionalConstantPropagationSolver::dVariable::m_constant)) {
+		solver.UpdateLatice (m_arg0, Evalue(arg1.m_label, arg2.m_label), dConditionalConstantPropagationSolver::dVariable::m_constant);
 	} else {
-		solver.UpdateLatice (m_arg0, m_arg0.m_label, dConstantPropagationSolver::dVariable::m_variableValue);
+		solver.UpdateLatice (m_arg0, m_arg0.m_label, dConditionalConstantPropagationSolver::dVariable::m_variableValue);
 	}
 }

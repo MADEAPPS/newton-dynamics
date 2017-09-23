@@ -107,12 +107,6 @@ void dCILInstrFunction::Serialize(char* const textOut) const
 }
 
 
-void dCILInstrFunction::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
-{
-	dAssert (0);
-}
-
-
 dCILInstrFunctionEnd::dCILInstrFunctionEnd(dCILInstrFunction* const functionBegin)
 	:dCILInstr(*functionBegin->GetCil())
 	,m_function(functionBegin)
