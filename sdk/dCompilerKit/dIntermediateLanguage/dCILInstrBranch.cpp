@@ -104,7 +104,7 @@ void dCILInstrGoto::ApplyConstantPropagationSSA (dConstantPropagationSolver& sol
 }
 
 
-dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, const dString& target0, const dString& target1)
+dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& target0, const dString& target1)
 	:dCILTwoArgInstr(program, dArg (name0, type0), dArg(name1, type1))
 	,m_label0(target0)
 	,m_label1(target1)
@@ -114,8 +114,8 @@ dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, c
 {
 }
 
-//dCILInstrConditional::dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
-dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
+
+dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, dCILInstrLabel* const target0, dCILInstrLabel* const target1)
 	:dCILTwoArgInstr(program, dArg(name0, type0), dArg(name1, type1))
 	,m_label0(target0->GetLabel())
 	,m_label1(target1->GetLabel())
@@ -127,22 +127,17 @@ dCILInstrConditional::dCILInstrConditional(dCIL& program, dOperator operation, c
 
 void dCILInstrConditional::Serialize(char* const textOut) const
 {
-	dAssert(0);
-/*
+	const char* const assignOperator = GetOperatorString(m_operator);
 	if (m_targetNode1) {
-		if (m_mode == m_ifnot) {
-			sprintf(textOut, "\tifnot (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
-		} else {
-			sprintf(textOut, "\tif (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
-		}
+		sprintf(textOut, "\tif (%s %s %s %s %s) goto %s else goto %s\n", 
+								m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), 
+								assignOperator,
+								m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr(),
+								m_label0.GetStr(), m_label1.GetStr());
 	} else {
-		if (m_mode == m_ifnot) {
-			sprintf(textOut, "\tifnot (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
-		} else {
-			sprintf(textOut, "\tif (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
-		}
+		dAssert(0);
+		//sprintf(textOut, "\tif (%s %s %s %s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 	}
-*/
 }
 
 void dCILInstrConditional::SetLabels (const dString& label0, const dString& label1)
@@ -237,7 +232,7 @@ void dCILInstrConditional::ReplaceArgument (const dArg& arg, const dArg& newArg)
 void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
 //Trace();
-	dAssert(0);
+dTrace(("xxxxxxxxxxxxxxxxxxxxxxxxxx\n"));
 /*
 	if ((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat)) {
 		dAssert (0);
@@ -250,10 +245,10 @@ void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolv
 			dAssert(GetTrueTarget());
 			dAssert(GetFalseTarget());
 
-			int condition = variable.m_constValue.ToInteger();
-			if (m_mode == dCILInstrConditional::m_ifnot) {
-				condition = !condition;
-			}
+			//int condition = variable.m_constValue.ToInteger();
+			//if (m_mode == dCILInstrConditional::m_ifnot) {
+			//	condition = !condition;
+			//}
 
 			dCILInstrLabel* target;
 			if (condition) {

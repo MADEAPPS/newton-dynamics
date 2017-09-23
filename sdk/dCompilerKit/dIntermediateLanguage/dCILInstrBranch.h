@@ -90,10 +90,8 @@ class dCILInstrGoto: public dCILInstr
 class dCILInstrConditional: public dCILTwoArgInstr
 {
 	public:
-	dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, const dString& target0, const dString& target1);
-	dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2, dCILInstrLabel* const target0, dCILInstrLabel* const target1);
-//	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
-//	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, dCILInstrLabel* const target0, dCILInstrLabel* const target1);
+	dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& target0, const dString& target1);
+	dCILInstrConditional(dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, dCILInstrLabel* const target0, dCILInstrLabel* const target1);
 	void Serialize(char* const textOut) const;
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 

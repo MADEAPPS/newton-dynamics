@@ -373,8 +373,9 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 		dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, exitLabel);
 		TRACE_INSTRUCTION(gotoJump);
 		m_currentClosure->InsertAfter(elseBlockNode->GetPrev(), gotoJump->GetNode());
-/*
-		dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstrConditional::m_ifnot, expressionArg.m_label, expressionArg.GetType(), elseBlockInstruction, thenBlockInstruction);
+
+		dString zero("0");
+		dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstr::m_different, expressionArg.m_label, expressionArg.GetType(), zero, expressionArg.GetType(), elseBlockInstruction, thenBlockInstruction);
 		m_currentClosure->InsertAfter (expresionNode, conditional->GetNode());
 		TRACE_INSTRUCTION(conditional);
 
@@ -384,9 +385,6 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 
 		//m_currentClosure->Trace();
 		return dUserVariable(conditional);
-*/
-		dAssert(0);
-		return dUserVariable();
 	} else {
 		dAssert (0);
 		return dUserVariable();

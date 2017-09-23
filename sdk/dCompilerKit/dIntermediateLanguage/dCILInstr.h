@@ -208,6 +208,8 @@ class dCILInstr
 
 	protected:
 	virtual void AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	const char* GetOperatorString(dOperator operatotion) const;
 	
 
 	dCIL* m_cil;

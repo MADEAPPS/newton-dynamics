@@ -146,6 +146,99 @@ void dCILInstr::Trace() const
 #endif
 }
 
+const char* dCILInstr::GetOperatorString(dOperator operatotion) const
+{
+	char* assignOperator = "";
+	switch (operatotion)
+	{
+		case m_equal:
+		{
+			//dTrace ((" = "));
+			assignOperator = "=";
+			break;
+		}
+
+		case m_add:
+		{
+			//dTrace ((" + "));
+			assignOperator = "+";
+			break;
+		}
+		case m_sub:
+		{
+			//dTrace ((" - "));
+			assignOperator = "-";
+			break;
+		}
+
+		case m_mul:
+		{
+			//dTrace ((" * "));
+			assignOperator = "*";
+			break;
+		}
+		case m_div:
+		{
+			//dTrace ((" / "));
+			assignOperator = "/";
+			break;
+		}
+
+		case m_mod:
+		{
+			//dTrace ((" %c ", '%'));
+			assignOperator = "%%";
+			break;
+		}
+
+		case m_identical:
+		{
+			//dTrace ((" == "));
+			assignOperator = "==";
+			break;
+		}
+
+		case m_different:
+		{
+			//dTrace ((" != "));
+			assignOperator = "!=";
+			break;
+		}
+
+		case m_less:
+		{
+			//dTrace ((" < "));
+			assignOperator = "<";
+			break;
+		}
+
+		case m_greather:
+		{
+			//dTrace ((" > "));
+			assignOperator = ">";
+			break;
+		}
+
+		case m_lessEqual:
+		{
+			//dTrace ((" <= "));
+			assignOperator = "<=";
+			break;
+		}
+
+		case m_greatherEqual:
+		{
+			//dTrace ((" >= "));
+			assignOperator = ">=";
+			break;
+		}
+		default:;
+			dAssert(0);
+	}
+
+	return assignOperator;
+}
+
 void dCILInstr::AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
 {
 	dAssert(0);
