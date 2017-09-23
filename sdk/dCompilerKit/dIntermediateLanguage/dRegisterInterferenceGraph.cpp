@@ -19,212 +19,9 @@
 
 
 
-#define D_SPILL_WEIGHT_FACTOR	10
-#define D_MOVE_WEIGHT_FACTOR	20
-
-#if 0
-
-void dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory)
-{
-dAssert (0);
-
-	if (argument.m_label == spillVariable) {
-		dString newtemp = m_flowGraph->m_cil->NewTemp (); 
-		argument.m_label = newtemp;
-
-		dTree<int, dString>::dTreeNode* penaltyNode = m_spillPenalty.Find(newtemp);
-		if (penaltyNode) {
-			penaltyNode->GetInfo() = m_spillPenatryFactor;
-		} else {
-			m_spillPenalty.Insert(m_spillPenatryFactor, newtemp);
-		}
-
-		dCIL::dListNode* const newNode = m_flowGraph->m_cil->NewStatement();
-		m_flowGraph->m_cil->InsertAfter (node, newNode);
-
-		dThreeAdressStmt& stmt = newNode->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_storeBase;
-		stmt.m_operator = dThreeAdressStmt::m_nothing;
-		stmt.m_arg0.m_label = newtemp;
-		stmt.m_arg0.m_type = dThreeAdressStmt::m_intVar;
-		stmt.m_arg2.m_label = spillMemory;
-		stmt.m_arg2.m_type = dThreeAdressStmt::m_intVar;
-
-//node->GetInfo().Trace();
-//stmt.Trace();
-	}
-}
-
-void dRegisterInterferenceGraph::LoadSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory)
-{
-dAssert (0);
-	if (argument.m_label == spillVariable) {
-		dString newtemp = m_flowGraph->m_cil->NewTemp (); 
-		argument.m_label = newtemp;
-
-		dTree<int, dString>::dTreeNode* penaltyNode = m_spillPenalty.Find(newtemp);
-		if (penaltyNode) {
-			penaltyNode->GetInfo() = m_spillPenatryFactor;
-		} else {
-			m_spillPenalty.Insert(m_spillPenatryFactor, newtemp);
-		}
-
-
-		dCIL::dListNode* const newNode = m_flowGraph->m_cil->NewStatement();
-		m_flowGraph->m_cil->InsertAfter (node->GetPrev(), newNode);
-
-		dThreeAdressStmt& stmt = newNode->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_loadBase;
-		stmt.m_operator = dThreeAdressStmt::m_nothing;
-		stmt.m_arg0.m_label = newtemp;
-		stmt.m_arg0.m_type = dThreeAdressStmt::m_intVar;
-		stmt.m_arg2.m_label = spillMemory;
-		stmt.m_arg2.m_type = dThreeAdressStmt::m_intVar;
-
-//stmt.Trace();
-//node->GetInfo().Trace();
-	}
-}
-
-void dRegisterInterferenceGraph::ReWriteFunctionSpillingVarible(const dString& spillVariable)
-{
-dAssert (0);
-	dString spillLocal = IndexToLocal(m_spillCount);
-	m_spillCount ++;
-
-	dCIL::dListNode* nextNode;
-	m_spillPenatryFactor += 50;
-	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = nextNode) {
-		nextNode = node->GetNext();
-		dThreeAdressStmt& stmt = node->GetInfo();
-//stmt.Trace();
-		switch (stmt.m_instruction)
-		{
-            case dThreeAdressStmt::m_pop:
-			case dThreeAdressStmt::m_loadBase:
-			{
-				SaveSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
-				break;
-			}
-
-			case dThreeAdressStmt::m_assigment:
-			{
-				LoadSpillRegister (node, stmt.m_arg1, spillVariable, spillLocal);
-				if (stmt.m_operator != dThreeAdressStmt::m_nothing) {
-					LoadSpillRegister (node, stmt.m_arg2, spillVariable, spillLocal);
-				}
-				SaveSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
-				break;
-			}
-
-			case dThreeAdressStmt::m_if:
-			{
-				LoadSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
-				LoadSpillRegister (node, stmt.m_arg1, spillVariable, spillLocal);
-				break;
-			}
-
-            case dThreeAdressStmt::m_load:
-            {
-                LoadSpillRegister (node, stmt.m_arg2, spillVariable, spillLocal);
-                LoadSpillRegister (node, stmt.m_arg1, spillVariable, spillLocal);
-                SaveSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
-            }
-
-			case dThreeAdressStmt::m_store:
-			{
-                LoadSpillRegister (node, stmt.m_arg2, spillVariable, spillLocal);
-                LoadSpillRegister (node, stmt.m_arg1, spillVariable, spillLocal);
-                LoadSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
-				break;
-			}
-
-            case dThreeAdressStmt::m_push:
-            case dThreeAdressStmt::m_storeBase:
-            {
-               LoadSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
-               break;
-            }
-		
-//			case dThreeAdressStmt::m_alloc:
-//			{
-//				dAssert (0);
-//				//point.m_killVariable = stmt.m_arg0.m_label;
-//				//point.m_generatedVariableSet.Insert(stmt.m_arg1.m_label);
-//				break;
-//			}
-//
-//			case dThreeAdressStmt::m_free:
-//			{
-//				dAssert (0);
-//				//point.m_generatedVariableSet.Insert(stmt.m_arg0.m_label);
-//				break;
-//			}
-//
-			
-			case dThreeAdressStmt::m_nop:
-			case dThreeAdressStmt::m_ret:
-			case dThreeAdressStmt::m_goto:
-			case dThreeAdressStmt::m_call:
-			case dThreeAdressStmt::m_label:
-			case dThreeAdressStmt::m_enter:
-			case dThreeAdressStmt::m_leave:
-			case dThreeAdressStmt::m_function:
-			case dThreeAdressStmt::m_argument:
-				break;
-
-			default:
-				dAssert (0);
-		}
-	}
-
-//m_flowGraph->m_cil->Trace();
-	m_flowGraph->m_returnVariableName = GetReturnVariableName();
-	m_flowGraph->BuildBasicBlockGraph();
-	m_flowGraph->CalculateLiveInputLiveOutput ();
-	RemoveAll();
-	Build();
-}
-
-void dRegisterInterferenceGraph::InsertEpilogAndProlog()
-{
-	int registerMask = 0;
-	int lastReg = 0;
-	Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
-		dRegisterInterferenceNode& node = iter.GetNode()->GetInfo();
-		lastReg = dMax(node.m_registerIndex, lastReg);
-	}
-
-	lastReg = lastReg - D_CALLER_SAVE_REGISTER_COUNT;
-	if (lastReg >= 0) {
-		registerMask = (1 << (lastReg + 1)) - 1;
-	}
-
-	int localMemory = 0;
-
-	if (registerMask || localMemory) {
-
-		dCILInstrFunction* const entryPoint = m_flowGraph->m_function->GetInfo()->GetAsFunction();
-		dAssert(entryPoint);
-		dCILInstrEnter* const enter = new dCILInstrEnter(*m_flowGraph->m_cil, entryPoint, registerMask, localMemory);
-		
-		for (dCIL::dListNode* node = m_flowGraph->m_function; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
-			dCILInstr* const instr = node->GetInfo();
-			if (instr->GetAsReturn()) {
-				new dCILInstrLeave(enter, instr->GetAsReturn());
-			}
-		}
-
-//		m_flowGraph->m_cil->Trace();
-	}
-}
-#endif
-
 bool dRegisterInterferenceGraph::IsSpilledVariable (const dString& name) const
 {
 	static int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
-	//return (name[0] != '_') && strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
 	return strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize) ? false : true;
 }
 
@@ -546,11 +343,9 @@ dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode(i
 
 int dRegisterInterferenceGraph::ColorGraph()
 {
+#if 0
 	dList<dTreeNode*> registerOrder;
-
-	//	m_flowGraph->m_savedRegistersMask = 0;
 	for (int i = 0; i < GetCount(); i++) {
-
 		int edgeCount; 
 		dTreeNode* const bestNode = GetBestNode(edgeCount);
 dTrace (("%s\n", bestNode->GetKey().GetStr()));
@@ -569,40 +364,6 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 			}
 		}
 	}
-/*
-	for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
-		dTreeNode* const varNode = node->GetInfo();
-		dRegisterInterferenceNode& variable = varNode->GetInfo();
-		if (variable.m_registerIndex != -1) {
-//			dRegisterInterferenceNode& parentVariable = variable.m_coalescedParent->GetInfo();
-//			variable.m_registerIndex = parentVariable.m_registerIndex;
-		}
-	}
-*/
-
-/*
-	m_flowGraph->CalculateLiveInputLiveOutput();
-	for (dCIL::dListNode* node = m_flowGraph->m_basicBlocks.m_begin; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
-		//dThreeAdressStmt& stmt = stmtNode->GetInfo();
-		dCILInstr* const instr = node->GetInfo();
-		if (instr->GetAsCall()) {
-			dCILInstrCall* const callInstr = instr->GetAsCall();
-			dAssert(m_flowGraph->m_dataFlowGraph.Find(node));
-			dDataFlowPoint& point = m_flowGraph->m_dataFlowGraph.Find(node)->GetInfo();
-			dDataFlowPoint::dVariableSet<dString>::Iterator iter(point.m_liveOutputSet);
-			for (iter.Begin(); iter; iter++) {
-				const dString& varName = iter.GetKey();
-				//if (varName != stmt.m_arg0.m_label) {
-				dTreeNode* const interferanceGraphNode = Find(varName);
-				dRegisterInterferenceNode& interferanceGraphVariable = interferanceGraphNode->GetInfo();
-				if (interferanceGraphVariable.m_registerIndex == -1) {
-					interferanceGraphVariable.m_saveRegisterOnEntry = true;
-					//callerSaveRegisterRemap.Insert (0, varName);
-				}
-			}
-		}
-	}
-*/
 
 	int registersUsed = -1;
 	for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
@@ -621,21 +382,18 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 			int index = 0;
 			if (variable.m_saveRegisterOnEntry) {
 				dAssert(0);
-/*
-				index = D_CALLER_SAVE_REGISTER_COUNT;
-				const int highMask = variable.m_saveRegisterOnEntry << D_CALLER_SAVE_REGISTER_COUNT;
-				for (int mask = regMask; mask & highMask; mask >>= 1) {
-					index++;
-				}
-
-				if (index > (D_INTEGER_REGISTER_COUNT - 1)) {
-					dAssert(0);
-					index = 0;
-					for (int mask = regMask; mask & 1; mask >>= 1) {
-						index++;
-					}
-				}
-*/
+				//index = D_CALLER_SAVE_REGISTER_COUNT;
+				//const int highMask = variable.m_saveRegisterOnEntry << D_CALLER_SAVE_REGISTER_COUNT;
+				//for (int mask = regMask; mask & highMask; mask >>= 1) {
+				//	index++;
+				//}
+				//if (index > (D_INTEGER_REGISTER_COUNT - 1)) {
+				//	dAssert(0);
+				//	index = 0;
+				//	for (int mask = regMask; mask & 1; mask >>= 1) {
+				//		index++;
+				//	}
+				//}
 			} else {
 				for (int mask = regMask; mask & 1; mask >>= 1) {
 					index++;
@@ -650,16 +408,15 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 			}
 			variable.m_registerIndex = index;
 		}
-
 		registersUsed = dMax(registersUsed, variable.m_registerIndex);
 	}
 
-
 	// remap register
-	
 	int count = 0;
 	int registerCost[1024];
 	dTreeNode* registerNode[1024];
+
+	m_graph->m_savedRegistersMask = 0;
 	dAssert(registerOrder.GetCount() < sizeof(registerCost) / sizeof(registerCost[0]));
 	for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
 		dTreeNode* const varNode = node->GetInfo();
@@ -685,7 +442,6 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 		registerNode[j + 1] = varNode;
 	}
 
-
 	int saveOnEntryStart = 100000;
 	for (int i = 0; i < count; i++) {
 		int cost = registerCost[i];
@@ -694,6 +450,74 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 			break;
 		}
 	}
+#else
+
+	// my algorithm for register allocation from interference graph, seems better than Chaitin method
+	// at least is much faster and yidl teh same result.
+	Iterator iter(*this);
+	int registersUsed = -1;
+	for (iter.Begin(); iter; iter++) {
+		dTreeNode* const node = iter.GetNode();
+		dRegisterInterferenceNode& variable = node->GetInfo();
+		if (variable.m_registerIndex == -1) {
+			int regMask = 0;
+			for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = variable.m_interferanceEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
+				dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+				const dRegisterInterferenceNode& otherVariable = edge.m_incidentNode->GetInfo();
+				if (otherVariable.m_registerIndex != -1) {
+					regMask |= (1 << otherVariable.m_registerIndex);
+				}
+			}
+
+			int index = 0;
+			if (variable.m_saveRegisterOnEntry) {
+				dAssert(0);
+				//index = D_CALLER_SAVE_REGISTER_COUNT;
+				//const int highMask = variable.m_saveRegisterOnEntry << D_CALLER_SAVE_REGISTER_COUNT;
+				//for (int mask = regMask; mask & highMask; mask >>= 1) {
+				//	index++;
+				//}
+				//if (index > (D_INTEGER_REGISTER_COUNT - 1)) {
+				//	dAssert(0);
+				//	index = 0;
+				//	for (int mask = regMask; mask & 1; mask >>= 1) {
+				//		index++;
+				//	}
+				//}
+			} else {
+				for (int mask = regMask; mask & 1; mask >>= 1) {
+					index++;
+				}
+			}
+
+			if (index > (D_INTEGER_REGISTER_COUNT - 1)) {
+				// spill
+				dAssert(0);
+				return  D_INTEGER_REGISTER_COUNT;
+			}
+			variable.m_registerIndex = index;
+		}
+		registersUsed = dMax(registersUsed, variable.m_registerIndex);
+	}
+
+	int count = 0;
+	int registerCost[1024];
+	dTreeNode* registerNode[1024];
+
+	m_graph->m_savedRegistersMask = 0;
+	dAssert(GetCount() < sizeof(registerCost) / sizeof(registerCost[0]));
+	for (iter.Begin(); iter; iter++) {
+		dTreeNode* const varNode = iter.GetNode();
+		dRegisterInterferenceNode& variable = varNode->GetInfo();
+		if (variable.m_saveRegisterOnEntry) {
+			registerCost[count] = (variable.m_saveRegisterOnEntry << 24) + (variable.m_registerIndex << 1);
+		} else {
+			registerCost[count] = (variable.m_registerIndex << 1) + !variable.m_isPrecolored;
+		}
+		registerNode[count] = varNode;
+		count++;
+	}
+#endif
 
 	int saveOnEntryIndex = D_CALLER_SAVE_REGISTER_COUNT;
 	memset(registerCost, -1, count * sizeof(registerCost[0]));
@@ -706,15 +530,16 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 				registerCost[index] = saveOnEntryIndex;
 				m_graph->m_savedRegistersMask |= (1 << saveOnEntryIndex);
 				saveOnEntryIndex++;
-			} else if (variable.m_isPrecolored) {
+			}
+			else if (variable.m_isPrecolored) {
 				registerCost[index] = variable.m_registerIndex;
-			} else {
+			}
+			else {
 				registerCost[index] = variable.m_registerIndex;
 			}
 		}
 		variable.m_registerIndex = registerCost[index];
 	}
-
 	return registersUsed + 1;
 }
 

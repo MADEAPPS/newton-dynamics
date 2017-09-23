@@ -100,15 +100,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	dTreeNode* GetBestNode(int& edgeCount);
 	int GetRegisterIndex(const dString& varName) const;
 	bool IsSpilledVariable (const dString& name) const;
-	
-/*
-	void InsertEpilogAndProlog();
-	
-	void ReWriteFunctionSpillingVarible(const dString& spillVariable);
-	void SaveSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory);
-	void LoadSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory);
 
-*/
 	dBasicBlocksGraph* m_graph;
 };
 

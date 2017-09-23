@@ -327,6 +327,8 @@ DemoEntityManager::DemoEntityManager ()
 */
 }
 
+
+
 DemoEntityManager::~DemoEntityManager ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.

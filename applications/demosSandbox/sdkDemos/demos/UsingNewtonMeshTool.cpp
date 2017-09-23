@@ -20,6 +20,79 @@
 #include "PhysicsUtils.h"
 
 
+void TestCollsionBug(NewtonWorld* world)
+{
+	// create static body
+	NewtonCollision* cs = 0;
+	NewtonBody* dyn = 0;
+	{
+		// Dummy transform matrix.
+		dMatrix tm(dGetIdentityMatrix());
+#if 0
+		// WORKING simple BOX
+		cs = NewtonCreateBox(world, 40., 40., 0.2, 0, 0);
+#else
+		// TRIANGLE MESH
+		dVector verts[6] = {
+#if 1
+			// FAILING,TRIANGLE MESH
+			dVector(-55.12000656, -38.16000366, 0.00000000),
+			dVector(55.12000656, -38.16000366, 0.00000000),
+			dVector(-55.12000656, 38.16000366, 0.00000000),
+			dVector(55.12000656, -38.16000366, 0.00000000),
+			dVector(55.12000656, 38.16000366, 0.00000000),
+			dVector(-55.12000656, 38.16000366, 0.00000000)
+#else
+			// WORKING,TRIANGLE MESH
+			dVector(+40, +30, 0),
+			dVector(-40, +30, 0),
+			dVector(-40, -30, 0),
+			dVector(-40, -30, 0),
+			dVector(+40, -30, 0),
+			dVector(+40, +30, 0),
+#endif
+		};
+
+		cs = NewtonCreateTreeCollision(world, 0);
+		NewtonTreeCollisionBeginBuild(cs);
+		NewtonTreeCollisionAddFace(cs, 3, &verts[0][0], sizeof(dVector), 0);
+		NewtonTreeCollisionAddFace(cs, 3, &verts[3][0], sizeof(dVector), 0);
+		NewtonTreeCollisionEndBuild(cs, 0);
+#endif
+		dyn = NewtonCreateDynamicBody(world, cs, &tm[0][0]);
+		NewtonDestroyCollision(cs);
+	}
+
+	// cast shape
+	NewtonCollision* cast_shape = 0;
+	{
+		cast_shape = NewtonCreateBox(world, 4, 4, 16, 0, 0);
+	}
+
+	// convex cast
+	dVector start(-10, 20.5, 9.5);
+	dVector target(-10, 20.5, 5);
+	dMatrix start_xform(dQuaternion(), start);
+	float hitParam = 0;
+	NewtonWorldConvexCastReturnInfo info[16];
+	int contactCount = NewtonWorldConvexCast(world, &start_xform[0][0], &target.m_x, cast_shape,
+		&hitParam, 0, 0,
+		info, sizeof(info) / sizeof(info[0]), 0);
+	// assert(contactCount > 0);
+	// int a = sizeof(dVector);
+	// dVector v;
+	// int b = sizeof(v.m_x);
+	// printf("%d %d ",a,b);
+	printf("%f %d\n", hitParam, contactCount);
+
+	// Tear down.
+//	NewtonMaterialDestroyAllGroupID(world);
+	NewtonDestroyCollision(cast_shape);
+	NewtonDestroyCollision(cs);
+//	NewtonDestroyAllBodies(world);
+//	NewtonDestroy(world);
+}
+
 
 static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
 {
@@ -158,6 +231,8 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
+
+TestCollsionBug(scene->GetNewton());
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
