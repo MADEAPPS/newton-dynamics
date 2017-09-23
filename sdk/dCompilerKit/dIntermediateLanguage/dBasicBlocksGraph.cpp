@@ -764,11 +764,11 @@ Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
-		actionFound |= ApplyConditionalConstantPropagationSSA();
-Trace();
-//		actionFound |= ApplyCopyPropagationSSA();
+//		actionFound |= ApplyConditionalConstantPropagationSSA();
 //Trace();
-//		actionFound |= ApplyDeadCodeEliminationSSA();
+		actionFound |= ApplyCopyPropagationSSA();
+Trace();
+		actionFound |= ApplyDeadCodeEliminationSSA();
 //Trace();
 //		actionFound |= ApplyConstantConditionalSSA();
 //Trace();
