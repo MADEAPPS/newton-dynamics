@@ -205,11 +205,6 @@ void dCILInstrConditional::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatP
 */
 }
 
-void dCILInstrConditional::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
-{
-	dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
-}
-
 
 void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
@@ -229,10 +224,19 @@ void dCILInstrConditional::ReplaceArgument (const dArg& arg, const dArg& newArg)
 	}
 }
 
+void dCILInstrConditional::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+{
+	dList<dArg*> variablesList;
+	GetUsedVariables (variablesList);
+	for(dList<dArg*>::dListNode * node = variablesList.GetFirst(); node; node = node->GetNext()) {
+		dArg* const arg = node->GetInfo();
+		arg->m_label = interferenceGraph.GetRegisterName(arg->m_label);
+	}
+}
+
 void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
 //Trace();
-dTrace(("xxxxxxxxxxxxxxxxxxxxxxxxxx\n"));
 /*
 	if ((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat)) {
 		dAssert (0);
@@ -281,6 +285,38 @@ dTrace(("xxxxxxxxxxxxxxxxxxxxxxxxxx\n"));
 		}
 	}
 */
+
+	if (!((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat))) {
+		dAssert(solver.m_variablesList.Find(m_arg0.m_label));
+		//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
+		dConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
+		if (!solver.m_executableEdges.Find(key0)) {
+			solver.m_executableEdges.Insert(1, key0);
+			solver.m_blockWorklist.Append(m_targetNode0->GetInfo()->GetBasicBlock());
+		}
+
+		dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
+		if (!solver.m_executableEdges.Find(key1)) {
+			solver.m_executableEdges.Insert(1, key1);
+			solver.m_blockWorklist.Append(m_targetNode1->GetInfo()->GetBasicBlock());
+		}
+	}
+
+	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat))) {
+		dAssert(solver.m_variablesList.Find(m_arg1.m_label));
+		//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
+		dConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
+		if (!solver.m_executableEdges.Find(key0)) {
+			solver.m_executableEdges.Insert(1, key0);
+			solver.m_blockWorklist.Append(m_targetNode0->GetInfo()->GetBasicBlock());
+		}
+
+		dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
+		if (!solver.m_executableEdges.Find(key1)) {
+			solver.m_executableEdges.Insert(1, key1);
+			solver.m_blockWorklist.Append(m_targetNode1->GetInfo()->GetBasicBlock());
+		}
+	}
 }
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)
@@ -361,18 +397,11 @@ void dCILInstrReturn::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint)
 
 void dCILInstrReturn::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	switch (m_arg0.GetType().m_intrinsicType)
-	{
-		case m_int:
-			dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
-		break;
-
-		case m_void:
-		case m_constInt:
-			break;
-
-		default:
-			dAssert(0);
+	dList<dArg*> variablesList;
+	GetUsedVariables(variablesList);
+	for (dList<dArg*>::dListNode * node = variablesList.GetFirst(); node; node = node->GetNext()) {
+		dArg* const arg = node->GetInfo();
+		arg->m_label = interferenceGraph.GetRegisterName(arg->m_label);
 	}
 }
 

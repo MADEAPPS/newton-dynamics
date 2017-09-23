@@ -24,10 +24,6 @@
 
 #if 0
 
-
-
-
-
 void dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory)
 {
 dAssert (0);
@@ -239,7 +235,7 @@ void dRegisterInterferenceGraph::Build()
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
 		dList<dCILInstr::dArg*> usedVariables;
 		dLiveInLiveOut& point = node->GetInfo();
-		
+//point.m_instruction->Trace();		
 		dCILInstr::dArg* const generated = point.m_instruction->GetGeneratedVariable();
 		if (generated) {
 //dTrace (("%s\n", generated->m_label.GetStr()));
@@ -727,9 +723,9 @@ void dRegisterInterferenceGraph::AllocateRegisters()
 {
 	for (dList<dBasicBlock>::dListNode* blockNode = m_graph->GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		dBasicBlock& block = blockNode->GetInfo();
-		for (dCIL::dListNode* node = block.m_begin; node != block.m_end; node = node->GetNext()) {
+		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
 			dCILInstr* const instr = node->GetInfo();
-			//instr->Trace();
+//instr->Trace();
 			instr->AssignRegisterName(*this);
 			//instr->Trace();
 		}

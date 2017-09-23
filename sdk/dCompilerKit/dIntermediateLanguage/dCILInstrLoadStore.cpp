@@ -195,16 +195,11 @@ bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatement
 
 void dCILInstrMove::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
-	//dAssert(solver.m_variablesList.Find(m_arg0.m_label));
-	//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
-
 	dConstantPropagationSolver::dVariable::dValueTypes type = dConstantPropagationSolver::dVariable::m_undefined;
 	dString value ("");
 	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
 		type = dConstantPropagationSolver::dVariable::m_constant;
 		value = m_arg1.m_label;
-		//variable.m_value = dConstantPropagationSolver::dVariable::m_constant;
-		//variable.m_constValue = m_arg1.m_label;
 	} else {
 		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
 		type = variable.m_type;

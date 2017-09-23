@@ -105,8 +105,6 @@ class dCILInstrConditional: public dCILTwoArgInstr
 
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
-
-	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
@@ -121,6 +119,7 @@ class dCILInstrConditional: public dCILTwoArgInstr
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg);
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dString m_label0;
 	dString m_label1;

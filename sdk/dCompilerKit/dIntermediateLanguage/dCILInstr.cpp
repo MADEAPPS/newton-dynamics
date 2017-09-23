@@ -153,82 +153,70 @@ const char* dCILInstr::GetOperatorString(dOperator operatotion) const
 	{
 		case m_equal:
 		{
-			//dTrace ((" = "));
 			assignOperator = "=";
 			break;
 		}
 
 		case m_add:
 		{
-			//dTrace ((" + "));
 			assignOperator = "+";
 			break;
 		}
 		case m_sub:
 		{
-			//dTrace ((" - "));
 			assignOperator = "-";
 			break;
 		}
 
 		case m_mul:
 		{
-			//dTrace ((" * "));
 			assignOperator = "*";
 			break;
 		}
 		case m_div:
 		{
-			//dTrace ((" / "));
 			assignOperator = "/";
 			break;
 		}
 
 		case m_mod:
 		{
-			//dTrace ((" %c ", '%'));
 			assignOperator = "%%";
 			break;
 		}
 
 		case m_identical:
 		{
-			//dTrace ((" == "));
 			assignOperator = "==";
 			break;
 		}
 
 		case m_different:
 		{
-			//dTrace ((" != "));
 			assignOperator = "!=";
 			break;
 		}
 
 		case m_less:
 		{
-			//dTrace ((" < "));
 			assignOperator = "<";
 			break;
 		}
 
 		case m_greather:
 		{
-			//dTrace ((" > "));
 			assignOperator = ">";
 			break;
 		}
 
 		case m_lessEqual:
 		{
-			//dTrace ((" <= "));
 			assignOperator = "<=";
 			break;
 		}
 
 		case m_greatherEqual:
 		{
-			//dTrace ((" >= "));
 			assignOperator = ">=";
 			break;
 		}
@@ -286,9 +274,6 @@ void dCILSingleArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& in
 
 void dCILTwoArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-//	dList<dArg*> variablesList;
-//	GetUsedVariables(variablesList);
-//	if (variablesList.GetCount()) {
 	if ((m_arg1.m_intrinsicType != m_constInt) && (m_arg1.m_intrinsicType != m_constFloat)) {
 		m_arg1.m_label = interferenceGraph.GetRegisterName(m_arg1.m_label);
 	}
