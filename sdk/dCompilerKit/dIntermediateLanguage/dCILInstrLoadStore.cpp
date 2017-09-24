@@ -121,10 +121,8 @@ void dCILInstrMove::ReplaceArgument (const dArg& arg, const dArg& newArg)
 	}
 }
 
-/*
-bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
+bool dCILInstrMove::ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
-//Trace();
 	bool ret = false;
 	if ((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
 		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
@@ -132,21 +130,18 @@ bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatement
 			dStatementBlockBucket::Iterator iter (node->GetInfo());
 			for (iter.Begin(); iter; iter ++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-				//instrution->Trace();
-				instrution->ReplaceArgument (m_arg0, NULL, m_arg1);
-				//instrution->Trace();
-				workList.Insert(instrution->GetNode());
+				instrution->ReplaceArgument (m_arg0, m_arg1);
+				workList.Insert(instrution);
 			}
 		}
-		Nullify();
 		ret = true;
 	}
 	return ret;
 }
-*/
 
 void dCILInstrMove::ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver)
 {
+	dAssert (0);
 	dConditionalConstantPropagationSolver::dVariable::dValueTypes type = dConditionalConstantPropagationSolver::dVariable::m_undefined;
 	dString value ("");
 	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
@@ -317,35 +312,34 @@ void dCILInstrPhy::ReplaceArgument(const dArg& arg, const dArg& newArg)
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
 		dArgPair& pair = node->GetInfo();
 		if (arg.m_label == pair.m_arg.m_label) {
-			pair.m_arg.m_label = newArg.m_label;
+			pair.m_arg = newArg;
 			break;
 		}
 	}
 }
 
-/*
-bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
+bool dCILInstrPhy::ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 	bool ret = false;
-	if (!m_sources.GetFirst()->GetInfo().m_intructionNode) {
+	if (m_sources.GetCount()) {
 		const dArg& arg = m_sources.GetFirst()->GetInfo().m_arg;
 		if ((arg.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
 			ret = true;
-			for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
-				const dArg& srcArg = node->GetInfo().m_intructionNode ? *node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : node->GetInfo().m_arg;
-				ret &= ((srcArg.m_label == arg.m_label) && !node->GetInfo().m_intructionNode);
+			for (dList<dArgPair>::dListNode* node = m_sources.GetFirst()->GetNext(); node; node = node->GetNext()) {
+				const dArg& arg1 = node->GetInfo().m_arg;
+				ret &= (arg1.m_label == arg.m_label);
 			}
 		}
 	}
 
 	if (ret) {
-		Trace();
-		dAssert (0);
+		const dArg& arg = m_sources.GetFirst()->GetInfo().m_arg;
+		dCILInstrMove* const move = new dCILInstrMove (*m_cil, m_arg0.m_label, m_arg0.GetType(), arg.m_label, arg.GetType());
+		ReplaceInstruction(move);
 	}
-
 	return ret;
 }
-*/
+
 
 void dCILInstrPhy::ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver)
 {

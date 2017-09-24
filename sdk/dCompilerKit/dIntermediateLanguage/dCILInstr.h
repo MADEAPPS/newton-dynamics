@@ -194,7 +194,7 @@ class dCILInstr
 
 	virtual bool ApplyConstantFoldingSSA () {return false;}
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
-	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
+	virtual bool ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
 	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver) {}
 
 	dString RemoveSSAPostfix(const dString& name) const;

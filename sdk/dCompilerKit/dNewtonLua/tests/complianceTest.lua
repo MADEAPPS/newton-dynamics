@@ -1,4 +1,4 @@
----[[	
+--[[	
 	local a, b, c, d	
 	local e = d + a
 	local f = b + c
@@ -9,12 +9,12 @@
 		d = e - f
 	end
 --]]
---[[	
+---[[	
 	local d	
 	if 1 == 0 then
 		d = 3
 	else
-		d = 4
+		d = 3
 	end		 
 --]]
 	return d;

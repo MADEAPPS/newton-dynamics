@@ -525,56 +525,6 @@ void dBasicBlocksGraph::GetStatementsWorklist(dWorkList& workList) const
 }
 
 
-bool dBasicBlocksGraph::ApplyConstantConditionalSSA()
-{
-	bool anyChanges = false;
-
-	dTree<int, dCIL::dListNode*> phyMap;
-	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
-		dCILInstr* const instruction = node->GetInfo();
-		if (instruction->GetAsPhi()) {
-			phyMap.Insert(0, node);
-		}
-	}
-
-	dCIL* const cil = m_begin->GetInfo()->GetCil();
-	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
-		dCILInstr* const instruction = node->GetInfo();
-		if (instruction->GetAsIF()) {
-			dCILInstrConditional* const conditinal = instruction->GetAsIF();
-
-			const dCILInstr::dArg& arg0 = conditinal->GetArg0();
-			if ((arg0.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg0.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
-				dAssert(conditinal->GetTrueTarget());
-				dAssert(conditinal->GetFalseTarget());
-				dAssert(0);
-/*
-				int condition = arg0.m_label.ToInteger();
-				if (conditinal->m_mode == dCILInstrConditional::m_ifnot) {
-					condition = !condition;
-				}
-
-				dCILInstrLabel* label;
-				if (condition) {
-					label = conditinal->GetTrueTarget()->GetInfo()->GetAsLabel();
-				} else {
-					label = conditinal->GetFalseTarget()->GetInfo()->GetAsLabel();
-				}
-
-				//dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label->GetLabel);
-				//jump->SetTarget(label);
-				dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label);
-				conditinal->ReplaceInstruction(jump);
-				anyChanges = true;
-*/
-			}
-		}
-	}
-
-	return anyChanges;
-}
-
-
 bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 {
 	bool anyChanges = false;
@@ -650,6 +600,76 @@ bool dBasicBlocksGraph::ApplyCopyPropagationSSA()
 	}
 	return anyChanges;
 }
+
+bool dBasicBlocksGraph::ApplySimpleConstantPropagationSSA()
+{
+	bool anyChanges = false;
+
+	dWorkList workList;
+	dStatementBlockDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist(*this);
+
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetInfo();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+instruction->Trace();
+		anyChanges |= instruction->ApplySimpleConstantPropagationSSA(workList, usedVariablesList);
+	}
+	return anyChanges;
+}
+
+/*
+bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
+{
+	bool anyChanges = false;
+
+	dTree<int, dCIL::dListNode*> phyMap;
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		if (instruction->GetAsPhi()) {
+			phyMap.Insert(0, node);
+		}
+	}
+
+	dCIL* const cil = m_begin->GetInfo()->GetCil();
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		if (instruction->GetAsIF()) {
+			dCILInstrConditional* const conditinal = instruction->GetAsIF();
+
+			const dCILInstr::dArg& arg0 = conditinal->GetArg0();
+			if ((arg0.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg0.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+				dAssert(conditinal->GetTrueTarget());
+				dAssert(conditinal->GetFalseTarget());
+				dAssert(0);
+
+				int condition = arg0.m_label.ToInteger();
+				if (conditinal->m_mode == dCILInstrConditional::m_ifnot) {
+					condition = !condition;
+				}
+
+				dCILInstrLabel* label;
+				if (condition) {
+					label = conditinal->GetTrueTarget()->GetInfo()->GetAsLabel();
+				} else {
+					label = conditinal->GetFalseTarget()->GetInfo()->GetAsLabel();
+				}
+
+				//dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label->GetLabel);
+				//jump->SetTarget(label);
+				dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label);
+				conditinal->ReplaceInstruction(jump);
+				anyChanges = true;
+
+			}
+		}
+	}
+
+	return anyChanges;
+}
+*/
 
 /*
 bool dBasicBlocksGraph::ApplyConstantPropagationSSA()
@@ -764,14 +784,14 @@ Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
+		actionFound |= ApplySimpleConstantPropagationSSA();
+Trace();
+//		actionFound |= ApplyCopyPropagationSSA();
+//Trace();
 //		actionFound |= ApplyConditionalConstantPropagationSSA();
 //Trace();
-		actionFound |= ApplyCopyPropagationSSA();
-Trace();
 		actionFound |= ApplyDeadCodeEliminationSSA();
-//Trace();
-//		actionFound |= ApplyConstantConditionalSSA();
-//Trace();
+Trace();
 	}
 	dAssert (!actionFound);
 }

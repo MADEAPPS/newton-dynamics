@@ -215,9 +215,8 @@ class dBasicBlocksGraph: public dBasicBlocksList
 
 	// Single Static transformation assignments passes
 	bool ApplyCopyPropagationSSA();
-	//bool ApplyConstantPropagationSSA();
 	bool ApplyDeadCodeEliminationSSA();
-	bool ApplyConstantConditionalSSA();
+	bool ApplySimpleConstantPropagationSSA();
 	bool ApplyConditionalConstantPropagationSSA();
 
 	// Non Single Static transformation assignments passes

@@ -118,6 +118,11 @@ void dRegisterInterferenceGraph::Build()
 						registerInfo.m_isPrecolored = true;
 						break;
 					}
+
+					case dCILInstr::m_constInt:
+					case dCILInstr::m_constFloat:
+						break;		
+
 					default:
 					{
 						dAssert(0);
@@ -453,7 +458,7 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 #else
 
 	// my algorithm for register allocation from interference graph, seems better than Chaitin method
-	// at least is much faster and yidl teh same result.
+	// at least is much faster and yielding the same result.
 	Iterator iter(*this);
 	int registersUsed = -1;
 	for (iter.Begin(); iter; iter++) {

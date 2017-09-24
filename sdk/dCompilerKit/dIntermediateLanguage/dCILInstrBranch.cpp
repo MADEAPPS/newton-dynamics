@@ -399,11 +399,8 @@ void dCILInstrReturn::GetUsedVariables (dList<dArg*>& variablesList)
 		switch (m_arg0.GetType().m_intrinsicType) 
 		{
 			case m_void:
-				break;
-
 			case m_constInt:
 			case m_constFloat:
-				dAssert (0);
 				break;
 
 			default:

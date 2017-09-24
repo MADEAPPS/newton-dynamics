@@ -76,7 +76,7 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
-	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
+	virtual bool ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver);
 };
 
@@ -121,7 +121,7 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg);
-	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
+	virtual bool ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver);
 
 	dList<dArgPair> m_sources;
@@ -145,6 +145,7 @@ class dCILInstrLoad: public dCILTwoArgInstr
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { dAssert(0);  return false; }
 
 	// ***********************
+	virtual bool ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {dAssert (0); return false;}
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 };
