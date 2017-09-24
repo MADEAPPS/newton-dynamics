@@ -34,7 +34,7 @@ void TestCollsionBug(NewtonWorld* world)
 #else
 		// TRIANGLE MESH
 		dVector verts[6] = {
-#if 1
+#if 0
 			// FAILING,TRIANGLE MESH
 			dVector(-55.12000656, -38.16000366, 0.00000000),
 			dVector(55.12000656, -38.16000366, 0.00000000),
