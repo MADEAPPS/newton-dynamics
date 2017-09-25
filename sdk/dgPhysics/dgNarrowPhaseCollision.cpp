@@ -1821,7 +1821,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 
 	dgFloat32 timeNormalizer = proxy.m_timestep;
 	dgFloat32 epsilon = dgFloat32(-1.0e-3f) * proxy.m_timestep;
-dgAssert(0);
+
 	for (dgInt32 i = 0; (i < data.m_faceCount) && (proxy.m_timestep >= (data.m_hitDistance[i] * timeNormalizer)); i++) {
 		dgInt32 address = data.m_faceIndexStart[i];
 		const dgInt32* const localIndexArray = &indexArray[address];
@@ -1840,6 +1840,7 @@ dgAssert(0);
 		proxy.m_timestep = minTimeStep;
 		proxy.m_maxContacts = countleft;
 		proxy.m_contacts = &contactOut[count];
+
 		dgInt32 count1 = polygon.CalculateContactToConvexHullContinue(this, polySoupInstance, proxy);
 
 		if (count1 > 0) {

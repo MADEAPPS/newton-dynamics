@@ -562,7 +562,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 			}
 		}
 
+
 		dgFloat32 convexSphapeUmbra = dgMax (proxy.m_instance0->GetUmbraClipSize(), sphRadius.GetScalar());
+dgAssert(0);
 		if (m_faceClipSize > convexSphapeUmbra) {
 			BeamClipping(pointInPlane, convexSphapeUmbra);
 			m_faceClipSize = proxy.m_instance0->m_childShape->GetBoxMaxRadius();
