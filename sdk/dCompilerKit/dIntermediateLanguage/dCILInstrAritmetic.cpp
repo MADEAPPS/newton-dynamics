@@ -190,19 +190,24 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 
 void dCILInstrIntergerLogical::GetUsedVariables (dList<dArg*>& variablesList)
 {
-	variablesList.Append(&m_arg1);
-	if (m_arg1.m_isPointer) {
-		variablesList.Append(&m_arg1);
-	} else {
-		switch (m_arg2.GetType().m_intrinsicType) 
-		{
-			case m_constInt:
-			case m_constFloat:			
-				break;
+	switch (m_arg1.GetType().m_intrinsicType)
+	{
+		case m_constInt:
+		case m_constFloat:
+			break;
 
-			default:
-				variablesList.Append(&m_arg2);
-		}
+		default:
+			variablesList.Append(&m_arg1);
+	}
+
+	switch (m_arg2.GetType().m_intrinsicType) 
+	{
+		case m_constInt:
+		case m_constFloat:			
+			break;
+
+		default:
+			variablesList.Append(&m_arg2);
 	}
 }
 

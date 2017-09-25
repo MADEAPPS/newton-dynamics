@@ -27,11 +27,10 @@ void dStatementBlockDictionary::BuildUsedVariableWorklist(dBasicBlocksGraph& lis
 
 		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
 			dCILInstr* const instruction = node->GetInfo();
-			//instruction->Trace();
-
 			dList<dCILInstr::dArg*> variablesList;
 			instruction->GetUsedVariables(variablesList);
 			for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
+				//instruction->Trace();
 				const dCILInstr::dArg* const variable = varNode->GetInfo();
 				dTreeNode* entry = Find(variable->m_label);
 				if (!entry) {
@@ -612,8 +611,9 @@ bool dBasicBlocksGraph::ApplySimpleConstantPropagationSSA()
 		dCIL::dListNode* const node = workList.GetRoot()->GetInfo();
 		workList.Remove(workList.GetRoot());
 		dCILInstr* const instruction = node->GetInfo();
-instruction->Trace();
-		anyChanges |= instruction->ApplySimpleConstantPropagationSSA(workList, usedVariablesList);
+//instruction->Trace();
+		bool change = instruction->ApplySimpleConstantPropagationSSA(workList, usedVariablesList);
+		anyChanges |= change;
 	}
 	return anyChanges;
 }
@@ -783,12 +783,12 @@ Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
-//		actionFound |= ApplySimpleConstantPropagationSSA();
-//Trace();
-		actionFound |= ApplyConditionalConstantPropagationSSA();
+		actionFound |= ApplySimpleConstantPropagationSSA();
 Trace();
-//		actionFound |= ApplyCopyPropagationSSA();
+//		actionFound |= ApplyConditionalConstantPropagationSSA();
 //Trace();
+		actionFound |= ApplyCopyPropagationSSA();
+Trace();
 		actionFound |= ApplyDeadCodeEliminationSSA();
 Trace();
 	}
