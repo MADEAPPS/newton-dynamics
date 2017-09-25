@@ -17,7 +17,7 @@
 
 
 
-#define D_TEMPRARY_SYMBOL			"t"
+#define D_TEMPRARY_SYMBOL "$t"
 
 inline dString GetTemporaryVariableName(int index)
 {

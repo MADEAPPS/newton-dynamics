@@ -60,7 +60,7 @@ void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T
 	dgCheckAligment(matrix);
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
-		dgGetRow(const T* const matrix, dgInt32 size, dgInt32 index)
+		//dgGetRow(const T* const matrix, dgInt32 size, dgInt32 index)
 		const T* const row = &matrix[stride];
 		dgCheckAligment(row);
 		out[i] = dgDotProduct(size, row, v);
