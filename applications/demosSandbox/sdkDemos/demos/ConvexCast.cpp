@@ -209,9 +209,9 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 {
 	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
-	:dCustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
-	,m_selectShape (true)
-	,m_stupidLevel(stupidLevel)
+		:dCustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
+		,m_selectShape (true)
+		,m_stupidLevel(stupidLevel)
 	{
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
 	}
@@ -242,17 +242,15 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 
 	virtual void PreUpdate (dFloat timestep)
 	{
-		dAssert(0);
-		/*
-
 		(void)timestep;
 
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		DemoCamera* const camera = scene->GetCamera();
 
-		m_helpKey.UpdatePushButton (scene, 'H');
-		if (m_selectShape.UpdateTriggerButton (scene, ' ')) {
+		//m_helpKey.UpdatePushButton (scene, 'H');
+//		bool state = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('H'));
+		if (m_selectShape.UpdateTrigger(scene->GetKeyState(' '))) {
 			m_stupidLevel->ChangeCastingShape();
 		}
 
@@ -291,11 +289,11 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 			}
 			m_stupidLevel->SetCastingLine (p0, p1);
 		}
-*/
 	}
 
-	DemoEntityManager::ButtonKey m_selectShape;
 	StupidComplexOfConvexShapes* m_stupidLevel;
+	DemoEntityManager::ButtonKey m_selectShape;
+	//DemoEntityManager::ButtonKey m_helpKey;
 };
 
 

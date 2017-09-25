@@ -261,11 +261,12 @@ void DemoEntity::SetUserData (UserData* const data)
 void DemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex)
 {
 	DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(body);
-	
-	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-	dMatrix transform (matrix);
-	dQuaternion rot (transform);
-	ent->SetMatrix (*scene, rot, transform.m_posit);
+	if (ent) {
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+		dMatrix transform(matrix);
+		dQuaternion rot(transform);
+		ent->SetMatrix(*scene, rot, transform.m_posit);
+	}
 }
 
 
