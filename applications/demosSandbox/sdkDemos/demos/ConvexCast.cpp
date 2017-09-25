@@ -22,14 +22,14 @@ class StupidComplexOfConvexShapes: public DemoEntity
 {
 	public:
 	StupidComplexOfConvexShapes (DemoEntityManager* const scene, int count)
-	:DemoEntity (dGetIdentityMatrix(), NULL)
-	,m_rayP0(0.0f)
-	,m_rayP1(0.0f)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
+		,m_rayP0(0.0f)
+		,m_rayP1(0.0f)
 	{
 		scene->Append(this);
 
-		count = 40;
-		//count = 1;
+		//count = 40;
+		count = 1;
 		const dFloat size = 0.5f;
 
 		DemoMesh* gemetries[32];
@@ -267,8 +267,8 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-			//p0 = dVector (-12.044177f, 8.068434f, -7.558466f, 1.0f);
-			//p1 = dVector (1751.264038f, -845.520630f, 633.307312f, 1.0f);
+			p0 = dVector(-4.426113f, 7.244503f, 15.269794f);
+			p1 = dVector(878.254150f, -742.662842f, -1708.758545f);
 
 			// do the convex cast here
 			dMatrix matrix (dGetIdentityMatrix());
@@ -280,8 +280,8 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 			//int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, &filter.m_contacts[0], 4, 0);
 			NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &param, NULL, Prefilter, NULL, 0, 0);
 
-			//dTrace(("%ff, %ff, %ff\n", p0[0], p0[1], p0[2]));
-			//dTrace(("%ff, %ff, %ff\n", p1[0], p1[1], p1[2]));
+			dTrace(("%ff, %ff, %ff\n", p0[0], p0[1], p0[2]));
+			dTrace(("%ff, %ff, %ff\n", p1[0], p1[1], p1[2]));
 
 			if (param < 1.0f) {
 				matrix.m_posit += (p1 - matrix.m_posit).Scale (param);
@@ -293,7 +293,6 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 
 	StupidComplexOfConvexShapes* m_stupidLevel;
 	DemoEntityManager::ButtonKey m_selectShape;
-	//DemoEntityManager::ButtonKey m_helpKey;
 };
 
 
