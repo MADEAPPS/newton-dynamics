@@ -173,21 +173,20 @@ class dBasicBlocksList: public dList<dBasicBlock>
 };
 
 
-class dLiveInLiveOut
+class dFlowGraphNode
 {
 	public:
 	dCILInstr* m_instruction;
 	dVariableSet<dString> m_liveInputSet;
 	dVariableSet<dString> m_liveOutputSet;
-	dList<dLiveInLiveOut*> m_successors;
+	dList<dFlowGraphNode*> m_successors;
 //	dList<dLiveInLiveOut*> m_predecessors;
 };
 
-class dLiveInLiveOutSolver: public dList<dLiveInLiveOut>
+class dLiveInLiveOutSolver: public dList<dFlowGraphNode>
 {
 	public:
 	dLiveInLiveOutSolver(dBasicBlocksGraph* const graph);
-	void BuildReverseOrdeBlockList(dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const;
 
 	void Trace();
 	dBasicBlocksGraph* m_graph;
@@ -204,9 +203,11 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	void ConvertToSSA ();
 
 	void RegistersAllocations ();
+	void BuildReverseOrderBlockList (dList<const dBasicBlock*>& reverseOrder);
 
 	private:
 	void GetStatementsWorklist (dWorkList& workList) const;
+	void BuildReverseOrdeBlockList (dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const;
 
 	void RemovePhyFunctions ();
 	void BuildDominatorTree ();
@@ -229,7 +230,7 @@ class dBasicBlocksGraph: public dBasicBlocksList
 
 	friend class dBasicBlocksList;
 	friend class dConvertToSSASolver;
-	friend class dLiveInLiveOutSolver;
+	//friend class dLiveInLiveOutSolver;
 	friend class dRegisterInterferenceGraph;
 	friend class dConditionalConstantPropagationSolver;
 };

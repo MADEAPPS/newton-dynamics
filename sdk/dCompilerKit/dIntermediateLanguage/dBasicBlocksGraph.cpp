@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #include "dCILstdafx.h"
 #include "dCILInstrBranch.h"
 #include "dBasicBlocksGraph.h"
@@ -122,7 +121,6 @@ void dBasicBlock::Trace() const
 	dTrace (("\n"));
 }
 
-
 bool dBasicBlock::ComparedDominator(const dTree<int, const dBasicBlock*>& newdominators) const
 {
 	if (m_dominators.GetCount() != newdominators.GetCount()) {
@@ -153,31 +151,31 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 	:m_graph(graph)
 {
 	dList<const dBasicBlock*> reverseOrderBlocks;
+	m_graph->BuildReverseOrderBlockList (reverseOrderBlocks);
+/*
 	for (dBasicBlocksList::dListNode* blockNode = m_graph->GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		const dBasicBlock& block = blockNode->GetInfo();
 		block.m_mark = m_graph->m_mark;
 	}
 	m_graph->m_mark++;
 	BuildReverseOrdeBlockList(reverseOrderBlocks, &m_graph->GetFirst()->GetInfo());
+*/
 
-//m_graph->Trace();
 	dTree<dListNode*, const dBasicBlock*> lastStatement;
 	dTree<dListNode*, const dBasicBlock*> firstStatement;
 	for (dList<const dBasicBlock*>::dListNode* blockNode = reverseOrderBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		const dBasicBlock* const block = blockNode->GetInfo();
-//block->Trace();
 
 		dListNode* lastNode = GetFirst();
 		for (dCIL::dListNode* instNode = block->m_end; instNode != block->m_begin; instNode = instNode->GetPrev()) {
 			dCILInstr* const instruction = instNode->GetInfo();
-//instruction->Trace();
 			if (instruction->IsDefineOrUsedVariable()) {
-				dLiveInLiveOut& entry = Addtop()->GetInfo();
+				dFlowGraphNode& entry = Addtop()->GetInfo();
 				entry.m_instruction = instruction;
 			}
 		}
 		if (lastNode == GetFirst()) {
-			dLiveInLiveOut& entry = Addtop()->GetInfo();
+			dFlowGraphNode& entry = Addtop()->GetInfo();
 			entry.m_instruction = block->m_begin->GetInfo();
 		}
 		if (!lastNode) {
@@ -189,7 +187,7 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 		firstStatement.Insert(GetFirst(), block);
 		if (GetFirst() != lastNode) {
 			for (dListNode* node = GetFirst(); node != lastNode; node = node->GetNext()) {
-				dLiveInLiveOut& point = node->GetInfo();
+				dFlowGraphNode& point = node->GetInfo();
 				point.m_successors.Append(&node->GetNext()->GetInfo());
 			}
 		}
@@ -211,7 +209,7 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 	while (!someSetChanged) {
 		someSetChanged = true;
 		for (dListNode* pointNode = GetLast(); pointNode; pointNode = pointNode->GetPrev()) {
-			dLiveInLiveOut& point = pointNode->GetInfo();
+			dFlowGraphNode& point = pointNode->GetInfo();
 			dVariableSet<dString> oldInput(point.m_liveInputSet);
 			dVariableSet<dString> oldOutput(point.m_liveOutputSet);
 
@@ -226,8 +224,8 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 			point.m_liveInputSet.Union(usedVariables);
 			point.m_liveOutputSet.RemoveAll();
 
-			for (dList<dLiveInLiveOut*>::dListNode* successorNode = point.m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {
-				dLiveInLiveOut* const successorInfo = successorNode->GetInfo();
+			for (dList<dFlowGraphNode*>::dListNode* successorNode = point.m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {
+				dFlowGraphNode* const successorInfo = successorNode->GetInfo();
 				point.m_liveOutputSet.Union(successorInfo->m_liveInputSet);
 			}
 			someSetChanged = (someSetChanged && oldOutput.Compare(point.m_liveOutputSet) && oldInput.Compare(point.m_liveInputSet));
@@ -240,7 +238,7 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 void dLiveInLiveOutSolver::Trace()
 {
 	for (dListNode* pointNode = GetFirst(); pointNode; pointNode = pointNode->GetNext()) {
-		dLiveInLiveOut& point = pointNode->GetInfo();
+		dFlowGraphNode& point = pointNode->GetInfo();
 		dTrace (("liveIn: "));
 		point.m_liveInputSet.Trace();
 		point.m_instruction->Trace();
@@ -250,16 +248,6 @@ void dLiveInLiveOutSolver::Trace()
 	}
 }
 
-void dLiveInLiveOutSolver::BuildReverseOrdeBlockList(dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const
-{
-	if (block->m_mark != m_graph->m_mark) {
-		block->m_mark = m_graph->m_mark;
-		for (dList<const dBasicBlock*>::dListNode* successorNode = block->m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {
-			BuildReverseOrdeBlockList(reverseOrderList, successorNode->GetInfo());
-		}
-		reverseOrderList.Append(block);
-	}
-}
 
 dBasicBlocksGraph::dBasicBlocksGraph()
 	:dBasicBlocksList()
@@ -298,7 +286,6 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 	BuildDominatorTree ();
 //Trace();
 }
-
 
 void dBasicBlocksGraph::CalculateSuccessorsAndPredecessors ()
 {
@@ -408,8 +395,6 @@ void dBasicBlocksGraph::DeleteUnreachedBlocks()
 		}
 	}
 }
-
-
 
 void dBasicBlocksGraph::BuildDominatorTree ()
 {
@@ -521,6 +506,28 @@ void dBasicBlocksGraph::GetStatementsWorklist(dWorkList& workList) const
 {
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
 		workList.Insert(node->GetInfo());
+	}
+}
+
+void dBasicBlocksGraph::BuildReverseOrderBlockList(dList<const dBasicBlock*>& reverseOrder)
+{
+	dList<const dBasicBlock*> reverseOrderBlocks;
+	for (dBasicBlocksList::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		const dBasicBlock& block = blockNode->GetInfo();
+		block.m_mark = m_mark;
+	}
+	m_mark++;
+	BuildReverseOrdeBlockList(reverseOrderBlocks, &GetFirst()->GetInfo());
+}
+
+void dBasicBlocksGraph::BuildReverseOrdeBlockList(dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const
+{
+	if (block->m_mark != m_mark) {
+		block->m_mark = m_mark;
+		for (dList<const dBasicBlock*>::dListNode* successorNode = block->m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {
+			BuildReverseOrdeBlockList(reverseOrderList, successorNode->GetInfo());
+		}
+		reverseOrderList.Append(block);
 	}
 }
 
@@ -701,7 +708,8 @@ bool dBasicBlocksGraph::ApplyConstantPropagationSSA()
 bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
 {
 	dConditionalConstantPropagationSolver constantPropagation(this);
-	return constantPropagation.Solve();
+	return false;
+	//return constantPropagation.Solve();
 }
 
 

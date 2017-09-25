@@ -31,7 +31,7 @@ void dRegisterInterferenceGraph::Build()
 	dLiveInLiveOutSolver liveInLiveOut(m_graph);
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
 		dList<dCILInstr::dArg*> usedVariables;
-		dLiveInLiveOut& point = node->GetInfo();
+		dFlowGraphNode& point = node->GetInfo();
 //point.m_instruction->Trace();		
 		dCILInstr::dArg* const generated = point.m_instruction->GetGeneratedVariable();
 		if (generated) {
@@ -60,7 +60,7 @@ void dRegisterInterferenceGraph::Build()
 	// pre-color some special nodes
 	//int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX; 
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dLiveInLiveOut& point = node->GetInfo();
+		dFlowGraphNode& point = node->GetInfo();
 		dCILInstr* const instr = point.m_instruction;
 		//instr->Trace();
 
@@ -209,7 +209,7 @@ void dRegisterInterferenceGraph::Build()
 
 //m_graph->Trace();
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dLiveInLiveOut& point = node->GetInfo();
+		dFlowGraphNode& point = node->GetInfo();
 //point.m_instruction->Trace();
 		const dVariableSet<dString>& liveIntSet = point.m_liveInputSet;
 
@@ -236,7 +236,7 @@ void dRegisterInterferenceGraph::Build()
 
 //m_graph->Trace();
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dLiveInLiveOut& point = node->GetInfo();
+		dFlowGraphNode& point = node->GetInfo();
 		dCILInstr* const instr = point.m_instruction;
 		if (instr->GetAsMove()) {
 			dCILInstrMove* const move = instr->GetAsMove();
