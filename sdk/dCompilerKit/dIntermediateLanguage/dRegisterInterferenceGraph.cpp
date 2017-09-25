@@ -275,6 +275,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const
 	,m_graph(graph)
 {
 //	m_flowGraph->ApplySemanticInstructionReordering();
+m_graph->Trace();
 	Build();
 	while (ColorGraph () > registerCount) {
 		// we have a spill, find a good spill node and try graph coloring again

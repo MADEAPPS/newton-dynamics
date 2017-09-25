@@ -152,14 +152,6 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 {
 	dList<const dBasicBlock*> reverseOrderBlocks;
 	m_graph->BuildReverseOrderBlockList (reverseOrderBlocks);
-/*
-	for (dBasicBlocksList::dListNode* blockNode = m_graph->GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
-		const dBasicBlock& block = blockNode->GetInfo();
-		block.m_mark = m_graph->m_mark;
-	}
-	m_graph->m_mark++;
-	BuildReverseOrdeBlockList(reverseOrderBlocks, &m_graph->GetFirst()->GetInfo());
-*/
 
 	dTree<dListNode*, const dBasicBlock*> lastStatement;
 	dTree<dListNode*, const dBasicBlock*> firstStatement;
@@ -509,9 +501,8 @@ void dBasicBlocksGraph::GetStatementsWorklist(dWorkList& workList) const
 	}
 }
 
-void dBasicBlocksGraph::BuildReverseOrderBlockList(dList<const dBasicBlock*>& reverseOrder)
+void dBasicBlocksGraph::BuildReverseOrderBlockList(dList<const dBasicBlock*>& reverseOrderBlocks)
 {
-	dList<const dBasicBlock*> reverseOrderBlocks;
 	for (dBasicBlocksList::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		const dBasicBlock& block = blockNode->GetInfo();
 		block.m_mark = m_mark;
