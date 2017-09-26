@@ -566,7 +566,6 @@ void DemoEntityManager::ApplyMenuOptions()
 void DemoEntityManager::ShowMainMenuBar()
 {
 	int mainMenu = 0;
-	m_suspendPhysicsUpdate = false;
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) {
@@ -799,7 +798,7 @@ void DemoEntityManager::RenderStats()
 	if (m_showStats) {
 		char text[1024];
 		
-		if (ImGui::Begin("statistics", &m_showStats)){
+		if (ImGui::Begin("statistics", &m_showStats)) {
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text);
 
@@ -826,6 +825,7 @@ void DemoEntityManager::RenderStats()
 			statusText.Printf (wxT ("instructions: %s",  wxString::FromAscii(floatMode).wc_str());
 			m_statusbar->SetStatusText (statusText, 6);
 */
+			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
 		}
 	}
@@ -833,6 +833,7 @@ void DemoEntityManager::RenderStats()
 	if (m_showUI && m_renderUI) {
 		if (ImGui::Begin("User Interface", &m_showUI)){
 			m_renderUI (this, m_renderUIContext);
+			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
 		}
 	}
@@ -1362,41 +1363,6 @@ void DemoEntityManager::RenderScene()
 	glPopMatrix();
 }
 
-/*
-void DemoEntityManager::RenderUI()
-{
-	int width = GetWidth();
-	int height = GetHeight();
-
-	glColor3f(1.0, 1.0, 1.0);
-
-	glPushMatrix();
-	glMatrixMode(GL_PROJECTION);
-
-	glLoadIdentity();
-	gluOrtho2D(0, width, 0, height);
-
-	glPushMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);	
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	// render 2d display
-	m_renderUI (this, m_renderUIContext, 0);
-
-	// restore display mode
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-}
-*/
 
 void DemoEntityManager::Run()
 {
@@ -1404,6 +1370,7 @@ void DemoEntityManager::Run()
     while (!glfwWindowShouldClose(m_mainFrame))
     {
 		dTimeTrackerEvent(__FUNCTION__);
+		m_suspendPhysicsUpdate = false;
 
 		BeginFrame();
 
