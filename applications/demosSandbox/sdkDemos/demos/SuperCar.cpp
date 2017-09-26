@@ -611,123 +611,11 @@ class SuperCarEntity: public DemoEntity
 	{
 		dAssert (0);
 		return 0;
-/*
-		const dCustomVehicleController::dBodyPart& chassis = *m_controller->GetChassis();
-		//CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
-
-		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
-
-		dMatrix matrix;
-		dVector veloc(0.0f);
-		NewtonBody* const body = chassis.GetBody();
-		NewtonBodyGetVelocity(body, &veloc[0]);
-		NewtonBodyGetMatrix(body, &matrix[0][0]);
-		dVector lookAheadPoint (veloc.Scale (distanceAhead / dSqrt (veloc.DotProduct3(veloc))));
-
-		// find the closet point to the past on the spline
-		dAssert (0);
-		//dMatrix vehicleMatrix (m_controller->GetLocalFrame() * matrix);
-		dMatrix vehicleMatrix (matrix);
-		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
-
-		dVector p0 (vehicleMatrix.m_posit + lookAheadPoint);
-		p0.m_y = 0.0f;
-		
-		dBigVector q; 
-		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
-		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
-		dVector p1 (pathMatrix.TransformVector(q));
-		p1.m_y = 0.0f;
-		dVector dist (p1 - p0);
-		dFloat angle = 0.0f;
-//		dFloat maxAngle = steering->GetMaxSteeringAngle ();
-		dFloat maxAngle = 20.0f * 3.1314f / 180.0f;
-		if (dist.DotProduct3(dist) < (pathWidth * pathWidth)) {
-			dBigVector averageTangent (0.0f, 0.0f, 0.0f, 0.0f);
-			for(int i = 0; i < 4; i ++) {
-				dBigVector tangent (path->m_curve.CurveDerivative (u));
-				tangent = tangent.Scale (1.0f / dSqrt (tangent.DotProduct3(tangent)));
-				averageTangent += tangent;
-				q += tangent.Scale (5.0f);
-				u = path->m_curve.FindClosestKnot (q, q, 4);
-			}
-			averageTangent = averageTangent.Scale (1.0f / dSqrt (averageTangent.DotProduct3(averageTangent)));
-			dVector heading (pathMatrix.RotateVector(averageTangent));
-			heading.m_y = 0.0;
-			heading = vehicleMatrix.UnrotateVector(heading);
-			angle = dClamp (dAtan2 (heading.m_z, heading.m_x), -maxAngle, maxAngle);
-		} else {
-
-			// find a point in the past at some distance ahead
-			for(int i = 0; i < 5; i ++) {
-				dBigVector tangent (path->m_curve.CurveDerivative (u));
-				q += tangent.Scale (5.0f / dSqrt (tangent.DotProduct3(tangent)));
-				path->m_curve.FindClosestKnot (q, q, 4);
-			}
-
-			m_debugTargetHeading = pathMatrix.TransformVector(q);
-			dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
-			angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
-		}
-		dFloat param = steering->GetParam();
-		return param + (-angle / maxAngle - param) * 0.25f;
-*/
 	}
 
 	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity)
 	{
-		//drive the vehicle by trying to follow the spline path as close as possible 
-		//NewtonBody* const body = m_controller->GetBody();
-		//NewtonWorld* const world = NewtonBodyGetWorld(body);
-		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		//NewtonDemos* const mainWindow = scene->GetRootWindow();
-		 
-		dEngineController* const engine = m_controller->GetEngine();
-		dSteeringController* const steering = m_controller->GetSteering();
-		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
-		dBrakeController* const brakes = m_controller->GetBrakes();
-		dBrakeController* const handBrakes = m_controller->GetHandBrakes();
-		if (!engine) {
-			return;
-		}
-		
-//		if (!engine->GetKey()) 
-		{
-			// start engine
-//			m_engineOldKeyState = engine->GetKey();
-//			engine->SetKey (true);
-
-			// AI car are manual gears
-			engine->SetTransmissionMode (1);
-			//clutch->SetParam(1.0f);
-
-			// engage first Gear 
-//			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 3);
-		}
-		
-		
-		//const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
-		//dMatrix matrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
-		//dVector veloc (chassis.GetVelocity());
-		//veloc.m_y = 0.0f;
-
-		dFloat speed = dAbs(engine->GetSpeed());
-
-		if (speed < 0.1f) {
-			// if the vehicle is not moving start the motion
-			engine->SetParam (0.75f);
-			engine->SetIgnition(true);
-			brakes->SetParam(0.0f);
-			handBrakes->SetParam(0.0f);
-			engine->SetGear(engine->GetFirstGear() + 2);
-			return;
-		}
-
-		dFloat steeringParam = CalculateNPCControlSteerinValue (2.0f, 2.0f, pathEntity);
-		steering->SetParam (steeringParam);
 	}
-
-
 
 	dCustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_engineDifferentialLock;
@@ -949,9 +837,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			engine->SetIgnition(false);
 		}
 		m_player = player;
-
-//xxxx
-//		SaveVehicle ("simpleVehicle.txt", m_player->m_controller);
 	}
 
 	void SetNextPlayer() 
