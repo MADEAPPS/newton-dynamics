@@ -539,13 +539,19 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 		bool inside = false;
 
 		dgVector sphOrigin(polygonMatrix.TransformVector((hullBoxP1 + hullBoxP0) * dgVector::m_half));
+		dgVector pointInPlane (sphOrigin - step.Scale4 (m_normal.DotProduct4(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct4(step).GetScalar()));
+
 		dgVector sphRadius(dgVector::m_half * (hullBoxP1 - hullBoxP0));
 		dgFloat32 radius = dgSqrt(sphRadius.DotProduct4(sphRadius).GetScalar());
 		dgVector planeMinkStep (m_normal.Scale4 (radius));
 		sphOrigin -= planeMinkStep;
-		dgVector pointInPlane (sphOrigin - step.Scale4 (m_normal.DotProduct4(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct4(step).GetScalar()));
+		dgVector supportPoint (sphOrigin - step.Scale4 (m_normal.DotProduct4(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct4(step).GetScalar()));
 
-		if (!proxy.m_intersectionTestOnly) {
+		supportPoint -= pointInPlane;
+		dgAssert (supportPoint.m_w == dgFloat32 (0.0f));
+		radius = dgMax (dgSqrt (supportPoint.DotProduct4(supportPoint).GetScalar()), radius);
+
+//		if (!proxy.m_intersectionTestOnly) {
 			inside = true;
 			dgInt32 i0 = m_count - 1;
 
@@ -560,11 +566,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 				inside &= (dist1 <= dgFloat32 (0.0f));
 				i0 = i;
 			}
-		}
+//		}
 
-
-		dgFloat32 convexSphapeUmbra = dgMax (proxy.m_instance0->GetUmbraClipSize(), sphRadius.GetScalar());
-dgAssert(0);
+		dgFloat32 convexSphapeUmbra = dgMax (proxy.m_instance0->GetUmbraClipSize(), radius);
 		if (m_faceClipSize > convexSphapeUmbra) {
 			BeamClipping(pointInPlane, convexSphapeUmbra);
 			m_faceClipSize = proxy.m_instance0->m_childShape->GetBoxMaxRadius();
@@ -614,6 +618,9 @@ dgAssert(0);
 		} else {
 			m_vertexCount = dgUnsigned16 (m_count);
 			count = world->CalculateConvexToConvexContacts(proxy);
+			dgTrace (("dt %f\n", proxy.m_timestep));
+			proxy.m_closestPointBody0.Trace("p0");
+			proxy.m_closestPointBody1.Trace("p1");
 			if (count >= 1) {
 				dgContactPoint* const contactsOut = proxy.m_contacts;
 				for (dgInt32 i = 0; i < count; i++) {

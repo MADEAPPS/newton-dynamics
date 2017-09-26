@@ -19,8 +19,8 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 
-/*
-void TestCollsionBug(NewtonWorld* world)
+
+static void TestConvexCastBug(NewtonWorld* world)
 {
 	// create static body
 	NewtonCollision* cs = 0;
@@ -34,7 +34,7 @@ void TestCollsionBug(NewtonWorld* world)
 #else
 		// TRIANGLE MESH
 		dVector verts[6] = {
-#if 0
+#if 1
 			// FAILING,TRIANGLE MESH
 			dVector(-55.12000656, -38.16000366, 0.00000000),
 			dVector(55.12000656, -38.16000366, 0.00000000),
@@ -92,7 +92,7 @@ void TestCollsionBug(NewtonWorld* world)
 //	NewtonDestroyAllBodies(world);
 //	NewtonDestroy(world);
 }
-*/
+
 
 static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
 {
@@ -232,7 +232,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
-//TestCollsionBug(scene->GetNewton());
+//TestConvexCastBug(scene->GetNewton());
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);

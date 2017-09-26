@@ -195,9 +195,9 @@ class dgTemplateVector
 
 	// check validity of floats
 #ifdef _DEBUG
-	void Trace () const
+	void Trace (char* const name) const
 	{
-		dgTrace (("%f %f %f %f\n", m_x, m_y, m_z, m_w));
+		dgTrace (("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
 	}
 #endif
 
@@ -1508,6 +1508,13 @@ class dgVector
 		dst2 = dgVector (_mm_movelh_ps (tmp2, tmp3));
 		dst3 = dgVector (_mm_movehl_ps (tmp3, tmp2));
 	}
+
+#ifdef _DEBUG
+	void Trace(char* const name) const
+	{
+		dgTrace(("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
+	}
+#endif
 
 	DG_CLASS_ALLOCATOR(allocator)
 
