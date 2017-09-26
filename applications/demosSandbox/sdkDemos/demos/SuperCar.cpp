@@ -687,7 +687,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context)
 	{
 		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*) context;
-		//me->RenderVehicleHud (scene, lineNumber);
+		//me->RenderVehicleHud (scene);
 		me->DrawHelp(scene);
 	}
 
@@ -760,20 +760,19 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	void DrawHelp(DemoEntityManager* const scene)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print (color, "Vehicle driving keyboard control:   Joystick control");
-		scene->Print (color, "engine switch             : 'I'           start engine");
-		scene->Print (color, "accelerator               : 'W'           stick forward");
-		scene->Print (color, "brakes                    : 'S'           stick back");
-		scene->Print (color, "turn left                 : 'A'           stick left");
-		scene->Print (color, "turn right                : 'D'           stick right");
-		scene->Print (color, "engage clutch             : 'K'           button 5");
-		scene->Print (color, "engage differential lock  : 'L'           button 5");
-		scene->Print (color, "gear up                   : '>'           button 2");
-		scene->Print (color, "gear down                 : '<'           button 3");
-		scene->Print (color, "manual transmission       : enter         button 4");
-		scene->Print (color, "hand brakes               : space         button 1");
+		scene->Print (color, "Vehicle driving           keyboard control:   Joystick control");
+		scene->Print (color, "engine switch             : 'I'               start engine");
+		scene->Print (color, "accelerator               : 'W'               stick forward");
+		scene->Print (color, "brakes                    : 'S'               stick back");
+		scene->Print (color, "turn left                 : 'A'               stick left");
+		scene->Print (color, "turn right                : 'D'               stick right");
+		scene->Print (color, "engage clutch             : 'K'               button 5");
+		scene->Print (color, "engage differential lock  : 'L'               button 5");
+		scene->Print (color, "gear up                   : '>'               button 2");
+		scene->Print (color, "gear down                 : '<'               button 3");
+		scene->Print (color, "manual transmission       : enter             button 4");
+		scene->Print (color, "hand brakes               : space             button 1");
 		scene->Print (color, "next vehicle              : 'V'");
-		scene->Print (color, "hide help                 : 'H'");
 	}				
 
 	void RenderVehicleHud (DemoEntityManager* const scene)

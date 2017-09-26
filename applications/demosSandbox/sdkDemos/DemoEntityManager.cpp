@@ -1154,6 +1154,8 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPushMatrix();
 	glLoadIdentity();
 
+dTrace(("xxxxxxxxxxxxx mode 2d renading here !!\n"));
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
