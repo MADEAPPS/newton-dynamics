@@ -793,11 +793,10 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
-
-				dFloat y = gageSize / 2.0f + 60.0f;
+				dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 
 				// draw the tachometer
-				dFloat x = gageSize / 2 + 40.0f;
+				dFloat x = gageSize / 2 + 20.0f;
 				dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
 				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
 
