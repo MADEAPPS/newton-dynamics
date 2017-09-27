@@ -38,7 +38,9 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 
 	~dJointDebugDisplay()
 	{
-		glEnd();;
+		glEnd();
+		glEnable(GL_LIGHTING);
+		glEnable(GL_TEXTURE_2D);
 	}
 
 	void SetColor(const dVector& color)
