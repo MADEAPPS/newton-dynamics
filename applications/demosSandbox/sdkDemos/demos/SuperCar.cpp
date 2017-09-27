@@ -759,6 +759,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	void DrawGear(dFloat param, dFloat origin_x, dFloat origin_y, int gear, dFloat size) const
 	{
 		dMatrix origin (dGetIdentityMatrix());
+		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);
 
 		glPushMatrix();
@@ -785,9 +786,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	void RenderUI (DemoEntityManager* const scene)
 	{
 		// set to transparent color
-		//glEnable (GL_BLEND);
-		//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		if (m_player) {
 			dEngineController* const engine = m_player->m_controller->GetEngine();
 			if (engine) {
@@ -804,9 +802,11 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 				x += gageSize;
 				//dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
 				dFloat speed = dAbs(engine->GetSpeed())  / engine->GetTopSpeed();
-				int gear = engine->GetGear();
 				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
-				DrawGear(speed, x, y, m_player->m_gearMap[gear], gageSize);
+
+				// draw the current gear
+				int gear = engine->GetGear();
+				DrawGear(speed, x, y + 98, m_player->m_gearMap[gear], gageSize);
 			}
 		}
 	}
