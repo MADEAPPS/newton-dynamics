@@ -31,10 +31,10 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
 		//NewtonMaterialSetCallbackUserData (scene->GetNewton(), m_material, m_material, this);
 		//NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
-		scene->Set2DDisplayRenderFunction (Debug, this);
+		scene->Set2DDisplayRenderFunction (DemoHelp, NULL, this);
 	}
 
-	static void Debug (DemoEntityManager* const scene, void* const context)
+	static void DemoHelp (DemoEntityManager* const scene, void* const context)
 	{
 //		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*) context;
 //		me->RenderVehicleHud (scene, lineNumber);

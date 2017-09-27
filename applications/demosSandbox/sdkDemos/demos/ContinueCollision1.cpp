@@ -91,7 +91,7 @@ class CCDInputManager : public dCustomInputManager
 		:dCustomInputManager(scene->GetNewton())
 		, m_scene(scene)
 	{
-		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
+		scene->Set2DDisplayRenderFunction (DrawHelpMenu, NULL, this);
 	}
 
 	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context)

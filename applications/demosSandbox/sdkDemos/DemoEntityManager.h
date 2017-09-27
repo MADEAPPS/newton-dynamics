@@ -25,7 +25,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 {
 	public:
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
-	typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context);
+	typedef void (*RenderGuiHelpCallback) (DemoEntityManager* const manager, void* const context);
 
 	class TransparentMesh
 	{
@@ -105,7 +105,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
-	void Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context);
+	void Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context);
 
 	bool IsShiftKeyDown () const;
 	bool IsControlKeyDown () const;
@@ -158,7 +158,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	NewtonWorld* m_world;
 	DemoCameraListener* m_cameraManager;
 	void* m_renderUIContext;
-	RenderHoodCallback m_renderUI;
+	RenderGuiHelpCallback m_renderDemoGUI;
+	RenderGuiHelpCallback m_renderHelpMenus;
 
 	unsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;

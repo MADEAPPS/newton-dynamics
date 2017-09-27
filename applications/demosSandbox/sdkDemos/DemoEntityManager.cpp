@@ -190,7 +190,8 @@ DemoEntityManager::DemoEntityManager ()
 	,m_world(NULL)
 	,m_cameraManager(NULL)
 	,m_renderUIContext(NULL)
-	,m_renderUI(NULL)
+	,m_renderDemoGUI(NULL)
+	,m_renderHelpMenus(NULL)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
 	,m_currentScene(DEFAULT_SCENE)
@@ -387,13 +388,12 @@ bool DemoEntityManager::GetMouseKeyState (int button) const
 	return io.MouseDown[button];
 }
 
-
-void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context)
+void DemoEntityManager::Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context)
 {
-	m_renderUI = callback;
+	m_renderDemoGUI = UIcallback;
+	m_renderHelpMenus = helpCallback;
 	m_renderUIContext = context;
 }
-
 
 int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
 {
@@ -497,7 +497,8 @@ void DemoEntityManager::Cleanup ()
 	NewtonSetPerformanceClock (m_world, dGetTimeInMicrosenconds);
 
 	// we start without 2d render
-	m_renderUI = NULL;
+	m_renderDemoGUI = NULL;
+	m_renderHelpMenus = NULL;
 	m_renderUIContext = NULL;
 }
 
@@ -830,9 +831,9 @@ void DemoEntityManager::RenderStats()
 		}
 	}
 
-	if (m_showUI && m_renderUI) {
+	if (m_showUI && m_renderHelpMenus) {
 		if (ImGui::Begin("User Interface", &m_showUI)){
-			m_renderUI (this, m_renderUIContext);
+			m_renderHelpMenus (this, m_renderUIContext);
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
 		}
@@ -1154,7 +1155,9 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPushMatrix();
 	glLoadIdentity();
 
-dTrace(("xxxxxxxxxxxxx mode 2d renading here !!\n"));
+	if (window->m_renderDemoGUI) {
+		window->m_renderDemoGUI(window, window->m_renderUIContext);
+	}
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1375,7 +1378,6 @@ void DemoEntityManager::Run()
 		m_suspendPhysicsUpdate = false;
 
 		BeginFrame();
-
 		RenderStats();
 
 		ImGui::Render();

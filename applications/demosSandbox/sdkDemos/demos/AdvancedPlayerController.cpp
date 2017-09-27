@@ -266,7 +266,7 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 		,m_shootState(0)
 	{
 		// plug a callback for 2d help display
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL,this);
 	}
 
 	void SpawnRandomProp(const dMatrix& location) const

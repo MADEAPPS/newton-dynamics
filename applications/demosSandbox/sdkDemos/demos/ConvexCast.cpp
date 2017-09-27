@@ -213,7 +213,7 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 		,m_selectShape (true)
 		,m_stupidLevel(stupidLevel)
 	{
-		scene->Set2DDisplayRenderFunction (RenderHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderHelp, NULL, this);
 	}
 
 	static void RenderHelp (DemoEntityManager* const scene, void* const context)

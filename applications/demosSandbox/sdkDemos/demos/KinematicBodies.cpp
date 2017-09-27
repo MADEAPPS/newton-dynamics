@@ -107,7 +107,7 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		,m_roll(0.0f)
         ,m_isInPenetration(false)
 	{
-		scene->Set2DDisplayRenderFunction (RenderHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderHelp, NULL, this);
 		m_phantomEntity = new PhantomPlacement (scene);
 		scene->Append (m_phantomEntity);
 		m_contactJoint.Init (&m_body, &m_static);

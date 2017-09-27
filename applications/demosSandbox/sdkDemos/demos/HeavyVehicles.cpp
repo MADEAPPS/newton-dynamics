@@ -1395,7 +1395,7 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
+		scene->Set2DDisplayRenderFunction (RenderVehicleHud, NULL, this);
 	}
 
 	~HeavyVehicleControllerManager ()

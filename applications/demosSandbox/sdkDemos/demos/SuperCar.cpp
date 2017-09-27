@@ -649,7 +649,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
+		scene->Set2DDisplayRenderFunction (RenderHelpMenu, RenderUI, this);
 
 		// load 2d display assets
 		m_gears = LoadTexture ("gears_font.tga");
@@ -684,17 +684,42 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	}
 	
 
-	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context)
+	static void RenderHelpMenu (DemoEntityManager* const scene, void* const context)
 	{
 		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*) context;
 		//me->RenderVehicleHud (scene);
 		me->DrawHelp(scene);
 	}
 
+	static void RenderUI (DemoEntityManager* const scene, void* const context)
+	{
+		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*)context;
+		me->RenderUI (scene);
+	}
+
+	void DrawHelp(DemoEntityManager* const scene)
+	{
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Vehicle driving           keyboard control:   Joystick control");
+		scene->Print(color, "engine switch             : 'I'               start engine");
+		scene->Print(color, "accelerator               : 'W'               stick forward");
+		scene->Print(color, "brakes                    : 'S'               stick back");
+		scene->Print(color, "turn left                 : 'A'               stick left");
+		scene->Print(color, "turn right                : 'D'               stick right");
+		scene->Print(color, "engage clutch             : 'K'               button 5");
+		scene->Print(color, "engage differential lock  : 'L'               button 5");
+		scene->Print(color, "gear up                   : '>'               button 2");
+		scene->Print(color, "gear down                 : '<'               button 3");
+		scene->Print(color, "manual transmission       : enter             button 4");
+		scene->Print(color, "hand brakes               : space             button 1");
+		scene->Print(color, "next vehicle              : 'V'");
+	}
+
 	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size) const
 	{
 		size *= 0.5f;
 		dMatrix origin (dGetIdentityMatrix());
+		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
 
 		// render dial
@@ -757,29 +782,11 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		glPopMatrix();
 	}
 
-	void DrawHelp(DemoEntityManager* const scene)
-	{
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print (color, "Vehicle driving           keyboard control:   Joystick control");
-		scene->Print (color, "engine switch             : 'I'               start engine");
-		scene->Print (color, "accelerator               : 'W'               stick forward");
-		scene->Print (color, "brakes                    : 'S'               stick back");
-		scene->Print (color, "turn left                 : 'A'               stick left");
-		scene->Print (color, "turn right                : 'D'               stick right");
-		scene->Print (color, "engage clutch             : 'K'               button 5");
-		scene->Print (color, "engage differential lock  : 'L'               button 5");
-		scene->Print (color, "gear up                   : '>'               button 2");
-		scene->Print (color, "gear down                 : '<'               button 3");
-		scene->Print (color, "manual transmission       : enter             button 4");
-		scene->Print (color, "hand brakes               : space             button 1");
-		scene->Print (color, "next vehicle              : 'V'");
-	}				
-
-	void RenderVehicleHud (DemoEntityManager* const scene)
+	void RenderUI (DemoEntityManager* const scene)
 	{
 		// set to transparent color
-		glEnable (GL_BLEND);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable (GL_BLEND);
+		//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if (m_player) {
 			dEngineController* const engine = m_player->m_controller->GetEngine();
@@ -803,12 +810,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 				DrawGear(speed, x, y, m_player->m_gearMap[gear], gageSize);
 			}
 		}
-
-		//print controllers help 
-		//DrawHelp(scene, lineNumber);
-
-		// restore color and blend mode
-		glDisable (GL_BLEND);
 	}
 
 	void SaveVehicle (const char* const name, dCustomVehicleController* const vehicle)

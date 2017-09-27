@@ -1397,7 +1397,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 		,m_currentPlayer(0)
 	{
 		// plug a callback for 2d help display
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
 	}
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
