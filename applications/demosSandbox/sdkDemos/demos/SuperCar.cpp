@@ -708,8 +708,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		scene->Print(color, "turn right                : 'D'               stick right");
 		scene->Print(color, "engage clutch             : 'K'               button 5");
 		scene->Print(color, "engage differential lock  : 'L'               button 5");
-		scene->Print(color, "gear up                   : '>'               button 2");
-		scene->Print(color, "gear down                 : '<'               button 3");
+		scene->Print(color, "gear up                   : 'M'               button 2");
+		scene->Print(color, "gear down                 : 'N'               button 3");
 		scene->Print(color, "manual transmission       : enter             button 4");
 		scene->Print(color, "hand brakes               : space             button 1");
 		scene->Print(color, "next vehicle              : 'V'");
@@ -875,9 +875,9 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			bool ignitionButton = buttons[m_ignitionButton] ? true : false;
 			bool handBreakButton = buttons[m_handBrakeButton] ? true : false;
 			bool gearUpButton = buttons[m_gearUpButton] ? true : false;
-			bool gearDonwButton = buttons[m_gearDonwButton] ? true : false;
+			bool gearDownButton = buttons[m_gearDonwButton] ? true : false;
 
-			gear += (int (m_gearUpKey.UpdateTrigger(gearUpButton)) - int (m_gearDownKey.UpdateTrigger(gearDonwButton))); 
+			gear += (int (m_gearUpKey.UpdateTrigger(gearUpButton)) - int (m_gearDownKey.UpdateTrigger(gearDownButton))); 
 			
 			driverInput.m_clutchPedal = joyPosZ * joyPosZ * joyPosZ;
 			driverInput.m_steeringValue = joyPosX * joyPosX * joyPosX;
@@ -897,14 +897,14 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 		} else {
 			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
-			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
-			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 1.0f : 0.0f;
-			//driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
+			driverInput.m_clutchPedal = 1.0f - scene->GetKeyState('K') ? 1.0f : 0.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
-			//gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
-
-			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
 			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState ('I'));
+			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+			//driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
+			gear += m_gearUpKey.UpdateTrigger(scene->GetKeyState('M')) - m_gearUpKey.UpdateTrigger(scene->GetKeyState('N')); 
+			driverInput.m_gear = gear;
 			//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
 		}
 
