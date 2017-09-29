@@ -1539,7 +1539,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		dTimeTrackerEvent("preListeners");
 		for (dgWorld::dgListenerList::dgListNode* node1 = m_world->m_listeners.GetFirst(); node1; node1 = node1->GetNext()) {
 			dgWorld::dgListener& listener = node1->GetInfo();
-			listener.m_onPreUpdate(m_world, listener.m_userData, timestep);
+			if (listener.m_onPreUpdate) {
+				listener.m_onPreUpdate(m_world, listener.m_userData, timestep);
+			}
 		}
 	}
 

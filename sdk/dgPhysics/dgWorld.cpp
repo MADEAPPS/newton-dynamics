@@ -926,7 +926,9 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 		dTimeTrackerEvent("postListeners");
 		for (dgListenerList::dgListNode* node = m_listeners.GetFirst(); node; node = node->GetNext()) {
 			dgListener& listener = node->GetInfo();
-			listener.m_onPostUpdate (this, listener.m_userData, timestep);
+			if (listener.m_onPostUpdate) {
+				listener.m_onPostUpdate(this, listener.m_userData, timestep);
+			}
 		}
 	}
 
