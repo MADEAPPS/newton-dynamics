@@ -433,7 +433,9 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
 			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-			customJoint->Debug(jointDebug);
+			if (customJoint) {
+				customJoint->Debug(jointDebug);
+			}
 		}
 	}
 	NewtonWorldListenerDebug(world, jointDebug);
