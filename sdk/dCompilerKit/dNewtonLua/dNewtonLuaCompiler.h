@@ -62,11 +62,11 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 	dUserVariable EmitLoadConstant(const dUserVariable& constName);
 
 	dUserVariable EmitBlockBeginning();
-	dUserVariable EmitFunctionDeclaration(const dUserVariable& name);
+	
 	dUserVariable EmitLocalVariableDeclaration(const dUserVariable& nameList);
 	dUserVariable EmitParametersToLocalVariables(const dUserVariable& parameterList);
 	dUserVariable EmitFunctionCall(const dUserVariable& functionName, const dUserVariable& argumentsList);
-	dUserVariable EmitFunctionParameter(const dUserVariable& prevParameter, const dUserVariable& parameter);
+	dUserVariable EmitFunctionDeclaration(const dUserVariable& name, const dUserVariable& parameterList);
 	dUserVariable EmitAssigmentStatement(const dUserVariable& nameList, const dUserVariable& expresionList);
 	dUserVariable EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1);
 

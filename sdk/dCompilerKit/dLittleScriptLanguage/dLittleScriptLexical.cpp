@@ -746,1495 +746,764 @@ int dLittleScriptLexical::NextToken ()
 			state = stateArray[nextStateIndex];
 		} else {
 			UnGetChar ();
+			GetLexString ();
 			switch (state) 
 			{
 				case 1:
 				{
-					GetLexString ();
-					{/* skip is a white space*/}
+					/* skip is a white space*/
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 2:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_DIFFERENT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_DIFFERENT;
 				}
 				case 3:
 				{
-					GetLexString ();
-					{return '!';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '!';
 				}
 				case 4:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_MOD;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_MOD;
 				}
 				case 5:
 				{
-					GetLexString ();
-					{return '%';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '%';
 				}
 				case 6:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_LOGIC_AND;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_LOGIC_AND;
 				}
 				case 7:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_AND;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_AND;
 				}
 				case 8:
 				{
-					GetLexString ();
-					{return '&';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '&';
 				}
 				case 9:
 				{
-					GetLexString ();
-					{return '(';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '(';
 				}
 				case 10:
 				{
-					GetLexString ();
-					{return ')';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ')';
 				}
 				case 11:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_MUL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_MUL;
 				}
 				case 12:
 				{
-					GetLexString ();
-					{return '*';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '*';
 				}
 				case 13:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_OP_INC;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_OP_INC;
 				}
 				case 14:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_ADD;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_ADD;
 				}
 				case 15:
 				{
-					GetLexString ();
-					{return '+';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '+';
 				}
 				case 16:
 				{
-					GetLexString ();
-					{return ',';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ',';
 				}
 				case 17:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_OP_DEC;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_OP_DEC;
 				}
 				case 18:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_SUB;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_SUB;
 				}
 				case 19:
 				{
-					GetLexString ();
-					{return '-';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '-';
 				}
 				case 20:
 				{
-					GetLexString ();
-					{return '.';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '.';
 				}
 				case 21:
 				{
-					GetLexString ();
-					{/* skip commnets */}
+					/* skip commnets */
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 22:
 				{
-					GetLexString ();
-					{/* skip commnets */}
+					/* skip commnets */
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 23:
 				{
-					GetLexString ();
-					{/* skip commnets */}
+					/* skip commnets */
 					state = 0;
 					ch = NextChar();
 					break;
 				}
 				case 24:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_DIV;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_DIV;
 				}
 				case 25:
 				{
-					GetLexString ();
-					{return '/';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '/';
 				}
 				case 26:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_FLOAT_CONST;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_FLOAT_CONST;
 				}
 				case 27:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_FLOAT_CONST;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_FLOAT_CONST;
 				}
 				case 28:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_INTEGER_CONST;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_INTEGER_CONST;
 				}
 				case 29:
 				{
-					GetLexString ();
-					{return ':';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ':';
 				}
 				case 30:
 				{
-					GetLexString ();
-					{return ';';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ';';
 				}
 				case 31:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_SHL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_SHL;
 				}
 				case 32:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_LESS_EQUAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_LESS_EQUAL;
 				}
 				case 33:
 				{
-					GetLexString ();
-					{return '<';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '<';
 				}
 				case 34:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_IDENTICAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_IDENTICAL;
 				}
 				case 35:
 				{
-					GetLexString ();
-					{return '=';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '=';
 				}
 				case 36:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_GREATHER_EQUAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_GREATHER_EQUAL;
 				}
 				case 37:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_SHR;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_SHR;
 				}
 				case 38:
 				{
-					GetLexString ();
-					{return '>';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '>';
 				}
 				case 39:
 				{
-					GetLexString ();
-					{return '?';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '?';
 				}
 				case 40:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 41:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_OP_DIM;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_OP_DIM;
 				}
 				case 42:
 				{
-					GetLexString ();
-					{return '[';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '[';
 				}
 				case 43:
 				{
-					GetLexString ();
-					{return ']';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return ']';
 				}
 				case 44:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_XOR;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_XOR;
 				}
 				case 45:
 				{
-					GetLexString ();
-					{return '^';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '^';
 				}
 				case 46:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_BOOLEAN;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_BOOLEAN;
 				}
 				case 47:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 48:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 49:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_BREAK;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_BREAK;
 				}
 				case 50:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 51:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 52:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 53:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_BYTE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_BYTE;
 				}
 				case 54:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 55:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 56:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 57:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_CASE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_CASE;
 				}
 				case 58:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 59:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 60:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_CLASS;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_CLASS;
 				}
 				case 61:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 62:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 63:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 64:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_CONST;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_CONST;
 				}
 				case 65:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 66:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_CONTINUE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_CONTINUE;
 				}
 				case 67:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 68:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 69:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 70:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 71:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 72:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 73:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 74:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_DEFAULT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_DEFAULT;
 				}
 				case 75:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 76:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 77:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 78:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 79:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 80:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_DOUBLE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_DOUBLE;
 				}
 				case 81:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 82:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 83:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 84:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_DO;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_DO;
 				}
 				case 85:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 86:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ELSE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ELSE;
 				}
 				case 87:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 88:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 89:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 90:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_FINAL;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_FINAL;
 				}
 				case 91:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 92:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 93:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 94:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_FLOAT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_FLOAT;
 				}
 				case 95:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 96:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 97:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 98:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_FOR;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_FOR;
 				}
 				case 99:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 100:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 101:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_IF;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_IF;
 				}
 				case 102:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_IMPORT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_IMPORT;
 				}
 				case 103:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 104:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 105:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 106:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 107:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_INTERFACE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_INTERFACE;
 				}
 				case 108:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 109:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 110:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 111:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 112:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 113:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_INT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_INT;
 				}
 				case 114:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 115:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 116:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_LONG;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_LONG;
 				}
 				case 117:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 118:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 119:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 120:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_NATIVE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_NATIVE;
 				}
 				case 121:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 122:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 123:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 124:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 125:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_NEW;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_NEW;
 				}
 				case 126:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 127:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 128:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_PACKAGE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_PACKAGE;
 				}
 				case 129:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 130:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 131:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 132:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 133:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 134:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_PRIVATE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_PRIVATE;
 				}
 				case 135:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 136:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 137:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 138:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 139:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 140:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_PUBLIC;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_PUBLIC;
 				}
 				case 141:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 142:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 143:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 144:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 145:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 146:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_RETURN;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_RETURN;
 				}
 				case 147:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 148:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 149:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 150:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 151:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 152:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_SHORT;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_SHORT;
 				}
 				case 153:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 154:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 155:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 156:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_STATIC;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_STATIC;
 				}
 				case 157:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 158:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 159:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 160:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 161:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_SWITCH;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_SWITCH;
 				}
 				case 162:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 163:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 164:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 165:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 166:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 167:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_THIS;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_THIS;
 				}
 				case 168:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 169:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 170:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 171:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_VOID;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_VOID;
 				}
 				case 172:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 173:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 174:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 175:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 176:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_WHILE;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_WHILE;
 				}
 				case 177:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 178:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 179:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 180:
 				{
-					GetLexString ();
-					{m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;}
-					state = 0;
-					ch = NextChar();
-					break;
+					m_tokenString = dString ('_') + m_tokenString; return dLittleScriptParser::_IDENTIFIER;
 				}
 				case 181:
 				{
-					GetLexString ();
-					{return '{';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '{';
 				}
 				case 182:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_ASS_OR;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_ASS_OR;
 				}
 				case 183:
 				{
-					GetLexString ();
-					{return dLittleScriptParser::_LOGIC_OR;}
-					state = 0;
-					ch = NextChar();
-					break;
+					return dLittleScriptParser::_LOGIC_OR;
 				}
 				case 184:
 				{
-					GetLexString ();
-					{return '|';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '|';
 				}
 				case 185:
 				{
-					GetLexString ();
-					{return '}';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '}';
 				}
 				case 186:
 				{
-					GetLexString ();
-					{return '~';}
-					state = 0;
-					ch = NextChar();
-					break;
+					return '~';
 				}
 
 

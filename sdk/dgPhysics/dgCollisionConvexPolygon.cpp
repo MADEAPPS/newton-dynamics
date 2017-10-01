@@ -530,8 +530,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	dgVector minBox(polyBoxP0 - hullBoxP1);
 	dgVector maxBox(polyBoxP1 - hullBoxP0);
 
-	dgVector step (relativeVelocity.Scale4(proxy.m_timestep));
-	dgFastRayTest ray(dgVector(dgFloat32(0.0f)), polygonMatrix.UnrotateVector(step));
+	dgVector relStep (relativeVelocity.Scale4(proxy.m_timestep));
+	dgFastRayTest ray(dgVector(dgFloat32(0.0f)), polygonMatrix.UnrotateVector(relStep));
  	dgFloat32 distance = ray.BoxIntersect(minBox, maxBox);
 
 	dgInt32 count = 0;
@@ -539,13 +539,13 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 		bool inside = false;
 
 		dgVector sphOrigin(polygonMatrix.TransformVector((hullBoxP1 + hullBoxP0) * dgVector::m_half));
-		dgVector pointInPlane (sphOrigin - step.Scale4 (m_normal.DotProduct4(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct4(step).GetScalar()));
+		dgVector pointInPlane (sphOrigin - relStep.Scale4 (m_normal.DotProduct4(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct4(relStep).GetScalar()));
 
 		dgVector sphRadius(dgVector::m_half * (hullBoxP1 - hullBoxP0));
 		dgFloat32 radius = dgSqrt(sphRadius.DotProduct4(sphRadius).GetScalar());
 		dgVector planeMinkStep (m_normal.Scale4 (radius));
 		sphOrigin -= planeMinkStep;
-		dgVector supportPoint (sphOrigin - step.Scale4 (m_normal.DotProduct4(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct4(step).GetScalar()));
+		dgVector supportPoint (sphOrigin - relStep.Scale4 (m_normal.DotProduct4(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct4(relStep).GetScalar()));
 
 		supportPoint -= pointInPlane;
 		dgAssert (supportPoint.m_w == dgFloat32 (0.0f));
@@ -618,9 +618,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 		} else {
 			m_vertexCount = dgUnsigned16 (m_count);
 			count = world->CalculateConvexToConvexContacts(proxy);
-			dgTrace (("dt %f\n", proxy.m_timestep));
-			proxy.m_closestPointBody0.Trace("p0");
-			proxy.m_closestPointBody1.Trace("p1");
+			//dgTrace (("dt %f\n", proxy.m_timestep));
+			//proxy.m_closestPointBody0.Trace("p0");
+			//proxy.m_closestPointBody1.Trace("p1");
 			if (count >= 1) {
 				dgContactPoint* const contactsOut = proxy.m_contacts;
 				for (dgInt32 i = 0; i < count; i++) {

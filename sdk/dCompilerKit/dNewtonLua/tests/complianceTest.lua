@@ -1,4 +1,4 @@
---[[	
+--[[
 	local a, b, c, d	
 	local e = d + a
 	local f = b + c
@@ -8,13 +8,17 @@
 	else
 		d = e - f
 	end
---]]
----[[	
-	local d	
-	if 1 == 0 then
-		d = 3
-	else
-		d = 3
-	end		 
---]]
 	return d;
+--]]
+
+
+---[[	
+	-- defines a factorial function
+    function fact (n, n1, n2)
+      if n == 0 then
+        return 1
+      else
+        return n * fact(n-1)
+      end
+    end
+--]]

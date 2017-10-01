@@ -1510,10 +1510,12 @@ class dgVector
 	}
 
 #ifdef _DEBUG
-	void Trace(char* const name) const
+	inline void Trace(char* const name) const
 	{
 		dgTrace(("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
 	}
+#else 
+	inline void Trace(char* const name) const {}
 #endif
 
 	DG_CLASS_ALLOCATOR(allocator)
