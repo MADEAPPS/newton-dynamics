@@ -169,6 +169,16 @@ dList<dCILInstr*>::dListNode* dCILInstrConditional::GetFalseTarget () const
 	return m_targetNode1;
 }
 
+const dString& dCILInstrConditional::GetTrueLabel() const
+{
+	return m_label0;
+}
+
+const dString& dCILInstrConditional::GetFalseLabel() const
+{
+	return m_label1;
+}
+
 
 dCILInstrConditional* dCILInstrConditional::GetAsIF()
 {

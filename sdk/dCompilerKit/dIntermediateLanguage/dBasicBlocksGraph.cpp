@@ -259,23 +259,60 @@ void dBasicBlocksGraph::Trace() const
 
 void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 {
-	//RemoveAll();
 	dAssert (!GetCount());
-
 	m_begin = functionNode->GetNext();
 	dAssert (m_begin->GetInfo()->GetAsLabel());
 	for (m_end = functionNode->GetNext(); !m_end->GetInfo()->GetAsFunctionEnd(); m_end = m_end->GetNext());
 
+	for (bool change = true; change; ) {
+		change = false;
+		for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+			dCILInstr* const instruction = node->GetInfo();
+			if (instruction->GetAsGoto()) {
+				dCIL* const cil = m_begin->GetInfo()->GetCil();
+				while (!node->GetNext()->GetInfo()->GetAsLabel()) {
+					change = true;
+					cil->Remove(node->GetNext());
+				}
+			}
+		}
+
+		dTree<int, dString> filter;
+		for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+			dCILInstr* const instruction = node->GetInfo();
+			if (instruction->GetAsGoto()) {
+				filter.Insert (0, instruction->GetAsGoto()->GetLabel());
+			} else if (instruction->GetAsIF()) {
+				filter.Insert (0, instruction->GetAsIF()->GetTrueLabel());
+				filter.Insert (0, instruction->GetAsIF()->GetFalseLabel());
+			}
+		}
+
+		for (dCIL::dListNode* node = m_begin->GetNext(); node != m_end; node = node->GetNext()) {
+			dCILInstrLabel* const label = node->GetInfo()->GetAsLabel();
+			if (label && !filter.Find (label->GetLabel())) {
+				dCIL* const cil = m_begin->GetInfo()->GetCil();
+				while (!node->GetNext()->GetInfo()->GetAsLabel()) {
+					cil->Remove(node->GetNext());
+				}
+				change = true;
+				dCIL::dListNode* const saveNode = node->GetPrev();
+				cil->Remove(node);
+				node = saveNode;
+			}
+		}
+	}
+
 	// find the root of all basic blocks leaders
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
-		if (node->GetInfo()->IsBasicBlockBegin()) {
-			dAssert (node->GetInfo()->GetAsLabel());
+		dCILInstr* const instruction = node->GetInfo();
+		if (instruction->IsBasicBlockBegin()) {
+			dAssert (instruction->GetAsLabel());
 			Append(dBasicBlock(node));
 		}
 	}
 	CalculateSuccessorsAndPredecessors ();
 	BuildDominatorTree ();
-//Trace();
 }
 
 void dBasicBlocksGraph::CalculateSuccessorsAndPredecessors ()
@@ -289,12 +326,9 @@ void dBasicBlocksGraph::CalculateSuccessorsAndPredecessors ()
 
 		stack.Remove(stack.GetLast()->GetInfo());
 		if (block->m_mark < m_mark) {
-
 			block->m_mark = m_mark;
-			//m_traversalBlocksOrder.Addtop(block);
-//block->Trace();
-
 			dCILInstr* const instruction = block->m_end->GetInfo();
+instruction->Trace();
 			dAssert(instruction->IsBasicBlockEnd());
 			if (instruction->GetAsIF()) {
 				dCILInstrConditional* const ifInstr = instruction->GetAsIF();
@@ -374,7 +408,6 @@ void dBasicBlocksGraph::DeleteUnreachedBlocks()
 		dBasicBlock& block = blockNode->GetInfo();
 		nextBlockNode = blockNode->GetNext();
 		if (block.m_mark != m_mark) {
-			//block.Trace();
 			bool terminate = false;
 			dCIL::dListNode* nextNode;
 			for (dCIL::dListNode* node = block.m_begin; !terminate; node = nextNode) {

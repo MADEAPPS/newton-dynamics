@@ -14,7 +14,7 @@
 
 ---[[	
 	-- defines a factorial function
-    function fact (n, n1, n2)
+    function fact (n)
       if n == 0 then
         return 1
       else

@@ -112,6 +112,19 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionDeclaration(co
 
 void dNewtonLuaCompiler::CloseFunctionDeclaration()
 {
+	dLuaClosure::dListNode* const funtionNode = m_currentClosure->GetFirst();
+	dLuaClosure::dListNode* const labelNode = funtionNode->GetNext();
+	dAssert (labelNode->GetInfo()->GetAsLabel());
+
+	dCILInstrFunction* const functionInstruction = funtionNode->GetInfo()->GetAsFunction();
+	for (dList<dCILInstrFunction::dArg>::dListNode* argNode = functionInstruction->m_parameters.GetLast(); argNode; argNode = argNode->GetPrev()) {
+		const dCILInstrFunction::dArg& arg = argNode->GetInfo();
+		dCILInstrArgument* const localVariable = new dCILInstrArgument(*m_currentClosure, arg.m_label, arg.GetType());
+		m_currentClosure->InsertAfter(labelNode, localVariable->GetNode());
+		TRACE_INSTRUCTION(localVariable);
+	}
+
+
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
 	dCILInstrLabel* const label = new dCILInstrLabel(*m_currentClosure, m_currentClosure->m_returnLabel);
 	for (dLuaClosure::dListNode* node = m_currentClosure->GetFirst(); node; node = node->GetNext()) {
@@ -138,7 +151,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 //basicBlocks.Trace();
 
 	basicBlocks.OptimizeSSA();
-	//basicBlocks.Trace();
+basicBlocks.Trace();
 
 	basicBlocks.RegistersAllocations();
 basicBlocks.Trace();

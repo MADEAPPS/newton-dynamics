@@ -99,6 +99,8 @@ class dCILInstrConditional: public dCILTwoArgInstr
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { dAssert(0);  return false; }
 
+	const dString& GetTrueLabel() const;
+	const dString& GetFalseLabel() const;
 	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
 	dList<dCILInstr*>::dListNode* GetFalseTarget () const;
 

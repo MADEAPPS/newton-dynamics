@@ -2419,7 +2419,7 @@ break;
 break;
 
 						case 39:// functionDefinition : functionDeclare block _END 
-{dAssert(0);}
+{MyModule->CloseFunctionDeclaration();}
 break;
 
 						case 51:// returnStatement : _RETURN expressionList ; 

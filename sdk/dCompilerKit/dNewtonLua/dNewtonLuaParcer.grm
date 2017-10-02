@@ -239,7 +239,7 @@ functionDeclare
 	;
 
 functionDefinition
-	: functionDeclare block _END {dAssert(0);}
+	: functionDeclare block _END {MyModule->CloseFunctionDeclaration();} 
 	;
 
 statement 
