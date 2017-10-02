@@ -201,25 +201,25 @@ dLiveInLiveOutSolver::dLiveInLiveOutSolver(dBasicBlocksGraph* const graph)
 		someSetChanged = true;
 		for (dListNode* pointNode = GetLast(); pointNode; pointNode = pointNode->GetPrev()) {
 			dFlowGraphNode& point = pointNode->GetInfo();
-			dVariableSet<dString> oldInput(point.m_liveInputSet);
-			dVariableSet<dString> oldOutput(point.m_liveOutputSet);
+			dVariableSet<dString> oldInput(point.m_livedInputSet);
+			dVariableSet<dString> oldOutput(point.m_livedOutputSet);
 
-			point.m_liveInputSet.RemoveAll();
-			point.m_liveInputSet.Union(point.m_liveOutputSet);
+			point.m_livedInputSet.RemoveAll();
+			point.m_livedInputSet.Union(point.m_livedOutputSet);
 			dCILInstr::dArg* const generatedVar = point.m_instruction->GetGeneratedVariable();
 			if (generatedVar) {
-				point.m_liveInputSet.Remove(generatedVar->m_label);
+				point.m_livedInputSet.Remove(generatedVar->m_label);
 			}
 			dList<dCILInstr::dArg*> usedVariables;
 			point.m_instruction->GetUsedVariables(usedVariables);
-			point.m_liveInputSet.Union(usedVariables);
-			point.m_liveOutputSet.RemoveAll();
+			point.m_livedInputSet.Union(usedVariables);
+			point.m_livedOutputSet.RemoveAll();
 
 			for (dList<dFlowGraphNode*>::dListNode* successorNode = point.m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {
 				dFlowGraphNode* const successorInfo = successorNode->GetInfo();
-				point.m_liveOutputSet.Union(successorInfo->m_liveInputSet);
+				point.m_livedOutputSet.Union(successorInfo->m_livedInputSet);
 			}
-			someSetChanged = (someSetChanged && oldOutput.Compare(point.m_liveOutputSet) && oldInput.Compare(point.m_liveInputSet));
+			someSetChanged = (someSetChanged && oldOutput.Compare(point.m_livedOutputSet) && oldInput.Compare(point.m_livedInputSet));
 		}
 	}
 
@@ -231,10 +231,10 @@ void dLiveInLiveOutSolver::Trace()
 	for (dListNode* pointNode = GetFirst(); pointNode; pointNode = pointNode->GetNext()) {
 		dFlowGraphNode& point = pointNode->GetInfo();
 		dTrace (("liveIn: "));
-		point.m_liveInputSet.Trace();
+		point.m_livedInputSet.Trace();
 		point.m_instruction->Trace();
 		dTrace (("liveOut: "));
-		point.m_liveOutputSet.Trace();
+		point.m_livedOutputSet.Trace();
 		dTrace (("\n"));
 	}
 }
@@ -737,7 +737,7 @@ bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
 }
 
 
-void dBasicBlocksGraph::RemovePhyFunctions()
+void dBasicBlocksGraph::RemovePhiFunctions()
 {
 	for (dBasicBlocksGraph::dListNode* nodeOuter = GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
 		dBasicBlock& block = nodeOuter->GetInfo();
@@ -771,8 +771,8 @@ void dBasicBlocksGraph::RegistersAllocations ()
 {
 	int regCount = 16;
 
-Trace();
-	RemovePhyFunctions();
+//Trace();
+	RemovePhiFunctions();
 Trace();
 	dRegisterInterferenceGraph interferenceGraph(this, regCount);
 Trace();

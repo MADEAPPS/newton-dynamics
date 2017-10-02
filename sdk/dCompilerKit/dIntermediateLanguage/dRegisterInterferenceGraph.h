@@ -39,10 +39,9 @@ class dRegisterInterferenceNode
 	dRegisterInterferenceNode()
 		:m_name()
 		,m_interferanceEdge()
-		,m_coalescedParent(NULL)
 		,m_registerIndex (-1)
 		,m_inSet (false)
-		, m_isPrecolored(false)
+		//,m_isPrecolored(false)
 		,m_saveRegisterOnEntry(false)
 	{
 	}
@@ -51,11 +50,10 @@ class dRegisterInterferenceNode
 
 	dString m_name;
 	dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
-	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_coalescedParent;
 
 	int m_registerIndex;
 	bool m_inSet;
-	bool m_isPrecolored;
+	//bool m_isPrecolored;
 	bool m_saveRegisterOnEntry;
 };
 

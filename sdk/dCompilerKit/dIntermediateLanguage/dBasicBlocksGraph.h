@@ -177,8 +177,8 @@ class dFlowGraphNode
 {
 	public:
 	dCILInstr* m_instruction;
-	dVariableSet<dString> m_liveInputSet;
-	dVariableSet<dString> m_liveOutputSet;
+	dVariableSet<dString> m_livedInputSet;
+	dVariableSet<dString> m_livedOutputSet;
 	dList<dFlowGraphNode*> m_successors;
 //	dList<dLiveInLiveOut*> m_predecessors;
 };
@@ -209,7 +209,7 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	void GetStatementsWorklist (dWorkList& workList) const;
 	void BuildReverseOrdeBlockList (dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const;
 
-	void RemovePhyFunctions ();
+	void RemovePhiFunctions ();
 	void BuildDominatorTree ();
 	void DeleteUnreachedBlocks();
 	void CalculateSuccessorsAndPredecessors ();

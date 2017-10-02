@@ -193,8 +193,13 @@ bool dCILInstrConditional::IsBasicBlockEnd() const
 
 void dCILInstrConditional::GetUsedVariables (dList<dArg*>& variablesList)
 {
-	variablesList.Append(&m_arg0);
+	if (!((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat))) {
+		variablesList.Append(&m_arg0);
+	}
 
+	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat))) {
+		variablesList.Append(&m_arg1);
+	}
 }
 
 void dCILInstrConditional::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
@@ -539,8 +544,6 @@ dCILInstr::dArg* dCILInstrCall::GetGeneratedVariable()
 
 void dCILInstrCall::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	dAssert (0);
-/*
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
 		m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
 	}
@@ -549,7 +552,6 @@ void dCILInstrCall::AssignRegisterName(const dRegisterInterferenceGraph& interfe
 		dArg& arg = node->GetInfo();
 		arg.m_label = interferenceGraph.GetRegisterName(arg.m_label);
 	}
-*/
 }
 
 void dCILInstrCall::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const 
