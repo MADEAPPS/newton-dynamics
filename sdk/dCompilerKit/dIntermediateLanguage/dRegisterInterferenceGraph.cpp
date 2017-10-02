@@ -57,10 +57,18 @@ void dRegisterInterferenceGraph::Build()
 		}
 	}
 
+#ifdef _DEBUG
+	dRegisterInterferenceGraph::Iterator debugIter(*this);
+	for (debugIter.Begin(); debugIter; debugIter++) {
+		const dString& key = debugIter.GetKey();
+		dTrace(("%s\n", key.GetStr()));
+	}
+#endif
+
 	// pre-color some special nodes
-	int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX + 1;   
-	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dFlowGraphNode& point = node->GetInfo();
+	int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX;
+	for (dLiveInLiveOutSolver::dListNode* instNode = liveInLiveOut.GetFirst(); instNode; instNode = instNode->GetNext()) {
+		dFlowGraphNode& point = instNode->GetInfo();
 		dCILInstr* const instr = point.m_instruction;
 		//instr->Trace();
 
@@ -75,6 +83,7 @@ void dRegisterInterferenceGraph::Build()
 						dTreeNode* const returnRegNode = Find(arg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = intArgumentIndex;
 						//registerInfo.m_isPrecolored = true;
 						intArgumentIndex++;
@@ -90,6 +99,7 @@ void dRegisterInterferenceGraph::Build()
 						dTreeNode* const returnRegNode = Find(arg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = intArgumentIndex;
 						//registerInfo.m_isPrecolored = true;
 						intArgumentIndex++;
@@ -118,6 +128,7 @@ void dRegisterInterferenceGraph::Build()
 						dTreeNode* const returnRegNode = Find(arg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
 						//registerInfo.m_isPrecolored = true;
 						break;
@@ -128,6 +139,7 @@ void dRegisterInterferenceGraph::Build()
 						dTreeNode* const returnRegNode = Find(arg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
 						//registerInfo.m_isPrecolored = true;
 						break;
@@ -147,15 +159,16 @@ void dRegisterInterferenceGraph::Build()
 		} else if (instr->GetAsCall()) {
 			dCILInstrCall* const callInstr = instr->GetAsCall();
 
-			const dCILInstr::dArg& arg = callInstr->GetArg0();
-			if (arg.GetType().m_isPointer || (arg.GetType().m_intrinsicType != dCILInstr::m_void)) {
-				switch (arg.GetType().m_intrinsicType)
+			const dCILInstr::dArg& retArg = callInstr->GetArg0();
+			if (retArg.GetType().m_isPointer || (retArg.GetType().m_intrinsicType != dCILInstr::m_void)) {
+				switch (retArg.GetType().m_intrinsicType)
 				{
 					case dCILInstr::m_int:
 					{
-						dTreeNode* const returnRegNode = Find (arg.m_label);
+						dTreeNode* const returnRegNode = Find (retArg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
 						//registerInfo.m_isPrecolored = true;
 						break;
@@ -163,9 +176,10 @@ void dRegisterInterferenceGraph::Build()
 
 					case dCILInstr::m_luaType:
 					{
-						dTreeNode* const returnRegNode = Find(arg.m_label);
+						dTreeNode* const returnRegNode = Find(retArg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
 						//registerInfo.m_isPrecolored = true;
 						break;
@@ -176,12 +190,14 @@ void dRegisterInterferenceGraph::Build()
 				}
 			}
 
+
 			int index = D_CALLER_SAVE_REGISTER_INDEX;
 			for (dList<dCILInstr::dArg>::dListNode* node = callInstr->m_parameters.GetLast(); node && (index < D_CALLER_SAVE_REGISTER_COUNT); node = node->GetPrev()) {
 				const dCILInstr::dArg& arg = node->GetInfo();
 				dTreeNode* const regNode = Find (arg.m_label);
 				dAssert(regNode);
 				dRegisterInterferenceNode& registerInfo = regNode->GetInfo();
+				dAssert(registerInfo.m_registerIndex == -1);
 				registerInfo.m_registerIndex = index;
 				index ++;
 				dAssert (index < D_CALLER_SAVE_REGISTER_COUNT);
@@ -210,7 +226,8 @@ void dRegisterInterferenceGraph::Build()
 					dRegisterInterferenceNodeEdge edgeBA(varAnodeNode);
 					varAnode.m_interferanceEdge.Append(edgeAB);
 					varBnode.m_interferanceEdge.Append(edgeBA);
-					//dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
+					dAssert((varAnode.m_registerIndex == -1) || (varBnode.m_registerIndex == -1) || (varAnode.m_registerIndex != varBnode.m_registerIndex));
+					dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
 				}
 			}
 		}
