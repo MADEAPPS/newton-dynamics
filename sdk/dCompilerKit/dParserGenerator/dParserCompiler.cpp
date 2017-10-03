@@ -577,7 +577,8 @@ void dParserCompiler::ScanGrammarFile(
 	LoadTemplateFile("dParserUserVariableTemplate_cpp.txt", userVariableClass);
 
 	// scan the definition segment
-	for (dToken token = dToken(lexical.NextToken()); token != GRAMMAR_SEGMENT; ) {
+	for (dToken token = dToken(lexical.NextToken()); token != GRAMMAR_SEGMENT; ) 
+	{
 		switch (int (token)) 
 		{
 			case START:
@@ -907,7 +908,7 @@ void dParserCompiler::CanonicalItemSets (
 				delete newState;
 			}
 		}
-		dTrace (("state#:%d   items: %d   transitions: %d\n", state->m_number, state->GetCount(), state->m_transitions.GetCount()));
+		//dTrace (("state#:%d   items: %d   transitions: %d\n", state->m_number, state->GetCount(), state->m_transitions.GetCount()));
 	}
 
 	if (debugFile) {

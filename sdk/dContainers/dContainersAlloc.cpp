@@ -62,17 +62,20 @@
 
 void* dContainersAlloc::operator new (size_t size)
 {
-	return ::new char[size];
+	//return ::new char[size];
+	return Alloc (size);
 }
 
 void dContainersAlloc::operator delete (void* ptr)
 {
-	delete[] (char*) ptr;
+//	delete[] (char*) ptr;
+	Free(ptr);
 }
 
 void* dContainersAlloc::Alloc (size_t size)
 {
-	return ::new char[size];
+	char* const ptr = ::new char[size];
+	return ptr;
 }
 
 void dContainersAlloc::Free(void* const ptr)
