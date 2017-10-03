@@ -29,12 +29,14 @@ void dCILInstrEnter::Serialize(char* const textOut) const
 	sprintf(textOut, "\tenter %d, %d\n", m_registerMask, m_localMemorySize);
 }
 
+
 void dCILInstrEnter::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
-	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
-	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_enter);
-	code.m_type1.m_imm1 = m_registerMask;
-	code.m_type1.m_imm2 = m_localMemorySize;
+	dAssert (0);
+//	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+//	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_enter);
+//	code.m_type1.m_imm1 = m_registerMask;
+//	code.m_type1.m_imm2 = m_localMemorySize;
 }
 
 dCILInstrLeave::dCILInstrLeave(dCILInstrEnter* const enter, dCILInstrReturn* const successor)
@@ -54,12 +56,12 @@ void dCILInstrLeave::Serialize(char* const textOut) const
 
 void dCILInstrLeave::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
-	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
-	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_leave);
-	code.m_type1.m_imm1 = m_registerMask;
-	code.m_type1.m_imm2 = m_localMemorySize;
+	dAssert (0);
+//	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+//	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_leave);
+//	code.m_type1.m_imm1 = m_registerMask;
+//	code.m_type1.m_imm2 = m_localMemorySize;
 }
-
 
 
 dCILInstrNop::dCILInstrNop(dCIL& program)

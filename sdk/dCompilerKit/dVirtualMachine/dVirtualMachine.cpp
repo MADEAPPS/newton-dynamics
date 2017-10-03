@@ -165,6 +165,8 @@ int stackMem[100] ;
 			//enter	imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
 			case m_enter:
 			{
+				dAssert (0);
+/*
 				int stack = m_integerRegisters[D_STACK_REGISTER_INDEX];
 				int saveRegIndex = D_CALLER_SAVE_REGISTER_COUNT;
 				for (unsigned mask = code.m_type1.m_imm1; mask; mask = mask >>= 1) {
@@ -179,12 +181,15 @@ int stackMem[100] ;
 				}
 
 				m_integerRegisters[D_STACK_REGISTER_INDEX] = stack;
+*/
 				break;
 			}
 
 			//leave imm1, imm2			imm1 = registerMask, imm2 local variable stack size 
 			case m_leave:
 			{
+				dAssert(0);
+/*
 				int stack = m_integerRegisters[D_STACK_REGISTER_INDEX];
 				int saveRegIndex = D_INTEGER_REGISTER_COUNT;
 
@@ -201,6 +206,7 @@ int stackMem[100] ;
 				}
 
 				m_integerRegisters[D_STACK_REGISTER_INDEX] = stack;
+*/
 				break;
 			}
 

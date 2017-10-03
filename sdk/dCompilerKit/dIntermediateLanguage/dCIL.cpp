@@ -131,7 +131,8 @@ dVirtualMachine* dCIL::BuilExecutable()
 			dCILInstrCall* const call = instr->GetAsCall();
 			dTree <dListNode*, dString>::dTreeNode* const targetNode = fuctionList.Find(call->GetArg1().m_label);
 			if (targetNode) {
-				call->SetTarget(targetNode->GetInfo());
+				dAssert (0);
+				//call->SetTarget(targetNode->GetInfo());
 			}
 		}
 	}

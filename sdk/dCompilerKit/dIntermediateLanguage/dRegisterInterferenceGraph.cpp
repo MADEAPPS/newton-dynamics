@@ -29,6 +29,7 @@ void dRegisterInterferenceGraph::Build()
 {
 //m_graph->Trace();
 	dLiveInLiveOutSolver liveInLiveOut(m_graph);
+	
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
 		dList<dCILInstr::dArg*> usedVariables;
 		dFlowGraphNode& point = node->GetInfo();
@@ -66,7 +67,7 @@ void dRegisterInterferenceGraph::Build()
 #endif
 
 	// pre-color some special nodes
-	int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX;
+	int parameterInResgisterIndex = 0;
 	for (dLiveInLiveOutSolver::dListNode* instNode = liveInLiveOut.GetFirst(); instNode; instNode = instNode->GetNext()) {
 		dFlowGraphNode& point = instNode->GetInfo();
 		dCILInstr* const instr = point.m_instruction;
@@ -79,14 +80,14 @@ void dRegisterInterferenceGraph::Build()
 			{
 				case dCILInstr::m_int:
 				{
-					if (intArgumentIndex < D_CALLER_SAVE_REGISTER_COUNT) {
+					if (parameterInResgisterIndex < D_PARMETER_IN_REGISTER_COUNT) {
 						dTreeNode* const returnRegNode = Find(arg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = intArgumentIndex;
+						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
 						//registerInfo.m_isPrecolored = true;
-						intArgumentIndex++;
+						parameterInResgisterIndex++;
 					} else {
 						dAssert(0);
 					}
@@ -95,14 +96,14 @@ void dRegisterInterferenceGraph::Build()
 
 				case dCILInstr::m_luaType:
 				{
-					if (intArgumentIndex < D_CALLER_SAVE_REGISTER_COUNT) {
+					if (parameterInResgisterIndex < D_PARMETER_IN_REGISTER_COUNT) {
 						dTreeNode* const returnRegNode = Find(arg.m_label);
 						dAssert(returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = intArgumentIndex;
+						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
 						//registerInfo.m_isPrecolored = true;
-						intArgumentIndex++;
+						parameterInResgisterIndex++;
 					}
 					else 
 					{
@@ -190,17 +191,16 @@ void dRegisterInterferenceGraph::Build()
 				}
 			}
 
-
-			int index = D_CALLER_SAVE_REGISTER_INDEX;
-			for (dList<dCILInstr::dArg>::dListNode* node = callInstr->m_parameters.GetLast(); node && (index < D_CALLER_SAVE_REGISTER_COUNT); node = node->GetPrev()) {
+			int index = 0;
+			for (dList<dCILInstr::dArg>::dListNode* node = callInstr->m_parameters.GetLast(); node && (index < D_PARMETER_IN_REGISTER_COUNT); node = node->GetPrev()) {
 				const dCILInstr::dArg& arg = node->GetInfo();
 				dTreeNode* const regNode = Find (arg.m_label);
 				dAssert(regNode);
 				dRegisterInterferenceNode& registerInfo = regNode->GetInfo();
 				dAssert(registerInfo.m_registerIndex == -1);
-				registerInfo.m_registerIndex = index;
+				registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + index;
 				index ++;
-				dAssert (index < D_CALLER_SAVE_REGISTER_COUNT);
+				dAssert (index < D_PARMETER_IN_REGISTER_COUNT);
 			}
 		}
 	}
@@ -226,8 +226,8 @@ void dRegisterInterferenceGraph::Build()
 					dRegisterInterferenceNodeEdge edgeBA(varAnodeNode);
 					varAnode.m_interferanceEdge.Append(edgeAB);
 					varBnode.m_interferanceEdge.Append(edgeBA);
-					dAssert((varAnode.m_registerIndex == -1) || (varBnode.m_registerIndex == -1) || (varAnode.m_registerIndex != varBnode.m_registerIndex));
 					dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
+					dAssert((varAnode.m_registerIndex == -1) || (varBnode.m_registerIndex == -1) || (varAnode.m_registerIndex != varBnode.m_registerIndex));
 				}
 			}
 		}
@@ -254,7 +254,6 @@ void dRegisterInterferenceGraph::Build()
 		}
 	}
 }
-
 
 dRegisterInterferenceNodeEdge* dRegisterInterferenceNode::FindEdge(const dString& var)
 {
@@ -525,7 +524,8 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 	}
 #endif
 
-	int saveOnEntryIndex = D_CALLER_SAVE_REGISTER_COUNT;
+//	int saveOnEntryIndex = D_CALLER_SAVE_REGISTER_COUNT;
+int saveOnEntryIndex = 4;
 	memset(registerCost, -1, count * sizeof(registerCost[0]));
 	for (int i = 0; i < count; i++) {
 		dTreeNode* const varNode = registerNode[i];

@@ -154,7 +154,7 @@ class dCILInstrCall: public dCILTwoArgInstr
 	void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	void AddArgument (const dArg& argument);
-	void SetTarget(dList<dCILInstr*>::dListNode* const node) {m_tagetNode = node; }
+//	void SetTarget(dList<dCILInstr*>::dListNode* const node) {m_tagetNode = node; }
 
 	virtual dCILInstrCall* GetAsCall() { return this; }
 
@@ -170,7 +170,7 @@ class dCILInstrCall: public dCILTwoArgInstr
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 
 	dList<dArg> m_parameters;
-	dList<dCILInstr*>::dListNode* m_tagetNode;
+//	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
 #endif

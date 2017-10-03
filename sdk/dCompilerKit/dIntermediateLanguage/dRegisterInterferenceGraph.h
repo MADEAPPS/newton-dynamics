@@ -92,12 +92,12 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	dString GetRegisterName(const dString& varName) const;
 
 	private:
-	void Build();
 	int ColorGraph();
 	void AllocateRegisters();
 	dTreeNode* GetBestNode(int& edgeCount);
 	int GetRegisterIndex(const dString& varName) const;
 	bool IsSpilledVariable (const dString& name) const;
+	void Build();
 
 	dBasicBlocksGraph* m_graph;
 };

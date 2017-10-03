@@ -206,21 +206,19 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	void BuildReverseOrderBlockList (dList<const dBasicBlock*>& reverseOrder);
 
 	private:
-	void GetStatementsWorklist (dWorkList& workList) const;
-	void BuildReverseOrdeBlockList (dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const;
-
-	void RemovePhiFunctions ();
-	void BuildDominatorTree ();
-	void DeleteUnreachedBlocks();
-	void CalculateSuccessorsAndPredecessors ();
-
-	// Single Static transformation assignments passes
+	void RemovePhiFunctionsSSA ();
 	bool ApplyCopyPropagationSSA();
+	void InsertFunctioncallSpillsSSA();
 	bool ApplyDeadCodeEliminationSSA();
 	bool ApplySimpleConstantPropagationSSA();
 	bool ApplyConditionalConstantPropagationSSA();
 
 	// Non Single Static transformation assignments passes
+	void BuildDominatorTree();
+	void DeleteUnreachedBlocks();
+	void CalculateSuccessorsAndPredecessors();
+	void GetStatementsWorklist(dWorkList& workList) const;
+	void BuildReverseOrdeBlockList(dList<const dBasicBlock*>& reverseOrderList, const dBasicBlock* const block) const;
 
 	dCIL::dListNode* m_begin;
 	dCIL::dListNode* m_end;

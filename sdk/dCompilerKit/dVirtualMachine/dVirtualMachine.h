@@ -31,28 +31,24 @@
 
 
 #define D_OPCODE_FIELD					7
-#define D_REGISTER_SET_FIELD			5
+#define D_REGISTER_SET_FIELD			3
 
 #define D_REGISTER_SYMBOL				"%r"
 #define D_SPILL_REGISTER_SYMBOL			"spilled"
 
 #define D_INTEGER_REGISTER_COUNT		(1<<D_REGISTER_SET_FIELD)
-
-#define D_RETURN_REGISTER_INDEX			(0)
-#define D_CALLER_SAVE_REGISTER_INDEX	(0)
-#define D_CALLER_SAVE_REGISTER_COUNT	(D_INTEGER_REGISTER_COUNT / 2)
-
 #define D_STACK_REGISTER_INDEX			(D_INTEGER_REGISTER_COUNT - 1)
-
 #define D_FLOAT_REGISTER_COUNT			D_INTEGER_REGISTER_COUNT		
 
 
-//#define D_REGISTER_BANK_SIZE			4
+#define D_RETURN_REGISTER_INDEX			(0)
+#define D_PARMETER_IN_REGISTER_START	(0)
+#define D_PARMETER_IN_REGISTER_END		((D_INTEGER_REGISTER_COUNT - 1) >> 1)
+#define D_PARMETER_IN_REGISTER_COUNT	(D_PARMETER_IN_REGISTER_END - D_PARMETER_IN_REGISTER_START)
+
 
 typedef unsigned dMachineIntRegister;
 typedef double dMachineFloatRegister;
-
-
 
 class dVirtualMachine
 {
@@ -141,14 +137,14 @@ class dVirtualMachine
 			unsigned	m_opcode	: D_OPCODE_FIELD;
 			int			m_imm1		: 32 - D_OPCODE_FIELD;
 		} m_type0;
-
+/*
 		struct 
 		{
 			unsigned	m_opcode	: D_OPCODE_FIELD;
 			unsigned	m_imm1		: D_CALLER_SAVE_REGISTER_COUNT;
 			unsigned	m_imm2		: 32 - (D_OPCODE_FIELD + D_CALLER_SAVE_REGISTER_COUNT);
 		} m_type1;
-
+*/
 		struct 
 		{
 			unsigned	m_opcode	: D_OPCODE_FIELD;

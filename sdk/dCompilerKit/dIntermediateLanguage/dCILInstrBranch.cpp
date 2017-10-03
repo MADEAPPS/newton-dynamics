@@ -466,7 +466,7 @@ dCILInstrCall::dCILInstrCall(dCIL& program, const dString& returnValue, const dA
 
 dCILInstrCall::dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& functionName)
 	:dCILTwoArgInstr(program, dArg(returnValue, type), dArg(functionName, dArgType()))
-	,m_tagetNode(NULL)
+//	,m_tagetNode(NULL)
 {
 }
 
@@ -556,9 +556,10 @@ void dCILInstrCall::AssignRegisterName(const dRegisterInterferenceGraph& interfe
 
 void dCILInstrCall::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const 
 {
-	dAssert (m_tagetNode);
-	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
-	code.m_type2.m_opcode = unsigned(dVirtualMachine::m_calli);
-	code.m_type2.m_reg0 = D_STACK_REGISTER_INDEX;
-	code.m_type2.m_imm2 = m_tagetNode->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
+//	dAssert (m_tagetNode);
+	dAssert (0);
+//	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+//	code.m_type2.m_opcode = unsigned(dVirtualMachine::m_calli);
+//	code.m_type2.m_reg0 = D_STACK_REGISTER_INDEX;
+//	code.m_type2.m_imm2 = m_tagetNode->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
 }

@@ -736,8 +736,46 @@ bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
 	//return constantPropagation.Solve();
 }
 
+void dBasicBlocksGraph::InsertFunctioncallSpillsSSA()
+{
+	bool hasCalls = false;
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstrCall* const functionCall = node->GetInfo()->GetAsCall();
+		if (functionCall) {
+			hasCalls = true;
+			break;
+		}
+	}
 
-void dBasicBlocksGraph::RemovePhiFunctions()
+	if (hasCalls) {
+		dTree<dCILInstr*, dString> definedWorkList;
+		for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+			dCILInstr* const instruction = node->GetInfo();
+			const dCILInstr::dArg* const arg = instruction->GetGeneratedVariable();
+			if (arg) {
+				definedWorkList.Insert(instruction, arg->m_label);
+			}
+		}
+
+		dLiveInLiveOutSolver liveInLiveOut(this);
+		for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+			dFlowGraphNode& point = node->GetInfo();
+			dCILInstrCall* const functionCall = point.m_instruction->GetAsCall();
+			if (functionCall) {
+				const dCILInstr::dArg* const arg = functionCall->GetGeneratedVariable();
+				dVariableSet<dString>::Iterator iter (point.m_livedOutputSet);
+				for (iter.Begin(); iter; iter ++) {
+					const dString& var = iter.GetKey(); 
+					if (var != arg->m_label) {
+						dAssert (0);
+					}
+				}
+			}
+		}
+	}
+}
+
+void dBasicBlocksGraph::RemovePhiFunctionsSSA()
 {
 	for (dBasicBlocksGraph::dListNode* nodeOuter = GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
 		dBasicBlock& block = nodeOuter->GetInfo();
@@ -772,7 +810,9 @@ void dBasicBlocksGraph::RegistersAllocations ()
 	int regCount = 16;
 
 //Trace();
-	RemovePhiFunctions();
+	InsertFunctioncallSpillsSSA();
+	RemovePhiFunctionsSSA();
+
 Trace();
 	dRegisterInterferenceGraph interferenceGraph(this, regCount);
 Trace();
