@@ -296,6 +296,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const
 	}
 
 	AllocateRegisters();
+m_graph->Trace();
 /*
 //m_flowGraph->m_cil->Trace();
 
@@ -559,9 +560,7 @@ void dRegisterInterferenceGraph::AllocateRegisters()
 		dBasicBlock& block = blockNode->GetInfo();
 		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
 			dCILInstr* const instr = node->GetInfo();
-//instr->Trace();
 			instr->AssignRegisterName(*this);
-			//instr->Trace();
 		}
 	}
 }
