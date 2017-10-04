@@ -40,9 +40,7 @@ class dRegisterInterferenceNode
 		:m_name()
 		,m_interferanceEdge()
 		,m_registerIndex (-1)
-		,m_inSet (false)
-		//,m_isPrecolored(false)
-		,m_saveRegisterOnEntry(false)
+		,m_registerIndexBase(0)
 	{
 	}
 
@@ -52,9 +50,7 @@ class dRegisterInterferenceNode
 	dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
 
 	int m_registerIndex;
-	bool m_inSet;
-	//bool m_isPrecolored;
-	bool m_saveRegisterOnEntry;
+	int m_registerIndexBase;
 };
 
 

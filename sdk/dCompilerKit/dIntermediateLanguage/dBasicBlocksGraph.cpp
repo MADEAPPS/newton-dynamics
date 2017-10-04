@@ -18,11 +18,11 @@
 #include "dConditionalConstantPropagationSolver.h"
 
 
-void dStatementBlockDictionary::BuildUsedVariableWorklist(dBasicBlocksGraph& list)
+void dStatementBlockDictionary::BuildUsedVariableWorklist(dBasicBlocksGraph& graph)
 {
 	RemoveAll();
 
-	for (dBasicBlocksGraph::dListNode* nodeOuter = list.GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
+	for (dBasicBlocksGraph::dListNode* nodeOuter = graph.GetFirst(); nodeOuter; nodeOuter = nodeOuter->GetNext()) {
 		dBasicBlock& block = nodeOuter->GetInfo();
 
 		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
@@ -757,7 +757,9 @@ void dBasicBlocksGraph::InsertFunctioncallSpillsSSA()
 			}
 		}
 
+		dStatementBlockDictionary usedList;
 		dLiveInLiveOutSolver liveInLiveOut(this);
+		usedList.BuildUsedVariableWorklist(*this);
 		for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
 			dFlowGraphNode& point = node->GetInfo();
 			dCILInstrCall* const functionCall = point.m_instruction->GetAsCall();
@@ -767,12 +769,33 @@ void dBasicBlocksGraph::InsertFunctioncallSpillsSSA()
 				for (iter.Begin(); iter; iter ++) {
 					const dString& var = iter.GetKey(); 
 					if (var != arg->m_label) {
-						dAssert (0);
+						dTree<dCILInstr*, dString>::dTreeNode* const definedNode = definedWorkList.Find(var);
+						dAssert (definedNode);
+						dCILInstr* const definedInstr = definedNode->GetInfo();
+						const dCILInstr::dArg* const defArg = definedInstr->GetGeneratedVariable();
+						dAssert (defArg->m_label == var);
+						definedWorkList.Remove(definedNode);
+						
+						dCILInstr::dArg newArg (definedInstr->m_cil->NewTemp(), defArg->GetType());
+						dCILInstrMove* const moveInstr = new dCILInstrMove (*definedInstr->m_cil, newArg.m_label, newArg.GetType(), defArg->m_label, defArg->GetType());
+						moveInstr->m_basicBlock = definedInstr->m_basicBlock;
+						definedInstr->m_cil->InsertAfter(definedInstr->GetNode(), moveInstr->GetNode());
+						
+						dAssert (usedList.Find(var));
+						dStatementBlockBucket::Iterator usedIter(usedList.Find(var)->GetInfo());
+						for (usedIter.Begin(); usedIter; usedIter ++) {
+							const dCIL::dListNode* const instrNode = usedIter.GetKey();
+							dCILInstr* const instruction = instrNode->GetInfo();
+							//instruction->Trace();
+							instruction->ReplaceArgument(*defArg, newArg);
+							//instruction->Trace();
+						}
 					}
 				}
 			}
 		}
 	}
+	//Trace();
 }
 
 void dBasicBlocksGraph::RemovePhiFunctionsSSA()

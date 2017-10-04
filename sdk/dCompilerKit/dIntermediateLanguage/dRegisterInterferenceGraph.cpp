@@ -58,6 +58,24 @@ void dRegisterInterferenceGraph::Build()
 		}
 	}
 
+	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+		dFlowGraphNode& point = node->GetInfo();
+		dCILInstrCall* const functionCall = point.m_instruction->GetAsCall();
+		if (functionCall) {
+			const dCILInstr::dArg* const arg = functionCall->GetGeneratedVariable();
+			dVariableSet<dString>::Iterator iter(point.m_livedOutputSet);
+			for (iter.Begin(); iter; iter++) {
+				const dString& var = iter.GetKey();
+				if (var != arg->m_label) {
+					dAssert (Find(var));
+					dRegisterInterferenceNode& regNode = Find(var)->GetInfo();
+					regNode.m_registerIndexBase = D_CALLEE_SAVE_REGISTER_START;
+				}
+			}
+		}
+	}
+
+
 #ifdef _DEBUG
 	dRegisterInterferenceGraph::Iterator debugIter(*this);
 	for (debugIter.Begin(); debugIter; debugIter++) {
@@ -86,7 +104,6 @@ void dRegisterInterferenceGraph::Build()
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
-						//registerInfo.m_isPrecolored = true;
 						parameterInResgisterIndex++;
 					} else {
 						dAssert(0);
@@ -102,7 +119,6 @@ void dRegisterInterferenceGraph::Build()
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
-						//registerInfo.m_isPrecolored = true;
 						parameterInResgisterIndex++;
 					}
 					else 
@@ -131,7 +147,6 @@ void dRegisterInterferenceGraph::Build()
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						//registerInfo.m_isPrecolored = true;
 						break;
 					}
 
@@ -142,7 +157,6 @@ void dRegisterInterferenceGraph::Build()
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						//registerInfo.m_isPrecolored = true;
 						break;
 					}
 
@@ -171,7 +185,6 @@ void dRegisterInterferenceGraph::Build()
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						//registerInfo.m_isPrecolored = true;
 						break;
 					}
 
@@ -182,7 +195,6 @@ void dRegisterInterferenceGraph::Build()
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						dAssert(registerInfo.m_registerIndex == -1);
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						//registerInfo.m_isPrecolored = true;
 						break;
 					}
 
@@ -233,6 +245,8 @@ void dRegisterInterferenceGraph::Build()
 		}
 	}
 
+/*
+// remember implement register coalescing 
 //m_graph->Trace();
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
 		dFlowGraphNode& point = node->GetInfo();
@@ -253,6 +267,7 @@ void dRegisterInterferenceGraph::Build()
 			}
 		}
 	}
+*/
 }
 
 dRegisterInterferenceNodeEdge* dRegisterInterferenceNode::FindEdge(const dString& var)
@@ -314,7 +329,7 @@ m_flowGraph->m_cil->Trace();
 }
 
 
-
+/*
 dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode(int& edgeCount)
 {
 	int minCount = 0x7fffff;
@@ -343,7 +358,7 @@ dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode(i
 	info.m_inSet = true;
 	return bestNode;
 }
-
+*/
 
 int dRegisterInterferenceGraph::ColorGraph()
 {
@@ -464,7 +479,8 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 		dTreeNode* const node = iter.GetNode();
 		dRegisterInterferenceNode& variable = node->GetInfo();
 		if (variable.m_registerIndex == -1) {
-			int regMask = 0;
+			//int regMask = 0;
+			int regMask = variable.m_registerIndexBase ? (1 << variable.m_registerIndexBase) - 1 : 0;
 			for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = variable.m_interferanceEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
 				dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
 				const dRegisterInterferenceNode& otherVariable = edge.m_incidentNode->GetInfo();
@@ -474,24 +490,8 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 			}
 
 			int index = 0;
-			if (variable.m_saveRegisterOnEntry) {
-				dAssert(0);
-				//index = D_CALLER_SAVE_REGISTER_COUNT;
-				//const int highMask = variable.m_saveRegisterOnEntry << D_CALLER_SAVE_REGISTER_COUNT;
-				//for (int mask = regMask; mask & highMask; mask >>= 1) {
-				//	index++;
-				//}
-				//if (index > (D_INTEGER_REGISTER_COUNT - 1)) {
-				//	dAssert(0);
-				//	index = 0;
-				//	for (int mask = regMask; mask & 1; mask >>= 1) {
-				//		index++;
-				//	}
-				//}
-			} else {
-				for (int mask = regMask; mask & 1; mask >>= 1) {
-					index++;
-				}
+			for (int mask = regMask; mask & 1; mask >>= 1) {
+				index++;
 			}
 
 			if (index > (D_INTEGER_REGISTER_COUNT - 1)) {
@@ -503,7 +503,9 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 		}
 		registersUsed = dMax(registersUsed, variable.m_registerIndex);
 	}
+#endif
 
+/*
 	int count = 0;
 	int registerCost[1024];
 	dTreeNode* registerNode[1024];
@@ -513,37 +515,40 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 	for (iter.Begin(); iter; iter++) {
 		dTreeNode* const varNode = iter.GetNode();
 		dRegisterInterferenceNode& variable = varNode->GetInfo();
-		if (variable.m_saveRegisterOnEntry) {
-			registerCost[count] = (variable.m_saveRegisterOnEntry << 24) + (variable.m_registerIndex << 1);
-		} else {
-			//registerCost[count] = (variable.m_registerIndex << 1) + !variable.m_isPrecolored;
-			registerCost[count] = (variable.m_registerIndex << 1);
-		}
+		//		if (variable.m_saveRegisterOnEntry____) {
+		//			registerCost[count] = (variable.m_saveRegisterOnEntry____ << 24) + (variable.m_registerIndex << 1);
+		//		} else {
+		//			//registerCost[count] = (variable.m_registerIndex << 1) + !variable.m_isPrecolored;
+		//			registerCost[count] = (variable.m_registerIndex << 1);
+		//		}
+		registerCost[count] = (variable.m_registerIndex << 1);
+
 		registerNode[count] = varNode;
 		count++;
 	}
-#endif
 
 //	int saveOnEntryIndex = D_CALLER_SAVE_REGISTER_COUNT;
-int saveOnEntryIndex = 4;
+	int saveOnEntryIndex = 4;
 	memset(registerCost, -1, count * sizeof(registerCost[0]));
 	for (int i = 0; i < count; i++) {
 		dTreeNode* const varNode = registerNode[i];
 		dRegisterInterferenceNode& variable = varNode->GetInfo();
 		int index = variable.m_registerIndex;
 		if (registerCost[index] == -1) {
-			if (variable.m_saveRegisterOnEntry) {
-				registerCost[index] = saveOnEntryIndex;
-				m_graph->m_savedRegistersMask |= (1 << saveOnEntryIndex);
-				saveOnEntryIndex++;
+			//if (variable.m_saveRegisterOnEntry____) {
+			//	registerCost[index] = saveOnEntryIndex;
+			//	m_graph->m_savedRegistersMask |= (1 << saveOnEntryIndex);
+			//	saveOnEntryIndex++;
 			//} else if (variable.m_isPrecolored) {
 			//	registerCost[index] = variable.m_registerIndex;
-			} else {
-				registerCost[index] = variable.m_registerIndex;
-			}
+			//} else {
+			//	registerCost[index] = variable.m_registerIndex;
+			//}
+			registerCost[index] = variable.m_registerIndex;
 		}
 		variable.m_registerIndex = registerCost[index];
 	}
+*/
 	return registersUsed + 1;
 }
 

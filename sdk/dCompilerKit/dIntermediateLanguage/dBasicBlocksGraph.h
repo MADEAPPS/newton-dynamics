@@ -150,7 +150,7 @@ class dStatementBlockDictionary: public dTree <dStatementBlockBucket, dString>
 	{
 	}
 
-	void BuildUsedVariableWorklist(dBasicBlocksGraph& list);
+	void BuildUsedVariableWorklist(dBasicBlocksGraph& graph);
 };
 
 class dWorkList: public dTree <dCIL::dListNode*, int>
