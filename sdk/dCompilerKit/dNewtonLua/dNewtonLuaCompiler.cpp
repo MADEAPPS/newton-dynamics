@@ -151,7 +151,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 //basicBlocks.Trace();
 
 	basicBlocks.OptimizeSSA();
-basicBlocks.Trace();
+//basicBlocks.Trace();
 
 	basicBlocks.RegistersAllocations();
 basicBlocks.Trace();

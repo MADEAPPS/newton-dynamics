@@ -228,7 +228,6 @@ class dBasicBlocksGraph: public dBasicBlocksList
 
 	friend class dBasicBlocksList;
 	friend class dConvertToSSASolver;
-	//friend class dLiveInLiveOutSolver;
 	friend class dRegisterInterferenceGraph;
 	friend class dConditionalConstantPropagationSolver;
 };

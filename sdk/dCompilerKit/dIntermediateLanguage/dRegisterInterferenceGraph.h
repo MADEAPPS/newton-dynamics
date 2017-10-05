@@ -48,7 +48,6 @@ class dRegisterInterferenceNode
 
 	dString m_name;
 	dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
-
 	int m_registerIndex;
 	int m_registerIndexBase;
 };
@@ -94,6 +93,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int GetRegisterIndex(const dString& varName) const;
 	bool IsSpilledVariable (const dString& name) const;
 	void Build();
+	void ApplyDeadCodeElimination();
 
 	dBasicBlocksGraph* m_graph;
 };

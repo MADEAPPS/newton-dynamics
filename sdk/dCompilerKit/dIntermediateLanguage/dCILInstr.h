@@ -13,14 +13,14 @@
 #define  _DCIL_INSTRUC_H_
 
 class dCIL;
+class dCILInstrPop;
+class dCILInstrPush;
 class dCILInstrNop;
 class dCILInstrPhy;
 class dCILInstrCall;
 class dCILInstrMove;
 class dCILInstrGoto;
 class dCILInstrLocal;
-class dCILInstrLeave;
-class dCILInstrEnter;
 class dCILInstrLabel;
 class dCILInstrReturn;
 class dCILInstrArgument;
@@ -146,25 +146,24 @@ class dCILInstr
 	virtual bool IsBasicBlockEnd() const { return false; }
 	virtual bool IsBasicBlockBegin() const { return false; }
 
-	virtual dCILInstrLeave* GetAsLeave() { return NULL; }
-	virtual dCILInstrEnter* GetAsEnter() { return NULL; }
-	virtual dCILInstrNop* GetAsNop() { return NULL; }
-	virtual dCILInstrConditional* GetAsIF() { return NULL; }
-	virtual dCILInstrPhy* GetAsPhi() { return NULL; }
-	virtual dCILInstrMove* GetAsMove() { return NULL; }
-	virtual dCILInstrCall* GetAsCall() { return NULL; }
-	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
-	virtual dCILInstrLabel* GetAsLabel() { return NULL; }
-	virtual dCILInstrReturn* GetAsReturn() { return NULL; }
-	virtual dCILInstrLocal* GetAsLocal() { return NULL; }
-	virtual dCILInstrArgument* GetAsArgument() { return NULL; }
-	virtual dCILInstrFunction* GetAsFunction() { return NULL; }
-	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return NULL; }
-	virtual dCILSingleArgInstr* GetAsSingleArg()  { return NULL; }
-	virtual dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic() { return NULL; }
+	virtual dCILInstrNop* GetAsNop() { return NULL;}
+	virtual dCILInstrPhy* GetAsPhi() { return NULL;}
+	virtual dCILInstrPop* GetAsPop() { return NULL;}
+	virtual dCILInstrPush* GetAsPush() { return NULL;}
+	virtual dCILInstrMove* GetAsMove() { return NULL;}
+	virtual dCILInstrCall* GetAsCall() { return NULL;}
+	virtual dCILInstrGoto* GetAsGoto() { return NULL;}
+	virtual dCILInstrLocal* GetAsLocal() { return NULL;}
+	virtual dCILInstrLabel* GetAsLabel() { return NULL;}
+	virtual dCILInstrReturn* GetAsReturn() { return NULL;}
+	virtual dCILInstrConditional* GetAsIF() { return NULL;}
+	virtual dCILInstrArgument* GetAsArgument() { return NULL;}
+	virtual dCILInstrFunction* GetAsFunction() { return NULL;}
+	virtual dCILSingleArgInstr* GetAsSingleArg()  { return NULL;}
+	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return NULL;}
+	virtual dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic() { return NULL;}
 
 	virtual bool IsDefineOrUsedVariable() { return true; }
-
 
 	//virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const = 0;
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const 

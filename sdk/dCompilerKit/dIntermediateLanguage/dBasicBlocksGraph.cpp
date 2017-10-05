@@ -598,7 +598,6 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 							if (map.Find(variable->m_label)) {
 								workList.Insert(map.Find(variable->m_label)->GetInfo()->GetInfo());
 								if (!buckect.GetCount()) {
-									//usedVariablesList.Remove(usesNodeBuckect);
 									usedVariablesList.Remove(entry);
 								}
 							}
@@ -836,7 +835,7 @@ void dBasicBlocksGraph::RegistersAllocations ()
 	InsertFunctioncallSpillsSSA();
 	RemovePhiFunctionsSSA();
 
-Trace();
+//Trace();
 	dRegisterInterferenceGraph interferenceGraph(this, regCount);
 Trace();
 	dAssert(0);
@@ -875,18 +874,18 @@ Trace();
 
 void dBasicBlocksGraph::OptimizeSSA()
 {
-Trace();
+//Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
 		actionFound |= ApplySimpleConstantPropagationSSA();
-Trace();
+//Trace();
 //		actionFound |= ApplyConditionalConstantPropagationSSA();
 //Trace();
 		actionFound |= ApplyCopyPropagationSSA();
-Trace();
+//Trace();
 		actionFound |= ApplyDeadCodeEliminationSSA();
-Trace();
+//Trace();
 	}
 	dAssert (!actionFound);
 }

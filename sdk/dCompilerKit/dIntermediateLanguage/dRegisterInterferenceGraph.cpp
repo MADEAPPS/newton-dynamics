@@ -25,264 +25,6 @@ bool dRegisterInterferenceGraph::IsSpilledVariable (const dString& name) const
 	return strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize) ? false : true;
 }
 
-void dRegisterInterferenceGraph::Build()
-{
-//m_graph->Trace();
-	dLiveInLiveOutSolver liveInLiveOut(m_graph);
-	
-	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dList<dCILInstr::dArg*> usedVariables;
-		dFlowGraphNode& point = node->GetInfo();
-//point.m_instruction->Trace();		
-		dCILInstr::dArg* const generated = point.m_instruction->GetGeneratedVariable();
-		if (generated) {
-//dTrace (("%s\n", generated->m_label.GetStr()));
-			Insert(generated->m_label);
-		}
-
-		point.m_instruction->GetUsedVariables(usedVariables);
-		for (dList<dCILInstr::dArg*>::dListNode* usedVarNode = usedVariables.GetFirst(); usedVarNode; usedVarNode = usedVarNode->GetNext()) {	
-			const dString& variable = usedVarNode->GetInfo()->m_label;
-//dTrace (("%s\n", variable.GetStr()));
-			if (IsSpilledVariable(variable)) {
-				dAssert (0);
-				dTreeNode* interferanceGraphNode = Find(variable);
-				if (!interferanceGraphNode) {
-					interferanceGraphNode = Insert(variable);
-					interferanceGraphNode->GetInfo().m_name = variable;
-					//dTrace (("%s\n", variable.GetStr()));
-				}
-			} else {
-				Insert(variable);
-			}
-		}
-	}
-
-	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dFlowGraphNode& point = node->GetInfo();
-		dCILInstrCall* const functionCall = point.m_instruction->GetAsCall();
-		if (functionCall) {
-			const dCILInstr::dArg* const arg = functionCall->GetGeneratedVariable();
-			dVariableSet<dString>::Iterator iter(point.m_livedOutputSet);
-			for (iter.Begin(); iter; iter++) {
-				const dString& var = iter.GetKey();
-				if (var != arg->m_label) {
-					dAssert (Find(var));
-					dRegisterInterferenceNode& regNode = Find(var)->GetInfo();
-					regNode.m_registerIndexBase = D_CALLEE_SAVE_REGISTER_START;
-				}
-			}
-		}
-	}
-
-
-#ifdef _DEBUG
-	dRegisterInterferenceGraph::Iterator debugIter(*this);
-	for (debugIter.Begin(); debugIter; debugIter++) {
-		const dString& key = debugIter.GetKey();
-		dTrace(("%s\n", key.GetStr()));
-	}
-#endif
-
-	// pre-color some special nodes
-	int parameterInResgisterIndex = 0;
-	for (dLiveInLiveOutSolver::dListNode* instNode = liveInLiveOut.GetFirst(); instNode; instNode = instNode->GetNext()) {
-		dFlowGraphNode& point = instNode->GetInfo();
-		dCILInstr* const instr = point.m_instruction;
-		//instr->Trace();
-
-		if (instr->GetAsArgument()) {
-			dCILInstrArgument* const argInst = instr->GetAsArgument();
-			const dCILInstr::dArg& arg = argInst->GetArg0();
-			switch (arg.GetType().m_intrinsicType)
-			{
-				case dCILInstr::m_int:
-				{
-					if (parameterInResgisterIndex < D_PARMETER_IN_REGISTER_COUNT) {
-						dTreeNode* const returnRegNode = Find(arg.m_label);
-						dAssert(returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
-						parameterInResgisterIndex++;
-					} else {
-						dAssert(0);
-					}
-					break;
-				}
-
-				case dCILInstr::m_luaType:
-				{
-					if (parameterInResgisterIndex < D_PARMETER_IN_REGISTER_COUNT) {
-						dTreeNode* const returnRegNode = Find(arg.m_label);
-						dAssert(returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
-						parameterInResgisterIndex++;
-					}
-					else 
-					{
-						dAssert(0);
-					}
-					break;
-				}
-
-				default:
-					dAssert(0);
-			}
-
-		} else if (instr->GetAsReturn()) {
-			dCILInstrReturn* const retInstr = instr->GetAsReturn();
-
-			const dCILInstr::dArg& arg = retInstr->GetArg0();
-			if (arg.GetType().m_isPointer || (arg.GetType().m_intrinsicType != dCILInstr::m_void)) {
-				switch (arg.GetType().m_intrinsicType)
-				{
-					case dCILInstr::m_int:
-					{
-						dAssert (0);
-						dTreeNode* const returnRegNode = Find(arg.m_label);
-						dAssert(returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						break;
-					}
-
-					case dCILInstr::m_luaType:
-					{
-						dTreeNode* const returnRegNode = Find(arg.m_label);
-						dAssert(returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						break;
-					}
-
-					case dCILInstr::m_constInt:
-					case dCILInstr::m_constFloat:
-						break;		
-
-					default:
-					{
-						dAssert(0);
-					}
-				}
-			}
-
-		} else if (instr->GetAsCall()) {
-			dCILInstrCall* const callInstr = instr->GetAsCall();
-
-			const dCILInstr::dArg& retArg = callInstr->GetArg0();
-			if (retArg.GetType().m_isPointer || (retArg.GetType().m_intrinsicType != dCILInstr::m_void)) {
-				switch (retArg.GetType().m_intrinsicType)
-				{
-					case dCILInstr::m_int:
-					{
-						dTreeNode* const returnRegNode = Find (retArg.m_label);
-						dAssert(returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						break;
-					}
-
-					case dCILInstr::m_luaType:
-					{
-						dTreeNode* const returnRegNode = Find(retArg.m_label);
-						dAssert(returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						dAssert(registerInfo.m_registerIndex == -1);
-						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						break;
-					}
-
-					default:
-						dAssert(0);
-				}
-			}
-
-			int index = 0;
-			for (dList<dCILInstr::dArg>::dListNode* node = callInstr->m_parameters.GetLast(); node && (index < D_PARMETER_IN_REGISTER_COUNT); node = node->GetPrev()) {
-				const dCILInstr::dArg& arg = node->GetInfo();
-				dTreeNode* const regNode = Find (arg.m_label);
-				dAssert(regNode);
-				dRegisterInterferenceNode& registerInfo = regNode->GetInfo();
-				dAssert(registerInfo.m_registerIndex == -1);
-				registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + index;
-				index ++;
-				dAssert (index < D_PARMETER_IN_REGISTER_COUNT);
-			}
-		}
-	}
-
-//m_graph->Trace();
-	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dFlowGraphNode& point = node->GetInfo();
-//point.m_instruction->Trace();
-		const dVariableSet<dString>& livedInputSet = point.m_livedInputSet;
-
-		dVariableSet<dString>::Iterator iterA(livedInputSet);
-		for (iterA.Begin(); iterA; iterA++) {
-			const dString& varA = iterA.GetKey();
-			dTree<dRegisterInterferenceNode, dString>::dTreeNode* const varAnodeNode = Find(varA);
-			dRegisterInterferenceNode& varAnode = varAnodeNode->GetInfo();
-			dVariableSet<dString>::Iterator iterB(iterA);
-			for (iterB++; iterB; iterB++) {
-				const dString& varB = iterB.GetKey();
-				if (!varAnode.FindEdge(varB)) {
-					dTree<dRegisterInterferenceNode, dString>::dTreeNode* const varBnodeNode = Find(varB);
-					dRegisterInterferenceNode& varBnode = varBnodeNode->GetInfo();
-					dRegisterInterferenceNodeEdge edgeAB(varBnodeNode);
-					dRegisterInterferenceNodeEdge edgeBA(varAnodeNode);
-					varAnode.m_interferanceEdge.Append(edgeAB);
-					varBnode.m_interferanceEdge.Append(edgeBA);
-					dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
-					dAssert((varAnode.m_registerIndex == -1) || (varBnode.m_registerIndex == -1) || (varAnode.m_registerIndex != varBnode.m_registerIndex));
-				}
-			}
-		}
-	}
-
-/*
-// remember implement register coalescing 
-//m_graph->Trace();
-	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
-		dFlowGraphNode& point = node->GetInfo();
-		dCILInstr* const instr = point.m_instruction;
-		if (instr->GetAsMove()) {
-			dCILInstrMove* const move = instr->GetAsMove();
-			dList<dCILInstr::dArg*> variablesList;
-			move->GetUsedVariables(variablesList);
-//move->Trace();
-			if (variablesList.GetCount()) {
-				//if ((stmt.m_instruction == dThreeAdressStmt::m_assigment) && (stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constFloat)) {
-				const dString& variableA = move->GetArg0().m_label;
-				const dString& variableB = move->GetArg1().m_label;
-				dTreeNode* const nodeA = Find(variableA);
-				dTreeNode* const nodeB = Find(variableB);
-				nodeA;
-				nodeB;
-			}
-		}
-	}
-*/
-}
-
-dRegisterInterferenceNodeEdge* dRegisterInterferenceNode::FindEdge(const dString& var)
-{
-	for (dList<dRegisterInterferenceNodeEdge>::dListNode* node = m_interferanceEdge.GetFirst(); node; node = node->GetNext()) {
-		dRegisterInterferenceNodeEdge& info = node->GetInfo();
-		const dString& edgeVar = info.m_incidentNode->GetKey();
-		if (edgeVar == var) {
-			return &info;
-		}
-	}
-	return NULL;
-}
-
-
 dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const graph, int registerCount)
 	:dTree<dRegisterInterferenceNode, dString>()
 	,m_graph(graph)
@@ -294,39 +36,17 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const
 		// we have a spill, find a good spill node and try graph coloring again
 		dAssert (0);
 	}
-
 	AllocateRegisters();
 m_graph->Trace();
+
+	ApplyDeadCodeElimination();
+m_graph->Trace();
 /*
-//m_flowGraph->m_cil->Trace();
-
-	m_flowGraph->BuildBasicBlockGraph();
-	for (bool optimized = true; optimized;) {
-		optimized = false;
-//		m_flowGraph->CalculateLiveInputLiveOutput();
-//		m_flowGraph->UpdateReachingDefinitions();
-//		optimized |= m_flowGraph->ApplyCopyPropagation();
-//m_flowGraph->m_cil->Trace();
-//		m_flowGraph->CalculateLiveInputLiveOutput();
-//m_flowGraph->m_cil->Trace();
-		optimized |= m_flowGraph->ApplyRemoveDeadCode();
-//m_flowGraph->m_cil->Trace();
-	}
-
-//m_flowGraph->m_cil->Trace();	
 	while (m_flowGraph->RemoveRedundantJumps());
-//m_flowGraph->m_cil->Trace();
-
-	m_flowGraph->ApplyRemoveDeadCode();
-//m_flowGraph->m_cil->Trace();
 	m_flowGraph->RemoveDeadInstructions();
-//m_flowGraph->m_cil->Trace();
-
 	m_flowGraph->RemoveNop();
-
-	InsertEpilogAndProlog();
-m_flowGraph->m_cil->Trace();
 */
+
 }
 
 
@@ -360,6 +80,18 @@ dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode(i
 	return bestNode;
 }
 */
+
+dRegisterInterferenceNodeEdge* dRegisterInterferenceNode::FindEdge(const dString& var)
+{
+	for (dList<dRegisterInterferenceNodeEdge>::dListNode* node = m_interferanceEdge.GetFirst(); node; node = node->GetNext()) {
+		dRegisterInterferenceNodeEdge& info = node->GetInfo();
+		const dString& edgeVar = info.m_incidentNode->GetKey();
+		if (edgeVar == var) {
+			return &info;
+		}
+	}
+	return NULL;
+}
 
 int dRegisterInterferenceGraph::ColorGraph()
 {
@@ -556,12 +288,36 @@ dTrace (("%s\n", bestNode->GetKey().GetStr()));
 
 void dRegisterInterferenceGraph::AllocateRegisters()
 {
-	for (dList<dBasicBlock>::dListNode* blockNode = m_graph->GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
-		dBasicBlock& block = blockNode->GetInfo();
-		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
-			dCILInstr* const instr = node->GetInfo();
-			instr->AssignRegisterName(*this);
+	for (dCIL::dListNode* node = m_graph->m_begin; node != m_graph->m_end; node = node->GetNext()) {
+		dCILInstr* const instr = node->GetInfo();
+		instr->AssignRegisterName(*this);
+	}
+
+	int savedRegMask = 0;
+	Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) {
+		const dRegisterInterferenceNode& node = iter.GetNode()->GetInfo();
+		if (node.m_registerIndex >= D_CALLEE_SAVE_REGISTER_START) {
+			savedRegMask |= 1 << (node.m_registerIndex - D_CALLEE_SAVE_REGISTER_START);
 		}
+	}
+
+	if (savedRegMask) {
+		dCILInstr* const pushReference = m_graph->m_begin->GetInfo();
+		dCIL* const cil = pushReference->GetCil();
+		int index = 0;
+		for (; savedRegMask & (1 << index); index ++) {
+			dString reg (IndexToRegister(index + D_CALLEE_SAVE_REGISTER_START));
+			dCILInstrPush* const push = new dCILInstrPush (*cil, reg, dCILInstr::dArgType());
+			cil->InsertAfter (pushReference->GetNode(), push->GetNode());
+		}
+
+		dCILInstr* const popReference = m_graph->m_end->GetPrev()->GetPrev()->GetInfo();
+		for (int i = 0; savedRegMask & (1 << i); i ++) {
+			dString reg(IndexToRegister(index - i - 1 + D_CALLEE_SAVE_REGISTER_START));
+			dCILInstrPop* const pop = new dCILInstrPop(*cil, reg, dCILInstr::dArgType());
+			cil->InsertAfter(popReference->GetNode(), pop->GetNode());
+		} 
 	}
 }
 
@@ -569,14 +325,11 @@ void dRegisterInterferenceGraph::AllocateRegisters()
 int dRegisterInterferenceGraph::GetRegisterIndex(const dString& varName) const
 {
 	int index = -1;
-	//	if (varName[0] != '_') {
 	dTreeNode* const node = Find(varName);
 	dRegisterInterferenceNode& var = node->GetInfo();
 	index = var.m_registerIndex;
-	//	}
 	return index;
 }
-
 
 dString dRegisterInterferenceGraph::GetRegisterName(const dString& varName) const
 {
@@ -586,5 +339,302 @@ dString dRegisterInterferenceGraph::GetRegisterName(const dString& varName) cons
 		return varName;
 	} else {
 		return IndexToRegister(index);
+	}
+}
+
+
+void dRegisterInterferenceGraph::Build()
+{
+//m_graph->Trace();
+	dLiveInLiveOutSolver liveInLiveOut(m_graph);
+	
+	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+		dList<dCILInstr::dArg*> usedVariables;
+		dFlowGraphNode& point = node->GetInfo();
+//point.m_instruction->Trace();		
+		dCILInstr::dArg* const generated = point.m_instruction->GetGeneratedVariable();
+		if (generated) {
+//dTrace (("%s\n", generated->m_label.GetStr()));
+			Insert(generated->m_label);
+		}
+
+		point.m_instruction->GetUsedVariables(usedVariables);
+		for (dList<dCILInstr::dArg*>::dListNode* usedVarNode = usedVariables.GetFirst(); usedVarNode; usedVarNode = usedVarNode->GetNext()) {	
+			const dString& variable = usedVarNode->GetInfo()->m_label;
+//dTrace (("%s\n", variable.GetStr()));
+			if (IsSpilledVariable(variable)) {
+				dAssert (0);
+				dTreeNode* interferanceGraphNode = Find(variable);
+				if (!interferanceGraphNode) {
+					interferanceGraphNode = Insert(variable);
+					interferanceGraphNode->GetInfo().m_name = variable;
+					//dTrace (("%s\n", variable.GetStr()));
+				}
+			} else {
+				Insert(variable);
+			}
+		}
+	}
+
+	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+		dFlowGraphNode& point = node->GetInfo();
+		dCILInstrCall* const functionCall = point.m_instruction->GetAsCall();
+		if (functionCall) {
+			const dCILInstr::dArg* const arg = functionCall->GetGeneratedVariable();
+			dVariableSet<dString>::Iterator iter(point.m_livedOutputSet);
+			for (iter.Begin(); iter; iter++) {
+				const dString& var = iter.GetKey();
+				if (var != arg->m_label) {
+					dAssert (Find(var));
+					dRegisterInterferenceNode& regNode = Find(var)->GetInfo();
+					regNode.m_registerIndexBase = D_CALLEE_SAVE_REGISTER_START;
+				}
+			}
+		}
+	}
+
+
+#if 0
+	dRegisterInterferenceGraph::Iterator debugIter(*this);
+	for (debugIter.Begin(); debugIter; debugIter++) {
+		const dString& key = debugIter.GetKey();
+		dTrace(("%s\n", key.GetStr()));
+	}
+	dTrace(("\n"));
+#endif
+
+	// pre-color some special nodes
+	int parameterInResgisterIndex = 0;
+	for (dLiveInLiveOutSolver::dListNode* instNode = liveInLiveOut.GetFirst(); instNode; instNode = instNode->GetNext()) {
+		dFlowGraphNode& point = instNode->GetInfo();
+		dCILInstr* const instr = point.m_instruction;
+		//instr->Trace();
+
+		if (instr->GetAsArgument()) {
+			dCILInstrArgument* const argInst = instr->GetAsArgument();
+			const dCILInstr::dArg& arg = argInst->GetArg0();
+			switch (arg.GetType().m_intrinsicType)
+			{
+				case dCILInstr::m_int:
+				{
+					if (parameterInResgisterIndex < D_PARMETER_IN_REGISTER_COUNT) {
+						dTreeNode* const returnRegNode = Find(arg.m_label);
+						dAssert(returnRegNode);
+						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
+						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
+						parameterInResgisterIndex++;
+					} else {
+						dAssert(0);
+					}
+					break;
+				}
+
+				case dCILInstr::m_luaType:
+				{
+					if (parameterInResgisterIndex < D_PARMETER_IN_REGISTER_COUNT) {
+						dTreeNode* const returnRegNode = Find(arg.m_label);
+						dAssert(returnRegNode);
+						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
+						registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + parameterInResgisterIndex;
+						parameterInResgisterIndex++;
+					}
+					else 
+					{
+						dAssert(0);
+					}
+					break;
+				}
+
+				default:
+					dAssert(0);
+			}
+
+		} else if (instr->GetAsReturn()) {
+			dCILInstrReturn* const retInstr = instr->GetAsReturn();
+
+			const dCILInstr::dArg& arg = retInstr->GetArg0();
+			if (arg.GetType().m_isPointer || (arg.GetType().m_intrinsicType != dCILInstr::m_void)) {
+				switch (arg.GetType().m_intrinsicType)
+				{
+					case dCILInstr::m_int:
+					{
+						dAssert (0);
+						dTreeNode* const returnRegNode = Find(arg.m_label);
+						dAssert(returnRegNode);
+						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
+						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
+						break;
+					}
+
+					case dCILInstr::m_luaType:
+					{
+						dTreeNode* const returnRegNode = Find(arg.m_label);
+						dAssert(returnRegNode);
+						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
+						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
+						break;
+					}
+
+					case dCILInstr::m_constInt:
+					case dCILInstr::m_constFloat:
+						break;		
+
+					default:
+					{
+						dAssert(0);
+					}
+				}
+			}
+
+		} else if (instr->GetAsCall()) {
+			dCILInstrCall* const callInstr = instr->GetAsCall();
+
+			const dCILInstr::dArg& retArg = callInstr->GetArg0();
+			if (retArg.GetType().m_isPointer || (retArg.GetType().m_intrinsicType != dCILInstr::m_void)) {
+				switch (retArg.GetType().m_intrinsicType)
+				{
+					case dCILInstr::m_int:
+					{
+						dTreeNode* const returnRegNode = Find (retArg.m_label);
+						dAssert(returnRegNode);
+						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
+						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
+						break;
+					}
+
+					case dCILInstr::m_luaType:
+					{
+						dTreeNode* const returnRegNode = Find(retArg.m_label);
+						dAssert(returnRegNode);
+						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						dAssert(registerInfo.m_registerIndex == -1);
+						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
+						break;
+					}
+
+					default:
+						dAssert(0);
+				}
+			}
+
+			int index = 0;
+			for (dList<dCILInstr::dArg>::dListNode* node = callInstr->m_parameters.GetLast(); node && (index < D_PARMETER_IN_REGISTER_COUNT); node = node->GetPrev()) {
+				const dCILInstr::dArg& arg = node->GetInfo();
+				dTreeNode* const regNode = Find (arg.m_label);
+				dAssert(regNode);
+				dRegisterInterferenceNode& registerInfo = regNode->GetInfo();
+				dAssert(registerInfo.m_registerIndex == -1);
+				registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + index;
+				index ++;
+				dAssert (index < D_PARMETER_IN_REGISTER_COUNT);
+			}
+		}
+	}
+
+//m_graph->Trace();
+	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+		dFlowGraphNode& point = node->GetInfo();
+//point.m_instruction->Trace();
+		const dVariableSet<dString>& livedInputSet = point.m_livedInputSet;
+
+		dVariableSet<dString>::Iterator iterA(livedInputSet);
+		for (iterA.Begin(); iterA; iterA++) {
+			const dString& varA = iterA.GetKey();
+			dTree<dRegisterInterferenceNode, dString>::dTreeNode* const varAnodeNode = Find(varA);
+			dRegisterInterferenceNode& varAnode = varAnodeNode->GetInfo();
+			dVariableSet<dString>::Iterator iterB(iterA);
+			for (iterB++; iterB; iterB++) {
+				const dString& varB = iterB.GetKey();
+				if (!varAnode.FindEdge(varB)) {
+					dTree<dRegisterInterferenceNode, dString>::dTreeNode* const varBnodeNode = Find(varB);
+					dRegisterInterferenceNode& varBnode = varBnodeNode->GetInfo();
+					dRegisterInterferenceNodeEdge edgeAB(varBnodeNode);
+					dRegisterInterferenceNodeEdge edgeBA(varAnodeNode);
+					varAnode.m_interferanceEdge.Append(edgeAB);
+					varBnode.m_interferanceEdge.Append(edgeBA);
+					//dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
+					dAssert((varAnode.m_registerIndex == -1) || (varBnode.m_registerIndex == -1) || (varAnode.m_registerIndex != varBnode.m_registerIndex));
+				}
+			}
+		}
+	}
+
+/*
+// remember implement register coalescing 
+//m_graph->Trace();
+	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
+		dFlowGraphNode& point = node->GetInfo();
+		dCILInstr* const instr = point.m_instruction;
+		if (instr->GetAsMove()) {
+			dCILInstrMove* const move = instr->GetAsMove();
+			dList<dCILInstr::dArg*> variablesList;
+			move->GetUsedVariables(variablesList);
+//move->Trace();
+			if (variablesList.GetCount()) {
+				//if ((stmt.m_instruction == dThreeAdressStmt::m_assigment) && (stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constFloat)) {
+				const dString& variableA = move->GetArg0().m_label;
+				const dString& variableB = move->GetArg1().m_label;
+				dTreeNode* const nodeA = Find(variableA);
+				dTreeNode* const nodeB = Find(variableB);
+				nodeA;
+				nodeB;
+			}
+		}
+	}
+*/
+}
+
+
+void dRegisterInterferenceGraph::ApplyDeadCodeElimination()
+{
+	
+	for (bool anyChanges = true; anyChanges; ) {
+		anyChanges = false;
+		dLiveInLiveOutSolver liveInLiveOut(m_graph);
+		for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext() ) {
+			const dFlowGraphNode& liveInfo = node->GetInfo();
+			const dCILInstr::dArg* const variableOuter = liveInfo.m_instruction->GetGeneratedVariable();
+		liveInfo.m_instruction->Trace();
+			if (variableOuter && !liveInfo.m_instruction->GetAsCall()) {
+				liveInfo.m_instruction->Trace();
+			}
+
+	/*
+			if (!instruction->GetAsCall()) {
+				const dCILInstr::dArg* const variableOuter = instruction->GetGeneratedVariable();
+				if (variableOuter) {
+					dStatementBlockDictionary::dTreeNode* const usesNodeBuckect = usedVariablesList.Find(variableOuter->m_label);
+					dAssert(!usesNodeBuckect || usesNodeBuckect->GetInfo().GetCount());
+					if (!usesNodeBuckect) {
+						anyChanges = true;
+						dList<dCILInstr::dArg*> variablesList;
+						instruction->GetUsedVariables(variablesList);
+						for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
+							const dCILInstr::dArg* const variable = varNode->GetInfo();
+							dAssert(usedVariablesList.Find(variable->m_label));
+							dStatementBlockDictionary::dTreeNode* const entry = usedVariablesList.Find(variable->m_label);
+							if (entry) {
+								dStatementBlockBucket& buckect = entry->GetInfo();
+								buckect.Remove(node);
+								dAssert(map.Find(variable->m_label) || instruction->GetAsPhi());
+								if (map.Find(variable->m_label)) {
+									workList.Insert(map.Find(variable->m_label)->GetInfo()->GetInfo());
+									if (!buckect.GetCount()) {
+										usedVariablesList.Remove(entry);
+									}
+								}
+							}
+						}
+						instruction->Nullify();
+					}
+				}
+			}
+	*/
+		}
 	}
 }

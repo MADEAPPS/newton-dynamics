@@ -20,57 +20,6 @@ class dCILInstrReturn;
 class dCILInstrFunction;
 
 
-class dCILInstrEnter: public dCILInstr
-{
-	public:
-	dCILInstrEnter(dCIL& program, dCILInstrFunction* const predecessor, int registerMask, int localMemorySize);
-
-	void Serialize(char* const textOut) const;
-	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
-
-	virtual bool ApplySemanticReordering() { return false; }
-	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
-	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const {}
-	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
-	virtual dCILInstrEnter* GetAsEnter() { return this; }
-
-	// ***********************
-	virtual dArg* GetGeneratedVariable () { return NULL; }
-	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver) {}
-
-
-	int m_registerMask;
-	int m_localMemorySize;
-};
-
-class dCILInstrLeave : public dCILInstr
-{
-	public:
-	dCILInstrLeave (dCILInstrEnter* const enter, dCILInstrReturn* const successor);
-
-	void Serialize(char* const textOut) const;
-	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
-
-	virtual bool ApplySemanticReordering() { return false; }
-	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
-	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const {}
-	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
-
-	virtual dCILInstrLeave* GetAsLeave() { return this; }
-
-	// ***********************
-	virtual dArg* GetGeneratedVariable () { return NULL; }
-	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver) {}
-
-
-	dCILInstrEnter* m_enter;
-	int m_registerMask;
-	int m_localMemorySize;
-};
-
-
 class dCILInstrNop: public dCILInstr
 {
 	public:

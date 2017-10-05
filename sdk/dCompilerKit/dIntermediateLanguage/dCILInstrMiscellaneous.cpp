@@ -16,54 +16,6 @@
 #include "dCILInstrMiscellaneous.h"
 
 
-dCILInstrEnter::dCILInstrEnter(dCIL& program, dCILInstrFunction* const predecessor, int registerMask, int localMemorySize)
-	:dCILInstr(program)
-	,m_registerMask(registerMask)
-	,m_localMemorySize(localMemorySize)
-{
-	program.InsertAfter(predecessor->GetNode(), m_myNode);
-}
-
-void dCILInstrEnter::Serialize(char* const textOut) const
-{
-	sprintf(textOut, "\tenter %d, %d\n", m_registerMask, m_localMemorySize);
-}
-
-
-void dCILInstrEnter::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
-{
-	dAssert (0);
-//	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
-//	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_enter);
-//	code.m_type1.m_imm1 = m_registerMask;
-//	code.m_type1.m_imm2 = m_localMemorySize;
-}
-
-dCILInstrLeave::dCILInstrLeave(dCILInstrEnter* const enter, dCILInstrReturn* const successor)
-	:dCILInstr(*enter->GetCil())
-	,m_registerMask (enter->m_registerMask)
-	,m_localMemorySize(enter->m_localMemorySize)
-{
-	enter->GetCil()->InsertAfter(successor->GetNode()->GetPrev(), m_myNode);
-}
-
-
-void dCILInstrLeave::Serialize(char* const textOut) const
-{
-	sprintf(textOut, "\tleave %d, %d\n", m_registerMask, m_localMemorySize);
-}
-
-
-void dCILInstrLeave::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
-{
-	dAssert (0);
-//	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
-//	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_leave);
-//	code.m_type1.m_imm1 = m_registerMask;
-//	code.m_type1.m_imm2 = m_localMemorySize;
-}
-
-
 dCILInstrNop::dCILInstrNop(dCIL& program)
 	:dCILInstr (program)
 {

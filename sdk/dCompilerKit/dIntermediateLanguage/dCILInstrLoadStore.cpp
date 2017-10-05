@@ -378,5 +378,36 @@ void dCILInstrPhy::ApplyConditionalConstantPropagationSSA (dConditionalConstantP
 		}
 	}
 */	
+}
 
+
+dCILInstrPush::dCILInstrPush(dCIL& program, const dString& name, const dArgType& type)
+	:dCILSingleArgInstr(program, dArg(name, type))
+{
+}
+
+void dCILInstrPush::Serialize(char* const textOut) const
+{
+	sprintf (textOut, "\tpush %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
+}
+
+void dCILInstrPush::AddUsedVariable (dInstructionVariableDictionary& dictionary) const
+{
+	dAssert(0);
+}
+
+
+dCILInstrPop::dCILInstrPop(dCIL& program, const dString& name, const dArgType& type)
+	:dCILSingleArgInstr(program, dArg(name, type))
+{
+}
+
+void dCILInstrPop::Serialize(char* const textOut) const
+{
+	sprintf(textOut, "\tpop %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
+}
+
+void dCILInstrPop::AddUsedVariable(dInstructionVariableDictionary& dictionary) const
+{
+	dAssert(0);
 }

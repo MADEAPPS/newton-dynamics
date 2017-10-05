@@ -166,4 +166,38 @@ class dCILInstrStore: public dCILTwoArgInstr
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 };
 
+
+class dCILInstrPush: public dCILSingleArgInstr
+{
+	public:
+	dCILInstrPush(dCIL& program, const dString& name0, const dArgType& type0);
+	void Serialize(char* const textOut) const;
+
+	virtual bool ApplySemanticReordering() { return false; }
+	virtual void AddUsedVariable(dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const {}
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst){return false;}
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable() { return NULL; }
+	virtual void GetUsedVariables(dList<dArg*>& variablesList) {variablesList.Append(&m_arg0);}
+};
+
+class dCILInstrPop: public dCILSingleArgInstr
+{
+	public:
+	dCILInstrPop(dCIL& program, const dString& name0, const dArgType& type0);
+	void Serialize(char* const textOut) const;
+
+	virtual bool ApplySemanticReordering() { return false; }
+	virtual void AddUsedVariable(dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const {}
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst){return false;}
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable() { return &m_arg0; }
+	virtual void GetUsedVariables(dList<dArg*>& variablesList) {};
+};
+
+
 #endif
