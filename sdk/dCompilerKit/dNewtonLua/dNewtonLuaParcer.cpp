@@ -2685,7 +2685,7 @@ break;
 break;
 
 						case 32:// ifBlock : _IF expression _THEN block _END 
-{dAssert(0);}
+{entry.m_value = MyModule->EmitIf(parameter[1].m_value, parameter[3].m_value, dUserVariable());}
 break;
 
 						case 39:// functionDeclare : _FUNCTION variable ( variableList ) 

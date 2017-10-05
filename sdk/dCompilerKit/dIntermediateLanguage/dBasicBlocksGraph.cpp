@@ -773,7 +773,7 @@ void dBasicBlocksGraph::InsertFunctioncallSpillsSSA()
 						dCILInstr* const definedInstr = definedNode->GetInfo();
 						const dCILInstr::dArg* const defArg = definedInstr->GetGeneratedVariable();
 						dAssert (defArg->m_label == var);
-						definedWorkList.Remove(definedNode);
+						//definedWorkList.Remove(definedNode);
 						
 						dCILInstr::dArg newArg (definedInstr->m_cil->NewTemp(), defArg->GetType());
 						dCILInstrMove* const moveInstr = new dCILInstrMove (*definedInstr->m_cil, newArg.m_label, newArg.GetType(), defArg->m_label, defArg->GetType());

@@ -151,7 +151,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 //basicBlocks.Trace();
 
 	basicBlocks.OptimizeSSA();
-//basicBlocks.Trace();
+basicBlocks.Trace();
 
 	basicBlocks.RegistersAllocations();
 basicBlocks.Trace();
@@ -291,6 +291,10 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const
 			operation = dCILThreeArgInstr::m_lessEqual;
 			break;
 
+		case '<':
+			operation = dCILThreeArgInstr::m_less;
+			break;
+
 		case '-':
 			operation = dCILThreeArgInstr::m_sub;
 			break;
@@ -406,8 +410,24 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 		//m_currentClosure->Trace();
 		return dUserVariable(conditional);
 	} else {
-		dAssert (0);
-		return dUserVariable();
+		// this is an: if exp then block end
+		//dCIL::dListNode* const elseBlockNode = elseBlock.m_nodeList.GetFirst()->GetInfo();
+		//dCILInstrLabel* const elseBlockInstruction = elseBlockNode->GetInfo()->GetAsLabel();
+		//dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, exitLabel);
+		//TRACE_INSTRUCTION(gotoJump);
+		//m_currentClosure->InsertAfter(elseBlockNode->GetPrev(), gotoJump->GetNode());
+
+		dString zero("0");
+		dCILInstr::dArgType zeroType(dCILInstr::m_constInt);
+		dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstr::m_different, expressionArg.m_label, expressionArg.GetType(), zero, zeroType, exitLabel, thenBlockInstruction);
+		m_currentClosure->InsertAfter(expresionNode, conditional->GetNode());
+		TRACE_INSTRUCTION(conditional);
+
+		dCILInstrGoto* const gotoJump1 = new dCILInstrGoto(*m_currentClosure, exitLabel);
+		m_currentClosure->InsertAfter(exitLabel->GetNode()->GetPrev(), gotoJump1->GetNode());
+		TRACE_INSTRUCTION(gotoJump1);
+
+		return dUserVariable(conditional);
 	}
 }
 

@@ -12,7 +12,7 @@
 --]]
 
 
----[[
+--[[
 	-- defines a factorial function
     function fact (n)
       if n <= 1 then
@@ -23,8 +23,8 @@
     end
 --]]
 
---[[
-	function fibonacciNaive(n)
+---[[
+	function fibonacciNaive(m)
 		if m < 2 then
 		  return m
 		end
