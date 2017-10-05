@@ -592,6 +592,19 @@ void dRegisterInterferenceGraph::Build()
 
 void dRegisterInterferenceGraph::ApplyDeadCodeElimination()
 {
+	for (dCIL::dListNode* node = m_graph->m_begin; node != m_graph->m_end; node = node->GetNext()) {
+		dCILInstrMove* const moveInst = node->GetInfo()->GetAsMove();
+		if (moveInst) {
+		moveInst->Trace();
+			dList<dCILInstr::dArg*> variablesList;
+			dCILInstr::dArg* const genVariable = moveInst->GetGeneratedVariable();
+			moveInst->GetUsedVariables(variablesList);
+			if (variablesList.GetCount() && (genVariable->m_label == variablesList.GetFirst()->GetInfo()->m_label)) {
+				moveInst->Nullify();
+			}
+		}
+	}
+
 	for (bool anyChanges = true; anyChanges; ) {
 		anyChanges = false;
 		dLiveInLiveOutSolver liveInLiveOut(m_graph);

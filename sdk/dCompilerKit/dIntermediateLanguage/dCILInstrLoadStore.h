@@ -180,7 +180,7 @@ class dCILInstrPush: public dCILSingleArgInstr
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable() { return NULL; }
-	virtual void GetUsedVariables(dList<dArg*>& variablesList) {variablesList.Append(&m_arg0);}
+	virtual void GetUsedVariables(dList<dArg*>& variablesList) {}
 };
 
 class dCILInstrPop: public dCILSingleArgInstr
@@ -195,7 +195,7 @@ class dCILInstrPop: public dCILSingleArgInstr
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst){return false;}
 
 	// ***********************
-	virtual dArg* GetGeneratedVariable() { return &m_arg0; }
+	virtual dArg* GetGeneratedVariable() { return NULL; }
 	virtual void GetUsedVariables(dList<dArg*>& variablesList) {};
 };
 

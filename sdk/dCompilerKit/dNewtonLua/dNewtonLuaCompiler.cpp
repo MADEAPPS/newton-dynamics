@@ -287,6 +287,9 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBinaryExpression(const
 		case _DIFFERENT:
 			operation = dCILThreeArgInstr::m_different;
 			break;
+		case _LEFT_EQUAL:
+			operation = dCILThreeArgInstr::m_lessEqual;
+			break;
 
 		case '-':
 			operation = dCILThreeArgInstr::m_sub;

@@ -163,7 +163,7 @@ expression
 //	| expression _DIFFERENT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 	| expression _OR expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 //	| expression _AND expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
-//	| expression _LEFT_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
+	| expression _LEFT_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 //	| expression _GREATHER_EQUAL expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 //	| expression _LEFT_SHIFT expression	{$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
 //	| expression _RIGHT_SHIFT expression {$$ = MyModule->EmitBinaryExpression($1, $2, $3);}
