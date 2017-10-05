@@ -592,7 +592,6 @@ void dRegisterInterferenceGraph::Build()
 
 void dRegisterInterferenceGraph::ApplyDeadCodeElimination()
 {
-	
 	for (bool anyChanges = true; anyChanges; ) {
 		anyChanges = false;
 		dLiveInLiveOutSolver liveInLiveOut(m_graph);
@@ -601,7 +600,10 @@ void dRegisterInterferenceGraph::ApplyDeadCodeElimination()
 			const dCILInstr::dArg* const variableOuter = liveInfo.m_instruction->GetGeneratedVariable();
 		liveInfo.m_instruction->Trace();
 			if (variableOuter && !liveInfo.m_instruction->GetAsCall()) {
-				liveInfo.m_instruction->Trace();
+				if (!liveInfo.m_livedOutputSet.Find(variableOuter->m_label)) {
+					anyChanges = true;
+					liveInfo.m_instruction->Trace();
+				}
 			}
 
 	/*
