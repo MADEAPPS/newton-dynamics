@@ -33,7 +33,7 @@ dParserLexical::~dParserLexical()
 }
 
 
-void dParserLexical::ReadBalancedExpresion (char open, char close)
+void dParserLexical::ReadBalancedExpression (char open, char close)
 {
 	int count = 1;
 	while (count) {
@@ -405,7 +405,7 @@ int dParserLexical::NextToken ()
 				}
 				case 46:
 				{
-					 ReadBalancedExpresion ('{', '}'); return dParserCompiler::SEMANTIC_ACTION;
+					 ReadBalancedExpression ('{', '}'); return dParserCompiler::SEMANTIC_ACTION;
 				}
 				case 47:
 				{

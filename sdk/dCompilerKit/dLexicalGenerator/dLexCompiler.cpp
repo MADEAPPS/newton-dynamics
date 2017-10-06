@@ -30,7 +30,7 @@ enum dLexCompiler::dToken
 	m_number,
 	m_quatedString,
 	m_literal,
-	m_extendedRegularExpresion,
+	m_extendedRegularExpression,
 	m_curlyBrace,
 	m_end,
 };
@@ -40,8 +40,8 @@ enum dLexCompiler::dToken
 class dLexCompiler::dTokenData: public dDeterministicFiniteAutonata
 {
 	public:
-	dTokenData (dToken token, const char* const regulatExpresion)
-		:dDeterministicFiniteAutonata (regulatExpresion)
+	dTokenData (dToken token, const char* const regulatExpression)
+		:dDeterministicFiniteAutonata (regulatExpression)
 		,m_token(token)
 	{
 	}
@@ -64,9 +64,9 @@ dLexCompiler::dTokenDataList::~dTokenDataList ()
 	DeleteAll();
 }
 
-void dLexCompiler::dTokenDataList::AddTokenData (dToken token, const char* const regulatExpresion)
+void dLexCompiler::dTokenDataList::AddTokenData (dToken token, const char* const regulatExpression)
 {
-	dTokenData* const data = new dTokenData (token, regulatExpresion);
+	dTokenData* const data = new dTokenData (token, regulatExpression);
 	Append (data);
 }
 
@@ -89,20 +89,20 @@ dLexCompiler::dDefinitionsMap::~dDefinitionsMap ()
 
 
 
-void dLexCompiler::dDefinitionsMap::PreProcessDefinitions (dString& regularExpresionWithMacros)
+void dLexCompiler::dDefinitionsMap::PreProcessDefinitions (dString& regularExpressionWithMacros)
 {
 	int i0 = 0;
-	for (int i1 = int (regularExpresionWithMacros.Find('{', i0)); i1 != -1; i1 = int (regularExpresionWithMacros.Find('{', i0))) {
+	for (int i1 = int (regularExpressionWithMacros.Find('{', i0)); i1 != -1; i1 = int (regularExpressionWithMacros.Find('{', i0))) {
 		i0 = i1;
-		int size = int (regularExpresionWithMacros.Size());
-		for (i1 ++; (i1 <= size) && isalnum (regularExpresionWithMacros[i1]); i1 ++) {
+		int size = int (regularExpressionWithMacros.Size());
+		for (i1 ++; (i1 <= size) && isalnum (regularExpressionWithMacros[i1]); i1 ++) {
 		} 
 		if (i1 < size) {
-			dString expressionName (&regularExpresionWithMacros[i0 + 1], i1 - i0 - 1);
+			dString expressionName (&regularExpressionWithMacros[i0 + 1], i1 - i0 - 1);
 			dTreeNode* const node = Find(dCRC64 (expressionName.GetStr()));
 			if (node) {
 				dString expression (node->GetInfo());
-				regularExpresionWithMacros.Replace(i0, i1 - i0 + 1, expression);
+				regularExpressionWithMacros.Replace(i0, i1 - i0 + 1, expression);
 			} else {
 				i0 ++;
 			}
@@ -112,10 +112,10 @@ void dLexCompiler::dDefinitionsMap::PreProcessDefinitions (dString& regularExpre
 	}
 }
 
-void dLexCompiler::dDefinitionsMap::AddDefinition (dString& regularExpresion, dString& key)
+void dLexCompiler::dDefinitionsMap::AddDefinition (dString& regularExpression, dString& key)
 {
-	PreProcessDefinitions (regularExpresion);
-	Insert (regularExpresion, dCRC64 (key.GetStr()));
+	PreProcessDefinitions (regularExpression);
+	Insert (regularExpression, dCRC64 (key.GetStr()));
 }
 
 
@@ -408,10 +408,10 @@ void dLexCompiler::ParseDefinitionBlock (dString& preheaderCode)
 		dString literal (&m_grammar[m_grammarTokenStart], m_grammarTokenLength);
 		MatchToken (m_token);
 		
-		dString extendedRegularExpresion (&m_grammar[m_grammarTokenStart], m_grammarTokenLength);
+		dString extendedRegularExpression (&m_grammar[m_grammarTokenStart], m_grammarTokenLength);
 		MatchToken (m_token);
 
-		m_defintions.AddDefinition(extendedRegularExpresion, literal);
+		m_defintions.AddDefinition(extendedRegularExpression, literal);
 
 	} else {
 		dAssert (0);
@@ -442,7 +442,7 @@ void dLexCompiler::ParseDefinitions (dExpandedNFA& nfa, dString& preHeaderCode, 
 		m_tokenList.AddTokenData (m_number, "[0-9]+");
 		m_tokenList.AddTokenData (m_internalSize, "%[pneako]");
 		m_tokenList.AddTokenData (m_delimiter, "%%");
-		m_tokenList.AddTokenData (m_extendedRegularExpresion, "((\\[[^\\]]+\\])|(\\[\\]\\])|[^ \n\r\t\v\f[]+)+");
+		m_tokenList.AddTokenData (m_extendedRegularExpression, "((\\[[^\\]]+\\])|(\\[\\]\\])|[^ \n\r\t\v\f[]+)+");
 		for (NextToken(); (m_token != m_end) && (m_token != m_delimiter);) {
 			ParseDefinitionExpression (preHeaderCode);
 		}
@@ -463,20 +463,20 @@ void dLexCompiler::ParseDefinitions (dExpandedNFA& nfa, dString& preHeaderCode, 
 		//	6	m_number,
 		//	7	m_quatedString,
 		//	8	m_literal,
-		//	9	m_extendedRegularExpresion,
+		//	9	m_extendedRegularExpression,
 
 		m_tokenList.AddTokenData (m_whiteSpace, "[ \n\r\t\v\f]+");
 		m_tokenList.AddTokenData (m_quatedString, "\"[^\" \t\v\n\f]*\"");
 		m_tokenList.AddTokenData (m_delimiter, "%%");
 		m_tokenList.AddTokenData (m_comment, "(/\\*([^*]|[\r\n]|(\\*+([^*/]|[\r\n])))*\\*+/)|(//.*)");
-		m_tokenList.AddTokenData (m_extendedRegularExpresion, "((\\[[^\\]]+\\])|(\\[\\]\\])|[^ \n\r\t\v\f[]+)+");
+		m_tokenList.AddTokenData (m_extendedRegularExpression, "((\\[[^\\]]+\\])|(\\[\\]\\])|[^ \n\r\t\v\f[]+)+");
 
 		for (NextToken(); (m_token != m_end) && (m_token != m_delimiter); ) {
 
 			int lineNumber = m_lineNumber;
 			dString expression (&m_grammar[m_grammarTokenStart], m_grammarTokenLength);
 			m_defintions.PreProcessDefinitions(expression);
-			dToken expresionToken (m_token);
+			dToken expressionToken (m_token);
 
 			// until I get the balance expression feature working
 			m_grammarTokenStart += m_grammarTokenLength;
@@ -524,7 +524,7 @@ void dLexCompiler::ParseDefinitions (dExpandedNFA& nfa, dString& preHeaderCode, 
 				}
 
 				dString userAction (str + 1, length - 2);
-				switch (expresionToken) 
+				switch (expressionToken) 
 				{
 					case m_quatedString:
 					{
@@ -534,7 +534,7 @@ void dLexCompiler::ParseDefinitions (dExpandedNFA& nfa, dString& preHeaderCode, 
 						break;
 					}
 
-					case m_extendedRegularExpresion:
+					case m_extendedRegularExpression:
 					{
 						nfa.AddExpression(expression, userAction, lineNumber);
 						//dTrace ((semanticActionCode.c_str()));

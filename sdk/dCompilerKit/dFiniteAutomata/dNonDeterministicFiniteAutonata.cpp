@@ -186,7 +186,7 @@ void dNonDeterministicFiniteAutonata::CompileExpression(const char* const regula
 	dTrace_NFA(("\n"));
 	dTrace_NFA(("Expression: %s\n", regularExpression));
 
-	ParseExpresionToNFA ();
+	ParseExpressionToNFA ();
 }
 
 
@@ -443,8 +443,8 @@ void dNonDeterministicFiniteAutonata::ReduceZeroOrOneDiagram()
 }
 
 
-// UnionExpression				: ConcatenateExpresion MoreUnionExpression
-// MoreUnionExpression			: m_union ConcatenateExpresion MoreUnionExpression | nothing
+// UnionExpression				: ConcatenateExpression MoreUnionExpression
+// MoreUnionExpression			: m_union ConcatenateExpression MoreUnionExpression | nothing
 void dNonDeterministicFiniteAutonata::UnionExpression ()
 {
 	ConcatenationExpression ();
@@ -479,7 +479,7 @@ void dNonDeterministicFiniteAutonata::ConcatenationExpression ()
 	}
 }
 
-// UnuaryExpresion : m_zeroOrMore | m_oneOrMore | m_zeroOrOne | BracketedExpression | nothing
+// UnuaryExpression : m_zeroOrMore | m_oneOrMore | m_zeroOrOne | BracketedExpression | nothing
 void dNonDeterministicFiniteAutonata::UnuaryExpression ()
 {
 	ShiftID ();
@@ -579,7 +579,7 @@ int dNonDeterministicFiniteAutonata::BracketedExpression (char* const set, int s
 
 // id	: m_openSquareBrakect BracketedExpression m_closeSquareBrakect
 // id	: m_openParentesis UnionExpression m_closeParentesis
-// id	: m_balancedCharacterExpresion CHARACTER UnionExpression m_balancedCharacterExpresion CHARACTER
+// id	: m_balancedCharacterExpression CHARACTER UnionExpression m_balancedCharacterExpression CHARACTER
 // id	: .
 // id	: CHARACTER
 void dNonDeterministicFiniteAutonata::ShiftID()
@@ -620,13 +620,13 @@ void dNonDeterministicFiniteAutonata::ShiftID()
 //
 // Productions Rule for a top down grammar, stack based Regular expression grammar
 //
-// UnionExpression				: ConcatenateExpresion MoreUnionExpression
-// MoreUnionExpression			: m_union ConcatenateExpresion MoreUnionExpression | nothing
+// UnionExpression				: ConcatenateExpression MoreUnionExpression
+// MoreUnionExpression			: m_union ConcatenateExpression MoreUnionExpression | nothing
 //
-// ConcatenationExpression		: UnuaryExpresion MoreConcatenationExpression
-// MoreConcatenationExpression	: m_concatenation UnuaryExpresion MoreConcatenationExpression  | nothing
+// ConcatenationExpression		: UnuaryExpression MoreConcatenationExpression
+// MoreConcatenationExpression	: m_concatenation UnuaryExpression MoreConcatenationExpression  | nothing
 //
-// UnuaryExpresion				: m_zeroOrMore | m_oneOrMore | m_zeroOrOne| nothing
+// UnuaryExpression				: m_zeroOrMore | m_oneOrMore | m_zeroOrOne| nothing
 //
 // BracketedExpression  		: '^' BracketedExpression
 // BracketedExpression  		: '^' m_concatenation BracketedExpression
@@ -639,7 +639,7 @@ void dNonDeterministicFiniteAutonata::ShiftID()
 // id							: m_openParentesis UnionExpression m_closeParentesis
 // id							: .
 // id							: CHARACTER 
-void dNonDeterministicFiniteAutonata::ParseExpresionToNFA ()
+void dNonDeterministicFiniteAutonata::ParseExpressionToNFA ()
 {
 	m_error = false;
 	for (m_token = GetChar(); m_token;) {

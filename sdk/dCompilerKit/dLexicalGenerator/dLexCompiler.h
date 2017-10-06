@@ -48,7 +48,7 @@ class dLexCompiler
 		dTokenDataList ();
 		~dTokenDataList ();
 		void DeleteAll();
-		void AddTokenData (dToken token, const char* const regulatExpresion);
+		void AddTokenData (dToken token, const char* const regulatExpression);
 	};
 
 
@@ -57,8 +57,8 @@ class dLexCompiler
 		public:
 		dDefinitionsMap ();
 		~dDefinitionsMap ();
-		void PreProcessDefinitions (dString& regularExpresionWithDefinitions);
-		void AddDefinition (dString& regularExpresionWithMacros, dString& key);
+		void PreProcessDefinitions (dString& regularExpressionWithDefinitions);
+		void AddDefinition (dString& regularExpressionWithMacros, dString& key);
 	};
 
 	class dTransitionCountStart

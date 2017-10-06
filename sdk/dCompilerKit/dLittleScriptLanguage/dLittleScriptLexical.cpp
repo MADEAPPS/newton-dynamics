@@ -39,7 +39,7 @@ dLittleScriptLexical::~dLittleScriptLexical()
 }
 
 
-void dLittleScriptLexical::ReadBalancedExpresion (char open, char close)
+void dLittleScriptLexical::ReadBalancedExpression (char open, char close)
 {
 	int count = 1;
 	while (count) {

@@ -73,7 +73,7 @@ class dNonDeterministicFiniteAutonata: public dFiniteAutomata
 	virtual void PreProcessExpression (const char* const regularExpression);
 	void CompileExpression(const char* const regularExpression);	
 	int GetChar();
-	void ParseExpresionToNFA ();
+	void ParseExpressionToNFA ();
 	void DeleteNFA (dAutomataState* const startdAutomataState);
 	
 

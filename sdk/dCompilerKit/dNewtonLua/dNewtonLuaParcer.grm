@@ -224,17 +224,17 @@ ifBlock
 	;
 
 
-forExpresionLabel
+forBlockBeginLabel
 	: {$$ = MyModule->EmitLabel();}
 	;
 
-forBlockExpresion
-	: forExpresionLabel expression {$$ = $2;}
+forIterator
+	: _LABEL '=' expression {$1.m_tokenList.Append ($1.GetString()); $$ = MyModule->EmitAssigmentStatement($1, $3);}
 	;
 
 forBlock
-	: _FOR _LABEL '=' expression ',' forBlockExpresion _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, dUserVariable(), $8);}
-	| _FOR _LABEL '=' expression ',' forBlockExpresion ',' forBlockExpresion _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, $8, $10);}
+	: _FOR forIterator ',' forBlockBeginLabel expression _DO block _END {$$ = MyModule->EmitFor($2, $4, $5, dUserVariable(), $7);}
+	| _FOR forIterator ',' forBlockBeginLabel expression ',' expression _DO block _END {$$ = MyModule->EmitFor($2, $4, $5, $7, $9);}
 	;
 
 functionCallName

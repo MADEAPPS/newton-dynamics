@@ -74,7 +74,7 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewExpressionNodeConstant (const dUserVariable& identifier);
 	dUserVariable NewExpressionNodeOperatorThisConstant (const dUserVariable& identifier);
 
-	dUserVariable NewExpresionNodePrefixPostfixOperator (const dUserVariable& expression, bool isPrefix, bool isIncrement);
+	dUserVariable NewExpressionNodePrefixPostfixOperator (const dUserVariable& expression, bool isPrefix, bool isIncrement);
 	dUserVariable NewExpressionNodeBinaryOperator (const dUserVariable& expressionA, const dUserVariable& binaryOperator, const dUserVariable& expressionB);
 
 	dUserVariable NewExpressionNodeLogiOperator (const dUserVariable& expressionA, const dUserVariable& logigOperator, const dUserVariable& expressionB);
@@ -84,8 +84,8 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewExpressionOperatorNew (const dString& typeName, const dUserVariable& dimension);
 
 	dUserVariable NewExpressionNodeVariable (const dString& name, const dString& modifiers, const dUserVariable& dimArray = dUserVariable());
-	dUserVariable NewExpresionNodeAssigment (const dUserVariable& leftVariable, const dUserVariable& expression);
-	dUserVariable NewExpresionNodeAssigment (const dUserVariable& leftVariable, const dUserVariable& assigmentOperator, const dUserVariable& expression);
+	dUserVariable NewExpressionNodeAssigment (const dUserVariable& leftVariable, const dUserVariable& expression);
+	dUserVariable NewExpressionNodeAssigment (const dUserVariable& leftVariable, const dUserVariable& assigmentOperator, const dUserVariable& expression);
 
 	dUserVariable NewReturnStatement(const dUserVariable& expression);
 	dUserVariable NewIFStatement(const dUserVariable& expression, const dUserVariable& thenExpression, const dUserVariable& elseExpression);

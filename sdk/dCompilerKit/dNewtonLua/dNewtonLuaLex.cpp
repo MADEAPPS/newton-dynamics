@@ -39,7 +39,7 @@ dNewtonLuaLex::~dNewtonLuaLex()
 }
 
 
-void dNewtonLuaLex::ReadBalancedExpresion (char open, char close)
+void dNewtonLuaLex::ReadBalancedExpression (char open, char close)
 {
 	int count = 1;
 	while (count) {

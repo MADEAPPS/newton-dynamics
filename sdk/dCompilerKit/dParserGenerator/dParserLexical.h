@@ -79,7 +79,7 @@ class dParserLexical
 		
 	}
 
-	void ReadBalancedExpresion (char open, char close);
+	void ReadBalancedExpression (char open, char close);
 
 	void GetLexString ();
 	int GetNextStateIndex (char symbol, int count, const char* const characterSet) const;
