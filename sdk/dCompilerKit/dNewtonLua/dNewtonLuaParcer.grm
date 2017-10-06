@@ -223,9 +223,18 @@ ifBlock
 	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE block _END {dAssert(0);}
 	;
 
+
+forExpresionLabel
+	: {$$ = MyModule->EmitLabel();}
+	;
+
+forBlockExpresion
+	: forExpresionLabel expression {$$ = $2;}
+	;
+
 forBlock
-	: _FOR _LABEL '=' expression ',' expression _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, dUserVariable(), $8);}
-	| _FOR _LABEL '=' expression ',' expression ',' expression _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, $8, $10);}
+	: _FOR _LABEL '=' expression ',' forBlockExpresion _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, dUserVariable(), $8);}
+	| _FOR _LABEL '=' expression ',' forBlockExpresion ',' forBlockExpresion _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, $8, $10);}
 	;
 
 functionCallName

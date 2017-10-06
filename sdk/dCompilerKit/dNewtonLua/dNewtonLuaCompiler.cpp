@@ -442,6 +442,14 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 	}
 }
 
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLabel()
+{
+	dString label(m_currentClosure->NewLabel());
+	dCILInstrLabel* const exitLabel = new dCILInstrLabel(*m_currentClosure, label);
+	TRACE_INSTRUCTION(exitLabel);
+	return dUserVariable(exitLabel);
+}
+
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariable& iterName, const dUserVariable& iterExpresion0, const dUserVariable& iterExpresion1, const dUserVariable& iterExpresion2, const dUserVariable& block)
 {
 	return dUserVariable();
