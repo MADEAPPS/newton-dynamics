@@ -312,6 +312,7 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 		}
 	}
 	CalculateSuccessorsAndPredecessors ();
+Trace();
 	BuildDominatorTree ();
 }
 

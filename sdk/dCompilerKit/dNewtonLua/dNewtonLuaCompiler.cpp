@@ -427,13 +427,6 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 		//m_currentClosure->Trace();
 		return dUserVariable(conditional);
 	} else {
-		// this is an: if exp then block end
-		//dCIL::dListNode* const elseBlockNode = elseBlock.m_nodeList.GetFirst()->GetInfo();
-		//dCILInstrLabel* const elseBlockInstruction = elseBlockNode->GetInfo()->GetAsLabel();
-		//dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, exitLabel);
-		//TRACE_INSTRUCTION(gotoJump);
-		//m_currentClosure->InsertAfter(elseBlockNode->GetPrev(), gotoJump->GetNode());
-
 		dString zero("0");
 		dCILInstr::dArgType zeroType(dCILInstr::m_constInt);
 		dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstr::m_different, expressionArg.m_label, expressionArg.GetType(), zero, zeroType, exitLabel, thenBlockInstruction);
@@ -451,30 +444,34 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLabel()
 {
 	dString label(m_currentClosure->NewLabel());
-	dCILInstrLabel* const exitLabel = new dCILInstrLabel(*m_currentClosure, label);
-	TRACE_INSTRUCTION(exitLabel);
-	return dUserVariable(exitLabel);
+	dCILInstrLabel* const labelInstruction = new dCILInstrLabel(*m_currentClosure, label);
+	TRACE_INSTRUCTION(labelInstruction);
+	return dUserVariable(labelInstruction);
 }
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariable& iterName, const dUserVariable& startLoopLabel, const dUserVariable& testExpression, const dUserVariable& stepExpression, const dUserVariable& block)
 {
-/*
-	dUserVariable binaryOperator;
-	binaryOperator.m_token = dToken ('+');
-	dString name (m_currentClosure->NewTemp());
-	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, name, dCILInstr::dArgType(dCILInstr::m_int), dString ("1"), dCILInstr::dArgType(dCILInstr::m_constInt));
-	TRACE_INSTRUCTION(move);
-	dUserVariable arg1Variable(move);
-	EmitBinaryExpression(iterName, binaryOperator, arg1Variable);
-*/
-
 	dCILSingleArgInstr* const arg0Instruction = iterName.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsSingleArg();
+	dCILSingleArgInstr* const testInstruction = testExpression.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsSingleArg();
+	dCILInstrLabel* const blockStartInstruction = block.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsLabel();
+	dAssert(testInstruction);
 	dAssert(arg0Instruction);
+	dAssert(blockStartInstruction);
 	const dCILInstr::dArg& arg0 = arg0Instruction->GetArg0();
+	const dCILInstr::dArg& testArg = testInstruction->GetArg0();
+
 	dCILInstrIntergerLogical* const instruction = new dCILInstrIntergerLogical(*m_currentClosure, dCILInstr::m_add, arg0.m_label, arg0.GetType(), arg0.m_label, arg0.GetType(), dString("1"), dCILInstr::dArgType(dCILInstr::m_constInt));
 	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, startLoopLabel.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsLabel());
 
+	dString label(m_currentClosure->NewLabel());
+	dCILInstrLabel* const labelInstruction = new dCILInstrLabel(*m_currentClosure, label);
+	dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstr::m_greatherEqual, arg0.m_label, arg0.GetType(), testArg.m_label, testArg.GetType(), labelInstruction, blockStartInstruction);
+	m_currentClosure->InsertAfter(testInstruction->GetNode(), conditional->GetNode());
+
+	TRACE_INSTRUCTION(conditional);
 	TRACE_INSTRUCTION(instruction);
 	TRACE_INSTRUCTION(gotoJump);
+	TRACE_INSTRUCTION(labelInstruction);
+//m_currentClosure->Trace();
 	return dUserVariable();
 }
