@@ -141,7 +141,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	TRACE_INSTRUCTION(label);
 	TRACE_INSTRUCTION(ret);
 	TRACE_INSTRUCTION(functionEnd);
-//m_currentClosure->Trace();
+m_currentClosure->Trace();
 
 	dBasicBlocksGraph basicBlocks;
 	basicBlocks.Build(m_currentClosure->GetFirst());
@@ -458,6 +458,23 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLabel()
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariable& iterName, const dUserVariable& startLoopLabel, const dUserVariable& testExpression, const dUserVariable& stepExpression, const dUserVariable& block)
 {
-	dAssert(0);
+/*
+	dUserVariable binaryOperator;
+	binaryOperator.m_token = dToken ('+');
+	dString name (m_currentClosure->NewTemp());
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, name, dCILInstr::dArgType(dCILInstr::m_int), dString ("1"), dCILInstr::dArgType(dCILInstr::m_constInt));
+	TRACE_INSTRUCTION(move);
+	dUserVariable arg1Variable(move);
+	EmitBinaryExpression(iterName, binaryOperator, arg1Variable);
+*/
+
+	dCILSingleArgInstr* const arg0Instruction = iterName.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsSingleArg();
+	dAssert(arg0Instruction);
+	const dCILInstr::dArg& arg0 = arg0Instruction->GetArg0();
+	dCILInstrIntergerLogical* const instruction = new dCILInstrIntergerLogical(*m_currentClosure, dCILInstr::m_add, arg0.m_label, arg0.GetType(), arg0.m_label, arg0.GetType(), dString("1"), dCILInstr::dArgType(dCILInstr::m_constInt));
+	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, startLoopLabel.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsLabel());
+
+	TRACE_INSTRUCTION(instruction);
+	TRACE_INSTRUCTION(gotoJump);
 	return dUserVariable();
 }

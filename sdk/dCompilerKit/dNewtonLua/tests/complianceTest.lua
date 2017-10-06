@@ -34,7 +34,7 @@
 
 ---[[
 	function fibonacciIterative(n)
-	  a, b = 0, 1
+	  local a, b = 0, 1
 	  for i = 1, n do
 		a, b = b, a + b
 	  end
