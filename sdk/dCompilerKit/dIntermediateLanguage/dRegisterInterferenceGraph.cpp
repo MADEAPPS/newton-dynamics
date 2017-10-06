@@ -36,6 +36,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dBasicBlocksGraph* const
 		// we have a spill, find a good spill node and try graph coloring again
 		dAssert (0);
 	}
+m_graph->Trace();
 	AllocateRegisters();
 m_graph->Trace();
 
@@ -611,45 +612,15 @@ void dRegisterInterferenceGraph::ApplyDeadCodeElimination()
 		for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext() ) {
 			const dFlowGraphNode& liveInfo = node->GetInfo();
 			const dCILInstr::dArg* const variableOuter = liveInfo.m_instruction->GetGeneratedVariable();
-		liveInfo.m_instruction->Trace();
+		//liveInfo.m_instruction->Trace();
 			if (variableOuter && !liveInfo.m_instruction->GetAsCall()) {
 				if (!liveInfo.m_livedOutputSet.Find(variableOuter->m_label)) {
 					anyChanges = true;
-					liveInfo.m_instruction->Trace();
+					dAssert (0);
+					//liveInfo.m_instruction->Trace();
+					liveInfo.m_instruction->Nullify();
 				}
 			}
-
-	/*
-			if (!instruction->GetAsCall()) {
-				const dCILInstr::dArg* const variableOuter = instruction->GetGeneratedVariable();
-				if (variableOuter) {
-					dStatementBlockDictionary::dTreeNode* const usesNodeBuckect = usedVariablesList.Find(variableOuter->m_label);
-					dAssert(!usesNodeBuckect || usesNodeBuckect->GetInfo().GetCount());
-					if (!usesNodeBuckect) {
-						anyChanges = true;
-						dList<dCILInstr::dArg*> variablesList;
-						instruction->GetUsedVariables(variablesList);
-						for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
-							const dCILInstr::dArg* const variable = varNode->GetInfo();
-							dAssert(usedVariablesList.Find(variable->m_label));
-							dStatementBlockDictionary::dTreeNode* const entry = usedVariablesList.Find(variable->m_label);
-							if (entry) {
-								dStatementBlockBucket& buckect = entry->GetInfo();
-								buckect.Remove(node);
-								dAssert(map.Find(variable->m_label) || instruction->GetAsPhi());
-								if (map.Find(variable->m_label)) {
-									workList.Insert(map.Find(variable->m_label)->GetInfo()->GetInfo());
-									if (!buckect.GetCount()) {
-										usedVariablesList.Remove(entry);
-									}
-								}
-							}
-						}
-						instruction->Nullify();
-					}
-				}
-			}
-	*/
 		}
 	}
 }

@@ -213,6 +213,11 @@ ifBlock
 	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE block _END
 	;
 
+forBlock
+	: _FOR _LABEL '=' expression ',' expression _DO block _END 
+	| _FOR _LABEL '=' expression ',' expression ',' expression _DO block _END 
+	;
+
 statement 
 	: ';' 
 	| local

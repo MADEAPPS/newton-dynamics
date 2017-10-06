@@ -55,20 +55,21 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 
 	void CloseFunctionDeclaration();
 
-	dUserVariable EmitReturn(const dUserVariable& expression);
-	dUserVariable EmitIf(const dUserVariable& expression, const dUserVariable& thenBlock, const dUserVariable& elseBlock);
-	
-	dUserVariable EmitLoadVariable(const dUserVariable& varName);
-	dUserVariable EmitLoadConstant(const dUserVariable& constName);
 
 	dUserVariable EmitBlockBeginning();
+
+	dUserVariable EmitReturn(const dUserVariable& expression);
+	dUserVariable EmitLoadVariable(const dUserVariable& varName);
+	dUserVariable EmitLoadConstant(const dUserVariable& constName);
 	
 	dUserVariable EmitLocalVariableDeclaration(const dUserVariable& nameList);
 	dUserVariable EmitParametersToLocalVariables(const dUserVariable& parameterList);
 	dUserVariable EmitFunctionCall(const dUserVariable& functionName, const dUserVariable& argumentsList);
 	dUserVariable EmitFunctionDeclaration(const dUserVariable& name, const dUserVariable& parameterList);
 	dUserVariable EmitAssigmentStatement(const dUserVariable& nameList, const dUserVariable& expresionList);
+	dUserVariable EmitIf(const dUserVariable& expression, const dUserVariable& thenBlock, const dUserVariable& elseBlock);
 	dUserVariable EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1);
+	dUserVariable EmitFor(const dUserVariable& iterName, const dUserVariable& iterExpresion0, const dUserVariable& iterExpresion1, const dUserVariable& iterExpresion2, const dUserVariable& block);
 
 
 	dLuaClosure m_closures;

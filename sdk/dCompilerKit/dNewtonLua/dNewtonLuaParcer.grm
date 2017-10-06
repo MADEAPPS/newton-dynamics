@@ -83,43 +83,42 @@
 }
 
 
-
-%token            _AND
-%token            _BREAK
-%token            _DO
-%token            _ELSE
-%token            _ELSEIF
-%token            _END
-%token            _FALSE
-%token            _FOR
-%token            _FUNCTION
-%token            _GOTO
-%token            _IF
-%token            _IN
-%token            _LOCAL
-%token            _NIL
-%token            _NOT
-%token            _OR
-%token            _REPEAT
-%token            _RETURN
-%token            _THEN
-%token            _TRUE
-%token            _UNTIL
-%token            _WHILE
-%token            _LEFT_SHIFT
-%token            _RIGHT_SHIFT
-%token            _INTEGER_DIVIDE
-%token            _IDENTICAL
-%token            _DIFFERENT
-%token            _LEFT_EQUAL
-%token            _GREATHER_EQUAL
-%token            _DOUBLE_COLUMN
-%token            _DOUBLE_DOT
-%token            _TRIPLE_DOT
-%token            _INTEGER
-%token            _FLOAT
-%token            _LABEL
-%token            _STRING
+%token _AND
+%token _BREAK
+%token _DO
+%token _ELSE
+%token _ELSEIF
+%token _END
+%token _FALSE
+%token _FOR
+%token _FUNCTION
+%token _GOTO
+%token _IF
+%token _IN
+%token _LOCAL
+%token _NIL
+%token _NOT
+%token _OR
+%token _REPEAT
+%token _RETURN
+%token _THEN
+%token _TRUE
+%token _UNTIL
+%token _WHILE
+%token _LEFT_SHIFT
+%token _RIGHT_SHIFT
+%token _INTEGER_DIVIDE
+%token _IDENTICAL
+%token _DIFFERENT
+%token _LEFT_EQUAL
+%token _GREATHER_EQUAL
+%token _DOUBLE_COLUMN
+%token _DOUBLE_DOT
+%token _TRIPLE_DOT
+%token _INTEGER
+%token _FLOAT
+%token _LABEL
+%token _STRING
 
 
 %right _ELSE _ELSEIF
@@ -224,6 +223,11 @@ ifBlock
 	| _IF expression _THEN block _ELSEIF expression _THEN block _ELSE block _END {dAssert(0);}
 	;
 
+forBlock
+	: _FOR _LABEL '=' expression ',' expression _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, dUserVariable(), $8);}
+	| _FOR _LABEL '=' expression ',' expression ',' expression _DO block _END {$$ = MyModule->EmitFor($2, $4, $6, $8, $10);}
+	;
+
 functionCallName
 	: _LABEL {$$ = $1; $$.m_tokenList.Append ($1.GetString());}
 	;
@@ -242,13 +246,15 @@ functionDefinition
 	: functionDeclare block _END {MyModule->CloseFunctionDeclaration();} 
 	;
 
+
 statement 
 	: ';' 
-	| assignment
-	| local
-	| ifBlock	
-	| functionCall {dAssert(0);}
-	| functionDefinition {dAssert(0);}
+	| local 
+	| ifBlock 
+	| forBlock 
+	| assignment 
+	| functionCall 
+	| functionDefinition 
 	;
 
 statementList

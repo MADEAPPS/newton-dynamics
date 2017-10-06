@@ -23,11 +23,21 @@
     end
 --]]
 
----[[
+--[[
 	function fibonacciNaive(m)
 		if m < 2 then
 		  return m
 		end
 		return fibonacciNaive(m-1) + fibonacciNaive(m-2)
+	end
+--]]
+
+---[[
+	function fibonacciIterative(n)
+	  a, b = 0, 1
+	  for i = 1, n do
+		a, b = b, a + b
+	  end
+	  return a
 	end
 --]]

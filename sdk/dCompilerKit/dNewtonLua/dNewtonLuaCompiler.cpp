@@ -375,6 +375,17 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 	return dUserVariable();
 }
 
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitReturn(const dUserVariable& expression)
+{
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+	dCILSingleArgInstr* const exp = expression.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsSingleArg();
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, m_currentClosure->m_returnVariable, type, exp->GetArg0().m_label, exp->GetArg0().GetType());
+	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, m_currentClosure->m_returnLabel);
+
+	TRACE_INSTRUCTION(move);
+	TRACE_INSTRUCTION(gotoJump);
+	return dUserVariable(move);
+}
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable& expression, const dUserVariable& thenBlock, const dUserVariable& elseBlock)
 {
@@ -431,15 +442,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 	}
 }
 
-dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitReturn(const dUserVariable& expression)
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariable& iterName, const dUserVariable& iterExpresion0, const dUserVariable& iterExpresion1, const dUserVariable& iterExpresion2, const dUserVariable& block)
 {
-	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dCILSingleArgInstr* const exp = expression.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsSingleArg();
-	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, m_currentClosure->m_returnVariable, type, exp->GetArg0().m_label, exp->GetArg0().GetType());
-	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, m_currentClosure->m_returnLabel);
-
-	TRACE_INSTRUCTION(move);
-	TRACE_INSTRUCTION(gotoJump);
-	return dUserVariable(move);
+	return dUserVariable();
 }
-
