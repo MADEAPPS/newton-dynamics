@@ -70,7 +70,7 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const;
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 
-	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg);
+	virtual bool ReplaceArgument (const dArg& arg, const dArg& newArg);
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
@@ -120,7 +120,7 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
-	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg);
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
 	virtual bool ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver);
 

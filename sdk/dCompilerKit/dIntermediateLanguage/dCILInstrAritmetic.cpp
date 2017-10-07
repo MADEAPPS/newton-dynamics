@@ -211,14 +211,23 @@ void dCILInstrIntergerLogical::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
-void dCILInstrIntergerLogical::ReplaceArgument (const dArg& arg, const dArg& newArg)
+bool dCILInstrIntergerLogical::ReplaceArgument (const dArg& arg, const dArg& newArg)
 {
-	if (arg.m_label == m_arg1.m_label) {
-		m_arg1 = newArg;
-	}
+	bool change = false;
 	if (arg.m_label == m_arg2.m_label) {
-		m_arg2 = newArg;
+		if (m_arg2.m_label != newArg.m_label) {
+			change = true;
+			m_arg2 = newArg;
+		}
 	}
+
+	if (arg.m_label == m_arg1.m_label) {
+		if (m_arg1.m_label != newArg.m_label) {
+			change = true;
+			m_arg1 = newArg;
+		}
+	}
+	return change;
 }
 
 dString dCILInstrIntergerLogical::Evalue (const dString& arg1, const dString& arg2) const

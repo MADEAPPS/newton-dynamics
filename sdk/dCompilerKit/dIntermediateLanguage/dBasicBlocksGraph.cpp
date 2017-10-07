@@ -74,13 +74,15 @@ dBasicBlock::dBasicBlock(const dBasicBlock& src)
 
 void dBasicBlock::Trace() const
 {
+#if 1
 	bool terminate = false;
 	for (dCIL::dListNode* node = m_begin; !terminate; node = node->GetNext()) {
 		terminate = (node == m_end);
 		node->GetInfo()->Trace();
 	}
+#endif
 
-
+#if 0
 	dCILInstrLabel* const labelOuter = m_begin->GetInfo()->GetAsLabel();
 	dTrace ((" block-> %s\n", labelOuter->GetLabel().GetStr()));
 
@@ -98,7 +100,6 @@ void dBasicBlock::Trace() const
 	}
 	dTrace(("\n"));
 
-
 	dTrace (("   dominators-> "));
 	dTree<int, const dBasicBlock*>::Iterator iter (m_dominators);
 	for (iter.Begin(); iter; iter ++) {
@@ -107,6 +108,7 @@ void dBasicBlock::Trace() const
 		dTrace (("%s ", label->GetLabel().GetStr()));
 	}
 	dTrace (("\n"));
+#endif
 
 /*
 	dTrace(("   dominanceFrontier-> "));
@@ -117,7 +119,6 @@ void dBasicBlock::Trace() const
 	}
 	dTrace (("\n"));
 */
-	dTrace (("\n"));
 }
 
 bool dBasicBlock::ComparedDominator(const dTree<int, const dBasicBlock*>& newdominators) const
@@ -510,7 +511,7 @@ void dBasicBlocksGraph::BuildDominatorTree ()
 		//block.m_idom->Trace();
 	}
 
-Trace();
+//Trace();
 	// build dominator tree
 	m_dominatorTree = &GetFirst()->GetInfo();
 	for (dListNode* node = GetFirst()->GetNext(); node; node = node->GetNext()) {
@@ -736,8 +737,31 @@ bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
 	//return constantPropagation.Solve();
 }
 
-void dBasicBlocksGraph::InsertFunctioncallSpillsSSA()
+void dBasicBlocksGraph::InsertCommonSpillsSSA()
 {
+Trace();
+	
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstrArgument* const firstArg = node->GetInfo()->GetAsArgument();
+		if (firstArg) {
+			dCIL* const cil = firstArg->m_cil;
+			const dCILInstr::dArg& param = firstArg->GetArg0();
+			dCILInstr::dArg newArg(cil->NewTemp(), param.GetType());
+			dCILInstrMove* const moveInstr = new dCILInstrMove(*cil, newArg.m_label, newArg.GetType(), param.m_label, param.GetType());
+			moveInstr->m_basicBlock = firstArg->m_basicBlock;
+			cil->InsertAfter(firstArg->GetNode(), moveInstr->GetNode());
+			
+			for (dCIL::dListNode* node1 = node->GetNext(); node1 && !node1->GetInfo()->GetAsFunctionEnd(); node1 = node1->GetNext()) {
+				dCILInstr* const instruction = node1->GetInfo();
+				//instruction->Trace();
+				instruction->ReplaceArgument(param, newArg);
+				//instruction->Trace();
+			}
+			break;
+		}
+	}
+Trace();
+
 	bool hasCalls = false;
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
 		dCILInstrCall* const functionCall = node->GetInfo()->GetAsCall();
@@ -774,7 +798,6 @@ void dBasicBlocksGraph::InsertFunctioncallSpillsSSA()
 						dCILInstr* const definedInstr = definedNode->GetInfo();
 						const dCILInstr::dArg* const defArg = definedInstr->GetGeneratedVariable();
 						dAssert (defArg->m_label == var);
-						//definedWorkList.Remove(definedNode);
 						
 						dCILInstr::dArg newArg (definedInstr->m_cil->NewTemp(), defArg->GetType());
 						dCILInstrMove* const moveInstr = new dCILInstrMove (*definedInstr->m_cil, newArg.m_label, newArg.GetType(), defArg->m_label, defArg->GetType());
@@ -833,7 +856,7 @@ void dBasicBlocksGraph::RegistersAllocations ()
 	int regCount = 16;
 
 //Trace();
-	InsertFunctioncallSpillsSSA();
+	InsertCommonSpillsSSA();
 	RemovePhiFunctionsSSA();
 
 //Trace();

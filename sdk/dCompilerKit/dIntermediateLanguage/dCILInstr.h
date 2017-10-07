@@ -189,7 +189,7 @@ class dCILInstr
 	// ****************************
 	virtual dArg* GetGeneratedVariable () {dAssert (0); return NULL;}
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {dAssert (0);}
-	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg) {dAssert (0);}
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) {dAssert (0); return false;}
 
 	virtual bool ApplyConstantFoldingSSA () {return false;}
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}

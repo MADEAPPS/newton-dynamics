@@ -346,7 +346,7 @@ dString dRegisterInterferenceGraph::GetRegisterName(const dString& varName) cons
 
 void dRegisterInterferenceGraph::Build()
 {
-//m_graph->Trace();
+m_graph->Trace();
 	dLiveInLiveOutSolver liveInLiveOut(m_graph);
 	
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
@@ -395,7 +395,7 @@ void dRegisterInterferenceGraph::Build()
 	}
 
 
-#if 0
+#if 1
 	dRegisterInterferenceGraph::Iterator debugIter(*this);
 	for (debugIter.Begin(); debugIter; debugIter++) {
 		const dString& key = debugIter.GetKey();
@@ -558,7 +558,7 @@ void dRegisterInterferenceGraph::Build()
 					dRegisterInterferenceNodeEdge edgeBA(varAnodeNode);
 					varAnode.m_interferanceEdge.Append(edgeAB);
 					varBnode.m_interferanceEdge.Append(edgeBA);
-					//dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
+					dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
 					dAssert((varAnode.m_registerIndex == -1) || (varBnode.m_registerIndex == -1) || (varAnode.m_registerIndex != varBnode.m_registerIndex));
 				}
 			}

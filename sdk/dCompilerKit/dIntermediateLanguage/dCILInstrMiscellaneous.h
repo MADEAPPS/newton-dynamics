@@ -37,7 +37,7 @@ class dCILInstrNop: public dCILInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
-	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg) {}
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) {return false;}
 	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver) {}
 
 	virtual bool IsDefineOrUsedVariable() { return false; }

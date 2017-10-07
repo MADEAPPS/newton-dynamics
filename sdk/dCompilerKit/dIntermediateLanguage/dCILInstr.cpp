@@ -16,7 +16,7 @@
 #include "dRegisterInterferenceGraph.h"
 
 //dString dCILInstr::m_ssaPosfix ("_ssa");
-dString dCILInstr::m_ssaPosfix ("_");
+dString dCILInstr::m_ssaPosfix (".");
 
 dCILInstr::dMapTable dCILInstr::m_maptable[] = 
 {
@@ -107,8 +107,7 @@ dString dCILInstr::RemoveSSAPostfix(const dString& name) const
 {
 	int index = name.Find (m_ssaPosfix);
 	if (index >= 0) {
-		dString copy (name);
-		copy[index] = 0;
+		dString copy (name.GetStr(), index);
 		return copy;
 	}
 	return name;

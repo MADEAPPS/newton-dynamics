@@ -68,6 +68,7 @@ class dCILInstrGoto: public dCILInstr
 
 	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) {return false;}
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
@@ -108,7 +109,7 @@ class dCILInstrConditional: public dCILTwoArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
-	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg);
+	virtual bool ReplaceArgument (const dArg& arg, const dArg& newArg);
 	virtual void ApplyConditionalConstantPropagationSSA (dConditionalConstantPropagationSolver& solver);
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
@@ -135,7 +136,7 @@ class dCILInstrReturn: public dCILSingleArgInstr
 
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
-	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg);
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);

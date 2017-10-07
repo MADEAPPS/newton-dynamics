@@ -181,7 +181,6 @@ void dConvertToSSASolver::Solve()
 	dCIL* const cil = m_graph->m_begin->GetInfo()->GetCil();
 	dTree <dStatementBucket, dString>::Iterator iter (variableList);
 
-#if 1
 	dTree <dStatementBucket, dString> phiVariables;
 	for (iter.Begin(); iter; iter ++) {
 		dStatementBucket w;
@@ -228,44 +227,6 @@ void dConvertToSSASolver::Solve()
 		}
 	}
 
-#else
-	for (iter.Begin(); iter; iter++) {
-		dStatementBucket& bucket = iter.GetNode()->GetInfo();
-
-		dCILInstr::dArg name (iter.GetNode()->GetInfo().m_variable);
-dTrace(("%s\n", name.m_label.GetStr()));
-
-		dTree<int, const dBasicBlock*> dominance;
-		dStatementBucket::Iterator iter1 (bucket);
-		for (iter1.Begin(); iter1; iter1 ++) {
-			const dBasicBlock* const block = iter1.GetKey();
-			dAssert (m_dominanceFrontier.Find(block));
-			dFrontierList& frontierList = m_dominanceFrontier.Find(block)->GetInfo();
-			for (dList<const dBasicBlock*>::dListNode* node = frontierList.GetFirst(); node; node = node->GetNext()) {
-				dominance.Insert(0, node->GetInfo());
-			}
-		}
-
-		dTree<int, const dBasicBlock*>::Iterator dominanceIter (dominance);
-		for (dominanceIter.Begin(); dominanceIter; dominanceIter ++) {
-			const dBasicBlock* const frontier = dominanceIter.GetKey();
-frontier->Trace();
-
-			dList<const dBasicBlock*> sources;
-			for (dList<const dBasicBlock*>::dListNode* predNode = frontier->m_predecessors.GetFirst(); predNode; predNode = predNode->GetNext()) {
-				const dBasicBlock* const predBlock = predNode->GetInfo();
-predBlock->Trace();
-				sources.Append(predBlock);
-			}
-
-			dAssert (sources.GetCount());
-			dCILInstrPhy* const phyInstruction = new dCILInstrPhy (*cil, name.m_label, name.GetType(), frontier, sources);
-			cil->InsertAfter(frontier->m_begin, phyInstruction->GetNode());
-m_graph->Trace();
-		}
-	}
-#endif
-
 //m_graph->Trace();
 
 	variableList.RemoveAll ();
@@ -287,9 +248,9 @@ m_graph->Trace();
 			}
 		}
 	}
-m_graph->Trace();
+//m_graph->Trace();
 	RenameVariables (&m_graph->GetFirst()->GetInfo(), variableList);
-m_graph->Trace();
+//m_graph->Trace();
 	m_graph->ApplyDeadCodeEliminationSSA ();
-m_graph->Trace();
+//m_graph->Trace();
 }

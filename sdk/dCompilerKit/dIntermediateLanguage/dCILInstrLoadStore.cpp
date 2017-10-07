@@ -114,11 +114,16 @@ void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
-void dCILInstrMove::ReplaceArgument (const dArg& arg, const dArg& newArg)
+bool dCILInstrMove::ReplaceArgument (const dArg& arg, const dArg& newArg)
 {
+	bool change = false;
 	if (arg.m_label == m_arg1.m_label) {
-		m_arg1 = newArg;
+		if (m_arg1.m_label != newArg.m_label) {
+			change = true;
+			m_arg1 = newArg;
+		}
 	}
+	return change;
 }
 
 bool dCILInstrMove::ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
@@ -127,11 +132,11 @@ bool dCILInstrMove::ApplySimpleConstantPropagationSSA (dWorkList& workList, dSta
 	if ((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
 		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
 		if (node) {
-			ret = true;
+			//ret = true;
 			dStatementBlockBucket::Iterator iter (node->GetInfo());
 			for (iter.Begin(); iter; iter ++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-				instrution->ReplaceArgument (m_arg0, m_arg1);
+				ret |= instrution->ReplaceArgument (m_arg0, m_arg1);
 				workList.Insert(instrution);
 			}
 		}
@@ -163,12 +168,13 @@ bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBloc
 	bool ret = false;
 	if (!((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat))) {
 		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
+Trace();
 		if (node) {
-			ret = true;
 			dStatementBlockBucket::Iterator iter(node->GetInfo());
 			for (iter.Begin(); iter; iter++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-				instrution->ReplaceArgument(m_arg0, m_arg1);
+instrution->Trace();
+				ret |= instrution->ReplaceArgument(m_arg0, m_arg1);
 				workList.Insert(instrution);
 			}
 		}
@@ -307,15 +313,20 @@ void dCILInstrPhy::GetUsedVariables (dList<dArg*>& variablesList)
 }
 
 
-void dCILInstrPhy::ReplaceArgument(const dArg& arg, const dArg& newArg)
+bool dCILInstrPhy::ReplaceArgument(const dArg& arg, const dArg& newArg)
 {
+	bool change = false;
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
 		dArgPair& pair = node->GetInfo();
 		if (arg.m_label == pair.m_arg.m_label) {
-			pair.m_arg = newArg;
-			break;
+			if (pair.m_arg.m_label != newArg.m_label) {
+				change = true;
+				pair.m_arg = newArg;
+				break;
+			}
 		}
 	}
+	return change;
 }
 
 bool dCILInstrPhy::ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)

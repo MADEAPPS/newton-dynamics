@@ -223,11 +223,23 @@ void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr
 */
 }
 
-void dCILInstrConditional::ReplaceArgument (const dArg& arg, const dArg& newArg)
+bool dCILInstrConditional::ReplaceArgument (const dArg& arg, const dArg& newArg)
 {
+	bool change = false;
 	if (arg.m_label == m_arg0.m_label) {
-		m_arg0 = newArg;
+		if (m_arg0.m_label != newArg.m_label) {
+			change = true;
+			m_arg0 = newArg;
+		}
 	}
+
+	if (arg.m_label == m_arg1.m_label) {
+		if (m_arg1.m_label != newArg.m_label) {
+			change = true;
+			m_arg1 = newArg;
+		}
+	}
+	return change;
 }
 
 void dCILInstrConditional::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
@@ -340,12 +352,17 @@ bool dCILInstrReturn::IsBasicBlockEnd() const
 	return true;
 }
 
-void dCILInstrReturn::ReplaceArgument(const dArg& arg, const dArg& newArg)
+bool dCILInstrReturn::ReplaceArgument(const dArg& arg, const dArg& newArg)
 {
 	//Trace ();
+	bool change = false;
 	if (arg.m_label == m_arg0.m_label) {
-		m_arg0 = newArg;
+		if (m_arg0.m_label != newArg.m_label) {
+			change = true;
+			m_arg0 = newArg;
+		}
 	}
+	return change;
 }
 
 

@@ -208,7 +208,7 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	private:
 	void RemovePhiFunctionsSSA ();
 	bool ApplyCopyPropagationSSA();
-	void InsertFunctioncallSpillsSSA();
+	void InsertCommonSpillsSSA();
 	bool ApplyDeadCodeEliminationSSA();
 	bool ApplySimpleConstantPropagationSSA();
 	bool ApplyConditionalConstantPropagationSSA();
