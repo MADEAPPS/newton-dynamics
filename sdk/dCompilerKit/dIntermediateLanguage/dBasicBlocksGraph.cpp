@@ -312,7 +312,6 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 		}
 	}
 	CalculateSuccessorsAndPredecessors ();
-Trace();
 	BuildDominatorTree ();
 }
 
@@ -324,12 +323,13 @@ void dBasicBlocksGraph::CalculateSuccessorsAndPredecessors ()
 
 	while (stack.GetCount()) {
 		dBasicBlock* const block = stack.GetLast()->GetInfo();
-
 		stack.Remove(stack.GetLast()->GetInfo());
+//block->Trace();
+
 		if (block->m_mark < m_mark) {
 			block->m_mark = m_mark;
 			dCILInstr* const instruction = block->m_end->GetInfo();
-instruction->Trace();
+//instruction->Trace();
 			dAssert(instruction->IsBasicBlockEnd());
 			if (instruction->GetAsIF()) {
 				dCILInstrConditional* const ifInstr = instruction->GetAsIF();
@@ -880,13 +880,13 @@ void dBasicBlocksGraph::OptimizeSSA()
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
 		actionFound |= ApplySimpleConstantPropagationSSA();
-//Trace();
+Trace();
 //		actionFound |= ApplyConditionalConstantPropagationSSA();
 //Trace();
 		actionFound |= ApplyCopyPropagationSSA();
-//Trace();
+Trace();
 		actionFound |= ApplyDeadCodeEliminationSSA();
-//Trace();
+Trace();
 	}
 	dAssert (!actionFound);
 }

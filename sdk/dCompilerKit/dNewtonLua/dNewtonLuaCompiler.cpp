@@ -444,7 +444,11 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitIf(const dUserVariable
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLabel()
 {
 	dString label(m_currentClosure->NewLabel());
+	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, label);
 	dCILInstrLabel* const labelInstruction = new dCILInstrLabel(*m_currentClosure, label);
+	gotoJump->SetTarget(labelInstruction);
+
+	TRACE_INSTRUCTION(gotoJump);
 	TRACE_INSTRUCTION(labelInstruction);
 	return dUserVariable(labelInstruction);
 }
@@ -472,6 +476,5 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariabl
 	TRACE_INSTRUCTION(instruction);
 	TRACE_INSTRUCTION(gotoJump);
 	TRACE_INSTRUCTION(labelInstruction);
-//m_currentClosure->Trace();
 	return dUserVariable();
 }

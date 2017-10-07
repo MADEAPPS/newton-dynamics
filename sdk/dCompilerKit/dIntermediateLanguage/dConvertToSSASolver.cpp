@@ -287,8 +287,9 @@ m_graph->Trace();
 			}
 		}
 	}
-//m_graph->Trace();
-
+m_graph->Trace();
 	RenameVariables (&m_graph->GetFirst()->GetInfo(), variableList);
+m_graph->Trace();
 	m_graph->ApplyDeadCodeEliminationSSA ();
+m_graph->Trace();
 }
