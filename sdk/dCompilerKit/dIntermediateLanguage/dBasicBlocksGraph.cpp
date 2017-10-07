@@ -80,12 +80,12 @@ void dBasicBlock::Trace() const
 		node->GetInfo()->Trace();
 	}
 
-/*
-	dCILInstrLabel* const label = m_begin->GetInfo()->GetAsLabel();
-	dTrace ((" block-> %s\n", label->GetArg0().m_label.GetStr()));
+
+	dCILInstrLabel* const labelOuter = m_begin->GetInfo()->GetAsLabel();
+	dTrace ((" block-> %s\n", labelOuter->GetLabel().GetStr()));
 
 	if (m_idom) {
-		dTrace(("   immediateDominator-> %s\n", m_idom->m_begin->GetInfo()->GetAsLabel()->GetArg0().m_label.GetStr()));
+		dTrace(("   immediateDominator-> %s\n", m_idom->m_begin->GetInfo()->GetAsLabel()->GetLabel().GetStr()));
 	} else {
 		dTrace(("   immediateDominator->\n"));
 	}
@@ -94,7 +94,7 @@ void dBasicBlock::Trace() const
 	for (dList<const dBasicBlock*>::dListNode* childNode = m_children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 		const dBasicBlock* const childBlock = childNode->GetInfo();
 		dCILInstrLabel* const label = childBlock->m_begin->GetInfo()->GetAsLabel();
-		dTrace(("%s ", label->GetArg0().m_label.GetStr()));
+		dTrace(("%s ", label->GetLabel().GetStr()));
 	}
 	dTrace(("\n"));
 
@@ -104,10 +104,10 @@ void dBasicBlock::Trace() const
 	for (iter.Begin(); iter; iter ++) {
 		const dBasicBlock& domBlock = *iter.GetKey();
 		dCILInstrLabel* const label = domBlock.m_begin->GetInfo()->GetAsLabel();
-		dTrace (("%s ", label->GetArg0().m_label.GetStr()));
+		dTrace (("%s ", label->GetLabel().GetStr()));
 	}
 	dTrace (("\n"));
-*/
+
 /*
 	dTrace(("   dominanceFrontier-> "));
 	for (dList<const dBasicBlock*>::dListNode* childFrontierNode = m_dominanceFrontier.GetFirst(); childFrontierNode; childFrontierNode = childFrontierNode->GetNext()) {
@@ -510,7 +510,7 @@ void dBasicBlocksGraph::BuildDominatorTree ()
 		//block.m_idom->Trace();
 	}
 
-//Trace();
+Trace();
 	// build dominator tree
 	m_dominatorTree = &GetFirst()->GetInfo();
 	for (dListNode* node = GetFirst()->GetNext(); node; node = node->GetNext()) {
