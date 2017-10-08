@@ -175,7 +175,6 @@ class dCILInstr
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) = 0;
 	
 	virtual void Serialize(char* const textOut) const;
 

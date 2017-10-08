@@ -145,7 +145,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 
 	dBasicBlocksGraph basicBlocks;
 	basicBlocks.Build(m_currentClosure->GetFirst());
-//basicBlocks.Trace();
+basicBlocks.Trace();
 
 	basicBlocks.ConvertToSSA();
 //basicBlocks.Trace();

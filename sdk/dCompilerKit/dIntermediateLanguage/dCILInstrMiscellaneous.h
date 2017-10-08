@@ -32,7 +32,6 @@ class dCILInstrNop: public dCILInstr
 
 	virtual int GetByteCodeSize() const { return 0; }
 	virtual dCILInstrNop* GetAsNop() { return this; }
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
@@ -65,7 +64,6 @@ class dCILInstrFunction: public dCILInstr
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 
 	virtual int GetByteCodeSize() const { return 0; }
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
@@ -91,7 +89,6 @@ class dCILInstrFunctionEnd : public dCILInstr
 
 	virtual int GetByteCodeSize() const { return 0; }
 	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return this; }
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }

@@ -51,7 +51,6 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	virtual bool ApplySemanticReordering ();
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }

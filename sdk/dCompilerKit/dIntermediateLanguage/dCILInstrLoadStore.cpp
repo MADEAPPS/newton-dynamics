@@ -75,18 +75,6 @@ void dCILInstrMove::AddDefinedVariable(dInstructionVariableDictionary& dictionar
 }
 
 
-bool dCILInstrMove::ApplyCopyPropagation (dCILInstrMove* const moveInst) 
-{ 
-	bool ret = false;
-	if (moveInst->m_arg0.m_label == m_arg1.m_label) {
-		ret = true;
-		m_arg1.m_label = moveInst->m_arg1.m_label;
-	}
-	
-	dAssert(ret);
-	return ret;
-}
-
 void dCILInstrMove::AddUsedVariable (dInstructionVariableDictionary& dictionary) const
 {
 	dAssert(0);
@@ -168,12 +156,12 @@ bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBloc
 	bool ret = false;
 	if (!((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat))) {
 		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
-Trace();
+//Trace();
 		if (node) {
 			dStatementBlockBucket::Iterator iter(node->GetInfo());
 			for (iter.Begin(); iter; iter++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-instrution->Trace();
+//instrution->Trace();
 				ret |= instrution->ReplaceArgument(m_arg0, m_arg1);
 				workList.Insert(instrution);
 			}
@@ -238,11 +226,6 @@ void dCILInstrStore::Serialize(char* const textOut) const
 	sprintf (textOut, "\t[%s %s] = %s %s\n", m_arg0.GetTypeName().GetStr(),  m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
 }
 
-bool dCILInstrStore::ApplyCopyPropagation (dCILInstrMove* const moveInst) 
-{ 
-	dAssert(0);  
-	return false; 
-}
 
 void dCILInstrStore::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
 {

@@ -117,8 +117,8 @@ void dBasicBlock::Trace() const
 		dCILInstrLabel* const label = childBlock->m_begin->GetInfo()->GetAsLabel();
 		dTrace(("%s ", label->GetArg0().m_label.GetStr()));
 	}
-	dTrace (("\n"));
 */
+	dTrace (("\n"));
 }
 
 bool dBasicBlock::ComparedDominator(const dTree<int, const dBasicBlock*>& newdominators) const
@@ -739,7 +739,7 @@ bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
 
 void dBasicBlocksGraph::InsertCommonSpillsSSA()
 {
-Trace();
+//Trace();
 	
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
 		dCILInstrArgument* const firstArg = node->GetInfo()->GetAsArgument();
@@ -747,20 +747,19 @@ Trace();
 			dCIL* const cil = firstArg->m_cil;
 			const dCILInstr::dArg& param = firstArg->GetArg0();
 			dCILInstr::dArg newArg(cil->NewTemp(), param.GetType());
-			dCILInstrMove* const moveInstr = new dCILInstrMove(*cil, newArg.m_label, newArg.GetType(), param.m_label, param.GetType());
-			moveInstr->m_basicBlock = firstArg->m_basicBlock;
-			cil->InsertAfter(firstArg->GetNode(), moveInstr->GetNode());
-			
 			for (dCIL::dListNode* node1 = node->GetNext(); node1 && !node1->GetInfo()->GetAsFunctionEnd(); node1 = node1->GetNext()) {
 				dCILInstr* const instruction = node1->GetInfo();
 				//instruction->Trace();
 				instruction->ReplaceArgument(param, newArg);
 				//instruction->Trace();
 			}
+			dCILInstrMove* const moveInstr = new dCILInstrMove(*cil, newArg.m_label, newArg.GetType(), param.m_label, param.GetType());
+			moveInstr->m_basicBlock = firstArg->m_basicBlock;
+			cil->InsertAfter(firstArg->GetNode(), moveInstr->GetNode());
 			break;
 		}
 	}
-Trace();
+//Trace();
 
 	bool hasCalls = false;
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
@@ -848,6 +847,7 @@ void dBasicBlocksGraph::RemovePhiFunctionsSSA()
 			}
 		}
 	}
+Trace();
 }
 
 
@@ -898,7 +898,7 @@ Trace();
 
 void dBasicBlocksGraph::OptimizeSSA()
 {
-//Trace();
+Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;

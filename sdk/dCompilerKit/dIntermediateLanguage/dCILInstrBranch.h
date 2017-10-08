@@ -29,7 +29,7 @@ class dCILInstrLabel: public dCILInstr
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {}
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
 	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) {return false;}
 	virtual bool IsBasicBlockBegin() const;
 
 	const dString& GetLabel() const;
@@ -67,7 +67,6 @@ class dCILInstrGoto: public dCILInstr
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
 
 	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) {return false;}
 
 	// ***********************
@@ -98,7 +97,6 @@ class dCILInstrConditional: public dCILTwoArgInstr
 
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { dAssert(0);  return false; }
 
 	const dString& GetTrueLabel() const;
 	const dString& GetFalseLabel() const;
@@ -137,8 +135,6 @@ class dCILInstrReturn: public dCILSingleArgInstr
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
 	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
-
 	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	// ***********************
@@ -163,7 +159,6 @@ class dCILInstrCall: public dCILTwoArgInstr
 
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	// ***********************

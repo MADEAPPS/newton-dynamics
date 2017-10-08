@@ -98,37 +98,6 @@ void dCILInstrIntergerLogical::AddUsedVariable (dInstructionVariableDictionary& 
 */
 }
 
-bool dCILInstrIntergerLogical::ApplyCopyPropagation(dCILInstrMove* const moveInst)
-{
-	bool ret = false;
-	if (moveInst->m_arg0.m_label == m_arg1.m_label) {
-		ret = true;
-		m_arg1.m_label = moveInst->m_arg1.m_label;
-	}
-
-	switch (m_arg2.GetType().m_intrinsicType) 
-	{
-		case m_int:
-		{
-		  	if (moveInst->m_arg0.m_label == m_arg2.m_label) {
-				ret = true;
-				m_arg2.m_label = moveInst->m_arg1.m_label;
-			}
-			break;
-		}
-
-		case m_constInt:
-			break;
-
-		default:
-			dAssert(0);
-	}
-
-	dAssert (ret);
-	return ret; 
-}
-
-
 
 void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
