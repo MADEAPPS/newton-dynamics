@@ -146,7 +146,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	basicBlocks.Build(m_currentClosure->GetFirst());
 basicBlocks.Trace();
 
-	FixUnitializedReturnVariable(basicBlocks);
+	FixUnitializedReturnVariable();
 basicBlocks.Trace();
 
 	basicBlocks.ConvertToSSA();
@@ -161,11 +161,21 @@ m_currentClosure->Trace();
 	m_currentClosure = m_currentClosure->m_parent;
 }
 
-void dNewtonLuaCompiler::FixUnitializedReturnVariable(dBasicBlocksGraph& blocks)
+void dNewtonLuaCompiler::FixUnitializedReturnVariable()
 {
-	dLiveInLiveOutSolver liveInLiveOut(&blocks);
-//	dStatementBlockDictionary usedVariablesList;
+	dCIL::dListNode* retNode = NULL; 
+	for (retNode = m_currentClosure->GetLast(); retNode && !retNode->GetInfo()->GetAsReturn(); retNode = retNode->GetPrev());
+	for (dCIL::dListNode* node = retNode->GetPrev(); node; node = node->GetPrev()) {
+		dCILInstr::dArg* const var = node->GetInfo()->GetGeneratedVariable();
+		if (var && var->m_label == m_currentClosure->m_returnVariable) {
+			return;
+		}
+	}
 
+	dCILInstrReturn* const retInstruction = retNode->GetInfo()->GetAsReturn();
+	dString temp (m_currentClosure->NewTemp());
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, retInstruction->GetArg0().m_label, retInstruction->GetArg0().GetType(), '0', dCILInstr::m_constInt);
+	m_currentClosure->InsertAfter (retNode->GetPrev(), move->GetNode());
 }
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBlockBeginning()
