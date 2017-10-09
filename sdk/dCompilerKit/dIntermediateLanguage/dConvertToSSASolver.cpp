@@ -215,9 +215,12 @@ void dConvertToSSASolver::Solve()
 
 					dAssert (sources.GetCount());
 					dCILInstrPhy* const phyInstruction = new dCILInstrPhy (*cil, name.m_label, name.GetType(), frontier, sources);
-					cil->InsertAfter(frontier->m_begin, phyInstruction->GetNode());
-//frontier->Trace();
-//m_graph->Trace();
+
+					dCIL::dListNode* phiNode = frontier->m_begin;
+					while (phiNode->GetNext()->GetInfo()->GetAsPhi()) {
+						phiNode = phiNode->GetNext();
+					}
+					cil->InsertAfter(phiNode, phyInstruction->GetNode());
 					wPhi.Insert(instruction, frontier);
 					if (!iter.GetNode()->GetInfo().Find(frontier)) {
 						w.Insert(instruction, frontier);

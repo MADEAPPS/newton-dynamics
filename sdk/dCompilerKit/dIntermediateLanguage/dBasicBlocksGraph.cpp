@@ -262,15 +262,25 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 {
 	dAssert (!GetCount());
 	m_begin = functionNode->GetNext();
+	dCIL* const cil = m_begin->GetInfo()->GetCil();
+//cil->Trace();
 	dAssert (m_begin->GetInfo()->GetAsLabel());
 	for (m_end = functionNode->GetNext(); !m_end->GetInfo()->GetAsFunctionEnd(); m_end = m_end->GetNext());
 
+	dCIL::dListNode* nextNode;
+	for (dCIL::dListNode* node = m_begin; node && !node->GetInfo()->GetAsFunctionEnd(); node = nextNode) {
+		nextNode = node->GetNext();
+		if (node->GetInfo()->GetAsNop()) {
+			delete node->GetInfo();
+		}
+	}
+
 	for (bool change = true; change; ) {
 		change = false;
-		for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+
+		for (dCIL::dListNode* node = m_begin; node && node != m_end; node = node->GetNext()) {
 			dCILInstr* const instruction = node->GetInfo();
 			if (instruction->GetAsGoto()) {
-				dCIL* const cil = m_begin->GetInfo()->GetCil();
 				while (!node->GetNext()->GetInfo()->GetAsLabel()) {
 					change = true;
 					cil->Remove(node->GetNext());
@@ -292,14 +302,23 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 		for (dCIL::dListNode* node = m_begin->GetNext(); node != m_end; node = node->GetNext()) {
 			dCILInstrLabel* const label = node->GetInfo()->GetAsLabel();
 			if (label && !filter.Find (label->GetLabel())) {
-				dCIL* const cil = m_begin->GetInfo()->GetCil();
-				while (!node->GetNext()->GetInfo()->GetAsLabel()) {
-					cil->Remove(node->GetNext());
+//label->Trace();
+				
+				if (node->GetPrev()->GetInfo()->GetAsLabel()) {
+					change = true;
+					dCIL::dListNode* const saveNode = node->GetPrev();
+					cil->Remove(node);
+					node = saveNode;
+
+				} else if (node->GetPrev()->GetInfo()->GetAsGoto()) {
+					while (!node->GetNext()->GetInfo()->GetAsLabel()) {
+						cil->Remove(node->GetNext());
+					}
+					change = true;
+					dCIL::dListNode* const saveNode = node->GetPrev();
+					cil->Remove(node);
+					node = saveNode;
 				}
-				change = true;
-				dCIL::dListNode* const saveNode = node->GetPrev();
-				cil->Remove(node);
-				node = saveNode;
 			}
 		}
 	}
@@ -847,53 +866,16 @@ void dBasicBlocksGraph::RemovePhiFunctionsSSA()
 			}
 		}
 	}
-Trace();
+//Trace();
 }
 
 
 void dBasicBlocksGraph::RegistersAllocations ()
 {
 	int regCount = 16;
-
-//Trace();
 	InsertCommonSpillsSSA();
 	RemovePhiFunctionsSSA();
-
-//Trace();
 	dRegisterInterferenceGraph interferenceGraph(this, regCount);
-Trace();
-	dAssert(0);
-/*
-	// remove all redundant newly generate extra jumps 
-	//RemoveRedundantJumps(functionNode);
-
-	// create float control for inteBlock optimization
-	dDataFlowGraph datFlowGraph (this, functionNode, returnType);
-
-	// apply all basic blocks peephole optimizations 
-	datFlowGraph.ApplyLocalOptimizations();
-
-	// do register allocation before removing dead jumps and nops
-	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
-
-	for (bool isDirty = true; isDirty; ) {
-		isDirty = false;
-		// remove all redundant newly generate extra jumps 
-		isDirty |= RemoveRedundantJumps(functionNode);
-//Trace();
-
-		// clean up all nop instruction added by the optimizer
-		isDirty |= RemoveNop(functionNode);
-//Trace();
-	}
-
-//	Trace();
-*/
-
-
-	//	dDataFlowGraph datFlowGraph (this, functionNode);
-	//	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
-
 }
 
 void dBasicBlocksGraph::OptimizeSSA()
