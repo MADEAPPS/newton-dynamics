@@ -427,7 +427,6 @@ void dBasicBlocksGraph::DeleteUnreachedBlocks()
 		}
 	}
 
-	dCIL* const cil = m_begin->GetInfo()->GetCil();
 	dBasicBlocksGraph::dListNode* nextBlockNode;
 	for (dBasicBlocksGraph::dListNode* blockNode = GetFirst(); blockNode; blockNode = nextBlockNode) {
 		dBasicBlock& block = blockNode->GetInfo();
