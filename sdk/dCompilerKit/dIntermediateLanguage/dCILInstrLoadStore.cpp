@@ -123,9 +123,11 @@ bool dCILInstrMove::ApplySimpleConstantPropagationSSA (dWorkList& workList, dSta
 			//ret = true;
 			dStatementBlockBucket::Iterator iter (node->GetInfo());
 			for (iter.Begin(); iter; iter ++) {
-				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-				ret |= instrution->ReplaceArgument (m_arg0, m_arg1);
-				workList.Insert(instrution);
+				dCILInstr* const instruction = iter.GetKey()->GetInfo();
+				if (!instruction->GetAsReturn()) {
+					ret |= instruction->ReplaceArgument(m_arg0, m_arg1);
+					workList.Insert(instruction);
+				}
 			}
 		}
 	}
@@ -160,10 +162,10 @@ bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBloc
 		if (node) {
 			dStatementBlockBucket::Iterator iter(node->GetInfo());
 			for (iter.Begin(); iter; iter++) {
-				dCILInstr* const instrution = iter.GetKey()->GetInfo();
-//instrution->Trace();
-				ret |= instrution->ReplaceArgument(m_arg0, m_arg1);
-				workList.Insert(instrution);
+				dCILInstr* const instruction = iter.GetKey()->GetInfo();
+//instruction->Trace();
+				ret |= instruction->ReplaceArgument(m_arg0, m_arg1);
+				workList.Insert(instruction);
 			}
 		}
 	}
