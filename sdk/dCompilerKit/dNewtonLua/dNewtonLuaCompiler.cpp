@@ -495,5 +495,6 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariabl
 	TRACE_INSTRUCTION(instruction);
 	TRACE_INSTRUCTION(gotoJump);
 	TRACE_INSTRUCTION(labelInstruction);
+m_currentClosure->GetFirst()->GetInfo()->GetCil()->Trace();
 	return dUserVariable();
 }

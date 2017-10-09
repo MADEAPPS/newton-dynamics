@@ -132,7 +132,11 @@ class dCILInstr
 
 
 	dCILInstr (dCIL& program);
+	dCILInstr(const dCILInstr& instruction);
+
 	virtual ~dCILInstr ();
+
+	virtual dCILInstr* clone(dCILInstr* const intruction) const { dAssert(0); return NULL;}
 
 	dCIL* GetCil() const { return m_cil; }
 	int GetUniqueID() const { return m_uniqueId; }

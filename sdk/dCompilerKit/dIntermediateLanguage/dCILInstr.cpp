@@ -90,12 +90,18 @@ dCILInstr::dCILInstr (dCIL& program)
 	m_myNode = program.Append (this);
 }
 
+dCILInstr::dCILInstr(const dCILInstr& instruction)
+{
+	dAssert(0);
+}
+
 dCILInstr::~dCILInstr ()
 {
 	if (m_myNode) {
 		m_cil->Remove(m_myNode);
 	}
 }
+
 
 
 dString dCILInstr::MakeSSAName(const dString& name, int ssaPostfix) const

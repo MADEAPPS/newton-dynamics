@@ -796,7 +796,7 @@ bool dRegisterInterferenceGraph::RemoveRedundantJumps ()
 				}
 				if (nextGotoNode->GetInfo()->GetAsGoto()) {
 					ret = true;
-					dCIL* const cil = stmt->GetCil();
+					//dCIL* const cil = stmt->GetCil();
 					for (dCIL::dListNode* node1 = node->GetNext(); !node1->GetInfo()->GetAsLabel(); node1 = node1->GetNext()) {
 						node1->GetInfo()->Nullify();
 					}
