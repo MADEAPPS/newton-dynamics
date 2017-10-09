@@ -262,7 +262,7 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 {
 	dAssert (!GetCount());
 	m_begin = functionNode->GetNext();
-	dCIL* const cil = m_begin->GetInfo()->GetCil();
+//	dCIL* const cil = m_begin->GetInfo()->GetCil();
 //cil->Trace();
 	dAssert (m_begin->GetInfo()->GetAsLabel());
 	for (m_end = functionNode->GetNext(); !m_end->GetInfo()->GetAsFunctionEnd(); m_end = m_end->GetNext());
@@ -283,7 +283,8 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 			if (instruction->GetAsGoto()) {
 				while (!node->GetNext()->GetInfo()->GetAsLabel()) {
 					change = true;
-					cil->Remove(node->GetNext());
+					//cil->Remove(node->GetNext());
+					delete node->GetNext()->GetInfo();
 				}
 			}
 		}
@@ -307,16 +308,19 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 				if (node->GetPrev()->GetInfo()->GetAsLabel()) {
 					change = true;
 					dCIL::dListNode* const saveNode = node->GetPrev();
-					cil->Remove(node);
+					//cil->Remove(node);
+					delete (node->GetInfo());
 					node = saveNode;
 
 				} else if (node->GetPrev()->GetInfo()->GetAsGoto()) {
 					while (!node->GetNext()->GetInfo()->GetAsLabel()) {
-						cil->Remove(node->GetNext());
+						//cil->Remove(node->GetNext());
+						delete (node->GetNext()->GetInfo());
 					}
 					change = true;
 					dCIL::dListNode* const saveNode = node->GetPrev();
-					cil->Remove(node);
+					//cil->Remove(node);
+					delete (node->GetInfo());
 					node = saveNode;
 				}
 			}
@@ -434,7 +438,8 @@ void dBasicBlocksGraph::DeleteUnreachedBlocks()
 			for (dCIL::dListNode* node = block.m_begin; !terminate; node = nextNode) {
 				terminate = (node == block.m_end);
 				nextNode = node->GetNext();
-				cil->Remove(node);
+				//cil->Remove(node);
+				delete (node->GetInfo());
 			}
 			Remove(blockNode);
 		}

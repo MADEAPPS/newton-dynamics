@@ -31,6 +31,7 @@
 #include "dNewtonLuaCompiler.h"
 %}
 
+
 %union 
 {
 	class dUserVariable: public dDefualtUserVariable

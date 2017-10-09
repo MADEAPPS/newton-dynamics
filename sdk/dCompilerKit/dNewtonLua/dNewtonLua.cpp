@@ -25,7 +25,13 @@
 #include <crtdbg.h>
 #endif
 
-void *operator new(size_t s) 
+//#define D_TRACK_ALLOCATIONS
+
+#ifdef D_TRACK_ALLOCATIONS
+static int memoryIndex = 0;
+#endif
+
+void *operator new(size_t size) 
 {
 	static int installmemmoryLeaksTracker = 1;
 	if (installmemmoryLeaksTracker) {
@@ -34,19 +40,29 @@ void *operator new(size_t s)
 			_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 		#endif
 	}
-	void* const mem = malloc (s);
-//	unsigned long xxx = unsigned long (mem);
-//	if (((xxx & 0xffff) == 0x8598) && (s == 16))
-//		dAssert(0);
-	return mem;
+
+#ifdef D_TRACK_ALLOCATIONS
+	char* const ptr = (char*) malloc(size + 8);
+	int* const trackAlloc = (int*)ptr;
+	trackAlloc[0] = memoryIndex;
+	dTrace(("%d %x\n", memoryIndex, ptr));
+	memoryIndex++;
+	return &ptr[8];
+#else
+	char* const ptr = (char*) malloc(size);
+	return ptr;
+#endif
 }
 
 void operator delete (void* ptr) 
 {
-//	unsigned long xxx = unsigned long (ptr);
-//	if (((xxx & 0xffff) == 0x3DF0))
-//		dAssert(0);
-	free (ptr);
+#ifdef D_TRACK_ALLOCATIONS
+	char* const pointerPtr = ((char*)ptr) - 8;
+	//int* const trackAlloc = (int*)pointerPtr;
+	free(pointerPtr);
+#else
+	free(ptr);
+#endif
 }
 
 int _tmain(int argc, _TCHAR* argv[])

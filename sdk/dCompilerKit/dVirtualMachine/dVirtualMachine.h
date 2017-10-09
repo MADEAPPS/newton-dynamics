@@ -31,7 +31,7 @@
 
 
 #define D_OPCODE_FIELD					7
-#define D_REGISTER_SET_FIELD			3
+#define D_REGISTER_SET_FIELD			4
 
 #define D_REGISTER_SYMBOL				"%r"
 #define D_SPILL_REGISTER_SYMBOL			"spilled"

@@ -140,7 +140,7 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	TRACE_INSTRUCTION(label);
 	TRACE_INSTRUCTION(ret);
 	TRACE_INSTRUCTION(functionEnd);
-//m_currentClosure->Trace();
+m_currentClosure->Trace();
 
 	dBasicBlocksGraph basicBlocks;
 	basicBlocks.Build(m_currentClosure->GetFirst());

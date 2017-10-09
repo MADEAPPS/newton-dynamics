@@ -74,7 +74,7 @@ class dNewtonLuaParcer
 	{
 		public:
 		dDefualtUserVariable () 
-			:m_scannerLine (0), m_scannerIndex(0), m_token (dToken (0)), m_data("")
+			:m_scannerLine (0), m_scannerIndex(0), m_token (dToken (0)), m_data()
 		{
 		}
 
@@ -107,12 +107,10 @@ class dNewtonLuaParcer
 			return m_data;
 		}
 
-		//protected:
 		int m_scannerLine;
 		int m_scannerIndex;
 		dToken m_token;
 		dString m_data;
-		//friend dNewtonLuaParcer;
 	};
 
 
