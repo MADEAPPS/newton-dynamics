@@ -157,6 +157,7 @@ void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrL
 	} else {
 		m_targetNode1 = NULL;
 	}
+	SetLabels (target0->GetLabel(), target1->GetLabel());
 }
 
 dList<dCILInstr*>::dListNode* dCILInstrConditional::GetTrueTarget () const

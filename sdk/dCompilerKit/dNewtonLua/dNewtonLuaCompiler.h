@@ -54,8 +54,6 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 	};
 
 	void CloseFunctionDeclaration();
-
-
 	dUserVariable EmitBlockBeginning();
 
 	dUserVariable EmitLabel();
@@ -72,6 +70,7 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 	dUserVariable EmitBinaryExpression(const dUserVariable& arg0, const dUserVariable& binaryOperator, const dUserVariable& arg1);
 	dUserVariable EmitFor(const dUserVariable& iterName, const dUserVariable& startLoopLabel, const dUserVariable& testExpression, const dUserVariable& stepExpression, const dUserVariable& block);
 
+	void FixUnitializedReturnVariable(dBasicBlocksGraph& blocks);
 
 	dLuaClosure m_closures;
 	dLuaClosure* m_currentClosure;

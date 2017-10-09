@@ -39,10 +39,9 @@ void dNewtonLuaCompiler::dLuaClosure::RemoveAll()
 dNewtonLuaCompiler::dLuaClosure* dNewtonLuaCompiler::dLuaClosure::AddClosure(dLuaClosure* const parent)
 {
 	dNewtonLuaCompiler::dLuaClosure* const closureNode = &m_children.Append()->GetInfo();
-	closureNode->m_parent = this;
+	closureNode->m_parent = parent;
 	return closureNode;
 }
-
 
 dNewtonLuaCompiler::dNewtonLuaCompiler()
 	:dNewtonLuaParcer()
@@ -113,6 +112,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionDeclaration(co
 void dNewtonLuaCompiler::CloseFunctionDeclaration()
 {
 	dLuaClosure::dListNode* const funtionNode = m_currentClosure->GetFirst();
+
 	dLuaClosure::dListNode* const labelNode = funtionNode->GetNext();
 	dAssert (labelNode->GetInfo()->GetAsLabel());
 
@@ -123,7 +123,6 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 		m_currentClosure->InsertAfter(labelNode, localVariable->GetNode());
 		TRACE_INSTRUCTION(localVariable);
 	}
-
 
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
 	dCILInstrLabel* const label = new dCILInstrLabel(*m_currentClosure, m_currentClosure->m_returnLabel);
@@ -147,6 +146,9 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	basicBlocks.Build(m_currentClosure->GetFirst());
 basicBlocks.Trace();
 
+	FixUnitializedReturnVariable(basicBlocks);
+basicBlocks.Trace();
+
 	basicBlocks.ConvertToSSA();
 //basicBlocks.Trace();
 
@@ -154,8 +156,16 @@ basicBlocks.Trace();
 //basicBlocks.Trace();
 
 	basicBlocks.RegistersAllocations();
+m_currentClosure->Trace();
 //basicBlocks.Trace();
 	m_currentClosure = m_currentClosure->m_parent;
+}
+
+void dNewtonLuaCompiler::FixUnitializedReturnVariable(dBasicBlocksGraph& blocks)
+{
+	dLiveInLiveOutSolver liveInLiveOut(&blocks);
+//	dStatementBlockDictionary usedVariablesList;
+
 }
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitBlockBeginning()

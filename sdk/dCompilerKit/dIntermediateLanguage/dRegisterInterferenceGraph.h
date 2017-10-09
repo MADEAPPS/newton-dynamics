@@ -76,7 +76,6 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 			:m_useCount(0)
 			,m_loopUseCount(0)
 		{
-
 		}
 
 		int m_useCount;
@@ -87,13 +86,15 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	dString GetRegisterName(const dString& varName) const;
 
 	private:
-	int ColorGraph();
-	void AllocateRegisters();
-	dTreeNode* GetBestNode(int& edgeCount);
-	int GetRegisterIndex(const dString& varName) const;
-	bool IsSpilledVariable (const dString& name) const;
 	void Build();
+	int ColorGraph();
+	bool RemoveNop();
+	void AllocateRegisters();
+	bool RemoveRedundantJumps ();
 	void ApplyDeadCodeElimination();
+//	dTreeNode* GetBestNode(int& edgeCount);
+	int GetRegisterIndex(const dString& varName) const;
+	bool IsSpilledVariable(const dString& name) const;
 
 	dBasicBlocksGraph* m_graph;
 };

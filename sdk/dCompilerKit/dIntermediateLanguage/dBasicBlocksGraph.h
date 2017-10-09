@@ -206,9 +206,9 @@ class dBasicBlocksGraph: public dBasicBlocksList
 	void BuildReverseOrderBlockList (dList<const dBasicBlock*>& reverseOrder);
 
 	private:
-	void RemovePhiFunctionsSSA ();
-	bool ApplyCopyPropagationSSA();
 	void InsertCommonSpillsSSA();
+	void RemovePhiFunctionsSSA();
+	bool ApplyCopyPropagationSSA();
 	bool ApplyDeadCodeEliminationSSA();
 	bool ApplySimpleConstantPropagationSSA();
 	bool ApplyConditionalConstantPropagationSSA();
