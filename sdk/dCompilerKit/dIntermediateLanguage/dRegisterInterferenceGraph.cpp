@@ -646,49 +646,51 @@ bool dRegisterInterferenceGraph::RemoveRedundantJumps ()
 
 	// create jump and label workList;
 	dTree<int, dCIL::dListNode*> jumpWorkList;
-	for (dCIL::dListNode* node = m_graph->m_begin; node && !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+	for (dCIL::dListNode* node = m_graph->m_begin->GetNext(); node && !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsIF() || instr->GetAsLabel() || instr->GetAsGoto()) {
 			jumpWorkList.Insert(0, node);
 		}
 	}
 
-m_graph->m_begin->GetInfo()->GetCil()->Trace();
+//m_graph->m_begin->GetInfo()->GetCil()->Trace();
+
+	dTree<int, dCIL::dListNode*>::Iterator iter(jumpWorkList);
+
 	// remove redundant adjacent labels
-	dTree<int, dCIL::dListNode*>::Iterator iter (jumpWorkList);
-	for (iter.Begin(); iter; iter ++) {
-		dCIL::dListNode* const node = iter.GetKey();
-		const dCILInstrLabel* const stmt = node->GetInfo()->GetAsLabel();
+	for (iter.Begin(); iter; iter++) {
+		dCIL::dListNode* const labelNode = iter.GetKey();
+		const dCILInstrLabel* const stmt = labelNode->GetInfo()->GetAsLabel();
 		if (stmt) {
 //stmt->Trace();
-			dCIL::dListNode* const labelNode = node->GetNext();
-			if (labelNode && labelNode->GetInfo()->GetAsLabel()) {
-				//const dCILInstrLabel* const nextLabel = labelNode->GetAsLabel();
-				dAssert (0);
-/*
-				dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
-				for (iter1.Begin(); iter1; iter1 ++) {
+			dCIL::dListNode* nextNode = labelNode->GetNext();
+			while (nextNode && nextNode->GetInfo()->GetAsNop()) {
+				nextNode = nextNode->GetNext();
+			}
+
+			if (nextNode->GetInfo()->GetAsLabel()) {
+//nextNode->GetInfo()->Trace();
+				dTree<int, dCIL::dListNode*>::Iterator iter1(jumpWorkList);
+				for (iter1.Begin(); iter1; iter1++) {
 					dCIL::dListNode* const node1 = iter1.GetKey();
-					dThreeAdressStmt& stmt1 = node1->GetInfo();
-					if (stmt1.m_instruction == dThreeAdressStmt::m_goto) {
-						dAssert (0);
-//						if (stmt1.m_jmpTarget == labelNode)	{
-//							stmt1.m_jmpTarget = node;
-//							stmt1.m_arg0.m_label = stmt.m_arg0.m_label;
-//						}
-					} else if (stmt1.m_instruction == dThreeAdressStmt::m_if) { 
-						dAssert (0);
-//						if (stmt1.m_jmpTarget == labelNode)	{
-//							stmt1.m_jmpTarget = node;	
-//							stmt1.m_arg2.m_label = stmt.m_arg0.m_label;
-//						}
+					dCILInstrGoto* const gotoInstru = node1->GetInfo()->GetAsGoto();
+					if (gotoInstru) {
+						if (gotoInstru->GetTarget() == nextNode) {
+							ret = true;
+							gotoInstru->Trace();
+							gotoInstru->SetTarget(labelNode->GetInfo()->GetAsLabel());
+						}
+					}
+					dCILInstrConditional* const ifInstru = node1->GetInfo()->GetAsIF();
+					if (ifInstru) {
+						if (ifInstru->GetTrueTarget() == nextNode) {
+							ret = true;
+							//ifInstru->Trace();
+							ifInstru->SetTargets(labelNode->GetInfo()->GetAsLabel(), ifInstru->GetFalseTarget()->GetInfo()->GetAsLabel());
+							//ifInstru->Trace();
+						}
 					}
 				}
-				ret = true;
-				dAssert (0);
-				//m_cil->Remove(labelNode);
-				//jumpMap.Remove(labelNode);
-*/
 			}
 		}
 	}
@@ -705,15 +707,15 @@ m_graph->m_begin->GetInfo()->GetCil()->Trace();
 			dCIL::dListNode* const targetNode = jumpWorkList.Find (stmt->GetTarget())->GetKey();
 			dCILInstr* stmt1 = targetNode->GetInfo();
 //stmt1->Trace();
-			dCIL::dListNode* nextGotoNode = targetNode->GetNext();
-			while (nextGotoNode->GetInfo()->GetAsNop()) {
-				nextGotoNode = nextGotoNode->GetNext();
+			dCIL::dListNode* nextNode = targetNode->GetNext();
+			while (nextNode && nextNode->GetInfo()->GetAsNop()) {
+				nextNode = nextNode->GetNext();
 			}
 
-			if (stmt1->GetAsLabel() && nextGotoNode->GetInfo()->GetAsGoto()) {
+			if (stmt1->GetAsLabel() && nextNode->GetInfo()->GetAsGoto()) {
 				dAssert (0);
 /*
-				const dThreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
+				const dThreeAdressStmt& stmt2 = nextNode->GetInfo();
 				stmt.m_arg0.m_label = stmt2.m_arg0.m_label;
 				stmt.m_trueTargetJump = stmt2.m_trueTargetJump;
 				ret = true;
@@ -726,13 +728,13 @@ m_graph->m_begin->GetInfo()->GetCil()->Trace();
 			dCIL::dListNode* const targetNode = jumpWorkList.Find (stmt->GetTrueTarget())->GetKey();
 			dCILInstr* stmt1 = targetNode->GetInfo();
 //stmt1->Trace();
-			dCIL::dListNode* nextGotoNode = targetNode->GetNext();
-			while (nextGotoNode->GetInfo()->GetAsNop()) {
-				nextGotoNode = nextGotoNode->GetNext();
+			dCIL::dListNode* nextNode = targetNode->GetNext();
+			while (nextNode && nextNode->GetInfo()->GetAsNop()) {
+				nextNode = nextNode->GetNext();
 			}
 
-			if (stmt1->GetAsLabel() && nextGotoNode->GetInfo()->GetAsGoto()) {
-				dCILInstrGoto* const gotoInstruct = nextGotoNode->GetInfo()->GetAsGoto();
+			if (stmt1->GetAsLabel() && nextNode->GetInfo()->GetAsGoto()) {
+				dCILInstrGoto* const gotoInstruct = nextNode->GetInfo()->GetAsGoto();
 				stmt->SetTargets (gotoInstruct->GetTarget()->GetInfo()->GetAsLabel(), stmt->GetFalseTarget()->GetInfo()->GetAsLabel());
 //stmt->Trace();
 				ret = true;
@@ -747,14 +749,14 @@ m_graph->m_begin->GetInfo()->GetCil()->Trace();
 		dCILInstrGoto* const stmt = node->GetInfo()->GetAsGoto();
 		if (stmt) {
 //stmt->Trace();
-			dCIL::dListNode* nextGotoNode = node->GetNext();
-			while (nextGotoNode->GetInfo()->GetAsNop()) {
-				nextGotoNode = nextGotoNode->GetNext();
+			dCIL::dListNode* nextNode = node->GetNext();
+			while (nextNode && nextNode->GetInfo()->GetAsNop()) {
+				nextNode = nextNode->GetNext();
 			}
 
-			if (nextGotoNode->GetInfo()->GetAsLabel()) {
-				if (stmt->GetLabel() == nextGotoNode->GetInfo()->GetAsLabel()->GetLabel()) {
-//nextGotoNode->GetInfo()->Trace();
+			if (nextNode->GetInfo()->GetAsLabel()) {
+				if (stmt->GetLabel() == nextNode->GetInfo()->GetAsLabel()->GetLabel()) {
+//nextNode->GetInfo()->Trace();
 					ret = true;
 					stmt->Nullify();
 				}
@@ -766,8 +768,8 @@ m_graph->m_begin->GetInfo()->GetCil()->Trace();
 
 	// delete unreachable labels
 	for (iter.Begin(); iter; ) {
-		dCIL::dListNode* const node = iter.GetKey();
-		const dCILInstrLabel* const stmt = node->GetInfo()->GetAsLabel();
+		dCIL::dListNode* const labelNode = iter.GetKey();
+		const dCILInstrLabel* const stmt = labelNode->GetInfo()->GetAsLabel();
 		iter++;
 
 		if (stmt) {
@@ -777,33 +779,24 @@ m_graph->m_begin->GetInfo()->GetCil()->Trace();
 				dCIL::dListNode* const node1 = iter1.GetKey();
 				dCILInstrGoto* const gotoInstru = node1->GetInfo()->GetAsGoto();
 				if (gotoInstru){
-					if (gotoInstru->GetTarget() == node) {
+					if (gotoInstru->GetTarget() == labelNode) {
 						isReferenced = true;
 						break;
 					}
 				} 
 				dCILInstrConditional* const ifInstru = node1->GetInfo()->GetAsIF();
 				if (ifInstru) {
-					if (ifInstru->GetTrueTarget() == node) {
+					if ((ifInstru->GetTrueTarget() == labelNode) || (ifInstru->GetFalseTarget() == labelNode)) {
 						isReferenced = true;
 						break;
 					}
 				}
 			}
 			if (!isReferenced) {
-				dCIL::dListNode* nextGotoNode = node->GetPrev();
-				while (nextGotoNode->GetInfo()->GetAsNop()) {
-					nextGotoNode = nextGotoNode->GetPrev();
-				}
-				if (nextGotoNode->GetInfo()->GetAsGoto()) {
-					ret = true;
-					//dCIL* const cil = stmt->GetCil();
-					for (dCIL::dListNode* node1 = node->GetNext(); !node1->GetInfo()->GetAsLabel(); node1 = node1->GetNext()) {
-						node1->GetInfo()->Nullify();
-					}
-					jumpWorkList.Remove (node);
-					node->GetInfo()->Nullify();
-				}
+				//stmt->Trace();
+				//m_graph->m_begin->GetInfo()->GetCil()->Trace();
+				labelNode->GetInfo()->Nullify();
+				//m_graph->m_begin->GetInfo()->GetCil()->Trace();
 			}
 		}
 	}
