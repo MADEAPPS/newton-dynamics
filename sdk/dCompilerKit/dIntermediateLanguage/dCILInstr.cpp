@@ -87,12 +87,17 @@ dCILInstr::dCILInstr (dCIL& program)
 	,m_byteCodeOffset(0)
 	,m_uniqueId(program.GetInstructionUniqurID())
 {
-	m_myNode = program.Append (this);
+	m_myNode = m_cil->Append (this);
 }
 
 dCILInstr::dCILInstr(const dCILInstr& instruction)
+	:m_cil(instruction.m_cil)
+	,m_basicBlock(instruction.m_basicBlock)
+	,m_myNode(NULL)
+	,m_byteCodeOffset(instruction.m_byteCodeOffset)
+	,m_uniqueId(m_cil->GetInstructionUniqurID())
 {
-	dAssert(0);
+	m_myNode = m_cil->Append (this);
 }
 
 dCILInstr::~dCILInstr ()

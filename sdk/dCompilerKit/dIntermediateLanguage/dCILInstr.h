@@ -132,11 +132,11 @@ class dCILInstr
 
 
 	dCILInstr (dCIL& program);
-	dCILInstr(const dCILInstr& instruction);
+	dCILInstr(const dCILInstr& copy);
 
 	virtual ~dCILInstr ();
 
-	virtual dCILInstr* clone(dCILInstr* const intruction) const { dAssert(0); return NULL;}
+	virtual dCILInstr* Clone() const { dAssert(0); return NULL;}
 
 	dCIL* GetCil() const { return m_cil; }
 	int GetUniqueID() const { return m_uniqueId; }
@@ -221,6 +221,12 @@ class dCILInstr
 class dCILSingleArgInstr: public dCILInstr
 {
 	public:
+	dCILSingleArgInstr(const dCILSingleArgInstr& copy)
+		:dCILInstr(copy)
+		,m_arg0(copy.m_arg0)
+	{
+	}
+
 	dCILSingleArgInstr (dCIL& program, const dArg &arg)
 		:dCILInstr (program)
 		,m_arg0(arg)
@@ -249,6 +255,12 @@ class dCILSingleArgInstr: public dCILInstr
 class dCILTwoArgInstr: public dCILSingleArgInstr
 {
 	public:
+	dCILTwoArgInstr (const dCILTwoArgInstr& copy)
+		:dCILSingleArgInstr(copy)
+		,m_arg1(copy.m_arg1)
+	{
+	}
+
 	dCILTwoArgInstr (dCIL& program, const dArg& arg0, const dArg& arg1)
 		:dCILSingleArgInstr (program, arg0)
 		,m_arg1(arg1)
@@ -270,6 +282,12 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 class dCILThreeArgInstr: public dCILTwoArgInstr
 {
 	public:
+	dCILThreeArgInstr(const dCILThreeArgInstr& copy)
+		:dCILTwoArgInstr(copy)
+		,m_arg2(copy.m_arg2)
+	{
+	}
+
 	dCILThreeArgInstr (dCIL& program, const dArg& arg0, const dArg& arg1, const dArg& arg2)
 		:dCILTwoArgInstr (program, arg0, arg1)
 		,m_arg2(arg2)

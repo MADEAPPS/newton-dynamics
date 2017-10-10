@@ -60,6 +60,12 @@ dCILInstrMove::dCILInstrMove (dCIL& program, const dString& name0, const dArgTyp
 {
 }
 
+dCILInstrMove::dCILInstrMove (const dCILInstrMove& copy)
+	:dCILTwoArgInstr (copy)
+{
+}
+
+
 void dCILInstrMove::Serialize(char* const textOut) const
 {
 	sprintf(textOut, "\t%s %s = %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());

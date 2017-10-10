@@ -150,7 +150,7 @@ basicBlocks.Trace();
 basicBlocks.Trace();
 
 	basicBlocks.ConvertToSSA();
-//basicBlocks.Trace();
+basicBlocks.Trace();
 
 	basicBlocks.OptimizeSSA();
 //basicBlocks.Trace();
@@ -483,18 +483,28 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariabl
 	const dCILInstr::dArg& arg0 = arg0Instruction->GetArg0();
 	const dCILInstr::dArg& testArg = testInstruction->GetArg0();
 
+//m_currentClosure->GetFirst()->GetInfo()->GetCil()->Trace();
 	dCILInstrIntergerLogical* const instruction = new dCILInstrIntergerLogical(*m_currentClosure, dCILInstr::m_add, arg0.m_label, arg0.GetType(), arg0.m_label, arg0.GetType(), dString("1"), dCILInstr::dArgType(dCILInstr::m_constInt));
-	dCILInstrGoto* const gotoJump = new dCILInstrGoto(*m_currentClosure, startLoopLabel.m_nodeList.GetFirst()->GetInfo()->GetInfo()->GetAsLabel());
 
-	dString label(m_currentClosure->NewLabel());
-	dCILInstrLabel* const labelInstruction = new dCILInstrLabel(*m_currentClosure, label);
-	dCILInstrConditional* const conditional = new dCILInstrConditional(*m_currentClosure, dCILInstr::m_greatherEqual, arg0.m_label, arg0.GetType(), testArg.m_label, testArg.GetType(), labelInstruction, blockStartInstruction);
-	m_currentClosure->InsertAfter(testInstruction->GetNode(), conditional->GetNode());
+	// make a for loop to a do loop
+	dCIL::dListNode* const loopstartNode = startLoopLabel.m_nodeList.GetFirst()->GetInfo();
+	for (dCIL::dListNode* node = loopstartNode->GetNext()->GetInfo()->GetNode(); node != blockStartInstruction->GetNode(); node = node->GetNext()) {
+		dCILInstr* const loopInstruction = node->GetInfo();
+		dCILInstr* const copyLoop = loopInstruction->Clone();
+		TRACE_INSTRUCTION(copyLoop);
+	}
+	dString exitLoopLabel(m_currentClosure->NewLabel());
+	dCILInstrLabel* const exitLabelInstruction = new dCILInstrLabel(*m_currentClosure, exitLoopLabel);
+	dCILInstrConditional* const loopConditional = new dCILInstrConditional(*m_currentClosure, dCILInstr::m_less, arg0.m_label, arg0.GetType(), testArg.m_label, testArg.GetType(), blockStartInstruction, exitLabelInstruction);
+	m_currentClosure->InsertAfter(exitLabelInstruction->GetNode()->GetPrev(), loopConditional->GetNode());
 
-	TRACE_INSTRUCTION(conditional);
-	TRACE_INSTRUCTION(instruction);
-	TRACE_INSTRUCTION(gotoJump);
-	TRACE_INSTRUCTION(labelInstruction);
+	dCILInstrConditional* const loopBeginConditional = new dCILInstrConditional(*m_currentClosure, dCILInstr::m_greatherEqual, arg0.m_label, arg0.GetType(), testArg.m_label, testArg.GetType(), exitLabelInstruction, blockStartInstruction);
+	m_currentClosure->InsertAfter(testInstruction->GetNode(), loopBeginConditional->GetNode());
+
+	TRACE_INSTRUCTION(loopBeginConditional);
+	TRACE_INSTRUCTION(loopConditional);
+	TRACE_INSTRUCTION(exitLabelInstruction);
+
 m_currentClosure->GetFirst()->GetInfo()->GetCil()->Trace();
 	return dUserVariable();
 }

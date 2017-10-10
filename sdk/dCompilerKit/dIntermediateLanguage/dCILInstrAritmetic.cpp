@@ -24,6 +24,12 @@ dCILInstrIntergerLogical::dCILInstrIntergerLogical (dCIL& program, dOperator ope
 {
 }
 
+dCILInstrIntergerLogical::dCILInstrIntergerLogical(const dCILInstrIntergerLogical& copy)
+	:dCILInstrThreeArgArithmetic(copy)
+	,m_operator(copy.m_operator)
+{
+}
+
 void dCILInstrIntergerLogical::Serialize(char* const textOut) const
 {
 	const char* const assignOperator = GetOperatorString(m_operator);

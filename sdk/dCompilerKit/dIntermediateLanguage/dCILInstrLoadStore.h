@@ -55,8 +55,10 @@ class dCILInstrLocal: public dCILSingleArgInstr
 class dCILInstrMove: public dCILTwoArgInstr
 {
 	public:
+	dCILInstrMove (const dCILInstrMove& copy);
 	dCILInstrMove (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1);
-	
+	virtual dCILInstr* Clone() const { return new dCILInstrMove (*this);}
+
 	void Serialize(char* const textOut) const;
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
