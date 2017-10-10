@@ -153,7 +153,7 @@ basicBlocks.Trace();
 basicBlocks.Trace();
 
 	basicBlocks.OptimizeSSA();
-//basicBlocks.Trace();
+basicBlocks.Trace();
 
 	basicBlocks.RegistersAllocations();
 m_currentClosure->Trace();
@@ -505,6 +505,6 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFor(const dUserVariabl
 	TRACE_INSTRUCTION(loopConditional);
 	TRACE_INSTRUCTION(exitLabelInstruction);
 
-m_currentClosure->GetFirst()->GetInfo()->GetCil()->Trace();
+//m_currentClosure->GetFirst()->GetInfo()->GetCil()->Trace();
 	return dUserVariable();
 }

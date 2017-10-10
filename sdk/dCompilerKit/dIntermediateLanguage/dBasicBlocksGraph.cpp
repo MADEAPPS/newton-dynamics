@@ -884,18 +884,18 @@ void dBasicBlocksGraph::RegistersAllocations ()
 
 void dBasicBlocksGraph::OptimizeSSA()
 {
-Trace();
+//Trace();
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
 		actionFound |= ApplySimpleConstantPropagationSSA();
-Trace();
+//Trace();
 //		actionFound |= ApplyConditionalConstantPropagationSSA();
 //Trace();
 		actionFound |= ApplyCopyPropagationSSA();
-Trace();
+//Trace();
 		actionFound |= ApplyDeadCodeEliminationSSA();
-Trace();
+//Trace();
 	}
 	dAssert (!actionFound);
 }

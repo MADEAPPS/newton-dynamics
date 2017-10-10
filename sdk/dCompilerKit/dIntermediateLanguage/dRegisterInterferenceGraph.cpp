@@ -653,6 +653,7 @@ bool dRegisterInterferenceGraph::RemoveRedundantJumps ()
 		}
 	}
 
+m_graph->m_begin->GetInfo()->GetCil()->Trace();
 	// remove redundant adjacent labels
 	dTree<int, dCIL::dListNode*>::Iterator iter (jumpWorkList);
 	for (iter.Begin(); iter; iter ++) {
