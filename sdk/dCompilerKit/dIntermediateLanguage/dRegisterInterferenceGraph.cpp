@@ -18,6 +18,7 @@
 #include "dRegisterInterferenceGraph.h"
 
 
+#define D_TRACE_INTERFIRANCE_GRAPH
 
 bool dRegisterInterferenceGraph::IsSpilledVariable (const dString& name) const
 {
@@ -392,7 +393,7 @@ void dRegisterInterferenceGraph::Build()
 	}
 
 
-#if 0
+#ifdef D_TRACE_INTERFIRANCE_GRAPH
 	dRegisterInterferenceGraph::Iterator debugIter(*this);
 	for (debugIter.Begin(); debugIter; debugIter++) {
 		const dString& key = debugIter.GetKey();
@@ -555,16 +556,19 @@ void dRegisterInterferenceGraph::Build()
 					dRegisterInterferenceNodeEdge edgeBA(varAnodeNode);
 					varAnode.m_interferanceEdge.Append(edgeAB);
 					varBnode.m_interferanceEdge.Append(edgeBA);
-					//dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
+#ifdef D_TRACE_INTERFIRANCE_GRAPH
+					dTrace(("%s  %s\n", varA.GetStr(), varB.GetStr()));
+#endif
 					dAssert((varAnode.m_registerIndex == -1) || (varBnode.m_registerIndex == -1) || (varAnode.m_registerIndex != varBnode.m_registerIndex));
 				}
 			}
 		}
 	}
 
-/*
 // remember implement register coalescing 
-//m_graph->Trace();
+m_graph->Trace();
+
+/*
 	for (dLiveInLiveOutSolver::dListNode* node = liveInLiveOut.GetFirst(); node; node = node->GetNext()) {
 		dFlowGraphNode& point = node->GetInfo();
 		dCILInstr* const instr = point.m_instruction;
