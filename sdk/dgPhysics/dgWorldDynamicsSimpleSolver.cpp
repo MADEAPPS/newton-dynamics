@@ -665,11 +665,11 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 	dgFloat32 z0[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 d0[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 p0[DG_CONSTRAINT_MAX_ROWS];
-	
 	dgFloat32 invM[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 low[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 high[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 cacheForce[DG_CONSTRAINT_MAX_ROWS + 4];
+	dgInt32 activeRows[DG_CONSTRAINT_MAX_ROWS];
 
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;
@@ -681,7 +681,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 	dgFloat32* const normalForce = &cacheForce[4];
 
 	const dgInt32 index = jointInfo->m_pairStart;
-	const dgInt32 rowsCount = jointInfo->m_pairCount;
+	dgInt32 rowsCount = jointInfo->m_pairCount;
 
 	dgAssert(rowsCount <= DG_CONSTRAINT_MAX_ROWS);
 
@@ -710,6 +710,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 		angularM0 += row->m_Jt.m_jacobianM0.m_angular * force;
 		linearM1 += row->m_Jt.m_jacobianM1.m_linear * force;
 		angularM1 += row->m_Jt.m_jacobianM1.m_angular * force;
+
+		activeRows[i] = i;
 	}
 
 	for (dgInt32 i = 0; i < rowsCount; i++) {
@@ -727,13 +729,13 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 	}
 
 	for (dgInt32 k = 0; k < 10; k++) {
-
 		dgVector linearForce0(dgVector::m_zero);
 		dgVector angularForce0(dgVector::m_zero);
 		dgVector linearForce1(dgVector::m_zero);
 		dgVector angularForce1(dgVector::m_zero);
 
-		for (dgInt32 i = 0; i < rowsCount; i++) {
+		for (dgInt32 j = 0; j < rowsCount; j++) {
+			const dgInt32 i = activeRows[j];
 			const dgJacobianMatrixElement* const row = &matrixRow[index + i];
 
 			dgVector force(p0[i]);
@@ -745,7 +747,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 
 		dgFloat32 den = dgFloat32(0.0f);
 		dgFloat32 num = dgFloat32(0.0f);
-		for (dgInt32 i = 0; i < rowsCount; i++) {
+		for (dgInt32 j = 0; j < rowsCount; j++) {
+			const dgInt32 i = activeRows[j];
 			const dgJacobianMatrixElement* const row = &matrixRow[index + i];
 			dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * linearForce0 + row->m_JMinv.m_jacobianM0.m_angular * angularForce0 +
 						   row->m_JMinv.m_jacobianM1.m_linear * linearForce1 + row->m_JMinv.m_jacobianM1.m_angular * angularForce1);
@@ -756,7 +759,70 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 		}
 
 		dgFloat32 alpha = num / den;
+		bool needRestart = false;
+		for (dgInt32 j = 0; j < rowsCount; j++) {
+			const dgInt32 i = activeRows[j];
+			dgFloat32 f1 = x0[i] + alpha * p0[i];
+			if (f1 < low[i]) {
+				needRestart = true;
+				x0[i] = low[i];
+				dgSwap(activeRows[j], activeRows[rowsCount - 1]);
+				j--;
+				rowsCount--;
+			} else if (f1 > high[i]) {
+				needRestart = true;
+				x0[i] = high[i];
+				dgSwap(activeRows[j], activeRows[rowsCount - 1]);
+				j--;
+				rowsCount--;
+			}
+		}
 
+		if (needRestart) {
+			dgVector lM0(dgVector::m_zero);
+			dgVector aM0(dgVector::m_zero);
+			dgVector lM1(dgVector::m_zero);
+			dgVector aM1(dgVector::m_zero);
+
+			for (dgInt32 j = 0; j < rowsCount; j++) {
+				const dgInt32 i = activeRows[j];
+				const dgJacobianMatrixElement* const row = &matrixRow[index + i];
+				dgVector force(x0[i]);
+				lM0 += row->m_Jt.m_jacobianM0.m_linear * force;
+				aM0 += row->m_Jt.m_jacobianM0.m_angular * force;
+				lM1 += row->m_Jt.m_jacobianM1.m_linear * force;
+				aM1 += row->m_Jt.m_jacobianM1.m_angular * force;
+			}
+
+			for (dgInt32 i = 0; i < rowsCount; i++) {
+				const dgJacobianMatrixElement* const row = &matrixRow[index + i];
+				dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * lM0 + row->m_JMinv.m_jacobianM0.m_angular * aM0 +
+							  row->m_JMinv.m_jacobianM1.m_linear * lM1 + row->m_JMinv.m_jacobianM1.m_angular * aM1);
+
+				r0[i] = b[i] - x0[i] * d0[i] - (accel.AddHorizontal()).GetScalar();
+				z0[i] = invM[i] * r0[i];
+				p0[i] = z0[i];
+			}
+
+		} else {
+
+			dgFloat32 betaNum = dgFloat32(0.0f);
+			for (dgInt32 j = 0; j < rowsCount; j++) {
+				const dgInt32 i = activeRows[j];
+				x0[i] += alpha * p0[i];
+				r0[i] -= alpha * r1[i];
+				betaNum += r0[i] * r0[i];
+			}
+			dgFloat32 beta = betaNum / num;
+			if (beta < dgFloat32(1.0e-6f)) {
+				break;
+			}
+
+			for (dgInt32 j = 0; j < rowsCount; j++) {
+				const dgInt32 i = activeRows[j];
+				p0[i] = r0[i] + beta * p0[i];
+			}
+		}
 	}
 
 /*
