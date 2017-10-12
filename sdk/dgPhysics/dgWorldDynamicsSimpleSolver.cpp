@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
+CalculateJointConjugateGradient/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -811,10 +811,11 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 				const dgInt32 i = activeRows[j];
 				x0[i] += alpha * p0[i];
 				r0[i] -= alpha * r1[i];
-				betaNum += r0[i] * r0[i];
+				z0[i] = invM[i] * r0[i];
+				betaNum += z0[i] * r0[i];
 			}
 			dgFloat32 beta = betaNum / num;
-			if (beta < dgFloat32(1.0e-6f)) {
+			if (beta < dgFloat32(1.0e-8f)) {
 				break;
 			}
 
