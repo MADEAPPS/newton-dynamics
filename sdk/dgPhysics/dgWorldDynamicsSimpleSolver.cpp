@@ -386,6 +386,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 		row->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 		row->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dgAssert(row->m_jointFeebackForce);
+		row->m_accel = row->m_jointFeebackForce->m_accel;
 		const dgFloat32 force = row->m_jointFeebackForce->m_force * forceImpulseScale; 
 		row->m_force = isBilateral ? dgClamp(force, row->m_lowerBoundFrictionCoefficent, row->m_upperBoundFrictionCoefficent) : force;
 		row->m_force0 = row->m_force;
@@ -407,6 +408,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 		row->m_jMinvJt = diag;
 		row->m_invJMinvJt = dgFloat32(1.0f) / diag;
 
+		dgAssert(dgCheckFloat(row->m_accel));
 		dgAssert(dgCheckFloat(row->m_force));
 		dgVector val(row->m_force);
 		forceAcc0.m_linear += row->m_Jt.m_jacobianM0.m_linear * val;
@@ -632,6 +634,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceGaussSeidel(const dgJointInfo
 
 			row->m_force = f;
 			normalForce[i] = f;
+			row->m_accel = dgFloat32(0.0f);
 			dgVector deltaforce0(scale0 * deltaForce);
 			dgVector deltaforce1(scale1 * deltaForce);
 			linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
@@ -671,9 +674,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 	dgFloat32 cacheForce[DG_CONSTRAINT_MAX_ROWS + 4];
 	dgInt32 activeRows[DG_CONSTRAINT_MAX_ROWS];
 
-	const dgInt32 m0 = jointInfo->m_m0;
-	const dgInt32 m1 = jointInfo->m_m1;
-
 	cacheForce[0] = dgFloat32(1.0f);
 	cacheForce[1] = dgFloat32(1.0f);
 	cacheForce[2] = dgFloat32(1.0f);
@@ -685,6 +685,40 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 
 	dgAssert(rowsCount <= DG_CONSTRAINT_MAX_ROWS);
 
+	const dgInt32 m0 = jointInfo->m_m0;
+	const dgInt32 m1 = jointInfo->m_m1;
+	dgJacobian y0 (internalForces[m0]);
+	dgJacobian y1 (internalForces[m1]);
+	for (dgInt32 i = 0; i < rowsCount; i++) {
+		const dgJacobianMatrixElement* const row = &matrixRow[index + i];
+		const dgJacobian JMinvM0 = row->m_JMinv.m_jacobianM0;
+		const dgJacobian JMinvM1 = row->m_JMinv.m_jacobianM1;
+
+		dgVector diag(JMinvM0.m_linear * y0.m_linear + JMinvM0.m_angular * y0.m_angular + JMinvM1.m_linear * y1.m_linear + JMinvM1.m_angular * y1.m_angular);
+		dgVector accel(row->m_coordenateAccel - row->m_force * row->m_diagDamp - (diag.AddHorizontal()).GetScalar());
+
+/*
+		dgInt32 frictionIndex = row->m_normalForceIndex;
+		dgAssert(((frictionIndex < 0) && (normalForce[frictionIndex] == dgFloat32(1.0f))) || ((frictionIndex >= 0) && (normalForce[frictionIndex] >= dgFloat32(0.0f))));
+		normalForce[i] = row->m_force;
+		dgFloat32 frictionNormal = normalForce[frictionIndex];
+		dgFloat32 lowerFrictionForce = frictionNormal * row->m_lowerBoundFrictionCoefficent;
+		dgFloat32 upperFrictionForce = frictionNormal * row->m_upperBoundFrictionCoefficent;
+
+		//f[i] = row->m_force;
+		f[i] = dgFloat32(0.0f);
+		b[i] = accel.GetScalar();
+		low[i] = lowerFrictionForce - row->m_force;
+		high[i] = upperFrictionForce - row->m_force;
+
+		dgVector force(row->m_force + row->m_invJMinvJt * accel.GetScalar());
+		accel = accel.AndNot((force > upperFrictionForce) | (force < lowerFrictionForce));
+		accNorm = accNorm.GetMax(accel.Abs());
+*/
+	}
+
+
+/*
 	dgVector linearM0(dgVector::m_zero);
 	dgVector angularM0(dgVector::m_zero);
 	dgVector linearM1(dgVector::m_zero);
@@ -825,6 +859,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 			}
 		}
 	}
+*/
 
 /*
 	const dgJacobian& y0 = internalForces[m0];
@@ -883,6 +918,9 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
 {
+	dgAssert(0);
+	return 0.0f;
+/*
 	dgFloat32 massMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 f[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 b[DG_CONSTRAINT_MAX_ROWS];
@@ -982,9 +1020,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 	internalForces[m1].m_linear = linearM1;
 	internalForces[m1].m_angular = angularM1;
 	return accNorm.GetScalar();
+*/
 }
-
-
 
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const
@@ -1113,9 +1150,10 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 
 			for (dgInt32 j = 0; j < count; j++) {
 				dgJacobianMatrixElement* const row = &matrixRow[j + first];
-				dgFloat32 val = row->m_force;
-				dgAssert(dgCheckFloat(val));
-				row->m_jointFeebackForce->m_force = val;
+				dgAssert(dgCheckFloat(row->m_accel));
+				dgAssert(dgCheckFloat(row->m_force));
+				row->m_jointFeebackForce->m_force = row->m_force;
+				row->m_jointFeebackForce->m_accel = row->m_accel;
 				row->m_jointFeebackForce->m_impact = row->m_maxImpact * timestepRK;
 			}
 			hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);

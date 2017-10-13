@@ -74,6 +74,7 @@ class dgForceImpactPair
 {
 	public:
 	dgFloat32 m_force;
+	dgFloat32 m_accel;
 	dgFloat32 m_impact;
 };
 

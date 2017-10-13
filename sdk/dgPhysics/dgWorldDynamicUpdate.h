@@ -208,22 +208,23 @@ class dgJacobianMatrixElement
 	dgJacobianPair m_JMinv;
 
 	dgFloat32 m_force;
-	dgFloat32 m_diagDamp;
+	dgFloat32 m_accel;
 	dgFloat32 m_jMinvJt;
 	dgFloat32 m_invJMinvJt;
 
+	dgFloat32 m_diagDamp;
+	dgFloat32 m_coordenateAccel;
 	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
-	dgFloat32 m_penetration;
-	dgFloat32 m_coordenateAccel;
 
 	dgFloat32 m_force0;
-	dgFloat32 m_penetrationStiffness;
+	dgFloat32 m_penetration;
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
 
 	dgFloat32 m_stiffness;
 	dgFloat32 m_maxImpact;
+	dgFloat32 m_penetrationStiffness;
 
 	dgForceImpactPair* m_jointFeebackForce;
 	dgInt32 m_normalForceIndex;

@@ -2007,7 +2007,7 @@ void NewtonMaterialSetContactNormalAcceleration(const NewtonMaterial* const mate
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-
+	dgAssert(0);
 	material->m_normal_Force.m_force = accel;
 	material->m_flags |= dgContactMaterial::m_overrideNormalAccel;
 }
@@ -2029,6 +2029,7 @@ void NewtonMaterialSetContactTangentAcceleration(const NewtonMaterial* const mat
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
+	dgAssert(0);
 	if (index) {
 		material->m_dir1_Force.m_force = accel;
 		material->m_flags |= dgContactMaterial::m_override1Accel;
