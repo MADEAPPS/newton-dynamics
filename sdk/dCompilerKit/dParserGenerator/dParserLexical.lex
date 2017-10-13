@@ -71,5 +71,5 @@ Integer				[0-9]+
 "'\]'"				{ m_tokenString = "]"; return(']'); }
 "'\#'"				{ m_tokenString = "#"; return('#'); }
 '[A-Za-z]'			{ m_tokenString = m_tokenString.SubString (1, 1); return(m_tokenString[0]); }
-[{]					{ ReadBalancedExpresion ('{', '}'); return dParserCompiler::SEMANTIC_ACTION;}
+[{]					{ ReadBalancedExpression ('{', '}'); return dParserCompiler::SEMANTIC_ACTION;}
 

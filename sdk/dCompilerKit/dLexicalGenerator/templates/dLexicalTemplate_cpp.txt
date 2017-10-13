@@ -31,7 +31,7 @@ $(className)::~$(className)()
 }
 
 
-void $(className)::ReadBalancedExpresion (char open, char close)
+void $(className)::ReadBalancedExpression (char open, char close)
 {
 	int count = 1;
 	while (count) {
