@@ -1,4 +1,4 @@
-CalculateJointConjugateGradient/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -680,11 +680,12 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 	cacheForce[3] = dgFloat32(1.0f);
 	dgFloat32* const normalForce = &cacheForce[4];
 
+
+static int xxx;
+xxx++;
 	const dgInt32 index = jointInfo->m_pairStart;
 	dgInt32 rowsCount = jointInfo->m_pairCount;
-
 	dgAssert(rowsCount <= DG_CONSTRAINT_MAX_ROWS);
-
 
 	dgFloat32 accelNorm = dgFloat32(0.0f);
 	const dgInt32 m0 = jointInfo->m_m0;
@@ -719,149 +720,142 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInf
 		activeRows[i] = i;
 	}
 
-	y0.m_linear = dgVector::m_zero;
-	y0.m_angular = dgVector::m_zero;
-	y1.m_linear = dgVector::m_zero;
-	y1.m_angular = dgVector::m_zero;
-	for (dgInt32 j = 0; j < rowsCount; j++) {
-		const dgInt32 i = activeRows[j];
-		const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-		dgVector force(x0[i]);
-		y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * force;
-		y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * force;
-		y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * force;
-		y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * force;
-	}
-
-	for (dgInt32 j = 0; j < rowsCount; j++) {
-		const dgInt32 i = activeRows[j];
-		const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-		dgVector accel (row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
-						row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-
-		r0[i] = b[i] - x0[i] * d0[i] - (accel.AddHorizontal()).GetScalar();
-		z0[i] = invM[i] * r0[i];
-		p0[i] = z0[i];
-	}
-
-
-	for (dgInt32 k = 0; k < 10; k++) {
+	if (accelNorm > dgFloat32(1.0e-6f)) {
 		y0.m_linear = dgVector::m_zero;
 		y0.m_angular = dgVector::m_zero;
 		y1.m_linear = dgVector::m_zero;
 		y1.m_angular = dgVector::m_zero;
-		for (dgInt32 j = 0; j < rowsCount; j++) {
-			const dgInt32 i = activeRows[j];
+		for (dgInt32 i = 0; i < rowsCount; i++) {
 			const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-			dgVector force(p0[i]);
+			dgVector force(x0[i]);
 			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * force;
 			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * force;
 			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * force;
 			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * force;
 		}
 
-		dgFloat32 den = dgFloat32(0.0f);
-		dgFloat32 num = dgFloat32(0.0f);
-		for (dgInt32 j = 0; j < rowsCount; j++) {
-			const dgInt32 i = activeRows[j];
+		for (dgInt32 i = 0; i < rowsCount; i++) {
 			const dgJacobianMatrixElement* const row = &matrixRow[index + i];
 			dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
-						   row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
+				row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
 
-			r1[i] = (accel.AddHorizontal()).GetScalar() + p0[i] * d0[i];
-			den += r1[i] * p0[i];
-			num += r0[i] * z0[i];
+			r0[i] = b[i] - x0[i] * d0[i] - (accel.AddHorizontal()).GetScalar();
+			z0[i] = invM[i] * r0[i];
+			p0[i] = z0[i];
 		}
 
+		for (dgInt32 k = 0; k < 10; k++) {
+xxx++;
 
-		dgFloat32 alpha = num / den;
-		bool needRestart = false;
-		for (dgInt32 j = 0; j < rowsCount; j++) {
-			const dgInt32 i = activeRows[j];
-			dgFloat32 f1 = x0[i] + alpha * p0[i];
-			if (f1 < low[i]) {
-				needRestart = true;
-				x0[i] = low[i];
-				dgSwap(activeRows[j], activeRows[rowsCount - 1]);
-				j--;
-				rowsCount--;
-			} else if (f1 > high[i]) {
-				needRestart = true;
-				x0[i] = high[i];
-				dgSwap(activeRows[j], activeRows[rowsCount - 1]);
-				j--;
-				rowsCount--;
-			}
-		}
-
-		if (needRestart) {
 			y0.m_linear = dgVector::m_zero;
 			y0.m_angular = dgVector::m_zero;
 			y1.m_linear = dgVector::m_zero;
 			y1.m_angular = dgVector::m_zero;
-			for (dgInt32 j = 0; j < rowsCount; j++) {
-				const dgInt32 i = activeRows[j];
-				const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-				dgVector force(x0[i]);
+			for (dgInt32 i = 0; i < rowsCount; i++) {
+				const dgInt32 j = activeRows[i];
+				const dgJacobianMatrixElement* const row = &matrixRow[index + j];
+				dgVector force(p0[i]);
 				y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * force;
 				y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * force;
 				y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * force;
 				y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * force;
 			}
 
+			dgFloat32 den = dgFloat32(0.0f);
+			dgFloat32 num = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < rowsCount; i++) {
-				const dgJacobianMatrixElement* const row = &matrixRow[index + i];
+				const dgInt32 j = activeRows[i];
+				const dgJacobianMatrixElement* const row = &matrixRow[index + j];
 				dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 							   row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
 
-				r0[i] = b[i] - x0[i] * d0[i] - (accel.AddHorizontal()).GetScalar();
-				z0[i] = invM[i] * r0[i];
-				p0[i] = z0[i];
+				r1[i] = (accel.AddHorizontal()).GetScalar() + p0[i] * d0[i];
+				den += r1[i] * p0[i];
+				num += r0[i] * z0[i];
 			}
 
-		} else {
-			dgFloat32 betaNum = dgFloat32(0.0f);
-			for (dgInt32 j = 0; j < rowsCount; j++) {
-				const dgInt32 i = activeRows[j];
-				x0[i] += alpha * p0[i];
-				r0[i] -= alpha * r1[i];
-				z0[i] = invM[i] * r0[i];
-				betaNum += z0[i] * r0[i];
-			}
-			dgFloat32 beta = betaNum / num;
-			if (beta < dgFloat32(1.0e-8f)) {
-				break;
+			dgFloat32 alpha = num / den;
+			bool needRestart = false;
+			for (dgInt32 i = 0; i < rowsCount; i++) {
+				dgFloat32 f1 = x0[i] + alpha * p0[i];
+				if (f1 < low[i]) {
+					needRestart = true;
+					x0[i] = low[i];
+					dgSwap(activeRows[i], activeRows[rowsCount - 1]);
+					i--;
+					rowsCount--;
+				} else if (f1 > high[i]) {
+					needRestart = true;
+					x0[i] = high[i];
+					dgSwap(activeRows[i], activeRows[rowsCount - 1]);
+					i--;
+					rowsCount--;
+				}
 			}
 
-			for (dgInt32 j = 0; j < rowsCount; j++) {
-				const dgInt32 i = activeRows[j];
-				p0[i] = r0[i] + beta * p0[i];
+			if (needRestart) {
+				y0.m_linear = dgVector::m_zero;
+				y0.m_angular = dgVector::m_zero;
+				y1.m_linear = dgVector::m_zero;
+				y1.m_angular = dgVector::m_zero;
+				for (dgInt32 i = 0; i < rowsCount; i++) {
+					const dgInt32 j = activeRows[i];
+					const dgJacobianMatrixElement* const row = &matrixRow[index + j];
+					dgVector force(x0[i]);
+					y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * force;
+					y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * force;
+					y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * force;
+					y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * force;
+				}
+
+				for (dgInt32 i = 0; i < rowsCount; i++) {
+					const dgInt32 j = activeRows[i];
+					const dgJacobianMatrixElement* const row = &matrixRow[index + j];
+					dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
+						row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
+
+					r0[i] = b[i] - x0[i] * d0[i] - (accel.AddHorizontal()).GetScalar();
+					z0[i] = invM[i] * r0[i];
+					p0[i] = z0[i];
+				}
+
+			} else {
+				dgFloat32 betaNum = dgFloat32(0.0f);
+				for (dgInt32 i = 0; i < rowsCount; i++) {
+					x0[i] += alpha * p0[i];
+					r0[i] -= alpha * r1[i];
+					z0[i] = invM[i] * r0[i];
+					betaNum += z0[i] * r0[i];
+				}
+				dgFloat32 beta = betaNum / num;
+				if (beta < dgFloat32(1.0e-8f)) {
+					break;
+				}
+
+				for (dgInt32 i = 0; i < rowsCount; i++) {
+					p0[i] = r0[i] + beta * p0[i];
+				}
 			}
 		}
-	}
 
-/*
-	dgVector linearM0(internalForces[m0].m_linear);
-	dgVector angularM0(internalForces[m0].m_angular);
-	dgVector linearM1(internalForces[m1].m_linear);
-	dgVector angularM1(internalForces[m1].m_angular);
-	for (dgInt32 i = 0; i < rowsCount; i++) {
-		dgJacobianMatrixElement* const row = &matrixRow[index + i];
-		dgVector jointForce(f[i]);
-		row->m_force = f[i] + row->m_force;
-		linearM0 += row->m_Jt.m_jacobianM0.m_linear * jointForce;
-		angularM0 += row->m_Jt.m_jacobianM0.m_angular * jointForce;
-		linearM1 += row->m_Jt.m_jacobianM1.m_linear * jointForce;
-		angularM1 += row->m_Jt.m_jacobianM1.m_angular * jointForce;
-	}
+		y0 = internalForces[m0];
+		y1 = internalForces[m1];
+		rowsCount = jointInfo->m_pairCount;
+		for (dgInt32 i = 0; i < rowsCount; i++) {
+			const dgInt32 j = activeRows[i];
+			dgJacobianMatrixElement* const row = &matrixRow[index + j];
+			dgVector jointForce(x0[i] - row->m_force);
+			row->m_force = x0[i];
+			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
+			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
+			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
+			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
+		}
 
-	internalForces[m0].m_linear = linearM0;
-	internalForces[m0].m_angular = angularM0;
-	internalForces[m1].m_linear = linearM1;
-	internalForces[m1].m_angular = angularM1;
-	return accNorm.GetScalar();
-*/
-	return 0;
+		internalForces[m0] = y0;
+		internalForces[m1] = y1;
+	}
+	return accelNorm;
 }
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
