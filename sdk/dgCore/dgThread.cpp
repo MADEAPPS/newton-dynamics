@@ -41,11 +41,11 @@ dgThread::dgThread (const char* const name, dgInt32 id)
 }
 
 
-void dgThread::Init (const char* const name, dgInt32 id, int stackSize)
+void dgThread::Init (const char* const name, dgInt32 id)
 {
 	m_id = id;
 	strncpy (m_name, name, sizeof (m_name) - 1);
-	Init (stackSize);
+	Init ();
 }
 
 
@@ -76,7 +76,7 @@ dgThread::~dgThread ()
 {
 }
 
-void dgThread::Init (dgInt32  stacksize)
+void dgThread::Init ()
 {
 }
 
@@ -131,7 +131,7 @@ dgThread::~dgThread ()
 {
 }
 
-void dgThread::Init (dgInt32 stacksize)
+void dgThread::Init ()
 {
 	m_handle = std::thread(dgThreadSystemCallback, this);
 	dgThreadYield();

@@ -1403,9 +1403,6 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 
 dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 {
-//static int xxx;
-//xxx ++;
-
 	dgInt32 count = 0;
 	if (m_proxy->m_intersectionTestOnly) {
 		CalculateClosestPoints();

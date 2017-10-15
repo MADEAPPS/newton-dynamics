@@ -201,7 +201,7 @@ void dgWorld::dgAsyncUpdate::Update ()
 #define DG_MUTEX_THREAD_ID	0
 #define DG_ASYNC_THREAD_ID	1
 
-dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
+dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	:dgBodyMasterList(allocator)
 	,dgBodyMaterialList(allocator)
 	,dgBodyCollisionList(allocator)
@@ -209,7 +209,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,dgInverseDynamicsList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()
-	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID, stackSize)
+	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID)
 	,dgAsyncThread("newtonAsyncThread", DG_ASYNC_THREAD_ID)
 	,dgWorldThreadPool(allocator)
 	,dgDeadBodies(allocator)

@@ -24,7 +24,6 @@
 #include "dgMemory.h"
 #include "dgThreadHive.h"
 
-#define DG_WORKER_THREAD_STACK_SIZE_IN_BYTES (256 * 1024)
 
 dgThreadHive::dgThreadBee::dgThreadBee()
 	:dgThread()
@@ -48,7 +47,7 @@ void dgThreadHive::dgThreadBee::SetUp(dgMemoryAllocator* const allocator, const 
 {
 	m_allocator = allocator;
 	m_hive = hive;
-	Init (name, id, DG_WORKER_THREAD_STACK_SIZE_IN_BYTES);
+	Init (name, id);
 }
 
 bool dgThreadHive::dgThreadBee::IsBusy() const

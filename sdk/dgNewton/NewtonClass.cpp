@@ -35,8 +35,8 @@ void Newton::DefaultFreeMemory (void* const ptr, dgInt32 size)
 }
 
 
-Newton::Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 stackSize)
-	:dgWorld(allocator, stackSize) 
+Newton::Newton (dgMemoryAllocator* const allocator)
+	:dgWorld(allocator) 
 	,m_destructor(NULL)
 {
 }

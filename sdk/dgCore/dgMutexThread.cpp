@@ -24,13 +24,13 @@
 #include "dgMutexThread.h"
 
 
-dgMutexThread::dgMutexThread(const char* const name, dgInt32 id, dgInt32 stackSize)
+dgMutexThread::dgMutexThread(const char* const name, dgInt32 id)
 	:dgThread(name, id)
 	,m_isBusy(0)
 	,m_myMutex()
 	,m_callerMutex()
 {
-	Init (stackSize);
+	Init ();
 }
 
 dgMutexThread::~dgMutexThread(void)

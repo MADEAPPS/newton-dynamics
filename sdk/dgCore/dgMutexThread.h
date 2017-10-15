@@ -28,7 +28,7 @@
 class dgMutexThread: public dgThread
 {
 	public:
-	dgMutexThread(const char* const name, dgInt32 id, dgInt32 stackSize);
+	dgMutexThread(const char* const name, dgInt32 id);
 	virtual ~dgMutexThread(void);
 
 	void Tick(); 

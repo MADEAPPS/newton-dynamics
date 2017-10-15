@@ -71,8 +71,8 @@ class dgThread
 	void SuspendExecution (dgInt32 count, dgSemaphore* const mutexes);
 
 	protected:
-	void Init (dgInt32 stacksize = 0);
-	void Init (const char* const name, dgInt32 id, dgInt32 stacksize);
+	void Init ();
+	void Init (const char* const name, dgInt32 id);
 	void Close ();
 	static void* dgThreadSystemCallback(void* threadData);
 

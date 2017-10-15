@@ -159,29 +159,7 @@ NewtonWorld* NewtonCreate()
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMemoryAllocator* const allocator = new dgMemoryAllocator();
 
-	NewtonWorld* const world = (NewtonWorld*) new (allocator) Newton (dgFloat32(1.0f), allocator);
-	return world;
-}
-
-/*!
-  Create an instance of the Newton world.
-
-  @param stackSizeInMegabytes Assign this much memory to each thread.
-  @return Pointer to new Newton world.
-
-  This function does the same as ::NewtonCreate, except that it accepts an extra
-  argument to specify the stack size for each thread. This is only useful for
-  simulation with very many (ie thousands or more objects). If in doubt, use
-  ::NewtonCreate as it uses reasonable defaults.
-
-  See also: ::NewtonDestroy, ::NewtonDestroyAllBodies
-*/
-NewtonWorld* NewtonCreateEx (int stackSizeInMegabytes)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMemoryAllocator* const allocator = new dgMemoryAllocator();
-
-	NewtonWorld* const world = (NewtonWorld*) new (allocator)Newton(dgFloat32(1.0f), allocator, stackSizeInMegabytes<<20);
+	NewtonWorld* const world = (NewtonWorld*) new (allocator) Newton (allocator);
 	return world;
 }
 

@@ -33,7 +33,7 @@ class Newton: public dgWorld
 	public:
 	DG_CLASS_ALLOCATOR(allocator)
 
-	Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 stackSize = DG_ENGINE_STACK_SIZE);
+	Newton (dgMemoryAllocator* const allocator);
 	~Newton ();
 
 	void UpdatePhysics (dgFloat32 timestep);

@@ -428,7 +428,6 @@ extern "C" {
 	NEWTON_API void NewtonSetMemorySystem (NewtonAllocMemory malloc, NewtonFreeMemory free);
 
 	NEWTON_API NewtonWorld* NewtonCreate ();
-	NEWTON_API NewtonWorld* NewtonCreateEx (int stackSizeInMegabytes);
 	NEWTON_API void NewtonDestroy (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonDestroyAllBodies (const NewtonWorld* const newtonWorld);
 

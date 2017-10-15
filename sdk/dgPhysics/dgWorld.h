@@ -38,8 +38,6 @@
 #define DG_SLEEP_ENTRIES					8
 #define DG_MAX_DESTROYED_BODIES_BY_FORCE	8
 
-#define DG_ENGINE_STACK_SIZE				(1024 * 1024)
-
 class dgBody;
 class dgDynamicBody;
 class dgKinematicBody;
@@ -239,7 +237,7 @@ class dgWorld
 
 	DG_CLASS_ALLOCATOR(allocator)
 
-	dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize);
+	dgWorld(dgMemoryAllocator* const allocator);
 	~dgWorld();
 
 
