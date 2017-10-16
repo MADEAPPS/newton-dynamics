@@ -785,8 +785,8 @@ xxx++;
 				num += data.m_r0 * data.m_z0;
 			}
 
-			dgFloat32 alpha = num / den;
-			bool needRestart = false;
+//			dgFloat32 alpha = num / den;
+//			bool needRestart = false;
 /*
 			for (dgInt32 i = 0; i < rowsCount; i++) {
 				dgFloat32 f1 = x0[i] + alpha * p0[i];
@@ -876,7 +876,40 @@ xxx++;
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
 {
-	dgAssert(0);
+	dgFloat32 angle = -30.0f * 3.141692f / 180.0f;
+	dgMatrix matrix(dgRollMatrix(angle));
+	dgVector r0(matrix.RotateVector(dgVector(-0.5f, -0.5f, 0.0f, 0.0f)));
+	dgVector r1(matrix.RotateVector(dgVector( 0.5f, -0.5f, 0.0f, 0.0f)));
+
+	dgJacobian jt[4];
+	jt[0].m_linear = matrix.RotateVector(dgVector(0.0f, 1.0f, 0.0f, 0.0f));
+	jt[0].m_angular = r0.CrossProduct3(jt[0].m_linear);
+	jt[1].m_linear = matrix.RotateVector(dgVector(0.0f, 1.0f, 0.0f, 0.0f));
+	jt[1].m_angular = r1.CrossProduct3(jt[1].m_linear);
+	jt[2].m_linear = matrix.RotateVector(dgVector(1.0f, 0.0f, 0.0f, 0.0f));
+	jt[2].m_angular = r0.CrossProduct3(jt[2].m_linear);
+	jt[3].m_linear = matrix.RotateVector(dgVector(1.0f, 0.0f, 0.0f, 0.0f));
+	jt[3].m_angular = r1.CrossProduct3(jt[3].m_linear);
+
+	dgJacobian w;
+	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
+	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
+
+	dgFloat32 b[4];
+	dgFloat32 m[4][4];
+	
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgVector tmp(jt[i].m_linear * w.m_linear + jt[i].m_angular * w.m_angular);
+		b[i] = -tmp.AddHorizontal().GetScalar();
+		for (dgInt32 j = 0; j < 4; j++) {
+			dgVector acc (jt[i].m_linear * jt[j].m_linear + jt[i].m_angular * jt[j].m_angular);
+			m[i][j] = acc.AddHorizontal().GetScalar();
+		}
+		m[i][i] *= 1.0001f;
+	}
+	dgCholeskyFactorization<dgFloat32>(4, &m[0][0]);
+	dgSolveCholesky<dgFloat32>(4, 4, &m[0][0], b);
+
 	return 0.0f;
 /*
 	dgFloat32 massMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
@@ -1059,6 +1092,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				dgJointInfo* const jointInfo = &constraintArray[j];
 				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 //				dgFloat32 accel = CalculateJointConjugateGradient(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+//				dgFloat32 accel = CalculateJointForceDanzig(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 		}
