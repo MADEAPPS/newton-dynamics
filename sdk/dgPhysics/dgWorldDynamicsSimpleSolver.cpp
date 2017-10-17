@@ -899,7 +899,105 @@ static void dgSolveCholesky(dgInt32 size, dgInt32 n, const dgFloat32* const chol
 }
 
 
-static void xxxxxx1(dgInt32 size, const dgFloat32* const matrix, dgFloat32* const b, dgFloat32* const low, dgFloat32* const high)
+static void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, dgFloat32* const matrix, dgFloat32* const choleskyMatrix, dgFloat32* const x, dgFloat32* const r, dgFloat32* const low, dgFloat32* const high, dgInt16* const permute)
+{
+	if (i != j) {
+		dgFloat32* const A = &matrix[size * i];
+		dgFloat32* const B = &matrix[size * j];
+		dgFloat32* const invA = &choleskyMatrix[size * i];
+		dgFloat32* const invB = &choleskyMatrix[size * j];
+		for (dgInt32 k = 0; k < size; k++) {
+			dgSwap(A[k], B[k]);
+			dgSwap(invA[k], invB[k]);
+		}
+
+		dgInt32 stride = 0;
+		for (dgInt32 k = 0; k < size; k++) {
+			dgSwap(matrix[stride + i], matrix[stride + j]);
+			stride += size;
+		}
+
+		dgSwap(x[i], x[j]);
+		dgSwap(r[i], r[j]);
+		dgSwap(low[i], low[j]);
+		dgSwap(high[i], high[j]);
+		dgSwap(permute[i], permute[j]);
+	}
+}
+
+static void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, dgFloat32* const choleskyMatrix, dgFloat32* const tmp, dgFloat32* const reflexion)
+{
+	if (row != colum) {
+		dgInt16 activeColumns[DG_CONSTRAINT_MAX_ROWS];
+		dgAssert(row < colum);
+
+		// using Householder rotations, much more stable than Givens rotations
+		for (dgInt32 i = row; i < size; i++) {
+			dgFloat32* const rowI = &choleskyMatrix[size * i];
+			activeColumns[0] = dgInt16(i);
+			dgInt32 width = 1;
+			for (dgInt32 j = i + 1; j < size; j++) {
+				activeColumns[width] = dgInt16(j);
+				width += dgAbsf(rowI[j]) > dgFloat32(1.0e-14f) ? 1 : 0;
+			}
+
+			if (width > 1) {
+				dgFloat32 mag = dgFloat32(0.0f);
+				for (dgInt32 j = 1; j < width; j++) {
+					dgInt32 index = activeColumns[j];
+					mag += rowI[index] * rowI[index];
+					reflexion[index] = rowI[index];
+				}
+				reflexion[i] = rowI[i] - dgSqrt(mag + rowI[i] * rowI[i]);
+
+				const dgFloat32 vMag2(mag + reflexion[i] * reflexion[i]);
+				//const T den (dgFloat32 (1.0f) / T (sqrt (vMag2)));
+				//for (dgInt32 j = 0; j < width; j ++) {
+				//	dgInt32 index = activeColumns[j];
+				//	reflexion[index] *= den;
+				//}
+
+				const dgFloat32 den = dgFloat32(2.0f) / vMag2;
+				for (dgInt32 j = i; j < size; j++) {
+					dgFloat32 acc = dgFloat32(0.0f);
+					dgFloat32* const rowJ = &choleskyMatrix[size * j];
+					for (dgInt32 k = 0; k < width; k++) {
+						dgInt32 index = activeColumns[k];
+						acc += rowJ[index] * reflexion[index];
+					}
+					tmp[j] = acc;
+				}
+
+				for (dgInt32 j = i + 1; j < size; j++) {
+					dgFloat32* const rowJ = &choleskyMatrix[size * j];
+					const dgFloat32 a = tmp[j] * den;
+					for (dgInt32 k = 0; k < width; k++) {
+						dgInt32 index = activeColumns[k];
+						rowJ[index] -= a * reflexion[index];
+					}
+				}
+				rowI[i] -= tmp[i] * reflexion[i] * den;
+			}
+
+			for (dgInt32 k = i + 1; k < size; k++) {
+				rowI[k] = dgFloat32(0.0f);
+			}
+
+			if (rowI[i] < dgFloat32(0.0f)) {
+				for (dgInt32 k = i; k < size; k++) {
+					choleskyMatrix[size * k + i] = -choleskyMatrix[size * k + i];
+				}
+			}
+		}
+		for (dgInt32 i = row; i < size; i++) {
+			choleskyMatrix[size * i + i] = dgMax(choleskyMatrix[size * i + i], dgFloat32(1.0e-6f));
+		}
+	}
+}
+
+
+
+static void xxxxxx1(dgInt32 size, dgFloat32* const matrix, dgFloat32* const b, dgFloat32* const low, dgFloat32* const high)
 {
 /*
 	T* const x0 = dgAlloca(T, size);
@@ -930,14 +1028,17 @@ static void xxxxxx1(dgInt32 size, const dgFloat32* const matrix, dgFloat32* cons
 	dgFloat32 r0[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 delta_x[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 delta_r[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 tmp0[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 tmp1[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 choleskyMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
+	dgInt16 permute[DG_CONSTRAINT_MAX_ROWS];
 
 	dgInt32 index = 0;
 	dgInt32 count = size;
 	dgInt32 clampedIndex = size;
 
 	for (dgInt32 i = 0; i < size; i++) {
-//		permute[i] = short(i);
+		permute[i] = short(i);
 		r0[i] = -b[i];
 		x0[i] = dgFloat32(0.0f);
 		delta_x[i] = dgFloat32(0.0f);
@@ -1091,15 +1192,12 @@ static void xxxxxx1(dgInt32 size, const dgFloat32* const matrix, dgFloat32* cons
 				count--;
 				loop = false;
 			} else if (swapIndex == index) {
-				dgAssert(0);
-				/*
 				count--;
 				clampedIndex--;
 				x0[index] = clamp_x;
-				dgPermuteRows(size, index, clampedIndex, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-				dgCholeskyUpdate(size, index, clampedIndex, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
+				dgPermuteRows(size, index, clampedIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dgCholeskyUpdate(size, index, clampedIndex, choleskyMatrix, tmp0, tmp1);
 				loop = count ? true : false;
-				*/
 			} else if (swapIndex > index) {
 				dgAssert(0);
 				/*
@@ -1179,13 +1277,13 @@ static void xxxxxx()
 
 	low[0] = 0.0f;
 	low[1] = 0.0f;
-	low[2] = -100.0f;
-	low[3] = -100.0f;
+	low[2] = -3.0f;
+	low[3] = -3.0f;
 
 	high[0] = 1000.0f;
 	high[1] = 1000.0f;
-	high[2] = 100.0f;
-	high[3] = 100.0f;
+	high[2] = 3.0f;
+	high[3] = 3.0f;
 
 	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
 	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
