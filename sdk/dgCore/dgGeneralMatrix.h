@@ -511,7 +511,6 @@ DG_INLINE void dgCalculateDelta_r(dgInt32 size, dgInt32 n, const T* const matrix
 	dgInt32 stride = n * size;
 	const dgInt32 size1 = n + 1;
 	for (dgInt32 i = n; i < size; i++) {
-		//delta_r[i] = dgDotProduct(size, &matrix[stride], delta_x);
 		delta_r[i] = dgDotProduct(size1, &matrix[stride], delta_x);
 		stride += size;
 	}
@@ -753,8 +752,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 					x0[i] += s * delta_x[i];
 					r0[i] += s * delta_r[i];
 
-					dgAssert((x0[i] + dgFloat32(1.0f)) >= low[i]);
-					dgAssert((x0[i] - dgFloat32(1.0f)) <= high[i]);
+					dgAssert((x0[i] + T(dgFloat32(1.0f))) >= low[i]);
+					dgAssert((x0[i] - T(dgFloat32(1.0f))) <= high[i]);
 				}
 			}
 
