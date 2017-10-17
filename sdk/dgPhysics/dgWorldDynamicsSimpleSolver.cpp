@@ -1223,22 +1223,19 @@ static void xxxxxx1(dgInt32 size, dgFloat32* const matrix, dgFloat32* const b, d
 				calculateDelta_x = false;
 				*/
 			} else {
-				dgAssert(0);
-				/*
 				dgAssert(index > 0);
 				x0[swapIndex] = clamp_x;
-				delta_x[index] = T(dgFloat32(0.0f));
+				delta_x[index] = dgFloat32(0.0f);
 
 				dgAssert(swapIndex < index);
-				dgPermuteRows(size, swapIndex, index - 1, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-				dgPermuteRows(size, index - 1, index, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-				dgPermuteRows(size, clampedIndex - 1, index, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-				dgCholeskyUpdate(size, swapIndex, clampedIndex - 1, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
+				dgPermuteRows(size, swapIndex, index - 1, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dgPermuteRows(size, index - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dgPermuteRows(size, clampedIndex - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dgCholeskyUpdate(size, swapIndex, clampedIndex - 1, choleskyMatrix, tmp0, tmp1);
 
 				clampedIndex--;
 				index--;
 				loop = true;
-*/
 			}
 		}
 	}
@@ -1254,7 +1251,7 @@ static void xxxxxx1(dgInt32 size, dgFloat32* const matrix, dgFloat32* const b, d
 
 static void xxxxxx()
 {
-	dgFloat32 angle = -30.0f * 3.141692f / 180.0f;
+	dgFloat32 angle = -50.0f * 3.141692f / 180.0f;
 	dgMatrix matrix(dgRollMatrix(angle));
 	dgVector r0(matrix.RotateVector(dgVector(-0.5f, -0.5f, 0.0f, 0.0f)));
 	dgVector r1(matrix.RotateVector(dgVector(0.5f, -0.5f, 0.0f, 0.0f)));
@@ -1277,13 +1274,13 @@ static void xxxxxx()
 
 	low[0] = 0.0f;
 	low[1] = 0.0f;
-	low[2] = -3.0f;
-	low[3] = -3.0f;
+	low[2] = -30.0f;
+	low[3] = -30.0f;
 
 	high[0] = 1000.0f;
 	high[1] = 1000.0f;
-	high[2] = 3.0f;
-	high[3] = 3.0f;
+	high[2] = 30.0f;
+	high[3] = 30.0f;
 
 	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
 	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
@@ -1304,41 +1301,6 @@ static void xxxxxx()
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
 {
-/*
-	dgFloat32 angle = -30.0f * 3.141692f / 180.0f;
-	dgMatrix matrix(dgRollMatrix(angle));
-	dgVector r0(matrix.RotateVector(dgVector(-0.5f, -0.5f, 0.0f, 0.0f)));
-	dgVector r1(matrix.RotateVector(dgVector( 0.5f, -0.5f, 0.0f, 0.0f)));
-
-	dgJacobian jt[4];
-	jt[0].m_linear = matrix.RotateVector(dgVector(0.0f, 1.0f, 0.0f, 0.0f));
-	jt[0].m_angular = r0.CrossProduct3(jt[0].m_linear);
-	jt[1].m_linear = matrix.RotateVector(dgVector(0.0f, 1.0f, 0.0f, 0.0f));
-	jt[1].m_angular = r1.CrossProduct3(jt[1].m_linear);
-	jt[2].m_linear = matrix.RotateVector(dgVector(1.0f, 0.0f, 0.0f, 0.0f));
-	jt[2].m_angular = r0.CrossProduct3(jt[2].m_linear);
-	jt[3].m_linear = matrix.RotateVector(dgVector(1.0f, 0.0f, 0.0f, 0.0f));
-	jt[3].m_angular = r1.CrossProduct3(jt[3].m_linear);
-
-	dgJacobian w;
-	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
-	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
-
-	dgFloat32 b[4];
-	dgFloat32 m[4][4];
-	
-	for (dgInt32 i = 0; i < 4; i++) {
-		dgVector tmp(jt[i].m_linear * w.m_linear + jt[i].m_angular * w.m_angular);
-		b[i] = -tmp.AddHorizontal().GetScalar();
-		for (dgInt32 j = 0; j < 4; j++) {
-			dgVector acc (jt[i].m_linear * jt[j].m_linear + jt[i].m_angular * jt[j].m_angular);
-			m[i][j] = acc.AddHorizontal().GetScalar();
-		}
-		m[i][i] *= 1.0001f;
-	}
-	dgCholeskyFactorization<dgFloat32>(4, &m[0][0]);
-	dgSolveCholesky<dgFloat32>(4, 4, &m[0][0], b);
-*/
 	xxxxxx();
 	return 0.0f;
 /*
