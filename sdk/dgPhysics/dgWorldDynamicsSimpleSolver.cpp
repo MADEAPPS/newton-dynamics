@@ -883,6 +883,87 @@ class dgDanzigSolver
 	{
 	}
 
+	void SetSize(dgInt32 size)
+	{
+		m_size = size;
+	}
+
+	dgFloat32* GetX()
+	{
+		return m_x;
+	}
+
+//	dgFloat32* GetR()
+//	{
+//		return m_r;
+//	}
+
+	dgFloat32* GetB()
+	{
+		return m_b;
+	}
+
+	dgFloat32* GetLow()
+	{
+		return m_low;
+	}
+
+	dgFloat32* GetHigh()
+	{
+		return m_low;
+	}
+
+	dgFloat32* GetMatrixRow(dgInt32 i)
+	{
+		return &m_matrix[i * m_size];
+	}
+
+	bool CholeskyFactorization()
+	{
+		const dgFloat32* src = m_matrix;
+		dgFloat32* dst = m_choleskyMatrix;
+		for (dgInt32 i = 0; i < m_size; i++) {
+			for (dgInt32 j = 0; j < m_size; j++) {
+				dst[j] = src[j];
+			}
+			dst += m_size;
+			src += m_size;
+		}
+
+		dgFloat32* rowN = m_choleskyMatrix;
+		for (dgInt32 i = 0; i < m_size; i++) {
+			dgInt32 stride = 0;
+			for (dgInt32 j = 0; j <= i; j++) {
+				dgFloat32 s = dgFloat32(0.0f);
+				dgFloat32* const rowJ = &m_choleskyMatrix[stride];
+				for (dgInt32 k = 0; k < j; k++) {
+					s += rowN[k] * rowJ[k];
+				}
+
+				if (i == j) {
+					dgFloat32 diag = rowN[i] - s;
+					if (diag < dgFloat32(1.0e-6f)) {
+						return false;
+					}
+					rowN[i] = dgSqrt(diag);
+				} else {
+					rowN[j] = (rowN[j] - s) / rowJ[j];
+				}
+				stride += m_size;
+			}
+			rowN += m_size;
+		}
+
+		dst = m_choleskyMatrix;
+		for (dgInt32 i = 0; i < m_size - 1; i++) {
+			for (dgInt32 j = i + 1; j < m_size; j++) {
+				dst[j] = dgFloat32 (0.0f);
+			}
+			dst += m_size;
+		}
+		return true;
+	}
+
 	void Solve()
 	{
 		dgInt32 index = 0;
@@ -896,7 +977,7 @@ class dgDanzigSolver
 			m_delta_x[i] = dgFloat32(0.0f);
 			m_delta_r[i] = dgFloat32(0.0f);
 		}
-
+/*
 		bool findInitialGuess = m_size >= 6;
 		if (findInitialGuess) {
 			dgInt32 initialGuessCount = m_size;
@@ -950,10 +1031,11 @@ class dgDanzigSolver
 				}
 			}
 		}
-		
+*/		
 
-		memcpy(m_choleskyMatrix, m_matrix, m_size * m_size * sizeof(dgFloat32));
-		dgCholeskyFactorization<dgFloat32>(m_size, m_choleskyMatrix);
+//		memcpy(m_choleskyMatrix, m_matrix, m_size * m_size * sizeof(dgFloat32));
+//		dgCholeskyFactorization<dgFloat32>(m_size, m_choleskyMatrix);
+		CholeskyFactorization();
 		
 		while (count) {
 			bool loop = true;
@@ -973,7 +1055,7 @@ class dgDanzigSolver
 						for (dgInt32 i = 0; i < index; i++) {
 							m_delta_x[i] = -row[i];
 						}
-						dgSolveCholesky(index, m_delta_x);
+						SolveCholesky(index, m_delta_x);
 						m_delta_x[index] = dgFloat32(1.0f);
 					}
 
@@ -1046,8 +1128,8 @@ class dgDanzigSolver
 					count--;
 					clampedIndex--;
 					m_x0[index] = clamp_x;
-					dgPermuteRows(index, clampedIndex);
-					dgCholeskyUpdate(index, clampedIndex);
+					PermuteRows(index, clampedIndex);
+					CholeskyUpdate(index, clampedIndex);
 					loop = count ? true : false;
 
 				} else if (swapIndex > index) {
@@ -1058,14 +1140,14 @@ class dgDanzigSolver
 					if (swapIndex < clampedIndex) {
 						count--;
 						clampedIndex--;
-						dgPermuteRows(clampedIndex, swapIndex);
-						dgCholeskyUpdate(swapIndex, clampedIndex);
+						PermuteRows(clampedIndex, swapIndex);
+						CholeskyUpdate(swapIndex, clampedIndex);
 						dgAssert(clampedIndex >= index);
 					} else {
 						count++;
 						dgAssert(clampedIndex < m_size);
-						dgPermuteRows(clampedIndex, swapIndex);
-						dgCholeskyUpdate(clampedIndex, swapIndex);
+						PermuteRows(clampedIndex, swapIndex);
+						CholeskyUpdate(clampedIndex, swapIndex);
 						clampedIndex++;
 						dgAssert(clampedIndex <= m_size);
 						dgAssert(clampedIndex >= index);
@@ -1078,10 +1160,10 @@ class dgDanzigSolver
 					m_delta_x[index] = dgFloat32(0.0f);
 
 					dgAssert(swapIndex < index);
-					dgPermuteRows(swapIndex, index - 1);
-					dgPermuteRows(index - 1, index);
-					dgPermuteRows(clampedIndex - 1, index);
-					dgCholeskyUpdate(swapIndex, clampedIndex - 1);
+					PermuteRows(swapIndex, index - 1);
+					PermuteRows(index - 1, index);
+					PermuteRows(clampedIndex - 1, index);
+					CholeskyUpdate(swapIndex, clampedIndex - 1);
 
 					clampedIndex--;
 					index--;
@@ -1100,7 +1182,7 @@ class dgDanzigSolver
 
 	private:
 //	static void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, dgFloat32* const matrix, dgFloat32* const choleskyMatrix, dgFloat32* const x, dgFloat32* const r, dgFloat32* const low, dgFloat32* const high, dgInt16* const permute)
-	void dgPermuteRows(dgInt32 i, dgInt32 j)
+	void PermuteRows(dgInt32 i, dgInt32 j)
 	{
 		if (i != j) {
 			dgFloat32* const A = &m_matrix[m_size * i];
@@ -1128,7 +1210,7 @@ class dgDanzigSolver
 
 
 //	void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, dgFloat32* const choleskyMatrix, dgFloat32* const tmp, dgFloat32* const reflexion)
-	void dgCholeskyUpdate(dgInt32 row, dgInt32 colum)
+	void CholeskyUpdate(dgInt32 row, dgInt32 colum)
 	{
 		if (row != colum) {
 			dgAssert(row < colum);
@@ -1198,7 +1280,7 @@ class dgDanzigSolver
 	}
 
 //	void dgSolveCholesky(dgInt32 size, dgInt32 n, const dgFloat32* const choleskyMatrix, dgFloat32* const x)
-	void dgSolveCholesky(dgInt32 n, dgFloat32* const out)
+	void SolveCholesky(dgInt32 n, dgFloat32* const out)
 	{
 		dgInt32 stride = 0;
 		for (dgInt32 i = 0; i < n; i++) {
@@ -1249,10 +1331,18 @@ static void xxxxxx()
 
 	dgJacobian w;
 	dgJacobian jt[4];
-	dgFloat32 b[4];
-	dgFloat32 low[4];
-	dgFloat32 high[4];
-	dgFloat32 m[4][4];
+//	dgFloat32 b[4];
+//	dgFloat32 low[4];
+//	dgFloat32 high[4];
+//	dgFloat32 m[4][4];
+
+	dgDanzigSolver solver;
+
+	solver.SetSize(4);
+	dgFloat32* const b = solver.GetB();
+	dgFloat32* const m = solver.GetMatrixRow(0);
+	dgFloat32* const low = solver.GetLow();
+	dgFloat32* const high = solver.GetHigh();
 
 	jt[0].m_linear = matrix.RotateVector(dgVector(0.0f, 1.0f, 0.0f, 0.0f));
 	jt[0].m_angular = r0.CrossProduct3(jt[0].m_linear);
@@ -1276,17 +1366,16 @@ static void xxxxxx()
 	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
 	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
 
-
 	for (dgInt32 i = 0; i < 4; i++) {
 		dgVector tmp(jt[i].m_linear * w.m_linear + jt[i].m_angular * w.m_angular);
 		b[i] = -tmp.AddHorizontal().GetScalar();
 		for (dgInt32 j = 0; j < 4; j++) {
 			dgVector acc(jt[i].m_linear * jt[j].m_linear + jt[i].m_angular * jt[j].m_angular);
-			m[i][j] = acc.AddHorizontal().GetScalar();
+			m[i * 4 + j] = acc.AddHorizontal().GetScalar();
 		}
-		m[i][i] *= 1.0001f;
+		m[i * 4 + i] *= 1.0001f;
 	}
-
+	solver.Solve();
 //	xxxxxx1(4, &m[0][0], b, low, high);
 }
 
