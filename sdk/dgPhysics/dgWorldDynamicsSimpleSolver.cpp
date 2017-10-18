@@ -876,378 +876,369 @@ xxx++;
 
 
 
-static void dgSolveCholesky(dgInt32 size, dgInt32 n, const dgFloat32* const choleskyMatrix, dgFloat32* const x)
+class dgDanzigSolver
 {
-	dgInt32 stride = 0;
-	for (dgInt32 i = 0; i < n; i++) {
-		dgFloat32 acc = dgFloat32(0.0f);
-		const dgFloat32* const row = &choleskyMatrix[stride];
-		for (dgInt32 j = 0; j < i; j++) {
-			acc = acc + row[j] * x[j];
-		}
-		x[i] = (x[i] - acc) / row[i];
-		stride += size;
+	public:
+	dgDanzigSolver()
+	{
 	}
 
-	for (dgInt32 i = n - 1; i >= 0; i--) {
-		dgFloat32 acc = dgFloat32 (0.0f);
-		for (dgInt32 j = i + 1; j < n; j++) {
-			acc = acc + choleskyMatrix[size * j + i] * x[j];
-		}
-		x[i] = (x[i] - acc) / choleskyMatrix[size * i + i];
-	}
-}
+	void Solve()
+	{
+		dgInt32 index = 0;
+		dgInt32 count = m_size;
+		dgInt32 clampedIndex = m_size;
 
-
-static void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, dgFloat32* const matrix, dgFloat32* const choleskyMatrix, dgFloat32* const x, dgFloat32* const r, dgFloat32* const low, dgFloat32* const high, dgInt16* const permute)
-{
-	if (i != j) {
-		dgFloat32* const A = &matrix[size * i];
-		dgFloat32* const B = &matrix[size * j];
-		dgFloat32* const invA = &choleskyMatrix[size * i];
-		dgFloat32* const invB = &choleskyMatrix[size * j];
-		for (dgInt32 k = 0; k < size; k++) {
-			dgSwap(A[k], B[k]);
-			dgSwap(invA[k], invB[k]);
+		for (dgInt32 i = 0; i < m_size; i++) {
+			m_permute[i] = short(i);
+			m_r0[i] = -m_b[i];
+			m_x0[i] = dgFloat32(0.0f);
+			m_delta_x[i] = dgFloat32(0.0f);
+			m_delta_r[i] = dgFloat32(0.0f);
 		}
 
-		dgInt32 stride = 0;
-		for (dgInt32 k = 0; k < size; k++) {
-			dgSwap(matrix[stride + i], matrix[stride + j]);
-			stride += size;
-		}
+		bool findInitialGuess = m_size >= 6;
+		if (findInitialGuess) {
+			dgInt32 initialGuessCount = m_size;
+			for (dgInt32 j = 0; (j < 5) && findInitialGuess; j++) {
 
-		dgSwap(x[i], x[j]);
-		dgSwap(r[i], r[j]);
-		dgSwap(low[i], low[j]);
-		dgSwap(high[i], high[j]);
-		dgSwap(permute[i], permute[j]);
-	}
-}
-
-static void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, dgFloat32* const choleskyMatrix, dgFloat32* const tmp, dgFloat32* const reflexion)
-{
-	if (row != colum) {
-		dgInt16 activeColumns[DG_CONSTRAINT_MAX_ROWS];
-		dgAssert(row < colum);
-
-		// using Householder rotations, much more stable than Givens rotations
-		for (dgInt32 i = row; i < size; i++) {
-			dgFloat32* const rowI = &choleskyMatrix[size * i];
-			activeColumns[0] = dgInt16(i);
-			dgInt32 width = 1;
-			for (dgInt32 j = i + 1; j < size; j++) {
-				activeColumns[width] = dgInt16(j);
-				width += dgAbsf(rowI[j]) > dgFloat32(1.0e-14f) ? 1 : 0;
-			}
-
-			if (width > 1) {
-				dgFloat32 mag = dgFloat32(0.0f);
-				for (dgInt32 j = 1; j < width; j++) {
-					dgInt32 index = activeColumns[j];
-					mag += rowI[index] * rowI[index];
-					reflexion[index] = rowI[index];
-				}
-				reflexion[i] = rowI[i] - dgSqrt(mag + rowI[i] * rowI[i]);
-
-				const dgFloat32 vMag2(mag + reflexion[i] * reflexion[i]);
-				//const T den (dgFloat32 (1.0f) / T (sqrt (vMag2)));
-				//for (dgInt32 j = 0; j < width; j ++) {
-				//	dgInt32 index = activeColumns[j];
-				//	reflexion[index] *= den;
-				//}
-
-				const dgFloat32 den = dgFloat32(2.0f) / vMag2;
-				for (dgInt32 j = i; j < size; j++) {
-					dgFloat32 acc = dgFloat32(0.0f);
-					dgFloat32* const rowJ = &choleskyMatrix[size * j];
-					for (dgInt32 k = 0; k < width; k++) {
-						dgInt32 index = activeColumns[k];
-						acc += rowJ[index] * reflexion[index];
-					}
-					tmp[j] = acc;
-				}
-
-				for (dgInt32 j = i + 1; j < size; j++) {
-					dgFloat32* const rowJ = &choleskyMatrix[size * j];
-					const dgFloat32 a = tmp[j] * den;
-					for (dgInt32 k = 0; k < width; k++) {
-						dgInt32 index = activeColumns[k];
-						rowJ[index] -= a * reflexion[index];
-					}
-				}
-				rowI[i] -= tmp[i] * reflexion[i] * den;
-			}
-
-			for (dgInt32 k = i + 1; k < size; k++) {
-				rowI[k] = dgFloat32(0.0f);
-			}
-
-			if (rowI[i] < dgFloat32(0.0f)) {
-				for (dgInt32 k = i; k < size; k++) {
-					choleskyMatrix[size * k + i] = -choleskyMatrix[size * k + i];
-				}
-			}
-		}
-		for (dgInt32 i = row; i < size; i++) {
-			choleskyMatrix[size * i + i] = dgMax(choleskyMatrix[size * i + i], dgFloat32(1.0e-6f));
-		}
-	}
-}
-
-
-
-static void xxxxxx1(dgInt32 size, dgFloat32* const matrix, dgFloat32* const b, dgFloat32* const low, dgFloat32* const high)
-{
-/*
-	T* const x0 = dgAlloca(T, size);
-	T* const r0 = dgAlloca(T, size);
-	T* const tmp0 = dgAlloca(T, size);
-	T* const tmp1 = dgAlloca(T, size);
-	T* const delta_r = dgAlloca(T, size);
-	T* const delta_x = dgAlloca(T, size);
-	dgInt16* const permute = dgAlloca(short, size);
-	dgInt16* const updateIndex = dgAlloca(short, size);
-
-	dgCheckAligment(x);
-	dgCheckAligment(b);
-	dgCheckAligment(x0);
-	dgCheckAligment(r0);
-	dgCheckAligment(low);
-	dgCheckAligment(high);
-	dgCheckAligment(tmp0);
-	dgCheckAligment(tmp1);
-	dgCheckAligment(delta_r);
-	dgCheckAligment(delta_x);
-	dgCheckAligment(permute);
-	dgCheckAligment(symmetricMatrixPSD);
-	dgCheckAligment(lowerTriangularMatrix);
-*/
-
-	dgFloat32 x0[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 r0[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 delta_x[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 delta_r[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 tmp0[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 tmp1[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 choleskyMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
-	dgInt16 permute[DG_CONSTRAINT_MAX_ROWS];
-
-	dgInt32 index = 0;
-	dgInt32 count = size;
-	dgInt32 clampedIndex = size;
-
-	for (dgInt32 i = 0; i < size; i++) {
-		permute[i] = short(i);
-		r0[i] = -b[i];
-		x0[i] = dgFloat32(0.0f);
-		delta_x[i] = dgFloat32(0.0f);
-		delta_r[i] = dgFloat32(0.0f);
-	}
-
-/*
-	bool findInitialGuess = size >= 6;
-	if (findInitialGuess) {
-		dgInt32 initialGuessCount = size;
-		for (dgInt32 j = 0; (j < 5) && findInitialGuess; j++) {
-
-			findInitialGuess = false;
-			for (dgInt32 i = 0; i < initialGuessCount; i++) {
-				x0[i] = -r0[i];
-			}
-			dgSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, x0);
-			dgInt32 permuteStart = initialGuessCount;
-			for (dgInt32 i = 0; i < initialGuessCount; i++) {
-				T f = x0[i];
-				if ((f < low[i]) || (f > high[i])) {
-					findInitialGuess = true;
-					x0[i] = T(dgFloat32(0.0f));
-					dgPermuteRows(size, i, initialGuessCount - 1, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-					permuteStart = dgMin(permuteStart, i);
-					i--;
-					initialGuessCount--;
-				}
-			}
-			if (findInitialGuess) {
-				dgCholeskyUpdate(size, permuteStart, size - 1, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
-			}
-		}
-
-		if (initialGuessCount == size) {
-			for (dgInt32 i = 0; i < size; i++) {
-				x[i] = x0[i];
-				b[i] = T(dgFloat32(0.0f));
-			}
-
-			return true;
-		} else {
-			if (!findInitialGuess) {
+				findInitialGuess = false;
 				for (dgInt32 i = 0; i < initialGuessCount; i++) {
-					r0[i] = T(dgFloat32(0.0f));
+					m_x0[i] = -m_r0[i];
 				}
-				for (dgInt32 i = initialGuessCount; i < size; i++) {
-					r0[i] += dgDotProduct(size, &symmetricMatrixPSD[i * size], x0);
+				dgSolveCholesky(initialGuessCount, m_x0);
+				dgInt32 permuteStart = initialGuessCount;
+				for (dgInt32 i = 0; i < initialGuessCount; i++) {
+					dgFloat32 f = m_x0[i];
+					if ((f < m_low[i]) || (f > m_high[i])) {
+						findInitialGuess = true;
+						m_x0[i] = dgFloat32(0.0f);
+						dgPermuteRows(i, initialGuessCount - 1);
+						permuteStart = dgMin(permuteStart, i);
+						i--;
+						initialGuessCount--;
+					}
 				}
-				index = initialGuessCount;
-				count = size - initialGuessCount;
+				if (findInitialGuess) {
+					dgCholeskyUpdate(permuteStart, m_size - 1);
+				}
+			}
+
+			if (initialGuessCount == m_size) {
+				for (dgInt32 i = 0; i < m_size; i++) {
+					m_x[i] = m_x0[i];
+					m_b[i] = dgFloat32(0.0f);
+				}
+				dgAssert(0);
+				return;
+//				return true;
 			} else {
-				//dgAssert(0);
-				for (dgInt32 i = 0; i < size; i++) {
-					x0[i] = dgFloat32(0.0f);
+				if (!findInitialGuess) {
+					for (dgInt32 i = 0; i < initialGuessCount; i++) {
+						m_r0[i] = dgFloat32(0.0f);
+					}
+					for (dgInt32 i = initialGuessCount; i < m_size; i++) {
+						m_r0[i] += dgDotProduct(m_size, &m_matrix[i * m_size], m_x0);
+					}
+					index = initialGuessCount;
+					count = m_size - initialGuessCount;
+				} else {
+					//dgAssert(0);
+					for (dgInt32 i = 0; i < m_size; i++) {
+						m_x0[i] = dgFloat32(0.0f);
+					}
 				}
 			}
 		}
-	}
-*/
+		
 
-	memcpy(choleskyMatrix, matrix, size * size * sizeof(dgFloat32));
-	dgCholeskyFactorization<dgFloat32>(size, choleskyMatrix);
-//	dgSolveCholesky<dgFloat32>(size, size, choleskyMatrix, b);
+		memcpy(m_choleskyMatrix, m_matrix, m_size * m_size * sizeof(dgFloat32));
+		dgCholeskyFactorization<dgFloat32>(m_size, m_choleskyMatrix);
+		
+		while (count) {
+			bool loop = true;
+			bool calculateDelta_x = true;
 
-	while (count) {
-		bool loop = true;
-		bool calculateDelta_x = true;
+			while (loop) {
 
-		while (loop) {
+				loop = false;
+				dgFloat32 clamp_x = dgFloat32(0.0f);
+				dgInt32 swapIndex = -1;
 
-			loop = false;
-			dgFloat32 clamp_x = dgFloat32(0.0f);
-			dgInt32 swapIndex = -1;
+				if (dgAbsf(m_r0[index]) > dgFloat32(1.0e-12f)) {
+					dgAssert(calculateDelta_x);
 
-			if (dgAbsf(r0[index]) > dgFloat32(1.0e-12f)) {
-				dgAssert(calculateDelta_x);
-
-				if (calculateDelta_x) {
-					const dgFloat32* const row = &matrix[size * index];
-					for (dgInt32 i = 0; i < index; i++) {
-						delta_x[i] = -row[i];
+					if (calculateDelta_x) {
+						const dgFloat32* const row = &m_matrix[m_size * index];
+						for (dgInt32 i = 0; i < index; i++) {
+							m_delta_x[i] = -row[i];
+						}
+						dgSolveCholesky(index, m_delta_x);
+						m_delta_x[index] = dgFloat32(1.0f);
 					}
-					dgSolveCholesky(size, index, choleskyMatrix, delta_x);
-					delta_x[index] = dgFloat32(1.0f);
-				}
 
-				calculateDelta_x = true;
-				dgInt32 stride = index * size;
-				for (dgInt32 j = index; j < size; j++) {
-					dgFloat32 val = dgFloat32(0.0f);
-					const dgFloat32* const A = &matrix[stride];
-					for (dgInt32 i = 0; i < size; i++) {
-						val = val + A[i] * delta_x[i];
+					calculateDelta_x = true;
+					dgInt32 stride = index * m_size;
+					for (dgInt32 j = index; j < m_size; j++) {
+						dgFloat32 val = dgFloat32(0.0f);
+						const dgFloat32* const A = &m_matrix[stride];
+						for (dgInt32 i = 0; i < m_size; i++) {
+							val = val + A[i] * m_delta_x[i];
+						}
+						m_delta_r[j] = val;
+						stride += m_size;
 					}
-					delta_r[j] = val;
-					stride += size;
-				}
 
-				dgAssert(delta_r[index] != dgFloat32(0.0f));
-				dgAssert(dgAbsf(delta_x[index]) == dgFloat32(1.0f));
-				delta_r[index] = (delta_r[index] == dgFloat32(0.0f)) ? dgFloat32(1.0e-12f) : delta_r[index];
+					dgAssert(m_delta_r[index] != dgFloat32(0.0f));
+					dgAssert(dgAbsf(m_delta_x[index]) == dgFloat32(1.0f));
+					m_delta_r[index] = (m_delta_r[index] == dgFloat32(0.0f)) ? dgFloat32(1.0e-12f) : m_delta_r[index];
 
-				dgFloat32 s = -r0[index] / delta_r[index];
-				dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
+					dgFloat32 s = -m_r0[index] / m_delta_r[index];
+					dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
 
-				for (dgInt32 i = 0; i <= index; i++) {
-					dgFloat32 x1 = x0[i] + s * delta_x[i];
-					if (x1 > high[i]) {
-						swapIndex = i;
-						clamp_x = high[i];
-						s = (high[i] - x0[i]) / delta_x[i];
-					} else if (x1 < low[i]) {
-						swapIndex = i;
-						clamp_x = low[i];
-						s = (low[i] - x0[i]) / delta_x[i];
-					}
-				}
-				dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
-
-				for (dgInt32 i = clampedIndex; (i < size) && (s > dgFloat32(1.0e-12f)); i++) {
-					dgFloat32 r1 = r0[i] + s * delta_r[i];
-					if ((r1 * r0[i]) < dgFloat32(0.0f)) {
-						dgAssert(dgAbsf(delta_r[i]) > dgFloat32(0.0f));
-						dgFloat32 s1 = -r0[i] / delta_r[i];
-						dgAssert(dgAbsf(s1) >= dgFloat32(0.0f));
-						dgAssert(dgAbsf(s1) <= dgAbsf(s));
-						if (dgAbsf(s1) < dgAbsf(s)) {
-							s = s1;
+					for (dgInt32 i = 0; i <= index; i++) {
+						dgFloat32 x1 = m_x0[i] + s * m_delta_x[i];
+						if (x1 > m_high[i]) {
 							swapIndex = i;
+							clamp_x = m_high[i];
+							s = (m_high[i] - m_x0[i]) / m_delta_x[i];
+						} else if (x1 < m_low[i]) {
+							swapIndex = i;
+							clamp_x = m_low[i];
+							s = (m_low[i] - m_x0[i]) / m_delta_x[i];
 						}
 					}
+					dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
+
+					for (dgInt32 i = clampedIndex; (i < m_size) && (s > dgFloat32(1.0e-12f)); i++) {
+						dgFloat32 r1 = m_r0[i] + s * m_delta_r[i];
+						if ((r1 * m_r0[i]) < dgFloat32(0.0f)) {
+							dgAssert(dgAbsf(m_delta_r[i]) > dgFloat32(0.0f));
+							dgFloat32 s1 = -m_r0[i] / m_delta_r[i];
+							dgAssert(dgAbsf(s1) >= dgFloat32(0.0f));
+							dgAssert(dgAbsf(s1) <= dgAbsf(s));
+							if (dgAbsf(s1) < dgAbsf(s)) {
+								s = s1;
+								swapIndex = i;
+							}
+						}
+					}
+
+					for (dgInt32 i = 0; i < m_size; i++) {
+						dgAssert((m_x0[i] + dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) >= m_low[i]);
+						dgAssert((m_x0[i] - dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) <= m_high[i]);
+
+						m_x0[i] += s * m_delta_x[i];
+						m_r0[i] += s * m_delta_r[i];
+
+						dgAssert((m_x0[i] + dgFloat32(1.0f)) >= m_low[i]);
+						dgAssert((m_x0[i] - dgFloat32(1.0f)) <= m_high[i]);
+					}
 				}
 
-				for (dgInt32 i = 0; i < size; i++) {
-					dgAssert((x0[i] + dgAbsf(x0[i]) * dgFloat32(1.0e-4f)) >= low[i]);
-					dgAssert((x0[i] - dgAbsf(x0[i]) * dgFloat32(1.0e-4f)) <= high[i]);
-
-					x0[i] += s * delta_x[i];
-					r0[i] += s * delta_r[i];
-
-					dgAssert((x0[i] + dgFloat32(1.0f)) >= low[i]);
-					dgAssert((x0[i] - dgFloat32(1.0f)) <= high[i]);
-				}
-			}
-
-			if (swapIndex == -1) {
-				r0[index] = dgFloat32(0.0f);
-				delta_r[index] = dgFloat32(0.0f);
-				index++;
-				count--;
-				loop = false;
-			} else if (swapIndex == index) {
-				count--;
-				clampedIndex--;
-				x0[index] = clamp_x;
-				dgPermuteRows(size, index, clampedIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgCholeskyUpdate(size, index, clampedIndex, choleskyMatrix, tmp0, tmp1);
-				loop = count ? true : false;
-			} else if (swapIndex > index) {
-				dgAssert(0);
-				/*
-				loop = true;
-				r0[swapIndex] = T(dgFloat32(0.0f));
-				dgAssert(swapIndex < size);
-				dgAssert(clampedIndex <= size);
-				if (swapIndex < clampedIndex) {
+				if (swapIndex == -1) {
+					m_r0[index] = dgFloat32(0.0f);
+					m_delta_r[index] = dgFloat32(0.0f);
+					index++;
+					count--;
+					loop = false;
+				} else if (swapIndex == index) {
 					count--;
 					clampedIndex--;
-					dgPermuteRows(size, clampedIndex, swapIndex, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-					dgCholeskyUpdate(size, swapIndex, clampedIndex, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
-					dgAssert(clampedIndex >= index);
+					m_x0[index] = clamp_x;
+					dgPermuteRows(index, clampedIndex);
+					dgCholeskyUpdate(index, clampedIndex);
+					loop = count ? true : false;
+
+				} else if (swapIndex > index) {
+					loop = true;
+					m_r0[swapIndex] = dgFloat32(0.0f);
+					dgAssert(swapIndex < m_size);
+					dgAssert(clampedIndex <= m_size);
+					if (swapIndex < clampedIndex) {
+						count--;
+						clampedIndex--;
+						dgPermuteRows(clampedIndex, swapIndex);
+						dgCholeskyUpdate(swapIndex, clampedIndex);
+						dgAssert(clampedIndex >= index);
+					} else {
+						count++;
+						dgAssert(clampedIndex < m_size);
+						dgPermuteRows(clampedIndex, swapIndex);
+						dgCholeskyUpdate(clampedIndex, swapIndex);
+						clampedIndex++;
+						dgAssert(clampedIndex <= m_size);
+						dgAssert(clampedIndex >= index);
+					}
+					calculateDelta_x = false;
+
 				} else {
-					count++;
-					dgAssert(clampedIndex < size);
-					dgPermuteRows(size, clampedIndex, swapIndex, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-					dgCholeskyUpdate(size, clampedIndex, swapIndex, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
-					clampedIndex++;
-					dgAssert(clampedIndex <= size);
-					dgAssert(clampedIndex >= index);
+					dgAssert(index > 0);
+					m_x0[swapIndex] = clamp_x;
+					m_delta_x[index] = dgFloat32(0.0f);
+
+					dgAssert(swapIndex < index);
+					dgPermuteRows(swapIndex, index - 1);
+					dgPermuteRows(index - 1, index);
+					dgPermuteRows(clampedIndex - 1, index);
+					dgCholeskyUpdate(swapIndex, clampedIndex - 1);
+
+					clampedIndex--;
+					index--;
+					loop = true;
 				}
-				calculateDelta_x = false;
-				*/
-			} else {
-				dgAssert(index > 0);
-				x0[swapIndex] = clamp_x;
-				delta_x[index] = dgFloat32(0.0f);
+			}
+		}
 
-				dgAssert(swapIndex < index);
-				dgPermuteRows(size, swapIndex, index - 1, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgPermuteRows(size, index - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgPermuteRows(size, clampedIndex - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgCholeskyUpdate(size, swapIndex, clampedIndex - 1, choleskyMatrix, tmp0, tmp1);
 
-				clampedIndex--;
-				index--;
-				loop = true;
+		for (dgInt32 i = 0; i < m_size; i++) {
+			dgInt32 j = m_permute[i];
+			m_x[j] = m_x0[i];
+			m_b[j] = m_r0[i];
+		}
+	}
+
+	private:
+//	static void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, dgFloat32* const matrix, dgFloat32* const choleskyMatrix, dgFloat32* const x, dgFloat32* const r, dgFloat32* const low, dgFloat32* const high, dgInt16* const permute)
+	void dgPermuteRows(dgInt32 i, dgInt32 j)
+	{
+		if (i != j) {
+			dgFloat32* const A = &m_matrix[m_size * i];
+			dgFloat32* const B = &m_matrix[m_size * j];
+			dgFloat32* const invA = &m_choleskyMatrix[m_size * i];
+			dgFloat32* const invB = &m_choleskyMatrix[m_size * j];
+			for (dgInt32 k = 0; k < m_size; k++) {
+				dgSwap(A[k], B[k]);
+				dgSwap(invA[k], invB[k]);
+			}
+
+			dgInt32 stride = 0;
+			for (dgInt32 k = 0; k < m_size; k++) {
+				dgSwap(m_matrix[stride + i], m_matrix[stride + j]);
+				stride += m_size;
+			}
+
+			dgSwap(m_x0[i], m_x0[j]);
+			dgSwap(m_r0[i], m_r0[j]);
+			dgSwap(m_low[i], m_low[j]);
+			dgSwap(m_high[i], m_high[j]);
+			dgSwap(m_permute[i], m_permute[j]);
+		}
+	}
+
+
+//	void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, dgFloat32* const choleskyMatrix, dgFloat32* const tmp, dgFloat32* const reflexion)
+	void dgCholeskyUpdate(dgInt32 row, dgInt32 colum)
+	{
+		if (row != colum) {
+			dgAssert(row < colum);
+
+			// using Householder rotations, much more stable than Givens rotations
+			for (dgInt32 i = row; i < m_size; i++) {
+				dgFloat32* const rowI = &m_choleskyMatrix[m_size * i];
+				m_activeColumns[0] = dgInt16(i);
+				dgInt32 width = 1;
+				for (dgInt32 j = i + 1; j < m_size; j++) {
+					m_activeColumns[width] = dgInt16(j);
+					width += dgAbsf(rowI[j]) > dgFloat32(1.0e-14f) ? 1 : 0;
+				}
+
+				if (width > 1) {
+					dgFloat32 mag = dgFloat32(0.0f);
+					for (dgInt32 j = 1; j < width; j++) {
+						dgInt32 index = m_activeColumns[j];
+						mag += rowI[index] * rowI[index];
+						m_tmp1[index] = rowI[index];
+					}
+					m_tmp1[i] = rowI[i] - dgSqrt(mag + rowI[i] * rowI[i]);
+
+					const dgFloat32 vMag2(mag + m_tmp1[i] * m_tmp1[i]);
+					//const T den (dgFloat32 (1.0f) / T (sqrt (vMag2)));
+					//for (dgInt32 j = 0; j < width; j ++) {
+					//	dgInt32 index = activeColumns[j];
+					//	reflexion[index] *= den;
+					//}
+
+					const dgFloat32 den = dgFloat32(2.0f) / vMag2;
+					for (dgInt32 j = i; j < m_size; j++) {
+						dgFloat32 acc = dgFloat32(0.0f);
+						dgFloat32* const rowJ = &m_choleskyMatrix[m_size * j];
+						for (dgInt32 k = 0; k < width; k++) {
+							dgInt32 index = m_activeColumns[k];
+							acc += rowJ[index] * m_tmp1[index];
+						}
+						m_tmp0[j] = acc;
+					}
+
+					for (dgInt32 j = i + 1; j < m_size; j++) {
+						dgFloat32* const rowJ = &m_choleskyMatrix[m_size * j];
+						const dgFloat32 a = m_tmp0[j] * den;
+						for (dgInt32 k = 0; k < width; k++) {
+							dgInt32 index = m_activeColumns[k];
+							rowJ[index] -= a * m_tmp1[index];
+						}
+					}
+					rowI[i] -= m_tmp0[i] * m_tmp1[i] * den;
+				}
+
+				for (dgInt32 k = i + 1; k < m_size; k++) {
+					rowI[k] = dgFloat32(0.0f);
+				}
+
+				if (rowI[i] < dgFloat32(0.0f)) {
+					for (dgInt32 k = i; k < m_size; k++) {
+						m_choleskyMatrix[m_size * k + i] = -m_choleskyMatrix[m_size * k + i];
+					}
+				}
+			}
+			for (dgInt32 i = row; i < m_size; i++) {
+				m_choleskyMatrix[m_size * i + i] = dgMax(m_choleskyMatrix[m_size * i + i], dgFloat32(1.0e-6f));
 			}
 		}
 	}
 
-/*
-	for (dgInt32 i = 0; i < size; i++) {
-		dgInt32 j = permute[i];
-		x[j] = x0[i];
-		b[j] = r0[i];
+//	void dgSolveCholesky(dgInt32 size, dgInt32 n, const dgFloat32* const choleskyMatrix, dgFloat32* const x)
+	void dgSolveCholesky(dgInt32 n, dgFloat32* const out)
+	{
+		dgInt32 stride = 0;
+		for (dgInt32 i = 0; i < n; i++) {
+			dgFloat32 acc = dgFloat32(0.0f);
+			const dgFloat32* const row = &m_choleskyMatrix[stride];
+			for (dgInt32 j = 0; j < i; j++) {
+				acc = acc + row[j] * out[j];
+			}
+			out[i] = (out[i] - acc) / row[i];
+			stride += m_size;
+		}
+
+		for (dgInt32 i = n - 1; i >= 0; i--) {
+			dgFloat32 acc = dgFloat32(0.0f);
+			for (dgInt32 j = i + 1; j < n; j++) {
+				acc = acc + m_choleskyMatrix[m_size * j + i] * out[j];
+			}
+			out[i] = (out[i] - acc) / m_choleskyMatrix[m_size * i + i];
+		}
 	}
-*/
-}
+
+
+	dgFloat32 m_x[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_b[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_x0[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_r0[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_low[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_high[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_tmp0[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_tmp1[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_delta_x[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_delta_r[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_matrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_choleskyMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
+	dgInt16 m_permute[DG_CONSTRAINT_MAX_ROWS];
+	dgInt16 m_activeColumns[DG_CONSTRAINT_MAX_ROWS];
+	dgInt32 m_size;
+};
+
+
 
 static void xxxxxx()
 {
@@ -1296,7 +1287,7 @@ static void xxxxxx()
 		m[i][i] *= 1.0001f;
 	}
 
-	xxxxxx1(4, &m[0][0], b, low, high);
+//	xxxxxx1(4, &m[0][0], b, low, high);
 }
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
