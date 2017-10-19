@@ -1015,11 +1015,15 @@ class dgDanzigSolver
 				}
 			}
 
-			for (dgInt32 i = 0; i < initialGuessCount; i++) {
+			for (dgInt32 i = 0; i < m_size; i++) {
 				m_x0[i] += alpha * m_delta_x[i];
 				m_r0[i] += alpha * m_delta_r[i];
 				m_delta_r[i] = -m_r0[i];
 				m_delta_x[i] = m_delta_r[i];
+			}
+
+			for (dgInt32 i = initialGuessCount; i < m_size; i++) {
+				m_delta_x[i] = dgFloat32(0.0f);
 			}
 
 			if (test) {
@@ -1029,16 +1033,20 @@ class dgDanzigSolver
 
 		count = m_size - initialGuessCount;
 		if (count) {
-			dgInt32 stride = 0;
-			for (dgInt32 j = 0; j < m_size; j++) {
+			for (dgInt32 i = 0; i < m_size; i++) {
+				m_r0[i] = dgFloat32(0.0f);
+				m_delta_x[i] = dgFloat32(0.0f);
+				m_delta_r[i] = dgFloat32(0.0f);
+			}
+
+			dgInt32 stride = initialGuessCount * m_size;
+			for (dgInt32 j = initialGuessCount; j < m_size; j++) {
 				dgFloat32 val = -m_b[j];
 				const dgFloat32* const A = &m_matrix[stride];
 				for (dgInt32 i = 0; i < m_size; i++) {
 					val = val + A[i] * m_x0[i];
 				}
 				m_r0[j] = val;
-				m_delta_x[j] = dgFloat32(0.0f);
-				m_delta_r[j] = dgFloat32(0.0f);
 				stride += m_size;
 			}
 			index = initialGuessCount;
@@ -1332,7 +1340,8 @@ class dgDanzigSolver
 
 static void xxxxxx()
 {
-	dgFloat32 angle = -45.00899f * 3.141592f / 180.0f;
+//	dgFloat32 angle = -45.00899f * 3.141592f / 180.0f;
+	dgFloat32 angle = -50.0f * 3.141592f / 180.0f;
 	dgMatrix matrix(dgRollMatrix(angle));
 	dgVector r0(matrix.RotateVector(dgVector(-0.5f, -0.5f, 0.0f, 0.0f)));
 	dgVector r1(matrix.RotateVector(dgVector(0.5f, -0.5f, 0.0f, 0.0f)));
@@ -1359,7 +1368,7 @@ static void xxxxxx()
 #if 1
 	low[0] = 0.0f;
 	low[1] = 0.0f;
-	low[2] = -30.0f;
+	low[2] = -3.0f;
 	low[3] = -30.0f;
 	high[0] = 1000.0f;
 	high[1] = 1000.0f;
