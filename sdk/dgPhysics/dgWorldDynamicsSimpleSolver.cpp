@@ -966,26 +966,25 @@ class dgDanzigSolver
 
 	void Solve()
 	{
+		CholeskyFactorization();
+
+
 		dgInt32 index = 0;
 		dgInt32 count = m_size;
 		dgInt32 clampedIndex = m_size;
+		dgInt32 initialGuessCount = m_size;
 
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_permute[i] = short(i);
 			m_r0[i] = -m_b[i];
 			m_x0[i] = dgFloat32(0.0f);
-//			m_delta_x[i] = dgFloat32(0.0f);
-//			m_delta_r[i] = dgFloat32(0.0f);
 		}
-		CholeskyFactorization();
-
-		dgInt32 initialGuessCount = m_size;
-
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_delta_r[i] = -m_r0[i];
 			m_delta_x[i] = m_delta_r[i];
 		}
-		for (dgInt32 j = 0; j < 5; j++) {
+		for (dgInt32 test = true; test; ) {
+			test = false;
 			SolveCholesky(initialGuessCount, m_delta_x);
 			dgInt32 permuteStart = initialGuessCount;
 
@@ -994,6 +993,7 @@ class dgDanzigSolver
 				dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
 
 				if (x < m_low[i]) {
+					test = true;
 					permuteStart = dgMin(permuteStart, i);
 					dgFloat32 alpha1 = (m_low[i] - m_x0[i]) / m_delta_x[i];
 					dgAssert(alpha1 < alpha);
@@ -1003,6 +1003,7 @@ class dgDanzigSolver
 					PermuteRows(i, initialGuessCount);
 					i--;
 				} else if (x > m_high[i]) {
+					test = true;
 					permuteStart = dgMin(permuteStart, i);
 					dgFloat32 alpha1 = (m_high[i] - m_x0[i]) / m_delta_x[i];
 					dgAssert(alpha1 < alpha);
@@ -1014,48 +1015,35 @@ class dgDanzigSolver
 				}
 			}
 
-			for (dgInt32 i = 0; i < m_size; i++) {
+			for (dgInt32 i = 0; i < initialGuessCount; i++) {
 				m_x0[i] += alpha * m_delta_x[i];
 				m_r0[i] += alpha * m_delta_r[i];
 				m_delta_r[i] = -m_r0[i];
 				m_delta_x[i] = m_delta_r[i];
 			}
 
-			if (permuteStart < m_size) {
+			if (test) {
 				CholeskyUpdate(permuteStart, m_size - 1);
 			}
 		}
 
-/*
-		if (initialGuessCount == m_size) {
-			for (dgInt32 i = 0; i < m_size; i++) {
-				m_x[i] = m_x0[i];
-				m_b[i] = dgFloat32(0.0f);
-			}
-			dgAssert(0);
-			return;
-//				return true;
-		} else {
-			if (!findInitialGuess) {
-				for (dgInt32 i = 0; i < initialGuessCount; i++) {
-					m_r0[i] = dgFloat32(0.0f);
-				}
-				for (dgInt32 i = initialGuessCount; i < m_size; i++) {
-					m_r0[i] += dgDotProduct(m_size, &m_matrix[i * m_size], m_x0);
-				}
-				index = initialGuessCount;
-				count = m_size - initialGuessCount;
-			} else {
-				//dgAssert(0);
+		count = m_size - initialGuessCount;
+		if (count) {
+			dgInt32 stride = 0;
+			for (dgInt32 j = 0; j < m_size; j++) {
+				dgFloat32 val = -m_b[j];
+				const dgFloat32* const A = &m_matrix[stride];
 				for (dgInt32 i = 0; i < m_size; i++) {
-					m_x0[i] = dgFloat32(0.0f);
+					val = val + A[i] * m_x0[i];
 				}
+				m_r0[j] = val;
+				m_delta_x[j] = dgFloat32(0.0f);
+				m_delta_r[j] = dgFloat32(0.0f);
+				stride += m_size;
 			}
+			index = initialGuessCount;
 		}
-*/		
 
-
-		
 		while (count) {
 			bool loop = true;
 			bool calculateDelta_x = true;
@@ -1219,6 +1207,7 @@ class dgDanzigSolver
 				stride += m_size;
 			}
 
+			dgSwap(m_b[i], m_b[j]);
 			dgSwap(m_x0[i], m_x0[j]);
 			dgSwap(m_r0[i], m_r0[j]);
 			dgSwap(m_low[i], m_low[j]);
@@ -1343,18 +1332,13 @@ class dgDanzigSolver
 
 static void xxxxxx()
 {
-	dgFloat32 angle = -50.0f * 3.141692f / 180.0f;
+	dgFloat32 angle = -45.00899f * 3.141592f / 180.0f;
 	dgMatrix matrix(dgRollMatrix(angle));
 	dgVector r0(matrix.RotateVector(dgVector(-0.5f, -0.5f, 0.0f, 0.0f)));
 	dgVector r1(matrix.RotateVector(dgVector(0.5f, -0.5f, 0.0f, 0.0f)));
 
 	dgJacobian w;
 	dgJacobian jt[4];
-//	dgFloat32 b[4];
-//	dgFloat32 low[4];
-//	dgFloat32 high[4];
-//	dgFloat32 m[4][4];
-
 	dgDanzigSolver solver;
 
 	solver.SetSize(4);
@@ -1372,15 +1356,26 @@ static void xxxxxx()
 	jt[3].m_linear = matrix.RotateVector(dgVector(1.0f, 0.0f, 0.0f, 0.0f));
 	jt[3].m_angular = r1.CrossProduct3(jt[3].m_linear);
 
+#if 1
 	low[0] = 0.0f;
 	low[1] = 0.0f;
 	low[2] = -30.0f;
 	low[3] = -30.0f;
-
 	high[0] = 1000.0f;
 	high[1] = 1000.0f;
 	high[2] = 30.0f;
 	high[3] = 30.0f;
+
+#else
+	low[0] = -1000.0f;
+	low[1] = -1000.0f;
+	low[2] = -1000.0f;
+	low[3] = -1000.0f;
+	high[0] = 1000.0f;
+	high[1] = 1000.0f;
+	high[2] = 1000.0f;
+	high[3] = 1000.0f;
+#endif
 
 	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
 	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
