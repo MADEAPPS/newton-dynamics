@@ -910,7 +910,7 @@ class dgDanzigSolver
 
 	dgFloat32* GetHigh()
 	{
-		return m_low;
+		return m_high;
 	}
 
 	dgFloat32* GetMatrixRow(dgInt32 i)
@@ -974,68 +974,87 @@ class dgDanzigSolver
 			m_permute[i] = short(i);
 			m_r0[i] = -m_b[i];
 			m_x0[i] = dgFloat32(0.0f);
-			m_delta_x[i] = dgFloat32(0.0f);
-			m_delta_r[i] = dgFloat32(0.0f);
+//			m_delta_x[i] = dgFloat32(0.0f);
+//			m_delta_r[i] = dgFloat32(0.0f);
 		}
-/*
-		bool findInitialGuess = m_size >= 6;
-		if (findInitialGuess) {
-			dgInt32 initialGuessCount = m_size;
-			for (dgInt32 j = 0; (j < 5) && findInitialGuess; j++) {
+		CholeskyFactorization();
 
-				findInitialGuess = false;
-				for (dgInt32 i = 0; i < initialGuessCount; i++) {
-					m_x0[i] = -m_r0[i];
-				}
-				dgSolveCholesky(initialGuessCount, m_x0);
-				dgInt32 permuteStart = initialGuessCount;
-				for (dgInt32 i = 0; i < initialGuessCount; i++) {
-					dgFloat32 f = m_x0[i];
-					if ((f < m_low[i]) || (f > m_high[i])) {
-						findInitialGuess = true;
-						m_x0[i] = dgFloat32(0.0f);
-						dgPermuteRows(i, initialGuessCount - 1);
-						permuteStart = dgMin(permuteStart, i);
-						i--;
-						initialGuessCount--;
-					}
-				}
-				if (findInitialGuess) {
-					dgCholeskyUpdate(permuteStart, m_size - 1);
+		dgInt32 initialGuessCount = m_size;
+
+		for (dgInt32 i = 0; i < m_size; i++) {
+			m_delta_r[i] = -m_r0[i];
+			m_delta_x[i] = m_delta_r[i];
+		}
+		for (dgInt32 j = 0; j < 5; j++) {
+			SolveCholesky(initialGuessCount, m_delta_x);
+			dgInt32 permuteStart = initialGuessCount;
+
+			dgFloat32 alpha = dgFloat32(1.0f);
+			for (dgInt32 i = 0; i < initialGuessCount; i++) {
+				dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
+
+				if (x < m_low[i]) {
+					permuteStart = dgMin(permuteStart, i);
+					dgFloat32 alpha1 = (m_low[i] - m_x0[i]) / m_delta_x[i];
+					dgAssert(alpha1 < alpha);
+					dgAssert(alpha1 >= dgFloat32(0.0f));
+					alpha = alpha1;
+					initialGuessCount--;
+					PermuteRows(i, initialGuessCount);
+					i--;
+				} else if (x > m_high[i]) {
+					permuteStart = dgMin(permuteStart, i);
+					dgFloat32 alpha1 = (m_high[i] - m_x0[i]) / m_delta_x[i];
+					dgAssert(alpha1 < alpha);
+					dgAssert(alpha1 >= dgFloat32(0.0f));
+					alpha = alpha1;
+					initialGuessCount--;
+					PermuteRows(i, initialGuessCount);
+					i--;
 				}
 			}
 
-			if (initialGuessCount == m_size) {
-				for (dgInt32 i = 0; i < m_size; i++) {
-					m_x[i] = m_x0[i];
-					m_b[i] = dgFloat32(0.0f);
-				}
-				dgAssert(0);
-				return;
+			for (dgInt32 i = 0; i < m_size; i++) {
+				m_x0[i] += alpha * m_delta_x[i];
+				m_r0[i] += alpha * m_delta_r[i];
+				m_delta_r[i] = -m_r0[i];
+				m_delta_x[i] = m_delta_r[i];
+			}
+
+			if (permuteStart < m_size) {
+				CholeskyUpdate(permuteStart, m_size - 1);
+			}
+		}
+
+/*
+		if (initialGuessCount == m_size) {
+			for (dgInt32 i = 0; i < m_size; i++) {
+				m_x[i] = m_x0[i];
+				m_b[i] = dgFloat32(0.0f);
+			}
+			dgAssert(0);
+			return;
 //				return true;
+		} else {
+			if (!findInitialGuess) {
+				for (dgInt32 i = 0; i < initialGuessCount; i++) {
+					m_r0[i] = dgFloat32(0.0f);
+				}
+				for (dgInt32 i = initialGuessCount; i < m_size; i++) {
+					m_r0[i] += dgDotProduct(m_size, &m_matrix[i * m_size], m_x0);
+				}
+				index = initialGuessCount;
+				count = m_size - initialGuessCount;
 			} else {
-				if (!findInitialGuess) {
-					for (dgInt32 i = 0; i < initialGuessCount; i++) {
-						m_r0[i] = dgFloat32(0.0f);
-					}
-					for (dgInt32 i = initialGuessCount; i < m_size; i++) {
-						m_r0[i] += dgDotProduct(m_size, &m_matrix[i * m_size], m_x0);
-					}
-					index = initialGuessCount;
-					count = m_size - initialGuessCount;
-				} else {
-					//dgAssert(0);
-					for (dgInt32 i = 0; i < m_size; i++) {
-						m_x0[i] = dgFloat32(0.0f);
-					}
+				//dgAssert(0);
+				for (dgInt32 i = 0; i < m_size; i++) {
+					m_x0[i] = dgFloat32(0.0f);
 				}
 			}
 		}
 */		
 
-//		memcpy(m_choleskyMatrix, m_matrix, m_size * m_size * sizeof(dgFloat32));
-//		dgCholeskyFactorization<dgFloat32>(m_size, m_choleskyMatrix);
-		CholeskyFactorization();
+
 		
 		while (count) {
 			bool loop = true;
