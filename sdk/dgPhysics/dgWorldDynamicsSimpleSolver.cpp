@@ -886,15 +886,15 @@ class dgDanzigSolver
 		m_size = size;
 	}
 
+	dgInt32 GetSize() const
+	{
+		return m_size;
+	}
+
 	dgFloat32* GetX()
 	{
 		return m_x;
 	}
-
-//	dgFloat32* GetR()
-//	{
-//		return m_r;
-//	}
 
 	dgFloat32* GetB()
 	{
@@ -909,6 +909,11 @@ class dgDanzigSolver
 	dgFloat32* GetHigh()
 	{
 		return m_high;
+	}
+
+	dgInt16* GetFrictionIndex()
+	{
+		return m_frictionIndex;
 	}
 
 	dgFloat32* GetMatrixRow(dgInt32 i)
@@ -972,6 +977,7 @@ class dgDanzigSolver
 		dgInt32 clampedIndex = m_size;
 		dgInt32 initialGuessCount = m_size;
 
+		m_x0[m_size] = m_x[m_size];
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_permute[i] = short(i);
 			m_r0[i] = -m_b[i];
@@ -988,22 +994,26 @@ class dgDanzigSolver
 
 			dgFloat32 alpha = dgFloat32(1.0f);
 			for (dgInt32 i = 0; i < initialGuessCount; i++) {
-				dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
-
-				if (x < m_low[i]) {
+				const dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
+				const dgInt32 frictionIndex = m_frictionIndex[i];
+				const dgFloat32 low = m_low[i] * m_x0[frictionIndex];
+				const dgFloat32 high = m_high[i] * m_x0[frictionIndex];
+				if (x < low) {
 					test = true;
 					permuteStart = dgMin(permuteStart, i);
-					dgFloat32 alpha1 = (m_low[i] - m_x0[i]) / m_delta_x[i];
+					dgFloat32 alpha1 = (low - m_x0[i]) / m_delta_x[i];
 					dgAssert(alpha1 < alpha);
 					dgAssert(alpha1 >= dgFloat32(0.0f));
 					alpha = alpha1;
 					initialGuessCount--;
+		dgAssert(0);
 					PermuteRows(i, initialGuessCount);
 					i--;
-				} else if (x > m_high[i]) {
+				} else if (x > high) {
 					test = true;
 					permuteStart = dgMin(permuteStart, i);
-					dgFloat32 alpha1 = (m_high[i] - m_x0[i]) / m_delta_x[i];
+					
+					dgFloat32 alpha1 = (high - m_x0[i]) / m_delta_x[i];
 					dgAssert(alpha1 < alpha);
 					dgAssert(alpha1 >= dgFloat32(0.0f));
 					alpha = alpha1;
@@ -1093,14 +1103,18 @@ class dgDanzigSolver
 
 					for (dgInt32 i = 0; i <= index; i++) {
 						dgFloat32 x1 = m_x0[i] + s * m_delta_x[i];
-						if (x1 > m_high[i]) {
+						const dgInt32 frictionIndex = m_frictionIndex[i];
+						const dgFloat32 low = m_low[i] * m_x0[frictionIndex];
+						const dgFloat32 high = m_high[i] * m_x0[frictionIndex];
+
+						if (x1 > high) {
 							swapIndex = i;
-							clamp_x = m_high[i];
-							s = (m_high[i] - m_x0[i]) / m_delta_x[i];
-						} else if (x1 < m_low[i]) {
+							clamp_x = high;
+							s = (high - m_x0[i]) / m_delta_x[i];
+						} else if (x1 < low) {
 							swapIndex = i;
-							clamp_x = m_low[i];
-							s = (m_low[i] - m_x0[i]) / m_delta_x[i];
+							clamp_x = low;
+							s = (low - m_x0[i]) / m_delta_x[i];
 						}
 					}
 					dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
@@ -1120,14 +1134,14 @@ class dgDanzigSolver
 					}
 
 					for (dgInt32 i = 0; i < m_size; i++) {
-						dgAssert((m_x0[i] + dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) >= m_low[i]);
-						dgAssert((m_x0[i] - dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) <= m_high[i]);
+						//dgAssert((m_x0[i] + dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) >= m_low[i]);
+						//dgAssert((m_x0[i] - dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) <= m_high[i]);
 
 						m_x0[i] += s * m_delta_x[i];
 						m_r0[i] += s * m_delta_r[i];
 
-						dgAssert((m_x0[i] + dgFloat32(1.0f)) >= m_low[i]);
-						dgAssert((m_x0[i] - dgFloat32(1.0f)) <= m_high[i]);
+						//dgAssert((m_x0[i] + dgFloat32(1.0f)) >= m_low[i]);
+						//dgAssert((m_x0[i] - dgFloat32(1.0f)) <= m_high[i]);
 					}
 				}
 
@@ -1219,6 +1233,7 @@ class dgDanzigSolver
 			dgSwap(m_low[i], m_low[j]);
 			dgSwap(m_high[i], m_high[j]);
 			dgSwap(m_permute[i], m_permute[j]);
+			dgSwap(m_frictionIndex[i], m_frictionIndex[j]);
 		}
 	}
 
@@ -1330,6 +1345,7 @@ class dgDanzigSolver
 	dgFloat32 m_matrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_choleskyMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
 	dgInt16 m_permute[DG_CONSTRAINT_MAX_ROWS];
+	dgInt16 m_frictionIndex[DG_CONSTRAINT_MAX_ROWS];
 	dgInt16 m_activeColumns[DG_CONSTRAINT_MAX_ROWS];
 	dgInt32 m_size;
 };
@@ -1350,9 +1366,11 @@ static void xxxxxx()
 
 	solver.SetSize(4);
 	dgFloat32* const b = solver.GetB();
+	dgFloat32* const x = solver.GetX();
 	dgFloat32* const m = solver.GetMatrixRow(0);
 	dgFloat32* const low = solver.GetLow();
 	dgFloat32* const high = solver.GetHigh();
+	dgInt16* const frictionIndex = solver.GetFrictionIndex();
 
 	jt[0].m_linear = matrix.RotateVector(dgVector(0.0f, 1.0f, 0.0f, 0.0f));
 	jt[0].m_angular = r0.CrossProduct3(jt[0].m_linear);
@@ -1363,26 +1381,22 @@ static void xxxxxx()
 	jt[3].m_linear = matrix.RotateVector(dgVector(1.0f, 0.0f, 0.0f, 0.0f));
 	jt[3].m_angular = r1.CrossProduct3(jt[3].m_linear);
 
-#if 1
 	low[0] = 0.0f;
 	low[1] = 0.0f;
-	low[2] = -3.0f;
-	low[3] = -30.0f;
+	low[2] = -0.9f;
+	low[3] = -0.9f;
 	high[0] = 1000.0f;
 	high[1] = 1000.0f;
-	high[2] = 30.0f;
-	high[3] = 30.0f;
+	high[2] = 0.9f;
+	high[3] = 0.9f;
 
-#else
-	low[0] = -1000.0f;
-	low[1] = -1000.0f;
-	low[2] = -1000.0f;
-	low[3] = -1000.0f;
-	high[0] = 1000.0f;
-	high[1] = 1000.0f;
-	high[2] = 1000.0f;
-	high[3] = 1000.0f;
-#endif
+	frictionIndex[0] = dgInt16(solver.GetSize());
+	frictionIndex[1] = dgInt16(solver.GetSize());
+	frictionIndex[2] = 0;
+	frictionIndex[3] = 1;
+
+	x[solver.GetSize()] = dgFloat32(1.0f);
+
 
 	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
 	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
