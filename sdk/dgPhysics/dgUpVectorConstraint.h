@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(__DGUPVECTORCONSTRAINT_563GFT35684GT_H)
-#define __DGUPVECTORCONSTRAINT_563GFT35684GT_H
+#ifndef __DGUPVECTORCONSTRAINT__
+#define __DGUPVECTORCONSTRAINT__
 #include "dgBilateralConstraint.h"
 
 //template<class T> class dgPool;

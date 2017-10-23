@@ -437,9 +437,6 @@ extern "C" {
 	//	NEWTON_API void NewtonSetPlatformArchitecture (const NewtonWorld* const newtonWorld, int mode);
 	//	NEWTON_API int NewtonGetPlatformArchitecture(const NewtonWorld* const newtonWorld, char* description);
 
-	NEWTON_API int NewtonGetStackSize (const NewtonWorld* const newtonWorld);
-	NEWTON_API void NewtonSetStackSize (const NewtonWorld* const newtonWorld, int size);
-
 	NEWTON_API int NewtonEnumerateDevices (const NewtonWorld* const newtonWorld);
 	NEWTON_API int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetCurrentDevice (const NewtonWorld* const newtonWorld, int deviceIndex);

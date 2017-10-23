@@ -51,7 +51,6 @@
 #include "dgCollisionIncompressibleParticles.h"
 
 
-
 DG_MSC_VECTOR_ALIGMENT
 class dgCollisionContactCloud: public dgCollisionConvex
 {

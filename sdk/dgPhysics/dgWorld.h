@@ -467,12 +467,12 @@ class dgWorld
 
 	virtual void Execute (dgInt32 threadID);
 	virtual void TickCallback (dgInt32 threadID);
-
 	void UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID);
 
 	static dgUnsigned32 dgApi GetPerformanceCount ();
 	static void UpdateTransforms(void* const context, void* const node, dgInt32 threadID);
 	static dgInt32 SortFaces (const dgAdressDistPair* const A, const dgAdressDistPair* const B, void* const context);
+	static dgInt32 CompareJointByInvMass (const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed);
 
 	dgUnsigned32 m_numberOfSubsteps;
 	dgUnsigned32 m_dynamicsLru;

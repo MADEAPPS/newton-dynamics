@@ -34,6 +34,7 @@
 #define	DG_BODY_LRU_STEP				2	
 #define	DG_MAX_SKELETON_JOINT_COUNT		256
 #define DG_MAX_CONTINUE_COLLISON_STEPS	8
+#define	DG_SMALL_ISLAND_COUNT			2
 
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
 #define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_MAG * dgFloat32 (0.5f))
@@ -252,7 +253,6 @@ class dgWorldDynamicUpdate
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
 	static dgInt32 CompareClusters (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
-	static dgInt32 CompareJointByInvMass (const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed);
 
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 

@@ -227,7 +227,7 @@ class dgBroadPhaseTreeNode: public dgBroadPhaseNode
 	dgBroadPhaseNode* m_left;
 	dgBroadPhaseNode* m_right;
 	dgList<dgBroadPhaseTreeNode*>::dgListNode* m_fitnessNode;
-};
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 class dgBroadPhase

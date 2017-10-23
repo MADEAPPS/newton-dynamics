@@ -183,16 +183,6 @@ void xxxxx()
 }
 */
 
-/*
-dgWorld::dgAsyncUpdate::dgAsyncUpdate ()
-	:dgAsyncUpdateThread("Newton AsynUpdate", 1)
-{
-}
-
-void dgWorld::dgAsyncUpdate::Update ()
-{
-}
-*/
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -248,6 +238,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	m_inUpdate = 0;
 	m_bodyGroupID = 0;
+	m_lastExecutionTime = 0;
 	
 	m_defualtBodyGroupID = CreateBodyGroupID();
 	m_genericLRUMark = 0;
@@ -1116,7 +1107,6 @@ void dgWorld::ResetBroadPhase()
 	m_broadPhase = newBroadPhase;
 }
 
-
 dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootBone)
 {
 	dgAssert (rootBone);
@@ -1247,6 +1237,31 @@ void dgWorld::UpdateBroadphase(dgFloat32 timestep)
 {
 	m_broadPhase->UpdateContacts (timestep);
 }
+
+dgInt32 dgWorld::CompareJointByInvMass(const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed)
+{
+	dgInt32 modeA = jointA->m_solverModel;
+	dgInt32 modeB = jointB->m_solverModel;
+
+	if (modeA < modeB) {
+		return -1;
+	}
+	else if (modeA > modeB) {
+		return 1;
+	}
+	else {
+		dgFloat32 invMassA = dgMin(jointA->GetBody0()->m_invMass.m_w, jointA->GetBody1()->m_invMass.m_w);
+		dgFloat32 invMassB = dgMin(jointB->GetBody0()->m_invMass.m_w, jointB->GetBody1()->m_invMass.m_w);
+		if (invMassA < invMassB) {
+			return -1;
+		}
+		else if (invMassA > invMassB) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 
 void dgWorld::UpdateSkeletons()
 {

@@ -206,8 +206,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	dgInt32 stack = 1;
 	dgInt32 bodyCount = 1;
 	dgInt32 jointCount = 0;
-	dgInt32 isInEquilibrium = 1;
 	dgInt32 hasSoftBodies = 0;
+	dgInt32 isInEquilibrium = 1;
 
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 clusterLRU = world->m_clusterLRU;
@@ -443,7 +443,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 }
 
 
-
 void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
 	dgWorld* const world = (dgWorld*) this;
@@ -603,28 +602,6 @@ dgInt32 dgWorldDynamicUpdate::CompareClusters(const dgBodyCluster* const cluster
 }
 
 
-dgInt32 dgWorldDynamicUpdate::CompareJointByInvMass (const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed)
-{
-	dgInt32 modeA = jointA->m_solverModel;
-	dgInt32 modeB = jointB->m_solverModel;
-
-	if (modeA < modeB) {
-		return -1;
-	} else if (modeA > modeB) {
-		return 1;
-	} else {
-		dgFloat32 invMassA = dgMin (jointA->GetBody0()->m_invMass.m_w, jointA->GetBody1()->m_invMass.m_w);
-		dgFloat32 invMassB = dgMin (jointB->GetBody0()->m_invMass.m_w, jointB->GetBody1()->m_invMass.m_w);
-		if (invMassA < invMassB) {
-			return -1;
-		} else if (invMassA > invMassB) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-
 void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -744,8 +721,8 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 
 void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const
 {
-	bool isAutoSleep = true;
 	bool stackSleeping = true;
+	bool isClusterResting = true;
 	dgInt32 sleepCounter = 10000;
 
 	dgWorld* const world = (dgWorld*) this;
@@ -760,7 +737,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 			autosleep &= bodyArray[1].m_body->m_autoSleep;
 		}
 		if (!autosleep) {
-			velocityDragCoeff *= dgFloat32 (0.99f);
+			velocityDragCoeff = dgFloat32 (0.9999f);
 		}
 	}
 
@@ -769,18 +746,16 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 	dgFloat32 maxSpeed = dgFloat32 (0.0f);
 	dgFloat32 maxOmega = dgFloat32 (0.0f);
 
-	const dgFloat32 smallClusterCutoff = (cluster->m_jointCount ? dgFloat32(0.01f) : dgFloat32(1.0f));
-	const dgFloat32 speedFreeze = world->m_freezeSpeed2 * smallClusterCutoff;
-	const dgFloat32 accelFreeze = world->m_freezeAccel2 * smallClusterCutoff;
+	const dgFloat32 speedFreeze = world->m_freezeSpeed2;
+	const dgFloat32 accelFreeze = world->m_freezeAccel2 * ((cluster->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32 (0.05f) : dgFloat32 (1.0f));
 	dgVector velocDragVect (velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32 (0.0f));
+
 	for (dgInt32 i = 0; i < count; i ++) {
-		//dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 		dgBody* const body = bodyArray[i].m_body;
 		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBody));
 		
-		dgVector isMovingMask (body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
-		dgAssert (dgCheckVector(isMovingMask));
-		if (!body->m_equilibrium || ((isMovingMask.TestZero().GetSignMask() & 7) != 7)) {
+		dgVector isMovingMask ((body->m_veloc + body->m_omega + body->m_accel + body->m_alpha) & dgVector::m_signMask);
+		if ((isMovingMask.TestZero().GetSignMask() & 7) != 7) {
 			dgAssert (body->m_invMass.m_w);
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				body->IntegrateVelocity(timestep);
@@ -799,21 +774,18 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 			maxAlpha = dgMax (maxAlpha, alpha2);
 			maxSpeed = dgMax (maxSpeed, speed2);
 			maxOmega = dgMax (maxOmega, omega2);
-
 			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
-
 			if (equilibrium) {
 				dgVector veloc (body->m_veloc * velocDragVect);
 				dgVector omega (body->m_omega * velocDragVect);
-				body->m_veloc = (veloc * veloc > m_velocTol) & veloc;
-				body->m_omega = (omega * omega > m_velocTol) & omega;
+				body->m_veloc = (veloc.DotProduct4(veloc) > m_velocTol) & veloc;
+				body->m_omega = (omega.DotProduct4(omega) > m_velocTol) & omega;
 			}
 
-			body->m_equilibrium = dgUnsigned32 (equilibrium);
+			body->m_equilibrium = equilibrium ? 1 : 0;
 //body->m_equilibrium &= body->m_autoSleep;
-
 			stackSleeping &= equilibrium;
-			isAutoSleep &= body->m_autoSleep;
+			isClusterResting &= body->m_autoSleep;
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				sleepCounter = dgMin (sleepCounter, ((dgDynamicBody*)body)->m_sleepingCounter);
 			}
@@ -822,8 +794,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		}
 	}
 
-
-	if (isAutoSleep && cluster->m_jointCount) {
+	if (isClusterResting && cluster->m_jointCount) {
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgBody* const body =  bodyArray[i].m_body;

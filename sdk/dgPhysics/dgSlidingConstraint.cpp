@@ -93,10 +93,6 @@ dgFloat32 dgSlidingConstraint::GetJointVeloc () const
 	dgVector dir (m_body0->GetMatrix().RotateVector (m_localMatrix0[0]));
 	const dgVector& veloc0 = m_body0->GetVelocity();
 	const dgVector& veloc1 = m_body1->GetVelocity();
-//	dgVector veloc1 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//	if (m_body1) {
-//		veloc1 = m_body1->GetVelocity();
-//	}
 	return dir.DotProduct3(veloc0 - veloc1);
 }
 

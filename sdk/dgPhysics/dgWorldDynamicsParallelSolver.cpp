@@ -516,6 +516,8 @@ dgAssert (0);
 
 void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
@@ -534,6 +536,7 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 		world->CalculateNetAcceleration (body, invTime, maxAccNorm2);
 	}
+*/
 }
 
 
@@ -557,9 +560,12 @@ void dgWorldDynamicUpdate::KinematicCallbackUpdateParallelKernel (void* const co
 
 void dgWorldDynamicUpdate::IntegrateClusterParallel(dgParallelSolverSyncData* const syncData) const
 {
+	dgAssert (0);
+/*
 	dgWorld* const world = (dgWorld*) this;
 //	dgWorldDynamicUpdate::IntegrateIslandParallelKernel (syncData, world, 0);
 	world->IntegrateVelocity (syncData->m_cluster, DG_SOLVER_MAX_ERROR, syncData->m_timestep, 0); 
+*/
 }
 
 
