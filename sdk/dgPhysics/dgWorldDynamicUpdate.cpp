@@ -449,9 +449,9 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
-	dgJointInfo** queueBuffer = dgAlloca(dgJointInfo*, cluster->m_jointCount * 2 + 1024);
 	dgJointInfo* const tmpInfoList = dgAlloca(dgJointInfo, cluster->m_jointCount);
-	dgQueue<dgJointInfo*> queue(queueBuffer, cluster->m_jointCount * 2 + 1024);
+	dgJointInfo** queueBuffer = dgAlloca(dgJointInfo*, cluster->m_jointCount * 2 + 1024 * 8);
+	dgQueue<dgJointInfo*> queue(queueBuffer, cluster->m_jointCount * 2 + 1024 * 8);
 	dgFloat32 heaviestMass = dgFloat32(1.0e20f);
 	dgJointInfo* heaviestBody = NULL;
 

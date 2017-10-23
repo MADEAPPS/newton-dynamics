@@ -330,9 +330,9 @@ typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, dgInt32
 typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, dgInt32 size);
 typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void* const userData);
 
-#define DG_ALLOCA_SIZE (sizeof (dgVector)/ sizeof (dgFloat32))
+//#define DG_ALLOCA_SIZE (sizeof (dgVector))
 //#define dgAlloca(type, size) (type*) alloca ((size) * sizeof (type))
-#define dgAlloca(type, size) (type*) ((dgVector*) alloca (DG_ALLOCA_SIZE * ((size * sizeof (type) + DG_ALLOCA_SIZE - 1) / DG_ALLOCA_SIZE)))
+#define dgAlloca(type, size) (type*) ((dgVector*) alloca (size * sizeof (type) + 256))
 
 //#define dgCheckAligment(x) dgAssert (!(dgUnsigned64 (x) & 0xf))
 #define dgCheckAligment(x) 
