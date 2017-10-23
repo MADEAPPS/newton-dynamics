@@ -152,11 +152,11 @@ class dgBody
 	virtual dgMatrix CalculateInvInertiaMatrix () const;
 	virtual dgMatrix CalculateLocalInertiaMatrix () const;
 
-	virtual dgVector GetNetAlpha() const;
-	virtual dgVector GetNetAccel() const;
+	virtual dgVector GetAlpha() const;
+	virtual dgVector GetAccel() const;
 
-	virtual void SetNetAlpha(const dgVector& alpha);
-	virtual void SetNetAccel(const dgVector& accel);
+	virtual void SetAlpha(const dgVector& alpha);
+	virtual void SetAccel(const dgVector& accel);
 
 
 	bool IsCollidable() const;

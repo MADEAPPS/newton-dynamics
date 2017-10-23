@@ -80,10 +80,10 @@ class dgDynamicBody : public dgBody
 	private:
 	virtual void AddDampingAcceleration(dgFloat32 timestep);
 
-	virtual dgVector GetNetAlpha() const;
-	virtual dgVector GetNetAccel() const;
-	virtual void SetNetAlpha(const dgVector& alpha);
-	virtual void SetNetAccel(const dgVector& accel);
+	virtual dgVector GetAlpha() const;
+	virtual dgVector GetAccel() const;
+	virtual void SetAlpha(const dgVector& alpha);
+	virtual void SetAccel(const dgVector& accel);
 
 #ifdef DG_USEFULL_INERTIA_MATRIX
 	virtual void SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia);
@@ -99,8 +99,6 @@ class dgDynamicBody : public dgBody
 	dgVector m_savedExternalForce;
 	dgVector m_savedExternalTorque;
 	dgVector m_dampCoef;
-	dgVector m_netAccel;
-	dgVector m_netAlpha;
 	dgInt32 m_sleepingCounter;
 	dgUnsigned32 m_isInDestructionArrayLRU;
 	dgSkeletonContainer* m_skeleton;

@@ -39,8 +39,6 @@ dgDynamicBody::dgDynamicBody()
 	,m_savedExternalForce(dgFloat32 (0.0f))
 	,m_savedExternalTorque(dgFloat32 (0.0f))
 	,m_dampCoef(dgFloat32 (0.0f))
-	,m_netAccel(dgFloat32(0.0f))
-	,m_netAlpha(dgFloat32(0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -63,8 +61,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	,m_savedExternalForce(dgFloat32 (0.0f))
 	,m_savedExternalTorque(dgFloat32 (0.0f))
 	,m_dampCoef(dgFloat32 (0.0f))
-	,m_netAccel(dgFloat32(0.0f))
-	,m_netAlpha(dgFloat32(0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -80,8 +76,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
-	serializeCallback(userData, &m_netAccel, sizeof(m_netAccel));
-	serializeCallback(userData, &m_netAlpha, sizeof(m_netAlpha));
 	serializeCallback(userData, &val, sizeof (dgInt32));
 	m_linearDampOn = (val & 1) ? true : false;
 	m_angularDampOn = (val & 2) ? true : false;
@@ -108,8 +102,6 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
-	serializeCallback (userData, &m_netAccel, sizeof(m_netAccel));
-	serializeCallback (userData, &m_netAlpha, sizeof(m_netAlpha));
 	serializeCallback (userData, &val, sizeof (dgInt32));
 
 #ifdef DG_USEFULL_INERTIA_MATRIX
@@ -190,24 +182,24 @@ void dgDynamicBody::AttachCollision (dgCollisionInstance* const collision)
 }
 
 
-dgVector dgDynamicBody::GetNetAlpha() const
+dgVector dgDynamicBody::GetAlpha() const
 {
-	return m_netAlpha;
+	return m_alpha;
 }
 
-dgVector dgDynamicBody::GetNetAccel() const
+dgVector dgDynamicBody::GetAccel() const
 {
-	return m_netAccel;
+	return m_accel;
 }
 
-void dgDynamicBody::SetNetAlpha(const dgVector& alpha)
+void dgDynamicBody::SetAlpha(const dgVector& alpha)
 {
-	m_netAlpha = alpha;
+	m_alpha = alpha;
 }
 
-void dgDynamicBody::SetNetAccel(const dgVector& accel)
+void dgDynamicBody::SetAccel(const dgVector& accel)
 {
-	m_netAccel = accel;
+	m_accel = accel;
 }
 
 
@@ -264,9 +256,6 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			m_accel = accel;
 			m_alpha = alpha;
-
-			m_netAccel = accel;
-			m_netAlpha = alpha;
 
 			dgVector timeStepVect(timestep);
 			m_veloc += accel * timeStepVect;

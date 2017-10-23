@@ -560,8 +560,6 @@ void dgWorldDynamicUpdate::CalculateNetAcceleration(dgBody* const body, const dg
 
 	body->m_accel = accel;
 	body->m_alpha = alpha;
-	body->SetNetAccel(accel);
-	body->SetNetAlpha(alpha);
 }
 
 

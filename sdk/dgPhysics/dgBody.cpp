@@ -153,25 +153,22 @@ dgBody::~dgBody()
 {
 }
 
-dgVector dgBody::GetNetAlpha() const
+dgVector dgBody::GetAlpha() const
 {
 	return dgVector::m_zero;
 }
-dgVector dgBody::GetNetAccel() const
+dgVector dgBody::GetAccel() const
 {
 	return dgVector::m_zero;
 }
 
-void dgBody::SetNetAlpha(const dgVector& alpha)
+void dgBody::SetAlpha(const dgVector& alpha)
 {
 }
 
-void dgBody::SetNetAccel(const dgVector& accel)
+void dgBody::SetAccel(const dgVector& accel)
 {
 }
-
-
-
 
 void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 {

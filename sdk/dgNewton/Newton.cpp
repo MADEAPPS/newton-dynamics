@@ -5891,7 +5891,7 @@ void NewtonBodyGetAlpha(const NewtonBody* const bodyPtr, dFloat* const alpha)
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 
-	dgVector vector(body->GetNetAlpha());
+	const dgVector vector(body->GetAlpha());
 	alpha[0] = vector.m_x;
 	alpha[1] = vector.m_y;
 	alpha[2] = vector.m_z;
@@ -5911,7 +5911,7 @@ void NewtonBodyGetAcceleration(const NewtonBody* const bodyPtr, dFloat* const ac
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 
-	dgVector vector(body->GetNetAccel());
+	dgVector vector(body->GetAccel());
 	acceleration[0] = vector.m_x;
 	acceleration[1] = vector.m_y;
 	acceleration[2] = vector.m_z;
