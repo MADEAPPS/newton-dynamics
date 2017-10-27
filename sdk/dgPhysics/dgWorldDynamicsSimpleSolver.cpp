@@ -667,6 +667,8 @@ class dgDanzigSolver
 	void SetSize(dgInt32 size)
 	{
 		m_size = size;
+		m_x[m_size] = dgFloat32(1.0f);
+		m_x0[m_size] = dgFloat32(1.0f);
 	}
 
 	dgInt32 GetSize() const
@@ -756,15 +758,16 @@ class dgDanzigSolver
 		//dgInt32 count = m_size;
 		//dgInt32 clampedIndex = m_size;
 		//dgInt32 initialGuessCount = m_size;
-//		CholeskyFactorization();
+		CholeskyFactorization();
 
 		dgInt32 stride = 0;
 		for (dgInt32 i = 0; i < m_size; i++) {
+			m_permute[i] = dgInt16(i);
 			const dgFloat32* const row = &m_matrix[stride];
 			const dgInt32 frictionIndex = m_frictionIndex[i];
 			const dgFloat32 low = m_low[i] * m_x[frictionIndex];
 			const dgFloat32 high = m_high[i] * m_x[frictionIndex];
-			m_x[i] = dgClamp(m_x[i], low, high);
+			m_x0[i] = dgClamp(m_x[i], low, high);
 			m_diag[i] = row[i];
 			m_invDiag[i] = dgFloat32 (1.0f) / m_diag[i];
 			stride += m_size;
@@ -781,12 +784,12 @@ class dgDanzigSolver
 				const dgFloat32* const row = &m_matrix[stride];
 				dgFloat32 r = m_b[j];
 				for (dgInt32 k = 0; k < m_size; k++) {
-					r = r - row[k] * m_x[k];
+					r = r - row[k] * m_x0[k];
 				}
 				const dgInt32 frictionIndex = m_frictionIndex[j];
-				const dgFloat32 low = m_low[j] * m_x[frictionIndex];
-				const dgFloat32 high = m_high[j] * m_x[frictionIndex];
-				dgFloat32 f = (r + row[j] * m_x[j]) * m_invDiag[j];
+				const dgFloat32 low = m_low[j] * m_x0[frictionIndex];
+				const dgFloat32 high = m_high[j] * m_x0[frictionIndex];
+				dgFloat32 f = (r + row[j] * m_x0[j]) * m_invDiag[j];
 
 				if (f > high) {
 					f = high;
@@ -795,30 +798,40 @@ class dgDanzigSolver
 				} else {
 					tolerance += r * r;
 				}
-				m_x[j] = f;
+				m_x0[j] = f;
 				stride += m_size;
 			}
 		}
 
-		stride = 0;
-		for (dgInt32 j = 0; j < m_size; j++) {
+		dgInt32 activeCount = m_size;
+		stride = (m_size - 1) * m_size;
+		for (dgInt32 j = m_size - 1; j >= 0; j--) {
 			const dgFloat32* const row = &m_matrix[stride];
 			dgFloat32 r = m_b[j];
 			for (dgInt32 k = 0; k < m_size; k++) {
-				r = r - row[k] * m_x[k];
+				r = r - row[k] * m_x0[k];
 			}
+			m_r0[j] = -r;
 			const dgInt32 frictionIndex = m_frictionIndex[j];
-			const dgFloat32 low = m_low[j] * m_x[frictionIndex];
-			const dgFloat32 high = m_high[j] * m_x[frictionIndex];
-			dgFloat32 f = (r + row[j] * m_x[j]) * m_invDiag[j];
+			const dgFloat32 low = m_low[j] * m_x0[frictionIndex];
+			const dgFloat32 high = m_high[j] * m_x0[frictionIndex];
+			//m_low[j] = low;
+			//m_high[j] = high;
+			dgFloat32 f = (r + row[j] * m_x0[j]) * m_invDiag[j];
 			if ((f > high) || (f < low)) {
-				const dgFloat32 high1 = m_high[j] * m_x[frictionIndex];
+				activeCount--;
+				PermuteRows(j, activeCount);
 			}
-//			m_low[j] = low;
-//			m_high[j] = high;
-			stride += m_size;
+			stride -= m_size;
 		}
 
+		if (activeCount == 0) {
+			dgAssert(0);
+		}
+
+		if (activeCount < m_size) {
+			dgAssert(0);
+		}
 
 /*
 		m_x0[m_size] = m_x[m_size];
@@ -1042,13 +1055,12 @@ class dgDanzigSolver
 				}
 			}
 		}
-
+*/
 		for (dgInt32 i = 0; i < m_size; i++) {
 			dgInt32 j = m_permute[i];
 			m_x[j] = m_x0[i];
-			m_b[j] = m_r0[i];
+//			m_b[j] = m_r0[i];
 		}
-*/
 	}
 
 	private:
@@ -1239,13 +1251,14 @@ static void xxxxxx()
 	frictionIndex[2] = 0;
 	frictionIndex[3] = 1;
 
-	x[solver.GetSize()] = dgFloat32(1.0f);
+//	x[solver.GetSize()] = dgFloat32(1.0f);
 
 
 	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
 	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
 
 	for (dgInt32 i = 0; i < 4; i++) {
+		x[i] = 0.0f;
 		dgVector tmp(jt[i].m_linear * w.m_linear + jt[i].m_angular * w.m_angular);
 		b[i] = -tmp.AddHorizontal().GetScalar();
 		for (dgInt32 j = 0; j < 4; j++) {
