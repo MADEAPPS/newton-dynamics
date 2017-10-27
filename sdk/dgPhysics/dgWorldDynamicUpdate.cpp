@@ -450,6 +450,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
 //dgWorld::dgStackBuffer<dgJointInfo> tmpInfoListBuffer (world, cluster->m_jointCount);
+//dgWorld::dgStackBuffer<dgJointInfo*> tmpInfoListBuffer1(world, cluster->m_jointCount * 2 + 4096);
 
 	dgJointInfo* const tmpInfoList = dgAlloca(dgJointInfo, cluster->m_jointCount);
 	dgJointInfo** queueBuffer = dgAlloca(dgJointInfo*, cluster->m_jointCount * 2 + 1024 * 8);
