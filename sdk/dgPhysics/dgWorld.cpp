@@ -214,6 +214,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_solverJacobiansMemory (allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
 	,m_clusterMemory (allocator, 64)
+	,m_stack(allocator)
 {
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);
