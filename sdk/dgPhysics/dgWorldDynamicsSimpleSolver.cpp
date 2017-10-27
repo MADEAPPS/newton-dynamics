@@ -657,223 +657,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceGaussSeidel(const dgJointInfo
 }
 
 
-dgFloat32 dgWorldDynamicUpdate::CalculateJointConjugateGradient(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
-{
-	DG_MSC_VECTOR_ALIGMENT
-	struct GradientParam
-	{
-		dgFloat32 m_x0;
-		dgFloat32 m_r0;
-		dgFloat32 m_r1;
-		dgFloat32 m_z0;
-		dgFloat32 m_d0;
-		dgFloat32 m_p0;
-		dgFloat32 m_b;
-		dgFloat32 m_invM;
-		//dgFloat32 m_low;
-		//dgFloat32 m_high;
-		//dgFloat32 m_normalForce;
-		dgInt32 m_activeRows;
-	} DG_GCC_VECTOR_ALIGMENT;
-	GradientParam buffer[DG_CONSTRAINT_MAX_ROWS + 4];
-
-	buffer[0].m_x0 = dgFloat32(1.0f);
-	buffer[1].m_x0 = dgFloat32(1.0f);
-	buffer[2].m_x0 = dgFloat32(1.0f);
-	buffer[3].m_x0 = dgFloat32(1.0f);
-	GradientParam* const param = &buffer[4];
-
-static int xxx;
-xxx++;
-	const dgInt32 index = jointInfo->m_pairStart;
-	dgInt32 rowsCount = jointInfo->m_pairCount;
-	dgAssert(rowsCount <= DG_CONSTRAINT_MAX_ROWS);
-
-	dgFloat32 accelNorm = dgFloat32(0.0f);
-	const dgInt32 m0 = jointInfo->m_m0;
-	const dgInt32 m1 = jointInfo->m_m1;
-	dgJacobian y0 (internalForces[m0]);
-	dgJacobian y1 (internalForces[m1]);
-
-	dgInt32 normalCount = 0;
-	for (dgInt32 i = 0; i < rowsCount; i++) {
-		const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-		const dgJacobian JMinvM0 = row->m_JMinv.m_jacobianM0;
-		const dgJacobian JMinvM1 = row->m_JMinv.m_jacobianM1;
-
-		GradientParam& data = param[i];
-		dgVector diag(JMinvM0.m_linear * y0.m_linear + JMinvM0.m_angular * y0.m_angular + JMinvM1.m_linear * y1.m_linear + JMinvM1.m_angular * y1.m_angular);
-		dgFloat32 accel = row->m_coordenateAccel + row->m_accel - row->m_force * row->m_diagDamp - (diag.AddHorizontal()).GetScalar();
-		accelNorm += accel * accel;
-
-		const dgInt32 frictionIndex = row->m_normalForceIndex;
-		normalCount += frictionIndex < 0;
-		dgAssert(((frictionIndex < 0) && (param[frictionIndex].m_x0 == dgFloat32(1.0f))) || ((frictionIndex >= 0) && (param[frictionIndex].m_x0 >= dgFloat32(0.0f))));
-	
-		const dgVector f(row->m_force);
-		const dgFloat32 frictionNormal = param[frictionIndex].m_x0;
-		const dgVector low(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-		const dgVector high(frictionNormal * row->m_upperBoundFrictionCoefficent);
-		const dgVector force(f.GetMax(low).GetMin(high));
-
-		data.m_x0 = force.GetScalar();
-		data.m_invM = dgFloat32(1.0f);
-		data.m_d0 = row->m_diagDamp;
-		data.m_b = row->m_coordenateAccel;
-		data.m_activeRows = i;
-	}
-
-	if (accelNorm > dgFloat32(1.0e-6f)) {
-		y0.m_linear = dgVector::m_zero;
-		y0.m_angular = dgVector::m_zero;
-		y1.m_linear = dgVector::m_zero;
-		y1.m_angular = dgVector::m_zero;
-
-		for (dgInt32 i = 0; i < rowsCount; i++) {
-			const GradientParam& data = param[i];
-			const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-			dgVector force(data.m_x0);
-			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * force;
-			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * force;
-			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * force;
-			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * force;
-		}
-
-		for (dgInt32 i = 0; i < rowsCount; i++) {
-			GradientParam& data = param[i];
-			const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-			dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
-						   row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-
-			data.m_r0 = data.m_b - data.m_x0 * data.m_d0 - (accel.AddHorizontal()).GetScalar();
-			data.m_z0 = data.m_invM * data.m_r0;
-			data.m_p0 = data.m_z0;
-		}
-
-		for (dgInt32 k = 0; k < 10; k++) {
-xxx++;
-
-			y0.m_linear = dgVector::m_zero;
-			y0.m_angular = dgVector::m_zero;
-			y1.m_linear = dgVector::m_zero;
-			y1.m_angular = dgVector::m_zero;
-			for (dgInt32 i = 0; i < rowsCount; i++) {
-				const GradientParam& data = param[i];
-				const dgInt32 j = data.m_activeRows;
-				const dgJacobianMatrixElement* const row = &matrixRow[index + j];
-				const dgVector force(data.m_p0);
-				y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * force;
-				y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * force;
-				y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * force;
-				y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * force;
-			}
-
-
-			dgFloat32 den = dgFloat32(0.0f);
-			dgFloat32 num = dgFloat32(0.0f);
-			for (dgInt32 i = 0; i < rowsCount; i++) {
-				GradientParam& data = param[i];
-				const dgInt32 j = data.m_activeRows;
-				const dgJacobianMatrixElement* const row = &matrixRow[index + j];
-				dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
-							   row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-
-				data.m_r1 = (accel.AddHorizontal()).GetScalar() + data.m_p0 * data.m_d0;
-				den += data.m_r1 * data.m_p0;
-				num += data.m_r0 * data.m_z0;
-			}
-
-//			dgFloat32 alpha = num / den;
-//			bool needRestart = false;
-/*
-			for (dgInt32 i = 0; i < rowsCount; i++) {
-				dgFloat32 f1 = x0[i] + alpha * p0[i];
-				if (f1 < low[i]) {
-					needRestart = true;
-					x0[i] = low[i];
-					dgSwap(activeRows[i], activeRows[rowsCount - 1]);
-					i--;
-					rowsCount--;
-				} else if (f1 > high[i]) {
-					needRestart = true;
-					x0[i] = high[i];
-					dgSwap(activeRows[i], activeRows[rowsCount - 1]);
-					i--;
-					rowsCount--;
-				}
-			}
-
-			if (needRestart) {
-				y0.m_linear = dgVector::m_zero;
-				y0.m_angular = dgVector::m_zero;
-				y1.m_linear = dgVector::m_zero;
-				y1.m_angular = dgVector::m_zero;
-				for (dgInt32 i = 0; i < rowsCount; i++) {
-					const dgInt32 j = activeRows[i];
-					const dgJacobianMatrixElement* const row = &matrixRow[index + j];
-					dgVector force(x0[i]);
-					y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * force;
-					y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * force;
-					y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * force;
-					y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * force;
-				}
-
-				for (dgInt32 i = 0; i < rowsCount; i++) {
-					const dgInt32 j = activeRows[i];
-					const dgJacobianMatrixElement* const row = &matrixRow[index + j];
-					dgVector accel(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
-						row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-
-					r0[i] = b[i] - x0[i] * d0[i] - (accel.AddHorizontal()).GetScalar();
-					z0[i] = invM[i] * r0[i];
-					p0[i] = z0[i];
-				}
-
-			} else {
-				dgFloat32 betaNum = dgFloat32(0.0f);
-				for (dgInt32 i = 0; i < rowsCount; i++) {
-					x0[i] += alpha * p0[i];
-					r0[i] -= alpha * r1[i];
-					z0[i] = invM[i] * r0[i];
-					betaNum += z0[i] * r0[i];
-				}
-				dgFloat32 beta = betaNum / num;
-				if (beta < dgFloat32(1.0e-8f)) {
-					break;
-				}
-
-				for (dgInt32 i = 0; i < rowsCount; i++) {
-					p0[i] = r0[i] + beta * p0[i];
-				}
-			}
-*/
-		}
-
-/*
-		y0 = internalForces[m0];
-		y1 = internalForces[m1];
-		rowsCount = jointInfo->m_pairCount;
-		for (dgInt32 i = 0; i < rowsCount; i++) {
-			const dgInt32 j = activeRows[i];
-			dgJacobianMatrixElement* const row = &matrixRow[index + j];
-			dgVector jointForce(x0[i] - row->m_force);
-			row->m_force = x0[i];
-			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
-			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
-			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
-			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
-		}
-
-		internalForces[m0] = y0;
-		internalForces[m1] = y1;
-*/
-	}
-
-	return accelNorm;
-}
-
-
-
 class dgDanzigSolver
 {
 	public:
@@ -969,14 +752,75 @@ class dgDanzigSolver
 
 	void Solve()
 	{
-		CholeskyFactorization();
+		//dgInt32 index = 0;
+		//dgInt32 count = m_size;
+		//dgInt32 clampedIndex = m_size;
+		//dgInt32 initialGuessCount = m_size;
+//		CholeskyFactorization();
+
+		dgInt32 stride = 0;
+		for (dgInt32 i = 0; i < m_size; i++) {
+			const dgFloat32* const row = &m_matrix[stride];
+			const dgInt32 frictionIndex = m_frictionIndex[i];
+			const dgFloat32 low = m_low[i] * m_x[frictionIndex];
+			const dgFloat32 high = m_high[i] * m_x[frictionIndex];
+			m_x[i] = dgClamp(m_x[i], low, high);
+			m_diag[i] = row[i];
+			m_invDiag[i] = dgFloat32 (1.0f) / m_diag[i];
+			stride += m_size;
+		}
+
+		const dgFloat32 tol = dgFloat32(0.1f);
+		const dgFloat32 tol2 = tol * tol;
+		dgFloat32 tolerance = dgFloat32 (1.0f);
+		const dgInt32 maxIterCount = dgMin (m_size, 4);
+		for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+			stride = 0;
+			tolerance = dgFloat32(0.0f);
+			for (dgInt32 j = 0; j < m_size; j++) {
+				const dgFloat32* const row = &m_matrix[stride];
+				dgFloat32 r = m_b[j];
+				for (dgInt32 k = 0; k < m_size; k++) {
+					r = r - row[k] * m_x[k];
+				}
+				const dgInt32 frictionIndex = m_frictionIndex[j];
+				const dgFloat32 low = m_low[j] * m_x[frictionIndex];
+				const dgFloat32 high = m_high[j] * m_x[frictionIndex];
+				dgFloat32 f = (r + row[j] * m_x[j]) * m_invDiag[j];
+
+				if (f > high) {
+					f = high;
+				} else if (f < low) {
+					f = low;
+				} else {
+					tolerance += r * r;
+				}
+				m_x[j] = f;
+				stride += m_size;
+			}
+		}
+
+		stride = 0;
+		for (dgInt32 j = 0; j < m_size; j++) {
+			const dgFloat32* const row = &m_matrix[stride];
+			dgFloat32 r = m_b[j];
+			for (dgInt32 k = 0; k < m_size; k++) {
+				r = r - row[k] * m_x[k];
+			}
+			const dgInt32 frictionIndex = m_frictionIndex[j];
+			const dgFloat32 low = m_low[j] * m_x[frictionIndex];
+			const dgFloat32 high = m_high[j] * m_x[frictionIndex];
+			dgFloat32 f = (r + row[j] * m_x[j]) * m_invDiag[j];
+			if ((f > high) || (f < low)) {
+				const dgFloat32 high1 = m_high[j] * m_x[frictionIndex];
+			}
+//			m_low[j] = low;
+//			m_high[j] = high;
+			stride += m_size;
+		}
 
 
-		dgInt32 index = 0;
-		dgInt32 count = m_size;
-		dgInt32 clampedIndex = m_size;
-		dgInt32 initialGuessCount = m_size;
-
+/*
 		m_x0[m_size] = m_x[m_size];
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_permute[i] = short(i);
@@ -1199,16 +1043,15 @@ class dgDanzigSolver
 			}
 		}
 
-
 		for (dgInt32 i = 0; i < m_size; i++) {
 			dgInt32 j = m_permute[i];
 			m_x[j] = m_x0[i];
 			m_b[j] = m_r0[i];
 		}
+*/
 	}
 
 	private:
-//	static void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, dgFloat32* const matrix, dgFloat32* const choleskyMatrix, dgFloat32* const x, dgFloat32* const r, dgFloat32* const low, dgFloat32* const high, dgInt16* const permute)
 	void PermuteRows(dgInt32 i, dgInt32 j)
 	{
 		if (i != j) {
@@ -1237,8 +1080,6 @@ class dgDanzigSolver
 		}
 	}
 
-
-//	void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, dgFloat32* const choleskyMatrix, dgFloat32* const tmp, dgFloat32* const reflexion)
 	void CholeskyUpdate(dgInt32 row, dgInt32 colum)
 	{
 		if (row != colum) {
@@ -1308,7 +1149,6 @@ class dgDanzigSolver
 		}
 	}
 
-//	void dgSolveCholesky(dgInt32 size, dgInt32 n, const dgFloat32* const choleskyMatrix, dgFloat32* const x)
 	void SolveCholesky(dgInt32 n, dgFloat32* const out)
 	{
 		dgInt32 stride = 0;
@@ -1340,6 +1180,8 @@ class dgDanzigSolver
 	dgFloat32 m_high[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_tmp0[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_tmp1[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_diag[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_invDiag[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_delta_x[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_delta_r[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_matrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
@@ -1356,6 +1198,8 @@ static void xxxxxx()
 {
 //	dgFloat32 angle = -45.00899f * 3.141592f / 180.0f;
 	dgFloat32 angle = -50.0f * 3.141592f / 180.0f;
+//	dgFloat32 angle = -40.0f * 3.141592f / 180.0f;
+//	dgFloat32 angle = 0.0f * 3.141592f / 180.0f;
 	dgMatrix matrix(dgRollMatrix(angle));
 	dgVector r0(matrix.RotateVector(dgVector(-0.5f, -0.5f, 0.0f, 0.0f)));
 	dgVector r1(matrix.RotateVector(dgVector(0.5f, -0.5f, 0.0f, 0.0f)));
@@ -1410,6 +1254,12 @@ static void xxxxxx()
 		}
 		m[i * 4 + i] *= 1.0001f;
 	}
+	solver.Solve();
+	solver.Solve();
+	solver.Solve();
+	solver.Solve();
+	solver.Solve();
+	solver.Solve();
 	solver.Solve();
 //	xxxxxx1(4, &m[0][0], b, low, high);
 }
@@ -1598,7 +1448,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
-//				dgFloat32 accel = CalculateJointConjugateGradient(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 //				dgFloat32 accel = CalculateJointForceDanzig(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
