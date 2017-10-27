@@ -812,11 +812,13 @@ class dgDanzigSolver
 				r = r - row[k] * m_x0[k];
 			}
 			m_r0[j] = -r;
+			m_delta_x[j] = r;
+			m_delta_r[j] = r;
 			const dgInt32 frictionIndex = m_frictionIndex[j];
 			const dgFloat32 low = m_low[j] * m_x0[frictionIndex];
 			const dgFloat32 high = m_high[j] * m_x0[frictionIndex];
-			//m_low[j] = low;
-			//m_high[j] = high;
+			m_low[j] = low;
+			m_high[j] = high;
 			dgFloat32 f = (r + row[j] * m_x0[j]) * m_invDiag[j];
 			if ((f > high) || (f < low)) {
 				activeCount--;
@@ -830,46 +832,39 @@ class dgDanzigSolver
 		}
 
 		if (activeCount < m_size) {
-			dgAssert(0);
+			CholeskyUpdate(activeCount, m_size - 1);
 		}
 
-/*
-		m_x0[m_size] = m_x[m_size];
-		for (dgInt32 i = 0; i < m_size; i++) {
-			m_permute[i] = short(i);
-			m_r0[i] = -m_b[i];
-			m_x0[i] = dgFloat32(0.0f);
-		}
-		for (dgInt32 i = 0; i < m_size; i++) {
-			m_delta_r[i] = -m_r0[i];
-			m_delta_x[i] = m_delta_r[i];
-		}
 		for (dgInt32 test = true; test; ) {
 			test = false;
-			SolveCholesky(initialGuessCount, m_delta_x);
-			dgInt32 permuteStart = initialGuessCount;
-
+			SolveCholesky(activeCount, m_delta_x);
+			dgInt32 permuteStart = activeCount;
 			dgFloat32 alpha = dgFloat32(1.0f);
-			for (dgInt32 i = 0; i < initialGuessCount; i++) {
+
+			for (dgInt32 i = 0; i < activeCount; i++) {
 				const dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
-				const dgInt32 frictionIndex = m_frictionIndex[i];
-				const dgFloat32 low = m_low[i] * m_x0[frictionIndex];
-				const dgFloat32 high = m_high[i] * m_x0[frictionIndex];
+				const dgFloat32 low = m_low[i];
+				const dgFloat32 high = m_high[i];
 				if (x < low) {
 					test = true;
 					permuteStart = dgMin(permuteStart, i);
+					dgAssert(0);
+/*
 					dgFloat32 alpha1 = (low - m_x0[i]) / m_delta_x[i];
 					dgAssert(alpha1 < alpha);
 					dgAssert(alpha1 >= dgFloat32(0.0f));
 					alpha = alpha1;
 					initialGuessCount--;
-		dgAssert(0);
+					
 					PermuteRows(i, initialGuessCount);
 					i--;
+*/
 				} else if (x > high) {
 					test = true;
 					permuteStart = dgMin(permuteStart, i);
-					
+					dgAssert(0);
+/*
+
 					dgFloat32 alpha1 = (high - m_x0[i]) / m_delta_x[i];
 					dgAssert(alpha1 < alpha);
 					dgAssert(alpha1 >= dgFloat32(0.0f));
@@ -877,18 +872,15 @@ class dgDanzigSolver
 					initialGuessCount--;
 					PermuteRows(i, initialGuessCount);
 					i--;
+*/
 				}
 			}
 
-			for (dgInt32 i = 0; i < m_size; i++) {
+			for (dgInt32 i = 0; i < activeCount; i++) {
 				m_x0[i] += alpha * m_delta_x[i];
 				m_r0[i] += alpha * m_delta_r[i];
 				m_delta_r[i] = -m_r0[i];
 				m_delta_x[i] = m_delta_r[i];
-			}
-
-			for (dgInt32 i = initialGuessCount; i < m_size; i++) {
-				m_delta_x[i] = dgFloat32(0.0f);
 			}
 
 			if (test) {
@@ -896,26 +888,29 @@ class dgDanzigSolver
 			}
 		}
 
-		count = m_size - initialGuessCount;
-		if (count) {
+		dgInt32 index = activeCount;
+		dgInt32 count = m_size - activeCount;
+		dgInt32 clampedIndex = m_size;
+		if (activeCount < m_size) {
 			for (dgInt32 i = 0; i < m_size; i++) {
 				m_r0[i] = dgFloat32(0.0f);
 				m_delta_x[i] = dgFloat32(0.0f);
 				m_delta_r[i] = dgFloat32(0.0f);
 			}
 
-			dgInt32 stride = initialGuessCount * m_size;
-			for (dgInt32 j = initialGuessCount; j < m_size; j++) {
-				dgFloat32 val = -m_b[j];
-				const dgFloat32* const A = &m_matrix[stride];
+			stride = activeCount * m_size;
+			for (dgInt32 j = activeCount; j < m_size; j++) {
+				dgFloat32 val = m_b[j];
+				const dgFloat32* const row = &m_matrix[stride];
 				for (dgInt32 i = 0; i < m_size; i++) {
-					val = val + A[i] * m_x0[i];
+					val = val - row[i] * m_x0[i];
 				}
-				m_r0[j] = val;
+				m_r0[j] = -val;
 				stride += m_size;
 			}
-			index = initialGuessCount;
+			//index = activeCount;
 		}
+
 
 		while (count) {
 			bool loop = true;
@@ -940,7 +935,7 @@ class dgDanzigSolver
 					}
 
 					calculateDelta_x = true;
-					dgInt32 stride = index * m_size;
+					stride = index * m_size;
 					for (dgInt32 j = index; j < m_size; j++) {
 						dgFloat32 val = dgFloat32(0.0f);
 						const dgFloat32* const A = &m_matrix[stride];
@@ -960,9 +955,8 @@ class dgDanzigSolver
 
 					for (dgInt32 i = 0; i <= index; i++) {
 						dgFloat32 x1 = m_x0[i] + s * m_delta_x[i];
-						const dgInt32 frictionIndex = m_frictionIndex[i];
-						const dgFloat32 low = m_low[i] * m_x0[frictionIndex];
-						const dgFloat32 high = m_high[i] * m_x0[frictionIndex];
+						const dgFloat32 low = m_low[i];
+						const dgFloat32 high = m_high[i];
 
 						if (x1 > high) {
 							swapIndex = i;
@@ -1055,7 +1049,7 @@ class dgDanzigSolver
 				}
 			}
 		}
-*/
+
 		for (dgInt32 i = 0; i < m_size; i++) {
 			dgInt32 j = m_permute[i];
 			m_x[j] = m_x0[i];
@@ -1206,6 +1200,7 @@ class dgDanzigSolver
 
 
 
+
 static void xxxxxx()
 {
 //	dgFloat32 angle = -45.00899f * 3.141592f / 180.0f;
@@ -1237,43 +1232,41 @@ static void xxxxxx()
 	jt[3].m_linear = matrix.RotateVector(dgVector(1.0f, 0.0f, 0.0f, 0.0f));
 	jt[3].m_angular = r1.CrossProduct3(jt[3].m_linear);
 
-	low[0] = 0.0f;
-	low[1] = 0.0f;
-	low[2] = -0.9f;
-	low[3] = -0.9f;
-	high[0] = 1000.0f;
-	high[1] = 1000.0f;
-	high[2] = 0.9f;
-	high[3] = 0.9f;
+	x[0] = 0.0f;
+	x[1] = 0.0f;
+	x[2] = 0.0f;
+	x[0] = 0.0f;
 
-	frictionIndex[0] = dgInt16(solver.GetSize());
-	frictionIndex[1] = dgInt16(solver.GetSize());
-	frictionIndex[2] = 0;
-	frictionIndex[3] = 1;
+	for (int i = 0; i < 10; i++) {
+		low[0] = 0.0f;
+		low[1] = 0.0f;
+		low[2] = -0.9f;
+		low[3] = -0.9f;
+		high[0] = 1000.0f;
+		high[1] = 1000.0f;
+		high[2] = 0.9f;
+		high[3] = 0.9f;
 
-//	x[solver.GetSize()] = dgFloat32(1.0f);
+		frictionIndex[0] = dgInt16(solver.GetSize());
+		frictionIndex[1] = dgInt16(solver.GetSize());
+		frictionIndex[2] = 0;
+		frictionIndex[3] = 1;
 
+		w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
+		w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
 
-	w.m_linear = dgVector(0.0f, -10.0f, 0.0f, 0.0f);
-	w.m_angular = dgVector(0.0f, 0.0f, 0.0f, 0.0f);
+		for (dgInt32 i = 0; i < 4; i++) {
 
-	for (dgInt32 i = 0; i < 4; i++) {
-		x[i] = 0.0f;
-		dgVector tmp(jt[i].m_linear * w.m_linear + jt[i].m_angular * w.m_angular);
-		b[i] = -tmp.AddHorizontal().GetScalar();
-		for (dgInt32 j = 0; j < 4; j++) {
-			dgVector acc(jt[i].m_linear * jt[j].m_linear + jt[i].m_angular * jt[j].m_angular);
-			m[i * 4 + j] = acc.AddHorizontal().GetScalar();
+			dgVector tmp(jt[i].m_linear * w.m_linear + jt[i].m_angular * w.m_angular);
+			b[i] = -tmp.AddHorizontal().GetScalar();
+			for (dgInt32 j = 0; j < 4; j++) {
+				dgVector acc(jt[i].m_linear * jt[j].m_linear + jt[i].m_angular * jt[j].m_angular);
+				m[i * 4 + j] = acc.AddHorizontal().GetScalar();
+			}
+			m[i * 4 + i] *= 1.0001f;
 		}
-		m[i * 4 + i] *= 1.0001f;
+		solver.Solve();
 	}
-	solver.Solve();
-	solver.Solve();
-	solver.Solve();
-	solver.Solve();
-	solver.Solve();
-	solver.Solve();
-	solver.Solve();
 //	xxxxxx1(4, &m[0][0], b, low, high);
 }
 
