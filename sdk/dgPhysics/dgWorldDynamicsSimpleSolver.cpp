@@ -681,6 +681,11 @@ class dgDanzigSolver
 		return m_x;
 	}
 
+	dgFloat32* GetR()
+	{
+		return m_r0;
+	}
+
 	dgFloat32* GetB()
 	{
 		return m_b;
@@ -768,8 +773,7 @@ class dgDanzigSolver
 			const dgFloat32 low = m_low[i] * m_x[frictionIndex];
 			const dgFloat32 high = m_high[i] * m_x[frictionIndex];
 			m_x0[i] = dgClamp(m_x[i], low, high);
-			m_diag[i] = row[i];
-			m_invDiag[i] = dgFloat32 (1.0f) / m_diag[i];
+			m_invDiag[i] = dgFloat32 (1.0f) / row[i];
 			stride += m_size;
 		}
 
@@ -780,6 +784,7 @@ class dgDanzigSolver
 		for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
 			stride = 0;
 			tolerance = dgFloat32(0.0f);
+
 			for (dgInt32 j = 0; j < m_size; j++) {
 				const dgFloat32* const row = &m_matrix[stride];
 				dgFloat32 r = m_b[j];
@@ -795,12 +800,19 @@ class dgDanzigSolver
 					f = high;
 				} else if (f < low) {
 					f = low;
-				} else {
-					tolerance += r * r;
+//				} else {
+//					tolerance += r * r;
 				}
+
+				r += m_r0[j];
 				m_x0[j] = f;
+				tolerance += r * r;
 				stride += m_size;
 			}
+		}
+
+		if (tolerance < dgFloat32(10e-6f)) {
+			dgAssert(0);
 		}
 
 		dgInt32 activeCount = m_size;
@@ -1053,7 +1065,7 @@ class dgDanzigSolver
 		for (dgInt32 i = 0; i < m_size; i++) {
 			dgInt32 j = m_permute[i];
 			m_x[j] = m_x0[i];
-//			m_b[j] = m_r0[i];
+			m_b[j] = m_r0[i];
 		}
 	}
 
@@ -1081,6 +1093,7 @@ class dgDanzigSolver
 			dgSwap(m_r0[i], m_r0[j]);
 			dgSwap(m_low[i], m_low[j]);
 			dgSwap(m_high[i], m_high[j]);
+			dgSwap(m_invDiag[i], m_invDiag[j]);
 			dgSwap(m_permute[i], m_permute[j]);
 			dgSwap(m_frictionIndex[i], m_frictionIndex[j]);
 		}
@@ -1186,7 +1199,6 @@ class dgDanzigSolver
 	dgFloat32 m_high[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_tmp0[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_tmp1[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_diag[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_invDiag[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_delta_x[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_delta_r[DG_CONSTRAINT_MAX_ROWS];
@@ -1218,6 +1230,7 @@ static void xxxxxx()
 	solver.SetSize(4);
 	dgFloat32* const b = solver.GetB();
 	dgFloat32* const x = solver.GetX();
+	dgFloat32* const r = solver.GetR();
 	dgFloat32* const m = solver.GetMatrixRow(0);
 	dgFloat32* const low = solver.GetLow();
 	dgFloat32* const high = solver.GetHigh();
@@ -1235,9 +1248,14 @@ static void xxxxxx()
 	x[0] = 0.0f;
 	x[1] = 0.0f;
 	x[2] = 0.0f;
-	x[0] = 0.0f;
+	x[3] = 0.0f;
 
-	for (int i = 0; i < 10; i++) {
+	r[0] = 0.0f;
+	r[1] = 0.0f;
+	r[2] = 0.0f;
+	r[3] = 0.0f;
+
+	for (int k = 0; k < 10; k++) {
 		low[0] = 0.0f;
 		low[1] = 0.0f;
 		low[2] = -0.9f;
@@ -1266,8 +1284,11 @@ static void xxxxxx()
 			m[i * 4 + i] *= 1.0001f;
 		}
 		solver.Solve();
+		r[0] = b[0];
+		r[1] = b[1];
+		r[2] = b[2];
+		r[3] = b[3];
 	}
-//	xxxxxx1(4, &m[0][0], b, low, high);
 }
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
