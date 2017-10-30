@@ -694,7 +694,8 @@ class dgDanzigSolver
 			const dgInt32 frictionIndex = m_frictionIndex[i];
 			const dgFloat32 low = m_low[i] * m_x[frictionIndex];
 			const dgFloat32 high = m_high[i] * m_x[frictionIndex];
-			m_x0[i] = dgClamp(m_x[i], low, high);
+			//m_x0[i] = dgClamp(m_x[i], low, high);
+			m_x0[i] = dgFloat32 (0.0f);
 			m_invDiag[i] = dgFloat32 (1.0f) / row[i];
 			stride += m_size;
 		}
@@ -714,9 +715,9 @@ class dgDanzigSolver
 					r = r - row[k] * m_x0[k];
 				}
 				const dgInt32 frictionIndex = m_frictionIndex[j];
-				const dgFloat32 low = m_low[j] * m_x0[frictionIndex];
-				const dgFloat32 high = m_high[j] * m_x0[frictionIndex];
-				dgFloat32 f = (r + row[j] * m_x0[j]) * m_invDiag[j];
+				const dgFloat32 low = m_low[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+				const dgFloat32 high = m_high[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+				dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
 
 				if (f > high) {
 					f = high;
@@ -727,7 +728,7 @@ class dgDanzigSolver
 				}
 
 				r += m_r0[j];
-				m_x0[j] = f;
+				m_x0[j] = f - m_x[j];
 				tolerance += r * r;
 				stride += m_size;
 			}
@@ -1280,7 +1281,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 		row->m_maxImpact = dgMax(dgAbsf(f), row->m_maxImpact);
 
 		dgVector deltaForce(f - row->m_force);
-		row->m_force = f;
+//		row->m_force = f;
 		dgVector deltaforce0(scale0 * deltaForce);
 		dgVector deltaforce1(scale1 * deltaForce);
 		linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
@@ -1296,8 +1297,9 @@ dgFloat32 xxxxx = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalF
 	internalForces[m1].m_angular = angularM1;
 
 	for (dgInt32 i = 0; i < rowsCount; i++) {
-		const dgJacobianMatrixElement* const row_i = &matrixRow[index + i];
+		dgJacobianMatrixElement* const row_i = &matrixRow[index + i];
 		dgTrace(("(%f %f) ", x[i], row_i->m_force));
+		row_i->m_force = x[i];
 	}
 	dgTrace(("\n"));
 	return xxxxx;
