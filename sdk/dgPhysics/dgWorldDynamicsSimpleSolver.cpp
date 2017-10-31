@@ -753,25 +753,28 @@ class dgDanzigSolver
 			const dgInt32 frictionIndex = m_frictionIndex[j];
 			const dgFloat32 low = m_low[j] * (m_x[frictionIndex] + m_x0[frictionIndex]);
 			const dgFloat32 high = m_high[j] * (m_x[frictionIndex] + m_x0[frictionIndex]);
+			m_low[j] = low - m_x[j];
+			m_high[j] = high - m_x[j];
 			dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
 			if (f > high) {
 				activeCount--;
-				//m_x0[j] = high - m_x[j] - r * m_invDiag[j];
 				m_x0[j] = high - m_x[j];
 				PermuteRows(j, activeCount);
 			} else if (f < low) {
 				activeCount--;
-				//m_x0[j] = low - m_x[j] - r * m_invDiag[j];
 				m_x0[j] = low - m_x[j];
 				PermuteRows(j, activeCount);
 			}
-			m_low[j] = low - m_x[j];
-			m_high[j] = high - m_x[j];
 			stride -= m_size;
 		}
 
 		if (activeCount == 0) {
-			dgAssert(0);
+			for (dgInt32 i = 0; i < m_size; i++) {
+				dgInt32 j = m_permute[i];
+				m_x[j] = m_x0[i];
+				m_b[j] = m_r0[i];
+			}
+			return accelNorm;
 		}
 
 		if (activeCount < m_size) {
