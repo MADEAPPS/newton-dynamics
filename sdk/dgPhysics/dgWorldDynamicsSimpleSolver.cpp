@@ -591,7 +591,7 @@ class dgDanzigSolver
 	void SetSize(dgInt32 size)
 	{
 		m_size = size;
-		m_x[m_size] = dgFloat32(1.0f);
+		m_x[m_size] = dgFloat32(0.0f);
 		m_x0[m_size] = dgFloat32(1.0f);
 	}
 
@@ -697,9 +697,6 @@ class dgDanzigSolver
 			stride += m_size;
 		}
 
-static int xxx;
-xxx++;
-
 		const dgFloat32 tol = dgFloat32(0.1f);
 		const dgFloat32 tol2 = tol * tol;
 		dgFloat32 accelNorm = dgFloat32 (1.0f);
@@ -756,18 +753,20 @@ xxx++;
 			const dgInt32 frictionIndex = m_frictionIndex[j];
 			const dgFloat32 low = m_low[j] * (m_x[frictionIndex] + m_x0[frictionIndex]);
 			const dgFloat32 high = m_high[j] * (m_x[frictionIndex] + m_x0[frictionIndex]);
-			m_low[j] = low;
-			m_high[j] = high;
 			dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
 			if (f > high) {
-				dgAssert(0);
 				activeCount--;
+				//m_x0[j] = high - m_x[j] - r * m_invDiag[j];
+				m_x0[j] = high - m_x[j];
 				PermuteRows(j, activeCount);
 			} else if (f < low) {
-				dgAssert(0);
 				activeCount--;
+				//m_x0[j] = low - m_x[j] - r * m_invDiag[j];
+				m_x0[j] = low - m_x[j];
 				PermuteRows(j, activeCount);
 			}
+			m_low[j] = low - m_x[j];
+			m_high[j] = high - m_x[j];
 			stride -= m_size;
 		}
 
@@ -854,6 +853,12 @@ xxx++;
 			}
 			//index = activeCount;
 		}
+
+static int xxx;
+xxx++;
+if (xxx == 3)
+xxx *= 1;
+
 
 		while (count) {
 			bool loop = true;
