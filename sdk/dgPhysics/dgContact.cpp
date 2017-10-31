@@ -220,7 +220,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_forceBounds[normalIndex].m_low = dgFloat32 (0.0f);
 	params.m_forceBounds[normalIndex].m_normalIndex = DG_NORMAL_CONSTRAINT;
 	params.m_forceBounds[normalIndex].m_jointForce = (dgForceImpactPair*) &contact.m_normal_Force;
-	params.m_jointStiffness[normalIndex] = dgFloat32 (0.5f);
+	params.m_jointStiffness[normalIndex] = dgFloat32 (0.0f);
 
 //	params.m_jointAccel[normalIndex] = GetMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * params.m_invTimestep;
 //	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
@@ -238,7 +238,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir0, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir0);
 		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
-		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.5f);
+		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 		
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
@@ -266,7 +266,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir1, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir1);
 		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
-		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.5f);
+		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);

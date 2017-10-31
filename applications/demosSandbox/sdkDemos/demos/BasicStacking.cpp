@@ -218,6 +218,10 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 		matrix3.m_posit.m_y += vertialStep * 2.0f;
 	}
 
+matrix0.m_posit.m_y += 10.0f;
+mass *= 4.0f;
+CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
+
 	// do not forget to release the assets	
 	geometry->Release();
 	NewtonDestroyCollision(collision);
@@ -287,12 +291,12 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	}
 
 	high = 20;
-high = 1;
+high = 8;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 //			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
-//			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, 0.0f + i * 8, 0.0f), dVector (0.5f, 4.0f, 0.5f, 0.0f), high);
-			BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
+			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, 0.0f + i * 8, 0.0f), dVector (0.5f, 4.0f, 0.5f, 0.0f), high);
+//			BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 		}
 	}
 

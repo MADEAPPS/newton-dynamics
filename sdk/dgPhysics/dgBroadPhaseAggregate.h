@@ -43,7 +43,7 @@ class dgBroadPhaseAggregate: public dgBroadPhaseNode
 
 	bool GetSelfCollision() const 
 	{
-		return m_isSelfCollidable;
+		return m_isSelfCollidable ? true : false;
 	}
 	
 	void SetSelfCollision(bool state) 
@@ -66,8 +66,8 @@ class dgBroadPhaseAggregate: public dgBroadPhaseNode
 	dgList<dgBroadPhaseAggregate*>::dgListNode* m_myAggregateNode;
 	dgList<dgBroadPhaseTreeNode*> m_fitnessList;
 	dgFloat64 m_treeEntropy;
-	bool m_isInEquilibrium;
-	bool m_isSelfCollidable;
+	dgInt32 m_isInEquilibrium	: 1;
+	dgInt32 m_isSelfCollidable	: 1;
 };
 
 #endif

@@ -258,10 +258,10 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_userData = NULL;
 	m_clusterUpdate = NULL;
 
-	m_freezeAccel2 = DG_FREEZE_MAG2;
-	m_freezeAlpha2 = DG_FREEZE_MAG2;
-	m_freezeSpeed2 = DG_FREEZE_MAG2 * dgFloat32 (0.1f);
-	m_freezeOmega2 = DG_FREEZE_MAG2 * dgFloat32 (0.1f);
+	m_freezeAccel2 = DG_FREEZE_ACCEL2;
+	m_freezeAlpha2 = DG_FREEZE_ACCEL2;
+	m_freezeSpeed2 = DG_FREEZE_SPEED2;
+	m_freezeOmega2 = DG_FREEZE_SPEED2;
 
 	m_contactTolerance = DG_PRUNE_CONTACT_TOLERANCE;
 

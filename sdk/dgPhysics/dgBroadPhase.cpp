@@ -1069,12 +1069,12 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 	m_world->CalculateContacts(pair, threadID, false, false);
 
 	if (pair->m_contactCount) {
-		if (pair->m_contact->m_body0->m_invMass.m_w != dgFloat32 (0.0f)) {
-			pair->m_contact->m_body0->m_equilibrium = false;
-		}
-		if (pair->m_contact->m_body1->m_invMass.m_w != dgFloat32 (0.0f)) {
-			pair->m_contact->m_body1->m_equilibrium = false;
-		}
+//		if (pair->m_contact->m_body0->m_invMass.m_w != dgFloat32 (0.0f)) {
+//			pair->m_contact->m_body0->m_equilibrium = false;
+//		}
+//		if (pair->m_contact->m_body1->m_invMass.m_w != dgFloat32 (0.0f)) {
+//			pair->m_contact->m_body1->m_equilibrium = false;
+//		}
 		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
 		m_world->ProcessContacts(pair, threadID);
 		KinematicBodyActivation(pair->m_contact);
@@ -1152,7 +1152,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 				const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
 				if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-					bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
+					const dgInt32 kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? 0 : 1;
 					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
 						const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
 						const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);

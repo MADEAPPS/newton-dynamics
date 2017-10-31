@@ -251,6 +251,7 @@ class dgBody
 		dgUnsigned32 m_flags;
 		struct {
 			dgUnsigned32 m_freeze					: 1;
+			dgUnsigned32 m_resting					: 1;
 			dgUnsigned32 m_sleeping					: 1;
 			dgUnsigned32 m_autoSleep				: 1;
 			dgUnsigned32 m_inCallback				: 1;

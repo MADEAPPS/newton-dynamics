@@ -37,7 +37,7 @@
 #define	DG_SMALL_ISLAND_COUNT			2
 
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
-#define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_MAG * dgFloat32 (0.5f))
+#define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_ACCEL * dgFloat32 (0.5f))
 
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
@@ -84,7 +84,6 @@ class dgBodyCluster
 	dgInt32 m_rowsStart;
 	dgInt32 m_rowsCount;
 	dgInt32 m_clusterLRU;
-	dgInt32 m_activeJointCount;
 	dgInt16 m_isContinueCollision;
 	dgInt16 m_hasSoftBodies;
 };
@@ -100,8 +99,6 @@ class dgJointInfo
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
 	dgInt32 m_pairCount;
-	dgInt32 m_isFrontier		: 1;
-	dgInt32 m_isInQueueFrontier : 1;
 };
 
 
@@ -210,8 +207,8 @@ class dgJacobianMatrixElement
 
 	dgFloat32 m_force;
 	dgFloat32 m_accel;
-	dgFloat32 m_jMinvJt;
-	dgFloat32 m_invJMinvJt;
+	dgFloat32 m_jinvMJt;
+	dgFloat32 m_invJinvMJt;
 
 	dgFloat32 m_diagDamp;
 	dgFloat32 m_coordenateAccel;
@@ -249,7 +246,7 @@ class dgWorldDynamicUpdate
 
 	private:
 	void BuildClusters(dgFloat32 timestep);
-	void SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
+	dgInt32 SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
 	static dgInt32 CompareClusters (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
@@ -278,8 +275,6 @@ class dgWorldDynamicUpdate
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgBodyCluster* const cluster) const;
 
 	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
-//	void ApplyForceAndTorque(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2) const;
-	
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void ResolveClusterForces (dgBodyCluster* const cluste, dgInt32 threadID, dgFloat32 timestep) const;
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
