@@ -686,34 +686,27 @@ class dgDanzigSolver
 		return true;
 	}
 
-	void Solve()
+	dgFloat32 Solve()
 	{
-		//dgInt32 index = 0;
-		//dgInt32 count = m_size;
-		//dgInt32 clampedIndex = m_size;
-		//dgInt32 initialGuessCount = m_size;
 		CholeskyFactorization();
 
 		dgInt32 stride = 0;
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_permute[i] = dgInt16(i);
-			const dgFloat32* const row = &m_matrix[stride];
-			//const dgInt32 frictionIndex = m_frictionIndex[i];
-			//const dgFloat32 low = m_low[i] * m_x[frictionIndex];
-			//const dgFloat32 high = m_high[i] * m_x[frictionIndex];
-			//m_x0[i] = dgClamp(m_x[i], low, high);
 			m_x0[i] = dgFloat32 (0.0f);
-			m_invDiag[i] = dgFloat32 (1.0f) / row[i];
 			stride += m_size;
 		}
 
+static int xxx;
+xxx++;
+
 		const dgFloat32 tol = dgFloat32(0.1f);
 		const dgFloat32 tol2 = tol * tol;
-		dgFloat32 tolerance = dgFloat32 (1.0f);
+		dgFloat32 accelNorm = dgFloat32 (1.0f);
 		const dgInt32 maxIterCount = dgMin (m_size, 4);
-		for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+		for (dgInt32 i = 0; (i < maxIterCount) && (accelNorm > tol2); i++) {
 			stride = 0;
-			tolerance = dgFloat32(0.0f);
+			accelNorm = dgFloat32(0.0f);
 
 			for (dgInt32 j = 0; j < m_size; j++) {
 				const dgFloat32* const row = &m_matrix[stride];
@@ -736,14 +729,18 @@ class dgDanzigSolver
 
 				r += m_r0[j];
 				m_x0[j] = f - m_x[j];
-				tolerance += r * r;
+				accelNorm += r * r;
 				stride += m_size;
 			}
 		}
 
-		if (tolerance < dgFloat32(10e-6f)) {
-			dgAssert(0);
+		if (accelNorm < dgFloat32(10e-6f)) {
+			for (dgInt32 i = 0; i < m_size; i++) {
+				m_x[i] = m_x0[i];
+			}
+			return accelNorm;
 		}
+
 
 		dgInt32 activeCount = m_size;
 		stride = (m_size - 1) * m_size;
@@ -757,12 +754,17 @@ class dgDanzigSolver
 			m_delta_x[j] = r;
 			m_delta_r[j] = r;
 			const dgInt32 frictionIndex = m_frictionIndex[j];
-			const dgFloat32 low = m_low[j] * m_x0[frictionIndex];
-			const dgFloat32 high = m_high[j] * m_x0[frictionIndex];
+			const dgFloat32 low = m_low[j] * (m_x[frictionIndex] + m_x0[frictionIndex]);
+			const dgFloat32 high = m_high[j] * (m_x[frictionIndex] + m_x0[frictionIndex]);
 			m_low[j] = low;
 			m_high[j] = high;
-			dgFloat32 f = (r + row[j] * m_x0[j]) * m_invDiag[j];
-			if ((f > high) || (f < low)) {
+			dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
+			if (f > high) {
+				dgAssert(0);
+				activeCount--;
+				PermuteRows(j, activeCount);
+			} else if (f < low) {
+				dgAssert(0);
 				activeCount--;
 				PermuteRows(j, activeCount);
 			}
@@ -852,7 +854,6 @@ class dgDanzigSolver
 			}
 			//index = activeCount;
 		}
-
 
 		while (count) {
 			bool loop = true;
@@ -997,6 +998,8 @@ class dgDanzigSolver
 			m_x[j] = m_x0[i];
 			m_b[j] = m_r0[i];
 		}
+
+		return accelNorm;
 	}
 
 	private:
@@ -1273,24 +1276,23 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 		dgVector diag(row_i->m_JMinv.m_jacobianM0.m_linear * linearM0 + row_i->m_JMinv.m_jacobianM0.m_angular * angularM0 +
 					  row_i->m_JMinv.m_jacobianM1.m_linear * linearM1 + row_i->m_JMinv.m_jacobianM1.m_angular * angularM1);
 
-		//b[i] = row_i->m_coordenateAccel;
 		b[i] = row_i->m_coordenateAccel - row_i->m_force * row_i->m_diagDamp - diag.AddHorizontal().GetScalar();
 
 		low[i] = row_i->m_lowerBoundFrictionCoefficent;
 		high[i] = row_i->m_upperBoundFrictionCoefficent;
 		frictionIndex[i] = (row_i->m_normalForceIndex < 0) ? dgInt16(rowsCount) : dgInt16(row_i->m_normalForceIndex);
 	}
-	solver.Solve();
+	dgFloat32 accelNorm = solver.Solve();
 
 	const dgVector scale0(jointInfo->m_scale0);
 	const dgVector scale1(jointInfo->m_scale1);
 	for (dgInt32 i = 0; i < rowsCount; i++) {
 		dgJacobianMatrixElement* const row = &matrixRow[index + i];
-		dgFloat32 f = x[i];
-		row->m_maxImpact = dgMax(dgAbsf(f), row->m_maxImpact);
 
-		dgVector deltaForce(f - row->m_force);
-//		row->m_force = f;
+		row->m_force += x[i];
+		row->m_maxImpact = dgMax(dgAbsf(row->m_force), row->m_maxImpact);
+
+		dgVector deltaForce(x[i]);
 		dgVector deltaforce0(scale0 * deltaForce);
 		dgVector deltaforce1(scale1 * deltaForce);
 		linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
@@ -1299,7 +1301,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 		angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
 	}
 
-dgFloat32 xxxxx = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, restAcceleration);
+//dgFloat32 xxxxx = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, restAcceleration);
 	internalForces[m0].m_linear = linearM0;
 	internalForces[m0].m_angular = angularM0;
 	internalForces[m1].m_linear = linearM1;
@@ -1307,11 +1309,13 @@ dgFloat32 xxxxx = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalF
 
 	for (dgInt32 i = 0; i < rowsCount; i++) {
 		dgJacobianMatrixElement* const row_i = &matrixRow[index + i];
-		dgTrace(("(%f %f) ", x[i], row_i->m_force));
-		row_i->m_force = x[i];
+		//dgTrace(("(%f %f) ", x[i], row_i->m_force));
+		//row_i->m_force = x[i];
+		dgTrace(("%f ", row_i->m_force));
 	}
 	dgTrace(("\n"));
-	return xxxxx;
+
+	return accelNorm;
 }
 
 
