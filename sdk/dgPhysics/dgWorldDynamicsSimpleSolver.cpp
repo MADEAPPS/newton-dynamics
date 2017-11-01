@@ -686,15 +686,82 @@ class dgDanzigSolver
 		return true;
 	}
 
+	dgFloat32 SolveDebug()
+	{
+
+		for (dgInt32 i = 0; i < m_size; i++) {
+			m_x0[i] = dgFloat32(0.0f);
+		}
+
+		dgInt32 stride = 0;
+		dgFloat32 accelNorm0 = dgFloat32(0.0f);
+		for (dgInt32 j = 0; j < m_size; j++) {
+			const dgFloat32* const row = &m_matrix[stride];
+			dgFloat32 r = m_b[j];
+			for (dgInt32 k = 0; k < m_size; k++) {
+				r = r - row[k] * m_x0[k];
+			}
+			const dgInt32 frictionIndex = m_frictionIndex[j];
+			const dgFloat32 low = m_low[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+			const dgFloat32 high = m_high[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+			dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
+
+			if (f > high) {
+				f = high;
+			} else if (f < low) {
+				f = low;
+			}
+
+			r += m_r0[j];
+			m_x0[j] = f - m_x[j];
+			accelNorm0 += r * r;
+			stride += m_size;
+		}
+
+		dgInt32 maxIterCount = 500;
+		dgFloat32 accelNorm = dgFloat32(1.0f);
+		for (dgInt32 i = 0; (i < maxIterCount) && (accelNorm > dgFloat32 (1.0e-5f)); i++) {
+			stride = 0;
+			accelNorm = dgFloat32(0.0f);
+
+			for (dgInt32 j = 0; j < m_size; j++) {
+				const dgFloat32* const row = &m_matrix[stride];
+				dgFloat32 r = m_b[j];
+				for (dgInt32 k = 0; k < m_size; k++) {
+					r = r - row[k] * m_x0[k];
+				}
+				const dgInt32 frictionIndex = m_frictionIndex[j];
+				const dgFloat32 low = m_low[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+				const dgFloat32 high = m_high[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+				dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
+
+				if (f > high) {
+					f = high;
+				} else if (f < low) {
+					f = low;
+				}
+
+				r += m_r0[j];
+				m_x0[j] = f - m_x[j];
+				accelNorm += r * r;
+				stride += m_size;
+			}
+		}
+		return accelNorm0;
+	}
+
 	dgFloat32 Solve()
 	{
+
+		dgDanzigSolver debugTest(*this);
+		debugTest.SolveDebug();
+
 		CholeskyFactorization();
 
 		dgInt32 stride = 0;
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_permute[i] = dgInt16(i);
 			m_x0[i] = dgFloat32 (0.0f);
-			stride += m_size;
 		}
 
 		const dgFloat32 tol = dgFloat32(0.1f);
