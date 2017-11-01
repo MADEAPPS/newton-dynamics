@@ -755,7 +755,7 @@ class dgDanzigSolver
 		return accelNorm0;
 	}
 
-	dgFloat32 Solve()
+	dgFloat32 Solve(dgInt32 frictionIndexCount)
 	{
 //		CholeskyFactorization();
 
@@ -905,19 +905,22 @@ xxx++;
 
 	dgInt32 stride = 0;
 //	dgFloat32 accelNorm0 = dgFloat32(0.0f);
-	for (dgInt32 j = 0; j < m_size; j++) {
+
+	dgFloat32 mask[DG_CONSTRAINT_MAX_ROWS];
+	for (dgInt32 i = 0; i < m_size; i++) {
 		const dgFloat32* const row = &m_matrix[stride];
-		dgFloat32 r = m_b[j];
-		for (dgInt32 k = 0; k < m_size; k++) {
-			r -= row[k] * m_x[k];
+		dgFloat32 r = m_b[i];
+		for (dgInt32 j = 0; j < m_size; j++) {
+			r -= row[j] * m_x[j];
 		}
-		m_r0[j] = r;
-		m_x0[j] = m_x[j];
-		m_delta_x[j] = r;
+		m_r0[i] = r;
+		m_x0[i] = m_x[i];
+		m_delta_x[i] = r;
+		mask[i] = dgFloat32(1.0f);
 		stride += m_size;
 	}
 
-	for (dgInt32 iter = 0; iter < 4; iter++) {
+	for (dgInt32 iter = 0; iter < 20; iter++) {
 
 		stride = 0;
 		dgFloat32 num = dgFloat32(0.0f);
@@ -928,7 +931,7 @@ xxx++;
 			for (dgInt32 j = 0; j < m_size; j++) {
 				r += row[j] * m_delta_x[j];
 			}
-			m_delta_r[i] = r;
+			m_delta_r[i] = r * mask[i];
 
 			num += r * r;
 			den += m_delta_x[i] * r;
@@ -936,13 +939,55 @@ xxx++;
 		}
 
 		dgFloat32 alpha = num / den;
-dgAssert(0);
+
+		dgInt32 index = -1;
+		for (dgInt32 i = m_size - 1; (i >= 0) && (alpha > dgFloat32(1.0e-6f)); i--) {
+			const dgInt32 frictionIndex = m_frictionIndex[i];
+			const dgFloat32 low = m_low[i] * m_x0[frictionIndex];
+			const dgFloat32 high = m_high[i] * m_x0[frictionIndex];
+			dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
+			if (x < low) {
+				index = i;
+				dgAssert(dgAbsf(m_delta_x[i]) > dgFloat32(0.0f));
+				alpha = (low - m_x0[i]) / m_delta_x[i];
+			} else if (x > m_high[i]) {
+				index = i;
+				alpha = (high - m_x0[i]) / m_delta_x[i];
+			}
+			dgAssert(alpha >= dgFloat32(0.0f));
+		}
+
+
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_x0[i] += alpha * m_delta_x[i];
 			m_r0[i] -= alpha * m_delta_r[i];
 		}
 
-
+		if (index >= 0) {
+			stride = 0;
+			mask[index] = dgFloat32(0.0f);
+			m_delta_x[index] = dgFloat32(0.0f);
+			for (dgInt32 i = 0; i < m_size; i++) {
+				const dgFloat32* const row = &m_matrix[stride];
+				dgFloat32 r = m_b[i];
+				for (dgInt32 j = 0; j < m_size; j++) {
+					r -= row[j] * m_x[j] * mask[i];
+				}
+				m_r0[i] = r;
+				m_x0[i] = m_x[i];
+				m_delta_x[i] = r * mask[i];
+				stride += m_size;
+			}
+		} else {
+			dgFloat32 beta = dgFloat32 (0.0f);
+			for (dgInt32 i = 0; i < m_size; i++) {
+				beta += m_r0[i] * m_r0[i] * mask[i];
+			}
+			beta = beta / num;
+			for (dgInt32 i = 0; i < m_size; i++) {
+				m_delta_x[i] = m_r0[i] * mask[i] + beta * m_delta_x[i];
+			}
+		}
 	}
 
 dgAssert (0);
@@ -1282,6 +1327,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 	dgDanzigSolver solver;
 	solver.SetSize(rowsCount);
 
+	dgInt32 frictionIndexCount = 0;
 	dgFloat32* const b = solver.GetB();
 	dgFloat32* const x = solver.GetX();
 	dgFloat32* const r = solver.GetR();
@@ -1290,6 +1336,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 	dgFloat32* const invDiag = solver.GetInvDiag();
 	dgFloat32* const massMatrix = solver.GetMatrixRow(0);
 	dgInt16* const frictionIndex = solver.GetFrictionIndex();
+	
 	for (dgInt32 i = 0; i < rowsCount; i++) {
 		const dgJacobianMatrixElement* const row_i = &matrixRow[index + i];
 		dgFloat32* const massMatrixRow = solver.GetMatrixRow(i);
@@ -1320,7 +1367,10 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 
 		low[i] = row_i->m_lowerBoundFrictionCoefficent;
 		high[i] = row_i->m_upperBoundFrictionCoefficent;
-		frictionIndex[i] = (row_i->m_normalForceIndex < 0) ? dgInt16(rowsCount) : dgInt16(row_i->m_normalForceIndex);
+
+		dgInt32 isFrictionIndex = row_i->m_normalForceIndex >= 0;
+		frictionIndexCount += isFrictionIndex;
+		frictionIndex[i] = isFrictionIndex ? dgInt16(row_i->m_normalForceIndex) : dgInt16(rowsCount);
 	}
 
 #if 0
@@ -1334,7 +1384,7 @@ for (dgInt32 i = 0; i < rowsCount; i++) {
 dgTrace(("\n"));
 #endif
 
-	dgFloat32 accelNorm = solver.Solve();
+	dgFloat32 accelNorm = solver.Solve(frictionIndexCount);
 //	dgFloat32 accelNorm = solver.SolveDebug();
 
 	const dgVector scale0(jointInfo->m_scale0);
