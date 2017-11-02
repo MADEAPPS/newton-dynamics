@@ -759,241 +759,102 @@ class dgDanzigSolver
 	{
 //		CholeskyFactorization();
 
+		dgFloat32 mask[DG_CONSTRAINT_MAX_ROWS];
 		dgFloat32 accelNorm = dgFloat32 (0.0f);
-
-/*
+		
+		dgFloat32 beta = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < m_size; i++) {
+			m_r0[i] = m_b[i];
 			m_x0[i] = dgFloat32(0.0f);
+			m_delta_x[i] = m_b[i];
+			mask[i] = dgFloat32(1.0f);
+			beta += m_b[i] * m_b[i];
+			accelNorm += m_b[i] * m_b[i];
 		}
-
-		dgInt32 stride = 0;
-		for (dgInt32 j = 0; j < m_size; j++) {
-			const dgFloat32* const row = &m_matrix[stride];
-			dgFloat32 r = m_b[j];
-			for (dgInt32 k = 0; k < m_size; k++) {
-				r = r - row[k] * m_x0[k];
-			}
-			const dgInt32 frictionIndex = m_frictionIndex[j];
-			const dgFloat32 low = m_low[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-			const dgFloat32 high = m_high[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-			dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
-
-			if (f > high) {
-				f = high;
-			} else if (f < low) {
-				f = low;
-			}
-
-			r += m_r0[j];
-			m_x0[j] = f - m_x[j];
-			accelNorm += r * r;
-			stride += m_size;
-		}
-
-		if (accelNorm < dgFloat32(10e-6f)) {
-			for (dgInt32 i = 0; i < m_size; i++) {
-				m_x[i] = m_x0[i];
-			}
-			return accelNorm;
-		}
-
-		for (dgInt32 i = 0; i < 3; i++) {
-			stride = 0;
-			for (dgInt32 j = 0; j < m_size; j++) {
-				const dgFloat32* const row = &m_matrix[stride];
-				dgFloat32 r = m_b[j];
-				for (dgInt32 k = 0; k < m_size; k++) {
-					r = r - row[k] * m_x0[k];
-				}
-				const dgInt32 frictionIndex = m_frictionIndex[j];
-				const dgFloat32 low = m_low[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-				const dgFloat32 high = m_high[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-				dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
-
-				if (f > high) {
-					f = high;
-				} else if (f < low) {
-					f = low;
-				}
-
-				r += m_r0[j];
-				m_x0[j] = f - m_x[j];
-				stride += m_size;
-			}
-		}
-
-		stride = 0;
-		for (dgInt32 i = 0; i < m_size; i++) {
-			dgFloat32 b = m_b[i];
-			const dgFloat32* const row = &m_matrix[stride];
-			stride += m_size;
-			for (dgInt32 j = 0; j < m_size; j++) {
-				b -= row[j] * m_x0[j];
-			}
-			
-			m_r0[i] = b;
-			m_delta_x[i] = b;
-			m_delta_r[i] = b;
-			m_permute[i] = dgInt16(i);
-			const dgInt32 frictionIndex = m_frictionIndex[i];
-			m_low[i] = m_low[i] * (m_x[frictionIndex] + m_x0[frictionIndex]) - m_x[i];
-			m_high[i] = m_high[i] * (m_x[frictionIndex] + m_x0[frictionIndex]) - m_x[i];
-		}
-
-static int xxx;
-xxx++;
 
 		dgInt32 activeCount = m_size;
-		for (dgInt32 test = true; test; ) {
-			test = false;
-			SolveCholesky(activeCount, m_delta_x);
-
-			dgInt32 index = -1;
-			dgFloat32 alpha = dgFloat32(1.0f);
-			for (dgInt32 i = activeCount - 1; (i >= 0) && (alpha > dgFloat32 (0.0f)); i--) {
-				const dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
-				if (x < m_low[i]) {
-					index = i;
-					dgAssert (dgAbsf(m_delta_x[i]) > dgFloat32 (0.0f));
-					dgAssert ((m_low[i] - m_x0[i]) / m_delta_x[i] <= alpha);
-					alpha = dgMax ((m_low[i] - m_x0[i]) / m_delta_x[i], dgFloat32 (0.0f));
-				} else if (x > m_high[i]) {
-					index = i;
-					dgAssert (dgAbsf(m_delta_x[i]) > dgFloat32 (0.0f));
-					dgAssert ((m_high[i] - m_x0[i]) / m_delta_x[i] <= alpha);
-					alpha = dgMax ((m_high[i] - m_x0[i]) / m_delta_x[i], dgFloat32 (0.0f));
+		const dgFloat32 accelTol2 = dgFloat32(1.0e-6f);
+		while (beta > accelTol2) {
+			dgInt32 stride = 0;
+			dgFloat32 num = dgFloat32(0.0f);
+			dgFloat32 den = dgFloat32(0.0f);
+			for (dgInt32 i = 0; i < m_size; i++) {
+				const dgFloat32* const row = &m_matrix[stride];
+				dgFloat32 r = dgFloat32 (0.0f);
+				for (dgInt32 j = 0; j < m_size; j++) {
+					r += row[j] * m_delta_x[j];
 				}
+				m_delta_r[i] = r * mask[i];
+
+				num += r * r;
+				den += m_delta_x[i] * r;
+				stride += m_size;
+			}
+	
+			dgInt32 index = -1;
+			dgFloat32 alpha = num / den;
+			for (dgInt32 i = m_size - 1; (i >= 0) && (alpha > dgFloat32(1.0e-6f)); i--) {
+				const dgInt32 frictionIndex = m_frictionIndex[i];
+				const dgFloat32 low = m_low[i] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+				const dgFloat32 high = m_high[i] * (m_x0[frictionIndex] + m_x[frictionIndex]);
+				dgFloat32 x = m_x[i] + m_x0[i] + alpha * m_delta_x[i];
+				if (x < low) {
+					index = i;
+					dgAssert(dgAbsf(m_delta_x[i]) > dgFloat32(0.0f));
+					alpha = (low - m_x[i] - m_x0[i]) / m_delta_x[i];
+				} else if (x > high) {
+					index = i;
+					alpha = (high - m_x[i] - m_x0[i]) / m_delta_x[i];
+				}
+				dgAssert(alpha >= dgFloat32(0.0f));
 			}
 
+			beta = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < m_size; i++) {
 				m_x0[i] += alpha * m_delta_x[i];
 				m_r0[i] -= alpha * m_delta_r[i];
-				m_delta_r[i] = m_r0[i];
-				m_delta_x[i] = m_r0[i];
+				beta += m_r0[i] * m_r0[i] * mask[i];
 			}
 
-			if (index != -1) {
-				activeCount --;
-				PermuteRows(index, activeCount);
-				CholeskyUpdate(index, activeCount);
-				for (dgInt32 i = activeCount; i < m_size; i++) {
-					m_delta_x[i] = dgFloat32 (0.0f);
+			if (index >= 0) {
+				stride = 0;
+				activeCount--;
+				beta = dgFloat32(1.0f);
+				mask[index] = dgFloat32(0.0f);
+				m_delta_x[index] = dgFloat32(0.0f);
+				for (dgInt32 i = 0; i < m_size; i++) {
+					const dgFloat32* const row = &m_matrix[stride];
+					dgFloat32 r = m_b[i];
+					for (dgInt32 j = 0; j < m_size; j++) {
+						r -= row[j] * m_x[j] * mask[i];
+					}
+					m_r0[i] = r;
+					m_x0[i] = m_x[i];
+					m_delta_x[i] = r * mask[i];
+					stride += m_size;
 				}
-				test = activeCount != 0;
+			} else {
+				alpha = beta / num;
+				for (dgInt32 i = 0; i < m_size; i++) {
+					m_delta_x[i] = m_r0[i] * mask[i] + alpha * m_delta_x[i];
+				}
 			}
 		}
 
-		if (activeCount == m_size) {
-			for (dgInt32 i = 0; i < m_size; i++) {
+		if ((activeCount == m_size) && (beta < accelTol2)) {
+			for (dgInt32 i = m_size - 1; i >= 0; i--) {
 				m_x[i] = m_x0[i];
-				m_b[i] = dgFloat32 (0.0f);
+				m_b[i] = m_r0[i];
 			}
 			return accelNorm;
 		}
 
-		if (activeCount == 0) {
-			for (dgInt32 i = 0; i < m_size; i++) {
-				dgInt32 j = m_permute[i];
-				m_x[j] = m_x0[i];
-				m_b[j] = m_r0[i];
-			}
-			return accelNorm;
-		}
-*/
-
-
-
-	dgInt32 stride = 0;
-//	dgFloat32 accelNorm0 = dgFloat32(0.0f);
-
-	dgFloat32 mask[DG_CONSTRAINT_MAX_ROWS];
-	for (dgInt32 i = 0; i < m_size; i++) {
-	dgAssert(0);
-		const dgFloat32* const row = &m_matrix[stride];
-		dgFloat32 r = m_b[i];
-		for (dgInt32 j = 0; j < m_size; j++) {
-			r -= row[j] * m_x[j];
-		}
-		m_r0[i] = r;
-		m_x0[i] = m_x[i];
-		m_delta_x[i] = r;
-		mask[i] = dgFloat32(1.0f);
-		stride += m_size;
-	}
-
-	dgFloat32 beta = dgFloat32(1.0f);
-	while (beta > dgFloat32(1.0e-8f)) {
-		stride = 0;
-		dgFloat32 num = dgFloat32(0.0f);
-		dgFloat32 den = dgFloat32(0.0f);
-		for (dgInt32 i = 0; i < m_size; i++) {
-			const dgFloat32* const row = &m_matrix[stride];
-			dgFloat32 r = dgFloat32 (0.0f);
-			for (dgInt32 j = 0; j < m_size; j++) {
-				r += row[j] * m_delta_x[j];
-			}
-			m_delta_r[i] = r * mask[i];
-
-			num += r * r;
-			den += m_delta_x[i] * r;
-			stride += m_size;
-		}
-	
-		dgInt32 index = -1;
-		dgFloat32 alpha = num / den;
-		for (dgInt32 i = m_size - 1; (i >= 0) && (alpha > dgFloat32(1.0e-6f)); i--) {
+		for (dgInt32 i = m_size - 1; i >= 0; i--) {
 			const dgInt32 frictionIndex = m_frictionIndex[i];
-			const dgFloat32 low = m_low[i] * m_x0[frictionIndex];
-			const dgFloat32 high = m_high[i] * m_x0[frictionIndex];
-			dgFloat32 x = m_x0[i] + alpha * m_delta_x[i];
-			if (x < low) {
-				index = i;
-				dgAssert(dgAbsf(m_delta_x[i]) > dgFloat32(0.0f));
-				alpha = (low - m_x0[i]) / m_delta_x[i];
-			} else if (x > m_high[i]) {
-				index = i;
-				alpha = (high - m_x0[i]) / m_delta_x[i];
-			}
-			dgAssert(alpha >= dgFloat32(0.0f));
+			m_low[i] *= m_x0[frictionIndex];
+			m_high[i] *= m_x0[frictionIndex];
+	m_x[i] = m_x0[i];
 		}
-
-		beta = dgFloat32(0.0f);
-		for (dgInt32 i = 0; i < m_size; i++) {
-			m_x0[i] += alpha * m_delta_x[i];
-			m_r0[i] -= alpha * m_delta_r[i];
-			beta += m_r0[i] * m_r0[i] * mask[i];
-		}
-
-		if (index >= 0) {
-			stride = 0;
-			beta = dgFloat32(1.0f);
-			mask[index] = dgFloat32(0.0f);
-			m_delta_x[index] = dgFloat32(0.0f);
-			for (dgInt32 i = 0; i < m_size; i++) {
-				const dgFloat32* const row = &m_matrix[stride];
-				dgFloat32 r = m_b[i];
-				for (dgInt32 j = 0; j < m_size; j++) {
-					r -= row[j] * m_x[j] * mask[i];
-				}
-				m_r0[i] = r;
-				m_x0[i] = m_x[i];
-				m_delta_x[i] = r * mask[i];
-				stride += m_size;
-			}
-		} else {
-			alpha = beta / num;
-			for (dgInt32 i = 0; i < m_size; i++) {
-				m_delta_x[i] = m_r0[i] * mask[i] + alpha * m_delta_x[i];
-			}
-		}
-	}
-
-	for (dgInt32 i = m_size - 1; i >= 0; i--) {
-		const dgInt32 frictionIndex = m_frictionIndex[i];
-		m_low[i] *= m_x0[frictionIndex];
-		m_high[i] *= m_x0[frictionIndex];
-m_x[i] = m_x0[i] - m_x[i];
-	}
 return 1;
 dgAssert (0);
 //stride = 0;
@@ -1598,8 +1459,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
-				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
-//				dgFloat32 accel = CalculateJointForceDanzig(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+//				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+				dgFloat32 accel = CalculateJointForceDanzig(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 		}
