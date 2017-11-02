@@ -772,6 +772,11 @@ class dgDanzigSolver
 			accelNorm += m_b[i] * m_b[i];
 		}
 
+static int xxx;
+xxx++;
+if (xxx == 3)
+xxx *= 1;
+
 		dgInt32 activeCount = m_size;
 		const dgFloat32 accelTol2 = dgFloat32(1.0e-6f);
 		while (beta > accelTol2) {
@@ -800,7 +805,6 @@ class dgDanzigSolver
 				dgFloat32 x = m_x[i] + m_x0[i] + alpha * m_delta_x[i];
 				if (x < low) {
 					index = i;
-					dgAssert(dgAbsf(m_delta_x[i]) > dgFloat32(0.0f));
 					alpha = (low - m_x[i] - m_x0[i]) / m_delta_x[i];
 				} else if (x > high) {
 					index = i;
@@ -849,6 +853,13 @@ class dgDanzigSolver
 			return accelNorm;
 		}
 
+for (dgInt32 i = m_size - 1; i >= 0; i--) {
+	m_x[i] = m_x0[i];
+	m_b[i] = m_r0[i];
+}
+return accelNorm;
+
+/*
 		for (dgInt32 i = m_size - 1; i >= 0; i--) {
 			const dgInt32 frictionIndex = m_frictionIndex[i];
 			m_low[i] *= m_x0[frictionIndex];
@@ -857,6 +868,7 @@ class dgDanzigSolver
 		}
 return 1;
 dgAssert (0);
+*/
 //stride = 0;
 /*
 		dgInt32 index = activeCount;
