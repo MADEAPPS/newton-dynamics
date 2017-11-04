@@ -756,7 +756,7 @@ class dgDanzigSolver
 
 	dgFloat32 Solve()
 	{
-//		CholeskyFactorization();
+		CholeskyFactorization();
 
 		dgFloat32 mask[DG_CONSTRAINT_MAX_ROWS];
 		dgFloat32 accelNorm = dgFloat32 (0.0f);
@@ -769,11 +769,12 @@ class dgDanzigSolver
 			mask[i] = dgFloat32(1.0f);
 			beta += m_b[i] * m_b[i];
 			accelNorm += m_b[i] * m_b[i];
+			m_permute[i] = dgInt16 (i);
 		}
 
 static int xxx;
 xxx++;
-if (xxx == 3)
+if (xxx == 15)
 xxx *= 1;
 
 		dgInt32 activeCount = m_size;
@@ -878,53 +879,31 @@ xxx *= 1;
 			return accelNorm;
 		}
 
-for (dgInt32 i = m_size - 1; i >= 0; i--) {
-	m_x[i] = m_x0[i];
-	m_b[i] = m_r0[i];
-}
-return accelNorm;
-
-/*
+		dgInt32 index = m_size;
 		for (dgInt32 i = m_size - 1; i >= 0; i--) {
-			const dgInt32 frictionIndex = m_frictionIndex[i];
-			m_low[i] *= m_x0[frictionIndex];
-			m_high[i] *= m_x0[frictionIndex];
-	m_x[i] = m_x0[i];
+			m_r0[i] = dgFloat32(0.0f);
+			m_delta_x[i] = dgFloat32(0.0f);
+			m_delta_r[i] = dgFloat32(0.0f);
+			if (!mask[i]) {
+				index--;
+				PermuteRows(i, index);
+			}
 		}
-return 1;
-dgAssert (0);
-*/
-//stride = 0;
-/*
-		dgInt32 index = activeCount;
-		dgInt32 count = m_size - activeCount;
+		CholeskyUpdate(index, m_size);
+
+		dgInt32 stride = index * m_size;
+		for (dgInt32 i = index; i < m_size; i++) {
+			const dgFloat32* const row = &m_matrix[stride];
+			dgFloat32 r = -m_b[i];
+			for (dgInt32 j = 0; j < m_size; j++) {
+				r += row[j] * m_x0[j] * mask[j];
+			}
+			m_r0[i] = r;
+			stride += m_size;
+		}
+
+		dgInt32 count = m_size - index;
 		dgInt32 clampedIndex = m_size;
-		if (activeCount < m_size) {
-			for (dgInt32 i = 0; i < m_size; i++) {
-				m_r0[i] = dgFloat32(0.0f);
-				m_delta_x[i] = dgFloat32(0.0f);
-				m_delta_r[i] = dgFloat32(0.0f);
-			}
-
-			stride = activeCount * m_size;
-			for (dgInt32 j = activeCount; j < m_size; j++) {
-				dgFloat32 val = m_b[j];
-				const dgFloat32* const row = &m_matrix[stride];
-				for (dgInt32 i = 0; i < m_size; i++) {
-					val = val - row[i] * m_x0[i];
-				}
-				m_r0[j] = -val;
-				stride += m_size;
-			}
-			//index = activeCount;
-		}
-
-static int xxx;
-xxx++;
-if (xxx == 3)
-xxx *= 1;
-
-
 		while (count) {
 			bool loop = true;
 			bool calculateDelta_x = true;
@@ -1069,7 +1048,6 @@ xxx *= 1;
 			m_b[j] = m_r0[i];
 		}
 		return accelNorm;
-*/
 	}
 
 	private:
