@@ -688,7 +688,6 @@ class dgDanzigSolver
 
 	dgFloat32 SolveDebug()
 	{
-
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_x0[i] = dgFloat32(0.0f);
 		}
@@ -789,18 +788,18 @@ xxx *= 1;
 				for (dgInt32 j = 0; j < m_size; j++) {
 					r += row[j] * m_delta_x[j];
 				}
-				m_delta_r[i] = r * mask[i];
-
-				num += r * r;
-				den += m_delta_x[i] * r;
 				stride += m_size;
+				den += m_delta_x[i] * r;
+				m_delta_r[i] = r * mask[i];
+				num += m_r0[i] * m_r0[i] * mask[i];
 			}
 	
 			dgInt32 index = -1;
 			dgFloat32 alpha = num / den;
-			for (dgInt32 i = m_size - 1; (i >= 0) && (alpha > dgFloat32(1.0e-6f)); i--) {
+			dgAssert (alpha > dgFloat32 (0.0f));
+			for (dgInt32 i = m_size - 1; (i >= 0) && (alpha > dgFloat32 (0.0f)); i--) {
 				if (m_delta_x[i]) {
-					const dgInt32 frictionIndex = m_frictionIndex[i];
+					//const dgInt32 frictionIndex = m_frictionIndex[i];
 					//const dgFloat32 low = m_low[i] * (m_x0[frictionIndex] + m_x[frictionIndex]);
 					//const dgFloat32 high = m_high[i] * (m_x0[frictionIndex] + m_x[frictionIndex]);
 					const dgFloat32 low = m_low[i];
@@ -815,37 +814,58 @@ xxx *= 1;
 						alpha = (high - m_x0[i]) / m_delta_x[i];
 					}
 					dgAssert(alpha >= dgFloat32(-1.0e-4f));
+					if (alpha < dgFloat32 (1.0e-6f)) {
+						alpha = dgFloat32 (0.0f);
+					}
 				}
 			}
 
-			beta = dgFloat32(0.0f);
-			for (dgInt32 i = 0; i < m_size; i++) {
-				m_x0[i] += alpha * m_delta_x[i];
-				m_r0[i] -= alpha * m_delta_r[i];
-				beta += m_r0[i] * m_r0[i] * mask[i];
-			}
-
-			if (index >= 0) {
-				stride = 0;
+			if (alpha == dgFloat32 (0.0f)) {
 				activeCount--;
-				mask[index] = dgFloat32(0.0f);
 				beta = dgFloat32(0.0f);
-				m_delta_x[index] = dgFloat32(0.0f);
+				mask[index] = dgFloat32(0.0f);
+				const dgFloat32* const row = &m_matrix[stride * index];
 				for (dgInt32 i = 0; i < m_size; i++) {
-					const dgFloat32* const row = &m_matrix[stride];
-					dgFloat32 r = m_b[i];
-					for (dgInt32 j = 0; j < m_size; j++) {
-						r -= row[j] * m_x0[j] * mask[i];
-					}
+					//const dgFloat32* const row = &m_matrix[stride];
+					//dgFloat32 r = m_b[i];
+					//for (dgInt32 j = 0; j < m_size; j++) {
+					//	r -= row[j] * m_x0[j] * mask[j];
+					//}
+					dgFloat32 r = m_r0[i] + row[i] * m_x0[index];
 					m_r0[i] = r;
-					m_delta_x[i] = r * mask[i];
 					beta += r * r * mask[i];
-					stride += m_size;
+					m_delta_x[i] = r * mask[i];
 				}
 			} else {
-				alpha = beta / num;
+				beta = dgFloat32(0.0f);
 				for (dgInt32 i = 0; i < m_size; i++) {
-					m_delta_x[i] = m_r0[i] * mask[i] + alpha * m_delta_x[i];
+					m_x0[i] += alpha * m_delta_x[i];
+					m_r0[i] -= alpha * m_delta_r[i];
+					beta += m_r0[i] * m_r0[i] * mask[i];
+				}
+
+				if (index >= 0) {
+					stride = 0;
+					activeCount--;
+					mask[index] = dgFloat32(0.0f);
+					beta = dgFloat32(0.0f);
+					m_delta_x[index] = dgFloat32(0.0f);
+					for (dgInt32 i = 0; i < m_size; i++) {
+						const dgFloat32* const row = &m_matrix[stride];
+						dgFloat32 r = m_b[i];
+						for (dgInt32 j = 0; j < m_size; j++) {
+							r -= row[j] * m_x0[j] * mask[j];
+						}
+						m_r0[i] = r;
+						m_delta_x[i] = r * mask[i];
+						beta += r * r * mask[i];
+						stride += m_size;
+					}
+				} else {
+					alpha = beta / num;
+					for (dgInt32 i = 0; i < m_size; i++) {
+						m_delta_x[i] = m_r0[i] * mask[i] + alpha * m_delta_x[i];
+					}
 				}
 			}
 		}
@@ -1191,8 +1211,6 @@ xxx *= 1;
 	dgInt16 m_activeColumns[DG_CONSTRAINT_MAX_ROWS];
 	dgInt32 m_size;
 };
-
-
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
 {
