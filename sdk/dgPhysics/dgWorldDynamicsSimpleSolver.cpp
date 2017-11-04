@@ -938,53 +938,58 @@ xxx *= 1;
 						stride += m_size;
 					}
 
-					dgAssert(m_delta_r[index] != dgFloat32(0.0f));
-					dgAssert(dgAbsf(m_delta_x[index]) == dgFloat32(1.0f));
-					m_delta_r[index] = (m_delta_r[index] == dgFloat32(0.0f)) ? dgFloat32(1.0e-12f) : m_delta_r[index];
+					//dgAssert(m_delta_r[index] != dgFloat32(0.0f));
+					if (dgAbsf(m_delta_r[index]) > dgFloat32(1.0e-7f)) {
+						dgAssert(dgAbsf(m_delta_x[index]) == dgFloat32(1.0f));
+						m_delta_r[index] = (m_delta_r[index] == dgFloat32(0.0f)) ? dgFloat32(1.0e-12f) : m_delta_r[index];
 
-					dgFloat32 s = -m_r0[index] / m_delta_r[index];
-					dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
+						dgFloat32 s = -m_r0[index] / m_delta_r[index];
+						dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
 
-					for (dgInt32 i = 0; i <= index; i++) {
-						dgFloat32 x1 = m_x0[i] + s * m_delta_x[i];
-						const dgFloat32 low = m_low[i];
-						const dgFloat32 high = m_high[i];
+						for (dgInt32 i = 0; i <= index; i++) {
+							dgFloat32 x1 = m_x0[i] + s * m_delta_x[i];
+							const dgFloat32 low = m_low[i];
+							const dgFloat32 high = m_high[i];
 
-						if (x1 > high) {
-							swapIndex = i;
-							clamp_x = high;
-							s = (high - m_x0[i]) / m_delta_x[i];
-						} else if (x1 < low) {
-							swapIndex = i;
-							clamp_x = low;
-							s = (low - m_x0[i]) / m_delta_x[i];
-						}
-					}
-					dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
-
-					for (dgInt32 i = clampedIndex; (i < m_size) && (s > dgFloat32(1.0e-12f)); i++) {
-						dgFloat32 r1 = m_r0[i] + s * m_delta_r[i];
-						if ((r1 * m_r0[i]) < dgFloat32(0.0f)) {
-							dgAssert(dgAbsf(m_delta_r[i]) > dgFloat32(0.0f));
-							dgFloat32 s1 = -m_r0[i] / m_delta_r[i];
-							dgAssert(dgAbsf(s1) >= dgFloat32(0.0f));
-							dgAssert(dgAbsf(s1) <= dgAbsf(s));
-							if (dgAbsf(s1) < dgAbsf(s)) {
-								s = s1;
+							if (x1 > high) {
 								swapIndex = i;
+								clamp_x = high;
+								s = (high - m_x0[i]) / m_delta_x[i];
+							} else if (x1 < low) {
+								swapIndex = i;
+								clamp_x = low;
+								s = (low - m_x0[i]) / m_delta_x[i];
 							}
 						}
-					}
+						dgAssert(dgAbsf(s) >= dgFloat32(0.0f));
 
-					for (dgInt32 i = 0; i < m_size; i++) {
-						//dgAssert((m_x0[i] + dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) >= m_low[i]);
-						//dgAssert((m_x0[i] - dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) <= m_high[i]);
+						for (dgInt32 i = clampedIndex; (i < m_size) && (s > dgFloat32(1.0e-12f)); i++) {
+							dgFloat32 r1 = m_r0[i] + s * m_delta_r[i];
+							if ((r1 * m_r0[i]) < dgFloat32(0.0f)) {
+								dgAssert(dgAbsf(m_delta_r[i]) > dgFloat32(0.0f));
+								dgFloat32 s1 = -m_r0[i] / m_delta_r[i];
+								dgAssert(dgAbsf(s1) >= dgFloat32(0.0f));
+								dgAssert(dgAbsf(s1) <= dgAbsf(s));
+								if (dgAbsf(s1) < dgAbsf(s)) {
+									s = s1;
+									swapIndex = i;
+								}
+							}
+						}
 
-						m_x0[i] += s * m_delta_x[i];
-						m_r0[i] += s * m_delta_r[i];
+						for (dgInt32 i = 0; i < m_size; i++) {
+							//dgAssert((m_x0[i] + dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) >= m_low[i]);
+							//dgAssert((m_x0[i] - dgAbsf(m_x0[i]) * dgFloat32(1.0e-4f)) <= m_high[i]);
 
-						//dgAssert((m_x0[i] + dgFloat32(1.0f)) >= m_low[i]);
-						//dgAssert((m_x0[i] - dgFloat32(1.0f)) <= m_high[i]);
+							m_x0[i] += s * m_delta_x[i];
+							m_r0[i] += s * m_delta_r[i];
+
+							//dgAssert((m_x0[i] + dgFloat32(1.0f)) >= m_low[i]);
+							//dgAssert((m_x0[i] - dgFloat32(1.0f)) <= m_high[i]);
+						}
+					} else {
+						clamp_x = m_x0[index];
+						swapIndex = index;
 					}
 				}
 
