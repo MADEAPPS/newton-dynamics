@@ -720,7 +720,7 @@ class dgDanzigSolver
 		dgInt32 maxIterCount = 10000;
 		dgFloat32 accelNorm = dgFloat32(1.0f);
 		dgInt32 iter = 0;
-		for (; (iter < maxIterCount) && (accelNorm > dgFloat32 (1.0e-5f)); iter++) {
+		for (; (iter < maxIterCount) && (accelNorm > dgFloat32 (1.0e-6f)); iter++) {
 			stride = 0;
 			accelNorm = dgFloat32(0.0f);
 
@@ -1055,6 +1055,26 @@ xxx *= 1;
 		return accelNorm;
 	}
 
+
+	dgFloat32 Solve___()
+	{
+		dgDanzigSolver xxxx(*this);
+		xxxx.SolveDebug();
+		dgTrace(("gau: "));
+		for (dgInt32 i = 0; i < m_size; i++) {
+			dgTrace(("%f ", xxxx.m_x[i]));
+		}
+		dgTrace(("\n"));
+
+		dgTrace(("lcp: "));
+		dgFloat32 val = Solve();
+		for (dgInt32 i = 0; i < m_size; i++) {
+			dgTrace(("%f ", m_x[i]));
+		}
+		dgTrace(("\n"));
+		return val;
+	}
+
 	private:
 	void PermuteRows(dgInt32 i, dgInt32 j)
 	{
@@ -1270,8 +1290,9 @@ for (dgInt32 i = 0; i < rowsCount; i++) {
 dgTrace(("\n"));
 #endif
 
-	dgFloat32 accelNorm = solver.Solve();
+//	dgFloat32 accelNorm = solver.Solve();
 //	dgFloat32 accelNorm = solver.SolveDebug();
+	dgFloat32 accelNorm = solver.Solve___();
 
 	const dgVector scale0(jointInfo->m_scale0);
 	const dgVector scale1(jointInfo->m_scale1);
