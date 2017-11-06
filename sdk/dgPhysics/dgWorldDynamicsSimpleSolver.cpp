@@ -1574,33 +1574,6 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 	joindDesc.m_invTimeStep = invTimestepRK;
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
 
-	dgInt32 skeletonCount = 0;
-	dgInt32 skeletonMemorySizeInBytes = 0;
-	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
-	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
-	dgInt32 memorySizes[DG_MAX_SKELETON_JOINT_COUNT];
-	for (dgInt32 i = 1; i < bodyCount; i++) {
-		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
-		dgSkeletonContainer* const container = body->GetSkeleton();
-		if (container && (container->m_lru != lru)) {
-			container->m_lru = lru;
-			memorySizes[skeletonCount] = container->GetMemoryBufferSizeInBytes(constraintArray, matrixRow);
-			skeletonMemorySizeInBytes += memorySizes[skeletonCount];
-			skeletonArray[skeletonCount] = container;
-			skeletonCount++;
-			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
-		}
-	}
-
-	dgInt8* const skeletonMemory = (dgInt8*)dgAlloca(dgVector, skeletonMemorySizeInBytes / sizeof(dgVector));
-	dgAssert((dgInt64(skeletonMemory) & 0x0f) == 0);
-
-	skeletonMemorySizeInBytes = 0;
-	for (dgInt32 i = 0; i < skeletonCount; i++) {
-		skeletonArray[i]->InitMassMatrix(constraintArray, matrixRow, &skeletonMemory[skeletonMemorySizeInBytes]);
-		skeletonMemorySizeInBytes += memorySizes[i];
-	}
-
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
 
@@ -1619,12 +1592,9 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
-				//				dgFloat32 accel = CalculateJointForceDanzig(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+				//dgFloat32 accel = CalculateJointForceDanzig(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
-		}
-		for (dgInt32 j = 0; j < skeletonCount; j++) {
-			skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
 		}
 
 		if (timestepRK != dgFloat32(0.0f)) {
