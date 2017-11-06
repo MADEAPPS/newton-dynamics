@@ -815,14 +815,14 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				}
 
 				for (dgInt32 i = 0; i < size; i++) {
-					dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) >= low[i]);
-					dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) <= high[i]);
+					//dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) >= low[i]);
+					//dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) <= high[i]);
 
 					x0[i] += s * delta_x[i];
 					r0[i] += s * delta_r[i];
 
-					dgAssert((x0[i] + T(dgFloat32(1.0f))) >= low[i]);
-					dgAssert((x0[i] - T(dgFloat32(1.0f))) <= high[i]);
+					//dgAssert((x0[i] + T(dgFloat32(1.0f))) >= low[i]);
+					//dgAssert((x0[i] - T(dgFloat32(1.0f))) <= high[i]);
 				}
 			}
 
