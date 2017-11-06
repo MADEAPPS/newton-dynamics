@@ -238,6 +238,7 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 
 	// create the stack
 	dMatrix baseMatrix(dGetIdentityMatrix());
+//baseMatrix = dPitchMatrix(30.0f * 3.1416f/180.0f);
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;

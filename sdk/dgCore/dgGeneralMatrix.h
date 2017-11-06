@@ -446,7 +446,7 @@ void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, con
 	const T* const invDiag = invDiag1;
 	const dgInt32 maxIterCount = size * size * size * size + 100000;
 	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
-		tolerance = T(dgFloat32(0.0f));
+		tolerance = T(0.0f);
 		dgInt32 base = 0;
 		for (dgInt32 j = 0; j < size; j++) {
 			const T* const row = &me[base];
@@ -538,7 +538,7 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 					dgInt32 index = activeColumns[j];
 					mag += rowI[index] * rowI[index];
 					reflexion[index] = rowI[index];
-				}
+			        }
 				reflexion[i] = rowI[i] - T (sqrt(mag + rowI[i] * rowI[i]));
 
 				const T vMag2 (mag + reflexion[i] * reflexion[i]);
@@ -573,7 +573,7 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 			}
 		
 			for (dgInt32 k = i + 1; k < size; k++) {
-				rowI[k] = T(dgFloat32(0.0f));
+				rowI[k] = T(0.0f);
 			}
 
 			if (rowI[i] < T (dgFloat32 (0.0f))) {
@@ -630,6 +630,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 	dgCheckAligment(symmetricMatrixPSD);
 	dgCheckAligment(lowerTriangularMatrix);
 
+#if 0
 	dgInt32 index = 0;
 	dgInt32 count = size;
 	dgInt32 clampedIndex = size;
@@ -637,8 +638,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		permute[i] = short(i);
 		r0[i] = -b[i];
 		x0[i] = dgFloat32(0.0f);
-		delta_x[i] = T(dgFloat32(0.0f));
-		delta_r[i] = T(dgFloat32(0.0f));
+		delta_x[i] = T(0.0f);
+		delta_r[i] = T(0.0f);
 	}
 
 	bool findInitialGuess = size >= 6;
@@ -656,7 +657,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				T f = x0[i];
 				if ((f < low[i]) || (f > high[i])) {
 					findInitialGuess = true;
-					x0[i] = T(dgFloat32(0.0f));
+					x0[i] = T(0.0f);
 					dgPermuteRows(size, i, initialGuessCount -1, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
 					permuteStart = dgMin (permuteStart, i);
 					i --;
@@ -678,7 +679,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		} else {
 			if (!findInitialGuess) {
 				for (dgInt32 i = 0; i < initialGuessCount; i++) {
-					r0[i] = T(dgFloat32(0.0f));
+					r0[i] = T(0.0f);
 				}
 				for (dgInt32 i = initialGuessCount; i < size; i++) {
 					r0[i] += dgDotProduct(size, &symmetricMatrixPSD[i * size], x0);
@@ -694,9 +695,80 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		}
 	} 
 
+#else
+	for (dgInt32 i = 0; i < size; i++) {
+		permute[i] = short(i);
+		r0[i] = b[i];
+		x0[i] = dgFloat32(0.0f);
+		delta_x[i] = r0[i];
+		delta_r[i] = r0[i];
+	}
+
+	dgInt32 initialGuessCount = size;
+	for (T error2 = T (1.0f); initialGuessCount && (error2 > T (1.0e-12f)); ) {
+		dgSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, delta_x);
+
+		T alpha = T(1.0f);
+		dgInt32 index = -1;
+		for (dgInt32 i = 0; i < initialGuessCount ; i ++) {
+			T x1 = x0[i] + alpha * delta_x[i];
+			if (x1 < low[i]) {
+ 				index = i;
+				alpha = (low[i] - x0[i]) / delta_x[i];
+			} else if (x1 > high[i]) {
+				index = i;
+				alpha = (high[i] - x0[i]) / delta_x[i];
+			}
+		}
+
+		error2 = T (0.0f);
+		for (dgInt32 i = 0; i < initialGuessCount; i ++) {
+			x0[i] += alpha * delta_x[i];
+			r0[i] -= alpha * delta_r[i];
+			delta_x[i] = r0[i];
+			delta_r[i] = r0[i];
+			error2 = r0[i] * r0[i];
+		}
+
+		if (index != -1) {
+			initialGuessCount --;
+			delta_x[index] = T (0.0f);
+			dgSwap(delta_x[index], delta_x[initialGuessCount]);
+			dgSwap(delta_r[index], delta_r[initialGuessCount]);
+			dgPermuteRows(size, index, initialGuessCount, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
+			dgCholeskyUpdate(size, index, initialGuessCount, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
+		}
+	}
+
+	if (initialGuessCount == size) {
+		for (dgInt32 i = 0; i < size; i++) {
+			x[i] = x0[i];
+			b[i] = T (0.0f);
+		}
+		return true;
+	}
+
+	for (dgInt32 i = 0; i < size; i++) {
+		r0[i] = dgFloat32(0.0f);
+		delta_x[i] = dgFloat32(0.0f);
+		delta_r[i] = dgFloat32(0.0f);
+	}
+
+	dgInt32 clampedIndex = size;
+	dgInt32 index = initialGuessCount;
+	dgInt32 count = size - initialGuessCount;
+
+	dgInt32 stride = index * size;
+	for (dgInt32 i = index; i < size; i ++) {
+		dgInt32 j = permute[i];
+		r0[i] = dgDotProduct(size, &symmetricMatrixPSD[stride], x0) - b[j];
+		stride += size;
+	}
+
+#endif
+
 	while (count) {
 		bool loop = true;
-		bool calculateDelta_x = true;
 
 		while (loop) {
 			loop = false;
@@ -704,18 +776,15 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 			dgInt32 swapIndex = -1;
 
 			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
-				if (calculateDelta_x) {
-					dgCalculateDelta_x(size, index, symmetricMatrixPSD, lowerTriangularMatrix, delta_x);
-				}
-
-				calculateDelta_x = true;
+				dgCalculateDelta_x(size, index, symmetricMatrixPSD, lowerTriangularMatrix, delta_x);
 				dgCalculateDelta_r(size, index, symmetricMatrixPSD, delta_x, delta_r);
-				dgAssert(delta_r[index] != T(dgFloat32(0.0f)));
+
+				dgAssert(delta_r[index] != T(0.0f));
 				dgAssert(dgAbsf(delta_x[index]) == T(1.0f));
 				delta_r[index] = (delta_r[index] == T(dgFloat32 (0.0f))) ? T(dgFloat32 (1.0e-12f)) : delta_r[index];
 
 				T s = -r0[index] / delta_r[index];
-				dgAssert(dgAbsf(s) >= T(dgFloat32(0.0f)));
+				dgAssert(dgAbsf(s) >= T(0.0f));
 
 				for (dgInt32 i = 0; i <= index; i++) {
 					T x1 = x0[i] + s * delta_x[i];
@@ -729,14 +798,14 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 						s = (low[i] - x0[i]) / delta_x[i];
 					}
 				}
-				dgAssert(dgAbsf(s) >= T(dgFloat32(0.0f)));
+				dgAssert(dgAbsf(s) >= T(0.0f));
 
 				for (dgInt32 i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
 					T r1 = r0[i] + s * delta_r[i];
-					if ((r1 * r0[i]) < T(dgFloat32(0.0f))) {
-						dgAssert(dgAbsf(delta_r[i]) > T(dgFloat32(0.0f)));
+					if ((r1 * r0[i]) < T(0.0f)) {
+						dgAssert(dgAbsf(delta_r[i]) > T(0.0f));
 						T s1 = -r0[i] / delta_r[i];
-						dgAssert(dgAbsf(s1) >= T(dgFloat32(0.0f)));
+						dgAssert(dgAbsf(s1) >= T(0.0f));
 						dgAssert(dgAbsf(s1) <= dgAbsf(s));
 						if (dgAbsf(s1) < dgAbsf(s)) {
 							s = s1;
@@ -758,8 +827,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 			}
 
 			if (swapIndex == -1) {
-				r0[index] = T(dgFloat32(0.0f));
-				delta_r[index] = T(dgFloat32(0.0f));
+				r0[index] = T(0.0f);
+				delta_r[index] = T(0.0f);
 				index++;
 				count--;
 				loop = false;
@@ -772,7 +841,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				loop = count ? true : false;
 			} else if (swapIndex > index) {
 				loop = true;
-				r0[swapIndex] = T(dgFloat32(0.0f));
+				r0[swapIndex] = T(0.0f);
 				dgAssert(swapIndex < size);
 				dgAssert(clampedIndex <= size);
 				if (swapIndex < clampedIndex) {
@@ -790,12 +859,11 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 					dgAssert(clampedIndex <= size);
 					dgAssert(clampedIndex >= index);
 				}
-				calculateDelta_x = false;
 
 			} else {
 				dgAssert(index > 0);
 				x0[swapIndex] = clamp_x;
-				delta_x[index] = T(dgFloat32(0.0f));
+				delta_x[index] = T(0.0f);
 
 				dgAssert(swapIndex < index);
 				dgPermuteRows(size, swapIndex, index - 1, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
@@ -952,7 +1020,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 				arow[j] = elem;
 				a11[j * boundedSize + i] = elem;
 			}
-			u[i] = T(dgFloat32(0.0f));
+			u[i] = T(0.0f);
 			c[i] = -b[i + unboundedSize];
 			l[i] = low[i + unboundedSize];
 			h[i] = high[i + unboundedSize];
@@ -971,7 +1039,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 		}
 	} else {
 		for (dgInt32 i = 0; i < size; i++) {
-			x[i] = T(dgFloat32(0.0f));
+			x[i] = T(0.0f);
 		}
 		ret = dgSolveDantzigLCP(size, symmetricMatrixPSD, x, b, low, high);
 	}

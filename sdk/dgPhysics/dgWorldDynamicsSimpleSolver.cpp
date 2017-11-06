@@ -688,41 +688,21 @@ class dgDanzigSolver
 
 	dgFloat32 SolveDebug()
 	{
+		dgFloat32 accelNorm = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < m_size; i++) {
 			m_x0[i] = dgFloat32(0.0f);
-		}
-
-		dgInt32 stride = 0;
-		dgFloat32 accelNorm0 = dgFloat32(0.0f);
-		for (dgInt32 j = 0; j < m_size; j++) {
-			const dgFloat32* const row = &m_matrix[stride];
-			dgFloat32 r = m_b[j];
-			for (dgInt32 k = 0; k < m_size; k++) {
-				r = r - row[k] * m_x0[k];
-			}
-			const dgInt32 frictionIndex = m_frictionIndex[j];
-			const dgFloat32 low = m_low[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-			const dgFloat32 high = m_high[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-			dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
-
-			if (f > high) {
-				f = high;
-			} else if (f < low) {
-				f = low;
-			}
-
-			r += m_r0[j];
-			m_x0[j] = f - m_x[j];
-			accelNorm0 += r * r;
-			stride += m_size;
+			dgFloat32 r = m_b[i];
+			accelNorm += r * r;
 		}
 
 		dgInt32 maxIterCount = 10000;
-		dgFloat32 accelNorm = dgFloat32(1.0f);
+		dgFloat32 accelNorm0 = accelNorm;
+		dgFloat32 accelNorm1 = accelNorm;
 		dgInt32 iter = 0;
-		for (; (iter < maxIterCount) && (accelNorm > dgFloat32 (1.0e-6f)); iter++) {
-			stride = 0;
-			accelNorm = dgFloat32(0.0f);
+		for (; (iter < maxIterCount) && (accelNorm0 > dgFloat32 (1.0e-6f) || (accelNorm1 > dgFloat32 (1.0e-6f))); iter++) {
+			dgInt32 stride = 0;
+			accelNorm0 = accelNorm1;
+			accelNorm1 = dgFloat32(0.0f);
 
 			for (dgInt32 j = 0; j < m_size; j++) {
 				const dgFloat32* const row = &m_matrix[stride];
@@ -730,28 +710,28 @@ class dgDanzigSolver
 				for (dgInt32 k = 0; k < m_size; k++) {
 					r = r - row[k] * m_x0[k];
 				}
-				const dgInt32 frictionIndex = m_frictionIndex[j];
-				const dgFloat32 low = m_low[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-				const dgFloat32 high = m_high[j] * (m_x0[frictionIndex] + m_x[frictionIndex]);
-				dgFloat32 f = m_x[j] + (r + row[j] * m_x0[j]) * m_invDiag[j];
+				//const dgInt32 frictionIndex = m_frictionIndex[j];
+				const dgFloat32 low = m_low[j];
+				const dgFloat32 high = m_high[j];
+				dgFloat32 x = (r + row[j] * m_x0[j]) * m_invDiag[j];
 
-				if (f > high) {
-					f = high;
-				} else if (f < low) {
-					f = low;
+				if (x > high) {
+					x = high;
+				} else if (x < low) {
+					x = low;
 				} else {
 					r += m_r0[j];
-					accelNorm += r * r;
+					accelNorm1 += r * r;
 				}
 				
-				m_x0[j] = f - m_x[j];
+				m_x0[j] = x;
 				stride += m_size;
 			}
 		}
-		for (dgInt32 j = 0; j < m_size; j++) {
-			m_x[j] = m_x0[j];
+		for (dgInt32 i = 0; i < m_size; i++) {
+			m_x[i] = m_x0[i];
 		}
-		return accelNorm0;
+		return accelNorm;
 	}
 
 	dgFloat32 Solve()
@@ -774,11 +754,11 @@ class dgDanzigSolver
 
 static int xxx;
 xxx++;
-if (xxx == 15)
+if (xxx == 3)
 xxx *= 1;
 
 		dgInt32 activeCount = m_size;
-		const dgFloat32 accelTol2 = dgFloat32(1.0e-6f);
+		const dgFloat32 accelTol2 = dgFloat32(1.0e-8f);
 		while (beta > accelTol2) {
 			dgInt32 stride = 0;
 			dgFloat32 num = dgFloat32(0.0f);
@@ -790,8 +770,8 @@ xxx *= 1;
 					r += row[j] * m_delta_x[j];
 				}
 				stride += m_size;
+				m_delta_r[i] = r;
 				den += m_delta_x[i] * r;
-				m_delta_r[i] = r * mask[i];
 				num += m_r0[i] * m_r0[i] * mask[i];
 			}
 	
@@ -821,57 +801,31 @@ xxx *= 1;
 				}
 			}
 
-			if (alpha == dgFloat32 (0.0f)) {
+			beta = dgFloat32(0.0f);
+			for (dgInt32 i = 0; i < m_size; i++) {
+				m_x0[i] += alpha * m_delta_x[i];
+				m_r0[i] -= alpha * m_delta_r[i];
+				beta += m_r0[i] * m_r0[i] * mask[i];
+			}
+
+			if (index >= 0) {
 				activeCount--;
 				beta = dgFloat32(0.0f);
 				mask[index] = dgFloat32(0.0f);
-				const dgFloat32* const row = &m_matrix[stride * index];
 				for (dgInt32 i = 0; i < m_size; i++) {
-					//const dgFloat32* const row = &m_matrix[stride];
-					//dgFloat32 r = m_b[i];
-					//for (dgInt32 j = 0; j < m_size; j++) {
-					//	r -= row[j] * m_x0[j] * mask[j];
-					//}
-					dgFloat32 r = m_r0[i] + row[i] * m_x0[index];
-					m_r0[i] = r;
-					beta += r * r * mask[i];
-					m_delta_x[i] = r * mask[i];
+					m_delta_x[i] = m_r0[i] * mask[i];
+					beta += m_r0[i] * m_r0[i] * mask[i];
+					stride += m_size;
 				}
 			} else {
-				beta = dgFloat32(0.0f);
+				alpha = beta / num;
 				for (dgInt32 i = 0; i < m_size; i++) {
-					m_x0[i] += alpha * m_delta_x[i];
-					m_r0[i] -= alpha * m_delta_r[i];
-					beta += m_r0[i] * m_r0[i] * mask[i];
-				}
-
-				if (index >= 0) {
-					stride = 0;
-					activeCount--;
-					mask[index] = dgFloat32(0.0f);
-					beta = dgFloat32(0.0f);
-					m_delta_x[index] = dgFloat32(0.0f);
-					for (dgInt32 i = 0; i < m_size; i++) {
-						const dgFloat32* const row = &m_matrix[stride];
-						dgFloat32 r = m_b[i];
-						for (dgInt32 j = 0; j < m_size; j++) {
-							r -= row[j] * m_x0[j] * mask[j];
-						}
-						m_r0[i] = r;
-						m_delta_x[i] = r * mask[i];
-						beta += r * r * mask[i];
-						stride += m_size;
-					}
-				} else {
-					alpha = beta / num;
-					for (dgInt32 i = 0; i < m_size; i++) {
-						m_delta_x[i] = m_r0[i] * mask[i] + alpha * m_delta_x[i];
-					}
+					m_delta_x[i] = m_r0[i] * mask[i] + alpha * m_delta_x[i];
 				}
 			}
 		}
 
-		if ((activeCount == 0) || ((activeCount == m_size) && (beta < accelTol2))) {
+		if (activeCount == m_size) {
 			for (dgInt32 i = 0; i < m_size; i++) {
 				m_x[i] = m_x0[i];
 				m_b[i] = m_r0[i];
@@ -879,34 +833,31 @@ xxx *= 1;
 			return accelNorm;
 		}
 
-		dgInt32 index = m_size;
-		for (dgInt32 i = m_size - 1; i >= 0; i--) {
-			m_r0[i] = dgFloat32(0.0f);
+		for (dgInt32 i = 0; i < m_size ; i++) {
+			m_r0[i] = -m_r0[i];
 			m_delta_x[i] = dgFloat32(0.0f);
 			m_delta_r[i] = dgFloat32(0.0f);
-			if (!mask[i]) {
-				index--;
-				PermuteRows(i, index);
-			}
-		}
-		CholeskyUpdate(index, m_size);
-
-		dgInt32 stride = index * m_size;
-		for (dgInt32 i = index; i < m_size; i++) {
-			const dgFloat32* const row = &m_matrix[stride];
-			dgFloat32 r = -m_b[i];
-			for (dgInt32 j = 0; j < m_size; j++) {
-				r += row[j] * m_x0[j] * mask[j];
-			}
-			m_r0[i] = r;
-			stride += m_size;
 		}
 
-		dgInt32 count = m_size - index;
+		dgInt32 index = 0;
+		dgInt32 count = m_size;
+		if (activeCount != 0) {
+			index = m_size;
+			dgInt32 updateStart = m_size;
+			for (dgInt32 i = m_size - 1; i >= 0; i--) {
+				if (!mask[i]) {
+					index--;
+					updateStart = i;
+					PermuteRows(i, index);
+				}
+			}
+			CholeskyUpdate(updateStart, m_size - 1);
+		}
+
+		count = m_size - index;
 		dgInt32 clampedIndex = m_size;
 		while (count) {
 			bool loop = true;
-			bool calculateDelta_x = true;
 
 			while (loop) {
 
@@ -915,19 +866,14 @@ xxx *= 1;
 				dgInt32 swapIndex = -1;
 
 				if (dgAbsf(m_r0[index]) > dgFloat32(1.0e-12f)) {
-					dgAssert(calculateDelta_x);
-
-					if (calculateDelta_x) {
 						const dgFloat32* const row = &m_matrix[m_size * index];
 						for (dgInt32 i = 0; i < index; i++) {
 							m_delta_x[i] = -row[i];
 						}
 						SolveCholesky(index, m_delta_x);
 						m_delta_x[index] = dgFloat32(1.0f);
-					}
 
-					calculateDelta_x = true;
-					stride = index * m_size;
+					dgInt32 stride = index * m_size;
 					for (dgInt32 j = index; j < m_size; j++) {
 						dgFloat32 val = dgFloat32(0.0f);
 						const dgFloat32* const A = &m_matrix[stride];
@@ -1027,7 +973,6 @@ xxx *= 1;
 						dgAssert(clampedIndex <= m_size);
 						dgAssert(clampedIndex >= index);
 					}
-					calculateDelta_x = false;
 
 				} else {
 					dgAssert(index > 0);
@@ -1058,7 +1003,11 @@ xxx *= 1;
 
 	dgFloat32 Solve___()
 	{
+static int xxx;
+xxx ++;
+//		dgDanzigSolver xxxx1(*this);
 		dgDanzigSolver xxxx(*this);
+
 		xxxx.SolveDebug();
 		dgTrace(("gau: "));
 		for (dgInt32 i = 0; i < m_size; i++) {
@@ -1066,12 +1015,32 @@ xxx *= 1;
 		}
 		dgTrace(("\n"));
 
+/*
+		dgSolveDantzigLCP<dgFloat32>(xxxx1.m_size, xxxx1.m_matrix, xxxx1.m_x, xxxx1.m_b, xxxx1.m_low, xxxx1.m_high);
+		dgTrace(("xxx: "));
+		for (dgInt32 i = 0; i < m_size; i++) {
+			dgTrace(("%f ", xxxx1.m_x[i]));
+		}
+		dgTrace(("\n"));
+*/
+
 		dgTrace(("lcp: "));
 		dgFloat32 val = Solve();
 		for (dgInt32 i = 0; i < m_size; i++) {
 			dgTrace(("%f ", m_x[i]));
 		}
 		dgTrace(("\n"));
+
+/*
+		for (dgInt32 i = 0; i < m_size; i++) {
+			dgFloat32 error = xxxx.m_x[i] - xxxx1.m_x[i];
+			dgAssert(error * error < 1.0f);
+		}
+*/
+		for (dgInt32 i = 0; i < m_size; i++) {
+			dgFloat32 error = xxxx.m_x[i] - m_x[i];
+			dgAssert(error * error < 1.0f);
+		}
 		return val;
 	}
 
@@ -1130,11 +1099,6 @@ xxx *= 1;
 					m_tmp1[i] = rowI[i] - dgSqrt(mag + rowI[i] * rowI[i]);
 
 					const dgFloat32 vMag2(mag + m_tmp1[i] * m_tmp1[i]);
-					//const T den (dgFloat32 (1.0f) / T (sqrt (vMag2)));
-					//for (dgInt32 j = 0; j < width; j ++) {
-					//	dgInt32 index = activeColumns[j];
-					//	reflexion[index] *= den;
-					//}
 
 					const dgFloat32 den = dgFloat32(2.0f) / vMag2;
 					for (dgInt32 j = i; j < m_size; j++) {
