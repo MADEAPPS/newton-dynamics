@@ -611,7 +611,7 @@ static int xxx;
 	dVector dir(0.0f, 1.0f, 0.0f);
 xxx++;
 if (xxx > 50) {
-//	dir.m_z = 1.0f;
+	dir.m_z = 1.0f;
 }
 
 	dVector force (dir.Scale (mass * DEMO_GRAVITY));
