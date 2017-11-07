@@ -781,7 +781,7 @@ dgTrace(("%d\n", xxx));
 	}
 
 	private:
-	dgFloat32 m_x[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_x[DG_CONSTRAINT_MAX_ROWS + 4];
 	dgFloat32 m_b[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_low[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_high[DG_CONSTRAINT_MAX_ROWS];
