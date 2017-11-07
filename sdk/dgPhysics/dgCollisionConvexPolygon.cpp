@@ -95,11 +95,13 @@ dgFloat32 dgCollisionConvexPolygon::GetBoxMaxRadius () const
 
 dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
+	dgAssert (dgAbsf(dir.m_w == dgFloat32(0.0f)));
 	dgAssert (dgAbsf (dir.DotProduct3(dir) - 1.0f) < dgFloat32 (1.0e-2f));
+	
 	dgInt32 index = 0;
-	dgFloat32 val = m_localPoly[0].DotProduct3(dir);
+	dgFloat32 val = m_localPoly[0].DotProduct4(dir).GetScalar();
 	for (dgInt32 i = 1; i < m_count; i ++) {
-		dgFloat32 val1 = m_localPoly[i].DotProduct3(dir);
+		dgFloat32 val1 = m_localPoly[i].DotProduct4(dir).GetScalar();
 		if (val1 > val) {
 			val = val1; 
 			index = i;
