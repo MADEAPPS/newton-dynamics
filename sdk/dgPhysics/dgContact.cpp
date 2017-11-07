@@ -57,13 +57,13 @@ dgContactMaterial::dgContactMaterial()
 	m_dynamicFriction1 = dgFloat32 (0.5f);
 	m_dir0_Force.m_force = dgFloat32 (0.0f);
 	m_dir0_Force.m_impact = dgFloat32 (0.0f);
-	m_dir0_Force.m_accel = dgFloat32(0.0f);
+	//m_dir0_Force.m_accel = dgFloat32(0.0f);
 	m_dir1_Force.m_force = dgFloat32 (0.0f);
 	m_dir1_Force.m_impact = dgFloat32 (0.0f);
-	m_dir1_Force.m_accel = dgFloat32(0.0f);
+	//m_dir1_Force.m_accel = dgFloat32(0.0f);
 	m_normal_Force.m_force = dgFloat32 (0.0f);
 	m_normal_Force.m_impact = dgFloat32 (0.0f);
-	m_normal_Force.m_accel = dgFloat32(0.0f);
+	//m_normal_Force.m_accel = dgFloat32(0.0f);
 	m_skinThickness = dgFloat32 (0.0f);
 	//m_skinThickness = dgFloat32 (0.1f);
 	//m_skinThickness = DG_MAX_COLLISION_AABB_PADDING * dgFloat32 (0.125f);
