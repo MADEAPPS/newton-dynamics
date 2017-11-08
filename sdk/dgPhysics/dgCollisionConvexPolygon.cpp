@@ -95,7 +95,7 @@ dgFloat32 dgCollisionConvexPolygon::GetBoxMaxRadius () const
 
 dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir.m_w == dgFloat32(0.0f)));
+	dgAssert (dgAbsf(dir.m_w) == dgFloat32(0.0f));
 	dgAssert (dgAbsf (dir.DotProduct3(dir) - 1.0f) < dgFloat32 (1.0e-2f));
 	
 	dgInt32 index = 0;

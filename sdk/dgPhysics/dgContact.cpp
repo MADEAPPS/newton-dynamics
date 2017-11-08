@@ -57,13 +57,10 @@ dgContactMaterial::dgContactMaterial()
 	m_dynamicFriction1 = dgFloat32 (0.5f);
 	m_dir0_Force.m_force = dgFloat32 (0.0f);
 	m_dir0_Force.m_impact = dgFloat32 (0.0f);
-	//m_dir0_Force.m_accel = dgFloat32(0.0f);
 	m_dir1_Force.m_force = dgFloat32 (0.0f);
 	m_dir1_Force.m_impact = dgFloat32 (0.0f);
-	//m_dir1_Force.m_accel = dgFloat32(0.0f);
 	m_normal_Force.m_force = dgFloat32 (0.0f);
 	m_normal_Force.m_impact = dgFloat32 (0.0f);
-	//m_normal_Force.m_accel = dgFloat32(0.0f);
 	m_skinThickness = dgFloat32 (0.0f);
 	//m_skinThickness = dgFloat32 (0.1f);
 	//m_skinThickness = DG_MAX_COLLISION_AABB_PADDING * dgFloat32 (0.125f);
@@ -237,7 +234,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir0, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir0);
-		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
+		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_NORMAL_CONSTRAINT : normalIndex;
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 		
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
@@ -265,7 +262,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir1, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir1);
-		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
+		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_NORMAL_CONSTRAINT : normalIndex;
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
@@ -317,7 +314,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 			dgFloat32 aRel = row->m_deltaAccel;
 
-			if (row->m_normalForceIndex < 0) {
+			if (row->m_normalForceIndex == count) {
 				dgAssert (row->m_restitution >= 0.0f);
 				dgAssert (row->m_restitution <= 2.0f);
 				dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + row->m_restitution) : dgFloat32 (1.0f);

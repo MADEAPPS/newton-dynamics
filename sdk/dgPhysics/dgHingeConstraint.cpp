@@ -130,8 +130,8 @@ dgVector dgHingeConstraint::GetJointForce () const
 	dgMatrix matrix1;
 
 	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
-	return dgVector (matrix0.m_front.Scale3 (m_jointForce[0].m_force) +
-		             matrix0.m_up.Scale3 (m_jointForce[1].m_force) +
+	return dgVector (matrix0.m_front.Scale3 (m_jointForce[0].m_force) + 
+		             matrix0.m_up.Scale3 (m_jointForce[1].m_force) + 
 					 matrix0.m_right.Scale3 (m_jointForce[2].m_force) +
 					 matrix0.m_up.Scale3 (m_jointForce[3].m_force) +
 					 matrix0.m_right.Scale3 (m_jointForce[4].m_force));
@@ -184,7 +184,7 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 			if ((axisParam.m_minFriction > DG_MIN_BOUND) || (axisParam.m_maxFriction < DG_MAX_BOUND)) {
 				params.m_forceBounds[5].m_low = axisParam.m_minFriction;
 				params.m_forceBounds[5].m_upper = axisParam.m_maxFriction;
-				params.m_forceBounds[5].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
+				params.m_forceBounds[5].m_normalIndex = DG_NORMAL_CONSTRAINT;
 			}
 
 			CalculateAngularDerivative (5, params, dir0, m_stiffness, dgFloat32 (0.0f), &m_jointForce[5]);

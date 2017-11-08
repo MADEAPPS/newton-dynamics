@@ -26,14 +26,8 @@
 
 #define DG_MAX_BOUND						dgFloat32 (1.0e15f)
 #define DG_MIN_BOUND						(-DG_MAX_BOUND)
-
-
-#define DG_BILATERAL_CONSTRAINT				-1
-#define DG_NORMAL_CONSTRAINT				-2 
-#define DG_BILATERAL_FRICTION_CONSTRAINT	-3 
-
+#define DG_NORMAL_CONSTRAINT		-1 
 #define DG_CONSTRAINT_MAX_ROWS				 (3 * 16)
-
 #define MIN_JOINT_PIN_LENGTH				dgFloat32 (50.0f)
 
 class dgBody;
@@ -74,7 +68,6 @@ class dgForceImpactPair
 {
 	public:
 	dgFloat32 m_force;
-//	dgFloat32 m_accel;
 	dgFloat32 m_impact;
 };
 
@@ -230,7 +223,7 @@ class dgConstraint
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
-	dgUnsigned32 m_isInSkeleton		: 1;
+	dgUnsigned32 m_isInSkeleton			: 1;
 	
 	friend class dgWorld;
 	friend class dgJacobianMemory;

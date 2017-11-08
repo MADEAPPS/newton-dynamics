@@ -189,7 +189,7 @@ dgVector dgCorkscrewConstraint::GetJointForce () const
 	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
 
 	return dgVector (matrix0.m_up.Scale3 (m_jointForce[0].m_force) + 
-		             matrix0.m_right.Scale3 (m_jointForce[1].m_force) +
+		             matrix0.m_right.Scale3 (m_jointForce[1].m_force) + 
 					 matrix0.m_up.Scale3 (m_jointForce[2].m_force) +
 					 matrix0.m_right.Scale3 (m_jointForce[3].m_force));
 
@@ -253,7 +253,7 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 			if ((axisParam[0].m_minFriction > DG_MIN_BOUND) || (axisParam[0].m_maxFriction < DG_MAX_BOUND)) {
 				params.m_forceBounds[ret].m_low = axisParam[0].m_minFriction;
 				params.m_forceBounds[ret].m_upper = axisParam[0].m_maxFriction;
-				params.m_forceBounds[ret].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
+				params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
 			}
 
 			CalculatePointDerivative (ret, params, matrix0.m_front, pointDataP, &m_jointForce[ret]); 
@@ -266,7 +266,7 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 			if ((axisParam[1].m_minFriction > DG_MIN_BOUND) || (axisParam[1].m_maxFriction < DG_MAX_BOUND)) {
 				params.m_forceBounds[ret].m_low = axisParam[1].m_minFriction;
 				params.m_forceBounds[ret].m_upper = axisParam[1].m_maxFriction;
-				params.m_forceBounds[ret].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
+				params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
 			}
 
 //			dgVector p (p0 +  dir1);

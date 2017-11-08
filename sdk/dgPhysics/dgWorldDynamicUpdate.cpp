@@ -440,7 +440,7 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 	for (dgInt32 i = 0; i < jointCount; i++) {
 		dgJointInfo& jointInfo = constraintArray[i];
 		tmpInfoList[i] = jointInfo;
-		tmpInfoList[i].m_scale0 = dgFloat32(0.0f);
+		tmpInfoList[i].m_scale0 = dgFloat32 (0.0f);
 
 		const dgInt32 m0 = jointInfo.m_m0;
 		const dgInt32 m1 = jointInfo.m_m1;
@@ -451,12 +451,12 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 		const dgFloat32 invMass1 = body1->GetInvMass().m_w;
 
 		dgInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-		body0->m_resting &= resting | (invMass0 == dgFloat32(0.0f));
-		body1->m_resting &= resting | (invMass1 == dgFloat32(0.0f));
+		body0->m_resting &= resting | (invMass0 == dgFloat32 (0.0f));
+		body1->m_resting &= resting | (invMass1 == dgFloat32 (0.0f));
 
-		if ((invMass0 == dgFloat32(0.0f)) || (invMass1 == dgFloat32(0.0f))) {
+		if ((invMass0 == dgFloat32 (0.0f)) || (invMass1 == dgFloat32 (0.0f))) {
 			queue.Insert(&tmpInfoList[i]);
-			tmpInfoList[i].m_scale0 = dgFloat32(1.0f);
+			tmpInfoList[i].m_scale0 = dgFloat32 (1.0f);
 		} else if (invMass0 && (heaviestMass > invMass0)) {
 			heaviestMass = invMass0;
 			heaviestBody = &tmpInfoList[i];
@@ -497,7 +497,7 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 				const dgInt32 m1 = jointInfo->m_m1;
 				const dgBody* const body0 = bodyArray[m0].m_body;
 				const dgBody* const body1 = bodyArray[m1].m_body;
-
+				
 				activeJoints += !(body0->m_resting & body1->m_resting);
 				
 				if (body0->GetInvMass().m_w > dgFloat32(0.0f)) {
@@ -525,9 +525,9 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 								queue.Insert(nextInfo);
 								nextInfo->m_scale0 = dgFloat32 (1.0f);
 							}
-							}
 						}
 					}
+				}
 
 				if (infoIndex == cluster->m_jointCount) {
 					queue.Reset();
@@ -596,7 +596,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		constraintParamOut.m_forceBounds[i].m_low = DG_MIN_BOUND;
 		constraintParamOut.m_forceBounds[i].m_upper = DG_MAX_BOUND;
 		constraintParamOut.m_forceBounds[i].m_jointForce = NULL;
-		constraintParamOut.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
+		constraintParamOut.m_forceBounds[i].m_normalIndex = DG_NORMAL_CONSTRAINT;
 	}
 
 	dgAssert(constraint->m_body0);
@@ -681,7 +681,8 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		row->m_upperBoundFrictionCoefficent = constraintParamOut.m_forceBounds[i].m_upper;
 		row->m_jointFeebackForce = constraintParamOut.m_forceBounds[i].m_jointForce;
 
-		row->m_normalForceIndex = constraintParamOut.m_forceBounds[i].m_normalIndex;
+		dgInt32 frictionIndex = constraintParamOut.m_forceBounds[i].m_normalIndex < 0 ? dof : constraintParamOut.m_forceBounds[i].m_normalIndex;
+		row->m_normalForceIndex = frictionIndex;
 		rowCount++;
 	}
 	rowCount = (rowCount & (dgInt32(sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32(sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32(sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
