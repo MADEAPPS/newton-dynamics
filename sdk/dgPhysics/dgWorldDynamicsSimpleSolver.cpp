@@ -1103,20 +1103,6 @@ xxx++;
 				//dgFloat32 mask[DG_CONSTRAINT_MAX_ROWS];
 				dgFloat32 beta = dgFloat32(1.0f);
 				for (dgInt32 k = 0; (k < 20) && (beta > tol2); k++) {
-/*
-					for (dgInt32 i = 0; i < m_size; i++) {
-						const dgFloat32* const row = &m_matrix[stride];
-						dgFloat32 r = dgFloat32(0.0f);
-						for (dgInt32 j = 0; j < m_size; j++) {
-							r += row[j] * m_delta_x[j];
-						}
-						stride += m_size;
-						m_delta_r[i] = r;
-						den += m_delta_x[i] * r;
-						num += m_b[i] * m_b[i] * mask[i];
-					}
-*/
-
 					dgJacobian delta_x0;
 					dgJacobian delta_x1;
 					delta_x0.m_linear = dgVector::m_zero;
@@ -1146,21 +1132,18 @@ xxx++;
 						num += b[i] * b[i] * mask[i];
 					}
 
-					dgInt32 index___ = -1;
+					dgInt32 clampIndex = -1;
 					dgFloat32 alpha = num / den;
 					dgAssert(alpha > dgFloat32(0.0f));
-
-/*
-					for (dgInt32 i = 0; (i < m_size) && (alpha > dgFloat32(0.0f)); i++) {
-
-						if (m_delta_x[i]) {
-							dgFloat32 x = m_x[i] + alpha * m_delta_x[i];
-							if (x < m_low[i]) {
-								index = i;
-								alpha = (m_low[i] - m_x[i]) / m_delta_x[i];
-							} else if (x > m_high[i]) {
-								index = i;
-								alpha = (m_high[i] - m_x[i]) / m_delta_x[i];
+					for (dgInt32 i = 0; (i < rowsCount) && (alpha > dgFloat32(0.0f)); i++) {
+						if (delta_x[i]) {
+							dgFloat32 x1 = x0[i] + alpha * delta_x[i];
+							if (x1 < low[i]) {
+								clampIndex = i;
+								alpha = (low[i] - x0[i]) / delta_x[i];
+							} else if (x1 > high[i]) {
+								clampIndex = i;
+								alpha = (high[i] - x0[i]) / delta_x[i];
 							}
 							dgAssert(alpha >= dgFloat32(-1.0e-4f));
 							if (alpha < dgFloat32(1.0e-6f)) {
@@ -1168,7 +1151,6 @@ xxx++;
 							}
 						}
 					}
-*/
 
 					beta = dgFloat32(0.0f);
 					for (dgInt32 i = 0; i < rowsCount; i++) {
@@ -1177,9 +1159,9 @@ xxx++;
 						beta += b[i] * b[i] * mask[i];
 					}
 
-					if (index___ >= 0) {
+					if (clampIndex >= 0) {
 						beta = dgFloat32(0.0f);
-						mask[index___] = dgFloat32(0.0f);
+						mask[clampIndex] = dgFloat32(0.0f);
 						for (dgInt32 i = 0; i < rowsCount; i++) {
 							delta_x[i] = b[i] * mask[i];
 							beta += b[i] * b[i] * mask[i];
