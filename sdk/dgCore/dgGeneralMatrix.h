@@ -90,7 +90,7 @@ public:
 		return m_high;
 	}
 
-	dgInt16* GetFrictionIndex()
+	dgInt32* GetFrictionIndex()
 	{
 		return m_frictionIndex;
 	}
@@ -242,7 +242,7 @@ public:
 	dgFloat32 m_delta_x[maxRows];
 	dgFloat32 m_delta_r[maxRows];
 	dgFloat32 m_matrix[maxRows * maxRows];
-	dgInt16 m_frictionIndex[maxRows];
+	dgInt32 m_frictionIndex[maxRows];
 	dgInt32 m_size;
 };
 

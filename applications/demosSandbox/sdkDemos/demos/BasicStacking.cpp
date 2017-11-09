@@ -238,7 +238,6 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 
 	// create the stack
 	dMatrix baseMatrix(dGetIdentityMatrix());
-//baseMatrix = dPitchMatrix(30.0f * 3.1416f/180.0f);
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
@@ -255,6 +254,9 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
 	DemoMesh* const geometry = new DemoMesh("sphere", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+//baseMatrix = dRollMatrix(30.0f * 3.1416f / 180.0f) * dPitchMatrix(30.0f * 3.1416f / 180.0f) * baseMatrix;
+//baseMatrix.m_posit.m_y += 10.0f;
 
 	for (int i = 0; i < count; i++) {
 		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);

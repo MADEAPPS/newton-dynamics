@@ -673,7 +673,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
 {
 
-#if 1
+#if 0
 	dgFloat32 accNorm = dgFloat32(0.0f);
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;
@@ -698,7 +698,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 		dgFloat32* const high = solver.GetHigh();
 		dgFloat32* const invDiag = solver.GetInvDiag();
 		dgFloat32* const massMatrix = solver.GetMatrixRow(0);
-		dgInt16* const frictionIndex = solver.GetFrictionIndex();
+		dgInt32* const frictionIndex = solver.GetFrictionIndex();
 	
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			const dgJacobianMatrixElement* const row_i = &matrixRow[index + i];
@@ -720,7 +720,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 			b[i] = row_i->m_coordenateAccel;
 			low[i] = row_i->m_lowerBoundFrictionCoefficent;
 			high[i] = row_i->m_upperBoundFrictionCoefficent;
-			frictionIndex[i] = dgInt16(row_i->m_normalForceIndex);
+			frictionIndex[i] = row_i->m_normalForceIndex;
 		}
 
 		accNorm = solver.Solve();
@@ -746,6 +746,13 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 		internalForces[m0].m_angular = angularM0;
 		internalForces[m1].m_linear = linearM1;
 		internalForces[m1].m_angular = angularM1;
+
+		dgTrace(("old %d: ", xxx));
+		for (int i = 0; i < rowsCount; i++) {
+			dgTrace(("%f ", solver.GetX()[i]));
+		}
+		dgTrace(("\n"));
+
 	}
 
 #else
@@ -755,7 +762,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 	const dgInt32 m1 = jointInfo->m_m1;
 	const dgBody* const body0 = bodyArray[m0].m_body;
 	const dgBody* const body1 = bodyArray[m1].m_body;
-
 	if (!(body0->m_resting & body1->m_resting)) {
 
 		dgFloat32 b[DG_CONSTRAINT_MAX_ROWS];
@@ -866,7 +872,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 				}
 			}
 
-maxAccel = 0;
 			if (maxAccel > tol2) {
 				for (dgInt32 i = 0; i < rowsCount; i++) {
 					const dgJacobianMatrixElement* const row = &matrixRow[index + i];
@@ -968,19 +973,20 @@ maxAccel = 0;
 					angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
 				}
 			}
-
-			for (dgInt32 i = 0; i < rowsCount; i++) {
-				dgJacobianMatrixElement* const row = &matrixRow[index + i];
-				row->m_force = x[i];
-				row->m_maxImpact = dgMax(dgAbsf(row->m_force), row->m_maxImpact);
-			}
-
-			internalForces[m0].m_linear = linearM0;
-			internalForces[m0].m_angular = angularM0;
-			internalForces[m1].m_linear = linearM1;
-			internalForces[m1].m_angular = angularM1;
 		}
+
+		for (dgInt32 i = 0; i < rowsCount; i++) {
+			dgJacobianMatrixElement* const row = &matrixRow[index + i];
+			row->m_force = x[i];
+			row->m_maxImpact = dgMax(dgAbsf(row->m_force), row->m_maxImpact);
+		}
+
+		internalForces[m0].m_linear = linearM0;
+		internalForces[m0].m_angular = angularM0;
+		internalForces[m1].m_linear = linearM1;
+		internalForces[m1].m_angular = angularM1;
 	}
+
 #endif
 
 	return accNorm;
@@ -1183,8 +1189,8 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 	joindDesc.m_rowsCount = jointInfo->m_pairCount;
 	joindDesc.m_rowMatrix = &matrixRow[jointInfo->m_pairStart];
 	constraint->JointAccelerations(&joindDesc);
-	CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
-//	CalculateJointForce_1(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+//	CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+	CalculateJointForce_1(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 
 	if (timestep != dgFloat32(0.0f)) {
 		dgVector timestep4(timestep);
