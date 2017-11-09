@@ -31,201 +31,6 @@
 #include "dgBilateralConstraint.h"
 
 
-class dgOldSolverNetwon_1_5
-{
-	public:
-	dgOldSolverNetwon_1_5()
-	{
-	}
-
-	void SetSize(dgInt32 size)
-	{
-		m_size = size;
-	}
-
-	dgInt32 GetSize() const
-	{
-		return m_size;
-	}
-
-	dgFloat32* GetX()
-	{
-		return m_x;
-	}
-
-	dgFloat32* GetB()
-	{
-		return m_b;
-	}
-
-	dgFloat32* GetLow()
-	{
-		return m_low;
-	}
-
-	dgFloat32* GetHigh()
-	{
-		return m_high;
-	}
-
-	dgInt16* GetFrictionIndex()
-	{
-		return m_frictionIndex;
-	}
-
-	dgFloat32* GetInvDiag()
-	{
-		return m_invDiag;
-	}
-
-	dgFloat32* GetMatrixRow(dgInt32 i)
-	{
-		return &m_matrix[i * m_size];
-	}
-
-	dgFloat32 Solve()
-	{
-		dgInt32 stride = 0;
-		m_x[m_size] = dgFloat32(1.0f);
-		dgFloat32 accelNorm = dgFloat32(0.0f);
-		for (dgInt32 i = 0; i < m_size; i++) {
-			dgVector error(m_b[i]);
-			dgVector x (m_x[i]);
-			const dgInt32 frictionIndex = m_frictionIndex[i];
-			const dgVector low(m_low[i] * m_x[frictionIndex]);
-			const dgVector high(m_high[i] * m_x[frictionIndex]);
-			error = error.AndNot((x > high) | (x < low));
-			accelNorm += error.GetScalar() * error.GetScalar();
-			stride += m_size;
-		}
-
-		const dgFloat32 tol2 = dgFloat32(1.0e-5f);
-		if (accelNorm > tol2) {
-			dgFloat32 accelNorm0 = accelNorm;
-			for (dgInt32 i = 0; (i < 5) && (accelNorm0 > tol2); i++) {
-				stride = 0;
-				accelNorm0 = dgFloat32(0.0f);
-				for (dgInt32 j = 0; j < m_size; j++) {
-					const dgFloat32* const row = &m_matrix[stride];
-					dgFloat32 r = m_b[j];
-					for (dgInt32 k = 0; k < m_size; k++) {
-						r = r - row[k] * m_x[k];
-					}
-					const dgInt32 frictionIndex = m_frictionIndex[j];
-					const dgVector low(m_low[j] * m_x[frictionIndex]);
-					const dgVector high(m_high[j] * m_x[frictionIndex]);
-					dgVector x((r + row[j] * m_x[j]) * m_invDiag[j]);
-
-					dgVector a(r);
-					a = a.AndNot((x > high) | (x < low));
-					x = x.GetMax(low).GetMin(high);
-					m_x[j] = x.GetScalar();
-
-					accelNorm0 += a.GetScalar() * a.GetScalar();
-					stride += m_size;
-				}
-			}
-
-			if (accelNorm0 > tol2) {
-				stride = 0;
-				dgFloat32 mask[DG_CONSTRAINT_MAX_ROWS];
-				for (dgInt32 i = 0; i < m_size; i++) {
-					dgFloat32 r = dgFloat32(0.0f);
-					const dgFloat32* const row = &m_matrix[stride];
-					for (dgInt32 j = 0; j < m_size; j++) {
-						r += row[j] * m_x[j];
-					}
-					m_b[i] -= r;
-					m_delta_x[i] = m_b[i];
-					mask[i] = dgFloat32(1.0f);
-					const dgInt32 frictionIndex = m_frictionIndex[i];
-					m_low[i] *= m_x[frictionIndex];
-					m_high[i] *= m_x[frictionIndex];
-					stride += m_size;
-				}
-
-				dgFloat32 beta = dgFloat32(1.0f);
-				for (dgInt32 k = 0; (k < 20) && (beta > tol2); k++) {
-					stride = 0;
-					dgFloat32 num = dgFloat32(0.0f);
-					dgFloat32 den = dgFloat32(0.0f);
-					for (dgInt32 i = 0; i < m_size; i++) {
-						const dgFloat32* const row = &m_matrix[stride];
-						dgFloat32 r = dgFloat32(0.0f);
-						for (dgInt32 j = 0; j < m_size; j++) {
-							r += row[j] * m_delta_x[j];
-						}
-						stride += m_size;
-						m_delta_r[i] = r;
-						den += m_delta_x[i] * r;
-						num += m_b[i] * m_b[i] * mask[i];
-					}
-
-					dgInt32 index = -1;
-					dgFloat32 alpha = num / den;
-					dgAssert(alpha > dgFloat32(0.0f));
-
-					for (dgInt32 i = 0; (i < m_size) && (alpha > dgFloat32(0.0f)); i++) {
-
-						if (m_delta_x[i]) {
-							dgFloat32 x = m_x[i] + alpha * m_delta_x[i];
-							if (x < m_low[i]) {
-								index = i;
-								alpha = (m_low[i] - m_x[i]) / m_delta_x[i];
-							}
-							else if (x > m_high[i]) {
-								index = i;
-								alpha = (m_high[i] - m_x[i]) / m_delta_x[i];
-							}
-							dgAssert(alpha >= dgFloat32(-1.0e-4f));
-							if (alpha < dgFloat32(1.0e-6f)) {
-								alpha = dgFloat32(0.0f);
-							}
-						}
-					}
-
-					beta = dgFloat32(0.0f);
-					for (dgInt32 i = 0; i < m_size; i++) {
-						m_x[i] += alpha * m_delta_x[i];
-						m_b[i] -= alpha * m_delta_r[i];
-						beta += m_b[i] * m_b[i] * mask[i];
-					}
-
-					if (index >= 0) {
-						beta = dgFloat32(0.0f);
-						mask[index] = dgFloat32(0.0f);
-						for (dgInt32 i = 0; i < m_size; i++) {
-							m_delta_x[i] = m_b[i] * mask[i];
-							beta += m_b[i] * m_b[i] * mask[i];
-							stride += m_size;
-						}
-					}
-					else {
-						alpha = beta / num;
-						for (dgInt32 i = 0; i < m_size; i++) {
-							m_delta_x[i] = m_b[i] * mask[i] + alpha * m_delta_x[i];
-						}
-					}
-				}
-			}
-		}
-
-		return accelNorm;
-	}
-
-	private:
-	dgFloat32 m_x[DG_CONSTRAINT_MAX_ROWS + 4];
-	dgFloat32 m_b[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_low[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_high[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_invDiag[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_delta_x[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_delta_r[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_matrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS];
-	dgInt16 m_frictionIndex[DG_CONSTRAINT_MAX_ROWS];
-	dgInt32 m_size;
-};
-
 
 
 void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
@@ -868,7 +673,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
 {
 
-#if 0
+#if 1
 	dgFloat32 accNorm = dgFloat32(0.0f);
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;
@@ -884,7 +689,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 		dgVector linearM1(internalForces[m1].m_linear);
 		dgVector angularM1(internalForces[m1].m_angular);
 
-		dgOldSolverNetwon_1_5 solver;
+		dgOldSolverNetwon_1_5<DG_CONSTRAINT_MAX_ROWS> solver;
 		solver.SetSize(rowsCount);
 
 		dgFloat32* const b = solver.GetB();

@@ -25,56 +25,6 @@
 #include "dgMemory.h"
 
 
-/*
-class TestSolver_xxxxxxx: public SymmetricBiconjugateGradientSolve
-{
-	public:
-	dgFloat64 a[4][4];
-
-	TestSolver_xxxxxxx()
-		:SymmetricBiconjugateGradientSolve()
-	{
-		dgFloat64 b[] = {1, 2, 3, 4};
-		dgFloat64 x[] = {0, 0, 0, 0};
-		dgFloat64 c[4];
-
-		memset (a, 0, sizeof (a));
-		a[0][0] = 2;
-		a[1][1] = 3;
-		a[2][2] = 4;
-		a[0][3] = 1;
-		a[1][3] = 1;
-		a[2][3] = 1;
-		a[3][0] = 1;
-		a[3][1] = 1;
-		a[3][2] = 1;
-
-
-		Solve (4, dgFloat64  (1.0e-10f), x, b);
-
-		MatrixTimeVector (c, x);
-		MatrixTimeVector (c, x);
-	}
-
-	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
-	{
-		out[0] = a[0][0] * v[0] + a[0][1] * v[1] + a[0][2] * v[2] + a[0][3] * v[3];
-		out[1] = a[1][0] * v[0] + a[1][1] * v[1] + a[1][2] * v[2] + a[1][3] * v[3];
-		out[2] = a[2][0] * v[0] + a[2][1] * v[1] + a[2][2] * v[2] + a[2][3] * v[3];
-		out[3] = a[3][0] * v[0] + a[3][1] * v[1] + a[3][2] * v[2] + a[3][3] * v[3];
-	}
-
-	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
-	{
-		out[0] = v[0]/a[0][0];
-		out[1] = v[1]/a[1][1];
-		out[2] = v[2]/a[2][2];
-		out[3] = v[3];
-	}
-};
-*/
-
-
 dgSymmetricBiconjugateGradientSolve::dgSymmetricBiconjugateGradientSolve ()
 {
 }
