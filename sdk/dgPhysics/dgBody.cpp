@@ -353,7 +353,7 @@ dgConstraint* dgBody::GetFirstJoint() const
 	if (m_masterNode) {
 		for (dgBodyMasterListRow::dgListNode* node = m_masterNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
 			dgConstraint* const joint = node->GetInfo().m_joint;
-			if (joint->GetId() >= dgConstraint::m_unknownConstraint) {
+			if (joint && (joint->GetId() >= dgConstraint::m_unknownConstraint)) {
 				return joint;
 			}
 		}

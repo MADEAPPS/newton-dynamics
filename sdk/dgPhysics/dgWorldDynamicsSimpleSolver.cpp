@@ -874,7 +874,9 @@ static int xxx;
 				}
 			}
 
+//maxAccel = 0;
 			if (maxAccel > tol2) {
+				dgInt32 passes = rowsCount;
 				for (dgInt32 i = 0; i < rowsCount; i++) {
 					const dgJacobianMatrixElement* const row = &matrixRow[index + i];
 					const dgFloat32 frictionNormal = x[frictionIndex[i]];
@@ -886,15 +888,16 @@ static int xxx;
 
 					b[i] -= (x[i] * diagDamp[i] + diag.AddHorizontal().GetScalar());
 					x0[i] = x[i];
-					delta_x[i] = b[i];
-					dgFloat32 x1 = x[i] + invJinvMJt[i] * b[i];
+					const dgFloat32 x1 = x[i] + invJinvMJt[i] * b[i];
 					mask[i] = (x1 < low[i]) ? dgFloat32(0.0f) : ((x1 > high[i]) ? dgFloat32(0.0f) : dgFloat32(1.0f));
+					delta_x[i] = b[i] * mask[i];
+					passes -= mask[i] ? 0 : 1;
 				}
 
 xxx++;
 				dgInt32 iter = 0;
 				dgFloat32 beta = dgFloat32(1.0f);
-				for (dgInt32 k = 0; (k < 20) && (beta > tol2); k++) {
+				for (dgInt32 k = 0; (k < passes) && (beta > tol2); k++) {
 					iter++;
 					dgJacobian delta_x0;
 					dgJacobian delta_x1;
@@ -953,6 +956,8 @@ xxx++;
 					}
 
 					if (clampIndex >= 0) {
+						k = 0;
+						passes--;
 						beta = dgFloat32(0.0f);
 						mask[clampIndex] = dgFloat32(0.0f);
 						for (dgInt32 i = 0; i < rowsCount; i++) {
@@ -967,7 +972,7 @@ xxx++;
 					}
 				}
 
-//				dgAssert(iter < 20);
+//				dgTrace(("%d\n", iter));
 
 				for (dgInt32 i = 0; i < rowsCount; i++) {
 					const dgJacobianMatrixElement* const row = &matrixRow[index + i];
@@ -1032,8 +1037,8 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 	joindDesc.m_rowsCount = jointInfo->m_pairCount;
 	joindDesc.m_rowMatrix = &matrixRow[jointInfo->m_pairStart];
 	constraint->JointAccelerations(&joindDesc);
-	//	CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
-	CalculateJointForce_1(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+	CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+	//CalculateJointForce_1(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 
 	if (timestep != dgFloat32(0.0f)) {
 		dgVector timestep4(timestep);
