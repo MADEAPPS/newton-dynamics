@@ -885,17 +885,9 @@ static int xxx;
 								  row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
 
 					b[i] -= (x[i] * diagDamp[i] + diag.AddHorizontal().GetScalar());
-
-					dgFloat32 x1 = x[i] + invJinvMJt[i] * b[i];
-					if (x1 < low[i]) {
-						x1 *= 1;
-					} else if (x1 > high[i]) {
-						x1 *= 1;
-					}
-				
 					x0[i] = x[i];
 					delta_x[i] = b[i];
-					//mask[i] = dgFloat32(1.0f);
+					dgFloat32 x1 = x[i] + invJinvMJt[i] * b[i];
 					mask[i] = (x1 < low[i]) ? dgFloat32(0.0f) : ((x1 > high[i]) ? dgFloat32(0.0f) : dgFloat32(1.0f));
 				}
 
