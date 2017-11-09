@@ -757,6 +757,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 
 #else
 
+static int xxx;
+
 	dgFloat32 accNorm = dgFloat32(0.0f);
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;
@@ -883,14 +885,25 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 								  row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
 
 					b[i] -= (x[i] * diagDamp[i] + diag.AddHorizontal().GetScalar());
-					delta_x[i] = b[i];
+
+					dgFloat32 x1 = x[i] + invJinvMJt[i] * b[i];
+					if (x1 < low[i]) {
+						x1 *= 1;
+					} else if (x1 > high[i]) {
+						x1 *= 1;
+					}
 				
 					x0[i] = x[i];
-					mask[i] = dgFloat32(1.0f);
+					delta_x[i] = b[i];
+					//mask[i] = dgFloat32(1.0f);
+					mask[i] = (x1 < low[i]) ? dgFloat32(0.0f) : ((x1 > high[i]) ? dgFloat32(0.0f) : dgFloat32(1.0f));
 				}
 
+xxx++;
+				dgInt32 iter = 0;
 				dgFloat32 beta = dgFloat32(1.0f);
 				for (dgInt32 k = 0; (k < 20) && (beta > tol2); k++) {
+					iter++;
 					dgJacobian delta_x0;
 					dgJacobian delta_x1;
 					delta_x0.m_linear = dgVector::m_zero;
@@ -961,6 +974,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1(const dgJointInfo* const j
 						}
 					}
 				}
+
+//				dgAssert(iter < 20);
 
 				for (dgInt32 i = 0; i < rowsCount; i++) {
 					const dgJacobianMatrixElement* const row = &matrixRow[index + i];
