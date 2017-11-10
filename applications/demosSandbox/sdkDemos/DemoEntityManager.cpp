@@ -1077,9 +1077,9 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 			ClearDebugDisplay(m_world);
 
 			if (m_asynchronousPhysicsUpdate) {
-				NewtonUpdate (m_world, timestepInSecunds);
-			} else {
 				NewtonUpdateAsync(m_world, timestepInSecunds);
+			} else {
+				NewtonUpdate(m_world, timestepInSecunds);
 			}
 			physicsTime += NewtonGetLastUpdateTime(m_world);
 			
