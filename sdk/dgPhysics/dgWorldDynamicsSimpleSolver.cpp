@@ -1037,8 +1037,8 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 	joindDesc.m_rowsCount = jointInfo->m_pairCount;
 	joindDesc.m_rowMatrix = &matrixRow[jointInfo->m_pairStart];
 	constraint->JointAccelerations(&joindDesc);
-	CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
-	//CalculateJointForce_1(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+	//CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+	CalculateJointForce_1(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 
 	if (timestep != dgFloat32(0.0f)) {
 		dgVector timestep4(timestep);
