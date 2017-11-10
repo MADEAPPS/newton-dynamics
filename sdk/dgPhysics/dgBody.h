@@ -148,6 +148,9 @@ class dgBody
 	void SetInvMass(const dgVector& invMass);
 	const dgMatrix& GetInvInertiaMatrix () const;
 
+	bool IsCollidable() const;
+	void UpdateCollisionMatrix(dgFloat32 timestep, dgInt32 threadIndex);
+
 	virtual dgMatrix CalculateInertiaMatrix () const;
 	virtual dgMatrix CalculateInvInertiaMatrix () const;
 	virtual dgMatrix CalculateLocalInertiaMatrix () const;
@@ -158,8 +161,6 @@ class dgBody
 	virtual void SetAlpha(const dgVector& alpha);
 	virtual void SetAccel(const dgVector& accel);
 
-
-	bool IsCollidable() const;
 	virtual void SetCollidable (bool state) = 0;
 	virtual bool IsInEquilibrium () const = 0;
 
@@ -193,7 +194,7 @@ class dgBody
 	virtual void ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex) = 0;		
 	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const = 0;
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback) = 0;
-
+	
 	virtual dgFloat32 RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 	
@@ -219,8 +220,8 @@ class dgBody
 
 	protected:
 	void UpdateWorlCollisionMatrix() const;
-	//void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
-	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
+
+	
 		
 	// member variables:
 	protected:
