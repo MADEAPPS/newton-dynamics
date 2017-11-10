@@ -977,6 +977,38 @@ void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionPar
 		// prune close contacts
 		pair->m_contactCount = PruneContacts (pair->m_contactCount, proxy.m_contacts);
 	}
+/*
+	if (pair->m_contactCount > 8) {
+		dgJacobian jt[DG_CONSTRAINT_MAX_ROWS / 3];
+		dgFloat32 massMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS / 9];
+
+		const dgBody* const body = proxy.m_body0;
+		dgVector com(body->m_globalCentreOfMass);
+		for (dgInt32 i = 0; i < pair->m_contactCount; i++) {
+			jt[i].m_linear = proxy.m_contacts[i].m_normal;
+			jt[i].m_angular = (proxy.m_contacts[i].m_point - com).CrossProduct3(proxy.m_contacts[i].m_normal);
+		}
+
+		dgInt32 index = 0;
+		for (dgInt32 i = 0; i < pair->m_contactCount; i++) {
+			dgFloat32* const row = &massMatrix[index];
+			const dgJacobian& gInvMass = jt[i];
+			dgVector aii(gInvMass.m_linear * jt[i].m_linear + gInvMass.m_angular * jt[i].m_angular);
+			row[i] = aii.AddHorizontal().GetScalar() * dgFloat32(1.0f);
+			for (dgInt32 j = i + 1; j < pair->m_contactCount; j++) {
+				dgVector aij(gInvMass.m_linear * jt[j].m_linear + gInvMass.m_angular * jt[j].m_angular);
+				dgFloat32 b = aij.AddHorizontal().GetScalar();
+				row[j] = b;
+				massMatrix[j * pair->m_contactCount + i] = b;
+			}
+			index += pair->m_contactCount;
+		}
+
+		dgFloat32 eigenValues[DG_CONSTRAINT_MAX_ROWS / 3];
+		dgEigenValues(pair->m_contactCount, massMatrix, eigenValues);
+		index += 1;
+	}
+*/
 	proxy.m_contactJoint->m_separationDistance = dgFloat32 (0.0f);
 }
 
