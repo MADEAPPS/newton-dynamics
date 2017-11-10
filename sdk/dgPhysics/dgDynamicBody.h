@@ -104,6 +104,8 @@ class dgDynamicBody : public dgBody
 	dgVector m_savedExternalForce;
 	dgVector m_savedExternalTorque;
 	dgVector m_dampCoef;
+	dgVector m_cachedDampCoef;
+	dgFloat32 m_cachedTimeStep;
 	dgInt32 m_sleepingCounter;
 	dgUnsigned32 m_isInDestructionArrayLRU;
 	dgSkeletonContainer* m_skeleton;
@@ -154,6 +156,7 @@ DG_INLINE void dgDynamicBody::SetLinearDamping (dgFloat32 linearDamp)
 	m_dampCoef.m_w = DG_MIN_SPEED_ATT + (DG_MAX_SPEED_ATT - DG_MIN_SPEED_ATT) * linearDamp;
 
 	m_linearDampOn = m_dampCoef.m_w > dgFloat32 (1.0e-7f);
+	m_cachedTimeStep = dgFloat32(0.0f);
 }
 
 DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
@@ -168,6 +171,7 @@ DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
 	m_dampCoef.m_z = DG_MIN_SPEED_ATT + (DG_MAX_SPEED_ATT - DG_MIN_SPEED_ATT) * tmp;
 
 	m_angularDampOn = m_dampCoef.DotProduct3(m_dampCoef) > dgFloat32 (1.0e-12f);
+	m_cachedTimeStep = dgFloat32(0.0f);
 }
 
 
@@ -191,22 +195,6 @@ DG_INLINE void dgDynamicBody::SetForce (const dgVector& force)
 DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 {
 	m_externalTorque = torque;
-}
-
-DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
-{
-	const dgFloat32 tau = dgFloat32 (1.0f) / (dgFloat32(60.0f) * timestep);
-	if (m_linearDampOn) {
-		dgFloat32 velocDamp = dgPow(dgFloat32(1.0f) - m_dampCoef.m_w, tau);
-		m_veloc = m_veloc.Scale4(velocDamp);
-	}
-
-	if (m_angularDampOn) {
-		dgVector omegaDamp(dgPow(dgFloat32(1.0f) - m_dampCoef.m_x, tau), dgPow(dgFloat32(1.0f) - m_dampCoef.m_y, tau), dgPow(dgFloat32(1.0f) - m_dampCoef.m_z, tau), 0.0f);
-		dgVector omega(m_matrix.UnrotateVector(m_omega));
-		omega = omega * omegaDamp;
-		m_omega = m_matrix.RotateVector(omega);
-	}
 }
 
 

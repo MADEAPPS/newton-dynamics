@@ -39,6 +39,8 @@ dgDynamicBody::dgDynamicBody()
 	,m_savedExternalForce(dgFloat32 (0.0f))
 	,m_savedExternalTorque(dgFloat32 (0.0f))
 	,m_dampCoef(dgFloat32 (0.0f))
+	,m_cachedDampCoef(dgFloat32(0.0f))
+	,m_cachedTimeStep(dgFloat32(0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -61,6 +63,8 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	,m_savedExternalForce(dgFloat32 (0.0f))
 	,m_savedExternalTorque(dgFloat32 (0.0f))
 	,m_dampCoef(dgFloat32 (0.0f))
+	,m_cachedDampCoef(dgFloat32(0.0f))
+	,m_cachedTimeStep(dgFloat32(0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -235,6 +239,30 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 	m_impulseForce = dgVector::m_zero;
 	m_impulseTorque = dgVector::m_zero;
 }
+
+void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
+{
+	if (dgAbsf(m_cachedTimeStep - timestep) > dgFloat32(1.0e-6f)) {
+		m_cachedTimeStep = timestep;
+		const dgFloat32 tau = dgFloat32(1.0f) / (dgFloat32(60.0f) * timestep);
+		m_cachedDampCoef.m_x = dgPow(dgFloat32(1.0f) - m_dampCoef.m_x, tau);
+		m_cachedDampCoef.m_y = dgPow(dgFloat32(1.0f) - m_dampCoef.m_y, tau);
+		m_cachedDampCoef.m_z = dgPow(dgFloat32(1.0f) - m_dampCoef.m_z, tau);
+		m_cachedDampCoef.m_w = dgPow(dgFloat32(1.0f) - m_dampCoef.m_w, tau);
+	} 
+
+	if (m_linearDampOn) {
+		m_veloc = m_veloc.Scale4(m_cachedDampCoef.m_w);
+	}
+
+	if (m_angularDampOn) {
+		dgVector omegaDamp(m_cachedDampCoef & dgVector::m_triplexMask);
+		dgVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
+		//omega = omega * omegaDamp;
+		m_omega = m_matrix.RotateVector(omega);
+	}
+}
+
 
 void dgDynamicBody::InvalidateCache ()
 {
