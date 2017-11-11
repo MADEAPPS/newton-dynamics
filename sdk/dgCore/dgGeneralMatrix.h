@@ -525,12 +525,12 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 
 				T hh(f / (h + h));
 				for (dgInt32 j = 0; j < i; j++) {
-					T f(rowI[j]);
-					T g(offDiag[j] - hh * f);
-					offDiag[j] = g;
+					T f1 (rowI[j]);
+					T g1(offDiag[j] - hh * f1);
+					offDiag[j] = g1;
 					T* const rowJ = &matrix[j * size];
 					for (dgInt32 k = 0; k <= j; k++) {
-						rowJ[k] -= (f * offDiag[k] + g * rowI[k]);
+						rowJ[k] -= (f1 * offDiag[k] + g1 * rowI[k]);
 					}
 				}
 			}
@@ -577,20 +577,20 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 				for (k = j - 1; k >= i; k--) {
 					T f(s * offDiag[k]);
 					T b(c * offDiag[k]);
-					T r(dgPythag(f, g));
-					offDiag[k + 1] = r;
-					if (r == T(0.0f)) {
+					T d(dgPythag(f, g));
+					offDiag[k + 1] = d;
+					if (d == T(0.0f)) {
 						eigenValues[k + 1] -= p;
 						offDiag[j] = T(0.0f);
 						break;
 					}
-					s = f / r;
-					c = g / r;
+					s = f / d;
+					c = g / d;
 					g = eigenValues[k + 1] - p;
-					r = (eigenValues[k] - g) * s + T(2.0f) * c * b;
-					p = s * r;
+					d = (eigenValues[k] - g) * s + T(2.0f) * c * b;
+					p = s * d;
 					eigenValues[k + 1] = g + p;
-					g = c * r - b;
+					g = c * d - b;
 				}
 
 				if (r == T(0.0f) && k >= i) {

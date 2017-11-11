@@ -487,6 +487,7 @@ class dgWorld
 	dgInt32 CalculateUserContacts (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexToNonConvexContacts (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) const;
+	dgInt32 PruneContactsByRank(dgInt32 count, dgCollisionParamProxy& proxy, dgInt32 maxCount) const;
 	
 	void PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);	
 	void ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);
