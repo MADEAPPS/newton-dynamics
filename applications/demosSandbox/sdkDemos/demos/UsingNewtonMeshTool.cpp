@@ -20,6 +20,39 @@
 #include "PhysicsUtils.h"
 
 
+static void LoadAndCreateMesh(DemoEntityManager* const scene)
+{
+	FILE* f;
+	//f = fopen("C:/Users/julio/Downloads/track.txt", "rb");
+	f = fopen("../../../track.xxx", "rb");
+	if (!f)
+		return;
+
+	NewtonCollision* pCollision = NewtonCreateTreeCollision(scene->GetNewton(), 0);
+	NewtonTreeCollisionBeginBuild(pCollision);
+
+	// Read number of triangles
+	int numTris;
+	fread((void*)&numTris, 4, 1, f);
+
+	// Add face for each tri
+	for (int i = 0; i < numTris; i++) {
+		// Read 3 vertices (3 floats per vertex)
+		float v[9];
+		fread((void*)&(v[0]), sizeof(float), 9, f);
+
+		NewtonTreeCollisionAddFace(pCollision, 3, &(v[0]), 3 * sizeof(float), 0);
+	}
+
+	NewtonTreeCollisionEndBuild(pCollision, 1);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
+	NewtonDestroyCollision(pCollision);
+
+	fclose(f);
+}
+
 static void TestConvexCastBug(NewtonWorld* world)
 {
 	// create static body
@@ -233,6 +266,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 //TestConvexCastBug(scene->GetNewton());
+LoadAndCreateMesh(scene);
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);

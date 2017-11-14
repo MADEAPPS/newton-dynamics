@@ -215,6 +215,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_solverForceAccumulatorMemory (allocator, 64)
 	,m_clusterMemory (allocator, 64)
 	,m_stack(allocator)
+	,m_postUpdateCallback(NULL)
 {
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);
@@ -1002,6 +1003,10 @@ void dgWorld::RunStep ()
 		node = node ? node->GetNext() : NULL;
 	}
 	SynchronizationBarrier();
+
+	if (m_postUpdateCallback) {
+		m_postUpdateCallback (this, m_savetimestep);
+	}
 
 	m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
 }

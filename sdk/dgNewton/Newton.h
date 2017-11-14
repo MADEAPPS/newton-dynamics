@@ -339,6 +339,7 @@ extern "C" {
 	typedef void (*NewtonFreeMemory) (void* const ptr, int sizeInBytes);
 	
 	typedef void (*NewtonWorldDestructorCallback) (const NewtonWorld* const world);
+	typedef void (*NewtonPostUpdateCallback) (const NewtonWorld* const world, dFloat timestep);
 
 	typedef void (*NewtonWorldListenerDebugCallback) (const NewtonWorld* const world, void* const listener, void* const debugContext);
 	typedef void (*NewtonWorldListenerBodyDestroyCallback) (const NewtonWorld* const world, void* const listenerUserData, NewtonBody* const body);
@@ -431,19 +432,15 @@ extern "C" {
 	NEWTON_API void NewtonDestroy (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonDestroyAllBodies (const NewtonWorld* const newtonWorld);
 
+	NEWTON_API void NewtonSetPosUpdateCallback (const NewtonWorld* const newtonWorld, NewtonPostUpdateCallback callback);
+
 	NEWTON_API void* NewtonAlloc (int sizeInBytes);
 	NEWTON_API void NewtonFree (void* const ptr);
-
-	//	NEWTON_API void NewtonSetPlatformArchitecture (const NewtonWorld* const newtonWorld, int mode);
-	//	NEWTON_API int NewtonGetPlatformArchitecture(const NewtonWorld* const newtonWorld, char* description);
 
 	NEWTON_API int NewtonEnumerateDevices (const NewtonWorld* const newtonWorld);
 	NEWTON_API int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetCurrentDevice (const NewtonWorld* const newtonWorld, int deviceIndex);
 	NEWTON_API void NewtonGetDeviceString (const NewtonWorld* const newtonWorld, int deviceIndex, char* const vendorString, int maxSize);
-
-//	NEWTON_API dFloat NewtonGetGlobalScale (const NewtonWorld* const newtonWorld);
-//	NEWTON_API void NewtonSetGlobalScale (const NewtonWorld* const newtonWorld, dFloat scale);
 
 	NEWTON_API dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloat tolerance);
@@ -455,10 +452,7 @@ extern "C" {
 
 	NEWTON_API void NewtonSetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld, int mode);
 	NEWTON_API int NewtonGetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld);
-
 	NEWTON_API void NewtonSetPerformanceClock (const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback);
-	//NEWTON_API unsigned NewtonReadPerformanceTicks (const NewtonWorld* const newtonWorld, unsigned performanceEntry);
-	//NEWTON_API unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsigned threadIndex);
 
 	NEWTON_API int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int algorithmType);

@@ -53,6 +53,9 @@ class dCustomHingeActuator: public dCustomHinge
     CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
 
 	protected:
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat m_angle;
@@ -60,6 +63,8 @@ class dCustomHingeActuator: public dCustomHinge
 	dFloat m_maxAngle;
 	dFloat m_angularRate;
     dFloat m_maxForce;
+
+	DECLARE_CUSTOM_JOINT(dCustomHingeActuator, dCustomHinge)
 };
 
 #endif

@@ -150,6 +150,7 @@ class dgDeadBodies: public dgTree<dgBody*, void* >
 	dgInt32 m_lock;
 };
 
+typedef void (*dgPostUpdateCallback) (const dgWorld* const world, dgFloat32 timestep);
 
 DG_MSC_VECTOR_ALIGMENT
 class dgWorld
@@ -246,6 +247,8 @@ class dgWorld
 
 	dgInt32 GetSolverMode() const;
 	void SetSolverMode (dgInt32 mode);
+
+	void SetPosUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback);
 
 	dgInt32 EnumerateHardwareModes() const;
 	dgInt32 GetCurrentHardwareMode() const;
@@ -568,6 +571,7 @@ class dgWorld
 	dgArray<dgUnsigned8> m_clusterMemory;
 	dgStack m_stack;
 
+	dgPostUpdateCallback m_postUpdateCallback;
 	
 	friend class dgBody;
 	friend class dgBroadPhase;
@@ -630,6 +634,11 @@ inline dgInt32 dgWorld::GetSubsteps () const
 inline dgFloat32 dgWorld::GetUpdateTime() const
 {
 	return m_lastExecutionTime;
+}
+
+inline void dgWorld::SetPosUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback)
+{
+	m_postUpdateCallback = callback;
 }
 
 #endif

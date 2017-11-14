@@ -48,7 +48,7 @@
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
-#define DEFAULT_SCENE	17			// non uniform Scaled Collision
+//#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// continuous collision
 //#define DEFAULT_SCENE	20			// paper wall continuous collision
@@ -60,7 +60,7 @@
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
-//#define DEFAULT_SCENE	29			// articulated joints
+#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
@@ -472,6 +472,9 @@ void DemoEntityManager::Cleanup ()
 
 	// create the newton world
 	m_world = NewtonCreate();
+
+	// set a post update callback which is call after all simulation and all listeners updates
+	NewtonSetPosUpdateCallback (m_world, PostUpdateCallback);
 
 	// link the work with this user data
 	NewtonWorldSetUserData(m_world, this);
@@ -1205,6 +1208,13 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPopAttrib();
 }
 
+void DemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat timestep)
+{
+	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+
+//	dAssert (0);
+}
+
 void DemoEntityManager::RenderScene()
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -1367,6 +1377,7 @@ void DemoEntityManager::RenderScene()
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 }
+
 
 
 void DemoEntityManager::Run()

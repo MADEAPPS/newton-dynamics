@@ -185,6 +185,13 @@ void NewtonDestroy(const NewtonWorld* const newtonWorld)
 	delete allocator;
 }
 
+void NewtonSetPosUpdateCallback(const NewtonWorld* const newtonWorld, NewtonPostUpdateCallback callback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->SetPosUpdateCallback(world, (dgPostUpdateCallback) callback);
+}
+
 
 int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld)
 {

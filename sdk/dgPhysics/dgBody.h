@@ -221,8 +221,6 @@ class dgBody
 	protected:
 	void UpdateWorlCollisionMatrix() const;
 
-	
-		
 	// member variables:
 	protected:
 	void UpdateLumpedMatrix();

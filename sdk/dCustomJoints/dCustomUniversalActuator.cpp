@@ -16,6 +16,7 @@
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomUniversalActuator.h"
 
+IMPLEMENT_CUSTOM_JOINT(dCustomUniversalActuator);
 
 dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomUniversal(pinAndPivotFrame, child, parent)
@@ -60,18 +61,6 @@ dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFra
 }
 
 
-dCustomUniversalActuator::dCustomUniversalActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:dCustomUniversal(child, parent, callback, userData)
-{
-	callback(userData, &m_angle0, sizeof(dFloat));
-	callback(userData, &m_maxForce0, sizeof(dFloat));
-	callback(userData, &m_angularRate0, sizeof(dFloat));
-
-	callback(userData, &m_angle1, sizeof(dFloat));
-	callback(userData, &m_maxForce1, sizeof(dFloat));
-	callback(userData, &m_angularRate1, sizeof(dFloat));
-}
-
 dCustomUniversalActuator::~dCustomUniversalActuator()
 {
 }
@@ -88,6 +77,13 @@ void dCustomUniversalActuator::Serialize(NewtonSerializeCallback callback, void*
 	callback(userData, &m_maxForce1, sizeof(dFloat));
 	callback(userData, &m_angularRate1, sizeof(dFloat));
 }
+
+
+void dCustomUniversalActuator::Deserialize(NewtonDeserializeCallback callback, void* const userData)
+{
+	dAssert (0);
+}
+
 
 bool dCustomUniversalActuator::GetEnableFlag0 () const
 {

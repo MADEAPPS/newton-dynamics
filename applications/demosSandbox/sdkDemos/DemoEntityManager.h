@@ -148,6 +148,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
 	static void ErrorCallback(int error, const char* const description);
 
+	static void PostUpdateCallback(const NewtonWorld* const world, dFloat timestep);
+
 	void ApplyMenuOptions();
 
 	GLFWwindow* m_mainFrame;

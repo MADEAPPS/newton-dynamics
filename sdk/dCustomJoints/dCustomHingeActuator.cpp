@@ -22,6 +22,8 @@
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomHingeActuator.h"
 
+IMPLEMENT_CUSTOM_JOINT(dCustomHingeActuator);
+
 dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
 	,m_angle(0.0f)
@@ -49,6 +51,17 @@ dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 dCustomHingeActuator::~dCustomHingeActuator()
 {
 }
+
+void dCustomHingeActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dAssert (0);
+}
+
+void dCustomHingeActuator::Deserialize(NewtonDeserializeCallback callback, void* const userData)
+{
+	dAssert (0);
+}
+
 
 bool dCustomHingeActuator::GetEnableFlag () const
 {
