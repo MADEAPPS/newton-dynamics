@@ -240,8 +240,8 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 		if (contact.m_flags & dgContactMaterial::m_override0Accel) {
+			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
-			dgAssert(0);
 			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		} else {
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
@@ -270,7 +270,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
-			dgAssert(0);
+			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		} else {
@@ -307,6 +307,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 	}
 
 	for (dgInt32 k = 0; k < count; k ++) {
+		// note: using restitution been negative to indicate that the acceleration was override
 		if (rowMatrix[k].m_restitution >= dgFloat32 (0.0f)) {
 			dgJacobianMatrixElement* const row = &rowMatrix[k];
 

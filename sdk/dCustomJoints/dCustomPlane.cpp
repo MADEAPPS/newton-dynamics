@@ -58,7 +58,7 @@ void dCustomPlane5DOF::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
 	dVector p0(matrix0.m_posit);
-	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit).DotProduct3(matrix1.m_front)));
+	dVector p1(matrix0.m_posit + matrix1.m_front.Scale((matrix1.m_posit - matrix0.m_posit).DotProduct3(matrix1.m_front)));
 	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
@@ -99,7 +99,7 @@ void dCustomPlane3DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
 	dVector p0(matrix0.m_posit);
-	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit).DotProduct3(matrix1.m_front)));
+	dVector p1(matrix0.m_posit + matrix1.m_front.Scale((matrix1.m_posit - matrix0.m_posit).DotProduct3(matrix1.m_front)));
 	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 

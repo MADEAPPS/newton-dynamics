@@ -756,7 +756,6 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgAssert (body1);
 	dgAssert (contact->m_body0 == body0);
 	dgAssert (contact->m_body1 == body1);
-	//dgAssert (contact->m_broadphaseLru == GetBroadPhase()->m_lru);
 
 	const dgContactMaterial* const material = contact->m_material;
 	const dgContactPoint* const contactArray = pair->m_contactBuffer;
@@ -779,19 +778,15 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 
 	const dgVector& v0 = body0->m_veloc;
 	const dgVector& w0 = body0->m_omega;
-	//const dgMatrix& matrix0 = body0->m_matrix;
 	const dgVector& com0 = body0->m_globalCentreOfMass;
 
 	const dgVector& v1 = body1->m_veloc;
 	const dgVector& w1 = body1->m_omega;
-	//const dgMatrix& matrix1 = body1->m_matrix;
 	const dgVector& com1 = body1->m_globalCentreOfMass;
 
-	dgVector controlDir0 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector controlDir1 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector controlDir0 (dgFloat32 (0.0f));
+	dgVector controlDir1 (dgFloat32 (0.0f));
 	dgVector controlNormal (contactArray[0].m_normal);
-	//dgVector vel0 (v0 + w0 * (contactArray[0].m_point - matrix0.m_posit));
-	//dgVector vel1 (v1 + w1 * (contactArray[0].m_point - matrix1.m_posit));
 	dgVector vel0 (v0 + w0.CrossProduct3(contactArray[0].m_point - com0));
 	dgVector vel1 (v1 + w1.CrossProduct3(contactArray[0].m_point - com1));
 	dgVector vRel (vel1 - vel0);

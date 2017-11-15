@@ -470,7 +470,7 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 		dgAssert(heaviestBody);
 		queue.Insert(heaviestBody);
 		heaviestBody->m_scale0 = dgFloat32 (1.0f);
-		dgAssert(heaviestBody->m_joint->m_body0->GetSkeleton() == heaviestBody->m_joint->m_body1->GetSkeleton());
+		//dgAssert(heaviestBody->m_joint->m_body0->GetSkeleton() == heaviestBody->m_joint->m_body1->GetSkeleton());
 	}
 
 	while (!queue.IsEmpty()) {

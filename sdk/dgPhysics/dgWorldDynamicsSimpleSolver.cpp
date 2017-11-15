@@ -46,6 +46,7 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 			// for now use same solver
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			CalculateSingleClusterReactionForces(cluster, threadID, timestep);
+			//CalculateClusterReactionForces(cluster, threadID, timestep);
 		} else if (activeJoint > 1) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			CalculateClusterReactionForces(cluster, threadID, timestep);
