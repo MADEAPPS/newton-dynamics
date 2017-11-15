@@ -44,7 +44,7 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 		NewtonTreeCollisionAddFace(pCollision, 3, &(v[0]), 3 * sizeof(float), 0);
 	}
 
-	NewtonTreeCollisionEndBuild(pCollision, 1);
+	NewtonTreeCollisionEndBuild(pCollision, 0);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
@@ -269,7 +269,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 LoadAndCreateMesh(scene);
 
 	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
+//	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
 //	CreateLevelMesh (scene, "sponza.ngd", true);
 
