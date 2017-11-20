@@ -174,7 +174,6 @@ class dgContactMaterial: public dgContactPoint
 }DG_GCC_VECTOR_ALIGMENT;
 
 
-
 DG_MSC_VECTOR_ALIGMENT 
 class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 {
@@ -183,6 +182,9 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgFloat32 GetTimeOfImpact() const;
 	void SetTimeOfImpact(dgFloat32 timetoImpact);
 	const dgContactMaterial* GetMaterial() const;
+
+	dgFloat32 GetPruningTolerance() const;
+	void SetPruningTolerance(dgFloat32 tolerance);
 
 	protected:
 	dgContact(dgContact* const clone);
@@ -214,6 +216,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgWorld* m_world;
 	const dgContactMaterial* m_material;
 	dgActiveContacts::dgListNode* m_contactNode;
+	dgFloat32 m_contactPruningTolereance;
 	dgUnsigned32 m_broadphaseLru;
 	dgUnsigned32 m_isNewContact				: 1;
 
@@ -290,6 +293,16 @@ inline dgFloat32 dgContact::GetClosestDistance() const
 inline void dgContact::ResetMaxDOF()
 {
 	m_maxDOF = 0;
+}
+
+inline dgFloat32 dgContact::GetPruningTolerance() const
+{
+	return m_contactPruningTolereance;
+}
+
+inline void dgContact::SetPruningTolerance(dgFloat32 tolerance)
+{
+	m_contactPruningTolereance = dgAbsf (tolerance);
 }
 
 

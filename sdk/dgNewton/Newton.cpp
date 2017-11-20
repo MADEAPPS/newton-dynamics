@@ -1861,6 +1861,28 @@ NewtonCollision* NewtonMaterialGetBodyCollidingShape(const NewtonMaterial* const
 	return (NewtonCollision*) collision;
 }
 
+
+dFloat NewtonMaterialGetContactPruningTolerance(const NewtonBody* const body0, const NewtonBody* const body1)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	const dgBody* const bodyPtr0 = (dgBody*)body0;
+	const dgBody* const bodyPtr1 = (dgBody*)body1;
+	const dgContact* const contact = bodyPtr0->GetWorld()->FindContactJoint(bodyPtr0, bodyPtr1);
+	dgAssert(contact);
+	return contact->GetPruningTolerance ();
+}
+
+void NewtonMaterialSetContactPruningTolerance(const NewtonBody* const body0, const NewtonBody* const body1, dFloat tolerance)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	const dgBody* const bodyPtr0 = (dgBody*)body0;
+	const dgBody* const bodyPtr1 = (dgBody*)body1;
+	dgContact* const contact = bodyPtr0->GetWorld()->FindContactJoint(bodyPtr0, bodyPtr1);
+	dgAssert(contact);
+	contact->SetPruningTolerance (dgMax (tolerance, dFloat (1.0e-3f)));
+}
+
+
 /*!
   Override the default softness value for the contact.
 
@@ -1880,6 +1902,25 @@ void NewtonMaterialSetContactSoftness(const NewtonMaterial* const materialHandle
 	material->m_softness = dgClamp (softness, dFloat(0.01f), dFloat(0.7f));
 }
 
+/*!
+  Override the default contact skin thickness value for the contact.
+
+  @param materialHandle pointer to a material pair.
+  @param thickness skin thickness value, must be positive.
+
+  @return Nothing.
+
+  This function can only be called from a material callback event handler.
+
+  See also: ::NewtonMaterialSetCollisionCallback, ::NewtonMaterialSetDefaultSoftness
+*/
+void NewtonMaterialSetContactThickness (const NewtonMaterial* const materialHandle, dFloat thickness)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert (thickness >= dgFloat32 (0.0f));
+	dgContactMaterial* const material = (dgContactMaterial*)materialHandle;
+	material->m_skinThickness = thickness;
+}
 
 /*!
   Override the default elasticity (coefficient of restitution) value for the contact.

@@ -41,6 +41,23 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
+dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomJoint(6, child, parent)
+	,m_speed(0.0f)
+	,m_posit(0.0f)
+	,m_minDist(-1.0f)
+	,m_maxDist(1.0f)
+	,m_spring(0.0f)
+	,m_damper(0.0f)
+	,m_springDamperRelaxation(0.6f)
+	,m_limitsOn(false)
+	,m_setAsSpringDamper(false)
+	,m_lastRowWasUsed(false)
+{
+	dMatrix	dummy;
+	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
+	CalculateLocalMatrix(pinAndPivotFrameParent, dummy, m_localMatrix1);
+}
 
 void dCustomSlider::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
@@ -157,13 +174,18 @@ void dCustomSlider::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& mat
 		}
 
 		const dFloat velCut = 0.5f;
-		dFloat speedStep = dAbs (NewtonUserCalculateRowZeroAccelaration(m_joint) * timestep);
+		// I should just calculate acceleration to cancel the relative velocity and neglect the position, 
+		// but for now this si good enough
+		const dFloat stopAccel = NewtonUserCalculateRowZeroAccelaration(m_joint);
+		const dFloat speedStep = dAbs (stopAccel * timestep);
 		if ((m_posit < m_minDist) && (speedStep > velCut))  {
-			//dFloat accel = NewtonUserJointGetRowAcceleration(m_joint);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			//NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, dFloat (0.0f));
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, dFloat (0.0f));
 		} else if ((m_posit > m_maxDist) && (speedStep > velCut))  {
-			//dFloat accel = NewtonUserJointGetRowAcceleration(m_joint);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			//NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, dFloat (0.0f));
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowMaximumFriction(m_joint, dFloat(0.0f));
 		} else {
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 		}

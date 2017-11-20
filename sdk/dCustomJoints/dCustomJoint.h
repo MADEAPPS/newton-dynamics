@@ -77,7 +77,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 		dCRCTYPE m_key_##className;																							\
 	};																														\
 	friend class SerializeMetaData_##className;																				\
-	CUSTOM_JOINTS_API static SerializeMetaData_##className m_metaData_##className;
+	static SerializeMetaData_##className m_metaData_##className;
 
 #define IMPLEMENT_CUSTOM_JOINT(className)																					\
 	className::SerializeMetaData_##className className::m_metaData_##className(#className);									\

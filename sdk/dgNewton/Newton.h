@@ -396,7 +396,7 @@ extern "C" {
 
 	typedef void (*NewtonContactsProcess) (const NewtonJoint* const contact, dFloat timestep, int threadIndex);
 	typedef int  (*NewtonOnAABBOverlap) (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
-	typedef int  (*NewtonOnCompoundSubCollisionAABBOverlap) (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex);
+	typedef int  (*NewtonOnCompoundSubCollisionAABBOverlap) (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex);
 	typedef int  (*NewtonOnContactGeneration) (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex);
 
 	typedef int (*NewtonBodyIterator) (const NewtonBody* const body, void* const userData);
@@ -586,6 +586,7 @@ extern "C" {
 	NEWTON_API dFloat NewtonMaterialGetContactPenetration (const NewtonMaterial* const material);
 		
 	NEWTON_API void NewtonMaterialSetContactSoftness (const NewtonMaterial* const material, dFloat softness);
+	NEWTON_API void NewtonMaterialSetContactThickness (const NewtonMaterial* const material, dFloat thickness);
 	NEWTON_API void NewtonMaterialSetContactElasticity (const NewtonMaterial* const material, dFloat restitution);
 	NEWTON_API void NewtonMaterialSetContactFrictionState (const NewtonMaterial* const material, int state, int index);
 	NEWTON_API void NewtonMaterialSetContactFrictionCoef (const NewtonMaterial* const material, dFloat staticFrictionCoef, dFloat kineticFrictionCoef, int index);
@@ -597,6 +598,9 @@ extern "C" {
 	NEWTON_API void NewtonMaterialSetContactTangentFriction (const NewtonMaterial* const material, dFloat friction, int index);
 	NEWTON_API void NewtonMaterialSetContactTangentAcceleration (const NewtonMaterial* const material, dFloat accel, int index);
 	NEWTON_API void NewtonMaterialContactRotateTangentDirections (const NewtonMaterial* const material, const dFloat* const directionVector);
+
+	NEWTON_API dFloat NewtonMaterialGetContactPruningTolerance (const NewtonBody* const body0, const NewtonBody* const body1);
+	NEWTON_API void NewtonMaterialSetContactPruningTolerance (const NewtonBody* const body0, const NewtonBody* const body1, dFloat tolerance);
 
 	// **********************************************************************************************
 	//

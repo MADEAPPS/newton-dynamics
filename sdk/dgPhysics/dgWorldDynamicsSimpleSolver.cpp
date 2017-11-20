@@ -750,9 +750,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1_50(const dgJointInfo* cons
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
 {
-static int xxx;
-xxx ++;
-
 	dgFloat32 accNorm = dgFloat32(0.0f);
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;

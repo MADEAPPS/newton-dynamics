@@ -37,7 +37,7 @@
 #define DG_HEAVY_MASS_SCALE_FACTOR			(25.0f)
 //#define DG_LARGE_STACK_DAMP_FACTOR			(0.25f)
 
-dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-12f));
+dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
 
 
 class dgWorldDynamicUpdateSyncDescriptor
@@ -623,43 +623,18 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	jointInfo->m_scale1 = dgFloat32(1.0f);
 	const dgFloat32 invMass0 = body0->GetInvMass().m_w;
 	const dgFloat32 invMass1 = body1->GetInvMass().m_w;
-//	bool isScaled = false;
-	if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
+	//if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
+	if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
 		const dgFloat32 scaleFactor = dgFloat32 (DG_HEAVY_MASS_SCALE_FACTOR);
 			
 		if (mass0 > scaleFactor * mass1) {
-			//isScaled = true;
 			jointInfo->m_scale0 = invMass1 * mass0 / scaleFactor;
 		} else if (mass1 > scaleFactor * mass0) {
 			jointInfo->m_scale1 = invMass0 * mass1 / scaleFactor;
-			//isScaled = true;
 		}
 	}
-
-/*
-	if (!isScaled) {
-		if (body0->m_equilibrium) {
-			if ((invMass0 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
-				//dgAssert (!body1->m_equilibrium);
-				dgVector isMovingMask(body0->m_veloc + body0->m_omega + body0->m_accel + body0->m_alpha);
-				dgAssert(dgCheckVector(isMovingMask));
-				if ((isMovingMask.TestZero().GetSignMask() & 7) == 7) {
-					jointInfo->m_scale0 *= DG_LARGE_STACK_DAMP_FACTOR;
-				}
-			}
-		} else if (body1->m_equilibrium) {
-			if ((invMass1 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
-				dgVector isMovingMask(body1->m_veloc + body1->m_omega + body1->m_accel + body1->m_alpha);
-				dgAssert(dgCheckVector(isMovingMask));
-				if ((isMovingMask.TestZero().GetSignMask() & 7) == 7) {
-					jointInfo->m_scale1 *= DG_LARGE_STACK_DAMP_FACTOR;
-				}
-			}
-		}
-	}
-*/
 
 	jointInfo->m_pairCount = dof;
 	jointInfo->m_pairStart = rowCount;
@@ -705,11 +680,13 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart + 1]; 
 	dgInt32 count = cluster->m_bodyCount - 1;
 	if (count <= 2) {
-		bool autosleep = bodyArray[0].m_body->m_autoSleep;
+		//bool autosleep = bodyArray[0].m_body->m_autoSleep;
+		bool equilibrium  = bodyArray[0].m_body->m_equilibrium;
 		if (count == 2) {
-			autosleep &= bodyArray[1].m_body->m_autoSleep;
+			//autosleep &= bodyArray[1].m_body->m_autoSleep;
+			equilibrium  &= bodyArray[1].m_body->m_equilibrium;
 		}
-		if (!autosleep) {
+		if (!equilibrium ) {
 			velocityDragCoeff = dgFloat32 (0.9999f);
 		}
 	}

@@ -62,8 +62,6 @@ dgContactMaterial::dgContactMaterial()
 	m_normal_Force.m_force = dgFloat32 (0.0f);
 	m_normal_Force.m_impact = dgFloat32 (0.0f);
 	m_skinThickness = dgFloat32 (0.0f);
-	//m_skinThickness = dgFloat32 (0.1f);
-	//m_skinThickness = DG_MAX_COLLISION_AABB_PADDING * dgFloat32 (0.125f);
 	m_flags = m_collisionEnable | m_friction0Enable | m_friction1Enable;
 }
 
@@ -77,6 +75,7 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	,m_world(world)
 	,m_material(material)
 	,m_contactNode(NULL)
+	,m_contactPruningTolereance(world->GetContactMergeTolerance())
 	,m_broadphaseLru(0)
 	,m_isNewContact(true)
 {
@@ -97,6 +96,7 @@ dgContact::dgContact(dgContact* const clone)
 	,m_world(clone->m_world)
 	,m_material(clone->m_material)
 	,m_contactNode(clone->m_contactNode)
+	,m_contactPruningTolereance(clone->m_contactPruningTolereance)
 	,m_broadphaseLru(clone->m_broadphaseLru)
 	,m_isNewContact(clone->m_isNewContact)
 {

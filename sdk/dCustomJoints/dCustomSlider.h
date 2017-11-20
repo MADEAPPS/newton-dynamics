@@ -24,6 +24,7 @@ class dCustomSlider: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent);
 	CUSTOM_JOINTS_API virtual ~dCustomSlider();
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);

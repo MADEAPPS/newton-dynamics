@@ -612,31 +612,32 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 }
 
 
-dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount) const
+dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPointArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
 {
 	if (count > 1) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
 		dgInt32 index = 0;
 		dgInt32 packContacts = 0;
-		dgFloat32 window = m_contactTolerance;
+
+		dgFloat32 window = distTolerenace;
 		dgFloat32 window2 = window * window;
 
 		memset (mask, 0, size_t (count));
-		dgSort (contact, count, CompareContact, NULL);
+		dgSort (contactPointArray, count, CompareContact, NULL);
 
 		for (dgInt32 i = 0; i < count; i ++) {
 			if (!mask[i]) {
-				dgFloat32 val = contact[i].m_point[index] + window;
-				for (dgInt32 j = i + 1; (j < count) && (contact[j].m_point[index] < val) ; j ++) {
+				dgFloat32 val = contactPointArray[i].m_point[index] + window;
+				for (dgInt32 j = i + 1; (j < count) && (contactPointArray[j].m_point[index] < val) ; j ++) {
 					if (!mask[j]) {
-						dgVector dp (contact[j].m_point - contact[i].m_point);
+						dgVector dp (contactPointArray[j].m_point - contactPointArray[i].m_point);
 						dgFloat32 dist2 = dp.DotProduct3(dp);
 						if (dist2 < window2) {
-							if (contact[i].m_penetration < contact[j].m_penetration ) {
-								contact[i].m_point = contact[j].m_point;
-								contact[i].m_normal = contact[j].m_normal;
-								contact[i].m_penetration =contact[j].m_penetration;
+							if (contactPointArray[i].m_penetration < contactPointArray[j].m_penetration ) {
+								contactPointArray[i].m_point = contactPointArray[j].m_point;
+								contactPointArray[i].m_normal = contactPointArray[j].m_normal;
+								contactPointArray[i].m_penetration =contactPointArray[j].m_penetration;
 							}
 							mask[j] = 1;
 							packContacts = 1;
@@ -650,7 +651,7 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dg
 			dgInt32 j = 0;
 			for (dgInt32 i = 0; i < count; i ++) {
 				if (!mask[i]) {
-					contact[j] = contact[i];
+					contactPointArray[j] = contactPointArray[i];
 					j ++;
 				}
 			}
@@ -658,7 +659,7 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dg
 		}
 
 		if (count > maxCount) {
-			count = ReduceContacts (count, contact, maxCount, window * dgFloat32 (2.0f), 1);
+			count = ReduceContacts (count, contactPointArray, maxCount, window * dgFloat32 (2.0f), 1);
 		}
 	}
 	return count;
@@ -667,10 +668,10 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dg
 
 dgInt32 dgWorld::PruneContactsByRank(dgInt32 count, dgCollisionParamProxy& proxy, dgInt32 maxCount) const
 {
-/*
 	dgJacobian jt[DG_CONSTRAINT_MAX_ROWS / 3];
 	dgFloat32 massMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS / 9];
 
+	dgAssert (count > maxCount);
 	const dgBody* const body = proxy.m_body0;
 	dgVector com(body->m_globalCentreOfMass);
 	for (dgInt32 i = 0; i < count; i++) {
@@ -684,7 +685,7 @@ dgInt32 dgWorld::PruneContactsByRank(dgInt32 count, dgCollisionParamProxy& proxy
 		dgFloat32* const row = &massMatrix[index];
 		const dgJacobian& gInvMass = jt[i];
 		dgVector aii(gInvMass.m_linear * jt[i].m_linear + gInvMass.m_angular * jt[i].m_angular);
-		row[i] = aii.AddHorizontal().GetScalar() * dgFloat32(1.0f);
+		row[i] = aii.AddHorizontal().GetScalar() * dgFloat32(1.0001f);
 		for (dgInt32 j = i + 1; j < count; j++) {
 			dgVector aij(gInvMass.m_linear * jt[j].m_linear + gInvMass.m_angular * jt[j].m_angular);
 			dgFloat32 b = aij.AddHorizontal().GetScalar();
@@ -696,7 +697,20 @@ dgInt32 dgWorld::PruneContactsByRank(dgInt32 count, dgCollisionParamProxy& proxy
 
 	dgFloat32 eigenValues[DG_CONSTRAINT_MAX_ROWS / 3];
 	dgEigenValues(count, massMatrix, eigenValues);
-*/
+
+	for (dgInt32 i = 1; i < count; i++) {
+		dgFloat32 value = eigenValues[i];
+		dgContactPoint point (proxy.m_contacts[i]);
+
+		dgInt32 j = i - 1;
+		for (; (j >= 0) && (eigenValues[j] < value); j--) {
+			eigenValues[j + 1] = eigenValues[j];
+			proxy.m_contacts[j + 1] = proxy.m_contacts[j];
+		}
+		eigenValues[j + 1] = value;
+		proxy.m_contacts[j + 1] = point;
+	}
+
 	return maxCount;
 }
 
@@ -1005,12 +1019,12 @@ void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionPar
 	compound->CalculateContacts (pair, proxy);
 	if (pair->m_contactCount) {
 		// prune close contacts
-		pair->m_contactCount = PruneContacts (pair->m_contactCount, proxy.m_contacts);
+		pair->m_contactCount = PruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
 	}
 
-	if (pair->m_contactCount > 8) {
-		pair->m_contactCount = PruneContactsByRank(pair->m_contactCount, proxy, 8);
-	}
+//	if (pair->m_contactCount > 8) {
+//		pair->m_contactCount = PruneContactsByRank(pair->m_contactCount, proxy, 8);
+//	}
 
 	proxy.m_contactJoint->m_separationDistance = dgFloat32 (0.0f);
 }
@@ -1033,7 +1047,7 @@ void dgWorld::SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionP
 
 	proxy.m_contacts = savedBuffer;
 	if (pair->m_contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-		pair->m_contactCount = dgInt16 (ReduceContacts (pair->m_contactCount, proxy.m_contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_contactTolerance));
+		pair->m_contactCount = dgInt16 (ReduceContacts (pair->m_contactCount, proxy.m_contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance()));
 	}
 }
 
@@ -1060,7 +1074,7 @@ void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamP
 		scene->CollidePair (pair, proxy);
 		if (pair->m_contactCount > 0) {
 			// prune close contacts
-			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts));
+			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance()));
 		}
 	} else if (otherInstance->IsType (dgCollision::dgCollisionCompound_RTTI) & ~otherInstance->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		proxy.m_body0 = otherBody;
@@ -1072,7 +1086,7 @@ void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamP
 		scene->CollideCompoundPair (pair, proxy);
 		if (pair->m_contactCount > 0) {
 			// prune close contacts
-			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts));
+			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance()));
 		}
 	} else {
 		dgAssert (0);
@@ -1237,7 +1251,7 @@ dgInt32 dgWorld::CollideContinue (
 	count = pair.m_contactCount;
 	if (count) {
 		if (count > maxContacts) {
-			count = PruneContacts (count, contacts, maxContacts);
+			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
 		}
 		//dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
 		if (pair.m_flipContacts) {
@@ -1318,7 +1332,7 @@ dgInt32 dgWorld::Collide (
 
 	count = pair.m_contactCount;
 	if (count > maxContacts) {
-		count = ReduceContacts (count, contacts, maxContacts, m_contactTolerance);
+		count = ReduceContacts (count, contacts, maxContacts, contactJoint.GetPruningTolerance());
 		count = dgMin (count, maxContacts);
 	}
 
@@ -1587,7 +1601,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 
 			if (count > 0) {
 				proxy.m_contactJoint->m_contactActive = 1;
-				count = PruneContacts(count, proxy.m_contacts);
+				count = PruneContacts(count, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
 			}
 		}
 
@@ -1756,41 +1770,12 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		proxy.m_intersectionTestOnly = saveintersectionTestOnly;
 		cloudInstance.m_userData0 = NULL;
 		cloudInstance.m_userData1 = NULL;
-		
 	}
 
-/*
-	// this was the method used in newton 1.5 for filtering contacts, but now I realized it did not really worked as I though
-	// the method is too good for an iterative solver  
-	dgJacobian jt[DG_CONSTRAINT_MAX_ROWS / 3];
-	dgFloat32 massMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS / 9];
-
-	const dgBody* const body = proxy.m_body0;
-	dgVector com (body->m_globalCentreOfMass - proxy.m_worldOrigin);
-	for (dgInt32 i = 0; i < count; i ++) {
-		jt[i].m_linear = contactOut[i].m_normal;
-		jt[i].m_angular = (contactOut[i].m_point - com).CrossProduct3(contactOut[i].m_normal);
-	}
-
-	dgInt32 index = 0;
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgFloat32* const row = &massMatrix[index];
-		const dgJacobian& gInvMass = jt[i];
-		dgVector aii (gInvMass.m_linear.CompProduct4(jt[i].m_linear) + gInvMass.m_angular.CompProduct4(jt[i].m_angular));
-		row[i] = aii.AddHorizontal().GetScalar() * dgFloat32 (1.01f);
-		for (dgInt32 j = i + 1; j < count; j ++) {
-			dgVector aij (gInvMass.m_linear.CompProduct4(jt[j].m_linear) + gInvMass.m_angular.CompProduct4(jt[j].m_angular));
-			dgFloat32 b = aij.AddHorizontal().GetScalar();
-			row[j] = b;
-			massMatrix[j * count + i] = b;
-		}
-		index += count;
-	}
-
-	dgFloat32 eigenValues[DG_CONSTRAINT_MAX_ROWS / 3];
-	dgEigenValues(count, massMatrix, eigenValues);
-*/
 	proxy.m_contacts = contactOut;
+//	if(count > 3) {
+//	     count = PruneContactsByRank(count, proxy, 3);
+//	}
 
 	// restore the pointer
 	polyInstance.m_userData0 = NULL;
