@@ -969,9 +969,9 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 						k = 0;
 						passes--;
 						beta = dgFloat32(0.0f);
-						const dgInt32 k = activeRows[clampIndex];
-						mask[k] = dgVector::m_zero;
-						delta_x[k] = dgVector::m_zero;
+						const dgInt32 n = activeRows[clampIndex];
+						mask[n] = dgVector::m_zero;
+						delta_x[n] = dgVector::m_zero;
 						activeRowsCount --;
 						dgSwap (activeRows[clampIndex], activeRows[activeRowsCount]);
 						for (dgInt32 i = 0; i < activeRowsCount; i++) {
