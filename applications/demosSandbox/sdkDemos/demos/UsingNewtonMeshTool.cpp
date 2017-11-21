@@ -36,15 +36,25 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 	fread((void*)&numTris, 4, 1, f);
 
 	// Add face for each tri
+	struct point
+	{
+		float v[3];
+	};
+	struct tria
+	{
+		point face[3];
+	};
+	tria faces[3000];
 	for (int i = 0; i < numTris; i++) {
-		// Read 3 vertices (3 floats per vertex)
-		float v[9];
-		fread((void*)&(v[0]), sizeof(float), 9, f);
-
-		NewtonTreeCollisionAddFace(pCollision, 3, &(v[0]), 3 * sizeof(float), 0);
+		fread((void*)&(faces[i]), sizeof(float), 9, f);
 	}
 
-	NewtonTreeCollisionEndBuild(pCollision, 0);
+//	for (int i = 0; i < numTris; i++) {
+	for (int i = 1696; i < 1750; i++) {
+		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0].v[0]), 3 * sizeof(float), 0);
+	}
+
+	NewtonTreeCollisionEndBuild(pCollision, 1);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
@@ -288,10 +298,12 @@ LoadAndCreateMesh(scene);
 	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
-	dQuaternion rot;
-//	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
-	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
-//	dVector origin (-1.0f, 0.25f, 0.0f, 0.0f);
+//	dQuaternion rot;
+//	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
+
+	dQuaternion rot (0.471605480f, - 0.279436618f, 0.820808113f, - 0.160553753f);
+	dVector origin (-21.8602009f, 39.1065178f, -34.6017456f,0.0f);
+
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");
