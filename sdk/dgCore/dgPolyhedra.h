@@ -179,6 +179,9 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void CalculateAllMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool) const;
 	void CalculateVertexMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool, dgEdge* const edge) const;
 	dgEdge* BestEdgePolygonizeFace(const dgBigVector& normal, dgEdge* const edge, const dgFloat64* const pool, dgInt32 stride, const dgBigVector& point) const;
+
+	static void RemoveOuterColinearEdges(dgPolyhedra& flatFace, const dgFloat64* const vertex, dgInt32 stride);
+	static void RemoveInteriorColinearEdges(dgPolyhedra& flatFace, const dgFloat64* const vertex, dgInt32 stride);
 	
 	mutable dgInt32 m_baseMark;
 	mutable dgInt32 m_edgeMark;

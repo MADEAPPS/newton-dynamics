@@ -245,6 +245,17 @@ class dgVector
 		dgAssert (dgCheckVector ((*this)));
 	}
 
+#ifndef	_NEWTON_USE_DOUBLE
+	DG_INLINE dgVector(const dgFloat64* const ptr)
+		:m_x(dgFloat32(ptr[0]))
+		,m_y(dgFloat32(ptr[1]))
+		,m_z(dgFloat32(ptr[2]))
+		,m_w(dgFloat32(0.0f))
+	{
+	}
+#endif
+
+
 	DG_INLINE dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w) 
 		:m_x(x), m_y(y), m_z(z), m_w(w)
 	{
@@ -1178,6 +1189,17 @@ class dgVector
 	{
 		m_type = _mm_and_ps (m_type, m_triplexMask.m_type);
 	}
+
+#ifndef	_NEWTON_USE_DOUBLE
+//	DG_INLINE dgVector(const dgFloat64* const ptr)
+	dgVector(const dgFloat64* const ptr)
+		:m_x(dgFloat32(ptr[0]))
+		,m_y(dgFloat32(ptr[1]))
+		,m_z(dgFloat32(ptr[2]))
+		,m_w(dgFloat32(0.0f))
+	{
+	}
+#endif
 
 	DG_INLINE dgVector (const dgVector& copy)
 		:m_type(copy.m_type)

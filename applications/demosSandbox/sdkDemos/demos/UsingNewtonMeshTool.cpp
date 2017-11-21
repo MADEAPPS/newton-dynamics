@@ -49,8 +49,8 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 		fread((void*)&(faces[i]), sizeof(float), 9, f);
 	}
 
-//	for (int i = 0; i < numTris; i++) {
-	for (int i = 1696; i < 1750; i++) {
+	for (int i = 0; i < numTris; i++) {
+//	for (int i = 1696; i < 1750; i++) {
 		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0].v[0]), 3 * sizeof(float), 0);
 	}
 
@@ -295,7 +295,7 @@ LoadAndCreateMesh(scene);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 0.5f, 1.0f, 0.0f), 0.0f);
 
-	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+//	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
 //	dQuaternion rot;
