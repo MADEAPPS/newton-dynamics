@@ -31,7 +31,8 @@
 #include "dgBilateralConstraint.h"
 
 
-
+#define DG_HEAVY_MASS_SCALE_FACTOR			dgFloat32 (25.0f)
+#define DG_HEAVY_MASS_INV_SCALE_FACTOR		(dgFloat32 (1.0f) / DG_HEAVY_MASS_SCALE_FACTOR)
 
 void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
@@ -346,8 +347,7 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 	}
 }
 
-
-void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfoArray, const dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const 
+void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfoArray, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const 
 {
 	const dgInt32 index = jointInfo->m_pairStart;
 	const dgInt32 count = jointInfo->m_pairCount;
@@ -377,18 +377,29 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 		torque1 = ((dgDynamicBody*)body1)->m_externalTorque;
 	}
 
-	const dgVector scale0(jointInfo->m_scale0);
-	const dgVector scale1(jointInfo->m_scale1);
+	jointInfo->m_scale0 = dgFloat32(1.0f);
+	jointInfo->m_scale1 = dgFloat32(1.0f);
+//	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
+	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())) {
+		const dgFloat32 mass0 = body0->GetMass().m_w;
+		const dgFloat32 mass1 = body1->GetMass().m_w;
+		if (mass0 > (DG_HEAVY_MASS_SCALE_FACTOR * mass1)) {
+			jointInfo->m_scale0 = invMass1.GetScalar() * mass0 * DG_HEAVY_MASS_INV_SCALE_FACTOR;
+		} else if (mass1 > (DG_HEAVY_MASS_SCALE_FACTOR * mass0)) {
+			jointInfo->m_scale1 = invMass0.GetScalar() * mass1 * DG_HEAVY_MASS_INV_SCALE_FACTOR;
+		}
+	}
 
 	dgJacobian forceAcc0;
 	dgJacobian forceAcc1;
+	const dgVector scale0(jointInfo->m_scale0);
+	const dgVector scale1(jointInfo->m_scale1);
 	forceAcc0.m_linear = dgVector::m_zero;
 	forceAcc0.m_angular = dgVector::m_zero;
 	forceAcc1.m_linear = dgVector::m_zero;
 	forceAcc1.m_angular = dgVector::m_zero;
 	
 	for (dgInt32 i = 0; i < count; i++) {
-
 		dgJacobianMatrixElement* const row = &matrixRow[index + i];
 		dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
 		dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
