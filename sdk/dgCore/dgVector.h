@@ -1191,12 +1191,8 @@ class dgVector
 	}
 
 #ifndef	_NEWTON_USE_DOUBLE
-//	DG_INLINE dgVector(const dgFloat64* const ptr)
-	dgVector(const dgFloat64* const ptr)
-		:m_x(dgFloat32(ptr[0]))
-		,m_y(dgFloat32(ptr[1]))
-		,m_z(dgFloat32(ptr[2]))
-		,m_w(dgFloat32(0.0f))
+	DG_INLINE dgVector(const dgFloat64* const ptr)
+		:m_type(_mm_set_ps(dgFloat32(0.0f), dgFloat32(ptr[2]), dgFloat32(ptr[1]), dgFloat32(ptr[0])))
 	{
 	}
 #endif

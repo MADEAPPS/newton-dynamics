@@ -180,8 +180,13 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void CalculateVertexMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool, dgEdge* const edge) const;
 	dgEdge* BestEdgePolygonizeFace(const dgBigVector& normal, dgEdge* const edge, const dgFloat64* const pool, dgInt32 stride, const dgBigVector& point) const;
 
+	static dgInt32 GetInteriorDiagonals (dgPolyhedra& polyhedra, dgEdge** const diagonals, dgInt32 maxCount);
+	static dgBigPlane UnboundedLoopPlane (dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const pool);
 	static void RemoveOuterColinearEdges(dgPolyhedra& flatFace, const dgFloat64* const vertex, dgInt32 stride);
 	static void RemoveInteriorColinearEdges(dgPolyhedra& flatFace, const dgFloat64* const vertex, dgInt32 stride);
+	static bool IsEssensialDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool,  dgInt32 stride);
+	static bool IsEssensialPointDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool, dgInt32 stride);
+	
 	
 	mutable dgInt32 m_baseMark;
 	mutable dgInt32 m_edgeMark;

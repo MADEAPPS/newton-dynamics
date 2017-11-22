@@ -782,10 +782,7 @@ void dgPolyhedra::DeleteDegenerateFaces (const dgFloat64* const pool, dgInt32 st
 }
 
 
-
-
-
-static dgBigPlane UnboundedLoopPlane (dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const pool)
+dgBigPlane dgPolyhedra::UnboundedLoopPlane (dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const pool)
 {
 	const dgBigVector p0 = pool[i0];
 	const dgBigVector p1 = pool[i1];
@@ -1643,7 +1640,7 @@ void dgPolyhedra::RemoveInteriorColinearEdges(dgPolyhedra& flatFace, const dgFlo
 }
 
 
-static dgInt32 GetInteriorDiagonals (dgPolyhedra& polyhedra, dgEdge** const diagonals, dgInt32 maxCount)
+dgInt32 dgPolyhedra::GetInteriorDiagonals (dgPolyhedra& polyhedra, dgEdge** const diagonals, dgInt32 maxCount)
 {
 	dgInt32 count = 0;
 	dgInt32 mark = polyhedra.IncLRU();
@@ -1668,7 +1665,7 @@ static dgInt32 GetInteriorDiagonals (dgPolyhedra& polyhedra, dgEdge** const diag
 	return count;
 }
 
-static bool IsEssensialPointDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool, dgInt32 stride)
+bool dgPolyhedra::IsEssensialPointDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool, dgInt32 stride)
 {
 	dgFloat64 dot;
 	dgBigVector p0 (&pool[diagonal->m_incidentVertex * stride]);
@@ -1701,12 +1698,9 @@ static bool IsEssensialPointDiagonal (dgEdge* const diagonal, const dgBigVector&
 }
 
 
-static bool IsEssensialDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool,  dgInt32 stride)
+bool dgPolyhedra::IsEssensialDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool,  dgInt32 stride)
 {
 	bool ret = IsEssensialPointDiagonal (diagonal, normal, pool, stride) || IsEssensialPointDiagonal (diagonal->m_twin, normal, pool, stride); 
-//	if (!ret) {
-//		ret = ret || ((diagonal->m_next->m_twin->m_next->m_twin == diagonal) && (diagonal->m_twin->m_next->m_twin->m_next == diagonal));
-//	}
 	return ret;
 }
 
@@ -2587,9 +2581,6 @@ bool dgPolyhedra::PolygonizeFace(dgEdge* const face, const dgFloat64* const pool
 
 void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut)
 {
-//static int xxx;
-//static int xxx2;
-
 	if (GetCount()) {
 		Triangulate (vertex, strideInBytes, leftOversOut);
 		DeleteDegenerateFaces (vertex, strideInBytes, dgFloat32 (1.0e-5f));
@@ -2612,15 +2603,12 @@ void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 stride
 
 					dgPolyhedra flatFace(GetAllocator());
 					MarkAdjacentCoplanarFaces (flatFace, edge, vertex, strideInBytes);
-//xxx ++;
-//if ((xxx == 4) || (xxx == -1))
 					if (flatFace.GetCount()) {
 						flatFace.RefineTriangulation (vertex, stride);
 						RemoveOuterColinearEdges (flatFace, vertex, stride);
 						RemoveInteriorColinearEdges(flatFace, vertex, stride);
 
 						dgInt32 diagonalCount = GetInteriorDiagonals (flatFace, diagonalsPool, sizeof (diagonalsPool) / sizeof (diagonalsPool[0]));
-//diagonalCount = 0;
 						if (diagonalCount) {
 							edge = &flatFace.GetRoot()->GetInfo();
 							if (edge->m_incidentFace < 0) {
@@ -2711,10 +2699,7 @@ void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 stride
 								for (dgInt32 j = 0; j < diagonalCount; j ++) {
 									dgEdge* const diagonal = diagonalsPool[j];
 									if (!IsEssensialDiagonal(diagonal, normal, vertex, stride)) {
-//xxx2++;
 										flatFace.DeleteEdge (diagonal);
-//if (xxx2 >= 2)
-//break;
 									}
 								}
 							}
@@ -2746,12 +2731,9 @@ void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 stride
 				}
 			}
 
-
 			buildConvex.EndFace();
 			dgAssert (GetCount() == 0);
 			SwapInfo(buildConvex);
 		}
 	}
-
-//dgTrace (("%d\n", xxx));
 }

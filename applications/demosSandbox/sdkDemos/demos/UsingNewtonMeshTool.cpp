@@ -38,7 +38,7 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 	// Add face for each tri
 	struct point
 	{
-		float v[3];
+		dFloat v[3];
 	};
 	struct tria
 	{
@@ -46,12 +46,18 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 	};
 	tria faces[3000];
 	for (int i = 0; i < numTris; i++) {
-		fread((void*)&(faces[i]), sizeof(float), 9, f);
+		float v[3][3];
+		fread(v, sizeof(float), 9, f);
+		for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < 3; k++) {
+				faces[i].face[j].v[k] = v[j][k];
+			}
+		}
 	}
 
 	for (int i = 0; i < numTris; i++) {
 //	for (int i = 1696; i < 1750; i++) {
-		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0].v[0]), 3 * sizeof(float), 0);
+		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0].v[0]), 3 * sizeof(dFloat), 0);
 	}
 
 	NewtonTreeCollisionEndBuild(pCollision, 1);
@@ -116,7 +122,7 @@ static void TestConvexCastBug(NewtonWorld* world)
 	dVector start(-10, 20.5, 9.5);
 	dVector target(-10, 20.5, 5);
 	dMatrix start_xform(dQuaternion(), start);
-	float hitParam = 0;
+	dFloat hitParam = 0;
 	NewtonWorldConvexCastReturnInfo info[16];
 	int contactCount = NewtonWorldConvexCast(world, &start_xform[0][0], &target.m_x, cast_shape,
 		&hitParam, 0, 0,
@@ -295,7 +301,7 @@ LoadAndCreateMesh(scene);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 0.5f, 1.0f, 0.0f), 0.0f);
 
-//	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
 //	dQuaternion rot;

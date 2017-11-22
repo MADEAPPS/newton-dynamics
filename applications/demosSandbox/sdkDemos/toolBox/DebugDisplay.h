@@ -45,13 +45,13 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 
 	void SetColor(const dVector& color)
 	{
-		glColor3f(color.m_x, color.m_y, color.m_z);
+		glColor3f(GLfloat (color.m_x), GLfloat (color.m_y), GLfloat (color.m_z));
 	}
 
 	void DrawLine(const dVector& p0, const dVector& p1)
 	{
-		glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-		glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+		glVertex3f(GLfloat (p0.m_x), GLfloat (p0.m_y), GLfloat (p0.m_z));
+		glVertex3f(GLfloat (p1.m_x), GLfloat (p1.m_y), GLfloat (p1.m_z));
 	}
 };
 

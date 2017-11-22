@@ -871,7 +871,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 			joyPosX = axis[m_steeringAxis];
 			joyPosY = -axis[m_throttleAxis];
-			joyPosZ = dMax (axis[m_clutchAxis], 0.0f);
+			joyPosZ = dMax (axis[m_clutchAxis], dFloat (0.0f));
 			bool ignitionButton = buttons[m_ignitionButton] ? true : false;
 			bool handBreakButton = buttons[m_handBrakeButton] ? true : false;
 			bool gearUpButton = buttons[m_gearUpButton] ? true : false;
