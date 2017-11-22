@@ -492,7 +492,7 @@ class SuperCarEntity: public DemoEntity
 		CalculateTireDimensions ("rl_tire", width, radius);
 		dWheelJoint* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
-/*		
+		
 		// add a steering Wheel component
 		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
@@ -509,7 +509,7 @@ class SuperCarEntity: public DemoEntity
 		brakes->AddTire (rightRearTire);
 		m_controller->SetBrakes(brakes);
 
-
+/*
 		// add vehicle hand brakes
 		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		handBrakes->AddTire (leftRearTire);
@@ -731,7 +731,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			//           camMatrix = camMatrix * playerMatrix;
 			//           camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
 		}
-
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
@@ -995,15 +994,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		// do the base class post update
 		dCustomVehicleControllerManager::PostUpdate(timestep);
-/*
-		if (m_player) {
-			UpdateCamera (m_player, timestep);
-		} else {
-			dCustomVehicleController* const controller = &GetLast()->GetInfo();
-			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-			UpdateCamera (vehicleEntity, timestep);
-		}
-*/
 	}
 
 
@@ -1091,7 +1081,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
-		//draw the schematic (laterals forces diagram for the player vehicle) 
 		m_player->m_controller->DrawSchematic(debugContext, 6.0f, 3.0f, 0.125f);
 		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}
