@@ -31,7 +31,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// Precessing tops
@@ -64,7 +64,7 @@
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
-//#define DEFAULT_SCENE	33			// super Car
+#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
@@ -207,7 +207,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_solverPasses(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
-	,m_showUI(true)
+	,m_showUI(false)
 	,m_showAABB(false)
 	,m_showStats(true)
 	,m_hasJoytick(false)
@@ -221,6 +221,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
 {
+//	m_showUI = true;
 //	m_showAABB = false;
 //	m_showContactPoints = false;
 //	m_hideVisualMeshes = false;
@@ -231,7 +232,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 	m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 1;
+//	m_collisionDisplayMode = 1;
 //	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
