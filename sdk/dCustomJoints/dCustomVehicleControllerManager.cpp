@@ -1645,14 +1645,14 @@ int dCustomVehicleControllerManager::GetTireMaterial() const
 dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 	dCustomVehicleController* const controller = CreateController();
-	controller->Init (body, forceAndTorque, gravityMag);
+	controller->Init (body, vehicleFrame, forceAndTorque, gravityMag);
 	return controller;
 }
 
 dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 	dCustomVehicleController* const controller = CreateController();
-	controller->Init(chassisShape, mass, forceAndTorque, gravityMag);
+	controller->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
 	return controller;
 }
 
@@ -1702,12 +1702,12 @@ class dCustomVehicleControllerManager::dTireFilter: public dCustomControllerConv
 };
 
 
-void dCustomVehicleController::Init(NewtonCollision* const chassisShape, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+void dCustomVehicleController::Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
-	// create a body and an call the low level init function
+	// create a body and call the low level init function
 	dMatrix locationMatrix(dGetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
@@ -1715,10 +1715,10 @@ void dCustomVehicleController::Init(NewtonCollision* const chassisShape, dFloat 
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
-	Init(body, forceAndTorque, gravityMag);
+	Init(body, localFrame, forceAndTorque, gravityMag);
 }
 
-void dCustomVehicleController::Init(NewtonBody* const body, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+void dCustomVehicleController::Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 	m_body = body;
 	m_speed = 0.0f;
@@ -1732,6 +1732,10 @@ void dCustomVehicleController::Init(NewtonBody* const body, NewtonApplyForceAndT
 	m_aerodynamicsDownSpeedCutOff = 0.0f;
 	m_aerodynamicsDownForceCoefficient = 0.0f;
 
+	m_localFrame = localFrame;
+	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+	dAssert(m_localFrame.TestOrthogonal());
+
 	m_forceAndTorqueCallback = forceAndTorque;
 
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
@@ -1739,7 +1743,7 @@ void dCustomVehicleController::Init(NewtonBody* const body, NewtonApplyForceAndT
 
 	// set linear and angular drag to zero
 	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_body, 0);
+	NewtonBodySetLinearDamping(m_body, 0.0f);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 
 	// set the standard force and torque call back
@@ -1983,6 +1987,7 @@ dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
 	dMatrix locationInGlobalSpase;
 	NewtonBodyGetMatrix(m_body, &locationInGlobalSpase[0][0]);
 	locationInGlobalSpase.m_posit = locationInGlobalSpase.TransformVector(tireInfo.m_location);
+	locationInGlobalSpase = m_localFrame * locationInGlobalSpase;
 	dAssert (locationInGlobalSpase.m_posit.m_w == 1.0f);
 
 	// create the rigid body that will make this bone
@@ -2006,7 +2011,6 @@ dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
 	dMatrix matrix (dYawMatrix(-90.0f * 3.141592f / 180.0f) * locationInGlobalSpase);
 	matrix.m_posit += matrix.m_front.Scale(tireInfo.m_pivotOffset);
 	dWheelJoint* const joint = new dWheelJoint(matrix, tireBody, m_body, this, tireInfo);
-//	joint->m_index = m_tireList.GetCount();
 	m_tireList.Append(joint);
 
 	NewtonCollisionSetUserData1(collision, joint);

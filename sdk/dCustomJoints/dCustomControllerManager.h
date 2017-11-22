@@ -98,7 +98,8 @@ class dCustomControllerBase
 {
 	public:
 	dCustomControllerBase ()
-		:m_userData(NULL)
+		:m_localFrame(dGetIdentityMatrix())
+		,m_userData(NULL)
 		,m_body(NULL)
 		,m_manager(NULL)
 	{
@@ -140,6 +141,7 @@ class dCustomControllerBase
 	{
 	}
 
+	dMatrix m_localFrame;
 	void* m_userData;
 	NewtonBody* m_body;
 	void* m_manager;

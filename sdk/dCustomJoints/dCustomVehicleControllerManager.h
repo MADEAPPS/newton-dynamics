@@ -650,8 +650,8 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	bool ControlStateChanged() const;
-	void Init (NewtonBody* const body, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Init (NewtonCollision* const chassisShape, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	void Init (NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	void Init (NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	
 	void CalculateSideSlipDynamics(dFloat timestep);
 	void ApplySuspensionForces (dFloat timestep) const;

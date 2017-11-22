@@ -279,7 +279,9 @@ class SuperCarEntity: public DemoEntity
 
 		// create the vehicle controller
 		dMatrix chassisMatrix;
-		chassisMatrix.m_front = dVector (1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
+//		chassisMatrix.m_front = dVector (1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
+//		chassisMatrix.m_up	  = dVector (0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
+		chassisMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
 		chassisMatrix.m_up	  = dVector (0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
 		chassisMatrix.m_right = chassisMatrix.m_front.CrossProduct(chassisMatrix.m_up);	// this is in the side vehicle direction (the plane of the wheels)
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
@@ -490,7 +492,7 @@ class SuperCarEntity: public DemoEntity
 		CalculateTireDimensions ("rl_tire", width, radius);
 		dWheelJoint* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
-		
+/*		
 		// add a steering Wheel component
 		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
@@ -602,7 +604,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat weightRatio1 = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		dFloat speedFactor = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
-
+*/
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
