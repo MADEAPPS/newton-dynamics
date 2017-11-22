@@ -26,6 +26,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	public:
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
 	typedef void (*RenderGuiHelpCallback) (DemoEntityManager* const manager, void* const context);
+	typedef void(*UpdateCameraCallback) (DemoEntityManager* const manager, void* const context, dFloat timestep);
 
 	class TransparentMesh
 	{
@@ -105,6 +106,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
+	void SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context);
 	void Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context);
 
 	bool IsShiftKeyDown () const;
@@ -147,8 +149,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
 	static void ErrorCallback(int error, const char* const description);
-
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat timestep);
+
 
 	void ApplyMenuOptions();
 
@@ -160,8 +162,10 @@ class DemoEntityManager: public dList <DemoEntity*>
 	NewtonWorld* m_world;
 	DemoCameraListener* m_cameraManager;
 	void* m_renderUIContext;
+	void* m_updateCameraContext;
 	RenderGuiHelpCallback m_renderDemoGUI;
 	RenderGuiHelpCallback m_renderHelpMenus;
+	UpdateCameraCallback m_updateCamera;
 
 	unsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;

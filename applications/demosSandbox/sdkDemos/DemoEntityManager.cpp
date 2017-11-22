@@ -190,8 +190,10 @@ DemoEntityManager::DemoEntityManager ()
 	,m_world(NULL)
 	,m_cameraManager(NULL)
 	,m_renderUIContext(NULL)
+	,m_updateCameraContext(NULL)
 	,m_renderDemoGUI(NULL)
 	,m_renderHelpMenus(NULL)
+	,m_updateCamera(NULL)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
 	,m_currentScene(DEFAULT_SCENE)
@@ -396,6 +398,13 @@ void DemoEntityManager::Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCa
 	m_renderHelpMenus = helpCallback;
 	m_renderUIContext = context;
 }
+
+void DemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
+{
+	m_updateCamera = callback;
+	m_updateCameraContext = context;
+}
+
 
 int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
 {
@@ -1213,8 +1222,9 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 void DemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat timestep)
 {
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-
-//	dAssert (0);
+	if (scene->m_updateCamera) {
+		scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
+	}
 }
 
 void DemoEntityManager::RenderScene()

@@ -649,6 +649,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction (RenderHelpMenu, RenderUI, this);
 
 		// load 2d display assets
@@ -695,6 +697,40 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*)context;
 		me->RenderUI (scene);
+	}
+
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
+	{
+		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*)context;
+		me->UpdateCamera(timestep);
+	}
+
+	void UpdateCamera(dFloat timestep)
+	{
+		SuperCarEntity* player = m_player;
+		if (!player) {
+			dCustomVehicleController* const controller = &GetLast()->GetInfo();
+			player = (SuperCarEntity*)NewtonBodyGetUserData(controller->GetBody());
+		}
+
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		DemoCamera* const camera = scene->GetCamera();
+		dMatrix camMatrix(camera->GetNextMatrix());
+		dMatrix playerMatrix(player->GetNextMatrix());
+
+		dVector frontDir(camMatrix[0]);
+		dVector camOrigin(0.0f);
+		if (m_externalView) {
+			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
+			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
+			//camOrigin = dVector (-7.0f, 3.0f, 0.0f, 0.0f);
+		} else {
+			dAssert(0);
+			//           camMatrix = camMatrix * playerMatrix;
+			//           camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+		}
+
+		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
 	void DrawHelp(DemoEntityManager* const scene)
@@ -957,7 +993,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	{
 		// do the base class post update
 		dCustomVehicleControllerManager::PostUpdate(timestep);
-
+/*
 		if (m_player) {
 			UpdateCamera (m_player, timestep);
 		} else {
@@ -965,30 +1001,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 			UpdateCamera (vehicleEntity, timestep);
 		}
-	}
-
-
-	void UpdateCamera (SuperCarEntity* const player, dFloat timestep)
-	{
-//return;		
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-		DemoCamera* const camera = scene->GetCamera();
-		dMatrix camMatrix (camera->GetNextMatrix ());
-		dMatrix playerMatrix (player->GetNextMatrix());
-
-		dVector frontDir (camMatrix[0]);
-		dVector camOrigin(0.0f); 
-		if (m_externalView) {
-			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
-			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
-//camOrigin = dVector (-7.0f, 3.0f, 0.0f, 0.0f);
-		} else {
-			dAssert (0);
-			//           camMatrix = camMatrix * playerMatrix;
-			//           camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
-		}
-
-		camera->SetNextMatrix (*scene, camMatrix, camOrigin);
+*/
 	}
 
 
