@@ -18,7 +18,7 @@
 #include "DemoCamera.h"
 #include "OpenGlUtil.h"
 #include "PhysicsUtils.h"
-#include "DemoCameraListener.h"
+#include "DemoCameraManager.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -27,11 +27,8 @@
 //#define USE_PICK_BODY_BY_FORCE
 
 
-#define D_CAMERA_LISTENER_NAMNE "cameraListener"
-
-DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
-	:DemoListenerBase(scene, D_CAMERA_LISTENER_NAMNE)
-	,m_camera (new DemoCamera())
+DemoCameraManager::DemoCameraManager(DemoEntityManager* const scene)
+	:m_camera (new DemoCamera())
 	,m_mousePosX(0)
 	,m_mousePosY(0)
 	,m_yaw (m_camera->GetYawAngle())
@@ -52,12 +49,12 @@ DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 {
 }
 
-DemoCameraListener::~DemoCameraListener()
+DemoCameraManager::~DemoCameraManager()
 {
 	m_camera->Release();
 }
 
-void DemoCameraListener::SetCameraMatrix(DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
+void DemoCameraManager::SetCameraMatrix(DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
 {
 	m_camera->SetMatrix(*scene, rotation, position);
 	m_camera->SetMatrix(*scene, rotation, position);
@@ -66,7 +63,7 @@ void DemoCameraListener::SetCameraMatrix(DemoEntityManager* const scene, const d
 }
 
 
-void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat timestep)
+void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timestep)
 {
 	// update the camera;
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -132,17 +129,14 @@ void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat times
 	UpdatePickBody(scene, timestep);
 }
 
-void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat timestep)
-{
-}
 
-void DemoCameraListener::SetCameraMouseLock (bool loockState)
+void DemoCameraManager::SetCameraMouseLock (bool loockState)
 {
 	m_mouseLockState = loockState;
 }
 
 
-void DemoCameraListener::RenderPickedTarget () const
+void DemoCameraManager::RenderPickedTarget () const
 {
 	if (m_targetPicked) {
 		dMatrix matrix;
@@ -155,7 +149,7 @@ void DemoCameraListener::RenderPickedTarget () const
 }
 
 
-void DemoCameraListener::InterpolateMatrices (DemoEntityManager* const scene, dFloat param)
+void DemoCameraManager::InterpolateMatrices (DemoEntityManager* const scene, dFloat param)
 {
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -171,7 +165,7 @@ void DemoCameraListener::InterpolateMatrices (DemoEntityManager* const scene, dF
 	}
 }
 
-void DemoCameraListener::OnBodyDestroy (NewtonBody* const body)
+void DemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 {
 	// remove the references pointer because the body is going to be destroyed
 	m_targetPicked = NULL;
@@ -179,7 +173,7 @@ void DemoCameraListener::OnBodyDestroy (NewtonBody* const body)
 }
 
 
-void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
+void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
 {
 	// handle pick body from the screen
 	bool mousePickState = scene->GetMouseKeyState(0);

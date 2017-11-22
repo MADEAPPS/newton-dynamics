@@ -19,7 +19,7 @@ class DemoMesh;
 class DemoEntity;
 class DemoCamera;
 class DemoMeshInterface;
-class DemoCameraListener;
+class DemoCameraManager;
 
 class DemoEntityManager: public dList <DemoEntity*>
 {
@@ -160,7 +160,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	DemoEntity* m_sky;
 	NewtonWorld* m_world;
-	DemoCameraListener* m_cameraManager;
+	DemoCameraManager* m_cameraManager;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
 	RenderGuiHelpCallback m_renderDemoGUI;

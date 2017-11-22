@@ -22,11 +22,11 @@
 #include "DemoListenerBase.h"
 
 class DemoCamera;
-class DemoCameraListener: public DemoListenerBase
+class DemoCameraManager
 {
 	public:
-	DemoCameraListener(DemoEntityManager* const scene);
-	~DemoCameraListener();
+	DemoCameraManager(DemoEntityManager* const scene);
+	~DemoCameraManager();
 
 	DemoCamera* GetCamera() const 
 	{
@@ -40,10 +40,9 @@ class DemoCameraListener: public DemoListenerBase
 	void RenderPickedTarget () const;
 	void InterpolateMatrices (DemoEntityManager* const scene, dFloat timeStepFraction);
 
-	private:
-	virtual void PreUpdate (const NewtonWorld* const world, dFloat timestep);
-	virtual void PostUpdate (const NewtonWorld* const world, dFloat timestep);
+	virtual void FixUpdate(const NewtonWorld* const world, dFloat timestep);
 
+	private:
 	virtual void OnBodyDestroy (NewtonBody* const body);
 	void UpdatePickBody (DemoEntityManager* const scene, dFloat timestep); 
 	

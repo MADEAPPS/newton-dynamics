@@ -472,6 +472,7 @@ class SuperCarEntity: public DemoEntity
 	// this function is an example of how to make a high performance super car
 	void BuildWheelCar (const CarDefinition& definition)
 	{
+/*
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
 		dFloat radius;
@@ -485,7 +486,7 @@ class SuperCarEntity: public DemoEntity
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
 		dWheelJoint* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
 		dWheelJoint* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
-/*
+
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
@@ -960,7 +961,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	#endif
 #endif
 
-		vehicle->ApplyDefualtDriver(driverInput, timestep);
+//	 vehicle->ApplyDefualtDriver(driverInput, timestep);
 	}
 
 

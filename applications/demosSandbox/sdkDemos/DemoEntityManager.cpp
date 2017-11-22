@@ -18,9 +18,9 @@
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "DemoCameraListener.h"
+#include "DemoCameraManager.h"
 #include "DemoEntityListener.h"
-#include "DemoCameraListener.h"
+#include "DemoCameraManager.h"
 #include "dHighResolutionTimer.h"
 
 #ifdef _MACOSX_VER
@@ -494,10 +494,10 @@ void DemoEntityManager::Cleanup ()
 	dCustomJoint::Initalize(m_world);
 
 	// add all physics pre and post listeners
-	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));
 	new DemoEntityListener (this);
-	m_cameraManager = new DemoCameraListener(this);
-	//	m_postListenerManager.Append (new DemoAIListener("aiManager"));
+
+	// add the camera manager
+	m_cameraManager = new DemoCameraManager(this);
 
 	ApplyMenuOptions();
 
@@ -1222,6 +1222,7 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 void DemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat timestep)
 {
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+	scene->m_cameraManager->FixUpdate(scene->GetNewton(), timestep);
 	if (scene->m_updateCamera) {
 		scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
 	}
