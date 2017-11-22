@@ -459,12 +459,11 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const chassisBody = controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(chassisBody));
 
-		//DemoEntity::TransformCallback(tireBody, tireMatrix, threadIndex);
-
 		dMatrix parentMatrix;
 		dMatrix matrix (tireMatrix);
 		NewtonBodyGetMatrix(chassisBody, &parentMatrix[0][0]);
-		matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
+//		matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
+		matrix = matrix * parentMatrix.Inverse();
 		dQuaternion rot (matrix);
 		tirePart->SetMatrix(*scene, rot, matrix.m_posit);
 	}
@@ -486,7 +485,7 @@ class SuperCarEntity: public DemoEntity
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
 		dWheelJoint* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
 		dWheelJoint* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
-
+/*
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
@@ -509,7 +508,7 @@ class SuperCarEntity: public DemoEntity
 		brakes->AddTire (rightRearTire);
 		m_controller->SetBrakes(brakes);
 
-/*
+
 		// add vehicle hand brakes
 		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		handBrakes->AddTire (leftRearTire);
