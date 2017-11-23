@@ -285,7 +285,7 @@ class SuperCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, dAbs (DEMO_GRAVITY));
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -409,8 +409,8 @@ class SuperCarEntity: public DemoEntity
 		DemoEntity* const tirePart = chassisEntity->Find (tireName);
 
 		// save the controller with the tire so that we can use it a callback 
-		TireVehControllerSaved* const m_ligmentMatrix = new TireVehControllerSaved(m_controller);
-		tirePart->SetUserData(m_ligmentMatrix);
+		TireVehControllerSaved* const savedVehController = new TireVehControllerSaved(m_controller);
+		tirePart->SetUserData(savedVehController);
 
 		// for simplicity, tires are position in global space
 		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix());
@@ -479,7 +479,7 @@ class SuperCarEntity: public DemoEntity
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
-		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
+//		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
 		dWheelJoint* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
 		dWheelJoint* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
 

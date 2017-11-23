@@ -101,7 +101,7 @@ enum dEulerAngleOrder
 template <class T>
 T dAbs(T A)
 {
-	// according to Intel this is better because is does not read after write
+	// this is far faster than the standard function (does not mess with cpu rounding mode)
 	return (A >= T(0.0f)) ? A : -A;
 }
 

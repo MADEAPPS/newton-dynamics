@@ -1623,7 +1623,7 @@ dCustomVehicleControllerManager::dCustomVehicleControllerManager(NewtonWorld* co
 		if (m_tireMaterial != materialsList[i]) {
 			NewtonMaterialSetContactGenerationCallback (world, m_tireMaterial, materialsList[i], OnContactGeneration);
 		}
-		NewtonMaterialSetCollisionCallback(world, m_tireMaterial, materialsList[i], OnTireAABBOverlap, OnTireContactsProcess);
+		NewtonMaterialSetCollisionCallback(world, m_tireMaterial, materialsList[i], OnTireAabbOverlap, OnTireContactsProcess);
 	}
 }
 
@@ -1656,9 +1656,6 @@ dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonC
 	controller->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
 	return controller;
 }
-
-
-
 
 dCustomVehicleController* dCustomVehicleControllerManager::Load(dCustomJointSaveLoad* const fileLoader)
 {
@@ -1729,7 +1726,7 @@ void dCustomVehicleController::Init(NewtonBody* const body, const dMatrix& local
 	m_sideSlip = 0.0f;
 	m_prevSideSlip = 0.0f;
 	m_finalized = false;
-	m_gravityMag = gravityMag;
+	m_gravityMag = dAbs (gravityMag);
 	m_weightDistribution = 0.5f;
 	m_aerodynamicsDownForce0 = 0.0f;
 	m_aerodynamicsDownForce1 = 0.0f;
@@ -1781,6 +1778,14 @@ dVector dCustomVehicleController::GetUpAxis() const
 	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
 	return chassisMatrix.RotateVector(m_localFrame.m_up);
 }
+
+dVector dCustomVehicleController::GetRightAxis() const
+{
+	dMatrix chassisMatrix;
+	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
+	return chassisMatrix.RotateVector(m_localFrame.m_right);
+}
+
 
 dVector dCustomVehicleController::GetFrontAxis() const
 {
@@ -2003,10 +2008,16 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
 	NewtonCollisionSetScale(manager->m_tireShapeTemplate, tireInfo.m_width, tireInfo.m_radio, tireInfo.m_radio);
 
-	dMatrix tireLocalRotation(dGrammSchmidt(locationInGlobalSpace.UnrotateVector(m_localFrame.m_right)));
+	dMatrix tireLocalRotation (dGetIdentityMatrix());
+	tireLocalRotation.m_front = GetRightAxis();
+	tireLocalRotation.m_up = GetUpAxis();
+	tireLocalRotation.m_right = tireLocalRotation.m_front.CrossProduct(tireLocalRotation.m_up);
+	tireLocalRotation = tireLocalRotation * locationInGlobalSpace.Inverse();
+	tireLocalRotation.m_posit = dVector (dFloat (0.0f), dFloat (0.0f), dFloat (0.0f), dFloat (1.0f));
+	//dMatrix tireLocalRotation__(dGrammSchmidt(locationInGlobalSpace.UnrotateVector(GetRightAxis())));
 	NewtonCollisionSetMatrix(manager->m_tireShapeTemplate, &tireLocalRotation[0][0]);
 
-	// create the rigid body that will make this bone
+	// create the rigid body that will make this tire
 	NewtonBody* const tireBody = NewtonCreateDynamicBody(world, manager->m_tireShapeTemplate, &locationInGlobalSpace[0][0]);
 	m_bodyList.Append(tireBody);
 
@@ -2020,11 +2031,11 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 	// set the standard force and torque call back
 	NewtonBodySetForceAndTorqueCallback(tireBody, m_forceAndTorqueCallback);
 
-	// tire are highly non linear, sung spherical inertia matrix make the calculation more accurate 
+	// tire tend to have asymmetrical inertia with is hard of the simulation, 
+	// using spherical inertia matrix make the calculation more stable.
 	dFloat inertia = 2.0f * tireInfo.m_mass * tireInfo.m_radio * tireInfo.m_radio / 5.0f;
 	NewtonBodySetMassMatrix(tireBody, tireInfo.m_mass, inertia, inertia, inertia);
 
-//	dMatrix matrix (dYawMatrix(-90.0f * 3.141592f / 180.0f) * locationInGlobalSpace);
 	dMatrix matrix(tireLocalRotation * locationInGlobalSpace);
 	matrix.m_posit += matrix.m_front.Scale(tireInfo.m_pivotOffset);
 	dWheelJoint* const joint = new dWheelJoint(matrix, tireBody, m_body, this, tireInfo);
@@ -2277,7 +2288,7 @@ void dCustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat downWe
 	m_aerodynamicsDownForceCoefficient = m_aerodynamicsDownForce0 / (m_aerodynamicsDownSpeedCutOff * m_aerodynamicsDownSpeedCutOff);
 }
 
-int dCustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 {
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)NewtonMaterialGetMaterialPairUserData(material);
 
@@ -2287,17 +2298,17 @@ int dCustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* con
 		const NewtonBody* const otherBody = body1;
 		const dWheelJoint* const tire = (dWheelJoint*) NewtonCollisionGetUserData1(collision0);
 		dAssert(tire->GetBody1() != otherBody);
-		return manager->OnTireAABBOverlap(material, tire, otherBody);
+		return manager->OnTireAabbOverlap(material, tire, otherBody);
 	} 
 	const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 	dAssert (NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData) ;
 	const NewtonBody* const otherBody = body0;
 	const dWheelJoint* const tire = (dWheelJoint*) NewtonCollisionGetUserData1(collision1);
 	dAssert(tire->GetBody1() != otherBody);
-	return manager->OnTireAABBOverlap(material, tire, otherBody);
+	return manager->OnTireAabbOverlap(material, tire, otherBody);
 }
 
-int dCustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const
+int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const
 {
 	for (int i = 0; i < tire->m_collidingCount; i ++) {
 		if (otherBody == tire->m_contactInfo[i].m_hitBody) {
@@ -2354,8 +2365,6 @@ int dCustomVehicleControllerManager::Collide(dWheelJoint* const tire, int thread
 
 	NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 	NewtonBodyGetMatrix(vehicleBody, &chassisMatrix[0][0]);
-//	tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-//	const dVector& tireSidePin = tireMatrix.m_front;
 	const dVector tireSidePin (tireMatrix.RotateVector(tire->GetMatrix0().m_front));
 	chassisMatrix = tire->GetMatrix1() * chassisMatrix;
 	chassisMatrix.m_posit += tireSidePin.Scale(tireSidePin.DotProduct3(tireMatrix.m_posit - chassisMatrix.m_posit));
