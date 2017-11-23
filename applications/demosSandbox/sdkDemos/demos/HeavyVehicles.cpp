@@ -717,6 +717,9 @@ class HeavyVehicleEntity: public DemoEntity
 
 	dWheelJoint* AddTire(const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const VehicleParameters& definition) 
 	{
+		dAssert(0);
+		return NULL;
+/*
 		NewtonBody* const chassis = m_controller->GetBody();
 		DemoEntity* const chassisEntiry = (DemoEntity*) NewtonBodyGetUserData(chassis);
 		DemoEntity* const tirePart = chassisEntiry->Find (tireName);
@@ -739,7 +742,7 @@ class HeavyVehicleEntity: public DemoEntity
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 
-		tireInfo.m_location = tireMatrix.m_posit;
+//		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
@@ -757,6 +760,7 @@ class HeavyVehicleEntity: public DemoEntity
 		NewtonBody* const tireBody = tireJoint->GetTireBody();
 		NewtonBodySetUserData(tireBody, tirePart);
 		return tireJoint;
+*/
 	}
 
 

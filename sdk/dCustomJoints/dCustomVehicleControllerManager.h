@@ -77,7 +77,6 @@ class dTireInfo
 		memset(this, 0, sizeof(dTireInfo));
 	}
 
-	dVector m_location;
 	dFloat m_mass;
 	dFloat m_radio;
 	dFloat m_width;
@@ -598,7 +597,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs, dFloat timestep);
 
 	CUSTOM_JOINTS_API void Finalize();
-	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dTireInfo& tireInfo);
+	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential);
 
@@ -606,6 +605,9 @@ class dCustomVehicleController: public dCustomControllerBase
 
 	CUSTOM_JOINTS_API dEngineJoint* GetEngineJoint() const;
 	CUSTOM_JOINTS_API dEngineJoint* AddEngineJoint (dFloat mass, dFloat armatureRadius);
+
+	CUSTOM_JOINTS_API dVector GetUpAxis() const;
+	CUSTOM_JOINTS_API dVector GetFrontAxis() const;
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 
@@ -660,6 +662,7 @@ class dCustomVehicleController: public dCustomControllerBase
 
 	void ApplyDownForce ();
 	
+	dMatrix m_localFrame;
 	dList<NewtonBody*> m_bodyList;
 	dList<dWheelJoint*> m_tireList;
 	dList<dDifferentialJoint*> m_differentialList;

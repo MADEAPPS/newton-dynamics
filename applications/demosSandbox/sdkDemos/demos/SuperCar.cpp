@@ -235,7 +235,7 @@ class SuperCarEntity: public DemoEntity
 		m_driveReverse,
 		m_preDriveReverse,
 	};
-
+/*
 	class TireAligmentTransform: public UserData
 	{
 		public: 
@@ -252,7 +252,7 @@ class SuperCarEntity: public DemoEntity
 		dMatrix m_matrix;
 		dCustomVehicleController* m_controller;
 	};
-
+*/
 
 	SuperCarEntity (DemoEntityManager* const scene, dCustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath, const CarDefinition& definition)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
@@ -279,10 +279,10 @@ class SuperCarEntity: public DemoEntity
 
 		// create the vehicle controller
 		dMatrix chassisMatrix;
-//		chassisMatrix.m_front = dVector (1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
-//		chassisMatrix.m_up	  = dVector (0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
-		chassisMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
+		chassisMatrix.m_front = dVector (1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
 		chassisMatrix.m_up	  = dVector (0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
+//		chassisMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
+//		chassisMatrix.m_up	  = dVector (0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
 		chassisMatrix.m_right = chassisMatrix.m_front.CrossProduct(chassisMatrix.m_up);	// this is in the side vehicle direction (the plane of the wheels)
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -410,22 +410,24 @@ class SuperCarEntity: public DemoEntity
 		DemoEntity* const chassisEntity = (DemoEntity*) NewtonBodyGetUserData(chassisBody);
 		DemoEntity* const tirePart = chassisEntity->Find (tireName);
 
+		
 		// the tire is located at position of the tire mesh relative to the chassis mesh
-		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(chassisEntity));
+//		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(chassisEntity));
+		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix());
 
 		// add the offset location
-		tireMatrix.m_posit.m_y += definition.m_tirePivotOffset;
+		tireMatrix.m_posit += m_controller->GetUpAxis().Scale (definition.m_tirePivotOffset);
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
-		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dYawMatrix(-0.5f * 3.141592f) : dYawMatrix(0.5f * 3.141592f));
-
-		TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix, m_controller);
-		tirePart->SetUserData(m_ligmentMatrix);
+		//dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dYawMatrix(-0.5f * 3.141592f) : dYawMatrix(0.5f * 3.141592f));
+		//TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix, m_controller);
+		//tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 
-		tireInfo.m_location = tireMatrix.m_posit;
+		//tireInfo.m_location = tireMatrix.m_posit;
+		//tireInfo.m_spinAxis = dVector(0.0f, 0.0f, 1.0f, 0.0f);
 		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
@@ -440,12 +442,12 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
 
-		dWheelJoint* const tireJoint = m_controller->AddTire (tireInfo);
+		dWheelJoint* const tireJoint = m_controller->AddTire (tireMatrix, tireInfo);
 		NewtonBody* const tireBody = tireJoint->GetTireBody (); 
 
-		// add the user data and a tire transform callback that calclate the tire local space matrix
-		NewtonBodySetUserData (tireBody, tirePart);
-		NewtonBodySetTransformCallback (tireBody, TireTransformCallback);
+		// add the user data and a tire transform callback that calculate the tire local space matrix
+//		NewtonBodySetUserData (tireBody, tirePart);
+//		NewtonBodySetTransformCallback (tireBody, TireTransformCallback);
 		return tireJoint;
 	}
 
@@ -453,6 +455,7 @@ class SuperCarEntity: public DemoEntity
 	// this transform make sure the tire matrix is relative to the chassis 
 	static void TireTransformCallback(const NewtonBody* tireBody, const dFloat* tireMatrix, int threadIndex)
 	{
+/*
 		DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(tireBody);
 		TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
 		dCustomVehicleController* const controller = aligmentMatrix->m_controller;
@@ -466,13 +469,14 @@ class SuperCarEntity: public DemoEntity
 		matrix = matrix * parentMatrix.Inverse();
 		dQuaternion rot (matrix);
 		tirePart->SetMatrix(*scene, rot, matrix.m_posit);
+*/
 	}
 
 
 	// this function is an example of how to make a high performance super car
 	void BuildWheelCar (const CarDefinition& definition)
 	{
-/*
+
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
 		dFloat radius;
@@ -492,7 +496,8 @@ class SuperCarEntity: public DemoEntity
 		CalculateTireDimensions ("rl_tire", width, radius);
 		dWheelJoint* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
-		
+
+/*
 		// add a steering Wheel component
 		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
@@ -961,7 +966,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	#endif
 #endif
 
-//	 vehicle->ApplyDefualtDriver(driverInput, timestep);
+	 vehicle->ApplyDefualtDriver(driverInput, timestep);
 	}
 
 

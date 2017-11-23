@@ -1612,8 +1612,9 @@ dCustomVehicleControllerManager::dCustomVehicleControllerManager(NewtonWorld* co
 	,m_tireMaterial(NewtonMaterialCreateGroupID(world))
 {
 	// create the normalized size tire shape
-	dMatrix alignment (dYawMatrix(90.0f * 3.141592f / 180.0f));
-	m_tireShapeTemplate = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, &alignment[0][0]);
+//	dMatrix alignment (dYawMatrix(90.0f * 3.141592f / 180.0f));
+//	m_tireShapeTemplate = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, &alignment[0][0]);
+	m_tireShapeTemplate = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
 	m_tireShapeTemplateData = NewtonCollisionDataPointer(m_tireShapeTemplate);
 
 	// create a tire material and associate with the material the vehicle new to collide 
@@ -1655,6 +1656,9 @@ dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonC
 	controller->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
 	return controller;
 }
+
+
+
 
 dCustomVehicleController* dCustomVehicleControllerManager::Load(dCustomJointSaveLoad* const fileLoader)
 {
@@ -1770,6 +1774,21 @@ void dCustomVehicleController::Init(NewtonBody* const body, const dMatrix& local
 	fprintf (file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
 #endif
 }
+
+dVector dCustomVehicleController::GetUpAxis() const
+{
+	dMatrix chassisMatrix;
+	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
+	return chassisMatrix.RotateVector(m_localFrame.m_up);
+}
+
+dVector dCustomVehicleController::GetFrontAxis() const
+{
+	dMatrix chassisMatrix;
+	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
+	return chassisMatrix.RotateVector(m_localFrame.m_front);
+}
+
 
 void dCustomVehicleController::Cleanup()
 {
@@ -1976,7 +1995,7 @@ bool dCustomVehicleController::ControlStateChanged() const
 	return inputChanged;
 }
 
-dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
+dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
 {
 	dVector drag(0.0f);
 
@@ -1984,14 +2003,11 @@ dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
 	NewtonCollisionSetScale(manager->m_tireShapeTemplate, tireInfo.m_width, tireInfo.m_radio, tireInfo.m_radio);
 
-	dMatrix locationInGlobalSpase;
-	NewtonBodyGetMatrix(m_body, &locationInGlobalSpase[0][0]);
-	locationInGlobalSpase.m_posit = locationInGlobalSpase.TransformVector(tireInfo.m_location);
-	locationInGlobalSpase = m_localFrame * locationInGlobalSpase;
-	dAssert (locationInGlobalSpase.m_posit.m_w == 1.0f);
+	dMatrix tireLocalRotation(dGrammSchmidt(locationInGlobalSpace.UnrotateVector(m_localFrame.m_right)));
+	NewtonCollisionSetMatrix(manager->m_tireShapeTemplate, &tireLocalRotation[0][0]);
 
 	// create the rigid body that will make this bone
-	NewtonBody* const tireBody = NewtonCreateDynamicBody(world, manager->m_tireShapeTemplate, &locationInGlobalSpase[0][0]);
+	NewtonBody* const tireBody = NewtonCreateDynamicBody(world, manager->m_tireShapeTemplate, &locationInGlobalSpace[0][0]);
 	m_bodyList.Append(tireBody);
 
 	NewtonCollision* const collision = NewtonBodyGetCollision(tireBody);
@@ -2008,7 +2024,8 @@ dWheelJoint* dCustomVehicleController::AddTire(const dTireInfo& tireInfo)
 	dFloat inertia = 2.0f * tireInfo.m_mass * tireInfo.m_radio * tireInfo.m_radio / 5.0f;
 	NewtonBodySetMassMatrix(tireBody, tireInfo.m_mass, inertia, inertia, inertia);
 
-	dMatrix matrix (dYawMatrix(-90.0f * 3.141592f / 180.0f) * locationInGlobalSpase);
+//	dMatrix matrix (dYawMatrix(-90.0f * 3.141592f / 180.0f) * locationInGlobalSpace);
+	dMatrix matrix(tireLocalRotation * locationInGlobalSpace);
 	matrix.m_posit += matrix.m_front.Scale(tireInfo.m_pivotOffset);
 	dWheelJoint* const joint = new dWheelJoint(matrix, tireBody, m_body, this, tireInfo);
 	m_tireList.Append(joint);
