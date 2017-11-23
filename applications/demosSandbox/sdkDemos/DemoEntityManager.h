@@ -151,7 +151,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void ErrorCallback(int error, const char* const description);
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat timestep);
 
-
 	void ApplyMenuOptions();
 
 	GLFWwindow* m_mainFrame;

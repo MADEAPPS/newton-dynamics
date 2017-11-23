@@ -235,13 +235,12 @@ class SuperCarEntity: public DemoEntity
 		m_driveReverse,
 		m_preDriveReverse,
 	};
-/*
-	class TireAligmentTransform: public UserData
+
+	class TireVehControllerSaved: public UserData
 	{
 		public: 
-		TireAligmentTransform (const dMatrix& matrix, dCustomVehicleController* const controller)
+		TireVehControllerSaved (dCustomVehicleController* const controller)
 			:UserData()
-			,m_matrix(matrix)
 			,m_controller(controller)
 		{
 		}
@@ -249,10 +248,9 @@ class SuperCarEntity: public DemoEntity
 		virtual void OnRender (dFloat timestep) const{};
 		virtual void OnInterpolateMatrix (DemoEntityManager& world, dFloat param) const{};
 
-		dMatrix m_matrix;
 		dCustomVehicleController* m_controller;
 	};
-*/
+
 
 	SuperCarEntity (DemoEntityManager* const scene, dCustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath, const CarDefinition& definition)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
@@ -410,24 +408,19 @@ class SuperCarEntity: public DemoEntity
 		DemoEntity* const chassisEntity = (DemoEntity*) NewtonBodyGetUserData(chassisBody);
 		DemoEntity* const tirePart = chassisEntity->Find (tireName);
 
-		
-		// the tire is located at position of the tire mesh relative to the chassis mesh
-//		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(chassisEntity));
+		// save the controller with the tire so that we can use it a callback 
+		TireVehControllerSaved* const m_ligmentMatrix = new TireVehControllerSaved(m_controller);
+		tirePart->SetUserData(m_ligmentMatrix);
+
+		// for simplicity, tires are position in global space
 		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix());
 
-		// add the offset location
+		// add the offset to the tire position to account for suspension span
 		tireMatrix.m_posit += m_controller->GetUpAxis().Scale (definition.m_tirePivotOffset);
-
-		// add and alignment matrix,to match visual mesh to physics collision shape
-		//dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dYawMatrix(-0.5f * 3.141592f) : dYawMatrix(0.5f * 3.141592f));
-		//TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix, m_controller);
-		//tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 
-		//tireInfo.m_location = tireMatrix.m_posit;
-		//tireInfo.m_spinAxis = dVector(0.0f, 0.0f, 1.0f, 0.0f);
 		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
@@ -446,30 +439,29 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const tireBody = tireJoint->GetTireBody (); 
 
 		// add the user data and a tire transform callback that calculate the tire local space matrix
-//		NewtonBodySetUserData (tireBody, tirePart);
-//		NewtonBodySetTransformCallback (tireBody, TireTransformCallback);
+		NewtonBodySetUserData (tireBody, tirePart);
+		NewtonBodySetTransformCallback (tireBody, TireTransformCallback);
 		return tireJoint;
 	}
 
-
 	// this transform make sure the tire matrix is relative to the chassis 
-	static void TireTransformCallback(const NewtonBody* tireBody, const dFloat* tireMatrix, int threadIndex)
+	// Note: this transform us only use because the tire in the model are children of the chassis
+	static void TireTransformCallback(const NewtonBody* const tireBody, const dFloat* const tireMatrix, int threadIndex)
 	{
-/*
 		DemoEntity* const tirePart = (DemoEntity*)NewtonBodyGetUserData(tireBody);
-		TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
-		dCustomVehicleController* const controller = aligmentMatrix->m_controller;
+		TireVehControllerSaved* const tireUserData = (TireVehControllerSaved*)tirePart->GetUserData();
+		dCustomVehicleController* const controller = tireUserData->m_controller;
 		NewtonBody* const chassisBody = controller->GetBody();
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(chassisBody));
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(tireBody));
+		dAssert (scene);
 
+		// calculate the local space matrix,
 		dMatrix parentMatrix;
 		dMatrix matrix (tireMatrix);
 		NewtonBodyGetMatrix(chassisBody, &parentMatrix[0][0]);
-//		matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
 		matrix = matrix * parentMatrix.Inverse();
 		dQuaternion rot (matrix);
 		tirePart->SetMatrix(*scene, rot, matrix.m_posit);
-*/
 	}
 
 
@@ -1086,6 +1078,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
+		//draw the schematic (laterals forces diagram for the player vehicle) 
 		m_player->m_controller->DrawSchematic(debugContext, 6.0f, 3.0f, 0.125f);
 		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}

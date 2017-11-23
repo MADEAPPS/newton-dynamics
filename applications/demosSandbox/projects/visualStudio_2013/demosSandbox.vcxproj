@@ -36,7 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sdkDemos\DemoCamera.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoCameraManager.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp" />
@@ -98,7 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\DemoCamera.h" />
-    <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoCameraManager.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntity.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h" />

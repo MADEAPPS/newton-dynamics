@@ -234,7 +234,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 1;
+	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -404,7 +404,6 @@ void DemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback, v
 	m_updateCamera = callback;
 	m_updateCameraContext = context;
 }
-
 
 int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
 {

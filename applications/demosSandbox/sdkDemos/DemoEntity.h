@@ -72,9 +72,6 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	static void TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
 
 	protected:
-
-
-
 	mutable dMatrix m_matrix;			// interpolated matrix
 	dVector m_curPosition;				// position one physics simulation step in the future
 	dVector m_nextPosition;             // position at the current physics simulation step

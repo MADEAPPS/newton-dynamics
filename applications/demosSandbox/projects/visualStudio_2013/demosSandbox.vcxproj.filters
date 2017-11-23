@@ -147,9 +147,6 @@
     <ClCompile Include="..\..\sdkDemos\main.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp">
-      <Filter>mainLogic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
@@ -163,6 +160,9 @@
       <Filter>mainLogic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoCameraManager.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,9 +197,6 @@
     <ClInclude Include="..\..\sdkDemos\DemoCamera.h">
       <Filter>mainLogic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h">
-      <Filter>mainLogic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoEntity.h">
       <Filter>mainLogic</Filter>
     </ClInclude>
@@ -213,6 +210,9 @@
       <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h">
+      <Filter>mainLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoCameraManager.h">
       <Filter>mainLogic</Filter>
     </ClInclude>
   </ItemGroup>
