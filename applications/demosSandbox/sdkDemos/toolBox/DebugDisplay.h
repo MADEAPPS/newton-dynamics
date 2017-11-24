@@ -33,6 +33,12 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 		glColor3f(1.0f, 1.0f, 1.0f);
+
+		GLint viewport[4];
+		glGetIntegerv (GL_VIEWPORT, viewport);
+		m_width = viewport[2]; 
+		m_height = viewport[3]; 
+
 		glBegin(GL_LINES);
 	}
 
@@ -52,6 +58,33 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 	{
 		glVertex3f(GLfloat (p0.m_x), GLfloat (p0.m_y), GLfloat (p0.m_z));
 		glVertex3f(GLfloat (p1.m_x), GLfloat (p1.m_y), GLfloat (p1.m_z));
+	}
+
+	virtual void SetOrthRendering() 
+	{
+		glEnd();
+
+		glPushMatrix();
+
+		glLoadIdentity();
+		glOrtho(0, m_width, 0, m_height, 0.0f, 1.0f);
+
+		dMatrix centerMatrix (dGetIdentityMatrix());
+		centerMatrix.m_posit.m_x = dFloat(m_width / 2);
+		centerMatrix.m_posit.m_y = dFloat(m_height / 2);
+
+		glPushMatrix();
+		glMultMatrix (&centerMatrix[0][0]);
+
+		glBegin(GL_LINES);
+	}
+
+	virtual void ResetOrthRendering() 
+	{
+		glEnd();
+		glPopMatrix();
+		glPopMatrix();
+		glBegin(GL_LINES);
 	}
 };
 

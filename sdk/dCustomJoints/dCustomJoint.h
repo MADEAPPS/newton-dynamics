@@ -92,16 +92,23 @@ class dCustomJoint: public dCustomAlloc
 		public:
 		dDebugDisplay (const dMatrix& cameraMatrix) 
 			:m_cameraMatrix(cameraMatrix)
+			,m_width(0)
+			,m_height(0)
 		{
 		}
 		virtual ~dDebugDisplay () {}
 
 		virtual void SetColor(const dVector& color) = 0;
 		virtual void DrawLine(const dVector& p0, const dVector& p1) = 0;
+		virtual void SetOrthRendering () {};
+		virtual void ResetOrthRendering () {};
+
 		const dMatrix& GetCameraMatrix() const {return m_cameraMatrix;}
 		CUSTOM_JOINTS_API void DrawFrame(const dMatrix& matrix);
 
 		dMatrix m_cameraMatrix;
+		int m_width;
+		int m_height;
 	};
 
 

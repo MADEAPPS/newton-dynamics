@@ -75,7 +75,7 @@ void DemoCamera::SetViewMatrix(int width, int height)
 			  m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);	
 
 
-	glGetIntegerv(GL_VIEWPORT, (GLint*)&m_viewport); 
+	glGetIntegerv(GL_VIEWPORT, m_viewport); 
 	glGetDoublev(GL_MODELVIEW_MATRIX, m_modelViewMatrix); 
 	glGetDoublev(GL_PROJECTION_MATRIX, m_projectionViewMatrix); 
 }

@@ -1445,52 +1445,53 @@ void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const
 void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const debugContext, dFloat x, dFloat y, dFloat scale) const
 {
 	dMatrix chassisMatrix;
-	dVector com(0.0f);
 	dVector array[32];
+/*
+	dVector com(0.0f);
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
-	NewtonBody* const chassisBody = GetBody();
-
 	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	chassisMatrix.m_posit = chassisMatrix.TransformVector(com);
 
 	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 	dMatrix chassisInvMatrix(chassisMatrix.Inverse());
+*/
 
-	dMatrix scaleMatrix (dGetIdentityMatrix());
-	scaleMatrix[0][0] = scale;
-	scaleMatrix[1][1] = scale;
-	scaleMatrix[2][2] = scale;
-	dMatrix placementMatrix (scaleMatrix * dRollMatrix(90.0f * 3.141592f / 180.0f) * dPitchMatrix(90.0f * 3.141592f / 180.0f));
-	placementMatrix.m_posit.m_x = 1.0f;
-	placementMatrix.m_posit.m_y =  y * scale;
-	placementMatrix.m_posit.m_z =  x * scale;
+	dMatrix matrix (dGetIdentityMatrix());
+	matrix[0][0] = scale;
+	matrix[1][1] = scale * 3.0f / 4.0f;
+	matrix[2][2] = 1.0f;
+	matrix.m_posit.m_x = x;
+	matrix.m_posit.m_y = y;
 
-	dMatrix projectionMatrix(placementMatrix * debugContext->GetCameraMatrix());
+	debugContext->SetOrthRendering();
+
+	NewtonBody* const chassisBody = GetBody();
+	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	{
 		// draw vehicle chassis
 		dVector p0(D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, 0.0f);
 		dVector p1(-D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, 0.0f);
 
 		for (dList<dWheelJoint*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			dMatrix matrix;
+			dMatrix tireMatrix;
 			dWheelJoint* const tireJoint = node->GetInfo();
 			NewtonBody* const tireBody = tireJoint->GetTireBody();
 			
-			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
-			dVector p(chassisInvMatrix.TransformVector(matrix.m_posit));
+			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
+			dVector p(chassisMatrix.UntransformVector(tireMatrix.m_posit));
 			p0 = dVector(dMin(p.m_x, p0.m_x), dMin(p.m_y, p0.m_y), dMin(p.m_z, p0.m_z), 1.0f);
 			p1 = dVector(dMax(p.m_x, p1.m_x), dMax(p.m_y, p1.m_y), dMax(p.m_z, p1.m_z), 1.0f);
 		}
 
 		debugContext->SetColor(dVector (1.0f, 1.0f, 1.0f, 1.0f));
-		array[0] = projectionMatrix.TransformVector (dVector(p0.m_x, p0.m_y, p0.m_z, 1.0f));
-		array[1] = projectionMatrix.TransformVector (dVector(p1.m_x, p0.m_y, p0.m_z, 1.0f));
-		array[2] = projectionMatrix.TransformVector (dVector(p1.m_x, p0.m_y, p1.m_z, 1.0f));
-		array[3] = projectionMatrix.TransformVector (dVector(p0.m_x, p0.m_y, p1.m_z, 1.0f));
+		array[0] = matrix.TransformVector (dVector(p0.m_x, p0.m_z, 0.0f, 1.0f));
+		array[1] = matrix.TransformVector (dVector(p1.m_x, p0.m_z, 0.0f, 1.0f));
+		array[2] = matrix.TransformVector (dVector(p1.m_x, p1.m_z, 0.0f, 1.0f));
+		array[3] = matrix.TransformVector (dVector(p0.m_x, p1.m_z, 0.0f, 1.0f));
 
 		debugContext->DrawLine(array[0], array[1]);
 		debugContext->DrawLine(array[1], array[2]);
@@ -1498,6 +1499,7 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 		debugContext->DrawLine(array[3], array[0]);
 	}
 
+/*
 	{
 		// draw vehicle tires
 		for (dList<dWheelJoint*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -1575,7 +1577,7 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 			matrix.m_right = (matrix.m_front.CrossProduct(matrix.m_up)).Normalize();
 			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
 
-/*
+#if 0
 			dVector origin(worldToComMatrix.TransformVector(matrix.m_posit));
 
 			dVector lateralForce(chassisMatrix.UnrotateVector(GetTireLateralForce(tire)));
@@ -1602,9 +1604,11 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 			array[0] = origin;
 			array[1] = origin + veloc.Scale(velocityScale);
 			manager->DrawSchematicCallback(this, "tireVelocity", 0, 2, array);
-*/
+#endif
 		}
 	}
+*/
+	debugContext->ResetOrthRendering();
 }
 
 dCustomVehicleControllerManager::dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const materialsList)
