@@ -1462,7 +1462,7 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix[0][0] = scale;
-	matrix[1][1] = scale * 3.0f / 4.0f;
+	matrix[1][1] = scale * debugContext->m_height / debugContext->m_width;
 	matrix[2][2] = 1.0f;
 	matrix.m_posit.m_x = x;
 	matrix.m_posit.m_y = y;
@@ -1499,32 +1499,24 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 		debugContext->DrawLine(array[3], array[0]);
 	}
 
-/*
 	{
 		// draw vehicle tires
 		for (dList<dWheelJoint*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			dMatrix matrix;
+			dMatrix tireMatrix;
 			dWheelJoint* const tireJoint = node->GetInfo();
 			dFloat width = tireJoint->m_width * 0.5f;
 			dFloat radio = tireJoint->m_radio;
 			NewtonBody* const tireBody = tireJoint->GetTireBody();
-			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
-			dMatrix offset (tireJoint->GetMatrix0());
-			offset.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-			matrix = offset * matrix;
-			matrix.m_up = chassisMatrix.m_up;
-			matrix.m_right = (matrix.m_front.CrossProduct(matrix.m_up)).Normalize();
-			matrix.m_front = matrix.m_up.CrossProduct(matrix.m_right);
+			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 
-			array[0] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector( width, 0.0f,  radio, 0.0f)));
-			array[1] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector( width, 0.0f, -radio, 0.0f)));
-			array[2] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f, -radio, 0.0f)));
-			array[3] = chassisInvMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f,  radio, 0.0f)));
+			dMatrix steerMatrix (dRollMatrix(-tireJoint->m_steerAngle0));
+			dVector origin(chassisMatrix.UntransformVector(tireMatrix.m_posit));
+			steerMatrix.m_posit = dVector (origin.m_x, origin.m_z, 0.0f, 1.0f);
 
-			array[0] = projectionMatrix.TransformVector(array[0]);
-			array[1] = projectionMatrix.TransformVector(array[1]);
-			array[2] = projectionMatrix.TransformVector(array[2]);
-			array[3] = projectionMatrix.TransformVector(array[3]);
+			array[0] = matrix.TransformVector(steerMatrix.TransformVector(dVector( radio,  width, 0.0f, 1.0f)));
+			array[1] = matrix.TransformVector(steerMatrix.TransformVector(dVector(-radio,  width, 0.0f, 1.0f)));
+			array[2] = matrix.TransformVector(steerMatrix.TransformVector(dVector(-radio, -width, 0.0f, 1.0f)));
+			array[3] = matrix.TransformVector(steerMatrix.TransformVector(dVector( radio, -width, 0.0f, 1.0f)));
 
 			debugContext->SetColor(dVector (0.0f, 0.0f, 0.0f, 1.0f));
 			debugContext->DrawLine(array[0], array[1]);
@@ -1534,6 +1526,7 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 		}
 	}
 
+/*
 	{
 		dFloat velocityScale = 0.125f;
 		// draw vehicle velocity
