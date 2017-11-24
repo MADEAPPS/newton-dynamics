@@ -175,7 +175,6 @@ void dgCollisionChamferCylinder::DebugCollision (const dgMatrix& matrix, dgColli
 		}
 	}
 
-	//dgMatrix matrix (GetLocalMatrix() * matrixPtr);
 	matrix.TransformTriplex (&pool[0].m_x, sizeof (dgTriplex), &pool[0].m_x, sizeof (dgTriplex), 24 * (12 + 1));
 
 	dgTriplex face[32];
