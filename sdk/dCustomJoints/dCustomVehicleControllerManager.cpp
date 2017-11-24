@@ -1786,7 +1786,6 @@ dVector dCustomVehicleController::GetRightAxis() const
 	return chassisMatrix.RotateVector(m_localFrame.m_right);
 }
 
-
 dVector dCustomVehicleController::GetFrontAxis() const
 {
 	dMatrix chassisMatrix;
