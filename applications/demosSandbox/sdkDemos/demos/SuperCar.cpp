@@ -958,7 +958,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	#endif
 #endif
 
-	 vehicle->ApplyDefualtDriver(driverInput, timestep);
+		vehicle->ApplyDefualtDriver(driverInput, timestep);
 	}
 
 
