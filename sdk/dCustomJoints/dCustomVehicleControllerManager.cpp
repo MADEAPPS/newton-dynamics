@@ -1725,6 +1725,12 @@ dVector dCustomVehicleController::GetFrontAxis() const
 	return chassisMatrix.RotateVector(m_localFrame.m_front);
 }
 
+dMatrix dCustomVehicleController::GetBasisMatrix() const
+{
+	dMatrix chassisMatrix;
+	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
+	return m_localFrame * chassisMatrix;
+}
 
 void dCustomVehicleController::Cleanup()
 {
@@ -3099,47 +3105,6 @@ void dCustomVehicleController::Collide(dWheelJoint* const tire, int threadIndex)
 	}
 }
 
-
-// Using brush tire model explained by Giancarlo Genta in his book, adapted to calculate friction coefficient instead tire forces
-void dTireFrictionModel::CalculateTireFrictionCoefficents(
-	const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material,
-	dFloat longitudinalSlip, dFloat lateralSlip, dFloat longitudinalStiffness, dFloat lateralStiffness,
-	dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const
-{
-	lateralSlip = dAbs(lateralSlip);
-	longitudinalSlip = dAbs(longitudinalSlip);
-
-	dAssert(lateralStiffness >= 0.0f);
-	dAssert(longitudinalStiffness >= 0.0f);
-	dFloat den = 1.0f / (1.0f + longitudinalSlip);
-
-	lateralSlip *= den;
-	longitudinalSlip *= den;
-
-	dFloat phy_y = lateralStiffness * lateralSlip;
-	dFloat phy_x = longitudinalStiffness * longitudinalSlip;
-
-	dFloat gamma = dMax(dSqrt(phy_x * phy_x + phy_y * phy_y), dFloat(0.1f));
-	dFloat fritionCoeficicent = dClamp(GetFrictionCoefficient(material, tire->GetBody0(), otherBody), dFloat(0.0f), dFloat(1.0f));
-
-	dFloat normalTireLoad = 1.0f * fritionCoeficicent;
-	dFloat phyMax = 3.0f * normalTireLoad + 1.0e-3f;
-	dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax + gamma * gamma / (3.0f * phyMax * phyMax))) : normalTireLoad;
-
-	dFloat fraction = F / gamma;
-	dAssert(fraction > 0.0f);
-	lateralFrictionCoef = phy_y * fraction;
-	longitudinalFrictionCoef = phy_x * fraction;
-
-	dAssert(lateralFrictionCoef >= 0.0f);
-	dAssert(lateralFrictionCoef <= 1.1f);
-	dAssert(longitudinalFrictionCoef >= 0.0f);
-	dAssert(longitudinalFrictionCoef <= 1.1f);
-
-	aligningTorqueCoef = 0.0f;
-}
-
-
 void dTireFrictionModel::CalculateTireForces(
 	const dWheelJoint* const tire, const NewtonBody* const otherBody,
 	dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat corneringStiffness,
@@ -3203,52 +3168,18 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 	}
 }
 
-
-/*
-void dCustomVehicleController::CalculateBodyCenteredDynamics(dFloat timestep, int threadID)
-{
-//	dMatrix matrix;
-//	dVector veloc;
-
-	// add force components
-	CalculateAerodynamicsForces();
-	CalculateSuspensionForces(timestep);
-	CalulateTireForces(timestep, threadID);
-	
-
-	NewtonBody* const chassisBody = GetBody();
-	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-	NewtonBodyGetVelocity(chassisBody, &veloc[0]);
-
-	dFloat speed_x = veloc.DotProduct3(matrix.m_front);
-	dFloat speed_z = veloc.DotProduct3(matrix.m_right);
-	if (dAbs(speed_x) > 1.0f) {
-		m_prevSideSlip = m_sideSlip;
-		m_sideSlip = speed_z / dAbs(speed_x);
-	} else {
-		m_sideSlip = 0.0f;
-		m_prevSideSlip = 0.0f;
-	}
-
-	static int xxx;
-	//dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/3.1416f, (m_sideSlip - m_prevSideSlip) * (180.0f / 3.1416f) / timestep));
-	xxx++;
-
-	if ((dAbs(m_sideSlip * 180.0f / 3.1416f) > 35.0f)) {
-		dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(m_sideSlip)));
-		NewtonBodyAddTorque(chassisBody, &xxx1[0]);
-	} else {
-		dFloat betaRate = (m_sideSlip - m_prevSideSlip) / timestep;
-		if (dAbs(betaRate * 180.0f / 3.1416f) > 15.0f) {
-			dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(betaRate)));
-			NewtonBodyAddTorque(chassisBody, &xxx1[0]);
-		}
-	}
-}
-*/
-
 void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 {
+	dMatrix axisMatrix(GetBasisMatrix());
+	dVector veloc(0.0f);
+	dVector omega(0.0f);
+	dVector force(0.0f);
+	dVector torque(0.0f);
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+
 	int isSleeping = NewtonBodyGetSleepState(m_body);
 	if (!isSleeping) {
 		// project integration error from previous frame
@@ -3262,15 +3193,14 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 		}
 	}
 
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
+	NewtonBodyGetOmega(m_body, &omega.m_x);
+	NewtonBodyGetVelocity(m_body, &veloc.m_x);
 	NewtonBodyGetMass(m_body, &mass, &Ixx, &Iyy, &Izz);
 	dFloat weight = mass * m_gravityMag;
 
 //dTrace(("frame %d: ", zzzzzzzzzz));
 	//	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
+
 	for (dList<dWheelJoint*>::dListNode* node = GetFirstTire(); node; node = GetNextTire(node)) {
 		dWheelJoint* const tireJoint = node->GetInfo();
 
@@ -3350,6 +3280,42 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 	}
 dTrace(("\n"));
 
+
+
+	dFloat torque_y = axisMatrix.m_up.DotProduct3(torque);
+	dFloat force_x = axisMatrix.m_front.DotProduct3(force);
+	dFloat force_z = axisMatrix.m_right.DotProduct3(force);
+
+	dFloat omega_y = axisMatrix.m_up.DotProduct3(omega);
+	dFloat veloc_x = axisMatrix.m_front.DotProduct3(veloc);
+	dFloat veloc_z = axisMatrix.m_right.DotProduct3(veloc);
+
+/*
+	dFloat speed_x = veloc.DotProduct3(matrix.m_front);
+	dFloat speed_z = veloc.DotProduct3(matrix.m_right);
+	if (dAbs(speed_x) > 1.0f) {
+		m_prevSideSlip = m_sideSlip;
+		m_sideSlip = speed_z / dAbs(speed_x);
+	} else {
+		m_sideSlip = 0.0f;
+		m_prevSideSlip = 0.0f;
+	}
+
+	static int xxx;
+	//dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/3.1416f, (m_sideSlip - m_prevSideSlip) * (180.0f / 3.1416f) / timestep));
+	xxx++;
+
+	if ((dAbs(m_sideSlip * 180.0f / 3.1416f) > 35.0f)) {
+		dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(m_sideSlip)));
+		NewtonBodyAddTorque(chassisBody, &xxx1[0]);
+	} else {
+		dFloat betaRate = (m_sideSlip - m_prevSideSlip) / timestep;
+		if (dAbs(betaRate * 180.0f / 3.1416f) > 15.0f) {
+			dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(betaRate)));
+			NewtonBodyAddTorque(chassisBody, &xxx1[0]);
+		}
+	}
+*/
 
 
 	for (dList<dWheelJoint*>::dListNode* node = GetFirstTire(); node; node = GetNextTire(node)) {

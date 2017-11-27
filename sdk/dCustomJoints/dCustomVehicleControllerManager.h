@@ -105,10 +105,6 @@ class dTireFrictionModel
 		return 1.0f;
 	}
 
-	virtual void CalculateTireFrictionCoefficents(const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material,
-		dFloat longitudinalSlip, dFloat lateralSlip, dFloat longitudinalStiffness, dFloat lateralStiffness,
-		dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const;
-
 	virtual void CalculateTireForces(const dWheelJoint* const tire, const NewtonBody* const otherBody,
 		dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat corneringStiffness,
 		dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const;
@@ -619,6 +615,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dVector GetUpAxis() const;
 	CUSTOM_JOINTS_API dVector GetRightAxis() const;
 	CUSTOM_JOINTS_API dVector GetFrontAxis() const;
+	CUSTOM_JOINTS_API dMatrix GetBasisMatrix() const;
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 
