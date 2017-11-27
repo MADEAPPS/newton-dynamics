@@ -81,25 +81,33 @@ int dCustomJointSaveLoad::LoadInt() const
 
 dFloat dCustomJointSaveLoad::LoadFloat() const
 {
-	dFloat val;
+	dFloat32 val;
 	fscanf(m_file, "%f", &val);
 	return val;
 }
 
 dVector dCustomJointSaveLoad::LoadVector() const
 {
-	dVector val(0.0f);
-	fscanf(m_file, "%f %f %f", &val.m_x, &val.m_y, &val.m_z);
-	return val;
+	dFloat32 x;
+	dFloat32 y;
+	dFloat32 z;
+	fscanf(m_file, "%f %f %f", &x, &y, &z);
+	return dVector (x, y, z, 0.0f);
 }
 
 dMatrix dCustomJointSaveLoad::LoadMatrix () const
 {
-	dVector euler;
-	dVector posit;
-	fscanf(m_file, "%f %f %f %f %f %f", &euler.m_x, &euler.m_y, &euler.m_z, &posit.m_x, &posit.m_y, &posit.m_z);
+	dFloat32 x;
+	dFloat32 y;
+	dFloat32 z;
+	dFloat32 p;
+	dFloat32 q;
+	dFloat32 r;
+	fscanf(m_file, "%f %f %f %f %f %f", &p, &q, &r, &x, &y, &z);
 
-	posit.m_w = 1.0f;
+	dVector euler(p, q, r, 0.0f);
+	dVector posit(x, y, z, 1.0f);
+
 	euler = euler.Scale(3.141592f / 180.0f);
 	return dMatrix (euler.m_x, euler.m_y, euler.m_z, posit);
 }

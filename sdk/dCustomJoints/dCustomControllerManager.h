@@ -53,7 +53,7 @@ class dCustomControllerConvexCastPreFilter
 	protected:
 	const NewtonBody* m_me;
 	friend class dCustomPlayerController;
-	friend class dCustomVehicleControllerManager;
+	friend class dCustomVehicleController;
 };
 
 

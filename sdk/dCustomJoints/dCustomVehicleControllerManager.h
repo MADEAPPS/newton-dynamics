@@ -85,8 +85,7 @@ class dTireInfo
 	dFloat m_dampingRatio;
 	dFloat m_springStrength;
 	dFloat m_suspensionLength;
-	dFloat m_lateralStiffness;
-	dFloat m_longitudialStiffness;
+	dFloat m_corneringStiffness;
 	dFloat m_aligningMomentTrail;
 	int m_hasFender;
 	dSuspensionType m_suspentionType;
@@ -109,6 +108,11 @@ class dTireFrictionModel
 	virtual void CalculateTireFrictionCoefficents(const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material,
 		dFloat longitudinalSlip, dFloat lateralSlip, dFloat longitudinalStiffness, dFloat lateralStiffness,
 		dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const;
+
+	virtual void CalculateTireForces(const dWheelJoint* const tire, const NewtonBody* const otherBody,
+		dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat corneringStiffness,
+		dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const;
+
 
 	const dCustomVehicleController* m_controller;
 };
@@ -228,15 +232,18 @@ class dWheelJoint: public dCustomJoint
 	dFloat m_aligningTorque;
 	dFloat m_longitudinalSlip;
 	dFloat m_aligningMomentTrail;
-	dFloat m_lateralStiffness;
-	dFloat m_longitudialStiffness;
+	dFloat m_corneringStiffness;
 	dFloat m_maxSteeringAngle;
 
 	dCustomVehicleController* m_controller;
 	int m_suspentionType;
 	int m_hasFender;
-	int m_collidingCount;
+	int m_contactCount;
+#ifdef _DEBUG
+	int m_index;
+#endif
 	NewtonWorldConvexCastReturnInfo m_contactInfo[4];
+	dVector m_contactLongitudinalDir[4];
 
 	friend class dBrakeController;
 	friend class dEngineController;
@@ -593,6 +600,7 @@ class dBrakeController: public dVehicleController
 
 class dCustomVehicleController: public dCustomControllerBase
 {
+	class dTireFilter;
 	public:
 	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs, dFloat timestep);
 
@@ -647,7 +655,7 @@ class dCustomVehicleController: public dCustomControllerBase
 
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
 	
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
@@ -655,13 +663,15 @@ class dCustomVehicleController: public dCustomControllerBase
 	bool ControlStateChanged() const;
 	void Init (NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Init (NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	
-	void CalculateSideSlipDynamics(dFloat timestep);
-	void ApplySuspensionForces (dFloat timestep) const;
-	dVector GetLastLateralForce(dWheelJoint* const tire) const;
 	void Cleanup();
-
-	void ApplyDownForce ();
+	
+	void CalculateAerodynamicsForces ();
+	void CalculateSuspensionForces (dFloat timestep);
+	void CalulateTireForces (dFloat timestep, int threadID);
+	void CalculateBodyCenteredDynamics(dFloat timestep, int threadID);
+	void Collide (dWheelJoint* const tire, int threadIndex);
+	
+	dVector GetLastLateralForce(dWheelJoint* const tire) const;
 	
 	dMatrix m_localFrame;
 	dList<NewtonBody*> m_bodyList;
@@ -696,7 +706,6 @@ class dCustomVehicleController: public dCustomControllerBase
 
 class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVehicleController> 
 {
-	class dTireFilter;
 	public:
 	CUSTOM_JOINTS_API dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials);
 	CUSTOM_JOINTS_API virtual ~dCustomVehicleControllerManager();
@@ -716,10 +725,9 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
 
 	protected:
-	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);
-	CUSTOM_JOINTS_API int OnContactGeneration (const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
+	void OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);
+	int OnContactGeneration(const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
 	
-	int Collide (dWheelJoint* const tire, int threadIndex) const;
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static int OnTireAabbOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 	static int OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex);

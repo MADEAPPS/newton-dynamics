@@ -58,10 +58,13 @@
 	#endif
 #endif
 
+#ifndef dFloat32
+	#define dFloat32 float
+#endif
+
 #ifndef dFloat64
 	#define dFloat64 double
 #endif
-
 
 #ifdef __cplusplus 
 extern "C" {

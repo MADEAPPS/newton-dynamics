@@ -38,7 +38,6 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 		glGetIntegerv (GL_VIEWPORT, viewport);
 		m_width = viewport[2]; 
 		m_height = viewport[3]; 
-
 		glBegin(GL_LINES);
 	}
 
@@ -63,18 +62,20 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 	virtual void SetOrthRendering() 
 	{
 		glEnd();
+		glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
 
 		glPushMatrix();
-
 		glLoadIdentity();
-		glOrtho(0, m_width, 0, m_height, 0.0f, 1.0f);
+		glOrtho(0.0f, m_width, m_height, 0.0f, 0.0f, 1.0f);
 
-		dMatrix centerMatrix (dGetIdentityMatrix());
-		centerMatrix.m_posit.m_x = dFloat(m_width / 2);
-		centerMatrix.m_posit.m_y = dFloat(m_height / 2);
-
+		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		glMultMatrix (&centerMatrix[0][0]);
+		glLoadIdentity();
+
+		float x = 0.0f;
+		float y = 0.0f;
+		glTranslated(x, y, 0);
 
 		glBegin(GL_LINES);
 	}
@@ -82,8 +83,17 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 	virtual void ResetOrthRendering() 
 	{
 		glEnd();
+
+		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
+
+		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
+
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+		glLoadIdentity();
+
 		glBegin(GL_LINES);
 	}
 };

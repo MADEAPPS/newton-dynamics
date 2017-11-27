@@ -60,15 +60,14 @@ struct CarDefinition
 	dFloat m_egineRPMAtPeakHorsePower;
 	dFloat m_engineRPMAtRedLine;
 	dFloat m_vehicleTopSpeed;
-	dFloat m_tireLaretalStiffeness;
-	dFloat m_tireLongitudinalStiffness;
+	dFloat m_corneringStiffness;
 	dFloat m_tireAligningMomemtTrail;
-	dFloat m_TireSuspensionSpringConstant;
-	dFloat m_TireSuspensionDamperConstant;
-	dFloat m_TireSuspensionLength;
-	dSuspensionType m_TireSuspensionType;
-	dFloat m_TireBrakesTorque;
+	dFloat m_tireSuspensionSpringConstant;
+	dFloat m_tireSuspensionDamperConstant;
+	dFloat m_tireSuspensionLength;
+	dFloat m_tireBrakesTorque;
 	dFloat m_tirePivotOffset;
+	dFloat m_tireVerticalOffsetTweak;
 	dFloat m_transmissionGearRatio0;
 	dFloat m_transmissionGearRatio1;
 	dFloat m_transmissionGearRatio2;
@@ -82,6 +81,7 @@ struct CarDefinition
 	dFloat m_aerodynamicsDownForceSpeedFactor;
 	int m_wheelHasCollisionFenders;
 	int m_differentialType; // 0 rear wheel drive, 1 front wheel drive, 3 four wheel drive
+	dSuspensionType m_tireSuspensionType;
 };
 
 static CarDefinition monsterTruck = 
@@ -102,15 +102,14 @@ static CarDefinition monsterTruck =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	1.2f,										// TIRE_LATERAL_STIFFNESS
-	1.2f,										// TIRE_LONGITUDINAL_STIFFNESS
+	1.0f,										// TIRE_CORNERING_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	m_confort,									// TIRE_SUSPENSION_TYPE
 	2000.0f,									// TIRE_BRAKE_TORQUE
-	-0.0f,										// TIRE_PIVOT_OFFSET_Y
+	0.0f,										// TIRE_PIVOT_OFFSET_Z
+	0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
 	1.30f,										// TIRE_GEAR_3
@@ -124,6 +123,7 @@ static CarDefinition monsterTruck =
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,											// WHEEL_HAS_FENDER
 	2,											// DIFFERENTIAL_TYPE
+	m_confort,									// TIRE_SUSPENSION_TYPE
 };
 
 static CarDefinition viper = 
@@ -144,15 +144,14 @@ static CarDefinition viper =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	1.0f,										// TIRE_LATERAL_STIFFNESS
-	1.0f,										// TIRE_LONGITUDINAL_STIFFNESS
+	1.0f,										// TIRE_CORNERING_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	m_confort,									// TIRE_SUSPENSION_TYPE
 	2000.0f,									// TIRE_BRAKE_TORQUE
-	-0.0f,										// TIRE_PIVOT_OFFSET_Y
+	0.0f,										// TIRE_PIVOT_OFFSET_Z
+	0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
 	1.30f,										// TIRE_GEAR_3
@@ -166,6 +165,7 @@ static CarDefinition viper =
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	1,											// WHEEL_HAS_FENDER
 	0,											// DIFFERENTIAL_TYPE
+	m_confort,									// TIRE_SUSPENSION_TYPE
 };
 
 
@@ -411,12 +411,13 @@ class SuperCarEntity: public DemoEntity
 		// save the controller with the tire so that we can use it a callback 
 		TireVehControllerSaved* const savedVehController = new TireVehControllerSaved(m_controller);
 		tirePart->SetUserData(savedVehController);
-
+		
 		// for simplicity, tires are position in global space
 		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix());
 
 		// add the offset to the tire position to account for suspension span
-		tireMatrix.m_posit += m_controller->GetUpAxis().Scale (definition.m_tirePivotOffset);
+		//tireMatrix.m_posit += m_controller->GetUpAxis().Scale (definition.m_tirePivotOffset);
+		tireMatrix.m_posit -= m_controller->GetUpAxis().Scale (definition.m_tireVerticalOffsetTweak);
 
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
@@ -426,14 +427,13 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = pivotOffset;
 		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f; 
-		tireInfo.m_dampingRatio = definition.m_TireSuspensionDamperConstant;
-		tireInfo.m_springStrength = definition.m_TireSuspensionSpringConstant;
-		tireInfo.m_suspensionLength = definition.m_TireSuspensionLength;
-		tireInfo.m_lateralStiffness = dAbs (definition.m_tireLaretalStiffeness);
-		tireInfo.m_longitudialStiffness = dAbs (definition.m_tireLongitudinalStiffness);
+		tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
+		tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
+		tireInfo.m_suspensionLength = definition.m_tireSuspensionLength;
+		tireInfo.m_corneringStiffness = definition.m_corneringStiffness;
 		tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
-		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
+		tireInfo.m_suspentionType = definition.m_tireSuspensionType;
 
 		dWheelJoint* const tireJoint = m_controller->AddTire (tireMatrix, tireInfo);
 		NewtonBody* const tireBody = tireJoint->GetTireBody (); 
@@ -488,8 +488,7 @@ class SuperCarEntity: public DemoEntity
 		CalculateTireDimensions ("rl_tire", width, radius);
 		dWheelJoint* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		dWheelJoint* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
-
-
+		
 		// add a steering Wheel component
 		dSteeringController* const steering = new dSteeringController(m_controller);
 		steering->AddTire(leftFrontTire);
@@ -499,7 +498,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
-		dBrakeController* const brakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque);
+		dBrakeController* const brakes = new dBrakeController (m_controller, definition.m_tireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
 		brakes->AddTire (rightFrontTire);
 		brakes->AddTire (leftRearTire);
@@ -507,7 +506,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add vehicle hand brakes
-		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_TireBrakesTorque);
+		dBrakeController* const handBrakes = new dBrakeController (m_controller, definition.m_tireBrakesTorque * 2.0f);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
@@ -1078,7 +1077,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		//draw the schematic (laterals forces diagram for the player vehicle) 
-		m_player->m_controller->DrawSchematic(debugContext, debugContext->m_width/2 - 170.0f, debugContext->m_height/2 - 230.0f, 60.0f);
+		//m_player->m_controller->DrawSchematic(debugContext, 150.0f, 120.0f, 60.0f);
+		m_player->m_controller->DrawSchematic(debugContext, 350.0f, 220.0f, 100.0f);
 		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}
 
