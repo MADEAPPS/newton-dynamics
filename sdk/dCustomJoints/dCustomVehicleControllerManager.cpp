@@ -3357,7 +3357,7 @@ dTrace(("\n"));
 		const int contactCount = tireJoint->m_contactCount;
 		if (contactCount) {
 			for (int i = 0; i < contactCount; i++) {
-				tireJoint->m_lateralSpeed[i] = 1.0f;
+//				tireJoint->m_lateralSpeed[i] = 1.0f;
 				tireJoint->m_longitudinalSpeed[i] = 2.0f;
 			}
 		}
