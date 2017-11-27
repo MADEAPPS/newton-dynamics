@@ -3354,11 +3354,13 @@ dTrace(("\n"));
 
 	for (dList<dWheelJoint*>::dListNode* node = GetFirstTire(); node; node = GetNextTire(node)) {
 		dWheelJoint* const tireJoint = node->GetInfo();
-		const int contactCount = tireJoint->m_contactCount;
-		if (contactCount) {
-			for (int i = 0; i < contactCount; i++) {
-//				tireJoint->m_lateralSpeed[i] = 1.0f;
-				tireJoint->m_longitudinalSpeed[i] = 2.0f;
+		if (tireJoint->m_index >= 0) {
+			const int contactCount = tireJoint->m_contactCount;
+			if (contactCount) {
+				for (int i = 0; i < contactCount; i++) {
+					//tireJoint->m_lateralSpeed[i] = 1.0f;
+					tireJoint->m_longitudinalSpeed[i] = 2.0f;
+				}
 			}
 		}
 	}
