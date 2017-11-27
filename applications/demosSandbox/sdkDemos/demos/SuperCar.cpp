@@ -277,10 +277,12 @@ class SuperCarEntity: public DemoEntity
 
 		// create the vehicle controller
 		dMatrix chassisMatrix;
+#if 0
 		chassisMatrix.m_front = dVector (1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
-		chassisMatrix.m_up	  = dVector (0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
-//		chassisMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
-//		chassisMatrix.m_up	  = dVector (0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
+#else
+		chassisMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
+#endif
+		chassisMatrix.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
 		chassisMatrix.m_right = chassisMatrix.m_front.CrossProduct(chassisMatrix.m_up);	// this is in the side vehicle direction (the plane of the wheels)
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 

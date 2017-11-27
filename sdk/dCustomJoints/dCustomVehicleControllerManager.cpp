@@ -1987,7 +1987,6 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
 {
-//	dMatrix matrix;
 	dVector origin;
 	dFloat Ixx;
 	dFloat Iyy;
@@ -2021,15 +2020,15 @@ origin.m_y += 1.0f;
 	NewtonDestroyCollision(collision);
 
 	dMatrix pinMatrix(matrix);
-	pinMatrix.m_front = matrix.m_front;
 	pinMatrix.m_up = matrix.m_right;
+	pinMatrix.m_front = matrix.m_front;
 	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
 	dDifferentialJoint* const differentialJoint = new dDifferentialJoint(pinMatrix, differentialBody, m_body);
 	m_differentialList.Append(differentialJoint);
 
 	m_bodyList.Append(differentialBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
-
+/*
 	dMatrix chassisMatrix;
 	dMatrix differentialMatrix;
 	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
@@ -2046,7 +2045,7 @@ origin.m_y += 1.0f;
 	NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 	rightTireMatrix = rightTire->GetMatrix0() * rightTireMatrix;
 	new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightTireBody, differentialBody);
-
+*/
 	return differentialJoint;
 }
 
