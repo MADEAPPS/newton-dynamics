@@ -1998,7 +1998,6 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 
 	// get engine location (place at the body center of mass)
 	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
-//	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 	dMatrix matrix(GetBasisMatrix());
 origin.m_y += 1.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
@@ -2028,24 +2027,19 @@ origin.m_y += 1.0f;
 
 	m_bodyList.Append(differentialBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
-/*
-	dMatrix chassisMatrix;
-	dMatrix differentialMatrix;
-	NewtonBodyGetMatrix(m_body, &chassisMatrix[0][0]);
-	NewtonBodyGetMatrix(differentialBody, &differentialMatrix[0][0]);
 	
 	dMatrix leftTireMatrix;
 	NewtonBody* const leftTireBody = leftTire->GetBody0();
 	NewtonBodyGetMatrix(leftTireBody, &leftTireMatrix[0][0]);
 	leftTireMatrix = leftTire->GetMatrix0() * leftTireMatrix;
-	new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftTireBody, differentialBody);
-
+	new dAxelJoint(leftTireMatrix[0], pinMatrix[0].Scale(-1.0f), pinMatrix[1], leftTireBody, differentialBody);
+	
 	dMatrix rightTireMatrix;
 	NewtonBody* const rightTireBody = rightTire->GetBody0();
 	NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 	rightTireMatrix = rightTire->GetMatrix0() * rightTireMatrix;
-	new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightTireBody, differentialBody);
-*/
+	new dAxelJoint(rightTireMatrix[0], pinMatrix[0].Scale(1.0f), pinMatrix[1], rightTireBody, differentialBody);
+
 	return differentialJoint;
 }
 
@@ -3321,12 +3315,13 @@ dTrace(("\n"));
 
 	for (dList<dWheelJoint*>::dListNode* node = GetFirstTire(); node; node = GetNextTire(node)) {
 		dWheelJoint* const tireJoint = node->GetInfo();
-		if (tireJoint->m_index >= 0) {
+		if (tireJoint->m_index >= 2) {
 			const int contactCount = tireJoint->m_contactCount;
 			if (contactCount) {
 				for (int i = 0; i < contactCount; i++) {
 					//tireJoint->m_lateralSpeed[i] = 1.0f;
-					tireJoint->m_longitudinalSpeed[i] = 2.0f;
+					//tireJoint->m_longitudinalSpeed[i] = 2.0f;
+					tireJoint->m_longitudinalSpeed[i] = tireJoint->m_index == 2 ? 1.0f : -1.0f;
 				}
 			}
 		}

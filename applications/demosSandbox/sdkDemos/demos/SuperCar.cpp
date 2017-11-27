@@ -277,7 +277,7 @@ class SuperCarEntity: public DemoEntity
 
 		// create the vehicle controller
 		dMatrix chassisMatrix;
-#if 0
+#if 1
 		chassisMatrix.m_front = dVector (1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
 #else
 		chassisMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
