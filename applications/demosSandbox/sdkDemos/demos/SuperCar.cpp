@@ -102,7 +102,7 @@ static CarDefinition monsterTruck =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	1.0f,										// TIRE_CORNERING_STIFFNESS
+	4.0f,										// TIRE_CORNERING_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
@@ -144,7 +144,7 @@ static CarDefinition viper =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	1.0f,										// TIRE_CORNERING_STIFFNESS
+	4.0f,										// TIRE_CORNERING_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
@@ -1076,10 +1076,10 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
+		dCustomVehicleControllerManager::OnDebug(debugContext);
 		//draw the schematic (laterals forces diagram for the player vehicle) 
 		//m_player->m_controller->DrawSchematic(debugContext, 150.0f, 120.0f, 60.0f);
 		m_player->m_controller->DrawSchematic(debugContext, 350.0f, 220.0f, 100.0f);
-		dCustomVehicleControllerManager::OnDebug(debugContext);
 	}
 
 	bool m_externalView;

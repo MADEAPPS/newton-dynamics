@@ -243,7 +243,9 @@ class dWheelJoint: public dCustomJoint
 	int m_index;
 #endif
 	NewtonWorldConvexCastReturnInfo m_contactInfo[4];
-	dVector m_contactLongitudinalDir[4];
+	dVector m_contactTangentDir0[4];
+	dFloat m_lateralSpeed[4];
+	dFloat m_longitudinalSpeed[4];
 
 	friend class dBrakeController;
 	friend class dEngineController;
@@ -668,7 +670,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	void CalculateAerodynamicsForces ();
 	void CalculateSuspensionForces (dFloat timestep);
 	void CalulateTireForces (dFloat timestep, int threadID);
-	void CalculateBodyCenteredDynamics(dFloat timestep, int threadID);
 	void Collide (dWheelJoint* const tire, int threadIndex);
 	
 	dVector GetLastLateralForce(dWheelJoint* const tire) const;
