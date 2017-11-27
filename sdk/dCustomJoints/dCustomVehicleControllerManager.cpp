@@ -3172,110 +3172,16 @@ void dTireFrictionModel::CalculateTireForces(
 
 void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tireJoint, const NewtonBody* const otherBody, dFloat timestep)
 {
-/*
-	dMatrix tireMatrix;
-	dMatrix chassisMatrix;
-	dVector tireOmega(0.0f);
-	dVector tireVeloc(0.0f);
-
+	dVector normal(0.0f);
+	dVector contactPoint(0.0f);
+	dVector lateralDir(0.0f);
+	dVector longitudinalDir(0.0f);
+	dVector velocity(0.0f);
 	NewtonBody* const tireBody = tireJoint->GetBody0();
 	dAssert(tireBody == tireJoint->GetTireBody());
-	dAssert((tireBody == NewtonJointGetBody0(contactJoint)) || (tireBody == NewtonJointGetBody1(contactJoint)));
-	const dCustomVehicleController* const controller = tireJoint->GetController();
-
-	tireJoint->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-
-	NewtonBodyGetOmega(tireBody, &tireOmega[0]);
-	NewtonBodyGetVelocity(tireBody, &tireVeloc[0]);
-
-	dVector lateralPin(tireMatrix.m_front);
-	dVector longitudinalPin(tireMatrix.m_front.CrossProduct(chassisMatrix.m_up));
-
-	tireJoint->m_lateralSlip = 0.0f;
-	tireJoint->m_aligningTorque = 0.0f;
-	tireJoint->m_longitudinalSlip = 0.0f;
-
-	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-		dVector contactPoint(0.0f);
-		dVector contactNormal(0.0f);
-
-		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-		NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
-		NewtonMaterialGetContactPositionAndNormal(material, tireBody, &contactPoint[0], &contactNormal[0]);
-
-		dVector tireAnglePin(contactNormal.CrossProduct(lateralPin));
-		dFloat pinMag2 = tireAnglePin.DotProduct3(tireAnglePin);
-		if (pinMag2 > 0.25f) {
-			// brush rubber tire friction model
-			// project the contact point to the surface of the collision shape
-			dVector contactPatch(contactPoint - lateralPin.Scale((contactPoint - tireMatrix.m_posit).DotProduct3(lateralPin)));
-			dVector dp(contactPatch - tireMatrix.m_posit);
-			dVector radius(dp.Scale(tireJoint->m_radio / dSqrt(dp.DotProduct3(dp))));
-
-			dVector lateralContactDir(0.0f);
-			dVector longitudinalContactDir(0.0f);
-			NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
-
-			dFloat tireOriginLongitudinalSpeed = tireVeloc.DotProduct3(longitudinalContactDir);
-			dFloat tireContactLongitudinalSpeed = -longitudinalContactDir.DotProduct3(tireOmega.CrossProduct(radius));
-
-			//			if ((dAbs(tireOriginLongitudinalSpeed) < (1.0f)) || (dAbs(tireContactLongitudinalSpeed) < 0.1f)) {
-			if (dAbs(tireOriginLongitudinalSpeed) < (0.1f)) {
-				// vehicle moving low speed, do normal coulomb friction
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-			}
-			else {
-
-				// calculating Brush tire model with longitudinal and lateral coupling 
-				// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
-				// reduces to this, which may have a divide by zero locked, so I am clamping to some small value
-				// dFloat k = (vw - vx) / vx;
-				if (dAbs(tireContactLongitudinalSpeed) < 0.01f) {
-					tireContactLongitudinalSpeed = 0.01f * dSign(tireContactLongitudinalSpeed);
-				}
-				tireJoint->m_longitudinalSlip = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
-
-				dFloat lateralSpeed = tireVeloc.DotProduct3(lateralPin);
-				dFloat longitudinalSpeed = tireVeloc.DotProduct3(longitudinalPin);
-				dAssert(dAbs(longitudinalSpeed) > 0.01f);
-
-				tireJoint->m_lateralSlip = dAbs(lateralSpeed / longitudinalSpeed);
-
-				dFloat aligningMoment;
-				dFloat lateralFrictionCoef;
-				dFloat longitudinalFrictionCoef;
-				controller->m_contactFilter->CalculateTireFrictionCoefficents(tireJoint, otherBody, material,
-					tireJoint->m_longitudinalSlip, tireJoint->m_lateralSlip,
-					tireJoint->m_corneringStiffness, tireJoint->m_corneringStiffness,
-					longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
-#ifdef _DEBUG
-				if (tireJoint->m_index >= 2) {
-					//dTrace (("%f %f\n", tire->m_index, longitudinalFrictionCoef, lateralFrictionCoef));
-					//dTrace (("%d %d k=%f v=%f\n", zzzzzzzzzz, tireJoint->m_index, tireJoint->m_longitudinalSlip, tireJoint->m_lateralSlip));
-				}
-#endif
-
-				NewtonMaterialSetContactFrictionCoef(material, lateralFrictionCoef, lateralFrictionCoef, 0);
-				NewtonMaterialSetContactFrictionCoef(material, longitudinalFrictionCoef, longitudinalFrictionCoef, 1);
-#if 0
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-#endif
-			}
-
-		}
-		else {
-			// vehicle moving low speed, do normal coulomb friction
-			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-		}
-
-		NewtonMaterialSetContactElasticity(material, 0.0f);
-	}
-*/
 
 	int index = 0;
+	dFloat32 invDt = 1.0f / timestep;
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
 
@@ -3283,16 +3189,16 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 		NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 		NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 		NewtonMaterialContactRotateTangentDirections(material, &tireJoint->m_contactTangentDir0[index].m_x);
-/*
-dVector f;
-dVector d0;
-dVector d1;
-NewtonMaterialGetContactTangentDirections (material, tireJoint->GetBody0(), &d0[0], &d1[0]);
-NewtonMaterialGetContactForce (material, tireJoint->GetBody0(), &f[0]);
-dTrace (("%d %f %f\n", tireJoint->m_index, f.DotProduct3(d1), tireDynamics.m_lateralForce));
-		NewtonMaterialSetContactTangentFriction (material, tireDynamics.m_lateralForce, 1);
-		NewtonMaterialSetContactTangentFriction (material, tireDynamics.m_longitudinalForce, 0);
-*/		
+
+		NewtonMaterialGetContactPositionAndNormal(material, tireBody, &contactPoint.m_x, &normal.m_x);
+		NewtonMaterialGetContactTangentDirections(material, tireBody, &longitudinalDir.m_x, &lateralDir.m_x);
+		NewtonBodyGetPointVelocity(tireBody, &contactPoint.m_x, &velocity.m_x);
+
+		dFloat lateralAccel = (lateralDir.DotProduct3(velocity) - tireJoint->m_lateralSpeed[index]) * invDt;
+		dFloat longitudinalAccel = (longitudinalDir.DotProduct3(velocity) - tireJoint->m_longitudinalSpeed[index]) * invDt;
+
+		NewtonMaterialSetContactTangentAcceleration(material, -lateralAccel, 1);
+		NewtonMaterialSetContactTangentAcceleration(material, -longitudinalAccel, 0);
 		index ++;
 	}
 }
@@ -3433,14 +3339,27 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 							longitudinalForce, lateralForce, aligningMoment);
 
 #ifdef _DEBUG
-if ((tireJoint->m_index == 1) || (tireJoint->m_index == 3)) {
-dTrace(("(t:%d b:%f fx:%f fy:%f) ", tireJoint->m_index, dAtan(tireJoint->m_lateralSlip) * 180.0f / 3.1416f, longitudinalForce, lateralForce));
-}
+//if ((tireJoint->m_index == 1) || (tireJoint->m_index == 3)) {
+//dTrace(("(t:%d b:%f fx:%f fy:%f) ", tireJoint->m_index, dAtan(tireJoint->m_lateralSlip) * 180.0f / 3.1416f, longitudinalForce, lateralForce));
+//}
 #endif
 					}
 				}
 			}
 		}
 	}
-//	dTrace(("\n"));
+dTrace(("\n"));
+
+
+
+	for (dList<dWheelJoint*>::dListNode* node = GetFirstTire(); node; node = GetNextTire(node)) {
+		dWheelJoint* const tireJoint = node->GetInfo();
+		const int contactCount = tireJoint->m_contactCount;
+		if (contactCount) {
+			for (int i = 0; i < contactCount; i++) {
+				tireJoint->m_lateralSpeed[i] = 1.0f;
+				tireJoint->m_longitudinalSpeed[i] = 2.0f;
+			}
+		}
+	}
 }

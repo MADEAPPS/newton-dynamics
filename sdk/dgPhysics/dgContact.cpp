@@ -243,6 +243,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
+			//dgTrace(("[x(%f %f) ", contact.m_dir0_Force.m_force, relVelocErr * impulseOrForceScale));
 		} else {
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
@@ -273,6 +274,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
+			//dgTrace(("y(%f %f)] ", contact.m_dir1_Force.m_force, relVelocErr * impulseOrForceScale));
 		} else {
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
