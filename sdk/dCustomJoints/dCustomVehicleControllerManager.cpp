@@ -1987,7 +1987,7 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
 {
-	dMatrix matrix;
+//	dMatrix matrix;
 	dVector origin;
 	dFloat Ixx;
 	dFloat Iyy;
@@ -1999,11 +1999,13 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 
 	// get engine location (place at the body center of mass)
 	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
-	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+//	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+	dMatrix matrix(GetBasisMatrix());
+origin.m_y += 1.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
-	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
+//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	NewtonBody* const differentialBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
@@ -3189,7 +3191,7 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 
 		for (dList<dDifferentialJoint*>::dListNode* diffNode = m_differentialList.GetFirst(); diffNode; diffNode = diffNode->GetNext()) {
 			dDifferentialJoint* const diff = diffNode->GetInfo();
-			diff->ProjectError();
+//			diff->ProjectError();
 		}
 	}
 

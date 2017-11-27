@@ -511,7 +511,6 @@ class SuperCarEntity: public DemoEntity
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
-/*
 		// add the engine, differential and transmission 
 		dEngineInfo engineInfo;
 		engineInfo.m_mass = definition.m_engineMass; 
@@ -567,7 +566,7 @@ class SuperCarEntity: public DemoEntity
 		}
 		dAssert(differential);
 
-
+/*
 		engineInfo.m_differentialLock = 0;
 		//engineInfo.m_userData = this;
 
