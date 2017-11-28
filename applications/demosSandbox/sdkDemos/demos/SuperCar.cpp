@@ -573,9 +573,9 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
-//		m_controller->AddEngineJoint (engineInfo.m_mass, engineInfo.m_radio);
-//		dEngineController* const engineControl = new dEngineController (m_controller, engineInfo, differential, rightRearTire);
-//		m_controller->SetEngine(engineControl);
+		m_controller->AddEngineJoint (engineInfo.m_mass, engineInfo.m_radio);
+		dEngineController* const engineControl = new dEngineController (m_controller, engineInfo, differential, rightRearTire);
+		m_controller->SetEngine(engineControl);
 /*
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState() ? true : false);
