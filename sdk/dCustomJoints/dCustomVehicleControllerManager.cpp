@@ -220,7 +220,7 @@ dEngineMountJoint::dEngineMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody
 }
 
 
-void dEngineMountJoint::ProjectError()
+void dEngineMountJoint::ResetTransform()
 {
 	dMatrix chassisMatrix;
 	dVector engineOmega(0.0f);
@@ -281,7 +281,7 @@ dDifferentialMountJoint::dDifferentialMountJoint(const dMatrix& pinAndPivotFrame
 	m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
 }
 
-void dDifferentialMountJoint::ProjectError()
+void dDifferentialMountJoint::ResetTransform()
 {
 	dMatrix chassisMatrix;
 	dVector chassisOmega(0.0f);
@@ -337,9 +337,9 @@ dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBo
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-void dDifferentialJoint::ProjectError()
+void dDifferentialJoint::ResetTransform()
 {
-	m_differentialMount->ProjectError();
+	m_differentialMount->ResetTransform();
 }
 
 void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -424,7 +424,7 @@ dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBo
 	m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
 }
 
-void dDifferentialJoint::ProjectError()
+void dDifferentialJoint::ResetTransform()
 {
 	dMatrix chassisMatrix;
 	dVector chassisOmega(0.0f);
@@ -539,10 +539,8 @@ dWheelJoint::dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tire
 	,m_suspentionType(m_offroad)
 	,m_hasFender(tireInfo.m_hasFender)
 	,m_contactCount(0)
+	,m_index(0)
 {
-#ifdef _DEBUG
-	m_index = 0;
-#endif
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -557,7 +555,7 @@ dFloat dWheelJoint::CalculateTireParametricPosition(const dMatrix& tireMatrix, c
 	return num / den;
 }
 
-void dWheelJoint::ProjectError()
+void dWheelJoint::ResetTransform()
 {
 	dMatrix tireMatrix;
 	dMatrix chassisMatrix;
@@ -1975,9 +1973,7 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 	dMatrix matrix(tireLocalRotation * locationInGlobalSpace);
 	matrix.m_posit += matrix.m_front.Scale(tireInfo.m_pivotOffset);
 	dWheelJoint* const joint = new dWheelJoint(matrix, tireBody, m_body, this, tireInfo);
-#ifdef _DEBUG
 	joint->m_index = m_tireList.GetCount();
-#endif
 	m_tireList.Append(joint);
 
 	NewtonCollisionSetUserData1(collision, joint);
@@ -1985,63 +1981,6 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 	return joint;
 }
 
-dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
-{
-	dVector origin;
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-
-	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
-	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
-
-	// get engine location (place at the body center of mass)
-	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
-	dMatrix matrix(GetBasisMatrix());
-origin.m_y += 1.0f;
-	matrix.m_posit = matrix.TransformVector(origin);
-
-//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
-	NewtonCollisionSetMode(collision, 0);
-	NewtonBody* const differentialBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
-
-	// use the tire mass to set the mass of the differential	
-	NewtonBodyGetMass(leftTire->GetBody0(), &mass, &Ixx, &Iyy, &Izz);
-	NewtonBodySetMassMatrix(differentialBody, mass, Ixx, Ixx, Ixx);
-
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(differentialBody, 0);
-	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(differentialBody, 3.141692f * 2.0f);
-	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
-	NewtonDestroyCollision(collision);
-
-	dMatrix pinMatrix(matrix);
-	pinMatrix.m_up = matrix.m_right;
-	pinMatrix.m_front = matrix.m_front;
-	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
-	dDifferentialJoint* const differentialJoint = new dDifferentialJoint(pinMatrix, differentialBody, m_body);
-	m_differentialList.Append(differentialJoint);
-
-	m_bodyList.Append(differentialBody);
-	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
-	
-	dMatrix leftTireMatrix;
-	NewtonBody* const leftTireBody = leftTire->GetBody0();
-	NewtonBodyGetMatrix(leftTireBody, &leftTireMatrix[0][0]);
-	leftTireMatrix = leftTire->GetMatrix0() * leftTireMatrix;
-	new dAxelJoint(leftTireMatrix[0], pinMatrix[0].Scale(-1.0f), pinMatrix[1], leftTireBody, differentialBody);
-	
-	dMatrix rightTireMatrix;
-	NewtonBody* const rightTireBody = rightTire->GetBody0();
-	NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
-	rightTireMatrix = rightTire->GetMatrix0() * rightTireMatrix;
-	new dAxelJoint(rightTireMatrix[0], pinMatrix[0].Scale(1.0f), pinMatrix[1], rightTireBody, differentialBody);
-
-	return differentialJoint;
-}
 
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential)
 {
@@ -2052,6 +1991,7 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint
 	dFloat Izz;
 	dFloat mass;
 
+dAssert(0);
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
 
@@ -2106,6 +2046,110 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint
 	return differentialJoint;
 }
 
+dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
+{
+	dMatrix matrix(GetBasisMatrix());
+	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
+	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
+
+	dVector origin;
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+
+	// get engine location (place at the body center of mass)
+	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
+
+	//origin.m_y += 1.0f;
+	matrix.m_posit = matrix.TransformVector(origin);
+
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+//	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
+	NewtonCollisionSetMode(collision, 0);
+	NewtonBody* const differentialBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+
+	// use the tire mass to set the mass of the differential	
+	NewtonBodyGetMass(leftTire->GetBody0(), &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodySetMassMatrix(differentialBody, mass, Ixx, Ixx, Ixx);
+
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(differentialBody, 0);
+	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
+	NewtonBodySetMaxRotationPerStep(differentialBody, 3.141692f * 2.0f);
+	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
+	NewtonDestroyCollision(collision);
+
+	dMatrix pinMatrix(matrix);
+	pinMatrix.m_up = matrix.m_right;
+	pinMatrix.m_front = matrix.m_front;
+	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
+	dDifferentialJoint* const differentialJoint = new dDifferentialJoint(pinMatrix, differentialBody, m_body);
+	m_differentialList.Append(differentialJoint);
+
+	m_bodyList.Append(differentialBody);
+	NewtonCollisionAggregateAddBody(m_collisionAggregate, differentialBody);
+
+	dMatrix leftTireMatrix;
+	NewtonBody* const leftTireBody = leftTire->GetBody0();
+	NewtonBodyGetMatrix(leftTireBody, &leftTireMatrix[0][0]);
+	leftTireMatrix = leftTire->GetMatrix0() * leftTireMatrix;
+	new dAxelJoint(leftTireMatrix[0], pinMatrix[0].Scale(-1.0f), pinMatrix[1], leftTireBody, differentialBody);
+
+	dMatrix rightTireMatrix;
+	NewtonBody* const rightTireBody = rightTire->GetBody0();
+	NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
+	rightTireMatrix = rightTire->GetMatrix0() * rightTireMatrix;
+	new dAxelJoint(rightTireMatrix[0], pinMatrix[0].Scale(1.0f), pinMatrix[1], rightTireBody, differentialBody);
+
+	return differentialJoint;
+}
+
+dEngineJoint* dCustomVehicleController::AddEngineJoint(dFloat mass, dFloat armatureRadius)
+{
+//	dMatrix matrix;
+	dVector origin;
+
+	dMatrix matrix(GetBasisMatrix());
+	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
+	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
+
+	// get engine location (place at the body center of mass)
+	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
+//	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+
+	origin.m_y += 1.0f;
+	matrix.m_posit = matrix.TransformVector(origin);
+
+//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+	NewtonCollisionSetMode(collision, 0);
+	NewtonBody* const engineBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+
+	// make engine inertia spherical (also make scale inertia about 10 time the radio for more stability)
+	const dFloat engineInertiaScale = 9.0f;
+	const dFloat inertia = 2.0f * engineInertiaScale * mass * armatureRadius * armatureRadius / 5.0f;
+	NewtonBodySetMassMatrix(engineBody, mass, inertia, inertia, inertia);
+
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(engineBody, 0);
+	NewtonBodySetAngularDamping(engineBody, &drag[0]);
+	NewtonBodySetMaxRotationPerStep(engineBody, 3.141692f * 2.0f);
+	NewtonBodySetForceAndTorqueCallback(engineBody, m_forceAndTorqueCallback);
+	NewtonDestroyCollision(collision);
+
+	dMatrix pinMatrix(matrix);
+	pinMatrix.m_up = matrix.m_up;
+	pinMatrix.m_front = matrix.m_right;
+	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
+	m_engine = new dEngineJoint(pinMatrix, engineBody, m_body);
+
+	m_bodyList.Append(engineBody);
+	NewtonCollisionAggregateAddBody(m_collisionAggregate, engineBody);
+	return m_engine;
+}
+
+
 
 void dCustomVehicleController::LinkTiresKinematically(dWheelJoint* const tire0, dWheelJoint* const tire1)
 {
@@ -2130,59 +2174,10 @@ dEngineJoint* dCustomVehicleController::GetEngineJoint() const
 	return m_engine;
 }
 
-dEngineJoint* dCustomVehicleController::AddEngineJoint (dFloat mass, dFloat armatureRadius)
-{
-	dMatrix matrix;
-	dVector origin;
 
-//	m_engine = new dBodyPartEngine (this, mass, armatureRadius);
-//	m_parent = &controller->m_chassis;
-//	m_controller = controller;
-//	NewtonBody* const chassisBody = m_controller->GetBody();
-//	NewtonWorld* const world = ((dCustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
-
-	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
-	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
-
-	// get engine location (place at the body center of mass)
-	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
-	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
-
-	//origin.m_y += 2.0f;
-	matrix.m_posit = matrix.TransformVector(origin);
-
-	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
-	NewtonCollisionSetMode(collision, 0);
-	NewtonBody* const engineBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
-
-	// make engine inertia spherical (also make scale inertia but twice the radio for more stability)
-	const dFloat engineInertiaScale = 9.0f;
-	const dFloat inertia = 2.0f * engineInertiaScale * mass * armatureRadius * armatureRadius / 5.0f;
-	NewtonBodySetMassMatrix(engineBody, mass, inertia, inertia, inertia);
-
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(engineBody, 0);
-	NewtonBodySetAngularDamping(engineBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(engineBody, 3.141692f * 2.0f);
-	NewtonBodySetForceAndTorqueCallback(engineBody, m_forceAndTorqueCallback);
-	NewtonDestroyCollision(collision);
-
-	dMatrix pinMatrix(matrix);
-	pinMatrix.m_front = matrix.m_right;
-	pinMatrix.m_up = matrix.m_up;
-	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
-	m_engine = new dEngineJoint(pinMatrix, engineBody, m_body);
-
-	m_bodyList.Append(engineBody);
-	NewtonCollisionAggregateAddBody(m_collisionAggregate, engineBody);
-	return m_engine;
-}
 
 dVector dCustomVehicleController::GetTireNormalForce(const dWheelJoint* const tire) const
 {
-//	dWheelJoint* const joint = tire->GetJoint();
-//	dFloat force = joint->GetTireLoad();
 	dFloat force = tire->GetTireLoad();
 	return dVector (0.0f, force, 0.0f, 0.0f);
 }
@@ -2928,7 +2923,7 @@ void dCustomVehicleController::PreUpdate(dFloat timestep, int threadID)
 
 		CalculateAerodynamicsForces();
 		CalculateSuspensionForces(timestep);
-		CalulateTireForces(timestep, threadID);
+		CalculateTireForces(timestep, threadID);
 
 		if (m_brakesControl) {
 			m_brakesControl->Update(timestep);
@@ -3140,6 +3135,10 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 	NewtonBody* const tireBody = tireJoint->GetBody0();
 	dAssert(tireBody == tireJoint->GetTireBody());
 
+//static int xxx;
+//xxx++;
+//dTrace(("%d ", xxx));
+
 	int index = 0;
 	dFloat32 invDt = 1.0f / timestep;
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
@@ -3163,7 +3162,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 	}
 }
 
-void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
+void dCustomVehicleController::CalculateTireForces(dFloat timestep, int threadID)
 {
 	dMatrix axisMatrix(GetBasisMatrix());
 	dVector veloc(0.0f);
@@ -3177,14 +3176,13 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 
 	int isSleeping = NewtonBodyGetSleepState(m_body);
 	if (!isSleeping) {
-		// project integration error from previous frame
 		if (m_engine) {
-			m_engine->m_engineMount->ProjectError();
+			m_engine->m_engineMount->ResetTransform();
 		}
 
 		for (dList<dDifferentialJoint*>::dListNode* diffNode = m_differentialList.GetFirst(); diffNode; diffNode = diffNode->GetNext()) {
 			dDifferentialJoint* const diff = diffNode->GetInfo();
-//			diff->ProjectError();
+			diff->ResetTransform();
 		}
 	}
 
@@ -3193,16 +3191,16 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 	NewtonBodyGetMass(m_body, &mass, &Ixx, &Iyy, &Izz);
 	dFloat weight = mass * m_gravityMag;
 
-//dTrace(("frame %d: ", zzzzzzzzzz));
-	//	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
-
+//static int xxx;
+//xxx++;
+//dTrace(("%d ", xxx));
 	for (dList<dWheelJoint*>::dListNode* node = GetFirstTire(); node; node = GetNextTire(node)) {
 		dWheelJoint* const tireJoint = node->GetInfo();
 
 		// calculate contacts, if body is sleeping then contacts are the same as preview frame 
 		if (!isSleeping) {
 			// project integration error from previous frame
-			tireJoint->ProjectError();
+			tireJoint->ResetTransform();
 			Collide(tireJoint, threadID);
 		}
 
@@ -3233,7 +3231,6 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 				dVector tireAnglePin(contactNormal.CrossProduct(lateralPin));
 				dFloat pinMag2 = tireAnglePin.DotProduct3(tireAnglePin);
 				if (pinMag2 > 0.25f) {
-					// brush rubber tire friction model
 					// project the contact point to the surface of the collision shape
 					const dVector& contactPoint = tireJoint->m_contactInfo[i].m_point;
 					dVector contactPatch(contactPoint - lateralPin.Scale((contactPoint - tireMatrix.m_posit).DotProduct3(lateralPin)));
@@ -3242,7 +3239,6 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 
 					// calculate contact tangent directions 
 					const dVector& longitudinalContactDir = tireJoint->m_contactTangentDir0[i];
-					//longitudinalContactDir = contactNormal.CrossProduct(lateralPin).Normalize();
 					const dVector lateralContactDir(longitudinalContactDir.CrossProduct(contactNormal));
 
 					dFloat tireOriginLongitudinalSpeed = tireVeloc.DotProduct3(longitudinalContactDir);
@@ -3274,8 +3270,6 @@ void dCustomVehicleController::CalulateTireForces(dFloat timestep, int threadID)
 		}
 	}
 dTrace(("\n"));
-
-
 
 	dFloat torque_y = axisMatrix.m_up.DotProduct3(torque);
 	dFloat force_x = axisMatrix.m_front.DotProduct3(force);
@@ -3321,7 +3315,7 @@ dTrace(("\n"));
 				for (int i = 0; i < contactCount; i++) {
 					//tireJoint->m_lateralSpeed[i] = 1.0f;
 					//tireJoint->m_longitudinalSpeed[i] = 2.0f;
-					tireJoint->m_longitudinalSpeed[i] = tireJoint->m_index == 2 ? 1.0f : -1.0f;
+					//tireJoint->m_longitudinalSpeed[i] = tireJoint->m_index == 2 ? 1.0f : -1.0f;
 				}
 			}
 		}

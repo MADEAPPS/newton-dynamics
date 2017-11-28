@@ -1036,24 +1036,26 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 {
 	dgAssert(contact && (contact->GetId() == dgConstraint::m_contactConstraint));
 
-	dgBody* const body0 = contact->GetBody0();
-	dgBody* const body1 = contact->GetBody1();
+	if (!contact->m_material->m_contactGeneration) {
+		dgBody* const body0 = contact->GetBody0();
+		dgBody* const body1 = contact->GetBody1();
 
-	dgVector deltaTime(timestep);
-	dgVector positStep(deltaTime * (body0->m_veloc - body1->m_veloc));
-	positStep = ((positStep.DotProduct4(positStep)) > m_velocTol) & positStep;
-	contact->m_positAcc += positStep;
+		dgVector deltaTime(timestep);
+		dgVector positStep(deltaTime * (body0->m_veloc - body1->m_veloc));
+		positStep = ((positStep.DotProduct4(positStep)) > m_velocTol) & positStep;
+		contact->m_positAcc += positStep;
 
-	dgVector positError2(contact->m_positAcc.DotProduct4(contact->m_positAcc));
-	if ((positError2 < m_linearContactError2).GetSignMask()) {
-		dgVector rotationStep(deltaTime * (body0->m_omega - body1->m_omega));
-		rotationStep = ((rotationStep.DotProduct4(rotationStep)) > m_velocTol) & rotationStep;
-		contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion(dgFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
+		dgVector positError2(contact->m_positAcc.DotProduct4(contact->m_positAcc));
+		if ((positError2 < m_linearContactError2).GetSignMask()) {
+			dgVector rotationStep(deltaTime * (body0->m_omega - body1->m_omega));
+			rotationStep = ((rotationStep.DotProduct4(rotationStep)) > m_velocTol) & rotationStep;
+			contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion(dgFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
 
-		dgVector angle(contact->m_rotationAcc.m_q1, contact->m_rotationAcc.m_q2, contact->m_rotationAcc.m_q3, dgFloat32(0.0f));
-		dgVector rotatError2(angle.DotProduct4(angle));
-		if ((rotatError2 < m_angularContactError2).GetSignMask()) {
-			return true;
+			dgVector angle(contact->m_rotationAcc.m_q1, contact->m_rotationAcc.m_q2, contact->m_rotationAcc.m_q3, dgFloat32(0.0f));
+			dgVector rotatError2(angle.DotProduct4(angle));
+			if ((rotatError2 < m_angularContactError2).GetSignMask()) {
+				return true;
+			}
 		}
 	}
 	return false;

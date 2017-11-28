@@ -205,8 +205,8 @@ class dWheelJoint: public dCustomJoint
 	}
 
 	protected:
+	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API dFloat CalculateTireParametricPosition(const dMatrix& tireMatrix, const dMatrix& chassisMatrix) const;
-	CUSTOM_JOINTS_API void ProjectError();
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
@@ -235,9 +235,7 @@ class dWheelJoint: public dCustomJoint
 	int m_suspentionType;
 	int m_hasFender;
 	int m_contactCount;
-#ifdef _DEBUG
 	int m_index;
-#endif
 	NewtonWorldConvexCastReturnInfo m_contactInfo[4];
 	dVector m_contactTangentDir0[4];
 	dFloat m_lateralSpeed[4];
@@ -258,7 +256,7 @@ class dEngineMountJoint: public dCustomHinge
 	CUSTOM_JOINTS_API dEngineMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody);
 
 	protected:
-	CUSTOM_JOINTS_API void ProjectError();
+	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
@@ -331,7 +329,7 @@ class dDifferentialMountJoint: public dCustomUniversal
 	CUSTOM_JOINTS_API dDifferentialMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody);
 
 	protected:
-	CUSTOM_JOINTS_API void ProjectError();
+	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
@@ -357,7 +355,7 @@ class dDifferentialJoint: public dCustomJoint
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
-	CUSTOM_JOINTS_API void ProjectError();
+	CUSTOM_JOINTS_API void ResetTransform();
 
 //	dMatrix m_baseOffsetMatrix;
 	dDifferentialMountJoint* m_differentialMount;
@@ -381,10 +379,10 @@ class dDifferentialJoint: public dCustomUniversal
 	}
 
 	protected:
+	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
-	CUSTOM_JOINTS_API void ProjectError();
 
 	dMatrix m_baseOffsetMatrix;
 	dFloat m_turnSpeed;
@@ -603,6 +601,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs, dFloat timestep);
 
 	CUSTOM_JOINTS_API void Finalize();
+	CUSTOM_JOINTS_API dEngineJoint* AddEngineJoint(dFloat mass, dFloat armatureRadius);
 	CUSTOM_JOINTS_API dWheelJoint* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire);
 	CUSTOM_JOINTS_API dDifferentialJoint* AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential);
@@ -610,7 +609,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void LinkTiresKinematically(dWheelJoint* const tire0, dWheelJoint* const tire1);
 
 	CUSTOM_JOINTS_API dEngineJoint* GetEngineJoint() const;
-	CUSTOM_JOINTS_API dEngineJoint* AddEngineJoint (dFloat mass, dFloat armatureRadius);
+	
 
 	CUSTOM_JOINTS_API dVector GetUpAxis() const;
 	CUSTOM_JOINTS_API dVector GetRightAxis() const;
@@ -666,7 +665,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	
 	void CalculateAerodynamicsForces ();
 	void CalculateSuspensionForces (dFloat timestep);
-	void CalulateTireForces (dFloat timestep, int threadID);
+	void CalculateTireForces (dFloat timestep, int threadID);
 	void Collide (dWheelJoint* const tire, int threadIndex);
 	
 	dVector GetLastLateralForce(dWheelJoint* const tire) const;
