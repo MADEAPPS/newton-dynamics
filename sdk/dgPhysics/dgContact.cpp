@@ -241,14 +241,13 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 
-//dgFloat32 xxx = dgAbsf (relVelocErr * impulseOrForceScale - contact.m_dir0_Force.m_force);
-//dgAssert(xxx < 1.0e-3f);
 //dgTrace(("[x(%f %f) ", contact.m_dir0_Force.m_force, relVelocErr * impulseOrForceScale));
-
 		if (contact.m_flags & dgContactMaterial::m_override0Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override
+			//dgAssert(dgAbsf(relVelocErr * impulseOrForceScale - contact.m_dir0_Force.m_force) < 1.0e-3f);
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
+
 		} else {
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
@@ -275,11 +274,11 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_jointStiffness[jacobIndex] = dgFloat32(0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 
-//dgFloat32 xxx = dgAbsf(relVelocErr * impulseOrForceScale - contact.m_dir1_Force.m_force);
-//dgAssert(xxx < 1.0e-3f);
+
 //dgTrace(("y(%f %f)] ", contact.m_dir1_Force.m_force, relVelocErr * impulseOrForceScale));
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override
+			//dgAssert(dgAbsf(relVelocErr * impulseOrForceScale - contact.m_dir1_Force.m_force) < 1.0e-3f);
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		} else {

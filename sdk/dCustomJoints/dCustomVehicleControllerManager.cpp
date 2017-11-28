@@ -3158,6 +3158,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 
 		NewtonMaterialSetContactTangentAcceleration(material, -lateralAccel, 1);
 		NewtonMaterialSetContactTangentAcceleration(material, -longitudinalAccel, 0);
+dTrace(("(x:%f z:%f)] ", longitudinalAccel, lateralAccel));
 		index ++;
 	}
 }
