@@ -165,6 +165,9 @@
     <ClCompile Include="..\..\sdkDemos\DemoCameraManager.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SixAxisManipulators.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
