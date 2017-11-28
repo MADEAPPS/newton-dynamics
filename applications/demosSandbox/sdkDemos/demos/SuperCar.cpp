@@ -576,7 +576,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->AddEngineJoint (engineInfo.m_mass, engineInfo.m_radio);
 		dEngineController* const engineControl = new dEngineController (m_controller, engineInfo, differential, rightRearTire);
 		m_controller->SetEngine(engineControl);
-/*
+
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState() ? true : false);
 		engineControl->SetIgnition(true);
@@ -596,7 +596,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat weightRatio1 = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		dFloat speedFactor = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
-*/
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
