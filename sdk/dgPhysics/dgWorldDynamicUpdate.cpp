@@ -664,7 +664,6 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		//bool autosleep = bodyArray[0].m_body->m_autoSleep;
 		bool equilibrium  = bodyArray[0].m_body->m_equilibrium;
 		if (count == 2) {
-			//autosleep &= bodyArray[1].m_body->m_autoSleep;
 			equilibrium  &= bodyArray[1].m_body->m_equilibrium;
 		}
 		if (!equilibrium ) {
@@ -717,7 +716,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 			body->m_equilibrium = equilibrium ? 1 : 0;
 //body->m_equilibrium &= body->m_autoSleep;
 			stackSleeping &= equilibrium;
-			isClusterResting &= body->m_autoSleep;
+			isClusterResting &= (body->m_autoSleep & equilibrium);
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				sleepCounter = dgMin (sleepCounter, ((dgDynamicBody*)body)->m_sleepingCounter);
 			}
@@ -735,6 +734,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 				body->m_alpha = dgVector::m_zero;
 				body->m_veloc = dgVector::m_zero;
 				body->m_omega = dgVector::m_zero;
+				body->m_sleeping = body->m_autoSleep;
 			}
 		} else {
 			const bool state = (maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) || (maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
@@ -766,7 +766,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 						body->m_alpha = dgVector::m_zero;
 						body->m_veloc = dgVector::m_zero;
 						body->m_omega = dgVector::m_zero;
-						body->m_equilibrium = true;
+						body->m_equilibrium = 1;
+						body->m_sleeping = body->m_autoSleep;
 					}
 				} else {
 					sleepCounter ++;
