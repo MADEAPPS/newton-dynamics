@@ -46,10 +46,16 @@ class dSixAxisController: public dCustomControllerBase
 	};
 
 	dSixAxisController()
-		:m_azimuth(0.0f)
+		:m_kinematicSolver(NULL)
+		,m_azimuth(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
 	{
+	}
+
+	void Init()
+	{
+		m_kinematicSolver = NewtonCreateInverseDynamics(GetManager()->GetWorld());
 	}
 
 	void DrawHelp(DemoEntityManager* const scene)
@@ -157,6 +163,7 @@ class dSixAxisController: public dCustomControllerBase
 		return body;
 	}
 
+	NewtonInverseDynamics* m_kinematicSolver;
 	dFloat32 m_azimuth;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
@@ -182,6 +189,13 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		if (me->m_currentController) {
 			me->m_currentController->DrawHelp(scene);
 		}
+	}
+
+	virtual dSixAxisController* CreateController()
+	{
+		dSixAxisController* const controller = (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
+		controller->Init();
+		return controller;
 	}
 
 	dSixAxisController* MakeKukaRobot(DemoEntityManager* const scene, const dVector& origin)

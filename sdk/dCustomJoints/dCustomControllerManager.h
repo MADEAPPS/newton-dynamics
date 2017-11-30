@@ -65,7 +65,6 @@ class dCustomControllerConvexRayFilter: public dCustomControllerConvexCastPreFil
 		,m_hitBody(NULL)
 		,m_shapeHit(NULL)
 		,m_collisionID(0) 
-		
 	{
 		m_me = me;
 	}
@@ -91,6 +90,30 @@ class dCustomControllerConvexRayFilter: public dCustomControllerConvexCastPreFil
 	const NewtonCollision* m_shapeHit;
 	dLong m_collisionID; 
 	dFloat m_intersectParam;
+};
+
+
+class dCustomControllerManagerBase
+{
+	public:
+	dCustomControllerManagerBase(NewtonWorld* const world)
+		:m_world(world)
+		,m_curTimestep(0.0f)
+	{
+	}
+
+	NewtonWorld* GetWorld() const
+	{
+		return m_world;
+	}
+
+	dFloat GetTimeStep() const
+	{
+		return m_curTimestep;
+	}
+
+	NewtonWorld* m_world;
+	dFloat m_curTimestep;
 };
 
 
@@ -123,7 +146,7 @@ class dCustomControllerBase
 		return m_body;
 	}
 
-	void* GetManager() const 
+	dCustomControllerManagerBase* GetManager() const
 	{
 		return m_manager;
 	}
@@ -142,25 +165,15 @@ class dCustomControllerBase
 
 	void* m_userData;
 	NewtonBody* m_body;
-	void* m_manager;
+	dCustomControllerManagerBase* m_manager;
 };
 
 template<class CONTROLLER_BASE>
-class dCustomControllerManager: public dList<CONTROLLER_BASE>
+class dCustomControllerManager: public dCustomControllerManagerBase, public dList<CONTROLLER_BASE>
 {
 	public:
 	dCustomControllerManager(NewtonWorld* const world, const char* const managerName);
 	~dCustomControllerManager();
-
-	NewtonWorld* GetWorld() const 
-	{
-		return m_world;
-	}
-
-	dFloat GetTimeStep() const 
-	{
-		return m_curTimestep;
-	}
 
 	virtual CONTROLLER_BASE* CreateController ();
 	virtual void DestroyController (CONTROLLER_BASE* const controller);
@@ -184,17 +197,13 @@ class dCustomControllerManager: public dList<CONTROLLER_BASE>
 
 	static void PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
 	static void PostUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
-
-	protected:
-	NewtonWorld* m_world;
-	dFloat m_curTimestep;
 };
 
 
 template<class CONTROLLER_BASE>
 dCustomControllerManager<CONTROLLER_BASE>::dCustomControllerManager(NewtonWorld* const world, const char* const managerName)
-	:m_world(world)
-	,m_curTimestep(0.0f)
+	:dCustomControllerManagerBase(world)
+	,dList<CONTROLLER_BASE>()
 {
 	void* const listener = NewtonWorldAddListener(world, managerName, this);
 
@@ -208,7 +217,6 @@ dCustomControllerManager<CONTROLLER_BASE>::dCustomControllerManager(NewtonWorld*
 template<class CONTROLLER_BASE>
 dCustomControllerManager<CONTROLLER_BASE>::~dCustomControllerManager()
 {
-
 }
 
 template<class CONTROLLER_BASE>
