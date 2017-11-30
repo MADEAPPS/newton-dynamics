@@ -227,7 +227,6 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	joint2->SetTwistAngle(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
 }
 
-
 static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size (1.0f, 1.0f, 1.0f);
@@ -315,7 +314,6 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	joint2->EnableLimit_1(true);
 	joint2->SetLimits_1(-4.0f * 3.141592f, 2.0f * 3.141592f);
 }
-
 
 class JoesRagdollJoint: public dCustomBallAndSocket
 {
@@ -452,15 +450,8 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 	}
 }*/
 
-inline float randF (unsigned int time)
-{
-	time *= 1664525;
-	time ^= (time << 16);
-	time *= 16807;
-	return float(time) / float(0xFFFFFFFFu);
-}
 
-void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
+static void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
 	const int numArms = 1,
 	const dFloat torsoHeight = 1.0f, 
 	const dFloat torsoWidth = 4.0f, 
@@ -486,9 +477,8 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 		dMatrix armTransform = armRotation * torsoMatrix;
 		
 		NewtonBody* parent = torso;
-
 		int numBodies = numSegments;
-		if (randomness > 0.0f) numBodies += int (randF(j) * dFloat(numSegments) + 0.5f);
+		if (randomness > 0.0f) numBodies += int (dGaussianRandom (dFloat(numSegments)) + 0.5f);
 		for (int i=0; i < numBodies; i++)
 		{
 			dFloat height = armHeight;
@@ -512,9 +502,9 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 			}
 			if (randomness > 0.0f)
 			{
-				dMatrix rotation =  dPitchMatrix(randF(bodyIndex*3+0) * 3.141592f * 0.25f * randomness);
-				rotation = rotation * dYawMatrix(randF(bodyIndex*3+1) * 3.141592f * 0.25f * randomness);
-				rotation = rotation * dYawMatrix(randF(bodyIndex*3+2) * 3.141592f * 0.25f * randomness);
+				dMatrix rotation =  dPitchMatrix(dGaussianRandom  (3.141592f) * randomness);
+				rotation = rotation * dYawMatrix(dGaussianRandom  (3.141592f) * randomness);
+				rotation = rotation * dYawMatrix(dGaussianRandom  (3.141592f) * randomness);
 				matrix0 = matrix0 * rotation;
 			}
 			JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
@@ -596,7 +586,7 @@ joint0->SetPitchAngle (90.0f * 3.141592f / 180.0f);
 */
 }
 
-void AddHinge (DemoEntityManager* const scene, const dVector& origin)
+static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 {
     dVector size (1.5f, 1.5f, 0.125f);
 	NewtonBody* parent = CreateBox(scene, origin + dVector (-0.8f, 4.0f, 0.0f, 0.0f), dVector (0.2f, 0.125f, 0.125f));
@@ -624,19 +614,6 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 		parent = child;
 		position.m_x += size.m_x;
 	}
-
-/*
-	// link the two boxes
-	NewtonBody* const heavyBox = CreateBox (scene, position, dVector (1.5f, 1.5f, 1.5f));
-	NewtonBodyGetMatrix(heavyBox, &matrix[0][0]);
-	NewtonBodySetMassProperties(heavyBox, 10.0f, NewtonBodyGetCollision(heavyBox));
-	matrix.m_posit += dVector(-size.m_x * 0.5f, 0.0f, 0.0f);
-	matrix = localPin * matrix;
-	CustomHinge* const hinge = new CustomHinge(matrix, heavyBox, parent);
-	hinge->EnableLimits(true);
-	hinge->SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
-	hinge->SetFriction(20.0f);
-*/
 }
 
 static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
@@ -704,7 +681,6 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 	slider->SetAngularLimits (-7.0f * 3.1416f, 5.0f * 3.1416f);
 }
 
-
 static void AddCylindrical (DemoEntityManager* const scene, const dVector& origin)
 {
     // make a reel static
@@ -726,7 +702,6 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
 	cylinder->EnableAngularLimits(true);
 	cylinder->SetAngularLimis(-4.0f * 3.1416f, 6.0f * 3.1416f);
 }
-
 
 static dCustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
 {
@@ -821,7 +796,6 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 	NewtonCollisionAggregateAddBody (aggregate, body1);
 }
 
-
 static dCustomCorkScrew* AddCylindricalWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
 {
     NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
@@ -832,7 +806,6 @@ static dCustomCorkScrew* AddCylindricalWheel (DemoEntityManager* const scene, co
 
     return new dCustomCorkScrew (matrix, wheel, parent);
 }
-
 
 static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -879,7 +852,6 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 	NewtonCollisionAggregateAddBody(aggregate, body2);
 }
 
-
 class MyPathFollow: public dCustomPathFollow
 {
 	public:
@@ -908,7 +880,6 @@ class MyPathFollow: public dCustomPathFollow
 		tangentOut = tangent;
 	}
 };
-
 
 static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin)
 {

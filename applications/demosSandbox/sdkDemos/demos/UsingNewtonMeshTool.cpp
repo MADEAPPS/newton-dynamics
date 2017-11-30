@@ -20,55 +20,6 @@
 #include "PhysicsUtils.h"
 
 
-static void LoadAndCreateMesh(DemoEntityManager* const scene)
-{
-	FILE* f;
-	//f = fopen("C:/Users/julio/Downloads/track.txt", "rb");
-	f = fopen("../../../track.xxx", "rb");
-	if (!f)
-		return;
-
-	NewtonCollision* pCollision = NewtonCreateTreeCollision(scene->GetNewton(), 0);
-	NewtonTreeCollisionBeginBuild(pCollision);
-
-	// Read number of triangles
-	int numTris;
-	fread((void*)&numTris, 4, 1, f);
-
-	// Add face for each tri
-	struct point
-	{
-		dFloat v[3];
-	};
-	struct tria
-	{
-		point face[3];
-	};
-	tria faces[3000];
-	for (int i = 0; i < numTris; i++) {
-		float v[3][3];
-		fread(v, sizeof(float), 9, f);
-		for (int j = 0; j < 3; j++) {
-			for (int k = 0; k < 3; k++) {
-				faces[i].face[j].v[k] = v[j][k];
-			}
-		}
-	}
-
-	for (int i = 0; i < numTris; i++) {
-//	for (int i = 1696; i < 1750; i++) {
-		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0].v[0]), 3 * sizeof(dFloat), 0);
-	}
-
-	NewtonTreeCollisionEndBuild(pCollision, 1);
-
-	dMatrix matrix(dGetIdentityMatrix());
-	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
-	NewtonDestroyCollision(pCollision);
-
-	fclose(f);
-}
-
 static void TestConvexCastBug(NewtonWorld* world)
 {
 	// create static body

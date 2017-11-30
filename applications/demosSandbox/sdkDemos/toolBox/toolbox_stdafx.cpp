@@ -50,7 +50,8 @@ unsigned dRand ()
 	return ___dRandSeed___ & dRAND_MAX;
 }
 
-dFloat dRandomVariable(dFloat amp)
+// a pseudo Gaussian random with mean 0 and variance 0.5f
+dFloat dGaussianRandom (dFloat amp)
 {
 	unsigned val;
 	val = dRand() + dRand();

@@ -229,7 +229,7 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 
 unsigned dRand ();
 void dSetRandSeed (unsigned seed);
-dFloat dRandomVariable(dFloat amp);
+dFloat dGaussianRandom (dFloat amp);
 
 inline int dTwosPower (int x)
 {

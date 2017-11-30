@@ -42,7 +42,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		PrimitiveType selection[] = {_SPHERE_PRIMITIVE};
 		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
-			dVector shapeSize (size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), 0.0f);
+			dVector shapeSize (size + dGaussianRandom  (size / 2.0f), size + dGaussianRandom  (size / 2.0f), size + dGaussianRandom  (size / 2.0f), 0.0f);
 			shapeSize = dVector(size, size, size, 0.0f);
 			collisionArray[i] = CreateConvexCollision (world, dGetIdentityMatrix(), shapeSize, selection[index], materialID);
 			gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
@@ -54,13 +54,13 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
-				dFloat pitch = dRandomVariable (1.0f) * 2.0f * 3.1416f;
-				dFloat yaw = dRandomVariable (1.0f) * 2.0f * 3.1416f;
-				dFloat roll = dRandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat pitch = dGaussianRandom  (1.0f) * 2.0f * 3.1416f;
+				dFloat yaw = dGaussianRandom  (1.0f) * 2.0f * 3.1416f;
+				dFloat roll = dGaussianRandom  (1.0f) * 2.0f * 3.1416f;
 
-				dFloat x = size * (j - count / 2) + dRandomVariable (size * 0.5f);
-				dFloat y = dRandomVariable (size * 2.0f);
-				dFloat z = size * (i - count / 2) + dRandomVariable (size * 0.5f);
+				dFloat x = size * (j - count / 2) + dGaussianRandom  (size * 0.5f);
+				dFloat y = dGaussianRandom  (size * 2.0f);
+				dFloat z = size * (i - count / 2) + dGaussianRandom  (size * 0.5f);
 
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
@@ -116,7 +116,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 		dMatrix alignMatrix (dRollMatrix(3.141592f * 90.0f / 180.0f));
 		for (int i = 0; i < m_count; i ++) {
-			shapeSize = dVector (size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), 0.0f);
+			shapeSize = dVector (size + dGaussianRandom  (size / 2.0f), size + dGaussianRandom  (size / 2.0f), size + dGaussianRandom  (size / 2.0f), 0.0f);
 #if 1
 			m_castingShapeArray[i] = CreateConvexCollision (world, &alignMatrix[0][0], shapeSize, castSelection[i], materialID);
 #else

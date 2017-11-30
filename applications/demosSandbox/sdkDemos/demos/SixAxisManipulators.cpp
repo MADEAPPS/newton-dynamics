@@ -20,6 +20,27 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
+class KukaServoMotor: public dCustomHinge
+{
+	public:
+	KukaServoMotor (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+		:dCustomHinge(pinAndPivotFrame, child, parent)
+		,m_torque(1000.0f)
+	{
+	}
+
+	void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
+	{
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+	}
+
+	dFloat m_torque;
+};
+
 #if 0
 class DynamicRagdollManager: public dCustomActiveCharacterManager
 {
@@ -261,8 +282,84 @@ xxx->SetMaxAngularFriction(5000.0f);
 
 	int m_material;
 };
-
 #endif
+
+
+static NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dFloat mass = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
+static NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat radius, dFloat height)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	dVector size(radius, height, radius, 0.0f);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dFloat mass = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
+
+static void Make3dofKukaRobot (DemoEntityManager* const scene, const dVector& origin)
+{
+	dMatrix location (dRollMatrix(90.0f * 3.141592f / 180.0f));
+	location.m_posit = origin;
+	location.m_posit.m_y += 0.125f * 0.5f;
+
+	NewtonBody* const parent = CreateCylinder(scene, location, 0.35f, 0.125f);
+	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	dMatrix baseMatrix(dGetIdentityMatrix());
+	baseMatrix.m_posit = location.m_posit;
+	baseMatrix.m_posit.m_y += 0.125f * 0.5f + 0.11f;
+	baseMatrix.m_posit.m_z += 0.125f * 0.5f;
+
+	NewtonBody* const base = CreateBox(scene, baseMatrix, dVector (0.125f, 0.2f, 0.25f));
+	
+	dMatrix baseSpin (dGrammSchmidt(dVector (0.0f, 1.0f, 0.0f)));
+	baseSpin.m_posit = location.m_posit;
+	KukaServoMotor* const baseHinge = new KukaServoMotor (baseSpin, base, parent);
+
+	dMatrix arm0Matrix(dPitchMatrix (45.0f * 3.141592f / 180.0f));
+	arm0Matrix.m_posit = baseMatrix.m_posit;
+	arm0Matrix.m_posit.m_y += 0.30f;
+	arm0Matrix.m_posit.m_x += 0.09f;
+	arm0Matrix.m_posit.m_z -= 0.125f;
+
+	NewtonBody* const arm0 = CreateBox(scene, arm0Matrix, dVector (0.05f, 0.1f, 0.75f));
+	dMatrix arm0HingeMatrix (dGrammSchmidt(dVector (1.0f, 0.0f, 0.0f)));
+	arm0HingeMatrix.m_posit = arm0Matrix.m_posit + arm0Matrix.RotateVector(dVector (0.0f, 0.0f, 0.3f));
+	KukaServoMotor* const arm0Hinge = new KukaServoMotor (arm0HingeMatrix, arm0, base);
+
+	dMatrix arm1Matrix (arm0Matrix * dYawMatrix(3.131592f));
+	arm1Matrix.m_posit = arm0Matrix.m_posit;
+	arm1Matrix.m_posit.m_y += 0.4f;
+	arm1Matrix.m_posit.m_x -= 0.05f;
+	arm1Matrix.m_posit.m_z -= 0.1f;
+	NewtonBody* const arm1 = CreateBox(scene, arm1Matrix, dVector (0.05f, 0.1f, 0.5f));
+
+	dMatrix arm1HingeMatrix (dGrammSchmidt(dVector (1.0f, 0.0f, 0.0f)));
+	arm1HingeMatrix.m_posit = arm1Matrix.m_posit + arm1Matrix.RotateVector(dVector (0.0f, 0.0f, 0.2f));
+	KukaServoMotor* const arm1Hinge = new KukaServoMotor (arm1HingeMatrix, arm1, arm0);
+}
+
 
 void SixAxisManipulators(DemoEntityManager* const scene)
 {
@@ -305,7 +402,10 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 */
 #endif
-dVector origin(-10.0f, 1.0f, 0.0f, 1.0f);
+
+	Make3dofKukaRobot (scene, dVector (0.0f, 0.0f, 0.0f));
+	Make3dofKukaRobot (scene, dVector (0.0f, 0.0f, 2.0f));
+	dVector origin(-10.0f, 1.0f, 0.0f, 1.0f);
 	origin.m_x = -5.0f;
 //	origin.m_x -= 2.0f;
 	origin.m_y  = 0.5f;

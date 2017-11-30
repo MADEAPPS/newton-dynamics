@@ -43,7 +43,7 @@ static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const 
 		dVector& p = points[i];
 		bool test;
 		do {
-			p = dVector (2.0f * dRandomVariable(r), 2.0f * dRandomVariable(r), 2.0f * dRandomVariable(r), 0.0f);
+			p = dVector (2.0f * dGaussianRandom (r), 2.0f * dGaussianRandom (r), 2.0f * dGaussianRandom (r), 0.0f);
 			dFloat len = dSqrt (p.DotProduct3(p));
 			dFloat scale = dFloat (pow(len, biasExp) / len);
 			p = p.Scale (scale) + origin;
@@ -79,9 +79,9 @@ static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const poi
 				dFloat x = x0;
 				dFloat y = y0;
 				dFloat z = z0;
-				x += dRandomVariable(POISON_VARIANCE);
-				y += dRandomVariable(POISON_VARIANCE);
-				z += dRandomVariable(POISON_VARIANCE);
+				x += dGaussianRandom (POISON_VARIANCE);
+				y += dGaussianRandom (POISON_VARIANCE);
+				z += dGaussianRandom (POISON_VARIANCE);
 				points[count] = dVector (x, y, z);
 				count ++;
 				x0 += POINT_DENSITY_PER_METERS;

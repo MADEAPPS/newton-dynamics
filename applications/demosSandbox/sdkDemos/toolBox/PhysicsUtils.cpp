@@ -781,9 +781,9 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 			int count = 6;
 			// populate the cloud with pseudo Gaussian random points
 			for (int i = 6; i < SAMPLE_COUNT; i ++) {
-				cloud [i].m_x = dRandomVariable(size.m_x);
-				cloud [i].m_y = dRandomVariable(size.m_y);
-				cloud [i].m_z = dRandomVariable(size.m_z);
+				cloud [i].m_x = dGaussianRandom (size.m_x);
+				cloud [i].m_y = dGaussianRandom (size.m_y);
+				cloud [i].m_z = dGaussianRandom (size.m_z);
 				count ++;
 			}
 			collision = NewtonCreateConvexHull (world, count, &cloud[0].m_x, sizeof (dVector), 0.01f, 0, NULL); 

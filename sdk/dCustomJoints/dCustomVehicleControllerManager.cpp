@@ -157,7 +157,7 @@ dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const en
 	,m_rpm (0.0f)
 	,m_targetRpm (0.0f)
 {
-	SetSolverModel(1);
+	SetSolverModel(2);
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -333,7 +333,7 @@ dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBo
 	,m_turnSpeed(0.0f)
 	,m_isTractionDifferential(false)
 {
-	SetSolverModel(1);
+	SetSolverModel(2);
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -681,8 +681,6 @@ void dWheelJoint::Load(dCustomJointSaveLoad* const fileLoader)
 	LOAD_FLOAT(aligningTorque);
 	LOAD_FLOAT(longitudinalSlip);
 	LOAD_FLOAT(aligningMomentTrail);
-//	LOAD_FLOAT(lateralStiffness);
-//	LOAD_FLOAT(longitudialStiffness);
 	LOAD_FLOAT(corneringStiffness);
 	LOAD_FLOAT(maxSteeringAngle);
 	LOAD_INT(suspentionType);
@@ -716,8 +714,6 @@ void dWheelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
 	SAVE_FLOAT(aligningTorque);
 	SAVE_FLOAT(longitudinalSlip);
 	SAVE_FLOAT(aligningMomentTrail);
-//	SAVE_FLOAT(lateralStiffness);
-//	SAVE_FLOAT(longitudialStiffness);
 	SAVE_FLOAT(corneringStiffness);
 	SAVE_FLOAT(maxSteeringAngle);
 	SAVE_INT(suspentionType);
@@ -1044,7 +1040,7 @@ dFloat dEngineController::GetGearRatio () const
 
 void dEngineController::UpdateAutomaticGearBox(dFloat timestep, dFloat omega)
 {
-m_info.m_gearsCount = 3;
+m_info.m_gearsCount = 4;
 
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
@@ -2107,22 +2103,20 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 
 dEngineJoint* dCustomVehicleController::AddEngineJoint(dFloat mass, dFloat armatureRadius)
 {
-//	dMatrix matrix;
 	dVector origin;
-
 	dMatrix matrix(GetBasisMatrix());
+
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
 
 	// get engine location (place at the body center of mass)
 	NewtonBodyGetCentreOfMass(m_body, &origin[0]);
-//	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 
-	origin.m_y += 1.0f;
+//	origin.m_y += 1.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
-//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+//	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	NewtonBody* const engineBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
@@ -3124,6 +3118,143 @@ void dTireFrictionModel::CalculateTireForces(
 //dTrace (("(fx:%f fy:%f) ", longitudinalForce, lateralForce));
 }
 
+/*
+// Using brush tire model explained by Giancarlo Genta in his book, adapted to calculate friction coefficient instead tire forces
+void dTireFrictionModel::CalculateTireFrictionCoefficents(
+	const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material,
+	dFloat longitudinalSlip, dFloat lateralSlip, dFloat longitudinalStiffness, dFloat lateralStiffness,
+	dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const
+{
+	dAssert(lateralSlip >= 0.0f);
+	//	dAssert (longitudinalSlip >= 0.0f);
+	dAssert(lateralStiffness >= 0.0f);
+	dAssert(longitudinalStiffness >= 0.0f);
+	dFloat den = 1.0f / (1.0f + longitudinalSlip);
+
+	lateralSlip *= den;
+	longitudinalSlip *= den;
+
+	dFloat phy_y = dAbs(lateralStiffness * lateralSlip * 4.0f);
+	dFloat phy_x = dAbs(longitudinalStiffness * longitudinalSlip * 4.0f);
+
+	dFloat gamma = dMax(dSqrt(phy_x * phy_x + phy_y * phy_y), dFloat(0.1f));
+	dFloat fritionCoeficicent = dClamp(GetFrictionCoefficient(material, tire->GetBody0(), otherBody), dFloat(0.0f), dFloat(1.0f));
+
+	dFloat normalTireLoad = 1.0f * fritionCoeficicent;
+	dFloat phyMax = 3.0f * normalTireLoad + 1.0e-3f;
+	dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax + gamma * gamma / (3.0f * phyMax * phyMax))) : normalTireLoad;
+
+	dFloat fraction = F / gamma;
+	dAssert(fraction > 0.0f);
+	lateralFrictionCoef = phy_y * fraction;
+	longitudinalFrictionCoef = phy_x * fraction;
+
+	dAssert(lateralFrictionCoef >= 0.0f);
+	dAssert(lateralFrictionCoef <= 1.1f);
+	dAssert(longitudinalFrictionCoef >= 0.0f);
+	dAssert(longitudinalFrictionCoef <= 1.1f);
+
+	aligningTorqueCoef = 0.0f;
+}
+
+void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep)
+{
+	dMatrix tireMatrix;
+	dMatrix chassisMatrix;
+	dVector tireOmega(0.0f);
+	dVector tireVeloc(0.0f);
+
+	NewtonBody* const tireBody = tire->GetBody0();
+	dAssert(tireBody == tire->GetTireBody());
+	dAssert((tireBody == NewtonJointGetBody0(contactJoint)) || (tireBody == NewtonJointGetBody1(contactJoint)));
+	const dCustomVehicleController* const controller = tire->GetController();
+
+	tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+
+	NewtonBodyGetOmega(tireBody, &tireOmega[0]);
+	NewtonBodyGetVelocity(tireBody, &tireVeloc[0]);
+
+	dVector lateralPin(tireMatrix.m_front);
+	dVector longitudinalPin(tireMatrix.m_front.CrossProduct(chassisMatrix.m_up));
+
+	tire->m_lateralSlip = 0.0f;
+	tire->m_aligningTorque = 0.0f;
+	tire->m_longitudinalSlip = 0.0f;
+
+	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+		dVector contactPoint(0.0f);
+		dVector contactNormal(0.0f);
+
+		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+		NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
+		NewtonMaterialGetContactPositionAndNormal(material, tireBody, &contactPoint[0], &contactNormal[0]);
+
+		dVector tireAnglePin(contactNormal.CrossProduct(lateralPin));
+		dFloat pinMag2 = tireAnglePin.DotProduct3(tireAnglePin);
+		if (pinMag2 > 0.25f) {
+			// brush rubber tire friction model
+			// project the contact point to the surface of the collision shape
+			dVector contactPatch(contactPoint - lateralPin.Scale((contactPoint - tireMatrix.m_posit).DotProduct3(lateralPin)));
+			dVector dp(contactPatch - tireMatrix.m_posit);
+			dVector radius(dp.Scale(tire->m_radio / dSqrt(dp.DotProduct3(dp))));
+
+			dVector lateralContactDir(0.0f);
+			dVector longitudinalContactDir(0.0f);
+			NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
+
+			dFloat tireOriginLongitudinalSpeed = tireVeloc.DotProduct3(longitudinalContactDir);
+			dFloat tireContactLongitudinalSpeed = -longitudinalContactDir.DotProduct3(tireOmega.CrossProduct(radius));
+
+			if ((dAbs(tireOriginLongitudinalSpeed) < (1.0f)) || (dAbs(tireContactLongitudinalSpeed) < 0.1f)) {
+				// vehicle moving low speed, do normal coulomb friction
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+			}
+			else {
+
+				// calculating Brush tire model with longitudinal and lateral coupling 
+				// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
+				// reduces to this, which may have a divide by zero locked, so I am clamping to some small value
+				// dFloat k = (vw - vx) / vx;
+				if (dAbs(tireContactLongitudinalSpeed) < 0.01f) {
+					tireContactLongitudinalSpeed = 0.01f * dSign(tireContactLongitudinalSpeed);
+				}
+				tire->m_longitudinalSlip = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
+
+				dFloat lateralSpeed = tireVeloc.DotProduct3(lateralPin);
+				dFloat longitudinalSpeed = tireVeloc.DotProduct3(longitudinalPin);
+				dAssert(dAbs(longitudinalSpeed) > 0.01f);
+
+				tire->m_lateralSlip = dAbs(lateralSpeed / longitudinalSpeed);
+
+				dFloat aligningMoment;
+				dFloat lateralFrictionCoef;
+				dFloat longitudinalFrictionCoef;
+				dFloat lateralSlipSensitivity = 2.0f;
+				controller->m_contactFilter->CalculateTireFrictionCoefficents(tire, otherBody, material,
+					tire->m_longitudinalSlip, tire->m_lateralSlip * lateralSlipSensitivity,
+					tire->m_longitudialStiffness, tire->m_lateralStiffness,
+					longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
+
+				//dTrace (("%d %f %f\n", tire->m_index, longitudinalFrictionCoef, lateralFrictionCoef));
+
+				NewtonMaterialSetContactFrictionCoef(material, lateralFrictionCoef, lateralFrictionCoef, 0);
+				NewtonMaterialSetContactFrictionCoef(material, longitudinalFrictionCoef, longitudinalFrictionCoef, 1);
+#if 0
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+#endif
+			}
+		} else {
+			// vehicle moving low speed, do normal coulomb friction
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+		}
+
+		NewtonMaterialSetContactElasticity(material, 0.0f);
+	}
+}
+*/
 
 void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tireJoint, const NewtonBody* const otherBody, dFloat timestep)
 {
