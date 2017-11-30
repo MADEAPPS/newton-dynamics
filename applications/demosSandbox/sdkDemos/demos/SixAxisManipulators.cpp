@@ -24,10 +24,10 @@
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
-	class KukaServoMotor : public dCustomHinge
+	class dKukaServoMotor : public dCustomHinge
 	{
 		public:
-		KukaServoMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+		dKukaServoMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 			:dCustomHinge(pinAndPivotFrame, child, parent)
 			,m_torque(1000.0f)
 		{
@@ -45,34 +45,11 @@ class dSixAxisController: public dCustomControllerBase
 		dFloat m_torque;
 	};
 
-
-	void PreUpdate(dFloat timestep, int threadIndex)
-	{
-	}
-	void PostUpdate(dFloat timestep, int threadIndex){}
-
-};
-
-class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
-{
-	public:
-	dSixAxisManager(DemoEntityManager* const scene)
-		:dCustomControllerManager<dSixAxisController>(scene->GetNewton(), "sixAxisManipulator")
-		,m_azimuth(0.0f)
+	dSixAxisController()
+		:m_azimuth(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
 	{
-		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
-	}
-
-	~dSixAxisManager()
-	{
-	}
-
-	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
-	{
-		dSixAxisManager* const me = (dSixAxisManager*)context;
-		me->DrawHelp(scene);
 	}
 
 	void DrawHelp(DemoEntityManager* const scene)
@@ -83,7 +60,16 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::SliderFloat("position_x", &m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("position_y", &m_posit_y, -1.0f, 1.0f);
 	}
-	
+
+	void PostUpdate(dFloat timestep, int threadIndex)
+	{
+	}
+
+
+	void PreUpdate(dFloat timestep, int threadIndex)
+	{
+	}
+
 	void MakeKukaRobot(DemoEntityManager* const scene, const dVector& origin)
 	{
 		dMatrix location(dRollMatrix(90.0f * 3.141592f / 180.0f));
@@ -102,7 +88,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		dSixAxisController::KukaServoMotor* const baseHinge = new dSixAxisController::KukaServoMotor(baseSpin, base, parent);
+		dKukaServoMotor* const baseHinge = new dKukaServoMotor(baseSpin, base, parent);
 
 		dMatrix arm0Matrix(dPitchMatrix(45.0f * 3.141592f / 180.0f));
 		arm0Matrix.m_posit = baseMatrix.m_posit;
@@ -113,7 +99,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		NewtonBody* const arm0 = CreateBox(scene, arm0Matrix, dVector(0.05f, 0.1f, 0.75f));
 		dMatrix arm0HingeMatrix(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 		arm0HingeMatrix.m_posit = arm0Matrix.m_posit + arm0Matrix.RotateVector(dVector(0.0f, 0.0f, 0.3f));
-		dSixAxisController::KukaServoMotor* const arm0Hinge = new dSixAxisController::KukaServoMotor(arm0HingeMatrix, arm0, base);
+		dKukaServoMotor* const arm0Hinge = new dKukaServoMotor(arm0HingeMatrix, arm0, base);
 
 		dMatrix arm1Matrix(arm0Matrix * dYawMatrix(3.131592f));
 		arm1Matrix.m_posit = arm0Matrix.m_posit;
@@ -124,7 +110,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 
 		dMatrix arm1HingeMatrix(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 		arm1HingeMatrix.m_posit = arm1Matrix.m_posit + arm1Matrix.RotateVector(dVector(0.0f, 0.0f, 0.2f));
-		dSixAxisController::KukaServoMotor* const arm1Hinge = new dSixAxisController::KukaServoMotor(arm1HingeMatrix, arm1, arm0);
+		dKukaServoMotor* const arm1Hinge = new dKukaServoMotor(arm1HingeMatrix, arm1, arm0);
 	}
 
 	private:
@@ -165,7 +151,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		dFloat mass = 1.0f;
 		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
 		ScaleIntertia(body, 10.0f);
-		
+
 		geometry->Release();
 		NewtonDestroyCollision(collision);
 		return body;
@@ -174,6 +160,39 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 	dFloat32 m_azimuth;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
+};
+
+class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
+{
+	public:
+	dSixAxisManager(DemoEntityManager* const scene)
+		:dCustomControllerManager<dSixAxisController>(scene->GetNewton(), "sixAxisManipulator")
+		,m_currentController(NULL)
+	{
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~dSixAxisManager()
+	{
+	}
+
+	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
+	{
+		dSixAxisManager* const me = (dSixAxisManager*)context;
+		if (me->m_currentController) {
+			me->m_currentController->DrawHelp(scene);
+		}
+	}
+
+	dSixAxisController* MakeKukaRobot(DemoEntityManager* const scene, const dVector& origin)
+	{
+		dSixAxisController* const controller = (dSixAxisController*)CreateController();
+		controller->MakeKukaRobot(scene, origin);
+		m_currentController = controller;
+		return controller;
+	}
+
+	dSixAxisController* m_currentController;
 };
 
 
@@ -186,9 +205,8 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 
 	robotManager->MakeKukaRobot (scene, dVector (0.0f, 0.0f, 0.0f));
 //	robotManager->MakeKukaRobot (scene, dVector (0.0f, 0.0f, 2.0f));
-	dVector origin(-10.0f, 1.0f, 0.0f, 1.0f);
-	origin.m_x = -5.0f;
-//	origin.m_x -= 2.0f;
+	dVector origin(0.0f);
+	origin.m_x = -2.0f;
 	origin.m_y  = 0.5f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
