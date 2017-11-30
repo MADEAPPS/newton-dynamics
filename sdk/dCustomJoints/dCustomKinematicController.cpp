@@ -49,7 +49,8 @@ void dCustomKinematicController::Serialize (NewtonSerializeCallback callback, vo
 
 dCustomKinematicController::~dCustomKinematicController()
 {
-	NewtonBodySetAutoSleep (m_body0, m_autoSleepState);
+	//NewtonBodySetAutoSleep (m_body0, m_autoSleepState);
+	//NewtonBodySetSleepState(body, 0);
 }
 
 void dCustomKinematicController::Init (NewtonBody* const body, const dMatrix& matrix)
@@ -57,7 +58,8 @@ void dCustomKinematicController::Init (NewtonBody* const body, const dMatrix& ma
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 
 	m_autoSleepState = NewtonBodyGetSleepState(body);
-	NewtonBodySetAutoSleep(body, 0);
+	//NewtonBodySetAutoSleep(body, 0);
+	NewtonBodySetSleepState(body, 0);
 
 	SetPickMode(1);
 	SetTargetMatrix(matrix);
