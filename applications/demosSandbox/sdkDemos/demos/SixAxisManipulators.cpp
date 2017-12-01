@@ -24,13 +24,14 @@
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
-	class dKukaServoMotor : public dCustomHinge
+	class dKukaServoMotor1: public dCustomHinge
 	{
 		public:
-		dKukaServoMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+		dKukaServoMotor1(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 			:dCustomHinge(pinAndPivotFrame, child, parent)
 			,m_torque(1000.0f)
 		{
+			EnableLimits(false);
 		}
 
 		void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
@@ -44,6 +45,33 @@ class dSixAxisController: public dCustomControllerBase
 
 		dFloat m_torque;
 	};
+
+	class dKukaServoMotor2: public dCustomUniversal
+	{
+		public:
+		dKukaServoMotor2(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+			:dCustomUniversal(pinAndPivotFrame, child, parent)
+			,m_torque(1000.0f)
+		{
+			EnableLimit_0(false);
+			EnableLimit_1(false);
+		}
+
+		void SubmitConstraints(dFloat timestep, int threadIndex)
+		{
+			dCustomUniversal::SubmitConstraints(timestep, threadIndex);
+/*
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+*/
+		}
+
+		dFloat m_torque;
+	};
+
 
 	dSixAxisController()
 		:m_kinematicSolver(NULL)
@@ -82,8 +110,8 @@ class dSixAxisController: public dCustomControllerBase
 		location.m_posit = origin;
 		location.m_posit.m_y += 0.125f * 0.5f;
 
+		// add Robot Base
 		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
-		//NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
 		dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		parentMatrix.m_posit = location.m_posit;
 		dCustomHinge* const fixHinge = new dCustomHinge(parentMatrix, parentBody, NULL);
@@ -91,6 +119,7 @@ class dSixAxisController: public dCustomControllerBase
 		fixHinge->SetLimits(0.0f, 0.0f);
 		void* const rootNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, parentBody);
 
+		// add Robot rotating platform
 		dMatrix baseMatrix(dGetIdentityMatrix());
 		baseMatrix.m_posit = location.m_posit;
 		baseMatrix.m_posit.m_y += 0.125f * 0.5f + 0.11f;
@@ -98,30 +127,44 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		dKukaServoMotor* const baseHinge = new dKukaServoMotor(baseSpin, base, parentBody);
+		dKukaServoMotor1* const baseHinge = new dKukaServoMotor1(baseSpin, base, parentBody);
 		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
-		dMatrix arm0Matrix(dPitchMatrix(45.0f * 3.141592f / 180.0f));
-		arm0Matrix.m_posit = baseMatrix.m_posit;
-		arm0Matrix.m_posit.m_y += 0.30f;
-		arm0Matrix.m_posit.m_x += 0.09f;
-		arm0Matrix.m_posit.m_z -= 0.125f;
-		NewtonBody* const arm0 = CreateBox(scene, arm0Matrix, dVector(0.05f, 0.1f, 0.75f));
-		dMatrix arm0HingeMatrix(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
-		arm0HingeMatrix.m_posit = arm0Matrix.m_posit + arm0Matrix.RotateVector(dVector(0.0f, 0.0f, 0.3f));
-		dKukaServoMotor* const arm0Hinge = new dKukaServoMotor(arm0HingeMatrix, arm0, base);
-		void* const arm0HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, arm0Hinge->GetJoint());
+		// add Robot Arm
+		dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
+		armMatrix0.m_posit = baseMatrix.m_posit;
+		armMatrix0.m_posit.m_y += 0.30f;
+		armMatrix0.m_posit.m_x += 0.09f;
+		armMatrix0.m_posit.m_z -= 0.125f;
+		NewtonBody* const armBody0 = CreateBox(scene, armMatrix0, dVector(0.05f, 0.1f, 0.75f));
+		dMatrix armHingeMatrix0(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
+		armHingeMatrix0.m_posit = armMatrix0.m_posit + armMatrix0.RotateVector(dVector(0.0f, 0.0f, 0.3f));
+		dKukaServoMotor1* const armJoint0 = new dKukaServoMotor1(armHingeMatrix0, armBody0, base);
+		void* const armJointNode0 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, armJoint0->GetJoint());
 
-		dMatrix arm1Matrix(arm0Matrix * dYawMatrix(3.131592f));
-		arm1Matrix.m_posit = arm0Matrix.m_posit;
-		arm1Matrix.m_posit.m_y += 0.4f;
-		arm1Matrix.m_posit.m_x -= 0.05f;
-		arm1Matrix.m_posit.m_z -= 0.1f;
-		NewtonBody* const arm1 = CreateBox(scene, arm1Matrix, dVector(0.05f, 0.1f, 0.5f));
-		dMatrix arm1HingeMatrix(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
-		arm1HingeMatrix.m_posit = arm1Matrix.m_posit + arm1Matrix.RotateVector(dVector(0.0f, 0.0f, 0.2f));
-		dKukaServoMotor* const arm1Hinge = new dKukaServoMotor(arm1HingeMatrix, arm1, arm0);
-		void* const arm1HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, arm0HingeNode, arm1Hinge->GetJoint());
+		dMatrix armMatrix1(armMatrix0 * dYawMatrix(3.141592f));
+		armMatrix1.m_posit = armMatrix0.m_posit;
+		armMatrix1.m_posit.m_y += 0.4f;
+		armMatrix1.m_posit.m_x -= 0.05f;
+		armMatrix1.m_posit.m_z -= 0.1f;
+		NewtonBody* const armBody1 = CreateBox(scene, armMatrix1, dVector(0.05f, 0.1f, 0.5f));
+		dMatrix armHingeMatrix1(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
+		armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
+		dKukaServoMotor1* const armJoint1 = new dKukaServoMotor1(armHingeMatrix1, armBody1, armBody0);
+		void* const armJointNode1 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode0, armJoint1->GetJoint());
+
+		// Robot gripper base
+		dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f) * armMatrix1);
+		gripperMatrix.m_posit += gripperMatrix.m_front.Scale(0.325f);
+		NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
+		dMatrix gripperEffectMatrix(dGetIdentityMatrix());
+		gripperEffectMatrix.m_up = gripperMatrix.m_front;
+		gripperEffectMatrix.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+		gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
+		gripperEffectMatrix.m_posit = gripperMatrix.m_posit - gripperMatrix.m_front.Scale(0.05f);
+		dKukaServoMotor2* const gripperJoint = new dKukaServoMotor2(gripperEffectMatrix, gripperBase, armBody1);
+//		void* const arm1HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, arm0HingeNode, arm1Hinge->GetJoint());
+
 
 		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 	}

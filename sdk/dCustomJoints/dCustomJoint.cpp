@@ -241,7 +241,11 @@ void dCustomJoint::Destructor (const NewtonJoint* me)
 
 void dCustomJoint::Debug(dDebugDisplay* const debugDisplay) const
 {
-
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
 }
 
 void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex)
