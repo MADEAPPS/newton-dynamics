@@ -61,10 +61,10 @@ class dSixAxisController: public dCustomControllerBase
 	void DrawHelp(DemoEntityManager* const scene)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Use Sliders to manipulate the robot");
+		scene->Print(color, "Use sliders to manipulate robot");
 		ImGui::SliderFloat("Azimuth", &m_azimuth, -360.0f, 360.0f);
-		ImGui::SliderFloat("position_x", &m_posit_x, -1.0f, 1.0f);
-		ImGui::SliderFloat("position_y", &m_posit_y, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_x", &m_posit_x, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_y", &m_posit_y, -1.0f, 1.0f);
 	}
 
 	void PostUpdate(dFloat timestep, int threadIndex)
@@ -82,9 +82,14 @@ class dSixAxisController: public dCustomControllerBase
 		location.m_posit = origin;
 		location.m_posit.m_y += 0.125f * 0.5f;
 
-		NewtonBody* const parent = CreateCylinder(scene, location, 0.35f, 0.125f);
-		NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
-		
+		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
+		//NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
+		dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
+		parentMatrix.m_posit = location.m_posit;
+		dCustomHinge* const fixHinge = new dCustomHinge(parentMatrix, parentBody, NULL);
+		fixHinge->EnableLimits(true);
+		fixHinge->SetLimits(0.0f, 0.0f);
+		void* const rootNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, parentBody);
 
 		dMatrix baseMatrix(dGetIdentityMatrix());
 		baseMatrix.m_posit = location.m_posit;
@@ -93,9 +98,8 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		dKukaServoMotor* const baseHinge = new dKukaServoMotor(baseSpin, base, parent);
-		void* const baseNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, base);
-//		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseNode, baseHinge->GetJoint());
+		dKukaServoMotor* const baseHinge = new dKukaServoMotor(baseSpin, base, parentBody);
+		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 		dMatrix arm0Matrix(dPitchMatrix(45.0f * 3.141592f / 180.0f));
 		arm0Matrix.m_posit = baseMatrix.m_posit;
@@ -106,7 +110,7 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix arm0HingeMatrix(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 		arm0HingeMatrix.m_posit = arm0Matrix.m_posit + arm0Matrix.RotateVector(dVector(0.0f, 0.0f, 0.3f));
 		dKukaServoMotor* const arm0Hinge = new dKukaServoMotor(arm0HingeMatrix, arm0, base);
-		void* const arm0HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseNode, arm0Hinge->GetJoint());
+		void* const arm0HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, arm0Hinge->GetJoint());
 
 		dMatrix arm1Matrix(arm0Matrix * dYawMatrix(3.131592f));
 		arm1Matrix.m_posit = arm0Matrix.m_posit;
