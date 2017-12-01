@@ -43,6 +43,10 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}
 
+		void Debug(dDebugDisplay* const debugDisplay) const
+		{
+		}
+
 		dFloat m_torque;
 	};
 
@@ -59,14 +63,26 @@ class dSixAxisController: public dCustomControllerBase
 
 		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
+			dMatrix matrix0;
+			dMatrix matrix1;
+			dFloat accel;
+
 			dCustomUniversal::SubmitConstraints(timestep, threadIndex);
-/*
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+
+			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+			CalculateGlobalMatrix(matrix0, matrix1);
+			
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
-*/
+
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}
 
 		dFloat m_torque;
@@ -98,7 +114,6 @@ class dSixAxisController: public dCustomControllerBase
 	void PostUpdate(dFloat timestep, int threadIndex)
 	{
 	}
-
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
@@ -158,13 +173,12 @@ class dSixAxisController: public dCustomControllerBase
 		gripperMatrix.m_posit += gripperMatrix.m_front.Scale(0.325f);
 		NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
 		dMatrix gripperEffectMatrix(dGetIdentityMatrix());
-		gripperEffectMatrix.m_up = gripperMatrix.m_front;
-		gripperEffectMatrix.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+		gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f); 
+		gripperEffectMatrix.m_front = gripperMatrix.m_front;
 		gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 		gripperEffectMatrix.m_posit = gripperMatrix.m_posit - gripperMatrix.m_front.Scale(0.05f);
 		dKukaServoMotor2* const gripperJoint = new dKukaServoMotor2(gripperEffectMatrix, gripperBase, armBody1);
-//		void* const arm1HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, arm0HingeNode, arm1Hinge->GetJoint());
-
+		void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
 
 		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 	}
