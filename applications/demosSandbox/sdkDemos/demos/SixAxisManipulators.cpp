@@ -89,8 +89,44 @@ class dSixAxisController: public dCustomControllerBase
 	};
 
 
+	class dKukaEndEffector: public dCustomJoint
+	{
+		public:
+		dKukaEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
+			:dCustomJoint(invDynSolver, invDynNode)
+		{
+		}
+
+		~dKukaEndEffector()
+		{
+		}
+/*
+		void SetMaxLinearFriction(dFloat accel);
+		void SetMaxAngularFriction(dFloat alpha);
+
+		void SetTargetPosit(const dVector& posit);
+		void SetTargetRotation(const dQuaternion& rotation);
+
+		dMatrix GetTargetMatrix() const;
+		void SetTargetMatrix(const dMatrix& matrix);
+*/
+		protected:
+		void SubmitConstraints(dFloat timestep, int threadIndex)
+		{
+
+		}
+/*
+		dVector m_targetPosit;
+		dQuaternion m_targetRot;
+		dFloat m_maxLinearFriction;
+		dFloat m_maxAngularFriction;
+*/
+	};
+
+
 	dSixAxisController()
-		:m_kinematicSolver(NULL)
+		:m_effector(NULL)
+		,m_kinematicSolver(NULL)
 		,m_azimuth(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
@@ -109,14 +145,6 @@ class dSixAxisController: public dCustomControllerBase
 		ImGui::SliderFloat("Azimuth", &m_azimuth, -360.0f, 360.0f);
 		ImGui::SliderFloat("posit_x", &m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &m_posit_y, -1.0f, 1.0f);
-	}
-
-	void PostUpdate(dFloat timestep, int threadIndex)
-	{
-	}
-
-	void PreUpdate(dFloat timestep, int threadIndex)
-	{
 	}
 
 	void MakeKukaRobot(DemoEntityManager* const scene, const dVector& origin)
@@ -180,6 +208,9 @@ class dSixAxisController: public dCustomControllerBase
 		dKukaServoMotor2* const gripperJoint = new dKukaServoMotor2(gripperEffectMatrix, gripperBase, armBody1);
 		void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
 
+		// add the inverse dynamics end effector
+		m_effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
+
 		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 	}
 
@@ -227,10 +258,18 @@ class dSixAxisController: public dCustomControllerBase
 		return body;
 	}
 
+	void PostUpdate(dFloat timestep, int threadIndex) {}
+
+	void PreUpdate(dFloat timestep, int threadIndex)
+	{
+	}
+
+	dKukaEndEffector* m_effector;
 	NewtonInverseDynamics* m_kinematicSolver;
 	dFloat32 m_azimuth;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
+	
 };
 
 class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
