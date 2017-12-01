@@ -84,7 +84,7 @@ class dSixAxisController: public dCustomControllerBase
 
 		NewtonBody* const parent = CreateCylinder(scene, location, 0.35f, 0.125f);
 		NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
-//		void* const baseNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, parent);
+		
 
 		dMatrix baseMatrix(dGetIdentityMatrix());
 		baseMatrix.m_posit = location.m_posit;
@@ -94,6 +94,7 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
 		dKukaServoMotor* const baseHinge = new dKukaServoMotor(baseSpin, base, parent);
+		void* const baseNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, base);
 //		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseNode, baseHinge->GetJoint());
 
 		dMatrix arm0Matrix(dPitchMatrix(45.0f * 3.141592f / 180.0f));
@@ -105,7 +106,7 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix arm0HingeMatrix(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 		arm0HingeMatrix.m_posit = arm0Matrix.m_posit + arm0Matrix.RotateVector(dVector(0.0f, 0.0f, 0.3f));
 		dKukaServoMotor* const arm0Hinge = new dKukaServoMotor(arm0HingeMatrix, arm0, base);
-//		void* const arm0HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, arm0Hinge->GetJoint());
+		void* const arm0HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseNode, arm0Hinge->GetJoint());
 
 		dMatrix arm1Matrix(arm0Matrix * dYawMatrix(3.131592f));
 		arm1Matrix.m_posit = arm0Matrix.m_posit;
@@ -116,9 +117,9 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix arm1HingeMatrix(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 		arm1HingeMatrix.m_posit = arm1Matrix.m_posit + arm1Matrix.RotateVector(dVector(0.0f, 0.0f, 0.2f));
 		dKukaServoMotor* const arm1Hinge = new dKukaServoMotor(arm1HingeMatrix, arm1, arm0);
-//		void* const arm1HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, arm0HingeNode, arm1Hinge->GetJoint());
+		void* const arm1HingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, arm0HingeNode, arm1Hinge->GetJoint());
 
-//		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
+		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 	}
 
 	private:
