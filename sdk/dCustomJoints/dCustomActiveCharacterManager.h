@@ -148,7 +148,7 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	CUSTOM_JOINTS_API virtual void Debug (dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	protected:
-	NewtonInverseDynamics* m_kinemativSolver;
+	NewtonInverseDynamics* m_kinematicSolver;
 	dList<dCustomRagdollMotor_EndEffector*> m_effectorList;
 	friend class dCustomActiveCharacterManager;
 };

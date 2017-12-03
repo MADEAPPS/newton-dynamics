@@ -851,7 +851,7 @@ void DemoEntityManager::RenderStats()
 	if (m_showUI && m_renderHelpMenus) {
 		if (ImGui::Begin("User Interface", &m_showUI)){
 			m_renderHelpMenus (this, m_renderUIContext);
-			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
+			//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
 		}
 	}

@@ -179,6 +179,7 @@ dgFloat32 NewtonUserJoint::GetInverseDynamicsAcceleration() const
 	dgInt32 index = m_rows - 1;
 	dgFloat32 accel = dgFloat32(0.0f);
 	if ((index >= 0) && (index < dgInt32(m_maxDOF))) {
+		m_param->m_forceBounds[index].m_isIkRow = 1;
 		accel = GetInverseDynamicAcceleration(index);
 	}
 	return accel;
@@ -210,7 +211,9 @@ void NewtonUserJoint::SetHighFriction (dgFloat32 friction)
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		m_param->m_forceBounds[index].m_upper = dgClamp (friction, dgFloat32(0.001f), dgFloat32(DG_MAX_BOUND));
-		m_param->m_forceBounds[index].m_normalIndex = DG_NORMAL_CONSTRAINT - 1;
+		//m_param->m_forceBounds[index].m_normalIndex = DG_NORMAL_CONSTRAINT - 1;
+		dgAssert (m_param->m_forceBounds[index].m_normalIndex == DG_NORMAL_CONSTRAINT);
+		//m_param->m_forceBounds[index].m_normalIndex = DG_NORMAL_CONSTRAINT;
 
 		#ifdef _DEBUG
 		dgInt32 i0 = 0; 
@@ -230,7 +233,9 @@ void NewtonUserJoint::SetLowerFriction (dgFloat32 friction)
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		m_param->m_forceBounds[index].m_low = dgClamp (friction, dgFloat32(DG_MIN_BOUND), dgFloat32(-0.001f));
-		m_param->m_forceBounds[index].m_normalIndex = DG_NORMAL_CONSTRAINT - 1;
+		//m_param->m_forceBounds[index].m_normalIndex = DG_NORMAL_CONSTRAINT - 1;
+		dgAssert (m_param->m_forceBounds[index].m_normalIndex == DG_NORMAL_CONSTRAINT);
+		//m_param->m_forceBounds[index].m_normalIndex = DG_NORMAL_CONSTRAINT;
 
 		#ifdef _DEBUG
 		dgInt32 i0 = 0;

@@ -26,6 +26,7 @@ dCustomKinematicController::dCustomKinematicController(NewtonBody* const body, c
 	:dCustomJoint(6, body, NULL)
 {
 	dMatrix matrix;
+	dAssert (GetBody0() == body);
 	NewtonBodyGetMatrix (body, &matrix[0][0]);
 	matrix.m_posit = handleInGlobalSpace;
 	Init (body, matrix);
@@ -36,6 +37,13 @@ dCustomKinematicController::dCustomKinematicController (NewtonBody* const body, 
 {
 	Init (body, attachmentMatrixInGlobalSpace);
 }
+
+dCustomKinematicController::dCustomKinematicController(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& handleInGlobalSpace)
+	:dCustomJoint(invDynSolver, invDynNode)
+{
+	Init(GetBody0(), handleInGlobalSpace);
+}
+
 
 void dCustomKinematicController::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {

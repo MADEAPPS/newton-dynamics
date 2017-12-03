@@ -26,6 +26,7 @@ class dCustomKinematicController: public dCustomJoint
 	public:
 	CUSTOM_JOINTS_API dCustomKinematicController (NewtonBody* const body, const dVector& attachmentPointInGlobalSpace);
 	CUSTOM_JOINTS_API dCustomKinematicController (NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace);
+	CUSTOM_JOINTS_API dCustomKinematicController (NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace);
 	CUSTOM_JOINTS_API virtual ~dCustomKinematicController();
 
 	CUSTOM_JOINTS_API void SetPickMode (int mode);

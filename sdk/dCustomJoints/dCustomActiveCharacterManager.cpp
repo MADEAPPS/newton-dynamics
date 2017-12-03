@@ -43,14 +43,14 @@ void dCustomActiveCharacterManager::OnUpdateTransform(const dCustomActiveCharact
 
 
 dCustomActiveCharacterController::dCustomActiveCharacterController()
-	:m_kinemativSolver(NULL)
+	:m_kinematicSolver(NULL)
 {
 }
 
 dCustomActiveCharacterController::~dCustomActiveCharacterController()
 {
-	if (m_kinemativSolver) {
-		NewtonInverseDynamicsDestroy (m_kinemativSolver);
+	if (m_kinematicSolver) {
+		NewtonInverseDynamicsDestroy (m_kinematicSolver);
 	}
 }
 
@@ -89,53 +89,53 @@ void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadInd
 
 void* dCustomActiveCharacterController::GetRoot() const
 {
-	return m_kinemativSolver ? NewtonInverseDynamicsGetRoot (m_kinemativSolver) : NULL;
+	return m_kinematicSolver ? NewtonInverseDynamicsGetRoot (m_kinematicSolver) : NULL;
 }
 
 NewtonBody* dCustomActiveCharacterController::GetBody(void* const node) const
 {
-	return m_kinemativSolver ? NewtonInverseDynamicsGetBody (m_kinemativSolver, node) : NULL;
+	return m_kinematicSolver ? NewtonInverseDynamicsGetBody (m_kinematicSolver, node) : NULL;
 }
 
 dCustomJoint* const dCustomActiveCharacterController::GetJoint(void* const node) const
 {
-	NewtonJoint* const joint = m_kinemativSolver ? NewtonInverseDynamicsGetJoint (m_kinemativSolver, node) : NULL;
+	NewtonJoint* const joint = m_kinematicSolver ? NewtonInverseDynamicsGetJoint (m_kinematicSolver, node) : NULL;
 	//dAssert(!joint || ((dCustomRagdollMotor*)NewtonJointGetUserData(joint))->IsType(dCustomRagdollMotor::GetType()));
 	return joint ? (dCustomJoint*) NewtonJointGetUserData(joint) : NULL;
 }
 
 void* dCustomActiveCharacterController::AddRoot(NewtonBody* const rootBody)
 {
-	dAssert (!m_kinemativSolver);
-	if (m_kinemativSolver) {
-		NewtonInverseDynamicsDestroy (m_kinemativSolver);
+	dAssert (!m_kinematicSolver);
+	if (m_kinematicSolver) {
+		NewtonInverseDynamicsDestroy (m_kinematicSolver);
 	}
 
 	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
 	m_body = rootBody;
-	m_kinemativSolver = NewtonCreateInverseDynamics(world);
-	return NewtonInverseDynamicsAddRoot(m_kinemativSolver, m_body);
+	m_kinematicSolver = NewtonCreateInverseDynamics(world);
+	return NewtonInverseDynamicsAddRoot(m_kinematicSolver, m_body);
 }
 
 void* dCustomActiveCharacterController::AddBone(dCustomRagdollMotor* const childJoint, void* const parentBone)
 {
-	dAssert (m_kinemativSolver);
-	return NewtonInverseDynamicsAddChildNode (m_kinemativSolver, parentBone, childJoint->GetJoint());
+	dAssert (m_kinematicSolver);
+	return NewtonInverseDynamicsAddChildNode (m_kinematicSolver, parentBone, childJoint->GetJoint());
 }
 
 void dCustomActiveCharacterController::Finalize ()
 {
-	if (m_kinemativSolver) {
-		NewtonInverseDynamicsEndBuild (m_kinemativSolver);
+	if (m_kinematicSolver) {
+		NewtonInverseDynamicsEndBuild (m_kinematicSolver);
 	}
 }
 
 dCustomRagdollMotor_EndEffector* dCustomActiveCharacterController::AddEndEffector(void* const node, const dMatrix& pinAndPivot)
 {
-	dAssert (m_kinemativSolver);
-	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinemativSolver, node, pinAndPivot);
+	dAssert (m_kinematicSolver);
+	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinematicSolver, node, pinAndPivot);
 	m_effectorList.Append(effector);
 	return effector;
 }
@@ -155,8 +155,8 @@ void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadInde
 	//	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
 	//	manager->OnPreUpdate(this, timestep, threadIndex);
 
-	if (m_kinemativSolver) {
-		NewtonInverseDynamicsUpdate (m_kinemativSolver, timestep, threadIndex);
+	if (m_kinematicSolver) {
+		NewtonInverseDynamicsUpdate (m_kinematicSolver, timestep, threadIndex);
 	}
 }
 

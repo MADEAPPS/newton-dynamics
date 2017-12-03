@@ -234,7 +234,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir0, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir0);
-		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_NORMAL_CONSTRAINT : normalIndex;
+		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_NORMAL_CONSTRAINT : normalIndex);
 
 		params.m_restitution[jacobIndex] = dgFloat32(0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32(0.0f);
@@ -267,7 +267,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir1, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir1);
-		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_NORMAL_CONSTRAINT : normalIndex;
+		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_NORMAL_CONSTRAINT : normalIndex);
 		
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);

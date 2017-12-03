@@ -83,8 +83,9 @@ class dgInverseDynamics::dgNode
 		,m_sibling(NULL)
 		,m_primaryStart(0)
 		,m_auxiliaryStart(0)
-		,m_index(0)
 		,m_dof(0)
+		,m_ikdof(0)
+		,m_index(0)
 		,m_swapJacobianBodiesIndex(0)
 	{
 	}
@@ -97,8 +98,9 @@ class dgInverseDynamics::dgNode
 		,m_sibling(NULL)
 		,m_primaryStart(0)
 		,m_auxiliaryStart(0)
-		,m_index(0)
 		,m_dof(0)
+		,m_ikdof(0)
+		,m_index(0)
 		,m_swapJacobianBodiesIndex(joint->GetBody0() == parent->m_body)
 	{
 		dgAssert (m_parent);
@@ -174,6 +176,7 @@ class dgInverseDynamics::dgNode
 			CalculateInertiaMatrix();
 		}
 
+//		dgInt32 freeDof = 0;
 		dgInt32 boundedDof = 0;
 		m_ordinals = m_ordinalInit;
 		if (m_joint) {
@@ -182,8 +185,20 @@ class dgInverseDynamics::dgNode
 			dgAssert(jointInfo->m_joint == m_joint);
 
 			m_dof = 0;
+			m_ikdof = 0;
 			dgInt32 count = jointInfo->m_pairCount;
 			const dgInt32 first = jointInfo->m_pairStart;
+
+			for (dgInt32 i = 0; i < count; i++) {
+				dgInt32 k = m_sourceJacobianIndex[i];
+				const dgJacobianMatrixElement* const row = &matrixRow[k + first];
+				if (row->m_normalForceIndex) {
+					dgSwap(m_sourceJacobianIndex[i], m_sourceJacobianIndex[count - 1]);
+					i--;
+					count--;
+					m_ikdof++;
+				}
+			}
 
 			for (dgInt32 i = 0; i < count; i++) {
 				dgInt32 k = m_sourceJacobianIndex[i];
@@ -198,7 +213,9 @@ class dgInverseDynamics::dgNode
 			}
 			dgAssert (m_dof > 0);
 			dgAssert (m_dof <= 6);
-			boundedDof += (jointInfo->m_pairCount - count);
+//			boundedDof += (jointInfo->m_pairCount - count - freeDof);
+//			boundedDof += (jointInfo->m_pairCount - count - freeDof);
+			boundedDof = jointInfo->m_pairCount - m_dof - m_ikdof;
 			GetJacobians(jointInfo, matrixRow);
 		}
 
@@ -221,6 +238,7 @@ class dgInverseDynamics::dgNode
 			CalculateJointDiagonal();
 			CalculateJacobianBlock();
 		}
+//		return jointInfo->m_pairCount - m_count - freeDof;
 		return boundedDof;
 	}
 
@@ -375,8 +393,10 @@ class dgInverseDynamics::dgNode
 	};
 	dgInt16 m_primaryStart;
 	dgInt16 m_auxiliaryStart;
-	dgInt16 m_index;
+
 	dgInt8 m_dof;
+	dgInt8 m_ikdof;
+	dgInt8 m_index;
 	dgInt8 m_swapJacobianBodiesIndex;
 	static dgInt64 m_ordinalInit;
 };
@@ -397,6 +417,7 @@ dgInverseDynamics::dgInverseDynamics(dgWorld* const world)
 	,m_loopingJoints(world->GetAllocator())
 	,m_nodeCount(1)
 	,m_rowCount(0)
+	,m_ikRowCount(0)
 	,m_auxiliaryRowCount(0)
 {
 }
@@ -469,7 +490,7 @@ void dgInverseDynamics::SortGraph(dgNode* const root, dgInt32& index)
 
 	dgAssert((m_nodeCount - index - 1) >= 0);
 	m_nodesOrder[index] = root;
-	root->m_index = dgInt16(index);
+	root->m_index = dgInt8(index);
 	index++;
 	dgAssert(index <= m_nodeCount);
 }
@@ -609,24 +630,26 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 	dTimeTrackerEvent(__FUNCTION__);
 
 	dgInt32 rowCount = 0;
+	dgInt32 ikRowCount = 0;
 	dgInt32 primaryStart = 0;
-	dgInt32 auxiliaryStart = 0;
+	dgInt32 auxiliaryCount = 0;
 
 	if (m_nodesOrder) {
 		for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 			dgNode* const node = m_nodesOrder[i];
 			dgAssert (node->m_index == i);
-			node->m_auxiliaryStart = dgInt16 (auxiliaryStart);
+			node->m_auxiliaryStart = dgInt16 (auxiliaryCount);
 			node->m_primaryStart = dgInt16 (primaryStart);
-			auxiliaryStart += node->Factorize(jointInfoArray, matrixRow);
-
+			auxiliaryCount += node->Factorize(jointInfoArray, matrixRow);
+			ikRowCount += node->m_ikdof;
 			rowCount += (jointInfoArray[i].m_pairCount);
 			primaryStart += node->m_dof;
 		}
 		m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, matrixRow);
 	}
 	m_rowCount = dgInt16 (rowCount);
-	m_auxiliaryRowCount = dgInt16 (auxiliaryStart);
+	m_ikRowCount = dgInt16 (ikRowCount);
+	m_auxiliaryRowCount = dgInt16 (auxiliaryCount);
 
 	dgInt32 extraAuxiliaryRows = 0;
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
@@ -637,7 +660,7 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 	m_auxiliaryRowCount += dgInt16 (extraAuxiliaryRows);
 
 	if (m_auxiliaryRowCount) {
-		const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
+		const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount - m_ikRowCount;
 		dgInt32 primaryIndex = 0;
 		dgInt32 auxiliaryIndex = 0;
 
@@ -667,8 +690,9 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 				primaryIndex++;
 			}
 
-			const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
+			const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof - node->m_ikdof;
 			for (dgInt32 j = 0; j < auxiliaryDof; j++) {
+				dgAssert (0);
 				const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 				dgJacobianMatrixElement* const row = &matrixRow[first + index];
 				m_rowArray[auxiliaryIndex + primaryCount] = row;
@@ -698,7 +722,7 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 		}
 
 		dgFloat32* const diagDamp = dgAlloca(dgFloat32, m_auxiliaryRowCount);
-		const dgInt32 auxiliaryBase = m_rowCount - m_auxiliaryRowCount;
+		const dgInt32 auxiliaryBase = m_rowCount - m_auxiliaryRowCount - m_ikRowCount;
 		for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 			const dgJacobianMatrixElement* const row_i = m_rowArray[primaryCount + i];
 			dgFloat32* const matrixRow11 = &m_massMatrix11[m_auxiliaryRowCount * i];
@@ -939,7 +963,6 @@ DG_INLINE void dgInverseDynamics::CalculateJointAccel(dgJointInfo* const jointIn
 DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const
 {
 	dgVector zero(dgVector::m_zero);
-//	dgAssert (m_loopingBodies.GetCount() == 0);
 	const dgInt32 bodyCount = m_nodeCount;
 	for (dgInt32 i = 0; i < bodyCount; i++) {
 		externalForces[i].m_linear = zero; 
@@ -948,7 +971,6 @@ DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const exte
 
 	for (dgInt32 i = 0; i < (m_nodeCount - 1); i++) {
 		dgNode* const node = m_nodesOrder[i];
-		//const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
 		const dgJointInfo* const jointInfo = &jointInfoArray[i];
 
 		dgJacobian y0;
@@ -985,10 +1007,10 @@ DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const exte
 	}
 }
 
-void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalAccel, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
+void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForce, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
-
+		
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
 	dgFloat32* const u = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);
@@ -999,7 +1021,7 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalAcce
 
 	dgInt32 primaryIndex = 0;
 	dgInt32 auxiliaryIndex = 0;
-	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
+	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount - m_ikRowCount;
 
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		const dgNode* const node = m_nodesOrder[i];
@@ -1017,8 +1039,9 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalAcce
 			primaryIndex++;
 		}
 
-		const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
+		const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof - node->m_ikdof;
 		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
+			dgAssert (0);
 			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 			dgJacobianMatrixElement* const row = &matrixRow[first + index];
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
@@ -1045,7 +1068,7 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalAcce
 			//dgVector diag(row->m_Jt.m_jacobianM0.m_linear * y0.m_linear) + row->m_Jt.m_jacobianM0.m_angular * y0.m_angular) +
 			//			  row->m_Jt.m_jacobianM1.m_linear * y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular * y1.m_angular));
 			//b[auxiliaryIndex] = row->m_penetrationStiffness - (diag.AddHorizontal()).GetScalar();
-			b[auxiliaryIndex] = row->m_penetrationStiffness;
+			b[auxiliaryIndex] = -row->m_penetrationStiffness;
 			low[auxiliaryIndex] = dgClamp(row->m_lowerBoundFrictionCoefficent, -DG_MAX_BOUND, dgFloat32(0.0f));
 			high[auxiliaryIndex] = dgClamp(row->m_upperBoundFrictionCoefficent, dgFloat32(0.0f), DG_MAX_BOUND);
 			auxiliaryIndex++;
@@ -1076,34 +1099,23 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalAcce
 		}
 	}
 
-
-	dgVector zero(dgVector::m_zero);
-	//const dgInt32 bodyCount = m_loopingBodies.GetCount() + m_nodeCount;
-	const dgInt32 bodyCount = m_nodeCount;
-	for (dgInt32 i = 0; i < bodyCount; i++) {
-		externalAccel[i].m_linear = zero;
-		externalAccel[i].m_angular = zero;
-	}
-
-	for (dgInt32 i = 0; i < m_rowCount; i++) {
+	const dgInt32 rowCount = m_rowCount - m_ikRowCount;
+	for (dgInt32 i = 0; i < rowCount; i++) {
 		dgJacobianMatrixElement* const row = m_rowArray[i];
 		const dgInt32 m0 = m_pairs[i].m_m0;
 		const dgInt32 m1 = m_pairs[i].m_m1;
 
 		row->m_force += f[i];
 		dgVector jointForce(f[i]);
-		externalAccel[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
-		externalAccel[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
-		externalAccel[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
-		externalAccel[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
+		externalForce[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
+		externalForce[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
+		externalForce[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
+		externalForce[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
 	}
 }
 
-
 DG_INLINE void dgInverseDynamics::GetRowJacobianDerivatives (dgInt32 index, const dgVector& invMass0, const dgVector& invMass1, const dgMatrix& invInertia0, const dgMatrix& invInertia1, const dgContraintDescritor& constraintParams, dgJacobianMatrixElement* const row) const
 {
-	dgAssert (0);
-/*
 	dgAssert(constraintParams.m_forceBounds[index].m_jointForce);
 	row->m_Jt = constraintParams.m_jacobian[index];
 
@@ -1119,7 +1131,9 @@ DG_INLINE void dgInverseDynamics::GetRowJacobianDerivatives (dgInt32 index, cons
 	row->m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[index].m_low;
 	row->m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[index].m_upper;
 	row->m_jointFeebackForce = constraintParams.m_forceBounds[index].m_jointForce;
-	row->m_normalForceIndex = constraintParams.m_forceBounds[index].m_normalIndex;
+	// use this to indicate if this row is an inverse IK
+	//row->m_normalForceIndex = constraintParams.m_forceBounds[index].m_normalIndex;
+	row->m_normalForceIndex = constraintParams.m_forceBounds[index].m_isIkRow;
 
 	dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
 	dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
@@ -1140,34 +1154,26 @@ DG_INLINE void dgInverseDynamics::GetRowJacobianDerivatives (dgInt32 index, cons
 	dgAssert(diag > dgFloat32(0.0f));
 	row->m_diagDamp = diag * row->m_stiffness;
 	diag *= (dgFloat32(1.0f) + row->m_stiffness);
-	row->m_jMinvJt = diag;
-	row->m_invJMinvJt = dgFloat32(1.0f) / diag;
+	row->m_jinvMJt = diag;
+	row->m_invJinvMJt = dgFloat32(1.0f) / diag;
 	row->m_force = dgFloat32(0.0f);
-*/
 }
 
 DG_INLINE dgInt32 dgInverseDynamics::GetJacobianDerivatives (dgBilateralConstraint* const constraint, dgContraintDescritor& constraintParams) const
 {
-dgAssert (0);
-return 0;
-/*
 	for (dgInt32 i = 0; i < 6; i++) {
 		constraint->m_inverseDynamicsAcceleration[i] = dgFloat32(0.0f);
 		constraintParams.m_forceBounds[i].m_low = DG_MIN_BOUND;
 		constraintParams.m_forceBounds[i].m_upper = DG_MAX_BOUND;
 		constraintParams.m_forceBounds[i].m_jointForce = NULL;
-		constraintParams.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
+		constraintParams.m_forceBounds[i].m_isIkRow = 0;
+		constraintParams.m_forceBounds[i].m_normalIndex = DG_NORMAL_CONSTRAINT;
 	}
 	return constraint->JacobianDerivative(constraintParams);
-*/
 }
-
 
 dgInt32 dgInverseDynamics::GetJacobianDerivatives(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep, dgInt32 threadIndex) const
 {
-	dgAssert(0);
-	return 0;
-/*
 	dgContraintDescritor constraintParams;
 	constraintParams.m_timestep = timestep;
 	constraintParams.m_threadIndex = threadIndex;
@@ -1252,14 +1258,11 @@ dgInt32 dgInverseDynamics::GetJacobianDerivatives(dgJointInfo* const jointInfoAr
 	}
 
 	return rowCount;
-*/
 }
 
 
 void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const externalForce, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const
 {
-	dgAssert(0);
-/*
 	//dgJacobian* const velocity = dgAlloca(dgJacobian, m_nodeCount + m_loopingBodies.GetCount());
 	dgJacobian* const velocity = dgAlloca(dgJacobian, m_nodeCount);
 
@@ -1301,18 +1304,14 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 							  veloc1.m_linear * row->m_Jt.m_jacobianM1.m_linear +
 							  veloc1.m_angular * row->m_Jt.m_jacobianM1.m_angular);
 
-
 			dgFloat32 a = relVeloc.AddHorizontal().GetScalar() * invTimestep; 
 			joint->m_inverseDynamicsAcceleration[k] = -a;
 		}
 	}
-*/
 }
 
 void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 {
-return;
-/*
 	dgJointInfo* const jointInfoArray = dgAlloca (dgJointInfo, m_nodeCount + m_loopingJoints.GetCount());
 	dgJacobianMatrixElement* const matrixRow = dgAlloca (dgJacobianMatrixElement, 6 * (m_nodeCount + m_loopingJoints.GetCount()));
 
@@ -1334,8 +1333,9 @@ return;
 	InitMassMatrix(jointInfoArray, matrixRow, memoryBuffer);
 	CalculateJointAccel(jointInfoArray, matrixRow, accel);
 	CalculateOpenLoopForce(force, accel);
-//	CalculateInternalForces(internalForce, jointInfoArray, matrixRow, force);
-	CalculateCloseLoopsForces(internalForce, jointInfoArray, matrixRow, accel, force);
+	CalculateInternalForces(internalForce, jointInfoArray, matrixRow, force);
+	if (m_auxiliaryRowCount) {
+		CalculateCloseLoopsForces(internalForce, jointInfoArray, matrixRow, accel, force);
+	}
 	CalculateMotorsAccelerations (internalForce, jointInfoArray, matrixRow, timestep);
-*/
 }

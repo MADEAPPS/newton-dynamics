@@ -61,6 +61,10 @@ class dSixAxisController: public dCustomControllerBase
 			EnableLimit_1(false);
 		}
 
+		void Debug(dDebugDisplay* const debugDisplay) const
+		{
+		}
+
 		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
 			dMatrix matrix0;
@@ -68,10 +72,10 @@ class dSixAxisController: public dCustomControllerBase
 			dFloat accel;
 
 			dCustomUniversal::SubmitConstraints(timestep, threadIndex);
-return;
+
 			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 			CalculateGlobalMatrix(matrix0, matrix1);
-			
+
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
@@ -89,40 +93,47 @@ return;
 	};
 
 
-	class dKukaEndEffector: public dCustomJoint
+	class dKukaEndEffector: public dCustomKinematicController
 	{
 		public:
-		dKukaEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
-			:dCustomJoint(invDynSolver, invDynNode)
+		dKukaEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace, const dVector& origin)
+			:dCustomKinematicController(invDynSolver, invDynNode, attachmentPointInGlobalSpace)
+			,m_origin(origin)
 		{
+			m_x0 = attachmentPointInGlobalSpace.m_posit.m_z - m_origin.m_z;
+			m_y0 = attachmentPointInGlobalSpace.m_posit.m_y - m_origin.m_y;
+			SetPickMode(0);
+			SetMaxLinearFriction (1000.0f);
 		}
 
 		~dKukaEndEffector()
 		{
 		}
-/*
-		void SetMaxLinearFriction(dFloat accel);
-		void SetMaxAngularFriction(dFloat alpha);
 
-		void SetTargetPosit(const dVector& posit);
-		void SetTargetRotation(const dQuaternion& rotation);
+		void Debug(dDebugDisplay* const debugDisplay) const
+		{
+			dCustomKinematicController::Debug(debugDisplay);
+		}
 
-		dMatrix GetTargetMatrix() const;
-		void SetTargetMatrix(const dMatrix& matrix);
-*/
+		void SetTarget (dFloat x, dFloat y, dFloat azymuth)
+		{
+			x = 0.5f;
+			dVector xxx (m_origin);
+			xxx.m_y += m_y0 + y;
+			xxx.m_z += m_x0 + x;
+			SetTargetPosit(xxx);
+		}
+
 		protected:
 		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
-
+			dCustomKinematicController::SubmitConstraints(timestep, threadIndex);
 		}
-/*
-		dVector m_targetPosit;
-		dQuaternion m_targetRot;
-		dFloat m_maxLinearFriction;
-		dFloat m_maxAngularFriction;
-*/
-	};
 
+		dVector m_origin;
+		dFloat m_x0;
+		dFloat m_y0;
+	};
 
 	dSixAxisController()
 		:m_effector(NULL)
@@ -198,20 +209,25 @@ return;
 
 		// Robot gripper base
 		dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
-		gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale (-0.06f);
+		gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
 		NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
 		dMatrix gripperEffectMatrix(dGetIdentityMatrix());
-		gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f); 
+		gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f);
 		gripperEffectMatrix.m_front = gripperMatrix.m_front;
 		gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 		gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
 		dKukaServoMotor2* const gripperJoint = new dKukaServoMotor2(gripperEffectMatrix, gripperBase, armBody1);
-//		void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
+		void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
 
 		// add the inverse dynamics end effector
-//		m_effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
+		m_effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix, origin);
 
 		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
+	}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		m_effector->Debug(debugContext);
 	}
 
 	private:
@@ -262,6 +278,9 @@ return;
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
+		// calculate the current position
+		m_effector->SetTarget (m_posit_x, m_posit_y, m_azimuth * 3.141592f / 180.0f);
+		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 
 	dKukaEndEffector* m_effector;
@@ -269,7 +288,6 @@ return;
 	dFloat32 m_azimuth;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
-	
 };
 
 class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
@@ -309,6 +327,14 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		return controller;
 	}
 
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->Debug(debugContext);
+		}
+	}
+
 	dSixAxisController* m_currentController;
 };
 
@@ -321,7 +347,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
 	robotManager->MakeKukaRobot (scene, dVector (0.0f, 0.0f, 0.0f));
-//	robotManager->MakeKukaRobot (scene, dVector (0.0f, 0.0f, 2.0f));
+
 	dVector origin(0.0f);
 	origin.m_x = -2.0f;
 	origin.m_y  = 0.5f;

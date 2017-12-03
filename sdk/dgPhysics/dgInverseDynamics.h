@@ -114,6 +114,7 @@ class dgInverseDynamics
 	dgList<dgLoopingJoint> m_loopingJoints;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
+	dgInt16 m_ikRowCount;
 	dgInt16 m_auxiliaryRowCount;
 
 	friend class dgWorld;

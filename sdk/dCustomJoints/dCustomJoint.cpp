@@ -58,7 +58,6 @@ dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* cons
 	m_body0 = NewtonInverseDynamicsGetBody (invDynSolver, invDynNode);
 	m_world = NewtonBodyGetWorld(m_body0);
 	m_joint = NewtonInverseDynamicsCreateEffector(invDynSolver, invDynNode, SubmitConstraints);
-//	m_joint = NewtonConstraintCreateUserJoint(m_world, maxDOF, SubmitConstraints, m_body0, m_body1);
 
 	NewtonJointSetUserData(m_joint, this);
 	NewtonJointSetDestructor(m_joint, Destructor);

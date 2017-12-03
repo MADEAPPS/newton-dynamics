@@ -24,11 +24,11 @@
 
 #include "dgBodyMasterList.h"
 
-#define DG_MAX_BOUND						dgFloat32 (1.0e15f)
-#define DG_MIN_BOUND						(-DG_MAX_BOUND)
+#define DG_MAX_BOUND				dgFloat32 (1.0e15f)
+#define DG_MIN_BOUND				(-DG_MAX_BOUND)
 #define DG_NORMAL_CONSTRAINT		-1 
-#define DG_CONSTRAINT_MAX_ROWS				 (3 * 16)
-#define MIN_JOINT_PIN_LENGTH				dgFloat32 (50.0f)
+#define DG_CONSTRAINT_MAX_ROWS		(3 * 16)
+#define MIN_JOINT_PIN_LENGTH		dgFloat32 (50.0f)
 
 class dgBody;
 class dgWorld;
@@ -74,10 +74,11 @@ class dgForceImpactPair
 class dgBilateralBounds
 {
 	public:
+	dgForceImpactPair* m_jointForce;
 	dgFloat32 m_low;
 	dgFloat32 m_upper;
-	dgInt32 m_normalIndex;
-	dgForceImpactPair* m_jointForce;
+	dgInt16 m_normalIndex;
+	dgInt16 m_isIkRow;
 };
 
 DG_MSC_VECTOR_ALIGMENT
