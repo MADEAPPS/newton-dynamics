@@ -200,46 +200,6 @@ class dSixAxisController: public dCustomControllerBase
 				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 			}
-
-/*
-			if (m_pickMode) {
-				dQuaternion rotation(matrix0);
-				if (m_targetRot.DotProduct(rotation) < 0.0f) {
-					rotation.Scale(-1.0f);
-				}
-
-				dFloat dot = rotation.DotProduct(m_targetRot);
-				if (dot < 0.9995f) {
-					dMatrix rot(dGrammSchmidt(dVector(rotation.m_q1, rotation.m_q2, rotation.m_q3)));
-					dFloat angle = 2.0f * dAcos(dClamp(rotation.m_q0, dFloat(-1.0f), dFloat(1.0f)));
-
-					NewtonUserJointAddAngularRow(m_joint, -angle, &rot.m_front[0]);
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_up[0]);
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_right[0]);
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-				} else {
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_up[0]);
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_right[0]);
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-				}
-			}
-*/
 		}
 
 		dMatrix m_targetMatrix;
