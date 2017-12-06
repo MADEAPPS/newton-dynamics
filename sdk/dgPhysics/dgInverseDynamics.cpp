@@ -566,61 +566,63 @@ void dgInverseDynamics::Finalize()
 {
 	dgAssert(m_nodeCount >= 1);
 
-	const dgDynamicBody* const rootBody = m_skeleton->m_body;
-	dgAssert (m_skeleton->m_body->GetInvMass().m_w != dgFloat32 (0.0f));
+	if (m_skeleton) {
+		const dgDynamicBody* const rootBody = m_skeleton->m_body;
+		dgAssert (m_skeleton->m_body->GetInvMass().m_w != dgFloat32 (0.0f));
 
-	dgMemoryAllocator* const allocator = rootBody->GetWorld()->GetAllocator();
-	m_nodesOrder = (dgNode**)allocator->Malloc(m_nodeCount * sizeof (dgNode*));
+		dgMemoryAllocator* const allocator = rootBody->GetWorld()->GetAllocator();
+		m_nodesOrder = (dgNode**)allocator->Malloc(m_nodeCount * sizeof (dgNode*));
 
-	dgInt32 index = 0;
-	SortGraph(m_skeleton, index);
-	dgAssert(index == m_nodeCount);
+		dgInt32 index = 0;
+		SortGraph(m_skeleton, index);
+		dgAssert(index == m_nodeCount);
 
-	dgInt32 loopJointsCount = 0;
-	dgBilateralConstraint* loopJointArray[1024];
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const dgLoopingJoint& entry = ptr->GetInfo();
-		loopJointArray[loopJointsCount] = entry.m_joint;
-		loopJointsCount ++;
-	}
-	m_loopingJoints.RemoveAll();
+		dgInt32 loopJointsCount = 0;
+		dgBilateralConstraint* loopJointArray[1024];
+		for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			const dgLoopingJoint& entry = ptr->GetInfo();
+			loopJointArray[loopJointsCount] = entry.m_joint;
+			loopJointsCount ++;
+		}
+		m_loopingJoints.RemoveAll();
 
-	dgInt32 infoIndex = m_nodeCount - 1;
-	dgInt32 loopBodyIndex = m_nodeCount;
-	dgTree<dgInt32, dgDynamicBody*> filter (allocator);
-	for (dgInt32 i = 0; i < loopJointsCount; i++) {
-		dgBilateralConstraint* const joint = loopJointArray[i];
-		dgDynamicBody* const body0 = (dgDynamicBody*)joint->GetBody0();
-		dgDynamicBody* const body1 = (dgDynamicBody*)joint->GetBody1();
+		dgInt32 infoIndex = m_nodeCount - 1;
+		dgInt32 loopBodyIndex = m_nodeCount;
+		dgTree<dgInt32, dgDynamicBody*> filter (allocator);
+		for (dgInt32 i = 0; i < loopJointsCount; i++) {
+			dgBilateralConstraint* const joint = loopJointArray[i];
+			dgDynamicBody* const body0 = (dgDynamicBody*)joint->GetBody0();
+			dgDynamicBody* const body1 = (dgDynamicBody*)joint->GetBody1();
 
-		dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-		dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 
-		dgNode* const node0 = FindNode(body0);
-		dgNode* const node1 = FindNode(body1);
-		dgAssert((node0 && !node1) || (node1 && !node0));
+			dgNode* const node0 = FindNode(body0);
+			dgNode* const node1 = FindNode(body1);
+			dgAssert((node0 && !node1) || (node1 && !node0));
 		
-		if (node0) {
-			filter.Insert(node0->m_index, node0->m_body);
-		}
-		if (node1) {
-			filter.Insert(node1->m_index, node1->m_body);
-		}
+			if (node0) {
+				filter.Insert(node0->m_index, node0->m_body);
+			}
+			if (node1) {
+				filter.Insert(node1->m_index, node1->m_body);
+			}
 
-		dgTree<dgInt32, dgDynamicBody*>::dgTreeNode* index0 = filter.Find(body0);
-		if (!index0) {
-			index0 = filter.Insert(loopBodyIndex, body0);
-			loopBodyIndex ++;
-		}
+			dgTree<dgInt32, dgDynamicBody*>::dgTreeNode* index0 = filter.Find(body0);
+			if (!index0) {
+				index0 = filter.Insert(loopBodyIndex, body0);
+				loopBodyIndex ++;
+			}
 
-		dgTree<dgInt32, dgDynamicBody*>::dgTreeNode* index1 = filter.Find(body1);
-		if (!index1) {
-			index1 = filter.Insert(loopBodyIndex, body1);
-			loopBodyIndex++;
+			dgTree<dgInt32, dgDynamicBody*>::dgTreeNode* index1 = filter.Find(body1);
+			if (!index1) {
+				index1 = filter.Insert(loopBodyIndex, body1);
+				loopBodyIndex++;
+			}
+			dgLoopingJoint loopJointEntry(joint, index0->GetInfo(), index1->GetInfo(), infoIndex);
+			m_loopingJoints.Append(loopJointEntry);
+			infoIndex ++;
 		}
-		dgLoopingJoint loopJointEntry(joint, index0->GetInfo(), index1->GetInfo(), infoIndex);
-		m_loopingJoints.Append(loopJointEntry);
-		infoIndex ++;
 	}
 }
 
@@ -1312,30 +1314,32 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 
 void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	dgJointInfo* const jointInfoArray = dgAlloca (dgJointInfo, m_nodeCount + m_loopingJoints.GetCount());
-	dgJacobianMatrixElement* const matrixRow = dgAlloca (dgJacobianMatrixElement, 6 * (m_nodeCount + m_loopingJoints.GetCount()));
+	if (m_skeleton) {
+		dgJointInfo* const jointInfoArray = dgAlloca (dgJointInfo, m_nodeCount + m_loopingJoints.GetCount());
+		dgJacobianMatrixElement* const matrixRow = dgAlloca (dgJacobianMatrixElement, 6 * (m_nodeCount + m_loopingJoints.GetCount()));
 
-	GetJacobianDerivatives(jointInfoArray, matrixRow, timestep, threadIndex);
+		GetJacobianDerivatives(jointInfoArray, matrixRow, timestep, threadIndex);
 
-	dgInt32 memorySizeInBytes = GetMemoryBufferSizeInBytes(jointInfoArray, matrixRow);
-	dgInt8* const memoryBuffer = (dgInt8*)dgAlloca(dgVector, memorySizeInBytes / sizeof(dgVector));
-	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
-	dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount);
-	dgJacobian* const internalForce = dgAlloca(dgJacobian, m_nodeCount + m_loopingJoints.GetCount());
+		dgInt32 memorySizeInBytes = GetMemoryBufferSizeInBytes(jointInfoArray, matrixRow);
+		dgInt8* const memoryBuffer = (dgInt8*)dgAlloca(dgVector, memorySizeInBytes / sizeof(dgVector));
+		dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
+		dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount);
+		dgJacobian* const internalForce = dgAlloca(dgJacobian, m_nodeCount + m_loopingJoints.GetCount());
 
-	dgAssert((dgInt64(accel) & 0x0f) == 0);
-	dgAssert((dgInt64(force) & 0x0f) == 0);
-	dgAssert((dgInt64(matrixRow) & 0x0f) == 0);
-	dgAssert((dgInt64(memoryBuffer) & 0x0f) == 0);
-	dgAssert((dgInt64(internalForce) & 0x0f) == 0);
-	dgAssert((dgInt64(jointInfoArray) & 0x0f) == 0);
+		dgAssert((dgInt64(accel) & 0x0f) == 0);
+		dgAssert((dgInt64(force) & 0x0f) == 0);
+		dgAssert((dgInt64(matrixRow) & 0x0f) == 0);
+		dgAssert((dgInt64(memoryBuffer) & 0x0f) == 0);
+		dgAssert((dgInt64(internalForce) & 0x0f) == 0);
+		dgAssert((dgInt64(jointInfoArray) & 0x0f) == 0);
 
-	InitMassMatrix(jointInfoArray, matrixRow, memoryBuffer);
-	CalculateJointAccel(jointInfoArray, matrixRow, accel);
-	CalculateOpenLoopForce(force, accel);
-	CalculateInternalForces(internalForce, jointInfoArray, matrixRow, force);
-	if (m_auxiliaryRowCount) {
-		CalculateCloseLoopsForces(internalForce, jointInfoArray, matrixRow, accel, force);
+		InitMassMatrix(jointInfoArray, matrixRow, memoryBuffer);
+		CalculateJointAccel(jointInfoArray, matrixRow, accel);
+		CalculateOpenLoopForce(force, accel);
+		CalculateInternalForces(internalForce, jointInfoArray, matrixRow, force);
+		if (m_auxiliaryRowCount) {
+			CalculateCloseLoopsForces(internalForce, jointInfoArray, matrixRow, accel, force);
+		}
+		CalculateMotorsAccelerations (internalForce, jointInfoArray, matrixRow, timestep);
 	}
-	CalculateMotorsAccelerations (internalForce, jointInfoArray, matrixRow, timestep);
 }
