@@ -383,10 +383,7 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
 		dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		parentMatrix.m_posit = location.m_posit;
-		dCustomHinge* const fixHinge = new dCustomHinge(parentMatrix, parentBody, NULL);
-		fixHinge->EnableLimits(true);
-		fixHinge->SetLimits(0.0f, 0.0f);
-		void* const rootNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, parentBody);
+		NewtonBodySetMassMatrix(parentBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		// add Robot rotating platform
 		dMatrix baseMatrix(dGetIdentityMatrix());
@@ -396,8 +393,11 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		dKukaServoMotor1* const baseHinge = new dKukaServoMotor1(baseSpin, base, parentBody);
-		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
+		dCustomHinge* const fixHinge = new dKukaServoMotor1(baseSpin, base, parentBody);
+		fixHinge->EnableLimits(true);
+		fixHinge->SetLimits(0.0f, 0.0f);
+
+		void* const baseHingeNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, base);
 
 		// add Robot Arm
 		dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
@@ -425,14 +425,11 @@ class dSixAxisController: public dCustomControllerBase
 		// Robot gripper base
 		dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
 		gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
-//		NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
 		dMatrix gripperEffectMatrix(dGetIdentityMatrix());
 		gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f);
 		gripperEffectMatrix.m_front = gripperMatrix.m_front;
 		gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 		gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-//		dKukaServoMotor2* const gripperJoint = new dKukaServoMotor2(gripperEffectMatrix, gripperBase, armBody1);
-//		void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
 
 		// add the inverse dynamics end effector
 		m_effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix, origin);
@@ -448,11 +445,9 @@ class dSixAxisController: public dCustomControllerBase
 
 		// add Robot Base
 		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
+		NewtonBodySetMassMatrix(parentBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		parentMatrix.m_posit = location.m_posit;
-		dCustomHinge* const fixHinge = new dCustomHinge(parentMatrix, parentBody, NULL);
-		fixHinge->EnableLimits(true);
-		fixHinge->SetLimits(0.0f, 0.0f);
 
 		// add Robot rotating platform
 		dMatrix baseMatrix(dGetIdentityMatrix());
@@ -462,7 +457,10 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		new dCustomHinge(baseSpin, base, parentBody);
+		dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, parentBody);
+		fixHinge->EnableLimits(true);
+		fixHinge->SetLimits(0.0f, 0.0f);
+
 
 		// add Robot Arm
 		dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
@@ -488,13 +486,12 @@ class dSixAxisController: public dCustomControllerBase
 		// Robot gripper base
 		dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
 		gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
-//		NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
+
 		dMatrix gripperEffectMatrix(dGetIdentityMatrix());
 		gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f);
 		gripperEffectMatrix.m_front = gripperMatrix.m_front;
 		gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 		gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-//		new dCustomUniversal(gripperEffectMatrix, gripperBase, armBody1);
 
 		// add the inverse dynamics end effector
 		m_effector = new dKukaEndEffector(armBody1, gripperEffectMatrix, origin);
@@ -559,7 +556,7 @@ class dSixAxisController: public dCustomControllerBase
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
 		// calculate the current position
-		m_effector->SetTarget (m_posit_x, m_posit_y, m_azimuth * 3.141592f / 180.0f);
+		m_effector->SetTarget (m_posit_x, m_posit_y, m_azimuth);
 		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 
@@ -590,13 +587,15 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
 		dSixAxisManager* const me = (dSixAxisManager*)context;
-//		me->m_currentController->DrawHelp(scene);
+
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Use sliders to manipulate robot");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -360.0f, 360.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 2.0f);
 
+me->m_azimuth = 0.0f;
+me->m_posit_y = 2.0f;
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
 			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f);
