@@ -592,10 +592,10 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		scene->Print(color, "Use sliders to manipulate robot");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -360.0f, 360.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 2.0f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
 
 me->m_azimuth = 0.0f;
-me->m_posit_y = 2.0f;
+me->m_posit_y = 1.0f;
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
 			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f);
