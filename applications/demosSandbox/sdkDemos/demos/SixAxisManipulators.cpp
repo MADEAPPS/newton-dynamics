@@ -156,17 +156,14 @@ class dSixAxisController: public dCustomControllerBase
 			
 			dFloat mag2 = relPosit.DotProduct3(relPosit);
 			if (mag2 > 1.0e-4f) {
-//				dMatrix dirMatrix(dGrammSchmidt(relPosit));
-				const dMatrix& dirMatrix = m_targetMatrix;
-
-				NewtonBodyGetPointVelocity(m_body0, &targetPosit[0], &pointVeloc[0]);
-
-				
 				dFloat dist;
 				dFloat speed;
 				dFloat relSpeed;
 				dFloat relAccel;
 				dFloat damp = 0.3f;
+
+				const dMatrix& dirMatrix = m_targetMatrix;
+				NewtonBodyGetPointVelocity(m_body0, &targetPosit[0], &pointVeloc[0]);
 
 				// Restrict the movement on the pivot point along all tree orthonormal direction
 				speed = pointVeloc.DotProduct3(dirMatrix.m_front);
@@ -393,7 +390,7 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		dCustomHinge* const fixHinge = new dKukaServoMotor1(baseSpin, base, parentBody);
+		dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, parentBody);
 		fixHinge->EnableLimits(true);
 		fixHinge->SetLimits(0.0f, 0.0f);
 
@@ -595,7 +592,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
 
 me->m_azimuth = 0.0f;
-me->m_posit_y = 1.0f;
+//me->m_posit_y = 1.0f;
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
 			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f);
@@ -649,7 +646,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
 	robotManager->MakeKukaRobot_IK (scene, dVector (0.0f, 0.0f, -0.75f));
-	robotManager->MakeKukaRobot_FD (scene, dVector (0.0f, 0.0f,  0.75f));
+//	robotManager->MakeKukaRobot_FD (scene, dVector (0.0f, 0.0f,  0.75f));
 
 	dVector origin(0.0f);
 	origin.m_x = -2.0f;

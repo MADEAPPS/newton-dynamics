@@ -962,13 +962,13 @@ DG_INLINE void dgInverseDynamics::CalculateJointAccel(dgJointInfo* const jointIn
 }
 
 
-DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const
+DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const internalForce, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const
 {
 	dgVector zero(dgVector::m_zero);
 	const dgInt32 bodyCount = m_nodeCount;
 	for (dgInt32 i = 0; i < bodyCount; i++) {
-		externalForces[i].m_linear = zero; 
-		externalForces[i].m_angular = zero; 
+		internalForce[i].m_linear = zero; 
+		internalForce[i].m_angular = zero; 
 	}
 
 	for (dgInt32 i = 0; i < (m_nodeCount - 1); i++) {
@@ -1002,10 +1002,10 @@ DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const exte
 		const dgInt32 m0 = node->m_swapJacobianBodiesIndex ? node->m_parent->m_index : i;
 		const dgInt32 m1 = node->m_swapJacobianBodiesIndex ? i : node->m_parent->m_index;
 
-		externalForces[m0].m_linear += y0.m_linear;
-		externalForces[m0].m_angular += y0.m_angular;
-		externalForces[m1].m_linear += y1.m_linear;
-		externalForces[m1].m_angular += y1.m_angular;
+		internalForce[m0].m_linear += y0.m_linear;
+		internalForce[m0].m_angular += y0.m_angular;
+		internalForce[m1].m_linear += y1.m_linear;
+		internalForce[m1].m_angular += y1.m_angular;
 	}
 }
 
@@ -1265,9 +1265,8 @@ dgInt32 dgInverseDynamics::GetJacobianDerivatives(dgJointInfo* const jointInfoAr
 
 void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const externalForce, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const
 {
-	//dgJacobian* const velocity = dgAlloca(dgJacobian, m_nodeCount + m_loopingBodies.GetCount());
+/*
 	dgJacobian* const velocity = dgAlloca(dgJacobian, m_nodeCount);
-
 	dgVector timestep4(timestep);
 	for (dgInt32 i = 0; i < m_nodeCount; i++) {
 		dgNode* const node = m_nodesOrder[i];
@@ -1295,6 +1294,9 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 		const dgJacobian& veloc0 = velocity[m0];
 		const dgJacobian& veloc1 = velocity[m1];
 
+		const dgJacobian& force0 = externalForce[m0];
+		const dgJacobian& force1 = externalForce[m1];
+
 		const dgInt32 dof = jointInfo->m_pairCount;
 		const dgInt32 first = jointInfo->m_pairStart;
 
@@ -1305,8 +1307,43 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 							  veloc0.m_angular * row->m_Jt.m_jacobianM0.m_angular +
 							  veloc1.m_linear * row->m_Jt.m_jacobianM1.m_linear +
 							  veloc1.m_angular * row->m_Jt.m_jacobianM1.m_angular);
+			dgFloat32 a1 = relVeloc.AddHorizontal().GetScalar() * invTimestep; 
 
-			dgFloat32 a = relVeloc.AddHorizontal().GetScalar() * invTimestep; 
+			dgVector accel(force0.m_linear * row->m_JMinv.m_jacobianM0.m_linear +
+						   force0.m_angular * row->m_JMinv.m_jacobianM0.m_angular +
+						   force1.m_linear * row->m_JMinv.m_jacobianM1.m_linear +
+						   force1.m_angular * row->m_JMinv.m_jacobianM1.m_angular);
+			dgFloat32 a = accel.AddHorizontal().GetScalar(); 
+
+			joint->m_inverseDynamicsAcceleration[k] = -a;
+		}
+	}
+*/
+
+	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+		dgNode* const node = m_nodesOrder[i];
+		dgAssert(i == node->m_index);
+		const dgJointInfo* const jointInfo = &jointInfoArray[i];
+		dgBilateralConstraint* const joint = node->m_joint;
+
+		const dgInt32 m0 = node->m_swapJacobianBodiesIndex ? node->m_parent->m_index : i;
+		const dgInt32 m1 = node->m_swapJacobianBodiesIndex ? i : node->m_parent->m_index;
+			
+		const dgJacobian& force0 = externalForce[m0];
+		const dgJacobian& force1 = externalForce[m1];
+
+		const dgInt32 dof = jointInfo->m_pairCount;
+		const dgInt32 first = jointInfo->m_pairStart;
+
+		for (dgInt32 j = 0; j < dof; j++) {
+			dgInt32 k = node->m_sourceJacobianIndex[j];
+			dgJacobianMatrixElement* const row = &matrixRow[first + k];
+			dgVector accel(force0.m_linear * row->m_JMinv.m_jacobianM0.m_linear +
+						   force0.m_angular * row->m_JMinv.m_jacobianM0.m_angular +
+						   force1.m_linear * row->m_JMinv.m_jacobianM1.m_linear +
+						   force1.m_angular * row->m_JMinv.m_jacobianM1.m_angular);
+			dgFloat32 a = accel.AddHorizontal().GetScalar();
+
 			joint->m_inverseDynamicsAcceleration[k] = -a;
 		}
 	}
