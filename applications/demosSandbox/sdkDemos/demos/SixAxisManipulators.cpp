@@ -372,6 +372,9 @@ class dSixAxisController: public dCustomControllerBase
 			fixHinge->EnableLimits(true);
 			fixHinge->SetLimits(0.0f, 0.0f);
 
+			// lock the roo mnode to teh base
+			NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, fixHinge->GetJoint());
+
 			// add Robot Arm
 			dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
 			armMatrix0.m_posit = baseMatrix.m_posit;
@@ -392,7 +395,7 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonBody* const armBody1 = CreateBox(scene, armMatrix1, dVector(0.05f, 0.1f, 0.5f));
 			dMatrix armHingeMatrix1(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 			armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
-			dKukaServoMotor1* const armJoint1 = new dKukaServoMotor1(armHingeMatrix1, armBody1, armBody0, - 60.0f * 3.141592f / 180.0f, 60.0f * 3.141592f / 180.0f);
+			dKukaServoMotor1* const armJoint1 = new dKukaServoMotor1(armHingeMatrix1, armBody1, armBody0, - 80.0f * 3.141592f / 180.0f, 80.0f * 3.141592f / 180.0f);
 			void* const armJointNode1 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode0, armJoint1->GetJoint());
 
 			// Robot gripper base
@@ -408,9 +411,6 @@ class dSixAxisController: public dCustomControllerBase
 			//m_effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix, origin);
 			dKukaEndEffector* effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
 			m_effector = new dSixAxisEffector(this, effector);
-
-			// add a joint to lock the base 
-			NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, fixHinge->GetJoint());
 
 			// save the tip reference point
 			m_referencePosit = gripperEffectMatrix.m_posit - origin;
@@ -571,9 +571,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 
 	virtual dSixAxisController* CreateController()
 	{
-		dSixAxisController* const controller = (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
-//		controller->Init();
-		return controller;
+		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
 	}
 
 	dSixAxisController* MakeKukaRobot_IK(DemoEntityManager* const scene, const dVector& origin)
