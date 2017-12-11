@@ -128,7 +128,7 @@ class dSixAxisController: public dCustomControllerBase
 
 		void SetTarget (dFloat x, dFloat y, dFloat azymuth)
 		{
-			x += 0.5f;
+//			x += 0.5f;
 			dMatrix matrix(dYawMatrix(azymuth));
 			dVector target(0.0f, m_y0 + y, m_x0 + x);
 			matrix.m_posit = m_origin + matrix.RotateVector(target);
@@ -178,7 +178,6 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
-/*
 			speed = pointVeloc.DotProduct3(m_targetMatrix.m_front);
 			dist = relPosit.DotProduct3(m_targetMatrix.m_front) * damp;
 			relSpeed = dist * invTimestep - speed;
@@ -187,7 +186,6 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-*/
 		}
 
 		dMatrix m_targetMatrix;
@@ -441,7 +439,6 @@ class dSixAxisController: public dCustomControllerBase
 		dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, NULL);
 		fixHinge->EnableLimits(true);
 		fixHinge->SetLimits(0.0f, 0.0f);
-
 
 		// add Robot Arm
 		dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
