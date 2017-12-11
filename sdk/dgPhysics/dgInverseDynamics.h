@@ -38,18 +38,20 @@ class dgInverseDynamics
 	class dgLoopingJoint
 	{
 		public: 
-		dgLoopingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1, dgInt32 infoIndex)
+		dgLoopingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1, dgInt32 infoIndex, dgInt32 isEffector)
 			:m_joint(joint)
-			,m_infoIndex(infoIndex)
-			,m_m0(dgInt16 (index0))
-			,m_m1(dgInt16 (index1))
+			,m_m0(dgInt16(index0))
+			,m_m1(dgInt16(index1))
+			,m_infoIndex(dgInt16 (infoIndex))
+			,m_isEffector(dgInt16 (isEffector))
 		{
 		}
 
 		dgBilateralConstraint* m_joint;
-		dgInt32 m_infoIndex;
 		dgInt16 m_m0;
 		dgInt16 m_m1;
+		dgInt16 m_infoIndex;
+		dgInt16 m_isEffector;
 	};
 
 	DG_CLASS_ALLOCATOR(allocator)
@@ -58,7 +60,6 @@ class dgInverseDynamics
 
 	dgWorld* GetWorld() const; 
 	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
-	//void RemoveLoopJoint(dgBilateralConstraint* const joint);  
 
 	void Finalize ();
 	
@@ -66,7 +67,8 @@ class dgInverseDynamics
 	dgNode* AddRoot(dgDynamicBody* const rootBody);
 	dgNode* AddChild (dgBilateralConstraint* const joint, dgNode* const parent);
 
-	void AddLoopJoint (dgBilateralConstraint* const joint, dgNode* const node);
+	bool AddEffector (dgBilateralConstraint* const joint);
+	bool AddLoopJoint (dgBilateralConstraint* const joint);
 	void RemoveLoopJoint (dgBilateralConstraint* const joint);
 
 	dgDynamicBody* GetBody(dgNode* const node) const;
@@ -99,7 +101,7 @@ class dgInverseDynamics
 	void CalculateCloseLoopsForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const;
 	void RemoveLoopJoint(dgList<dgLoopingJoint>::dgListNode* const node);
-	dgList<dgLoopingJoint>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;
+	dgList<dgLoopingJoint>::dgListNode* FindLoopJointNode(dgBilateralConstraint* const joint) const;
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;

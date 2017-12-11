@@ -207,7 +207,7 @@ void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int 
 	world->SetBroadPhaseType(algorithmType);
 }
 
-NEWTON_API void NewtonResetBroadphase(const NewtonWorld* const newtonWorld)
+void NewtonResetBroadphase(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
@@ -5295,7 +5295,7 @@ void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics,
 	return ik->AddRoot((dgDynamicBody*)root);
 }
 
-NEWTON_API void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint)
+void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgInverseDynamics* const ik = (dgInverseDynamics*) inverseDynamics;
@@ -5303,6 +5303,12 @@ NEWTON_API void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const 
 }
 
 
+bool NewtonInverseDynamicsAddLoopJoint(NewtonInverseDynamics* const inverseDynamics, NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	return ik->AddLoopJoint((dgBilateralConstraint*)joint);
+}
 
 /*!
   Return to number of contact in this contact joint.
@@ -7660,14 +7666,14 @@ NewtonMesh* NewtonMeshCreateConvexHull (const NewtonWorld* const newtonWorld, in
 	return (NewtonMesh*) mesh;
 }
 
-NEWTON_API NewtonMesh* NewtonMeshCreateTetrahedraIsoSurface(const NewtonMesh* const closeManifoldMesh)
+NewtonMesh* NewtonMeshCreateTetrahedraIsoSurface(const NewtonMesh* const closeManifoldMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) closeManifoldMesh;
 	return (NewtonMesh*)meshEffect->CreateTetrahedraIsoSurface();
 }
 
-NEWTON_API void NewtonCreateTetrahedraLinearBlendSkinWeightsChannel(const NewtonMesh* const tetrahedraMesh, NewtonMesh* const skinMesh)
+void NewtonCreateTetrahedraLinearBlendSkinWeightsChannel(const NewtonMesh* const tetrahedraMesh, NewtonMesh* const skinMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)skinMesh;

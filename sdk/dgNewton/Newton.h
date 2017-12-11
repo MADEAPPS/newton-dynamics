@@ -1026,7 +1026,8 @@ extern "C" {
 
 	NEWTON_API void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics, NewtonBody* const root);
 	NEWTON_API void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint);
-
+	NEWTON_API bool NewtonInverseDynamicsAddLoopJoint(NewtonInverseDynamics* const inverseDynamics, NewtonJoint* const joint);
+	
 	NEWTON_API void NewtonInverseDynamicsEndBuild (NewtonInverseDynamics* const inverseDynamics);
 
 	NEWTON_API void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep, int threadIndex);

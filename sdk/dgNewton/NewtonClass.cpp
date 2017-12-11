@@ -282,9 +282,8 @@ void NewtonUserJoint::SetUpdateFeedbackFunction (NewtonUserBilateralCallback get
 NewtonUserJointInverseDynamicsEffector::NewtonUserJointInverseDynamicsEffector(dgInverseDynamics* const invDynSolver, dgInverseDynamics::dgNode* const invDynNode, NewtonUserBilateralCallback callback)
 	:NewtonUserJoint(callback, invDynSolver->GetBody(invDynNode))
 	,m_invDynSolver(invDynSolver)
-	,m_invDynNode (invDynNode)
 {
-	m_invDynSolver->AddLoopJoint (this, m_invDynNode);
+	m_invDynSolver->AddEffector (this);
 }
 
 NewtonUserJointInverseDynamicsEffector::~NewtonUserJointInverseDynamicsEffector()

@@ -429,7 +429,7 @@ dgInverseDynamics::~dgInverseDynamics()
 		ptr1 = ptr->GetNext();
 		RemoveLoopJoint(ptr);
 	}
-	dgAssert(m_loopingJoints.GetCount() == 0);
+	//dgAssert(m_loopingJoints.GetCount() == 0);
 
 	dgMemoryAllocator* const allocator = m_world->GetAllocator();
 	if (m_nodesOrder) {
@@ -529,13 +529,7 @@ dgInverseDynamics::dgNode* dgInverseDynamics::AddChild(dgBilateralConstraint* co
 	return node;
 }
 
-void dgInverseDynamics::AddLoopJoint(dgBilateralConstraint* const joint, dgNode* const node)
-{
-	dgLoopingJoint cyclicEntry(joint, 0, 0, 0);
-	m_loopingJoints.Append(cyclicEntry);
-}
-
-dgList<dgInverseDynamics::dgLoopingJoint>::dgListNode* dgInverseDynamics::FindEffector(dgBilateralConstraint* const joint) const
+dgList<dgInverseDynamics::dgLoopingJoint>::dgListNode* dgInverseDynamics::FindLoopJointNode(dgBilateralConstraint* const joint) const
 {
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		if (ptr->GetInfo().m_joint == joint) {
@@ -545,17 +539,44 @@ dgList<dgInverseDynamics::dgLoopingJoint>::dgListNode* dgInverseDynamics::FindEf
 	return NULL;
 }
 
+
+bool dgInverseDynamics::AddEffector (dgBilateralConstraint* const joint)
+{
+	dgLoopingJoint cyclicEntry(joint, 0, 0, 0, 1);
+	dgNode* const node0 = FindNode((dgDynamicBody*)joint->GetBody0());
+	dgNode* const node1 = FindNode((dgDynamicBody*)joint->GetBody1());
+	if (node0 || node1) {
+		m_loopingJoints.Append(cyclicEntry);
+	}
+	return node0 || node1;
+}
+
+bool dgInverseDynamics::AddLoopJoint(dgBilateralConstraint* const joint)
+{
+	dgLoopingJoint cyclicEntry(joint, 0, 0, 0, 0);
+	dgNode* const node0 = FindNode((dgDynamicBody*)joint->GetBody0());
+	dgNode* const node1 = FindNode((dgDynamicBody*)joint->GetBody1());
+	if (node0 || node1) {
+		m_loopingJoints.Append(cyclicEntry);
+	}
+	return node0 || node1;
+}
+
+
 void dgInverseDynamics::RemoveLoopJoint(dgList<dgLoopingJoint>::dgListNode* const node)
 {
-	dgBilateralConstraint* const joint = node->GetInfo().m_joint;
-	m_loopingJoints.Remove(node);
-	delete joint;
+	const dgLoopingJoint& loopJoint = node->GetInfo();
+	if (loopJoint.m_isEffector) {
+		dgBilateralConstraint* const joint = node->GetInfo().m_joint;
+		m_loopingJoints.Remove(node);
+		delete joint;
+	}
 }
 
 
 void dgInverseDynamics::RemoveLoopJoint(dgBilateralConstraint* const joint)
 {
-	dgList<dgLoopingJoint>::dgListNode* const node = FindEffector(joint);
+	dgList<dgLoopingJoint>::dgListNode* const node = FindLoopJointNode(joint);
 	if (node) {
 		RemoveLoopJoint(node);
 	}
@@ -578,9 +599,11 @@ void dgInverseDynamics::Finalize()
 		dgAssert(index == m_nodeCount);
 
 		dgInt32 loopJointsCount = 0;
+		dgInt32 isEffector[1024];
 		dgBilateralConstraint* loopJointArray[1024];
 		for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			const dgLoopingJoint& entry = ptr->GetInfo();
+			isEffector[loopJointsCount] = entry.m_isEffector;
 			loopJointArray[loopJointsCount] = entry.m_joint;
 			loopJointsCount ++;
 		}
@@ -619,13 +642,13 @@ void dgInverseDynamics::Finalize()
 				index1 = filter.Insert(loopBodyIndex, body1);
 				loopBodyIndex++;
 			}
-			dgLoopingJoint loopJointEntry(joint, index0->GetInfo(), index1->GetInfo(), infoIndex);
+
+			dgLoopingJoint loopJointEntry(joint, index0->GetInfo(), index1->GetInfo(), infoIndex, isEffector[i]);
 			m_loopingJoints.Append(loopJointEntry);
 			infoIndex ++;
 		}
 	}
 }
-
 
 void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {
@@ -1335,7 +1358,7 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 		const dgInt32 dof = jointInfo->m_pairCount;
 		const dgInt32 first = jointInfo->m_pairStart;
 
-		for (dgInt32 j = 0; j < dof; j++) {
+		for (dgInt32 j = dof - node->m_ikdof; j < dof; j++) {
 			dgInt32 k = node->m_sourceJacobianIndex[j];
 			dgJacobianMatrixElement* const row = &matrixRow[first + k];
 			dgVector accel(force0.m_linear * row->m_JMinv.m_jacobianM0.m_linear +
@@ -1343,10 +1366,11 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 						   force1.m_linear * row->m_JMinv.m_jacobianM1.m_linear +
 						   force1.m_angular * row->m_JMinv.m_jacobianM1.m_angular);
 			dgFloat32 a = accel.AddHorizontal().GetScalar();
-
+dgTrace (("%f ", a));
 			joint->m_inverseDynamicsAcceleration[k] = -a;
 		}
 	}
+dgTrace (("\n"));
 }
 
 void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)

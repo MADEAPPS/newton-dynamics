@@ -140,74 +140,54 @@ class dSixAxisController: public dCustomControllerBase
 		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
 			dMatrix matrix0;
-			dMatrix matrix1;
 			dVector veloc(0.0f);
 			dVector omega(0.0f);
 			dVector com(0.0f);
 			dVector pointVeloc(0.0f);
-
+			dFloat dist;
+			dFloat speed;
+			dFloat relSpeed;
+			dFloat relAccel;
+			dFloat damp = 0.3f;
 			dFloat invTimestep = 1.0f / timestep;
 
-			CalculateGlobalMatrix(matrix0, matrix1);
+			// Get the global matrices of each rigid body.
+			NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
+			matrix0 = m_localMatrix0 * matrix0;
 
 			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-			dVector targetPosit(m_targetMatrix.m_posit);
-			dVector relPosit(targetPosit - matrix0.m_posit);
-			
-			dFloat mag2 = relPosit.DotProduct3(relPosit);
-			if (mag2 > 1.0e-4f) {
-				dFloat dist;
-				dFloat speed;
-				dFloat relSpeed;
-				dFloat relAccel;
-				dFloat damp = 0.3f;
+			dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
+			NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
 
-				const dMatrix& dirMatrix = m_targetMatrix;
-				NewtonBodyGetPointVelocity(m_body0, &targetPosit[0], &pointVeloc[0]);
+			// Restrict the movement on the pivot point along all tree orthonormal direction
+			speed = pointVeloc.DotProduct3(m_targetMatrix.m_up);
+			dist = relPosit.DotProduct3(m_targetMatrix.m_up) * damp;
+			relSpeed = dist * invTimestep - speed;
+			relAccel = relSpeed * invTimestep;
+			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_up[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
-				// Restrict the movement on the pivot point along all tree orthonormal direction
-				speed = pointVeloc.DotProduct3(dirMatrix.m_front);
-				dist = relPosit.DotProduct3(dirMatrix.m_front) * damp;
-				relSpeed = dist * invTimestep - speed;
-				relAccel = relSpeed * invTimestep;
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_front[0]);
-				NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+			speed = pointVeloc.DotProduct3(m_targetMatrix.m_right);
+			dist = relPosit.DotProduct3(m_targetMatrix.m_right) * damp;
+			relSpeed = dist * invTimestep - speed;
+			relAccel = relSpeed * invTimestep;
+			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_right[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 
-				speed = pointVeloc.DotProduct3(dirMatrix.m_up);
-				dist = relPosit.DotProduct3(dirMatrix.m_up) * damp;
-				relSpeed = dist * invTimestep - speed;
-				relAccel = relSpeed * invTimestep;
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_up[0]);
-				NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-
-				speed = pointVeloc.DotProduct3(dirMatrix.m_right);
-				dist = relPosit.DotProduct3(dirMatrix.m_right) * damp;
-				relSpeed = dist * invTimestep - speed;
-				relAccel = relSpeed * invTimestep;
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_right[0]);
-				NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-			} else {
-				// Restrict the movement on the pivot point along all tree orthonormal direction
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &targetPosit[0], &matrix0.m_front[0]);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &targetPosit[0], &matrix0.m_up[0]);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &targetPosit[0], &matrix0.m_right[0]);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-			}
+/*
+			speed = pointVeloc.DotProduct3(m_targetMatrix.m_front);
+			dist = relPosit.DotProduct3(m_targetMatrix.m_front) * damp;
+			relSpeed = dist * invTimestep - speed;
+			relAccel = relSpeed * invTimestep;
+			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+*/
 		}
 
 		dMatrix m_targetMatrix;
@@ -377,10 +357,10 @@ class dSixAxisController: public dCustomControllerBase
 		location.m_posit.m_y += 0.125f * 0.5f;
 
 		// add Robot Base
-		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
-		dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
-		parentMatrix.m_posit = location.m_posit;
-		NewtonBodySetMassMatrix(parentBody, 0.0f, 0.0f, 0.0f, 0.0f);
+//		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
+//		dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
+//		parentMatrix.m_posit = location.m_posit;
+//		NewtonBodySetMassMatrix(parentBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		// add Robot rotating platform
 		dMatrix baseMatrix(dGetIdentityMatrix());
@@ -388,13 +368,13 @@ class dSixAxisController: public dCustomControllerBase
 		baseMatrix.m_posit.m_y += 0.125f * 0.5f + 0.11f;
 		baseMatrix.m_posit.m_z += 0.125f * 0.5f;
 		NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
+		void* const baseHingeNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, base);
+
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, parentBody);
+		dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, NULL);
 		fixHinge->EnableLimits(true);
 		fixHinge->SetLimits(0.0f, 0.0f);
-
-		void* const baseHingeNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, base);
 
 		// add Robot Arm
 		dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
@@ -431,6 +411,10 @@ class dSixAxisController: public dCustomControllerBase
 		// add the inverse dynamics end effector
 		m_effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix, origin);
 
+		// add a joint to lock the base 
+		NewtonInverseDynamicsAddLoopJoint (m_kinematicSolver, fixHinge->GetJoint());
+
+		// complete the ik
 		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 	}
 
@@ -441,8 +425,8 @@ class dSixAxisController: public dCustomControllerBase
 		location.m_posit.m_y += 0.125f * 0.5f;
 
 		// add Robot Base
-		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
-		NewtonBodySetMassMatrix(parentBody, 0.0f, 0.0f, 0.0f, 0.0f);
+//		NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
+//		NewtonBodySetMassMatrix(parentBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		parentMatrix.m_posit = location.m_posit;
 
@@ -454,7 +438,7 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
 		dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 		baseSpin.m_posit = location.m_posit;
-		dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, parentBody);
+		dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, NULL);
 		fixHinge->EnableLimits(true);
 		fixHinge->SetLimits(0.0f, 0.0f);
 
@@ -592,7 +576,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
 
 me->m_azimuth = 0.0f;
-//me->m_posit_y = 1.0f;
+//me->m_posit_y = -0.4f;
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
 			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f);
@@ -646,7 +630,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
 	robotManager->MakeKukaRobot_IK (scene, dVector (0.0f, 0.0f, -0.75f));
-//	robotManager->MakeKukaRobot_FD (scene, dVector (0.0f, 0.0f,  0.75f));
+	robotManager->MakeKukaRobot_FD (scene, dVector (0.0f, 0.0f,  0.75f));
 
 	dVector origin(0.0f);
 	origin.m_x = -2.0f;
