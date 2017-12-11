@@ -39,8 +39,9 @@ class dCustomKinematicController: public dCustomJoint
 
 	CUSTOM_JOINTS_API dMatrix GetTargetMatrix () const;
 
+	CUSTOM_JOINTS_API void ResetAutoSleep ();
+
 	protected:
-	//CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 

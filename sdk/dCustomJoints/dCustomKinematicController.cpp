@@ -55,10 +55,15 @@ void dCustomKinematicController::Serialize (NewtonSerializeCallback callback, vo
 	dAssert (0);
 }
 
+
+void dCustomKinematicController::ResetAutoSleep ()
+{
+	NewtonBodySetAutoSleep(GetBody0(), 0);
+}
+
 dCustomKinematicController::~dCustomKinematicController()
 {
-	//NewtonBodySetAutoSleep (m_body0, m_autoSleepState);
-	//NewtonBodySetSleepState(body, 0);
+	NewtonBodySetAutoSleep (m_body0, m_autoSleepState);
 }
 
 void dCustomKinematicController::Init (NewtonBody* const body, const dMatrix& matrix)
