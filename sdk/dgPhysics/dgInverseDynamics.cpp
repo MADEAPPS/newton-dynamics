@@ -717,7 +717,6 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 
 			const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof - node->m_ikdof;
 			for (dgInt32 j = 0; j < auxiliaryDof; j++) {
-				dgAssert (0);
 				const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 				dgJacobianMatrixElement* const row = &matrixRow[first + index];
 				m_rowArray[auxiliaryIndex + primaryCount] = row;
@@ -1066,7 +1065,6 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 
 		const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof - node->m_ikdof;
 		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
-			dgAssert (0);
 			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 			dgJacobianMatrixElement* const row = &matrixRow[first + index];
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
@@ -1080,19 +1078,12 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		const dgLoopingJoint& entry = ptr->GetInfo();
 		const dgJointInfo* const jointInfo = &jointInfoArray[entry.m_infoIndex];
-		//const dgInt32 m0 = entry.m_m0;
-		//const dgInt32 m1 = entry.m_m1;
 		const dgInt32 first = jointInfo->m_pairStart;
 		const dgInt32 auxiliaryDof = jointInfo->m_pairCount;
-		//const dgJacobian& y0 = externalAccel[m0];
-		//const dgJacobian& y1 = externalAccel[m1];
 
 		for (dgInt32 i = 0; i < auxiliaryDof; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[first + i];
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
-			//dgVector diag(row->m_Jt.m_jacobianM0.m_linear * y0.m_linear) + row->m_Jt.m_jacobianM0.m_angular * y0.m_angular) +
-			//			  row->m_Jt.m_jacobianM1.m_linear * y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular * y1.m_angular));
-			//b[auxiliaryIndex] = row->m_penetrationStiffness - (diag.AddHorizontal()).GetScalar();
 			b[auxiliaryIndex] = -row->m_penetrationStiffness;
 			low[auxiliaryIndex] = dgClamp(row->m_lowerBoundFrictionCoefficent, -DG_MAX_BOUND, dgFloat32(0.0f));
 			high[auxiliaryIndex] = dgClamp(row->m_upperBoundFrictionCoefficent, dgFloat32(0.0f), DG_MAX_BOUND);
