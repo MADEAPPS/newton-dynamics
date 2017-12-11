@@ -353,10 +353,16 @@ class dSixAxisController: public dCustomControllerBase
 			location.m_posit.m_y += 0.125f * 0.5f;
 
 			// add Robot Base
-			//NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
-			//dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
-			//parentMatrix.m_posit = location.m_posit;
-			//NewtonBodySetMassMatrix(parentBody, 0.0f, 0.0f, 0.0f, 0.0f);
+			NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
+			dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
+			parentMatrix.m_posit = location.m_posit;
+			dCustomHinge* const fixHinge = new dCustomHinge(parentMatrix, parentBody, NULL);
+			fixHinge->EnableLimits(true);
+			fixHinge->SetLimits(0.0f, 0.0f);
+			void* const rootNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, parentBody);
+
+			// lock the root body to the world
+			NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, fixHinge->GetJoint());
 
 			// add Robot rotating platform
 			dMatrix baseMatrix(dGetIdentityMatrix());
@@ -364,16 +370,11 @@ class dSixAxisController: public dCustomControllerBase
 			baseMatrix.m_posit.m_y += 0.125f * 0.5f + 0.11f;
 			baseMatrix.m_posit.m_z += 0.125f * 0.5f;
 			NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
-			void* const baseHingeNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, base);
 
 			dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 			baseSpin.m_posit = location.m_posit;
-			dCustomHinge* const fixHinge = new dCustomHinge(baseSpin, base, NULL);
-			fixHinge->EnableLimits(true);
-			fixHinge->SetLimits(0.0f, 0.0f);
-
-			// lock the roo mnode to teh base
-			NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, fixHinge->GetJoint());
+			dKukaServoMotor1* const baseHinge = new dKukaServoMotor1(baseSpin, base, parentBody, -3.141592f * 2.0f, 3.141592f * 2.0f);
+			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 			// add Robot Arm
 			dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
