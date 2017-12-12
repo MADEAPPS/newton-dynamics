@@ -111,7 +111,6 @@ class dSixAxisController: public dCustomControllerBase
 		dKukaEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
 			:dCustomKinematicController(invDynSolver, invDynNode, attachmentPointInGlobalSpace)
 			,m_targetMatrix(dGetIdentityMatrix())
-			,m_pichAngle(0.0f)
 		{
 			SetPickMode(0);
 			SetMaxLinearFriction (1000.0f);
@@ -181,12 +180,9 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-			dMatrix grippertRotation (dPitchMatrix(m_pichAngle) * m_targetMatrix);
 		}
 
 		dMatrix m_targetMatrix;
-		dFloat m_pichAngle;
 	};
 
 	class dSixAxisNode
@@ -427,7 +423,7 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonInverseDynamicsDestroy (m_kinematicSolver);
 		}
 
-		void SetTarget (dFloat z, dFloat y, dFloat azimuth)
+		void SetTarget (dFloat z, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
 		{
 			m_yawAngle = azimuth;
 			m_effector->m_matrix.m_posit.m_y = y;
@@ -504,10 +500,10 @@ class dSixAxisController: public dCustomControllerBase
 		}
 	}
 
-	void SetTarget (dFloat x, dFloat y, dFloat azimuth)
+	void SetTarget (dFloat x, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
 	{
 		if (m_robot) {
-			m_robot->SetTarget(x, y, azimuth);
+			m_robot->SetTarget(x, y, azimuth, pitch, roll);
 		}
 	}
 
@@ -546,6 +542,8 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		,m_azimuth(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
+		,m_gripper_roll(0.0f)
+		,m_gripper_pitch(0.0f)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -564,9 +562,14 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
 
+		ImGui::Separator();
+		ImGui::Separator();
+		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
+		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
+
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
-			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f);
+			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f, me->m_gripper_pitch * 3.141592f / 180.0f, me->m_gripper_roll * 3.141592f / 180.0f);
 		}
 	}
 
@@ -595,6 +598,8 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 	dFloat m_azimuth;
 	dFloat m_posit_x;
 	dFloat m_posit_y;
+	dFloat m_gripper_roll;
+	dFloat m_gripper_pitch;
 };
 
 
