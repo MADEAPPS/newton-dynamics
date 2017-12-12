@@ -480,8 +480,8 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Use sliders to manipulate robot");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -360.0f, 360.0f);
-		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.75f, 0.75f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.75f, 0.75f);
 
 		ImGui::Separator();
 		ImGui::Separator();
