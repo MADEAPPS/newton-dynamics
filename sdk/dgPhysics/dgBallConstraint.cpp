@@ -122,7 +122,7 @@ dgVector dgBallConstraint::GetJointForce () const
 	dgMatrix matrix0;
 	dgMatrix matrix1;
 
-	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
+	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 	return dgVector (matrix0.m_front.Scale3 (m_jointForce[0].m_force) + matrix0.m_up.Scale3 (m_jointForce[1].m_force) + matrix0.m_right.Scale3 (m_jointForce[2].m_force));
 }
 
@@ -167,11 +167,11 @@ void dgBallConstraint::SetPivotPoint(const dgVector &pivot)
 		pin = matrix.m_front;
 	}
 
-	SetPivotAndPinDir (pivot, pin);
+	SetPivotAndPinDir (pivot, pin, m_localMatrix0, m_localMatrix1);
 
 	dgMatrix matrix0;
 	dgMatrix matrix1;
-	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
+	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 	SetLimits (matrix0.m_front, -dgPI * dgFloat32 (0.5f), dgPI * dgFloat32 (0.5f), dgPI * dgFloat32 (0.5f), matrix0.m_right, dgFloat32 (0.0f), dgFloat32 (0.0f));
 }
 
@@ -186,7 +186,7 @@ void dgBallConstraint::SetLimits (
 {
 	dgMatrix matrix0;
 	dgMatrix matrix1;
-	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
+	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 
 	dgAssert (m_body0);
 	dgAssert (m_body1);
@@ -241,7 +241,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 		m_jointUserCallback (*this, params.m_timestep);
 	}
 
-	dgVector angle (CalculateGlobalMatrixAndAngle (matrix0, matrix1));
+	dgVector angle (CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1));
 	m_angles = angle.Scale3 (-dgFloat32 (1.0f));
 
 	const dgVector& dir0 = matrix0.m_front;

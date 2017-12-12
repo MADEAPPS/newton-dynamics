@@ -697,7 +697,7 @@ dgHingeConstraint* dgWorld::CreateHingeConstraint (
 	dgHingeConstraint* const constraint = new (m_allocator) dgHingeConstraint;
 
 	AttachConstraint (constraint, body0, body1);
-	constraint->SetPivotAndPinDir (pivot, pinDir);
+	constraint->SetPivotAndPinDir (pivot, pinDir, constraint->m_localMatrix0, constraint->m_localMatrix1);
 	return constraint;
 }
 
@@ -725,7 +725,7 @@ dgSlidingConstraint* dgWorld::CreateSlidingConstraint (
 	dgSlidingConstraint* const constraint = new (m_allocator) dgSlidingConstraint;
 
 	AttachConstraint (constraint, body0, body1);
-	constraint->SetPivotAndPinDir (pivot, pinDir);
+	constraint->SetPivotAndPinDir (pivot, pinDir, constraint->m_localMatrix0, constraint->m_localMatrix1);
 	return constraint;
 }
 
@@ -741,7 +741,7 @@ dgCorkscrewConstraint* dgWorld::CreateCorkscrewConstraint (
 	dgCorkscrewConstraint* const constraint = new (m_allocator) dgCorkscrewConstraint;
 
 	AttachConstraint (constraint, body0, body1);
-	constraint->SetPivotAndPinDir (pivot, pinDir);
+	constraint->SetPivotAndPinDir (pivot, pinDir, constraint->m_localMatrix0, constraint->m_localMatrix1);
 	return constraint;
 }
 
@@ -758,7 +758,7 @@ dgUniversalConstraint* dgWorld::CreateUniversalConstraint (
 	dgUniversalConstraint* const constraint = new (m_allocator) dgUniversalConstraint;
 
 	AttachConstraint (constraint, body0, body1);
-	constraint->SetPivotAndPinDir(pivot, pin0, pin1);
+	constraint->SetPivotAndPinDir(pivot, pin0, pin1, constraint->m_localMatrix0, constraint->m_localMatrix1);
 	return constraint;
 }
 

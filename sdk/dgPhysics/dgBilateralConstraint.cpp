@@ -86,7 +86,7 @@ void dgBilateralConstraint::SetDestructorCallback (OnConstraintDestroy destructo
 	m_destructor = destructor;
 }
 
-void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1)
+void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1) const
 {
 	dgFloat32 length; 
 	dgAssert (m_body0);
@@ -110,65 +110,58 @@ void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const 
 }
 
 
-void dgBilateralConstraint::SetPivotAndPinDir(const dgVector &pivot, const dgVector &pinDirection)
+void dgBilateralConstraint::SetPivotAndPinDir(const dgVector &pivot, const dgVector &pinDirection, dgMatrix& matrix0, dgMatrix& matrix1) const
 {
-	dgAssert (0);
-//	CalculateMatrixOffset (pivot, pinDirection, m_localMatrix0, m_localMatrix1);
+	CalculateMatrixOffset (pivot, pinDirection, matrix0, matrix1);
 }
 
-void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVector& pinDirection0, const dgVector& pinDirection1)
+void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVector& pinDirection0, const dgVector& pinDirection1, dgMatrix& matrix0, dgMatrix& matrix1) const
 {
-	dgAssert (0);
-/*
 	dgAssert (m_body0);
 	dgAssert (m_body1);
 
 	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
 
+	dgAssert ((pinDirection0.DotProduct3(pinDirection0)) > dgFloat32 (0.0f));
+	matrix0.m_front = pinDirection0.Scale3 (dgRsqrt (pinDirection0.DotProduct3(pinDirection0)));
+	matrix0.m_right = matrix0.m_front * pinDirection1;
+	matrix0.m_right = matrix0.m_right.Scale3 (dgRsqrt (matrix0.m_right.DotProduct3(matrix0.m_right)));
+	matrix0.m_up = matrix0.m_right * matrix0.m_front; 
+	matrix0.m_posit = pivot;
 	
-	dgAssert ((pinDirection0 % pinDirection0) > dgFloat32 (0.0f));
-	m_localMatrix0.m_front = pinDirection0.Scale3 (dgRsqrt (pinDirection0 % pinDirection0));
-	m_localMatrix0.m_right = m_localMatrix0.m_front * pinDirection1;
-	m_localMatrix0.m_right = m_localMatrix0.m_right.Scale3 (dgRsqrt (m_localMatrix0.m_right % m_localMatrix0.m_right));
-	m_localMatrix0.m_up = m_localMatrix0.m_right * m_localMatrix0.m_front; 
-	m_localMatrix0.m_posit = pivot;
+	matrix0.m_front.m_w = dgFloat32 (0.0f);
+	matrix0.m_up.m_w    = dgFloat32 (0.0f);
+	matrix0.m_right.m_w = dgFloat32 (0.0f);
+	matrix0.m_posit.m_w = dgFloat32 (1.0f);
 
-	m_localMatrix0.m_front.m_w = dgFloat32 (0.0f);
-	m_localMatrix0.m_up.m_w    = dgFloat32 (0.0f);
-	m_localMatrix0.m_right.m_w = dgFloat32 (0.0f);
-	m_localMatrix0.m_posit.m_w = dgFloat32 (1.0f);
-	 
 	const dgMatrix& body1_Matrix = m_body1->GetMatrix();
+	 
+	matrix1 = matrix0 * body1_Matrix.Inverse(); 
+	matrix0 = matrix0 * body0_Matrix.Inverse();
 
-	m_localMatrix1 = m_localMatrix0 * body1_Matrix.Inverse(); 
-	m_localMatrix0 = m_localMatrix0 * body0_Matrix.Inverse();
-*/
 }
 
-dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const
+dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (const dgMatrix& localMatrix0, const dgMatrix& localMatrix1, dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const
 {
-	dgAssert (0);
-	return dgVector (0.0f);
-/*
 	dgAssert (m_body0);
 	dgAssert (m_body1);
 	const dgMatrix& body0Matrix = m_body0->GetMatrix();
 	const dgMatrix& body1Matrix = m_body1->GetMatrix();
 
-	globalMatrix0 = m_localMatrix0 * body0Matrix;
-	globalMatrix1 = m_localMatrix1 * body1Matrix;
+	globalMatrix0 = localMatrix0 * body0Matrix;
+	globalMatrix1 = localMatrix1 * body1Matrix;
 
 	dgMatrix relMatrix (globalMatrix1 * globalMatrix0.Inverse());
 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_front % relMatrix.m_front)) < 1.0e-5f); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_up % relMatrix.m_up)) < 1.0e-5f); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_right % relMatrix.m_right)) < 1.0e-5f); 
+	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_front.DotProduct3(relMatrix.m_front))) < 1.0e-5f); 
+	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_up.DotProduct3(relMatrix.m_up))) < 1.0e-5f); 
+	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_right.DotProduct3(relMatrix.m_right))) < 1.0e-5f); 
 
 	dgVector euler0;
 	dgVector euler1;
 	relMatrix.CalcPitchYawRoll (euler0, euler1);
 	return euler0;
-*/
+
 }
 
 dgFloat32 dgBilateralConstraint::GetRowAcceleration (dgInt32 index, dgContraintDescritor& desc) const

@@ -47,11 +47,10 @@ class dgBilateralConstraint: public dgConstraint
 	virtual dgInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dgInt32 model);
 
-	void SetPivotAndPinDir(const dgVector &pivot, const dgVector &pinDirection);
-	void SetPivotAndPinDir (const dgVector& pivot, const dgVector& pinDirection0, const dgVector& pinDirection1);
-	dgVector CalculateGlobalMatrixAndAngle (dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const;
-	void CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1);
-
+	void CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1) const;
+	void SetPivotAndPinDir(const dgVector &pivot, const dgVector &pinDirection, dgMatrix& matrix0, dgMatrix& matrix1) const;
+	void SetPivotAndPinDir(const dgVector& pivot, const dgVector& pinDirection0, const dgVector& pinDirection1, dgMatrix& matrix0, dgMatrix& matrix1) const;
+	dgVector CalculateGlobalMatrixAndAngle (const dgMatrix& localMatrix0, const dgMatrix& localMatrix1, dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const;
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
 

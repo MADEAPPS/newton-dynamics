@@ -87,7 +87,7 @@ void dgUpVectorConstraint::InitPinDir (const dgVector& pin)
 	const dgMatrix& matrix = m_body0->GetMatrix();
 
 	dgVector pivot (matrix.m_posit); 
-	SetPivotAndPinDir (pivot, pin);
+	SetPivotAndPinDir (pivot, pin, m_localMatrix0, m_localMatrix1);
 
 }
 
@@ -112,7 +112,7 @@ dgUnsigned32 dgUpVectorConstraint::JacobianDerivative (dgContraintDescritor& par
 {
 	dgMatrix matrix0;
 	dgMatrix matrix1;
-	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
+	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 
 	dgVector lateralDir (matrix0.m_front.CrossProduct3(matrix1.m_front));
 

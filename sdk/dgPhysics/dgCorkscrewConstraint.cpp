@@ -186,7 +186,7 @@ dgVector dgCorkscrewConstraint::GetJointForce () const
 	dgMatrix matrix0;
 	dgMatrix matrix1;
 
-	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
+	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 
 	return dgVector (matrix0.m_up.Scale3 (m_jointForce[0].m_force) + 
 		             matrix0.m_right.Scale3 (m_jointForce[1].m_force) + 
@@ -200,7 +200,7 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 	dgMatrix matrix0;
 	dgMatrix matrix1;
 
-	dgVector angle (CalculateGlobalMatrixAndAngle (matrix0, matrix1));
+	dgVector angle (CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1));
 
 	m_angle = -angle.m_x;
 	m_posit = matrix0.m_front.DotProduct3(matrix0.m_posit - matrix1.m_posit);

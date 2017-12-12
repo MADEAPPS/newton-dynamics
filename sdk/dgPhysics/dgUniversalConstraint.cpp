@@ -197,7 +197,7 @@ dgVector dgUniversalConstraint::GetJointForce () const
 	dgMatrix matrix0;
 	dgMatrix matrix1;
 
-	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
+	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 
 	return dgVector (matrix0.m_up.Scale3 (m_jointForce[0].m_force) + 
 		             matrix0.m_right.Scale3 (m_jointForce[1].m_force) + 
@@ -207,13 +207,13 @@ dgVector dgUniversalConstraint::GetJointForce () const
 
 dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& params)
 {
-	dgInt32 ret;
-	dgFloat32 sinAngle;
-	dgFloat32 cosAngle;
 	dgMatrix matrix0;
 	dgMatrix matrix1;
+	dgFloat32 sinAngle;
+	dgFloat32 cosAngle;
+	dgInt32 ret;
 
-	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
+	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 
 	const dgVector& dir0 = matrix0.m_front;
 	const dgVector& dir1 = matrix1.m_up;

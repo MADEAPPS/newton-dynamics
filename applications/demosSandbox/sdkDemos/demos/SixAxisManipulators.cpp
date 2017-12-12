@@ -110,16 +110,11 @@ class dSixAxisController: public dCustomControllerBase
 		public:
 		dKukaEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
 			:dCustomKinematicController(invDynSolver, invDynNode, attachmentPointInGlobalSpace)
+			,m_targetMatrix(dGetIdentityMatrix())
+			,m_pichAngle(0.0f)
 		{
 			SetPickMode(0);
 			SetMaxLinearFriction (1000.0f);
-		}
-
-		dKukaEndEffector(NewtonBody* const body, const dMatrix& attachmentPointInGlobalSpace)
-			:dCustomKinematicController(body, attachmentPointInGlobalSpace)
-		{
-			SetPickMode(0);
-			SetMaxLinearFriction(1000.0f);
 		}
 
 		~dKukaEndEffector()
@@ -186,9 +181,12 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+
+			dMatrix grippertRotation (dPitchMatrix(m_pichAngle) * m_targetMatrix);
 		}
 
 		dMatrix m_targetMatrix;
+		dFloat m_pichAngle;
 	};
 
 	class dSixAxisNode
