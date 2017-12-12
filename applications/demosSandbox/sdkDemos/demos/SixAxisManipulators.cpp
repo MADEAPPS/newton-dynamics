@@ -402,15 +402,17 @@ class dSixAxisController: public dCustomControllerBase
 			// Robot gripper base
 			dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
 			gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
+			NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
 			dMatrix gripperEffectMatrix(dGetIdentityMatrix());
 			gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f);
 			gripperEffectMatrix.m_front = gripperMatrix.m_front;
 			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
+			dKukaServoMotor2* const gripperJoint = new dKukaServoMotor2(gripperEffectMatrix, gripperBase, armBody1);
+			void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
 
 			// add the inverse dynamics end effector
-			//m_effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix, origin);
-			dKukaEndEffector* effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
+			dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
 			m_effector = new dSixAxisEffector(this, effector);
 
 			// save the tip reference point
