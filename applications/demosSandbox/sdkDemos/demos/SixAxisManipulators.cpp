@@ -306,10 +306,11 @@ class dSixAxisController: public dCustomControllerBase
 			armMatrix1.m_posit.m_y += 0.4f;
 			armMatrix1.m_posit.m_x -= 0.05f;
 			armMatrix1.m_posit.m_z -= 0.1f;
+			dFloat armAngleLimit = 10.0f * 3.141592f / 180.0f;
 			NewtonBody* const armBody1 = CreateBox(scene, armMatrix1, dVector(0.05f, 0.1f, 0.5f));
 			dMatrix armHingeMatrix1(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 			armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
-			dKukaServoMotor1* const armJoint1 = new dKukaServoMotor1(armHingeMatrix1, armBody1, armBody0, - 80.0f * 3.141592f / 180.0f, 80.0f * 3.141592f / 180.0f);
+			dKukaServoMotor1* const armJoint1 = new dKukaServoMotor1(armHingeMatrix1, armBody1, armBody0, -armAngleLimit, armAngleLimit);
 			void* const armJointNode1 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode0, armJoint1->GetJoint());
 #if 0
 			// Robot gripper base
