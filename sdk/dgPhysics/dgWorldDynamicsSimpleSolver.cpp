@@ -41,14 +41,20 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 		activeJoint = SortClusters(cluster, timestep, threadID);
 	}
 
+	dgWorld* const world = (dgWorld*) this;
+//	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
+//	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
+//	dgContact* const contact = (dgContact*) constraintArray[0].m_joint;
+
 	if (!cluster->m_isContinueCollision) {
 		if ((activeJoint == 1) && (cluster->m_jointCount == 1)) {
+//		if ((activeJoint == 1) && (cluster->m_jointCount == 1) && (constraintArray[0].m_joint->GetId() == dgConstraint::m_contactConstraint)) {
 			// later special case single joints using exact solve, 
 			// for now use same solver
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			CalculateSingleClusterReactionForces(cluster, threadID, timestep);
 			//CalculateClusterReactionForces(cluster, threadID, timestep);
-		} else if (activeJoint > 1) {
+		} else if (activeJoint >= 1) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			CalculateClusterReactionForces(cluster, threadID, timestep);
 		} else if (cluster->m_jointCount == 0) {
@@ -77,7 +83,6 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 		bool stackSleeping = true;
 		dgInt32 sleepCounter = 10000;
 
-		dgWorld* const world = (dgWorld*) this;
 		const dgInt32 bodyCount = cluster->m_bodyCount;
 		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 		dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];

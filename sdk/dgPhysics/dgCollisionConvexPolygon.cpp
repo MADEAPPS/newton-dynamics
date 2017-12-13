@@ -502,7 +502,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	if (den > dgFloat32 (-1.0e-10f)) {
 		return 0;
 	}
-//	den1 = dgFloat32 (1.0f) / den1;
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
@@ -512,7 +511,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	polygonMatrix[0] = right.Normalize();
 	polygonMatrix[1] = m_normal;
 	polygonMatrix[2] = polygonMatrix[0].CrossProduct3(m_normal);
-//	polygonMatrix[3] = dgVector::m_wOne;
 	polygonMatrix[3] = m_localPoly[0];
 	polygonMatrix[3].m_w = dgFloat32 (1.0f);
 	dgAssert (polygonMatrix.TestOrthogonal());
@@ -532,7 +530,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	dgVector minBox(polyBoxP0 - hullBoxP1);
 	dgVector maxBox(polyBoxP1 - hullBoxP0);
 
-	dgVector relStep (relativeVelocity.Scale4(proxy.m_timestep));
+	dgVector relStep (relativeVelocity.Scale4(dgMax (proxy.m_timestep, dgFloat32 (1.0e-12f))));
 	dgFastRayTest ray(dgVector(dgFloat32(0.0f)), polygonMatrix.UnrotateVector(relStep));
  	dgFloat32 distance = ray.BoxIntersect(minBox, maxBox);
 
