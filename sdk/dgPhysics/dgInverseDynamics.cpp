@@ -176,7 +176,6 @@ class dgInverseDynamics::dgNode
 			CalculateInertiaMatrix();
 		}
 
-//		dgInt32 freeDof = 0;
 		dgInt32 boundedDof = 0;
 		m_ordinals = m_ordinalInit;
 		if (m_joint) {
@@ -213,13 +212,10 @@ class dgInverseDynamics::dgNode
 			}
 			dgAssert (m_dof > 0);
 			dgAssert (m_dof <= 6);
-//			boundedDof += (jointInfo->m_pairCount - count - freeDof);
-//			boundedDof += (jointInfo->m_pairCount - count - freeDof);
 			boundedDof = jointInfo->m_pairCount - m_dof - m_ikdof;
 			GetJacobians(jointInfo, matrixRow);
 		}
 
-		//Factorize();
 		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
 			for (dgNode* child = m_child; child; child = child->m_sibling) {
 				CalculateBodyDiagonal(child);
@@ -238,7 +234,6 @@ class dgInverseDynamics::dgNode
 			CalculateJointDiagonal();
 			CalculateJacobianBlock();
 		}
-//		return jointInfo->m_pairCount - m_count - freeDof;
 		return boundedDof;
 	}
 

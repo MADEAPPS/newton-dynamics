@@ -21,13 +21,13 @@
 #include "HeightFieldPrimitive.h"
 
 
-class dSixAxisController: public dCustomControllerBase
+class dHaxapodController: public dCustomControllerBase
 {
 	public:
-	class dKukaServoMotor1: public dCustomHinge
+	class dHexapodMotor: public dCustomHinge
 	{
 		public:
-		dKukaServoMotor1(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle)
+		dHexapodMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle)
 			:dCustomHinge(pinAndPivotFrame, child, parent)
 			,m_torque(1000.0f)
 		{
@@ -63,52 +63,10 @@ class dSixAxisController: public dCustomControllerBase
 		dFloat m_torque;
 	};
 
-	class dKukaServoMotor2: public dCustomUniversal
+	class dHexapodEndEffector: public dCustomKinematicController
 	{
 		public:
-		dKukaServoMotor2(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-			:dCustomUniversal(pinAndPivotFrame, child, parent)
-			,m_torque(1000.0f)
-		{
-			EnableLimit_0(false);
-			EnableLimit_1(false);
-		}
-
-		void Debug(dDebugDisplay* const debugDisplay) const
-		{
-		}
-
-		void SubmitConstraints(dFloat timestep, int threadIndex)
-		{
-			dMatrix matrix0;
-			dMatrix matrix1;
-			dFloat accel;
-
-			dCustomUniversal::SubmitConstraints(timestep, threadIndex);
-
-			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-			CalculateGlobalMatrix(matrix0, matrix1);
-
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, accel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
-
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, accel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
-		}
-
-		dFloat m_torque;
-	};
-
-	class dKukaEndEffector: public dCustomKinematicController
-	{
-		public:
-		dKukaEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
+		dHexapodEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
 			:dCustomKinematicController(invDynSolver, invDynNode, attachmentPointInGlobalSpace)
 			,m_targetMatrix(dGetIdentityMatrix())
 		{
@@ -116,7 +74,7 @@ class dSixAxisController: public dCustomControllerBase
 			SetMaxLinearFriction (1000.0f);
 		}
 
-		~dKukaEndEffector()
+		~dHexapodEndEffector()
 		{
 		}
 
@@ -186,19 +144,19 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix m_targetMatrix;
 	};
 
-	class dSixAxisNode
+	class dHexapodNode
 	{
 		public:
-		dSixAxisNode(dSixAxisNode* const parent)
+		dHexapodNode(dHexapodNode* const parent)
 			:m_matrix(dGetIdentityMatrix())
 			,m_parent(parent)
 			,m_children()
 		{
 		}
 
-		virtual ~dSixAxisNode()
+		virtual ~dHexapodNode()
 		{
-			for (dList<dSixAxisNode*>::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
+			for (dList<dHexapodNode*>::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
 				delete node->GetInfo();
 			}
 		}
@@ -206,31 +164,31 @@ class dSixAxisController: public dCustomControllerBase
 		virtual void UpdateTranform(const dMatrix& parentMatrix)
 		{
 			m_worldMatrix = m_matrix * parentMatrix;
-			for (dList<dSixAxisNode*>::dListNode* nodePtr = m_children.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-				dSixAxisNode* const node = nodePtr->GetInfo();
+			for (dList<dHexapodNode*>::dListNode* nodePtr = m_children.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+				dHexapodNode* const node = nodePtr->GetInfo();
 				node->UpdateTranform(m_worldMatrix);
 			}
 		}
 
 		virtual void UpdateEffectors(dFloat timestep)
 		{
-			for (dList<dSixAxisNode*>::dListNode* nodePtr = m_children.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-				dSixAxisNode* const node = nodePtr->GetInfo();
+			for (dList<dHexapodNode*>::dListNode* nodePtr = m_children.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+				dHexapodNode* const node = nodePtr->GetInfo();
 				node->UpdateEffectors(timestep);
 			}
 		}
 
 		dMatrix m_matrix;
 		dMatrix m_worldMatrix;
-		dSixAxisNode* m_parent;
-		dList<dSixAxisNode*> m_children;
+		dHexapodNode* m_parent;
+		dList<dHexapodNode*> m_children;
 	};
 
-	class dSixAxisEffector: public dSixAxisNode
+	class dHexapodEffector: public dHexapodNode
 	{
 		public:
-		dSixAxisEffector(dSixAxisNode* const parent, dKukaEndEffector* const effector)
-			:dSixAxisNode(parent)
+		dHexapodEffector(dHexapodNode* const parent, dHexapodEndEffector* const effector)
+			:dHexapodNode(parent)
 			,m_effector(effector)
 		{
 			if (parent) {
@@ -241,17 +199,17 @@ class dSixAxisController: public dCustomControllerBase
 		virtual void UpdateEffectors(dFloat timestep)
 		{
 			m_effector->SetTarget (m_worldMatrix);
-			dSixAxisNode::UpdateEffectors(timestep);
+			dHexapodNode::UpdateEffectors(timestep);
 		}
 
-		dKukaEndEffector* m_effector;
+		dHexapodEndEffector* m_effector;
 	};
 
-	class dSixAxisRoot: public dSixAxisNode
+	class dHexapodRoot: public dHexapodNode
 	{
 		public:
-		dSixAxisRoot(DemoEntityManager* const scene, const dVector& origin)
-			:dSixAxisNode(NULL)
+		dHexapodRoot(DemoEntityManager* const scene, const dVector& origin)
+			:dHexapodNode(NULL)
 			,m_kinematicSolver(NULL)
 			,m_effector(NULL)
 			,m_referencePosit (0.0f)
@@ -286,7 +244,7 @@ class dSixAxisController: public dCustomControllerBase
 
 			dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
 			baseSpin.m_posit = location.m_posit;
-			dKukaServoMotor1* const baseHinge = new dKukaServoMotor1(baseSpin, base, parentBody, -3.141592f * 2.0f, 3.141592f * 2.0f);
+			dHexapodMotor* const baseHinge = new dHexapodMotor(baseSpin, base, parentBody, -3.141592f * 2.0f, 3.141592f * 2.0f);
 			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 			// add Robot Arm
@@ -298,7 +256,7 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonBody* const armBody0 = CreateBox(scene, armMatrix0, dVector(0.05f, 0.1f, 0.75f));
 			dMatrix armHingeMatrix0(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 			armHingeMatrix0.m_posit = armMatrix0.m_posit + armMatrix0.RotateVector(dVector(0.0f, 0.0f, 0.3f));
-			dKukaServoMotor1* const armJoint0 = new dKukaServoMotor1(armHingeMatrix0, armBody0, base, -3.141592f * 2.0f, 3.141592f * 2.0f);
+			dHexapodMotor* const armJoint0 = new dHexapodMotor(armHingeMatrix0, armBody0, base, -3.141592f * 2.0f, 3.141592f * 2.0f);
 			void* const armJointNode0 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, armJoint0->GetJoint());
 
 			dMatrix armMatrix1(armMatrix0 * dYawMatrix(3.141592f));
@@ -311,7 +269,7 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonBody* const armBody1 = CreateBox(scene, armMatrix1, dVector(0.05f, 0.1f, 0.5f));
 			dMatrix armHingeMatrix1(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 			armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
-			dKukaServoMotor1* const armJoint1 = new dKukaServoMotor1(armHingeMatrix1, armBody1, armBody0, -armAngleLimit, armAngleLimit);
+			dHexapodMotor* const armJoint1 = new dHexapodMotor(armHingeMatrix1, armBody1, armBody0, -armAngleLimit, armAngleLimit);
 			void* const armJointNode1 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode0, armJoint1->GetJoint());
 #if 0
 			// Robot gripper base
@@ -337,10 +295,10 @@ class dSixAxisController: public dCustomControllerBase
 			gripperEffectMatrix.m_front = gripperMatrix.m_front;
 			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-			dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
+			dHexapodEndEffector* const effector = new dHexapodEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
 #endif
 
-			m_effector = new dSixAxisEffector(this, effector);
+			m_effector = new dHexapodEffector(this, effector);
 
 			// save the tip reference point
 			m_referencePosit = gripperEffectMatrix.m_posit - origin;
@@ -350,7 +308,7 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 		}
 
-		~dSixAxisRoot()
+		~dHexapodRoot()
 		{
 			NewtonInverseDynamicsDestroy (m_kinematicSolver);
 		}
@@ -371,7 +329,7 @@ class dSixAxisController: public dCustomControllerBase
 
 		virtual void UpdateEffectors(dFloat timestep)
 		{
-			dSixAxisNode::UpdateEffectors(timestep);
+			dHexapodNode::UpdateEffectors(timestep);
 			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
 		}
 
@@ -419,16 +377,16 @@ class dSixAxisController: public dCustomControllerBase
 		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
-		dSixAxisEffector* m_effector;
+		dHexapodEffector* m_effector;
 		dVector m_referencePosit;
 	};
 
-	dSixAxisController()
+	dHaxapodController()
 		:m_robot (NULL)
 	{
 	}
 
-	~dSixAxisController()
+	~dHaxapodController()
 	{
 		if (m_robot) {
 			delete m_robot;
@@ -442,9 +400,9 @@ class dSixAxisController: public dCustomControllerBase
 		}
 	}
 
-	void MakeKukaRobot_IK(DemoEntityManager* const scene, const dVector& origin)
+	void MakeHexapod(DemoEntityManager* const scene, const dVector& origin)
 	{
-		m_robot = new dSixAxisRoot(scene, origin);
+		m_robot = new dHexapodRoot(scene, origin);
 	}
 
 	void PostUpdate(dFloat timestep, int threadIndex) 
@@ -465,14 +423,14 @@ class dSixAxisController: public dCustomControllerBase
 		}
 	}
 
-	dSixAxisRoot* m_robot;
+	dHexapodRoot* m_robot;
 };
 
-class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
+class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 {
 	public:
-	dSixAxisManager(DemoEntityManager* const scene)
-		:dCustomControllerManager<dSixAxisController>(scene->GetNewton(), "sixAxisManipulator")
+	dHexapodManager(DemoEntityManager* const scene)
+		:dCustomControllerManager<dHaxapodController>(scene->GetNewton(), "sixAxisManipulator")
 		,m_currentController(NULL)
 		,m_azimuth(0.0f)
 		,m_posit_x(0.0f)
@@ -483,13 +441,13 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~dSixAxisManager()
+	~dHexapodManager()
 	{
 	}
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		dSixAxisManager* const me = (dSixAxisManager*)context;
+		dHexapodManager* const me = (dHexapodManager*)context;
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Use sliders to manipulate robot");
@@ -505,20 +463,20 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 me->m_posit_y = 0.25f;
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-			dSixAxisController* const controller = &node->GetInfo();
+			dHaxapodController* const controller = &node->GetInfo();
 			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f, me->m_gripper_pitch * 3.141592f / 180.0f, me->m_gripper_roll * 3.141592f / 180.0f);
 		}
 	}
 
-	virtual dSixAxisController* CreateController()
+	virtual dHaxapodController* CreateController()
 	{
-		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
+		return (dHaxapodController*)dCustomControllerManager<dHaxapodController>::CreateController();
 	}
 
-	dSixAxisController* MakeKukaRobot_IK(DemoEntityManager* const scene, const dVector& origin)
+	dHaxapodController* MakeHexapod(DemoEntityManager* const scene, const dVector& origin)
 	{
-		dSixAxisController* const controller = (dSixAxisController*)CreateController();
-		controller->MakeKukaRobot_IK(scene, origin);
+		dHaxapodController* const controller = (dHaxapodController*)CreateController();
+		controller->MakeHexapod(scene, origin);
 		m_currentController = controller;
 		return controller;
 	}
@@ -526,12 +484,12 @@ me->m_posit_y = 0.25f;
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			dSixAxisController* const controller = &node->GetInfo();
+			dHaxapodController* const controller = &node->GetInfo();
 			controller->Debug(debugContext);
 		}
 	}
 
-	dSixAxisController* m_currentController;
+	dHaxapodController* m_currentController;
 	dFloat m_azimuth;
 	dFloat m_posit_x;
 	dFloat m_posit_y;
@@ -540,14 +498,14 @@ me->m_posit_y = 0.25f;
 };
 
 
-void SixAxisManipulators(DemoEntityManager* const scene)
+void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
-	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
+	dHexapodManager* const robotManager = new dHexapodManager(scene);
 
-	robotManager->MakeKukaRobot_IK (scene, dVector (0.0f, 0.0f, 0.0f, 1.0f));
+	robotManager->MakeHexapod (scene, dVector (0.0f, 0.0f, 0.0f, 1.0f));
 
 	dVector origin(0.0f);
 	origin.m_x = -2.0f;

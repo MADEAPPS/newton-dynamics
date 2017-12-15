@@ -60,17 +60,18 @@
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
-#define DEFAULT_SCENE	29			// six axis manipulators
-//#define DEFAULT_SCENE	30			// articulated joints
-//#define DEFAULT_SCENE	31			// basic rag doll
-//#define DEFAULT_SCENE	32			// dynamics rag doll
-//#define DEFAULT_SCENE	33			// basic Car
-//#define DEFAULT_SCENE	34			// super Car
-//#define DEFAULT_SCENE	35			// heavy vehicles
-//#define DEFAULT_SCENE	36			// basic player controller
-//#define DEFAULT_SCENE	37			// advanced player controller
-//#define DEFAULT_SCENE	38			// cloth patch			
-//#define DEFAULT_SCENE	39			// soft bodies			
+//#define DEFAULT_SCENE	29			// six axis manipulators
+#define DEFAULT_SCENE	30			// Hexapod Robot
+//#define DEFAULT_SCENE	31			// articulated joints
+//#define DEFAULT_SCENE	32			// basic rag doll
+//#define DEFAULT_SCENE	33			// dynamics rag doll
+//#define DEFAULT_SCENE	34			// basic Car
+//#define DEFAULT_SCENE	35			// super Car
+//#define DEFAULT_SCENE	36			// heavy vehicles
+//#define DEFAULT_SCENE	37			// basic player controller
+//#define DEFAULT_SCENE	38			// advanced player controller
+//#define DEFAULT_SCENE	39			// cloth patch			
+//#define DEFAULT_SCENE	40			// soft bodies			
 
 
 /// demos forward declaration 
@@ -114,6 +115,7 @@ void DynamicRagDoll (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
+void Hexapod(DemoEntityManager* const scene);
 
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
@@ -148,6 +150,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
 	{"Standard Joints", "show some of the common joints", StandardJoints},
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
+	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
