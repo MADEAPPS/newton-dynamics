@@ -130,8 +130,6 @@ void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-//	matrix1 = dMatrix (m_targetRot, m_targetPosit);
-
 	debugDisplay->DrawFrame(matrix0);
 	debugDisplay->DrawFrame(m_targetMatrix);
 }

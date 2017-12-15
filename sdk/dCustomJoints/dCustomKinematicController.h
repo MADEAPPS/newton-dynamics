@@ -37,17 +37,14 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API void SetTargetPosit (const dVector& posit); 
 	CUSTOM_JOINTS_API void SetTargetMatrix (const dMatrix& matrix); 
 
+	CUSTOM_JOINTS_API void ResetAutoSleep();
 	CUSTOM_JOINTS_API dMatrix GetTargetMatrix () const;
-
-	CUSTOM_JOINTS_API void ResetAutoSleep ();
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
-
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	void Init (NewtonBody* const body, const dMatrix& matrix);
 

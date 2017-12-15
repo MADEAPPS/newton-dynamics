@@ -105,87 +105,6 @@ class dSixAxisController: public dCustomControllerBase
 		dFloat m_torque;
 	};
 
-	class dKukaEndEffector: public dCustomKinematicController
-	{
-		public:
-		dKukaEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
-			:dCustomKinematicController(invDynSolver, invDynNode, attachmentPointInGlobalSpace)
-			,m_targetMatrix(dGetIdentityMatrix())
-		{
-			SetPickMode(0);
-			SetMaxLinearFriction (1000.0f);
-		}
-
-		~dKukaEndEffector()
-		{
-		}
-
-		void Debug(dDebugDisplay* const debugDisplay) const
-		{
-			dCustomKinematicController::Debug(debugDisplay);
-		}
-
-		void SetTarget (const dMatrix& targetMatrix)
-		{
-			m_targetMatrix = targetMatrix;
-			SetTargetPosit(targetMatrix.m_posit);
-		}
-
-		void SubmitConstraints(dFloat timestep, int threadIndex)
-		{
-			dMatrix matrix0;
-			dVector veloc(0.0f);
-			dVector omega(0.0f);
-			dVector com(0.0f);
-			dVector pointVeloc(0.0f);
-			dFloat dist;
-			dFloat speed;
-			dFloat relSpeed;
-			dFloat relAccel;
-			dFloat damp = 0.3f;
-			dFloat invTimestep = 1.0f / timestep;
-
-			// Get the global matrices of each rigid body.
-			NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-			matrix0 = m_localMatrix0 * matrix0;
-
-			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-			dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
-			NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
-
-			// Restrict the movement on the pivot point along all tree orthonormal direction
-			speed = pointVeloc.DotProduct3(m_targetMatrix.m_up);
-			dist = relPosit.DotProduct3(m_targetMatrix.m_up) * damp;
-			relSpeed = dist * invTimestep - speed;
-			relAccel = relSpeed * invTimestep;
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_up[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-			speed = pointVeloc.DotProduct3(m_targetMatrix.m_front);
-			dist = relPosit.DotProduct3(m_targetMatrix.m_front) * damp;
-			relSpeed = dist * invTimestep - speed;
-			relAccel = relSpeed * invTimestep;
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_front[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-/*
-			speed = pointVeloc.DotProduct3(m_targetMatrix.m_right);
-			dist = relPosit.DotProduct3(m_targetMatrix.m_right) * damp;
-			relSpeed = dist * invTimestep - speed;
-			relAccel = relSpeed * invTimestep;
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_right[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-*/
-		}
-
-		dMatrix m_targetMatrix;
-	};
-
 	class dSixAxisNode
 	{
 		public:
@@ -229,10 +148,12 @@ class dSixAxisController: public dCustomControllerBase
 	class dSixAxisEffector: public dSixAxisNode
 	{
 		public:
-		dSixAxisEffector(dSixAxisNode* const parent, dKukaEndEffector* const effector)
+		dSixAxisEffector(dSixAxisNode* const parent, dCustomKinematicController* const effector)
 			:dSixAxisNode(parent)
 			,m_effector(effector)
 		{
+			m_effector->SetPickMode(0);
+			m_effector->SetMaxLinearFriction(1000.0f);
 			if (parent) {
 				parent->m_children.Append (this);
 			}
@@ -240,11 +161,11 @@ class dSixAxisController: public dCustomControllerBase
 
 		virtual void UpdateEffectors(dFloat timestep)
 		{
-			m_effector->SetTarget (m_worldMatrix);
+			m_effector->SetTargetMatrix (m_worldMatrix);
 			dSixAxisNode::UpdateEffectors(timestep);
 		}
 
-		dKukaEndEffector* m_effector;
+		dCustomKinematicController* m_effector;
 	};
 
 	class dSixAxisRoot: public dSixAxisNode
@@ -327,7 +248,8 @@ class dSixAxisController: public dCustomControllerBase
 			void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
 
 			// add the inverse dynamics end effector
-			dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
+			//dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
+			dCustomKinematicController* const effector = new dCustomKinematicController(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
 #else
 
 			dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
@@ -337,9 +259,9 @@ class dSixAxisController: public dCustomControllerBase
 			gripperEffectMatrix.m_front = gripperMatrix.m_front;
 			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-			dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
+			//dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
+			dCustomKinematicController* const effector = new dCustomKinematicController(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
 #endif
-
 			m_effector = new dSixAxisEffector(this, effector);
 
 			// save the tip reference point
@@ -502,7 +424,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
 		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
 
-me->m_posit_y = 0.25f;
+//me->m_posit_y = 0.25f;
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
