@@ -51,8 +51,7 @@ class dCustomKinematicController: public dCustomJoint
 
 	void Init (NewtonBody* const body, const dMatrix& matrix);
 
-	dVector m_targetPosit;
-	dQuaternion m_targetRot;
+	dMatrix m_targetMatrix;
 	int m_pickMode;
 	int m_autoSleepState;
 	dFloat m_maxLinearFriction;

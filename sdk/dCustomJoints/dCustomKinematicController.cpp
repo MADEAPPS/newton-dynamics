@@ -30,6 +30,7 @@ dCustomKinematicController::dCustomKinematicController(NewtonBody* const body, c
 	NewtonBodyGetMatrix (body, &matrix[0][0]);
 	matrix.m_posit = handleInGlobalSpace;
 	Init (body, matrix);
+//m_targetMatrix = dPitchMatrix (0.4f) * dRollMatrix (-0.5f)  * dYawMatrix (-0.5f) * m_targetMatrix;
 }
 
 dCustomKinematicController::dCustomKinematicController (NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace)
@@ -102,13 +103,14 @@ void dCustomKinematicController::SetMaxAngularFriction(dFloat frictionTorque)
 void dCustomKinematicController::SetTargetRotation(const dQuaternion& rotation)
 {
 	NewtonBodySetSleepState(m_body0, 0);
-	m_targetRot = rotation;
+	m_targetMatrix = dMatrix (rotation, m_targetMatrix.m_posit);
 }
 
 void dCustomKinematicController::SetTargetPosit(const dVector& posit)
 {
 	NewtonBodySetSleepState(m_body0, 0);
-	m_targetPosit = posit;
+	m_targetMatrix.m_posit = posit;
+	m_targetMatrix.m_posit.m_w = 1.0f;
 }
 
 void dCustomKinematicController::SetTargetMatrix(const dMatrix& matrix)
@@ -119,7 +121,7 @@ void dCustomKinematicController::SetTargetMatrix(const dMatrix& matrix)
 
 dMatrix dCustomKinematicController::GetTargetMatrix () const
 {
-	return dMatrix (m_targetRot, m_targetPosit);
+	return m_targetMatrix;
 }
 
 
@@ -128,10 +130,10 @@ void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	matrix1 = dMatrix (m_targetRot, m_targetPosit);
+//	matrix1 = dMatrix (m_targetRot, m_targetPosit);
 
 	debugDisplay->DrawFrame(matrix0);
-	debugDisplay->DrawFrame(matrix1);
+	debugDisplay->DrawFrame(m_targetMatrix);
 }
 
 void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
@@ -140,72 +142,40 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	dAssert (timestep > 0.0f);
 
 	dMatrix matrix0;
-	dMatrix matrix1;
 	dVector veloc(0.0f);
 	dVector omega(0.0f);
 	dVector com(0.0f);
 	dVector pointVeloc(0.0f);
+	const dFloat damp = 0.3f;
+	const dFloat invTimestep = 1.0f / timestep;
 
-	dFloat invTimestep = 1.0f / timestep;
-
-	CalculateGlobalMatrix(matrix0, matrix1);
+	// Get the global matrices of each rigid body.
+	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
+	matrix0 = m_localMatrix0 * matrix0;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	dVector targetPosit(m_targetPosit);
-	dVector relPosit (targetPosit - matrix0.m_posit);
-	dFloat mag2 = relPosit.DotProduct3(relPosit);
-	if (mag2 > 1.0e-4f) {
-		dMatrix dirMatrix (dGrammSchmidt(relPosit));
+	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
+	NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
 
-		NewtonBodyGetPointVelocity(m_body0, &targetPosit[0], &pointVeloc[0]);
-		
-		dFloat speed = pointVeloc.DotProduct3(dirMatrix.m_front);
-		dFloat dist = relPosit.DotProduct3(dirMatrix.m_front) * 0.3f;
-		
+	for (int i = 0; i < 3; i ++) {
+		// Restrict the movement on the pivot point along all tree orthonormal direction
+		dFloat speed = pointVeloc.DotProduct3(m_targetMatrix[i]);
+		dFloat dist = relPosit.DotProduct3(m_targetMatrix[i]) * damp;
 		dFloat relSpeed = dist * invTimestep - speed;
 		dFloat relAccel = relSpeed * invTimestep;
-
-		// Restrict the movement on the pivot point along all tree orthonormal direction
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_front[0]);
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix[i][0]);
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_up[0]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &dirMatrix.m_right[0]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-	} else {
-		// Restrict the movement on the pivot point along all tree orthonormal direction
-		NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &targetPosit[0], &matrix0.m_front[0]);
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxLinearFriction);
-
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &targetPosit[0], &matrix0.m_up[0]);
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxLinearFriction);
-
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &targetPosit[0], &matrix0.m_right[0]);
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxLinearFriction);
-	}
+	}	
 
 	if (m_pickMode) {
-		dQuaternion rotation (matrix0);
-		if (m_targetRot.DotProduct (rotation) < 0.0f) {
-			rotation.Scale(-1.0f);
-		}
-
-		dFloat dot = rotation.DotProduct(m_targetRot);
-		if (dot < 0.9995f) {
+		dQuaternion rotation (matrix0.Inverse() * m_targetMatrix);
+		if (dAbs (rotation.m_q0) < 0.99998f) {
 			dMatrix rot (dGrammSchmidt(dVector (rotation.m_q1, rotation.m_q2, rotation.m_q3)));
 			dFloat angle = 2.0f * dAcos(dClamp(rotation.m_q0, dFloat(-1.0f), dFloat(1.0f)));
 
-			NewtonUserJointAddAngularRow (m_joint, -angle, &rot.m_front[0]);
+			NewtonUserJointAddAngularRow (m_joint, angle, &rot.m_front[0]);
 			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
 
