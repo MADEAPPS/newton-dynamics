@@ -63,86 +63,6 @@ class dHaxapodController: public dCustomControllerBase
 		dFloat m_torque;
 	};
 
-	class dHexapodEndEffector: public dCustomKinematicController
-	{
-		public:
-		dHexapodEndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
-			:dCustomKinematicController(invDynSolver, invDynNode, attachmentPointInGlobalSpace)
-			,m_targetMatrix(dGetIdentityMatrix())
-		{
-			SetPickMode(0);
-			SetMaxLinearFriction (1000.0f);
-		}
-
-		~dHexapodEndEffector()
-		{
-		}
-
-		void Debug(dDebugDisplay* const debugDisplay) const
-		{
-			dCustomKinematicController::Debug(debugDisplay);
-		}
-
-		void SetTarget (const dMatrix& targetMatrix)
-		{
-			m_targetMatrix = targetMatrix;
-			SetTargetPosit(targetMatrix.m_posit);
-		}
-
-		void SubmitConstraints(dFloat timestep, int threadIndex)
-		{
-			dMatrix matrix0;
-			dVector veloc(0.0f);
-			dVector omega(0.0f);
-			dVector com(0.0f);
-			dVector pointVeloc(0.0f);
-			dFloat dist;
-			dFloat speed;
-			dFloat relSpeed;
-			dFloat relAccel;
-			dFloat damp = 0.3f;
-			dFloat invTimestep = 1.0f / timestep;
-
-			// Get the global matrices of each rigid body.
-			NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-			matrix0 = m_localMatrix0 * matrix0;
-
-			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-			dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
-			NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
-
-			// Restrict the movement on the pivot point along all tree orthonormal direction
-			speed = pointVeloc.DotProduct3(m_targetMatrix.m_up);
-			dist = relPosit.DotProduct3(m_targetMatrix.m_up) * damp;
-			relSpeed = dist * invTimestep - speed;
-			relAccel = relSpeed * invTimestep;
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_up[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-
-			speed = pointVeloc.DotProduct3(m_targetMatrix.m_front);
-			dist = relPosit.DotProduct3(m_targetMatrix.m_front) * damp;
-			relSpeed = dist * invTimestep - speed;
-			relAccel = relSpeed * invTimestep;
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_front[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-/*
-			speed = pointVeloc.DotProduct3(m_targetMatrix.m_right);
-			dist = relPosit.DotProduct3(m_targetMatrix.m_right) * damp;
-			relSpeed = dist * invTimestep - speed;
-			relAccel = relSpeed * invTimestep;
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix.m_right[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-*/
-		}
-
-		dMatrix m_targetMatrix;
-	};
 
 	class dHexapodNode
 	{
@@ -187,10 +107,13 @@ class dHaxapodController: public dCustomControllerBase
 	class dHexapodEffector: public dHexapodNode
 	{
 		public:
-		dHexapodEffector(dHexapodNode* const parent, dHexapodEndEffector* const effector)
+		dHexapodEffector(dHexapodNode* const parent, dCustomKinematicController* const effector)
 			:dHexapodNode(parent)
 			,m_effector(effector)
 		{
+			m_effector->SetPickMode(0);
+			m_effector->SetMaxLinearFriction(1000.0f);
+
 			if (parent) {
 				parent->m_children.Append (this);
 			}
@@ -198,11 +121,11 @@ class dHaxapodController: public dCustomControllerBase
 
 		virtual void UpdateEffectors(dFloat timestep)
 		{
-			m_effector->SetTarget (m_worldMatrix);
+			m_effector->SetTargetMatrix(m_worldMatrix);
 			dHexapodNode::UpdateEffectors(timestep);
 		}
 
-		dHexapodEndEffector* m_effector;
+		dCustomKinematicController* m_effector;
 	};
 
 	class dHexapodRoot: public dHexapodNode
@@ -271,22 +194,6 @@ class dHaxapodController: public dCustomControllerBase
 			armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
 			dHexapodMotor* const armJoint1 = new dHexapodMotor(armHingeMatrix1, armBody1, armBody0, -armAngleLimit, armAngleLimit);
 			void* const armJointNode1 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode0, armJoint1->GetJoint());
-#if 0
-			// Robot gripper base
-			dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
-			gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
-			NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
-			dMatrix gripperEffectMatrix(dGetIdentityMatrix());
-			gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-			gripperEffectMatrix.m_front = gripperMatrix.m_front;
-			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
-			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-			dKukaServoMotor2* const gripperJoint = new dKukaServoMotor2(gripperEffectMatrix, gripperBase, armBody1);
-			void* const gripperJointNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode1, gripperJoint->GetJoint());
-
-			// add the inverse dynamics end effector
-			dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
-#else
 
 			dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
 			gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
@@ -295,8 +202,7 @@ class dHaxapodController: public dCustomControllerBase
 			gripperEffectMatrix.m_front = gripperMatrix.m_front;
 			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-			dHexapodEndEffector* const effector = new dHexapodEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
-#endif
+			dCustomKinematicController* const effector = new dCustomKinematicController(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
 
 			m_effector = new dHexapodEffector(this, effector);
 
