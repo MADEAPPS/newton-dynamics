@@ -230,22 +230,22 @@ return;
 			for (int i = 0; i < 3; i ++) {
 			//for (int i = 0; i < 1; i ++) {
 				dMatrix rightLocation (baseMatrix);
-				rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.6f);
+				rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.65f);
 				rightLocation.m_posit += rightLocation.m_front.Scale (size.m_x * 0.3f - size.m_x * i / 3.0f);
-				AddLimb (scene, hexaBodyNode, rightLocation, mass * 0.1f);
+				AddLimb (scene, hexaBodyNode, rightLocation, mass * 0.1f, 0.3f);
 
 				dMatrix similarTransform (dGetIdentityMatrix());
 				similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
 				similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
 				dMatrix leftLocation (rightLocation * similarTransform.Inverse() * dYawMatrix(3.141592f) * similarTransform);
-				AddLimb (scene, hexaBodyNode, leftLocation, mass * 0.1f);
+				AddLimb (scene, hexaBodyNode, leftLocation, mass * 0.1f, 0.3f);
 			}
 
 			// complete the ik
 			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 		}
 
-		void AddLimb(DemoEntityManager* const scene, void* const rootNode, const dMatrix& location, dFloat partMass)
+		void AddLimb(DemoEntityManager* const scene, void* const rootNode, const dMatrix& location, dFloat partMass, dFloat limbLenght)
 		{
 			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
 
@@ -258,7 +258,7 @@ return;
 
 			//make limb forward arm
 			dMatrix forwardArmMatrix (dPitchMatrix(-30.0f * 3.141592f / 180.0f));
-			dVector forwardArmSize (0.05f, 0.05f, 0.4f, 0.0f);
+			dVector forwardArmSize (limbLenght * 0.25f, limbLenght * 0.25f, limbLenght, 0.0f);
 			forwardArmMatrix.m_posit += forwardArmMatrix.m_right.Scale (forwardArmSize.m_z * 0.5f);
 			forwardArmMatrix = forwardArmMatrix * location;
 			NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix, forwardArmSize, partMass, 10.0f);
