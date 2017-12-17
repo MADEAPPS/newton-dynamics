@@ -193,12 +193,13 @@ baseMatrix.m_posit.m_y += 0.5f;
 
 			//make limb forward arm
 			dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
-			dVector armSize(limbLenght * 0.25f, limbLenght * 0.25f, limbLenght * 1.5f, 0.0f);
+			dFloat armSize = limbLenght * 1.25f;
 			armMatrix.m_posit += forwardArmMatrix.m_right.Scale(limbLenght);
-			armMatrix.m_posit.m_y -= armSize.m_z * 0.5f;
-			NewtonBody* const arm = CreateBox(scene, armMatrix * location, armSize, partMass, 10.0f);
+			armMatrix.m_posit.m_y -= armSize * 0.5f;
+			//NewtonBody* const arm = CreateBox(scene, armMatrix * location, armSize, partMass, 10.0f);
+			NewtonBody* const arm = CreateCapsule(scene, armMatrix * location, partMass, 10.0f, armSize * 0.2f, armSize);
 			dMatrix armPivot(armMatrix);
-			armPivot.m_posit.m_y += armSize.m_z * 0.5f;
+			armPivot.m_posit.m_y += armSize * 0.5f;
 			dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * location, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
 
 		}
@@ -258,6 +259,25 @@ baseMatrix.m_posit.m_y += 0.5f;
 			return body;
 		}
 
+
+		NewtonBody* CreateCapsule(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat inertiaScale, dFloat radius, dFloat height) const
+		{
+			NewtonWorld* const world = scene->GetNewton();
+			int materialID = NewtonMaterialGetDefaultGroupID(world);
+			dVector size(radius, height, radius, 0.0f);
+			dMatrix align (dYawMatrix(3.141592f * 0.5f));
+			NewtonCollision* const collision = CreateConvexCollision(world, align, size, _CAPSULE_PRIMITIVE, 0);
+			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+			ScaleIntertia(body, inertiaScale);
+
+			geometry->Release();
+			NewtonDestroyCollision(collision);
+			return body;
+		}
+
+
 		NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat inertiaScale, dFloat radius, dFloat height) const
 		{
 			NewtonWorld* const world = scene->GetNewton();
@@ -268,7 +288,7 @@ baseMatrix.m_posit.m_y += 0.5f;
 
 			
 			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-			ScaleIntertia(body, 10.0f);
+			ScaleIntertia(body, inertiaScale);
 
 			geometry->Release();
 			NewtonDestroyCollision(collision);
