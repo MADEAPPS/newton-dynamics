@@ -609,7 +609,7 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 	dVector dir(0.0f, 1.0f, 0.0f);
 
 	dVector force (dir.Scale (mass * DEMO_GRAVITY));
-	NewtonBodySetForce (body, &force.m_x);
+//	NewtonBodySetForce (body, &force.m_x);
 }
 
 
