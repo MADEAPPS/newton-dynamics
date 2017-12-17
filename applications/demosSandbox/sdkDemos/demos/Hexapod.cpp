@@ -59,6 +59,7 @@ return;
 
 		void Debug(dDebugDisplay* const debugDisplay) const
 		{
+			dCustomHinge::Debug(debugDisplay);
 		}
 
 		dFloat m_torque;
@@ -135,92 +136,16 @@ return;
 		dHexapodRoot(DemoEntityManager* const scene, const dMatrix& origin)
 			:dHexapodNode(NULL)
 			,m_kinematicSolver(NULL)
-//			,m_effector(NULL)
-//			,m_referencePosit (0.0f)
 		{
-/*
-			m_matrix = dGetIdentityMatrix();
-			m_matrix.m_posit = origin;
-			m_matrix.m_posit.m_w = 1.0f;
-
-			m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
-
-			dMatrix location(dRollMatrix(90.0f * 3.141592f / 180.0f));
-			location.m_posit = origin;
-			location.m_posit.m_y += 0.125f * 0.5f;
-
-			// add Robot Base
-			NewtonBody* const parentBody = CreateCylinder(scene, location, 0.35f, 0.125f);
-			dMatrix parentMatrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
-			parentMatrix.m_posit = location.m_posit;
-			dCustomHinge* const fixHinge = new dCustomHinge(parentMatrix, parentBody, NULL);
-			fixHinge->EnableLimits(true);
-			fixHinge->SetLimits(0.0f, 0.0f);
-			// lock the root body to the world
-			void* const rootNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, parentBody);
-			NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, fixHinge->GetJoint());
-
-			// add Robot rotating platform
-			dMatrix baseMatrix(dGetIdentityMatrix());
-			baseMatrix.m_posit = location.m_posit;
-			baseMatrix.m_posit.m_y += 0.125f * 0.5f + 0.11f;
-			baseMatrix.m_posit.m_z += 0.125f * 0.5f;
-			NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(0.125f, 0.2f, 0.25f));
-
-			dMatrix baseSpin(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f)));
-			baseSpin.m_posit = location.m_posit;
-			dHexapodMotor* const baseHinge = new dHexapodMotor(baseSpin, base, parentBody, -3.141592f * 2.0f, 3.141592f * 2.0f);
-			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
-
-			// add Robot Arm
-			dMatrix armMatrix0(dPitchMatrix(45.0f * 3.141592f / 180.0f));
-			armMatrix0.m_posit = baseMatrix.m_posit;
-			armMatrix0.m_posit.m_y += 0.30f;
-			armMatrix0.m_posit.m_x += 0.09f;
-			armMatrix0.m_posit.m_z -= 0.125f;
-			NewtonBody* const armBody0 = CreateBox(scene, armMatrix0, dVector(0.05f, 0.1f, 0.75f));
-			dMatrix armHingeMatrix0(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
-			armHingeMatrix0.m_posit = armMatrix0.m_posit + armMatrix0.RotateVector(dVector(0.0f, 0.0f, 0.3f));
-			dHexapodMotor* const armJoint0 = new dHexapodMotor(armHingeMatrix0, armBody0, base, -3.141592f * 2.0f, 3.141592f * 2.0f);
-			void* const armJointNode0 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, armJoint0->GetJoint());
-
-			dMatrix armMatrix1(armMatrix0 * dYawMatrix(3.141592f));
-			armMatrix1.m_posit = armMatrix0.m_posit;
-			armMatrix1.m_posit.m_y += 0.4f;
-			armMatrix1.m_posit.m_x -= 0.05f;
-			armMatrix1.m_posit.m_z -= 0.1f;
-			dFloat armAngleLimit = 80.0f * 3.141592f / 180.0f;
-			NewtonBody* const armBody1 = CreateBox(scene, armMatrix1, dVector(0.05f, 0.1f, 0.5f));
-			dMatrix armHingeMatrix1(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
-			armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
-			dHexapodMotor* const armJoint1 = new dHexapodMotor(armHingeMatrix1, armBody1, armBody0, -armAngleLimit, armAngleLimit);
-			void* const armJointNode1 = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, armJointNode0, armJoint1->GetJoint());
-
-			dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
-			gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
-			dMatrix gripperEffectMatrix(dGetIdentityMatrix());
-			gripperEffectMatrix.m_up = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-			gripperEffectMatrix.m_front = gripperMatrix.m_front;
-			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
-			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-			dCustomKinematicController* const effector = new dCustomKinematicController(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
-
-			m_effector = new dHexapodEffector(this, effector);
-
-			// save the tip reference point
-			m_referencePosit = gripperEffectMatrix.m_posit - origin;
-			m_referencePosit.m_w = 1.0f;
-
-*/
-
 			dFloat mass = 30.0f;
 			// make the kinematic solver
 			m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
 			// make the root body
 			dMatrix baseMatrix(origin);
-			baseMatrix.m_posit.m_y += 0.25f;
-			dVector size (1.2f, 0.31f, 0.5f, 0.0f);
+//			baseMatrix.m_posit.m_y += 0.25f;
+baseMatrix.m_posit.m_y += 0.5f;
+			dVector size (1.3f, 0.31f, 0.5f, 0.0f);
 			NewtonBody* const hexaBody = CreateBox(scene, baseMatrix, size, mass, 1.0f);
 			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
 			m_rootEffector = new dCustomKinematicController(m_kinematicSolver, hexaBodyNode, baseMatrix);
@@ -260,12 +185,21 @@ return;
 			dMatrix forwardArmMatrix (dPitchMatrix(-30.0f * 3.141592f / 180.0f));
 			dVector forwardArmSize (limbLenght * 0.25f, limbLenght * 0.25f, limbLenght, 0.0f);
 			forwardArmMatrix.m_posit += forwardArmMatrix.m_right.Scale (forwardArmSize.m_z * 0.5f);
-			forwardArmMatrix = forwardArmMatrix * location;
-			NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix, forwardArmSize, partMass, 10.0f);
-
+			NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix * location, forwardArmSize, partMass, 10.0f);
 			dMatrix forwardArmPivot (forwardArmMatrix);
 			forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale (forwardArmSize.m_z * 0.5f);
-			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
+			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * location, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
+
+
+			//make limb forward arm
+			dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
+			dVector armSize(limbLenght * 0.25f, limbLenght * 0.25f, limbLenght * 1.5f, 0.0f);
+			armMatrix.m_posit += forwardArmMatrix.m_right.Scale(limbLenght);
+			armMatrix.m_posit.m_y -= armSize.m_z * 0.5f;
+			NewtonBody* const arm = CreateBox(scene, armMatrix * location, armSize, partMass, 10.0f);
+			dMatrix armPivot(armMatrix);
+			armPivot.m_posit.m_y += armSize.m_z * 0.5f;
+			dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * location, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
 
 		}
 
