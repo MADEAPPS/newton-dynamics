@@ -131,12 +131,13 @@ class dHaxapodController: public dCustomControllerBase
 	class dHexapodRoot: public dHexapodNode
 	{
 		public:
-		dHexapodRoot(DemoEntityManager* const scene, const dVector& origin)
+		dHexapodRoot(DemoEntityManager* const scene, const dMatrix& origin)
 			:dHexapodNode(NULL)
 			,m_kinematicSolver(NULL)
-			,m_effector(NULL)
-			,m_referencePosit (0.0f)
+//			,m_effector(NULL)
+//			,m_referencePosit (0.0f)
 		{
+/*
 			m_matrix = dGetIdentityMatrix();
 			m_matrix.m_posit = origin;
 			m_matrix.m_posit.m_w = 1.0f;
@@ -187,8 +188,7 @@ class dHaxapodController: public dCustomControllerBase
 			armMatrix1.m_posit.m_y += 0.4f;
 			armMatrix1.m_posit.m_x -= 0.05f;
 			armMatrix1.m_posit.m_z -= 0.1f;
-//			dFloat armAngleLimit = 80.0f * 3.141592f / 180.0f;
-			dFloat armAngleLimit = 10.0f * 3.141592f / 180.0f;
+			dFloat armAngleLimit = 80.0f * 3.141592f / 180.0f;
 			NewtonBody* const armBody1 = CreateBox(scene, armMatrix1, dVector(0.05f, 0.1f, 0.5f));
 			dMatrix armHingeMatrix1(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 			armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
@@ -212,15 +212,25 @@ class dHaxapodController: public dCustomControllerBase
 
 			// complete the ik
 			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
+*/
+
+
+			dMatrix baseMatrix(origin);
+			baseMatrix.m_posit.m_y += 0.25f;
+			NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(1.6f, 0.31f, 0.5f, 0.0f));
+
 		}
 
 		~dHexapodRoot()
 		{
-			NewtonInverseDynamicsDestroy (m_kinematicSolver);
+			if (m_kinematicSolver) {
+				NewtonInverseDynamicsDestroy (m_kinematicSolver);
+			}
 		}
 
 		void SetTarget (dFloat z, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
 		{
+/*
 			// set base matrix
 			m_matrix = dYawMatrix(azimuth);
 			m_matrix.m_posit = m_matrix.TransformVector(m_referencePosit);
@@ -231,12 +241,15 @@ class dHaxapodController: public dCustomControllerBase
 
 			// calculate global matrices
 			UpdateTranform(dGetIdentityMatrix());
+*/
 		}
 
 		virtual void UpdateEffectors(dFloat timestep)
 		{
-			dHexapodNode::UpdateEffectors(timestep);
-			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
+			if (m_kinematicSolver) {
+				dHexapodNode::UpdateEffectors(timestep);
+				NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
+			}
 		}
 
 		void ScaleIntertia(NewtonBody* const body, dFloat factor) const
@@ -283,8 +296,8 @@ class dHaxapodController: public dCustomControllerBase
 		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
-		dHexapodEffector* m_effector;
-		dVector m_referencePosit;
+		//dHexapodEffector* m_effector;
+		//dVector m_referencePosit;
 	};
 
 	dHaxapodController()
@@ -306,9 +319,9 @@ class dHaxapodController: public dCustomControllerBase
 		}
 	}
 
-	void MakeHexapod(DemoEntityManager* const scene, const dVector& origin)
+	void MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
 	{
-		m_robot = new dHexapodRoot(scene, origin);
+		m_robot = new dHexapodRoot(scene, location);
 	}
 
 	void PostUpdate(dFloat timestep, int threadIndex) 
@@ -325,7 +338,7 @@ class dHaxapodController: public dCustomControllerBase
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
 		if (m_robot) {
-			m_robot->m_effector->m_effector->Debug(debugContext);
+//			m_robot->m_effector->m_effector->Debug(debugContext);
 		}
 	}
 
@@ -356,22 +369,20 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		dHexapodManager* const me = (dHexapodManager*)context;
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Use sliders to manipulate robot");
+		scene->Print(color, "Hexapod controller");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -360.0f, 360.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
-
+/*
 		ImGui::Separator();
 		ImGui::Separator();
 		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
 		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
-
-me->m_posit_y = 0.25f;
-
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
 			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f, me->m_gripper_pitch * 3.141592f / 180.0f, me->m_gripper_roll * 3.141592f / 180.0f);
 		}
+*/
 	}
 
 	virtual dHaxapodController* CreateController()
@@ -379,10 +390,10 @@ me->m_posit_y = 0.25f;
 		return (dHaxapodController*)dCustomControllerManager<dHaxapodController>::CreateController();
 	}
 
-	dHaxapodController* MakeHexapod(DemoEntityManager* const scene, const dVector& origin)
+	dHaxapodController* MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
 	{
 		dHaxapodController* const controller = (dHaxapodController*)CreateController();
-		controller->MakeHexapod(scene, origin);
+		controller->MakeHexapod(scene, location);
 		m_currentController = controller;
 		return controller;
 	}
@@ -411,7 +422,8 @@ void Hexapod(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	dHexapodManager* const robotManager = new dHexapodManager(scene);
 
-	robotManager->MakeHexapod (scene, dVector (0.0f, 0.0f, 0.0f, 1.0f));
+	dMatrix location (dGetIdentityMatrix());
+	robotManager->MakeHexapod (scene, location);
 
 	dVector origin(0.0f);
 	origin.m_x = -2.0f;
