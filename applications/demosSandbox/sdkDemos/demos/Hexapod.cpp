@@ -38,6 +38,7 @@ class dHaxapodController: public dCustomControllerBase
 
 		void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 		{
+return;
 			dFloat angle = m_curJointAngle.GetAngle();
 			if (angle < m_minAngle) {
 				dFloat relAngle = angle - m_minAngle;
@@ -210,14 +211,47 @@ class dHaxapodController: public dCustomControllerBase
 			m_referencePosit = gripperEffectMatrix.m_posit - origin;
 			m_referencePosit.m_w = 1.0f;
 
-			// complete the ik
-			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 */
 
+			dFloat mass = 30.0f;
+			// make the kinematic solver
+			m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
+			// make the root body
 			dMatrix baseMatrix(origin);
 			baseMatrix.m_posit.m_y += 0.25f;
-			NewtonBody* const base = CreateBox(scene, baseMatrix, dVector(1.6f, 0.31f, 0.5f, 0.0f));
+			dVector size (1.2f, 0.31f, 0.5f, 0.0f);
+			NewtonBody* const hexaBody = CreateBox(scene, baseMatrix, size, mass, 1.0f);
+			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
+			m_rootEffector = new dCustomKinematicController(m_kinematicSolver, hexaBodyNode, baseMatrix);
+
+			// make the hexapod six limbs
+			for (int i = 0; i < 3; i ++) {
+				dMatrix rightLocation (baseMatrix);
+				rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.6f);
+				rightLocation.m_posit += rightLocation.m_front.Scale (size.m_x * 0.3f - size.m_x * i / 3.0f);
+				AddLimb (scene, hexaBodyNode, rightLocation, mass * 0.1f);
+
+				dMatrix similarTransform (dGetIdentityMatrix());
+				similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
+				similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
+				dMatrix leftLocation (rightLocation * similarTransform.Inverse() * dYawMatrix(3.141592f) * similarTransform);
+				AddLimb (scene, hexaBodyNode, leftLocation, mass * 0.1f);
+			}
+
+			// complete the ik
+			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
+		}
+
+		void AddLimb(DemoEntityManager* const scene, void* const rootNode, const dMatrix& location, dFloat partMass)
+		{
+			dMatrix cylinderMatrix (dRollMatrix(3.141592f * 0.5f) * location);
+
+			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
+			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, 10.0f, 0.2f, 0.1f);
+
+			dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
+
 
 		}
 
@@ -262,23 +296,21 @@ class dHaxapodController: public dCustomControllerBase
 			NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
 		}
 
-		NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size) const
+		NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size, dFloat mass, dFloat inertiaScale) const
 		{
 			NewtonWorld* const world = scene->GetNewton();
 			int materialID = NewtonMaterialGetDefaultGroupID(world);
 			NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
 			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			dFloat mass = 1.0f;
 			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-			ScaleIntertia(body, 10.0f);
+			ScaleIntertia(body, inertiaScale);
 
 			geometry->Release();
 			NewtonDestroyCollision(collision);
 			return body;
 		}
 
-		NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat radius, dFloat height) const
+		NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat inertiaScale, dFloat radius, dFloat height) const
 		{
 			NewtonWorld* const world = scene->GetNewton();
 			int materialID = NewtonMaterialGetDefaultGroupID(world);
@@ -286,7 +318,7 @@ class dHaxapodController: public dCustomControllerBase
 			NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
 			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-			dFloat mass = 1.0f;
+			
 			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
 			ScaleIntertia(body, 10.0f);
 
@@ -296,7 +328,7 @@ class dHaxapodController: public dCustomControllerBase
 		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
-		//dHexapodEffector* m_effector;
+		dCustomKinematicController* m_rootEffector;
 		//dVector m_referencePosit;
 	};
 
