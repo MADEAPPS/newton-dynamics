@@ -225,8 +225,10 @@ return;
 			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
 			m_rootEffector = new dCustomKinematicController(m_kinematicSolver, hexaBodyNode, baseMatrix);
 
+			baseMatrix.m_posit.m_y -= 0.06f;
 			// make the hexapod six limbs
 			for (int i = 0; i < 3; i ++) {
+			//for (int i = 0; i < 1; i ++) {
 				dMatrix rightLocation (baseMatrix);
 				rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.6f);
 				rightLocation.m_posit += rightLocation.m_front.Scale (size.m_x * 0.3f - size.m_x * i / 3.0f);
@@ -245,13 +247,25 @@ return;
 
 		void AddLimb(DemoEntityManager* const scene, void* const rootNode, const dMatrix& location, dFloat partMass)
 		{
-			dMatrix cylinderMatrix (dRollMatrix(3.141592f * 0.5f) * location);
-
 			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
-			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, 10.0f, 0.2f, 0.1f);
 
+			dMatrix baseMatrix (dRollMatrix(3.141592f * 0.5f));
+
+			// make limb base
+			dMatrix cylinderMatrix (baseMatrix * location);
+			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, 10.0f, 0.2f, 0.1f);
 			dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
 
+			//make limb forward arm
+			dMatrix forwardArmMatrix (dPitchMatrix(-30.0f * 3.141592f / 180.0f));
+			dVector forwardArmSize (0.05f, 0.05f, 0.4f, 0.0f);
+			forwardArmMatrix.m_posit += forwardArmMatrix.m_right.Scale (forwardArmSize.m_z * 0.5f);
+			forwardArmMatrix = forwardArmMatrix * location;
+			NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix, forwardArmSize, partMass, 10.0f);
+
+			dMatrix forwardArmPivot (forwardArmMatrix);
+			forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale (forwardArmSize.m_z * 0.5f);
+			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
 
 		}
 
