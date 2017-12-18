@@ -1359,26 +1359,9 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showNormalForces) {
 		RenderNormalForces (m_world);
-		// see if there is a vehicle controller and 
-/*
-		void* const vehListerNode =  NewtonWorldGetPreListener (m_world, VEHICLE_PLUGIN_NAME);
-		if (vehListerNode) {
-			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonWorldGetListenerUserData(m_world, vehListerNode);
-			manager->Debug();
-		}
-
-		void* const characterListerNode =  NewtonWorldGetPreListener (m_world, PLAYER_PLUGIN_NAME);
-		if (characterListerNode) {
-			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) NewtonWorldGetListenerUserData(m_world, characterListerNode);
-			manager->Debug();
-		}
-*/
 	}
 
-
 	if (m_tranparentHeap.GetCount()) {
-		//dMatrix modelView;
-		//glGetFloat (GL_MODELVIEW_MATRIX, &modelView[0][0]);
 		glPushMatrix();	
 		while (m_tranparentHeap.GetCount()) {
 			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
@@ -1388,7 +1371,6 @@ void DemoEntityManager::RenderScene()
 			m_tranparentHeap.Pop();
 		}
 		glPopMatrix();
-		//glLoadMatrix(&modelView[0][0]);
 	}
 
 	glMatrixMode(GL_MODELVIEW);

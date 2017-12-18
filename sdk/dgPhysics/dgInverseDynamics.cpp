@@ -944,7 +944,8 @@ dgInt32 dgInverseDynamics::GetMemoryBufferSizeInBytes (const dgJointInfo* const 
 	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount * 2;
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
-	return (size + 1024) & -0x10;
+//	return (size + 1024) & -0x10;
+return 1024 * 128;
 }
 
 
@@ -1352,11 +1353,9 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 						   force1.m_linear * row->m_JMinv.m_jacobianM1.m_linear +
 						   force1.m_angular * row->m_JMinv.m_jacobianM1.m_angular);
 			dgFloat32 a = accel.AddHorizontal().GetScalar();
-dgTrace (("%f ", a));
 			joint->m_inverseDynamicsAcceleration[k] = -a;
 		}
 	}
-dgTrace (("\n"));
 }
 
 void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
@@ -1368,10 +1367,10 @@ void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 		GetJacobianDerivatives(jointInfoArray, matrixRow, timestep, threadIndex);
 
 		dgInt32 memorySizeInBytes = GetMemoryBufferSizeInBytes(jointInfoArray, matrixRow);
-		dgInt8* const memoryBuffer = (dgInt8*)dgAlloca(dgVector, memorySizeInBytes / sizeof(dgVector));
-		dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
-		dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount);
-		dgJacobian* const internalForce = dgAlloca(dgJacobian, m_nodeCount + m_loopingJoints.GetCount());
+		dgInt8* const memoryBuffer = (dgInt8*)dgAlloca(dgVector, memorySizeInBytes / sizeof(dgVector) + 1024);
+		dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount + 1024);
+		dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount + 1024);
+		dgJacobian* const internalForce = dgAlloca(dgJacobian, m_nodeCount + 1024);
 
 		dgAssert((dgInt64(accel) & 0x0f) == 0);
 		dgAssert((dgInt64(force) & 0x0f) == 0);
