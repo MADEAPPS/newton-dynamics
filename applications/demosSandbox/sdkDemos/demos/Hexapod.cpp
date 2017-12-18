@@ -38,7 +38,6 @@ class dHaxapodController: public dCustomControllerBase
 
 		void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 		{
-return;
 			dFloat angle = m_curJointAngle.GetAngle();
 			if (angle < m_minAngle) {
 				dFloat relAngle = angle - m_minAngle;
@@ -143,8 +142,7 @@ return;
 
 			// make the root body
 			dMatrix baseMatrix(origin);
-//			baseMatrix.m_posit.m_y += 0.25f;
-baseMatrix.m_posit.m_y += 0.5f;
+			baseMatrix.m_posit.m_y += 0.35f;
 			dVector size (1.3f, 0.31f, 0.5f, 0.0f);
 			NewtonBody* const hexaBody = CreateBox(scene, baseMatrix, size, mass, 1.0f);
 			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
