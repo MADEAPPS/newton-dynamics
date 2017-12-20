@@ -105,7 +105,7 @@ class dSixAxisController: public dCustomControllerBase
 		dFloat m_torque;
 	};
 
-#if 0
+#if 1
 	class dKukaEffector: public dCustomRagdollMotor_EndEffector
 	{
 		public:

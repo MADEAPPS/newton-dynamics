@@ -60,8 +60,8 @@
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
-#define DEFAULT_SCENE	29			// six axis manipulators
-//#define DEFAULT_SCENE	30			// Hexapod Robot
+//#define DEFAULT_SCENE	29			// six axis manipulators
+#define DEFAULT_SCENE	30			// Hexapod Robot
 //#define DEFAULT_SCENE	31			// articulated joints
 //#define DEFAULT_SCENE	32			// basic rag doll
 //#define DEFAULT_SCENE	33			// dynamics rag doll
