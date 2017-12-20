@@ -105,6 +105,31 @@ class dSixAxisController: public dCustomControllerBase
 		dFloat m_torque;
 	};
 
+#if 0
+	class dKukaEffector: public dCustomRagdollMotor_EndEffector
+	{
+		public:
+		dKukaEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace)
+			:dCustomRagdollMotor_EndEffector(invDynSolver, invDynNode, attachmentMatrixInGlobalSpace)
+		{
+		}
+	};
+#else
+	class dKukaEffector: public dCustomKinematicController
+	{
+		public:
+		dKukaEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace)
+			:dCustomKinematicController(invDynSolver, invDynNode, attachmentMatrixInGlobalSpace)
+		{
+		}
+
+		void SetAsThreedof()
+		{
+			SetPickMode(0);
+		}
+	};
+#endif
+
 	class dSixAxisNode
 	{
 		public:
@@ -148,11 +173,11 @@ class dSixAxisController: public dCustomControllerBase
 	class dSixAxisEffector: public dSixAxisNode
 	{
 		public:
-		dSixAxisEffector(dSixAxisNode* const parent, dCustomKinematicController* const effector)
+		dSixAxisEffector(dSixAxisNode* const parent, dKukaEffector* const effector)
 			:dSixAxisNode(parent)
 			,m_effector(effector)
 		{
-			m_effector->SetPickMode(0);
+			m_effector->SetAsThreedof();
 			m_effector->SetMaxLinearFriction(1000.0f);
 			if (parent) {
 				parent->m_children.Append (this);
@@ -165,7 +190,7 @@ class dSixAxisController: public dCustomControllerBase
 			dSixAxisNode::UpdateEffectors(timestep);
 		}
 
-		dCustomKinematicController* m_effector;
+		dKukaEffector* m_effector;
 	};
 
 	class dSixAxisRoot: public dSixAxisNode
@@ -227,8 +252,8 @@ class dSixAxisController: public dCustomControllerBase
 			armMatrix1.m_posit.m_y += 0.4f;
 			armMatrix1.m_posit.m_x -= 0.05f;
 			armMatrix1.m_posit.m_z -= 0.1f;
-//			dFloat armAngleLimit = 80.0f * 3.141592f / 180.0f;
-			dFloat armAngleLimit = 10.0f * 3.141592f / 180.0f;
+			dFloat armAngleLimit = 80.0f * 3.141592f / 180.0f;
+//			dFloat armAngleLimit = 10.0f * 3.141592f / 180.0f;
 			NewtonBody* const armBody1 = CreateBox(scene, armMatrix1, dVector(0.05f, 0.1f, 0.5f));
 			dMatrix armHingeMatrix1(dGrammSchmidt(dVector(1.0f, 0.0f, 0.0f)));
 			armHingeMatrix1.m_posit = armMatrix1.m_posit + armMatrix1.RotateVector(dVector(0.0f, 0.0f, 0.2f));
@@ -249,7 +274,7 @@ class dSixAxisController: public dCustomControllerBase
 
 			// add the inverse dynamics end effector
 			//dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
-			dCustomKinematicController* const effector = new dCustomKinematicController(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
+			dKukaEffector* const effector = new dKukaEffector(m_kinematicSolver, gripperJointNode, gripperEffectMatrix);
 #else
 
 			dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
@@ -260,7 +285,7 @@ class dSixAxisController: public dCustomControllerBase
 			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
 			//dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
-			dCustomKinematicController* const effector = new dCustomKinematicController(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
+			dKukaEffector* const effector = new dKukaEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
 #endif
 			m_effector = new dSixAxisEffector(this, effector);
 

@@ -135,30 +135,38 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace);
 	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor_EndEffector();
 
+	CUSTOM_JOINTS_API void SetAsSixdof (); 
+	CUSTOM_JOINTS_API void SetAsThreedof (); 
+
+	CUSTOM_JOINTS_API void SetLinearSpeed(dFloat speed);
+	CUSTOM_JOINTS_API void SetAngularSpeed(dFloat speed);
+
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat accel);
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat alpha);
 
 	CUSTOM_JOINTS_API void SetTargetPosit(const dVector& posit);
 	CUSTOM_JOINTS_API void SetTargetRotation(const dQuaternion& rotation);
 	
+	CUSTOM_JOINTS_API dMatrix GetBodyMatrix() const;
 	CUSTOM_JOINTS_API dMatrix GetTargetMatrix() const;
 	CUSTOM_JOINTS_API void SetTargetMatrix(const dMatrix& matrix);
 
-	protected:
-	//CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
+	protected:
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
 	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
-	dVector m_targetPosit;
-	dQuaternion m_targetRot;
+	dMatrix m_targetMatrix;	
+	dFloat m_linearSpeed;
+	dFloat m_angularSpeed;
 	dFloat m_maxLinearFriction;
 	dFloat m_maxAngularFriction;
+	bool m_isSixdof;
 
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector, dCustomJoint)
 };
