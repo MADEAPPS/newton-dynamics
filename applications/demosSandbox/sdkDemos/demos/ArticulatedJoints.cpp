@@ -1492,23 +1492,22 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 	void RenderPlayerHelp (DemoEntityManager* const scene) const
 	{
-		//		if (m_player->m_helpKey.GetPushButtonState()) {
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print (color, "Navigation Keys");
-		scene->Print (color, "drive forward:           W");
-		scene->Print (color, "drive backward:          S");
-		scene->Print (color, "turn right:              D");
-		scene->Print (color, "turn left:               A");
-		scene->Print (color, "open palette:            F");
-		scene->Print (color, "close palette            G");
-		scene->Print (color, "lift palette:            E");
-		scene->Print (color, "lower palette            Q");
-		scene->Print (color, "tilt forward:            Z");
-		scene->Print (color, "tilt backward:           X");
-		scene->Print (color, "turn base left:          R");
-		scene->Print (color, "turn base right:         T");
-		scene->Print (color, "toggle camera mode:      C");
-		scene->Print (color, "switch vehicle:          P");
+		scene->Print (color, "drive forward:      W");
+		scene->Print (color, "drive backward:     S");
+		scene->Print (color, "turn right:         D");
+		scene->Print (color, "turn left:          A");
+		scene->Print (color, "open palette:       F");
+		scene->Print (color, "close palette       G");
+		scene->Print (color, "lift palette:       E");
+		scene->Print (color, "lower palette       Q");
+		scene->Print (color, "tilt forward:       Z");
+		scene->Print (color, "tilt backward:      X");
+		scene->Print (color, "turn base left:     R");
+		scene->Print (color, "turn base right:    T");
+		scene->Print (color, "toggle camera mode: C");
+		scene->Print (color, "switch vehicle:     P");
 	}				
 
 	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)

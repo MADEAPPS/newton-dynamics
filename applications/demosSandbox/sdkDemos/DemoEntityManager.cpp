@@ -252,6 +252,19 @@ DemoEntityManager::DemoEntityManager ()
 	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
 
+	int monitorsCount;
+	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
+	if (monitorsCount > 1) {
+		int window_x;
+		int window_y;
+		int monitor_x;
+		int monitor_y;
+
+		glfwGetMonitorPos(monitors[1], &monitor_x, &monitor_y);
+		glfwGetWindowPos(m_mainFrame, &window_x, &window_y);
+		glfwSetWindowPos(m_mainFrame, monitor_x + window_x, monitor_y + 64);
+	}
+
 	// attach myself to the main frame
 	glfwSetWindowUserPointer(m_mainFrame, this);
 

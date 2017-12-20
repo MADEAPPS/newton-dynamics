@@ -33,11 +33,13 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
 	
-	CUSTOM_JOINTS_API void SetTargetRotation (const dQuaternion& rotation); 
 	CUSTOM_JOINTS_API void SetTargetPosit (const dVector& posit); 
+	CUSTOM_JOINTS_API void SetTargetRotation (const dQuaternion& rotation); 
 	CUSTOM_JOINTS_API void SetTargetMatrix (const dMatrix& matrix); 
 
 	CUSTOM_JOINTS_API void ResetAutoSleep();
+
+	CUSTOM_JOINTS_API dMatrix GetBodyMatrix () const;
 	CUSTOM_JOINTS_API dMatrix GetTargetMatrix () const;
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 

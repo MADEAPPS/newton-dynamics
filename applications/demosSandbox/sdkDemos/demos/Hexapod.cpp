@@ -38,6 +38,7 @@ class dHaxapodController: public dCustomControllerBase
 
 		void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 		{
+/*
 			dFloat angle = m_curJointAngle.GetAngle();
 			if (angle < m_minAngle) {
 				dFloat relAngle = angle - m_minAngle;
@@ -54,6 +55,12 @@ class dHaxapodController: public dCustomControllerBase
 				NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 			}
+*/
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}
 
 		void Debug(dDebugDisplay* const debugDisplay) const
@@ -62,6 +69,89 @@ class dHaxapodController: public dCustomControllerBase
 		}
 
 		dFloat m_torque;
+	};
+
+
+	class dHexapodEffector: public dCustomKinematicController
+	{
+		public:
+		dHexapodEffector (NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace)
+			:dCustomKinematicController (invDynSolver, invDynNode, attachmentMatrixInGlobalSpace)
+		{
+		}
+			
+		void dHexapodEffector::SubmitConstraints(dFloat timestep, int threadIndex)
+		{
+			// check if this is an impulsive time step
+			dAssert(timestep > 0.0f);
+
+			dMatrix matrix0(GetBodyMatrix());
+			dVector veloc(0.0f);
+			dVector omega(0.0f);
+			dVector com(0.0f);
+			dVector pointVeloc(0.0f);
+			const dFloat damp = 0.3f;
+			const dFloat invTimestep = 1.0f / timestep;
+
+			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+			dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
+			NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
+
+			for (int i = 0; i < 3; i++) {
+				// Restrict the movement on the pivot point along all tree orthonormal direction
+				dFloat speed = pointVeloc.DotProduct3(m_targetMatrix[i]);
+				dFloat dist = relPosit.DotProduct3(m_targetMatrix[i]) * damp;
+				dFloat relSpeed = dist * invTimestep - speed;
+
+		float xxx = 0.4f;
+		if (relSpeed > 0.1f)
+			relSpeed = xxx;
+		else if (relSpeed < -0.1f)
+			relSpeed = -xxx;
+		else
+			relSpeed = 0.0f;
+
+				dFloat relAccel = relSpeed * invTimestep;
+				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix[i][0]);
+				NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+			}
+
+			if (m_pickMode) {
+				dQuaternion rotation(matrix0.Inverse() * m_targetMatrix);
+				if (dAbs(rotation.m_q0) < 0.99998f) {
+					dMatrix rot(dGrammSchmidt(dVector(rotation.m_q1, rotation.m_q2, rotation.m_q3)));
+					dFloat angle = 2.0f * dAcos(dClamp(rotation.m_q0, dFloat(-1.0f), dFloat(1.0f)));
+
+					NewtonUserJointAddAngularRow(m_joint, angle, &rot.m_front[0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+
+					NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_up[0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+
+					NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_right[0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+
+				}
+				else {
+					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+
+					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_up[0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+
+					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_right[0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+				}
+			}
+		}
 	};
 
 
@@ -113,14 +203,14 @@ class dHaxapodController: public dCustomControllerBase
 		dMatrix m_matrix;
 		dMatrix m_worldMatrix;
 		dHexapodNode* m_parent;
-		dCustomKinematicController* m_effector;
+		dHexapodEffector* m_effector;
 		dList<dHexapodNode*> m_children;
 	};
 
 	class dHexapodLimb: public dHexapodNode
 	{
 		public:
-		dHexapodLimb(dHexapodNode* const parent, dCustomKinematicController* const effector, dFloat footRadio)
+		dHexapodLimb(dHexapodNode* const parent, dHexapodEffector* const effector, dFloat footRadio)
 			:dHexapodNode(parent)
 			,m_radiusHeight(footRadio)
 		{
@@ -154,13 +244,14 @@ class dHaxapodController: public dCustomControllerBase
 			m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
 			// make the root body
-			dMatrix baseMatrix(origin);
+			dMatrix baseMatrix(dGetIdentityMatrix());
 			baseMatrix.m_posit.m_y += 0.35f;
 			dVector size (1.3f, 0.31f, 0.5f, 0.0f);
 			NewtonBody* const hexaBody = CreateBox(scene, baseMatrix, size, mass, 1.0f);
 			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
-			m_effector = new dCustomKinematicController(m_kinematicSolver, hexaBodyNode, baseMatrix);
-			m_effector->SetMaxLinearFriction(mass * DEMO_GRAVITY * 4.0f);
+			m_effector = new dHexapodEffector(m_kinematicSolver, hexaBodyNode, baseMatrix * origin);
+			//m_effector = new dHexapodEffector(hexaBody, baseMatrix * origin);
+			m_effector->SetMaxLinearFriction(mass * DEMO_GRAVITY * 10.0f);
 			m_effector->SetMaxAngularFriction(mass * DEMO_GRAVITY * 4.0f);
 
 			baseMatrix.m_posit.m_y -= 0.06f;
@@ -179,12 +270,13 @@ class dHaxapodController: public dCustomControllerBase
 				AddLimb (scene, hexaBodyNode, leftLocation, mass * 0.1f, 0.3f);
 			}
 
-			// complete the ik
+			// finalize inverse dynamics solver
 			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 		}
 
 		void AddLimb(DemoEntityManager* const scene, void* const rootNode, const dMatrix& location, dFloat partMass, dFloat limbLenght)
 		{
+#if 0
 			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
 			dMatrix baseMatrix (dRollMatrix(3.141592f * 0.5f));
 
@@ -192,7 +284,7 @@ class dHaxapodController: public dCustomControllerBase
 			dMatrix cylinderMatrix (baseMatrix * location);
 			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, 10.0f, 0.2f, 0.1f);
 			dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
+			//void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 			//make limb forward arm
 			dMatrix forwardArmMatrix (dPitchMatrix(-30.0f * 3.141592f / 180.0f));
@@ -202,7 +294,7 @@ class dHaxapodController: public dCustomControllerBase
 			dMatrix forwardArmPivot (forwardArmMatrix);
 			forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale (forwardArmSize.m_z * 0.5f);
 			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * location, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
+			//void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
 
 			//make limb forward arm
 			dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
@@ -213,13 +305,66 @@ class dHaxapodController: public dCustomControllerBase
 			dMatrix armPivot(armMatrix);
 			armPivot.m_posit.m_y += armSize * 0.5f;
 			dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * location, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
+			//void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
 
 			dMatrix effectorMatrix(dGetIdentityMatrix());
 			effectorMatrix.m_posit = armPivot.m_posit;
 			effectorMatrix.m_posit.m_y -= armSize;
-			dCustomKinematicController* const effector = new dCustomKinematicController(m_kinematicSolver, armHingeNode, effectorMatrix * location);
+#if 1
+dHexapodEffector* const effector = new dHexapodEffector(arm, effectorMatrix * location);
+effector->SetPickMode(1);
+effector->SetMaxLinearFriction(1000.0f);
+effector->SetMaxAngularFriction(1000.0f);
+#else
+			dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, effectorMatrix * location);
 			new dHexapodLimb (this, effector, armSize * 0.2f);
+#endif
+
+#else
+
+
+			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
+
+			// make limb base
+//			dMatrix baseMatrix(dRollMatrix(3.141592f * 0.5f));
+//			dMatrix cylinderMatrix(baseMatrix * location);
+//			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
+//			dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
+//			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
+
+			dFloat inertiaScale = 1.0f;
+
+			//make limb forward arm
+			dMatrix forwardArmMatrix(dPitchMatrix(-30.0f * 3.141592f / 180.0f));
+			dVector forwardArmSize(limbLenght * 0.25f, limbLenght * 0.25f, limbLenght, 0.0f);
+			forwardArmMatrix.m_posit += forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
+			NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix * location, forwardArmSize, partMass, inertiaScale);
+			dMatrix forwardArmPivot(forwardArmMatrix);
+			forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
+			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * location, forwardArm, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
+			void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, forwardArmHinge->GetJoint());
+/*
+			//make limb forward arm
+			dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
+			dFloat armSize = limbLenght * 1.25f;
+			armMatrix.m_posit += forwardArmMatrix.m_right.Scale(limbLenght);
+			armMatrix.m_posit.m_y -= armSize * 0.5f;
+			NewtonBody* const arm = CreateCapsule(scene, armMatrix * location, partMass, inertiaScale, armSize * 0.2f, armSize);
+			dMatrix armPivot(armMatrix);
+			armPivot.m_posit.m_y += armSize * 0.5f;
+			dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * location, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
+			//void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
+
+			dMatrix effectorMatrix(dGetIdentityMatrix());
+			effectorMatrix.m_posit = armPivot.m_posit;
+			effectorMatrix.m_posit.m_y -= armSize;
+			dHexapodEffector* const effector = new dHexapodEffector(arm, effectorMatrix * location);
+			effector->SetPickMode(1);
+			effector->SetMaxLinearFriction(1000.0f);
+			effector->SetMaxAngularFriction(1000.0f);
+*/
+#endif
+
 		}
 
 		~dHexapodRoot()
@@ -248,6 +393,11 @@ class dHaxapodController: public dCustomControllerBase
 		virtual void UpdateEffectors(dFloat timestep)
 		{
 			if (m_kinematicSolver) {
+				//dVector xxx (m_effector->GetBodyMatrix().m_posit);
+				dVector xxx (m_effector->GetTargetMatrix().m_posit);
+				xxx.m_y = 2.0f;
+				m_effector->SetTargetPosit(xxx);
+
 				dHexapodNode::UpdateEffectors(timestep);
 				NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
 			}
@@ -343,6 +493,7 @@ class dHaxapodController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
+Sleep (16);
 		if (m_robot) {
 			m_robot->UpdateEffectors(timestep);
 		}

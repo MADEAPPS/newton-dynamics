@@ -124,13 +124,16 @@ dMatrix dCustomKinematicController::GetTargetMatrix () const
 	return m_targetMatrix;
 }
 
+dMatrix dCustomKinematicController::GetBodyMatrix () const
+{
+	dMatrix matrix0;
+	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
+	return m_localMatrix0 * matrix0;
+}
 
 void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(GetBodyMatrix());
 	debugDisplay->DrawFrame(m_targetMatrix);
 }
 
@@ -139,17 +142,13 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	// check if this is an impulsive time step
 	dAssert (timestep > 0.0f);
 
-	dMatrix matrix0;
+	dMatrix matrix0(GetBodyMatrix());
 	dVector veloc(0.0f);
 	dVector omega(0.0f);
 	dVector com(0.0f);
 	dVector pointVeloc(0.0f);
 	const dFloat damp = 0.3f;
 	const dFloat invTimestep = 1.0f / timestep;
-
-	// Get the global matrices of each rigid body.
-	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-	matrix0 = m_localMatrix0 * matrix0;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
