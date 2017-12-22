@@ -424,7 +424,7 @@ effector->SetMaxAngularFriction(1000.0f);
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-Sleep (10);
+//Sleep (10);
 		if (m_robot) {
 			m_robot->UpdateEffectors(timestep);
 		}
