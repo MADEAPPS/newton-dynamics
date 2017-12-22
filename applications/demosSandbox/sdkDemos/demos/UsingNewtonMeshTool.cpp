@@ -34,13 +34,14 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 	fread((void*)&numTris, 4, 1, f);
 
 	// Add face for each tri
-	struct point
-	{
-		dFloat v[3];
-	};
+//	struct point
+//	{
+//		dFloat v[3];
+//	};
 	struct tria
 	{
-		point face[3];
+//		point face[3];
+		dVector face[3];
 	};
 	tria faces[3000];
 	for (int i = 0; i < numTris; i++) {
@@ -48,14 +49,26 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 		fread(v, sizeof(float), 9, f);
 		for (int j = 0; j < 3; j++) {
 			for (int k = 0; k < 3; k++) {
-				faces[i].face[j].v[k] = v[j][k];
+				//faces[i].face[j].v[k] = v[j][k];
+				faces[i].face[j][k] = v[j][k];
 			}
 		}
 	}
 
-	for (int i = 0; i < numTris; i++) {
-//	for (int i = 1696; i < 1750; i++) {
-		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0].v[0]), 3 * sizeof(dFloat), 0);
+	const int y0 = 1484;
+	const int y1 = 1720;
+
+	const int dx = y1 - y0;
+	const int x0 = y0;
+	const int x1 = y1;
+	for (int i = x0; i < x1; i++) {
+		dVector p10 (faces[i].face[1] - faces[i].face[0]);
+		dVector p20 (faces[i].face[2] - faces[i].face[0]);
+		dVector normal (p10.CrossProduct(p20));
+		normal = normal.Normalize();
+		if (normal.m_y > 0.1f) {
+			NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0][0]), sizeof(dVector), 0);
+		}
 	}
 
 	NewtonTreeCollisionEndBuild(pCollision, 1);
@@ -298,7 +311,7 @@ LoadAndCreateMesh(scene);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 0.5f, 1.0f, 0.0f), 0.0f);
 
-	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+//	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
 	dQuaternion rot (0.363103747f, - 0.198065042f, 0.906994224f, - 0.0792928487f);
