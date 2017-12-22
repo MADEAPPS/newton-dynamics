@@ -307,6 +307,8 @@ effector->SetMaxAngularFriction(1000.0f);
 
 		void SetTarget (dFloat z, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
 		{
+			m_y = y * 0.25f;
+			m_x = z * 0.125f;
 /*
 			// set base matrix
 			m_matrix = dYawMatrix(azimuth);
@@ -326,7 +328,10 @@ effector->SetMaxAngularFriction(1000.0f);
 			if (m_kinematicSolver) {
 				//dVector xxx (m_effector->GetBodyMatrix().m_posit);
 				dVector xxx (m_effector->GetTargetMatrix().m_posit);
-				xxx.m_y = 0.75f;
+				xxx.m_y = 0.75f + m_y;
+				//xxx.m_x = m_x;
+				xxx.m_z = m_x;
+				
 				m_effector->SetTargetPosit(xxx);
 
 				dHexapodNode::UpdateEffectors(timestep);
@@ -392,6 +397,8 @@ effector->SetMaxAngularFriction(1000.0f);
 		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
+		dFloat m_y;
+		dFloat m_x;
 	};
 
 	dHaxapodController()
@@ -452,7 +459,7 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		,m_gripper_roll(0.0f)
 		,m_gripper_pitch(0.0f)
 	{
-//		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
 	~dHexapodManager()
@@ -465,6 +472,14 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Hexapod controller");
+
+static int xxxx;
+		ImGui::Separator();
+		scene->Print(color, "control mode");
+		ImGui::RadioButton("rotate body", &xxxx, 1);
+		ImGui::RadioButton("translate body", &xxxx, 0);
+		ImGui::Separator();
+
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -360.0f, 360.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
@@ -473,11 +488,11 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		ImGui::Separator();
 		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
 		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
+*/
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
 			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f, me->m_gripper_pitch * 3.141592f / 180.0f, me->m_gripper_roll * 3.141592f / 180.0f);
 		}
-*/
 	}
 
 	virtual dHaxapodController* CreateController()
