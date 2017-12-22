@@ -61,17 +61,53 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 	const int dx = y1 - y0;
 	const int x0 = y0;
 	const int x1 = y1;
+
+	int count = 0;
+	int map[136];
 	for (int i = x0; i < x1; i++) {
-		dVector p10 (faces[i].face[1] - faces[i].face[0]);
-		dVector p20 (faces[i].face[2] - faces[i].face[0]);
-		dVector normal (p10.CrossProduct(p20));
+		dVector p10(faces[i].face[1] - faces[i].face[0]);
+		dVector p20(faces[i].face[2] - faces[i].face[0]);
+		dVector normal(p10.CrossProduct(p20));
 		normal = normal.Normalize();
 		if (normal.m_y > 0.1f) {
+			map[count] = i;
+			count ++;
+		}
+	}
+
+//map[0] = -1;
+//map[10] = -1;
+//map[20] = -1;
+map[30] = -1;
+map[31] = -1;
+//map[40] = -1;
+//map[50] = -1;
+//map[60] = -1;
+map[70] = -1;
+map[71] = -1;
+//map[80] = -1;
+//map[90] = -1;
+//map[100] = -1;
+//map[110] = -1;
+map[120] = -1;
+map[121] = -1;
+//map[122] = -1;
+
+map[130] = -1;
+map[131] = -1;
+map[132] = -1;
+map[133] = -1;
+map[134] = -1;
+map[135] = -1;
+
+	for (int j = 0; j < count; j++) {
+		int i = map[j];
+		if (i >= 0) {
 			NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0][0]), sizeof(dVector), 0);
 		}
 	}
 
-	NewtonTreeCollisionEndBuild(pCollision, 1);
+	NewtonTreeCollisionEndBuild(pCollision, 0);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
