@@ -479,11 +479,11 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 	}
 
 	dSixAxisController* m_currentController;
-	dFloat m_azimuth;
-	dFloat m_posit_x;
-	dFloat m_posit_y;
-	dFloat m_gripper_roll;
-	dFloat m_gripper_pitch;
+	dFloat32 m_azimuth;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_gripper_roll;
+	dFloat32 m_gripper_pitch;
 };
 
 

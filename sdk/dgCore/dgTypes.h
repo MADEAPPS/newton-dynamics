@@ -330,7 +330,7 @@ typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffe
 typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void* const userData);
 
 // assume this function returns memory aligned to 16 bytes
-#define dgAlloca(type, count) (type*) alloca ((sizeof (type) * (count)) + 64)
+#define dgAlloca(type, count) (type*) alloca (sizeof (type) * (count))
 
 //#define dgCheckAligment(x) dgAssert (!(dgUnsigned64 (x) & 0xf))
 #define dgCheckAligment(x) 

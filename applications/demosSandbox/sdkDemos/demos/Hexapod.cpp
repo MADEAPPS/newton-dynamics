@@ -524,11 +524,11 @@ static int xxxx;
 	}
 
 	dHaxapodController* m_currentController;
-	dFloat m_yaw;
-	dFloat m_posit_x;
-	dFloat m_posit_y;
-	dFloat m_roll;
-	dFloat m_pitch;
+	dFloat32 m_yaw;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_roll;
+	dFloat32 m_pitch;
 };
 
 
