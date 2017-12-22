@@ -255,14 +255,13 @@ effector->SetMaxAngularFriction(1000.0f);
 
 			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
 
+			dFloat inertiaScale = 4.0f;
 			// make limb base
-//			dMatrix baseMatrix(dRollMatrix(3.141592f * 0.5f));
-//			dMatrix cylinderMatrix(baseMatrix * location);
-//			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
-//			dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
-//			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
-
-			dFloat inertiaScale = 1.0f;
+			dMatrix baseMatrix(dRollMatrix(3.141592f * 0.5f));
+			dMatrix cylinderMatrix(baseMatrix * location);
+			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
+			dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
+			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 			//make limb forward arm
 			dMatrix forwardArmMatrix(dPitchMatrix(-30.0f * 3.141592f / 180.0f));
@@ -271,8 +270,8 @@ effector->SetMaxAngularFriction(1000.0f);
 			NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix * location, forwardArmSize, partMass, inertiaScale);
 			dMatrix forwardArmPivot(forwardArmMatrix);
 			forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
-			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * location, forwardArm, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, forwardArmHinge->GetJoint());
+			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * location, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
+			void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
 
 			//make limb forward arm
 			dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
@@ -283,7 +282,8 @@ effector->SetMaxAngularFriction(1000.0f);
 			dMatrix armPivot(armMatrix);
 			armPivot.m_posit.m_y += armSize * 0.5f;
 			dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * location, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
+			//void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
+			NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
 
 			dMatrix effectorMatrix(dGetIdentityMatrix());
 			effectorMatrix.m_posit = armPivot.m_posit;
