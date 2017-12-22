@@ -737,7 +737,6 @@ void dCustomRagdollMotor_EndEffector::SetAngularSpeed(dFloat speed)
 void dCustomRagdollMotor_EndEffector::SetTargetRotation(const dQuaternion& rotation)
 {
 	NewtonBodySetSleepState(m_body0, 0);
-	
 }
 
 void dCustomRagdollMotor_EndEffector::SetTargetPosit(const dVector& posit)
@@ -749,8 +748,9 @@ void dCustomRagdollMotor_EndEffector::SetTargetPosit(const dVector& posit)
 
 void dCustomRagdollMotor_EndEffector::SetTargetMatrix(const dMatrix& matrix)
 {
-	SetTargetRotation(matrix);
-	SetTargetPosit(matrix.m_posit);
+	NewtonBodySetSleepState(m_body0, 0);
+	m_targetMatrix = matrix;
+	m_targetMatrix.m_posit.m_w = 1.0f;
 }
 
 dMatrix dCustomRagdollMotor_EndEffector::GetBodyMatrix() const

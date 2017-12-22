@@ -113,8 +113,9 @@ void dCustomKinematicController::SetTargetPosit(const dVector& posit)
 
 void dCustomKinematicController::SetTargetMatrix(const dMatrix& matrix)
 {
-	SetTargetRotation (matrix);
-	SetTargetPosit (matrix.m_posit);
+	NewtonBodySetSleepState(m_body0, 0);
+	m_targetMatrix = matrix;
+	m_targetMatrix.m_posit.m_w = 1.0f; 
 }
 
 dMatrix dCustomKinematicController::GetTargetMatrix () const

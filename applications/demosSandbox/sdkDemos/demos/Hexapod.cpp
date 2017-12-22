@@ -65,7 +65,7 @@ class dHaxapodController: public dCustomControllerBase
 
 		void Debug(dDebugDisplay* const debugDisplay) const
 		{
-			dCustomHinge::Debug(debugDisplay);
+			//dCustomHinge::Debug(debugDisplay);
 		}
 
 		dFloat m_torque;
@@ -305,10 +305,13 @@ effector->SetMaxAngularFriction(1000.0f);
 			}
 		}
 
-		void SetTarget (dFloat z, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
+		void SetTarget (dFloat z, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
 		{
 			m_y = y * 0.25f;
 			m_x = z * 0.125f;
+			m_pitch = pitch;
+			m_yaw =  yaw;
+			m_roll = roll;
 /*
 			// set base matrix
 			m_matrix = dYawMatrix(azimuth);
@@ -332,7 +335,11 @@ effector->SetMaxAngularFriction(1000.0f);
 				//xxx.m_x = m_x;
 				xxx.m_z = m_x;
 				
-				m_effector->SetTargetPosit(xxx);
+				dMatrix xxxxx (dPitchMatrix(m_pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
+				xxxxx.m_posit = xxx;
+				xxxxx.m_posit.m_w = 1.0f;
+				//m_effector->SetTargetPosit(xxx);
+				m_effector->SetTargetMatrix(xxxxx);
 
 				dHexapodNode::UpdateEffectors(timestep);
 				NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
@@ -399,6 +406,9 @@ effector->SetMaxAngularFriction(1000.0f);
 		NewtonInverseDynamics* m_kinematicSolver;
 		dFloat m_y;
 		dFloat m_x;
+		dFloat m_pitch;
+		dFloat m_yaw;
+		dFloat m_roll;
 	};
 
 	dHaxapodController()
@@ -413,10 +423,10 @@ effector->SetMaxAngularFriction(1000.0f);
 		}
 	}
 
-	void SetTarget (dFloat x, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
+	void SetTarget (dFloat x, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
 	{
 		if (m_robot) {
-			m_robot->SetTarget(x, y, azimuth, pitch, roll);
+			m_robot->SetTarget(x, y, pitch, yaw, roll);
 		}
 	}
 
@@ -453,11 +463,11 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 	dHexapodManager(DemoEntityManager* const scene)
 		:dCustomControllerManager<dHaxapodController>(scene->GetNewton(), "sixAxisManipulator")
 		,m_currentController(NULL)
-		,m_azimuth(0.0f)
+		,m_yaw(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
-		,m_gripper_roll(0.0f)
-		,m_gripper_pitch(0.0f)
+		,m_roll(0.0f)
+		,m_pitch(0.0f)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -475,23 +485,20 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 
 static int xxxx;
 		ImGui::Separator();
-		scene->Print(color, "control mode");
-		ImGui::RadioButton("rotate body", &xxxx, 1);
-		ImGui::RadioButton("translate body", &xxxx, 0);
-		ImGui::Separator();
+//		scene->Print(color, "control mode");
+//		ImGui::RadioButton("rotate body", &xxxx, 1);
+//		ImGui::RadioButton("translate body", &xxxx, 0);
+//		ImGui::Separator();
 
-		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -360.0f, 360.0f);
+		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
+		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
+		ImGui::SliderFloat("roll", &me->m_roll, -10.0f, 10.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
-/*
-		ImGui::Separator();
-		ImGui::Separator();
-		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
-		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
-*/
+
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
-			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f, me->m_gripper_pitch * 3.141592f / 180.0f, me->m_gripper_roll * 3.141592f / 180.0f);
+			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_pitch * 3.141592f / 180.0f, me->m_yaw * 3.141592f / 180.0f, me->m_roll * 3.141592f / 180.0f);
 		}
 	}
 
@@ -517,11 +524,11 @@ static int xxxx;
 	}
 
 	dHaxapodController* m_currentController;
-	dFloat m_azimuth;
+	dFloat m_yaw;
 	dFloat m_posit_x;
 	dFloat m_posit_y;
-	dFloat m_gripper_roll;
-	dFloat m_gripper_pitch;
+	dFloat m_roll;
+	dFloat m_pitch;
 };
 
 
@@ -536,8 +543,8 @@ void Hexapod(DemoEntityManager* const scene)
 	robotManager->MakeHexapod (scene, location);
 
 	dVector origin(0.0f);
-	origin.m_x = -2.0f;
-	origin.m_y  = 0.5f;
+	origin.m_x = -4.0f;
+	origin.m_y  = 1.5f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
