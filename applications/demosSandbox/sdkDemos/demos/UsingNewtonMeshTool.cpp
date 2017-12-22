@@ -20,6 +20,53 @@
 #include "PhysicsUtils.h"
 
 
+static void LoadAndCreateMesh(DemoEntityManager* const scene)
+{
+	FILE* f = fopen("../../track2.xxx", "rb");
+	if (!f)
+		return;
+
+	NewtonCollision* pCollision = NewtonCreateTreeCollision(scene->GetNewton(), 0);
+	NewtonTreeCollisionBeginBuild(pCollision);
+
+	// Read number of triangles
+	int numTris;
+	fread((void*)&numTris, 4, 1, f);
+
+	// Add face for each tri
+	struct point
+	{
+		dFloat v[3];
+	};
+	struct tria
+	{
+		point face[3];
+	};
+	tria faces[3000];
+	for (int i = 0; i < numTris; i++) {
+		float v[3][3];
+		fread(v, sizeof(float), 9, f);
+		for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < 3; k++) {
+				faces[i].face[j].v[k] = v[j][k];
+			}
+		}
+	}
+
+	for (int i = 0; i < numTris; i++) {
+//	for (int i = 1696; i < 1750; i++) {
+		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0].v[0]), 3 * sizeof(dFloat), 0);
+	}
+
+	NewtonTreeCollisionEndBuild(pCollision, 1);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
+	NewtonDestroyCollision(pCollision);
+
+	fclose(f);
+}
+
 static void TestConvexCastBug(NewtonWorld* world)
 {
 	// create static body
@@ -233,12 +280,12 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 //TestConvexCastBug(scene->GetNewton());
-//LoadAndCreateMesh(scene);
+LoadAndCreateMesh(scene);
 // create a shattered mesh array
 //TestConvexApproximation (scene);
 
 	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
+//	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
 //	CreateLevelMesh (scene, "sponza.ngd", true);
 
@@ -254,11 +301,11 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
-//	dQuaternion rot (0.471605480f, - 0.279436618f, 0.820808113f, - 0.160553753f);
-//	dVector origin (-21.8602009f, 39.1065178f, -34.6017456f,0.0f);
+	dQuaternion rot (0.363103747f, - 0.198065042f, 0.906994224f, - 0.0792928487f);
+	dVector origin (- 1.06522131f, 14.7539968f, - 69.4075775f, 1.0f);
 
-	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+//	dQuaternion rot;
+//	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");
