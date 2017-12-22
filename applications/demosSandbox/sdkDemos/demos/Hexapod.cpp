@@ -173,7 +173,7 @@ class dHaxapodController: public dCustomControllerBase
 			// make the root body
 			dMatrix baseMatrix(dGetIdentityMatrix());
 //			baseMatrix.m_posit.m_y += 0.35f;
-			baseMatrix.m_posit.m_y += 0.5f;
+			baseMatrix.m_posit.m_y += 0.75f;
 			dVector size (1.3f, 0.31f, 0.5f, 0.0f);
 			NewtonBody* const hexaBody = CreateBox(scene, baseMatrix, size, mass, 1.0f);
 			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
@@ -185,7 +185,7 @@ class dHaxapodController: public dCustomControllerBase
 			baseMatrix.m_posit.m_y -= 0.06f;
 			// make the hexapod six limbs
 			for (int i = 0; i < 3; i ++) {
-//if (i == 2)
+//if (i != 1)
 {
 				dMatrix rightLocation (baseMatrix);
 				rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.65f);
@@ -285,15 +285,15 @@ effector->SetMaxAngularFriction(1000.0f);
 			dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * location, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
 			void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
 
-
 			dMatrix effectorMatrix(dGetIdentityMatrix());
 			effectorMatrix.m_posit = armPivot.m_posit;
 			effectorMatrix.m_posit.m_y -= armSize;
 			//dHexapodEffector* const effector = new dHexapodEffector(arm, effectorMatrix * location);
 			dCustomKinematicController* const effector = new dCustomKinematicController(arm, effectorMatrix * location);
+			NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, effector->GetJoint());
 			effector->SetPickMode(0);
-			effector->SetMaxLinearFriction(100000.0f);
-			effector->SetMaxAngularFriction(100000.0f);
+			effector->SetMaxLinearFriction(10000.0f);
+			effector->SetMaxAngularFriction(10000.0f);
 #endif
 
 		}
@@ -326,7 +326,7 @@ effector->SetMaxAngularFriction(1000.0f);
 			if (m_kinematicSolver) {
 				//dVector xxx (m_effector->GetBodyMatrix().m_posit);
 				dVector xxx (m_effector->GetTargetMatrix().m_posit);
-				xxx.m_y = 0.5f;
+				xxx.m_y = 0.75f;
 				m_effector->SetTargetPosit(xxx);
 
 				dHexapodNode::UpdateEffectors(timestep);
