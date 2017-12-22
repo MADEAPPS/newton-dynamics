@@ -467,7 +467,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const 
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgAssert (cluster->m_bodyCount >= 2);
 
 	dgWorld* const world = (dgWorld*) this;
@@ -1024,7 +1023,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 
 void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
 	const dgInt32 jointCount = cluster->m_jointCount;
@@ -1140,7 +1138,6 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
 	const dgInt32 jointCount = cluster->m_jointCount;

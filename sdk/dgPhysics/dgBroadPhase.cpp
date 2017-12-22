@@ -243,7 +243,6 @@ dgBroadPhaseTreeNode* dgBroadPhase::InsertNode(dgBroadPhaseNode* const root, dgB
 
 void dgBroadPhase::UpdateAggregateEntropyKernel(void* const context, void* const node, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -252,7 +251,6 @@ void dgBroadPhase::UpdateAggregateEntropyKernel(void* const context, void* const
 
 void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -261,7 +259,6 @@ void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dg
 
 void dgBroadPhase::SleepingStateKernel(void* const context, void* const node, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -836,7 +833,6 @@ dgInt32 dgBroadPhase::CompareNodes(const dgBroadPhaseNode* const nodeA, const dg
 
 void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	if (*root) {
 		dgBroadPhaseNode* const parent = (*root)->m_parent;
 		(*root)->m_parent = NULL;
@@ -1130,8 +1126,6 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 //	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)));
 	if ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || 
 		(body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI))) {
@@ -1357,7 +1351,6 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 
 void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1371,7 +1364,6 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1381,7 +1373,6 @@ void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* 
 
 void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgInt32 threadsCount = m_world->GetThreadCount();
 	dgList<dgBroadPhaseNode*>::dgListNode* node = m_updateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1462,8 +1453,6 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 
 void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	dgActiveContacts::dgListNode* node = nodePtr;
 	const dgFloat32 timestep = descriptor->m_timestep;
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
@@ -1516,7 +1505,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	const dgInt32 lastDirtyCount = m_dirtyNodesCount;
 
     m_lru = m_lru + 1;
@@ -1538,7 +1526,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	// update pre-listeners after the force and true are applied
 	if (m_world->m_listeners.GetCount()) {
-		dTimeTrackerEvent("preListeners");
 		for (dgWorld::dgListenerList::dgListNode* node1 = m_world->m_listeners.GetFirst(); node1; node1 = node1->GetNext()) {
 			dgWorld::dgListener& listener = node1->GetInfo();
 			if (listener.m_onPreUpdate) {

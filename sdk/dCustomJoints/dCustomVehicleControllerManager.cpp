@@ -2911,7 +2911,6 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 
 void dCustomVehicleController::PreUpdate(dFloat timestep, int threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 		manager->UpdateDriverInput(this, timestep);

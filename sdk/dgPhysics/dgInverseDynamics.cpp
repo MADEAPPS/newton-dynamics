@@ -647,8 +647,6 @@ void dgInverseDynamics::Finalize()
 
 void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	dgInt32 rowCount = 0;
 	dgInt32 ikRowCount = 0;
 	dgInt32 primaryStart = 0;
@@ -1031,8 +1029,6 @@ DG_INLINE void dgInverseDynamics::CalculateInternalForces(dgJacobian* const inte
 
 void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForce, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {
-	dTimeTrackerEvent(__FUNCTION__);
-		
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
 	dgFloat32* const u = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);

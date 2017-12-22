@@ -71,7 +71,6 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	
 	m_bodies = 0;
@@ -157,14 +156,11 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 void dgWorldDynamicUpdate::SortClustersByCount ()
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgSort(m_clusterMemory, m_clusters, CompareClusters);
 }
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	dgWorld* const world = (dgWorld*) this;
 	dgUnsigned32 lru = m_markLru - 1;
 
@@ -572,7 +568,6 @@ dgInt32 dgWorldDynamicUpdate::CompareClusters(const dgBodyCluster* const cluster
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*) context;
 
 	dgFloat32 timestep = descriptor->m_timestep;

@@ -950,8 +950,6 @@ void dgSkeletonContainer::CalculateMassMatrixCoeff(const dgJointInfo* const join
 
 void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 
 	m_rowArray = (dgJacobianMatrixElement**)memoryBuffer;
@@ -1260,8 +1258,6 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {
-	dTimeTrackerEvent(__FUNCTION__);
-	
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
 	dgFloat32* const u = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);
@@ -1399,8 +1395,6 @@ dgInt32 dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* cons
 
 void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	dgInt32 rowCount = 0;
 	dgInt32 primaryStart = 0;
 	dgInt32 auxiliaryStart = 0;
@@ -1439,8 +1433,6 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 
 void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount);
 	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
 

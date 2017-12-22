@@ -905,7 +905,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	//xxxxx();
 	//SerializeToFile ("xxx.bin");
 
-	dTimeTrackerEvent(__FUNCTION__);
 	dgAssert (m_inUpdate == 0);
 	dgAssert (GetThreadCount() >= 1);
 
@@ -916,7 +915,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	UpdateDynamics (timestep);
 
 	if (m_listeners.GetCount()) {
-		dTimeTrackerEvent("postListeners");
 		for (dgListenerList::dgListNode* node = m_listeners.GetFirst(); node; node = node->GetNext()) {
 			dgListener& listener = node->GetInfo();
 			if (listener.m_onPostUpdate) {
@@ -973,7 +971,6 @@ void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threa
 
 void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*)context;
 	dgBodyMasterList::dgListNode* node = (dgBodyMasterList::dgListNode*) nodePtr;
 	world->UpdateTransforms(node, threadID);
@@ -1273,7 +1270,6 @@ void dgWorld::UpdateSkeletons()
 {
 	dgSkeletonList& skelManager = *this;
 	if (skelManager.m_skelListIsDirty) {
-		dTimeTrackerEvent(__FUNCTION__);
 		skelManager.m_skelListIsDirty = false;
 		dgSkeletonList::Iterator iter(skelManager);
 		for (iter.Begin(); iter; iter++) {

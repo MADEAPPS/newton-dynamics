@@ -1096,7 +1096,6 @@ void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamP
 
 void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgContact* const contact = pair->m_contact;
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;

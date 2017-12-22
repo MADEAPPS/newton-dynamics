@@ -294,7 +294,6 @@ void dCustomControllerManager<CONTROLLER_BASE>::OnBodyDestroy (const NewtonWorld
 template<class CONTROLLER_BASE>
 void dCustomControllerManager<CONTROLLER_BASE>::PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dCustomControllerBase* const controller = (dCustomControllerBase*) context;
 	controller->PreUpdate(((dCustomControllerManager*)controller->m_manager)->GetTimeStep(), threadIndex);
 }
@@ -302,7 +301,6 @@ void dCustomControllerManager<CONTROLLER_BASE>::PreUpdateKernel (NewtonWorld* co
 template<class CONTROLLER_BASE>
 void dCustomControllerManager<CONTROLLER_BASE>::PostUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	class dCustomControllerBase* const controller = (dCustomControllerBase*) context;
 	controller->PostUpdate(((dCustomControllerManager*)controller->m_manager)->GetTimeStep(), threadIndex);
 }

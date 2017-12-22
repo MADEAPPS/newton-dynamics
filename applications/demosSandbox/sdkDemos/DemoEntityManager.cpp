@@ -322,9 +322,6 @@ DemoEntityManager::DemoEntityManager ()
 	Cleanup ();
 	ResetTimer();
 
-	dTimeTrackerSetThreadName ("mainThread");
-
-
 /*
 	dFloat A[2][2];
 	dFloat x[2];
@@ -808,8 +805,6 @@ void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int 
 
 void DemoEntityManager::BeginFrame()
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	glfwPollEvents();
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -827,8 +822,6 @@ void DemoEntityManager::BeginFrame()
 
 void DemoEntityManager::RenderStats()
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	if (m_showStats) {
 		char text[1024];
 		
@@ -1105,7 +1098,6 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 		//while (nextTime >= timestepMicrosecunds) 
 		if (nextTime >= timestepMicrosecunds) 
 		{
-			dTimeTrackerEvent(__FUNCTION__);
 			newUpdate = true;
 			ClearDebugDisplay(m_world);
 
@@ -1249,8 +1241,6 @@ void DemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloa
 
 void DemoEntityManager::RenderScene()
 {
-	dTimeTrackerEvent(__FUNCTION__);
-
 	dFloat timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
@@ -1399,7 +1389,6 @@ void DemoEntityManager::Run()
     // Main loop
     while (!glfwWindowShouldClose(m_mainFrame))
     {
-		dTimeTrackerEvent(__FUNCTION__);
 		m_suspendPhysicsUpdate = false;
 
 		BeginFrame();
