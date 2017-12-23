@@ -167,6 +167,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void RefineTriangulation (const dgFloat64* const vertex, dgInt32 stride);
 	void RefineTriangulation (const dgFloat64* const vertex, dgInt32 stride, const dgBigVector& normal, dgInt32 perimeterCount, dgEdge** const perimeter);
 	void OptimizeTriangulation (const dgFloat64* const vertex, dgInt32 strideInBytes);
+	void RemoveInteriorEdges (dgPolyhedra& polyhedraOut, const dgFloat64* const vertex, dgInt32 strideInBytes);
 	void MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes);
 	dgEdge* FindEarTip (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, const dgBigVector &normal) const;
 	dgEdge* TriangulateFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, dgBigVector* const faceNormalOut);

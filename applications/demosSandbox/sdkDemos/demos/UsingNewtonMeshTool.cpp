@@ -49,12 +49,12 @@ static void LoadAndCreateMesh(DemoEntityManager* const scene)
 		fread(v, sizeof(float), 9, f);
 		for (int j = 0; j < 3; j++) {
 			for (int k = 0; k < 3; k++) {
-				//faces[i].face[j].v[k] = v[j][k];
 				faces[i].face[j][k] = v[j][k];
 			}
 		}
 	}
 
+#if 0
 	const int y0 = 1484;
 	const int y1 = 1720;
 
@@ -91,7 +91,6 @@ map[71] = -1;
 //map[110] = -1;
 map[120] = -1;
 map[121] = -1;
-//map[122] = -1;
 
 map[130] = -1;
 map[131] = -1;
@@ -100,14 +99,32 @@ map[133] = -1;
 map[134] = -1;
 map[135] = -1;
 
+	int count1 = count;	
+	count = 0;
+	for (int j = 0; j < count1; j++) {
+		int i = map[j];
+		if (i >= 0) {
+			map[count] = i;
+			count ++;
+		}
+	}
+
+//map[122] = -1;
+//map[123] = -1;
+
 	for (int j = 0; j < count; j++) {
 		int i = map[j];
 		if (i >= 0) {
 			NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0][0]), sizeof(dVector), 0);
 		}
 	}
+#else
+	for (int i = 0; i < numTris; i++) {
+		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0][0]), sizeof(dVector), 0);
+	}
+#endif
 
-	NewtonTreeCollisionEndBuild(pCollision, 0);
+	NewtonTreeCollisionEndBuild(pCollision, 1);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
@@ -326,7 +343,7 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
-	scene->CreateSkyBox();
+//	scene->CreateSkyBox();
 
 //TestConvexCastBug(scene->GetNewton());
 LoadAndCreateMesh(scene);
@@ -350,8 +367,8 @@ LoadAndCreateMesh(scene);
 //	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
-	dQuaternion rot (0.363103747f, - 0.198065042f, 0.906994224f, - 0.0792928487f);
-	dVector origin (- 1.06522131f, 14.7539968f, - 69.4075775f, 1.0f);
+	dQuaternion rot (- 0.112522639f, - 0.620757043f, 0.770572960f, 0.0906458423f);
+	dVector origin (- 24.5024796f, 48.2213058f, - 97.0880356f, 1.0f);
 
 //	dQuaternion rot;
 //	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
