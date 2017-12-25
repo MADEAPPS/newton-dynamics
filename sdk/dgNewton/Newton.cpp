@@ -7284,7 +7284,7 @@ dFloat NewtonUserJointGetRowInverseDynamicsAcceleration (const NewtonJoint* cons
 	return userJoint->GetInverseDynamicsAcceleration();
 }
 
-dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
+dFloat NewtonUserJointCalculateRowZeroAccelaration (const NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;

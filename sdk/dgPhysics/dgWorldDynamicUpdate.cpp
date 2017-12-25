@@ -596,14 +596,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	dgAssert(constraint->m_body0);
 	dgAssert(constraint->m_body1);
 
-//	dgDynamicBody* const body0 = (dgDynamicBody*)constraint->m_body0;
-//	dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
-
 	dgBody* const body0 = constraint->m_body0;
 	dgBody* const body1 = constraint->m_body1;
 
-	//dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-	//dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 	dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 	dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 

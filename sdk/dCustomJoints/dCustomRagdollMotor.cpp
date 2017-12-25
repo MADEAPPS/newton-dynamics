@@ -657,7 +657,6 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 	}
 }
 
-
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint (invDynSolver, invDynNode)
 	,m_targetMatrix(attachmentPointInGlobalSpace)

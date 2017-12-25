@@ -80,6 +80,8 @@ class dSixAxisController: public dCustomControllerBase
 
 		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
+			dAssert (0);
+/*
 			dMatrix matrix0;
 			dMatrix matrix1;
 			dFloat accel;
@@ -100,6 +102,7 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+*/
 		}
 
 		dFloat m_torque;
@@ -284,7 +287,6 @@ class dSixAxisController: public dCustomControllerBase
 			gripperEffectMatrix.m_front = gripperMatrix.m_front;
 			gripperEffectMatrix.m_right = gripperEffectMatrix.m_front.CrossProduct(gripperEffectMatrix.m_up);
 			gripperEffectMatrix.m_posit = gripperMatrix.m_posit + gripperMatrix.m_front.Scale(0.065f);
-			//dKukaEndEffector* const effector = new dKukaEndEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
 			dKukaEffector* const effector = new dKukaEffector(m_kinematicSolver, armJointNode1, gripperEffectMatrix);
 #endif
 			m_effector = new dSixAxisEffector(this, effector);
@@ -449,7 +451,8 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
 		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
 
-//me->m_posit_y = 0.25f;
+Sleep (16);
+me->m_posit_x = 1.0f;
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();

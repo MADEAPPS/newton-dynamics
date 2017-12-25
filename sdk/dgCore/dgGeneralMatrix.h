@@ -826,72 +826,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 	dgCheckAligment(symmetricMatrixPSD);
 	dgCheckAligment(lowerTriangularMatrix);
 
-#if 0
-	dgInt32 index = 0;
-	dgInt32 count = size;
-	dgInt32 clampedIndex = size;
-	for (dgInt32 i = 0; i < size; i++) {
-		permute[i] = short(i);
-		r0[i] = -b[i];
-		x0[i] = dgFloat32(0.0f);
-		delta_x[i] = T(0.0f);
-		delta_r[i] = T(0.0f);
-	}
-
-	bool findInitialGuess = size >= 6;
-	if (findInitialGuess) {
-		dgInt32 initialGuessCount = size;
-		for (dgInt32 j = 0; (j < 5) && findInitialGuess; j ++) {
-
-			findInitialGuess = false;
-			for (dgInt32 i = 0; i < initialGuessCount; i++) {
-				x0[i] = -r0[i];
-			}
-			dgSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, x0);
-			dgInt32 permuteStart = initialGuessCount;
-			for (dgInt32 i = 0; i < initialGuessCount; i++) {
-				T f = x0[i];
-				if ((f < low[i]) || (f > high[i])) {
-					findInitialGuess = true;
-					x0[i] = T(0.0f);
-					dgPermuteRows(size, i, initialGuessCount -1, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-					permuteStart = dgMin (permuteStart, i);
-					i --;
-					initialGuessCount--;
-				}
-			}
-			if (findInitialGuess) {
-				dgCholeskyUpdate(size, permuteStart, size - 1, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
-			}
-		}
-
-		if (initialGuessCount == size) {
-			for (dgInt32 i = 0; i < size; i++) {
-				x[i] = x0[i];
-				b[i] = T (dgFloat32 (0.0f));
-			}
-
-			return true;
-		} else {
-			if (!findInitialGuess) {
-				for (dgInt32 i = 0; i < initialGuessCount; i++) {
-					r0[i] = T(0.0f);
-				}
-				for (dgInt32 i = initialGuessCount; i < size; i++) {
-					r0[i] += dgDotProduct(size, &symmetricMatrixPSD[i * size], x0);
-				}
-				index = initialGuessCount;
-				count = size - initialGuessCount;
-			} else {
-				//dgAssert(0);
-				for (dgInt32 i = 0; i < size; i++) {
-					x0[i] = dgFloat32(0.0f);
-				}
-			}
-		}
-	} 
-
-#else
 	for (dgInt32 i = 0; i < size; i++) {
 		permute[i] = short(i);
 		r0[i] = b[i];
@@ -960,8 +894,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		r0[i] = dgDotProduct(size, &symmetricMatrixPSD[stride], x0) - b[j];
 		stride += size;
 	}
-
-#endif
 
 	while (count) {
 		bool loop = true;

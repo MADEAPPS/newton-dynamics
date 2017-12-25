@@ -176,7 +176,7 @@ void dCustomSlider::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& mat
 		const dFloat velCut = 0.5f;
 		// I should just calculate acceleration to cancel the relative velocity and neglect the position, 
 		// but for now this si good enough
-		const dFloat stopAccel = NewtonUserCalculateRowZeroAccelaration(m_joint);
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
 		const dFloat speedStep = dAbs (stopAccel * timestep);
 		if ((m_posit < m_minDist) && (speedStep > velCut))  {
 			//NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, dFloat (0.0f));
