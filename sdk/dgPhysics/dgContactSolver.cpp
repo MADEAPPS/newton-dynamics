@@ -1248,9 +1248,12 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 		dgAssert (index);
 		if (index > 0) {
 			dgVector q (v + point);
-			dgFloat32 den = normal.DotProduct4(p0p1).m_x;
-			dgAssert (den != 0.0f);
-			dgFloat32 t1 = normal.DotProduct3(localP0 - q) / den;
+			dgFloat32 den = normal.DotProduct4(p0p1).GetScalar();
+			if (dgAbsf (den) < dgFloat32(1.0e-12f))  {
+				den = dgSign(den) * dgFloat32(1.0e-12f);
+			}
+			dgAssert (normal.m_w == dgFloat32 (0.0f));
+			dgFloat32 t1 = normal.DotProduct4(localP0 - q).GetScalar() / den;
 
 			if (t1 < param) {
 				index = -1;
