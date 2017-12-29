@@ -1398,7 +1398,6 @@ class AriculatedJointInputManager: public dCustomInputManager
 	{
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
-
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
