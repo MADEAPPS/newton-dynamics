@@ -119,77 +119,24 @@ class dSixAxisController: public dCustomControllerBase
 	};
 */
 
-
-#if 0
 	class dKukaEffector: public dCustomRagdollMotor_EndEffector
 	{
 		public:
 		dKukaEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace)
 			:dCustomRagdollMotor_EndEffector(invDynSolver, invDynNode, attachmentMatrixInGlobalSpace)
 		{
+			SetLinearSpeed(0.4f);
+			SetMaxLinearFriction (5000.0f);
 		}
 
 		dKukaEffector(NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace)
-			:dCustomKinematicController(body, attachmentMatrixInGlobalSpace)
+			:dCustomRagdollMotor_EndEffector(body, attachmentMatrixInGlobalSpace)
 		{
+			SetLinearSpeed(0.4f);
+			SetMaxLinearFriction (5000.0f);
 		}
-
 	};
 
-#else
-	class dKukaEffector: public dCustomKinematicController
-	{
-		public:
-		dKukaEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace)
-			:dCustomKinematicController(invDynSolver, invDynNode, attachmentMatrixInGlobalSpace)
-			,m_linearSpeed(0.4f)
-		{
-		}
-
-		dKukaEffector(NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace)
-			:dCustomKinematicController(body, attachmentMatrixInGlobalSpace)
-			,m_linearSpeed(0.4f)
-		{
-		}
-
-		void SetAsThreedof()
-		{
-			SetPickMode(0);
-		}
-
-		void SubmitConstraints(dFloat timestep, int threadIndex)
-		{
-			// check if this is an impulsive time step
-			dMatrix matrix0(GetBodyMatrix());
-			dVector veloc(0.0f);
-			dVector omega(0.0f);
-			dVector com(0.0f);
-			dVector pointVeloc(0.0f);
-			dAssert(timestep > 0.0f);
-			const dFloat damp = 0.3f;
-			const dFloat invTimestep = 1.0f / timestep;
-
-			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-			//NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
-			NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &pointVeloc[0]);
-			dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
-
-			for (int i = 0; i < 3; i++) {
-				// Restrict the movement on the pivot point along all tree orthonormal direction
-				dFloat speed = pointVeloc.DotProduct3(m_targetMatrix[i]);
-				dFloat dist = relPosit.DotProduct3(m_targetMatrix[i]) * damp;
-				dFloat relSpeed = dClamp(dist * invTimestep - speed, -m_linearSpeed, m_linearSpeed);
-				dFloat relAccel = relSpeed * invTimestep;
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix[i][0]);
-				NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-			}
-		}
-
-		dFloat m_linearSpeed;
-	};
-#endif
 
 	class dSixAxisNode
 	{

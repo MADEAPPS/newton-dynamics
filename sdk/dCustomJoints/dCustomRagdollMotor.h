@@ -30,7 +30,7 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 
 	CUSTOM_JOINTS_API dFloat GetJointTorque() const;
 	CUSTOM_JOINTS_API void SetJointTorque(dFloat torque);
-
+	
 	protected:
 	//CUSTOM_JOINTS_API dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
@@ -127,6 +127,7 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 class dCustomRagdollMotor_EndEffector: public dCustomJoint
 {
 	public:
+	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonBody* const body, const dMatrix& attachmentPointInGlobalSpace);
 	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace);
 	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor_EndEffector();
 
@@ -136,8 +137,8 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	CUSTOM_JOINTS_API void SetLinearSpeed(dFloat speed);
 	CUSTOM_JOINTS_API void SetAngularSpeed(dFloat speed);
 
-	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat accel);
-	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat alpha);
+	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat friction);
+	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat friction);
 
 	CUSTOM_JOINTS_API void SetTargetPosit(const dVector& posit);
 	CUSTOM_JOINTS_API void SetTargetRotation(const dQuaternion& rotation);

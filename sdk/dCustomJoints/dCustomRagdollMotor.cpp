@@ -631,6 +631,21 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDy
 	SetSolverModel(2);
 }
 
+dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const body, const dMatrix& attachmentPointInGlobalSpace)
+	:dCustomJoint(6, body, NULL)
+	,m_targetMatrix(attachmentPointInGlobalSpace)
+	,m_linearSpeed(0.4f)
+	,m_angularSpeed(1.0f)
+	,m_maxLinearFriction(10000.0f)
+	,m_maxAngularFriction(1000.0f)
+	,m_isSixdof(true)
+{
+	SetAsThreedof();
+	CalculateLocalMatrix(attachmentPointInGlobalSpace, m_localMatrix0, m_localMatrix1);
+	SetTargetMatrix(attachmentPointInGlobalSpace);
+	SetSolverModel(2);
+}
+
 dCustomRagdollMotor_EndEffector::~dCustomRagdollMotor_EndEffector()
 {
 }
@@ -658,26 +673,14 @@ void dCustomRagdollMotor_EndEffector::SetAsThreedof()
 }
 
 
-void dCustomRagdollMotor_EndEffector::SetMaxLinearFriction(dFloat accel)
+void dCustomRagdollMotor_EndEffector::SetMaxLinearFriction(dFloat friction)
 {
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-
-	NewtonBodyGetMass(m_body0, &mass, &Ixx, &Iyy, &Izz);
-	m_maxLinearFriction = dAbs(accel) * mass;
+	m_maxLinearFriction = dAbs(friction);
 }
 
-void dCustomRagdollMotor_EndEffector::SetMaxAngularFriction(dFloat alpha)
+void dCustomRagdollMotor_EndEffector::SetMaxAngularFriction(dFloat friction)
 {
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-
-	NewtonBodyGetMass(m_body0, &mass, &Ixx, &Iyy, &Izz);
-	m_maxAngularFriction = dAbs(alpha) * mass;
+	m_maxAngularFriction = dAbs(friction);
 }
 
 
@@ -777,7 +780,7 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	}
 
 	if (m_isSixdof) {
-
+		dAssert (0);
 /*
 		dQuaternion rotation(matrix0.Inverse() * m_targetMatrix);
 		if (dAbs(rotation.m_q0) < 0.99998f) {
