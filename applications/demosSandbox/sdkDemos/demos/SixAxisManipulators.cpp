@@ -332,8 +332,8 @@ class dSixAxisController: public dCustomControllerBase
 			dFloat r = size / 4.0f;
 			dFloat h = size / 8.0f;
 
-			dFloat lowLimit = -90.0f * 3.141592f / 180.0f;
-			dFloat highLimit = 30.0f * 3.141592f / 180.0f;
+			dFloat lowLimit = -88.0f * 3.141592f / 180.0f;
+			dFloat highLimit = 60.0f * 3.141592f / 180.0f;
 
 			if (isIK) {
 				m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
@@ -356,12 +356,22 @@ class dSixAxisController: public dCustomControllerBase
 				linkArmMatrix.m_posit.m_y += l * 0.5f;
 				NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
 				linkArmMatrix.m_posit.m_y -= l * 0.5f;
-				dKukaServoMotor1* const linkArmJoint = new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, lowLimit, highLimit, true);
+				dKukaServoMotor1* const linkArmJoint = new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, -80.0f * 3.141592f / 180.0f, 80.0f * 3.141592f / 180.0f, true);
 				void* const linkArmNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rotatingColumnNode, linkArmJoint->GetJoint());
 
-				dMatrix gripperMatrix(linkArmMatrix);
-				gripperMatrix.m_posit.m_y += l;
-				dKukaEffector* const effector = new dKukaEffector(m_kinematicSolver, linkArmNode, gripperMatrix * location);
+				// add Robot arm
+				dFloat l1 = l * 0.5f;
+				dMatrix armMatrix(linkArmMatrix);
+				armMatrix.m_posit.m_y += l;
+				armMatrix.m_posit.m_z += l1 * 0.5f;
+				NewtonBody* const armBody = CreateBox(scene, armMatrix * location, dVector(l * 0.125f, l * 0.125f, l1));
+				armMatrix.m_posit.m_z -= l1 * 0.5f;
+				dKukaServoMotor1* const armJoint = new dKukaServoMotor1(armMatrix * location, armBody, linkArmBody, lowLimit, highLimit, true);
+				void* const armNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, linkArmNode, armJoint->GetJoint());
+
+				dMatrix gripperMatrix(armMatrix);
+				gripperMatrix.m_posit.m_z += l1;
+				dKukaEffector* const effector = new dKukaEffector(m_kinematicSolver, armNode, gripperMatrix * location);
 				m_effector = new dSixAxisEffector(this, effector);
 
 				// save the tip reference point
@@ -390,9 +400,17 @@ class dSixAxisController: public dCustomControllerBase
 				linkArmMatrix.m_posit.m_y -= l * 0.5f;
 				new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, lowLimit, highLimit, false);
 
-				dMatrix gripperMatrix(linkArmMatrix);
-				gripperMatrix.m_posit.m_y += l;
-				dKukaEffector* const effector = new dKukaEffector(linkArmBody, gripperMatrix * location);
+				dFloat l1 = l * 0.5f;
+				dMatrix armMatrix(linkArmMatrix);
+				armMatrix.m_posit.m_y += l;
+				armMatrix.m_posit.m_z += l1 * 0.5f;
+				NewtonBody* const armBody = CreateBox(scene, armMatrix * location, dVector(l * 0.125f, l * 0.125f, l1));
+				armMatrix.m_posit.m_z -= l1 * 0.5f;
+				new dKukaServoMotor1(armMatrix * location, armBody, linkArmBody, lowLimit, highLimit, false);
+
+				dMatrix gripperMatrix(armMatrix);
+				gripperMatrix.m_posit.m_z += l1;
+				dKukaEffector* const effector = new dKukaEffector(armBody, gripperMatrix * location);
 				m_effector = new dSixAxisEffector(this, effector);
 
 				// save the tip reference point
