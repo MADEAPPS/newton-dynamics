@@ -589,7 +589,6 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		constraintParamOut.m_forceBounds[i].m_low = DG_MIN_BOUND;
 		constraintParamOut.m_forceBounds[i].m_upper = DG_MAX_BOUND;
 		constraintParamOut.m_forceBounds[i].m_jointForce = NULL;
-		constraintParamOut.m_forceBounds[i].m_isIkRow = 0;
 		constraintParamOut.m_forceBounds[i].m_normalIndex = DG_NORMAL_CONSTRAINT;
 	}
 

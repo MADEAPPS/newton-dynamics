@@ -77,8 +77,8 @@ class dgBilateralBounds
 	dgForceImpactPair* m_jointForce;
 	dgFloat32 m_low;
 	dgFloat32 m_upper;
-	dgInt16 m_normalIndex;
-	dgInt16 m_isIkRow;
+	dgInt32 m_normalIndex;
+//	dgInt16 m_isIkRow;
 };
 
 DG_MSC_VECTOR_ALIGMENT

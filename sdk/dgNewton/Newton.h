@@ -340,7 +340,7 @@ extern "C" {
 	// Newton callback functions
 	typedef void* (*NewtonAllocMemory) (int sizeInBytes);
 	typedef void (*NewtonFreeMemory) (void* const ptr, int sizeInBytes);
-	
+
 	typedef void (*NewtonWorldDestructorCallback) (const NewtonWorld* const world);
 	typedef void (*NewtonPostUpdateCallback) (const NewtonWorld* const world, dFloat timestep);
 
@@ -1027,7 +1027,7 @@ extern "C" {
 	NEWTON_API void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics, NewtonBody* const root);
 	NEWTON_API void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint);
 	NEWTON_API bool NewtonInverseDynamicsAddLoopJoint(NewtonInverseDynamics* const inverseDynamics, NewtonJoint* const joint);
-	
+
 	NEWTON_API void NewtonInverseDynamicsEndBuild (NewtonInverseDynamics* const inverseDynamics);
 
 	NEWTON_API void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep, int threadIndex);
@@ -1169,7 +1169,7 @@ extern "C" {
 	NEWTON_API void NewtonUserJointSetRowMaximumFriction (const NewtonJoint* const joint, dFloat friction);
 	NEWTON_API dFloat NewtonUserJointCalculateRowZeroAccelaration (const NewtonJoint* const joint);
 	NEWTON_API dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint);
-	NEWTON_API dFloat NewtonUserJointGetRowInverseDynamicsAcceleration (const NewtonJoint* const joint);
+	NEWTON_API void NewtonUserJointSetRowAsInverseDynamics (const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointSetRowAcceleration (const NewtonJoint* const joint, dFloat acceleration);
 	NEWTON_API void NewtonUserJointSetRowSpringDamperAcceleration (const NewtonJoint* const joint, dFloat rowStiffness, dFloat spring, dFloat damper);
 	NEWTON_API void NewtonUserJointSetRowStiffness (const NewtonJoint* const joint, dFloat stiffness);

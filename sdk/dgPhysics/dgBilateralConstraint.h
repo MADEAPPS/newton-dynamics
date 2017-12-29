@@ -32,7 +32,7 @@ class dgBilateralConstraint: public dgConstraint
 	virtual void SetDestructorCallback (OnConstraintDestroy destructor);
 	virtual void Serialize (dgSerialize serializeCallback, void* const userData) = 0;
 
-	bool IsRowMotor(dgInt32 index) const {return m_rowIsMotor[index] ? true : false;}
+	bool IsRowMotor(dgInt32 index) const {return m_rowIsMotor & (1 << index) ? true : false; }
 
 	protected:
 	dgBilateralConstraint ();
@@ -66,9 +66,10 @@ class dgBilateralConstraint: public dgConstraint
 	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_inverseDynamicsAcceleration[DG_BILATERAL_CONTRAINT_DOF];
-	dgInt8	  m_rowIsMotor[DG_BILATERAL_CONTRAINT_DOF];
-	OnConstraintDestroy m_destructor;
 	dgFloat32 m_stiffness;
+	OnConstraintDestroy m_destructor;
+	dgInt8	  m_rowIsMotor;
+	dgInt8	  m_rowIsIk;
 
 	friend class dgInverseDynamics;
 	friend class dgWorldDynamicUpdate;

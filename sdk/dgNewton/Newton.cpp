@@ -7277,11 +7277,20 @@ dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint)
 	return userJoint->GetAcceleration();
 }
 
+/*
 dFloat NewtonUserJointGetRowInverseDynamicsAcceleration (const NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
 	return userJoint->GetInverseDynamicsAcceleration();
+}
+*/
+
+void NewtonUserJointSetRowAsInverseDynamics (const NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	userJoint->SetAsInverseDynamicsRow();
 }
 
 dFloat NewtonUserJointCalculateRowZeroAccelaration (const NewtonJoint* const joint)

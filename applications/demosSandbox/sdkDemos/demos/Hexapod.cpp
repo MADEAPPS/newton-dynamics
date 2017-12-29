@@ -56,9 +56,9 @@ class dHaxapodController: public dCustomControllerBase
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 			}
 */
+
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowAsInverseDynamics(m_joint);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}

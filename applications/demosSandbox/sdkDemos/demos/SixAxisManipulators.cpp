@@ -57,9 +57,9 @@ class dSixAxisController: public dCustomControllerBase
 			}
 */
 
-			dAssert (0);
+
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-//			NewtonUserJointSetRowAsInverseDynamics(m_joint);
+			NewtonUserJointSetRowAsInverseDynamics(m_joint);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}
@@ -88,23 +88,20 @@ class dSixAxisController: public dCustomControllerBase
 				dFloat relAngle = angle - m_minAngle;
 				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
 				if (m_isIK) {
-					dAssert (0);
-					//NewtonUserJointSetRowAsInverseDynamics(m_joint);
+					NewtonUserJointSetRowAsInverseDynamics(m_joint);
 				}
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 			} else if (angle >= m_maxAngle) {
 				dFloat relAngle = angle - m_maxAngle;
 				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
 				if (m_isIK) {
-					dAssert (0);
-					//NewtonUserJointSetRowAsInverseDynamics(m_joint);
+					NewtonUserJointSetRowAsInverseDynamics(m_joint);
 				}
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 			} else {
 				if (m_isIK) {
-					dAssert (0);
 					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-					//NewtonUserJointSetRowAsInverseDynamics(m_joint);
+					NewtonUserJointSetRowAsInverseDynamics(m_joint);
 					NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 					NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 				}
@@ -727,7 +724,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 //	dMatrix origin(dGetIdentityMatrix());
 	dMatrix origin(dYawMatrix(0.0f * 3.141693f));
 	origin.m_posit.m_z = -0.5f;
-//	robotManager->MakeKukaRobot_IK (scene, origin);
+	robotManager->MakeKukaRobot_IK (scene, origin);
 
 	origin.m_posit.m_z = 0.5f;
 	robotManager->MakeKukaRobot_FD(scene, origin);

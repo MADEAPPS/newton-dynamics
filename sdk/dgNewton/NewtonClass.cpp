@@ -174,6 +174,7 @@ void NewtonUserJoint::SetAcceleration (dgFloat32 acceleration)
 	}
 }
 
+/*
 dgFloat32 NewtonUserJoint::GetInverseDynamicsAcceleration() const
 {
 	dgInt32 index = m_rows - 1;
@@ -184,7 +185,25 @@ dgFloat32 NewtonUserJoint::GetInverseDynamicsAcceleration() const
 	}
 	return accel;
 }
+*/
 
+void NewtonUserJoint::SetAsInverseDynamicsRow()
+{
+	dgInt32 index = m_rows - 1;
+	if ((index >= 0) && (index < dgInt32(m_maxDOF))) {
+
+		dgFloat32 accel;
+		if (m_rowIsIk & (1 << index)) {
+			accel = GetInverseDynamicAcceleration(index);
+		} else {
+			accel = GetAcceleration();
+			//accel = 0.0f;
+		}
+dgTrace (("%f ", accel));
+		SetMotorAcceleration(index, accel, *m_param);
+		m_rowIsIk |= (1 << index);
+	}
+}
 
 dgFloat32 NewtonUserJoint::CalculateZeroMotorAcceleration() const
 {

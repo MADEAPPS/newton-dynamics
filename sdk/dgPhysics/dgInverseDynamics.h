@@ -85,7 +85,7 @@ class dgInverseDynamics
 	DG_INLINE void CalculateOpenLoopForce (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE dgInt32 GetJacobianDerivatives (dgBilateralConstraint* const constraint, dgContraintDescritor& constraintParams) const;
 	DG_INLINE void CalculateJointAccel(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
-	DG_INLINE void GetRowJacobianDerivatives(dgInt32 index, const dgVector& invMass0, const dgVector& invMass1, const dgMatrix& invInertia0, const dgMatrix& invInertia1, const dgContraintDescritor& constraintParams, dgJacobianMatrixElement* const row) const;
+	DG_INLINE void GetRowJacobianDerivatives(dgInt32 index, const dgVector& invMass0, const dgVector& invMass1, const dgMatrix& invInertia0, const dgMatrix& invInertia1, const dgContraintDescritor& constraintParams, dgJacobianMatrixElement* const row, int isIkRow) const;
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
