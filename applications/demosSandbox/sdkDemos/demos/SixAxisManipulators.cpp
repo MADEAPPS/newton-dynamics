@@ -90,14 +90,14 @@ class dSixAxisController: public dCustomControllerBase
 				if (m_isIK) {
 					NewtonUserJointSetRowAsInverseDynamics(m_joint);
 				}
-				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 			} else if (angle >= m_maxAngle) {
 				dFloat relAngle = angle - m_maxAngle;
 				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
 				if (m_isIK) {
 					NewtonUserJointSetRowAsInverseDynamics(m_joint);
 				}
-				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 			} else {
 				if (m_isIK) {
 					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
@@ -208,13 +208,7 @@ class dSixAxisController: public dCustomControllerBase
 			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 			//NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
 			NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &pointVeloc[0]);
-
-//			dFloat masStep = m_linearSpeed * timestep;
 			dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
-//			dFloat mag2 = relPosit.DotProduct3(relPosit);
-//			if (mag2 > (masStep * masStep)) {
-//				relPosit = relPosit.Scale(masStep / dSqrt(mag2));
-//			}
 
 			for (int i = 0; i < 3; i++) {
 				// Restrict the movement on the pivot point along all tree orthonormal direction
@@ -721,7 +715,6 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
-//	dMatrix origin(dGetIdentityMatrix());
 	dMatrix origin(dYawMatrix(0.0f * 3.141693f));
 	origin.m_posit.m_z = -0.5f;
 	robotManager->MakeKukaRobot_IK (scene, origin);
