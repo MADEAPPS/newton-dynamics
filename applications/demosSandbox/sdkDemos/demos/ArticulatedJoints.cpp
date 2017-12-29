@@ -1398,6 +1398,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 	{
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
+
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
@@ -1455,14 +1457,18 @@ class AriculatedJointInputManager: public dCustomInputManager
 		vehicleModel->SetInput (inputs);
 	}
 
-	void OnEndUpdate (dFloat timestepInSecunds)
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
 	{
-//		dAssert(0);
-		/*
+		AriculatedJointInputManager* const me = (AriculatedJointInputManager*)context;
+		me->UpdateCamera(timestep);
+	}
+
+	void UpdateCamera (dFloat timestepInSecunds)
+	{
 		DemoCamera* const camera = m_scene->GetCamera();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
-		if (m_changeVehicle.UpdateTriggerButton(m_scene, 'P')) {
+		if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState ('P'))) {
 			m_currentPlayer ++;
 		}
 		
@@ -1471,7 +1477,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 		dVector frontDir (camMatrix[0]);
 		dVector camOrigin(0.0f); 
-		m_cameraMode.UpdatePushButton(m_scene, 'C');
+		m_cameraMode.UpdatePushButton(m_scene->GetKeyState('C'));
 		if (m_cameraMode.GetPushButtonState()) {
 			camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
 			camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
@@ -1481,7 +1487,10 @@ class AriculatedJointInputManager: public dCustomInputManager
 		}
 
 		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
-*/
+	}
+
+	void OnEndUpdate (dFloat timestepInSecunds)
+	{
 	}
 
 	void AddPlayer(dCustomArticulatedTransformController* const player)

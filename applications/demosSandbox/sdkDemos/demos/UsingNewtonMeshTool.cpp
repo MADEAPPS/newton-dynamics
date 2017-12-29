@@ -346,12 +346,12 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 //	scene->CreateSkyBox();
 
 //TestConvexCastBug(scene->GetNewton());
-LoadAndCreateMesh(scene);
+//LoadAndCreateMesh(scene);
 // create a shattered mesh array
 //TestConvexApproximation (scene);
 
 	// load the scene from a ngd file format
-//	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
 //	CreateLevelMesh (scene, "sponza.ngd", true);
 
@@ -364,14 +364,14 @@ LoadAndCreateMesh(scene);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 0.5f, 1.0f, 0.0f), 0.0f);
 
-//	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
-	dQuaternion rot (- 0.112522639f, - 0.620757043f, 0.770572960f, 0.0906458423f);
-	dVector origin (- 24.5024796f, 48.2213058f, - 97.0880356f, 1.0f);
+//	dQuaternion rot (- 0.112522639f, - 0.620757043f, 0.770572960f, 0.0906458423f);
+//	dVector origin (- 24.5024796f, 48.2213058f, - 97.0880356f, 1.0f);
 
-//	dQuaternion rot;
-//	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dQuaternion rot;
+	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");
