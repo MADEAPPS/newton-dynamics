@@ -326,6 +326,7 @@ class dSixAxisController: public dCustomControllerBase
 			:dSixAxisNode(NULL)
 			,m_kinematicSolver(NULL)
 			,m_effector(NULL)
+			,m_location(location)
 			,m_referenceMatrix(dGetIdentityMatrix())
 		{
 			dFloat size = 1.0f;
@@ -338,16 +339,23 @@ class dSixAxisController: public dCustomControllerBase
 			if (isIK) {
 				m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
+				// add Robot Base Frame locked the root body to the world
+				dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
+				baseFrameMatrix.m_posit.m_y = h * 0.5f;
+				NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
+				dCustomHinge* const baseFrameFixHinge = new dCustomHinge(baseFrameMatrix * location, baseFrameBody, NULL);
+				baseFrameFixHinge->EnableLimits(true);
+				baseFrameFixHinge->SetLimits(0.0f, 0.0f);
+				void* const baseFrameNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, baseFrameBody);
+				NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, baseFrameFixHinge->GetJoint());
+
 				// add Robot rotating column
 				dMatrix rotatingColumnMatrix(dGetIdentityMatrix());
-				rotatingColumnMatrix.m_posit.m_y = h * 0.5f;
+				rotatingColumnMatrix.m_posit.m_y = h + h * 0.5f;
 				NewtonBody* const rotatingColumnBody = CreateBox(scene, rotatingColumnMatrix * location, dVector(r * 0.5f, h, r * 0.75f));
 				rotatingColumnMatrix = dRollMatrix(3.141592f * 0.5f) * rotatingColumnMatrix;
-				dCustomHinge* const rotatingColumnHinge = new dCustomHinge(rotatingColumnMatrix * location, rotatingColumnBody, NULL);
-				rotatingColumnHinge->EnableLimits(true);
-				rotatingColumnHinge->SetLimits(0.0f, 0.0f);
-				void* const rotatingColumnNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, rotatingColumnBody);
-				NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, rotatingColumnHinge->GetJoint());
+				dKukaServoMotor1* const rotatingColumnHinge = new dKukaServoMotor1(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody, -2.0f * 3.141592f, 2.0f * 3.141592f, true);
+				void* const rotatingColumnNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseFrameNode, rotatingColumnHinge->GetJoint());
 
 				// add Robot link arm
 				dFloat l = size * 0.75f;
@@ -375,21 +383,27 @@ class dSixAxisController: public dCustomControllerBase
 				m_effector = new dSixAxisEffector(this, effector);
 
 				// save the tip reference point
-				m_referenceMatrix = gripperMatrix * location;
+				m_referenceMatrix = gripperMatrix;
 
 				// complete the ik
 				NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 			} 
 			else
 			{
+				// add Robot Base Frame locked the root body to the world
+				dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
+				baseFrameMatrix.m_posit.m_y = h * 0.5f;
+				NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
+				dCustomHinge* const baseFrameFixHinge = new dCustomHinge(baseFrameMatrix * location, baseFrameBody, NULL);
+				baseFrameFixHinge->EnableLimits(true);
+				baseFrameFixHinge->SetLimits(0.0f, 0.0f);
+
 				// add Robot rotating column
 				dMatrix rotatingColumnMatrix(dGetIdentityMatrix());
-				rotatingColumnMatrix.m_posit.m_y = h * 0.5f;
+				rotatingColumnMatrix.m_posit.m_y = h + h * 0.5f;
 				NewtonBody* const rotatingColumnBody = CreateBox(scene, rotatingColumnMatrix * location, dVector(r * 0.5f, h, r * 0.75f));
 				rotatingColumnMatrix = dRollMatrix(3.141592f * 0.5f) * rotatingColumnMatrix;
-				dCustomHinge* const rotatingColumnHinge = new dCustomHinge(rotatingColumnMatrix * location, rotatingColumnBody, NULL);
-				rotatingColumnHinge->EnableLimits(true);
-				rotatingColumnHinge->SetLimits(0.0f, 0.0f);
+				new dKukaServoMotor1(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody, -2.0f * 3.141592f, 2.0f * 3.141592f, false);
 
 				// add Robot link arm
 				dFloat l = size * 0.75f;
@@ -398,7 +412,7 @@ class dSixAxisController: public dCustomControllerBase
 				linkArmMatrix.m_posit.m_y += l * 0.5f;
 				NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
 				linkArmMatrix.m_posit.m_y -= l * 0.5f;
-				new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, lowLimit, highLimit, false);
+				new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, -0.5f * 3.141592f, 0.5f * 3.141592f, false);
 
 				dFloat l1 = l * 0.5f;
 				dMatrix armMatrix(linkArmMatrix);
@@ -414,7 +428,7 @@ class dSixAxisController: public dCustomControllerBase
 				m_effector = new dSixAxisEffector(this, effector);
 
 				// save the tip reference point
-				m_referenceMatrix = gripperMatrix * location;
+				m_referenceMatrix = gripperMatrix;
 			}
 		}
 
@@ -428,7 +442,7 @@ class dSixAxisController: public dCustomControllerBase
 		void SetTarget (dFloat z, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
 		{
 			// set base matrix
-			m_matrix = dYawMatrix(azimuth) * m_referenceMatrix;
+			m_matrix = m_referenceMatrix * dYawMatrix(azimuth) * m_location;
 
 			// set effector matrix
 			m_effector->m_matrix = dRollMatrix(roll) * dPitchMatrix(pitch);
@@ -491,6 +505,7 @@ class dSixAxisController: public dCustomControllerBase
 
 		NewtonInverseDynamics* m_kinematicSolver;
 		dSixAxisEffector* m_effector;
+		dMatrix m_location;
 		dMatrix m_referenceMatrix;
 	};
 
@@ -634,14 +649,13 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
 	dMatrix origin(dYawMatrix(0.0f * 3.141693f));
-	origin.m_posit.m_z = -0.5f;
+	origin.m_posit.m_z = -0.75f;
 	robotManager->MakeKukaRobot_IK (scene, origin);
 
-	origin = dYawMatrix(1.0f * 3.141693f) * origin;
-	origin.m_posit.m_z = 0.5f;
+	origin.m_posit.m_z = 0.75f;
 	robotManager->MakeKukaRobot_FD(scene, origin);
 	
-	origin.m_posit = dVector (-2.0f, 0.5f, 0.0f, 1.0f);
+	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 
