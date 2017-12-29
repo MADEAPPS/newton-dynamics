@@ -585,7 +585,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Use sliders to manipulate robot");
-		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -360.0f, 360.0f);
+		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
 
@@ -593,8 +593,6 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::Separator();
 		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
 		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
-
-//me->m_posit_x = 1.0f;
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
