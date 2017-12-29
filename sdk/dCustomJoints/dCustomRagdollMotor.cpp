@@ -52,7 +52,7 @@ void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* cons
 
 void dCustomRagdollMotor::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	const char* token = fileLoader->NextToken();
+	fileLoader->NextToken();
 	dAssert(!strcmp(token, "frictionTorque:"));
 	m_torque = fileLoader->LoadFloat();
 }
@@ -625,7 +625,7 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDy
 	,m_maxAngularFriction(1000.0f)
 	,m_isSixdof(true)
 {
-	SetAsSixdof();
+	SetAsThreedof();
 	CalculateLocalMatrix(attachmentPointInGlobalSpace, m_localMatrix0, m_localMatrix1);
 	SetTargetMatrix(attachmentPointInGlobalSpace);
 	SetSolverModel(2);
@@ -780,40 +780,6 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	}
 
 	if (m_isSixdof) {
-		dAssert (0);
-/*
-		dQuaternion rotation(matrix0.Inverse() * m_targetMatrix);
-		if (dAbs(rotation.m_q0) < 0.99998f) {
-			dMatrix rot(dGrammSchmidt(dVector(rotation.m_q1, rotation.m_q2, rotation.m_q3)));
-			dFloat angle = 2.0f * dAcos(dClamp(rotation.m_q0, dFloat(-1.0f), dFloat(1.0f)));
-
-			NewtonUserJointAddAngularRow(m_joint, angle, &rot.m_front[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_up[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_right[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-		} else {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_up[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_right[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-		}
-*/
-		
 		dQuaternion rotation(matrix0.Inverse() * m_targetMatrix);
 		if (dAbs(rotation.m_q0) < 0.99998f) {
 			dMatrix rot(dGrammSchmidt(dVector(rotation.m_q1, rotation.m_q2, rotation.m_q3)));
