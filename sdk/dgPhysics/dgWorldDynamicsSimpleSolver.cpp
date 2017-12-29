@@ -1280,10 +1280,16 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 
 		const dgVector invTime(invTimestep);
 		const dgVector maxAccNorm2(DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR);
+
+//static int xxx;
+//dgTrace(("forward dynamics %d\n", xxx)); 
 		for (dgInt32 i = 1; i < bodyCount; i++) {
 			dgBody* const body = bodyArray[i].m_body;
 			CalculateNetAcceleration(body, invTime, maxAccNorm2);
+dgTrace(("%d v(%f %f %f) w(%f %f %f)\n", body->m_uniqueID, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_omega.m_x, body->m_omega.m_y, body->m_omega.m_z));
 		}
+//dgTrace(("\n", xxx)); 
+//xxx++;
 		if (hasJointFeeback) {
 			for (dgInt32 i = 0; i < jointCount; i++) {
 				if (constraintArray[i].m_joint->m_updaFeedbackCallback) {

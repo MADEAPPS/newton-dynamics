@@ -197,9 +197,7 @@ void NewtonUserJoint::SetAsInverseDynamicsRow()
 			accel = GetInverseDynamicAcceleration(index);
 		} else {
 			accel = GetAcceleration();
-			//accel = 0.0f;
 		}
-dgTrace (("%f ", accel));
 		SetMotorAcceleration(index, accel, *m_param);
 		m_rowIsIk |= (1 << index);
 	}

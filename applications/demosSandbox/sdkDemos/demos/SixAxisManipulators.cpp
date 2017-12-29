@@ -24,93 +24,56 @@
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
-	class dKukaServoMotor1: public dCustomHinge
+	class dKukaServoMotor1: public dCustomRagdollMotor_1dof
 	{
 		public:
-		dKukaServoMotor1(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle)
-			:dCustomHinge(pinAndPivotFrame, child, parent)
-			,m_torque(1000.0f)
+		dKukaServoMotor1(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle, bool isIK)
+			:dCustomRagdollMotor_1dof(pinAndPivotFrame, child, parent)
+			,m_isIK(isIK)
 		{
-			EnableLimits(false);
-			SetLimits (minAngle, maxAngle);
+			SetJointTorque (1000.0f);
+			SetTwistAngle (minAngle, maxAngle);
 		}
 
-		void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
+		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
-/*
-			dFloat angle = m_curJointAngle.GetAngle();
-			if (angle < m_minAngle) {
-				dFloat relAngle = angle - m_minAngle;
-				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-				NewtonUserJointSetRowAsInverseDynamics (m_joint);
-				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-			} else if (angle > m_maxAngle) {
-				dFloat relAngle = angle - m_maxAngle;
-				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-				NewtonUserJointSetRowAsInverseDynamics (m_joint);
-				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			if (m_isIK) {
+				dCustomRagdollMotor_1dof::SubmitConstraints(timestep, threadIndex);
 			} else {
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-				NewtonUserJointSetRowAsInverseDynamics (m_joint);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+				// for debug purpose
+				dMatrix matrix0;
+				dMatrix matrix1;
+
+				CalculateGlobalMatrix(matrix0, matrix1);
+				dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
+
+				// two rows to restrict rotation around around the parent coordinate system
+				NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+				NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+
+				dFloat angle = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix1.m_front);
+				if (angle < m_minTwistAngle) {
+					dFloat relAngle = angle - m_minTwistAngle;
+					NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+				} else if (angle > m_maxTwistAngle) {
+					dFloat relAngle = angle - m_maxTwistAngle;
+					NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
+
+					NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+				}
 			}
-*/
-
-
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-			NewtonUserJointSetRowAsInverseDynamics(m_joint);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}
 
 		void Debug(dDebugDisplay* const debugDisplay) const
 		{
-//			dCustomHinge::Debug(debugDisplay);
-		}
-
-		dFloat m_torque;
-	};
-
-	class dKukaServoMotor1_xxxx: public dKukaServoMotor1 
-	{
-		public:
-		dKukaServoMotor1_xxxx(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle, bool isIK)
-			:dKukaServoMotor1(pinAndPivotFrame, child, parent, minAngle, maxAngle)
-			,m_isIK(isIK)
-		{
-		}
-
-		void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
-		{
-			dFloat angle = m_curJointAngle.GetAngle();
-			if (angle <= m_minAngle) {
-				dFloat relAngle = angle - m_minAngle;
-				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-				if (m_isIK) {
-					NewtonUserJointSetRowAsInverseDynamics(m_joint);
-				}
-				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-			} else if (angle >= m_maxAngle) {
-				dFloat relAngle = angle - m_maxAngle;
-				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-				if (m_isIK) {
-					NewtonUserJointSetRowAsInverseDynamics(m_joint);
-				}
-				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-			} else {
-				if (m_isIK) {
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-					NewtonUserJointSetRowAsInverseDynamics(m_joint);
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
-				}
-			}
+			dCustomRagdollMotor_1dof::Debug(debugDisplay);
 		}
 
 		bool m_isIK;
 	};
 
+/*
 	class dKukaServoMotor2: public dCustomUniversal
 	{
 		public:
@@ -129,7 +92,7 @@ class dSixAxisController: public dCustomControllerBase
 		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
 			dAssert (0);
-/*
+
 			dMatrix matrix0;
 			dMatrix matrix1;
 			dFloat accel;
@@ -150,11 +113,12 @@ class dSixAxisController: public dCustomControllerBase
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
-*/
 		}
 
 		dFloat m_torque;
 	};
+*/
+
 
 #if 0
 	class dKukaEffector: public dCustomRagdollMotor_EndEffector
@@ -422,7 +386,7 @@ class dSixAxisController: public dCustomControllerBase
 			dFloat h = size / 8.0f;
 
 			dFloat lowLimit = -90.0f * 3.141592f / 180.0f;
-			dFloat highLimit = 90.0f * 3.141592f / 180.0f;
+			dFloat highLimit = 30.0f * 3.141592f / 180.0f;
 
 			if (isIK) {
 				m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
@@ -445,7 +409,7 @@ class dSixAxisController: public dCustomControllerBase
 				linkArmMatrix.m_posit.m_y += l * 0.5f;
 				NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
 				linkArmMatrix.m_posit.m_y -= l * 0.5f;
-				dKukaServoMotor1* const linkArmJoint = new dKukaServoMotor1_xxxx(linkArmMatrix * location, linkArmBody, rotatingColumnBody, lowLimit, highLimit, true);
+				dKukaServoMotor1* const linkArmJoint = new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, lowLimit, highLimit, true);
 				void* const linkArmNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rotatingColumnNode, linkArmJoint->GetJoint());
 
 				dMatrix gripperMatrix(linkArmMatrix);
@@ -477,7 +441,7 @@ class dSixAxisController: public dCustomControllerBase
 				linkArmMatrix.m_posit.m_y += l * 0.5f;
 				NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
 				linkArmMatrix.m_posit.m_y -= l * 0.5f;
-				new dKukaServoMotor1_xxxx(linkArmMatrix * location, linkArmBody, rotatingColumnBody, lowLimit, highLimit, false);
+				new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, lowLimit, highLimit, false);
 
 				dMatrix gripperMatrix(linkArmMatrix);
 				gripperMatrix.m_posit.m_y += l;
@@ -488,8 +452,6 @@ class dSixAxisController: public dCustomControllerBase
 				m_referenceMatrix = gripperMatrix * location;
 			}
 		}
-
-
 
 		~dSixAxisRoot()
 		{
@@ -603,18 +565,9 @@ class dSixAxisController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-static int xxx;
-dTrace(("\n"));
-//Sleep(16);
-dTrace(("ik: %d  ", xxx));
 		if (m_robot) {
 			m_robot->UpdateEffectors(timestep);
 		}
-
-dTrace(("\n"));
-dTrace(("fd: %d  ", xxx));
-
-xxx ++;
 	}
 
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -661,7 +614,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
 		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
 
-me->m_posit_x = 1.0f;
+//me->m_posit_x = 1.0f;
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
