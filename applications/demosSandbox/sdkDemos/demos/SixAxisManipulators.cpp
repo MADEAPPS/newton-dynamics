@@ -637,6 +637,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	origin.m_posit.m_z = -0.5f;
 	robotManager->MakeKukaRobot_IK (scene, origin);
 
+	origin = dYawMatrix(1.0f * 3.141693f) * origin;
 	origin.m_posit.m_z = 0.5f;
 	robotManager->MakeKukaRobot_FD(scene, origin);
 	
