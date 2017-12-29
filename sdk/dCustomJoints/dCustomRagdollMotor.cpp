@@ -185,6 +185,8 @@ void dCustomRagdollMotor_1dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+	dAssert (0);
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 	dVector omega0(0.0f);
@@ -239,6 +241,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
+*/
 }
 
 
@@ -317,6 +320,8 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+	dAssert (0);
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 	dVector omega0(0.0f);
@@ -414,6 +419,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}
 	}
+*/
 }
 
 
@@ -556,6 +562,8 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+dAssert (0);
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 	dVector omega0(0.0f);
@@ -655,6 +663,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
+*/
 }
 
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
@@ -802,7 +811,8 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
-	NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
+	//NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
+	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &pointVeloc[0]);
 
 	for (int i = 0; i < 3; i++) {
 		// Restrict the movement on the pivot point along all tree orthonormal direction
