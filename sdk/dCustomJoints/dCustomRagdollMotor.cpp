@@ -53,7 +53,7 @@ void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* cons
 void dCustomRagdollMotor::Load(dCustomJointSaveLoad* const fileLoader)
 {
 	fileLoader->NextToken();
-	dAssert(!strcmp(token, "frictionTorque:"));
+	//dAssert(!strcmp(token, "frictionTorque:"));
 	m_torque = fileLoader->LoadFloat();
 }
 
