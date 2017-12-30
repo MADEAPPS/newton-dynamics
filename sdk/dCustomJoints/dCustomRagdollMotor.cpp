@@ -710,7 +710,7 @@ void dCustomRagdollMotor_EndEffector::SetTargetPosit(const dVector& posit)
 
 void dCustomRagdollMotor_EndEffector::SetTargetMatrix(const dMatrix& matrix)
 {
-//	NewtonBodySetSleepState(m_body0, 0);
+	NewtonBodySetSleepState(m_body0, 0);
 	m_targetMatrix = matrix;
 	m_targetMatrix.m_posit.m_w = 1.0f;
 }

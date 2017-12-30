@@ -407,11 +407,18 @@ class dHaxapodController: public dCustomControllerBase
 
 	void UpdatePose()
 	{
-		dMatrix rootMatrix(m_robot->m_effector->GetBodyMatrix());
+		//dMatrix rootMatrix(m_robot->m_effector->GetBodyMatrix());
+		dMatrix xxxx(m_robot->m_effector->GetBodyMatrix());
+		dMatrix rootMatrix(dGetIdentityMatrix());
+		rootMatrix.m_posit = xxxx.m_posit;
 		for (int i = 0; i < m_nodesCount; i++) {
 			dHexapodNode* const node = m_poseArray[i].m_node;
 			dMatrix poseMatrix (m_poseArray[i].m_rotation, m_poseArray[i].m_posit);
 			dMatrix effectorMatrix(poseMatrix * rootMatrix);
+			if (i == 0) {
+				dMatrix offset (dPitchMatrix(m_robot->m_pitch) * dYawMatrix(m_robot->m_yaw)* dRollMatrix(m_robot->m_roll));
+				effectorMatrix = offset * effectorMatrix;
+			}
 			node->m_effector->SetTargetMatrix(effectorMatrix);
 		}
 	}
