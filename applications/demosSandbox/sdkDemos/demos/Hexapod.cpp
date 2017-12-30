@@ -410,13 +410,16 @@ class dHaxapodController: public dCustomControllerBase
 		//dMatrix rootMatrix(m_robot->m_effector->GetBodyMatrix());
 		dMatrix xxxx(m_robot->m_effector->GetBodyMatrix());
 		dMatrix rootMatrix(dGetIdentityMatrix());
-		rootMatrix.m_posit = xxxx.m_posit;
+//		rootMatrix.m_posit = xxxx.m_posit;
+		rootMatrix.m_posit = dVector (0.0f, 0.32f, 0.0f, 1.0f);
 		for (int i = 0; i < m_nodesCount; i++) {
 			dHexapodNode* const node = m_poseArray[i].m_node;
 			dMatrix poseMatrix (m_poseArray[i].m_rotation, m_poseArray[i].m_posit);
 			dMatrix effectorMatrix(poseMatrix * rootMatrix);
 			if (i == 0) {
 				dMatrix offset (dPitchMatrix(m_robot->m_pitch) * dYawMatrix(m_robot->m_yaw)* dRollMatrix(m_robot->m_roll));
+				offset.m_posit.m_y = m_robot->m_y;
+				offset.m_posit.m_z = m_robot->m_x;
 				effectorMatrix = offset * effectorMatrix;
 			}
 			node->m_effector->SetTargetMatrix(effectorMatrix);
@@ -440,6 +443,7 @@ class dHaxapodController: public dCustomControllerBase
 
 	dHexapodRoot* m_robot;
 	dHexapodNode::dPose* m_poseArray;
+
 	int m_nodesCount;
 };
 
@@ -478,8 +482,8 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
 		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
 		ImGui::SliderFloat("roll", &me->m_roll, -10.0f, 10.0f);
-		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.5f, 0.5f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.5f, 0.5f);
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
