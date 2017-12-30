@@ -1289,7 +1289,7 @@ dgInt32 dgInverseDynamics::GetJacobianDerivatives(dgJointInfo* const jointInfoAr
 
 void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const externalForce, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const
 {
-#if 1
+#if 0
 static int xxx;
 
 dgTrace(("inv dyn %d\n", xxx));
@@ -1317,7 +1317,6 @@ dgTrace(("%d v(%f %f %f) w(%f %f %f)\n", body->m_uniqueID,
 
 xxx ++;
 #endif
-
 
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgNode* const node = m_nodesOrder[i];
