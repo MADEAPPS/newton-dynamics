@@ -20,6 +20,175 @@
 #include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
+class dEffectorTreeInterface
+{
+	public:
+class dEffectorTransform
+{
+	public:
+	dVector m_posit;
+	dQuaternion m_rotation;
+	dCustomRagdollMotor_EndEffector* m_effector;
+};
+
+class dEffectorPose: public dList<dEffectorTransform>
+{
+	public:
+	dEffectorPose()
+		:dList<dEffectorTransform>()
+		,m_childNode(NULL)
+	{
+	}
+	dEffectorTreeInterface* m_childNode;
+};
+
+
+	dEffectorTreeInterface()
+	{
+	}
+	virtual ~dEffectorTreeInterface()
+	{
+	}
+	
+	virtual void Evaluate(dEffectorPose& output)
+	{
+	}
+};
+
+class dEffectorTreeRoot: public dEffectorTreeInterface
+{
+	public:
+	dEffectorTreeRoot(dEffectorTreeInterface* const childNode)
+	{
+		m_pose.m_childNode = childNode;
+	}
+
+	virtual ~dEffectorTreeRoot()
+	{
+		dAssert (m_pose.m_childNode);
+		delete m_pose.m_childNode;
+	}
+
+	void Update()
+	{
+		Evaluate(m_pose);
+		for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
+			const dEffectorTransform& src = srcNode->GetInfo();
+			dMatrix matrix (src.m_rotation, src.m_posit);
+			src.m_effector->SetTargetMatrix(matrix);
+		}
+	}
+
+	virtual void Evaluate(dEffectorPose& output)
+	{
+		dAssert (m_pose.m_childNode);
+		m_pose.m_childNode->Evaluate(output);
+	}
+
+	dEffectorPose m_pose;
+};
+
+class dEffectorTreePose: public dEffectorTreeInterface
+{
+	public:
+	dEffectorTreePose (dCustomRagdollMotor_EndEffector* const rootEffector)
+		:dEffectorTreeInterface()
+		,m_rootEffector(rootEffector)
+	{
+	}
+
+	virtual void Evaluate(dEffectorPose& output)
+	{
+		dAssert (0);
+	}
+
+	dCustomRagdollMotor_EndEffector* m_rootEffector;
+};
+
+class dEffectorTreeFixPose: public dEffectorTreePose
+{
+	public:
+	dEffectorTreeFixPose(dCustomRagdollMotor_EndEffector* const rootEffector)
+		:dEffectorTreePose(rootEffector)
+	{
+	}
+
+	~dEffectorTreeFixPose()
+	{
+	}
+
+	virtual void Evaluate(dEffectorPose& output)
+	{
+		dMatrix rootMatrix(m_rootEffector->GetBodyMatrix());
+		dQuaternion rootRotation (rootMatrix);
+		for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
+			dEffectorTransform& dst = dstNode->GetInfo();
+			const dEffectorTransform& src = srcNode->GetInfo();
+			dAssert (dst.m_effector == src.m_effector);
+			dst.m_rotation = src.m_rotation * rootRotation;
+			dst.m_posit = rootMatrix.m_posit + rootRotation.RotateVector(src.m_posit);
+		}
+	}
+	
+	dEffectorPose m_pose;
+};
+
+class dEffectorTreeInputModifier: public dEffectorTreeInterface
+{
+	public:
+	dEffectorTreeInputModifier(dEffectorTreePose* const poseGenerator)
+		:dEffectorTreeInterface()
+		,m_poseGenerator(poseGenerator)
+		,m_euler(0.0f)
+		,m_position(0.0f)
+	{
+		m_position.m_w = 1.0f;
+	}
+
+	~dEffectorTreeInputModifier()
+	{
+		delete m_poseGenerator;
+	}
+
+	void SetTarget(dFloat z, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
+	{
+		m_position.m_y = y;
+		m_position.m_z = z;
+		m_euler.m_x = pitch;
+		m_euler.m_y = yaw;
+		m_euler.m_z = roll;
+	}
+
+	virtual void Evaluate(dEffectorPose& output)
+	{
+		m_poseGenerator->Evaluate(output);
+
+		dMatrix modifierMatrix (dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
+		modifierMatrix.m_posit = m_position;
+
+		dEffectorTransform& rootTransform = output.GetFirst()->GetInfo();
+
+//		rootTransform.m_rotation = dQuaternion (modifierMatrix) * rootTransform.m_rotation;
+//		rootTransform.m_posit += rootTransform.m_rotation.RotateVector(m_position);
+
+		dMatrix rootMatrix (rootTransform.m_rotation, rootTransform.m_posit);
+		dMatrix matrix (rootMatrix.Inverse() * modifierMatrix * rootMatrix);
+		dQuaternion rotation (matrix);
+		for (dEffectorPose::dListNode* node = output.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			dEffectorTransform& transform = output.GetFirst()->GetInfo();
+			transform.m_rotation = transform.m_rotation * rotation;
+			transform.m_posit = matrix.m_posit + rotation.RotateVector(transform.m_posit);
+		}
+
+	}
+
+	dEffectorTreePose* m_poseGenerator;
+	dVector m_euler;
+	dVector m_position;
+};
+
+
+
 
 class dHaxapodController: public dCustomControllerBase
 {
@@ -53,18 +222,8 @@ class dHaxapodController: public dCustomControllerBase
 	class dHexapodNode
 	{
 		public:
-		class dPose
-		{
-			public:
-			dVector m_posit;
-			dQuaternion m_rotation;
-			dHexapodNode* m_node;
-		};
-
 		dHexapodNode(dHexapodNode* const parent)
-			:m_matrix(dGetIdentityMatrix())
-			,m_worldMatrix(dGetIdentityMatrix())
-			,m_parent(parent)
+			:m_parent(parent)
 			,m_effector(NULL)
 			,m_children()
 		{
@@ -77,22 +236,6 @@ class dHaxapodController: public dCustomControllerBase
 			}
 		}
 
-		virtual void UpdateTranform(const dMatrix& parentMatrix)
-		{
-			m_worldMatrix = m_matrix * parentMatrix;
-			for (dList<dHexapodNode*>::dListNode* nodePtr = m_children.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-				dHexapodNode* const node = nodePtr->GetInfo();
-				node->UpdateTranform(m_worldMatrix);
-			}
-		}
-
-		virtual void UpdateEffectors(dFloat timestep)
-		{
-			for (dList<dHexapodNode*>::dListNode* nodePtr = m_children.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-				dHexapodNode* const node = nodePtr->GetInfo();
-				node->UpdateEffectors(timestep);
-			}
-		}
 
 		void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 		{
@@ -105,8 +248,6 @@ class dHaxapodController: public dCustomControllerBase
 			}
 		}
 
-		dMatrix m_matrix;
-		dMatrix m_worldMatrix;
 		dHexapodNode* m_parent;
 		dHexapodEffector* m_effector;
 		dList<dHexapodNode*> m_children;
@@ -122,12 +263,6 @@ class dHaxapodController: public dCustomControllerBase
 			if (parent) {
 				parent->m_children.Append (this);
 			}
-		}
-
-		virtual void UpdateEffectors(dFloat timestep)
-		{
-//			m_effector->SetTargetMatrix(m_worldMatrix);
-			dHexapodNode::UpdateEffectors(timestep);
 		}
 	};
 
@@ -212,15 +347,8 @@ class dHaxapodController: public dCustomControllerBase
 			dMatrix effectorMatrix(dGetIdentityMatrix());
 			effectorMatrix.m_posit = armPivot.m_posit;
 			effectorMatrix.m_posit.m_y -= armSize;
-#if 1
 			dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, effectorMatrix * matrix);
 			effector->SetAsThreedof();
-#else
-			dCustomKinematicController* const effector = new dCustomKinematicController(arm, effectorMatrix * matrix);
-			NewtonInverseDynamicsAddLoopJoint(m_kinematicSolver, effector->GetJoint());
-			effector->SetPickMode(0);
-#endif
-			
 			effector->SetMaxLinearFriction(partMass * DEMO_GRAVITY * 10.0f);
 			effector->SetMaxAngularFriction(partMass * DEMO_GRAVITY * 10.0f);
 			new dHexapodLimb (this, effector);
@@ -233,45 +361,9 @@ class dHaxapodController: public dCustomControllerBase
 			}
 		}
 
-		void SetTarget (dFloat z, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
-		{
-			m_y = y * 0.25f;
-			m_x = z * 0.125f;
-			m_pitch = pitch;
-			m_yaw =  yaw;
-			m_roll = roll;
-/*
-			// set base matrix
-			m_matrix = dYawMatrix(azimuth);
-			m_matrix.m_posit = m_matrix.TransformVector(m_referencePosit);
-
-			// set effector matrix
-			m_effector->m_matrix = dRollMatrix(roll) * dPitchMatrix(pitch);
-			m_effector->m_matrix.m_posit = dVector(0.0f, y, z, 1.0f);
-
-			// calculate global matrices
-			UpdateTranform(dGetIdentityMatrix());
-*/
-		}
-
 		virtual void UpdateEffectors(dFloat timestep)
 		{
 			if (m_kinematicSolver) {
-/*
-				//dVector xxx (m_effector->GetBodyMatrix().m_posit);
-				dVector xxx (m_effector->GetTargetMatrix().m_posit);
-				xxx.m_y = 0.75f + m_y;
-				//xxx.m_x = m_x;
-				xxx.m_z = m_x;
-				
-				dMatrix xxxxx (dPitchMatrix(m_pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
-				xxxxx.m_posit = xxx;
-				xxxxx.m_posit.m_w = 1.0f;
-				//m_effector->SetTargetPosit(xxx);
-				m_effector->SetTargetMatrix(xxxxx);
-
-				dHexapodNode::UpdateEffectors(timestep);
-*/
 				NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
 			}
 		}
@@ -334,17 +426,12 @@ class dHaxapodController: public dCustomControllerBase
 		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
-		dFloat m_y;
-		dFloat m_x;
-		dFloat m_pitch;
-		dFloat m_yaw;
-		dFloat m_roll;
 	};
 
 	dHaxapodController()
 		:m_robot (NULL)
-		,m_poseArray(NULL)
-		,m_nodesCount(0)
+		,m_animTreeNode(NULL)
+		,m_inputModifier(NULL)
 	{
 	}
 
@@ -352,14 +439,14 @@ class dHaxapodController: public dCustomControllerBase
 	{
 		if (m_robot) {
 			delete m_robot;
-			delete[] m_poseArray;
+			delete m_animTreeNode;
 		}
 	}
 
 	void SetTarget (dFloat x, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
 	{
-		if (m_robot) {
-			m_robot->SetTarget(x, y, pitch, yaw, roll);
+		if (m_inputModifier) {
+			m_inputModifier->SetTarget(x, y, pitch, yaw, roll);
 		}
 	}
 
@@ -368,36 +455,43 @@ class dHaxapodController: public dCustomControllerBase
 		m_robot = new dHexapodRoot(scene, location);
 
 		int stack = 1;
+		int nodesCount = 0;
 		dHexapodNode* effectors[128];
+
 		// determine the number of effectors;
-		m_nodesCount = 0;
 		dHexapodNode* pool[32];
 		pool[0] = m_robot;
 		while (stack) {
 			stack --;
 			dHexapodNode* const node = pool[stack];
 			if (node->m_effector) {
-				effectors[m_nodesCount] = node;
-				m_nodesCount ++;
+				effectors[nodesCount] = node;
+				nodesCount ++;
 			}
 			for (dList<dHexapodNode*>::dListNode* ptr = node->m_children.GetFirst(); ptr; ptr = ptr->GetNext()) {
 				pool[stack] = ptr->GetInfo();
 				stack ++;
 			}
 		}
-		
-		// create array of effectors positions
-		m_poseArray = new dHexapodNode::dPose[m_nodesCount];
 
-		// initialize effectors base pose
-		dMatrix rootMatrix (m_robot->m_effector->GetBodyMatrix().Inverse());
-		for (int i = 0; i < m_nodesCount; i ++) {
+		// create a fix pose frame generator
+		dEffectorTreeFixPose* const fixPose = new dEffectorTreeFixPose(m_robot->m_effector);
+		m_inputModifier = new dEffectorTreeInputModifier(fixPose);
+		m_animTreeNode = new dEffectorTreeRoot(m_inputModifier);
+
+		dMatrix rootMatrix(m_robot->m_effector->GetBodyMatrix().Inverse());
+		for (int i = 0; i < nodesCount; i++) {
+			dEffectorTreeInterface::dEffectorTransform frame;
 			dHexapodNode* const node = effectors[i];
-			m_poseArray[i].m_node = node;
-			dMatrix effectorMatrix (node->m_effector->GetBodyMatrix());
-			dMatrix poseMatrix (effectorMatrix * rootMatrix);
-			m_poseArray[i].m_posit = poseMatrix.m_posit;
-			m_poseArray[i].m_rotation = dQuaternion(poseMatrix);
+
+			dMatrix effectorMatrix(node->m_effector->GetBodyMatrix());
+			dMatrix poseMatrix(effectorMatrix * rootMatrix);
+			
+			frame.m_effector = node->m_effector;
+			frame.m_posit = poseMatrix.m_posit;
+			frame.m_rotation = dQuaternion(poseMatrix);
+			fixPose->m_pose.Append(frame);
+			m_animTreeNode->m_pose.Append(frame);
 		}
 	}
 
@@ -405,31 +499,10 @@ class dHaxapodController: public dCustomControllerBase
 	{
 	}
 
-	void UpdatePose()
-	{
-		//dMatrix rootMatrix(m_robot->m_effector->GetBodyMatrix());
-		dMatrix xxxx(m_robot->m_effector->GetBodyMatrix());
-		dMatrix rootMatrix(dGetIdentityMatrix());
-//		rootMatrix.m_posit = xxxx.m_posit;
-		rootMatrix.m_posit = dVector (0.0f, 0.32f, 0.0f, 1.0f);
-		for (int i = 0; i < m_nodesCount; i++) {
-			dHexapodNode* const node = m_poseArray[i].m_node;
-			dMatrix poseMatrix (m_poseArray[i].m_rotation, m_poseArray[i].m_posit);
-			dMatrix effectorMatrix(poseMatrix * rootMatrix);
-			if (i == 0) {
-				dMatrix offset (dPitchMatrix(m_robot->m_pitch) * dYawMatrix(m_robot->m_yaw)* dRollMatrix(m_robot->m_roll));
-				offset.m_posit.m_y = m_robot->m_y;
-				offset.m_posit.m_z = m_robot->m_x;
-				effectorMatrix = offset * effectorMatrix;
-			}
-			node->m_effector->SetTargetMatrix(effectorMatrix);
-		}
-	}
-
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
 		if (m_robot) {
-			UpdatePose();
+			m_animTreeNode->Update();
 			m_robot->UpdateEffectors(timestep);
 		}
 	}
@@ -442,9 +515,8 @@ class dHaxapodController: public dCustomControllerBase
 	}
 
 	dHexapodRoot* m_robot;
-	dHexapodNode::dPose* m_poseArray;
-
-	int m_nodesCount;
+	dEffectorTreeRoot* m_animTreeNode;
+	dEffectorTreeInputModifier* m_inputModifier;
 };
 
 class dHexapodManager: public dCustomControllerManager<dHaxapodController>
