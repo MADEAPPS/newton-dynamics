@@ -277,9 +277,6 @@ class dSixAxisController: public dCustomControllerBase
 				// complete the ik
 				NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 			} 
-			else
-			{
-			}
 		}
 
 		~dSixAxisRoot()
@@ -288,75 +285,6 @@ class dSixAxisController: public dCustomControllerBase
 				NewtonInverseDynamicsDestroy (m_kinematicSolver);
 			}
 		}
-
-		void SetTarget (dFloat z, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
-		{
-			// set base matrix
-			m_matrix = m_referenceMatrix * dYawMatrix(azimuth) * m_location;
-
-			// set effector matrix
-			m_effector->m_matrix = dRollMatrix(roll) * dPitchMatrix(pitch);
-			m_effector->m_matrix.m_posit = dVector(0.0f, y, z, 1.0f);
-
-			// calculate global matrices
-			UpdateTranform(dGetIdentityMatrix());
-		}
-
-		virtual void UpdateEffectors(dFloat timestep)
-		{
-			dSixAxisNode::UpdateEffectors(timestep);
-			if (m_kinematicSolver) {
-				NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
-			}
-		}
-
-		void ScaleIntertia(NewtonBody* const body, dFloat factor) const
-		{
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
-			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-			NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
-		}
-
-		NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size) const
-		{
-			NewtonWorld* const world = scene->GetNewton();
-			int materialID = NewtonMaterialGetDefaultGroupID(world);
-			NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			dFloat mass = 1.0f;
-			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-			ScaleIntertia(body, 10.0f);
-
-			geometry->Release();
-			NewtonDestroyCollision(collision);
-			return body;
-		}
-
-		NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat radius, dFloat height) const
-		{
-			NewtonWorld* const world = scene->GetNewton();
-			int materialID = NewtonMaterialGetDefaultGroupID(world);
-			dVector size(radius, height, radius, 0.0f);
-			NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
-			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			dFloat mass = 1.0f;
-			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-			ScaleIntertia(body, 10.0f);
-
-			geometry->Release();
-			NewtonDestroyCollision(collision);
-			return body;
-		}
-
-		NewtonInverseDynamics* m_kinematicSolver;
-		dSixAxisEffector* m_effector;
-		dMatrix m_location;
-		dMatrix m_referenceMatrix;
 	};
 #endif
 
@@ -427,10 +355,74 @@ class dSixAxisController: public dCustomControllerBase
 		return body;
 	}
 
-	void MakeKukaRobot_IK(DemoEntityManager* const scene, const dMatrix& origin)
+	void MakeKukaRobot_IK(DemoEntityManager* const scene, const dMatrix& location)
 	{
-		dAssert (0);
-//		m_robot = new dSixAxisRoot(scene, origin, true);
+		dFloat size = 1.0f;
+		dFloat r = size / 4.0f;
+		dFloat h = size / 8.0f;
+
+		dFloat lowLimit = -88.0f * 3.141592f / 180.0f;
+		dFloat highLimit = 60.0f * 3.141592f / 180.0f;
+
+		// add Robot Base Frame locked the root body to the world
+		dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
+		baseFrameMatrix.m_posit.m_y = h * 0.5f;
+		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
+		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
+
+		//dCustomHinge* const baseFrameFixHinge = new dCustomHinge(baseFrameMatrix * location, baseFrameBody, NULL);
+		//baseFrameFixHinge->EnableLimits(true);
+		//baseFrameFixHinge->SetLimits(0.0f, 0.0f);
+
+		// add Robot rotating column
+		dMatrix rotatingColumnMatrix(dGetIdentityMatrix());
+		rotatingColumnMatrix.m_posit.m_y = h + h * 0.5f;
+		NewtonBody* const rotatingColumnBody = CreateBox(scene, rotatingColumnMatrix * location, dVector(r * 0.5f, h, r * 0.75f));
+		rotatingColumnMatrix = dRollMatrix(3.141592f * 0.5f) * rotatingColumnMatrix;
+		new dKukaServoMotor1(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody, -2.0f * 3.141592f, 2.0f * 3.141592f, false);
+
+		// add Robot link arm
+		dFloat l = size * 0.75f;
+		dMatrix linkArmMatrix(dGetIdentityMatrix());
+		linkArmMatrix.m_posit = rotatingColumnMatrix.m_posit;
+		linkArmMatrix.m_posit.m_y += l * 0.5f;
+		NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
+		linkArmMatrix.m_posit.m_y -= l * 0.5f;
+		new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, -0.5f * 3.141592f, 0.5f * 3.141592f, false);
+
+		// add Robot arm
+		dFloat l1 = l * 0.5f;
+		dMatrix armMatrix(linkArmMatrix);
+		armMatrix.m_posit.m_y += l;
+		armMatrix.m_posit.m_z += l1 * 0.5f;
+		NewtonBody* const armBody = CreateBox(scene, armMatrix * location, dVector(l * 0.125f, l * 0.125f, l1));
+		armMatrix.m_posit.m_z -= l1 * 0.5f;
+		new dKukaServoMotor1(armMatrix * location, armBody, linkArmBody, lowLimit, highLimit, false);
+
+		// add effector
+		dMatrix gripperMatrix(armMatrix);
+		gripperMatrix.m_posit.m_z += l1;
+		dKukaEffector* const effector = new dKukaEffector(armBody, gripperMatrix * location);
+		effector->SetAsThreedof();
+		effector->SetMaxLinearFriction(1000.0f);
+
+		// add effector node 
+		dMatrix effectorLocalMatrix(gripperMatrix * baseFrameMatrix.Inverse());
+		dVector upAxis(baseFrameMatrix.UnrotateVector(dVector(0.0f, 1.0f, 0.0f, 1.0f)));
+		dVector planeAxis(baseFrameMatrix.UnrotateVector(dVector(0.0f, 0.0f, 1.0f, 1.0f)));
+
+		dEffectorTreeFixPose* const fixPose = new dEffectorTreeFixPose(baseFrameBody);
+		m_inputModifier = new dEffectorTreeInputModifier(fixPose, upAxis, planeAxis);
+		m_animTreeNode = new dEffectorTreeRoot(baseFrameBody, m_inputModifier);
+
+		// set base pose
+		dEffectorTreeInterface::dEffectorTransform frame;
+		frame.m_effector = effector;
+		frame.m_posit = effectorLocalMatrix.m_posit;
+		frame.m_rotation = dQuaternion(effectorLocalMatrix);
+
+		fixPose->GetPose().Append(frame);
+		m_animTreeNode->GetPose().Append(frame);
 	}
 
 	void MakeKukaRobot_FD(DemoEntityManager* const scene, const dMatrix& location)
@@ -616,10 +608,10 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 
 	dMatrix origin(dYawMatrix(0.0f * 3.141693f));
 	origin.m_posit.m_z = -0.75f;
-//	robotManager->MakeKukaRobot_IK (scene, origin);
+	robotManager->MakeKukaRobot_IK (scene, origin);
 
 	origin.m_posit.m_z = 0.75f;
-	robotManager->MakeKukaRobot_FD(scene, origin);
+//	robotManager->MakeKukaRobot_FD(scene, origin);
 	
 	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
