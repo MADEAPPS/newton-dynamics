@@ -712,7 +712,6 @@ void dCustomRagdollMotor_EndEffector::SetTargetMatrix(const dMatrix& matrix)
 {
 	NewtonBodySetSleepState(m_body0, 0);
 	m_targetMatrix = matrix;
-	m_targetMatrix.m_posit.m_w = 1.0f;
 }
 
 dMatrix dCustomRagdollMotor_EndEffector::GetBodyMatrix() const
@@ -813,5 +812,54 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
 		}
+	}
+}
+
+
+
+dEffectorTreeRoot::~dEffectorTreeRoot()
+{
+	dAssert(m_pose.m_childNode);
+	delete m_pose.m_childNode;
+}
+
+void dEffectorTreeRoot::Update()
+{
+	Evaluate(m_pose);
+	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
+		const dEffectorTransform& src = srcNode->GetInfo();
+		dMatrix matrix(src.m_rotation, src.m_posit);
+		src.m_effector->SetTargetMatrix(matrix);
+	}
+}
+
+void dEffectorTreeRoot::Evaluate(dEffectorPose& output)
+{
+	dAssert(m_pose.m_childNode);
+	m_pose.m_childNode->Evaluate(output);
+
+	dVector rootPosition;
+	dQuaternion rootRotation;
+	NewtonBodyGetRotation(m_rootBody, &rootRotation.m_q0);
+	NewtonBodyGetPosition(m_rootBody, &rootPosition.m_x);
+	rootPosition.m_w = 1.0f;
+
+	for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+		dEffectorTransform& tranform = node->GetInfo();
+		tranform.m_rotation = tranform.m_rotation * rootRotation;
+		tranform.m_posit = rootPosition + rootRotation.RotateVector(tranform.m_posit);
+	}
+}
+
+
+void dEffectorTreeFixPose::Evaluate(dEffectorPose& output)
+{
+	// just copy the base pose to the output frame
+	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
+		dEffectorTransform& dst = dstNode->GetInfo();
+		const dEffectorTransform& src = srcNode->GetInfo();
+		dAssert(dst.m_effector == src.m_effector);
+		dst.m_rotation = src.m_rotation;
+		dst.m_posit = src.m_posit;
 	}
 }

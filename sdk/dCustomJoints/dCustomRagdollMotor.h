@@ -168,5 +168,90 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 };
 
 
+class dEffectorTreeInterface
+{
+	public:
+	class dEffectorTransform
+	{
+		public:
+		dVector m_posit;
+		dQuaternion m_rotation;
+		dCustomRagdollMotor_EndEffector* m_effector;
+	};
+
+	class dEffectorPose: public dList<dEffectorTransform>
+	{
+		public:
+		dEffectorPose(): dList<dEffectorTransform>(), m_childNode(NULL)	{}
+		dEffectorTreeInterface* m_childNode;
+	};
+
+	dEffectorTreeInterface(NewtonBody* const rootBody)
+		:m_rootBody(rootBody)
+	{
+	}
+
+	virtual ~dEffectorTreeInterface()
+	{
+	}
+
+	virtual void Evaluate(dEffectorPose& output)
+	{
+	}
+
+	NewtonBody* m_rootBody;
+};
+
+
+class dEffectorTreeRoot: public dEffectorTreeInterface
+{
+	public:
+	dEffectorTreeRoot(NewtonBody* const rootBody, dEffectorTreeInterface* const childNode)
+		:dEffectorTreeInterface(rootBody)
+	{
+		m_pose.m_childNode = childNode;
+	}
+	CUSTOM_JOINTS_API virtual ~dEffectorTreeRoot();
+
+	dEffectorPose& GetPose() {return m_pose;}
+
+	CUSTOM_JOINTS_API void Update();
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output);
+
+	protected:
+	dEffectorPose m_pose;
+};
+
+class dEffectorTreePose: public dEffectorTreeInterface
+{
+	public:
+	dEffectorTreePose(NewtonBody* const rootBody)
+		:dEffectorTreeInterface(rootBody)
+	{
+	}
+
+	virtual void Evaluate(dEffectorPose& output)
+	{
+		dAssert(0);
+	}
+};
+
+
+class dEffectorTreeFixPose: public dEffectorTreePose
+{
+	public:
+	dEffectorTreeFixPose(NewtonBody* const rootBody)
+		:dEffectorTreePose(rootBody)
+	{
+	}
+
+	dEffectorPose& GetPose() {return m_pose;}
+
+	protected:
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output);
+	dEffectorPose m_pose;
+};
+
+
 #endif 
 

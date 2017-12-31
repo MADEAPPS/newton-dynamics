@@ -20,128 +20,17 @@
 #include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
-class dEffectorTreeInterface
-{
-	public:
-class dEffectorTransform
-{
-	public:
-	dVector m_posit;
-	dQuaternion m_rotation;
-	dCustomRagdollMotor_EndEffector* m_effector;
-};
-
-class dEffectorPose: public dList<dEffectorTransform>
-{
-	public:
-	dEffectorPose()
-		:dList<dEffectorTransform>()
-		,m_childNode(NULL)
-	{
-	}
-	dEffectorTreeInterface* m_childNode;
-};
-
-
-	dEffectorTreeInterface()
-	{
-	}
-	virtual ~dEffectorTreeInterface()
-	{
-	}
-	
-	virtual void Evaluate(dEffectorPose& output)
-	{
-	}
-};
-
-class dEffectorTreeRoot: public dEffectorTreeInterface
-{
-	public:
-	dEffectorTreeRoot(dEffectorTreeInterface* const childNode)
-	{
-		m_pose.m_childNode = childNode;
-	}
-
-	virtual ~dEffectorTreeRoot()
-	{
-		dAssert (m_pose.m_childNode);
-		delete m_pose.m_childNode;
-	}
-
-	void Update()
-	{
-		Evaluate(m_pose);
-		for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
-			const dEffectorTransform& src = srcNode->GetInfo();
-			dMatrix matrix (src.m_rotation, src.m_posit);
-			src.m_effector->SetTargetMatrix(matrix);
-		}
-	}
-
-	virtual void Evaluate(dEffectorPose& output)
-	{
-		dAssert (m_pose.m_childNode);
-		m_pose.m_childNode->Evaluate(output);
-	}
-
-	dEffectorPose m_pose;
-};
-
-class dEffectorTreePose: public dEffectorTreeInterface
-{
-	public:
-	dEffectorTreePose (dCustomRagdollMotor_EndEffector* const rootEffector)
-		:dEffectorTreeInterface()
-		,m_rootEffector(rootEffector)
-	{
-	}
-
-	virtual void Evaluate(dEffectorPose& output)
-	{
-		dAssert (0);
-	}
-
-	dCustomRagdollMotor_EndEffector* m_rootEffector;
-};
-
-class dEffectorTreeFixPose: public dEffectorTreePose
-{
-	public:
-	dEffectorTreeFixPose(dCustomRagdollMotor_EndEffector* const rootEffector)
-		:dEffectorTreePose(rootEffector)
-	{
-	}
-
-	~dEffectorTreeFixPose()
-	{
-	}
-
-	virtual void Evaluate(dEffectorPose& output)
-	{
-		dMatrix rootMatrix(m_rootEffector->GetBodyMatrix());
-		dQuaternion rootRotation (rootMatrix);
-		for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
-			dEffectorTransform& dst = dstNode->GetInfo();
-			const dEffectorTransform& src = srcNode->GetInfo();
-			dAssert (dst.m_effector == src.m_effector);
-			dst.m_rotation = src.m_rotation * rootRotation;
-			dst.m_posit = rootMatrix.m_posit + rootRotation.RotateVector(src.m_posit);
-		}
-	}
-	
-	dEffectorPose m_pose;
-};
 
 class dEffectorTreeInputModifier: public dEffectorTreeInterface
 {
 	public:
 	dEffectorTreeInputModifier(dEffectorTreePose* const poseGenerator)
-		:dEffectorTreeInterface()
+		:dEffectorTreeInterface(poseGenerator->m_rootBody)
 		,m_poseGenerator(poseGenerator)
 		,m_euler(0.0f)
 		,m_position(0.0f)
 	{
+		dAssert (0);
 		m_position.m_w = 1.0f;
 	}
 
@@ -179,7 +68,6 @@ class dEffectorTreeInputModifier: public dEffectorTreeInterface
 			transform.m_rotation = transform.m_rotation * rotation;
 			transform.m_posit = matrix.m_posit + rotation.RotateVector(transform.m_posit);
 		}
-
 	}
 
 	dEffectorTreePose* m_poseGenerator;
@@ -473,7 +361,8 @@ class dHaxapodController: public dCustomControllerBase
 				stack ++;
 			}
 		}
-
+		dAssert (0);
+/*
 		// create a fix pose frame generator
 		dEffectorTreeFixPose* const fixPose = new dEffectorTreeFixPose(m_robot->m_effector);
 		m_inputModifier = new dEffectorTreeInputModifier(fixPose);
@@ -490,9 +379,11 @@ class dHaxapodController: public dCustomControllerBase
 			frame.m_effector = node->m_effector;
 			frame.m_posit = poseMatrix.m_posit;
 			frame.m_rotation = dQuaternion(poseMatrix);
-			fixPose->m_pose.Append(frame);
-			m_animTreeNode->m_pose.Append(frame);
+
+			fixPose->GetPose().Append(frame);
+			m_animTreeNode->GetPose().Append(frame);
 		}
+*/
 	}
 
 	void PostUpdate(dFloat timestep, int threadIndex) 
