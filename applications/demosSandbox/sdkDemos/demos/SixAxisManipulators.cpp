@@ -237,7 +237,7 @@ class dSixAxisController: public dCustomControllerBase
 		return body;
 	}
 
-	NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat radius, dFloat height) const
+	NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat radius, dFloat height) const
 	{
 		NewtonWorld* const world = scene->GetNewton();
 		int materialID = NewtonMaterialGetDefaultGroupID(world);
@@ -245,7 +245,6 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
 		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-		dFloat mass = 1.0f;
 		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
 		ScaleIntertia(body, 10.0f);
 
@@ -269,7 +268,7 @@ class dSixAxisController: public dCustomControllerBase
 		// add Robot Base Frame locked the root body to the world
 		dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
 		baseFrameMatrix.m_posit.m_y = h * 0.5f;
-		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
+		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, 20.0f, r, h);
 		void* const baseFrameNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, baseFrameBody);
 		//NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -361,7 +360,7 @@ class dSixAxisController: public dCustomControllerBase
 		// add Robot Base Frame locked the root body to the world
 		dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
 		baseFrameMatrix.m_posit.m_y = h * 0.5f;
-		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
+		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, 20.0f, r, h);
 		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		
 		// add Robot rotating column
