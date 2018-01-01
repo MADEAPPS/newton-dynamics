@@ -95,70 +95,6 @@ class dHaxapodController: public dCustomControllerBase
 		}
 	};
 
-#if 0
-	class dHexapodNode
-	{
-		public:
-		dHexapodNode(dHexapodNode* const parent)
-			:m_parent(parent)
-			,m_effector(NULL)
-			,m_children()
-		{
-		}
-
-		virtual ~dHexapodNode()
-		{
-			for (dList<dHexapodNode*>::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
-				delete node->GetInfo();
-			}
-		}
-
-
-		void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-		{
-			if (m_effector) {
-				m_effector->Debug(debugContext);
-				for (dList<dHexapodNode*>::dListNode* nodePtr = m_children.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-					dHexapodNode* const node = nodePtr->GetInfo();
-					node->Debug(debugContext);
-				}
-			}
-		}
-
-		dHexapodNode* m_parent;
-		dHexapodEffector* m_effector;
-		dList<dHexapodNode*> m_children;
-	};
-
-	class dHexapodLimb: public dHexapodNode
-	{
-		public:
-		dHexapodLimb(dHexapodNode* const parent, dHexapodEffector* const effector)
-			:dHexapodNode(parent)
-		{
-			m_effector = effector;
-			if (parent) {
-				parent->m_children.Append (this);
-			}
-		}
-	};
-
-	class dHexapodRoot: public dHexapodNode
-	{
-		public:
-		virtual void UpdateEffectors(dFloat timestep)
-		{
-			if (m_kinematicSolver) {
-				NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
-			}
-		}
-
-
-
-		NewtonInverseDynamics* m_kinematicSolver;
-	};
-#endif
-
 	dHaxapodController()
 		:m_animTreeNode(NULL)
 		,m_kinematicSolver(NULL)
@@ -297,8 +233,6 @@ class dHaxapodController: public dCustomControllerBase
 		baseMatrix.m_posit.m_y -= 0.06f;
 		// make the hexapod six limbs
 		for (int i = 0; i < 3; i ++) {
-//if (i != 1)
-{
 			dMatrix rightLocation (baseMatrix);
 			rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.65f);
 			rightLocation.m_posit += rightLocation.m_front.Scale (size.m_x * 0.3f - size.m_x * i / 3.0f);
@@ -311,7 +245,6 @@ class dHaxapodController: public dCustomControllerBase
 			dMatrix leftLocation (rightLocation * similarTransform.Inverse() * dYawMatrix(3.141592f) * similarTransform);
 			legEffectors[legEffectorCount] = AddLeg (scene, hexaBodyNode, leftLocation * location, mass * 0.1f, 0.3f);
 			legEffectorCount ++;
-}
 		}
 
 		// finalize inverse dynamics solver
@@ -400,8 +333,8 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
 		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
 		ImGui::SliderFloat("roll", &me->m_roll, -10.0f, 10.0f);
-		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.5f, 0.5f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.5f, 0.5f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.1f, 0.1f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.4f, 0.4f);
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
