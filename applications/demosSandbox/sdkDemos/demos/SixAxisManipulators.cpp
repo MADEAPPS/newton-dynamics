@@ -271,7 +271,7 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
 		baseFrameMatrix.m_posit.m_y = h * 0.5f;
 		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
-		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
+		//NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		void* const baseFrameNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, baseFrameBody);
 
 		// add Robot rotating column
@@ -364,7 +364,7 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
 		baseFrameMatrix.m_posit.m_y = h * 0.5f;
 		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
-		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
+		//NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		
 		// add Robot rotating column
 		dMatrix rotatingColumnMatrix(dGetIdentityMatrix());
