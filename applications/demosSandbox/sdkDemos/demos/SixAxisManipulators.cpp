@@ -362,7 +362,7 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
 		baseFrameMatrix.m_posit.m_y = h * 0.5f;
 		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, r, h);
-		//NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
+		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		
 		// add Robot rotating column
 		dMatrix rotatingColumnMatrix(dGetIdentityMatrix());
@@ -537,7 +537,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	robotManager->MakeKukaRobot_IK (scene, origin);
 
 	origin.m_posit.m_z = 0.75f;
-//	robotManager->MakeKukaRobot_FD(scene, origin);
+	robotManager->MakeKukaRobot_FD(scene, origin);
 	
 	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
