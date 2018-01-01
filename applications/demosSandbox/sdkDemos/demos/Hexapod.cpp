@@ -52,7 +52,7 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 		m_poseGenerator->Evaluate(output);
 
 		dQuaternion rotation (dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
-		for (dEffectorPose::dListNode* node = output.GetFirst()->GetNext(); node; node = node->GetNext()) {
+		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dEffectorTransform& transform = node->GetInfo();
 			transform.m_rotation = transform.m_rotation * rotation;
 			transform.m_posit = m_position + rotation.RotateVector(transform.m_posit);
