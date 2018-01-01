@@ -412,11 +412,6 @@ class dSixAxisController: public dCustomControllerBase
 
 		fixPose->GetPose().Append(frame);
 		m_animTreeNode->GetPose().Append(frame);
-
-//dMatrix xxxxxx (baseFrameMatrix * location * dYawMatrix(0.0f * 3.141592f));
-//xxxxxx.m_posit.m_y += 2.0f;
-//NewtonBodySetMatrixRecursive(baseFrameBody, &xxxxxx[0][0]);
-
 	}
 
 	void PostUpdate(dFloat timestep, int threadIndex) 
@@ -427,7 +422,7 @@ class dSixAxisController: public dCustomControllerBase
 	{
 		m_animTreeNode->Update();
 		if (m_kinematicSolver) {
-			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, 0);
+			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
 	}
 

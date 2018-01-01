@@ -21,20 +21,19 @@
 #include "HeightFieldPrimitive.h"
 
 
-class dEffectorTreeInputModifier: public dEffectorTreeInterface
+class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 {
 	public:
-	dEffectorTreeInputModifier(dEffectorTreePose* const poseGenerator)
+	dEffectorTreePostureGenerator(dEffectorTreePose* const poseGenerator)
 		:dEffectorTreeInterface(poseGenerator->m_rootBody)
-		,m_poseGenerator(poseGenerator)
 		,m_euler(0.0f)
 		,m_position(0.0f)
+		,m_poseGenerator(poseGenerator)
 	{
-		dAssert (0);
 		m_position.m_w = 1.0f;
 	}
 
-	~dEffectorTreeInputModifier()
+	~dEffectorTreePostureGenerator()
 	{
 		delete m_poseGenerator;
 	}
@@ -52,29 +51,18 @@ class dEffectorTreeInputModifier: public dEffectorTreeInterface
 	{
 		m_poseGenerator->Evaluate(output);
 
-		dMatrix modifierMatrix (dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
-		modifierMatrix.m_posit = m_position;
-
-		dEffectorTransform& rootTransform = output.GetFirst()->GetInfo();
-
-//		rootTransform.m_rotation = dQuaternion (modifierMatrix) * rootTransform.m_rotation;
-//		rootTransform.m_posit += rootTransform.m_rotation.RotateVector(m_position);
-
-		dMatrix rootMatrix (rootTransform.m_rotation, rootTransform.m_posit);
-		dMatrix matrix (rootMatrix.Inverse() * modifierMatrix * rootMatrix);
-		dQuaternion rotation (matrix);
+		dQuaternion rotation (dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
 		for (dEffectorPose::dListNode* node = output.GetFirst()->GetNext(); node; node = node->GetNext()) {
-			dEffectorTransform& transform = output.GetFirst()->GetInfo();
+			dEffectorTransform& transform = node->GetInfo();
 			transform.m_rotation = transform.m_rotation * rotation;
-			transform.m_posit = matrix.m_posit + rotation.RotateVector(transform.m_posit);
+			transform.m_posit = m_position + rotation.RotateVector(transform.m_posit);
 		}
 	}
 
-	dEffectorTreePose* m_poseGenerator;
 	dVector m_euler;
 	dVector m_position;
+	dEffectorTreePose* m_poseGenerator;
 };
-
 
 
 
@@ -103,10 +91,11 @@ class dHaxapodController: public dCustomControllerBase
 		dHexapodEffector (NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace)
 			:dCustomRagdollMotor_EndEffector (invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
 		{
-			SetLinearSpeed(0.4f);
+			SetLinearSpeed(1.0f);
 		}
 	};
 
+#if 0
 	class dHexapodNode
 	{
 		public:
@@ -157,103 +146,6 @@ class dHaxapodController: public dCustomControllerBase
 	class dHexapodRoot: public dHexapodNode
 	{
 		public:
-		dHexapodRoot(DemoEntityManager* const scene, const dMatrix& location)
-			:dHexapodNode(NULL)
-			,m_kinematicSolver(NULL)
-		{
-			dFloat mass = 30.0f;
-			// make the kinematic solver
-			m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
-
-			// make the root body
-			dMatrix baseMatrix(dGetIdentityMatrix());
-//			baseMatrix.m_posit.m_y += 0.35f;
-			baseMatrix.m_posit.m_y += 0.75f;
-			dVector size (1.3f, 0.31f, 0.5f, 0.0f);
-			NewtonBody* const hexaBody = CreateBox(scene, baseMatrix * location, size, mass, 1.0f);
-dAssert (0);
-/*
-			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
-			m_effector = new dHexapodEffector(m_kinematicSolver, hexaBodyNode, baseMatrix * location);
-			m_effector->SetAsSixdof();
-			m_effector->SetMaxLinearFriction(mass * DEMO_GRAVITY * 10.0f);
-			m_effector->SetMaxAngularFriction(mass * DEMO_GRAVITY * 4.0f);
-
-			baseMatrix.m_posit.m_y -= 0.06f;
-			// make the hexapod six limbs
-			for (int i = 0; i < 3; i ++) {
-//if (i != 1)
-{
-				dMatrix rightLocation (baseMatrix);
-				rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.65f);
-				rightLocation.m_posit += rightLocation.m_front.Scale (size.m_x * 0.3f - size.m_x * i / 3.0f);
-				AddLimb (scene, hexaBodyNode, rightLocation * location, mass * 0.1f, 0.3f);
-
-				dMatrix similarTransform (dGetIdentityMatrix());
-				similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
-				similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
-				dMatrix leftLocation (rightLocation * similarTransform.Inverse() * dYawMatrix(3.141592f) * similarTransform);
-				AddLimb (scene, hexaBodyNode, leftLocation * location, mass * 0.1f, 0.3f);
-}
-			}
-*/
-			// finalize inverse dynamics solver
-			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
-		}
-
-		void AddLimb(DemoEntityManager* const scene, void* const rootNode, const dMatrix& matrix, dFloat partMass, dFloat limbLenght)
-		{
-			dAssert (0);
-/*
-			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
-
-			dFloat inertiaScale = 4.0f;
-			// make limb base
-			dMatrix baseMatrix(dRollMatrix(3.141592f * 0.5f));
-			dMatrix cylinderMatrix(baseMatrix * matrix);
-			NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
-			dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
-
-			//make limb forward arm
-			dMatrix forwardArmMatrix(dPitchMatrix(-30.0f * 3.141592f / 180.0f));
-			dVector forwardArmSize(limbLenght * 0.25f, limbLenght * 0.25f, limbLenght, 0.0f);
-			forwardArmMatrix.m_posit += forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
-			NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix * matrix, forwardArmSize, partMass, inertiaScale);
-			dMatrix forwardArmPivot(forwardArmMatrix);
-			forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
-			dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * matrix, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
-
-			//make limb forward arm
-			dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
-			dFloat armSize = limbLenght * 1.25f;
-			armMatrix.m_posit += forwardArmMatrix.m_right.Scale(limbLenght);
-			armMatrix.m_posit.m_y -= armSize * 0.5f;
-			NewtonBody* const arm = CreateCapsule(scene, armMatrix * matrix, partMass, inertiaScale, armSize * 0.2f, armSize);
-			dMatrix armPivot(armMatrix);
-			armPivot.m_posit.m_y += armSize * 0.5f;
-			dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * matrix, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
-			void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
-
-			dMatrix effectorMatrix(dGetIdentityMatrix());
-			effectorMatrix.m_posit = armPivot.m_posit;
-			effectorMatrix.m_posit.m_y -= armSize;
-			dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, effectorMatrix * matrix);
-			effector->SetAsThreedof();
-			effector->SetMaxLinearFriction(partMass * DEMO_GRAVITY * 10.0f);
-			effector->SetMaxAngularFriction(partMass * DEMO_GRAVITY * 10.0f);
-			new dHexapodLimb (this, effector);
-*/
-		}
-
-		~dHexapodRoot()
-		{
-			if (m_kinematicSolver) {
-				NewtonInverseDynamicsDestroy (m_kinematicSolver);
-			}
-		}
-
 		virtual void UpdateEffectors(dFloat timestep)
 		{
 			if (m_kinematicSolver) {
@@ -261,134 +153,192 @@ dAssert (0);
 			}
 		}
 
-		void ScaleIntertia(NewtonBody* const body, dFloat factor) const
-		{
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
-			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-			NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
-		}
 
-		NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size, dFloat mass, dFloat inertiaScale) const
-		{
-			NewtonWorld* const world = scene->GetNewton();
-			int materialID = NewtonMaterialGetDefaultGroupID(world);
-			NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-			ScaleIntertia(body, inertiaScale);
-
-			geometry->Release();
-			NewtonDestroyCollision(collision);
-			return body;
-		}
-
-		NewtonBody* CreateCapsule(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat inertiaScale, dFloat radius, dFloat height) const
-		{
-			NewtonWorld* const world = scene->GetNewton();
-			int materialID = NewtonMaterialGetDefaultGroupID(world);
-			dVector size(radius, height, radius, 0.0f);
-			dMatrix align (dYawMatrix(3.141592f * 0.5f));
-			NewtonCollision* const collision = CreateConvexCollision(world, align, size, _CAPSULE_PRIMITIVE, 0);
-			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-			ScaleIntertia(body, inertiaScale);
-
-			geometry->Release();
-			NewtonDestroyCollision(collision);
-			return body;
-		}
-
-		NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat inertiaScale, dFloat radius, dFloat height) const
-		{
-			NewtonWorld* const world = scene->GetNewton();
-			int materialID = NewtonMaterialGetDefaultGroupID(world);
-			dVector size(radius, height, radius, 0.0f);
-			NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
-			DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-			ScaleIntertia(body, inertiaScale);
-
-			geometry->Release();
-			NewtonDestroyCollision(collision);
-			return body;
-		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
 	};
+#endif
 
 	dHaxapodController()
-		:m_robot (NULL)
-		,m_animTreeNode(NULL)
-		,m_inputModifier(NULL)
+		:m_animTreeNode(NULL)
+		,m_kinematicSolver(NULL)
 	{
 	}
 
 	~dHaxapodController()
 	{
-		if (m_robot) {
-			delete m_robot;
-			delete m_animTreeNode;
+		if (m_kinematicSolver) {
+			NewtonInverseDynamicsDestroy(m_kinematicSolver);
 		}
 	}
 
 	void SetTarget (dFloat x, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
 	{
-		if (m_inputModifier) {
-			m_inputModifier->SetTarget(x, y, pitch, yaw, roll);
-		}
+		m_postureModifier->SetTarget(x, y, pitch, yaw, roll);
+	}
+
+	void ScaleIntertia(NewtonBody* const body, dFloat factor) const
+	{
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
+	}
+
+	NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size, dFloat mass, dFloat inertiaScale) const
+	{
+		NewtonWorld* const world = scene->GetNewton();
+		int materialID = NewtonMaterialGetDefaultGroupID(world);
+		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+		ScaleIntertia(body, inertiaScale);
+
+		geometry->Release();
+		NewtonDestroyCollision(collision);
+		return body;
+	}
+
+	NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat inertiaScale, dFloat radius, dFloat height) const
+	{
+		NewtonWorld* const world = scene->GetNewton();
+		int materialID = NewtonMaterialGetDefaultGroupID(world);
+		dVector size(radius, height, radius, 0.0f);
+		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
+		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+		ScaleIntertia(body, inertiaScale);
+
+		geometry->Release();
+		NewtonDestroyCollision(collision);
+		return body;
+	}
+
+	NewtonBody* CreateCapsule(DemoEntityManager* const scene, const dMatrix& location, dFloat mass, dFloat inertiaScale, dFloat radius, dFloat height) const
+	{
+		NewtonWorld* const world = scene->GetNewton();
+		int materialID = NewtonMaterialGetDefaultGroupID(world);
+		dVector size(radius, height, radius, 0.0f);
+		dMatrix align(dYawMatrix(3.141592f * 0.5f));
+		NewtonCollision* const collision = CreateConvexCollision(world, align, size, _CAPSULE_PRIMITIVE, 0);
+		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+		ScaleIntertia(body, inertiaScale);
+
+		geometry->Release();
+		NewtonDestroyCollision(collision);
+		return body;
+	}
+
+	dCustomRagdollMotor_EndEffector* AddLeg(DemoEntityManager* const scene, void* const rootNode, const dMatrix& matrix, dFloat partMass, dFloat limbLenght)
+	{
+		NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
+
+		dFloat inertiaScale = 4.0f;
+		// make limb base
+		dMatrix baseMatrix(dRollMatrix(3.141592f * 0.5f));
+		dMatrix cylinderMatrix(baseMatrix * matrix);
+		NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
+		dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
+		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
+
+		//make limb forward arm
+		dMatrix forwardArmMatrix(dPitchMatrix(-30.0f * 3.141592f / 180.0f));
+		dVector forwardArmSize(limbLenght * 0.25f, limbLenght * 0.25f, limbLenght, 0.0f);
+		forwardArmMatrix.m_posit += forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
+		NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix * matrix, forwardArmSize, partMass, inertiaScale);
+		dMatrix forwardArmPivot(forwardArmMatrix);
+		forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
+		dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * matrix, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
+		void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
+
+		//make limb forward arm
+		dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
+		dFloat armSize = limbLenght * 1.25f;
+		armMatrix.m_posit += forwardArmMatrix.m_right.Scale(limbLenght);
+		armMatrix.m_posit.m_y -= armSize * 0.5f;
+		NewtonBody* const arm = CreateCapsule(scene, armMatrix * matrix, partMass, inertiaScale, armSize * 0.2f, armSize);
+		dMatrix armPivot(armMatrix);
+		armPivot.m_posit.m_y += armSize * 0.5f;
+		dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * matrix, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
+		void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
+
+		dMatrix effectorMatrix(dGetIdentityMatrix());
+		effectorMatrix.m_posit = armPivot.m_posit;
+		effectorMatrix.m_posit.m_y -= armSize;
+		dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, parent, effectorMatrix * matrix);
+		effector->SetAsThreedof();
+		effector->SetMaxLinearFriction(partMass * DEMO_GRAVITY * 10.0f);
+		effector->SetMaxAngularFriction(partMass * DEMO_GRAVITY * 10.0f);
+
+		return effector;
 	}
 
 	void MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
 	{
-		m_robot = new dHexapodRoot(scene, location);
+		dFloat mass = 30.0f;
+		// make the kinematic solver
+		m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
-		int stack = 1;
-		int nodesCount = 0;
-		dHexapodNode* effectors[128];
+		// make the root body
+		dMatrix baseMatrix(dGetIdentityMatrix());
+		baseMatrix.m_posit.m_y += 0.35f;
+		dVector size (1.3f, 0.31f, 0.5f, 0.0f);
+		NewtonBody* const hexaBody = CreateBox(scene, baseMatrix * location, size, mass, 1.0f);
+		void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
 
-		// determine the number of effectors;
-		dHexapodNode* pool[32];
-		pool[0] = m_robot;
-		while (stack) {
-			stack --;
-			dHexapodNode* const node = pool[stack];
-			if (node->m_effector) {
-				effectors[nodesCount] = node;
-				nodesCount ++;
-			}
-			for (dList<dHexapodNode*>::dListNode* ptr = node->m_children.GetFirst(); ptr; ptr = ptr->GetNext()) {
-				pool[stack] = ptr->GetInfo();
-				stack ++;
-			}
+		int legEffectorCount = 0;
+		dCustomRagdollMotor_EndEffector* legEffectors[32];
+
+		baseMatrix.m_posit.m_y -= 0.06f;
+		// make the hexapod six limbs
+		for (int i = 0; i < 3; i ++) {
+//if (i != 1)
+{
+			dMatrix rightLocation (baseMatrix);
+			rightLocation.m_posit += rightLocation.m_right.Scale (size.m_z * 0.65f);
+			rightLocation.m_posit += rightLocation.m_front.Scale (size.m_x * 0.3f - size.m_x * i / 3.0f);
+			legEffectors[legEffectorCount] = AddLeg (scene, hexaBodyNode, rightLocation * location, mass * 0.1f, 0.3f);
+			legEffectorCount ++;
+
+			dMatrix similarTransform (dGetIdentityMatrix());
+			similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
+			similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
+			dMatrix leftLocation (rightLocation * similarTransform.Inverse() * dYawMatrix(3.141592f) * similarTransform);
+			legEffectors[legEffectorCount] = AddLeg (scene, hexaBodyNode, leftLocation * location, mass * 0.1f, 0.3f);
+			legEffectorCount ++;
+}
 		}
-		dAssert (0);
-/*
+
+		// finalize inverse dynamics solver
+		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
+		
 		// create a fix pose frame generator
-		dEffectorTreeFixPose* const fixPose = new dEffectorTreeFixPose(m_robot->m_effector);
-		m_inputModifier = new dEffectorTreeInputModifier(fixPose);
-		m_animTreeNode = new dEffectorTreeRoot(m_inputModifier);
+		dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(hexaBody);
+		m_postureModifier = new dEffectorTreePostureGenerator(idlePose);
+		m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
 
-		dMatrix rootMatrix(m_robot->m_effector->GetBodyMatrix().Inverse());
-		for (int i = 0; i < nodesCount; i++) {
+		dMatrix rootMatrix;
+		NewtonBodyGetMatrix (hexaBody, &rootMatrix[0][0]);
+		rootMatrix = rootMatrix.Inverse();
+		for (int i = 0; i < legEffectorCount; i++) {
 			dEffectorTreeInterface::dEffectorTransform frame;
-			dHexapodNode* const node = effectors[i];
+			dCustomRagdollMotor_EndEffector* const effector = legEffectors[i];
+			dMatrix effectorMatrix(effector->GetBodyMatrix());
 
-			dMatrix effectorMatrix(node->m_effector->GetBodyMatrix());
 			dMatrix poseMatrix(effectorMatrix * rootMatrix);
 			
-			frame.m_effector = node->m_effector;
+			frame.m_effector = effector;
 			frame.m_posit = poseMatrix.m_posit;
 			frame.m_rotation = dQuaternion(poseMatrix);
 
-			fixPose->GetPose().Append(frame);
+			idlePose->GetPose().Append(frame);
 			m_animTreeNode->GetPose().Append(frame);
 		}
-*/
 	}
 
 	void PostUpdate(dFloat timestep, int threadIndex) 
@@ -397,22 +347,22 @@ dAssert (0);
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		if (m_robot) {
-			m_animTreeNode->Update();
-			m_robot->UpdateEffectors(timestep);
-		}
+		m_animTreeNode->Update();
+		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
-		if (m_robot) {
-			m_robot->Debug(debugContext);
+		const dEffectorTreeInterface::dEffectorPose& pose = m_animTreeNode->GetPose();
+		for (dEffectorTreeInterface::dEffectorPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
+			dCustomRagdollMotor_EndEffector* const effector = node->GetInfo().m_effector;
+			effector->Debug(debugContext);
 		}
 	}
 
-	dHexapodRoot* m_robot;
 	dEffectorTreeRoot* m_animTreeNode;
-	dEffectorTreeInputModifier* m_inputModifier;
+	NewtonInverseDynamics* m_kinematicSolver;
+	dEffectorTreePostureGenerator* m_postureModifier; // do not delete 
 };
 
 class dHexapodManager: public dCustomControllerManager<dHaxapodController>
