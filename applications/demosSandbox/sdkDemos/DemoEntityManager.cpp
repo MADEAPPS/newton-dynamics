@@ -240,7 +240,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 	m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 2;
+//	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
