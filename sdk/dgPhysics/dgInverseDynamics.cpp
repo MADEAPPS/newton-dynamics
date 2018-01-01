@@ -589,6 +589,7 @@ void dgInverseDynamics::Finalize()
 
 	if (m_skeleton) {
 		const dgDynamicBody* const rootBody = m_skeleton->m_body;
+		//dgAssert (m_skeleton->m_body->GetInvMass().m_w != dgFloat32 (0.0f));
 
 		dgMemoryAllocator* const allocator = rootBody->GetWorld()->GetAllocator();
 		m_nodesOrder = (dgNode**)allocator->Malloc(m_nodeCount * sizeof (dgNode*));
@@ -1102,18 +1103,7 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 		b[i] -= r;
 	}
 
-//static int xxx;
-//xxx ++;
-//dgTrace (("\n"));
-//for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) 
-//dgTrace (("%f ", b[i]));
-//dgTrace (("\n"));
-
 	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, lowerTriangularMassMatrix11, u, b, low, high);
-
-//for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++)
-//dgTrace(("%f ", u[i]));
-//dgTrace (("\n"));
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
@@ -1232,11 +1222,10 @@ dgInt32 dgInverseDynamics::GetJacobianDerivatives(dgJointInfo* const jointInfoAr
 		dgAssert((body0 == constraint->GetBody0()) || (body0 == constraint->GetBody1()));
 		dgAssert((body1 == constraint->GetBody0()) || (body1 == constraint->GetBody1()));
 
-		const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
-		const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
 		const dgVector invMass0(body0->m_invMass[3]);
 		const dgVector invMass1(body1->m_invMass[3]);
-		
+		const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
+		const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
 		const dgInt32 rowIsIk = constraint->m_rowIsIk;
 
 		for (dgInt32 i = 0; i < dof; i++) {
@@ -1350,16 +1339,14 @@ xxx ++;
 void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 {
 	if (m_skeleton) {
-		dgDynamicBody* const body = GetRoot()->m_body;
-
-		dgVector mass(body->m_mass);
-		dgVector invMass(body->m_invMass);
-		body->m_invMass = dgVector::m_zero;
-		body->m_mass = dgVector(DG_INFINITE_MASS);
+		//dgDynamicBody* const body = GetRoot()->m_body;
+		//dgVector mass(body->m_mass);
+		//dgVector invMass(body->m_invMass);
+		//body->m_invMass = dgVector::m_zero;
+		//body->m_mass = dgVector(DG_INFINITE_MASS);
 
 		dgJointInfo* const jointInfoArray = dgAlloca (dgJointInfo, m_nodeCount + m_loopingJoints.GetCount());
 		dgJacobianMatrixElement* const matrixRow = dgAlloca (dgJacobianMatrixElement, 6 * (m_nodeCount + m_loopingJoints.GetCount()));
-		
 		GetJacobianDerivatives(jointInfoArray, matrixRow, timestep, threadIndex);
 
 		dgInt32 memorySizeInBytes = GetMemoryBufferSizeInBytes(jointInfoArray, matrixRow);
@@ -1384,7 +1371,7 @@ void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 		}
 		CalculateMotorsAccelerations (internalForce, jointInfoArray, matrixRow, timestep);
 		
-		body->m_mass = mass;
-		body->m_invMass = invMass;
+		//body->m_mass = mass;
+		//body->m_invMass = invMass;
 	}
 }

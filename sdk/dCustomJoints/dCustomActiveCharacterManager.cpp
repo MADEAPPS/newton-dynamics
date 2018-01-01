@@ -135,7 +135,9 @@ void dCustomActiveCharacterController::Finalize ()
 dCustomRagdollMotor_EndEffector* dCustomActiveCharacterController::AddEndEffector(void* const node, const dMatrix& pinAndPivot)
 {
 	dAssert (m_kinematicSolver);
-	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinematicSolver, node, pinAndPivot);
+dAssert (0);
+NewtonBody* const referenceBody = NULL;
+	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinematicSolver, node, referenceBody, pinAndPivot);
 	m_effectorList.Append(effector);
 	return effector;
 }

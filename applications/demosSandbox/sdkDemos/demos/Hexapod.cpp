@@ -100,8 +100,8 @@ class dHaxapodController: public dCustomControllerBase
 	class dHexapodEffector: public dCustomRagdollMotor_EndEffector
 	{
 		public:
-		dHexapodEffector (NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace)
-			:dCustomRagdollMotor_EndEffector (invDynSolver, invDynNode, attachmentMatrixInGlobalSpace)
+		dHexapodEffector (NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace)
+			:dCustomRagdollMotor_EndEffector (invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
 		{
 			SetLinearSpeed(0.4f);
 		}
@@ -171,6 +171,8 @@ class dHaxapodController: public dCustomControllerBase
 			baseMatrix.m_posit.m_y += 0.75f;
 			dVector size (1.3f, 0.31f, 0.5f, 0.0f);
 			NewtonBody* const hexaBody = CreateBox(scene, baseMatrix * location, size, mass, 1.0f);
+dAssert (0);
+/*
 			void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
 			m_effector = new dHexapodEffector(m_kinematicSolver, hexaBodyNode, baseMatrix * location);
 			m_effector->SetAsSixdof();
@@ -194,13 +196,15 @@ class dHaxapodController: public dCustomControllerBase
 				AddLimb (scene, hexaBodyNode, leftLocation * location, mass * 0.1f, 0.3f);
 }
 			}
-
+*/
 			// finalize inverse dynamics solver
 			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 		}
 
 		void AddLimb(DemoEntityManager* const scene, void* const rootNode, const dMatrix& matrix, dFloat partMass, dFloat limbLenght)
 		{
+			dAssert (0);
+/*
 			NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
 
 			dFloat inertiaScale = 4.0f;
@@ -240,6 +244,7 @@ class dHaxapodController: public dCustomControllerBase
 			effector->SetMaxLinearFriction(partMass * DEMO_GRAVITY * 10.0f);
 			effector->SetMaxAngularFriction(partMass * DEMO_GRAVITY * 10.0f);
 			new dHexapodLimb (this, effector);
+*/
 		}
 
 		~dHexapodRoot()

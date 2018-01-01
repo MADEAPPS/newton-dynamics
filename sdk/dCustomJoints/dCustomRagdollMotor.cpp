@@ -616,13 +616,14 @@ dAssert (0);
 */
 }
 
-dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace)
+dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint (invDynSolver, invDynNode)
 	,m_targetMatrix(attachmentPointInGlobalSpace)
-	,m_linearSpeed(0.4f)
+	,m_referenceBody(referenceBody)
+	,m_linearSpeed(1.0f)
 	,m_angularSpeed(1.0f)
-	,m_maxLinearFriction(10000.0f)
-	,m_maxAngularFriction(1000.0f)
+	,m_linearFriction(1000.0f)
+	,m_angularFriction(1000.0f)
 	,m_isSixdof(true)
 {
 	SetAsThreedof();
@@ -631,13 +632,14 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDy
 	SetSolverModel(2);
 }
 
-dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const body, const dMatrix& attachmentPointInGlobalSpace)
+dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint(6, body, NULL)
 	,m_targetMatrix(attachmentPointInGlobalSpace)
-	,m_linearSpeed(0.4f)
+	,m_referenceBody(referenceBody)
+	,m_linearSpeed(1.0f)
 	,m_angularSpeed(1.0f)
-	,m_maxLinearFriction(10000.0f)
-	,m_maxAngularFriction(1000.0f)
+	,m_linearFriction(1000.0f)
+	,m_angularFriction(1000.0f)
 	,m_isSixdof(true)
 {
 	SetAsThreedof();
@@ -675,12 +677,12 @@ void dCustomRagdollMotor_EndEffector::SetAsThreedof()
 
 void dCustomRagdollMotor_EndEffector::SetMaxLinearFriction(dFloat friction)
 {
-	m_maxLinearFriction = dAbs(friction);
+	m_linearFriction = dAbs(friction);
 }
 
 void dCustomRagdollMotor_EndEffector::SetMaxAngularFriction(dFloat friction)
 {
-	m_maxAngularFriction = dAbs(friction);
+	m_angularFriction = dAbs(friction);
 }
 
 
@@ -756,27 +758,33 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	dVector veloc(0.0f);
 	dVector omega(0.0f);
 	dVector com(0.0f);
-	dVector pointVeloc(0.0f);
+	dVector veloc0(0.0f);
+	dVector veloc1(0.0f);
 	dAssert(timestep > 0.0f);
 	const dFloat damp = 0.3f;
 	const dFloat invTimestep = 1.0f / timestep;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
+	NewtonBodyGetPointVelocity(m_referenceBody, &m_targetMatrix.m_posit[0], &veloc1[0]);
+
+	dVector relVeloc(veloc1 - veloc0);
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
-	//NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);
-	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &pointVeloc[0]);
 
 	for (int i = 0; i < 3; i++) {
 		// Restrict the movement on the pivot point along all tree orthonormal direction
-		dFloat speed = pointVeloc.DotProduct3(m_targetMatrix[i]);
+		dFloat speed = relVeloc.DotProduct3(m_targetMatrix[i]);
 		dFloat dist = relPosit.DotProduct3(m_targetMatrix[i]) * damp;
-		dFloat relSpeed = dClamp (dist * invTimestep - speed, -m_linearSpeed, m_linearSpeed);
+		dFloat relSpeed = dClamp (dist * invTimestep + speed, -m_linearSpeed, m_linearSpeed);
 		dFloat relAccel = relSpeed * invTimestep;
 		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix[i][0]);
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
+//dTrace(("%f ", relAccel));
 	}
+//dTrace(("p(%f %f %f) v(%f %f %f)\n", relPosit.m_x, relPosit.m_y, relPosit.m_z, relVeloc.m_x, relVeloc.m_y, relVeloc.m_z));
+
 
 	if (m_isSixdof) {
 		dQuaternion rotation(matrix0.Inverse() * m_targetMatrix);
@@ -789,32 +797,31 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 				alpha = dClamp (alpha, -m_angularSpeed * invTimestep, m_angularSpeed * invTimestep);
 				NewtonUserJointSetRowAcceleration(m_joint, alpha);
 			}
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_up[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &rot.m_right[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 		} else {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_up[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_right[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 		}
 	}
 }
-
 
 
 dEffectorTreeRoot::~dEffectorTreeRoot()

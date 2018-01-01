@@ -127,8 +127,8 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 class dCustomRagdollMotor_EndEffector: public dCustomJoint
 {
 	public:
-	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonBody* const body, const dMatrix& attachmentPointInGlobalSpace);
-	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace);
+	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace);
+	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace);
 	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor_EndEffector();
 
 	CUSTOM_JOINTS_API void SetAsSixdof (); 
@@ -158,10 +158,11 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	dMatrix m_targetMatrix;	
+	NewtonBody* m_referenceBody;
 	dFloat m_linearSpeed;
 	dFloat m_angularSpeed;
-	dFloat m_maxLinearFriction;
-	dFloat m_maxAngularFriction;
+	dFloat m_linearFriction;
+	dFloat m_angularFriction;
 	bool m_isSixdof;
 
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector, dCustomJoint)
