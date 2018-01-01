@@ -24,7 +24,7 @@
 class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 {
 	public:
-	dEffectorTreePostureGenerator(dEffectorTreePose* const poseGenerator)
+	dEffectorTreePostureGenerator(dEffectorTreeInterface* const poseGenerator)
 		:dEffectorTreeInterface(poseGenerator->m_rootBody)
 		,m_euler(0.0f)
 		,m_position(0.0f)
@@ -61,7 +61,7 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 
 	dVector m_euler;
 	dVector m_position;
-	dEffectorTreePose* m_poseGenerator;
+	dEffectorTreeInterface* m_poseGenerator;
 };
 
 
@@ -252,7 +252,11 @@ class dHaxapodController: public dCustomControllerBase
 		
 		// create a fix pose frame generator
 		dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(hexaBody);
-		m_postureModifier = new dEffectorTreePostureGenerator(idlePose);
+		dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorTreeFixPose(hexaBody);
+
+		dEffectorTreeTwoWayBlender* const poseBlender = new dEffectorTreeTwoWayBlender (hexaBody, idlePose, walkPoseGenerator);
+
+		m_postureModifier = new dEffectorTreePostureGenerator(poseBlender);
 		m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
 
 		dMatrix rootMatrix;
@@ -270,6 +274,7 @@ class dHaxapodController: public dCustomControllerBase
 			frame.m_rotation = dQuaternion(poseMatrix);
 
 			idlePose->GetPose().Append(frame);
+			walkPoseGenerator->GetPose().Append(frame);
 			m_animTreeNode->GetPose().Append(frame);
 		}
 	}
@@ -389,4 +394,5 @@ void Hexapod(DemoEntityManager* const scene)
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
+
 

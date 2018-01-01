@@ -254,5 +254,25 @@ class dEffectorTreeFixPose: public dEffectorTreePose
 };
 
 
+class dEffectorTreeTwoWayBlender: public dEffectorTreeInterface
+{
+	public:
+	dEffectorTreeTwoWayBlender(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1)
+		:dEffectorTreeInterface(rootBody)
+		,m_node0(node0)
+		,m_node1(node1)
+		,m_param(0.0f)
+	{
+	}
+
+	protected:
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output);
+
+	dEffectorTreeInterface* m_node0;
+	dEffectorTreeInterface* m_node1;
+	dFloat m_param;
+};
+
+
 #endif 
 

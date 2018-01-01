@@ -781,9 +781,7 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
-//dTrace(("%f ", relAccel));
 	}
-//dTrace(("p(%f %f %f) v(%f %f %f)\n", relPosit.m_x, relPosit.m_y, relPosit.m_z, relVeloc.m_x, relVeloc.m_y, relVeloc.m_z));
 
 
 	if (m_isSixdof) {
@@ -868,5 +866,32 @@ void dEffectorTreeFixPose::Evaluate(dEffectorPose& output)
 		dAssert(dst.m_effector == src.m_effector);
 		dst.m_rotation = src.m_rotation;
 		dst.m_posit = src.m_posit;
+	}
+}
+
+
+void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output)
+{
+	if (m_param < 0.001f) {
+		m_node0->Evaluate(output);
+	} else if (m_param > 0.999f) {
+		m_node1->Evaluate(output);
+	} else {
+		dEffectorPose pose;
+		pose.m_childNode = m_node1;
+		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			pose.Append(node->GetInfo());
+		}
+		m_node1->Evaluate(pose);
+		m_node0->Evaluate(output);
+		for (dEffectorPose::dListNode* srcNode = pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
+			dEffectorTransform& dst = dstNode->GetInfo();
+			const dEffectorTransform& src = srcNode->GetInfo();
+			dst.m_posit = dst.m_posit.Scale (1.0f - m_param) + src.m_posit.Scale (m_param);
+			dQuaternion srcRotation (src.m_rotation);
+			srcRotation.Scale (dSign (dst.m_rotation.DotProduct(src.m_rotation)));
+			dst.m_rotation = dst.m_rotation.Slerp(srcRotation, m_param);
+			dst.m_posit.m_w = 1.0f;
+		}
 	}
 }
