@@ -29,6 +29,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		,m_acc(0.0f)
 		,m_amplitud_y(0.2f)
 		,m_period (1.0f)
+		,cycle()
 	{
 		m_sequence[0] = 0;
 		m_sequence[3] = 0;
@@ -36,26 +37,35 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		m_sequence[1] = 1;
 		m_sequence[2] = 1;
 		m_sequence[5] = 1;
+
+		// make left walk cycle
+		dFloat64 knots[11];
+		dBigVector leftControlPoints[sizeof (knots) / sizeof (knots[0]) + 2];
+		for (int i = 0; i <= 10; i ++) {
+			knots[i] = dFloat (i) / 10.0f;
+		}
+		memset (leftControlPoints, 0, sizeof (leftControlPoints));
+
+		for (int i = 0; i <= 6; i ++) {
+			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (3.141592f * dFloat (i) / 6);
+		}
+		cycle.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, leftControlPoints);
 	}
 
 	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
 	{
 		dEffectorTreeFixPose::Evaluate(output, timestep);
+
 		m_acc = dMod (m_acc + timestep, m_period);
 
-		dFloat angle = 2.0f * 3.141592f * m_acc / m_period;
-
-		dFloat ovelapAngle = 5.0f;
-		if (angle < 3.141592f) {
-			angle = angle * (180.0f + 2.0f * ovelapAngle) / 180.0f;
-		} else {
-			angle = 3.141592f * (180.0f + 2.0f * ovelapAngle) / 180.0f + (angle - 3.141592f) * (180.0f - 2.0f * ovelapAngle) / 180.0f;
-		}
+		dFloat param = m_acc / m_period;
+		dBigVector left (cycle.CurvePoint(param));
+		dBigVector right (cycle.CurvePoint(dMod (param + 0.5f, 1.0f)));
 
 		dFloat high[2];
-		high[0] = m_amplitud_y * dClamp (dSin (angle +   0.0f * 3.141592f / 180.0f), 0.0f, 1.0f);
-		high[1] = m_amplitud_y * dClamp (dSin (angle + (180.0f + ovelapAngle) * 3.141592f / 180.0f), 0.0f, 1.0f);
-	
+		high[0] = dFloat (left.m_y);
+		high[1] = dFloat (right.m_y);
+
 		int index = 0;
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dEffectorTransform& transform = node->GetInfo();
@@ -67,6 +77,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	dFloat m_acc;
 	dFloat m_period;
 	dFloat m_amplitud_y;
+	dBezierSpline cycle;
 	int m_sequence[6]; 
 };
 
@@ -113,9 +124,6 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 	dVector m_position;
 	dEffectorTreeInterface* m_poseGenerator;
 };
-
-
-
 
 
 class dHaxapodController: public dCustomControllerBase
