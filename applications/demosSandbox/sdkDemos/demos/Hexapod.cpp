@@ -402,7 +402,7 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
-			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_pitch * 3.141592f / 180.0f, me->m_yaw * 3.141592f / 180.0f, me->m_roll * 3.141592f / 180.0f);
+			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * 3.141592f / 180.0f, me->m_yaw * 3.141592f / 180.0f, me->m_roll * 3.141592f / 180.0f);
 		}
 	}
 
