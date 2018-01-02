@@ -364,11 +364,12 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 
 	dMatrix origin(dYawMatrix(0.0f * 3.141693f));
 	dMatrix origin1(dYawMatrix(1.0f * 3.141693f));
-	origin.m_posit.m_z = -0.75f;
-	origin1.m_posit.m_z =  0.75f;
-	for (int i = 0; i < 5; i ++) {
-		origin.m_posit.m_x += i * 3.0f / 5.0f;
-		origin1.m_posit.m_x += i * 3.0f / 5.0f;
+	origin.m_posit.m_z = -1.0f;
+	origin1.m_posit.m_z =  1.0f;
+
+	for (int i = 0; i < 8; i ++) {
+		origin.m_posit.m_x += 1.0f;
+		origin1.m_posit.m_x += 1.0f;
 		robotManager->MakeKukaRobot (scene, origin);
 		robotManager->MakeKukaRobot (scene, origin1);
 	}
