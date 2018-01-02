@@ -196,7 +196,7 @@ class dEffectorTreeInterface
 	{
 	}
 
-	virtual void Evaluate(dEffectorPose& output)
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
 	{
 	}
 
@@ -216,8 +216,8 @@ class dEffectorTreeRoot: public dEffectorTreeInterface
 
 	dEffectorPose& GetPose() {return m_pose;}
 
-	CUSTOM_JOINTS_API void Update();
-	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output);
+	CUSTOM_JOINTS_API void Update(dFloat timestep);
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep);
 
 	protected:
 	dEffectorPose m_pose;
@@ -231,7 +231,7 @@ class dEffectorTreePose: public dEffectorTreeInterface
 	{
 	}
 
-	virtual void Evaluate(dEffectorPose& output)
+	void Evaluate(dEffectorPose& output, dFloat timestep)
 	{
 		dAssert(0);
 	}
@@ -249,7 +249,7 @@ class dEffectorTreeFixPose: public dEffectorTreePose
 	dEffectorPose& GetPose() {return m_pose;}
 
 	protected:
-	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output);
+	void Evaluate(dEffectorPose& output, dFloat timestep);
 	dEffectorPose m_pose;
 };
 
@@ -261,12 +261,12 @@ class dEffectorTreeTwoWayBlender: public dEffectorTreeInterface
 		:dEffectorTreeInterface(rootBody)
 		,m_node0(node0)
 		,m_node1(node1)
-		,m_param(0.0f)
+		,m_param(1.0f)
 	{
 	}
 
 	protected:
-	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output);
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep);
 
 	dEffectorTreeInterface* m_node0;
 	dEffectorTreeInterface* m_node1;

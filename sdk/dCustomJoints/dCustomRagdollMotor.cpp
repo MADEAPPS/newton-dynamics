@@ -828,9 +828,9 @@ dEffectorTreeRoot::~dEffectorTreeRoot()
 	delete m_pose.m_childNode;
 }
 
-void dEffectorTreeRoot::Update()
+void dEffectorTreeRoot::Update(dFloat timestep)
 {
-	Evaluate(m_pose);
+	Evaluate(m_pose, timestep);
 	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
 		const dEffectorTransform& src = srcNode->GetInfo();
 		dMatrix matrix(src.m_rotation, src.m_posit);
@@ -838,10 +838,10 @@ void dEffectorTreeRoot::Update()
 	}
 }
 
-void dEffectorTreeRoot::Evaluate(dEffectorPose& output)
+void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep)
 {
 	dAssert(m_pose.m_childNode);
-	m_pose.m_childNode->Evaluate(output);
+	m_pose.m_childNode->Evaluate(output, timestep);
 
 	dVector rootPosition;
 	dQuaternion rootRotation;
@@ -857,7 +857,7 @@ void dEffectorTreeRoot::Evaluate(dEffectorPose& output)
 }
 
 
-void dEffectorTreeFixPose::Evaluate(dEffectorPose& output)
+void dEffectorTreeFixPose::Evaluate(dEffectorPose& output, dFloat timestep)
 {
 	// just copy the base pose to the output frame
 	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
@@ -870,20 +870,20 @@ void dEffectorTreeFixPose::Evaluate(dEffectorPose& output)
 }
 
 
-void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output)
+void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep)
 {
 	if (m_param < 0.001f) {
-		m_node0->Evaluate(output);
+		m_node0->Evaluate(output, timestep);
 	} else if (m_param > 0.999f) {
-		m_node1->Evaluate(output);
+		m_node1->Evaluate(output, timestep);
 	} else {
 		dEffectorPose pose;
 		pose.m_childNode = m_node1;
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			pose.Append(node->GetInfo());
 		}
-		m_node1->Evaluate(pose);
-		m_node0->Evaluate(output);
+		m_node1->Evaluate(pose, timestep);
+		m_node0->Evaluate(output, timestep);
 		for (dEffectorPose::dListNode* srcNode = pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
 			dEffectorTransform& dst = dstNode->GetInfo();
 			const dEffectorTransform& src = srcNode->GetInfo();

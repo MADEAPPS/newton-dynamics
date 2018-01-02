@@ -21,6 +21,56 @@
 #include "HeightFieldPrimitive.h"
 
 
+class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
+{
+	public:
+	dEffectorWalkPoseGenerator(NewtonBody* const rootBody)
+		:dEffectorTreeFixPose(rootBody)
+		,m_acc(0.0f)
+		,m_amplitud_y(0.2f)
+		,m_period (1.0f)
+	{
+		m_sequence[0] = 0;
+		m_sequence[3] = 0;
+		m_sequence[4] = 0;
+		m_sequence[1] = 1;
+		m_sequence[2] = 1;
+		m_sequence[5] = 1;
+	}
+
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
+	{
+		dEffectorTreeFixPose::Evaluate(output, timestep);
+		m_acc = dMod (m_acc + timestep, m_period);
+
+		dFloat angle = 2.0f * 3.141592f * m_acc / m_period;
+
+		dFloat ovelapAngle = 5.0f;
+		if (angle < 3.141592f) {
+			angle = angle * (180.0f + 2.0f * ovelapAngle) / 180.0f;
+		} else {
+			angle = 3.141592f * (180.0f + 2.0f * ovelapAngle) / 180.0f + (angle - 3.141592f) * (180.0f - 2.0f * ovelapAngle) / 180.0f;
+		}
+
+		dFloat high[2];
+		high[0] = m_amplitud_y * dClamp (dSin (angle +   0.0f * 3.141592f / 180.0f), 0.0f, 1.0f);
+		high[1] = m_amplitud_y * dClamp (dSin (angle + (180.0f + ovelapAngle) * 3.141592f / 180.0f), 0.0f, 1.0f);
+	
+		int index = 0;
+		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dEffectorTransform& transform = node->GetInfo();
+			transform.m_posit.m_y += high[m_sequence[index]];
+			index ++;
+		}
+	}
+
+	dFloat m_acc;
+	dFloat m_period;
+	dFloat m_amplitud_y;
+	int m_sequence[6]; 
+};
+
+
 class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 {
 	public:
@@ -47,9 +97,9 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 		m_euler.m_z = roll;
 	}
 
-	virtual void Evaluate(dEffectorPose& output)
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
 	{
-		m_poseGenerator->Evaluate(output);
+		m_poseGenerator->Evaluate(output, timestep);
 
 		dQuaternion rotation (dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
@@ -63,6 +113,8 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 	dVector m_position;
 	dEffectorTreeInterface* m_poseGenerator;
 };
+
+
 
 
 
@@ -252,8 +304,7 @@ class dHaxapodController: public dCustomControllerBase
 		
 		// create a fix pose frame generator
 		dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(hexaBody);
-		dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorTreeFixPose(hexaBody);
-
+		dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorWalkPoseGenerator(hexaBody);
 		dEffectorTreeTwoWayBlender* const poseBlender = new dEffectorTreeTwoWayBlender (hexaBody, idlePose, walkPoseGenerator);
 
 		m_postureModifier = new dEffectorTreePostureGenerator(poseBlender);
@@ -285,7 +336,7 @@ class dHaxapodController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		m_animTreeNode->Update();
+		m_animTreeNode->Update(timestep);
 		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 

@@ -46,16 +46,14 @@ class dSixAxisController: public dCustomControllerBase
 		{
 			m_position.m_y = y;
 			m_position.m_z = z;
-
-//m_position.m_y = -0.5f;
 			m_euler.m_x = pitch;
 			m_euler.m_y = azimuth;
 			m_euler.m_z = roll;
 		}
 
-		virtual void Evaluate(dEffectorPose& output)
+		virtual void Evaluate(dEffectorPose& output, dFloat timestep)
 		{
-			m_poseGenerator->Evaluate(output);
+			m_poseGenerator->Evaluate(output, timestep);
 
 			dEffectorTransform& transform = output.GetFirst()->GetInfo();
 			dQuaternion yawRotation (m_azimuthAxis, m_euler.m_y);
@@ -420,7 +418,7 @@ class dSixAxisController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		m_animTreeNode->Update();
+		m_animTreeNode->Update(timestep);
 		if (m_kinematicSolver) {
 			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
