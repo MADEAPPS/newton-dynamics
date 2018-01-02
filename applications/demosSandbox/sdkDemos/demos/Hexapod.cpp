@@ -20,7 +20,6 @@
 #include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
-
 class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 {
 	public:
@@ -81,7 +80,6 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	int m_sequence[6]; 
 };
 
-
 class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 {
 	public:
@@ -126,6 +124,20 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 };
 
 
+class dEffectorBlendIdleWalk: public dEffectorTreeTwoWayBlender
+{
+	public:
+	dEffectorBlendIdleWalk(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1)
+		:dEffectorTreeTwoWayBlender(rootBody, node0, node1)
+	{
+	}
+
+	void SetBlendFactor (dFloat blend)
+	{
+		m_param = blend;
+	}
+};
+
 class dHaxapodController: public dCustomControllerBase
 {
 	public:
@@ -158,6 +170,8 @@ class dHaxapodController: public dCustomControllerBase
 	dHaxapodController()
 		:m_animTreeNode(NULL)
 		,m_kinematicSolver(NULL)
+		,m_walkIdleBlender(NULL)
+		,m_postureModifier(NULL)
 	{
 	}
 
@@ -313,9 +327,9 @@ class dHaxapodController: public dCustomControllerBase
 		// create a fix pose frame generator
 		dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(hexaBody);
 		dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorWalkPoseGenerator(hexaBody);
-		dEffectorTreeTwoWayBlender* const poseBlender = new dEffectorTreeTwoWayBlender (hexaBody, idlePose, walkPoseGenerator);
+		m_walkIdleBlender = new dEffectorBlendIdleWalk (hexaBody, idlePose, walkPoseGenerator);
 
-		m_postureModifier = new dEffectorTreePostureGenerator(poseBlender);
+		m_postureModifier = new dEffectorTreePostureGenerator(m_walkIdleBlender);
 		m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
 
 		dMatrix rootMatrix;
@@ -359,6 +373,7 @@ class dHaxapodController: public dCustomControllerBase
 
 	dEffectorTreeRoot* m_animTreeNode;
 	NewtonInverseDynamics* m_kinematicSolver;
+	dEffectorBlendIdleWalk* m_walkIdleBlender; // do not delete 
 	dEffectorTreePostureGenerator* m_postureModifier; // do not delete 
 };
 
@@ -400,8 +415,15 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.1f, 0.1f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.4f, 0.4f);
 
+static float xxx = 1.0f;
+ImGui::SliderFloat("blend", &xxx, 0.0f, 1.0f);
+
+
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
+
+controller->m_walkIdleBlender->SetBlendFactor (xxx);
+
 			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * 3.141592f / 180.0f, me->m_yaw * 3.141592f / 180.0f, me->m_roll * 3.141592f / 180.0f);
 		}
 	}
