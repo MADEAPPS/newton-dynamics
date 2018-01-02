@@ -276,7 +276,7 @@ void* dSoundManager::CreateSound (const char* const fileName)
 {
 	if (m_device) {
 		char path[2048];
-		GetWorkingFileName (fileName, path);
+		dGetWorkingFileName (fileName, path);
 
 		dCRCTYPE code = dCRC64 (path);
 		dSoundAssetList::dTreeNode* assetNode = m_assets.Find(code);
