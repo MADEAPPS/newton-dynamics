@@ -177,9 +177,8 @@ class dHaxapodController: public dCustomControllerBase
 
 	~dHaxapodController()
 	{
-		if (m_kinematicSolver) {
-			NewtonInverseDynamicsDestroy(m_kinematicSolver);
-		}
+		delete m_animTreeNode;
+		NewtonInverseDynamicsDestroy(m_kinematicSolver);
 	}
 
 	void SetTarget (dFloat x, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
