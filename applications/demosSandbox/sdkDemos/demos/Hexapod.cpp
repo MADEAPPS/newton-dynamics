@@ -26,8 +26,9 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	dEffectorWalkPoseGenerator(NewtonBody* const rootBody)
 		:dEffectorTreeFixPose(rootBody)
 		,m_acc(0.0f)
+		,m_amplitud_x (0.1f)
 		,m_amplitud_y(0.2f)
-		,m_period (1.0f)
+		,m_period (4.0f)
 		,cycle()
 	{
 		m_sequence[0] = 0;
@@ -38,17 +39,23 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		m_sequence[5] = 1;
 
 		// make left walk cycle
-		dFloat64 knots[11];
-		dBigVector leftControlPoints[sizeof (knots) / sizeof (knots[0]) + 2];
-		for (int i = 0; i <= 10; i ++) {
-			knots[i] = dFloat (i) / 10.0f;
+		const int size = 11;
+		dFloat64 knots[size];
+		dBigVector leftControlPoints[size + 2];
+		for (int i = 0; i < size; i ++) {
+			knots[i] = dFloat (i) / (size - 1);
 		}
 		memset (leftControlPoints, 0, sizeof (leftControlPoints));
 
-		for (int i = 0; i <= 6; i ++) {
-			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (3.141592f * dFloat (i) / 6);
+		for (int i = 0; i <= (size / 2 + 1); i ++) {
+			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (3.141592f * dFloat (i) / ((size / 2 + 1)));
 		}
-		cycle.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, leftControlPoints);
+
+		for (int i = 0; i < size; i++) {
+			leftControlPoints[i + 1].m_x = m_amplitud_x * dSin(2.0f * 3.141592f * dFloat(i) / size);
+		}
+
+		cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
 	}
 
 	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
@@ -62,19 +69,24 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		dBigVector right (cycle.CurvePoint(dMod (param + 0.5f, 1.0f)));
 
 		dFloat high[2];
+		dFloat stride[2];
 		high[0] = dFloat (left.m_y);
 		high[1] = dFloat (right.m_y);
+		stride[0] = dFloat(left.m_x);
+		stride[1] = dFloat(right.m_x);
 
 		int index = 0;
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dEffectorTransform& transform = node->GetInfo();
 			transform.m_posit.m_y += high[m_sequence[index]];
+			transform.m_posit.m_x += stride[m_sequence[index]];
 			index ++;
 		}
 	}
 
 	dFloat m_acc;
 	dFloat m_period;
+	dFloat m_amplitud_x;
 	dFloat m_amplitud_y;
 	dBezierSpline cycle;
 	int m_sequence[6]; 
