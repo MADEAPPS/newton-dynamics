@@ -28,7 +28,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		,m_acc(0.0f)
 		,m_amplitud_x (0.1f)
 		,m_amplitud_y(0.2f)
-		,m_period (4.0f)
+		,m_period (20.0f)
 		,cycle()
 	{
 		m_sequence[0] = 0;
@@ -52,7 +52,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		}
 
 		for (int i = 0; i < size; i++) {
-			leftControlPoints[i + 1].m_x = m_amplitud_x * dSin(2.0f * 3.141592f * dFloat(i) / size);
+			leftControlPoints[i + 1].m_x = 0.0f;//m_amplitud_x * dSin(2.0f * 3.141592f * dFloat(i) / size);
 		}
 
 		cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
