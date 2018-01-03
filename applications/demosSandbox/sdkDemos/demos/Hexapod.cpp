@@ -64,7 +64,8 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		leftControlPoints[0].m_x = leftControlPoints[1].m_x;
 		leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
 
-		cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
+//		cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
+		cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
 	}
 
 	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
@@ -87,9 +88,10 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 			dEffectorTransform& transform = node->GetInfo();
 			transform.m_posit.m_y += high[m_sequence[index]];
 			transform.m_posit.m_x += stride[m_sequence[index]];
+//dTrace (("%f, %f\n", stride[m_sequence[index]], high[m_sequence[index]]));
 			index ++;
+//break;
 		}
-
 		m_acc = dMod(m_acc + timestep, m_period);
 	}
 
