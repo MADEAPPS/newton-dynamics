@@ -26,9 +26,9 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	dEffectorWalkPoseGenerator(NewtonBody* const rootBody)
 		:dEffectorTreeFixPose(rootBody)
 		,m_acc(0.0f)
-		,m_amplitud_x (0.2f)
-		,m_amplitud_y(0.2f)
-		,m_period (1.0f)
+		,m_amplitud_x (0.3f)
+		,m_amplitud_y(0.1f)
+		,m_period (1.5f)
 		,cycle()
 	{
 		m_sequence[0] = 0;
