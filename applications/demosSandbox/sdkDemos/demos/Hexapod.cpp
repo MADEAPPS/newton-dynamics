@@ -26,9 +26,9 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	dEffectorWalkPoseGenerator(NewtonBody* const rootBody)
 		:dEffectorTreeFixPose(rootBody)
 		,m_acc(0.0f)
-		,m_amplitud_x (0.3f)
+		,m_amplitud_x(0.35f)
 		,m_amplitud_y(0.1f)
-		,m_period (1.5f)
+		,m_period (1.0f)
 		,cycle()
 	{
 		m_sequence[0] = 0;
@@ -89,9 +89,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 			dEffectorTransform& transform = node->GetInfo();
 			transform.m_posit.m_y += high[m_sequence[index]];
 			transform.m_posit.m_x += stride[m_sequence[index]];
-//dTrace (("%f, %f\n", stride[m_sequence[index]], high[m_sequence[index]]));
 			index ++;
-//break;
 		}
 		m_acc = dMod(m_acc + timestep, m_period);
 	}
@@ -151,8 +149,8 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 class dEffectorBlendIdleWalk: public dEffectorTreeTwoWayBlender
 {
 	public:
-	dEffectorBlendIdleWalk(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1)
-		:dEffectorTreeTwoWayBlender(rootBody, node0, node1)
+	dEffectorBlendIdleWalk(NewtonBody* const rootBody, dEffectorTreeFixPose* const node0, dEffectorTreeFixPose* const node1)
+		:dEffectorTreeTwoWayBlender(rootBody, node0, node1, node0->GetPose())
 	{
 	}
 
@@ -411,6 +409,7 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		,m_pitch(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
+		,m_speed(0.5f)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -425,29 +424,19 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Hexapod controller");
-
-		ImGui::Separator();
-//		scene->Print(color, "control mode");
-//		ImGui::RadioButton("rotate body", &xxxx, 1);
-//		ImGui::RadioButton("translate body", &xxxx, 0);
-//		ImGui::Separator();
-
 		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
 		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
 		ImGui::SliderFloat("roll", &me->m_roll, -10.0f, 10.0f);
+		ImGui::SliderFloat("speed", &me->m_speed, 0.0f, 1.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.1f, 0.1f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.4f, 0.4f);
-
-static float xxx = 1.0f;
-ImGui::SliderFloat("blend", &xxx, 0.0f, 1.0f);
-
+		//ImGui::SliderFloat("turn", &me->m_speed, 0.0f, 1.0f);
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
 
-controller->m_walkIdleBlender->SetBlendFactor (xxx);
-
-			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * 3.141592f / 180.0f, me->m_yaw * 3.141592f / 180.0f, me->m_roll * 3.141592f / 180.0f);
+			controller->m_walkIdleBlender->SetBlendFactor (me->m_speed);
+			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * 3.141592f / 180.0f, me->m_yaw * 3.141592f / 180.0f, -me->m_roll * 3.141592f / 180.0f);
 		}
 	}
 
@@ -478,6 +467,7 @@ controller->m_walkIdleBlender->SetBlendFactor (xxx);
 	dFloat32 m_pitch;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
+	dFloat32 m_speed;
 };
 
 
@@ -490,7 +480,16 @@ void Hexapod(DemoEntityManager* const scene)
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_y = 1.0f;
-	robotManager->MakeHexapod (scene, location);
+//	robotManager->MakeHexapod (scene, location);
+
+	dMatrix location1(location);
+	location1.m_posit.m_z += 2.0f;
+	for (int i = 0; i < 5; i++) {
+		location.m_posit.m_x += 2.0f;
+		location1.m_posit.m_x += 2.0f;
+		robotManager->MakeHexapod (scene, location);
+		robotManager->MakeHexapod (scene, location1);
+	}
 
 	dVector origin(0.0f);
 	origin.m_x = -4.0f;

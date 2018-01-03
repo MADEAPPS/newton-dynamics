@@ -870,6 +870,22 @@ void dEffectorTreeFixPose::Evaluate(dEffectorPose& output, dFloat timestep)
 }
 
 
+dEffectorTreeTwoWayBlender::dEffectorTreeTwoWayBlender(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1, dEffectorPose& output)
+	:dEffectorTreeInterface(rootBody)
+	,m_node0(node0)
+	,m_node1(node1)
+	,m_pose1()
+	,m_param(1.0f)
+{
+	m_pose1.m_childNode = m_node1;
+	if (m_pose1.GetCount() != output.GetCount()) {
+		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			m_pose1.Append(node->GetInfo());
+		}
+	}
+}
+
+
 void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep)
 {
 	if (m_param < 0.001f) {
@@ -877,14 +893,21 @@ void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep
 	} else if (m_param > 0.999f) {
 		m_node1->Evaluate(output, timestep);
 	} else {
-		dEffectorPose pose;
-		pose.m_childNode = m_node1;
-		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-			pose.Append(node->GetInfo());
+		
+		m_pose1.m_childNode = m_node1;
+		if (m_pose1.GetCount() != output.GetCount()) {
+			NEWTON_API void NewtonWorldCriticalSectionLock(const NewtonWorld* const newtonWorld, int threadIndex);
+			NEWTON_API void NewtonWorldCriticalSectionUnlock(const NewtonWorld* const newtonWorld);
+
+
+			m_pose1.RemoveAll();
+			for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+				m_pose1.Append(node->GetInfo());
+			}
 		}
-		m_node1->Evaluate(pose, timestep);
+		m_node1->Evaluate(m_pose1, timestep);
 		m_node0->Evaluate(output, timestep);
-		for (dEffectorPose::dListNode* srcNode = pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
+		for (dEffectorPose::dListNode* srcNode = m_pose1.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
 			dEffectorTransform& dst = dstNode->GetInfo();
 			const dEffectorTransform& src = srcNode->GetInfo();
 			dst.m_posit = dst.m_posit.Scale (1.0f - m_param) + src.m_posit.Scale (m_param);
