@@ -40,24 +40,25 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 
 		// make left walk cycle
 		const int size = 11;
+		const int splite = (size - 1) / 2 - 1;
 		dFloat64 knots[size];
 		dBigVector leftControlPoints[size + 2];
 		for (int i = 0; i < size; i ++) {
 			knots[i] = dFloat (i) / (size - 1);
 		}
 		memset (leftControlPoints, 0, sizeof (leftControlPoints));
-
+		
 		dFloat x = -m_amplitud_x / 2.0f;
-		dFloat step_x = m_amplitud_x / (size / 2 + 1);
-		for (int i = 0; i <= (size / 2 + 1); i ++) {
-			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (3.141592f * dFloat (i) / ((size / 2 + 1)));
+		dFloat step_x = m_amplitud_x / splite;
+		for (int i = 0; i <= splite; i ++) {
+			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (3.141592f * dFloat (i) / splite);
 			leftControlPoints[i + 1].m_x = x;
 			x += step_x;
 		}
 
 		x = m_amplitud_x / 2.0f;
-		step_x = -m_amplitud_x / (size - (size / 2 + 1) - 1);
-		for (int i = size / 2 + 1; i < size; i++) {
+		step_x = -m_amplitud_x / (size - splite - 1);
+		for (int i = splite; i < size; i++) {
 			leftControlPoints[i + 1].m_x = x;
 			x += step_x;
 		}
