@@ -26,9 +26,9 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	dEffectorWalkPoseGenerator(NewtonBody* const rootBody)
 		:dEffectorTreeFixPose(rootBody)
 		,m_acc(0.0f)
-		,m_amplitud_x (0.1f)
+		,m_amplitud_x (0.2f)
 		,m_amplitud_y(0.2f)
-		,m_period (10.0f)
+		,m_period (1.0f)
 		,cycle()
 	{
 		m_sequence[0] = 0;
@@ -56,11 +56,13 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		}
 
 		x = m_amplitud_x / 2.0f;
-		step_x = -m_amplitud_x / (size - (size / 2 + 1));
+		step_x = -m_amplitud_x / (size - (size / 2 + 1) - 1);
 		for (int i = size / 2 + 1; i < size; i++) {
 			leftControlPoints[i + 1].m_x = x;
 			x += step_x;
 		}
+		leftControlPoints[0].m_x = leftControlPoints[1].m_x;
+		leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
 
 		cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
 	}
@@ -68,8 +70,6 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
 	{
 		dEffectorTreeFixPose::Evaluate(output, timestep);
-
-		m_acc = dMod (m_acc + timestep, m_period);
 
 		dFloat param = m_acc / m_period;
 		dBigVector left (cycle.CurvePoint(param));
@@ -89,6 +89,8 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 			transform.m_posit.m_x += stride[m_sequence[index]];
 			index ++;
 		}
+
+		m_acc = dMod(m_acc + timestep, m_period);
 	}
 
 	dFloat m_acc;
