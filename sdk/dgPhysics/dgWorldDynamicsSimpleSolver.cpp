@@ -42,15 +42,13 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 	}
 
 	dgWorld* const world = (dgWorld*) this;
-//	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
-//	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
+	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
+	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 //	dgContact* const contact = (dgContact*) constraintArray[0].m_joint;
 
 	if (!cluster->m_isContinueCollision) {
-		if ((activeJoint == 1) && (cluster->m_jointCount == 1)) {
-//		if ((activeJoint == 1) && (cluster->m_jointCount == 1) && (constraintArray[0].m_joint->GetId() == dgConstraint::m_contactConstraint)) {
-			// later special case single joints using exact solve, 
-			// for now use same solver
+		//if ((activeJoint == 1) && (cluster->m_jointCount == 1)) {
+		if ((activeJoint == 1) && (cluster->m_jointCount == 1) && (constraintArray[0].m_joint->GetId() == dgConstraint::m_contactConstraint)) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			CalculateSingleClusterReactionForces(cluster, threadID, timestep);
 			//CalculateClusterReactionForces(cluster, threadID, timestep);

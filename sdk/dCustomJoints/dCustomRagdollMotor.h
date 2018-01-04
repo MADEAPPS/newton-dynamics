@@ -40,8 +40,8 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
-	dFloat m_torque;
-
+	dFloat m_motorTorque;
+	bool m_motorMode;
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor, dCustomBallAndSocket)
 };
 
