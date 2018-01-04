@@ -74,6 +74,18 @@ dFloat dCustomRagdollMotor::GetJointTorque() const
 	return m_motorTorque;
 }
 
+void dCustomRagdollMotor::DisableMotor()
+{
+	m_motorMode = false;
+}
+
+void dCustomRagdollMotor::EnableMotor()
+{
+	m_motorMode = true;
+}
+
+
+
 void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
@@ -525,7 +537,6 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 	dFloat dot = coneDir0.DotProduct3(coneDir1);
-
 
 	dFloat correctionFactor = 0.3f;
 	dFloat invTimestep = 1.0f / timestep;
