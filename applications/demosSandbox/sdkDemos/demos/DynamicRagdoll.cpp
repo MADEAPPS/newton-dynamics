@@ -271,8 +271,8 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	//CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	// load a skeleton mesh for using as a ragdoll manager
-	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
-	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
+//	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
+//	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 //	ragDollModel.LoadNGD_mesh ("gymnast.ngd", scene->GetNewton());
 
 	//  create a skeletal transform controller for controlling rag doll

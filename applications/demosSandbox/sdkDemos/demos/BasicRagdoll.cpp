@@ -311,7 +311,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
 		// for debugging
-NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddBone (rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -364,7 +364,7 @@ NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
 
 		//xxx
-		//PrintRagdoll (controller, "balancingGait.txt");
+		PrintRagdoll (controller, "balancingGait.txt");
 	}
 
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
