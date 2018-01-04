@@ -283,10 +283,11 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 			case three_dof:
 			{
-				dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
+				//dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
+				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
 				joint->DisableMotor();
 				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
-				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
 				break;
 			}
 		}
@@ -479,12 +480,12 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 		limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_L_Thigh");
-		limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-		limb->ResetMatrix(*scene, limbMatrix);
+		//limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		//limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_R_Thigh");
-		limbMatrix = dPitchMatrix(-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-		limb->ResetMatrix(*scene, limbMatrix);
+		//limbMatrix = dPitchMatrix(-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		//limb->ResetMatrix(*scene, limbMatrix);
 	}
 
 
