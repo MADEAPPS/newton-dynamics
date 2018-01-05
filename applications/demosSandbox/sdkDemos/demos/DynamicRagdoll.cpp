@@ -303,7 +303,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 */
 
-	origin.m_x = -5.0f;
+	origin.m_x = -6.0f;
 //	origin.m_x -= 2.0f;
 	origin.m_y  = 0.5f;
 	dQuaternion rot;
