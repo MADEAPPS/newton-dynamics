@@ -181,9 +181,9 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	CalculateGlobalMatrix(matrix0, matrix1);
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
+	CalculateGlobalMatrix(matrix0, matrix1);
 	// two rows to restrict rotation around around the parent coordinate system
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
@@ -203,7 +203,17 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 		}
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 	} else if (m_motorMode) {
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		dVector relOmega(omega1 - omega0);
+		dFloat invTimestep = 0.5f / timestep;
+
+		dFloat accel = relOmega.DotProduct3(matrix1.m_front) * invTimestep;
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		//NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowAsInverseDynamics(m_joint);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
@@ -295,13 +305,10 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	}
 }
 
-
 void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -358,16 +365,15 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		
 		dVector sideDir(swingAxis.CrossProduct(coneDir0));
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-//		if (m_motorMode) 
-		{
+		if (m_motorMode) {
 			NewtonUserJointSetRowAsInverseDynamics(m_joint);
 		}
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
-//	} else if (m_motorMode) {
-	} else {
-
+	} else if (m_motorMode) {
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
 		NewtonBodyGetOmega(m_body0, &omega0[0]);
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 		dVector relOmega(omega1 - omega0);
