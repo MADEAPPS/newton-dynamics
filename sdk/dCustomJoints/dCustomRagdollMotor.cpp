@@ -324,34 +324,33 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
 	}
 
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
-
-	dVector relOmega(omega1 - omega0);
-
 	dFloat coneAngle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
 	dFloat angle = coneAngle - m_coneAngle;
 	if (angle > 0.0f) {
-		dFloat correctionFactor = 0.3f;
-		dFloat invTimestep = 1.0f / timestep;
-
+		// check if the cone violates the limit
 		dVector swingAxis(coneDir0.CrossProduct(coneDir1));
 		dAssert(swingAxis.DotProduct3(swingAxis) > 0.0f);
 		swingAxis = swingAxis.Scale(1.0f / dSqrt(swingAxis.DotProduct3(swingAxis)));
 		NewtonUserJointAddAngularRow(m_joint, angle, &swingAxis[0]);
-		dFloat accel = (correctionFactor * angle * invTimestep + relOmega.DotProduct3(swingAxis)) * invTimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
-		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		
+		//NewtonBodyGetOmega(m_body0, &omega0[0]);
+		//NewtonBodyGetOmega(m_body1, &omega1[0]);
+		//dVector relOmega(omega1 - omega0);
+		//dFloat correctionFactor = 0.3f;
+		//dFloat invTimestep = 1.0f / timestep;
+		//dFloat accel = (correctionFactor * angle * invTimestep + relOmega.DotProduct3(swingAxis)) * invTimestep;
+		//NewtonUserJointSetRowAcceleration(m_joint, accel);
 		if (m_motorMode) {
 			NewtonUserJointSetRowAsInverseDynamics(m_joint);
-
-			dVector sideDir(swingAxis.CrossProduct(coneDir0));
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-			NewtonUserJointSetRowAsInverseDynamics(m_joint);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		
+		dVector sideDir(swingAxis.CrossProduct(coneDir0));
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
+		if (m_motorMode) {
+			NewtonUserJointSetRowAsInverseDynamics(m_joint);
+		}
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 	} else if (m_motorMode) {
 		if (coneAngle > 1.0f * 3.141592f / 180.0f) {

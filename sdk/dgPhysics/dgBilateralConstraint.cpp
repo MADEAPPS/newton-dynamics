@@ -49,7 +49,6 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	SetStiffness (dgFloat32 (1.0f));
 
 	memset (m_jointForce, 0, sizeof (m_jointForce));
-	//memset (m_rowIsMotor, 0, sizeof (m_rowIsMotor));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
 	memset (m_inverseDynamicsAcceleration, 0, sizeof (m_inverseDynamicsAcceleration));
 }
@@ -61,6 +60,11 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 	}
 }
 
+void dgBilateralConstraint::ResetMotors()
+{
+	m_rowIsIk = 0;
+	m_rowIsMotor = 0;
+}
 
 dgInt32 dgBilateralConstraint::GetSolverModel() const
 {

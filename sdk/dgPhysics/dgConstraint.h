@@ -78,7 +78,6 @@ class dgBilateralBounds
 	dgFloat32 m_low;
 	dgFloat32 m_upper;
 	dgInt32 m_normalIndex;
-//	dgInt16 m_isIkRow;
 };
 
 DG_MSC_VECTOR_ALIGMENT
@@ -197,16 +196,15 @@ class dgConstraint
 	protected:
 	dgConstraint();
 	virtual ~dgConstraint();
+
+	virtual void ResetMotors() = 0;
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params) = 0; 
-
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params) = 0; 
-
 
 	void SetUpdateFeedbackFunction (ConstraintsForceFeeback function);
 	void InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const;
-
-	
 	void InitInfo (dgConstraintInfo* const info) const;
+	
 
 	void* m_userData;
 	dgBody* m_body0;
