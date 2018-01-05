@@ -220,27 +220,33 @@ dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFra
 
 void dCustomRagdollMotor_2dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	m_coneAngle = 0.0f;
+	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 }
 
 void dCustomRagdollMotor_2dof::Load(dCustomJointSaveLoad* const fileLoader)
 {
-	const char* token = fileLoader->NextToken();
-	token;
+	const char* token;
+	token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "coneAngle:"));
 	m_coneAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "coneAligment:"));
+	m_limitAligment = fileLoader->LoadMatrix();
 }
 
 void dCustomRagdollMotor_2dof::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dCustomRagdollMotor::Save(fileSaver);
 	fileSaver->SaveFloat ("\tconeAngle", m_coneAngle * 180.0f / 3.141592f);
+	fileSaver->SaveMatrix("\tconeAligment", m_limitAligment);
 }
 
 void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomRagdollMotor::Serialize(callback, userData);
+	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 }
 
@@ -400,6 +406,7 @@ dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFra
 
 void dCustomRagdollMotor_3dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
+	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
@@ -411,6 +418,10 @@ void dCustomRagdollMotor_3dof::Load(dCustomJointSaveLoad* const fileLoader)
 	const char* token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "coneAngle:"));
 	m_coneAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
+
+	token = fileLoader->NextToken();
+	dAssert(!strcmp(token, "coneAligment:"));
+	m_limitAligment = fileLoader->LoadMatrix();
 
 	token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "minTwistAngle:"));
@@ -425,6 +436,7 @@ void dCustomRagdollMotor_3dof::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dCustomRagdollMotor::Save(fileSaver);
 	fileSaver->SaveFloat ("\tconeAngle", m_coneAngle * 180.0f / 3.141592f);
+	fileSaver->SaveMatrix("\tconeAligment", m_limitAligment);
 	fileSaver->SaveFloat ("\tminTwistAngle", m_minTwistAngle * 180.0f / 3.141592f);
 	fileSaver->SaveFloat ("\tmaxTwistAngle", m_maxTwistAngle * 180.0f / 3.141592f);
 }
@@ -432,6 +444,7 @@ void dCustomRagdollMotor_3dof::Save(dCustomJointSaveLoad* const fileSaver) const
 void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomRagdollMotor::Serialize(callback, userData);
+	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
