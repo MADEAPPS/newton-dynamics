@@ -197,7 +197,7 @@ class dgConstraint
 	dgConstraint();
 	virtual ~dgConstraint();
 
-	virtual void ResetMotors() = 0;
+	virtual void ResetInverseDynamics() = 0;
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params) = 0; 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params) = 0; 
 

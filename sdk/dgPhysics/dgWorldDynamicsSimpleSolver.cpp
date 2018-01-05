@@ -44,7 +44,6 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 	dgWorld* const world = (dgWorld*) this;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
-//	dgContact* const contact = (dgContact*) constraintArray[0].m_joint;
 
 	if (!cluster->m_isContinueCollision) {
 		//if ((activeJoint == 1) && (cluster->m_jointCount == 1)) {
@@ -59,7 +58,6 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 			IntegrateExternalForce(cluster, timestep, threadID);
 		} else {
 			dgAssert((activeJoint == 0) && cluster->m_jointCount);
-			dgWorld* const world = (dgWorld*) this;
 			dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
 			dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 			dgVector zero(dgVector::m_zero);
@@ -195,8 +193,8 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 			// island is not sleeping, need to integrate island velocity
 			const dgUnsigned32 lru = world->GetBroadPhase()->m_lru;
 			const dgInt32 jointCount = cluster->m_jointCount;
-			dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
-			dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
+			//dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
+			//dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
 			dgFloat32 timeRemaining = timestep;
 			const dgFloat32 timeTol = dgFloat32 (0.01f) * timestep;

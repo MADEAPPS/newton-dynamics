@@ -60,10 +60,9 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 	}
 }
 
-void dgBilateralConstraint::ResetMotors()
+void dgBilateralConstraint::ResetInverseDynamics()
 {
 	m_rowIsIk = 0;
-	m_rowIsMotor = 0;
 }
 
 dgInt32 dgBilateralConstraint::GetSolverModel() const
