@@ -56,6 +56,8 @@ struct dPasiveRagDollDefinition
 	dFloat m_framePitch;
 	dFloat m_frameYaw;
 	dFloat m_frameRoll;
+
+	dFloat m_coneAligment;
 };
 
 
@@ -63,12 +65,12 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
 	{"Bip01_Pelvis",	 "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,  0.0f,    0.0f,   0.0f}, 
 
-	{"Bip01_L_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f},
-	{"Bip01_L_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f,  10.0f,     0.0f,  90.0f,    0.0f,  90.0f}, 
+	{"Bip01_L_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f, -40.0f},
+//	{"Bip01_L_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f,  10.0f,     0.0f,  90.0f,    0.0f,  90.0f}, 
 //	{"Bip01_L_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     75.0f,	 0.0f,  -90.0f,  -0.0f}, 
 
-	{"Bip01_R_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f},
-	{"Bip01_R_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f, 10.0f,     0.0f,   90.0f,   0.0f,   90.0f}, 
+	{"Bip01_R_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f, 40.0f},
+//	{"Bip01_R_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f, 10.0f,     0.0f,   90.0f,   0.0f,   90.0f}, 
 //	{"Bip01_R_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     75.0f,	 0.0f,  -90.0f,  -0.0f}, 
 
 //	{"Bip01_Spine",		 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,    30.0f,  -30.0f,  30.0f,		0.0f, -90.0f, 0.0f,	   0.0f, -90.0f, 0.0f}, 
@@ -287,6 +289,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
 				joint->DisableMotor();
 				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+				joint->SetConeAligmentMatrix (dRollMatrix(definition.m_coneAligment * 3.141592f / 180.0f));
 				//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
 				break;
 			}
@@ -312,7 +315,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
 		// for debugging
-//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddBone (rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -365,7 +368,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
 
 		//xxx
-		PrintRagdoll (controller, "balancingGait.txt");
+		//PrintRagdoll (controller, "balancingGait.txt");
 	}
 
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)

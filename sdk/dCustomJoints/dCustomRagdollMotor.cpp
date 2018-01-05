@@ -213,6 +213,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	,m_limitAligment(dGetIdentityMatrix())
 	,m_coneAngle(30.0f * 3.141592f / 180.0f)
 {
 }
@@ -243,6 +244,11 @@ void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void*
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 }
 
+void dCustomRagdollMotor_2dof::SetConeAligmentMatrix(const dMatrix& matrix)
+{
+	m_limitAligment = matrix;
+}
+
 void dCustomRagdollMotor_2dof::SetConeAngle(dFloat angle)
 {
 	m_coneAngle = dMin(dAbs(angle), dFloat(150.0f * 3.141582f / 180.0f));
@@ -252,7 +258,6 @@ dFloat dCustomRagdollMotor_2dof::GetConeAngle() const
 {
 	return m_coneAngle;
 }
-
 
 void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 {
@@ -272,7 +277,8 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	dVector arch[subdiv + 1];
 	debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
-		dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
+		dVector conePoint(m_limitAligment.RotateVector(dPitchMatrix(angle0).RotateVector(point)));
+		dVector p(matrix1.TransformVector(conePoint));
 		arch[i] = p;
 		debugDisplay->DrawLine(matrix1.m_posit, p);
 		angle0 += angleStep;
@@ -385,6 +391,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 
 dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	,m_limitAligment(dGetIdentityMatrix())
 	,m_coneAngle(30.0f * 3.141592f / 180.0f)
 	,m_minTwistAngle(-30.0f * 3.141592f / 180.0f)
 	,m_maxTwistAngle(30.0f * 3.141592f / 180.0f)
@@ -452,6 +459,11 @@ dFloat dCustomRagdollMotor_3dof::GetConeAngle() const
 	return m_coneAngle;
 }
 
+void dCustomRagdollMotor_3dof::SetConeAligmentMatrix(const dMatrix& matrix)
+{
+	m_limitAligment = matrix;
+}
+
 
 void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 {
@@ -471,7 +483,9 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 	dVector arch[subdiv + 1];
 	debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
-		dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
+		//dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
+		dVector conePoint(m_limitAligment.RotateVector(dPitchMatrix(angle0).RotateVector(point)));
+		dVector p(matrix1.TransformVector(conePoint));
 		arch[i] = p;
 		debugDisplay->DrawLine(matrix1.m_posit, p);
 		angle0 += angleStep;

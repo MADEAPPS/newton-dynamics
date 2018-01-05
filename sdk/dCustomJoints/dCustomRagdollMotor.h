@@ -78,11 +78,11 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 	public:
 	CUSTOM_JOINTS_API dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
 
-	CUSTOM_JOINTS_API void SetConeAngle(dFloat angle);
 	CUSTOM_JOINTS_API dFloat GetConeAngle() const;
+	CUSTOM_JOINTS_API void SetConeAngle(dFloat angle);
+	CUSTOM_JOINTS_API void SetConeAligmentMatrix(const dMatrix& matrix);
 
 	protected:
-	//CUSTOM_JOINTS_API dCustomRagdollMotor_2dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
@@ -92,6 +92,7 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
+	dMatrix m_limitAligment;
 	dFloat m_coneAngle;
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_2dof, dCustomRagdollMotor)
 };
@@ -108,6 +109,8 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
 	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
 
+	CUSTOM_JOINTS_API void SetConeAligmentMatrix(const dMatrix& matrix);
+
 	protected:
 	//CUSTOM_JOINTS_API dCustomRagdollMotor_3dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
@@ -119,6 +122,7 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
+	dMatrix m_limitAligment;
 	dFloat m_coneAngle;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
