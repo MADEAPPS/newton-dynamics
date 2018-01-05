@@ -205,7 +205,6 @@ class dgConstraint
 	void InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const;
 	void InitInfo (dgConstraintInfo* const info) const;
 	
-
 	void* m_userData;
 	dgBody* m_body0;
 	dgBody* m_body1;
