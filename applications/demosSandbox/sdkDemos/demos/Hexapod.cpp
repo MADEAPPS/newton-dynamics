@@ -475,11 +475,18 @@ void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	//CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.3f, 200.0f, -50.0f);
 	dHexapodManager* const robotManager = new dHexapodManager(scene);
 
+	NewtonWorld* const world = scene->GetNewton();
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
+	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
+
 	dMatrix location (dGetIdentityMatrix());
-	location.m_posit.m_y = 1.0f;
+	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	location.m_posit.m_y += 1.0f;
 //	robotManager->MakeHexapod (scene, location);
 
 	dMatrix location1(location);
@@ -491,9 +498,10 @@ void Hexapod(DemoEntityManager* const scene)
 		robotManager->MakeHexapod (scene, location1);
 	}
 
-	dVector origin(0.0f);
-	origin.m_x = -4.0f;
-	origin.m_y  = 1.5f;
+	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	origin.m_y  += 2.5f;
+	
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }

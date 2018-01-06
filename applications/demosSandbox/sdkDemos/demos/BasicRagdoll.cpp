@@ -63,30 +63,30 @@ struct dPasiveRagDollDefinition
 
 static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
-	{"Bip01_Pelvis",	 "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,  0.0f,    0.0f,   0.0f}, 
+	{"Bip01_Pelvis",	 "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,  0.0f,    0.0f,   0.0f, 0.0f}, 
 
 	{"Bip01_L_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f, -40.0f},
-	{"Bip01_L_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f,  10.0f,     0.0f,  90.0f,    0.0f,  90.0f}, 
-	{"Bip01_L_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     75.0f,	 0.0f,  -90.0f,  -0.0f}, 
+	{"Bip01_L_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f,  10.0f,     0.0f,  90.0f,    0.0f,  90.0f, 0.0f },
+	{"Bip01_L_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     75.0f,	 0.0f,  -90.0f,  -0.0f, 0.0f },
 
 	{"Bip01_R_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f, 40.0f},
-	{"Bip01_R_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f, 10.0f,     0.0f,   90.0f,   0.0f,   90.0f}, 
-	{"Bip01_R_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     75.0f,	 0.0f,  -90.0f,  -0.0f}, 
+	{"Bip01_R_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f, 10.0f,     0.0f,   90.0f,   0.0f,   90.0f, 0.0f },
+	{"Bip01_R_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     75.0f,	 0.0f,  -90.0f,  -0.0f, 0.0f },
 
-	{"Bip01_Spine",		 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,    30.0f,  -30.0f,  30.0f,	0.0f, -90.0f, 0.0f},
-	{"Bip01_Spine1",	 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f,  20.0f,    30.0f,  -30.0f,  30.0f,	0.0f, -90.0f, 0.0f},
-	{"Bip01_Spine2",	 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f,  20.0f,    30.0f,  -30.0f,  30.0f,	0.0f, -90.0f, 0.0f},
+	{"Bip01_Spine",		 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,    30.0f,  -30.0f,  30.0f,	0.0f, -90.0f, 0.0f, 0.0f },
+	{"Bip01_Spine1",	 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f,  20.0f,    30.0f,  -30.0f,  30.0f,	0.0f, -90.0f, 0.0f, 0.0f },
+	{"Bip01_Spine2",	 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f,  20.0f,    30.0f,  -30.0f,  30.0f,	0.0f, -90.0f, 0.0f, 0.0f },
 
-//	{"Bip01_Neck",		 "capsule", three_dof,   0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f,  5.0f,		30.0f,  -30.0f,  30.0f,		0.0f, -90.0f, 0.0f,	   0.0f, -90.0f, 0.0f},
-//	{"Bip01_Head",		 "sphere",  three_dof,   0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f,   5.0f,		30.0f,  -60.0f,  60.0f,		0.0f, -90.0f, 0.0f,	   0.0f, -90.0f, 0.0f},
+	{"Bip01_Neck",		 "capsule", two_dof,	 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f,  5.0f,		30.0f,  -30.0f,  30.0f,		0.0f, -90.0f, 0.0f, 0.0f },
+	{"Bip01_Head",		 "sphere",  three_dof,   0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f,   5.0f,		30.0f,  -60.0f,  60.0f,		0.0f, -90.0f, 0.0f, 0.0f },
 
-	{"Bip01_L_UpperArm", "capsule", three_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		80.0f,  30.0f,   30.0f,		0.0f, -90.0f,  0.0f},
-	{"Bip01_L_Forearm",  "capsule", one_dof,    0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,		  0.0f,  0.0f,	150.0f,		0.0f,   0.0f, 90.0f},
-	{"Bip01_L_Hand",  "convexhull", two_dof,    0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		0.0f,  -45.0f,  45.0f,		0.0f,   0.0f, 90.0f},
+	{"Bip01_L_UpperArm", "capsule", three_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		80.0f,  30.0f,   30.0f,		0.0f, -90.0f,  0.0f, 0.0f },
+	{"Bip01_L_Forearm",  "capsule", one_dof,    0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,		  0.0f,  0.0f,	150.0f,		0.0f,   0.0f, 90.0f, 0.0f },
+	{"Bip01_L_Hand",  "convexhull", two_dof,    0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		0.0f,  -45.0f,  45.0f,		0.0f,   0.0f, 90.0f, 0.0f },
 
-	{"Bip01_R_UpperArm", "capsule", three_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		  80.0f, 30.0f,  30.0f,		0.0f, -90.0f,  0.0f},
-	{"Bip01_R_Forearm",  "capsule", one_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,		  0.0f, -150.0f,  0.0f,		0.0f,   0.0f,-90.0f},
-	{"Bip01_R_Hand",  "convexhull", two_dof,	0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,   0.0f,-90.0f},
+	{"Bip01_R_UpperArm", "capsule", three_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		  80.0f, 30.0f,  30.0f,		0.0f, -90.0f,  0.0f, 0.0f },
+	{"Bip01_R_Forearm",  "capsule", one_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,		  0.0f, -150.0f,  0.0f,		0.0f,   0.0f,-90.0f, 0.0f },
+	{"Bip01_R_Hand",  "convexhull", two_dof,	0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,   0.0f,-90.0f, 0.0f },
 };
 
 
