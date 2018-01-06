@@ -89,7 +89,6 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 	{"Bip01_R_Hand",  "convexhull", two_dof,	0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,     0.0f,-90.0f,   0.0f,  10.0f },
 };
 
-
 class PassiveRagdollManager: public dCustomArticulaledTransformManager
 {
 	public: 
@@ -369,7 +368,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
 
 		//xxx
-		//PrintRagdoll (controller, "balancingGait.txt");
+//		PrintRagdoll (controller, "balancingGait.txt");
 	}
 
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
@@ -503,7 +502,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
 //	int count = 10;
-	int count = 4;
+	int count = 5;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));

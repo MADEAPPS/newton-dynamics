@@ -249,7 +249,7 @@ void dCustomRagdollMotor_2dof::Load(dCustomJointSaveLoad* const fileLoader)
 	m_coneAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
 
 	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "coneAngleOffset"));
+	dAssert(!strcmp(token, "coneAngleOffset:"));
 	m_coneAngleOffset = fileLoader->LoadFloat() * 3.141592f / 180.0f;
 }
 

@@ -63,8 +63,8 @@
 //#define DEFAULT_SCENE	29			// six axis manipulator
 //#define DEFAULT_SCENE	30			// hexapod Robot
 //#define DEFAULT_SCENE	31			// articulated joints
-#define DEFAULT_SCENE	32			// basic rag doll
-//#define DEFAULT_SCENE	33			// dynamics rag doll
+//#define DEFAULT_SCENE	32			// basic rag doll
+#define DEFAULT_SCENE	33			// dynamics rag doll
 //#define DEFAULT_SCENE	34			// basic Car
 //#define DEFAULT_SCENE	35			// super Car
 //#define DEFAULT_SCENE	36			// heavy vehicles
@@ -239,7 +239,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_workerThreades = 1;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
-//	m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
