@@ -487,8 +487,10 @@ void Hexapod(DemoEntityManager* const scene)
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	location.m_posit.m_y += 1.0f;
-//	robotManager->MakeHexapod (scene, location);
 
+#if 1
+	robotManager->MakeHexapod (scene, location);
+#else
 	dMatrix location1(location);
 	location1.m_posit.m_z += 2.0f;
 	for (int i = 0; i < 5; i++) {
@@ -497,6 +499,7 @@ void Hexapod(DemoEntityManager* const scene)
 		robotManager->MakeHexapod (scene, location);
 		robotManager->MakeHexapod (scene, location1);
 	}
+#endif
 
 	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));

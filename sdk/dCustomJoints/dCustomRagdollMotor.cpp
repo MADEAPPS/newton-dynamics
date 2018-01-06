@@ -183,8 +183,8 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
-	CalculateGlobalMatrix(matrix0, matrix1);
 	// two rows to restrict rotation around around the parent coordinate system
+	CalculateGlobalMatrix(matrix0, matrix1);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 	dFloat angle = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix1.m_front);
@@ -213,7 +213,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 		dFloat accel = relOmega.DotProduct3(matrix1.m_front) * invTimestep;
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-		//NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowAsInverseDynamics(m_joint);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
@@ -223,14 +223,21 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
-	,m_limitAligment(dGetIdentityMatrix())
 	,m_coneAngle(30.0f * 3.141592f / 180.0f)
+	,m_coneAngleOffset(0.0f)
 {
 }
 
 void dCustomRagdollMotor_2dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
+	callback(userData, &m_coneAngleOffset, sizeof(m_coneAngleOffset));
+	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
+}
+
+void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomRagdollMotor::Serialize(callback, userData);
+	callback(userData, &m_coneAngleOffset, sizeof(m_coneAngleOffset));
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 }
 
@@ -242,27 +249,20 @@ void dCustomRagdollMotor_2dof::Load(dCustomJointSaveLoad* const fileLoader)
 	m_coneAngle = fileLoader->LoadFloat() * 3.141592f / 180.0f;
 
 	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "coneAligment:"));
-	m_limitAligment = fileLoader->LoadMatrix();
+	dAssert(!strcmp(token, "coneAngleOffset"));
+	m_coneAngleOffset = fileLoader->LoadFloat() * 3.141592f / 180.0f;
 }
 
 void dCustomRagdollMotor_2dof::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dCustomRagdollMotor::Save(fileSaver);
 	fileSaver->SaveFloat ("\tconeAngle", m_coneAngle * 180.0f / 3.141592f);
-	fileSaver->SaveMatrix("\tconeAligment", m_limitAligment);
+	fileSaver->SaveFloat("\tconeAngleOffset", m_coneAngleOffset * 180.0f / 3.141592f);
 }
 
-void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
+void dCustomRagdollMotor_2dof::SetConeAngleOffset(dFloat angle)
 {
-	dCustomRagdollMotor::Serialize(callback, userData);
-	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
-	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
-}
-
-void dCustomRagdollMotor_2dof::SetConeAligmentMatrix(const dMatrix& matrix)
-{
-	m_limitAligment = matrix;
+	m_coneAngleOffset = angle;
 }
 
 void dCustomRagdollMotor_2dof::SetConeAngle(dFloat angle)
@@ -290,10 +290,11 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	dFloat angleStep = 3.141692f * 2.0f / subdiv;
 	dFloat angle0 = 0.0f;
 
+	dMatrix limitAligment (dRollMatrix(m_coneAngleOffset));
 	dVector arch[subdiv + 1];
 	debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
-		dVector conePoint(m_limitAligment.RotateVector(dPitchMatrix(angle0).RotateVector(point)));
+		dVector conePoint(limitAligment.RotateVector(dPitchMatrix(angle0).RotateVector(point)));
 		dVector p(matrix1.TransformVector(conePoint));
 		arch[i] = p;
 		debugDisplay->DrawLine(matrix1.m_posit, p);
@@ -312,9 +313,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
-	dFloat dot = coneDir0.DotProduct3(coneDir1);
+	matrix0 = dRollMatrix(-m_coneAngleOffset) * matrix0;
 
 	// do the twist
 	dQuaternion quat0(matrix0);
@@ -333,6 +332,10 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	dFloat den = (q0[0] * q1[0]) - (-q0[1] * q1[1]) - (-q0[2] * q1[2]) - (-q0[3] * q1[3]);
 	dFloat twistAngle = 2.0f * dAtan2(num, den);
 
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
+	dFloat dot = coneDir0.DotProduct3(coneDir1);	
+
 	// select an axis for the twist. 
 	// any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
 	if (dot > -0.999f) {
@@ -342,6 +345,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	} else {
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
 	}
+
 
 	dFloat coneAngle = dAcos(dClamp(dot, dFloat(-1.0f), dFloat(1.0f)));
 	dFloat angle = coneAngle - m_coneAngle;
@@ -415,11 +419,10 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	}
 }
 
-
 dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
-	,m_limitAligment(dGetIdentityMatrix())
 	,m_coneAngle(30.0f * 3.141592f / 180.0f)
+	,m_coneAngleOffset(0.0f)
 	,m_minTwistAngle(-30.0f * 3.141592f / 180.0f)
 	,m_maxTwistAngle(30.0f * 3.141592f / 180.0f)
 {
@@ -427,8 +430,17 @@ dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFra
 
 void dCustomRagdollMotor_3dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
+	callback(userData, &m_coneAngleOffset, sizeof(m_coneAngleOffset));
+	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
+	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
+}
+
+void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomRagdollMotor::Serialize(callback, userData);
+	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
+	callback(userData, &m_coneAngleOffset, sizeof(m_coneAngleOffset));
 	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
 }
@@ -442,7 +454,7 @@ void dCustomRagdollMotor_3dof::Load(dCustomJointSaveLoad* const fileLoader)
 
 	token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "coneAligment:"));
-	m_limitAligment = fileLoader->LoadMatrix();
+	m_coneAngleOffset = fileLoader->LoadFloat() * 180.0f / 3.141592f;
 
 	token = fileLoader->NextToken();
 	dAssert(!strcmp(token, "minTwistAngle:"));
@@ -457,19 +469,11 @@ void dCustomRagdollMotor_3dof::Save(dCustomJointSaveLoad* const fileSaver) const
 {
 	dCustomRagdollMotor::Save(fileSaver);
 	fileSaver->SaveFloat ("\tconeAngle", m_coneAngle * 180.0f / 3.141592f);
-	fileSaver->SaveMatrix("\tconeAligment", m_limitAligment);
+	fileSaver->SaveFloat("\tconeAligment", m_coneAngleOffset * 180.0f / 3.141592f);
 	fileSaver->SaveFloat ("\tminTwistAngle", m_minTwistAngle * 180.0f / 3.141592f);
 	fileSaver->SaveFloat ("\tmaxTwistAngle", m_maxTwistAngle * 180.0f / 3.141592f);
 }
 
-void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
-{
-	dCustomRagdollMotor::Serialize(callback, userData);
-	callback(userData, &m_limitAligment, sizeof(m_limitAligment));
-	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
-	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
-	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
-}
 
 void dCustomRagdollMotor_3dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
@@ -493,9 +497,9 @@ dFloat dCustomRagdollMotor_3dof::GetConeAngle() const
 	return m_coneAngle;
 }
 
-void dCustomRagdollMotor_3dof::SetConeAligmentMatrix(const dMatrix& matrix)
+void dCustomRagdollMotor_3dof::SetConeAngleOffset(dFloat angle)
 {
-	m_limitAligment = matrix;
+	m_coneAngleOffset = angle;
 }
 
 
@@ -516,9 +520,11 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 
 	dVector arch[subdiv + 1];
 	debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
+
+	dMatrix limitAligment (dRollMatrix(m_coneAngleOffset));
 	for (int i = 0; i <= subdiv; i++) {
 		//dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
-		dVector conePoint(m_limitAligment.RotateVector(dPitchMatrix(angle0).RotateVector(point)));
+		dVector conePoint(limitAligment.RotateVector(dPitchMatrix(angle0).RotateVector(point)));
 		dVector p(matrix1.TransformVector(conePoint));
 		arch[i] = p;
 		debugDisplay->DrawLine(matrix1.m_posit, p);
@@ -577,6 +583,8 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
 	CalculateGlobalMatrix(matrix0, matrix1);
+	matrix0 = dRollMatrix(-m_coneAngleOffset) * matrix0;
+
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
 
