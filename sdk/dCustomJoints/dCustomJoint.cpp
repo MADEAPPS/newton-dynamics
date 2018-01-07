@@ -15,7 +15,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomJoint.h"
-#include "dCustomModelLoadSave.h"
 
 dCRCTYPE dCustomJoint::m_key = dCRC64 ("dCustomJoint");
 dCustomJoint::dSerializeMetaData m_metaData_CustomJoint("dCustomJoint");
@@ -90,46 +89,6 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	Init (m_maxDof, body0, body1);
 	SetSolverModel(solverModel);
 }
-
-
-dCustomJoint::dCustomJoint(dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)
-	:dCustomAlloc()
-	,m_localMatrix0(dGetIdentityMatrix())
-	,m_localMatrix1(dGetIdentityMatrix())
-	,m_userData(NULL)
-	,m_body0(body0)
-	,m_body1(body1)
-	,m_joint(NULL)
-	,m_world(NULL)
-	,m_userDestructor(NULL)
-	,m_stiffness(1.0f)
-	,m_maxDof(0)
-	,m_autoDestroy(0)
-{
-	const char* token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "degreesOfFreedom:"));
-	m_maxDof = fileLoader->LoadInt();
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "solverModel:"));
-	int solverModel = fileLoader->LoadInt();
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "localMatrix0:"));
-	m_localMatrix0 = fileLoader->LoadMatrix();
-	
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "localMatrix1:"));
-	m_localMatrix1 = fileLoader->LoadMatrix();
-
-	token = fileLoader->NextToken();
-	dAssert(!strcmp(token, "stiffness:"));
-	m_stiffness = fileLoader->LoadFloat();
-
-	Init(m_maxDof, body0, body1);
-	SetSolverModel(solverModel);
-}
-
 
 dCustomJoint::~dCustomJoint()
 {
@@ -289,22 +248,6 @@ void dCustomJoint::Deserialize (NewtonBody* const body0, NewtonBody* const body1
 	}
 }
 
-dCustomJoint* dCustomJoint::Load(dCustomJointSaveLoad* const fileLoader, const char* const jointType, NewtonBody* const body0, NewtonBody* const body1)
-{
-	dCRCTYPE key (dCRC64 (jointType));
-	const dSerializeMetaDataDictionary& dictionary = GetDictionary();
-	dCustomJoint* joint = NULL;
-	dSerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
-	dAssert (node);
-	if (node) {
-		dSerializeMetaData* const meta = node->GetInfo();
-		joint = meta->Load(fileLoader, body0, body1);
-	}
-
-	return joint;
-}
-
-
 void dCustomJoint::CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const
 {
 	dMatrix matrix0;
@@ -402,12 +345,6 @@ dCustomJoint* dCustomJoint::dSerializeMetaData::DeserializeJoint (NewtonBody* co
 	return NULL;
 }
 
-dCustomJoint* dCustomJoint::dSerializeMetaData::Load (dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)
-{
-	dAssert(0);
-	return NULL;
-}
-
 dCustomJoint::dSerializeMetaDataDictionary& dCustomJoint::GetDictionary()
 {
 	static dSerializeMetaDataDictionary dictionary;
@@ -448,18 +385,3 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 	DrawLine (matrix.m_posit, z);
 }
 
-
-void dCustomJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	fileSaver->SaveInt ("\tdegreesOfFreedom", m_maxDof);
-	fileSaver->SaveInt ("\tsolverModel", GetSolverModel());
-
-	fileSaver->SaveMatrix ("\tlocalMatrix0", m_localMatrix0);
-	fileSaver->SaveMatrix ("\tlocalMatrix1", m_localMatrix1);
-	fileSaver->SaveFloat("\tstiffness", m_stiffness);
-}
-
-void dCustomJoint::Load(dCustomJointSaveLoad* const loader)
-{
-	dAssert (0);
-}

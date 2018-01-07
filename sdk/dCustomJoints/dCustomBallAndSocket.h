@@ -50,10 +50,8 @@ class dCustomBallAndSocket: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const loader) {}
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };

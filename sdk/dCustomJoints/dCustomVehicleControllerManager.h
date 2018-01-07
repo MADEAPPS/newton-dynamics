@@ -162,9 +162,6 @@ class dEngineInfo
 	private:
 	void SetTorqueRPMTable();
 	void ConvertToMetricSystem();
-	
-	void Load(dCustomJointSaveLoad* const fileLoader);
-	void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dEngineTorqueNode m_torqueCurve[6];
 	dFloat m_crownGearRatio;
@@ -208,8 +205,6 @@ class dWheelJoint: public dCustomJoint
 	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API dFloat CalculateTireParametricPosition(const dMatrix& tireMatrix, const dMatrix& chassisMatrix) const;
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API void Debug(dDebugDisplay* const debugDisplay) const;
 
 	dVector m_lateralDir;
@@ -258,8 +253,6 @@ class dEngineMountJoint: public dCustomHinge
 	protected:
 	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dMatrix m_baseOffsetMatrix;
 	friend class dEngineController;
@@ -279,8 +272,6 @@ class dEngineJoint: public dCustomJoint
 
 	protected:
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dEngineMountJoint* m_engineMount;
 	dFloat m_torque;
@@ -311,8 +302,6 @@ class dGearBoxJoint: public dCustomGear
 
 	protected:
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dFloat m_param;
 	dFloat m_cluthFrictionTorque;
@@ -330,8 +319,6 @@ class dDifferentialMountJoint: public dCustomUniversal
 
 	protected:
 	CUSTOM_JOINTS_API void ResetTransform();
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dMatrix m_baseOffsetMatrix;
 	friend class dDifferentialJoint;
@@ -353,8 +340,6 @@ class dDifferentialJoint: public dCustomJoint
 
 	protected:
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API void ResetTransform();
 
 //	dMatrix m_baseOffsetMatrix;
@@ -381,8 +366,6 @@ class dDifferentialJoint: public dCustomUniversal
 	protected:
 	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dMatrix m_baseOffsetMatrix;
 	dFloat m_turnSpeed;
@@ -407,8 +390,6 @@ class dAxelJoint: public dCustomGear
 
 	protected:
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;
@@ -456,17 +437,6 @@ class dVehicleController: public dCustomAlloc
 	{
 		dAssert(0);
 	}
-
-	virtual void Load(dCustomJointSaveLoad* const fileLoader)
-	{
-		dAssert(0);
-	}
-
-	virtual void Save(dCustomJointSaveLoad* const fileSaver) const
-	{
-		dAssert(0);
-	}
-
 
 	dCustomVehicleController* m_controller;
 
@@ -525,8 +495,6 @@ class dEngineController: public dVehicleController
 
 	protected:
 	virtual void Update(dFloat timestep);
-	virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dFloat GetTopGear() const;
 	dFloat GetRadiansPerSecond() const;
@@ -559,8 +527,6 @@ class dSteeringController: public dVehicleController
 
 	protected:
 	virtual void Update(dFloat timestep);
-	virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dList<dWheelJoint*> m_tires;
 	bool m_isSleeping;
@@ -586,8 +552,6 @@ class dBrakeController: public dVehicleController
 
 	protected:
 	virtual void Update(dFloat timestep);
-	virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	dList<dWheelJoint*> m_tires;
 	dFloat m_maxTorque;
@@ -654,9 +618,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
-	
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
 
 	bool ControlStateChanged() const;
 	void Init (NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
@@ -713,10 +674,6 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	CUSTOM_JOINTS_API virtual dCustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	CUSTOM_JOINTS_API virtual dCustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	CUSTOM_JOINTS_API virtual void DestroyController (dCustomVehicleController* const controller);
-
-	CUSTOM_JOINTS_API virtual dCustomVehicleController* Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomVehicleController* const vehicle, dCustomJointSaveLoad* const fileSaver);
-
 	CUSTOM_JOINTS_API virtual int OnTireAabbOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const;
 
 	CUSTOM_JOINTS_API int GetTireMaterial() const;

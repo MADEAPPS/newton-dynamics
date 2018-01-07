@@ -15,7 +15,6 @@
 #include "dCustomGear.h"
 #include "dCustomHinge.h"
 #include "dCustomUniversal.h"
-#include "dCustomModelLoadSave.h"
 #include "dCustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE
@@ -82,73 +81,6 @@ void dEngineInfo::SetTorqueRPMTable()
 	m_torqueCurve[5] = dEngineTorqueNode (m_rpmAtRedLine, m_idleTorque);
 }
 
-void dEngineInfo::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	LOAD_BEGIN(fileLoader);
-
-	LOAD_VECTOR (location);
-	LOAD_FLOAT (mass);
-	LOAD_FLOAT (radio);
-	LOAD_FLOAT (idleTorque);
-	LOAD_FLOAT (rpmAtIdleTorque);
-	LOAD_FLOAT (peakTorque);
-	LOAD_FLOAT (rpmAtPeakTorque);
-	LOAD_FLOAT (peakHorsePower);
-	LOAD_FLOAT (rpmAtPeakHorsePower);
-	LOAD_FLOAT (rpmAtRedLine);
-	LOAD_FLOAT (vehicleTopSpeed);
-	LOAD_FLOAT (reverseGearRatio);
-	LOAD_FLOAT (gearRatiosSign);
-	LOAD_FLOAT (clutchFrictionTorque);
-	LOAD_FLOAT (aerodynamicDownforceFactor);
-	LOAD_FLOAT (aerodynamicDownforceFactorAtTopSpeed);
-	LOAD_FLOAT (aerodynamicDownForceSurfaceCoeficident);
-	LOAD_FLOAT (crownGearRatio);
-	LOAD_FLOAT (peakPowerTorque);
-	LOAD_INT  (differentialLock);
-	LOAD_INT (gearsCount);
-	for (int i = 0; i < m_gearsCount; i ++) {
-		dFloat m_ratio;
-		LOAD_FLOAT (ratio);
-		m_gearRatios[i] = m_ratio;
-	}
-	LOAD_END();
-
-	SetTorqueRPMTable();
-}
-
-void dEngineInfo::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	SAVE_BEGIN(fileSaver);
-	
-	SAVE_VECTOR (location);
-	SAVE_FLOAT (mass);
-	SAVE_FLOAT (radio);
-	SAVE_FLOAT (idleTorque);
-	SAVE_FLOAT (rpmAtIdleTorque);
-	SAVE_FLOAT (peakTorque);
-	SAVE_FLOAT (rpmAtPeakTorque);
-	SAVE_FLOAT (peakHorsePower);
-	SAVE_FLOAT (rpmAtPeakHorsePower);
-	SAVE_FLOAT (rpmAtRedLine);
-	SAVE_FLOAT (vehicleTopSpeed);
-	SAVE_FLOAT (reverseGearRatio);
-	SAVE_FLOAT (gearRatiosSign);
-	SAVE_FLOAT (clutchFrictionTorque);
-	SAVE_FLOAT (aerodynamicDownforceFactor);
-	SAVE_FLOAT (aerodynamicDownforceFactorAtTopSpeed);
-	SAVE_FLOAT (aerodynamicDownForceSurfaceCoeficident);
-	SAVE_FLOAT (crownGearRatio);
-	SAVE_FLOAT (peakPowerTorque);
-	SAVE_INT  (differentialLock);
-	SAVE_INT (gearsCount);
-	for (int i = 0; i < m_gearsCount; i ++) {
-		dFloat m_ratio = m_gearRatios[i];
-		SAVE_FLOAT (ratio);
-	}
-	SAVE_END();
-}
-
 
 dEngineJoint::dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 	:dCustomJoint(1, engineBody, NULL)
@@ -186,26 +118,6 @@ void dEngineJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonUserJointSetRowMaximumFriction(m_joint, (m_rpm > 1.0f) ? m_torque : m_torque * 100.0f);
 	NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 }
-
-
-void dEngineJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	LOAD_BEGIN(fileLoader);
-	dAssert (0);
-	LOAD_END();
-
-	m_engineMount = NULL;
-}
-
-void dEngineJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	dCustomJoint::Save (fileSaver);
-
-	SAVE_BEGIN(fileSaver);
-dAssert (0);
-	SAVE_END();
-}
-
 
 dEngineMountJoint::dEngineMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 	:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
@@ -251,22 +163,6 @@ void dEngineMountJoint::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix&
 {
 }
 
-void dEngineMountJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	LOAD_BEGIN(fileLoader);
-	LOAD_MATRIX(baseOffsetMatrix);
-	LOAD_END();
-}
-
-void dEngineMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	dCustomHinge::Save (fileSaver);
-
-	SAVE_BEGIN(fileSaver);
-	SAVE_MATRIX(baseOffsetMatrix);
-	SAVE_END();
-}
-
 
 dDifferentialMountJoint::dDifferentialMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
 	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
@@ -309,22 +205,6 @@ void dDifferentialMountJoint::ResetTransform()
 }
 
 
-void dDifferentialMountJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	LOAD_BEGIN(fileLoader);
-	LOAD_MATRIX(baseOffsetMatrix);
-	LOAD_END();
-}
-
-void dDifferentialMountJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	// nothing really to save;
-	dCustomUniversal::Save(fileSaver);
-
-	SAVE_BEGIN(fileSaver);
-	SAVE_MATRIX(baseOffsetMatrix);
-	SAVE_END();
-}
 
 #ifdef VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
 dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
@@ -384,28 +264,6 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		}
 	}
-}
-
-void dDifferentialJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-dAssert (0);
-
-	LOAD_BEGIN(fileLoader);
-	LOAD_FLOAT(turnSpeed);
-	LOAD_INT(isTractionDifferential);
-	LOAD_END();
-}
-
-void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	dAssert (0);
-	// nothing really to save;
-	dCustomJoint::Save(fileSaver);
-
-	SAVE_BEGIN(fileSaver);
-	SAVE_FLOAT(turnSpeed);
-	SAVE_INT(isTractionDifferential);
-	SAVE_END();
 }
 
 #else
@@ -491,27 +349,6 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		}
 	}
-}
-
-void dDifferentialJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	LOAD_BEGIN(fileLoader);
-	LOAD_MATRIX(baseOffsetMatrix);
-	LOAD_FLOAT(turnSpeed);
-	LOAD_INT(isTractionDifferential);
-	LOAD_END();
-}
-
-void dDifferentialJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	// nothing really to save;
-	dCustomUniversal::Save(fileSaver);
-
-	SAVE_BEGIN(fileSaver);
-	SAVE_MATRIX(baseOffsetMatrix);
-	SAVE_FLOAT(turnSpeed);
-	SAVE_INT(isTractionDifferential);
-	SAVE_END();
 }
 #endif
 
@@ -660,68 +497,6 @@ void dWheelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	m_brakeTorque = 0.0f;
 }
 
-
-void dWheelJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	LOAD_BEGIN(fileLoader);
-
-	LOAD_VECTOR(lateralDir);
-	LOAD_VECTOR(longitudinalDir);
-	LOAD_FLOAT(tireLoad);
-	LOAD_FLOAT(radio);
-	LOAD_FLOAT(width);
-	LOAD_FLOAT(steerRate);
-	LOAD_FLOAT(steerAngle0);
-	LOAD_FLOAT(steerAngle1);
-	LOAD_FLOAT(brakeTorque);
-	LOAD_FLOAT(dampingRatio);
-	LOAD_FLOAT(springStrength);
-	LOAD_FLOAT(suspensionLength);
-	LOAD_FLOAT(lateralSlip);
-	LOAD_FLOAT(aligningTorque);
-	LOAD_FLOAT(longitudinalSlip);
-	LOAD_FLOAT(aligningMomentTrail);
-	LOAD_FLOAT(corneringStiffness);
-	LOAD_FLOAT(maxSteeringAngle);
-	LOAD_INT(suspentionType);
-	LOAD_INT(hasFender);
-
-	LOAD_END();
-
-	m_controller = NULL;
-	m_contactCount = 0;
-}
-
-void dWheelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	dCustomJoint::Save(fileSaver);
-
-	SAVE_BEGIN(fileSaver);
-
-	SAVE_VECTOR(lateralDir);
-	SAVE_VECTOR(longitudinalDir);
-	SAVE_FLOAT(tireLoad);
-	SAVE_FLOAT(radio);
-	SAVE_FLOAT(width);
-	SAVE_FLOAT(steerRate);
-	SAVE_FLOAT(steerAngle0);
-	SAVE_FLOAT(steerAngle1);
-	SAVE_FLOAT(brakeTorque);
-	SAVE_FLOAT(dampingRatio);
-	SAVE_FLOAT(springStrength);
-	SAVE_FLOAT(suspensionLength);
-	SAVE_FLOAT(lateralSlip);
-	SAVE_FLOAT(aligningTorque);
-	SAVE_FLOAT(longitudinalSlip);
-	SAVE_FLOAT(aligningMomentTrail);
-	SAVE_FLOAT(corneringStiffness);
-	SAVE_FLOAT(maxSteeringAngle);
-	SAVE_INT(suspentionType);
-	SAVE_INT(hasFender);
-
-	SAVE_END();
-}
-
 void dWheelJoint::Debug(dDebugDisplay* const debugDisplay) const
 {
 	dCustomJoint::Debug(debugDisplay);
@@ -753,22 +528,6 @@ void dGearBoxJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMaximumFriction(m_joint,  m_param * m_cluthFrictionTorque);
 		}
 	}
-}
-
-void dGearBoxJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	LOAD_BEGIN(fileLoader);
-	LOAD_FLOAT(cluthFrictionTorque);
-	LOAD_END();
-	m_param = 0.0f;
-}
-
-void dGearBoxJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	dCustomGear::Save(fileSaver);
-	SAVE_BEGIN(fileSaver);
-	SAVE_FLOAT(cluthFrictionTorque);
-	SAVE_END();
 }
 
 dAxelJoint::dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent)
@@ -833,27 +592,6 @@ void dAxelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 }
-
-void dAxelJoint::Load(dCustomJointSaveLoad* const fileLoader)
-{
-//	int m_parentReferenceIndex;
-//	LOAD_BEGIN(fileLoader);
-//	LOAD_INT(parentReferenceIndex);
-//	LOAD_VECTOR(pintOnReference);
-//	LOAD_END();
-//	m_parentReference = fileLoader->FindBody(m_parentReferenceIndex);
-}
-
-void dAxelJoint::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	dCustomGear::Save(fileSaver);
-//	int m_parentReferenceIndex = fileSaver->FindBodyId(m_parentReference);
-//	SAVE_BEGIN(fileSaver);
-//	SAVE_INT(parentReferenceIndex);
-//	SAVE_VECTOR(pintOnReference);
-//	SAVE_END();
-}
-
 
 /*
 dFloat dBodyPartTire::GetRPM() const
@@ -1120,55 +858,6 @@ void dEngineController::Update(dFloat timestep)
 	}
 }
 
-void dEngineController::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	m_info.Load(fileLoader);
-	m_infoCopy = m_info;
-
-	LOAD_BEGIN(fileLoader);
-	int m_crownGear;
-	int m_diffJoint;
-	int m_gearJoint;
-	LOAD_INT(crownGear);
-	LOAD_INT(diffJoint);
-	LOAD_INT(gearJoint);
-	m_crownGearCalculator = (dWheelJoint*)fileLoader->FindJoint(m_crownGear);
-	m_differential = (dDifferentialJoint*)fileLoader->FindJoint(m_diffJoint);
-	m_gearBoxJoint = (dGearBoxJoint*)fileLoader->FindJoint(m_gearJoint);
-
-	LOAD_FLOAT(clutchParam);
-	LOAD_INT(gearTimer);
-	LOAD_INT(currentGear);
-	LOAD_INT(drivingState);
-	LOAD_INT(ignitionKey);
-	LOAD_INT(automaticTransmissionMode);
-
-	LOAD_END();
-}
-
-void dEngineController::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	m_info.Save(fileSaver);
-
-	SAVE_BEGIN(fileSaver);
-
-	int m_crownGear = fileSaver->FindJointId(m_crownGearCalculator);
-	int m_diffJoint = fileSaver->FindJointId(m_differential);
-	int m_gearJoint = fileSaver->FindJointId(m_gearBoxJoint);
-	SAVE_INT(crownGear);
-	SAVE_INT(diffJoint);
-	SAVE_INT(gearJoint);
-	SAVE_FLOAT(clutchParam);
-	SAVE_INT(gearTimer);
-	SAVE_INT(currentGear);
-	SAVE_INT(drivingState);
-	SAVE_INT(ignitionKey);
-	SAVE_INT(automaticTransmissionMode);
-
-	SAVE_END();
-}
-
-
 bool dEngineController::GetTransmissionMode() const
 {
 	return m_automaticTransmissionMode ? true : false;
@@ -1296,31 +985,6 @@ void dSteeringController::Update(dFloat timestep)
 	}
 }
 
-void dSteeringController::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	int count = fileLoader->LoadInt();
-	LOAD_BEGIN(fileLoader);
-	for (int i = 0; i < count; i ++) {
-		int m_tireIndex;
-		LOAD_INT(tireIndex);
-		dWheelJoint* const tireJoint = (dWheelJoint*)fileLoader->FindJoint(m_tireIndex);
-		AddTire (tireJoint);
-	}
-	LOAD_END();
-}
-
-void dSteeringController::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	SAVE_BEGIN(fileSaver);
-	for (dList<dWheelJoint*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-		dWheelJoint* const tireJoint = node->GetInfo();
-		int m_tireIndex = fileSaver->FindJointId(tireJoint);
-		SAVE_INT(tireIndex);
-	}
-	SAVE_END();
-}
-
-
 void dSteeringController::AddTire (dWheelJoint* const tire)
 {
 	m_tires.Append(tire);
@@ -1363,34 +1027,6 @@ void dBrakeController::Update(dFloat timestep)
 		tire->m_brakeTorque = dMax(torque, tire->m_brakeTorque);
 	}
 }
-
-void dBrakeController::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	int count = fileLoader->LoadInt();
-	LOAD_BEGIN(fileLoader);
-	LOAD_FLOAT(maxTorque);
-	for (int i = 0; i < count; i ++) {
-		int m_tireIndex;
-		LOAD_INT(tireIndex);
-		dWheelJoint* const tireJoint = (dWheelJoint*)fileLoader->FindJoint(m_tireIndex);
-		AddTire (tireJoint);
-	}
-	LOAD_END();
-}
-
-void dBrakeController::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	SAVE_BEGIN(fileSaver);
-	SAVE_FLOAT(maxTorque);
-
-	for (dList<dWheelJoint*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-		dWheelJoint* const tireJoint = node->GetInfo();
-		int m_tireIndex = fileSaver->FindJointId(tireJoint);
-		SAVE_INT(tireIndex);
-	}
-	SAVE_END();
-}
-
 
 void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
@@ -1583,19 +1219,6 @@ dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonC
 	controller->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
 	return controller;
 }
-
-dCustomVehicleController* dCustomVehicleControllerManager::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	dCustomVehicleController* const controller = CreateController();
-	controller->Load(fileLoader);
-	return controller;
-}
-
-void dCustomVehicleControllerManager::Save(dCustomVehicleController* const vehicle, dCustomJointSaveLoad* const fileSaver)
-{
-	vehicle->Save(fileSaver);
-}
-
 
 class dCustomVehicleController::dTireFilter: public dCustomControllerConvexCastPreFilter
 {
@@ -2558,180 +2181,6 @@ void dCustomVehicleController::Debug(dCustomJoint::dDebugDisplay* const debugCon
 		dVector p3 (p0 - longitudinalForce.Scale (scale));
 		debugContext->SetColor(dVector (0.0f, 1.0f, 0.0f, 0.0f));
 		debugContext->DrawLine(p0, p3);
-	}
-}
-
-
-void dCustomVehicleController::Load(dCustomJointSaveLoad* const fileLoader)
-{
-	m_body = fileLoader->Load();
-	m_speed = 0.0f;
-	m_sideSlip = 0.0f;
-	m_prevSideSlip = 0.0f;
-	m_finalized = false;
-	m_gravityMag = 0.0f;
-	m_weightDistribution = 0.5f;
-	m_aerodynamicsDownForce0 = 0.0f;
-	m_aerodynamicsDownForce1 = 0.0f;
-	m_aerodynamicsDownSpeedCutOff = 0.0f;
-	m_aerodynamicsDownForceCoefficient = 0.0f;
-	m_forceAndTorqueCallback = NewtonBodyGetForceAndTorqueCallback(m_body);
-
-	m_contactFilter = new dTireFrictionModel(this);
-
-	NewtonWorld* const world = NewtonBodyGetWorld(m_body);
-	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
-	NewtonCollisionAggregateSetSelfCollision(m_collisionAggregate, 0);
-
-	dTree<int, NewtonBody*>::Iterator bodyIter (fileLoader->GetBodyList());
-	for (bodyIter.Begin(); bodyIter; bodyIter ++) {
-		NewtonBody* const body = bodyIter.GetKey();
-		NewtonCollisionAggregateAddBody(m_collisionAggregate, body);
-		m_bodyList.Append(body);
-	}
-
-	m_engine = NULL;
-	dGearBoxJoint* gearBox = NULL;
-	dEngineMountJoint* engineMount = NULL;
-	dTree<dCustomJoint*, int>::Iterator jointIter (fileLoader->GetJointList());
-	for (jointIter.Begin(); jointIter; jointIter ++) {
-		dCustomJoint* const joint = jointIter.GetNode()->GetInfo();
-		if (joint->IsType(dWheelJoint::GetType())) {
-			dWheelJoint* const wheel = (dWheelJoint*)joint;
-			wheel->m_controller = this;
-			m_tireList.Append(wheel);
-		} else if (joint->IsType(dEngineMountJoint::GetType())) {
-			engineMount = (dEngineMountJoint*)joint;
-		} else if (joint->IsType(dEngineJoint::GetType())) {
-			m_engine = (dEngineJoint*)joint;
-		} else if (joint->IsType(dDifferentialJoint::GetType())) {
-			m_differentialList.Append((dDifferentialJoint*)joint);
-		} else if (joint->IsType(dGearBoxJoint::GetType())) {
-			gearBox = (dGearBoxJoint*)joint;
-		} else if (joint->IsType(dAxelJoint::GetType())) {
-			// nothing
-		} else {
-			dAssert (0);
-		}
-	}
-
-	if (m_engine) {
-		dAssert (engineMount);
-		m_engine->m_engineMount = engineMount;
-	}
-
-	m_brakesControl = NULL;
-	m_engineControl = NULL;
-	m_steeringControl = NULL;
-	m_handBrakesControl = NULL;
-
-	fileLoader->NextToken();
-	const int controlerCount = fileLoader->LoadInt();
-	for (int i = 0; i < controlerCount; i ++) {
-		const char* const token1 = fileLoader->NextToken();
-		if (!strcmp (token1, "VehicleController:")) {
-			dFloat m_aeroDownForce0;
-			dFloat m_aeroDownForce1;
-
-			LOAD_BEGIN(fileLoader);
-			LOAD_FLOAT(speed);
-			LOAD_FLOAT(totalMass);
-			LOAD_FLOAT(gravityMag);
-			LOAD_FLOAT(weightDistribution);
-			LOAD_FLOAT(aeroDownForce0);
-			LOAD_FLOAT(aeroDownForce1);
-			LOAD_FLOAT(aerodynamicsDownSpeedCutOff);
-			LOAD_FLOAT(aerodynamicsDownForceCoefficient);
-			LOAD_END();
-
-			dFloat Ixx;
-			dFloat mass;
-			NewtonBodyGetMass(m_body, &mass, &Ixx, &Ixx, &Ixx);
-			m_aerodynamicsDownForce0 = m_aeroDownForce0 * mass * m_gravityMag;
-			m_aerodynamicsDownForce1 = m_aeroDownForce1 * mass * m_gravityMag;
-		} else if (!strcmp (token1, "SteeringController:")) {
-			m_steeringControl = new dSteeringController (this);
-			m_steeringControl->Load(fileLoader);
-		} else if (!strcmp (token1, "BrakesController:")) {
-			m_brakesControl = new dBrakeController (this);
-			m_brakesControl->Load(fileLoader);
-		} else if (!strcmp (token1, "HandBrakesController:")) {
-			m_handBrakesControl = new dBrakeController (this);
-			m_handBrakesControl->Load(fileLoader);
-		} else if (!strcmp (token1, "HandBrakesController:")) {
-			m_handBrakesControl = new dBrakeController (this);
-			m_handBrakesControl->Load(fileLoader);
-		} else if (!strcmp (token1, "EngineController:")) {
-			m_engineControl = new dEngineController (this);
-			m_engineControl->Load(fileLoader);
-
-		} else {
-			dAssert (0);
-		}
-
-		fileLoader->NextToken();
-	}
-		
-
-	Finalize();
-}
-
-void dCustomVehicleController::Save(dCustomJointSaveLoad* const fileSaver) const
-{
-	fileSaver->Save(GetBody());
-
-
-	int controlerCount = 1;
-	controlerCount += m_steeringControl != NULL;
-	controlerCount += m_brakesControl != NULL;
-	controlerCount += m_handBrakesControl != NULL;
-	controlerCount += m_engineControl != NULL;
-	fileSaver->SaveInt("ControllersCount", controlerCount);
-
-	fileSaver->SaveName("VehicleController", "");
-
-	dFloat Ixx;
-	dFloat mass;
-	NewtonBodyGetMass(m_body, &mass, &Ixx, &Ixx, &Ixx);
-	dFloat m_aeroDownForce0 = m_aerodynamicsDownForce0 / (mass * m_gravityMag);
-	dFloat m_aeroDownForce1 = m_aerodynamicsDownForce1 / (mass * m_gravityMag);
-
-	SAVE_BEGIN(fileSaver);
-	SAVE_FLOAT(speed);
-	SAVE_FLOAT(totalMass);
-	SAVE_FLOAT(gravityMag);
-//	SAVE_FLOAT(sideSlip);
-//	SAVE_FLOAT(prevSideSlip);
-	SAVE_FLOAT(weightDistribution);
-	SAVE_FLOAT(aeroDownForce0);
-	SAVE_FLOAT(aeroDownForce1);
-	SAVE_FLOAT(aerodynamicsDownSpeedCutOff);
-	SAVE_FLOAT(aerodynamicsDownForceCoefficient);
-	SAVE_END();
-	fileSaver->SaveName("VehicleEnd", "\n");
-
-	if (m_steeringControl) {
-		fileSaver->SaveInt("SteeringController", m_steeringControl->m_tires.GetCount());
-		m_steeringControl->Save(fileSaver);
-		fileSaver->SaveName("SteeringEnd", "\n");
-	}
-
-	if (m_brakesControl) {
-		fileSaver->SaveInt("BrakesController", m_brakesControl->m_tires.GetCount());
-		m_brakesControl->Save(fileSaver);
-		fileSaver->SaveName("BrakesEnd", "\n");
-	}
-
-	if (m_handBrakesControl) {
-		fileSaver->SaveInt("HandBrakesController", m_handBrakesControl->m_tires.GetCount());
-		m_handBrakesControl->Save(fileSaver);
-		fileSaver->SaveName("HandBrakesEnd", "\n");
-	}
-
-	if (m_engineControl) {
-		fileSaver->SaveName("EngineController", "");
-		m_engineControl->Save(fileSaver);
-		fileSaver->SaveName("EngineEnd", "\n");
 	}
 }
 

@@ -24,64 +24,6 @@
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 
-class dBasicVehicleLoader: public dCustomJointSaveLoad
-{
-	public:
-	dBasicVehicleLoader(NewtonWorld* const world, FILE* const file, int materialID)
-		:dCustomJointSaveLoad(world, file)
-		, m_material(materialID)
-	{
-	}
-
-	const char* GetUserDataName(const NewtonBody* const body) const
-	{
-		dAssert(0);
-		return NULL;
-	}
-
-	virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
-	{
-		dMatrix matrix;
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		DemoMesh* mesh;
-		if (!strcmp(bodyName, "tireMesh")) {
-			mesh = new DemoMesh(bodyName, collision, "wood_4.tga", "wood_4.tga", "wood_4.tga");
-		}
-		else {
-			mesh = new DemoMesh(bodyName, collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
-		}
-
-		NewtonBodyGetMatrix(body, &matrix[0][0]);
-		DemoEntity* const entity = new DemoEntity(matrix, NULL);
-		entity->SetMesh(mesh, dGetIdentityMatrix());
-		scene->Append(entity);
-		mesh->Release();
-
-		// save the pointer to the graphic object with the body.
-		NewtonBodySetUserData(body, entity);
-
-		// assign the wood id
-		NewtonBodySetMaterialGroupID(body, m_material);
-
-		//set continuous collision mode
-		//NewtonBodySetContinuousCollisionMode (body, continueCollisionMode);
-
-		// set a destructor for this rigid body
-		NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
-
-		// set the transform call back function
-		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-		// set the force and torque call back function
-		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-	}
-
-	int m_material;
-	dCustomVehicleController* m_vehicle;
-};
-
 
 class BasicCarControllerManager: public dCustomVehicleControllerManager
 {
@@ -297,6 +239,9 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 	dCustomVehicleController* LoadVehicle(const char* const name)
 	{
+		dAssert (0);
+		return NULL;
+/*
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
@@ -310,8 +255,8 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 
 		fclose(inputFile);
 		setlocale(LC_ALL, oldloc);
-
 		return vehicle;
+*/
 	}
 
 	bool m_externalView;
@@ -329,6 +274,7 @@ void BasicCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
 dAssert (0);
 return;
+/*
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
 
@@ -380,6 +326,6 @@ return;
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-		
+*/		
 }
 

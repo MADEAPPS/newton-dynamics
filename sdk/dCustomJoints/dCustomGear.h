@@ -35,10 +35,6 @@ class dCustomGear: public dCustomJoint
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-
-	CUSTOM_JOINTS_API void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API void Save(dCustomJointSaveLoad* const fileSaver) const;
-
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	dFloat m_gearRatio;

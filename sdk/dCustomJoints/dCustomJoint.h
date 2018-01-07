@@ -25,7 +25,6 @@
 #include "dCustomAlloc.h"
 
 class dCustomJoint;
-class dCustomJointSaveLoad;
 typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);	
 
 
@@ -43,12 +42,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 	className(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)	\
 		:baseClass(child, parent, callback, userData)																		\
 	{																														\
-		dAssert (0);																								\
-	}																														\
-	className(dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)						\
-		:baseClass(fileLoader, body0, body1)																				\
-	{																														\
-		Load(fileLoader);																									\
+		dAssert (0);																										\
 	}																														\
 	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
 	static dCRCTYPE GetType () { return m_metaData_##className.m_key_##className; }										    \
@@ -69,10 +63,6 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 											    NewtonDeserializeCallback callback, void* const userData)					\
 		{																													\
 			return new className (body0, body1, callback, userData);														\
-		}																													\
-		virtual dCustomJoint* Load(dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1)\
-		{																													\
-			return new className (fileLoader, body0, body1);																\
 		}																													\
 		dCRCTYPE m_key_##className;																							\
 	};																														\
@@ -119,7 +109,6 @@ class dCustomJoint: public dCustomAlloc
 		CUSTOM_JOINTS_API virtual void SerializeJoint (dCustomJoint* const joint, NewtonSerializeCallback callback, void* const userData);
 		CUSTOM_JOINTS_API virtual dCustomJoint* DeserializeJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 		CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const {return false;}
-		CUSTOM_JOINTS_API virtual dCustomJoint* Load (dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1);
 	};
 
 	class dSerializeMetaDataDictionary: public dTree<dSerializeMetaData*, dCRCTYPE>
@@ -198,7 +187,6 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API dCustomJoint();
 	CUSTOM_JOINTS_API dCustomJoint(int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
-	CUSTOM_JOINTS_API dCustomJoint(dCustomJointSaveLoad* const fileLoader, NewtonBody* const body0, NewtonBody* const body1);
 	CUSTOM_JOINTS_API dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual ~dCustomJoint();
 
@@ -237,18 +225,12 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
-	
-
-
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 
 	CUSTOM_JOINTS_API static void Destructor (const NewtonJoint* me);	
 	CUSTOM_JOINTS_API static void SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API static dCustomJoint* Load(dCustomJointSaveLoad* const fileLoader, const char* const jointType, NewtonBody* const body0, NewtonBody* const body1);
 
 	protected:
 	CUSTOM_JOINTS_API dCustomJoint (NewtonInverseDynamics* const invDynSolver, void* const invDynNode);
@@ -277,8 +259,6 @@ class dCustomJoint: public dCustomAlloc
 	int m_autoDestroy;
 	CUSTOM_JOINTS_API static dCRCTYPE m_key;
 	CUSTOM_JOINTS_API static dSerializeMetaData m_metaData_CustomJoint;
-
-	friend class dCustomJointSaveLoad;
 };
 
 

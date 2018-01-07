@@ -169,59 +169,6 @@ static CarDefinition viper =
 };
 
 
-class SuperVehicleSaver : public dCustomJointSaveLoad
-{
-	public:
-	SuperVehicleSaver(NewtonWorld* const world, dCustomVehicleController* const vehicle, FILE* const file, int materialID)
-		:dCustomJointSaveLoad(world, file)
-		, m_material(materialID)
-		, m_vehicle(vehicle)
-	{
-	}
-
-	const char* GetUserDataName(const NewtonBody* const body) const
-	{
-		static char* tire = "tireMesh";
-		static char* engine = "engineMesh";
-		static char* chassis = "chassisMesh";
-		static char* differential = "differentialMesh";
-
-		if (m_vehicle->GetBody() == body) {
-			return chassis;
-		}
-
-		if (m_vehicle->GetEngineJoint()->GetEngineBody() == body) {
-			return engine;
-		}
-
-		for (dList<dWheelJoint*>::dListNode* node = m_vehicle->GetFirstTire(); node; node = m_vehicle->GetNextTire(node)) {
-			const dWheelJoint* const tirePart = node->GetInfo();
-			if (tirePart->GetTireBody() == body) {
-				return tire;
-			}
-		}
-
-		for (dList<dDifferentialJoint*>::dListNode* node = m_vehicle->GetFirstDifferential(); node; node = m_vehicle->GetNextDifferential(node)) {
-			const dDifferentialJoint* const differentialPart = node->GetInfo();
-			if (differentialPart->GetDifferentialBody() == body) {
-				return differential;
-			}
-		}
-
-		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-		return entity ? entity->GetName().GetStr() : NULL;
-	}
-
-	const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
-	{
-	}
-
-	int m_material;
-	dCustomVehicleController* m_vehicle;
-};
-
-
-
 class SuperCarEntity: public DemoEntity
 {
 	public: 
@@ -838,24 +785,6 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 				DrawGear(speed, x, y + 98, m_player->m_gearMap[gear], gageSize);
 			}
 		}
-	}
-
-	void SaveVehicle (const char* const name, dCustomVehicleController* const vehicle)
-	{
-		char fileName[2048];
-		dGetWorkingFileName(name, fileName);
-
-		char* const oldloc = setlocale(LC_ALL, 0);
-		setlocale(LC_ALL, "C");
-		FILE* const outputFile = fopen(fileName, "wt");
-		dAssert(outputFile);
-
-		SuperVehicleSaver saveLoad(GetWorld(), vehicle, outputFile, 0);
-		//vehicle->Save(&saveLoad);
-		Save(vehicle, &saveLoad);
-
-		fclose(outputFile);
-		setlocale(LC_ALL, oldloc);
 	}
 
 	void SetAsPlayer (SuperCarEntity* const player)

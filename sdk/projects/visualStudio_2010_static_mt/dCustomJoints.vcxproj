@@ -36,7 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dCustomJoints\dCustom6DOF.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomActiveCharacterManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomBallAndSocket.cpp" />
@@ -59,7 +58,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\dCustomKinematicController.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomModelLoadSave.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPathFollow.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPlane.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
@@ -77,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\dCustom6DOF.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomActiveCharacterManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomBallAndSocket.h" />
@@ -91,7 +88,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomKinematicController.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomModelLoadSave.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPathFollow.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPlane.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />

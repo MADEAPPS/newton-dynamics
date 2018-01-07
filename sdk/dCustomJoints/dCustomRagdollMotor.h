@@ -37,9 +37,6 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_motorTorque;
@@ -63,8 +60,6 @@ class dCustomRagdollMotor_1dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	protected:
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_minTwistAngle;
@@ -88,8 +83,6 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_coneAngle;
@@ -116,8 +109,6 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_coneAngle;
@@ -155,9 +146,6 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void Load(dCustomJointSaveLoad* const fileLoader);
-	CUSTOM_JOINTS_API virtual void Save(dCustomJointSaveLoad* const fileSaver) const;
-
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 

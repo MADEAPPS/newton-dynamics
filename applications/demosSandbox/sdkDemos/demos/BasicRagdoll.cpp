@@ -89,10 +89,10 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 	{"Bip01_R_Hand",  "convexhull", two_dof,	0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,     0.0f,-90.0f,   0.0f,  10.0f },
 };
 
-class PassiveRagdollManager: public dCustomArticulaledTransformManager
+class CrashDummyModel: public dCustomArticulaledTransformManager
 {
 	public: 
-	PassiveRagdollManager (DemoEntityManager* const scene)
+	CrashDummyModel (DemoEntityManager* const scene)
 		:dCustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
@@ -186,16 +186,6 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		return NULL;
 	}
 
-	
-	virtual void OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
-	{
-		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
-		
-		dQuaternion rot (localMatrix);
-		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
-	}
-
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
 		dFloat points[1024 * 16][3];
@@ -214,7 +204,6 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0][0], 3 * sizeof (dFloat), 1.0e-3f, 0, NULL);
 	}
-
 
 	NewtonBody* CreateRagDollBodyPart (DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) 
 	{
@@ -366,9 +355,6 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		// transform the entire contraction to its location
 		dMatrix worldMatrix (rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
-
-		//xxx
-//		PrintRagdoll (controller, "balancingGait.txt");
 	}
 
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
@@ -385,73 +371,13 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 	}
 
 
-	//class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
-	class MySaveLoad: public dCustomJointSaveLoad
+	virtual void OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
-		public:
-		MySaveLoad(NewtonWorld* const world, FILE* const file, int materialID)
-			:dCustomJointSaveLoad(world, file)
-			,m_material(materialID)
-		{
-		}
+		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
 
-		const char* GetUserDataName(const NewtonBody* const body) const
-		{
-			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-			return entity ? entity->GetName().GetStr() : NULL;
-		}
-
-		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
-		{
-			dMatrix matrix;
-			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-
-			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-			DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
-			DemoEntity* const entity = new DemoEntity(matrix, NULL);
-			entity->SetMesh(mesh, dGetIdentityMatrix());
-			scene->Append(entity);
-			mesh->Release();
-
-			// save the pointer to the graphic object with the body.
-			NewtonBodySetUserData(body, entity);
-
-			// assign the wood id
-			NewtonBodySetMaterialGroupID(body, m_material);
-
-			//set continuous collision mode
-			//NewtonBodySetContinuousCollisionMode (body, continueCollisionMode);
-
-			// set a destructor for this rigid body
-			NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
-
-			// set the transform call back function
-			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-			// set the force and torque call back function
-			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-		}
-
-		int m_material;
-	};
-
-	void PrintRagdoll (dCustomArticulatedTransformController* const controller, const char* const name)
-	{
-		char fileName[2048];
-		dGetWorkingFileName(name, fileName);
-
-		char* const oldloc = setlocale(LC_ALL, 0);
-		setlocale(LC_ALL, "C");
-		FILE* const outputFile = fopen(fileName, "wt");
-		dAssert(outputFile);
-
-		MySaveLoad saveLoad(GetWorld(), outputFile, m_material);
-		saveLoad.Save(controller->GetBoneBody(controller->GetBone(0)));
-
-		fclose(outputFile);
-		setlocale(LC_ALL, oldloc);
+		dQuaternion rot(localMatrix);
+		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
 	int m_material;
@@ -493,7 +419,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 
 
 	//  create a skeletal transform controller for controlling rag doll
-	PassiveRagdollManager* const manager = new PassiveRagdollManager (scene);
+	CrashDummyModel* const manager = new CrashDummyModel (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());
@@ -501,8 +427,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
-//	int count = 10;
-	int count = 5;
+	int count = 1;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
