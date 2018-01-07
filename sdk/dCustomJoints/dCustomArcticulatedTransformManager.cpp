@@ -58,7 +58,6 @@ bool dCustomArticulaledTransformManager::SelfCollisionTest (const dCustomArticul
 
 dCustomArticulatedTransformController::dCustomArticulatedTransformController()
 	:m_collisionAggregate(NULL)
-	,m_boneCount(0)
 {
 }
 
@@ -75,7 +74,6 @@ void dCustomArticulatedTransformController::Init ()
 	dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
-	m_boneCount = 0;
 	m_calculateLocalTransform = false;
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 }
@@ -89,37 +87,63 @@ void dCustomArticulatedTransformController::PreUpdate(dFloat timestep, int threa
 void dCustomArticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_calculateLocalTransform) {
+
 		dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
-		for (int i = 0; i < m_boneCount; i ++) {
-			const dSkeletonBone& bone = m_bones[i];
+
+		dMatrix parentMatrixPool[128];
+		dList<dSkeletonBone>::dListNode* stackPool[128];
+
+		int stack = 1;
+		stackPool[0] = m_bones.GetFirst();
+		parentMatrixPool[0] = dGetIdentityMatrix();
+
+		while (stack) {
 			dMatrix matrix;
+			stack --;
+
+			dMatrix parentMatrix (parentMatrixPool[stack]);
+			dList<dSkeletonBone>::dListNode* const node = stackPool[stack];
+
+			const dSkeletonBone& bone = node->GetInfo();
 			NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
-			if (bone.m_parent) {
-				dMatrix parentMatrix;
-				NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
-				matrix = matrix * parentMatrix.Inverse() * bone.m_bindMatrix;
+			manager->OnUpdateTransform (&bone, matrix * parentMatrix * bone.m_bindMatrix);
+
+			parentMatrix = matrix.Inverse();
+			for (dList<dSkeletonBone>::dListNode* node = bone.GetFirst(); node; node = node->GetNext()) {
+				parentMatrixPool[stack] = parentMatrix;
+				stackPool[stack] = node;
+				stack ++;
 			}
-			manager->OnUpdateTransform (&bone, matrix);
 		}
 	}
 }
 
-dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
+dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::AddBone (NewtonBody* const boneBody, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
 {
-	m_bones[m_boneCount].m_body = bone;
-	m_bones[m_boneCount].m_myController = this;
-	m_bones[m_boneCount].m_parent = parentBone;
-	m_bones[m_boneCount].m_bindMatrix = bindMatrix;
+	dSkeletonBone* const bone = parentBone ? &parentBone->Append()->GetInfo() : &m_bones.Append()->GetInfo();
+
+	bone->m_body = boneBody;
+	bone->m_myController = this;
+	bone->m_parent = parentBone;
+	bone->m_bindMatrix = bindMatrix;
 
 	if (m_collisionAggregate) {
-		NewtonCollisionAggregateAddBody (m_collisionAggregate, bone);
+		NewtonCollisionAggregateAddBody (m_collisionAggregate, boneBody);
 	}
-
-	m_boneCount ++;
-	dAssert (m_boneCount < D_HIERACHICAL_CONTROLLER_MAX_BONES);
-	return &m_bones[m_boneCount - 1];
+	return bone;
 }
 
+dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::AddRoot (NewtonBody* const boneBody, const dMatrix& bindMatrix)
+{
+	return AddBone (boneBody, bindMatrix, NULL);
+}
+
+dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::GetRoot () const
+{
+	return m_bones.GetCount() ? &m_bones.GetFirst()->GetInfo() : NULL;
+}
+
+/*
 int dCustomArticulatedTransformController::GetBoneCount() const
 {
 	return m_boneCount;
@@ -141,6 +165,7 @@ const dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTr
 	return bone->m_parent;
 }
 
+
 NewtonBody* dCustomArticulatedTransformController::GetBoneBody (const dSkeletonBone* const bone) const
 {
 	dAssert (bone->m_myController == this);
@@ -151,10 +176,12 @@ NewtonBody* dCustomArticulatedTransformController::GetBoneBody (int index) const
 {
 	return GetBone(index)->m_body;
 }
-
+*/
 
 void dCustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
 {
+//	dAssert (0);
+/*
 	for (int i = 0; i < m_boneCount; i ++) {
 		dSkeletonBone& bone = m_bones[i];
 		bone.m_bitField.SetBit (i);
@@ -166,10 +193,13 @@ void dCustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
 			SetSelfCollisionMask (&bone, bone.m_parent, false);
 		}
 	}
+*/
 }
 
 void dCustomArticulatedTransformController::DisableAllSelfCollision ()
 {
+//	dAssert (0);
+/*
 	if (m_collisionAggregate) {
 		NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
 	}
@@ -178,10 +208,13 @@ void dCustomArticulatedTransformController::DisableAllSelfCollision ()
 			SetSelfCollisionMask (&m_bones[i], &m_bones[j], false);
 		}
 	}
+*/
 }
 
 void dCustomArticulatedTransformController::SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode)
 {
+	dAssert (0);
+/*
 	dAssert (bone0->m_myController);
 	dAssert (bone1->m_myController);
 	dAssert (bone0->m_myController == this);
@@ -198,10 +231,15 @@ void dCustomArticulatedTransformController::SetSelfCollisionMask (dSkeletonBone*
 		bone0->m_bitField.ResetBit (boneId1);
 		bone1->m_bitField.ResetBit (boneId0);
 	}
+*/
 }
 
 bool dCustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const
 {
+//dAssert (0);
+return false;
+/*
+return false;
 	bool state = true;
 	dAssert (bone0->m_myController);
 	dAssert (bone1->m_myController);
@@ -210,5 +248,6 @@ bool dCustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBo
 		state = bone0->m_bitField.TestMask(id1);
 	}
 	return state;
+*/
 }
 

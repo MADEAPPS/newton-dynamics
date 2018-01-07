@@ -328,7 +328,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		// for debugging
 		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
-		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddBone(rootBone, dGetIdentityMatrix());
+		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), bone0);
 
@@ -427,6 +427,3 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
-
-
-

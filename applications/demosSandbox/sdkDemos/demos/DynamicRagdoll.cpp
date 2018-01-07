@@ -102,6 +102,11 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 			// make the kinematic solver
 			m_kinematicSolver = NewtonCreateInverseDynamics(workd);
+
+			dAssert (0);
+//			NewtonBody* const rootBody = controller->GetBoneBody(0);
+			
+
 		}
 
 		~dBiped()
@@ -319,7 +324,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
-
 	void DestroyController (dCustomArticulatedTransformController* const controller)
 	{
 		dBiped* const balancingModule = (dBiped*)controller->GetUserData();
@@ -346,7 +350,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		// for debugging
 		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
-		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddBone(rootBone, dGetIdentityMatrix());
+		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), bone0);
 

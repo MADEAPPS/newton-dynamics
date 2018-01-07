@@ -10,7 +10,6 @@
 */
 
 
-
 #include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
