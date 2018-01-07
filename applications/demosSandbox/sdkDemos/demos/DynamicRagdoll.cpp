@@ -91,6 +91,21 @@ static dBalancingDummyDefinition skeletonRagDoll[] =
 class BalancingDummyManager: public dCustomArticulaledTransformManager
 {
 	public:
+	class dSelfBalancingBiped: public dCustomAlloc
+	{
+		public:
+		dSelfBalancingBiped(dCustomArticulatedTransformController* const controller)
+		{
+		}
+
+		~dSelfBalancingBiped()
+		{
+		}
+
+		dCustomArticulatedTransformController* m_controller;
+	};
+
+
 	BalancingDummyManager(DemoEntityManager* const scene)
 		:dCustomArticulaledTransformManager(scene->GetNewton())
 	{
@@ -175,11 +190,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 	NewtonCollision* MakeBox(DemoEntity* const bodyPart) const
 	{
 		dAssert(0);
-		//		dVector size(0.0f);
-		//		dVector origin(0.0f);
-		//		dMatrix matrix (GetIdentityMatrix());
-		//		GetDimentions(bone, matrix.m_posit, size);
-		//		return NewtonCreateBox (nWorld, 2.0f * size.m_x, 2.0f * size.m_y, 2.0f * size.m_z, 0, &matrix[0][0]);
 		return NULL;
 	}
 
@@ -278,6 +288,37 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		}
 	}
 
+	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
+	{
+		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
+			dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+			if (((child == cJoint->GetBody0()) && (parent == cJoint->GetBody1())) ||
+				((child == cJoint->GetBody1()) && (parent == cJoint->GetBody0()))) {
+				return cJoint;
+			}
+		}
+		dAssert(0);
+		return NULL;
+	}
+
+
+	virtual void OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	{
+		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+
+		dQuaternion rot(localMatrix);
+		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+	}
+
+
+	void DestroyController (dCustomArticulatedTransformController* const controller)
+	{
+		dSelfBalancingBiped* const balancingModule = (dSelfBalancingBiped*)controller->GetUserData();
+		delete balancingModule;
+		dCustomArticulaledTransformManager::DestroyController (controller);
+	}
+
 	void CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dBalancingDummyDefinition* const definition, int defintionCount)
 	{
 		NewtonWorld* const world = GetWorld();
@@ -288,9 +329,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		scene->Append(ragDollEntity);
 
 		// build the rag doll with rigid bodies connected by joints
-		// create a transform controller
-		dCustomArticulatedTransformController* const controller = CreateTransformController(ragDollEntity);
-
+		dCustomArticulatedTransformController* const controller = CreateTransformController();
 		controller->SetCalculateLocalTransforms(true);
 
 		// add the root bone
@@ -348,30 +387,12 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
+
+		// add up the active balancing support
+		dSelfBalancingBiped* const balancingModule = new dSelfBalancingBiped(controller);
+		controller->SetUserData(balancingModule);
 	}
 
-	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
-	{
-		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
-			dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-			if (((child == cJoint->GetBody0()) && (parent == cJoint->GetBody1())) ||
-				((child == cJoint->GetBody1()) && (parent == cJoint->GetBody0()))) {
-				return cJoint;
-			}
-		}
-		dAssert(0);
-		return NULL;
-	}
-
-
-	virtual void OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
-	{
-		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
-
-		dQuaternion rot(localMatrix);
-		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
-	}
 
 	int m_material;
 };

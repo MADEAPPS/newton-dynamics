@@ -104,7 +104,7 @@ class MyTriggerManager: public dCustomTriggerManager
 
 	void CreateBuoyancyTrigger (const dMatrix& matrix, NewtonCollision* const convexShape)
 	{
-		dCustomTriggerController* const controller = CreateTrigger (matrix, convexShape, NULL);
+		dCustomTriggerController* const controller = CreateTrigger (matrix, convexShape);
 		BuoyancyForce* const buoyancyForce = new BuoyancyForce (controller);
 		controller->SetUserData (buoyancyForce);
 	}

@@ -156,7 +156,6 @@ class ArticulatedEntityModel: public DemoEntity
 		return new ArticulatedEntityModel(*this);
 	}
 
-
 	void SetInput (const InputRecord& inputs)
 	{
 		m_inputs = inputs;
@@ -563,12 +562,12 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
-//		dVector points[1024 * 16];
-		dFloat points[1024 * 16][3];
+		//dFloat points[1024 * 16][3];
+		dVector points[1024 * 16];
 
 		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
 		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
-		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points) / (3 * sizeof (dFloat)))));
+		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points) / sizeof (points[0]))));
 
 		// go over the vertex array and find and collect all vertices's weighted by this bone.
 		const dFloat* const array = mesh->m_vertex;
@@ -576,9 +575,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			points[i][0] = array[i * 3 + 0];
 			points[i][1] = array[i * 3 + 1];
 			points[i][2] = array[i * 3 + 2];
+			points[i][2] = 0.0f;
 		}
 		bodyPart->GetMeshMatrix().TransformTriplex(&points[0][0], 3 * sizeof (dFloat), &points[0][0], 3 * sizeof (dFloat), mesh->m_vertexCount) ;
-		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0][0], 3 * sizeof (dFloat), 1.0e-3f, 0, NULL);
+		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof (dVector), 1.0e-3f, 0, NULL);
 	}
 
 	NewtonCollision* MakeConvexHullAggregate(DemoEntity* const bodyPart) const
@@ -707,7 +707,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		}
 	}
 
-
 	dCustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
 	{
 		NewtonWorld* const world = GetWorld(); 
@@ -720,7 +719,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// plane the model at its location
 		vehicleModel->ResetMatrix (*scene, location);
 
-		dCustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
+		//dCustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
+		dCustomArticulatedTransformController* const controller = CreateTransformController ();
+		controller->SetUserData(vehicleModel);
 		controller->SetCalculateLocalTransforms (true);
 
 		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
@@ -738,7 +739,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// save the bone as the shape use data for self collision test
 		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBody), chassisBone);
 
-
 		// add engine
 		vehicleModel->m_engineJoint = CreateEngineBodyPart(controller, chassisBone);
 
@@ -749,8 +749,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		vehicleModel->m_maxTurmDamp = 0.0f;
 		vehicleModel->m_maxTurmAccel = 0.0f;
-
-
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
@@ -942,7 +940,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
 		return new dCustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
 	}
-	
 
 	void MakeLeftTrack(dCustomArticulatedTransformController* const controller)
 	{
@@ -1320,7 +1317,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		matrix.m_posit = location.m_posit;
 		vehicleModel->ResetMatrix(*scene, matrix);
 
-		dCustomArticulatedTransformController* const controller = CreateTransformController(vehicleModel);
+		dCustomArticulatedTransformController* const controller = CreateTransformController();
+		controller->SetUserData(vehicleModel);
 		controller->SetCalculateLocalTransforms (true);
 
 		ARTICULATED_VEHICLE_DEFINITION definition;

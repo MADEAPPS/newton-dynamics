@@ -104,8 +104,8 @@ class dCustomArticulatedTransformController: public dCustomControllerBase
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}
 	
 	protected:
-	CUSTOM_JOINTS_API void Init (void* const userData);
-
+	//CUSTOM_JOINTS_API void Init (void* const userData);
+	CUSTOM_JOINTS_API void Init ();
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
@@ -125,7 +125,8 @@ class dCustomArticulaledTransformManager: public dCustomControllerManager<dCusto
 
 	CUSTOM_JOINTS_API virtual void Debug () const {}
 
-	CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController (void* const userData);
+	//CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController (void* const userData);
+	CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController ();
 	
 	CUSTOM_JOINTS_API virtual void DisableAllSelfCollision (dCustomArticulatedTransformController* const controller);
 	CUSTOM_JOINTS_API virtual void SetDefaultSelfCollisionMask (dCustomArticulatedTransformController* const controller);

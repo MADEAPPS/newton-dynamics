@@ -28,10 +28,10 @@ dCustomTriggerManager::~dCustomTriggerManager()
 }
 
 	
-dCustomTriggerController* dCustomTriggerManager::CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData)
+dCustomTriggerController* dCustomTriggerManager::CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape)
 {
 	dCustomTriggerController* const trigger = (dCustomTriggerController*) CreateController();
-	trigger->Init (convexShape, matrix, userData);
+	trigger->Init (convexShape, matrix);
 	return trigger;
 }
 
@@ -119,9 +119,10 @@ dCustomTriggerController::~dCustomTriggerController()
 }
 
 
-void dCustomTriggerController::Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData)
+void dCustomTriggerController::Init (NewtonCollision* const convexShape, const dMatrix& matrix)
 {
-	m_userData = userData;
+	//m_userData = userData;
+	SetUserData (NULL);
 
 	NewtonWorld* const world = ((dCustomTriggerManager*)GetManager())->GetWorld();
 

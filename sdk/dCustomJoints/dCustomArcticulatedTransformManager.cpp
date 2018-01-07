@@ -24,13 +24,12 @@ dCustomArticulaledTransformManager::~dCustomArticulaledTransformManager()
 {
 }
 
-dCustomArticulatedTransformController* dCustomArticulaledTransformManager::CreateTransformController (void* const userData)
+dCustomArticulatedTransformController* dCustomArticulaledTransformManager::CreateTransformController ()
 {
 	dCustomArticulatedTransformController* const controller = (dCustomArticulatedTransformController*) CreateController();
-	controller->Init (userData);
+	controller->Init ();
 	return controller;
 }
-
 
 void dCustomArticulaledTransformManager::SetCollisionMask (dCustomArticulatedTransformController::dSkeletonBone* const bone0, dCustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode)
 {
@@ -71,13 +70,12 @@ dCustomArticulatedTransformController::~dCustomArticulatedTransformController()
 }
 
 
-void dCustomArticulatedTransformController::Init (void* const userData)
+void dCustomArticulatedTransformController::Init ()
 {
 	dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
 	m_boneCount = 0;
-	m_userData = userData;
 	m_calculateLocalTransform = false;
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 }

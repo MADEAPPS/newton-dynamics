@@ -31,7 +31,7 @@ class dCustomTriggerController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dCustomTriggerController();
 	CUSTOM_JOINTS_API ~dCustomTriggerController();
 
-	CUSTOM_JOINTS_API void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
+	CUSTOM_JOINTS_API void Init (NewtonCollision* const convexShape, const dMatrix& matrix);
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
@@ -64,7 +64,7 @@ class dCustomTriggerManager: public dCustomControllerManager<dCustomTriggerContr
 	CUSTOM_JOINTS_API virtual void OnDestroyBody (NewtonBody* const body); 
 
 	virtual void Debug () const {};
-	CUSTOM_JOINTS_API virtual dCustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
+	CUSTOM_JOINTS_API virtual dCustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape);
 
 	CUSTOM_JOINTS_API virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType eventType, NewtonBody* const guess) const = 0;
 

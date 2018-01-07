@@ -56,7 +56,6 @@ class dCustomControllerConvexCastPreFilter
 	friend class dCustomVehicleController;
 };
 
-
 class dCustomControllerConvexRayFilter: public dCustomControllerConvexCastPreFilter
 {	
 	public:
