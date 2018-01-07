@@ -72,20 +72,20 @@ static dBalancingDummyDefinition skeletonRagDoll[] =
 	{ "Bip01_R_Calf", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f, -140.0f, 10.0f, 0.0f, 90.0f, 0.0f, 90.0f, 0.0f, 50.0f },
 	{ "Bip01_R_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 75.0f, 0.0f, -90.0f, -0.0f, 0.0f, 50.0f },
 
-	{ "Bip01_Spine", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
-	{ "Bip01_Spine1", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
-	{ "Bip01_Spine2", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
+//	{ "Bip01_Spine", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
+//	{ "Bip01_Spine1", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
+//	{ "Bip01_Spine2", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
 
-	{ "Bip01_Neck", "capsule", two_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f, 5.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
-	{ "Bip01_Head", "sphere", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f, 5.0f, 30.0f, -60.0f, 60.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
+//	{ "Bip01_Neck", "capsule", two_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f, 5.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
+//	{ "Bip01_Head", "sphere", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f, 5.0f, 30.0f, -60.0f, 60.0f, 0.0f, -90.0f, 0.0f, 0.0f, 100.0f },
 
-	{ "Bip01_L_UpperArm", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f, 80.0f, 30.0f, 120.0f, 0.0f, -90.0f, 0.0f, 40.0f, 100.0f },
-	{ "Bip01_L_Forearm", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 7.0f, -150.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f, 0.0f, 50.0f },
-	{ "Bip01_L_Hand", "convexhull", two_dof, 0.0f, 00.0f, 0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 2.0f, 0.0f, -45.0f, 45.0f, 0.0f, 0.0f, 90.0f, 0.0f, 10.0f },
+//	{ "Bip01_L_UpperArm", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f, 80.0f, 30.0f, 120.0f, 0.0f, -90.0f, 0.0f, 40.0f, 100.0f },
+//	{ "Bip01_L_Forearm", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 7.0f, -150.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f, 0.0f, 50.0f },
+//	{ "Bip01_L_Hand", "convexhull", two_dof, 0.0f, 00.0f, 0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 2.0f, 0.0f, -45.0f, 45.0f, 0.0f, 0.0f, 90.0f, 0.0f, 10.0f },
 
-	{ "Bip01_R_UpperArm", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f, 80.0f, 30.0f, 120.0f, 0.0f, -90.0f, 0.0f, -40.0f, 100.0f },
-	{ "Bip01_R_Forearm", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 7.0f, 0.0f, 150.0f, 0.0f, 0.0f, 0.0f, -90.0f, 0.0f, 50.0f },
-	{ "Bip01_R_Hand", "convexhull", two_dof, 0.0f, 00.0f, 0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 2.0f, 0.0f, -45.0f, 45.0f, 0.0f, 0.0f, -90.0f, 0.0f, 10.0f },
+//	{ "Bip01_R_UpperArm", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f, 80.0f, 30.0f, 120.0f, 0.0f, -90.0f, 0.0f, -40.0f, 100.0f },
+//	{ "Bip01_R_Forearm", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 7.0f, 0.0f, 150.0f, 0.0f, 0.0f, 0.0f, -90.0f, 0.0f, 50.0f },
+//	{ "Bip01_R_Hand", "convexhull", two_dof, 0.0f, 00.0f, 0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 2.0f, 0.0f, -45.0f, 45.0f, 0.0f, 0.0f, -90.0f, 0.0f, 10.0f },
 };
 
 class BalancingDummyManager: public dCustomArticulaledTransformManager
@@ -148,7 +148,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		origin.m_w = 1.0f;
 	}
 
-
 	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const dBalancingDummyDefinition& definition) const
 	{
 		dVector size(0.0f);
@@ -159,7 +158,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		matrix.m_posit.m_y = definition.m_shape_y;
 		matrix.m_posit.m_z = definition.m_shape_z;
 		return NewtonCreateSphere(GetWorld(), definition.m_radio, 0, &matrix[0][0]);
-
 	}
 
 	NewtonCollision* MakeCapsule(DemoEntity* const bodyPart, const dBalancingDummyDefinition& definition) const
@@ -209,20 +207,16 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		NewtonCollision* shape = NULL;
 		if (!strcmp(definition.m_shapeType, "sphere")) {
 			shape = MakeSphere(bodyPart, definition);
-		}
-		else if (!strcmp(definition.m_shapeType, "capsule")) {
+		} else if (!strcmp(definition.m_shapeType, "capsule")) {
 			shape = MakeCapsule(bodyPart, definition);
-		}
-		else if (!strcmp(definition.m_shapeType, "box")) {
+		} else if (!strcmp(definition.m_shapeType, "box")) {
 			shape = MakeBox(bodyPart);
-		}
-		else {
+		} else {
 			shape = MakeConvexHull(bodyPart);
 		}
 
 		// calculate the bone matrix
 		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
-
 		NewtonWorld* const world = GetWorld();
 
 		// create the rigid body that will make this bone
@@ -253,36 +247,34 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(definition.m_framePitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_frameYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_frameRoll * 3.141592f / 180.0f));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
-		switch (definition.m_type) {
-		case one_dof:
+		switch (definition.m_type) 
 		{
-			dCustomRagdollMotor_1dof* const joint = new dCustomRagdollMotor_1dof(pinAndPivotInGlobalSpace, bone, parent);
-			//joint->DisableMotor();
-			joint->SetJointTorque(definition.m_frictionTorque);
-			joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
-			break;
-		}
+			case one_dof:
+			{
+				dCustomRagdollMotor_1dof* const joint = new dCustomRagdollMotor_1dof(pinAndPivotInGlobalSpace, bone, parent);
+				joint->SetJointTorque(definition.m_frictionTorque);
+				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				break;
+			}
 
-		case two_dof:
-		{
-			dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
-			//joint->DisableMotor();
-			joint->SetJointTorque(definition.m_frictionTorque);
-			joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
-			break;
-		}
+			case two_dof:
+			{
+				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
+				joint->SetJointTorque(definition.m_frictionTorque);
+				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+				break;
+			}
 
-		case three_dof:
-		{
-			//dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
-			dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
-			//joint->DisableMotor();
-			joint->SetJointTorque(definition.m_frictionTorque);
-			joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
-			joint->SetConeAngleOffset(definition.m_coneAligment * 3.141592f / 180.0f);
-			//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
-			break;
-		}
+			case three_dof:
+			{
+				//dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
+				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
+				joint->SetJointTorque(definition.m_frictionTorque);
+				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+				joint->SetConeAngleOffset(definition.m_coneAligment * 3.141592f / 180.0f);
+				//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				break;
+			}
 		}
 	}
 
