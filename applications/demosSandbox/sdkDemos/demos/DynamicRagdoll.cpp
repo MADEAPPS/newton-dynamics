@@ -91,17 +91,29 @@ static dBalancingDummyDefinition skeletonRagDoll[] =
 class BalancingDummyManager: public dCustomArticulaledTransformManager
 {
 	public:
-	class dSelfBalancingBiped: public dCustomAlloc
+	class dBiped: public dCustomAlloc
 	{
 		public:
-		dSelfBalancingBiped(dCustomArticulatedTransformController* const controller)
+		dBiped(dCustomArticulatedTransformController* const controller)
+			:m_kinematicSolver(NULL)
+			,m_controller(controller)
+		{
+			NewtonWorld* const workd = controller->GetManager()->GetWorld();
+
+			// make the kinematic solver
+			m_kinematicSolver = NewtonCreateInverseDynamics(workd);
+		}
+
+		~dBiped()
+		{
+			NewtonInverseDynamicsDestroy(m_kinematicSolver);
+		}
+
+		void Update(dFloat timestep)
 		{
 		}
 
-		~dSelfBalancingBiped()
-		{
-		}
-
+		NewtonInverseDynamics* m_kinematicSolver;
 		dCustomArticulatedTransformController* m_controller;
 	};
 
@@ -113,10 +125,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
 		NewtonMaterialSetCallbackUserData(scene->GetNewton(), m_material, m_material, this);
 		NewtonMaterialSetCollisionCallback(scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
-	}
-
-	virtual void OnPreUpdate(dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
-	{
 	}
 
 	static int OnBoneAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -314,7 +322,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 	void DestroyController (dCustomArticulatedTransformController* const controller)
 	{
-		dSelfBalancingBiped* const balancingModule = (dSelfBalancingBiped*)controller->GetUserData();
+		dBiped* const balancingModule = (dBiped*)controller->GetUserData();
 		delete balancingModule;
 		dCustomArticulaledTransformManager::DestroyController (controller);
 	}
@@ -389,8 +397,14 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
 
 		// add up the active balancing support
-		dSelfBalancingBiped* const balancingModule = new dSelfBalancingBiped(controller);
+		dBiped* const balancingModule = new dBiped(controller);
 		controller->SetUserData(balancingModule);
+	}
+
+	void OnPreUpdate(dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
+	{
+		dBiped* const biped = (dBiped*)controller->GetUserData();
+		biped->Update(timestep);
 	}
 
 
