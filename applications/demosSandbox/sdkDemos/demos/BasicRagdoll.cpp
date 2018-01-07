@@ -89,10 +89,10 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 	{"Bip01_R_Hand",  "convexhull", two_dof,	0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,     0.0f,-90.0f,   0.0f,  10.0f },
 };
 
-class CrashDummyModel: public dCustomArticulaledTransformManager
+class CrashDummyManager: public dCustomArticulaledTransformManager
 {
 	public: 
-	CrashDummyModel (DemoEntityManager* const scene)
+	CrashDummyManager (DemoEntityManager* const scene)
 		:dCustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
@@ -391,35 +391,12 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
-	// load a skeleton mesh for using as a ragdoll manager
+	// load a skeleton mesh 
 	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
-	{
-		// prepare model for rag doll
-		DemoEntity* limb;
-		dMatrix limbMatrix;
-
-		limb = ragDollModel.Find("Bip01_L_UpperArm");
-		//limbMatrix = dPitchMatrix (-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-		//limb->ResetMatrix(*scene, limbMatrix);
-
-		limb = ragDollModel.Find("Bip01_R_UpperArm");
-		//limbMatrix = dPitchMatrix( 40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-		//limb->ResetMatrix(*scene, limbMatrix);
-
-		limb = ragDollModel.Find("Bip01_L_Thigh");
-		//limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-		//limb->ResetMatrix(*scene, limbMatrix);
-
-		limb = ragDollModel.Find("Bip01_R_Thigh");
-		//limbMatrix = dPitchMatrix(-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-		//limb->ResetMatrix(*scene, limbMatrix);
-	}
-
-
 	//  create a skeletal transform controller for controlling rag doll
-	CrashDummyModel* const manager = new CrashDummyModel (scene);
+	CrashDummyManager* const manager = new CrashDummyManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());
