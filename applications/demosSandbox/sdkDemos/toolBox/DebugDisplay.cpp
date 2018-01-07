@@ -333,6 +333,17 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 		glBegin(GL_TRIANGLES);
 	}
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+
+		dFloat mass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		if (mass == 0.0f) {
+			continue;
+		}
+
+
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		int collisionType = NewtonCollisionGetType (collision);
 		switch (collisionType) 
