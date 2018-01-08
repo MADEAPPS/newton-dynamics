@@ -444,9 +444,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		if (id0 & id1 & ARTICULATED_VEHICLE_DEFINITION::m_bodyPart) {
 			dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
 			dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
-			if (bone0 && bone1 && (bone0->m_myController == bone1->m_myController)) {
-				dAssert (!bone0->m_myController->SelfCollisionTest (bone0, bone1));
-				return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
+			if (bone0 && bone1 && (bone0->m_controller == bone1->m_controller)) {
+				dAssert (!bone0->m_controller->SelfCollisionTest (bone0, bone1));
+				return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
 			}
 		}
 		return 1;
@@ -472,7 +472,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			// find the root body from the articulated structure 
 			NewtonCollision* const linkCollision = NewtonBodyGetCollision(linkBody);
 			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollision);
-			dCustomArticulatedTransformController* const controller = rootbone->m_myController;
+			dCustomArticulatedTransformController* const controller = rootbone->m_controller;
 			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
 
 			int countCount = 0;
@@ -505,7 +505,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			NewtonCollision* const tireCollsion = NewtonBodyGetCollision(tireBody);
 			const dCustomArticulatedTransformController::dSkeletonBone* const bone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (tireCollsion);
 
-			dCustomArticulatedTransformController* const controller = bone->m_myController;
+			dCustomArticulatedTransformController* const controller = bone->m_controller;
 			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = controller->GetParent(bone);
 			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
 

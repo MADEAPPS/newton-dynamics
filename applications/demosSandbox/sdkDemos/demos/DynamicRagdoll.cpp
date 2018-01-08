@@ -103,10 +103,12 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 			// make the kinematic solver
 			m_kinematicSolver = NewtonCreateInverseDynamics(workd);
 
-			dAssert (0);
-//			NewtonBody* const rootBody = controller->GetBoneBody(0);
-			
+			// build the articulated body hierarchy 
+			BuildInverseDynamics();
 
+			// finalize inverse dynamics solver
+			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
+		
 		}
 
 		~dBiped()
@@ -114,8 +116,56 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 			NewtonInverseDynamicsDestroy(m_kinematicSolver);
 		}
 
-		void Update(dFloat timestep)
+
+		void BuildInverseDynamics()
 		{
+			void* rootNode[128];
+			dCustomArticulatedTransformController::dSkeletonBone* stackPool[128];
+
+			int stack = 1;
+			rootNode[0] = NULL;
+			stackPool[0] = m_controller->GetRoot();
+			while (stack) {
+				stack--;
+				void* parentNode = rootNode[stack];
+				dCustomArticulatedTransformController::dSkeletonBone* const bone = stackPool[stack];
+
+				void* ikNode = NULL;
+				if (parentNode) {
+					NewtonBody* const parentBody = bone->m_parent->m_body;
+					for (NewtonJoint* joint = NewtonBodyGetFirstJoint(bone->m_body); joint; joint = NewtonBodyGetNextJoint (bone->m_body, joint)) {
+						dCustomJoint* const customJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
+						if ((customJoint->GetBody0() == parentBody) || (customJoint->GetBody1() == parentBody)) {
+							ikNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, parentNode, joint);
+							break;
+						}
+					}
+					dAssert (ikNode);
+				} else {
+					ikNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, bone->m_body);
+				}
+
+				//DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
+				//const dString& name = entity->GetName();
+				//if (name == "Bip01_L_Foot") {
+				//	dAssert(0);
+				//} else if (name == "Bip01_R_Foot") {
+				//	dAssert(0);
+				//}
+
+				for (dList<dCustomArticulatedTransformController::dSkeletonBone>::dListNode* node = bone->GetFirst(); node; node = node->GetNext()) {
+					rootNode[stack] = ikNode; 
+					stackPool[stack] = &node->GetInfo();
+					stack++;
+				}
+			}
+
+
+		}
+
+		void Update(dFloat timestep, int threadIndex)
+		{
+			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
@@ -141,8 +191,8 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 		dAssert(bone0);
 		dAssert(bone1);
-		if (bone0->m_myController && bone1->m_myController) {
-			return bone0->m_myController->SelfCollisionTest(bone0, bone1) ? 1 : 0;
+		if (bone0->m_controller && bone1->m_controller) {
+			return bone0->m_controller->SelfCollisionTest(bone0, bone1) ? 1 : 0;
 		}
 
 		return 1;
@@ -408,7 +458,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 	void OnPreUpdate(dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
 		dBiped* const biped = (dBiped*)controller->GetUserData();
-		biped->Update(timestep);
+		biped->Update(timestep, threadIndex);
 	}
 
 

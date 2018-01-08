@@ -84,7 +84,7 @@ class dCustomArticulatedTransformController: public dCustomControllerBase
 		dMatrix m_bindMatrix;
 		NewtonBody* m_body;
 		dSkeletonBone* m_parent;
-		dCustomArticulatedTransformController* m_myController;
+		dCustomArticulatedTransformController* m_controller;
 		//dSelfCollisionBitmask m_bitField;
 	};
 

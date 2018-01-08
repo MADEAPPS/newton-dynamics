@@ -114,8 +114,8 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 
 		dAssert (bone0);
 		dAssert (bone1);
-		if (bone0->m_myController && bone1->m_myController) {
-			return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
+		if (bone0->m_controller && bone1->m_controller) {
+			return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
 		}
 
 		return 1;
