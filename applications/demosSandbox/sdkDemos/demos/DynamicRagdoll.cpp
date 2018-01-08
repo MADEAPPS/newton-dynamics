@@ -159,8 +159,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 					stack++;
 				}
 			}
-
-
 		}
 
 		void Update(dFloat timestep, int threadIndex)
