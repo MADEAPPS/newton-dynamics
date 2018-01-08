@@ -75,7 +75,6 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 
 	CUSTOM_JOINTS_API dFloat GetConeAngle() const;
 	CUSTOM_JOINTS_API void SetConeAngle(dFloat angle);
-	CUSTOM_JOINTS_API void SetConeAngleOffset(dFloat angle);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
@@ -86,7 +85,6 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_coneAngle;
-	dFloat m_coneAngleOffset;
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_2dof, dCustomRagdollMotor)
 };
 
