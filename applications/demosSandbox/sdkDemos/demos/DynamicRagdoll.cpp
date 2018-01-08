@@ -657,7 +657,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 		for (int z = 0; z < count; z++) {
 			dVector p(origin + dVector((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor(world, p, 100.0f);
-			matrix.m_posit.m_y += 0.1f;
+			matrix.m_posit.m_y += 3.0f;
 			manager->CreateRagDoll(matrix, &ragDollModel, skeletonRagDoll, sizeof(skeletonRagDoll) / sizeof(skeletonRagDoll[0]));
 		}
 	}
