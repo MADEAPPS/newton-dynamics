@@ -172,7 +172,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 				if (effector) {
 					// set left foot effector local position
 					effectorMatrix = effector->GetBodyMatrix();
-				effectorMatrix.m_posit.m_z -= 0.2f;
+				effectorMatrix.m_posit.m_z -= 0.4f;
 				effectorMatrix.m_posit.m_y -= 0.1f;
 
 					poseMatrix = effectorMatrix * invRootMatrix;
@@ -188,7 +188,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 				if (effector) {
 					// set right foot effector local position
 					effectorMatrix = effector->GetBodyMatrix();
-				effectorMatrix.m_posit.m_z += 0.2f;
+				effectorMatrix.m_posit.m_z += 0.4f;
 				effectorMatrix.m_posit.m_y -= 0.1f;
 
 					poseMatrix = effectorMatrix * invRootMatrix;
