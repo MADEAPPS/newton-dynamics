@@ -100,7 +100,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 		void Debug(dDebugDisplay* const debugDisplay) const
 		{
-			//dCustomRagdollMotor_2dof::Debug(debugDisplay);
+			dCustomRagdollMotor_1dof::Debug(debugDisplay);
 		}
 	};
 
