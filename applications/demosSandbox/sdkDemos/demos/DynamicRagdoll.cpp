@@ -280,7 +280,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 		void Update(dFloat timestep, int threadIndex)
 		{
-			m_animTreeNode->Update(timestep);
+			//m_animTreeNode->Update(timestep);
 			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
 
