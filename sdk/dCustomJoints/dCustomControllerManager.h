@@ -207,7 +207,7 @@ dCustomControllerManager<CONTROLLER_BASE>::dCustomControllerManager(NewtonWorld*
 	void* const listener = NewtonWorldAddListener(world, managerName, this);
 
 	NewtonWorldListenerSetDebugCallback(world, listener, Debug);
-	NewtonWorldListenerSetDestroctorCallback(world, listener, Destroy);
+	NewtonWorldListenerSetDestructorCallback(world, listener, Destroy);
 	NewtonWorldListenerSetPreUpdateCallback(world, listener, PreUpdate);
 	NewtonWorldListenerSetPostUpdateCallback(world, listener, PostUpdate);
 	NewtonWorldListenerSetBodyDestroyCallback(world, listener, OnBodyDestroy);

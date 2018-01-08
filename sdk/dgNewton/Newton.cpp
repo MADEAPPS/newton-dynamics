@@ -994,7 +994,7 @@ void* NewtonWorldAddListener (const NewtonWorld* const newtonWorld, const char* 
 	return world->AddListener (nameId, listenerUserData);
 }
 
-void NewtonWorldListenerSetDestroctorCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback destroy)
+void NewtonWorldListenerSetDestructorCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback destroy)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;

@@ -65,11 +65,11 @@ static dBalancingDummyDefinition skeletonRagDoll[] =
 
 	{ "Bip01_L_Thigh", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 14.0f, -45.0f, 45.0f, 120.0f, 0.0f, -90.0f, -0.0f, 1000.0f },
 	{ "Bip01_L_Calf", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f, -140.0f, 10.0f, 0.0f, 90.0f, 0.0f, 90.0f, 500.0f },
-	{ "Bip01_L_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 45.0f, 0.0f, -90.0f, -0.0f, 500.0f },
+	{ "Bip01_L_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 60.0f, 0.0f, -90.0f, -0.0f, 500.0f },
 
 	{ "Bip01_R_Thigh", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 14.0f, -45.0f, 45.0f, 120.0f, 0.0f, -90.0f, -0.0f, 1000.0f },
 	{ "Bip01_R_Calf", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f, -140.0f, 10.0f, 0.0f, 90.0f, 0.0f, 90.0f, 500.0f },
-	{ "Bip01_R_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 45.0f, 0.0f, -90.0f, -0.0f, 500.0f },
+	{ "Bip01_R_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 60.0f, 0.0f, -90.0f, -0.0f, 500.0f },
 
 //	{ "Bip01_Spine", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 100.0f },
 //	{ "Bip01_Spine1", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 100.0f },
@@ -90,12 +90,26 @@ static dBalancingDummyDefinition skeletonRagDoll[] =
 class BalancingDummyManager: public dCustomArticulaledTransformManager
 {
 	public:
+
+	class dBipedEffector: public dCustomRagdollMotor_EndEffector
+	{
+		public:
+		dBipedEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace)
+			:dCustomRagdollMotor_EndEffector(invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
+		{
+			SetLinearSpeed(1.0f);
+		}
+	};
+
+
 	class dBiped: public dCustomAlloc
 	{
 		public:
 		dBiped(dCustomArticulatedTransformController* const controller)
 			:m_kinematicSolver(NULL)
 			,m_controller(controller)
+			,m_rightLegEffector(NULL)
+			,m_leftLegEffector(NULL)
 		{
 			NewtonWorld* const workd = controller->GetManager()->GetWorld();
 
@@ -118,12 +132,16 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 		void BuildInverseDynamics()
 		{
+			dMatrix rootMatrix;
 			void* rootNode[128];
 			dCustomArticulatedTransformController::dSkeletonBone* stackPool[128];
 
 			int stack = 1;
 			rootNode[0] = NULL;
 			stackPool[0] = m_controller->GetRoot();
+			NewtonBody* const rootbody = stackPool[0]->m_body;
+			NewtonBodyGetMatrix(rootbody, &rootMatrix[0][0]);
+
 			while (stack) {
 				stack--;
 				void* parentNode = rootNode[stack];
@@ -144,13 +162,24 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 					ikNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, bone->m_body);
 				}
 
-				//DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
-				//const dString& name = entity->GetName();
-				//if (name == "Bip01_L_Foot") {
-				//	dAssert(0);
-				//} else if (name == "Bip01_R_Foot") {
-				//	dAssert(0);
-				//}
+				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
+				const dString& name = entity->GetName();
+				if (name == "Bip01_L_Foot") {
+					dMatrix matrix0;
+					dMatrix matrix1;
+					dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(NewtonInverseDynamicsGetJoint(m_kinematicSolver, ikNode));
+					dAssert(customJoint->GetBody0() == bone->m_body);
+					customJoint->CalculateGlobalMatrix(matrix0, matrix1);
+					m_leftLegEffector = new dBipedEffector(m_kinematicSolver, ikNode, rootbody, matrix0);
+
+				} else if (name == "Bip01_R_Foot") {
+					dMatrix matrix0;
+					dMatrix matrix1;
+					dCustomJoint* const customJoint = (dCustomJoint*) NewtonJointGetUserData(NewtonInverseDynamicsGetJoint(m_kinematicSolver, ikNode));
+					dAssert (customJoint->GetBody0() == bone->m_body);
+					customJoint->CalculateGlobalMatrix (matrix0, matrix1);
+					m_rightLegEffector = new dBipedEffector(m_kinematicSolver, ikNode, rootbody, matrix0);
+				}
 
 				for (dList<dCustomArticulatedTransformController::dSkeletonBone>::dListNode* node = bone->GetFirst(); node; node = node->GetNext()) {
 					rootNode[stack] = ikNode; 
@@ -162,11 +191,14 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 		void Update(dFloat timestep, int threadIndex)
 		{
-//			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
+			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
 
 		NewtonInverseDynamics* m_kinematicSolver;
 		dCustomArticulatedTransformController* m_controller;
+		dCustomRagdollMotor_EndEffector* m_rightLegEffector;
+		dCustomRagdollMotor_EndEffector* m_leftLegEffector;
+		
 	};
 
 
@@ -331,7 +363,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 			case two_dof:
 			{
 				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
-				//joint->DisableMotor();
+				joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
 				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
 				break;

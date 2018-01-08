@@ -18,7 +18,7 @@ DemoListenerBase::DemoListenerBase(DemoEntityManager* const scene, const char* c
 	NewtonWorld* const world = scene->GetNewton();
 	void* const listener = NewtonWorldAddListener (world, listenerName, this);
 
-	NewtonWorldListenerSetDestroctorCallback (world, listener, Destroy);
+	NewtonWorldListenerSetDestructorCallback (world, listener, Destroy);
 	NewtonWorldListenerSetPreUpdateCallback (world, listener, PreUpdate);
 	NewtonWorldListenerSetPostUpdateCallback (world, listener, PostUpdate);
 	NewtonWorldListenerSetBodyDestroyCallback (world, listener, OnBodyDestroy);
