@@ -147,7 +147,7 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
-	dMatrix m_targetMatrix;	
+	dMatrix m_targetMatrix____;	
 	NewtonBody* m_referenceBody;
 	dFloat m_linearSpeed;
 	dFloat m_angularSpeed;
@@ -155,6 +155,7 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	dFloat m_angularFriction;
 	bool m_isSixdof;
 
+	friend class dEffectorTreeRoot;
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector, dCustomJoint)
 };
 

@@ -583,7 +583,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint (invDynSolver, invDynNode)
-	,m_targetMatrix(attachmentPointInGlobalSpace)
+	,m_targetMatrix____(dGetIdentityMatrix())
 	,m_referenceBody(referenceBody)
 	,m_linearSpeed(1.0f)
 	,m_angularSpeed(1.0f)
@@ -599,7 +599,7 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDy
 
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint(6, body, NULL)
-	,m_targetMatrix(attachmentPointInGlobalSpace)
+	,m_targetMatrix____(dGetIdentityMatrix())
 	,m_referenceBody(referenceBody)
 	,m_linearSpeed(1.0f)
 	,m_angularSpeed(1.0f)
@@ -664,21 +664,27 @@ void dCustomRagdollMotor_EndEffector::SetAngularSpeed(dFloat speed)
 
 void dCustomRagdollMotor_EndEffector::SetTargetRotation(const dQuaternion& rotation)
 {
+	dAssert(0);
 //	NewtonBodySetSleepState(m_body0, 0);
-	m_targetMatrix = dMatrix (rotation, m_targetMatrix.m_posit);
+//	m_targetMatrix = dMatrix (rotation, m_targetMatrix.m_posit);
 }
 
 void dCustomRagdollMotor_EndEffector::SetTargetPosit(const dVector& posit)
 {
+	dMatrix parentMatrix;
 //	NewtonBodySetSleepState(m_body0, 0);
-	m_targetMatrix.m_posit = posit;
-	m_targetMatrix.m_posit.m_w = 1.0f;
+
+	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
+	m_targetMatrix____.m_posit = parentMatrix.UntransformVector(posit);
 }
 
 void dCustomRagdollMotor_EndEffector::SetTargetMatrix(const dMatrix& matrix)
 {
+	dMatrix parentMatrix;
 	NewtonBodySetSleepState(m_body0, 0);
-	m_targetMatrix = matrix;
+
+	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
+	m_targetMatrix____ = matrix * parentMatrix.Inverse();
 }
 
 dMatrix dCustomRagdollMotor_EndEffector::GetBodyMatrix() const
@@ -691,18 +697,23 @@ dMatrix dCustomRagdollMotor_EndEffector::GetBodyMatrix() const
 
 dMatrix dCustomRagdollMotor_EndEffector::GetTargetMatrix() const
 {
-	return m_targetMatrix;
+	dMatrix parentMatrix;
+	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
+	return m_targetMatrix____ * parentMatrix;
 }
 
 void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) const
 {
+	dMatrix parentMatrix;
+	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
 	debugDisplay->DrawFrame(GetBodyMatrix());
-	debugDisplay->DrawFrame(m_targetMatrix);
+	debugDisplay->DrawFrame(m_targetMatrix____ * parentMatrix);
 }
 
 void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	// check if this is an impulsive time step
+	dMatrix parentMatrix;
 	dMatrix matrix0(GetBodyMatrix());
 	dVector veloc(0.0f);
 	dVector omega(0.0f);
@@ -713,23 +724,27 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	const dFloat damp = 0.3f;
 	const dFloat invTimestep = 1.0f / timestep;
 
+	
+	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
+	parentMatrix = m_targetMatrix____ * parentMatrix;
+
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
-	NewtonBodyGetPointVelocity(m_referenceBody, &m_targetMatrix.m_posit[0], &veloc1[0]);
+	NewtonBodyGetPointVelocity(m_referenceBody, &parentMatrix.m_posit[0], &veloc1[0]);
 
 	dVector relVeloc(veloc1 - veloc0);
-	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
+	dVector relPosit(parentMatrix.m_posit - matrix0.m_posit);
 
-if (relVeloc.DotProduct3(relVeloc) > 1.0)
-relVeloc =veloc1 - veloc0;
+//if (relVeloc.DotProduct3(relVeloc) > 1.0)
+//relVeloc =veloc1 - veloc0;
 
 	for (int i = 0; i < 3; i++) {
 		// Restrict the movement on the pivot point along all tree orthonormal direction
-		dFloat speed = relVeloc.DotProduct3(m_targetMatrix[i]);
-		dFloat dist = relPosit.DotProduct3(m_targetMatrix[i]) * damp;
+		dFloat speed = relVeloc.DotProduct3(parentMatrix[i]);
+		dFloat dist = relPosit.DotProduct3(parentMatrix[i]) * damp;
 		dFloat relSpeed = dClamp (dist * invTimestep + speed, -m_linearSpeed, m_linearSpeed);
 		dFloat relAccel = relSpeed * invTimestep;
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &m_targetMatrix[i][0]);
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &parentMatrix[i][0]);
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
@@ -737,7 +752,7 @@ relVeloc =veloc1 - veloc0;
 
 
 	if (m_isSixdof) {
-		dQuaternion rotation(matrix0.Inverse() * m_targetMatrix);
+		dQuaternion rotation(matrix0.Inverse() * parentMatrix);
 		if (dAbs(rotation.m_q0) < 0.99998f) {
 			dMatrix rot(dGrammSchmidt(dVector(rotation.m_q1, rotation.m_q2, rotation.m_q3)));
 			dFloat angle = 2.0f * dAcos(dClamp(rotation.m_q0, dFloat(-1.0f), dFloat(1.0f)));
@@ -786,7 +801,9 @@ void dEffectorTreeRoot::Update(dFloat timestep)
 	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
 		const dEffectorTransform& src = srcNode->GetInfo();
 		dMatrix matrix(src.m_rotation, src.m_posit);
-		src.m_effector->SetTargetMatrix(matrix);
+		//src.m_effector->SetTargetMatrix(matrix);
+		src.m_effector->m_targetMatrix____ = matrix;
+		NewtonBodySetSleepState(src.m_effector->GetBody0(), 0);
 	}
 }
 
@@ -795,6 +812,7 @@ void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep)
 	dAssert(m_pose.m_childNode);
 	m_pose.m_childNode->Evaluate(output, timestep);
 
+/*
 	dVector rootPosition;
 	dQuaternion rootRotation;
 	NewtonBodyGetRotation(m_rootBody, &rootRotation.m_q0);
@@ -806,6 +824,7 @@ void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep)
 		tranform.m_rotation = tranform.m_rotation * rootRotation;
 		tranform.m_posit = rootPosition + rootRotation.RotateVector(tranform.m_posit);
 	}
+*/
 }
 
 

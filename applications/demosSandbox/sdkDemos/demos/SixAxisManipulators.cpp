@@ -367,11 +367,11 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	origin.m_posit.m_z = -1.0f;
 	origin1.m_posit.m_z =  1.0f;
 
-	for (int i = 0; i < 8; i ++) {
+	for (int i = 0; i < 1; i ++) {
 		origin.m_posit.m_x += 1.0f;
 		origin1.m_posit.m_x += 1.0f;
 		robotManager->MakeKukaRobot (scene, origin);
-		robotManager->MakeKukaRobot (scene, origin1);
+		//robotManager->MakeKukaRobot (scene, origin1);
 	}
 	
 	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
