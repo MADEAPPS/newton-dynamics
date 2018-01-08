@@ -63,13 +63,13 @@ static dBalancingDummyDefinition skeletonRagDoll[] =
 {
 	{ "Bip01_Pelvis", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f, 0.0f, -0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f },
 
-	{ "Bip01_L_Thigh", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 14.0f, -45.0f, 45.0f, 120.0f, 0.0f, -90.0f, -0.0f, 1000.0f },
-	{ "Bip01_L_Calf", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f, -140.0f, 10.0f, 0.0f, 90.0f, 0.0f, 90.0f, 500.0f },
-	{ "Bip01_L_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 60.0f, 0.0f, -90.0f, -0.0f, 500.0f },
+	{ "Bip01_L_Thigh", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 14.0f, -45.0f, 45.0f, 120.0f, 0.0f, -90.0f, -0.0f, 10000.0f },
+	{ "Bip01_L_Calf", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f, -140.0f, 10.0f, 0.0f, 90.0f, 0.0f, 90.0f, 5000.0f },
+	{ "Bip01_L_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 60.0f, 0.0f, -90.0f, -0.0f, 5000.0f },
 
-	{ "Bip01_R_Thigh", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 14.0f, -45.0f, 45.0f, 120.0f, 0.0f, -90.0f, -0.0f, 1000.0f },
-	{ "Bip01_R_Calf", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f, -140.0f, 10.0f, 0.0f, 90.0f, 0.0f, 90.0f, 500.0f },
-	{ "Bip01_R_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 60.0f, 0.0f, -90.0f, -0.0f, 500.0f },
+//	{ "Bip01_R_Thigh", "capsule", three_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 14.0f, -45.0f, 45.0f, 120.0f, 0.0f, -90.0f, -0.0f, 10000.0f },
+//	{ "Bip01_R_Calf", "capsule", one_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f, -140.0f, 10.0f, 0.0f, 90.0f, 0.0f, 90.0f, 5000.0f },
+//	{ "Bip01_R_Foot", "convexhull", two_dof, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 60.0f, 0.0f, -90.0f, -0.0f, 5000.0f },
 
 //	{ "Bip01_Spine", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 100.0f },
 //	{ "Bip01_Spine1", "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f, 30.0f, -30.0f, 30.0f, 0.0f, -90.0f, 0.0f, 100.0f },
@@ -281,7 +281,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		void Update(dFloat timestep, int threadIndex)
 		{
 			//m_animTreeNode->Update(timestep);
-			//NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
+			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
 
 		dEffectorTreeRoot* m_animTreeNode;
@@ -455,19 +455,25 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		{
 			case one_dof:
 			{
-				dBiped1d* const joint = new dBiped1d(pinAndPivotInGlobalSpace, bone, parent);
-				//joint->DisableMotor();
-				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				//dBiped1d* const joint = new dBiped1d(pinAndPivotInGlobalSpace, bone, parent);
+				//joint->SetJointTorque(definition.m_frictionTorque);
+				//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+
+				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
+				joint->EnableLimits(true);
+				joint->SetLimits(0.0f, 0.0f);
 				break;
 			}
 
 			case two_dof:
 			{
-				dBiped2d* const joint = new dBiped2d(pinAndPivotInGlobalSpace, bone, parent);
-				joint->DisableMotor();
-				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+				//dBiped2d* const joint = new dBiped2d(pinAndPivotInGlobalSpace, bone, parent);
+				//joint->DisableMotor();
+				//joint->SetJointTorque(definition.m_frictionTorque);
+				//joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+				dCustomHinge* const joint = new dCustomHinge (pinAndPivotInGlobalSpace, bone, parent);
+				joint->EnableLimits(true);
+				joint->SetLimits(0.0f, 0.0f);
 				break;
 			}
 

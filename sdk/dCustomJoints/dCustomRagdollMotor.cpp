@@ -256,6 +256,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dFloat project = matrix1.m_front.DotProduct3(matrix0.m_front);
 	if (dAbs (project) > 0.9995f) {
+/*
 		dFloat twistAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
 
@@ -281,7 +282,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
-
+*/
 	} else {
 		dFloat coneAngle = dAcos (dClamp (project, dFloat (-1.0f), dFloat (1.0f)));
 		dVector conePlane (matrix1.m_front.CrossProduct(matrix0.m_front).Normalize());
@@ -314,7 +315,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			NewtonBodyGetOmega(m_body0, &omega0[0]);
 			NewtonBodyGetOmega(m_body1, &omega1[0]);
 			dVector relOmega(omega1 - omega0);
-			dFloat invTimestep = 0.5f / timestep;
+			dFloat invTimestep = 0.25f / timestep;
 
 			if (coneAngle > 1.0f * 3.141592f / 180.0f) {
 				dFloat accel = relOmega.DotProduct3(conePlane) * invTimestep;
