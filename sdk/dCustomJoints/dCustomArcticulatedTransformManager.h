@@ -129,9 +129,6 @@ class dCustomArticulaledTransformManager: public dCustomControllerManager<dCusto
 	CUSTOM_JOINTS_API dCustomArticulaledTransformManager(NewtonWorld* const world, const char* const name = HIERACHICAL_ARTICULATED_PLUGIN_NAME);
 	CUSTOM_JOINTS_API virtual ~dCustomArticulaledTransformManager();
 
-	CUSTOM_JOINTS_API virtual void Debug () const {}
-
-	//CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController (void* const userData);
 	CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController ();
 	
 	CUSTOM_JOINTS_API virtual void DisableAllSelfCollision (dCustomArticulatedTransformController* const controller);
@@ -140,6 +137,7 @@ class dCustomArticulaledTransformManager: public dCustomControllerManager<dCusto
 	CUSTOM_JOINTS_API virtual void SetCollisionMask (dCustomArticulatedTransformController::dSkeletonBone* const bone0, dCustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
 	CUSTOM_JOINTS_API virtual bool SelfCollisionTest (const dCustomArticulatedTransformController::dSkeletonBone* const bone0, const dCustomArticulatedTransformController::dSkeletonBone* const bone1) const;
 
+	CUSTOM_JOINTS_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
 	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const = 0;
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 

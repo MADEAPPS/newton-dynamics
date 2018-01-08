@@ -100,6 +100,10 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
 	}
 
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+	}
+
 	virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
 	}

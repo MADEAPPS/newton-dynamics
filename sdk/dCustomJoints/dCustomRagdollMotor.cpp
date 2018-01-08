@@ -720,6 +720,9 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 	dVector relVeloc(veloc1 - veloc0);
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
 
+if (relVeloc.DotProduct3(relVeloc) > 1.0)
+relVeloc =veloc1 - veloc0;
+
 	for (int i = 0; i < 3; i++) {
 		// Restrict the movement on the pivot point along all tree orthonormal direction
 		dFloat speed = relVeloc.DotProduct3(m_targetMatrix[i]);
@@ -845,14 +848,12 @@ void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep
 		
 		m_pose1.m_childNode = m_node1;
 		if (m_pose1.GetCount() != output.GetCount()) {
-			NEWTON_API void NewtonWorldCriticalSectionLock(const NewtonWorld* const newtonWorld, int threadIndex);
-			NEWTON_API void NewtonWorldCriticalSectionUnlock(const NewtonWorld* const newtonWorld);
-
-
+			NewtonWorldCriticalSectionLock(NewtonBodyGetWorld(m_rootBody), 0);
 			m_pose1.RemoveAll();
 			for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 				m_pose1.Append(node->GetInfo());
 			}
+			NewtonWorldCriticalSectionUnlock(NewtonBodyGetWorld(m_rootBody));
 		}
 		m_node1->Evaluate(m_pose1, timestep);
 		m_node0->Evaluate(output, timestep);

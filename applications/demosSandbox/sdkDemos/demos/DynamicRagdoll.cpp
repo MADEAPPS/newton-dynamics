@@ -90,6 +90,33 @@ static dBalancingDummyDefinition skeletonRagDoll[] =
 class BalancingDummyManager: public dCustomArticulaledTransformManager
 {
 	public:
+	class dBiped1d: public dCustomRagdollMotor_1dof
+	{
+		public:
+		dBiped1d(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+			:dCustomRagdollMotor_1dof(pinAndPivotFrame, child, parent)
+		{
+		}
+
+		void Debug(dDebugDisplay* const debugDisplay) const
+		{
+			//dCustomRagdollMotor_2dof::Debug(debugDisplay);
+		}
+	};
+
+	class dBiped2d: public dCustomRagdollMotor_2dof
+	{
+		public:
+		dBiped2d (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+			:dCustomRagdollMotor_2dof(pinAndPivotFrame, child, parent)
+		{
+		}
+
+		void Debug(dDebugDisplay* const debugDisplay) const
+		{
+			//dCustomRagdollMotor_2dof::Debug(debugDisplay);
+		}
+	};
 
 	class dBipedEffector: public dCustomRagdollMotor_EndEffector
 	{
@@ -101,15 +128,15 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		}
 	};
 
-
 	class dBiped: public dCustomAlloc
 	{
 		public:
 		dBiped(dCustomArticulatedTransformController* const controller)
-			:m_kinematicSolver(NULL)
+			:m_animTreeNode(NULL)
+			,m_kinematicSolver(NULL)
 			,m_controller(controller)
-			,m_rightLegEffector(NULL)
 			,m_leftLegEffector(NULL)
+			,m_rightLegEffector(NULL)
 		{
 			NewtonWorld* const workd = controller->GetManager()->GetWorld();
 
@@ -121,7 +148,58 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 			// finalize inverse dynamics solver
 			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
-		
+
+
+			// create an animation tree
+			NewtonBody* const rootBody = NewtonInverseDynamicsGetBody(m_kinematicSolver, NewtonInverseDynamicsGetRoot(m_kinematicSolver));
+			dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(rootBody);
+
+			//m_animTreeNode = new dEffectorTreeRoot(rootBody, m_postureModifier);
+			m_animTreeNode = new dEffectorTreeRoot(rootBody, idlePose);
+
+
+			dMatrix invRootMatrix;
+			NewtonBodyGetMatrix(rootBody, &invRootMatrix[0][0]);
+			invRootMatrix = invRootMatrix.Inverse();
+
+			{
+				dMatrix poseMatrix;
+				dMatrix effectorMatrix;
+				dEffectorTreeInterface::dEffectorTransform frame;
+				dCustomRagdollMotor_EndEffector* effector;
+
+				effector = m_leftLegEffector;
+				if (effector) {
+					// set left foot effector local position
+					effectorMatrix = effector->GetBodyMatrix();
+				effectorMatrix.m_posit.m_z -= 0.2f;
+				effectorMatrix.m_posit.m_y -= 0.1f;
+
+					poseMatrix = effectorMatrix * invRootMatrix;
+					frame.m_effector = effector;
+					frame.m_posit = poseMatrix.m_posit;
+					frame.m_rotation = dQuaternion(poseMatrix);
+					idlePose->GetPose().Append(frame);
+					//walkPoseGenerator->GetPose().Append(frame);
+					m_animTreeNode->GetPose().Append(frame);
+				}
+
+				effector = m_rightLegEffector;
+				if (effector) {
+					// set right foot effector local position
+					effectorMatrix = effector->GetBodyMatrix();
+				effectorMatrix.m_posit.m_z += 0.2f;
+				effectorMatrix.m_posit.m_y -= 0.1f;
+
+					poseMatrix = effectorMatrix * invRootMatrix;
+					frame.m_effector = effector;
+					frame.m_posit = poseMatrix.m_posit;
+					frame.m_rotation = dQuaternion(poseMatrix);
+					idlePose->GetPose().Append(frame);
+					//walkPoseGenerator->GetPose().Append(frame);
+					m_animTreeNode->GetPose().Append(frame);
+				}
+			}
 		}
 
 		~dBiped()
@@ -189,18 +267,32 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 			}
 		}
 
+		void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+		{
+			//const dEffectorTreeInterface::dEffectorPose& pose = m_animTreeNode->GetPose();
+			if (m_leftLegEffector) {
+				m_leftLegEffector->Debug(debugContext);
+			}
+			if (m_rightLegEffector) {
+				m_rightLegEffector->Debug(debugContext);
+			}
+		}
+
 		void Update(dFloat timestep, int threadIndex)
 		{
+			m_animTreeNode->Update(timestep);
 			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
 
+		dEffectorTreeRoot* m_animTreeNode;
 		NewtonInverseDynamics* m_kinematicSolver;
+		
+		// these objects are no to be deleted
 		dCustomArticulatedTransformController* m_controller;
-		dCustomRagdollMotor_EndEffector* m_rightLegEffector;
 		dCustomRagdollMotor_EndEffector* m_leftLegEffector;
+		dCustomRagdollMotor_EndEffector* m_rightLegEffector;
 		
 	};
-
 
 	BalancingDummyManager(DemoEntityManager* const scene)
 		:dCustomArticulaledTransformManager(scene->GetNewton())
@@ -253,6 +345,16 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		size = (pmax - pmin).Scale(0.5f);
 		origin = (pmax + pmin).Scale(0.5f);
 		origin.m_w = 1.0f;
+	}
+
+	void ScaleIntertia(NewtonBody* const body, dFloat factor) const
+	{
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
 	}
 
 	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const dBalancingDummyDefinition& definition) const
@@ -353,7 +455,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		{
 			case one_dof:
 			{
-				dCustomRagdollMotor_1dof* const joint = new dCustomRagdollMotor_1dof(pinAndPivotInGlobalSpace, bone, parent);
+				dBiped1d* const joint = new dBiped1d(pinAndPivotInGlobalSpace, bone, parent);
 				//joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
 				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
@@ -362,7 +464,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 			case two_dof:
 			{
-				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
+				dBiped2d* const joint = new dBiped2d(pinAndPivotInGlobalSpace, bone, parent);
 				joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
 				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
@@ -371,8 +473,8 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 			case three_dof:
 			{
-				//dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
-				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
+				//dBiped3d* const joint = new dBiped2d(pinAndPivotInGlobalSpace, bone, parent);
+				dBiped2d* const joint = new dBiped2d(pinAndPivotInGlobalSpace, bone, parent);
 				//joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
 				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
@@ -425,12 +527,12 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		dCustomArticulatedTransformController* const controller = CreateTransformController();
 		controller->SetCalculateLocalTransforms(true);
 
-		// add the root bone
+		// add the root boneBody
 		DemoEntity* const rootEntity = (DemoEntity*)ragDollEntity->Find(definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
 		// for debugging
 // xxx
-NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -454,15 +556,17 @@ NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < defintionCount; i++) {
 				if (!strcmp(definition[i].m_boneName, name)) {
-					NewtonBody* const bone = CreateRagDollBodyPart(entity, definition[i]);
+					NewtonBody* const boneBody = CreateRagDollBodyPart(entity, definition[i]);
+
+					ScaleIntertia(boneBody, 5.0f);
 
 					// connect this body part to its parent with a ragdoll joint
-					ConnectBodyParts(bone, parentBone->m_body, definition[i]);
+					ConnectBodyParts(boneBody, parentBone->m_body, definition[i]);
 
 					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
-					parentBone = controller->AddBone(bone, bindMatrix, parentBone);
+					parentBone = controller->AddBone(boneBody, bindMatrix, parentBone);
 					// save the controller as the collision user data, for collision culling
-					NewtonCollisionSetUserData(NewtonBodyGetCollision(bone), parentBone);
+					NewtonCollisionSetUserData(NewtonBodyGetCollision(boneBody), parentBone);
 					break;
 				}
 			}
@@ -493,6 +597,14 @@ NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 		biped->Update(timestep, threadIndex);
 	}
 
+	void OnDebug (dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			dCustomArticulatedTransformController* const controller = &node->GetInfo();
+			dBiped* const biped = (dBiped*)controller->GetUserData();
+			biped->Debug(debugContext);
+		}
+	}
 
 	int m_material;
 };
@@ -545,7 +657,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 		for (int z = 0; z < count; z++) {
 			dVector p(origin + dVector((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor(world, p, 100.0f);
-			//matrix.m_posit.m_y += 0.f;
+			matrix.m_posit.m_y += 0.1f;
 			manager->CreateRagDoll(matrix, &ragDollModel, skeletonRagDoll, sizeof(skeletonRagDoll) / sizeof(skeletonRagDoll[0]));
 		}
 	}

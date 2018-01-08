@@ -283,6 +283,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
 	}
 
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+	}
+
 	virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
