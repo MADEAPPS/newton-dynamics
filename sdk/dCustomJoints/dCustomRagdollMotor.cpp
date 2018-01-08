@@ -249,15 +249,39 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
+	dMatrix matrix0;
+	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	
 	dFloat project = matrix1.m_front.DotProduct3(matrix0.m_front);
 	if (dAbs (project) > 0.9995f) {
-		dTrace (("xxxxxx\n"));
+		dFloat twistAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
+
+		if (m_motorMode) {
+			dVector omega0(0.0f);
+			dVector omega1(0.0f);
+			NewtonBodyGetOmega(m_body0, &omega0[0]);
+			NewtonBodyGetOmega(m_body1, &omega1[0]);
+			dVector relOmega(omega1 - omega0);
+			dFloat invTimestep = 0.5f / timestep;
+
+			dFloat accel = relOmega.DotProduct3(matrix0.m_right) * invTimestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_right[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowAsInverseDynamics(m_joint);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
+
+			accel = relOmega.DotProduct3(matrix0.m_up) * invTimestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_up[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowAsInverseDynamics(m_joint);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
+		}
+
 	} else {
 		dFloat coneAngle = dAcos (dClamp (project, dFloat (-1.0f), dFloat (1.0f)));
 		dVector conePlane (matrix1.m_front.CrossProduct(matrix0.m_front).Normalize());
@@ -283,8 +307,8 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			}
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
-		} else if (m_motorMode) {
 
+		} else if (m_motorMode) {
 			dVector omega0(0.0f);
 			dVector omega1(0.0f);
 			NewtonBodyGetOmega(m_body0, &omega0[0]);
