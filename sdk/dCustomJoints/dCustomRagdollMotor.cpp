@@ -27,6 +27,8 @@ IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_2dof)
 IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_3dof)
 IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector)
 
+#define D_SERVO_OMEGA_TAU (3.0f * 3.141592f / 180.0f) 
+
 
 dEffectorTreeRoot::dEffectorTreeRoot(NewtonBody* const rootBody, dEffectorTreeInterface* const childNode)
 	:dEffectorTreeInterface(rootBody)
@@ -166,6 +168,7 @@ void dCustomRagdollMotor::EnableMotor()
 {
 	m_motorMode = true;
 }
+
 
 
 
@@ -836,8 +839,16 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 dQuaternion  xxxx(matrix0_.Inverse() * dPitchMatrix(twistAngle_) * matrix0_);
 dVector pin(xxxx.m_q1, xxxx.m_q2, xxxx.m_q3, 0.0f);
 pin = pin.Normalize();
-
 		NewtonUserJointAddAngularRow(m_joint, -twistAngle_, &matrix0.m_front[0]);
+
+		if (twistAngle_ > D_SERVO_OMEGA_TAU) {
+//			dAssert(0);
+		} else if (twistAngle_ < -D_SERVO_OMEGA_TAU) {
+//			dAssert(0);
+		} else {
+//			dAssert(0);
+		}
+
 
 
 		dFloat coneAngle = dAcos(dClamp(project, dFloat(-1.0f), dFloat(1.0f)));
