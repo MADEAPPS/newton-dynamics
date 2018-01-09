@@ -833,14 +833,19 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		dMatrix localMatrix(matrix0_ * matrix1_.Inverse());
 		dFloat twistAngle_ = dAtan2 (-localMatrix.m_right.m_y, localMatrix.m_up.m_y);
 
+dQuaternion  xxxx(matrix0_.Inverse() * dPitchMatrix(twistAngle_) * matrix0_);
+dVector pin(xxxx.m_q1, xxxx.m_q2, xxxx.m_q3, 0.0f);
+pin = pin.Normalize();
+
+		NewtonUserJointAddAngularRow(m_joint, -twistAngle_, &matrix0.m_front[0]);
+
 
 		dFloat coneAngle = dAcos(dClamp(project, dFloat(-1.0f), dFloat(1.0f)));
 		dVector conePlane(matrix1.m_front.CrossProduct(matrix0.m_front).Normalize());
 		dMatrix coneMatrix(dQuaternion(conePlane, coneAngle), matrix1.m_posit);
 		matrix1 = matrix1 * coneMatrix;
-
 		dFloat twistAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
+//		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
 /*
 		dFloat angle = coneAngle - m_coneAngle;
 		if (angle > 0.0f) {
