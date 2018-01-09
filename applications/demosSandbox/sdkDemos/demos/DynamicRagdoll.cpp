@@ -281,7 +281,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		void Update(dFloat timestep, int threadIndex)
 		{
 			//m_animTreeNode->Update(timestep);
-			NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
+			//NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 		}
 
 		dEffectorTreeRoot* m_animTreeNode;
@@ -538,7 +538,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
 		// for debugging
 // xxx
-//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -663,7 +663,8 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 		for (int z = 0; z < count; z++) {
 			dVector p(origin + dVector((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor(world, p, 100.0f);
-			matrix.m_posit.m_y += 3.0f;
+			matrix.m_posit.m_y += 0.2f;
+			//matrix.m_posit.m_y += 3.0f;
 			manager->CreateRagDoll(matrix, &ragDollModel, skeletonRagDoll, sizeof(skeletonRagDoll) / sizeof(skeletonRagDoll[0]));
 		}
 	}
