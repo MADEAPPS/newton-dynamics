@@ -27,7 +27,7 @@ class dSixAxisController: public dCustomControllerBase
 	{
 		public:
 		dEffectorTreeInputModifier(dEffectorTreePose* const poseGenerator, const dVector& azimuthAxis, const dVector& planeAxis)
-			:dEffectorTreeInterface(poseGenerator->m_rootBody)
+			:dEffectorTreeInterface(poseGenerator->GetRootBody())
 			,m_poseGenerator(poseGenerator)
 			,m_euler(0.0f)
 			,m_position(0.0f)
@@ -50,9 +50,9 @@ class dSixAxisController: public dCustomControllerBase
 			m_euler.m_z = roll;
 		}
 
-		virtual void Evaluate(dEffectorPose& output, dFloat timestep)
+		virtual void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
 		{
-			m_poseGenerator->Evaluate(output, timestep);
+			m_poseGenerator->Evaluate(output, timestep, threadIndex);
 
 			dEffectorTransform& transform = output.GetFirst()->GetInfo();
 			dQuaternion yawRotation (m_azimuthAxis, m_euler.m_y);
@@ -267,7 +267,7 @@ class dSixAxisController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		m_animTreeNode->Update(timestep);
+		m_animTreeNode->Update(timestep, threadIndex);
 		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 

@@ -28,6 +28,102 @@ IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_3dof)
 IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector)
 
 
+dEffectorTreeRoot::dEffectorTreeRoot(NewtonBody* const rootBody, dEffectorTreeInterface* const childNode)
+	:dEffectorTreeInterface(rootBody)
+{
+	m_pose.m_childNode = childNode;
+}
+
+
+dEffectorTreeRoot::~dEffectorTreeRoot()
+{
+	dAssert(m_pose.m_childNode);
+	delete m_pose.m_childNode;
+}
+
+
+void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
+{
+	dAssert(m_pose.m_childNode);
+	m_pose.m_childNode->Evaluate(output, timestep, threadIndex);
+
+	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
+		const dEffectorTransform& src = srcNode->GetInfo();
+		dMatrix matrix(src.m_rotation, src.m_posit);
+		//src.m_effector->SetTargetMatrix(matrix);
+		src.m_effector->m_targetMatrix = matrix;
+		NewtonBodySetSleepState(src.m_effector->GetBody0(), 0);
+	}
+}
+
+
+void dEffectorTreeFixPose::Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
+{
+	// just copy the base pose to the output frame
+	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
+		dEffectorTransform& dst = dstNode->GetInfo();
+		const dEffectorTransform& src = srcNode->GetInfo();
+		dAssert(dst.m_effector == src.m_effector);
+		dst.m_rotation = src.m_rotation;
+		dst.m_posit = src.m_posit;
+	}
+}
+
+
+dEffectorTreeTwoWayBlender::dEffectorTreeTwoWayBlender(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1, dEffectorPose& output)
+	:dEffectorTreeInterface(rootBody)
+	,m_node0(node0)
+	,m_node1(node1)
+	,m_pose1()
+	,m_param(1.0f)
+{
+	m_pose1.m_childNode = m_node1;
+	if (m_pose1.GetCount() != output.GetCount()) {
+		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			m_pose1.Append(node->GetInfo());
+		}
+	}
+}
+
+dEffectorTreeTwoWayBlender::~dEffectorTreeTwoWayBlender()
+{
+	delete m_node0;
+	delete m_node1;
+}
+
+void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
+{
+	if (m_param < 0.001f) {
+		m_node0->Evaluate(output, timestep, threadIndex);
+	} else if (m_param > 0.999f) {
+		m_node1->Evaluate(output, timestep, threadIndex);
+	} else {
+
+		m_pose1.m_childNode = m_node1;
+		if (m_pose1.GetCount() != output.GetCount()) {
+			NewtonWorldCriticalSectionLock(NewtonBodyGetWorld(m_rootBody), threadIndex);
+			m_pose1.RemoveAll();
+			for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+				m_pose1.Append(node->GetInfo());
+			}
+			NewtonWorldCriticalSectionUnlock(NewtonBodyGetWorld(m_rootBody));
+		}
+
+		m_node1->Evaluate(m_pose1, timestep, threadIndex);
+		m_node0->Evaluate(output, timestep, threadIndex);
+		for (dEffectorPose::dListNode* srcNode = m_pose1.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
+			dEffectorTransform& dst = dstNode->GetInfo();
+			const dEffectorTransform& src = srcNode->GetInfo();
+			dst.m_posit = dst.m_posit.Scale(1.0f - m_param) + src.m_posit.Scale(m_param);
+			dQuaternion srcRotation(src.m_rotation);
+			srcRotation.Scale(dSign(dst.m_rotation.DotProduct(src.m_rotation)));
+			dst.m_rotation = dst.m_rotation.Slerp(srcRotation, m_param);
+			dst.m_posit.m_w = 1.0f;
+		}
+	}
+}
+
+
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	,m_motorTorque(100.0f)
@@ -254,9 +350,10 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
+
+
 	dFloat project = matrix1.m_front.DotProduct3(matrix0.m_front);
 	if (dAbs (project) > 0.9995f) {
-/*
 		dFloat twistAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
 
@@ -282,7 +379,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
-*/
+
 	} else {
 		dFloat coneAngle = dAcos (dClamp (project, dFloat (-1.0f), dFloat (1.0f)));
 		dVector conePlane (matrix1.m_front.CrossProduct(matrix0.m_front).Normalize());
@@ -584,7 +681,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint (invDynSolver, invDynNode)
-	,m_targetMatrix____(dGetIdentityMatrix())
+	,m_targetMatrix(dGetIdentityMatrix())
 	,m_referenceBody(referenceBody)
 	,m_linearSpeed(1.0f)
 	,m_angularSpeed(1.0f)
@@ -600,7 +697,7 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDy
 
 dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint(6, body, NULL)
-	,m_targetMatrix____(dGetIdentityMatrix())
+	,m_targetMatrix(dGetIdentityMatrix())
 	,m_referenceBody(referenceBody)
 	,m_linearSpeed(1.0f)
 	,m_angularSpeed(1.0f)
@@ -676,7 +773,7 @@ void dCustomRagdollMotor_EndEffector::SetTargetPosit(const dVector& posit)
 //	NewtonBodySetSleepState(m_body0, 0);
 
 	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
-	m_targetMatrix____.m_posit = parentMatrix.UntransformVector(posit);
+	m_targetMatrix.m_posit = parentMatrix.UntransformVector(posit);
 }
 
 void dCustomRagdollMotor_EndEffector::SetTargetMatrix(const dMatrix& matrix)
@@ -685,7 +782,7 @@ void dCustomRagdollMotor_EndEffector::SetTargetMatrix(const dMatrix& matrix)
 	NewtonBodySetSleepState(m_body0, 0);
 
 	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
-	m_targetMatrix____ = matrix * parentMatrix.Inverse();
+	m_targetMatrix = matrix * parentMatrix.Inverse();
 }
 
 dMatrix dCustomRagdollMotor_EndEffector::GetBodyMatrix() const
@@ -700,7 +797,7 @@ dMatrix dCustomRagdollMotor_EndEffector::GetTargetMatrix() const
 {
 	dMatrix parentMatrix;
 	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
-	return m_targetMatrix____ * parentMatrix;
+	return m_targetMatrix * parentMatrix;
 }
 
 void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) const
@@ -708,7 +805,7 @@ void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) c
 	dMatrix parentMatrix;
 	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
 	debugDisplay->DrawFrame(GetBodyMatrix());
-	debugDisplay->DrawFrame(m_targetMatrix____ * parentMatrix);
+	debugDisplay->DrawFrame(m_targetMatrix * parentMatrix);
 }
 
 void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -727,7 +824,7 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 
 	
 	NewtonBodyGetMatrix(m_referenceBody, &parentMatrix[0][0]);
-	parentMatrix = m_targetMatrix____ * parentMatrix;
+	parentMatrix = m_targetMatrix * parentMatrix;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
@@ -790,101 +887,3 @@ void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int thr
 }
 
 
-dEffectorTreeRoot::~dEffectorTreeRoot()
-{
-	dAssert(m_pose.m_childNode);
-	delete m_pose.m_childNode;
-}
-
-void dEffectorTreeRoot::Update(dFloat timestep)
-{
-	Evaluate(m_pose, timestep);
-	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
-		const dEffectorTransform& src = srcNode->GetInfo();
-		dMatrix matrix(src.m_rotation, src.m_posit);
-		//src.m_effector->SetTargetMatrix(matrix);
-		src.m_effector->m_targetMatrix____ = matrix;
-		NewtonBodySetSleepState(src.m_effector->GetBody0(), 0);
-	}
-}
-
-void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep)
-{
-	dAssert(m_pose.m_childNode);
-	m_pose.m_childNode->Evaluate(output, timestep);
-
-/*
-	dVector rootPosition;
-	dQuaternion rootRotation;
-	NewtonBodyGetRotation(m_rootBody, &rootRotation.m_q0);
-	NewtonBodyGetPosition(m_rootBody, &rootPosition.m_x);
-	rootPosition.m_w = 1.0f;
-
-	for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-		dEffectorTransform& tranform = node->GetInfo();
-		tranform.m_rotation = tranform.m_rotation * rootRotation;
-		tranform.m_posit = rootPosition + rootRotation.RotateVector(tranform.m_posit);
-	}
-*/
-}
-
-
-void dEffectorTreeFixPose::Evaluate(dEffectorPose& output, dFloat timestep)
-{
-	// just copy the base pose to the output frame
-	for (dEffectorPose::dListNode* srcNode = m_pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
-		dEffectorTransform& dst = dstNode->GetInfo();
-		const dEffectorTransform& src = srcNode->GetInfo();
-		dAssert(dst.m_effector == src.m_effector);
-		dst.m_rotation = src.m_rotation;
-		dst.m_posit = src.m_posit;
-	}
-}
-
-
-dEffectorTreeTwoWayBlender::dEffectorTreeTwoWayBlender(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1, dEffectorPose& output)
-	:dEffectorTreeInterface(rootBody)
-	,m_node0(node0)
-	,m_node1(node1)
-	,m_pose1()
-	,m_param(1.0f)
-{
-	m_pose1.m_childNode = m_node1;
-	if (m_pose1.GetCount() != output.GetCount()) {
-		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-			m_pose1.Append(node->GetInfo());
-		}
-	}
-}
-
-
-void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep)
-{
-	if (m_param < 0.001f) {
-		m_node0->Evaluate(output, timestep);
-	} else if (m_param > 0.999f) {
-		m_node1->Evaluate(output, timestep);
-	} else {
-		
-		m_pose1.m_childNode = m_node1;
-		if (m_pose1.GetCount() != output.GetCount()) {
-			NewtonWorldCriticalSectionLock(NewtonBodyGetWorld(m_rootBody), 0);
-			m_pose1.RemoveAll();
-			for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-				m_pose1.Append(node->GetInfo());
-			}
-			NewtonWorldCriticalSectionUnlock(NewtonBodyGetWorld(m_rootBody));
-		}
-		m_node1->Evaluate(m_pose1, timestep);
-		m_node0->Evaluate(output, timestep);
-		for (dEffectorPose::dListNode* srcNode = m_pose1.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
-			dEffectorTransform& dst = dstNode->GetInfo();
-			const dEffectorTransform& src = srcNode->GetInfo();
-			dst.m_posit = dst.m_posit.Scale (1.0f - m_param) + src.m_posit.Scale (m_param);
-			dQuaternion srcRotation (src.m_rotation);
-			srcRotation.Scale (dSign (dst.m_rotation.DotProduct(src.m_rotation)));
-			dst.m_rotation = dst.m_rotation.Slerp(srcRotation, m_param);
-			dst.m_posit.m_w = 1.0f;
-		}
-	}
-}

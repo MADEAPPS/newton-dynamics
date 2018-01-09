@@ -20,6 +20,92 @@
 #include "dCustomJoint.h"
 #include "dCustomBallAndSocket.h"
 
+class dCustomRagdollMotor_EndEffector;
+
+class dEffectorTreeInterface
+{
+	public:
+	class dEffectorTransform
+	{
+		public:
+		dVector m_posit;
+		dQuaternion m_rotation;
+		dCustomRagdollMotor_EndEffector* m_effector;
+	};
+
+	class dEffectorPose : public dList<dEffectorTransform>
+	{
+		public:
+		dEffectorPose() : dList<dEffectorTransform>(), m_childNode(NULL) {}
+		dEffectorTreeInterface* m_childNode;
+	};
+
+	dEffectorTreeInterface(NewtonBody* const rootBody):m_rootBody(rootBody){}
+	virtual ~dEffectorTreeInterface(){}
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex) = 0;
+
+	NewtonBody* GetRootBody() { return m_rootBody;}
+
+	protected:
+	NewtonBody* m_rootBody;
+};
+
+
+class dEffectorTreeRoot : public dEffectorTreeInterface
+{
+	public:
+	CUSTOM_JOINTS_API dEffectorTreeRoot(NewtonBody* const rootBody, dEffectorTreeInterface* const childNode);
+	CUSTOM_JOINTS_API ~dEffectorTreeRoot();
+
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex);
+
+	dEffectorPose& GetPose() { return m_pose; }
+
+	void dEffectorTreeRoot::Update(dFloat timestep, int threadIndex)
+	{
+		Evaluate(m_pose, timestep, threadIndex);
+	}
+
+	protected:
+	dEffectorPose m_pose;
+};
+
+class dEffectorTreePose : public dEffectorTreeInterface
+{
+	public:
+	dEffectorTreePose(NewtonBody* const rootBody):dEffectorTreeInterface(rootBody){}
+};
+
+
+class dEffectorTreeFixPose : public dEffectorTreePose
+{
+	public:
+	dEffectorTreeFixPose(NewtonBody* const rootBody):dEffectorTreePose(rootBody){}
+	dEffectorPose& GetPose() { return m_pose; }
+
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex);
+
+	protected:
+	dEffectorPose m_pose;
+};
+
+
+class dEffectorTreeTwoWayBlender: public dEffectorTreeInterface
+{
+	public:
+	CUSTOM_JOINTS_API dEffectorTreeTwoWayBlender(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1, dEffectorPose& output);
+	CUSTOM_JOINTS_API ~dEffectorTreeTwoWayBlender();
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex);
+
+	protected:
+	dEffectorTreeInterface* m_node0;
+	dEffectorTreeInterface* m_node1;
+	dEffectorPose m_pose1;
+	dFloat m_param;
+};
+
+
+
 
 // this joint is for controlling rag dolls muscles
 class dCustomRagdollMotor: public dCustomBallAndSocket
@@ -147,7 +233,7 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
-	dMatrix m_targetMatrix____;	
+	dMatrix m_targetMatrix;	
 	NewtonBody* m_referenceBody;
 	dFloat m_linearSpeed;
 	dFloat m_angularSpeed;
@@ -159,105 +245,6 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector, dCustomJoint)
 };
 
-
-class dEffectorTreeInterface
-{
-	public:
-	class dEffectorTransform
-	{
-		public:
-		dVector m_posit;
-		dQuaternion m_rotation;
-		dCustomRagdollMotor_EndEffector* m_effector;
-	};
-
-	class dEffectorPose: public dList<dEffectorTransform>
-	{
-		public:
-		dEffectorPose(): dList<dEffectorTransform>(), m_childNode(NULL)	{}
-		dEffectorTreeInterface* m_childNode;
-	};
-
-	dEffectorTreeInterface(NewtonBody* const rootBody)
-		:m_rootBody(rootBody)
-	{
-	}
-
-	virtual ~dEffectorTreeInterface()
-	{
-	}
-
-	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
-	{
-	}
-
-	NewtonBody* m_rootBody;
-};
-
-
-class dEffectorTreeRoot: public dEffectorTreeInterface
-{
-	public:
-	dEffectorTreeRoot(NewtonBody* const rootBody, dEffectorTreeInterface* const childNode)
-		:dEffectorTreeInterface(rootBody)
-	{
-		m_pose.m_childNode = childNode;
-	}
-	CUSTOM_JOINTS_API virtual ~dEffectorTreeRoot();
-
-	dEffectorPose& GetPose() {return m_pose;}
-
-	CUSTOM_JOINTS_API void Update(dFloat timestep);
-	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep);
-
-	protected:
-	dEffectorPose m_pose;
-};
-
-class dEffectorTreePose: public dEffectorTreeInterface
-{
-	public:
-	dEffectorTreePose(NewtonBody* const rootBody)
-		:dEffectorTreeInterface(rootBody)
-	{
-	}
-
-	void Evaluate(dEffectorPose& output, dFloat timestep)
-	{
-		dAssert(0);
-	}
-};
-
-
-class dEffectorTreeFixPose: public dEffectorTreePose
-{
-	public:
-	dEffectorTreeFixPose(NewtonBody* const rootBody)
-		:dEffectorTreePose(rootBody)
-	{
-	}
-
-	dEffectorPose& GetPose() {return m_pose;}
-
-	protected:
-	void Evaluate(dEffectorPose& output, dFloat timestep);
-	dEffectorPose m_pose;
-};
-
-
-class dEffectorTreeTwoWayBlender: public dEffectorTreeInterface
-{
-	public:
-	CUSTOM_JOINTS_API dEffectorTreeTwoWayBlender(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1, dEffectorPose& output);
-
-	protected:
-	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep);
-
-	dEffectorTreeInterface* m_node0;
-	dEffectorTreeInterface* m_node1;
-	dEffectorPose m_pose1;
-	dFloat m_param;
-};
 
 
 #endif 

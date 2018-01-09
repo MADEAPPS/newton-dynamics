@@ -69,9 +69,9 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
 	}
 
-	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
 	{
-		dEffectorTreeFixPose::Evaluate(output, timestep);
+		dEffectorTreeFixPose::Evaluate(output, timestep, threadIndex);
 
 		dFloat param = m_acc / m_period;
 		dBigVector left (cycle.CurvePoint(param));
@@ -106,7 +106,7 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 {
 	public:
 	dEffectorTreePostureGenerator(dEffectorTreeInterface* const poseGenerator)
-		:dEffectorTreeInterface(poseGenerator->m_rootBody)
+		:dEffectorTreeInterface(poseGenerator->GetRootBody())
 		,m_euler(0.0f)
 		,m_position(0.0f)
 		,m_poseGenerator(poseGenerator)
@@ -128,9 +128,9 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 		m_euler.m_z = roll;
 	}
 
-	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
 	{
-		m_poseGenerator->Evaluate(output, timestep);
+		m_poseGenerator->Evaluate(output, timestep, threadIndex);
 
 		dQuaternion rotation (dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
@@ -379,7 +379,7 @@ class dHaxapodController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		m_animTreeNode->Update(timestep);
+		m_animTreeNode->Update(timestep, threadIndex);
 		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 
