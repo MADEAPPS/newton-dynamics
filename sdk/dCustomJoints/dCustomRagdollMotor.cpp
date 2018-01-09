@@ -825,6 +825,15 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		}
 */
 	} else {
+		dMatrix matrix1_(dGetIdentityMatrix());
+		dMatrix matrix0_(dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(25.0f * 3.141592f / 180.0f) * dYawMatrix(68.0f * 3.141592f / 180.0f) * matrix1_);
+
+		matrix1_ = matrix1;
+		matrix0_ = matrix0;
+		dMatrix localMatrix(matrix0_ * matrix1_.Inverse());
+		dFloat twistAngle_ = dAtan2 (-localMatrix.m_right.m_y, localMatrix.m_up.m_y);
+
+
 		dFloat coneAngle = dAcos(dClamp(project, dFloat(-1.0f), dFloat(1.0f)));
 		dVector conePlane(matrix1.m_front.CrossProduct(matrix0.m_front).Normalize());
 		dMatrix coneMatrix(dQuaternion(conePlane, coneAngle), matrix1.m_posit);
@@ -890,6 +899,8 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		}
 */
 
-		dTrace(("%f\n", twistAngle * 180.0f / 3.141592f));
+		
+
+		dTrace(("%f %f\n", -twistAngle * 180.0f / 3.141592f, twistAngle_ * 180.0f / 3.141592f));
 	}
 }
