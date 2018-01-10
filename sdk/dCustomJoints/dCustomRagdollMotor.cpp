@@ -788,13 +788,13 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 {
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	dFloat project = matrix1.m_front.DotProduct3(matrix0.m_front);
 	if (dAbs(project) > 0.9995f) {
-/*
 		dFloat twistAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
 
@@ -820,7 +820,6 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
-*/
 	} else {
 		dMatrix matrix1_(dGetIdentityMatrix());
 		dMatrix matrix0_(dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(25.0f * 3.141592f / 180.0f) * dYawMatrix(68.0f * 3.141592f / 180.0f) * matrix1_);
@@ -853,7 +852,7 @@ pin = pin.Normalize();
 		matrix1 = matrix1 * coneMatrix;
 		dFloat twistAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 //		NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix1.m_front[0]);
-/*
+
 		dFloat angle = coneAngle - m_coneAngle;
 		if (angle > 0.0f) {
 			NewtonUserJointAddAngularRow(m_joint, -angle, &conePlane[0]);
@@ -909,10 +908,38 @@ pin = pin.Normalize();
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 			}
 		}
+//		dTrace(("%f %f\n", -twistAngle * 180.0f / 3.141592f, twistAngle_ * 180.0f / 3.141592f));
+	}
 */
 
-		
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	//dMatrix matrix0_(dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(25.0f * 3.141592f / 180.0f) * dYawMatrix(68.0f * 3.141592f / 180.0f) * matrix1_);
+	//matrix1_ = matrix1;
+	//matrix0_ = matrix0;
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dFloat twistAngle = dAtan2 (-localMatrix.m_right.m_y, localMatrix.m_up.m_y);
 
-		dTrace(("%f %f\n", -twistAngle * 180.0f / 3.141592f, twistAngle_ * 180.0f / 3.141592f));
-	}
+dQuaternion  xxxx(matrix0.Inverse() * dPitchMatrix(twistAngle) * matrix0);
+dVector pin(xxxx.m_q1, xxxx.m_q2, xxxx.m_q3, 0.0f);
+pin = pin.Normalize();
+
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		dVector relOmega(omega1 - omega0);
+
+		const dFloat damp = 0.4f;
+		const dFloat invTimestep = 1.0f / timestep;
+
+		dFloat alpha = (-twistAngle * damp * invTimestep + relOmega.DotProduct3(matrix0.m_front)) * invTimestep;
+		//NewtonUserJointAddAngularRow(m_joint, -twistAngle, &matrix0.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+
+dFloat xxxxx = dAbs (twistAngle * 180.0f / 3.141592f);
+
+dTrace(("%f\n", twistAngle * 180.0f / 3.141592f));
 }

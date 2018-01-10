@@ -100,7 +100,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 		void Debug(dDebugDisplay* const debugDisplay) const
 		{
-			dCustomRagdollMotor_1dof::Debug(debugDisplay);
+			//dCustomRagdollMotor_1dof::Debug(debugDisplay);
 		}
 	};
 
@@ -114,7 +114,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 		void Debug(dDebugDisplay* const debugDisplay) const
 		{
-			//dCustomRagdollMotor_2dof::Debug(debugDisplay);
+			dCustomRagdollMotor_2dof::Debug(debugDisplay);
 		}
 	};
 
@@ -484,6 +484,7 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 				//joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
 				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+				joint->SetConeAngle(60.0f * 3.141592f / 180.0f);
 				//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
 				break;
 			}
@@ -641,8 +642,8 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 		limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_L_Thigh");
-		limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-		limb->ResetMatrix(*scene, limbMatrix);
+		//limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		//limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_R_Thigh");
 		limbMatrix = dPitchMatrix(-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
