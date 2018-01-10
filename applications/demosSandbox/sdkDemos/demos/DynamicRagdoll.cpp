@@ -149,6 +149,8 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 			// finalize inverse dynamics solver
 			NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 
+			// make sure innerta are too skewed
+			NormalizeInertia();
 
 			// create an animation tree
 			NewtonBody* const rootBody = NewtonInverseDynamicsGetBody(m_kinematicSolver, NewtonInverseDynamicsGetRoot(m_kinematicSolver));
@@ -156,7 +158,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 
 			//m_animTreeNode = new dEffectorTreeRoot(rootBody, m_postureModifier);
 			m_animTreeNode = new dEffectorTreeRoot(rootBody, idlePose);
-
 
 			dMatrix invRootMatrix;
 			NewtonBodyGetMatrix(rootBody, &invRootMatrix[0][0]);
@@ -200,6 +201,10 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 					m_animTreeNode->GetPose().Append(frame);
 				}
 			}
+
+// xxx
+NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+
 		}
 
 		~dBiped()
@@ -266,6 +271,35 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 				}
 			}
 		}
+
+
+		void NormalizeInertia()
+		{
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+			dCustomArticulatedTransformController::dSkeletonBone* stackPool[128];
+
+			int stack = 1;
+			stackPool[0] = m_controller->GetRoot();
+			NewtonBody* const rootbody = stackPool[0]->m_body;
+			NewtonBodyGetMass(rootbody, &mass, &Ixx, &Iyy, &Izz);
+			dFloat inertialScale = dMax(dMax(Ixx, Iyy), Izz) / mass;
+
+			while (stack) {
+				stack--;
+				dCustomArticulatedTransformController::dSkeletonBone* const bone = stackPool[stack];
+				NewtonBodyGetMass(bone->m_body, &mass, &Ixx, &Iyy, &Izz);
+				NewtonBodySetMassMatrix(bone->m_body, mass, mass * inertialScale, mass * inertialScale, mass * inertialScale);
+
+				for (dList<dCustomArticulatedTransformController::dSkeletonBone>::dListNode* node = bone->GetFirst(); node; node = node->GetNext()) {
+					stackPool[stack] = &node->GetInfo();
+					stack++;
+				}
+			}
+		}
+
 
 		void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 		{
@@ -345,16 +379,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		size = (pmax - pmin).Scale(0.5f);
 		origin = (pmax + pmin).Scale(0.5f);
 		origin.m_w = 1.0f;
-	}
-
-	void ScaleIntertia(NewtonBody* const body, dFloat factor) const
-	{
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		dFloat mass;
-		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
 	}
 
 	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const dBalancingDummyDefinition& definition) const
@@ -538,8 +562,6 @@ class BalancingDummyManager: public dCustomArticulaledTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*)ragDollEntity->Find(definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
 		// for debugging
-// xxx
-NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -564,8 +586,6 @@ NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 			for (int i = 0; i < defintionCount; i++) {
 				if (!strcmp(definition[i].m_boneName, name)) {
 					NewtonBody* const boneBody = CreateRagDollBodyPart(entity, definition[i]);
-
-					ScaleIntertia(boneBody, 5.0f);
 
 					// connect this body part to its parent with a ragdoll joint
 					ConnectBodyParts(boneBody, parentBone->m_body, definition[i]);
