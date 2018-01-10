@@ -27,8 +27,6 @@ IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_2dof)
 IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_3dof)
 IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector)
 
-#define D_SERVO_OMEGA_TAU (3.0f * 3.141592f / 180.0f) 
-
 
 dEffectorTreeRoot::dEffectorTreeRoot(NewtonBody* const rootBody, dEffectorTreeInterface* const childNode)
 	:dEffectorTreeInterface(rootBody)
@@ -36,13 +34,11 @@ dEffectorTreeRoot::dEffectorTreeRoot(NewtonBody* const rootBody, dEffectorTreeIn
 	m_pose.m_childNode = childNode;
 }
 
-
 dEffectorTreeRoot::~dEffectorTreeRoot()
 {
 	dAssert(m_pose.m_childNode);
 	delete m_pose.m_childNode;
 }
-
 
 void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
 {
@@ -58,7 +54,6 @@ void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep, int thr
 	}
 }
 
-
 void dEffectorTreeFixPose::Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
 {
 	// just copy the base pose to the output frame
@@ -70,7 +65,6 @@ void dEffectorTreeFixPose::Evaluate(dEffectorPose& output, dFloat timestep, int 
 		dst.m_posit = src.m_posit;
 	}
 }
-
 
 dEffectorTreeTwoWayBlender::dEffectorTreeTwoWayBlender(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1, dEffectorPose& output)
 	:dEffectorTreeInterface(rootBody)
@@ -839,16 +833,18 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 dQuaternion  xxxx(matrix0_.Inverse() * dPitchMatrix(twistAngle_) * matrix0_);
 dVector pin(xxxx.m_q1, xxxx.m_q2, xxxx.m_q3, 0.0f);
 pin = pin.Normalize();
+
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		dVector relOmega(omega1 - omega0);
+		dFloat invTimestep = 1.0f / timestep;
+
+
+		dFloat alpha = (10.0 + relOmega.DotProduct3(matrix0.m_front)) * invTimestep;
 		NewtonUserJointAddAngularRow(m_joint, -twistAngle_, &matrix0.m_front[0]);
-
-		if (twistAngle_ > D_SERVO_OMEGA_TAU) {
-//			dAssert(0);
-		} else if (twistAngle_ < -D_SERVO_OMEGA_TAU) {
-//			dAssert(0);
-		} else {
-//			dAssert(0);
-		}
-
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
 
 
 		dFloat coneAngle = dAcos(dClamp(project, dFloat(-1.0f), dFloat(1.0f)));
