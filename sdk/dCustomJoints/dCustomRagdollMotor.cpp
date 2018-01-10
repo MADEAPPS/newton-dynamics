@@ -914,32 +914,31 @@ pin = pin.Normalize();
 
 	dMatrix matrix0;
 	dMatrix matrix1;
+	
+	//matrix1 = dGetIdentityMatrix();
+	//matrix0 = dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(25.0f * 3.141592f / 180.0f) * dYawMatrix(68.0f * 3.141592f / 180.0f) * matrix1;
+	//dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	//dFloat twistAngle = dAtan2(-localMatrix.m_right.m_y, localMatrix.m_up.m_y);
+
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+
 	CalculateGlobalMatrix(matrix0, matrix1);
-	//dMatrix matrix0_(dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(25.0f * 3.141592f / 180.0f) * dYawMatrix(68.0f * 3.141592f / 180.0f) * matrix1_);
-	//matrix1_ = matrix1;
-	//matrix0_ = matrix0;
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	dFloat twistAngle = dAtan2 (-localMatrix.m_right.m_y, localMatrix.m_up.m_y);
 
-dQuaternion  xxxx(matrix0.Inverse() * dPitchMatrix(twistAngle) * matrix0);
-dVector pin(xxxx.m_q1, xxxx.m_q2, xxxx.m_q3, 0.0f);
-pin = pin.Normalize();
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+	dVector relOmega(omega0 - omega1);
 
-		dVector omega0(0.0f);
-		dVector omega1(0.0f);
-		NewtonBodyGetOmega(m_body0, &omega0[0]);
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-		dVector relOmega(omega1 - omega0);
+	const dFloat damp = 0.4f;
+	const dFloat invTimestep = 1.0f / timestep;
 
-		const dFloat damp = 0.4f;
-		const dFloat invTimestep = 1.0f / timestep;
-
-		dFloat alpha = (-twistAngle * damp * invTimestep + relOmega.DotProduct3(matrix0.m_front)) * invTimestep;
-		//NewtonUserJointAddAngularRow(m_joint, -twistAngle, &matrix0.m_front[0]);
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	// calculate twisting axis acceleration
+	dFloat twistAngle = dAtan2(-localMatrix.m_right.m_y, localMatrix.m_up.m_y);
+	dFloat alpha = (twistAngle * damp * invTimestep + relOmega.DotProduct3(matrix0.m_front)) * invTimestep;
+	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, -alpha);
 
 dFloat xxxxx = dAbs (twistAngle * 180.0f / 3.141592f);
-
 dTrace(("%f\n", twistAngle * 180.0f / 3.141592f));
 }
