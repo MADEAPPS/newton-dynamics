@@ -919,18 +919,20 @@ pin = pin.Normalize();
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
 
-/*	
+	
 	dMatrix matrix1_ (dGetIdentityMatrix());
-	dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(0.0f * 3.141592f / 180.0f) * dYawMatrix(0.0f * 3.141592f / 180.0f) * matrix1_);
+	//dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(20.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * matrix1_);
+	dMatrix matrix0_(dPitchMatrix(30.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * dRollMatrix(20.0f * 3.141592f / 180.0f) * matrix1_);
 	dMatrix localMatrix_(matrix0_ * matrix1_.Inverse());
 	dFloat twistAngle_ = dAtan2(-localMatrix_.m_right.m_y, localMatrix_.m_up.m_y);
 	localMatrix_.GetEulerAngles(euler0, euler1, m_pitchYawRoll);
-	localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-*/
+//	localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+//	localMatrix.GetEulerAngles(euler0, euler1, m_pitchYawRoll);
+//	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
