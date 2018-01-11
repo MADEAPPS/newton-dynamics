@@ -290,10 +290,9 @@ dgMatrix dgMatrix::Symetric3by3Inverse () const
 void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
 	const dgMatrix& matrix = *this;
-	//dgAssert (dgAbsf (((matrix[0] * matrix[1]) % matrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 	dgAssert (matrix[2].DotProduct3(matrix[0].CrossProduct3(matrix[1])) > 0.0f);
 	dgAssert (dgAbsf (matrix[2].DotProduct3(matrix[0].CrossProduct3(matrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-
+/*
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > dgFloat32 (0.99995f)) {
 		dgFloat32 picth0 = dgFloat32 (0.0f);
@@ -342,6 +341,56 @@ void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 		euler1[1] = yaw1;
 		euler1[2] = roll1;
 	}
+*/
+
+	// Assuming the angles are in radians.
+	if (matrix[0][2] > dgFloat32 (0.99995f)) {
+		dgFloat32 picth0 = dgFloat32(0.0f);
+		dgFloat32 yaw0 = dgFloat32(-3.141592f * 0.5f);
+		dgFloat32 roll0 = -dgAtan2(matrix[2][1], matrix[1][1]);
+		euler0[0] = picth0;
+		euler0[1] = yaw0;
+		euler0[2] = roll0;
+
+		euler1[0] = picth0;
+		euler1[1] = yaw0;
+		euler1[2] = roll0;
+
+	} else if (matrix[0][2] < dgFloat32 (-0.99995f)) {
+		dgFloat32 picth0 = dgFloat32 (0.0f);
+		dgFloat32 yaw0 = dgFloat32(3.141592f * 0.5f);
+		dgFloat32 roll0 = dgAtan2(matrix[2][1], matrix[1][1]);
+		euler0[0] = picth0;
+		euler0[1] = yaw0;
+		euler0[2] = roll0;
+
+		euler1[0] = picth0;
+		euler1[1] = yaw0;
+		euler1[2] = roll0;
+
+	} else {
+		dgFloat32 yaw0 = -dgAsin(matrix[0][2]);
+		dgFloat32 yaw1 = dgFloat32(3.141592f) - yaw0;
+
+		dgFloat32 picth0 = dgAtan2( matrix[1][2],  matrix[2][2]);
+		dgFloat32 picth1 = dgAtan2(-matrix[1][2], -matrix[2][2]);
+
+		dgFloat32 roll0 = dgAtan2( matrix[0][1],  matrix[0][0]);
+		dgFloat32 roll1 = dgAtan2(-matrix[0][1], -matrix[0][0]);
+
+		if (yaw1 > dgFloat32 (3.141592f)) {
+			yaw1 -= dgFloat32 (2.0f * 3.141592f);
+		}
+
+		euler0[0] = picth0;
+		euler0[1] = yaw0;
+		euler0[2] = roll0;
+
+		euler1[0] = picth1;
+		euler1[1] = yaw1;
+		euler1[2] = roll1;
+	}
+
 	euler0[3] = dgFloat32(0.0f);
 	euler1[3] = dgFloat32(0.0f);
 
