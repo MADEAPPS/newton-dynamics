@@ -169,6 +169,7 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 
 	private:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API void GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMatrix& matrix0, const dMatrix& matrix1) const;
 
 	dFloat m_coneAngle;
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_2dof, dCustomRagdollMotor)

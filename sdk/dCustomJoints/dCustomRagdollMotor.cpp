@@ -784,6 +784,25 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	}
 }
 
+void dCustomRagdollMotor_2dof::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMatrix& matrix0, const dMatrix& matrix1) const
+{
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dVector euler0;
+	dVector euler1;
+	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+	//dMatrix matrix1_ (dGetIdentityMatrix());
+	//dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(40.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * matrix1_);
+	//dMatrix localMatrix_(matrix0_ * matrix1_.Inverse());
+	//localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+	pitch = euler0.m_x;
+	yaw = euler0.m_y;
+	roll = euler0.m_z;
+
+	dTrace(("%f %f %f\n", pitch * 180.0f / 3.141592f, yaw * 180.0f / 3.141592f, roll * 180.0f / 3.141592f));
+}
+
 void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
@@ -914,20 +933,15 @@ pin = pin.Normalize();
 
 	dMatrix matrix0;
 	dMatrix matrix1;
-	dVector euler0;
-	dVector euler1;
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
-	
-	//dMatrix matrix1_ (dGetIdentityMatrix());
-	//dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(40.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * matrix1_);
-	//dMatrix localMatrix_(matrix0_ * matrix1_.Inverse());
-	//dFloat twistAngle_ = dAtan2(-localMatrix_.m_right.m_y, localMatrix_.m_up.m_y);
-	//localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+	dFloat pitch;
+	dFloat yaw;
+	dFloat roll;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+	GetEulers(pitch, yaw, roll, matrix0, matrix1);
 
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
@@ -937,11 +951,8 @@ pin = pin.Normalize();
 	const dFloat invTimestep = 1.0f / timestep;
 
 	// calculate twisting axis acceleration
-	//dFloat twistAngle = dAtan2(-localMatrix.m_right.m_y, localMatrix.m_up.m_y);
-	dFloat alpha = (euler0.m_x * damp * invTimestep + relOmega.DotProduct3(matrix0.m_front)) * invTimestep;
+	dFloat alpha = (pitch * damp * invTimestep + relOmega.DotProduct3(matrix0.m_front)) * invTimestep;
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, -alpha);
 
-dFloat xxxxx = dAbs (dAtan2(-localMatrix.m_right.m_y, localMatrix.m_up.m_y) * 180.0f / 3.141592f);
-dTrace(("%f %f\n", dAtan2(-localMatrix.m_right.m_y, localMatrix.m_up.m_y) * 180.0f / 3.141592f, euler0.m_x * 180.0f / 3.141592f));
 }
