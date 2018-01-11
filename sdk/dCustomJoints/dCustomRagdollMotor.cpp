@@ -758,13 +758,59 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dFloat pitch;
+	dFloat yaw;
+	dFloat roll;
 
-	CalculateGlobalMatrix(matrix0, matrix1);
 	dCustomRagdollMotor::Debug(debugDisplay);
 
+	CalculateGlobalMatrix(matrix0, matrix1);
+	GetEulers(pitch, yaw, roll, matrix0, matrix1);
+
+	const int subdiv = 8;
+	const float radius = 0.25f;
+	dVector point(radius, 0.0f, 0.0f, 0.0f);
+
+float minYaw = -30.0f * 3.141592f / 180.0f;
+float maxYaw =  60.0f * 3.141592f / 180.0f;
+	dFloat angleStep = (maxYaw - minYaw) / subdiv;
+	dFloat angle0 = minYaw;
+
+	dVector arch[subdiv + 1];
+	debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
+	for (int i = 0; i <= subdiv; i++) {
+		dVector p(matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point)));
+		arch[i] = p;
+		debugDisplay->DrawLine(matrix1.m_posit, p);
+		angle0 += angleStep;
+	}
+
+	for (int i = 0; i < subdiv; i++) {
+		debugDisplay->DrawLine(arch[i], arch[i + 1]);
+	}
+
+
+	float minRoll = -30.0f * 3.141592f / 180.0f;
+	float maxRoll = 60.0f * 3.141592f / 180.0f;
+	angleStep = (maxRoll - minRoll) / subdiv;
+	angle0 = minRoll;
+	dMatrix rollMatrix(dYawMatrix(yaw) * matrix1);
+	debugDisplay->SetColor(dVector(1.0f, 0.0f, 1.0f, 0.0f));
+	for (int i = 0; i <= subdiv; i++) {
+		dVector p(rollMatrix.TransformVector(dRollMatrix(angle0).RotateVector(point)));
+		arch[i] = p;
+		debugDisplay->DrawLine(matrix1.m_posit, p);
+		angle0 += angleStep;
+	}
+
+	for (int i = 0; i < subdiv; i++) {
+		debugDisplay->DrawLine(arch[i], arch[i + 1]);
+	}
+
+
+/*
 	const int subdiv = 24;
 	const float radius = 0.25f;
-
 	dVector point(radius * dCos(m_coneAngle), radius * dSin(m_coneAngle), 0.0f, 0.0f);
 	dFloat angleStep = 3.141692f * 2.0f / subdiv;
 	dFloat angle0 = 0.0f;
@@ -782,6 +828,7 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	for (int i = 0; i < subdiv; i++) {
 		debugDisplay->DrawLine(arch[i], arch[i + 1]);
 	}
+*/
 }
 
 void dCustomRagdollMotor_2dof::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMatrix& matrix0, const dMatrix& matrix1) const
