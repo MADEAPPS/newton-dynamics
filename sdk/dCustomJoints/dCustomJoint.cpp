@@ -19,6 +19,7 @@
 dCRCTYPE dCustomJoint::m_key = dCRC64 ("dCustomJoint");
 dCustomJoint::dSerializeMetaData m_metaData_CustomJoint("dCustomJoint");
 
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -387,3 +388,30 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 	DrawLine (matrix.m_posit, z);
 }
 
+
+dCustomJoint::dAngularIntegration dCustomJoint::dAngularIntegration::operator+ (const dAngularIntegration& angle) const
+{
+	dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle;
+	dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle;
+	dFloat angle_da = dAtan2(sin_da, cos_da);
+	return dAngularIntegration(m_angle + angle_da);
+}
+
+dCustomJoint::dAngularIntegration dCustomJoint::dAngularIntegration::operator- (const dAngularIntegration& angle) const
+{
+	dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle;
+	dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle;
+	dFloat angle_da = dAtan2(sin_da, cos_da);
+	return dAngularIntegration(angle_da);
+}
+
+dFloat dCustomJoint::dAngularIntegration::Update(dFloat newAngleCos, dFloat newAngleSin)
+{
+	dFloat sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle;
+	dFloat cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle;
+
+	m_angle += dAtan2(sin_da, cos_da);
+	m_cosJointAngle = newAngleCos;
+	m_sinJointAngle = newAngleSin;
+	return m_angle;
+}

@@ -101,7 +101,6 @@ class dCustomJoint: public dCustomAlloc
 		int m_height;
 	};
 
-
 	class dSerializeMetaData
 	{
 		public:
@@ -145,38 +144,15 @@ class dCustomJoint: public dCustomAlloc
 			m_cosJointAngle = dCos(angle);
 		}
 
-		dFloat Update (dFloat newAngleCos, dFloat newAngleSin)
+		dFloat Update(dFloat angle)
 		{
-			dFloat sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle; 
-			dFloat cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle; 
-
-			m_angle += dAtan2 (sin_da, cos_da);
-			m_cosJointAngle = newAngleCos;
-			m_sinJointAngle = newAngleSin;
-			return m_angle;
+			return Update(dCos(angle), dSin(angle));
 		}
 
-		dAngularIntegration operator+ (const dAngularIntegration& angle) const
-		{
-			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle; 
-			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle; 
-			dFloat angle_da = dAtan2 (sin_da, cos_da);
-			return dAngularIntegration(m_angle + angle_da);
-		}
+		dFloat Update(dFloat newAngleCos, dFloat newAngleSin);
+		dAngularIntegration operator+ (const dAngularIntegration& angle) const;
+		dAngularIntegration operator- (const dAngularIntegration& angle) const;
 
-		dAngularIntegration operator- (const dAngularIntegration& angle) const
-		{
-			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle; 
-			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle; 
-			dFloat angle_da = dAtan2 (sin_da, cos_da);
-			return dAngularIntegration (angle_da);
-		}
-
-
-		dFloat Update (dFloat angle)
-		{
-			return Update (dCos (angle), dSin (angle));
-		}
 
 		private:
 		dFloat m_angle;

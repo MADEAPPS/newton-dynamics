@@ -24,7 +24,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustom6DOF);
 //////////////////////////////////////////////////////////////////////
 
 //#define MIN_JOINT_PIN_LENGTH					50.0f
-#define D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION	0.5f
+//#define D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION	0.5f
 //#define D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION	10.0f
 
 dCustom6DOF::dCustom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame___, NewtonBody* const child, NewtonBody* const parent)
@@ -132,10 +132,11 @@ void dCustom6DOF::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMat
 		euler0 = euler1;
 	}
 
-	pitch = euler0.m_x;
 	yaw = euler0.m_y;
 	roll = euler0.m_z;
-	//	dTrace(("%f %f %f\n", pitch * 180.0f / 3.141592f, yaw * 180.0f / 3.141592f, roll * 180.0f / 3.141592f));
+	pitch = euler0.m_x;
+
+dTrace(("%f %f %f\n", pitch * 180.0f / 3.141592f, yaw * 180.0f / 3.141592f, roll * 180.0f / 3.141592f));
 }
 
 
@@ -239,13 +240,14 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
-	dVector dp (p0 - p1);
+	//dVector dp (p0 - p1);
 
 	for (int i = 0; i < 3; i ++) {
 		if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
-			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0[i][0]);
+			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 		} else {
+			/*
 			// it is a limited linear dof, check if it pass the limits
 			dFloat dist = dp.DotProduct3(matrix1[i]);
 			if (dist > m_maxLinearLimits[i]) {
@@ -276,66 +278,22 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 				// allow the object to return but not to kick going forward
 				NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 			}
-		}
-	}
-
-/*
-	dVector euler0(0.0f);
-	dVector euler1(0.0f);
-	dMatrix localMatrix (matrix0 * matrix1.Inverse());
-	localMatrix.GetEulerAngles(euler0, euler1);
-
-	dAngularIntegration pitchStep0 (dAngularIntegration (euler0.m_x) - m_pitch);
-	dAngularIntegration pitchStep1 (dAngularIntegration (euler1.m_x) - m_pitch);
-	if (dAbs (pitchStep0.GetAngle()) > dAbs (pitchStep1.GetAngle())) {
-		euler0 = euler1;
-	}
-
-	dVector euler (m_pitch.Update (euler0.m_x), m_yaw.Update (euler0.m_y), m_roll.Update (euler0.m_z), 0.0f);
-
-//dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.m_angle * 180.0f / 3.141592f, m_roll.m_angle * 180.0f / 3.141592f,  euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f));
-
-	bool limitViolation = false;
-	for (int i = 0; i < 3; i ++) {
-		if (euler[i] < m_minAngularLimits[i]) {
-			limitViolation = true;
-			euler[i] = m_minAngularLimits[i];
-		} else if (euler[i] > m_maxAngularLimits[i]) {
-			limitViolation = true;
-			euler[i] = m_maxAngularLimits[i];
-		}
-	}
-
-	if (limitViolation) {
-		//dMatrix pyr (dPitchMatrix(m_pitch.m_angle) * dYawMatrix(m_yaw.m_angle) * dRollMatrix(m_roll.m_angle));
-		dMatrix p0y0r0 (dPitchMatrix(euler[0]) * dYawMatrix(euler[1]) * dRollMatrix(euler[2]));
-		dMatrix baseMatrix (p0y0r0 * matrix1);
-        dMatrix rotation (matrix0.Inverse() * baseMatrix);
-
-        dQuaternion quat (rotation);
-        if (quat.m_q0 > dFloat (0.99995f)) {
-			//dVector p0 (matrix0[3] + baseMatrix[1].Scale (MIN_JOINT_PIN_LENGTH));
-			//dVector p1 (matrix0[3] + baseMatrix[1].Scale (MIN_JOINT_PIN_LENGTH));
-			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &baseMatrix[2][0]);
-			//NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-
-			//dVector q0 (matrix0[3] + baseMatrix[0].Scale (MIN_JOINT_PIN_LENGTH));
-			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &baseMatrix[1][0]);
-			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &baseMatrix[2][0]);
-
-        } else {
-            dMatrix basis (dGrammSchmidt (dVector (quat.m_q1, quat.m_q2, quat.m_q3, 0.0f)));
-
-			dVector q0 (matrix0[3] + basis[1].Scale (MIN_JOINT_PIN_LENGTH));
-			dVector q1 (matrix0[3] + rotation.RotateVector(basis[1].Scale (MIN_JOINT_PIN_LENGTH)));
-			NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &basis[2][0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-
-			//dVector q0 (matrix0[3] + basis[0].Scale (MIN_JOINT_PIN_LENGTH));
-			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[1][0]);
-			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[2][0]);
-        }
-	}
 */
+		}
+	}
+
+
+	dVector omega0;
+	dVector omega1;
+	dFloat yaw;
+	dFloat roll;
+	dFloat pitch;
+	GetEulers(pitch, yaw, roll, matrix0, matrix1);
+
+
+	m_yaw.m_currentAngle.Update(yaw);
+	m_roll.m_currentAngle.Update(roll);
+	m_pitch.m_currentAngle.Update(pitch);
+
 }
 
