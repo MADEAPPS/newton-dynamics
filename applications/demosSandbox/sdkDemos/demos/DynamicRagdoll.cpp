@@ -20,7 +20,7 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
-
+#if 0
 enum JointType
 {
 	one_dof,
@@ -636,11 +636,15 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 	int m_material;
 };
 
+#endif
 
 void DynamicRagDoll (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+
+	dAssert (0);
+/*
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
@@ -702,6 +706,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	origin.m_y += 1.0f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

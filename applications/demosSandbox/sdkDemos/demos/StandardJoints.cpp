@@ -266,14 +266,18 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	dCustom6DOF* const joint0 = new dCustom6DOF (pinMatrix, pinMatrix, box0, base);
-	joint0->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
+	joint0->SetYawLimits (-angle, angle);
+	joint0->SetPitchLimits (-angle, angle);
+	joint0->SetRollLimits (-angle, angle);
 
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
 	dCustom6DOF* const joint1 = new dCustom6DOF (pinMatrix, pinMatrix, box1, box0);
-	joint1->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
+	joint1->SetYawLimits(-angle, angle);
+	joint1->SetPitchLimits(-angle, angle);
+	joint1->SetRollLimits(-angle, angle);
 }
 
 static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
@@ -1008,29 +1012,29 @@ void StandardJoints (DemoEntityManager* const scene)
 //AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 
 #if 1
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  10.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
-	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
-	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
-//	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
-	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  10.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
+//	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
+//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
+////	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
-	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
-	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
-	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
-	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
-	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
-	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
-	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
-//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+//	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
+//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
+//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
+//	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
+//	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
+//	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
+////	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
 #endif
     // place camera into position

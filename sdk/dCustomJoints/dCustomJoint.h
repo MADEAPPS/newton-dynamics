@@ -204,6 +204,7 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix0 () const;
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix1 () const;
 	CUSTOM_JOINTS_API void CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) const;
+	CUSTOM_JOINTS_API void GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMatrix& matrix0, const dMatrix& matrix1) const;
 
 	// the application needs to implement this function for serialization
 	CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const;

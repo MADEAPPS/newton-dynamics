@@ -16,7 +16,6 @@
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustom6DOF.h"
 
-//dInitRtti(dCustom6DOF);
 
 IMPLEMENT_CUSTOM_JOINT(dCustom6DOF);
 
@@ -24,22 +23,19 @@ IMPLEMENT_CUSTOM_JOINT(dCustom6DOF);
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MIN_JOINT_PIN_LENGTH					50.0f
+//#define MIN_JOINT_PIN_LENGTH					50.0f
 #define D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION	0.5f
-#define D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION	10.0f
+//#define D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION	10.0f
 
 dCustom6DOF::dCustom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame___, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
 	,m_minLinearLimits(0.0f)
 	,m_maxLinearLimits(0.0f)
-	,m_minAngularLimits(0.0f)
-	,m_maxAngularLimits(0.0f)
-	,m_pitch()
 	,m_yaw()
 	,m_roll()
+	,m_pitch()
 {
 	CalculateLocalMatrix (pinsAndPivotChildFrame, m_localMatrix0, m_localMatrix1);
-
 }
 
 dCustom6DOF::~dCustom6DOF()
@@ -50,11 +46,9 @@ void dCustom6DOF::Deserialize (NewtonDeserializeCallback callback, void* const u
 {
 	callback (userData, &m_minLinearLimits, sizeof (dVector));
 	callback (userData, &m_maxLinearLimits, sizeof (dVector));
-	callback (userData, &m_minAngularLimits, sizeof (dVector));
-	callback (userData, &m_maxAngularLimits, sizeof (dVector));
-	callback (userData, &m_pitch, sizeof (dAngularIntegration));
-	callback (userData, &m_yaw, sizeof (dAngularIntegration));
-	callback (userData, &m_roll, sizeof (dAngularIntegration));
+	callback (userData, &m_yaw, sizeof (dAngleData));
+	callback (userData, &m_roll, sizeof (dAngleData));
+	callback (userData, &m_pitch, sizeof (dAngleData));
 }
 
 void dCustom6DOF::Serialize (NewtonSerializeCallback callback, void* const userData) const
@@ -62,13 +56,10 @@ void dCustom6DOF::Serialize (NewtonSerializeCallback callback, void* const userD
 	dCustomJoint::Serialize (callback, userData);
 	callback(userData, &m_minLinearLimits, sizeof (dVector));
 	callback(userData, &m_maxLinearLimits, sizeof (dVector));
-	callback(userData, &m_minAngularLimits, sizeof (dVector));
-	callback(userData, &m_maxAngularLimits, sizeof (dVector));
-	callback(userData, &m_pitch, sizeof (dAngularIntegration));
-	callback(userData, &m_yaw, sizeof (dAngularIntegration));
-	callback(userData, &m_roll, sizeof (dAngularIntegration));
+	callback(userData, &m_yaw, sizeof(dAngleData));
+	callback(userData, &m_roll, sizeof(dAngleData));
+	callback(userData, &m_pitch, sizeof(dAngleData));
 }
-
 
 void dCustom6DOF::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
 {
@@ -76,28 +67,140 @@ void dCustom6DOF::SetLinearLimits (const dVector& minLinearLimits, const dVector
 		m_minLinearLimits[i] =  (dAbs (minLinearLimits[i]) < dFloat (1.0e-5f)) ? 0.0f : minLinearLimits[i];
 		m_maxLinearLimits[i] =  (dAbs (maxLinearLimits[i]) < dFloat (1.0e-5f)) ? 0.0f : maxLinearLimits[i];
 	}
-
 }
 
-void dCustom6DOF::SetAngularLimits (const dVector& minAngularLimits, const dVector& maxAngularLimits)
-{
-	for (int i = 0; i < 3; i ++) {
-		m_minAngularLimits[i] =  (dAbs (minAngularLimits[i]) < dFloat (1.0e-5f)) ? 0.0f : minAngularLimits[i];
-		m_maxAngularLimits[i] =  (dAbs (maxAngularLimits[i]) < dFloat (1.0e-5f)) ? 0.0f : maxAngularLimits[i];
-	}
-}
 
-void dCustom6DOF::GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits)
+void dCustom6DOF::GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits) const
 {
 	minLinearLimits = m_minLinearLimits;
 	maxLinearLimits = m_maxLinearLimits;
 }
 
-void dCustom6DOF::GetAngularLimits (dVector& minAngularLimits, dVector& maxAngularLimits)
+void dCustom6DOF::SetYawLimits(dFloat minAngle, dFloat maxAngle)
 {
-	minAngularLimits = m_minAngularLimits;
-	maxAngularLimits = m_maxAngularLimits;
+	m_yaw.m_maxAngle = dAbs(maxAngle);
+	m_yaw.m_minAngle = -dAbs(minAngle);
 }
+
+void dCustom6DOF::SetRollLimits(dFloat minAngle, dFloat maxAngle)
+{
+	m_roll.m_maxAngle = dAbs(maxAngle);
+	m_roll.m_minAngle = -dAbs(minAngle);
+}
+
+void dCustom6DOF::SetPitchLimits(dFloat minAngle, dFloat maxAngle)
+{
+	m_pitch.m_maxAngle = dAbs(maxAngle);
+	m_pitch.m_minAngle = -dAbs(minAngle);
+}
+
+void dCustom6DOF::GetYawLimits(dFloat& minAngle, dFloat& maxAngle) const
+{
+	maxAngle = m_yaw.m_maxAngle;
+	minAngle = m_yaw.m_minAngle;
+}
+
+void dCustom6DOF::GetRollLimits(dFloat& minAngle, dFloat& maxAngle) const
+{
+	maxAngle = m_roll.m_maxAngle;
+	minAngle = m_roll.m_minAngle;
+}
+
+void dCustom6DOF::GetPitchLimits(dFloat& minAngle, dFloat& maxAngle) const
+{
+	maxAngle = m_pitch.m_maxAngle;
+	minAngle = m_pitch.m_minAngle;
+}
+
+
+
+void dCustom6DOF::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	dCustomJoint::Debug(debugDisplay);
+
+	const int subdiv = 12;
+	const float radius = 0.5f;
+	dVector arch[subdiv + 1];
+
+	CalculateGlobalMatrix(matrix0, matrix1);
+	{
+		// show pitch angle limits
+		dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
+
+		dFloat minAngle = dClamp(m_pitch.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
+		dFloat maxAngle = dClamp(m_pitch.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
+
+		dFloat angleStep = (maxAngle - minAngle) / subdiv;
+		dFloat angle0 = minAngle;
+
+		debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+		for (int i = 0; i <= subdiv; i++) {
+			arch[i] = matrix0.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			debugDisplay->DrawLine(matrix0.m_posit, arch[i]);
+			angle0 += angleStep;
+		}
+
+		for (int i = 0; i < subdiv; i++) {
+			debugDisplay->DrawLine(arch[i], arch[i + 1]);
+		}
+	}
+
+return;
+	{
+		// show yaw angle limits
+		dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
+
+		dFloat minAngle = dClamp(m_yaw.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f);
+		dFloat maxAngle = dClamp(m_yaw.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f);
+
+		dFloat angleStep = (maxAngle - minAngle) / subdiv;
+		dFloat angle0 = minAngle;
+
+		debugDisplay->SetColor(dVector(0.0f, 0.5f, 0.0f, 0.0f));
+		for (int i = 0; i <= subdiv; i++) {
+			arch[i] = matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point));
+			debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
+			angle0 += angleStep;
+		}
+
+		for (int i = 0; i < subdiv; i++) {
+			debugDisplay->DrawLine(arch[i], arch[i + 1]);
+		}
+	}
+
+	{
+		dFloat pitch;
+		dFloat yaw;
+		dFloat roll;
+		GetEulers(pitch, yaw, roll, matrix0, matrix1);
+
+		// show roll angle limits
+		dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
+
+		dFloat minAngle = dClamp(m_roll.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f);
+		dFloat maxAngle = dClamp(m_roll.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f);
+
+		dFloat angleStep = (maxAngle - minAngle) / subdiv;
+		dFloat angle0 = minAngle;
+
+
+		matrix1 = dYawMatrix(yaw) * matrix1;
+		debugDisplay->SetColor(dVector(0.0f, 0.0f, 0.5f, 0.0f));
+		for (int i = 0; i <= subdiv; i++) {
+			arch[i] = matrix1.TransformVector(dRollMatrix(angle0).RotateVector(point));
+			debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
+			angle0 += angleStep;
+		}
+
+		for (int i = 0; i < subdiv; i++) {
+			debugDisplay->DrawLine(arch[i], arch[i + 1]);
+		}
+	}
+}
+
 
 
 void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
@@ -123,7 +226,7 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 			if (dist > m_maxLinearLimits[i]) {
 				dVector q1 (p1 + matrix1[i].Scale (m_maxLinearLimits[i]));
 
-				// clamp the error, so the not too much energy is added when constraint violation occurs
+				// clamp the error, so that not too much energy is added when constraint violation occurs
 				dFloat maxDist = (p0 - q1).DotProduct3(matrix1[i]);
 				if (maxDist > D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION) {
 					q1 = p0 - matrix1[i].Scale(D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION);
@@ -151,6 +254,7 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
+/*
 	dVector euler0(0.0f);
 	dVector euler1(0.0f);
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
@@ -207,5 +311,6 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[2][0]);
         }
 	}
+*/
 }
 

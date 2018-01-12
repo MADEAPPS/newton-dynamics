@@ -20,6 +20,7 @@
 #include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
+#if 0
 class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 {
 	public:
@@ -469,12 +470,14 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 	dFloat32 m_posit_y;
 	dFloat32 m_speed;
 };
-
+#endif
 
 void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+	dAssert (0);
+/*
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.3f, 200.0f, -50.0f);
 	dHexapodManager* const robotManager = new dHexapodManager(scene);
@@ -504,6 +507,7 @@ void Hexapod(DemoEntityManager* const scene)
 	
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

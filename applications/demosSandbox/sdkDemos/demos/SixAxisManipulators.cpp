@@ -20,6 +20,7 @@
 #include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
+
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -72,14 +73,14 @@ class dSixAxisController: public dCustomControllerBase
 		dVector m_azimuthAxis;
 	};
 
-	class dKukaServoMotor1: public dCustomRagdollMotor_1dof
+	class dKukaServoMotor1: public dCustomRagdollMotor
 	{
 		public:
 		dKukaServoMotor1(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle)
-			:dCustomRagdollMotor_1dof(pinAndPivotFrame, child, parent)
+			:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
 		{
-			SetJointTorque (1000.0f);
-			SetTwistAngle (minAngle, maxAngle);
+//			SetJointTorque (1000.0f);
+//			SetTwistAngle (minAngle, maxAngle);
 		}
 	};
 
@@ -267,8 +268,8 @@ class dSixAxisController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		m_animTreeNode->Update(timestep, threadIndex);
-		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
+//		m_animTreeNode->Update(timestep, threadIndex);
+//		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -284,6 +285,7 @@ class dSixAxisController: public dCustomControllerBase
 	NewtonInverseDynamics* m_kinematicSolver;
 	dEffectorTreeInputModifier* m_inputModifier;
 };
+
 
 class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 {
@@ -359,6 +361,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
