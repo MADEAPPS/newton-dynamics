@@ -112,6 +112,32 @@ void dCustom6DOF::GetPitchLimits(dFloat& minAngle, dFloat& maxAngle) const
 	minAngle = m_pitch.m_minAngle;
 }
 
+void dCustom6DOF::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMatrix& matrix0, const dMatrix& matrix1) const
+{
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dVector euler0;
+	dVector euler1;
+	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+#if 0
+	dMatrix matrix1_ (dGetIdentityMatrix());
+	dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(100.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * matrix1_);
+	dMatrix localMatrix_(matrix0_ * matrix1_.Inverse());
+	localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+#endif
+
+	dAngularIntegration deltaRoll(dAngularIntegration(euler0.m_y) - m_roll.m_currentAngle);
+	dAngularIntegration deltaPitch(dAngularIntegration(euler0.m_x) - m_pitch.m_currentAngle);
+	if ((dAbs(deltaRoll.GetAngle()) > (0.5f * 3.141592f)) && (dAbs(deltaPitch.GetAngle()) > (0.5f * 3.141592f))) {
+		euler0 = euler1;
+	}
+
+	pitch = euler0.m_x;
+	yaw = euler0.m_y;
+	roll = euler0.m_z;
+	//	dTrace(("%f %f %f\n", pitch * 180.0f / 3.141592f, yaw * 180.0f / 3.141592f, roll * 180.0f / 3.141592f));
+}
+
 
 
 void dCustom6DOF::Debug(dDebugDisplay* const debugDisplay) const
@@ -148,7 +174,7 @@ void dCustom6DOF::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
-return;
+//return;
 	{
 		// show yaw angle limits
 		dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
@@ -200,7 +226,6 @@ return;
 		}
 	}
 }
-
 
 
 void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)

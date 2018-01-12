@@ -280,24 +280,6 @@ void dCustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) co
 	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
-void dCustomJoint::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMatrix& matrix0, const dMatrix& matrix1) const
-{
-	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	dVector euler0;
-	dVector euler1;
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-
-	//dMatrix matrix1_ (dGetIdentityMatrix());
-	//dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(40.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * matrix1_);
-	//dMatrix localMatrix_(matrix0_ * matrix1_.Inverse());
-	//localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-
-	pitch = euler0.m_x;
-	yaw = euler0.m_y;
-	roll = euler0.m_z;
-	//	dTrace(("%f %f %f\n", pitch * 180.0f / 3.141592f, yaw * 180.0f / 3.141592f, roll * 180.0f / 3.141592f));
-}
-
 
 dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const
 {

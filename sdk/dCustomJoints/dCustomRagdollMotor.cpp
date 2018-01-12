@@ -1019,6 +1019,8 @@ void dCustomRagdollMotor::Debug(dDebugDisplay* const debugDisplay) const
 
 	dCustomJoint::Debug(debugDisplay);
 
+	dAssert(0);
+/*
 	const int subdiv = 12;
 	const float radius = 0.25f;
 	dVector arch[subdiv + 1];
@@ -1096,6 +1098,7 @@ void dCustomRagdollMotor::Debug(dDebugDisplay* const debugDisplay) const
 			debugDisplay->DrawLine(arch[i], arch[i + 1]);
 		}
 	}
+*/
 }
 
 
@@ -1120,6 +1123,7 @@ void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
+/*
 	GetEulers(pitch, yaw, roll, matrix0, matrix1);
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
@@ -1141,4 +1145,5 @@ void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 	dFloat rollAlpha = (roll * damp * invTimestep + relOmega.DotProduct3(matrix1.m_right)) * invTimestep;
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_right[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, -rollAlpha);
+*/
 }

@@ -92,9 +92,6 @@
 
 enum dEulerAngleOrder
 {
-//	m_pitchYawRoll = (0 << 8) + (1 << 4) + (2 << 0),
-//	m_pitchRollYaw = (0 << 8) + (2 << 4) + (1 << 0),
-//	m_rollYawpitch = (2 << 8) + (1 << 4) + (0 << 0),
 	m_pitchYawRoll,
 	m_pitchRollYaw,
 };
