@@ -267,8 +267,8 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	dCustom6DOF* const joint0 = new dCustom6DOF (pinMatrix, pinMatrix, box0, base);
 	joint0->SetYawLimits (-angle, angle);
-	joint0->SetPitchLimits (-angle, angle);
 	joint0->SetRollLimits (-angle, angle);
+	//joint0->SetPitchLimits(-angle, angle);
 /*
 	// link the two boxes
 	dMatrix matrix1;

@@ -290,6 +290,24 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat pitch;
 	GetEulers(pitch, yaw, roll, matrix0, matrix1);
 
+	if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {
+		NewtonUserJointAddAngularRow(m_joint, -pitch, &matrix0.m_front[0]);
+	} else {
+
+	}
+
+	if ((m_yaw.m_minAngle == 0.0f) && (m_yaw.m_maxAngle == 0.0f)) {
+		NewtonUserJointAddAngularRow(m_joint, -yaw, &matrix1.m_up[0]);
+	} else {
+
+	}
+
+	matrix1 = dYawMatrix(yaw) * matrix1;
+	if ((m_roll.m_minAngle == 0.0f) && (m_roll.m_maxAngle == 0.0f)) {
+		NewtonUserJointAddAngularRow(m_joint, -roll, &matrix1.m_right[0]);
+	} else {
+
+	}
 
 	m_yaw.m_currentAngle.Update(yaw);
 	m_roll.m_currentAngle.Update(roll);
