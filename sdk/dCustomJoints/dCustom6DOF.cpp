@@ -27,7 +27,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustom6DOF);
 //#define D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION	0.5f
 //#define D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION	10.0f
 
-dCustom6DOF::dCustom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame___, NewtonBody* const child, NewtonBody* const parent)
+dCustom6DOF::dCustom6DOF (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
 	,m_minLinearLimits(0.0f)
 	,m_maxLinearLimits(0.0f)
@@ -36,7 +36,7 @@ dCustom6DOF::dCustom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& 
 	,m_pitch()
 	,m_mask(0x3f)
 {
-	CalculateLocalMatrix (pinsAndPivotChildFrame, m_localMatrix0, m_localMatrix1);
+	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
 dCustom6DOF::~dCustom6DOF()
@@ -137,11 +137,8 @@ void dCustom6DOF::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& ma
 	m_yaw.m_currentAngle.Update(euler0.m_y);
 	m_roll.m_currentAngle.Update(euler0.m_z);
 	m_pitch.m_currentAngle.Update(euler0.m_x);
-
-dTrace(("%f %f %f\n", GetPitch() * 180.0f / 3.141592f, GetYaw() * 180.0f / 3.141592f, GetRoll() * 180.0f / 3.141592f));
+//dTrace(("%f %f %f\n", GetPitch() * 180.0f / 3.141592f, GetYaw() * 180.0f / 3.141592f, GetRoll() * 180.0f / 3.141592f));
 }
-
-
 
 void dCustom6DOF::Debug(dDebugDisplay* const debugDisplay) const
 {
@@ -243,10 +240,9 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
-	//dVector dp (p0 - p1);
 
 	for (int i = 0; i < 3; i ++) {
-		if (1<<i) {
+		if (m_mask & (1<<i)) {
 			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
 				NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 				NewtonUserJointSetRowStiffness (m_joint, m_stiffness);

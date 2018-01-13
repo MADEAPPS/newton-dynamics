@@ -25,9 +25,11 @@ IMPLEMENT_CUSTOM_JOINT(dCustomCorkScrew);
 //////////////////////////////////////////////////////////////////////
 
 dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
-	:dCustomJoint(6, child, parent)
-	,m_curJointAngle()
+	:dCustom6DOF(pinAndPivotFrame, child, parent)
 {
+	m_xAxis = 0;
+	m_pitchAxis = 0;
+
 	m_limitsLinearOn = false;
 	m_limitsAngularOn = false;
 	m_minLinearDist = -1.0f;
@@ -37,10 +39,7 @@ dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody*
 
 	m_angularmotorOn = false;
 	m_angularDamp = 0.1f;
-	m_angularAccel = 5.0f;
-
-	// calculate the two local matrix of the pivot point
-	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	m_angularVeloc = 5.0f;
 }
 
 dCustomCorkScrew::~dCustomCorkScrew()
@@ -54,8 +53,7 @@ void dCustomCorkScrew::Deserialize (NewtonDeserializeCallback callback, void* co
 	callback (userData, &m_minAngularDist, sizeof (dFloat));
 	callback (userData, &m_maxAngularDist, sizeof (dFloat));
 	callback (userData, &m_angularDamp, sizeof (dFloat));
-	callback (userData, &m_angularAccel, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (dAngularIntegration));
+	callback (userData, &m_angularVeloc, sizeof (dFloat));
 
 	int tmp[3];
 	callback (userData, tmp, sizeof (tmp));
@@ -73,8 +71,7 @@ void dCustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const 
 	callback (userData, &m_minAngularDist, sizeof (dFloat));
 	callback (userData, &m_maxAngularDist, sizeof (dFloat));
 	callback (userData, &m_angularDamp, sizeof (dFloat));
-	callback (userData, &m_angularAccel, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (dAngularIntegration));
+	callback (userData, &m_angularVeloc, sizeof (dFloat));
 
 	int tmp[3];
 	tmp[0] = m_limitsLinearOn ; 
@@ -107,14 +104,11 @@ void dCustomCorkScrew::SetAngularLimis(dFloat minDist, dFloat maxDist)
 {
 	//dAssert (minDist < 0.0f);
 	//dAssert (maxDist > 0.0f);
-
 	m_minAngularDist = minDist;
 	m_maxAngularDist = maxDist;
 }
 
-
-
-
+#if 0
 void dCustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -218,6 +212,54 @@ void dCustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
 	}
  }
+#endif
+
+ void dCustomCorkScrew::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex)
+ {
+	 dAssert(freeDof == 2);
+	 if (m_limitsLinearOn) {
+		 dFloat dist = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix0.m_front);
+		 if (dist < m_minLinearDist) {
+			 NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix0.m_front[0]);
+			 NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		 } else if (dist > m_maxLinearDist) {
+			 NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix0.m_front[0]);
+			 NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		 }
+	 }
 
 
+	 if (m_limitsAngularOn) {
+		 // the joint angle can be determine by getting the angle between any two non parallel vectors
+		 dFloat angle = GetPitch();
+		 if (angle < m_minAngularDist) {
+			 dFloat relAngle = angle - m_minAngularDist;
+			 NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
+			 NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			 NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
+		 }  else if (angle > m_maxAngularDist) {
+			 dFloat relAngle = angle - m_maxAngularDist;
+			 NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
+			 NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			 NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			 
+		 } if (m_angularmotorOn) {
+			 dAssert(0);
+		 }
+	 } else if (m_angularmotorOn) {
+		 dVector omega0(0.0f);
+		 dVector omega1(0.0f);
+
+		 // get relative angular velocity
+		 NewtonBodyGetOmega(m_body0, &omega0[0]);
+		 if (m_body1) {
+			 NewtonBodyGetOmega(m_body1, &omega1[0]);
+		 }
+
+		 dFloat relOmega = (omega0 - omega1).DotProduct3(matrix0.m_front);
+		 dFloat relAccel = (m_angularVeloc - m_angularDamp * relOmega) / timestep;
+		 NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+		 NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+	 }
+ }

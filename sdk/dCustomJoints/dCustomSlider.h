@@ -18,13 +18,12 @@
 #ifndef _CUSTOM_SLIDER_H__
 #define _CUSTOM_SLIDER_H__
 
-#include "dCustomJoint.h"
+#include "dCustom6DOF.h"
 
-class dCustomSlider: public dCustomJoint  
+class dCustomSlider: public dCustom6DOF
 {
 	public:
 	CUSTOM_JOINTS_API dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent);
 	CUSTOM_JOINTS_API virtual ~dCustomSlider();
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);
@@ -38,8 +37,9 @@ class dCustomSlider: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
+//	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+//	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
 	dFloat m_speed;
 	dFloat m_posit;
@@ -57,7 +57,7 @@ class dCustomSlider: public dCustomJoint
 			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
-	DECLARE_CUSTOM_JOINT(dCustomSlider, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomSlider, dCustom6DOF)
 };
 
 #endif

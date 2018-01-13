@@ -265,7 +265,7 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	dCustom6DOF* const joint0 = new dCustom6DOF (pinMatrix, pinMatrix, box0, base);
+	dCustom6DOF* const joint0 = new dCustom6DOF (pinMatrix, box0, base);
 	joint0->SetYawLimits (-angle, angle);
 	joint0->SetRollLimits (-angle, angle);
 	joint0->SetPitchLimits(-angle, angle);
@@ -274,7 +274,7 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	dCustom6DOF* const joint1 = new dCustom6DOF (pinMatrix, pinMatrix, box1, box0);
+	dCustom6DOF* const joint1 = new dCustom6DOF (pinMatrix, box1, box0);
 	joint1->SetYawLimits(-angle, angle);
 	joint1->SetPitchLimits(-angle, angle);
 	joint1->SetRollLimits(-angle, angle);
@@ -1027,9 +1027,9 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
-//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
+	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 //	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));

@@ -38,7 +38,7 @@ class dCustom6DOF: public dCustomJoint
 	};
 
 	public:
-	CUSTOM_JOINTS_API dCustom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustom6DOF (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustom6DOF();
 
 	CUSTOM_JOINTS_API void GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits) const;
@@ -90,5 +90,5 @@ class dCustom6DOF: public dCustomJoint
 	DECLARE_CUSTOM_JOINT(dCustom6DOF, dCustomJoint)
 };
 
-#endif // !defined(AFX_Custom6DOF_H__B631F556_B7D7_F85ECF3E9ADE_H)
+#endif
 
