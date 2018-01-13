@@ -126,9 +126,9 @@ void dCustom6DOF::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& roll, const dMat
 	localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 #endif
 
-	dAngularIntegration deltaRoll(dAngularIntegration(euler0.m_y) - m_roll.m_currentAngle);
+	dAngularIntegration deltaYaw(dAngularIntegration(euler0.m_y) - m_yaw.m_currentAngle);
 	dAngularIntegration deltaPitch(dAngularIntegration(euler0.m_x) - m_pitch.m_currentAngle);
-	if ((dAbs(deltaRoll.GetAngle()) > (0.5f * 3.141592f)) && (dAbs(deltaPitch.GetAngle()) > (0.5f * 3.141592f))) {
+	if ((dAbs(deltaYaw.GetAngle()) > (0.5f * 3.141592f)) && (dAbs(deltaPitch.GetAngle()) > (0.5f * 3.141592f))) {
 		euler0 = euler1;
 	}
 
@@ -245,8 +245,9 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	for (int i = 0; i < 3; i ++) {
 		if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
 			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+			NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 		} else {
+			dAssert (0);
 			/*
 			// it is a limited linear dof, check if it pass the limits
 			dFloat dist = dp.DotProduct3(matrix1[i]);
@@ -283,8 +284,9 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 
 
-	dVector omega0;
-	dVector omega1;
+static int xxx;
+xxx++;
+
 	dFloat yaw;
 	dFloat roll;
 	dFloat pitch;
@@ -292,12 +294,14 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {
 		NewtonUserJointAddAngularRow(m_joint, -pitch, &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 	} else {
 
 	}
 
 	if ((m_yaw.m_minAngle == 0.0f) && (m_yaw.m_maxAngle == 0.0f)) {
 		NewtonUserJointAddAngularRow(m_joint, -yaw, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 	} else {
 
 	}
@@ -305,13 +309,26 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	matrix1 = dYawMatrix(yaw) * matrix1;
 	if ((m_roll.m_minAngle == 0.0f) && (m_roll.m_maxAngle == 0.0f)) {
 		NewtonUserJointAddAngularRow(m_joint, -roll, &matrix1.m_right[0]);
+		NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 	} else {
 
+		dVector omega0;
+		dVector omega1;
+
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		dVector relOmega(omega0 - omega1);
+		const dFloat damp = 0.4f;
+		const dFloat invTimestep = 1.0f / timestep;
+
+		// calculate twisting axis acceleration
+		dFloat rollAlpha = (1.0f - relOmega.DotProduct3(matrix1.m_right)) * invTimestep;
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_right[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, rollAlpha);
 	}
 
 	m_yaw.m_currentAngle.Update(yaw);
 	m_roll.m_currentAngle.Update(roll);
 	m_pitch.m_currentAngle.Update(pitch);
-
 }
 
