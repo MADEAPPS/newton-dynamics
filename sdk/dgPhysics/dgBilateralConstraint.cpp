@@ -410,10 +410,10 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 // remember the impulse branch 
 //dgAssert (params->m_timeStep > dgFloat32 (0.0f));
 	if (params->m_timeStep > dgFloat32 (0.0f)) {
-		//dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.25f);
-		//dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
-		const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (1.0f);
-		const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (0.25f);
+		//const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.25f);
+		//const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
+		const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.5f);
+		const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
 		const dgFloat32 dt = params->m_timeStep;
 		for (dgInt32 k = 0; k < params->m_rowsCount; k ++) {
 			if (m_rowIsMotor & (1 << k)) {

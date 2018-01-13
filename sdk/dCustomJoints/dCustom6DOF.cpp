@@ -34,7 +34,7 @@ dCustom6DOF::dCustom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& 
 	,m_yaw()
 	,m_roll()
 	,m_pitch()
-	,m_mask(0xff)
+	,m_mask(0x3f)
 {
 	CalculateLocalMatrix (pinsAndPivotChildFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -288,47 +288,67 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-
 	CalculateJointAngles(matrix0, matrix1);
 	if (m_pitchAxis) {
+		dFloat pitchAngle = GetPitch();
 		if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {
-			NewtonUserJointAddAngularRow(m_joint, -GetPitch(), &matrix0.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		} else {
-
+			if (pitchAngle > m_pitch.m_maxAngle) {
+				NewtonUserJointAddAngularRow(m_joint, m_pitch.m_maxAngle - pitchAngle, &matrix0.m_front[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			} else if (pitchAngle < m_pitch.m_minAngle) {
+				NewtonUserJointAddAngularRow(m_joint, m_pitch.m_minAngle - pitchAngle, &matrix0.m_front[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			}
 		}
 	}
 
 	if (m_yawAxis) {
+		dFloat yawAngle = GetYaw();
 		if ((m_yaw.m_minAngle == 0.0f) && (m_yaw.m_maxAngle == 0.0f)) {
-			NewtonUserJointAddAngularRow(m_joint, -GetYaw(), &matrix1.m_up[0]);
+			NewtonUserJointAddAngularRow(m_joint, -yawAngle, &matrix1.m_up[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		} else {
-
+			if (yawAngle > m_yaw.m_maxAngle) {
+				NewtonUserJointAddAngularRow(m_joint, m_yaw.m_maxAngle - yawAngle, &matrix1.m_up[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			} else if (yawAngle < m_yaw.m_minAngle) {
+				NewtonUserJointAddAngularRow(m_joint, m_yaw.m_minAngle - yawAngle, &matrix1.m_up[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			}
 		}
 	}
 
 	if (m_rollAxis) {
 		matrix1 = dYawMatrix(GetYaw()) * matrix1;
+		dFloat rollAngle = GetRoll();
 		if ((m_roll.m_minAngle == 0.0f) && (m_roll.m_maxAngle == 0.0f)) {
-			NewtonUserJointAddAngularRow(m_joint, -GetRoll(), &matrix1.m_right[0]);
+			NewtonUserJointAddAngularRow(m_joint, -rollAngle, &matrix1.m_right[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		} else {
-
-			dVector omega0;
-			dVector omega1;
-
-			NewtonBodyGetOmega(m_body0, &omega0[0]);
-			NewtonBodyGetOmega(m_body1, &omega1[0]);
-			dVector relOmega(omega0 - omega1);
-			const dFloat damp = 0.4f;
-			const dFloat invTimestep = 1.0f / timestep;
-
-			// calculate twisting axis acceleration
-			dFloat rollAlpha = (1.0f - relOmega.DotProduct3(matrix1.m_right)) * invTimestep;
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_right[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, rollAlpha);
+			if (rollAngle > m_roll.m_maxAngle) {
+				NewtonUserJointAddAngularRow(m_joint, m_roll.m_maxAngle - rollAngle, &matrix1.m_right[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			} else if (rollAngle < m_roll.m_minAngle) {
+				NewtonUserJointAddAngularRow(m_joint, m_roll.m_minAngle - rollAngle, &matrix1.m_right[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			}
 		}
+	}
+
+	int freedof = (m_mask & 0x55) + ((m_mask >> 1) & 0x55);
+	freedof = (freedof & 0x33) + ((freedof >> 2) & 0x33);
+	freedof = (freedof & 0x0f) + ((freedof >> 4) & 0xff);
+	if (freedof != 6) {
+		SubmitConstraintsFreeDof(6 - freedof, matrix0, matrix1, timestep, threadIndex);
 	}
 }
 
