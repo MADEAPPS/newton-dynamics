@@ -40,16 +40,30 @@ dCustomSlidingContact::dCustomSlidingContact (const dMatrix& pinAndPivotFrame, N
 	SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 }
 
+dCustomSlidingContact::dCustomSlidingContact(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+	:dCustom6dof(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
+	,m_speed(0.0f)
+	,m_posit(0.0f)
+	,m_flags(0)
+{
+	m_yAxis = 0;
+	m_pitchAxis = 0;
+
+	m_lastRowWasUsed = true;
+	EnableLinearLimits(false);
+	EnableAngularLimits(false);
+	SetLinearLimits(-1.0f, 1.0f);
+	SetAngularLimits(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
+	SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
+}
+
+
 void dCustomSlidingContact::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_speed, sizeof(dFloat));
 	callback(userData, &m_posit, sizeof(dFloat));
 	callback(userData, &m_spring, sizeof(dFloat));
 	callback(userData, &m_damper, sizeof(dFloat));
-	callback(userData, &m_minLinearDist, sizeof(dFloat));
-	callback(userData, &m_maxLinearDist, sizeof(dFloat));
-	callback(userData, &m_minAngularDist, sizeof(dFloat));
-	callback(userData, &m_maxAngularDist, sizeof(dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof(dFloat));
 	callback(userData, &m_flags, sizeof(int));
 }
@@ -62,10 +76,6 @@ void dCustomSlidingContact::Serialize(NewtonSerializeCallback callback, void* co
 	callback(userData, &m_posit, sizeof(dFloat));
 	callback(userData, &m_spring, sizeof(dFloat));
 	callback(userData, &m_damper, sizeof(dFloat));
-	callback(userData, &m_minLinearDist, sizeof(dFloat));
-	callback(userData, &m_maxLinearDist, sizeof(dFloat));
-	callback(userData, &m_minAngularDist, sizeof(dFloat));
-	callback(userData, &m_maxAngularDist, sizeof(dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof(dFloat));
 	callback(userData, &m_flags, sizeof(int));
 }
@@ -87,14 +97,18 @@ void dCustomSlidingContact::EnableAngularLimits(bool state)
 
 void dCustomSlidingContact::SetLinearLimits(dFloat minDist, dFloat maxDist)
 {
-	m_minLinearDist = minDist;
-	m_maxLinearDist = maxDist;
+	dVector minLinearLimits;
+	dVector maxLinearLimits;
+
+	dCustom6dof::GetLinearLimits(minLinearLimits, maxLinearLimits);
+	minLinearLimits.m_y = -dAbs (minDist);
+	maxLinearLimits.m_y = dAbs(maxDist);
+	dCustom6dof::SetLinearLimits(minLinearLimits, maxLinearLimits);
 }
 
 void dCustomSlidingContact::SetAngularLimits(dFloat minDist, dFloat maxDist)
 {
-	m_minAngularDist = minDist;
-	m_maxAngularDist = maxDist;
+	SetPitchLimits(minDist, maxDist);
 }
 
 void dCustomSlidingContact::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
@@ -238,13 +252,13 @@ void dCustomSlidingContact::SubmitConstraintsFreeDof(int freeDof, const dMatrix&
 	// if limit are enable ...
 	if (m_limitsAngularOn) {
 		dFloat angle = GetPitch();
-		if (angle < m_minAngularDist) {
-			dFloat relAngle = m_minAngularDist - angle;
+		if (angle < m_pitch.m_minAngle) {
+			dFloat relAngle = m_pitch.m_minAngle - angle;
 			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (angle > m_maxAngularDist) {
-			dFloat relAngle = m_maxAngularDist - angle;
+		} else if (angle > m_pitch.m_maxAngle) {
+			dFloat relAngle = m_pitch.m_maxAngle - angle;
 			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
@@ -253,7 +267,7 @@ void dCustomSlidingContact::SubmitConstraintsFreeDof(int freeDof, const dMatrix&
 
 	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_up);
 	if (m_setAsSpringDamper && m_limitsLinearOn) {
-		if (m_posit < m_minLinearDist) {
+		if (m_posit < m_minLinearLimits.m_y) {
 			//const dVector& p0 = matrix0.m_posit;
 			//dVector p1(p0 + matrix0.m_front.Scale(m_minLinearDist - m_posit));
 			//NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
@@ -264,7 +278,7 @@ void dCustomSlidingContact::SubmitConstraintsFreeDof(int freeDof, const dMatrix&
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 			//NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (m_posit > m_maxLinearDist) {
+		} else if (m_posit > m_maxLinearLimits.m_y) {
 			//const dVector& p0 = matrix0.m_posit;
 			//dVector p1(p0 + matrix0.m_front.Scale(m_maxLinearDist - m_posit));
 			//NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
@@ -280,13 +294,13 @@ void dCustomSlidingContact::SubmitConstraintsFreeDof(int freeDof, const dMatrix&
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 		}
 	} else if (m_limitsLinearOn) {
-		if (m_posit < m_minLinearDist) {
-			dVector p(matrix1.m_posit + matrix1.m_up.Scale(m_minLinearDist));
+		if (m_posit < m_minLinearLimits.m_y) {
+			dVector p(matrix1.m_posit + matrix1.m_up.Scale(m_minLinearLimits.m_y));
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (m_posit > m_maxLinearDist) {
-			dVector p(matrix1.m_posit + matrix1.m_up.Scale(m_maxLinearDist));
+		} else if (m_posit > m_maxLinearLimits.m_y) {
+			dVector p(matrix1.m_posit + matrix1.m_up.Scale(m_maxLinearLimits.m_y));
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);

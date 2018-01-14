@@ -79,8 +79,8 @@ void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userD
 void dCustom6dof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
 {
 	for (int i = 0; i < 3; i ++) {
-		m_minLinearLimits[i] =  (dAbs (minLinearLimits[i]) < dFloat (1.0e-5f)) ? 0.0f : minLinearLimits[i];
-		m_maxLinearLimits[i] =  (dAbs (maxLinearLimits[i]) < dFloat (1.0e-5f)) ? 0.0f : maxLinearLimits[i];
+		m_minLinearLimits[i] =  (dAbs (minLinearLimits[i]) < dFloat (1.0e-3f)) ? dFloat(0.0f) : -dAbs (minLinearLimits[i]);
+		m_maxLinearLimits[i] =  (dAbs (maxLinearLimits[i]) < dFloat (1.0e-3f)) ? dFloat(0.0f) :  dAbs (maxLinearLimits[i]);
 	}
 }
 
@@ -167,31 +167,6 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-//	if (m_pitchAxis) 
-	{
-		if ((m_pitch.m_maxAngle > 1.0e-3f) || (m_pitch.m_minAngle < -1.0e-3f)) {
-			// show pitch angle limits
-			dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
-
-			dFloat minAngle = dClamp(m_pitch.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
-			dFloat maxAngle = dClamp(m_pitch.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
-
-			dFloat angleStep = (maxAngle - minAngle) / subdiv;
-			dFloat angle0 = minAngle;
-
-			debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
-			for (int i = 0; i <= subdiv; i++) {
-				arch[i] = matrix0.TransformVector(dPitchMatrix(angle0).RotateVector(point));
-				debugDisplay->DrawLine(matrix0.m_posit, arch[i]);
-				angle0 += angleStep;
-			}
-
-			for (int i = 0; i < subdiv; i++) {
-				debugDisplay->DrawLine(arch[i], arch[i + 1]);
-			}
-		}
-	}
-
 //	if (m_yawAxis) 
 	{
 		// show yaw angle limits
@@ -217,7 +192,7 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
-//	if (m_rollAxis) 
+	matrix1 = dYawMatrix(GetYaw()) * matrix1;
 	{
 		// show roll angle limits
 		if ((m_roll.m_maxAngle > 1.0e-3f) || (m_roll.m_minAngle < -1.0e-3f)) {
@@ -228,9 +203,7 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 
 			dFloat angleStep = (maxAngle - minAngle) / subdiv;
 			dFloat angle0 = minAngle;
-
-
-			matrix1 = dYawMatrix(GetYaw()) * matrix1;
+			
 			debugDisplay->SetColor(dVector(0.0f, 0.0f, 0.5f, 0.0f));
 			for (int i = 0; i <= subdiv; i++) {
 				arch[i] = matrix1.TransformVector(dRollMatrix(angle0).RotateVector(point));
@@ -243,6 +216,33 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 			}
 		}
 	}
+
+	matrix1 = dRollMatrix(GetRoll()) * matrix1;
+	{
+		if ((m_pitch.m_maxAngle > 1.0e-3f) || (m_pitch.m_minAngle < -1.0e-3f)) {
+			// show pitch angle limits
+			dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
+
+			dFloat minAngle = dClamp(m_pitch.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
+			dFloat maxAngle = dClamp(m_pitch.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
+
+			dFloat angleStep = (maxAngle - minAngle) / subdiv;
+			dFloat angle0 = minAngle;
+
+			matrix1.m_posit = matrix0.m_posit;
+			debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+			for (int i = 0; i <= subdiv; i++) {
+				arch[i] = matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+				debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
+				angle0 += angleStep;
+			}
+
+			for (int i = 0; i < subdiv; i++) {
+				debugDisplay->DrawLine(arch[i], arch[i + 1]);
+			}
+		}
+	}
+
 }
 
 
