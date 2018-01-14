@@ -32,7 +32,6 @@ dCustomSlidingContact::dCustomSlidingContact (const dMatrix& pinAndPivotFrame, N
 	m_yAxis = 0;
 	m_pitchAxis = 0;
 
-	m_lastRowWasUsed = true;
 	EnableLinearLimits(false);
 	EnableAngularLimits(false);
 	SetLinearLimits(-1.0f, 1.0f);
@@ -49,7 +48,6 @@ dCustomSlidingContact::dCustomSlidingContact(const dMatrix& pinAndPivotFrameChil
 	m_yAxis = 0;
 	m_pitchAxis = 0;
 
-	m_lastRowWasUsed = true;
 	EnableLinearLimits(false);
 	EnableAngularLimits(false);
 	SetLinearLimits(-1.0f, 1.0f);

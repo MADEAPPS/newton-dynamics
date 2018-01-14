@@ -42,11 +42,6 @@ class dCustomSlidingContact: public dCustom6dof
 	
 	dFloat m_speed;
 	dFloat m_posit;
-//	dFloat m_minLinearDist;
-//	dFloat m_maxLinearDist;
-//	dFloat m_minAngularDist;
-//	dFloat m_maxAngularDist;
-
 	dFloat m_spring;
 	dFloat m_damper;
 	dFloat m_springDamperRelaxation;
@@ -58,7 +53,6 @@ class dCustomSlidingContact: public dCustom6dof
 			unsigned m_limitsLinearOn	 : 1;
 			unsigned m_limitsAngularOn	 : 1;
 			unsigned m_setAsSpringDamper : 1;
-			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
 	DECLARE_CUSTOM_JOINT(dCustomSlidingContact, dCustom6dof)
