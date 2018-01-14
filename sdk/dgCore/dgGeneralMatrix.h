@@ -363,9 +363,9 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 	for (dgInt32 i = 0; i < size - 1; i++) {
 		const T* const rowI = &matrix[i * size];
 		dgInt32 k = i;
-		T maxVal (fabs(rowI[i]));
+		T maxVal (dgAbsf(rowI[i]));
 		for (dgInt32 j = i + 1; j < size - 1; j++) {
-			T val (fabs(matrix[size * j + i]));
+			T val (dgAbsf(matrix[size * j + i]));
 			if (val > maxVal) {
 				k = j;
 				maxVal = val;
@@ -418,7 +418,7 @@ DG_INLINE void dgHouseHolderReduction(const dgInt32 size, T* const matrix, T* co
 		if (l > 0) {
 			T scale(0.0f);
 			for (dgInt32 k = 0; k <= l; k++) {
-				scale += T(abs(rowI[k]));
+				scale += T(dgAbsf(rowI[k]));
 			}
 
 			if (scale == T(0.0f)) {
@@ -492,7 +492,7 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 		if (i > 1) {
 			T scale(0.0f);
 			for (dgInt32 k = 0; k < i; k++) {
-				scale += T(abs(rowI[k]));
+				scale += dgAbsf(rowI[k]);
 			}
 
 			if (scale == T(0.0f)) {
@@ -553,8 +553,8 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 		dgInt32 iter = 0;
 		do {
 			for (j = i; j < size - 1; j++) {
-				T dd(abs(eigenValues[j]) + abs(eigenValues[j + 1]));
-				if (abs(offDiag[j]) <= (T(1.e-6f) * dd)) {
+				T dd(dgAbsf(eigenValues[j]) + dgAbsf(eigenValues[j + 1]));
+				if (dgAbsf(offDiag[j]) <= (T(1.e-6f) * dd)) {
 					break;
 				}
 			}
