@@ -109,9 +109,9 @@ void dCustomArticulatedTransformController::PostUpdate(dFloat timestep, int thre
 			manager->OnUpdateTransform (&bone, matrix * parentMatrix * bone.m_bindMatrix);
 
 			parentMatrix = matrix.Inverse();
-			for (dList<dSkeletonBone>::dListNode* node = bone.GetFirst(); node; node = node->GetNext()) {
+			for (dList<dSkeletonBone>::dListNode* ptrNode = bone.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
 				parentMatrixPool[stack] = parentMatrix;
-				stackPool[stack] = node;
+				stackPool[stack] = ptrNode;
 				stack ++;
 			}
 		}
