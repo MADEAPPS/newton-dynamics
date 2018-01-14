@@ -167,7 +167,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	if (m_pitchAxis) {
+//	if (m_pitchAxis) 
+	{
 		if ((m_pitch.m_maxAngle > 1.0e-3f) || (m_pitch.m_minAngle < -1.0e-3f)) {
 			// show pitch angle limits
 			dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
@@ -191,7 +192,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
-	if (m_yawAxis) {
+//	if (m_yawAxis) 
+	{
 		// show yaw angle limits
 		if ((m_yaw.m_maxAngle > 1.0e-3f) || (m_yaw.m_minAngle < -1.0e-3f)) {
 			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
@@ -215,7 +217,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
-	if (m_rollAxis) {
+//	if (m_rollAxis) 
+	{
 		// show roll angle limits
 		if ((m_roll.m_maxAngle > 1.0e-3f) || (m_roll.m_minAngle < -1.0e-3f)) {
 			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
