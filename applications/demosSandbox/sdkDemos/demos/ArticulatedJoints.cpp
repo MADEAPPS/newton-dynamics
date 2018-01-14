@@ -68,6 +68,7 @@ class ArticulatedEntityModel: public DemoEntity
 		SuspensionTire (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const chassis)
 			:dCustomSlidingContact (pinAndPivotFrame, tire, chassis)
 		{
+dAssert (0);
 			EnableLinearLimits(true);
 			SetLinearLimits (-0.5f, 0.01f);
 			SetAsSpringDamper(true, 0.9f, 1550.0f, 150.0f);

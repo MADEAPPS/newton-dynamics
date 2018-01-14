@@ -317,6 +317,8 @@ void dCustomLimitBallAndSocket::GetTwistAngle (dFloat& minAngle, dFloat& maxAngl
 
 void dCustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+dAssert (0);
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -382,8 +384,8 @@ void dCustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInd
 			}
 		}
 	}
+*/
 }
-
 
 dCustomControlledBallAndSocket::dCustomControlledBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)

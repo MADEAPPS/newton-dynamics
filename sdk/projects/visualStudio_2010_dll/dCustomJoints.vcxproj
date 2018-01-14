@@ -35,7 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dCustomJoints\dCustom6DOF.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustom6dof.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomActiveCharacterManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.cpp" />
@@ -76,7 +76,7 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomVehicleControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dCustomJoints\dCustom6DOF.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustom6dof.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomActiveCharacterManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.h" />

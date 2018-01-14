@@ -219,8 +219,6 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API static dSerializeMetaDataDictionary& GetDictionary();
 
-	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
-	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

@@ -17,16 +17,14 @@
 #ifndef _CUSTOMHINGE_H_
 #define _CUSTOMHINGE_H_
 
-#include "dCustomJoint.h"
+#include "dCustom6dof.h"
 
-class dCustomHinge: public dCustomJoint  
+class dCustomHinge: public dCustom6dof
 {
 	public:
 	CUSTOM_JOINTS_API dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-
-	// this is a special constructor that create a hinge with an error between the two matrices, the error is reduce to zero after few iterations 
-	// the error can not be too great, this is more for hinges with wiggle room
 	CUSTOM_JOINTS_API dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
+
 	CUSTOM_JOINTS_API virtual ~dCustomHinge();
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);
@@ -43,13 +41,13 @@ class dCustomHinge: public dCustomJoint
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
+	private:
+	void SubmitConstraintsLimitsOnly(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	void SubmitConstraintsFrictionOnly(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	void SubmitConstraintsFrictionAndLimit(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
-	CUSTOM_JOINTS_API void ApplySpringDamper (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
-	
-	dAngularIntegration m_curJointAngle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
 	dFloat m_friction;
@@ -70,7 +68,7 @@ class dCustomHinge: public dCustomJoint
 		};
 	};
 
-	DECLARE_CUSTOM_JOINT(dCustomHinge, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomHinge, dCustom6dof)
 };
 
 #endif 

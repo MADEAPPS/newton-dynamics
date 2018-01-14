@@ -17,7 +17,6 @@
 #include "dCustomCorkScrew.h"
 
 
-
 IMPLEMENT_CUSTOM_JOINT(dCustomCorkScrew);
 
 //////////////////////////////////////////////////////////////////////
@@ -25,7 +24,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustomCorkScrew);
 //////////////////////////////////////////////////////////////////////
 
 dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
-	:dCustom6DOF(pinAndPivotFrame, child, parent)
+	:dCustom6dof(pinAndPivotFrame, child, parent)
 {
 	m_xAxis = 0;
 	m_pitchAxis = 0;
@@ -228,18 +227,17 @@ void dCustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		 }
 	 }
 
-
 	 if (m_limitsAngularOn) {
 		 // the joint angle can be determine by getting the angle between any two non parallel vectors
 		 dFloat angle = GetPitch();
 		 if (angle < m_minAngularDist) {
-			 dFloat relAngle = angle - m_minAngularDist;
+			 dFloat relAngle = m_minAngularDist - angle;
 			 NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 			 NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			 NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
 		 }  else if (angle > m_maxAngularDist) {
-			 dFloat relAngle = angle - m_maxAngularDist;
+			 dFloat relAngle = m_maxAngularDist - angle;
 			 NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 			 NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			 NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);

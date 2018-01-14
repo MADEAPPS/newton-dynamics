@@ -438,6 +438,8 @@ void dWheelJoint::ResetTransform()
 
 void dWheelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+	dAssert (0);
+/*
 	dMatrix tireMatrix;
 	dMatrix chassisMatrix;
 
@@ -495,6 +497,7 @@ void dWheelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 
 	m_brakeTorque = 0.0f;
+*/
 }
 
 void dWheelJoint::Debug(dDebugDisplay* const debugDisplay) const

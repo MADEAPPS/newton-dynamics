@@ -17,9 +17,9 @@
 #ifndef _CUSTOMUNIVERSAL_H_
 #define _CUSTOMUNIVERSAL_H_
 
-#include "dCustom6DOF.h"
+#include "dCustom6dof.h"
 
-class dCustomUniversal: public dCustom6DOF
+class dCustomUniversal: public dCustom6dof
 {
 	public:
 	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -83,7 +83,7 @@ class dCustomUniversal: public dCustom6DOF
 		};
 	};
 
-	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustom6DOF)
+	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustom6dof)
 };
 
 #endif 

@@ -17,7 +17,7 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 #include <dCustomGear.h>
-#include <dCustom6DOF.h>
+#include <dCustom6dof.h>
 #include <dCustomHinge.h>
 #include <dCustomSlider.h>
 #include <dCustomPulley.h>
@@ -265,7 +265,7 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	dCustom6DOF* const joint0 = new dCustom6DOF (pinMatrix, box0, base);
+	dCustom6dof* const joint0 = new dCustom6dof (pinMatrix, box0, base);
 	joint0->SetYawLimits (-angle, angle);
 	joint0->SetRollLimits (-angle, angle);
 	joint0->SetPitchLimits(-angle, angle);
@@ -274,7 +274,7 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	dCustom6DOF* const joint1 = new dCustom6DOF (pinMatrix, box1, box0);
+	dCustom6dof* const joint1 = new dCustom6dof (pinMatrix, box1, box0);
 	joint1->SetYawLimits(-angle, angle);
 	joint1->SetPitchLimits(-angle, angle);
 	joint1->SetRollLimits(-angle, angle);
@@ -675,7 +675,8 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 
 	// connect the bodies by a Slider joint
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	matrix = dPitchMatrix(45.0f * 3.141592f / 160.0f) * matrix;
+//	matrix = dPitchMatrix(90.0f * 3.141592f / 180.0f) * matrix;
+	matrix = dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix;
 
 	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, box1, box0);
 	slider->EnableLinearLimits (true);
@@ -1023,18 +1024,17 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
-////	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
-	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
-//	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
+	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 ////	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
 #endif

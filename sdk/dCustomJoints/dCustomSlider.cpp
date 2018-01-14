@@ -25,7 +25,7 @@
 IMPLEMENT_CUSTOM_JOINT(dCustomSlider);
 
 dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustom6DOF(pinAndPivotFrame, child, parent)
+	:dCustom6dof(pinAndPivotFrame, child, parent)
 	,m_speed(0.0f)
 	,m_posit(0.0f)
 	,m_minDist(-1.0f)
@@ -40,25 +40,21 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	m_xAxis = 0;
 }
 
-/*
 dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
-	:dCustom6DOF(pinAndPivotFrame, child, parent)
+	:dCustom6dof(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_speed(0.0f)
 	,m_posit(0.0f)
 	,m_minDist(-1.0f)
 	,m_maxDist(1.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
-	,m_springDamperRelaxation(0.6f)
+	,m_springDamperRelaxation(0.97f)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
 	,m_lastRowWasUsed(false)
 {
-	dMatrix	dummy;
-	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
-	CalculateLocalMatrix(pinAndPivotFrameParent, dummy, m_localMatrix1);
+	m_xAxis = 0;
 }
-*/
 
 void dCustomSlider::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {

@@ -91,6 +91,8 @@ dCustomPlane3DOF::~dCustomPlane3DOF()
 
 void dCustomPlane3DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 {
+dAssert (0);
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -108,5 +110,6 @@ void dCustomPlane3DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+*/
 }
 

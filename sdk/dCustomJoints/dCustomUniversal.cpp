@@ -10,7 +10,6 @@
 */
 
 
-
 // dCustomUniversal.cpp: implementation of the dCustomUniversal class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -25,7 +24,7 @@
 IMPLEMENT_CUSTOM_JOINT(dCustomUniversal);
 
 dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustom6DOF(pinAndPivotFrame, child, parent)
+	:dCustom6dof(pinAndPivotFrame, child, parent)
 	,m_flags(0)
 {
 	m_yawAxis = 0;
@@ -350,4 +349,67 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 void dCustomUniversal::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex)
 {
 	dAssert(freeDof == 2);
+
+	// check is the joint limit are enable
+	if (m_limit_0_On) {
+		dFloat angle0 = GetPitch();
+		if (angle0 < m_minAngle_0) {
+			dFloat relAngle = m_minAngle_0 - angle0;
+			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else if (angle0 > m_maxAngle_0) {
+			dFloat relAngle = m_maxAngle_0 - angle0;
+			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (m_angularMotor_0_On) {
+			dAssert (0);
+		}
+	
+	} else if (m_angularMotor_0_On) {
+		dAssert (0);
+/*
+		// calculate the desired acceleration
+		// dFloat relOmega = (omega0 - omega1) % matrix0.m_front;
+		dFloat relAccel = m_angularAccel_0 - m_angularDamp_0 * m_jointOmega_0;
+
+		// add and angular constraint row to that will set the relative acceleration to zero
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+
+		// override the joint acceleration.
+		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+*/
+	}
+
+
+	// if limit are enable ...
+	if (m_limit_1_On) {
+		dFloat angle1 = GetYaw();
+		if (angle1 < m_minAngle_1) {
+			dFloat relAngle = m_minAngle_1 - angle1;
+			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else if (angle1 > m_maxAngle_1) {
+			dFloat relAngle = m_maxAngle_1 - angle1;
+			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (m_angularMotor_1_On) {
+			dAssert (0);
+		}
+	} else if (m_angularMotor_1_On) {
+		dAssert (0);
+/*
+		// calculate the desired acceleration
+		dFloat relAccel = m_angularAccel_1 - m_angularDamp_1 * m_jointOmega_1;
+
+		// add and angular constraint row to that will set the relative acceleration to zero
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+
+		// override the joint acceleration.
+		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+*/
+	}
 }

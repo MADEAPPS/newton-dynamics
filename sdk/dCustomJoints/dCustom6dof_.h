@@ -10,9 +10,7 @@
 */
 
 
-
 // dCustom6DOF.h: interface for the dCustom6DOF class.
-//
 //////////////////////////////////////////////////////////////////////
 
 #ifndef _CUSTOM_6DOF_H_
@@ -20,7 +18,7 @@
 
 #include "dCustomJoint.h"
 
-class dCustom6DOF: public dCustomJoint  
+class dCustom6dof: public dCustomJoint  
 {
 	class dAngleData
 	{
@@ -38,8 +36,9 @@ class dCustom6DOF: public dCustomJoint
 	};
 
 	public:
-	CUSTOM_JOINTS_API dCustom6DOF (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~dCustom6DOF();
+	CUSTOM_JOINTS_API dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame,  NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~dCustom6dof();
 
 	CUSTOM_JOINTS_API void GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits) const;
 	CUSTOM_JOINTS_API void SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits);
@@ -87,7 +86,7 @@ class dCustom6DOF: public dCustomJoint
 	};
 
 
-	DECLARE_CUSTOM_JOINT(dCustom6DOF, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustom6dof, dCustomJoint)
 };
 
 #endif
