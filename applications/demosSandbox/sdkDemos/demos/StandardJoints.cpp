@@ -1025,12 +1025,12 @@ void StandardJoints (DemoEntityManager* const scene)
 //	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
 ////	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
-	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
-//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
+//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
+	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));

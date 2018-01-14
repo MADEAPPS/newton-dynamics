@@ -25,13 +25,11 @@
 IMPLEMENT_CUSTOM_JOINT(dCustomUniversal);
 
 dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
-	,m_curJointAngle_0()
-	,m_curJointAngle_1()
+	:dCustom6DOF(pinAndPivotFrame, child, parent)
 	,m_flags(0)
 {
-	// calculate the relative matrix of the pin and pivot on each body
-	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	m_yawAxis = 0;
+	m_pitchAxis = 0;
 
 	m_actuator_0 = false;
 	m_actuator_1 = false;
@@ -55,9 +53,6 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 
 void dCustomUniversal::Deserialize (NewtonDeserializeCallback callback, void* const userData) 
 {
-	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
-	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
-
 	callback(userData, &m_minAngle_0, sizeof(dFloat));
 	callback(userData, &m_maxAngle_0, sizeof(dFloat));
 	callback(userData, &m_jointOmega_0, sizeof(dFloat));
@@ -76,9 +71,6 @@ void dCustomUniversal::Deserialize (NewtonDeserializeCallback callback, void* co
 void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize(callback, userData);
-
-	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
-	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
 
 	callback(userData, &m_minAngle_0, sizeof(dFloat));
 	callback(userData, &m_maxAngle_0, sizeof(dFloat));
@@ -182,12 +174,16 @@ dFloat dCustomUniversal::GetMaxAngularLimit_1() const
 
 dFloat dCustomUniversal::GetJointAngle_0 () const
 {
-	return -m_curJointAngle_0.GetAngle();
+	dAssert(0);
+	return 0;
+//	return -m_curJointAngle_0.GetAngle();
 }
 
 dFloat dCustomUniversal::GetJointAngle_1 () const
 {
-	return -m_curJointAngle_1.GetAngle();
+	dAssert(0);
+	return 0;
+//	return -m_curJointAngle_1.GetAngle();
 }
 
 dFloat dCustomUniversal::GetJointOmega_0 () const
@@ -216,7 +212,7 @@ dVector dCustomUniversal::GetPinAxis_1 () const
 	return matrix1.m_up;
 }
 
-
+#if 0
 void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -348,3 +344,10 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 }
 
+#endif
+
+
+void dCustomUniversal::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex)
+{
+	dAssert(freeDof == 2);
+}

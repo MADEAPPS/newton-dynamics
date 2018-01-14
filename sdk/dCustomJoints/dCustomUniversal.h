@@ -17,9 +17,9 @@
 #ifndef _CUSTOMUNIVERSAL_H_
 #define _CUSTOMUNIVERSAL_H_
 
-#include "dCustomJoint.h"
+#include "dCustom6DOF.h"
 
-class dCustomUniversal: public dCustomJoint  
+class dCustomUniversal: public dCustom6DOF
 {
 	public:
 	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -57,10 +57,7 @@ class dCustomUniversal: public dCustomJoint
 	protected:
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-
-	dAngularIntegration m_curJointAngle_0;
-	dAngularIntegration m_curJointAngle_1;
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
 	dFloat m_minAngle_0;
 	dFloat m_maxAngle_0;
@@ -86,7 +83,7 @@ class dCustomUniversal: public dCustomJoint
 		};
 	};
 
-	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustom6DOF)
 };
 
 #endif 
