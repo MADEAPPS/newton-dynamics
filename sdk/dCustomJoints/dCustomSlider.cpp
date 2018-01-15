@@ -54,12 +54,12 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 
 void dCustomSlider::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback (userData, &m_speed, sizeof (dFloat));
-	callback (userData, &m_posit, sizeof (dFloat));
-	callback (userData, &m_spring, sizeof (dFloat));
-	callback (userData, &m_damper, sizeof (dFloat));
-	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_options, sizeof (int));
+	callback (userData, &m_speed, sizeof (m_speed));
+	callback (userData, &m_posit, sizeof (m_posit));
+	callback (userData, &m_spring, sizeof (m_spring));
+	callback (userData, &m_damper, sizeof (m_damper));
+	callback (userData, &m_springDamperRelaxation, sizeof (m_springDamperRelaxation));
+	callback (userData, &m_options, sizeof (m_options));
 }
 
 dCustomSlider::~dCustomSlider()
@@ -70,12 +70,12 @@ void dCustomSlider::Serialize (NewtonSerializeCallback callback, void* const use
 {
 	dCustomJoint::Serialize (callback, userData);
 
-	callback (userData, &m_speed, sizeof (dFloat));
-	callback (userData, &m_posit, sizeof (dFloat));
-	callback (userData, &m_spring, sizeof (dFloat));
-	callback (userData, &m_damper, sizeof (dFloat));
-	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_options, sizeof (int));
+	callback(userData, &m_speed, sizeof(m_speed));
+	callback(userData, &m_posit, sizeof(m_posit));
+	callback(userData, &m_spring, sizeof(m_spring));
+	callback(userData, &m_damper, sizeof(m_damper));
+	callback(userData, &m_springDamperRelaxation, sizeof(m_springDamperRelaxation));
+	callback(userData, &m_options, sizeof(m_options));
 }
 
 

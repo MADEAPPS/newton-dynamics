@@ -605,7 +605,7 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 	position.m_y += 4.0f;
 	NewtonBody* child = NULL;
 
-	int count = 6;
+	int count = 1;
 	for (int i = 0; i < count; i ++) {
 		child = CreateBox (scene, position, size);
 		NewtonBodyGetMatrix(child, &matrix[0][0]);
@@ -1026,23 +1026,24 @@ void StandardJoints (DemoEntityManager* const scene)
 //	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
-//	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
+
+	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
-	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
-	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
+//	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 ////	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
 #endif
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
-	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-//dVector origin (-2.0f, 5.0f, 0.0f, 0.0f);
+//	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
+dVector origin (-25.0f, 5.0f, 0.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 

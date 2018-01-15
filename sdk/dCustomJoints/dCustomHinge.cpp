@@ -25,38 +25,34 @@ IMPLEMENT_CUSTOM_JOINT(dCustomHinge);
 
 dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustom6dof(pinAndPivotFrame, child, parent)
-	,m_minAngle(-45.0f * 3.141592f / 180.0f)
-	,m_maxAngle(45.0f * 3.141592f / 180.0f)
 	,m_friction(0.0f)
 	,m_jointOmega(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.97f)
-	,m_flags(0)
+	,m_options(0)
 {
 	m_pitchAxis = 0;
 	m_limitsOn = false;
 	m_actuatorFlag = false;
-	m_lastRowWasUsed = false;
 	m_setAsSpringDamper = false;
+	SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
 }
 
 dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
 	:dCustom6dof(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
-	,m_minAngle(-45.0f * 3.141592f / 180.0f)
-	,m_maxAngle(45.0f * 3.141592f / 180.0f)
 	,m_friction(0.0f)
 	,m_jointOmega(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.97f)
-	,m_flags(0)
+	,m_options(0)
 {
 	m_pitchAxis = 0;
 	m_limitsOn = false;
 	m_actuatorFlag = false;
-	m_lastRowWasUsed = false;
 	m_setAsSpringDamper = false;
+	SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
 }
 
 dCustomHinge::~dCustomHinge()
@@ -65,28 +61,24 @@ dCustomHinge::~dCustomHinge()
 
 void dCustomHinge::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback (userData, &m_minAngle, sizeof (dFloat));
-	callback (userData, &m_maxAngle, sizeof (dFloat));
-	callback (userData, &m_friction, sizeof (dFloat));
-	callback (userData, &m_jointOmega, sizeof (dFloat));
-	callback (userData, &m_spring, sizeof (dFloat));
-	callback (userData, &m_damper, sizeof (dFloat));
-	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_flags, sizeof (int));
+	callback (userData, &m_friction, sizeof (m_friction));
+	callback (userData, &m_jointOmega, sizeof (m_jointOmega));
+	callback (userData, &m_spring, sizeof (m_spring));
+	callback (userData, &m_damper, sizeof (m_damper));
+	callback (userData, &m_springDamperRelaxation, sizeof (m_springDamperRelaxation));
+	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize (callback, userData);
 
-	callback (userData, &m_minAngle, sizeof (dFloat));
-	callback (userData, &m_maxAngle, sizeof (dFloat));
-	callback (userData, &m_friction, sizeof (dFloat));
-	callback (userData, &m_jointOmega, sizeof (dFloat));
-	callback(userData, &m_spring, sizeof (dFloat));
-	callback(userData, &m_damper, sizeof (dFloat));
-	callback(userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback(userData, &m_flags, sizeof (int));
+	callback(userData, &m_friction, sizeof(m_friction));
+	callback(userData, &m_jointOmega, sizeof(m_jointOmega));
+	callback(userData, &m_spring, sizeof(m_spring));
+	callback(userData, &m_damper, sizeof(m_damper));
+	callback(userData, &m_springDamperRelaxation, sizeof(m_springDamperRelaxation));
+	callback(userData, &m_options, sizeof(m_options));
 }
 
 
@@ -97,8 +89,7 @@ void dCustomHinge::EnableLimits(bool state)
 
 void dCustomHinge::SetLimits(dFloat minAngle, dFloat maxAngle)
 {
-	m_minAngle = minAngle;
-	m_maxAngle = maxAngle;
+	SetPitchLimits(minAngle, maxAngle);
 }
 
 void dCustomHinge::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
@@ -304,7 +295,6 @@ void dCustomHinge::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0,
 //m_springDamperRelaxation = 0.97f;
 
 	if (m_setAsSpringDamper) {
-		//m_lastRowWasUsed = true;
 		NewtonUserJointAddAngularRow(m_joint, -GetPitch(), &matrix0.m_front[0]);
 		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 	} else {
@@ -325,18 +315,16 @@ void dCustomHinge::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0,
 void dCustomHinge::SubmitConstraintsLimitsOnly(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dFloat angle = GetPitch();
-	if (angle < m_minAngle) {
-		dFloat relAngle = m_minAngle - angle;
-		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+	if (angle < m_pitch.m_minAngle) {
+		dFloat relAngle = m_pitch.m_minAngle - angle;
+		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		//		m_lastRowWasUsed = true;
-	} else if (angle > m_maxAngle) {
-		dFloat relAngle = m_maxAngle - angle;
-		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+	} else if (angle > m_pitch.m_maxAngle) {
+		dFloat relAngle = m_pitch.m_maxAngle - angle;
+		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		//		m_lastRowWasUsed = true;
 	}
 }
 
@@ -352,19 +340,18 @@ void dCustomHinge::SubmitConstraintsFrictionOnly(const dMatrix& matrix0, const d
 
 void dCustomHinge::SubmitConstraintsFrictionAndLimit(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+
 	dFloat angle = GetPitch();
-	if (angle < m_minAngle) {
-		dFloat relAngle = m_minAngle - angle;
-		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+	if (angle < m_pitch.m_minAngle) {
+		dFloat relAngle = m_pitch.m_minAngle - angle;
+		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-//		m_lastRowWasUsed = true;
-	} else if (angle > m_maxAngle) {
-		dFloat relAngle = m_maxAngle - angle;
-		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+	} else if (angle > m_pitch.m_maxAngle) {
+		dFloat relAngle = m_pitch.m_maxAngle - angle;
+		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-//		m_lastRowWasUsed = true;
+		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 	} else {
 		// friction but not limits
 		dFloat alpha = m_jointOmega / timestep;
@@ -373,6 +360,5 @@ void dCustomHinge::SubmitConstraintsFrictionAndLimit(const dMatrix& matrix0, con
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-//		m_lastRowWasUsed = true;
 	}
 }

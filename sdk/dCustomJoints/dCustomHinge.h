@@ -48,8 +48,6 @@ class dCustomHinge: public dCustom6dof
 	void SubmitConstraintsFrictionOnly(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintsFrictionAndLimit(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
-	dFloat m_minAngle;
-	dFloat m_maxAngle;
 	dFloat m_friction;
 	dFloat m_jointOmega;
 
@@ -58,13 +56,12 @@ class dCustomHinge: public dCustom6dof
 	dFloat m_springDamperRelaxation;
 	union
 	{
-		int m_flags;
+		int m_options;
 		struct
 		{
 			unsigned m_limitsOn			 : 1;
 			unsigned m_setAsSpringDamper : 1;
 			unsigned m_actuatorFlag		 : 1;
-			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
 

@@ -77,30 +77,30 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const d
 
 void dCustomUniversal::Deserialize (NewtonDeserializeCallback callback, void* const userData) 
 {
-	callback(userData, &m_jointOmega_0, sizeof(dFloat));
-	callback(userData, &m_angularDamp_0, sizeof(dFloat));
-	callback(userData, &m_angularAccel_0, sizeof(dFloat));
+	callback(userData, &m_jointOmega_0, sizeof(m_jointOmega_0));
+	callback(userData, &m_angularDamp_0, sizeof(m_angularDamp_0));
+	callback(userData, &m_angularAccel_0, sizeof(m_angularAccel_0));
 
-	callback(userData, &m_jointOmega_1, sizeof(dFloat));
-	callback(userData, &m_angularDamp_1, sizeof(dFloat));
-	callback(userData, &m_angularAccel_1, sizeof(dFloat));
+	callback(userData, &m_jointOmega_1, sizeof(m_jointOmega_1));
+	callback(userData, &m_angularDamp_1, sizeof(m_angularDamp_1));
+	callback(userData, &m_angularAccel_1, sizeof(m_angularAccel_1));
 
-	callback(userData, &m_options, sizeof(int));
+	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize(callback, userData);
 
-	callback(userData, &m_jointOmega_0, sizeof(dFloat));
-	callback(userData, &m_angularDamp_0, sizeof(dFloat));
-	callback(userData, &m_angularAccel_0, sizeof(dFloat));
+	callback(userData, &m_jointOmega_0, sizeof(m_jointOmega_0));
+	callback(userData, &m_angularDamp_0, sizeof(m_angularDamp_0));
+	callback(userData, &m_angularAccel_0, sizeof(m_angularAccel_0));
 
-	callback(userData, &m_jointOmega_1, sizeof(dFloat));
-	callback(userData, &m_angularDamp_1, sizeof(dFloat));
-	callback(userData, &m_angularAccel_1, sizeof(dFloat));
+	callback(userData, &m_jointOmega_1, sizeof(m_jointOmega_1));
+	callback(userData, &m_angularDamp_1, sizeof(m_angularDamp_1));
+	callback(userData, &m_angularAccel_1, sizeof(m_angularAccel_1));
 
-	callback(userData, &m_options, sizeof(int));
+	callback(userData, &m_options, sizeof(m_options));
 }
 
 dCustomUniversal::~dCustomUniversal()
