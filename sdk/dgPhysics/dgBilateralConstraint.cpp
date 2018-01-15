@@ -342,7 +342,22 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	jacobian1.m_angular[2] = r1CrossDir.m_z;
 	jacobian1.m_angular[3] = dgFloat32 (0.0f);
 
-//	m_rowIsMotor[index] = 0;
+/*
+dgVector v0(m_body0->GetVelocity());
+dgVector v1(m_body1->GetVelocity());
+
+dgVector w0(m_body0->GetOmega());
+dgVector w1(m_body1->GetOmega());
+
+dgVector xxxxx0(param.m_r0.CrossProduct3(w0.CrossProduct3(jacobian0.m_linear)) + (w0.CrossProduct3(param.m_r0).CrossProduct3(jacobian0.m_linear)));
+dgVector xxxxx1(param.m_r1.CrossProduct3(w1.CrossProduct3(jacobian1.m_linear)) + (w1.CrossProduct3(param.m_r1).CrossProduct3(jacobian1.m_linear)));
+
+dgVector xxx0 (v0.DotProduct4(w0.CrossProduct3(jacobian0.m_linear)) + v1.DotProduct4(w1.CrossProduct3(jacobian1.m_linear)));
+dgVector xxx1 (w0.DotProduct4(w0.CrossProduct3(jacobian0.m_angular)) + w1.DotProduct4(w1.CrossProduct3(jacobian1.m_angular)));
+dgVector xxx2 (w0.DotProduct4(xxxxx0) + w1.DotProduct4(xxxxx1));
+dgTrace(("%f %f %f\n", xxx0.GetScalar(), xxx1.GetScalar(), xxx2.GetScalar()));
+*/
+
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 

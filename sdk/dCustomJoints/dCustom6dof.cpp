@@ -167,7 +167,7 @@ void dCustom6dof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& ma
 	m_yaw.m_currentAngle.Update(euler0.m_y);
 	m_roll.m_currentAngle.Update(euler0.m_z);
 	m_pitch.m_currentAngle.Update(euler0.m_x);
-dTrace(("%f %f %f\n", GetPitch() * 180.0f / 3.141592f, GetYaw() * 180.0f / 3.141592f, GetRoll() * 180.0f / 3.141592f));
+//dTrace(("%f %f %f\n", GetPitch() * 180.0f / 3.141592f, GetYaw() * 180.0f / 3.141592f, GetRoll() * 180.0f / 3.141592f));
 }
 
 void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
