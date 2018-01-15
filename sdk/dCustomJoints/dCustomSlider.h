@@ -41,13 +41,11 @@ class dCustomSlider: public dCustom6dof
 
 	dFloat m_speed;
 	dFloat m_posit;
-	dFloat m_minDist;
-	dFloat m_maxDist;
 	dFloat m_spring;
 	dFloat m_damper;
 	dFloat m_springDamperRelaxation;
 	union {
-		int m_flags;
+		int m_options;
 		struct {
 			unsigned m_limitsOn			 : 1;
 			unsigned m_setAsSpringDamper : 1;

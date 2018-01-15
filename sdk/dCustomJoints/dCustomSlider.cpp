@@ -10,9 +10,7 @@
 */
 
 
-
 // dCustomSlider.cpp: implementation of the dCustomSlider class.
-//
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomSlider.h"
@@ -28,24 +26,21 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	:dCustom6dof(pinAndPivotFrame, child, parent)
 	,m_speed(0.0f)
 	,m_posit(0.0f)
-	,m_minDist(-1.0f)
-	,m_maxDist(1.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
-	,m_springDamperRelaxation(0.6f)
+	,m_springDamperRelaxation(0.96f)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
 	,m_lastRowWasUsed(false)
 {
 	m_xAxis = 0;
+	SetLimits(-1.0f, 1.0f);
 }
 
 dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
 	:dCustom6dof(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_speed(0.0f)
 	,m_posit(0.0f)
-	,m_minDist(-1.0f)
-	,m_maxDist(1.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.97f)
@@ -54,18 +49,17 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 	,m_lastRowWasUsed(false)
 {
 	m_xAxis = 0;
+	SetLimits(-1.0f, 1.0f);
 }
 
 void dCustomSlider::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback (userData, &m_speed, sizeof (dFloat));
 	callback (userData, &m_posit, sizeof (dFloat));
-	callback (userData, &m_minDist, sizeof (dFloat));
-	callback (userData, &m_maxDist, sizeof (dFloat));
 	callback (userData, &m_spring, sizeof (dFloat));
 	callback (userData, &m_damper, sizeof (dFloat));
 	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_flags, sizeof (int));
+	callback (userData, &m_options, sizeof (int));
 }
 
 dCustomSlider::~dCustomSlider()
@@ -78,12 +72,10 @@ void dCustomSlider::Serialize (NewtonSerializeCallback callback, void* const use
 
 	callback (userData, &m_speed, sizeof (dFloat));
 	callback (userData, &m_posit, sizeof (dFloat));
-	callback (userData, &m_minDist, sizeof (dFloat));
-	callback (userData, &m_maxDist, sizeof (dFloat));
 	callback (userData, &m_spring, sizeof (dFloat));
 	callback (userData, &m_damper, sizeof (dFloat));
 	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_flags, sizeof (int));
+	callback (userData, &m_options, sizeof (int));
 }
 
 
@@ -94,8 +86,13 @@ void dCustomSlider::EnableLimits(bool state)
 
 void dCustomSlider::SetLimits(dFloat minDist, dFloat maxDist)
 {
-	m_minDist = minDist;
-	m_maxDist = maxDist;
+	dVector minLinearLimits;
+	dVector maxLinearLimits;
+
+	dCustom6dof::GetLinearLimits(minLinearLimits, maxLinearLimits);
+	minLinearLimits.m_x = -dAbs(minDist);
+	maxLinearLimits.m_x = dAbs(maxDist);
+	dCustom6dof::SetLinearLimits(minLinearLimits, maxLinearLimits);
 }
 
 void dCustomSlider::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
@@ -261,13 +258,13 @@ void dCustomSlider::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0
 	// if limit are enable ...
 	if (m_limitsOn && m_setAsSpringDamper) {
 		m_lastRowWasUsed = true;
-		if (m_posit < m_minDist) {
+		if (m_posit < m_minLinearLimits.m_x) {
 			const dVector& p0 = matrix0.m_posit;
-			dVector p1(p0 + matrix0.m_front.Scale(m_minDist - m_posit));
+			dVector p1(p0 + matrix0.m_front.Scale(m_minLinearLimits.m_x - m_posit));
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-		} else if (m_posit > m_maxDist) {
+		} else if (m_posit > m_maxLinearLimits.m_x) {
 			const dVector& p0 = matrix0.m_posit;
-			dVector p1(p0 + matrix0.m_front.Scale(m_maxDist - m_posit));
+			dVector p1(p0 + matrix0.m_front.Scale(m_maxLinearLimits.m_x - m_posit));
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 		} else {
 			const dVector& p0 = matrix0.m_posit;
@@ -280,33 +277,31 @@ void dCustomSlider::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0
 		// but for now this si good enough
 		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
 		const dFloat speedStep = dAbs(stopAccel * timestep);
-		if ((m_posit < m_minDist) && (speedStep > velCut)) {
+		if ((m_posit < m_minLinearLimits.m_x) && (speedStep > velCut)) {
 			//NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, dFloat (0.0f));
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, dFloat(0.0f));
-		}
-		else if ((m_posit > m_maxDist) && (speedStep > velCut)) {
+		} else if ((m_posit > m_maxLinearLimits.m_x) && (speedStep > velCut)) {
 			//NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, dFloat (0.0f));
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowMaximumFriction(m_joint, dFloat(0.0f));
-		}
-		else {
+		} else {
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 		}
 	} else if (m_limitsOn) {
-		if (m_posit < m_minDist) {
+		if (m_posit < m_minLinearLimits.m_x) {
 			// get a point along the up vector and set a constraint  
 			const dVector& p0 = matrix0.m_posit;
-			dVector p1(p0 + matrix0.m_front.Scale(m_minDist - m_posit));
+			dVector p1(p0 + matrix0.m_front.Scale(m_minLinearLimits.m_x - m_posit));
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 			m_lastRowWasUsed = true;
-		} else if (m_posit > m_maxDist) {
+		} else if (m_posit > m_maxLinearLimits.m_x) {
 			// get a point along the up vector and set a constraint  
 
 			const dVector& p0 = matrix0.m_posit;
-			dVector p1(p0 + matrix0.m_front.Scale(m_maxDist - m_posit));
+			dVector p1(p0 + matrix0.m_front.Scale(m_maxLinearLimits.m_x - m_posit));
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
