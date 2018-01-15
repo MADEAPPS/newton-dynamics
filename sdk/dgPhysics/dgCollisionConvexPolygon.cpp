@@ -95,8 +95,8 @@ dgFloat32 dgCollisionConvexPolygon::GetBoxMaxRadius () const
 
 dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir.m_w) == dgFloat32(0.0f));
-	dgAssert (dgAbsf (dir.DotProduct3(dir) - 1.0f) < dgFloat32 (1.0e-2f));
+	dgAssert (dgAbs(dir.m_w) == dgFloat32(0.0f));
+	dgAssert (dgAbs (dir.DotProduct3(dir) - 1.0f) < dgFloat32 (1.0e-2f));
 	
 	dgInt32 index = 0;
 	dgFloat32 val = m_localPoly[0].DotProduct4(dir).GetScalar();
@@ -339,8 +339,8 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 				if (side1 <= dgFloat32 (0.0f)) {
 					dgVector dp (p1 - p0);
 					dgFloat32 t = plane.DotProduct3(dp);
-					dgAssert (dgAbsf (t) >= dgFloat32 (0.0f));
-					if (dgAbsf (t) < dgFloat32 (1.0e-8f)) {
+					dgAssert (dgAbs (t) >= dgFloat32 (0.0f));
+					if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 						t = dgSign(t) * dgFloat32 (1.0e-8f);	
 					}
 					contactsOut[count] = p0 - dp.Scale3 (side0 / t);
@@ -356,8 +356,8 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 			} else if (side1 > dgFloat32 (0.0f)) {
 				dgVector dp (p1 - p0);
 				dgFloat32 t = plane.DotProduct3(dp);
-				dgAssert (dgAbsf (t) >= dgFloat32 (0.0f));
-				if (dgAbsf (t) < dgFloat32 (1.0e-8f)) {
+				dgAssert (dgAbs (t) >= dgFloat32 (0.0f));
+				if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
 				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
@@ -387,8 +387,8 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 			if ((side0 * side1) < dgFloat32 (0.0f)) {
 				dgVector dp (p1 - p0);
 				dgFloat32 t = plane.DotProduct3(dp);
-				dgAssert (dgAbsf (t) >= dgFloat32 (0.0f));
-				if (dgAbsf (t) < dgFloat32 (1.0e-8f)) {
+				dgAssert (dgAbs (t) >= dgFloat32 (0.0f));
+				if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
 				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
@@ -477,7 +477,7 @@ dgVector dgCollisionConvexPolygon::CalculateGlobalNormal (const dgCollisionInsta
 	normal = normal * invScale;
 	dgAssert(normal.m_w == dgFloat32(0.0f));
 	normal = normal.Normalize();
-	dgAssert (dgAbsf(normal.DotProduct3(normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+	dgAssert (dgAbs(normal.DotProduct3(normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 	return globalMatrix.RotateVector(normal);
 }
 

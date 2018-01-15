@@ -257,7 +257,7 @@ void dgCollisionConvex::MassProperties ()
 
 dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {
-	if ((dgAbsf (localScale.m_x - localScale.m_y) < dgFloat32 (1.0e-5f)) && (dgAbsf (localScale.m_x - localScale.m_z) < dgFloat32 (1.0e-5f))) {
+	if ((dgAbs (localScale.m_x - localScale.m_y) < dgFloat32 (1.0e-5f)) && (dgAbs (localScale.m_x - localScale.m_z) < dgFloat32 (1.0e-5f))) {
 		dgAssert (m_alignMatrix[0][0] == dgFloat32(1.0f));
 		dgAssert (m_alignMatrix[1][1] == dgFloat32(1.0f));
 		dgAssert (m_alignMatrix[2][2] == dgFloat32(1.0f));
@@ -505,7 +505,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 
 dgVector dgCollisionConvex::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgInt16 cache[16];
 	memset (cache, -1, sizeof (cache));
@@ -607,7 +607,7 @@ dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& n
 
 			dgVector e0 = polygon[i1] - polygon[i0];
 			dgVector e1 = polygon[i2] - polygon[i0];
-			dgFloat32 area = dgAbsf (normal.DotProduct3(e0.CrossProduct3(e1)));
+			dgFloat32 area = dgAbs (normal.DotProduct3(e0.CrossProduct3(e1)));
 
 			sortHeap.Push(i1, area);
 
@@ -888,7 +888,7 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 				dgAssert (side0 >= dgFloat32 (0.0f));
 				dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_vertex])) >= dgFloat32 (0.0f));
 				dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_twin->m_vertex])) < dgFloat32 (0.0f));
-				dgAssert (dgAbsf (side0 - plane.Evalue (m_vertex[firstEdge->m_vertex])) < dgFloat32 (1.0e-5f));
+				dgAssert (dgAbs (side0 - plane.Evalue (m_vertex[firstEdge->m_vertex])) < dgFloat32 (1.0e-5f));
 
 				dgInt32 maxCount = 0;
 				const dgConvexSimplexEdge* ptr = firstEdge;

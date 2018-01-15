@@ -23,6 +23,7 @@ class dCustomUniversal: public dCustom6dof
 {
 	public:
 	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomUniversal();
 
 	CUSTOM_JOINTS_API void EnableLimit_0(bool state);
@@ -59,20 +60,15 @@ class dCustomUniversal: public dCustom6dof
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
-	dFloat m_minAngle_0;
-	dFloat m_maxAngle_0;
 	dFloat m_jointOmega_0;
 	dFloat m_angularDamp_0;
 	dFloat m_angularAccel_0;
-
-	dFloat m_minAngle_1;
-	dFloat m_maxAngle_1;
 	dFloat m_jointOmega_1;
 	dFloat m_angularDamp_1;
 	dFloat m_angularAccel_1;
 
 	union {
-		int m_flags;
+		int m_options;
 		struct {
 			unsigned m_limit_0_On		 : 1;
 			unsigned m_limit_1_On		 : 1;

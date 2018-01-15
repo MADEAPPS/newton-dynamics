@@ -81,7 +81,7 @@ dgContactSolver::dgContactSolver(dgCollisionParamProxy* const proxy)
 DG_INLINE void dgContactSolver::SupportVertex(const dgVector& dir0, dgInt32 vertexIndex)
 {
 	dgAssert(dir0.m_w == dgFloat32(0.0f));
-	dgAssert(dgAbsf(dir0.DotProduct3(dir0) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbs(dir0.DotProduct3(dir0) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	dgVector dir1 (dir0.Scale4(dgFloat32 (-1.0f)));
 
 	const dgMatrix& matrix0 = m_instance0->m_globalMatrix;
@@ -135,7 +135,7 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTriangle (dgInt32& indexOut)
 
 	const dgFloat64 det = a00 * a11 - a01 * a01;
 	dgAssert(det >= dgFloat32(0.0f));
-	if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+	if (dgAbs(det) > dgFloat32(1.0e-24f)) {
 		const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
 		const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
 
@@ -402,7 +402,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 			}
 			matrix = rotation * matrix;
 		}
-		if (dgAbsf (maxArea) < dgFloat32(1e-15f)) {
+		if (dgAbs (maxArea) < dgFloat32(1e-15f)) {
 			return -1;
 		}
 		dgAssert(maxArea > dgFloat32(0.0f));
@@ -419,11 +419,11 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		normal = normal.Scale4(dgRsqrt(mag2));
 		SupportVertex(normal, 3);
 		volume = normal.DotProduct3(m_hullDiff[3] - m_hullDiff[0]);
-		if (dgAbsf(volume) < dgFloat32(1.0e-10f)) {
+		if (dgAbs(volume) < dgFloat32(1.0e-10f)) {
 			normal = normal.Scale4(dgFloat32(-1.0f));
 			SupportVertex(normal, 3);
 			volume = - normal.DotProduct3(m_hullDiff[3] - m_hullDiff[0]);
-			if (dgAbsf(volume) < dgFloat32(1.0e-10f)) {
+			if (dgAbs(volume) < dgFloat32(1.0e-10f)) {
 				volume = dgFloat32(0.0f);
 			}
 		}
@@ -443,7 +443,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		dgSwap(m_hullDiff[1], m_hullDiff[0]);
 	}
 
-	if (dgAbsf(volume) < dgFloat32(1e-15f)) {
+	if (dgAbs(volume) < dgFloat32(1e-15f)) {
 
 		// this volume is unrealizable, let us build  a different tetrahedron using the method of core 200
 		dgVector e1;
@@ -482,7 +482,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 			SupportVertex(m_hullDirs[i], 3);
 			e3 = m_hullDiff[3] - m_hullDiff[0];
 			error2 = normal.DotProduct3(e3);
-			if (dgAbsf(error2) > DG_CALCULATE_SEPARATING_PLANE_ERROR) {
+			if (dgAbs(error2) > DG_CALCULATE_SEPARATING_PLANE_ERROR) {
 				break;
 			}
 		}
@@ -560,7 +560,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 			SupportVertex(faceNode->m_plane & dgVector::m_triplexMask, m_vertexIndex);
 			const dgVector& p = m_hullDiff[m_vertexIndex];
 			dgFloat32 dist = faceNode->m_plane.Evalue(p);
-			dgFloat32 distTolerance = dgMax(dgAbsf(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
+			dgFloat32 distTolerance = dgMax(dgAbs(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
 
 			if (dist < distTolerance) {
 				dgVector sum[3];
@@ -783,7 +783,7 @@ DG_INLINE void dgContactSolver::CalculateContactFromFeacture(dgInt32 featureType
 
 	m_closestPoint0 = dgVector::m_half * (s + d);
 	m_closestPoint1 = dgVector::m_half * (s - d);
-	dgAssert(dgAbsf(m_normal.DotProduct3(m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+	dgAssert(dgAbs(m_normal.DotProduct3(m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 	m_proxy->m_contactJoint->m_separtingVector = m_normal;
 }
 
@@ -868,7 +868,7 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 				} else {
 					dgVector dp(ptr[1] - ptr[0]);
 					dgFloat32 den = plane.DotProduct3(dp);
-					if (dgAbsf(den) < 1.0e-10f) {
+					if (dgAbs(den) < 1.0e-10f) {
 						den = 1.0e-10f;
 					}
 					output[count + 0] = ptr[0];
@@ -878,7 +878,7 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 			} else if (test1 >= dgFloat32(0.0f)) {
 				dgVector dp(ptr[1] - ptr[0]);
 				dgFloat32 den = plane.DotProduct3(dp);
-				if (dgAbsf(den) < 1.0e-10f) {
+				if (dgAbs(den) < 1.0e-10f) {
 					den = 1.0e-10f;
 				}
 				output[count] = ptr[0] - dp.Scale3(test0 / den);
@@ -1086,7 +1086,7 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 						const dgVector& p1 = *tmp->m_next->m_vertex;
 						dgVector dp(p1 - p0);
 						dgFloat32 den = plane.DotProduct3(dp);
-						if (dgAbsf(den) < dgFloat32(1.0e-24f)) {
+						if (dgAbs(den) < dgFloat32(1.0e-24f)) {
 							den = (den >= dgFloat32(0.0f)) ? dgFloat32(1.0e-24f) : dgFloat32(-1.0e-24f);
 						}
 
@@ -1107,7 +1107,7 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 					isInside |= 1;
 					dgVector dp(p1 - p0);
 					dgFloat32 den = plane.DotProduct3(dp);
-					if (dgAbsf(den) < dgFloat32(1.0e-24f)) {
+					if (dgAbs(den) < dgFloat32(1.0e-24f)) {
 						den = (den >= dgFloat32(0.0f)) ? dgFloat32(1.0e-24f) : dgFloat32(-1.0e-24f);
 					}
 					den = test0 / den;
@@ -1249,7 +1249,7 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 		if (index > 0) {
 			dgVector q (v + point);
 			dgFloat32 den = normal.DotProduct4(p0p1).GetScalar();
-			if (dgAbsf (den) < dgFloat32(1.0e-12f))  {
+			if (dgAbs (den) < dgFloat32(1.0e-12f))  {
 				den = dgSign(den) * dgFloat32(1.0e-12f);
 			}
 			dgAssert (normal.m_w == dgFloat32 (0.0f));
@@ -1659,7 +1659,7 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 				p10 = p10.Scale4(dgRsqrt(p10.DotProduct3(p10) + dgFloat32(1.0e-8f)));
 				q10 = q10.Scale4(dgRsqrt(q10.DotProduct3(q10) + dgFloat32(1.0e-8f)));
 				dgFloat32 dot = q10.DotProduct3(p10);
-				if (dgAbsf(dot) > dgFloat32(0.998f)) {
+				if (dgAbs(dot) > dgFloat32(0.998f)) {
 					dgFloat32 pl0 = p0.DotProduct3(p10);
 					dgFloat32 pl1 = p1.DotProduct3(p10);
 					dgFloat32 ql0 = q0.DotProduct3(p10);

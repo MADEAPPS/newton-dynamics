@@ -138,7 +138,7 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, dgFloat32 max
 					// calculate the volume formed by the line and the edge of the polygon
 					dgFloat32 alpha = (m_diff * p0v1) % p0v0;
 					// if a least one volume is negative it mean the line cross the polygon outside this edge and do not hit the face
-					if (dgAbsf (alpha) < errorTest) {
+					if (dgAbs (alpha) < errorTest) {
 						return PolygonIntersectFallback (normal, maxT, polygon, strideInBytes, indexArray, indexCount);
 					} else if (alpha < 0.0f) {
 						return dgFloat32 (1.2f);
@@ -222,7 +222,7 @@ dgBigVector dgPointToTriangleDistance(const dgBigVector& point, const dgBigVecto
 
 	const dgFloat64 det = a00 * a11 - a01 * a01;
 	dgAssert(det >= dgFloat32(0.0f));
-	if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+	if (dgAbs(det) > dgFloat32(1.0e-24f)) {
 		dgBigVector p0Point (point - p0);
 		const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
 		const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
@@ -362,8 +362,8 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 	}
 
 	// finally do the division to get sc and tc
-	dgFloat32 sc = (dgAbsf(sN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : sN / sD);
-	dgFloat32 tc = (dgAbsf(tN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : tN / tD);
+	dgFloat32 sc = (dgAbs(sN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : sN / sD);
+	dgFloat32 tc = (dgAbs(tN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : tN / tD);
 
 	pOut = ray_p0 + u.Scale3 (sc);
 	qOut = ray_q0 + v.Scale3 (tc);
@@ -492,7 +492,7 @@ dgFloat32 dgRayCastBox (const dgVector& p0, const dgVector& p1, const dgVector& 
 	//dgVector size (boxP1 - boxP0);
 	for (dgInt32 i = 0; i < 3; i++) {
 		dgFloat32 dp = p1[i] - p0[i];
-		if (dgAbsf (dp) < dgFloat32 (1.0e-8f)) {
+		if (dgAbs (dp) < dgFloat32 (1.0e-8f)) {
 			if (p0[i] <= boxP0[i] || p0[i] >= boxP1[i]) {
 				return dgFloat32 (1.2f);
 			}

@@ -334,9 +334,9 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 
 void dgCollisionInstance::SetScale (const dgVector& scale)
 {
-	dgFloat32 scaleX = dgAbsf (scale.m_x);
-	dgFloat32 scaleY = dgAbsf (scale.m_y);
-	dgFloat32 scaleZ = dgAbsf (scale.m_z);
+	dgFloat32 scaleX = dgAbs (scale.m_x);
+	dgFloat32 scaleY = dgAbs (scale.m_y);
+	dgFloat32 scaleZ = dgAbs (scale.m_z);
 	dgAssert (scaleX > dgFloat32 (0.0f));
 	dgAssert (scaleY > dgFloat32 (0.0f));
 	dgAssert (scaleZ > dgFloat32 (0.0f));
@@ -345,8 +345,8 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 		dgAssert (m_scaleType == m_unit);
 		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
 		compound->ApplyScale(scale);
-	} else if ((dgAbsf (scaleX - scaleY) < dgFloat32 (1.0e-4f)) && (dgAbsf (scaleX - scaleZ) < dgFloat32 (1.0e-4f))) {
-		if ((dgAbsf (scaleX - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f))) {
+	} else if ((dgAbs (scaleX - scaleY) < dgFloat32 (1.0e-4f)) && (dgAbs (scaleX - scaleZ) < dgFloat32 (1.0e-4f))) {
+		if ((dgAbs (scaleX - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f))) {
 			m_scaleType = m_unit;
 			m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
 			m_maxScale = m_scale;	
@@ -383,7 +383,7 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
 	dgAssert (localMatrix.m_posit.m_w == dgFloat32 (1.0f));
 
-	if ((dgAbsf (scale[0] - scale[1]) < dgFloat32 (1.0e-4f)) && (dgAbsf (scale[0] - scale[2]) < dgFloat32 (1.0e-4f))) {
+	if ((dgAbs (scale[0] - scale[1]) < dgFloat32 (1.0e-4f)) && (dgAbs (scale[0] - scale[2]) < dgFloat32 (1.0e-4f))) {
 		m_localMatrix = localMatrix;
 		m_localMatrix.m_posit = m_localMatrix.m_posit * scale | dgVector::m_wOne;
 		m_aligmentMatrix = dgGetIdentityMatrix();
@@ -414,8 +414,8 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 
 		bool isIdentity = true;
 		for (dgInt32 i = 0; i < 3; i ++) {
-			isIdentity &= dgAbsf (m_aligmentMatrix[i][i] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f);
-			isIdentity &= dgAbsf (m_aligmentMatrix[3][i]) < dgFloat32 (1.0e-5f);
+			isIdentity &= dgAbs (m_aligmentMatrix[i][i] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f);
+			isIdentity &= dgAbs (m_aligmentMatrix[3][i]) < dgFloat32 (1.0e-5f);
 		}
 		m_scaleType = isIdentity ? m_nonUniform : m_global;
 

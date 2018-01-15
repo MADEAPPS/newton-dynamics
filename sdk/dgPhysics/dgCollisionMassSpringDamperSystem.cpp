@@ -367,7 +367,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			dgVector tangentDir(veloc[i] - normalDir[i] * (normalDir[i].DotProduct4(veloc[i])));
 			dgVector mag(tangentDir.DotProduct4(tangentDir) + epsilon);
 			
-			dgFloat32 tangentFrictionAccel = dgAbsf(netAccel.DotProduct4(normalDir[i]).GetScalar());
+			dgFloat32 tangentFrictionAccel = dgAbs(netAccel.DotProduct4(normalDir[i]).GetScalar());
 			dgVector friction(tangentDir.Scale4(frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt(mag.GetScalar())));
 
 			//dgVector particleAccel (accel[i] + normalAccel[i] - normalDirAccel);

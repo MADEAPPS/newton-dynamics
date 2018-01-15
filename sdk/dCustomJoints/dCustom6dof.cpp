@@ -34,6 +34,7 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_yaw()
 	,m_roll()
 	,m_pitch()
+	,m_debugScale(1.0f)
 	,m_mask(0x3f)
 {
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -46,6 +47,7 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& p
 	,m_yaw()
 	,m_roll()
 	,m_pitch()
+	,m_debugScale(1.0f)
 	,m_mask(0x3f)
 {
 	dMatrix dummy;
@@ -59,22 +61,37 @@ dCustom6dof::~dCustom6dof()
 
 void dCustom6dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback (userData, &m_minLinearLimits, sizeof (dVector));
-	callback (userData, &m_maxLinearLimits, sizeof (dVector));
-	callback (userData, &m_yaw, sizeof (dAngleData));
-	callback (userData, &m_roll, sizeof (dAngleData));
-	callback (userData, &m_pitch, sizeof (dAngleData));
+	callback(userData, &m_minLinearLimits, sizeof(m_minLinearLimits));
+	callback(userData, &m_maxLinearLimits, sizeof(m_maxLinearLimits));
+	callback(userData, &m_yaw, sizeof(m_yaw));
+	callback(userData, &m_roll, sizeof(m_roll));
+	callback(userData, &m_pitch, sizeof(m_pitch));
+	callback(userData, &m_debugScale, sizeof(m_debugScale));
+	callback(userData, &m_mask, sizeof(m_mask));
 }
 
 void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize (callback, userData);
-	callback(userData, &m_minLinearLimits, sizeof (dVector));
-	callback(userData, &m_maxLinearLimits, sizeof (dVector));
-	callback(userData, &m_yaw, sizeof(dAngleData));
-	callback(userData, &m_roll, sizeof(dAngleData));
-	callback(userData, &m_pitch, sizeof(dAngleData));
+	callback(userData, &m_minLinearLimits, sizeof (m_minLinearLimits));
+	callback(userData, &m_maxLinearLimits, sizeof (m_maxLinearLimits));
+	callback(userData, &m_yaw, sizeof(m_yaw));
+	callback(userData, &m_roll, sizeof(m_roll));
+	callback(userData, &m_pitch, sizeof(m_pitch));
+	callback(userData, &m_debugScale, sizeof(m_debugScale));
+	callback(userData, &m_mask, sizeof(m_mask));
 }
+
+dFloat dCustom6dof::GetDebugScale() const
+{
+	return m_debugScale;
+}
+
+void dCustom6dof::SetDebugScale(dFloat scale)
+{
+	m_debugScale = scale;
+}
+
 
 void dCustom6dof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
 {
@@ -83,7 +100,6 @@ void dCustom6dof::SetLinearLimits (const dVector& minLinearLimits, const dVector
 		m_maxLinearLimits[i] =  (dAbs (maxLinearLimits[i]) < dFloat (1.0e-3f)) ? dFloat(0.0f) :  dAbs (maxLinearLimits[i]);
 	}
 }
-
 
 void dCustom6dof::GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits) const
 {
@@ -162,12 +178,11 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 	dCustomJoint::Debug(debugDisplay);
 
 	const int subdiv = 12;
-	const float radius = 0.5f;
 	dVector arch[subdiv + 1];
+	const float radius = m_debugScale;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-//	if (m_yawAxis) 
 	{
 		// show yaw angle limits
 		if ((m_yaw.m_maxAngle > 1.0e-3f) || (m_yaw.m_minAngle < -1.0e-3f)) {
@@ -242,7 +257,6 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 			}
 		}
 	}
-
 }
 
 

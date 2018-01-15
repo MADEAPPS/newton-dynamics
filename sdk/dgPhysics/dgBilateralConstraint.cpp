@@ -158,9 +158,9 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (const dgMatrix& l
 
 	dgMatrix relMatrix (globalMatrix1 * globalMatrix0.Inverse());
 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_front.DotProduct3(relMatrix.m_front))) < 1.0e-5f); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_up.DotProduct3(relMatrix.m_up))) < 1.0e-5f); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_right.DotProduct3(relMatrix.m_right))) < 1.0e-5f); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_front.DotProduct3(relMatrix.m_front))) < 1.0e-5f); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_up.DotProduct3(relMatrix.m_up))) < 1.0e-5f); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_right.DotProduct3(relMatrix.m_right))) < 1.0e-5f); 
 
 	dgVector euler0;
 	dgVector euler1;
@@ -240,8 +240,8 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;
-		dgFloat32 ks = dgAbsf (spring);
-		dgFloat32 kd = dgAbsf (damper);
+		dgFloat32 ks = dgAbs (spring);
+		dgFloat32 kd = dgAbs (damper);
 		dgFloat32 ksd = dt * ks;
 		dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
 		dgFloat32 den = dt * kd + dt * ksd;

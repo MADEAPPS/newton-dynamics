@@ -363,9 +363,9 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 	for (dgInt32 i = 0; i < size - 1; i++) {
 		const T* const rowI = &matrix[i * size];
 		dgInt32 k = i;
-		T maxVal (dgAbsf(rowI[i]));
+		T maxVal (dgAbs(rowI[i]));
 		for (dgInt32 j = i + 1; j < size - 1; j++) {
-			T val (dgAbsf(matrix[size * j + i]));
+			T val (dgAbs(matrix[size * j + i]));
 			if (val > maxVal) {
 				k = j;
 				maxVal = val;
@@ -418,7 +418,7 @@ DG_INLINE void dgHouseHolderReduction(const dgInt32 size, T* const matrix, T* co
 		if (l > 0) {
 			T scale(0.0f);
 			for (dgInt32 k = 0; k <= l; k++) {
-				scale += T(dgAbsf(rowI[k]));
+				scale += T(dgAbs(rowI[k]));
 			}
 
 			if (scale == T(0.0f)) {
@@ -492,7 +492,7 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 		if (i > 1) {
 			T scale(0.0f);
 			for (dgInt32 k = 0; k < i; k++) {
-				scale += dgAbsf(rowI[k]);
+				scale += dgAbs(rowI[k]);
 			}
 
 			if (scale == T(0.0f)) {
@@ -553,8 +553,8 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 		dgInt32 iter = 0;
 		do {
 			for (j = i; j < size - 1; j++) {
-				T dd(dgAbsf(eigenValues[j]) + dgAbsf(eigenValues[j + 1]));
-				if (dgAbsf(offDiag[j]) <= (T(1.e-6f) * dd)) {
+				T dd(dgAbs(eigenValues[j]) + dgAbs(eigenValues[j + 1]));
+				if (dgAbs(offDiag[j]) <= (T(1.e-6f) * dd)) {
 					break;
 				}
 			}
@@ -725,7 +725,7 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 			dgInt32 width = 1;
 			for (dgInt32 j = i + 1; j < size; j ++) {
 				activeColumns[width] = dgInt16(j);
-				width += dgAbsf (rowI[j]) > dgFloat32 (1.0e-14f) ? 1 : 0;
+				width += dgAbs (rowI[j]) > dgFloat32 (1.0e-14f) ? 1 : 0;
 			}
 			
 			if (width > 1) {
@@ -903,16 +903,16 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 			T clamp_x(0.0f);
 			dgInt32 swapIndex = -1;
 
-			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
+			if (dgAbs(r0[index]) > T(1.0e-12f)) {
 				dgCalculateDelta_x(size, index, symmetricMatrixPSD, lowerTriangularMatrix, delta_x);
 				dgCalculateDelta_r(size, index, symmetricMatrixPSD, delta_x, delta_r);
 
 				dgAssert(delta_r[index] != T(0.0f));
-				dgAssert(dgAbsf(delta_x[index]) == T(1.0f));
+				dgAssert(dgAbs(delta_x[index]) == T(1.0f));
 				delta_r[index] = (delta_r[index] == T(dgFloat32 (0.0f))) ? T(dgFloat32 (1.0e-12f)) : delta_r[index];
 
 				T s = -r0[index] / delta_r[index];
-				dgAssert(dgAbsf(s) >= T(0.0f));
+				dgAssert(dgAbs(s) >= T(0.0f));
 
 				for (dgInt32 i = 0; i <= index; i++) {
 					T x1 = x0[i] + s * delta_x[i];
@@ -926,16 +926,16 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 						s = (low[i] - x0[i]) / delta_x[i];
 					}
 				}
-				dgAssert(dgAbsf(s) >= T(0.0f));
+				dgAssert(dgAbs(s) >= T(0.0f));
 
 				for (dgInt32 i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
 					T r1 = r0[i] + s * delta_r[i];
 					if ((r1 * r0[i]) < T(0.0f)) {
-						dgAssert(dgAbsf(delta_r[i]) > T(0.0f));
+						dgAssert(dgAbs(delta_r[i]) > T(0.0f));
 						T s1 = -r0[i] / delta_r[i];
-						dgAssert(dgAbsf(s1) >= T(0.0f));
-						dgAssert(dgAbsf(s1) <= dgAbsf(s));
-						if (dgAbsf(s1) < dgAbsf(s)) {
+						dgAssert(dgAbs(s1) >= T(0.0f));
+						dgAssert(dgAbs(s1) <= dgAbs(s));
+						if (dgAbs(s1) < dgAbs(s)) {
 							s = s1;
 							swapIndex = i;
 						}
@@ -943,8 +943,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				}
 
 				for (dgInt32 i = 0; i < size; i++) {
-					//dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) >= low[i]);
-					//dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) <= high[i]);
+					//dgAssert((x0[i] + dgAbs(x0[i]) * T(dgFloat32(1.0e-4f))) >= low[i]);
+					//dgAssert((x0[i] - dgAbs(x0[i]) * T(dgFloat32(1.0e-4f))) <= high[i]);
 
 					x0[i] += s * delta_x[i];
 					r0[i] += s * delta_r[i];

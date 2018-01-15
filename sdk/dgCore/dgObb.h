@@ -102,7 +102,7 @@ inline dgObb &dgObb::operator= (const dgMatrix &arg)
 
 inline void dgObb::SetDimensions (dgFloat32 W, dgFloat32 H, dgFloat32 B)
 {
-	m_size = dgVector (dgAbsf(W), dgAbsf(H), dgAbsf(B), dgSqrt (W * W + H * H + B * B));
+	m_size = dgVector (dgAbs(W), dgAbs(H), dgAbs(B), dgSqrt (W * W + H * H + B * B));
 }
 
 inline void dgObb::Scale (dgFloat32 Ws, dgFloat32 Hs, dgFloat32 Bs) 

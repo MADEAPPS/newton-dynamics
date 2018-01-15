@@ -27,7 +27,7 @@ dCustomSlidingContact::dCustomSlidingContact (const dMatrix& pinAndPivotFrame, N
 	:dCustom6dof(pinAndPivotFrame, child, parent)
 	,m_speed(0.0f)
 	,m_posit(0.0f)
-	,m_flags(0)
+	,m_options(0)
 {
 	m_yAxis = 0;
 	m_pitchAxis = 0;
@@ -43,7 +43,7 @@ dCustomSlidingContact::dCustomSlidingContact(const dMatrix& pinAndPivotFrameChil
 	:dCustom6dof(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_speed(0.0f)
 	,m_posit(0.0f)
-	,m_flags(0)
+	,m_options(0)
 {
 	m_yAxis = 0;
 	m_pitchAxis = 0;
@@ -63,7 +63,7 @@ void dCustomSlidingContact::Deserialize (NewtonDeserializeCallback callback, voi
 	callback(userData, &m_spring, sizeof(dFloat));
 	callback(userData, &m_damper, sizeof(dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof(dFloat));
-	callback(userData, &m_flags, sizeof(int));
+	callback(userData, &m_options, sizeof(int));
 }
 
 void dCustomSlidingContact::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -75,7 +75,7 @@ void dCustomSlidingContact::Serialize(NewtonSerializeCallback callback, void* co
 	callback(userData, &m_spring, sizeof(dFloat));
 	callback(userData, &m_damper, sizeof(dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof(dFloat));
-	callback(userData, &m_flags, sizeof(int));
+	callback(userData, &m_options, sizeof(int));
 }
 
 

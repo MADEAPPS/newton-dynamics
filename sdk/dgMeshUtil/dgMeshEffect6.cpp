@@ -1845,9 +1845,9 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
             if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
                 dgBigVector n (FaceNormal(edge, &m_points.m_vertex[0].m_x, sizeof (dgBigVector)));
                 dgVector normal (rotationMatrix.RotateVector(dgVector (n.Scale3 (dgFloat64 (1.0f) / sqrt (n.DotProduct3(n))))));
-                normal.m_x = dgAbsf (normal.m_x);
-                normal.m_y = dgAbsf (normal.m_y);
-                normal.m_z = dgAbsf (normal.m_z);
+                normal.m_x = dgAbs (normal.m_x);
+                normal.m_y = dgAbs (normal.m_y);
+                normal.m_z = dgAbs (normal.m_z);
                 if ((normal.m_z >= (normal.m_x - dgFloat32 (1.0e-4f))) && (normal.m_z >= (normal.m_y - dgFloat32 (1.0e-4f)))) {
                     dgEdge* ptr = edge;
                     do {

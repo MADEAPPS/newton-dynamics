@@ -1565,7 +1565,7 @@ bool dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
 
 	dgVector massMatrix (myBody->GetMass());
 	if (m_density < dgFloat32 (0.0f)) {
-		m_density = dgAbsf (massMatrix.m_w * m_density);
+		m_density = dgAbs (massMatrix.m_w * m_density);
 	}
 
 	dgFloat32 attenuation = m_impulseAbsortionFactor;

@@ -146,9 +146,9 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 
 	m_angle = -angle.m_x;
 
-	dgAssert (dgAbsf (1.0f - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (1.0f - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (1.0f - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (1.0f - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (1.0f - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (1.0f - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
 
 	const dgVector& dir0 = matrix0.m_front;
 	const dgVector& dir1 = matrix0.m_up;

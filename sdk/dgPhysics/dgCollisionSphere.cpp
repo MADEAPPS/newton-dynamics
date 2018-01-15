@@ -65,7 +65,7 @@ dgCollisionSphere::~dgCollisionSphere()
 void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 {
 	m_rtti |= dgCollisionSphere_RTTI;
-	m_radius = dgMax (dgAbsf (radius), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius = dgMax (dgAbs (radius), D_MIN_CONVEX_SHAPE_SIZE);
 
 	m_edgeCount = DG_SPHERE_EDGE_COUNT;
 	m_vertexCount = DG_SPHERE_VERTEX_COUNT;
@@ -145,7 +145,7 @@ void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 
 dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == 0.0f);
 	return dir.Scale4 (m_radius);
 }
@@ -153,9 +153,9 @@ dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const v
 void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* const ouput) const
 {
 	if (level) {
-		dgAssert (dgAbsf (p0.DotProduct3(p0) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p1.DotProduct3(p1) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p2.DotProduct3(p2) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p0.DotProduct3(p0) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p1.DotProduct3(p1) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p2.DotProduct3(p2) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgVector p01 (p0 + p1);
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
@@ -168,9 +168,9 @@ void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, co
 		p12 = p12.Normalize();
 		p20 = p20.Normalize();
 
-		dgAssert (dgAbsf (p01.DotProduct3(p01) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p12.DotProduct3(p12) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p20.DotProduct3(p20) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p01.DotProduct3(p01) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p12.DotProduct3(p12) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p20.DotProduct3(p20) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 		TesselateTriangle (level - 1, p0,  p01, p20, count, ouput);
 		TesselateTriangle (level - 1, p1,  p12, p01, count, ouput);
@@ -192,7 +192,7 @@ void dgCollisionSphere::SetCollisionBBox (const dgVector& p0__, const dgVector& 
 dgInt32 dgCollisionSphere::CalculateSignature (dgFloat32 radius)
 {
 	dgUnsigned32 buffer[2];
-	radius = dgAbsf (radius);
+	radius = dgAbs (radius);
 
 	buffer[0] = m_sphereCollision;
 	buffer[1] = Quantize (radius);

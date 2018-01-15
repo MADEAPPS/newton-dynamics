@@ -36,8 +36,8 @@ DG_INLINE T dgSQRH(const T num, const T den)
 template <class T>
 DG_INLINE T dgPythag(const T a, const T b)
 {
-	T absa(dgAbsf(a));
-	T absb(dgAbsf(b));
+	T absa(dgAbs(a));
+	T absb(dgAbs(b));
 	return (absa > absb) ? (absa * dgSQRH(absb, absa)) : ((absb == T(0.0f) ? T(0.0f) : (absb * dgSQRH(absa, absb))));
 }
 

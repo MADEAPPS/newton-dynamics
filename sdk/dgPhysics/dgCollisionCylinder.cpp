@@ -53,9 +53,9 @@ dgCollisionCylinder::dgCollisionCylinder(dgWorld* const world, dgDeserialize des
 void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
 	m_rtti |= dgCollisionCylinder_RTTI;
-	m_radio0 = dgMax (dgAbsf (radio0), D_MIN_CONVEX_SHAPE_SIZE);
-	m_radio1 = dgMax (dgAbsf (radio1), D_MIN_CONVEX_SHAPE_SIZE);
-	m_height = dgMax (dgAbsf (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radio0 = dgMax (dgAbs (radio0), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radio1 = dgMax (dgAbs (radio1), D_MIN_CONVEX_SHAPE_SIZE);
+	m_height = dgMax (dgAbs (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	dgFloat32 angle = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < DG_TAPED_CYLINDER_SEGMENTS; i ++) {
@@ -206,7 +206,7 @@ void dgCollisionCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::O
 
 dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf (dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs (dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	if (dir.m_x < dgFloat32(-0.9999f)) {
 		return dgVector(-m_height, dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
@@ -237,7 +237,7 @@ dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const
 
 dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	if (dir.m_x < dgFloat32 (-0.9999f)) {
 		return dgVector (-(m_height - DG_PENETRATION_TOL), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
@@ -267,7 +267,7 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32
 
 dgVector dgCollisionCylinder::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
-	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	return point + dir.Scale4 (DG_PENETRATION_TOL);
 }
 
@@ -296,7 +296,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 			dgFloat32 cosAng = normal.m_y * magInv;
 			dgFloat32 sinAng = normal.m_z * magInv;
 
-			dgAssert(dgAbsf(normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbs(normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32(1.0e-4f));
 			dgVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32(0.0f), dgFloat32(0.0f));
 			dgVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng,	origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32(0.0f));
 
@@ -339,7 +339,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 			dgFloat32 cosAng = normal.m_y * magInv;
 			dgFloat32 sinAng = normal.m_z * magInv;
 
-			dgAssert(dgAbsf(normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbs(normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32(1.0e-4f));
 			dgVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32(0.0f), dgFloat32(0.0f));
 			dgVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32(0.0f));
 
@@ -372,7 +372,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 		dgFloat32 cosAng = normal.m_y * magInv;
 		dgFloat32 sinAng = normal.m_z * magInv;
 
-		dgAssert(dgAbsf(normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32(1.0e-4f));
 		dgVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32(0.0f), dgFloat32(0.0f));
 		dgVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32(0.0f));
 

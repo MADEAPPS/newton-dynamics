@@ -132,7 +132,7 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& p, const dgVector& q)
 DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 {
 	m_front = front; 
-	if (dgAbsf (front.m_z) > dgFloat32 (0.577f)) {
+	if (dgAbs (front.m_z) > dgFloat32 (0.577f)) {
 		m_right = front.CrossProduct3(dgVector (-front.m_y, front.m_z, dgFloat32(0.0f), dgFloat32(0.0f)));
 	} else {
 	  	m_right = front.CrossProduct3(dgVector (-front.m_y, front.m_x, dgFloat32(0.0f), dgFloat32(0.0f)));
@@ -145,10 +145,10 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	m_right.m_w = dgFloat32(0.0f);
 	m_posit = dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f));
 
-	dgAssert ((dgAbsf (m_front.DotProduct3(m_front)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
-	dgAssert ((dgAbsf (m_up.DotProduct3(m_up)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
-	dgAssert ((dgAbsf (m_right.DotProduct3(m_right)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
-	dgAssert ((dgAbsf (m_right.DotProduct3(m_front.CrossProduct3(m_up))) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbs (m_front.DotProduct3(m_front)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbs (m_up.DotProduct3(m_up)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbs (m_right.DotProduct3(m_right)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbs (m_right.DotProduct3(m_front.CrossProduct3(m_up))) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
 }
 
 
@@ -270,18 +270,18 @@ DG_INLINE bool dgMatrix::TestOrthogonal(dgFloat32 tol) const
 		   (m_up[3] == dgFloat32 (0.0f)) & 
 		   (m_right[3] == dgFloat32 (0.0f)) & 
 		   (m_posit[3] == dgFloat32 (1.0f)) &
-		   (dgAbsf(a - dgFloat32 (1.0f)) < tol) & 
-		   (dgAbsf(b - dgFloat32 (1.0f)) < tol) &
-		   (dgAbsf(c - dgFloat32 (1.0f)) < tol) &
-		   (dgAbsf(d - dgFloat32 (1.0f)) < tol); 
+		   (dgAbs(a - dgFloat32 (1.0f)) < tol) & 
+		   (dgAbs(b - dgFloat32 (1.0f)) < tol) &
+		   (dgAbs(c - dgFloat32 (1.0f)) < tol) &
+		   (dgAbs(d - dgFloat32 (1.0f)) < tol); 
 }
 
 DG_INLINE bool dgMatrix::TestSymetric3x3() const
 {
 	const dgMatrix& me = *this;
-	return (dgAbsf (me[0][1] - me[1][0]) < dgFloat32 (1.0e-5f)) && 
-		   (dgAbsf (me[0][2] - me[2][0]) < dgFloat32 (1.0e-5f)) &&
-		   (dgAbsf (me[1][2] - me[2][1]) < dgFloat32 (1.0e-5f)) &&
+	return (dgAbs (me[0][1] - me[1][0]) < dgFloat32 (1.0e-5f)) && 
+		   (dgAbs (me[0][2] - me[2][0]) < dgFloat32 (1.0e-5f)) &&
+		   (dgAbs (me[1][2] - me[2][1]) < dgFloat32 (1.0e-5f)) &&
 		   (me[0][3] == dgFloat32 (0.0f)) &&
 		   (me[1][3] == dgFloat32 (0.0f)) &&
 		   (me[2][3] == dgFloat32 (0.0f)) &&

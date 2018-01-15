@@ -70,11 +70,11 @@ dgQuaternion::dgQuaternion (const dgMatrix& matrix)
 	dgMatrix tmp (*this, matrix.m_posit);
 	dgMatrix unitMatrix (tmp * matrix.Inverse());
 	for (dgInt32 i = 0; i < 4; i ++) {
-		dgFloat32 err = dgAbsf (unitMatrix[i][i] - dgFloat32(1.0f));
+		dgFloat32 err = dgAbs (unitMatrix[i][i] - dgFloat32(1.0f));
 		dgAssert (err < dgFloat32 (1.0e-2f));
 	}
 
-	dgFloat32 err = dgAbsf (DotProduct(*this) - dgFloat32(1.0f));
+	dgFloat32 err = dgAbs (DotProduct(*this) - dgFloat32(1.0f));
 	dgAssert (err < dgFloat32(dgEPSILON * 100.0f));
 #endif
 }
@@ -87,8 +87,8 @@ dgQuaternion::dgQuaternion (const dgVector &unitAxis, dgFloat32 angle)
 	dgFloat32 sinAng = dgSin (angle);
 
 #ifdef _DEBUG
-	if (dgAbsf (angle) > dgFloat32(dgEPSILON / 10.0f)) {
-		dgAssert (dgAbsf (dgFloat32(1.0f) - unitAxis.DotProduct3(unitAxis)) < dgFloat32(dgEPSILON * 10.0f));
+	if (dgAbs (angle) > dgFloat32(dgEPSILON / 10.0f)) {
+		dgAssert (dgAbs (dgFloat32(1.0f) - unitAxis.DotProduct3(unitAxis)) < dgFloat32(dgEPSILON * 10.0f));
 	} 
 #endif
 	m_q1 = unitAxis.m_x * sinAng;

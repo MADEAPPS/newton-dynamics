@@ -462,7 +462,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 	dgFloat32 Ixx = inertia[0][0];
 	dgFloat32 Iyy = inertia[1][1];
 	dgFloat32 Izz = inertia[2][2];
-	mass = dgAbsf (mass);
+	mass = dgAbs (mass);
 	if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI) || m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
 		mass = DG_INFINITE_MASS * 2.0f;
 	}
@@ -492,9 +492,9 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		}
 
 	} else {
-		Ixx = dgAbsf (Ixx);
-		Iyy = dgAbsf (Iyy);
-		Izz = dgAbsf (Izz);
+		Ixx = dgAbs (Ixx);
+		Iyy = dgAbs (Iyy);
+		Izz = dgAbs (Izz);
 
 		dgFloat32 Ixx1 = dgClamp (Ixx, dgFloat32 (0.001f) * mass, dgFloat32 (1000.0f) * mass);
 		dgFloat32 Iyy1 = dgClamp (Iyy, dgFloat32 (0.001f) * mass, dgFloat32 (1000.0f) * mass);

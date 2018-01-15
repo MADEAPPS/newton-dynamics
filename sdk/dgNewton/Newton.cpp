@@ -1381,8 +1381,8 @@ void NewtonMaterialSetDefaultFriction(const NewtonWorld* const newtonWorld, int 
 	Newton* const world = (Newton *)newtonWorld;
 	dgContactMaterial* const material = world->GetMaterial (dgUnsigned32 (id0), dgUnsigned32 (id1));
 
-	staticFriction = dgAbsf (staticFriction);
-	kineticFriction = dgAbsf (kineticFriction);
+	staticFriction = dgAbs (staticFriction);
+	kineticFriction = dgAbs (kineticFriction);
 
 	if (material) {
 		if (staticFriction >= dgFloat32 (1.0e-2f)) {
@@ -2068,7 +2068,7 @@ void NewtonMaterialSetContactTangentFriction (const NewtonMaterial* const materi
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-	friction = dgMax (dFloat(0.01f), dgAbsf (friction));
+	friction = dgMax (dFloat(0.01f), dgAbs (friction));
 	if (index) {
 		material->m_flags |= dgContactMaterial::m_override1Friction;
 		dgAssert (index == 1);
@@ -2111,7 +2111,7 @@ void NewtonMaterialSetContactNormalDirection(const NewtonMaterial* const materia
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 	dgVector normal (direction[0], direction[1], direction[2], dgFloat32 (0.0f));
 
-	//dgAssert (dgAbsf (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
+	//dgAssert (dgAbs (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
 	dgAssert (normal.DotProduct3(material->m_normal) > dgFloat32 (0.01f));
 	if (normal.DotProduct3(material->m_normal) < dgFloat32 (0.0f)) {
 		normal = normal.Scale3 (-dgFloat32(1.0f));
@@ -2241,7 +2241,7 @@ NewtonCollision* NewtonCreateSphere(const NewtonWorld* const newtonWorld, dFloat
 		 matrix = dgMatrix (offsetMatrix);
 	}
 
-	return (NewtonCollision*) world->CreateSphere(dgAbsf(radius), shapeID, matrix);
+	return (NewtonCollision*) world->CreateSphere(dgAbs(radius), shapeID, matrix);
 }
 
 
@@ -6222,19 +6222,19 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 		coneAxis.m_x = dgFloat32(1.0f);
 	}
 	dgVector tmp (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	if (dgAbsf (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
+	if (dgAbs (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
 		tmp = dgVector (dgFloat32 (0.0f), dgFloat32(1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-		if (dgAbsf (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
+		if (dgAbs (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
 			tmp = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32(1.0f), dgFloat32 (0.0f)); 
-			dgAssert (dgAbsf (tmp.DotProduct3(coneAxis)) < dgFloat32 (0.999f));
+			dgAssert (dgAbs (tmp.DotProduct3(coneAxis)) < dgFloat32 (0.999f));
 		}
 	}
 	dgVector lateral (tmp.CrossProduct3(coneAxis)); 
 	lateral = lateral.Scale3 (dgRsqrt (lateral.DotProduct3(lateral)));
 	coneAxis = coneAxis.Scale3 (dgRsqrt (coneAxis.DotProduct3(coneAxis)));
 
-	maxConeAngle = dgAbsf (maxConeAngle);
-	maxTwistAngle = dgAbsf (maxTwistAngle);
+	maxConeAngle = dgAbs (maxConeAngle);
+	maxTwistAngle = dgAbs (maxTwistAngle);
 	joint->SetConeLimitState ((maxConeAngle > dgDEG2RAD) ? true : false); 
 	joint->SetTwistLimitState ((maxTwistAngle > dgDEG2RAD) ? true : false);
 	joint->SetLatealLimitState (false); 
@@ -7135,7 +7135,7 @@ void NewtonUserJointAddLinearRow(const NewtonJoint* const joint, const dFloat* c
 	TRACE_FUNCTION(__FUNCTION__);
 	dgVector direction (dir[0], dir[1], dir[2], dgFloat32 (0.0f)); 
 	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
-	dgAssert (dgAbsf (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
+	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
 	dgVector pivotPoint0 (pivot0[0], pivot0[1], pivot0[2], dgFloat32 (0.0f)); 
 	dgVector pivotPoint1 (pivot1[0], pivot1[1], pivot1[2], dgFloat32 (0.0f)); 
 	
@@ -7170,7 +7170,7 @@ void NewtonUserJointAddAngularRow(const NewtonJoint* const joint, dFloat relativ
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
 	dgVector direction (pin[0], pin[1], pin[2], dgFloat32 (0.0f));
 	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
-	dgAssert (dgAbsf (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	userJoint->AddAngularRowJacobian (direction, relativeAngleError);
 }

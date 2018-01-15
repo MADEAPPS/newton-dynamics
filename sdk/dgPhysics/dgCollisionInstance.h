@@ -359,7 +359,7 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMaxRadius () const
 
 DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 {
-	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
+	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	switch (m_scaleType)
 	{
@@ -393,7 +393,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 
 DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-2f));
+	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-2f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
 	switch (m_scaleType) 
 	{
@@ -430,7 +430,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 
 DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
-	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-2f));
+	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-2f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
 	switch (m_scaleType) 
 	{

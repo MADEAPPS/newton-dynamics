@@ -76,9 +76,9 @@ dgConvexHull4d::dgNormalMap::dgNormalMap()
 void dgConvexHull4d::dgNormalMap::TessellateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgBigVector* const buffer, dgInt32& count)
 {
 	if (level) {
-		dgAssert(dgAbsf(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbsf(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbsf(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 		dgVector p01(p0 + p1);
 		dgVector p12(p1 + p2);
 		dgVector p20(p2 + p0);
@@ -87,9 +87,9 @@ void dgConvexHull4d::dgNormalMap::TessellateTriangle(dgInt32 level, const dgVect
 		p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
 		p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
 
-		dgAssert(dgAbsf(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbsf(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbsf(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 
 		TessellateTriangle(level - 1, p0, p01, p20, buffer, count);
 		TessellateTriangle(level - 1, p1, p12, p01, buffer, count);

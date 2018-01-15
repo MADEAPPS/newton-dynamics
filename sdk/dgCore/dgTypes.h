@@ -397,7 +397,7 @@ DG_INLINE void dgSwap(T& A, T& B)
 }	
 
 template <class T>
-DG_INLINE T dgAbsf(T A)
+DG_INLINE T dgAbs(T A)
 {
 	// according to Intel this is better because is does not read after write
 	return (A >= T(0)) ? A : -A;
@@ -412,7 +412,7 @@ DG_INLINE T dgSign(T A)
 template <class T> 
 DG_INLINE bool dgAreEqual(T A, T B, T tol)
 {
-	if ((dgAbsf(A) < tol) && (dgAbsf(B) < tol)) {
+	if ((dgAbs(A) < tol) && (dgAbs(B) < tol)) {
 		return true;
 	}
 /*
@@ -431,10 +431,10 @@ DG_INLINE bool dgAreEqual(T A, T B, T tol)
 	}
 	return dgAbsf(mantissa0 - mantissa1) < tol;
 */	
-	T den = dgMax(dgAbsf(A), dgAbsf(B)) + tol;
+	T den = dgMax(dgAbs(A), dgAbs(B)) + tol;
 	A /= den;
 	B /= den;
-	return dgAbsf(A - B) < tol;
+	return dgAbs(A - B) < tol;
 }
 
 template <class T> 

@@ -141,7 +141,7 @@ dgCollisionInstance* dgWorld::CreateSphere(dgFloat32 radii, dgInt32 shapeID, con
 	dgUnsigned32 crc = dgCollisionSphere::CalculateSignature (radii);
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
-		dgCollision* const collision = new  (m_allocator) dgCollisionSphere (m_allocator, crc, dgAbsf(radii));
+		dgCollision* const collision = new  (m_allocator) dgCollisionSphere (m_allocator, crc, dgAbs(radii));
 		node = dgBodyCollisionList::Insert (collision, crc);
 	}
 	return CreateInstance (node->GetInfo(), shapeID, offsetMatrix);
@@ -162,7 +162,7 @@ dgCollisionInstance* dgWorld::CreateBox(dgFloat32 dx, dgFloat32 dy, dgFloat32 dz
 
 dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionCapsule::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned32 crc = dgCollisionCapsule::CalculateSignature(dgAbs (radio0), dgAbs (radio1), dgAbs (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
@@ -175,7 +175,7 @@ dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radio0, dgFloat32 radio1,
 
 dgCollisionInstance* dgWorld::CreateCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionCylinder::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned32 crc = dgCollisionCylinder::CalculateSignature(dgAbs (radio0), dgAbs (radio1), dgAbs (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
@@ -188,7 +188,7 @@ dgCollisionInstance* dgWorld::CreateCylinder (dgFloat32 radio0, dgFloat32 radio1
 
 dgCollisionInstance* dgWorld::CreateChamferCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionChamferCylinder::CalculateSignature(dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned32 crc = dgCollisionChamferCylinder::CalculateSignature(dgAbs (radius), dgAbs (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
@@ -200,7 +200,7 @@ dgCollisionInstance* dgWorld::CreateChamferCylinder (dgFloat32 radius, dgFloat32
 
 dgCollisionInstance* dgWorld::CreateCone (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionCone::CalculateSignature (dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned32 crc = dgCollisionCone::CalculateSignature (dgAbs (radius), dgAbs (height) * dgFloat32 (0.5f));
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		dgCollision* const collision = new (m_allocator) dgCollisionCone (m_allocator, crc, radius, height);
@@ -317,10 +317,10 @@ dgCollisionInstance* dgWorld::CreateHeightField(
 
 dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgAssert (dgAbsf (offsetMatrix[0].DotProduct3(offsetMatrix[0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbsf (offsetMatrix[1].DotProduct3(offsetMatrix[1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbsf (offsetMatrix[2].DotProduct3(offsetMatrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbsf (offsetMatrix[2].DotProduct3(offsetMatrix[0].CrossProduct3(offsetMatrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[0].DotProduct3(offsetMatrix[0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[1].DotProduct3(offsetMatrix[1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[2].DotProduct3(offsetMatrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[2].DotProduct3(offsetMatrix[0].CrossProduct3(offsetMatrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
 
 	dgAssert (offsetMatrix[0][3] == dgFloat32 (0.0f));
 	dgAssert (offsetMatrix[1][3] == dgFloat32 (0.0f));
@@ -810,7 +810,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgInt32 staticMotion = 0;
 	if (diff <= dgFloat32 (1.0e-2f)) {
 		staticMotion = 1;
-		if (dgAbsf (controlNormal.m_z) > dgFloat32 (0.577f)) {
+		if (dgAbs (controlNormal.m_z) > dgFloat32 (0.577f)) {
 			tangDir = dgVector (-controlNormal.m_y, controlNormal.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
 		} else {
 			tangDir = dgVector (-controlNormal.m_y, controlNormal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -819,7 +819,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		dgAssert (controlDir0.DotProduct3(controlDir0) > dgFloat32 (1.0e-8f));
 		controlDir0 = controlDir0.Scale3 (dgRsqrt (controlDir0.DotProduct3(controlDir0)));
 		controlDir1 = controlNormal.CrossProduct3(controlDir0);
-		dgAssert (dgAbsf(controlNormal.DotProduct3(controlDir0.CrossProduct3(controlDir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbs(controlNormal.DotProduct3(controlDir0.CrossProduct3(controlDir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	}
 
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
@@ -879,7 +879,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		contactMaterial->m_dynamicFriction0 = material->m_dynamicFriction0;
 		contactMaterial->m_dynamicFriction1 = material->m_dynamicFriction1;
 
-		dgAssert (dgAbsf(contactMaterial->m_normal.DotProduct3(contactMaterial->m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 		//contactMaterial.m_collisionEnable = true;
 		//contactMaterial.m_friction0Enable = material->m_friction0Enable;
@@ -895,7 +895,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				contactMaterial->m_dir0 = controlDir0;
 				contactMaterial->m_dir1 = controlDir1;
 			} else {
-				if (dgAbsf (contactMaterial->m_normal.m_z) > dgFloat32 (0.577f)) {
+				if (dgAbs (contactMaterial->m_normal.m_z) > dgFloat32 (0.577f)) {
 					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				} else {
 					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -904,7 +904,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 				contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct3(contactMaterial->m_dir0);
-				dgAssert (dgAbsf(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+				dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			}
 		} else {
 			dgVector veloc0 (v0 + w0.CrossProduct3(contactMaterial->m_point - com0));
@@ -912,8 +912,8 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			dgVector relReloc (veloc1 - veloc0);
 
 			dgFloat32 impulse = relReloc.DotProduct3(contactMaterial->m_normal);
-			if (dgAbsf (impulse) > maxImpulse) {
-				maxImpulse = dgAbsf (impulse); 
+			if (dgAbs (impulse) > maxImpulse) {
+				maxImpulse = dgAbs (impulse); 
 //				breakImpulse0 = contactMaterial->m_collision0->GetBreakImpulse();
 //				breakImpulse1 = contactMaterial->m_collision1->GetBreakImpulse();
 			}
@@ -924,7 +924,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			if (diff > dgFloat32 (1.0e-2f)) {
 				contactMaterial->m_dir0 = tangentDir.Scale3 (dgRsqrt (diff));
 			} else {
-				if (dgAbsf (contactMaterial->m_normal.m_z) > dgFloat32 (0.577f)) {
+				if (dgAbs (contactMaterial->m_normal.m_z) > dgFloat32 (0.577f)) {
 					tangentDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				} else {
 					tangentDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -934,7 +934,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 			}
 			contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct3(contactMaterial->m_dir0);
-			dgAssert (dgAbsf(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+			dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 		}
 		contactMaterial->m_normal.m_w = dgFloat32 (0.0f);
 		contactMaterial->m_dir0.m_w = dgFloat32 (0.0f); 
@@ -1425,7 +1425,7 @@ dgInt32 dgWorld::CalculateUserContacts(dgCollisionParamProxy& proxy) const
 		proxy.m_contactJoint->m_contactActive = 1;
 		dgContactPoint* const contactOut = proxy.m_contacts;
 		for (dgInt32 i = 0; i < count; i++) {
-			dgAssert(dgAbsf(buffer[i].m_normal.DotProduct3(buffer[i].m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbs(buffer[i].m_normal.DotProduct3(buffer[i].m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 			contactOut[i].m_point = buffer[i].m_point;
 			contactOut[i].m_normal = buffer[i].m_normal;
 			contactOut[i].m_penetration = buffer[i].m_penetration;

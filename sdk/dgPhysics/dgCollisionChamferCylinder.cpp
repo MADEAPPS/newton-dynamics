@@ -64,8 +64,8 @@ void dgCollisionChamferCylinder::Init (dgFloat32 radius, dgFloat32 height)
 {
 	m_rtti |= dgCollisionChamferCylinder_RTTI;
 
-	m_radius = dgMax (dgAbsf (radius), D_MIN_CONVEX_SHAPE_SIZE);
-	m_height = dgMax (dgAbsf (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius = dgMax (dgAbs (radius), D_MIN_CONVEX_SHAPE_SIZE);
+	m_height = dgMax (dgAbs (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	dgFloat32 sliceAngle = dgFloat32 (0.0f);
 	dgFloat32 sliceStep = dgPI  / DG_CHAMFERCYLINDER_SLICES; 
@@ -281,7 +281,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 
 	//dgVector dir(dq * dq.InvMagSqrt());
 	dgVector dir(dq.Normalize());
-	if (dgAbsf(dir.m_x) > 0.9999f) {
+	if (dgAbs(dir.m_x) > 0.9999f) {
 		return dgCollisionConvex::RayCast(q0, q1, maxT, contactOut, body, NULL, NULL);
 	}
 
@@ -335,10 +335,10 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 
 dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 x = dir.GetScalar();
-	if (dgAbsf (x) > dgFloat32 (0.9999f)) {
+	if (dgAbs (x) > dgFloat32 (0.9999f)) {
 		return dgVector ((x > dgFloat32 (0.0f)) ? m_height : - m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 	}
 
@@ -351,10 +351,10 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 
 dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 x = dir.GetScalar();
-	if (dgAbsf (x) > dgFloat32 (0.99995f)) {
+	if (dgAbs (x) > dgFloat32 (0.99995f)) {
 		return dgVector::m_zero; 
 	}
 

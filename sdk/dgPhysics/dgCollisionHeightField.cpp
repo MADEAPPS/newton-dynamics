@@ -1102,11 +1102,11 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				//normalBase 
 				const dgInt32 normalIndex0 = normalBase;
 				vertex[normalIndex0] = n0.Normalize();
-				dgAssert  (dgAbsf(vertex[normalIndex0].DotProduct3(vertex[normalIndex0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
+				dgAssert  (dgAbs(vertex[normalIndex0].DotProduct3(vertex[normalIndex0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 
 				const dgInt32 normalIndex1 = normalBase + 1;
 				vertex[normalIndex1] = n1.Normalize();
-				dgAssert  (dgAbsf(vertex[normalIndex1].DotProduct3(vertex[normalIndex1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
+				dgAssert  (dgAbs(vertex[normalIndex1].DotProduct3(vertex[normalIndex1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 
 				faceIndexCount[faceCount] = 3;
 				indices[index + 0 + 0] = i2;

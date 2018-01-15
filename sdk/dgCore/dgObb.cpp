@@ -33,8 +33,8 @@ namespace InternalSphere
 	static dgFloat32 AspectRatio (dgFloat32 x, dgFloat32 y)
 	{
 		dgFloat32 tmp;
-		x = dgAbsf (x);
-		y = dgAbsf (y);
+		x = dgAbs (x);
+		y = dgAbs (y);
 
 		if (y < x) {
 			tmp = y;
@@ -491,7 +491,7 @@ dgObb::dgObb (
 	front = Dir;
 	front.Fast_Normalize(); 
 
-	if (dgAbsf (front % dgObb.right) < 0.995) {
+	if (dgAbs (front % dgObb.right) < 0.995) {
 		up = front * dgObb.right;
 		up.Fast_Normalize(); 
 	} else {
@@ -500,18 +500,18 @@ dgObb::dgObb (
 	right = up * front;
 
 	dgVector Step (Dir.Scale3(0.5));
-	size.m_x = (dgFloat32)(dgObb.size.m_x * dgAbsf (right % dgObb.right) +
-						 dgObb.size.m_y * dgAbsf (right % dgObb.up) +
-						 dgObb.size.m_z * dgAbsf (right % dgObb.front));
+	size.m_x = (dgFloat32)(dgObb.size.m_x * dgAbs (right % dgObb.right) +
+						 dgObb.size.m_y * dgAbs (right % dgObb.up) +
+						 dgObb.size.m_z * dgAbs (right % dgObb.front));
 
-	size.m_y = (dgFloat32)(dgObb.size.m_x * dgAbsf (up % dgObb.right) +
-						  dgObb.size.m_y * dgAbsf (up % dgObb.up) +
-						  dgObb.size.m_z * dgAbsf (up % dgObb.front));
+	size.m_y = (dgFloat32)(dgObb.size.m_x * dgAbs (up % dgObb.right) +
+						  dgObb.size.m_y * dgAbs (up % dgObb.up) +
+						  dgObb.size.m_z * dgAbs (up % dgObb.front));
 
 	size.m_z = (dgFloat32)(sqrt (Step % Step) +
-							dgObb.size.m_x * dgAbsf (front % dgObb.right) +
-							dgObb.size.m_y * dgAbsf (front % dgObb.up) +
-							dgObb.size.m_z * dgAbsf (front % dgObb.front));
+							dgObb.size.m_x * dgAbs (front % dgObb.right) +
+							dgObb.size.m_y * dgAbs (front % dgObb.up) +
+							dgObb.size.m_z * dgAbs (front % dgObb.front));
 	posit = dgObb.posit + Step;
 
 }
@@ -523,52 +523,52 @@ bool dgObb::dgObb_Overlap_Test (const dgObb &dgObb)
 	dgFloat64 R;
 	dgVector Dir (dgObb.posit - posit);
 
-  	R = size.m_x * dgAbsf (right % Dir) + dgObb.size.m_x * dgAbsf (dgObb.right % Dir) + 
-	    size.m_y * dgAbsf (up % Dir) + dgObb.size.m_y * dgAbsf (dgObb.up % Dir) + 
-		 size.m_z * dgAbsf (front %Dir) + dgObb.size.m_z * dgAbsf (dgObb.front % Dir);
+  	R = size.m_x * dgAbs (right % Dir) + dgObb.size.m_x * dgAbs (dgObb.right % Dir) + 
+	    size.m_y * dgAbs (up % Dir) + dgObb.size.m_y * dgAbs (dgObb.up % Dir) + 
+		 size.m_z * dgAbs (front %Dir) + dgObb.size.m_z * dgAbs (dgObb.front % Dir);
 	if (R	< (Dir % Dir)) {
 		return false;
 	}
 
-	R = size.m_x * dgAbsf (right % dgObb.right) + 
-	    size.m_y * dgAbsf (up % dgObb.right) + 
-		 size.m_z * dgAbsf (front % dgObb.right) + dgObb.size.m_x;
-	if (R	< dgAbsf (Dir % dgObb.right)) {
+	R = size.m_x * dgAbs (right % dgObb.right) + 
+	    size.m_y * dgAbs (up % dgObb.right) + 
+		 size.m_z * dgAbs (front % dgObb.right) + dgObb.size.m_x;
+	if (R	< dgAbs (Dir % dgObb.right)) {
 		return false;
 	}
 
-	R = size.m_x * dgAbsf (right % dgObb.up) + 
-	    size.m_y * dgAbsf (up % dgObb.up) + 
-		 size.m_z * dgAbsf (front % dgObb.up) + dgObb.size.m_y;
-	if (R	< dgAbsf (Dir % dgObb.up)) {
+	R = size.m_x * dgAbs (right % dgObb.up) + 
+	    size.m_y * dgAbs (up % dgObb.up) + 
+		 size.m_z * dgAbs (front % dgObb.up) + dgObb.size.m_y;
+	if (R	< dgAbs (Dir % dgObb.up)) {
 		return false;
 	}
 
-	R = size.m_x * dgAbsf (right % dgObb.front) + 
-	    size.m_y * dgAbsf (up % dgObb.front) + 
-		 size.m_z * dgAbsf (front % dgObb.front) + dgObb.size.m_z; 
-	if (R	< dgAbsf (Dir % dgObb.front)) {
+	R = size.m_x * dgAbs (right % dgObb.front) + 
+	    size.m_y * dgAbs (up % dgObb.front) + 
+		 size.m_z * dgAbs (front % dgObb.front) + dgObb.size.m_z; 
+	if (R	< dgAbs (Dir % dgObb.front)) {
 		return false;
 	}
 
-	R = dgObb.size.m_x * dgAbsf (dgObb.right % right) + 
-	    dgObb.size.m_y * dgAbsf (dgObb.up % right) + 
-		 dgObb.size.m_z * dgAbsf (dgObb.front % right) + size.m_x;
-	if (R	< dgAbsf (Dir % right)) {
+	R = dgObb.size.m_x * dgAbs (dgObb.right % right) + 
+	    dgObb.size.m_y * dgAbs (dgObb.up % right) + 
+		 dgObb.size.m_z * dgAbs (dgObb.front % right) + size.m_x;
+	if (R	< dgAbs (Dir % right)) {
 		return false;
 	}
 
-	R = dgObb.size.m_x * dgAbsf (dgObb.right % up) + 
-	    dgObb.size.m_y * dgAbsf (dgObb.up % up) + 
-		 dgObb.size.m_z * dgAbsf (dgObb.front % up) + size.m_y;
-	if (R	< dgAbsf (Dir % up)) {
+	R = dgObb.size.m_x * dgAbs (dgObb.right % up) + 
+	    dgObb.size.m_y * dgAbs (dgObb.up % up) + 
+		 dgObb.size.m_z * dgAbs (dgObb.front % up) + size.m_y;
+	if (R	< dgAbs (Dir % up)) {
 		return false;
 	}
 
-	R = dgObb.size.m_x * dgAbsf (dgObb.right % front) + 
-	    dgObb.size.m_y * dgAbsf (dgObb.up % front) + 
-		 dgObb.size.m_z * dgAbsf (dgObb.front % front) + size.m_z;
-	if (R	< dgAbsf (Dir % front)) {
+	R = dgObb.size.m_x * dgAbs (dgObb.right % front) + 
+	    dgObb.size.m_y * dgAbs (dgObb.up % front) + 
+		 dgObb.size.m_z * dgAbs (dgObb.front % front) + size.m_z;
+	if (R	< dgAbs (Dir % front)) {
 		return false;
 	}
 
@@ -584,9 +584,9 @@ void dgObb::Swept_Volume (
 	dgFloat32 h;
 	dgFloat32 b;
 
-	w = (dgFloat32)(size.m_x * dgAbsf(right.m_x) + size.m_y * dgAbsf(up.m_x) + size.m_z * dgAbsf(front.m_x));  
-	h = (dgFloat32)(size.m_x * dgAbsf(right.m_y) + size.m_y * dgAbsf(up.m_y) + size.m_z * dgAbsf(front.m_y));  
-	b = (dgFloat32)(size.m_x * dgAbsf(right.m_z) + size.m_y * dgAbsf(up.m_z) + size.m_z * dgAbsf(front.m_z));  
+	w = (dgFloat32)(size.m_x * dgAbs(right.m_x) + size.m_y * dgAbs(up.m_x) + size.m_z * dgAbs(front.m_x));  
+	h = (dgFloat32)(size.m_x * dgAbs(right.m_y) + size.m_y * dgAbs(up.m_y) + size.m_z * dgAbs(front.m_y));  
+	b = (dgFloat32)(size.m_x * dgAbs(right.m_z) + size.m_y * dgAbs(up.m_z) + size.m_z * dgAbs(front.m_z));  
 
 	min.m_x = posit.m_x - w;
 	min.m_y = posit.m_y - h;
@@ -609,7 +609,7 @@ dgInt32 dgObb::FrontTest (
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
-	dR = m_size.m_x * dgAbsf (matrix.m_front.m_x) + m_size.m_y * dgAbsf (matrix.m_up.m_x) + m_size.m_z * dgAbsf (matrix.m_right.m_x);
+	dR = m_size.m_x * dgAbs (matrix.m_front.m_x) + m_size.m_y * dgAbs (matrix.m_up.m_x) + m_size.m_z * dgAbs (matrix.m_right.m_x);
 	R = plane[5].m_x * matrix.m_posit.m_x + plane[5].m_w; 
 
 	flag0.f = R + dR;
@@ -626,7 +626,7 @@ dgInt32 dgObb::RearTest (const dgMatrix& matrix, const dgPlane* plane) const
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
-	dR = m_size.m_x * dgAbsf (matrix.m_front.m_x) + m_size.m_y * dgAbsf (matrix.m_up.m_x) + m_size.m_z * dgAbsf (matrix.m_right.m_x);
+	dR = m_size.m_x * dgAbs (matrix.m_front.m_x) + m_size.m_y * dgAbs (matrix.m_up.m_x) + m_size.m_z * dgAbs (matrix.m_right.m_x);
 	R = plane[4].m_x * matrix.m_posit.m_x + plane[4].m_w; 
 
 	flag0.f = R + dR;
@@ -644,9 +644,9 @@ dgInt32 dgObb::LeftTest (const dgMatrix& matrix, const dgPlane* plane) const
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
-	dR = m_size.m_x * dgAbsf (matrix.m_front.m_x * plane[0].m_x + matrix.m_front.m_z * plane[0].m_z) + 
-		 m_size.m_y * dgAbsf (matrix.m_up.m_x    * plane[0].m_x + matrix.m_up.m_z    * plane[0].m_z) +
-		 m_size.m_z * dgAbsf (matrix.m_right.m_x * plane[0].m_x + matrix.m_right.m_z * plane[0].m_z);
+	dR = m_size.m_x * dgAbs (matrix.m_front.m_x * plane[0].m_x + matrix.m_front.m_z * plane[0].m_z) + 
+		 m_size.m_y * dgAbs (matrix.m_up.m_x    * plane[0].m_x + matrix.m_up.m_z    * plane[0].m_z) +
+		 m_size.m_z * dgAbs (matrix.m_right.m_x * plane[0].m_x + matrix.m_right.m_z * plane[0].m_z);
 	R = plane[0].m_x * matrix.m_posit.m_x + plane[0].m_z * matrix.m_posit.m_z; 
 
 	flag0.f = R + dR;
@@ -663,9 +663,9 @@ dgInt32 dgObb::RightTest (const dgMatrix& matrix, const dgPlane* plane) const
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
-	dR = m_size.m_x * dgAbsf (matrix.m_front.m_x * plane[1].m_x + matrix.m_front.m_z * plane[1].m_z) + 
-		 m_size.m_y * dgAbsf (matrix.m_up.m_x    * plane[1].m_x + matrix.m_up.m_z    * plane[1].m_z) +
-		 m_size.m_z * dgAbsf (matrix.m_right.m_x * plane[1].m_x + matrix.m_right.m_z * plane[1].m_z);
+	dR = m_size.m_x * dgAbs (matrix.m_front.m_x * plane[1].m_x + matrix.m_front.m_z * plane[1].m_z) + 
+		 m_size.m_y * dgAbs (matrix.m_up.m_x    * plane[1].m_x + matrix.m_up.m_z    * plane[1].m_z) +
+		 m_size.m_z * dgAbs (matrix.m_right.m_x * plane[1].m_x + matrix.m_right.m_z * plane[1].m_z);
 	R = plane[1].m_x * matrix.m_posit.m_x + plane[1].m_z * matrix.m_posit.m_z; 
 
 	flag0.f = R + dR;
@@ -682,9 +682,9 @@ dgInt32 dgObb::BottomTest (const dgMatrix& matrix, const dgPlane* plane) const
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
-	dR = m_size.m_x * dgAbsf (matrix.m_front.m_x * plane[2].m_x + matrix.m_front.m_y * plane[2].m_y) + 
-		 m_size.m_y * dgAbsf (matrix.m_up.m_x    * plane[2].m_x + matrix.m_up.m_y    * plane[2].m_y) +
-		 m_size.m_z * dgAbsf (matrix.m_right.m_x * plane[2].m_x + matrix.m_right.m_y * plane[2].m_y);
+	dR = m_size.m_x * dgAbs (matrix.m_front.m_x * plane[2].m_x + matrix.m_front.m_y * plane[2].m_y) + 
+		 m_size.m_y * dgAbs (matrix.m_up.m_x    * plane[2].m_x + matrix.m_up.m_y    * plane[2].m_y) +
+		 m_size.m_z * dgAbs (matrix.m_right.m_x * plane[2].m_x + matrix.m_right.m_y * plane[2].m_y);
 
 	R = plane[2].m_x * matrix.m_posit.m_x + plane[2].m_y * matrix.m_posit.m_y; 
 
@@ -703,9 +703,9 @@ dgInt32 dgObb::TopTest (const dgMatrix& matrix, const dgPlane* plane) const
 	InternalSphere::dgFloatSign flag0;
 	InternalSphere::dgFloatSign flag1;
 
-	dR = m_size.m_x * dgAbsf (matrix.m_front.m_x * plane[3].m_x + matrix.m_front.m_y * plane[3].m_y) + 
-		 m_size.m_y * dgAbsf (matrix.m_up.m_x    * plane[3].m_x + matrix.m_up.m_y    * plane[3].m_y) +
-		 m_size.m_z * dgAbsf (matrix.m_right.m_x * plane[3].m_x + matrix.m_right.m_y * plane[3].m_y);
+	dR = m_size.m_x * dgAbs (matrix.m_front.m_x * plane[3].m_x + matrix.m_front.m_y * plane[3].m_y) + 
+		 m_size.m_y * dgAbs (matrix.m_up.m_x    * plane[3].m_x + matrix.m_up.m_y    * plane[3].m_y) +
+		 m_size.m_z * dgAbs (matrix.m_right.m_x * plane[3].m_x + matrix.m_right.m_y * plane[3].m_y);
 
 	R = plane[3].m_x * matrix.m_posit.m_x + plane[3].m_y * matrix.m_posit.m_y; 
 

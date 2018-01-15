@@ -242,7 +242,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 
 void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 {
-	if (dgAbsf(m_cachedTimeStep - timestep) > dgFloat32(1.0e-6f)) {
+	if (dgAbs(m_cachedTimeStep - timestep) > dgFloat32(1.0e-6f)) {
 		m_cachedTimeStep = timestep;
 		const dgFloat32 tau = dgFloat32(1.0f) / (dgFloat32(60.0f) * timestep);
 		m_cachedDampCoef.m_x = dgPow(dgFloat32(1.0f) - m_dampCoef.m_x, tau);

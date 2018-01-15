@@ -63,9 +63,9 @@ dgCollisionBox::dgCollisionBox(dgWorld* const world, dgDeserialize deserializati
 void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 {
 	m_rtti |= dgCollisionBox_RTTI;
-	m_size[0].m_x = dgMax (dgAbsf (size_x) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
-	m_size[0].m_y = dgMax (dgAbsf (size_y) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
-	m_size[0].m_z = dgMax (dgAbsf (size_z) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_x = dgMax (dgAbs (size_x) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_y = dgMax (dgAbs (size_y) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_z = dgMax (dgAbs (size_z) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
 	m_size[0].m_w = dgFloat32 (0.0f);
 
 	m_size[1].m_x = - m_size[0].m_x;
@@ -170,9 +170,9 @@ dgInt32 dgCollisionBox::CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat3
 {
 	dgUnsigned32 buffer[4];
 
-	dx = dgAbsf (dx);
-	dy = dgAbsf (dy);
-	dz = dgAbsf (dz);
+	dx = dgAbs (dx);
+	dy = dgAbs (dy);
+	dz = dgAbs (dz);
 	buffer[0] = m_boxCollision;
 	buffer[1] = Quantize (dx * dgFloat32 (0.5f));
 	buffer[2] = Quantize (dy * dgFloat32 (0.5f));
@@ -192,7 +192,7 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir0, dgInt32* const ver
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);
 
-	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
 	if (vertexIndex) {
@@ -208,7 +208,7 @@ dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir0, dgInt32* con
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);
 
-	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
 	dgVector mask(dir < dgVector(dgFloat32(0.0f)));
 	if (vertexIndex) {
@@ -228,7 +228,7 @@ dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point,
 {
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);
-	dgAssert(dgAbsf((dir.DotProduct4(dir).GetScalar() - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbs((dir.DotProduct4(dir).GetScalar() - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
 	return point + dir.Scale4 (DG_PENETRATION_TOL);
 }
 
@@ -251,7 +251,7 @@ dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& loca
 	dgFloat32 tmax = dgFloat32 (1.0f);
 	for (dgInt32 i = 0; i < 3; i++) {
 		dgFloat32 dp = localP1[i] - localP0[i];
-		if (dgAbsf (dp) < dgFloat32 (1.0e-8f)) {
+		if (dgAbs (dp) < dgFloat32 (1.0e-8f)) {
 			if (localP0[i] <= m_size[1][i] || localP0[i] >= m_size[0][i]) {
 				return dgFloat32 (1.2f);
 			}

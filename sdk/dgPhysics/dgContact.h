@@ -306,7 +306,7 @@ inline dgFloat32 dgContact::GetPruningTolerance() const
 
 inline void dgContact::SetPruningTolerance(dgFloat32 tolerance)
 {
-	m_contactPruningTolereance = dgAbsf (tolerance);
+	m_contactPruningTolereance = dgAbs (tolerance);
 }
 
 

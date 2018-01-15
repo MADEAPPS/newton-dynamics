@@ -168,9 +168,9 @@ class dgTetraIsoSufaceStuffing
 		void TessellateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count)
 		{
 			if (level) {
-				dgAssert(dgAbsf(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbsf(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbsf(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 				dgVector p01(p0 + p1);
 				dgVector p12(p1 + p2);
 				dgVector p20(p2 + p0);
@@ -179,9 +179,9 @@ class dgTetraIsoSufaceStuffing
 				p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
 				p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
 
-				dgAssert(dgAbsf(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbsf(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbsf(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 
 				TessellateTriangle(level - 1, p0, p01, p20, count);
 				TessellateTriangle(level - 1, p1, p12, p01, count);
@@ -369,7 +369,7 @@ class dgTetraIsoSufaceStuffing
 
 			const dgFloat64 det = a00 * a11 - a01 * a01;
 			dgAssert(det >= dgFloat32(0.0f));
-			if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+			if (dgAbs(det) > dgFloat32(1.0e-24f)) {
 				dgBigVector p0Point(point0 - p0);
 				dgBigVector normal(e10.CrossProduct3(e20));
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
@@ -411,7 +411,7 @@ class dgTetraIsoSufaceStuffing
 
 			const dgFloat64 det = a00 * a11 - a01 * a01;
 			dgAssert(det >= dgFloat32(0.0f));
-			if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+			if (dgAbs(det) > dgFloat32(1.0e-24f)) {
 				dgBigVector p0Point(point0 - p0);
 				dgBigVector normal(e10.CrossProduct3(e20));
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);

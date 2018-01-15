@@ -47,7 +47,7 @@ class dCustomSlidingContact: public dCustom6dof
 	dFloat m_springDamperRelaxation;
 	union
 	{
-		int m_flags;
+		int m_options;
 		struct
 		{
 			unsigned m_limitsLinearOn	 : 1;

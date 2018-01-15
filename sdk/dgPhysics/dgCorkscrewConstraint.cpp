@@ -206,9 +206,9 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 	m_posit = matrix0.m_front.DotProduct3(matrix0.m_posit - matrix1.m_posit);
 	matrix1.m_posit += matrix1.m_front.Scale3 (m_posit);
 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
 
 	const dgVector& dir1 = matrix0.m_up;
 	const dgVector& dir2 = matrix0.m_right;
