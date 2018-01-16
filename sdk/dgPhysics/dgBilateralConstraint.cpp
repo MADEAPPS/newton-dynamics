@@ -359,8 +359,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgVector& bodyOmega0 = m_body0->m_omega;
 		const dgVector& bodyVeloc1 = m_body1->m_veloc;
 		const dgVector& bodyOmega1 = m_body1->m_omega;
-		dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(jacobian0.m_linear) + bodyVeloc1 * bodyOmega1.CrossProduct3(jacobian1.m_linear) +
-					   bodyOmega0 * bodyOmega0.CrossProduct3(jacobian0.m_angular) + bodyOmega1 * bodyOmega1.CrossProduct3(jacobian1.m_angular));
+		dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(jacobian0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(jacobian0.m_angular) +
+					   bodyVeloc1 * bodyOmega1.CrossProduct3(jacobian1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(jacobian1.m_angular));
 		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
 
 		//dgVector centrError (param.m_centripetal1 - param.m_centripetal0);
@@ -432,8 +432,8 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
 
 				//dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
-				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_linear)  + bodyVeloc1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_linear) +
-							   bodyOmega0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_angular) + bodyOmega1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_angular));
+				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_angular) +
+							   bodyVeloc1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_angular));
 				//dgTrace(("%f %f\n", aRel, -xxx.AddHorizontal().GetScalar()));
 				dgFloat32 aRel = -accel.AddHorizontal().GetScalar(); 
 
