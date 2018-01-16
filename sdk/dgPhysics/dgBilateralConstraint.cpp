@@ -199,7 +199,6 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 	jacobian0.m_angular[2] = jacobianA[5];
 	jacobian0.m_angular[3] = dgFloat32 (0.0f);
 
-
 	jacobian1.m_linear[0] = jacobianB[0];
 	jacobian1.m_linear[1] = jacobianB[1];
 	jacobian1.m_linear[2] = jacobianB[2];

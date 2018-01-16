@@ -126,8 +126,6 @@ void dCustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 		jacobian1[4] = -r1[1];
 		jacobian1[5] = -r1[2];
 
-//		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix[1][0]);
-//		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix[2][0]);
 		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 		NewtonUserJointSetRowAcceleration(m_joint, a);
 	}

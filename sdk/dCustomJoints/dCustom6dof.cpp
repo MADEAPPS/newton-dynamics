@@ -300,6 +300,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
+	dVector step(p0 - p1);
 
 	for (int i = 0; i < 3; i ++) {
 		if (m_mask & (1<<i)) {
@@ -307,15 +308,11 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 				NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 				NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 			} else {
-				dFloat posit = (p0 - p1).DotProduct3(matrix1[i]);
+				dFloat posit = step.DotProduct3(matrix1[i]);
 				if (posit < m_minLinearLimits.m_x) {
-					const dVector& p0 = matrix0.m_posit;
-					//dVector p1(p0 + matrix0.m_front.Scale(m_minLinearLimits.m_x - posit));
 					NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 				} else if (posit > m_maxLinearLimits.m_x) {
-					const dVector& p0 = matrix0.m_posit;
-					//dVector p1(p0 + matrix0.m_front.Scale(m_maxLinearLimits.m_x - posit));
 					NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 				}
