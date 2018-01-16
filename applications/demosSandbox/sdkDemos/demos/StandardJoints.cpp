@@ -257,8 +257,9 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f- size.m_y * 2.0f, 0.0f, 0.0f), size);
 
-//	const dFloat angle = 60.0f * 3.1415592f / 180.0f;
-const dFloat angle = 1000.0f * 3.1415592f / 180.0f;
+	const dFloat angle = 120.0f * 3.1415592f / 180.0f;
+//const dFloat angle = 1000.0f * 3.1415592f / 180.0f;
+	const dFloat rollLimit = 80.0f * 3.1415592f / 180.0f;
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
@@ -269,7 +270,7 @@ const dFloat angle = 1000.0f * 3.1415592f / 180.0f;
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	dCustom6dof* const joint0 = new dCustom6dof (pinMatrix, box0, base);
 	joint0->SetYawLimits (-angle, angle);
-	joint0->SetRollLimits (-angle, angle);
+	joint0->SetRollLimits (-rollLimit, rollLimit);
 	joint0->SetPitchLimits(-angle, angle);
 
 	// link the two boxes
@@ -278,8 +279,9 @@ const dFloat angle = 1000.0f * 3.1415592f / 180.0f;
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
 	dCustom6dof* const joint1 = new dCustom6dof (pinMatrix, box1, box0);
 	joint1->SetYawLimits(-angle, angle);
-	joint1->SetPitchLimits(-angle, angle);
+	joint1->SetPitchLimits(-rollLimit, rollLimit);
 	joint1->SetRollLimits(-angle, angle);
+
 }
 
 static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)

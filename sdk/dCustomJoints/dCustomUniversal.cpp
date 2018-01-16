@@ -28,7 +28,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 	,m_options(0)
 {
 	m_yawAxis = 0;
-	m_rollAxis = 0;
+//	m_rollAxis = 0;
 	m_pitchAxis = 0;
 
 	m_actuator_0 = false;
@@ -374,9 +374,8 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 void dCustomUniversal::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex)
 {
 //	dAssert(freeDof == 3);
-
+/*
 	dMatrix rollMatrix (dYawMatrix(GetYaw()) * matrix1);
-
 	dVector omega0;
 	dVector omega1;
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
@@ -391,7 +390,7 @@ void dCustomUniversal::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matr
 	NewtonUserJointAddAngularRow(m_joint, -rollAngle, &rollMatrix.m_right[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
+*/
 
 	// check is the joint limit are enable
 	if (m_limit_0_On) {

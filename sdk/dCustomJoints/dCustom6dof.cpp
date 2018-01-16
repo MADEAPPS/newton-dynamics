@@ -158,16 +158,42 @@ void dCustom6dof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& ma
 	localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 #endif
 
+	// deal with gimbals lock
+	if (euler0.m_z > 89.5f * 3.141592f / 180.0f) {
+		dAssert(0);
+	} else if (euler0.m_z < -89.5f * 3.141592f / 180.0f) {
+		dAssert(0);
+	}
+
+	// deal with roll angle flip
 	dAngularIntegration deltaYaw(dAngularIntegration(euler0.m_y) - m_yaw.m_currentAngle);
 	dAngularIntegration deltaPitch(dAngularIntegration(euler0.m_x) - m_pitch.m_currentAngle);
 	if ((dAbs(deltaYaw.GetAngle()) > (0.5f * 3.141592f)) && (dAbs(deltaPitch.GetAngle()) > (0.5f * 3.141592f))) {
 		euler0 = euler1;
 	}
 
+#if 0
+dFloat x = GetPitch();
+dFloat y = GetYaw();
+dFloat z = GetRoll();
+dAngularIntegration x0(m_pitch.m_currentAngle);
+dAngularIntegration y0(m_yaw.m_currentAngle);
+dAngularIntegration z0(m_roll.m_currentAngle);
+x0.Update(euler0.m_x);
+y0.Update(euler0.m_y);
+z0.Update(euler0.m_z);
+x -= x0.GetAngle();
+y -= y0.GetAngle();
+z -= z0.GetAngle();
+dAssert (dAbs (x) < 10.0f * 3.141592f / 180.0f );
+dAssert (dAbs (y) < 10.0f * 3.141592f / 180.0f );
+dAssert (dAbs (z) < 10.0f * 3.141592f / 180.0f );
+dTrace(("%f %f %f\n", x * 180.0f / 3.141592f, y * 180.0f / 3.141592f, z * 180.0f / 3.141592f));
+#endif
+
 	m_yaw.m_currentAngle.Update(euler0.m_y);
 	m_roll.m_currentAngle.Update(euler0.m_z);
 	m_pitch.m_currentAngle.Update(euler0.m_x);
-//dTrace(("%f %f %f\n", GetPitch() * 180.0f / 3.141592f, GetYaw() * 180.0f / 3.141592f, GetRoll() * 180.0f / 3.141592f));
 }
 
 void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const

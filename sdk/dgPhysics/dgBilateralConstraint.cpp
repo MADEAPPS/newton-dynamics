@@ -286,6 +286,10 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
+
+		dgVector accel(omega0 * omega0.CrossProduct3(jacobian0.m_angular) + omega1 * omega1.CrossProduct3(jacobian1.m_angular));
+		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
+
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;
 		dgFloat32 ks = DG_POS_DAMP;
@@ -300,8 +304,8 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		desc.m_penetration[index] = jointAngle;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_jointStiffness[index] = stiffness;
-		desc.m_jointAccel[index] = alphaError;
-		desc.m_penetrationStiffness[index] = alphaError;
+		desc.m_jointAccel[index] = alphaError + relCentr;
+		desc.m_penetrationStiffness[index] = alphaError + relCentr;
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	} else {
 		desc.m_penetration[index] = dgFloat32 (0.0f);
@@ -352,20 +356,18 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		dgVector positError (param.m_posit1 - param.m_posit0);
 		dgFloat32 relPosit = positError.DotProduct4(dir).GetScalar();
 
-		//dgVector centrError (param.m_centripetal1 - param.m_centripetal0);
-		//dgFloat32 relCentr = centrError.DotProduct3(dir); 
-		//relCentr = dgClamp (relCentr, dgFloat32(-100000.0f), dgFloat32(100000.0f));
-		//dgTrace(("%f %f\n", relCentr, -xxxx.AddHorizontal().GetScalar()));
-
 		const dgVector& bodyVeloc0 = m_body0->m_veloc;
 		const dgVector& bodyOmega0 = m_body0->m_omega;
 		const dgVector& bodyVeloc1 = m_body1->m_veloc;
 		const dgVector& bodyOmega1 = m_body1->m_omega;
 		dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(jacobian0.m_linear) + bodyVeloc1 * bodyOmega1.CrossProduct3(jacobian1.m_linear) +
 					   bodyOmega0 * bodyOmega0.CrossProduct3(jacobian0.m_angular) + bodyOmega1 * bodyOmega1.CrossProduct3(jacobian1.m_angular));
-		dgFloat32 relCentr = accel.AddHorizontal().GetScalar();
-		//dgVector xxxx(v0 * w0.CrossProduct3(jacobian0.m_linear) + v1 * w1.CrossProduct3(jacobian1.m_linear) +
-		//	w0 * w0.CrossProduct3(jacobian0.m_angular) + w1 * w1.CrossProduct3(jacobian1.m_angular));
+		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
+
+		//dgVector centrError (param.m_centripetal1 - param.m_centripetal0);
+		//dgFloat32 relCentr = centrError.DotProduct3(dir); 
+		//relCentr = dgClamp (relCentr, dgFloat32(-100000.0f), dgFloat32(100000.0f));
+		//dgTrace(("%f %f\n", relCentr, -xxxx.AddHorizontal().GetScalar()));
 
 		desc.m_zeroRowAcceleration[index] = (relPosit * desc.m_invTimestep + relVeloc) * desc.m_invTimestep;
 
@@ -382,8 +384,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		desc.m_jointStiffness[index] = param.m_stiffness;
 		desc.m_jointAccel[index] = accelError + relCentr;
 		desc.m_penetrationStiffness[index] = accelError + relCentr;
-		// save centripetal acceleration in the restitution member
-		desc.m_restitution[index] = relCentr;
+		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	} else {
 		desc.m_penetration[index] = dgFloat32 (0.0f);
@@ -432,7 +433,6 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
 
 				//dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
-
 				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_linear)  + bodyVeloc1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_linear) +
 							   bodyOmega0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_angular) + bodyOmega1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_angular));
 				//dgTrace(("%f %f\n", aRel, -xxx.AddHorizontal().GetScalar()));
@@ -462,7 +462,8 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				dgFloat32 aRelErr = num / den;
 
 				//centripetal acceleration is stored in restitution member
-				jacobianMatrixElements[k].m_coordenateAccel = aRelErr + jacobianMatrixElements[k].m_restitution + aRel;
+				//jacobianMatrixElements[k].m_coordenateAccel = aRelErr + jacobianMatrixElements[k].m_restitution + aRel;
+				jacobianMatrixElements[k].m_coordenateAccel = aRelErr + aRel;
 			}
 		}
 	} else {
