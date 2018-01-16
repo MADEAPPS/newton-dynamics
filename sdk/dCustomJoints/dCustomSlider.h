@@ -50,7 +50,6 @@ class dCustomSlider: public dCustom6dof
 			unsigned m_limitsOn			 : 1;
 			unsigned m_setAsSpringDamper : 1;
 			unsigned m_actuatorFlag		 : 1;
-			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
 	DECLARE_CUSTOM_JOINT(dCustomSlider, dCustom6dof)

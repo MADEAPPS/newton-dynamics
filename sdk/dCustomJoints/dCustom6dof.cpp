@@ -268,6 +268,9 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
+	// update joint angle
+	CalculateJointAngles(matrix0, matrix1);
+
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
@@ -278,44 +281,22 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 				NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 				NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 			} else {
-				dAssert(0);
-				/*
-					// it is a limited linear dof, check if it pass the limits
-					dFloat dist = dp.DotProduct3(matrix1[i]);
-					if (dist > m_maxLinearLimits[i]) {
-						dVector q1 (p1 + matrix1[i].Scale (m_maxLinearLimits[i]));
-
-						// clamp the error, so that not too much energy is added when constraint violation occurs
-						dFloat maxDist = (p0 - q1).DotProduct3(matrix1[i]);
-						if (maxDist > D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION) {
-							q1 = p0 - matrix1[i].Scale(D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION);
-						}
-
-						NewtonUserJointAddLinearRow (m_joint, &p0[0], &q1[0], &matrix0[i][0]);
-						NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-						// allow the object to return but not to kick going forward
-						NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-
-					} else if (dist < m_minLinearLimits[i]) {
-						dVector q1 (p1 + matrix1[i].Scale (m_minLinearLimits[i]));
-
-						// clamp the error, so the not too much energy is added when constraint violation occurs
-						dFloat maxDist = (p0 - q1).DotProduct3(matrix1[i]);
-						if (maxDist < -D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION) {
-							q1 = p0 - matrix1[i].Scale(-D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION);
-						}
-
-						NewtonUserJointAddLinearRow (m_joint, &p0[0], &q1[0], &matrix0[i][0]);
-						NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-						// allow the object to return but not to kick going forward
-						NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-					}
-				*/
+				dFloat posit = (p0 - p1).DotProduct3(matrix1[i]);
+				if (posit < m_minLinearLimits.m_x) {
+					const dVector& p0 = matrix0.m_posit;
+					//dVector p1(p0 + matrix0.m_front.Scale(m_minLinearLimits.m_x - posit));
+					NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				} else if (posit > m_maxLinearLimits.m_x) {
+					const dVector& p0 = matrix0.m_posit;
+					//dVector p1(p0 + matrix0.m_front.Scale(m_maxLinearLimits.m_x - posit));
+					NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				}
 			}
 		}
 	}
-
-	CalculateJointAngles(matrix0, matrix1);
+	
 	if (m_pitchAxis) {
 		dFloat pitchAngle = GetPitch();
 		if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {

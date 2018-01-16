@@ -31,7 +31,6 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	,m_springDamperRelaxation(0.96f)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
-	,m_lastRowWasUsed(false)
 {
 	m_xAxis = 0;
 	SetLimits(-1.0f, 1.0f);
@@ -46,7 +45,6 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 	,m_springDamperRelaxation(0.97f)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
-	,m_lastRowWasUsed(false)
 {
 	m_xAxis = 0;
 	SetLimits(-1.0f, 1.0f);
@@ -257,19 +255,21 @@ void dCustomSlider::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0
 
 	// if limit are enable ...
 	if (m_limitsOn && m_setAsSpringDamper) {
-		m_lastRowWasUsed = true;
 		if (m_posit < m_minLinearLimits.m_x) {
 			const dVector& p0 = matrix0.m_posit;
 			dVector p1(p0 + matrix0.m_front.Scale(m_minLinearLimits.m_x - m_posit));
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		} else if (m_posit > m_maxLinearLimits.m_x) {
 			const dVector& p0 = matrix0.m_posit;
 			dVector p1(p0 + matrix0.m_front.Scale(m_maxLinearLimits.m_x - m_posit));
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		} else {
 			const dVector& p0 = matrix0.m_posit;
 			const dVector& p1 = matrix1.m_posit;
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
 
 		const dFloat velCut = 0.5f;
@@ -296,7 +296,6 @@ void dCustomSlider::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-			m_lastRowWasUsed = true;
 		} else if (m_posit > m_maxLinearLimits.m_x) {
 			// get a point along the up vector and set a constraint  
 
@@ -305,7 +304,6 @@ void dCustomSlider::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-			m_lastRowWasUsed = true;
 		} else {
 			/*
 			// uncomment this for a slider with friction
@@ -336,7 +334,6 @@ void dCustomSlider::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0
 			*/
 		}
 	} else if (m_setAsSpringDamper) {
-		m_lastRowWasUsed = true;
 		const dVector& p0 = matrix0.m_posit;
 		const dVector& p1 = matrix1.m_posit;
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);

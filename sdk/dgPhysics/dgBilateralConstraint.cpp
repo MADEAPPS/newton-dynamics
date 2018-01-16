@@ -342,22 +342,6 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	jacobian1.m_angular[2] = r1CrossDir.m_z;
 	jacobian1.m_angular[3] = dgFloat32 (0.0f);
 
-/*
-dgVector v0(m_body0->GetVelocity());
-dgVector v1(m_body1->GetVelocity());
-
-dgVector w0(m_body0->GetOmega());
-dgVector w1(m_body1->GetOmega());
-
-dgVector xxxxx0(param.m_r0.CrossProduct3(w0.CrossProduct3(jacobian0.m_linear)) + (w0.CrossProduct3(param.m_r0).CrossProduct3(jacobian0.m_linear)));
-dgVector xxxxx1(param.m_r1.CrossProduct3(w1.CrossProduct3(jacobian1.m_linear)) + (w1.CrossProduct3(param.m_r1).CrossProduct3(jacobian1.m_linear)));
-
-dgVector xxx0 (v0.DotProduct4(w0.CrossProduct3(jacobian0.m_linear)) + v1.DotProduct4(w1.CrossProduct3(jacobian1.m_linear)));
-dgVector xxx1 (w0.DotProduct4(w0.CrossProduct3(jacobian0.m_angular)) + w1.DotProduct4(w1.CrossProduct3(jacobian1.m_angular)));
-dgVector xxx2 (w0.DotProduct4(xxxxx0) + w1.DotProduct4(xxxxx1));
-dgTrace(("%f %f %f\n", xxx0.GetScalar(), xxx1.GetScalar(), xxx2.GetScalar()));
-*/
-
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
@@ -366,11 +350,22 @@ dgTrace(("%f %f %f\n", xxx0.GetScalar(), xxx1.GetScalar(), xxx2.GetScalar()));
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
 
 		dgVector positError (param.m_posit1 - param.m_posit0);
-		dgVector centrError (param.m_centripetal1 - param.m_centripetal0);
+		dgFloat32 relPosit = positError.DotProduct4(dir).GetScalar();
 
-		dgFloat32 relPosit = positError.DotProduct3(dir);
-		dgFloat32 relCentr = centrError.DotProduct3(dir); 
-		relCentr = dgClamp (relCentr, dgFloat32(-100000.0f), dgFloat32(100000.0f));
+		//dgVector centrError (param.m_centripetal1 - param.m_centripetal0);
+		//dgFloat32 relCentr = centrError.DotProduct3(dir); 
+		//relCentr = dgClamp (relCentr, dgFloat32(-100000.0f), dgFloat32(100000.0f));
+		//dgTrace(("%f %f\n", relCentr, -xxxx.AddHorizontal().GetScalar()));
+
+		const dgVector& bodyVeloc0 = m_body0->m_veloc;
+		const dgVector& bodyOmega0 = m_body0->m_omega;
+		const dgVector& bodyVeloc1 = m_body1->m_veloc;
+		const dgVector& bodyOmega1 = m_body1->m_omega;
+		dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(jacobian0.m_linear) + bodyVeloc1 * bodyOmega1.CrossProduct3(jacobian1.m_linear) +
+					   bodyOmega0 * bodyOmega0.CrossProduct3(jacobian0.m_angular) + bodyOmega1 * bodyOmega1.CrossProduct3(jacobian1.m_angular));
+		dgFloat32 relCentr = accel.AddHorizontal().GetScalar();
+		//dgVector xxxx(v0 * w0.CrossProduct3(jacobian0.m_linear) + v1 * w1.CrossProduct3(jacobian1.m_linear) +
+		//	w0 * w0.CrossProduct3(jacobian0.m_angular) + w1 * w1.CrossProduct3(jacobian1.m_angular));
 
 		desc.m_zeroRowAcceleration[index] = (relPosit * desc.m_invTimestep + relVeloc) * desc.m_invTimestep;
 
@@ -435,18 +430,20 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
    				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
 			} else {
 				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
-				dgVector relVeloc (Jt.m_jacobianM0.m_linear.CompProduct3(bodyVeloc0) + Jt.m_jacobianM0.m_angular.CompProduct3(bodyOmega0) +
-								   Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1) + Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
 
-				dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+				//dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
 
-				//dgFloat32 aRel = jacobianMatrixElements[k].m_deltaAccel;
-				//dgFloat32 aRel = jacobianMatrixElements[k].m_coordenateAccel;
-				dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
+				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_linear)  + bodyVeloc1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_linear) +
+							   bodyOmega0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_angular) + bodyOmega1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_angular));
+				//dgTrace(("%f %f\n", aRel, -xxx.AddHorizontal().GetScalar()));
+				dgFloat32 aRel = -accel.AddHorizontal().GetScalar(); 
+
+				dgVector relVeloc (Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
+								   Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
+				dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 
 				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 				//alphaError = num / den;
-
 				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 				//dgFloat32 dt = desc.m_timestep;
 				//dgFloat32 ks = DG_POS_DAMP;
