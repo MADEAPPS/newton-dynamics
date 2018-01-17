@@ -17,8 +17,8 @@
 #ifndef _D_CUSTOM_BALLANDSOCKET_H_
 #define _D_CUSTOM_BALLANDSOCKET_H_
 
-#include "dCustomJoint.h"
-
+#include "dCustom6dof.h"
+//#include "dCustomJoint.h"
 
 class dCustomPointToPoint: public dCustomJoint  
 {
@@ -36,21 +36,12 @@ class dCustomPointToPoint: public dCustomJoint
 };
 
 
-class dCustomBallAndSocket: public dCustomJoint  
+class dCustomBallAndSocket: public dCustom6dof
 {
 	public:
 	CUSTOM_JOINTS_API dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~dCustomBallAndSocket();
-
-	protected:
-	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-
-	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
+	CUSTOM_JOINTS_API dCustomBallAndSocket(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
+	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustom6dof)
 };
 
 
@@ -60,7 +51,7 @@ class dCustomLimitBallAndSocket: public dCustomBallAndSocket
 {
 	public:
 	CUSTOM_JOINTS_API dCustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
+	CUSTOM_JOINTS_API dCustomLimitBallAndSocket(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomLimitBallAndSocket();
 
 	CUSTOM_JOINTS_API void SetConeAngle (dFloat angle);
@@ -72,8 +63,8 @@ class dCustomLimitBallAndSocket: public dCustomBallAndSocket
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	//CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
 	dMatrix m_rotationOffset;
 	dFloat m_coneAngle;

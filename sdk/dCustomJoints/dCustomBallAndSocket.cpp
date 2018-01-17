@@ -132,56 +132,20 @@ void dCustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 }
 
 
-
 dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
+	:dCustom6dof(pinAndPivotFrame, child, parent)
 {
-	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	m_yawAxis = 0;
+	m_rollAxis = 0;
+	m_pitchAxis = 0;
 }
 
-dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
+dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+	:dCustom6dof(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 {
-	dMatrix	dummy;
-	CalculateLocalMatrix (pinAndPivotFrame0, m_localMatrix0, dummy);
-	CalculateLocalMatrix (pinAndPivotFrame1, dummy, m_localMatrix1);
-}
-
-
-dCustomBallAndSocket::~dCustomBallAndSocket()
-{
-}
-
-void dCustomBallAndSocket::Deserialize (NewtonDeserializeCallback callback, void* const userData)
-{
-}
-
-void dCustomBallAndSocket::Serialize (NewtonSerializeCallback callback, void* const userData) const
-{
-	dCustomJoint::Serialize (callback, userData);
-}
-
-
-void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
-{
-	dCustomJoint::Debug(debugDisplay);
-}
-
-void dCustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (matrix0, matrix1);
-
-	// Restrict the movement on the pivot point along all three orthonormal directions
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_front[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_up[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_right[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	m_yawAxis = 0;
+	m_rollAxis = 0;
+	m_pitchAxis = 0;
 }
 
 dCustomBallAndSocketWithFriction::dCustomBallAndSocketWithFriction(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction)
@@ -244,14 +208,13 @@ dCustomLimitBallAndSocket::dCustomLimitBallAndSocket(const dMatrix& pinAndPivotF
 }
 
 
-dCustomLimitBallAndSocket::dCustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
-	:dCustomBallAndSocket(childPinAndPivotFrame, child, parent)
-	,m_rotationOffset(childPinAndPivotFrame * parentPinAndPivotFrame.Inverse())
+dCustomLimitBallAndSocket::dCustomLimitBallAndSocket(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomBallAndSocket(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
+//	,m_rotationOffset(childPinAndPivotFrame * parentPinAndPivotFrame.Inverse())
+	,m_rotationOffset(dGetIdentityMatrix())
 {
 	SetConeAngle (0.0f);
 	SetTwistAngle (0.0f, 0.0f);
-	dMatrix matrix;
-	CalculateLocalMatrix (parentPinAndPivotFrame, matrix, m_localMatrix1);
 }
 
 
@@ -312,11 +275,9 @@ void dCustomLimitBallAndSocket::GetTwistAngle (dFloat& minAngle, dFloat& maxAngl
 }
 
 
-
+/*
 void dCustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
-dAssert (0);
-/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -382,8 +343,15 @@ dAssert (0);
 			}
 		}
 	}
-*/
 }
+*/
+
+void dCustomLimitBallAndSocket::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex)
+{
+	dAssert (freeDof == 3);
+}
+
+
 
 dCustomControlledBallAndSocket::dCustomControlledBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
