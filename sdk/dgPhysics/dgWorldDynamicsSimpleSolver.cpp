@@ -417,7 +417,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 
 		dgAssert(tmpAccel.m_w == dgFloat32(0.0f));
 		dgFloat32 extenalAcceleration = -(tmpAccel.AddHorizontal()).GetScalar();
-		row->m_deltaAccel____ = extenalAcceleration * forceImpulseScale;
+		row->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 		row->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dgAssert(row->m_jointFeebackForce);
 		const dgFloat32 force = row->m_jointFeebackForce->m_force * forceImpulseScale; 

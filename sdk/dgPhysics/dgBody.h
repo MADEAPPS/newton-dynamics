@@ -598,6 +598,19 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 }
 
 
+DG_INLINE void dgBody::ApplyGyroTorque()
+{
+//	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
+//	dgVector localAngularMomentum(m_mass * localOmega);
+//	dgVector gyroTorque(m_matrix.RotateVector(localOmega.CrossProduct3(localAngularMomentum)));
+
+	//dgVector angularMomentum(CalculateInertiaMatrix().RotateVector(m_omega));
+	//dgFloat32 energy =  m_omega.DotProduct3(angularMomentum);
+	//dgTrace(("w(%f %f %f) L(%f %f %f, %f)\n", m_omega.m_x, m_omega.m_y, m_omega.m_z, angularMomentum.m_x, angularMomentum.m_y, angularMomentum.m_z, energy));
+	//	SetTorque(GetTorque() - gyroTorque);
+}
+
+
 DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
 {
 	return NULL;

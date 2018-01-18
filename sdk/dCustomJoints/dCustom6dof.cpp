@@ -82,6 +82,39 @@ void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userD
 	callback(userData, &m_mask, sizeof(m_mask));
 }
 
+void dCustom6dof::DisableAxisX()
+{
+	m_xAxis = 0;
+}
+
+void dCustom6dof::DisableAxisY()
+{
+	m_yAxis = 0;
+}
+
+void dCustom6dof::DisableAxisZ()
+{
+	m_zAxis = 0;
+}
+
+void dCustom6dof::DisableRotationX()
+{
+	m_yawAxis = 0;
+}
+
+void dCustom6dof::DisableRotationY()
+{
+	m_rollAxis = 0;
+}
+
+void dCustom6dof::DisableRotationZ()
+{
+	m_pitchAxis = 0;
+}
+
+
+
+
 dFloat dCustom6dof::GetDebugScale() const
 {
 	return m_debugScale;
@@ -160,9 +193,9 @@ void dCustom6dof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& ma
 
 	// deal with gimbals lock
 	if (euler0.m_z > 89.5f * 3.141592f / 180.0f) {
-		dAssert(0);
+//		dAssert(0);
 	} else if (euler0.m_z < -89.5f * 3.141592f / 180.0f) {
-		dAssert(0);
+//		dAssert(0);
 	}
 
 	// deal with roll angle flip

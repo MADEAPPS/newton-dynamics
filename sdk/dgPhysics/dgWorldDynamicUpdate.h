@@ -216,7 +216,7 @@ class dgJacobianMatrixElement
 	dgFloat32 m_upperBoundFrictionCoefficent;
 
 	dgFloat32 m_force0;
-	dgFloat32 m_deltaAccel____;
+	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
 	dgFloat32 m_penetration;
 
