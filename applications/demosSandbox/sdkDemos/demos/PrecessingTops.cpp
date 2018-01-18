@@ -157,6 +157,25 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 	fixPoint->DisableRotationZ();
 }
 
+static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
+{
+	NewtonBody* const top = CreateFryWheel(scene, posit, 100.0f, 0.6f, 0.3f);
+
+	dMatrix matrix;
+	dVector omega;
+
+	dMatrix rotation(dRollMatrix(75.0f * 3.141592f / 180.0f));
+	
+	NewtonBodyGetOmega(top, &omega[0]);
+	NewtonBodyGetMatrix(top, &matrix[0][0]);
+
+	omega = rotation.RotateVector(omega);
+	matrix = rotation * matrix;
+
+	NewtonBodySetMatrix(top, &matrix[0][0]);
+	NewtonBodySetOmega(top, &omega[0]);
+}
+
 
 void GyroscopyPrecession(DemoEntityManager* const scene)
 {
@@ -174,10 +193,13 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	// should just flops
 	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f);
 
+	// place a toy top
+	PrecessingTop(scene, dVector(-2.0f, 5.0f, 2.0f, 1.0f));
+
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 3.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
