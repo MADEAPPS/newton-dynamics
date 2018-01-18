@@ -600,11 +600,9 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 
 DG_INLINE void dgBody::ApplyGyroTorque()
 {
-	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
-	dgVector localAngularMomentum(m_mass * localOmega);
-//	dgTrace(("w=(%f %f %f) L=(%f %f %f) E= %f\n", localOmega.m_x, localOmega.m_y, localOmega.m_z, localAngularMomentum.m_x, localAngularMomentum.m_y, localAngularMomentum.m_z, localOmega.DotProduct3(localAngularMomentum)));
-	dgTrace(("w=(%f %f %f) L=(%f %f %f) E= %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z, localAngularMomentum.m_x, localAngularMomentum.m_y, localAngularMomentum.m_z, localOmega.DotProduct3(localAngularMomentum)));
-	
+//	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
+//	dgVector localAngularMomentum(m_mass * localOmega);
+//	dgTrace(("w=(%f %f %f) L=(%f %f %f) E= %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z, localAngularMomentum.m_x, localAngularMomentum.m_y, localAngularMomentum.m_z, localOmega.DotProduct3(localAngularMomentum)));
 
 //	dgVector gyroTorque(m_matrix.RotateVector(localOmega.CrossProduct3(localAngularMomentum)));
 //	SetTorque(GetTorque() - gyroTorque);

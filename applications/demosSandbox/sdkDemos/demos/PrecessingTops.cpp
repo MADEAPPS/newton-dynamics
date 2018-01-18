@@ -18,6 +18,7 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 
+/*
 void PrecessingTops (DemoEntityManager* const scene)
 {
 	scene->CreateSkyBox();
@@ -92,9 +93,9 @@ const int count = 1;
 	dVector origin (-40.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
+*/
 
-
-static void CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed)
+static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed)
 {
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -135,34 +136,44 @@ static void CreateFryWheel (DemoEntityManager* const scene, const dVector& posit
 
 	matrix.m_posit.m_x -= lenght * 0.5f;
 
-	dCustom6dof* const fixPoint = new dCustom6dof(matrix, wheelBody, NULL);
-	//fixPoint->DisableAxisX();
-	//fixPoint->DisableAxisZ();
-	fixPoint->DisableRotationX();
-	fixPoint->DisableRotationY();
-	fixPoint->DisableRotationZ();
-
 	geometry->Release();
 	NewtonDestroyCollision(flyWheelShape);
 	NewtonDestroyCollision(wheel);
 	NewtonDestroyCollision(rod);
+
+	return wheelBody;
 }
 
-void PrecessingFlyWheel(DemoEntityManager* const scene)
+
+static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed)
+{
+	NewtonBody* const flyWheel = CreateFryWheel(scene, posit, speed);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = posit;
+
+	dCustom6dof* const fixPoint = new dCustom6dof(matrix, flyWheel, NULL);
+	fixPoint->DisableRotationX();
+	fixPoint->DisableRotationY();
+	fixPoint->DisableRotationZ();
+}
+
+
+void GyroscopyPrecession(DemoEntityManager* const scene)
 {
 	scene->CreateSkyBox();
 	dMatrix offsetMatrix(dGetIdentityMatrix());
 
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 
-	// should spins very slowlly
-	CreateFryWheel(scene, dVector (0.0f, 5.0f, 0.0f, 0.0f), 100.0f);
+	// should spins very slowly
+	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 0.0f, 1.0f), 100.0f);
 
 	// spin twice as fast
-	CreateFryWheel(scene, dVector (0.0f, 5.0f, -2.0f, 0.0f), 50.0f);
+	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, -2.0f, 1.0f), 50.0f);
 
-	// should judt flops
-	CreateFryWheel(scene, dVector (0.0f, 5.0f, 2.0f, 0.0f), 0.0f);
+	// should just flops
+	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 2.0f, 1.0f), 0.0f);
 
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
