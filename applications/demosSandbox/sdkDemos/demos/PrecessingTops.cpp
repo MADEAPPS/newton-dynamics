@@ -95,15 +95,14 @@ const int count = 1;
 }
 */
 
-static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed)
+static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
 {
 	NewtonWorld* const world = scene->GetNewton();
 
-	dFloat lenght = 0.25f;
 	dMatrix offset(dGetIdentityMatrix());
 	offset.m_posit.m_x = lenght * 0.5f;
 	NewtonCollision* const rod = NewtonCreateCapsule(world, 0.0625f * 0.5f, 0.0625f * 0.5f, lenght, 0, NULL);
-	NewtonCollision* const wheel = NewtonCreateCylinder(world, 0.75f, 0.75f, 0.125f, 0, &offset[0][0]);
+	NewtonCollision* const wheel = NewtonCreateCylinder(world, radius, radius, 0.125f, 0, &offset[0][0]);
 
 	NewtonCollision* const flyWheelShape = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(flyWheelShape);
@@ -145,9 +144,9 @@ static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector
 }
 
 
-static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed)
+static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
 {
-	NewtonBody* const flyWheel = CreateFryWheel(scene, posit, speed);
+	NewtonBody* const flyWheel = CreateFryWheel(scene, posit, speed, radius, lenght);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = posit;
@@ -167,13 +166,13 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 
 	// should spins very slowly
-	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 0.0f, 1.0f), 100.0f);
+	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f);
 
 	// spin twice as fast
-	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, -2.0f, 1.0f), 50.0f);
+	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f);
 
 	// should just flops
-	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 2.0f, 1.0f), 0.0f);
+	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f);
 
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
