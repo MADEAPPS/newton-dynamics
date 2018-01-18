@@ -78,6 +78,7 @@
 void Friction (DemoEntityManager* const scene);
 void Restitution (DemoEntityManager* const scene);
 void PrecessingTops (DemoEntityManager* const scene);
+void PrecessingFlyWheel(DemoEntityManager* const scene);
 void ClosestDistance (DemoEntityManager* const scene);
 void ConvexCast (DemoEntityManager* const scene);
 void PrimitiveCollision (DemoEntityManager* const scene);
@@ -123,7 +124,8 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
 	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
 	{"Coefficients of restitution", "demonstrate the effect of various coefficient of restitution", Restitution},
-	{"Precessing tops", "show natural precession", PrecessingTops},
+//	{"Precessing tops", "show natural precession", PrecessingTops},
+	{"Flywheel Gyro effect", "show natural precession", PrecessingFlyWheel},
 	{"Closest distance", "demonstrate closest distance to a convex shape", ClosestDistance},
 	{"Primitive Collision", "demonstrate separate collision of primitives", PrimitiveCollision},
 	{"Kinematic bodies", "demonstrate separate collision of primitives", KinematicPlacement},

@@ -18,65 +18,8 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 
-
-void PrecessingFlightWheel(DemoEntityManager* const scene)
-{
-	scene->CreateSkyBox();
-	dMatrix offsetMatrix(dGetIdentityMatrix());
-
-	CreateLevelMesh(scene, "flatPlane.ngd", 1);
-
-	NewtonWorld* const world = scene->GetNewton();
-
-	dFloat lenght = 0.5f;
-	dMatrix offset(dGetIdentityMatrix());
-	offset.m_posit.m_x = lenght * 0.5f;
-	NewtonCollision* const rod = NewtonCreateCapsule(world, 0.0625f * 0.5f, 0.0625f * 0.5f, lenght, 0, NULL);
-	NewtonCollision* const wheel = NewtonCreateCylinder(world, 0.75f, 0.75f, 0.125f, 0, &offset[0][0]);
-
-	NewtonCollision* const flightWheelShape = NewtonCreateCompoundCollision(world, 0);
-	NewtonCompoundCollisionBeginAddRemove(flightWheelShape);
-
-	NewtonCompoundCollisionAddSubCollision(flightWheelShape, rod);
-	NewtonCompoundCollisionAddSubCollision(flightWheelShape, wheel);
-	NewtonCompoundCollisionEndAddRemove(flightWheelShape);
-
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = 5.0f;
-
-	DemoMesh* const geometry = new DemoMesh("primitive", flightWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
-	NewtonBody* const wheelBody = CreateSimpleSolid(scene, geometry, 10.0f, matrix, flightWheelShape, 0);
-	NewtonBodySetMassProperties(wheelBody, 10.0f, flightWheelShape);
-
-	dVector damp(0.0f);
-	NewtonBodySetLinearDamping(wheelBody, 0.0f);
-	NewtonBodySetAngularDamping(wheelBody, &damp[0]);
-
-	dVector omega(100.0f, 0.0f, 0.0f);
-	NewtonBodySetOmega(wheelBody, &omega[0]);
-
-	matrix.m_posit.m_x -= lenght * 0.5f;
-	new dCustomBallAndSocket(matrix, wheelBody, NULL);
-	
-	// place camera into position
-	dMatrix camMatrix(dGetIdentityMatrix());
-	dQuaternion rot(camMatrix);
-	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
-
-	geometry->Release();
-	NewtonDestroyCollision(flightWheelShape);
-	NewtonDestroyCollision(wheel);
-	NewtonDestroyCollision(rod);
-}
-
-
-
-
 void PrecessingTops (DemoEntityManager* const scene)
 {
-//PrecessingFlightWheel(scene);
-//return;
 	scene->CreateSkyBox();
 
 	dMatrix offsetMatrix (dGetIdentityMatrix());
@@ -85,6 +28,11 @@ void PrecessingTops (DemoEntityManager* const scene)
 
 	dVector location (0.0f);
 	dVector size (3.0f, 2.0f, 0.0f, 0.0f);
+
+	NewtonWorld* const world = scene->GetNewton();
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
+	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
 	// create an array of cones 
 //	const int count = 10;
@@ -102,7 +50,6 @@ const int count = 1;
 
 	int topscount = 0;
 	NewtonBody* array[count * count];
-	NewtonWorld* const world = scene->GetNewton();
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		if (NewtonCollisionGetType (collision) == SERIALIZE_ID_CONE) {
@@ -110,8 +57,6 @@ const int count = 1;
 			topscount ++;
 		}
 	}
-
-omega = dVector(2.0f, 2.0f, 2.0f, 0.0f);
 
 	for (int i = 0; i < topscount ; i ++) {
 		dMatrix bodyMatrix;
@@ -125,17 +70,17 @@ omega = dVector(2.0f, 2.0f, 2.0f, 0.0f);
 		NewtonCollision* const shape = NewtonBodyGetCollision(body);
 		NewtonBodySetMassProperties (body, 5.0f, shape);
 
-dFloat m;
-dFloat x;
-dFloat y;
-dFloat z;
-NewtonBodyGetMass(body, &m, &x, &y, &z);
-y *= 1.2f;
-z *= 0.7f;
-NewtonBodySetMassMatrix(body, m, x, y, z);
+		dFloat m;
+		dFloat x;
+		dFloat y;
+		dFloat z;
+		NewtonBodyGetMass(body, &m, &x, &y, &z);
+		x = 1.0f;
+		z = 1.0f;
+		y = 3.0f;
+//		NewtonBodySetMassMatrix(body, m, x, y, z);
 
 		NewtonBodySetOmega (body, &omega[0]);
-
 		NewtonBodySetAutoSleep (body, 0);
 		NewtonBodySetLinearDamping(body, 0.0f);
 		NewtonBodySetAngularDamping (body, &damp[0]);
@@ -147,5 +92,65 @@ NewtonBodySetMassMatrix(body, m, x, y, z);
 	dVector origin (-40.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
+
+
+void PrecessingFlyWheel(DemoEntityManager* const scene)
+{
+	scene->CreateSkyBox();
+	dMatrix offsetMatrix(dGetIdentityMatrix());
+
+	CreateLevelMesh(scene, "flatPlane.ngd", 1);
+
+	NewtonWorld* const world = scene->GetNewton();
+
+	dFloat lenght = 0.5f;
+	dMatrix offset(dGetIdentityMatrix());
+	offset.m_posit.m_x = lenght * 0.5f;
+	NewtonCollision* const rod = NewtonCreateCapsule(world, 0.0625f * 0.5f, 0.0625f * 0.5f, lenght, 0, NULL);
+	NewtonCollision* const wheel = NewtonCreateCylinder(world, 0.75f, 0.75f, 0.125f, 0, &offset[0][0]);
+
+	NewtonCollision* const flyWheelShape = NewtonCreateCompoundCollision(world, 0);
+	NewtonCompoundCollisionBeginAddRemove(flyWheelShape);
+
+	NewtonCompoundCollisionAddSubCollision(flyWheelShape, rod);
+	NewtonCompoundCollisionAddSubCollision(flyWheelShape, wheel);
+	NewtonCompoundCollisionEndAddRemove(flyWheelShape);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_x = lenght * 0.5f;
+	matrix.m_posit.m_y = 5.0f;
+
+	DemoMesh* const geometry = new DemoMesh("primitive", flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	NewtonBody* const wheelBody = CreateSimpleSolid(scene, geometry, 10.0f, matrix, flyWheelShape, 0);
+	NewtonBodySetMassProperties(wheelBody, 10.0f, flyWheelShape);
+
+	dFloat m;
+	dFloat x;
+	dFloat y;
+	dFloat z;
+	NewtonBodyGetMass(wheelBody, &m, &x, &y, &z);
+
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(wheelBody, 0.0f);
+	NewtonBodySetAngularDamping(wheelBody, &damp[0]);
+
+	dVector omega(100.0f, 0.0f, 0.0f);
+	NewtonBodySetOmega(wheelBody, &omega[0]);
+
+	matrix.m_posit.m_x -= lenght * 0.5f;
+	new dCustomBallAndSocket(matrix, wheelBody, NULL);
+
+	// place camera into position
+	dMatrix camMatrix(dGetIdentityMatrix());
+	dQuaternion rot(camMatrix);
+	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	scene->SetCameraMatrix(rot, origin);
+
+	geometry->Release();
+	NewtonDestroyCollision(flyWheelShape);
+	NewtonDestroyCollision(wheel);
+	NewtonDestroyCollision(rod);
+}
+
 
 
