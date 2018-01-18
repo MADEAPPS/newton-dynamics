@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-//#define DEFAULT_SCENE	3			// Precessing tops
+#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -59,7 +59,7 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-#define DEFAULT_SCENE	28          // standard joints
+//#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// six axis manipulator
 //#define DEFAULT_SCENE	30			// hexapod Robot
 //#define DEFAULT_SCENE	31			// articulated joints

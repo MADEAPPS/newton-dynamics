@@ -627,6 +627,16 @@ dgMatrix dgBody::CalculateInvInertiaMatrix () const
 #endif
 }
 
+
+void dgBody::ApplyGyroTorque()
+{
+	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
+	dgVector angularMomentum(m_mass * localOmega);
+	dgVector gyroTorque(m_matrix.RotateVector (localOmega.CrossProduct3(angularMomentum)));
+//	SetTorque(GetTorque() - gyroTorque);
+}
+
+
 void dgBody::InvalidateCache ()
 {
 	m_sleeping = false;

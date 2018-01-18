@@ -111,6 +111,8 @@ const int count = 1;
 		}
 	}
 
+omega = dVector(2.0f, 2.0f, 2.0f, 0.0f);
+
 	for (int i = 0; i < topscount ; i ++) {
 		dMatrix bodyMatrix;
 		NewtonBody* const body = array[i];
@@ -122,6 +124,15 @@ const int count = 1;
 
 		NewtonCollision* const shape = NewtonBodyGetCollision(body);
 		NewtonBodySetMassProperties (body, 5.0f, shape);
+
+dFloat m;
+dFloat x;
+dFloat y;
+dFloat z;
+NewtonBodyGetMass(body, &m, &x, &y, &z);
+y *= 1.2f;
+z *= 0.7f;
+NewtonBodySetMassMatrix(body, m, x, y, z);
 
 		NewtonBodySetOmega (body, &omega[0]);
 
