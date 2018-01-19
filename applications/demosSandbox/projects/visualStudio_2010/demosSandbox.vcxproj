@@ -64,7 +64,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\GyroscopyPrecession" />
     <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp" />
