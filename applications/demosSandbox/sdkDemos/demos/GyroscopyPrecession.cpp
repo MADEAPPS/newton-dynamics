@@ -74,8 +74,20 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 	NewtonBody* const flyWheel = CreateFryWheel(scene, posit, speed, radius, lenght);
 
 	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = posit;
+	NewtonBodyGetMatrix(flyWheel, &matrix[0][0]);
 
+
+dVector omega(speed, 0.0f, 0.0f);
+dMatrix rotation(dRollMatrix(45.0f * 3.141592f / 180.0f));
+NewtonBodyGetOmega(flyWheel, &omega[0]);
+omega = rotation.RotateVector(omega);
+matrix = rotation * matrix;
+NewtonBodySetMatrix(flyWheel, &matrix[0][0]);
+NewtonBodySetOmega(flyWheel, &omega[0]);
+
+
+
+	matrix.m_posit -= matrix.m_front.Scale (lenght * 0.5f);
 	dCustom6dof* const fixPoint = new dCustom6dof(matrix, flyWheel, NULL);
 	fixPoint->DisableRotationX();
 	fixPoint->DisableRotationY();
@@ -113,10 +125,10 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
-/*
+
 	// should spins very slowly
 	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f);
-
+/*
 	// spin twice as fast
 	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f);
 
