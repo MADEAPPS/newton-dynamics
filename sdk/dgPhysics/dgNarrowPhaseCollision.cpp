@@ -1490,15 +1490,13 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 				}
 				case m_capsuleCollision:
 				{
-					/*
 					dgMatrix diff(instance0.GetGlobalMatrix() * instance1.GetGlobalMatrix().Inverse());
-					if (dgAbs(diff[1][1]) > dgFloat32(0.9999f)) {
-					if (dgAbs(diff.m_posit.m_x) < dgFloat32(1.0e-3f)) {
-					diff.m_posit.m_x = dgFloat32(1.0e-3f);
-					instance0.SetGlobalMatrix(diff * instance1.GetGlobalMatrix());
+					if (dgAbs(diff[0][0]) > dgFloat32(0.9999f)) {
+						if (dgAbs(diff.m_posit.m_x) < dgFloat32(1.0e-3f)) {
+							diff.m_posit.m_y = dgFloat32(1.0e-3f);
+							instance0.SetGlobalMatrix(diff * instance1.GetGlobalMatrix());
+						}
 					}
-					}
-					*/
 					break;
 				}
 				case m_chamferCylinderCollision:
