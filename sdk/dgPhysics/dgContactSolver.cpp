@@ -488,9 +488,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		}
 
 		if (i >= nCount) {
-			//dgAssert(0);
-			//this is a very rare case where there is no what to get a point close to the hull
-			//since all point are a equal distance.
+			dgAssert(0);
 			return -1;
 		}
 
