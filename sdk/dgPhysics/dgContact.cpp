@@ -319,7 +319,8 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 		if (rowMatrix[k].m_restitution >= dgFloat32 (0.0f)) {
 			dgJacobianMatrixElement* const row = &rowMatrix[k];
 
-			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 + row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 + row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
+			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 + row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + 
+							   row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 + row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
 			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 			dgFloat32 aRel = row->m_deltaAccel;
 
@@ -345,7 +346,12 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 
 				vRel = vRel * restitution + penetrationVeloc;
 				vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
+			} else {
+				//dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(row->m_Jt.m_jacobianM0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(row->m_Jt.m_jacobianM0.m_angular) +
+				//			   bodyVeloc1 * bodyOmega1.CrossProduct3(row->m_Jt.m_jacobianM1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(row->m_Jt.m_jacobianM1.m_angular));
+				//aRel -= accel.AddHorizontal().GetScalar();
 			}
+
 			row->m_coordenateAccel = aRel - vRel * invTimestep;
 		}
 	}

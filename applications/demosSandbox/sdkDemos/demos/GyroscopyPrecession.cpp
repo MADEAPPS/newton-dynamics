@@ -83,7 +83,7 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 
 static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 {
-	NewtonBody* const top = CreateFryWheel(scene, posit, 100.0f, 0.6f, 0.3f);
+	NewtonBody* const top = CreateFryWheel(scene, posit, 100.0f, 0.5f, 0.3f);
 
 	dMatrix matrix;
 	dVector omega;
@@ -123,12 +123,17 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f);
 
 	// place a toy top
-	PrecessingTop(scene, dVector(-2.0f, 3.0f, 2.0f, 1.0f));
+	const int topsCount = 4;
+	for (int i = 0; i < topsCount; i ++) {
+		for (int j = 0; j < topsCount; j ++) {
+			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
+		}
+	}
 
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);
-	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
+	dVector origin(-15.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 

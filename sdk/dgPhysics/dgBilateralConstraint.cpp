@@ -434,7 +434,7 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				//dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
 				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_angular) +
 							   bodyVeloc1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_angular));
-				dgFloat32 aRel = jacobianMatrixElements[k].m_deltaAccel -accel.AddHorizontal().GetScalar(); 
+				dgFloat32 aRel = jacobianMatrixElements[k].m_deltaAccel - accel.AddHorizontal().GetScalar(); 
 
 				dgVector relVeloc (Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
 								   Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
