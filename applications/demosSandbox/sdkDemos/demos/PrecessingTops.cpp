@@ -18,82 +18,6 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 
-/*
-void PrecessingTops (DemoEntityManager* const scene)
-{
-	scene->CreateSkyBox();
-
-	dMatrix offsetMatrix (dGetIdentityMatrix());
-
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-
-	dVector location (0.0f);
-	dVector size (3.0f, 2.0f, 0.0f, 0.0f);
-
-	NewtonWorld* const world = scene->GetNewton();
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
-	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
-	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
-
-	// create an array of cones 
-//	const int count = 10;
-const int count = 1;
-
-	// all shapes use the x axis as the  axis of symmetry, to make an upright cone we apply a 90 degree rotation local matrix
-	dMatrix shapeOffsetMatrix (dRollMatrix(-3.141592f/2.0f));
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
-
-	// till the cont 30 degrees, and apply a local high angular velocity
-	dMatrix matrix (dRollMatrix (-25.0f * 3.141592f / 180.0f));
-	dVector omega (10.0f, 50.0f, 0.0f);
-	omega = matrix.RotateVector (omega);
-	dVector damp (0.0f);
-
-	int topscount = 0;
-	NewtonBody* array[count * count];
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		if (NewtonCollisionGetType (collision) == SERIALIZE_ID_CONE) {
-			array[topscount] = body;
-			topscount ++;
-		}
-	}
-
-	for (int i = 0; i < topscount ; i ++) {
-		dMatrix bodyMatrix;
-		NewtonBody* const body = array[i];
-		NewtonBodyGetMatrix(body, &bodyMatrix[0][0]);
-		matrix.m_posit = bodyMatrix.m_posit;
-		matrix.m_posit.m_y += 1.0f; 
-		NewtonBodySetMatrix(body, &matrix[0][0]);
-		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-
-		NewtonCollision* const shape = NewtonBodyGetCollision(body);
-		NewtonBodySetMassProperties (body, 5.0f, shape);
-
-		dFloat m;
-		dFloat x;
-		dFloat y;
-		dFloat z;
-		NewtonBodyGetMass(body, &m, &x, &y, &z);
-		x = 1.0f;
-		z = 1.0f;
-		y = 3.0f;
-//		NewtonBodySetMassMatrix(body, m, x, y, z);
-
-		NewtonBodySetOmega (body, &omega[0]);
-		NewtonBodySetAutoSleep (body, 0);
-		NewtonBodySetLinearDamping(body, 0.0f);
-		NewtonBodySetAngularDamping (body, &damp[0]);
-	}
-
-	// place camera into position
-	dMatrix camMatrix (dGetIdentityMatrix());
-	dQuaternion rot (camMatrix);
-	dVector origin (-40.0f, 5.0f, 0.0f, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
-}
-*/
 
 static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
 {
@@ -183,6 +107,11 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	dMatrix offsetMatrix(dGetIdentityMatrix());
 
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
+
+	NewtonWorld* const world = scene->GetNewton();
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
+	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
 	// should spins very slowly
 	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f);
