@@ -25,7 +25,8 @@ static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector
 
 	dMatrix offset(dGetIdentityMatrix());
 	offset.m_posit.m_x = lenght * 0.5f;
-	NewtonCollision* const rod = NewtonCreateCapsule(world, 0.0625f * 0.5f, 0.0625f * 0.5f, lenght, 0, NULL);
+	dFloat smallRadius = 0.0625f;
+	NewtonCollision* const rod = NewtonCreateCapsule(world, smallRadius * 0.5f, smallRadius * 0.5f, lenght, 0, NULL);
 	NewtonCollision* const wheel = NewtonCreateCylinder(world, radius, radius, 0.125f, 0, &offset[0][0]);
 
 	NewtonCollision* const flyWheelShape = NewtonCreateCompoundCollision(world, 0);
@@ -112,7 +113,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
-
+/*
 	// should spins very slowly
 	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f);
 
@@ -121,11 +122,12 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 
 	// should just flops
 	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f);
-
+*/
 	// place a toy top
-	const int topsCount = 4;
+	const int topsCount = 1;
 	for (int i = 0; i < topsCount; i ++) {
 		for (int j = 0; j < topsCount; j ++) {
+			// should translate for a moment then spins in place (so far is wrong)
 			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
 		}
 	}
