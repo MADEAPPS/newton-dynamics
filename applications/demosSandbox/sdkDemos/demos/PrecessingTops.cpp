@@ -114,21 +114,21 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
 	// should spins very slowly
-	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f);
+	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f);
 
 	// spin twice as fast
-	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f);
+	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f);
 
 	// should just flops
-	CreateBicycleWheel(scene, dVector (0.0f, 5.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f);
+	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f);
 
 	// place a toy top
-	PrecessingTop(scene, dVector(-2.0f, 5.0f, 2.0f, 1.0f));
+	PrecessingTop(scene, dVector(-2.0f, 3.0f, 2.0f, 1.0f));
 
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);
-	dVector origin(-10.0f, 3.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
