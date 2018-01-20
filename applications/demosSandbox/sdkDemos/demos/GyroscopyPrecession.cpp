@@ -78,7 +78,7 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 
 
 dVector omega(speed, 0.0f, 0.0f);
-dMatrix rotation(dRollMatrix(45.0f * 3.141592f / 180.0f));
+dMatrix rotation(dRollMatrix(75.0f * 3.141592f / 180.0f));
 NewtonBodyGetOmega(flyWheel, &omega[0]);
 omega = rotation.RotateVector(omega);
 matrix = rotation * matrix;
