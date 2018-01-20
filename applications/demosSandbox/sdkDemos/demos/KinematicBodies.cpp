@@ -497,39 +497,37 @@ static void DebugKinematic (DemoEntityManager* const scene)
 	}
 
    {
-	   dVector location(0.0f, 3.0f, 0.0f);
-	   dVector size(1.5f, 2.0f, 2.0f, 0.0f);
+		dVector location(0.0f, 3.0f, 0.0f);
+		dVector size(1.5f, 2.0f, 2.0f, 0.0f);
 
-	   NewtonWorld* const world = scene->GetNewton();
-	   int materialID = NewtonMaterialGetDefaultGroupID(world);
-	   NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-	   DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		NewtonWorld* const world = scene->GetNewton();
+		int materialID = NewtonMaterialGetDefaultGroupID(world);
+		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-	   dFloat mass = 1.0f;
-	   dMatrix matrix(dGetIdentityMatrix());
-	   matrix.m_posit = location;
-	   matrix.m_posit.m_w = 1.0f;
-	   //NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+		dFloat mass = 1.0f;
+		dMatrix matrix(dGetIdentityMatrix());
+		matrix.m_posit = location;
+		matrix.m_posit.m_w = 1.0f;
+	   
+		DemoMesh* const mesh = geometry;
+		DemoEntity* const entity = new DemoEntity(matrix, NULL);
+		scene->Append(entity);
+		entity->SetMesh(mesh, dGetIdentityMatrix());
+		NewtonBody* const rigidBody = NewtonCreateKinematicBody(world, collision, &matrix[0][0]);
+		//NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
-	   DemoMesh* const mesh = geometry;
-	   DemoEntity* const entity = new DemoEntity(matrix, NULL);
-	   scene->Append(entity);
-	   if (mesh) {
-		   entity->SetMesh(mesh, dGetIdentityMatrix());
-	   }
-	   //NewtonBody* body = CreateSimpleBody (scene->GetNewton(), entity, mass, matrix, collision, materialID);
+		NewtonBodySetCollidable (rigidBody, true);
 
-	   NewtonBody* const rigidBody = NewtonCreateKinematicBody(world, collision, &matrix[0][0]);
+		NewtonBodySetMassProperties(rigidBody, mass, collision);
+		NewtonBodySetUserData(rigidBody, entity);
+		NewtonBodySetMaterialGroupID(rigidBody, materialID);
+		NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
+		NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
+		NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
 
-	   NewtonBodySetMassProperties(rigidBody, mass, collision);
-	   NewtonBodySetUserData(rigidBody, entity);
-	   NewtonBodySetMaterialGroupID(rigidBody, materialID);
-	   NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
-	   NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
-	   NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
-
-	   geometry->Release();
-	   NewtonDestroyCollision(collision);
+		geometry->Release();
+		NewtonDestroyCollision(collision);
    }
 }
 
