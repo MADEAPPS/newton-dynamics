@@ -142,24 +142,5 @@ void Restitution (DemoEntityManager* const scene)
 	origin = dVector (-25.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-/*
-	{
-		dMatrix offsetMatrix(dGetIdentityMatrix());
-		offsetMatrix.m_front = dVector(0.0f, 1.0f, 0.0f, 0.0f);
-		offsetMatrix.m_up = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-		offsetMatrix.m_right = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-		offsetMatrix.m_posit = dVector(0.0f, 0.1f, 0.0f, 1.0f);
-		dVector cylSize(0.8f, 0.2f, 0.0f, 0.0f);
-
-		NewtonCollision* const chamferCylinderCollision = CreateConvexCollision(world, offsetMatrix, cylSize, _CHAMFER_CYLINDER_PRIMITIVE, 0);
-		NewtonCollision* const chamferCylinderCollision2 = CreateConvexCollision(world, offsetMatrix, cylSize, _CHAMFER_CYLINDER_PRIMITIVE, 0);
-
-		dMatrix mtxC(0.0f, 3.141592f * -0.5f, 0.0f, dVector(9.40291786f, 2.99999571f, -4.01828432f));
-		dMatrix mtxD(0.0f, 3.141592f * -0.5f, 0.0f, dVector(9.25f, 3.00000072, -4.375f));
-		//dMatrix mtxD(0.0f, 0.0f, 0.0f, dVector(9.25f, 3.00000072, -4.375f));
-		int result = NewtonCollisionIntersectionTest(world, chamferCylinderCollision, &mtxC[0][0], chamferCylinderCollision2, &mtxD[0][0], 0);
-		result = NewtonCollisionIntersectionTest(world, chamferCylinderCollision, &mtxC[0][0], chamferCylinderCollision2, &mtxD[0][0], 0);
-	}
-*/
 }
 

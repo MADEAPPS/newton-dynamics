@@ -69,7 +69,7 @@ static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector
 }
 
 
-static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
+static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght, dFloat tiltAnsgle)
 {
 	NewtonBody* const flyWheel = CreateFryWheel(scene, posit, speed, radius, lenght);
 
@@ -77,13 +77,13 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 	NewtonBodyGetMatrix(flyWheel, &matrix[0][0]);
 
 
-dVector omega(speed, 0.0f, 0.0f);
-dMatrix rotation(dRollMatrix(75.0f * 3.141592f / 180.0f));
-NewtonBodyGetOmega(flyWheel, &omega[0]);
-omega = rotation.RotateVector(omega);
-matrix = rotation * matrix;
-NewtonBodySetMatrix(flyWheel, &matrix[0][0]);
-NewtonBodySetOmega(flyWheel, &omega[0]);
+	dVector omega(speed, 0.0f, 0.0f);
+	dMatrix rotation(dRollMatrix(tiltAnsgle * 3.141592f / 180.0f));
+	NewtonBodyGetOmega(flyWheel, &omega[0]);
+	omega = rotation.RotateVector(omega);
+	matrix = rotation * matrix;
+	NewtonBodySetMatrix(flyWheel, &matrix[0][0]);
+	NewtonBodySetOmega(flyWheel, &omega[0]);
 
 
 
@@ -126,17 +126,20 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
-	// should spins very slowly
-	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f);
-/*
+	// should spins very slowly, with a tilt angle of 45 degrees
+	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -4.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
+
 	// spin twice as fast
-	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f);
+	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
+
+	// should spins very slowly
+	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f, 0.0f);
 
 	// should just flops
-	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f);
-*/
+	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f, 0.0f);
+
 	// place a toy top
-	const int topsCount = 1;
+	const int topsCount = 4;
 	for (int i = 0; i < topsCount; i ++) {
 		for (int j = 0; j < topsCount; j ++) {
 			// should translate for a moment then spins in place (so far is wrong)

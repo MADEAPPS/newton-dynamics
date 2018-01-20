@@ -49,8 +49,8 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 		//if ((activeJoint == 1) && (cluster->m_jointCount == 1)) {
 		if ((activeJoint == 1) && (cluster->m_jointCount == 1) && (constraintArray[0].m_joint->GetId() == dgConstraint::m_contactConstraint)) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
-			CalculateSingleClusterReactionForces(cluster, threadID, timestep);
 			//CalculateClusterReactionForces(cluster, threadID, timestep);
+			CalculateSingleClusterReactionForces(cluster, threadID, timestep);
 		} else if (activeJoint >= 1) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			CalculateClusterReactionForces(cluster, threadID, timestep);
