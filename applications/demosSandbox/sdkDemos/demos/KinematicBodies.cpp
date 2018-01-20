@@ -474,42 +474,9 @@ static NewtonBody* AddStaticMesh(DemoEntityManager* const scene)
 }
 
 
-void KinematicPlacement (DemoEntityManager* const scene)
+static void DebugKinematic (DemoEntityManager* const scene)
 {
-	// load the skybox
-	scene->CreateSkyBox();
 
-/*
-	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-
-	AddStaticMesh (scene);
-
-	// create a system for object placement
-	new dKinematicPlacementManager (scene);
-
-	// add some bodies 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	dVector location (0,0,0,0);
-	location.m_x += 0.0f;
-	location.m_z += 0.0f;
-	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
-
-
-	int count = 3;
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-*/
-
-#if 1
 	{
 		dVector location(0.0f, 6.0f, 0.0f);
 		dVector size(1.5f, 2.0f, 2.0f, 0.0f);
@@ -523,11 +490,12 @@ void KinematicPlacement (DemoEntityManager* const scene)
 		dMatrix matrix(dGetIdentityMatrix());
 		matrix.m_posit = location;
 		matrix.m_posit.m_w = 1.0f;
-		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
+		CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
 
 		geometry->Release();
 		NewtonDestroyCollision(collision);
 	}
+
    {
 	   dVector location(0.0f, 3.0f, 0.0f);
 	   dVector size(1.5f, 2.0f, 2.0f, 0.0f);
@@ -563,6 +531,43 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	   geometry->Release();
 	   NewtonDestroyCollision(collision);
    }
+}
+
+void KinematicPlacement (DemoEntityManager* const scene)
+{
+	// load the skybox
+	scene->CreateSkyBox();
+
+#if 1
+	DebugKinematic (scene);
+#else
+	// load the scene from a ngd file format
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+
+	AddStaticMesh (scene);
+
+	// create a system for object placement
+	new dKinematicPlacementManager (scene);
+
+	// add some bodies 
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	dVector location (0,0,0,0);
+	location.m_x += 0.0f;
+	location.m_z += 0.0f;
+	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+
+
+	int count = 3;
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 #endif
 
 	// place camera into position
