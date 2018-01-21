@@ -305,7 +305,6 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetMatrix(box2, &matrix[0][0]);
 	((DemoEntity*) NewtonBodyGetUserData(box2))->ResetMatrix (*scene, matrix);
 
-
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
@@ -317,10 +316,16 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	dCustomUniversal* const joint2 = new dCustomUniversal(matrix, box2, box0);
-	joint2->EnableLimit_0(true);
-	joint2->SetLimits_0 (-3.0f * 3.141592f, 5.0f * 3.141592f);
-	joint2->EnableLimit_1(true);
-	joint2->SetLimits_1(-4.0f * 3.141592f, 2.0f * 3.141592f);
+	joint2->EnableLimit_0(false);
+	joint2->EnableLimit_1(false);
+	joint2->SetLimits_0 (-3.141592f, 3.141592f);
+	joint2->SetLimits_1 (-3.141592f, 3.141592f);
+
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(box2, 0.0f);
+	NewtonBodySetAngularDamping(box2, &damp[0]);
+	dVector omega (0.0f, 20.0f, 100.0f, 0.0f);
+	NewtonBodySetOmega(box2, &omega[0]);
 }
 
 class JoesRagdollJoint: public dCustomBallAndSocket
@@ -1026,8 +1031,8 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
-	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 
@@ -1035,7 +1040,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
-//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
@@ -1047,7 +1052,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, -20.0f, 0.0f);
+dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 

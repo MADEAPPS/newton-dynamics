@@ -507,7 +507,7 @@ static void DebugKinematic (DemoEntityManager* const scene)
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
 		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-		dFloat mass = 1.0f;
+		dFloat mass = 100.0f;
 		dMatrix matrix(dGetIdentityMatrix());
 		matrix.m_posit = location;
 		matrix.m_posit.m_w = 1.0f;

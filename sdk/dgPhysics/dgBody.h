@@ -182,7 +182,6 @@ class dgBody
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
-
 	virtual void InvalidateCache();
 	
     virtual void SetMatrix(const dgMatrix& matrix);
@@ -226,6 +225,8 @@ class dgBody
 	void UpdateLumpedMatrix();
 	void CalcInvInertiaMatrix ();
 	void ApplyGyroTorque ();
+	dgVector CalculateLineraMomentum() const; 
+	dgVector CalculateAngularMomentum() const; 
 
 	dgMatrix m_invWorldInertiaMatrix;
 	dgMatrix m_matrix;
@@ -597,21 +598,23 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
 
+DG_INLINE dgVector dgBody::CalculateLineraMomentum() const
+{
+	return dgVector (m_veloc.Scale4 (m_mass.m_w));
+}
+
+DG_INLINE dgVector dgBody::CalculateAngularMomentum() const
+{
+	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
+	dgVector localAngularMomentum(m_mass * localOmega);
+	return m_matrix.RotateVector(localAngularMomentum);
+}
 
 DG_INLINE void dgBody::ApplyGyroTorque()
 {
-//	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
-//	dgVector localAngularMomentum(m_mass * localOmega);
-//	dgTrace(("w=(%f %f %f) L=(%f %f %f) E= %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z, localAngularMomentum.m_x, localAngularMomentum.m_y, localAngularMomentum.m_z, localOmega.DotProduct3(localAngularMomentum)));
-
-//	dgVector gyroTorque(m_matrix.RotateVector(localOmega.CrossProduct3(localAngularMomentum)));
+//	dgVector gyroTorque (m_omega.CrossProduct3(CalculateAngularMomentum()));
 //	SetTorque(GetTorque() - gyroTorque);
-
-//	dgVector angularMomentum(CalculateInertiaMatrix().RotateVector(m_omega));
-//	dgFloat32 energy =  m_omega.DotProduct3(angularMomentum);
-//	dgTrace(("w=(%f %f %f) L=(%f %f %f) E= %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z, angularMomentum.m_x, angularMomentum.m_y, angularMomentum.m_z, energy));
 }
-
 
 DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
 {
@@ -622,7 +625,6 @@ DG_INLINE dgInt32 dgBody::GetSerializedID() const
 {
 	return m_serializedEnum;
 }
-
 
 #endif 
 
