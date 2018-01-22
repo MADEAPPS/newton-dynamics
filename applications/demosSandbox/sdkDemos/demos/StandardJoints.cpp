@@ -206,25 +206,17 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
 	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket(pinMatrix, box0, base);
-	joint0->SetConeAngle (30.0f * 3.141592f / 180.0f);
-	joint0->SetTwistAngle (-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
+	joint0->SetConeAngle (130.0f * 3.141592f / 180.0f);
+	joint0->SetTwistAngle (-60.0f * 3.141592f / 180.0f, 60.0f * 3.141592f / 180.0f);
 
 	// connect first box1 to box0 the world
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
 	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket(pinMatrix, box1, box0);
-	joint1->SetConeAngle(30.0f * 3.141592f / 180.0f);
-	joint1->SetTwistAngle(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
-/*
-	// connect first box2 to box1 the world
-	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
+	joint1->SetConeAngle(130.0f * 3.141592f / 180.0f);
+	joint1->SetTwistAngle(-60.0f * 3.141592f / 180.0f, 60.0f * 3.141592f / 180.0f);
 
-	dCustomLimitBallAndSocket* const joint2 = new dCustomLimitBallAndSocket(pinMatrix, box2, box1);
-	joint2->SetConeAngle(30.0f * 3.141592f / 180.0f);
-	joint2->SetTwistAngle(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
-*/
 }
 
 static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const dVector& origin)
@@ -241,13 +233,17 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	new dCustomBallAndSocketWithFriction (pinMatrix, box0, base, 20.0f);
+	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket (pinMatrix, box0, base);
+	joint0->SetFriction(20.0f);
+	joint0->SetConeAngle (80.0f * 3.141592f / 180.0f);
 
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, & matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	new dCustomBallAndSocketWithFriction (pinMatrix, box1, box0, 10.0f);
+	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket (pinMatrix, box1, box0);
+	joint1->SetFriction(10.0f);
+	joint1->SetConeAngle (80.0f * 3.141592f / 180.0f);
 }
 
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
@@ -1030,17 +1026,17 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
-//	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-//	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
-//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
-//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-//	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
+	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
+	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
-	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
@@ -1052,7 +1048,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
+dVector origin (-30.0f, 5.0f, -10.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 

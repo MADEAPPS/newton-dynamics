@@ -54,37 +54,24 @@ class dCustomLimitBallAndSocket: public dCustomBallAndSocket
 	CUSTOM_JOINTS_API dCustomLimitBallAndSocket(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomLimitBallAndSocket();
 
+	CUSTOM_JOINTS_API void SetFriction (dFloat angle);
 	CUSTOM_JOINTS_API void SetConeAngle (dFloat angle);
 	CUSTOM_JOINTS_API void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
 
+	CUSTOM_JOINTS_API dFloat GetFriction () const;
 	CUSTOM_JOINTS_API dFloat GetConeAngle () const;
 	CUSTOM_JOINTS_API void GetTwistAngle (dFloat& minAngle, dFloat& maxAngle) const;
 
 	protected:
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-	//CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
-	dMatrix m_rotationOffset;
+	dFloat m_friction;
 	dFloat m_coneAngle;
-	dFloat m_minTwistAngle;
-	dFloat m_maxTwistAngle;
 	dFloat m_coneAngleCos;
-	dFloat m_coneAngleSin;
-	dFloat m_coneAngleHalfCos;
-	dFloat m_coneAngleHalfSin;	
 	DECLARE_CUSTOM_JOINT(dCustomLimitBallAndSocket, dCustomBallAndSocket)
-};
-
-
-class dCustomBallAndSocketWithFriction: public dCustomBallAndSocket
-{
-	public:
-	CUSTOM_JOINTS_API dCustomBallAndSocketWithFriction(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction);
-	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-
-	dFloat m_dryFriction;
 };
 
 
