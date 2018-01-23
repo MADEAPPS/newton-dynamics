@@ -99,19 +99,18 @@ void dCustom6dof::DisableAxisZ()
 
 void dCustom6dof::DisableRotationX()
 {
-	m_yawAxis = 0;
+	m_pitchAxis = 0;
 }
 
 void dCustom6dof::DisableRotationY()
 {
-	m_rollAxis = 0;
+	m_yawAxis = 0;
 }
 
 void dCustom6dof::DisableRotationZ()
 {
-	m_pitchAxis = 0;
+	m_rollAxis = 0;
 }
-
 
 
 
@@ -352,7 +351,8 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 			}
 		}
 	}
-	
+
+#if 0
 	if (m_pitchAxis) {
 		dFloat pitchAngle = GetPitch();
 		if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {
@@ -414,5 +414,66 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	if (freedof != 6) {
 		SubmitConstraintsFreeDof(6 - freedof, matrix0, matrix1, timestep, threadIndex);
 	}
+#else
+
+	dFloat deltaYaw = GetYaw() - dClamp (GetYaw(), m_yaw.m_minAngle, m_yaw.m_maxAngle);
+	dFloat deltaRoll = GetRoll() - dClamp (GetRoll(), m_roll.m_minAngle, m_roll.m_maxAngle);
+	dFloat deltaPitch = GetPitch() - dClamp (GetPitch(), m_pitch.m_minAngle, m_pitch.m_maxAngle);
+	
+	dMatrix dL(dPitchMatrix(deltaPitch) * dRollMatrix(deltaRoll) * dYawMatrix(deltaRoll));
+//	dMatrix L(matrix0 * matrix1.Inverse());
+//  dMatrix matrix1_ = L * matrix1;
+//	matrix0 = dL * dL.Inverse() * L * matrix1;
+	dMatrix clipMatrix1 (dL.Inverse() * matrix0);
+
+	if (m_pitchAxis) {
+		if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaPitch, &matrix0.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		} else if (deltaPitch > 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaPitch, &matrix0.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (deltaPitch < 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaPitch, &matrix0.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		}
+	}
+
+	if (m_yawAxis) {
+		if ((m_yaw.m_minAngle == 0.0f) && (m_yaw.m_maxAngle == 0.0f)) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaYaw, &clipMatrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		} else if (deltaYaw > 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaYaw, &clipMatrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (deltaYaw < 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaYaw, &clipMatrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		}
+	}
+
+	if (m_rollAxis) {
+		clipMatrix1 = dYawMatrix(deltaYaw) * clipMatrix1;
+		if ((m_roll.m_minAngle == 0.0f) && (m_roll.m_maxAngle == 0.0f)) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaRoll, &clipMatrix1.m_right[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		} else if (deltaRoll > 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaRoll, &clipMatrix1.m_right[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (deltaRoll < 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, -deltaRoll, &clipMatrix1.m_right[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		}
+	}
+
+	dTrace (("%f %f %f\n", deltaPitch, deltaRoll, deltaYaw));
+
+#endif
 }
 
