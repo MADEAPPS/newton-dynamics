@@ -22,11 +22,6 @@ IMPLEMENT_CUSTOM_JOINT(dCustom6dof);
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-//#define MIN_JOINT_PIN_LENGTH					50.0f
-//#define D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION	0.5f
-//#define D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION	10.0f
-
 dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
 	,m_minLinearLimits(0.0f)
