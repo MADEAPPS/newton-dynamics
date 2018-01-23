@@ -403,12 +403,6 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-	int freedof = (m_mask & 0x55) + ((m_mask >> 1) & 0x55);
-	freedof = (freedof & 0x33) + ((freedof >> 2) & 0x33);
-	freedof = (freedof & 0x0f) + ((freedof >> 4) & 0xff);
-	if (freedof != 6) {
-		SubmitConstraintsFreeDof(6 - freedof, matrix0, matrix1, timestep, threadIndex);
-	}
 #else
 
 	dVector errorAngles(GetPitch() - dClamp(GetPitch(), m_pitch.m_minAngle, m_pitch.m_maxAngle),
@@ -442,5 +436,12 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	dTrace (("%f %f %f\n", errorAngles.m_x, errorAngles.m_y, errorAngles.m_z));
 
 #endif
+
+	int freedof = (m_mask & 0x55) + ((m_mask >> 1) & 0x55);
+	freedof = (freedof & 0x33) + ((freedof >> 2) & 0x33);
+	freedof = (freedof & 0x0f) + ((freedof >> 4) & 0xff);
+	if (freedof != 6) {
+		SubmitConstraintsFreeDof(6 - freedof, matrix0, matrix1, timestep, threadIndex);
+	}
 }
 
