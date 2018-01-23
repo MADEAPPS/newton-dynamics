@@ -417,9 +417,9 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 #else
 
 	dVector errorAngles(GetPitch() - dClamp(GetPitch(), m_pitch.m_minAngle, m_pitch.m_maxAngle),
-		GetYaw() - dClamp(GetYaw(), m_yaw.m_minAngle, m_yaw.m_maxAngle),
-		GetRoll() - dClamp(GetRoll(), m_roll.m_minAngle, m_roll.m_maxAngle),
-		0.0f);
+						GetYaw() - dClamp(GetYaw(), m_yaw.m_minAngle, m_yaw.m_maxAngle),
+						GetRoll() - dClamp(GetRoll(), m_roll.m_minAngle, m_roll.m_maxAngle),
+						0.0f);
 	dMatrix dL(dPitchMatrix(errorAngles.m_x) * dRollMatrix(errorAngles.m_z) * dYawMatrix(errorAngles.m_y));
 //	dMatrix L(matrix0 * matrix1.Inverse());
 //  dMatrix matrix1_ = L * matrix1;

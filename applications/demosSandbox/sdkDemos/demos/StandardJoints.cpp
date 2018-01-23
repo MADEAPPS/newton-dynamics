@@ -271,7 +271,6 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 joint0->SetPitchLimits(-0, 0);
 //joint0->DisableRotationX ();
 
-/*
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
@@ -281,8 +280,7 @@ joint0->SetPitchLimits(-0, 0);
 	joint1->SetPitchLimits(-rollLimit, rollLimit);
 	joint1->SetRollLimits(-angle, angle);
 joint1->SetPitchLimits(-0, 0);
-joint1->DisableRotationX ();
-*/
+//joint1->DisableRotationX ();
 }
 
 static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
