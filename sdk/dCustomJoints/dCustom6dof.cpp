@@ -433,7 +433,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-	dTrace (("%f %f %f\n", errorAngles.m_x, errorAngles.m_y, errorAngles.m_z));
+	dTrace (("%f %f %f\n", errorAngles.m_x * 180.0f / 3.141592f, errorAngles.m_y * 180.0f / 3.141592f, errorAngles.m_z * 180.0f / 3.141592f));
 
 #endif
 

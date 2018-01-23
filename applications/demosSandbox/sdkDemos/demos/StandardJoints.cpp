@@ -266,11 +266,11 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	dCustom6dof* const joint0 = new dCustom6dof (pinMatrix, box0, base);
 	joint0->SetYawLimits (-angle, angle);
-	joint0->SetRollLimits (-rollLimit, rollLimit);
 	joint0->SetPitchLimits(-angle, angle);
+	joint0->SetRollLimits(-rollLimit, rollLimit);
 joint0->SetPitchLimits(-0, 0);
 //joint0->DisableRotationX ();
-
+/*
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
@@ -281,6 +281,7 @@ joint0->SetPitchLimits(-0, 0);
 	joint1->SetRollLimits(-angle, angle);
 joint1->SetPitchLimits(-0, 0);
 //joint1->DisableRotationX ();
+*/
 }
 
 static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
