@@ -297,14 +297,14 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		dgFloat32 num = ks * jointAngle + kd * omegaError + ksd * omegaError;
 		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 		dgFloat32 alphaError = num / den;
-
+		dgFloat32 kinematicAlpha = (dgFloat32(0.5f) * jointAngle * desc.m_invTimestep + omegaError) * desc.m_invTimestep;
 		desc.m_zeroRowAcceleration[index] = (jointAngle * desc.m_invTimestep + omegaError) * desc.m_invTimestep;
 
 		desc.m_penetration[index] = jointAngle;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_jointStiffness[index] = stiffness;
 		desc.m_jointAccel[index] = alphaError + relCentr;
-		desc.m_penetrationStiffness[index] = alphaError + relCentr;
+		desc.m_penetrationStiffness[index] = alphaError + relCentr + kinematicAlpha;
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	} else {
 		desc.m_penetration[index] = dgFloat32 (0.0f);
@@ -425,6 +425,7 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 		const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.5f);
 		const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
 		const dgFloat32 dt = params->m_timeStep;
+		const dgFloat32 invDt = params->m_invTimeStep;
 		for (dgInt32 k = 0; k < params->m_rowsCount; k ++) {
 			if (m_rowIsMotor & (1 << k)) {
    				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
@@ -458,10 +459,11 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				dgFloat32 num = ks * relPosit - kd * vRel - ksd * vRel;
 				dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 				dgFloat32 aRelErr = num / den;
+				dgFloat32 kinematicAccel = (dgFloat32(0.3f) * relPosit * invDt - vRel) * invDt;
 
 				//centripetal acceleration is stored in restitution member
 				//jacobianMatrixElements[k].m_coordenateAccel = aRelErr + jacobianMatrixElements[k].m_restitution + aRel;
-				jacobianMatrixElements[k].m_coordenateAccel = aRelErr + aRel;
+				jacobianMatrixElements[k].m_coordenateAccel = aRelErr + aRel + kinematicAccel;
 			}
 		}
 	} else {
