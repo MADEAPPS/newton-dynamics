@@ -350,6 +350,9 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
+static int xxxxxxxxx;
+xxxxxxxxx++;
+
 #if 0
 	if (m_pitchAxis) {
 		dFloat pitchAngle = GetPitch();
@@ -438,7 +441,13 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-	dTrace (("%d (%f %f %f)\n", errorAngles.m_x * dRadToDegree, errorAngles.m_y * dRadToDegree, errorAngles.m_z * dRadToDegree));
+if (dAbs(errorAngles.m_x * dRadToDegree) > 10.0f)
+{
+dTrace(("xxx-> "));
+}
+
+
+	dTrace (("f:%d j:%d (%f %f %f)\n", xxxxxxxxx/2, xxxx, errorAngles.m_x * dRadToDegree, errorAngles.m_y * dRadToDegree, errorAngles.m_z * dRadToDegree));
 
 #endif
 
