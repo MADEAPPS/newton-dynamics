@@ -108,9 +108,9 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 
 		if ((ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0))) {
 			if (mouseSpeedX > 0) {
-				m_yaw = dMod(m_yaw + m_yawRate, 2.0f * 3.1416f);
+				m_yaw = dMod(m_yaw + m_yawRate, 2.0f * dPi);
 			} else if (mouseSpeedX < 0){
-				m_yaw = dMod(m_yaw - m_yawRate, 2.0f * 3.1416f);
+				m_yaw = dMod(m_yaw - m_yawRate, 2.0f * dPi);
 			}
 
 			if (mouseSpeedY > 0) {
@@ -118,7 +118,7 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 			} else if (mouseSpeedY < 0){
 				m_pitch -= m_pitchRate;
 			}
-			m_pitch = dClamp(m_pitch, dFloat (-80.0f * 3.1416f / 180.0f), dFloat (80.0f * 3.1416f / 180.0f));
+			m_pitch = dClamp(m_pitch, dFloat (-80.0f * dDegreeToRad), dFloat (80.0f * dDegreeToRad));
 		}
 	}
 

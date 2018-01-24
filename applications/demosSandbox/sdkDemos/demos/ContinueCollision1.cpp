@@ -230,7 +230,7 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	pos.m_y = 50.0f;
 	pos.m_z = 0.0f;
 
-	dQuaternion rot(dVector(1.f,0.f,0.f),(dFloat)3.141592f/4.0f);
+	dQuaternion rot(dVector(1.f,0.f,0.f),(dFloat)dPi/4.0f);
 	scene->SetCameraMatrix(rot, pos);
 
 	CreateBackgroundWallsAndCellingBody(scene->GetNewton());

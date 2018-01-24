@@ -511,7 +511,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		int material = LoadTexture("smilli.tga");
 		NewtonMeshApplyBoxMapping (tetrahedra, material, material, material);
-		NewtonMeshCalculateVertexNormals (tetrahedra, 60.0f * 3.1416f / 180.0f);
+		NewtonMeshCalculateVertexNormals (tetrahedra, 60.0f * dDegreeToRad);
 
 		// make a deformable collision mesh
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetrahedra, materialID);
@@ -541,7 +541,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		int material = LoadTexture("smilli.tga");
 		NewtonMeshApplyBoxMapping(tetraCube, material, material, material);
-		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * 3.1416f / 180.0f);
+		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * dDegreeToRad);
 
 		// make a deformable collision mesh
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetraCube, materialID);
@@ -570,7 +570,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		int material = LoadTexture("smilli.tga");
 		NewtonMeshApplyBoxMapping(tetraCube, material, material, material);
-		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * 3.1416f / 180.0f);
+		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * dDegreeToRad);
 
 		// make a deformable collision mesh
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetraCube, materialID);

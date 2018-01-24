@@ -78,7 +78,7 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 
 
 	dVector omega(speed, 0.0f, 0.0f);
-	dMatrix rotation(dRollMatrix(tiltAnsgle * 3.141592f / 180.0f));
+	dMatrix rotation(dRollMatrix(tiltAnsgle * dDegreeToRad));
 	NewtonBodyGetOmega(flyWheel, &omega[0]);
 	omega = rotation.RotateVector(omega);
 	matrix = rotation * matrix;
@@ -101,7 +101,7 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 	dMatrix matrix;
 	dVector omega;
 
-	dMatrix rotation(dRollMatrix(75.0f * 3.141592f / 180.0f));
+	dMatrix rotation(dRollMatrix(75.0f * dDegreeToRad));
 	
 	NewtonBodyGetOmega(top, &omega[0]);
 	NewtonBodyGetMatrix(top, &matrix[0][0]);

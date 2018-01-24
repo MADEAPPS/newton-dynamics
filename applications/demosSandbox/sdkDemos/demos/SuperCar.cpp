@@ -375,7 +375,7 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = pivotOffset;
-		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f; 
+		tireInfo.m_maxSteeringAngle = maxSteerAngle * dDegreeToRad; 
 		tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
 		tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
 		tireInfo.m_suspensionLength = definition.m_tireSuspensionLength;
@@ -710,8 +710,8 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		glEnd();
 
 		// render needle
-		const dFloat minAngle = 180.0f * 3.141592f / 180.0f;
-		const dFloat maxAngle = -90.0f * 3.141592f / 180.0f;
+		const dFloat minAngle = 180.0f * dDegreeToRad;
+		const dFloat maxAngle = -90.0f * dDegreeToRad;
 		dFloat angle = minAngle + (maxAngle - minAngle) * param;
 		dMatrix needleMatrix (dRollMatrix (angle));
 
@@ -1122,7 +1122,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	scene->SetCameraMouseLock (true);
 
 	camMatrix.m_posit.m_x -= 5.0f;
-//camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
+//camMatrix = dYawMatrix (-0.5f * dPi) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 /*

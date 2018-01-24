@@ -54,9 +54,9 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
-				dFloat pitch = dGaussianRandom  (1.0f) * 2.0f * 3.1416f;
-				dFloat yaw = dGaussianRandom  (1.0f) * 2.0f * 3.1416f;
-				dFloat roll = dGaussianRandom  (1.0f) * 2.0f * 3.1416f;
+				dFloat pitch = dGaussianRandom  (1.0f) * 2.0f * dPi;
+				dFloat yaw = dGaussianRandom  (1.0f) * 2.0f * dPi;
+				dFloat roll = dGaussianRandom  (1.0f) * 2.0f * dPi;
 
 				dFloat x = size * (j - count / 2) + dGaussianRandom  (size * 0.5f);
 				dFloat y = dGaussianRandom  (size * 2.0f);
@@ -114,7 +114,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		m_castingGeometries = new DemoMesh*[m_count];
 		m_castingShapeArray = new NewtonCollision*[m_count];
 
-		dMatrix alignMatrix (dRollMatrix(3.141592f * 90.0f / 180.0f));
+		dMatrix alignMatrix (dRollMatrix(dPi * 90.0f / 180.0f));
 		for (int i = 0; i < m_count; i ++) {
 			shapeSize = dVector (size + dGaussianRandom  (size / 2.0f), size + dGaussianRandom  (size / 2.0f), size + dGaussianRandom  (size / 2.0f), 0.0f);
 #if 1

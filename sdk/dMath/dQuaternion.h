@@ -135,11 +135,11 @@ inline dVector dQuaternion::GetXYZ_EulerAngles() const
 	dFloat val = 2.0f * (m_q2 * m_q0 - m_q3 * m_q1);
 	if (val  >= 0.99995f) {
 		pitch = 2.0f * atan2(m_q1, m_q0);
-		yaw = (0.5f * 3.141592f);
+		yaw = (0.5f * dPi);
 		roll = 0.0f;
 	} else if (val  <= -0.99995f) {
 		pitch = 2.0f * atan2(m_q1, m_q0);
-		yaw = -(0.5f * 3.141592f);
+		yaw = -(0.5f * dPi);
 		roll = 0.0f;
 	} else {
 		yaw = dAsin (val);

@@ -37,7 +37,7 @@ static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVect
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y / 2.0f;
 
 	// create a 90 degree rotation matrix
-	dMatrix rotMatrix (dYawMatrix (3.141592f * 0.5f));
+	dMatrix rotMatrix (dYawMatrix (dPi * 0.5f));
 
 	// create a material to control collision with this objects
 	int defaultMaterialID;
@@ -84,7 +84,7 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeMatrix, size, type, defaultMaterialID);
 	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
 
-	//	matrix = dRollMatrix(3.141592f/2.0f);
+	//	matrix = dRollMatrix(dPi/2.0f);
 	dFloat startElevation = 100.0f;
 	dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 
@@ -198,7 +198,7 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 	dMatrix matrix1(matrix0);
 	matrix1.m_posit.m_z += horizontalStep;
 
-	dMatrix matrix2(dYawMatrix(3.141592f * 0.5f) * matrix0);
+	dMatrix matrix2(dYawMatrix(dPi * 0.5f) * matrix0);
 	matrix2.m_posit.m_x += horizontalStep * 0.5f;
 	matrix2.m_posit.m_z += horizontalStep * 0.5f;
 	matrix2.m_posit.m_y += vertialStep;
@@ -255,7 +255,7 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
 	DemoMesh* const geometry = new DemoMesh("sphere", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-//baseMatrix = dRollMatrix(30.0f * 3.1416f / 180.0f) * dPitchMatrix(30.0f * 3.1416f / 180.0f) * baseMatrix;
+//baseMatrix = dRollMatrix(30.0f * dDegreeToRad) * dPitchMatrix(30.0f * dDegreeToRad) * baseMatrix;
 //baseMatrix.m_posit.m_y += 10.0f;
 
 	for (int i = 0; i < count; i++) {

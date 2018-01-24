@@ -151,8 +151,8 @@ dQuaternion dQuaternion::Slerp (const dQuaternion &QB, dFloat t) const
 		Q.m_q2 =  m_q1;
 		Q.m_q3 =  m_q0;
 
-		dFloat Sclp = dSin ((dFloat(1.0f) - t) * dFloat (3.141592f *0.5f));
-		dFloat Sclq = dSin (t * dFloat (3.141592f * 0.5f));
+		dFloat Sclp = dSin ((dFloat(1.0f) - t) * dFloat (dPi *0.5f));
+		dFloat Sclq = dSin (t * dFloat (dPi * 0.5f));
 
 		Q.m_q0 = m_q0 * Sclp + Q.m_q0 * Sclq;
 		Q.m_q1 = m_q1 * Sclp + Q.m_q1 * Sclq;
@@ -198,7 +198,7 @@ dQuaternion dQuaternion::IntegrateOmega (const dVector& omega, dFloat timestep) 
 	// this is correct
 	dQuaternion rotation (*this);
 	dFloat omegaMag2 = omega.DotProduct3(omega);
-	const dFloat errAngle = 0.0125f * 3.141592f / 180.0f;
+	const dFloat errAngle = 0.0125f * dDegreeToRad;
 	const dFloat errAngle2 = errAngle * errAngle;
 	if (omegaMag2 > errAngle2) {
 		dFloat invOmegaMag = 1.0f / dSqrt (omegaMag2);

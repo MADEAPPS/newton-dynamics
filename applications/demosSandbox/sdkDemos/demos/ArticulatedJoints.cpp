@@ -171,7 +171,7 @@ dAssert (0);
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
 		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
 
-		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
+		chassisMatrix = dYawMatrix(90.0f * dDegreeToRad) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
 		dCustomGear* const axel = new dCustomGear(5.0f, chassisMatrix.m_front, chassisMatrix.m_front, tire, m_engineJoint->GetBody0());
@@ -191,11 +191,11 @@ dAssert (0);
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
 		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
 
-		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
+		chassisMatrix = dYawMatrix(90.0f * dDegreeToRad) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
-		dFloat angleLimit = 30.0f * 3.141592f / 180.0f;
-		dFloat angularRate = 60.0f * 3.141592f / 180.0f;
+		dFloat angleLimit = 30.0f * dDegreeToRad;
+		dFloat angularRate = 60.0f * dDegreeToRad;
 		m_rearTireJoints[m_rearTiresCount] = new dCustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
 		m_rearTireJoints[m_rearTiresCount]->SetEnableFlag0 (false);
 		m_rearTiresCount ++;
@@ -206,9 +206,9 @@ dAssert (0);
 		dMatrix baseMatrix;
 		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
 
-		dFloat minAngleLimit = -20.0f * 3.141592f / 180.0f;
-		dFloat maxAngleLimit =  20.0f * 3.141592f / 180.0f;
-		dFloat angularRate = 10.0f * 3.141592f / 180.0f;
+		dFloat minAngleLimit = -20.0f * dDegreeToRad;
+		dFloat maxAngleLimit =  20.0f * dDegreeToRad;
+		dFloat angularRate = 10.0f * dDegreeToRad;
 		m_angularActuator0[m_angularActuatorsCount0] = new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
 		m_angularActuatorsCount0 ++;
 	}
@@ -654,7 +654,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// create the rigid body that will make this bone
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
-		engineMatrix = dRollMatrix(0.5f * 3.141592f) * engineMatrix;
+		engineMatrix = dRollMatrix(0.5f * dPi) * engineMatrix;
 		engineMatrix.m_posit.m_y += 1.0f;
 
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
@@ -821,7 +821,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat width = maxWidth - minWidth;
 		radius -= width * 0.5f;
 
-		dMatrix align (dRollMatrix(90.0f * 3.141592f / 180.0f));
+		dMatrix align (dRollMatrix(90.0f * dDegreeToRad));
 		return NewtonCreateChamferCylinder(GetWorld(), radius, width, 0, &align[0][0]);
 	}
 
@@ -880,7 +880,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix (bone->m_body, &matrix[0][0]);
-		dMatrix hingeFrame (dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix);
+		dMatrix hingeFrame (dRollMatrix(90.0f * dDegreeToRad) * matrix);
 		new dCustomHinge (hingeFrame, bone->m_body, parentBone->m_body);
 
 		return bone;
@@ -906,7 +906,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		dMatrix tireHingeMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix);
+		dMatrix tireHingeMatrix(dRollMatrix(90.0f * dDegreeToRad) * matrix);
 
 		// save tractions tires 
 		vehicleModel->m_tractionTires[vehicleModel->m_tractionTiresCount] = bone->m_body;
@@ -1066,7 +1066,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dMatrix rootMatrix (chassis->GetCurrentMatrix());
 
-		dMatrix aligmentMatrix (dRollMatrix(180.0f * 3.141592f / 180.0f));
+		dMatrix aligmentMatrix (dRollMatrix(180.0f * dDegreeToRad));
 
 		DemoEntity* const threadLink = chassis->Find("link");
 		dMatrix shapeMatrix (threadPath->GetMeshMatrix() * threadPath->GetCurrentMatrix());
@@ -1123,7 +1123,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		}
 		NewtonDestroyCollision(collision);
 
-		dMatrix aligment (dYawMatrix(90.0f * 3.1416f / 180.0f));
+		dMatrix aligment (dYawMatrix(90.0f * dDegreeToRad));
 		NewtonBody* link0 = linkArray[0];
 
 		NewtonJoint* hingeArray[1024];
@@ -1183,7 +1183,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dMatrix matrix;
 		NewtonBodyGetMatrix(boomBody, &matrix[0][0]);
-		matrix = dRollMatrix(0.5f * 3.141592f) * matrix;
+		matrix = dRollMatrix(0.5f * dPi) * matrix;
 
 		dFloat minLimit =  0.0f;
 		dFloat maxLimit =  4.0f;
@@ -1211,7 +1211,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dMatrix matrix;
 		NewtonBodyGetMatrix(paletteBody, &matrix[0][0]);
-		matrix = dRollMatrix(0.5f * 3.141592f) * matrix;
+		matrix = dRollMatrix(0.5f * dPi) * matrix;
 
 		dFloat minLimit = -0.01f;
 		dFloat maxLimit =  1.25f;
@@ -1239,11 +1239,11 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dMatrix matrix;
 		NewtonBodyGetMatrix(wristBody, &matrix[0][0]);
-		matrix = dPitchMatrix(0.0f * 3.141592f) * dYawMatrix(0.5f * 3.141592f) * matrix;
+		matrix = dPitchMatrix(0.0f * dPi) * dYawMatrix(0.5f * dPi) * matrix;
 
-		dFloat minAngleLimit = -120.0f * 3.141592f / 180.0f;
-		dFloat maxAngleLimit =  120.0f * 3.141592f / 180.0f;
-		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
+		dFloat minAngleLimit = -120.0f * dDegreeToRad;
+		dFloat maxAngleLimit =  120.0f * dDegreeToRad;
+		dFloat angularRate = 30.0f * dDegreeToRad;
 
 		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new dCustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, wristBody, baseBone->m_body);
 		vehicleModel->m_universalActuatorsCount++;
@@ -1269,11 +1269,11 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dMatrix matrix;
 		NewtonBodyGetMatrix(boomBody, &matrix[0][0]);
-		matrix = dRollMatrix(0.5f * 3.141592f) * matrix;
+		matrix = dRollMatrix(0.5f * dPi) * matrix;
 
-		dFloat minAngleLimit = -60.0f * 3.141592f / 180.0f;
-		dFloat maxAngleLimit =  10.0f * 3.141592f / 180.0f;
-		dFloat angularRate = 20.0f * 3.141592f / 180.0f;
+		dFloat minAngleLimit = -60.0f * dDegreeToRad;
+		dFloat maxAngleLimit =  10.0f * dDegreeToRad;
+		dFloat angularRate = 20.0f * dDegreeToRad;
 		vehicleModel->m_angularActuator0[vehicleModel->m_angularActuatorsCount0] = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, boomBody, baseBone->m_body);
 		vehicleModel->m_angularActuatorsCount0++;
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone1 = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
@@ -1299,11 +1299,11 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dMatrix matrix;
 		NewtonBodyGetMatrix (baseBody, &matrix[0][0]);
-		matrix = dRollMatrix (0.5f * 3.141592f) * matrix;
+		matrix = dRollMatrix (0.5f * dPi) * matrix;
 
 		dFloat minAngleLimit = -1.0e10f;
 		dFloat maxAngleLimit = 1.0e10f;
-		dFloat angularRate = 20.0f * 3.141592f / 180.0f;
+		dFloat angularRate = 20.0f * dDegreeToRad;
 		vehicleModel->m_angularActuator1[vehicleModel->m_angularActuatorsCount1] = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, baseBody, chassisBone->m_body);
 		vehicleModel->m_angularActuatorsCount1++;
 		dCustomArticulatedTransformController::dSkeletonBone* const baseBone = controller->AddBone(baseBody, dGetIdentityMatrix(), chassisBone);
@@ -1637,7 +1637,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
 }
 

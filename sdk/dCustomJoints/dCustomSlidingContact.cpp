@@ -35,7 +35,7 @@ dCustomSlidingContact::dCustomSlidingContact (const dMatrix& pinAndPivotFrame, N
 	EnableLinearLimits(false);
 	EnableAngularLimits(false);
 	SetLinearLimits(-1.0f, 1.0f);
-	SetAngularLimits(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
+	SetAngularLimits(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
 	SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 }
 
@@ -51,7 +51,7 @@ dCustomSlidingContact::dCustomSlidingContact(const dMatrix& pinAndPivotFrameChil
 	EnableLinearLimits(false);
 	EnableAngularLimits(false);
 	SetLinearLimits(-1.0f, 1.0f);
-	SetAngularLimits(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
+	SetAngularLimits(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
 	SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 }
 

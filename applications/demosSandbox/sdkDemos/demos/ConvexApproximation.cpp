@@ -128,7 +128,7 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	dMatrix originMatrix;
 	NewtonBodyGetMatrix(body, &originMatrix[0][0]);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (originMatrix.m_posit);
 	dFloat hight = 1000.0f;

@@ -37,8 +37,8 @@ IMPLEMENT_CUSTOM_JOINT(dDifferentialMountJoint);
 #define D_VEHICLE_FIRST_GEAR						2
 #define D_VEHICLE_MAX_ENGINE_LOAD					dFloat(100.0f)
 #define D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS		dFloat(10.0f)
-#define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
-#define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
+#define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * dDegreeToRad)
+#define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * dDegreeToRad)
 
 
 void dEngineInfo::ConvertToMetricSystem()
@@ -359,7 +359,7 @@ dWheelJoint::dWheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tire
 	,m_tireLoad(0.0f)
 	,m_radio(tireInfo.m_radio)
 	,m_width(tireInfo.m_width)
-	,m_steerRate(0.5f * 3.1416f)
+	,m_steerRate(0.5f * dPi)
 	,m_steerAngle0(0.0f)
 	,m_steerAngle1(0.0f)
 	,m_brakeTorque(0.0f)
@@ -2845,7 +2845,7 @@ void dCustomVehicleController::CalculateTireForces(dFloat timestep, int threadID
 
 #ifdef _DEBUG
 //if ((tireJoint->m_index == 1) || (tireJoint->m_index == 3)) {
-//dTrace(("(t:%d b:%f fx:%f fy:%f) ", tireJoint->m_index, dAtan(tireJoint->m_lateralSlip) * 180.0f / 3.1416f, longitudinalForce, lateralForce));
+//dTrace(("(t:%d b:%f fx:%f fy:%f) ", tireJoint->m_index, dAtan(tireJoint->m_lateralSlip) * 180.0f / dPi, longitudinalForce, lateralForce));
 //}
 #endif
 					}
@@ -2875,15 +2875,15 @@ dTrace(("\n"));
 	}
 
 	static int xxx;
-	//dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/3.1416f, (m_sideSlip - m_prevSideSlip) * (180.0f / 3.1416f) / timestep));
+	//dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/dPi, (m_sideSlip - m_prevSideSlip) * (180.0f / dPi) / timestep));
 	xxx++;
 
-	if ((dAbs(m_sideSlip * 180.0f / 3.1416f) > 35.0f)) {
+	if ((dAbs(m_sideSlip * 180.0f / dPi) > 35.0f)) {
 		dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(m_sideSlip)));
 		NewtonBodyAddTorque(chassisBody, &xxx1[0]);
 	} else {
 		dFloat betaRate = (m_sideSlip - m_prevSideSlip) / timestep;
-		if (dAbs(betaRate * 180.0f / 3.1416f) > 15.0f) {
+		if (dAbs(betaRate * 180.0f / dPi) > 15.0f) {
 			dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(betaRate)));
 			NewtonBodyAddTorque(chassisBody, &xxx1[0]);
 		}

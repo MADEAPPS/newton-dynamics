@@ -36,7 +36,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	m_limitsOn = false;
 	m_actuatorFlag = false;
 	m_setAsSpringDamper = false;
-	SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 }
 
 dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
@@ -52,7 +52,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	m_limitsOn = false;
 	m_actuatorFlag = false;
 	m_setAsSpringDamper = false;
-	SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 }
 
 dCustomHinge::~dCustomHinge()

@@ -252,8 +252,8 @@ void dComplentaritySolver::dBodyState::IntegrateForce (dFloat timestep, const dV
 
 void dComplentaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
 {
-	const dFloat D_MAX_ANGLE_STEP = dFloat (45.0f * 3.141592f / 180.0f);
-	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * 3.141592f / 180.0f);
+	const dFloat D_MAX_ANGLE_STEP = dFloat (45.0f * dDegreeToRad);
+	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * dDegreeToRad);
 
 	m_globalCentreOfMass += m_veloc.Scale (timestep); 
 	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > (D_MAX_ANGLE_STEP * D_MAX_ANGLE_STEP)) {

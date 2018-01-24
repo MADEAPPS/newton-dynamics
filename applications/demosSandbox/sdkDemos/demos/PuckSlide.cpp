@@ -64,12 +64,12 @@ class PuckEntity: public DemoEntity
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), puckSize, _CYLINDER_PRIMITIVE, materialID);
 
 		// correction: make the puck an upright cylinder, this makes everything simpler  
-		dMatrix collisionAligmentMatrix (dRollMatrix(3.141592f/2.0f));
+		dMatrix collisionAligmentMatrix (dRollMatrix(dPi/2.0f));
 		NewtonCollisionSetMatrix(collision, &collisionAligmentMatrix[0][0]);
 
 		DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-		//dMatrix matrix = dRollMatrix(3.141592f/2.0f);
+		//dMatrix matrix = dRollMatrix(dPi/2.0f);
 		dMatrix matrix (dGetIdentityMatrix());
 		matrix.m_posit.m_x = -TABLE_LENGTH*0.5f+WEIGHT_DIAMETER;
 		matrix.m_posit.m_z = -11.8f;
@@ -257,7 +257,7 @@ void PuckSlide (DemoEntityManager* const scene)
 	}
 
 	// place camera into position
-	dMatrix camMatrix (dPitchMatrix(20.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dPitchMatrix(20.0f * dPi /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (CAMERA_Z, CAMERA_Y, CAMERA_X, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

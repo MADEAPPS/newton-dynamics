@@ -175,13 +175,13 @@ class dSixAxisController: public dCustomControllerBase
 		dFloat r = size / 4.0f;
 		dFloat h = size / 8.0f;
 
-		dFloat lowLimit = -88.0f * 3.141592f / 180.0f;
-		dFloat highLimit = 60.0f * 3.141592f / 180.0f;
+		dFloat lowLimit = -88.0f * dDegreeToRad;
+		dFloat highLimit = 60.0f * dDegreeToRad;
 
 		m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
 		// add Robot Base Frame locked the root body to the world
-		dMatrix baseFrameMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f));
+		dMatrix baseFrameMatrix(dRollMatrix(90.0f * dDegreeToRad));
 		baseFrameMatrix.m_posit.m_y = h * 0.5f;
 		NewtonBody* const baseFrameBody = CreateCylinder(scene, baseFrameMatrix * location, 20.0f, r, h);
 		void* const baseFrameNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, baseFrameBody);
@@ -191,8 +191,8 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix rotatingColumnMatrix(dGetIdentityMatrix());
 		rotatingColumnMatrix.m_posit.m_y = h + h * 0.5f;
 		NewtonBody* const rotatingColumnBody = CreateBox(scene, rotatingColumnMatrix * location, dVector(r * 0.5f, h, r * 0.75f));
-		rotatingColumnMatrix = dRollMatrix(3.141592f * 0.5f) * rotatingColumnMatrix;
-		dKukaServoMotor1* const rotatingColumnHinge = new dKukaServoMotor1(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody, -2.0f * 3.141592f, 2.0f * 3.141592f);
+		rotatingColumnMatrix = dRollMatrix(dPi * 0.5f) * rotatingColumnMatrix;
+		dKukaServoMotor1* const rotatingColumnHinge = new dKukaServoMotor1(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody, -2.0f * dPi, 2.0f * dPi);
 		void* const rotatingColumnNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseFrameNode, rotatingColumnHinge->GetJoint());
 
 		// add Robot link arm
@@ -202,7 +202,7 @@ class dSixAxisController: public dCustomControllerBase
 		linkArmMatrix.m_posit.m_y += l * 0.5f;
 		NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
 		linkArmMatrix.m_posit.m_y -= l * 0.5f;
-		dKukaServoMotor1* const linkArmJoint = new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, -0.5f * 3.141592f, 0.5f * 3.141592f);
+		dKukaServoMotor1* const linkArmJoint = new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, -0.5f * dPi, 0.5f * dPi);
 		void* const linkArmNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rotatingColumnNode, linkArmJoint->GetJoint());
 
 		// add Robot arm
@@ -225,7 +225,7 @@ class dSixAxisController: public dCustomControllerBase
 
 /*
 		// Robot gripper base
-		dMatrix gripperMatrix(dYawMatrix(90.0f * 3.141592f / 180.0f));
+		dMatrix gripperMatrix(dYawMatrix(90.0f * dDegreeToRad));
 		gripperMatrix.m_posit = armMatrix1.m_posit + armMatrix1.m_right.Scale(-0.25f) + gripperMatrix.m_front.Scale(-0.06f);
 		NewtonBody* const gripperBase = CreateCylinder(scene, gripperMatrix, 0.1f, -0.15f);
 		dMatrix gripperEffectMatrix(dGetIdentityMatrix());
@@ -323,7 +323,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
-			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * 3.141592f / 180.0f, me->m_gripper_pitch * 3.141592f / 180.0f, me->m_gripper_roll * 3.141592f / 180.0f);
+			controller->SetTarget (me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
 		}
 	}
 

@@ -54,7 +54,7 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 	NewtonCollision* const collision = CreateConvexCollision (world, &shapeOffsetMatrix[0][0], size, type, materialID);
 
 	dFloat startElevation = 1000.0f;
-	dMatrix matrix (dRollMatrix(-3.141592f/2.0f));
+	dMatrix matrix (dRollMatrix(-dPi/2.0f));
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
@@ -91,7 +91,7 @@ void UserHeightFieldCollision (DemoEntityManager* const scene)
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 	
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (250.0f, 0.0f, 250.0f, 0.0f);
 	dFloat height = 1000.0f;
@@ -131,7 +131,7 @@ void UserPlaneCollision (DemoEntityManager* const scene)
 	CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (0.0f, 0.0f, 0.0f, 0.0f);
 //	dFloat hight = 1000.0f;

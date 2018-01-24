@@ -28,7 +28,7 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 //	CreateLevelMesh (scene, "cattle.ngd", fileName);
 //	CreateLevelMesh (scene, "playground.ngd", optimization);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

@@ -118,7 +118,7 @@ static VehicleParameters heavyTruck =
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
 	2,									// DIFFERENTIAL_TYPE
-	dRollMatrix(3.141592f * 90.0f / 180.0f),
+	dRollMatrix(dPi * 90.0f / 180.0f),
 };
 
 static VehicleParameters lightTruck = 
@@ -171,7 +171,7 @@ static VehicleParameters lightTruck =
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
 	2,									// DIFFERENTIAL_TYPE
-	dRollMatrix(3.141592f * 90.0f / 180.0f),
+	dRollMatrix(dPi * 90.0f / 180.0f),
 };
 
 static VehicleParameters m1a1Param = 
@@ -205,7 +205,7 @@ static VehicleParameters m1a1Param =
 	(5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
 	(5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
 	1.5f,									// ALIGNING_MOMENT_TRAIL
-	dRollMatrix(3.141592f * 90.0f / 180.0f),
+	dRollMatrix(dPi * 90.0f / 180.0f),
 	0,										// WHEEL_HAS_FENDER	
 	0,										// DIFFERENTIAL_TYPE
 */
@@ -258,7 +258,7 @@ static VehicleParameters m1a1Param =
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
 	1,									// DIFFERENTIAL_TYPE
-	dRollMatrix(3.141592f * 90.0f / 180.0f),
+	dRollMatrix(dPi * 90.0f / 180.0f),
 };
 
 
@@ -432,7 +432,7 @@ class HeavyVehicleEntity: public DemoEntity
 				m_intepolants[i] = steps[i];
 			}
 
-			m_aligmentMatrix = dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f);
+			m_aligmentMatrix = dRollMatrix(dPi * 90.0f / 180.0f) * dPitchMatrix(dPi * 180.0f / 180.0f);
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
 		}
 
@@ -733,7 +733,7 @@ class HeavyVehicleEntity: public DemoEntity
 		// add and alignment matrix,to match visual mesh to physics collision shape
 		dMatrix aligmentMatrix (dGetIdentityMatrix());
 		if (tireMatrix[0][2] < 0.0f) {
-			aligmentMatrix = dYawMatrix(3.141592f);
+			aligmentMatrix = dYawMatrix(dPi);
 		}
 
 		TireAligmentTransform* const aligmentTransform = new TireAligmentTransform (definition.m_aligmentMatrix * aligmentMatrix);
@@ -746,7 +746,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
-		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f;
+		tireInfo.m_maxSteeringAngle = maxSteerAngle * dDegreeToRad;
 		tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
 		tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
 		tireInfo.m_suspensionLength = definition.m_tireSuspensionLength;
@@ -788,7 +788,7 @@ class HeavyVehicleEntity: public DemoEntity
 		rightTire[1] = AddTire ("rr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
 
 		// add a steering Wheel
-		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
+		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * dDegreeToRad);
 		steering->AddSteeringTire (leftTire[0]);
 		steering->AddSteeringTire (rightTire[0]);
 		m_controller->SetSteering(steering);
@@ -1662,7 +1662,7 @@ void MilitaryTransport (DemoEntityManager* const scene)
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
-//	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+//	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (1000.0f, 100.0f, 1000.0f, 1.0f);
 location.m_posit.m_x = 126.0f;
@@ -1721,7 +1721,7 @@ for (int i = 0; i < 5; i ++){
 */
 	
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
-	//camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
+	//camMatrix = dYawMatrix (-0.5f * dPi) * camMatrix;
 	//scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 

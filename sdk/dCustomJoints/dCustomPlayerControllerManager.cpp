@@ -53,7 +53,7 @@ void dCustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat inner
 	m_innerRadio = innerRadius;
 	m_height = height;
 	m_stairStep = stairStep;
-	SetClimbSlope(45.0f * 3.1416f/ 180.0f);
+	SetClimbSlope(45.0f * dDegreeToRad);
 	m_upVector = localAxis[0];
 	m_frontVector = localAxis[1];
 
@@ -69,7 +69,7 @@ void dCustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat inner
 	dVector p0 (0.0f, m_innerRadio, 0.0f, 0.0f);
 	dVector p1 (shapeHigh, m_innerRadio, 0.0f, 0.0f);
 	for (int i = 0; i < steps; i ++) {
-		dMatrix rotation (dPitchMatrix (i * 2.0f * 3.141592f / steps));
+		dMatrix rotation (dPitchMatrix (i * 2.0f * dPi / steps));
 		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(p0));
 		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(p1));
 	}
@@ -109,7 +109,7 @@ void dCustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat inner
 	dVector q0 (0.0f, castRadio, 0.0f, 0.0f);
 	dVector q1 (castHigh, castRadio, 0.0f, 0.0f);
 	for (int i = 0; i < steps; i ++) {
-		dMatrix rotation (dPitchMatrix (i * 2.0f * 3.141592f / steps));
+		dMatrix rotation (dPitchMatrix (i * 2.0f * dPi / steps));
 		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(q0));
 		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(q1));
 	}

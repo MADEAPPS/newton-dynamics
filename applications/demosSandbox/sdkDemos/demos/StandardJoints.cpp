@@ -70,7 +70,7 @@ static NewtonBody* CreateCapule (DemoEntityManager* const scene, const dVector& 
 {
 	NewtonWorld* const world = scene->GetNewton();
 	int materialID =  NewtonMaterialGetDefaultGroupID (world);
-	dMatrix uprightAligment (dRollMatrix(3.141592f * 90.0f / 180.0f));
+	dMatrix uprightAligment (dRollMatrix(dPi * 90.0f / 180.0f));
 	NewtonCollision* const collision = CreateConvexCollision (world, &uprightAligment[0][0], size, _CAPSULE_PRIMITIVE, 0);
 	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -206,16 +206,16 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
 	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket(pinMatrix, box0, base);
-	joint0->SetConeAngle (130.0f * 3.141592f / 180.0f);
-	joint0->SetTwistAngle (-60.0f * 3.141592f / 180.0f, 60.0f * 3.141592f / 180.0f);
+	joint0->SetConeAngle (130.0f * dDegreeToRad);
+	joint0->SetTwistAngle (-60.0f * dDegreeToRad, 60.0f * dDegreeToRad);
 
 	// connect first box1 to box0 the world
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
 	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket(pinMatrix, box1, box0);
-	joint1->SetConeAngle(130.0f * 3.141592f / 180.0f);
-	joint1->SetTwistAngle(-60.0f * 3.141592f / 180.0f, 60.0f * 3.141592f / 180.0f);
+	joint1->SetConeAngle(130.0f * dDegreeToRad);
+	joint1->SetTwistAngle(-60.0f * dDegreeToRad, 60.0f * dDegreeToRad);
 
 }
 
@@ -235,7 +235,7 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket (pinMatrix, box0, base);
 	joint0->SetFriction(20.0f);
-	joint0->SetConeAngle (80.0f * 3.141592f / 180.0f);
+	joint0->SetConeAngle (80.0f * dDegreeToRad);
 
 	// link the two boxes
 	dMatrix matrix1;
@@ -243,7 +243,7 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
 	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket (pinMatrix, box1, box0);
 	joint1->SetFriction(10.0f);
-	joint1->SetConeAngle (80.0f * 3.141592f / 180.0f);
+	joint1->SetConeAngle (80.0f * dDegreeToRad);
 }
 
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
@@ -296,12 +296,12 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	// align the object so that is looks nice
 	dMatrix matrix;
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	matrix = dYawMatrix (3.1416f * 0.5f) * matrix; 
+	matrix = dYawMatrix (dPi * 0.5f) * matrix; 
 	NewtonBodySetMatrix(box1, &matrix[0][0]);
 	((DemoEntity*) NewtonBodyGetUserData(box1))->ResetMatrix (*scene, matrix);
 
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	matrix = dYawMatrix(3.1416f * 0.5f) * matrix;
+	matrix = dYawMatrix(dPi * 0.5f) * matrix;
 	NewtonBodySetMatrix(box2, &matrix[0][0]);
 	((DemoEntity*) NewtonBodyGetUserData(box2))->ResetMatrix (*scene, matrix);
 
@@ -309,17 +309,17 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
 	joint1->EnableLimit_0(true);
-	joint1->SetLimits_0 (-5.0f * 3.141592f, 2.0f * 3.141592f);
+	joint1->SetLimits_0 (-5.0f * dPi, 2.0f * dPi);
 	joint1->EnableLimit_1(true);
-	joint1->SetLimits_1 (-3.0f * 3.141592f, 4.0f * 3.141592f);
+	joint1->SetLimits_1 (-3.0f * dPi, 4.0f * dPi);
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	dCustomUniversal* const joint2 = new dCustomUniversal(matrix, box2, box0);
 	joint2->EnableLimit_0(false);
 	joint2->EnableLimit_1(false);
-	joint2->SetLimits_0 (-3.141592f, 3.141592f);
-	joint2->SetLimits_1 (-3.141592f, 3.141592f);
+	joint2->SetLimits_0 (-dPi, dPi);
+	joint2->SetLimits_1 (-dPi, dPi);
 
 	dVector damp(0.0f);
 	NewtonBodySetLinearDamping(box2, 0.0f);
@@ -485,7 +485,7 @@ static void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector
 	NewtonBody* pickBody = 0;
 	for (int j=0; j < numArms; j++)
 	{
-		dFloat angle = dFloat(j) / dFloat(numArms) * 3.141592f*2.0f;
+		dFloat angle = dFloat(j) / dFloat(numArms) * dPi*2.0f;
 		dMatrix armRotation = dPitchMatrix(angle);
 		dMatrix armTransform = armRotation * torsoMatrix;
 		
@@ -515,9 +515,9 @@ static void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector
 			}
 			if (randomness > 0.0f)
 			{
-				dMatrix rotation =  dPitchMatrix(dGaussianRandom  (3.141592f) * randomness);
-				rotation = rotation * dYawMatrix(dGaussianRandom  (3.141592f) * randomness);
-				rotation = rotation * dYawMatrix(dGaussianRandom  (3.141592f) * randomness);
+				dMatrix rotation =  dPitchMatrix(dGaussianRandom  (dPi) * randomness);
+				rotation = rotation * dYawMatrix(dGaussianRandom  (dPi) * randomness);
+				rotation = rotation * dYawMatrix(dGaussianRandom  (dPi) * randomness);
 				matrix0 = matrix0 * rotation;
 			}
 			JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
@@ -560,42 +560,42 @@ static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& or
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	dCustomControlledBallAndSocket* const joint0 = new dCustomControlledBallAndSocket (pinMatrix, box0, NULL);
-	joint0->SetAngularVelocity (2000.0f * 3.141592f / 180.0f);
-//	joint0->SetPitchAngle (-45.0f * 3.141592f / 180.0f);
-//	joint0->SetYawAngle (-85.0f * 3.141592f / 180.0f);
-//	joint0->SetRollAngle (120.0f * 3.141592f / 180.0f);
+	joint0->SetAngularVelocity (2000.0f * dDegreeToRad);
+//	joint0->SetPitchAngle (-45.0f * dDegreeToRad);
+//	joint0->SetYawAngle (-85.0f * dDegreeToRad);
+//	joint0->SetRollAngle (120.0f * dDegreeToRad);
 	
-joint0->SetPitchAngle (90.0f * 3.141592f / 180.0f);	
+joint0->SetPitchAngle (90.0f * dDegreeToRad);	
 /*
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
 	CustomControlledBallAndSocket* const joint1 = new CustomControlledBallAndSocket (pinMatrix, box0, box1);
-	joint1->SetAngularVelocity (1000.0f * 3.141592f / 180.0f);
-	joint1->SetPitchAngle (45.0f * 3.141592f / 180.0f);
-	joint1->SetYawAngle ( 30.0f * 3.141592f / 180.0f);
-	joint1->SetRollAngle (25.0f * 3.141592f / 180.0f);
+	joint1->SetAngularVelocity (1000.0f * dDegreeToRad);
+	joint1->SetPitchAngle (45.0f * dDegreeToRad);
+	joint1->SetYawAngle ( 30.0f * dDegreeToRad);
+	joint1->SetRollAngle (25.0f * dDegreeToRad);
 
 	// link next box
 	dMatrix matrix2;
 	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
 	pinMatrix.m_posit = (matrix1.m_posit + matrix2.m_posit).Scale(0.5f);
 	CustomControlledBallAndSocket* const joint2 = new CustomControlledBallAndSocket(pinMatrix, box1, box2);
-	joint2->SetAngularVelocity(1000.0f * 3.141592f / 180.0f);
-	joint2->SetPitchAngle(45.0f * 3.141592f / 180.0f);
-	joint2->SetYawAngle(30.0f * 3.141592f / 180.0f);
-	joint2->SetRollAngle(25.0f * 3.141592f / 180.0f);
+	joint2->SetAngularVelocity(1000.0f * dDegreeToRad);
+	joint2->SetPitchAngle(45.0f * dDegreeToRad);
+	joint2->SetYawAngle(30.0f * dDegreeToRad);
+	joint2->SetRollAngle(25.0f * dDegreeToRad);
 
 	// link next box
 	dMatrix matrix3;
 	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
 	pinMatrix.m_posit = (matrix2.m_posit + matrix3.m_posit).Scale(0.5f);
 	CustomControlledBallAndSocket* const joint3 = new CustomControlledBallAndSocket(pinMatrix, box2, box3);
-	joint3->SetAngularVelocity(1000.0f * 3.141592f / 180.0f);
-	joint3->SetPitchAngle(45.0f * 3.141592f / 180.0f);
-	joint3->SetYawAngle(30.0f * 3.141592f / 180.0f);
-	joint3->SetRollAngle(25.0f * 3.141592f / 180.0f);
+	joint3->SetAngularVelocity(1000.0f * dDegreeToRad);
+	joint3->SetPitchAngle(45.0f * dDegreeToRad);
+	joint3->SetYawAngle(30.0f * dDegreeToRad);
+	joint3->SetRollAngle(25.0f * dDegreeToRad);
 */
 }
 
@@ -606,7 +606,7 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
     //the joint pin is the first row of the matrix, to make a upright pin we
     //take the x axis and rotate by 90 degree around the y axis
-    dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
+    dMatrix localPin (dRollMatrix(90.0f * dDegreeToRad));
 
 	dMatrix matrix;
 	dVector position (origin);
@@ -622,7 +622,7 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 		dCustomHinge* const hinge = new dCustomHinge (matrix, child, parent);
 
 		hinge->EnableLimits (true);
-		hinge->SetLimits (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+		hinge->SetLimits (-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 		hinge->SetFriction(20.0f);
 		parent = child;
 		position.m_x += size.m_x;
@@ -683,8 +683,8 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 
 	// connect the bodies by a Slider joint
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-//	matrix = dPitchMatrix(90.0f * 3.141592f / 180.0f) * matrix;
-	matrix = dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix;
+//	matrix = dPitchMatrix(90.0f * dDegreeToRad) * matrix;
+	matrix = dRollMatrix(90.0f * dDegreeToRad) * matrix;
 
 	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, box1, box0);
 	slider->EnableLinearLimits (true);
@@ -692,7 +692,7 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 
 	// enable limit of first axis
 	slider->EnableAngularLimits(true);
-	slider->SetAngularLimits (-7.0f * 3.1416f, 5.0f * 3.1416f);
+	slider->SetAngularLimits (-7.0f * dPi, 5.0f * dPi);
 }
 
 static void AddCylindrical (DemoEntityManager* const scene, const dVector& origin)
@@ -714,7 +714,7 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
 
 	// set angular limit on second axis
 	cylinder->EnableAngularLimits(true);
-	cylinder->SetAngularLimis(-4.0f * 3.1416f, 6.0f * 3.1416f);
+	cylinder->SetAngularLimis(-4.0f * dPi, 6.0f * dPi);
 }
 
 static dCustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
@@ -722,7 +722,7 @@ static dCustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVecto
     NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
 
     // the joint pin is the first row of the matrix
-    //dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
+    //dMatrix localPin (dRollMatrix(90.0f * dDegreeToRad));
     dMatrix localPin (dGetIdentityMatrix());
     dMatrix matrix;
     NewtonBodyGetMatrix (wheel, & matrix[0][0]);
@@ -764,7 +764,7 @@ static dCustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVec
     NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
 
     // the joint pin is the first row of the matrix
-    //dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
+    //dMatrix localPin (dRollMatrix(90.0f * dDegreeToRad));
     dMatrix localPin (dGetIdentityMatrix());
     dMatrix matrix;
     NewtonBodyGetMatrix (wheel, & matrix[0][0]);

@@ -82,7 +82,7 @@ class dCustom6dof: public dCustomJoint
 	dAngleData m_yaw;
 	dAngleData m_roll;
 	dFloat m_debugScale;
-
+int xxxx;
 	union
 	{
 		int m_mask;

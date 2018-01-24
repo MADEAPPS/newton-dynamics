@@ -225,8 +225,8 @@ class dCustomRagdollMotor: public dCustomJoint
 		public:
 		dAngleData ()
 			:m_currentAngle()
-			,m_minAngle (-60.0f * 3.141592f / 180.0f) 
-			,m_maxAngle ( 60.0f * 3.141592f / 180.0f) 
+			,m_minAngle (-60.0f * dDegreeToRad) 
+			,m_maxAngle ( 60.0f * dDegreeToRad) 
 		{
 		}
 

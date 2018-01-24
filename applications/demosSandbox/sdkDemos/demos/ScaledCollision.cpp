@@ -26,7 +26,7 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 	NewtonCollision* const collision = CreateConvexCollision (world, &shapeOffsetMatrix[0][0], size, type, materialID);
 
 	dFloat startElevation = 1000.0f;
-	dMatrix matrix (dRollMatrix(-3.141592f/2.0f));
+	dMatrix matrix (dRollMatrix(-dPi/2.0f));
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
@@ -63,7 +63,7 @@ static void AddNonUniformScaledPrimitives(DemoEntityManager* const scene, dFloat
 
 	dFloat startElevation = 1000.0f;
 	dMatrix matrix(dGetIdentityMatrix());
-	//matrix = dPitchMatrix(-45.0f * 3.141592f/180.0f);
+	//matrix = dPitchMatrix(-45.0f * dPi/180.0f);
 	for (int i = 0; i < xCount; i++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j++) {
@@ -148,7 +148,7 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "cattle.ngd", fileName);
 	//CreateLevelMesh (scene, "playground.ngd", 0);
 
-	dMatrix camMatrix(dRollMatrix(-20.0f * 3.1416f / 180.0f) * dYawMatrix(-45.0f * 3.1416f / 180.0f));
+	dMatrix camMatrix(dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot(camMatrix);
 	//	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
 	dVector origin(-5.0f, 5.0f, -15.0f, 0.0f);
@@ -160,7 +160,7 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	dVector size0(0.5f, 0.5f, 0.5f, 0.0f);
 	dVector size1(0.25f, 0.5f, 0.5f, 0.0f);
 
-	dMatrix shapeOffsetMatrix(dRollMatrix(3.141592f / 2.0f));
+	dMatrix shapeOffsetMatrix(dRollMatrix(dPi / 2.0f));
 
 	int count = 5;
 	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -189,7 +189,7 @@ void NonUniformScaledCollision(DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "cattle.ngd", fileName);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
-	dMatrix camMatrix(dRollMatrix(-20.0f * 3.1416f / 180.0f) * dYawMatrix(-45.0f * 3.1416f / 180.0f));
+	dMatrix camMatrix(dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot(camMatrix);
 	//	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
 	dVector origin(-10.0f, 5.0f, -15.0f, 0.0f);
@@ -202,7 +202,7 @@ void NonUniformScaledCollision(DemoEntityManager* const scene)
 	dVector size1(0.25f, 0.5f, 0.5f, 0.0f);
 
 	int count = 5;
-	dMatrix shapeOffsetMatrix(dRollMatrix(3.141592f / 2.0f));
+	dMatrix shapeOffsetMatrix(dRollMatrix(dPi / 2.0f));
 	shapeOffsetMatrix.m_posit.m_y = 0.0f;
 
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -231,7 +231,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "cattle.ngd", fileName);
 	//CreateLevelMesh (scene, "playground.ngd", 0);
 
-	//dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	//dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 5.0f, 0.0f, 0.0f);
@@ -275,7 +275,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 
 	dVector size0 (0.5f, 0.5f, 0.5f, 0.0f);
 	dVector size1 (0.25f, 0.5f, 0.5f, 0.0f);
-	dMatrix shapeOffsetMatrix (dRollMatrix(3.141592f/2.0f));
+	dMatrix shapeOffsetMatrix (dRollMatrix(dPi/2.0f));
 
 	int count = 3;
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

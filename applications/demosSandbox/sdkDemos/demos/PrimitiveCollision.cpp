@@ -113,7 +113,7 @@ static void AddSinglePrimitive (DemoEntityManager* const scene, dFloat x, Primit
 	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 
-	matrix = dRollMatrix(3.141592f/2.0f);
+	matrix = dRollMatrix(dPi/2.0f);
 	matrix.m_posit.m_x = 0;
 	matrix.m_posit.m_z = x;
 	matrix.m_posit.m_y = 0;
@@ -165,7 +165,7 @@ void PrimitiveCollision (DemoEntityManager* const scene)
 	}
 
 	// place camera into position
-	//dMatrix camMatrix (dYawMatrix(90.0f * 3.1416f /180.0f));
+	//dMatrix camMatrix (dYawMatrix(90.0f * dPi /180.0f));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 0.0f, 0.0f, 0.0f);

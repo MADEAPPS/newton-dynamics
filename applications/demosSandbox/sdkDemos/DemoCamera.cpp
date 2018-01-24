@@ -27,7 +27,7 @@
 
 DemoCamera::DemoCamera()
 	:DemoEntity (dGetIdentityMatrix(), NULL) 
-	,m_fov (60.0f * 3.1416f / 180.0f)
+	,m_fov (60.0f * dDegreeToRad)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.01f)
 	,m_cameraYaw(0.0f)
@@ -64,7 +64,7 @@ void DemoCamera::SetViewMatrix(int width, int height)
 	glLoadIdentity();
 
 	//m_backPlane = 10000.0f;
-	gluPerspective(m_fov * 180.0f / 3.1416f, GLfloat (width) /GLfloat(height), m_frontPlane, m_backPlane);
+	gluPerspective(m_fov * 180.0f / dPi, GLfloat (width) /GLfloat(height), m_frontPlane, m_backPlane);
 
 	// set the model view matrix 
 	glMatrixMode(GL_MODELVIEW);

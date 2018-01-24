@@ -123,8 +123,8 @@ void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep
 #if 0
 dCustomRagdollMotor_1dof::dCustomRagdollMotor_1dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
-	,m_minTwistAngle(-30.0f * 3.141592f / 180.0f)
-	,m_maxTwistAngle( 30.0f * 3.141592f / 180.0f)
+	,m_minTwistAngle(-30.0f * dDegreeToRad)
+	,m_maxTwistAngle( 30.0f * dDegreeToRad)
 {
 }
 
@@ -236,10 +236,10 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
-	,m_coneAngle(30.0f * 3.141592f / 180.0f)
+	,m_coneAngle(30.0f * dDegreeToRad)
 	,m_coneAngleOffset(0.0f)
-	,m_minTwistAngle(-30.0f * 3.141592f / 180.0f)
-	,m_maxTwistAngle(30.0f * 3.141592f / 180.0f)
+	,m_minTwistAngle(-30.0f * dDegreeToRad)
+	,m_maxTwistAngle(30.0f * dDegreeToRad)
 {
 }
 
@@ -338,7 +338,7 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 	debugDisplay->SetColor(dVector(1.0f, 0.0f, 1.0f, 0.0f));
 	debugDisplay->DrawLine(matrix0.m_posit, matrix0.m_posit - matrix0.m_up.Scale (radius * 1.25f));
 
-	matrix1 = dRollMatrix(-90.0f * 3.141592f / 180.0f) * matrix1;
+	matrix1 = dRollMatrix(-90.0f * dDegreeToRad) * matrix1;
 	const int subdiv1 = 12;
 	point = dVector (radius, 0.0f, 0.0f, 0.0f);
 	angleStep = (m_maxTwistAngle - m_minTwistAngle) / subdiv1;
@@ -403,7 +403,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 
 	} else if (m_motorMode) {
 
-		if (coneAngle > 1.0f * 3.141592f / 180.0f) {
+		if (coneAngle > 1.0f * dDegreeToRad) {
 			dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
 			dAssert(swingAxis.DotProduct3(swingAxis) > 0.0f);
 			swingAxis = swingAxis.Scale(1.0f / dSqrt(swingAxis.DotProduct3(swingAxis)));
@@ -468,7 +468,7 @@ void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadInde
 
 dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
-	, m_coneAngle(30.0f * 3.141592f / 180.0f)
+	, m_coneAngle(30.0f * dDegreeToRad)
 {
 }
 
@@ -510,8 +510,8 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	const float radius = 0.25f;
 	dVector point(radius, 0.0f, 0.0f, 0.0f);
 
-float minYaw = -30.0f * 3.141592f / 180.0f;
-float maxYaw =  60.0f * 3.141592f / 180.0f;
+float minYaw = -30.0f * dDegreeToRad;
+float maxYaw =  60.0f * dDegreeToRad;
 	dFloat angleStep = (maxYaw - minYaw) / subdiv;
 	dFloat angle0 = minYaw;
 
@@ -529,8 +529,8 @@ float maxYaw =  60.0f * 3.141592f / 180.0f;
 	}
 
 
-	float minRoll = -30.0f * 3.141592f / 180.0f;
-	float maxRoll = 60.0f * 3.141592f / 180.0f;
+	float minRoll = -30.0f * dDegreeToRad;
+	float maxRoll = 60.0f * dDegreeToRad;
 	angleStep = (maxRoll - minRoll) / subdiv;
 	angle0 = minRoll;
 	dMatrix rollMatrix(dYawMatrix(yaw) * matrix1);
@@ -578,7 +578,7 @@ void dCustomRagdollMotor_2dof::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& rol
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
 	//dMatrix matrix1_ (dGetIdentityMatrix());
-	//dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(40.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * matrix1_);
+	//dMatrix matrix0_ (dPitchMatrix(30.0f * dDegreeToRad) * dRollMatrix(40.0f * dDegreeToRad) * dYawMatrix(50.0f * dDegreeToRad) * matrix1_);
 	//dMatrix localMatrix_(matrix0_ * matrix1_.Inverse());
 	//localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
@@ -586,7 +586,7 @@ void dCustomRagdollMotor_2dof::GetEulers(dFloat& pitch, dFloat& yaw, dFloat& rol
 	yaw = euler0.m_y;
 	roll = euler0.m_z;
 
-	dTrace(("%f %f %f\n", pitch * 180.0f / 3.141592f, yaw * 180.0f / 3.141592f, roll * 180.0f / 3.141592f));
+	dTrace(("%f %f %f\n", pitch * dRadToDegree, yaw * dRadToDegree, roll * dRadToDegree));
 }
 
 void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -627,7 +627,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		}
 	} else {
 		dMatrix matrix1_(dGetIdentityMatrix());
-		dMatrix matrix0_(dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(25.0f * 3.141592f / 180.0f) * dYawMatrix(68.0f * 3.141592f / 180.0f) * matrix1_);
+		dMatrix matrix0_(dPitchMatrix(30.0f * dDegreeToRad) * dRollMatrix(25.0f * dDegreeToRad) * dYawMatrix(68.0f * dDegreeToRad) * matrix1_);
 
 		matrix1_ = matrix1;
 		matrix0_ = matrix0;
@@ -683,7 +683,7 @@ pin = pin.Normalize();
 			dVector relOmega(omega1 - omega0);
 			dFloat invTimestep = 0.25f / timestep;
 
-			if (coneAngle > 1.0f * 3.141592f / 180.0f) {
+			if (coneAngle > 1.0f * dDegreeToRad) {
 				dFloat accel = relOmega.DotProduct3(conePlane) * invTimestep;
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &conePlane[0]);
 				NewtonUserJointSetRowAcceleration(m_joint, accel);
@@ -713,7 +713,7 @@ pin = pin.Normalize();
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 			}
 		}
-//		dTrace(("%f %f\n", -twistAngle * 180.0f / 3.141592f, twistAngle_ * 180.0f / 3.141592f));
+//		dTrace(("%f %f\n", -twistAngle * dRadToDegree, twistAngle_ * dRadToDegree));
 	}
 */
 
@@ -1030,8 +1030,8 @@ void dCustomRagdollMotor::Debug(dDebugDisplay* const debugDisplay) const
 		// show pitch angle limits
 		dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
 
-		dFloat minAngle = dClamp (m_pitch.m_minAngle, -180.0f * 3.141592f / 180.0f,   0.0f * 3.141592f / 180.0f); 
-		dFloat maxAngle = dClamp (m_pitch.m_maxAngle,    0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f); 
+		dFloat minAngle = dClamp (m_pitch.m_minAngle, -180.0f * dDegreeToRad,   0.0f * dDegreeToRad); 
+		dFloat maxAngle = dClamp (m_pitch.m_maxAngle,    0.0f * dDegreeToRad, 180.0f * dDegreeToRad); 
 
 		dFloat angleStep = (maxAngle - minAngle) / subdiv;
 		dFloat angle0 = minAngle;
@@ -1052,8 +1052,8 @@ void dCustomRagdollMotor::Debug(dDebugDisplay* const debugDisplay) const
 		// show yaw angle limits
 		dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
 
-		dFloat minAngle = dClamp(m_yaw.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f);
-		dFloat maxAngle = dClamp(m_yaw.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f);
+		dFloat minAngle = dClamp(m_yaw.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad);
+		dFloat maxAngle = dClamp(m_yaw.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad);
 
 		dFloat angleStep = (maxAngle - minAngle) / subdiv;
 		dFloat angle0 = minAngle;
@@ -1079,8 +1079,8 @@ void dCustomRagdollMotor::Debug(dDebugDisplay* const debugDisplay) const
 		// show roll angle limits
 		dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
 
-		dFloat minAngle = dClamp(m_roll.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f);
-		dFloat maxAngle = dClamp(m_roll.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f);
+		dFloat minAngle = dClamp(m_roll.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad);
+		dFloat maxAngle = dClamp(m_roll.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad);
 
 		dFloat angleStep = (maxAngle - minAngle) / subdiv;
 		dFloat angle0 = minAngle;

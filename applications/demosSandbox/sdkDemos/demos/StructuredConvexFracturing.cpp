@@ -402,7 +402,7 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	// place camera into position
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f); 
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad); 
 	dVector origin (-45.0f, 20.0f, -15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

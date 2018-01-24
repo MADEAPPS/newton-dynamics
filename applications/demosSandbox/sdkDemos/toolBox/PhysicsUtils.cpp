@@ -794,7 +794,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 			dFloat radius = size.m_y;
 			dFloat height = size.m_x * 0.999f;
 			dFloat x = - height * 0.5f;
-			dMatrix rotation (dPitchMatrix(2.0f * 3.141592f / STEPS_HULL));
+			dMatrix rotation (dPitchMatrix(2.0f * dPi / STEPS_HULL));
 			for (int i = 0; i < 4; i ++) {
 				dFloat pad = ((i == 1) || (i == 2)) * 0.25f * radius;
 				dVector p (x, 0.0f, radius + pad);
@@ -817,7 +817,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 		case _COMPOUND_CONVEX_CRUZ_PRIMITIVE:
 		{
 			//dMatrix matrix (GetIdentityMatrix());
-			dMatrix matrix (dPitchMatrix(15.0f * 3.1416f / 180.0f) * dYawMatrix(15.0f * 3.1416f / 180.0f) * dRollMatrix(15.0f * 3.1416f / 180.0f));
+			dMatrix matrix (dPitchMatrix(15.0f * dDegreeToRad) * dYawMatrix(15.0f * dDegreeToRad) * dRollMatrix(15.0f * dDegreeToRad));
 
 			matrix.m_posit = dVector (size.m_x * 0.5f, 0.0f, 0.0f, 1.0f);
 			NewtonCollision* const collisionA = NewtonCreateBox (world, size.m_x, size.m_x * 0.25f, size.m_x * 0.25f, 0, &matrix[0][0]); 

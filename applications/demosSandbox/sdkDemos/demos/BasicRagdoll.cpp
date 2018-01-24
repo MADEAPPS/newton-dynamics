@@ -170,7 +170,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 	{
 		dVector size(0.0f);
 		dVector origin(0.0f);
-		dMatrix matrix (dPitchMatrix(definition.m_shapePitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_shapeYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_shapeRoll * 3.141592f / 180.0f));
+		dMatrix matrix (dPitchMatrix(definition.m_shapePitch * dDegreeToRad) * dYawMatrix(definition.m_shapeYaw * dDegreeToRad) * dRollMatrix(definition.m_shapeRoll * dDegreeToRad));
 
 		matrix.m_posit.m_x = definition.m_shape_x;
 		matrix.m_posit.m_y = definition.m_shape_y;
@@ -251,7 +251,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
 		
-		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix (definition.m_framePitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_frameYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_frameRoll * 3.141592f / 180.0f));
+		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix (definition.m_framePitch * dDegreeToRad) * dYawMatrix (definition.m_frameYaw * dDegreeToRad) * dRollMatrix (definition.m_frameRoll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
 		switch (definition.m_type)
@@ -261,7 +261,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 				dCustomRagdollMotor_1dof* const joint = new dCustomRagdollMotor_1dof(pinAndPivotInGlobalSpace, bone, parent);
 				//joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				joint->SetTwistAngle(definition.m_minTwistAngle * dDegreeToRad, definition.m_maxTwistAngle * dDegreeToRad);
 				break;
 			}
 
@@ -270,7 +270,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
 				//joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+				joint->SetConeAngle(definition.m_coneAngle * dDegreeToRad);
 				break;
 			}
 
@@ -280,8 +280,8 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
 				//joint->DisableMotor();
 				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
-				//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				joint->SetConeAngle(definition.m_coneAngle * dDegreeToRad);
+				//joint->SetTwistAngle(definition.m_minTwistAngle * dDegreeToRad, definition.m_maxTwistAngle * dDegreeToRad);
 				break;
 			}
 		}
@@ -406,19 +406,19 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 		dMatrix limbMatrix;
 
 		limb = ragDollModel.Find("Bip01_L_UpperArm");
-		limbMatrix = dPitchMatrix (-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limbMatrix = dPitchMatrix (-40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
 		limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_R_UpperArm");
-		limbMatrix = dPitchMatrix( 40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limbMatrix = dPitchMatrix( 40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
 		limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_L_Thigh");
-		limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limbMatrix = dPitchMatrix(40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
 		limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_R_Thigh");
-		limbMatrix = dPitchMatrix(-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limbMatrix = dPitchMatrix(-40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
 		limb->ResetMatrix(*scene, limbMatrix);
 	}
 

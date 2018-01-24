@@ -32,6 +32,9 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_debugScale(1.0f)
 	,m_mask(0x3f)
 {
+static int xxxxx;
+xxxx = xxxxx++;
+
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -180,22 +183,22 @@ void dCustom6dof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& ma
 
 #if 0
 	dMatrix matrix1_ (dGetIdentityMatrix());
-	dMatrix matrix0_ (dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(100.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f) * matrix1_);
+	dMatrix matrix0_ (dPitchMatrix(30.0f * dDegreeToRad) * dRollMatrix(100.0f * dDegreeToRad) * dYawMatrix(50.0f * dDegreeToRad) * matrix1_);
 	dMatrix localMatrix_(matrix0_ * matrix1_.Inverse());
 	localMatrix_.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 #endif
 
 	// deal with gimbals lock
-	if (euler0.m_z > 89.5f * 3.141592f / 180.0f) {
+	if (euler0.m_z > 89.5f * dDegreeToRad) {
 //		dAssert(0);
-	} else if (euler0.m_z < -89.5f * 3.141592f / 180.0f) {
+	} else if (euler0.m_z < -89.5f * dDegreeToRad) {
 //		dAssert(0);
 	}
 
 	// deal with roll angle flip
 	dAngularIntegration deltaYaw(dAngularIntegration(euler0.m_y) - m_yaw.m_currentAngle);
 	dAngularIntegration deltaPitch(dAngularIntegration(euler0.m_x) - m_pitch.m_currentAngle);
-	if ((dAbs(deltaYaw.GetAngle()) > (0.5f * 3.141592f)) && (dAbs(deltaPitch.GetAngle()) > (0.5f * 3.141592f))) {
+	if ((dAbs(deltaYaw.GetAngle()) > (0.5f * dPi)) && (dAbs(deltaPitch.GetAngle()) > (0.5f * dPi))) {
 		euler0 = euler1;
 	}
 
@@ -212,10 +215,10 @@ z0.Update(euler0.m_z);
 x -= x0.GetAngle();
 y -= y0.GetAngle();
 z -= z0.GetAngle();
-dAssert (dAbs (x) < 10.0f * 3.141592f / 180.0f );
-dAssert (dAbs (y) < 10.0f * 3.141592f / 180.0f );
-dAssert (dAbs (z) < 10.0f * 3.141592f / 180.0f );
-dTrace(("%f %f %f\n", x * 180.0f / 3.141592f, y * 180.0f / 3.141592f, z * 180.0f / 3.141592f));
+dAssert (dAbs (x) < 10.0f * dDegreeToRad );
+dAssert (dAbs (y) < 10.0f * dDegreeToRad );
+dAssert (dAbs (z) < 10.0f * dDegreeToRad );
+dTrace(("%f %f %f\n", x * dRadToDegree, y * dRadToDegree, z * dRadToDegree));
 #endif
 
 	m_yaw.m_currentAngle.Update(euler0.m_y);
@@ -241,8 +244,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 		if ((m_yaw.m_maxAngle > 1.0e-3f) || (m_yaw.m_minAngle < -1.0e-3f)) {
 			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
 
-			dFloat minAngle = dClamp(m_yaw.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f);
-			dFloat maxAngle = dClamp(m_yaw.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f);
+			dFloat minAngle = dClamp(m_yaw.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad);
+			dFloat maxAngle = dClamp(m_yaw.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad);
 
 			dFloat angleStep = (maxAngle - minAngle) / subdiv;
 			dFloat angle0 = minAngle;
@@ -266,8 +269,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 		if ((m_roll.m_maxAngle > 1.0e-3f) || (m_roll.m_minAngle < -1.0e-3f)) {
 			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
 
-			dFloat minAngle = dClamp(m_roll.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f);
-			dFloat maxAngle = dClamp(m_roll.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f);
+			dFloat minAngle = dClamp(m_roll.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad);
+			dFloat maxAngle = dClamp(m_roll.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad);
 
 			dFloat angleStep = (maxAngle - minAngle) / subdiv;
 			dFloat angle0 = minAngle;
@@ -291,8 +294,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 			// show pitch angle limits
 			dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
 
-			dFloat minAngle = dClamp(m_pitch.m_minAngle, -180.0f * 3.141592f / 180.0f, 0.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
-			dFloat maxAngle = dClamp(m_pitch.m_maxAngle, 0.0f * 3.141592f / 180.0f, 180.0f * 3.141592f / 180.0f) + 0.0f * 3.141592f;
+			dFloat minAngle = dClamp(m_pitch.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad) + 0.0f * dPi;
+			dFloat maxAngle = dClamp(m_pitch.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad) + 0.0f * dPi;
 
 			dFloat angleStep = (maxAngle - minAngle) / subdiv;
 			dFloat angle0 = minAngle;
@@ -435,7 +438,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-	dTrace (("%f %f %f\n", errorAngles.m_x * 180.0f / 3.141592f, errorAngles.m_y * 180.0f / 3.141592f, errorAngles.m_z * 180.0f / 3.141592f));
+	dTrace (("%d (%f %f %f)\n", errorAngles.m_x * dRadToDegree, errorAngles.m_y * dRadToDegree, errorAngles.m_z * dRadToDegree));
 
 #endif
 

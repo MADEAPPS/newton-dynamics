@@ -39,14 +39,14 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 	m_angularDamp_0 = 0.5f;
 	m_angularAccel_0 = -4.0f;
 	m_jointOmega_0 = 0.0f;
-	SetPitchLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetPitchLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 
 	m_limit_1_On = true;
 	m_angularMotor_1_On = false; 
 	m_angularDamp_1 = 0.3f;
 	m_angularAccel_1 = -4.0f;
 	m_jointOmega_1 = 0.0f;
-	SetYawLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetYawLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 }
 
 dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
@@ -64,14 +64,14 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const d
 	m_angularDamp_0 = 0.5f;
 	m_angularAccel_0 = -4.0f;
 	m_jointOmega_0 = 0.0f;
-	SetPitchLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetPitchLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 
 	m_limit_1_On = true;
 	m_angularMotor_1_On = false;
 	m_angularDamp_1 = 0.3f;
 	m_angularAccel_1 = -4.0f;
 	m_jointOmega_1 = 0.0f;
-	SetYawLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetYawLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 }
 
 

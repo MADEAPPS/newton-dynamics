@@ -184,7 +184,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 			// Assuming the angles are in radians.
 			if (matrix[0][2] > 0.99995f) {
 				dFloat picth0 = 0.0f;
-				dFloat yaw0 = -3.141592f * 0.5f;
+				dFloat yaw0 = -dPi * 0.5f;
 				dFloat roll0 = -dAtan2(matrix[2][1], matrix[1][1]);
 				euler0[0] = picth0;
 				euler0[1] = yaw0;
@@ -196,7 +196,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 
 			} else if (matrix[0][2] < -0.99995f) {
 				dFloat picth0 = 0.0f;
-				dFloat yaw0 = 3.141592f * 0.5f;
+				dFloat yaw0 = dPi * 0.5f;
 				dFloat roll0 = dAtan2(matrix[2][1], matrix[1][1]);
 				euler0[0] = picth0;
 				euler0[1] = yaw0;
@@ -207,7 +207,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 				euler1[2] = roll0;
 			} else {
 				dFloat yaw0 = -dAsin(matrix[0][2]);
-				dFloat yaw1 = 3.141592f - yaw0;
+				dFloat yaw1 = dPi - yaw0;
 
 				dFloat picth0 = dAtan2( matrix[1][2],  matrix[2][2]);
 				dFloat picth1 = dAtan2(-matrix[1][2], -matrix[2][2]);
@@ -215,8 +215,8 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 				dFloat roll0 = dAtan2( matrix[0][1],  matrix[0][0]);
 				dFloat roll1 = dAtan2(-matrix[0][1], -matrix[0][0]);
 
-				if (yaw1 > 3.141592f) {
-					yaw1 -= 2.0f * 3.141592f;
+				if (yaw1 > dPi) {
+					yaw1 -= 2.0f * dPi;
 				}
 
 				euler0[0] = picth0;
@@ -246,11 +246,11 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 		case m_pitchRollYaw:
 		{
 			const dMatrix& matrix = *this;
-			//dMatrix matrix(dPitchMatrix(30.0f * 3.141592f / 180.0f) * dRollMatrix(-90.0f * 3.141592f / 180.0f) * dYawMatrix(50.0f * 3.141592f / 180.0f));
+			//dMatrix matrix(dPitchMatrix(30.0f * dDegreeToRad) * dRollMatrix(-90.0f * dDegreeToRad) * dYawMatrix(50.0f * dDegreeToRad));
 			if (matrix[0][1] > 0.99995f) {
 
 				dFloat picth0 = 0.0f;
-				dFloat roll0 = dFloat (3.141592f * 0.5f);
+				dFloat roll0 = dFloat (dPi * 0.5f);
 				dFloat yaw0 = dAtan2(matrix[1][2], matrix[2][2]);
 
 				euler0[0] = picth0;
@@ -264,7 +264,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 			} else if (matrix[0][1] < -0.99995f) {
 
 				dFloat picth0 = 0.0f;
-				dFloat roll0 = dFloat(-3.141592f * 0.5f);
+				dFloat roll0 = dFloat(-dPi * 0.5f);
 				dFloat yaw0 = dAtan2(-matrix[1][2], matrix[2][2]);
 
 				euler0[0] = picth0;
@@ -277,7 +277,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 
 			} else {
 				dFloat roll0 = dAsin(matrix[0][1]);
-				dFloat roll1 = 3.141592f - roll0;
+				dFloat roll1 = dPi - roll0;
 
 				dFloat yaw0 = dAtan2(-matrix[0][2], matrix[0][0]);
 				dFloat yaw1 = dAtan2( matrix[0][2], -matrix[0][0]);
@@ -285,8 +285,8 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 				dFloat picth0 = dAtan2(-matrix[2][1],  matrix[1][1]);
 				dFloat picth1 = dAtan2( matrix[2][1], -matrix[1][1]);
 
-				if (roll1 > dFloat (3.141592f)) {
-					roll1 -= dFloat (2.0f * 3.141592f);
+				if (roll1 > dFloat (dPi)) {
+					roll1 -= dFloat (2.0f * dPi);
 				}
 
 				euler0[0] = picth0;

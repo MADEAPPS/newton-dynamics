@@ -52,7 +52,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		dFloat x = -m_amplitud_x / 2.0f;
 		dFloat step_x = m_amplitud_x / splite;
 		for (int i = 0; i <= splite; i ++) {
-			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (3.141592f * dFloat (i) / splite);
+			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (dPi * dFloat (i) / splite);
 			leftControlPoints[i + 1].m_x = x;
 			x += step_x;
 		}
@@ -254,7 +254,7 @@ class dHaxapodController: public dCustomControllerBase
 		NewtonWorld* const world = scene->GetNewton();
 		int materialID = NewtonMaterialGetDefaultGroupID(world);
 		dVector size(radius, height, radius, 0.0f);
-		dMatrix align(dYawMatrix(3.141592f * 0.5f));
+		dMatrix align(dYawMatrix(dPi * 0.5f));
 		NewtonCollision* const collision = CreateConvexCollision(world, align, size, _CAPSULE_PRIMITIVE, 0);
 		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -272,31 +272,31 @@ class dHaxapodController: public dCustomControllerBase
 
 		dFloat inertiaScale = 4.0f;
 		// make limb base
-		dMatrix baseMatrix(dRollMatrix(3.141592f * 0.5f));
+		dMatrix baseMatrix(dRollMatrix(dPi * 0.5f));
 		dMatrix cylinderMatrix(baseMatrix * matrix);
 		NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
-		dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -3.141592f * 0.5f, 3.141592f * 0.5f);
+		dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -dPi * 0.5f, dPi * 0.5f);
 		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 		//make limb forward arm
-		dMatrix forwardArmMatrix(dPitchMatrix(-30.0f * 3.141592f / 180.0f));
+		dMatrix forwardArmMatrix(dPitchMatrix(-30.0f * dDegreeToRad));
 		dVector forwardArmSize(limbLenght * 0.25f, limbLenght * 0.25f, limbLenght, 0.0f);
 		forwardArmMatrix.m_posit += forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
 		NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix * matrix, forwardArmSize, partMass, inertiaScale);
 		dMatrix forwardArmPivot(forwardArmMatrix);
 		forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
-		dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * matrix, forwardArm, base, -3.141592f * 0.5f, 3.141592f * 0.5f);
+		dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * matrix, forwardArm, base, -dPi * 0.5f, dPi * 0.5f);
 		void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
 
 		//make limb forward arm
-		dMatrix armMatrix(dPitchMatrix(-90.0f * 3.141592f / 180.0f));
+		dMatrix armMatrix(dPitchMatrix(-90.0f * dDegreeToRad));
 		dFloat armSize = limbLenght * 1.25f;
 		armMatrix.m_posit += forwardArmMatrix.m_right.Scale(limbLenght);
 		armMatrix.m_posit.m_y -= armSize * 0.5f;
 		NewtonBody* const arm = CreateCapsule(scene, armMatrix * matrix, partMass, inertiaScale, armSize * 0.2f, armSize);
 		dMatrix armPivot(armMatrix);
 		armPivot.m_posit.m_y += armSize * 0.5f;
-		dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * matrix, arm, forwardArm, -3.141592f * 0.5f, 3.141592f * 0.5f);
+		dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * matrix, arm, forwardArm, -dPi * 0.5f, dPi * 0.5f);
 		void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
 
 		dMatrix effectorMatrix(dGetIdentityMatrix());
@@ -338,7 +338,7 @@ class dHaxapodController: public dCustomControllerBase
 			dMatrix similarTransform (dGetIdentityMatrix());
 			similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
 			similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
-			dMatrix leftLocation (rightLocation * similarTransform.Inverse() * dYawMatrix(3.141592f) * similarTransform);
+			dMatrix leftLocation (rightLocation * similarTransform.Inverse() * dYawMatrix(dPi) * similarTransform);
 			legEffectors[legEffectorCount] = AddLeg (scene, hexaBodyNode, leftLocation * location, mass * 0.1f, 0.3f);
 			legEffectorCount ++;
 		}
@@ -437,7 +437,7 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 			dHaxapodController* const controller = &node->GetInfo();
 
 			controller->m_walkIdleBlender->SetBlendFactor (me->m_speed);
-			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * 3.141592f / 180.0f, me->m_yaw * 3.141592f / 180.0f, -me->m_roll * 3.141592f / 180.0f);
+			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * dDegreeToRad, me->m_yaw * dDegreeToRad, -me->m_roll * dDegreeToRad);
 		}
 	}
 

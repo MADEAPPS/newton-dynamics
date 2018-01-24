@@ -334,16 +334,16 @@ dCustomLimitBallAndSocket::dCustomLimitBallAndSocket(const dMatrix& pinAndPivotF
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	,m_friction(0.0f)
 {
-	SetConeAngle (45.0f * 3.141592f / 180.0f);
-	SetTwistAngle (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetConeAngle (45.0f * dDegreeToRad);
+	SetTwistAngle (-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 }
 
 dCustomLimitBallAndSocket::dCustomLimitBallAndSocket(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_friction(0.0f)
 {
-	SetConeAngle(45.0f * 3.141592f / 180.0f);
-	SetTwistAngle(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	SetConeAngle(45.0f * dDegreeToRad);
+	SetTwistAngle(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 }
 
 dCustomLimitBallAndSocket::~dCustomLimitBallAndSocket()

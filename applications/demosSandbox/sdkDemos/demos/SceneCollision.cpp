@@ -185,11 +185,11 @@ class ComplexScene: public DemoEntity
 
 		//y = a * sin(x)* (sin (z)) ^2
 		for (int i = 0; i < size; i ++) {
-			dFloat z = 3.1416f * i / (size - 1);
+			dFloat z = dPi * i / (size - 1);
 			dFloat z2 = dSin (z);
 			z2 = z2 * z2 * 5.0f;
 			for (int j = 0; j < size; j ++) {
-				dFloat x = 3.1416f * j / (size - 1);
+				dFloat x = dPi * j / (size - 1);
 				dFloat y = z2 * dSin(x);
 				elevation[j * size + i] = y;
 			}
@@ -232,7 +232,7 @@ class ComplexScene: public DemoEntity
 		void* proxy;
 		NewtonCollision* shape;
 		
-		matrix = dRollMatrix(15.0f * 3.1416f / 180.0f);
+		matrix = dRollMatrix(15.0f * dDegreeToRad);
 		matrix.m_posit.m_y = 4.0f;
 		matrix.m_posit.m_x = 3.0f;
 		matrix.m_posit.m_z = 0.0f;
@@ -243,7 +243,7 @@ class ComplexScene: public DemoEntity
 		mesh->AddRef();
 
 		
-		matrix = dRollMatrix(-15.0f * 3.1416f / 180.0f);
+		matrix = dRollMatrix(-15.0f * dDegreeToRad);
 		matrix.m_posit.m_y = 8.0f;
 		matrix.m_posit.m_x = -3.0f;
 		matrix.m_posit.m_z = 0.0f;
@@ -357,7 +357,7 @@ void SceneCollision (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 5.0f, -5.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
