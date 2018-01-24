@@ -897,7 +897,7 @@ void dgCollisionHeightField::CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1,
 	}
 }
 
-void dgCollisionHeightField::CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1, const dgInt16* const elevation, dgFloat32& minHeight, dgFloat32& maxHeight) const
+void dgCollisionHeightField::CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1, const dgUnsigned16* const elevation, dgFloat32& minHeight, dgFloat32& maxHeight) const
 {
 	dgInt32 base = z0 * m_width;
 	for (dgInt32 z = z0; z <= z1; z++) {
@@ -942,7 +942,7 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 
 		case m_unsigned16Bit:
 		{
-			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgInt16*)m_elevationMap, minHeight, maxHeight);
+			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgUnsigned16*)m_elevationMap, minHeight, maxHeight);
 			break;
 		}
 	}
@@ -1010,7 +1010,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 		case m_unsigned16Bit:
 		{
-			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgInt16*)m_elevationMap, minHeight, maxHeight);
+			CalculateMinAndMaxElevation(x0, x1, z0, z1, (dgUnsigned16*)m_elevationMap, minHeight, maxHeight);
 			break;
 		}
 	}

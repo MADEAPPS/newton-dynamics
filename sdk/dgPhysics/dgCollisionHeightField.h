@@ -73,7 +73,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 	};
 
 	void CalculateAABB();
-	void CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1, const dgInt16* const elevation, dgFloat32& minHeight, dgFloat32& maxHeight) const;
+	void CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1, const dgUnsigned16* const elevation, dgFloat32& minHeight, dgFloat32& maxHeight) const;
 	void CalculateMinAndMaxElevation(dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1, const dgFloat32* const elevation, dgFloat32& minHeight, dgFloat32& maxHeight) const;
 		
 	void AllocateVertex(dgWorld* const world, dgInt32 thread) const;
