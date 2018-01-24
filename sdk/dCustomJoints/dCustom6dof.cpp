@@ -415,9 +415,11 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 //	matrix0 = dL * dL.Inverse() * L * matrix1;
 	dMatrix clipMatrix (dL.Inverse() * matrix0);
 
+	dAngleData* angle[] = {&m_pitch, &m_yaw, &m_roll};
+
 	for (int i = 0; i < 3; i++) {
 		if (m_mask & (1 << (i + 3))) {
-			const dAngleData& angleLimits = m_angle[i];
+			const dAngleData& angleLimits = *angle[i];
 			if ((angleLimits.m_minAngle == 0.0f) && (angleLimits.m_maxAngle == 0.0f)) {
 				NewtonUserJointAddAngularRow(m_joint, -errorAngles[i], &clipMatrix[i][0]);
 				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);

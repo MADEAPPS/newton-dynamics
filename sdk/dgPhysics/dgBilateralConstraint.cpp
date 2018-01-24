@@ -453,8 +453,9 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				//accelError = num / den;
 
 				dgFloat32 ksd = dt * ks;
-				dgFloat32 relPosit = jacobianMatrixElements[k].m_penetration - vRel * dt * params->m_firstPassCoefFlag;
-				jacobianMatrixElements[k].m_penetration = relPosit;
+				//dgFloat32 relPosit = jacobianMatrixElements[k].m_penetration - vRel * dt * params->m_firstPassCoefFlag;
+				//jacobianMatrixElements[k].m_penetration = relPosit;
+				dgFloat32 relPosit = jacobianMatrixElements[k].m_penetration * params->m_subSampleScaler;
 
 				dgFloat32 num = ks * relPosit - kd * vRel - ksd * vRel;
 				dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;

@@ -103,7 +103,9 @@ class dgJointAccelerationDecriptor
 	dgInt32 m_rowsCount;
 	dgFloat32 m_timeStep;
 	dgFloat32 m_invTimeStep;
+	dgFloat32 m_subSampleScaler;
 	dgFloat32 m_firstPassCoefFlag;
+	
 	dgJacobianMatrixElement *m_rowMatrix;
 };
 

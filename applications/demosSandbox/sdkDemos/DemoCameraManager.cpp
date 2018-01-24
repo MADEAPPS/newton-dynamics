@@ -98,8 +98,10 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
+	bool mouseState = scene->GetMouseKeyState(0);
+
 	// do camera rotation, only if we do not have anything picked
-	bool buttonState = m_mouseLockState || scene->GetMouseKeyState(0);
+	bool buttonState = m_mouseLockState || mouseState;
 	if (!m_targetPicked && buttonState) {
 		int mouseSpeedX = mouseX - m_mousePosX;
 		int mouseSpeedY = mouseY - m_mousePosY;
@@ -127,7 +129,43 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 	dQuaternion rot (matrix);
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
-	UpdatePickBody(scene, timestep);
+	// get the mouse pick parameter so that we can do replay for debugging
+	dFloat x = dFloat(m_mousePosX);
+	dFloat y = dFloat(m_mousePosY);
+	dVector p0(m_camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
+	dVector p1(m_camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
+
+#if 0
+	struct dReplay
+	{
+		dVector m_p0;
+		dVector m_p1;
+		int m_mouseState;
+	};
+	dReplay replay;
+
+	#if 0
+		replay.m_p0 = p0;
+		replay.m_p1 = p1;
+		replay.m_mouseState = mouseState ? 1 : 0;
+
+		static FILE* file = fopen("log.bin", "wb");
+		if (file) {
+			fwrite(&replay, sizeof(dReplay), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen("log.bin", "rb");
+		if (file) {
+			fread(&replay, sizeof(dReplay), 1, file);
+			p0 = replay.m_p0;
+			p1 = replay.m_p1;
+			mouseState = replay.m_mouseState ? true : false;
+		}
+	#endif
+#endif
+
+	UpdatePickBody(scene, mouseState, p0, p1, timestep);
 }
 
 
@@ -174,20 +212,19 @@ void DemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 }
 
 
-void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
+void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat timestep) 
 {
 	// handle pick body from the screen
-	bool mousePickState = scene->GetMouseKeyState(0);
 	if (!m_targetPicked) {
 		if (!m_prevMouseState && mousePickState) {
 			dFloat param;
 			dVector posit;
 			dVector normal;
 
-			dFloat x = dFloat (m_mousePosX);
-			dFloat y = dFloat (m_mousePosY);
-			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
-			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
+			//dFloat x = dFloat (m_mousePosX);
+			//dFloat y = dFloat (m_mousePosY);
+			//dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
+			//dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			NewtonBody* const body = MousePickBody (scene->GetNewton(), p0, p1, param, posit, normal);
 			if (body) {
 				dMatrix matrix;
@@ -226,11 +263,11 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, dFloat ti
 		}
 
 	} else {
-		if (scene->GetMouseKeyState(0)) {
-			dFloat x = dFloat (m_mousePosX);
-			dFloat y = dFloat (m_mousePosY);
-			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
-			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
+		if (mousePickState) {
+			//dFloat x = dFloat (m_mousePosX);
+			//dFloat y = dFloat (m_mousePosY);
+			//dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
+			//dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 
 			#ifdef USE_PICK_BODY_BY_FORCE

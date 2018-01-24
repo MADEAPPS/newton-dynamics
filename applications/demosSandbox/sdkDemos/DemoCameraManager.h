@@ -44,7 +44,7 @@ class DemoCameraManager
 
 	private:
 	virtual void OnBodyDestroy (NewtonBody* const body);
-	void UpdatePickBody (DemoEntityManager* const scene, dFloat timestep); 
+	void UpdatePickBody (DemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat timestep); 
 	
 	DemoCamera* m_camera;
 	int m_mousePosX;

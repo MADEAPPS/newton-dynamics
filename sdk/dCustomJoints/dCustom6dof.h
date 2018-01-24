@@ -78,14 +78,9 @@ class dCustom6dof: public dCustomJoint
 	protected:
 	dVector m_minLinearLimits;
 	dVector m_maxLinearLimits;
-	union {
-		dAngleData m_angle[3];
-		struct {
-			dAngleData m_pitch;
-			dAngleData m_yaw;
-			dAngleData m_roll;
-		};
-	};
+	dAngleData m_pitch;
+	dAngleData m_yaw;
+	dAngleData m_roll;
 	dFloat m_debugScale;
 
 	union
