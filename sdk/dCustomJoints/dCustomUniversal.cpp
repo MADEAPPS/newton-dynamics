@@ -396,6 +396,7 @@ if (!m_rollAxis)
 	NewtonUserJointAddAngularRow(m_joint, -rollAngle, &rollMatrix.m_right[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+dTrace(("U: %f (%f %f %f\n", rollAngle * dRadToDegree, rollMatrix.m_right[0], rollMatrix.m_right[1], rollMatrix.m_right[2]));
 }
 
 	// check is the joint limit are enable

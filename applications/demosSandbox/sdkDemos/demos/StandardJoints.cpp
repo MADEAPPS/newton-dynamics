@@ -310,7 +310,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
-		joint1->SetLimits_0 (-5.0f * dPi, 2.0f * dPi);
+	joint1->SetLimits_0 (-5.0f * dPi, 2.0f * dPi);
 	joint1->SetLimits_1 (-3.0f * dPi, 4.0f * dPi);
 	joint1->EnableLimit_0(true);
 	joint1->EnableLimit_1(true);
@@ -1035,11 +1035,11 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
-	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
-	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
-	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
+//	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+//	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));

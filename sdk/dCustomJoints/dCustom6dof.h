@@ -91,9 +91,9 @@ class dCustom6dof: public dCustomJoint
 			int m_xAxis : 1;
 			int m_yAxis : 1;
 			int m_zAxis : 1;
+			int m_pitchAxis : 1;
 			int m_yawAxis : 1;
 			int m_rollAxis : 1;
-			int m_pitchAxis : 1;
 		};
 	};
 
