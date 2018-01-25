@@ -248,7 +248,7 @@ void dCustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thr
 	dVector euler (m_pitch.Update (euler0.m_x), m_yaw.Update (euler0.m_y), m_roll.Update (euler0.m_z), 0.0f);
 	for (int i = 0; i < 3; i ++) {
 		dFloat error = m_targetAngles[i] - euler[i];
-		if (dAbs (error) > (0.125f * 3.14159213f / 180.0f) ) {
+		if (dAbs (error) > (0.125f * dDegreeToRad) ) {
 			dFloat angularStep = dSign(error) * m_angulaSpeed * timestep;
 			if (angularStep > 0.0f) {
 				if (angularStep > error) {
@@ -479,7 +479,7 @@ void dCustomLimitBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	const float radius = m_debugScale;
 
 	dVector point(radius * dCos(m_coneAngle), radius * dSin(m_coneAngle), 0.0f, 0.0f);
-	dFloat angleStep = 3.141692f * 2.0f / subdiv;
+	dFloat angleStep = dPi * 2.0f / subdiv;
 	dFloat angle0 = 0.0f;
 
 	dVector arch[subdiv + 1];

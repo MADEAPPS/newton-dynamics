@@ -183,7 +183,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 /*
 	//test buoyancy on scaled collisions
 	dVector plane (0.0f, 1.0f, 0.0f, 0.0f);
-	dMatrix L1 (dPitchMatrix(30.0f * 3.141692f / 180.0f) * dYawMatrix(0.0f * 3.141692f / 180.0f) * dRollMatrix(0.0f * 3.141692f / 180.0f));
+	dMatrix L1 (dPitchMatrix(30.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
 	NewtonCollision* xxx0 = NewtonCreateCompoundCollision(scene->GetNewton(), 0);
 	NewtonCompoundCollisionBeginAddRemove(xxx0);
 	NewtonCollision* xxxx0 = NewtonCreateBox(scene->GetNewton(), 1.0f, 2.0f, 1.0f, 0, &L1[0][0]);
@@ -196,8 +196,8 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	NewtonCompoundCollisionEndAddRemove(xxx1);
 	NewtonCollisionSetScale(xxx1, 1.0f, 2.0f, 1.0f);
 
-	//dMatrix m (dPitchMatrix(45.0f * 3.141692f / 180.0f) * dYawMatrix(40.0f * 3.141692f / 180.0f) * dRollMatrix(70.0f * 3.141692f / 180.0f));
-	dMatrix m (dPitchMatrix(0.0f * 3.141692f / 180.0f) * dYawMatrix(0.0f * 3.141692f / 180.0f) * dRollMatrix(0.0f * 3.141692f / 180.0f));
+	//dMatrix m (dPitchMatrix(45.0f * dDegreeToRad) * dYawMatrix(40.0f * dDegreeToRad) * dRollMatrix(70.0f * dDegreeToRad));
+	dMatrix m (dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
 
 	dVector gravity (0.0f, 0.0f, -9.8f, 0.0f);
 	dVector cog0 (0.0f, 0.0f, 0.0f, 0.0f);

@@ -286,7 +286,7 @@ void dgCollisionSphere::MassProperties ()
 {
 	m_centerOfMass = dgVector (dgFloat32 (0.0f));
 	m_crossInertia = dgVector (dgFloat32 (0.0f));
-	dgFloat32 volume = dgFloat32 (4.0f * 3.141592f / 3.0f) * m_radius *  m_radius * m_radius; 
+	dgFloat32 volume = dgFloat32 (4.0f * dgPI / 3.0f) * m_radius *  m_radius * m_radius;
 	dgFloat32 II = dgFloat32 (2.0f / 5.0f) * m_radius *  m_radius;
 
 //dgCollisionConvex::MassProperties ();

@@ -1574,11 +1574,11 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
         dgFloat64 u = dgAsin (dgClamp (point.m_y, dgFloat64 (-1.0f + 1.0e-6f), dgFloat64 (1.0f - 1.0e-6f)));
         dgFloat64 v = dgAtan2 (point.m_x, point.m_z);
 
-        u = dgFloat32 (1.0f) -(dgFloat64 (3.141592f/2.0f) - u) / dgFloat64 (3.141592f);
+        u = dgFloat32 (1.0f) -(dgFloat64 (dgPI/2.0f) - u) / dgFloat64 (dgPI);
         dgAssert (u >= dgFloat32 (0.0f));
         dgAssert (u <= dgFloat32 (1.0f));
 
-        v = (dgFloat64 (3.141592f) - v) / dgFloat64 (2.0f * 3.141592f);
+        v = (dgFloat64 (dgPI) - v) / dgFloat64 (2.0f * dgPI);
 
         sphere[i].m_x = v;
         sphere[i].m_y = u;
@@ -1664,7 +1664,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
         point = point.Scale3 (dgFloat64 (1.0f) / sqrt (point.DotProduct3(point)));
         dgFloat64 v = dgAtan2 (point.m_y, point.m_z);
 
-        v = (v - dgFloat64 (3.141592f)) / dgFloat64 (2.0f * 3.141592f) + dgFloat64 (1.0f);
+        v = (v - dgFloat64 (dgPI)) / dgFloat64 (2.0f * dgPI) + dgFloat64 (1.0f);
         cylinder[i].m_x = u;
         cylinder[i].m_y = v;
     }
@@ -1833,9 +1833,9 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
     for (dgInt32 i = 0; i < 3; i ++) {
         dgMatrix rotationMatrix (dgGetIdentityMatrix());
         if (i == 1) {
-            rotationMatrix = dgYawMatrix(dgFloat32 (90.0f * 3.141592f / 180.0f));
+            rotationMatrix = dgYawMatrix(dgFloat32 (90.0f * dgDEG2RAD));
         } else if (i == 2) {
-            rotationMatrix = dgPitchMatrix(dgFloat32 (90.0f * 3.141592f / 180.0f));
+            rotationMatrix = dgPitchMatrix(dgFloat32 (90.0f * dgDEG2RAD));
         }
 
         dgPolyhedra::Iterator iter (*this);	

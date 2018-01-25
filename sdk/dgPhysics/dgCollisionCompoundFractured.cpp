@@ -285,7 +285,7 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 		}
 
 		dgConvexSolidArray::Iterator iter (delanayNodes);
-		dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
+		dgFloat32 normalAngleInRadians = 30.0f * dgDEG2RAD;
 
 		dgTree<dgFractureConectivity::dgListNode*, dgConvexSolidArray::dgTreeNode*> graphMap(allocator);
 		for (iter.Begin(); iter; iter ++) {
@@ -1396,7 +1396,7 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 //			projection.StoreScalar(&val);
 			dgFloat32 val = projection.GetScalar();
 			dgAssert (val > dgFloat32 (-1.0f));
-			dgFloat32 angle = dgAcos (val) - dgFloat32 (3.141592f * 90.0f / 180.0f) + dgFloat32 (3.141592f * 15.0f / 180.0f);
+			dgFloat32 angle = dgAcos (val) - dgFloat32 (90.0f * dgDEG2RAD) + dgFloat32 (15.0f * dgDEG2RAD);
 			dgVector axis (himespherePlane.CrossProduct3(directionsMap[i]));
 			axis = axis.Normalize();
 			dgQuaternion rot (axis, angle);

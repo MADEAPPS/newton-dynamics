@@ -1583,7 +1583,7 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 
 	NewtonBodySetLinearDamping(tireBody, 0.0f);
 	NewtonBodySetAngularDamping(tireBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(tireBody, 3.141692f);
+	NewtonBodySetMaxRotationPerStep(tireBody, dPi);
 
 	// set the standard force and torque call back
 	NewtonBodySetForceAndTorqueCallback(tireBody, m_forceAndTorqueCallback);
@@ -1635,7 +1635,7 @@ dAssert(0);
 	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(differentialBody, 0);
 	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(differentialBody, 3.141692f * 2.0f);
+	NewtonBodySetMaxRotationPerStep(differentialBody, dPi * 2.0f);
 	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
 	NewtonDestroyCollision(collision);
 
@@ -1699,7 +1699,7 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(differentialBody, 0);
 	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(differentialBody, 3.141692f * 2.0f);
+	NewtonBodySetMaxRotationPerStep(differentialBody, dPi * 2.0f);
 	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
 	NewtonDestroyCollision(collision);
 
@@ -1755,7 +1755,7 @@ dEngineJoint* dCustomVehicleController::AddEngineJoint(dFloat mass, dFloat armat
 	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(engineBody, 0);
 	NewtonBodySetAngularDamping(engineBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(engineBody, 3.141692f * 2.0f);
+	NewtonBodySetMaxRotationPerStep(engineBody, dPi * 2.0f);
 	NewtonBodySetForceAndTorqueCallback(engineBody, m_forceAndTorqueCallback);
 	NewtonDestroyCollision(collision);
 

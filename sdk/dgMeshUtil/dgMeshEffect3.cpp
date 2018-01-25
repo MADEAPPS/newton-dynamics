@@ -892,7 +892,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 	dgFloat64 CalculateConcavityMetric (dgFloat64 convexConcavity, dgFloat64 area, dgFloat64 perimeter, dgInt32 faceCountA, dgInt32 faceCountB) const 
 	{
-		dgFloat64 edgeCost = perimeter * perimeter / (dgFloat64(4.0f * 3.141592f) * area);
+		dgFloat64 edgeCost = perimeter * perimeter / (dgFloat64(4.0f * dgPI) * area);
 		return convexConcavity * DG_CONCAVITY_SCALE + edgeCost + ConcavityByFaceMedian (faceCountA, faceCountB);
 	}
 

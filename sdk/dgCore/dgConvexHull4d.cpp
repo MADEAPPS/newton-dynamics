@@ -55,7 +55,7 @@ dgConvexHull4d::dgNormalMap::dgNormalMap()
 
 	count = 0;
 	for (dgInt32 j = 0; j < 8; j++) {
-		dgFloat64 beta = (j - 4) * dgFloat64 (3.141592f * 22.5f / 180.0f) + dgFloat64 (3.141592f * 10.5f / 180.0f);
+		dgFloat64 beta = (j - 4) * dgFloat64 (22.5f * dgDEG2RAD) + dgFloat64 (10.5f * dgDEG2RAD);
 		dgFloat64 sinBeta = sin(beta);
 		dgFloat64 cosBeta = cos(beta);
 

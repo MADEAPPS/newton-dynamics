@@ -893,7 +893,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		dMatrix hingeFrame(dRollMatrix (-3.141692f * 0.0f) * matrix);
+		dMatrix hingeFrame(dRollMatrix (0.0f * dDegreeToRad) * matrix);
 		new ArticulatedEntityModel::SuspensionTire(hingeFrame, bone->m_body, parentBone->m_body);
 		return bone;
 	}

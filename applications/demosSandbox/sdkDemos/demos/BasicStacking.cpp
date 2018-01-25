@@ -280,10 +280,10 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	int high = 20;
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
-		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-		//BuildPyramid (scene, 10.0f, dVector( 40.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CHAMFER_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
+		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
+		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * dPi));
+		//BuildPyramid (scene, 10.0f, dVector( 40.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CHAMFER_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
 	}
 
 	high = 20;

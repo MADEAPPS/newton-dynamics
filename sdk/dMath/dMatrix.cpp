@@ -541,7 +541,7 @@ public:
 		s.PolarDecomposition (matrix, scale, stretch);
 		dMatrix s1 (matrix, scale, stretch);
 
-		dMatrix xxx (dPitchMatrix(30.0f * 3.14159f/180.0f) * dRollMatrix(30.0f * 3.14159f/180.0f));
+		dMatrix xxx (dPitchMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad));
 		dMatrix xxxx (GetIdentityMatrix());
 		xxx[0] = xxx[0].Scale (-1.0f);
 		dFloat mmm = (xxx[0] * xxx[1]) % xxx[2];

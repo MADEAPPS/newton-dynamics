@@ -880,7 +880,7 @@ void dgMeshEffect::LoadOffMesh(const char* const fileName)
 					vertexFormat.m_vertex.m_indexList = &indexList[0];
 					BuildFromIndexList(&vertexFormat);
 
-					CalculateNormals(3.1416f * 30.0f / 180.0f);
+					CalculateNormals(30.0f * dgDEG2RAD);
 					stillData = false;
 					break;
 				}
@@ -924,7 +924,7 @@ void dgMeshEffect::LoadTetraMesh (const char* const filename)
 			dgMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dgBigVector), dgFloat64(0.0f));
 
 			dgAssert(convexMesh.GetCount());
-			convexMesh.CalculateNormals(dgFloat32(30.0f * 3.1416f / 180.0f));
+			convexMesh.CalculateNormals(dgFloat32(30.0f * dgDEG2RAD));
 			for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
 				convexMesh.m_points.m_layers[i] = layers;
 			}
@@ -1017,7 +1017,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		index ++;
 	}
 
-	const dgFloat32 normalAngleInRadians = dgFloat32 (30.0f * 3.1416f / 180.0f);
+	const dgFloat32 normalAngleInRadians = dgFloat32 (30.0f * dgDEG2RAD);
 	dgMeshEffect* const voronoiPartition = new (allocator) dgMeshEffect (allocator);
 	voronoiPartition->BeginBuild();
 	dgInt32 layer = 0;
@@ -1109,7 +1109,7 @@ xxxx.EndBuild(dgFloat64(1.0e-8f), false);
 			}
 			dgMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dgBigVector), dgFloat64(0.0f));
 			//dgAssert (convexMesh.GetCount());
-			//convexMesh.CalculateNormals(dgFloat32 (30.0f * 3.1416f / 180.0f));
+			//convexMesh.CalculateNormals(dgFloat32 (30.0f * dgDEG2RAD));
 			for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
 				convexMesh.m_points.m_layers[i] = layer;
 			}

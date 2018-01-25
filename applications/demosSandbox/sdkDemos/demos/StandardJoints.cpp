@@ -253,9 +253,9 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f- size.m_y * 2.0f, 0.0f, 0.0f), size);
 
-	const dFloat yawLimit = 120.0f * 3.1415592f / 180.0f;
-	const dFloat rollLimit = 80.0f * 3.1415592f / 180.0f;
-	const dFloat pitchLimit = 80.0f * 3.1415592f / 180.0f;
+	const dFloat yawLimit = 120.0f * dDegreeToRad;
+	const dFloat rollLimit = 80.0f * dDegreeToRad;
+	const dFloat pitchLimit = 80.0f * dDegreeToRad;
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
@@ -966,7 +966,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		matrix.m_right = matrix.m_right.Scale(1.0f / dSqrt(matrix.m_right.DotProduct3(matrix.m_right)));
 		matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
 		matrix.m_posit = pathBodyMatrix.TransformVector(dVector (positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, 1.0));
-		dMatrix matrix1 (dYawMatrix(0.5f * 3.141692f) * matrix);
+		dMatrix matrix1 (dYawMatrix(0.5f * dPi) * matrix);
 
 		NewtonBodySetMatrix(box, &matrix1[0][0]);
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(box);
@@ -1031,7 +1031,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-//	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
+	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -5.0f));

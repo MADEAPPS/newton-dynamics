@@ -365,8 +365,8 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
-	dMatrix origin(dYawMatrix(0.0f * 3.141693f));
-	dMatrix origin1(dYawMatrix(1.0f * 3.141693f));
+	dMatrix origin(dYawMatrix(0.0f * dDegreeToRad));
+	dMatrix origin1(dYawMatrix(180.0f * dDegreeToRad));
 	origin.m_posit.m_z = -1.0f;
 	origin1.m_posit.m_z =  1.0f;
 

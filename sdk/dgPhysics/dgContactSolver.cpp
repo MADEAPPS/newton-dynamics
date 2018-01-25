@@ -388,7 +388,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		dgVector e0(m_hullDiff[1] - m_hullDiff[0]);
 		dgAssert(e0.DotProduct3(e0) > dgFloat32(0.0f));
 		dgMatrix matrix(e0.Scale4(dgRsqrt(e0.DotProduct3(e0))));
-		dgMatrix rotation(dgPitchMatrix(dgFloat32(45.0f * 3.141592f / 180.0f)));
+		dgMatrix rotation(dgPitchMatrix(dgFloat32(45.0f * dgDEG2RAD)));
 		dgFloat32 maxArea = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < 8; i++) {
 			SupportVertex(matrix[1], 3);

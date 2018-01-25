@@ -146,8 +146,8 @@ void dCustomRagdollMotor_1dof::Serialize(NewtonSerializeCallback callback, void*
 
 void dCustomRagdollMotor_1dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
-	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-170.0f * 3.141582f / 180.0f));
-	m_maxTwistAngle = dMin( dAbs(maxAngle), dFloat( 170.0f * 3.141582f / 180.0f));
+	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-170.0f * dDegreeToRad));
+	m_maxTwistAngle = dMin( dAbs(maxAngle), dFloat( 170.0f * dDegreeToRad));
 }
 
 void dCustomRagdollMotor_1dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
@@ -262,8 +262,8 @@ void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void*
 
 void dCustomRagdollMotor_3dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
-	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-60.0f * 3.141582f / 180.0f));
-	m_maxTwistAngle = dMin( dAbs(maxAngle), dFloat( 60.0f * 3.141582f / 180.0f));
+	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-60.0f * dDegreeToRad));
+	m_maxTwistAngle = dMin( dAbs(maxAngle), dFloat( 60.0f * dDegreeToRad));
 }
 
 void dCustomRagdollMotor_3dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
@@ -274,7 +274,7 @@ void dCustomRagdollMotor_3dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle)
 
 void dCustomRagdollMotor_3dof::SetConeAngle(dFloat angle)
 {
-	m_coneAngle = dMin(dAbs(angle), dFloat(150.0f * 3.141582f / 180.0f));
+	m_coneAngle = dMin(dAbs(angle), dFloat(150.0f * dDegreeToRad));
 }
 
 dFloat dCustomRagdollMotor_3dof::GetConeAngle() const
@@ -300,7 +300,7 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 	const float radius = 0.25f;
 
 	dVector point(radius * dCos(m_coneAngle), radius * dSin(m_coneAngle), 0.0f, 0.0f);
-	dFloat angleStep = 3.141692f * 2.0f / subdiv;
+	dFloat angleStep = dPi * 2.0f / subdiv;
 	dFloat angle0 = 0.0f;
 
 	dVector arch[subdiv + 1];
@@ -485,7 +485,7 @@ void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void*
 
 void dCustomRagdollMotor_2dof::SetConeAngle(dFloat angle)
 {
-	m_coneAngle = dMin(dAbs(angle), dFloat(150.0f * 3.141582f / 180.0f));
+	m_coneAngle = dMin(dAbs(angle), dFloat(150.0f * dDegreeToRad));
 }
 
 dFloat dCustomRagdollMotor_2dof::GetConeAngle() const
@@ -551,7 +551,7 @@ float maxYaw =  60.0f * dDegreeToRad;
 	const int subdiv = 24;
 	const float radius = 0.25f;
 	dVector point(radius * dCos(m_coneAngle), radius * dSin(m_coneAngle), 0.0f, 0.0f);
-	dFloat angleStep = 3.141692f * 2.0f / subdiv;
+	dFloat angleStep = dPi * 2.0f / subdiv;
 	dFloat angle0 = 0.0f;
 
 	dVector arch[subdiv + 1];

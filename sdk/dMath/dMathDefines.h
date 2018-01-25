@@ -69,8 +69,10 @@
 	typedef double dFloat64;
 #endif 
 
-
-
+// some constants
+#define	dPi			  3.141592f
+#define	dRadToDegree (180.0f / dPi)
+#define	dDegreeToRad (1.0f / dRadToDegree)
 
 // transcendental functions
 #define	dSqrt(x)	dFloat (sqrt (dFloat(x))) 
@@ -86,10 +88,6 @@
 #define dAcos(x)	dFloat (acos (dFloat(x)))
 #define	dAtan(x)	dFloat (atan (dFloat(x)))
 #define	dAtan2(x,y) dFloat (atan2 (dFloat(x), dFloat(y)))
-
-#define	dPi			  3.141592f
-#define	dRadToDegree (180.0f / dPi)
-#define	dDegreeToRad (1.0f / dRadToDegree)
 
 
 #define	D_MSC_VECTOR_ALIGMENT

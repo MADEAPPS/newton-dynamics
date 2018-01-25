@@ -289,7 +289,7 @@ class dgTriplex
 };
 
 
-#define dgPI			 	dgFloat32 (3.14159f)
+#define dgPI			 	dgFloat32 (3.141592f)
 #define dgPI2			 	dgFloat32 (dgPI * 2.0f)
 #define dgEXP			 	dgFloat32 (2.71828f)
 #define dgEPSILON	  	 	dgFloat32 (1.0e-5f)

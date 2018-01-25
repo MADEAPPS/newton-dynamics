@@ -320,7 +320,7 @@ return m_noHandle;
 				handle = m_xyHandle;
 			}
 
-			dMatrix matrix1 (dPitchMatrix(90.0f * 3.1416f/180.0f) * matrix);
+			dMatrix matrix1 (dPitchMatrix(90.0f * dDegreeToRad) * matrix);
 			localL0 = matrix1.UntransformVector(l0); 
 			localL1 = matrix1.UntransformVector(l1); 
 			dFloat t1 = dPolygonRayCast (localL0, localL1, 4, &p[0].m_x, sizeof (dVector), indices);
@@ -329,7 +329,7 @@ return m_noHandle;
 				handle = m_zxHandle;
 			}
 
-			matrix1 = dYawMatrix(-90.0f * 3.1416f/180.0f) * matrix;
+			matrix1 = dYawMatrix(-90.0f * dDegreeToRad) * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
 			localL1 = matrix1.UntransformVector(l1); 
 			t1 = dPolygonRayCast (localL0, localL1, 4, &p[0].m_x, sizeof (dVector), indices);
@@ -359,7 +359,7 @@ return m_noHandle;
 				}
 			}
 
-			matrix1 = dRollMatrix(90.0f * 3.141592f / 180.0f);
+			matrix1 = dRollMatrix(90.0f * dDegreeToRad);
 			matrix1.m_posit.m_y = size;
 			matrix1 = matrix1 * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
@@ -373,7 +373,7 @@ return m_noHandle;
 				}
 			}
 
-			matrix1 = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+			matrix1 = dYawMatrix(-90.0f * dDegreeToRad);
 			matrix1.m_posit.m_z = size;
 			matrix1 = matrix1 * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
@@ -415,7 +415,7 @@ return m_noHandle;
 				}
 			}
 
-			matrix1 = dRollMatrix(90.0f * 3.141592f / 180.0f);
+			matrix1 = dRollMatrix(90.0f * dDegreeToRad);
 			matrix1.m_posit.m_y = size * NE_ROTATE_GIZMO_LOCATION_FACTOR;
 			matrix1 = matrix1 * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
@@ -430,7 +430,7 @@ return m_noHandle;
 			}
 
 
-			matrix1 = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+			matrix1 = dYawMatrix(-90.0f * dDegreeToRad);
 			matrix1.m_posit.m_z = size * NE_ROTATE_GIZMO_LOCATION_FACTOR;
 			matrix1 = matrix1 * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
@@ -495,7 +495,7 @@ return m_noHandle;
 				handle = m_xyHandle;
 			}
 
-			dMatrix matrix1 (dPitchMatrix(90.0f * 3.1416f/180.0f) * matrix);
+			dMatrix matrix1 (dPitchMatrix(90.0f * dDegreeToRad) * matrix);
 			localL0 = matrix1.UntransformVector(l0); 
 			localL1 = matrix1.UntransformVector(l1); 
 			t1 = dPolygonRayCast (localL0, localL1, 4, &p[0].m_x, sizeof (dVector), indices);
@@ -504,7 +504,7 @@ return m_noHandle;
 				handle = m_zxHandle;
 			}
 
-			matrix1 = dYawMatrix(-90.0f * 3.1416f/180.0f) * matrix;
+			matrix1 = dYawMatrix(-90.0f * dDegreeToRad) * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
 			localL1 = matrix1.UntransformVector(l1); 
 			t1 = dPolygonRayCast (localL0, localL1, 4, &p[0].m_x, sizeof (dVector), indices);
@@ -533,7 +533,7 @@ return m_noHandle;
 				}
 			}
 
-			matrix1 = dRollMatrix(90.0f * 3.141592f / 180.0f);
+			matrix1 = dRollMatrix(90.0f * dDegreeToRad);
 			matrix1.m_posit.m_y = size;
 			matrix1 = matrix1 * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
@@ -547,7 +547,7 @@ return m_noHandle;
 				}
 			}
 
-			matrix1 = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+			matrix1 = dYawMatrix(-90.0f * dDegreeToRad);
 			matrix1.m_posit.m_z = size;
 			matrix1 = matrix1 * matrix;
 			localL0 = matrix1.UntransformVector(l0); 
@@ -619,7 +619,7 @@ dAssert (0);
 					dFloat radius = NE_TRANSLATE_ARROW_RADIUS_FACTOR * size;
 					dFloat height = NE_TRANSLATE_ARROW_HEIGHT_FACTOR * size;
 
-					dMatrix matrix1 = dRollMatrix(90.0f * 3.141592f / 180.0f);
+					dMatrix matrix1 = dRollMatrix(90.0f * dDegreeToRad);
 					matrix1.m_posit.m_y = size;
 					matrix1 = matrix1 * matrix;
 					Draw3DArrow (matrix1, 16, radius, height, color);
@@ -631,7 +631,7 @@ dAssert (0);
 					dFloat radius = NE_TRANSLATE_ARROW_RADIUS_FACTOR * size;
 					dFloat height = NE_TRANSLATE_ARROW_HEIGHT_FACTOR * size;
 
-					dMatrix matrix1 = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+					dMatrix matrix1 = dYawMatrix(-90.0f * dDegreeToRad);
 					matrix1.m_posit.m_z = size;
 					matrix1 = matrix1 * matrix;
 					Draw3DArrow (matrix1, 16, radius, height, color);
@@ -656,7 +656,7 @@ dAssert (0);
 
 				case m_zxHandle:
 				{
-					dMatrix matrix1 (dPitchMatrix(90.0f * 3.1416f/180.0f) * matrix);
+					dMatrix matrix1 (dPitchMatrix(90.0f * dDegreeToRad) * matrix);
 					matrix1.TransformTriplex(q, sizeof (dVector), p, sizeof (dVector), 4);
 					
 					glBegin(GL_TRIANGLES);
@@ -672,7 +672,7 @@ dAssert (0);
 
 				case m_yzHandle:
 				{
-					dMatrix matrix1 (dYawMatrix(-90.0f * 3.1416f/180.0f) * matrix);
+					dMatrix matrix1 (dYawMatrix(-90.0f * dDegreeToRad) * matrix);
 					matrix1.TransformTriplex(q, sizeof (dVector), p, sizeof (dVector), 4);
 
 					glBegin(GL_TRIANGLES);
@@ -710,7 +710,7 @@ dAssert (0);
 				{
 					dFloat radius = NE_ROTATE_RADIUS_FACTOR * size;
 					dFloat height = NE_ROTATE_HEIGHT_FACTOR * size;
-					dMatrix matrix1 (dRollMatrix(90.0f * 3.141592f / 180.0f));
+					dMatrix matrix1 (dRollMatrix(90.0f * dDegreeToRad));
 					matrix1.m_posit.m_y = size * NE_ROTATE_GIZMO_LOCATION_FACTOR;
 					matrix1 = matrix1 * matrix;
 					Draw3DCylinder(matrix1, 16, radius, height, color);
@@ -722,7 +722,7 @@ dAssert (0);
 					dFloat radius = NE_ROTATE_RADIUS_FACTOR * size;
 					dFloat height = NE_ROTATE_HEIGHT_FACTOR * size;
 
-					dMatrix matrix1 (dYawMatrix(-90.0f * 3.141592f / 180.0f));
+					dMatrix matrix1 (dYawMatrix(-90.0f * dDegreeToRad));
 					matrix1.m_posit.m_z = size * NE_ROTATE_GIZMO_LOCATION_FACTOR;
 					matrix1 = matrix1 * matrix;
 					Draw3DCylinder(matrix1, 16, radius, height, color);
@@ -792,7 +792,7 @@ dAssert (0);
 					dFloat radius = NE_TRANSLATE_ARROW_RADIUS_FACTOR * size;
 					dFloat height = NE_TRANSLATE_ARROW_HEIGHT_FACTOR * size;
 
-					dMatrix matrix1 = dRollMatrix(90.0f * 3.141592f / 180.0f);
+					dMatrix matrix1 = dRollMatrix(90.0f * dDegreeToRad);
 					matrix1.m_posit.m_y = size;
 					matrix1 = matrix1 * matrix;
 					Draw3DArrow (matrix1, 16, radius, height, color);
@@ -804,7 +804,7 @@ dAssert (0);
 					dFloat radius = NE_TRANSLATE_ARROW_RADIUS_FACTOR * size;
 					dFloat height = NE_TRANSLATE_ARROW_HEIGHT_FACTOR * size;
 
-					dMatrix matrix1 = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+					dMatrix matrix1 = dYawMatrix(-90.0f * dDegreeToRad);
 					matrix1.m_posit.m_z = size;
 					matrix1 = matrix1 * matrix;
 					Draw3DArrow (matrix1, 16, radius, height, color);
@@ -828,7 +828,7 @@ dAssert (0);
 
 				case m_zxHandle:
 				{
-					dMatrix matrix1 (dPitchMatrix(90.0f * 3.1416f/180.0f) * matrix);
+					dMatrix matrix1 (dPitchMatrix(90.0f * dDegreeToRad) * matrix);
 					matrix1.TransformTriplex(q, sizeof (dVector), p, sizeof (dVector), 4);
 
 					glBegin(GL_TRIANGLES);
@@ -844,7 +844,7 @@ dAssert (0);
 
 				case m_yzHandle:
 				{
-					dMatrix matrix1 (dYawMatrix(-90.0f * 3.1416f/180.0f) * matrix);
+					dMatrix matrix1 (dYawMatrix(-90.0f * dDegreeToRad) * matrix);
 					matrix1.TransformTriplex(q, sizeof (dVector), p, sizeof (dVector), 4);
 
 					glBegin(GL_TRIANGLES);
@@ -957,11 +957,11 @@ dAssert (0);
 			location.m_posit.m_x = size;
 			Draw3DArrow (location, segments, radius, height, dVector (1.0f, 0.0f, 0.0f, 0.0f));
 
-			location = dRollMatrix(90.0f * 3.141592f / 180.0f);
+			location = dRollMatrix(90.0f * dDegreeToRad);
 			location.m_posit.m_y = size;
 			Draw3DArrow (location, segments, radius, height, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
-			location = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+			location = dYawMatrix(-90.0f * dDegreeToRad);
 			location.m_posit.m_z = size;
 			Draw3DArrow (location, segments, radius, height, dVector (0.0f, 0.0f, 1.0f, 0.0f));
 
@@ -990,11 +990,11 @@ dAssert (0);
 			location.m_posit.m_x = size * NE_ROTATE_GIZMO_LOCATION_FACTOR;
 			Draw3DCylinder (location, segments, radius, height, dVector (1.0f, 0.0f, 0.0f, 0.0f));
 
-			location = dRollMatrix(90.0f * 3.141592f / 180.0f);
+			location = dRollMatrix(90.0f * dDegreeToRad);
 			location.m_posit.m_y = size * NE_ROTATE_GIZMO_LOCATION_FACTOR;
 			Draw3DCylinder (location, segments, radius, height, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
-			location = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+			location = dYawMatrix(-90.0f * dDegreeToRad);
 			location.m_posit.m_z = size * NE_ROTATE_GIZMO_LOCATION_FACTOR;
 			Draw3DCylinder (location, segments, radius, height, dVector (0.0f, 0.0f, 1.0f, 0.0f));
 			break;
@@ -1062,11 +1062,11 @@ dAssert (0);
 			location.m_posit.m_x = size;
 			Draw3DArrow (location, segments, radius, height, dVector (1.0f, 0.0f, 0.0f, 0.0f));
 
-			location = dRollMatrix(90.0f * 3.141592f / 180.0f);
+			location = dRollMatrix(90.0f * dDegreeToRad);
 			location.m_posit.m_y = size;
 			Draw3DArrow (location, segments, radius, height, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
-			location = dYawMatrix(-90.0f * 3.141592f / 180.0f);
+			location = dYawMatrix(-90.0f * dDegreeToRad);
 			location.m_posit.m_z = size;
 			Draw3DArrow (location, segments, radius, height, dVector (0.0f, 0.0f, 1.0f, 0.0f));
 			break;
