@@ -428,6 +428,8 @@ xxxxxxxxx++;
 			if ((angleLimits.m_minAngle == 0.0f) && (angleLimits.m_maxAngle == 0.0f)) {
 				NewtonUserJointAddAngularRow(m_joint, -errorAngles[i], &clipMatrix[i][0]);
 				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+				dTrace(("J: %f (%f %f %f\n", errorAngles[i] * dRadToDegree, clipMatrix[i][0], clipMatrix[i][1], clipMatrix[i][2]));
 			} else if (errorAngles[i] > 0.0f) {
 				NewtonUserJointAddAngularRow(m_joint, -errorAngles[i], &clipMatrix[i][0]);
 				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);

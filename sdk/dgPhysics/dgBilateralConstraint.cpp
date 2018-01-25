@@ -461,6 +461,7 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 				dgFloat32 aRelErr = num / den;
 				dgFloat32 kinematicAccel = (dgFloat32(0.3f) * relPosit * invDt - vRel) * invDt;
+kinematicAccel = 0.0f;
 
 				//centripetal acceleration is stored in restitution member
 				//jacobianMatrixElements[k].m_coordenateAccel = aRelErr + jacobianMatrixElements[k].m_restitution + aRel;
