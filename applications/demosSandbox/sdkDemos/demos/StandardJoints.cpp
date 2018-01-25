@@ -1042,7 +1042,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
-//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
@@ -1054,7 +1054,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, -20.0f, 0.0f);
+//dVector origin (-30.0f, 5.0f, -20.0f, 0.0f);
+dVector origin(-30.0f, 5.0f, 10.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 
