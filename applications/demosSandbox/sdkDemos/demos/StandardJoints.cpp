@@ -310,10 +310,12 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
-	joint1->EnableLimit_0(true);
-	joint1->SetLimits_0 (-5.0f * dPi, 2.0f * dPi);
-	joint1->EnableLimit_1(true);
+		joint1->SetLimits_0 (-5.0f * dPi, 2.0f * dPi);
 	joint1->SetLimits_1 (-3.0f * dPi, 4.0f * dPi);
+	joint1->EnableLimit_0(true);
+	joint1->EnableLimit_1(true);
+	joint1->EnableLimit_0(false);
+	joint1->EnableLimit_1(false);
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
@@ -327,6 +329,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetLinearDamping(box2, 0.0f);
 	NewtonBodySetAngularDamping(box2, &damp[0]);
 	dVector omega (0.0f, 20.0f, 100.0f, 0.0f);
+	NewtonBodySetOmega(box1, &omega[0]);
 	NewtonBodySetOmega(box2, &omega[0]);
 }
 
