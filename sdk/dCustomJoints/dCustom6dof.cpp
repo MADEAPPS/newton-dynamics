@@ -32,9 +32,8 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_debugScale(1.0f)
 	,m_mask(0x3f)
 {
-static int xxxxx;
-xxxx = xxxxx++;
-
+//static int xxxxx;
+//xxxx = xxxxx++;
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -441,13 +440,11 @@ xxxxxxxxx++;
 		}
 	}
 
-if (dAbs(errorAngles.m_x * dRadToDegree) > 10.0f)
-{
-dTrace(("xxx-> "));
-}
-
-
-	dTrace (("f:%d j:%d (%f %f %f)\n", xxxxxxxxx/2, xxxx, errorAngles.m_x * dRadToDegree, errorAngles.m_y * dRadToDegree, errorAngles.m_z * dRadToDegree));
+//if (dAbs(errorAngles.m_x * dRadToDegree) > 10.0f)
+//{
+//dTrace(("xxx-> "));
+//}
+//	dTrace (("f:%d j:%d (%f %f %f)\n", xxxxxxxxx/2, xxxx, errorAngles.m_x * dRadToDegree, errorAngles.m_y * dRadToDegree, errorAngles.m_z * dRadToDegree));
 
 #endif
 
