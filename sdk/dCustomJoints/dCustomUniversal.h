@@ -78,7 +78,7 @@ class dCustomUniversal: public dCustom6dof
 			unsigned m_actuator_1		 : 1;
 		};
 	};
-
+int xxx;
 	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustom6dof)
 };
 
