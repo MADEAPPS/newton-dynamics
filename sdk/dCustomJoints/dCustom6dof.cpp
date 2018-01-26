@@ -442,6 +442,24 @@ xxxxxxxxx++;
 		}
 	}
 
+/*
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
+	dVector lateralDir(coneDir1.CrossProduct(coneDir0));
+	dFloat mag2 = lateralDir.DotProduct3(lateralDir);
+	if (mag2 > 1.0e-4f) {
+		dAssert(mag2 > 1.0e-4f);
+		lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
+		dQuaternion rot(lateralDir, dAcos(coneDir0.DotProduct3(coneDir1)));
+		dMatrix xxxx (matrix1 * dMatrix(rot, matrix0.m_front));
+		dMatrix xxxx1(matrix0 * xxxx.Inverse());
+
+		dVector upDir(coneDir0.CrossProduct(lateralDir));
+	}
+*/
+
+
+
 //if (dAbs(errorAngles.m_x * dRadToDegree) > 10.0f)
 //{
 //dTrace(("xxx-> "));
