@@ -108,9 +108,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\PrecessingTops.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -169,6 +166,9 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\Hexapod.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\GyroscopyPrecession.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

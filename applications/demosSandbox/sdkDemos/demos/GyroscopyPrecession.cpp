@@ -85,8 +85,6 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 	NewtonBodySetMatrix(flyWheel, &matrix[0][0]);
 	NewtonBodySetOmega(flyWheel, &omega[0]);
 
-
-
 	matrix.m_posit -= matrix.m_front.Scale (lenght * 0.5f);
 	dCustom6dof* const fixPoint = new dCustom6dof(matrix, flyWheel, NULL);
 	fixPoint->DisableRotationX();

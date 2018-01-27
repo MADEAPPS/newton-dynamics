@@ -36,13 +36,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dCustomJoints\dCustom6dof.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomActiveCharacterManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomBallAndSocket.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomCorkScrew.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomDryRollingFriction.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomFixDistance.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomGear.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomHingeActuator.cpp" />
@@ -59,7 +59,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\dCustomKinematicController.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomModelLoadSave.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPathFollow.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPulley.cpp" />
@@ -75,13 +74,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\dCustom6dof.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomActiveCharacterManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomBallAndSocket.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomCorkScrew.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomDryRollingFriction.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomFixDistance.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomGear.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomHingeActuator.h" />
@@ -89,7 +88,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomKinematicController.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomModelLoadSave.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPathFollow.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPulley.h" />

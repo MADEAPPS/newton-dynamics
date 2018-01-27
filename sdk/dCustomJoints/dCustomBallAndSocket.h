@@ -20,22 +20,6 @@
 #include "dCustom6dof.h"
 //#include "dCustomJoint.h"
 
-class dCustomPointToPoint: public dCustomJoint  
-{
-	public:
-	CUSTOM_JOINTS_API dCustomPointToPoint(const dVector& pivotFrame0, const dVector& pivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~dCustomPointToPoint();
-
-	protected:
-	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-
-	dFloat m_distance;
-	DECLARE_CUSTOM_JOINT(dCustomPointToPoint, dCustomJoint)
-};
-
-
 class dCustomBallAndSocket: public dCustom6dof
 {
 	public:

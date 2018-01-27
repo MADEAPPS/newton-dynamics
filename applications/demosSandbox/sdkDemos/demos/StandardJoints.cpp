@@ -24,6 +24,7 @@
 #include <dBezierSpline.h>
 #include <dCustomCorkScrew.h>
 #include <dCustomPathFollow.h>
+#include <dCustomFixDistance.h>
 #include <dCustomBallAndSocket.h>
 #include <dCustomRackAndPinion.h>
 #include <dCustomSlidingContact.h>
@@ -149,7 +150,7 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	dVector pivot1 (matrix1.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f));
 
 	// connect bodies at a corner
-	new dCustomPointToPoint (pivot1, pivot0, box2, box1);
+	new dCustomFixDistance (pivot1, pivot0, box2, box1);
 }
 
 
@@ -159,7 +160,7 @@ static void FunnyDistanceJointNullForce(const NewtonBody* body, dFloat timestep,
 	NewtonBodySetForce(body, &force.m_x);
 }
 
-static void FunnyAddDistance(DemoEntityManager* const scene, const dVector& origin)
+static void AddFixDistance(DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const box0 = CreateSphere(scene, origin + dVector(0.0f, 6.0f - size.m_y * 0.0f, 0.0f, 0.0f), size);
@@ -176,17 +177,17 @@ static void FunnyAddDistance(DemoEntityManager* const scene, const dVector& orig
 	dMatrix matrix1;
 	NewtonBodyGetMatrix(box0, &matrix0[0][0]);
 	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
-	new dCustomPointToPoint(matrix1.m_posit, matrix0.m_posit, box1, box0);
+	new dCustomFixDistance(matrix1.m_posit, matrix0.m_posit, box1, box0);
 
 	dMatrix matrix2;
 	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
 	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
-	new dCustomPointToPoint(matrix2.m_posit, matrix1.m_posit, box2, box1);
+	new dCustomFixDistance(matrix2.m_posit, matrix1.m_posit, box2, box1);
 
 	dMatrix matrix3;
 	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
 	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
-	new dCustomPointToPoint(matrix3.m_posit, matrix2.m_posit, box3, box2);
+	new dCustomFixDistance(matrix3.m_posit, matrix2.m_posit, box3, box2);
 }
 
 static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVector& origin)
@@ -999,7 +1000,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		matrix1.m_posit.m_y += attachmentOffset;
 
 		//new CustomDistanceRope (matrix1.m_posit, matrix0.m_posit, box1, box0);
-		new dCustomPointToPoint (matrix1.m_posit, matrix0.m_posit, box1, box0);
+		new dCustomFixDistance (matrix1.m_posit, matrix0.m_posit, box1, box0);
 	}
 
 	void* const aggregate = NewtonCollisionAggregateCreate (scene->GetNewton());
@@ -1039,9 +1040,9 @@ void StandardJoints (DemoEntityManager* const scene)
 
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
-//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-//	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
+	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
