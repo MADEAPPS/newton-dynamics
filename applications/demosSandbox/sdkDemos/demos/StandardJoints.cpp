@@ -562,7 +562,7 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 	position.m_y += 4.0f;
 	NewtonBody* child = NULL;
 
-	int count = 1;
+	int count = 6;
 	for (int i = 0; i < count; i ++) {
 		child = CreateBox (scene, position, size);
 		NewtonBodyGetMatrix(child, &matrix[0][0]);
@@ -980,12 +980,12 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
-//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
+	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-//	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
+	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
+	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 
-//	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
