@@ -86,10 +86,7 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 	NewtonBodySetOmega(flyWheel, &omega[0]);
 
 	matrix.m_posit -= matrix.m_front.Scale (lenght * 0.5f);
-	dCustom6dof* const fixPoint = new dCustom6dof(matrix, flyWheel, NULL);
-	fixPoint->DisableRotationX();
-	fixPoint->DisableRotationY();
-	fixPoint->DisableRotationZ();
+	new dCustomBallAndSocket(matrix, flyWheel, NULL);
 }
 
 static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
