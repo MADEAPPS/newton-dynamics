@@ -10,8 +10,6 @@
 */
 
 
-// dCustom6dof.cpp: implementation of the dCustom6dof class.
-//
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustom6dof.h"

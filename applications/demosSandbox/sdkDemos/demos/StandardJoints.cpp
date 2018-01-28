@@ -580,22 +580,25 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 
 static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 {
-    // make a reel static
-    NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), dVector (8.0f, 0.25f, 0.25f, 0.0f));
-    NewtonBody* const box1 = CreateWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
+	// make a reel static
+	NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), dVector (8.0f, 0.25f, 0.25f, 0.0f));
+	NewtonBody* const box1 = CreateWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
 
 	dMatrix matrix;
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	// connect the bodies by a Slider joint
-    NewtonBodyGetMatrix (box1, &matrix[0][0]);
-    dCustomSlider* const slider = new dCustomSlider (matrix, box1, box0);
+	NewtonBodyGetMatrix (box1, &matrix[0][0]);
+	dCustomSlider* const slider = new dCustomSlider (matrix, box1, box0);
 
-    // enable limit of first axis
-    slider->EnableLimits(true);
+	// add some friction
+	slider->SetFriction(5.0f);
 
-    // set limit on second axis
-    slider->SetLimits (-4.0f, 4.0f);
+	// enable limit of first axis
+	slider->EnableLimits(true);
+
+	// set limit on second axis
+	slider->SetLimits (-4.0f, 4.0f);
 }
 
 static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector& origin)
@@ -985,9 +988,9 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 
-//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 //	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
@@ -1001,7 +1004,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, -15.0f, 0.0f);
+dVector origin (-30.0f, 5.0f, -0.0f, 0.0f);
 //dVector origin(-30.0f, 5.0f, 10.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
