@@ -84,6 +84,7 @@ class dCustomJoint: public dCustomAlloc
 			:m_cameraMatrix(cameraMatrix)
 			,m_width(0)
 			,m_height(0)
+			,m_debugScale(1.0f)
 		{
 		}
 		virtual ~dDebugDisplay () {}
@@ -97,6 +98,7 @@ class dCustomJoint: public dCustomAlloc
 		CUSTOM_JOINTS_API void DrawFrame(const dMatrix& matrix);
 
 		dMatrix m_cameraMatrix;
+		dFloat m_debugScale;
 		int m_width;
 		int m_height;
 	};
@@ -200,6 +202,8 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
+	CUSTOM_JOINTS_API void SetDebugScale(dFloat scale);
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 

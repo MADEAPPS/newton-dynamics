@@ -313,8 +313,6 @@ void dCustomJoint::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 }
 
-
-
 const char* dCustomJoint::GetTypeName() const
 {
 	return "dCustomJoint";
@@ -374,7 +372,7 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 {
 	dVector o0(matrix.m_posit);
 
-	dFloat size = 0.25f;
+	dFloat size = m_debugScale;
 	dVector x(matrix.m_posit + matrix.RotateVector(dVector(size, 0.0f, 0.0f, 0.0f)));
 	SetColor(dVector (1.0f, 0.0f, 0.0f));
 	DrawLine (matrix.m_posit, x);

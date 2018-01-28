@@ -29,7 +29,6 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_pitch()
 	,m_yaw()
 	,m_roll()
-	,m_debugScale(1.0f)
 	,m_mask(0x3f)
 {
 //static int xxxxx;
@@ -44,7 +43,6 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& p
 	,m_pitch()
 	,m_yaw()
 	,m_roll()
-	,m_debugScale(1.0f)
 	,m_mask(0x3f)
 {
 	dMatrix dummy;
@@ -63,7 +61,6 @@ void dCustom6dof::Deserialize (NewtonDeserializeCallback callback, void* const u
 	callback(userData, &m_yaw, sizeof(m_yaw));
 	callback(userData, &m_roll, sizeof(m_roll));
 	callback(userData, &m_pitch, sizeof(m_pitch));
-	callback(userData, &m_debugScale, sizeof(m_debugScale));
 	callback(userData, &m_mask, sizeof(m_mask));
 }
 
@@ -75,7 +72,6 @@ void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userD
 	callback(userData, &m_yaw, sizeof(m_yaw));
 	callback(userData, &m_roll, sizeof(m_roll));
 	callback(userData, &m_pitch, sizeof(m_pitch));
-	callback(userData, &m_debugScale, sizeof(m_debugScale));
 	callback(userData, &m_mask, sizeof(m_mask));
 }
 
@@ -108,19 +104,6 @@ void dCustom6dof::DisableRotationZ()
 {
 	m_rollAxis = 0;
 }
-
-
-
-dFloat dCustom6dof::GetDebugScale() const
-{
-	return m_debugScale;
-}
-
-void dCustom6dof::SetDebugScale(dFloat scale)
-{
-	m_debugScale = scale;
-}
-
 
 void dCustom6dof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
 {
@@ -234,7 +217,7 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 
 	const int subdiv = 12;
 	dVector arch[subdiv + 1];
-	const float radius = m_debugScale;
+	const float radius = debugDisplay->m_debugScale;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 

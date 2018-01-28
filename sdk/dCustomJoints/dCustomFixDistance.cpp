@@ -20,12 +20,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-
 IMPLEMENT_CUSTOM_JOINT(dCustomFixDistance);
 
-
 dCustomFixDistance::dCustomFixDistance(const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
+	:dCustomJoint(3, child, parent)
 {
 	dVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
 	m_distance = dSqrt(dist.DotProduct3(dist));
@@ -47,7 +45,6 @@ dCustomFixDistance::~dCustomFixDistance()
 {
 }
 
-
 void dCustomFixDistance::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 }
@@ -56,6 +53,7 @@ void dCustomFixDistance::Serialize(NewtonSerializeCallback callback, void* const
 {
 	dCustomJoint::Serialize (callback, userData);
 }
+
 
 void dCustomFixDistance::SubmitConstraints(dFloat timestep, int threadIndex)
 {
@@ -73,8 +71,10 @@ void dCustomFixDistance::SubmitConstraints(dFloat timestep, int threadIndex)
 	if (mag2 < 1.0e-3f) {
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	} else {

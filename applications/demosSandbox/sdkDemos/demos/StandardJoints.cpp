@@ -206,9 +206,8 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
 	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket(pinMatrix, box0, base);
-	joint0->SetConeAngle (130.0f * dDegreeToRad);
-	joint0->SetTwistAngle (-60.0f * dDegreeToRad, 60.0f * dDegreeToRad);
-	joint0->SetTwistAngle(-0.0f * dDegreeToRad, 0.0f * dDegreeToRad);
+	joint0->SetConeAngle (120.0f * dDegreeToRad);
+	joint0->SetTwistAngle (-60.0f * dDegreeToRad, 90.0f * dDegreeToRad);
 
 	// connect first box1 to box0 the world
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
@@ -217,7 +216,6 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket(pinMatrix, box1, box0);
 	joint1->SetConeAngle(130.0f * dDegreeToRad);
 	joint1->SetTwistAngle(-60.0f * dDegreeToRad, 60.0f * dDegreeToRad);
-	joint1->SetTwistAngle(-0.0f * dDegreeToRad, 0.0f * dDegreeToRad);
 }
 
 static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const dVector& origin)
@@ -548,63 +546,6 @@ static void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector
 		NewtonBodyGetMatrix(pickBody, &matrix[0][0]);
 		new dCustomBallAndSocket(matrix, pickBody);
 	}
-}
-
-
-
-static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin)
-{
-	dVector size (1.0f, 1.0f, 1.0f);
-	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 9.0f, 0.0f, 0.0f), size);
-//	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 9.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
-//	NewtonBody* const box2 = CreateCapule(scene, origin + dVector(0.0f, 9.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
-//	NewtonBody* const box3 = CreateCapule(scene, origin + dVector(0.0f, 9.0 - size.m_y * 6.0f, 0.0f, 0.0f), size);
-
-	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
-//dMatrix pinMatrix (dGrammSchmidt (dVector (1.0f, 0.0f, 0.0f, 0.0f)));
-
-	// connect first box to the world
-	dMatrix matrix0;
-	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
-	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	dCustomControlledBallAndSocket* const joint0 = new dCustomControlledBallAndSocket (pinMatrix, box0, NULL);
-	joint0->SetAngularVelocity (2000.0f * dDegreeToRad);
-//	joint0->SetPitchAngle (-45.0f * dDegreeToRad);
-//	joint0->SetYawAngle (-85.0f * dDegreeToRad);
-//	joint0->SetRollAngle (120.0f * dDegreeToRad);
-	
-joint0->SetPitchAngle (90.0f * dDegreeToRad);	
-/*
-	// link the two boxes
-	dMatrix matrix1;
-	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
-	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	CustomControlledBallAndSocket* const joint1 = new CustomControlledBallAndSocket (pinMatrix, box0, box1);
-	joint1->SetAngularVelocity (1000.0f * dDegreeToRad);
-	joint1->SetPitchAngle (45.0f * dDegreeToRad);
-	joint1->SetYawAngle ( 30.0f * dDegreeToRad);
-	joint1->SetRollAngle (25.0f * dDegreeToRad);
-
-	// link next box
-	dMatrix matrix2;
-	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
-	pinMatrix.m_posit = (matrix1.m_posit + matrix2.m_posit).Scale(0.5f);
-	CustomControlledBallAndSocket* const joint2 = new CustomControlledBallAndSocket(pinMatrix, box1, box2);
-	joint2->SetAngularVelocity(1000.0f * dDegreeToRad);
-	joint2->SetPitchAngle(45.0f * dDegreeToRad);
-	joint2->SetYawAngle(30.0f * dDegreeToRad);
-	joint2->SetRollAngle(25.0f * dDegreeToRad);
-
-	// link next box
-	dMatrix matrix3;
-	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
-	pinMatrix.m_posit = (matrix2.m_posit + matrix3.m_posit).Scale(0.5f);
-	CustomControlledBallAndSocket* const joint3 = new CustomControlledBallAndSocket(pinMatrix, box2, box3);
-	joint3->SetAngularVelocity(1000.0f * dDegreeToRad);
-	joint3->SetPitchAngle(45.0f * dDegreeToRad);
-	joint3->SetYawAngle(30.0f * dDegreeToRad);
-	joint3->SetRollAngle(25.0f * dDegreeToRad);
-*/
 }
 
 static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
@@ -1038,11 +979,11 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
-//	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
+//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
-//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
+	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+//	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
@@ -1060,7 +1001,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, -20.0f, 0.0f);
+dVector origin (-30.0f, 5.0f, -15.0f, 0.0f);
 //dVector origin(-30.0f, 5.0f, 10.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
