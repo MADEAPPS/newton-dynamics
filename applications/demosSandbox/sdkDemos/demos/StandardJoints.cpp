@@ -71,7 +71,7 @@ static NewtonBody* CreateCapule (DemoEntityManager* const scene, const dVector& 
 {
 	NewtonWorld* const world = scene->GetNewton();
 	int materialID =  NewtonMaterialGetDefaultGroupID (world);
-	dMatrix uprightAligment (dRollMatrix(dPi * 90.0f / 180.0f));
+	dMatrix uprightAligment (dRollMatrix(90.0f * dDegreeToRad));
 	NewtonCollision* const collision = CreateConvexCollision (world, &uprightAligment[0][0], size, _CAPSULE_PRIMITIVE, 0);
 	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -961,15 +961,6 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 
 struct JoesNewRagdollJoint: public dCustomJoint
 {
-//   dMatrix m_localMatrix0;
-//   dMatrix m_localMatrix1;
-//   void* m_userData;
-//   NewtonBody* m_body0;
-//   NewtonBody* m_body1;
-//   NewtonJoint* m_joint;
-//   NewtonWorld* m_world;
-
-
    dQuaternion m_target; // relative target rotation to reach at next timestep
 
    // motor:

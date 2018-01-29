@@ -70,6 +70,7 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomTriggerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomUniversal.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomUniversalActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomVehicleControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +100,7 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomTriggerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomUniversal.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomUniversalActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomVehicleControllerManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
