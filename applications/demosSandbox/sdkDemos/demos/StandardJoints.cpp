@@ -939,254 +939,245 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 
 
 
-
-
-
 struct JoesNewRagdollJoint: public dCustomJoint
 {
-   dQuaternion m_target; // relative target rotation to reach at next timestep
+	dQuaternion m_target; // relative target rotation to reach at next timestep
 
-   // motor:
-   dFloat m_reduceError;
-   dFloat m_pin_length;
-   dFloat m_angularFriction;
-   dFloat m_stiffness;
+	// motor:
+	dFloat m_reduceError;
+	dFloat m_pin_length;
+	dFloat m_angularFriction;
+	dFloat m_stiffness;
 
-   dFloat m_anim_speed;
-   dFloat m_anim_offset;
-   dFloat m_anim_time;
+	dFloat m_anim_speed;
+	dFloat m_anim_offset;
+	dFloat m_anim_time;
 
-   // limits:
-   bool m_isLimitJoint;
+	// limits:
+	bool m_isLimitJoint;
 
-   dFloat m_minTwistAngle;
-   dFloat m_maxTwistAngle;
+	dFloat m_minTwistAngle;
+	dFloat m_maxTwistAngle;
 
-   dFloat m_coneAngle;
-   dFloat m_arcAngleCos;
-   dFloat m_arcAngleSin;
-
-   
-   JoesNewRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world, bool isLimitJoint = false)
-	   :dCustomJoint (6, child, parent)
-   {
-      m_localMatrix0 = localMatrix0;
-      m_localMatrix1 = localMatrix1;
-
-      m_target = dQuaternion(dVector(1.0f, 0, 0), 0.0f);
-      m_reduceError = 0.95f; // amount of error to reduce per timestep (more -> oszillation)
-      m_stiffness = 0.98f;
-      m_angularFriction = 300.0f;
-
-      m_anim_speed = 0.0f;
-      m_anim_offset = 0.0f;
-      m_anim_time = 0.0f;
-      
-      m_isLimitJoint = isLimitJoint;
-
-      SetTwistSwingLimits (0.1f, 0.2f, -0.1f, 0.1f);
-      //SetTwistSwingLimits (0.1f, 0.0f, -0.1f, 0.1f);
-   }
-
-   void SetTwistSwingLimits (const float coneAngle, const float arcAngle, const float minTwistAngle, const float maxTwistAngle)
-   {
-      float const maxAng = 2.8f; // to prevent flipping on the pole on the backside
-
-      m_coneAngle = min (maxAng, coneAngle);
-      float angle = max (0.0f, min (maxAng, arcAngle + m_coneAngle) - m_coneAngle);
-      m_arcAngleCos = cos (angle);
-      m_arcAngleSin = sin (angle);
-
-      m_minTwistAngle = minTwistAngle;
-      m_maxTwistAngle = maxTwistAngle;
-   }
-
-   dVector BodyGetPointVelocity(const NewtonBody* const body, const dVector &point)
-   {
-      dMatrix matrix;
-      dVector v(0.0f);
-      dVector w(0.0f);
-      dVector c(0.0f);
-      NewtonBodyGetVelocity(body, &v[0]);
-      NewtonBodyGetOmega(body, &w[0]);
-      NewtonBodyGetMatrix(body, &matrix[0][0]);
-      c = matrix.m_posit; // TODO: Does not handle COM offset !!!
-      return v + w.CrossProduct(point - c);
-   }
-
-   static void SubmitConstraintsCallback (const NewtonJoint* const userJoint, dFloat timestep, int threadIndex)
-   {
-      JoesNewRagdollJoint *joint = (JoesNewRagdollJoint*) NewtonJointGetUserData (userJoint);
-      joint->SubmitConstraints(timestep, threadIndex);
-   }
-
-   void SubmitConstraints(dFloat timestep, int threadIndex)
-   {
-      dFloat invTimestep = 1.0f / timestep;
-
-      dMatrix matrix0;
-      dMatrix matrix1;
-
-      //CalculateGlobalMatrix(matrix0, matrix1);
-      dMatrix body0Matrix;
-      // Get the global matrices of each rigid body.
-      NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
-
-      dMatrix body1Matrix (dGetIdentityMatrix());
-      if (m_body1) {
-         NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);
-      }
-      matrix0 = m_localMatrix0 * body0Matrix;
-      matrix1 = m_localMatrix1 * body1Matrix;
+	dFloat m_coneAngle;
+	dFloat m_arcAngleCos;
+	dFloat m_arcAngleSin;
 
 
+	JoesNewRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world, bool isLimitJoint = false)
+		:dCustomJoint(6, child, parent)
+	{
+		m_localMatrix0 = localMatrix0;
+		m_localMatrix1 = localMatrix1;
 
-      const dVector& p0 = matrix0.m_posit;
-      const dVector& p1 = matrix1.m_posit;
-      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
-      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
+		m_target = dQuaternion(dVector(1.0f, 0, 0), 0.0f);
+		m_reduceError = 0.95f; // amount of error to reduce per timestep (more -> oszillation)
+		m_stiffness = 0.98f;
+		m_angularFriction = 300.0f;
+
+		m_anim_speed = 0.0f;
+		m_anim_offset = 0.0f;
+		m_anim_time = 0.0f;
+
+		m_isLimitJoint = isLimitJoint;
+
+		SetTwistSwingLimits(0.1f, 0.2f, -0.1f, 0.1f);
+		//SetTwistSwingLimits (0.1f, 0.0f, -0.1f, 0.1f);
+	}
+
+	void SetTwistSwingLimits(const float coneAngle, const float arcAngle, const float minTwistAngle, const float maxTwistAngle)
+	{
+		float const maxAng = 2.8f; // to prevent flipping on the pole on the backside
+
+		m_coneAngle = min(maxAng, coneAngle);
+		float angle = max(0.0f, min(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
+		m_arcAngleCos = cos(angle);
+		m_arcAngleSin = sin(angle);
+
+		m_minTwistAngle = minTwistAngle;
+		m_maxTwistAngle = maxTwistAngle;
+	}
+
+	dVector BodyGetPointVelocity(const NewtonBody* const body, const dVector &point)
+	{
+		dMatrix matrix;
+		dVector v(0.0f);
+		dVector w(0.0f);
+		dVector c(0.0f);
+		NewtonBodyGetVelocity(body, &v[0]);
+		NewtonBodyGetOmega(body, &w[0]);
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
+		c = matrix.m_posit; // TODO: Does not handle COM offset !!!
+		return v + w.CrossProduct(point - c);
+	}
+
+	static void SubmitConstraintsCallback(const NewtonJoint* const userJoint, dFloat timestep, int threadIndex)
+	{
+		JoesNewRagdollJoint *joint = (JoesNewRagdollJoint*)NewtonJointGetUserData(userJoint);
+		joint->SubmitConstraints(timestep, threadIndex);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dFloat invTimestep = 1.0f / timestep;
+
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		//CalculateGlobalMatrix(matrix0, matrix1);
+		dMatrix body0Matrix;
+		// Get the global matrices of each rigid body.
+		NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
+
+		dMatrix body1Matrix(dGetIdentityMatrix());
+		if (m_body1) {
+			NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);
+		}
+		matrix0 = m_localMatrix0 * body0Matrix;
+		matrix1 = m_localMatrix1 * body1Matrix;
 
 
 
-      if (m_isLimitJoint)
-      {
+		const dVector& p0 = matrix0.m_posit;
+		const dVector& p1 = matrix1.m_posit;
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
 
-         //dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 
 
-         const dVector& coneDir0 = matrix0.m_front;
-         const dVector& coneDir1 = matrix1.m_front;
-         float dot = coneDir0.DotProduct3(coneDir1);
-         if (dot < -0.999) return; // should never happen
+		if (m_isLimitJoint) {
 
-         // do the twist
+			//dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 
-         if (m_maxTwistAngle >= m_minTwistAngle) // twist restricted?
-         {
-            dQuaternion quat0(matrix0), quat1(matrix1);      
-            float *q0 = (float*)&quat0;
-            float *q1 = (float*)&quat1;
 
-            // factor rotation about x axis between quat0 and quat1. Code is an optimization of this: qt = q0.Inversed() * q1; halfTwistAngle = atan (qt.x / qt.w);
-            float twistAngle = 2.0f * atan (
-               ( ( ( (q0[0] * q1[1]) + (-q0[1] * q1[0]) ) + (-q0[2] * q1[3]) ) - (-q0[3] * q1[2]) ) /
-               ( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) );
+			const dVector& coneDir0 = matrix0.m_front;
+			const dVector& coneDir1 = matrix1.m_front;
+			float dot = coneDir0.DotProduct3(coneDir1);
+			if (dot < -0.999) return; // should never happen
 
-            // select an axis for the twist - any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
-            dVector twistAxis = coneDir0 + coneDir1;
-            twistAxis.Scale (1.0f / sqrt (twistAxis.DotProduct3(twistAxis)));
+			// do the twist
 
-            if (m_maxTwistAngle == m_minTwistAngle) // no freedom for any twist
-            {
-               NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
-            }
-            else if (twistAngle > m_maxTwistAngle)
-            {
-               NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
-               NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-            }
-            else if (twistAngle < m_minTwistAngle)
-            {
-               NewtonUserJointAddAngularRow (m_joint, twistAngle - m_minTwistAngle, (float*)&twistAxis);
-               NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-            }
-         }
+			if (m_maxTwistAngle >= m_minTwistAngle) // twist restricted?
+			{
+				dQuaternion quat0(matrix0), quat1(matrix1);
+				float *q0 = (float*)&quat0;
+				float *q1 = (float*)&quat1;
 
-         // do the swing
+				// factor rotation about x axis between quat0 and quat1. Code is an optimization of this: qt = q0.Inversed() * q1; halfTwistAngle = atan (qt.x / qt.w);
+				float twistAngle = 2.0f * atan(
+					((((q0[0] * q1[1]) + (-q0[1] * q1[0])) + (-q0[2] * q1[3])) - (-q0[3] * q1[2])) /
+					((((q0[0] * q1[0]) - (-q0[1] * q1[1])) - (-q0[2] * q1[2])) - (-q0[3] * q1[3])));
+
+				// select an axis for the twist - any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
+				dVector twistAxis = coneDir0 + coneDir1;
+				twistAxis = twistAxis.Scale(1.0f / sqrt(twistAxis.DotProduct3(twistAxis)));
+
+				if (m_maxTwistAngle == m_minTwistAngle) // no freedom for any twist
+				{
+					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+				}
+				else if (twistAngle > m_maxTwistAngle) {
+					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+				}
+				else if (twistAngle < m_minTwistAngle) {
+					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_minTwistAngle, (float*)&twistAxis);
+					NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+				}
+			}
+
+			// do the swing
 #if 0
-         // simple cone limit:
+			// simple cone limit:
 
-         float angle = acos (dot) - m_coneAngle;
-         if (angle > 0)
-         {
-            dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
-            swingAxis.Scale (1.0 / sqrt (swingAxis.DotProduct3(swingAxis)));
-            NewtonUserJointAddAngularRow (m_joint, angle, (float*)&swingAxis);
-            NewtonUserJointSetRowMinimumFriction (m_joint, 0.0);
-         }
+			float angle = acos(dot) - m_coneAngle;
+			if (angle > 0) {
+				dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
+				swingAxis = swingAxis.Scale(1.0 / sqrt(swingAxis.DotProduct3(swingAxis)));
+				NewtonUserJointAddAngularRow(m_joint, angle, (float*)&swingAxis);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0);
+			}
 #else
-         // cone / arc limit - think of an piece of pizza (arc) and an allowed max distance from it (cone):
+			// cone / arc limit - think of an piece of pizza (arc) and an allowed max distance from it (cone):
 
-         if (m_coneAngle > 0.0f && dot < 0.999f) 
-         {
-            // project current axis to the arc plane (y)
-            dVector d = matrix1.UnrotateVector (matrix0.m_front);
-            dVector cone = d; cone.m_y = 0; cone.Scale (1.0f / sqrt (cone.DotProduct3(cone)));
+			if (m_coneAngle > 0.0f && dot < 0.999f) {
+				// project current axis to the arc plane (y)
+				dVector d = matrix1.UnrotateVector(matrix0.m_front);
+				dVector cone = d; cone.m_y = 0; cone = cone.Scale(1.0f / sqrt(cone.DotProduct3(cone)));
 
-            // clamp the result to be within the arc angle
-            if (cone.m_x < m_arcAngleCos)
-               cone = dVector (m_arcAngleCos, 0.0f, ( (cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
+				// clamp the result to be within the arc angle
+				if (cone.m_x < m_arcAngleCos)
+					cone = dVector(m_arcAngleCos, 0.0f, ((cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
 
-            // do a regular cone constraint from that
-            float angle = acos (max(-1.0f, min(1.0f, d.DotProduct3(cone)))) - m_coneAngle;
-            if (angle > 0.0f)
-            {
-               dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
-               swingAxis.Scale (1.0f / sqrt (swingAxis.DotProduct3(swingAxis)));
-               NewtonUserJointAddAngularRow (m_joint, angle, (float*)&swingAxis);
-               NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-            }   
-         }
+				// do a regular cone constraint from that
+				float angle = acos(max(-1.0f, min(1.0f, d.DotProduct3(cone)))) - m_coneAngle;
+				if (angle > 0.0f) {
+					dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
+					swingAxis = swingAxis.Scale(1.0f / sqrt(swingAxis.DotProduct3(swingAxis)));
+					NewtonUserJointAddAngularRow(m_joint, angle, (float*)&swingAxis);
+					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+				}
+			}
 #endif
-      }
-      else
-      {
+		}
+		else {
 
-         if (m_anim_speed != 0.0f) // some animation to illustrate purpose
-         {
-            m_anim_time += timestep * m_anim_speed;
-            dFloat a0 = sin(m_anim_time);
-            dFloat a1 = m_anim_offset * 3.14f;
-            dVector axis(sin(a1), 0.0f, cos(a1));
-            //dVector axis (1,0,0);
-            m_target = dQuaternion(axis, a0 * 0.5f);
-         }
+			if (m_anim_speed != 0.0f) // some animation to illustrate purpose
+			{
+				m_anim_time += timestep * m_anim_speed;
+				dFloat a0 = sin(m_anim_time);
+				dFloat a1 = m_anim_offset * 3.14f;
+				dVector axis(sin(a1), 0.0f, cos(a1));
+				//dVector axis (1,0,0);
+				m_target = dQuaternion(axis, a0 * 0.5f);
+			}
 
-         // measure error
-         dQuaternion q0(matrix0);
-         dQuaternion q1(matrix1);
-         dQuaternion qt0 = m_target * q1;
-         dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)   ? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
-         qErr.Normalize();
+			// measure error
+			dQuaternion q0(matrix0);
+			dQuaternion q1(matrix1);
+			dQuaternion qt0 = m_target * q1;
+			dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f) ? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
+			qErr.Normalize();
 
-         dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
-         dVector errorAngVel(0, 0, 0);
+			dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
+			dVector errorAngVel(0, 0, 0);
 
-         dMatrix basis;
-         if (errorAngle > 1.0e-10f) {
-            dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
-            errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis.DotProduct3(errorAxis)));
-            errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
+			dMatrix basis;
+			if (errorAngle > 1.0e-10f) {
+				dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
+				errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis.DotProduct3(errorAxis)));
+				errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
 
-            basis = dGrammSchmidt(errorAxis);
-         } else {
-            basis = dMatrix(qt0, dVector(0.0f, 0.0f, 0.0f, 1.0f));
-         }
+				basis = dGrammSchmidt(errorAxis);
+			}
+			else {
+				basis = dMatrix(qt0, dVector(0.0f, 0.0f, 0.0f, 1.0f));
+			}
 
-         dVector angVel0(0.0f);
-         dVector angVel1(0.0f);
-         NewtonBodyGetOmega(m_body0, (dFloat*)&angVel0);
-         NewtonBodyGetOmega(m_body1, (dFloat*)&angVel1);
+			dVector angVel0(0.0f);
+			dVector angVel1(0.0f);
+			NewtonBodyGetOmega(m_body0, (dFloat*)&angVel0);
+			NewtonBodyGetOmega(m_body1, (dFloat*)&angVel1);
 
-         dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
+			dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
 
-         //dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-         // motors
-         for (int n = 0; n < 3; n++) {
-            // calculate the desired acceleration
-            dVector &axis = basis[n];
-            dFloat relAccel = angAcc.DotProduct3(axis);
+			//dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
+			// motors
+			for (int n = 0; n < 3; n++) {
+				// calculate the desired acceleration
+				dVector &axis = basis[n];
+				dFloat relAccel = angAcc.DotProduct3(axis);
 
-            NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
-            NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-            NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-            NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-            NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-         }
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
+				NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			}
 
-      }
-   }
+		}
+	}
 };
 
 
