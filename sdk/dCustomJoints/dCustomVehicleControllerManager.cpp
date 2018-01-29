@@ -438,8 +438,6 @@ void dWheelJoint::ResetTransform()
 
 void dWheelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
-	dAssert (0);
-/*
 	dMatrix tireMatrix;
 	dMatrix chassisMatrix;
 
@@ -497,7 +495,6 @@ void dWheelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 
 	m_brakeTorque = 0.0f;
-*/
 }
 
 void dWheelJoint::Debug(dDebugDisplay* const debugDisplay) const
@@ -2845,7 +2842,7 @@ void dCustomVehicleController::CalculateTireForces(dFloat timestep, int threadID
 
 #ifdef _DEBUG
 //if ((tireJoint->m_index == 1) || (tireJoint->m_index == 3)) {
-//dTrace(("(t:%d b:%f fx:%f fy:%f) ", tireJoint->m_index, dAtan(tireJoint->m_lateralSlip) * 180.0f / dPi, longitudinalForce, lateralForce));
+//dTrace(("(t:%d b:%f fx:%f fy:%f) ", tireJoint->m_index, dAtan(tireJoint->m_lateralSlip) * dRadToDegree, longitudinalForce, lateralForce));
 //}
 #endif
 					}
@@ -2875,15 +2872,15 @@ dTrace(("\n"));
 	}
 
 	static int xxx;
-	//dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/dPi, (m_sideSlip - m_prevSideSlip) * (180.0f / dPi) / timestep));
+	//dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * dRadToDegree, (m_sideSlip - m_prevSideSlip) * dRadToDegree / timestep));
 	xxx++;
 
-	if ((dAbs(m_sideSlip * 180.0f / dPi) > 35.0f)) {
+	if ((dAbs(m_sideSlip * dRadToDegree) > 35.0f)) {
 		dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(m_sideSlip)));
 		NewtonBodyAddTorque(chassisBody, &xxx1[0]);
 	} else {
 		dFloat betaRate = (m_sideSlip - m_prevSideSlip) / timestep;
-		if (dAbs(betaRate * 180.0f / dPi) > 15.0f) {
+		if (dAbs(betaRate * dRadToDegree) > 15.0f) {
 			dVector xxx1(matrix.m_up.Scale(-8000.0f * dSign(betaRate)));
 			NewtonBodyAddTorque(chassisBody, &xxx1[0]);
 		}

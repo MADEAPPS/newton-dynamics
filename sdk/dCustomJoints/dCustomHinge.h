@@ -23,6 +23,9 @@ class dCustomHinge: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+
+	// this is a special constructor that create a hinge with an error between the two matrices, the error is reduce to zero after few iterations 
+	// the error can not be too great, this is more for hinges with wiggle room
 	CUSTOM_JOINTS_API dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomHinge();
 
@@ -38,16 +41,13 @@ class dCustomHinge: public dCustomJoint
 	CUSTOM_JOINTS_API dFloat GetFriction () const;
 
 	protected:
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
-	private:
-	void SubmitConstraintsLimitsOnly(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
-	void SubmitConstraintsFrictionOnly(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
-	void SubmitConstraintsFrictionAndLimit(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
-
+	CUSTOM_JOINTS_API void ApplySpringDamper (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
+	
 	dAngularIntegration m_curJointAngle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
@@ -59,12 +59,13 @@ class dCustomHinge: public dCustomJoint
 	dFloat m_springDamperRelaxation;
 	union
 	{
-		int m_options;
+		int m_flags;
 		struct
 		{
 			unsigned m_limitsOn			 : 1;
 			unsigned m_setAsSpringDamper : 1;
 			unsigned m_actuatorFlag		 : 1;
+			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
 

@@ -182,6 +182,7 @@ class dgBody
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
+
 	virtual void InvalidateCache();
 	
     virtual void SetMatrix(const dgMatrix& matrix);
@@ -225,8 +226,6 @@ class dgBody
 	void UpdateLumpedMatrix();
 	void CalcInvInertiaMatrix ();
 	void ApplyGyroTorque ();
-	dgVector CalculateLineraMomentum() const; 
-	dgVector CalculateAngularMomentum() const; 
 
 	dgMatrix m_invWorldInertiaMatrix;
 	dgMatrix m_matrix;
@@ -598,22 +597,10 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
 
-DG_INLINE dgVector dgBody::CalculateLineraMomentum() const
+DG_INLINE void dgBody::ApplyGyroTorque ()
 {
-	return dgVector (m_veloc.Scale4 (m_mass.m_w));
-}
-
-DG_INLINE dgVector dgBody::CalculateAngularMomentum() const
-{
-	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
-	dgVector localAngularMomentum(m_mass * localOmega);
-	return m_matrix.RotateVector(localAngularMomentum);
-}
-
-DG_INLINE void dgBody::ApplyGyroTorque()
-{
-//	dgVector gyroTorque (m_omega.CrossProduct3(CalculateAngularMomentum()));
-//	SetTorque(GetTorque() - gyroTorque);
+	dgVector gyroTorque (m_omega.CrossProduct3(m_matrix.RotateVector(m_mass * m_matrix.UnrotateVector(m_omega))));
+	SetTorque (GetTorque() - gyroTorque);
 }
 
 DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
@@ -625,6 +612,7 @@ DG_INLINE dgInt32 dgBody::GetSerializedID() const
 {
 	return m_serializedEnum;
 }
+
 
 #endif 
 

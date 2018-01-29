@@ -281,10 +281,8 @@ void dCustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) co
 	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
-/*
 dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const
 {
-	dAssert (0);
 	cosAngle = dir.DotProduct3(cosDir);
 	sinAngle = sinDir.DotProduct3(dir.CrossProduct(cosDir));
 	return dAtan2(sinAngle, cosAngle);
@@ -292,12 +290,11 @@ dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, 
 
 dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
 {
-	dAssert (0);
 	dFloat sinAngle;
 	dFloat cosAngle;
 	return CalculateAngle (dir, cosDir, sinDir, sinAngle, cosAngle);
 }
-*/
+
 
 void dCustomJoint::SetBodiesCollisionState (int state)
 {
@@ -387,29 +384,3 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 }
 
 
-dCustomJoint::dAngularIntegration dCustomJoint::dAngularIntegration::operator+ (const dAngularIntegration& angle) const
-{
-	dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle;
-	dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle;
-	dFloat angle_da = dAtan2(sin_da, cos_da);
-	return dAngularIntegration(m_angle + angle_da);
-}
-
-dCustomJoint::dAngularIntegration dCustomJoint::dAngularIntegration::operator- (const dAngularIntegration& angle) const
-{
-	dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle;
-	dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle;
-	dFloat angle_da = dAtan2(sin_da, cos_da);
-	return dAngularIntegration(angle_da);
-}
-
-dFloat dCustomJoint::dAngularIntegration::Update(dFloat newAngleCos, dFloat newAngleSin)
-{
-	dFloat sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle;
-	dFloat cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle;
-
-	m_angle += dAtan2(sin_da, cos_da);
-	m_cosJointAngle = newAngleCos;
-	m_sinJointAngle = newAngleSin;
-	return m_angle;
-}

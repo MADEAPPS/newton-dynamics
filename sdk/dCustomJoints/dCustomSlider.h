@@ -24,40 +24,37 @@ class dCustomSlider: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent);
 	CUSTOM_JOINTS_API virtual ~dCustomSlider();
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);
-	
 	CUSTOM_JOINTS_API void SetLimits(dFloat mindist, dFloat maxdist);
 	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
-	
+
 	CUSTOM_JOINTS_API dFloat GetJointPosit () const;
 	CUSTOM_JOINTS_API dFloat GetJointSpeed () const;
-
-	CUSTOM_JOINTS_API dFloat GetFriction () const;
-	CUSTOM_JOINTS_API void SetFriction (dFloat friction);
 	
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat m_speed;
 	dFloat m_posit;
 	dFloat m_minDist;
 	dFloat m_maxDist;
-	dFloat m_friction;
 	dFloat m_spring;
 	dFloat m_damper;
 	dFloat m_springDamperRelaxation;
 	union {
-		int m_options;
+		int m_flags;
 		struct {
 			unsigned m_limitsOn			 : 1;
 			unsigned m_setAsSpringDamper : 1;
 			unsigned m_actuatorFlag		 : 1;
+			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
 	DECLARE_CUSTOM_JOINT(dCustomSlider, dCustomJoint)

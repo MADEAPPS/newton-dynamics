@@ -42,7 +42,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 	className(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)	\
 		:baseClass(child, parent, callback, userData)																		\
 	{																														\
-		dAssert (0);																										\
+		dAssert (0);																								\
 	}																														\
 	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
 	static dCRCTYPE GetType () { return m_metaData_##className.m_key_##className; }										    \
@@ -146,15 +146,38 @@ class dCustomJoint: public dCustomAlloc
 			m_cosJointAngle = dCos(angle);
 		}
 
-		dFloat Update(dFloat angle)
+		dFloat Update (dFloat newAngleCos, dFloat newAngleSin)
 		{
-			return Update(dCos(angle), dSin(angle));
+			dFloat sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle; 
+			dFloat cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle; 
+
+			m_angle += dAtan2 (sin_da, cos_da);
+			m_cosJointAngle = newAngleCos;
+			m_sinJointAngle = newAngleSin;
+			return m_angle;
 		}
 
-		dFloat Update(dFloat newAngleCos, dFloat newAngleSin);
-		dAngularIntegration operator+ (const dAngularIntegration& angle) const;
-		dAngularIntegration operator- (const dAngularIntegration& angle) const;
+		dAngularIntegration operator+ (const dAngularIntegration& angle) const
+		{
+			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle; 
+			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle; 
+			dFloat angle_da = dAtan2 (sin_da, cos_da);
+			return dAngularIntegration(m_angle + angle_da);
+		}
 
+		dAngularIntegration operator- (const dAngularIntegration& angle) const
+		{
+			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle; 
+			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle; 
+			dFloat angle_da = dAtan2 (sin_da, cos_da);
+			return dAngularIntegration (angle_da);
+		}
+
+
+		dFloat Update (dFloat angle)
+		{
+			return Update (dCos (angle), dSin (angle));
+		}
 
 		private:
 		dFloat m_angle;
@@ -211,7 +234,7 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API static void SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
-
+	
 	protected:
 	CUSTOM_JOINTS_API dCustomJoint (NewtonInverseDynamics* const invDynSolver, void* const invDynNode);
 	CUSTOM_JOINTS_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
@@ -223,6 +246,8 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API static dSerializeMetaDataDictionary& GetDictionary();
 
+	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
+	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

@@ -99,7 +99,7 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		m_pith = dGaussianRandom (dPi * 2.0f);
 		m_yaw = dGaussianRandom (dPi * 2.0f);
 		m_roll = dGaussianRandom (dPi * 2.0f);
-		m_step = 15.0f * (dAbs (dGaussianRandom (0.25f)) + 0.0001f) * dPi/180.0f;
+		m_step = 15.0f * (dAbs (dGaussianRandom (0.25f)) + 0.0001f) * dDegreeToRad;
 
 		CreatCasterBody(location_x, location_z, shapeType, materialID);
 
@@ -220,7 +220,7 @@ void ClosestDistance (DemoEntityManager* const scene)
 
 
 	// place camera into position
-	//dMatrix camMatrix (dYawMatrix(90.0f * dPi /180.0f));
+	//dMatrix camMatrix (dYawMatrix(90.0f * dDegreeToRad));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);

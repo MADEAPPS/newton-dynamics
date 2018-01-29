@@ -17,9 +17,9 @@
 #ifndef _CUSTOMCORKSCREW_H_
 #define _CUSTOMCORKSCREW_H_
 
-#include "dCustom6dof.h"
+#include "dCustomJoint.h"
 
-class dCustomCorkScrew: public dCustom6dof
+class dCustomCorkScrew: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
@@ -31,22 +31,25 @@ class dCustomCorkScrew: public dCustom6dof
 	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
 	protected:
+	//CUSTOM_JOINTS_API dCustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+
+	dAngularIntegration m_curJointAngle;
 	dFloat m_minLinearDist;
 	dFloat m_maxLinearDist;
 	dFloat m_minAngularDist;
 	dFloat m_maxAngularDist;
 	dFloat m_angularDamp;
-	dFloat m_angularVeloc;
+	dFloat m_angularAccel;
 	bool m_limitsLinearOn;
 	bool m_limitsAngularOn;
 	bool m_angularmotorOn;
 
-	DECLARE_CUSTOM_JOINT(dCustomCorkScrew, dCustom6dof)
+	DECLARE_CUSTOM_JOINT(dCustomCorkScrew, dCustomJoint)
 };
 
-#endif 
+#endif // !defined(AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
 

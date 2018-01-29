@@ -17,13 +17,12 @@
 #ifndef _CUSTOMUNIVERSAL_H_
 #define _CUSTOMUNIVERSAL_H_
 
-#include "dCustom6dof.h"
+#include "dCustomJoint.h"
 
-class dCustomUniversal: public dCustom6dof
+class dCustomUniversal: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomUniversal();
 
 	CUSTOM_JOINTS_API void EnableLimit_0(bool state);
@@ -58,17 +57,26 @@ class dCustomUniversal: public dCustom6dof
 	protected:
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
-	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
 
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+
+	dAngularIntegration m_curJointAngle_0;
+	dAngularIntegration m_curJointAngle_1;
+
+	dFloat m_minAngle_0;
+	dFloat m_maxAngle_0;
 	dFloat m_jointOmega_0;
 	dFloat m_angularDamp_0;
 	dFloat m_angularAccel_0;
+
+	dFloat m_minAngle_1;
+	dFloat m_maxAngle_1;
 	dFloat m_jointOmega_1;
 	dFloat m_angularDamp_1;
 	dFloat m_angularAccel_1;
 
 	union {
-		int m_options;
+		int m_flags;
 		struct {
 			unsigned m_limit_0_On		 : 1;
 			unsigned m_limit_1_On		 : 1;
@@ -78,8 +86,8 @@ class dCustomUniversal: public dCustom6dof
 			unsigned m_actuator_1		 : 1;
 		};
 	};
-int xxx;
-	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustom6dof)
+
+	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustomJoint)
 };
 
 #endif 

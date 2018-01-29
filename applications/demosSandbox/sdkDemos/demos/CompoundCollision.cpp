@@ -342,7 +342,7 @@ void CompoundCollision (DemoEntityManager* const scene)
 	NewtonMaterialSetCollisionCallback (scene->GetNewton(), defaultMaterialID, defaultMaterialID, NULL, OnGettingTheCollisionSubShapeFromMaterialCallback);
 	NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), defaultMaterialID, defaultMaterialID, OnSubShapeAABBOverlapTest);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot (camMatrix);
 	dVector origin (100.0f, 0.0f, 100.0f, 0.0f);
 	dFloat hight = 1000.0f;

@@ -48,7 +48,7 @@ void ContinuousCollision (DemoEntityManager* const scene)
 //	CreateLevelMesh (scene, "playground.ngd", fileName);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot (camMatrix);
 	dVector origin (FindFloor (scene->GetNewton(), dVector (-5.0f, 20.0f, -10.0f, 0.0f), 100.0f));
 	origin.m_y += 10.0f;

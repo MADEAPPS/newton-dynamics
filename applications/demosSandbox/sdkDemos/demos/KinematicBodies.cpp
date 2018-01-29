@@ -474,73 +474,11 @@ static NewtonBody* AddStaticMesh(DemoEntityManager* const scene)
 }
 
 
-static void DebugKinematic (DemoEntityManager* const scene)
-{
-
-	{
-		dVector location(0.0f, 6.0f, 0.0f);
-		dVector size(1.5f, 2.0f, 2.0f, 0.0f);
-
-		NewtonWorld* const world = scene->GetNewton();
-		int materialID = NewtonMaterialGetDefaultGroupID(world);
-		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-		//NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-		dFloat mass = 100.0f;
-		dMatrix matrix(dGetIdentityMatrix());
-		matrix.m_posit = location;
-		matrix.m_posit.m_w = 1.0f;
-		CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
-
-		geometry->Release();
-		NewtonDestroyCollision(collision);
-	}
-
-   {
-		dVector location(0.0f, 3.0f, 0.0f);
-		dVector size(1.5f, 2.0f, 2.0f, 0.0f);
-
-		NewtonWorld* const world = scene->GetNewton();
-		int materialID = NewtonMaterialGetDefaultGroupID(world);
-		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-		//NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-		dFloat mass = 100.0f;
-		dMatrix matrix(dGetIdentityMatrix());
-		matrix.m_posit = location;
-		matrix.m_posit.m_w = 1.0f;
-	   
-		DemoMesh* const mesh = geometry;
-		DemoEntity* const entity = new DemoEntity(matrix, NULL);
-		scene->Append(entity);
-		entity->SetMesh(mesh, dGetIdentityMatrix());
-		NewtonBody* const rigidBody = NewtonCreateKinematicBody(world, collision, &matrix[0][0]);
-		//NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
-
-		NewtonBodySetCollidable (rigidBody, true);
-
-		NewtonBodySetMassProperties(rigidBody, mass, collision);
-		NewtonBodySetUserData(rigidBody, entity);
-		NewtonBodySetMaterialGroupID(rigidBody, materialID);
-		NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
-		NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
-		NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
-
-		geometry->Release();
-		NewtonDestroyCollision(collision);
-   }
-}
-
 void KinematicPlacement (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
 
-#if 1
-	DebugKinematic (scene);
-#else
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
@@ -555,8 +493,13 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	location.m_x += 0.0f;
 	location.m_z += 0.0f;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
-
-
+/*
+dMatrix matrix (dGetIdentityMatrix());
+dFloat pts[] = { 0,0,0, 0,0,0.01, 0.01,0,0.01,  0.01,0,0, 0,0.03,0, 0,0.03,0.01, 0.01, 0.03,0, 0.01,0.03,0.01 };
+NewtonCollision* col = NewtonCreateConvexHull(scene->GetNewton(), 8, pts, 12, 0.0, 0, NULL);
+NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
+NewtonBodySetMassProperties(body, 1.0, col);
+*/
 	int count = 3;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -568,7 +511,6 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-#endif
 
 	// place camera into position
 	dQuaternion rot;

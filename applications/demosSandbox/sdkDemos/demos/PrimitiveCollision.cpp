@@ -165,7 +165,7 @@ void PrimitiveCollision (DemoEntityManager* const scene)
 	}
 
 	// place camera into position
-	//dMatrix camMatrix (dYawMatrix(90.0f * dPi /180.0f));
+	//dMatrix camMatrix (dYawMatrix(90.0f * dDegreeToRad));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 0.0f, 0.0f, 0.0f);

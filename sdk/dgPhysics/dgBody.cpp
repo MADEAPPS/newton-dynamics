@@ -627,7 +627,6 @@ dgMatrix dgBody::CalculateInvInertiaMatrix () const
 #endif
 }
 
-
 void dgBody::InvalidateCache ()
 {
 	m_sleeping = false;

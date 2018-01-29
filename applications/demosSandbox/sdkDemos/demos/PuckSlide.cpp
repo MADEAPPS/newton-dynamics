@@ -257,7 +257,7 @@ void PuckSlide (DemoEntityManager* const scene)
 	}
 
 	// place camera into position
-	dMatrix camMatrix (dPitchMatrix(20.0f * dPi /180.0f));
+	dMatrix camMatrix (dPitchMatrix(20.0f * dDegreeToRad));
 	dQuaternion rot (camMatrix);
 	dVector origin (CAMERA_Z, CAMERA_Y, CAMERA_X, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

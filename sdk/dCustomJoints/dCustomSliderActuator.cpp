@@ -144,8 +144,6 @@ void dCustomSliderActuator::SetMaxForcePower(dFloat force)
 
 void dCustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	dAssert(0);
-/*
 	if (m_actuatorFlag) {
 		dVector posit1 (matrix1.m_posit);
 		dVector posit0 (matrix0.m_posit - matrix1.m_front.Scale (m_posit));
@@ -165,7 +163,6 @@ void dCustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMat
 	} else {
 		dCustomSlider::SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
 	}
-*/
 }
 
 

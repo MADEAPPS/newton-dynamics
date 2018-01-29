@@ -10,20 +10,20 @@
 */
 
 
+
 // dCustomSlidingContact.h: interface for the dCustomSlidingContact class.
+//
 //////////////////////////////////////////////////////////////////////
 
 #ifndef _CUSTOM_SLIDING_H_
 #define _CUSTOM_SLIDING_H_
 
+#include "dCustomJoint.h"
 
-#include "dCustom6dof.h"
-
-class dCustomSlidingContact: public dCustom6dof
+class dCustomSlidingContact: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API dCustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomSlidingContact (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomSlidingContact();
 
 	CUSTOM_JOINTS_API void EnableLinearLimits(bool state);
@@ -36,26 +36,35 @@ class dCustomSlidingContact: public dCustom6dof
 	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 	protected:
+	//CUSTOM_JOINTS_API dCustomSlidingContact(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex);
-	
+
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+
+	dAngularIntegration m_curJointAngle;
 	dFloat m_speed;
 	dFloat m_posit;
+	dFloat m_minLinearDist;
+	dFloat m_maxLinearDist;
+	dFloat m_minAngularDist;
+	dFloat m_maxAngularDist;
+
 	dFloat m_spring;
 	dFloat m_damper;
 	dFloat m_springDamperRelaxation;
 	union
 	{
-		int m_options;
+		int m_flags;
 		struct
 		{
 			unsigned m_limitsLinearOn	 : 1;
 			unsigned m_limitsAngularOn	 : 1;
 			unsigned m_setAsSpringDamper : 1;
+			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
-	DECLARE_CUSTOM_JOINT(dCustomSlidingContact, dCustom6dof)
+	DECLARE_CUSTOM_JOINT(dCustomSlidingContact, dCustomJoint)
 };
 
 #endif 

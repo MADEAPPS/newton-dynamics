@@ -63,7 +63,7 @@ static void AddNonUniformScaledPrimitives(DemoEntityManager* const scene, dFloat
 
 	dFloat startElevation = 1000.0f;
 	dMatrix matrix(dGetIdentityMatrix());
-	//matrix = dPitchMatrix(-45.0f * dPi/180.0f);
+	//matrix = dPitchMatrix(-45.0f * dgDEG2RAD);
 	for (int i = 0; i < xCount; i++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j++) {
@@ -231,7 +231,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "cattle.ngd", fileName);
 	//CreateLevelMesh (scene, "playground.ngd", 0);
 
-	//dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
+	//dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 5.0f, 0.0f, 0.0f);

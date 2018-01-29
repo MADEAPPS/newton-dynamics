@@ -133,8 +133,6 @@ void dCustomHingeActuator::SetMaxForcePower(dFloat force)
 
 void dCustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	dAssert (0);
-/*
 	if (m_actuatorFlag) {
 		dFloat jointangle = GetActuatorAngle();
 		dFloat relAngle = jointangle - m_angle;
@@ -150,7 +148,6 @@ void dCustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMat
 	} else {
 		dCustomHinge::SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
 	}
-*/
 }
 
 

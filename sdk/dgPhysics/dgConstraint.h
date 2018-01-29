@@ -78,6 +78,7 @@ class dgBilateralBounds
 	dgFloat32 m_low;
 	dgFloat32 m_upper;
 	dgInt32 m_normalIndex;
+//	dgInt16 m_isIkRow;
 };
 
 DG_MSC_VECTOR_ALIGMENT
@@ -103,7 +104,6 @@ class dgJointAccelerationDecriptor
 	dgInt32 m_rowsCount;
 	dgFloat32 m_timeStep;
 	dgFloat32 m_invTimeStep;
-	dgFloat32 m_subSampleScaler;
 	dgFloat32 m_firstPassCoefFlag;
 	
 	dgJacobianMatrixElement *m_rowMatrix;
@@ -190,6 +190,8 @@ class dgConstraint
 		dgVector m_posit1;
 		dgVector m_veloc0;
 		dgVector m_veloc1;
+		dgVector m_centripetal0;
+		dgVector m_centripetal1;
 		dgFloat32 m_stiffness;
 	};
 
@@ -204,7 +206,7 @@ class dgConstraint
 	void SetUpdateFeedbackFunction (ConstraintsForceFeeback function);
 	void InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const;
 	void InitInfo (dgConstraintInfo* const info) const;
-	
+
 	void* m_userData;
 	dgBody* m_body0;
 	dgBody* m_body1;

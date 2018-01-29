@@ -118,7 +118,7 @@ static VehicleParameters heavyTruck =
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
 	2,									// DIFFERENTIAL_TYPE
-	dRollMatrix(dPi * 90.0f / 180.0f),
+	dRollMatrix(90.0f * dDegreeToRad),
 };
 
 static VehicleParameters lightTruck = 
@@ -171,7 +171,7 @@ static VehicleParameters lightTruck =
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
 	2,									// DIFFERENTIAL_TYPE
-	dRollMatrix(dPi * 90.0f / 180.0f),
+	dRollMatrix(90.0f * dDegreeToRad),
 };
 
 static VehicleParameters m1a1Param = 
@@ -205,7 +205,7 @@ static VehicleParameters m1a1Param =
 	(5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
 	(5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
 	1.5f,									// ALIGNING_MOMENT_TRAIL
-	dRollMatrix(dPi * 90.0f / 180.0f),
+	dRollMatrix(90.0f * dDegreeToRad),
 	0,										// WHEEL_HAS_FENDER	
 	0,										// DIFFERENTIAL_TYPE
 */
@@ -258,7 +258,7 @@ static VehicleParameters m1a1Param =
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
 	1,									// DIFFERENTIAL_TYPE
-	dRollMatrix(dPi * 90.0f / 180.0f),
+	dRollMatrix(90.0f * dDegreeToRad),
 };
 
 
@@ -432,7 +432,7 @@ class HeavyVehicleEntity: public DemoEntity
 				m_intepolants[i] = steps[i];
 			}
 
-			m_aligmentMatrix = dRollMatrix(dPi * 90.0f / 180.0f) * dPitchMatrix(dPi * 180.0f / 180.0f);
+			m_aligmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * dPitchMatrix(dPi * 180.0f / 180.0f);
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
 		}
 
@@ -1662,7 +1662,7 @@ void MilitaryTransport (DemoEntityManager* const scene)
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
-//	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
+//	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (1000.0f, 100.0f, 1000.0f, 1.0f);
 location.m_posit.m_x = 126.0f;

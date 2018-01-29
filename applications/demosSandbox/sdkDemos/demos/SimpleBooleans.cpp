@@ -47,12 +47,12 @@ static NewtonMesh* MakeCruz (DemoEntityManager* const scene, dFloat lengh, dFloa
 return boxMesh;
 /*
 	// rotate 90 degree around y
-	dMatrix yawMatrix (dYawMatrix(dPi * 90.0f / 180.0f));
+	dMatrix yawMatrix (dYawMatrix(90.0f * dDegreeToRad));
 	NewtonMesh* const auxiliaryMesh = NewtonMeshUnion (boxMesh, boxMesh, &yawMatrix[0][0]);
 	NewtonMeshPolygonize(auxiliaryMesh);
 
 	// rotate 90 degree around z
-	dMatrix rollMatrix (dRollMatrix(dPi * 90.0f / 180.0f));
+	dMatrix rollMatrix (dRollMatrix(90.0f * dDegreeToRad));
 	NewtonMesh* const cruz = NewtonMeshUnion (auxiliaryMesh, boxMesh, &rollMatrix[0][0]);
 	NewtonMeshPolygonize(cruz);
 
@@ -113,7 +113,7 @@ void SimpleBooleanOperations (DemoEntityManager* const scene)
 	dMatrix originMatrix;
 	NewtonBodyGetMatrix(body, &originMatrix[0][0]);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * dPi /180.0f) * dYawMatrix(-45.0f * dPi /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	//dMatrix camMatrix (GetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (originMatrix.m_posit);

@@ -389,7 +389,7 @@ void ConvexCast (DemoEntityManager* const scene)
 
 	//char fileName[2048];
 	//NewtonWorld* const world = scene->GetNewton();
-	//GetWorkingFileName ("low_rez_rim.OFF", fileName);
+	//dGetWorkingFileName ("low_rez_rim.OFF", fileName);
 	//NewtonMesh* const mesh = NewtonMeshLoadOFF(world, fileName);
 	//NewtonCollision* coll = NewtonCreateConvexHullFromMesh (world, mesh, 0.0f, 0);
 	//NewtonDestroyCollision(coll);

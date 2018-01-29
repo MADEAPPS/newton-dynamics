@@ -776,7 +776,7 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 			// create a trigger to match his mesh
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, &meshMatrix[0][0]);
 			dMatrix matrix (entity->GetNextMatrix());
-			dCustomTriggerController* const controller = triggerManager->CreateTrigger(matrix, collision);
+			dCustomTriggerController* const controller = triggerManager->CreateTrigger(matrix, collision, NULL);
 			NewtonDestroyCollision (collision);
 
 			if (!trigger0) {

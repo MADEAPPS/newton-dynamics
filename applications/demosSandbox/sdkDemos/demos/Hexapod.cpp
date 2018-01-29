@@ -20,15 +20,13 @@
 #include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
-#if 0
 class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 {
 	public:
 	dEffectorWalkPoseGenerator(NewtonBody* const rootBody)
 		:dEffectorTreeFixPose(rootBody)
 		,m_acc(0.0f)
-		,m_amplitud_x(0.35f)
-		,m_amplitud_y(0.1f)
+		,m_amplitud_y(0.2f)
 		,m_period (1.0f)
 		,cycle()
 	{
@@ -40,64 +38,43 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		m_sequence[5] = 1;
 
 		// make left walk cycle
-		const int size = 11;
-		const int splite = (size - 1) / 2 - 1;
-		dFloat64 knots[size];
-		dBigVector leftControlPoints[size + 2];
-		for (int i = 0; i < size; i ++) {
-			knots[i] = dFloat (i) / (size - 1);
+		dFloat64 knots[11];
+		dBigVector leftControlPoints[sizeof (knots) / sizeof (knots[0]) + 2];
+		for (int i = 0; i <= 10; i ++) {
+			knots[i] = dFloat (i) / 10.0f;
 		}
 		memset (leftControlPoints, 0, sizeof (leftControlPoints));
-		
-		dFloat x = -m_amplitud_x / 2.0f;
-		dFloat step_x = m_amplitud_x / splite;
-		for (int i = 0; i <= splite; i ++) {
-			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (dPi * dFloat (i) / splite);
-			leftControlPoints[i + 1].m_x = x;
-			x += step_x;
-		}
 
-		x = m_amplitud_x / 2.0f;
-		step_x = -m_amplitud_x / (size - splite - 1);
-		for (int i = splite; i < size; i++) {
-			leftControlPoints[i + 1].m_x = x;
-			x += step_x;
+		for (int i = 0; i <= 6; i ++) {
+			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin (dPi * dFloat (i) / 6);
 		}
-		leftControlPoints[0].m_x = leftControlPoints[1].m_x;
-		leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
-
-//		cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
-		cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
+		cycle.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, leftControlPoints);
 	}
 
-	virtual void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
 	{
-		dEffectorTreeFixPose::Evaluate(output, timestep, threadIndex);
+		dEffectorTreeFixPose::Evaluate(output, timestep);
+
+		m_acc = dMod (m_acc + timestep, m_period);
 
 		dFloat param = m_acc / m_period;
 		dBigVector left (cycle.CurvePoint(param));
 		dBigVector right (cycle.CurvePoint(dMod (param + 0.5f, 1.0f)));
 
 		dFloat high[2];
-		dFloat stride[2];
 		high[0] = dFloat (left.m_y);
 		high[1] = dFloat (right.m_y);
-		stride[0] = dFloat(left.m_x);
-		stride[1] = dFloat(right.m_x);
 
 		int index = 0;
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dEffectorTransform& transform = node->GetInfo();
 			transform.m_posit.m_y += high[m_sequence[index]];
-			transform.m_posit.m_x += stride[m_sequence[index]];
 			index ++;
 		}
-		m_acc = dMod(m_acc + timestep, m_period);
 	}
 
 	dFloat m_acc;
 	dFloat m_period;
-	dFloat m_amplitud_x;
 	dFloat m_amplitud_y;
 	dBezierSpline cycle;
 	int m_sequence[6]; 
@@ -107,7 +84,7 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 {
 	public:
 	dEffectorTreePostureGenerator(dEffectorTreeInterface* const poseGenerator)
-		:dEffectorTreeInterface(poseGenerator->GetRootBody())
+		:dEffectorTreeInterface(poseGenerator->m_rootBody)
 		,m_euler(0.0f)
 		,m_position(0.0f)
 		,m_poseGenerator(poseGenerator)
@@ -129,9 +106,9 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 		m_euler.m_z = roll;
 	}
 
-	virtual void Evaluate(dEffectorPose& output, dFloat timestep, int threadIndex)
+	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
 	{
-		m_poseGenerator->Evaluate(output, timestep, threadIndex);
+		m_poseGenerator->Evaluate(output, timestep);
 
 		dQuaternion rotation (dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
@@ -150,8 +127,8 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 class dEffectorBlendIdleWalk: public dEffectorTreeTwoWayBlender
 {
 	public:
-	dEffectorBlendIdleWalk(NewtonBody* const rootBody, dEffectorTreeFixPose* const node0, dEffectorTreeFixPose* const node1)
-		:dEffectorTreeTwoWayBlender(rootBody, node0, node1, node0->GetPose())
+	dEffectorBlendIdleWalk(NewtonBody* const rootBody, dEffectorTreeInterface* const node0, dEffectorTreeInterface* const node1)
+		:dEffectorTreeTwoWayBlender(rootBody, node0, node1)
 	{
 	}
 
@@ -354,15 +331,15 @@ class dHaxapodController: public dCustomControllerBase
 		m_postureModifier = new dEffectorTreePostureGenerator(m_walkIdleBlender);
 		m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
 
-		dMatrix invRootMatrix;
-		NewtonBodyGetMatrix (hexaBody, &invRootMatrix[0][0]);
-		invRootMatrix = invRootMatrix.Inverse();
+		dMatrix rootMatrix;
+		NewtonBodyGetMatrix (hexaBody, &rootMatrix[0][0]);
+		rootMatrix = rootMatrix.Inverse();
 		for (int i = 0; i < legEffectorCount; i++) {
 			dEffectorTreeInterface::dEffectorTransform frame;
 			dCustomRagdollMotor_EndEffector* const effector = legEffectors[i];
 			dMatrix effectorMatrix(effector->GetBodyMatrix());
 
-			dMatrix poseMatrix(effectorMatrix * invRootMatrix);
+			dMatrix poseMatrix(effectorMatrix * rootMatrix);
 			
 			frame.m_effector = effector;
 			frame.m_posit = poseMatrix.m_posit;
@@ -380,7 +357,7 @@ class dHaxapodController: public dCustomControllerBase
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		m_animTreeNode->Update(timestep, threadIndex);
+		m_animTreeNode->Update(timestep);
 		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
 	}
 
@@ -410,7 +387,6 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 		,m_pitch(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
-		,m_speed(0.5f)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -425,19 +401,29 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Hexapod controller");
+
+		ImGui::Separator();
+//		scene->Print(color, "control mode");
+//		ImGui::RadioButton("rotate body", &xxxx, 1);
+//		ImGui::RadioButton("translate body", &xxxx, 0);
+//		ImGui::Separator();
+
 		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
 		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
 		ImGui::SliderFloat("roll", &me->m_roll, -10.0f, 10.0f);
-		ImGui::SliderFloat("speed", &me->m_speed, 0.0f, 1.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.1f, 0.1f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.4f, 0.4f);
-		//ImGui::SliderFloat("turn", &me->m_speed, 0.0f, 1.0f);
+
+static float xxx = 1.0f;
+ImGui::SliderFloat("blend", &xxx, 0.0f, 1.0f);
+
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHaxapodController* const controller = &node->GetInfo();
 
-			controller->m_walkIdleBlender->SetBlendFactor (me->m_speed);
-			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * dDegreeToRad, me->m_yaw * dDegreeToRad, -me->m_roll * dDegreeToRad);
+controller->m_walkIdleBlender->SetBlendFactor (xxx);
+
+			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * dDegreeToRad, me->m_yaw * dDegreeToRad, me->m_roll * dDegreeToRad);
 		}
 	}
 
@@ -468,46 +454,25 @@ class dHexapodManager: public dCustomControllerManager<dHaxapodController>
 	dFloat32 m_pitch;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
-	dFloat32 m_speed;
 };
-#endif
+
 
 void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-	dAssert (0);
-/*
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.3f, 200.0f, -50.0f);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	dHexapodManager* const robotManager = new dHexapodManager(scene);
 
-	NewtonWorld* const world = scene->GetNewton();
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
-	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
-	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
-
 	dMatrix location (dGetIdentityMatrix());
-	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
-	location.m_posit.m_y += 1.0f;
+	location.m_posit.m_y = 1.0f;
+	robotManager->MakeHexapod (scene, location);
 
-	const int count = 1;
-	dMatrix location1(location);
-	location1.m_posit.m_z += 2.0f;
-	for (int i = 0; i < count; i++) {
-		location.m_posit.m_x += 2.0f;
-		location1.m_posit.m_x += 2.0f;
-		robotManager->MakeHexapod (scene, location);
-		//robotManager->MakeHexapod (scene, location1);
-	}
-
-	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
-	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
-	origin.m_y  += 2.5f;
-	
+	dVector origin(0.0f);
+	origin.m_x = -4.0f;
+	origin.m_y  = 1.5f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
-*/
 }
 
 

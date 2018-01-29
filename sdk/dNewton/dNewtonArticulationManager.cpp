@@ -70,7 +70,7 @@ void dNewtonArticulationManager::DestroyController (dCustomArticulatedTransformC
 dNewtonArticulationManager::dNewtonArticulationController::dNewtonArticulationController (dNewtonArticulationManager* const manager)
 	:dNewtonAlloc()
 {
-	m_controller = manager->CreateTransformController();
+	m_controller = manager->CreateTransformController(this);
 }
 
 dNewtonArticulationManager::dNewtonArticulationController::~dNewtonArticulationController ()
@@ -96,41 +96,31 @@ void dNewtonArticulationManager::dNewtonArticulationController::SetDefaultSelfCo
 
 int dNewtonArticulationManager::dNewtonArticulationController::GetBoneCount() const
 {
-//	return m_controller->GetBoneCount();
-	dAssert(0);
-	return 0;
+	return m_controller->GetBoneCount();
 }
 
 void* dNewtonArticulationManager::dNewtonArticulationController::GetBone(int bonexIndex) const
 {
-//	return (void*)(m_controller->GetBone(bonexIndex));
-	dAssert(0);
-	return 0;
+	return (void*)(m_controller->GetBone(bonexIndex));
 }
 
 dNewtonBody* dNewtonArticulationManager::dNewtonArticulationController::GetBoneBody (int index) const
 {
-	dAssert(0);
-	return 0;
-//	NewtonBody* const body = m_controller->GetBoneBody(index);
-//	dAssert(body);
-//	return (dNewtonBody*)NewtonBodyGetUserData (body);
+	NewtonBody* const body = m_controller->GetBoneBody(index);
+	dAssert(body);
+	return (dNewtonBody*)NewtonBodyGetUserData (body);
 }
 
 dNewtonBody* dNewtonArticulationManager::dNewtonArticulationController::GetBoneBody (void* const bone) const
 {
-//	NewtonBody* const body = m_controller->GetBoneBody((dCustomArticulatedTransformController::dSkeletonBone*)bone);
-//	dAssert(body);
-//	return (dNewtonBody*)NewtonBodyGetUserData (body);
-	dAssert(0);
-	return 0;
+	NewtonBody* const body = m_controller->GetBoneBody((dCustomArticulatedTransformController::dSkeletonBone*)bone);
+	dAssert(body);
+	return (dNewtonBody*)NewtonBodyGetUserData (body);
 }
 
 void* dNewtonArticulationManager::dNewtonArticulationController::GetBoneParent (const void* const bone) const
 {
-//	return (void*)(m_controller->GetParent((dCustomArticulatedTransformController::dSkeletonBone*)bone));
-	dAssert(0);
-	return 0;
+	return (void*)(m_controller->GetParent((dCustomArticulatedTransformController::dSkeletonBone*)bone));
 }
 
 void dNewtonArticulationManager::dNewtonArticulationController::SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode)
@@ -171,10 +161,9 @@ void dNewtonArticulationManager::OnPreUpdate (dCustomArticulatedTransformControl
 
 void dNewtonArticulationManager::OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 {
-	dAssert(0);
-	//dNewtonBody* const boneBody = (dNewtonBody*)NewtonBodyGetUserData (bone->m_body);
-	//dNewtonArticulationController* const controller = (dNewtonArticulationController*)bone->m_myController->GetUserData();
-	//controller->OnUpdateBoneTransform (boneBody, &localMatrix[0][0]);
+	dNewtonBody* const boneBody = (dNewtonBody*)NewtonBodyGetUserData (bone->m_body);
+	dNewtonArticulationController* const controller = (dNewtonArticulationController*)bone->m_myController->GetUserData();
+	controller->OnUpdateBoneTransform (boneBody, &localMatrix[0][0]);
 }
 
 void dNewtonArticulationManager::DisableAllSelfCollision (dCustomArticulatedTransformController* const controller)
@@ -193,20 +182,17 @@ void dNewtonArticulationManager::SetDefaultSelfCollisionMask (dCustomArticulated
 
 void dNewtonArticulationManager::SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode)
 {
-//	dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode0;
-//	dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode1;
-//	dAssert (bone0->m_myController == bone1->m_myController);
-//	bone0->m_myController->SetSelfCollisionMask (bone0, bone1, mode);
-	dAssert(0);
+	dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode0;
+	dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode1;
+	dAssert (bone0->m_myController == bone1->m_myController);
+	bone0->m_myController->SetSelfCollisionMask (bone0, bone1, mode);
 }
 
 bool dNewtonArticulationManager::SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const
 {
-//	dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode0;
-//	dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode1;
-//	return bone0->m_myController->SelfCollisionTest (bone0, bone1);
-	dAssert(0);
-	return 0;
+	dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode0;
+	dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*) boneNode1;
+	return bone0->m_myController->SelfCollisionTest (bone0, bone1);
 }
 
 

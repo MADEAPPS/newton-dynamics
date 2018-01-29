@@ -10,6 +10,7 @@
 */
 
 
+
 // dCustomUniversal.cpp: implementation of the dCustomUniversal class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -24,15 +25,13 @@
 IMPLEMENT_CUSTOM_JOINT(dCustomUniversal);
 
 dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustom6dof(pinAndPivotFrame, child, parent)
-	,m_options(0)
+	:dCustomJoint(6, child, parent)
+	,m_curJointAngle_0()
+	,m_curJointAngle_1()
+	,m_flags(0)
 {
-static int xxxx;
-xxx = xxxx++;
-
-	m_yawAxis = 0;
-	m_rollAxis = 0;
-	m_pitchAxis = 0;
+	// calculate the relative matrix of the pin and pivot on each body
+	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 
 	m_actuator_0 = false;
 	m_actuator_1 = false;
@@ -42,69 +41,58 @@ xxx = xxxx++;
 	m_angularDamp_0 = 0.5f;
 	m_angularAccel_0 = -4.0f;
 	m_jointOmega_0 = 0.0f;
-	SetPitchLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
+	m_minAngle_0 = -45.0f * dDegreeToRad;
+	m_maxAngle_0 =  45.0f * dDegreeToRad;
 
 	m_limit_1_On = true;
 	m_angularMotor_1_On = false; 
 	m_angularDamp_1 = 0.3f;
 	m_angularAccel_1 = -4.0f;
 	m_jointOmega_1 = 0.0f;
-	SetYawLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
+	m_minAngle_1 = -45.0f * dDegreeToRad;
+	m_maxAngle_1 =  45.0f * dDegreeToRad;
 }
-
-dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
-	:dCustom6dof(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
-	,m_options(0)
-{
-	m_yawAxis = 0;
-	m_rollAxis = 0;
-	m_pitchAxis = 0;
-
-	m_actuator_0 = false;
-	m_actuator_1 = false;
-
-	m_limit_0_On = true;
-	m_angularMotor_0_On = false;
-	m_angularDamp_0 = 0.5f;
-	m_angularAccel_0 = -4.0f;
-	m_jointOmega_0 = 0.0f;
-	SetPitchLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
-
-	m_limit_1_On = true;
-	m_angularMotor_1_On = false;
-	m_angularDamp_1 = 0.3f;
-	m_angularAccel_1 = -4.0f;
-	m_jointOmega_1 = 0.0f;
-	SetYawLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
-}
-
 
 void dCustomUniversal::Deserialize (NewtonDeserializeCallback callback, void* const userData) 
 {
-	callback(userData, &m_jointOmega_0, sizeof(m_jointOmega_0));
-	callback(userData, &m_angularDamp_0, sizeof(m_angularDamp_0));
-	callback(userData, &m_angularAccel_0, sizeof(m_angularAccel_0));
+	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
+	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
 
-	callback(userData, &m_jointOmega_1, sizeof(m_jointOmega_1));
-	callback(userData, &m_angularDamp_1, sizeof(m_angularDamp_1));
-	callback(userData, &m_angularAccel_1, sizeof(m_angularAccel_1));
+	callback(userData, &m_minAngle_0, sizeof(dFloat));
+	callback(userData, &m_maxAngle_0, sizeof(dFloat));
+	callback(userData, &m_jointOmega_0, sizeof(dFloat));
+	callback(userData, &m_angularDamp_0, sizeof(dFloat));
+	callback(userData, &m_angularAccel_0, sizeof(dFloat));
 
-	callback(userData, &m_options, sizeof(m_options));
+	callback(userData, &m_minAngle_1, sizeof(dFloat));
+	callback(userData, &m_maxAngle_1, sizeof(dFloat));
+	callback(userData, &m_jointOmega_1, sizeof(dFloat));
+	callback(userData, &m_angularDamp_1, sizeof(dFloat));
+	callback(userData, &m_angularAccel_1, sizeof(dFloat));
+
+	callback(userData, &m_flags, sizeof(int));
 }
 
 void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize(callback, userData);
 
-	callback(userData, &m_jointOmega_0, sizeof(m_jointOmega_0));
-	callback(userData, &m_angularDamp_0, sizeof(m_angularDamp_0));
-	callback(userData, &m_angularAccel_0, sizeof(m_angularAccel_0));
+	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
+	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
 
-	callback(userData, &m_jointOmega_1, sizeof(m_jointOmega_1));
-	callback(userData, &m_angularDamp_1, sizeof(m_angularDamp_1));
-	callback(userData, &m_angularAccel_1, sizeof(m_angularAccel_1));
+	callback(userData, &m_minAngle_0, sizeof(dFloat));
+	callback(userData, &m_maxAngle_0, sizeof(dFloat));
+	callback(userData, &m_jointOmega_0, sizeof(dFloat));
+	callback(userData, &m_angularDamp_0, sizeof(dFloat));
+	callback(userData, &m_angularAccel_0, sizeof(dFloat));
 
-	callback(userData, &m_options, sizeof(m_options));
+	callback(userData, &m_minAngle_1, sizeof(dFloat));
+	callback(userData, &m_maxAngle_1, sizeof(dFloat));
+	callback(userData, &m_jointOmega_1, sizeof(dFloat));
+	callback(userData, &m_angularDamp_1, sizeof(dFloat));
+	callback(userData, &m_angularAccel_1, sizeof(dFloat));
+
+	callback(userData, &m_flags, sizeof(int));
 }
 
 dCustomUniversal::~dCustomUniversal()
@@ -157,61 +145,49 @@ void dCustomUniversal::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (minAngle < 0.0f);
 	dAssert (maxAngle > 0.0f);
-	SetPitchLimits(minAngle, maxAngle);
+
+	m_minAngle_0 = minAngle;
+	m_maxAngle_0 = maxAngle;
 }
 
 dFloat dCustomUniversal::GetMinAngularLimit_0() const
 {
-	dFloat minAngle;
-	dFloat maxAngle;
-	GetPitchLimits(minAngle, maxAngle);
-	return minAngle;
+	return m_minAngle_0;
 }
 
 dFloat dCustomUniversal::GetMaxAngularLimit_0() const
 {
-	dFloat minAngle;
-	dFloat maxAngle;
-	GetPitchLimits(minAngle, maxAngle);
-	return maxAngle;
+	return m_maxAngle_0;
 }
 
 void dCustomUniversal::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (minAngle < 0.0f);
 	dAssert (maxAngle > 0.0f);
-	SetYawLimits(minAngle, maxAngle);
+
+	m_minAngle_1 = minAngle;
+	m_maxAngle_1 = maxAngle;
 }
 
 dFloat dCustomUniversal::GetMinAngularLimit_1() const
 {
-	dFloat minAngle;
-	dFloat maxAngle;
-	GetYawLimits(minAngle, maxAngle);
-	return minAngle;
+	return m_minAngle_1;
 }
 
 dFloat dCustomUniversal::GetMaxAngularLimit_1() const
 {
-	dFloat minAngle;
-	dFloat maxAngle;
-	GetYawLimits(minAngle, maxAngle);
-	return maxAngle;
+	return m_maxAngle_1;
 }
 
 
 dFloat dCustomUniversal::GetJointAngle_0 () const
 {
-	dAssert(0);
-	return 0;
-//	return -m_curJointAngle_0.GetAngle();
+	return -m_curJointAngle_0.GetAngle();
 }
 
 dFloat dCustomUniversal::GetJointAngle_1 () const
 {
-	dAssert(0);
-	return 0;
-//	return -m_curJointAngle_1.GetAngle();
+	return -m_curJointAngle_1.GetAngle();
 }
 
 dFloat dCustomUniversal::GetJointOmega_0 () const
@@ -240,7 +216,7 @@ dVector dCustomUniversal::GetPinAxis_1 () const
 	return matrix1.m_up;
 }
 
-#if 0
+
 void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -372,90 +348,3 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 }
 
-#endif
-
-
-void dCustomUniversal::SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex)
-{
-	dAssert(freeDof == 3);
-
-	dMatrix rollMatrix (dYawMatrix(GetYaw()) * matrix1);
-	dVector omega0;
-	dVector omega1;
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	if (m_body1) {
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-	}
-	dVector relOmega(omega0 - omega1);
-
-	dFloat rollAngle = GetRoll();
-	dFloat rollOmega = (relOmega.DotProduct3(rollMatrix.m_right));
-	dFloat alphaRollError = -(rollAngle + rollOmega * timestep) / (timestep * timestep);
-	NewtonUserJointAddAngularRow(m_joint, -rollAngle, &rollMatrix.m_right[0]);
-if (xxx)
-	NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-	// check is the joint limit are enable
-	if (m_limit_0_On) {
-		dFloat angle = GetPitch();
-		if (angle < m_pitch.m_minAngle) {
-			dFloat relAngle = m_pitch.m_minAngle - angle;
-			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (angle > m_pitch.m_maxAngle) {
-			dFloat relAngle = m_pitch.m_maxAngle - angle;
-			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		} else if (m_angularMotor_0_On) {
-			dAssert (0);
-		}
-	
-	} else if (m_angularMotor_0_On) {
-		dAssert (0);
-/*
-		// calculate the desired acceleration
-		// dFloat relOmega = (omega0 - omega1) % matrix0.m_front;
-		dFloat relAccel = m_angularAccel_0 - m_angularDamp_0 * m_jointOmega_0;
-
-		// add and angular constraint row to that will set the relative acceleration to zero
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-
-		// override the joint acceleration.
-		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-*/
-	}
-
-
-	// if limit are enable ...
-	if (m_limit_1_On) {
-		dFloat angle = GetYaw();
-		if (angle < m_yaw.m_minAngle) {
-			dFloat relAngle = m_yaw.m_minAngle - angle;
-			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_up[0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (angle > m_yaw.m_maxAngle) {
-			dFloat relAngle = m_yaw.m_maxAngle - angle;
-			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_up[0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		} else if (m_angularMotor_1_On) {
-			dAssert (0);
-		}
-	} else if (m_angularMotor_1_On) {
-		dAssert (0);
-/*
-		// calculate the desired acceleration
-		dFloat relAccel = m_angularAccel_1 - m_angularDamp_1 * m_jointOmega_1;
-
-		// add and angular constraint row to that will set the relative acceleration to zero
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-
-		// override the joint acceleration.
-		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-*/
-	}
-}

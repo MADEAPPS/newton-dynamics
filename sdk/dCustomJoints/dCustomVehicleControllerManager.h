@@ -162,7 +162,7 @@ class dEngineInfo
 	private:
 	void SetTorqueRPMTable();
 	void ConvertToMetricSystem();
-
+	
 	dEngineTorqueNode m_torqueCurve[6];
 	dFloat m_crownGearRatio;
 	dFloat m_peakPowerTorque;
@@ -618,7 +618,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
-
+	
 	bool ControlStateChanged() const;
 	void Init (NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Init (NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
