@@ -71,7 +71,7 @@ inline dgQuaternion::dgQuaternion (dgFloat32 Q0, dgFloat32 Q1, dgFloat32 Q2, dgF
 	m_q1 = Q1;
 	m_q2 = Q2;
 	m_q3 = Q3;
-//	dgAssert (dgAbsf (DotProduct (*this) -dgFloat32 (1.0f)) < dgFloat32(1.0e-4f));
+//	dgAssert (dgAbs (DotProduct (*this) -dgFloat32 (1.0f)) < dgFloat32(1.0e-4f));
 }
 
 

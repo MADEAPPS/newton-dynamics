@@ -342,7 +342,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
 
 	// apply the vertex normals
-	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dPi/180.0f);
+	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);
 
 	// apply uv projections
 	NewtonCollisionInfoRecord info;

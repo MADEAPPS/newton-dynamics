@@ -360,7 +360,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			dgVector tangentDir (veloc[i] - normalDir[i].CompProduct4(normalDir[i].DotProduct4(veloc[i])));
 			dgVector mag (tangentDir.DotProduct4(tangentDir) + epsilon);
 
-			dgFloat32 tangentFrictionAccel = dgAbsf (accel[i].DotProduct4(normalDir[i]).GetScalar());
+			dgFloat32 tangentFrictionAccel = dgAbs (accel[i].DotProduct4(normalDir[i]).GetScalar());
 			dgVector friction (tangentDir.Scale4 (frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt (mag.GetScalar())));
 
 			accel[i] += (normalAccel[i] - normalDirAccel - friction);

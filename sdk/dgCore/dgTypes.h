@@ -429,7 +429,7 @@ DG_INLINE bool dgAreEqual(T A, T B, T tol)
 	if (exp0 != exp1) {
 		return false;
 	}
-	return dgAbsf(mantissa0 - mantissa1) < tol;
+	return dgAbs(mantissa0 - mantissa1) < tol;
 */	
 	T den = dgMax(dgAbs(A), dgAbs(B)) + tol;
 	A /= den;

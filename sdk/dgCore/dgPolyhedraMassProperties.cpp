@@ -153,10 +153,10 @@ public:
 
 		mag2 = plane % plane;
 		if (mag2 > dgFloat32 (1.0e-8f)) {
-			if ((dgAbsf (plane.m_x) > dgAbsf (plane.m_y)) && (dgAbsf (plane.m_x) > dgAbsf (plane.m_z))) {
+			if ((dgAbs (plane.m_x) > dgAbs (plane.m_y)) && (dgAbs (plane.m_x) > dgAbs (plane.m_z))) {
 				m_C = X;
 			} else {
-				m_C = (dgAbsf (plane.m_y) > dgAbsf (plane.m_z)) ? Y : Z;
+				m_C = (dgAbs (plane.m_y) > dgAbs (plane.m_z)) ? Y : Z;
 			}
 			m_A = (m_C + 1) % 3;
 			m_B = (m_A + 1) % 3;
@@ -211,10 +211,10 @@ public:
 		mag2 = plane % plane;
 		if (mag2 > dgFloat32 (1.0e-8f)) {
 			plane = plane.Scale (dgRsqrt ((plane % plane)));
-			if ((dgAbsf (plane.m_x) > dgAbsf (plane.m_y)) && (dgAbsf (plane.m_x) > dgAbsf (plane.m_z))) {
+			if ((dgAbs (plane.m_x) > dgAbs (plane.m_y)) && (dgAbs (plane.m_x) > dgAbs (plane.m_z))) {
 				m_C = X;
 			} else {
-				m_C = (dgAbsf (plane.m_y) > dgAbsf (plane.m_z)) ? Y : Z;
+				m_C = (dgAbs (plane.m_y) > dgAbs (plane.m_z)) ? Y : Z;
 			}
 			m_A = (m_C + 1) % 3;
 			m_B = (m_A + 1) % 3;

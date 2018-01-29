@@ -248,7 +248,7 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 
 	sinAngle = matrix0.m_front.DotProduct3(matrix1.m_up.CrossProduct3(matrix0.m_up));
 	cosAngle = matrix0.m_up.DotProduct3(matrix1.m_up);
-//	dgAssert (dgAbsf (m_angle0 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
+//	dgAssert (dgAbs (m_angle0 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
 	m_angle0 = dgAtan2 (sinAngle, cosAngle);
 
 //	dgVector sinAngle1 (matrix0.m_front * matrix1.m_front);
@@ -259,7 +259,7 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 
 	sinAngle = matrix1.m_up.DotProduct3(matrix0.m_front.CrossProduct3(matrix1.m_front));
 	cosAngle = matrix0.m_front.DotProduct3(matrix1.m_front);
-//	dgAssert (dgAbsf (m_angle1 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
+//	dgAssert (dgAbs (m_angle1 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
 	m_angle1 = dgAtan2 (sinAngle, cosAngle);
 
 	if (m_jointAccelFnt) {

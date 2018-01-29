@@ -430,7 +430,7 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 
 	dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
 	dgFloat32 det = (pureRotation[0] * pureRotation[1]) % pureRotation[2];
-	if (dgAbsf (det - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f)) {
+	if (dgAbs (det - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f)) {
 		// this is a pure scale * rotation * translation
 		det = sign * dgSqrt (det2);
 		scale[0] = det;
@@ -523,8 +523,8 @@ void dgMatrix::EigenVectors (dgVector& eigenValues, const dgMatrix& initialGuess
 
 	for (dgInt32 m = 0; m < 20; m ++) {
 		dgFloat32 ajk[3];
-		ajk[0] = dgAbsf(mat[0][1]);
-		ajk[1] = dgAbsf(mat[0][2]);
+		ajk[0] = dgAbs(mat[0][1]);
+		ajk[1] = dgAbs(mat[0][2]);
 		ajk[2] = dgAbs(mat[1][2]);
 		dgFloat32 sm = ajk[0] + ajk[1] + ajk[2];
 		if (sm < dgFloat32 (1.0e-12f)) {

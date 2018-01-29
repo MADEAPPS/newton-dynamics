@@ -1530,7 +1530,7 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 				p10 = p10.Scale4(dgRsqrt(p10.DotProduct3(p10) + dgFloat32(1.0e-8f)));
 				q10 = q10.Scale4(dgRsqrt(q10.DotProduct3(q10) + dgFloat32(1.0e-8f)));
 				dgFloat32 dot = q10.DotProduct3(p10);
-				if (dgAbsf(dot) > dgFloat32(0.998f)) {
+				if (dgAbs(dot) > dgFloat32(0.998f)) {
 					dgFloat32 pl0 = p0.DotProduct3(p10);
 					dgFloat32 pl1 = p1.DotProduct3(p10);
 					dgFloat32 ql0 = q0.DotProduct3(p10);
