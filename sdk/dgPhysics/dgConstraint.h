@@ -78,7 +78,6 @@ class dgBilateralBounds
 	dgFloat32 m_low;
 	dgFloat32 m_upper;
 	dgInt32 m_normalIndex;
-//	dgInt16 m_isIkRow;
 };
 
 DG_MSC_VECTOR_ALIGMENT
@@ -104,6 +103,7 @@ class dgJointAccelerationDecriptor
 	dgInt32 m_rowsCount;
 	dgFloat32 m_timeStep;
 	dgFloat32 m_invTimeStep;
+	dgFloat32 m_subSampleScaler;
 	dgFloat32 m_firstPassCoefFlag;
 	
 	dgJacobianMatrixElement *m_rowMatrix;
