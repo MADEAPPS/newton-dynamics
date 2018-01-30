@@ -49,7 +49,6 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	SetStiffness (dgFloat32 (1.0f));
 
 	memset (m_jointForce, 0, sizeof (m_jointForce));
-	//memset (m_rowIsMotor, 0, sizeof (m_rowIsMotor));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
 	memset (m_inverseDynamicsAcceleration, 0, sizeof (m_inverseDynamicsAcceleration));
 }
@@ -178,7 +177,6 @@ dgFloat32 dgBilateralConstraint::GetRowAcceleration (dgInt32 index, dgContraintD
 
 void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc)
 {
-//	m_rowIsMotor[index] = 1;
 	m_rowIsMotor |= (1 << index);
 	m_motorAcceleration[index] = acceleration;
 	desc.m_jointAccel[index] = acceleration;
@@ -209,7 +207,6 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 	jacobian1.m_angular[2] = jacobianB[5];
 	jacobian1.m_angular[3] = dgFloat32 (0.0f);
 
-//	m_rowIsMotor[index] = 1;
 	m_rowIsMotor |= (1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
@@ -282,7 +279,6 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 	const dgVector& omega1 = m_body1->GetOmega();
 	dgFloat32 omegaError = dir.DotProduct3(omega1 - omega0);
 
-//	m_rowIsMotor[index] = 0;
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
@@ -343,7 +339,6 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	jacobian1.m_angular[2] = r1CrossDir.m_z;
 	jacobian1.m_angular[3] = dgFloat32 (0.0f);
 
-//	m_rowIsMotor[index] = 0;
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
@@ -415,9 +410,7 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 		dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.25f);
 		dgFloat32 dt = params->m_timeStep;
 		for (dgInt32 k = 0; k < params->m_rowsCount; k ++) {
-//			if (m_rowIsMotor[k]) {
 			if (m_rowIsMotor & (1 << k)) {
-				//params.m_coordenateAccel[k] = m_motorAcceleration[k] + params.m_externAccelaration[k];
    				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
 			} else {
 				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
@@ -425,9 +418,6 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 								   Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1) + Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
 
 				dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-
-				//dgFloat32 aRel = jacobianMatrixElements[k].m_deltaAccel;
-				//dgFloat32 aRel = jacobianMatrixElements[k].m_coordenateAccel;
 				dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
 
 				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
@@ -446,7 +436,6 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				dgFloat32 relPosit = jacobianMatrixElements[k].m_penetration - vRel * dt * params->m_firstPassCoefFlag;
 				jacobianMatrixElements[k].m_penetration = relPosit;
 
-
 				dgFloat32 num = ks * relPosit - kd * vRel - ksd * vRel;
 				dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 				dgFloat32 aRelErr = num / den;
@@ -457,7 +446,6 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 		}
 	} else {
 		for (dgInt32 k = 0; k < params->m_rowsCount; k ++) {
-//			if (m_rowIsMotor[k]) {
 			if (m_rowIsMotor & (1 << k)) {
 				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
 			} else {
