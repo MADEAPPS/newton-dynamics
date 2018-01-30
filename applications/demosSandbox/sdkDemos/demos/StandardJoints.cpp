@@ -238,18 +238,26 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
-
+	dAssert (0);
+/*
 	// connect first box to the world
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	new dCustomBallAndSocketWithFriction (pinMatrix, box0, base, 20.0f);
+	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket (pinMatrix, box0, base);
+	joint0->SetFriction(200.0f);
+	joint0->SetConeAngle (150.0f * dDegreeToRad);
+	joint0->SetTwistAngle(-90.0f * dDegreeToRad, 90.0f * dDegreeToRad);
 
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, & matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	new dCustomBallAndSocketWithFriction (pinMatrix, box1, box0, 10.0f);
+	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket (pinMatrix, box1, box0);
+	joint1->SetFriction(200.0f);
+	joint1->SetConeAngle (120.0f * dDegreeToRad);
+	joint1->SetTwistAngle(-90.0f * dDegreeToRad, 90.0f * dDegreeToRad);
+*/
 }
 
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)

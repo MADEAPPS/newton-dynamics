@@ -22,118 +22,9 @@
 //////////////////////////////////////////////////////////////////////
 
 
-IMPLEMENT_CUSTOM_JOINT(dCustomPointToPoint);
 IMPLEMENT_CUSTOM_JOINT(dCustomBallAndSocket);
 IMPLEMENT_CUSTOM_JOINT(dCustomLimitBallAndSocket);
 IMPLEMENT_CUSTOM_JOINT(dCustomControlledBallAndSocket);
-
-
-dCustomPointToPoint::dCustomPointToPoint(const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
-{
-	dVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
-	m_distance = dSqrt(dist.DotProduct3(dist));
-
-	dMatrix childMatrix(dGetIdentityMatrix());
-	dMatrix parentMatrix(dGetIdentityMatrix());
-
-	childMatrix.m_posit = pivotInChildInGlobalSpace;
-	parentMatrix.m_posit = pivotInParentInGlobalSpace;
-	childMatrix.m_posit.m_w = 1.0f;
-	parentMatrix.m_posit.m_w = 1.0f;
-
-	dMatrix dummy;
-	CalculateLocalMatrix(childMatrix, m_localMatrix0, dummy);
-	CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
-}
-
-dCustomPointToPoint::~dCustomPointToPoint()
-{
-}
-
-
-void dCustomPointToPoint::Deserialize (NewtonDeserializeCallback callback, void* const userData)
-{
-}
-
-void dCustomPointToPoint::Serialize(NewtonSerializeCallback callback, void* const userData) const
-{
-	dCustomJoint::Serialize (callback, userData);
-}
-
-void dCustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	dVector p0(matrix0.m_posit);
-	dVector p1(matrix1.m_posit);
-
-	dVector dir(p1 - p0);
-	dFloat mag2 = dir.DotProduct3(dir);
-	if (mag2 < 1.0e-3f) {
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	} else {
-		dir = dir.Scale(1.0f / dSqrt(mag2));
-		dMatrix matrix (dGrammSchmidt (dir));
-		dFloat x = dSqrt (mag2) - m_distance;
-
-		dVector com0(0.0f);
-		dVector com1(0.0f);
-		dVector veloc0(0.0f);
-		dVector veloc1(0.0f);
-		dMatrix body0Matrix;
-		dMatrix body1Matrix;
-
-		NewtonBody* const body0 = GetBody0();
-		NewtonBody* const body1 = GetBody1();
-
-		NewtonBodyGetCentreOfMass(body0, &com0[0]);
-		NewtonBodyGetMatrix(body0, &body0Matrix[0][0]);
-		NewtonBodyGetPointVelocity (body0, &p0[0], &veloc0[0]);
-
-		NewtonBodyGetCentreOfMass(body1, &com1[0]);
-		NewtonBodyGetMatrix(body1, &body1Matrix[0][0]);
-		NewtonBodyGetPointVelocity (body1, &p1[0], &veloc1[0]);
-
-		dFloat v((veloc0 - veloc1).DotProduct3(dir));
-		dFloat a = (x - v * timestep) / (timestep * timestep);
-
-		dVector r0 ((p0 - body0Matrix.TransformVector(com0)).CrossProduct(matrix.m_front));
-		dVector r1 ((p1 - body1Matrix.TransformVector(com1)).CrossProduct(matrix.m_front));
-		dFloat jacobian0[6];
-		dFloat jacobian1[6];
-
-		jacobian0[0] = matrix[0][0];
-		jacobian0[1] = matrix[0][1];
-		jacobian0[2] = matrix[0][2];
-		jacobian0[3] = r0[0];
-		jacobian0[4] = r0[1];
-		jacobian0[5] = r0[2];
-
-		jacobian1[0] = -matrix[0][0];
-		jacobian1[1] = -matrix[0][1];
-		jacobian1[2] = -matrix[0][2];
-		jacobian1[3] = -r1[0];
-		jacobian1[4] = -r1[1];
-		jacobian1[5] = -r1[2];
-
-//		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix[1][0]);
-//		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix[2][0]);
-		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-		NewtonUserJointSetRowAcceleration(m_joint, a);
-	}
-}
-
-
 
 dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
@@ -149,7 +40,6 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, con
 	CalculateLocalMatrix (pinAndPivotFrame1, dummy, m_localMatrix1);
 }
 
-
 dCustomBallAndSocket::~dCustomBallAndSocket()
 {
 }
@@ -163,27 +53,26 @@ void dCustomBallAndSocket::Serialize (NewtonSerializeCallback callback, void* co
 	dCustomJoint::Serialize (callback, userData);
 }
 
-
-void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
+void dCustomBallAndSocket::SubmitLinearRows (const dMatrix& matrix0, const dMatrix& matrix1) const
 {
-	dCustomJoint::Debug(debugDisplay);
+	const dVector& p0 = matrix0.m_posit;
+	const dVector& p1 = matrix1.m_posit;
+
+	for (int i = 0; i < 3; i++) {
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
 }
 
-void dCustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
+void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (matrix0, matrix1);
+	CalculateGlobalMatrix(matrix0, matrix1);
 
-	// Restrict the movement on the pivot point along all three orthonormal directions
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_front[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_up[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_right[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	SubmitLinearRows (matrix0, matrix1);
 }
 
 dCustomBallAndSocketWithFriction::dCustomBallAndSocketWithFriction(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction)

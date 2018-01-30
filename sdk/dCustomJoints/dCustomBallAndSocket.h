@@ -19,25 +19,6 @@
 
 #include "dCustomJoint.h"
 
-
-class dCustomPointToPoint: public dCustomJoint  
-{
-	public:
-	CUSTOM_JOINTS_API dCustomPointToPoint(const dVector& pivotFrame0, const dVector& pivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~dCustomPointToPoint();
-
-	protected:
-	//CUSTOM_JOINTS_API dCustomPointToPoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-
-	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-
-	dFloat m_distance;
-	DECLARE_CUSTOM_JOINT(dCustomPointToPoint, dCustomJoint)
-};
-
-
 class dCustomBallAndSocket: public dCustomJoint  
 {
 	public:
@@ -46,18 +27,15 @@ class dCustomBallAndSocket: public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomBallAndSocket();
 
 	protected:
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-
+	void SubmitLinearRows (const dMatrix& matrix0, const dMatrix& matrix1) const;
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };
 
-
-// similar to the ball and socked 
-// plus it has the ability to set joint limits
+// similar to the ball and socked, plus it has the ability to set joint limits and friction
 class dCustomLimitBallAndSocket: public dCustomBallAndSocket  
 {
 	public:

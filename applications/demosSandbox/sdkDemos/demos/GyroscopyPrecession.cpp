@@ -122,23 +122,23 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
 	// should spins very slowly, with a tilt angle of 45 degrees
-	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -4.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
+//	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -4.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
 
 	// spin twice as fast
-	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
+//	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
 
 	// should spins very slowly
 	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f, 0.0f);
 
 	// should just flops
-	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f, 0.0f);
+//	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f, 0.0f);
 
 	// place a toy top
 	const int topsCount = 4;
 	for (int i = 0; i < topsCount; i ++) {
 		for (int j = 0; j < topsCount; j ++) {
 			// should translate for a moment then spins in place (so far is wrong)
-			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
+//			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
 		}
 	}
 
