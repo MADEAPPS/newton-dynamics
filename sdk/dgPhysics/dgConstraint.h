@@ -103,9 +103,7 @@ class dgJointAccelerationDecriptor
 	dgInt32 m_rowsCount;
 	dgFloat32 m_timeStep;
 	dgFloat32 m_invTimeStep;
-	dgFloat32 m_subSampleScaler;
 	dgFloat32 m_firstPassCoefFlag;
-	
 	dgJacobianMatrixElement *m_rowMatrix;
 };
 
@@ -190,8 +188,8 @@ class dgConstraint
 		dgVector m_posit1;
 		dgVector m_veloc0;
 		dgVector m_veloc1;
-		dgVector m_centripetal0;
-		dgVector m_centripetal1;
+		//dgVector m_centripetal0;
+		//dgVector m_centripetal1;
 		dgFloat32 m_stiffness;
 	};
 

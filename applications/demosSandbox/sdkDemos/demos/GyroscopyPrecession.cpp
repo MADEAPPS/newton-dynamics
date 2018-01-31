@@ -138,7 +138,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	for (int i = 0; i < topsCount; i ++) {
 		for (int j = 0; j < topsCount; j ++) {
 			// should translate for a moment then spins in place (so far is wrong)
-//			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
+			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
 		}
 	}
 

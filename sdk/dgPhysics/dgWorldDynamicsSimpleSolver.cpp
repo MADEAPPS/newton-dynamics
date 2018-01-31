@@ -1040,7 +1040,6 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 	dgJointAccelerationDecriptor joindDesc;
 	joindDesc.m_timeStep = timestep;
 	joindDesc.m_invTimeStep = invTimestep;
-	joindDesc.m_subSampleScaler = dgFloat32 (1.0f);
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
 
 	dgJointInfo* const jointInfo = &constraintArray[0];
@@ -1160,7 +1159,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	joindDesc.m_timeStep = timestepRK;
 	joindDesc.m_invTimeStep = invTimestepRK;
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
-	joindDesc.m_subSampleScaler = dgFloat32 (1.0f) / derivativesEvaluationsRK4;
 
 	dgInt32 skeletonCount = 0;
 	dgInt32 skeletonMemorySizeInBytes = 0;
