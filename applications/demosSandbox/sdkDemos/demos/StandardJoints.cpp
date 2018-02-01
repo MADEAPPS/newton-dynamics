@@ -1242,7 +1242,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
-	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
+//	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
 
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
@@ -1250,7 +1250,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
@@ -1266,8 +1266,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-//dVector origin (-30.0f, 5.0f, -0.0f, 0.0f);
-dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
+dVector origin (-30.0f, 5.0f, -0.0f, 0.0f);
+//dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 
