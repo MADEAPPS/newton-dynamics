@@ -227,7 +227,6 @@ class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print (color, "mouse point and right click to cast current convex shape");
 		scene->Print (color, "space	   : change casting shape");
-		scene->Print (color, "h		   : hide help");
 	}				
 
 	virtual void Debug () const

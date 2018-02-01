@@ -464,6 +464,9 @@ void SimpleConvexFracturing(DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
+dAssert(0);
+return;
+
 	// load the scene from a ngd file format
 	CreateLevelMesh(scene, "flatPlane.ngd", false);
 	//	CreateLevelMesh (scene, "sponza.ngd", false);

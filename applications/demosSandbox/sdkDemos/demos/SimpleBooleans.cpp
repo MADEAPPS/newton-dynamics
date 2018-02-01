@@ -104,6 +104,8 @@ void SimpleBooleanOperations (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
+dAssert (0);
+return;
 	// load the scene from a ngd file format
 	NewtonBody* const body = CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	NewtonBody* const body = CreateLevelMesh (scene, "playground.ngd", true);

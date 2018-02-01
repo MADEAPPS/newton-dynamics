@@ -298,16 +298,14 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 
 	virtual void PreUpdate (dFloat timestep)
 	{
-		dAssert (0);
-/*
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		DemoCamera* const camera = scene->GetCamera();
 
-		m_helpKey.UpdatePushButton (scene, 'H');
-		if (m_selectShape.UpdateTriggerButton (scene, ' ')) {
+//		m_helpKey.UpdatePushButton (scene, 'H');
+//		if (m_selectShape.UpdateTriggerButton (scene, ' ')) {
 //			m_stupidLevel->ChangeCastingShape();
-		}
+//		}
 
 		bool buttonState = scene->GetMouseKeyState(1);
 		if (buttonState) {
@@ -335,7 +333,7 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
                         m_phantomEntity->SetPhantomMesh (false);
 //dTrace (("%d %d\n", mouseX, mouseY));
 
-						if (m_placeInstance.UpdateTriggerJoystick (scene, scene->GetMouseKeyState(0))) {
+						if (m_placeInstance.UpdateTrigger (scene->GetMouseKeyState(0))) {
 							dMatrix matrix;
 							NewtonBodyGetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 							NewtonCollision* const collision = NewtonBodyGetCollision(m_phantomEntity->m_phantom);
@@ -350,14 +348,11 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		} else {
 			m_selectionToIgnore.RemoveAll();
 		}
-*/
 	}
 
 	virtual void PostUpdate (dFloat timestep)
 	{
 	}
-
-
 
 	void CalculateRotationMatrix (dFloat power)
 	{

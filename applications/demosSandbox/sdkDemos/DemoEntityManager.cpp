@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-#define DEFAULT_SCENE	3			// gyroscope precession
+//#define DEFAULT_SCENE	3			// gyroscope precession
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -59,7 +59,7 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	28          // standard joints
+#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// six axis manipulator
 //#define DEFAULT_SCENE	30			// hexapod Robot
 //#define DEFAULT_SCENE	31			// articulated joints
@@ -226,6 +226,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_updateMenuOptions(true)
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
+	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
 {
@@ -680,6 +681,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("Show normal forces", &m_showNormalForces);
 			ImGui::Checkbox("Show center of mass", &m_showCenterOfMass);
 			ImGui::Checkbox("show Joint debug info", &m_showJointDebugInfo);
+			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
 			ImGui::Separator();
 			
 			ImGui::Text ("select worker threads");
@@ -691,6 +693,8 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("sixteen", &m_workerThreades, 16);
 
 			ImGui::EndMenu();
+
+			SetDebugDisplayMode(m_showCollidingFaces ? 1 : 0);
 		}
 
 		if (ImGui::BeginMenu("Help")) {
