@@ -268,11 +268,11 @@ void dCustomSlider::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix
 	if (m_posit < m_minDist) {
 		const dVector& p0 = matrix1.m_posit;
 		dVector p1(p0 + matrix1.m_front.Scale(m_minDist - m_posit));
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 	} else if (m_posit > m_maxDist) {
 		const dVector& p0 = matrix1.m_posit;
-		dVector p1(p0 + matrix0.m_front.Scale(m_maxDist - m_posit));
+		dVector p1(p0 + matrix1.m_front.Scale(m_maxDist - m_posit));
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 	}
