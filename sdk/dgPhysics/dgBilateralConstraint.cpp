@@ -368,7 +368,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 					   bodyVeloc1 * bodyOmega1.CrossProduct3(jacobian1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(jacobian1.m_angular));
 		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
 		
-		desc.m_zeroRowAcceleration[index] = (relPosit * desc.m_invTimestep + relVeloc) * desc.m_invTimestep;
+		//desc.m_zeroRowAcceleration[index] = (relPosit * desc.m_invTimestep + relVeloc) * desc.m_invTimestep;
+		desc.m_zeroRowAcceleration[index] = relVeloc * desc.m_invTimestep;
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		const dgFloat32 dt = desc.m_timestep;
