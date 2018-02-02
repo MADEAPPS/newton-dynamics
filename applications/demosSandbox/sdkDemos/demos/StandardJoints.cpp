@@ -609,11 +609,10 @@ static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector
 
 	// enable limit of first axis
 	slider->EnableLimits(true);
-slider->EnableLimits(false);
 
 	// set limit on second axis
 	slider->SetLimits(-4.0f, 4.0f);
-	slider->SetAsSpringDamper(true, 0.5f, 50.0f, 0.0f);
+	slider->SetAsSpringDamper(true, 0.7f, 80.0f, 0.0f);
 }
 
 
@@ -1253,7 +1252,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));

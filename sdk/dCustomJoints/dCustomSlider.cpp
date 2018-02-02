@@ -301,7 +301,7 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	if (m_limitsOn) {
 		if (m_setAsSpringDamper) {
-			dAssert(0);
+			SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
 		} else {
 			SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
@@ -318,8 +318,34 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dCustomSlider::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
 	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
+}
+
+
+void dCustomSlider::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dFloat x = m_posit + m_speed * timestep;
+	if (x < m_minDist) {
+		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
+		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+
+	} else if (x > m_maxDist) {
+		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
+		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+	} else {
+		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+	}
 }

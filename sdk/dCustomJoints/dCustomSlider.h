@@ -44,6 +44,7 @@ class dCustomSlider: public dCustomJoint
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	CUSTOM_JOINTS_API virtual void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
 	dFloat m_speed;
 	dFloat m_posit;
