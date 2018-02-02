@@ -30,7 +30,8 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, N
 	,m_linearRate(0.0f)
 	,m_maxForce(1.0e20f)
 {
-	m_actuatorFlag = false;
+	dAssert (0);
+//	m_actuatorFlag = false;
 	EnableLimits(false);
 }
 
@@ -42,7 +43,8 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, d
 	,m_linearRate(speed)
     ,m_maxForce(D_CUSTOM_LARGE_VALUE)
 {
-	m_actuatorFlag = true;
+	dAssert (0);
+//	m_actuatorFlag = true;
 	EnableLimits(false);
 }
 
@@ -74,7 +76,9 @@ dCustomSliderActuator::~dCustomSliderActuator()
 
 bool dCustomSliderActuator::GetEnableFlag () const
 {
-	return m_actuatorFlag;
+	dAssert (0);
+	return false;
+//	return m_actuatorFlag;
 }
 
 dFloat dCustomSliderActuator::GetTargetPosit() const
@@ -122,7 +126,8 @@ void dCustomSliderActuator::SetLinearRate(dFloat rate)
 
 void dCustomSliderActuator::SetEnableFlag (bool flag)
 {
-	m_actuatorFlag = flag;
+	dAssert (0);
+//	m_actuatorFlag = flag;
 }
 
 

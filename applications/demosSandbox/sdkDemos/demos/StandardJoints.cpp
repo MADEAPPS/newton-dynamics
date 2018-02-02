@@ -310,7 +310,6 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetMatrix(box2, &matrix[0][0]);
 	((DemoEntity*) NewtonBodyGetUserData(box2))->ResetMatrix (*scene, matrix);
 
-
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
@@ -585,6 +584,9 @@ static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
     NewtonBodyGetMatrix (box1, &matrix[0][0]);
     dCustomSlider* const slider = new dCustomSlider (matrix, box1, box0);
 
+	// add some friction for more realism
+	slider->SetFriction(10.0f);
+
     // enable limit of first axis
     slider->EnableLimits(true);
 
@@ -607,6 +609,7 @@ static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector
 
 	// enable limit of first axis
 	slider->EnableLimits(true);
+slider->EnableLimits(false);
 
 	// set limit on second axis
 	slider->SetLimits(-4.0f, 4.0f);
@@ -1251,7 +1254,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
+	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 //	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
