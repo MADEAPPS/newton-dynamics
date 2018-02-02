@@ -278,7 +278,9 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			AddDampingAcceleration(timestep);
 			CalcInvInertiaMatrix();
-			ApplyGyroTorque();
+			//ApplyGyroTorque();
+			//dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
+			//SetTorque(GetTorque() - gyroTorque);
 
 			dgVector accel(m_externalForce.Scale4(m_invMass.m_w));
 			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque));

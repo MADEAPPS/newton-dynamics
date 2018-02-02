@@ -19,6 +19,61 @@
 #include "OpenGlUtil.h"
 
 
+static void ZeroGravityForce(const NewtonBody* body, dFloat timestep, int threadIndex)
+{
+}
+
+
+static NewtonBody* DzhanibekovEffect(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
+{
+	NewtonWorld* const world = scene->GetNewton();
+
+	dMatrix offset(dYawMatrix (90.0f * dDegreeToRad));
+
+	dFloat shortLength = lenght * 0.3f;
+	offset.m_posit.m_z = radius * 0.75f + shortLength * 0.5f;
+	NewtonCollision* const longCylinder = NewtonCreateCylinder(world, radius, radius, lenght, 0, NULL);
+	NewtonCollision* const shortCylinder = NewtonCreateCylinder(world, radius, radius, shortLength, 0, &offset[0][0]);
+
+	NewtonCollision* const dzhanibekovShape = NewtonCreateCompoundCollision(world, 0);
+	NewtonCompoundCollisionBeginAddRemove(dzhanibekovShape);
+
+	NewtonCompoundCollisionAddSubCollision(dzhanibekovShape, longCylinder);
+	NewtonCompoundCollisionAddSubCollision(dzhanibekovShape, shortCylinder);
+	NewtonCompoundCollisionEndAddRemove(dzhanibekovShape);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = posit;
+	matrix.m_posit.m_x += lenght * 0.5f;
+	matrix.m_posit.m_w = 1.0f;
+
+	DemoMesh* const geometry = new DemoMesh("primitive", dzhanibekovShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	NewtonBody* const dzhanibekovBody = CreateSimpleSolid(scene, geometry, 10.0f, matrix, dzhanibekovShape, 0);
+
+	NewtonBodySetMassProperties(dzhanibekovBody, 10.0f, dzhanibekovShape);
+
+	dFloat m, x, y, z;
+	NewtonBodyGetMass(dzhanibekovBody, &m, &x, &y, &z);
+
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(dzhanibekovBody, 0.0f);
+	NewtonBodySetAngularDamping(dzhanibekovBody, &damp[0]);
+	NewtonBodySetForceAndTorqueCallback(dzhanibekovBody, ZeroGravityForce);
+
+	dVector omega(speed * 0.01f, speed * 0.01f, speed);
+	NewtonBodySetOmega(dzhanibekovBody, &omega[0]);
+
+	matrix.m_posit.m_x -= lenght * 0.5f;
+
+	geometry->Release();
+	NewtonDestroyCollision(dzhanibekovShape);
+	NewtonDestroyCollision(longCylinder);
+	NewtonDestroyCollision(shortCylinder);
+
+	return dzhanibekovBody;
+
+}
+
 static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -122,23 +177,26 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
 	// should spins very slowly, with a tilt angle of 45 degrees
-	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -4.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
+//	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -4.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
 
 	// spin twice as fast
-	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
+//	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -2.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
 
 	// should spins very slowly
-	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f, 0.0f);
+//	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 0.0f, 1.0f), 100.0f, 0.6f, 0.3f, 0.0f);
 
 	// should just flops
-	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f, 0.0f);
+//	CreateBicycleWheel(scene, dVector (0.0f, 3.0f, 2.0f, 1.0f), 0.0f, 0.6f, 0.3f, 0.0f);
+
+	// intemediate Axis Theorem
+	DzhanibekovEffect(scene, dVector(0.0f, 3.0f, -4.0f, 1.0f), 10.0f, 0.25f, 2.0f);
 
 	// place a toy top
 	const int topsCount = 4;
 	for (int i = 0; i < topsCount; i ++) {
 		for (int j = 0; j < topsCount; j ++) {
 			// should translate for a moment then spins in place (so far is wrong)
-			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
+//			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
 		}
 	}
 
