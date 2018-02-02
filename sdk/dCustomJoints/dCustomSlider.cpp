@@ -266,23 +266,23 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 void dCustomSlider::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dFloat x = m_posit + m_speed * timestep;
-//	if (m_posit < m_minDist) {
 	if (x < m_minDist) {
-		//dFloat error = m_maxDist - m_posit;
 		const dVector& p0 = matrix1.m_posit;
-		//dVector p1(p0 + matrix1.m_front.Scale(m_minDist - m_posit));
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p0[0], &matrix1.m_front[0]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-//	} else if (m_posit > m_maxDist) {
 	} else if (x > m_maxDist) {
-		//dFloat error = m_maxDist - m_posit;
 		const dVector& p0 = matrix1.m_posit;
-		//dVector p1(p0 + matrix1.m_front.Scale(error));
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p0[0], &matrix1.m_front[0]);
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep; 
 		NewtonUserJointSetRowAcceleration (m_joint, stopAccel);
 	}
 }
