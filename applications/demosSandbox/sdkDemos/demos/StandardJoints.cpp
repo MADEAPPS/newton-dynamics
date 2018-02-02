@@ -1252,7 +1252,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
