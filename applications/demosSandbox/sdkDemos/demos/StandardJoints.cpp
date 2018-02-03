@@ -269,7 +269,10 @@ dAssert (0);
 	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f- size.m_y * 2.0f, 0.0f, 0.0f), size);
 
-	const dFloat angle = 60.0f * dDegreeToRad;
+	const dFloat yawLimit = 120.0f * dDegreeToRad;
+	const dFloat rollLimit = 80.0f * dDegreeToRad;
+	const dFloat pitchLimit = 80.0f * dDegreeToRad;
+
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
 
@@ -277,15 +280,23 @@ dAssert (0);
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	dCustom6DOF* const joint0 = new dCustom6DOF (pinMatrix, pinMatrix, box0, base);
-	joint0->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
+	dCustom6dof* const joint0 = new dCustom6dof (pinMatrix, box0, base);
+	joint0->SetYawLimits (-yawLimit, yawLimit);
+	joint0->SetPitchLimits(-pitchLimit, pitchLimit);
+	joint0->SetRollLimits(-rollLimit, rollLimit);
+joint0->SetPitchLimits(-0, 0);
+//joint0->DisableRotationX ();
 
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	dCustom6DOF* const joint1 = new dCustom6DOF (pinMatrix, pinMatrix, box1, box0);
-	joint1->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
+	dCustom6dof* const joint1 = new dCustom6dof (pinMatrix, box1, box0);
+	joint1->SetYawLimits(-yawLimit, yawLimit);
+	joint1->SetRollLimits(-rollLimit, rollLimit);
+	joint1->SetPitchLimits(-pitchLimit, pitchLimit);
+joint1->SetPitchLimits(-0, 0);
+//joint1->DisableRotationX ();
 */
 }
 

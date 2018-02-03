@@ -10,7 +10,6 @@
 */
 
 
-
 // dCustomHinge.cpp: implementation of the dCustomHinge class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -32,13 +31,10 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_jointOmega(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
-	,m_springDamperRelaxation(0.6f)
-	,m_flags(0)
+	,m_springDamperRelaxation(0.9f)
+	,m_limitsOn(false)
+	,m_setAsSpringDamper(false)
 {
-	m_limitsOn = false;
-	m_actuatorFlag = false;
-	m_lastRowWasUsed = false;
-	m_setAsSpringDamper = false;
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -53,14 +49,11 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_jointOmega(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
-	,m_springDamperRelaxation(0.6f)
-	,m_flags(0)
+	,m_springDamperRelaxation(0.9f)
+	,m_limitsOn(false)
+	,m_setAsSpringDamper(false)
 {
 	dMatrix	dummy;
-	m_limitsOn = false;
-	m_actuatorFlag = false;
-	m_lastRowWasUsed = false;
-	m_setAsSpringDamper = false;
 	CalculateLocalMatrix (pinAndPivotFrameChild, m_localMatrix0, dummy);
 	CalculateLocalMatrix (pinAndPivotFrameParent, dummy, m_localMatrix1);
 }
@@ -79,7 +72,7 @@ void dCustomHinge::Deserialize (NewtonDeserializeCallback callback, void* const 
 	callback (userData, &m_spring, sizeof (dFloat));
 	callback (userData, &m_damper, sizeof (dFloat));
 	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_flags, sizeof (int));
+	callback (userData, &m_options, sizeof (m_options));
 }
 
 void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
@@ -93,7 +86,7 @@ void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const user
 	callback(userData, &m_spring, sizeof (dFloat));
 	callback(userData, &m_damper, sizeof (dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback(userData, &m_flags, sizeof (int));
+	callback (userData, &m_options, sizeof (m_options));
 }
 
 
@@ -143,7 +136,47 @@ dFloat dCustomHinge::GetFriction () const
 	return m_friction;
 }
 
+void dCustomHinge::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dCustomJoint::Debug(debugDisplay);
 
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const int subdiv = 12;
+	dVector arch[subdiv + 1];
+	const float radius = debugDisplay->m_debugScale;
+
+	if ((m_maxAngle > 1.0e-3f) || (m_minAngle < -1.0e-3f)) {
+		// show pitch angle limits
+		dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
+
+		dFloat minAngle = m_minAngle;
+		dFloat maxAngle = m_maxAngle;
+		if ((maxAngle - minAngle) >= dPi * 2.0f) {
+			minAngle = 0.0f;
+			maxAngle = dPi * 2.0f;
+		}
+
+		dFloat angleStep = (maxAngle - minAngle) / subdiv;
+		dFloat angle0 = minAngle;
+
+		matrix1.m_posit = matrix0.m_posit;
+		debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+		for (int i = 0; i <= subdiv; i++) {
+			arch[i] = matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
+			angle0 += angleStep;
+		}
+
+		for (int i = 0; i < subdiv; i++) {
+			debugDisplay->DrawLine(arch[i], arch[i + 1]);
+		}
+	}
+}
+
+/*
 void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -199,27 +232,15 @@ void dCustomHinge::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matr
 			// friction and limits at the same time
 			if (angle < m_minAngle) {
 				dFloat relAngle = angle - m_minAngle;
-
-				// tell joint error will minimize the exceeded angle error
 				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-
-				// need high stiffness here
 				NewtonUserJointSetRowStiffness(m_joint, 1.0f);
-
-				// allow the joint to move back freely 
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
 				m_lastRowWasUsed = true;
 			} else if (angle > m_maxAngle) {
 				dFloat relAngle = angle - m_maxAngle;
-
-				// tell joint error will minimize the exceeded angle error
 				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-
-				// need high stiffness here
 				NewtonUserJointSetRowStiffness(m_joint, 1.0f);
-
-				// allow the joint to move back freely
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 
 				m_lastRowWasUsed = true;
@@ -286,4 +307,96 @@ void dCustomHinge::ApplySpringDamper (dFloat timestep, const dMatrix& matrix0, c
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
 	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 }
+*/
 
+
+
+void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dFloat angle = m_curJointAngle.GetAngle() + m_jointOmega * timestep;
+	if (angle < m_minAngle) {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+	} else if (angle > m_maxAngle) {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+
+	} else if (m_friction != 0.0f) {
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+	}
+}
+
+
+void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
+	for (int i = 0; i < 3; i ++) {
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
+	
+
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dVector euler0;
+	dVector euler1;
+	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	m_curJointAngle.Update(euler0.m_x);
+
+	// save the current joint Omega
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+	}
+	m_jointOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
+
+
+	if (m_limitsOn) {
+		if (m_setAsSpringDamper) {
+			dAssert (0);
+			//SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
+		} else {
+			SubmitConstraintLimits(matrix0, matrix1, timestep);
+		}
+	} else if (m_setAsSpringDamper) {
+		dAssert (0);
+//		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+	} else if (m_friction != 0.0f) {
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+	}
+}

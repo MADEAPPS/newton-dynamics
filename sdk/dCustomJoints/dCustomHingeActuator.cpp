@@ -32,7 +32,8 @@ dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, Newt
 	,m_angularRate(0.0f)
 	,m_maxForce(1.0e20f)
 {
-	m_actuatorFlag = false;
+	dAssert (0);
+//	m_actuatorFlag = false;
 	EnableLimits(false);
 }
 
@@ -44,7 +45,8 @@ dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 	,m_angularRate(angularRate)
     ,m_maxForce(1.0e20f)
 {
-	m_actuatorFlag = true;
+	dAssert (0);
+//	m_actuatorFlag = true;
 	EnableLimits(false);
 }
 
@@ -65,7 +67,9 @@ void dCustomHingeActuator::Deserialize(NewtonDeserializeCallback callback, void*
 
 bool dCustomHingeActuator::GetEnableFlag () const
 {
-	return m_actuatorFlag;
+	dAssert (0);
+	return 0;
+//	return m_actuatorFlag;
 }
 
 dFloat dCustomHingeActuator::GetTargetAngle() const
@@ -112,7 +116,8 @@ void dCustomHingeActuator::SetTargetAngle(dFloat angle)
 
 void dCustomHingeActuator::SetEnableFlag (bool flag)
 {
-	m_actuatorFlag = flag;
+	dAssert (0);
+//	m_actuatorFlag = flag;
 }
 
 dFloat dCustomHingeActuator::GetActuatorAngle() const
@@ -133,6 +138,8 @@ void dCustomHingeActuator::SetMaxForcePower(dFloat force)
 
 void dCustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
+	dAssert (0);
+/*
 	if (m_actuatorFlag) {
 		dFloat jointangle = GetActuatorAngle();
 		dFloat relAngle = jointangle - m_angle;
@@ -148,6 +155,7 @@ void dCustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMat
 	} else {
 		dCustomHinge::SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
 	}
+*/
 }
 
 
