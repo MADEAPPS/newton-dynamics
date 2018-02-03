@@ -577,10 +577,12 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 		hinge->EnableLimits (true);
 		hinge->SetLimits (-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 		hinge->SetFriction(20.0f);
+
 		parent = child;
 		position.m_x += size.m_x;
 	}
 }
+
 
 static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -624,6 +626,29 @@ static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector
 	// set limit on second axis
 	slider->SetLimits(-4.0f, 4.0f);
 	slider->SetAsSpringDamper(true, 0.7f, 80.0f, 0.0f);
+}
+
+
+static void AddHingeSpringDamper (DemoEntityManager* const scene, const dVector& origin)
+{
+	dMatrix matrix;
+
+	// add a hinge spring
+	NewtonBody* const box0 = CreateCylinder (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), 0.25f, 2.0f);
+	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
+
+	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	// connect the bodies by a Slider joint
+	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+	dCustomHinge* const hinge = new dCustomHinge(matrix, box1, box0);
+
+	// enable limit of first axis
+	hinge->EnableLimits(true);
+
+	// set limit on second axis
+	hinge->SetLimits (-120.0f * dDegreeToRad, 120.0f * dDegreeToRad);
+	hinge->SetAsSpringDamper(true, 0.9f, 300.0f, 1.0f);
 }
 
 
@@ -1263,10 +1288,10 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
-
-//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
+	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
+	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
+//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
 //	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
