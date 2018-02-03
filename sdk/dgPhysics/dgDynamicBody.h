@@ -113,7 +113,6 @@ class dgDynamicBody : public dgBody
 	bool m_linearDampOn;
 	bool m_angularDampOn;
 	static dgVector m_equilibriumError2;
-	static dgVector m_eulerTaylorCorrection;
 
 	friend class dgWorld;
 	friend class dgBroadPhase;

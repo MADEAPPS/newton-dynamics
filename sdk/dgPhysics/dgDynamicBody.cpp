@@ -30,7 +30,6 @@
 //////////////////////////////////////////////////////////////////////
 
 dgVector dgDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
-dgVector dgDynamicBody::m_eulerTaylorCorrection(dgFloat32(1.0f / 12.0f));
 
 dgDynamicBody::dgDynamicBody()
 	:dgBody()
@@ -278,9 +277,9 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			AddDampingAcceleration(timestep);
 			CalcInvInertiaMatrix();
-			//ApplyGyroTorque();
-			//dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
-			//SetTorque(GetTorque() - gyroTorque);
+
+			dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
+			m_externalTorque -= gyroTorque;
 
 			dgVector accel(m_externalForce.Scale4(m_invMass.m_w));
 			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque));
@@ -291,15 +290,17 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			dgVector timeStepVect(timestep);
 			m_veloc += accel * timeStepVect;
 
-#if 0
+#if 1
 			// Using forward half step Euler integration 
 			// (not enough to cope with high angular velocities)
-			dgVector correction(alpha.CrossProduct3(m_omega));
-			m_omega += alpha * timeStepVect * dgVector::m_half + correction * timeStepVect * timeStepVect * m_eulerTaylorCorrection;
+			//dgVector correction(alpha.CrossProduct3(m_omega));
+			//dgVector eulerTaylorCorrection(dgFloat32(1.0f / 12.0f));
+			//m_omega += alpha * timeStepVect * dgVector::m_half + correction * timeStepVect * timeStepVect * eulerTaylorCorrection;
+			m_omega += alpha * timeStepVect;
 #else
 			// Using forward and backward Euler integration
 			// (good to resolve high angular velocity precession) 
-			// alpha = (T * R^1 - (wl cross (wl * Il)) Il^1 * R
+			// alpha = T - (w cross ((wl * Il) * R)
 			dgVector omega(m_omega);
 			dgVector halfStep(dgVector::m_half.Scale4(timestep));
 			dgMatrix matrix (m_matrix);
