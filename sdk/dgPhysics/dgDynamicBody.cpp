@@ -273,34 +273,91 @@ void dgDynamicBody::InvalidateCache ()
 
 void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 {
+	dgAssert (m_needsVelocityIntegration == 1);
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			AddDampingAcceleration(timestep);
-			CalcInvInertiaMatrix();
-
-			dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
-			m_externalTorque -= gyroTorque;
-
-			dgVector accel(m_externalForce.Scale4(m_invMass.m_w));
-			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque));
-
-			m_accel = accel;
-			m_alpha = alpha;
 
 			dgVector timeStepVect(timestep);
+
+			dgVector accel(m_externalForce.Scale4(m_invMass.m_w));
+			m_accel = accel;
 			m_veloc += accel * timeStepVect;
 
-#if 1
-			// Using forward half step Euler integration 
-			// (not enough to cope with high angular velocities)
-			//dgVector correction(alpha.CrossProduct3(m_omega));
-			//dgVector eulerTaylorCorrection(dgFloat32(1.0f / 12.0f));
-			//m_omega += alpha * timeStepVect * dgVector::m_half + correction * timeStepVect * timeStepVect * eulerTaylorCorrection;
+#if 0
+			// Simple Euler step not enough to cope with high angular velocities)
+			// alpha = I^-1 * (T - (w cross ((wl * Il) * R))
+			CalcInvInertiaMatrix();
+			dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
+			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque));
+			m_alpha = alpha;
 			m_omega += alpha * timeStepVect;
+
+#else 
+			// using implicit mid point Euler
+			// alpha = I^-1 * (T - (w cross ((wl * Il) * R))
+
+			int steps = 4;
+			dgFloat32 dt4 = timestep * dgFloat32 (1.0f / steps);
+			dgVector dt4Vec(dt4);
+			for (dgInt32 i = 0; i < steps; i ++) {
+				CalcInvInertiaMatrix();
+				dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
+				dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque));
+				m_alpha = alpha;
+				m_omega += alpha * dt4Vec;
+
+				dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
+				dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
+				dgVector omegaAxis(m_omega.Scale4(invOmegaMag));
+				dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt4;
+				dgQuaternion rotation(omegaAxis, omegaAngle);
+				m_rotation = m_rotation * rotation;
+				m_rotation.Scale(dgRsqrt(m_rotation.DotProduct(m_rotation)));
+				m_matrix = dgMatrix(m_rotation, m_matrix.m_posit);
+			}
+
+/*
+			CalcInvInertiaMatrix();
+			dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
+			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque));
+
+			// calculate first step and get the average angular velocity
+			dgVector omega1 (m_omega + alpha * timeStepVect);
+			dgVector midOmega ((omega1 + m_omega) * dgVector::m_half);
+
+
+dgMatrix xxx0 (m_matrix);
+dgQuaternion xxx1 (m_rotation);
+dgVector xxx2 (m_omega);
+
+			// integrate locally to the the matrix at the mid step angular velocity
+			dgFloat32 omegaMag2 = midOmega.DotProduct4(midOmega).GetScalar();
+			dgFloat32 invOmegaMag = dgRsqrt(omegaMag2 + dgFloat32(1.0e-14f));
+			dgVector omegaAxis(midOmega.Scale4(invOmegaMag));
+			dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
+			m_rotation = m_rotation * dgQuaternion(omegaAxis, omegaAngle);
+			m_matrix = dgMatrix (m_rotation, m_matrix.m_posit);
+
+			// calculate the derivative (torque) at the mid point angular velocity
+			m_omega = midOmega;
+			CalcInvInertiaMatrix();
+
+			dgVector midGyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
+			dgVector midAlpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - midGyroTorque));
+
+			// now integrate by the average angular velocity
+			m_matrix = xxx0;
+			m_rotation = xxx1;
+			m_omega = xxx2;
+			m_omega += midAlpha * timeStepVect;
+*/
+
+/*
 #else
 			// Using forward and backward Euler integration
 			// (good to resolve high angular velocity precession) 
-			// alpha = T - (w cross ((wl * Il) * R)
+			
 			dgVector omega(m_omega);
 			dgVector halfStep(dgVector::m_half.Scale4(timestep));
 			dgMatrix matrix (m_matrix);
@@ -331,9 +388,11 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				omega = m_omega + halfStep * (correctionDerivative + predictDerivative);
 			}
 			m_omega = omega;
+*/
 #endif
 
 		} else {
+			dgAssert (0);
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
 			lumpedMassShape->IntegrateForces(timestep);
 		}
@@ -341,4 +400,5 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 		m_accel = dgVector::m_zero;
 		m_alpha = dgVector::m_zero;
 	}
+	m_needsVelocityIntegration = 0;
 }

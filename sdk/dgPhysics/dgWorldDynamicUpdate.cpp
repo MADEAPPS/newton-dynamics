@@ -73,6 +73,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
 	dgWorld* const world = (dgWorld*) this;
 	
+//timestep *= 0.25f;
 	m_bodies = 0;
 	m_joints = 0;
 	m_clusters = 0;
@@ -173,7 +174,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
 		const dgBodyMasterListRow& graphNode = node->GetInfo();
 		dgBody* const body = graphNode.GetBody();
-
+		
 		if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
 #ifdef _DEBUG
 			for (; node; node = node->GetPrev()) {
@@ -186,6 +187,8 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 			dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
+			body->m_needsVelocityIntegration = 1;
+
 			if (dynamicBody->m_dynamicsLru < lru) {
 				if (!(dynamicBody->m_freeze | dynamicBody->m_spawnnedFromCallback | dynamicBody->m_sleeping)) {
 					SpanningTree(dynamicBody, stackPoolBuffer, timestep);
@@ -680,7 +683,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		dgVector isMovingMask ((body->m_veloc + body->m_omega + body->m_accel + body->m_alpha) & dgVector::m_signMask);
 		if ((isMovingMask.TestZero().GetSignMask() & 7) != 7) {
 			dgAssert (body->m_invMass.m_w);
-			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI) && body->m_needsVelocityIntegration) {
 				body->IntegrateVelocity(timestep);
 			}
 

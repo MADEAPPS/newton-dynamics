@@ -308,14 +308,16 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	//dgTrace (("%d p(%f %f %f)\n", m_uniqueID, m_globalCentreOfMass[0], m_globalCentreOfMass[1], m_globalCentreOfMass[2]));
-
-	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
-	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
+return;
+	dgAssert (m_veloc.m_w == dgFloat32 (0.0f));
+	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
+	m_globalCentreOfMass += m_veloc.Scale4 (timestep); 
+	while ((m_omega.DotProduct4(m_omega).GetScalar() * timestep * timestep) > m_maxAngulaRotationPerSet2) {
 		m_omega = m_omega.Scale4 (dgFloat32 (0.9f));
 	}
 
 	// this is correct
-	dgFloat32 omegaMag2 = m_omega.DotProduct3(m_omega);
+	dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
 		dgVector omegaAxis (m_omega.Scale4 (invOmegaMag));
@@ -329,7 +331,6 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dgAssert (m_matrix.TestOrthogonal());
 }
-
 
 
 dgVector dgBody::CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const
