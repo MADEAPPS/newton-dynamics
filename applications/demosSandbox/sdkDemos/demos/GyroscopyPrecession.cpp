@@ -54,13 +54,16 @@ static NewtonBody* DzhanibekovEffect(DemoEntityManager* const scene, const dVect
 
 	dFloat m, x, y, z;
 	NewtonBodyGetMass(dzhanibekovBody, &m, &x, &y, &z);
+//NewtonBodySetMassMatrix(dzhanibekovBody, m, x, x, x);
 
 	dVector damp(0.0f);
 	NewtonBodySetLinearDamping(dzhanibekovBody, 0.0f);
 	NewtonBodySetAngularDamping(dzhanibekovBody, &damp[0]);
 	NewtonBodySetForceAndTorqueCallback(dzhanibekovBody, ZeroGravityForce);
 
-	dVector omega(speed * 0.01f, speed * 0.01f, speed);
+	dFloat pertubation = 0.01f;
+	//dFloat pertubation = 0.0f;
+	dVector omega(speed * pertubation, speed * pertubation, speed);
 	NewtonBodySetOmega(dzhanibekovBody, &omega[0]);
 
 	matrix.m_posit.m_x -= lenght * 0.5f;

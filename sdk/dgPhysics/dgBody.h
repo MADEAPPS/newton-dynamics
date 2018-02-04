@@ -261,7 +261,6 @@ class dgBody
 			dgUnsigned32 m_continueCollisionMode	: 1;
 			dgUnsigned32 m_collideWithLinkedBodies	: 1;
 			dgUnsigned32 m_transformIsDirty			: 1;
-			dgUnsigned32 m_needsVelocityIntegration	: 1;
 		};
 	};
 

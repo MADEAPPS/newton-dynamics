@@ -187,8 +187,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 			dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
-			body->m_needsVelocityIntegration = 1;
-
 			if (dynamicBody->m_dynamicsLru < lru) {
 				if (!(dynamicBody->m_freeze | dynamicBody->m_spawnnedFromCallback | dynamicBody->m_sleeping)) {
 					SpanningTree(dynamicBody, stackPoolBuffer, timestep);
@@ -683,7 +681,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		dgVector isMovingMask ((body->m_veloc + body->m_omega + body->m_accel + body->m_alpha) & dgVector::m_signMask);
 		if ((isMovingMask.TestZero().GetSignMask() & 7) != 7) {
 			dgAssert (body->m_invMass.m_w);
-			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI) && body->m_needsVelocityIntegration) {
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				body->IntegrateVelocity(timestep);
 			}
 

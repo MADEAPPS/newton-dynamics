@@ -377,9 +377,12 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 		}
 
 		if (k != i) {
-			dgAssert(0);
-//			dgGeneralMatrix<T, Rows, Columns>::SwapRows(i, k);
-//			dgSwap(B[i], B[k]);
+            T* const rowK = &matrix[k * size];
+            T* const rowJ = &matrix[i * size];
+			for (dgInt32 j = 0; j < size; j++) {
+				dgSwap(rowK[j], rowJ[j]);
+			}
+			dgSwap(b[i], b[k]);
 		}
 
 		T den = T(1.0f) / rowI[i];

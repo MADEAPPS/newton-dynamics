@@ -308,7 +308,6 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	//dgTrace (("%d p(%f %f %f)\n", m_uniqueID, m_globalCentreOfMass[0], m_globalCentreOfMass[1], m_globalCentreOfMass[2]));
-return;
 	dgAssert (m_veloc.m_w == dgFloat32 (0.0f));
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
 	m_globalCentreOfMass += m_veloc.Scale4 (timestep); 

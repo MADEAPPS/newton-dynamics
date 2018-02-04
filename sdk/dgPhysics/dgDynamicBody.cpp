@@ -273,122 +273,104 @@ void dgDynamicBody::InvalidateCache ()
 
 void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 {
-	dgAssert (m_needsVelocityIntegration == 1);
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
-			AddDampingAcceleration(timestep);
 
 			dgVector timeStepVect(timestep);
-
-			dgVector accel(m_externalForce.Scale4(m_invMass.m_w));
-			m_accel = accel;
-			m_veloc += accel * timeStepVect;
-
+			AddDampingAcceleration(timestep);
+			m_accel = m_externalForce.Scale4(m_invMass.m_w);
+			m_veloc += m_accel * timeStepVect;
 #if 0
-			// Simple Euler step not enough to cope with high angular velocities)
+			// Simple Euler in global space not enough to cope with high angular velocities)
 			// alpha = I^-1 * (T - (w cross ((wl * Il) * R))
 			CalcInvInertiaMatrix();
 			dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
-			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque));
-			m_alpha = alpha;
-			m_omega += alpha * timeStepVect;
-
-#else 
-			// using implicit mid point Euler
-			// alpha = I^-1 * (T - (w cross ((wl * Il) * R))
-
-			int steps = 4;
-			dgFloat32 dt4 = timestep * dgFloat32 (1.0f / steps);
-			dgVector dt4Vec(dt4);
-			for (dgInt32 i = 0; i < steps; i ++) {
-				CalcInvInertiaMatrix();
-				dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
-				dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque));
-				m_alpha = alpha;
-				m_omega += alpha * dt4Vec;
-
-				dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
-				dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
-				dgVector omegaAxis(m_omega.Scale4(invOmegaMag));
-				dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt4;
-				dgQuaternion rotation(omegaAxis, omegaAngle);
-				m_rotation = m_rotation * rotation;
-				m_rotation.Scale(dgRsqrt(m_rotation.DotProduct(m_rotation)));
-				m_matrix = dgMatrix(m_rotation, m_matrix.m_posit);
-			}
-
-/*
-			CalcInvInertiaMatrix();
-			dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
-			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque));
-
-			// calculate first step and get the average angular velocity
-			dgVector omega1 (m_omega + alpha * timeStepVect);
-			dgVector midOmega ((omega1 + m_omega) * dgVector::m_half);
-
-
-dgMatrix xxx0 (m_matrix);
-dgQuaternion xxx1 (m_rotation);
-dgVector xxx2 (m_omega);
-
-			// integrate locally to the the matrix at the mid step angular velocity
-			dgFloat32 omegaMag2 = midOmega.DotProduct4(midOmega).GetScalar();
-			dgFloat32 invOmegaMag = dgRsqrt(omegaMag2 + dgFloat32(1.0e-14f));
-			dgVector omegaAxis(midOmega.Scale4(invOmegaMag));
-			dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
-			m_rotation = m_rotation * dgQuaternion(omegaAxis, omegaAngle);
-			m_matrix = dgMatrix (m_rotation, m_matrix.m_posit);
-
-			// calculate the derivative (torque) at the mid point angular velocity
-			m_omega = midOmega;
-			CalcInvInertiaMatrix();
-
-			dgVector midGyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
-			dgVector midAlpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque - midGyroTorque));
-
-			// now integrate by the average angular velocity
-			m_matrix = xxx0;
-			m_rotation = xxx1;
-			m_omega = xxx2;
-			m_omega += midAlpha * timeStepVect;
-*/
-
-/*
+			m_alpha = m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque);
+			m_omega += m_alpha * timeStepVect;
+#elif 0
+			// Simple Euler in local space step not enough to cope with high angular velocities)
+			// localAlpha = (Tl - (wl x (wl * Il)) * Il^1
+			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
+			dgVector localTorque (m_matrix.UnrotateVector(m_externalTorque));
+			dgVector angulaMomentum (m_mass * localOmega);
+			dgVector nextTorque (localTorque - localOmega.CrossProduct3(angulaMomentum));
+			dgVector localAlpha (nextTorque * m_invMass);
+			localOmega += localAlpha * timeStepVect;
+			m_omega = m_matrix.RotateVector(localOmega);
 #else
-			// Using forward and backward Euler integration
+			// implicit integration is local space, 
+			// use angular velocity at dt, to solve equation
+			// dW/dt * I + w x (w * I) = T
+			// discretized above equation and solve using multivariate Taylor expansion
+			// (w - w0) * I  + w x (w * I) * dt - T * dt = 0
+			//
+			// I and T are inertia and torque in local space.
 			// (good to resolve high angular velocity precession) 
-			
-			dgVector omega(m_omega);
-			dgVector halfStep(dgVector::m_half.Scale4(timestep));
-			dgMatrix matrix (m_matrix);
 
-			for (dgInt32 i = 0; i < 2; i++) {
-				// get forward derivative
-				dgVector localOmega(matrix.UnrotateVector(m_omega));
-				dgVector localTorque(matrix.UnrotateVector(m_externalTorque));
-				dgVector predictDerivative(matrix.RotateVector(m_invMass * (localTorque - localOmega.CrossProduct3(localOmega * m_mass))));
-				dgVector predictOmega(omega + predictDerivative * timeStepVect);
+			// using mathematica top cal;cula the derivative of expression
+			/*
+			Wxx = wx * Ix + (wy * wz * Iz - wz * wy * Iy - Tx) * dt
+			Wyy = wy * Iy + (wz * wx * Ix - wx * wz * Iz - Ty) * dt
+			Wzz = wz * Iz + (wx * wy * Iy - wy * wx * Ix - Tz) * dt
 
-				// calculate new rotation matrix at time (dw, dt) 
-				dgFloat32 omegaMag2 = predictOmega.DotProduct3(predictOmega);
-				dgFloat32 invOmegaMag = dgRsqrt(omegaMag2 + dgFloat32(1.0e-14f));
-				dgVector omegaAxis(predictOmega.Scale4(invOmegaMag));
-				dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
-				dgQuaternion rotation(m_rotation * dgQuaternion(omegaAxis, omegaAngle));
-				matrix = dgMatrix(rotation, dgVector::m_wOne);
+			CreateDocument[{TextCell["Wx ="], Wxx,
+			TextCell["dwx/dwx ="], D[Wxx, { wx, 1 }],
+			TextCell["dwx/dwy ="], D[Wxx, { wy, 1 }],
+			TextCell["dwx/dwz ="], D[Wxx, { wz, 1 }]}]
 
-				// get backward derivative
-				localOmega = matrix.UnrotateVector(predictOmega);
-				localTorque = matrix.UnrotateVector(m_externalTorque);
-				dgVector correctionDerivative(matrix.RotateVector(m_invMass * (localTorque - localOmega.CrossProduct3(localOmega * m_mass))));
+			CreateDocument[{TextCell["Wy ="], Wyy,
+			TextCell["dwy/dwx ="], D[Wyy, { wx, 1 }],
+			TextCell["dwy/dwy ="], D[Wyy, { wy, 1 }],
+			TextCell["dwy/dwz ="], D[Wyy, { wz, 1 }]}]
 
-				// calculate omega as the average of forward and backward derivatives.
-				// In theory since alpha is a quadratic function of omega, this should converge to an eact value
-				// in one at most two steps.
-				omega = m_omega + halfStep * (correctionDerivative + predictDerivative);
+			CreateDocument[{TextCell["Wz ="], Wzz,
+			TextCell["dwz/dwx ="], D[Wzz, { wx, 1 }],
+			TextCell["dwz/dwy ="], D[Wzz, { wy, 1 }],
+			TextCell["dwz/dwz ="], D[Wzz, { wz, 1 }]}]
+			*/
+
+			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
+			dgVector localTorque (m_matrix.UnrotateVector(m_externalTorque));
+			dgVector angulaMomentum (m_mass * localOmega);
+			dgVector nextTorque (localTorque - localOmega.CrossProduct3(angulaMomentum));
+
+			const dgInt32 steps = 2;
+			dgFloat32 dt = timestep/steps;
+			dgMatrix jacobianMatrix(dgGetIdentityMatrix());
+			for (dgInt32 i = 0; i < steps; i ++) {
+
+				// calculates Jacobian matrix
+				//dWx / dwx = Ix
+				//dWx / dwy = dt * (-Iy wz + Iz wz)
+				//dWx / dwz = dt * (-Iy wy + Iz wy)
+				jacobianMatrix[0][0] = m_mass[0];
+				jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * localOmega[2] * dt;
+				jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * localOmega[1] * dt;
+
+				//dWy / dwx = dt * (Ix wz - Iz wz)
+				//dWy / dwy = Iy
+				//dWy / dwz = dt * (Ix wx - Iz wx)
+				jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * localOmega[2] * dt;
+				jacobianMatrix[1][1] = m_mass[1];
+				jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * localOmega[0] * dt;
+
+				//dWz / dwx = dt * (-Ix wy + Iy wy)
+				//dWz / dwy = dt * (-Ix wx + Iy wx)
+				//dWz / dwz = Iz
+				jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * localOmega[1] * dt;
+				jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * localOmega[0] * dt;
+				jacobianMatrix[2][2] = m_mass[2];
+
+				// calculate gradient
+				dgVector gradient (localTorque - localOmega.CrossProduct3(localOmega * m_mass)); 
+				dgVector gradientStep (gradient.Scale4(dt)); 
+				dgSolveGaussian(4, &jacobianMatrix[0][0], &gradientStep[0]);
+
+				localOmega += gradientStep;
 			}
-			m_omega = omega;
-*/
+
+
+			m_omega = m_matrix.RotateVector(localOmega);
 #endif
 
 		} else {
@@ -400,5 +382,4 @@ dgVector xxx2 (m_omega);
 		m_accel = dgVector::m_zero;
 		m_alpha = dgVector::m_zero;
 	}
-	m_needsVelocityIntegration = 0;
 }
