@@ -307,7 +307,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			// I and T are inertia and torque in local space.
 			// (good to resolve high angular velocity precession) 
 
-			// using mathematica top cal;cula the derivative of expression
+			// using mathematica script to calculate the derivatives of the Taylor expression
 			/*
 			Wxx = wx * Ix + (wy * wz * Iz - wz * wy * Iy - Tx) * dt
 			Wyy = wy * Iy + (wz * wx * Ix - wx * wz * Iz - Ty) * dt

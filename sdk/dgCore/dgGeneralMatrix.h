@@ -377,8 +377,8 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 		}
 
 		if (k != i) {
-            T* const rowK = &matrix[k * size];
-            T* const rowJ = &matrix[i * size];
+			T* const rowK = &matrix[k * size];
+			T* const rowJ = &matrix[i * size];
 			for (dgInt32 j = 0; j < size; j++) {
 				dgSwap(rowK[j], rowJ[j]);
 			}
