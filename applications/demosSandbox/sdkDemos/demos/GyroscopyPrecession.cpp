@@ -194,8 +194,8 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  2.0f, 1.0f), dVector (0.01f, 20.0f, 0.01f), 0.25f, 2.0f);
 	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  4.0f, 1.0f), dVector (20.0f, 0.01f, 0.01f), 0.25f, 2.0f);
 
-	// test this only happens is there is when there is residual angular velocity 
-	// for perfectly axis aligned velocity the the body is on unstable equilibrium.
+	// test this only happens is there a residual angular velocity on the othe two axis
+	// for perfectly axis aligned velocity the the body is on unstable equilibrium and should not flip.
 	DzhanibekovEffect(scene, dVector(3.0f, 3.0f,  6.0f, 1.0f), dVector (0.0f, 0.0f, 15.0f), 0.25f, 2.0f);
 
 	// test a different angular velocity
