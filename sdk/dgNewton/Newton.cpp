@@ -4054,12 +4054,14 @@ dFloat NewtonCollisionGetSkinThickness(const NewtonCollision* const collisionPtr
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*)collisionPtr;
+	return collision->GetSkinThickness();
 }
 
 void NewtonCollisionSetSkinThickness(const NewtonCollision* const collisionPtr, dFloat thickness)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*)collisionPtr;
+	collision->SetSkinThickness(thickness);
 }
 
 NewtonCollision* NewtonCollisionCreateInstance (const NewtonCollision* const collision)
