@@ -664,16 +664,15 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 
 	// connect the bodies by a Slider joint
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-//	matrix = dPitchMatrix(90.0f * dDegreeToRad) * matrix;
-	matrix = dRollMatrix(90.0f * dDegreeToRad) * matrix;
+	matrix = dPitchMatrix(90.0f * dDegreeToRad) * matrix;
 
 	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, box1, box0);
-	slider->EnableLinearLimits (true);
-	slider->SetLinearLimits (-4.0f, 4.0f);
+	slider->EnableLimits (true);
+	slider->SetLimits (-4.0f, 4.0f);
 
 	// enable limit of first axis
 	slider->EnableAngularLimits(true);
-	slider->SetAngularLimits (-7.0f * dPi, 5.0f * dPi);
+	slider->SetAngularLimits(-7.0f * dPi, 5.0f * dPi);
 }
 
 static void AddCylindrical (DemoEntityManager* const scene, const dVector& origin)
@@ -695,7 +694,7 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
 
 	// set angular limit on second axis
 	cylinder->EnableAngularLimits(true);
-	cylinder->SetAngularLimis(-4.0f * dPi, 6.0f * dPi);
+	cylinder->SetAngularLimits(-4.0f * dPi, 6.0f * dPi);
 }
 
 static dCustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
@@ -1291,12 +1290,13 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
-	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
+//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
+	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
-//	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
+//
 ////	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
 #endif
