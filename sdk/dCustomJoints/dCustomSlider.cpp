@@ -33,8 +33,7 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_limitsOn(false)
-	,m_setAsSpringDamper(false)
+	,m_options(0)
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -48,9 +47,8 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 	,m_maxDist(1.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
-	,m_springDamperRelaxation(0.6f)
-	,m_limitsOn(false)
-	,m_setAsSpringDamper(false)
+	,m_springDamperRelaxation(0.9f)
+	,m_options(0)
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);

@@ -32,8 +32,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_limitsOn(false)
-	,m_setAsSpringDamper(false)
+	,m_options(0)
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -50,8 +49,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_limitsOn(false)
-	,m_setAsSpringDamper(false)
+	,m_options(0)
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix (pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -229,7 +227,7 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 
 	} else if (angle > m_maxAngle) {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 
 		const dFloat invtimestep = 1.0f / timestep;
