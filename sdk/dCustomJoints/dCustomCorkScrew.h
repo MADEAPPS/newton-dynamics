@@ -37,7 +37,6 @@ class dCustomCorkScrew: public dCustomSlider
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
-
 	dAngularIntegration m_curJointAngle;
 	dFloat m_minAngularDist;
 	dFloat m_maxAngularDist;

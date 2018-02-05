@@ -205,6 +205,7 @@ void dCustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 
 void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+/*
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
 	dVector euler1;
@@ -213,6 +214,50 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 		NewtonUserJointAddAngularRow(m_joint, -euler0[i], &matrix1[i][0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	}
+*/
+
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dVector euler0;
+	dVector euler1;
+	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	m_curJointAngle.Update(euler0.m_x);
+/*
+	// save the current joint Omega
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+	}
+	m_jointOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
+
+	if (m_limitsOn) {
+		if (m_setAsSpringDamper) {
+			SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
+		}
+		else {
+			SubmitConstraintLimits(matrix0, matrix1, timestep);
+		}
+	}
+	else if (m_setAsSpringDamper) {
+		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+	}
+	else if (m_friction != 0.0f) {
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+	}
+*/
+
 }
 
 
