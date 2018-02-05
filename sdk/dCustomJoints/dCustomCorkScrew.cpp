@@ -28,10 +28,7 @@ dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody*
 	:dCustomSlider(pinAndPivotFrame, child, parent)
 	,m_curJointAngle()
 {
-	m_limitsLinearOn = false;
 	m_limitsAngularOn = false;
-	m_minLinearDist = -1.0f;
-	m_maxLinearDist = 1.0f;
 	m_minAngularDist = -1.0f;
 	m_maxAngularDist = 1.0f;
 
@@ -44,10 +41,7 @@ dCustomCorkScrew::dCustomCorkScrew(const dMatrix& pinAndPivotFrameChild, const d
 	:dCustomSlider(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_curJointAngle()
 {
-	m_limitsLinearOn = false;
 	m_limitsAngularOn = false;
-	m_minLinearDist = -1.0f;
-	m_maxLinearDist = 1.0f;
 	m_minAngularDist = -1.0f;
 	m_maxAngularDist = 1.0f;
 
@@ -63,8 +57,6 @@ dCustomCorkScrew::~dCustomCorkScrew()
 
 void dCustomCorkScrew::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback (userData, &m_minLinearDist, sizeof (dFloat));
-	callback (userData, &m_maxLinearDist, sizeof (dFloat));
 	callback (userData, &m_minAngularDist, sizeof (dFloat));
 	callback (userData, &m_maxAngularDist, sizeof (dFloat));
 	callback (userData, &m_angularDamp, sizeof (dFloat));
@@ -73,7 +65,6 @@ void dCustomCorkScrew::Deserialize (NewtonDeserializeCallback callback, void* co
 
 	int tmp[3];
 	callback (userData, tmp, sizeof (tmp));
-	m_limitsLinearOn = tmp[0] ? true : false; 
 	m_limitsAngularOn = tmp[1] ? true : false; 
 	m_angularmotorOn = tmp[2] ? true : false; 
 }
@@ -82,8 +73,6 @@ void dCustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const 
 {
 	dCustomJoint::Serialize (callback, userData);
 
-	callback (userData, &m_minLinearDist, sizeof (dFloat));
-	callback (userData, &m_maxLinearDist, sizeof (dFloat));
 	callback (userData, &m_minAngularDist, sizeof (dFloat));
 	callback (userData, &m_maxAngularDist, sizeof (dFloat));
 	callback (userData, &m_angularDamp, sizeof (dFloat));
@@ -91,44 +80,24 @@ void dCustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const 
 	callback (userData, &m_curJointAngle, sizeof (dAngularIntegration));
 
 	int tmp[3];
-	tmp[0] = m_limitsLinearOn ; 
 	tmp[1] = m_limitsAngularOn; 
 	tmp[2] = m_angularmotorOn; 
 	callback (userData, tmp, sizeof (tmp));
 }
 
-void dCustomCorkScrew::EnableLinearLimits(bool state)
-{
-	m_limitsLinearOn = state;
-}
 
 void dCustomCorkScrew::EnableAngularLimits(bool state)
 {
 	m_limitsAngularOn = state;
 }
 
-
-void dCustomCorkScrew::SetLinearLimis(dFloat minDist, dFloat maxDist)
-{
-	//dAssert (minDist < 0.0f);
-	//dAssert (maxDist > 0.0f);
-
-	m_minLinearDist = minDist;
-	m_maxLinearDist = maxDist;
-}
-
 void dCustomCorkScrew::SetAngularLimis(dFloat minDist, dFloat maxDist)
 {
-	//dAssert (minDist < 0.0f);
-	//dAssert (maxDist > 0.0f);
-
 	m_minAngularDist = minDist;
 	m_maxAngularDist = maxDist;
 }
 
-
-
-
+/*
 void dCustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -232,6 +201,18 @@ void dCustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
 	}
  }
+*/
 
+void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dVector euler0;
+	dVector euler1;
+	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+	for (int i = 0; i < 3; i++) {
+		NewtonUserJointAddAngularRow(m_joint, -euler0[i], &matrix1[i][0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
+}
 
 

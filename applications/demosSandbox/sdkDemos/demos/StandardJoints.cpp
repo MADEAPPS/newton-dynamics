@@ -690,8 +690,8 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
     dCustomCorkScrew* const cylinder = new dCustomCorkScrew (matrix, box1, box0);
 
     // enable limit of first axis
-    cylinder->EnableLinearLimits(true);
-    cylinder->SetLinearLimis (-4.0f, 4.0f);
+    cylinder->EnableLimits(true);
+    cylinder->SetLimits (-4.0f, 4.0f);
 
 	// set angular limit on second axis
 	cylinder->EnableAngularLimits(true);
@@ -815,8 +815,8 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
     dCustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
     dCustomCorkScrew* const cylinder = AddCylindricalWheel(scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
 
-    cylinder->EnableLinearLimits(true);
-    cylinder->SetLinearLimis(-2.0f, 2.0f);
+    cylinder->EnableLimits(true);
+    cylinder->SetLimits(-2.0f, 2.0f);
 
     NewtonBody* const body0 = hinge0->GetBody0();
     NewtonBody* const body1 = hinge1->GetBody0();

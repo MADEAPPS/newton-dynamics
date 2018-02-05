@@ -42,6 +42,9 @@ class dCustomSlider: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
+	protected:
+	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+
 	private:
 	void SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
