@@ -362,12 +362,12 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 {
 	for (dgInt32 i = 0; i < size - 1; i++) {
 		const T* const rowI = &matrix[i * size];
-		dgInt32 k = i;
+		dgInt32 m = i;
 		T maxVal (dgAbs(rowI[i]));
 		for (dgInt32 j = i + 1; j < size - 1; j++) {
 			T val (dgAbs(matrix[size * j + i]));
 			if (val > maxVal) {
-				k = j;
+				m = j;
 				maxVal = val;
 			}
 		}
@@ -376,13 +376,13 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 			return false;
 		}
 
-		if (k != i) {
-			T* const rowK = &matrix[k * size];
+		if (m != i) {
+			T* const rowK = &matrix[m * size];
 			T* const rowJ = &matrix[i * size];
 			for (dgInt32 j = 0; j < size; j++) {
 				dgSwap(rowK[j], rowJ[j]);
 			}
-			dgSwap(b[i], b[k]);
+			dgSwap(b[i], b[m]);
 		}
 
 		T den = T(1.0f) / rowI[i];

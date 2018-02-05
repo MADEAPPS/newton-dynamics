@@ -301,6 +301,11 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			// implicit integration is local space, 
 			// use angular velocity at dt, to solve equation
 			// dW/dt * I + w x (w * I) = T
+			// dW * I + w x (w * I) * dt = T * dt
+			// since c * (a x b) =  (c * a) x (c * b)
+			//  we get
+			// dw * I + (w * dt) x ((w * dt) * I) = T * dt
+			// dw * I + dw x (dw * I) = dT
 			// discretized above equation and solve using multivariate Taylor expansion
 			// (w - w0) * I  + w x (w * I) * dt - T * dt = 0
 			//
@@ -334,8 +339,9 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			dgVector angulaMomentum (m_mass * localOmega);
 			dgVector nextTorque (localTorque - localOmega.CrossProduct3(angulaMomentum));
 
-			const dgInt32 steps = 2;
-			dgFloat32 dt = timestep/steps;
+			const dgInt32 steps = 1;
+//			dgFloat32 dt = timestep/steps;
+			dgFloat32 dt = dgFloat32 (0.5f) * timestep / steps;
 			dgMatrix jacobianMatrix(dgGetIdentityMatrix());
 			for (dgInt32 i = 0; i < steps; i ++) {
 
@@ -363,7 +369,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 				// calculate gradient
 				dgVector gradient (localTorque - localOmega.CrossProduct3(localOmega * m_mass)); 
-				dgVector gradientStep (gradient.Scale4(dt)); 
+				dgVector gradientStep (gradient.Scale4(timestep)); 
 				dgSolveGaussian(4, &jacobianMatrix[0][0], &gradientStep[0]);
 
 				localOmega += gradientStep;
