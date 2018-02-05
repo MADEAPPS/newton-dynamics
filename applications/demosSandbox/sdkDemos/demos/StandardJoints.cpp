@@ -1037,8 +1037,8 @@ struct JoesNewRagdollJoint: public dCustomJoint
 
 		m_coneAngle = min(maxAng, coneAngle);
 		float angle = max(0.0f, min(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
-		m_arcAngleCos = cos(angle);
-		m_arcAngleSin = sin(angle);
+		m_arcAngleCos = float(cos(angle));
+		m_arcAngleSin = float(sin(angle));
 
 		m_minTwistAngle = minTwistAngle;
 		m_maxTwistAngle = maxTwistAngle;
@@ -1111,13 +1111,13 @@ struct JoesNewRagdollJoint: public dCustomJoint
 				float *q1 = (float*)&quat1;
 
 				// factor rotation about x axis between quat0 and quat1. Code is an optimization of this: qt = q0.Inversed() * q1; halfTwistAngle = atan (qt.x / qt.w);
-				float twistAngle = 2.0f * atan(
+				float twistAngle = 2.0f * float(atan(
 					((((q0[0] * q1[1]) + (-q0[1] * q1[0])) + (-q0[2] * q1[3])) - (-q0[3] * q1[2])) /
-					((((q0[0] * q1[0]) - (-q0[1] * q1[1])) - (-q0[2] * q1[2])) - (-q0[3] * q1[3])));
+					((((q0[0] * q1[0]) - (-q0[1] * q1[1])) - (-q0[2] * q1[2])) - (-q0[3] * q1[3]))));
 
 				// select an axis for the twist - any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
 				dVector twistAxis = coneDir0 + coneDir1;
-				twistAxis = twistAxis.Scale(1.0f / sqrt(twistAxis.DotProduct3(twistAxis)));
+				twistAxis = twistAxis.Scale(1.0f / float(sqrt(twistAxis.DotProduct3(twistAxis))));
 
 				if (m_maxTwistAngle == m_minTwistAngle) // no freedom for any twist
 				{
@@ -1150,17 +1150,17 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			if (m_coneAngle > 0.0f && dot < 0.999f) {
 				// project current axis to the arc plane (y)
 				dVector d = matrix1.UnrotateVector(matrix0.m_front);
-				dVector cone = d; cone.m_y = 0; cone = cone.Scale(1.0f / sqrt(cone.DotProduct3(cone)));
+				dVector cone = d; cone.m_y = 0; cone = cone.Scale(1.0f / float(sqrt(cone.DotProduct3(cone))));
 
 				// clamp the result to be within the arc angle
 				if (cone.m_x < m_arcAngleCos)
 					cone = dVector(m_arcAngleCos, 0.0f, ((cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
 
 				// do a regular cone constraint from that
-				float angle = acos(max(-1.0f, min(1.0f, d.DotProduct3(cone)))) - m_coneAngle;
+				float angle = float(acos(max(-1.0f, min(1.0f, d.DotProduct3(cone))))) - m_coneAngle;
 				if (angle > 0.0f) {
 					dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
-					swingAxis = swingAxis.Scale(1.0f / sqrt(swingAxis.DotProduct3(swingAxis)));
+					swingAxis = swingAxis.Scale(1.0f / float(sqrt(swingAxis.DotProduct3(swingAxis))));
 					NewtonUserJointAddAngularRow(m_joint, angle, (float*)&swingAxis);
 					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 				}
@@ -1172,9 +1172,9 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			if (m_anim_speed != 0.0f) // some animation to illustrate purpose
 			{
 				m_anim_time += timestep * m_anim_speed;
-				dFloat a0 = sin(m_anim_time);
-				dFloat a1 = m_anim_offset * 3.14f;
-				dVector axis(sin(a1), 0.0f, cos(a1));
+				dFloat a0 = float(sin(m_anim_time));
+				dFloat a1 = m_anim_offset * dPi;
+				dVector axis(float(sin(a1)), 0.0f, float(cos(a1)));
 				//dVector axis (1,0,0);
 				m_target = dQuaternion(axis, a0 * 0.5f);
 			}
@@ -1186,7 +1186,7 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f) ? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
 			qErr.Normalize();
 
-			dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
+			dFloat errorAngle = 2.0f * float(acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0))));
 			dVector errorAngVel(0, 0, 0);
 
 			dMatrix basis;
@@ -1287,11 +1287,11 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
-	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
-	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
-//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
+//	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+//	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
+//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
+	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
 //	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
@@ -1304,7 +1304,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, -0.0f, 0.0f);
+dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
 //dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }

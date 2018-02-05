@@ -25,7 +25,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustomCorkScrew);
 //////////////////////////////////////////////////////////////////////
 
 dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
-	:dCustomJoint(6, child, parent)
+	:dCustomSlider(pinAndPivotFrame, child, parent)
 	,m_curJointAngle()
 {
 	m_limitsLinearOn = false;
@@ -38,10 +38,24 @@ dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody*
 	m_angularmotorOn = false;
 	m_angularDamp = 0.1f;
 	m_angularAccel = 5.0f;
-
-	// calculate the two local matrix of the pivot point
-	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
+
+dCustomCorkScrew::dCustomCorkScrew(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomSlider(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
+	,m_curJointAngle()
+{
+	m_limitsLinearOn = false;
+	m_limitsAngularOn = false;
+	m_minLinearDist = -1.0f;
+	m_maxLinearDist = 1.0f;
+	m_minAngularDist = -1.0f;
+	m_maxAngularDist = 1.0f;
+
+	m_angularmotorOn = false;
+	m_angularDamp = 0.1f;
+	m_angularAccel = 5.0f;
+}
+
 
 dCustomCorkScrew::~dCustomCorkScrew()
 {

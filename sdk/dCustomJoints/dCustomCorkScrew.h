@@ -17,12 +17,13 @@
 #ifndef _CUSTOMCORKSCREW_H_
 #define _CUSTOMCORKSCREW_H_
 
-#include "dCustomJoint.h"
+#include "dCustomSlider.h"
 
-class dCustomCorkScrew: public dCustomJoint  
+class dCustomCorkScrew: public dCustomSlider
 {
 	public:
 	CUSTOM_JOINTS_API dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
+	CUSTOM_JOINTS_API dCustomCorkScrew (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomCorkScrew();
 
 	CUSTOM_JOINTS_API void EnableLinearLimits(bool state);
@@ -31,7 +32,6 @@ class dCustomCorkScrew: public dCustomJoint
 	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
 	protected:
-	//CUSTOM_JOINTS_API dCustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
@@ -48,8 +48,8 @@ class dCustomCorkScrew: public dCustomJoint
 	bool m_limitsAngularOn;
 	bool m_angularmotorOn;
 
-	DECLARE_CUSTOM_JOINT(dCustomCorkScrew, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomCorkScrew, dCustomSlider)
 };
 
-#endif // !defined(AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
+#endif
 
