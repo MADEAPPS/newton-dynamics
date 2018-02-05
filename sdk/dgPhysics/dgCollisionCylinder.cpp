@@ -52,7 +52,7 @@ dgCollisionCylinder::dgCollisionCylinder(dgWorld* const world, dgDeserialize des
 
 void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
-m_skinThickness = 0.2f;
+m_skinThickness = 0.1f;
 	m_rtti |= dgCollisionCylinder_RTTI;
 	m_radio0 = dgMax (dgAbs (radio0), D_MIN_CONVEX_SHAPE_SIZE);
 	m_radio1 = dgMax (dgAbs (radio1), D_MIN_CONVEX_SHAPE_SIZE);
@@ -270,7 +270,7 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32
 dgVector dgCollisionCylinder::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
-	return point + dir.Scale4 (DG_PENETRATION_TOL + m_skinThickness);
+	return point + dir.Scale4 (DG_PENETRATION_TOL);
 }
 
 
