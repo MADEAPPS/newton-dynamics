@@ -27,27 +27,27 @@ IMPLEMENT_CUSTOM_JOINT(dCustomCorkScrew);
 dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
 	:dCustomSlider(pinAndPivotFrame, child, parent)
 	,m_curJointAngle()
+	,m_minAngle(-45.0f * dDegreeToRad)
+	,m_maxAngle(45.0f * dDegreeToRad)
+	,m_angularFriction(0.0f)
+	,m_angularOmega(0.0f)
+	,m_angularSpring(0.0f)
+	,m_angularDamper(0.0f)
+	,m_angularSpringDamperRelaxation(0.9f)
 {
-	m_limitsAngularOn = false;
-	m_minAngularDist = -1.0f;
-	m_maxAngularDist = 1.0f;
-
-	m_angularmotorOn = false;
-	m_angularDamp = 0.1f;
-	m_angularAccel = 5.0f;
 }
 
 dCustomCorkScrew::dCustomCorkScrew(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomSlider(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_curJointAngle()
+	,m_minAngle(-45.0f * dDegreeToRad)
+	,m_maxAngle(45.0f * dDegreeToRad)
+	,m_angularFriction(0.0f)
+	,m_angularOmega(0.0f)
+	,m_angularSpring(0.0f)
+	,m_angularDamper(0.0f)
+	,m_angularSpringDamperRelaxation(0.9f)
 {
-	m_limitsAngularOn = false;
-	m_minAngularDist = -1.0f;
-	m_maxAngularDist = 1.0f;
-
-	m_angularmotorOn = false;
-	m_angularDamp = 0.1f;
-	m_angularAccel = 5.0f;
 }
 
 
@@ -57,44 +57,40 @@ dCustomCorkScrew::~dCustomCorkScrew()
 
 void dCustomCorkScrew::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback (userData, &m_minAngularDist, sizeof (dFloat));
-	callback (userData, &m_maxAngularDist, sizeof (dFloat));
-	callback (userData, &m_angularDamp, sizeof (dFloat));
-	callback (userData, &m_angularAccel, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (dAngularIntegration));
-
-	int tmp[3];
-	callback (userData, tmp, sizeof (tmp));
-	m_limitsAngularOn = tmp[1] ? true : false; 
-	m_angularmotorOn = tmp[2] ? true : false; 
+	callback(userData, &m_curJointAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_minAngle, sizeof(dFloat));
+	callback(userData, &m_maxAngle, sizeof(dFloat));
+	callback(userData, &m_angularFriction, sizeof(dFloat));
+	callback(userData, &m_angularOmega, sizeof(dFloat));
+	callback(userData, &m_angularSpring, sizeof(dFloat));
+	callback(userData, &m_angularDamper, sizeof(dFloat));
+	callback(userData, &m_angularSpringDamperRelaxation, sizeof(dFloat));
 }
 
 void dCustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize (callback, userData);
 
-	callback (userData, &m_minAngularDist, sizeof (dFloat));
-	callback (userData, &m_maxAngularDist, sizeof (dFloat));
-	callback (userData, &m_angularDamp, sizeof (dFloat));
-	callback (userData, &m_angularAccel, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (dAngularIntegration));
-
-	int tmp[3];
-	tmp[1] = m_limitsAngularOn; 
-	tmp[2] = m_angularmotorOn; 
-	callback (userData, tmp, sizeof (tmp));
+	callback(userData, &m_curJointAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_minAngle, sizeof(dFloat));
+	callback(userData, &m_maxAngle, sizeof(dFloat));
+	callback(userData, &m_angularFriction, sizeof(dFloat));
+	callback(userData, &m_angularOmega, sizeof(dFloat));
+	callback(userData, &m_angularSpring, sizeof(dFloat));
+	callback(userData, &m_angularDamper, sizeof(dFloat));
+	callback(userData, &m_angularSpringDamperRelaxation, sizeof(dFloat));
 }
 
 
 void dCustomCorkScrew::EnableAngularLimits(bool state)
 {
-	m_limitsAngularOn = state;
+	m_options |= (state << 8);
 }
 
 void dCustomCorkScrew::SetAngularLimis(dFloat minDist, dFloat maxDist)
 {
-	m_minAngularDist = minDist;
-	m_maxAngularDist = maxDist;
+	m_minAngle = -dAbs(minDist);
+	m_maxAngle = -dAbs(maxDist);
 }
 
 /*
@@ -228,7 +224,7 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(euler0.m_x);
-/*
+
 	// save the current joint Omega
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
@@ -236,8 +232,8 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	m_jointOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
-
+	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
+/*
 	if (m_limitsOn) {
 		if (m_setAsSpringDamper) {
 			SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);

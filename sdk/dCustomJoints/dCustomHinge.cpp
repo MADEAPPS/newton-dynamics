@@ -97,8 +97,8 @@ void dCustomHinge::EnableLimits(bool state)
 
 void dCustomHinge::SetLimits(dFloat minAngle, dFloat maxAngle)
 {
-	m_minAngle = minAngle;
-	m_maxAngle = maxAngle;
+	m_minAngle = -dAbs (minAngle);
+	m_maxAngle = dAbs (maxAngle);
 }
 
 void dCustomHinge::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)

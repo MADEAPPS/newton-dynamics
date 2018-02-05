@@ -10,7 +10,6 @@
 */
 
 
-
 // dCustomSlider.h: interface for the dCustomSlider class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -45,7 +44,6 @@ class dCustomSlider: public dCustomJoint
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
-	private:
 	void SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);

@@ -32,18 +32,19 @@ class dCustomCorkScrew: public dCustomSlider
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-	//CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
 	dAngularIntegration m_curJointAngle;
-	dFloat m_minAngularDist;
-	dFloat m_maxAngularDist;
-	dFloat m_angularDamp;
-	dFloat m_angularAccel;
-	bool m_limitsAngularOn;
-	bool m_angularmotorOn;
+	dFloat m_minAngle;
+	dFloat m_maxAngle;
+	dFloat m_angularFriction;
+	dFloat m_angularOmega;
+
+	dFloat m_angularSpring;
+	dFloat m_angularDamper;
+	dFloat m_angularSpringDamperRelaxation;
 
 	DECLARE_CUSTOM_JOINT(dCustomCorkScrew, dCustomSlider)
 };
