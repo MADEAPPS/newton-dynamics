@@ -127,6 +127,9 @@ class dgCollisionInstance
 	dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
 	dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 
+	dgFloat32 GetSkinThickness() const;
+	void SetSkinThickness(dgFloat32 thickness);
+
 	dgMatrix m_globalMatrix;
 	dgMatrix m_localMatrix;
 	dgMatrix m_aligmentMatrix;
@@ -580,6 +583,18 @@ DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) c
 	dgAssert (size.m_w == dgFloat32 (0.0f));
 	dgAssert (origin.m_w == dgFloat32 (0.0f));
 }
+
+DG_INLINE dgFloat32 dgCollisionInstance::GetSkinThickness() const
+{
+	dgAssert(0);
+	return 0;
+}
+
+DG_INLINE void dgCollisionInstance::SetSkinThickness(dgFloat32 thickness)
+{
+	dgAssert(0);
+}
+
 
 #endif 
 

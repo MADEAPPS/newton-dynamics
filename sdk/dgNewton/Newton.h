@@ -503,7 +503,6 @@ extern "C" {
 
 	NEWTON_API void NewtonWorldSetUserData (const NewtonWorld* const newtonWorld, void* const userData);
 	NEWTON_API void* NewtonWorldGetUserData (const NewtonWorld* const newtonWorld);
-
 	
 	NEWTON_API void* NewtonWorldAddListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData);
 	NEWTON_API void* NewtonWorldGetListener (const NewtonWorld* const newtonWorld, const char* const nameId);
@@ -794,7 +793,8 @@ extern "C" {
 	NEWTON_API void NewtonCollisionGetScale (const NewtonCollision* const collision, dFloat* const scaleX, dFloat* const scaleY, dFloat* const scaleZ);
 	NEWTON_API void NewtonDestroyCollision (const NewtonCollision* const collision);
 
-	//NEWTON_API dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision);
+	NEWTON_API dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision);
+	NEWTON_API void NewtonCollisionSetSkinThickness(const NewtonCollision* const collision, dFloat thickness);
 
 	NEWTON_API int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, 
 		const NewtonCollision* const collisionA, const dFloat* const matrixA, 
