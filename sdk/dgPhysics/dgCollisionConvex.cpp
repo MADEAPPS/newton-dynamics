@@ -54,6 +54,7 @@ dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsi
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
 	,m_simplexVolume (dgFloat32 (0.0f))
+	,m_skinThickness (dgFloat32(0.0f))
 	,m_edgeCount (0)
 	,m_vertexCount (0)
 {
@@ -68,6 +69,7 @@ dgCollisionConvex::dgCollisionConvex (dgWorld* const world, dgDeserialize deseri
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
 	,m_simplexVolume (dgFloat32 (0.0f))
+	,m_skinThickness (dgFloat32(0.0f))
 	,m_edgeCount (0)
 	,m_vertexCount (0)
 {
@@ -501,8 +503,6 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	return cg; 
 }
 
-
-
 dgVector dgCollisionConvex::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
@@ -537,7 +537,6 @@ dgVector dgCollisionConvex::SupportVertex (const dgVector& dir, dgInt32* const v
 	dgAssert (index != -1);
 	return m_vertex[index];
 }
-
 
 
 bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const
