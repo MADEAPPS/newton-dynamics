@@ -265,7 +265,7 @@ dgVector dgCollisionPoint::SupportVertex (const dgVector& dir, dgInt32* const ve
 	return dgVector (dgFloat32 (0.0f)); 
 }
 
-dgVector dgCollisionPoint::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionPoint::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	return dgVector (dgFloat32 (0.0f)); 
 }
@@ -308,7 +308,7 @@ void dgCollisionSphere::Serialize(dgSerialize callback, void* const userData) co
 }
 
 
-dgVector dgCollisionSphere::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const 
+dgVector dgCollisionSphere::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const 
 {
 	return dgVector (dgFloat32 (0.0f));
 }

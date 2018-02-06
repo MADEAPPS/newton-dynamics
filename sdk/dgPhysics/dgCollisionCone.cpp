@@ -217,7 +217,7 @@ dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const ver
 	}
 }
 
-dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 

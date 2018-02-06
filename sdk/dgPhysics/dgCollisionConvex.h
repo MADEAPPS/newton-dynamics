@@ -65,9 +65,6 @@ class dgCollisionConvex: public dgCollision
 	virtual dgFloat32 GetBoxMinRadius () const; 
 	virtual dgFloat32 GetBoxMaxRadius () const;
 
-	virtual void SetSkinThickness(dgFloat32 thickness) {}
-	dgFloat32 GetSkinThickness() const { return m_skinThickness;}
-
 	dgInt32 RayCastClosestFace (dgVector* tetrahedrum, const dgVector& origin, dgFloat32& pointDist) const;
 	dgInt32 SimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const;
 
@@ -85,7 +82,7 @@ class dgCollisionConvex: public dgCollision
 
 	dgInt32 RectifyConvexSlice (dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const;
 
-	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
+	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 	
@@ -95,7 +92,6 @@ class dgCollisionConvex: public dgCollision
 	dgFloat32 m_boxMinRadius;
 	dgFloat32 m_boxMaxRadius;
 	dgFloat32 m_simplexVolume;
-	dgFloat32 m_skinThickness;
 	
 	dgUnsigned16 m_edgeCount;
 	dgUnsigned16 m_vertexCount;

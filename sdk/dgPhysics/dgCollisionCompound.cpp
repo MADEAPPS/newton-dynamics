@@ -1337,7 +1337,7 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 	return supportVertex;
 }
 
-dgVector dgCollisionCompound::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionCompound::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgAssert (0);
 	return SupportVertex (dir, vertexIndex);

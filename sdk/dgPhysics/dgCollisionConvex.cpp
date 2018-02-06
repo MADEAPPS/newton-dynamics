@@ -54,7 +54,6 @@ dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsi
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
 	,m_simplexVolume (dgFloat32 (0.0f))
-	,m_skinThickness (dgFloat32(0.0f))
 	,m_edgeCount (0)
 	,m_vertexCount (0)
 {
@@ -69,7 +68,6 @@ dgCollisionConvex::dgCollisionConvex (dgWorld* const world, dgDeserialize deseri
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
 	,m_simplexVolume (dgFloat32 (0.0f))
-	,m_skinThickness (dgFloat32(0.0f))
 	,m_edgeCount (0)
 	,m_vertexCount (0)
 {
@@ -746,7 +744,7 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 }
 
 
-dgVector dgCollisionConvex::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const 
+dgVector dgCollisionConvex::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const 
 {
 	return SupportVertex(dir, vertexIndex);
 }

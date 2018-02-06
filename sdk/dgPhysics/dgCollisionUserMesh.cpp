@@ -131,7 +131,7 @@ dgVector dgCollisionUserMesh::SupportVertex (const dgVector& dir) const
 	return dgVector (0, 0, 0, 0);
 }
 
-dgVector dgCollisionUserMesh::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionUserMesh::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgAssert(0);
 	return dgVector(0, 0, 0, 0);

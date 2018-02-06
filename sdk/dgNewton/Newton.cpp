@@ -4049,7 +4049,6 @@ void NewtonDestroyCollision(const NewtonCollision* const collisionPtr)
 	collision->Release();
 }
 
-
 dFloat NewtonCollisionGetSkinThickness(const NewtonCollision* const collisionPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);

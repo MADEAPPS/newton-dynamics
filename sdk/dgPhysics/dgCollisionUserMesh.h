@@ -50,7 +50,7 @@ class dgCollisionUserMesh: public dgCollisionMesh
 	void Serialize(dgSerialize callback, void* const userData) const;
 
 	dgVector SupportVertex (const dgVector& dir) const;
-	dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
+	dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
 	dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const {return point;}
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;

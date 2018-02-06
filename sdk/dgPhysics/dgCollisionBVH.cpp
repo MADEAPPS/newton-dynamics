@@ -358,7 +358,7 @@ dgVector dgCollisionBVH::SupportVertex(const dgVector& dir, dgInt32* const verte
 	return ForAllSectorsSupportVectex(dir);
 }
 
-dgVector dgCollisionBVH::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionBVH::SupportVertexSpecial(const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgAssert(0);
 	return SupportVertex(dir, vertexIndex);

@@ -142,6 +142,7 @@ class dgCollisionInstance
 	const dgCollision* m_childShape;
 	const void* m_subCollisionHandle;
 	const dgCollisionInstance* m_parent;
+	dgFloat32 m_skinThickness;
 	dgInt32 m_collisionMode;
 	dgUnsigned32 m_userDataID;
 	dgInt32 m_refCount;
@@ -163,6 +164,7 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_childShape (shape)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
+	,m_skinThickness(meshInstance.m_skinThickness)
 	,m_collisionMode(meshInstance.m_collisionMode)
 	,m_userDataID(meshInstance.m_userDataID)
 	,m_refCount(1)
@@ -402,11 +404,11 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 	{
 		case m_unit:
 		{
-		   return m_childShape->SupportVertexSpecial(dir, vertexIndex);
+		   return m_childShape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
 		}
 		case m_uniform:
 		{
-			return m_scale * m_childShape->SupportVertexSpecial(dir, vertexIndex);
+			return m_scale * m_childShape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
 		}
 
 		default:
@@ -586,13 +588,12 @@ DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) c
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetSkinThickness() const
 {
-	dgAssert(0);
-	return 0;
+	return m_skinThickness;
 }
 
 DG_INLINE void dgCollisionInstance::SetSkinThickness(dgFloat32 thickness)
 {
-	dgAssert(0);
+	m_skinThickness = dgAbs (thickness);
 }
 
 

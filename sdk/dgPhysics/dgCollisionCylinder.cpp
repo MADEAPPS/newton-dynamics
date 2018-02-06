@@ -52,7 +52,6 @@ dgCollisionCylinder::dgCollisionCylinder(dgWorld* const world, dgDeserialize des
 
 void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
-m_skinThickness = 0.1f;
 	m_rtti |= dgCollisionCylinder_RTTI;
 	m_radio0 = dgMax (dgAbs (radio0), D_MIN_CONVEX_SHAPE_SIZE);
 	m_radio1 = dgMax (dgAbs (radio1), D_MIN_CONVEX_SHAPE_SIZE);
@@ -236,11 +235,11 @@ dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const
 }
 
 
-dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
-	const dgFloat32 thickness = DG_PENETRATION_TOL + m_skinThickness;
+	const dgFloat32 thickness = DG_PENETRATION_TOL + skinThickness;
 	if (dir.m_x < dgFloat32 (-0.9999f)) {
 		return dgVector (-(m_height - thickness), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	} else if (dir.m_x > dgFloat32 (0.9999f)) {

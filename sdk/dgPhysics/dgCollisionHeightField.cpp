@@ -762,7 +762,7 @@ dgVector dgCollisionHeightField::SupportVertex (const dgVector& dir, dgInt32* co
 	return support;
 }
 
-dgVector dgCollisionHeightField::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionHeightField::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgAssert (0);
 	return SupportVertex (dir, vertexIndex);

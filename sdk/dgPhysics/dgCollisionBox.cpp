@@ -203,7 +203,7 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir0, dgInt32* const ver
 	return (m_size[1] & mask) + m_size[0].AndNot(mask);
 }
 
-dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir0, dgInt32* const vertexIndex) const
+dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir0, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);

@@ -357,7 +357,7 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 	return p0 * m_transform;
 }
 
-dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgInt32* const vertexIndex) const
+dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgVector dir(direction * m_transform);
 	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
