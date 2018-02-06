@@ -21,6 +21,16 @@
 
 static void ZeroGravityForce(const NewtonBody* body, dFloat timestep, int threadIndex)
 {
+/*
+	dMatrix inertia;
+	dVector omega;
+
+	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
+	NewtonBodyGetOmega(body, &omega[0]);
+	dVector L(inertia.RotateVector(omega));
+	dFloat e = L.DotProduct3(omega) * 0.5f;
+	dTrace(("E = %f  L (%f %f %f)\n", e, L.m_x, L.m_y, L.m_z));
+*/
 }
 
 
