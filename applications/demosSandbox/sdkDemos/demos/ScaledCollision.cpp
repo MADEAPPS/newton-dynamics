@@ -33,7 +33,7 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 
 			dFloat scale = 0.75f + 1.0f * (dFloat (dRand()) / dFloat(dRAND_MAX) - 0.5f);
 scale = 1.0f;
-			NewtonCollisionSetSkinThickness(collision, 0.1f);
+			NewtonCollisionSetSkinThickness(collision, 0.01f);
 			NewtonCollisionSetScale (collision, scale, scale, scale);
 			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
