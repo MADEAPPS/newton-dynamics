@@ -658,13 +658,18 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(8.0f, 0.25f, 0.25f, 0.0f));
 	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
 
-	dMatrix matrix;
-
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
-	// connect the bodies by a Slider joint
+	dMatrix matrix;
+	//rotate body so that is lok like a wheel
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	matrix = dPitchMatrix(90.0f * dDegreeToRad) * matrix;
+	matrix = dRollMatrix(90.0f * dDegreeToRad) * matrix;
+	NewtonBodySetMatrix(box1, &matrix[0][0]);
+
+	//make joint matrix
+	matrix.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	matrix.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	matrix.m_right = dVector(0.0f, 0.0f, 1.0f, 0.0f);
 
 	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, box1, box0);
 	slider->EnableLimits (true);
