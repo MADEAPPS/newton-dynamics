@@ -314,9 +314,9 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			// using mathematica script to calculate the derivatives of the Taylor expression
 			/*
-			Wxx = wx * Ix + (wy * wz * Iz - wz * wy * Iy - Tx) * dt
-			Wyy = wy * Iy + (wz * wx * Ix - wx * wz * Iz - Ty) * dt
-			Wzz = wz * Iz + (wx * wy * Iy - wy * wx * Ix - Tz) * dt
+			Wxx = wx * Ix + ((Iz - Iy) * wy * wz - Tx) * dt
+			Wyy = wy * Iy + ((Ix - Iz) * wz * wx - Ty) * dt
+			Wzz = wz * Iz + ((Iy - Ix) * wx * wy - Tz) * dt
 
 			CreateDocument[{TextCell["Wx ="], Wxx,
 			TextCell["dwx/dwx ="], D[Wxx, { wx, 1 }],
@@ -344,27 +344,28 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			dgFloat32 dt = dgFloat32 (0.5f) * timestep / steps;
 			dgMatrix jacobianMatrix(dgGetIdentityMatrix());
 			for (dgInt32 i = 0; i < steps; i ++) {
+				dgVector dw(localOmega.Scale4(dt));
 
 				// calculates Jacobian matrix
 				//dWx / dwx = Ix
-				//dWx / dwy = dt * (-Iy wz + Iz wz)
-				//dWx / dwz = dt * (-Iy wy + Iz wy)
+				//dWx / dwy = (Iz - Iy) * wz * dt
+				//dWx / dwz = (Iz - Iy) * wy * dt
 				jacobianMatrix[0][0] = m_mass[0];
-				jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * localOmega[2] * dt;
-				jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * localOmega[1] * dt;
+				jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
+				jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
 
-				//dWy / dwx = dt * (Ix wz - Iz wz)
-				//dWy / dwy = Iy
-				//dWy / dwz = dt * (Ix wx - Iz wx)
-				jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * localOmega[2] * dt;
+				//dWy / dwx = (Ix - Iz) * wz * dt
+				//dWy / dwy = Iy				 
+				//dWy / dwz = (Ix - Iz) * wx * dt
+				jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
 				jacobianMatrix[1][1] = m_mass[1];
-				jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * localOmega[0] * dt;
+				jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
 
-				//dWz / dwx = dt * (-Ix wy + Iy wy)
-				//dWz / dwy = dt * (-Ix wx + Iy wx)
+				//dWz / dwx = (Iy - Ix) * wy * dt 
+				//dWz / dwy = (Iy - Ix) * wx * dt 
 				//dWz / dwz = Iz
-				jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * localOmega[1] * dt;
-				jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * localOmega[0] * dt;
+				jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
+				jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
 				jacobianMatrix[2][2] = m_mass[2];
 
 				// calculate gradient
