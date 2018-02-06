@@ -665,13 +665,15 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	matrix = dRollMatrix(90.0f * dDegreeToRad) * matrix;
 	NewtonBodySetMatrix(box1, &matrix[0][0]);
+	DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(box1);
+	ent->ResetMatrix(*scene, matrix);
+
 
 	//make joint matrix
-	matrix.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	matrix.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
-	matrix.m_right = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+	dMatrix jointMatrix(dGetIdentityMatrix());
+	jointMatrix.m_posit = matrix.m_posit;
 
-	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, box1, box0);
+	dCustomSlidingContact* const slider = new dCustomSlidingContact(jointMatrix, box1, box0);
 	slider->EnableLimits (true);
 	slider->SetLimits (-4.0f, 4.0f);
 

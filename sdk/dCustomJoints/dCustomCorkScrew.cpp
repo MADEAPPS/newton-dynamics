@@ -131,7 +131,7 @@ void dCustomCorkScrew::SubmitConstraintLimits(const dMatrix& matrix0, const dMat
 		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
-	} else if (m_friction != 0.0f) {
+	} else if (m_angularFriction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
@@ -205,7 +205,7 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 		}
 	} else if (setAsSpringDamper) {
 		dCustomCorkScrew::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
-	} else if (m_friction != 0.0f) {
+	} else if (m_angularFriction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);

@@ -339,7 +339,7 @@ void dCustomSlidingContact::SubmitConstraintLimits(const dMatrix& matrix0, const
 		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
-	} else if (m_friction != 0.0f) {
+	} else if (m_angularFriction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
@@ -386,13 +386,14 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
-	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
+	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix1[0][0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
+
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	m_curJointAngle.Update(euler0.m_x);
+	m_curJointAngle.Update(euler0.m_y);
 
 	// save the current joint Omega
 	dVector omega0(0.0f);
@@ -401,8 +402,9 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
+	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1[1]);
 
+/*
 	int limitsOn = m_options & (1 << D_SLIDINGCONTACT_LIMIT_FLAG);
 	int setAsSpringDamper = m_options & (1 << D_SLIDINGCONTACT_SPRING_DAMPER_FLAG);
 	if (limitsOn) {
@@ -413,13 +415,14 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 		}
 	} else if (setAsSpringDamper) {
 		dCustomSlidingContact::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
-	} else if (m_friction != 0.0f) {
+	} else if (m_angularFriction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 	}
+*/
 }
 
 
