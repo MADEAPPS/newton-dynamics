@@ -26,15 +26,25 @@ class dCustomBallAndSocket: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomBallAndSocket();
 
+	CUSTOM_JOINTS_API void EnableTwist(bool state);
+	CUSTOM_JOINTS_API void SetTwistLimits(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void GetTwistLimits(dFloat& minAngle, dFloat& maxAngle) const;
+
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	void SubmitLinearRows (const dMatrix& matrix0, const dMatrix& matrix1) const;
+	dAngularIntegration m_twistAngle;
+	dFloat m_minTwistAngle;
+	dFloat m_maxTwistAngle;
+	dFloat m_twistFriction;
+
+	dOptions m_options;
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };
 
+#if 0
 // similar to the ball and socked, plus it has the ability to set joint limits and friction
 class dCustomLimitBallAndSocket: public dCustomBallAndSocket  
 {
@@ -165,6 +175,7 @@ DECLARE_CUSTOM_JOINT(dCustomLimitBallAndSocket, dCustomBallAndSocket)
 
 
 */
+#endif
 
 #endif 
 

@@ -192,8 +192,6 @@ static void AddFixDistance(DemoEntityManager* const scene, const dVector& origin
 
 static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVector& origin)
 {
-	dAssert (0);
-/*
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
 	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 5.0f, 0.0f, 0.0f), size);
@@ -207,7 +205,8 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
-	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket(pinMatrix, box0, base);
+	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket(pinMatrix, box0, base);
+/*
 	joint0->SetConeAngle (30.0f * dDegreeToRad);
 	joint0->SetTwistAngle (-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
 
@@ -1301,7 +1300,7 @@ void StandardJoints (DemoEntityManager* const scene)
 
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
