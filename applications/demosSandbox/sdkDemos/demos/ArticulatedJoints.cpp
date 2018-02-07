@@ -314,7 +314,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			engineTorque -= (engineOmega.DotProduct3(chassisMatrix.m_up)) * vehicleModel->m_omegaResistance;
 			dVector torque (chassisMatrix.m_up.Scale(engineTorque));
 			NewtonBodyAddTorque (engineBody, &torque[0]);
-			
+			dAssert (0);
+/*			
 			if (!vehicleModel->m_rearTiresCount) {
 				// apply DC rate turn Motor 
 				if (vehicleModel->m_inputs.m_steerValue > 0) {
@@ -329,13 +330,14 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 					vehicleModel->m_engineJoint->EnableMotor_0(false);
 				}
 			}
-
+*/
 			// apply breaks
 			for (int i = 0; i < vehicleModel->m_tractionTiresCount; i ++) {
 				vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
 			}
 		}
-
+		dAssert (0);
+/*
 		// update steering wheels
 		if (vehicleModel->m_rearTiresCount) {
 			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetJointAngle_1();
@@ -350,7 +352,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
 			}
 		}
-
+*/
 		// set the base turn angle
 		if (vehicleModel->m_angularActuatorsCount1) {
 			dFloat turnAngle = vehicleModel->m_turnAngle;
@@ -415,6 +417,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		// open Close palette position
 		if (vehicleModel->m_universalActuatorsCount) {
+			dAssert (0);
+/*
 			dFloat posit0 = vehicleModel->m_wristAxis0;
 			if (vehicleModel->m_inputs.m_wristAxis0 > 0) {
 				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_0();
@@ -437,6 +441,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 				vehicleModel->m_universalActuator[i]->SetTargetAngle0(posit0);
 				vehicleModel->m_universalActuator[i]->SetTargetAngle1(posit1);
 			}
+*/
 		}
 	}
 
@@ -684,8 +689,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		engineAxis.m_posit = engineMatrix.m_posit;
 
 		dCustomUniversal* const engineJoint = new dCustomUniversal(engineAxis, engineBody, chassis);
-		engineJoint->EnableLimit_0(false);
-		engineJoint->EnableLimit_1(false);
+		dAssert (0);
+//		engineJoint->EnableLimit_0(false);
+//		engineJoint->EnableLimit_1(false);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(engineBody), bone);
@@ -1367,7 +1373,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
 
 		vehicleModel->m_maxTurmAccel = 10.0f;
-		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
+		dAssert (0);
+//		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
 
 		AddCraneBase (controller);
 		MakeLeftTrack (controller);

@@ -297,11 +297,11 @@ void dCustomSlidingContact::EnableAngularLimits(bool state)
 	m_options = (m_options & ~(1 << D_SLIDINGCONTACT_LIMIT_FLAG)) | (int(state) << D_SLIDINGCONTACT_LIMIT_FLAG);
 }
 
-void dCustomSlidingContact::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+void dCustomSlidingContact::SetAsAngularSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
-	m_spring = spring;
-	m_damper = damper;
-	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
+	m_angularSpring = spring;
+	m_angularDamper = damper;
+	m_angularSpringDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
 	m_options = (m_options & ~(1 << D_SLIDINGCONTACT_SPRING_DAMPER_FLAG)) | (int(state) << D_SLIDINGCONTACT_SPRING_DAMPER_FLAG);
 }
 
@@ -313,7 +313,7 @@ void dCustomSlidingContact::SetAngularLimits(dFloat minDist, dFloat maxDist)
 
 void dCustomSlidingContact::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	NewtonUserJointAddAngularRow(m_joint, -m_curJointAngle.GetAngle(), &matrix1.m_front[0]);
+	NewtonUserJointAddAngularRow(m_joint, -m_curJointAngle.GetAngle(), &matrix1.m_up[0]);
 	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_angularSpringDamperRelaxation, m_angularSpring, m_angularDamper);
 }
 
@@ -321,7 +321,7 @@ void dCustomSlidingContact::SubmitConstraintLimits(const dMatrix& matrix0, const
 {
 	dFloat angle = m_curJointAngle.GetAngle() + m_angularOmega * timestep;
 	if (angle < m_minAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 
@@ -330,7 +330,7 @@ void dCustomSlidingContact::SubmitConstraintLimits(const dMatrix& matrix0, const
 		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 	} else if (angle > m_maxAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
@@ -340,7 +340,7 @@ void dCustomSlidingContact::SubmitConstraintLimits(const dMatrix& matrix0, const
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else if (m_angularFriction != 0.0f) {
-		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
@@ -352,7 +352,7 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 {
 	dFloat angle = m_curJointAngle.GetAngle() + m_angularOmega * timestep;
 	if (angle < m_minAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 
@@ -363,7 +363,7 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else if (angle > m_maxAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
@@ -377,7 +377,6 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 		dCustomSlidingContact::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	}
 }
-
 
 void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
@@ -404,7 +403,7 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	}
 	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1[1]);
 
-/*
+
 	int limitsOn = m_options & (1 << D_SLIDINGCONTACT_LIMIT_FLAG);
 	int setAsSpringDamper = m_options & (1 << D_SLIDINGCONTACT_SPRING_DAMPER_FLAG);
 	if (limitsOn) {
@@ -416,13 +415,12 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	} else if (setAsSpringDamper) {
 		dCustomSlidingContact::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	} else if (m_angularFriction != 0.0f) {
-		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 	}
-*/
 }
 
 

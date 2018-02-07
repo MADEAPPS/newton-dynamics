@@ -194,7 +194,7 @@ void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix&
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 	} else if (angle > m_maxAngle) {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 
 		const dFloat invtimestep = 1.0f / timestep;
@@ -241,6 +241,14 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 	}
 }
 
+void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+{
+	NewtonUserJointAddAngularRow(m_joint, -eulers[1], &matrix1[1][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &matrix1[2][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+}
+
 void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -259,12 +267,7 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector euler0;
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-
-	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
+	SubmitAngularRow(matrix0, matrix1, euler0, timestep);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(euler0.m_x);

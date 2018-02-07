@@ -233,8 +233,8 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 {
 	dVector size (1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
-	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f- size.m_y * 2.0f, 0.0f, 0.0f), size);
+//	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
+//	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f- size.m_y * 2.0f, 0.0f, 0.0f), size);
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
@@ -324,6 +324,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
+/*
 	joint1->EnableLimit_0(true);
 	joint1->SetLimits_0 (-5.0f * dPi, 2.0f * dPi);
 	joint1->EnableLimit_1(true);
@@ -336,6 +337,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	joint2->SetLimits_0 (-3.0f * dPi, 5.0f * dPi);
 	joint2->EnableLimit_1(true);
 	joint2->SetLimits_1(-4.0f * dPi, 2.0f * dPi);
+*/
 }
 
 class JoesRagdollJoint: public dCustomBallAndSocket
@@ -676,6 +678,7 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 	dCustomSlidingContact* const slider = new dCustomSlidingContact(jointMatrix, box1, box0);
 	slider->EnableLimits (true);
 	slider->SetLimits (-4.0f, 4.0f);
+	slider->SetAsSpringDamper(true, 0.7f, 80.0f, 0.0f);
 
 	// enable limit of first axis
 	slider->EnableAngularLimits(true);
@@ -1298,8 +1301,8 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
 //	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
 //	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
-	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 15.0f));
-//	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 15.0f));
+	AddUniversal (scene, dVector (-20.0f, 0.0f, 17.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));

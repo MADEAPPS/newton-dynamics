@@ -24,327 +24,257 @@
 //dInitRtti(dCustomUniversal);
 IMPLEMENT_CUSTOM_JOINT(dCustomUniversal);
 
+#define D_UNIVERSAL_LIMIT_FLAG			8
+#define D_UNIVERSAL_SPRING_DAMPER_FLAG	9
+
 dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
-	,m_curJointAngle_0()
-	,m_curJointAngle_1()
-	,m_flags(0)
+	:dCustomHinge(pinAndPivotFrame, child, parent)
+	,m_curJointAngle2()
+	,m_minAngle2(-45.0f * dDegreeToRad)
+	,m_maxAngle2(45.0f * dDegreeToRad)
+	,m_friction2(0.0f)
+	,m_jointOmega2(0.0f)
+	,m_spring2(0.0f)
+	,m_damper2(0.0f)
+	,m_springDamperRelaxation2(0.9f)
 {
-	// calculate the relative matrix of the pin and pivot on each body
-	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
-
-	m_actuator_0 = false;
-	m_actuator_1 = false;
-
-	m_limit_0_On = true;
-	m_angularMotor_0_On = false;
-	m_angularDamp_0 = 0.5f;
-	m_angularAccel_0 = -4.0f;
-	m_jointOmega_0 = 0.0f;
-	m_minAngle_0 = -45.0f * dDegreeToRad;
-	m_maxAngle_0 =  45.0f * dDegreeToRad;
-
-	m_limit_1_On = true;
-	m_angularMotor_1_On = false; 
-	m_angularDamp_1 = 0.3f;
-	m_angularAccel_1 = -4.0f;
-	m_jointOmega_1 = 0.0f;
-	m_minAngle_1 = -45.0f * dDegreeToRad;
-	m_maxAngle_1 =  45.0f * dDegreeToRad;
 }
 
-void dCustomUniversal::Deserialize (NewtonDeserializeCallback callback, void* const userData) 
+
+dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomHinge(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
+	,m_curJointAngle2()
+	,m_minAngle2(-45.0f * dDegreeToRad)
+	,m_maxAngle2(45.0f * dDegreeToRad)
+	,m_friction2(0.0f)
+	,m_jointOmega2(0.0f)
+	,m_spring2(0.0f)
+	,m_damper2(0.0f)
+	,m_springDamperRelaxation2(0.9f)
 {
-	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
-	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
-
-	callback(userData, &m_minAngle_0, sizeof(dFloat));
-	callback(userData, &m_maxAngle_0, sizeof(dFloat));
-	callback(userData, &m_jointOmega_0, sizeof(dFloat));
-	callback(userData, &m_angularDamp_0, sizeof(dFloat));
-	callback(userData, &m_angularAccel_0, sizeof(dFloat));
-
-	callback(userData, &m_minAngle_1, sizeof(dFloat));
-	callback(userData, &m_maxAngle_1, sizeof(dFloat));
-	callback(userData, &m_jointOmega_1, sizeof(dFloat));
-	callback(userData, &m_angularDamp_1, sizeof(dFloat));
-	callback(userData, &m_angularAccel_1, sizeof(dFloat));
-
-	callback(userData, &m_flags, sizeof(int));
-}
-
-void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
-{
-	dCustomJoint::Serialize(callback, userData);
-
-	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
-	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
-
-	callback(userData, &m_minAngle_0, sizeof(dFloat));
-	callback(userData, &m_maxAngle_0, sizeof(dFloat));
-	callback(userData, &m_jointOmega_0, sizeof(dFloat));
-	callback(userData, &m_angularDamp_0, sizeof(dFloat));
-	callback(userData, &m_angularAccel_0, sizeof(dFloat));
-
-	callback(userData, &m_minAngle_1, sizeof(dFloat));
-	callback(userData, &m_maxAngle_1, sizeof(dFloat));
-	callback(userData, &m_jointOmega_1, sizeof(dFloat));
-	callback(userData, &m_angularDamp_1, sizeof(dFloat));
-	callback(userData, &m_angularAccel_1, sizeof(dFloat));
-
-	callback(userData, &m_flags, sizeof(int));
 }
 
 dCustomUniversal::~dCustomUniversal()
 {
 }
 
-
-void dCustomUniversal::EnableLimit_0(bool state)
+void dCustomUniversal::Deserialize(NewtonDeserializeCallback callback, void* const userData)
 {
-	m_limit_0_On = state;
+	callback(userData, &m_curJointAngle2, sizeof(dAngularIntegration));
+	callback(userData, &m_minAngle2, sizeof(dFloat));
+	callback(userData, &m_maxAngle2, sizeof(dFloat));
+	callback(userData, &m_friction2, sizeof(dFloat));
+	callback(userData, &m_jointOmega2, sizeof(dFloat));
+	callback(userData, &m_spring2, sizeof(dFloat));
+	callback(userData, &m_damper2, sizeof(dFloat));
+	callback(userData, &m_springDamperRelaxation2, sizeof(dFloat));
 }
 
-void dCustomUniversal::EnableLimit_1(bool state)
+void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	m_limit_1_On = state;
-}
-
-void dCustomUniversal::EnableMotor_0(bool state)
-{
-	m_angularMotor_0_On = state;
-}
-
-void dCustomUniversal::EnableMotor_1(bool state)
-{
-	m_angularMotor_1_On = state;
-}
-
-void dCustomUniversal::SetAccel_0(dFloat accel)
-{
-	m_angularAccel_0 = accel;
-}
-
-void dCustomUniversal::SetDamp_0(dFloat damp)
-{
-	m_angularDamp_0 = damp;
+	dCustomJoint::Serialize(callback, userData);
+	callback(userData, &m_curJointAngle2, sizeof(dAngularIntegration));
+	callback(userData, &m_minAngle2, sizeof(dFloat));
+	callback(userData, &m_maxAngle2, sizeof(dFloat));
+	callback(userData, &m_friction2, sizeof(dFloat));
+	callback(userData, &m_jointOmega2, sizeof(dFloat));
+	callback(userData, &m_spring2, sizeof(dFloat));
+	callback(userData, &m_damper2, sizeof(dFloat));
+	callback(userData, &m_springDamperRelaxation2, sizeof(dFloat));
 }
 
 
-void dCustomUniversal::SetAccel_1(dFloat accel)
+void dCustomUniversal::EnableLimits2(bool state)
 {
-	m_angularAccel_1 = accel;
+//	m_limitsOn = state;
+	m_options = (m_options & ~(1<<D_UNIVERSAL_LIMIT_FLAG)) | (int(state) << D_UNIVERSAL_LIMIT_FLAG);
 }
 
-void dCustomUniversal::SetDamp_1(dFloat damp)
+void dCustomUniversal::SetLimits2(dFloat minAngle, dFloat maxAngle)
 {
-	m_angularDamp_1 = damp;
+	m_minAngle2 = -dAbs(minAngle);
+	m_maxAngle2 = dAbs(maxAngle);
 }
 
-void dCustomUniversal::SetLimits_0(dFloat minAngle, dFloat maxAngle)
+void dCustomUniversal::SetAsSpringDamper2(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
-	dAssert (minAngle < 0.0f);
-	dAssert (maxAngle > 0.0f);
-
-	m_minAngle_0 = minAngle;
-	m_maxAngle_0 = maxAngle;
+	m_spring2 = spring;
+	m_damper2 = damper;
+	m_springDamperRelaxation2 = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
+	m_options = (m_options & ~(1 << D_UNIVERSAL_SPRING_DAMPER_FLAG)) | (int(state) << D_UNIVERSAL_SPRING_DAMPER_FLAG);
 }
 
-dFloat dCustomUniversal::GetMinAngularLimit_0() const
+dFloat dCustomUniversal::GetJointAngle2() const
 {
-	return m_minAngle_0;
+	return m_curJointAngle2.GetAngle();
 }
 
-dFloat dCustomUniversal::GetMaxAngularLimit_0() const
+dVector dCustomUniversal::GetPinAxis2() const
 {
-	return m_maxAngle_0;
+	dMatrix matrix;
+	NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
+dAssert (0);
+	return matrix.RotateVector(m_localMatrix0.m_front);
 }
 
-void dCustomUniversal::SetLimits_1(dFloat minAngle, dFloat maxAngle)
+dFloat dCustomUniversal::GetJointOmega2() const
 {
-	dAssert (minAngle < 0.0f);
-	dAssert (maxAngle > 0.0f);
-
-	m_minAngle_1 = minAngle;
-	m_maxAngle_1 = maxAngle;
+	return m_jointOmega2;
 }
 
-dFloat dCustomUniversal::GetMinAngularLimit_1() const
+void dCustomUniversal::SetFriction2(dFloat frictionTorque)
 {
-	return m_minAngle_1;
+	m_friction2 = frictionTorque;
 }
 
-dFloat dCustomUniversal::GetMaxAngularLimit_1() const
+dFloat dCustomUniversal::GetFriction2() const
 {
-	return m_maxAngle_1;
+	return m_friction2;
 }
 
-
-dFloat dCustomUniversal::GetJointAngle_0 () const
+void dCustomUniversal::Debug(dDebugDisplay* const debugDisplay) const
 {
-	return -m_curJointAngle_0.GetAngle();
-}
-
-dFloat dCustomUniversal::GetJointAngle_1 () const
-{
-	return -m_curJointAngle_1.GetAngle();
-}
-
-dFloat dCustomUniversal::GetJointOmega_0 () const
-{
-	return m_jointOmega_0;
-}
-
-dFloat dCustomUniversal::GetJointOmega_1 () const
-{
-	return m_jointOmega_1;
-}
-
-dVector dCustomUniversal::GetPinAxis_0 () const
-{
+	dCustomHinge::Debug(debugDisplay);
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
-	CalculateGlobalMatrix (matrix0, matrix1);
-	return matrix0.m_front;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const int subdiv = 12;
+	dVector arch[subdiv + 1];
+	const float radius = debugDisplay->m_debugScale;
+
+	if ((m_maxAngle > 1.0e-3f) || (m_minAngle < -1.0e-3f)) {
+		// show pitch angle limits
+		dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
+
+		dFloat minAngle = m_minAngle;
+		dFloat maxAngle = m_maxAngle;
+		if ((maxAngle - minAngle) >= dPi * 2.0f) {
+			minAngle = 0.0f;
+			maxAngle = dPi * 2.0f;
+		}
+
+		dFloat angleStep = (maxAngle - minAngle) / subdiv;
+		dFloat angle0 = minAngle;
+
+		matrix1.m_posit = matrix0.m_posit;
+		debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+		for (int i = 0; i <= subdiv; i++) {
+			arch[i] = matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+			debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
+			angle0 += angleStep;
+		}
+
+		for (int i = 0; i < subdiv; i++) {
+			debugDisplay->DrawLine(arch[i], arch[i + 1]);
+		}
+	}
+*/
 }
 
-dVector dCustomUniversal::GetPinAxis_1 () const
+
+void dCustomUniversal::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix (matrix0, matrix1);
-	return matrix1.m_up;
+	NewtonUserJointAddAngularRow(m_joint, -m_curJointAngle2.GetAngle(), &matrix1.m_up[0]);
+	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation2, m_spring2, m_damper2);
+}
+
+void dCustomUniversal::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dFloat angle = m_curJointAngle2.GetAngle() + m_jointOmega2 * timestep;
+	if (angle < m_minAngle2) {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction2);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_minAngle2 - m_curJointAngle2.GetAngle()) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+	} else if (angle > m_maxAngle2) {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_maxAngle2 - m_curJointAngle2.GetAngle()) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+
+	} else if (m_friction != 0.0f) {
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega2 / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction2);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction2);
+	}
+}
+
+void dCustomUniversal::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dFloat angle = m_curJointAngle2.GetAngle() + m_jointOmega2 * timestep;
+	if (angle < m_minAngle2) {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction2);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_minAngle2 - m_curJointAngle2.GetAngle()) * invtimestep;
+		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring2, m_curJointAngle2.GetAngle(), m_damper2, m_jointOmega2);
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+
+	} else if (angle > m_maxAngle2) {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction2);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_maxAngle2 - m_curJointAngle2.GetAngle()) * invtimestep;
+		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring2, m_curJointAngle2.GetAngle(), m_damper2, m_jointOmega2);
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+
+	} else {
+		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+	}
 }
 
 
-void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
+void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	dMatrix matrix (dYawMatrix(eulers[1]) * matrix1);
+	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &matrix[2][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (matrix0, matrix1);
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	m_curJointAngle.Update(eulers.m_y);
 
-	// Restrict the movement on the pivot point along all tree orthonormal direction
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
-
-	// construct an orthogonal coordinate system with these two vectors
-	dMatrix matrix1_1;
-	matrix1_1.m_up = matrix1.m_up;
-	matrix1_1.m_right = matrix0.m_front.CrossProduct(matrix1.m_up);
-	dAssert (matrix1_1.m_right.DotProduct3(matrix1_1.m_right) > 0.0f);
-	matrix1_1.m_right = matrix1_1.m_right.Scale (1.0f / dSqrt (matrix1_1.m_right.DotProduct3(matrix1_1.m_right)));
-	matrix1_1.m_front = matrix1_1.m_up.CrossProduct(matrix1_1.m_right);
-	
-
-	// override the normal right side  because the joint is too week due to centripetal accelerations
+	// save the current joint Omega
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	dVector relOmega(omega0 - omega1);
+	m_jointOmega2 = (omega0 - omega1).DotProduct3(matrix1.m_up);
 
-	dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
-	dFloat omega = (relOmega.DotProduct3(matrix1_1.m_right));
-	dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);
-	
-	NewtonUserJointAddAngularRow (m_joint, -angle, &matrix1_1.m_right[0]);
-	NewtonUserJointSetRowAcceleration (m_joint, alphaError);
-	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-	dFloat sinAngle_0;
-	dFloat cosAngle_0;
-	CalculateAngle (matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front, sinAngle_0, cosAngle_0);
-	dFloat angle0 = -m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
-
-	dFloat sinAngle_1;
-	dFloat cosAngle_1;
-	CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
-	dFloat angle1 = -m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
-
-	// calculate the desired acceleration
-	m_jointOmega_0 = relOmega.DotProduct3(matrix0.m_front);
-	m_jointOmega_1 = relOmega.DotProduct3(matrix1.m_up);
-	
-	// check is the joint limit are enable
-	if (m_limit_0_On) {
-		if (angle0 < m_minAngle_0) {
-			dFloat relAngle = angle0 - m_minAngle_0;
-
-			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
-
-			// need high stiffeners here
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-			// allow the joint to move back freely
-			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-
-		} else if (angle0 > m_maxAngle_0) {
-			dFloat relAngle = angle0 - m_maxAngle_0;
-
-			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
-
-			// need high stiffness here
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-			// allow the joint to move back freely 
-			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+	int limitsOn = m_options & (1 << D_UNIVERSAL_LIMIT_FLAG);
+	int setAsSpringDamper = m_options & (1 << D_UNIVERSAL_SPRING_DAMPER_FLAG);
+	if (limitsOn) {
+		if (setAsSpringDamper) {
+			dCustomUniversal::SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
+		} else {
+			dCustomUniversal::SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
-
-		// check is the joint limit motor is enable
-	} else if (m_angularMotor_0_On) {
-		// calculate the desired acceleration
-//		dFloat relOmega = (omega0 - omega1) % matrix0.m_front;
-		dFloat relAccel = m_angularAccel_0 - m_angularDamp_0 * m_jointOmega_0;
-
-		// add and angular constraint row to that will set the relative acceleration to zero
-		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_front[0]);
-
-		// override the joint acceleration.
-		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
-	}
-
-	// if limit are enable ...
-	if (m_limit_1_On) {
-		if (angle1 < m_minAngle_1) {
-			dFloat relAngle = angle1 - m_minAngle_1;
-
-			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
-
-			// need high stiffeners here
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-			// allow the joint to move back freely 
-			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-
-		} else if (angle1 > m_maxAngle_1) {
-			dFloat relAngle = angle1 - m_maxAngle_1;
-			
-			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
-
-			// need high stiffness here
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-			// allow the joint to move back freely
-			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-  		}
-	} else if (m_angularMotor_1_On) {
-		// calculate the desired acceleration
-		dFloat relAccel = m_angularAccel_1 - m_angularDamp_1 * m_jointOmega_1;
-
-		// add and angular constraint row to that will set the relative acceleration to zero
-		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix1.m_up[0]);
-		
-		// override the joint acceleration.
-		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
+	} else if (m_setAsSpringDamper) {
+		dCustomUniversal::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+	} else if (m_friction != 0.0f) {
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega2 / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 	}
 }
-

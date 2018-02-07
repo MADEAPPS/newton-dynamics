@@ -29,8 +29,7 @@ class dCustomSlidingContact: public dCustomSlider
 
 	CUSTOM_JOINTS_API void EnableAngularLimits(bool state);
 	CUSTOM_JOINTS_API void SetAngularLimits(dFloat minAngle, dFloat maxAngle);
-
-	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
+	CUSTOM_JOINTS_API void SetAsAngularSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 protected:
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);

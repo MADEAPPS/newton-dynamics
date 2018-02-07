@@ -169,12 +169,14 @@ dDifferentialMountJoint::dDifferentialMountJoint(const dMatrix& pinAndPivotFrame
 {
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
-
+	dAssert (0);
+/*
 	EnableLimit_0(false);
 	EnableLimit_1(false);
 	NewtonBodyGetMatrix(differentialBody, &engineMatrix[0][0]);
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
+*/
 }
 
 void dDifferentialMountJoint::ResetTransform()
@@ -272,6 +274,8 @@ dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBo
 	,m_turnSpeed(0.0f)
 	,m_isTractionDifferential(false)
 {
+	dAssert (0);
+/*
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
 
@@ -280,6 +284,7 @@ dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBo
 	NewtonBodyGetMatrix(differentialBody, &engineMatrix[0][0]);
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
+*/
 }
 
 void dDifferentialJoint::ResetTransform()

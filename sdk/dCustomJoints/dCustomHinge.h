@@ -31,17 +31,16 @@ class dCustomHinge: public dCustomJoint
 	CUSTOM_JOINTS_API dFloat GetJointAngle () const;
 	CUSTOM_JOINTS_API dVector GetPinAxis () const;
 	CUSTOM_JOINTS_API dFloat GetJointOmega () const;
-
-	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
-
+	CUSTOM_JOINTS_API dFloat GetFriction () const;	
 	CUSTOM_JOINTS_API void SetFriction (dFloat frictionTorque);
-	CUSTOM_JOINTS_API dFloat GetFriction () const;
+	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
 	
 	void SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);

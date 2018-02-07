@@ -27,6 +27,8 @@ dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFr
 	,m_angularRate1(angularRate1)
     ,m_maxForce1(D_CUSTOM_LARGE_VALUE)
 {
+	dAssert (0);
+/*
 	EnableLimit_0(false);
 	EnableLimit_1(false);
 
@@ -36,6 +38,7 @@ dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFr
 	m_maxAngle_0 = maxAngle0;
 	m_minAngle_1 = minAngle1;
 	m_maxAngle_1 = maxAngle1;
+*/
 }
 
 
@@ -48,6 +51,8 @@ dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFra
 	,m_angularRate1(0.0f)
 	,m_maxForce1(D_CUSTOM_LARGE_VALUE)
 {
+	dAssert(0);
+	/*
 	EnableLimit_0(false);
 	EnableLimit_1(false);
 
@@ -57,7 +62,7 @@ dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFra
 	m_maxAngle_0 = 0.0f;
 	m_minAngle_1 = 0.0f;
 	m_maxAngle_1 = 0.0f;
-
+*/
 }
 
 
@@ -87,7 +92,9 @@ void dCustomUniversalActuator::Deserialize(NewtonDeserializeCallback callback, v
 
 bool dCustomUniversalActuator::GetEnableFlag0 () const
 {
-	return m_actuator_0;
+	dAssert(0);
+//	return m_actuator_0;
+	return 0;
 }
 
 dFloat dCustomUniversalActuator::GetTargetAngle0() const
@@ -103,7 +110,9 @@ dFloat dCustomUniversalActuator::GetAngularRate0() const
 
 bool dCustomUniversalActuator::GetEnableFlag1 () const
 {
-	return m_actuator_1;
+	dAssert(0);
+//	return m_actuator_1;
+	return 0;
 }
 
 dFloat dCustomUniversalActuator::GetTargetAngle1() const
@@ -119,12 +128,14 @@ dFloat dCustomUniversalActuator::GetAngularRate1() const
 
 void dCustomUniversalActuator::SetEnableFlag0 (bool flag)
 {
-	m_actuator_0 = flag;
+	dAssert(0);
+//	m_actuator_0 = flag;
 }
 
 void dCustomUniversalActuator::SetTargetAngle0(dFloat angle)
 {
-	m_angle0 = dClamp (angle, m_minAngle_0, m_maxAngle_0);
+	dAssert(0);
+//	m_angle0 = dClamp (angle, m_minAngle_0, m_maxAngle_0);
 }
 
 
@@ -146,12 +157,14 @@ void dCustomUniversalActuator::SetAngularRate0(dFloat rate)
 
 void dCustomUniversalActuator::SetEnableFlag1 (bool flag)
 {
-	m_actuator_1 = flag;
+	dAssert(0);
+//	m_actuator_1 = flag;
 }
 
 void dCustomUniversalActuator::SetTargetAngle1(dFloat angle)
 {
-	m_angle1 = dClamp (angle, m_minAngle_1, m_maxAngle_1);
+	dAssert(0);
+//	m_angle1 = dClamp (angle, m_minAngle_1, m_maxAngle_1);
 }
 
 
@@ -173,6 +186,8 @@ void dCustomUniversalActuator::SetMaxTorquePower1(dFloat force)
 
 void dCustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 {
+	dAssert(0);
+/*
 	dCustomUniversal::SubmitConstraints (timestep, threadIndex);
 
 	if (m_actuator_0 | m_actuator_1){
@@ -213,6 +228,7 @@ void dCustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInd
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 		}
 	}
+*/
 }
 
 
