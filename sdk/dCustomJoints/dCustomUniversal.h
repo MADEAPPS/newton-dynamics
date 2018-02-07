@@ -35,6 +35,8 @@ class dCustomUniversal: public dCustomHinge
 	CUSTOM_JOINTS_API void SetFriction2(dFloat frictionTorque);
 	CUSTOM_JOINTS_API void SetAsSpringDamper2(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
+	CUSTOM_JOINTS_API void SetHardMiddleAxis(bool state);
+
 	protected:
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);

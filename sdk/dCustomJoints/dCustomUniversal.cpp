@@ -36,6 +36,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 	,m_damper2(0.0f)
 	,m_springDamperRelaxation2(0.9f)
 {
+	m_options.m_option4 = -1;
 }
 
 
@@ -50,6 +51,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const d
 	,m_damper2(0.0f)
 	,m_springDamperRelaxation2(0.9f)
 {
+	m_options.m_option4 = -1;
 }
 
 dCustomUniversal::~dCustomUniversal()
@@ -81,6 +83,11 @@ void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const u
 	callback(userData, &m_springDamperRelaxation2, sizeof(dFloat));
 }
 
+
+void dCustomUniversal::SetHardMiddleAxis(bool state)
+{
+	m_options.m_option4 = state;
+}
 
 void dCustomUniversal::EnableLimits2(bool state)
 {
@@ -257,12 +264,11 @@ void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	dMatrix rollMatrix(dYawMatrix(eulers[1]) * matrix1);
 	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &rollMatrix.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	if (1) {
+	if (m_options.m_option4) {
 		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
 		dFloat alphaRollError = -(eulers[2] + rollOmega * timestep) / (timestep * timestep);
 		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
 	}
-
 
 	if (m_options.m_option2) {
 		if (m_options.m_option3) {
