@@ -27,8 +27,9 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_pitch()
 	,m_yaw()
 	,m_roll()
-	,m_mask(0x3f)
+	,m_options()
 {
+	m_options.m_value = 0x3f;
 //static int xxxxx;
 //xxxx = xxxxx++;
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -41,9 +42,11 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& p
 	,m_pitch()
 	,m_yaw()
 	,m_roll()
-	,m_mask(0x3f)
+	,m_options()
 {
 	dMatrix dummy;
+
+	m_options.m_value = 0x3f;
 	CalculateLocalMatrix(pinAndPivotChildFrame, m_localMatrix0, dummy);
 	CalculateLocalMatrix(pinAndPivotParentFrame, dummy, m_localMatrix1);
 }
@@ -59,7 +62,7 @@ void dCustom6dof::Deserialize (NewtonDeserializeCallback callback, void* const u
 	callback(userData, &m_yaw, sizeof(m_yaw));
 	callback(userData, &m_roll, sizeof(m_roll));
 	callback(userData, &m_pitch, sizeof(m_pitch));
-	callback(userData, &m_mask, sizeof(m_mask));
+	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userData) const
@@ -70,37 +73,43 @@ void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userD
 	callback(userData, &m_yaw, sizeof(m_yaw));
 	callback(userData, &m_roll, sizeof(m_roll));
 	callback(userData, &m_pitch, sizeof(m_pitch));
-	callback(userData, &m_mask, sizeof(m_mask));
+	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustom6dof::DisableAxisX()
 {
-	m_xAxis = 0;
+	dAssert(0);
+//	m_xAxis = 0;
 }
 
 void dCustom6dof::DisableAxisY()
 {
-	m_yAxis = 0;
+	dAssert(0);
+//	m_yAxis = 0;
 }
 
 void dCustom6dof::DisableAxisZ()
 {
-	m_zAxis = 0;
+	dAssert(0);
+//	m_zAxis = 0;
 }
 
 void dCustom6dof::DisableRotationX()
 {
-	m_pitchAxis = 0;
+	dAssert(0);
+//	m_pitchAxis = 0;
 }
 
 void dCustom6dof::DisableRotationY()
 {
-	m_yawAxis = 0;
+	dAssert(0);
+//	m_yawAxis = 0;
 }
 
 void dCustom6dof::DisableRotationZ()
 {
-	m_rollAxis = 0;
+	dAssert(0);
+//	m_rollAxis = 0;
 }
 
 void dCustom6dof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
@@ -298,6 +307,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 {
+	dAssert(0);
+#if 0
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -455,5 +466,7 @@ xxxxxxxxx++;
 	if (freedof != 6) {
 		SubmitConstraintsFreeDof(6 - freedof, matrix0, matrix1, timestep, threadIndex);
 	}
+
+#endif
 }
 

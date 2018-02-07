@@ -78,7 +78,8 @@ class dCustom6dof: public dCustomJoint
 	dAngleData m_pitch;
 	dAngleData m_yaw;
 	dAngleData m_roll;
-
+	dOptions m_options;
+/*
 	union
 	{
 		int m_mask;
@@ -92,7 +93,7 @@ class dCustom6dof: public dCustomJoint
 			int m_rollAxis : 1;
 		};
 	};
-
+*/
 
 	DECLARE_CUSTOM_JOINT(dCustom6dof, dCustomJoint)
 };

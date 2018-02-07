@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-
 IMPLEMENT_CUSTOM_JOINT(dCustomBallAndSocket);
+
+#if 0
 IMPLEMENT_CUSTOM_JOINT(dCustomLimitBallAndSocket);
 IMPLEMENT_CUSTOM_JOINT(dCustomControlledBallAndSocket);
 
@@ -449,58 +449,10 @@ void dCustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thr
 #endif
 }
 
+#endif
 
 #if 0
 
-
-dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
-{
-	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
-}
-
-dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(6, child, parent)
-{
-	dMatrix	dummy;
-	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
-	CalculateLocalMatrix(pinAndPivotFrame1, dummy, m_localMatrix1);
-}
-
-dCustomBallAndSocket::~dCustomBallAndSocket()
-{
-}
-
-void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void* const userData)
-{
-}
-
-void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* const userData) const
-{
-	dCustomJoint::Serialize(callback, userData);
-}
-
-void dCustomBallAndSocket::SubmitLinearRows (const dMatrix& matrix0, const dMatrix& matrix1) const
-{
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-
-	for (int i = 0; i < 3; i++) {
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	}
-}
-
-void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	SubmitLinearRows (matrix0, matrix1);
-}
 
 
 //***********************
@@ -801,3 +753,89 @@ void dCustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInd
 
 
 #endif
+
+
+
+
+dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomJoint(6, child, parent)
+	,m_twistAngle(0.0f)
+	,m_minTwistAngle(-180.0 * dDegreeToRad)
+	,m_maxTwistAngle(180.0 * dDegreeToRad)
+	,m_twistFriction(0.0f)
+	,m_options()
+{
+	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+}
+
+dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomJoint(6, child, parent)
+	,m_twistAngle(0.0f)
+	,m_minTwistAngle(-180.0 * dDegreeToRad)
+	,m_maxTwistAngle(180.0 * dDegreeToRad)
+	,m_twistFriction(0.0f)
+	,m_options()
+{
+	dMatrix	dummy;
+	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
+	CalculateLocalMatrix(pinAndPivotFrame1, dummy, m_localMatrix1);
+}
+
+dCustomBallAndSocket::~dCustomBallAndSocket()
+{
+}
+
+void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void* const userData)
+{
+	callback(userData, &m_twistAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_minTwistAngle, sizeof(dFloat));
+	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
+	callback(userData, &m_twistFriction, sizeof(dFloat));
+	callback(userData, &m_options, sizeof(m_options));
+}
+
+void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomJoint::Serialize(callback, userData);
+
+	callback(userData, &m_twistAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_minTwistAngle, sizeof(dFloat));
+	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
+	callback(userData, &m_twistFriction, sizeof(dFloat));
+	callback(userData, &m_options, sizeof(m_options));
+}
+
+
+void dCustomBallAndSocket::EnableTwist(bool state)
+{
+	m_options.m_option0 = state;
+}
+
+void dCustomBallAndSocket::SetTwistLimits(dFloat minAngle, dFloat maxAngle)
+{
+	m_minTwistAngle = -dAbs (minAngle);
+	m_maxTwistAngle = dAbs(maxAngle);
+}
+
+void dCustomBallAndSocket::GetTwistLimits(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_minTwistAngle;
+	maxAngle = m_maxTwistAngle;
+}
+
+
+void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const dVector& p0 = matrix0.m_posit;
+	const dVector& p1 = matrix1.m_posit;
+	for (int i = 0; i < 3; i++) {
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
+}

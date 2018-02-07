@@ -192,8 +192,6 @@ static void AddFixDistance(DemoEntityManager* const scene, const dVector& origin
 
 static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVector& origin)
 {
-	dAssert (0);
-/*
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
 	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 5.0f, 0.0f, 0.0f), size);
@@ -207,7 +205,8 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
-	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket(pinMatrix, box0, base);
+	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket(pinMatrix, box0, base);
+/*
 	joint0->SetConeAngle (30.0f * dDegreeToRad);
 	joint0->SetTwistAngle (-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
 
@@ -324,21 +323,19 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
+	joint1->SetHardMiddleAxis(0);
 
-//	joint1->EnableLimit_0(true);
-//	joint1->SetLimits_0 (-5.0f * dPi, 2.0f * dPi);
-//	joint1->EnableLimit_1(true);
-//	joint1->SetLimits_1 (-3.0f * dPi, 4.0f * dPi);
+//	joint1->EnableLimits(true);
+	joint1->EnableLimits(false);
+	joint1->SetLimits (-5.0f * dPi, 2.0f * dPi);
 
-/*
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	dCustomUniversal* const joint2 = new dCustomUniversal(matrix, box2, box0);
-	joint2->EnableLimit_0(true);
-	joint2->SetLimits_0 (-3.0f * dPi, 5.0f * dPi);
-	joint2->EnableLimit_1(true);
-	joint2->SetLimits_1(-4.0f * dPi, 2.0f * dPi);
 
+//	joint2->EnableLimits2(true);
+	joint2->EnableLimits2(false);
+	joint2->SetLimits2 (-3.0f * dPi, 5.0f * dPi);
 
 	dVector damp(0.0f);
 	dVector omega (0.0f, 10.0f, 100.0f, 0.0f);
@@ -348,7 +345,6 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetAngularDamping(box1, &damp[0]);
 	NewtonBodySetLinearDamping(box2, 0.0f);
 	NewtonBodySetAngularDamping(box2, &damp[0]);
-*/
 }
 
 class JoesRagdollJoint: public dCustomBallAndSocket
@@ -1304,7 +1300,7 @@ void StandardJoints (DemoEntityManager* const scene)
 
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
