@@ -24,9 +24,6 @@ IMPLEMENT_CUSTOM_JOINT(dCustomCorkScrew);
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define D_CORKSCREW_LIMIT_FLAG			8
-#define D_CORKSCREW_SPRING_DAMPER_FLAG	9
-
 dCustomCorkScrew::dCustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
 	:dCustomSlider(pinAndPivotFrame, child, parent)
 	,m_curJointAngle()
@@ -86,15 +83,15 @@ void dCustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const 
 
 void dCustomCorkScrew::EnableAngularLimits(bool state)
 {
-	m_options = (m_options & ~(1<<D_CORKSCREW_LIMIT_FLAG)) | (int(state) << D_CORKSCREW_LIMIT_FLAG);
+	m_options.m_option2 = state;
 }
 
 void dCustomCorkScrew::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
 	m_spring = spring;
 	m_damper = damper;
+	m_options.m_option3 = state;
 	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
-	m_options = (m_options & ~(1 << D_CORKSCREW_SPRING_DAMPER_FLAG)) | (int(state) << D_CORKSCREW_SPRING_DAMPER_FLAG);
 }
 
 void dCustomCorkScrew::SetAngularLimits(dFloat minDist, dFloat maxDist)
@@ -195,15 +192,13 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	}
 	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
 
-	int limitsOn = m_options & (1 << D_CORKSCREW_LIMIT_FLAG);
-	int setAsSpringDamper = m_options & (1 << D_CORKSCREW_SPRING_DAMPER_FLAG);
-	if (limitsOn) {
-		if (setAsSpringDamper) {
+	if (m_options.m_option2) {
+		if (m_options.m_option3) {
 			dCustomCorkScrew::SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
 		} else {
 			dCustomCorkScrew::SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
-	} else if (setAsSpringDamper) {
+	} else if (m_options.m_option3) {
 		dCustomCorkScrew::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	} else if (m_angularFriction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);

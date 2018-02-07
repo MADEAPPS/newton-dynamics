@@ -32,7 +32,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options(0)
+	,m_options()
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -49,7 +49,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options(0)
+	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix (pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -90,7 +90,7 @@ void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const user
 
 void dCustomHinge::EnableLimits(bool state)
 {
-	m_limitsOn = state;
+	m_options.m_option0 = state;
 }
 
 void dCustomHinge::SetLimits(dFloat minAngle, dFloat maxAngle)
@@ -101,9 +101,9 @@ void dCustomHinge::SetLimits(dFloat minAngle, dFloat maxAngle)
 
 void dCustomHinge::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
-	m_setAsSpringDamper = state;
 	m_spring = spring;
 	m_damper = damper;
+	m_options.m_option1 = state;
 	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
 }
 
@@ -281,13 +281,13 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 	m_jointOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
 
-	if (m_limitsOn) {
-		if (m_setAsSpringDamper) {
+	if (m_options.m_option0) {
+		if (m_options.m_option1) {
 			SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
 		} else {
 			SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
-	} else if (m_setAsSpringDamper) {
+	} else if (m_options.m_option1) {
 		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	} else if (m_friction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);

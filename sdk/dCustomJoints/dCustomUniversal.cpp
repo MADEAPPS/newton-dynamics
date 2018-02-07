@@ -24,8 +24,6 @@
 //dInitRtti(dCustomUniversal);
 IMPLEMENT_CUSTOM_JOINT(dCustomUniversal);
 
-#define D_UNIVERSAL_LIMIT_FLAG			8
-#define D_UNIVERSAL_SPRING_DAMPER_FLAG	9
 
 dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge(pinAndPivotFrame, child, parent)
@@ -86,8 +84,7 @@ void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const u
 
 void dCustomUniversal::EnableLimits2(bool state)
 {
-//	m_limitsOn = state;
-	m_options = (m_options & ~(1<<D_UNIVERSAL_LIMIT_FLAG)) | (int(state) << D_UNIVERSAL_LIMIT_FLAG);
+	m_options.m_option2 = state;
 }
 
 void dCustomUniversal::SetLimits2(dFloat minAngle, dFloat maxAngle)
@@ -100,8 +97,8 @@ void dCustomUniversal::SetAsSpringDamper2(bool state, dFloat springDamperRelaxat
 {
 	m_spring2 = spring;
 	m_damper2 = damper;
+	m_options.m_option3 = state;
 	m_springDamperRelaxation2 = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
-	m_options = (m_options & ~(1 << D_UNIVERSAL_SPRING_DAMPER_FLAG)) | (int(state) << D_UNIVERSAL_SPRING_DAMPER_FLAG);
 }
 
 dFloat dCustomUniversal::GetJointAngle2() const
@@ -267,15 +264,13 @@ void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	}
 
 
-	int limitsOn = m_options & (1 << D_UNIVERSAL_LIMIT_FLAG);
-	int setAsSpringDamper = m_options & (1 << D_UNIVERSAL_SPRING_DAMPER_FLAG);
-	if (limitsOn) {
-		if (setAsSpringDamper) {
+	if (m_options.m_option2) {
+		if (m_options.m_option3) {
 			dCustomUniversal::SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
 		} else {
 			dCustomUniversal::SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
-	} else if (m_setAsSpringDamper) {
+	} else if (m_options.m_option3) {
 		dCustomUniversal::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	} else if (m_friction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);

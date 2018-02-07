@@ -33,7 +33,7 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options(0)
+	,m_options()
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -48,7 +48,7 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options(0)
+	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -90,7 +90,7 @@ void dCustomSlider::Serialize (NewtonSerializeCallback callback, void* const use
 
 void dCustomSlider::EnableLimits(bool state)
 {
-	m_limitsOn = state;
+	m_options.m_option0 = state;
 }
 
 void dCustomSlider::SetLimits(dFloat minDist, dFloat maxDist)
@@ -103,7 +103,7 @@ void dCustomSlider::SetAsSpringDamper(bool state, dFloat springDamperRelaxation,
 {
 	m_spring = spring;
 	m_damper = damper;
-	m_setAsSpringDamper = state;
+	m_options.m_option1 = state;
 	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.99f));
 }
 
@@ -234,13 +234,13 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_front);
 	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
 
-	if (m_limitsOn) {
-		if (m_setAsSpringDamper) {
+	if (m_options.m_option0) {
+		if (m_options.m_option1) {
 			SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
 		} else {
 			SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
-	} else if (m_setAsSpringDamper) {
+	} else if (m_options.m_option1) {
 		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	} else if (m_friction != 0.0f) {
 		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);

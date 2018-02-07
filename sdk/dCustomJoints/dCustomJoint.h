@@ -77,6 +77,26 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 class dCustomJoint: public dCustomAlloc  
 {
 	public:
+	class dOptions
+	{
+		public:
+		dOptions():m_value(0){}
+
+		union {
+			int m_value;
+			struct {
+				int m_option0 : 1;
+				int m_option1 : 1;
+				int m_option2 : 1;
+				int m_option3 : 1;
+				int m_option4 : 1;
+				int m_option5 : 1;
+				int m_option7 : 1;
+			};
+		};
+	};
+
+
 	class dDebugDisplay
 	{
 		public:

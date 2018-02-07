@@ -339,7 +339,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	joint2->EnableLimit_1(true);
 	joint2->SetLimits_1(-4.0f * dPi, 2.0f * dPi);
 
-
+*/
 	dVector damp(0.0f);
 	dVector omega (0.0f, 10.0f, 100.0f, 0.0f);
 	NewtonBodySetOmega(box1, &omega[0]);
@@ -348,7 +348,6 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetAngularDamping(box1, &damp[0]);
 	NewtonBodySetLinearDamping(box2, 0.0f);
 	NewtonBodySetAngularDamping(box2, &damp[0]);
-*/
 }
 
 class JoesRagdollJoint: public dCustomBallAndSocket
