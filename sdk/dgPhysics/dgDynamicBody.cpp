@@ -276,18 +276,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 
-			dgVector timeStepVect(timestep);
-			AddDampingAcceleration(timestep);
-			m_accel = m_externalForce.Scale4(m_invMass.m_w);
-			m_veloc += m_accel * timeStepVect;
 #if 0
-			// Simple Euler in global space not enough to cope with high angular velocities)
-			// alpha = I^-1 * (T - (w cross ((wl * Il) * R))
-			CalcInvInertiaMatrix();
-			dgVector gyroTorque(m_omega.CrossProduct3(CalculateAngularMomentum()));
-			m_alpha = m_invWorldInertiaMatrix.RotateVector(m_externalTorque - gyroTorque);
-			m_omega += m_alpha * timeStepVect;
-#elif 0
 			// Simple Euler in local space step not enough to cope with high angular velocities)
 			// localAlpha = (Tl - (wl x (wl * Il)) * Il^1
 			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
@@ -295,6 +284,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			dgVector angulaMomentum (m_mass * localOmega);
 			dgVector nextTorque (localTorque - localOmega.CrossProduct3(angulaMomentum));
 			dgVector localAlpha (nextTorque * m_invMass);
+			m_alpha = localAlpha * timeStepVect;
 			localOmega += localAlpha * timeStepVect;
 			m_omega = m_matrix.RotateVector(localOmega);
 #else
@@ -336,48 +326,43 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
 			dgVector localTorque (m_matrix.UnrotateVector(m_externalTorque));
-			dgVector angulaMomentum (m_mass * localOmega);
-			dgVector nextTorque (localTorque - localOmega.CrossProduct3(angulaMomentum));
+			localTorque -= localOmega.CrossProduct3(localOmega * m_mass); 
+			
+			dgFloat32 dt = dgFloat32 (0.5f) * timestep;
+			dgVector dw(localOmega.Scale4(dt));
 
-			const dgInt32 steps = 1;
-//			dgFloat32 dt = timestep/steps;
-			dgFloat32 dt = dgFloat32 (0.5f) * timestep / steps;
 			dgMatrix jacobianMatrix(dgGetIdentityMatrix());
-			for (dgInt32 i = 0; i < steps; i ++) {
-				dgVector dw(localOmega.Scale4(dt));
+			// calculates Jacobian matrix
+			//dWx / dwx = Ix
+			//dWx / dwy = (Iz - Iy) * wz * dt
+			//dWx / dwz = (Iz - Iy) * wy * dt
+			jacobianMatrix[0][0] = m_mass[0];
+			jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
+			jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
 
-				// calculates Jacobian matrix
-				//dWx / dwx = Ix
-				//dWx / dwy = (Iz - Iy) * wz * dt
-				//dWx / dwz = (Iz - Iy) * wy * dt
-				jacobianMatrix[0][0] = m_mass[0];
-				jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
-				jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
+			//dWy / dwx = (Ix - Iz) * wz * dt
+			//dWy / dwy = Iy				 
+			//dWy / dwz = (Ix - Iz) * wx * dt
+			jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
+			jacobianMatrix[1][1] = m_mass[1];
+			jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
 
-				//dWy / dwx = (Ix - Iz) * wz * dt
-				//dWy / dwy = Iy				 
-				//dWy / dwz = (Ix - Iz) * wx * dt
-				jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
-				jacobianMatrix[1][1] = m_mass[1];
-				jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
+			//dWz / dwx = (Iy - Ix) * wy * dt 
+			//dWz / dwy = (Iy - Ix) * wx * dt 
+			//dWz / dwz = Iz
+			jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
+			jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
+			jacobianMatrix[2][2] = m_mass[2];
 
-				//dWz / dwx = (Iy - Ix) * wy * dt 
-				//dWz / dwy = (Iy - Ix) * wx * dt 
-				//dWz / dwz = Iz
-				jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
-				jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
-				jacobianMatrix[2][2] = m_mass[2];
+			// calculate gradient
+			dgVector gradientStep (localTorque.Scale4(timestep)); 
+			dgSolveGaussian(4, &jacobianMatrix[0][0], &gradientStep[0]);
 
-				// calculate gradient
-				dgVector gradient (localTorque - localOmega.CrossProduct3(localOmega * m_mass)); 
-				dgVector gradientStep (gradient.Scale4(timestep)); 
-				dgSolveGaussian(4, &jacobianMatrix[0][0], &gradientStep[0]);
+			m_accel = m_externalForce.Scale4(m_invMass.m_w);
+			m_alpha = m_matrix.RotateVector(localTorque * m_invMass);
 
-				localOmega += gradientStep;
-			}
-
-
-			m_omega = m_matrix.RotateVector(localOmega);
+			m_veloc += m_accel.Scale4(timestep);
+			m_omega = m_matrix.RotateVector(localOmega + gradientStep);
 #endif
 
 		} else {

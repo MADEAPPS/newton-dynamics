@@ -206,13 +206,14 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 
 	// test this only happens is there a residual angular velocity on the other two axis
 	// for perfectly axis aligned velocity the the body is on unstable equilibrium and should not flip.
-	DzhanibekovEffect(scene, dVector(3.0f, 3.0f,  6.0f, 1.0f), dVector (0.0f, 0.0f, 15.0f), 0.25f, 2.0f);
+//	DzhanibekovEffect(scene, dVector(3.0f, 3.0f,  6.0f, 1.0f), dVector (0.0f, 0.0f, 15.0f), 0.25f, 2.0f);
 
 	// test a different angular velocity
 	DzhanibekovEffect(scene, dVector(3.0f, 3.0f,  8.0f, 1.0f), dVector (0.01f, 0.01f, 15.0f), 0.25f, 2.0f);
 
 	// place a toy top
 	const int topsCount = 4;
+
 	for (int i = 0; i < topsCount; i ++) {
 		for (int j = 0; j < topsCount; j ++) {
 			// should translate for a moment then spins in place (so far is wrong)

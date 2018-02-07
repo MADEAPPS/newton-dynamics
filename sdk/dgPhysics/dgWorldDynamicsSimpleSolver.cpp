@@ -50,7 +50,7 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 		if ((activeJoint == 1) && (cluster->m_jointCount == 1) && (constraintArray[0].m_joint->GetId() == dgConstraint::m_contactConstraint)) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			//CalculateClusterReactionForces(cluster, threadID, timestep);
-			CalculateSingleClusterReactionForces(cluster, threadID, timestep);
+			CalculateSingleContactReactionForces(cluster, threadID, timestep);
 		} else if (activeJoint >= 1) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
 			CalculateClusterReactionForces(cluster, threadID, timestep);
@@ -489,7 +489,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 				dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
 				body->AddDampingAcceleration(timestep);
 				body->CalcInvInertiaMatrix ();
-				body->ApplyGyroTorque();
 			}
 
 			// re use these variables for temp storage 
@@ -562,6 +561,7 @@ void dgWorldDynamicUpdate::IntegrateExternalForce(const dgBodyCluster* const clu
 	const dgInt32 bodyCount = cluster->m_bodyCount;
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+		body->AddDampingAcceleration(timestep);
 		body->IntegrateOpenLoopExternalForce(timestep);
 	}
 }
@@ -1017,7 +1017,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 }
 
 
-void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
+void dgWorldDynamicUpdate::CalculateSingleContactReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
@@ -1052,74 +1052,60 @@ void dgWorldDynamicUpdate::CalculateSingleClusterReactionForces(const dgBodyClus
 
 	if (timestep != dgFloat32(0.0f)) {
 		dgVector timestep4(timestep);
-		for (dgInt32 i = 1; i < bodyCount; i++) {
-			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
-			dgAssert(body->m_index == i);
-			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-				const dgJacobian& forceAndTorque = internalForces[i];
-				if (!body->m_resting) {
-					const dgVector saveForce(body->m_externalForce);
-					const dgVector saveTorque(body->m_externalTorque);
-	dgTrace((" there is a big bug here\n"));
-					body->m_externalForce += forceAndTorque.m_linear;
-					body->m_externalTorque += forceAndTorque.m_angular;
-					body->IntegrateOpenLoopExternalForce(timestep);
-					body->m_externalForce = saveForce;
-					body->m_externalTorque += saveTorque;
+		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[1].m_body;
+		dgAssert(body->m_index == 1);
+		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+			const dgJacobian& forceAndTorque = internalForces[1];
+			if (!body->m_resting) {
+				body->m_externalForce += forceAndTorque.m_linear;
+				body->m_externalTorque += forceAndTorque.m_angular;
+				body->IntegrateOpenLoopExternalForce(timestep);
 
-				} else {
-					const dgVector force(body->m_externalForce + forceAndTorque.m_linear);
-					const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
+			} else {
+				const dgVector force(body->m_externalForce + forceAndTorque.m_linear);
+				const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
 
-					const dgVector velocStep((force.Scale4(body->m_invMass.m_w)) * timestep4);
-					const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
+				const dgVector velocStep((force.Scale4(body->m_invMass.m_w)) * timestep4);
+				const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
 
-					const dgVector velocStep2(velocStep.DotProduct4(velocStep));
-					const dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
-					const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dgVector::m_negOne);
-					const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-					body->m_resting &= equilibrium;
-				}
-
-				dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
-				dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
+				const dgVector velocStep2(velocStep.DotProduct4(velocStep));
+				const dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
+				const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dgVector::m_negOne);
+				const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+				body->m_resting &= equilibrium;
 			}
-		}
-	} else {
-		for (dgInt32 i = 1; i < bodyCount; i++) {
-			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
-			const dgVector& linearMomentum = internalForces[i].m_linear;
-			const dgVector& angularMomentum = internalForces[i].m_angular;
 
-			body->m_veloc += linearMomentum.Scale4(body->m_invMass.m_w);
-			body->m_omega += body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
+			dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
+			dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
 		}
+		
+	} else {
+
+		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[1].m_body;
+		const dgVector& linearMomentum = internalForces[1].m_linear;
+		const dgVector& angularMomentum = internalForces[1].m_angular;
+
+		body->m_veloc += linearMomentum.Scale4(body->m_invMass.m_w);
+		body->m_omega += body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
 	}
 
 	dgInt32 hasJointFeeback = 0;
 	if (timestep != dgFloat32(0.0f)) {
-		for (dgInt32 i = 0; i < jointCount; i++) {
-			dgJointInfo* const jointInfo1 = &constraintArray[i];
-			dgConstraint* const constraint1 = jointInfo1->m_joint;
 
-			const dgInt32 first = jointInfo1->m_pairStart;
-			const dgInt32 count = jointInfo1->m_pairCount;
+		dgJointInfo* const jointInfo1 = &constraintArray[0];
+		dgConstraint* const constraint1 = jointInfo1->m_joint;
 
-			for (dgInt32 j = 0; j < count; j++) {
-				dgJacobianMatrixElement* const row = &matrixRow[j + first];
-				dgAssert(dgCheckFloat(row->m_force));
-				row->m_jointFeebackForce->m_force = row->m_force;
-				row->m_jointFeebackForce->m_impact = row->m_maxImpact * timestep;
-			}
-			hasJointFeeback |= (constraint1->m_updaFeedbackCallback ? 1 : 0);
+		const dgInt32 first = jointInfo1->m_pairStart;
+		const dgInt32 count = jointInfo1->m_pairCount;
+
+		for (dgInt32 j = 0; j < count; j++) {
+			dgJacobianMatrixElement* const row = &matrixRow[j + first];
+			dgAssert(dgCheckFloat(row->m_force));
+			row->m_jointFeebackForce->m_force = row->m_force;
+			row->m_jointFeebackForce->m_impact = row->m_maxImpact * timestep;
 		}
+		hasJointFeeback |= (constraint1->m_updaFeedbackCallback ? 1 : 0);
 
-		const dgVector invTime(invTimestep);
-		const dgVector maxAccNorm2(DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR);
-		for (dgInt32 i = 1; i < bodyCount; i++) {
-			dgBody* const body = bodyArray[i].m_body;
-			CalculateNetAcceleration(body, invTime, maxAccNorm2);
-		}
 		if (hasJointFeeback) {
 			for (dgInt32 i = 0; i < jointCount; i++) {
 				if (constraintArray[i].m_joint->m_updaFeedbackCallback) {

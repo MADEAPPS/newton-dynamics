@@ -224,7 +224,6 @@ class dgBody
 	protected:
 	void UpdateLumpedMatrix();
 	void CalcInvInertiaMatrix ();
-	void ApplyGyroTorque ();
 	dgVector CalculateLineraMomentum() const; 
 	dgVector CalculateAngularMomentum() const; 
 
@@ -608,12 +607,6 @@ DG_INLINE dgVector dgBody::CalculateAngularMomentum() const
 	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
 	dgVector localAngularMomentum(m_mass * localOmega);
 	return m_matrix.RotateVector(localAngularMomentum);
-}
-
-DG_INLINE void dgBody::ApplyGyroTorque ()
-{
-//	dgVector gyroTorque (m_omega.CrossProduct3(CalculateAngularMomentum()));
-//	SetTorque(GetTorque() - gyroTorque);
 }
 
 DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const

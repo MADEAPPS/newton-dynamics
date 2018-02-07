@@ -32,7 +32,7 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 		for (int j = 0; j < zCount; j ++) {
 
 			dFloat scale = 0.75f + 1.0f * (dFloat (dRand()) / dFloat(dRAND_MAX) - 0.5f);
-//scale = 1.0f;
+			//scale = 1.0f;
 			// test skin thinckness
 			NewtonCollisionSetSkinThickness(collision, 0.01f);
 			NewtonCollisionSetScale (collision, scale, scale, scale);
