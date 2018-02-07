@@ -244,10 +244,6 @@ void dCustomUniversal::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0,
 
 void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
-	dMatrix matrix (dYawMatrix(eulers[1]) * matrix1);
-	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &matrix[2][0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(eulers.m_y);
 
@@ -258,7 +254,18 @@ void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	m_jointOmega2 = (omega0 - omega1).DotProduct3(matrix1.m_up);
+	dVector relOmega(omega0 - omega1);
+	m_jointOmega2 = relOmega.DotProduct3(matrix1.m_up);
+
+	dMatrix rollMatrix(dYawMatrix(eulers[1]) * matrix1);
+	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &rollMatrix.m_right[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (1) {
+		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
+		dFloat alphaRollError = -(eulers[2] + rollOmega * timestep) / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
+	}
+
 
 	int limitsOn = m_options & (1 << D_UNIVERSAL_LIMIT_FLAG);
 	int setAsSpringDamper = m_options & (1 << D_UNIVERSAL_SPRING_DAMPER_FLAG);
