@@ -762,6 +762,8 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, Newt
 	,m_twistAngle(0.0f)
 	,m_minTwistAngle(-180.0f * dDegreeToRad)
 	,m_maxTwistAngle(180.0f * dDegreeToRad)
+	,m_maxConeAngle(60.0f * dDegreeToRad)
+	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
 	,m_options()
 {
@@ -773,6 +775,8 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, con
 	,m_twistAngle(0.0f)
 	,m_minTwistAngle(-180.0f * dDegreeToRad)
 	,m_maxTwistAngle(180.0f * dDegreeToRad)
+	,m_maxConeAngle(60.0f * dDegreeToRad)
+	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
 	,m_options()
 {
@@ -790,6 +794,8 @@ void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void*
 	callback(userData, &m_twistAngle, sizeof(dAngularIntegration));
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
+	callback(userData, &m_maxConeAngle, sizeof(dFloat));
+	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
 	callback(userData, &m_options, sizeof(m_options));
 }
@@ -801,15 +807,22 @@ void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* con
 	callback(userData, &m_twistAngle, sizeof(dAngularIntegration));
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
+	callback(userData, &m_maxConeAngle, sizeof(dFloat));
+	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
 	callback(userData, &m_options, sizeof(m_options));
 }
-
 
 void dCustomBallAndSocket::EnableTwist(bool state)
 {
 	m_options.m_option0 = state;
 }
+
+void dCustomBallAndSocket::EnableCone(bool state)
+{
+	m_options.m_option1 = state;
+}
+
 
 void dCustomBallAndSocket::SetTwistLimits(dFloat minAngle, dFloat maxAngle)
 {
@@ -832,6 +845,27 @@ dFloat dCustomBallAndSocket::GetTwistFriction (dFloat frictionTorque) const
 {
 	return m_twistFriction;
 }
+
+dFloat dCustomBallAndSocket::GetConeLimits() const
+{
+	return m_maxConeAngle;
+}
+
+void dCustomBallAndSocket::SetConeLimits(dFloat maxAngle)
+{
+	m_maxConeAngle = dMin (dAbs (maxAngle), dFloat (160.0f * dDegreeToRad));
+}
+
+void dCustomBallAndSocket::SetConeFriction(dFloat frictionTorque)
+{
+	m_coneFriction = dAbs (frictionTorque);
+}
+
+dFloat dCustomBallAndSocket::GetConeFriction(dFloat frictionTorque) const
+{
+	return m_coneFriction;
+}
+
 
 void dCustomBallAndSocket::SetTwistSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
@@ -898,9 +932,9 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
-/*
+
 	{
-		dVector point(radius * dCos(m_coneAngle), radius * dSin(m_coneAngle), 0.0f, 0.0f);
+		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), 0.0f, 0.0f);
 		dFloat angleStep = dPi * 2.0f / subdiv;
 		dFloat angle0 = 0.0f;
 
@@ -919,7 +953,6 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 			debugDisplay->DrawLine(arch[i], arch[i + 1]);
 		}
 	}
-*/
 }
 
 
@@ -956,6 +989,7 @@ void dCustomBallAndSocket::SubmitConstraintTwistLimits(const dMatrix& matrix0, c
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
 	}
 }
+
 
 void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
@@ -999,6 +1033,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 	dVector relOmega(omega0 - omega1);
 
+	// do twist angle calculations
 	dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
 	dFloat twistAngle = m_twistAngle.Update(dAtan2(twistMatrix[1][2], twistMatrix[1][1]));
 	if (m_options.m_option0) {
@@ -1018,9 +1053,46 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
-		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
+	}
+
+	// do twist cone angle calculations
+	if (m_options.m_option2) {
+/*
+		if ((m_minTwistAngle == 0.0f) && (m_minTwistAngle == 0.0f)) {
+			NewtonUserJointAddAngularRow(m_joint, -twistAngle, &matrix0.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		} else {
+			if (m_options.m_option1) {
+				dAssert(0);
+			}
+			else {
+				SubmitConstraintTwistLimits(matrix0, matrix1, relOmega, timestep);
+			}
+		}
+	} else if (m_options.m_option1) {
+		dAssert(0);
+*/
+	} else if (m_coneFriction > 0.0f) {
+//		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
+//		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+//		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+//		NewtonUserJointSetRowAcceleration(m_joint, accel);
+//		NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
+//		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
+//		dFloat accel = relOmega.DotProduct3(lateralDir) / timestep;
+
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+
+		dVector upDir(lateralDir.CrossProduct(coneDir0));
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 	}
 }
