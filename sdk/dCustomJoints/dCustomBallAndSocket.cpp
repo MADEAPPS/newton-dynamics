@@ -838,4 +838,26 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	}
+
+
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
+
+	dFloat cosAngleCos = coneDir1.DotProduct3(coneDir0);
+	dMatrix coneRotation(dGetIdentityMatrix());
+	dVector lateralDir(matrix0.m_up);
+
+	if (cosAngleCos < 0.9999f) {
+		lateralDir = coneDir1.CrossProduct(coneDir0);
+		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
+		dAssert(mag2 > 1.0e-4f);
+		lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
+		coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
+	}
+
+	dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
+	dFloat twistAngle = dAtan2(twistMatrix[1][2], twistMatrix[1][1]);
+	m_twistAngle.Update(twistAngle);
+	//m_twistAngle.Update(twistMatrix[1][2], twistMatrix[1][1]);
+
 }
