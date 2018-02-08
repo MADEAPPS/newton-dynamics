@@ -249,8 +249,9 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 //	joint0->EnableCone(true);
 	joint0->SetConeFriction(200.0f);
 //	joint0->SetConeLimits (150.0f * dDegreeToRad);
-//	joint0->EnableTwist(true);
-//	joint0->SetTwistLimits(-90.0f * dDegreeToRad, 90.0f * dDegreeToRad);
+	joint0->EnableTwist(true);
+	joint0->SetTwistFriction(50.0f);
+	joint0->SetTwistLimits(-150.0f * dDegreeToRad, 150.0f * dDegreeToRad);
 /*
 	// link the two boxes
 	dMatrix matrix1;
