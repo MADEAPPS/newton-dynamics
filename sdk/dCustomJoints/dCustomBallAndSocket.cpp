@@ -936,8 +936,6 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), 0.0f, 0.0f);
 		dFloat angleStep = dPi * 2.0f / subdiv;
 		dFloat angle0 = 0.0f;
-
-		dVector arch[subdiv + 1];
 		debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
 
 		for (int i = 0; i <= subdiv; i++) {
@@ -1075,14 +1073,6 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 		dAssert(0);
 */
 	} else if (m_coneFriction > 0.0f) {
-//		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
-//		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-//		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-//		NewtonUserJointSetRowAcceleration(m_joint, accel);
-//		NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
-//		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
-//		dFloat accel = relOmega.DotProduct3(lateralDir) / timestep;
-
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
