@@ -287,6 +287,8 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_alpha = localAlpha * timeStepVect;
 			localOmega += localAlpha * timeStepVect;
 			m_omega = m_matrix.RotateVector(localOmega);
+			m_accel = m_externalForce.Scale4(m_invMass.m_w);
+			m_veloc += m_accel.Scale4(timestep);
 #else
 			// implicit integration is local space, 
 			// use angular velocity at dt, to solve equation

@@ -206,10 +206,14 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
 	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket(pinMatrix, box0, base);
-/*
-	joint0->SetConeAngle (30.0f * dDegreeToRad);
-	joint0->SetTwistAngle (-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
 
+	joint0->EnableTwist(true);
+	joint0->SetTwistFriction (1.0f);
+	joint0->SetTwistLimits (-1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad);
+//	joint0->SetTwistLimits (-60.0f * dDegreeToRad, 60.0f * dDegreeToRad);
+
+//	joint0->SetConeAngle (30.0f * dDegreeToRad);
+/*
 	// connect first box1 to box0 the world
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
@@ -1321,8 +1325,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
-//dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
+//dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
+dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 
