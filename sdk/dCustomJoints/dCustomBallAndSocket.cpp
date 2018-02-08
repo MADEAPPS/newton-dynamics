@@ -911,7 +911,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	dVector arch[subdiv + 1];
 
 	// show pitch angle limits
-	if (m_maxTwistAngle - m_minTwistAngle > dFloat(1.0e-3f)) {
+	if (m_options.m_option0 && ((m_maxTwistAngle - m_minTwistAngle) > dFloat(1.0e-3f))) {
 		dMatrix pitchMatrix(matrix1 * coneRotation);
 		pitchMatrix.m_posit = matrix1.m_posit;
 
@@ -932,8 +932,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
-
-	{
+	if (m_options.m_option2) {
 		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), 0.0f, 0.0f);
 		dFloat angleStep = dPi * 2.0f / subdiv;
 		dFloat angle0 = 0.0f;
