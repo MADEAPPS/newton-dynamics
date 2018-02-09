@@ -1282,10 +1282,6 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//FunnyAddDistance(scene, dVector(0.0f, 0.0f, -15.0f));
-//AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
-//AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
-
 #if 1
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
@@ -1309,19 +1305,19 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 13.0f));
 	AddUniversal (scene, dVector (-20.0f, 0.0f, 17.0f));
-//	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
-//	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
-//	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
-//
-////	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
+	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
+	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
+
+//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
 #endif
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
-//	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
-//dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
+	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
+	//dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 
