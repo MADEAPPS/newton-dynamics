@@ -21,7 +21,7 @@
 #include "HeightFieldPrimitive.h"
 #include "dCustomArcticulatedTransformManager.h"
 
-#if 0
+#if 1
 enum JointType
 {
 	one_dof,
@@ -391,8 +391,6 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-	dAssert (0);
-/*
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
@@ -400,6 +398,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
+/*
 	{
 		// prepare model for rag doll
 		DemoEntity* limb;
@@ -421,10 +420,10 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 		limbMatrix = dPitchMatrix(-40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
 		limb->ResetMatrix(*scene, limbMatrix);
 	}
-
+*/
 	//  create a skeletal transform controller for controlling rag doll
 	CrashDummyManager* const manager = new CrashDummyManager (scene);
-
+/*
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());
 
