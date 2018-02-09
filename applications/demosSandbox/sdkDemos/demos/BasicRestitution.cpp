@@ -86,8 +86,8 @@ void Restitution (DemoEntityManager* const scene)
 	origin.m_x -= 0.0f;
 
 	// create a simple scene
-	for (int i = zCount - 1; i < zCount; i ++) {
-		dFloat restitution = i * 0.1f + 0.083f;
+	for (int i = 0; i < zCount; i ++) {
+		dFloat restitution = 0.1f * (i + 1);
 		NewtonBody* body;
 		NewtonCollision* collision;
 
@@ -115,13 +115,13 @@ void Restitution (DemoEntityManager* const scene)
 		NewtonBodySetLinearDamping (body, 0.0f);
 		collision = NewtonBodyGetCollision(body);
 		NewtonCollisionSetUserData (collision, *((void**)&restitution));
-/*
+
 		matrix.m_posit.m_y += 6.0f;
 		body = CreateSimpleSolid (scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID);
 		NewtonBodySetLinearDamping (body, 0.0f);
 		collision = NewtonBodyGetCollision(body);
 		NewtonCollisionSetUserData (collision, *((void**)&restitution));
-
+/*
 		matrix.m_posit.m_y += 6.0f;
 		//body = CreateSimpleSolid (scene, boxMesh, mass, matrix, boxCollision, defaultMaterialID);
 		body = CreateSimpleSolid (scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID);

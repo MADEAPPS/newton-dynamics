@@ -364,8 +364,6 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			m_veloc += m_accel.Scale4(timestep);
 			m_omega = m_matrix.RotateVector(localOmega + gradientStep);
-
-			dgTrace(("%d %f %f %f\n", m_uniqueID, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
 #endif
 
 		} else {
