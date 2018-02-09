@@ -121,14 +121,13 @@ void Restitution (DemoEntityManager* const scene)
 		NewtonBodySetLinearDamping (body, 0.0f);
 		collision = NewtonBodyGetCollision(body);
 		NewtonCollisionSetUserData (collision, *((void**)&restitution));
-/*
+
 		matrix.m_posit.m_y += 6.0f;
-		//body = CreateSimpleSolid (scene, boxMesh, mass, matrix, boxCollision, defaultMaterialID);
-		body = CreateSimpleSolid (scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID);
+		body = CreateSimpleSolid (scene, boxMesh, mass, matrix, boxCollision, defaultMaterialID);
+		//body = CreateSimpleSolid (scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID);
 		NewtonBodySetLinearDamping (body, 0.0f);
 		collision = NewtonBodyGetCollision(body);
 		NewtonCollisionSetUserData (collision, *((void**)&restitution));
-*/
 	}
 
 	boxMesh->Release();
