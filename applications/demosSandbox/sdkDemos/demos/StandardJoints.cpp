@@ -1301,13 +1301,13 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-//	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
-//	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-//	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
-//	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
-//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
-//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
-//	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 15.0f));
+	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
+	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
+	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
+	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
+	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 13.0f));
 	AddUniversal (scene, dVector (-20.0f, 0.0f, 17.0f));
 //	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
@@ -1320,8 +1320,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-//dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
-dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
+dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
+//dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 
