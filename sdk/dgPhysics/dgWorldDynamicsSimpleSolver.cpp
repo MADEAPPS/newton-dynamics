@@ -1052,41 +1052,43 @@ void dgWorldDynamicUpdate::CalculateSingleContactReactionForces(const dgBodyClus
 
 	if (timestep != dgFloat32(0.0f)) {
 		dgVector timestep4(timestep);
-		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[1].m_body;
-		dgAssert(body->m_index == 1);
-		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			const dgJacobian& forceAndTorque = internalForces[1];
-			if (!body->m_resting) {
-				body->m_externalForce += forceAndTorque.m_linear;
-				body->m_externalTorque += forceAndTorque.m_angular;
-				body->IntegrateOpenLoopExternalForce(timestep);
+		for (dgInt32 i = 1; i < bodyCount; i++) {
+			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+			dgAssert(body->m_index == i);
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				const dgJacobian& forceAndTorque = internalForces[i];
+				if (!body->m_resting) {
+					body->m_externalForce += forceAndTorque.m_linear;
+					body->m_externalTorque += forceAndTorque.m_angular;
+					body->IntegrateOpenLoopExternalForce(timestep);
 
-			} else {
-				const dgVector force(body->m_externalForce + forceAndTorque.m_linear);
-				const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
+				} else {
+					const dgVector force(body->m_externalForce + forceAndTorque.m_linear);
+					const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
 
-				const dgVector velocStep((force.Scale4(body->m_invMass.m_w)) * timestep4);
-				const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
+					const dgVector velocStep((force.Scale4(body->m_invMass.m_w)) * timestep4);
+					const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
 
-				const dgVector velocStep2(velocStep.DotProduct4(velocStep));
-				const dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
-				const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dgVector::m_negOne);
-				const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-				body->m_resting &= equilibrium;
+					const dgVector velocStep2(velocStep.DotProduct4(velocStep));
+					const dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
+					const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dgVector::m_negOne);
+					const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+					body->m_resting &= equilibrium;
+				}
+
+				dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
+				dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
 			}
-
-			dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
-			dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
 		}
 		
 	} else {
-
-		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[1].m_body;
-		const dgVector& linearMomentum = internalForces[1].m_linear;
-		const dgVector& angularMomentum = internalForces[1].m_angular;
-
-		body->m_veloc += linearMomentum.Scale4(body->m_invMass.m_w);
-		body->m_omega += body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
+		for (dgInt32 i = 1; i < bodyCount; i++) {
+			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+			const dgVector& linearMomentum = internalForces[1].m_linear;
+			const dgVector& angularMomentum = internalForces[1].m_angular;
+			body->m_veloc += linearMomentum.Scale4(body->m_invMass.m_w);
+			body->m_omega += body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
+		}
 	}
 
 	dgInt32 hasJointFeeback = 0;
