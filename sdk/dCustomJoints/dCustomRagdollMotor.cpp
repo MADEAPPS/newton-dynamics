@@ -134,6 +134,8 @@ void dCustomRagdollMotor_1dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+	dAssert(0);
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -161,6 +163,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
+*/
 }
 
 
