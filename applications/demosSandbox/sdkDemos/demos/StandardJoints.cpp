@@ -133,7 +133,6 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
-	
 
 	// connect first box to the world
 	dMatrix matrix0;
@@ -205,30 +204,23 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
-	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket(pinMatrix, box0, base);
+	// tilt the cone limit
+	dMatrix tiltConeMatrix (dYawMatrix(-30.0f * dDegreeToRad) * pinMatrix);
+	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket(pinMatrix, tiltConeMatrix, box0, base);
+	joint0->EnableCone(true);
 	joint0->EnableTwist(true);
-	joint0->SetTwistFriction (1.0f);
+	joint0->SetConeLimits (60.0f * dDegreeToRad);
 	joint0->SetTwistLimits (-1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad);
-//	joint0->SetTwistLimits (-60.0f * dDegreeToRad, 60.0f * dDegreeToRad);
 
-//	joint0->SetConeAngle (30.0f * dDegreeToRad);
-/*
 	// connect first box1 to box0 the world
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
-	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket(pinMatrix, box1, box0);
-	joint1->SetConeAngle(30.0f * dDegreeToRad);
-	joint1->SetTwistAngle(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
-
-	// connect first box2 to box1 the world
-	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
-
-	dCustomLimitBallAndSocket* const joint2 = new dCustomLimitBallAndSocket(pinMatrix, box2, box1);
-	joint2->SetConeAngle(30.0f * dDegreeToRad);
-	joint2->SetTwistAngle(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
-*/
+	dCustomBallAndSocket* const joint1 = new dCustomBallAndSocket(pinMatrix, box1, box0);
+	joint1->EnableCone(true);
+	joint1->SetConeLimits(30.0f * dDegreeToRad);
+	joint1->EnableTwist(true);
+	joint1->SetTwistLimits(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
 }
 
 static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const dVector& origin)
@@ -245,14 +237,15 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket (pinMatrix, box0, base);
-//	joint0->EnableCone(true);
+	dMatrix rotateLimit (dYawMatrix (-30.0f * dDegreeToRad) * pinMatrix);
+	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket (pinMatrix, rotateLimit, box0, base);
+	joint0->EnableCone(true);
 	joint0->SetConeFriction(200.0f);
-//	joint0->SetConeLimits (150.0f * dDegreeToRad);
+	joint0->SetConeLimits (120.0f * dDegreeToRad);
 	joint0->EnableTwist(true);
 	joint0->SetTwistFriction(50.0f);
 	joint0->SetTwistLimits(-150.0f * dDegreeToRad, 150.0f * dDegreeToRad);
-/*
+
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, & matrix1[0][0]);
@@ -263,7 +256,6 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 	joint1->SetConeLimits(120.0f * dDegreeToRad);
 	joint1->EnableTwist(true);
 	joint1->SetTwistLimits(-90.0f * dDegreeToRad, 90.0f * dDegreeToRad);
-*/
 }
 
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
@@ -1306,8 +1298,8 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
 
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
-//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
