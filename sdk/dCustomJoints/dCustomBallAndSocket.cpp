@@ -157,8 +157,6 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		dVector lateralDir(coneDir1.CrossProduct(coneDir0));
 		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
 		dAssert(mag2 > 1.0e-4f);
-		//lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-		//coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
 		if (mag2 > 1.0e-4f) {
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
@@ -175,7 +173,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	const float radius = debugDisplay->m_debugScale;
 	dVector arch[subdiv + 1];
 
-	// show pitch angle limits
+	// show twist angle limits
 	if (m_options.m_option0 && ((m_maxTwistAngle - m_minTwistAngle) > dFloat(1.0e-3f))) {
 		dMatrix pitchMatrix(matrix1 * coneRotation);
 		pitchMatrix.m_posit = matrix1.m_posit;
@@ -185,7 +183,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		dFloat angleStep = dMin (m_maxTwistAngle - m_minTwistAngle, dFloat (2.0f * dPi)) / subdiv;
 		dFloat angle0 = m_minTwistAngle;
 
-		debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+		debugDisplay->SetColor(dVector(0.6f, 0.2f, 0.0f, 0.0f));
 		for (int i = 0; i <= subdiv; i++) {
 			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
 			debugDisplay->DrawLine(pitchMatrix.m_posit, arch[i]);
@@ -197,11 +195,12 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
+	// show cone angle limits
 	if (m_options.m_option2) {
 		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), 0.0f, 0.0f);
 		dFloat angleStep = dPi * 2.0f / subdiv;
 		dFloat angle0 = 0.0f;
-		debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
+		debugDisplay->SetColor(dVector(0.3f, 0.8f, 0.0f, 0.0f));
 
 		for (int i = 0; i <= subdiv; i++) {
 			dVector conePoint(dPitchMatrix(angle0).RotateVector(point));
