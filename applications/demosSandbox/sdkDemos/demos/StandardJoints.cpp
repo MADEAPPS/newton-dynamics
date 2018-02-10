@@ -260,8 +260,6 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 {
-dAssert (0);
-/*
 	dVector size (1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
 	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
@@ -295,7 +293,7 @@ joint0->SetPitchLimits(-0, 0);
 	joint1->SetPitchLimits(-pitchLimit, pitchLimit);
 joint1->SetPitchLimits(-0, 0);
 //joint1->DisableRotationX ();
-*/
+
 }
 
 static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
@@ -1281,6 +1279,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
+//Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 #if 1
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
@@ -1291,7 +1290,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 //	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
 
-//	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
+	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
@@ -1315,7 +1314,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dQuaternion rot (camMatrix);
 	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
 	//dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
-	//dVector origin(-30.0f, 5.0f, -15.0f, 0.0f);
+	//dVector origin(-30.0f, 5.0f, -25.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 

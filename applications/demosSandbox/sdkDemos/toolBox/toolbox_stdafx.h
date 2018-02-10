@@ -124,6 +124,7 @@ typedef long long unsigned64;
 #include <dBezierSpline.h>
 
 #include <dCustomJoint.h>
+#include <dCustom6dof.h>
 #include <dCustomGear.h>
 #include <dCustomHinge.h>
 #include <dCustomRagdollMotor.h>

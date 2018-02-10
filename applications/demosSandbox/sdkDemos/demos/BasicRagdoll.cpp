@@ -16,10 +16,8 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "dCustomBallAndSocket.h"
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
-#include "dCustomArcticulatedTransformManager.h"
 
 
 struct dPasiveRagDollDefinition
@@ -282,7 +280,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
-	void CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
+	dCustomArticulatedTransformController* CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -299,8 +297,6 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*)ragDollEntity->Find(definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
-		// for debugging
-		NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -351,6 +347,8 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
+
+		return controller;
 	}
 
 
@@ -379,16 +377,26 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
-	int count = 1;
+	dVector p(origin + dVector(0.0f, 0.0f, 0.0f, 0.0f));
+	matrix.m_posit = FindFloor(world, p, 100.0f);
+	matrix.m_posit.m_y += 2.0f;
+	dCustomArticulatedTransformController* const ragdoll = manager->CreateRagDoll(matrix, &ragDollModel, skeletonRagDoll, sizeof(skeletonRagDoll) / sizeof(skeletonRagDoll[0]));
+
+	// attach this ragdoll to world with a fix joint
+	dCustomArticulatedTransformController::dSkeletonBone* const rootBone = ragdoll->GetRoot ();
+	dMatrix rootMatrix; 
+	NewtonBodyGetMatrix(rootBone->m_body, &rootMatrix[0][0]);
+	new dCustom6dof (rootMatrix, rootBone->m_body);
+
+	int count = 3;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
-			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
+			dVector p (origin + dVector (10.0f + (x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor (world, p, 100.0f);
-			matrix.m_posit.m_y += 3.0f;
+			matrix.m_posit.m_y += 2.0f;
 			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
 		}
 	}
-
 
 //	const int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	const dVector location(origin);
@@ -398,8 +406,8 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 //	origin.m_x -= 25.0f;
-	origin.m_x -= 2.0f;
-	origin.m_y += 4.0f;
+	origin.m_x -= 4.0f;
+	origin.m_y += 3.0f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -67,7 +67,6 @@ class dCustom6dof: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof(int freeDof, const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep, int threadIndex) {};
 
 	private:
 	void CalculateJointAngles(const dMatrix& matrix0, const dMatrix& matrix1);
@@ -79,21 +78,6 @@ class dCustom6dof: public dCustomJoint
 	dAngleData m_yaw;
 	dAngleData m_roll;
 	dOptions m_options;
-/*
-	union
-	{
-		int m_mask;
-		struct 
-		{
-			int m_xAxis : 1;
-			int m_yAxis : 1;
-			int m_zAxis : 1;
-			int m_pitchAxis : 1;
-			int m_yawAxis : 1;
-			int m_rollAxis : 1;
-		};
-	};
-*/
 
 	DECLARE_CUSTOM_JOINT(dCustom6dof, dCustomJoint)
 };

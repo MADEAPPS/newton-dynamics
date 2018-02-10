@@ -30,8 +30,6 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_options()
 {
 	m_options.m_value = 0x3f;
-//static int xxxxx;
-//xxxx = xxxxx++;
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -191,25 +189,6 @@ void dCustom6dof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& ma
 		euler0 = euler1;
 	}
 
-#if 0
-dFloat x = GetPitch();
-dFloat y = GetYaw();
-dFloat z = GetRoll();
-dAngularIntegration x0(m_pitch.m_currentAngle);
-dAngularIntegration y0(m_yaw.m_currentAngle);
-dAngularIntegration z0(m_roll.m_currentAngle);
-x0.Update(euler0.m_x);
-y0.Update(euler0.m_y);
-z0.Update(euler0.m_z);
-x -= x0.GetAngle();
-y -= y0.GetAngle();
-z -= z0.GetAngle();
-dAssert (dAbs (x) < 10.0f * dDegreeToRad );
-dAssert (dAbs (y) < 10.0f * dDegreeToRad );
-dAssert (dAbs (z) < 10.0f * dDegreeToRad );
-dTrace(("%f %f %f\n", x * dRadToDegree, y * dRadToDegree, z * dRadToDegree));
-#endif
-
 	m_yaw.m_currentAngle.Update(euler0.m_y);
 	m_roll.m_currentAngle.Update(euler0.m_z);
 	m_pitch.m_currentAngle.Update(euler0.m_x);
@@ -307,8 +286,6 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dAssert(0);
-#if 0
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -324,7 +301,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	dVector step(p0 - p1);
 
 	for (int i = 0; i < 3; i ++) {
-		if (m_mask & (1<<i)) {
+		if (m_options.m_value & (1 << (i + 3))) {
 			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
 				NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 				NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
@@ -341,11 +318,8 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-static int xxxxxxxxx;
-xxxxxxxxx++;
 
-#if 0
-	if (m_pitchAxis) {
+	if (m_options.m_option3) {
 		dFloat pitchAngle = GetPitch();
 		if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {
 			NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &matrix0.m_front[0]);
@@ -363,7 +337,7 @@ xxxxxxxxx++;
 		}
 	}
 
-	if (m_yawAxis) {
+	if (m_options.m_option4) {
 		dFloat yawAngle = GetYaw();
 		if ((m_yaw.m_minAngle == 0.0f) && (m_yaw.m_maxAngle == 0.0f)) {
 			NewtonUserJointAddAngularRow(m_joint, -yawAngle, &matrix1.m_up[0]);
@@ -381,7 +355,7 @@ xxxxxxxxx++;
 		}
 	}
 
-	if (m_rollAxis) {
+	if (m_options.m_option5) {
 		matrix1 = dYawMatrix(GetYaw()) * matrix1;
 		dFloat rollAngle = GetRoll();
 		if ((m_roll.m_minAngle == 0.0f) && (m_roll.m_maxAngle == 0.0f)) {
@@ -400,73 +374,14 @@ xxxxxxxxx++;
 		}
 	}
 
-#else
-
-	dVector errorAngles(GetPitch() - dClamp(GetPitch(), m_pitch.m_minAngle, m_pitch.m_maxAngle),
-						GetYaw() - dClamp(GetYaw(), m_yaw.m_minAngle, m_yaw.m_maxAngle),
-						GetRoll() - dClamp(GetRoll(), m_roll.m_minAngle, m_roll.m_maxAngle),
-						0.0f);
-	dMatrix dL(dPitchMatrix(errorAngles.m_x) * dRollMatrix(errorAngles.m_z) * dYawMatrix(errorAngles.m_y));
-//	dMatrix L(matrix0 * matrix1.Inverse());
-//  dMatrix matrix1_ = L * matrix1;
-//	matrix0 = dL * dL.Inverse() * L * matrix1;
-	dMatrix clipMatrix (dL.Inverse() * matrix0);
-
-	dAngleData* angle[] = {&m_pitch, &m_yaw, &m_roll};
-
-	for (int i = 0; i < 3; i++) {
-		if (m_mask & (1 << (i + 3))) {
-			const dAngleData& angleLimits = *angle[i];
-			if ((angleLimits.m_minAngle == 0.0f) && (angleLimits.m_maxAngle == 0.0f)) {
-				NewtonUserJointAddAngularRow(m_joint, -errorAngles[i], &clipMatrix[i][0]);
-				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-				dTrace(("J: %f (%f %f %f\n", errorAngles[i] * dRadToDegree, clipMatrix[i][0], clipMatrix[i][1], clipMatrix[i][2]));
-			} else if (errorAngles[i] > 0.0f) {
-				NewtonUserJointAddAngularRow(m_joint, -errorAngles[i], &clipMatrix[i][0]);
-				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-			} else if (errorAngles[i] < 0.0f) {
-				NewtonUserJointAddAngularRow(m_joint, -errorAngles[i], &clipMatrix[i][0]);
-				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-			}
-		}
-	}
-
 /*
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
-	dVector lateralDir(coneDir1.CrossProduct(coneDir0));
-	dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-	if (mag2 > 1.0e-4f) {
-		dAssert(mag2 > 1.0e-4f);
-		lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-		dQuaternion rot(lateralDir, dAcos(coneDir0.DotProduct3(coneDir1)));
-		dMatrix xxxx (matrix1 * dMatrix(rot, matrix0.m_front));
-		dMatrix xxxx1(matrix0 * xxxx.Inverse());
-
-		dVector upDir(coneDir0.CrossProduct(lateralDir));
-	}
-*/
-
-
-
-//if (dAbs(errorAngles.m_x * dRadToDegree) > 10.0f)
-//{
-//dTrace(("xxx-> "));
-//}
-//	dTrace (("f:%d j:%d (%f %f %f)\n", xxxxxxxxx/2, xxxx, errorAngles.m_x * dRadToDegree, errorAngles.m_y * dRadToDegree, errorAngles.m_z * dRadToDegree));
-
-#endif
-
 	int freedof = (m_mask & 0x55) + ((m_mask >> 1) & 0x55);
 	freedof = (freedof & 0x33) + ((freedof >> 2) & 0x33);
 	freedof = (freedof & 0x0f) + ((freedof >> 4) & 0xff);
 	if (freedof != 6) {
 		SubmitConstraintsFreeDof(6 - freedof, matrix0, matrix1, timestep, threadIndex);
 	}
+*/
 
-#endif
 }
 
