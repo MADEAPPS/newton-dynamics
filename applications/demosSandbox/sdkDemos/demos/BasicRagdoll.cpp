@@ -423,13 +423,13 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 */
 	//  create a skeletal transform controller for controlling rag doll
 	CrashDummyManager* const manager = new CrashDummyManager (scene);
-/*
+
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());
 
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
-
+/*
 	int count = 1;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
@@ -439,6 +439,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
 		}
 	}
+*/
 
 //	const int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	const dVector location(origin);
@@ -452,5 +453,4 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	origin.m_y += 4.0f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
-*/
 }
