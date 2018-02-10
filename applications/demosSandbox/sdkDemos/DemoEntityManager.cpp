@@ -33,7 +33,7 @@
 
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
-#define DEFAULT_SCENE	2			// Coefficients of restitution
+//#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// gyroscope precession
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
@@ -63,8 +63,8 @@
 //#define DEFAULT_SCENE	29			// six axis manipulator
 //#define DEFAULT_SCENE	30			// hexapod Robot
 //#define DEFAULT_SCENE	31			// articulated joints
-//#define DEFAULT_SCENE	32			// basic rag doll
-//#define DEFAULT_SCENE	33			// dynamics rag doll
+#define DEFAULT_SCENE	32			// basic rag doll
+//#define DEFAULT_SCENE	33			// dynamic rag doll
 //#define DEFAULT_SCENE	34			// basic Car
 //#define DEFAULT_SCENE	35			// super Car
 //#define DEFAULT_SCENE	36			// heavy vehicles
@@ -1361,7 +1361,9 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		RenderJointsDebugInfo(m_world, &jointDebugRender, 0.5f);
+		jointDebugRender.SetScale(0.25f);
+
+		RenderJointsDebugInfo(m_world, &jointDebugRender);
 	}
 
 	if (m_showNormalForces) {

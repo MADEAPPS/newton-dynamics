@@ -1277,7 +1277,6 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix offsetMatrix (dGetIdentityMatrix());
 
     CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	//CreateLevelMesh (scene, "flatPlane1.ngd", 1);
 
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);

@@ -438,7 +438,7 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 #endif
 }
 
-void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug, dFloat size)
+void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug)
 {
 	// this will go over the joint list twice, 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {

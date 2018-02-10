@@ -21,20 +21,11 @@
 #include "HeightFieldPrimitive.h"
 #include "dCustomArcticulatedTransformManager.h"
 
-#if 1
-enum JointType
-{
-	one_dof,
-	two_dof,
-	three_dof,
-};
 
 struct dPasiveRagDollDefinition
 {
 	char m_boneName[32];
 	char m_shapeType[32];
-
-	JointType m_type;
 
 	dFloat m_shapePitch;
 	dFloat m_shapeYaw;
@@ -56,36 +47,39 @@ struct dPasiveRagDollDefinition
 	dFloat m_frameYaw;
 	dFloat m_frameRoll;
 
+	dFloat m_parentRollOffset;
+
 	dFloat m_frictionTorque;
 };
 
 
 static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
-	{"Bip01_Pelvis",	 "capsule", three_dof,	 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,    0.0f,    0.0f,   0.0f,  0.0f}, 
+	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,    0.0f,    0.0f,   0.0f,   0.0f, 0.0f}, 
 
-	{"Bip01_L_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f, 100.0f},
-	{"Bip01_L_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f,  10.0f,     0.0f,  90.0f,    0.0f,  90.0f, 50.0f},
-	{"Bip01_L_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     45.0f,	 0.0f,  -90.0f,  -0.0f, 50.0f},
+	{"Bip01_L_Thigh",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f, -30.0f, 100.0f},
+	{"Bip01_L_Calf",     "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f,  10.0f,     0.0f,  90.0f,    0.0f,  90.0f,  0.0f,  50.0f},
+	{"Bip01_L_Foot",  "convexhull", 0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     45.0f,	 0.0f,  -90.0f,  -0.0f, 0.0f,  50.0f},
 
-	{"Bip01_R_Thigh",    "capsule", three_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f,  100.0f},
-	{"Bip01_R_Calf",     "capsule",   one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f, 10.0f,     0.0f,   90.0f,   0.0f,   90.0f,  50.0f},
-	{"Bip01_R_Foot",  "convexhull",   two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     45.0f,	 0.0f,  -90.0f,  -0.0f,  50.0f},
+	{"Bip01_R_Thigh",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,   -45.0f,  45.0f,   120.0f,   0.0f,  -90.0f,  -0.0f,   30.0f, 100.0f},
+	{"Bip01_R_Calf",     "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,   -140.0f, 10.0f,     0.0f,   90.0f,   0.0f,   90.0f,   0.0f,  50.0f},
+	{"Bip01_R_Foot",  "convexhull", 0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,     45.0f,	 0.0f,  -90.0f,  -0.0f,  0.0f,  50.0f},
+/*
+	{"Bip01_Spine",		 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,    30.0f,  -30.0f,   30.0f,	 0.0f,  -90.0f,  0.0f,  100.0f},
+	{"Bip01_Spine1",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f,  20.0f,    30.0f,  -30.0f,   30.0f,	 0.0f,  -90.0f,  0.0f,  100.0f},
+	{"Bip01_Spine2",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f,  20.0f,    30.0f,  -30.0f,   30.0f,	 0.0f,  -90.0f,  0.0f,  100.0f},
 
-	{"Bip01_Spine",		 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,    30.0f,  -30.0f,   30.0f,	 0.0f,  -90.0f,  0.0f,  100.0f},
-	{"Bip01_Spine1",	 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f,  20.0f,    30.0f,  -30.0f,   30.0f,	 0.0f,  -90.0f,  0.0f,  100.0f},
-	{"Bip01_Spine2",	 "capsule", three_dof,   0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f,  20.0f,    30.0f,  -30.0f,   30.0f,	 0.0f,  -90.0f,  0.0f,  100.0f},
+	{"Bip01_Neck",		 "capsule", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f,  5.0f,		30.0f,  -30.0f,  30.0f,		0.0f,   -90.0f, 0.0f, 100.0f },
+	{"Bip01_Head",		 "sphere",  0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f,   5.0f,		30.0f,  -60.0f,  60.0f,		0.0f,   -90.0f,	0.0f, 100.0f },
 
-	{"Bip01_Neck",		 "capsule", two_dof,	 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f,  5.0f,		30.0f,  -30.0f,  30.0f,		0.0f,   -90.0f, 0.0f, 100.0f },
-	{"Bip01_Head",		 "sphere",  three_dof,   0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f,   5.0f,		30.0f,  -60.0f,  60.0f,		0.0f,   -90.0f,	0.0f, 100.0f },
+	{"Bip01_L_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		80.0f,  30.0f,  120.0f,		0.0f,   -90.0f,  0.0f, 100.0f },
+	{"Bip01_L_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,	  -150.0f,  0.0f,	  0.0f,		0.0f,     0.0f, 90.0f,  50.0f },
+	{"Bip01_L_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		0.0f,  -45.0f,  45.0f,		0.0f,     0.0f, 90.0f,  10.0f },
 
-	{"Bip01_L_UpperArm", "capsule", three_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		80.0f,  30.0f,  120.0f,		0.0f,   -90.0f,  0.0f, 100.0f },
-	{"Bip01_L_Forearm",  "capsule", one_dof,    0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,	  -150.0f,  0.0f,	  0.0f,		0.0f,     0.0f, 90.0f,  50.0f },
-	{"Bip01_L_Hand",  "convexhull", two_dof,    0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		0.0f,  -45.0f,  45.0f,		0.0f,     0.0f, 90.0f,  10.0f },
-
-	{"Bip01_R_UpperArm", "capsule", three_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		  80.0f, 30.0f, 120.0f,		0.0f,   -90.0f,  0.0f, 100.0f },
-	{"Bip01_R_Forearm",  "capsule", one_dof,	0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,		  0.0f, 150.0f,  0.0f,		0.0f,     0.0f,-90.0f,  50.0f },
-	{"Bip01_R_Hand",  "convexhull", two_dof,	0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,     0.0f,-90.0f,  10.0f },
+	{"Bip01_R_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		  80.0f, 30.0f, 120.0f,		0.0f,   -90.0f,  0.0f, 100.0f },
+	{"Bip01_R_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,		  0.0f, 150.0f,  0.0f,		0.0f,     0.0f,-90.0f,  50.0f },
+	{"Bip01_R_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,     0.0f,-90.0f,  10.0f },
+*/
 };
 
 class CrashDummyManager: public dCustomArticulaledTransformManager
@@ -254,37 +248,16 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix (definition.m_framePitch * dDegreeToRad) * dYawMatrix (definition.m_frameYaw * dDegreeToRad) * dRollMatrix (definition.m_frameRoll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
-		switch (definition.m_type)
-		{
-			case one_dof:
-			{
-				dCustomRagdollMotor_1dof* const joint = new dCustomRagdollMotor_1dof(pinAndPivotInGlobalSpace, bone, parent);
-				//joint->DisableMotor();
-				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetTwistAngle(definition.m_minTwistAngle * dDegreeToRad, definition.m_maxTwistAngle * dDegreeToRad);
-				break;
-			}
+		dMatrix parentRollMatrix (dRollMatrix (definition.m_parentRollOffset * dDegreeToRad) * pinAndPivotInGlobalSpace);
 
-			case two_dof:
-			{
-				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
-				//joint->DisableMotor();
-				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetConeAngle(definition.m_coneAngle * dDegreeToRad);
-				break;
-			}
+		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, bone, parent);
+		joint->EnableCone(true);
+		joint->SetConeFriction(definition.m_frictionTorque);
+		joint->SetConeLimits(definition.m_coneAngle * dDegreeToRad);
 
-			case three_dof:
-			{
-				//dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
-				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
-				//joint->DisableMotor();
-				joint->SetJointTorque(definition.m_frictionTorque);
-				joint->SetConeAngle(definition.m_coneAngle * dDegreeToRad);
-				//joint->SetTwistAngle(definition.m_minTwistAngle * dDegreeToRad, definition.m_maxTwistAngle * dDegreeToRad);
-				break;
-			}
-		}
+		joint->EnableTwist(true);
+		joint->SetTwistFriction(definition.m_frictionTorque);
+		joint->SetTwistLimits(definition.m_minTwistAngle * dDegreeToRad, definition.m_maxTwistAngle * dDegreeToRad);
 	}
 
 
@@ -328,7 +301,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*)ragDollEntity->Find(definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
 		// for debugging
-		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+		NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -385,7 +358,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 	int m_material;
 };
 
-#endif
+
 
 void PassiveRagdoll (DemoEntityManager* const scene)
 {
@@ -398,29 +371,6 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
-/*
-	{
-		// prepare model for rag doll
-		DemoEntity* limb;
-		dMatrix limbMatrix;
-
-		limb = ragDollModel.Find("Bip01_L_UpperArm");
-		limbMatrix = dPitchMatrix (-40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
-		limb->ResetMatrix(*scene, limbMatrix);
-
-		limb = ragDollModel.Find("Bip01_R_UpperArm");
-		limbMatrix = dPitchMatrix( 40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
-		limb->ResetMatrix(*scene, limbMatrix);
-
-		limb = ragDollModel.Find("Bip01_L_Thigh");
-		limbMatrix = dPitchMatrix(40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
-		limb->ResetMatrix(*scene, limbMatrix);
-
-		limb = ragDollModel.Find("Bip01_R_Thigh");
-		limbMatrix = dPitchMatrix(-40.0f * dDegreeToRad) * limb->GetCurrentMatrix();
-		limb->ResetMatrix(*scene, limbMatrix);
-	}
-*/
 	//  create a skeletal transform controller for controlling rag doll
 	CrashDummyManager* const manager = new CrashDummyManager (scene);
 
@@ -429,7 +379,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
-/*
+
 	int count = 1;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
@@ -439,7 +389,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
 		}
 	}
-*/
+
 
 //	const int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	const dVector location(origin);
@@ -448,7 +398,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	const dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 //	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-	origin.m_x -= 25.0f;
+//	origin.m_x -= 25.0f;
 	origin.m_x -= 2.0f;
 	origin.m_y += 4.0f;
 	dQuaternion rot;
