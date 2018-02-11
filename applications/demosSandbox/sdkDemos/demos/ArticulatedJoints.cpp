@@ -336,10 +336,11 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 				vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
 			}
 		}
-		dAssert (0);
-/*
+		
 		// update steering wheels
 		if (vehicleModel->m_rearTiresCount) {
+			dAssert (0);
+/*
 			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetJointAngle_1();
 			if (vehicleModel->m_inputs.m_steerValue > 0) {
 				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
@@ -351,8 +352,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
 				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
 			}
-		}
 */
+		}
+
 		// set the base turn angle
 		if (vehicleModel->m_angularActuatorsCount1) {
 			dFloat turnAngle = vehicleModel->m_turnAngle;
@@ -574,7 +576,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
-		//dFloat points[1024 * 16][3];
 		dVector points[1024 * 16];
 
 		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
@@ -587,9 +588,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			points[i][0] = array[i * 3 + 0];
 			points[i][1] = array[i * 3 + 1];
 			points[i][2] = array[i * 3 + 2];
-			points[i][2] = 0.0f;
+			points[i][3] = 0.0f;
 		}
-		bodyPart->GetMeshMatrix().TransformTriplex(&points[0][0], 3 * sizeof (dFloat), &points[0][0], 3 * sizeof (dFloat), mesh->m_vertexCount) ;
+		bodyPart->GetMeshMatrix().TransformTriplex(&points[0][0], sizeof (dVector), &points[0][0], sizeof (dVector), mesh->m_vertexCount) ;
 		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof (dVector), 1.0e-3f, 0, NULL);
 	}
 
@@ -1341,29 +1342,40 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
-		
-		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
-		NewtonCompoundCollisionBeginAddRemove(compound);
-		NewtonCompoundCollisionAddSubCollision (compound, NewtonBodyGetCollision(chassis));
+
+		// hide the thread fenders
 		for (int i = 0; i < 4; i ++) {
 			char name[64];
 			sprintf (name, "fender%d", i);
 			DemoEntity* const fender = vehicleModel->Find(name);
-			NewtonCollision* const collision = MakeConvexHull (fender);
-			NewtonCollisionSetUserID (collision, ARTICULATED_VEHICLE_DEFINITION::m_fenderPart);
-			dMatrix matrix(fender->GetCurrentMatrix());
-			NewtonCollisionSetMatrix (collision, &matrix[0][0]);
-			NewtonCompoundCollisionAddSubCollision (compound, collision);
-			NewtonDestroyCollision(collision);
 			fender->SetMesh(NULL, dGetIdentityMatrix());
 		}
-		NewtonCompoundCollisionEndAddRemove(compound);	
-		NewtonBodySetCollision(chassis, compound);
-		NewtonDestroyCollision(compound);
+		
+		// adding fenders to protect the threads
+		#if 0
+			NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
+			NewtonCompoundCollisionBeginAddRemove(compound);
+			NewtonCompoundCollisionAddSubCollision (compound, NewtonBodyGetCollision(chassis));
+			for (int i = 0; i < 4; i ++) {
+				char name[64];
+				sprintf (name, "fender%d", i);
+				DemoEntity* const fender = vehicleModel->Find(name);
+				NewtonCollision* const collision = MakeConvexHull (fender);
+				NewtonCollisionSetUserID (collision, ARTICULATED_VEHICLE_DEFINITION::m_fenderPart);
+				dMatrix matrix(fender->GetCurrentMatrix());
+				NewtonCollisionSetMatrix (collision, &matrix[0][0]);
+				NewtonCompoundCollisionAddSubCollision (compound, collision);
+				NewtonDestroyCollision(collision);
+			}
+			NewtonCompoundCollisionEndAddRemove(compound);	
+			NewtonBodySetCollision(chassis, compound);
+			NewtonDestroyCollision(compound);
+		#endif
 
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(chassis, dGetIdentityMatrix());
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), chassisBone);
 
+/*
 		// add engine
 		vehicleModel->m_engineJoint = CreateEngineBodyPart(controller, chassisBone);
 
@@ -1391,7 +1403,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 //			dCustomArticulatedTransformController::dSkeletonBone* const bone = controller->GetBone(i);
 //			NewtonCollisionSetUserData (NewtonBodyGetCollision(bone->m_body), bone);
 //		}
-
+*/
 		return controller;
 	}
 };
@@ -1448,9 +1460,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 			m_scene->GetKeyState ('Z') ||
 			m_scene->GetKeyState ('X')) 
 		{
-			dAssert (0);
-			//NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetBoneBody(0);
-			//NewtonBodySetSleepState(body, false);
+			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
+			NewtonBodySetSleepState(body, false);
 		}
 
 #if 0
@@ -1628,19 +1639,19 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle
-	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
-	dCustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-	inputManager->AddPlayer(forklift);
+//	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
+//	dCustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+//	inputManager->AddPlayer(forklift);
 
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
 	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
-	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	LoadLumberYardMesh (scene, entity, dVector(40.0f, 0.0f, 0.0f, 0.0f));
-	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 10.0f, 0.0f));
-	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
-	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
-	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
+//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+//	LoadLumberYardMesh (scene, entity, dVector(40.0f, 0.0f, 0.0f, 0.0f));
+//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 10.0f, 0.0f));
+//	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
+//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
+//	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
 
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
