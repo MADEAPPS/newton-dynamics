@@ -16,7 +16,6 @@
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomPulley.h"
 
-//dInitRtti(dCustomPulley);
 IMPLEMENT_CUSTOM_JOINT(dCustomPulley);
 
 //////////////////////////////////////////////////////////////////////

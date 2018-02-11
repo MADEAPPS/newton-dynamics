@@ -21,9 +21,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//dInitRtti(dCustomUniversal);
 IMPLEMENT_CUSTOM_JOINT(dCustomUniversal);
-
 
 dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge(pinAndPivotFrame, child, parent)

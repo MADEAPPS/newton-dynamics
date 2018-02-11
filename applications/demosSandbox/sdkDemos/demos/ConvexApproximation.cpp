@@ -120,7 +120,7 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 
 dAssert(0);
 return;
-
+/*
 	// load the scene from a ngd file format
 //	NewtonBody* const body = CreateLevelMesh (scene, "xxxx.ngd", true);
 	NewtonBody* const body = CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -171,6 +171,7 @@ return;
 
 	origin.m_y += 10.0f;
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

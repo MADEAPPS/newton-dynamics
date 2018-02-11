@@ -30,7 +30,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 
 #define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
 
-#define DECLARE_CUSTOM_JOINT(className,baseClass)																			\
+#define DECLARE_CUSTOM_JOINT_BASE(className,baseClass)																		\
 	public:																													\
 	virtual bool IsType (dCRCTYPE type) const																				\
 	{																														\
@@ -66,8 +66,16 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 		}																													\
 		dCRCTYPE m_key_##className;																							\
 	};																														\
-	friend class SerializeMetaData_##className;																				\
-	static SerializeMetaData_##className m_metaData_##className;
+	friend class SerializeMetaData_##className;
+	
+
+#define DECLARE_CUSTOM_JOINT(className,baseClass)	\
+	DECLARE_CUSTOM_JOINT_BASE(className,baseClass)	\
+	static CUSTOM_JOINTS_API SerializeMetaData_##className m_metaData_##className;
+
+#define DECLARE_CUSTOM_JOINT_EXPORT_IMPORT(exportImport,className,baseClass)	\
+	DECLARE_CUSTOM_JOINT_BASE(className,baseClass)								\
+	static exportImport SerializeMetaData_##className m_metaData_##className;
 
 #define IMPLEMENT_CUSTOM_JOINT(className)																					\
 	className::SerializeMetaData_##className className::m_metaData_##className(#className);									\

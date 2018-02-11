@@ -21,7 +21,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//dInitRtti(dCustomUpVector);
 
 dCustomUpVector::dCustomUpVector(const dVector& pin, NewtonBody* child)
 	:dCustomJoint(2, child, NULL)
