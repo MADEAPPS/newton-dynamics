@@ -281,6 +281,21 @@ void dCustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) co
 	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
+dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	cosAngle = dir.DotProduct3(cosDir);
+	sinAngle = sinDir.DotProduct3(dir.CrossProduct(cosDir));
+	return dAtan2(sinAngle, cosAngle);
+}
+
+dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
+{
+	dFloat sinAngle;
+	dFloat cosAngle;
+	return CalculateAngle (dir, cosDir, sinDir, sinAngle, cosAngle);
+}
+
+
 void dCustomJoint::SetBodiesCollisionState (int state)
 {
 	NewtonJointSetCollisionState (m_joint, state);

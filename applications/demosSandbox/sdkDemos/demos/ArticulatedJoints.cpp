@@ -68,10 +68,9 @@ class ArticulatedEntityModel: public DemoEntity
 		SuspensionTire (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const chassis)
 			:dCustomSlidingContact (pinAndPivotFrame, tire, chassis)
 		{
-dAssert (0);
-//			EnableLinearLimits(true);
-//			SetLinearLimits (-0.5f, 0.01f);
-//			SetAsSpringDamper(true, 0.9f, 1550.0f, 150.0f);
+			EnableLimits(true);
+			SetLimits (-0.5f, 0.01f);
+			SetAsSpringDamper(true, 0.9f, 1550.0f, 150.0f);
 		}
 	};
 
@@ -919,7 +918,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_tractionTires[vehicleModel->m_tractionTiresCount] = bone->m_body;
 		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount] = new dCustomHinge(tireHingeMatrix, bone->m_body, parentBone->m_body);
 		vehicleModel->m_tractionTiresCount ++;
-
+/*
 		// link traction tire to the engine using a differential gear
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
@@ -933,6 +932,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
 		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+*/
 		return bone;
 	}
 
@@ -1389,8 +1389,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 //		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
 
 		AddCraneBase (controller);
+*/
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
+/*
 		MakeLeftThread(controller);
 		MakeRightThread(controller);
 

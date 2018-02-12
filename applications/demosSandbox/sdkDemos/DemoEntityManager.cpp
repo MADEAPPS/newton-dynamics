@@ -240,7 +240,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_workerThreades = 1;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
-//	m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 1;
 //	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
@@ -1361,7 +1361,7 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		jointDebugRender.SetScale(0.125f);
+		jointDebugRender.SetScale(0.5f);
 
 		RenderJointsDebugInfo(m_world, &jointDebugRender);
 	}
