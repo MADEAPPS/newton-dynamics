@@ -246,12 +246,17 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 
 void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& euler, dFloat timestep)
 {
-#if 0
-	NewtonUserJointAddAngularRow(m_joint, -euler[1], &matrix1[1][0]);
+#if 1
+//	NewtonUserJointAddAngularRow(m_joint, -euler[1], &matrix1[1][0]);
+//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+//	NewtonUserJointAddAngularRow(m_joint, -euler[2], &matrix1[2][0]);
+//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	
+	// two rows to restrict rotation around around the parent coordinate system
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -euler[2], &matrix1[2][0]);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
 #else
 	dVector rollPin(dSin(euler[1]), dFloat(0.0f), dCos(euler[1]), dFloat(0.0f));
 	rollPin = matrix1.RotateVector(rollPin);
@@ -282,7 +287,7 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 	SubmitAngularRow(matrix0, matrix1, euler0, timestep);
-
+/*
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(euler0.m_x);
 
@@ -310,4 +315,5 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 	}
+*/
 }
