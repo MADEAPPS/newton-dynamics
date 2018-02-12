@@ -223,6 +223,7 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API static void Initalize(NewtonWorld* const world);
 
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const {}
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonSerializeCallback callback, void* const userData) const;
 	
@@ -252,11 +253,7 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
 	CUSTOM_JOINTS_API int GetSolverModel() const;
-
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
-
-	CUSTOM_JOINTS_API void SetDebugScale(dFloat scale);
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 

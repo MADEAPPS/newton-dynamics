@@ -127,6 +127,14 @@ dFloat dCustomSlider::GetFriction () const
 	return m_friction;
 }
 
+void dCustomSlider::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
+}
 
 void dCustomSlider::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
@@ -197,6 +205,7 @@ void dCustomSlider::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, co
 
 void dCustomSlider::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+/*
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
 	dVector euler1;
@@ -205,6 +214,23 @@ void dCustomSlider::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matr
 		NewtonUserJointAddAngularRow(m_joint, -euler0[i], &matrix1[i][0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	}
+*/
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dVector euler0;
+	dVector euler1;
+	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
+	rollPin = matrix1.RotateVector(rollPin);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix0[0][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
 
 void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)

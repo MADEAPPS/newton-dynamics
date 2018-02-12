@@ -136,12 +136,13 @@ dFloat dCustomHinge::GetFriction () const
 
 void dCustomHinge::Debug(dDebugDisplay* const debugDisplay) const
 {
-	dCustomJoint::Debug(debugDisplay);
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
 
 	if (m_options.m_option0) {
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
 
 		const int subdiv = 12;
 		dVector arch[subdiv + 1];
@@ -243,12 +244,23 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 	}
 }
 
-void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& euler, dFloat timestep)
 {
-	NewtonUserJointAddAngularRow(m_joint, -eulers[1], &matrix1[1][0]);
+#if 0
+	NewtonUserJointAddAngularRow(m_joint, -euler[1], &matrix1[1][0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &matrix1[2][0]);
+	NewtonUserJointAddAngularRow(m_joint, -euler[2], &matrix1[2][0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+#else
+	dVector rollPin(dSin(euler[1]), dFloat(0.0f), dCos(euler[1]), dFloat(0.0f));
+	rollPin = matrix1.RotateVector(rollPin);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler[1], &matrix1[1][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	NewtonUserJointAddAngularRow(m_joint, -euler[2], &rollPin[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+#endif
 }
 
 void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)

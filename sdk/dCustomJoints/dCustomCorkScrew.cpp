@@ -175,9 +175,12 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
+	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
+	rollPin = matrix1.RotateVector(rollPin);
+
 	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
+	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors

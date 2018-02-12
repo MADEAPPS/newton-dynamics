@@ -169,77 +169,21 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 
 void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-#if 0
-	dFloat sinAngle;
-	dFloat cosAngle;
-
-	// construct an orthogonal coordinate system with these two vectors
-	dMatrix matrix1_1;
-	matrix1_1.m_up = matrix1.m_up;
-	matrix1_1.m_right = matrix0.m_front.CrossProduct(matrix1.m_up);
-	matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right.DotProduct3(matrix1_1.m_right)));
-	matrix1_1.m_front = matrix1_1.m_up.CrossProduct(matrix1_1.m_right);
-	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_front), &matrix1_1.m_front[0]);
-	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_right), &matrix1_1.m_right[0]);
-
-	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	CalculateAngle(matrix1_1.m_front, matrix1.m_front, matrix1.m_up, sinAngle, cosAngle);
-	m_curJointAngle.Update(cosAngle, sinAngle);
-
-
-static int xxxxxx;
-dMatrix localMatrix(matrix0 * matrix1.Inverse());
-dVector euler0;
-dVector euler1;
-localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-dFloat xxx0 = CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_front);
-dFloat xxx1 = CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_right);
-dTrace(("%d (%f %f) (%f %f)\n", xxxxxx++, xxx0, -euler0[0], xxx1, -euler0[2]));
-dFloat a = xxx0+euler0[0];
-dFloat b = xxx1+euler0[2];
-if ((dAbs (a) > 1.0e-2f) || (dAbs (b) > 1.0e-2f)) {
-	xxxxxx*=1;
-}
-
-#else 
-
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
+	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
+	rollPin = matrix1.RotateVector(rollPin);
+
 	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix0[0][0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-	dVector rollPin (dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat (0.0f));
-	rollPin = matrix1.RotateVector (rollPin);
-	dMatrix referenceFrame (dYawMatrix(euler0[1]) * matrix1);
-
 	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(euler0.m_y);
-
-/*
-static int xxxxxx;
-dMatrix matrix1_1;
-matrix1_1.m_up = matrix1.m_up;
-matrix1_1.m_right = matrix0.m_front.CrossProduct(matrix1.m_up);
-matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right.DotProduct3(matrix1_1.m_right)));
-matrix1_1.m_front = matrix1_1.m_up.CrossProduct(matrix1_1.m_right);
-dFloat xxx0 = CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_front);
-dFloat xxx1 = CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_right);
-localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-dTrace(("%d (%f %f) (%f %f)\n", xxxxxx++, xxx0, -euler0[0], xxx1, -euler0[2]));
-
-dFloat a = xxx0+euler0[0];
-dFloat b = xxx1+euler0[2];
-if ((dAbs (a) > 1.0e-2f) || (dAbs (b) > 1.0e-2f)) {
-xxxxxx*=1;
-}
-*/
-#endif
 
 	// save the current joint Omega
 	dVector omega0(0.0f);
