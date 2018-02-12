@@ -176,7 +176,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dCustomGear* const axel = new dCustomGear(5.0f, chassisMatrix.m_front, chassisMatrix.m_front, tire, m_engineJoint->GetBody0());
 		cycleLinks.Append(axel);
 
-		m_tractionTiresJoints[m_tractionTiresCount] = new dCustomHinge (&chassisMatrix[0][0], tire, chassis);
+		m_tractionTiresJoints[m_tractionTiresCount] = new SuspensionTire(&chassisMatrix[0][0], tire, chassis);
 		m_tractionTires[m_tractionTiresCount] = tire;
 		m_tractionTiresCount ++;
 	}
@@ -258,13 +258,15 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_wristAxis1;
 		
 	NewtonBody* m_tractionTires[4];
-	dCustomHinge* m_tractionTiresJoints[4];
+	dCustomSlidingContact* m_tractionTiresJoints[4];
+	
 	dCustomSliderActuator* m_liftJoints[4];
 	dCustomSliderActuator* m_paletteJoints[4];
 	dCustomHingeActuator* m_angularActuator0[4];
 	dCustomHingeActuator* m_angularActuator1[4];
 	dCustomUniversalActuator* m_rearTireJoints[4];
 	dCustomUniversalActuator* m_universalActuator[4];
+
 	dCustomUniversal* m_engineJoint;
 
 	InputRecord m_inputs;
@@ -886,9 +888,11 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix (bone->m_body, &matrix[0][0]);
-		dMatrix hingeFrame (dRollMatrix(90.0f * dDegreeToRad) * matrix);
-		new dCustomHinge (hingeFrame, bone->m_body, parentBone->m_body);
-
+		//dMatrix hingeFrame (dRollMatrix(90.0f * dDegreeToRad) * matrix);
+		dMatrix hingeFrame(dRollMatrix(0.0f * dDegreeToRad) * matrix);
+		dCustomSlidingContact* const tire = new ArticulatedEntityModel::SuspensionTire(hingeFrame, bone->m_body, parentBone->m_body);
+		tire->SetLimits(0.0f, 0.0f);
+		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 		return bone;
 	}
 
@@ -912,11 +916,14 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		dMatrix tireHingeMatrix(dRollMatrix(90.0f * dDegreeToRad) * matrix);
+		//dMatrix tireHingeMatrix(dRollMatrix(90.0f * dDegreeToRad) * matrix);
+		dMatrix tireHingeMatrix(dRollMatrix(0.0f * dDegreeToRad) * matrix);
 
 		// save tractions tires 
 		vehicleModel->m_tractionTires[vehicleModel->m_tractionTiresCount] = bone->m_body;
-		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount] = new dCustomHinge(tireHingeMatrix, bone->m_body, parentBone->m_body);
+		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount] = new ArticulatedEntityModel::SuspensionTire(tireHingeMatrix, bone->m_body, parentBone->m_body);
+		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount]->SetLimits(0.0f, 0.0f);
+		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount]->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 		vehicleModel->m_tractionTiresCount ++;
 /*
 		// link traction tire to the engine using a differential gear
@@ -965,12 +972,12 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		MakeTire ("leftTireSuport_0", "suportTire", controller, chassisBone);
 		MakeTire ("leftTireSuport_1", "suportTire", controller, chassisBone);
-
+return;
 		for (int i = 1; i < 7; i++) {
 			char name[64];
 			sprintf(name, "leftTire_%d", i);
 			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-			LinkTires (leftTire_0, childBone, chassisBone);
+//			LinkTires (leftTire_0, childBone, chassisBone);
 		}
 	}
 
@@ -984,12 +991,12 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		MakeTire("rightTireSuport_0", "suportTire", controller, chassisBone);
 		MakeTire("rightTireSuport_1", "suportTire", controller, chassisBone);
-
+return;
 		for (int i = 1; i < 7; i++) {
 			char name[64];
 			sprintf(name, "rightTire_%d", i);
 			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-			LinkTires(rightTire_0, childBone, chassisBone);
+//			LinkTires(rightTire_0, childBone, chassisBone);
 		}
 	}
 		

@@ -144,33 +144,38 @@ void dCustomSlider::SubmitConstraintSpringDamper(const dMatrix& matrix0, const d
 
 void dCustomSlider::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dFloat x = m_posit + m_speed * timestep;
-	if (x < m_minDist) {
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	if ((m_minDist == 0.0f) && (m_maxDist == 0.0f)) {
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+	} else {
+		dFloat x = m_posit + m_speed * timestep;
+		if (x < m_minDist) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			const dFloat invtimestep = 1.0f / timestep;
+			const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
-	} else if (x > m_maxDist) {
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		} else if (x > m_maxDist) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep; 
-		NewtonUserJointSetRowAcceleration (m_joint, stopAccel);
+			const dFloat invtimestep = 1.0f / timestep;
+			const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
-	} else if (m_friction != 0.0f) {
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowAcceleration(m_joint, -m_speed / timestep);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		} else if (m_friction != 0.0f) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowAcceleration(m_joint, -m_speed / timestep);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		}
 	}
 }
 
