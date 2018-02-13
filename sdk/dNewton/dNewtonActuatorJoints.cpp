@@ -176,13 +176,15 @@ void dNewtonUniversalActuator::SetTargetAngle0(dFloat angle)
 void dNewtonUniversalActuator::SetMinAngularLimit0(dFloat limit)
 {
 	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
-	joint->SetLimits_0(limit, joint->GetMaxAngularLimit_0());
+	dAssert (0);
+//	joint->SetLimits_0(limit, joint->GetMaxAngularLimit_0());
 }
 
 void dNewtonUniversalActuator::SetMaxAngularLimit0(dFloat limit)
 {
 	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
-	joint->SetLimits_0(joint->GetMinAngularLimit_0(), limit);
+	dAssert (0);
+//	joint->SetLimits_0(joint->GetMinAngularLimit_0(), limit);
 }
 
 void dNewtonUniversalActuator::SetAngularRate0(dFloat rate)
@@ -204,14 +206,15 @@ void dNewtonUniversalActuator::SetTargetAngle1(dFloat angle)
 void dNewtonUniversalActuator::SetMinAngularLimit1(dFloat limit)
 {
 	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
-	joint->SetLimits_1(limit, joint->GetMaxAngularLimit_1());
+	dAssert (0);
+//	joint->SetLimits_1(limit, joint->GetMaxAngularLimit_1());
 }
 
 void dNewtonUniversalActuator::SetMaxAngularLimit1(dFloat limit)
 {
-//	((dCustomUniversalActuator*)m_joint)->SetMaxAngularLimit1(limit);
 	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
-	joint->SetLimits_1(joint->GetMaxAngularLimit_1(), limit);
+	dAssert (0);
+//	joint->SetLimits_1(joint->GetMaxAngularLimit_1(), limit);
 }
 
 void dNewtonUniversalActuator::SetAngularRate1(dFloat rate)
@@ -238,12 +241,16 @@ dFloat dNewtonUniversalActuator::GetAngularRate0() const
 
 dFloat dNewtonUniversalActuator::GetMinAngularLimit0() const
 {
-	return ((dCustomUniversalActuator*)m_joint)->GetMinAngularLimit_0();
+	dAssert (0);
+	return 0;
+//	return ((dCustomUniversalActuator*)m_joint)->GetMinAngularLimit_0();
 }
 
 dFloat dNewtonUniversalActuator::GetMaxAngularLimit0() const
 {
-	return ((dCustomUniversalActuator*)m_joint)->GetMaxAngularLimit_0();
+	dAssert (0);
+	return 0;
+//	return ((dCustomUniversalActuator*)m_joint)->GetMaxAngularLimit_0();
 }
 
 bool dNewtonUniversalActuator::GetEnableFlag1 () const
@@ -263,21 +270,29 @@ dFloat dNewtonUniversalActuator::GetAngularRate1() const
 
 dFloat dNewtonUniversalActuator::GetMinAngularLimit1() const
 {
-	return ((dCustomUniversalActuator*)m_joint)->GetMinAngularLimit_1();
+	dAssert (0);
+	return 0;
+//	return ((dCustomUniversalActuator*)m_joint)->GetMinAngularLimit_1();
 }
 
 dFloat dNewtonUniversalActuator::GetMaxAngularLimit1() const
 {
-	return ((dCustomUniversalActuator*)m_joint)->GetMaxAngularLimit_1();
+	dAssert (0);
+	return 0;
+//	return ((dCustomUniversalActuator*)m_joint)->GetMaxAngularLimit_1();
 }
 
 dFloat dNewtonUniversalActuator::GetActuatorAngle0() const
 {
-	return ((dCustomUniversalActuator*)m_joint)->GetJointAngle_0();
+	dAssert (0);
+	return 0;
+//	return ((dCustomUniversalActuator*)m_joint)->GetJointAngle_0();
 }
 
 dFloat dNewtonUniversalActuator::GetActuatorAngle1() const
 {
-	return ((dCustomUniversalActuator*)m_joint)->GetJointAngle_1();
+	dAssert (0);
+	return 0;
+//	return ((dCustomUniversalActuator*)m_joint)->GetJointAngle_1();
 }
 

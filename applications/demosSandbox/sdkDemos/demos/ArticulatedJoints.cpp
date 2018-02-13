@@ -32,7 +32,7 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	{
 		m_terrain		= 1<<0,
 		m_bodyPart		= 1<<2,
-		m_LinkPart		= 1<<3,
+		m_linkPart		= 1<<3,
 		m_fenderPart	= 1<<4,
 //		m_tireID		= 1<<5,
 		m_tireInnerRing = 1<<6,
@@ -434,9 +434,21 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id0 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID (NewtonCollisionGetUserID(collision0));
 		ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id1 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID (NewtonCollisionGetUserID(collision1));
 
-		switch (id0 & id1)
+		switch (id0 | id1)
 		{
-			case ARTICULATED_VEHICLE_DEFINITION::m_terrain & ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireOuterRing | ARTICULATED_VEHICLE_DEFINITION::m_tireOuterRing:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireOuterRing | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			{
+				return 0;
+				break;
+			}
+
+			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:			
+			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 			{
 				return 1;
 				break;
@@ -444,20 +456,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			default:
 			{
 				dAssert (0);
-				return false;
+				return true;
 			}
 		}
-/*
-		if (id0 & id1 & ARTICULATED_VEHICLE_DEFINITION::m_bodyPart) {
-			dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-			dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
-			if (bone0 && bone1 && (bone0->m_controller == bone1->m_controller)) {
-				dAssert (!bone0->m_controller->SelfCollisionTest (bone0, bone1));
-				return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
-			}
-		}
-		return 1;
-*/
 	}
 
 	static int CompoundSubCollisionAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
@@ -467,29 +468,43 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 	
 	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
+		int countCount = 0;
+		void* contactList[32];
+
+		for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+			contactList[countCount] = contact;
+			countCount++;
+		}
+
 		NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 		NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		for (int i = 0; i < countCount; i ++) {
+			NewtonMaterial* const material = NewtonContactGetMaterial (contactList[i]);
+			NewtonCollision* const collision0 = NewtonMaterialGetBodyCollidingShape(material, body0);
+			NewtonCollision* const collision1 = NewtonMaterialGetBodyCollidingShape(material, body1);
 
-		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+			ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id0 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision0));
+			ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id1 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision1));
 
-		//int id0 = NewtonCollisionGetUserID (collision0);
-		//int id1 = NewtonCollisionGetUserID (collision1);
-		//NewtonBody* const tireBody = (id0 & ARTICULATED_VEHICLE_DEFINITION::m_tireID) ? body0 : ((id1 & ARTICULATED_VEHICLE_DEFINITION::m_tireID) ? body1 : NULL);
-		//NewtonBody* const linkBody = (id0 & ARTICULATED_VEHICLE_DEFINITION::m_LinkPart) ? body0 : ((id1 & ARTICULATED_VEHICLE_DEFINITION::m_LinkPart) ? body1 : NULL);
-
-		ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id0 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision0));
-		ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id1 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision1));
-
-		switch (id0 & id1) 
-		{
-			case ARTICULATED_VEHICLE_DEFINITION::m_terrain & ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			switch (id0 | id1) 
 			{
-				break;
-			}
-			default:
-			{
-				dAssert(0);
+				case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireOuterRing:
+				{
+					NewtonContactJointRemoveContact(contactJoint, contactList[i]);
+					break;
+				}
+
+				case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+				case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireOuterRing:
+				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+				{
+					break;
+				}
+				default:
+				{
+					dAssert(0);
+				}
 			}
 		}
 
@@ -848,7 +863,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dMatrix align (dRollMatrix(90.0f * dDegreeToRad));
 		if (hasOuterRing) {
 			NewtonCollision* const innerRing = NewtonCreateChamferCylinder(GetWorld(), radius, width, ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing, &align[0][0]);
-			NewtonCollision* const outerRing = NewtonCreateChamferCylinder(GetWorld(), radius + 0.1f, width, ARTICULATED_VEHICLE_DEFINITION::m_tireOuterRing, &align[0][0]);
+			NewtonCollision* const outerRing = NewtonCreateChamferCylinder(GetWorld(), radius + 0.07f, width, ARTICULATED_VEHICLE_DEFINITION::m_tireOuterRing, &align[0][0]);
 
 			tireShape = NewtonCreateCompoundCollision(GetWorld(), ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);
 			NewtonCompoundCollisionBeginAddRemove(tireShape);
@@ -1138,7 +1153,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dMatrix linkMatrix (dGetIdentityMatrix());
 		linkMatrix.m_posit.m_y = linkLength * 0.5f;
 		NewtonCollision* const collision = NewtonCreateBox (GetWorld(), 0.06f, linkLength, 0.5f, 0, &linkMatrix[0][0]);
-		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_LinkPart);
+		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_linkPart);
 		NewtonCollisionSetUserData (collision, rootNode);
 
 		NewtonBody* linkArray[1024];
@@ -1444,10 +1459,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 */
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
-/*
+
 		MakeLeftThread(controller);
 		MakeRightThread(controller);
-
+/*
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
 
