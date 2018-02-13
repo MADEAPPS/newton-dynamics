@@ -1154,7 +1154,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		linkMatrix.m_posit.m_y = linkLength * 0.5f;
 		NewtonCollision* const collision = NewtonCreateBox (GetWorld(), 0.06f, linkLength, 0.5f, 0, &linkMatrix[0][0]);
 		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_linkPart);
-		NewtonCollisionSetUserData (collision, rootNode);
+		//NewtonCollisionSetUserData (collision, rootNode);
 
 		NewtonBody* linkArray[1024];
 
@@ -1196,6 +1196,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		NewtonBody* link0 = linkArray[0];
 
 		NewtonJoint* hingeArray[1024];
+
+		
 		for (int i = 1; i < bodyCount; i++) {
 			NewtonBody* const link1 = linkArray[i];
 
@@ -1222,6 +1224,22 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dCustomHinge* const hinge = new dCustomHinge (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 		hinge->SetStiffness(0.99f);
 		hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+
+		dVector com (0.0f);
+		for (int i = 0; i < bodyCount; i++) {
+			dMatrix matrix;
+			NewtonBody* const link = linkArray[i];
+			NewtonBodyGetMatrix(link, &matrix[0][0]);
+			com += matrix.m_posit;
+		}
+		com = com.Scale (1.0f / bodyCount);
+		com.m_w = 1.0f;
+
+		NewtonBody* const chassisBody = rootNode->m_body;
+		NewtonBody* const chainBody = linkArray[0];
+		dMatrix planeMatrix;
+		NewtonBodyGetMatrix(chassisBody, &planeMatrix[0][0]);
+		new dCustomPlane (com, planeMatrix.m_right, chainBody, chassisBody);
 	}
 
 	void MakeLeftThread(dCustomArticulatedTransformController* const controller)
