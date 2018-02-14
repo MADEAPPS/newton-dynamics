@@ -31,11 +31,12 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	enum SHAPES_ID
 	{
 		m_terrain		= 1<<0,
+		m_landPart		= 1<<1,
 		m_bodyPart		= 1<<2,
 		m_linkPart		= 1<<3,
 		m_tirePart		= 1<<4,
 		m_tireInnerRing = 1<<5,
-//		m_fenderPart	= 1<<4,
+		
 	};
 
 	char m_boneName[32];
@@ -444,11 +445,14 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 				break;
 			}
 
-			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:			
-//			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
-//			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			{
 				return 1;
 				break;
@@ -478,15 +482,15 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 			//case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 			{
 				return 1;
 				break;
 			}
 
-			//case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
-			//case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 			{
 				return 0;
@@ -533,6 +537,11 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
+				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
+				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
+				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 				{
 					break;
 				}
@@ -1708,8 +1717,7 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 				dVector size (maxBox - minBox);
 				dMatrix offset (dGetIdentityMatrix());
 				offset.m_posit = (maxBox + minBox).Scale (0.5f);
-				//NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, 0, NULL);
-				NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, 0, &offset[0][0]);
+				NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, ARTICULATED_VEHICLE_DEFINITION::m_landPart, &offset[0][0]);
 				node = filter.Insert (shape, mesh);
 			}
 
@@ -1765,7 +1773,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
 	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
-//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 //	LoadLumberYardMesh (scene, entity, dVector(40.0f, 0.0f, 0.0f, 0.0f));
 //	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 10.0f, 0.0f));
 //	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
