@@ -286,10 +286,12 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector euler0;
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-	SubmitAngularRow(matrix0, matrix1, euler0, timestep);
-/*
+
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(euler0.m_x);
+
+	// submit the angualar rows.
+	SubmitAngularRow(matrix0, matrix1, euler0, timestep);
 
 	// save the current joint Omega
 	dVector omega0(0.0f);
@@ -315,5 +317,4 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 	}
-*/
 }
