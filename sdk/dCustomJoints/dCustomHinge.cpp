@@ -31,6 +31,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_jointOmega(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
+	,m_motorSpeed(0.0f)
 	,m_springDamperRelaxation(0.9f)
 	,m_options()
 {
@@ -48,6 +49,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_jointOmega(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
+	,m_motorSpeed(0.0f)
 	,m_springDamperRelaxation(0.9f)
 	,m_options()
 {
@@ -69,6 +71,7 @@ void dCustomHinge::Deserialize (NewtonDeserializeCallback callback, void* const 
 	callback (userData, &m_jointOmega, sizeof (dFloat));
 	callback (userData, &m_spring, sizeof (dFloat));
 	callback (userData, &m_damper, sizeof (dFloat));
+	callback (userData, &m_motorSpeed, sizeof(dFloat));
 	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
 	callback (userData, &m_options, sizeof (m_options));
 }
@@ -83,10 +86,10 @@ void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const user
 	callback (userData, &m_jointOmega, sizeof (dFloat));
 	callback(userData, &m_spring, sizeof (dFloat));
 	callback(userData, &m_damper, sizeof (dFloat));
+	callback(userData, &m_motorSpeed, sizeof(dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof (dFloat));
 	callback (userData, &m_options, sizeof (m_options));
 }
-
 
 void dCustomHinge::EnableLimits(bool state)
 {
@@ -97,6 +100,11 @@ void dCustomHinge::SetLimits(dFloat minAngle, dFloat maxAngle)
 {
 	m_minAngle = -dAbs (minAngle);
 	m_maxAngle = dAbs (maxAngle);
+}
+
+void dCustomHinge::EnableMotor(bool state, dFloat motorSpeed)
+{
+	m_options.m_option2 = state;
 }
 
 void dCustomHinge::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
@@ -302,19 +310,25 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 	m_jointOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
 
-	if (m_options.m_option0) {
-		if (m_options.m_option1) {
-			SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
-		} else {
-			SubmitConstraintLimits(matrix0, matrix1, timestep);
+	if (!m_options.m_option2) {
+		// the joint is not motor
+		if (m_options.m_option0) {
+			if (m_options.m_option1) {
+				SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
+			} else {
+				SubmitConstraintLimits(matrix0, matrix1, timestep);
+			}
+		} else if (m_options.m_option1) {
+			SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+		} else if (m_friction != 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 		}
-	} else if (m_options.m_option1) {
-		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
-	} else if (m_friction != 0.0f) {
-		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+	} else {
+		// the joint is motor
+		dAssert(0);
 	}
 }

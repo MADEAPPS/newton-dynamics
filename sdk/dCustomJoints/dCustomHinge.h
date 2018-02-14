@@ -28,11 +28,15 @@ class dCustomHinge: public dCustomJoint
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);
 	CUSTOM_JOINTS_API void SetLimits(dFloat minAngle, dFloat maxAngle);
+
 	CUSTOM_JOINTS_API dFloat GetJointAngle () const;
 	CUSTOM_JOINTS_API dVector GetPinAxis () const;
 	CUSTOM_JOINTS_API dFloat GetJointOmega () const;
+
 	CUSTOM_JOINTS_API dFloat GetFriction () const;	
 	CUSTOM_JOINTS_API void SetFriction (dFloat frictionTorque);
+
+	CUSTOM_JOINTS_API void EnableMotor(bool state, dFloat motorSpeed);
 	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 	protected:
@@ -51,9 +55,9 @@ class dCustomHinge: public dCustomJoint
 	dFloat m_maxAngle;
 	dFloat m_friction;
 	dFloat m_jointOmega;
-
 	dFloat m_spring;
 	dFloat m_damper;
+	dFloat m_motorSpeed;
 	dFloat m_springDamperRelaxation;
 	dOptions m_options;
 	DECLARE_CUSTOM_JOINT(dCustomHinge, dCustomJoint)

@@ -34,7 +34,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 	,m_damper2(0.0f)
 	,m_springDamperRelaxation2(0.9f)
 {
-	m_options.m_option4 = -1;
+	m_options.m_option5 = -1;
 }
 
 
@@ -49,7 +49,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const d
 	,m_damper2(0.0f)
 	,m_springDamperRelaxation2(0.9f)
 {
-	m_options.m_option4 = -1;
+	m_options.m_option5 = -1;
 }
 
 dCustomUniversal::~dCustomUniversal()
@@ -84,12 +84,12 @@ void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const u
 
 void dCustomUniversal::SetHardMiddleAxis(bool state)
 {
-	m_options.m_option4 = state;
+	m_options.m_option5 = state;
 }
 
 void dCustomUniversal::EnableLimits2(bool state)
 {
-	m_options.m_option2 = state;
+	m_options.m_option3 = state;
 }
 
 void dCustomUniversal::SetLimits2(dFloat minAngle, dFloat maxAngle)
@@ -102,7 +102,7 @@ void dCustomUniversal::SetAsSpringDamper2(bool state, dFloat springDamperRelaxat
 {
 	m_spring2 = spring;
 	m_damper2 = damper;
-	m_options.m_option3 = state;
+	m_options.m_option4 = state;
 	m_springDamperRelaxation2 = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
 }
 
@@ -133,48 +133,6 @@ dFloat dCustomUniversal::GetFriction2() const
 {
 	return m_friction2;
 }
-
-/*
-void dCustomUniversal::Debug(dDebugDisplay* const debugDisplay) const
-{
-	dCustomHinge::Debug(debugDisplay);
-
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	const int subdiv = 12;
-	dVector arch[subdiv + 1];
-	const float radius = debugDisplay->m_debugScale;
-
-	if ((m_maxAngle > 1.0e-3f) || (m_minAngle < -1.0e-3f)) {
-		// show pitch angle limits
-		dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
-
-		dFloat minAngle = m_minAngle;
-		dFloat maxAngle = m_maxAngle;
-		if ((maxAngle - minAngle) >= dPi * 2.0f) {
-			minAngle = 0.0f;
-			maxAngle = dPi * 2.0f;
-		}
-
-		dFloat angleStep = (maxAngle - minAngle) / subdiv;
-		dFloat angle0 = minAngle;
-
-		matrix1.m_posit = matrix0.m_posit;
-		debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
-		for (int i = 0; i <= subdiv; i++) {
-			arch[i] = matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point));
-			debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
-			angle0 += angleStep;
-		}
-
-		for (int i = 0; i < subdiv; i++) {
-			debugDisplay->DrawLine(arch[i], arch[i + 1]);
-		}
-	}
-}
-*/
 
 void dCustomUniversal::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
@@ -262,19 +220,19 @@ void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	dMatrix rollMatrix(dYawMatrix(eulers[1]) * matrix1);
 	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &rollMatrix.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	if (m_options.m_option4) {
+	if (m_options.m_option5) {
 		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
 		dFloat alphaRollError = -(eulers[2] + rollOmega * timestep) / (timestep * timestep);
 		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
 	}
 
-	if (m_options.m_option2) {
-		if (m_options.m_option3) {
+	if (m_options.m_option3) {
+		if (m_options.m_option4) {
 			dCustomUniversal::SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
 		} else {
 			dCustomUniversal::SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
-	} else if (m_options.m_option3) {
+	} else if (m_options.m_option4) {
 		dCustomUniversal::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	} else if (m_friction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
@@ -289,7 +247,7 @@ void dCustomUniversal::Debug(dDebugDisplay* const debugDisplay) const
 {
 	dCustomHinge::Debug(debugDisplay);
 
-	if (m_options.m_option2) {
+	if (m_options.m_option3) {
 		dMatrix matrix0;
 		dMatrix matrix1;
 		CalculateGlobalMatrix(matrix0, matrix1);
