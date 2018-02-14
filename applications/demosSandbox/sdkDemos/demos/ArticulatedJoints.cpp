@@ -1098,7 +1098,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		DemoBezierCurve* const bezierPath = (DemoBezierCurve*) threadPath->GetMesh();
 
 		dFloat length = dFloat (bezierPath->m_curve.CalculateLength (0.01f));
-		int linksCount = int(length / linkLength) + 1;
+		int linksCount = int(dFloor (length / linkLength)) + 1;
 		linkLength = length / linksCount;
 
 		// create the uniform speed knot interpolation table
@@ -1157,7 +1157,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		NewtonBody* linkArray[1024];
 
 		int bodyCount = 0;
-		linksCount += 2;
+		// add extra link for wiggle room
+		//linksCount += 2;
+		linksCount += 1;
 
 		void* const aggregate = NewtonCollisionAggregateCreate(world);
 		NewtonCollisionAggregateSetSelfCollision (aggregate, 0);
@@ -1194,8 +1196,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		NewtonBody* link0 = linkArray[0];
 
 		NewtonJoint* hingeArray[1024];
-
-		
 		for (int i = 1; i < bodyCount; i++) {
 			NewtonBody* const link1 = linkArray[i];
 
