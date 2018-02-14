@@ -1204,6 +1204,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				dgJointInfo* const jointInfo = &constraintArray[j];
 				//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
 				dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
+				//accNorm = (accel > accNorm) ? accel : accNorm;
 				accNorm += accel2;
 			}
 		}
@@ -1218,6 +1219,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				if (!jointInfo->m_joint->IsSkeleton()) {
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
 					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
+				        //accNorm = (accel > accNorm) ? accel : accNorm;
 					accNorm += accel2;
 				}
 			}
