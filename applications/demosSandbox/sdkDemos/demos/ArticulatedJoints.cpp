@@ -294,7 +294,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			engineTorque -= (engineOmega.DotProduct3(chassisMatrix.m_up)) * vehicleModel->m_omegaResistance;
 			dVector torque (chassisMatrix.m_up.Scale(engineTorque));
 			NewtonBodyAddTorque (engineBody, &torque[0]);
-			dAssert (0);
 /*			
 			if (!vehicleModel->m_rearTiresCount) {
 				// apply DC rate turn Motor 
@@ -721,9 +720,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		engineAxis.m_posit = engineMatrix.m_posit;
 
 		dCustomUniversal* const engineJoint = new dCustomUniversal(engineAxis, engineBody, chassis);
-		dAssert (0);
-//		engineJoint->EnableLimit_0(false);
-//		engineJoint->EnableLimit_1(false);
+		engineJoint->EnableLimits(false);
+		engineJoint->EnableLimits2(false);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(engineBody), bone);
@@ -972,7 +970,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount]->SetLimits(0.0f, 0.0f);
 		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount]->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 		vehicleModel->m_tractionTiresCount ++;
-/*
+
 		// link traction tire to the engine using a differential gear
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
@@ -985,8 +983,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
-		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
-*/
+		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+
 		return bone;
 	}
 
@@ -1460,7 +1458,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(chassis, dGetIdentityMatrix());
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), chassisBone);
 
-/*
 		// add engine
 		vehicleModel->m_engineJoint = CreateEngineBodyPart(controller, chassisBone);
 
@@ -1470,11 +1467,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
 
 		vehicleModel->m_maxTurmAccel = 10.0f;
-		dAssert (0);
 //		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
 
-		AddCraneBase (controller);
-*/
+//		AddCraneBase (controller);
+
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
 
