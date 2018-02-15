@@ -1024,7 +1024,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
-		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+		//new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
 
 		return bone;
 	}
