@@ -293,7 +293,6 @@ joint0->SetPitchLimits(-0, 0);
 	joint1->SetPitchLimits(-pitchLimit, pitchLimit);
 joint1->SetPitchLimits(-0, 0);
 //joint1->DisableRotationX ();
-
 }
 
 static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
@@ -860,6 +859,66 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 	NewtonCollisionAggregateAddBody(aggregate, body2);
 }
 
+
+static void AddDifferential(DemoEntityManager* const scene, const dVector& origin)
+{
+	dVector size(1.0f, 1.0f, 1.0f);
+	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
+	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 2.0f, 0.0f), 1.0f, 0.5f);
+	NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.0f, 0.0f), 1.0f, 0.5f);
+	NewtonBody* const box3 = CreateWheel(scene, origin + dVector(0.0f, 4.0f,  0.0f, 0.0f), 1.0f, 0.5f);
+
+	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	// align the object so that is looks nice
+	dMatrix matrix;
+	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+	matrix = dYawMatrix(dPi * 0.5f) * matrix;
+	NewtonBodySetMatrix(box1, &matrix[0][0]);
+	((DemoEntity*)NewtonBodyGetUserData(box1))->ResetMatrix(*scene, matrix);
+
+	NewtonBodyGetMatrix(box2, &matrix[0][0]);
+	matrix = dYawMatrix(dPi * 0.5f) * matrix;
+	NewtonBodySetMatrix(box2, &matrix[0][0]);
+	((DemoEntity*)NewtonBodyGetUserData(box2))->ResetMatrix(*scene, matrix);
+
+	// connect right tire
+	dMatrix matrix1;
+	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
+	dCustomHinge* const joint1 = new dCustomHinge(matrix1, box1, box0);
+	joint1->EnableLimits(false);
+
+	// connect left tire
+	dMatrix matrix2;
+	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
+	dCustomHinge* const joint2 = new dCustomHinge(matrix2, box2, box0);
+	joint2->EnableLimits(false);
+
+	// make the gear system
+	dMatrix matrix3;
+	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
+	new dCustomUniversal(matrix3, box3, box0);
+
+	// connect right differential
+	dMatrix righDiff(matrix3);
+	new dCustomDifferentialGear(1.0f, matrix1.m_front, righDiff, box1, box3);
+
+	// connect left differential
+	dMatrix leftDiff(matrix3);
+	leftDiff.m_up = leftDiff.m_up.Scale(-1.0f);
+	leftDiff.m_right = leftDiff.m_front.CrossProduct(leftDiff.m_up);
+	new dCustomDifferentialGear(1.0f, matrix2.m_front, leftDiff, box2, box3);
+
+
+	dVector damp(0.0f);
+	dVector omega(10.0f, 10.0f, 0.0f, 0.0f);
+	NewtonBodySetOmega(box3, &omega[0]);
+	NewtonBodySetAngularDamping(box1, &damp[0]);
+	NewtonBodySetAngularDamping(box2, &damp[0]);
+	NewtonBodySetAngularDamping(box3, &damp[0]);
+}
+
+
 class MyPathFollow: public dCustomPathFollow
 {
 	public:
@@ -1280,7 +1339,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
-#if 1
+	AddDifferential(scene, dVector(-20.0f, 0.0f, 32.0f));
+#if 0
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
@@ -1312,9 +1372,9 @@ void StandardJoints (DemoEntityManager* const scene)
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
-	dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
 	//dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
-	//dVector origin(-30.0f, 5.0f, -25.0f, 0.0f);
+	dVector origin(-30.0f, 5.0f, 32.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 

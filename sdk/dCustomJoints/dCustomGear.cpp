@@ -278,10 +278,10 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 //	dVector dir2(matrix1.m_front);
 //	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
 //	dVector dir1(dir2 + dir3);
-//	dVector dir1 (matrix1.m_front + matrix1.m_up);
-dVector dir1(matrix1.m_front);
+	dVector dir1 (matrix1.m_front + matrix1.m_up);
+//dVector dir1(matrix1.m_up);
 //dTrace(("d(%f %f %f) d(%f %f %f)\n", matrix1[1][0], matrix1[1][1], matrix1[1][2], dir3[0], dir3[1], dir3[2]));
-dTrace(("d(%f %f %f)\n", dir1[0], dir1[1], dir1[2]));
+//dTrace(("d(%f %f %f)\n", dir1[0], dir1[1], dir1[2]));
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;
