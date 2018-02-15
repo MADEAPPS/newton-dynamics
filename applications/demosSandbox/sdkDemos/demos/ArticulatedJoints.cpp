@@ -224,7 +224,7 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_maxEngineTorque;
 	dFloat m_omegaResistance;
 	dFloat m_maxTurmDamp;
-	dFloat m_maxTurmAccel;
+	dFloat m_maxTurmVelocity;
 	dFloat m_maxEngineSpeed;
 	dFloat m_maxTurnSpeed;
 	dFloat m_turnAngle;
@@ -294,22 +294,20 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			engineTorque -= (engineOmega.DotProduct3(chassisMatrix.m_up)) * vehicleModel->m_omegaResistance;
 			dVector torque (chassisMatrix.m_up.Scale(engineTorque));
 			NewtonBodyAddTorque (engineBody, &torque[0]);
-/*			
+			
 			if (!vehicleModel->m_rearTiresCount) {
 				// apply DC rate turn Motor 
 				if (vehicleModel->m_inputs.m_steerValue > 0) {
 					brakeTorque = 0.0f;
-					vehicleModel->m_engineJoint->EnableMotor_0(true);
-					vehicleModel->m_engineJoint->SetAccel_0(vehicleModel->m_maxTurmAccel);
+					vehicleModel->m_engineJoint->EnableMotor(true, vehicleModel->m_maxTurmVelocity);
 				} else if (vehicleModel->m_inputs.m_steerValue < 0){
 					brakeTorque = 0.0f;
-					vehicleModel->m_engineJoint->EnableMotor_0(true);
-					vehicleModel->m_engineJoint->SetAccel_0(-vehicleModel->m_maxTurmAccel);
+					vehicleModel->m_engineJoint->EnableMotor(true, -vehicleModel->m_maxTurmVelocity);
 				} else {
-					vehicleModel->m_engineJoint->EnableMotor_0(false);
+					vehicleModel->m_engineJoint->EnableMotor(false, 0.0f);
 				}
 			}
-*/
+
 			// apply breaks
 			for (int i = 0; i < vehicleModel->m_tractionTiresCount; i ++) {
 				vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
@@ -836,7 +834,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
 
 		vehicleModel->m_maxTurmDamp = 0.0f;
-		vehicleModel->m_maxTurmAccel = 0.0f;
+		vehicleModel->m_maxTurmVelocity = 0.0f;
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
@@ -1073,7 +1071,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			char name[64];
 			sprintf(name, "leftTire_%d", i);
 			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-			LinkTires (leftTire_0, childBone, chassisBone);
+//			LinkTires (leftTire_0, childBone, chassisBone);
 		}
 	}
 
@@ -1092,7 +1090,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			char name[64];
 			sprintf(name, "rightTire_%d", i);
 			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-			LinkTires(rightTire_0, childBone, chassisBone);
+//			LinkTires(rightTire_0, childBone, chassisBone);
 		}
 	}
 		
@@ -1509,7 +1507,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_maxEngineTorque = 1250.0f;
 		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
 
-		vehicleModel->m_maxTurmAccel = 10.0f;
+		vehicleModel->m_maxTurmVelocity = 10.0f;
 //		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
 
 //		AddCraneBase (controller);
@@ -1517,8 +1515,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
 
-		MakeLeftThread(controller);
-		MakeRightThread(controller);
+//		MakeLeftThread(controller);
+//		MakeRightThread(controller);
 /*
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();

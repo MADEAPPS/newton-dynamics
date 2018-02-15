@@ -2859,7 +2859,7 @@ void dCustomVehicleController::CalculateTireForces(dFloat timestep, int threadID
 		}
 	}
 dTrace(("\n"));
-
+/*
 	dFloat torque_y = axisMatrix.m_up.DotProduct3(torque);
 	dFloat force_x = axisMatrix.m_front.DotProduct3(force);
 	dFloat force_z = axisMatrix.m_right.DotProduct3(force);
@@ -2868,7 +2868,7 @@ dTrace(("\n"));
 	dFloat veloc_x = axisMatrix.m_front.DotProduct3(veloc);
 	dFloat veloc_z = axisMatrix.m_right.DotProduct3(veloc);
 
-/*
+
 	dFloat speed_x = veloc.DotProduct3(matrix.m_front);
 	dFloat speed_z = veloc.DotProduct3(matrix.m_right);
 	if (dAbs(speed_x) > 1.0f) {

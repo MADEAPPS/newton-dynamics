@@ -105,6 +105,7 @@ void dCustomHinge::SetLimits(dFloat minAngle, dFloat maxAngle)
 void dCustomHinge::EnableMotor(bool state, dFloat motorSpeed)
 {
 	m_options.m_option2 = state;
+	m_motorSpeed = motorSpeed;
 }
 
 void dCustomHinge::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
@@ -329,6 +330,9 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 		}
 	} else {
 		// the joint is motor
-		dAssert(0);
+		dFloat accel = (m_motorSpeed - m_jointOmega) / timestep;
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	}
 }
