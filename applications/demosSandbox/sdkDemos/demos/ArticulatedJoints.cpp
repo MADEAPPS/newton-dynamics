@@ -443,6 +443,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 				break;
 			}
 
+			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
@@ -1024,7 +1025,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
-		//new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
 
 		return bone;
 	}
@@ -1507,8 +1508,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_maxEngineTorque = 1250.0f;
 		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
 
+		// set the sterring torque 
+		vehicleModel->m_engineJoint->SetFriction(300.0f);
 		vehicleModel->m_maxTurmVelocity = 10.0f;
-//		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
 
 //		AddCraneBase (controller);
 

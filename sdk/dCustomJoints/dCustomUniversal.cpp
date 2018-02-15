@@ -34,7 +34,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 	,m_damper2(0.0f)
 	,m_springDamperRelaxation2(0.9f)
 {
-//	m_options.m_option5 = -1;
+	m_options.m_option5 = -1;
 }
 
 
