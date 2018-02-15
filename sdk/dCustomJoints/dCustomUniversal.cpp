@@ -140,6 +140,49 @@ void dCustomUniversal::SubmitConstraintSpringDamper(const dMatrix& matrix0, cons
 	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation2, m_spring2, m_damper2);
 }
 
+void dCustomUniversal::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dCustomHinge::Debug(debugDisplay);
+
+	if (m_options.m_option3) {
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		const int subdiv = 12;
+		dVector arch[subdiv + 1];
+		const float radius = debugDisplay->m_debugScale;
+
+		if ((m_maxAngle > 1.0e-3f) || (m_minAngle < -1.0e-3f)) {
+			// show pitch angle limits
+			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
+
+			dFloat minAngle = m_minAngle;
+			dFloat maxAngle = m_maxAngle;
+			if ((maxAngle - minAngle) >= dPi * 2.0f) {
+				minAngle = 0.0f;
+				maxAngle = dPi * 2.0f;
+			}
+
+			dFloat angleStep = (maxAngle - minAngle) / subdiv;
+			dFloat angle0 = minAngle;
+
+			matrix1.m_posit = matrix0.m_posit;
+			debugDisplay->SetColor(dVector(0.0f, 0.5f, 0.0f, 0.0f));
+			for (int i = 0; i <= subdiv; i++) {
+				arch[i] = matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point));
+				debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
+				angle0 += angleStep;
+			}
+
+			for (int i = 0; i < subdiv; i++) {
+				debugDisplay->DrawLine(arch[i], arch[i + 1]);
+			}
+		}
+	}
+}
+
+
 void dCustomUniversal::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dFloat angle = m_curJointAngle2.GetAngle() + m_jointOmega2 * timestep;
@@ -204,9 +247,6 @@ void dCustomUniversal::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0,
 
 void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
-	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	m_curJointAngle.Update(eulers.m_y);
-
 	// save the current joint Omega
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
@@ -215,6 +255,7 @@ void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
 	dVector relOmega(omega0 - omega1);
+	m_curJointAngle2.Update(eulers.m_y);
 	m_jointOmega2 = relOmega.DotProduct3(matrix1.m_up);
 
 	dMatrix rollMatrix(dYawMatrix(eulers[1]) * matrix1);
@@ -243,44 +284,3 @@ void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	}
 }
 
-void dCustomUniversal::Debug(dDebugDisplay* const debugDisplay) const
-{
-	dCustomHinge::Debug(debugDisplay);
-
-	if (m_options.m_option3) {
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-
-		const int subdiv = 12;
-		dVector arch[subdiv + 1];
-		const float radius = debugDisplay->m_debugScale;
-
-		if ((m_maxAngle > 1.0e-3f) || (m_minAngle < -1.0e-3f)) {
-			// show pitch angle limits
-			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
-
-			dFloat minAngle = m_minAngle;
-			dFloat maxAngle = m_maxAngle;
-			if ((maxAngle - minAngle) >= dPi * 2.0f) {
-				minAngle = 0.0f;
-				maxAngle = dPi * 2.0f;
-			}
-
-			dFloat angleStep = (maxAngle - minAngle) / subdiv;
-			dFloat angle0 = minAngle;
-
-			matrix1.m_posit = matrix0.m_posit;
-			debugDisplay->SetColor(dVector(0.0f, 0.5f, 0.0f, 0.0f));
-			for (int i = 0; i <= subdiv; i++) {
-				arch[i] = matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point));
-				debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
-				angle0 += angleStep;
-			}
-
-			for (int i = 0; i < subdiv; i++) {
-				debugDisplay->DrawLine(arch[i], arch[i + 1]);
-			}
-		}
-	}
-}
