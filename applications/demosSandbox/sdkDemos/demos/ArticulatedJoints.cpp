@@ -1030,13 +1030,13 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat side = (tireMatrix.m_posit - engineMatrix.m_posit).DotProduct3(engineMatrix.m_right);
 		dVector sidePin((side > 0.0f) ? engineMatrix.m_front : engineMatrix.m_front.Scale(-1.0f));
 		engineMatrix.m_right = engineMatrix.m_front.CrossProduct(engineMatrix.m_up);
-		
+/*		
 //		parentBasis.m_front = 
 static int xxx;
 if (!xxx)
 		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix, tire, engine);
 xxx++;
-
+*/
 		return bone;
 	}
 
