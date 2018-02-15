@@ -210,7 +210,6 @@ void dCustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 	jacobian1[4] = 	0.0f;
 	jacobian1[5] = 	0.0f;
 
-
 	// add a angular constraint
 	NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);
 
@@ -222,13 +221,17 @@ void dCustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 }
 
 
-dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
-	:dCustomGear(gearRatio, childPin, parentPin, child, parent)
-	,m_parentReference(parentReference)
+dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dMatrix& parentPins, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomGear(gearRatio, childPin, parentPins.m_front, child, parent)
 {
-	dMatrix referenceMatrix;
-	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
-	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
+//	dMatrix referenceMatrix;
+//	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
+//	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
+
+	//calculate the local matrix for body body1  
+	dMatrix dommyMatrix;
+	CalculateLocalMatrix(parentPins, dommyMatrix, m_localMatrix1);
+	m_localMatrix1.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// set as kinematic loop
 	SetSolverModel(1);
@@ -237,13 +240,11 @@ dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector
 void dCustomDifferentialGear::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	// remember to get referenceBody from the world 
-	int refeBodyID;
-	callback(userData, &m_pintOnReference, sizeof(dVector));
-	callback(userData, &refeBodyID, sizeof(int));
-
-	NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
-	m_parentReference = NewtonFindSerializedBody(world, refeBodyID);
-
+//	int refeBodyID;
+//	callback(userData, &m_pintOnReference, sizeof(dVector));
+//	callback(userData, &refeBodyID, sizeof(int));
+//	NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
+//	m_parentReference = NewtonFindSerializedBody(world, refeBodyID);
 	// set as kinematic loop
 	SetSolverModel(1);
 }
@@ -251,9 +252,9 @@ void dCustomDifferentialGear::Deserialize (NewtonDeserializeCallback callback, v
 void dCustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomGear::Serialize(callback, userData);
-	int refeBodyID = NewtonBodyGetSerializedID(m_parentReference);
-	callback(userData, &m_pintOnReference, sizeof(dVector));
-	callback(userData, &refeBodyID, sizeof(int));
+//	int refeBodyID = NewtonBodyGetSerializedID(m_parentReference);
+//	callback(userData, &m_pintOnReference, sizeof(dVector));
+//	callback(userData, &refeBodyID, sizeof(int));
 }
 
 
@@ -270,15 +271,17 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
 	CalculateGlobalMatrix(matrix0, matrix1);
-	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
+//	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 
 	// calculate the angular velocity for both bodies
 	dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
-	dVector dir2(matrix1.m_front);
-	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
-	dVector dir1(dir2 + dir3);
-//dir1 = matrix1.m_front + matrix1.m_up;
-//dTrace(("d(%f %f %f) d(%f %f %f)\n",matrix1[1][0], matrix1[1][1], matrix1[1][2], dir3[0], dir3[1], dir3[2]));
+//	dVector dir2(matrix1.m_front);
+//	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
+//	dVector dir1(dir2 + dir3);
+//	dVector dir1 (matrix1.m_front + matrix1.m_up);
+dVector dir1(matrix1.m_front);
+//dTrace(("d(%f %f %f) d(%f %f %f)\n", matrix1[1][0], matrix1[1][1], matrix1[1][2], dir3[0], dir3[1], dir3[2]));
+dTrace(("d(%f %f %f)\n", dir1[0], dir1[1], dir1[2]));
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;

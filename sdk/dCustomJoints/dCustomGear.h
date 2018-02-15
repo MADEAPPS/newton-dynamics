@@ -62,18 +62,14 @@ class dCustomGearAndSlide: public dCustomGear
 class dCustomDifferentialGear: public dCustomGear
 {
 	public:
-	CUSTOM_JOINTS_API dCustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference);
+	CUSTOM_JOINTS_API dCustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dMatrix& parentPins, NewtonBody* const child, NewtonBody* const parent);
 
 	protected:
-	//CUSTOM_JOINTS_API dCustomDifferentialGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	DECLARE_CUSTOM_JOINT(dCustomDifferentialGear, dCustomGear)
-
-	dVector m_pintOnReference;
-	NewtonBody* m_parentReference;
 };
 
 

@@ -1011,21 +1011,31 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount]->EnableLimits(true);
 		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount]->SetLimits(0.0f, 0.0f);
 		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount]->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
-		vehicleModel->m_tractionTiresCount ++;
+		vehicleModel->m_tractionTiresCount++;
 
 		// link traction tire to the engine using a differential gear
 		dMatrix tireMatrix;
-		dMatrix chassisMatrix;
+		//dMatrix chassisMatrix;
+		dMatrix engineMatrix;
 		NewtonBody* const tire = bone->m_body;
 		NewtonBody* const engine = vehicleModel->m_engineJoint->GetBody0();
-		NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
+		//NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
 		NewtonBodyGetMatrix(bone->m_body, &tireMatrix[0][0]);
-		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
-		chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
+		//NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
+		//chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
+		
+		NewtonBodyGetMatrix(engine, &engineMatrix[0][0]);
+		engineMatrix = vehicleModel->m_engineJoint->GetMatrix0() * engineMatrix;
 
-		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
-		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
-		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+		dFloat side = (tireMatrix.m_posit - engineMatrix.m_posit).DotProduct3(engineMatrix.m_right);
+		dVector sidePin((side > 0.0f) ? engineMatrix.m_front : engineMatrix.m_front.Scale(-1.0f));
+		engineMatrix.m_right = engineMatrix.m_front.CrossProduct(engineMatrix.m_up);
+		
+//		parentBasis.m_front = 
+static int xxx;
+if (!xxx)
+		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix, tire, engine);
+xxx++;
 
 		return bone;
 	}
