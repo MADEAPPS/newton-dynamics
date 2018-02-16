@@ -239,7 +239,7 @@ void dCustomDifferentialGear::Deserialize (NewtonDeserializeCallback callback, v
 	m_referenceBody = NewtonFindSerializedBody(world, refeBodyID);
 
 	// set as kinematic loop
-	SetSolverModel(1);
+//	SetSolverModel(1);
 }
 
 void dCustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -272,8 +272,9 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 	}
 
 	// calculate the angular velocity for both bodies
-	const dVector& dir0 = matrix0.m_front;
-	dVector dir1 ((matrix1.m_front + dir2).Scale(m_gearRatio));
+	const dVector& dir0 = matrix0.m_front.Scale(m_gearRatio);
+	dVector dir1 (matrix1.m_front + dir2);
+//dTrace(("%f %f %f\n", dir1[0], dir1[1], dir1[2]));
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;

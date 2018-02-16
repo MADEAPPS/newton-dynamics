@@ -1002,7 +1002,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		//dMatrix tireHingeMatrix(dRollMatrix(90.0f * dDegreeToRad) * matrix);
 		dMatrix tireHingeMatrix(dRollMatrix(0.0f * dDegreeToRad) * matrix);
 
 		// save tractions tires 
@@ -1014,29 +1013,21 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_tractionTiresCount++;
 
 		// link traction tire to the engine using a differential gear
-		dMatrix tireMatrix;
-		//dMatrix chassisMatrix;
 		dMatrix engineMatrix;
+		dMatrix chassisMatrix;
+		
 		NewtonBody* const tire = bone->m_body;
 		NewtonBody* const engine = vehicleModel->m_engineJoint->GetBody0();
-		//NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
-		NewtonBodyGetMatrix(bone->m_body, &tireMatrix[0][0]);
-		//NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
-		//chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
-		
-		NewtonBodyGetMatrix(engine, &engineMatrix[0][0]);
-		engineMatrix = vehicleModel->m_engineJoint->GetMatrix0() * engineMatrix;
+		NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
 
-		dFloat side = (tireMatrix.m_posit - engineMatrix.m_posit).DotProduct3(engineMatrix.m_right);
-		dVector sidePin((side > 0.0f) ? engineMatrix.m_front : engineMatrix.m_front.Scale(-1.0f));
-		engineMatrix.m_right = engineMatrix.m_front.CrossProduct(engineMatrix.m_up);
-/*		
-//		parentBasis.m_front = 
-static int xxx;
-if (!xxx)
-		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix, tire, engine);
-xxx++;
-*/
+//		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
+		vehicleModel->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+
+//dFloat m, x, y, z;
+//NewtonBodyGetMass(engine, &m, &x, &y, &z);
+
+		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
+		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
 		return bone;
 	}
 
@@ -1082,7 +1073,7 @@ xxx++;
 			char name[64];
 			sprintf(name, "leftTire_%d", i);
 			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-//			LinkTires (leftTire_0, childBone, chassisBone);
+			LinkTires (leftTire_0, childBone, chassisBone);
 		}
 	}
 
@@ -1101,7 +1092,7 @@ xxx++;
 			char name[64];
 			sprintf(name, "rightTire_%d", i);
 			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-//			LinkTires(rightTire_0, childBone, chassisBone);
+			LinkTires(rightTire_0, childBone, chassisBone);
 		}
 	}
 		
@@ -1519,7 +1510,7 @@ xxx++;
 		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
 
 		// set the sterring torque 
-		vehicleModel->m_engineJoint->SetFriction(300.0f);
+		vehicleModel->m_engineJoint->SetFriction(500.0f);
 		vehicleModel->m_maxTurmVelocity = 10.0f;
 
 //		AddCraneBase (controller);
