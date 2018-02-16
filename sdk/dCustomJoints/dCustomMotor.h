@@ -33,10 +33,31 @@ class dCustomMotor: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	dFloat m_targetSpeed;
 	dFloat m_motorOmega;
+	dFloat m_targetSpeed;
 	dFloat m_motorTorque;
 	DECLARE_CUSTOM_JOINT(dCustomMotor, dCustomJoint)
+};
+
+
+class dCustomMotor2 : public dCustomMotor
+{
+	public:
+	CUSTOM_JOINTS_API dCustomMotor2(const dVector& pin, const dVector& pinReferenceBody, NewtonBody* const body, NewtonBody* const referenceBody);
+	CUSTOM_JOINTS_API virtual ~dCustomMotor2();
+
+	CUSTOM_JOINTS_API void SetSpeed1(dFloat speed);
+
+	protected:
+	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+
+	dFloat m_motorOmega1;
+	dFloat m_targetSpeed1;
+	dFloat m_motorTorque1;
+	NewtonBody* m_referenceBody;
+	DECLARE_CUSTOM_JOINT(dCustomMotor2, dCustomMotor)
 };
 
 

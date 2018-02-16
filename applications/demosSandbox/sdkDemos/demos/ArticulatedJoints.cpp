@@ -93,7 +93,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
-		,m_omegaResistance(0.0f)
+//		,m_omegaResistance(0.0f)
 		,m_engineMotor(NULL)
 		,m_engineJoint(NULL)
 	{
@@ -111,9 +111,10 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_universalActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
-		,m_omegaResistance(0.0f)
-		,m_maxEngineSpeed(6.0f)
-		,m_maxTurnSpeed(2.0f)
+//		,m_omegaResistance(0.0f)
+		,m_maxEngineSpeed(30.0f)
+		,m_maxTurmVelocity(10.0f)
+//		,m_maxTurnSpeed(2.0f)
 		,m_turnAngle(0.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
@@ -224,11 +225,11 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_universalActuatorsCount;
 	int m_paletteActuatorsCount;
 	dFloat m_maxEngineTorque;
-	dFloat m_omegaResistance;
-	dFloat m_maxTurmDamp;
-	dFloat m_maxTurmVelocity;
+//	dFloat m_omegaResistance;
+//	dFloat m_maxTurmDamp;
 	dFloat m_maxEngineSpeed;
-	dFloat m_maxTurnSpeed;
+	dFloat m_maxTurmVelocity;
+//	dFloat m_maxTurnSpeed;
 	dFloat m_turnAngle;
 	dFloat m_tiltAngle;
 	dFloat m_liftPosit;
@@ -247,7 +248,7 @@ class ArticulatedEntityModel: public DemoEntity
 	dCustomUniversalActuator* m_rearTireJoints[4];
 	dCustomUniversalActuator* m_universalActuator[4];
 
-	dCustomMotor* m_engineMotor;
+	dCustomMotor2* m_engineMotor;
 	dCustomUniversal* m_engineJoint;
 
 	InputRecord m_inputs;
@@ -277,16 +278,20 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		if (vehicleModel->m_engineJoint) {
 			dFloat brakeTorque = 2000.0f;
-			dFloat engineTorque = 0.0f;
+			//dFloat engineTorque = 0.0f;
+			dFloat engineRPM = 0.0f;
 			if (vehicleModel->m_inputs.m_throttleValue > 0) {
 				brakeTorque = 0.0f;
-				engineTorque = -vehicleModel->m_maxEngineTorque; 
+				//engineTorque = -vehicleModel->m_maxEngineTorque; 
+				engineRPM = -vehicleModel->m_maxEngineSpeed;
 			} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
 				brakeTorque = 0.0f;
-				engineTorque = vehicleModel->m_maxEngineTorque; 
+				//engineTorque = vehicleModel->m_maxEngineTorque; 
+				engineRPM = vehicleModel->m_maxEngineSpeed;
 			}
 
 			// apply DC engine torque
+/*
 			dMatrix chassisMatrix;
 			dVector engineOmega(0.0f);
 			NewtonBody* const engineBody = vehicleModel->m_engineJoint->GetBody0();
@@ -297,7 +302,11 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			engineTorque -= (engineOmega.DotProduct3(chassisMatrix.m_up)) * vehicleModel->m_omegaResistance;
 			dVector torque (chassisMatrix.m_up.Scale(engineTorque));
 			NewtonBodyAddTorque (engineBody, &torque[0]);
-			
+*/			
+
+			vehicleModel->m_engineMotor->SetSpeed1(engineRPM);
+
+
 			if (!vehicleModel->m_rearTiresCount) {
 				// apply DC rate turn Motor 
 				if (vehicleModel->m_inputs.m_steerValue > 0) {
@@ -772,13 +781,14 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		return controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
 	}
 
-	dCustomMotor* CreateEngineMotor(dCustomArticulatedTransformController* const controller, dCustomUniversal* const engineJoint)
+	dCustomMotor2* CreateEngineMotor(dCustomArticulatedTransformController* const controller, dCustomUniversal* const engineJoint)
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
 		NewtonBody* const engine = engineJoint->GetBody0();
+		NewtonBody* const chassis = engineJoint->GetBody0();
 		engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		return new dCustomMotor(engineMatrix.m_front, engine);
+		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
 	}
 
 	void ConnectBodyPart (ArticulatedEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
@@ -836,13 +846,13 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_engineJoint = (dCustomUniversal*) engineBone->FindJoint();
 		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
 
+		dAssert(0);
 		// set power parameter for a simple DC engine
-		dFloat maxOmega = 40.0f;
-		vehicleModel->m_maxEngineTorque = -400.0f;
-		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
-
-		vehicleModel->m_maxTurmDamp = 0.0f;
-		vehicleModel->m_maxTurmVelocity = 0.0f;
+//		dFloat maxOmega = 40.0f;
+//		vehicleModel->m_maxEngineTorque = -400.0f;
+//		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
+//		vehicleModel->m_maxTurmDamp = 0.0f;
+//		vehicleModel->m_maxTurmVelocity = 0.0f;
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
@@ -1504,9 +1514,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
 
 		// set power parameter for a simple DC engine
-		dFloat maxOmega = 100.0f;
+//		dFloat maxOmega = 100.0f;
+		vehicleModel->m_maxEngineSpeed = 30.0f;
 		vehicleModel->m_maxEngineTorque = 1250.0f;
-		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
+//		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
 
 		// set the steering torque 
 		vehicleModel->m_engineJoint->SetFriction(500.0f);
