@@ -93,7 +93,6 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
-//		,m_omegaResistance(0.0f)
 		,m_engineMotor(NULL)
 		,m_engineJoint(NULL)
 	{
@@ -111,10 +110,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_universalActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
-//		,m_omegaResistance(0.0f)
 		,m_maxEngineSpeed(30.0f)
 		,m_maxTurmVelocity(10.0f)
-//		,m_maxTurnSpeed(2.0f)
 		,m_turnAngle(0.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
@@ -225,11 +222,8 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_universalActuatorsCount;
 	int m_paletteActuatorsCount;
 	dFloat m_maxEngineTorque;
-//	dFloat m_omegaResistance;
-//	dFloat m_maxTurmDamp;
 	dFloat m_maxEngineSpeed;
 	dFloat m_maxTurmVelocity;
-//	dFloat m_maxTurnSpeed;
 	dFloat m_turnAngle;
 	dFloat m_tiltAngle;
 	dFloat m_liftPosit;
@@ -1514,14 +1508,13 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
 
 		// set power parameter for a simple DC engine
-//		dFloat maxOmega = 100.0f;
+		vehicleModel->m_maxTurmVelocity = 10.0f;
 		vehicleModel->m_maxEngineSpeed = 30.0f;
-		vehicleModel->m_maxEngineTorque = 1250.0f;
-//		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
+		vehicleModel->m_engineMotor->SetTorque(1000.0f);
+		vehicleModel->m_engineMotor->SetTorque1(1250.0f);
 
 		// set the steering torque 
 		vehicleModel->m_engineJoint->SetFriction(500.0f);
-		vehicleModel->m_maxTurmVelocity = 10.0f;
 
 //		AddCraneBase (controller);
 

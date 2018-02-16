@@ -33,7 +33,6 @@ dCustomMotor::dCustomMotor(int dof, NewtonBody* const child)
 	SetSolverModel(2);
 }
 
-
 dCustomMotor::dCustomMotor(const dVector& pin, NewtonBody* const body)
 	:dCustomJoint(1, body, NULL)
 	,m_motorOmega(0.0f)
@@ -81,6 +80,11 @@ void dCustomMotor::SetSpeed(dFloat speed)
 	m_targetSpeed = speed;
 }
 
+void dCustomMotor::SetTorque(dFloat torque)
+{
+	m_motorTorque = dAbs(torque);
+}
+
 void dCustomMotor::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -112,13 +116,12 @@ void dCustomMotor::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	m_motorOmega = omega0.DotProduct3(dir0);
 
-dFloat32 xxx = 3000.0f;
 	dFloat accel = (m_targetSpeed - m_motorOmega) / timestep;
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &dir0[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointSetRowMinimumFriction(m_joint, -xxx);
-	NewtonUserJointSetRowMaximumFriction(m_joint, xxx);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+	NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 }
 
 
@@ -193,6 +196,12 @@ void dCustomMotor2::SetSpeed1(dFloat speed)
 	m_targetSpeed1 = speed;
 }
 
+void dCustomMotor2::SetTorque1(dFloat torque)
+{
+	m_motorTorque1 = dAbs(torque);
+}
+
+
 void dCustomMotor2::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -223,12 +232,11 @@ void dCustomMotor2::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	m_motorOmega1 = omega0.DotProduct3(dir0);
 
-dFloat32 xxx = 3000.0f;
 	dFloat accel = (m_targetSpeed1 - m_motorOmega1) / timestep;
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &dir0[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointSetRowMinimumFriction(m_joint, -xxx);
-	NewtonUserJointSetRowMaximumFriction(m_joint, xxx);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque1);
+	NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque1);
 }
 

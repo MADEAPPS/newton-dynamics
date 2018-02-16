@@ -27,6 +27,7 @@ class dCustomMotor: public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomMotor();
 
 	CUSTOM_JOINTS_API void SetSpeed(dFloat speed);
+	CUSTOM_JOINTS_API void SetTorque(dFloat torque);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
@@ -47,6 +48,7 @@ class dCustomMotor2 : public dCustomMotor
 	CUSTOM_JOINTS_API virtual ~dCustomMotor2();
 
 	CUSTOM_JOINTS_API void SetSpeed1(dFloat speed);
+	CUSTOM_JOINTS_API void SetTorque1(dFloat torque);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
