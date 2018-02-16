@@ -9,8 +9,6 @@
 * freely
 */
 
-
-
 #include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
@@ -18,193 +16,6 @@
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-
-
-static void LoadAndCreateMesh(DemoEntityManager* const scene)
-{
-	FILE* f = fopen("../../track2.xxx", "rb");
-	if (!f)
-		return;
-
-	NewtonCollision* pCollision = NewtonCreateTreeCollision(scene->GetNewton(), 0);
-	NewtonTreeCollisionBeginBuild(pCollision);
-
-	// Read number of triangles
-	int numTris;
-	fread((void*)&numTris, 4, 1, f);
-
-	// Add face for each tri
-//	struct point
-//	{
-//		dFloat v[3];
-//	};
-	struct tria
-	{
-//		point face[3];
-		dVector face[3];
-	};
-	tria faces[3000];
-	for (int i = 0; i < numTris; i++) {
-		float v[3][3];
-		fread(v, sizeof(float), 9, f);
-		for (int j = 0; j < 3; j++) {
-			for (int k = 0; k < 3; k++) {
-				faces[i].face[j][k] = v[j][k];
-			}
-		}
-	}
-
-#if 0
-	const int y0 = 1484;
-	const int y1 = 1720;
-
-	const int dx = y1 - y0;
-	const int x0 = y0;
-	const int x1 = y1;
-
-	int count = 0;
-	int map[136];
-	for (int i = x0; i < x1; i++) {
-		dVector p10(faces[i].face[1] - faces[i].face[0]);
-		dVector p20(faces[i].face[2] - faces[i].face[0]);
-		dVector normal(p10.CrossProduct(p20));
-		normal = normal.Normalize();
-		if (normal.m_y > 0.1f) {
-			map[count] = i;
-			count ++;
-		}
-	}
-
-//map[0] = -1;
-//map[10] = -1;
-//map[20] = -1;
-map[30] = -1;
-map[31] = -1;
-//map[40] = -1;
-//map[50] = -1;
-//map[60] = -1;
-map[70] = -1;
-map[71] = -1;
-//map[80] = -1;
-//map[90] = -1;
-//map[100] = -1;
-//map[110] = -1;
-map[120] = -1;
-map[121] = -1;
-
-map[130] = -1;
-map[131] = -1;
-map[132] = -1;
-map[133] = -1;
-map[134] = -1;
-map[135] = -1;
-
-	int count1 = count;	
-	count = 0;
-	for (int j = 0; j < count1; j++) {
-		int i = map[j];
-		if (i >= 0) {
-			map[count] = i;
-			count ++;
-		}
-	}
-
-//map[122] = -1;
-//map[123] = -1;
-
-	for (int j = 0; j < count; j++) {
-		int i = map[j];
-		if (i >= 0) {
-			NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0][0]), sizeof(dVector), 0);
-		}
-	}
-#else
-	for (int i = 0; i < numTris; i++) {
-		NewtonTreeCollisionAddFace(pCollision, 3, &(faces[i].face[0][0]), sizeof(dVector), 0);
-	}
-#endif
-
-	NewtonTreeCollisionEndBuild(pCollision, 1);
-
-	dMatrix matrix(dGetIdentityMatrix());
-	NewtonCreateDynamicBody(scene->GetNewton(), pCollision, &matrix[0][0]);
-	NewtonDestroyCollision(pCollision);
-
-	fclose(f);
-}
-
-static void TestConvexCastBug(NewtonWorld* world)
-{
-	// create static body
-	NewtonCollision* cs = 0;
-	NewtonBody* dyn = 0;
-	{
-		// Dummy transform matrix.
-		dMatrix tm(dGetIdentityMatrix());
-#if 0
-		// WORKING simple BOX
-		cs = NewtonCreateBox(world, 40., 40., 0.2, 0, 0);
-#else
-		// TRIANGLE MESH
-		dVector verts[6] = {
-#if 1
-			// FAILING,TRIANGLE MESH
-			dVector(-55.12000656f, -38.16000366f, 0.00000000f),
-			dVector(55.12000656f, -38.16000366f, 0.00000000f),
-			dVector(-55.12000656f, 38.16000366f, 0.00000000f),
-			dVector(55.12000656f, -38.16000366f, 0.00000000f),
-			dVector(55.12000656f, 38.16000366f, 0.00000000f),
-			dVector(-55.12000656f, 38.16000366f, 0.00000000f)
-#else
-			// WORKING,TRIANGLE MESH
-			dVector(+40, +30, 0),
-			dVector(-40, +30, 0),
-			dVector(-40, -30, 0),
-			dVector(-40, -30, 0),
-			dVector(+40, -30, 0),
-			dVector(+40, +30, 0),
-#endif
-		};
-
-		cs = NewtonCreateTreeCollision(world, 0);
-		NewtonTreeCollisionBeginBuild(cs);
-		NewtonTreeCollisionAddFace(cs, 3, &verts[0][0], sizeof(dVector), 0);
-		NewtonTreeCollisionAddFace(cs, 3, &verts[3][0], sizeof(dVector), 0);
-		NewtonTreeCollisionEndBuild(cs, 0);
-#endif
-		dyn = NewtonCreateDynamicBody(world, cs, &tm[0][0]);
-		NewtonDestroyCollision(cs);
-	}
-
-	// cast shape
-	NewtonCollision* cast_shape = 0;
-	{
-		cast_shape = NewtonCreateBox(world, 4, 4, 16, 0, 0);
-	}
-
-	// convex cast
-	dVector start(-10, 20.5, 9.5);
-	dVector target(-10, 20.5, 5);
-	dMatrix start_xform(dQuaternion(), start);
-	dFloat hitParam = 0;
-	NewtonWorldConvexCastReturnInfo info[16];
-	int contactCount = NewtonWorldConvexCast(world, &start_xform[0][0], &target.m_x, cast_shape,
-		&hitParam, 0, 0,
-		info, sizeof(info) / sizeof(info[0]), 0);
-	// assert(contactCount > 0);
-	// int a = sizeof(dVector);
-	// dVector v;
-	// int b = sizeof(v.m_x);
-	// printf("%d %d ",a,b);
-	printf("%f %d\n", hitParam, contactCount);
-
-	// Tear down.
-//	NewtonMaterialDestroyAllGroupID(world);
-	NewtonDestroyCollision(cast_shape);
-	NewtonDestroyCollision(cs);
-//	NewtonDestroyAllBodies(world);
-//	NewtonDestroy(world);
-}
 
 
 static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
@@ -345,16 +156,10 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	// load the skybox
 //	scene->CreateSkyBox();
 
-//TestConvexCastBug(scene->GetNewton());
-//LoadAndCreateMesh(scene);
-// create a shattered mesh array
-//TestConvexApproximation (scene);
-
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
 //	CreateLevelMesh (scene, "sponza.ngd", true);
-
 
 //	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	// using my own interpretation
