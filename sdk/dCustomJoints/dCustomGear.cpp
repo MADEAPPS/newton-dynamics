@@ -25,8 +25,8 @@ dCustomGear::dCustomGear(int dof, NewtonBody* const child, NewtonBody* const par
 	:dCustomJoint(dof, child, parent)
 	,m_gearRatio(1.0f)
 {
-	// set as kinematoc loop
-	SetSolverModel(1);
+	// set as kinematic loop
+	//SetSolverModel(1);
 }
 
 
@@ -47,7 +47,7 @@ dCustomGear::dCustomGear(dFloat gearRatio, const dVector& childPin, const dVecto
 	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 	// set as kinematic loop
-	SetSolverModel(1);
+	//SetSolverModel(1);
 }
 
 
@@ -59,7 +59,7 @@ void dCustomGear::Deserialize (NewtonDeserializeCallback callback, void* const u
 {
 	m_gearRatio = 1.0f;
 	// set as kinematic loop
-	SetSolverModel(1);
+	//SetSolverModel(1);
 
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
@@ -128,7 +128,7 @@ dCustomGearAndSlide::dCustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, c
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 
 	// set as kinematoc loop
-	SetSolverModel(1);
+	//SetSolverModel(1);
 }
 
 dCustomGearAndSlide::~dCustomGearAndSlide()
@@ -138,7 +138,7 @@ dCustomGearAndSlide::~dCustomGearAndSlide()
 void dCustomGearAndSlide::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	// set as kinematic loop
-	SetSolverModel(1);
+	//SetSolverModel(1);
 
 	callback (userData, &m_slideRatio, sizeof (dFloat));
 }
@@ -226,7 +226,7 @@ dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector
 	m_referencePin = referenceMatrix.UnrotateVector(referencePin);
 
 	// set as kinematic loop
-	SetSolverModel(1);
+	//SetSolverModel(1);
 }
 
 void dCustomDifferentialGear::Deserialize (NewtonDeserializeCallback callback, void* const userData)

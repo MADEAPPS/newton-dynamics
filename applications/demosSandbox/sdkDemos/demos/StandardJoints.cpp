@@ -1101,14 +1101,14 @@ struct JoesNewRagdollJoint: public dCustomJoint
 		//SetTwistSwingLimits (0.1f, 0.0f, -0.1f, 0.1f);
 	}
 
-	void SetTwistSwingLimits(const float coneAngle, const float arcAngle, const float minTwistAngle, const float maxTwistAngle)
+	void SetTwistSwingLimits(const dFloat coneAngle, const dFloat arcAngle, const dFloat minTwistAngle, const dFloat maxTwistAngle)
 	{
-		float const maxAng = 2.8f; // to prevent flipping on the pole on the backside
+		dFloat const maxAng = 2.8f; // to prevent flipping on the pole on the backside
 
 		m_coneAngle = min(maxAng, coneAngle);
-		float angle = max(0.0f, min(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
-		m_arcAngleCos = float(cos(angle));
-		m_arcAngleSin = float(sin(angle));
+		dFloat angle = max(0.0f, min(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
+		m_arcAngleCos = dFloat(cos(angle));
+		m_arcAngleSin = dFloat(sin(angle));
 
 		m_minTwistAngle = minTwistAngle;
 		m_maxTwistAngle = maxTwistAngle;
@@ -1169,7 +1169,7 @@ struct JoesNewRagdollJoint: public dCustomJoint
 
 			const dVector& coneDir0 = matrix0.m_front;
 			const dVector& coneDir1 = matrix1.m_front;
-			float dot = coneDir0.DotProduct3(coneDir1);
+			dFloat dot = coneDir0.DotProduct3(coneDir1);
 			if (dot < -0.999) return; // should never happen
 
 			// do the twist
@@ -1177,28 +1177,28 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			if (m_maxTwistAngle >= m_minTwistAngle) // twist restricted?
 			{
 				dQuaternion quat0(matrix0), quat1(matrix1);
-				float *q0 = (float*)&quat0;
-				float *q1 = (float*)&quat1;
+				dFloat *q0 = (dFloat*)&quat0;
+				dFloat *q1 = (dFloat*)&quat1;
 
 				// factor rotation about x axis between quat0 and quat1. Code is an optimization of this: qt = q0.Inversed() * q1; halfTwistAngle = atan (qt.x / qt.w);
-				float twistAngle = 2.0f * float(atan(
+				dFloat twistAngle = 2.0f * dFloat(atan(
 					((((q0[0] * q1[1]) + (-q0[1] * q1[0])) + (-q0[2] * q1[3])) - (-q0[3] * q1[2])) /
 					((((q0[0] * q1[0]) - (-q0[1] * q1[1])) - (-q0[2] * q1[2])) - (-q0[3] * q1[3]))));
 
 				// select an axis for the twist - any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
 				dVector twistAxis = coneDir0 + coneDir1;
-				twistAxis = twistAxis.Scale(1.0f / float(sqrt(twistAxis.DotProduct3(twistAxis))));
+				twistAxis = twistAxis.Scale(1.0f / dFloat(sqrt(twistAxis.DotProduct3(twistAxis))));
 
 				if (m_maxTwistAngle == m_minTwistAngle) // no freedom for any twist
 				{
-					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_maxTwistAngle, (dFloat*)&twistAxis);
 				}
 				else if (twistAngle > m_maxTwistAngle) {
-					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_maxTwistAngle, (dFloat*)&twistAxis);
 					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 				}
 				else if (twistAngle < m_minTwistAngle) {
-					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_minTwistAngle, (float*)&twistAxis);
+					NewtonUserJointAddAngularRow(m_joint, twistAngle - m_minTwistAngle, (dFloat*)&twistAxis);
 					NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 				}
 			}
@@ -1207,11 +1207,11 @@ struct JoesNewRagdollJoint: public dCustomJoint
 #if 0
 			// simple cone limit:
 
-			float angle = acos(dot) - m_coneAngle;
+			dFloat angle = acos(dot) - m_coneAngle;
 			if (angle > 0) {
 				dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
 				swingAxis = swingAxis.Scale(1.0 / sqrt(swingAxis.DotProduct3(swingAxis)));
-				NewtonUserJointAddAngularRow(m_joint, angle, (float*)&swingAxis);
+				NewtonUserJointAddAngularRow(m_joint, angle, (dFloat*)&swingAxis);
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0);
 			}
 #else
@@ -1220,18 +1220,18 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			if (m_coneAngle > 0.0f && dot < 0.999f) {
 				// project current axis to the arc plane (y)
 				dVector d = matrix1.UnrotateVector(matrix0.m_front);
-				dVector cone = d; cone.m_y = 0; cone = cone.Scale(1.0f / float(sqrt(cone.DotProduct3(cone))));
+				dVector cone = d; cone.m_y = 0; cone = cone.Scale(1.0f / dFloat(sqrt(cone.DotProduct3(cone))));
 
 				// clamp the result to be within the arc angle
 				if (cone.m_x < m_arcAngleCos)
 					cone = dVector(m_arcAngleCos, 0.0f, ((cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
 
 				// do a regular cone constraint from that
-				float angle = float(acos(max(-1.0f, min(1.0f, d.DotProduct3(cone))))) - m_coneAngle;
+				dFloat angle = dFloat(acos(max(-1.0f, min(1.0f, d.DotProduct3(cone))))) - m_coneAngle;
 				if (angle > 0.0f) {
 					dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
-					swingAxis = swingAxis.Scale(1.0f / float(sqrt(swingAxis.DotProduct3(swingAxis))));
-					NewtonUserJointAddAngularRow(m_joint, angle, (float*)&swingAxis);
+					swingAxis = swingAxis.Scale(1.0f / dFloat(sqrt(swingAxis.DotProduct3(swingAxis))));
+					NewtonUserJointAddAngularRow(m_joint, angle, (dFloat*)&swingAxis);
 					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 				}
 			}
@@ -1242,9 +1242,9 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			if (m_anim_speed != 0.0f) // some animation to illustrate purpose
 			{
 				m_anim_time += timestep * m_anim_speed;
-				dFloat a0 = float(sin(m_anim_time));
+				dFloat a0 = dFloat(sin(m_anim_time));
 				dFloat a1 = m_anim_offset * dPi;
-				dVector axis(float(sin(a1)), 0.0f, float(cos(a1)));
+				dVector axis(dFloat(sin(a1)), 0.0f, dFloat(cos(a1)));
 				//dVector axis (1,0,0);
 				m_target = dQuaternion(axis, a0 * 0.5f);
 			}
@@ -1256,7 +1256,7 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f) ? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
 			qErr.Normalize();
 
-			dFloat errorAngle = 2.0f * float(acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0))));
+			dFloat errorAngle = 2.0f * dFloat(acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0))));
 			dVector errorAngVel(0, 0, 0);
 
 			dMatrix basis;

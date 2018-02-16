@@ -251,3 +251,18 @@ return false;
 */
 }
 
+dCustomJoint* dCustomArticulatedTransformController::dSkeletonBone::FindJoint() const
+{
+	if (m_parent) {
+		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(m_body); joint; joint = NewtonBodyGetNextJoint(m_body, joint)) {
+			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+			dAssert (customJoint);
+			if (((customJoint->GetBody0() == m_body) && (customJoint->GetBody1() == m_parent->m_body)) ||
+				((customJoint->GetBody1() == m_body) && (customJoint->GetBody0() == m_parent->m_body))) {
+				return customJoint;
+			}
+		}
+		dAssert (0);
+	}
+	return NULL;
+}

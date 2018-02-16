@@ -85,6 +85,8 @@ class dCustomArticulatedTransformController: public dCustomControllerBase
 		NewtonBody* m_body;
 		dSkeletonBone* m_parent;
 		dCustomArticulatedTransformController* m_controller;
+
+		dCustomJoint* FindJoint() const; 
 		//dSelfCollisionBitmask m_bitField;
 	};
 

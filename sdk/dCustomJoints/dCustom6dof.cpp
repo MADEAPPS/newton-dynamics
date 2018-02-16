@@ -203,7 +203,7 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 
 	const int subdiv = 12;
 	dVector arch[subdiv + 1];
-	const float radius = debugDisplay->m_debugScale;
+	const dFloat radius = debugDisplay->m_debugScale;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
@@ -212,8 +212,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 		if ((m_yaw.m_maxAngle > 1.0e-3f) || (m_yaw.m_minAngle < -1.0e-3f)) {
 			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
 
-			dFloat minAngle = dClamp(m_yaw.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad);
-			dFloat maxAngle = dClamp(m_yaw.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad);
+			dFloat minAngle = dClamp(m_yaw.m_minAngle, dFloat(-180.0f) * dDegreeToRad, dFloat(0.0f) * dDegreeToRad);
+			dFloat maxAngle = dClamp(m_yaw.m_maxAngle, dFloat(0.0f) * dDegreeToRad, dFloat(180.0f) * dDegreeToRad);
 
 			dFloat angleStep = (maxAngle - minAngle) / subdiv;
 			dFloat angle0 = minAngle;
@@ -237,8 +237,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 		if ((m_roll.m_maxAngle > 1.0e-3f) || (m_roll.m_minAngle < -1.0e-3f)) {
 			dVector point(dFloat(radius), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
 
-			dFloat minAngle = dClamp(m_roll.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad);
-			dFloat maxAngle = dClamp(m_roll.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad);
+			dFloat minAngle = dClamp(m_roll.m_minAngle, dFloat(-180.0f) * dDegreeToRad, dFloat(0.0f) * dDegreeToRad);
+			dFloat maxAngle = dClamp(m_roll.m_maxAngle, dFloat(0.0f) * dDegreeToRad, dFloat(180.0f) * dDegreeToRad);
 
 			dFloat angleStep = (maxAngle - minAngle) / subdiv;
 			dFloat angle0 = minAngle;
@@ -262,8 +262,8 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 			// show pitch angle limits
 			dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
 
-			dFloat minAngle = dClamp(m_pitch.m_minAngle, -180.0f * dDegreeToRad, 0.0f * dDegreeToRad) + 0.0f * dPi;
-			dFloat maxAngle = dClamp(m_pitch.m_maxAngle, 0.0f * dDegreeToRad, 180.0f * dDegreeToRad) + 0.0f * dPi;
+			dFloat minAngle = dClamp(m_pitch.m_minAngle, dFloat(-180.0f) * dDegreeToRad, dFloat(0.0f) * dDegreeToRad) + dFloat(0.0f) * dPi;
+			dFloat maxAngle = dClamp(m_pitch.m_maxAngle, dFloat(0.0f) * dDegreeToRad, dFloat(180.0f) * dDegreeToRad) + dFloat(0.0f) * dPi;
 
 			dFloat angleStep = (maxAngle - minAngle) / subdiv;
 			dFloat angle0 = minAngle;

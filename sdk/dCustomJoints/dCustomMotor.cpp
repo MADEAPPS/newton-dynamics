@@ -23,29 +23,30 @@ IMPLEMENT_CUSTOM_JOINT(dCustomMotor);
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dCustomMotor::dCustomMotor(int dof, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(dof, child, parent)
-	,m_motorSpeed(0.0f)
+dCustomMotor::dCustomMotor(int dof, NewtonBody* const child)
+	:dCustomJoint(dof, child, NULL)
+	,m_targetSpeed(0.0f)
+	,m_motorOmega(0.0f)
 	,m_motorTorque(1.0f)
 {
-	SetSolverModel(2);
+//	SetSolverModel(2);
 }
 
 
-dCustomMotor::dCustomMotor(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomJoint(1, child, parent)
-	,m_motorSpeed(0.0f)
+dCustomMotor::dCustomMotor(const dVector& pin, NewtonBody* const body)
+	:dCustomJoint(1, body, NULL)
+	,m_targetSpeed(0.0f)
 	,m_motorTorque(1.0f)
 {
 	dMatrix dommyMatrix;
 	// calculate the local matrix for body body0
-	dMatrix pinAndPivot0 (dGrammSchmidt(childPin));
+	dMatrix pinAndPivot0 (dGrammSchmidt(pin));
 
 	CalculateLocalMatrix (pinAndPivot0, m_localMatrix0, dommyMatrix);
 	m_localMatrix0.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 	// calculate the local matrix for body body1  
-	dMatrix pinAndPivot1 (dGrammSchmidt(parentPin));
+	dMatrix pinAndPivot1 (dGrammSchmidt(pin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -60,25 +61,29 @@ dCustomMotor::~dCustomMotor()
 
 void dCustomMotor::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
-	callback (userData, &m_motorSpeed, sizeof (dFloat));
+	callback(userData, &m_motorOmega, sizeof(dFloat));
+	callback (userData, &m_targetSpeed, sizeof (dFloat));
 	callback (userData, &m_motorTorque, sizeof (dFloat));
 }
 
 void dCustomMotor::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize (callback, userData);
-	callback(userData, &m_motorSpeed, sizeof(dFloat));
+	callback(userData, &m_motorOmega, sizeof(dFloat));
+	callback(userData, &m_targetSpeed, sizeof(dFloat));
 	callback(userData, &m_motorTorque, sizeof(dFloat));
+}
+
+void dCustomMotor::SetSpeed(dFloat speed)
+{
+	m_targetSpeed = speed;
 }
 
 void dCustomMotor::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dAssert (0);
-/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 	dVector omega0(0.0f);
-	dVector omega1(0.0f);
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 
@@ -86,8 +91,7 @@ void dCustomMotor::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// calculate the angular velocity for both bodies
-	dVector dir0 = matrix0.m_front.Scale (m_gearRatio);
-	const dVector& dir1 = matrix1.m_front;
+	dVector dir0 = matrix0.m_front;
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;
@@ -99,21 +103,19 @@ void dCustomMotor::SubmitConstraints (dFloat timestep, int threadIndex)
 	jacobian1[0] = 0.0f;
 	jacobian1[1] = 0.0f;
 	jacobian1[2] = 0.0f;
-	jacobian1[3] = dir1.m_x;
-	jacobian1[4] = dir1.m_y;
-	jacobian1[5] = dir1.m_z;
+	jacobian1[3] = -dir0.m_x;
+	jacobian1[4] = -dir0.m_y;
+	jacobian1[5] = -dir0.m_z;
 
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
+	m_motorOmega = omega0.DotProduct3(dir0);
 
-	dFloat w0 = omega0.DotProduct3(dir0);
-	dFloat w1 = omega1.DotProduct3(dir1);
-	dFloat relOmega = w0 + w1;
-	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
-	dFloat relAccel = -0.5f * relOmega * invTimestep;
-	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-*/
+	dFloat accel = (m_targetSpeed - m_motorOmega) / timestep;
+	NewtonUserJointAddAngularRow(m_joint, 0.0f, &dir0[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, accel);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	//	NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+	//	NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 }
 
 

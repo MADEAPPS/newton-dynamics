@@ -22,16 +22,19 @@
 class dCustomMotor: public dCustomJoint
 {
 	public:
-	CUSTOM_JOINTS_API dCustomMotor(int dof, NewtonBody* const child, NewtonBody* const parent);
-	CUSTOM_JOINTS_API dCustomMotor(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent);
+	CUSTOM_JOINTS_API dCustomMotor(int dof, NewtonBody* const body);
+	CUSTOM_JOINTS_API dCustomMotor(const dVector& pin, NewtonBody* const body);
 	CUSTOM_JOINTS_API virtual ~dCustomMotor();
+
+	CUSTOM_JOINTS_API void SetSpeed(dFloat speed);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	dFloat m_motorSpeed;
+	dFloat m_targetSpeed;
+	dFloat m_motorOmega;
 	dFloat m_motorTorque;
 	DECLARE_CUSTOM_JOINT(dCustomMotor, dCustomJoint)
 };

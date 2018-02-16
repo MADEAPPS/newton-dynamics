@@ -170,7 +170,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	}
 
 	const int subdiv = 18;
-	const float radius = debugDisplay->m_debugScale;
+	const dFloat radius = debugDisplay->m_debugScale;
 	dVector arch[subdiv + 1];
 
 	// show twist angle limits

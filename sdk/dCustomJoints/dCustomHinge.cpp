@@ -155,7 +155,7 @@ void dCustomHinge::Debug(dDebugDisplay* const debugDisplay) const
 
 		const int subdiv = 12;
 		dVector arch[subdiv + 1];
-		const float radius = debugDisplay->m_debugScale;
+		const dFloat radius = debugDisplay->m_debugScale;
 
 		if ((m_maxAngle > 1.0e-3f) || (m_minAngle < -1.0e-3f)) {
 			// show pitch angle limits

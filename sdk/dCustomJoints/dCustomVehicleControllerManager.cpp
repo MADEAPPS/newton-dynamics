@@ -2728,7 +2728,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 //dTrace(("%d ", xxx));
 
 	int index = 0;
-	dFloat32 invDt = 1.0f / timestep;
+	dFloat invDt = dFloat(1.0f) / timestep;
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
 
