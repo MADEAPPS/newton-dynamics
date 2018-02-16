@@ -133,7 +133,6 @@ dCustomMotor2::dCustomMotor2(const dVector& pin0, const dVector& pin1, NewtonBod
 	,m_motorTorque1(1.0f)
 	,m_referenceBody(referenceBody)
 {
-
 	dMatrix dommyMatrix;
 	// calculate the local matrix for body body0
 	dMatrix pinAndPivot0(dGrammSchmidt(pin0));
@@ -145,6 +144,9 @@ dCustomMotor2::dCustomMotor2(const dVector& pin0, const dVector& pin1, NewtonBod
 	dMatrix pinAndPivot1(dGrammSchmidt(pin0));
 	CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+	NewtonBodyGetMatrix(m_referenceBody, &dommyMatrix[0][0]);
+	m_pin1 = dommyMatrix.UnrotateVector(pin1);
 
 /*
 	dMatrix dommyMatrix;
@@ -200,12 +202,9 @@ void dCustomMotor2::SubmitConstraints(dFloat timestep, int threadIndex)
 	dFloat jacobian1[6];
 
 	dCustomMotor::SubmitConstraints(timestep, threadIndex);
-/*
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
 
-	// calculate the angular velocity for both bodies
-	const dVector& dir0 = matrix0.m_up;
+	NewtonBodyGetMatrix(m_referenceBody, &matrix0[0][0]);
+	dVector dir0 = matrix0.RotateVector(m_pin1);
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;
@@ -231,6 +230,5 @@ dFloat32 xxx = 3000.0f;
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointSetRowMinimumFriction(m_joint, -xxx);
 	NewtonUserJointSetRowMaximumFriction(m_joint, xxx);
-*/
 }
 

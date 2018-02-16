@@ -53,6 +53,7 @@ class dCustomMotor2 : public dCustomMotor
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
+	dVector m_pin1;
 	dFloat m_motorOmega1;
 	dFloat m_targetSpeed1;
 	dFloat m_motorTorque1;

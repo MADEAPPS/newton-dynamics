@@ -786,7 +786,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
 		NewtonBody* const engine = engineJoint->GetBody0();
-		NewtonBody* const chassis = engineJoint->GetBody0();
+		NewtonBody* const chassis = engineJoint->GetBody1();
 		engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
 	}
