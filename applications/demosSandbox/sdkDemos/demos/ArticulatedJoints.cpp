@@ -1510,8 +1510,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// set power parameter for a simple DC engine
 		vehicleModel->m_maxTurmVelocity = 10.0f;
 		vehicleModel->m_maxEngineSpeed = 30.0f;
-		vehicleModel->m_engineMotor->SetTorque(1000.0f);
-		vehicleModel->m_engineMotor->SetTorque1(1250.0f);
+		vehicleModel->m_engineMotor->SetTorque(2000.0f);
+		vehicleModel->m_engineMotor->SetTorque1(2500.0f);
 
 		// set the steering torque 
 		vehicleModel->m_engineJoint->SetFriction(500.0f);

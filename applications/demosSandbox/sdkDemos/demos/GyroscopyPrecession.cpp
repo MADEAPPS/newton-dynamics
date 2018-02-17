@@ -29,7 +29,14 @@ static void ZeroGravityForce(const NewtonBody* body, dFloat timestep, int thread
 	NewtonBodyGetOmega(body, &omega[0]);
 	dVector L(inertia.RotateVector(omega));
 	dFloat e = L.DotProduct3(omega) * 0.5f;
-	dTrace(("E = %f  L (%f %f %f)\n", e, L.m_x, L.m_y, L.m_z));
+
+//dMatrix ii(dGetIdentityMatrix());
+//dMatrix matrix(dGetIdentityMatrix());
+//NewtonBodyGetMatrix(body, &matrix[0][0]);
+//NewtonBodyGetMass(body, &omega.m_w, &ii[0][0], &ii[1][1], &ii[2][2]);
+//ii = matrix.Inverse() * ii * matrix;
+
+	dTrace(("E=%f  L(%f %f %f) W(%f %f %f)\n", e, L.m_x, L.m_y, L.m_z, omega.m_x, omega.m_y, omega.m_z));
 */
 }
 
