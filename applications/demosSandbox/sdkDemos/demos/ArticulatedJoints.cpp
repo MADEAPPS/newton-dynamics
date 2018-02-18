@@ -24,7 +24,7 @@
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 //#define ARTICULATED_VEHICLE_CAMERA_DISTANCE		7.0f
-#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			10.0f
+#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			13.0f
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -1339,6 +1339,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 	void AddCraneWrist(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone)
 	{
+/*
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
@@ -1365,6 +1366,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dCustomArticulatedTransformController::dSkeletonBone* const wristBone = controller->AddBone(wristBody, dGetIdentityMatrix(), baseBone);
 		AddCranekPaletteActuator (controller, wristBone, "leftHand");
 		AddCranekPaletteActuator (controller, wristBone, "rightHand");
+*/
 	}
 
 	void AddCraneLift(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone)
@@ -1394,7 +1396,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone1 = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone2 = AddCraneBoom (controller, boomBone1, "Boom2");
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone3 = AddCraneBoom (controller, boomBone2, "Boom3");
-//		AddCraneWrist(controller, boomBone3);
+		AddCraneWrist(controller, boomBone3);
 	}
 
 	void AddCraneBase(dCustomArticulatedTransformController* const controller)

@@ -137,29 +137,24 @@ void dCustomSliderActuator::SetMaxForcePower(dFloat force)
 }
 
 
-//void dCustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dCustomSlider::SubmitAngularRow(matrix0, matrix1, timestep);
 //	if (m_actuatorFlag) 
 	{
-/*
-		dVector posit1 (matrix1.m_posit);
-		dVector posit0 (matrix0.m_posit - matrix1.m_front.Scale (m_posit));
-		dFloat jointosit = GetJointPosit();
-		dFloat relPosit = m_posit - jointosit;
+		dFloat jointPosit = GetJointPosit();
+		dFloat relPosit = m_targetPosit - jointPosit;
 		dFloat step = dFloat(2.0f) * m_linearRate * timestep;
 
 		dFloat currentSpeed = GetJointSpeed();
 		dFloat desiredSpeed = (dAbs(relPosit) > dAbs(step)) ? dSign(relPosit) * m_linearRate : dFloat(0.1f) * relPosit / timestep;
 		dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 
-		NewtonUserJointAddLinearRow(m_joint, &posit0[0], &posit1[0], &matrix1.m_front[0]);
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
-        NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
-        NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
+		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
+		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-*/
 	}
 }
 

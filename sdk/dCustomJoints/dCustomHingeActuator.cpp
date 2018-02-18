@@ -153,8 +153,8 @@ void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 
 		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
-        NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxToque);
-        NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxToque);
+		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxToque);
+		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxToque);
 		NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 	}
 }
