@@ -27,7 +27,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustomHingeActuator);
 dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
-	,m_maxToque(1.0e20f)
+	,m_maxToque(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
 	m_options.m_value = 0;
@@ -39,7 +39,7 @@ dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, Newt
 dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
-	,m_maxToque(1.0e20f)
+	,m_maxToque(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
 	m_options.m_value = 0;
@@ -52,16 +52,18 @@ dCustomHingeActuator::~dCustomHingeActuator()
 {
 }
 
-void dCustomHingeActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
-{
-	dAssert (0);
-}
-
 void dCustomHingeActuator::Deserialize(NewtonDeserializeCallback callback, void* const userData)
 {
-	dAssert (0);
+	callback(userData, &m_targetAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_maxToque, sizeof(dFloat));
 }
 
+void dCustomHingeActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomHinge::Serialize (callback, userData);
+	callback(userData, &m_targetAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_maxToque, sizeof(dFloat));
+}
 
 bool dCustomHingeActuator::GetEnableFlag () const
 {
@@ -134,7 +136,6 @@ void dCustomHingeActuator::SetMaxTorque(dFloat torque)
 }
 
 
-//void dCustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
 	dCustomHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);

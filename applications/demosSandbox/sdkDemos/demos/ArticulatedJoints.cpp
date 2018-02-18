@@ -74,9 +74,9 @@ class ArticulatedEntityModel: public DemoEntity
 			memset (this, 0, sizeof (InputRecord));
 		}
 
+		dFloat m_slideValue;
 		dFloat m_turnValue;
-		int m_tiltValue;
-		int m_liftValue;
+		dFloat m_liftValue;
 		int m_openValue;
 		int m_wristAxis0;
 		int m_wristAxis1;
@@ -88,13 +88,13 @@ class ArticulatedEntityModel: public DemoEntity
 		:DemoEntity(dGetIdentityMatrix(), NULL)
 		,m_rearTiresCount(0)
 		,m_tractionTiresCount(0)
-		,m_angularActuatorsCount0(0)
-		,m_angularActuatorsCount1(0)
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
 		,m_engineMotor(NULL)
 		,m_engineJoint(NULL)
+		,m_angularActuator0(NULL)
+		,m_angularActuator1(NULL)
 	{
 		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
@@ -104,8 +104,6 @@ class ArticulatedEntityModel: public DemoEntity
 		:DemoEntity(copy)
 		,m_rearTiresCount(0)
 		,m_tractionTiresCount(0)
-		,m_angularActuatorsCount0(0)
-		,m_angularActuatorsCount1(0)
 		,m_liftActuatorsCount(0)
 		,m_universalActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
@@ -120,6 +118,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_wristAxis1(0.0f)
 		,m_engineMotor(NULL)
 		,m_engineJoint(NULL)
+		,m_angularActuator0(NULL)
+		,m_angularActuator1(NULL)
 	{
 	}
 
@@ -185,8 +185,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat minAngleLimit = -20.0f * dDegreeToRad;
 		dFloat maxAngleLimit =  20.0f * dDegreeToRad;
 		dFloat angularRate = 10.0f * dDegreeToRad;
-		m_angularActuator0[m_angularActuatorsCount0] = new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
-		m_angularActuatorsCount0 ++;
+		m_angularActuator0 = new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
 	}
 
 	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
@@ -215,8 +214,6 @@ class ArticulatedEntityModel: public DemoEntity
 
 	int m_rearTiresCount;
 	int m_tractionTiresCount;
-	int m_angularActuatorsCount0;
-	int m_angularActuatorsCount1;
 	int m_liftActuatorsCount;
 	int m_universalActuatorsCount;
 	int m_paletteActuatorsCount;
@@ -229,19 +226,19 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_steeringTorque;
 	dFloat m_wristAxis0;
 	dFloat m_wristAxis1;
-		
-	NewtonBody* m_tractionTires[4];
-	dCustomSlidingContact* m_tractionTiresJoints[4];
-	
-	dCustomSliderActuator* m_liftJoints[4];
-	dCustomSliderActuator* m_paletteJoints[4];
-	dCustomHingeActuator* m_angularActuator0[4];
-	dCustomHingeActuator* m_angularActuator1[4];
-	dCustomUniversalActuator* m_rearTireJoints[4];
-	dCustomUniversalActuator* m_universalActuator[4];
 
 	dCustomMotor2* m_engineMotor;
 	dCustomUniversal* m_engineJoint;
+	dCustomHingeActuator* m_angularActuator0;
+	dCustomHingeActuator* m_angularActuator1;
+
+	NewtonBody* m_tractionTires[4];
+	dCustomSlidingContact* m_tractionTiresJoints[4];
+	
+	dCustomSliderActuator* m_liftJoints[2];
+	dCustomSliderActuator* m_paletteJoints[4];
+	dCustomUniversalActuator* m_rearTireJoints[4];
+	dCustomUniversalActuator* m_universalActuator[4];
 
 	InputRecord m_inputs;
 };
@@ -321,28 +318,33 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		}
 
 		// set the base turn angle
-		if (vehicleModel->m_angularActuatorsCount1) {
-			vehicleModel->m_angularActuator1[0]->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
-		}
+		vehicleModel->m_angularActuator1->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
+
 
 		// set the tilt angle
-		if (vehicleModel->m_angularActuatorsCount0) {
-			dFloat tiltAngle = vehicleModel->m_tiltAngle;
-			if (vehicleModel->m_inputs.m_tiltValue > 0) {
-				tiltAngle = vehicleModel->m_angularActuator0[0]->GetMinAngularLimit();
-				vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
-			} else if (vehicleModel->m_inputs.m_tiltValue < 0) {
-				tiltAngle = vehicleModel->m_angularActuator0[0]->GetMaxAngularLimit();
-				vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
-			}
-
-			for (int i = 0; i < vehicleModel->m_angularActuatorsCount0; i ++) {
-				vehicleModel->m_angularActuator0[i]->SetTargetAngle (tiltAngle);
-			}
+/*
+		dFloat tiltAngle = vehicleModel->m_tiltAngle;
+		if (vehicleModel->m_inputs.m_liftValue > 0) {
+			tiltAngle = vehicleModel->m_angularActuator0[0]->GetMinAngularLimit();
+			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
+		} else if (vehicleModel->m_inputs.m_liftValue < 0) {
+			tiltAngle = vehicleModel->m_angularActuator0[0]->GetMaxAngularLimit();
+			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
 		}
 
+		for (int i = 0; i < vehicleModel->m_angularActuatorsCount0; i ++) {
+			vehicleModel->m_angularActuator0[i]->SetTargetAngle (tiltAngle);
+		}
+*/
+
+
+		vehicleModel->m_angularActuator0->SetTargetAngle(vehicleModel->m_inputs.m_liftValue);
+
+
 		// set the lift position
-		if (vehicleModel->m_liftActuatorsCount) {
+//		if (vehicleModel->m_liftActuatorsCount) 
+		{
+/*
 			dFloat liftPosit = vehicleModel->m_liftPosit;
 			if (vehicleModel->m_inputs.m_liftValue > 0) {
 				liftPosit = vehicleModel->m_liftJoints[0]->GetMinPositLimit();
@@ -354,7 +356,12 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			for (int i = 0; i < vehicleModel->m_liftActuatorsCount; i ++) {
 				vehicleModel->m_liftJoints[i]->SetTargetPosit(liftPosit);
 			}
+*/
 		}
+
+		vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
+		vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
+		
 
 		// open Close palette position
 		if (vehicleModel->m_paletteActuatorsCount) {
@@ -423,6 +430,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
@@ -509,6 +517,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 //					break;
 //				}
 				
+				case ARTICULATED_VEHICLE_DEFINITION::m_bodyPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
@@ -1379,13 +1388,13 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dFloat minAngleLimit = -60.0f * dDegreeToRad;
 		dFloat maxAngleLimit =  10.0f * dDegreeToRad;
-		dFloat angularRate = 20.0f * dDegreeToRad;
-		vehicleModel->m_angularActuator0[vehicleModel->m_angularActuatorsCount0] = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, boomBody, baseBone->m_body);
-		vehicleModel->m_angularActuatorsCount0++;
+		dFloat angularRate = 40.0f * dDegreeToRad;
+
+		vehicleModel->m_angularActuator0 = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, boomBody, baseBone->m_body);
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone1 = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone2 = AddCraneBoom (controller, boomBone1, "Boom2");
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone3 = AddCraneBoom (controller, boomBone2, "Boom3");
-		AddCraneWrist(controller, boomBone3);
+//		AddCraneWrist(controller, boomBone3);
 	}
 
 	void AddCraneBase(dCustomArticulatedTransformController* const controller)
@@ -1410,11 +1419,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat minAngleLimit = -1.0e10f;
 		dFloat maxAngleLimit = 1.0e10f;
 		dFloat angularRate = 40.0f * dDegreeToRad;
-		vehicleModel->m_angularActuator1[vehicleModel->m_angularActuatorsCount1] = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, baseBody, chassisBone->m_body);
-		vehicleModel->m_angularActuatorsCount1++;
+		vehicleModel->m_angularActuator1 = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, baseBody, chassisBone->m_body);
 		dCustomArticulatedTransformController::dSkeletonBone* const baseBone = controller->AddBone(baseBody, dGetIdentityMatrix(), chassisBone);
 
-//		AddCraneLift(controller, baseBone);
+		AddCraneLift(controller, baseBone);
 	}
 
 	dCustomArticulatedTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
@@ -1522,6 +1530,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 		,m_changeVehicle(true)
 		,m_playersCount(0)
 		,m_currentPlayer(0)
+		,m_liftboom(0.0f) 
+		,m_slideboom(0.0f) 
 		,m_rotatebase(0.0f)
 	{
 		// plug a callback for 2d help display
@@ -1537,13 +1547,12 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 		inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
 		inputs.m_wristAxis1 = int(m_scene->GetKeyState('I')) - int(m_scene->GetKeyState('O'));
-
-		inputs.m_tiltValue = int (m_scene->GetKeyState ('Z')) - int (m_scene->GetKeyState ('X'));
-		inputs.m_liftValue = int (m_scene->GetKeyState ('Q')) - int (m_scene->GetKeyState ('E'));
 		inputs.m_openValue = int (m_scene->GetKeyState ('F')) - int (m_scene->GetKeyState ('G'));
 		inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
 		inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
 
+		inputs.m_slideValue = m_slideboom;
+		inputs.m_liftValue = m_liftboom * dDegreeToRad;
 		inputs.m_turnValue = m_rotatebase * dDegreeToRad;
 
 		// check if we must activate the player
@@ -1552,18 +1561,6 @@ class AriculatedJointInputManager: public dCustomInputManager
 			m_scene->GetKeyState ('D') ||
 			m_scene->GetKeyState ('W') ||
 			m_scene->GetKeyState ('S'))
-			//m_scene->GetKeyState ('R') ||
-			//m_scene->GetKeyState ('T') ||
-			//m_scene->GetKeyState ('I') ||
-			//m_scene->GetKeyState ('O') ||
-			//m_scene->GetKeyState ('Y') ||
-			//m_scene->GetKeyState ('U') ||
-			//m_scene->GetKeyState ('F') ||
-			//m_scene->GetKeyState ('G') ||
-			//m_scene->GetKeyState ('Q') ||
-			//m_scene->GetKeyState ('E') ||
-			//m_scene->GetKeyState ('Z') ||
-			//m_scene->GetKeyState ('X')) 
 		{
 			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
 			NewtonBodySetSleepState(body, false);
@@ -1636,9 +1633,12 @@ class AriculatedJointInputManager: public dCustomInputManager
 		scene->Print (color, "drive backward:     S");
 		scene->Print (color, "turn right:         D");
 		scene->Print (color, "turn left:          A");
-//xxxxxxx
+
 		m_needsWakeUp = false;
+		m_needsWakeUp = ImGui::SliderFloat("BoomSlide", &m_slideboom, 0.0f, 3.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("BoomLift", &m_liftboom, -180.0f, 180.0f) || m_needsWakeUp;
 		m_needsWakeUp = ImGui::SliderFloat("RotateBase", &m_rotatebase, -180.0f, 180.0f) || m_needsWakeUp;
+		
 
 		//scene->Print (color, "open palette:       F");
 		//scene->Print (color, "close palette       G");
@@ -1666,6 +1666,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 	int m_playersCount;
 	int m_currentPlayer;
 	bool m_needsWakeUp;
+	dFloat32 m_liftboom; 
+	dFloat32 m_slideboom; 
 	dFloat32 m_rotatebase; 
 };
 

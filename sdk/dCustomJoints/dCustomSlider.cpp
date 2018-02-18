@@ -210,16 +210,6 @@ void dCustomSlider::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, co
 
 void dCustomSlider::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-/*
-	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	dVector euler0;
-	dVector euler1;
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-	for (int i = 0; i < 3; i++) {
-		NewtonUserJointAddAngularRow(m_joint, -euler0[i], &matrix1[i][0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	}
-*/
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
 	dVector euler1;
@@ -252,8 +242,6 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
-	SubmitAngularRow(matrix0, matrix1, timestep);
-
 	// calculate position and speed	
 	dVector veloc0(0.0f);
 	dVector veloc1(0.0f);
@@ -264,6 +252,8 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_front);
 	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
+
+	SubmitAngularRow(matrix0, matrix1, timestep);
 
 	if (m_options.m_option0) {
 		if (m_options.m_option1) {

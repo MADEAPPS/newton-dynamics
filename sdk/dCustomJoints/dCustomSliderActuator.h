@@ -47,15 +47,11 @@ class dCustomSliderActuator: public dCustomSlider
     CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
 
 	protected:
-	//CUSTOM_JOINTS_API dCustomSliderActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
-	CUSTOM_JOINTS_API void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
-
-	dFloat m_posit;
-	dFloat m_minPosit;
-	dFloat m_maxPosit;
+	dFloat m_targetPosit;
 	dFloat m_linearRate;
     dFloat m_maxForce;
 	DECLARE_CUSTOM_JOINT(dCustomSliderActuator, dCustomSlider)
