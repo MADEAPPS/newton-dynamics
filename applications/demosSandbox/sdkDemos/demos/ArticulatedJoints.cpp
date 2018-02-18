@@ -74,7 +74,7 @@ class ArticulatedEntityModel: public DemoEntity
 			memset (this, 0, sizeof (InputRecord));
 		}
 
-		int m_turnValue;
+		dFloat m_turnValue;
 		int m_tiltValue;
 		int m_liftValue;
 		int m_openValue;
@@ -112,7 +112,6 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_maxEngineTorque(0.0f)
 		,m_maxEngineSpeed(30.0f)
 		,m_maxTurmVelocity(10.0f)
-		,m_turnAngle(0.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
 		,m_openPosit(0.0f)
@@ -224,7 +223,6 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_maxEngineTorque;
 	dFloat m_maxEngineSpeed;
 	dFloat m_maxTurmVelocity;
-	dFloat m_turnAngle;
 	dFloat m_tiltAngle;
 	dFloat m_liftPosit;
 	dFloat m_openPosit;
@@ -276,30 +274,14 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			dFloat engineRPM = 0.0f;
 			if (vehicleModel->m_inputs.m_throttleValue > 0) {
 				brakeTorque = 0.0f;
-				//engineTorque = -vehicleModel->m_maxEngineTorque; 
 				engineRPM = -vehicleModel->m_maxEngineSpeed;
 			} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
 				brakeTorque = 0.0f;
-				//engineTorque = vehicleModel->m_maxEngineTorque; 
 				engineRPM = vehicleModel->m_maxEngineSpeed;
 			}
 
 			// apply DC engine torque
-/*
-			dMatrix chassisMatrix;
-			dVector engineOmega(0.0f);
-			NewtonBody* const engineBody = vehicleModel->m_engineJoint->GetBody0();
-			NewtonBody* const chassisBody = vehicleModel->m_engineJoint->GetBody1();
-			NewtonBodyGetOmega(engineBody, &engineOmega[0]);
-			NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-			chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
-			engineTorque -= (engineOmega.DotProduct3(chassisMatrix.m_up)) * vehicleModel->m_omegaResistance;
-			dVector torque (chassisMatrix.m_up.Scale(engineTorque));
-			NewtonBodyAddTorque (engineBody, &torque[0]);
-*/			
-
 			vehicleModel->m_engineMotor->SetSpeed1(engineRPM);
-
 
 			if (!vehicleModel->m_rearTiresCount) {
 				// apply DC rate turn Motor 
@@ -340,18 +322,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		// set the base turn angle
 		if (vehicleModel->m_angularActuatorsCount1) {
-			dFloat turnAngle = vehicleModel->m_turnAngle;
-			if (vehicleModel->m_inputs.m_turnValue > 0) {
-				turnAngle = vehicleModel->m_angularActuator1[0]->GetMinAngularLimit();
-				vehicleModel->m_turnAngle = vehicleModel->m_angularActuator1[0]->GetActuatorAngle();
-			} else if (vehicleModel->m_inputs.m_turnValue < 0) {
-				turnAngle = vehicleModel->m_angularActuator1[0]->GetMaxAngularLimit();
-				vehicleModel->m_turnAngle = vehicleModel->m_angularActuator1[0]->GetActuatorAngle();
-			}
-
-			for (int i = 0; i < vehicleModel->m_angularActuatorsCount1; i++) {
-				vehicleModel->m_angularActuator1[i]->SetTargetAngle(turnAngle);
-			}
+			vehicleModel->m_angularActuator1[0]->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
 		}
 
 		// set the tilt angle
@@ -1438,11 +1409,12 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dFloat minAngleLimit = -1.0e10f;
 		dFloat maxAngleLimit = 1.0e10f;
-		dFloat angularRate = 20.0f * dDegreeToRad;
+		dFloat angularRate = 40.0f * dDegreeToRad;
 		vehicleModel->m_angularActuator1[vehicleModel->m_angularActuatorsCount1] = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, baseBody, chassisBone->m_body);
 		vehicleModel->m_angularActuatorsCount1++;
 		dCustomArticulatedTransformController::dSkeletonBone* const baseBone = controller->AddBone(baseBody, dGetIdentityMatrix(), chassisBone);
-		AddCraneLift(controller, baseBone);
+
+//		AddCraneLift(controller, baseBone);
 	}
 
 	dCustomArticulatedTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
@@ -1516,7 +1488,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		// set the steering torque 
 		vehicleModel->m_engineJoint->SetFriction(500.0f);
 
-//		AddCraneBase (controller);
+		AddCraneBase (controller);
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
@@ -1550,6 +1522,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 		,m_changeVehicle(true)
 		,m_playersCount(0)
 		,m_currentPlayer(0)
+		,m_rotatebase(0.0f)
 	{
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
@@ -1564,31 +1537,33 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 		inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
 		inputs.m_wristAxis1 = int(m_scene->GetKeyState('I')) - int(m_scene->GetKeyState('O'));
-		inputs.m_turnValue = int (m_scene->GetKeyState ('R')) - int (m_scene->GetKeyState ('T'));
+
 		inputs.m_tiltValue = int (m_scene->GetKeyState ('Z')) - int (m_scene->GetKeyState ('X'));
 		inputs.m_liftValue = int (m_scene->GetKeyState ('Q')) - int (m_scene->GetKeyState ('E'));
 		inputs.m_openValue = int (m_scene->GetKeyState ('F')) - int (m_scene->GetKeyState ('G'));
 		inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
 		inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
 
+		inputs.m_turnValue = m_rotatebase * dDegreeToRad;
+
 		// check if we must activate the player
-		if (m_scene->GetKeyState ('A') || 
+		if (m_needsWakeUp ||
+			m_scene->GetKeyState ('A') || 
 			m_scene->GetKeyState ('D') ||
 			m_scene->GetKeyState ('W') ||
-			m_scene->GetKeyState ('S') ||
-
-			m_scene->GetKeyState ('R') ||
-			m_scene->GetKeyState ('T') ||
-			m_scene->GetKeyState ('I') ||
-			m_scene->GetKeyState ('O') ||
-			m_scene->GetKeyState ('Y') ||
-			m_scene->GetKeyState ('U') ||
-			m_scene->GetKeyState ('F') ||
-			m_scene->GetKeyState ('G') ||
-			m_scene->GetKeyState ('Q') ||
-			m_scene->GetKeyState ('E') ||
-			m_scene->GetKeyState ('Z') ||
-			m_scene->GetKeyState ('X')) 
+			m_scene->GetKeyState ('S'))
+			//m_scene->GetKeyState ('R') ||
+			//m_scene->GetKeyState ('T') ||
+			//m_scene->GetKeyState ('I') ||
+			//m_scene->GetKeyState ('O') ||
+			//m_scene->GetKeyState ('Y') ||
+			//m_scene->GetKeyState ('U') ||
+			//m_scene->GetKeyState ('F') ||
+			//m_scene->GetKeyState ('G') ||
+			//m_scene->GetKeyState ('Q') ||
+			//m_scene->GetKeyState ('E') ||
+			//m_scene->GetKeyState ('Z') ||
+			//m_scene->GetKeyState ('X')) 
 		{
 			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
 			NewtonBodySetSleepState(body, false);
@@ -1653,7 +1628,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 		m_playersCount ++;
 	}
 
-	void RenderPlayerHelp (DemoEntityManager* const scene) const
+	void RenderPlayerHelp (DemoEntityManager* const scene)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print (color, "Navigation Keys");
@@ -1661,16 +1636,20 @@ class AriculatedJointInputManager: public dCustomInputManager
 		scene->Print (color, "drive backward:     S");
 		scene->Print (color, "turn right:         D");
 		scene->Print (color, "turn left:          A");
-		scene->Print (color, "open palette:       F");
-		scene->Print (color, "close palette       G");
-		scene->Print (color, "lift palette:       E");
-		scene->Print (color, "lower palette       Q");
-		scene->Print (color, "tilt forward:       Z");
-		scene->Print (color, "tilt backward:      X");
-		scene->Print (color, "turn base left:     R");
-		scene->Print (color, "turn base right:    T");
-		scene->Print (color, "toggle camera mode: C");
-		scene->Print (color, "switch vehicle:     P");
+//xxxxxxx
+		m_needsWakeUp = false;
+		m_needsWakeUp = ImGui::SliderFloat("RotateBase", &m_rotatebase, -180.0f, 180.0f) || m_needsWakeUp;
+
+		//scene->Print (color, "open palette:       F");
+		//scene->Print (color, "close palette       G");
+		//scene->Print (color, "lift palette:       E");
+		//scene->Print (color, "lower palette       Q");
+		//scene->Print (color, "tilt forward:       Z");
+		//scene->Print (color, "tilt backward:      X");
+		//scene->Print (color, "turn base left:     R");
+		//scene->Print (color, "turn base right:    T");
+		//scene->Print (color, "toggle camera mode: C");
+		//scene->Print (color, "switch vehicle:     P");
 	}				
 
 	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
@@ -1686,6 +1665,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 	DemoEntityManager::ButtonKey m_changeVehicle;
 	int m_playersCount;
 	int m_currentPlayer;
+	bool m_needsWakeUp;
+	dFloat32 m_rotatebase; 
 };
 
 static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity& entity, const dVector& location)
