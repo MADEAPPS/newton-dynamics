@@ -62,16 +62,17 @@
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// six axis manipulator
 //#define DEFAULT_SCENE	30			// hexapod Robot
-#define DEFAULT_SCENE	31			// articulated joints
-//#define DEFAULT_SCENE	32			// basic rag doll
-//#define DEFAULT_SCENE	33			// dynamic rag doll
-//#define DEFAULT_SCENE	34			// basic Car
-//#define DEFAULT_SCENE	35			// super Car
-//#define DEFAULT_SCENE	36			// heavy vehicles
-//#define DEFAULT_SCENE	37			// basic player controller
-//#define DEFAULT_SCENE	38			// advanced player controller
-//#define DEFAULT_SCENE	39			// cloth patch			
-//#define DEFAULT_SCENE	40			// soft bodies			
+#define DEFAULT_SCENE	31			// servo joints
+//#define DEFAULT_SCENE	32			// articulated joints
+//#define DEFAULT_SCENE	33			// basic rag doll
+//#define DEFAULT_SCENE	34			// dynamic rag doll
+//#define DEFAULT_SCENE	35			// basic Car
+//#define DEFAULT_SCENE	36			// super Car
+//#define DEFAULT_SCENE	37			// heavy vehicles
+//#define DEFAULT_SCENE	38			// basic player controller
+//#define DEFAULT_SCENE	39			// advanced player controller
+//#define DEFAULT_SCENE	30			// cloth patch			
+//#define DEFAULT_SCENE	41			// soft bodies			
 
 
 /// demos forward declaration 
@@ -112,6 +113,7 @@ void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void PassiveRagdoll (DemoEntityManager* const scene);
 void DynamicRagDoll (DemoEntityManager* const scene);
+void ServoJoints (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
@@ -151,7 +153,8 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Standard Joints", "show some of the common joints", StandardJoints},
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
-	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
+	{"Servo actuators joints", "demonstrate complex array of bodies interconnect by joints", ServoJoints},
+	{"Articulated robotic joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
 	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
