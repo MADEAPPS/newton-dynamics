@@ -34,8 +34,6 @@ class dCustomHingeActuator: public dCustomHinge
 	CUSTOM_JOINTS_API virtual ~dCustomHingeActuator();
 
 	CUSTOM_JOINTS_API dFloat GetActuatorAngle() const;
-	CUSTOM_JOINTS_API bool GetEnableFlag () const;
-	CUSTOM_JOINTS_API void SetEnableFlag (bool flag);
 
 	CUSTOM_JOINTS_API dFloat GetTargetAngle() const;
 	CUSTOM_JOINTS_API void SetTargetAngle(dFloat angle);
@@ -58,7 +56,7 @@ class dCustomHingeActuator: public dCustomHinge
 	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
 
 	dAngularIntegration m_targetAngle;
-	dFloat m_maxToque;
+	dFloat m_maxTorque;
 	DECLARE_CUSTOM_JOINT(dCustomHingeActuator, dCustomHinge)
 };
 

@@ -27,7 +27,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustomHingeActuator);
 dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
-	,m_maxToque(D_CUSTOM_LARGE_VALUE)
+	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
 	m_options.m_value = 0;
@@ -39,7 +39,7 @@ dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, Newt
 dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
-	,m_maxToque(D_CUSTOM_LARGE_VALUE)
+	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
 	m_options.m_value = 0;
@@ -55,21 +55,14 @@ dCustomHingeActuator::~dCustomHingeActuator()
 void dCustomHingeActuator::Deserialize(NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_targetAngle, sizeof(dAngularIntegration));
-	callback(userData, &m_maxToque, sizeof(dFloat));
+	callback(userData, &m_maxTorque, sizeof(dFloat));
 }
 
 void dCustomHingeActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomHinge::Serialize (callback, userData);
 	callback(userData, &m_targetAngle, sizeof(dAngularIntegration));
-	callback(userData, &m_maxToque, sizeof(dFloat));
-}
-
-bool dCustomHingeActuator::GetEnableFlag () const
-{
-	dAssert (0);
-	return 0;
-//	return m_actuatorFlag;
+	callback(userData, &m_maxTorque, sizeof(dFloat));
 }
 
 dFloat dCustomHingeActuator::GetTargetAngle() const
@@ -114,12 +107,6 @@ void dCustomHingeActuator::SetTargetAngle(dFloat angle)
 	m_targetAngle.SetAngle (dClamp (angle, m_minAngle, m_maxAngle));
 }
 
-void dCustomHingeActuator::SetEnableFlag (bool flag)
-{
-	dAssert (0);
-//	m_actuatorFlag = flag;
-}
-
 dFloat dCustomHingeActuator::GetActuatorAngle() const
 {
 	return GetJointAngle();
@@ -127,12 +114,12 @@ dFloat dCustomHingeActuator::GetActuatorAngle() const
 
 dFloat dCustomHingeActuator::GetMaxTorque() const
 {
-    return m_maxToque;
+    return m_maxTorque;
 }
 
 void dCustomHingeActuator::SetMaxTorque(dFloat torque)
 {
-    m_maxToque = dAbs (torque);
+    m_maxTorque = dAbs (torque);
 }
 
 
@@ -151,8 +138,8 @@ void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 
 	NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
-	NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxToque);
-	NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxToque);
+	NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxTorque);
+	NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxTorque);
 	NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 }
 

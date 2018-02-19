@@ -17,53 +17,43 @@
 #ifndef _CUSTOM_UNIVERSAL_ACTUATOR_H_
 #define _CUSTOM_UNIVERSAL_ACTUATOR_H_
 
-#include "dCustomHingeActuator.h"
+#include "dCustomUniversal.h"
 
-class dCustomUniversalActuator: public dCustomHingeActuator
+class dCustomUniversalActuator: public dCustomUniversal
 {
 	public:
 	CUSTOM_JOINTS_API dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomUniversalActuator();
 
-	CUSTOM_JOINTS_API bool GetEnableFlag0 () const;
-	CUSTOM_JOINTS_API void SetEnableFlag0 (bool flag);
-
-	CUSTOM_JOINTS_API dFloat GetTargetAngle0() const;
-	CUSTOM_JOINTS_API void SetTargetAngle0(dFloat angle);
-
-	CUSTOM_JOINTS_API dFloat GetAngularRate0() const;
-	CUSTOM_JOINTS_API void SetAngularRate0(dFloat rate);
-
-    CUSTOM_JOINTS_API dFloat GetMaxTorquePower0() const;
-    CUSTOM_JOINTS_API void SetMaxTorquePower0(dFloat force);
-
-	CUSTOM_JOINTS_API bool GetEnableFlag1 () const;
-	CUSTOM_JOINTS_API void SetEnableFlag1 (bool flag);
+	CUSTOM_JOINTS_API dFloat GetActuatorAngle1() const;
 
 	CUSTOM_JOINTS_API dFloat GetTargetAngle1() const;
 	CUSTOM_JOINTS_API void SetTargetAngle1(dFloat angle);
 
+	CUSTOM_JOINTS_API dFloat GetMinAngularLimit1() const;
+	CUSTOM_JOINTS_API void SetMinAngularLimit1(dFloat limit);
+
+	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit1() const;
+	CUSTOM_JOINTS_API void SetMaxAngularLimit1(dFloat limit);
+
 	CUSTOM_JOINTS_API dFloat GetAngularRate1() const;
 	CUSTOM_JOINTS_API void SetAngularRate1(dFloat rate);
 
-    CUSTOM_JOINTS_API dFloat GetMaxTorquePower1() const;
-    CUSTOM_JOINTS_API void SetMaxTorquePower1(dFloat force);
+	CUSTOM_JOINTS_API dFloat GetMaxTorque1() const;
+	CUSTOM_JOINTS_API void SetMaxTorque1(dFloat torque);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
 
-	dFloat m_angle0;
-	dFloat m_angularRate0;
-    dFloat m_maxForce0;
+	dAngularIntegration m_targetAngle0;
+	dAngularIntegration m_targetAngle1;
+	dFloat m_maxTorque0;
+	dFloat m_maxTorque1;
 
-	dFloat m_angle1;
-	dFloat m_angularRate1;
-    dFloat m_maxForce1;
-
-	DECLARE_CUSTOM_JOINT(dCustomUniversalActuator, dCustomHingeActuator)
+	DECLARE_CUSTOM_JOINT(dCustomUniversalActuator, dCustomUniversal)
 };
 
 #endif 
