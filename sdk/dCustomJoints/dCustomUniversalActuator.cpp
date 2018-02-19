@@ -22,6 +22,7 @@ dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFra
 	:dCustomUniversal(pinAndPivotFrame, child, parent)
 	,m_targetAngle0(0.0f)
 	,m_targetAngle1(0.0f)
+	,m_angularRate1(0.0f)
 	,m_maxTorque0(D_CUSTOM_LARGE_VALUE)
 	,m_maxTorque1(D_CUSTOM_LARGE_VALUE)
 {
@@ -34,6 +35,7 @@ dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFr
 	:dCustomUniversal(pinAndPivotFrame, child, parent)
 	,m_targetAngle0(0.0f)
 	,m_targetAngle1(0.0f)
+	,m_angularRate1(0.0f)
 	,m_maxTorque0(D_CUSTOM_LARGE_VALUE)
 	,m_maxTorque1(D_CUSTOM_LARGE_VALUE)
 {
@@ -51,6 +53,7 @@ void dCustomUniversalActuator::Deserialize(NewtonDeserializeCallback callback, v
 {
 	callback(userData, &m_targetAngle0, sizeof(dAngularIntegration));
 	callback(userData, &m_targetAngle1, sizeof(dAngularIntegration));
+	callback(userData, &m_angularRate1, sizeof(dFloat));
 	callback(userData, &m_maxTorque0, sizeof(dFloat));
 	callback(userData, &m_maxTorque1, sizeof(dFloat));
 }
@@ -61,6 +64,7 @@ void dCustomUniversalActuator::Serialize(NewtonSerializeCallback callback, void*
 
 	callback(userData, &m_targetAngle0, sizeof(dAngularIntegration));
 	callback(userData, &m_targetAngle1, sizeof(dAngularIntegration));
+	callback(userData, &m_angularRate1, sizeof(dFloat));
 	callback(userData, &m_maxTorque0, sizeof(dFloat));
 	callback(userData, &m_maxTorque1, sizeof(dFloat));
 }
@@ -125,7 +129,7 @@ void dCustomUniversalActuator::SetMaxTorque1(dFloat torque)
 void dCustomUniversalActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
 	dCustomUniversal::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
-
+/*
 	dFloat jointAngle0 = GetJointAngle();
 	dFloat targetAngle0 = m_targetAngle0.GetAngle();
 	dFloat relAngle0 = jointAngle0 - targetAngle0;
@@ -133,38 +137,19 @@ void dCustomUniversalActuator::SubmitAngularRow(const dMatrix& matrix0, const dM
 	dFloat step0 = dFloat(2.0f) * m_motorSpeed * timestep;
 
 	dFloat desiredSpeed0 = (dAbs(relAngle0) > dAbs(step0)) ? -dSign(relAngle0) * m_motorSpeed : -dFloat(0.1f) * relAngle0 / timestep;
-desiredSpeed0 = 5.0f;
+//desiredSpeed0 = 5.0f;
 	dFloat accel0 = (desiredSpeed0 - currentSpeed0) / timestep;
-dTrace(("%f %f\n", desiredSpeed0, currentSpeed0));
-//	accel0 = 0.5f;
+//dTrace(("%f %f\n", desiredSpeed0, currentSpeed0));
 
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 	NewtonUserJointSetRowAcceleration(m_joint, accel0);
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque0);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+*/
 
 /*
 	if (m_actuator_0 | m_actuator_1){
-		dMatrix matrix0;
-		dMatrix matrix1;
-
-		CalculateGlobalMatrix (matrix0, matrix1);
-		if (m_actuator_0) {
-			dFloat jointAngle = GetJointAngle_0();
-			dFloat relAngle = jointAngle - m_angle0;
-
-			dFloat currentSpeed = GetJointOmega_0();
-			dFloat step = dFloat(2.0f) * m_angularRate0 * timestep;
-			dFloat desiredSpeed = (dAbs(relAngle) > dAbs(step)) ? dSign(relAngle) * m_angularRate0 : dFloat(0.1f) * relAngle / timestep;
-			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-
-			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, accel);
-            NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce0);
-            NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce0);
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-		}
 
 		if (m_actuator_1) {
 			dFloat jointAngle = GetJointAngle_1();
@@ -184,6 +169,22 @@ dTrace(("%f %f\n", desiredSpeed0, currentSpeed0));
 		}
 	}
 */
+
+	dFloat jointAngle1 = GetJointAngle2();
+	dFloat relAngle1 = jointAngle1 - m_targetAngle1.GetAngle();
+
+	dFloat currentSpeed1 = GetJointOmega2();
+	dFloat step1 = dFloat(2.0f) * m_angularRate1 * timestep;
+	dFloat desiredSpeed1 = (dAbs(relAngle1) > dAbs(step1)) ? dSign(relAngle1) * m_angularRate1 : dFloat(0.1f) * relAngle1 / timestep;
+
+desiredSpeed1 = 5.0f;
+	dFloat accel1 = (desiredSpeed1 - currentSpeed1) / timestep;
+
+	NewtonUserJointAddAngularRow(m_joint, relAngle1, &matrix1.m_up[0]);
+	NewtonUserJointSetRowAcceleration(m_joint, accel1);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque1);
+	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque1);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
 
 

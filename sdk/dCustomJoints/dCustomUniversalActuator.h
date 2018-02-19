@@ -50,8 +50,10 @@ class dCustomUniversalActuator: public dCustomUniversal
 
 	dAngularIntegration m_targetAngle0;
 	dAngularIntegration m_targetAngle1;
+	dFloat m_angularRate1;
 	dFloat m_maxTorque0;
 	dFloat m_maxTorque1;
+	
 
 	DECLARE_CUSTOM_JOINT(dCustomUniversalActuator, dCustomUniversal)
 };
