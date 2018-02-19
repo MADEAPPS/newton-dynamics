@@ -86,7 +86,7 @@ void dCustomArticulatedTransformController::PreUpdate(dFloat timestep, int threa
 
 void dCustomArticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	if (m_calculateLocalTransform) {
+	if (m_calculateLocalTransform && m_bones.GetCount()) {
 
 		dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
 

@@ -45,7 +45,7 @@ struct SERVO_VEHICLE_DEFINITION
 	char m_articulationName[32];
 };
 
-#if 0
+
 static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 {
 	{"body",		"convexHull",			900.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
@@ -61,6 +61,7 @@ static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
+#if 0
 class ServoEntityModel: public DemoEntity
 {
 	public:
@@ -1753,7 +1754,6 @@ class ServoEntityModel: public DemoEntity
 		:DemoEntity(dGetIdentityMatrix(), NULL)
 		,m_inputs()
 	{
-		dAssert (0);
 		// load the vehicle model
 		LoadNGD_mesh(name, scene->GetNewton());
 	}
@@ -1762,12 +1762,10 @@ class ServoEntityModel: public DemoEntity
 		:DemoEntity(copy)
 		,m_inputs()
 	{
-		dAssert (0);
 	}
 
 	DemoEntity* CreateClone() const
 	{
-		dAssert (0);
 		return new ServoEntityModel(*this);
 	}
 
@@ -1802,10 +1800,6 @@ class ServoInputManager: public dCustomInputManager
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
 		ServoEntityModel::InputRecord inputs;
-		if (!m_currentPlayer) {
-			return;
-		}
-
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
 		//inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
@@ -1853,6 +1847,10 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
+		if (!m_currentPlayer) {
+			return;
+		}
+
 		DemoCamera* const camera = m_scene->GetCamera();
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
@@ -1942,7 +1940,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 	static int OnBoneAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	{
-		dAssert(0);
 		return 1;
 /*
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
@@ -2031,7 +2028,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 	
 	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
-		dAssert(0);
+//		dAssert(0);
 /*
 		int countCount = 0;
 		void* contactList[32];
@@ -2096,7 +2093,8 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 	virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
-		dAssert (0);
+//		dAssert (0);
+		dTrace (("Pre Update %s\n", __FUNCTION__));
 #if 0
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)controller->GetUserData();
 
@@ -2245,6 +2243,175 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 	}
 
 
+	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
+	{
+		dVector points[1024 * 16];
+
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		dAssert(mesh->m_vertexCount && (mesh->m_vertexCount < int(sizeof(points) / sizeof(points[0]))));
+
+		// go over the vertex array and find and collect all vertices's weighted by this bone.
+		const dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			points[i][0] = array[i * 3 + 0];
+			points[i][1] = array[i * 3 + 1];
+			points[i][2] = array[i * 3 + 2];
+			points[i][3] = 0.0f;
+		}
+		bodyPart->GetMeshMatrix().TransformTriplex(&points[0][0], sizeof(dVector), &points[0][0], sizeof(dVector), mesh->m_vertexCount);
+		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
+	}
+
+	NewtonCollision* MakeForkLiftTireShape(DemoEntity* const bodyPart) const
+	{
+		dFloat radius = 0.0f;
+		dFloat maxWidth = 0.0f;
+		dFloat minWidth = 0.0f;
+
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		const dMatrix& matrix = bodyPart->GetMeshMatrix();
+		dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			dVector p(matrix.TransformVector(dVector(array[i * 3 + 0], array[i * 3 + 1], array[i * 3 + 2], 1.0f)));
+			maxWidth = dMax(p.m_x, maxWidth);
+			minWidth = dMin(p.m_x, minWidth);
+			radius = dMax(p.m_y, radius);
+		}
+		dFloat width = maxWidth - minWidth;
+		radius -= width * 0.5f;
+		return NewtonCreateChamferCylinder(GetWorld(), radius, width, 0, NULL);
+	}
+
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const SERVO_VEHICLE_DEFINITION& definition)
+	{
+		NewtonCollision* shape = NULL;
+		if (!strcmp(definition.m_shapeTypeName, "tireShape")) {
+			shape = MakeForkLiftTireShape(bodyPart);
+		} else if (!strcmp(definition.m_shapeTypeName, "convexHull")) {
+			shape = MakeConvexHull(bodyPart);
+		} else if (!strcmp(definition.m_shapeTypeName, "convexHullAggregate")) {
+			//shape = MakeConvexHullAggregate(bodyPart);
+			shape = MakeConvexHull(bodyPart);
+		} else {
+			dAssert(0);
+		}
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		NewtonWorld* const world = GetWorld();
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, definition.m_mass, collision);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// assign a body part id
+		NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+
+
+	dCustomArticulatedTransformController* CreateForklift(const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
+	{
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		// make a clone of the mesh 
+		ServoEntityModel* const vehicleModel = (ServoEntityModel*)model->CreateClone();
+		scene->Append(vehicleModel);
+
+		// plane the model at its location
+		vehicleModel->ResetMatrix(*scene, location);
+
+		//dCustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
+		dCustomArticulatedTransformController* const controller = CreateTransformController();
+
+		controller->SetUserData(vehicleModel);
+		controller->SetCalculateLocalTransforms(true);
+
+		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
+
+		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
+
+		// move the center of mass a lithe to the back, and lower
+		dVector com(0.0f);
+		NewtonBodyGetCentreOfMass(rootBody, &com[0]);
+		//com.m_x -= 0.25f;
+		com.m_y -= 0.25f;
+		NewtonBodySetCentreOfMass(rootBody, &com[0]);
+
+		// add the root bone to the articulation manager
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
+/*
+		// add engine
+		dCustomArticulatedTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
+		vehicleModel->m_engineJoint = (dCustomUniversal*)engineBone->FindJoint();
+		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
+
+		dAssert(0);
+		// set power parameter for a simple DC engine
+		//		dFloat maxOmega = 40.0f;
+		//		vehicleModel->m_maxEngineTorque = -400.0f;
+		//		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
+		//		vehicleModel->m_maxTurmDamp = 0.0f;
+		//		vehicleModel->m_maxTurmVelocity = 0.0f;
+
+		// walk down the model hierarchy an add all the components 
+		int stackIndex = 0;
+		DemoEntity* childEntities[32];
+		dCustomArticulatedTransformController::dSkeletonBone* parentBones[32];
+		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = chassisBone;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		dList<dCustomJoint*> cycleLinks;
+		while (stackIndex) {
+			stackIndex--;
+			DemoEntity* const entity = childEntities[stackIndex];
+			dCustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+
+			const char* const name = entity->GetName().GetStr();
+			for (int i = 0; i < bodyPartsCount; i++) {
+				if (!strcmp(definition[i].m_boneName, name)) {
+					NewtonBody* const bone = CreateBodyPart(entity, definition[i]);
+
+					// connect this body part to its parent with a vehicle joint
+					ConnectBodyPart(vehicleModel, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
+
+					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
+					parentBone = controller->AddBone(bone, bindMatrix, parentBone);
+					break;
+				}
+			}
+
+			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+				parentBones[stackIndex] = parentBone;
+				childEntities[stackIndex] = child;
+				stackIndex++;
+			}
+		}
+*/
+
+		return controller;
+	}
 };
 
 
@@ -2259,25 +2426,22 @@ void ServoJoints (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
-/*
+
 	// add an input Manage to manage the inputs and user interaction 
 	ServoInputManager* const inputManager = new ServoInputManager (scene);
 
 	//  create a skeletal transform controller for controlling rag doll
 	ServoVehicleManagerManager* const vehicleManager = new ServoVehicleManagerManager (scene);
 
-	
-	
-
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
 
 	// load a the mesh of the articulate vehicle
-//	ServoEntityModel forkliftModel(scene, "forklift.ngd");
-//	dCustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-//	inputManager->AddPlayer(forklift);
-
+	ServoEntityModel forkliftModel(scene, "forklift.ngd");
+	dCustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+	inputManager->AddPlayer(forklift);
+/*
 	// add some object to play with
 //	DemoEntity entity (dGetIdentityMatrix(), NULL);
 //	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
