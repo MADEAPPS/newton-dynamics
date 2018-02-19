@@ -251,7 +251,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		// open Close palette position
 		if (vehicleModel->m_universalActuatorsCount) {
-			dAssert (0);
+			//dAssert (0);
 /*
 			dFloat posit0 = vehicleModel->m_gripperAxis0;
 			if (vehicleModel->m_inputs.m_gripperAxis0 > 0) {
@@ -523,7 +523,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		if (!strcmp (definition.m_shapeTypeName, "convexHull")) {
 			shape = MakeConvexHull(bodyPart);
 		} else if (!strcmp (definition.m_shapeTypeName, "convexHullAggregate")) {
-			//shape = MakeConvexHullAggregate(bodyPart);
 			shape = MakeConvexHull(bodyPart);
 		} else {
 			dAssert (0);
@@ -1079,7 +1078,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 	void AddCraneGripper(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone)
 	{
-/*
+
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
@@ -1104,9 +1103,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new dCustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
 		vehicleModel->m_universalActuatorsCount++;
 		dCustomArticulatedTransformController::dSkeletonBone* const gripperBone = controller->AddBone(gripperBody, dGetIdentityMatrix(), baseBone);
-		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
-		AddCranekPaletteActuator (controller, gripperBone, "rightHand");
-*/
+//		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
+//		AddCranekPaletteActuator (controller, gripperBone, "rightHand");
 	}
 
 	void AddCraneLift(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone)

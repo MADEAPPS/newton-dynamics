@@ -17,9 +17,9 @@
 #ifndef _CUSTOM_UNIVERSAL_ACTUATOR_H_
 #define _CUSTOM_UNIVERSAL_ACTUATOR_H_
 
-#include "dCustomUniversal.h"
+#include "dCustomHingeActuator.h"
 
-class dCustomUniversalActuator: public dCustomUniversal
+class dCustomUniversalActuator: public dCustomHingeActuator
 {
 	public:
 	CUSTOM_JOINTS_API dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -53,8 +53,7 @@ class dCustomUniversalActuator: public dCustomUniversal
 	protected:
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-
+	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
 
 	dFloat m_angle0;
 	dFloat m_angularRate0;
@@ -64,7 +63,7 @@ class dCustomUniversalActuator: public dCustomUniversal
 	dFloat m_angularRate1;
     dFloat m_maxForce1;
 
-	DECLARE_CUSTOM_JOINT(dCustomUniversalActuator, dCustomUniversal)
+	DECLARE_CUSTOM_JOINT(dCustomUniversalActuator, dCustomHingeActuator)
 };
 
 #endif 

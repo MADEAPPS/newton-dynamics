@@ -18,32 +18,8 @@
 
 IMPLEMENT_CUSTOM_JOINT(dCustomUniversalActuator);
 
-dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomUniversal(pinAndPivotFrame, child, parent)
-	,m_angle0(0.0f)
-	,m_angularRate0(angularRate0)
-    ,m_maxForce0(D_CUSTOM_LARGE_VALUE)
-	,m_angle1(0.0f)
-	,m_angularRate1(angularRate1)
-    ,m_maxForce1(D_CUSTOM_LARGE_VALUE)
-{
-	dAssert (0);
-/*
-	EnableLimit_0(false);
-	EnableLimit_1(false);
-
-	m_actuator_0 = true;
-	m_actuator_1 = true;
-	m_minAngle_0 = minAngle0;
-	m_maxAngle_0 = maxAngle0;
-	m_minAngle_1 = minAngle1;
-	m_maxAngle_1 = maxAngle1;
-*/
-}
-
-
 dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomUniversal(pinAndPivotFrame, child, parent)
+	:dCustomHingeActuator(pinAndPivotFrame, child, parent)
 	,m_angle0(0.0f)
 	,m_angularRate0(0.0f)
 	,m_maxForce0(D_CUSTOM_LARGE_VALUE)
@@ -62,6 +38,29 @@ dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFra
 	m_maxAngle_0 = 0.0f;
 	m_minAngle_1 = 0.0f;
 	m_maxAngle_1 = 0.0f;
+	*/
+}
+
+dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomHingeActuator(pinAndPivotFrame, angularRate0, minAngle0, maxAngle0, child, parent)
+	,m_angle0(0.0f)
+	,m_angularRate0(angularRate0)
+    ,m_maxForce0(D_CUSTOM_LARGE_VALUE)
+	,m_angle1(0.0f)
+	,m_angularRate1(angularRate1)
+    ,m_maxForce1(D_CUSTOM_LARGE_VALUE)
+{
+//	dAssert (0);
+/*
+	EnableLimit_0(false);
+	EnableLimit_1(false);
+
+	m_actuator_0 = true;
+	m_actuator_1 = true;
+	m_minAngle_0 = minAngle0;
+	m_maxAngle_0 = maxAngle0;
+	m_minAngle_1 = minAngle1;
+	m_maxAngle_1 = maxAngle1;
 */
 }
 
@@ -72,7 +71,7 @@ dCustomUniversalActuator::~dCustomUniversalActuator()
 
 void dCustomUniversalActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const 
 { 
-	dCustomUniversal::Serialize(callback, userData);
+	dCustomHingeActuator::Serialize(callback, userData);
 
 	callback(userData, &m_angle0, sizeof(dFloat));
 	callback(userData, &m_maxForce0, sizeof(dFloat));
@@ -184,11 +183,12 @@ void dCustomUniversalActuator::SetMaxTorquePower1(dFloat force)
 }
 
 
-void dCustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadIndex)
+//void dCustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadIndex)
+void dCustomUniversalActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
-	dAssert(0);
+//	dCustomHingeActuator::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
+	dCustomHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
 /*
-	dCustomUniversal::SubmitConstraints (timestep, threadIndex);
 
 	if (m_actuator_0 | m_actuator_1){
 		dMatrix matrix0;
