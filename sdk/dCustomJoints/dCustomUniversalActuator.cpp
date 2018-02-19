@@ -133,10 +133,13 @@ void dCustomUniversalActuator::SubmitAngularRow(const dMatrix& matrix0, const dM
 	dFloat step0 = dFloat(2.0f) * m_motorSpeed * timestep;
 
 	dFloat desiredSpeed0 = (dAbs(relAngle0) > dAbs(step0)) ? -dSign(relAngle0) * m_motorSpeed : -dFloat(0.1f) * relAngle0 / timestep;
+desiredSpeed0 = 5.0f;
 	dFloat accel0 = (desiredSpeed0 - currentSpeed0) / timestep;
+dTrace(("%f %f\n", desiredSpeed0, currentSpeed0));
+//	accel0 = 0.5f;
 
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-//	NewtonUserJointSetRowAcceleration(m_joint, accel0);
+	NewtonUserJointSetRowAcceleration(m_joint, accel0);
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque0);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
