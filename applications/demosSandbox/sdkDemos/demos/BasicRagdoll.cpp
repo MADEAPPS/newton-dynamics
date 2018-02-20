@@ -106,10 +106,11 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
 		dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 
+		dAssert(0);
 		dAssert (bone0);
 		dAssert (bone1);
 		if (bone0->m_controller && bone1->m_controller) {
-			return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
+//			return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
 		}
 
 		return 1;
@@ -342,7 +343,8 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
-		controller->SetDefaultSelfCollisionMask();
+		dAssert(0);
+		//controller->SetDefaultSelfCollisionMask();
 
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
