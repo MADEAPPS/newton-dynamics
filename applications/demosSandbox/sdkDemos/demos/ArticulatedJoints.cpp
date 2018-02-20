@@ -233,52 +233,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_gripperRotator->SetTargetAngle0(vehicleModel->m_inputs.m_gripperPitchValue);
 		vehicleModel->m_gripperRotator->SetTargetAngle1(vehicleModel->m_inputs.m_gripperRollValue);
 
-
 		// open Close palette position
-		if (vehicleModel->m_paletteActuatorsCount) {
-			dAssert (0);
-/*
-			dFloat openPosit = vehicleModel->m_openPosit;
-			if (vehicleModel->m_inputs.m_openValue > 0) {
-				openPosit = vehicleModel->m_paletteJoints[0]->GetMinPositLimit();
-				vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
-			} else if (vehicleModel->m_inputs.m_openValue < 0) {
-				openPosit = vehicleModel->m_paletteJoints[0]->GetMaxPositLimit();
-				vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
-			}
-			for (int i = 0; i < vehicleModel->m_paletteActuatorsCount; i ++) {
-				vehicleModel->m_paletteJoints[i]->SetTargetPosit(openPosit);
-			}
-*/
+		for (int i = 0; i < vehicleModel->m_paletteActuatorsCount; i ++) {
+			vehicleModel->m_paletteJoints[i]->SetTargetPosit(vehicleModel->m_inputs.m_gripperValue);
 		}
-
-		// open Close palette position
-			//dAssert (0);
-/*
-			dFloat posit0 = vehicleModel->m_gripperAxis0;
-			if (vehicleModel->m_inputs.m_gripperAxis0 > 0) {
-				posit0 = vehicleModel->m_gripperRotator[0]->GetMinAngularLimit_0();
-				vehicleModel->m_gripperAxis0 = vehicleModel->m_gripperRotator[0]->GetJointAngle_0();
-			} else if (vehicleModel->m_inputs.m_gripperAxis0 < 0) {
-				posit0 = vehicleModel->m_gripperRotator[0]->GetMaxAngularLimit_0();
-				vehicleModel->m_gripperAxis0 = vehicleModel->m_gripperRotator[0]->GetJointAngle_1();
-			}
-
-			dFloat posit1 = vehicleModel->m_gripperAxis1;
-			if (vehicleModel->m_inputs.m_gripperAxis1 > 0) {
-				posit1 = vehicleModel->m_gripperRotator[0]->GetMinAngularLimit_1();
-				vehicleModel->m_gripperAxis1 = vehicleModel->m_gripperRotator[0]->GetJointAngle_1();
-			} else if (vehicleModel->m_inputs.m_gripperAxis1 < 0) {
-				posit1 = vehicleModel->m_gripperRotator[0]->GetMaxAngularLimit_1();
-				vehicleModel->m_gripperAxis1 = vehicleModel->m_gripperRotator[0]->GetJointAngle_1();
-			}
-
-			for (int i = 0; i < vehicleModel->m_universalActuatorsCount; i ++) {
-				vehicleModel->m_gripperRotator[i]->SetTargetAngle0(posit0);
-				vehicleModel->m_gripperRotator[i]->SetTargetAngle1(posit1);
-			}
-*/
-
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -1103,8 +1061,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat angularRate = 30.0f * dDegreeToRad;
 		vehicleModel->m_gripperRotator = new dCustomDoubleHingeActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
 		dCustomArticulatedTransformController::dSkeletonBone* const gripperBone = controller->AddBone(gripperBody, dGetIdentityMatrix(), baseBone);
-//		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
-//		AddCranekPaletteActuator (controller, gripperBone, "rightHand");
+		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
+		AddCranekPaletteActuator (controller, gripperBone, "rightHand");
 	}
 
 	void AddCraneLift(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone)
