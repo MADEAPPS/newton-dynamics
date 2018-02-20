@@ -295,7 +295,7 @@ joint1->SetPitchLimits(-0, 0);
 //joint1->DisableRotationX ();
 }
 
-static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
+static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
@@ -329,9 +329,9 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	dCustomDoubleHinge* const joint2 = new dCustomDoubleHinge(matrix, box2, box0);
 
-//	joint2->EnableLimits2(true);
-	joint2->EnableLimits2(false);
-	joint2->SetLimits2 (-3.0f * dPi, 5.0f * dPi);
+//	joint2->EnableLimits1(true);
+	joint2->EnableLimits1(false);
+	joint2->SetLimits1 (-3.0f * dPi, 5.0f * dPi);
 
 	dVector damp(0.0f);
 	dVector omega (0.0f, 10.0f, 100.0f, 0.0f);

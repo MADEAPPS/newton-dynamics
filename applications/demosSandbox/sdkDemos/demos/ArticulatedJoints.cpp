@@ -57,12 +57,12 @@ class ArticulatedEntityModel: public DemoEntity
 			memset (this, 0, sizeof (InputRecord));
 		}
 
+		dFloat m_gripperValue;
 		dFloat m_slideValue;
 		dFloat m_turnValue;
 		dFloat m_liftValue;
-		int m_openValue;
-		int m_gripperAxis0;
-		int m_gripperAxis1;
+		dFloat m_gripperRollValue;
+		dFloat m_gripperPitchValue;
 		int m_steerValue;
 		int m_throttleValue;
 	};
@@ -77,6 +77,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_engineJoint(NULL)
 		,m_angularActuator0(NULL)
 		,m_angularActuator1(NULL)
+		,m_gripperRotator(NULL)
 	{
 		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
@@ -86,18 +87,17 @@ class ArticulatedEntityModel: public DemoEntity
 		:DemoEntity(copy)
 		,m_tractionTiresCount(0)
 		,m_liftActuatorsCount(0)
-		,m_universalActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
 		,m_maxEngineSpeed(30.0f)
 		,m_maxTurmVelocity(10.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
-//		,m_openPosit(0.0f)
 		,m_engineMotor(NULL)
 		,m_engineJoint(NULL)
 		,m_angularActuator0(NULL)
 		,m_angularActuator1(NULL)
+		,m_gripperRotator(NULL)
 	{
 	}
 
@@ -148,7 +148,6 @@ class ArticulatedEntityModel: public DemoEntity
 
 	int m_tractionTiresCount;
 	int m_liftActuatorsCount;
-	int m_universalActuatorsCount;
 	int m_paletteActuatorsCount;
 	dFloat m_maxEngineTorque;
 	dFloat m_maxEngineSpeed;
@@ -161,12 +160,13 @@ class ArticulatedEntityModel: public DemoEntity
 	dCustomDoubleHinge* m_engineJoint;
 	dCustomHingeActuator* m_angularActuator0;
 	dCustomHingeActuator* m_angularActuator1;
+	dCustomDoubleHingeActuator* m_gripperRotator;
 
 	dCustomSlidingContact* m_tractionTiresJoints[4];
 	
 	dCustomSliderActuator* m_liftJoints[2];
 	dCustomSliderActuator* m_paletteJoints[4];
-	dCustomDoubleHingeActuator* m_universalActuator[4];
+	
 
 	InputRecord m_inputs;
 };
@@ -230,6 +230,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		vehicleModel->m_angularActuator0->SetTargetAngle(vehicleModel->m_inputs.m_liftValue);
 		vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
 		vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
+		vehicleModel->m_gripperRotator->SetTargetAngle0(vehicleModel->m_inputs.m_gripperPitchValue);
+		vehicleModel->m_gripperRotator->SetTargetAngle1(vehicleModel->m_inputs.m_gripperRollValue);
+
 
 		// open Close palette position
 		if (vehicleModel->m_paletteActuatorsCount) {
@@ -250,33 +253,32 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		}
 
 		// open Close palette position
-		if (vehicleModel->m_universalActuatorsCount) {
 			//dAssert (0);
 /*
 			dFloat posit0 = vehicleModel->m_gripperAxis0;
 			if (vehicleModel->m_inputs.m_gripperAxis0 > 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_0();
-				vehicleModel->m_gripperAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_0();
+				posit0 = vehicleModel->m_gripperRotator[0]->GetMinAngularLimit_0();
+				vehicleModel->m_gripperAxis0 = vehicleModel->m_gripperRotator[0]->GetJointAngle_0();
 			} else if (vehicleModel->m_inputs.m_gripperAxis0 < 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_0();
-				vehicleModel->m_gripperAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
+				posit0 = vehicleModel->m_gripperRotator[0]->GetMaxAngularLimit_0();
+				vehicleModel->m_gripperAxis0 = vehicleModel->m_gripperRotator[0]->GetJointAngle_1();
 			}
 
 			dFloat posit1 = vehicleModel->m_gripperAxis1;
 			if (vehicleModel->m_inputs.m_gripperAxis1 > 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_1();
-				vehicleModel->m_gripperAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
+				posit1 = vehicleModel->m_gripperRotator[0]->GetMinAngularLimit_1();
+				vehicleModel->m_gripperAxis1 = vehicleModel->m_gripperRotator[0]->GetJointAngle_1();
 			} else if (vehicleModel->m_inputs.m_gripperAxis1 < 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_1();
-				vehicleModel->m_gripperAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
+				posit1 = vehicleModel->m_gripperRotator[0]->GetMaxAngularLimit_1();
+				vehicleModel->m_gripperAxis1 = vehicleModel->m_gripperRotator[0]->GetJointAngle_1();
 			}
 
 			for (int i = 0; i < vehicleModel->m_universalActuatorsCount; i ++) {
-				vehicleModel->m_universalActuator[i]->SetTargetAngle0(posit0);
-				vehicleModel->m_universalActuator[i]->SetTargetAngle1(posit1);
+				vehicleModel->m_gripperRotator[i]->SetTargetAngle0(posit0);
+				vehicleModel->m_gripperRotator[i]->SetTargetAngle1(posit1);
 			}
 */
-		}
+
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -597,7 +599,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dCustomDoubleHinge* const engineJoint = new dCustomDoubleHinge(engineAxis, engineBody, chassis);
 		engineJoint->EnableLimits(false);
-		engineJoint->EnableLimits2(false);
+		engineJoint->EnableLimits1(false);
 		return controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
 	}
 
@@ -1099,9 +1101,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat minAngleLimit = -120.0f * dDegreeToRad;
 		dFloat maxAngleLimit =  120.0f * dDegreeToRad;
 		dFloat angularRate = 30.0f * dDegreeToRad;
-
-		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new dCustomDoubleHingeActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
-		vehicleModel->m_universalActuatorsCount++;
+		vehicleModel->m_gripperRotator = new dCustomDoubleHingeActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
 		dCustomArticulatedTransformController::dSkeletonBone* const gripperBone = controller->AddBone(gripperBody, dGetIdentityMatrix(), baseBone);
 //		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
 //		AddCranekPaletteActuator (controller, gripperBone, "rightHand");
@@ -1270,9 +1270,12 @@ class AriculatedJointInputManager: public dCustomInputManager
 		,m_changeVehicle(true)
 		,m_playersCount(0)
 		,m_currentPlayer(0)
+		,m_gripper(0.0f)
 		,m_liftboom(0.0f) 
 		,m_slideboom(0.0f) 
 		,m_rotatebase(0.0f)
+		,m_gripperRoll(0.0f)
+		,m_gripperPitch(0.0f)
 	{
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
@@ -1285,15 +1288,15 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
-		inputs.m_gripperAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
-		inputs.m_gripperAxis1 = int(m_scene->GetKeyState('I')) - int(m_scene->GetKeyState('O'));
-		inputs.m_openValue = int (m_scene->GetKeyState ('F')) - int (m_scene->GetKeyState ('G'));
 		inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
 		inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
 
+		inputs.m_gripperValue = m_gripper;
 		inputs.m_slideValue = m_slideboom;
 		inputs.m_liftValue = m_liftboom * dDegreeToRad;
 		inputs.m_turnValue = m_rotatebase * dDegreeToRad;
+		inputs.m_gripperRollValue = m_gripperRoll * dDegreeToRad;
+		inputs.m_gripperPitchValue = m_gripperPitch * dDegreeToRad;
 
 		// check if we must activate the player
 		if (m_needsWakeUp ||
@@ -1375,20 +1378,12 @@ class AriculatedJointInputManager: public dCustomInputManager
 		scene->Print (color, "turn left:          A");
 
 		m_needsWakeUp = false;
+		m_needsWakeUp = ImGui::SliderFloat("Gripper", &m_gripper, -0.2f, 2.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("Roll", &m_gripperRoll, -180.0f, 180.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("Pitch", &m_gripperPitch, -180.0f, 180.0f) || m_needsWakeUp;
 		m_needsWakeUp = ImGui::SliderFloat("BoomSlide", &m_slideboom, 0.0f, 3.0f) || m_needsWakeUp;
 		m_needsWakeUp = ImGui::SliderFloat("BoomLift", &m_liftboom, -180.0f, 180.0f) || m_needsWakeUp;
 		m_needsWakeUp = ImGui::SliderFloat("RotateBase", &m_rotatebase, -180.0f, 180.0f) || m_needsWakeUp;
-
-		//scene->Print (color, "open palette:       F");
-		//scene->Print (color, "close palette       G");
-		//scene->Print (color, "lift palette:       E");
-		//scene->Print (color, "lower palette       Q");
-		//scene->Print (color, "tilt forward:       Z");
-		//scene->Print (color, "tilt backward:      X");
-		//scene->Print (color, "turn base left:     R");
-		//scene->Print (color, "turn base right:    T");
-		//scene->Print (color, "toggle camera mode: C");
-		//scene->Print (color, "switch vehicle:     P");
 	}				
 
 	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
@@ -1404,9 +1399,12 @@ class AriculatedJointInputManager: public dCustomInputManager
 	int m_playersCount;
 	int m_currentPlayer;
 	bool m_needsWakeUp;
+	dFloat32 m_gripper; 
 	dFloat32 m_liftboom; 
 	dFloat32 m_slideboom; 
 	dFloat32 m_rotatebase; 
+	dFloat32 m_gripperRoll; 
+	dFloat32 m_gripperPitch; 
 };
 
 static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity& entity, const dVector& location)

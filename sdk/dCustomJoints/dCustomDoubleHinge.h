@@ -26,14 +26,14 @@ class dCustomDoubleHinge: public dCustomHinge
 	CUSTOM_JOINTS_API dCustomDoubleHinge(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomDoubleHinge();
 
-	CUSTOM_JOINTS_API void EnableLimits2(bool state);
-	CUSTOM_JOINTS_API void SetLimits2(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API dFloat GetJointAngle2() const;
-	CUSTOM_JOINTS_API dVector GetPinAxis2() const;
-	CUSTOM_JOINTS_API dFloat GetJointOmega2() const;
-	CUSTOM_JOINTS_API dFloat GetFriction2() const;
-	CUSTOM_JOINTS_API void SetFriction2(dFloat frictionTorque);
-	CUSTOM_JOINTS_API void SetAsSpringDamper2(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
+	CUSTOM_JOINTS_API void EnableLimits1(bool state);
+	CUSTOM_JOINTS_API void SetLimits1(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API dFloat GetJointAngle1() const;
+	CUSTOM_JOINTS_API dVector GetPinAxis1() const;
+	CUSTOM_JOINTS_API dFloat GetJointOmega1() const;
+	CUSTOM_JOINTS_API dFloat GetFriction1() const;
+	CUSTOM_JOINTS_API void SetFriction1(dFloat frictionTorque);
+	CUSTOM_JOINTS_API void SetAsSpringDamper1(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 	CUSTOM_JOINTS_API void SetHardMiddleAxis(bool state);
 
@@ -47,14 +47,14 @@ class dCustomDoubleHinge: public dCustomHinge
 	void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
-	dAngularIntegration m_curJointAngle2;
-	dFloat m_minAngle2;
-	dFloat m_maxAngle2;
-	dFloat m_friction2;
-	dFloat m_jointOmega2;
-	dFloat m_spring2;
-	dFloat m_damper2;
-	dFloat m_springDamperRelaxation2;
+	dAngularIntegration m_curJointAngle1;
+	dFloat m_minAngle1;
+	dFloat m_maxAngle1;
+	dFloat m_friction1;
+	dFloat m_jointOmega1;
+	dFloat m_spring1;
+	dFloat m_damper1;
+	dFloat m_springDamperRelaxation1;
 
 	DECLARE_CUSTOM_JOINT(dCustomDoubleHinge, dCustomHinge)
 };
