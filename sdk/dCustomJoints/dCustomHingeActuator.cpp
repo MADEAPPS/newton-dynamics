@@ -127,20 +127,28 @@ void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 {
 	dCustomHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
 
-	dFloat jointAngle = GetActuatorAngle();
+	dFloat invTimeStep = 1.0f / timestep;
+	const dFloat tol = m_motorSpeed * timestep;
+	dFloat angle = m_curJointAngle.GetAngle();
 	dFloat targetAngle = m_targetAngle.GetAngle();
-	dFloat relAngle = jointAngle - targetAngle;
-	dFloat currentSpeed = GetJointOmega();
-	dFloat step = dFloat(2.0f) * m_motorSpeed * timestep;
-
-	dFloat desiredSpeed = (dAbs(relAngle) > dAbs(step)) ? -dSign(relAngle) * m_motorSpeed : -dFloat(0.1f) * relAngle / timestep;
-	dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-
-	NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
-	NewtonUserJointSetRowAcceleration(m_joint, accel);
-	NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxTorque);
-	NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxTorque);
-	NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
+	dFloat currentSpeed = 0.0f;
+	if (angle > (targetAngle + tol)) {
+		currentSpeed = -m_motorSpeed;
+		dFloat predictAngle = angle + currentSpeed * timestep;
+		if (predictAngle < targetAngle) {
+			currentSpeed = 0.5f * (targetAngle - angle) * invTimeStep;
+		}
+	} else if (angle < (targetAngle - tol)) {
+		currentSpeed = m_motorSpeed;
+		dFloat predictAngle = angle + currentSpeed * timestep;
+		if (predictAngle > targetAngle) {
+			currentSpeed = 0.5f * (targetAngle - angle) * invTimeStep;
+		}
+	}
+	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+	dFloat accel0 = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	NewtonUserJointSetRowAcceleration(m_joint, accel0);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
+	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
-
-

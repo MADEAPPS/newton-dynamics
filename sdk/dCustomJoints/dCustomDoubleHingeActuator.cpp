@@ -105,7 +105,6 @@ void dCustomDoubleHingeActuator::SetMaxAngularLimit1(dFloat limit)
 
 void dCustomDoubleHingeActuator::SetAngularRate1(dFloat rate)
 {
-//	EnableMotor(false, rate);
 	m_angularRate1 = rate;
 }
 
@@ -205,23 +204,7 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 {
 	dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
 
-
 	dFloat invTimeStep = 1.0f / timestep;
-/*
-	dFloat jointAngle0 = GetJointAngle();
-	dFloat targetAngle0 = m_targetAngle0.GetAngle();
-	dFloat relAngle0 = jointAngle0 - targetAngle0;
-	dFloat currentSpeed0 = GetJointOmega();
-	dFloat step0 = dFloat(2.0f) * m_motorSpeed * timestep;
-
-	dFloat desiredSpeed0 = (dAbs(relAngle0) > dAbs(step0)) ? -dSign(relAngle0) * m_motorSpeed : -dFloat(0.1f) * relAngle0 / timestep;
-	dFloat accel0 = (desiredSpeed0 - currentSpeed0) / timestep;
-	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-	NewtonUserJointSetRowAcceleration(m_joint, accel0);
-	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque0);
-	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-*/
 
 	const dFloat tol0 = m_motorSpeed * timestep;
 	dFloat angle0 = m_curJointAngle.GetAngle();
@@ -246,7 +229,6 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque0);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
 
 
 	const dFloat tol1 = m_angularRate1 * timestep;
