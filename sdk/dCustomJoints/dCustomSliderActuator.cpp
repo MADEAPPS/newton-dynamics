@@ -140,22 +140,32 @@ void dCustomSliderActuator::SetMaxForcePower(dFloat force)
 void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dCustomSlider::SubmitAngularRow(matrix0, matrix1, timestep);
-//	if (m_actuatorFlag) 
-	{
-		dFloat jointPosit = GetJointPosit();
-		dFloat relPosit = m_targetPosit - jointPosit;
-		dFloat step = dFloat(2.0f) * m_linearRate * timestep;
 
-		dFloat currentSpeed = GetJointSpeed();
-		dFloat desiredSpeed = (dAbs(relPosit) > dAbs(step)) ? dSign(relPosit) * m_linearRate : dFloat(0.1f) * relPosit / timestep;
-		dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
-		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+	dFloat invTimeStep = 1.0f / timestep;
+	const dFloat tol = m_linearRate * timestep;
+	dFloat posit = GetJointPosit();
+	dFloat targetPosit = m_targetPosit;
+	dFloat currentSpeed = 0.0f;
+	if (posit > (targetPosit + tol)) {
+		currentSpeed = -m_linearRate;
+		dFloat predictPosit = posit + currentSpeed * timestep;
+		if (predictPosit < targetPosit) {
+			currentSpeed = 0.5f * (predictPosit - posit) * invTimeStep;
+		}
+	} else if (posit < (targetPosit - tol)) {
+		currentSpeed = m_linearRate;
+		dFloat predictPosit = posit + currentSpeed * timestep;
+		if (predictPosit > targetPosit) {
+			currentSpeed = 0.5f * (predictPosit - posit) * invTimeStep;
+		}
 	}
+
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	NewtonUserJointSetRowAcceleration(m_joint, accel);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
+	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
 
 
