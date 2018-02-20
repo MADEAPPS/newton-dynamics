@@ -10,21 +10,21 @@
 */
 
 
-// dCustomUniversalActuator.h: interface for the dCustomUniversalActuator class.
+// dCustomDoubleHingeActuator.h: interface for the dCustomDoubleHingeActuator class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #ifndef _CUSTOM_UNIVERSAL_ACTUATOR_H_
 #define _CUSTOM_UNIVERSAL_ACTUATOR_H_
 
-#include "dCustomUniversal.h"
+#include "dCustomDoubleHinge.h"
 
-class dCustomUniversalActuator: public dCustomUniversal
+class dCustomDoubleHingeActuator: public dCustomDoubleHinge
 {
 	public:
-	CUSTOM_JOINTS_API dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~dCustomUniversalActuator();
+	CUSTOM_JOINTS_API dCustomDoubleHingeActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustomDoubleHingeActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~dCustomDoubleHingeActuator();
 
 	CUSTOM_JOINTS_API dFloat GetActuatorAngle1() const;
 
@@ -55,7 +55,7 @@ class dCustomUniversalActuator: public dCustomUniversal
 	dFloat m_maxTorque1;
 	
 
-	DECLARE_CUSTOM_JOINT(dCustomUniversalActuator, dCustomUniversal)
+	DECLARE_CUSTOM_JOINT(dCustomDoubleHingeActuator, dCustomDoubleHinge)
 };
 
 #endif 

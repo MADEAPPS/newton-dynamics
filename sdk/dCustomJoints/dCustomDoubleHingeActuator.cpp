@@ -10,16 +10,16 @@
 */
 
 
-// dCustomUniversal.cpp: implementation of the dCustomUniversal class.
+// dCustomDoubleHinge.cpp: implementation of the dCustomDoubleHinge class.
 //
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
-#include "dCustomUniversalActuator.h"
+#include "dCustomDoubleHingeActuator.h"
 
-IMPLEMENT_CUSTOM_JOINT(dCustomUniversalActuator);
+IMPLEMENT_CUSTOM_JOINT(dCustomDoubleHingeActuator);
 
-dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomUniversal(pinAndPivotFrame, child, parent)
+dCustomDoubleHingeActuator::dCustomDoubleHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomDoubleHinge(pinAndPivotFrame, child, parent)
 	,m_targetAngle0(0.0f)
 	,m_targetAngle1(0.0f)
 	,m_angularRate1(0.0f)
@@ -31,8 +31,8 @@ dCustomUniversalActuator::dCustomUniversalActuator(const dMatrix& pinAndPivotFra
 	SetHardMiddleAxis(true);
 }
 
-dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomUniversal(pinAndPivotFrame, child, parent)
+dCustomDoubleHingeActuator::dCustomDoubleHingeActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomDoubleHinge(pinAndPivotFrame, child, parent)
 	,m_targetAngle0(0.0f)
 	,m_targetAngle1(0.0f)
 	,m_angularRate1(0.0f)
@@ -45,11 +45,11 @@ dCustomUniversalActuator::dCustomUniversalActuator (const dMatrix& pinAndPivotFr
 }
 
 
-dCustomUniversalActuator::~dCustomUniversalActuator()
+dCustomDoubleHingeActuator::~dCustomDoubleHingeActuator()
 {
 }
 
-void dCustomUniversalActuator::Deserialize(NewtonDeserializeCallback callback, void* const userData)
+void dCustomDoubleHingeActuator::Deserialize(NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_targetAngle0, sizeof(dAngularIntegration));
 	callback(userData, &m_targetAngle1, sizeof(dAngularIntegration));
@@ -58,9 +58,9 @@ void dCustomUniversalActuator::Deserialize(NewtonDeserializeCallback callback, v
 	callback(userData, &m_maxTorque1, sizeof(dFloat));
 }
 
-void dCustomUniversalActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const 
+void dCustomDoubleHingeActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const 
 { 
-	dCustomUniversal::Serialize(callback, userData);
+	dCustomDoubleHinge::Serialize(callback, userData);
 
 	callback(userData, &m_targetAngle0, sizeof(dAngularIntegration));
 	callback(userData, &m_targetAngle1, sizeof(dAngularIntegration));
@@ -69,66 +69,66 @@ void dCustomUniversalActuator::Serialize(NewtonSerializeCallback callback, void*
 	callback(userData, &m_maxTorque1, sizeof(dFloat));
 }
 
-dFloat dCustomUniversalActuator::GetTargetAngle1() const
+dFloat dCustomDoubleHingeActuator::GetTargetAngle1() const
 {
 	return GetJointAngle();
 }
 
-dFloat dCustomUniversalActuator::GetMinAngularLimit1() const
+dFloat dCustomDoubleHingeActuator::GetMinAngularLimit1() const
 {
 	return m_minAngle;
 }
 
-dFloat dCustomUniversalActuator::GetMaxAngularLimit1() const
+dFloat dCustomDoubleHingeActuator::GetMaxAngularLimit1() const
 {
 	return m_maxAngle;
 }
 
-dFloat dCustomUniversalActuator::GetAngularRate1() const
+dFloat dCustomDoubleHingeActuator::GetAngularRate1() const
 {
 	return m_motorSpeed;
 }
 
 
-void dCustomUniversalActuator::SetMinAngularLimit1(dFloat limit)
+void dCustomDoubleHingeActuator::SetMinAngularLimit1(dFloat limit)
 {
 	m_minAngle = limit;
 }
 
-void dCustomUniversalActuator::SetMaxAngularLimit1(dFloat limit)
+void dCustomDoubleHingeActuator::SetMaxAngularLimit1(dFloat limit)
 {
 	m_maxAngle = limit;
 }
 
-void dCustomUniversalActuator::SetAngularRate1(dFloat rate)
+void dCustomDoubleHingeActuator::SetAngularRate1(dFloat rate)
 {
 	EnableMotor(false, rate);
 }
 
-void dCustomUniversalActuator::SetTargetAngle1(dFloat angle)
+void dCustomDoubleHingeActuator::SetTargetAngle1(dFloat angle)
 {
 //	m_targetAngle1.SetAngle(dClamp(angle, m_minAngle1, m_maxAngle1));
 }
 
-dFloat dCustomUniversalActuator::GetActuatorAngle1() const
+dFloat dCustomDoubleHingeActuator::GetActuatorAngle1() const
 {
 	return GetJointAngle();
 }
 
-dFloat dCustomUniversalActuator::GetMaxTorque1() const
+dFloat dCustomDoubleHingeActuator::GetMaxTorque1() const
 {
 	return m_maxTorque1;
 }
 
-void dCustomUniversalActuator::SetMaxTorque1(dFloat torque)
+void dCustomDoubleHingeActuator::SetMaxTorque1(dFloat torque)
 {
 	m_maxTorque1 = dAbs(torque);
 }
 
 
-void dCustomUniversalActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
-	dCustomUniversal::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
+	dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
 /*
 	dFloat jointAngle0 = GetJointAngle();
 	dFloat targetAngle0 = m_targetAngle0.GetAngle();

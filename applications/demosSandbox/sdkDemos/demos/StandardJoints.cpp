@@ -318,7 +318,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
+	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
 	joint1->SetHardMiddleAxis(0);
 
 //	joint1->EnableLimits(true);
@@ -327,7 +327,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	dCustomUniversal* const joint2 = new dCustomUniversal(matrix, box2, box0);
+	dCustomDoubleHinge* const joint2 = new dCustomDoubleHinge(matrix, box2, box0);
 
 //	joint2->EnableLimits2(true);
 	joint2->EnableLimits2(false);
@@ -897,7 +897,7 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	// make the gear system
 	dMatrix matrix3;
 	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
-	new dCustomUniversal(matrix3, box3, box0);
+	new dCustomDoubleHinge(matrix3, box3, box0);
 
 	dMatrix referenceMatrix;
 	NewtonBodyGetMatrix(box0, &referenceMatrix[0][0]);

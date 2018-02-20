@@ -14,7 +14,7 @@
 #include "dCustomJoint.h"
 #include "dCustomGear.h"
 #include "dCustomHinge.h"
-#include "dCustomUniversal.h"
+#include "dCustomDoubleHinge.h"
 #include "dCustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE
@@ -165,7 +165,7 @@ void dEngineMountJoint::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix&
 
 
 dDifferentialMountJoint::dDifferentialMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
-	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
+	:dCustomDoubleHinge(pinAndPivotFrame, differentialBody, chassisBody)
 {
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
@@ -270,7 +270,7 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 #else
 dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
-	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
+	:dCustomDoubleHinge(pinAndPivotFrame, differentialBody, chassisBody)
 	,m_turnSpeed(0.0f)
 	,m_isTractionDifferential(false)
 {
@@ -321,7 +321,7 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector chassisOmega(0.0f);
 	dVector differentialOmega(0.0f);
 
-	dCustomUniversal::SubmitConstraints(timestep, threadIndex);
+	dCustomDoubleHinge::SubmitConstraints(timestep, threadIndex);
 
 	// y axis controls the slip differential feature.
 	NewtonBody* const chassisBody = GetBody1();

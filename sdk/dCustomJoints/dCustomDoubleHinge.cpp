@@ -11,19 +11,19 @@
 
 
 
-// dCustomUniversal.cpp: implementation of the dCustomUniversal class.
+// dCustomDoubleHinge.cpp: implementation of the dCustomDoubleHinge class.
 //
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
-#include "dCustomUniversal.h"
+#include "dCustomDoubleHinge.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CUSTOM_JOINT(dCustomUniversal);
+IMPLEMENT_CUSTOM_JOINT(dCustomDoubleHinge);
 
-dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+dCustomDoubleHinge::dCustomDoubleHinge(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge(pinAndPivotFrame, child, parent)
 	,m_curJointAngle2()
 	,m_minAngle2(-45.0f * dDegreeToRad)
@@ -38,7 +38,7 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 }
 
 
-dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+dCustomDoubleHinge::dCustomDoubleHinge(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_curJointAngle2()
 	,m_minAngle2(-45.0f * dDegreeToRad)
@@ -52,11 +52,11 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const d
 	m_options.m_option5 = -1;
 }
 
-dCustomUniversal::~dCustomUniversal()
+dCustomDoubleHinge::~dCustomDoubleHinge()
 {
 }
 
-void dCustomUniversal::Deserialize(NewtonDeserializeCallback callback, void* const userData)
+void dCustomDoubleHinge::Deserialize(NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_curJointAngle2, sizeof(dAngularIntegration));
 	callback(userData, &m_minAngle2, sizeof(dFloat));
@@ -68,7 +68,7 @@ void dCustomUniversal::Deserialize(NewtonDeserializeCallback callback, void* con
 	callback(userData, &m_springDamperRelaxation2, sizeof(dFloat));
 }
 
-void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
+void dCustomDoubleHinge::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize(callback, userData);
 	callback(userData, &m_curJointAngle2, sizeof(dAngularIntegration));
@@ -82,23 +82,23 @@ void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const u
 }
 
 
-void dCustomUniversal::SetHardMiddleAxis(bool state)
+void dCustomDoubleHinge::SetHardMiddleAxis(bool state)
 {
 	m_options.m_option5 = state;
 }
 
-void dCustomUniversal::EnableLimits2(bool state)
+void dCustomDoubleHinge::EnableLimits2(bool state)
 {
 	m_options.m_option3 = state;
 }
 
-void dCustomUniversal::SetLimits2(dFloat minAngle, dFloat maxAngle)
+void dCustomDoubleHinge::SetLimits2(dFloat minAngle, dFloat maxAngle)
 {
 	m_minAngle2 = -dAbs(minAngle);
 	m_maxAngle2 = dAbs(maxAngle);
 }
 
-void dCustomUniversal::SetAsSpringDamper2(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+void dCustomDoubleHinge::SetAsSpringDamper2(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
 	m_spring2 = spring;
 	m_damper2 = damper;
@@ -106,12 +106,12 @@ void dCustomUniversal::SetAsSpringDamper2(bool state, dFloat springDamperRelaxat
 	m_springDamperRelaxation2 = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
 }
 
-dFloat dCustomUniversal::GetJointAngle2() const
+dFloat dCustomDoubleHinge::GetJointAngle2() const
 {
 	return m_curJointAngle2.GetAngle();
 }
 
-dVector dCustomUniversal::GetPinAxis2() const
+dVector dCustomDoubleHinge::GetPinAxis2() const
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
@@ -119,28 +119,28 @@ dAssert (0);
 	return matrix.RotateVector(m_localMatrix0.m_front);
 }
 
-dFloat dCustomUniversal::GetJointOmega2() const
+dFloat dCustomDoubleHinge::GetJointOmega2() const
 {
 	return m_jointOmega2;
 }
 
-void dCustomUniversal::SetFriction2(dFloat frictionTorque)
+void dCustomDoubleHinge::SetFriction2(dFloat frictionTorque)
 {
 	m_friction2 = frictionTorque;
 }
 
-dFloat dCustomUniversal::GetFriction2() const
+dFloat dCustomDoubleHinge::GetFriction2() const
 {
 	return m_friction2;
 }
 
-void dCustomUniversal::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+void dCustomDoubleHinge::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	NewtonUserJointAddAngularRow(m_joint, -m_curJointAngle2.GetAngle(), &matrix1.m_up[0]);
 	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation2, m_spring2, m_damper2);
 }
 
-void dCustomUniversal::Debug(dDebugDisplay* const debugDisplay) const
+void dCustomDoubleHinge::Debug(dDebugDisplay* const debugDisplay) const
 {
 	dCustomHinge::Debug(debugDisplay);
 
@@ -183,7 +183,7 @@ void dCustomUniversal::Debug(dDebugDisplay* const debugDisplay) const
 }
 
 
-void dCustomUniversal::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+void dCustomDoubleHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dFloat angle = m_curJointAngle2.GetAngle() + m_jointOmega2 * timestep;
 	if (angle < m_minAngle2) {
@@ -214,7 +214,7 @@ void dCustomUniversal::SubmitConstraintLimits(const dMatrix& matrix0, const dMat
 	}
 }
 
-void dCustomUniversal::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+void dCustomDoubleHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dFloat angle = m_curJointAngle2.GetAngle() + m_jointOmega2 * timestep;
 	if (angle < m_minAngle2) {
@@ -245,7 +245,7 @@ void dCustomUniversal::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0,
 }
 
 
-void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+void dCustomDoubleHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
 	// save the current joint Omega
 	dVector omega0(0.0f);
@@ -269,12 +269,12 @@ void dCustomUniversal::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 
 	if (m_options.m_option3) {
 		if (m_options.m_option4) {
-			dCustomUniversal::SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
+			dCustomDoubleHinge::SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
 		} else {
-			dCustomUniversal::SubmitConstraintLimits(matrix0, matrix1, timestep);
+			dCustomDoubleHinge::SubmitConstraintLimits(matrix0, matrix1, timestep);
 		}
 	} else if (m_options.m_option4) {
-		dCustomUniversal::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+		dCustomDoubleHinge::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
 	} else if (m_friction != 0.0f) {
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);

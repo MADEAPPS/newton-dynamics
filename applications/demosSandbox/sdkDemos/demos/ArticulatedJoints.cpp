@@ -158,7 +158,7 @@ class ArticulatedEntityModel: public DemoEntity
 //	dFloat m_openPosit;
 
 	dCustomMotor2* m_engineMotor;
-	dCustomUniversal* m_engineJoint;
+	dCustomDoubleHinge* m_engineJoint;
 	dCustomHingeActuator* m_angularActuator0;
 	dCustomHingeActuator* m_angularActuator1;
 
@@ -166,7 +166,7 @@ class ArticulatedEntityModel: public DemoEntity
 	
 	dCustomSliderActuator* m_liftJoints[2];
 	dCustomSliderActuator* m_paletteJoints[4];
-	dCustomUniversalActuator* m_universalActuator[4];
+	dCustomDoubleHingeActuator* m_universalActuator[4];
 
 	InputRecord m_inputs;
 };
@@ -595,13 +595,13 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
 		engineAxis.m_posit = engineMatrix.m_posit;
 
-		dCustomUniversal* const engineJoint = new dCustomUniversal(engineAxis, engineBody, chassis);
+		dCustomDoubleHinge* const engineJoint = new dCustomDoubleHinge(engineAxis, engineBody, chassis);
 		engineJoint->EnableLimits(false);
 		engineJoint->EnableLimits2(false);
 		return controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
 	}
 
-	dCustomMotor2* CreateEngineMotor(dCustomArticulatedTransformController* const controller, dCustomUniversal* const engineJoint)
+	dCustomMotor2* CreateEngineMotor(dCustomArticulatedTransformController* const controller, dCustomDoubleHinge* const engineJoint)
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
@@ -1100,7 +1100,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat maxAngleLimit =  120.0f * dDegreeToRad;
 		dFloat angularRate = 30.0f * dDegreeToRad;
 
-		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new dCustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
+		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new dCustomDoubleHingeActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
 		vehicleModel->m_universalActuatorsCount++;
 		dCustomArticulatedTransformController::dSkeletonBone* const gripperBone = controller->AddBone(gripperBody, dGetIdentityMatrix(), baseBone);
 //		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
@@ -1224,7 +1224,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		// add engine
 		dCustomArticulatedTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		vehicleModel->m_engineJoint = (dCustomUniversal*) engineBone->FindJoint();
+		vehicleModel->m_engineJoint = (dCustomDoubleHinge*) engineBone->FindJoint();
 		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
 
 		// set power parameter for a simple DC engine

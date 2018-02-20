@@ -1486,7 +1486,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 		// add engine
 		dCustomArticulatedTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		vehicleModel->m_engineJoint = (dCustomUniversal*) engineBone->FindJoint();
+		vehicleModel->m_engineJoint = (dCustomDoubleHinge*) engineBone->FindJoint();
 		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
 
 		// set power parameter for a simple DC engine
@@ -2361,7 +2361,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 /*
 		// add engine
 		dCustomArticulatedTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		vehicleModel->m_engineJoint = (dCustomUniversal*)engineBone->FindJoint();
+		vehicleModel->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
 		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
 
 		dAssert(0);

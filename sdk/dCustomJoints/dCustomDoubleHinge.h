@@ -10,7 +10,7 @@
 */
 
 
-// dCustomUniversal.h: interface for the dCustomUniversal class.
+// dCustomDoubleHinge.h: interface for the dCustomDoubleHinge class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -19,12 +19,12 @@
 
 #include "dCustomHinge.h"
 
-class dCustomUniversal: public dCustomHinge
+class dCustomDoubleHinge: public dCustomHinge
 {
 	public:
-	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomUniversal(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~dCustomUniversal();
+	CUSTOM_JOINTS_API dCustomDoubleHinge(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustomDoubleHinge(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~dCustomDoubleHinge();
 
 	CUSTOM_JOINTS_API void EnableLimits2(bool state);
 	CUSTOM_JOINTS_API void SetLimits2(dFloat minAngle, dFloat maxAngle);
@@ -56,7 +56,7 @@ class dCustomUniversal: public dCustomHinge
 	dFloat m_damper2;
 	dFloat m_springDamperRelaxation2;
 
-	DECLARE_CUSTOM_JOINT(dCustomUniversal, dCustomHinge)
+	DECLARE_CUSTOM_JOINT(dCustomDoubleHinge, dCustomHinge)
 };
 
 
