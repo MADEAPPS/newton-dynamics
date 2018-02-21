@@ -251,7 +251,6 @@ void dCustomBallAndSocket::SubmitConstraintTwistLimits(const dMatrix& matrix0, c
 	}
 }
 
-
 void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -259,13 +258,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	for (int i = 0; i < 3; i++) {
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	}
+	SubmitLinearRows(0x07, matrix0, matrix1, dVector(0.0f), dVector(0.0f));
 
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;

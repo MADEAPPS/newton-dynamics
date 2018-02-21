@@ -376,3 +376,17 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 }
 
 
+void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, const dMatrix& matrix1, const dVector& lowerLimit, const dVector& upperLimit) const
+{
+	const dVector& p0 = matrix0.m_posit;
+	const dVector& p1 = matrix1.m_posit;
+	const dVector dp(p0 - p1);
+	for (int i = 0; i < 3; i++) {
+		if (activeRows & (1 << i)) {
+			const dVector& dir = matrix1[i];
+			dVector prejectPoint(p0 - dir.Scale(dir.DotProduct3(dp)));
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &prejectPoint[0], &dir[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		}
+	}
+}

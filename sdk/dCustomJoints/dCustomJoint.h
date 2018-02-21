@@ -271,9 +271,10 @@ class dCustomJoint: public dCustomAlloc
 	
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 	CUSTOM_JOINTS_API static dSerializeMetaDataDictionary& GetDictionary();
-
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
+
+	CUSTOM_JOINTS_API void SubmitLinearRows(int activeRows, const dMatrix& matrix0, const dMatrix& matrix1, const dVector& lowerLimit, const dVector& upperLimit) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

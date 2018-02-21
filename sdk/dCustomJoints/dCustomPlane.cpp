@@ -57,10 +57,11 @@ void dCustomPlane::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
-	dVector p0(matrix0.m_posit);
-	dVector p1(matrix0.m_posit + matrix1.m_front.Scale((matrix1.m_posit - matrix0.m_posit).DotProduct3(matrix1.m_front)));
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+//	dVector p0(matrix0.m_posit);
+//	dVector p1(matrix0.m_posit + matrix1.m_front.Scale((matrix1.m_posit - matrix0.m_posit).DotProduct3(matrix1.m_front)));
+//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	SubmitLinearRows(0x01, matrix0, matrix1, dVector(0.0f), dVector(0.0f));
 
 	// construct an orthogonal coordinate system with these two vectors
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);

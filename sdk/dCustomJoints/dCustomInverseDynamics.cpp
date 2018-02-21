@@ -852,12 +852,7 @@ void dCustomInverseDynamics::SubmitConstraints(dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	for (int i = 0; i < 3; i++) {
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	}
+	SubmitLinearRows(0x07, matrix0, matrix1, dVector(0.0f), dVector(0.0f));
 
 	if (!m_options.m_option0 && (m_coneAngle == 0.0f)) {
 		SubmitHingeConstraints(matrix0, matrix1, timestep);
