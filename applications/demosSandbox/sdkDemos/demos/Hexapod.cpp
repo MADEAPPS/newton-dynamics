@@ -20,6 +20,7 @@
 #include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
+#if 0
 class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 {
 	public:
@@ -157,11 +158,11 @@ class dHaxapodController: public dCustomControllerBase
 		}
 	};
 
-	class dHexapodEffector: public dCustomRagdollMotor_EndEffector
+	class dHexapodEffector: public dCustomInverseDynamicsEffector
 	{
 		public:
 		dHexapodEffector (NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace)
-			:dCustomRagdollMotor_EndEffector (invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
+			:dCustomInverseDynamicsEffector (invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
 		{
 			SetLinearSpeed(1.0f);
 		}
@@ -243,7 +244,7 @@ class dHaxapodController: public dCustomControllerBase
 		return body;
 	}
 
-	dCustomRagdollMotor_EndEffector* AddLeg(DemoEntityManager* const scene, void* const rootNode, const dMatrix& matrix, dFloat partMass, dFloat limbLenght)
+	dCustomInverseDynamicsEffector* AddLeg(DemoEntityManager* const scene, void* const rootNode, const dMatrix& matrix, dFloat partMass, dFloat limbLenght)
 	{
 		NewtonBody* const parent = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
 
@@ -301,7 +302,7 @@ class dHaxapodController: public dCustomControllerBase
 		void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
 
 		int legEffectorCount = 0;
-		dCustomRagdollMotor_EndEffector* legEffectors[32];
+		dCustomInverseDynamicsEffector* legEffectors[32];
 
 		baseMatrix.m_posit.m_y -= 0.06f;
 		// make the hexapod six limbs
@@ -336,7 +337,7 @@ class dHaxapodController: public dCustomControllerBase
 		rootMatrix = rootMatrix.Inverse();
 		for (int i = 0; i < legEffectorCount; i++) {
 			dEffectorTreeInterface::dEffectorTransform frame;
-			dCustomRagdollMotor_EndEffector* const effector = legEffectors[i];
+			dCustomInverseDynamicsEffector* const effector = legEffectors[i];
 			dMatrix effectorMatrix(effector->GetBodyMatrix());
 
 			dMatrix poseMatrix(effectorMatrix * rootMatrix);
@@ -365,7 +366,7 @@ class dHaxapodController: public dCustomControllerBase
 	{
 		const dEffectorTreeInterface::dEffectorPose& pose = m_animTreeNode->GetPose();
 		for (dEffectorTreeInterface::dEffectorPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
-			dCustomRagdollMotor_EndEffector* const effector = node->GetInfo().m_effector;
+			dCustomInverseDynamicsEffector* const effector = node->GetInfo().m_effector;
 			effector->Debug(debugContext);
 		}
 	}
@@ -455,19 +456,21 @@ controller->m_walkIdleBlender->SetBlendFactor (xxx);
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
 };
-
+#endif
 
 void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+dAssert (0);
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
+/*
 	dHexapodManager* const robotManager = new dHexapodManager(scene);
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_y = 1.0f;
 	robotManager->MakeHexapod (scene, location);
-
+*/
 	dVector origin(0.0f);
 	origin.m_x = -4.0f;
 	origin.m_y  = 1.5f;

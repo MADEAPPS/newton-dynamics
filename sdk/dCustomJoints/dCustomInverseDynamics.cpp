@@ -14,59 +14,19 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
-#include "dCustomRagdollMotor.h"
+#include "dCustomInverseDynamics.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor);
-IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_1dof)
-IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_2dof)
-IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_3dof)
-IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector)
+IMPLEMENT_CUSTOM_JOINT(dCustomInverseDynamics);
+IMPLEMENT_CUSTOM_JOINT(dCustomInverseDynamicsEffector)
 
 
-dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
-	,m_torque(1.0f)
-{
-}
-
-dCustomRagdollMotor::~dCustomRagdollMotor()
-{
-}
-
-void dCustomRagdollMotor::Deserialize (NewtonDeserializeCallback callback, void* const userData)
-{
-	callback(userData, &m_torque, sizeof(dFloat));
-}
-
-void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* const userData) const
-{
-	dCustomBallAndSocket::Serialize(callback, userData);
-
-	callback(userData, &m_torque, sizeof(dFloat));
-}
-
-
-void dCustomRagdollMotor::SetJointTorque(dFloat torque)
-{
-	m_torque = dAbs(torque);
-}
-
-dFloat dCustomRagdollMotor::GetJointTorque() const
-{
-	return m_torque;
-}
-
-void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
-{
-	dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-}
-
+#if 0
 dCustomRagdollMotor_1dof::dCustomRagdollMotor_1dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	:dCustomInverseDynamics(pinAndPivotFrame, child, parent)
 	,m_minTwistAngle(-30.0f * dDegreeToRad)
 	,m_maxTwistAngle( 30.0f * dDegreeToRad)
 {
@@ -83,7 +43,7 @@ void dCustomRagdollMotor_1dof::Deserialize (NewtonDeserializeCallback callback, 
 
 void dCustomRagdollMotor_1dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	dCustomRagdollMotor::Serialize(callback, userData);
+	dCustomInverseDynamics::Serialize(callback, userData);
 	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
 }
@@ -107,7 +67,7 @@ void dCustomRagdollMotor_1dof::Debug(dDebugDisplay* const debugDisplay) const
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	dCustomRagdollMotor::Debug(debugDisplay);
+	dCustomInverseDynamics::Debug(debugDisplay);
 
 	// vis limits
 	const int subdiv = 16;
@@ -140,7 +100,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	dMatrix matrix1;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
+	dCustomInverseDynamics::SubmitConstraints(timestep, threadIndex);
 
 	// two rows to restrict rotation around around the parent coordinate system
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
@@ -168,7 +128,7 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 
 dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	:dCustomInverseDynamics(pinAndPivotFrame, child, parent)
 	,m_coneAngle(30.0f * dDegreeToRad)
 {
 }
@@ -181,7 +141,7 @@ void dCustomRagdollMotor_2dof::Deserialize (NewtonDeserializeCallback callback, 
 
 void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	dCustomRagdollMotor::Serialize(callback, userData);
+	dCustomInverseDynamics::Serialize(callback, userData);
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 }
 
@@ -202,7 +162,7 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 	dMatrix matrix1;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	dCustomRagdollMotor::Debug(debugDisplay);
+	dCustomInverseDynamics::Debug(debugDisplay);
 
 	const int subdiv = 24;
 	const float radius = 0.25f;
@@ -236,7 +196,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	dVector omega1(0.0f);
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
+	dCustomInverseDynamics::SubmitConstraints(timestep, threadIndex);
 
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
@@ -332,7 +292,7 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 
 
 dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	:dCustomInverseDynamics(pinAndPivotFrame, child, parent)
 	,m_coneAngle(30.0f * dDegreeToRad)
 	,m_minTwistAngle(-30.0f * dDegreeToRad)
 	,m_maxTwistAngle(30.0f * dDegreeToRad)
@@ -348,7 +308,7 @@ void dCustomRagdollMotor_3dof::Deserialize (NewtonDeserializeCallback callback, 
 
 void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	dCustomRagdollMotor::Serialize(callback, userData);
+	dCustomInverseDynamics::Serialize(callback, userData);
 	callback(userData, &m_coneAngle, sizeof(m_coneAngle));
 	callback(userData, &m_minTwistAngle, sizeof(m_minTwistAngle));
 	callback(userData, &m_maxTwistAngle, sizeof(m_maxTwistAngle));
@@ -383,7 +343,7 @@ void dCustomRagdollMotor_3dof::Debug(dDebugDisplay* const debugDisplay) const
 	dMatrix matrix1;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	dCustomRagdollMotor::Debug(debugDisplay);
+	dCustomInverseDynamics::Debug(debugDisplay);
 
 	const int subdiv = 24;
 	const float radius = 0.25f;
@@ -454,7 +414,7 @@ dAssert (0);
 	dVector omega1(0.0f);
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
+	dCustomInverseDynamics::SubmitConstraints(timestep, threadIndex);
 
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
@@ -549,8 +509,9 @@ dAssert (0);
 	}
 */
 }
+#endif
 
-dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
+dCustomInverseDynamicsEffector::dCustomInverseDynamicsEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint (invDynSolver, invDynNode)
 	,m_targetMatrix(attachmentPointInGlobalSpace)
 	,m_referenceBody(referenceBody)
@@ -566,7 +527,7 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonInverseDy
 	SetSolverModel(2);
 }
 
-dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
+dCustomInverseDynamicsEffector::dCustomInverseDynamicsEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace)
 	:dCustomJoint(6, body, NULL)
 	,m_targetMatrix(attachmentPointInGlobalSpace)
 	,m_referenceBody(referenceBody)
@@ -582,75 +543,75 @@ dCustomRagdollMotor_EndEffector::dCustomRagdollMotor_EndEffector(NewtonBody* con
 	SetSolverModel(2);
 }
 
-dCustomRagdollMotor_EndEffector::~dCustomRagdollMotor_EndEffector()
+dCustomInverseDynamicsEffector::~dCustomInverseDynamicsEffector()
 {
 }
 
 
-void dCustomRagdollMotor_EndEffector::Deserialize (NewtonDeserializeCallback callback, void* const userData)
-{
-	dAssert(0);
-}
-
-void dCustomRagdollMotor_EndEffector::Serialize(NewtonSerializeCallback callback, void* const userData) const
+void dCustomInverseDynamicsEffector::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	dAssert(0);
 }
 
+void dCustomInverseDynamicsEffector::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dAssert(0);
+}
 
-void dCustomRagdollMotor_EndEffector::SetAsSixdof()
+
+void dCustomInverseDynamicsEffector::SetAsSixdof()
 {
 	m_isSixdof = true;
 }
 
-void dCustomRagdollMotor_EndEffector::SetAsThreedof()
+void dCustomInverseDynamicsEffector::SetAsThreedof()
 {
 	m_isSixdof = false;
 }
 
 
-void dCustomRagdollMotor_EndEffector::SetMaxLinearFriction(dFloat friction)
+void dCustomInverseDynamicsEffector::SetMaxLinearFriction(dFloat friction)
 {
 	m_linearFriction = dAbs(friction);
 }
 
-void dCustomRagdollMotor_EndEffector::SetMaxAngularFriction(dFloat friction)
+void dCustomInverseDynamicsEffector::SetMaxAngularFriction(dFloat friction)
 {
 	m_angularFriction = dAbs(friction);
 }
 
 
-void dCustomRagdollMotor_EndEffector::SetLinearSpeed(dFloat speed)
+void dCustomInverseDynamicsEffector::SetLinearSpeed(dFloat speed)
 {
 	m_linearSpeed = dAbs (speed);
 }
 
-void dCustomRagdollMotor_EndEffector::SetAngularSpeed(dFloat speed)
+void dCustomInverseDynamicsEffector::SetAngularSpeed(dFloat speed)
 {
 	m_angularSpeed = dAbs (speed);
 }
 
 
-void dCustomRagdollMotor_EndEffector::SetTargetRotation(const dQuaternion& rotation)
+void dCustomInverseDynamicsEffector::SetTargetRotation(const dQuaternion& rotation)
 {
 //	NewtonBodySetSleepState(m_body0, 0);
 	m_targetMatrix = dMatrix (rotation, m_targetMatrix.m_posit);
 }
 
-void dCustomRagdollMotor_EndEffector::SetTargetPosit(const dVector& posit)
+void dCustomInverseDynamicsEffector::SetTargetPosit(const dVector& posit)
 {
 //	NewtonBodySetSleepState(m_body0, 0);
 	m_targetMatrix.m_posit = posit;
 	m_targetMatrix.m_posit.m_w = 1.0f;
 }
 
-void dCustomRagdollMotor_EndEffector::SetTargetMatrix(const dMatrix& matrix)
+void dCustomInverseDynamicsEffector::SetTargetMatrix(const dMatrix& matrix)
 {
 	NewtonBodySetSleepState(m_body0, 0);
 	m_targetMatrix = matrix;
 }
 
-dMatrix dCustomRagdollMotor_EndEffector::GetBodyMatrix() const
+dMatrix dCustomInverseDynamicsEffector::GetBodyMatrix() const
 {
 	dMatrix matrix0;
 	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
@@ -658,18 +619,18 @@ dMatrix dCustomRagdollMotor_EndEffector::GetBodyMatrix() const
 }
 
 
-dMatrix dCustomRagdollMotor_EndEffector::GetTargetMatrix() const
+dMatrix dCustomInverseDynamicsEffector::GetTargetMatrix() const
 {
 	return m_targetMatrix;
 }
 
-void dCustomRagdollMotor_EndEffector::Debug(dDebugDisplay* const debugDisplay) const
+void dCustomInverseDynamicsEffector::Debug(dDebugDisplay* const debugDisplay) const
 {
 	debugDisplay->DrawFrame(GetBodyMatrix());
 	debugDisplay->DrawFrame(m_targetMatrix);
 }
 
-void dCustomRagdollMotor_EndEffector::SubmitConstraints(dFloat timestep, int threadIndex)
+void dCustomInverseDynamicsEffector::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	// check if this is an impulsive time step
 	dMatrix matrix0(GetBodyMatrix());
@@ -812,4 +773,100 @@ void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep
 			dst.m_posit.m_w = 1.0f;
 		}
 	}
+}
+
+
+
+dCustomInverseDynamics::dCustomInverseDynamics(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomJoint(6, child, parent)
+	,m_torque(D_CUSTOM_LARGE_VALUE)
+	,m_coneAngle(0.0f)
+	,m_minTwistAngle(0.0f)
+	,m_maxTwistAngle(0.0f)
+	,m_options()
+{
+	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+}
+
+dCustomInverseDynamics::dCustomInverseDynamics (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomJoint(6, child, parent)
+	,m_torque(D_CUSTOM_LARGE_VALUE)
+	,m_coneAngle(0.0f)
+	,m_minTwistAngle(0.0f)
+	,m_maxTwistAngle(0.0f)
+	,m_options()
+{
+}
+
+dCustomInverseDynamics::~dCustomInverseDynamics()
+{
+}
+
+void dCustomInverseDynamics::Deserialize(NewtonDeserializeCallback callback, void* const userData)
+{
+	callback(userData, &m_torque, sizeof(dFloat));
+	callback(userData, &m_coneAngle, sizeof(dFloat));
+	callback(userData, &m_minTwistAngle, sizeof(dFloat));
+	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
+	callback (userData, &m_options, sizeof (m_options));
+}
+
+void dCustomInverseDynamics::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomJoint::Serialize(callback, userData);
+	callback(userData, &m_torque, sizeof(dFloat));
+	callback(userData, &m_coneAngle, sizeof(dFloat));
+	callback(userData, &m_minTwistAngle, sizeof(dFloat));
+	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
+	callback (userData, &m_options, sizeof (m_options));
+}
+
+void dCustomInverseDynamics::SetJointTorque(dFloat torque)
+{
+	m_torque = dAbs(torque);
+}
+
+dFloat dCustomInverseDynamics::GetJointTorque() const
+{
+	return m_torque;
+}
+
+void dCustomInverseDynamics::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
+{
+	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-170.0f * dDegreeToRad));
+	m_maxTwistAngle = dMin(dAbs(maxAngle), dFloat(170.0f * dDegreeToRad));
+}
+
+void dCustomInverseDynamics::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_minTwistAngle;
+	maxAngle = m_maxTwistAngle;
+}
+
+
+void dCustomInverseDynamics::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const dVector& p0 = matrix0.m_posit;
+	const dVector& p1 = matrix1.m_posit;
+	for (int i = 0; i < 3; i++) {
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
+
+	if (!m_options.m_option0 && (m_coneAngle == 0.0f)) {
+		SubmitHingeConstraints(matrix0, matrix1, timestep);
+	} else {
+		dAssert (0);
+	}
+}
+
+void dCustomInverseDynamics::SubmitHingeConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+
 }

@@ -131,11 +131,11 @@ typedef long long unsigned64;
 #include <dCustomMotor.h>
 #include <dCustomSlider.h>
 #include <dCustomDoubleHinge.h>
-#include <dCustomRagdollMotor.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomBallAndSocket.h>
 #include <dCustomSliderActuator.h>
 #include <dCustomSlidingContact.h>
+#include <dCustomInverseDynamics.h>
 #include <dCustomDoubleHingeActuator.h>
 
 #include <dCustomInputManager.h>

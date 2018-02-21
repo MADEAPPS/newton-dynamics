@@ -82,7 +82,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
 // for the user to implement it own joints
-class dCustomJoint: public dCustomAlloc  
+class dCustomJoint: public dCustomAlloc
 {
 	public:
 	class dOptions

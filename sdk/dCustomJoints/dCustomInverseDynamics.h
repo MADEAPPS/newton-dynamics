@@ -18,31 +18,10 @@
 #define _D_CUSTOM_RAG_DOLL_MOTOR_H_
 
 #include "dCustomJoint.h"
-#include "dCustomBallAndSocket.h"
 
 
-// this joint is for controlling rag dolls muscles
-class dCustomRagdollMotor: public dCustomBallAndSocket
-{
-	public:
-	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
-	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor();
-
-	CUSTOM_JOINTS_API dFloat GetJointTorque() const;
-	CUSTOM_JOINTS_API void SetJointTorque(dFloat torque);
-	
-	protected:
-	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-
-	dFloat m_torque;
-
-	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor, dCustomBallAndSocket)
-};
-
-
-class dCustomRagdollMotor_1dof: public dCustomRagdollMotor
+/*
+class dCustomRagdollMotor_1dof: public dCustomInverseDynamics
 {
 	public:
 	CUSTOM_JOINTS_API dCustomRagdollMotor_1dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
@@ -58,11 +37,11 @@ class dCustomRagdollMotor_1dof: public dCustomRagdollMotor
 
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
-	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_1dof, dCustomRagdollMotor)
+	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_1dof, dCustomInverseDynamics)
 };
 
 
-class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
+class dCustomRagdollMotor_2dof: public dCustomInverseDynamics
 {
 	public:
 	CUSTOM_JOINTS_API dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
@@ -77,11 +56,11 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_coneAngle;
-	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_2dof, dCustomRagdollMotor)
+	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_2dof, dCustomInverseDynamics)
 };
 
 
-class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
+class dCustomRagdollMotor_3dof: public dCustomInverseDynamics
 {
 	public:
 	CUSTOM_JOINTS_API dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
@@ -101,16 +80,16 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 	dFloat m_coneAngle;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
-	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_3dof, dCustomRagdollMotor)
+	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_3dof, dCustomInverseDynamics)
 };
+*/
 
-
-class dCustomRagdollMotor_EndEffector: public dCustomJoint
+class dCustomInverseDynamicsEffector: public dCustomJoint
 {
 	public:
-	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace);
-	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace);
-	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor_EndEffector();
+	CUSTOM_JOINTS_API dCustomInverseDynamicsEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace);
+	CUSTOM_JOINTS_API dCustomInverseDynamicsEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentPointInGlobalSpace);
+	CUSTOM_JOINTS_API virtual ~dCustomInverseDynamicsEffector();
 
 	CUSTOM_JOINTS_API void SetAsSixdof (); 
 	CUSTOM_JOINTS_API void SetAsThreedof (); 
@@ -143,11 +122,11 @@ class dCustomRagdollMotor_EndEffector: public dCustomJoint
 	dFloat m_angularFriction;
 	bool m_isSixdof;
 
-	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomInverseDynamicsEffector, dCustomJoint)
 };
 
 
-class dEffectorTreeInterface
+class dEffectorTreeInterface: public dCustomAlloc
 {
 	public:
 	class dEffectorTransform
@@ -155,7 +134,7 @@ class dEffectorTreeInterface
 		public:
 		dVector m_posit;
 		dQuaternion m_rotation;
-		dCustomRagdollMotor_EndEffector* m_effector;
+		dCustomInverseDynamicsEffector* m_effector;
 	};
 
 	class dEffectorPose: public dList<dEffectorTransform>
@@ -166,7 +145,8 @@ class dEffectorTreeInterface
 	};
 
 	dEffectorTreeInterface(NewtonBody* const rootBody)
-		:m_rootBody(rootBody)
+		:dCustomAlloc()
+		,m_rootBody(rootBody)
 	{
 	}
 
@@ -252,5 +232,36 @@ class dEffectorTreeTwoWayBlender: public dEffectorTreeInterface
 };
 
 
+// this joint is for controlling rag dolls muscles
+class dCustomInverseDynamics: public dCustomJoint
+{
+	public:
+	CUSTOM_JOINTS_API dCustomInverseDynamics(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
+	CUSTOM_JOINTS_API dCustomInverseDynamics (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent);
+	CUSTOM_JOINTS_API virtual ~dCustomInverseDynamics();
+
+	CUSTOM_JOINTS_API dFloat GetJointTorque() const;
+	CUSTOM_JOINTS_API void SetJointTorque(dFloat torque);
+
+	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
+
+	protected:
+	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+
+	CUSTOM_JOINTS_API virtual void SubmitHingeConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+
+	dFloat m_torque;
+	dFloat m_coneAngle;
+	dFloat m_minTwistAngle;
+	dFloat m_maxTwistAngle;
+	dOptions m_options;
+	DECLARE_CUSTOM_JOINT(dCustomInverseDynamics, dCustomJoint)
+};
+
+
 #endif 
+
 

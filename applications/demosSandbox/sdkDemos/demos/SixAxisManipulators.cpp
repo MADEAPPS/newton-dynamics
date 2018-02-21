@@ -17,7 +17,6 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
 class dSixAxisController: public dCustomControllerBase
@@ -72,6 +71,7 @@ class dSixAxisController: public dCustomControllerBase
 		dVector m_azimuthAxis;
 	};
 
+/*
 	class dKukaServoMotor1: public dCustomRagdollMotor_1dof
 	{
 		public:
@@ -83,7 +83,6 @@ class dSixAxisController: public dCustomControllerBase
 		}
 	};
 
-/*
 	class dKukaServoMotor2: public dCustomRagdollMotor_2dof
 	{
 		public:
@@ -97,11 +96,11 @@ class dSixAxisController: public dCustomControllerBase
 	};
 */
 
-	class dKukaEffector: public dCustomRagdollMotor_EndEffector
+	class dKukaEffector: public dCustomInverseDynamicsEffector
 	{
 		public:
 		dKukaEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace)
-			:dCustomRagdollMotor_EndEffector(invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
+			:dCustomInverseDynamicsEffector(invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
 		{
 			SetLinearSpeed(2.0f);
 			SetMaxLinearFriction (5000.0f);
@@ -191,7 +190,8 @@ class dSixAxisController: public dCustomControllerBase
 		rotatingColumnMatrix.m_posit.m_y = h + h * 0.5f;
 		NewtonBody* const rotatingColumnBody = CreateBox(scene, rotatingColumnMatrix * location, dVector(r * 0.5f, h, r * 0.75f));
 		rotatingColumnMatrix = dRollMatrix(dPi * 0.5f) * rotatingColumnMatrix;
-		dKukaServoMotor1* const rotatingColumnHinge = new dKukaServoMotor1(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody, -2.0f * dPi, 2.0f * dPi);
+		dCustomInverseDynamics* const rotatingColumnHinge = new dCustomInverseDynamics(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody);
+		rotatingColumnHinge->SetTwistAngle(-2.0f * dPi, 2.0f * dPi);
 		void* const rotatingColumnNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseFrameNode, rotatingColumnHinge->GetJoint());
 
 		// add Robot link arm
@@ -201,7 +201,8 @@ class dSixAxisController: public dCustomControllerBase
 		linkArmMatrix.m_posit.m_y += l * 0.5f;
 		NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
 		linkArmMatrix.m_posit.m_y -= l * 0.5f;
-		dKukaServoMotor1* const linkArmJoint = new dKukaServoMotor1(linkArmMatrix * location, linkArmBody, rotatingColumnBody, -0.5f * dPi, 0.5f * dPi);
+		dCustomInverseDynamics* const linkArmJoint = new dCustomInverseDynamics(linkArmMatrix * location, linkArmBody, rotatingColumnBody);
+		rotatingColumnHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
 		void* const linkArmNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rotatingColumnNode, linkArmJoint->GetJoint());
 
 		// add Robot arm
@@ -211,7 +212,8 @@ class dSixAxisController: public dCustomControllerBase
 		armMatrix.m_posit.m_z += l1 * 0.5f;
 		NewtonBody* const armBody = CreateBox(scene, armMatrix * location, dVector(l * 0.125f, l * 0.125f, l1));
 		armMatrix.m_posit.m_z -= l1 * 0.5f;
-		dKukaServoMotor1* const armJoint = new dKukaServoMotor1(armMatrix * location, armBody, linkArmBody, lowLimit, highLimit);
+		dCustomInverseDynamics* const armJoint = new dCustomInverseDynamics(armMatrix * location, armBody, linkArmBody);
+		rotatingColumnHinge->SetTwistAngle(lowLimit, highLimit);
 		void* const armNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, linkArmNode, armJoint->GetJoint());
 
 		// add effector
@@ -275,7 +277,7 @@ class dSixAxisController: public dCustomControllerBase
 	{
 		const dEffectorTreeInterface::dEffectorPose& pose = m_animTreeNode->GetPose();
 		for (dEffectorTreeInterface::dEffectorPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
-			dCustomRagdollMotor_EndEffector* const effector = node->GetInfo().m_effector;
+			dCustomInverseDynamicsEffector* const effector = node->GetInfo().m_effector;
 			effector->Debug(debugContext);
 		}
 	}
@@ -362,8 +364,8 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
-	dMatrix origin(dYawMatrix(0.0f * dPi));
-	dMatrix origin1(dYawMatrix(1.0f * dPi));
+	dMatrix origin(dYawMatrix(0.0f * dDegreeToRad));
+	dMatrix origin1(dYawMatrix(180.0f * dDegreeToRad));
 	origin.m_posit.m_z = -1.0f;
 	origin1.m_posit.m_z =  1.0f;
 

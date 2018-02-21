@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _CUSTOMUNIVERSAL_H_
-#define _CUSTOMUNIVERSAL_H_
+#ifndef _CUSTOM_DOUBLE_HINGE_H_
+#define _CUSTOM_DOUBLE_HINGE_H_
 
 #include "dCustomHinge.h"
 
