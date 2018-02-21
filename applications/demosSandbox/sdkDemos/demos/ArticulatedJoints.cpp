@@ -45,7 +45,6 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	char m_articulationName[32];
 };
 
-
 class ArticulatedEntityModel: public DemoEntity
 {
 	public:
@@ -111,41 +110,6 @@ class ArticulatedEntityModel: public DemoEntity
 		m_inputs = inputs;
 	}
 
-	void LinkHingeActuator (NewtonBody* const parent, NewtonBody* const child)
-	{
-		dMatrix baseMatrix;
-		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
-
-		dFloat minAngleLimit = -20.0f * dDegreeToRad;
-		dFloat maxAngleLimit =  20.0f * dDegreeToRad;
-		dFloat angularRate = 10.0f * dDegreeToRad;
-		m_angularActuator0 = new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
-	}
-
-	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
-	{
-		dMatrix baseMatrix;
-		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
-
-		dFloat minLimit = -0.25f;
-		dFloat maxLimit = 1.5f;
-		dFloat linearRate = 0.125f;
-		m_liftJoints[m_liftActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-		m_liftActuatorsCount ++;
-	}
-
-	void LinkPaletteActuator (NewtonBody* const parent, NewtonBody* const child)
-	{
-		dMatrix baseMatrix;
-		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
-
-		dFloat minLimit = -0.25f;
-		dFloat maxLimit = 0.2f;
-		dFloat linearRate = 0.25f;
-		m_paletteJoints[m_paletteActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-		m_paletteActuatorsCount ++;
-	}
-
 	int m_tractionTiresCount;
 	int m_liftActuatorsCount;
 	int m_paletteActuatorsCount;
@@ -154,7 +118,6 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_maxTurmVelocity;
 	dFloat m_tiltAngle;
 	dFloat m_liftPosit;
-//	dFloat m_openPosit;
 
 	dCustomMotor2* m_engineMotor;
 	dCustomDoubleHinge* m_engineJoint;
@@ -174,7 +137,6 @@ class ArticulatedEntityModel: public DemoEntity
 class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManager
 {
 	public:
-
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
 		:dCustomArticulaledTransformManager (scene->GetNewton())
 	{
@@ -1054,7 +1016,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		dMatrix matrix;
 		NewtonBodyGetMatrix(gripperBody, &matrix[0][0]);
-		matrix = dPitchMatrix(0.0f * dPi) * dYawMatrix(0.5f * dPi) * matrix;
+		matrix = dPitchMatrix(0.5f * dPi) * matrix;
+		matrix = dYawMatrix(0.5f * dPi) * matrix;
 
 		dFloat minAngleLimit = -120.0f * dDegreeToRad;
 		dFloat maxAngleLimit =  120.0f * dDegreeToRad;
