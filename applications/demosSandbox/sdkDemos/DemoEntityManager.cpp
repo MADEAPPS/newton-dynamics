@@ -61,8 +61,8 @@
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// servo joints
-#define DEFAULT_SCENE	30			// articulated joints
-//#define DEFAULT_SCENE	31			// six axis manipulator
+//#define DEFAULT_SCENE	30			// articulated joints
+#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll

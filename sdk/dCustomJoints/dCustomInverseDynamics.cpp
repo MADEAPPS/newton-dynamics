@@ -916,45 +916,34 @@ void dCustomInverseDynamics::SubmitHingeConstraints(const dMatrix& matrix0, cons
 
 	dFloat jointOmega = matrix0.m_front.DotProduct3(omega0 - omega1);
 
+	dFloat angle = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix1.m_front);
+	dFloat predictAngle = angle + jointOmega * timestep;
 
-	dFloat angle = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix1.m_front) + jointOmega * timestep;
-//	dFloat angle = m_curJointAngle.GetAngle() + jointOmega * timestep;
+	if (predictAngle < m_minTwistAngle) {
 
-	if (angle < m_minTwistAngle) {
-		//dFloat relAngle = angle - m_minTwistAngle;
-		//NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-		//NewtonUserJointSetRowAsInverseDynamics(m_joint);
-		//NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-
-		dAssert (0);
-/*
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 
 		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
+		const dFloat speed = 0.5f * (m_minTwistAngle - angle) * invtimestep;
 		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-*/
+		NewtonUserJointSetRowAsInverseDynamics(m_joint);
 
-	} else if (angle > m_maxTwistAngle) {
-		//dFloat relAngle = angle - m_maxTwistAngle;
-		//NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
-		//NewtonUserJointSetRowAsInverseDynamics(m_joint);
-		//NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-
-		dAssert (0);
-/*
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+
+	} else if (predictAngle > m_maxTwistAngle) {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 
 		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
+		const dFloat speed = 0.5f * (m_maxTwistAngle - angle) * invtimestep;
 		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-*/
+		NewtonUserJointSetRowAsInverseDynamics(m_joint);
+
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+
 	} else {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 		NewtonUserJointSetRowAsInverseDynamics(m_joint);
