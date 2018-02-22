@@ -130,7 +130,12 @@ typedef long long unsigned64;
 #include <dCustomPlane.h>
 #include <dCustomMotor.h>
 #include <dCustomSlider.h>
+#include <dCustomPulley.h>
+#include <dCustomCorkScrew.h>
+#include <dCustomPathFollow.h>
 #include <dCustomDoubleHinge.h>
+#include <dCustomFixDistance.h>
+#include <dCustomRackAndPinion.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomBallAndSocket.h>
 #include <dCustomSliderActuator.h>

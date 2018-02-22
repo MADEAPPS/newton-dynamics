@@ -16,18 +16,6 @@
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
-#include <dCustomGear.h>
-#include <dCustom6dof.h>
-#include <dCustomHinge.h>
-#include <dCustomSlider.h>
-#include <dCustomPulley.h>
-#include <dBezierSpline.h>
-#include <dCustomCorkScrew.h>
-#include <dCustomPathFollow.h>
-#include <dCustomFixDistance.h>
-#include <dCustomBallAndSocket.h>
-#include <dCustomRackAndPinion.h>
-#include <dCustomSlidingContact.h>
 
 
 static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size)

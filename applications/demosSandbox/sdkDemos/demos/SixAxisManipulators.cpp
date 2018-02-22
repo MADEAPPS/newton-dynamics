@@ -71,31 +71,6 @@ class dSixAxisController: public dCustomControllerBase
 		dVector m_azimuthAxis;
 	};
 
-/*
-	class dKukaServoMotor1: public dCustomRagdollMotor_1dof
-	{
-		public:
-		dKukaServoMotor1(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle)
-			:dCustomRagdollMotor_1dof(pinAndPivotFrame, child, parent)
-		{
-			SetJointTorque (1000.0f);
-			SetTwistAngle (minAngle, maxAngle);
-		}
-	};
-
-	class dKukaServoMotor2: public dCustomRagdollMotor_2dof
-	{
-		public:
-		dKukaServoMotor2(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-			:dCustomUniversal(pinAndPivotFrame, child, parent)
-			,m_torque(1000.0f)
-		{
-			EnableLimit_0(false);
-			EnableLimit_1(false);
-		}
-	};
-*/
-
 	class dKukaEffector: public dCustomInverseDynamicsEffector
 	{
 		public:

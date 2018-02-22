@@ -10,10 +10,6 @@
 */
 
 
-// dCustomBallAndSocket.h: interface for the dCustomBallAndSocket class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef _D_CUSTOM_BALLANDSOCKET_H_
 #define _D_CUSTOM_BALLANDSOCKET_H_
 

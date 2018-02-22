@@ -10,10 +10,6 @@
 */
 
 
-// dCustomBallAndSocket.h: interface for the dCustomBallAndSocket class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef _D_CUSTOM_RAG_DOLL_MOTOR_H_
 #define _D_CUSTOM_RAG_DOLL_MOTOR_H_
 
@@ -125,7 +121,6 @@ class dCustomInverseDynamicsEffector: public dCustomJoint
 	DECLARE_CUSTOM_JOINT(dCustomInverseDynamicsEffector, dCustomJoint)
 };
 
-
 class dEffectorTreeInterface: public dCustomAlloc
 {
 	public:
@@ -221,6 +216,12 @@ class dEffectorTreeTwoWayBlender: public dEffectorTreeInterface
 		,m_node1(node1)
 		,m_param(1.0f)
 	{
+	}
+
+	~dEffectorTreeTwoWayBlender()
+	{
+		delete m_node0;
+		delete m_node1;
 	}
 
 	protected:

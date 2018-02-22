@@ -17,10 +17,9 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "dCustomBallAndSocket.h"
 #include "HeightFieldPrimitive.h"
 
-#if 0
+
 class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 {
 	public:
@@ -142,22 +141,6 @@ class dEffectorBlendIdleWalk: public dEffectorTreeTwoWayBlender
 class dHaxapodController: public dCustomControllerBase
 {
 	public:
-	class dHexapodMotor: public dCustomRagdollMotor_1dof
-	{
-		public:
-		dHexapodMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat minAngle, dFloat maxAngle)
-			:dCustomRagdollMotor_1dof(pinAndPivotFrame, child, parent)
-		{
-			SetJointTorque (1000.0f);
-			SetTwistAngle (minAngle, maxAngle);
-		}
-
-		void Debug(dDebugDisplay* const debugDisplay) const
-		{
-			//dCustomRagdollMotor_1dof::Debug(debugDisplay);
-		}
-	};
-
 	class dHexapodEffector: public dCustomInverseDynamicsEffector
 	{
 		public:
@@ -253,7 +236,10 @@ class dHaxapodController: public dCustomControllerBase
 		dMatrix baseMatrix(dRollMatrix(dPi * 0.5f));
 		dMatrix cylinderMatrix(baseMatrix * matrix);
 		NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
-		dHexapodMotor* const baseHinge = new dHexapodMotor(cylinderMatrix, base, parent, -dPi * 0.5f, dPi * 0.5f);
+		dCustomInverseDynamics* const baseHinge = new dCustomInverseDynamics(cylinderMatrix, base, parent);
+		baseHinge->SetJointTorque(500.0f);
+		baseHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
+
 		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 		//make limb forward arm
@@ -263,7 +249,9 @@ class dHaxapodController: public dCustomControllerBase
 		NewtonBody* const forwardArm = CreateBox(scene, forwardArmMatrix * matrix, forwardArmSize, partMass, inertiaScale);
 		dMatrix forwardArmPivot(forwardArmMatrix);
 		forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
-		dHexapodMotor* const forwardArmHinge = new dHexapodMotor(forwardArmPivot * matrix, forwardArm, base, -dPi * 0.5f, dPi * 0.5f);
+		dCustomInverseDynamics* const forwardArmHinge = new dCustomInverseDynamics(forwardArmPivot * matrix, forwardArm, base);
+		forwardArmHinge->SetJointTorque(500.0f);
+		forwardArmHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
 		void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
 
 		//make limb forward arm
@@ -274,7 +262,10 @@ class dHaxapodController: public dCustomControllerBase
 		NewtonBody* const arm = CreateCapsule(scene, armMatrix * matrix, partMass, inertiaScale, armSize * 0.2f, armSize);
 		dMatrix armPivot(armMatrix);
 		armPivot.m_posit.m_y += armSize * 0.5f;
-		dHexapodMotor* const armHinge = new dHexapodMotor(armPivot * matrix, arm, forwardArm, -dPi * 0.5f, dPi * 0.5f);
+		dCustomInverseDynamics* const armHinge = new dCustomInverseDynamics(armPivot * matrix, arm, forwardArm);
+		armHinge->SetJointTorque(500.0f);
+		armHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
+
 		void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
 
 		dMatrix effectorMatrix(dGetIdentityMatrix());
@@ -456,21 +447,21 @@ controller->m_walkIdleBlender->SetBlendFactor (xxx);
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
 };
-#endif
+
 
 void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-dAssert (0);
+
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
-/*
+
 	dHexapodManager* const robotManager = new dHexapodManager(scene);
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_y = 1.0f;
 	robotManager->MakeHexapod (scene, location);
-*/
+
 	dVector origin(0.0f);
 	origin.m_x = -4.0f;
 	origin.m_y  = 1.5f;
