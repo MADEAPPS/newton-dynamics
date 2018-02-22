@@ -288,6 +288,9 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dVector veloc0(0.0f);
+	dVector veloc1(0.0f);
+	const dFloat invtimestep = 1.0f / timestep;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
@@ -295,9 +298,6 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	// update joint angle
 	CalculateJointAngles(matrix0, matrix1);
 
-
-	dVector veloc0(0.0f);
-	dVector veloc1(0.0f);
 	dAssert(m_body0);
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
 	if (m_body1) {
@@ -305,9 +305,6 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 	dVector veloc(veloc0 - veloc1);
 	
-
-	const dFloat invtimestep = 1.0f / timestep;
-
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
@@ -315,8 +312,6 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	for (int i = 0; i < 3; i ++) {
 		if (m_options.m_value & (1 << (i + 3))) {
 			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
-				//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-				//NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
 				const dVector& dir = matrix1[i];
 				dVector prejectPoint(p0 - dir.Scale(dir.DotProduct3(dp)));
 				NewtonUserJointAddLinearRow(m_joint, &p0[0], &prejectPoint[0], &dir[0]);
