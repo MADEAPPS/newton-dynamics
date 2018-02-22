@@ -376,7 +376,7 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 }
 
 
-void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, const dMatrix& matrix1, const dVector& lowerLimit, const dVector& upperLimit) const
+void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, const dMatrix& matrix1) const
 {
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;

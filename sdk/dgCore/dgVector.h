@@ -1330,8 +1330,7 @@ class dgVector
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return _mm_dp_ps(m_type, A.m_type, 0xff);
 		#else 
-		//return (*this * A).AddHorizontal().GetScalar();
-		return (*this * A).AddHorizontal();
+			return (*this * A).AddHorizontal();
 		#endif
 	}
 
@@ -2032,8 +2031,8 @@ class dgSpatialVector
 #define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
 	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
 		:m_d0(low.m_typeLow)
-		, m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
-		, m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
+		,m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
+		,m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
 	{
 	}
 #else 
@@ -2091,7 +2090,6 @@ class dgSpatialVector
 		dgFloat64 ret;
 		_mm_store_sd(&ret, dot);
 		return ret;
-		//return dot.m128d_f64[0];
 	}
 
 	DG_INLINE dgSpatialVector Scale(dgFloat64 s) const

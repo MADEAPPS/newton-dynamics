@@ -252,7 +252,7 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 //	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 //	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
-	SubmitLinearRows(0x06, matrix0, matrix1, dVector(0.0f), dVector(0.0f));
+	SubmitLinearRows(0x06, matrix0, matrix1);
 
 	SubmitAngularRow(matrix0, matrix1, timestep);
 

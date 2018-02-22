@@ -779,7 +779,7 @@ void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep
 
 dCustomInverseDynamics::dCustomInverseDynamics(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
-	,m_torque(D_CUSTOM_LARGE_VALUE)
+	,m_torque(1000.0f)
 	,m_coneAngle(0.0f)
 	,m_minTwistAngle(0.0f)
 	,m_maxTwistAngle(0.0f)
@@ -790,12 +790,15 @@ dCustomInverseDynamics::dCustomInverseDynamics(const dMatrix& pinAndPivotFrame, 
 
 dCustomInverseDynamics::dCustomInverseDynamics (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
-	,m_torque(D_CUSTOM_LARGE_VALUE)
+	,m_torque(1000.0f)
 	,m_coneAngle(0.0f)
 	,m_minTwistAngle(0.0f)
 	,m_maxTwistAngle(0.0f)
 	,m_options()
 {
+	dMatrix	dummy;
+	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
+	CalculateLocalMatrix(pinAndPivotFrameParent, dummy, m_localMatrix1);
 }
 
 dCustomInverseDynamics::~dCustomInverseDynamics()
@@ -833,14 +836,50 @@ dFloat dCustomInverseDynamics::GetJointTorque() const
 
 void dCustomInverseDynamics::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
-	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-170.0f * dDegreeToRad));
-	m_maxTwistAngle = dMin(dAbs(maxAngle), dFloat(170.0f * dDegreeToRad));
+	m_minTwistAngle = dMax(-dAbs(minAngle), dFloat(-2.0f * dPi));
+	m_maxTwistAngle = dMin(dAbs(maxAngle), dFloat(2.0f * dPi));
 }
 
 void dCustomInverseDynamics::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
 {
 	minAngle = m_minTwistAngle;
 	maxAngle = m_maxTwistAngle;
+}
+
+
+void dCustomInverseDynamics::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
+
+
+	// vis limits
+	const int subdiv = 16;
+	const float radius = 0.25f;
+	dVector arch[subdiv + 1];
+
+	dFloat angleStep = (m_maxTwistAngle - m_minTwistAngle) / subdiv;
+	if (angleStep > 1.0f * dDegreeToRad) {
+		dVector point(0.0f, radius, 0.0f, 0.0f);
+		dFloat angle0 = m_minTwistAngle;
+	
+		debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+		for (int i = 0; i <= subdiv; i++) {
+			dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
+			arch[i] = p;
+			debugDisplay->DrawLine(matrix1.m_posit, p);
+			angle0 += angleStep;
+		}
+
+		for (int i = 0; i < subdiv; i++) {
+			debugDisplay->DrawLine(arch[i], arch[i + 1]);
+		}
+	}
+
+//	if (!m_options.m_option0 && (m_coneAngle == 0.0f)) {
 }
 
 
@@ -852,7 +891,7 @@ void dCustomInverseDynamics::SubmitConstraints(dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	SubmitLinearRows(0x07, matrix0, matrix1, dVector(0.0f), dVector(0.0f));
+	SubmitLinearRows(0x07, matrix0, matrix1);
 
 	if (!m_options.m_option0 && (m_coneAngle == 0.0f)) {
 		SubmitHingeConstraints(matrix0, matrix1, timestep);
@@ -863,5 +902,64 @@ void dCustomInverseDynamics::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dCustomInverseDynamics::SubmitHingeConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
+
+	dVector omega0;
+	dVector omega1;
+	dAssert (m_body1);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	dFloat jointOmega = matrix0.m_front.DotProduct3(omega0 - omega1);
+
+
+	dFloat angle = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix1.m_front) + jointOmega * timestep;
+//	dFloat angle = m_curJointAngle.GetAngle() + jointOmega * timestep;
+
+	if (angle < m_minTwistAngle) {
+		//dFloat relAngle = angle - m_minTwistAngle;
+		//NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
+		//NewtonUserJointSetRowAsInverseDynamics(m_joint);
+		//NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
+		dAssert (0);
+/*
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+*/
+
+	} else if (angle > m_maxTwistAngle) {
+		//dFloat relAngle = angle - m_maxTwistAngle;
+		//NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
+		//NewtonUserJointSetRowAsInverseDynamics(m_joint);
+		//NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+
+		dAssert (0);
+/*
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+
+		const dFloat invtimestep = 1.0f / timestep;
+		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+*/
+	} else {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+		NewtonUserJointSetRowAsInverseDynamics(m_joint);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
 }

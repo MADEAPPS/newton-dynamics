@@ -191,6 +191,7 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const rotatingColumnBody = CreateBox(scene, rotatingColumnMatrix * location, dVector(r * 0.5f, h, r * 0.75f));
 		rotatingColumnMatrix = dRollMatrix(dPi * 0.5f) * rotatingColumnMatrix;
 		dCustomInverseDynamics* const rotatingColumnHinge = new dCustomInverseDynamics(rotatingColumnMatrix * location, rotatingColumnBody, baseFrameBody);
+		rotatingColumnHinge->SetJointTorque(300.0f);
 		rotatingColumnHinge->SetTwistAngle(-2.0f * dPi, 2.0f * dPi);
 		void* const rotatingColumnNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseFrameNode, rotatingColumnHinge->GetJoint());
 
@@ -202,7 +203,8 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const linkArmBody = CreateBox(scene, linkArmMatrix * location, dVector(l * 0.125f, l, l * 0.125f));
 		linkArmMatrix.m_posit.m_y -= l * 0.5f;
 		dCustomInverseDynamics* const linkArmJoint = new dCustomInverseDynamics(linkArmMatrix * location, linkArmBody, rotatingColumnBody);
-		rotatingColumnHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
+		linkArmJoint->SetJointTorque(300.0f);
+		linkArmJoint->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
 		void* const linkArmNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rotatingColumnNode, linkArmJoint->GetJoint());
 
 		// add Robot arm
@@ -213,7 +215,8 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBody* const armBody = CreateBox(scene, armMatrix * location, dVector(l * 0.125f, l * 0.125f, l1));
 		armMatrix.m_posit.m_z -= l1 * 0.5f;
 		dCustomInverseDynamics* const armJoint = new dCustomInverseDynamics(armMatrix * location, armBody, linkArmBody);
-		rotatingColumnHinge->SetTwistAngle(lowLimit, highLimit);
+		armJoint->SetJointTorque(300.0f);
+		armJoint->SetTwistAngle(lowLimit, highLimit);
 		void* const armNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, linkArmNode, armJoint->GetJoint());
 
 		// add effector

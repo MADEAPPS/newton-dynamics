@@ -255,21 +255,11 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 
 void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& euler, dFloat timestep)
 {
-#if 1
 	// two rows to restrict rotation around around the parent coordinate system
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-#else
-	dVector rollPin(dSin(euler[1]), dFloat(0.0f), dCos(euler[1]), dFloat(0.0f));
-	rollPin = matrix1.RotateVector(rollPin);
-
-	NewtonUserJointAddAngularRow(m_joint, -euler[1], &matrix1[1][0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -euler[2], &rollPin[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-#endif
 }
 
 void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -281,7 +271,7 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
-	SubmitLinearRows(0x07, matrix0, matrix1, dVector(0.0f), dVector(0.0f));
+	SubmitLinearRows(0x07, matrix0, matrix1);
 
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
@@ -298,7 +288,8 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	m_jointOmega = (omega0 - omega1).DotProduct3(matrix0.m_front);
+	//m_jointOmega = (omega0 - omega1).DotProduct3(matrix0.m_front);
+	m_jointOmega = matrix0.m_front.DotProduct3(omega0 - omega1);
 
 	// submit the angular rows.
 	SubmitAngularRow(matrix0, matrix1, euler0, timestep);

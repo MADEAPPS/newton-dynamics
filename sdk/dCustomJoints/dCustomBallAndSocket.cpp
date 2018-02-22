@@ -258,7 +258,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	SubmitLinearRows(0x07, matrix0, matrix1, dVector(0.0f), dVector(0.0f));
+	SubmitLinearRows(0x07, matrix0, matrix1);
 
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
