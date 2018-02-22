@@ -247,11 +247,6 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_front);
 	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
 
-//	dVector p0(matrix0.m_posit);
-//	dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_posit));
-//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
-//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
-
 	SubmitLinearRows(0x06, matrix0, matrix1);
 
 	SubmitAngularRow(matrix0, matrix1, timestep);

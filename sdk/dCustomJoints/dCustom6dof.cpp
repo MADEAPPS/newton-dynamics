@@ -295,24 +295,60 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 	// update joint angle
 	CalculateJointAngles(matrix0, matrix1);
 
+
+	dVector veloc0(0.0f);
+	dVector veloc1(0.0f);
+	dAssert(m_body0);
+	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
+	if (m_body1) {
+		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &veloc1[0]);
+	}
+	dVector veloc(veloc0 - veloc1);
+	
+
+	const dFloat invtimestep = 1.0f / timestep;
+
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
-	dVector step(p0 - p1);
-
+	const dVector dp(p0 - p1);
 	for (int i = 0; i < 3; i ++) {
 		if (m_options.m_value & (1 << (i + 3))) {
 			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
-				NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-				NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
+				//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+				//NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
+				const dVector& dir = matrix1[i];
+				dVector prejectPoint(p0 - dir.Scale(dir.DotProduct3(dp)));
+				NewtonUserJointAddLinearRow(m_joint, &p0[0], &prejectPoint[0], &dir[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			} else {
-				dFloat posit = step.DotProduct3(matrix1[i]);
-				if (posit < m_minLinearLimits.m_x) {
-					NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+				dFloat posit = dp.DotProduct3(matrix1[i]);
+				dFloat speed = veloc.DotProduct3(matrix1[i]);
+				dFloat x = posit + speed * timestep;
+				//if (posit < m_minLinearLimits.m_x) {
+				//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+				//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				//} else if (posit > m_maxLinearLimits.m_x) {
+				//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+				//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				//}
+				if (x < m_minLinearLimits[i]) {
+					NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
 					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-				} else if (posit > m_maxLinearLimits.m_x) {
-					NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
+					speed = 0.5f * (m_minLinearLimits[i] - posit) * invtimestep;
+					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+
+				} else if (x > m_maxLinearLimits[i]) {
+					NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
 					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+					NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+
+					speed = 0.5f * (m_maxLinearLimits[i] - posit) * invtimestep;
+					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 				}
 			}
 		}
