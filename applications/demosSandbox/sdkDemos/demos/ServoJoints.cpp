@@ -177,40 +177,6 @@ class ServoEntityModel: public DemoEntity
 		m_rearTiresCount ++;
 	}
 
-	void LinkHingeActuator (NewtonBody* const parent, NewtonBody* const child)
-	{
-		dMatrix baseMatrix;
-		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
-
-		dFloat minAngleLimit = -20.0f * dDegreeToRad;
-		dFloat maxAngleLimit =  20.0f * dDegreeToRad;
-		dFloat angularRate = 10.0f * dDegreeToRad;
-		m_angularActuator0 = new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
-	}
-
-	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
-	{
-		dMatrix baseMatrix;
-		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
-
-		dFloat minLimit = -0.25f;
-		dFloat maxLimit = 1.5f;
-		dFloat linearRate = 0.125f;
-		m_liftJoints[m_liftActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-		m_liftActuatorsCount ++;
-	}
-
-	void LinkPaletteActuator (NewtonBody* const parent, NewtonBody* const child)
-	{
-		dMatrix baseMatrix;
-		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
-
-		dFloat minLimit = -0.25f;
-		dFloat maxLimit = 0.2f;
-		dFloat linearRate = 0.25f;
-		m_paletteJoints[m_paletteActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-		m_paletteActuatorsCount ++;
-	}
 
 	int m_rearTiresCount;
 	int m_tractionTiresCount;
@@ -235,7 +201,7 @@ class ServoEntityModel: public DemoEntity
 	NewtonBody* m_tractionTires[4];
 	dCustomSlidingContact* m_tractionTiresJoints[4];
 	
-	dCustomSliderActuator* m_liftJoints[2];
+
 	dCustomSliderActuator* m_paletteJoints[4];
 	dCustomUniversalActuator* m_rearTireJoints[4];
 	dCustomUniversalActuator* m_universalActuator[4];
@@ -765,110 +731,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
 	}
 
-	void ConnectBodyPart (ServoEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
-	{
-		if (jointArticulation == "") {
-			// this is the root body do nothing
 
-		} else if (jointArticulation == "frontTire") {
-			vehicleModel->LinkFrontTire (parent, child, cycleLinks);
-		} else if (jointArticulation == "rearTire") {
-			vehicleModel->LinkRearTire (parent, child);
-		} else if (jointArticulation == "hingeActuator") {
-			vehicleModel->LinkHingeActuator (parent, child);
-		} else if (jointArticulation == "liftActuator") {
-			vehicleModel->LinkLiftActuator (parent, child);
-		} else if (jointArticulation == "paletteActuator") {
-			vehicleModel->LinkPaletteActuator (parent, child);
-		} else {
-			dAssert (0);
-		}
-	}
-
-	dCustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
-	{
-		NewtonWorld* const world = GetWorld(); 
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-
-		// make a clone of the mesh 
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*) model->CreateClone();
-		scene->Append(vehicleModel);
-
-		// plane the model at its location
-		vehicleModel->ResetMatrix (*scene, location);
-
-		//dCustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
-		dCustomArticulatedTransformController* const controller = CreateTransformController ();
-		controller->SetUserData(vehicleModel);
-		controller->SetCalculateLocalTransforms (true);
-
-		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
-		NewtonBody* const rootBody = CreateBodyPart (rootEntity, definition[0]);
-
-		// move the center of mass a lithe to the back, and lower
-		dVector com(0.0f);
-		NewtonBodyGetCentreOfMass(rootBody, &com[0]);
-		//com.m_x -= 0.25f;
-		com.m_y -= 0.25f;
-		NewtonBodySetCentreOfMass(rootBody, &com[0]);
-
-		// add the root bone to the articulation manager
-		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddRoot (rootBody, dGetIdentityMatrix());
-
-		// add engine
-		dCustomArticulatedTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		vehicleModel->m_engineJoint = (dCustomUniversal*) engineBone->FindJoint();
-		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
-
-		dAssert(0);
-		// set power parameter for a simple DC engine
-//		dFloat maxOmega = 40.0f;
-//		vehicleModel->m_maxEngineTorque = -400.0f;
-//		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
-//		vehicleModel->m_maxTurmDamp = 0.0f;
-//		vehicleModel->m_maxTurmVelocity = 0.0f;
-
-		// walk down the model hierarchy an add all the components 
-		int stackIndex = 0;
-		DemoEntity* childEntities[32];
-		dCustomArticulatedTransformController::dSkeletonBone* parentBones[32];
-		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = chassisBone;
-			childEntities[stackIndex] = child;
-			stackIndex ++;
-		}
-
-		dList<dCustomJoint*> cycleLinks;
-		while (stackIndex) {
-			stackIndex --;
-			DemoEntity* const entity = childEntities[stackIndex];
-			dCustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
-
-			const char* const name = entity->GetName().GetStr();
-			for (int i = 0; i < bodyPartsCount; i ++) {
-				if (!strcmp (definition[i].m_boneName, name)) {
-					NewtonBody* const bone = CreateBodyPart (entity, definition[i]);
-
-					// connect this body part to its parent with a vehicle joint
-					ConnectBodyPart (vehicleModel, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
-
-					dMatrix bindMatrix (entity->GetParent()->CalculateGlobalMatrix ((DemoEntity*)NewtonBodyGetUserData (parentBone->m_body)).Inverse());
-					parentBone = controller->AddBone (bone, bindMatrix, parentBone);
-					break;
-				}
-			}
-
-			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-				parentBones[stackIndex] = parentBone;
-				childEntities[stackIndex] = child;
-				stackIndex ++;
-			}
-		}
-
-		// disable self collision between all body parts
-		controller->DisableAllSelfCollision();
-		return controller;
-	}
 
 	NewtonCollision* MakeRobotTireShape(DemoEntity* const bodyPart, bool hasInnerRing) const
 	{
@@ -1753,7 +1616,13 @@ class ServoEntityModel: public DemoEntity
 	ServoEntityModel(DemoEntityManager* const scene, const char* const name)
 		:DemoEntity(dGetIdentityMatrix(), NULL)
 		,m_inputs()
+		,m_angularActuator0(NULL)
 	{
+		m_liftJoints[0] = NULL;
+		m_liftJoints[1] = NULL;
+		m_liftJoints[2] = NULL;
+		m_paletteJoints[0] = NULL;
+		m_paletteJoints[1] = NULL;
 		// load the vehicle model
 		LoadNGD_mesh(name, scene->GetNewton());
 	}
@@ -1761,7 +1630,13 @@ class ServoEntityModel: public DemoEntity
 	ServoEntityModel(const ServoEntityModel& copy)
 		:DemoEntity(copy)
 		,m_inputs()
+		,m_angularActuator0(NULL)
 	{
+		m_liftJoints[0] = NULL;
+		m_liftJoints[1] = NULL;
+		m_liftJoints[2] = NULL;
+		m_paletteJoints[0] = NULL;
+		m_paletteJoints[1] = NULL;
 	}
 
 	DemoEntity* CreateClone() const
@@ -1775,6 +1650,9 @@ class ServoEntityModel: public DemoEntity
 	}
 
 	InputRecord m_inputs;
+	dCustomHingeActuator* m_angularActuator0;
+	dCustomSliderActuator* m_liftJoints[3];
+	dCustomSliderActuator* m_paletteJoints[2];
 };
 
 
@@ -1940,8 +1818,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 	static int OnBoneAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	{
-		return 1;
-/*
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 		SERVO_VEHICLE_DEFINITION::SHAPES_ID id0 = SERVO_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision0));
@@ -1951,24 +1827,25 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 		switch (id0 | id1) 
 		{
-			case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_tirePart:
+			//case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
+			//case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
+			//case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_tirePart:
+			case SERVO_VEHICLE_DEFINITION::m_bodyPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
 			{
 				return 0;
 				break;
 			}
 
 			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_landPart:
-			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_terrain:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_landPart:
-			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_landPart:
+			//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_landPart:
+			//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_linkPart:
+			//case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
+			//case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_linkPart:
+			//case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_terrain:
+			//case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_landPart:
+			//case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
+			//case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
+			//case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_landPart:
 			{
 				return 1;
 				break;
@@ -1979,7 +1856,8 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 				return 1;
 			}
 		}
-*/
+
+		return 0;
 	}
 
 
@@ -2260,7 +2138,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			points[i][3] = 0.0f;
 		}
 		bodyPart->GetMeshMatrix().TransformTriplex(&points[0][0], sizeof(dVector), &points[0][0], sizeof(dVector), mesh->m_vertexCount);
-		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
+		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, SERVO_VEHICLE_DEFINITION::m_bodyPart, NULL);
 	}
 
 	NewtonCollision* MakeForkLiftTireShape(DemoEntity* const bodyPart) const
@@ -2326,6 +2204,77 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		return body;
 	}
 
+	dCustomHingeActuator* LinkHingeActuator (NewtonBody* const parent, NewtonBody* const child)
+	{
+		dMatrix baseMatrix;
+		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
+
+		dFloat minAngleLimit = -20.0f * dDegreeToRad;
+		dFloat maxAngleLimit =  20.0f * dDegreeToRad;
+		dFloat angularRate = 10.0f * dDegreeToRad;
+		return new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
+	}
+
+	dCustomSliderActuator* LinkLiftActuator(NewtonBody* const parent, NewtonBody* const child)
+	{
+		dMatrix baseMatrix;
+		NewtonBodyGetMatrix(child, &baseMatrix[0][0]);
+
+		dFloat minLimit = -0.25f;
+		dFloat maxLimit = 1.5f;
+		dFloat linearRate = 0.125f;
+		return new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+	}
+
+	dCustomSliderActuator* LinkPaletteActuator(NewtonBody* const parent, NewtonBody* const child)
+	{
+		dMatrix baseMatrix;
+		NewtonBodyGetMatrix(child, &baseMatrix[0][0]);
+
+		dFloat minLimit = -0.25f;
+		dFloat maxLimit = 0.2f;
+		dFloat linearRate = 0.25f;
+		return new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+	}
+
+	void ConnectBodyPart(ServoEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
+	{
+		if (jointArticulation == "") {
+			// this is the root body do nothing
+		} else if (jointArticulation == "frontTire") {
+			dAssert(0);
+			//vehicleModel->LinkFrontTire(parent, child, cycleLinks);
+		} else if (jointArticulation == "rearTire") {
+			dAssert(0);
+			//vehicleModel->LinkRearTire(parent, child);
+		} else if (jointArticulation == "hingeActuator") {
+			vehicleModel->m_angularActuator0 = LinkHingeActuator(parent, child);
+		} else if (jointArticulation == "liftActuator") {
+			dCustomSliderActuator* const lift = LinkLiftActuator(parent, child);;
+			if (!vehicleModel->m_liftJoints[0]) {
+				vehicleModel->m_liftJoints[0] = lift;
+			} else if (!vehicleModel->m_liftJoints[1]) {
+				dAssert(!vehicleModel->m_liftJoints[1]);
+				vehicleModel->m_liftJoints[1] = lift;
+			} else {
+				dAssert(!vehicleModel->m_liftJoints[2]);
+				vehicleModel->m_liftJoints[2] = lift;
+			}
+
+		} else if (jointArticulation == "paletteActuator") {
+			//vehicleModel->LinkPaletteActuator(parent, child);
+			dCustomSliderActuator* const lift = LinkLiftActuator(parent, child);;
+			if (!vehicleModel->m_paletteJoints[0]) {
+				vehicleModel->m_paletteJoints[0] = lift;
+			} else {
+				dAssert(!vehicleModel->m_paletteJoints[1]);
+				vehicleModel->m_paletteJoints[1] = lift;
+			}
+		} else {
+			dAssert(0);
+		}
+	}
+
 
 	dCustomArticulatedTransformController* CreateForklift(const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
 	{
@@ -2339,7 +2288,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		// plane the model at its location
 		vehicleModel->ResetMatrix(*scene, location);
 
-		//dCustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
 		dCustomArticulatedTransformController* const controller = CreateTransformController();
 
 		controller->SetUserData(vehicleModel);
@@ -2358,13 +2306,12 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 		// add the root bone to the articulation manager
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
-/*
-		// add engine
-		dCustomArticulatedTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		vehicleModel->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
-		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
 
-		dAssert(0);
+		// add engine
+		//dCustomArticulatedTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
+		//vehicleModel->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
+		//vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
+
 		// set power parameter for a simple DC engine
 		//		dFloat maxOmega = 40.0f;
 		//		vehicleModel->m_maxEngineTorque = -400.0f;
@@ -2382,6 +2329,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			stackIndex++;
 		}
 
+int xxxx = 0;
 		dList<dCustomJoint*> cycleLinks;
 		while (stackIndex) {
 			stackIndex--;
@@ -2402,13 +2350,15 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 				}
 			}
 
+xxxx++;
+if (xxxx >= 6)
+break;
 			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
 				parentBones[stackIndex] = parentBone;
 				childEntities[stackIndex] = child;
 				stackIndex++;
 			}
 		}
-*/
 
 		return controller;
 	}
