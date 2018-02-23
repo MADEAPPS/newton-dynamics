@@ -106,7 +106,7 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 {
 	public:
 	dEffectorTreePostureGenerator(dEffectorTreeInterface* const poseGenerator)
-		:dEffectorTreeInterface(poseGenerator->m_rootBody)
+		:dEffectorTreeInterface(poseGenerator->GetRootBody())
 		,m_euler(0.0f)
 		,m_position(0.0f)
 		,m_poseGenerator(poseGenerator)
@@ -261,7 +261,6 @@ class dHexapodController: public dCustomControllerBase
 		dCustomInverseDynamics* const baseHinge = new dCustomInverseDynamics(cylinderMatrix, base, parent);
 		baseHinge->SetJointTorque(500.0f);
 		baseHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
-
 		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
 		//make limb forward arm
@@ -287,7 +286,6 @@ class dHexapodController: public dCustomControllerBase
 		dCustomInverseDynamics* const armHinge = new dCustomInverseDynamics(armPivot * matrix, arm, forwardArm);
 		armHinge->SetJointTorque(500.0f);
 		armHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
-
 		void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
 
 		dMatrix effectorMatrix(dGetIdentityMatrix());
@@ -401,6 +399,7 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 		,m_pitch(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
+		,m_speed(0.5f)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -425,19 +424,15 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
 		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
 		ImGui::SliderFloat("roll", &me->m_roll, -10.0f, 10.0f);
+		ImGui::SliderFloat("speed", &me->m_speed, 0.0f, 1.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.1f, 0.1f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.4f, 0.4f);
-
-static float xxx = 1.0f;
-ImGui::SliderFloat("blend", &xxx, 0.0f, 1.0f);
-
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dHexapodController* const controller = &node->GetInfo();
 
-controller->m_walkIdleBlender->SetBlendFactor (xxx);
-
-			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * dDegreeToRad, me->m_yaw * dDegreeToRad, me->m_roll * dDegreeToRad);
+			controller->m_walkIdleBlender->SetBlendFactor (me->m_speed);
+			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * dDegreeToRad, me->m_yaw * dDegreeToRad, -me->m_roll * dDegreeToRad);
 		}
 	}
 
@@ -468,6 +463,7 @@ controller->m_walkIdleBlender->SetBlendFactor (xxx);
 	dFloat32 m_pitch;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;
+	dFloat32 m_speed;
 };
 
 
