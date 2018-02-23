@@ -259,7 +259,7 @@ class dHexapodController: public dCustomControllerBase
 		dMatrix cylinderMatrix(baseMatrix * matrix);
 		NewtonBody* const base = CreateCylinder(scene, cylinderMatrix, partMass, inertiaScale, 0.2f, 0.1f);
 		dCustomInverseDynamics* const baseHinge = new dCustomInverseDynamics(cylinderMatrix, base, parent);
-		baseHinge->SetJointTorque(500.0f);
+		baseHinge->SetJointTorque(1000.0f);
 		baseHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
 		void* const baseHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, rootNode, baseHinge->GetJoint());
 
@@ -271,7 +271,7 @@ class dHexapodController: public dCustomControllerBase
 		dMatrix forwardArmPivot(forwardArmMatrix);
 		forwardArmPivot.m_posit -= forwardArmMatrix.m_right.Scale(forwardArmSize.m_z * 0.5f);
 		dCustomInverseDynamics* const forwardArmHinge = new dCustomInverseDynamics(forwardArmPivot * matrix, forwardArm, base);
-		forwardArmHinge->SetJointTorque(500.0f);
+		forwardArmHinge->SetJointTorque(1000.0f);
 		forwardArmHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
 		void* const forwardArmHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, baseHingeNode, forwardArmHinge->GetJoint());
 
@@ -284,7 +284,7 @@ class dHexapodController: public dCustomControllerBase
 		dMatrix armPivot(armMatrix);
 		armPivot.m_posit.m_y += armSize * 0.5f;
 		dCustomInverseDynamics* const armHinge = new dCustomInverseDynamics(armPivot * matrix, arm, forwardArm);
-		armHinge->SetJointTorque(500.0f);
+		armHinge->SetJointTorque(1000.0f);
 		armHinge->SetTwistAngle(-0.5f * dPi, 0.5f * dPi);
 		void* const armHingeNode = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, forwardArmHingeNode, armHinge->GetJoint());
 
