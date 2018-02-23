@@ -756,16 +756,20 @@ void dEffectorTreeTwoWayBlender::Evaluate(dEffectorPose& output, dFloat timestep
 	} else if (m_param > 0.999f) {
 		m_node1->Evaluate(output, timestep);
 	} else {
-		dEffectorPose pose;
-		pose.m_childNode = m_node1;
+		int index = 0;
+		m_node1->Evaluate(output, timestep);
+		dEffectorTransform* const tmpKeyFrame = dAlloca (dEffectorTransform, output.GetCount());
 		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-			pose.Append(node->GetInfo());
+			tmpKeyFrame[index] = node->GetInfo();
+			index ++;
 		}
-		m_node1->Evaluate(pose, timestep);
+		index = 0;
 		m_node0->Evaluate(output, timestep);
-		for (dEffectorPose::dListNode* srcNode = pose.GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
-			dEffectorTransform& dst = dstNode->GetInfo();
-			const dEffectorTransform& src = srcNode->GetInfo();
+		for (dEffectorPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dEffectorTransform& dst = node->GetInfo();
+			const dEffectorTransform& src = tmpKeyFrame[index];
+			index ++;
+
 			dst.m_posit = dst.m_posit.Scale (1.0f - m_param) + src.m_posit.Scale (m_param);
 			dQuaternion srcRotation (src.m_rotation);
 			srcRotation.Scale (dSign (dst.m_rotation.DotProduct(src.m_rotation)));
