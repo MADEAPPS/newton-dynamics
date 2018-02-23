@@ -119,7 +119,7 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 		delete m_poseGenerator;
 	}
 
-	void SetTarget(dFloat z, dFloat y, dFloat pitch, dFloat yaw, dFloat roll)
+	void SetTarget(dFloat z, dFloat y, dFloat roll, dFloat yaw, dFloat pitch)
 	{
 		m_position.m_y = y;
 		m_position.m_z = z;
@@ -399,7 +399,7 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 		,m_pitch(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
-		,m_speed(0.5f)
+		,m_speed(0.0f)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -421,10 +421,10 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 //		ImGui::RadioButton("translate body", &xxxx, 0);
 //		ImGui::Separator();
 
+		ImGui::SliderFloat("speed", &me->m_speed, 0.0f, 1.0f);
 		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
 		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
 		ImGui::SliderFloat("roll", &me->m_roll, -10.0f, 10.0f);
-		ImGui::SliderFloat("speed", &me->m_speed, 0.0f, 1.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -0.1f, 0.1f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -0.4f, 0.4f);
 
@@ -432,7 +432,7 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 			dHexapodController* const controller = &node->GetInfo();
 
 			controller->m_walkIdleBlender->SetBlendFactor (me->m_speed);
-			controller->SetTarget (me->m_posit_x, -me->m_posit_y, me->m_pitch * dDegreeToRad, me->m_yaw * dDegreeToRad, -me->m_roll * dDegreeToRad);
+			controller->SetTarget (me->m_posit_x, -me->m_posit_y, -me->m_pitch * dDegreeToRad, -me->m_yaw * dDegreeToRad, -me->m_roll * dDegreeToRad);
 		}
 	}
 
