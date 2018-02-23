@@ -138,7 +138,7 @@ class dEffectorBlendIdleWalk: public dEffectorTreeTwoWayBlender
 	}
 };
 
-class dHaxapodController: public dCustomControllerBase
+class dHexapodController: public dCustomControllerBase
 {
 	public:
 	class dHexapodEffector: public dCustomInverseDynamicsEffector
@@ -151,7 +151,7 @@ class dHaxapodController: public dCustomControllerBase
 		}
 	};
 
-	dHaxapodController()
+	dHexapodController()
 		:m_animTreeNode(NULL)
 		,m_kinematicSolver(NULL)
 		,m_walkIdleBlender(NULL)
@@ -159,7 +159,7 @@ class dHaxapodController: public dCustomControllerBase
 	{
 	}
 
-	~dHaxapodController()
+	~dHexapodController()
 	{
 		delete m_animTreeNode;
 		NewtonInverseDynamicsDestroy(m_kinematicSolver);
@@ -368,11 +368,11 @@ class dHaxapodController: public dCustomControllerBase
 	dEffectorTreePostureGenerator* m_postureModifier; // do not delete 
 };
 
-class dHexapodManager: public dCustomControllerManager<dHaxapodController>
+class dHexapodManager: public dCustomControllerManager<dHexapodController>
 {
 	public:
 	dHexapodManager(DemoEntityManager* const scene)
-		:dCustomControllerManager<dHaxapodController>(scene->GetNewton(), "sixAxisManipulator")
+		:dCustomControllerManager<dHexapodController>(scene->GetNewton(), "sixAxisManipulator")
 		,m_currentController(NULL)
 		,m_yaw(0.0f)
 		,m_roll(0.0f)
@@ -411,7 +411,7 @@ ImGui::SliderFloat("blend", &xxx, 0.0f, 1.0f);
 
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-			dHaxapodController* const controller = &node->GetInfo();
+			dHexapodController* const controller = &node->GetInfo();
 
 controller->m_walkIdleBlender->SetBlendFactor (xxx);
 
@@ -419,14 +419,14 @@ controller->m_walkIdleBlender->SetBlendFactor (xxx);
 		}
 	}
 
-	virtual dHaxapodController* CreateController()
+	virtual dHexapodController* CreateController()
 	{
-		return (dHaxapodController*)dCustomControllerManager<dHaxapodController>::CreateController();
+		return (dHexapodController*)dCustomControllerManager<dHexapodController>::CreateController();
 	}
 
-	dHaxapodController* MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
+	dHexapodController* MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
 	{
-		dHaxapodController* const controller = (dHaxapodController*)CreateController();
+		dHexapodController* const controller = (dHexapodController*)CreateController();
 		controller->MakeHexapod(scene, location);
 		m_currentController = controller;
 		return controller;
@@ -435,12 +435,12 @@ controller->m_walkIdleBlender->SetBlendFactor (xxx);
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			dHaxapodController* const controller = &node->GetInfo();
+			dHexapodController* const controller = &node->GetInfo();
 			controller->Debug(debugContext);
 		}
 	}
 
-	dHaxapodController* m_currentController;
+	dHexapodController* m_currentController;
 	dFloat32 m_yaw;
 	dFloat32 m_roll;
 	dFloat32 m_pitch;
@@ -455,16 +455,32 @@ void Hexapod(DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
-
+	//CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.3f, 200.0f, -50.0f);
 	dHexapodManager* const robotManager = new dHexapodManager(scene);
 
-	dMatrix location (dGetIdentityMatrix());
-	location.m_posit.m_y = 1.0f;
-	robotManager->MakeHexapod (scene, location);
+	NewtonWorld* const world = scene->GetNewton();
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
+	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
-	dVector origin(0.0f);
-	origin.m_x = -4.0f;
-	origin.m_y  = 1.5f;
+	dMatrix location (dGetIdentityMatrix());
+	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	location.m_posit.m_y += 1.0f;
+
+	const int count = 1;
+	dMatrix location1(location);
+	location1.m_posit.m_z += 2.0f;
+	for (int i = 0; i < count; i++) {
+		location.m_posit.m_x += 2.0f;
+		location1.m_posit.m_x += 2.0f;
+	robotManager->MakeHexapod (scene, location);
+		//robotManager->MakeHexapod (scene, location1);
+	}
+
+	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	origin.m_y  += 2.5f;
+
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }

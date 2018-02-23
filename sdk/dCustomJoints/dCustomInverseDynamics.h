@@ -153,6 +153,11 @@ class dEffectorTreeInterface: public dCustomAlloc
 	{
 	}
 
+	NewtonBody* GetRootBody() const 
+	{
+		return m_rootBody;
+	}
+
 	NewtonBody* m_rootBody;
 };
 
