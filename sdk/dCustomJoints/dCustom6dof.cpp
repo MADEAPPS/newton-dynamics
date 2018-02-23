@@ -288,27 +288,29 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-	dVector veloc0(0.0f);
-	dVector veloc1(0.0f);
+	dVector veloc0;
+	dVector veloc1;
+	dVector omega0;
+	dVector omega1;
+
 	const dFloat invtimestep = 1.0f / timestep;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
-	// update joint angle
-	CalculateJointAngles(matrix0, matrix1);
-
 	dAssert(m_body0);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
 	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
 		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &veloc1[0]);
 	}
-	dVector veloc(veloc0 - veloc1);
-	
+
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
 	const dVector dp(p0 - p1);
+	const dVector veloc(veloc0 - veloc1);
 	for (int i = 0; i < 3; i ++) {
 		if (m_options.m_value & (1 << (i + 3))) {
 			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
@@ -320,13 +322,6 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 				dFloat posit = dp.DotProduct3(matrix1[i]);
 				dFloat speed = veloc.DotProduct3(matrix1[i]);
 				dFloat x = posit + speed * timestep;
-				//if (posit < m_minLinearLimits.m_x) {
-				//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-				//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-				//} else if (posit > m_maxLinearLimits.m_x) {
-				//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-				//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-				//}
 				if (x < m_minLinearLimits[i]) {
 					NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
 					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
@@ -349,21 +344,34 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
+	// update joint angle
+	CalculateJointAngles(matrix0, matrix1);
+	const dVector omega(omega0 - omega1);
 
 	if (m_options.m_option3) {
-		dFloat pitchAngle = GetPitch();
+		const dFloat pitchAngle = GetPitch();
 		if ((m_pitch.m_minAngle == 0.0f) && (m_pitch.m_maxAngle == 0.0f)) {
 			NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		} else {
-			if (pitchAngle > m_pitch.m_maxAngle) {
-				NewtonUserJointAddAngularRow(m_joint, m_pitch.m_maxAngle - pitchAngle, &matrix0.m_front[0]);
-				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-			} else if (pitchAngle < m_pitch.m_minAngle) {
-				NewtonUserJointAddAngularRow(m_joint, m_pitch.m_minAngle - pitchAngle, &matrix0.m_front[0]);
+			dFloat jointOmega = omega.DotProduct3(matrix0.m_front);
+			dFloat projectAngle = pitchAngle + jointOmega * timestep;
+			if (projectAngle < m_pitch.m_minAngle) {
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
+				const dFloat speed = 0.5f * (m_pitch.m_minAngle - pitchAngle) * invtimestep;
+				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+				NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			} else if (projectAngle > m_pitch.m_maxAngle) {
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+
+				const dFloat speed = 0.5f * (m_pitch.m_maxAngle - pitchAngle) * invtimestep;
+				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+				NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			}
 		}
 	}
@@ -404,15 +412,5 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 			}
 		}
 	}
-
-/*
-	int freedof = (m_mask & 0x55) + ((m_mask >> 1) & 0x55);
-	freedof = (freedof & 0x33) + ((freedof >> 2) & 0x33);
-	freedof = (freedof & 0x0f) + ((freedof >> 4) & 0xff);
-	if (freedof != 6) {
-		SubmitConstraintsFreeDof(6 - freedof, matrix0, matrix1, timestep, threadIndex);
-	}
-*/
-
 }
 

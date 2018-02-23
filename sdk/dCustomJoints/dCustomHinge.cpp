@@ -288,7 +288,6 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	//m_jointOmega = (omega0 - omega1).DotProduct3(matrix0.m_front);
 	m_jointOmega = matrix0.m_front.DotProduct3(omega0 - omega1);
 
 	// submit the angular rows.

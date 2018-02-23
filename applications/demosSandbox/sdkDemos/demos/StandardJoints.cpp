@@ -268,8 +268,8 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	joint0->SetYawLimits (-yawLimit, yawLimit);
 	joint0->SetPitchLimits(-pitchLimit, pitchLimit);
 	joint0->SetRollLimits(-rollLimit, rollLimit);
-joint0->SetPitchLimits(-0, 0);
-//joint0->DisableRotationX ();
+	//joint0->SetPitchLimits(-0, 0);
+	//joint0->DisableRotationX ();
 
 	// link the two boxes
 	dMatrix matrix1;
@@ -279,8 +279,8 @@ joint0->SetPitchLimits(-0, 0);
 	joint1->SetYawLimits(-yawLimit, yawLimit);
 	joint1->SetRollLimits(-rollLimit, rollLimit);
 	joint1->SetPitchLimits(-pitchLimit, pitchLimit);
-joint1->SetPitchLimits(-0, 0);
-//joint1->DisableRotationX ();
+	//joint1->DisableRotationX();
+
 }
 
 static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin)
