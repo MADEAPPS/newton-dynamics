@@ -128,6 +128,7 @@ typedef long long unsigned64;
 #include <dCustomGear.h>
 #include <dCustomHinge.h>
 #include <dCustomPlane.h>
+#include <dCustomWheel.h>
 #include <dCustomMotor.h>
 #include <dCustomSlider.h>
 #include <dCustomPulley.h>

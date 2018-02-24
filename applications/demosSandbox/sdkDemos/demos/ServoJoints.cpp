@@ -801,11 +801,11 @@ class ServoEntityModel: public DemoEntity
 	}
 
 	InputRecord m_inputs;
-	dCustomHingeActuator* m_angularActuator0;
+	dCustomWheel* m_rearTireJoints[2];
+	dCustomWheel* m_frontTiresJoints[2];
 	dCustomSliderActuator* m_liftJoints[3];
 	dCustomSliderActuator* m_paletteJoints[2];
-	dCustomDoubleHingeActuator* m_rearTireJoints[2];
-	dCustomDoubleHingeActuator* m_frontTiresJoints[2];
+	dCustomHingeActuator* m_angularActuator0;
 };
 
 
@@ -1417,7 +1417,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		return new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 	}
 
-	dCustomDoubleHingeActuator* LinkTireJoint(NewtonBody* const chassis, NewtonBody* const tire)
+	dCustomWheel* LinkTireJoint(NewtonBody* const chassis, NewtonBody* const tire)
 	{
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
@@ -1426,12 +1426,14 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
 		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
 
-		chassisMatrix = dYawMatrix(90.0f * dDegreeToRad) * chassisMatrix;
+		chassisMatrix = dRollMatrix(90.0f * dDegreeToRad) * chassisMatrix;
+		chassisMatrix = dPitchMatrix(90.0f * dDegreeToRad) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
 		dFloat angleLimit = 30.0f * dDegreeToRad;
 		dFloat angularRate = 60.0f * dDegreeToRad;
-		return new dCustomDoubleHingeActuator(&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
+		//return new dCustomWheel(&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
+		return new dCustomWheel(&chassisMatrix[0][0], tire, chassis);
 	}
 
 	void ConnectBodyPart(ServoEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
@@ -1440,7 +1442,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			// this is the root body do nothing
 		} else if (jointArticulation == "frontTire") {
 			//vehicleModel->LinkFrontTire(parent, child, cycleLinks);
-			dCustomDoubleHingeActuator* const tire = LinkTireJoint(parent, child);
+			dCustomWheel* const tire = LinkTireJoint(parent, child);
 			if (!vehicleModel->m_frontTiresJoints[0]) {
 				vehicleModel->m_frontTiresJoints[0] = tire;
 			} else {
@@ -1449,7 +1451,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			}
 
 		} else if (jointArticulation == "rearTire") {
-			dCustomDoubleHingeActuator* const tire = LinkTireJoint(parent, child);
+			dCustomWheel* const tire = LinkTireJoint(parent, child);
 			if (!vehicleModel->m_rearTireJoints[0]) {
 				vehicleModel->m_rearTireJoints[0] = tire;
 			} else {
@@ -1538,7 +1540,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			stackIndex++;
 		}
 
-int xxxx = 0;
 		dList<dCustomJoint*> cycleLinks;
 		while (stackIndex) {
 			stackIndex--;
@@ -1559,9 +1560,6 @@ int xxxx = 0;
 				}
 			}
 
-xxxx++;
-if (xxxx >= 10)
-break;
 			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
 				parentBones[stackIndex] = parentBone;
 				childEntities[stackIndex] = child;
