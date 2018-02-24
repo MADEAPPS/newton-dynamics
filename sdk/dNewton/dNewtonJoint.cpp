@@ -122,34 +122,34 @@ void dNewtonSliderJoint::SetLimits(dFloat minDist, dFloat maxDist)
     ((dCustomSlider*) m_joint)->SetLimits(minDist, maxDist);
 }
 
-dNewtonUniversalJoint::dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+dNewtonDoubleHinge::dNewtonDoubleHinge(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_universal)
 {
-	SetJoint (new dCustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomDoubleHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
-void dNewtonUniversalJoint::EnableLimit_0(bool state)
+void dNewtonDoubleHinge::EnableLimit_0(bool state)
 {
 	dAssert (0);
-//	((dCustomUniversal*) m_joint)->EnableLimit_0(state);
+//	((dCustomDoubleHinge*) m_joint)->EnableLimit_0(state);
 }
 
-void dNewtonUniversalJoint::EnableLimit_1(bool state)
+void dNewtonDoubleHinge::EnableLimit_1(bool state)
 {
 	dAssert (0);
-//	((dCustomUniversal*) m_joint)->EnableLimit_1(state);
+//	((dCustomDoubleHinge*) m_joint)->EnableLimit_1(state);
 }
 
-void dNewtonUniversalJoint::SetLimits_0(dFloat minAngle, dFloat maxAngle)
+void dNewtonDoubleHinge::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (0);
-//	((dCustomUniversal*) m_joint)->SetLimits_0 (minAngle, maxAngle);
+//	((dCustomDoubleHinge*) m_joint)->SetLimits_0 (minAngle, maxAngle);
 }
 
-void dNewtonUniversalJoint::SetLimits_1(dFloat minAngle, dFloat maxAngle)
+void dNewtonDoubleHinge::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (0);
-//	((dCustomUniversal*) m_joint)->SetLimits_1 (minAngle, maxAngle);
+//	((dCustomDoubleHinge*) m_joint)->SetLimits_1 (minAngle, maxAngle);
 }
 
 
