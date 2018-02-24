@@ -1432,8 +1432,10 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 		dFloat angleLimit = 30.0f * dDegreeToRad;
 		dFloat angularRate = 60.0f * dDegreeToRad;
-		//return new dCustomWheel(&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
-		return new dCustomWheel(&chassisMatrix[0][0], tire, chassis);
+		dCustomWheel* const wheel = new dCustomWheel(&chassisMatrix[0][0], tire, chassis);
+		wheel->EnableLimits(true);
+		wheel->SetLimits(0.0f, 0.0f);
+		return wheel;
 	}
 
 	void ConnectBodyPart(ServoEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
