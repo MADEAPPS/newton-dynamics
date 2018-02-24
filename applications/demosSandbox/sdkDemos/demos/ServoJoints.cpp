@@ -1517,6 +1517,8 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		com.m_y -= 0.25f;
 		NewtonBodySetCentreOfMass(rootBody, &com[0]);
 
+NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+
 		// add the root bone to the articulation manager
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
 
@@ -1611,9 +1613,10 @@ void ServoJoints (DemoEntityManager* const scene)
 //	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
 //	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
 */
-	origin.m_x -= 5.0f;
-	origin.m_y += 5.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad);  
+//	origin.m_x -= 5.0f;
+	origin.m_y += 2.0f;
+	origin.m_z -= 4.0f;
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -90.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
 }
 

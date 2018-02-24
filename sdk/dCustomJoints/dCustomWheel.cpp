@@ -9,44 +9,24 @@
 * freely
 */
 
-
-
-// dCustomWheel.cpp: implementation of the dCustomWheel class.
-//
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomWheel.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_CUSTOM_JOINT(dCustomWheel);
 
-
 dCustomWheel::dCustomWheel(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
 	:dCustomSlidingContact(pinAndPivotFrame, child, parent)
-//	,m_curJointAngle()
-//	,m_minAngle(-45.0f * dDegreeToRad)
-//	,m_maxAngle(45.0f * dDegreeToRad)
-//	,m_angularFriction(0.0f)
-//	,m_angularOmega(0.0f)
-//	,m_angularSpring(0.0f)
-//	,m_angularDamper(0.0f)
-//	,m_angularSpringDamperRelaxation(0.9f)
+	,m_steerAngle(0.0f)
+	,m_steerSpeed(60.0f * dDegreeToRad)
 {
 }
 
 dCustomWheel::dCustomWheel(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomSlidingContact(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
-//	,m_curJointAngle()
-//	,m_minAngle(-45.0f * dDegreeToRad)
-//	,m_maxAngle(45.0f * dDegreeToRad)
-//	,m_angularFriction(0.0f)
-//	,m_angularOmega(0.0f)
-//	,m_angularSpring(0.0f)
-//	,m_angularDamper(0.0f)
-//	,m_angularSpringDamperRelaxation(0.9f)
+	,m_steerAngle(0.0f)
+	,m_steerSpeed(60.0f * dDegreeToRad)
 {
 }
 
@@ -56,28 +36,16 @@ dCustomWheel::~dCustomWheel()
 
 void dCustomWheel::Deserialize(NewtonDeserializeCallback callback, void* const userData)
 {
-//	callback(userData, &m_curJointAngle, sizeof(dAngularIntegration));
-//	callback(userData, &m_minAngle, sizeof(dFloat));
-//	callback(userData, &m_maxAngle, sizeof(dFloat));
-//	callback(userData, &m_angularFriction, sizeof(dFloat));
-//	callback(userData, &m_angularOmega, sizeof(dFloat));
-//	callback(userData, &m_angularSpring, sizeof(dFloat));
-//	callback(userData, &m_angularDamper, sizeof(dFloat));
-//	callback(userData, &m_angularSpringDamperRelaxation, sizeof(dFloat));
+	callback(userData, &m_steerAngle, sizeof(dFloat));
+	callback(userData, &m_steerSpeed, sizeof(dFloat));
 }
 
 void dCustomWheel::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomSlidingContact::Serialize(callback, userData);
 
-//	callback(userData, &m_curJointAngle, sizeof(dAngularIntegration));
-//	callback(userData, &m_minAngle, sizeof(dFloat));
-//	callback(userData, &m_maxAngle, sizeof(dFloat));
-//	callback(userData, &m_angularFriction, sizeof(dFloat));
-//	callback(userData, &m_angularOmega, sizeof(dFloat));
-//	callback(userData, &m_angularSpring, sizeof(dFloat));
-//	callback(userData, &m_angularDamper, sizeof(dFloat));
-//	callback(userData, &m_angularSpringDamperRelaxation, sizeof(dFloat));
+	callback(userData, &m_steerAngle, sizeof(dFloat));
+	callback(userData, &m_steerSpeed, sizeof(dFloat));
 }
 
 /*
@@ -255,4 +223,48 @@ void dCustomWheel::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 */
+}
+
+void dCustomWheel::SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+	dVector euler0;
+	dVector euler1;
+	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
+	rollPin = matrix1.RotateVector(rollPin);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix0[0][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	
+	m_curJointAngle.Update(euler0.m_y);
+
+return;
+	const dFloat invTimeStep = 1.0f / timestep;
+	const dFloat tol = m_steerSpeed * timestep;
+	const dFloat angle = euler0.m_x;
+
+m_steerAngle = 30.0f * dDegreeToRad;
+
+	dFloat currentSpeed = 0.0f;
+	if (angle > (m_steerAngle + tol)) {
+		currentSpeed = -m_steerSpeed;
+		dFloat predictAngle = angle + currentSpeed * timestep;
+		if (predictAngle < m_steerAngle) {
+			currentSpeed = 0.5f * (m_steerAngle - angle) * invTimeStep;
+		}
+	} else if (angle < (m_steerAngle - tol)) {
+		currentSpeed = m_steerSpeed;
+		dFloat predictAngle = angle + currentSpeed * timestep;
+		if (predictAngle > m_steerAngle) {
+			currentSpeed = 0.5f * (m_steerAngle - angle) * invTimeStep;
+		}
+	}
+	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	NewtonUserJointSetRowAcceleration(m_joint, accel);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }

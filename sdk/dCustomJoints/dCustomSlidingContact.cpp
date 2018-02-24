@@ -167,7 +167,7 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 	}
 }
 
-void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+void dCustomSlidingContact::SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
@@ -184,7 +184,10 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(euler0.m_y);
+}
 
+void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
 	// save the current joint Omega
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
@@ -194,6 +197,7 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	}
 	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1[1]);
 
+	SubmitAnglarStructuralRows(matrix0, matrix1, timestep);
 
 	if (m_options.m_option2) {
 		if (m_options.m_option3) {

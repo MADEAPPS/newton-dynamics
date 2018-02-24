@@ -37,6 +37,8 @@ class dCustomSlidingContact: public dCustomSlider
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
+	CUSTOM_JOINTS_API virtual void SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+
 	void SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);

@@ -248,7 +248,6 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
 
 	SubmitLinearRows(0x06, matrix0, matrix1);
-
 	SubmitAngularRow(matrix0, matrix1, timestep);
 
 	if (m_options.m_option0) {
