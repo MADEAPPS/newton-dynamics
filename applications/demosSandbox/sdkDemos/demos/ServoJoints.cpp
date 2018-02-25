@@ -62,409 +62,12 @@ static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 #if 0
 class ServoEntityModel: public DemoEntity
 {
-	public:
-
-	class InputRecord
-	{
-		public:
-		InputRecord()
-		{
-			memset (this, 0, sizeof (InputRecord));
-		}
-
-		dFloat m_slideValue;
-		dFloat m_turnValue;
-		dFloat m_liftValue;
-		int m_openValue;
-		int m_wristAxis0;
-		int m_wristAxis1;
-		int m_steerValue;
-		int m_throttleValue;
-	};
-
-	void SetInput (const InputRecord& inputs)
-	{
-		m_inputs = inputs;
-	}
-
-	int m_rearTiresCount;
-	int m_tractionTiresCount;
-	int m_liftActuatorsCount;
-	int m_universalActuatorsCount;
-	int m_paletteActuatorsCount;
-	dFloat m_maxEngineTorque;
-	dFloat m_maxEngineSpeed;
-	dFloat m_maxTurmVelocity;
-	dFloat m_tiltAngle;
-	dFloat m_liftPosit;
-	dFloat m_openPosit;
-	dFloat m_steeringTorque;
-	dFloat m_wristAxis0;
-	dFloat m_wristAxis1;
-
 	dCustomMotor2* m_engineMotor;
 	dCustomUniversal* m_engineJoint;
-	InputRecord m_inputs;
 };
 
 class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 {
-	public:
-
-	ServoVehicleManagerManager (DemoEntityManager* const scene)
-		:dCustomArticulaledTransformManager (scene->GetNewton())
-	{
-		// create a material for early collision culling
-		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-		NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
-		NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), material, material, CompoundSubCollisionAABBOverlap);
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
-	}
-
-	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
-	{
-	}
-
-	virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
-	{
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*)controller->GetUserData();
-
-		if (vehicleModel->m_engineJoint) {
-			dFloat brakeTorque = 2000.0f;
-			//dFloat engineTorque = 0.0f;
-			dFloat engineRPM = 0.0f;
-			if (vehicleModel->m_inputs.m_throttleValue > 0) {
-				brakeTorque = 0.0f;
-				engineRPM = -vehicleModel->m_maxEngineSpeed;
-			} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
-				brakeTorque = 0.0f;
-				engineRPM = vehicleModel->m_maxEngineSpeed;
-			}
-
-			// apply DC engine torque
-			vehicleModel->m_engineMotor->SetSpeed1(engineRPM);
-
-			if (!vehicleModel->m_rearTiresCount) {
-				// apply DC rate turn Motor 
-				if (vehicleModel->m_inputs.m_steerValue > 0) {
-					brakeTorque = 0.0f;
-					vehicleModel->m_engineMotor->SetSpeed(vehicleModel->m_maxTurmVelocity);
-				} else if (vehicleModel->m_inputs.m_steerValue < 0){
-					brakeTorque = 0.0f;
-					vehicleModel->m_engineMotor->SetSpeed(-vehicleModel->m_maxTurmVelocity);
-				} else {
-					vehicleModel->m_engineMotor->SetSpeed(0.0f);
-				}
-			}
-
-			// apply breaks
-			for (int i = 0; i < vehicleModel->m_tractionTiresCount; i ++) {
-				vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
-			}
-		}
-		
-		// update steering wheels
-		if (vehicleModel->m_rearTiresCount) {
-			dAssert (0);
-/*
-			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetJointAngle_1();
-			if (vehicleModel->m_inputs.m_steerValue > 0) {
-				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit_1();
-			} else if (vehicleModel->m_inputs.m_steerValue < 0) {
-				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit_1();
-			}
-			for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
-				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
-			}
-*/
-		}
-
-		// set the base turn angle
-		vehicleModel->m_angularActuator1->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
-
-
-		// set the tilt angle
-/*
-		dFloat tiltAngle = vehicleModel->m_tiltAngle;
-		if (vehicleModel->m_inputs.m_liftValue > 0) {
-			tiltAngle = vehicleModel->m_angularActuator0[0]->GetMinAngularLimit();
-			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
-		} else if (vehicleModel->m_inputs.m_liftValue < 0) {
-			tiltAngle = vehicleModel->m_angularActuator0[0]->GetMaxAngularLimit();
-			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
-		}
-
-		for (int i = 0; i < vehicleModel->m_angularActuatorsCount0; i ++) {
-			vehicleModel->m_angularActuator0[i]->SetTargetAngle (tiltAngle);
-		}
-*/
-
-
-		vehicleModel->m_angularActuator0->SetTargetAngle(vehicleModel->m_inputs.m_liftValue);
-
-
-		// set the lift position
-//		if (vehicleModel->m_liftActuatorsCount) 
-		{
-/*
-			dFloat liftPosit = vehicleModel->m_liftPosit;
-			if (vehicleModel->m_inputs.m_liftValue > 0) {
-				liftPosit = vehicleModel->m_liftJoints[0]->GetMinPositLimit();
-				vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
-			} else if (vehicleModel->m_inputs.m_liftValue < 0) {
-				liftPosit = vehicleModel->m_liftJoints[0]->GetMaxPositLimit();
-				vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
-			}
-			for (int i = 0; i < vehicleModel->m_liftActuatorsCount; i ++) {
-				vehicleModel->m_liftJoints[i]->SetTargetPosit(liftPosit);
-			}
-*/
-		}
-
-		vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
-		vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
-		
-
-		// open Close palette position
-		if (vehicleModel->m_paletteActuatorsCount) {
-			dFloat openPosit = vehicleModel->m_openPosit;
-			if (vehicleModel->m_inputs.m_openValue > 0) {
-				openPosit = vehicleModel->m_paletteJoints[0]->GetMinPositLimit();
-				vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
-			} else if (vehicleModel->m_inputs.m_openValue < 0) {
-				openPosit = vehicleModel->m_paletteJoints[0]->GetMaxPositLimit();
-				vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
-			}
-			for (int i = 0; i < vehicleModel->m_paletteActuatorsCount; i ++) {
-				vehicleModel->m_paletteJoints[i]->SetTargetPosit(openPosit);
-			}
-		}
-
-		// open Close palette position
-		if (vehicleModel->m_universalActuatorsCount) {
-			dAssert (0);
-/*
-			dFloat posit0 = vehicleModel->m_wristAxis0;
-			if (vehicleModel->m_inputs.m_wristAxis0 > 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_0();
-				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_0();
-			} else if (vehicleModel->m_inputs.m_wristAxis0 < 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_0();
-				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
-			}
-
-			dFloat posit1 = vehicleModel->m_wristAxis1;
-			if (vehicleModel->m_inputs.m_wristAxis1 > 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_1();
-				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
-			} else if (vehicleModel->m_inputs.m_wristAxis1 < 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_1();
-				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
-			}
-
-			for (int i = 0; i < vehicleModel->m_universalActuatorsCount; i ++) {
-				vehicleModel->m_universalActuator[i]->SetTargetAngle0(posit0);
-				vehicleModel->m_universalActuator[i]->SetTargetAngle1(posit1);
-			}
-*/
-		}
-	}
-
-	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
-	{
-		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		SERVO_VEHICLE_DEFINITION::SHAPES_ID id0 = SERVO_VEHICLE_DEFINITION::SHAPES_ID (NewtonCollisionGetUserID(collision0));
-		SERVO_VEHICLE_DEFINITION::SHAPES_ID id1 = SERVO_VEHICLE_DEFINITION::SHAPES_ID (NewtonCollisionGetUserID(collision1));
-		dAssert(id0 != SERVO_VEHICLE_DEFINITION::m_tireInnerRing);
-		dAssert(id1 != SERVO_VEHICLE_DEFINITION::m_tireInnerRing);
-
-		switch (id0 | id1)
-		{
-			case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_tirePart:
-			{
-				return 0;
-				break;
-			}
-
-			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_landPart:
-			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_terrain:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_landPart:
-			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_landPart:
-			{
-				return 1;
-				break;
-			}
-			default:
-			{
-				dAssert (0);
-				return 1;
-			}
-		}
-	}
-
-	static int CompoundSubCollisionAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
-	{
-		dAssert(collisionNode0);
-		NewtonCollision* const collision0 = NewtonCompoundCollisionGetCollisionFromNode (NewtonBodyGetCollision(body0), collisionNode0);
-		NewtonCollision* const collision1 = collisionNode1 ? NewtonCompoundCollisionGetCollisionFromNode(NewtonBodyGetCollision(body1), collisionNode1) : NewtonBodyGetCollision(body1);
-
-		SERVO_VEHICLE_DEFINITION::SHAPES_ID id0 = SERVO_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision0));
-		SERVO_VEHICLE_DEFINITION::SHAPES_ID id1 = SERVO_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision1));
-//		dAssert(id0 != SERVO_VEHICLE_DEFINITION::m_tireInnerRing);
-//		dAssert(id1 != SERVO_VEHICLE_DEFINITION::m_tireInnerRing);
-
-		switch (id0 | id1)
-		{
-			//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_linkPart:			
-			//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_tireInnerRing:
-			//case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_tireInnerRing:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_terrain:
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_landPart:
-			case SERVO_VEHICLE_DEFINITION::m_tireInnerRing | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			{
-				return 1;
-				break;
-			}
-
-			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-			case SERVO_VEHICLE_DEFINITION::m_tireInnerRing | SERVO_VEHICLE_DEFINITION::m_landPart:
-			case SERVO_VEHICLE_DEFINITION::m_tireInnerRing | SERVO_VEHICLE_DEFINITION::m_terrain:
-			{
-				return 0;
-				break;
-			}
-			default:
-			{
-				dAssert(0);
-				return 0;
-			}
-		}
-	}
-	
-	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
-	{
-		int countCount = 0;
-		void* contactList[32];
-
-		for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-			contactList[countCount] = contact;
-			countCount++;
-		}
-
-		NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
-		NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-		for (int i = 0; i < countCount; i ++) {
-			NewtonMaterial* const material = NewtonContactGetMaterial (contactList[i]);
-			NewtonCollision* const collision0 = NewtonMaterialGetBodyCollidingShape(material, body0);
-			NewtonCollision* const collision1 = NewtonMaterialGetBodyCollidingShape(material, body1);
-
-			SERVO_VEHICLE_DEFINITION::SHAPES_ID id0 = SERVO_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision0));
-			SERVO_VEHICLE_DEFINITION::SHAPES_ID id1 = SERVO_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision1));
-
-			switch (id0 | id1) 
-			{
-				//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_tireInnerRing:
-				//case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_tirePart:
-//				{
-//					NewtonContactJointRemoveContact(contactJoint, contactList[i]);
-//					break;
-//				}
-				
-				case SERVO_VEHICLE_DEFINITION::m_bodyPart | SERVO_VEHICLE_DEFINITION::m_terrain:
-				case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_terrain:
-				case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-				case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_terrain:
-				case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_tireInnerRing:
-				case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_tirePart:
-				case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
-				case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
-				case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_terrain:
-				case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_landPart:
-				{
-					break;
-				}
-				default:
-				{
-					dAssert(0);
-				}
-			}
-		}
-
-
-//dAssert (0);
-/*
-		if (linkBody && !tireBody) {
-			// find the root body from the articulated structure 
-			NewtonCollision* const linkCollision = NewtonBodyGetCollision(linkBody);
-			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollision);
-			dCustomArticulatedTransformController* const controller = rootbone->m_controller;
-			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
-
-			int countCount = 0;
-			void* contactList[32];
-			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-				contactList[countCount] = contact;
-				countCount ++;
-			}
-
-			for (int i = 1; i < countCount; i++) {
-				NewtonContactJointRemoveContact(contactJoint, contactList[i]);
-			}
-
-			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
-			NewtonBodyGetMatrix(linkBody, &tireMatrix[0][0]);
-			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
-			dVector upDir(chassisMatrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
-			dVector tireAxis(tireMatrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
-			dVector contactDirection(upDir.CrossProduct(tireAxis));
-
-			NewtonMaterial* const material = NewtonContactGetMaterial(contactList[0]);
-			NewtonMaterialContactRotateTangentDirections(material, &contactDirection[0]);
-			NewtonMaterialSetContactFrictionCoef(material, 0.5f, 0.5f, 0);
-			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-
-		} else if (tireBody) {
-
-			// find the root body from the articulated structure 
-			NewtonCollision* const tireCollsion = NewtonBodyGetCollision(tireBody);
-			const dCustomArticulatedTransformController::dSkeletonBone* const bone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (tireCollsion);
-
-			dCustomArticulatedTransformController* const controller = bone->m_controller;
-			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = controller->GetParent(bone);
-			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
-
-			// Get the root and tire matrices
-			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
-			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
-			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
-
-			dVector upDir (chassisMatrix.RotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
-			dVector tireAxis (tireMatrix.RotateVector(dVector (1.0f, 0.0f, 0.0f, 0.0f)));
-
-			dVector contactDirection (upDir.CrossProduct(tireAxis));
-			for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
-				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
-				NewtonMaterialContactRotateTangentDirections (material, &contactDirection[0]);
-				NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 0);
-				NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 1);
-			}
-		}
-*/
-	}
-	
 	dCustomArticulatedTransformController::dSkeletonBone* CreateEngineNode(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const chassisBone)
 	{
 		NewtonWorld* const world = GetWorld();
@@ -519,159 +122,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
 	}
-};
-
-
-// we recommend using and input manage to control input for all games
-class ServoInputManager: public dCustomInputManager
-{
-	public:
-	ServoInputManager (DemoEntityManager* const scene)
-		:dCustomInputManager(scene->GetNewton())
-		,m_scene(scene)
-		,m_cameraMode(true)
-		,m_changeVehicle(true)
-		,m_playersCount(0)
-		,m_currentPlayer(0)
-		,m_liftboom(0.0f) 
-		,m_slideboom(0.0f) 
-		,m_rotatebase(0.0f)
-	{
-		// plug a callback for 2d help display
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
-		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-	}
-
-	void OnBeginUpdate (dFloat timestepInSecunds)
-	{
-		ServoEntityModel::InputRecord inputs;
-
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
-
-		inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
-		inputs.m_wristAxis1 = int(m_scene->GetKeyState('I')) - int(m_scene->GetKeyState('O'));
-		inputs.m_openValue = int (m_scene->GetKeyState ('F')) - int (m_scene->GetKeyState ('G'));
-		inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
-		inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
-
-		inputs.m_slideValue = m_slideboom;
-		inputs.m_liftValue = m_liftboom * dDegreeToRad;
-		inputs.m_turnValue = m_rotatebase * dDegreeToRad;
-
-		// check if we must activate the player
-		if (m_needsWakeUp ||
-			m_scene->GetKeyState ('A') || 
-			m_scene->GetKeyState ('D') ||
-			m_scene->GetKeyState ('W') ||
-			m_scene->GetKeyState ('S'))
-		{
-			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
-			NewtonBodySetSleepState(body, false);
-		}
-
-#if 0
-	#if 0
-			static FILE* file = fopen ("log.bin", "wb");
-			if (file) {
-				fwrite (&inputs, sizeof (inputs), 1, file);
-				fflush(file);
-			}
-	#else 
-			static FILE* file = fopen ("log.bin", "rb");
-			if (file) {
-				fread (&inputs, sizeof (inputs), 1, file);
-			}
-	#endif
-#endif
-		vehicleModel->SetInput (inputs);
-	}
-
-	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
-	{
-		ServoInputManager* const me = (ServoInputManager*)context;
-		me->UpdateCamera(timestep);
-	}
-
-	void UpdateCamera (dFloat timestepInSecunds)
-	{
-		DemoCamera* const camera = m_scene->GetCamera();
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
-
-		if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState ('P'))) {
-			m_currentPlayer ++;
-		}
-		
-		dMatrix camMatrix(camera->GetNextMatrix());
-		dMatrix playerMatrix (vehicleModel->GetNextMatrix());
-
-		dVector frontDir (camMatrix[0]);
-		dVector camOrigin(0.0f); 
-		m_cameraMode.UpdatePushButton(m_scene->GetKeyState('C'));
-		if (m_cameraMode.GetPushButtonState()) {
-			camOrigin = playerMatrix.TransformVector( dVector(0.0f, SERVO_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
-			camOrigin -= frontDir.Scale(SERVO_VEHICLE_CAMERA_DISTANCE);
-		} else {
-			camMatrix = camMatrix * playerMatrix;
-			camOrigin = playerMatrix.TransformVector(dVector(-0.8f, SERVO_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
-		}
-
-		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
-	}
-
-	void OnEndUpdate (dFloat timestepInSecunds)
-	{
-	}
-
-	void AddPlayer(dCustomArticulatedTransformController* const player)
-	{
-		m_player[m_playersCount] = player;
-		m_playersCount ++;
-	}
-
-	void RenderPlayerHelp (DemoEntityManager* const scene)
-	{
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print (color, "Navigation Keys");
-		scene->Print (color, "drive forward:      W");
-		scene->Print (color, "drive backward:     S");
-		scene->Print (color, "turn right:         D");
-		scene->Print (color, "turn left:          A");
-
-		m_needsWakeUp = false;
-		m_needsWakeUp = ImGui::SliderFloat("BoomSlide", &m_slideboom, 0.0f, 3.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("BoomLift", &m_liftboom, -180.0f, 180.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("RotateBase", &m_rotatebase, -180.0f, 180.0f) || m_needsWakeUp;
-		
-
-		//scene->Print (color, "open palette:       F");
-		//scene->Print (color, "close palette       G");
-		//scene->Print (color, "lift palette:       E");
-		//scene->Print (color, "lower palette       Q");
-		//scene->Print (color, "tilt forward:       Z");
-		//scene->Print (color, "tilt backward:      X");
-		//scene->Print (color, "turn base left:     R");
-		//scene->Print (color, "turn base right:    T");
-		//scene->Print (color, "toggle camera mode: C");
-		//scene->Print (color, "switch vehicle:     P");
-	}				
-
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
-	{
-		ServoInputManager* const me = (ServoInputManager*) context;
-		me->RenderPlayerHelp (scene);
-	}
-
-
-	DemoEntityManager* m_scene;
-	dCustomArticulatedTransformController* m_player[2];
-	DemoEntityManager::ButtonKey m_cameraMode;
-	DemoEntityManager::ButtonKey m_changeVehicle;
-	int m_playersCount;
-	int m_currentPlayer;
-	bool m_needsWakeUp;
-	dFloat32 m_liftboom; 
-	dFloat32 m_slideboom; 
-	dFloat32 m_rotatebase; 
 };
 
 static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity& entity, const dVector& location)
@@ -743,18 +193,16 @@ class ServoEntityModel: public DemoEntity
 
 		//dFloat m_slideValue;
 		//dFloat m_turnValue;
-		//dFloat m_liftValue;
-		//int m_openValue;
-		//int m_wristAxis0;
-		//int m_wristAxis1;
+		dFloat m_liftValue;
+		dFloat m_forkValue;
 		int m_steerValue;
-		//int m_throttleValue;
+		int m_throttleValue;
 	};
 
 	ServoEntityModel(DemoEntityManager* const scene, const char* const name)
 		:DemoEntity(dGetIdentityMatrix(), NULL)
 		,m_inputs()
-		,m_angularActuator0(NULL)
+		,m_forkBase(NULL)
 	{
 		m_liftJoints[0] = NULL;
 		m_liftJoints[1] = NULL;
@@ -772,7 +220,7 @@ class ServoEntityModel: public DemoEntity
 	ServoEntityModel(const ServoEntityModel& copy)
 		:DemoEntity(copy)
 		,m_inputs()
-		,m_angularActuator0(NULL)
+		,m_forkBase(NULL)
 	{
 		m_liftJoints[0] = NULL;
 		m_liftJoints[1] = NULL;
@@ -796,11 +244,11 @@ class ServoEntityModel: public DemoEntity
 	}
 
 	InputRecord m_inputs;
+	dCustomHingeActuator* m_forkBase;
 	dCustomWheel* m_rearTireJoints[2];
 	dCustomWheel* m_frontTiresJoints[2];
 	dCustomSliderActuator* m_liftJoints[3];
 	dCustomSliderActuator* m_paletteJoints[2];
-	dCustomHingeActuator* m_angularActuator0;
 };
 
 
@@ -814,9 +262,8 @@ class ServoInputManager: public dCustomInputManager
 		,m_changeVehicle(true)
 		,m_playersCount(0)
 		,m_currentPlayer(0)
-//		,m_liftboom(0.0f)
-//		,m_slideboom(0.0f)
-//		,m_rotatebase(0.0f)
+		,m_forkAngle(0.0f)
+		,m_listPosit(0.0f)
 	{
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
@@ -828,15 +275,11 @@ class ServoInputManager: public dCustomInputManager
 		ServoEntityModel::InputRecord inputs;
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
-		//inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
-		//inputs.m_wristAxis1 = int(m_scene->GetKeyState('I')) - int(m_scene->GetKeyState('O'));
-		//inputs.m_openValue = int(m_scene->GetKeyState('F')) - int(m_scene->GetKeyState('G'));
 		inputs.m_steerValue = int(m_scene->GetKeyState('D')) - int(m_scene->GetKeyState('A'));
-		//inputs.m_throttleValue = int(m_scene->GetKeyState('W')) - int(m_scene->GetKeyState('S'));
+		inputs.m_throttleValue = int(m_scene->GetKeyState('W')) - int(m_scene->GetKeyState('S'));
 
-		//inputs.m_slideValue = m_slideboom;
-		//inputs.m_liftValue = m_liftboom * dDegreeToRad;
-		//inputs.m_turnValue = m_rotatebase * dDegreeToRad;
+		inputs.m_liftValue = m_listPosit;
+		inputs.m_forkValue = m_forkAngle * dDegreeToRad;
 
 		// check if we must activate the player
 		if (m_needsWakeUp ||
@@ -921,8 +364,9 @@ class ServoInputManager: public dCustomInputManager
 		scene->Print(color, "turn left:          A");
 
 		m_needsWakeUp = false;
-		//m_needsWakeUp = ImGui::SliderFloat("BoomSlide", &m_slideboom, 0.0f, 3.0f) || m_needsWakeUp;
-		//m_needsWakeUp = ImGui::SliderFloat("BoomLift", &m_liftboom, -180.0f, 180.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("forkLift", &m_listPosit, -0.5f, 1.5f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("forkAngle", &m_forkAngle, -30.0f, 30.0f) || m_needsWakeUp;
+		
 		//m_needsWakeUp = ImGui::SliderFloat("RotateBase", &m_rotatebase, -180.0f, 180.0f) || m_needsWakeUp;
 	}
 
@@ -940,8 +384,8 @@ class ServoInputManager: public dCustomInputManager
 	int m_playersCount;
 	int m_currentPlayer;
 	bool m_needsWakeUp;
-//	dFloat32 m_liftboom;
-//	dFloat32 m_slideboom;
+	dFloat32 m_forkAngle;
+	dFloat32 m_listPosit;
 //	dFloat32 m_rotatebase;
 };
 
@@ -1164,53 +608,13 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		vehicleModel->m_rearTireJoints[0]->SetTargetSteerAngle(steeringAngle);
 		vehicleModel->m_rearTireJoints[1]->SetTargetSteerAngle(steeringAngle);
 
-#if 0
-		// set the base turn angle
-//		vehicleModel->m_angularActuator1->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
 
-		// set the tilt angle
-/*
-		dFloat tiltAngle = vehicleModel->m_tiltAngle;
-		if (vehicleModel->m_inputs.m_liftValue > 0) {
-			tiltAngle = vehicleModel->m_angularActuator0[0]->GetMinAngularLimit();
-			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
-		} else if (vehicleModel->m_inputs.m_liftValue < 0) {
-			tiltAngle = vehicleModel->m_angularActuator0[0]->GetMaxAngularLimit();
-			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator0[0]->GetActuatorAngle();
-		}
-
-		for (int i = 0; i < vehicleModel->m_angularActuatorsCount0; i ++) {
-			vehicleModel->m_angularActuator0[i]->SetTargetAngle (tiltAngle);
-		}
-*/
-
-
-
-		vehicleModel->m_angularActuator0->SetTargetAngle(vehicleModel->m_inputs.m_liftValue);
-
-
-		// set the lift position
-//		if (vehicleModel->m_liftActuatorsCount) 
-		{
-/*
-			dFloat liftPosit = vehicleModel->m_liftPosit;
-			if (vehicleModel->m_inputs.m_liftValue > 0) {
-				liftPosit = vehicleModel->m_liftJoints[0]->GetMinPositLimit();
-				vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
-			} else if (vehicleModel->m_inputs.m_liftValue < 0) {
-				liftPosit = vehicleModel->m_liftJoints[0]->GetMaxPositLimit();
-				vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
-			}
-			for (int i = 0; i < vehicleModel->m_liftActuatorsCount; i ++) {
-				vehicleModel->m_liftJoints[i]->SetTargetPosit(liftPosit);
-			}
-*/
-		}
-
-		vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
-		vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
+		vehicleModel->m_forkBase->SetTargetAngle(vehicleModel->m_inputs.m_forkValue);
+		vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_liftValue);
+		vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_liftValue);
+		vehicleModel->m_liftJoints[2]->SetTargetPosit(vehicleModel->m_inputs.m_liftValue);
 		
-
+#if 0
 		// open Close palette position
 		if (vehicleModel->m_paletteActuatorsCount) {
 			dFloat openPosit = vehicleModel->m_openPosit;
@@ -1302,7 +706,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		oririn.m_posit.m_w = 1.0f;
 		maxExtend -= minExtend;
 
-		oririn.m_posit.m_y -= maxExtend.m_y * 0.5f;
+		oririn.m_posit.m_y -= maxExtend.m_y * 0.43f;
 		maxExtend.m_y *= 0.125f;
 		return NewtonCreateBox(GetWorld(), maxExtend.m_x, maxExtend.m_y, maxExtend.m_z, SERVO_VEHICLE_DEFINITION::m_bodyPart, &oririn[0][0]);
 	}
@@ -1376,7 +780,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 		dFloat minAngleLimit = -20.0f * dDegreeToRad;
 		dFloat maxAngleLimit =  20.0f * dDegreeToRad;
-		dFloat angularRate = 10.0f * dDegreeToRad;
+		dFloat angularRate = 20.0f * dDegreeToRad;
 		return new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
 	}
 
@@ -1387,7 +791,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 		dFloat minLimit = -0.25f;
 		dFloat maxLimit = 1.5f;
-		dFloat linearRate = 0.125f;
+		dFloat linearRate = 0.25f;
 		return new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 	}
 
@@ -1447,7 +851,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 				vehicleModel->m_rearTireJoints[1] = tire;
 			}
 		} else if (jointArticulation == "hingeActuator") {
-			vehicleModel->m_angularActuator0 = LinkHingeActuator(parent, child);
+			vehicleModel->m_forkBase = LinkHingeActuator(parent, child);
 		} else if (jointArticulation == "liftActuator") {
 			dCustomSliderActuator* const lift = LinkLiftActuator(parent, child);;
 			if (!vehicleModel->m_liftJoints[0]) {
