@@ -87,6 +87,8 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const l
 NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramter, dVector& positionOut, dVector& normalOut);
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalScale, dFloat timestep);
 
+void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location, int shapeid);
+
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
 
 #endif

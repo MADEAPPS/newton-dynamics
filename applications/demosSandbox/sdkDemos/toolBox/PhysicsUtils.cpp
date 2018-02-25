@@ -1162,8 +1162,6 @@ NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, c
 	return body;
 }
 
-
-
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const name, bool optimized)
 {
 	// load the scene from a ngd file format
@@ -1268,4 +1266,62 @@ NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, con
 		paramterOut = rayCast.m_param;
 	}
 	return (NewtonBody*) rayCast.m_body;
+}
+
+
+void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location, int shapeid)
+{
+	DemoEntity entity (dGetIdentityMatrix(), NULL);
+	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
+
+	dTree<NewtonCollision*, DemoMesh*> filter;
+	NewtonWorld* const world = scene->GetNewton();
+
+	dFloat density = 15.0f;
+
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	for (DemoEntity* child = entity.GetFirst(); child; child = child->GetNext()) {
+		DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+		if (mesh) {
+			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+			dTree<NewtonCollision*, DemoMesh*>::dTreeNode* node = filter.Find(mesh);
+			if (!node) {
+				// make a collision shape only for and instance
+				dFloat* const array = mesh->m_vertex;
+				dVector minBox(1.0e10f, 1.0e10f, 1.0e10f, 1.0f);
+				dVector maxBox(-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
+
+				for (int i = 0; i < mesh->m_vertexCount; i++) {
+					dVector p(array[i * 3 + 0], array[i * 3 + 1], array[i * 3 + 2], 1.0f);
+					minBox.m_x = dMin(p.m_x, minBox.m_x);
+					minBox.m_y = dMin(p.m_y, minBox.m_y);
+					minBox.m_z = dMin(p.m_z, minBox.m_z);
+
+					maxBox.m_x = dMax(p.m_x, maxBox.m_x);
+					maxBox.m_y = dMax(p.m_y, maxBox.m_y);
+					maxBox.m_z = dMax(p.m_z, maxBox.m_z);
+				}
+
+				dVector size(maxBox - minBox);
+				dMatrix offset(dGetIdentityMatrix());
+				offset.m_posit = (maxBox + minBox).Scale(0.5f);
+				NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, shapeid, &offset[0][0]);
+				node = filter.Insert(shape, mesh);
+			}
+
+			// create a body and add to the world
+			NewtonCollision* const shape = node->GetInfo();
+			dMatrix matrix(child->GetMeshMatrix() * child->CalculateGlobalMatrix());
+			matrix.m_posit += location;
+			dFloat mass = density * NewtonConvexCollisionCalculateVolume(shape);
+			CreateSimpleSolid(scene, mesh, mass, matrix, shape, defaultMaterialID);
+		}
+	}
+
+	// destroy all shapes
+	while (filter.GetRoot()) {
+		NewtonCollision* const shape = filter.GetRoot()->GetInfo();
+		NewtonDestroyCollision(shape);
+		filter.Remove(filter.GetRoot());
+	}
 }
