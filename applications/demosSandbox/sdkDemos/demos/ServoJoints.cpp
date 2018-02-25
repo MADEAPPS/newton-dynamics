@@ -22,8 +22,7 @@
 
 #define SERVO_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define SERVO_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
-//#define SERVO_VEHICLE_CAMERA_DISTANCE			7.0f
-#define SERVO_VEHICLE_CAMERA_DISTANCE			10.0f
+#define SERVO_VEHICLE_CAMERA_DISTANCE			7.0f
 
 struct SERVO_VEHICLE_DEFINITION
 {
@@ -35,7 +34,6 @@ struct SERVO_VEHICLE_DEFINITION
 		m_linkPart		= 1<<3,
 		m_tirePart		= 1<<4,
 		m_tireInnerRing = 1<<5,
-		
 	};
 
 	char m_boneName[32];
@@ -83,9 +81,6 @@ class ServoEntityModel: public DemoEntity
 		int m_steerValue;
 		int m_throttleValue;
 	};
-
-
-
 
 	void SetInput (const InputRecord& inputs)
 	{
@@ -752,7 +747,7 @@ class ServoEntityModel: public DemoEntity
 		//int m_openValue;
 		//int m_wristAxis0;
 		//int m_wristAxis1;
-		//int m_steerValue;
+		int m_steerValue;
 		//int m_throttleValue;
 	};
 
@@ -836,7 +831,7 @@ class ServoInputManager: public dCustomInputManager
 		//inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
 		//inputs.m_wristAxis1 = int(m_scene->GetKeyState('I')) - int(m_scene->GetKeyState('O'));
 		//inputs.m_openValue = int(m_scene->GetKeyState('F')) - int(m_scene->GetKeyState('G'));
-		//inputs.m_steerValue = int(m_scene->GetKeyState('D')) - int(m_scene->GetKeyState('A'));
+		inputs.m_steerValue = int(m_scene->GetKeyState('D')) - int(m_scene->GetKeyState('A'));
 		//inputs.m_throttleValue = int(m_scene->GetKeyState('W')) - int(m_scene->GetKeyState('S'));
 
 		//inputs.m_slideValue = m_slideboom;
@@ -878,12 +873,12 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
-		if (!m_currentPlayer) {
-			return;
-		}
-
 		DemoCamera* const camera = m_scene->GetCamera();
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
+
+		//if (!m_currentPlayer) {
+		//	return;
+		//}
 
 		if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState('P'))) {
 			m_currentPlayer++;
@@ -898,8 +893,7 @@ class ServoInputManager: public dCustomInputManager
 		if (m_cameraMode.GetPushButtonState()) {
 			camOrigin = playerMatrix.TransformVector(dVector(0.0f, SERVO_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
 			camOrigin -= frontDir.Scale(SERVO_VEHICLE_CAMERA_DISTANCE);
-		}
-		else {
+		} else {
 			camMatrix = camMatrix * playerMatrix;
 			camOrigin = playerMatrix.TransformVector(dVector(-0.8f, SERVO_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
 		}
@@ -1123,11 +1117,8 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 	virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
-//		dAssert (0);
-		dTrace (("Pre Update %s\n", __FUNCTION__));
-#if 0
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)controller->GetUserData();
-
+/*
 		if (vehicleModel->m_engineJoint) {
 			dFloat brakeTorque = 2000.0f;
 			//dFloat engineTorque = 0.0f;
@@ -1161,28 +1152,21 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 				vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
 			}
 		}
-		
-		// update steering wheels
-		if (vehicleModel->m_rearTiresCount) {
-			dAssert (0);
-/*
-			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetJointAngle_1();
-			if (vehicleModel->m_inputs.m_steerValue > 0) {
-				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit_1();
-			} else if (vehicleModel->m_inputs.m_steerValue < 0) {
-				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit_1();
-			}
-			for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
-				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
-			}
 */
+
+		// update steering wheels
+		dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetSteerAngle();
+		if (vehicleModel->m_inputs.m_steerValue > 0) {
+			steeringAngle = 30.0f * dDegreeToRad;
+		} else if (vehicleModel->m_inputs.m_steerValue < 0) {
+			steeringAngle = -30.0f * dDegreeToRad;
 		}
+		vehicleModel->m_rearTireJoints[0]->SetTargetSteerAngle(steeringAngle);
+		vehicleModel->m_rearTireJoints[1]->SetTargetSteerAngle(steeringAngle);
 
+#if 0
 		// set the base turn angle
-		vehicleModel->m_angularActuator1->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
-
+//		vehicleModel->m_angularActuator1->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
 
 		// set the tilt angle
 /*
@@ -1199,6 +1183,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			vehicleModel->m_angularActuator0[i]->SetTargetAngle (tiltAngle);
 		}
 */
+
 
 
 		vehicleModel->m_angularActuator0->SetTargetAngle(vehicleModel->m_inputs.m_liftValue);
@@ -1430,9 +1415,10 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		chassisMatrix = dPitchMatrix(90.0f * dDegreeToRad) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
-		dFloat angleLimit = 30.0f * dDegreeToRad;
+		//dFloat angleLimit = 30.0f * dDegreeToRad;
 		dFloat angularRate = 60.0f * dDegreeToRad;
 		dCustomWheel* const wheel = new dCustomWheel(&chassisMatrix[0][0], tire, chassis);
+		wheel->SetSteerRate(angularRate);
 		wheel->EnableLimits(true);
 		wheel->SetLimits(0.0f, 0.0f);
 		return wheel;
@@ -1487,7 +1473,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			dAssert(0);
 		}
 	}
-
 
 	dCustomArticulatedTransformController* CreateForklift(const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
 	{
@@ -1616,7 +1601,7 @@ void ServoJoints (DemoEntityManager* const scene)
 //	origin.m_x -= 5.0f;
 	origin.m_y += 2.0f;
 	origin.m_z -= 4.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -90.0f * dDegreeToRad);  
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -45.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
 }
 

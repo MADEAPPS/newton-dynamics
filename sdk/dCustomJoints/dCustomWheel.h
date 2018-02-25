@@ -27,9 +27,12 @@ class dCustomWheel: public dCustomSlidingContact
 	CUSTOM_JOINTS_API dCustomWheel(const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomWheel();
 
-//	CUSTOM_JOINTS_API void EnableAngularLimits(bool state);
-//	CUSTOM_JOINTS_API void SetAngularLimits(dFloat minAngle, dFloat maxAngle);
-//	CUSTOM_JOINTS_API void SetAsAngularSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
+	CUSTOM_JOINTS_API dFloat GetSteerAngle() const;
+	CUSTOM_JOINTS_API dFloat GetTargetSteerAngle() const;
+	CUSTOM_JOINTS_API void SetTargetSteerAngle(dFloat angle);
+
+	CUSTOM_JOINTS_API dFloat GetSteerRate() const;
+	CUSTOM_JOINTS_API void SetSteerRate(dFloat rate);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
@@ -39,6 +42,7 @@ class dCustomWheel: public dCustomSlidingContact
 
 	dFloat m_steerAngle;
 	dFloat m_steerSpeed;
+	dFloat m_currentSteerAngle;
 
 	DECLARE_CUSTOM_JOINT(dCustomWheel, dCustomSlidingContact)
 

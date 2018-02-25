@@ -20,6 +20,7 @@ dCustomWheel::dCustomWheel(const dMatrix& pinAndPivotFrame, NewtonBody* child, N
 	:dCustomSlidingContact(pinAndPivotFrame, child, parent)
 	,m_steerAngle(0.0f)
 	,m_steerSpeed(60.0f * dDegreeToRad)
+	,m_currentSteerAngle(0.0f)
 {
 }
 
@@ -27,6 +28,7 @@ dCustomWheel::dCustomWheel(const dMatrix& pinAndPivotFrameChild, const dMatrix& 
 	:dCustomSlidingContact(pinAndPivotFrameChild, pinAndPivotFrameParent, child, parent)
 	,m_steerAngle(0.0f)
 	,m_steerSpeed(60.0f * dDegreeToRad)
+	,m_currentSteerAngle(0.0f)
 {
 }
 
@@ -48,139 +50,30 @@ void dCustomWheel::Serialize(NewtonSerializeCallback callback, void* const userD
 	callback(userData, &m_steerSpeed, sizeof(dFloat));
 }
 
-/*
-void dCustomWheel::EnableAngularLimits(bool state)
+dFloat dCustomWheel::GetSteerAngle() const
 {
-	m_options.m_option2 = state;
+	return m_currentSteerAngle;
 }
 
-void dCustomWheel::SetAsAngularSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+dFloat dCustomWheel::GetTargetSteerAngle() const
 {
-	m_angularSpring = spring;
-	m_angularDamper = damper;
-	m_options.m_option3 = state;
-	m_angularSpringDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
-	
+	return m_steerAngle;
 }
 
-void dCustomWheel::SetAngularLimits(dFloat minDist, dFloat maxDist)
+void dCustomWheel::SetTargetSteerAngle(dFloat angle)
 {
-	m_minAngle = -dAbs(minDist);
-	m_maxAngle = dAbs(maxDist);
+	m_steerAngle = angle;
 }
 
-void dCustomWheel::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+dFloat dCustomWheel::GetSteerRate() const
 {
-	NewtonUserJointAddAngularRow(m_joint, -m_curJointAngle.GetAngle(), &matrix1.m_up[0]);
-	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_angularSpringDamperRelaxation, m_angularSpring, m_angularDamper);
+	return m_steerSpeed;
 }
 
-void dCustomWheel::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+void dCustomWheel::SetSteerRate(dFloat rate)
 {
-	dFloat angle = m_curJointAngle.GetAngle() + m_angularOmega * timestep;
-	if (angle < m_minAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-	} else if (angle > m_maxAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-
-	} else if (m_angularFriction != 0.0f) {
-		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-	}
+	m_steerSpeed = dAbs (m_steerSpeed);
 }
-
-void dCustomWheel::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
-{
-	dFloat angle = m_curJointAngle.GetAngle() + m_angularOmega * timestep;
-	if (angle < m_minAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_angularSpring, m_curJointAngle.GetAngle(), m_angularDamper, m_angularOmega);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
-		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-
-	} else if (angle > m_maxAngle) {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_angularSpring, m_curJointAngle.GetAngle(), m_angularDamper, m_angularOmega);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
-		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-
-	} else {
-		dCustomWheel::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
-	}
-}
-
-void dCustomWheel::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
-{
-	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	dVector euler0;
-	dVector euler1;
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-
-	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
-	rollPin = matrix1.RotateVector(rollPin);
-
-	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix0[0][0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	m_curJointAngle.Update(euler0.m_y);
-
-	// save the current joint Omega
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	if (m_body1) {
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-	}
-	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1[1]);
-
-
-	if (m_options.m_option2) {
-		if (m_options.m_option3) {
-			dCustomWheel::SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
-		} else {
-			dCustomWheel::SubmitConstraintLimits(matrix0, matrix1, timestep);
-		}
-	} else if (m_options.m_option3) {
-		dCustomWheel::SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
-	} else if (m_angularFriction != 0.0f) {
-		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-	}
-}
-*/
 
 void dCustomWheel::Debug(dDebugDisplay* const debugDisplay) const
 {
@@ -235,13 +128,10 @@ void dCustomWheel::SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMat
 	NewtonUserJointAddAngularRow(m_joint, -planeAngle, &wheelPin[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
-return;
-/*
 	const dFloat invTimeStep = 1.0f / timestep;
 	const dFloat tol = m_steerSpeed * timestep;
-	const dFloat angle = euler0.m_x;
-
-m_steerAngle = 30.0f * dDegreeToRad;
+	const dFloat angle = CalculateAngle(matrix1.m_up, wheelFramePlane, matrix1.m_front);
+	m_currentSteerAngle = angle;
 
 	dFloat currentSpeed = 0.0f;
 	if (angle > (m_steerAngle + tol)) {
@@ -257,9 +147,8 @@ m_steerAngle = 30.0f * dDegreeToRad;
 			currentSpeed = 0.5f * (m_steerAngle - angle) * invTimeStep;
 		}
 	}
-	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
 	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-*/
 }
