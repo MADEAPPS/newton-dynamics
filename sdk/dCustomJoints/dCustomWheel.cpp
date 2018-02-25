@@ -227,22 +227,16 @@ void dCustomWheel::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomWheel::SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	dVector euler0;
-	dVector euler1;
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+	dVector wheelFramePlane(matrix0.m_up - matrix1.m_front.Scale(matrix0.m_up.DotProduct3(matrix1.m_front)));
+	wheelFramePlane = wheelFramePlane.Normalize();
+	dVector wheelPin(matrix1.m_front.CrossProduct(wheelFramePlane));
+	dFloat planeAngle = CalculateAngle(wheelFramePlane, matrix0.m_up, wheelPin);
 
-	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
-	rollPin = matrix1.RotateVector(rollPin);
-
-	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix0[0][0]);
+	NewtonUserJointAddAngularRow(m_joint, -planeAngle, &wheelPin[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	
-	m_curJointAngle.Update(euler0.m_y);
 
 return;
+/*
 	const dFloat invTimeStep = 1.0f / timestep;
 	const dFloat tol = m_steerSpeed * timestep;
 	const dFloat angle = euler0.m_x;
@@ -267,4 +261,5 @@ m_steerAngle = 30.0f * dDegreeToRad;
 	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+*/
 }
