@@ -75,6 +75,11 @@ void dCustomMotor::Serialize (NewtonSerializeCallback callback, void* const user
 	callback(userData, &m_motorTorque, sizeof(dFloat));
 }
 
+dFloat dCustomMotor::GetSpeed() const
+{
+	return m_targetSpeed;
+}
+
 void dCustomMotor::SetSpeed(dFloat speed)
 {
 	m_targetSpeed = speed;
@@ -189,6 +194,11 @@ void dCustomMotor2::Serialize(NewtonSerializeCallback callback, void* const user
 	callback(userData, &m_motorOmega, sizeof(dFloat));
 	callback(userData, &m_targetSpeed, sizeof(dFloat));
 	callback(userData, &m_motorTorque, sizeof(dFloat));
+}
+
+dFloat dCustomMotor2::GetSpeed1() const
+{
+	return m_targetSpeed1;
 }
 
 void dCustomMotor2::SetSpeed1(dFloat speed)

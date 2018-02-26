@@ -156,7 +156,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	if (cosAngleCos < 0.9999f) {
 		dVector lateralDir(coneDir1.CrossProduct(coneDir0));
 		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-		dAssert(mag2 > 1.0e-4f);
+		//dAssert(mag2 > 1.0e-4f);
 		if (mag2 > 1.0e-4f) {
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);

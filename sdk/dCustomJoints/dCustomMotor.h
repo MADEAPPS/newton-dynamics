@@ -26,6 +26,7 @@ class dCustomMotor: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomMotor(const dVector& pin, NewtonBody* const body);
 	CUSTOM_JOINTS_API virtual ~dCustomMotor();
 
+	CUSTOM_JOINTS_API dFloat GetSpeed() const;
 	CUSTOM_JOINTS_API void SetSpeed(dFloat speed);
 	CUSTOM_JOINTS_API void SetTorque(dFloat torque);
 
@@ -47,6 +48,7 @@ class dCustomMotor2 : public dCustomMotor
 	CUSTOM_JOINTS_API dCustomMotor2(const dVector& pin, const dVector& pinReferenceBody, NewtonBody* const body, NewtonBody* const referenceBody);
 	CUSTOM_JOINTS_API virtual ~dCustomMotor2();
 
+	CUSTOM_JOINTS_API dFloat GetSpeed1() const;
 	CUSTOM_JOINTS_API void SetSpeed1(dFloat speed);
 	CUSTOM_JOINTS_API void SetTorque1(dFloat torque);
 
