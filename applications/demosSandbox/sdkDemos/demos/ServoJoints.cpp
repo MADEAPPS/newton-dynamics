@@ -129,7 +129,7 @@ class ServoEntityModel: public DemoEntity
 	}
 
 	InputRecord m_inputs;
-	dCustomMotor2* m_engineMotor;
+	dCustomMotor* m_engineMotor;
 	dCustomDoubleHinge* m_engineJoint;
 	dCustomHingeActuator* m_forkBase;
 	dCustomWheel* m_rearTireJoints[2];
@@ -466,7 +466,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			}
 
 			// apply DC engine torque
-			vehicleModel->m_engineMotor->SetSpeed1(engineRPM);
+			vehicleModel->m_engineMotor->SetSpeed(engineRPM);
 
 			// apply breaks
 			//for (int i = 0; i < vehicleModel->m_tractionTiresCount; i++) {
@@ -680,8 +680,8 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 //NewtonBodyGetMass(engine, &m, &x, &y, &z);
 //NewtonBodyGetMass(chassis, &m, &x, &y, &z);
 
-		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
-		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
+//		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
+//		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
 
 		return wheel;
 	}
@@ -781,14 +781,15 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		return controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
 	}
 
-	dCustomMotor2* CreateEngineMotor(dCustomArticulatedTransformController* const controller, dCustomDoubleHinge* const engineJoint)
+	dCustomMotor* CreateEngineMotor(dCustomArticulatedTransformController* const controller, dCustomDoubleHinge* const engineJoint)
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
 		NewtonBody* const engine = engineJoint->GetBody0();
-		NewtonBody* const chassis = engineJoint->GetBody1();
+		//NewtonBody* const chassis = engineJoint->GetBody1();
 		engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
+		//return new dCustomMotor(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
+		return new dCustomMotor(engineMatrix.m_up, engine);
 	}
 
 	dCustomArticulatedTransformController* CreateForklift(const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
@@ -833,7 +834,7 @@ new dCustom6dof (location, rootBody);
 		// set power parameter for a simple DC engine
 		vehicleModel->m_maxEngineSpeed = 20.0f;
 		vehicleModel->m_engineMotor->SetTorque(1000.0f);
-		vehicleModel->m_engineMotor->SetTorque1(1500.0f);
+		//vehicleModel->m_engineMotor->SetTorque1(1500.0f);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
