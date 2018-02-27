@@ -669,6 +669,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		
 		NewtonBodyGetMatrix(tire, &matrix[0][0]);
 		dMatrix tireHingeMatrix(dRollMatrix(0.0f * dDegreeToRad) * matrix);
+		tireHingeMatrix = wheel->GetMatrix0() * tireHingeMatrix;
 
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)controller->GetUserData();
 
@@ -676,12 +677,8 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		NewtonBody* const engine = vehicleModel->m_engineJoint->GetBody0();
 		vehicleModel->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
-//dFloat m, x, y, z;
-//NewtonBodyGetMass(engine, &m, &x, &y, &z);
-//NewtonBodyGetMass(chassis, &m, &x, &y, &z);
-
-//		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
-//		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
+		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
+		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up.Scale(-1.0f), engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
 
 		return wheel;
 	}
@@ -820,7 +817,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		com.m_y -= 0.25f;
 		NewtonBodySetCentreOfMass(rootBody, &com[0]);
 
-new dCustom6dof (location, rootBody);
+//new dCustom6dof (location, rootBody);
 //NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		// add the root bone to the articulation manager
