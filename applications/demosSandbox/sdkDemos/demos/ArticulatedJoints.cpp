@@ -20,11 +20,11 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
-
+#define ARTICULATED_SIMULATE_THREADS				1
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
-//#define ARTICULATED_VEHICLE_CAMERA_DISTANCE		7.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			13.0f
+
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -1162,8 +1162,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
 
-		MakeLeftThread(controller);
-		MakeRightThread(controller);
+		#ifdef ARTICULATED_SIMULATE_THREADS
+			MakeLeftThread(controller);
+			MakeRightThread(controller);
+		#endif
 
 		return controller;
 	}
