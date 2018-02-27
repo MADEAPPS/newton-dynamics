@@ -994,6 +994,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat rate = 2.0f;
 
 		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount] = new dCustomSliderActuator(&matrix[0][0], rate, minLimit, maxLimit, paletteBody, baseBone->m_body);
+		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount]->SetMaxForcePower(10000.0f);
 		vehicleModel->m_paletteActuatorsCount++;
 		controller->AddBone(paletteBody, dGetIdentityMatrix(), baseBone);
 	}
