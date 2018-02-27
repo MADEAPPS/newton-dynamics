@@ -44,6 +44,8 @@ dCustomDoubleHingeActuator::dCustomDoubleHingeActuator (const dMatrix& pinAndPiv
 	m_options.m_value = 0;
 	SetHardMiddleAxis(true);
 	EnableMotor(false, dAbs (angularRate0));
+	SetLimits (minAngle0, maxAngle0);
+	SetLimits1 (minAngle1, maxAngle1);
 }
 
 dCustomDoubleHingeActuator::~dCustomDoubleHingeActuator()

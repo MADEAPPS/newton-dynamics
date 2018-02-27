@@ -1022,7 +1022,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat minAngleLimit = -120.0f * dDegreeToRad;
 		dFloat maxAngleLimit =  120.0f * dDegreeToRad;
 		dFloat angularRate = 30.0f * dDegreeToRad;
-		vehicleModel->m_gripperRotator = new dCustomDoubleHingeActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
+		vehicleModel->m_gripperRotator = new dCustomDoubleHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, angularRate, minAngleLimit, maxAngleLimit, gripperBody, baseBone->m_body);
 		dCustomArticulatedTransformController::dSkeletonBone* const gripperBone = controller->AddBone(gripperBody, dGetIdentityMatrix(), baseBone);
 		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
 		AddCranekPaletteActuator (controller, gripperBone, "rightHand");
