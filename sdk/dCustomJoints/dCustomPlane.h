@@ -33,6 +33,7 @@ class dCustomPlane: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	
 	DECLARE_CUSTOM_JOINT(dCustomPlane, dCustomJoint)
+	//DECLARE_CUSTOM_JOINT_EXPORT_IMPORT(PINT_JOINTS_API, Plane3DOF, dCustom6dof);
 };
 
 

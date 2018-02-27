@@ -22,7 +22,7 @@
 
 #define SERVO_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define SERVO_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
-#define SERVO_VEHICLE_CAMERA_DISTANCE			7.0f
+#define SERVO_VEHICLE_CAMERA_DISTANCE			8.0f
 
 struct SERVO_VEHICLE_DEFINITION
 {
@@ -168,7 +168,7 @@ class ServoInputManager: public dCustomInputManager
 		inputs.m_steerValue = int(m_scene->GetKeyState('D')) - int(m_scene->GetKeyState('A'));
 		inputs.m_throttleValue = int(m_scene->GetKeyState('W')) - int(m_scene->GetKeyState('S'));
 
-		inputs.m_paletteValue = m_palette;
+		inputs.m_paletteValue = -m_palette;
 		inputs.m_liftValue = m_listPosit;
 		inputs.m_forkValue = m_forkAngle * dDegreeToRad;
 
@@ -257,7 +257,7 @@ class ServoInputManager: public dCustomInputManager
 		m_needsWakeUp = false;
 		m_needsWakeUp = ImGui::SliderFloat("lift", &m_listPosit, -0.5f, 1.5f) || m_needsWakeUp;
 		m_needsWakeUp = ImGui::SliderFloat("tilt", &m_forkAngle, -30.0f, 30.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("palette", &m_palette, -0.8f, 0.2f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("palette", &m_palette, -0.2f, 0.6f) || m_needsWakeUp;
 	}
 
 	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
@@ -610,7 +610,7 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 
 		dFloat minAngleLimit = -20.0f * dDegreeToRad;
 		dFloat maxAngleLimit =  20.0f * dDegreeToRad;
-		dFloat angularRate = 20.0f * dDegreeToRad;
+		dFloat angularRate = 15.0f * dDegreeToRad;
 		return new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
 	}
 
@@ -619,20 +619,9 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		dMatrix baseMatrix;
 		NewtonBodyGetMatrix(child, &baseMatrix[0][0]);
 
-		dFloat minLimit = -0.25f;
-		dFloat maxLimit = 1.5f;
-		dFloat linearRate = 0.25f;
-		return new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-	}
-
-	dCustomSliderActuator* LinkPaletteActuator(NewtonBody* const parent, NewtonBody* const child)
-	{
-		dMatrix baseMatrix;
-		NewtonBodyGetMatrix(child, &baseMatrix[0][0]);
-
-		dFloat minLimit = -0.25f;
-		dFloat maxLimit = 0.2f;
-		dFloat linearRate = 0.25f;
+		dFloat minLimit = -2.0f;
+		dFloat maxLimit = 2.5f;
+		dFloat linearRate = 0.20f;
 		return new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 	}
 
@@ -649,7 +638,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		chassisMatrix = dPitchMatrix(90.0f * dDegreeToRad) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
-		//dFloat angleLimit = 30.0f * dDegreeToRad;
 		dFloat angularRate = 60.0f * dDegreeToRad;
 		dCustomWheel* const wheel = new dCustomWheel(&chassisMatrix[0][0], tire, chassis);
 		wheel->SetSteerRate(angularRate);
@@ -720,7 +708,6 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 			}
 
 		} else if (jointArticulation == "paletteActuator") {
-			//vehicleModel->LinkPaletteActuator(parent, child);
 			dCustomSliderActuator* const lift = LinkLiftActuator(parent, child);;
 			if (!vehicleModel->m_paletteJoints[0]) {
 				vehicleModel->m_paletteJoints[0] = lift;
@@ -783,10 +770,9 @@ class ServoVehicleManagerManager: public dCustomArticulaledTransformManager
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
 		NewtonBody* const engine = engineJoint->GetBody0();
-		//NewtonBody* const chassis = engineJoint->GetBody1();
+		NewtonBody* const chassis = engineJoint->GetBody1();
 		engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		//return new dCustomMotor(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
-		return new dCustomMotor(engineMatrix.m_up, engine);
+		return new dCustomMotor(engineMatrix.m_up, engine, chassis);
 	}
 
 	dCustomArticulatedTransformController* CreateForklift(const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
@@ -903,12 +889,8 @@ void ServoJoints (DemoEntityManager* const scene)
 	inputManager->AddPlayer(forklift);
 
 	// add some object to play with
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(40.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(20.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 20.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(20.0f, 0.0f, 20.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 
 //	origin.m_x -= 5.0f;
 	origin.m_y += 2.0f;

@@ -530,7 +530,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		NewtonBody* const engine = engineJoint->GetBody0();
 		NewtonBody* const chassis = engineJoint->GetBody1();
 		engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, chassis);
+		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, engine, chassis);
 	}
 
 	NewtonCollision* MakeRobotTireShape(DemoEntity* const bodyPart, bool hasInnerRing) const

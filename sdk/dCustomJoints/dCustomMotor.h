@@ -22,8 +22,7 @@
 class dCustomMotor: public dCustomJoint
 {
 	public:
-	CUSTOM_JOINTS_API dCustomMotor(int dof, NewtonBody* const body);
-	CUSTOM_JOINTS_API dCustomMotor(const dVector& pin, NewtonBody* const body);
+	CUSTOM_JOINTS_API dCustomMotor(const dVector& pin, NewtonBody* const body, NewtonBody* const referenceBody);
 	CUSTOM_JOINTS_API virtual ~dCustomMotor();
 
 	CUSTOM_JOINTS_API dFloat GetSpeed() const;
@@ -31,13 +30,16 @@ class dCustomMotor: public dCustomJoint
 	CUSTOM_JOINTS_API void SetTorque(dFloat torque);
 
 	protected:
+	CUSTOM_JOINTS_API dCustomMotor(int dof, const dVector& pin, NewtonBody* const body, NewtonBody* const referenceBody);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
+	dVector m_localReferencePin;
 	dFloat m_motorOmega;
 	dFloat m_targetSpeed;
 	dFloat m_motorTorque;
+	NewtonBody* m_referenceBody;
 	DECLARE_CUSTOM_JOINT(dCustomMotor, dCustomJoint)
 };
 
@@ -45,7 +47,7 @@ class dCustomMotor: public dCustomJoint
 class dCustomMotor2 : public dCustomMotor
 {
 	public:
-	CUSTOM_JOINTS_API dCustomMotor2(const dVector& pin, const dVector& pinReferenceBody, NewtonBody* const body, NewtonBody* const referenceBody);
+	CUSTOM_JOINTS_API dCustomMotor2(const dVector& pin0, const dVector& pin1, NewtonBody* const body, NewtonBody* const referenceBody0, NewtonBody* const referenceBody1);
 	CUSTOM_JOINTS_API virtual ~dCustomMotor2();
 
 	CUSTOM_JOINTS_API dFloat GetSpeed1() const;
@@ -57,11 +59,11 @@ class dCustomMotor2 : public dCustomMotor
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
-	dVector m_pin1;
+	dVector m_localReferencePin1;
 	dFloat m_motorOmega1;
 	dFloat m_targetSpeed1;
 	dFloat m_motorTorque1;
-	NewtonBody* m_referenceBody;
+	NewtonBody* m_referenceBody1;
 	DECLARE_CUSTOM_JOINT(dCustomMotor2, dCustomMotor)
 };
 
