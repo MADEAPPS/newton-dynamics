@@ -133,10 +133,10 @@ static NewtonBody* Tiptop(DemoEntityManager* const scene, const dVector& posit, 
 
 	dMatrix offset(dRollMatrix(90.0f * dDegreeToRad));
 	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, NULL);
-	NewtonCollisionSetScale(ballShape, 0.25f, 0.25f, 1.0f);
+	NewtonCollisionSetScale(ballShape, 0.5f, 0.5f, 1.0f);
 
 	//dMatrix matrix(dGetIdentityMatrix());
-	dMatrix matrix(dPitchMatrix(1.0f * dDegreeToRad));
+	dMatrix matrix(dPitchMatrix(10.0f * dDegreeToRad));
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -149,8 +149,6 @@ static NewtonBody* Tiptop(DemoEntityManager* const scene, const dVector& posit, 
 	NewtonBodyGetMass(ball, &m, &Ixx, &Iyy, &Izz);
 
 	dVector angVelocity(0.0f, omega, 0.0f, 0.0f);
-//	angVelocity = dPitchMatrix(0.2f * dDegreeToRad).RotateVector(angVelocity);
-
 	NewtonBodySetOmega(ball, &angVelocity[0]);
 
 	dVector damp(0.0f);
@@ -266,7 +264,6 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
-
 	// a body with an axis of symmetry should precesses 
 	TorqueFreePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
 
@@ -294,20 +291,18 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	// test a different angular velocity
 	DzhanibekovEffect(scene, dVector(3.0f, 3.0f,  8.0f, 1.0f), dVector (0.01f, 0.01f, 15.0f), 0.25f, 2.0f);
 
-	// place a toy top
+	// place a toy tops
 	const int topsCount = 4;
+	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
-		for (int j = 0; j < topsCount; j ++) {
-			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
-		}
-		Tiptop(scene, dVector(0.0f, 0.3f, -4.0f * i - 5.0f, 1.0f), i * 10.0f + 20.0f, 1.0f);
-		//Tiptop(scene, dVector(-5.0f, 0.3f, -10.0f, 1.0f), 50.0f, 1.0f);
+		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
+		Tiptop(scene, dVector(10.0f, 0.3f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
 	}
 
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);
-	dVector origin(-15.0f, 2.0f, -5.0f, 0.0f);
+	dVector origin(-10.0f, 2.0f, -5.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
