@@ -266,11 +266,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
-	Tiptop(scene, dVector(0.0f, 0.3f, -10.0f, 1.0f), 30.0f, 1.0f);
 
-	Tiptop(scene, dVector(-5.0f, 0.3f, -10.0f, 1.0f), 50.0f, 1.0f);
-
-/*
 	// a body with an axis of symmetry should precesses 
 	TorqueFreePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
 
@@ -302,15 +298,16 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	const int topsCount = 4;
 	for (int i = 0; i < topsCount; i ++) {
 		for (int j = 0; j < topsCount; j ++) {
-	//			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
+			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
 		}
+		Tiptop(scene, dVector(0.0f, 0.3f, -4.0f * i - 5.0f, 1.0f), i * 10.0f + 20.0f, 1.0f);
+		//Tiptop(scene, dVector(-5.0f, 0.3f, -10.0f, 1.0f), 50.0f, 1.0f);
 	}
-*/
 
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);
-	dVector origin(-15.0f, 2.0f, 0.0f, 0.0f);
+	dVector origin(-15.0f, 2.0f, -5.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
