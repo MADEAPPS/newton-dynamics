@@ -127,7 +127,7 @@ static NewtonBody* TorqueFreePreccesion(DemoEntityManager* const scene, const dV
 	return ball;
 }
 
-static NewtonBody* Tiptop(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio)
+static NewtonBody* PhiTop(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio)
 {
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -297,7 +297,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
 //		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
-		Tiptop(scene, dVector(10.0f, 0.3f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
+		PhiTop(scene, dVector(10.0f, 0.3f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
 	}
 
 	// place camera into position
