@@ -263,7 +263,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
-
+/*
 	// a body with an axis of symmetry should precesses 
 	TorqueFreePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
 
@@ -290,12 +290,13 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 
 	// test a different angular velocity
 	DzhanibekovEffect(scene, dVector(3.0f, 3.0f,  8.0f, 1.0f), dVector (0.01f, 0.01f, 15.0f), 0.25f, 2.0f);
+*/
 
 	// place a toy tops
 	const int topsCount = 4;
 	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
-		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
+//		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
 		Tiptop(scene, dVector(10.0f, 0.3f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
 	}
 
