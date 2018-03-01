@@ -220,6 +220,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgFloat32 m_contactPruningTolereance;
 	dgUnsigned32 m_broadphaseLru;
 	dgUnsigned32 m_isNewContact				: 1;
+	dgUnsigned32 m_skeletonSelfCollision	: 1;
 
     friend class dgBody;
 	friend class dgWorld;

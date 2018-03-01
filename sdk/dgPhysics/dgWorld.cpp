@@ -1385,6 +1385,12 @@ void dgWorld::UpdateSkeletons()
 			}
 		}
 	}
+
+	dgSkeletonList::Iterator iter(skelManager);
+	for (iter.Begin(); iter; iter++) {
+		dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
+		skeleton->ClearSelfCollision();
+	}
 }
 
 

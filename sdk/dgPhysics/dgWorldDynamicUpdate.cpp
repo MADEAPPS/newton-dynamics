@@ -464,7 +464,6 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 		dgAssert(heaviestBody);
 		queue.Insert(heaviestBody);
 		heaviestBody->m_scale0 = dgFloat32 (1.0f);
-		//dgAssert(heaviestBody->m_joint->m_body0->GetSkeleton() == heaviestBody->m_joint->m_body1->GetSkeleton());
 	}
 
 	while (!queue.IsEmpty()) {
@@ -606,6 +605,13 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	dof = constraint->JacobianDerivative(constraintParamOut);
 	body0->m_inCallback = false;
 	body1->m_inCallback = false;
+
+	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+		dgSkeletonContainer* const skeleton = body0->GetSkeleton() ? body0->GetSkeleton() : body1->GetSkeleton();
+		if (skeleton) {
+			skeleton->AddSelfCollisionJoint((dgContact*)constraint);
+		}
+	}
 	
 	jointInfo->m_pairCount = dof;
 	jointInfo->m_pairStart = rowCount;

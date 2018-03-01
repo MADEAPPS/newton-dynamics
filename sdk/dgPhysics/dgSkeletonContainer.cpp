@@ -386,11 +386,13 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_massMatrix10(NULL)
 	,m_lowerTriangularMassMatrix11(NULL)
 	,m_rowArray(NULL)
-	,m_loopingBodies(world->GetAllocator())
+//	,m_loopingBodies(world->GetAllocator())
 	,m_loopingJoints(world->GetAllocator())
 	,m_id(m_uniqueID)
 	,m_lru(0)
 	,m_nodeCount(1)
+	,m_loopCount(0)
+	,m_selfContactCount(0)
 	,m_rowCount(0)
 	,m_loopRowCount(0)
 	,m_auxiliaryRowCount(0)
@@ -403,11 +405,13 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 
 dgSkeletonContainer::~dgSkeletonContainer()
 {
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		dgLoopingJoint& entry = ptr->GetInfo();
+//	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	for (dgInt32 i = 0; i < m_loopCount; i++) {
+		//dgLoopingJoint& entry = ptr->GetInfo();
+		dgLoopingJoint& entry = m_loopingJoints[i];
 		entry.m_joint->m_isInSkeleton = false;
 	}
-	m_loopingJoints.RemoveAll();
+	//m_loopingJoints.RemoveAll();
 
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i ++) {
 		m_nodesOrder[i]->m_joint->m_isInSkeleton = false;
@@ -461,6 +465,24 @@ void dgSkeletonContainer::ResetUniqueId(dgInt32 id)
 	m_uniqueID = id;
 }
 
+void dgSkeletonContainer::ClearSelfCollision()
+{
+	m_selfContactCount = 0;
+}
+
+void dgSkeletonContainer::AddSelfCollisionJoint(dgContact* const contact)
+{
+	dgLoopingJoint entry(contact);
+
+//	dgNode* const node0 = FindNode(body0);
+//	dgNode* const node1 = FindNode(body1);
+//	dgAssert((node0 || node1));
+//	joint->m_isInSkeleton = true;
+
+//	m_loopingJoints[m_loopCount + m_selfContactCount] = entry;
+//	m_selfContactCount++;
+}
+
 void dgSkeletonContainer::SortGraph(dgNode* const root, dgInt32& index)
 {
 	for (dgNode* node = root->m_child; node; node = node->m_sibling) {
@@ -511,22 +533,26 @@ dgSkeletonContainer::dgNode* dgSkeletonContainer::AddChild(dgBilateralConstraint
 
 void dgSkeletonContainer::RemoveLoopJoint(dgBilateralConstraint* const joint)
 {
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		dgLoopingJoint& entry = ptr->GetInfo();
+	//for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	for (dgInt32 i = 0; i < m_loopCount; i++) {
+		//dgLoopingJoint& entry = ptr->GetInfo();
+		dgLoopingJoint& entry = m_loopingJoints[i];
 		if (entry.m_joint == joint) {
 			joint->m_isInSkeleton = false;
-			m_loopingJoints.Remove(ptr);
+			//m_loopingJoints.Remove(ptr);
+			m_loopCount--;
+			m_loopingJoints[i] = m_loopingJoints[m_loopCount];
 			break;
 		}
 	}
 
-	for (dgList<dgDynamicBody*>::dgListNode* ptr = m_loopingBodies.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		if ((joint->GetBody0() == ptr->GetInfo()) || (joint->GetBody1() == ptr->GetInfo())) {
-			dgAssert (0);
-			m_loopingBodies.Remove(ptr);
-			break;
-		}
-	}
+//	for (dgList<dgDynamicBody*>::dgListNode* ptr = m_loopingBodies.GetFirst(); ptr; ptr = ptr->GetNext()) {
+//		if ((joint->GetBody0() == ptr->GetInfo()) || (joint->GetBody1() == ptr->GetInfo())) {
+//			dgAssert (0);
+//			m_loopingBodies.Remove(ptr);
+//			break;
+//		}
+//	}
 }
 
 
@@ -579,7 +605,9 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 				loopIndex++;
 			}
 			dgLoopingJoint cyclicEntry(joint, index0->GetInfo(), index1->GetInfo());
-			m_loopingJoints.Append(cyclicEntry);
+			//m_loopingJoints.Append(cyclicEntry);
+			m_loopingJoints[m_loopCount] = cyclicEntry;
+			m_loopCount++;
 		}
 
 		for (dgInt32 i = 0; i < m_nodeCount; i++) {
@@ -591,10 +619,10 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 			bodyOrder.Insert (iter.GetKey(), iter.GetNode()->GetInfo());
 		}
 
-		dgTree<dgDynamicBody*, dgInt32>::Iterator iter1(bodyOrder);
-		for (iter1.Begin(); iter1; iter1 ++) {
-			m_loopingBodies.Append(iter1.GetNode()->GetInfo());
-		}
+//		dgTree<dgDynamicBody*, dgInt32>::Iterator iter1(bodyOrder);
+//		for (iter1.Begin(); iter1; iter1 ++) {
+//			m_loopingBodies.Append(iter1.GetNode()->GetInfo());
+//		}
 	}
 }
 
@@ -995,8 +1023,11 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 	}
 	dgAssert (m_loopRowCount == (m_auxiliaryRowCount - auxiliaryIndex));
 	
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const dgLoopingJoint& entry = ptr->GetInfo();
+	//for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	const dgInt32 loopCount = m_loopCount + m_selfContactCount;
+	for (dgInt32 j = 0; j < loopCount; j ++) {
+		//const dgLoopingJoint& entry = ptr->GetInfo();
+		const dgLoopingJoint& entry = m_loopingJoints[j];
 		const dgConstraint* const joint = entry.m_joint;
 		const dgJointInfo* const jointInfo = &jointInfoArray[joint->m_index];
 
@@ -1298,8 +1329,12 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		}
 	}
 
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const dgLoopingJoint& entry = ptr->GetInfo();
+	//for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	const dgInt32 loopCount = m_loopCount + m_selfContactCount;
+	for (dgInt32 j = 0; j < loopCount; j++) {
+		//const dgLoopingJoint& entry = ptr->GetInfo();
+		const dgLoopingJoint& entry = m_loopingJoints[j];
+		
 		const dgConstraint* const joint = entry.m_joint;
 		const dgJointInfo* const jointInfo = &jointInfoArray[joint->m_index];
 
@@ -1376,8 +1411,12 @@ dgInt32 dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* cons
 	}
 
 	dgInt32 extraAuxiliaryRows = 0;
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const dgLoopingJoint& entry = ptr->GetInfo();
+	//for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	const dgInt32 loopCount = m_loopCount + m_selfContactCount;
+	for (dgInt32 j = 0; j < loopCount; j++) {
+		//const dgLoopingJoint& entry = ptr->GetInfo();
+		const dgLoopingJoint& entry = m_loopingJoints[j];
+
 		const dgConstraint* const joint = entry.m_joint;
 		extraAuxiliaryRows += jointInfoArray[joint->m_index].m_pairCount;
 	}
@@ -1417,8 +1456,12 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	m_auxiliaryRowCount = dgInt16 (auxiliaryStart);
 
 	dgInt32 loopRowCount = 0;
-	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		const dgConstraint* const joint = ptr->GetInfo().m_joint;
+	//for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	const dgInt32 loopCount = m_loopCount + m_selfContactCount;
+	for (dgInt32 j = 0; j < loopCount; j++) {
+		//const dgConstraint* const joint = ptr->GetInfo().m_joint;
+		const dgConstraint* const joint = m_loopingJoints[j].m_joint;
+
 		loopRowCount += jointInfoArray[joint->m_index].m_pairCount;
 	}
 	m_loopRowCount = dgInt16 (loopRowCount);

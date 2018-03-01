@@ -25,6 +25,8 @@
 #define DG_SKELETON_BASE_UNIQUE_ID	10
 
 #include "dgConstraint.h"
+#include "dgContact.h"
+#include "dgBilateralConstraint.h"
 
 class dgDynamicBody;
 
@@ -39,6 +41,13 @@ class dgSkeletonContainer
 	class dgLoopingJoint
 	{
 		public: 
+		dgLoopingJoint(dgContact* const contact)
+			:m_joint(contact)
+			,m_m0(-1)
+			,m_m1(-1)
+		{
+		}
+
 		dgLoopingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1)
 			:m_joint(joint)
 			,m_m0(dgInt16 (index0))
@@ -46,7 +55,8 @@ class dgSkeletonContainer
 		{
 		}
 
-		dgBilateralConstraint* m_joint;
+		//dgBilateralConstraint* m_joint;
+		dgConstraint* m_joint;
 		dgInt16 m_m0;
 		dgInt16 m_m1;
 	};
@@ -68,6 +78,9 @@ class dgSkeletonContainer
 	dgNode* GetParent (dgNode* const node) const;
 	dgNode* GetFirstChild (dgNode* const parent) const;
 	dgNode* GetNextSiblingChild (dgNode* const sibling) const;
+
+	void ClearSelfCollision();
+	void AddSelfCollisionJoint(dgContact* const contact);
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
@@ -103,11 +116,14 @@ class dgSkeletonContainer
 	dgFloat32* m_massMatrix10;
 	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
-	dgList<dgDynamicBody*> m_loopingBodies;
-	dgList<dgLoopingJoint> m_loopingJoints;
+//	dgList<dgDynamicBody*> m_loopingBodies;
+//	dgList<dgLoopingJoint> m_loopingJoints;
+	dgArray<dgLoopingJoint> m_loopingJoints;
 	dgInt32 m_id;
 	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
+	dgInt16 m_loopCount;
+	dgInt16 m_selfContactCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_loopRowCount;
 	dgInt16 m_auxiliaryRowCount;
