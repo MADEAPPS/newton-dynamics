@@ -607,9 +607,14 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	body1->m_inCallback = false;
 
 	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-		dgSkeletonContainer* const skeleton = body0->GetSkeleton() ? body0->GetSkeleton() : body1->GetSkeleton();
-		if (skeleton) {
-			skeleton->AddSelfCollisionJoint((dgContact*)constraint);
+		dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
+		dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
+		if (skeleton0 == skeleton1) {
+			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
+		} else if (skeleton0 && !skeleton1) {
+			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
+		} else if (skeleton1 && !skeleton0) {
+			skeleton1->AddSelfCollisionJoint((dgContact*)constraint);
 		}
 	}
 	
