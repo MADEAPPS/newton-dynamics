@@ -38,29 +38,30 @@ class dgSkeletonContainer
 	class dgForcePair;
 	class dgMatriData;
 	class dgBodyJointMatrixDataPair;
+/*
 	class dgLoopingJoint
 	{
 		public: 
 		dgLoopingJoint(dgContact* const contact)
 			:m_joint(contact)
-			,m_m0(-1)
-			,m_m1(-1)
+//			,m_m0(-1)
+//			,m_m1(-1)
 		{
 		}
 
 		dgLoopingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1)
 			:m_joint(joint)
-			,m_m0(dgInt16 (index0))
-			,m_m1(dgInt16 (index1))
+//			,m_m0(dgInt16 (index0))
+//			,m_m1(dgInt16 (index1))
 		{
 		}
 
 		//dgBilateralConstraint* m_joint;
 		dgConstraint* m_joint;
-		dgInt16 m_m0;
-		dgInt16 m_m1;
+//		dgInt16 m_m0;
+//		dgInt16 m_m1;
 	};
-
+*/
 	DG_CLASS_ALLOCATOR(allocator)
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
 	~dgSkeletonContainer();
@@ -118,7 +119,8 @@ class dgSkeletonContainer
 	dgJacobianMatrixElement** m_rowArray;
 //	dgList<dgDynamicBody*> m_loopingBodies;
 //	dgList<dgLoopingJoint> m_loopingJoints;
-	dgArray<dgLoopingJoint> m_loopingJoints;
+//	dgArray<dgLoopingJoint> m_loopingJoints;
+	dgArray<dgConstraint*> m_loopingJoints;
 	dgInt32 m_id;
 	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
