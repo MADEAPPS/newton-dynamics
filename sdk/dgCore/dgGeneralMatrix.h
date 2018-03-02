@@ -625,25 +625,22 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high)
+void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol = 1.0e-6f, dgInt32 maxIterCount = 20)
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dgAlloca(T, size);
 	dgCheckAligment(invDiag1);
 
-	dgInt32 base = 0;
+	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
 		x[i] = dgClamp(x[i], low[i], high[i]);
-		invDiag1[i] = T(1.0f) / me[base + i];
-		base += size;
+		invDiag1[i] = T(1.0f) / me[stride + i];
+		stride += size;
 	}
 
-	T tol(1.0e-6f);
-	T tol2 = tol * tol;
-	T tolerance(1.0e6f);
-
+	const T tol2 = tol * tol;
+	T tolerance(tol2 * 2.0f);
 	const T* const invDiag = invDiag1;
-	const dgInt32 maxIterCount = size * size * size * size + 100000;
 	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
 		tolerance = T(0.0f);
 		dgInt32 base = 0;
@@ -662,7 +659,6 @@ void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, con
 			base += size;
 		}
 	}
-	tolerance *= 1;
 }
 
 template<class T>
@@ -806,6 +802,10 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 template <class T>
 bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
 {
+
+dgGaussSeidelLCP(size, symmetricMatrixPSD, x, b, low, high);
+return true;
+
 	T* const x0 = dgAlloca(T, size);
 	T* const r0 = dgAlloca(T, size);
 	T* const tmp0 = dgAlloca(T, size);
@@ -836,7 +836,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		delta_x[i] = r0[i];
 		delta_r[i] = r0[i];
 	}
-
+int xxxx0 = 0;
+int xxxx1 = 0;
 	dgInt32 initialGuessCount = size;
 	for (T error2 = T (1.0f); initialGuessCount && (error2 > T (1.0e-12f)); ) {
 		dgSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, delta_x);
@@ -864,6 +865,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		}
 
 		if (index != -1) {
+xxxx0++;
 			initialGuessCount --;
 			delta_x[index] = T (0.0f);
 			dgSwap(delta_x[index], delta_x[initialGuessCount]);
@@ -964,6 +966,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				count--;
 				loop = false;
 			} else if (swapIndex == index) {
+xxxx1++;
 				count--;
 				clampedIndex--;
 				x0[index] = clamp_x;
@@ -990,7 +993,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 					dgAssert(clampedIndex <= size);
 					dgAssert(clampedIndex >= index);
 				}
-
+xxxx1++;
 			} else {
 				dgAssert(index > 0);
 				x0[swapIndex] = clamp_x;
@@ -1005,6 +1008,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				clampedIndex--;
 				index--;
 				loop = true;
+
+xxxx1++;
 			}
 		}
 	}
