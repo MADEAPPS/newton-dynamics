@@ -559,7 +559,7 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 			dgBilateralConstraint* const joint = loopJointArray[i];
 			dgAssert(joint->GetBody0()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 			dgAssert(joint->GetBody1()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			dgAssert((FindNode(body0) || FindNode(body1)));
+			dgAssert((FindNode((dgDynamicBody*)joint->GetBody0()) || FindNode((dgDynamicBody*)joint->GetBody1())));
 			joint->m_isInSkeleton = true;
 
 			//dgDynamicBody* const body0 = (dgDynamicBody*)joint->GetBody0();
