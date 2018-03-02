@@ -612,9 +612,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		if (skeleton0 && (skeleton0 == skeleton1)) {
 			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
 		} else if (skeleton0 && !skeleton1) {
-			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
+//			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
 		} else if (skeleton1 && !skeleton0) {
-			skeleton1->AddSelfCollisionJoint((dgContact*)constraint);
+//			skeleton1->AddSelfCollisionJoint((dgContact*)constraint);
 		}
 	}
 	

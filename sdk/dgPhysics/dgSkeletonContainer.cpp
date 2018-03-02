@@ -387,6 +387,7 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_lowerTriangularMassMatrix11(NULL)
 	,m_rowArray(NULL)
 	,m_loopingJoints(world->GetAllocator())
+	,m_auxiliaryMemoryBuffer(world->GetAllocator())
 	,m_id(m_uniqueID)
 	,m_lru(0)
 	,m_nodeCount(1)
@@ -469,11 +470,12 @@ void dgSkeletonContainer::ClearSelfCollision()
 void dgSkeletonContainer::AddSelfCollisionJoint(dgContact* const contact)
 {
 //	joint->m_isInSkeleton = true;
-
-//	m_world->GlobalLock(false);
-//	m_loopingJoints[m_loopCount + m_selfContactCount] = contact;
-//	m_selfContactCount++;
-//	m_world->GlobalUnlock();
+#if 0
+	m_world->GlobalLock(false);
+	m_loopingJoints[m_loopCount + m_selfContactCount] = contact;
+	m_selfContactCount++;
+	m_world->GlobalUnlock();
+#endif
 }
 
 void dgSkeletonContainer::SortGraph(dgNode* const root, dgInt32& index)
@@ -555,16 +557,15 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 		//dgTree<dgInt32, dgDynamicBody*> filter (allocator);
 		for (dgInt32 i = 0; i < loopJointsCount; i++) {
 			dgBilateralConstraint* const joint = loopJointArray[i];
-			dgDynamicBody* const body0 = (dgDynamicBody*)joint->GetBody0();
-			dgDynamicBody* const body1 = (dgDynamicBody*)joint->GetBody1();
 			dgAssert(joint->GetBody0()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 			dgAssert(joint->GetBody1()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-
-			dgNode* const node0 = FindNode(body0);
-			dgNode* const node1 = FindNode(body1);
-			dgAssert((node0 || node1));
+			dgAssert((FindNode(body0) || FindNode(body1)));
 			joint->m_isInSkeleton = true;
-		
+
+			//dgDynamicBody* const body0 = (dgDynamicBody*)joint->GetBody0();
+			//dgDynamicBody* const body1 = (dgDynamicBody*)joint->GetBody1();
+			//dgNode* const node0 = FindNode(body0);
+			//dgNode* const node1 = FindNode(body1);
 			//if (node0) {
 			//	filter.Insert(node0->m_index, node0->m_body);
 			//}
@@ -944,9 +945,10 @@ void dgSkeletonContainer::CalculateMassMatrixCoeff(const dgJointInfo* const join
 	CalculateMassMatrixCoeffBruteForce(m_auxiliaryRowCount - m_loopRowCount, diagDamp);
 }
 
-void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
+void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow)
 {
 	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
+	dgInt8* const memoryBuffer = GetMemoryBufferSizeInBytes(jointInfoArray, matrixRow);
 
 	m_rowArray = (dgJacobianMatrixElement**)memoryBuffer;
 	m_pairs = (dgNodePair*)&m_rowArray[m_rowCount];
@@ -1398,7 +1400,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 }
 
 
-dgInt32 dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const
+dgInt8* dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow)
 {
 	dgInt32 rowCount = 0;
 	dgInt32 auxiliaryRowCount = 0;
@@ -1424,11 +1426,13 @@ dgInt32 dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* cons
 	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount * 2;
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
-	return (size + 1024) & -0x10;
+	size = (size + 1024) & -0x10;
+	m_auxiliaryMemoryBuffer.ResizeIfNecessary((size + 1024) & -0x10);
+	return &m_auxiliaryMemoryBuffer[0];
 }
 
 
-void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
+void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow)
 {
 	dgInt32 rowCount = 0;
 	dgInt32 primaryStart = 0;
@@ -1462,7 +1466,7 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	m_auxiliaryRowCount += m_loopRowCount;
 
 	if (m_auxiliaryRowCount) {
-		InitAuxiliaryMassMatrix(jointInfoArray, matrixRow, memoryBuffer);
+		InitAuxiliaryMassMatrix(jointInfoArray, matrixRow);
 	}
 }
 
