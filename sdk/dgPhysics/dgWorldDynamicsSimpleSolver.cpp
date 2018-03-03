@@ -1186,21 +1186,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 		dgFloat32 maxAccNorm = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR;
 		dgFloat32 accNorm = maxAccNorm * dgFloat32(2.0f);
 
-#if 0
-		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
-			accNorm = dgFloat32(0.0f);
-			for (dgInt32 j = 0; j < jointCount; j++) {
-				dgJointInfo* const jointInfo = &constraintArray[j];
-				//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
-				dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
-				//accNorm = (accel > accNorm) ? accel : accNorm;
-				accNorm += accel2;
-			}
-		}
-		for (dgInt32 j = 0; j < skeletonCount; j++) {
-			skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
-		}
-#else
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
@@ -1208,7 +1193,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				if (!jointInfo->m_joint->IsSkeleton()) {
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
 					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
-				        //accNorm = (accel > accNorm) ? accel : accNorm;
 					accNorm += accel2;
 				}
 			}
@@ -1216,7 +1200,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
 			}
 		}
-#endif
 
 
 		if (timestepRK != dgFloat32(0.0f)) {

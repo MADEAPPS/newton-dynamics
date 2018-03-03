@@ -607,6 +607,48 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 	}
 }
 
+template <class T>
+DG_INLINE dgFloat32 dgGaussSeidelLcpSor(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol, dgInt32 maxIterCount, dgFloat32 sor, dgInt16* const clipOut)
+{
+	const T* const me = matrix;
+	T* const invDiag1 = dgAlloca(T, size);
+	dgCheckAligment(invDiag1);
+
+	dgInt32 stride = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = dgClamp(x[i], low[i], high[i]);
+		invDiag1[i] = T(1.0f) / me[stride + i];
+		stride += size;
+	}
+
+	const T tol2 = tol * tol;
+	T tolerance(tol2 * 2.0f);
+	const T* const invDiag = invDiag1;
+	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+		dgInt32 base = 0;
+		tolerance = T(0.0f);
+		for (dgInt32 j = 0; j < size; j++) {
+			const T* const row = &me[base];
+			T r(b[j] - dgDotProduct(size, row, x));
+			T f((r + row[j] * x[j]) * invDiag[j]);
+			if (f > high[j]) {
+				f = high[j];
+				clipOut[j] = 1;
+			} else if (f < low[j]) {
+				f = low[j];
+				clipOut[j] = 1;
+			} else {
+				tolerance += r * r;
+				clipOut[j] = 0;
+			}
+			x[j] = x[j] + (f - x[j]) * sor;
+			base += size;
+		}
+	}
+
+	return tolerance;
+}
+
 
 // solve a general Linear complementary program (LCP)
 // A * x = b + r
@@ -625,40 +667,10 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol = 1.0e-6f, dgInt32 maxIterCount = 20)
+void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T sor = T(1.3f))
 {
-	const T* const me = matrix;
-	T* const invDiag1 = dgAlloca(T, size);
-	dgCheckAligment(invDiag1);
-
-	dgInt32 stride = 0;
-	for (dgInt32 i = 0; i < size; i++) {
-		x[i] = dgClamp(x[i], low[i], high[i]);
-		invDiag1[i] = T(1.0f) / me[stride + i];
-		stride += size;
-	}
-
-	const T tol2 = tol * tol;
-	T tolerance(tol2 * 2.0f);
-	const T* const invDiag = invDiag1;
-	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
-		tolerance = T(0.0f);
-		dgInt32 base = 0;
-		for (dgInt32 j = 0; j < size; j++) {
-			const T* const row = &me[base];
-			T r(b[j] - dgDotProduct(size, row, x));
-			T f((r + row[j] * x[j]) * invDiag[j]);
-			if (f > high[j]) {
-				f = high[j];
-			} else if (f < low[j]) {
-				f = low[j];
-			} else {
-				tolerance += r * r;
-			}
-			x[j] = f;
-			base += size;
-		}
-	}
+	dgInt16* const clipOut = dgAlloca(short, size);
+	dgGaussSeidelLcpSor(size, matrix, x, b, low, high, T(1.0e-5f), size * size, sor, clipOut);
 }
 
 template<class T>
@@ -712,7 +724,8 @@ DG_INLINE void dgCalculateDelta_r(dgInt32 size, dgInt32 n, const T* const matrix
 }
 
 template<class T>
-DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const choleskyMatrix, T* const tmp, T* const reflexion, dgInt16* const activeColumns)
+//DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const choleskyMatrix, T* const tmp, T* const reflexion, dgInt16* const activeColumns)
+void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const choleskyMatrix, T* const tmp, T* const reflexion, dgInt16* const activeColumns)
 {
 	if (row != colum) {
 		dgAssert (row < colum);
@@ -802,10 +815,6 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 template <class T>
 bool dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
 {
-
-dgGaussSeidelLCP(size, symmetricMatrixPSD, x, b, low, high);
-return true;
-
 	T* const x0 = dgAlloca(T, size);
 	T* const r0 = dgAlloca(T, size);
 	T* const tmp0 = dgAlloca(T, size);
@@ -829,16 +838,42 @@ return true;
 	dgCheckAligment(symmetricMatrixPSD);
 	dgCheckAligment(lowerTriangularMatrix);
 
+	dgInt32 lcpRows = 0;
 	for (dgInt32 i = 0; i < size; i++) {
 		permute[i] = short(i);
 		r0[i] = b[i];
 		x0[i] = dgFloat32(0.0f);
 		delta_x[i] = r0[i];
 		delta_r[i] = r0[i];
+		lcpRows += (low[i] > DG_LCP_MAX_VALUE) || (high[i] < DG_LCP_MAX_VALUE);
 	}
+
+//dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, T(1.0e-5f), 20, T(1.3f), updateIndex);
+//return true;
+
 int xxxx0 = 0;
 int xxxx1 = 0;
+
 	dgInt32 initialGuessCount = size;
+	if (lcpRows > 16) {
+		dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, T(1.0e-5f), 20, T(1.3f), updateIndex);
+
+		dgInt32 lastRow = size;
+		initialGuessCount = 0;
+		for (dgInt32 i = 0; i < lastRow; i++) {
+			initialGuessCount += updateIndex[i] ? 0 : 1; 
+			if (updateIndex[i]) {
+				lastRow --;
+				dgSwap(updateIndex[lastRow], updateIndex[i]);
+				dgPermuteRows(size, i, lastRow, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
+				i --;
+			}
+		}
+		memcpy (lowerTriangularMatrix, symmetricMatrixPSD, sizeof (T) * size * size);
+		dgCholeskyFactorization(size, lowerTriangularMatrix);
+		return true;
+	}
+
 	for (T error2 = T (1.0f); initialGuessCount && (error2 > T (1.0e-12f)); ) {
 		dgSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, delta_x);
 
