@@ -729,7 +729,7 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 {
 	if (row != colum) {
 		dgAssert (row < colum);
-
+#if 1
 		// using Householder rotations, much more stable than Givens rotations
 		for (dgInt32 i = row; i < size; i ++) {
 			T* const rowI = &choleskyMatrix[size * i];
@@ -746,16 +746,10 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 					dgInt32 index = activeColumns[j];
 					mag += rowI[index] * rowI[index];
 					reflexion[index] = rowI[index];
-			        }
+		        }
 				reflexion[i] = rowI[i] - T (sqrt(mag + rowI[i] * rowI[i]));
 
 				const T vMag2 (mag + reflexion[i] * reflexion[i]);
-				//const T den (dgFloat32 (1.0f) / T (sqrt (vMag2)));
-				//for (dgInt32 j = 0; j < width; j ++) {
-				//	dgInt32 index = activeColumns[j];
-				//	reflexion[index] *= den;
-				//}
-
 				const T den (dgFloat32 (2.0f) / vMag2);
 				for (dgInt32 j = i; j < size; j ++) {
 					T acc (0.0f);
@@ -769,14 +763,12 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 
 				for (dgInt32 j = i + 1; j < size; j++) {
 					T* const rowJ = &choleskyMatrix[size * j];
-					//const T a = tmp[j] * T (dgFloat32 (2.0f));
 					const T a = tmp[j] * den;
 					for (dgInt32 k = 0; k < width; k ++) {
 						dgInt32 index = activeColumns[k];
 						rowJ[index] -= a * reflexion[index];
 					}
 				}
-				//rowI[i] -= tmp[i] * reflexion[i] * T (dgFloat32 (2.0f));
 				rowI[i] -= tmp[i] * reflexion[i] * den;
 			}
 		
@@ -793,6 +785,29 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 		for (dgInt32 i = row; i < size; i ++) {
 			choleskyMatrix[size * i + i] = dgMax(choleskyMatrix[size * i + i], T (dgFloat32 (1.0e-6f)));
 		}
+#else
+		for (dgInt32 i = colum; i < row; i ++) {
+			T a01 (choleskyMatrix[size * i + row]);
+			choleskyMatrix[size * i + row] = T(0.0f);
+			if (dgAbs (a01) > dgFloat32 (1.0e-14f)) {
+				T a00 (choleskyMatrix[size * i + colum]);
+				dgAssert (a00 > T(0.0f));
+				dgFloat64 den = a00 * a00 + a01 * a01;
+				den = dgFloat64(1.0f) / sqrt (den);
+
+				dgFloat64 b0 = a00 * den;
+				dgFloat64 b1 = a01 * den;
+				choleskyMatrix[size * i + colum] = T(a00 * b0 + a01 * b1);
+
+				for (dgInt32 j = i + 1; i < size; i ++) {
+					a00 = choleskyMatrix[size * i + colum];
+					a01 = choleskyMatrix[size * i + row];
+					choleskyMatrix[size * j + colum] = T(a00 * b0 + a01 * b1);
+					choleskyMatrix[size * j + row] = T(a01 * b0 - a00 * b1);
+				}
+			}
+		}
+#endif
 	}
 }
 
