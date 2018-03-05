@@ -1326,7 +1326,9 @@ void StandardJoints (DemoEntityManager* const scene)
 
 //Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDifferential(scene, dVector(-20.0f, 0.0f, 32.0f));
-	Add6DOF(scene, dVector(-20.0f, 0.0f, 32.0f));
+//	Add6DOF(scene, dVector(-20.0f, 0.0f, 32.0f));
+//  AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, 32.0f));
+    AddHinge (scene, dVector (-20.0f, 0.0f, 32.0f));
 #if 0
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
