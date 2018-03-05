@@ -608,7 +608,7 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 }
 
 template <class T>
-DG_INLINE dgFloat32 dgGaussSeidelLcpSor(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, dgInt32 maxIterCount, dgFloat32 sor)
+DG_INLINE void dgGaussSeidelLcpSor(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, dgInt32 maxIterCount, dgInt16* const clipped, dgFloat32 sor)
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dgAlloca(T, size);
@@ -638,17 +638,18 @@ DG_INLINE dgFloat32 dgGaussSeidelLcpSor(const dgInt32 size, const T* const matri
 			T f((r + row[j] * x[j]) * invDiag[j]);
 			if (f > high[j]) {
 				x[j] = high[j];
+				clipped[j] = 1;
 			} else if (f < low[j]) {
 				x[j] = low[j];
+				clipped[j] = 1;
 			} else {
+				clipped[j] = 0;
 				tolerance += r * r;
 				x[j] = x[j] + (f - x[j]) * sor;
 			}
 			base += size;
 		}
 	}
-
-	return tolerance;
 }
 
 
@@ -1402,6 +1403,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 template <class T>
 void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
 {
+/*
 //	if (size < 64) {
 	if (1) {
 		dgSolveDantzigLcpLow(size, symmetricMatrixPSD, lowerTriangularMatrix, x, b, low, high);
@@ -1409,7 +1411,7 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		// larger size lcp required a better initial guess
 		T error2 = T(0.25f);
 		dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, error2, size, T(1.3f));
-/*
+
 		if (accel2 > error2) {
 			dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, error2, dgMax(20, size), T(1.3f), updateIndex);
 			return;
@@ -1445,7 +1447,33 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				b[j] = high[i];
 			}
 		}
+	}
 */
+
+	
+	T tol2 = T(0.25f * 0.25f);
+	dgInt32 passes = dgClamp(size, 12, 20);
+	T* const r = dgAlloca(T, size);
+	dgInt16* const clipped = dgAlloca(dgInt16, size);
+	dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, passes, clipped, T(1.3f));
+
+	T err2(0.0f);
+	dgInt32 stride = 0;
+	dgInt32 clippeCount = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		const T* const row = &symmetricMatrixPSD[stride];
+		r[i] = b[i] - dgDotProduct(size, row, x);
+		clippeCount += clipped[i];
+		err2 += (1 - clipped[i]) * r[i] * r[i];
+		stride += size;
+	}
+
+	if (err2 > tol2) {
+		if ((clippeCount > 64) && (err2 > T(4.0f))) {
+			dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, 20, clipped, T(1.3f));
+		} else {
+			dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, 20, clipped, T(1.3f));
+		}
 	}
 }
 
