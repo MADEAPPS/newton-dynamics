@@ -255,12 +255,20 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API int GetSolverModel() const;
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 
+	const dVector& GetForce0() const {return m_force0;}
+	const dVector& GetForce1() const {return m_force0;}
+	const dVector& GetTorque0() const {return m_force0;}
+	const dVector& GetTorque1() const {return m_force0;}
+
 	private:
+	CUSTOM_JOINTS_API void CalculateJointForce(); 
+
 	// this are the callback needed to have transparent c++ method interfaces 
 	CUSTOM_JOINTS_API static void Destructor (const NewtonJoint* me);	
 	CUSTOM_JOINTS_API static void SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
+	
 	
 	protected:
 	CUSTOM_JOINTS_API dCustomJoint (NewtonInverseDynamics* const invDynSolver, void* const invDynNode);
@@ -275,9 +283,12 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
 	
-
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
+	dVector m_force0;
+	dVector m_force1;
+	dVector m_torque0;
+	dVector m_torque1;
 	void* m_userData;
 	NewtonBody* m_body0;
 	NewtonBody* m_body1;

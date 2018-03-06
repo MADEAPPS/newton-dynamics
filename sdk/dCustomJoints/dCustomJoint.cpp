@@ -27,6 +27,10 @@ dCustomJoint::dCustomJoint ()
 	:dCustomAlloc()
 	,m_localMatrix0(dGetIdentityMatrix())
 	,m_localMatrix1(dGetIdentityMatrix())
+	,m_force0(0.0f)
+	,m_force1(0.0f)
+	,m_torque0(0.0f)
+	,m_torque1(0.0f)
 	,m_userData(NULL)
 	,m_body0(NULL)
 	,m_body1(NULL)
@@ -49,6 +53,10 @@ dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* cons
 	:dCustomAlloc()
 	,m_localMatrix0(dGetIdentityMatrix())
 	,m_localMatrix1(dGetIdentityMatrix())
+	,m_force0(0.0f)
+	,m_force1(0.0f)
+	,m_torque0(0.0f)
+	,m_torque1(0.0f)
 {
 	m_joint = NULL;
 	m_body1 = NULL;
@@ -70,6 +78,10 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	:dCustomAlloc()
 	,m_localMatrix0(dGetIdentityMatrix())
 	,m_localMatrix1(dGetIdentityMatrix())
+	,m_force0(0.0f)
+	,m_force1(0.0f)
+	,m_torque0(0.0f)
+	,m_torque1(0.0f)
 	,m_userData(NULL)
 	,m_body0(body0)
 	,m_body1(body1)
@@ -208,6 +220,7 @@ void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 		// call the constraint call back
 		if (joint) {
 			joint->SubmitConstraints(timestep, threadIndex);
+			joint->CalculateJointForce();
 		}
 	}
 }
@@ -388,5 +401,26 @@ void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, cons
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &prejectPoint[0], &dir[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
+	}
+}
+
+
+void dCustomJoint::CalculateJointForce()
+{
+	m_force0 = dVector(0.0f);
+	m_force1 = dVector(0.0f);
+	m_torque0 = dVector(0.0f);
+	m_torque1 = dVector(0.0f);
+
+	int row = NewtonUserJoinRowsCount(m_joint);
+	for (int i = 0; i < row; i ++) {
+		dFloat jacobian0[6];
+		dFloat jacobian1[6];
+		NewtonUserJointGetGeneralRow(m_joint, i, jacobian0, jacobian1);
+		dFloat f = NewtonUserJointGetRowForce(m_joint, i);
+		m_force0 += dVector (jacobian0[0] * f, jacobian0[1] * f, jacobian0[2] * f, 0.0f);
+		m_force1 += dVector (jacobian1[0] * f, jacobian1[1] * f, jacobian1[2] * f, 0.0f);
+		m_torque0 += dVector(jacobian0[3] * f, jacobian0[4] * f, jacobian0[5] * f, 0.0f);
+		m_torque1 += dVector(jacobian1[3] * f, jacobian1[4] * f, jacobian1[5] * f, 0.0f);
 	}
 }
