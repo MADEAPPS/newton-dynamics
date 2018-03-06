@@ -1350,7 +1350,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_z += 4.0f;
 
 	// add some object to play with
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
 //	LoadLumberYardMesh (scene, dVector(25.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
 
 	origin.m_x -= 5.0f;
