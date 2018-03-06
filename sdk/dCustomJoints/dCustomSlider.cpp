@@ -33,7 +33,6 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options()
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -48,7 +47,6 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -65,7 +63,6 @@ void dCustomSlider::Deserialize (NewtonDeserializeCallback callback, void* const
 	callback (userData, &m_spring, sizeof (m_spring));
 	callback (userData, &m_damper, sizeof (m_damper));
 	callback (userData, &m_springDamperRelaxation, sizeof (m_springDamperRelaxation));
-	callback (userData, &m_options, sizeof (m_options));
 }
 
 dCustomSlider::~dCustomSlider()
@@ -84,7 +81,6 @@ void dCustomSlider::Serialize (NewtonSerializeCallback callback, void* const use
 	callback(userData, &m_spring, sizeof(m_spring));
 	callback(userData, &m_damper, sizeof(m_damper));
 	callback(userData, &m_springDamperRelaxation, sizeof(m_springDamperRelaxation));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 

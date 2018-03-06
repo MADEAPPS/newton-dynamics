@@ -30,7 +30,7 @@ dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, Newt
 	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
-	m_options.m_value = 0;
+	dAssert(m_options.m_value == 0);
 	SetAngularRate(dPi);
 	SetMinAngularLimit(-180.0f * dDegreeToRad);
 	SetMaxAngularLimit(180.0f * dDegreeToRad);
@@ -42,7 +42,7 @@ dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
-	m_options.m_value = 0;
+	dAssert(m_options.m_value == 0);
 	SetAngularRate(angularRate);
 	SetMinAngularLimit(minAngle);
 	SetMaxAngularLimit(maxAngle);

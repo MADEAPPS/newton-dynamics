@@ -263,7 +263,6 @@ class dCustomInverseDynamics: public dCustomJoint
 	dFloat m_coneAngle;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
-	dOptions m_options;
 	DECLARE_CUSTOM_JOINT(dCustomInverseDynamics, dCustomJoint)
 };
 

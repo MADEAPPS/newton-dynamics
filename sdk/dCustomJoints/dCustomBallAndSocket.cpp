@@ -30,7 +30,6 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, Newt
 	,m_maxConeAngle(60.0f * dDegreeToRad)
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
-	,m_options()
 {
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -43,7 +42,6 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, con
 	,m_maxConeAngle(60.0f * dDegreeToRad)
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
-	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
@@ -62,7 +60,6 @@ void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void*
 	callback(userData, &m_maxConeAngle, sizeof(dFloat));
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -75,7 +72,6 @@ void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* con
 	callback(userData, &m_maxConeAngle, sizeof(dFloat));
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustomBallAndSocket::EnableTwist(bool state)

@@ -33,7 +33,6 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_damper(0.0f)
 	,m_motorSpeed(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options()
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -51,7 +50,6 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_damper(0.0f)
 	,m_motorSpeed(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix (pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -73,7 +71,6 @@ void dCustomHinge::Deserialize (NewtonDeserializeCallback callback, void* const 
 	callback (userData, &m_damper, sizeof (dFloat));
 	callback (userData, &m_motorSpeed, sizeof(dFloat));
 	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_options, sizeof (m_options));
 }
 
 void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
@@ -88,7 +85,6 @@ void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const user
 	callback(userData, &m_damper, sizeof (dFloat));
 	callback(userData, &m_motorSpeed, sizeof(dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof (dFloat));
-	callback (userData, &m_options, sizeof (m_options));
 }
 
 void dCustomHinge::EnableLimits(bool state)

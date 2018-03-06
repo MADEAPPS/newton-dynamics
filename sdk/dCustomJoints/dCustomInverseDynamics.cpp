@@ -787,7 +787,6 @@ dCustomInverseDynamics::dCustomInverseDynamics(const dMatrix& pinAndPivotFrame, 
 	,m_coneAngle(0.0f)
 	,m_minTwistAngle(0.0f)
 	,m_maxTwistAngle(0.0f)
-	,m_options()
 {
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -798,7 +797,6 @@ dCustomInverseDynamics::dCustomInverseDynamics (const dMatrix& pinAndPivotFrameC
 	,m_coneAngle(0.0f)
 	,m_minTwistAngle(0.0f)
 	,m_maxTwistAngle(0.0f)
-	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -815,7 +813,6 @@ void dCustomInverseDynamics::Deserialize(NewtonDeserializeCallback callback, voi
 	callback(userData, &m_coneAngle, sizeof(dFloat));
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
-	callback (userData, &m_options, sizeof (m_options));
 }
 
 void dCustomInverseDynamics::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -825,7 +822,6 @@ void dCustomInverseDynamics::Serialize(NewtonSerializeCallback callback, void* c
 	callback(userData, &m_coneAngle, sizeof(dFloat));
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
-	callback (userData, &m_options, sizeof (m_options));
 }
 
 void dCustomInverseDynamics::SetJointTorque(dFloat torque)

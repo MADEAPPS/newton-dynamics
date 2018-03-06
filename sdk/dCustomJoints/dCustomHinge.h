@@ -59,7 +59,6 @@ class dCustomHinge: public dCustomJoint
 	dFloat m_damper;
 	dFloat m_motorSpeed;
 	dFloat m_springDamperRelaxation;
-	dOptions m_options;
 	DECLARE_CUSTOM_JOINT(dCustomHinge, dCustomJoint)
 };
 

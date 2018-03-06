@@ -57,7 +57,6 @@ class dCustomSlider: public dCustomJoint
 	dFloat m_spring;
 	dFloat m_damper;
 	dFloat m_springDamperRelaxation;
-	dOptions m_options;
 	DECLARE_CUSTOM_JOINT(dCustomSlider, dCustomJoint)
 };
 

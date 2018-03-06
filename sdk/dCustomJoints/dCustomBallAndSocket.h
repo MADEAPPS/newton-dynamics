@@ -52,7 +52,6 @@ class dCustomBallAndSocket: public dCustomJoint
 	dFloat m_maxConeAngle;
 	dFloat m_coneFriction;
 	dFloat m_twistFriction;
-	dOptions m_options;
 
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };

@@ -29,7 +29,7 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, N
 	,m_maxForce(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
-	m_options.m_value = 0;
+	dAssert(m_options.m_value == 0);
 }
 
 dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent)
@@ -39,7 +39,7 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, d
     ,m_maxForce(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
-	m_options.m_value = 0;
+	dAssert(m_options.m_value == 0);
 	SetLinearRate(speed);
 	SetMinPositLimit(minPosit);
 	SetMaxPositLimit(maxPosit);

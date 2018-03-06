@@ -40,6 +40,7 @@ dCustomJoint::dCustomJoint ()
 	,m_stiffness(1.0f)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
+	,m_options()
 {
 }
 
@@ -57,6 +58,7 @@ dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* cons
 	,m_force1(0.0f)
 	,m_torque0(0.0f)
 	,m_torque1(0.0f)
+	,m_options()
 {
 	m_joint = NULL;
 	m_body1 = NULL;
@@ -97,6 +99,7 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &m_options, sizeof(m_options));
 	callback(userData, &solverModel, sizeof(solverModel));
 
 	Init (m_maxDof, body0, body1);
@@ -220,7 +223,9 @@ void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 		// call the constraint call back
 		if (joint) {
 			joint->SubmitConstraints(timestep, threadIndex);
-			joint->CalculateJointForce();
+			if (joint->m_options.m_calculateForces) {
+				joint->CalculateJointForce();
+			}
 		}
 	}
 }
@@ -362,6 +367,7 @@ void dCustomJoint::Serialize (NewtonSerializeCallback callback, void* const user
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &m_options, sizeof(m_options));
 	callback(userData, &solverModel, sizeof(solverModel));
 }
 
@@ -402,6 +408,31 @@ void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, cons
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
 	}
+}
+
+
+void dCustomJoint::SetJointForceCalculation(bool mode)
+{
+	m_options.m_calculateForces = mode ? -1 : 0;
+}
+
+const dVector& dCustomJoint::GetForce0() const 
+{ 
+	return m_force0; 
+}
+
+const dVector& dCustomJoint::GetForce1() const 
+{ 
+	return m_force1; 
+}
+
+const dVector& dCustomJoint::GetTorque0() const 
+{ 
+	return m_torque0; 
+}
+const dVector& dCustomJoint::GetTorque1() const 
+{ 
+	return m_torque1;
 }
 
 

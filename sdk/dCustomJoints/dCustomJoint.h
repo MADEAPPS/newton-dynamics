@@ -93,13 +93,13 @@ class dCustomJoint: public dCustomAlloc
 		union {
 			int m_value;
 			struct {
-				int m_option0 : 1;
-				int m_option1 : 1;
-				int m_option2 : 1;
-				int m_option3 : 1;
-				int m_option4 : 1;
-				int m_option5 : 1;
-				int m_option7 : 1;
+				int m_option0			: 1;
+				int m_option1			: 1;
+				int m_option2			: 1;
+				int m_option3			: 1;
+				int m_option4			: 1;
+				int m_option5			: 1;
+				int m_calculateForces	: 1;
 			};
 		};
 	};
@@ -255,10 +255,11 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API int GetSolverModel() const;
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 
-	const dVector& GetForce0() const {return m_force0;}
-	const dVector& GetForce1() const {return m_force0;}
-	const dVector& GetTorque0() const {return m_force0;}
-	const dVector& GetTorque1() const {return m_force0;}
+	CUSTOM_JOINTS_API void SetJointForceCalculation(bool mode);
+	CUSTOM_JOINTS_API const dVector& GetForce0() const;
+	CUSTOM_JOINTS_API const dVector& GetForce1() const;
+	CUSTOM_JOINTS_API const dVector& GetTorque0() const;
+	CUSTOM_JOINTS_API const dVector& GetTorque1() const;
 
 	private:
 	CUSTOM_JOINTS_API void CalculateJointForce(); 
@@ -298,6 +299,7 @@ class dCustomJoint: public dCustomAlloc
 	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;
+	dOptions m_options;
 	CUSTOM_JOINTS_API static dCRCTYPE m_key;
 	CUSTOM_JOINTS_API static dSerializeMetaData m_metaData_CustomJoint;
 };

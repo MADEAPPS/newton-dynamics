@@ -27,9 +27,9 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_pitch()
 	,m_yaw()
 	,m_roll()
-	,m_options()
 {
-	m_options.m_value = 0x3f;
+	m_options.m_option0 = -1;
+	m_options.m_option1 = -1;
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -40,11 +40,12 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& p
 	,m_pitch()
 	,m_yaw()
 	,m_roll()
-	,m_options()
 {
 	dMatrix dummy;
 
-	m_options.m_value = 0x3f;
+//	m_options.m_value = 0x3f;
+	m_options.m_option0 = -1;
+	m_options.m_option1 = -1;
 	CalculateLocalMatrix(pinAndPivotChildFrame, m_localMatrix0, dummy);
 	CalculateLocalMatrix(pinAndPivotParentFrame, dummy, m_localMatrix1);
 }
@@ -60,7 +61,6 @@ void dCustom6dof::Deserialize (NewtonDeserializeCallback callback, void* const u
 	callback(userData, &m_yaw, sizeof(m_yaw));
 	callback(userData, &m_roll, sizeof(m_roll));
 	callback(userData, &m_pitch, sizeof(m_pitch));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userData) const
@@ -71,7 +71,6 @@ void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userD
 	callback(userData, &m_yaw, sizeof(m_yaw));
 	callback(userData, &m_roll, sizeof(m_roll));
 	callback(userData, &m_pitch, sizeof(m_pitch));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustom6dof::DisableAxisX()

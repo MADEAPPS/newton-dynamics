@@ -77,7 +77,6 @@ class dCustom6dof: public dCustomJoint
 	dAngleData m_pitch;
 	dAngleData m_yaw;
 	dAngleData m_roll;
-	dOptions m_options;
 
 	DECLARE_CUSTOM_JOINT(dCustom6dof, dCustomJoint)
 };

@@ -27,7 +27,7 @@ dCustomDoubleHingeActuator::dCustomDoubleHingeActuator(const dMatrix& pinAndPivo
 	,m_maxTorque1(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
-	m_options.m_value = 0;
+	dAssert(m_options.m_value == 0);
 	SetHardMiddleAxis(true);
 	EnableMotor(false, 0.0f);
 }
@@ -41,7 +41,7 @@ dCustomDoubleHingeActuator::dCustomDoubleHingeActuator (const dMatrix& pinAndPiv
 	,m_maxTorque1(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
-	m_options.m_value = 0;
+	dAssert(m_options.m_value == 0);
 	SetHardMiddleAxis(true);
 	EnableMotor(false, dAbs (angularRate0));
 	SetLimits (minAngle0, maxAngle0);
