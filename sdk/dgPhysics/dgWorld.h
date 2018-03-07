@@ -98,7 +98,7 @@ class dgWorld;
 class dgCollisionInstance;
 class dgCollisionParamProxy;
 
-class dgSolverSleepTherfesholds
+class dgSolverProgressiveSleepEntry
 {
 	public:
 	dgFloat32 m_maxAccel;
@@ -546,7 +546,7 @@ class dgWorld
 	dgFloat32 m_contactTolerance;
 	dgFloat32 m_lastExecutionTime;
 
-	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
+	dgSolverProgressiveSleepEntry m_sleepTable[DG_SLEEP_ENTRIES];
 	
 	dgBroadPhase* m_broadPhase; 
 	dgDynamicBody* m_sentinelBody;

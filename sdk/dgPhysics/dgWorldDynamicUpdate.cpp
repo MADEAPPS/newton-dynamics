@@ -55,6 +55,19 @@ class dgWorldDynamicUpdateSyncDescriptor
 };
 
 
+void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes)
+{
+	world->m_solverJacobiansMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgJacobianMatrixElement));
+	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
+
+	world->m_solverForceAccumulatorMemory.ResizeIfNecessary((bodyCount + 8) * sizeof(dgJacobian));
+	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
+	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof(dgJacobian))) & (-8)));
+
+	dgAssert((dgUnsigned64(m_jacobianBuffer) & 0x01f) == 0);
+	dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
+}
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -653,6 +666,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 
 void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const
 {
+#if 0
 	bool stackSleeping = true;
 	bool isClusterResting = true;
 	dgInt32 sleepCounter = 10000;
@@ -784,19 +798,203 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 			}
 		}
 	}
+#else
+
+	dgWorld* const world = (dgWorld*) this;
+	dgFloat32 velocityDragCoeff = DG_FREEZZING_VELOCITY_DRAG;
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart + 1];
+	dgInt32 count = cluster->m_bodyCount - 1;
+	if (count <= 2) {
+		//bool autosleep = bodyArray[0].m_body->m_autoSleep;
+		bool equilibrium = bodyArray[0].m_body->m_equilibrium;
+		if (count == 2) {
+			equilibrium &= bodyArray[1].m_body->m_equilibrium;
+		}
+		if (!equilibrium) {
+			velocityDragCoeff = dgFloat32(0.9999f);
+		}
+	}
+
+	dgFloat32 maxAccel = dgFloat32(0.0f);
+	dgFloat32 maxAlpha = dgFloat32(0.0f);
+	dgFloat32 maxSpeed = dgFloat32(0.0f);
+	dgFloat32 maxOmega = dgFloat32(0.0f);
+
+	const dgFloat32 speedFreeze = world->m_freezeSpeed2;
+	const dgFloat32 accelFreeze = world->m_freezeAccel2 * ((cluster->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32(0.05f) : dgFloat32(1.0f));
+	dgVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32(0.0f));
+
+//static int xxxxx;
+//xxxxx++;
+	bool stackSleeping = true;
+	//bool isClusterResting = true;
+	dgInt32 sleepCounter = 10000;
+	for (dgInt32 i = 0; i < count; i++) {
+		dgBody* const body = bodyArray[i].m_body;
+		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBody));
+
+		body->m_equilibrium = 1;
+		dgVector isMovingMask((body->m_veloc + body->m_omega + body->m_accel + body->m_alpha) & dgVector::m_signMask);
+		if ((isMovingMask.TestZero().GetSignMask() & 7) != 7) {
+			dgAssert(body->m_invMass.m_w);
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				body->IntegrateVelocity(timestep);
+			}
+
+			dgAssert(body->m_accel.m_w == dgFloat32(0.0f));
+			dgAssert(body->m_alpha.m_w == dgFloat32(0.0f));
+			dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
+			dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
+			dgFloat32 accel2 = body->m_accel.DotProduct4(body->m_accel).GetScalar();
+			dgFloat32 alpha2 = body->m_alpha.DotProduct4(body->m_alpha).GetScalar();
+			dgFloat32 speed2 = body->m_veloc.DotProduct4(body->m_veloc).GetScalar();
+			dgFloat32 omega2 = body->m_omega.DotProduct4(body->m_omega).GetScalar();
+
+			maxAccel = dgMax(maxAccel, accel2);
+			maxAlpha = dgMax(maxAlpha, alpha2);
+			maxSpeed = dgMax(maxSpeed, speed2);
+			maxOmega = dgMax(maxOmega, omega2);
+			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
+			if (equilibrium) {
+				dgVector veloc(body->m_veloc * velocDragVect);
+				dgVector omega(body->m_omega * velocDragVect);
+				body->m_veloc = (veloc.DotProduct4(veloc) > m_velocTol) & veloc;
+				body->m_omega = (omega.DotProduct4(omega) > m_velocTol) & omega;
+			}
+
+			body->m_equilibrium = equilibrium ? 1 : 0;
+			//body->m_equilibrium &= body->m_autoSleep;
+			stackSleeping &= equilibrium;
+			//isClusterResting &= (body->m_autoSleep & equilibrium);
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				dgDynamicBody* const dynBody = (dgDynamicBody*)body;
+				sleepCounter = dgMin(sleepCounter, dynBody->m_sleepingCounter);
+				dynBody->m_sleepingCounter++;
+			}
+
+			body->UpdateCollisionMatrix(timestep, threadID);
+		}
+	}
+
+//	if (isClusterResting && cluster->m_jointCount) {
+	if (cluster->m_jointCount) {
+		if (stackSleeping) {
+			for (dgInt32 i = 0; i < count; i++) {
+				dgBody* const body = bodyArray[i].m_body;
+				dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+				body->m_accel = dgVector::m_zero;
+				body->m_alpha = dgVector::m_zero;
+				body->m_veloc = dgVector::m_zero;
+				body->m_omega = dgVector::m_zero;
+				body->m_sleeping = body->m_autoSleep;
+			}
+		} else {
+			bool state = (maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) ||
+						 (maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
+						 (maxSpeed > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxVeloc) || 
+						 (maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega);
+			if (state) {
+				for (dgInt32 i = 0; i < count; i++) {
+					dgBody* const body = bodyArray[i].m_body;
+					if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+						dgDynamicBody* const dynBody = (dgDynamicBody*)body;
+						dynBody->m_sleepingCounter = 0;
+					}
+				}
+			} else {
+				dgInt32 timeScaleSleepCount = dgInt32(dgFloat32(60.0f) * sleepCounter * timestep);
+
+				dgInt32 index = DG_SLEEP_ENTRIES;
+				for (dgInt32 i = 1; i < DG_SLEEP_ENTRIES; i ++) {
+					if (world->m_sleepTable[i].m_steps > timeScaleSleepCount) {
+						index = i;
+						break;
+					}
+				}
+				index --;
+
+				bool state1 = (maxAccel < world->m_sleepTable[index].m_maxAccel) &&
+							  (maxAlpha < world->m_sleepTable[index].m_maxAlpha) &&
+					          (maxSpeed < world->m_sleepTable[index].m_maxVeloc) &&
+					          (maxOmega < world->m_sleepTable[index].m_maxOmega);
+				if (state1) {
+					for (dgInt32 i = 0; i < count; i++) {
+						dgBody* const body = bodyArray[i].m_body;
+						body->m_accel = dgVector::m_zero;
+						body->m_alpha = dgVector::m_zero;
+						body->m_veloc = dgVector::m_zero;
+						body->m_omega = dgVector::m_zero;
+						body->m_sleeping = body->m_autoSleep;
+						if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+							dgDynamicBody* const dynBody = (dgDynamicBody*)body;
+							dynBody->m_sleepingCounter = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+
+/*
+if (stackSleeping) {
+	for (dgInt32 i = 0; i < count; i++) {
+		dgBody* const body = bodyArray[i].m_body;
+		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+		body->m_accel = dgVector::m_zero;
+		body->m_alpha = dgVector::m_zero;
+		body->m_veloc = dgVector::m_zero;
+		body->m_omega = dgVector::m_zero;
+		body->m_sleeping = body->m_autoSleep;
+	}
 }
+else {
+	const bool state = (maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) || (maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
+		(maxSpeed > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxVeloc) || (maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega);
+	if (state) {
+		for (dgInt32 i = 0; i < count; i++) {
+			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+			dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			body->m_sleepingCounter = 0;
+		}
+	}
+	else {
+		dgInt32 index = 0;
+		for (dgInt32 i = 0; i < DG_SLEEP_ENTRIES; i++) {
+			if ((maxAccel <= world->m_sleepTable[i].m_maxAccel) &&
+				(maxAlpha <= world->m_sleepTable[i].m_maxAlpha) &&
+				(maxSpeed <= world->m_sleepTable[i].m_maxVeloc) &&
+				(maxOmega <= world->m_sleepTable[i].m_maxOmega)) {
+				index = i;
+				break;
+			}
+		}
 
-void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes)
-{
-	world->m_solverJacobiansMemory.ResizeIfNecessary ((rowsCount + 1) * sizeof (dgJacobianMatrixElement));
-	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
-
-	world->m_solverForceAccumulatorMemory.ResizeIfNecessary ((bodyCount + 8) * sizeof (dgJacobian));
-	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
-	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
-
-	dgAssert((dgUnsigned64(m_jacobianBuffer) & 0x01f) == 0);
-	dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
+		dgInt32 timeScaleSleepCount = dgInt32(dgFloat32(60.0f) * sleepCounter * timestep);
+		if (timeScaleSleepCount > world->m_sleepTable[index].m_steps) {
+			for (dgInt32 i = 0; i < count; i++) {
+				dgBody* const body = bodyArray[i].m_body;
+				dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+				body->m_accel = dgVector::m_zero;
+				body->m_alpha = dgVector::m_zero;
+				body->m_veloc = dgVector::m_zero;
+				body->m_omega = dgVector::m_zero;
+				body->m_equilibrium = 1;
+				body->m_sleeping = body->m_autoSleep;
+			}
+		}
+		else {
+			sleepCounter++;
+			for (dgInt32 i = 0; i < count; i++) {
+				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+				if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+					body->m_sleepingCounter = sleepCounter;
+				}
+			}
+		}
+	}
+*/
+#endif
 }
 
 

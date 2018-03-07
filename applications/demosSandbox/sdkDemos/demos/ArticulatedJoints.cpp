@@ -638,7 +638,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dCustomSlidingContact* const joint = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
 		joint->EnableLimits(true);
 		joint->SetLimits(-0.5f, 0.01f);
-		joint->SetAsSpringDamper(true, 0.9f, 1550.0f, 150.0f);
+		joint->SetAsSpringDamper(true, 0.97f, 2050.0f, 200.0f);
 		return bone;
 	}
 
@@ -1350,7 +1350,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_z += 4.0f;
 
 	// add some object to play with
-	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
 //	LoadLumberYardMesh (scene, dVector(25.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
 
 	origin.m_x -= 5.0f;
