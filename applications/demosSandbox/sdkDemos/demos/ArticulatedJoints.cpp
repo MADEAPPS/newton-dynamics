@@ -215,6 +215,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart  | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :
 			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart  | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 			{
 				return 0;
 				break;
@@ -226,7 +228,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
-			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :
 			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
@@ -258,17 +259,18 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :			
 			//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 			//case ARTICULATED_VEHICLE_DEFINITION::m_linkPart  | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			//case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
-			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
-			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
 			{
 				return 1;
 				break;
 			}
 
-			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :
-			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			{
 				return 0;
 				break;
@@ -1351,7 +1353,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	// add some object to play with
 	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh (scene, dVector(25.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
+	LoadLumberYardMesh (scene, dVector(25.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
