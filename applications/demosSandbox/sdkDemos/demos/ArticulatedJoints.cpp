@@ -33,7 +33,7 @@ struct ARTICULATED_VEHICLE_DEFINITION
 		m_terrain		= 1<<0,
 		m_landPart		= 1<<1,
 		m_bodyPart		= 1<<2,
-		m_linkPart		= 1<<3,
+		m_woodSlab		= 1<<3,
 		m_tirePart		= 1<<4,
 		m_tireInnerRing = 1<<5,
 	};
@@ -212,8 +212,8 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		switch (id0 | id1)
 		{
-			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
-			case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
+			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
 			{
 				return 0;
@@ -222,13 +222,13 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
-			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
-			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
-			case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			{
 				return 1;
@@ -255,18 +255,18 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		switch (id0 | id1)
 		{
-			//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:			
+			//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:			
 			//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
-			//case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			//case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
-			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			{
 				return 1;
 				break;
 			}
 
-			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 			{
@@ -304,7 +304,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			switch (id0 | id1) 
 			{
 				//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
-				//case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
+				//case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
 //				{
 //					NewtonContactJointRemoveContact(contactJoint, contactList[i]);
 //					break;
@@ -312,12 +312,12 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 				
 				case ARTICULATED_VEHICLE_DEFINITION::m_bodyPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
-				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
-				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
-				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
+				case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
+				case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
 				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
-				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart:
+				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_woodSlab:
 				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 				case ARTICULATED_VEHICLE_DEFINITION::m_landPart | ARTICULATED_VEHICLE_DEFINITION::m_landPart:
 				{
@@ -838,7 +838,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dMatrix linkMatrix (dGetIdentityMatrix());
 		linkMatrix.m_posit.m_y = linkLength * 0.5f;
 		NewtonCollision* const collision = NewtonCreateBox (GetWorld(), 0.06f, linkLength, 0.5f, 0, &linkMatrix[0][0]);
-		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_linkPart);
+		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 
 		NewtonBody* linkArray[1024];
 
@@ -1350,7 +1350,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_z += 4.0f;
 
 	// add some object to play with
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
 //	LoadLumberYardMesh (scene, dVector(25.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_landPart);
 
 	origin.m_x -= 5.0f;
