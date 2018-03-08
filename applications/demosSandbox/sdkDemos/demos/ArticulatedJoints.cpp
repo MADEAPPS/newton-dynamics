@@ -1353,7 +1353,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	// add some object to play with
 	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-	LoadLumberYardMesh (scene, dVector(25.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
+	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;

@@ -939,8 +939,8 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
-//void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high, dgInt32 bilateralCount____)
+//DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
+void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
 {	
 	T* const x0 = dgAlloca(T, size);
 	T* const r0 = dgAlloca(T, size);
@@ -965,7 +965,7 @@ DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T
 	dgCheckAligment(symmetricMatrixPSD);
 	dgCheckAligment(lowerTriangularMatrix);
 
-#if 1
+#if 0
 	for (dgInt32 i = 0; i < size; i++) {
 		permute[i] = dgInt16(i);
 		r0[i] = b[i];
@@ -1034,20 +1034,39 @@ DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T
 		r0[i] = dgDotProduct(size, &symmetricMatrixPSD[stride], x0) - b[j];
 		stride += size;
 	}
-
 #else
-	dgInt32 base = 0;
-	for (dgInt32 i = 0; i < size; i ++) {
+
+
+	for (dgInt32 i = 0; i < size; i++) {
 		permute[i] = dgInt16(i);
-		x0[i] = x[i];
 		r0[i] = b[i];
-		r0[i] = b[i] - dgDotProduct(size, &symmetricMatrixPSD[base], x);
-		delta_x[i] = r0[i];
-		delta_r[i] = r0[i];
-		base += size;
+		x0[i] = dgFloat32(0.0f);
+		delta_x[i] = dgMax (dgAbs(b[i]), T (1.0f));
 	}
 
-	dgInt32 initialGuessCount = bilateralCount;
+	for (dgInt32 i = 0; i < size; i++) {
+		dgInt32 min = i;
+		for (dgInt32 j = i + 1; j < size; j++) {
+			if (delta_x[j] < delta_x[min]) {
+				min = j;
+			}
+		}
+		if (min != i) {
+			dgSwap(delta_x[i], delta_x[min]);
+			dgPermuteRows(size, i, min, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
+		}
+	}
+
+/*
+	for (dgInt32 i = 0; i < size; i++) {
+		permute[i] = dgInt16(i);
+		r0[i] = b[i];
+		x0[i] = dgFloat32(0.0f);
+		delta_x[i] = r0[i];
+		delta_r[i] = r0[i];
+	}
+
+	dgInt32 initialGuessCount = size;
 	for (T error2 = T(1.0f); initialGuessCount && (error2 > T(1.0e-12f));) {
 		dgSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, delta_x);
 
@@ -1058,7 +1077,8 @@ DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T
 			if (x1 < low[i]) {
 				index = i;
 				alpha = (low[i] - x0[i]) / delta_x[i];
-			} else if (x1 > high[i]) {
+			}
+			else if (x1 > high[i]) {
 				index = i;
 				alpha = (high[i] - x0[i]) / delta_x[i];
 			}
@@ -1079,7 +1099,7 @@ DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T
 			dgSwap(delta_x[index], delta_x[initialGuessCount]);
 			dgSwap(delta_r[index], delta_r[initialGuessCount]);
 			dgPermuteRows(size, index, initialGuessCount, symmetricMatrixPSD, lowerTriangularMatrix, x0, r0, low, high, permute);
-			dgCholeskyUpdate(size, index, initialGuessCount, lowerTriangularMatrix, tmp0, tmp1, updateIndex);
+			dgCholeskyUpdate(size, index, initialGuessCount, lowerTriangularMatrix, tmp0, tmp1);
 		}
 	}
 
@@ -1097,28 +1117,20 @@ DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T
 		delta_r[i] = dgFloat32(0.0f);
 	}
 
+	dgInt32 clampedIndex = size;
 	dgInt32 index = initialGuessCount;
-	dgInt32 clampedIndex = bilateralCount;
-	dgInt32 count = bilateralCount - initialGuessCount;
+	dgInt32 count = size - initialGuessCount;
 
-	base = index * size;
+	dgInt32 stride = index * size;
 	for (dgInt32 i = index; i < size; i++) {
 		dgInt32 j = permute[i];
-		r0[i] = dgDotProduct(size, &symmetricMatrixPSD[base], x0) - b[j];
-		base += size;
+		r0[i] = dgDotProduct(size, &symmetricMatrixPSD[stride], x0) - b[j];
+		stride += size;
 	}
-
-	if (bilateralCount < size) {
-		for (dgInt32 i = index; i < size; i++) {
-			if ((dgAbs(x0[i]) > T(1.0e-6f)) && ((x0[i] * r0[i]) > T(0.0e-6f))) {
-				dgAssert(0);
-			}
-			//count = 1;
-			//clampedIndex ++;
-		}
-	}
+*/
 #endif
 
+/*
 	while (count) {
 		bool loop = true;
 
@@ -1229,6 +1241,7 @@ DG_INLINE void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T
 		x[j] = x0[i];
 		b[j] = r0[i];
 	}
+*/
 }
 
 
@@ -1472,6 +1485,14 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		if ((clippeCount > 64) && (err2 > T(4.0f))) {
 			dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, 20, clipped, T(1.3f));
 		} else {
+			T* const x0 = dgAlloca(T, size);
+			for (dgInt32 i = 0; i < size; i++) {
+				x0[i] = x[i];
+				low[i] -= x[i];
+				high[i] -= x[i];
+			}
+			//dgSolveDantzigLcpLow(size, symmetricMatrixPSD, lowerTriangularMatrix, x0, r, low, high);
+
 			dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, 20, clipped, T(1.3f));
 		}
 	}

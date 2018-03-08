@@ -28,8 +28,7 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_yaw()
 	,m_roll()
 {
-	m_options.m_option0 = -1;
-	m_options.m_option1 = -1;
+	m_options.m_value = 0x3f;
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
@@ -42,10 +41,7 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& p
 	,m_roll()
 {
 	dMatrix dummy;
-
-//	m_options.m_value = 0x3f;
-	m_options.m_option0 = -1;
-	m_options.m_option1 = -1;
+	m_options.m_value = 0x3f;
 	CalculateLocalMatrix(pinAndPivotChildFrame, m_localMatrix0, dummy);
 	CalculateLocalMatrix(pinAndPivotParentFrame, dummy, m_localMatrix1);
 }

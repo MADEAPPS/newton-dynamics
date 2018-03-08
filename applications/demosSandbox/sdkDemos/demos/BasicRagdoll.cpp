@@ -106,7 +106,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
 		dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 
-		dAssert(0);
+//		dAssert(0);
 		dAssert (bone0);
 		dAssert (bone1);
 		if (bone0->m_controller && bone1->m_controller) {
@@ -343,7 +343,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
-		dAssert(0);
+		//dAssert(0);
 		//controller->SetDefaultSelfCollisionMask();
 
 		// transform the entire contraction to its location
@@ -396,7 +396,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 			dVector p (origin + dVector (10.0f + (x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor (world, p, 100.0f);
 			matrix.m_posit.m_y += 2.0f;
-			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
+//			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
 		}
 	}
 
