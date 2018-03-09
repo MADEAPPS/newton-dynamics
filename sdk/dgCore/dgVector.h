@@ -440,9 +440,9 @@ class dgVector
 	{
 		const dgInt32* const a = (dgInt32*)&m_x;
 		return dgVector ((a[0] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-			(a[1] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-			(a[2] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-			(a[3] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f));
+						 (a[1] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+						 (a[2] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+						 (a[3] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f));
 	}
 
 
@@ -857,9 +857,9 @@ class dgBigVector
 	{
 		const dgInt64* const a = (dgInt64*)&m_x;
 		return dgBigVector ((a[0] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
-			(a[1] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
-			(a[2] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
-			(a[3] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f));
+							(a[1] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
+							(a[2] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
+							(a[3] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f));
 	}
 
 
@@ -1412,7 +1412,8 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		return dgVector (_mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt)) & m_negOne;
+		//return dgVector (_mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt)) & m_negOne;
+		return m_negOne & (*this == m_zero);
 	}
 
 	DG_INLINE dgVector Floor () const
@@ -1948,7 +1949,8 @@ class dgBigVector
 
 	DG_INLINE dgBigVector TestZero() const
 	{
-		return dgBigVector(_mm_cmpeq_epi64(m_typeIntLow, m_zero.m_typeIntLow), _mm_cmpeq_epi64(m_typeIntHigh, m_zero.m_typeIntHigh)) & m_negOne;
+//		return dgBigVector(_mm_cmpeq_epi64(m_typeIntLow, m_zero.m_typeIntLow), _mm_cmpeq_epi64(m_typeIntHigh, m_zero.m_typeIntHigh)) & m_negOne;
+		return m_negOne | (*this == m_zero);
 	}
 
 	DG_INLINE static void Transpose4x4(dgBigVector& dst0, dgBigVector& dst1, dgBigVector& dst2, dgBigVector& dst3,
