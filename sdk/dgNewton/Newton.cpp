@@ -848,8 +848,8 @@ void NewtonWorldForEachBodyInAABBDo(const NewtonWorld* const newtonWorld, const 
 	TRACE_FUNCTION(__FUNCTION__);
 
 	Newton* const world = (Newton *) newtonWorld;
-	dgVector q0 (p0[0], p0[1], p0[2], dgFloat32 (0.0f));
-	dgVector q1 (p1[0], p1[1], p1[2], dgFloat32 (0.0f));
+	dgVector q0 (dgMin (p0[0], p1[0]), dgMin (p0[1], p1[1]), dgMin (p0[2], p1[2]), dgFloat32 (0.0f));
+	dgVector q1 (dgMax (p0[0], p1[0]), dgMax (p0[1], p1[1]), dgMax (p0[2], p1[2]), dgFloat32 (0.0f));
 
 	world->GetBroadPhase()->ForEachBodyInAABB (q0, q1, (OnBodiesInAABB) callback, userData);
 }
