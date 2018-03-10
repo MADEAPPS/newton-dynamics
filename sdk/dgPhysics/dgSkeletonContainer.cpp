@@ -1366,7 +1366,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	memcpy (lowerTriangularMassMatrix11, m_lowerTriangularMassMatrix11, sizeof (dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i ++) {
 		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
-		u[i] = dgFloat32(0.0f);
+		//u[i] = dgFloat32(0.0f);
 		dgFloat32 r = dgFloat32(0.0f);
 		for (dgInt32 j = 0; j < primaryCount; j++) {
 			r += matrixRow10[j] * f[j];

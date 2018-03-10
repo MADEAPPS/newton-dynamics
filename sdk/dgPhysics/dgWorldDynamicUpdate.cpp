@@ -835,7 +835,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBody));
 
 		body->m_equilibrium = 1;
-		dgVector isMovingMask((body->m_veloc + body->m_omega + body->m_accel + body->m_alpha) & dgVector::m_signMask);
+		//dgVector isMovingMask((body->m_veloc + body->m_omega + body->m_accel + body->m_alpha) & dgVector::m_signMask);
+		dgVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 		if ((isMovingMask.TestZero().GetSignMask() & 7) != 7) {
 			dgAssert(body->m_invMass.m_w);
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
