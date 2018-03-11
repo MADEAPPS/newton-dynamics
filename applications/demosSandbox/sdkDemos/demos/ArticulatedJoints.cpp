@@ -1214,6 +1214,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 		,m_gripperPitch(0.0f)
 	{
 		// plug a callback for 2d help display
+		memset (m_player, 0, sizeof (m_player));
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
@@ -1221,29 +1222,30 @@ class AriculatedJointInputManager: public dCustomInputManager
 	void OnBeginUpdate (dFloat timestepInSecunds)
 	{
 		ArticulatedEntityModel::InputRecord inputs;
+		if (m_playersCount) {
+			dCustomArticulatedTransformController* const player = m_player[m_currentPlayer % m_playersCount];
+			ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) player->GetUserData();
 
-		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
+			inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
+			inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
 
-		inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
-		inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
+			inputs.m_gripperValue = m_gripper;
+			inputs.m_slideValue = m_slideboom;
+			inputs.m_liftValue = m_liftboom * dDegreeToRad;
+			inputs.m_turnValue = m_rotatebase * dDegreeToRad;
+			inputs.m_gripperRollValue = m_gripperRoll * dDegreeToRad;
+			inputs.m_gripperPitchValue = m_gripperPitch * dDegreeToRad;
 
-		inputs.m_gripperValue = m_gripper;
-		inputs.m_slideValue = m_slideboom;
-		inputs.m_liftValue = m_liftboom * dDegreeToRad;
-		inputs.m_turnValue = m_rotatebase * dDegreeToRad;
-		inputs.m_gripperRollValue = m_gripperRoll * dDegreeToRad;
-		inputs.m_gripperPitchValue = m_gripperPitch * dDegreeToRad;
-
-		// check if we must activate the player
-		if (m_needsWakeUp ||
-			m_scene->GetKeyState ('A') || 
-			m_scene->GetKeyState ('D') ||
-			m_scene->GetKeyState ('W') ||
-			m_scene->GetKeyState ('S'))
-		{
-			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
-			NewtonBodySetSleepState(body, false);
-		}
+			// check if we must activate the player
+			if (m_needsWakeUp ||
+				m_scene->GetKeyState ('A') || 
+				m_scene->GetKeyState ('D') ||
+				m_scene->GetKeyState ('W') ||
+				m_scene->GetKeyState ('S'))
+			{
+				NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
+				NewtonBodySetSleepState(body, false);
+			}
 
 #if 0
 	#if 0
@@ -1259,7 +1261,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 			}
 	#endif
 #endif
-		vehicleModel->SetInput (inputs);
+			vehicleModel->SetInput (inputs);
+		}
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
@@ -1270,28 +1273,30 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 	void UpdateCamera (dFloat timestepInSecunds)
 	{
-		DemoCamera* const camera = m_scene->GetCamera();
-		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
+		if (m_playersCount) {
+			DemoCamera* const camera = m_scene->GetCamera();
+			ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
-		if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState ('P'))) {
-			m_currentPlayer ++;
-		}
+			if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState ('P'))) {
+				m_currentPlayer ++;
+			}
 		
-		dMatrix camMatrix(camera->GetNextMatrix());
-		dMatrix playerMatrix (vehicleModel->GetNextMatrix());
+			dMatrix camMatrix(camera->GetNextMatrix());
+			dMatrix playerMatrix (vehicleModel->GetNextMatrix());
 
-		dVector frontDir (camMatrix[0]);
-		dVector camOrigin(0.0f); 
-		m_cameraMode.UpdatePushButton(m_scene->GetKeyState('C'));
-		if (m_cameraMode.GetPushButtonState()) {
-			camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
-			camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
-		} else {
-			camMatrix = camMatrix * playerMatrix;
-			camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+			dVector frontDir (camMatrix[0]);
+			dVector camOrigin(0.0f); 
+			m_cameraMode.UpdatePushButton(m_scene->GetKeyState('C'));
+			if (m_cameraMode.GetPushButtonState()) {
+				camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
+				camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
+			} else {
+				camMatrix = camMatrix * playerMatrix;
+				camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+			}
+
+			camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
 		}
-
-		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
 	}
 
 	void OnEndUpdate (dFloat timestepInSecunds)
@@ -1367,14 +1372,14 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
-	dCustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
-	inputManager->AddPlayer (robot);
+//	dCustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
+//	inputManager->AddPlayer (robot);
 
 	matrix.m_posit.m_z += 4.0f;
 
 	// add some object to play with
 	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
+//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
