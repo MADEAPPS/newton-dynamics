@@ -1182,7 +1182,7 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 
 	if (err2 > tol2) {
 		// check for small lcp
-		if ((clippeCount < 32) && (err2 < T(64.0f))) {
+		if ((clippeCount < 32) && (err2 < T(16.0f))) {
 			// small lcp can be solved with direct method
 			T* const x0 = dgAlloca(T, size);
 			for (dgInt32 i = 0; i < size; i++) {

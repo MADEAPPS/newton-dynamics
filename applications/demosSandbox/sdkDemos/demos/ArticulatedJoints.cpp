@@ -287,7 +287,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 	{
 		int countCount = 0;
 		void* contactList[32];
-
 		for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 			contactList[countCount] = contact;
 			countCount++;
@@ -295,6 +294,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 		NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 		NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+
+		//void* userData0 = NewtonCollisionGetUserData(NewtonBodyGetCollision(body0));
+		//void* userData1 = NewtonCollisionGetUserData(NewtonBodyGetCollision(body1));
+
 		for (int i = 0; i < countCount; i ++) {
 			NewtonMaterial* const material = NewtonContactGetMaterial (contactList[i]);
 			NewtonCollision* const collision0 = NewtonMaterialGetBodyCollidingShape(material, body0);
@@ -305,18 +308,32 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 
 			switch (id0 | id1) 
 			{
-				//case ARTICULATED_VEHICLE_DEFINITION::m_terrain | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
-				//case ARTICULATED_VEHICLE_DEFINITION::m_linkPart  | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
-//				{
-//					NewtonContactJointRemoveContact(contactJoint, contactList[i]);
-//					break;
-//				}
+				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart  | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+				{
+					dMatrix tireMatrix;
+					NewtonBody* tireBody = body0;
+					if (id1 == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing) {
+						tireBody = body1;
+					}
+					NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
+					dVector tireAxis(tireMatrix.m_up);
+					for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+						dVector posit;
+						dVector normal;
+						NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+						NewtonMaterialGetContactPositionAndNormal (material, tireBody, &posit[0], &normal[0]);
+						dVector dir (normal.CrossProduct(tireAxis));
+						NewtonMaterialContactRotateTangentDirections(material, &dir[0]);
+						NewtonMaterialSetContactFrictionState (material, 0, 1);
+					}
+
+					break;
+				}
 				
 				case ARTICULATED_VEHICLE_DEFINITION::m_bodyPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
 				case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :
 				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart  | ARTICULATED_VEHICLE_DEFINITION::m_terrain:
-				case ARTICULATED_VEHICLE_DEFINITION::m_linkPart  | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 				case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
 				case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_bodyPart:
 				case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_linkPart :
@@ -778,7 +795,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		return dMod(u0 + du * (t - h0) / dh, 1.0f);
 	}
 
-	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, dFloat offset, dCustomArticulatedTransformController::dSkeletonBone* const rootNode)
+	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, dFloat offset, dCustomArticulatedTransformController::dSkeletonBone* const rootNode, dCustomArticulatedTransformController* const controller)
 	{
 		dFloat linkLength = 0.33f;
 
@@ -841,6 +858,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		linkMatrix.m_posit.m_y = linkLength * 0.5f;
 		NewtonCollision* const collision = NewtonCreateBox (GetWorld(), 0.06f, linkLength, 0.5f, 0, &linkMatrix[0][0]);
 		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_linkPart );
+		NewtonCollisionSetUserData (collision, controller);
 
 		NewtonBody* linkArray[1024];
 
@@ -933,7 +951,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		DemoEntity* const chassis = (DemoEntity*) NewtonBodyGetUserData (chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find ("leftTire_0");
-		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
+		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone, controller);
 	}
 
 	void MakeRightThread(dCustomArticulatedTransformController* const controller)
@@ -941,7 +959,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		DemoEntity* const chassis = (DemoEntity*)NewtonBodyGetUserData(chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find("rightTire_0");
-		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
+		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone, controller);
 	}
 	
 	dCustomArticulatedTransformController::dSkeletonBone* AddCraneBoom(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* name)
@@ -1122,27 +1140,6 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			DemoEntity* const fender = vehicleModel->Find(name);
 			fender->SetMesh(NULL, dGetIdentityMatrix());
 		}
-		
-		// adding fenders to protect the threads
-		#if 0
-			NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
-			NewtonCompoundCollisionBeginAddRemove(compound);
-			NewtonCompoundCollisionAddSubCollision (compound, NewtonBodyGetCollision(chassis));
-			for (int i = 0; i < 4; i ++) {
-				char name[64];
-				sprintf (name, "fender%d", i);
-				DemoEntity* const fender = vehicleModel->Find(name);
-				NewtonCollision* const collision = MakeConvexHull (fender);
-				NewtonCollisionSetUserID (collision, ARTICULATED_VEHICLE_DEFINITION::m_fenderPart);
-				dMatrix matrix(fender->GetCurrentMatrix());
-				NewtonCollisionSetMatrix (collision, &matrix[0][0]);
-				NewtonCompoundCollisionAddSubCollision (compound, collision);
-				NewtonDestroyCollision(collision);
-			}
-			NewtonCompoundCollisionEndAddRemove(compound);	
-			NewtonBodySetCollision(chassis, compound);
-			NewtonDestroyCollision(compound);
-		#endif
 
 		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(chassis, dGetIdentityMatrix());
 
@@ -1169,6 +1166,30 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 			MakeLeftThread(controller);
 			MakeRightThread(controller);
 		#endif
+
+
+		dCustomArticulatedTransformController::dSkeletonBone* stackPool[32];
+		stackPool[0] = chassisBone;
+		int stack = 1;
+		while (stack) {
+			stack --;
+			dCustomArticulatedTransformController::dSkeletonBone* const bone = stackPool[stack];
+			NewtonBody* const body = bone->m_body;
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+			NewtonCollisionSetUserData (collision, controller);
+			if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
+				for (void* node = NewtonCompoundCollisionGetFirstNode(collision); node; node = NewtonCompoundCollisionGetNextNode(collision, node)) {
+					NewtonCollision* const subShape = NewtonCompoundCollisionGetCollisionFromNode (collision, node);
+					NewtonCollisionSetUserData (subShape, controller);
+				}
+			}
+
+			for (dCustomArticulatedTransformController::dSkeletonBone::dListNode* node = bone->GetFirst(); node; node = node->GetNext()) {
+				stackPool[stack] = &node->GetInfo(); 
+				stack ++;
+			}
+		}
 
 		return controller;
 	}
@@ -1352,8 +1373,8 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_z += 4.0f;
 
 	// add some object to play with
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
+	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
+	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
