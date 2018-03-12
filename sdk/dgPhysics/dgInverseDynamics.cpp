@@ -412,7 +412,6 @@ dgInverseDynamics::dgInverseDynamics(dgWorld* const world)
 	,m_deltaForce(NULL)
 	,m_massMatrix11(NULL)
 	,m_massMatrix10(NULL)
-	,m_lowerTriangularMassMatrix11(NULL)
 	,m_rowArray(NULL)
 	,m_loopingJoints(world->GetAllocator())
 	,m_nodeCount(1)
@@ -690,8 +689,9 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 		m_rowArray = (dgJacobianMatrixElement**) memoryBuffer;
 		m_pairs = (dgNodePair*) &m_rowArray[m_rowCount];
 		m_massMatrix11 = (dgFloat32*)&m_pairs[m_rowCount];
-		m_lowerTriangularMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
-		m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+		//m_lowerTriangularMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+		//m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+		m_massMatrix10 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 		m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
 		for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -861,10 +861,11 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 			}
 		}
 
+		dgFloat32* const lowerTriangularMassMatrix = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
 		bool isPsdMatrix = false;
 		do {
-			memcpy (m_lowerTriangularMassMatrix11, m_massMatrix11, sizeof (dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
-			isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, m_lowerTriangularMassMatrix11);
+			memcpy(lowerTriangularMassMatrix, m_massMatrix11, sizeof(dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
+			isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, lowerTriangularMassMatrix);
 			if (!isPsdMatrix) {
 				for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 					diagDamp[i] *= dgFloat32 (2.0f);
@@ -872,13 +873,6 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 				}
 			}
 		} while (!isPsdMatrix);
-
-		for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-			dgFloat32* const row = &m_lowerTriangularMassMatrix11[i * m_auxiliaryRowCount];
-			for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
-				row[j] = dgFloat32 (0.0f);
-			}
-		}
 	}
 }
 
@@ -947,7 +941,7 @@ dgInt32 dgInverseDynamics::GetMemoryBufferSizeInBytes (const dgJointInfo* const 
 	dgInt32 size = sizeof (dgJacobianMatrixElement*) * rowCount;
 	size += sizeof (dgNodePair) * rowCount;
 	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount;		// matrix11[auxiliaryRowCount * auxiliaryRowCount]
-	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount;		// matrixLowerTraingular [auxiliaryRowCount * auxiliaryRowCount]
+//	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount;		// matrixLowerTraingular [auxiliaryRowCount * auxiliaryRowCount]
 	size += sizeof (dgFloat32) * auxiliaryRowCount * dofRows;
 	size += sizeof (dgFloat32) * auxiliaryRowCount * dofRows;
 	return (size + 1024) & -0x10;
@@ -1040,7 +1034,6 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 	dgFloat32* const low = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const high = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const massMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
-	dgFloat32* const lowerTriangularMassMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
 
 	dgInt32 primaryIndex = 0;
 	dgInt32 auxiliaryIndex = 0;
@@ -1091,8 +1084,6 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 	}
 
 	memcpy(massMatrix11, m_massMatrix11, sizeof(dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
-	memcpy(lowerTriangularMassMatrix11, m_lowerTriangularMassMatrix11, sizeof(dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
-
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		u[i] = dgFloat32(0.0f);

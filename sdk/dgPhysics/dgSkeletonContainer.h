@@ -92,7 +92,7 @@ class dgSkeletonContainer
 	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
-	dgFloat32* m_lowerTriangularMassMatrix11;
+//	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
 	dgArray<dgConstraint*> m_loopingJoints;
 	dgArray<dgInt8> m_auxiliaryMemoryBuffer;

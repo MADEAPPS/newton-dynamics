@@ -384,7 +384,7 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_deltaForce(NULL)
 	,m_massMatrix11(NULL)
 	,m_massMatrix10(NULL)
-	,m_lowerTriangularMassMatrix11(NULL)
+//	,m_lowerTriangularMassMatrix11(NULL)
 	,m_rowArray(NULL)
 	,m_loopingJoints(world->GetAllocator())
 	,m_auxiliaryMemoryBuffer(world->GetAllocator())
@@ -470,7 +470,7 @@ void dgSkeletonContainer::ClearSelfCollision()
 void dgSkeletonContainer::AddSelfCollisionJoint(dgContact* const contact)
 {
 //	joint->m_isInSkeleton = true;
-#if 0
+#if 1
 	m_world->GlobalLock(false);
 	m_loopingJoints[m_loopCount + m_selfContactCount] = contact;
 	m_selfContactCount++;
@@ -953,8 +953,9 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 	m_rowArray = (dgJacobianMatrixElement**)memoryBuffer;
 	m_pairs = (dgNodePair*)&m_rowArray[m_rowCount];
 	m_massMatrix11 = (dgFloat32*)&m_pairs[m_rowCount];
-	m_lowerTriangularMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
-	m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+//	m_lowerTriangularMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+//	m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+	m_massMatrix10 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 	m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
 	dgForcePair* const forcePair = dgAlloca(dgForcePair, m_nodeCount);
@@ -1095,24 +1096,20 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
+	dgFloat32* const lowerTriangularMassMatrix = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
+dgInt32 xxx = 0;
 	bool isPsdMatrix = false;
 	do {
-		memcpy(m_lowerTriangularMassMatrix11, m_massMatrix11, sizeof(dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
-		isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, m_lowerTriangularMassMatrix11);
+		memcpy(lowerTriangularMassMatrix, m_massMatrix11, sizeof(dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
+		isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, lowerTriangularMassMatrix);
 		if (!isPsdMatrix) {
+xxx++;
 			for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 				diagDamp[i] *= dgFloat32(2.0f);
 				m_massMatrix11[i * m_auxiliaryRowCount + i] += diagDamp[i];
 			}
 		}
 	} while (!isPsdMatrix);
-
-	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-		dgFloat32* const row = &m_lowerTriangularMassMatrix11[i * m_auxiliaryRowCount];
-		for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
-			row[j] = dgFloat32(0.0f);
-		}
-	}
 }
 
 
@@ -1421,7 +1418,8 @@ dgInt8* dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* cons
 
 	dgInt32 size = sizeof (dgJacobianMatrixElement*) * rowCount;
 	size += sizeof (dgNodePair) * rowCount;
-	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount * 2;
+	size += sizeof(dgFloat32) * auxiliaryRowCount * auxiliaryRowCount;		// matrix11[auxiliaryRowCount * auxiliaryRowCount]
+//	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount;		// matrixLowerTraingular [auxiliaryRowCount * auxiliaryRowCount]
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
 	size = (size + 1024) & -0x10;

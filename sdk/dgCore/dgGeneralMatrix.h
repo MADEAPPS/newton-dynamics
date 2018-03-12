@@ -822,7 +822,12 @@ void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const x,
 	}
 	
 	memcpy(lowerTriangularMatrix, symmetricMatrixPSD, sizeof(T) * size * size);
+#ifdef _DEBUG
+	bool valid = dgCholeskyFactorization(size, lowerTriangularMatrix);
+	dgAssert(valid);
+#else
 	dgCholeskyFactorization(size, lowerTriangularMatrix);
+#endif
 	for (dgInt32 j = 0; (j != -1) && initialGuessCount;) {
 		dgSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, x0, b);
 
