@@ -131,11 +131,9 @@ static NewtonBody* PhiTop(DemoEntityManager* const scene, const dVector& posit, 
 {
 	NewtonWorld* const world = scene->GetNewton();
 
-	dMatrix offset(dRollMatrix(90.0f * dDegreeToRad));
 	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, NULL);
 	NewtonCollisionSetScale(ballShape, 0.5f, 0.5f, 1.0f);
 
-	//dMatrix matrix(dGetIdentityMatrix());
 	dMatrix matrix(dPitchMatrix(10.0f * dDegreeToRad));
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
@@ -157,6 +155,51 @@ static NewtonBody* PhiTop(DemoEntityManager* const scene, const dVector& posit, 
 
 	geometry->Release();
 	NewtonDestroyCollision(ballShape);
+
+	return ball;
+}
+
+
+static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio)
+{
+	NewtonWorld* const world = scene->GetNewton();
+
+	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, NULL);
+	NewtonCollisionSetScale(ballShape, 0.3f, 0.3f, 1.0f);
+
+	dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad));
+	matrix.m_posit = posit;
+	matrix.m_posit.m_w = 1.0f;
+
+	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
+
+
+	NewtonCollision* const battleBackShape = NewtonCreateCompoundCollision(world, 0);
+	dMatrix offsetMatrix(dGetIdentityMatrix());
+	offsetMatrix.m_posit.m_x = 0.05f;
+	offsetMatrix.m_posit.m_y = -0.15f;
+
+	NewtonCollisionSetMatrix(ballShape, &offsetMatrix[0][0]);
+	NewtonCompoundCollisionBeginAddRemove(battleBackShape);
+	NewtonCompoundCollisionAddSubCollision(battleBackShape, ballShape);
+	NewtonCompoundCollisionEndAddRemove(battleBackShape);
+
+	NewtonBodySetMassProperties(ball, 10.0f, battleBackShape);
+
+	dFloat m, Ixx, Iyy, Izz;
+	NewtonBodyGetMass(ball, &m, &Ixx, &Iyy, &Izz);
+
+	dVector angVelocity(0.0f, omega, 0.0f, 0.0f);
+	NewtonBodySetOmega(ball, &angVelocity[0]);
+
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(ball, 0.0f);
+	NewtonBodySetAngularDamping(ball, &damp[0]);
+
+	geometry->Release();
+	NewtonDestroyCollision(ballShape);
+	NewtonDestroyCollision(battleBackShape);
 
 	return ball;
 }
@@ -293,11 +336,13 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 */
 
 	// place a toy tops
-	const int topsCount = 4;
+//	const int topsCount = 4;
+const int topsCount = 1;
 	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
 //		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
-		PhiTop(scene, dVector(10.0f, 0.3f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
+//		PhiTop(scene, dVector(10.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
+		RattleBack(scene, dVector(10.0f, 0.3f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
 	}
 
 	// place camera into position
