@@ -1182,7 +1182,7 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 
 	if (err2 > tol2) {
 		// check for small lcp
-		if ((clippeCount < 32) && (err2 < T(16.0f))) {
+		if ((clippeCount < 16) && ((clippeCount < 32) && (err2 < T(16.0f)))) {
 			// small lcp can be solved with direct method
 			T* const x0 = dgAlloca(T, size);
 			for (dgInt32 i = 0; i < size; i++) {
@@ -1196,29 +1196,6 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 		} else {
 			// larger lcp are too hard for direct method, see if we can get better approximation
 			dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, 20, clipped, T(1.3f));
-/*
-			stride = 0;
-			dgInt32 clippeCount = 0;
-			for (dgInt32 i = 0; i < size; i++) {
-				const T* const row = &symmetricMatrixPSD[stride];
-				r[i] = b[i] - dgDotProduct(size, row, x);
-				clippeCount += clipped[i];
-				stride += size;
-			}
-		
-			if (clippeCount < 32) {
-				// if lcp become small, them try direct method, else the solution is an approximation
-				T* const x0 = dgAlloca(T, size);
-				for (dgInt32 i = 0; i < size; i++) {
-					low[i] -= x[i];
-					high[i] -= x[i];
-				}
-				dgSolveDantzigLcpLow(size, symmetricMatrixPSD, lowerTriangularMatrix, x0, r, low, high);
-				for (dgInt32 i = 0; i < size; i++) {
-					x[i] += x0[i];
-				}
-			}
-*/
 		}
 	}
 }
