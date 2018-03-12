@@ -766,7 +766,7 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
+void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const x, T* const b, T* const low, T* const high)
 {
 	T* const x0 = dgAlloca(T, size);
 	T* const r0 = dgAlloca(T, size);
@@ -774,6 +774,7 @@ void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const lo
 	T* const tmp1 = dgAlloca(T, size);
 	T* const delta_r = dgAlloca(T, size);
 	T* const delta_x = dgAlloca(T, size);
+	T* const lowerTriangularMatrix = dgAlloca(T, size * size);
 	dgInt16* const permute = dgAlloca(dgInt16, size);
 
 	dgCheckAligment(x);
@@ -989,7 +990,7 @@ void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const lo
 	}
 }
 
-
+/*
 // solve a general Linear complementary program (LCP)
 // A * x = b + r
 // subjected to constraints
@@ -1022,7 +1023,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const symetricMatrix, T* const x, T* con
 	}
 	return dgSolveDantzigLCP(size, symetricMatrix, choleskyMatrix, x, b, low, high);
 }
-
+*/
 
 // solve a general Linear complementary program (LCP)
 // A * x = b + r
@@ -1159,7 +1160,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 
 
 template <class T>
-void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lowerTriangularMatrix, T* const x, T* const b, T* const low, T* const high)
+void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const x, T* const b, T* const low, T* const high)
 {
 	T tol2 = T(0.25f * 0.25f);
 	dgInt32 passes = dgClamp(size, 12, 20);
@@ -1189,7 +1190,7 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const lower
 				low[i] -= x[i];
 				high[i] -= x[i];
 			}
-			dgSolveDantzigLcpLow(size, symmetricMatrixPSD, lowerTriangularMatrix, x0, r, low, high);
+			dgSolveDantzigLcpLow(size, symmetricMatrixPSD, x0, r, low, high);
 			for (dgInt32 i = 0; i < size; i++) {
 				x[i] += x0[i];
 			}
