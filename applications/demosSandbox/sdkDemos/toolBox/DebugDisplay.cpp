@@ -212,7 +212,7 @@ void RenderContactPoints (NewtonWorld* const world)
 	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
-	glPointSize(8.0f);
+	glPointSize(32.0f);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glBegin(GL_POINTS);
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {

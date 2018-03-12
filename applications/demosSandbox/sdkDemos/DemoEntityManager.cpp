@@ -235,7 +235,7 @@ DemoEntityManager::DemoEntityManager ()
 {
 //	m_showUI = true;
 //	m_showAABB = false;
-//	m_showContactPoints = false;
+
 //	m_hideVisualMeshes = true;
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 1;
@@ -243,8 +243,9 @@ DemoEntityManager::DemoEntityManager ()
 //	m_workerThreades = 1;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
+	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);

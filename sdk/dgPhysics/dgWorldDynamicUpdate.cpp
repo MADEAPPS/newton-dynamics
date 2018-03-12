@@ -85,7 +85,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
 	dgWorld* const world = (dgWorld*) this;
-	
+return;
 	m_bodies = 0;
 	m_joints = 0;
 	m_clusters = 0;
