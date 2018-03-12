@@ -287,6 +287,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 	{
 		int countCount = 0;
 		void* contactList[32];
+
 		for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 			contactList[countCount] = contact;
 			countCount++;
