@@ -242,7 +242,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_solverPasses = 4;
 //	m_workerThreades = 1;
 //	m_showNormalForces = false;
-//	m_showCenterOfMass = false;
+	m_showCenterOfMass = true;
 //	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;

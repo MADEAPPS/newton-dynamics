@@ -164,7 +164,9 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 {
 	NewtonWorld* const world = scene->GetNewton();
 
-	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, NULL);
+
+	dMatrix shapeMatrix(dPitchMatrix(0.0f * dDegreeToRad));
+	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, &shapeMatrix[0][0]);
 	NewtonCollisionSetScale(ballShape, 0.3f, 0.25f, 1.0f);
 
 
@@ -172,13 +174,14 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
 	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
-	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
+	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0, true);
 	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
 	
-
 	dFloat m, Ixx, Iyy, Izz;
 	NewtonBodyGetMass(ball, &m, &Ixx, &Iyy, &Izz);
 
+	dVector com(0.0f, -0.2f, 0.0f, 0.0);
+	NewtonBodySetCentreOfMass(ball, &com[0]);
 	dVector angVelocity(0.0f, omega, 0.0f, 0.0f);
 //	NewtonBodySetOmega(ball, &angVelocity[0]);
 

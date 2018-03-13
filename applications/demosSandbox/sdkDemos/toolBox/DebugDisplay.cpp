@@ -193,7 +193,7 @@ void RenderCenterOfMass (NewtonWorld* const world)
 		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
 		glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
 
-		dVector y (o + matrix.RotateVector (dVector (0.0f, 1.0f, 0.0f, 0.0f)));
+ 		dVector y (o + matrix.RotateVector (dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 		glColor3f (0.0f, 1.0f, 0.0f);
 		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
 		glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));

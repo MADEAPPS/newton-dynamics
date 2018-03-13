@@ -855,7 +855,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 	return collision;
 }
 
-NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId)
+NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 
 	// calculate the moment of inertia and the relative center of mass of the solid
@@ -867,7 +867,7 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 	//	dFloat Izz = mass * inertia[2];
 
 	//create the rigid body
-	NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, collision, &matrix[0][0]);
+	NewtonBody* const rigidBody = &generalInertia ? NewtonCreateDynamicBody (world, collision, &matrix[0][0]) : NewtonCreateAsymetricDynamicBody(world, collision, &matrix[0][0]);
 
 	// set the correct center of gravity for this body (these function are for legacy)
 	//	NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
@@ -906,7 +906,7 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 	return rigidBody;
 }
 
-NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId)
+NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 	dAssert (collision);
 
@@ -916,7 +916,7 @@ NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const m
 	if (mesh) {
 		entity->SetMesh(mesh, dGetIdentityMatrix());
 	}
-	return CreateSimpleBody (scene->GetNewton(), entity, mass, matrix, collision, materialId);
+	return CreateSimpleBody (scene->GetNewton(), entity, mass, matrix, collision, materialId, generalInertia);
 }
 
 
