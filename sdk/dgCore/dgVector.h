@@ -27,6 +27,13 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
+#ifdef _WIN32
+// required for _mm_hadd_ps
+#include <pmmintrin.h>
+// required for _mm_cmpeq_epi64
+#include <smmintrin.h>
+#endif
+
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 
 template<class T>

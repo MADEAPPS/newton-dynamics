@@ -46,6 +46,17 @@ if (MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
   # Enable intrinsics on MSVC in debug mode
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
+  
+  # dgVector uses sse3 instrinsics
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:sse3")
+  # and clang needs this additional enabling (this is probably a bug
+  # in clang as it doesn't seem to understand the msvc style arch
+  # flag)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    message(STATUS "enabled it: ${CMAKE_CXX_COMPILER_ID}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3")
+  endif ()
+  
   if (CMAKE_CL_64)
     # Visual Studio bails out on debug builds in 64bit mode unless
     # this flag is set...
