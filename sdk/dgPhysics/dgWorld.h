@@ -306,6 +306,7 @@ class dgWorld
 	void InitBody (dgBody* const body, dgCollisionInstance* const collision, const dgMatrix& matrix);
 	dgDynamicBody* CreateDynamicBody (dgCollisionInstance* const collision, const dgMatrix& matrix);
 	dgKinematicBody* CreateKinematicBody (dgCollisionInstance* const collision, const dgMatrix& matrix);
+	dgDynamicBody* CreateDynamicBodyAsymetric(dgCollisionInstance* const collision, const dgMatrix& matrix);
 	void DestroyBody(dgBody* const body);
 	void DestroyAllBodies ();
 

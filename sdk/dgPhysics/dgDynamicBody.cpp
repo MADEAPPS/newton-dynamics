@@ -321,7 +321,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 }
 
 
-dgDynamicBodyAsymnetric::dgDynamicBodyAsymnetric()
+dgDynamicBodyAsymetric::dgDynamicBodyAsymetric()
 	:dgDynamicBody()
 	,m_principalAxis(dgGetIdentityMatrix())
 {
@@ -331,7 +331,7 @@ dgDynamicBodyAsymnetric::dgDynamicBodyAsymnetric()
 
 }
 
-dgDynamicBodyAsymnetric::dgDynamicBodyAsymnetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
+dgDynamicBodyAsymetric::dgDynamicBodyAsymetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
 	:dgDynamicBody(world, collisionNode, serializeCallback, userData, revisionNumber)
 	,m_principalAxis(dgGetIdentityMatrix())
 {
@@ -340,14 +340,14 @@ dgDynamicBodyAsymnetric::dgDynamicBodyAsymnetric(dgWorld* const world, const dgT
 	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
 }
 
-void dgDynamicBodyAsymnetric::Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
+void dgDynamicBodyAsymetric::Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 	dgDynamicBody::Serialize(collisionRemapId, serializeCallback, userData);
 	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
 }
 
 
-void dgDynamicBodyAsymnetric::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
+void dgDynamicBodyAsymetric::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 {
 	dgVector II;
 	m_principalAxis = inertia;
@@ -359,7 +359,7 @@ void dgDynamicBodyAsymnetric::SetMassMatrix(dgFloat32 mass, const dgMatrix& iner
 	dgBody::SetMassMatrix(mass, massMatrix);
 }
 
-dgMatrix dgDynamicBodyAsymnetric::CalculateLocalInertiaMatrix() const
+dgMatrix dgDynamicBodyAsymetric::CalculateLocalInertiaMatrix() const
 {
 	dgMatrix matrix(m_principalAxis);
 	matrix.m_posit = dgVector::m_wOne;
@@ -370,7 +370,7 @@ dgMatrix dgDynamicBodyAsymnetric::CalculateLocalInertiaMatrix() const
 	return matrix * diagonal * matrix.Inverse();
 }
 
-dgMatrix dgDynamicBodyAsymnetric::CalculateInertiaMatrix() const
+dgMatrix dgDynamicBodyAsymetric::CalculateInertiaMatrix() const
 {
 	dgMatrix matrix(m_principalAxis * m_matrix);
 	matrix.m_posit = dgVector::m_wOne;
@@ -381,7 +381,7 @@ dgMatrix dgDynamicBodyAsymnetric::CalculateInertiaMatrix() const
 	return matrix * diagonal * matrix.Inverse();
 }
 
-dgMatrix dgDynamicBodyAsymnetric::CalculateInvInertiaMatrix() const
+dgMatrix dgDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
 {
 	dgMatrix matrix(m_principalAxis * m_matrix);
 	matrix.m_posit = dgVector::m_wOne;

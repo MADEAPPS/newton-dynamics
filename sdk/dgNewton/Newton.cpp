@@ -4296,7 +4296,35 @@ NewtonBody* NewtonCreateDynamicBody(const NewtonWorld* const newtonWorld, const 
 
 NewtonBody* NewtonCreateAsymetricDynamicBody(const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionPtr, const dFloat* const matrixPtr)
 {
-	return NewtonCreateDynamicBody(newtonWorld, collisionPtr, matrixPtr);
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	dgCollisionInstance* collision = (dgCollisionInstance*)collisionPtr;
+	if (!collisionPtr) {
+		collision = (dgCollisionInstance*)NewtonCreateNull(newtonWorld);
+	}
+
+#ifdef SAVE_COLLISION
+	SaveCollision(collisionPtr);
+#endif
+
+	dgMatrix matrix(matrixPtr);
+#ifdef _DEBUG
+	//	matrix.m_front = matrix.m_front.Scale3 (dgRsqrt (matrix.m_front % matrix.m_front));
+	//	matrix.m_right = matrix.m_front * matrix.m_up;
+	//	matrix.m_right = matrix.m_right.Scale3 (dgRsqrt (matrix.m_right % matrix.m_right));
+	//	matrix.m_up = matrix.m_right * matrix.m_front;
+#endif
+
+	matrix.m_front.m_w = dgFloat32(0.0f);
+	matrix.m_up.m_w = dgFloat32(0.0f);
+	matrix.m_right.m_w = dgFloat32(0.0f);
+	matrix.m_posit.m_w = dgFloat32(1.0f);
+
+	NewtonBody* const body = (NewtonBody*)world->CreateDynamicBodyAsymetric(collision, matrix);
+	if (!collisionPtr) {
+		NewtonDestroyCollision((NewtonCollision*)collision);
+	}
+	return body;
 }
 
 NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionPtr, const dFloat* const matrixPtr)

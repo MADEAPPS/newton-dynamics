@@ -867,7 +867,7 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 	//	dFloat Izz = mass * inertia[2];
 
 	//create the rigid body
-	NewtonBody* const rigidBody = &generalInertia ? NewtonCreateDynamicBody (world, collision, &matrix[0][0]) : NewtonCreateAsymetricDynamicBody(world, collision, &matrix[0][0]);
+	NewtonBody* const rigidBody = generalInertia ? NewtonCreateAsymetricDynamicBody (world, collision, &matrix[0][0]) : NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
 	// set the correct center of gravity for this body (these function are for legacy)
 	//	NewtonBodySetCentreOfMass (rigidBody, &origin[0]);

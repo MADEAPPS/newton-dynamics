@@ -118,20 +118,18 @@ class dgDynamicBody : public dgBody
 
 
 DG_MSC_VECTOR_ALIGMENT
-class dgDynamicBodyAsymnetric : public dgDynamicBody
+class dgDynamicBodyAsymetric: public dgDynamicBody
 {
 	public:
-	dgDynamicBodyAsymnetric();
-	dgDynamicBodyAsymnetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber);
+	dgDynamicBodyAsymetric();
+	dgDynamicBodyAsymetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber);
 
 	virtual void Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 
-
-	virtual void SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia);
-	virtual dgMatrix CalculateLocalInertiaMatrix() const;
 	virtual dgMatrix CalculateInertiaMatrix() const;
+	virtual dgMatrix CalculateLocalInertiaMatrix() const;
 	virtual dgMatrix CalculateInvInertiaMatrix() const;
-
+	virtual void SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia);
 
 	dgMatrix m_principalAxis;
 } DG_GCC_VECTOR_ALIGMENT;

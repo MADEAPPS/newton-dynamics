@@ -527,6 +527,17 @@ dgDynamicBody* dgWorld::CreateDynamicBody(dgCollisionInstance* const collision, 
 	return body;
 }
 
+dgDynamicBody* dgWorld::CreateDynamicBodyAsymetric(dgCollisionInstance* const collision, const dgMatrix& matrix)
+{
+	dgDynamicBody* const body = new (m_allocator) dgDynamicBodyAsymetric();
+	dgAssert(dgInt32(sizeof(dgBody) & 0xf) == 0);
+	dgAssert((dgUnsigned64(body) & 0xf) == 0);
+
+	InitBody(body, collision, matrix);
+	return body;
+}
+
+
 dgKinematicBody* dgWorld::CreateKinematicBody (dgCollisionInstance* const collision, const dgMatrix& matrix)
 {
 	dgKinematicBody* const body = new (m_allocator) dgKinematicBody();
