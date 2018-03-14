@@ -10,6 +10,11 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+if(WIN32)
+  # Required dependencies
+  add_subdirectory(thirdParty)
+endif(WIN32)
+
 file(GLOB dgCore_srcs dgCore/*.cpp)               # low level core
 file(GLOB dgMeshUtil_srcs dgMeshUtil/*.cpp)       # mesh geometry
 file(GLOB dgNewton_srcs dgNewton/*.cpp)           # Newton engine
@@ -40,12 +45,12 @@ endif(UNIX)
 if (UNIX)
   include("GNUInstallDirs")
 else (UNIX)
-  set(CMAKE_INSTALL_LIBDIR "lib")
-  set(CMAKE_INSTALL_INCLUDEDIR "include")
+  set(CMAKE_INSTALL_LIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set(CMAKE_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_PREFIX}/include")
 endif (UNIX)
 
-install(TARGETS Newton DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(FILES dgNewton/Newton.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS Newton DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(FILES dgNewton/Newton.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 if (MSVC)
   set_source_files_properties(dgCore/dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdafx.h")
@@ -86,6 +91,7 @@ target_include_directories(dCustomJoints PUBLIC dgTimeTracker/)
 target_include_directories(dCustomJoints PUBLIC dCustomJoints/)
 target_link_libraries(dCustomJoints dContainers NewtonStatic)
 
+target_compile_definitions(dCustomJoints PRIVATE _CUSTOM_JOINTS_BUILD_DLL)
 
 # dMath
 file(GLOB dMath_srcs dMath/*.cpp)
@@ -100,6 +106,10 @@ add_library(dScene ${dScene_srcs})
 
 target_include_directories(dScene PUBLIC dScene/)
 target_link_libraries(dScene dAnimation dMath dContainers NewtonStatic)
+
+if(WIN32)
+  target_link_libraries(dScene tinyxml)
+endif(WIN32)
 
 
 if (CMAKE_COMPILER_IS_GNUCC)
