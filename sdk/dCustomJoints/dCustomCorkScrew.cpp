@@ -175,9 +175,12 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
+	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
+	rollPin = matrix1.RotateVector(rollPin);
+
 	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
+	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
@@ -206,6 +209,48 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+	}
+}
+
+void dCustomCorkScrew::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dCustomSlider::Debug(debugDisplay);
+
+	if (m_options.m_option2) {
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		const int subdiv = 12;
+		dVector arch[subdiv + 1];
+		const dFloat radius = debugDisplay->m_debugScale;
+
+		if ((m_maxAngle > 1.0e-3f) || (m_minAngle < -1.0e-3f)) {
+			// show pitch angle limits
+			dVector point(dFloat(0.0f), dFloat(radius), dFloat(0.0f), dFloat(0.0f));
+
+			dFloat minAngle = m_minAngle;
+			dFloat maxAngle = m_maxAngle;
+			if ((maxAngle - minAngle) >= dPi * 2.0f) {
+				minAngle = 0.0f;
+				maxAngle = dPi * 2.0f;
+			}
+
+			dFloat angleStep = (maxAngle - minAngle) / subdiv;
+			dFloat angle0 = minAngle;
+
+			matrix1.m_posit = matrix0.m_posit;
+			debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+			for (int i = 0; i <= subdiv; i++) {
+				arch[i] = matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point));
+				debugDisplay->DrawLine(matrix1.m_posit, arch[i]);
+				angle0 += angleStep;
+			}
+
+			for (int i = 0; i < subdiv; i++) {
+				debugDisplay->DrawLine(arch[i], arch[i + 1]);
+			}
+		}
 	}
 }
 

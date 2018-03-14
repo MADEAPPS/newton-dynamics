@@ -30,7 +30,6 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, Newt
 	,m_maxConeAngle(60.0f * dDegreeToRad)
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
-	,m_options()
 {
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -43,7 +42,6 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, con
 	,m_maxConeAngle(60.0f * dDegreeToRad)
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
-	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
@@ -62,7 +60,6 @@ void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void*
 	callback(userData, &m_maxConeAngle, sizeof(dFloat));
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -75,7 +72,6 @@ void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* con
 	callback(userData, &m_maxConeAngle, sizeof(dFloat));
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 void dCustomBallAndSocket::EnableTwist(bool state)
@@ -156,9 +152,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	if (cosAngleCos < 0.9999f) {
 		dVector lateralDir(coneDir1.CrossProduct(coneDir0));
 		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-		dAssert(mag2 > 1.0e-4f);
-		//lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-		//coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
+		//dAssert(mag2 > 1.0e-4f);
 		if (mag2 > 1.0e-4f) {
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
@@ -172,10 +166,10 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	}
 
 	const int subdiv = 18;
-	const float radius = debugDisplay->m_debugScale;
+	const dFloat radius = debugDisplay->m_debugScale;
 	dVector arch[subdiv + 1];
 
-	// show pitch angle limits
+	// show twist angle limits
 	if (m_options.m_option0 && ((m_maxTwistAngle - m_minTwistAngle) > dFloat(1.0e-3f))) {
 		dMatrix pitchMatrix(matrix1 * coneRotation);
 		pitchMatrix.m_posit = matrix1.m_posit;
@@ -185,7 +179,7 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		dFloat angleStep = dMin (m_maxTwistAngle - m_minTwistAngle, dFloat (2.0f * dPi)) / subdiv;
 		dFloat angle0 = m_minTwistAngle;
 
-		debugDisplay->SetColor(dVector(0.5f, 0.0f, 0.0f, 0.0f));
+		debugDisplay->SetColor(dVector(0.6f, 0.2f, 0.0f, 0.0f));
 		for (int i = 0; i <= subdiv; i++) {
 			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
 			debugDisplay->DrawLine(pitchMatrix.m_posit, arch[i]);
@@ -197,11 +191,12 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 
+	// show cone angle limits
 	if (m_options.m_option2) {
 		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), 0.0f, 0.0f);
 		dFloat angleStep = dPi * 2.0f / subdiv;
 		dFloat angle0 = 0.0f;
-		debugDisplay->SetColor(dVector(1.0f, 1.0f, 0.0f, 0.0f));
+		debugDisplay->SetColor(dVector(0.3f, 0.8f, 0.0f, 0.0f));
 
 		for (int i = 0; i <= subdiv; i++) {
 			dVector conePoint(dPitchMatrix(angle0).RotateVector(point));
@@ -252,7 +247,6 @@ void dCustomBallAndSocket::SubmitConstraintTwistLimits(const dMatrix& matrix0, c
 	}
 }
 
-
 void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -260,13 +254,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	for (int i = 0; i < 3; i++) {
-		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	}
+	SubmitLinearRows(0x07, matrix0, matrix1);
 
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;

@@ -124,14 +124,25 @@ typedef long long unsigned64;
 #include <dBezierSpline.h>
 
 #include <dCustomJoint.h>
+#include <dCustom6dof.h>
 #include <dCustomGear.h>
 #include <dCustomHinge.h>
-#include <dCustomRagdollMotor.h>
+#include <dCustomPlane.h>
+#include <dCustomWheel.h>
+#include <dCustomMotor.h>
+#include <dCustomSlider.h>
+#include <dCustomPulley.h>
+#include <dCustomCorkScrew.h>
+#include <dCustomPathFollow.h>
+#include <dCustomDoubleHinge.h>
+#include <dCustomFixDistance.h>
+#include <dCustomRackAndPinion.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomBallAndSocket.h>
 #include <dCustomSliderActuator.h>
 #include <dCustomSlidingContact.h>
-#include <dCustomUniversalActuator.h>
+#include <dCustomInverseDynamics.h>
+#include <dCustomDoubleHingeActuator.h>
 
 #include <dCustomInputManager.h>
 #include <dCustomTriggerManager.h>

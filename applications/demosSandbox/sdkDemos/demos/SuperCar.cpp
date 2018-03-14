@@ -1046,8 +1046,6 @@ void SuperCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-
-	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);

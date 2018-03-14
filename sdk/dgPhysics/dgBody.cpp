@@ -546,9 +546,8 @@ void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const
 	dgMatrix inertia (collision->CalculateInertia());
 
 	dgVector origin (inertia.m_posit);
-	dgFloat32 mag = origin.DotProduct3(origin);
-	for (dgInt32 i = 0; i < 3; i ++) {
-		inertia[i][i] = (inertia[i][i] - (mag - origin[i] * origin[i])) * mass;
+		for (dgInt32 i = 0; i < 3; i ++) {
+		inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
 		for (dgInt32 j = i + 1; j < 3; j ++) {
 			dgFloat32 crossIJ = origin[i] * origin[j];
 			inertia[i][j] = (inertia[i][j] + crossIJ) * mass;

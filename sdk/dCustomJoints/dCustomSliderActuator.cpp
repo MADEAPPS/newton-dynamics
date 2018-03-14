@@ -24,53 +24,45 @@ IMPLEMENT_CUSTOM_JOINT(dCustomSliderActuator);
 
 dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomSlider(pinAndPivotFrame, child, parent)
-	,m_posit(0.0f)
-	,m_minPosit(-D_CUSTOM_LARGE_VALUE)
-	,m_maxPosit( D_CUSTOM_LARGE_VALUE)
+	,m_targetPosit(0.0f)
 	,m_linearRate(0.0f)
-	,m_maxForce(1.0e20f)
+	,m_maxForce(D_CUSTOM_LARGE_VALUE)
 {
-	dAssert (0);
-//	m_actuatorFlag = false;
-	EnableLimits(false);
+	m_friction = 0.0f;
+	dAssert(m_options.m_value == 0);
 }
 
 dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomSlider(pinAndPivotFrame, child, parent)
-	,m_posit(0.0f)
-	,m_minPosit(minPosit)
-	,m_maxPosit(maxPosit)
+	,m_targetPosit(0.0f)
 	,m_linearRate(speed)
     ,m_maxForce(D_CUSTOM_LARGE_VALUE)
 {
-	dAssert (0);
-//	m_actuatorFlag = true;
-	EnableLimits(false);
+	m_friction = 0.0f;
+	dAssert(m_options.m_value == 0);
+	SetLinearRate(speed);
+	SetMinPositLimit(minPosit);
+	SetMaxPositLimit(maxPosit);
 }
 
-void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, void* const userData)
+dCustomSliderActuator::~dCustomSliderActuator()
 {
-	callback(userData, &m_posit, sizeof(dFloat));
-	callback(userData, &m_minPosit, sizeof(dFloat));
-	callback(userData, &m_maxPosit, sizeof(dFloat));
-	callback(userData, &m_linearRate, sizeof(dFloat));
-	callback(userData, &m_maxForce, sizeof(dFloat));
 }
 
 void dCustomSliderActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomSlider::Serialize(callback, userData);
 
-	callback(userData, &m_posit, sizeof(dFloat));
-	callback(userData, &m_minPosit, sizeof(dFloat));
-	callback(userData, &m_maxPosit, sizeof(dFloat));
+	callback(userData, &m_targetPosit, sizeof(dFloat));
 	callback(userData, &m_linearRate, sizeof(dFloat));
 	callback(userData, &m_maxForce, sizeof(dFloat));
 }
 
-
-dCustomSliderActuator::~dCustomSliderActuator()
+void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
+	callback(userData, &m_targetPosit, sizeof(dFloat));
+	callback(userData, &m_linearRate, sizeof(dFloat));
+	callback(userData, &m_maxForce, sizeof(dFloat));
 }
 
 
@@ -83,7 +75,12 @@ bool dCustomSliderActuator::GetEnableFlag () const
 
 dFloat dCustomSliderActuator::GetTargetPosit() const
 {
-	return m_posit;
+	return m_targetPosit;
+}
+
+void dCustomSliderActuator::SetTargetPosit(dFloat posit)
+{
+	m_targetPosit = dClamp(posit, m_minDist, m_maxDist);
 }
 
 dFloat dCustomSliderActuator::GetLinearRate() const
@@ -91,38 +88,31 @@ dFloat dCustomSliderActuator::GetLinearRate() const
 	return m_linearRate;
 }
 
-
-dFloat dCustomSliderActuator::GetMinPositLimit() const
-{
-	return m_minPosit;
-}
-
-dFloat dCustomSliderActuator::GetMaxPositLimit() const
-{
-	return m_maxPosit;
-}
-
-
-void dCustomSliderActuator::SetTargetPosit(dFloat posit)
-{
-	m_posit = dClamp (posit, m_minPosit, m_maxPosit);
-}
-
-
-void dCustomSliderActuator::SetMinPositLimit(dFloat limit)
-{
-	m_minPosit = limit;
-}
-
-void dCustomSliderActuator::SetMaxPositLimit(dFloat limit)
-{
-	m_maxPosit = limit;
-}
-
 void dCustomSliderActuator::SetLinearRate(dFloat rate)
 {
 	m_linearRate = rate;
 }
+
+dFloat dCustomSliderActuator::GetMinPositLimit() const
+{
+	return m_minDist;
+}
+
+dFloat dCustomSliderActuator::GetMaxPositLimit() const
+{
+	return m_maxDist;
+}
+
+void dCustomSliderActuator::SetMinPositLimit(dFloat limit)
+{
+	SetLimits(limit, m_maxDist);
+}
+
+void dCustomSliderActuator::SetMaxPositLimit(dFloat limit)
+{
+	SetLimits(m_minDist, limit);
+}
+
 
 void dCustomSliderActuator::SetEnableFlag (bool flag)
 {
@@ -147,30 +137,35 @@ void dCustomSliderActuator::SetMaxForcePower(dFloat force)
 }
 
 
-void dCustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
+void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dAssert(0);
-/*
-	if (m_actuatorFlag) {
-		dVector posit1 (matrix1.m_posit);
-		dVector posit0 (matrix0.m_posit - matrix1.m_front.Scale (m_posit));
-		dFloat jointosit = GetJointPosit();
-		dFloat relPosit = m_posit - jointosit;
-		dFloat step = dFloat(2.0f) * m_linearRate * timestep;
+	dCustomSlider::SubmitAngularRow(matrix0, matrix1, timestep);
 
-		dFloat currentSpeed = GetJointSpeed();
-		dFloat desiredSpeed = (dAbs(relPosit) > dAbs(step)) ? dSign(relPosit) * m_linearRate : dFloat(0.1f) * relPosit / timestep;
-		dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-
-		NewtonUserJointAddLinearRow(m_joint, &posit0[0], &posit1[0], &matrix1.m_front[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
-        NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
-        NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
-		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-	} else {
-		dCustomSlider::SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
+	dFloat invTimeStep = 1.0f / timestep;
+	const dFloat tol = m_linearRate * timestep;
+	dFloat posit = GetJointPosit();
+	dFloat targetPosit = m_targetPosit;
+	dFloat currentSpeed = 0.0f;
+	if (posit > (targetPosit + tol)) {
+		currentSpeed = -m_linearRate;
+		dFloat predictPosit = posit + currentSpeed * timestep;
+		if (predictPosit < targetPosit) {
+			currentSpeed = 0.5f * (predictPosit - posit) * invTimeStep;
+		}
+	} else if (posit < (targetPosit - tol)) {
+		currentSpeed = m_linearRate;
+		dFloat predictPosit = posit + currentSpeed * timestep;
+		if (predictPosit > targetPosit) {
+			currentSpeed = 0.5f * (predictPosit - posit) * invTimeStep;
+		}
 	}
-*/
+
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	NewtonUserJointSetRowAcceleration(m_joint, accel);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
+	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
 
 

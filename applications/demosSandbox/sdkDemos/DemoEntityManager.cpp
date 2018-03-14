@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-//#define DEFAULT_SCENE	3			// gyroscope precession
+#define DEFAULT_SCENE	3			// gyroscope precession
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -59,19 +59,20 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-#define DEFAULT_SCENE	28          // standard joints
-//#define DEFAULT_SCENE	29			// six axis manipulator
-//#define DEFAULT_SCENE	30			// hexapod Robot
-//#define DEFAULT_SCENE	31			// articulated joints
-//#define DEFAULT_SCENE	32			// basic rag doll
-//#define DEFAULT_SCENE	33			// dynamics rag doll
-//#define DEFAULT_SCENE	34			// basic Car
-//#define DEFAULT_SCENE	35			// super Car
-//#define DEFAULT_SCENE	36			// heavy vehicles
-//#define DEFAULT_SCENE	37			// basic player controller
-//#define DEFAULT_SCENE	38			// advanced player controller
-//#define DEFAULT_SCENE	39			// cloth patch			
-//#define DEFAULT_SCENE	40			// soft bodies			
+//#define DEFAULT_SCENE	28          // standard joints
+//#define DEFAULT_SCENE	29			// servo joints
+//#define DEFAULT_SCENE	30			// articulated joints
+//#define DEFAULT_SCENE	31			// six axis manipulator
+//#define DEFAULT_SCENE	32			// hexapod Robot
+//#define DEFAULT_SCENE	33			// basic rag doll
+//#define DEFAULT_SCENE	34			// dynamic rag doll
+//#define DEFAULT_SCENE	35			// basic Car
+//#define DEFAULT_SCENE	36			// super Car
+//#define DEFAULT_SCENE	37			// heavy vehicles
+//#define DEFAULT_SCENE	38			// basic player controller
+//#define DEFAULT_SCENE	39			// advanced player controller
+//#define DEFAULT_SCENE	30			// cloth patch			
+//#define DEFAULT_SCENE	41			// soft bodies			
 
 
 /// demos forward declaration 
@@ -112,6 +113,7 @@ void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void PassiveRagdoll (DemoEntityManager* const scene);
 void DynamicRagDoll (DemoEntityManager* const scene);
+void ServoJoints (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
@@ -149,9 +151,10 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Structured convex fracture", "demonstrate structured fracture destruction using Voronoi partition", StructuredConvexFracturing},
 	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
 	{"Standard Joints", "show some of the common joints", StandardJoints},
+	{"Servo actuators joints", "demonstrate complex array of bodies interconnect by joints", ServoJoints},
+	{"Articulated robotic joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
-	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
 	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
@@ -232,16 +235,17 @@ DemoEntityManager::DemoEntityManager ()
 {
 //	m_showUI = true;
 //	m_showAABB = false;
-//	m_showContactPoints = false;
-//	m_hideVisualMeshes = false;
+
+//	m_hideVisualMeshes = true;
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
 //	m_workerThreades = 1;
 //	m_showNormalForces = false;
-//	m_showCenterOfMass = false;
-	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 1;
+	m_showCenterOfMass = true;
+//	m_showContactPoints = true;
+//	m_showJointDebugInfo = true;
+//	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -1361,7 +1365,9 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		RenderJointsDebugInfo(m_world, &jointDebugRender, 0.5f);
+		jointDebugRender.SetScale(0.5f);
+
+		RenderJointsDebugInfo(m_world, &jointDebugRender);
 	}
 
 	if (m_showNormalForces) {

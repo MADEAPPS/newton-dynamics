@@ -19,7 +19,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//dInitRtti(dCustomRackAndPinion);
 IMPLEMENT_CUSTOM_JOINT(dCustomRackAndPinion);
 
 dCustomRackAndPinion::dCustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody)

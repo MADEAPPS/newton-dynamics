@@ -27,6 +27,10 @@ dCustomJoint::dCustomJoint ()
 	:dCustomAlloc()
 	,m_localMatrix0(dGetIdentityMatrix())
 	,m_localMatrix1(dGetIdentityMatrix())
+	,m_force0(0.0f)
+	,m_force1(0.0f)
+	,m_torque0(0.0f)
+	,m_torque1(0.0f)
 	,m_userData(NULL)
 	,m_body0(NULL)
 	,m_body1(NULL)
@@ -36,6 +40,7 @@ dCustomJoint::dCustomJoint ()
 	,m_stiffness(1.0f)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
+	,m_options()
 {
 }
 
@@ -49,6 +54,11 @@ dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* cons
 	:dCustomAlloc()
 	,m_localMatrix0(dGetIdentityMatrix())
 	,m_localMatrix1(dGetIdentityMatrix())
+	,m_force0(0.0f)
+	,m_force1(0.0f)
+	,m_torque0(0.0f)
+	,m_torque1(0.0f)
+	,m_options()
 {
 	m_joint = NULL;
 	m_body1 = NULL;
@@ -70,6 +80,10 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	:dCustomAlloc()
 	,m_localMatrix0(dGetIdentityMatrix())
 	,m_localMatrix1(dGetIdentityMatrix())
+	,m_force0(0.0f)
+	,m_force1(0.0f)
+	,m_torque0(0.0f)
+	,m_torque1(0.0f)
 	,m_userData(NULL)
 	,m_body0(body0)
 	,m_body1(body1)
@@ -85,6 +99,7 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &m_options, sizeof(m_options));
 	callback(userData, &solverModel, sizeof(solverModel));
 
 	Init (m_maxDof, body0, body1);
@@ -198,14 +213,6 @@ void dCustomJoint::Destructor (const NewtonJoint* me)
 	delete joint;
 }
 
-void dCustomJoint::Debug(dDebugDisplay* const debugDisplay) const
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-	debugDisplay->DrawFrame(matrix0);
-	debugDisplay->DrawFrame(matrix1);
-}
 
 void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex)
 {
@@ -216,6 +223,9 @@ void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 		// call the constraint call back
 		if (joint) {
 			joint->SubmitConstraints(timestep, threadIndex);
+			if (joint->m_options.m_calculateForces) {
+				joint->CalculateJointForce();
+			}
 		}
 	}
 }
@@ -281,6 +291,21 @@ void dCustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) co
 	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
+dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	cosAngle = dir.DotProduct3(cosDir);
+	sinAngle = sinDir.DotProduct3(dir.CrossProduct(cosDir));
+	return dAtan2(sinAngle, cosAngle);
+}
+
+dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
+{
+	dFloat sinAngle;
+	dFloat cosAngle;
+	return CalculateAngle (dir, cosDir, sinDir, sinAngle, cosAngle);
+}
+
+
 void dCustomJoint::SetBodiesCollisionState (int state)
 {
 	NewtonJointSetCollisionState (m_joint, state);
@@ -342,6 +367,7 @@ void dCustomJoint::Serialize (NewtonSerializeCallback callback, void* const user
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &m_options, sizeof(m_options));
 	callback(userData, &solverModel, sizeof(solverModel));
 }
 
@@ -369,3 +395,63 @@ void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
 }
 
 
+void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, const dMatrix& matrix1) const
+{
+	const dVector& p0 = matrix0.m_posit;
+	const dVector& p1 = matrix1.m_posit;
+	const dVector dp(p0 - p1);
+	for (int i = 0; i < 3; i++) {
+		if (activeRows & (1 << i)) {
+			const dVector& dir = matrix1[i];
+			dVector prejectPoint(p0 - dir.Scale(dir.DotProduct3(dp)));
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &prejectPoint[0], &dir[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		}
+	}
+}
+
+
+void dCustomJoint::SetJointForceCalculation(bool mode)
+{
+	m_options.m_calculateForces = mode ? -1 : 0;
+}
+
+const dVector& dCustomJoint::GetForce0() const 
+{ 
+	return m_force0; 
+}
+
+const dVector& dCustomJoint::GetForce1() const 
+{ 
+	return m_force1; 
+}
+
+const dVector& dCustomJoint::GetTorque0() const 
+{ 
+	return m_torque0; 
+}
+const dVector& dCustomJoint::GetTorque1() const 
+{ 
+	return m_torque1;
+}
+
+
+void dCustomJoint::CalculateJointForce()
+{
+	m_force0 = dVector(0.0f);
+	m_force1 = dVector(0.0f);
+	m_torque0 = dVector(0.0f);
+	m_torque1 = dVector(0.0f);
+
+	int row = NewtonUserJoinRowsCount(m_joint);
+	for (int i = 0; i < row; i ++) {
+		dFloat jacobian0[6];
+		dFloat jacobian1[6];
+		NewtonUserJointGetGeneralRow(m_joint, i, jacobian0, jacobian1);
+		dFloat f = NewtonUserJointGetRowForce(m_joint, i);
+		m_force0 += dVector (jacobian0[0] * f, jacobian0[1] * f, jacobian0[2] * f, 0.0f);
+		m_force1 += dVector (jacobian1[0] * f, jacobian1[1] * f, jacobian1[2] * f, 0.0f);
+		m_torque0 += dVector(jacobian0[3] * f, jacobian0[4] * f, jacobian0[5] * f, 0.0f);
+		m_torque1 += dVector(jacobian1[3] * f, jacobian1[4] * f, jacobian1[5] * f, 0.0f);
+	}
+}

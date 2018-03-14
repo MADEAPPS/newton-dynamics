@@ -284,9 +284,8 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			dgVector angulaMomentum (m_mass * localOmega);
 			dgVector nextTorque (localTorque - localOmega.CrossProduct3(angulaMomentum));
 			dgVector localAlpha (nextTorque * m_invMass);
-			m_alpha = localAlpha * timeStepVect;
-			localOmega += localAlpha * timeStepVect;
-			m_omega = m_matrix.RotateVector(localOmega);
+			m_alpha = m_matrix.RotateVector(localTorque);
+			m_omega = m_matrix.RotateVector(localOmega + localAlpha.Scale4(timestep));
 			m_accel = m_externalForce.Scale4(m_invMass.m_w);
 			m_veloc += m_accel.Scale4(timestep);
 #else

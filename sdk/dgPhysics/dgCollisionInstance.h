@@ -67,11 +67,8 @@ class dgCollisionInstance
 	dgUnsigned32 GetUserDataID () const;
 	void SetUserDataID (dgUnsigned32 userData);
 
-	void* GetUserData0 () const;
-	void SetUserData0 (void* const userData);
-
-	void* GetUserData1 () const;
-	void SetUserData1 (void* const userData);
+	void* GetUserData () const;
+	void SetUserData (void* const userData);
 
 	const void* GetCollisionHandle () const;
 	const dgCollisionInstance* GetParent () const;
@@ -136,8 +133,7 @@ class dgCollisionInstance
 	dgVector m_scale;
 	dgVector m_invScale;
 	dgVector m_maxScale;
-	void* m_userData0;
-	void* m_userData1;
+	void* m_userData;
 	const dgWorld* m_world;
 	const dgCollision* m_childShape;
 	const void* m_subCollisionHandle;
@@ -158,8 +154,7 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_scale(meshInstance.m_scale)
 	,m_invScale(meshInstance.m_invScale)
 	,m_maxScale(meshInstance.m_maxScale)
-	,m_userData0(meshInstance.m_userData0)
-	,m_userData1(meshInstance.m_userData1)
+	,m_userData(meshInstance.m_userData)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
 	,m_subCollisionHandle(NULL)
@@ -300,14 +295,9 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBreakImpulse() const
 	return dgFloat32 (1.0e20f);
 }
 
-DG_INLINE void* dgCollisionInstance::GetUserData0 () const
+DG_INLINE void* dgCollisionInstance::GetUserData () const
 {
-	return m_userData0;
-}
-
-DG_INLINE void* dgCollisionInstance::GetUserData1 () const
-{
-	return m_userData1;
+	return m_userData;
 }
 
 
@@ -321,14 +311,9 @@ DG_INLINE const dgCollisionInstance* dgCollisionInstance::GetParent () const
 	return m_parent;
 }
 
-DG_INLINE void dgCollisionInstance::SetUserData0 (void* const userData)
+DG_INLINE void dgCollisionInstance::SetUserData (void* const userData)
 {
-	m_userData0 = userData;
-}
-
-DG_INLINE void dgCollisionInstance::SetUserData1 (void* const userData)
-{
-	m_userData1 = userData;
+	m_userData = userData;
 }
 
 DG_INLINE dgUnsigned32 dgCollisionInstance::GetUserDataID () const

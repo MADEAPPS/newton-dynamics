@@ -16,7 +16,6 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "dCustomBallAndSocket.h"
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 

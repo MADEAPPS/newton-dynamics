@@ -107,10 +107,10 @@ class dNewtonSliderJoint: public dNewtonJoint
 };
 
 
-class dNewtonUniversalJoint: public dNewtonJoint 
+class dNewtonDoubleHinge: public dNewtonJoint 
 {
 	public:
-	CNEWTON_API dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
+	CNEWTON_API dNewtonDoubleHinge(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
 	CNEWTON_API void EnableLimit_0(bool state);
 	CNEWTON_API void EnableLimit_1(bool state);
 	CNEWTON_API void SetLimits_0(dFloat minAngle, dFloat maxAngle);

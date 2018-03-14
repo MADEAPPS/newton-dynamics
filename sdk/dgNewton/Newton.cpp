@@ -848,8 +848,8 @@ void NewtonWorldForEachBodyInAABBDo(const NewtonWorld* const newtonWorld, const 
 	TRACE_FUNCTION(__FUNCTION__);
 
 	Newton* const world = (Newton *) newtonWorld;
-	dgVector q0 (p0[0], p0[1], p0[2], dgFloat32 (0.0f));
-	dgVector q1 (p1[0], p1[1], p1[2], dgFloat32 (0.0f));
+	dgVector q0 (dgMin (p0[0], p1[0]), dgMin (p0[1], p1[1]), dgMin (p0[2], p1[2]), dgFloat32 (0.0f));
+	dgVector q1 (dgMax (p0[0], p1[0]), dgMax (p0[1], p1[1]), dgMax (p0[2], p1[2]), dgFloat32 (0.0f));
 
 	world->GetBroadPhase()->ForEachBodyInAABB (q0, q1, (OnBodiesInAABB) callback, userData);
 }
@@ -3954,30 +3954,15 @@ void NewtonCollisionSetUserData (const NewtonCollision* const collision, void* c
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	instance->SetUserData0(userData);
+	instance->SetUserData(userData);
 }
 
 void* NewtonCollisionGetUserData (const NewtonCollision* const collision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	return instance->GetUserData0();
+	return instance->GetUserData();
 }
-
-void NewtonCollisionSetUserData1 (const NewtonCollision* const collision, void* const userData)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	instance->SetUserData1(userData);
-}
-
-void* NewtonCollisionGetUserData1 (const NewtonCollision* const collision)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	return instance->GetUserData1();
-}
-
 
 void* NewtonCollisionGetSubCollisionHandle (const NewtonCollision* const collision)
 {
@@ -4307,6 +4292,11 @@ NewtonBody* NewtonCreateDynamicBody(const NewtonWorld* const newtonWorld, const 
 		NewtonDestroyCollision((NewtonCollision*)collision);
 	}
 	return body;
+}
+
+NewtonBody* NewtonCreateAsymetricDynamicBody(const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionPtr, const dFloat* const matrixPtr)
+{
+	return NewtonCreateDynamicBody(newtonWorld, collisionPtr, matrixPtr);
 }
 
 NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionPtr, const dFloat* const matrixPtr)

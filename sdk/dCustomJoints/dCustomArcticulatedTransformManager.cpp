@@ -31,30 +31,6 @@ dCustomArticulatedTransformController* dCustomArticulaledTransformManager::Creat
 	return controller;
 }
 
-void dCustomArticulaledTransformManager::SetCollisionMask (dCustomArticulatedTransformController::dSkeletonBone* const bone0, dCustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode)
-{
-	dAssert (bone0->m_controller);
-	dAssert (bone0->m_controller == bone1->m_controller);
-	dCustomArticulatedTransformController* const controller = bone0->m_controller; 
-	controller->SetSelfCollisionMask (bone0, bone1, mode);
-}
-
-void dCustomArticulaledTransformManager::SetDefaultSelfCollisionMask (dCustomArticulatedTransformController* const controller)
-{
-	controller->SetDefaultSelfCollisionMask();
-}
-
-void dCustomArticulaledTransformManager::DisableAllSelfCollision (dCustomArticulatedTransformController* const controller)
-{
-	controller->DisableAllSelfCollision ();
-}
-
-bool dCustomArticulaledTransformManager::SelfCollisionTest (const dCustomArticulatedTransformController::dSkeletonBone* const bone0, const dCustomArticulatedTransformController::dSkeletonBone* const bone1) const
-{
-	dCustomArticulatedTransformController* const controller0 = bone0->m_controller; 
-	dCustomArticulatedTransformController* const controller1 = bone1->m_controller; 
-	return (controller0 == controller1) ? controller0->SelfCollisionTest (bone0, bone1) : false;
-}
 
 dCustomArticulatedTransformController::dCustomArticulatedTransformController()
 	:m_collisionAggregate(NULL)
@@ -86,8 +62,9 @@ void dCustomArticulatedTransformController::PreUpdate(dFloat timestep, int threa
 
 void dCustomArticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	if (m_calculateLocalTransform) {
+	if (m_calculateLocalTransform && m_bones.GetCount()) {
 
+		dAssert(m_bones.GetCount() == 1);
 		dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
 
 		dMatrix parentMatrixPool[128];
@@ -143,111 +120,19 @@ dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransfor
 	return m_bones.GetCount() ? &m_bones.GetFirst()->GetInfo() : NULL;
 }
 
-/*
-int dCustomArticulatedTransformController::GetBoneCount() const
+
+dCustomJoint* dCustomArticulatedTransformController::dSkeletonBone::FindJoint() const
 {
-	return m_boneCount;
-}
-
-const dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::GetBone(int index) const
-{
-	return &m_bones[index];
-}
-
-dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::GetBone(int index)
-{
-	return &m_bones[index];
-}
-
-const dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::GetParent(const dSkeletonBone* const bone) const
-{
-	dAssert (bone->m_controller == this);
-	return bone->m_parent;
-}
-
-
-NewtonBody* dCustomArticulatedTransformController::GetBoneBody (const dSkeletonBone* const bone) const
-{
-	dAssert (bone->m_controller == this);
-	return bone->m_body;
-}
-
-NewtonBody* dCustomArticulatedTransformController::GetBoneBody (int index) const
-{
-	return GetBone(index)->m_body;
-}
-*/
-
-void dCustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
-{
-//	dAssert (0);
-/*
-	for (int i = 0; i < m_boneCount; i ++) {
-		dSkeletonBone& bone = m_bones[i];
-		bone.m_bitField.SetBit (i);
-	}
-
-	for (int i = 0; i < m_boneCount; i ++) {
-		dSkeletonBone& bone = m_bones[i];
-		if (bone.m_parent) {
-			SetSelfCollisionMask (&bone, bone.m_parent, false);
+	if (m_parent) {
+		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(m_body); joint; joint = NewtonBodyGetNextJoint(m_body, joint)) {
+			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+			dAssert (customJoint);
+			if (((customJoint->GetBody0() == m_body) && (customJoint->GetBody1() == m_parent->m_body)) ||
+				((customJoint->GetBody1() == m_body) && (customJoint->GetBody0() == m_parent->m_body))) {
+				return customJoint;
+			}
 		}
+		dAssert (0);
 	}
-*/
+	return NULL;
 }
-
-void dCustomArticulatedTransformController::DisableAllSelfCollision ()
-{
-//	dAssert (0);
-/*
-	if (m_collisionAggregate) {
-		NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
-	}
-	for (int i = 0; i < m_boneCount; i ++) {
-		for (int j = i + 1; j < m_boneCount; j ++) {
-			SetSelfCollisionMask (&m_bones[i], &m_bones[j], false);
-		}
-	}
-*/
-}
-
-void dCustomArticulatedTransformController::SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode)
-{
-	dAssert (0);
-/*
-	dAssert (bone0->m_controller);
-	dAssert (bone1->m_controller);
-	dAssert (bone0->m_controller == this);
-	dAssert (bone1->m_controller == this);
-
-	int boneId0 = int (bone0 - m_bones);
-	int boneId1 = int (bone1 - m_bones);
-	dAssert (boneId0 != boneId1);
-
-	if (mode) {
-		bone0->m_bitField.SetBit (boneId1);
-		bone1->m_bitField.SetBit (boneId0);
-	} else {
-		bone0->m_bitField.ResetBit (boneId1);
-		bone1->m_bitField.ResetBit (boneId0);
-	}
-*/
-}
-
-bool dCustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const
-{
-//dAssert (0);
-return false;
-/*
-return false;
-	bool state = true;
-	dAssert (bone0->m_controller);
-	dAssert (bone1->m_controller);
-	if (bone0->m_controller == bone1->m_controller) {
-		int id1 = int (bone1 - m_bones);
-		state = bone0->m_bitField.TestMask(id1);
-	}
-	return state;
-*/
-}
-

@@ -34,8 +34,6 @@ class dCustomHingeActuator: public dCustomHinge
 	CUSTOM_JOINTS_API virtual ~dCustomHingeActuator();
 
 	CUSTOM_JOINTS_API dFloat GetActuatorAngle() const;
-	CUSTOM_JOINTS_API bool GetEnableFlag () const;
-	CUSTOM_JOINTS_API void SetEnableFlag (bool flag);
 
 	CUSTOM_JOINTS_API dFloat GetTargetAngle() const;
 	CUSTOM_JOINTS_API void SetTargetAngle(dFloat angle);
@@ -49,21 +47,16 @@ class dCustomHingeActuator: public dCustomHinge
 	CUSTOM_JOINTS_API dFloat GetAngularRate() const;
 	CUSTOM_JOINTS_API void SetAngularRate(dFloat rate);
 
-    CUSTOM_JOINTS_API dFloat GetMaxForcePower() const;
-    CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
+    CUSTOM_JOINTS_API dFloat GetMaxTorque() const;
+    CUSTOM_JOINTS_API void SetMaxTorque(dFloat torque);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
 
-	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
-
-	dFloat m_angle;
-	dFloat m_minAngle;
-	dFloat m_maxAngle;
-	dFloat m_angularRate;
-    dFloat m_maxForce;
-
+	dAngularIntegration m_targetAngle;
+	dFloat m_maxTorque;
 	DECLARE_CUSTOM_JOINT(dCustomHingeActuator, dCustomHinge)
 };
 

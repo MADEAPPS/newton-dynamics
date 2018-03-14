@@ -80,7 +80,6 @@ void Restitution (DemoEntityManager* const scene)
 	DemoMesh* const boxMesh = new DemoMesh("box", boxCollision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	int zCount = 10;
-//	int zCount = 1;
 	dFloat spacing = 4.0f;
 	dMatrix matrix (dGetIdentityMatrix());
 	dVector origin (matrix.m_posit);
@@ -88,7 +87,7 @@ void Restitution (DemoEntityManager* const scene)
 
 	// create a simple scene
 	for (int i = 0; i < zCount; i ++) {
-		dFloat restitution = i * 0.1f + 0.083f;
+		dFloat restitution = 0.1f * (i + 1);
 		NewtonBody* body;
 		NewtonCollision* collision;
 
@@ -107,11 +106,9 @@ void Restitution (DemoEntityManager* const scene)
 		body = CreateSimpleSolid (scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID);
 		NewtonBodySetLinearDamping (body, 0.0f);
 		collision = NewtonBodyGetCollision(body);
-		
 		NewtonCollisionSetUserData (collision, *((void**)&restitution));
 
 		matrix.m_posit.m_y += 6.0f;
-		//body = CreateSimpleSolid (scene, boxMesh, mass, matrix, boxCollision, defaultMaterialID);
 		body = CreateSimpleSolid (scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID);
 		NewtonBodySetLinearDamping (body, 0.0f);
 		collision = NewtonBodyGetCollision(body);

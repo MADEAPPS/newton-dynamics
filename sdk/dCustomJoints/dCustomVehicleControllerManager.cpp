@@ -14,7 +14,7 @@
 #include "dCustomJoint.h"
 #include "dCustomGear.h"
 #include "dCustomHinge.h"
-#include "dCustomUniversal.h"
+#include "dCustomDoubleHinge.h"
 #include "dCustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE
@@ -165,7 +165,7 @@ void dEngineMountJoint::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix&
 
 
 dDifferentialMountJoint::dDifferentialMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
-	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
+	:dCustomDoubleHinge(pinAndPivotFrame, differentialBody, chassisBody)
 {
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
@@ -270,7 +270,7 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 #else
 dDifferentialJoint::dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
-	:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
+	:dCustomDoubleHinge(pinAndPivotFrame, differentialBody, chassisBody)
 	,m_turnSpeed(0.0f)
 	,m_isTractionDifferential(false)
 {
@@ -321,7 +321,7 @@ void dDifferentialJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector chassisOmega(0.0f);
 	dVector differentialOmega(0.0f);
 
-	dCustomUniversal::SubmitConstraints(timestep, threadIndex);
+	dCustomDoubleHinge::SubmitConstraints(timestep, threadIndex);
 
 	// y axis controls the slip differential feature.
 	NewtonBody* const chassisBody = GetBody1();
@@ -1565,6 +1565,9 @@ bool dCustomVehicleController::ControlStateChanged() const
 
 dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
 {
+dAssert(0);
+return NULL;
+/*
 	dVector drag(0.0f);
 
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
@@ -1606,7 +1609,9 @@ dWheelJoint* dCustomVehicleController::AddTire(const dMatrix& locationInGlobalSp
 
 	NewtonCollisionSetUserData1(collision, joint);
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, tireBody);
+
 	return joint;
+*/
 }
 
 
@@ -1845,6 +1850,9 @@ void dCustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat downWe
 
 int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 {
+	dAssert (0);
+	return 0;
+/*
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)NewtonMaterialGetMaterialPairUserData(material);
 
 	const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
@@ -1861,6 +1869,7 @@ int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* con
 	const dWheelJoint* const tire = (dWheelJoint*) NewtonCollisionGetUserData1(collision1);
 	dAssert(tire->GetBody1() != otherBody);
 	return manager->OnTireAabbOverlap(material, tire, otherBody);
+*/
 }
 
 int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const
@@ -1875,6 +1884,9 @@ int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* con
 
 int dCustomVehicleControllerManager::OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
 {
+	dAssert (0);
+	return 0;
+/*
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*) NewtonMaterialGetMaterialPairUserData(material);
 	const void* const data0 = NewtonCollisionDataPointer(collision0);
 //	const void* const data1 = NewtonCollisionDataPointer(collision1);
@@ -1904,11 +1916,14 @@ int dCustomVehicleControllerManager::OnContactGeneration (const NewtonMaterial* 
 		dSwap (contactBuffer[i].m_shapeId0, contactBuffer[i].m_shapeId1);
 	}
 	return count;
+*/
 }
 
 
 void dCustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
+	dAssert (0);
+/*
 	void* const contact = NewtonContactJointGetFirstContact(contactJoint);
 	dAssert (contact);
 	NewtonMaterial* const material = NewtonContactGetMaterial(contact);
@@ -1935,8 +1950,8 @@ void dCustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* 
 			manager->OnTireContactsProcess(contactJoint, tire, otherBody, timestep);
 		}
 	}
+*/
 }
-
 
 int dCustomVehicleControllerManager::OnContactGeneration(const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const
 {
@@ -2728,7 +2743,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 //dTrace(("%d ", xxx));
 
 	int index = 0;
-	dFloat32 invDt = 1.0f / timestep;
+	dFloat invDt = dFloat(1.0f) / timestep;
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
 
@@ -2859,7 +2874,7 @@ void dCustomVehicleController::CalculateTireForces(dFloat timestep, int threadID
 		}
 	}
 dTrace(("\n"));
-
+/*
 	dFloat torque_y = axisMatrix.m_up.DotProduct3(torque);
 	dFloat force_x = axisMatrix.m_front.DotProduct3(force);
 	dFloat force_z = axisMatrix.m_right.DotProduct3(force);
@@ -2868,7 +2883,7 @@ dTrace(("\n"));
 	dFloat veloc_x = axisMatrix.m_front.DotProduct3(veloc);
 	dFloat veloc_z = axisMatrix.m_right.DotProduct3(veloc);
 
-/*
+
 	dFloat speed_x = veloc.DotProduct3(matrix.m_front);
 	dFloat speed_z = veloc.DotProduct3(matrix.m_right);
 	if (dAbs(speed_x) > 1.0f) {

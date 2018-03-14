@@ -29,7 +29,14 @@ static void ZeroGravityForce(const NewtonBody* body, dFloat timestep, int thread
 	NewtonBodyGetOmega(body, &omega[0]);
 	dVector L(inertia.RotateVector(omega));
 	dFloat e = L.DotProduct3(omega) * 0.5f;
-	dTrace(("E = %f  L (%f %f %f)\n", e, L.m_x, L.m_y, L.m_z));
+
+//dMatrix ii(dGetIdentityMatrix());
+//dMatrix matrix(dGetIdentityMatrix());
+//NewtonBodyGetMatrix(body, &matrix[0][0]);
+//NewtonBodyGetMass(body, &omega.m_w, &ii[0][0], &ii[1][1], &ii[2][2]);
+//ii = matrix.Inverse() * ii * matrix;
+
+	dTrace(("E=%f  L(%f %f %f) W(%f %f %f)\n", e, L.m_x, L.m_y, L.m_z, omega.m_x, omega.m_y, omega.m_z));
 */
 }
 
@@ -66,7 +73,6 @@ static NewtonBody* DzhanibekovEffect(DemoEntityManager* const scene, const dVect
 	NewtonBodyGetMass(dzhanibekovBody, &m, &x, &y, &z);
 //NewtonBodySetMassMatrix(dzhanibekovBody, m, x, x, x);
 
-
 	NewtonBodySetOmega(dzhanibekovBody, &omega[0]);
 
 	dVector damp(0.0f);
@@ -74,16 +80,121 @@ static NewtonBody* DzhanibekovEffect(DemoEntityManager* const scene, const dVect
 	NewtonBodySetAngularDamping(dzhanibekovBody, &damp[0]);
 	NewtonBodySetForceAndTorqueCallback(dzhanibekovBody, ZeroGravityForce);
 
-//	matrix.m_posit.m_x -= lenght * 0.5f;
-
 	geometry->Release();
 	NewtonDestroyCollision(dzhanibekovShape);
 	NewtonDestroyCollision(longCylinder);
 	NewtonDestroyCollision(shortCylinder);
 
 	return dzhanibekovBody;
-
 }
+
+
+static NewtonBody* TorqueFreePreccesion(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio, dFloat precessingAngle)
+{
+	NewtonWorld* const world = scene->GetNewton();
+
+	dMatrix offset(dRollMatrix(90.0f * dDegreeToRad));
+	NewtonCollision* const ballShape = NewtonCreateCylinder(world, radio, radio, radio * 0.25f, 0, &offset[0][0]);
+	//NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, NULL);
+	//NewtonCollisionSetScale(ballShape, 1.0f, 0.5f, 1.0f);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = posit;
+	matrix.m_posit.m_w = 1.0f;
+
+	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
+
+	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
+
+	dFloat m, Ixx, Iyy, Izz;
+	NewtonBodyGetMass(ball, &m, &Ixx, &Iyy, &Izz);
+
+	omega = 2.0f;
+	dVector angVelocity (0.0f, omega, 0.0f, 0.0f);
+	angVelocity = dPitchMatrix(precessingAngle * dDegreeToRad).RotateVector(angVelocity);
+
+	NewtonBodySetOmega(ball, &angVelocity[0]);
+
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(ball, 0.0f);
+	NewtonBodySetAngularDamping(ball, &damp[0]);
+	NewtonBodySetForceAndTorqueCallback(ball, ZeroGravityForce);
+
+	geometry->Release();
+	NewtonDestroyCollision(ballShape);
+
+	return ball;
+}
+
+static NewtonBody* PhiTop(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio)
+{
+	NewtonWorld* const world = scene->GetNewton();
+
+	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, NULL);
+	NewtonCollisionSetScale(ballShape, 0.5f, 0.5f, 1.0f);
+
+	dMatrix matrix(dPitchMatrix(10.0f * dDegreeToRad));
+	matrix.m_posit = posit;
+	matrix.m_posit.m_w = 1.0f;
+
+	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
+
+	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
+
+	dFloat m, Ixx, Iyy, Izz;
+	NewtonBodyGetMass(ball, &m, &Ixx, &Iyy, &Izz);
+
+	dVector angVelocity(0.0f, omega, 0.0f, 0.0f);
+	NewtonBodySetOmega(ball, &angVelocity[0]);
+
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(ball, 0.0f);
+	NewtonBodySetAngularDamping(ball, &damp[0]);
+
+	geometry->Release();
+	NewtonDestroyCollision(ballShape);
+
+	return ball;
+}
+
+
+static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio)
+{
+	NewtonWorld* const world = scene->GetNewton();
+
+
+	dMatrix shapeMatrix(dPitchMatrix(0.0f * dDegreeToRad));
+	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, &shapeMatrix[0][0]);
+	NewtonCollisionSetScale(ballShape, 0.3f, 0.25f, 1.0f);
+
+
+	dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad));
+	matrix.m_posit = posit;
+	matrix.m_posit.m_w = 1.0f;
+	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0, true);
+	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
+	
+	dFloat m, Ixx, Iyy, Izz;
+	NewtonBodyGetMass(ball, &m, &Ixx, &Iyy, &Izz);
+
+	dVector com(0.0f, -0.2f, 0.0f, 0.0);
+	NewtonBodySetCentreOfMass(ball, &com[0]);
+	dVector angVelocity(0.0f, omega, 0.0f, 0.0f);
+//	NewtonBodySetOmega(ball, &angVelocity[0]);
+
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(ball, 0.0f);
+	NewtonBodySetAngularDamping(ball, &damp[0]);
+
+	geometry->Release();
+	NewtonDestroyCollision(ballShape);
+
+	return ball;
+}
+
 
 static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
 {
@@ -186,6 +297,9 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
+/*
+	// a body with an axis of symmetry should precesses 
+	TorqueFreePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
 
 	// should spins very slowly, with a tilt angle of 45 degrees
 	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -8.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
@@ -210,20 +324,22 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 
 	// test a different angular velocity
 	DzhanibekovEffect(scene, dVector(3.0f, 3.0f,  8.0f, 1.0f), dVector (0.01f, 0.01f, 15.0f), 0.25f, 2.0f);
+*/
 
-	// place a toy top
-	const int topsCount = 4;
+	// place a toy tops
+//	const int topsCount = 4;
+const int topsCount = 1;
+	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
-		for (int j = 0; j < topsCount; j ++) {
-			// should translate for a moment then spins in place (so far is wrong)
-			PrecessingTop(scene, dVector(-2.0f * i - 2.0f, 3.0f, 2.0f * j - 2.0f, 1.0f));
-		}
+//		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
+//		PhiTop(scene, dVector(10.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
+		RattleBack(scene, dVector(10.0f, 0.3f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
 	}
 
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);
-	dVector origin(-15.0f, 2.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 2.0f, -5.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 

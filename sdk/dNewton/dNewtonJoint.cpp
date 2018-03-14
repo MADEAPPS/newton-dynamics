@@ -122,30 +122,34 @@ void dNewtonSliderJoint::SetLimits(dFloat minDist, dFloat maxDist)
     ((dCustomSlider*) m_joint)->SetLimits(minDist, maxDist);
 }
 
-dNewtonUniversalJoint::dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+dNewtonDoubleHinge::dNewtonDoubleHinge(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_universal)
 {
-	SetJoint (new dCustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomDoubleHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
-void dNewtonUniversalJoint::EnableLimit_0(bool state)
+void dNewtonDoubleHinge::EnableLimit_0(bool state)
 {
-	((dCustomUniversal*) m_joint)->EnableLimit_0(state);
+	dAssert (0);
+//	((dCustomDoubleHinge*) m_joint)->EnableLimit_0(state);
 }
 
-void dNewtonUniversalJoint::EnableLimit_1(bool state)
+void dNewtonDoubleHinge::EnableLimit_1(bool state)
 {
-	((dCustomUniversal*) m_joint)->EnableLimit_1(state);
+	dAssert (0);
+//	((dCustomDoubleHinge*) m_joint)->EnableLimit_1(state);
 }
 
-void dNewtonUniversalJoint::SetLimits_0(dFloat minAngle, dFloat maxAngle)
+void dNewtonDoubleHinge::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 {
-	((dCustomUniversal*) m_joint)->SetLimits_0 (minAngle, maxAngle);
+	dAssert (0);
+//	((dCustomDoubleHinge*) m_joint)->SetLimits_0 (minAngle, maxAngle);
 }
 
-void dNewtonUniversalJoint::SetLimits_1(dFloat minAngle, dFloat maxAngle)
+void dNewtonDoubleHinge::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
-	((dCustomUniversal*) m_joint)->SetLimits_1 (minAngle, maxAngle);
+	dAssert (0);
+//	((dCustomDoubleHinge*) m_joint)->SetLimits_1 (minAngle, maxAngle);
 }
 
 
@@ -157,7 +161,8 @@ dNewtonCylindricalJoint::dNewtonCylindricalJoint(const dFloat* const pinAndPivot
 
 void dNewtonCylindricalJoint::EnableLimit_0(bool state)
 {
-    ((dCustomCorkScrew*) m_joint)->EnableLinearLimits(state);
+	dAssert (0);
+//    ((dCustomCorkScrew*) m_joint)->EnableLinearLimits(state);
 }
 
 void dNewtonCylindricalJoint::EnableLimit_1(bool state)
@@ -167,12 +172,14 @@ void dNewtonCylindricalJoint::EnableLimit_1(bool state)
 
 void dNewtonCylindricalJoint::SetLimits_0(dFloat minDist, dFloat maxDist)
 {
-    ((dCustomCorkScrew*) m_joint)->SetLinearLimis (minDist, maxDist);
+	dAssert (0);
+//    ((dCustomCorkScrew*) m_joint)->SetLinearLimis (minDist, maxDist);
 }
 
 void dNewtonCylindricalJoint::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
-    ((dCustomCorkScrew*) m_joint)->SetAngularLimis(minAngle, maxAngle);
+	dAssert (0);
+//    ((dCustomCorkScrew*) m_joint)->SetAngularLimis(minAngle, maxAngle);
 }
 
 

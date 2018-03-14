@@ -77,8 +77,8 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const enti
 NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& offsetMatrix, const dVector& size, PrimitiveType type, int materialID);
 
 NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize);
-NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId);
-NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId);
+NewtonBody* CreateSimpleBody(NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
+NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
 void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat findFloorElevation = 1000.0f, dFloat offsetHigh = 5.0f);
 
 NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size);
@@ -86,6 +86,8 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const l
 
 NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramter, dVector& positionOut, dVector& normalOut);
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalScale, dFloat timestep);
+
+void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location, int shapeid);
 
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
 

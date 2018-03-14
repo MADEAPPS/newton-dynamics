@@ -193,7 +193,7 @@ void RenderCenterOfMass (NewtonWorld* const world)
 		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
 		glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
 
-		dVector y (o + matrix.RotateVector (dVector (0.0f, 1.0f, 0.0f, 0.0f)));
+ 		dVector y (o + matrix.RotateVector (dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 		glColor3f (0.0f, 1.0f, 0.0f);
 		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
 		glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
@@ -212,7 +212,7 @@ void RenderContactPoints (NewtonWorld* const world)
 	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
-	glPointSize(8.0f);
+	glPointSize(32.0f);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glBegin(GL_POINTS);
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
@@ -438,7 +438,7 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 #endif
 }
 
-void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug, dFloat size)
+void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug)
 {
 	// this will go over the joint list twice, 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {

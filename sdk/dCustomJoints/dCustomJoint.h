@@ -30,7 +30,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 
 #define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
 
-#define DECLARE_CUSTOM_JOINT(className,baseClass)																			\
+#define DECLARE_CUSTOM_JOINT_BASE(className,baseClass)																		\
 	public:																													\
 	virtual bool IsType (dCRCTYPE type) const																				\
 	{																														\
@@ -66,15 +66,23 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 		}																													\
 		dCRCTYPE m_key_##className;																							\
 	};																														\
-	friend class SerializeMetaData_##className;																				\
-	static SerializeMetaData_##className m_metaData_##className;
+	friend class SerializeMetaData_##className;
+	
+
+#define DECLARE_CUSTOM_JOINT(className,baseClass)	\
+	DECLARE_CUSTOM_JOINT_BASE(className,baseClass)	\
+	static CUSTOM_JOINTS_API SerializeMetaData_##className m_metaData_##className;
+
+#define DECLARE_CUSTOM_JOINT_EXPORT_IMPORT(exportImport,className,baseClass)	\
+	DECLARE_CUSTOM_JOINT_BASE(className,baseClass)								\
+	static exportImport SerializeMetaData_##className m_metaData_##className;
 
 #define IMPLEMENT_CUSTOM_JOINT(className)																					\
 	className::SerializeMetaData_##className className::m_metaData_##className(#className);									\
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
 // for the user to implement it own joints
-class dCustomJoint: public dCustomAlloc  
+class dCustomJoint: public dCustomAlloc
 {
 	public:
 	class dOptions
@@ -85,13 +93,13 @@ class dCustomJoint: public dCustomAlloc
 		union {
 			int m_value;
 			struct {
-				int m_option0 : 1;
-				int m_option1 : 1;
-				int m_option2 : 1;
-				int m_option3 : 1;
-				int m_option4 : 1;
-				int m_option5 : 1;
-				int m_option7 : 1;
+				int m_option0			: 1;
+				int m_option1			: 1;
+				int m_option2			: 1;
+				int m_option3			: 1;
+				int m_option4			: 1;
+				int m_option5			: 1;
+				int m_calculateForces	: 1;
 			};
 		};
 	};
@@ -112,6 +120,9 @@ class dCustomJoint: public dCustomAlloc
 		virtual void DrawLine(const dVector& p0, const dVector& p1) = 0;
 		virtual void SetOrthRendering () {};
 		virtual void ResetOrthRendering () {};
+
+		dFloat GetScale() {return m_debugScale;} const
+		void SetScale(dFloat scale) {m_debugScale = scale;}
 
 		const dMatrix& GetCameraMatrix() const {return m_cameraMatrix;}
 		CUSTOM_JOINTS_API void DrawFrame(const dMatrix& matrix);
@@ -212,6 +223,7 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API static void Initalize(NewtonWorld* const world);
 
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const {}
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonSerializeCallback callback, void* const userData) const;
 	
@@ -241,18 +253,23 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
 	CUSTOM_JOINTS_API int GetSolverModel() const;
-
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
-	CUSTOM_JOINTS_API void SetDebugScale(dFloat scale);
+	CUSTOM_JOINTS_API void SetJointForceCalculation(bool mode);
+	CUSTOM_JOINTS_API const dVector& GetForce0() const;
+	CUSTOM_JOINTS_API const dVector& GetForce1() const;
+	CUSTOM_JOINTS_API const dVector& GetTorque0() const;
+	CUSTOM_JOINTS_API const dVector& GetTorque1() const;
 
 	private:
+	CUSTOM_JOINTS_API void CalculateJointForce(); 
+
 	// this are the callback needed to have transparent c++ method interfaces 
 	CUSTOM_JOINTS_API static void Destructor (const NewtonJoint* me);	
 	CUSTOM_JOINTS_API static void SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
+	
 	
 	protected:
 	CUSTOM_JOINTS_API dCustomJoint (NewtonInverseDynamics* const invDynSolver, void* const invDynNode);
@@ -260,12 +277,19 @@ class dCustomJoint: public dCustomAlloc
 
 	// the application needs to implement this function for each derived joint. See examples for more detail
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API void SubmitLinearRows(int activeRows, const dMatrix& matrix0, const dMatrix& matrix1) const;
 	
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 	CUSTOM_JOINTS_API static dSerializeMetaDataDictionary& GetDictionary();
-
+	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
+	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
+	
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
+	dVector m_force0;
+	dVector m_force1;
+	dVector m_torque0;
+	dVector m_torque1;
 	void* m_userData;
 	NewtonBody* m_body0;
 	NewtonBody* m_body1;
@@ -275,6 +299,7 @@ class dCustomJoint: public dCustomAlloc
 	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;
+	dOptions m_options;
 	CUSTOM_JOINTS_API static dCRCTYPE m_key;
 	CUSTOM_JOINTS_API static dSerializeMetaData m_metaData_CustomJoint;
 };

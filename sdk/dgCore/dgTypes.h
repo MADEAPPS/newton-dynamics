@@ -212,11 +212,15 @@
 #undef DLL_DECLSPEC
 #endif
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define DG_INLINE __forceinline 
+#ifdef _DEBUG
+	#define DG_INLINE inline
 #else 
-	#define DG_INLINE	inline
-	//#define DG_INLINE	 __attribute__((always_inline))
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+		#define DG_INLINE __forceinline 
+	#else 
+		#define DG_INLINE	inline
+		//#define DG_INLINE	 __attribute__((always_inline))
+	#endif
 #endif
 
 

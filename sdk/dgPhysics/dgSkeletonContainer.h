@@ -25,6 +25,8 @@
 #define DG_SKELETON_BASE_UNIQUE_ID	10
 
 #include "dgConstraint.h"
+#include "dgContact.h"
+#include "dgBilateralConstraint.h"
 
 class dgDynamicBody;
 
@@ -36,20 +38,6 @@ class dgSkeletonContainer
 	class dgForcePair;
 	class dgMatriData;
 	class dgBodyJointMatrixDataPair;
-	class dgLoopingJoint
-	{
-		public: 
-		dgLoopingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1)
-			:m_joint(joint)
-			,m_m0(dgInt16 (index0))
-			,m_m1(dgInt16 (index1))
-		{
-		}
-
-		dgBilateralConstraint* m_joint;
-		dgInt16 m_m0;
-		dgInt16 m_m1;
-	};
 
 	DG_CLASS_ALLOCATOR(allocator)
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
@@ -68,6 +56,9 @@ class dgSkeletonContainer
 	dgNode* GetParent (dgNode* const node) const;
 	dgNode* GetFirstChild (dgNode* const parent) const;
 	dgNode* GetNextSiblingChild (dgNode* const sibling) const;
+
+	void ClearSelfCollision();
+	void AddSelfCollisionJoint(dgContact* const contact);
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
@@ -88,9 +79,9 @@ class dgSkeletonContainer
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
 		
-	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
-	void InitAuxiliaryMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
-	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
+	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow);
+	void InitAuxiliaryMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow);
+	dgInt8* GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow);
 	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 
@@ -101,13 +92,15 @@ class dgSkeletonContainer
 	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
-	dgFloat32* m_lowerTriangularMassMatrix11;
+//	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
-	dgList<dgDynamicBody*> m_loopingBodies;
-	dgList<dgLoopingJoint> m_loopingJoints;
+	dgArray<dgConstraint*> m_loopingJoints;
+	dgArray<dgInt8> m_auxiliaryMemoryBuffer;
 	dgInt32 m_id;
 	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
+	dgInt16 m_loopCount;
+	dgInt16 m_selfContactCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_loopRowCount;
 	dgInt16 m_auxiliaryRowCount;

@@ -312,7 +312,7 @@ class dGearBoxJoint: public dCustomGear
 };
 
 
-class dDifferentialMountJoint: public dCustomUniversal
+class dDifferentialMountJoint: public dCustomDoubleHinge
 {
 	public:
 	CUSTOM_JOINTS_API dDifferentialMountJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody);
@@ -324,7 +324,7 @@ class dDifferentialMountJoint: public dCustomUniversal
 	friend class dDifferentialJoint;
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;
-	DECLARE_CUSTOM_JOINT(dDifferentialMountJoint, dCustomUniversal)
+	DECLARE_CUSTOM_JOINT(dDifferentialMountJoint, dCustomDoubleHinge)
 };
 
 #ifdef VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
@@ -353,7 +353,7 @@ class dDifferentialJoint: public dCustomJoint
 };
 
 #else
-class dDifferentialJoint: public dCustomUniversal
+class dDifferentialJoint: public dCustomDoubleHinge
 {
 	public:
 	CUSTOM_JOINTS_API dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody);
@@ -373,7 +373,7 @@ class dDifferentialJoint: public dCustomUniversal
 
 	friend class dCustomVehicleController;
 	friend class dCustomVehicleControllerManager;
-	DECLARE_CUSTOM_JOINT(dDifferentialJoint, dCustomUniversal)
+	DECLARE_CUSTOM_JOINT(dDifferentialJoint, dCustomDoubleHinge)
 };
 
 #endif

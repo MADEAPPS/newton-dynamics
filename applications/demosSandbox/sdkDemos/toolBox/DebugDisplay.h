@@ -106,7 +106,7 @@ void RenderAABB (NewtonWorld* const world);
 void RenderCenterOfMass (NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
 void RenderContactPoints (NewtonWorld* const world); 
-void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug, dFloat size);
+void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
 
 void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int faceId);
 

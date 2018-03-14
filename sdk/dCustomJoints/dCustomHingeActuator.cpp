@@ -26,55 +26,48 @@ IMPLEMENT_CUSTOM_JOINT(dCustomHingeActuator);
 
 dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
-	,m_angle(0.0f)
-	,m_minAngle(-D_CUSTOM_LARGE_VALUE)
-	,m_maxAngle( D_CUSTOM_LARGE_VALUE)
-	,m_angularRate(0.0f)
-	,m_maxForce(1.0e20f)
+	,m_targetAngle(0.0f)
+	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
-	dAssert (0);
-//	m_actuatorFlag = false;
-	EnableLimits(false);
+	m_friction = 0.0f;
+	dAssert(m_options.m_value == 0);
+	SetAngularRate(dPi);
+	SetMinAngularLimit(-180.0f * dDegreeToRad);
+	SetMaxAngularLimit(180.0f * dDegreeToRad);
 }
 
 dCustomHingeActuator::dCustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
-	,m_angle(0.0f)
-	,m_minAngle(minAngle)
-	,m_maxAngle(maxAngle)
-	,m_angularRate(angularRate)
-    ,m_maxForce(1.0e20f)
+	,m_targetAngle(0.0f)
+	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
-	dAssert (0);
-//	m_actuatorFlag = true;
-	EnableLimits(false);
+	m_friction = 0.0f;
+	dAssert(m_options.m_value == 0);
+	SetAngularRate(angularRate);
+	SetMinAngularLimit(minAngle);
+	SetMaxAngularLimit(maxAngle);
 }
 
 dCustomHingeActuator::~dCustomHingeActuator()
 {
 }
 
-void dCustomHingeActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
-{
-	dAssert (0);
-}
-
 void dCustomHingeActuator::Deserialize(NewtonDeserializeCallback callback, void* const userData)
 {
-	dAssert (0);
+	callback(userData, &m_targetAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_maxTorque, sizeof(dFloat));
 }
 
-
-bool dCustomHingeActuator::GetEnableFlag () const
+void dCustomHingeActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	dAssert (0);
-	return 0;
-//	return m_actuatorFlag;
+	dCustomHinge::Serialize (callback, userData);
+	callback(userData, &m_targetAngle, sizeof(dAngularIntegration));
+	callback(userData, &m_maxTorque, sizeof(dFloat));
 }
 
 dFloat dCustomHingeActuator::GetTargetAngle() const
 {
-	return m_angle;
+	return GetJointAngle();
 }
 
 dFloat dCustomHingeActuator::GetMinAngularLimit() const
@@ -89,7 +82,7 @@ dFloat dCustomHingeActuator::GetMaxAngularLimit() const
 
 dFloat dCustomHingeActuator::GetAngularRate() const
 {
-	return m_angularRate;
+	return m_motorSpeed;
 }
 
 
@@ -106,18 +99,12 @@ void dCustomHingeActuator::SetMaxAngularLimit(dFloat limit)
 
 void dCustomHingeActuator::SetAngularRate(dFloat rate)
 {
-	m_angularRate = rate;
+	EnableMotor(false, rate);
 }
 
 void dCustomHingeActuator::SetTargetAngle(dFloat angle)
 {
-	m_angle = dClamp (angle, m_minAngle, m_maxAngle);
-}
-
-void dCustomHingeActuator::SetEnableFlag (bool flag)
-{
-	dAssert (0);
-//	m_actuatorFlag = flag;
+	m_targetAngle.SetAngle (dClamp (angle, m_minAngle, m_maxAngle));
 }
 
 dFloat dCustomHingeActuator::GetActuatorAngle() const
@@ -125,37 +112,43 @@ dFloat dCustomHingeActuator::GetActuatorAngle() const
 	return GetJointAngle();
 }
 
-dFloat dCustomHingeActuator::GetMaxForcePower() const
+dFloat dCustomHingeActuator::GetMaxTorque() const
 {
-    return m_maxForce;
+    return m_maxTorque;
 }
 
-void dCustomHingeActuator::SetMaxForcePower(dFloat force)
+void dCustomHingeActuator::SetMaxTorque(dFloat torque)
 {
-    m_maxForce = dAbs (force);
+    m_maxTorque = dAbs (torque);
 }
 
 
-void dCustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
+void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
-	dAssert (0);
-/*
-	if (m_actuatorFlag) {
-		dFloat jointangle = GetActuatorAngle();
-		dFloat relAngle = jointangle - m_angle;
-		dFloat currentSpeed = GetJointOmega();
-		dFloat step = dFloat(2.0f) * m_angularRate * timestep;
-		dFloat desiredSpeed = (dAbs(relAngle) > dAbs(step)) ? -dSign(relAngle) * m_angularRate : -dFloat(0.1f) * relAngle / timestep;
-		dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
-        NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
-        NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
-		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-	} else {
-		dCustomHinge::SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
+	dCustomHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
+
+	const dFloat invTimeStep = 1.0f / timestep;
+	const dFloat tol = m_motorSpeed * timestep;
+	const dFloat angle = m_curJointAngle.GetAngle();
+	const dFloat targetAngle = m_targetAngle.GetAngle();
+	dFloat currentSpeed = 0.0f;
+	if (angle > (targetAngle + tol)) {
+		currentSpeed = -m_motorSpeed;
+		dFloat predictAngle = angle + currentSpeed * timestep;
+		if (predictAngle < targetAngle) {
+			currentSpeed = 0.5f * (targetAngle - angle) * invTimeStep;
+		}
+	} else if (angle < (targetAngle - tol)) {
+		currentSpeed = m_motorSpeed;
+		dFloat predictAngle = angle + currentSpeed * timestep;
+		if (predictAngle > targetAngle) {
+			currentSpeed = 0.5f * (targetAngle - angle) * invTimeStep;
+		}
 	}
-*/
+	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	NewtonUserJointSetRowAcceleration(m_joint, accel);
+	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
+	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
-
-

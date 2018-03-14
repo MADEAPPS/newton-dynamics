@@ -776,10 +776,6 @@ extern "C" {
 	NEWTON_API void NewtonCollisionSetUserData (const NewtonCollision* const collision, void* const userData);
 	NEWTON_API void* NewtonCollisionGetUserData (const NewtonCollision* const collision);
 	
-	// this is used data is used by the joint library
-	NEWTON_API void NewtonCollisionSetUserData1 (const NewtonCollision* const collision, void* const userData);
-	NEWTON_API void* NewtonCollisionGetUserData1 (const NewtonCollision* const collision);
-	
 	NEWTON_API void NewtonCollisionSetUserID (const NewtonCollision* const collision, unsigned id);
 	NEWTON_API unsigned NewtonCollisionGetUserID (const NewtonCollision* const collision);
 
@@ -858,6 +854,7 @@ extern "C" {
 	// **********************************************************************************************
 	NEWTON_API NewtonBody* NewtonCreateDynamicBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision, const dFloat* const matrix);
 	NEWTON_API NewtonBody* NewtonCreateKinematicBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision, const dFloat* const matrix);
+	NEWTON_API NewtonBody* NewtonCreateAsymetricDynamicBody(const NewtonWorld* const newtonWorld, const NewtonCollision* const collision, const dFloat* const matrix);
 
 	NEWTON_API void NewtonDestroyBody(const NewtonBody* const body);
 

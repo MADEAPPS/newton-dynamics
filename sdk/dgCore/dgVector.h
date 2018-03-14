@@ -447,9 +447,9 @@ class dgVector
 	{
 		const dgInt32* const a = (dgInt32*)&m_x;
 		return dgVector ((a[0] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-			(a[1] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-			(a[2] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-			(a[3] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f));
+						 (a[1] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+						 (a[2] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+						 (a[3] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f));
 	}
 
 
@@ -864,9 +864,9 @@ class dgBigVector
 	{
 		const dgInt64* const a = (dgInt64*)&m_x;
 		return dgBigVector ((a[0] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
-			(a[1] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
-			(a[2] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
-			(a[3] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f));
+							(a[1] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
+							(a[2] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f),
+							(a[3] == 0) ? dgFloat64 (-1.0f) : dgFloat64 (1.0f));
 	}
 
 
@@ -1337,8 +1337,7 @@ class dgVector
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return _mm_dp_ps(m_type, A.m_type, 0xff);
 		#else 
-		//return (*this * A).AddHorizontal().GetScalar();
-		return (*this * A).AddHorizontal();
+			return (*this * A).AddHorizontal();
 		#endif
 	}
 
@@ -1420,7 +1419,8 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		return dgVector (_mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt)) & m_negOne;
+		//return dgVector (_mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt)) & m_negOne;
+		return m_negOne & (*this == m_zero);
 	}
 
 	DG_INLINE dgVector Floor () const
@@ -1956,7 +1956,8 @@ class dgBigVector
 
 	DG_INLINE dgBigVector TestZero() const
 	{
-		return dgBigVector(_mm_cmpeq_epi64(m_typeIntLow, m_zero.m_typeIntLow), _mm_cmpeq_epi64(m_typeIntHigh, m_zero.m_typeIntHigh)) & m_negOne;
+//		return dgBigVector(_mm_cmpeq_epi64(m_typeIntLow, m_zero.m_typeIntLow), _mm_cmpeq_epi64(m_typeIntHigh, m_zero.m_typeIntHigh)) & m_negOne;
+		return m_negOne | (*this == m_zero);
 	}
 
 	DG_INLINE static void Transpose4x4(dgBigVector& dst0, dgBigVector& dst1, dgBigVector& dst2, dgBigVector& dst3,
@@ -2039,8 +2040,8 @@ class dgSpatialVector
 #define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
 	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
 		:m_d0(low.m_typeLow)
-		, m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
-		, m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
+		,m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
+		,m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
 	{
 	}
 #else 
@@ -2098,7 +2099,6 @@ class dgSpatialVector
 		dgFloat64 ret;
 		_mm_store_sd(&ret, dot);
 		return ret;
-		//return dot.m128d_f64[0];
 	}
 
 	DG_INLINE dgSpatialVector Scale(dgFloat64 s) const

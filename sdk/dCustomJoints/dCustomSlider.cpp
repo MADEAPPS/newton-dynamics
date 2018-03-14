@@ -33,7 +33,6 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options()
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -48,7 +47,6 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_springDamperRelaxation(0.9f)
-	,m_options()
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -65,7 +63,6 @@ void dCustomSlider::Deserialize (NewtonDeserializeCallback callback, void* const
 	callback (userData, &m_spring, sizeof (m_spring));
 	callback (userData, &m_damper, sizeof (m_damper));
 	callback (userData, &m_springDamperRelaxation, sizeof (m_springDamperRelaxation));
-	callback (userData, &m_options, sizeof (m_options));
 }
 
 dCustomSlider::~dCustomSlider()
@@ -84,7 +81,6 @@ void dCustomSlider::Serialize (NewtonSerializeCallback callback, void* const use
 	callback(userData, &m_spring, sizeof(m_spring));
 	callback(userData, &m_damper, sizeof(m_damper));
 	callback(userData, &m_springDamperRelaxation, sizeof(m_springDamperRelaxation));
-	callback(userData, &m_options, sizeof(m_options));
 }
 
 
@@ -127,6 +123,14 @@ dFloat dCustomSlider::GetFriction () const
 	return m_friction;
 }
 
+void dCustomSlider::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
+}
 
 void dCustomSlider::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
@@ -136,33 +140,38 @@ void dCustomSlider::SubmitConstraintSpringDamper(const dMatrix& matrix0, const d
 
 void dCustomSlider::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dFloat x = m_posit + m_speed * timestep;
-	if (x < m_minDist) {
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	if ((m_minDist == 0.0f) && (m_maxDist == 0.0f)) {
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+	} else {
+		dFloat x = m_posit + m_speed * timestep;
+		if (x < m_minDist) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			const dFloat invtimestep = 1.0f / timestep;
+			const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
-	} else if (x > m_maxDist) {
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		} else if (x > m_maxDist) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 
-		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep; 
-		NewtonUserJointSetRowAcceleration (m_joint, stopAccel);
+			const dFloat invtimestep = 1.0f / timestep;
+			const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
-	} else if (m_friction != 0.0f) {
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowAcceleration(m_joint, -m_speed / timestep);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		} else if (m_friction != 0.0f) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowAcceleration(m_joint, -m_speed / timestep);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		}
 	}
 }
 
@@ -201,10 +210,18 @@ void dCustomSlider::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matr
 	dVector euler0;
 	dVector euler1;
 	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-	for (int i = 0; i < 3; i++) {
-		NewtonUserJointAddAngularRow(m_joint, -euler0[i], &matrix1[i][0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	}
+
+	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
+	rollPin = matrix1.RotateVector(rollPin);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix0[0][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
 
 void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -214,14 +231,6 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-
-	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-	SubmitAngularRow(matrix0, matrix1, timestep);
 
 	// calculate position and speed	
 	dVector veloc0(0.0f);
@@ -233,6 +242,9 @@ void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_front);
 	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
+
+	SubmitLinearRows(0x06, matrix0, matrix1);
+	SubmitAngularRow(matrix0, matrix1, timestep);
 
 	if (m_options.m_option0) {
 		if (m_options.m_option1) {

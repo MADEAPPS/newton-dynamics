@@ -10,10 +10,6 @@
 */
 
 
-// dCustomBallAndSocket.h: interface for the dCustomBallAndSocket class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef _D_CUSTOM_BALLANDSOCKET_H_
 #define _D_CUSTOM_BALLANDSOCKET_H_
 
@@ -56,7 +52,6 @@ class dCustomBallAndSocket: public dCustomJoint
 	dFloat m_maxConeAngle;
 	dFloat m_coneFriction;
 	dFloat m_twistFriction;
-	dOptions m_options;
 
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };
