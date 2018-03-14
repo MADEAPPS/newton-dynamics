@@ -97,6 +97,7 @@
 //	#define DG_SSE4_INSTRUCTIONS_SET
 	#include <intrin.h>
 	#include <emmintrin.h> 
+	#include <pmmintrin.h>
 #endif
 
 
