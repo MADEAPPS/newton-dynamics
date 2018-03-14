@@ -324,6 +324,24 @@ bool dgCholeskyFactorization(dgInt32 size, T* const psdMatrix)
 }
 
 template<class T>
+void dgCholeskyApplyRegularizer (dgInt32 size, T* const psdMatrix, T* const regulalizer)
+{
+	bool isPsdMatrix = false;
+	dgFloat32* const lowerTriangule = dgAlloca(dgFloat32, size * size);
+	do {
+		memcpy(lowerTriangule, psdMatrix, sizeof(dgFloat32) * size * size);
+		isPsdMatrix = dgCholeskyFactorization(size, lowerTriangule);
+		if (!isPsdMatrix) {
+			for (dgInt32 i = 0; i < size; i++) {
+				regulalizer[i] *= dgFloat32(4.0f);
+				psdMatrix[i * size + i] += regulalizer[i];
+			}
+		}
+	} while (!isPsdMatrix);
+}
+
+
+template<class T>
 DG_INLINE void dgSolveCholesky(dgInt32 size, dgInt32 n, const T* const choleskyMatrix, T* const x, const T* const b)
 {
 	dgInt32 stride = 0;

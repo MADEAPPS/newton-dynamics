@@ -835,13 +835,13 @@ DG_INLINE void dgSkeletonContainer::CalculateMassMatrixCoeffBruteForce(dgInt32 l
 		dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
 
 		dgVector element(JMinvM0.m_linear * row_i->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_i->m_Jt.m_jacobianM0.m_angular +
-			JMinvM1.m_linear * row_i->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_i->m_Jt.m_jacobianM1.m_angular);
+						 JMinvM1.m_linear * row_i->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_i->m_Jt.m_jacobianM1.m_angular);
 		element = element.AddHorizontal();
 
 		// I know I am doubling the matrix regularizer, but this makes the solution more robust.
 		dgFloat32 diagonal = element.GetScalar() + row_i->m_diagDamp;
 		matrixRow11[i] = diagonal + row_i->m_diagDamp;
-		diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dgFloat32(2.0f));
+		diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dgFloat32(4.0f));
 
 		const dgInt32 m0_i = m_pairs[primaryCount + i].m_m0;
 		const dgInt32 m1_i = m_pairs[primaryCount + i].m_m1;
@@ -910,7 +910,6 @@ DG_INLINE void dgSkeletonContainer::CalculateMassMatrixCoeffBruteForce(dgInt32 l
 	}
 }
 
-//DG_INLINE void dgSkeletonContainer::CalculateMassMatrixCoeff(const dgJointInfo* const jointInfoArray, dgFloat32* const diagDamp)
 void dgSkeletonContainer::CalculateMassMatrixCoeff(const dgJointInfo* const jointInfoArray, dgFloat32* const diagDamp)
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -953,8 +952,6 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 	m_rowArray = (dgJacobianMatrixElement**)memoryBuffer;
 	m_pairs = (dgNodePair*)&m_rowArray[m_rowCount];
 	m_massMatrix11 = (dgFloat32*)&m_pairs[m_rowCount];
-//	m_lowerTriangularMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
-//	m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 	m_massMatrix10 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 	m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
@@ -1096,20 +1093,7 @@ void dgSkeletonContainer::InitAuxiliaryMassMatrix(const dgJointInfo* const joint
 		}
 	}
 
-	dgFloat32* const lowerTriangularMassMatrix = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
-dgInt32 xxx = 0;
-	bool isPsdMatrix = false;
-	do {
-		memcpy(lowerTriangularMassMatrix, m_massMatrix11, sizeof(dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
-		isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, lowerTriangularMassMatrix);
-		if (!isPsdMatrix) {
-xxx++;
-			for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-				diagDamp[i] *= dgFloat32(2.0f);
-				m_massMatrix11[i * m_auxiliaryRowCount + i] += diagDamp[i];
-			}
-		}
-	} while (!isPsdMatrix);
+	dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 }
 
 

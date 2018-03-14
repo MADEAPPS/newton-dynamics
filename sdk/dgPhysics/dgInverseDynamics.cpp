@@ -861,18 +861,7 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 			}
 		}
 
-		dgFloat32* const lowerTriangularMassMatrix = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
-		bool isPsdMatrix = false;
-		do {
-			memcpy(lowerTriangularMassMatrix, m_massMatrix11, sizeof(dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
-			isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, lowerTriangularMassMatrix);
-			if (!isPsdMatrix) {
-				for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-					diagDamp[i] *= dgFloat32 (2.0f);
-					m_massMatrix11[i * m_auxiliaryRowCount + i] += diagDamp[i];
-				}
-			}
-		} while (!isPsdMatrix);
+		dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 	}
 }
 
