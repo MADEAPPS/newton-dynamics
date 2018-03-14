@@ -69,6 +69,7 @@ class dgBody
 		m_baseBodyRTTI = 1<<0,
 		m_dynamicBodyRTTI = 1<<1,
 		m_kinematicBodyRTTI = 1<<2,
+		m_dynamicBodyAsymentricRTTI = 1 << 3,
 		//m_deformableBodyRTTI = 1<<3,
 	};
 
@@ -76,6 +77,7 @@ class dgBody
 	{
 		m_dynamicBody = 0,
 		m_kinematicBody,
+		m_dynamicBodyAsymatric,
 		//m_deformableBody,
 	};
 

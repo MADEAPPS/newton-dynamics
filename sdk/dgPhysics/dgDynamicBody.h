@@ -90,15 +90,6 @@ class dgDynamicBody : public dgBody
 	virtual void SetAlpha(const dgVector& alpha);
 	virtual void SetAccel(const dgVector& accel);
 
-#ifdef DG_USEFULL_INERTIA_MATRIX
-	virtual void SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia);
-	virtual dgMatrix CalculateLocalInertiaMatrix() const;
-	virtual dgMatrix CalculateInertiaMatrix() const;
-	virtual dgMatrix CalculateInvInertiaMatrix() const;
-
-	dgMatrix m_principalAxis;
-#endif
-
 	dgVector m_externalForce;
 	dgVector m_externalTorque;
 	dgVector m_savedExternalForce;
@@ -124,6 +115,27 @@ class dgDynamicBody : public dgBody
 	friend class dgCollisionDeformableSolidMesh;
 	friend class dgCollisionMassSpringDamperSystem;
 } DG_GCC_VECTOR_ALIGMENT;
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgDynamicBodyAsymnetric : public dgDynamicBody
+{
+	public:
+	dgDynamicBodyAsymnetric();
+	dgDynamicBodyAsymnetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber);
+
+	virtual void Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
+
+
+	virtual void SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia);
+	virtual dgMatrix CalculateLocalInertiaMatrix() const;
+	virtual dgMatrix CalculateInertiaMatrix() const;
+	virtual dgMatrix CalculateInvInertiaMatrix() const;
+
+
+	dgMatrix m_principalAxis;
+} DG_GCC_VECTOR_ALIGMENT;
+
 
 
 DG_INLINE const dgVector& dgDynamicBody::GetForce() const
@@ -172,8 +184,6 @@ DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
 	m_angularDampOn = m_dampCoef.DotProduct3(m_dampCoef) > dgFloat32 (1.0e-12f);
 	m_cachedTimeStep = dgFloat32(0.0f);
 }
-
-
 
 DG_INLINE void dgDynamicBody::AddForce (const dgVector& force)
 {

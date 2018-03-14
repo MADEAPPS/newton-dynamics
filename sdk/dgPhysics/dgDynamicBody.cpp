@@ -47,9 +47,6 @@ dgDynamicBody::dgDynamicBody()
 	,m_linearDampOn(true)
 	,m_angularDampOn(true)
 {
-#ifdef DG_USEFULL_INERTIA_MATRIX
-	m_principalAxis = dgGetIdentityMatrix();
-#endif
 	m_type = m_dynamicBody;
 	m_rtti |= m_dynamicBodyRTTI;
 	dgAssert ( dgInt32 (sizeof (dgDynamicBody) & 0x0f) == 0);
@@ -83,9 +80,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	m_linearDampOn = (val & 1) ? true : false;
 	m_angularDampOn = (val & 2) ? true : false;
 
-#ifdef DG_USEFULL_INERTIA_MATRIX
-	serializeCallback(userData, &m_principalAxis, sizeof (m_principalAxis));
-#endif
 }
 
 dgDynamicBody::~dgDynamicBody()
@@ -106,59 +100,8 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
 	serializeCallback (userData, &val, sizeof (dgInt32));
-
-#ifdef DG_USEFULL_INERTIA_MATRIX
-	serializeCallback(userData, &m_principalAxis, sizeof (m_principalAxis));
-#endif
 }
 
-#ifdef DG_USEFULL_INERTIA_MATRIX
-
-void dgDynamicBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
-{
-	dgVector II;
-	m_principalAxis = inertia;
-	m_principalAxis.EigenVectors(II);
-	dgMatrix massMatrix(dgGetIdentityMatrix());
-	massMatrix[0][0] = II[0];
-	massMatrix[1][1] = II[1];
-	massMatrix[2][2] = II[2];
-	dgBody::SetMassMatrix(mass, massMatrix);
-}
-
-dgMatrix dgDynamicBody::CalculateLocalInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-dgMatrix dgDynamicBody::CalculateInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-dgMatrix dgDynamicBody::CalculateInvInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_invMass[0];
-	diagonal[1][1] = m_invMass[1];
-	diagonal[2][2] = m_invMass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-#endif
 
 void dgDynamicBody::SetMatrixResetSleep(const dgMatrix& matrix)
 {
@@ -376,3 +319,76 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 		m_alpha = dgVector::m_zero;
 	}
 }
+
+
+dgDynamicBodyAsymnetric::dgDynamicBodyAsymnetric()
+	:dgDynamicBody()
+	,m_principalAxis(dgGetIdentityMatrix())
+{
+	m_type = m_dynamicBody;
+	m_rtti |= m_dynamicBodyAsymentricRTTI;
+	dgAssert(dgInt32(sizeof(dgDynamicBody) & 0x0f) == 0);
+
+}
+
+dgDynamicBodyAsymnetric::dgDynamicBodyAsymnetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
+	:dgDynamicBody(world, collisionNode, serializeCallback, userData, revisionNumber)
+	,m_principalAxis(dgGetIdentityMatrix())
+{
+	m_type = m_dynamicBody;
+	m_rtti |= m_dynamicBodyRTTI;
+	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
+}
+
+void dgDynamicBodyAsymnetric::Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
+{
+	dgDynamicBody::Serialize(collisionRemapId, serializeCallback, userData);
+	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
+}
+
+
+void dgDynamicBodyAsymnetric::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
+{
+	dgVector II;
+	m_principalAxis = inertia;
+	m_principalAxis.EigenVectors(II);
+	dgMatrix massMatrix(dgGetIdentityMatrix());
+	massMatrix[0][0] = II[0];
+	massMatrix[1][1] = II[1];
+	massMatrix[2][2] = II[2];
+	dgBody::SetMassMatrix(mass, massMatrix);
+}
+
+dgMatrix dgDynamicBodyAsymnetric::CalculateLocalInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBodyAsymnetric::CalculateInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBodyAsymnetric::CalculateInvInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_invMass[0];
+	diagonal[1][1] = m_invMass[1];
+	diagonal[2][2] = m_invMass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
