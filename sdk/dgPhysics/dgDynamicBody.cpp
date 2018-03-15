@@ -219,19 +219,9 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 
-#if 0
 			// Simple Euler in local space step not enough to cope with high angular velocities)
 			// localAlpha = (Tl - (wl x (wl * Il)) * Il^1
-			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
-			dgVector localTorque (m_matrix.UnrotateVector(m_externalTorque));
-			dgVector angulaMomentum (m_mass * localOmega);
-			dgVector nextTorque (localTorque - localOmega.CrossProduct3(angulaMomentum));
-			dgVector localAlpha (nextTorque * m_invMass);
-			m_alpha = m_matrix.RotateVector(localTorque);
-			m_omega = m_matrix.RotateVector(localOmega + localAlpha.Scale4(timestep));
-			m_accel = m_externalForce.Scale4(m_invMass.m_w);
-			m_veloc += m_accel.Scale4(timestep);
-#else
+
 			// implicit integration is local space, 
 			// use angular velocity at dt, to solve equation
 			// dW/dt * I + w x (w * I) = T
@@ -307,7 +297,6 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			m_veloc += m_accel.Scale4(timestep);
 			m_omega = m_matrix.RotateVector(localOmega + gradientStep);
-#endif
 
 		} else {
 			dgAssert (0);
@@ -392,3 +381,12 @@ dgMatrix dgDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
 	return matrix * diagonal * matrix.Inverse();
 }
 
+void dgDynamicBodyAsymetric::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
+{
+	dgMatrix saveMatrix(m_matrix);
+
+	m_matrix = m_principalAxis * m_matrix;
+	dgDynamicBody::IntegrateOpenLoopExternalForce(timestep);
+
+	m_matrix = saveMatrix;
+}

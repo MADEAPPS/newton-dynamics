@@ -80,7 +80,7 @@ class dgDynamicBody : public dgBody
 	virtual dgSkeletonContainer* GetSkeleton() const;
 	void SetSkeleton(dgSkeletonContainer* const skeleton);
 
-	void IntegrateOpenLoopExternalForce(dgFloat32 timeStep);
+	virtual void IntegrateOpenLoopExternalForce(dgFloat32 timeStep);
 
 	private:
 	virtual void AddDampingAcceleration(dgFloat32 timestep);
@@ -130,6 +130,7 @@ class dgDynamicBodyAsymetric: public dgDynamicBody
 	virtual dgMatrix CalculateLocalInertiaMatrix() const;
 	virtual dgMatrix CalculateInvInertiaMatrix() const;
 	virtual void SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia);
+	virtual void IntegrateOpenLoopExternalForce(dgFloat32 timestep);
 
 	dgMatrix m_principalAxis;
 } DG_GCC_VECTOR_ALIGMENT;

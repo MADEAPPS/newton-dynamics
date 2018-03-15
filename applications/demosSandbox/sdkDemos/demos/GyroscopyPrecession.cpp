@@ -170,7 +170,7 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 	NewtonCollisionSetScale(ballShape, 0.3f, 0.25f, 1.0f);
 
 
-	dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad));
+	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
 	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
