@@ -383,10 +383,8 @@ dgMatrix dgDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
 
 void dgDynamicBodyAsymetric::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 {
-	dgMatrix saveMatrix(m_matrix);
-
-	m_matrix = m_principalAxis * m_matrix;
+//	dgMatrix saveMatrix(m_matrix);
+//  m_matrix = m_principalAxis * m_matrix;
 	dgDynamicBody::IntegrateOpenLoopExternalForce(timestep);
-
-	m_matrix = saveMatrix;
+//	m_matrix = saveMatrix;
 }
