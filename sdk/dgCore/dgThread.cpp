@@ -133,6 +133,10 @@ dgThread::~dgThread ()
 
 void dgThread::Init ()
 {
+	// This must be set now because otherwise if this thread is
+	// immediately closed the Terminate method won't detect that the
+	// thread is running
+	dgInterlockedExchange(&m_threadRunning, 1);
 	m_handle = std::thread(dgThreadSystemCallback, this);
 	dgThreadYield();
 }
@@ -162,7 +166,6 @@ void* dgThread::dgThreadSystemCallback(void* threadData)
 
 	dgThread* const me = (dgThread*) threadData;
 
-	dgInterlockedExchange(&me->m_threadRunning, 1);
 	me->Execute(me->m_id);
 	dgInterlockedExchange(&me->m_threadRunning, 0);
 	dgThreadYield();
