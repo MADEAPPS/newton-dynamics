@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __DEMO_LISTENER_MANAGER_H__
-#define __DEMO_LISTENER_MANAGER_H__
+#ifndef __DEMO_LISTENER_BASE_MANAGER_H__
+#define __DEMO_LISTENER_BASE_MANAGER_H__
 
 #include "toolbox_stdafx.h"
 
@@ -32,10 +32,6 @@ class DemoListenerBase
 	static void PostUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
-
-//	protected:
-//	DemoEntityManager* m_scene; 
 };
-
 
 #endif

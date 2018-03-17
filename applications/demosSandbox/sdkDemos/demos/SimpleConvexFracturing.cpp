@@ -9,7 +9,7 @@
 * freely
 */
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
 #include "DemoMesh.h"
@@ -351,9 +351,9 @@ class VoronoidEffect: public FractureEffect
 		int count = 0;
 		// pepper the inside of the BBox box of the mesh with random points
 		while (count < NUMBER_OF_INTERNAL_PARTS) {
-			dFloat x = dRandomVariable(size.m_x);
-			dFloat y = dRandomVariable(size.m_y);
-			dFloat z = dRandomVariable(size.m_z);
+			dFloat x = dGaussianRandom (size.m_x);
+			dFloat y = dGaussianRandom (size.m_y);
+			dFloat z = dGaussianRandom (size.m_z);
 			if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)) {
 				points[count] = dVector(x, y, z);
 				count++;
@@ -464,6 +464,9 @@ void SimpleConvexFracturing(DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
+dAssert(0);
+return;
+/*
 	// load the scene from a ngd file format
 	CreateLevelMesh(scene, "flatPlane.ngd", false);
 	//	CreateLevelMesh (scene, "sponza.ngd", false);
@@ -493,6 +496,7 @@ void SimpleConvexFracturing(DemoEntityManager* const scene)
 	dQuaternion rot;
 	dVector origin(-15.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

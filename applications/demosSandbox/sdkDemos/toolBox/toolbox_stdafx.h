@@ -22,7 +22,6 @@
 
 #define DOMMY_API 
 
-
 typedef char dInt8;
 typedef unsigned char dUnsigned8;
 
@@ -51,8 +50,14 @@ typedef long long unsigned64;
 
 #ifdef _MSC_VER
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+
+	#undef APIENTRY
+	#define GLFW_EXPOSE_NATIVE_WIN32
+	#define GLFW_EXPOSE_NATIVE_WGL
+
 	#include <windows.h>
 	#include <Commctrl.h>
+	#include <stdio.h>
 	#include <stdlib.h>
 	#include <malloc.h>
 	#include <memory.h>
@@ -60,21 +65,22 @@ typedef long long unsigned64;
 	#include <tchar.h>
 	#include <crtdbg.h>
 
-	// opengl stuff
-	#include <GL/glew.h>
-	#include <GL/wglew.h>
-	#include <gl/gl.h>
-	#include <gl/glu.h>
+	#include <GL/glu.h>
+	#include <GL/gl.h>
+	#include <imgui.h>
+	#include <glfw3.h>
+	#include <glfw3native.h>
 #endif
 	
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <time.h>
-	#include <GL/glxew.h>
-	#include <GL/glew.h>
+
 	#include <GL/glu.h>
 	#include <GL/gl.h>
+	#include <imgui.h>
+	#include <GLFW/glfw3.h>
 
 	// audio library support
 	#include <AL/al.h>
@@ -92,19 +98,6 @@ typedef long long unsigned64;
 	#include <OpenAl/al.h>
 	#include <OpenAl/alc.h>
 #endif
-
-
-// font library for open gl text
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-// gui library includes
-#include <wx/wx.h>
-#include <wx/event.h>
-#include <wx/display.h>
-#include <wx/dcclient.h>
-#include <wx/glcanvas.h>
-#include <wx/joystick.h>
 
 
 
@@ -131,13 +124,25 @@ typedef long long unsigned64;
 #include <dBezierSpline.h>
 
 #include <dCustomJoint.h>
+#include <dCustom6dof.h>
 #include <dCustomGear.h>
 #include <dCustomHinge.h>
+#include <dCustomPlane.h>
+#include <dCustomWheel.h>
+#include <dCustomMotor.h>
+#include <dCustomSlider.h>
+#include <dCustomPulley.h>
+#include <dCustomCorkScrew.h>
+#include <dCustomPathFollow.h>
+#include <dCustomDoubleHinge.h>
+#include <dCustomFixDistance.h>
+#include <dCustomRackAndPinion.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomBallAndSocket.h>
 #include <dCustomSliderActuator.h>
 #include <dCustomSlidingContact.h>
-#include <dCustomUniversalActuator.h>
+#include <dCustomInverseDynamics.h>
+#include <dCustomDoubleHingeActuator.h>
 
 #include <dCustomInputManager.h>
 #include <dCustomTriggerManager.h>
@@ -172,10 +177,6 @@ typedef long long unsigned64;
 #include <dCollisionSphereNodeInfo.h>
 #include <dCollisionConvexHullNodeInfo.h>
 #include <dGeometryNodeSkinModifierInfo.h>
- 
-#include <dTimeTracker.h>
-
-
 
 /*
 #ifdef _NEWTON_USE_DOUBLE
@@ -192,7 +193,7 @@ typedef long long unsigned64;
 #ifdef _NEWTON_USE_DOUBLE
 inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 {
-	GLfloat tmp[4] = {params[0], params[1], params[2], params[3]};
+	GLfloat tmp[4] = {GLfloat(params[0]), GLfloat(params[1]), GLfloat(params[2]), GLfloat(params[3])};
 	glMaterialfv (face, pname, &tmp[0]);
 }
 #define glMultMatrix(x) glMultMatrixd(x)
@@ -234,7 +235,7 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 
 unsigned dRand ();
 void dSetRandSeed (unsigned seed);
-dFloat dRandomVariable(dFloat amp);
+dFloat dGaussianRandom (dFloat amp);
 
 inline int dTwosPower (int x)
 {
@@ -255,8 +256,6 @@ void dGetWorkingFileName (const char* const name, char* const outPathName);
 unsigned SWAP_INT32(unsigned x);
 unsigned short SWAP_INT16(unsigned short x);
 void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count);
-
-
 
 #endif 
 

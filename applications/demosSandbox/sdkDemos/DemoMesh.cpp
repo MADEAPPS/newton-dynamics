@@ -100,7 +100,7 @@ void DemoSubMesh::Render() const
 	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
 	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
 	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
-	glMaterialf(GL_FRONT, GL_SHININESS, m_shiness);
+	glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(m_shiness));
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	if (m_textureHandle) {
 		glEnable(GL_TEXTURE_2D);		
@@ -117,7 +117,7 @@ void DemoSubMesh::OptimizeForRender(const DemoMesh* const mesh) const
 	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
 	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
 	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
-	glMaterialf(GL_FRONT, GL_SHININESS, m_shiness);
+	glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(m_shiness));
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	if (m_textureHandle) {
 		glEnable(GL_TEXTURE_2D);		
@@ -132,9 +132,9 @@ void DemoSubMesh::OptimizeForRender(const DemoMesh* const mesh) const
 	const dFloat* const vertex = mesh->m_vertex;
 	for (int i = 0; i < m_indexCount; i ++) {
 		int index = m_indexes[i];
-		glTexCoord2f(uv[index * 2 + 0], uv[index * 2 + 1]); 
-		glNormal3f (normal[index * 3 + 0], normal[index * 3 + 1], normal[index * 3 + 2]); 
-		glVertex3f(vertex[index * 3 + 0], vertex[index * 3 + 1], vertex[index * 3 + 2]);
+		glTexCoord2f(GLfloat(uv[index * 2 + 0]), GLfloat(uv[index * 2 + 1])); 
+		glNormal3f (GLfloat(normal[index * 3 + 0]), GLfloat(normal[index * 3 + 1]), GLfloat(normal[index * 3 + 2])); 
+		glVertex3f(GLfloat(vertex[index * 3 + 0]), GLfloat(vertex[index * 3 + 1]), GLfloat(vertex[index * 3 + 2]));
 	}
 
 	glEnd();
@@ -342,7 +342,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
 
 	// apply the vertex normals
-	NewtonMeshCalculateVertexNormals(mesh, 30.0f * 3.141592f/180.0f);
+	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);
 
 	// apply uv projections
 	NewtonCollisionInfoRecord info;
@@ -810,8 +810,8 @@ void DemoMesh::RenderNormals ()
 	glBegin(GL_LINES);
 
 	for (int i = 0; i < m_vertexCount; i ++) {
-		glVertex3f (m_vertex[i * 3 + 0], m_vertex[i * 3 + 1], m_vertex[i * 3 + 2]);
-		glVertex3f (m_vertex[i * 3 + 0] + m_normal[i * 3 + 0] * length, m_vertex[i * 3 + 1] + m_normal[i * 3 + 1] * length, m_vertex[i * 3 + 2] + m_normal[i * 3 + 2] * length);
+		glVertex3f (GLfloat(m_vertex[i * 3 + 0]), GLfloat(m_vertex[i * 3 + 1]), GLfloat(m_vertex[i * 3 + 2]));
+		glVertex3f (GLfloat(m_vertex[i * 3 + 0] + m_normal[i * 3 + 0] * length), GLfloat(m_vertex[i * 3 + 1] + m_normal[i * 3 + 1] * length), GLfloat(m_vertex[i * 3 + 2] + m_normal[i * 3 + 2] * length));
 	}
 
 	glEnd();
@@ -879,8 +879,8 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 		dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
 		for (int i = 1; i <= m_renderResolution; i ++) {
 			dBigVector p1 (m_curve.CurvePoint(i * scale));
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+			glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 			p0 = p1;
 		}
 		glEnd();

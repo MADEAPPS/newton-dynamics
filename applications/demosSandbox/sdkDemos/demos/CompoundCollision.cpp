@@ -11,7 +11,7 @@
 
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "OpenGlUtil.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
@@ -183,9 +183,9 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	for (int i = 0 ; i < pointsCount; i ++) {
 		NewtonCollision* collision = NULL;
 
-		dFloat pitch = dRandomVariable (1.0f) * 2.0f * 3.1416f;
-		dFloat yaw = dRandomVariable (1.0f) * 2.0f * 3.1416f;
-		dFloat roll = dRandomVariable (1.0f) * 2.0f * 3.1416f;
+		dFloat pitch = dGaussianRandom  (1.0f) * 2.0f * dPi;
+		dFloat yaw = dGaussianRandom  (1.0f) * 2.0f * dPi;
+		dFloat roll = dGaussianRandom  (1.0f) * 2.0f * dPi;
 
 		dFloat x = points[i][0] * radio;
 		dFloat y = points[i][1] * radio;
@@ -342,7 +342,7 @@ void CompoundCollision (DemoEntityManager* const scene)
 	NewtonMaterialSetCollisionCallback (scene->GetNewton(), defaultMaterialID, defaultMaterialID, NULL, OnGettingTheCollisionSubShapeFromMaterialCallback);
 	NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), defaultMaterialID, defaultMaterialID, OnSubShapeAABBOverlapTest);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot (camMatrix);
 	dVector origin (100.0f, 0.0f, 100.0f, 0.0f);
 	dFloat hight = 1000.0f;

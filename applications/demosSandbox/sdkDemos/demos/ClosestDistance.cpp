@@ -10,7 +10,7 @@
 */
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
@@ -76,9 +76,9 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		NewtonBodyGetMatrix(m_body, &matrixA[0][0]);
 
 		dFloat speed = m_step * timestep * 60.0f; 
-		m_pith = dMod (m_pith + speed, 3.1416f * 2.0f);
-		m_yaw = dMod (m_yaw + speed, 3.1416f * 2.0f);
-		m_roll = dMod (m_roll + speed, 3.1416f * 2.0f);
+		m_pith = dMod (m_pith + speed, dPi * 2.0f);
+		m_yaw = dMod (m_yaw + speed, dPi * 2.0f);
+		m_roll = dMod (m_roll + speed, dPi * 2.0f);
 
 		dMatrix matrixB(dPitchMatrix(m_pith) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
 		matrixB.m_posit = matrixA.m_posit;
@@ -96,10 +96,10 @@ class dClosestDistanceRecord: public dCustomControllerBase
 
 	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
 	{
-		m_pith = dRandomVariable(3.1416f * 2.0f);
-		m_yaw = dRandomVariable(3.1416f * 2.0f);
-		m_roll = dRandomVariable(3.1416f * 2.0f);
-		m_step = 15.0f * (dAbs (dRandomVariable(0.25f)) + 0.0001f) * 3.1416f/180.0f;
+		m_pith = dGaussianRandom (dPi * 2.0f);
+		m_yaw = dGaussianRandom (dPi * 2.0f);
+		m_roll = dGaussianRandom (dPi * 2.0f);
+		m_step = 15.0f * (dAbs (dGaussianRandom (0.25f)) + 0.0001f) * dDegreeToRad;
 
 		CreatCasterBody(location_x, location_z, shapeType, materialID);
 
@@ -112,6 +112,11 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		m_castingVisualEntity = new ClosestDistanceEntity (scene, matrix, materialID, castingShapeType);
 	}
 
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
 
 	private:
 	void CreatCasterBody(dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID)
@@ -120,7 +125,7 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		//dMatrix matrix (GetIdentityMatrix());
-		dMatrix matrix (dRollMatrix(3.141592f/2.0f));
+		dMatrix matrix (dRollMatrix(dPi/2.0f));
 
 		matrix.m_posit.m_x = location_x;
 		matrix.m_posit.m_y = 2.0f;
@@ -215,7 +220,7 @@ void ClosestDistance (DemoEntityManager* const scene)
 
 
 	// place camera into position
-	//dMatrix camMatrix (dYawMatrix(90.0f * 3.1416f /180.0f));
+	//dMatrix camMatrix (dYawMatrix(90.0f * dDegreeToRad));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);

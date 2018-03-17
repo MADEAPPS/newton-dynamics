@@ -15,7 +15,7 @@
 *  <2014> by Auto Machine.
 */
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoEntityManager.h"
@@ -23,8 +23,8 @@
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 #include "dCustomInputManager.h"
-#include "NewtonDemos.h"
 #include "DebugDisplay.h"
+#include "dHighResolutionTimer.h"
 
 
 static dVector GetLookAtDirction(DemoEntityManager* const scene)
@@ -36,7 +36,7 @@ static dVector GetLookAtDirction(DemoEntityManager* const scene)
 	dFloat y2 = f.m_y * f.m_y;
 	dFloat z2 = f.m_z * f.m_z;
 
-	dFloat u = sqrt(x2 + y2 + z2);
+	dFloat u = dSqrt(x2 + y2 + z2);
 
 	return dVector(f.m_x / u, f.m_y / u, f.m_z / u);
 }
@@ -91,25 +91,22 @@ class CCDInputManager : public dCustomInputManager
 		:dCustomInputManager(scene->GetNewton())
 		, m_scene(scene)
 	{
-		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
+		scene->Set2DDisplayRenderFunction (DrawHelpMenu, NULL, this);
 	}
 
-	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to the wall");
+		scene->Print (color, "Hit R key to shot  boxes to the wall");
 	}
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
-
-		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
-
         int key = 0;
         static dLong timer = dGetTimeInMicrosenconds() + 100000;
         if (dGetTimeInMicrosenconds() > timer) {
             timer = dGetTimeInMicrosenconds() + 100000;
-            key = mainWindow->GetKeyState('R');
+            key = m_scene->GetKeyState('R');
         }
         dVector dir = GetLookAtDirction(m_scene);
         dVector pos = GetCamPosition(m_scene);
@@ -117,7 +114,6 @@ class CCDInputManager : public dCustomInputManager
 		// fire ammo
 		if (key)
 		{
-
 			dFloat ammo_vel = 1000.0f;
 			dVector vel(dir.m_x*ammo_vel, dir.m_y*ammo_vel, dir.m_z*ammo_vel);
 
@@ -234,13 +230,12 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	pos.m_y = 50.0f;
 	pos.m_z = 0.0f;
 
-	dQuaternion rot(dVector(1.f,0.f,0.f),(dFloat)M_PI/4.0f);
+	dQuaternion rot(dVector(1.f,0.f,0.f),(dFloat)dPi/4.0f);
 	scene->SetCameraMatrix(rot, pos);
 
 	CreateBackgroundWallsAndCellingBody(scene->GetNewton());
 	new CCDInputManager(scene);
 
 	// compel to change debug display mode. just for convenience.
-	NewtonDemos* const mainWindow = scene->GetRootWindow();
-	mainWindow->m_debugDisplayMode = 2;
+	scene->SetDebugDisplay (2);
 }

@@ -13,8 +13,7 @@ Compiling Newton
 ## Windows and OSX
 Project files for Visual Studio and XCode are provided, mainly
 
-* Newton Core: [coreLibrary_300/projects/](coreLibrary_300/projects/)
-* packages: [packages/projects/](packages/projects/)
+* Newton Core and packages: [sdk/projects/](sdk/projects/)
 * demo sandbox: [applications/demosSandbox/projects/](applications/demosSandbox/projects/)
 
 ## Linux
@@ -23,16 +22,14 @@ There are Unix makefiles in the project folders mentioned above, but it is *high
 Newton Core does not have any third party dependencies.
 
 To build the demo sandbox the following packages need to be installed:
-* wxWidgets 2.8 or 2.9
-* Freetype
 * OpenGL
-* GLEW
+* glfw3
 * OpenAL
 * TinyXML
 
 All of these should be available on any major Linux distribution (with associated `-dev` or `-devel` packages).
 
-Alternatively they can be found in the folder [packages/thirdParty/](packages/thirdParty/) and built from source.
+Alternatively they can be found in the folder [sdk/thirdParty/](sdk/thirdParty/) and built from source.
 
 
 License

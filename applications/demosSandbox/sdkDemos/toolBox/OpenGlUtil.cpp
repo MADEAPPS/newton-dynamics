@@ -14,7 +14,7 @@
 // OpenGlUtil.cpp: implementation of the OpenGlUtil class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "OpenGlUtil.h"
 #include "TargaToOpenGl.h"
 
@@ -59,21 +59,21 @@ void ShowMousePicking (const dVector& p0, const dVector& p1, const dVector& orig
 	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
-	glColor3f(lineColor.m_x, lineColor.m_y, lineColor.m_z);
+	glColor3f(GLfloat(lineColor.m_x), GLfloat(lineColor.m_y), GLfloat(lineColor.m_z));
 	glLineWidth(2.0f);
 	glBegin(GL_LINES);
-	glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-	glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+	glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 	glEnd();
 	glLineWidth(1.0f);
 
 	// draw the bone points
-	glColor3f(originColor.m_x, originColor.m_y, originColor.m_z);
+	glColor3f(GLfloat(originColor.m_x), GLfloat(originColor.m_y), GLfloat(originColor.m_z));
 	glPointSize(8.0f);
 //glPointSize(16.0f);
 	glBegin(GL_POINTS);
-	glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-	//glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+	glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	//glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 	glEnd();
 	glPointSize(1.0f);
 

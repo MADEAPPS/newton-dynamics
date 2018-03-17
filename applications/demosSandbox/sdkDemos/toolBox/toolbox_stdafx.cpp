@@ -14,7 +14,7 @@
 // stdafx.obj will contain the pre-compiled type information
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
@@ -36,15 +36,6 @@ void operator delete (void* ptr)
 }
 
 
-// for freeType library on OSX
-FT_BEGIN_HEADER
-    int z_verbose = 0;
-    void z_error (char* message)
-    {
-        //    (message);
-    }
-FT_END_HEADER
-
 static unsigned ___dRandSeed___ = 0;
 
 void dSetRandSeed (unsigned seed)
@@ -59,7 +50,8 @@ unsigned dRand ()
 	return ___dRandSeed___ & dRAND_MAX;
 }
 
-dFloat dRandomVariable(dFloat amp)
+// a pseudo Gaussian random with mean 0 and variance 0.5f
+dFloat dGaussianRandom (dFloat amp)
 {
 	unsigned val;
 	val = dRand() + dRand();
@@ -108,7 +100,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 
 	#else
-		#error  "error: need to implement \"GetWorkingFileName\" here for this platform"
+		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
 }
 

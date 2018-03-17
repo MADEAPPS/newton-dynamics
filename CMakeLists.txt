@@ -1,4 +1,4 @@
-# Copyright (c) <2014> <Newton Game Dynamics>
+# Copyright (c) <2014-2017> <Newton Game Dynamics>
 #
 # This software is provided 'as-is', without any express or implied
 # warranty. In no event will the authors be held liable for any damages
@@ -46,6 +46,17 @@ if (MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
   # Enable intrinsics on MSVC in debug mode
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
+  
+  # dgVector uses sse3 instrinsics
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:sse3")
+  # and clang needs this additional enabling (this is probably a bug
+  # in clang as it doesn't seem to understand the msvc style arch
+  # flag)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    message(STATUS "enabled it: ${CMAKE_CXX_COMPILER_ID}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3")
+  endif ()
+  
   if (CMAKE_CL_64)
     # Visual Studio bails out on debug builds in 64bit mode unless
     # this flag is set...
@@ -88,10 +99,11 @@ else ()
   set(BUILD_64 FALSE)
 endif ()
 
-option("DOUBLE_PRECISION" "Use Double Precision" OFF)
-option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
-option("THREAD_EMULATION" "Use single thread only" OFF)
 
+# options
+option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
+option("DOUBLE_PRECISION" "Use Double Precision" OFF)
+option("THREAD_EMULATION" "Use single thread only" OFF)
 
 if(THREAD_EMULATION)
   add_definitions(-DDG_USE_THREAD_EMULATION)
@@ -101,10 +113,12 @@ if(DOUBLE_PRECISION)
  add_definitions(-D_NEWTON_USE_DOUBLE)
 endif()
 
+
+# Newton core library
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk")
+
+# demos sandbox
 if(NEWTON_DEMOS_SANDBOX)
+  add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk/thirdParty")
   add_subdirectory("${NewtonSDK_SOURCE_DIR}/applications/demosSandbox")
 endif()
-
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages/thirdParty")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/coreLibrary_300")

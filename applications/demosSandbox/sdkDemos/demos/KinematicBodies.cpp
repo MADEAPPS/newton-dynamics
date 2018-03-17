@@ -9,12 +9,11 @@
 * freely
 */
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "DemoMesh.h"
-#include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 
 #define D_PLACEMENT_PENETRATION   0.005f
@@ -82,6 +81,12 @@ class dKinematicPlacement: public dCustomControllerBase
 	void PostUpdate(dFloat timestep, int threadIndex)
 	{
 	}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
 };
 
 
@@ -94,7 +99,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		:dCustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
 		,m_castDir (0.0f, -1.0f, 0.0f, 0.0f)
 		,m_phantomEntity(NULL)
-		,m_helpKey (true)
 		,m_selectShape (true)
 		,m_placeInstance (false)
 		,m_hitParam(0.0f)
@@ -103,27 +107,25 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		,m_roll(0.0f)
         ,m_isInPenetration(false)
 	{
-		scene->Set2DDisplayRenderFunction (RenderHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderHelp, NULL, this);
 		m_phantomEntity = new PhantomPlacement (scene);
 		scene->Append (m_phantomEntity);
 		m_contactJoint.Init (&m_body, &m_static);
 	}
 
-	static void RenderHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderHelp (DemoEntityManager* const scene, void* const context)
 	{
 		dKinematicPlacementManager* const me = (dKinematicPlacementManager*) context;
-		me->RenderHelp (scene, lineNumber);
+		me->RenderHelp (scene);
 	}
 
-	void RenderHelp (DemoEntityManager* const scene, int lineNumber)
+	void RenderHelp (DemoEntityManager* const scene)
 	{
-		if (m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Right click and drag the location where you want to place a dynamic body");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Left click while Right click down place a dynamics body if the location is free of intersection");
-			//lineNumber = scene->Print (color, 10, lineNumber + 20, "space      : change casting shape");
-			//lineNumber = scene->Print (color, 10, lineNumber + 20, "h          : hide help");
-		}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "Right click and drag the location where you want to place a dynamic body");
+		scene->Print (color, "Left click while Right click down place a dynamics body if the location is free of intersection");
+		//scene->Print (color, "space      : change casting shape");
+		//scene->Print (color, "h          : hide help");
 	}
 
 	virtual void Debug () const 
@@ -298,21 +300,20 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
 		DemoCamera* const camera = scene->GetCamera();
 
-		m_helpKey.UpdatePushButton (mainWindow, 'H');
-		if (m_selectShape.UpdateTriggerButton (mainWindow, ' ')) {
+//		m_helpKey.UpdatePushButton (scene, 'H');
+//		if (m_selectShape.UpdateTriggerButton (scene, ' ')) {
 //			m_stupidLevel->ChangeCastingShape();
-		}
+//		}
 
-		bool buttonState = mainWindow->GetMouseKeyState(1);
+		bool buttonState = scene->GetMouseKeyState(1);
 		if (buttonState) {
 			int mouseX;
 			int mouseY;
 
 			//buttonState = false;
-			mainWindow->GetMousePosition (mouseX, mouseY);
+			scene->GetMousePosition (mouseX, mouseY);
 
 			dFloat x = dFloat (mouseX);
 			dFloat y = dFloat (mouseY);
@@ -332,7 +333,7 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
                         m_phantomEntity->SetPhantomMesh (false);
 //dTrace (("%d %d\n", mouseX, mouseY));
 
-						if (m_placeInstance.UpdateTriggerJoystick (mainWindow, mainWindow->GetMouseKeyState(0))) {
+						if (m_placeInstance.UpdateTrigger (scene->GetMouseKeyState(0))) {
 							dMatrix matrix;
 							NewtonBodyGetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 							NewtonCollision* const collision = NewtonBodyGetCollision(m_phantomEntity->m_phantom);
@@ -352,8 +353,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 	virtual void PostUpdate (dFloat timestep)
 	{
 	}
-
-
 
 	void CalculateRotationMatrix (dFloat power)
 	{
@@ -431,7 +430,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 	dVector m_castDir;
 	PhantomPlacement* m_phantomEntity;
 	dList<NewtonBody*> m_selectionToIgnore;
-	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_selectShape;
 	DemoEntityManager::ButtonKey m_placeInstance;
     dFloat m_hitParam;

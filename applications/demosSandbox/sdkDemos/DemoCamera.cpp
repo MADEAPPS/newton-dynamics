@@ -14,11 +14,8 @@
 // RenderPrimitive.cpp: implementation of the RenderPrimitive class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "DemoCamera.h"
-#include "MousePick.h"
-#include "NewtonDemos.h"
-#include "NewtonDemos.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -30,7 +27,7 @@
 
 DemoCamera::DemoCamera()
 	:DemoEntity (dGetIdentityMatrix(), NULL) 
-	,m_fov (60.0f * 3.1416f / 180.0f)
+	,m_fov (60.0f * dDegreeToRad)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.01f)
 	,m_cameraYaw(0.0f)
@@ -67,7 +64,7 @@ void DemoCamera::SetViewMatrix(int width, int height)
 	glLoadIdentity();
 
 	//m_backPlane = 10000.0f;
-	gluPerspective(m_fov * 180.0f / 3.1416f, GLfloat (width) /GLfloat(height), m_frontPlane, m_backPlane);
+	gluPerspective(m_fov * 180.0f / dPi, GLfloat (width) /GLfloat(height), m_frontPlane, m_backPlane);
 
 	// set the model view matrix 
 	glMatrixMode(GL_MODELVIEW);
@@ -78,7 +75,7 @@ void DemoCamera::SetViewMatrix(int width, int height)
 			  m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);	
 
 
-	glGetIntegerv(GL_VIEWPORT, (GLint*)&m_viewport); 
+	glGetIntegerv(GL_VIEWPORT, m_viewport); 
 	glGetDoublev(GL_MODELVIEW_MATRIX, m_modelViewMatrix); 
 	glGetDoublev(GL_PROJECTION_MATRIX, m_projectionViewMatrix); 
 }

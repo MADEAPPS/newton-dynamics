@@ -10,7 +10,7 @@
 */
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
@@ -37,7 +37,7 @@ static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVect
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y / 2.0f;
 
 	// create a 90 degree rotation matrix
-	dMatrix rotMatrix (dYawMatrix (3.141592f * 0.5f));
+	dMatrix rotMatrix (dYawMatrix (dPi * 0.5f));
 
 	// create a material to control collision with this objects
 	int defaultMaterialID;
@@ -84,7 +84,7 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeMatrix, size, type, defaultMaterialID);
 	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
 
-	//	matrix = dRollMatrix(3.141592f/2.0f);
+	//	matrix = dRollMatrix(dPi/2.0f);
 	dFloat startElevation = 100.0f;
 	dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 
@@ -118,7 +118,6 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	geometry->Release(); 
 	NewtonDestroyCollision (collision);
 }
-
 
 static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
 {
@@ -154,7 +153,7 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 
 	//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);
 	DemoMesh* const geometry1 = new DemoMesh("sphere", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
-	CreateSimpleSolid(scene, geometry1, mass * 1000.0f, baseMatrix, collision, defaultMaterialID);
+//	CreateSimpleSolid(scene, geometry1, mass * 1000.0f, baseMatrix, collision, defaultMaterialID);
 
 	// do not forget to release the assets	
 	geometry1->Release();
@@ -198,7 +197,7 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 	dMatrix matrix1(matrix0);
 	matrix1.m_posit.m_z += horizontalStep;
 
-	dMatrix matrix2(dYawMatrix(3.141592f * 0.5f) * matrix0);
+	dMatrix matrix2(dYawMatrix(dPi * 0.5f) * matrix0);
 	matrix2.m_posit.m_x += horizontalStep * 0.5f;
 	matrix2.m_posit.m_z += horizontalStep * 0.5f;
 	matrix2.m_posit.m_y += vertialStep;
@@ -217,6 +216,10 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 		matrix2.m_posit.m_y += vertialStep * 2.0f;
 		matrix3.m_posit.m_y += vertialStep * 2.0f;
 	}
+
+//matrix0.m_posit.m_y += 10.0f;
+//mass *= 4.0f;
+//CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
 
 	// do not forget to release the assets	
 	geometry->Release();
@@ -242,6 +245,7 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 	dFloat startElevation = 100.0f;
 	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
+baseMatrix.m_posit.m_y += 1;
 
 	// create a material to control collision with this objects
 	int defaultMaterialID;
@@ -250,6 +254,9 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
 	DemoMesh* const geometry = new DemoMesh("sphere", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+//baseMatrix = dRollMatrix(30.0f * dDegreeToRad) * dPitchMatrix(30.0f * dDegreeToRad) * baseMatrix;
+//baseMatrix.m_posit.m_y += 10.0f;
 
 	for (int i = 0; i < count; i++) {
 		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
@@ -272,26 +279,26 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 
 	int high = 20;
 	for (int i = 0; i < 1; i ++) {
-		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
-		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-		//BuildPyramid (scene, 10.0f, dVector( 40.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CHAMFER_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+//		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
+//		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
+//		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
+//		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * dPi));
+		//BuildPyramid (scene, 10.0f, dVector( 40.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CHAMFER_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
 	}
 
 	high = 20;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high);
+//			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high);
 		}
 	}
 
 	high = 20;
-high = 10;
+	high = 1;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
-			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, 0.0f + i * 8, 0.0f), dVector (0.5f, 4.0f, 0.5f, 0.0f), high);
+//			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
+//			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, 0.0f + i * 8, 0.0f), dVector (0.5f, 4.0f, 0.5f, 0.0f), high);
 			BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 		}
 	}

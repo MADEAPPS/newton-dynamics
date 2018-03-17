@@ -11,7 +11,7 @@
 
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
 #include "DemoMesh.h"
@@ -38,14 +38,14 @@ static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const 
 
 	dFloat biasExp = 10.0f;
 	dFloat r = dSqrt (size.DotProduct3(size));
-	r = powf(r, 1.0f/biasExp);
+	r = dFloat (pow(r, 1.0f/biasExp));
 	for (int i = 0; i < count; i++) {
 		dVector& p = points[i];
 		bool test;
 		do {
-			p = dVector (2.0f * dRandomVariable(r), 2.0f * dRandomVariable(r), 2.0f * dRandomVariable(r), 0.0f);
+			p = dVector (2.0f * dGaussianRandom (r), 2.0f * dGaussianRandom (r), 2.0f * dGaussianRandom (r), 0.0f);
 			dFloat len = dSqrt (p.DotProduct3(p));
-			dFloat scale = powf(len, biasExp) / len;
+			dFloat scale = dFloat (pow(len, biasExp) / len);
 			p = p.Scale (scale) + origin;
 			test = (p.m_x > minBox.m_x) && (p.m_x < maxBox.m_x) && (p.m_y > minBox.m_y) && (p.m_y < maxBox.m_y) && (p.m_z > minBox.m_z) && (p.m_z < maxBox.m_z);
 		} while (!test);
@@ -79,9 +79,9 @@ static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const poi
 				dFloat x = x0;
 				dFloat y = y0;
 				dFloat z = z0;
-				x += dRandomVariable(POISON_VARIANCE);
-				y += dRandomVariable(POISON_VARIANCE);
-				z += dRandomVariable(POISON_VARIANCE);
+				x += dGaussianRandom (POISON_VARIANCE);
+				y += dGaussianRandom (POISON_VARIANCE);
+				z += dGaussianRandom (POISON_VARIANCE);
 				points[count] = dVector (x, y, z);
 				count ++;
 				x0 += POINT_DENSITY_PER_METERS;
@@ -402,7 +402,7 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	// place camera into position
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f); 
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad); 
 	dVector origin (-45.0f, 20.0f, -15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

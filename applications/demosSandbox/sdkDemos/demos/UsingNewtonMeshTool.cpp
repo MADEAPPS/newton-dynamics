@@ -9,16 +9,13 @@
 * freely
 */
 
-
-
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
 #include "DemoMesh.h"
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-
 
 
 static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
@@ -107,7 +104,7 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	dBigVector scale1 (scale);
 	for (int i = 0; i < 8; i ++) {
 		dBigVector p(&BoxPoints[i * 4]);
-		array[i] = scale1.CompProduct(p);
+		array[i] = scale1 * p;
 	}
 
 	NewtonMeshVertexFormat vertexFormat;
@@ -157,16 +154,12 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
-	scene->CreateSkyBox();
+//	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
 //	CreateLevelMesh (scene, "sponza.ngd", true);
-
-	// create a shattered mesh array
-//	TestConvexApproximation (scene);
-
 
 //	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	// using my own interpretation
@@ -179,10 +172,11 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
+//	dQuaternion rot (- 0.112522639f, - 0.620757043f, 0.770572960f, 0.0906458423f);
+//	dVector origin (- 24.5024796f, 48.2213058f, - 97.0880356f, 1.0f);
+
 	dQuaternion rot;
-//	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
-	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
-//	dVector origin (-1.0f, 0.25f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");

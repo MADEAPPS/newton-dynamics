@@ -11,7 +11,7 @@
 
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
 #include "DemoMesh.h"
@@ -58,6 +58,12 @@ class dRayCastRecord: public dCustomControllerBase
 		m_p1 = m_p0 + (matrix.m_posit - m_p0).Scale (parameter);
 	}
 
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dAssert(0);
+	}
+
+
 	dVector m_p0;
 	dVector m_p1;
 	NewtonBody* m_target;
@@ -89,8 +95,8 @@ class LineOfSightRayCastEntity: public DemoEntity
 		glBegin(GL_LINES);
 		for (dCustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
 			dRayCastRecord* const ray = &node->GetInfo();
-			glVertex3f(ray->m_p0.m_x, ray->m_p0.m_y, ray->m_p0.m_z);
-			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
+			glVertex3f(GLfloat(ray->m_p0.m_x), GLfloat(ray->m_p0.m_y), GLfloat(ray->m_p0.m_z));
+			glVertex3f(GLfloat(ray->m_p1.m_x), GLfloat(ray->m_p1.m_y), GLfloat(ray->m_p1.m_z));
 		}
 		glEnd();
 
@@ -100,7 +106,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 		glBegin(GL_POINTS);
 		for (dCustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
 			dRayCastRecord* const ray = &node->GetInfo();
-			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
+			glVertex3f(GLfloat(ray->m_p1.m_x), GLfloat(ray->m_p1.m_y), GLfloat(ray->m_p1.m_z));
 		}
 		glEnd();
 		glPointSize(1.0f);

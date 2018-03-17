@@ -10,9 +10,8 @@
 */
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
-#include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "dCustomHinge.h"
@@ -263,12 +262,11 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 		,m_player(NULL)
 		,m_jumpKey(false)
 		,m_cameraMode(true)
-		,m_helpKey(true)
 		,m_shootProp(false)
 		,m_shootState(0)
 	{
 		// plug a callback for 2d help display
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL,this);
 	}
 
 	void SpawnRandomProp(const dMatrix& location) const
@@ -302,21 +300,23 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
 	{
+		dAssert(0);
+		/*
+
         if (m_player) {
 		    AdvancePlayerEntity::InputRecord inputs;
 
 		    DemoCamera* const camera = m_scene->GetCamera();
-		    NewtonDemos* const mainWindow = m_scene->GetRootWindow();
-
+			
 		    // set the help key
-		    m_helpKey.UpdatePushButton (mainWindow, 'H');
+		    m_helpKey.UpdatePushButton (m_scene, 'H');
 
 		    // read the player inputs
 		    inputs.m_headinAngle = camera->GetYawAngle();
-		    inputs.m_cameraMode = m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C') ? 1 : 0;
-		    inputs.m_forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
-		    inputs.m_strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
-		    inputs.m_jumpSpeed = (m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? PLAYER_JUMP_SPEED : 0.0f;
+		    inputs.m_cameraMode = m_cameraMode.UpdatePushButton(m_scene, 'C') ? 1 : 0;
+		    inputs.m_forwarSpeed = (int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
+		    inputs.m_strafeSpeed = (int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
+		    inputs.m_jumpSpeed = (m_jumpKey.UpdateTriggerButton(m_scene, ' ')) ? PLAYER_JUMP_SPEED : 0.0f;
 
 		    // normalize player speed
 		    dFloat mag2 = inputs.m_forwarSpeed * inputs.m_forwarSpeed + inputs.m_strafeSpeed * inputs.m_strafeSpeed;
@@ -327,7 +327,7 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 		    }
 
 		    // see if we are shotting some props
-		    m_shootState = m_shootProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
+		    m_shootState = m_shootProp.UpdateTriggerButton(m_scene, 0x0d) ? 1 : 0;
 
 
     #if 0
@@ -346,6 +346,7 @@ class AdvancedPlayerInputManager: public dCustomInputManager
     #endif
 		    m_player->SetInput(inputs);
         }
+*/
 	}
 
 	void OnEndUpdate (dFloat timestepInSecunds)
@@ -388,27 +389,25 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 		m_player = player;
 	}
 
-	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
+	void RenderPlayerHelp (DemoEntityManager* const scene) const
 	{
-		if (m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk forward:            W");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk backward:           S");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe right:            D");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe left:             A");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "throw solids at player:  Enter");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
-		}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "Navigation Keys");
+		scene->Print (color, "walk forward:            W");
+		scene->Print (color, "walk backward:           S");
+		scene->Print (color, "strafe right:            D");
+		scene->Print (color, "strafe left:             A");
+		scene->Print (color, "toggle camera mode:      C");
+		scene->Print (color, "jump:                    Space");
+		scene->Print (color, "throw solids at player:  Enter");
+		scene->Print (color, "hide help:               H");
+		scene->Print (color, "change player direction: Left mouse button");
 	}
 
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
 	{
 		AdvancedPlayerInputManager* const me = (AdvancedPlayerInputManager*) context;
-		me->RenderPlayerHelp (scene, lineNumber);
+		me->RenderPlayerHelp (scene);
 	}
 
 
@@ -416,7 +415,6 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 	AdvancePlayerEntity* m_player;
 	DemoEntityManager::ButtonKey m_jumpKey;
 	DemoEntityManager::ButtonKey m_cameraMode;
-	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_shootProp;
 
 	int m_shootState;

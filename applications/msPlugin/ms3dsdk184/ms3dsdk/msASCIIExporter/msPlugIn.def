@@ -1,7 +1,0 @@
-DESCRIPTION 'MilkShape 3D ASCII Exporter'
-
-VERSION     1.0
-
-LIBRARY      "msASCIIExporter"
-EXPORTS
-    CreatePlugIn

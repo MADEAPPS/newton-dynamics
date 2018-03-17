@@ -10,7 +10,7 @@
 */
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
 #include "DemoMesh.h"
@@ -118,6 +118,9 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
+dAssert(0);
+return;
+/*
 	// load the scene from a ngd file format
 //	NewtonBody* const body = CreateLevelMesh (scene, "xxxx.ngd", true);
 	NewtonBody* const body = CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -128,7 +131,7 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	dMatrix originMatrix;
 	NewtonBodyGetMatrix(body, &originMatrix[0][0]);
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot (camMatrix);
 	dVector origin (originMatrix.m_posit);
 	dFloat hight = 1000.0f;
@@ -168,6 +171,7 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 
 	origin.m_y += 10.0f;
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

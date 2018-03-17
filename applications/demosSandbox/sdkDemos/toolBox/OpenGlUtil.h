@@ -18,7 +18,7 @@
 #if !defined(AFX_OPENGLUTIL_H_H)
 #define AFX_OPENGLUTIL_H_H
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 
 struct dMOUSE_POINT
 {

@@ -14,7 +14,7 @@
 // RenderPrimitive.cpp: implementation of the RenderPrimitive class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "TargaToOpenGl.h"
 #include "SkyBox.h"
 
@@ -54,11 +54,10 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
-	
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	dFloat padd = 1.0e-3f;
+	GLfloat padd = 1.0e-3f;
 	glDisable(GL_BLEND);
 	glDisable (GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
@@ -67,57 +66,57 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 	// front
 	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f( m_size.m_x,  m_size.m_y, -m_size.m_z);
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-m_size.m_x,  m_size.m_y, -m_size.m_z);
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-m_size.m_x, -m_size.m_y, -m_size.m_z);
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f( m_size.m_x, -m_size.m_y, -m_size.m_z);
+	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f( GLfloat(m_size.m_x),  GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-GLfloat(m_size.m_x),  GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-GLfloat(m_size.m_x), -GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f( GLfloat(m_size.m_x), -GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
 	glEnd();
 
 	// left
 	glBindTexture(GL_TEXTURE_2D, m_textures[3]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-m_size.m_x,  m_size.m_y, -m_size.m_z);
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-m_size.m_x,  m_size.m_y,  m_size.m_z);
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-m_size.m_x, -m_size.m_y,  m_size.m_z);
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-m_size.m_x, -m_size.m_y, -m_size.m_z);
+	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-GLfloat(m_size.m_x),  GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-GLfloat(m_size.m_x),  GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-GLfloat(m_size.m_x), -GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-GLfloat(m_size.m_x), -GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
 	glEnd();
 
 	// right
 	glBindTexture(GL_TEXTURE_2D, m_textures[1]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(m_size.m_x,   m_size.m_y,  m_size.m_z);
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(m_size.m_x,   m_size.m_y, -m_size.m_z);
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(m_size.m_x,  -m_size.m_y, -m_size.m_z);
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(m_size.m_x,  -m_size.m_y,  m_size.m_z);
+	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(GLfloat(m_size.m_x),   GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(GLfloat(m_size.m_x),   GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(GLfloat(m_size.m_x),  -GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(GLfloat(m_size.m_x),  -GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
 	glEnd();
 
 
 	// back
 	glBindTexture(GL_TEXTURE_2D, m_textures[2]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-m_size.m_x,  m_size.m_y, m_size.m_z);
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f( m_size.m_x,  m_size.m_y, m_size.m_z);
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f( m_size.m_x, -m_size.m_y, m_size.m_z);
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-m_size.m_x, -m_size.m_y, m_size.m_z);
+	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-GLfloat(m_size.m_x),  GLfloat(m_size.m_y), GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f( GLfloat(m_size.m_x),  GLfloat(m_size.m_y), GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f( GLfloat(m_size.m_x), -GLfloat(m_size.m_y), GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-GLfloat(m_size.m_x), -GLfloat(m_size.m_y), GLfloat(m_size.m_z));
 	glEnd();
 
 
 	// top
 	glBindTexture(GL_TEXTURE_2D, m_textures[4]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-m_size.m_x,  m_size.m_y, -m_size.m_z);
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f( m_size.m_x,  m_size.m_y, -m_size.m_z);
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f( m_size.m_x,  m_size.m_y,  m_size.m_z);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-m_size.m_x,  m_size.m_y,  m_size.m_z);
+	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-GLfloat(m_size.m_x),  GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f( GLfloat(m_size.m_x),  GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f( GLfloat(m_size.m_x),  GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-GLfloat(m_size.m_x),  GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
 	glEnd();	 
 
 	// bottom
 	glBindTexture(GL_TEXTURE_2D, m_textures[5]);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-m_size.m_x, -m_size.m_y,  m_size.m_z);
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f( m_size.m_x, -m_size.m_y,  m_size.m_z);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f( m_size.m_x, -m_size.m_y, -m_size.m_z);
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-m_size.m_x, -m_size.m_y, -m_size.m_z);
+	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-GLfloat(m_size.m_x), -GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
+	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f( GLfloat(m_size.m_x), -GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f( GLfloat(m_size.m_x), -GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
+	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-GLfloat(m_size.m_x), -GLfloat(m_size.m_y), -GLfloat(m_size.m_z));
 	glEnd();	 	
 
 //	glDepthMask(GL_TRUE);

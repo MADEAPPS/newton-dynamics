@@ -85,8 +85,8 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -118,8 +118,8 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -148,8 +148,8 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -181,8 +181,8 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dStandardModels;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;STANDARD_MODELS_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -250,9 +250,6 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dScene.vcxproj">
       <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\packages\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj">
-      <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_aui.vcxproj">
       <Project>{a16d3832-0f42-57ce-8f48-50e06649ade8}</Project>

@@ -9,11 +9,10 @@
  * freely
  */
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "NewtonDemos.h"
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
@@ -100,8 +99,7 @@ void HeightFieldCollision(DemoEntityManager* const scene)
 
 	scene->SetCameraMatrix(dQuaternion(locationTransform), locationTransform.m_posit + dVector(0, 5, 0));
 
-	NewtonDemos* const mainWindow = scene->GetRootWindow();
-	mainWindow->m_debugDisplayMode = 1;
+	scene->m_debugDisplayMode = 1;
 }
 
 #else

@@ -17,7 +17,7 @@
 #ifndef __DEMO_CAMERA_H__
 #define __DEMO_CAMERA_H__
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
 #include "DemoEntity.h"
 
 
@@ -45,7 +45,7 @@ class DemoCamera: public DemoEntity
 	dFloat m_cameraYaw;
 	dFloat m_cameraPitch;
 
-	int m_viewport[4]; 
+	GLint m_viewport[4]; 
 	GLdouble m_modelViewMatrix[16];
 	GLdouble m_projectionViewMatrix[16];
 	friend class DemoEntity;
