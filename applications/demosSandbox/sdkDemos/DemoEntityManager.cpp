@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-#define DEFAULT_SCENE	3			// gyroscope precession
+//#define DEFAULT_SCENE	3			// gyroscope precession
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -72,7 +72,9 @@
 //#define DEFAULT_SCENE	38			// basic player controller
 //#define DEFAULT_SCENE	39			// advanced player controller
 //#define DEFAULT_SCENE	30			// cloth patch			
-//#define DEFAULT_SCENE	41			// soft bodies			
+//#define DEFAULT_SCENE	41			// soft bodies	
+
+#define DEFAULT_SCENE	42          // joes joint test
 
 
 /// demos forward declaration 
@@ -118,6 +120,7 @@ void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
 void Hexapod(DemoEntityManager* const scene);
+void JoesJointTest (DemoEntityManager* const scene);
 
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
@@ -164,6 +167,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
+	{"Joes joint test", "", JoesJointTest},
 };
 
 
@@ -235,15 +239,14 @@ DemoEntityManager::DemoEntityManager ()
 {
 //	m_showUI = true;
 //	m_showAABB = false;
-
+//	m_showContactPoints = false;
 //	m_hideVisualMeshes = true;
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
 //	m_workerThreades = 1;
 //	m_showNormalForces = false;
-//	m_showCenterOfMass = true;
-//	m_showContactPoints = true;
+//	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
