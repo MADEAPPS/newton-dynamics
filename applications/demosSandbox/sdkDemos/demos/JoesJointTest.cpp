@@ -113,10 +113,6 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		}
 	};
 
-
-
-
-
 	public:
 	dQuaternion m_target; // relative target rotation to reach at next timestep
 
@@ -143,8 +139,11 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 	dFloat m_arcAngleCos;
 	dFloat m_arcAngleSin;
 
-	dFloat const E = dFloat(1.0E-16);
-	dFloat const E_angle = dFloat(1.0e-10);
+//	const dFloat E = dFloat(1.0E-16);
+//	const dFloat E_angle = dFloat(1.0e-10);
+
+	#define E		dFloat(1.0E-16)
+	#define E_angle dFloat(1.0e-10)
 
 	
 	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world, bool isLimitJoint = false, bool isMotorizedLimitJoint = false)
@@ -158,7 +157,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		m_stiffness = dFloat(0.9f);
 		m_maxTorque = dFloat(1000);
 
-		dAssert (m_maxTorque >= m_maxMotorTorque);
+		//dAssert (m_maxTorque >= m_maxMotorTorque);
 
 		m_anim_speed = 0;
 		m_anim_offset = 0;
@@ -182,6 +181,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		m_arcAngleSin = dSin (0);
 		m_minTwistAngle = 1; m_maxTwistAngle = -1; // unrestricted
 	}
+
 
 	void SetTwistSwingLimits (const dFloat coneAngle, const dFloat arcAngle, const dFloat minTwistAngle, const dFloat maxTwistAngle)
 	{
@@ -558,11 +558,6 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
 				}
 			}
-
-
-
-
-
 		}
 		else // no limits but motor (reference approach i use for my ragdoll - not suited for inverse dynamics)
 		{
@@ -583,13 +578,6 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 		}
 		
 	}
-
-
-
-
-
-
-
 
 	void Debug(dDebugDisplay* const debugDisplay) const
 	{
@@ -685,7 +673,7 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 			ob = matrix1[3];
 			ortho = dPitchMatrix(N_PI * 0.5f) * dYawMatrix(-minXAngle) * matrixVIS;//matrix1 * sMat4::rotationY(-minXAngle) * sMat4::rotationX(N_PI * 0.5);
 			dFloat angDiff = maxXAngle - minXAngle;
-			int subdiv2 = 1 + (angDiff / N_PI * 180.0f / (360.0f / dFloat(subdiv)));
+			int subdiv2 = 1 + int ((angDiff / N_PI * 180.0f / (360.0f / dFloat(subdiv))));
 			for (i=0; i<=subdiv2; i++)
 			{
 				dFloat t = dFloat(i) / dFloat(subdiv2);
@@ -703,7 +691,7 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 			ot = matrix1.m_posit;
 			ortho = dYawMatrix(N_PI * -0.5f) * dPitchMatrix(N_PI * -0.5f) * matrix1;//matrix1 * sMat4::rotationX(N_PI * -0.5) * sMat4::rotationY(N_PI * -0.5);
 			angDiff = maxTAngle - minTAngle;
-			subdiv2 = 1 + (angDiff / N_PI * 180.0f / (360.f / dFloat(subdiv)));
+			subdiv2 = 1 + int ((angDiff / N_PI * 180.0f / (360.f / dFloat(subdiv))));
 			for (i=0; i<=subdiv2; i++)
 			{
 				dFloat t = dFloat(i) / dFloat(subdiv2);
@@ -723,9 +711,6 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 			Vis::Vector (debugDisplay, matrix1[3], matrix1.RotateVector(dVector(0, dCos(twistAngle), dSin(-twistAngle)).Scale(radius)), 1,0,0); // current twist
 			Vis::Vector (debugDisplay, matrix0[3], matrix0[0].Scale(radius), 0.5f,0.5f,1); // current pin
 		}
-
-
-
 	}
 };
 
