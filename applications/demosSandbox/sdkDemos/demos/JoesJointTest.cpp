@@ -703,9 +703,9 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 			dQuaternion quat0(matrix0), quat1(matrix1);      
 			dFloat *q0 = (dFloat*)&quat0;
 			dFloat *q1 = (dFloat*)&quat1;
-			dFloat twistAngle = 2.0f * atan (
+			dFloat twistAngle = 2.0f * dFloat (atan (
 				( ( ( (q0[0] * q1[1]) + (-q0[1] * q1[0]) ) + (-q0[2] * q1[3]) ) - (-q0[3] * q1[2]) ) /
-				( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) );
+				( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) ));
 
 			Vis::Vector (debugDisplay, matrix1[3], matrix1.RotateVector(dVector(0,1,0).Scale(radius)), 0,1,0); // zero twist
 			Vis::Vector (debugDisplay, matrix1[3], matrix1.RotateVector(dVector(0, dCos(twistAngle), dSin(-twistAngle)).Scale(radius)), 1,0,0); // current twist
@@ -714,7 +714,7 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 	}
 };
 
-inline dFloat randF (unsigned int time)
+static inline dFloat randF (unsigned int time)
 {
 	time *= 1664525;
 	time ^= (time << 16);
