@@ -119,31 +119,31 @@
     <ClInclude Include="..\..\sdkDemos\toolBox\UserPlaneCollision.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dContainers.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\dContainers.vcxproj">
       <Project>{e6a31c39-173f-4000-97e0-f086db68dd42}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dCustomJoints.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\dCustomJoints.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dgCore.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\dgCore.vcxproj">
       <Project>{75a4a856-914e-4d41-a28d-23eaf8f8f9c9}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dgPhysics.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\dgPhysics.vcxproj">
       <Project>{34ad435b-7662-49d5-af13-5974fec5f578}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dMath.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\dMath.vcxproj">
       <Project>{2928f15f-0650-4261-b759-36c7792267dc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dScene.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\dScene.vcxproj">
       <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\newton.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2015_static_mt\newton.vcxproj">
       <Project>{f8604c1c-867d-4efd-afac-15404f17084e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\thirdParty\glfw\vs2013\glfw.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\thirdParty\glfw\vs2015\glfw.vcxproj">
       <Project>{71de04d1-e371-4a45-9694-2aa647d65451}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\sdk\thirdParty\imgui\vs2013\imgui.vcxproj">
+    <ProjectReference Include="..\..\..\..\sdk\thirdParty\imgui\vs2015\imgui.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
   </ItemGroup>
