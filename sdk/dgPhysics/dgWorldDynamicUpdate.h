@@ -105,13 +105,13 @@ class dgJointInfo
 class dgParallelSolverSyncData
 {
 	public:
-	class dgParallelJointMap
-	{
-		public:
-		dgInt32 m_color;
-		dgInt32 m_bashCount;
-		dgInt32 m_jointIndex;
-	};
+//	class dgParallelJointMap
+//	{
+//		public:
+//		dgInt32 m_color;
+//		dgInt32 m_bashCount;
+//		dgInt32 m_jointIndex;
+//	};
 
 	dgParallelSolverSyncData()
 	{
@@ -141,8 +141,8 @@ class dgParallelSolverSyncData
 
 	dgInt32* m_bodyLocks;  
 	const dgBodyCluster* m_cluster;
-	dgParallelJointMap* m_jointConflicts;
-	dgInt32 m_jointBatches[32];
+//	dgParallelJointMap* m_jointConflicts;
+//	dgInt32 m_jointBatches[32];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
 
@@ -210,21 +210,18 @@ class dgJacobianMatrixElement
 	dgFloat32 m_diagDamp;
 	dgFloat32 m_invJinvMJt;
 
-	dgFloat32 m_residual;
+	dgFloat32 m_deltaAccel;
 	dgFloat32 m_coordenateAccel;
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
 
-//	dgFloat32 m_force0____;
 	dgFloat32 m_maxImpact;
-	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
 	dgFloat32 m_penetration;
-
 	dgFloat32 m_stiffness;
-	dgFloat32 m_penetrationStiffness;
 
 	dgForceImpactPair* m_jointFeebackForce;
+	dgFloat32 m_penetrationStiffness;
 	dgInt32 m_normalForceIndex;
 } DG_GCC_VECTOR_ALIGMENT;
 
@@ -263,7 +260,7 @@ class dgWorldDynamicUpdate
 	static void KinematicCallbackUpdateParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateFeedbackForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
-	static dgInt32 SortJointInfoByColor(const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexA, const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexB, void* const context);
+//	static dgInt32 SortJointInfoByColor(const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexA, const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexB, void* const context);
 
 	void IntegrateClusterParallel(dgParallelSolverSyncData* const syncData) const; 
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const; 
@@ -272,7 +269,7 @@ class dgWorldDynamicUpdate
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
 
 	void CalculateReactionForcesParallel (const dgBodyCluster* const cluster, dgFloat32 timestep) const;
-	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgBodyCluster* const cluster) const;
+	//void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgBodyCluster* const cluster) const;
 
 	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
