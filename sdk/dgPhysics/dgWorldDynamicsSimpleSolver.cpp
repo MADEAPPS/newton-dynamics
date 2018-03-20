@@ -31,9 +31,6 @@
 #include "dgBilateralConstraint.h"
 
 
-#define DG_HEAVY_MASS_SCALE_FACTOR			dgFloat32 (25.0f)
-#define DG_HEAVY_MASS_INV_SCALE_FACTOR		(dgFloat32 (1.0f) / DG_HEAVY_MASS_SCALE_FACTOR)
-
 void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
 	dgInt32 activeJoint = cluster->m_jointCount;

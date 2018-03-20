@@ -39,6 +39,10 @@
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
 #define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_ACCEL * dgFloat32 (0.5f))
 
+#define DG_HEAVY_MASS_SCALE_FACTOR		dgFloat32 (25.0f)
+#define DG_HEAVY_MASS_INV_SCALE_FACTOR	(dgFloat32 (1.0f) / DG_HEAVY_MASS_SCALE_FACTOR)
+
+
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.

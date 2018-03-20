@@ -851,6 +851,24 @@ DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 }
 
 
+class dgScopeSpinLock
+{
+	public:
+		dgScopeSpinLock(dgInt32* const lock)
+		:m_atomicLock(lock)
+	{
+		dgSpinLock(m_atomicLock, false);
+	}
+	~dgScopeSpinLock()
+	{
+		dgSpinUnlock(m_atomicLock);
+	}
+
+	dgInt32* m_atomicLock;
+};
+
+
+
 #ifdef _MACOSX_VER
 #include <sys/time.h>
 #define CLOCK_REALTIME 0
