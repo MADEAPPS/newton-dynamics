@@ -1585,7 +1585,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce____(const dgJointInfo* const
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[index + i];
-			row->m_force = x[i].GetScalar();
+//			row->m_force = x[i].GetScalar();
+			row->m_force = row->m_force + (x[i].GetScalar() - row->m_force) * 0.85f;
 			row->m_maxImpact = dgMax(dgAbs(row->m_force), row->m_maxImpact);
 		}
 

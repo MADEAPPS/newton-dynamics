@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// Box stacks
+#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -73,8 +73,7 @@
 //#define DEFAULT_SCENE	39			// advanced player controller
 //#define DEFAULT_SCENE	30			// cloth patch			
 //#define DEFAULT_SCENE	41			// soft bodies	
-
-#define DEFAULT_SCENE	42          // joes joint test
+//#define DEFAULT_SCENE	42          // joes joint test
 
 
 /// demos forward declaration 
