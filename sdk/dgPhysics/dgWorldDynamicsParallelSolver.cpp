@@ -65,10 +65,8 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	InitilizeBodyArrayParallel (&syncData);
 	BuildJacobianMatrixParallel (&syncData);
 	SolverInitInternalForcesParallel (&syncData);
-/*
-	CalculateForcesGameModeParallel (&syncData);
-	IntegrateIslandParallel(&syncData); 
-*/
+	CalculateForcesParallel (&syncData);
+//	IntegrateIslandParallel(&syncData); 
 }
 
 /*
@@ -648,7 +646,7 @@ void dgWorldDynamicUpdate::IntegrateClusterParallel(dgParallelSolverSyncData* co
 }
 
 
-void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const
+void dgWorldDynamicUpdate::CalculateForcesParallel (dgParallelSolverSyncData* const syncData) const
 {
 dgAssert (0);
 /*

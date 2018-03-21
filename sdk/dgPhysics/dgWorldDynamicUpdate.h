@@ -270,7 +270,7 @@ class dgWorldDynamicUpdate
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const; 
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
 	void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
-	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
+	void CalculateForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 
 	void CalculateReactionForcesParallel (const dgBodyCluster* const cluster, dgFloat32 timestep) const;
 	//void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgBodyCluster* const cluster) const;
