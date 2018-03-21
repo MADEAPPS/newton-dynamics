@@ -1284,7 +1284,42 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	}
 }
 
-void dgWorldDynamicUpdate::CalculateResidual____ (dgInt32 const bodyCount, dgInt32 const jointCount, const dgJointInfo* const jointArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
+void dgWorldDynamicUpdate::CalculateResidual____(const dgJointInfo* const jointInfo, dgJacobian& forceAcc0, dgJacobian& forceAcc1, const dgJacobianMatrixElement* const matrixRow) const
+{
+	const dgInt32 index = jointInfo->m_pairStart;
+	const dgInt32 count = jointInfo->m_pairCount;
+	const dgInt32 m0 = jointInfo->m_m0;
+	const dgInt32 m1 = jointInfo->m_m1;
+
+	forceAcc0.m_linear = dgVector::m_zero;
+	forceAcc0.m_angular = dgVector::m_zero;
+	forceAcc1.m_linear = dgVector::m_zero;
+	forceAcc1.m_angular = dgVector::m_zero;
+	for (dgInt32 i = 0; i < count; i++) {
+		const dgJacobianMatrixElement* const row = &matrixRow[index + i];
+		dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
+		dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
+		dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
+		dgAssert(row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32(0.0f));
+
+		dgAssert(dgCheckFloat(row->m_force));
+		dgVector val(row->m_force);
+		forceAcc0.m_linear += row->m_Jt.m_jacobianM0.m_linear * val;
+		forceAcc0.m_angular += row->m_Jt.m_jacobianM0.m_angular * val;
+		forceAcc1.m_linear += row->m_Jt.m_jacobianM1.m_linear * val;
+		forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
+	}
+
+	const dgVector scale0(jointInfo->m_scale0);
+	const dgVector scale1(jointInfo->m_scale1);
+
+	forceAcc0.m_linear = forceAcc0.m_linear * scale0;
+	forceAcc0.m_angular = forceAcc0.m_angular * scale0;
+	forceAcc1.m_linear = forceAcc1.m_linear * scale1;
+	forceAcc1.m_angular = forceAcc1.m_angular * scale1;
+}
+
+void dgWorldDynamicUpdate::CalculateResidual____ (dgInt32 const bodyCount, dgInt32 const jointCount, const dgJointInfo* const jointArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow) const
 {
 	for (dgInt32 i = 0; i < bodyCount; i++) {
 		internalForces[i].m_linear = dgVector::m_zero;
@@ -1292,6 +1327,11 @@ void dgWorldDynamicUpdate::CalculateResidual____ (dgInt32 const bodyCount, dgInt
 	}
 
 	for (dgInt32 j = 0; j < jointCount; j++) {
+		dgJacobian forceAcc0;
+		dgJacobian forceAcc1;
+		const dgJointInfo* const jointInfo = &jointArray[j];
+		CalculateResidual____(jointInfo, forceAcc0, forceAcc1, matrixRow);
+/*
 		dgJacobian forceAcc0;
 		dgJacobian forceAcc1;
 
@@ -1327,7 +1367,10 @@ void dgWorldDynamicUpdate::CalculateResidual____ (dgInt32 const bodyCount, dgInt
 		forceAcc0.m_angular = forceAcc0.m_angular * scale0;
 		forceAcc1.m_linear = forceAcc1.m_linear * scale1;
 		forceAcc1.m_angular = forceAcc1.m_angular * scale1;
+*/
 
+		const dgInt32 m0 = jointInfo->m_m0;
+		const dgInt32 m1 = jointInfo->m_m1;
 		internalForces[m0].m_linear += forceAcc0.m_linear;
 		internalForces[m0].m_angular += forceAcc0.m_angular;
 		internalForces[m1].m_linear += forceAcc1.m_linear;
