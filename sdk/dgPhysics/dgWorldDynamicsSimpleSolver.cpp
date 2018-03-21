@@ -1600,8 +1600,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce____(const dgJointInfo* const
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForces____(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
-//	CalculateClusterReactionForces(cluster, threadID, timestep);
-
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
 	const dgInt32 jointCount = cluster->m_jointCount;

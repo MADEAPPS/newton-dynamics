@@ -433,11 +433,9 @@ dgFloat32 forceImpulseScale = dgFloat32(1.0f);
 
 void dgWorldDynamicUpdate::CalculateJointsAccelParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
-	dgAssert (0);
-/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
-	const dgBodyCluster* const island = syncData->m_island;
+	const dgBodyCluster* const island = syncData->m_cluster;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
@@ -448,38 +446,13 @@ void dgWorldDynamicUpdate::CalculateJointsAccelParallelKernel (void* const conte
 	joindDesc.m_firstPassCoefFlag = syncData->m_firstPassCoef;
 
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
-	if (joindDesc.m_firstPassCoefFlag == dgFloat32 (0.0f)) {
-		for (dgInt32 curJoint = dgAtomicExchangeAndAdd(atomicIndex, 1); curJoint < syncData->m_jointCount;  curJoint = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-			dgJointInfo* const jointInfo = &constraintArray[curJoint];
-			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_solverActive) {
-				joindDesc.m_rowsCount = jointInfo->m_pairCount;
-				joindDesc.m_rowMatrix = &matrixRow[jointInfo->m_pairStart];
-				constraint->JointAccelerations(&joindDesc);
-			}
-		}
-	} else {
-		const dgBodyCluster* const island = syncData->m_island;
-		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-		const dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
-
-		for (dgInt32 curJoint = dgAtomicExchangeAndAdd(atomicIndex, 1); curJoint < syncData->m_jointCount;  curJoint = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-			dgJointInfo* const jointInfo = &constraintArray[curJoint];
-			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_solverActive) {
-				const dgInt32 m0 = jointInfo->m_m0;
-				const dgInt32 m1 = jointInfo->m_m1;
-				const dgBody* const body0 = bodyArray[m0].m_body;
-				const dgBody* const body1 = bodyArray[m1].m_body;
-				if (!(body0->m_resting & body1->m_resting)) {
-					joindDesc.m_rowsCount = jointInfo->m_pairCount;
-					joindDesc.m_rowMatrix = &matrixRow[jointInfo->m_pairStart];
-					constraint->JointAccelerations(&joindDesc);
-				}
-			}
-		}
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		dgJointInfo* const jointInfo = &constraintArray[i];
+		dgConstraint* const constraint = jointInfo->m_joint;
+		joindDesc.m_rowsCount = jointInfo->m_pairCount;
+		joindDesc.m_rowMatrix = &matrixRow[jointInfo->m_pairStart];
+		constraint->JointAccelerations(&joindDesc);
 	}
-*/
 }
 
 
@@ -490,7 +463,7 @@ dgAssert (0);
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
-	const dgBodyCluster* const island = syncData->m_island;
+	const dgBodyCluster* const island = syncData->m_cluster;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
@@ -529,7 +502,7 @@ void dgWorldDynamicUpdate::CalculateJointsImpulseVelocParallelKernel (void* cons
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
-	const dgBodyCluster* const island = syncData->m_island;
+	const dgBodyCluster* const island = syncData->m_cluster;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
@@ -561,7 +534,7 @@ dgAssert (0);
 /*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
-	const dgBodyCluster* const island = syncData->m_island;
+	const dgBodyCluster* const island = syncData->m_cluster;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
@@ -648,8 +621,6 @@ void dgWorldDynamicUpdate::IntegrateClusterParallel(dgParallelSolverSyncData* co
 
 void dgWorldDynamicUpdate::CalculateForcesParallel (dgParallelSolverSyncData* const syncData) const
 {
-dgAssert (0);
-/*
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 threadCounts = world->GetThreadCount();	
 
@@ -657,6 +628,7 @@ dgAssert (0);
 	const dgInt32 maxPasses = syncData->m_maxPasses;
 //	const dgInt32 batchCount = syncData->m_bachCount;
 	syncData->m_firstPassCoef = dgFloat32 (0.0f);
+
 
 	for (dgInt32 step = 0; step < maxPasses; step++) {
 
@@ -716,6 +688,7 @@ dgAssert (0);
 		world->SynchronizationBarrier();
 	}
 
+/*
 	if (syncData->m_timestepRK != dgFloat32 (0.0f)) {
 		syncData->m_atomicIndex = 0;
 		for (dgInt32 j = 0; j < threadCounts; j ++) {
@@ -744,7 +717,7 @@ dgAssert (0);
 
 	} else {
 		const dgInt32 count = syncData->m_bodyCount;
-		const dgBodyCluster* const island = syncData->m_island;
+		const dgBodyCluster* const island = syncData->m_cluster;
 		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
 		dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 		for (dgInt32 i = 1; i < count; i++) {
@@ -766,7 +739,7 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
-	const dgBodyCluster* const island = syncData->m_island;
+	const dgBodyCluster* const island = syncData->m_cluster;
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	const dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
