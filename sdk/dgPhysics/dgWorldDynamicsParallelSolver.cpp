@@ -251,7 +251,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
-	//dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 	dgAssert (syncData->m_jointCount);
 
@@ -455,41 +454,6 @@ void dgWorldDynamicUpdate::CalculateJointsAccelParallelKernel (void* const conte
 	}
 }
 
-
-
-/*
-void dgWorldDynamicUpdate::CalculateJointsImpulseVelocParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-
-	const dgBodyCluster* const cluster = syncData->m_cluster;
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
-
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
-	//dgJacobian* const internalVeloc = &world->m_solverMemory.m_internalVeloc[0];
-
-	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		dgInt32 index = i + 1;
-		dgAssert (index);
-		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[index].m_body;
-		dgAssert (body->m_index == index);
-
-		const dgVector& linearMomentum = internalForces[index].m_linear;
-		const dgVector& angularMomentum = internalForces[index].m_angular;
-
-		body->m_veloc += linearMomentum.Scale4(body->m_invMass.m_w);
-		body->m_omega += body->m_invWorldInertiaMatrix.RotateVector (angularMomentum);
-
-		//internalVeloc[index].m_linear += body->m_veloc;
-		//internalVeloc[index].m_angular += body->m_omega;
-	}
-}
-*/
-
-
 void dgWorldDynamicUpdate::KinematicCallbackUpdateParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
@@ -513,8 +477,6 @@ void dgWorldDynamicUpdate::IntegrateClusterParallel(dgParallelSolverSyncData* co
 	dgWorld* const world = (dgWorld*) this;
 	world->IntegrateVelocity (syncData->m_cluster, DG_SOLVER_MAX_ERROR, syncData->m_timestep, 0); 
 }
-
-
 
 void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {

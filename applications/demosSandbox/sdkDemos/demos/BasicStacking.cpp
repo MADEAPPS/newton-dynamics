@@ -294,7 +294,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	}
 
 	high = 20;
-	high = 20;
+	high = 16;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 //			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
@@ -305,7 +305,8 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 
 	// place camera into position
 	dQuaternion rot;
-	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
+//	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
