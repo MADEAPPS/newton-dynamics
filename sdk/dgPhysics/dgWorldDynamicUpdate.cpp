@@ -593,75 +593,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 	}
 }
 
-dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const
-{
-	dgInt32 dof = dgInt32(constraint->m_maxDOF);
-	dgAssert(dof <= DG_CONSTRAINT_MAX_ROWS);
-	for (dgInt32 i = 0; i < dof; i++) {
-		constraintParamOut.m_forceBounds[i].m_low = DG_MIN_BOUND;
-		constraintParamOut.m_forceBounds[i].m_upper = DG_MAX_BOUND;
-		constraintParamOut.m_forceBounds[i].m_jointForce = NULL;
-		constraintParamOut.m_forceBounds[i].m_normalIndex = DG_NORMAL_CONSTRAINT;
-	}
-
-	dgAssert(constraint->m_body0);
-	dgAssert(constraint->m_body1);
-
-	dgBody* const body0 = constraint->m_body0;
-	dgBody* const body1 = constraint->m_body1;
-
-	dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
-	dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
-
-	body0->m_inCallback = true;
-	body1->m_inCallback = true;
-	dof = constraint->JacobianDerivative(constraintParamOut);
-	body0->m_inCallback = false;
-	body1->m_inCallback = false;
-
-	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-		dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
-		dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
-		if (skeleton0 && (skeleton0 == skeleton1)) {
-			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
-		} else if (skeleton0 && !skeleton1) {
-//			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
-		} else if (skeleton1 && !skeleton0) {
-//			skeleton1->AddSelfCollisionJoint((dgContact*)constraint);
-		}
-	}
-	
-	jointInfo->m_pairCount = dof;
-	jointInfo->m_pairStart = rowCount;
-	for (dgInt32 i = 0; i < dof; i++) {
-		dgJacobianMatrixElement* const row = &matrixRow[rowCount];
-		dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
-		row->m_Jt = constraintParamOut.m_jacobian[i];
-
-		row->m_diagDamp = dgFloat32 (0.0f);
-		row->m_stiffness = dgMax (DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]), dgFloat32 (1.0e-5f));
-		dgAssert(row->m_stiffness >= dgFloat32(0.0f));
-		dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
-		dgAssert ((dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) >= dgFloat32 (0.0f));
-		row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
-		row->m_restitution = constraintParamOut.m_restitution[i];
-		row->m_penetration = constraintParamOut.m_penetration[i];
-		row->m_penetrationStiffness = constraintParamOut.m_penetrationStiffness[i];
-		row->m_lowerBoundFrictionCoefficent = constraintParamOut.m_forceBounds[i].m_low;
-		row->m_upperBoundFrictionCoefficent = constraintParamOut.m_forceBounds[i].m_upper;
-		row->m_jointFeebackForce = constraintParamOut.m_forceBounds[i].m_jointForce;
-
-		dgInt32 frictionIndex = constraintParamOut.m_forceBounds[i].m_normalIndex < 0 ? dof : constraintParamOut.m_forceBounds[i].m_normalIndex;
-		row->m_normalForceIndex = frictionIndex;
-		rowCount++;
-	}
-	rowCount = (rowCount & (dgInt32(sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32(sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32(sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
-	dgAssert((rowCount & (dgInt32(sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
-
-	constraint->ResetInverseDynamics();
-
-	return rowCount;
-}
 
 
 void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const
@@ -803,3 +734,6 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		}
 	}
 }
+
+
+
