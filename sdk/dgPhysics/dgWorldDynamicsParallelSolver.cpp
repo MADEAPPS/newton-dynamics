@@ -534,7 +534,7 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgJointInfo* const jointInfo = &constraintArray[i];
-		dgFloat32 accel2 = world->CalculateJointForce____(jointInfo, bodyArray, internalForces, matrixRow);
+		dgFloat32 accel2 = world->CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, false);
 		accNorm += accel2;
 	}
 	syncData->m_accelNorm[threadID] = accNorm;
@@ -555,14 +555,41 @@ void dgWorldDynamicUpdate::CalculateBodiesForceParallelKernel(void* const contex
 	dgInt32* const bodyLocks = syncData->m_bodyLocks;
 
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	for (dgInt32 j = dgAtomicExchangeAndAdd(atomicIndex, 1); j < jointCount; j = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgJacobian forceAcc0;
 		dgJacobian forceAcc1;
-		const dgJointInfo* const jointInfo = &constraintArray[i];
-		world->CalculateResidual____(jointInfo, forceAcc0, forceAcc1, matrixRow);
-
+		const dgJointInfo* const jointInfo = &constraintArray[j];
+		const dgInt32 index = jointInfo->m_pairStart;
+		const dgInt32 count = jointInfo->m_pairCount;
 		const dgInt32 m0 = jointInfo->m_m0;
 		const dgInt32 m1 = jointInfo->m_m1;
+
+		forceAcc0.m_linear = dgVector::m_zero;
+		forceAcc0.m_angular = dgVector::m_zero;
+		forceAcc1.m_linear = dgVector::m_zero;
+		forceAcc1.m_angular = dgVector::m_zero;
+		for (dgInt32 i = 0; i < count; i++) {
+			const dgJacobianMatrixElement* const row = &matrixRow[index + i];
+			dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
+			dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
+			dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
+			dgAssert(row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32(0.0f));
+
+			dgAssert(dgCheckFloat(row->m_force));
+			dgVector val(row->m_force);
+			forceAcc0.m_linear += row->m_Jt.m_jacobianM0.m_linear * val;
+			forceAcc0.m_angular += row->m_Jt.m_jacobianM0.m_angular * val;
+			forceAcc1.m_linear += row->m_Jt.m_jacobianM1.m_linear * val;
+			forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
+		}
+
+		const dgVector scale0(jointInfo->m_scale0);
+		const dgVector scale1(jointInfo->m_scale1);
+		forceAcc0.m_linear = forceAcc0.m_linear * scale0;
+		forceAcc0.m_angular = forceAcc0.m_angular * scale0;
+		forceAcc1.m_linear = forceAcc1.m_linear * scale1;
+		forceAcc1.m_angular = forceAcc1.m_angular * scale1;
+
 		if (m0) {
 			dgScopeSpinLock lock(&bodyLocks[m0]);
 			internalForces[m0].m_linear += forceAcc0.m_linear;
@@ -680,7 +707,6 @@ void dgWorldDynamicUpdate::CalculateForcesParallel(dgParallelSolverSyncData* con
 
 	const dgInt32 passes = syncData->m_passes;
 	const dgInt32 maxPasses = syncData->m_maxPasses;
-	//	const dgInt32 batchCount = syncData->m_bachCount;
 	syncData->m_firstPassCoef = dgFloat32(0.0f);
 
 	const dgInt32 bodyCount = syncData->m_bodyCount;
