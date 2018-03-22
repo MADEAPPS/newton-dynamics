@@ -125,13 +125,13 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_clusterCount = m_clusters - index;
 
 	dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-	//useParallel = 1;
+//useParallel = 1;
 	if (useParallel) {
 		dgInt32 sum = m_joints;
 		useParallel = useParallel && m_joints && m_clusters;
 		useParallel = useParallel && ((threadCount * m_clusterMemory[0].m_jointCount) >= sum);
 		useParallel = useParallel && (m_clusterMemory[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
-		//useParallel = 1;
+//useParallel = 1;
 		while (useParallel) {
 			CalculateReactionForcesParallel(&m_clusterMemory[index], timestep);
 			index ++;
