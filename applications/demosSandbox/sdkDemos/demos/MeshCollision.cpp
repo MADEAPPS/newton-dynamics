@@ -37,6 +37,7 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.25f, 0.25f, 0.5f, 0.0f);
+size = size.Scale (2.0f);
 
 	int count = 6;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());

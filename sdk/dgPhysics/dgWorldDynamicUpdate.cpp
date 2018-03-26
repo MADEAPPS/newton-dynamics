@@ -33,7 +33,8 @@
 #include "dgCollisionDeformableMesh.h"
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(256)
+//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(256)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(128)
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
 
@@ -125,21 +126,23 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_clusterCount = m_clusters - index;
 
 	dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-useParallel = 1;
+useParallel = 0;
 	if (useParallel) {
-		dgInt32 sum = m_joints;
-		useParallel = useParallel && m_joints && m_clusters;
-		useParallel = useParallel && ((threadCount * m_clusterMemory[0].m_jointCount) >= sum);
-//		useParallel = useParallel && (m_clusterMemory[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
-//useParallel = 1;
-		while (useParallel) {
-			CalculateReactionForcesParallel(&m_clusterMemory[index], timestep);
-			index ++;
-			sum -= m_clusterMemory[index].m_jointCount;
-			useParallel = useParallel && (index < m_clusters);
-			useParallel = useParallel && ((threadCount * m_clusterMemory[index].m_jointCount) >= m_joints);
-			useParallel = useParallel && (m_clusterMemory[index].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
+#if 0
+		dgInt32 count = 0;
+		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF); i ++) {
+			count ++;
 		}
+		if (count) {
+			CalculateReactionForcesParallel(&m_clusterMemory[index], count, timestep);
+			index += count;
+		}
+#else
+		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
+			CalculateReactionForcesParallel(&m_clusterMemory[index], 1, timestep);
+			index ++;
+		}
+#endif
 	}
 
 	if (index < m_clusters) {
@@ -285,6 +288,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 
 						constraintArray[jointIndex].m_joint = constraint;
 						const dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
+						constraintArray[jointIndex].m_pairStart = dgInt16(0);
 						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
 						jointCount++;
 
@@ -865,8 +869,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 		BuildJacobianMatrix(bodyArray, jointInfo, internalForces, matrixRow, forceOrImpulseScale);
 	}
 }
-
-
 
 void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const
 {
