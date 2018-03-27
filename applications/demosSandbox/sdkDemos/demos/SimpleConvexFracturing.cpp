@@ -302,7 +302,9 @@ class DelaunayEffect: public FractureEffect
 		// apply a material map
 		int externalMaterial = LoadTexture("reljef.tga");
 		int internalMaterial = LoadTexture("concreteBrick.tga");
-		NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
+		dMatrix aligmentUV(dGetIdentityMatrix());
+
+		NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial, &aligmentUV[0][0]);
 
 		// create a newton mesh from the collision primitive
 		DelaunayEffect fracture(world, mesh, internalMaterial);
@@ -428,7 +430,9 @@ class VoronoidEffect: public FractureEffect
 		int externalMaterial = LoadTexture("reljef.tga");
 		//int internalMaterial = LoadTexture("KAMEN-stup.tga");
 		int internalMaterial = LoadTexture("concreteBrick.tga");
-		NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
+
+		dMatrix aligmentUV(dGetIdentityMatrix());
+		NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial, &aligmentUV[0][0]);
 
 		// create a newton mesh from the collision primitive
 		VoronoidEffect fracture(world, mesh, internalMaterial);

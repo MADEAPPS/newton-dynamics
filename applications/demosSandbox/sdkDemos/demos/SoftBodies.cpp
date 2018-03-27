@@ -380,7 +380,7 @@ dAssert (0);
 			}
 		}
 
-
+		dMatrix aligmentUV(dGetIdentityMatrix());
 		NewtonMeshVertexFormat vertexFormat;
 		NewtonMeshClearVertexFormat(&vertexFormat);
 
@@ -395,7 +395,7 @@ dAssert (0);
 		NewtonMeshBuildFromVertexListIndexList(clothPatch, &vertexFormat);
 
 		int material = LoadTexture("persianRug.tga");
-		NewtonMeshApplyBoxMapping(clothPatch, material, material, material);
+		NewtonMeshApplyBoxMapping(clothPatch, material, material, material, &aligmentUV[0][0]);
 
 		delete[] points;
 		delete[] faceIndexCount;
@@ -509,8 +509,9 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 			AddTetra (tetrahedra, 0, 1, 2, 3, tetra, 0);
 		NewtonMeshEndBuild(tetrahedra);
 
+		dMatrix aligmentUV(dGetIdentityMatrix());
 		int material = LoadTexture("smilli.tga");
-		NewtonMeshApplyBoxMapping (tetrahedra, material, material, material);
+		NewtonMeshApplyBoxMapping (tetrahedra, material, material, material, &aligmentUV[0][0]);
 		NewtonMeshCalculateVertexNormals (tetrahedra, 60.0f * dDegreeToRad);
 
 		// make a deformable collision mesh
@@ -539,8 +540,9 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 			BuildTetraSolidBlock(tetraCube, 2, 2, 15, 0.5f, 0.5f, 0.5f);
 		NewtonMeshEndBuild(tetraCube);
 
+		dMatrix aligmentUV(dGetIdentityMatrix());
 		int material = LoadTexture("smilli.tga");
-		NewtonMeshApplyBoxMapping(tetraCube, material, material, material);
+		NewtonMeshApplyBoxMapping(tetraCube, material, material, material, &aligmentUV[0][0]);
 		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * dDegreeToRad);
 
 		// make a deformable collision mesh
@@ -568,8 +570,9 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		dGetWorkingFileName ("box.tet", name);
 		NewtonMesh* const tetraCube = NewtonMeshLoadTetrahedraMesh(scene->GetNewton(), name);
 
+		dMatrix aligmentUV(dGetIdentityMatrix());
 		int material = LoadTexture("smilli.tga");
-		NewtonMeshApplyBoxMapping(tetraCube, material, material, material);
+		NewtonMeshApplyBoxMapping(tetraCube, material, material, material, &aligmentUV[0][0]);
 		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * dDegreeToRad);
 
 		// make a deformable collision mesh
@@ -599,8 +602,9 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		//NewtonCollision* const primitiveShape = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, materialID);
 		NewtonMesh* const skinMesh = NewtonMeshCreateFromCollision(primitiveShape);
 
+		dMatrix aligmentUV(dGetIdentityMatrix());
 		int material = LoadTexture("smilli.tga");
-		NewtonMeshApplySphericalMapping(skinMesh, material);
+		NewtonMeshApplySphericalMapping(skinMesh, material, &aligmentUV[0][0]);
 
 		// now now make an tetrahedra iso surface approximation of this mesh
 		NewtonMesh* const tetraIsoSurface = NewtonMeshCreateTetrahedraIsoSurface(skinMesh);

@@ -89,7 +89,9 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 	
 	// make a visual Mesh
 	int tex = LoadTexture(texture);
-	NewtonMeshApplyBoxMapping(mesh, tex, tex, tex);
+	dMatrix aligmentUV(dGetIdentityMatrix());
+
+	NewtonMeshApplyBoxMapping(mesh, tex, tex, tex, &aligmentUV[0][0]);
 	DemoMesh* const visualMesh = new DemoMesh (mesh);
 
 	dMatrix matrix (dGetIdentityMatrix());

@@ -47,7 +47,7 @@
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
-//#define DEFAULT_SCENE	16			// uniform Scaled Collision
+#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// continuous collision
@@ -66,7 +66,7 @@
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll
-#define DEFAULT_SCENE	35			// basic Car
+//#define DEFAULT_SCENE	35			// basic Car
 //#define DEFAULT_SCENE	36			// super Car
 //#define DEFAULT_SCENE	37			// heavy vehicles
 //#define DEFAULT_SCENE	38			// basic player controller

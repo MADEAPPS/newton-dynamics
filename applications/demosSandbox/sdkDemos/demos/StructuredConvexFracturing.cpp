@@ -237,6 +237,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
 
+	dMatrix aligmentUV (dGetIdentityMatrix());
 
 #if 0
 	// load the mesh asset
@@ -253,7 +254,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
 	NewtonDestroyCollision(collision);
 	//NewtonMeshTriangulate(solidMesh);
-	NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
+	NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial, &aligmentUV[0][0]);
 #endif
 
 

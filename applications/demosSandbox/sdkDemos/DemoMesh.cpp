@@ -344,6 +344,9 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	// apply the vertex normals
 	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);
 
+	dMatrix aligmentUV(dGetIdentityMatrix());
+	NewtonCollisionGetMatrix(collision, &aligmentUV[0][0]);
+
 	// apply uv projections
 	NewtonCollisionInfoRecord info;
 	NewtonCollisionGetInfo (collision, &info);
@@ -351,7 +354,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	{
 		case SERIALIZE_ID_SPHERE:
 		{
-			NewtonMeshApplySphericalMapping(mesh, LoadTexture (texture0));
+			NewtonMeshApplySphericalMapping(mesh, LoadTexture (texture0), &aligmentUV[0][0]);
 			break;
 		}
 
@@ -361,7 +364,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 		case SERIALIZE_ID_CHAMFERCYLINDER:
 		{
 			//NewtonMeshApplySphericalMapping(mesh, LoadTexture(texture0));
-			NewtonMeshApplyCylindricalMapping(mesh, LoadTexture(texture0), LoadTexture(texture1));
+			NewtonMeshApplyCylindricalMapping(mesh, LoadTexture(texture0), LoadTexture(texture1), &aligmentUV[0][0]);
 			break;
 		}
 
@@ -370,7 +373,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 			int tex0 = LoadTexture(texture0);
 			int tex1 = LoadTexture(texture1);
 			int tex2 = LoadTexture(texture2);
-			NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2);
+			NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
 			break;
 		}
 	}

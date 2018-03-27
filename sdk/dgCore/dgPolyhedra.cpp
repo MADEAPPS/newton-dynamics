@@ -424,7 +424,7 @@ dgBigVector dgPolyhedra::FaceNormal (const dgEdge* const face, const dgFloat64* 
 	dgBigVector p1 (&pool[edge->m_incidentVertex * stride]);
 	dgBigVector e1 (p1 - p0);
 
-	dgBigVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgBigVector normal (dgFloat32 (0.0f));
 	for (edge = edge->m_next; edge != face; edge = edge->m_next) {
 		dgBigVector p2 (&pool[edge->m_incidentVertex * stride]);
 		dgBigVector e2 (p2 - p0);

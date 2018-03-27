@@ -7806,32 +7806,36 @@ void NewtonMeshCalculateVertexNormals(const NewtonMesh* const mesh, dFloat angle
 	meshEffect->CalculateNormals (angleInRadians);
 }
 
-void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material, NewtonReportProgress reportPrograssCallback, void* const reportPrgressUserData)
+void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material, NewtonReportProgress reportPrograssCallback, void* const reportPrgressUserData, dFloat* const aligmentMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
+	dgMatrix matrix(aligmentMatrix);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
 	meshEffect->AngleBaseFlatteningMapping(material, (dgReportProgress) reportPrograssCallback, reportPrgressUserData);
 }
 
-void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material)
+void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material, dFloat* const aligmentMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
+	dgMatrix matrix(aligmentMatrix);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
 	meshEffect->SphericalMapping (material);
 }
 
-void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side, int top)
+void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side, int top, dFloat* const aligmentMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
+	dgMatrix matrix(aligmentMatrix);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
 	meshEffect->BoxMapping (front, side, top);
 }
 
-void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial)
+void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial, dFloat* const aligmentMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
+	dgMatrix matrix(aligmentMatrix);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-	meshEffect->CylindricalMapping (cylinderMaterial, capMaterial);
+	meshEffect->CylindricalMapping (cylinderMaterial, capMaterial, matrix);
 }
 
 void NewtonMeshTriangulate (const NewtonMesh* const mesh)

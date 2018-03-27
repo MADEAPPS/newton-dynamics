@@ -28,7 +28,8 @@ static NewtonMesh* MakeBox (DemoEntityManager* const scene, const dVector& size,
 	NewtonMesh* const boxMesh = NewtonMeshCreateFromCollision(box);
 
 	int texID = LoadTexture(texture);
-	NewtonMeshApplyBoxMapping(boxMesh, texID, texID, texID);
+	dMatrix aligmentUV(dGetIdentityMatrix());
+	NewtonMeshApplyBoxMapping(boxMesh, texID, texID, texID, &aligmentUV[0][0]);
 
 	// delete auxiliary collision shape
 	NewtonDestroyCollision(box);
