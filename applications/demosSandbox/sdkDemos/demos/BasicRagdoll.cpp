@@ -80,11 +80,11 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 
 };
 
-class CrashDummyManager: public dCustomArticulaledTransformManager
+class CrashDummyManager: public dCustomTransformManager
 {
 	public: 
 	CrashDummyManager (DemoEntityManager* const scene)
-		:dCustomArticulaledTransformManager (scene->GetNewton())
+		:dCustomTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
@@ -96,7 +96,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 	{
 	}
 
-	virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
 	}
 
@@ -104,8 +104,8 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 	{
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-		dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+		dCustomTransformController::dSkeletonBone* const bone0 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+		dCustomTransformController::dSkeletonBone* const bone1 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 
 //		dAssert(0);
 		dAssert (bone0);
@@ -273,7 +273,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		return NULL;
 	}
 
-	virtual void OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
@@ -282,7 +282,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
-	dCustomArticulatedTransformController* CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
+	dCustomTransformController* CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -292,7 +292,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		scene->Append(ragDollEntity);
 
 		// build the rag doll with rigid bodies connected by joints
-		dCustomArticulatedTransformController* const controller = CreateTransformController();
+		dCustomTransformController* const controller = CreateTransformController();
 
 		controller->SetCalculateLocalTransforms(true);
 
@@ -300,13 +300,13 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*)ragDollEntity->Find(definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
 
-		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
+		dCustomTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), bone0);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		dCustomArticulatedTransformController::dSkeletonBone* parentBones[32];
+		dCustomTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = bone0;
 			childEntities[stackIndex] = child;
@@ -317,7 +317,7 @@ class CrashDummyManager: public dCustomArticulaledTransformManager
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
-			dCustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+			dCustomTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < defintionCount; i++) {
@@ -383,10 +383,10 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dVector p(origin + dVector(0.0f, 0.0f, 0.0f, 0.0f));
 	matrix.m_posit = FindFloor(world, p, 100.0f);
 	matrix.m_posit.m_y += 2.0f;
-	dCustomArticulatedTransformController* const ragdoll = manager->CreateRagDoll(matrix, &ragDollModel, skeletonRagDoll, sizeof(skeletonRagDoll) / sizeof(skeletonRagDoll[0]));
+	dCustomTransformController* const ragdoll = manager->CreateRagDoll(matrix, &ragDollModel, skeletonRagDoll, sizeof(skeletonRagDoll) / sizeof(skeletonRagDoll[0]));
 
 	// attach this ragdoll to world with a fix joint
-	dCustomArticulatedTransformController::dSkeletonBone* const rootBone = ragdoll->GetRoot ();
+	dCustomTransformController::dSkeletonBone* const rootBone = ragdoll->GetRoot ();
 	dMatrix rootMatrix; 
 	NewtonBodyGetMatrix(rootBone->m_body, &rootMatrix[0][0]);
 	new dCustom6dof (rootMatrix, rootBone->m_body);

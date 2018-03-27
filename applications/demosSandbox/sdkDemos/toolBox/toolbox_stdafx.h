@@ -151,7 +151,7 @@ typedef long long unsigned64;
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
-#include <dCustomArcticulatedTransformManager.h>
+#include <dCustomTransformManager.h>
 
 #include <dCRC.h>
 #include <dHeap.h>

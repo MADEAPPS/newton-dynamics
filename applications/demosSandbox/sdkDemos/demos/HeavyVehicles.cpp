@@ -24,7 +24,7 @@
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		12.0f
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
 
-
+#if 0
 struct VehicleParameters
 {
 	dFloat m_vehicleMass;
@@ -1652,13 +1652,14 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 	DemoEntityManager::ButtonKey m_changeVehicle;
 	HeavyVehicleEntity* m_player;
 };
-
+#endif
 
 void MilitaryTransport (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
 
+#if 0
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
@@ -1743,5 +1744,6 @@ for (int i = 0; i < 5; i ++){
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 */
+#endif
 }
 

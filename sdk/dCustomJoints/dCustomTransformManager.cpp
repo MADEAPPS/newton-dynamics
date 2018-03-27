@@ -12,32 +12,32 @@
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomJoint.h"
-#include "dCustomArcticulatedTransformManager.h"
+#include "dCustomTransformManager.h"
 
 
-dCustomArticulaledTransformManager::dCustomArticulaledTransformManager(NewtonWorld* const world, const char* const name)
-	:dCustomControllerManager<dCustomArticulatedTransformController>(world, name)
+dCustomTransformManager::dCustomTransformManager(NewtonWorld* const world, const char* const name)
+	:dCustomControllerManager<dCustomTransformController>(world, name)
 {
 }
 
-dCustomArticulaledTransformManager::~dCustomArticulaledTransformManager()
+dCustomTransformManager::~dCustomTransformManager()
 {
 }
 
-dCustomArticulatedTransformController* dCustomArticulaledTransformManager::CreateTransformController ()
+dCustomTransformController* dCustomTransformManager::CreateTransformController ()
 {
-	dCustomArticulatedTransformController* const controller = (dCustomArticulatedTransformController*) CreateController();
+	dCustomTransformController* const controller = (dCustomTransformController*) CreateController();
 	controller->Init ();
 	return controller;
 }
 
 
-dCustomArticulatedTransformController::dCustomArticulatedTransformController()
+dCustomTransformController::dCustomTransformController()
 	:m_collisionAggregate(NULL)
 {
 }
 
-dCustomArticulatedTransformController::~dCustomArticulatedTransformController()
+dCustomTransformController::~dCustomTransformController()
 {
 	if (m_collisionAggregate) {
 		NewtonCollisionAggregateDestroy(m_collisionAggregate);
@@ -45,27 +45,27 @@ dCustomArticulatedTransformController::~dCustomArticulatedTransformController()
 }
 
 
-void dCustomArticulatedTransformController::Init ()
+void dCustomTransformController::Init ()
 {
-	dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
+	dCustomTransformManager* const manager = (dCustomTransformManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
 	m_calculateLocalTransform = false;
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 }
 
-void dCustomArticulatedTransformController::PreUpdate(dFloat timestep, int threadIndex)
+void dCustomTransformController::PreUpdate(dFloat timestep, int threadIndex)
 {
-	dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
+	dCustomTransformManager* const manager = (dCustomTransformManager*) GetManager();
 	manager->OnPreUpdate(this, timestep, threadIndex);
 }
 
-void dCustomArticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
+void dCustomTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_calculateLocalTransform && m_bones.GetCount()) {
 
 		dAssert(m_bones.GetCount() == 1);
-		dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*) GetManager();
+		dCustomTransformManager* const manager = (dCustomTransformManager*) GetManager();
 
 		dMatrix parentMatrixPool[128];
 		dList<dSkeletonBone>::dListNode* stackPool[128];
@@ -95,7 +95,7 @@ void dCustomArticulatedTransformController::PostUpdate(dFloat timestep, int thre
 	}
 }
 
-dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::AddBone (NewtonBody* const boneBody, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
+dCustomTransformController::dSkeletonBone* dCustomTransformController::AddBone (NewtonBody* const boneBody, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
 {
 	dSkeletonBone* const bone = parentBone ? &parentBone->Append()->GetInfo() : &m_bones.Append()->GetInfo();
 
@@ -110,18 +110,18 @@ dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransfor
 	return bone;
 }
 
-dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::AddRoot (NewtonBody* const boneBody, const dMatrix& bindMatrix)
+dCustomTransformController::dSkeletonBone* dCustomTransformController::AddRoot (NewtonBody* const boneBody, const dMatrix& bindMatrix)
 {
 	return AddBone (boneBody, bindMatrix, NULL);
 }
 
-dCustomArticulatedTransformController::dSkeletonBone* dCustomArticulatedTransformController::GetRoot () const
+dCustomTransformController::dSkeletonBone* dCustomTransformController::GetRoot () const
 {
 	return m_bones.GetCount() ? &m_bones.GetFirst()->GetInfo() : NULL;
 }
 
 
-dCustomJoint* dCustomArticulatedTransformController::dSkeletonBone::FindJoint() const
+dCustomJoint* dCustomTransformController::dSkeletonBone::FindJoint() const
 {
 	if (m_parent) {
 		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(m_body); joint; joint = NewtonBodyGetNextJoint(m_body, joint)) {

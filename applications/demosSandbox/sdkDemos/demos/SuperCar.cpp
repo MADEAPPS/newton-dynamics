@@ -37,6 +37,7 @@
 // 6th Gear 0.50:1 
 // Reverse 2.90:1 
 
+#if 0
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
@@ -1034,7 +1035,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 	void* m_engineSounds[16];
 };
 
-
+#endif
 
 // *************************************************************************************************
 // 
@@ -1045,7 +1046,7 @@ void SuperCar (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-
+#if 0
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
@@ -1145,5 +1146,6 @@ void SuperCar (DemoEntityManager* const scene)
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 */
+#endif
 }
 

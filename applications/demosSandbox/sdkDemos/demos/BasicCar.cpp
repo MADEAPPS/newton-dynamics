@@ -24,7 +24,7 @@
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 
-
+#if 0
 class BasicCarControllerManager: public dCustomVehicleControllerManager
 {
 	public:
@@ -262,12 +262,14 @@ class BasicCarControllerManager: public dCustomVehicleControllerManager
 	bool m_externalView;
 	dCustomVehicleController* m_player;
 };
+#endif
 
 void BasicCar (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
 
+#if 0
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
@@ -326,5 +328,6 @@ return;
 
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 */		
+#endif
 }
 
