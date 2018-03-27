@@ -146,12 +146,13 @@ typedef long long unsigned64;
 
 #include <dCustomInputManager.h>
 #include <dCustomTriggerManager.h>
+#include <dCustomTransformManager.h>
 #include <dCustomControllerManager.h>
 #include <dCustomKinematicController.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
-#include <dCustomTransformManager.h>
+
 
 #include <dCRC.h>
 #include <dHeap.h>
