@@ -7819,7 +7819,7 @@ void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material,
 	TRACE_FUNCTION(__FUNCTION__);	
 	dgMatrix matrix(aligmentMatrix);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-	meshEffect->SphericalMapping (material);
+	meshEffect->SphericalMapping (material, matrix);
 }
 
 void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side, int top, dFloat* const aligmentMatrix)

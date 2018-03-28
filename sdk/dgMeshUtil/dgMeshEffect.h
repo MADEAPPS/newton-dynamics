@@ -340,7 +340,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void CalculateAABB (dgBigVector& min, dgBigVector& max) const;
 
 	void CalculateNormals (dgFloat64 angleInRadians);
-	void SphericalMapping (dgInt32 material);
+	void SphericalMapping (dgInt32 material, const dgMatrix& uvAligment);
 	void BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top);
 	void UniformBoxMapping (dgInt32 material, const dgMatrix& textruMatrix);
 	void CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMaterial, const dgMatrix& uvAligment);

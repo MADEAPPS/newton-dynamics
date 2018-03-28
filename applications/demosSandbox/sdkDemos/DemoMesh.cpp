@@ -346,6 +346,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 
 	dMatrix aligmentUV(dGetIdentityMatrix());
 	NewtonCollisionGetMatrix(collision, &aligmentUV[0][0]);
+	aligmentUV = aligmentUV.Inverse();
 
 	// apply uv projections
 	NewtonCollisionInfoRecord info;
