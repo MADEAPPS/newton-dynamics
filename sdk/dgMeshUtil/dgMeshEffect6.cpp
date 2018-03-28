@@ -1692,34 +1692,6 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
     mark = IncLRU ();
     for(iter.Begin(); iter; iter ++){
         dgEdge* const edge = &(*iter);
-/*
-        if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-            const dgVector& p0 = m_points.m_vertex[edge->m_incidentVertex];
-            const dgVector& p1 = m_points.m_vertex[edge->m_next->m_incidentVertex];
-            const dgVector& p2 = m_points.m_vertex[edge->m_prev->m_incidentVertex];
-
-            edge->m_mark = mark;
-            edge->m_next->m_mark = mark;
-            edge->m_prev->m_mark = mark;
-
-            dgVector e0 (p1 - p0);
-            dgVector e1 (p2 - p0);
-            dgVector n (e0.CrossProduct3(e1));
-            if ((n.m_x * n.m_x) > (dgFloat32 (0.99f) * n.DotProduct3(n))) {
-                dgEdge* ptr = edge;
-                do {
-					dgAttibutFormat::dgUV uv;
-                    dgVector p (m_points.m_vertex[ptr->m_incidentVertex] - origin);
-                    uv.m_u = dgFloat32 ((p.m_y - pMin.m_y) * scale.m_y);
-                    uv.m_v = dgFloat32 ((p.m_z - pMin.m_z) * scale.m_z);
-					m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
-					m_attrib.m_materialChannel[dgInt32(ptr->m_userData)] = capMaterial;
-
-                    ptr = ptr->m_next;
-                }while (ptr !=  edge);
-            }
-        }
-*/
 		if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
 			dgVector p0(uvAligment.RotateVector(m_points.m_vertex[edge->m_incidentVertex] - origin));
 			dgVector p1(uvAligment.RotateVector(m_points.m_vertex[edge->m_next->m_incidentVertex] - origin));
