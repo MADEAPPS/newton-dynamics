@@ -124,15 +124,11 @@ class dgParallelSolverSyncData
 	dgFloat32 m_firstPassCoef;
 
 	dgInt32 m_passes;
-	dgInt32 m_bachIndex;
-	dgInt32 m_bachCount;
 	dgInt32 m_maxPasses;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_rowCount;
 	dgInt32 m_atomicIndex;
-//	dgInt32 m_lock0;
-//	dgInt32 m_lock1;
 	dgInt32 m_clusterCount;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
 
@@ -140,6 +136,7 @@ class dgParallelSolverSyncData
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointsArray;
 	dgBodyCluster* m_cluster;
+	dgFloat32* m_scheduledRelaxation;
 	const dgBodyCluster* m_clusterArray;
 
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];

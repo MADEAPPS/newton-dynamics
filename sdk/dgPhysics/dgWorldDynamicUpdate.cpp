@@ -34,7 +34,8 @@
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 //#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(256)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(128)
+//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(128)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(1)
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
 
@@ -127,6 +128,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
 useParallel = 0;
+//useParallel = 1;
 	if (useParallel) {
 #if 0
 		dgInt32 count = 0;
