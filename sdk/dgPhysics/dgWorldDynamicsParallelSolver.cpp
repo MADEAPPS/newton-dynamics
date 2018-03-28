@@ -385,7 +385,7 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
 	dgBodyInfo* const bodyArray = syncData->m_bodyArray;
 	dgJointInfo* const constraintArray = syncData->m_jointsArray;
-	dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
+	const dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
 	dgInt32* const bodyLocks = syncData->m_bodyLocks;
 	dgFloat32 forceImpulseScale = dgFloat32(1.0f);
 
@@ -585,6 +585,7 @@ void dgWorldDynamicUpdate::CalculateBodiesForceParallelKernel(void* const contex
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgJointInfo* const constraintArray = syncData->m_jointsArray;
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
+	const dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
 	const int jointCount = syncData->m_jointCount;
 	dgInt32* const bodyLocks = syncData->m_bodyLocks;
 
@@ -617,8 +618,8 @@ void dgWorldDynamicUpdate::CalculateBodiesForceParallelKernel(void* const contex
 			forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
 		}
 
-		const dgVector scale0(jointInfo->m_scale0);
-		const dgVector scale1(jointInfo->m_scale1);
+		const dgVector scale0(jointInfo->m_scale0 * scheduledRelaxation[m0]);
+		const dgVector scale1(jointInfo->m_scale1 * scheduledRelaxation[m1]);
 		forceAcc0.m_linear = forceAcc0.m_linear * scale0;
 		forceAcc0.m_angular = forceAcc0.m_angular * scale0;
 		forceAcc1.m_linear = forceAcc1.m_linear * scale1;
@@ -1046,10 +1047,9 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceParallel(const dgJointInfo* c
 			}
 		}
 
-		dgFloat32 sor = dgFloat32(0.75f);
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[index + i];
-			row->m_force += (x[i].GetScalar() - row->m_force) * sor;
+			row->m_force = x[i].GetScalar();
 			row->m_maxImpact = dgMax(dgAbs(row->m_force), row->m_maxImpact);
 		}
 	}
