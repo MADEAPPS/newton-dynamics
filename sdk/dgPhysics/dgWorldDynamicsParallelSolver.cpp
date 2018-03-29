@@ -956,7 +956,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceParallel(const dgJointInfo* c
 			}
 		}
 
-		const dgFloat32 weight = dgFloat32 (0.66f);
+		//const dgFloat32 weight = dgFloat32 (0.66f);
+		const dgFloat32 weight = dgFloat32(0.2f);
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[index + i];
 			row->m_force = row->m_force + (x[i].GetScalar() - row->m_force) * weight;
