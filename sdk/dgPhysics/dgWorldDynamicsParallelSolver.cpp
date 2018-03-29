@@ -126,7 +126,16 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	cluster.m_isContinueCollision = 0;
 	cluster.m_hasSoftBodies = 0;
 	syncData.m_cluster = &cluster;
-//	syncData.m_scheduledRelaxation = dgAlloca(dgFloat32, cluster.m_bodyCount);
+	syncData.m_scheduledRelaxation = dgAlloca(dgFloat32, cluster.m_bodyCount);
+	memset(syncData.m_scheduledRelaxation, 0, sizeof(dgFloat32) * cluster.m_bodyCount);
+
+	for (dgInt32 i = 0; i < jointsCount; i++) {
+		dgJointInfo* const jointInfo = &jointArray[i];
+		const dgInt32 m0 = jointInfo->m_m0;
+		const dgInt32 m1 = jointInfo->m_m1;
+		syncData.m_scheduledRelaxation[m0] += dgFloat32(1.0f);
+		syncData.m_scheduledRelaxation[m1] += dgFloat32(1.0f);
+	}
 
 	InitilizeBodyArrayParallel (&syncData);
 	BuildJacobianMatrixParallel (&syncData);
@@ -204,19 +213,15 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData
 {
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 threadCounts = world->GetThreadCount();	
-//	memset(syncData->m_scheduledRelaxation, 0, sizeof(dgFloat32) * syncData->m_bodyCount);
-
 	syncData->m_atomicIndex = 0;
 	for (dgInt32 i = 0; i < threadCounts; i ++) {
 		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, world);
 	}
 	world->SynchronizationBarrier();
 
-//	syncData->m_scheduledRelaxation[0] = dgFloat32(1.0f);
-//	for (dgInt32 i = 1; i < syncData->m_bodyCount; i++) {
-//		syncData->m_scheduledRelaxation[i] = dgFloat32(1.0f) / syncData->m_scheduledRelaxation[i];
-//		syncData->m_scheduledRelaxation[i] = dgFloat32(1.0f);
-//	}
+	for (dgInt32 i = 0; i < syncData->m_bodyCount; i++) {
+		syncData->m_scheduledRelaxation[i] = syncData->m_scheduledRelaxation[i] ? dgFloat32(1.0f) / syncData->m_scheduledRelaxation[i] : dgFloat32(1.0f);
+	}
 }
 
 
@@ -229,8 +234,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 	dgJointInfo* const constraintArray = syncData->m_jointsArray;
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
-//	dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
-//	dgInt32* const bodyLocks = syncData->m_bodyLocks;
+	dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
+	dgInt32* const bodyLocks = syncData->m_bodyLocks;
 	dgAssert (syncData->m_jointCount);
 
 	dgContraintDescritor constraintParams;
