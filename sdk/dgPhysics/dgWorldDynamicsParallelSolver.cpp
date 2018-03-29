@@ -213,6 +213,12 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData
 {
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 threadCounts = world->GetThreadCount();	
+	
+
+for (dgInt32 i = 0; i < syncData->m_bodyCount; i++) {
+	syncData->m_scheduledRelaxation[i] = dgFloat32(1.0f);
+}
+
 	syncData->m_atomicIndex = 0;
 	for (dgInt32 i = 0; i < threadCounts; i ++) {
 		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, world);
@@ -220,8 +226,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData
 	world->SynchronizationBarrier();
 
 	for (dgInt32 i = 0; i < syncData->m_bodyCount; i++) {
-//		syncData->m_scheduledRelaxation[i] = syncData->m_scheduledRelaxation[i] ? dgFloat32(1.0f) / syncData->m_scheduledRelaxation[i] : dgFloat32(1.0f);
-		syncData->m_scheduledRelaxation[i] = dgFloat32(1.0f);
+		syncData->m_scheduledRelaxation[i] = syncData->m_scheduledRelaxation[i] ? dgFloat32(1.0f) / syncData->m_scheduledRelaxation[i] : dgFloat32(1.0f);
 	}
 }
 
@@ -237,10 +242,18 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel(const dgBodyInfo* const b
 	const dgBody* const body1 = bodyInfoArray[m1].m_body;
 	const bool isBilateral = jointInfo->m_joint->IsBilateral();
 
-	const dgVector invMass0(body0->m_invMass[3]);
-	const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
-	const dgVector invMass1(body1->m_invMass[3]);
-	const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
+	const dgVector w0(scheduledRelaxation[m0]);
+	const dgVector w1(scheduledRelaxation[m1]);
+	const dgVector invMass0(body0->m_invMass[3] * scheduledRelaxation[m0]);
+	const dgVector invMass1(body1->m_invMass[3] * scheduledRelaxation[m1]);
+	dgMatrix invInertia0 (body0->m_invWorldInertiaMatrix);
+	dgMatrix invInertia1 (body1->m_invWorldInertiaMatrix);
+	invInertia0.m_front *= w0;
+	invInertia0.m_up *= w0;
+	invInertia0.m_right *= w0;
+	invInertia1.m_front *= w1;
+	invInertia1.m_up *= w1;
+	invInertia1.m_right *= w1;
 
 	dgVector force0(dgVector::m_zero);
 	dgVector torque0(dgVector::m_zero);
