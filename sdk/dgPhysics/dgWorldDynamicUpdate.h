@@ -136,7 +136,7 @@ class dgParallelSolverSyncData
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointsArray;
 	dgBodyCluster* m_cluster;
-	dgFloat32* m_scheduledRelaxation;
+//	dgFloat32* m_scheduledRelaxation;
 	const dgBodyCluster* m_clusterArray;
 
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];

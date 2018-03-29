@@ -198,6 +198,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_showCollidingFaces;
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
+	bool m_solveLargeIslandInParallel;
 
 	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;

@@ -126,7 +126,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	cluster.m_isContinueCollision = 0;
 	cluster.m_hasSoftBodies = 0;
 	syncData.m_cluster = &cluster;
-	syncData.m_scheduledRelaxation = dgAlloca(dgFloat32, cluster.m_bodyCount);
+//	syncData.m_scheduledRelaxation = dgAlloca(dgFloat32, cluster.m_bodyCount);
 
 	InitilizeBodyArrayParallel (&syncData);
 	BuildJacobianMatrixParallel (&syncData);
@@ -204,8 +204,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData
 {
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 threadCounts = world->GetThreadCount();	
-
-	memset(syncData->m_scheduledRelaxation, 0, sizeof(dgFloat32) * syncData->m_bodyCount);
+//	memset(syncData->m_scheduledRelaxation, 0, sizeof(dgFloat32) * syncData->m_bodyCount);
 
 	syncData->m_atomicIndex = 0;
 	for (dgInt32 i = 0; i < threadCounts; i ++) {
@@ -213,11 +212,11 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData
 	}
 	world->SynchronizationBarrier();
 
-	syncData->m_scheduledRelaxation[0] = dgFloat32(1.0f);
-	for (dgInt32 i = 1; i < syncData->m_bodyCount; i++) {
+//	syncData->m_scheduledRelaxation[0] = dgFloat32(1.0f);
+//	for (dgInt32 i = 1; i < syncData->m_bodyCount; i++) {
 //		syncData->m_scheduledRelaxation[i] = dgFloat32(1.0f) / syncData->m_scheduledRelaxation[i];
-		syncData->m_scheduledRelaxation[i] = dgFloat32(1.0f);
-	}
+//		syncData->m_scheduledRelaxation[i] = dgFloat32(1.0f);
+//	}
 }
 
 
@@ -230,8 +229,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 	dgJointInfo* const constraintArray = syncData->m_jointsArray;
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
-	dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
-	dgInt32* const bodyLocks = syncData->m_bodyLocks;
+//	dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
+//	dgInt32* const bodyLocks = syncData->m_bodyLocks;
 	dgAssert (syncData->m_jointCount);
 
 	dgContraintDescritor constraintParams;
@@ -253,7 +252,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 		dgAssert (jointInfo->m_m1 >= 0);
 		dgAssert (jointInfo->m_m0 != jointInfo->m_m1);
 		world->BuildJacobianMatrix (bodyArray, jointInfo, internalForces, matrixRow, forceOrImpulseScale);
-
+/*
 		const dgInt32 m0 = jointInfo->m_m0;
 		const dgInt32 m1 = jointInfo->m_m1;
 		if (m0) {
@@ -264,6 +263,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 			dgScopeSpinLock lock(&bodyLocks[m0]);
 			scheduledRelaxation[m1] += dgFloat32(1.0f);
 		}
+*/
 	}
 }
 
@@ -290,7 +290,7 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
 	dgBodyInfo* const bodyArray = syncData->m_bodyArray;
 	dgJointInfo* const constraintArray = syncData->m_jointsArray;
-	const dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
+//	const dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
 	dgInt32* const bodyLocks = syncData->m_bodyLocks;
 	dgFloat32 forceImpulseScale = dgFloat32(1.0f);
 
@@ -339,8 +339,10 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 
 		dgJacobian forceAcc0;
 		dgJacobian forceAcc1;
-		const dgVector scale0(jointInfo->m_scale0 * scheduledRelaxation[m0]);
-		const dgVector scale1(jointInfo->m_scale1 * scheduledRelaxation[m1]);
+		//const dgVector scale0(jointInfo->m_scale0 * scheduledRelaxation[m0]);
+		//const dgVector scale1(jointInfo->m_scale1 * scheduledRelaxation[m1]);
+		const dgVector scale0(jointInfo->m_scale0);
+		const dgVector scale1(jointInfo->m_scale1);
 		forceAcc0.m_linear = dgVector::m_zero;
 		forceAcc0.m_angular = dgVector::m_zero;
 		forceAcc1.m_linear = dgVector::m_zero;
@@ -490,7 +492,7 @@ void dgWorldDynamicUpdate::CalculateBodiesForceParallelKernel(void* const contex
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgJointInfo* const constraintArray = syncData->m_jointsArray;
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
-	const dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
+//	const dgFloat32* const scheduledRelaxation = syncData->m_scheduledRelaxation;
 	const int jointCount = syncData->m_jointCount;
 	dgInt32* const bodyLocks = syncData->m_bodyLocks;
 
@@ -523,8 +525,10 @@ void dgWorldDynamicUpdate::CalculateBodiesForceParallelKernel(void* const contex
 			forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
 		}
 
-		const dgVector scale0(jointInfo->m_scale0 * scheduledRelaxation[m0]);
-		const dgVector scale1(jointInfo->m_scale1 * scheduledRelaxation[m1]);
+		//const dgVector scale0(jointInfo->m_scale0 * scheduledRelaxation[m0]);
+		//const dgVector scale1(jointInfo->m_scale1 * scheduledRelaxation[m1]);
+		const dgVector scale0(jointInfo->m_scale0);
+		const dgVector scale1(jointInfo->m_scale1);
 		forceAcc0.m_linear = forceAcc0.m_linear * scale0;
 		forceAcc0.m_angular = forceAcc0.m_angular * scale0;
 		forceAcc1.m_linear = forceAcc1.m_linear * scale1;
@@ -952,10 +956,10 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceParallel(const dgJointInfo* c
 			}
 		}
 
+		const dgFloat32 weight = dgFloat32 (0.66f);
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[index + i];
-//			row->m_force = x[i].GetScalar();
-			row->m_force = row->m_force + (x[i].GetScalar() - row->m_force) * dgFloat32 (0.5f);
+			row->m_force = row->m_force + (x[i].GetScalar() - row->m_force) * weight;
 			row->m_maxImpact = dgMax(dgAbs(row->m_force), row->m_maxImpact);
 		}
 	}

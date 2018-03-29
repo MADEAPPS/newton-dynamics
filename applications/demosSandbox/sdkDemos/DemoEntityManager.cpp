@@ -39,8 +39,8 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-#define DEFAULT_SCENE	8			// Box stacks
-//#define DEFAULT_SCENE	9			// simple level mesh collision
+//#define DEFAULT_SCENE	8			// Box stacks
+#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
@@ -235,6 +235,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
+	,m_solveLargeIslandInParallel(false)
 {
 //	m_showUI = true;
 //	m_showAABB = false;
@@ -249,6 +250,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
+//  m_solveSingleIslandInParallel(false)
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 
@@ -598,7 +600,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	}
 
 	NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
-	//NewtonSetMultiThreadSolverOnSingleIsland (m_scene->m_world, m_useParallelSolver ? 1 : 0);	
+	NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
 }
 
 void DemoEntityManager::ShowMainMenuBar()
@@ -660,10 +662,11 @@ void DemoEntityManager::ShowMainMenuBar()
 			m_updateMenuOptions = true;
 			m_suspendPhysicsUpdate = true;
 
-			ImGui::Checkbox("Auto Sleep Mode", &m_autoSleepMode);
-			ImGui::Checkbox("Show UI", &m_showUI);
-			ImGui::Checkbox("Show stats", &m_showStats);
+			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
+			ImGui::Checkbox("show UI", &m_showUI);
+			ImGui::Checkbox("show stats", &m_showStats);
 			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
+			ImGui::Checkbox("solve large island in parallel", &m_solveLargeIslandInParallel);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
@@ -1086,7 +1089,6 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 {
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
-
 
 void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
