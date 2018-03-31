@@ -85,10 +85,10 @@ class dgThreadHive
 
 	void SetMatertThread (dgThread* const mastertThread);
 
-	void GlobalLock(bool yield) const;
+	void GlobalLock() const;
 	void GlobalUnlock() const;
 
-	void GetIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock, bool yield) const;
+	void GetIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock) const;
 	void ReleaseIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock) const;
 
 	dgInt32 GetThreadCount() const;
@@ -113,9 +113,9 @@ class dgThreadHive
 };
 
 
-DG_INLINE void dgThreadHive::GlobalLock(bool yield) const
+DG_INLINE void dgThreadHive::GlobalLock() const
 {
-	GetIndirectLock(&m_globalCriticalSection, yield);
+	GetIndirectLock(&m_globalCriticalSection);
 }
 
 DG_INLINE void dgThreadHive::GlobalUnlock() const
@@ -124,10 +124,10 @@ DG_INLINE void dgThreadHive::GlobalUnlock() const
 }
 
 
-DG_INLINE void dgThreadHive::GetIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock, bool yield) const
+DG_INLINE void dgThreadHive::GetIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock) const
 {
 	if (m_beesCount) {	
-		criticalSectionLock->Lock(yield);
+		criticalSectionLock->Lock();
 	}
 }
 
@@ -141,11 +141,11 @@ DG_INLINE void dgThreadHive::ReleaseIndirectLock (dgThread::dgCriticalSection* c
 class dgThreadHiveScopeLock
 {
 	public:
-	dgThreadHiveScopeLock(const dgThreadHive* const me, dgThread::dgCriticalSection* const criticalSectionLock, bool yield)
+	dgThreadHiveScopeLock(const dgThreadHive* const me, dgThread::dgCriticalSection* const criticalSectionLock)
 		:m_me(me)
 		,m_lock (criticalSectionLock)
 	{
-		me->GetIndirectLock (criticalSectionLock, yield);
+		me->GetIndirectLock (criticalSectionLock);
 	}
 
 	~dgThreadHiveScopeLock()

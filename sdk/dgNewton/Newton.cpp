@@ -379,7 +379,7 @@ void NewtonWorldCriticalSectionLock (const NewtonWorld* const newtonWorld, int t
 	TRACE_FUNCTION(__FUNCTION__);
 
 	Newton* const world = (Newton *)newtonWorld;
-	world->GlobalLock(true);
+	world->GlobalLock();
 }
 
 
@@ -5430,7 +5430,7 @@ void NewtonContactJointRemoveContact(const NewtonJoint* const contactJoint, void
 		//dgBody* const body = joint->GetBody0() ? joint->GetBody0() : joint->GetBody1();
 		//dgWorld* const world = body->GetWorld();
 		dgWorld* const world = joint->GetBody0()->GetWorld();
-		world->GlobalLock(false);
+		world->GlobalLock();
 		joint->Remove(node);
 		joint->GetBody0()->SetSleepState(false);
 		joint->GetBody1()->SetSleepState(false);

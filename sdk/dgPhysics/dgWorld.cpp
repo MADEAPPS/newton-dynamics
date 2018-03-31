@@ -1189,7 +1189,7 @@ void dgWorld::DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics)
 
 void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 {
-	dgSpinLock (&m_lock, true);
+	dgSpinLock (&m_lock);
 
 	dgWorld& me = *((dgWorld*)this);
 	if (me.m_delayDelateLock) {
@@ -1205,7 +1205,7 @@ void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 
 void dgDeadJoints::DestroyJoints(dgWorld& world)
 {
-	dgSpinLock (&m_lock, true);
+	dgSpinLock (&m_lock);
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter++) {
 		dgTreeNode* const node = iter.GetNode();
@@ -1220,7 +1220,7 @@ void dgDeadJoints::DestroyJoints(dgWorld& world)
 void dgDeadBodies::DestroyBody(dgBody* const body)
 {
 	dgAssert (0);
-	dgSpinLock (&m_lock, true);
+	dgSpinLock (&m_lock);
 
 	dgWorld& me = *((dgWorld*)this);
 	if (me.m_delayDelateLock) {
@@ -1235,7 +1235,7 @@ void dgDeadBodies::DestroyBody(dgBody* const body)
 
 void dgDeadBodies::DestroyBodies(dgWorld& world)
 {
-	dgSpinLock (&m_lock, true);
+	dgSpinLock (&m_lock);
 
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter++) {

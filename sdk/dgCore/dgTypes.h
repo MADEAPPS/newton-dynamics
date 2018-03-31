@@ -841,7 +841,7 @@ DG_INLINE void dgThreadYield()
 	#endif
 }
 
-void dgSpinLock (dgInt32* const ptr, bool yield);
+void dgSpinLock (dgInt32* const ptr);
 
 DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 {
@@ -857,7 +857,7 @@ class dgScopeSpinLock
 		dgScopeSpinLock(dgInt32* const lock)
 		:m_atomicLock(lock)
 	{
-		dgSpinLock(m_atomicLock, false);
+		dgSpinLock(m_atomicLock);
 	}
 	~dgScopeSpinLock()
 	{

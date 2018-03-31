@@ -471,7 +471,7 @@ void dgSkeletonContainer::AddSelfCollisionJoint(dgContact* const contact)
 {
 //	joint->m_isInSkeleton = true;
 #if 1
-	m_world->GlobalLock(false);
+	m_world->GlobalLock();
 	m_loopingJoints[m_loopCount + m_selfContactCount] = contact;
 	m_selfContactCount++;
 	m_world->GlobalUnlock();

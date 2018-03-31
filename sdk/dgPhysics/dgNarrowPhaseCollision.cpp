@@ -846,7 +846,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			nodes[index] = nodes[count];
 			cachePosition[index] = cachePosition[count];
 		} else {
-			GlobalLock(false);
+			GlobalLock();
 			contactNode = list.Append ();
 			GlobalUnlock();
 		}
@@ -942,7 +942,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	}
 
 	if (count) {
-		GlobalLock(false);
+		GlobalLock();
 		for (dgInt32 i = 0; i < count; i ++) {
 			list.Remove(nodes[i]);
 		}

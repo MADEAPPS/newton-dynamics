@@ -545,13 +545,13 @@ dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userDat
 }
 
 
-void dgSpinLock (dgInt32* const ptr, bool yield)
+void dgSpinLock (dgInt32* const ptr)
 {
 	#ifndef DG_USE_THREAD_EMULATION 
-	do {
-		_mm_pause();
-	} while (dgInterlockedExchange(ptr, 1));
-
+	while (dgInterlockedExchange(ptr, 1)) {
+		dgThreadYield();
+		//_mm_pause();
+	}
 	#endif
 }
 

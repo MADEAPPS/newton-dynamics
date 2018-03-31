@@ -35,7 +35,7 @@ class dgThread
 		public:
 		dgCriticalSection();
 		~dgCriticalSection();
-		void Lock(bool yield);
+		void Lock();
 		void Unlock();
 
 		private:
@@ -98,10 +98,10 @@ DG_INLINE dgThread::dgCriticalSection::~dgCriticalSection()
 
 
 
-DG_INLINE void dgThread::dgCriticalSection::Lock(bool yield)
+DG_INLINE void dgThread::dgCriticalSection::Lock()
 {
 	#ifndef DG_USE_THREAD_EMULATION 
-		dgSpinLock (&m_lock, yield);
+		dgSpinLock (&m_lock);
 	#endif
 }
 
