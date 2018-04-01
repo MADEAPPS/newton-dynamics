@@ -104,15 +104,13 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	syncData.m_invTimestepRK = syncData.m_invTimestep * dgFloat32 (maxPasses);
 	syncData.m_maxPasses = maxPasses;
 	syncData.m_passes = world->m_solverMode;
-syncData.m_passes = 8;
+syncData.m_passes = 16;
 
 	syncData.m_bodyCount = bodyIndex;
 	syncData.m_jointCount = jointsCount;
 	syncData.m_bodyArray = bodyArray;
 	syncData.m_jointsArray = jointArray;
 	syncData.m_atomicIndex = 0;
-
-dgSwap (jointArray[0], jointArray[1]);
 
 	syncData.m_clusterCount = clustersCount;
 	syncData.m_clusterArray = clusterArray;
