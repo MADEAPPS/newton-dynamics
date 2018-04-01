@@ -127,13 +127,12 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_clusterCount = m_clusters - index;
 
 	dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-useParallel = 0;
+//useParallel = 0;
 //useParallel = 1;
-
-static int xxx = 100;
-xxx--;
-if (xxx <= 0)
-useParallel = 1;
+//static int xxx = 100;
+//xxx--;
+//if (xxx <= 0)
+//useParallel = 1;
 
 	if (useParallel) {
 #if 1

@@ -136,8 +136,7 @@ class dgParallelSolverSyncData
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointsArray;
 	dgBodyCluster* m_cluster;
-	dgJacobian* m_weightedForces;
-	dgFloat32* m_scheduledRelaxation;
+	dgFloat32* m_weight;
 	const dgBodyCluster* m_clusterArray;
 
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
@@ -250,7 +249,6 @@ class dgWorldDynamicUpdate
 	static void IntegrateInslandParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void InitializeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void BuildJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void SolverInitInternalForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void CalculateJointsForceParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void CalculateJointsAccelParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void CalculateJointsVelocParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
@@ -263,9 +261,8 @@ class dgWorldDynamicUpdate
 	void IntegrateClusterParallel(dgParallelSolverSyncData* const syncData) const; 
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const; 
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
-	//void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesParallel (dgParallelSolverSyncData* const syncData) const; 
-	void BuildJacobianMatrixParallel(const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgInt32* const bodyLocks, const dgFloat32* const scheduledRelaxation) const;
+	void BuildJacobianMatrixParallel(const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgInt32* const bodyLocks, const dgFloat32* const weight, const dgFloat32* const invWeight) const;
 
 	void CalculateReactionForcesParallel (const dgBodyCluster* const clusters, dgInt32 clustersCount, dgFloat32 timestep) const;
 	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
@@ -279,7 +276,7 @@ class dgWorldDynamicUpdate
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	dgFloat32 CalculateJointForce_1_50(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	dgFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	dgFloat32 CalculateJointForceParallel(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgJacobian* const weightedForces, dgInt32* const bodyLocks) const;
+	dgFloat32 CalculateJointForceParallel(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 
 	void SortClustersByCount ();
 	void IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
