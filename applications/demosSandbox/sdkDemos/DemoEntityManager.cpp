@@ -590,7 +590,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	NewtonWaitForUpdateToFinish(m_world);
 
 	// clean up all caches the engine have saved
-	NewtonInvalidateCache(m_world);
+	//NewtonInvalidateCache(m_world);
 	NewtonSetSolverModel(m_world, m_solverPasses);
 	NewtonSetThreadsCount(m_world, m_workerThreades);
 
