@@ -124,7 +124,7 @@ class dgParallelSolverSyncData
 	dgFloat32 m_firstPassCoef;
 
 	dgInt32 m_passes;
-	dgInt32 m_maxPasses;
+	dgInt32 m_rkSubSteps;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_rowCount;

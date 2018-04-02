@@ -96,13 +96,13 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	internalForces[0].m_linear = dgVector::m_zero;
 	internalForces[0].m_angular = dgVector::m_zero;
 
-	const dgInt32 maxPasses = 4;
+	const dgInt32 rkSubSteps = 4;
 	syncData.m_timestep = timestep;
 	syncData.m_invTimestep = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestep : dgFloat32 (0.0f);
-	syncData.m_invStepRK = (dgFloat32 (1.0f) / dgFloat32 (maxPasses));
+	syncData.m_invStepRK = (dgFloat32 (1.0f) / dgFloat32 (rkSubSteps));
 	syncData.m_timestepRK = syncData.m_timestep * syncData.m_invStepRK;
-	syncData.m_invTimestepRK = syncData.m_invTimestep * dgFloat32 (maxPasses);
-	syncData.m_maxPasses = maxPasses;
+	syncData.m_invTimestepRK = syncData.m_invTimestep * dgFloat32 (rkSubSteps);
+	syncData.m_rkSubSteps = rkSubSteps;
 	syncData.m_passes = world->m_solverMode;
 syncData.m_passes = 16;
 
@@ -599,13 +599,13 @@ void dgWorldDynamicUpdate::CalculateForcesParallel(dgParallelSolverSyncData* con
 	const dgInt32 threadCounts = world->GetThreadCount();
 
 	const dgInt32 passes = syncData->m_passes;
-	const dgInt32 maxPasses = syncData->m_maxPasses;
+	const dgInt32 rkSubSteps = syncData->m_rkSubSteps;
 	syncData->m_firstPassCoef = dgFloat32(0.0f);
 
 	const dgInt32 bodyCount = syncData->m_bodyCount;
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 
-	for (dgInt32 step = 0; step < maxPasses; step++) {
+	for (dgInt32 step = 0; step < rkSubSteps; step++) {
 
 		syncData->m_atomicIndex = 0;
 		for (dgInt32 i = 0; i < threadCounts; i++) {
