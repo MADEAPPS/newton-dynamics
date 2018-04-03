@@ -16,9 +16,6 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 
-#define FRICTION_VAR_NAME "friction"
-static dCRCTYPE frictionCRC (dCRC64 (FRICTION_VAR_NAME));
-
 
 static int UserOnAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 {
@@ -45,8 +42,9 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 
 	//now core 300 can have per collision user data 		
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
-	void* userData = NewtonCollisionGetUserData (collision);
-	dFloat frictionValue = *((dFloat*)&userData);
+	//void* userData = NewtonCollisionGetUserData (collision);
+	//dFloat frictionValue = *((dFloat*)&userData);
+	dFloat frictionValue = dFloat(NewtonCollisionGetUserID(collision)) * 1.0e-3f;
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 		NewtonMaterialSetContactFrictionCoef (material, frictionValue + 0.1f, frictionValue, 0);
@@ -89,12 +87,9 @@ void Friction (DemoEntityManager* const scene)
 
 			// use the collision user data to save the coefficient of friction 
 			dFloat coefficientOfFriction = dFloat (index) * 0.03f; 
-			NewtonCollisionSetUserData (collision, *((void**)&coefficientOfFriction));
+			//NewtonCollisionSetUserData (collision, *((void**)&coefficientOfFriction));
+			NewtonCollisionSetUserID(collision, int(coefficientOfFriction * 1000.0f));
 
-//			DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData (body);
-//			dVariable* const friction = entity->CreateVariable (FRICTION_VAR_NAME);
-//			dAssert (friction);
-//			friction->SetValue(dFloat (index) * 0.03f);
 			index ++;
 		}
 	}
