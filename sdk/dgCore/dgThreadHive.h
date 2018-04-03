@@ -88,8 +88,6 @@ class dgThreadHive
 	void GlobalLock() const;
 	void GlobalUnlock() const;
 
-//	void GetIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock) const;
-//	void ReleaseIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock) const;
 	void GetIndirectLock (dgInt32* const criticalSectionLock) const;
 	void ReleaseIndirectLock (dgInt32* const criticalSectionLock) const;
 
