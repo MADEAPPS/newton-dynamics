@@ -49,7 +49,6 @@
 #include "dgPathFinder.h"
 #include "dgRefCounter.h"
 #include "dgQuaternion.h"
-#include "dgAsyncThread.h"
 #include "dgMutexThread.h"
 #include "dgConvexHull3d.h"
 #include "dgConvexHull4d.h"

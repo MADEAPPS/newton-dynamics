@@ -1950,7 +1950,7 @@ class dgBigVector
 	DG_INLINE dgBigVector TestZero() const
 	{
 //		return dgBigVector(_mm_cmpeq_epi64(m_typeIntLow, m_zero.m_typeIntLow), _mm_cmpeq_epi64(m_typeIntHigh, m_zero.m_typeIntHigh)) & m_negOne;
-		return m_negOne | (*this == m_zero);
+		return m_negOne & (*this == m_zero);
 	}
 
 	DG_INLINE static void Transpose4x4(dgBigVector& dst0, dgBigVector& dst1, dgBigVector& dst2, dgBigVector& dst3,

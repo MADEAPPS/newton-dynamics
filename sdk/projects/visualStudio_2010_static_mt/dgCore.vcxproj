@@ -37,7 +37,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\dgCore\dg.cpp" />
     <ClCompile Include="..\..\dgCore\dgAABBPolygonSoup.cpp" />
-    <ClCompile Include="..\..\dgCore\dgAsyncThread.cpp" />
     <ClCompile Include="..\..\dgCore\dgConvexHull3d.cpp" />
     <ClCompile Include="..\..\dgCore\dgConvexHull4d.cpp" />
     <ClCompile Include="..\..\dgCore\dgCRC.cpp" />
@@ -78,7 +77,6 @@
     <ClInclude Include="..\..\dgCore\dg.h" />
     <ClInclude Include="..\..\dgCore\dgAABBPolygonSoup.h" />
     <ClInclude Include="..\..\dgCore\dgArray.h" />
-    <ClInclude Include="..\..\dgCore\dgAsyncThread.h" />
     <ClInclude Include="..\..\dgCore\dgConvexHull3d.h" />
     <ClInclude Include="..\..\dgCore\dgConvexHull4d.h" />
     <ClInclude Include="..\..\dgCore\dgCRC.h" />

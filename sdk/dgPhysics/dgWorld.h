@@ -162,7 +162,6 @@ class dgWorld
 	,public dgActiveContacts 
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
-	,public dgAsyncThread
 	,public dgWorldThreadPool
 	,public dgDeadBodies
 	,public dgDeadJoints
@@ -174,10 +173,6 @@ class dgWorld
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
 	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listener);
 	typedef void (dgApi *OnListenerDebugCallback) (const dgWorld* const world, void* const listener, void* const debugContext);
-
-//	typedef void (dgApi *OnSerialize) (void* const userData, dgSerialize funt, void* const serilalizeObject);
-//	typedef void (dgApi *OnDeserialize) (void* const userData, dgDeserialize funt, void* const serilalizeObject);
-
 	typedef void (dgApi *OnBodySerialize) (dgBody& me, void* const userData, dgSerialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnBodyDeserialize) (dgBody& me, void* const userData, dgDeserialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
@@ -240,7 +235,6 @@ class dgWorld
 
 	dgWorld(dgMemoryAllocator* const allocator);
 	~dgWorld();
-
 
 	dgFloat32 GetUpdateTime() const;
 	dgBroadPhase* GetBroadPhase() const;
@@ -556,12 +550,15 @@ class dgWorld
 	void* m_userData;
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_hardwaredIndex;
+
+	dgSemaphore m_mutex;
 	OnClusterUpdate m_clusterUpdate;
 	OnGetTimeInMicrosenconds m_getDebugTime;
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
 	OnJointSerializationCallback m_serializedJointCallback;	
 	OnJointDeserializationCallback m_deserializedJointCallback;	
+	dgPostUpdateCallback m_postUpdateCallback;
 
 	dgListenerList m_listeners;
 	dgTree<void*, unsigned> m_perInstanceData;
@@ -570,9 +567,8 @@ class dgWorld
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
 	dgArray<dgUnsigned8> m_clusterMemory;
-	dgStack m_stack;
-
-	dgPostUpdateCallback m_postUpdateCallback;
+	
+	bool m_concurrentUpdate;
 	
 	friend class dgBody;
 	friend class dgContact;

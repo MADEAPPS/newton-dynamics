@@ -101,7 +101,7 @@ dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
 	:m_beesCount(0)
 	,m_currentIdleBee(0)
 	,m_workerBees(NULL)
-	,m_myMasterThread(NULL)
+	,m_parentThread(NULL)
 	,m_allocator(allocator)
 	,m_jobsCriticalSection()
 	,m_globalCriticalSection()
@@ -114,9 +114,9 @@ dgThreadHive::~dgThreadHive()
 	DestroyThreads();
 }
 
-void dgThreadHive::SetMatertThread (dgThread* const mastertThread)
+void dgThreadHive::SetParentThread (dgThread* const parentThread)
 {
-	m_myMasterThread = mastertThread;
+	m_parentThread = parentThread;
 }
 
 void dgThreadHive::DestroyThreads()
@@ -193,7 +193,7 @@ void dgThreadHive::SynchronizationBarrier ()
 			m_workerBees[i].m_myMutex.Release();
 		}
 
-		m_myMasterThread->SuspendExecution(m_beesCount, m_myMutex);
+		m_parentThread->SuspendExecution(m_beesCount, m_myMutex);
 		dgAssert (m_jobsPool.IsEmpty());
 	}
 }

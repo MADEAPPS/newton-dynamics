@@ -1541,47 +1541,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
-
-#if 0
-	static dgInt32 xxx;
-	xxx ++;
-	for (dgBodyMasterList::dgListNode* node = masterList->GetLast(); node; node = node->GetPrev()) {
-		dgDynamicBody* const body = (dgDynamicBody*)node->GetInfo().GetBody();
-		if ((body->GetType() == dgBody::m_dynamicBody) && (body->GetInvMass().m_w > dgFloat32 (0.0f))) {
-			#if 0
-				static FILE* file = fopen("replay.bin", "wb");
-				if (file) {
-					dgInt32 sleepState = body->GetSleepState();
-					fwrite(&body->m_accel, sizeof (dgVector), 1, file);
-					fwrite(&body->m_alpha, sizeof (dgVector), 1, file);
-					fwrite(&body->m_veloc, sizeof (dgVector), 1, file);
-					fwrite(&body->m_omega, sizeof (dgVector), 1, file);
-					fwrite(&body->m_externalForce, sizeof (dgVector), 1, file);
-					fwrite(&body->m_externalTorque, sizeof (dgVector), 1, file);
-					fwrite(&sleepState, sizeof (dgInt32), 1, file);
-					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
-					fflush(file);
-				}
-			#else 
-				static FILE* file = fopen("replay.bin", "rb");
-				if (file) {
-					fread(&body->m_accel, sizeof (dgVector), 1, file);
-					fread(&body->m_alpha, sizeof (dgVector), 1, file);
-					fread(&body->m_veloc, sizeof (dgVector), 1, file);
-					fread(&body->m_omega, sizeof (dgVector), 1, file);
-					fread(&body->m_externalForce, sizeof (dgVector), 1, file);
-					fread(&body->m_externalTorque, sizeof (dgVector), 1, file);
-					dgInt32 sleepState;
-					fread(&sleepState, sizeof (dgInt32), 1, file);
-					body->SetSleepState (sleepState ? true : false);
-					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
-				}
-			#endif
-		}
-	}
-#endif
-
-
 	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob (UpdateAggregateEntropyKernel, &syncPoints, aggregateNode);

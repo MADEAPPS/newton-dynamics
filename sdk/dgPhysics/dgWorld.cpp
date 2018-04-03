@@ -188,8 +188,8 @@ void xxxxx()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DG_MUTEX_THREAD_ID	0
-#define DG_ASYNC_THREAD_ID	1
+//#define DG_MUTEX_THREAD_ID	0
+//#define DG_ASYNC_THREAD_ID	1
 
 dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	:dgBodyMasterList(allocator)
@@ -199,14 +199,18 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgInverseDynamicsList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()
-	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID)
-	,dgAsyncThread("newtonAsyncThread", DG_ASYNC_THREAD_ID)
+	,dgMutexThread("newtonSyncThread", 0)
 	,dgWorldThreadPool(allocator)
 	,dgDeadBodies(allocator)
 	,dgDeadJoints(allocator)
 	,m_broadPhase(NULL)
 	,m_sentinelBody(NULL)
 	,m_pointCollision(NULL)
+	,m_userData(NULL)
+	,m_allocator (allocator)
+	,m_hardwaredIndex(0)
+	,m_mutex()
+	,m_postUpdateCallback(NULL)
 	,m_listeners(allocator)
 	,m_perInstanceData(allocator)
 	,m_bodiesMemory (allocator, 64)
@@ -214,11 +218,10 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_solverJacobiansMemory (allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
 	,m_clusterMemory (allocator, 64)
-	,m_stack(allocator)
-	,m_postUpdateCallback(NULL)
+	,m_concurrentUpdate(false)
 {
 	dgMutexThread* const mutexThread = this;
-	SetMatertThread (mutexThread);
+	SetParentThread (mutexThread);
 
 	// avoid small memory fragmentations on initialization
 	m_bodiesMemory.Resize(1024 * 32);
@@ -308,8 +311,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 dgWorld::~dgWorld()
 {	
 	Sync();
-	dgAsyncThread::Terminate();
-	dgMutexThread::Terminate();
+	Terminate();
 
 	m_listeners.RemoveAll();
 
@@ -950,16 +952,12 @@ void dgWorldThreadPool::OnEndWorkerThread (dgInt32 threadId)
 
 void dgWorld::Execute (dgInt32 threadID)
 {
-	if (threadID == DG_MUTEX_THREAD_ID) {
-		dgMutexThread::Execute (threadID);
-	} else {
-		dgAsyncThread::Execute (threadID);
-	}
+	dgMutexThread::Execute (threadID);
 }
 
 void dgWorld::Sync ()
 {
-	while (dgMutexThread::IsBusy()) {
+	while (IsBusy()) {
 		dgThreadYield();
 	}
 }
@@ -1017,20 +1015,21 @@ void dgWorld::RunStep ()
 	}
 
 	m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
+
+	if (!m_concurrentUpdate) {
+		m_mutex.Release();
+	}
 }
 
 void dgWorld::TickCallback (dgInt32 threadID)
 {
-	if (threadID == DG_MUTEX_THREAD_ID) {
-		RunStep ();
-	} else {
-		Update (m_savetimestep);
-	}
+	RunStep ();
 }
 
 
 void dgWorld::Update (dgFloat32 timestep)
 {
+	m_concurrentUpdate = false;
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
@@ -1039,14 +1038,15 @@ void dgWorld::Update (dgFloat32 timestep)
 	#else 
 		// runs the update in a separate thread and wait until the update is completed before it returns.
 		// this will run well on single core systems, since the two thread are mutually exclusive 
-		dgMutexThread::Tick();
+		Tick();
+		SuspendExecution(dgWorld::m_mutex);
 	#endif
 }
 
-
 void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
-	Sync ();
+	m_concurrentUpdate = true;
+	Sync();
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
@@ -1054,7 +1054,7 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 		RunStep ();
 	#else 
 		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
-		dgAsyncThread::Tick();
+		Tick();
 	#endif
 }
 

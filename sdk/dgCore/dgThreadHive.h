@@ -83,7 +83,7 @@ class dgThreadHive
 	virtual void OnBeginWorkerThread (dgInt32 threadId);
 	virtual void OnEndWorkerThread (dgInt32 threadId);
 
-	void SetMatertThread (dgThread* const mastertThread);
+	void SetParentThread (dgThread* const mastertThread);
 
 	void GlobalLock() const;
 	void GlobalUnlock() const;
@@ -104,7 +104,7 @@ class dgThreadHive
 	dgInt32 m_beesCount;
 	dgInt32 m_currentIdleBee;
 	dgThreadBee* m_workerBees;
-	dgThread* m_myMasterThread;
+	dgThread* m_parentThread;
 	dgMemoryAllocator* m_allocator;
 	dgThread::dgCriticalSection m_jobsCriticalSection;
 	mutable dgThread::dgCriticalSection m_globalCriticalSection;
