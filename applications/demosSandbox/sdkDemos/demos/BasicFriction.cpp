@@ -42,8 +42,6 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 
 	//now core 300 can have per collision user data 		
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
-	//void* userData = NewtonCollisionGetUserData (collision);
-	//dFloat frictionValue = *((dFloat*)&userData);
 	dFloat frictionValue = dFloat(NewtonCollisionGetUserID(collision)) * 1.0e-3f;
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);

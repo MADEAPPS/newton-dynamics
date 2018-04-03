@@ -221,7 +221,8 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 }
 
 
-DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex ()
+//DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex ()
+dgInt32 dgContactSolver::CalculateClosestSimplex()
 {
 	dgBigVector v(dgFloat32 (0.0f));
 	dgInt32 index = 1;
