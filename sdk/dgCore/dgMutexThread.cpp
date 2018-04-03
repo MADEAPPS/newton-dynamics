@@ -41,7 +41,6 @@ void dgMutexThread::Terminate()
 {
 	if (IsThreadActive()) {
 		dgInterlockedExchange(&m_terminate, 1);
-//		m_callerMutex.Release();
 		m_mutex.Release();
 		Close();
 	}
@@ -59,7 +58,6 @@ void dgMutexThread::Execute (dgInt32 threadID)
 			dgInterlockedExchange(&m_isBusy, 1);
 			TickCallback(threadID);
 			dgInterlockedExchange(&m_isBusy, 0);
-//			m_callerMutex.Release();
 		}
 	}
 	dgInterlockedExchange(&m_isBusy, 0);
@@ -74,8 +72,5 @@ void dgMutexThread::Tick()
 {
 	// let the thread run until the update function return  
 	m_mutex.Release();
-
-	// wait for the thread function to return
-//	SuspendExecution(m_callerMutex);
 }
 

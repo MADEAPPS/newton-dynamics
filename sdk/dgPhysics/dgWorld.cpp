@@ -188,9 +188,6 @@ void xxxxx()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//#define DG_MUTEX_THREAD_ID	0
-//#define DG_ASYNC_THREAD_ID	1
-
 dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	:dgBodyMasterList(allocator)
 	,dgBodyMaterialList(allocator)
