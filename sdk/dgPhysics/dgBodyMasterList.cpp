@@ -43,7 +43,8 @@ dgBodyMasterListRow::~dgBodyMasterListRow()
 
 dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstraint* const joint, dgBody* const body)
 {
-	dgThreadHiveScopeLock lock (body->m_world, &m_body->m_criticalSectionLock);
+//	dgThreadHiveScopeLock lock (body->m_world, &m_body->m_criticalSectionLock);
+	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 
 	body->m_world->GlobalLock();
 	dgListNode* const node = Addtop();
@@ -87,7 +88,8 @@ dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstra
 
 dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddBilateralJoint (dgConstraint* const joint, dgBody* const body)
 {
-	dgThreadHiveScopeLock lock (body->m_world, &m_body->m_criticalSectionLock);
+//	dgThreadHiveScopeLock lock (body->m_world, &m_body->m_criticalSectionLock);
+	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 
 	body->m_world->GlobalLock();
 	dgListNode* const node = Append();
@@ -111,7 +113,8 @@ void dgBodyMasterListRow::RemoveAllJoints ()
 
 void dgBodyMasterListRow::RemoveContactJoint (dgListNode* const link)
 {
-	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+//	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	
 	m_body->m_world->GlobalLock();
 	Remove(link);
@@ -123,7 +126,8 @@ void dgBodyMasterListRow::RemoveContactJoint (dgListNode* const link)
 
 void dgBodyMasterListRow::RemoveBilateralJoint (dgListNode* const link)
 {
-	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+//	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	
 	m_body->m_world->GlobalLock();
 	Remove(link);
@@ -133,7 +137,7 @@ void dgBodyMasterListRow::RemoveBilateralJoint (dgListNode* const link)
 
 dgContact* dgBodyMasterListRow::FindContactJoint (const dgBody* const otherBody) const
 {
-	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+//	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
 	if (m_body->m_masterNode->GetInfo().m_contactCount) {
 		dgInt32 key = otherBody->m_uniqueID;
 
@@ -160,7 +164,8 @@ dgContact* dgBodyMasterListRow::FindContactJoint (const dgBody* const otherBody)
 
 dgBilateralConstraint* dgBodyMasterListRow::FindBilateralJoint (const dgBody* const otherBody) const
 {
-	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+//	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	for (dgBodyMasterListRow::dgListNode* link = GetLast(); link; link = link->GetPrev()) {
 		dgConstraint* const constraint = link->GetInfo().m_joint;
 		if (constraint->GetId() == dgConstraint::m_contactConstraint) {
@@ -209,7 +214,8 @@ void dgBodyMasterListRow::SetAcceleratedSearch()
 
 void dgBodyMasterListRow::SortList()
 {
-	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+	//dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
+	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	if (GetFirst()) {
 		dgAssert (GetFirst()->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint);
 		dgListNode* nextKeyNode = NULL;

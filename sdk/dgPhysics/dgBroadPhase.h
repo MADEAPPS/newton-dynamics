@@ -403,18 +403,13 @@ class dgBroadPhase
 	dgList<dgBroadPhaseNode*> m_updateList;
 	dgList<dgBroadPhaseAggregate*> m_aggregateList;
 	dgUnsigned32 m_lru;
-	dgThread::dgCriticalSection m_contacJointLock;
-	dgThread::dgCriticalSection m_criticalSectionLock;
 	dgArray<dgPendingCollisionSofBodies> m_pendingSoftBodyCollisions;
 	dgInt32 m_pendingSoftBodyPairsCount;
+	dgInt32 m_contacJointLock;
+	dgInt32 m_criticalSectionLock;
 	dgInt32 m_dirtyNodesCount;
 	bool m_scanTwoWays;
 	bool m_recursiveChunks;
-
-	//DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
-	//DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
-	//DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
-	//DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
 
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;

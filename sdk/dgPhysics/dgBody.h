@@ -246,7 +246,7 @@ class dgBody
 	dgVector m_impulseTorque;	
 
 	dgFloat32 m_maxAngulaRotationPerSet2;
-	dgThread::dgCriticalSection m_criticalSectionLock;
+	dgInt32 m_criticalSectionLock;
 	union 
 	{
 		dgUnsigned32 m_flags;

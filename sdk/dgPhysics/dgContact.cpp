@@ -126,7 +126,8 @@ void dgContact::AppendToActiveList()
 {
 	dgAssert (!m_contactNode);
 	dgActiveContacts* const activeContacts = m_world;
-	m_contactNode = activeContacts->Append (this);
+	//m_contactNode = activeContacts->Append (this);
+	m_contactNode = activeContacts->Addtop(this);
 }
 
 void dgContact::SwapBodies()

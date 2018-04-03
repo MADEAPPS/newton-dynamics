@@ -222,9 +222,9 @@ class dgCollisionCompound: public dgCollision
 	dgWorld* m_world;	
 	dgNodeBase* m_root;
 	const dgCollisionInstance* m_myInstance;
-	dgThread::dgCriticalSection m_criticalSectionLock;
 	dgTreeArray m_array;
 	dgInt32 m_idIndex;
+	dgInt32 m_criticalSectionLock;
 
 	static dgVector m_padding;
 	friend class dgBody;

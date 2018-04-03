@@ -290,7 +290,7 @@ class dgWorldDynamicUpdate
 	dgInt32 m_clusters;
 	dgInt32 m_markLru;
 	dgJacobianMemory m_solverMemory;
-	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
+	dgInt32 m_softBodyCriticalSectionLock;
 	dgBodyCluster* m_clusterMemory;
 	
 	static dgVector m_velocTol;

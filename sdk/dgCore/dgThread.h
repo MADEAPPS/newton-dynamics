@@ -30,18 +30,6 @@
 class dgThread
 {
 	public:
-	class dgCriticalSection
-	{
-		public:
-		dgCriticalSection();
-		~dgCriticalSection();
-		void Lock();
-		void Unlock();
-
-		private:
-		dgInt32 m_lock;
-	};
-
 	class dgSemaphore
 	{
 		public:
@@ -85,32 +73,5 @@ class dgThread
 	
 	char m_name[32];
 };
-
-
-DG_INLINE dgThread::dgCriticalSection::dgCriticalSection()
-	:m_lock(0)
-{
-}
-
-DG_INLINE dgThread::dgCriticalSection::~dgCriticalSection()
-{
-};
-
-
-
-DG_INLINE void dgThread::dgCriticalSection::Lock()
-{
-	#ifndef DG_USE_THREAD_EMULATION 
-		dgSpinLock (&m_lock);
-	#endif
-}
-
-DG_INLINE void dgThread::dgCriticalSection::Unlock()
-{
-	#ifndef DG_USE_THREAD_EMULATION 
-		dgSpinUnlock (&m_lock);
-	#endif
-}
-
 
 #endif

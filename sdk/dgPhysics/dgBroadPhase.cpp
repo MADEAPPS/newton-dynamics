@@ -159,10 +159,10 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_updateList(world->GetAllocator())
 	,m_aggregateList(world->GetAllocator())
 	,m_lru(DG_CONTACT_DELAY_FRAMES)
-	,m_contacJointLock()
-	,m_criticalSectionLock()
 	,m_pendingSoftBodyCollisions(world->GetAllocator(), 64)
 	,m_pendingSoftBodyPairsCount(0)
+	,m_contacJointLock(0)
+	,m_criticalSectionLock(0)
 	,m_dirtyNodesCount(0)
 	,m_scanTwoWays(false)
 	,m_recursiveChunks(false)
@@ -709,7 +709,8 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 
 		const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
 
-		dgThreadHiveScopeLock lock(m_world, &m_criticalSectionLock);
+		//dgThreadHiveScopeLock lock(m_world, &m_criticalSectionLock);
+		dgScopeSpinLock lock(&m_criticalSectionLock);
 		if (body1->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
 			aggregate->m_isInEquilibrium = body1->m_equilibrium;
@@ -1127,9 +1128,15 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
 //	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)));
-	if ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || 
-		(body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI))) {
-		dgThreadHiveScopeLock lock(m_world, &m_contacJointLock);
+	dgAssert(body0);
+	dgAssert(body1);
+	bool test = body0->GetInvMass().m_w != dgFloat32(0.0f);
+	test = test || (body1->GetInvMass().m_w != dgFloat32(0.0f));
+	test = test || (body1->GetInvMass().m_w != dgFloat32(0.0f));
+	test = test || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+	test = test || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+	if (test) {
+		//dgThreadHiveScopeLock lock(m_world, &m_contacJointLock);
 		dgContact* contact = m_world->FindContactJoint(body0, body1);
 		if (!contact) {
 			const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
@@ -1157,11 +1164,15 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 							m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
 							m_pendingSoftBodyPairsCount++;
 						} else {
+							//dgThreadHiveScopeLock lock(m_world, &m_contacJointLock);
+							dgScopeSpinLock lock(&m_contacJointLock);
 							contact = new (m_world->m_allocator) dgContact(m_world, material);
 							contact->AppendToActiveList();
-							m_world->AttachConstraint(contact, body0, body1);
-
+							//m_world->AttachConstraint(contact, body0, body1);
 							dgAssert(contact);
+							contact->m_body0 = body0;
+							contact->m_body1 = body1;
+
 							contact->m_contactActive = 0;
 							contact->m_positAcc = dgVector(dgFloat32(10.0f));
 							contact->m_timeOfImpact = dgFloat32(1.0e10f);
@@ -1327,7 +1338,8 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 					dgVector relOmega (body0->m_omega - body1->m_omega);
 					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
 
-					dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock);
+					//dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock);
+					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
 					body1->m_sleeping = false;
 					body1->m_equilibrium = mask2.GetSignMask() ? true : false;
 				}
@@ -1339,7 +1351,8 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 					dgVector relOmega (body0->m_omega - body1->m_omega);
 					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
 
-					dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock);
+					//dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock);
+					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
 					body0->m_sleeping = false;
 					body0->m_equilibrium = mask2.GetSignMask() ? true : false;
 				}
@@ -1380,40 +1393,6 @@ void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 		node = node ? node->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
-
-	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
-	dgActiveContacts* const contactList = m_world;
-	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
-		dgContact* const contact = contactNode->GetInfo();
-		contactNode = contactNode->GetNext();
-		const dgBody* const body0 = contact->GetBody0();
-		const dgBody* const body1 = contact->GetBody1();
-		const dgInt32 equilbriun0 = body0->m_equilibrium;
-		const dgInt32 equilbriun1 = body1->m_equilibrium;
-		if (equilbriun0 & equilbriun1) {
-			contact->m_broadphaseLru = lru;
-		}
-		if (contact->m_broadphaseLru < lru) {
-			m_world->DestroyConstraint(contact);
-		}
-	}
-
-
-#if 0
-static dgInt32 xxx;
-dgInt32 xxx0 = 0;
-dgInt32 xxx1 = 0;
-	for (dgList<dgBroadPhaseNode*>::dgListNode* nodePtr = m_updateList.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-xxx0 ++;
-		dgBroadPhaseNode* const node = nodePtr->GetInfo();
-		dgAssert (node->IsLeafNode());
-		dgBroadPhaseBodyNode* const bodyNode = (dgBroadPhaseBodyNode*)node;
-xxx1 += bodyNode->m_nodeIsDirtyLru == (m_lru + 1) ? 1 : 0;
-	}
-dgTrace (("%d %d %d\n", xxx, xxx0, xxx1));
-xxx ++;
-#endif
-
 }
 
 void dgBroadPhase::UpdateSoftBodyContactKernel(void* const context, void* const worldContext, dgInt32 threadID)
@@ -1550,9 +1529,33 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	UpdateFitness();
 
 	m_scanTwoWays = (lastDirtyCount * 100) < (40 * m_updateList.GetCount());
-	ScanForContactJoints (syncPoints);
+m_scanTwoWays = 0;
 
 	dgActiveContacts* const contactList = m_world;
+	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
+	ScanForContactJoints (syncPoints);
+
+	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = contactNode->GetNext()) {
+		dgContact* const contact = contactNode->GetInfo();
+		m_world->AttachConstraint(contact, contact->m_body0, contact->m_body1);
+	}
+
+	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
+	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
+		dgContact* const contact = contactNode->GetInfo();
+		contactNode = contactNode->GetNext();
+		const dgBody* const body0 = contact->GetBody0();
+		const dgBody* const body1 = contact->GetBody1();
+		const dgInt32 equilbriun0 = body0->m_equilibrium;
+		const dgInt32 equilbriun1 = body1->m_equilibrium;
+		if (equilbriun0 & equilbriun1) {
+			contact->m_broadphaseLru = lru;
+		}
+		if (contact->m_broadphaseLru < lru) {
+			m_world->DestroyConstraint(contact);
+		}
+	}
+	
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode);

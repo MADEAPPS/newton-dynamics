@@ -468,9 +468,9 @@ dgCollisionCompound::dgCollisionCompound(dgWorld* const world)
 	,m_world(world)
 	,m_root(NULL)
 	,m_myInstance(NULL)
-	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
 	,m_idIndex(0)
+	,m_criticalSectionLock(0)
 {
 	m_rtti |= dgCollisionCompound_RTTI;
 }
@@ -483,9 +483,9 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source, con
 	,m_world (source.m_world)	
 	,m_root(NULL)
 	,m_myInstance(myInstance)
-	,m_criticalSectionLock()
 	,m_array (source.GetAllocator())
 	,m_idIndex(source.m_idIndex)
+	,m_criticalSectionLock(0)
 {
 	m_rtti |= dgCollisionCompound_RTTI;
 
@@ -564,9 +564,9 @@ dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize de
 	,m_world(world)
 	,m_root(NULL)
 	,m_myInstance(myInstance)
-	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
 	,m_idIndex(0)
+	,m_criticalSectionLock(0)
 {
 	dgAssert (m_rtti | dgCollisionCompound_RTTI);
 
@@ -994,8 +994,9 @@ dgFloat64 dgCollisionCompound::CalculateEntropy (dgList<dgNodeBase*>& list)
 void dgCollisionCompound::EndAddRemove (bool flushCache)
 {
 	if (m_root) {
-		dgWorld* const world = m_world;
-		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+		//dgWorld* const world = m_world;
+		//dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+		dgScopeSpinLock lock(&m_criticalSectionLock);
 
 		dgTreeArray::Iterator iter (m_array);
 		for (iter.Begin(); iter; iter ++) {
@@ -1146,7 +1147,7 @@ void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const nod
 {
 	if (node) {
 
-		dgWorld* const world = m_world;
+		//dgWorld* const world = m_world;
 		dgNodeBase* const baseNode = node->GetInfo();
 		dgCollisionInstance* const instance = baseNode->GetShape();
 
@@ -1162,7 +1163,9 @@ void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const nod
 		dgVector p1;
 		instance->CalcAABB(instance->GetLocalMatrix (), p0, p1);
 		
-		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+		//dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+		dgScopeSpinLock lock(&m_criticalSectionLock);
+
 		baseNode->SetBox (p0, p1);
 		for (dgNodeBase* parent = baseNode->m_parent; parent; parent = parent->m_parent) {
 			dgVector minBox;

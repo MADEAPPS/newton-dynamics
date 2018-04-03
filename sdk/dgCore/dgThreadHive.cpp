@@ -82,13 +82,15 @@ void dgThreadHive::dgThreadBee::RunNextJobInQueue(dgInt32 threadId)
 	do {
 		dgThreadJob job;
 		dgAssert (threadId == m_id);
-		m_hive->m_jobsCriticalSection.Lock();
+		//m_hive->m_jobsCriticalSection.Lock();
+		dgSpinLock(&m_hive->m_jobsCriticalSection);
 		isEmpty = m_hive->m_jobsPool.IsEmpty();
 		if (!isEmpty) {
 			job = m_hive->m_jobsPool.GetHead();
 			m_hive->m_jobsPool.Pop();
 		}
-		m_hive->m_jobsCriticalSection.Unlock();
+		//m_hive->m_jobsCriticalSection.Unlock();
+		dgSpinUnlock(&m_hive->m_jobsCriticalSection);
 
 		if (!isEmpty) {
 			job.m_callback (job.m_context0, job.m_context1, m_id);
@@ -98,13 +100,13 @@ void dgThreadHive::dgThreadBee::RunNextJobInQueue(dgInt32 threadId)
 
 
 dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
-	:m_beesCount(0)
-	,m_currentIdleBee(0)
-	,m_workerBees(NULL)
+	:m_workerBees(NULL)
 	,m_parentThread(NULL)
 	,m_allocator(allocator)
-	,m_jobsCriticalSection()
-	,m_globalCriticalSection()
+	,m_beesCount(0)
+	,m_currentIdleBee(0)
+	,m_jobsCriticalSection(0)
+	,m_globalCriticalSection(0)
     ,m_jobsPool(allocator)
 {
 }

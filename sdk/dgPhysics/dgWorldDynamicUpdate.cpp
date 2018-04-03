@@ -52,7 +52,7 @@ class dgWorldDynamicUpdateSyncDescriptor
 	
 	dgInt32 m_clusterCount;
 	dgInt32 m_firstCluster;
-	dgThread::dgCriticalSection* m_criticalSection;
+	dgInt32* m_criticalSection;
 };
 
 
@@ -78,7 +78,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 	,m_joints(0)
 	,m_clusters(0)
 	,m_markLru(0)
-	,m_softBodyCriticalSectionLock()
+	,m_softBodyCriticalSectionLock(0)
 	,m_clusterMemory(NULL)
 {
 }
