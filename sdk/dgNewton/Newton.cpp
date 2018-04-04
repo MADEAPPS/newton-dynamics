@@ -346,6 +346,33 @@ void NewtonGetDeviceString (const NewtonWorld* const newtonWorld, int deviceInde
 }
 
 
+void* NewtonGetFirstPlugin(const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+//	dgAssert(0);
+	return NULL;
+}
+
+void* NewtonGetNextPlugin(const void* const plugin) 
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert(0);
+	return NULL;
+}
+
+const char* NewtonGetPluginString(const void* const plugin)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert(0);
+	return NULL;
+}
+
+void NewtonSelectPlugin(const void* const plugin)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+//	dgAssert(0);
+}
 
 
 

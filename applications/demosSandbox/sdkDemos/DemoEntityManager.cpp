@@ -213,6 +213,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_currentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
 	,m_physicsFramesCount(0)
+	,m_currentPlugin(0)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
@@ -669,6 +670,23 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show stats", &m_showStats);
 			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
 			ImGui::Checkbox("solve large island in parallel", &m_solveLargeIslandInParallel);
+			ImGui::Separator();
+
+			int index = 0;
+			ImGui::RadioButton("dissable plugin", &m_currentPlugin, index);
+			for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(plugin)) {
+				index++;
+				const char* const id = NewtonGetPluginString(plugin);
+				ImGui::RadioButton(id, &m_currentPlugin, index);
+			}
+			void* plugin = NULL;
+			if (m_currentPlugin) {
+				plugin = NewtonGetFirstPlugin(m_world);
+				for (int i = 1; i < m_currentPlugin; i++) {
+					plugin = NewtonGetNextPlugin(plugin);
+				}
+			}
+			NewtonSelectPlugin(plugin);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);

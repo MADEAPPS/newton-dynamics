@@ -172,6 +172,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	int m_currentScene;
 	int m_framesCount;
 	int m_physicsFramesCount;
+	int m_currentPlugin;
 	dFloat m_fps;
 	dFloat m_timestepAcc;
 	dFloat m_currentListenerTimestep;
