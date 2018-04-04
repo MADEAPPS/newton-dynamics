@@ -41,7 +41,7 @@
 //#define DEFAULT_SCENE	7			// primitive convex cast 
 //#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
-#define DEFAULT_SCENE	10			// optimized level mesh collision
+//#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
@@ -74,7 +74,7 @@
 //#define DEFAULT_SCENE	30			// cloth patch			
 //#define DEFAULT_SCENE	41			// soft bodies	
 //#define DEFAULT_SCENE	42          // joes joint test
-
+#define DEFAULT_SCENE	43          // Misho's Rocket Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -120,6 +120,7 @@ void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
 void Hexapod(DemoEntityManager* const scene);
 void JoesJointTest (DemoEntityManager* const scene);
+void MishosRocketTest(DemoEntityManager* const scene);
 
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
@@ -167,6 +168,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
 	{"Joes joint test", "", JoesJointTest},
+	{ "Misho's Rocket Test", "", MishosRocketTest },
 };
 
 
