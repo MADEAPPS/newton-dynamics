@@ -674,19 +674,19 @@ void DemoEntityManager::ShowMainMenuBar()
 
 			int index = 0;
 			ImGui::RadioButton("dissable plugin", &m_currentPlugin, index);
-			for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(plugin)) {
+			for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
 				index++;
-				const char* const id = NewtonGetPluginString(plugin);
+				const char* const id = NewtonGetPluginString(m_world, plugin);
 				ImGui::RadioButton(id, &m_currentPlugin, index);
 			}
 			void* plugin = NULL;
 			if (m_currentPlugin) {
 				plugin = NewtonGetFirstPlugin(m_world);
 				for (int i = 1; i < m_currentPlugin; i++) {
-					plugin = NewtonGetNextPlugin(plugin);
+					plugin = NewtonGetNextPlugin(m_world, plugin);
 				}
 			}
-			NewtonSelectPlugin(plugin);
+			NewtonSelectPlugin(m_world, plugin);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);

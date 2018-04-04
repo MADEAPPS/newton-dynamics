@@ -55,6 +55,13 @@ class dgUniversalConstraint;
 class dgCorkscrewConstraint;
 class dgCollisionDeformableMesh;
 
+
+class dgPlugin
+{
+
+};
+
+
 class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned32>
 {
 	public:
@@ -92,6 +99,16 @@ class dgInverseDynamicsList: public dgList<dgInverseDynamics*>
 	{
 	}
 };
+
+class dgPluginList: public dgList<dgPlugin*>
+{
+	public:
+	dgPluginList(dgMemoryAllocator* const allocator)
+		:dgList<dgPlugin*>(allocator)
+	{
+	}
+};
+
 
 
 class dgWorld;
@@ -165,6 +182,7 @@ class dgWorld
 	,public dgWorldThreadPool
 	,public dgDeadBodies
 	,public dgDeadJoints
+	,public dgPluginList
 {
 	public:
 	typedef dgUnsigned64 (dgApi *OnGetTimeInMicrosenconds) ();
@@ -244,15 +262,16 @@ class dgWorld
 
 	void SetPosUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback);
 
-	dgInt32 EnumerateHardwareModes() const;
-	dgInt32 GetCurrentHardwareMode() const;
-	void SetCurrentHardwareMode(dgInt32 deviceIndex);
-	void GetHardwareVendorString (dgInt32 deviceIndex, char* const description, dgInt32 maxlength) const;
-
 	void EnableThreadOnSingleIsland(dgInt32 mode);
 	dgInt32 GetThreadOnSingleIsland() const;
 
 	void FlushCache();
+
+	dgPluginList::dgListNode* GetCurrentPlugin();
+	dgPluginList::dgListNode* GetFirstPlugin();
+	dgPluginList::dgListNode* GetNextPlugin(dgPluginList::dgListNode* const plugin);
+	const char* GetPluginId(dgPluginList::dgListNode* const plugin);
+	void SelectPlugin(dgPluginList::dgListNode* const plugin);
 	
 	void* GetUserData() const;
 	void SetUserData (void* const userData);
@@ -549,7 +568,6 @@ class dgWorld
 
 	void* m_userData;
 	dgMemoryAllocator* m_allocator;
-	dgInt32 m_hardwaredIndex;
 
 	dgSemaphore m_mutex;
 	OnClusterUpdate m_clusterUpdate;

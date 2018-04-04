@@ -200,12 +200,12 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgWorldThreadPool(allocator)
 	,dgDeadBodies(allocator)
 	,dgDeadJoints(allocator)
+	,dgPluginList(allocator)
 	,m_broadPhase(NULL)
 	,m_sentinelBody(NULL)
 	,m_pointCollision(NULL)
 	,m_userData(NULL)
 	,m_allocator (allocator)
-	,m_hardwaredIndex(0)
 	,m_mutex()
 	,m_postUpdateCallback(NULL)
 	,m_listeners(allocator)
@@ -291,7 +291,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_steps = steps;
 
-	m_hardwaredIndex = 0;
 	SetThreadsCount (0);
 
 	m_broadPhase = new (allocator) dgBroadPhaseDefault(this);
@@ -396,27 +395,6 @@ dgInt32 dgWorld::GetSolverMode() const
 	return m_solverMode;
 }
 
-
-dgInt32 dgWorld::EnumerateHardwareModes() const
-{
-	dgInt32 count = 1;
-	return count;
-}
-
-void dgWorld::GetHardwareVendorString (dgInt32 deviceIndex, char* const description, dgInt32 maxlength) const
-{
-	deviceIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
-	if (deviceIndex == 0) {
-		sprintf (description, "newton cpu");
-	}
-}
-
-void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)
-{
-	m_hardwaredIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
-}
-
-
 dgFloat32 dgWorld::GetContactMergeTolerance() const
 {
 	return m_contactTolerance;
@@ -425,12 +403,6 @@ dgFloat32 dgWorld::GetContactMergeTolerance() const
 void dgWorld::SetContactMergeTolerance(dgFloat32 tolerenace)
 {
 	m_contactTolerance = dgMax (tolerenace, dgFloat32 (1.e-3f));
-}
-
-
-dgInt32 dgWorld::GetCurrentHardwareMode() const
-{
-	return m_hardwaredIndex;
 }
 
 void dgWorld::EnableThreadOnSingleIsland(dgInt32 mode)
@@ -1705,4 +1677,31 @@ void dgWorld::SerializeJointArray(dgInt32 bodyCount, dgSerialize serializeCallba
 	}
 
 	dgSerializeMarker(serializeCallback, userData);
+}
+
+
+dgPluginList::dgListNode* dgWorld::GetFirstPlugin()
+{
+	dgPluginList& list = *this;
+	return list.GetFirst();
+}
+
+dgPluginList::dgListNode* dgWorld::GetNextPlugin(dgPluginList::dgListNode* const plugin)
+{
+//	dgPluginList& list = *this;
+	return plugin->GetNext();
+}
+
+const char* dgWorld::GetPluginId(dgPluginList::dgListNode* const plugin)
+{
+	return "xxxxx";
+}
+
+void dgWorld::SelectPlugin(dgPluginList::dgListNode* const plugin)
+{
+}
+
+dgPluginList::dgListNode* dgWorld::GetCurrentPlugin()
+{
+	return NULL;
 }

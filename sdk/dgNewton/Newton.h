@@ -440,15 +440,11 @@ extern "C" {
 	NEWTON_API void* NewtonAlloc (int sizeInBytes);
 	NEWTON_API void NewtonFree (void* const ptr);
 
-	NEWTON_API int NewtonEnumerateDevices (const NewtonWorld* const newtonWorld);
-	NEWTON_API int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld);
-	NEWTON_API void NewtonSetCurrentDevice (const NewtonWorld* const newtonWorld, int deviceIndex);
-	NEWTON_API void NewtonGetDeviceString(const NewtonWorld* const newtonWorld, int deviceIndex, char* const vendorString, int maxSize); \
-
+	NEWTON_API void* NewtonCurrentPlugin(const NewtonWorld* const newtonWorld);
 	NEWTON_API void* NewtonGetFirstPlugin(const NewtonWorld* const newtonWorld);
-	NEWTON_API void* NewtonGetNextPlugin(const void* const plugin);
-	NEWTON_API const char* NewtonGetPluginString(const void* const plugin);
-	NEWTON_API void NewtonSelectPlugin(const void* const plugin);
+	NEWTON_API void* NewtonGetNextPlugin(const NewtonWorld* const newtonWorld, const void* const plugin);
+	NEWTON_API const char* NewtonGetPluginString(const NewtonWorld* const newtonWorld, const void* const plugin);
+	NEWTON_API void NewtonSelectPlugin(const NewtonWorld* const newtonWorld, const void* const plugin);
 
 	NEWTON_API dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloat tolerance);

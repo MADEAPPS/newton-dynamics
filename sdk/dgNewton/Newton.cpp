@@ -316,64 +316,43 @@ NewtonBody* NewtonFindSerializedBody(const NewtonWorld* const newtonWorld, int b
 	return (NewtonBody*) world->FindBodyFromSerializedID(bodySerializedID);
 }
 
-
-int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld)
+void* NewtonCurrentPlugin(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->GetCurrentHardwareMode();
+	return world->GetCurrentPlugin();
 }
-
-int NewtonEnumerateDevices (const NewtonWorld* const newtonWorld)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	return world->EnumerateHardwareModes();
-}
-
-void NewtonSetCurrentDevice (const NewtonWorld* const newtonWorld, int deviceIndex)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	world->SetCurrentHardwareMode (deviceIndex);
-}
-
-void NewtonGetDeviceString (const NewtonWorld* const newtonWorld, int deviceIndex, char* const vendorString, int maxSize)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	world->GetHardwareVendorString (deviceIndex, vendorString, maxSize);
-}
-
 
 void* NewtonGetFirstPlugin(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-//	dgAssert(0);
-	return NULL;
+	return world->GetFirstPlugin();
 }
 
-void* NewtonGetNextPlugin(const void* const plugin) 
+void* NewtonGetNextPlugin(const NewtonWorld* const newtonWorld, const void* const plugin)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert(0);
-	return NULL;
+	Newton* const world = (Newton *)newtonWorld;
+	dgPluginList::dgListNode* const node = (dgPluginList::dgListNode*) plugin;
+	return world->GetNextPlugin(node);
 }
 
-const char* NewtonGetPluginString(const void* const plugin)
+const char* NewtonGetPluginString(const NewtonWorld* const newtonWorld, const void* const plugin)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert(0);
-	return NULL;
+	Newton* const world = (Newton *)newtonWorld;
+	dgPluginList::dgListNode* const node = (dgPluginList::dgListNode*) plugin;
+	return world->GetPluginId (node);
 }
 
-void NewtonSelectPlugin(const void* const plugin)
+void NewtonSelectPlugin(const NewtonWorld* const newtonWorld, const void* const plugin)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-//	dgAssert(0);
+	Newton* const world = (Newton *)newtonWorld;
+	dgPluginList::dgListNode* const node = (dgPluginList::dgListNode*) plugin;
+	return world->SelectPlugin(node);
 }
-
 
 
 /*!
