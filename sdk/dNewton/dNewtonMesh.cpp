@@ -161,19 +161,19 @@ void dNewtonMesh::MaterialGetIndexStream (void* const materialHandle, int materi
 	NewtonMeshMaterialGetIndexStream (m_mesh, materialHandle, materialIndex, indexes); 
 }
 
-void dNewtonMesh::ApplyBoxMapping (int topMatId, int sideMatId, int frontMatId)
+void dNewtonMesh::ApplyBoxMapping (int topMatId, int sideMatId, int frontMatId, const dMatrix& aligment)
 {
-	NewtonMeshApplyBoxMapping(m_mesh, topMatId, sideMatId, frontMatId);
+	NewtonMeshApplyBoxMapping(m_mesh, topMatId, sideMatId, frontMatId, &aligment[0][0]);
 }
 
-void dNewtonMesh::ApplySphericalMapping (int matId)
+void dNewtonMesh::ApplySphericalMapping (int matId, const dMatrix& aligment)
 {
-	NewtonMeshApplySphericalMapping(m_mesh, matId);
+	NewtonMeshApplySphericalMapping(m_mesh, matId, &aligment[0][0]);
 }
 
-void dNewtonMesh::ApplyCylindricalMapping (int cylinderMatId, int capMatId)
+void dNewtonMesh::ApplyCylindricalMapping (int cylinderMatId, int capMatId, const dMatrix& aligment)
 {
-	NewtonMeshApplyCylindricalMapping(m_mesh, cylinderMatId, capMatId);
+	NewtonMeshApplyCylindricalMapping(m_mesh, cylinderMatId, capMatId, &aligment[0][0]);
 }
 
 void dNewtonMesh::CalculateVertexNormals (dFloat angleInRadians)

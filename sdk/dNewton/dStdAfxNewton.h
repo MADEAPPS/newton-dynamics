@@ -78,11 +78,12 @@
 #include <dCustomRackAndPinion.h>
 #include <dCustomSliderActuator.h>
 #include <dCustomTriggerManager.h>
+#include <dCustomTransformManager.h>
 #include <dCustomControllerManager.h>
 #include <dCustomDoubleHingeActuator.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
-#include <dCustomArcticulatedTransformManager.h>
+
 
 
 

@@ -7814,7 +7814,7 @@ void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material
 	meshEffect->AngleBaseFlatteningMapping(material, (dgReportProgress) reportPrograssCallback, reportPrgressUserData);
 }
 
-void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material, dFloat* const aligmentMatrix)
+void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material, const dFloat* const aligmentMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
 	dgMatrix matrix(aligmentMatrix);
@@ -7822,7 +7822,7 @@ void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material,
 	meshEffect->SphericalMapping (material, matrix);
 }
 
-void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side, int top, dFloat* const aligmentMatrix)
+void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side, int top, const dFloat* const aligmentMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMatrix matrix(aligmentMatrix);
@@ -7830,7 +7830,7 @@ void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side
 	meshEffect->BoxMapping (front, side, top);
 }
 
-void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial, dFloat* const aligmentMatrix)
+void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial, const dFloat* const aligmentMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
 	dgMatrix matrix(aligmentMatrix);

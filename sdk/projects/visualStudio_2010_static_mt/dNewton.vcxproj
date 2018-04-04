@@ -39,7 +39,6 @@
     <ClCompile Include="..\..\dNewton\dNewton.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonActuatorJoints.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonAlloc.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonArticulationManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonCollision.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonDynamicBody.cpp" />
@@ -71,7 +70,6 @@
     <ClInclude Include="..\..\dNewton\dNewton.h" />
     <ClInclude Include="..\..\dNewton\dNewtonActuatorJoints.h" />
     <ClInclude Include="..\..\dNewton\dNewtonAlloc.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonArticulationManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonCollision.h" />
     <ClInclude Include="..\..\dNewton\dNewtonDynamicBody.h" />
