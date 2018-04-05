@@ -334,7 +334,7 @@ void* NewtonGetNextPlugin(const NewtonWorld* const newtonWorld, const void* cons
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgPluginList::dgListNode* const node = (dgPluginList::dgListNode*) plugin;
+	dgWorldPluginList::dgListNode* const node = (dgWorldPluginList::dgListNode*) plugin;
 	return world->GetNextPlugin(node);
 }
 
@@ -342,7 +342,7 @@ const char* NewtonGetPluginString(const NewtonWorld* const newtonWorld, const vo
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgPluginList::dgListNode* const node = (dgPluginList::dgListNode*) plugin;
+	dgWorldPluginList::dgListNode* const node = (dgWorldPluginList::dgListNode*) plugin;
 	return world->GetPluginId (node);
 }
 
@@ -350,7 +350,7 @@ void NewtonSelectPlugin(const NewtonWorld* const newtonWorld, const void* const 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgPluginList::dgListNode* const node = (dgPluginList::dgListNode*) plugin;
+	dgWorldPluginList::dgListNode* const node = (dgWorldPluginList::dgListNode*) plugin;
 	return world->SelectPlugin(node);
 }
 

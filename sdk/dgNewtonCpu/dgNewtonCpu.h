@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include <windows.h>
+#include "dgNewtonCpuStdafx.h"
 
 
 #ifdef NEWTONCPU_EXPORTS
@@ -28,16 +28,17 @@
 #define NEWTONCPU_API __declspec(dllimport)
 #endif
 
-class dgNewtonCpu 
+class dgNewtonCpu: public dgWorldPlugin
 {
 	public:
 	dgNewtonCpu(void);
-	// TODO: add your methods here.
+	virtual const char* GetId() const;
 };
 
 #ifdef __cplusplus 
-extern "C" {
-NEWTONCPU_API dgNewtonCpu* GetPlugin(void);
+extern "C" 
+{
+	NEWTONCPU_API dgWorldPlugin* GetPlugin(void);
 }
 #endif
 

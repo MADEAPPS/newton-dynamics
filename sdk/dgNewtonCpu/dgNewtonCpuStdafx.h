@@ -25,6 +25,10 @@
 #define WIN32_LEAN_AND_MEAN             
 #include <windows.h>
 
+#include <dg.h>
+#include <dgWorldPlugins.h>
+
+
 #pragma warning (disable: 4100) //unreferenced formal parameter
 
 

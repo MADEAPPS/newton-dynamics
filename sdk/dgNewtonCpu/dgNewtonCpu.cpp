@@ -23,15 +23,20 @@
 #include "dgNewtonCpu.h"
 
 
+// This is an example of an exported function.
+dgWorldPlugin* GetPlugin()
+{
+	static dgNewtonCpu module;
+	return &module;
+}
+
+
 dgNewtonCpu::dgNewtonCpu()
 {
 	return;
 }
 
-
-// This is an example of an exported function.
-dgNewtonCpu* GetPlugin()
+const char* dgNewtonCpu::GetId() const
 {
-	static dgNewtonCpu module;
-	return &module;
+	return "newtonCpu";
 }

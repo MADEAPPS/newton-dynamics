@@ -61,6 +61,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "..\..\..\..\sdk\thirdParty\imgui\vs2015\imgui.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonCpu", "..\..\..\..\sdk\projects\visualStudio_2015_static_mt\dgNewtonCpu.vcxproj", "{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}"
+	ProjectSection(ProjectDependencies) = postProject
+		{75A4A856-914E-4D41-A28D-23EAF8F8F9C9} = {75A4A856-914E-4D41-A28D-23EAF8F8F9C9}
+		{34AD435B-7662-49D5-AF13-5974FEC5F578} = {34AD435B-7662-49D5-AF13-5974FEC5F578}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -22,45 +22,20 @@
 #include "dgPhysicsStdafx.h"
 #include "dgWorld.h"
 #include "dgWorldPlugins.h"
-/*
-#include "dgDynamicBody.h"
-#include "dgKinematicBody.h"
-#include "dgCollisionBox.h"
-#include "dgKinematicBody.h"
-#include "dgCollisionNull.h"
-#include "dgCollisionCone.h"
-#include "dgCollisionScene.h"
-#include "dgCollisionSphere.h"
-#include "dgInverseDynamics.h"
-#include "dgCollisionCapsule.h"
-#include "dgBroadPhaseDefault.h"
-#include "dgCollisionInstance.h"
-#include "dgCollisionCompound.h"
-#include "dgWorldDynamicUpdate.h"
-#include "dgCollisionConvexHull.h"
-#include "dgBroadPhasePersistent.h"
-#include "dgCollisionChamferCylinder.h"
-#include "dgUserConstraint.h"
-#include "dgBallConstraint.h"
-#include "dgHingeConstraint.h"
-#include "dgSkeletonContainer.h"
-#include "dgSlidingConstraint.h"
-#include "dgUpVectorConstraint.h"
-#include "dgUniversalConstraint.h"
-#include "dgCorkscrewConstraint.h"
-*/
 
 
-dgPluginList::dgPluginList(dgMemoryAllocator* const allocator)
-	:dgList<dgPluginModulePair>(allocator)
+
+dgWorldPluginList::dgWorldPluginList(dgMemoryAllocator* const allocator)
+	:dgList<dgWorldPluginModulePair>(allocator)
+	,m_currentPlugin(NULL)
 {
 }
 
-dgPluginList::~dgPluginList()
+dgWorldPluginList::~dgWorldPluginList()
 {
 }
 
-void dgPluginList::LoadPlugins()
+void dgWorldPluginList::LoadPlugins()
 {
 	char plugInPath[2048];
 	char rootPathInPath[2048];
@@ -79,7 +54,7 @@ void dgPluginList::LoadPlugins()
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
 
-	dgPluginList& pluginsList = *this;
+	dgWorldPluginList& pluginsList = *this;
 
 	// scan for all plugins in this folder
 	_finddata_t data;
@@ -91,10 +66,10 @@ void dgPluginList::LoadPlugins()
 
 			if (module) {
 				// get the interface function pointer to the Plug in classes
-				dgPlugin* const plugin = (dgPlugin*)GetProcAddress(module, "GetPlugin");
-
-				if (plugin) {
-					dgPluginModulePair entry(plugin, module);
+				//dgWorldPlugin* const plugin = (dgWorldPlugin*)GetProcAddress(module, "GetPlugin");
+				InitPlugin initModule = (InitPlugin)GetProcAddress(module, "GetPlugin");
+				if (initModule) {
+					dgWorldPluginModulePair entry(initModule(), module);
 					pluginsList.Append(entry);
 				}
 				else {
@@ -108,39 +83,41 @@ void dgPluginList::LoadPlugins()
 	}
 }
 
-void dgPluginList::UnloadPlugins()
+void dgWorldPluginList::UnloadPlugins()
 {
-	dgPluginList& pluginsList = *this;
-	for (dgPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
+	dgWorldPluginList& pluginsList = *this;
+	for (dgWorldPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
 		HMODULE module = (HMODULE)node->GetInfo().m_module;
 		FreeLibrary(module);
 	}
 }
 
-dgPluginList::dgListNode* dgPluginList::GetCurrentPlugin()
+dgWorldPluginList::dgListNode* dgWorldPluginList::GetCurrentPlugin()
 {
 	return NULL;
 }
 
 
-dgPluginList::dgListNode* dgPluginList::GetFirstPlugin()
+dgWorldPluginList::dgListNode* dgWorldPluginList::GetFirstPlugin()
 {
-	dgPluginList& list = *this;
+	dgWorldPluginList& list = *this;
 	return list.GetFirst();
 }
 
-dgPluginList::dgListNode* dgPluginList::GetNextPlugin(dgListNode* const plugin)
+dgWorldPluginList::dgListNode* dgWorldPluginList::GetNextPlugin(dgListNode* const plugin)
 {
 	return plugin->GetNext();
 }
 
-const char* dgPluginList::GetPluginId(dgListNode* const plugin)
+const char* dgWorldPluginList::GetPluginId(dgListNode* const pluginNode)
 {
-	dgPluginModulePair entry(plugin->GetInfo());
-	//	void* xxxx = (void*) entry.m_plugin();
-	return "xxxxx";
+	dgWorldPluginModulePair entry(pluginNode->GetInfo());
+	dgWorldPlugin* const plugin = entry.m_plugin;
+	return plugin->GetId();
 }
 
-void dgPluginList::SelectPlugin(dgListNode* const plugin)
+void dgWorldPluginList::SelectPlugin(dgListNode* const plugin)
 {
+	m_currentPlugin = plugin;
 }
+

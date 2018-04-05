@@ -167,7 +167,7 @@ class dgWorld
 	,public dgWorldThreadPool
 	,public dgDeadBodies
 	,public dgDeadJoints
-	,public dgPluginList
+	,public dgWorldPluginList
 {
 	public:
 	typedef dgUnsigned64 (dgApi *OnGetTimeInMicrosenconds) ();

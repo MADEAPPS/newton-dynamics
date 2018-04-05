@@ -22,32 +22,39 @@
 #ifndef _DG_WORLD_PLUGINS_H_
 #define _DG_WORLD_PLUGINS_H_
 
-
-class dgPlugin
+class dgWorldPlugin
 {
 	public:
-	dgPlugin();
-	virtual ~dgPlugin();	
+	dgWorldPlugin() {};
+	virtual ~dgWorldPlugin() {};
 	virtual const char* GetId() const = 0;
 };
 
-class dgPluginModulePair
+#ifdef __cplusplus 
+extern "C"
+{
+	typedef dgWorldPlugin* (*InitPlugin)();
+}
+#endif
+
+
+class dgWorldPluginModulePair
 {
 	public:
-	dgPluginModulePair (dgPlugin* const plugin, void* module)
+	dgWorldPluginModulePair (dgWorldPlugin* const plugin, void* module)
 		:m_plugin(plugin)
 		,m_module(module)
 	{
 	}
-	dgPlugin* m_plugin;
+	dgWorldPlugin* m_plugin;
 	void* m_module;
 };
 
-class dgPluginList: public dgList<dgPluginModulePair>
+class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 {
 	public:
-	dgPluginList(dgMemoryAllocator* const allocator);
-	~dgPluginList();
+	dgWorldPluginList(dgMemoryAllocator* const allocator);
+	~dgWorldPluginList();
 
 	void LoadPlugins();
 	void UnloadPlugins();
@@ -57,9 +64,7 @@ class dgPluginList: public dgList<dgPluginModulePair>
 	dgListNode* GetNextPlugin(dgListNode* const plugin);
 	const char* GetPluginId(dgListNode* const plugin);
 	void SelectPlugin(dgListNode* const plugin);
+
+	dgListNode* m_currentPlugin;
 };
-
-
-
-
 #endif
