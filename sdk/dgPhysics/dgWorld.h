@@ -26,6 +26,7 @@
 #include "dgContact.h"
 #include "dgCollision.h"
 #include "dgBroadPhase.h"
+#include "dgWorldPlugins.h"
 #include "dgCollisionScene.h"
 #include "dgBodyMasterList.h"
 #include "dgWorldDynamicUpdate.h"
@@ -54,15 +55,6 @@ class dgUpVectorConstraint;
 class dgUniversalConstraint;
 class dgCorkscrewConstraint;
 class dgCollisionDeformableMesh;
-
-
-class dgPlugin
-{
-	public:
-	dgPlugin();
-	virtual ~dgPlugin();	
-	virtual const char* GetId() const = 0;
-};
 
 
 class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned32>
@@ -102,31 +94,6 @@ class dgInverseDynamicsList: public dgList<dgInverseDynamics*>
 	{
 	}
 };
-
-class dgPluginModulePair
-{
-	public:
-	dgPluginModulePair (dgPlugin* const plugin, void* module)
-		:m_plugin(plugin)
-		,m_module(module)
-	{
-	}
-	dgPlugin* m_plugin;
-	void* m_module;
-};
-
-class dgPluginList: public dgList<dgPluginModulePair>
-{
-	public:
-	dgPluginList(dgMemoryAllocator* const allocator)
-		:dgList<dgPluginModulePair>(allocator)
-	{
-	}
-
-	void LoadPlugins();
-	void UnloadPlugins();
-};
-
 
 
 class dgWorld;
@@ -285,11 +252,6 @@ class dgWorld
 
 	void FlushCache();
 
-	dgPluginList::dgListNode* GetCurrentPlugin();
-	dgPluginList::dgListNode* GetFirstPlugin();
-	dgPluginList::dgListNode* GetNextPlugin(dgPluginList::dgListNode* const plugin);
-	const char* GetPluginId(dgPluginList::dgListNode* const plugin);
-	void SelectPlugin(dgPluginList::dgListNode* const plugin);
 	
 	void* GetUserData() const;
 	void SetUserData (void* const userData);

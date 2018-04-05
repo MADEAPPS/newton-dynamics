@@ -23,7 +23,6 @@
 #define __DGPHYSICS_H__
 
 #include <dg.h>
-
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgContact.h"
@@ -31,6 +30,7 @@
 #include "dgMeshEffect.h"
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
+#include "dgWorldPlugins.h"
 #include "dgCollisionBVH.h"
 #include "dgContactSolver.h"
 #include "dgKinematicBody.h"
