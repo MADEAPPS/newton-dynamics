@@ -35,5 +35,9 @@ class dgNewtonCpu
 	// TODO: add your methods here.
 };
 
-
+#ifdef __cplusplus 
+extern "C" {
 NEWTONCPU_API dgNewtonCpu* GetPlugin(void);
+}
+#endif
+

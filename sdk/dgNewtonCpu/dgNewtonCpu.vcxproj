@@ -64,6 +64,10 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../applications\demosSandbox\Win32\newtonPlugins/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../applications\demosSandbox\Win32\newtonPlugins/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

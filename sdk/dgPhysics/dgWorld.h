@@ -58,7 +58,10 @@ class dgCollisionDeformableMesh;
 
 class dgPlugin
 {
-
+	public:
+	dgPlugin();
+	virtual ~dgPlugin();	
+	virtual const char* GetId() const = 0;
 };
 
 
@@ -100,13 +103,28 @@ class dgInverseDynamicsList: public dgList<dgInverseDynamics*>
 	}
 };
 
-class dgPluginList: public dgList<dgPlugin*>
+class dgPluginModulePair
+{
+	public:
+	dgPluginModulePair (dgPlugin* const plugin, void* module)
+		:m_plugin(plugin)
+		,m_module(module)
+	{
+	}
+	dgPlugin* m_plugin;
+	void* m_module;
+};
+
+class dgPluginList: public dgList<dgPluginModulePair>
 {
 	public:
 	dgPluginList(dgMemoryAllocator* const allocator)
-		:dgList<dgPlugin*>(allocator)
+		:dgList<dgPluginModulePair>(allocator)
 	{
 	}
+
+	void LoadPlugins();
+	void UnloadPlugins();
 };
 
 

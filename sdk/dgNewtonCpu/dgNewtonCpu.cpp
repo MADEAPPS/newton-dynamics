@@ -30,7 +30,8 @@ dgNewtonCpu::dgNewtonCpu()
 
 
 // This is an example of an exported function.
-dgNewtonCpu* GetPlugin(void)
+dgNewtonCpu* GetPlugin()
 {
-	return new dgNewtonCpu;
+	static dgNewtonCpu module;
+	return &module;
 }
