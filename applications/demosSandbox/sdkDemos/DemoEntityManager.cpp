@@ -682,11 +682,13 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			int index = 0;
-			ImGui::RadioButton("dissable plugin", &m_currentPlugin, index);
+			ImGui::RadioButton("plugin disabled", &m_currentPlugin, index);
+			char ids[32][32];
 			for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
 				index++;
 				const char* const id = NewtonGetPluginString(m_world, plugin);
-				ImGui::RadioButton(id, &m_currentPlugin, index);
+				sprintf (&ids[index][0], "%s", id);
+				ImGui::RadioButton(&ids[index][0], &m_currentPlugin, index);
 			}
 			ImGui::Separator();
 

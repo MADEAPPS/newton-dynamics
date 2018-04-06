@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demosSandBox", "demosSandBox.vcxproj", "{C70F431C-9E47-40FE-AB56-B99C6764AEA1}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -11,6 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demosSandBox", "demosSandBo
 		{75A4A856-914E-4D41-A28D-23EAF8F8F9C9} = {75A4A856-914E-4D41-A28D-23EAF8F8F9C9}
 		{34AD435B-7662-49D5-AF13-5974FEC5F578} = {34AD435B-7662-49D5-AF13-5974FEC5F578}
 		{2928F15F-0650-4261-B759-36C7792267DC} = {2928F15F-0650-4261-B759-36C7792267DC}
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997} = {4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}
 		{721C99CE-4716-4146-9817-59BC2671B844} = {721C99CE-4716-4146-9817-59BC2671B844}
 		{18E509CF-46D2-4749-B3BB-160937CF2481} = {18E509CF-46D2-4749-B3BB-160937CF2481}
 		{71DE04D1-E371-4A45-9694-2AA647D65451} = {71DE04D1-E371-4A45-9694-2AA647D65451}
@@ -33,6 +34,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dContainers.vcxproj", "{E6A31C39-173F-4000-97E0-F086DB68DD42}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dCustomJoints", "..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dCustomJoints.vcxproj", "{721C99CE-4716-4146-9817-59BC2671B844}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonCpu", "..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dgNewtonCpu.vcxproj", "{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}"
+	ProjectSection(ProjectDependencies) = postProject
+		{75A4A856-914E-4D41-A28D-23EAF8F8F9C9} = {75A4A856-914E-4D41-A28D-23EAF8F8F9C9}
+		{34AD435B-7662-49D5-AF13-5974FEC5F578} = {34AD435B-7662-49D5-AF13-5974FEC5F578}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -206,6 +213,18 @@ Global
 		{721C99CE-4716-4146-9817-59BC2671B844}.Release|Win32.Build.0 = Release|Win32
 		{721C99CE-4716-4146-9817-59BC2671B844}.Release|x64.ActiveCfg = Release|x64
 		{721C99CE-4716-4146-9817-59BC2671B844}.Release|x64.Build.0 = Release|x64
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.debug_double|Win32.ActiveCfg = Debug|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.debug_double|Win32.Build.0 = Debug|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.debug_double|x64.ActiveCfg = Debug|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Debug|Win32.Build.0 = Debug|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Debug|x64.ActiveCfg = Debug|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.release_double|Win32.ActiveCfg = Release|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.release_double|Win32.Build.0 = Release|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.release_double|x64.ActiveCfg = Release|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Release|Win32.ActiveCfg = Release|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Release|Win32.Build.0 = Release|Win32
+		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

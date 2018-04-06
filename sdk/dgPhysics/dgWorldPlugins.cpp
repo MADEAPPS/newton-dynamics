@@ -66,7 +66,6 @@ void dgWorldPluginList::LoadPlugins()
 
 			if (module) {
 				// get the interface function pointer to the Plug in classes
-				//dgWorldPlugin* const plugin = (dgWorldPlugin*)GetProcAddress(module, "GetPlugin");
 				InitPlugin initModule = (InitPlugin)GetProcAddress(module, "GetPlugin");
 				if (initModule) {
 					dgWorldPluginModulePair entry(initModule(), module);

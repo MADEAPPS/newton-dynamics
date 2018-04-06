@@ -38,5 +38,9 @@ dgNewtonCpu::dgNewtonCpu()
 
 const char* dgNewtonCpu::GetId() const
 {
+#ifdef _DEBUG
+	return "newtonCpu_d";
+#else
 	return "newtonCpu";
+#endif
 }
