@@ -125,9 +125,30 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_firstCluster = index;
 	descriptor.m_clusterCount = m_clusters - index;
 
+	if (world->m_currentPlugin) {
+		dgWorldPlugin* const plugin = world->m_currentPlugin->GetInfo().m_plugin;
+		plugin->GetId();
+		dgInt32 count = 0;
+		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
+			count++;
+		}
+		if (count) {
+			CalculateReactionForcesParallel(&m_clusterMemory[index], count, timestep);
+			index += count;
+		}
+	} else if (world->m_useParallelSolver && (threadCount > 1)) {
+		dgInt32 count = 0;
+		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
+			count++;
+		}
+		if (count) {
+			CalculateReactionForcesParallel(&m_clusterMemory[index], count, timestep);
+			index += count;
+		}
+	}
+
+/*
 	dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-//useParallel = 0;
-//useParallel = 1;
 	if (useParallel) {
 		dgInt32 count = 0;
 		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF); i ++) {
@@ -138,7 +159,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 			index += count;
 		}
 	}
-
+*/
 	if (index < m_clusters) {
 		descriptor.m_atomicCounter = 0;
 		descriptor.m_firstCluster = index;
