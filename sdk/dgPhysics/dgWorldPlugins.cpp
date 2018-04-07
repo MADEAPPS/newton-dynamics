@@ -68,10 +68,10 @@ void dgWorldPluginList::LoadPlugins()
 				// get the interface function pointer to the Plug in classes
 				InitPlugin initModule = (InitPlugin)GetProcAddress(module, "GetPlugin");
 				if (initModule) {
-					dgWorldPluginModulePair entry(initModule(), module);
+					dgWorldPlugin* const plugin = initModule(GetAllocator ());
+					dgWorldPluginModulePair entry(plugin, module);
 					pluginsList.Append(entry);
-				}
-				else {
+				} else {
 					FreeLibrary(module);
 				}
 			}

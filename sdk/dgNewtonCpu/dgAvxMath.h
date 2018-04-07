@@ -19,22 +19,60 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_NEWTON_CPU_STDADX_
+#ifndef _DG_SCALAR_H_
+#define _DG_SCALAR_H_
+#include "dgNewtonCpuStdafx.h"
 
-// Exclude rarely-used stuff from Windows headers
-#define WIN32_LEAN_AND_MEAN             
-#include <windows.h>
 
-#include <dg.h>
-#include <dgPhysics.h>
+DG_MSC_AVX_ALIGMENT
+class dgAvxFloat
+{
+	public:
+	union
+	{
+		__m256 m_type;
+		__m256i m_typeInt;
+		float m_f[8];
+		int m_i[8];
+	};
+} DG_GCC_AVX_ALIGMENT;
 
-#ifdef NEWTONCPU_EXPORTS
-	#define NEWTONCPU_API __declspec(dllexport)
-#else
-	#define NEWTONCPU_API __declspec(dllimport)
+
+class dgAvxScalar
+{
+	public:
+	dgAvxScalar (dgMemoryAllocator* const allocator)
+		:m_val(allocator)
+	{
+	}
+	void Reserve (dgInt32 count)
+	{
+		m_val.ResizeIfNecessary(count);
+	}
+
+	dgArray<dgAvxFloat> m_val;
+};
+
+class dgAvxVector3
+{
+	public:
+	dgAvxVector3 (dgMemoryAllocator* const allocator)
+		:m_x(allocator)
+		,m_y(allocator)
+		,m_z(allocator)
+	{
+	}
+	void Reserve (dgInt32 count)
+	{
+		m_x.ResizeIfNecessary(count);
+		m_y.ResizeIfNecessary(count);
+		m_z.ResizeIfNecessary(count);
+	}
+
+	dgArray<dgAvxFloat> m_x;
+	dgArray<dgAvxFloat> m_y;
+	dgArray<dgAvxFloat> m_z;
+};
+
 #endif
 
-#pragma warning (disable: 4100) //unreferenced formal parameter
-
-
-#endif

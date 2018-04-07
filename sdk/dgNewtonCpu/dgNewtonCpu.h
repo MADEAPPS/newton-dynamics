@@ -19,33 +19,38 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _DG_NEWTON_CPU_H_
+#define _DG_NEWTON_CPU_H_
 #include "dgNewtonCpuStdafx.h"
-
-
-#ifdef NEWTONCPU_EXPORTS
-#define NEWTONCPU_API __declspec(dllexport)
-#else
-#define NEWTONCPU_API __declspec(dllimport)
-#endif
+#include "dgAvxMath.h"
+#include "dgAvxBody.h"
 
 class dgNewtonCpu: public dgWorldPlugin
 {
 	public:
-	dgNewtonCpu(void);
+	dgNewtonCpu(dgMemoryAllocator* const allocator);
+	~dgNewtonCpu();
+
 	virtual const char* GetId() const;
-	virtual void CalculateJointForces(const dgBodyCluster& cluster, const dgBodyInfo* const bodyArray, const dgJointInfo* const jointArray, dgFloat32 timestep);
+	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	private:
+	void InityBodyArray();
+
+	dgAvxBody m_avxBody;
+	dgBodyInfo* m_bodyArray;
+	dgJointInfo* m_jointArray;
 	const dgBodyCluster* m_cluster;
-	const dgBodyInfo* m_bodyArray;
-	const dgJointInfo* m_jointArray;
 	dgFloat32 m_timestep;
+
+	
 };
 
 #ifdef __cplusplus 
 extern "C" 
 {
-	NEWTONCPU_API dgWorldPlugin* GetPlugin(void);
+	NEWTONCPU_API dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator);
 }
 #endif
 
+#endif

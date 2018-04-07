@@ -29,16 +29,25 @@ class dgBodyCluster;
 class dgWorldPlugin
 {
 	public:
-	dgWorldPlugin() {};
-	virtual ~dgWorldPlugin() {};
+	dgWorldPlugin(dgMemoryAllocator* const allocator) 
+		:m_allocator(allocator)
+	{
+	}
+	virtual ~dgWorldPlugin() 
+	{
+	}
+
 	virtual const char* GetId() const = 0;
-	virtual void CalculateJointForces(const dgBodyCluster& cluster, const dgBodyInfo* const bodyArray, const dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
+	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
+
+	protected:
+	dgMemoryAllocator* m_allocator;
 };
 
 #ifdef __cplusplus 
 extern "C"
 {
-	typedef dgWorldPlugin* (*InitPlugin)();
+	typedef dgWorldPlugin* (*InitPlugin)(dgMemoryAllocator* const allocator);
 }
 #endif
 

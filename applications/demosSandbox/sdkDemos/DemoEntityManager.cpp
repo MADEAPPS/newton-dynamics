@@ -609,7 +609,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	void* plugin = NULL;
 	if (m_currentPlugin) {
 		int index = 1;
-		for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, plugin)) {
+		for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
 			if (index == m_currentPlugin) {
 				plugin = ptr;
 			}

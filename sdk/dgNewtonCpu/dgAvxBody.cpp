@@ -19,22 +19,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_NEWTON_CPU_STDADX_
+#include "dgNewtonCpuStdafx.h"
+#include "dgAvxBody.h"
 
-// Exclude rarely-used stuff from Windows headers
-#define WIN32_LEAN_AND_MEAN             
-#include <windows.h>
+dgAvxBody::dgAvxBody(dgMemoryAllocator* const allocator)
+	:m_weight(allocator)
+	,m_invWeigh(allocator)
+	,m_veloc(allocator)
+	,m_count(0)
+{
+}
 
-#include <dg.h>
-#include <dgPhysics.h>
-
-#ifdef NEWTONCPU_EXPORTS
-	#define NEWTONCPU_API __declspec(dllexport)
-#else
-	#define NEWTONCPU_API __declspec(dllimport)
-#endif
-
-#pragma warning (disable: 4100) //unreferenced formal parameter
+void dgAvxBody::Reserve (dgInt32 count)
+{
+	m_count = ((count + 7) & -7) >> 3;
+	m_weight.Reserve(m_count);
+	m_invWeigh.Reserve(m_count);
+	m_veloc.Reserve(m_count);
+}
 
 
-#endif
