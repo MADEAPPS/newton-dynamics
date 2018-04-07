@@ -22,12 +22,15 @@
 #ifndef _DG_WORLD_PLUGINS_H_
 #define _DG_WORLD_PLUGINS_H_
 
+class dgBodyCluster;
+
 class dgWorldPlugin
 {
 	public:
 	dgWorldPlugin() {};
 	virtual ~dgWorldPlugin() {};
 	virtual const char* GetId() const = 0;
+	virtual void CalculateJointForces(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep) = 0;
 };
 
 #ifdef __cplusplus 

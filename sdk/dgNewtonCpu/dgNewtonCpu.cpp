@@ -44,3 +44,8 @@ const char* dgNewtonCpu::GetId() const
 	return "newtonCpu";
 #endif
 }
+
+void dgNewtonCpu::CalculateJointForces(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep)
+{
+
+}
