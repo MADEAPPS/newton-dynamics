@@ -51,7 +51,7 @@ const char* dgNewtonCpu::GetId() const
 
 void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, const dgBodyInfo* const bodyArray, const dgJointInfo* const jointArray, dgFloat32 timestep)
 {
-	timestep = (dgFloat32(0.0f));
+	m_timestep = timestep;
 	m_cluster= &cluster;
 	m_bodyArray = bodyArray;
 	m_jointArray = jointArray;

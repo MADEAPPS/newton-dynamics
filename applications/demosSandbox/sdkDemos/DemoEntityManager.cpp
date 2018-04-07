@@ -608,9 +608,12 @@ void DemoEntityManager::ApplyMenuOptions()
 
 	void* plugin = NULL;
 	if (m_currentPlugin) {
-		plugin = NewtonGetFirstPlugin(m_world);
-		for (int i = 1; i < m_currentPlugin; i++) {
-			plugin = NewtonGetNextPlugin(m_world, plugin);
+		int index = 1;
+		for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, plugin)) {
+			if (index == m_currentPlugin) {
+				plugin = ptr;
+			}
+			index ++;
 		}
 	}
 	NewtonSelectPlugin(m_world, plugin);
