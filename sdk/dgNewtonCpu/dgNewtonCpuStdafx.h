@@ -26,7 +26,7 @@
 #include <windows.h>
 
 #include <dg.h>
-#include <dgWorldPlugins.h>
+#include <dgPhysics.h>
 
 
 #pragma warning (disable: 4100) //unreferenced formal parameter

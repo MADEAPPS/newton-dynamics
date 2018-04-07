@@ -22,6 +22,8 @@
 #ifndef _DG_WORLD_PLUGINS_H_
 #define _DG_WORLD_PLUGINS_H_
 
+class dgBodyInfo;
+class dgJointInfo;
 class dgBodyCluster;
 
 class dgWorldPlugin
@@ -30,7 +32,7 @@ class dgWorldPlugin
 	dgWorldPlugin() {};
 	virtual ~dgWorldPlugin() {};
 	virtual const char* GetId() const = 0;
-	virtual void CalculateJointForces(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep) = 0;
+	virtual void CalculateJointForces(const dgBodyCluster& cluster, const dgBodyInfo* const bodyArray, const dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
 };
 
 #ifdef __cplusplus 

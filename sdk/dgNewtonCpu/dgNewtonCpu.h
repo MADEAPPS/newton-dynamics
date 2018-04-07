@@ -33,7 +33,13 @@ class dgNewtonCpu: public dgWorldPlugin
 	public:
 	dgNewtonCpu(void);
 	virtual const char* GetId() const;
-	virtual void CalculateJointForces(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep);
+	virtual void CalculateJointForces(const dgBodyCluster& cluster, const dgBodyInfo* const bodyArray, const dgJointInfo* const jointArray, dgFloat32 timestep);
+
+	private:
+	const dgBodyCluster* m_cluster;
+	const dgBodyInfo* m_bodyArray;
+	const dgJointInfo* m_jointArray;
+	dgFloat32 m_timestep;
 };
 
 #ifdef __cplusplus 
