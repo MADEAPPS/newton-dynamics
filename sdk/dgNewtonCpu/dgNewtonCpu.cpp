@@ -175,6 +175,17 @@ void dgNewtonCpu::InityBodyArray()
 		angularDamp.m_y[i] = damp1;
 		angularDamp.m_z[i] = damp2;
 		linearDamp.m_val[i] = damp3;
+
+
+		const dgMatrix& matrix0 = body0->GetMatrix();
+		const dgMatrix& matrix1 = body1->GetMatrix();
+		const dgMatrix& matrix2 = body2->GetMatrix();
+		const dgMatrix& matrix3 = body3->GetMatrix();
+		const dgMatrix& matrix4 = body4->GetMatrix();
+		const dgMatrix& matrix5 = body5->GetMatrix();
+		const dgMatrix& matrix6 = body6->GetMatrix();
+		const dgMatrix& matrix7 = body7->GetMatrix();
+
 	}
 
 	dgAvxFloat timestep (m_timestep);

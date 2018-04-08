@@ -29,16 +29,24 @@ class dgAvxBody
 	public:
 	dgAvxBody (dgMemoryAllocator* const allocator);
 	void Reserve (dgInt32 count);
-	void AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep);
+	DG_INLINE void AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep);
 	
-	dgAvxScalar m_weight;
-	dgAvxScalar m_invWeigh;
+	dgAvxMatrix3x3 m_rotation;
 	dgAvxVector3 m_veloc;
 	dgAvxVector3 m_omega;
-	dgAvxVector3 m_angularDamp;
+	dgAvxScalar m_weight;
+	dgAvxScalar m_invWeigh;
 	dgAvxScalar m_linearDamp;
+	dgAvxVector3 m_angularDamp;
+
 	dgInt32 m_count;
 };
+
+
+DG_INLINE void dgAvxBody::AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep)
+{
+	m_veloc.Scale (index, timestep);
+}
 
 
 #endif

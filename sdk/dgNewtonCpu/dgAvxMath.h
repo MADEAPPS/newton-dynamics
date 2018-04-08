@@ -23,6 +23,37 @@
 #define _DG_SCALAR_H_
 #include "dgNewtonCpuStdafx.h"
 
+template<class T>
+class dgAvxArray: public dgArray<T>
+{
+	public:
+	dgAvxArray (dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
+		:dgArray<T>(allocator, aligmentInBytes)
+		,m_ptr(NULL)
+	{
+	}
+
+	void Reserve(dgInt32 count)
+	{
+		ResizeIfNecessary(count);
+		dgArray<T>& me = *this;
+		m_ptr = &me[0];
+	}
+
+	DG_INLINE T& operator[] (dgInt32 i)
+	{
+		return m_ptr[i];
+	}
+
+	DG_INLINE const T& operator[] (dgInt32 i) const
+	{
+		return m_ptr[i];
+	}
+	
+
+	T* m_ptr;
+};
+
 
 DG_MSC_AVX_ALIGMENT
 class dgAvxFloat
@@ -53,6 +84,11 @@ class dgAvxFloat
 	{
 	}
 
+	DG_INLINE dgAvxFloat operator* (const dgAvxFloat& A) const
+	{
+		return _mm256_mul_ps(m_type, A.m_type);
+	}
+
 	DG_INLINE static void Transpose4x8(dgAvxFloat& src0, dgAvxFloat& src1, dgAvxFloat& src2, dgAvxFloat& src3)
 	{
 		__m256 tmp0(_mm256_unpacklo_ps(src0.m_type, src1.m_type));
@@ -65,7 +101,6 @@ class dgAvxFloat
 		src2 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(1, 0, 1, 0));
 		src3 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(3, 2, 3, 2));
 	}
-
 
 	union
 	{
@@ -86,10 +121,10 @@ class dgAvxScalar
 	}
 	void Reserve (dgInt32 count)
 	{
-		m_val.ResizeIfNecessary(count);
+		m_val.Reserve(count);
 	}
 
-	dgArray<dgAvxFloat> m_val;
+	dgAvxArray<dgAvxFloat> m_val;
 };
 
 class dgAvxVector3
@@ -101,16 +136,46 @@ class dgAvxVector3
 		,m_z(allocator)
 	{
 	}
+
 	void Reserve (dgInt32 count)
 	{
-		m_x.ResizeIfNecessary(count);
-		m_y.ResizeIfNecessary(count);
-		m_z.ResizeIfNecessary(count);
+		m_x.Reserve(count);
+		m_y.Reserve(count);
+		m_z.Reserve(count);
 	}
 
-	dgArray<dgAvxFloat> m_x;
-	dgArray<dgAvxFloat> m_y;
-	dgArray<dgAvxFloat> m_z;
+	DG_INLINE void Scale (dgInt32 index, const dgAvxFloat& scale)
+	{
+		m_x[index] = m_x[index] * scale;
+		m_y[index] = m_y[index] * scale;
+		m_z[index] = m_z[index] * scale;
+	}
+
+	dgAvxArray<dgAvxFloat> m_x;
+	dgAvxArray<dgAvxFloat> m_y;
+	dgAvxArray<dgAvxFloat> m_z;
+};
+
+class dgAvxMatrix3x3
+{
+	public:
+	dgAvxMatrix3x3(dgMemoryAllocator* const allocator)
+		:m_front(allocator)
+		,m_up(allocator)
+		,m_right(allocator)
+	{
+	}
+
+	void Reserve (dgInt32 count)
+	{
+		m_front.Reserve(count);
+		m_up.Reserve(count);
+		m_right.Reserve(count);
+	}
+
+	dgAvxVector3 m_front;
+	dgAvxVector3 m_up;
+	dgAvxVector3 m_right;
 };
 
 #endif

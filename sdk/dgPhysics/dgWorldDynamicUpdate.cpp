@@ -126,6 +126,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_firstCluster = index;
 	descriptor.m_clusterCount = m_clusters - index;
 
+world->m_useParallelSolver = 0;
 	if (world->m_currentPlugin) {
 		dgInt32 count = 0;
 		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
@@ -142,7 +143,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 			dgJointInfo* const jointArray = &constraintPtr[m_joints];
 
 			plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);
-			index += count;
+//			index += count;
 		}
 	} else if (world->m_useParallelSolver && (threadCount > 1)) {
 		dgInt32 count = 0;
