@@ -46,3 +46,45 @@ void dgAvxBody::Reserve (dgInt32 count)
 	m_rotation.Reserve(m_count);
 }
 
+void dgAvxBody::GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray)
+{
+	m_veloc.InitVector3(index, bodyArray[0]->GetVelocity(), bodyArray[1]->GetVelocity(), bodyArray[2]->GetVelocity(), bodyArray[3]->GetVelocity(),
+							   bodyArray[4]->GetVelocity(), bodyArray[5]->GetVelocity(), bodyArray[6]->GetVelocity(), bodyArray[7]->GetVelocity());
+}
+
+
+void dgAvxBody::GetOmega(dgInt32 index, dgDynamicBody** const bodyArray)
+{
+	m_omega.InitVector3(index, bodyArray[0]->GetOmega(), bodyArray[1]->GetOmega(), bodyArray[2]->GetOmega(), bodyArray[3]->GetOmega(),
+						       bodyArray[4]->GetOmega(), bodyArray[5]->GetOmega(), bodyArray[6]->GetOmega(), bodyArray[7]->GetOmega());
+}
+
+void dgAvxBody::GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray)
+{
+	const dgMatrix& matrix0 = bodyArray[0]->GetMatrix();
+	const dgMatrix& matrix1 = bodyArray[1]->GetMatrix();
+	const dgMatrix& matrix2 = bodyArray[2]->GetMatrix();
+	const dgMatrix& matrix3 = bodyArray[3]->GetMatrix();
+	const dgMatrix& matrix4 = bodyArray[4]->GetMatrix();
+	const dgMatrix& matrix5 = bodyArray[5]->GetMatrix();
+	const dgMatrix& matrix6 = bodyArray[6]->GetMatrix();
+	const dgMatrix& matrix7 = bodyArray[7]->GetMatrix();
+
+	m_rotation.m_front.InitVector3(index, matrix0[0], matrix1[0], matrix2[0], matrix3[0], matrix4[0], matrix5[0], matrix6[0], matrix7[0]);
+	m_rotation.m_up.InitVector3(index, matrix0[1], matrix1[1], matrix2[1], matrix3[1], matrix4[1], matrix5[1], matrix6[1], matrix7[1]);
+	m_rotation.m_right.InitVector3(index, matrix0[2], matrix1[2], matrix2[2], matrix3[2], matrix4[2], matrix5[2], matrix6[2], matrix7[2]);
+}
+
+
+void dgAvxBody::GetDampingCoef(dgInt32 index, dgDynamicBody** const bodyArray, float timestep)
+{
+	dgAvxFloat damp0(bodyArray[0]->GetDampCoeffcient(timestep), bodyArray[4]->GetDampCoeffcient(timestep));
+	dgAvxFloat damp1(bodyArray[1]->GetDampCoeffcient(timestep), bodyArray[5]->GetDampCoeffcient(timestep));
+	dgAvxFloat damp2(bodyArray[2]->GetDampCoeffcient(timestep), bodyArray[6]->GetDampCoeffcient(timestep));
+	dgAvxFloat damp3(bodyArray[3]->GetDampCoeffcient(timestep), bodyArray[7]->GetDampCoeffcient(timestep));
+	dgAvxFloat::Transpose4x8(damp0, damp1, damp2, damp3);
+	m_angularDamp.m_x[index] = damp0;
+	m_angularDamp.m_y[index] = damp1;
+	m_angularDamp.m_z[index] = damp2;
+	m_linearDamp.m_val[index] = damp3;
+}

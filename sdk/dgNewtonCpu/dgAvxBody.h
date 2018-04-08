@@ -30,6 +30,11 @@ class dgAvxBody
 	dgAvxBody (dgMemoryAllocator* const allocator);
 	void Reserve (dgInt32 count);
 	DG_INLINE void AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep);
+
+	void GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray);
+	void GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray);
+	void GetOmega(dgInt32 index, dgDynamicBody** const bodyArray);
+	void GetDampingCoef(dgInt32 index, dgDynamicBody** const bodyArray, float timestep);
 	
 	dgAvxMatrix3x3 m_rotation;
 	dgAvxVector3 m_veloc;

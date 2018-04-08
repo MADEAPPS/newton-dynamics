@@ -144,6 +144,23 @@ class dgAvxVector3
 		m_z.Reserve(count);
 	}
 
+	void InitVector3(dgInt32 index, const dgVector& v0, const dgVector& v1, const dgVector& v2, const dgVector& v3, const dgVector& v4, const dgVector& v5, const dgVector& v6, const dgVector& v7)
+	{
+		dgAvxFloat r0(v0, v4);
+		dgAvxFloat r1(v1, v5);
+		dgAvxFloat r2(v2, v6);
+		dgAvxFloat r3(v3, v7);
+		dgAvxFloat::Transpose4x8(r0, r1, r2, r3);
+		m_x[index] = r0;
+		m_y[index] = r1;
+		m_z[index] = r2;
+	}
+
+	void InitVector4(dgInt32 index, const dgVector& v0, const dgVector& v1, const dgVector& v2, const dgVector& v3, const dgVector& v4, const dgVector& v5, const dgVector& v6, const dgVector& v7)
+	{
+
+	}
+
 	DG_INLINE void Scale (dgInt32 index, const dgAvxFloat& scale)
 	{
 		m_x[index] = m_x[index] * scale;
