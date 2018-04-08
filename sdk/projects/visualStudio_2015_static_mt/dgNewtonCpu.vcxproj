@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dgNewtonCpu\dgAvxBody.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dgNewtonCpu.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dgNewtonCpuStdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -19,6 +20,8 @@
     <ClCompile Include="..\..\dgNewtonCpu\dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dgNewtonCpu\dgAvxBody.h" />
+    <ClInclude Include="..\..\dgNewtonCpu\dgAvxMath.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgNewtonCpu.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgNewtonCpuStdafx.h" />
   </ItemGroup>
