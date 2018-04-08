@@ -800,7 +800,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		dgVector maxAccel(accNorm);
 		dgVector sor(dgFloat32 (1.3f));
 		const dgFloat32 tol2 = dgFloat32(1.0e-4f);
-		for (dgInt32 j = 0; (j < 8) && (maxAccel.GetScalar() > tol2); j++) {
+		for (dgInt32 j = 0; (j < 4) && (maxAccel.GetScalar() > tol2); j++) {
 			maxAccel = dgVector::m_zero;
 			for (dgInt32 i = 0; i < rowsCount; i++) {
 				const dgJacobianMatrixElement* const row = &matrixRow[index + i];
@@ -808,7 +808,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 							  row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
 
 				dgVector accel(b[i] - x[i] * diagDamp[i] - diag.AddHorizontal());
-				//dgVector force(x[i] + invJinvMJt[i] * accel);
 				dgVector force(x[i] + invJinvMJt[i] * accel * sor);
 
 				const dgVector frictionNormal(x[frictionIndex[i]]);
