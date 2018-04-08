@@ -186,6 +186,9 @@
     <ClCompile Include="..\..\dgPhysics\dgInverseDynamics.cpp">
       <Filter>systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dgPhysics\dgWorldPlugins.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgPhysics\dgBodyMasterList.h">
@@ -336,6 +339,9 @@
       <Filter>meshUtil</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgPhysics\dgInverseDynamics.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dgPhysics\dgWorldPlugins.h">
       <Filter>systems</Filter>
     </ClInclude>
   </ItemGroup>
