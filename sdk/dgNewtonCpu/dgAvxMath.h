@@ -27,7 +27,46 @@
 DG_MSC_AVX_ALIGMENT
 class dgAvxFloat
 {
+	#define PERMUTE_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
 	public:
+	DG_INLINE dgAvxFloat()
+	{
+	}
+
+	DG_INLINE dgAvxFloat(float val)
+		:m_type(_mm256_set1_ps (val))
+	{
+	}
+
+	DG_INLINE dgAvxFloat(const __m256 type)
+		:m_type(type)
+	{
+	}
+
+	DG_INLINE dgAvxFloat(const dgAvxFloat& copy)
+		:m_type(copy.m_type)
+	{
+	}
+
+	DG_INLINE dgAvxFloat (const dgVector& low, const dgVector& high)
+		:m_type (_mm256_loadu2_m128 (&high.m_x, &low.m_x))
+	{
+	}
+
+	DG_INLINE static void Transpose4x8(dgAvxFloat& src0, dgAvxFloat& src1, dgAvxFloat& src2, dgAvxFloat& src3)
+	{
+		__m256 tmp0(_mm256_unpacklo_ps(src0.m_type, src1.m_type));
+		__m256 tmp1(_mm256_unpacklo_ps(src2.m_type, src3.m_type));
+		__m256 tmp2(_mm256_unpackhi_ps(src0.m_type, src1.m_type));
+		__m256 tmp3(_mm256_unpackhi_ps(src2.m_type, src3.m_type));
+
+		src0 = _mm256_shuffle_ps(tmp0, tmp1, PERMUTE_MASK(1, 0, 1, 0));
+		src1 = _mm256_shuffle_ps(tmp0, tmp1, PERMUTE_MASK(3, 2, 3, 2));
+		src2 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(1, 0, 1, 0));
+		src3 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(3, 2, 3, 2));
+	}
+
+
 	union
 	{
 		__m256 m_type;

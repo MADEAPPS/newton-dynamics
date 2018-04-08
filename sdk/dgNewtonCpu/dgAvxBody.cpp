@@ -26,6 +26,9 @@ dgAvxBody::dgAvxBody(dgMemoryAllocator* const allocator)
 	:m_weight(allocator)
 	,m_invWeigh(allocator)
 	,m_veloc(allocator)
+	,m_omega(allocator)
+	,m_angularDamp(allocator)
+	,m_linearDamp(allocator)
 	,m_count(0)
 {
 }
@@ -36,6 +39,11 @@ void dgAvxBody::Reserve (dgInt32 count)
 	m_weight.Reserve(m_count);
 	m_invWeigh.Reserve(m_count);
 	m_veloc.Reserve(m_count);
+	m_omega.Reserve(m_count);
+	m_angularDamp.Reserve(m_count);
+	m_linearDamp.Reserve(m_count);
 }
 
-
+void dgAvxBody::AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep)
+{
+}

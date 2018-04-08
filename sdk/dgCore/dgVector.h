@@ -1163,7 +1163,7 @@ class dgBigVector;
 DG_MSC_VECTOR_ALIGMENT
 class dgVector
 {
-	#define PURMUT_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
+	#define PERMUTE_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
 	public:
 	DG_INLINE dgVector() 
 	{
@@ -1203,7 +1203,7 @@ class dgVector
 	}
 
 	DG_INLINE dgVector (const dgBigVector& copy)
-		:m_type(_mm_shuffle_ps (_mm_cvtpd_ps (((__m128d*)&copy)[0]), _mm_cvtpd_ps (((__m128d*)&copy)[1]), PURMUT_MASK(1, 0, 1, 0)))
+		:m_type(_mm_shuffle_ps (_mm_cvtpd_ps (((__m128d*)&copy)[0]), _mm_cvtpd_ps (((__m128d*)&copy)[1]), PERMUTE_MASK(1, 0, 1, 0)))
 	{
 		dgAssert (dgCheckVector ((*this)));
 	}
@@ -1233,22 +1233,22 @@ class dgVector
 
 	DG_INLINE dgVector BroadcastX () const
 	{
-		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(0, 0, 0, 0));
+		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(0, 0, 0, 0));
 	}
 
 	DG_INLINE dgVector BroadcastY () const
 	{
-		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(1, 1, 1, 1));
+		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(1, 1, 1, 1));
 	}
 
 	DG_INLINE dgVector BroadcastZ () const
 	{
-		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(2, 2, 2, 2));
+		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(2, 2, 2, 2));
 	}
 
 	DG_INLINE dgVector BroadcastW () const
 	{
-		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 3, 3, 3));
+		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
 	}
 
 	DG_INLINE dgVector Scale3 (dgFloat32 s) const
@@ -1321,8 +1321,8 @@ class dgVector
 	// return cross product
 	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
 	{
-		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 1, 0, 2))),
-			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
+		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2))),
+			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1))));
 	}
 
 	DG_INLINE dgVector DotProduct4(const dgVector& A) const
@@ -1501,12 +1501,12 @@ class dgVector
 
 	DG_INLINE dgVector ShiftTripleRight () const
 	{
-		return _mm_shuffle_ps(m_type, m_type, PURMUT_MASK(3, 1, 0, 2));
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 1, 0, 2));
 	}
 
 	DG_INLINE dgVector ShiftTripleLeft () const
 	{
-		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1));
+		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1));
 	}
 
 	DG_INLINE dgVector ShiftRightLogical (int bits) const
@@ -1613,7 +1613,7 @@ class dgBigVector
 
 	DG_INLINE dgBigVector(const dgVector& v)
 		:m_typeLow(_mm_cvtps_pd (v.m_type))
-		,m_typeHigh(_mm_cvtps_pd (_mm_shuffle_ps (v.m_type, v.m_type, PURMUT_MASK(3, 2, 3, 2))))
+		,m_typeHigh(_mm_cvtps_pd (_mm_shuffle_ps (v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
 	{
 		dgAssert(dgCheckVector((*this)));
 	}
@@ -2040,8 +2040,8 @@ class dgSpatialVector
 #else 
 	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
 		:m_d0(_mm_cvtps_pd(low.m_type))
-		,m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PURMUT_MASK(0, 0, 0, 2)))))
-		,m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PURMUT_MASK(3, 3, 2, 1))))
+		,m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PERMUTE_MASK(0, 0, 0, 2)))))
+		,m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PERMUTE_MASK(3, 3, 2, 1))))
 	{
 	}
 #endif

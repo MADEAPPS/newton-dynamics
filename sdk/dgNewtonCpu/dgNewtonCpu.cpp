@@ -117,7 +117,7 @@ void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 		invWeights[i] = 1.0f / w;
 	}
 
-//	InityBodyArray();
+	InityBodyArray();
 
 }
 
@@ -131,24 +131,62 @@ void dgNewtonCpu::InityBodyArray()
 //	dgBodyInfo* const bodyArray = syncData->m_bodyArray;
 //	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 
-	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+//	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	const dgInt32 bodyCount = m_avxBody.m_count;
+
+	dgAvxVector3& veloc = m_avxBody.m_veloc;
+	dgAvxVector3& omega = m_avxBody.m_omega;
+	dgAvxScalar& linearDamp = m_avxBody.m_linearDamp;
+	dgAvxVector3& angularDamp = m_avxBody.m_angularDamp;
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
+		dgDynamicBody* const body0 = (dgDynamicBody*)m_bodyArray[i * 8 + 0].m_body;
+		dgDynamicBody* const body1 = (dgDynamicBody*)m_bodyArray[i * 8 + 1].m_body;
+		dgDynamicBody* const body2 = (dgDynamicBody*)m_bodyArray[i * 8 + 2].m_body;
+		dgDynamicBody* const body3 = (dgDynamicBody*)m_bodyArray[i * 8 + 3].m_body;
+		dgDynamicBody* const body4 = (dgDynamicBody*)m_bodyArray[i * 8 + 4].m_body;
+		dgDynamicBody* const body5 = (dgDynamicBody*)m_bodyArray[i * 8 + 5].m_body;
+		dgDynamicBody* const body6 = (dgDynamicBody*)m_bodyArray[i * 8 + 6].m_body;
+		dgDynamicBody* const body7 = (dgDynamicBody*)m_bodyArray[i * 8 + 7].m_body;
 
+		dgAvxFloat veloc0 (body0->GetVelocity(), body4->GetVelocity());
+		dgAvxFloat veloc1 (body1->GetVelocity(), body5->GetVelocity());
+		dgAvxFloat veloc2 (body2->GetVelocity(), body6->GetVelocity());
+		dgAvxFloat veloc3 (body3->GetVelocity(), body7->GetVelocity());
+		dgAvxFloat::Transpose4x8(veloc0, veloc1, veloc2, veloc3);
+		veloc.m_x[i] = veloc0;
+		veloc.m_y[i] = veloc1;
+		veloc.m_z[i] = veloc2;
 
+		dgAvxFloat omega0(body0->GetOmega(), body4->GetOmega());
+		dgAvxFloat omega1(body1->GetOmega(), body5->GetOmega());
+		dgAvxFloat omega2(body2->GetOmega(), body6->GetOmega());
+		dgAvxFloat omega3(body3->GetOmega(), body7->GetOmega());
+		dgAvxFloat::Transpose4x8(omega0, omega1, omega2, omega3);
+		omega.m_x[i] = omega0;
+		omega.m_y[i] = omega1;
+		omega.m_z[i] = omega2;
+
+		dgAvxFloat damp0 (body0->GetDampCoeffcient(m_timestep), body4->GetDampCoeffcient(m_timestep)); 
+		dgAvxFloat damp1 (body1->GetDampCoeffcient(m_timestep), body5->GetDampCoeffcient(m_timestep)); 
+		dgAvxFloat damp2 (body2->GetDampCoeffcient(m_timestep), body6->GetDampCoeffcient(m_timestep)); 
+		dgAvxFloat damp3 (body3->GetDampCoeffcient(m_timestep), body7->GetDampCoeffcient(m_timestep)); 
+		dgAvxFloat::Transpose4x8(damp0, damp1, damp2, damp3);
+		angularDamp.m_x[i] = damp0;
+		angularDamp.m_y[i] = damp1;
+		angularDamp.m_z[i] = damp2;
+		linearDamp.m_val[i] = damp3;
 	}
 
-
-
-
-//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	dgAvxFloat timestep (m_timestep);
+	dgAvxBody& avxBody = m_avxBody;
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 //		dgDynamicBody* const body = (dgDynamicBody*)m_bodyArray[i].m_body;
-
 //		if (!body->m_equilibrium) {
-//			dgAssert(body->m_invMass.m_w > dgFloat32(0.0f));
-//		body->AddDampingAcceleration(m_timestep);
+//			body->AddDampingAcceleration(m_timestep);
 //			body->CalcInvInertiaMatrix();
 //		}
+		avxBody.AddDampingAcceleration(i, timestep);
+
 /*
 		// re use these variables for temp storage 
 		body->m_accel = body->m_veloc;

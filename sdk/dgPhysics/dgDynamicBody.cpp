@@ -184,6 +184,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 
 void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 {
+/*
 	if (dgAbs(m_cachedTimeStep - timestep) > dgFloat32(1.0e-6f)) {
 		m_cachedTimeStep = timestep;
 		const dgFloat32 tau = dgFloat32(1.0f) / (dgFloat32(60.0f) * timestep);
@@ -192,13 +193,14 @@ void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 		m_cachedDampCoef.m_z = dgPow(dgFloat32(1.0f) - m_dampCoef.m_z, tau);
 		m_cachedDampCoef.m_w = dgPow(dgFloat32(1.0f) - m_dampCoef.m_w, tau);
 	} 
-
+*/
+	dgVector damp (GetDampCoeffcient (timestep));
 	if (m_linearDampOn) {
-		m_veloc = m_veloc.Scale4(m_cachedDampCoef.m_w);
+		m_veloc = m_veloc.Scale4(damp.m_w);
 	}
 
 	if (m_angularDampOn) {
-		dgVector omegaDamp(m_cachedDampCoef & dgVector::m_triplexMask);
+		dgVector omegaDamp(damp & dgVector::m_triplexMask);
 		dgVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
 		m_omega = m_matrix.RotateVector(omega);
 	}
