@@ -143,7 +143,7 @@ world->m_useParallelSolver = 0;
 			dgJointInfo* const jointArray = &constraintPtr[m_joints];
 
 			plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);
-//			index += count;
+			index += count;
 		}
 	} else if (world->m_useParallelSolver && (threadCount > 1)) {
 		dgInt32 count = 0;

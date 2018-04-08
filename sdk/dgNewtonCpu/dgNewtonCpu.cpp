@@ -134,7 +134,7 @@ void dgNewtonCpu::InityBodyArray()
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		dgDynamicBody* body[8];
 		for (dgInt32 j = 0; j < 8; j++) {
-			body[j] = (dgDynamicBody*)m_bodyArray[i * 8 + 0].m_body;
+			body[j] = (dgDynamicBody*)m_bodyArray[i * 8 + j].m_body;
 		}
 
 		m_avxBody.GetMatrix(i, body);
