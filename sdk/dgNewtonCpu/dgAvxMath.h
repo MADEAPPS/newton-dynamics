@@ -49,7 +49,6 @@ class dgAvxArray: public dgArray<T>
 	{
 		return m_ptr[i];
 	}
-	
 
 	T* m_ptr;
 };
@@ -111,6 +110,89 @@ class dgAvxFloat
 	};
 } DG_GCC_AVX_ALIGMENT;
 
+DG_MSC_AVX_ALIGMENT
+class dgAvxVector3_local
+{
+	public:
+	DG_INLINE dgAvxVector3_local()
+		:m_x()
+		,m_y()
+		,m_z()
+	{
+	}
+
+	DG_INLINE dgAvxVector3_local(const dgAvxVector3_local& val)
+		:m_x(val.m_x)
+		,m_y(val.m_y)
+		,m_z(val.m_z)
+	{
+	}
+
+	DG_INLINE dgAvxVector3_local(const dgAvxFloat& x, const dgAvxFloat& y, const dgAvxFloat& z)
+		:m_x(x)
+		,m_y(y)
+		,m_z(z)
+	{
+	}
+
+	DG_INLINE dgAvxVector3_local Scale(const dgAvxFloat& a) const
+	{
+		return dgAvxVector3_local(m_x * a, m_y * a, m_z * a);
+	}
+
+	DG_INLINE dgAvxVector3_local operator* (const dgAvxVector3_local& a) const
+	{
+		return dgAvxVector3_local(m_x * a.m_x, m_y * a.m_y, m_z * a.m_z);
+	}
+
+	dgAvxFloat m_x;
+	dgAvxFloat m_y;
+	dgAvxFloat m_z;
+} DG_GCC_AVX_ALIGMENT;
+
+DG_MSC_AVX_ALIGMENT
+class dgAvxMatrix3x3_local
+{
+	public:
+	DG_INLINE dgAvxMatrix3x3_local()
+		:m_right()
+		,m_up()
+		,m_front()
+	{
+	}
+
+	DG_INLINE dgAvxMatrix3x3_local(const dgAvxMatrix3x3_local& val)
+		:m_right(val.m_right)
+		,m_up(val.m_up)
+		,m_front(val.m_front)
+	{
+	}
+
+	DG_INLINE dgAvxMatrix3x3_local(const dgAvxVector3_local& x, const dgAvxVector3_local& y, const dgAvxVector3_local& z)
+		:m_right(x)
+		,m_up(y)
+		,m_front(z)
+	{
+	}
+
+	DG_INLINE dgAvxVector3_local RotateVector(const dgAvxVector3_local& a) const
+	{
+		return dgAvxVector3_local();
+	}
+
+	DG_INLINE dgAvxVector3_local UnrotateVector(const dgAvxVector3_local& a) const
+	{
+		return dgAvxVector3_local();
+	}
+
+	
+	dgAvxVector3_local m_front;
+	dgAvxVector3_local m_up;
+	dgAvxVector3_local m_right;
+	
+} DG_GCC_AVX_ALIGMENT;
+
+
 
 class dgAvxScalar
 {
@@ -156,16 +238,16 @@ class dgAvxVector3
 		m_z[index] = r2;
 	}
 
-	void InitVector4(dgInt32 index, const dgVector& v0, const dgVector& v1, const dgVector& v2, const dgVector& v3, const dgVector& v4, const dgVector& v5, const dgVector& v6, const dgVector& v7)
+	DG_INLINE void Set (dgInt32 index, const dgAvxVector3_local& val)
 	{
-
+		m_x[index] = val.m_x;
+		m_y[index] = val.m_y;
+		m_z[index] = val.m_z;
 	}
 
-	DG_INLINE void Scale (dgInt32 index, const dgAvxFloat& scale)
+	DG_INLINE dgAvxVector3_local Get(dgInt32 index) const
 	{
-		m_x[index] = m_x[index] * scale;
-		m_y[index] = m_y[index] * scale;
-		m_z[index] = m_z[index] * scale;
+		return dgAvxVector3_local(m_x[index], m_y[index], m_z[index]);
 	}
 
 	dgAvxArray<dgAvxFloat> m_x;
@@ -188,6 +270,18 @@ class dgAvxMatrix3x3
 		m_front.Reserve(count);
 		m_up.Reserve(count);
 		m_right.Reserve(count);
+	}
+
+	DG_INLINE dgAvxMatrix3x3_local Get(dgInt32 index) const
+	{
+		return dgAvxMatrix3x3_local(m_front.Get(index), m_up.Get(index), m_right.Get(index));
+	}
+
+	DG_INLINE void Set(dgInt32 index, const dgAvxMatrix3x3_local& val)
+	{
+		m_front.Set(index, val.m_front);
+		m_up.Set(index, val.m_up);
+		m_right.Set(index, val.m_right);
 	}
 
 	dgAvxVector3 m_front;

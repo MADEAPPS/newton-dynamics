@@ -88,3 +88,20 @@ void dgAvxBody::GetDampingCoef(dgInt32 index, dgDynamicBody** const bodyArray, f
 	m_angularDamp.m_z[index] = damp2;
 	m_linearDamp.m_val[index] = damp3;
 }
+
+
+void dgAvxBody::AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep)
+{
+	m_veloc.Set(index, m_veloc.Get(index).Scale(timestep));
+
+	//	dgVector omegaDamp(damp & dgVector::m_triplexMask);
+	//	dgVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
+	//	m_omega = m_matrix.RotateVector(omega);
+	dgAvxVector3_local damp(m_angularDamp.Get(index));
+	dgAvxVector3_local omega(m_omega.Get(index));
+	dgAvxMatrix3x3_local matrix(m_rotation.Get(index));
+	dgAvxVector3_local xxx1(matrix.UnrotateVector(omega));
+	dgAvxVector3_local xxx2(xxx1 * damp);
+	dgAvxVector3_local xxx3(matrix.RotateVector(xxx2));
+	m_omega.Set(index, xxx3);
+}

@@ -29,7 +29,7 @@ class dgAvxBody
 	public:
 	dgAvxBody (dgMemoryAllocator* const allocator);
 	void Reserve (dgInt32 count);
-	DG_INLINE void AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep);
+	void AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep);
 
 	void GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray);
 	void GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray);
@@ -48,10 +48,6 @@ class dgAvxBody
 };
 
 
-DG_INLINE void dgAvxBody::AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep)
-{
-	m_veloc.Scale (index, timestep);
-}
 
 
 #endif
