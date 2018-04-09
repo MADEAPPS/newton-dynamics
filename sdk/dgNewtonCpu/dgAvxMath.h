@@ -93,6 +93,11 @@ class dgAvxFloat
 		return _mm256_add_ps(m_type, A.m_type);
 	}
 
+	DG_INLINE dgAvxFloat MultAdd(const dgAvxFloat& a, const dgAvxFloat& b) const
+	{
+		return _mm256_fmadd_ps(a.m_type, b.m_type, m_type);
+	}
+
 	DG_INLINE static void Transpose4x8(dgAvxFloat& src0, dgAvxFloat& src1, dgAvxFloat& src2, dgAvxFloat& src3)
 	{
 		__m256 tmp0(_mm256_unpacklo_ps(src0.m_type, src1.m_type));
@@ -150,6 +155,12 @@ class dgAvxVector3_local
 		return dgAvxVector3_local(m_x * a.m_x, m_y * a.m_y, m_z * a.m_z);
 	}
 
+	DG_INLINE dgAvxVector3_local MultAdd (const dgAvxVector3_local& a, const dgAvxVector3_local& b) const
+	{
+		return dgAvxVector3_local(m_x.MultAdd (a.m_x, b.m_x), m_y.MultAdd(a.m_y, b.m_y), m_z.MultAdd(a.m_z, b.m_z));
+	}
+
+
 	dgAvxFloat m_x;
 	dgAvxFloat m_y;
 	dgAvxFloat m_z;
@@ -182,6 +193,9 @@ class dgAvxMatrix3x3_local
 
 	DG_INLINE dgAvxVector3_local RotateVector(const dgAvxVector3_local& a) const
 	{
+		//dgAvxFloat x(((a.m_x * m_front.m_x).MultAdd(a.m_y, m_up.m_x)).MultAdd(a.m_z, m_right.m_x));
+		//dgAvxFloat y(((a.m_x * m_front.m_y).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_right.m_y));
+		//dgAvxFloat z(((a.m_x * m_front.m_z).MultAdd(a.m_y, m_up.m_z)).MultAdd(a.m_z, m_right.m_z));
 		dgAvxFloat x(a.m_x * m_front.m_x + a.m_y * m_up.m_x + a.m_z * m_right.m_x);
 		dgAvxFloat y(a.m_x * m_front.m_y + a.m_y * m_up.m_y + a.m_z * m_right.m_y);
 		dgAvxFloat z(a.m_x * m_front.m_z + a.m_y * m_up.m_z + a.m_z * m_right.m_z);
@@ -190,12 +204,15 @@ class dgAvxMatrix3x3_local
 
 	DG_INLINE dgAvxVector3_local UnrotateVector(const dgAvxVector3_local& a) const
 	{
+		//dgAvxFloat x(((a.m_x * m_front.m_x).MultAdd (a.m_y, m_front.m_y)).MultAdd(a.m_z, m_front.m_z));
+		//dgAvxFloat y(((a.m_x * m_up.m_x).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_up.m_z));
+		//dgAvxFloat z(((a.m_x * m_right.m_x).MultAdd(a.m_y, m_right.m_y)).MultAdd(a.m_z, m_right.m_z));
+
 		dgAvxFloat x(a.m_x * m_front.m_x + a.m_y * m_front.m_y + a.m_z * m_front.m_z);
 		dgAvxFloat y(a.m_x * m_up.m_x    + a.m_y * m_up.m_y    + a.m_z * m_up.m_z);
 		dgAvxFloat z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);
 		return dgAvxVector3_local(x, y, z);
 	}
-
 	
 	dgAvxVector3_local m_front;
 	dgAvxVector3_local m_up;

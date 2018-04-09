@@ -152,6 +152,7 @@ void dgNewtonCpu::InityBodyArray()
 //			body->CalcInvInertiaMatrix();
 //		}
 		avxBody.AddDampingAcceleration(i, timestep);
+		avxBody.CalcInvInertiaMatrix();
 
 /*
 		// re use these variables for temp storage 

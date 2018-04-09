@@ -49,6 +49,10 @@ class dgAvxBody
 		m_omega.Set(index, matrix.RotateVector(matrix.UnrotateVector(omega) * damp));
 	}
 
+	DG_INLINE void CalcInvInertiaMatrix()
+	{
+
+	}
 
 	
 	dgAvxMatrix3x3 m_rotation;
