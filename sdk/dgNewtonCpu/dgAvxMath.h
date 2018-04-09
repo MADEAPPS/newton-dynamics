@@ -88,6 +88,11 @@ class dgAvxFloat
 		return _mm256_mul_ps(m_type, A.m_type);
 	}
 
+	DG_INLINE dgAvxFloat operator+ (const dgAvxFloat& A) const
+	{
+		return _mm256_add_ps(m_type, A.m_type);
+	}
+
 	DG_INLINE static void Transpose4x8(dgAvxFloat& src0, dgAvxFloat& src1, dgAvxFloat& src2, dgAvxFloat& src3)
 	{
 		__m256 tmp0(_mm256_unpacklo_ps(src0.m_type, src1.m_type));
@@ -177,12 +182,18 @@ class dgAvxMatrix3x3_local
 
 	DG_INLINE dgAvxVector3_local RotateVector(const dgAvxVector3_local& a) const
 	{
-		return dgAvxVector3_local();
+		dgAvxFloat x(a.m_x * m_front.m_x + a.m_y * m_up.m_x + a.m_z * m_right.m_x);
+		dgAvxFloat y(a.m_x * m_front.m_y + a.m_y * m_up.m_y + a.m_z * m_right.m_y);
+		dgAvxFloat z(a.m_x * m_front.m_z + a.m_y * m_up.m_z + a.m_z * m_right.m_z);
+		return dgAvxVector3_local(x, y, z);
 	}
 
 	DG_INLINE dgAvxVector3_local UnrotateVector(const dgAvxVector3_local& a) const
 	{
-		return dgAvxVector3_local();
+		dgAvxFloat x(a.m_x * m_front.m_x + a.m_y * m_front.m_y + a.m_z * m_front.m_z);
+		dgAvxFloat y(a.m_x * m_up.m_x    + a.m_y * m_up.m_y    + a.m_z * m_up.m_z);
+		dgAvxFloat z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);
+		return dgAvxVector3_local(x, y, z);
 	}
 
 	
