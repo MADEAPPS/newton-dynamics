@@ -50,7 +50,11 @@ void dgWorldPluginList::LoadPlugins()
 			break;
 		}
 	}
-	strcat(plugInPath, "/newtonPlugins");
+#ifdef _DEBUG
+	strcat(plugInPath, "/newtonPlugins/debug");
+#else
+	strcat(plugInPath, "/newtonPlugins/release");
+#endif
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
 

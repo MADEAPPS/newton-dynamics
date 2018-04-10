@@ -53,7 +53,6 @@ class dgWorldDynamicUpdateSyncDescriptor
 	
 	dgInt32 m_clusterCount;
 	dgInt32 m_firstCluster;
-	dgInt32* m_criticalSection;
 };
 
 

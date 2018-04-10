@@ -427,53 +427,6 @@ class dgWorld
 		dgFloat32 m_dist;
 	};
 
-	class dgStack: public dgArray<dgUnsigned8>
-	{
-		public:
-		dgStack(dgMemoryAllocator* const allocator)
-			:dgArray<dgUnsigned8>(allocator, 256)
-			,m_index(0)
-		{
-			Resize(1024 * 32);
-		}
-
-		~dgStack()
-		{
-		}
-
-		dgInt32 m_index;
-	};
-
-	template<class T>
-	class dgStackBuffer 
-	{
-		public: 
-		dgStackBuffer(dgWorld* const world, dgInt32 elements)
-			:m_stack(&world->m_stack)
-		{
-			dgInt32 sizeInBytes = m_stack->m_index + sizeof(T) * elements + 32;
-			m_stack->ResizeIfNecessary(sizeInBytes);
-			dgInt32 index = (m_stack->m_index + 0x0f) & -0x10;
-			m_ptr = (T*)(&(*m_stack)[index]);
-			m_previusIndex = m_stack->m_index;
-			m_stack->m_index = sizeInBytes;
-		}
-
-		~dgStackBuffer()
-		{
-			m_stack->m_index = m_previusIndex;
-		}
-
-		T* GetBuffer()
-		{
-			return m_ptr;
-		}
-
-		void* m_ptr;
-		dgStack* m_stack;
-		dgInt32 m_previusIndex;
-	};
-
 	void RunStep ();
 	void CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgFloat32 distTolerenace, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;

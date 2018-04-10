@@ -291,7 +291,7 @@
       <AdditionalDependencies>glu32.lib;opengl32.lib;winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/*.*" /F /Y /R</Command>
+      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/$(Configuration)/*.*" /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">
@@ -310,7 +310,7 @@
       <AdditionalDependencies>glu32.lib;opengl32.lib;winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/*.*" /F /Y /R</Command>
+      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/$(Configuration)/*.*" /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -365,7 +365,7 @@
       <AdditionalDependencies>glu32.lib;opengl32.lib;winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/*.*" /F /Y /R</Command>
+      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/$(Configuration)/*.*" /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">
@@ -388,7 +388,7 @@
       <AdditionalDependencies>glu32.lib;opengl32.lib;winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/*.*" /F /Y /R</Command>
+      <Command>xcopy  "../../../../sdk/projects/visualStudio_2013_static_mt/$(Platform)/dgNewtonCpu/$(Configuration)/*.dll"  "$(OutDir)newtonPlugins/$(Configuration)/*.*" /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
