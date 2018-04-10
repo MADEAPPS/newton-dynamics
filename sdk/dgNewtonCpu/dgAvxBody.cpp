@@ -109,9 +109,29 @@ void dgAvxBody::ApplyDampingAndCalculateInvInertia(dgInt32 index)
 //	tmp[1] = tmp[1] * m_invMass;
 //	tmp[2] = tmp[2] * m_invMass;
 //	return dgMatrix(m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
-	dgAvxMatrix3x3 tmp(m_rotation[index].Transpose());
-	dgAvxMatrix3x3 tmp1(tmp.m_front * m_localInvInertia[index], tmp.m_up * m_localInvInertia[index], tmp.m_right * m_localInvInertia[index]);
-	m_invInertia[index] = tmp1 * m_rotation[index];
+//	dgAvxMatrix3x3 tmp(m_rotation[index].Transpose());
+//	dgAvxMatrix3x3 tmp1(tmp.m_front * m_localInvInertia[index], tmp.m_up * m_localInvInertia[index], tmp.m_right * m_localInvInertia[index]);
+//	m_invInertia[index] = tmp1 * m_rotation[index];
+
+/*
+	const dgVector invIxx(m_invMass[0]);
+	const dgVector invIyy(m_invMass[1]);
+	const dgVector invIzz(m_invMass[2]);
+	return dgMatrix(
+		m_matrix.m_front.Scale4(m_matrix.m_front[0]) * invIxx +
+		m_matrix.m_up.Scale4(m_matrix.m_up[0])		 * invIyy +
+		m_matrix.m_right.Scale4(m_matrix.m_right[0]) * invIzz,
+
+		m_matrix.m_front.Scale4(m_matrix.m_front[1]) * invIxx +
+		m_matrix.m_up.Scale4(m_matrix.m_up[1])		 * invIyy +
+		m_matrix.m_right.Scale4(m_matrix.m_right[1]) * invIzz,
+
+		m_matrix.m_front.Scale4(m_matrix.m_front[2]) * invIxx +
+		m_matrix.m_up.Scale4(m_matrix.m_up[2])		 * invIyy +
+		m_matrix.m_right.Scale4(m_matrix.m_right[2]) * invIzz,
+		dgVector::m_wOne);
+*/
+
 }
 
 

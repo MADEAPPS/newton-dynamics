@@ -183,7 +183,7 @@ class dgAvxMatrix3x3
 
 	DG_INLINE dgAvxMatrix3x3 operator* (const dgAvxMatrix3x3& a) const
 	{
-		return dgAvxMatrix3x3();
+		return dgAvxMatrix3x3(a.RotateVector(m_front), a.RotateVector(m_up), a.RotateVector(m_right));
 	}
 
 	DG_INLINE dgAvxVector3 RotateVector(const dgAvxVector3& a) const
