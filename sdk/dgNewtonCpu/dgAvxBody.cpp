@@ -25,11 +25,14 @@
 dgAvxBody::dgAvxBody(dgMemoryAllocator* const allocator)
 	:m_veloc(allocator)
 	,m_omega(allocator)
+	,m_localInvInertia(allocator)
+	,m_invMass(allocator)
 	,m_weigh(allocator)
 	,m_invWeigh(allocator)
 	,m_linearDamp(allocator)
 	,m_angularDamp(allocator)
 	,m_rotation(allocator)
+	,m_invInertia(allocator)
 	,m_count(0)
 {
 }
@@ -39,11 +42,14 @@ void dgAvxBody::Reserve (dgInt32 count)
 	m_count = ((count + 7) & -7) >> 3;
 	m_veloc.Reserve(m_count);
 	m_omega.Reserve(m_count);
+	m_localInvInertia.Reserve(m_count);
+	m_invMass.Reserve(m_count);
 	m_weigh.Reserve(m_count);
 	m_invWeigh.Reserve(m_count);
 	m_angularDamp.Reserve(m_count);
 	m_linearDamp.Reserve(m_count);
 	m_rotation.Reserve(m_count);
+	m_invInertia.Reserve(m_count);
 }
 
 void dgAvxBody::GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray)
@@ -59,7 +65,6 @@ void dgAvxBody::GetOmega(dgInt32 index, dgDynamicBody** const bodyArray)
 								  bodyArray[4]->GetOmega(), bodyArray[5]->GetOmega(), bodyArray[6]->GetOmega(), bodyArray[7]->GetOmega());
 }
 
-
 void dgAvxBody::GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray)
 {
 	m_rotation[index] = dgAvxMatrix3x3(bodyArray[0]->GetMatrix(), 
@@ -72,15 +77,41 @@ void dgAvxBody::GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray)
 									   bodyArray[7]->GetMatrix());
 }
 
+void dgAvxBody::GetInvMassMatrix(dgInt32 index, dgDynamicBody** const bodyArray)
+{
+	dgAvxFloat v0(bodyArray[0]->GetInvMass(), bodyArray[4]->GetInvMass());
+	dgAvxFloat v1(bodyArray[1]->GetInvMass(), bodyArray[5]->GetInvMass());
+	dgAvxFloat v2(bodyArray[2]->GetInvMass(), bodyArray[6]->GetInvMass());
+	dgAvxFloat v3(bodyArray[3]->GetInvMass(), bodyArray[7]->GetInvMass());
+	dgAvxFloat::Transpose4x8(v0, v1, v2, v3);
+	m_invMass[index] = v3;
+	m_localInvInertia[index] = dgAvxVector3(v0, v1, v2);
+}
+
 void dgAvxBody::GetDampingCoef(dgInt32 index, dgDynamicBody** const bodyArray, float timestep)
 {
-	dgAvxFloat damp0(bodyArray[0]->GetDampCoeffcient(timestep), bodyArray[4]->GetDampCoeffcient(timestep));
-	dgAvxFloat damp1(bodyArray[1]->GetDampCoeffcient(timestep), bodyArray[5]->GetDampCoeffcient(timestep));
-	dgAvxFloat damp2(bodyArray[2]->GetDampCoeffcient(timestep), bodyArray[6]->GetDampCoeffcient(timestep));
-	dgAvxFloat damp3(bodyArray[3]->GetDampCoeffcient(timestep), bodyArray[7]->GetDampCoeffcient(timestep));
-	dgAvxFloat::Transpose4x8(damp0, damp1, damp2, damp3);
-	m_linearDamp[index] = damp3;
-	m_angularDamp[index] = dgAvxVector3 (damp0, damp1, damp2);
+	dgAvxFloat v0(bodyArray[0]->GetDampCoeffcient(timestep), bodyArray[4]->GetDampCoeffcient(timestep));
+	dgAvxFloat v1(bodyArray[1]->GetDampCoeffcient(timestep), bodyArray[5]->GetDampCoeffcient(timestep));
+	dgAvxFloat v2(bodyArray[2]->GetDampCoeffcient(timestep), bodyArray[6]->GetDampCoeffcient(timestep));
+	dgAvxFloat v3(bodyArray[3]->GetDampCoeffcient(timestep), bodyArray[7]->GetDampCoeffcient(timestep));
+	dgAvxFloat::Transpose4x8(v0, v1, v2, v3);
+	m_linearDamp[index] = v3;
+	m_angularDamp[index] = dgAvxVector3(v0, v1, v2);
+}
+
+void dgAvxBody::ApplyDampingAndCalculateInvInertia(dgInt32 index)
+{
+	m_veloc[index] = m_veloc[index].Scale(m_linearDamp[index]);
+	m_omega[index] = m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index]));
+
+//	dgMatrix tmp(m_matrix.Transpose4X4());
+//	tmp[0] = tmp[0] * m_invMass;
+//	tmp[1] = tmp[1] * m_invMass;
+//	tmp[2] = tmp[2] * m_invMass;
+//	return dgMatrix(m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
+	dgAvxMatrix3x3 tmp(m_rotation[index].Transpose());
+	dgAvxMatrix3x3 tmp1(tmp.m_front * m_localInvInertia[index], tmp.m_up * m_localInvInertia[index], tmp.m_right * m_localInvInertia[index]);
+	m_invInertia[index] = tmp1 * m_rotation[index];
 }
 
 

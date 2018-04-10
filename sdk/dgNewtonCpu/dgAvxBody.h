@@ -61,41 +61,27 @@ class dgAvxBody
 	public:
 	dgAvxBody (dgMemoryAllocator* const allocator);
 	void Reserve (dgInt32 count);
-
-	void GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray);
+	
+	
 	void GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray);
 	void GetOmega(dgInt32 index, dgDynamicBody** const bodyArray);
+	void GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray);
+	void GetInvMassMatrix(dgInt32 index, dgDynamicBody** const bodyArray);
 	void GetDampingCoef(dgInt32 index, dgDynamicBody** const bodyArray, float timestep);
 
-	DG_INLINE void AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep)
-	{
-		//m_veloc = m_veloc.Scale4(damp.m_w);
-		//dgVector omega(m_matrix.UnrotateVector(m_omega) * damp);
-		//m_omega = m_matrix.RotateVector(omega);
-		m_veloc[index] = m_veloc[index].Scale (m_linearDamp[index]);
-		m_omega[index] = m_rotation[index].RotateVector (m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index]));
-	}
+	void ApplyDampingAndCalculateInvInertia(dgInt32 index);
 
-	DG_INLINE void CalcInvInertiaMatrix()
-	{
-
-	}
-
-/*	
-	dgAvxMatrix3x3 m_rotation;
-*/
 	dgGlobalArray<dgAvxVector3> m_veloc;
 	dgGlobalArray<dgAvxVector3> m_omega;
+	dgGlobalArray<dgAvxVector3> m_localInvInertia;
+	dgGlobalArray<dgAvxFloat> m_invMass;
 	dgGlobalArray<dgAvxFloat> m_linearDamp;
 	dgGlobalArray<dgAvxVector3> m_angularDamp;
 	dgGlobalArray<dgAvxFloat> m_weigh;
 	dgGlobalArray<dgAvxFloat> m_invWeigh;
 	dgGlobalArray<dgAvxMatrix3x3> m_rotation;
+	dgGlobalArray<dgAvxMatrix3x3> m_invInertia;
 	dgInt32 m_count;
 };
-
-
-
-
 #endif
 

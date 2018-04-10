@@ -143,17 +143,9 @@ void dgNewtonCpu::InityBodyArray()
 		m_avxBody.GetDampingCoef(i, body, m_timestep);
 	}
 
-	dgAvxFloat timestep (m_timestep);
-	dgAvxBody& avxBody = m_avxBody;
+//	dgAvxFloat timestep (m_timestep);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
-//		dgDynamicBody* const body = (dgDynamicBody*)m_bodyArray[i].m_body;
-//		if (!body->m_equilibrium) {
-//			body->AddDampingAcceleration(m_timestep);
-//			body->CalcInvInertiaMatrix();
-//		}
-		avxBody.AddDampingAcceleration(i, timestep);
-		avxBody.CalcInvInertiaMatrix();
-
+		m_avxBody.ApplyDampingAndCalculateInvInertia(i);
 		// re use these variables for temp storage 
 //		body->m_accel = body->m_veloc;
 //		body->m_alpha = body->m_omega;

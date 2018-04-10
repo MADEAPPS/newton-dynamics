@@ -171,6 +171,21 @@ class dgAvxMatrix3x3
 	{
 	}
 
+	DG_INLINE dgAvxMatrix3x3 Transpose () const
+	{
+		dgAvxFloat tmp;
+		dgAvxMatrix3x3 ret (*this);
+		dgAvxFloat::Transpose4x8(ret.m_front.m_x, ret.m_front.m_y, ret.m_front.m_z, tmp);
+		dgAvxFloat::Transpose4x8(ret.m_up.m_x, ret.m_up.m_y, ret.m_up.m_z, tmp);
+		dgAvxFloat::Transpose4x8(ret.m_right.m_x, ret.m_right.m_y, ret.m_right.m_z, tmp);
+		return ret;
+	}
+
+	DG_INLINE dgAvxMatrix3x3 operator* (const dgAvxMatrix3x3& a) const
+	{
+		return dgAvxMatrix3x3();
+	}
+
 	DG_INLINE dgAvxVector3 RotateVector(const dgAvxVector3& a) const
 	{
 		//dgAvxFloat x(((a.m_x * m_front.m_x).MultAdd(a.m_y, m_up.m_x)).MultAdd(a.m_z, m_right.m_x));
