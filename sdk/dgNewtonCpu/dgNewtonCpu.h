@@ -42,8 +42,6 @@ class dgNewtonCpu: public dgWorldPlugin
 	dgJointInfo* m_jointArray;
 	const dgBodyCluster* m_cluster;
 	dgFloat32 m_timestep;
-
-	
 };
 
 #ifdef __cplusplus 

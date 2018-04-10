@@ -24,6 +24,38 @@
 #include "dgNewtonCpuStdafx.h"
 #include "dgAvxMath.h"
 
+
+template<class T>
+class dgGlobalArray: public dgArray<T>
+{
+	public:
+	dgGlobalArray(dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
+		:dgArray<T>(allocator, aligmentInBytes)
+		, m_ptr(NULL)
+	{
+	}
+
+	void Reserve(dgInt32 count)
+	{
+		ResizeIfNecessary(count);
+		dgArray<T>& me = *this;
+		m_ptr = &me[0];
+	}
+
+	DG_INLINE T& operator[] (dgInt32 i)
+	{
+		return m_ptr[i];
+	}
+
+	DG_INLINE const T& operator[] (dgInt32 i) const
+	{
+		return m_ptr[i];
+	}
+
+	T* m_ptr;
+};
+
+
 class dgAvxBody
 {
 	public:
@@ -35,18 +67,13 @@ class dgAvxBody
 	void GetOmega(dgInt32 index, dgDynamicBody** const bodyArray);
 	void GetDampingCoef(dgInt32 index, dgDynamicBody** const bodyArray, float timestep);
 
-
 	DG_INLINE void AddDampingAcceleration(dgInt32 index, const dgAvxFloat& timestep)
 	{
-		m_veloc.Set(index, m_veloc.Get(index).Scale(timestep));
-
-		//dgVector omegaDamp(damp & dgVector::m_triplexMask);
-		//dgVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
+		//m_veloc = m_veloc.Scale4(damp.m_w);
+		//dgVector omega(m_matrix.UnrotateVector(m_omega) * damp);
 		//m_omega = m_matrix.RotateVector(omega);
-		dgAvxVector3_local damp(m_angularDamp.Get(index));
-		dgAvxVector3_local omega(m_omega.Get(index));
-		dgAvxMatrix3x3_local matrix(m_rotation.Get(index));
-		m_omega.Set(index, matrix.RotateVector(matrix.UnrotateVector(omega) * damp));
+		m_veloc[index] = m_veloc[index].Scale (m_linearDamp[index]);
+		m_omega[index] = m_rotation[index].RotateVector (m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index]));
 	}
 
 	DG_INLINE void CalcInvInertiaMatrix()
@@ -54,15 +81,16 @@ class dgAvxBody
 
 	}
 
-	
+/*	
 	dgAvxMatrix3x3 m_rotation;
-	dgAvxVector3 m_veloc;
-	dgAvxVector3 m_omega;
-	dgAvxScalar m_weight;
-	dgAvxScalar m_invWeigh;
-	dgAvxScalar m_linearDamp;
-	dgAvxVector3 m_angularDamp;
-
+*/
+	dgGlobalArray<dgAvxVector3> m_veloc;
+	dgGlobalArray<dgAvxVector3> m_omega;
+	dgGlobalArray<dgAvxFloat> m_linearDamp;
+	dgGlobalArray<dgAvxVector3> m_angularDamp;
+	dgGlobalArray<dgAvxFloat> m_weigh;
+	dgGlobalArray<dgAvxFloat> m_invWeigh;
+	dgGlobalArray<dgAvxMatrix3x3> m_rotation;
 	dgInt32 m_count;
 };
 

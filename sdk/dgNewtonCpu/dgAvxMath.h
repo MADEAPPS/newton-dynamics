@@ -23,37 +23,6 @@
 #define _DG_SCALAR_H_
 #include "dgNewtonCpuStdafx.h"
 
-template<class T>
-class dgAvxArray: public dgArray<T>
-{
-	public:
-	dgAvxArray (dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
-		:dgArray<T>(allocator, aligmentInBytes)
-		,m_ptr(NULL)
-	{
-	}
-
-	void Reserve(dgInt32 count)
-	{
-		ResizeIfNecessary(count);
-		dgArray<T>& me = *this;
-		m_ptr = &me[0];
-	}
-
-	DG_INLINE T& operator[] (dgInt32 i)
-	{
-		return m_ptr[i];
-	}
-
-	DG_INLINE const T& operator[] (dgInt32 i) const
-	{
-		return m_ptr[i];
-	}
-
-	T* m_ptr;
-};
-
-
 DG_MSC_AVX_ALIGMENT
 class dgAvxFloat
 {
@@ -93,11 +62,6 @@ class dgAvxFloat
 		return _mm256_add_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgAvxFloat MultAdd(const dgAvxFloat& a, const dgAvxFloat& b) const
-	{
-		return _mm256_fmadd_ps(a.m_type, b.m_type, m_type);
-	}
-
 	DG_INLINE static void Transpose4x8(dgAvxFloat& src0, dgAvxFloat& src1, dgAvxFloat& src2, dgAvxFloat& src3)
 	{
 		__m256 tmp0(_mm256_unpacklo_ps(src0.m_type, src1.m_type));
@@ -121,45 +85,54 @@ class dgAvxFloat
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT
-class dgAvxVector3_local
+class dgAvxVector3
 {
 	public:
-	DG_INLINE dgAvxVector3_local()
+	DG_INLINE dgAvxVector3()
 		:m_x()
 		,m_y()
 		,m_z()
 	{
 	}
 
-	DG_INLINE dgAvxVector3_local(const dgAvxVector3_local& val)
+	DG_INLINE dgAvxVector3(const dgAvxVector3& val)
 		:m_x(val.m_x)
 		,m_y(val.m_y)
 		,m_z(val.m_z)
 	{
 	}
 
-	DG_INLINE dgAvxVector3_local(const dgAvxFloat& x, const dgAvxFloat& y, const dgAvxFloat& z)
+	DG_INLINE dgAvxVector3(const dgAvxFloat& x, const dgAvxFloat& y, const dgAvxFloat& z)
 		:m_x(x)
 		,m_y(y)
 		,m_z(z)
 	{
 	}
 
-	DG_INLINE dgAvxVector3_local Scale(const dgAvxFloat& a) const
+	DG_INLINE dgAvxVector3(const dgVector& v0, const dgVector& v1, const dgVector& v2, const dgVector& v3, const dgVector& v4, const dgVector& v5, const dgVector& v6, const dgVector& v7)
+		:m_x()
+		,m_y()
+		,m_z()
 	{
-		return dgAvxVector3_local(m_x * a, m_y * a, m_z * a);
+		dgAvxFloat r0(v0, v4);
+		dgAvxFloat r1(v1, v5);
+		dgAvxFloat r2(v2, v6);
+		dgAvxFloat r3(v3, v7);
+		dgAvxFloat::Transpose4x8(r0, r1, r2, r3);
+		m_x = r0;
+		m_y = r1;
+		m_z = r2;
 	}
 
-	DG_INLINE dgAvxVector3_local operator* (const dgAvxVector3_local& a) const
+	DG_INLINE dgAvxVector3 Scale(const dgAvxFloat& a) const
 	{
-		return dgAvxVector3_local(m_x * a.m_x, m_y * a.m_y, m_z * a.m_z);
+		return dgAvxVector3(m_x * a, m_y * a, m_z * a);
 	}
 
-	DG_INLINE dgAvxVector3_local MultAdd (const dgAvxVector3_local& a, const dgAvxVector3_local& b) const
+	DG_INLINE dgAvxVector3 operator* (const dgAvxVector3& a) const
 	{
-		return dgAvxVector3_local(m_x.MultAdd (a.m_x, b.m_x), m_y.MultAdd(a.m_y, b.m_y), m_z.MultAdd(a.m_z, b.m_z));
+		return dgAvxVector3(m_x * a.m_x, m_y * a.m_y, m_z * a.m_z);
 	}
-
 
 	dgAvxFloat m_x;
 	dgAvxFloat m_y;
@@ -167,31 +140,38 @@ class dgAvxVector3_local
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT
-class dgAvxMatrix3x3_local
+class dgAvxMatrix3x3
 {
 	public:
-	DG_INLINE dgAvxMatrix3x3_local()
+	DG_INLINE dgAvxMatrix3x3()
 		:m_right()
 		,m_up()
 		,m_front()
 	{
 	}
 
-	DG_INLINE dgAvxMatrix3x3_local(const dgAvxMatrix3x3_local& val)
+	DG_INLINE dgAvxMatrix3x3(const dgAvxMatrix3x3& val)
 		:m_right(val.m_right)
 		,m_up(val.m_up)
 		,m_front(val.m_front)
 	{
 	}
 
-	DG_INLINE dgAvxMatrix3x3_local(const dgAvxVector3_local& x, const dgAvxVector3_local& y, const dgAvxVector3_local& z)
+	DG_INLINE dgAvxMatrix3x3(const dgAvxVector3& x, const dgAvxVector3& y, const dgAvxVector3& z)
 		:m_right(x)
 		,m_up(y)
 		,m_front(z)
 	{
 	}
 
-	DG_INLINE dgAvxVector3_local RotateVector(const dgAvxVector3_local& a) const
+	DG_INLINE dgAvxMatrix3x3(const dgMatrix& matrix0, const dgMatrix& matrix1, const dgMatrix& matrix2, const dgMatrix& matrix3, const dgMatrix& matrix4, const dgMatrix& matrix5, const dgMatrix& matrix6, const dgMatrix& matrix7)
+		:m_right(matrix0[0], matrix1[0], matrix2[0], matrix3[0], matrix4[0], matrix5[0], matrix6[0], matrix7[0])
+		,m_up(matrix0[1], matrix1[1], matrix2[1], matrix3[1], matrix4[1], matrix5[1], matrix6[1], matrix7[1])
+		,m_front(matrix0[2], matrix1[2], matrix2[2], matrix3[2], matrix4[2], matrix5[2], matrix6[2], matrix7[2])
+	{
+	}
+
+	DG_INLINE dgAvxVector3 RotateVector(const dgAvxVector3& a) const
 	{
 		//dgAvxFloat x(((a.m_x * m_front.m_x).MultAdd(a.m_y, m_up.m_x)).MultAdd(a.m_z, m_right.m_x));
 		//dgAvxFloat y(((a.m_x * m_front.m_y).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_right.m_y));
@@ -199,10 +179,10 @@ class dgAvxMatrix3x3_local
 		dgAvxFloat x(a.m_x * m_front.m_x + a.m_y * m_up.m_x + a.m_z * m_right.m_x);
 		dgAvxFloat y(a.m_x * m_front.m_y + a.m_y * m_up.m_y + a.m_z * m_right.m_y);
 		dgAvxFloat z(a.m_x * m_front.m_z + a.m_y * m_up.m_z + a.m_z * m_right.m_z);
-		return dgAvxVector3_local(x, y, z);
+		return dgAvxVector3(x, y, z);
 	}
 
-	DG_INLINE dgAvxVector3_local UnrotateVector(const dgAvxVector3_local& a) const
+	DG_INLINE dgAvxVector3 UnrotateVector(const dgAvxVector3& a) const
 	{
 		//dgAvxFloat x(((a.m_x * m_front.m_x).MultAdd (a.m_y, m_front.m_y)).MultAdd(a.m_z, m_front.m_z));
 		//dgAvxFloat y(((a.m_x * m_up.m_x).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_up.m_z));
@@ -211,111 +191,14 @@ class dgAvxMatrix3x3_local
 		dgAvxFloat x(a.m_x * m_front.m_x + a.m_y * m_front.m_y + a.m_z * m_front.m_z);
 		dgAvxFloat y(a.m_x * m_up.m_x    + a.m_y * m_up.m_y    + a.m_z * m_up.m_z);
 		dgAvxFloat z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);
-		return dgAvxVector3_local(x, y, z);
+		return dgAvxVector3(x, y, z);
 	}
 	
-	dgAvxVector3_local m_front;
-	dgAvxVector3_local m_up;
-	dgAvxVector3_local m_right;
-	
-} DG_GCC_AVX_ALIGMENT;
-
-
-
-class dgAvxScalar
-{
-	public:
-	dgAvxScalar (dgMemoryAllocator* const allocator)
-		:m_val(allocator)
-	{
-	}
-	void Reserve (dgInt32 count)
-	{
-		m_val.Reserve(count);
-	}
-
-	dgAvxArray<dgAvxFloat> m_val;
-};
-
-class dgAvxVector3
-{
-	public:
-	dgAvxVector3 (dgMemoryAllocator* const allocator)
-		:m_x(allocator)
-		,m_y(allocator)
-		,m_z(allocator)
-	{
-	}
-
-	void Reserve (dgInt32 count)
-	{
-		m_x.Reserve(count);
-		m_y.Reserve(count);
-		m_z.Reserve(count);
-	}
-
-	void InitVector3(dgInt32 index, const dgVector& v0, const dgVector& v1, const dgVector& v2, const dgVector& v3, const dgVector& v4, const dgVector& v5, const dgVector& v6, const dgVector& v7)
-	{
-		dgAvxFloat r0(v0, v4);
-		dgAvxFloat r1(v1, v5);
-		dgAvxFloat r2(v2, v6);
-		dgAvxFloat r3(v3, v7);
-		dgAvxFloat::Transpose4x8(r0, r1, r2, r3);
-		m_x[index] = r0;
-		m_y[index] = r1;
-		m_z[index] = r2;
-	}
-
-	DG_INLINE void Set (dgInt32 index, const dgAvxVector3_local& val)
-	{
-		m_x[index] = val.m_x;
-		m_y[index] = val.m_y;
-		m_z[index] = val.m_z;
-	}
-
-	DG_INLINE dgAvxVector3_local Get(dgInt32 index) const
-	{
-		return dgAvxVector3_local(m_x[index], m_y[index], m_z[index]);
-	}
-
-	dgAvxArray<dgAvxFloat> m_x;
-	dgAvxArray<dgAvxFloat> m_y;
-	dgAvxArray<dgAvxFloat> m_z;
-};
-
-class dgAvxMatrix3x3
-{
-	public:
-	dgAvxMatrix3x3(dgMemoryAllocator* const allocator)
-		:m_front(allocator)
-		,m_up(allocator)
-		,m_right(allocator)
-	{
-	}
-
-	void Reserve (dgInt32 count)
-	{
-		m_front.Reserve(count);
-		m_up.Reserve(count);
-		m_right.Reserve(count);
-	}
-
-	DG_INLINE dgAvxMatrix3x3_local Get(dgInt32 index) const
-	{
-		return dgAvxMatrix3x3_local(m_front.Get(index), m_up.Get(index), m_right.Get(index));
-	}
-
-	DG_INLINE void Set(dgInt32 index, const dgAvxMatrix3x3_local& val)
-	{
-		m_front.Set(index, val.m_front);
-		m_up.Set(index, val.m_up);
-		m_right.Set(index, val.m_right);
-	}
-
 	dgAvxVector3 m_front;
 	dgAvxVector3 m_up;
 	dgAvxVector3 m_right;
-};
+	
+} DG_GCC_AVX_ALIGMENT;
 
 #endif
 

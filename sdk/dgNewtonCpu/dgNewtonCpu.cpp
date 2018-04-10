@@ -93,15 +93,16 @@ void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 */
 
 	m_avxBody.Reserve(cluster.m_bodyCount);
+
 	const dgInt32 bodyCount = m_avxBody.m_count * 8;
 	m_bodyArray = dgAlloca (dgBodyInfo, bodyCount);
 	memcpy (m_bodyArray, bodyArray, cluster.m_bodyCount * sizeof (dgBodyInfo));
 	for (dgInt32 i = cluster.m_bodyCount; i < bodyCount; i ++) {
 		m_bodyArray[i] = m_bodyArray[0];
 	}
-	
-	float* const weights = &m_avxBody.m_weight.m_val[0].m_f[0];
-	memset (weights, 0, bodyCount * sizeof (float));
+
+	float* const weights = &m_avxBody.m_weigh[0].m_f[0];
+	memset (weights, 0, m_avxBody.m_count * sizeof (dgAvxFloat));
 	for (dgInt32 i = 0; i < cluster.m_jointCount; i++) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
 		const dgInt32 m0 = jointInfo->m_m0;
@@ -110,7 +111,7 @@ void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 		weights[m1] += dgFloat32(1.0f);
 	}
 
-	float* const invWeights = &m_avxBody.m_invWeigh.m_val[0].m_f[0];
+	float* const invWeights = &m_avxBody.m_invWeigh[0].m_f[0];
 	for (dgInt32 i = 0; i < bodyCount; i++) {
 		const dgFloat32 w = weights[i] ? weights[i] : 1.0f;
 		weights[i] = w;
@@ -118,7 +119,6 @@ void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 	}
 
 	InityBodyArray();
-
 }
 
 
@@ -137,9 +137,9 @@ void dgNewtonCpu::InityBodyArray()
 			body[j] = (dgDynamicBody*)m_bodyArray[i * 8 + j].m_body;
 		}
 
-		m_avxBody.GetMatrix(i, body);
 		m_avxBody.GetVeloc(i, body);
 		m_avxBody.GetOmega(i, body);
+		m_avxBody.GetMatrix(i, body);
 		m_avxBody.GetDampingCoef(i, body, m_timestep);
 	}
 
@@ -154,13 +154,11 @@ void dgNewtonCpu::InityBodyArray()
 		avxBody.AddDampingAcceleration(i, timestep);
 		avxBody.CalcInvInertiaMatrix();
 
-/*
 		// re use these variables for temp storage 
-		body->m_accel = body->m_veloc;
-		body->m_alpha = body->m_omega;
-		internalForces[i].m_linear = dgVector::m_zero;
-		internalForces[i].m_angular = dgVector::m_zero;
-*/
+//		body->m_accel = body->m_veloc;
+//		body->m_alpha = body->m_omega;
+//		internalForces[i].m_linear = dgVector::m_zero;
+//		internalForces[i].m_angular = dgVector::m_zero;
 	}
 
 }
