@@ -171,14 +171,11 @@ class dgAvxMatrix3x3
 	{
 	}
 
-	DG_INLINE dgAvxMatrix3x3 Transpose () const
+	DG_INLINE dgAvxMatrix3x3 Transposed() const
 	{
-		dgAvxFloat tmp;
-		dgAvxMatrix3x3 ret (*this);
-		dgAvxFloat::Transpose4x8(ret.m_front.m_x, ret.m_front.m_y, ret.m_front.m_z, tmp);
-		dgAvxFloat::Transpose4x8(ret.m_up.m_x, ret.m_up.m_y, ret.m_up.m_z, tmp);
-		dgAvxFloat::Transpose4x8(ret.m_right.m_x, ret.m_right.m_y, ret.m_right.m_z, tmp);
-		return ret;
+		return dgAvxMatrix3x3(dgAvxVector3(m_front.m_x, m_up.m_x, m_right.m_x),
+							  dgAvxVector3(m_front.m_y, m_up.m_y, m_right.m_y),
+							  dgAvxVector3(m_front.m_z, m_up.m_z, m_right.m_z));
 	}
 
 	DG_INLINE dgAvxMatrix3x3 operator* (const dgAvxMatrix3x3& a) const

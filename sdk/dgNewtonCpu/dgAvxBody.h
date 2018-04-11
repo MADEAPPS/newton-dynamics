@@ -83,5 +83,24 @@ class dgAvxBody
 	dgGlobalArray<dgAvxMatrix3x3> m_invInertia;
 	dgInt32 m_count;
 };
+
+
+DG_INLINE void dgAvxBody::ApplyDampingAndCalculateInvInertia(dgInt32 index)
+{
+	m_veloc[index] = m_veloc[index].Scale(m_linearDamp[index]);
+	m_omega[index] = m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index]));
+
+	//dgMatrix tmp(m_matrix.Transpose4X4());
+	//tmp[0] = tmp[0] * m_invMass;
+	//tmp[1] = tmp[1] * m_invMass;
+	//tmp[2] = tmp[2] * m_invMass;
+	//return dgMatrix(m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
+	dgAvxMatrix3x3 tmp(m_rotation[index].Transposed());
+	tmp.m_front = tmp.m_front * m_localInvInertia[index];
+	tmp.m_up = tmp.m_up * m_localInvInertia[index];
+	tmp.m_right = tmp.m_right * m_localInvInertia[index];
+	m_invInertia[index] = tmp * m_rotation[index];
+}
+
 #endif
 

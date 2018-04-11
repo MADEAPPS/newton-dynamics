@@ -44,7 +44,7 @@ void dgWorldPluginList::LoadPlugins()
 	GetModuleFileNameA(NULL, plugInPath, 256);
 #endif
 
-	for (dgInt32 i = strlen(plugInPath) - 1; i; i--) {
+	for (dgInt32 i = dgInt32(strlen(plugInPath) - 1); i; i--) {
 		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
 			plugInPath[i] = 0;
 			break;
