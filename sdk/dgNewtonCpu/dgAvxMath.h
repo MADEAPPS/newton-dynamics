@@ -52,6 +52,11 @@ class dgAvxFloat
 	{
 	}
 
+	DG_INLINE void Store (dgAvxFloat* const ptr ) const
+	{
+		_mm256_store_ps((float*) ptr, m_type);
+	}
+
 	DG_INLINE dgAvxFloat operator* (const dgAvxFloat& A) const
 	{
 		return _mm256_mul_ps(m_type, A.m_type);
@@ -124,6 +129,13 @@ class dgAvxVector3
 		m_z = r2;
 	}
 
+	DG_INLINE void Store(dgAvxVector3* const ptr) const
+	{
+		m_x.Store(&ptr->m_x);
+		m_y.Store(&ptr->m_y);
+		m_z.Store(&ptr->m_z);
+	}
+
 	DG_INLINE dgAvxVector3 Scale(const dgAvxFloat& a) const
 	{
 		return dgAvxVector3(m_x * a, m_y * a, m_z * a);
@@ -169,6 +181,13 @@ class dgAvxMatrix3x3
 		,m_up(matrix0[1], matrix1[1], matrix2[1], matrix3[1], matrix4[1], matrix5[1], matrix6[1], matrix7[1])
 		,m_front(matrix0[2], matrix1[2], matrix2[2], matrix3[2], matrix4[2], matrix5[2], matrix6[2], matrix7[2])
 	{
+	}
+
+	DG_INLINE void Store(dgAvxMatrix3x3* const ptr) const
+	{
+		m_front.Store(&ptr->m_front);
+		m_up.Store(&ptr->m_up);
+		m_right.Store(&ptr->m_right);
 	}
 
 	DG_INLINE dgAvxMatrix3x3 Transposed() const
