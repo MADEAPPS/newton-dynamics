@@ -21,48 +21,15 @@
 
 #ifndef _DG_BODY_SOA_H_
 #define _DG_BODY_SOA_H_
-#include "dgNewtonCpuStdafx.h"
-#include "dgAvxMath.h"
+#include "dgNewtonPluginStdafx.h"
+#include "dgWorldBase.h"
+#include "dgMathAvx.h"
 
-
-template<class T>
-class dgGlobalArray: public dgArray<T>
+class dgBodyAvx
 {
 	public:
-	dgGlobalArray(dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
-		:dgArray<T>(allocator, aligmentInBytes)
-		, m_ptr(NULL)
-	{
-	}
-
-	void Reserve(dgInt32 count)
-	{
-		ResizeIfNecessary(count);
-		dgArray<T>& me = *this;
-		m_ptr = &me[0];
-	}
-
-	DG_INLINE T& operator[] (dgInt32 i)
-	{
-		return m_ptr[i];
-	}
-
-	DG_INLINE const T& operator[] (dgInt32 i) const
-	{
-		return m_ptr[i];
-	}
-
-	T* m_ptr;
-};
-
-
-class dgAvxBody
-{
-	public:
-	dgAvxBody (dgMemoryAllocator* const allocator);
+	dgBodyAvx (dgMemoryAllocator* const allocator);
 	void Reserve (dgInt32 count);
-	
-	
 	void GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray);
 	void GetOmega(dgInt32 index, dgDynamicBody** const bodyArray);
 	void GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray);
@@ -71,36 +38,40 @@ class dgAvxBody
 
 	void ApplyDampingAndCalculateInvInertia(dgInt32 index);
 
-	dgGlobalArray<dgAvxVector3> m_veloc;
-	dgGlobalArray<dgAvxVector3> m_omega;
-	dgGlobalArray<dgAvxVector3> m_localInvInertia;
-	dgGlobalArray<dgAvxFloat> m_invMass;
-	dgGlobalArray<dgAvxFloat> m_linearDamp;
-	dgGlobalArray<dgAvxVector3> m_angularDamp;
-	dgGlobalArray<dgAvxFloat> m_weigh;
-	dgGlobalArray<dgAvxFloat> m_invWeigh;
-	dgGlobalArray<dgAvxMatrix3x3> m_rotation;
-	dgGlobalArray<dgAvxMatrix3x3> m_invInertia;
+	dgGlobalArray<dgVector3Avx> m_veloc;
+	dgGlobalArray<dgVector3Avx> m_omega;
+	dgGlobalArray<dgVector3Avx> m_localInvInertia;
+	dgGlobalArray<dgFloatAvx> m_invMass;
+	dgGlobalArray<dgFloatAvx> m_linearDamp;
+	dgGlobalArray<dgVector3Avx> m_angularDamp;
+	dgGlobalArray<dgFloatAvx> m_weigh;
+	dgGlobalArray<dgFloatAvx> m_invWeigh;
+	dgGlobalArray<dgMatrix3x3Avx> m_rotation;
+	dgGlobalArray<dgMatrix3x3Avx> m_invInertia;
+
+	dgGlobalArray<dgVector6Avx> m_veloc0;
+	dgGlobalArray<dgVector6Avx> m_internalForces;
 	dgInt32 m_count;
 };
 
 
-DG_INLINE void dgAvxBody::ApplyDampingAndCalculateInvInertia(dgInt32 index)
+DG_INLINE void dgBodyAvx::ApplyDampingAndCalculateInvInertia(dgInt32 index)
 {
-	dgAvxMatrix3x3 tmp(m_rotation[index].Transposed());
+	dgMatrix3x3Avx tmp(m_rotation[index].Transposed());
 	tmp.m_front = tmp.m_front * m_localInvInertia[index];
 	tmp.m_up = tmp.m_up * m_localInvInertia[index];
 	tmp.m_right = tmp.m_right * m_localInvInertia[index];
 	tmp = tmp * m_rotation[index];
 	tmp.Store(&m_invInertia[index]);
-/*
-	dgAvxVector3 veloc(m_veloc[index].Scale(m_linearDamp[index]));
-	dgAvxVector3 omega(m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index])));
+
+	dgVector3Avx veloc(m_veloc[index].Scale(m_linearDamp[index]));
+	dgVector3Avx omega(m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index])));
 	veloc.Store(&m_veloc[index]);
 	omega.Store(&m_omega[index]);
-*/
+
+	veloc.Store (&m_veloc0[index].m_linear);
+	omega.Store(&m_veloc0[index].m_angular);
 }
-	
 
 
 #endif

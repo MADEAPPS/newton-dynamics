@@ -19,7 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_NEWTON_CPU_STDADX_
+#ifndef _DG_NEWTON_PLUGIN_STDADX_
+#define _DG_NEWTON_PLUGIN_STDADX_
 
 // Exclude rarely-used stuff from Windows headers
 #define WIN32_LEAN_AND_MEAN             
@@ -35,6 +36,5 @@
 #endif
 
 #pragma warning (disable: 4100) //unreferenced formal parameter
-
 
 #endif

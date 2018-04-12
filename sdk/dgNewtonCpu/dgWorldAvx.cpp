@@ -19,42 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dgNewtonCpuStdafx.h"
-#include "dgNewtonCpu.h"
+#include "dgNewtonPluginStdafx.h"
+#include "dgWorldAvx.h"
 
 
-// This is an example of an exported function.
-dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
-{
-	static dgNewtonCpu module(allocator);
-	return &module;
-}
-
-
-dgNewtonCpu::dgNewtonCpu(dgMemoryAllocator* const allocator)
-	:dgWorldPlugin(allocator)
+dgWorldAvx::dgWorldAvx(dgMemoryAllocator* const allocator)
+	:dgWorldBase(allocator)
 	,m_avxBody(allocator)
-	,m_bodyArray(NULL)
-	,m_jointArray(NULL)
-	,m_cluster(NULL)
-	,m_timestep(dgFloat32 (0.0f))
 {
 }
 
-dgNewtonCpu::~dgNewtonCpu()
+dgWorldAvx::~dgWorldAvx()
 {
 }
 
-const char* dgNewtonCpu::GetId() const
+const char* dgWorldAvx::GetId() const
 {
 #ifdef _DEBUG
-	return "newtonCpu_d";
+	return "newtonAvx_d";
 #else
-	return "newtonCpu";
+	return "newtonAvx";
 #endif
 }
 
-void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
+void dgWorldAvx::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	m_timestep = timestep;
 	m_cluster= &cluster;
@@ -102,7 +90,7 @@ void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 	}
 
 	float* const weights = &m_avxBody.m_weigh[0].m_f[0];
-	memset (weights, 0, m_avxBody.m_count * sizeof (dgAvxFloat));
+	memset (weights, 0, m_avxBody.m_count * sizeof (dgFloatAvx));
 	for (dgInt32 i = 0; i < cluster.m_jointCount; i++) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
 		const dgInt32 m0 = jointInfo->m_m0;
@@ -122,7 +110,7 @@ void dgNewtonCpu::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 }
 
 
-void dgNewtonCpu::InityBodyArray()
+void dgWorldAvx::InityBodyArray()
 {
 //	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*)context;
 //	dgWorld* const world = (dgWorld*)worldContext;
@@ -143,14 +131,11 @@ void dgNewtonCpu::InityBodyArray()
 		m_avxBody.GetDampingCoef(i, body, m_timestep);
 	}
 
-//	dgAvxFloat timestep (m_timestep);
+//	dgFloatAvx timestep (m_timestep);
+	dgVector3Avx zero (dgFloatAvx(0.0f), dgFloatAvx(0.0f), dgFloatAvx(0.0f));
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		m_avxBody.ApplyDampingAndCalculateInvInertia(i);
-		// re use these variables for temp storage 
-//		body->m_accel = body->m_veloc;
-//		body->m_alpha = body->m_omega;
-//		internalForces[i].m_linear = dgVector::m_zero;
-//		internalForces[i].m_angular = dgVector::m_zero;
+		zero.Store(&m_avxBody.m_internalForces[i].m_linear);
+		zero.Store(&m_avxBody.m_internalForces[i].m_angular);
 	}
-
 }
