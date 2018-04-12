@@ -23,7 +23,7 @@
 #define DG_WORLD_AVX2_H_
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
-#include "dgBodyAvx.h"
+#include "dgBodyAvx2.h"
 
 
 class dgWorldAvx2: public dgWorldBase
@@ -37,7 +37,7 @@ class dgWorldAvx2: public dgWorldBase
 
 	private:
 	virtual void InityBodyArray();
-	dgBodyAvx m_avxBody;
+	dgBodyAvx2 m_avxBody;
 };
 
 

@@ -185,24 +185,17 @@ class dgMatrix3x3Avx2
 
 	DG_INLINE dgVector3Avx2 RotateVector(const dgVector3Avx2& a) const
 	{
-		//dgFloatAvx2 x(((a.m_x * m_front.m_x).MultAdd(a.m_y, m_up.m_x)).MultAdd(a.m_z, m_right.m_x));
-		//dgFloatAvx2 y(((a.m_x * m_front.m_y).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_right.m_y));
-		//dgFloatAvx2 z(((a.m_x * m_front.m_z).MultAdd(a.m_y, m_up.m_z)).MultAdd(a.m_z, m_right.m_z));
-		dgFloatAvx2 x(a.m_x * m_front.m_x + a.m_y * m_up.m_x + a.m_z * m_right.m_x);
-		dgFloatAvx2 y(a.m_x * m_front.m_y + a.m_y * m_up.m_y + a.m_z * m_right.m_y);
-		dgFloatAvx2 z(a.m_x * m_front.m_z + a.m_y * m_up.m_z + a.m_z * m_right.m_z);
+		dgFloatAvx2 x(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_x).MulAdd(a.m_y, m_up.m_x).MulAdd(a.m_z, m_right.m_x));
+		dgFloatAvx2 y(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_y).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_right.m_y));
+		dgFloatAvx2 z(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_z).MulAdd(a.m_y, m_up.m_z).MulAdd(a.m_z, m_right.m_z));
 		return dgVector3Avx2(x, y, z);
 	}
 
 	DG_INLINE dgVector3Avx2 UnrotateVector(const dgVector3Avx2& a) const
 	{
-		//dgFloatAvx2 x(((a.m_x * m_front.m_x).MultAdd (a.m_y, m_front.m_y)).MultAdd(a.m_z, m_front.m_z));
-		//dgFloatAvx2 y(((a.m_x * m_up.m_x).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_up.m_z));
-		//dgFloatAvx2 z(((a.m_x * m_right.m_x).MultAdd(a.m_y, m_right.m_y)).MultAdd(a.m_z, m_right.m_z));
-
-		dgFloatAvx2 x(a.m_x * m_front.m_x + a.m_y * m_front.m_y + a.m_z * m_front.m_z);
-		dgFloatAvx2 y(a.m_x * m_up.m_x    + a.m_y * m_up.m_y    + a.m_z * m_up.m_z);
-		dgFloatAvx2 z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);
+		dgFloatAvx2 x(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_x).MulAdd(a.m_y, m_front.m_y).MulAdd(a.m_z, m_front.m_z));
+		dgFloatAvx2 y(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_up.m_x).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_up.m_z));
+		dgFloatAvx2 z(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_right.m_x).MulAdd(a.m_y, m_right.m_y).MulAdd(a.m_z, m_right.m_z));
 		return dgVector3Avx2(x, y, z);
 	}
 	
