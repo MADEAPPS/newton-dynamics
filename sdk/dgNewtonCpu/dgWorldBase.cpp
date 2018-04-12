@@ -22,6 +22,9 @@
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
 #include "dgWorldAvx.h"
+#include "dgMathAvx2.h"
+#include "dgMathAvx2.h"
+#include "dgWorldAvx2.h"
 
 dgWorldBase::dgWorldBase(dgMemoryAllocator* const allocator)
 	:dgWorldPlugin(allocator)
@@ -36,11 +39,9 @@ dgWorldBase::~dgWorldBase()
 {
 }
 
-
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
 {
-
 	union cpuInfo
 	{
 		int data[4];
@@ -57,6 +58,10 @@ dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
 	__cpuid(info.data, 7);
 	if (info.ebx & (1 << 5)) {
 		//cpu support avx2
+		dgFloatAvx::m_one = dgFloatAvx(1.0f);
+		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
+		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
+		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
 		static dgWorldAvx2 module(allocator);
 		return &module;
 	}
@@ -65,6 +70,10 @@ dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
 	__cpuid(info.data, 1);
 	if (info.ecx & (1 << 28)) {
 		//cpu support avx
+		dgFloatAvx::m_one = dgFloatAvx(1.0f);
+		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
+		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
+		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
 		static dgWorldAvx module(allocator);
 		return &module;
 	}

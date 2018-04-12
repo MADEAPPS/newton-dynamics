@@ -278,7 +278,8 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 //	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
 	int high = 20;
-	high = 40;
+//	high = 40;
+high = 10;
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
 //		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));

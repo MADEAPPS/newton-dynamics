@@ -19,16 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_BODY_AVX_H_
-#define _DG_BODY_AVX_H_
+#ifndef _DG_BODY_AVX2_H_
+#define _DG_BODY_AVX2_H_
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
-#include "dgMathAvx.h"
+#include "dgMathAvx2.h"
 
-class dgBodyAvx
+class dgBodyAvx2
 {
 	public:
-	dgBodyAvx (dgMemoryAllocator* const allocator);
+	dgBodyAvx2 (dgMemoryAllocator* const allocator);
 	void Reserve (dgInt32 count);
 	void GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray);
 	void GetOmega(dgInt32 index, dgDynamicBody** const bodyArray);
@@ -55,7 +55,7 @@ class dgBodyAvx
 };
 
 
-DG_INLINE void dgBodyAvx::ApplyDampingAndCalculateInvInertia(dgInt32 index)
+DG_INLINE void dgBodyAvx2::ApplyDampingAndCalculateInvInertia(dgInt32 index)
 {
 	dgMatrix3x3Avx tmp(m_rotation[index].Transposed());
 	tmp.m_front = tmp.m_front * m_localInvInertia[index];

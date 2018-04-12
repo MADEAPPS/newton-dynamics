@@ -87,6 +87,9 @@ class dgFloatAvx
 		float m_f[8];
 		int m_i[8];
 	};
+
+	static dgFloatAvx m_one;
+	static dgFloatAvx m_zero;
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT
