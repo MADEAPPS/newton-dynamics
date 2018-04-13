@@ -38,34 +38,34 @@ class dgBodyAvx2
 
 	void ApplyDampingAndCalculateInvInertia(dgInt32 index);
 
-	dgGlobalArray<dgVector3Avx> m_veloc;
-	dgGlobalArray<dgVector3Avx> m_omega;
-	dgGlobalArray<dgVector3Avx> m_localInvInertia;
-	dgGlobalArray<dgFloatAvx> m_invMass;
-	dgGlobalArray<dgFloatAvx> m_linearDamp;
-	dgGlobalArray<dgVector3Avx> m_angularDamp;
-	dgGlobalArray<dgFloatAvx> m_weigh;
-	dgGlobalArray<dgFloatAvx> m_invWeigh;
-	dgGlobalArray<dgMatrix3x3Avx> m_rotation;
-	dgGlobalArray<dgMatrix3x3Avx> m_invInertia;
+	dgGlobalArray<dgVector3Avx2> m_veloc;
+	dgGlobalArray<dgVector3Avx2> m_omega;
+	dgGlobalArray<dgVector3Avx2> m_localInvInertia;
+	dgGlobalArray<dgFloatAvx2> m_invMass;
+	dgGlobalArray<dgFloatAvx2> m_linearDamp;
+	dgGlobalArray<dgVector3Avx2> m_angularDamp;
+	dgGlobalArray<dgFloatAvx2> m_weigh;
+	dgGlobalArray<dgFloatAvx2> m_invWeigh;
+	dgGlobalArray<dgMatrix3x3Avx2> m_rotation;
+	dgGlobalArray<dgMatrix3x3Avx2> m_invInertia;
 
-	dgGlobalArray<dgVector6Avx> m_veloc0;
-	dgGlobalArray<dgVector6Avx> m_internalForces;
+	dgGlobalArray<dgVector6Avx2> m_veloc0;
+	dgGlobalArray<dgVector6Avx2> m_internalForces;
 	dgInt32 m_count;
 };
 
 
 DG_INLINE void dgBodyAvx2::ApplyDampingAndCalculateInvInertia(dgInt32 index)
 {
-	dgMatrix3x3Avx tmp(m_rotation[index].Transposed());
+	dgMatrix3x3Avx2 tmp(m_rotation[index].Transposed());
 	tmp.m_front = tmp.m_front * m_localInvInertia[index];
 	tmp.m_up = tmp.m_up * m_localInvInertia[index];
 	tmp.m_right = tmp.m_right * m_localInvInertia[index];
 	tmp = tmp * m_rotation[index];
 	tmp.Store(&m_invInertia[index]);
 
-	dgVector3Avx veloc(m_veloc[index].Scale(m_linearDamp[index]));
-	dgVector3Avx omega(m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index])));
+	dgVector3Avx2 veloc(m_veloc[index].Scale(m_linearDamp[index]));
+	dgVector3Avx2 omega(m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index])));
 	veloc.Store(&m_veloc[index]);
 	omega.Store(&m_omega[index]);
 

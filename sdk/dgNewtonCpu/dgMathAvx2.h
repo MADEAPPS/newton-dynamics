@@ -33,7 +33,6 @@ class dgFloatAvx2: public dgFloatAvx
 	{
 	}
 
-
 	DG_INLINE dgFloatAvx2(const __m256 type)
 		:dgFloatAvx(type)
 	{
@@ -47,6 +46,18 @@ class dgFloatAvx2: public dgFloatAvx
 	DG_INLINE dgFloatAvx2(const dgVector& low, const dgVector& high)
 		: dgFloatAvx(low, high)
 	{
+	}
+
+	DG_INLINE dgFloatAvx2 operator+ (const dgFloatAvx2& A) const
+	{
+		//return _mm256_fmadd_ps(A.m_type, m_zero.m_type, m_type);
+		return _mm256_add_ps(m_type, A.m_type);
+	}
+
+	DG_INLINE dgFloatAvx2 operator* (const dgFloatAvx2& A) const
+	{
+		//return _mm256_fmadd_ps(A.m_type, m_type, m_zero.m_type);
+		return _mm256_mul_ps(m_type, A.m_type);
 	}
 
 	DG_INLINE dgFloatAvx2 MulAdd(const dgFloatAvx2& A, const dgFloatAvx2& B) const
@@ -185,17 +196,23 @@ class dgMatrix3x3Avx2
 
 	DG_INLINE dgVector3Avx2 RotateVector(const dgVector3Avx2& a) const
 	{
-		dgFloatAvx2 x(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_x).MulAdd(a.m_y, m_up.m_x).MulAdd(a.m_z, m_right.m_x));
-		dgFloatAvx2 y(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_y).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_right.m_y));
-		dgFloatAvx2 z(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_z).MulAdd(a.m_y, m_up.m_z).MulAdd(a.m_z, m_right.m_z));
+		//dgFloatAvx2 x(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_x).MulAdd(a.m_y, m_up.m_x).MulAdd(a.m_z, m_right.m_x));
+		//dgFloatAvx2 y(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_y).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_right.m_y));
+		//dgFloatAvx2 z(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_z).MulAdd(a.m_y, m_up.m_z).MulAdd(a.m_z, m_right.m_z));
+		dgFloatAvx2 x((a.m_x * m_front.m_x).MulAdd(a.m_y, m_up.m_x).MulAdd(a.m_z, m_right.m_x));
+		dgFloatAvx2 y((a.m_x * m_front.m_y).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_right.m_y));
+		dgFloatAvx2 z((a.m_x * m_front.m_z).MulAdd(a.m_y, m_up.m_z).MulAdd(a.m_z, m_right.m_z));
 		return dgVector3Avx2(x, y, z);
 	}
 
 	DG_INLINE dgVector3Avx2 UnrotateVector(const dgVector3Avx2& a) const
 	{
-		dgFloatAvx2 x(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_x).MulAdd(a.m_y, m_front.m_y).MulAdd(a.m_z, m_front.m_z));
-		dgFloatAvx2 y(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_up.m_x).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_up.m_z));
-		dgFloatAvx2 z(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_right.m_x).MulAdd(a.m_y, m_right.m_y).MulAdd(a.m_z, m_right.m_z));
+		//dgFloatAvx2 x(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_front.m_x).MulAdd(a.m_y, m_front.m_y).MulAdd(a.m_z, m_front.m_z));
+		//dgFloatAvx2 y(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_up.m_x).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_up.m_z));
+		//dgFloatAvx2 z(dgFloatAvx2::m_zero.MulAdd(a.m_x, m_right.m_x).MulAdd(a.m_y, m_right.m_y).MulAdd(a.m_z, m_right.m_z));
+		dgFloatAvx2 x((a.m_x * m_front.m_x).MulAdd(a.m_y, m_front.m_y).MulAdd(a.m_z, m_front.m_z));
+		dgFloatAvx2 y((a.m_x * m_up.m_x).MulAdd(a.m_y, m_up.m_y).MulAdd(a.m_z, m_up.m_z));
+		dgFloatAvx2 z((a.m_x * m_right.m_x).MulAdd(a.m_y, m_right.m_y).MulAdd(a.m_z, m_right.m_z));
 		return dgVector3Avx2(x, y, z);
 	}
 	

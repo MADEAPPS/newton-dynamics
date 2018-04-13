@@ -20,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dgNewtonCpu\dgBodyAvx.cpp" />
+    <ClCompile Include="..\..\dgNewtonCpu\dgBodyAvx2.cpp" />
+    <ClCompile Include="..\..\dgNewtonCpu\dgMathAvx.cpp" />
+    <ClCompile Include="..\..\dgNewtonCpu\dgMathAvx2.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dgWorldAvx.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dgNewtonPluginStdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -27,14 +30,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\dgNewtonCpu\dgWorldAvx2.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dgWorldBase.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgNewtonCpu\dgBodyAvx.h" />
+    <ClInclude Include="..\..\dgNewtonCpu\dgBodyAvx2.h" />
+    <ClInclude Include="..\..\dgNewtonCpu\dgMathAvx2.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgWorldAvx.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgNewtonPluginStdafx.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgMathAvx.h" />
+    <ClInclude Include="..\..\dgNewtonCpu\dgWorldAvx2.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgWorldBase.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -125,8 +132,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,8 +154,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -170,6 +179,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -191,6 +205,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

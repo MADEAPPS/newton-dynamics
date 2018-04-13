@@ -57,14 +57,14 @@ class dgFloatAvx
 		_mm256_store_ps((float*) ptr, m_type);
 	}
 
-	DG_INLINE dgFloatAvx operator* (const dgFloatAvx& A) const
-	{
-		return _mm256_mul_ps(m_type, A.m_type);
-	}
-
 	DG_INLINE dgFloatAvx operator+ (const dgFloatAvx& A) const
 	{
 		return _mm256_add_ps(m_type, A.m_type);
+	}
+
+	DG_INLINE dgFloatAvx operator* (const dgFloatAvx& A) const
+	{
+		return _mm256_mul_ps(m_type, A.m_type);
 	}
 
 	DG_INLINE static void Transpose4x8(dgFloatAvx& src0, dgFloatAvx& src1, dgFloatAvx& src2, dgFloatAvx& src3)

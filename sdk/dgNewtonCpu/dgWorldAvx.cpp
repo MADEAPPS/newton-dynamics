@@ -132,7 +132,7 @@ void dgWorldAvx::InityBodyArray()
 	}
 
 //	dgFloatAvx timestep (m_timestep);
-	dgVector3Avx zero (dgFloatAvx(0.0f), dgFloatAvx(0.0f), dgFloatAvx(0.0f));
+	dgVector3Avx zero (dgFloatAvx::m_zero, dgFloatAvx::m_zero, dgFloatAvx::m_zero);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		m_avxBody.ApplyDampingAndCalculateInvInertia(i);
 		zero.Store(&m_avxBody.m_internalForces[i].m_linear);
