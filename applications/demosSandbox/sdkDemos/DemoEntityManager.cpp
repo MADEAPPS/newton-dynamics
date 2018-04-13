@@ -686,7 +686,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			int index = 0;
-			ImGui::RadioButton("plugin disabled", &m_currentPlugin, index);
+			ImGui::RadioButton("default solver", &m_currentPlugin, index);
 			char ids[32][32];
 			for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
 				index++;
@@ -874,6 +874,21 @@ void DemoEntityManager::RenderStats()
 
 			sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
 			ImGui::Text(text);
+
+			if (m_currentPlugin) {
+				int index = 1;
+				for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
+					if (index == m_currentPlugin) {
+						sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
+						ImGui::Text(text);
+
+						//sprintf(text, "plugin mflops:  %d", NewtonGetPluginString(m_world, plugin));
+						sprintf(text, "plugin mflops: %d", 0);
+						ImGui::Text(text);
+					}
+					index++;
+				}
+			}
 
 			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
 			ImGui::Text(text);
