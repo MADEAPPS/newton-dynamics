@@ -131,11 +131,13 @@ void dgWorldAvx::InityBodyArray()
 		m_avxBody.GetDampingCoef(i, body, m_timestep);
 	}
 
-//	dgFloatAvx timestep (m_timestep);
 	dgVector3Avx zero (dgFloatAvx::m_zero, dgFloatAvx::m_zero, dgFloatAvx::m_zero);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
+		dgFloatAvx::ClearFlops();
 		m_avxBody.ApplyDampingAndCalculateInvInertia(i);
 		zero.Store(&m_avxBody.m_internalForces[i].m_linear);
 		zero.Store(&m_avxBody.m_internalForces[i].m_angular);
 	}
+
+	dgInt32 flopsCount = 90 * 8 * bodyCount;
 }

@@ -52,6 +52,30 @@ class dgFloatAvx
 	{
 	}
 
+	DG_INLINE static void ClearFlops()
+	{
+		#ifdef _DEBUG
+		m_flopsCount = 0;
+		#endif
+	}
+
+	DG_INLINE static void IncFlops()
+	{
+		#ifdef _DEBUG
+		m_flopsCount++;
+		#endif
+	}
+
+	DG_INLINE static dgUnsigned32 GetFlops()
+	{
+#ifdef _DEBUG
+		return m_flopsCount;
+#else 
+		return 0;
+#endif
+	}
+
+
 	DG_INLINE void Store (dgFloatAvx* const ptr ) const
 	{
 		_mm256_store_ps((float*) ptr, m_type);
@@ -59,11 +83,13 @@ class dgFloatAvx
 
 	DG_INLINE dgFloatAvx operator+ (const dgFloatAvx& A) const
 	{
+		IncFlops();
 		return _mm256_add_ps(m_type, A.m_type);
 	}
 
 	DG_INLINE dgFloatAvx operator* (const dgFloatAvx& A) const
 	{
+		IncFlops();
 		return _mm256_mul_ps(m_type, A.m_type);
 	}
 
@@ -90,6 +116,9 @@ class dgFloatAvx
 
 	static dgFloatAvx m_one;
 	static dgFloatAvx m_zero;
+#ifdef _DEBUG
+	static dgUnsigned32 m_flopsCount;
+#endif
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT

@@ -50,18 +50,22 @@ class dgFloatAvx2: public dgFloatAvx
 
 	DG_INLINE dgFloatAvx2 operator+ (const dgFloatAvx2& A) const
 	{
+		IncFlops();
 		//return _mm256_add_ps(m_type, A.m_type);
 		return _mm256_fmadd_ps(m_type, m_one.m_type, A.m_type);
 	}
 
 	DG_INLINE dgFloatAvx2 operator* (const dgFloatAvx2& A) const
 	{
+		IncFlops();
 		//return _mm256_mul_ps(A.m_type, m_type);
 		return _mm256_fmadd_ps(m_type, A.m_type, m_zero.m_type);
 	}
 
 	DG_INLINE dgFloatAvx2 MulAdd(const dgFloatAvx2& A, const dgFloatAvx2& B) const
 	{
+		IncFlops();
+		IncFlops();
 		return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
 	}
 

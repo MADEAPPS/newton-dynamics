@@ -24,5 +24,8 @@
 
 dgFloatAvx dgFloatAvx::m_one;
 dgFloatAvx dgFloatAvx::m_zero;
+#ifdef _DEBUG
+dgUnsigned32 dgFloatAvx::m_flopsCount;
+#endif
 
 

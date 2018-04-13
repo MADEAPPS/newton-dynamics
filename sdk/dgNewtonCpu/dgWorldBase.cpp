@@ -62,7 +62,8 @@ dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
 		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
 		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
 		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
-		static dgWorldAvx2 module(allocator);
+		static dgWorldAvx module(allocator);
+		//static dgWorldAvx2 module(allocator);
 		return &module;
 	}
 
