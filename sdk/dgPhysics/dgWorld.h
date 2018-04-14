@@ -349,7 +349,6 @@ class dgWorld
 	void SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback);
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
-
 	static void OnDeserializeFromFile(void* const userData, void* const buffer, dgInt32 size);
 	static void OnSerializeToFile(void* const userData, const void* const buffer, dgInt32 size);
 	static dgInt32 SerializeToFileSort (const dgBody* const body0, const dgBody* const body1, void* const context);
@@ -526,6 +525,7 @@ class dgWorld
 	friend class dgBroadPhase;
 	friend class dgDeadBodies;
 	friend class dgDeadJoints;
+	friend class dgWorldPlugin;
 	friend class dgActiveContacts;
 	friend class dgUserConstraint;
 	friend class dgBodyMasterList;

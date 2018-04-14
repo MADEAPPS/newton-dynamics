@@ -141,7 +141,9 @@ world->m_useParallelSolver = 0;
 			dgBodyInfo* const bodyArray = &bodyPtr[m_bodies];
 			dgJointInfo* const jointArray = &constraintPtr[m_joints];
 
+			plugin->ResetMegaFlops();
 			plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);
+			plugin->CalculateMegaFlops();
 			index += count;
 		}
 	} else if (world->m_useParallelSolver && (threadCount > 1)) {

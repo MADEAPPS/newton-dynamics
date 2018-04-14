@@ -22,6 +22,7 @@
 #ifndef _DG_WORLD_PLUGINS_H_
 #define _DG_WORLD_PLUGINS_H_
 
+class dgWorld;
 class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
@@ -29,25 +30,31 @@ class dgBodyCluster;
 class dgWorldPlugin
 {
 	public:
-	dgWorldPlugin(dgMemoryAllocator* const allocator) 
-		:m_allocator(allocator)
-	{
-	}
-	virtual ~dgWorldPlugin() 
-	{
-	}
-
+	dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
+	virtual ~dgWorldPlugin();
+	const dgInt32 GetMegaFlops() const{return m_averageMflops;}
+	void ResetMegaFlops();
+	void AddFlops (dgInt32 flops);
+	void CalculateMegaFlops();
+	
 	virtual const char* GetId() const = 0;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
 
 	protected:
+	dgWorld* m_world;
 	dgMemoryAllocator* m_allocator;
+	
+	dgUnsigned64 m_flopsCount[8];
+	dgUnsigned64 m_ticksCount[8];
+	dgInt32 m_flopsIndex;
+	dgInt32 m_averageMflops;
+	friend class dgWorld;
 };
 
 #ifdef __cplusplus 
 extern "C"
 {
-	typedef dgWorldPlugin* (*InitPlugin)(dgMemoryAllocator* const allocator);
+	typedef dgWorldPlugin* (*InitPlugin)(dgWorld* const world, dgMemoryAllocator* const allocator);
 }
 #endif
 
@@ -81,4 +88,25 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 
 	dgListNode* m_currentPlugin;
 };
+
+
+inline dgWorldPlugin::dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
+	:m_world(world)
+	, m_allocator(allocator)
+	, m_flopsIndex(0)
+	, m_averageMflops(0)
+{
+	memset(m_flopsCount, 0, sizeof(m_flopsCount));
+	memset(m_ticksCount, 0, sizeof(m_ticksCount));
+}
+
+inline dgWorldPlugin::~dgWorldPlugin()
+{
+}
+
+inline void dgWorldPlugin::AddFlops(dgInt32 flops)
+{
+	m_flopsCount[m_flopsIndex] += flops;
+}
+
 #endif

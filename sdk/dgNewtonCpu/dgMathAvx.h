@@ -247,9 +247,6 @@ class dgMatrix3x3Avx
 
 	DG_INLINE dgVector3Avx RotateVector(const dgVector3Avx& a) const
 	{
-		//dgFloatAvx x(((a.m_x * m_front.m_x).MultAdd(a.m_y, m_up.m_x)).MultAdd(a.m_z, m_right.m_x));
-		//dgFloatAvx y(((a.m_x * m_front.m_y).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_right.m_y));
-		//dgFloatAvx z(((a.m_x * m_front.m_z).MultAdd(a.m_y, m_up.m_z)).MultAdd(a.m_z, m_right.m_z));
 		dgFloatAvx x(a.m_x * m_front.m_x + a.m_y * m_up.m_x + a.m_z * m_right.m_x);
 		dgFloatAvx y(a.m_x * m_front.m_y + a.m_y * m_up.m_y + a.m_z * m_right.m_y);
 		dgFloatAvx z(a.m_x * m_front.m_z + a.m_y * m_up.m_z + a.m_z * m_right.m_z);
@@ -258,10 +255,6 @@ class dgMatrix3x3Avx
 
 	DG_INLINE dgVector3Avx UnrotateVector(const dgVector3Avx& a) const
 	{
-		//dgFloatAvx x(((a.m_x * m_front.m_x).MultAdd (a.m_y, m_front.m_y)).MultAdd(a.m_z, m_front.m_z));
-		//dgFloatAvx y(((a.m_x * m_up.m_x).MultAdd(a.m_y, m_up.m_y)).MultAdd(a.m_z, m_up.m_z));
-		//dgFloatAvx z(((a.m_x * m_right.m_x).MultAdd(a.m_y, m_right.m_y)).MultAdd(a.m_z, m_right.m_z));
-
 		dgFloatAvx x(a.m_x * m_front.m_x + a.m_y * m_front.m_y + a.m_z * m_front.m_z);
 		dgFloatAvx y(a.m_x * m_up.m_x    + a.m_y * m_up.m_y    + a.m_z * m_up.m_z);
 		dgFloatAvx z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);

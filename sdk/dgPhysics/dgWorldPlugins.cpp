@@ -24,6 +24,29 @@
 #include "dgWorldPlugins.h"
 
 
+void dgWorldPlugin::ResetMegaFlops()
+{
+	m_flopsCount[m_flopsIndex] = 0;
+	m_ticksCount[m_flopsIndex] = m_world->m_getDebugTime ? m_world->m_getDebugTime() : 0;
+}
+
+void dgWorldPlugin::CalculateMegaFlops()
+{
+	const dgInt32 count = sizeof (m_ticksCount)/sizeof (m_ticksCount[0]);
+	m_ticksCount[m_flopsIndex] = (m_world->m_getDebugTime ? m_world->m_getDebugTime() : 0) - m_ticksCount[m_flopsIndex];
+	m_flopsIndex = (m_flopsIndex + 1) % count;
+	
+	dgUnsigned64 flopsCount = 0;
+	dgUnsigned64 ticksCount = 0;
+	for (dgInt32 i = 0; i < count; i ++) {
+		flopsCount += m_flopsCount[i];
+		ticksCount += m_ticksCount[i];
+	}
+	if (ticksCount) {
+		flopsCount = flopsCount * 1000000 / ticksCount;
+		m_averageMflops = dgInt32 (flopsCount / 1000000);
+	}
+}
 
 dgWorldPluginList::dgWorldPluginList(dgMemoryAllocator* const allocator)
 	:dgList<dgWorldPluginModulePair>(allocator)
@@ -58,7 +81,7 @@ void dgWorldPluginList::LoadPlugins()
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
 
-	dgWorldPluginList& pluginsList = *this;
+	dgWorld* const world = (dgWorld*) this;
 
 	// scan for all plugins in this folder
 	_finddata_t data;
@@ -72,9 +95,9 @@ void dgWorldPluginList::LoadPlugins()
 				// get the interface function pointer to the Plug in classes
 				InitPlugin initModule = (InitPlugin)GetProcAddress(module, "GetPlugin");
 				if (initModule) {
-					dgWorldPlugin* const plugin = initModule(GetAllocator ());
+					dgWorldPlugin* const plugin = initModule(world, GetAllocator ());
 					dgWorldPluginModulePair entry(plugin, module);
-					pluginsList.Append(entry);
+					Append(entry);
 				} else {
 					FreeLibrary(module);
 				}
@@ -97,9 +120,8 @@ void dgWorldPluginList::UnloadPlugins()
 
 dgWorldPluginList::dgListNode* dgWorldPluginList::GetCurrentPlugin()
 {
-	return NULL;
+	return m_currentPlugin;
 }
-
 
 dgWorldPluginList::dgListNode* dgWorldPluginList::GetFirstPlugin()
 {

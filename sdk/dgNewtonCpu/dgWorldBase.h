@@ -26,7 +26,7 @@
 #ifdef __cplusplus 
 extern "C"
 {
-	NEWTONCPU_API dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator);
+	NEWTONCPU_API dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
 }
 #endif
 
@@ -65,7 +65,7 @@ class dgGlobalArray: public dgArray<T>
 class dgWorldBase: public dgWorldPlugin
 {
 	public:
-	dgWorldBase(dgMemoryAllocator* const allocator);
+	dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator);
 	virtual ~dgWorldBase();
 
 	virtual const char* GetId() const = 0;

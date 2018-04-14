@@ -26,12 +26,12 @@
 #include "dgMathAvx2.h"
 #include "dgWorldAvx2.h"
 
-dgWorldBase::dgWorldBase(dgMemoryAllocator* const allocator)
-	:dgWorldPlugin(allocator)
-	, m_bodyArray(NULL)
-	, m_jointArray(NULL)
-	, m_cluster(NULL)
-	, m_timestep(dgFloat32(0.0f))
+dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator)
+	:dgWorldPlugin(world, allocator)
+	,m_bodyArray(NULL)
+	,m_jointArray(NULL)
+	,m_cluster(NULL)
+	,m_timestep(dgFloat32(0.0f))
 {
 }
 
@@ -40,7 +40,7 @@ dgWorldBase::~dgWorldBase()
 }
 
 // This is an example of an exported function.
-dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
+dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
 	union cpuInfo
 	{
@@ -62,8 +62,8 @@ dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
 		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
 		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
 		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
-		static dgWorldAvx module(allocator);
-		//static dgWorldAvx2 module(allocator);
+		//static dgWorldAvx module(world, allocator);
+		static dgWorldAvx2 module(world, allocator);
 		return &module;
 	}
 
@@ -75,7 +75,7 @@ dgWorldPlugin* GetPlugin(dgMemoryAllocator* const allocator)
 		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
 		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
 		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
-		static dgWorldAvx module(allocator);
+		static dgWorldAvx module(world, allocator);
 		return &module;
 	}
 

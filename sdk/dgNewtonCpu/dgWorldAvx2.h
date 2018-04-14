@@ -29,7 +29,7 @@
 class dgWorldAvx2: public dgWorldBase
 {
 	public:
-	dgWorldAvx2(dgMemoryAllocator* const allocator);
+	dgWorldAvx2(dgWorld* const world, dgMemoryAllocator* const allocator);
 	virtual ~dgWorldAvx2();
 
 	virtual const char* GetId() const;

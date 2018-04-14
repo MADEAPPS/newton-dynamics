@@ -23,8 +23,8 @@
 #include "dgWorldAvx.h"
 
 
-dgWorldAvx::dgWorldAvx(dgMemoryAllocator* const allocator)
-	:dgWorldBase(allocator)
+dgWorldAvx::dgWorldAvx(dgWorld* const world, dgMemoryAllocator* const allocator)
+	:dgWorldBase(world, allocator)
 	,m_avxBody(allocator)
 {
 }
@@ -138,6 +138,5 @@ void dgWorldAvx::InityBodyArray()
 		zero.Store(&m_avxBody.m_internalForces[i].m_linear);
 		zero.Store(&m_avxBody.m_internalForces[i].m_angular);
 	}
-
-	dgInt32 flopsCount = 90 * 8 * bodyCount;
+	AddFlops(90 * 8 * bodyCount);
 }

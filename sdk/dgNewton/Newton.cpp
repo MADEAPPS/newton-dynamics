@@ -354,6 +354,13 @@ void NewtonSelectPlugin(const NewtonWorld* const newtonWorld, const void* const 
 	return world->SelectPlugin(node);
 }
 
+int NewtonPluginGetMFlops(const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	dgWorldPluginList::dgListNode* const node = world->GetCurrentPlugin();
+	return node ? node->GetInfo().m_plugin->GetMegaFlops() : 0;
+}
 
 /*!
   this function block all other threads from executing the same subsequent code simultaneously.
