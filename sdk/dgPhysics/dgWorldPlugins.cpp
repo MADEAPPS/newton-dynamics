@@ -44,7 +44,7 @@ void dgWorldPlugin::CalculateMegaFlops()
 	}
 	if (ticksCount) {
 		flopsCount = flopsCount * 1000000 / ticksCount;
-		m_averageMflops = dgInt32 (flopsCount / 1000000);
+		m_averageMegaflops = dgInt32 (flopsCount / 1000000);
 	}
 }
 

@@ -57,20 +57,19 @@ class dgBodyAvx2
 
 DG_INLINE void dgBodyAvx2::ApplyDampingAndCalculateInvInertia(dgInt32 index)
 {
-	dgMatrix3x3Avx2 tmp(m_rotation[index].Transposed());
-	tmp.m_front = tmp.m_front * m_localInvInertia[index];
-	tmp.m_up = tmp.m_up * m_localInvInertia[index];
-	tmp.m_right = tmp.m_right * m_localInvInertia[index];
-	tmp = tmp * m_rotation[index];
-	tmp.Store(&m_invInertia[index]);
-
 	dgVector3Avx2 veloc(m_veloc[index].Scale(m_linearDamp[index]));
 	dgVector3Avx2 omega(m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index])));
 	veloc.Store(&m_veloc[index]);
 	omega.Store(&m_omega[index]);
-
-	veloc.Store (&m_veloc0[index].m_linear);
+	veloc.Store(&m_veloc0[index].m_linear);
 	omega.Store(&m_veloc0[index].m_angular);
+
+	dgMatrix3x3Avx2 invInertia(m_rotation[index].Transposed());
+	invInertia.m_front = invInertia.m_front * m_localInvInertia[index];
+	invInertia.m_up = invInertia.m_up * m_localInvInertia[index];
+	invInertia.m_right = invInertia.m_right * m_localInvInertia[index];
+	invInertia = invInertia * m_rotation[index];
+	invInertia.Store(&m_invInertia[index]);
 }
 
 

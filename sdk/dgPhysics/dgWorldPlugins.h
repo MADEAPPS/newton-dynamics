@@ -27,12 +27,13 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
+#define DG_AVERAGE_FLOPS_FILTER	16
 class dgWorldPlugin
 {
 	public:
 	dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
 	virtual ~dgWorldPlugin();
-	const dgInt32 GetMegaFlops() const{return m_averageMflops;}
+	const dgInt32 GetMegaFlops() const{return m_averageMegaflops;}
 	void ResetMegaFlops();
 	void AddFlops (dgInt32 flops);
 	void CalculateMegaFlops();
@@ -44,10 +45,10 @@ class dgWorldPlugin
 	dgWorld* m_world;
 	dgMemoryAllocator* m_allocator;
 	
-	dgUnsigned64 m_flopsCount[8];
-	dgUnsigned64 m_ticksCount[8];
+	dgUnsigned64 m_flopsCount[DG_AVERAGE_FLOPS_FILTER];
+	dgUnsigned64 m_ticksCount[DG_AVERAGE_FLOPS_FILTER];
 	dgInt32 m_flopsIndex;
-	dgInt32 m_averageMflops;
+	dgInt32 m_averageMegaflops;
 	friend class dgWorld;
 };
 
@@ -94,7 +95,7 @@ inline dgWorldPlugin::dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* con
 	:m_world(world)
 	, m_allocator(allocator)
 	, m_flopsIndex(0)
-	, m_averageMflops(0)
+	, m_averageMegaflops(0)
 {
 	memset(m_flopsCount, 0, sizeof(m_flopsCount));
 	memset(m_ticksCount, 0, sizeof(m_ticksCount));
