@@ -19,25 +19,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_WORLD_AVX_H_
-#define DG_WORLD_AVX_H_
+#ifndef _DG_WORLD_SSE_H_
+#define DG_WORLD_SSE_H_
+
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
-#include "dgBodyAvx.h"
+#include "dgBodySse.h"
 
 
-class dgWorldAvx: public dgWorldBase
+class dgWorldSse: public dgWorldBase
 {
 	public:
-	dgWorldAvx(dgWorld* const world, dgMemoryAllocator* const allocator);
-	virtual ~dgWorldAvx();
+	dgWorldSse(dgWorld* const world, dgMemoryAllocator* const allocator);
+	virtual ~dgWorldSse();
 
 	virtual const char* GetId() const;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	private:
 	virtual void InityBodyArray();
-	dgBodyAvx m_body;
+	dgBodySse m_body;
 };
 
 #endif

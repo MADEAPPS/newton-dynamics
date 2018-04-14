@@ -20,29 +20,29 @@
 */
 
 #include "dgNewtonPluginStdafx.h"
-#include "dgWorldAvx.h"
+#include "dgWorldSse.h"
 
 
-dgWorldAvx::dgWorldAvx(dgWorld* const world, dgMemoryAllocator* const allocator)
+dgWorldSse::dgWorldSse(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:dgWorldBase(world, allocator)
 	,m_body(allocator)
 {
 }
 
-dgWorldAvx::~dgWorldAvx()
+dgWorldSse::~dgWorldSse()
 {
 }
 
-const char* dgWorldAvx::GetId() const
+const char* dgWorldSse::GetId() const
 {
 #ifdef _DEBUG
-	return "newtonAvx_d";
+	return "newtonSse_d";
 #else
-	return "newtonAvx";
+	return "newtonSse";
 #endif
 }
 
-void dgWorldAvx::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
+void dgWorldSse::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	m_timestep = timestep;
 	m_cluster= &cluster;
@@ -110,7 +110,7 @@ void dgWorldAvx::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* 
 }
 
 
-void dgWorldAvx::InityBodyArray()
+void dgWorldSse::InityBodyArray()
 {
 //	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*)context;
 //	dgWorld* const world = (dgWorld*)worldContext;
