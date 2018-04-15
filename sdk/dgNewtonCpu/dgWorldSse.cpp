@@ -82,7 +82,7 @@ void dgWorldSse::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* 
 
 	m_body.Reserve(cluster.m_bodyCount);
 
-	const dgInt32 bodyCount = m_body.m_count * 8;
+	const dgInt32 bodyCount = m_body.m_count * 4;
 	m_bodyArray = dgAlloca (dgBodyInfo, bodyCount);
 	memcpy (m_bodyArray, bodyArray, cluster.m_bodyCount * sizeof (dgBodyInfo));
 	for (dgInt32 i = cluster.m_bodyCount; i < bodyCount; i ++) {
@@ -90,7 +90,7 @@ void dgWorldSse::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* 
 	}
 
 	float* const weights = &m_body.m_weigh[0].m_f[0];
-	memset (weights, 0, m_body.m_count * sizeof (dgFloatAvx));
+	memset (weights, 0, m_body.m_count * sizeof (dgFloatSse));
 	for (dgInt32 i = 0; i < cluster.m_jointCount; i++) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
 		const dgInt32 m0 = jointInfo->m_m0;
@@ -120,9 +120,9 @@ void dgWorldSse::InityBodyArray()
 
 	const dgInt32 bodyCount = m_body.m_count;
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
-		dgDynamicBody* body[8];
-		for (dgInt32 j = 0; j < 8; j++) {
-			body[j] = (dgDynamicBody*)m_bodyArray[i * 8 + j].m_body;
+		dgDynamicBody* body[4];
+		for (dgInt32 j = 0; j < 4; j++) {
+			body[j] = (dgDynamicBody*)m_bodyArray[i * 4 + j].m_body;
 		}
 
 		m_body.GetVeloc(i, body);
@@ -131,12 +131,12 @@ void dgWorldSse::InityBodyArray()
 		m_body.GetDampingCoef(i, body, m_timestep);
 	}
 
-	dgVector3Avx zero (dgFloatAvx::m_zero, dgFloatAvx::m_zero, dgFloatAvx::m_zero);
+	dgVector3Sse zero (dgFloatSse::m_zero, dgFloatSse::m_zero, dgFloatSse::m_zero);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
-		dgFloatAvx::ClearFlops();
+		dgFloatSse::ClearFlops();
 		m_body.ApplyDampingAndCalculateInvInertia(i);
 		zero.Store(&m_body.m_internalForces[i].m_linear);
 		zero.Store(&m_body.m_internalForces[i].m_angular);
 	}
-	AddFlops(90 * 8 * bodyCount);
+	AddFlops(90 * 4 * bodyCount);
 }

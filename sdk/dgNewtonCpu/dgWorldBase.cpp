@@ -21,6 +21,7 @@
 
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
+#include "dgMathSse.h"
 #include "dgWorldSse.h"
 #include "dgWorldAvx.h"
 #include "dgMathAvx2.h"
@@ -55,14 +56,17 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		};
 	} info;
 
+	dgFloatSse::m_one = dgFloatSse(1.0f);
+	dgFloatSse::m_zero = dgFloatSse(0.0f);
+	dgFloatAvx::m_one = dgFloatAvx(1.0f);
+	dgFloatAvx::m_zero = dgFloatAvx(0.0f);
+	dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
+	dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
+
 	// avx2 support in code 7, register ebx bit5
 	__cpuid(info.data, 7);
 	if (info.ebx & (1 << 5)) {
 		//cpu support avx2
-		dgFloatAvx::m_one = dgFloatAvx(1.0f);
-		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
-		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
-		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
 		static dgWorldSse module(world, allocator);
 		//static dgWorldAvx module(world, allocator);
 		//static dgWorldAvx2 module(world, allocator);
@@ -73,10 +77,6 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	__cpuid(info.data, 1);
 	if (info.ecx & (1 << 28)) {
 		//cpu support avx
-		dgFloatAvx::m_one = dgFloatAvx(1.0f);
-		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
-		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
-		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
 		static dgWorldAvx module(world, allocator);
 		return &module;
 	}

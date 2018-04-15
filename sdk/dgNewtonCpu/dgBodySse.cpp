@@ -41,7 +41,7 @@ dgBodySse::dgBodySse(dgMemoryAllocator* const allocator)
 
 void dgBodySse::Reserve (dgInt32 count)
 {
-	m_count = ((count + 7) & -7) >> 3;
+	m_count = ((count + 3) & -3) >> 2;
 	m_veloc.Reserve(m_count);
 	m_omega.Reserve(m_count);
 	m_localInvInertia.Reserve(m_count);
@@ -58,49 +58,43 @@ void dgBodySse::Reserve (dgInt32 count)
 
 void dgBodySse::GetVeloc(dgInt32 index, dgDynamicBody** const bodyArray)
 {
-	m_veloc[index] = dgVector3Avx(bodyArray[0]->GetVelocity(), bodyArray[1]->GetVelocity(), bodyArray[2]->GetVelocity(), bodyArray[3]->GetVelocity(),
-								  bodyArray[4]->GetVelocity(), bodyArray[5]->GetVelocity(), bodyArray[6]->GetVelocity(), bodyArray[7]->GetVelocity());
+	m_veloc[index] = dgVector3Sse(bodyArray[0]->GetVelocity(), bodyArray[1]->GetVelocity(), bodyArray[2]->GetVelocity(), bodyArray[3]->GetVelocity());
 }
 
 
 void dgBodySse::GetOmega(dgInt32 index, dgDynamicBody** const bodyArray)
 {
-	m_omega[index] = dgVector3Avx(bodyArray[0]->GetOmega(), bodyArray[1]->GetOmega(), bodyArray[2]->GetOmega(), bodyArray[3]->GetOmega(),
-								  bodyArray[4]->GetOmega(), bodyArray[5]->GetOmega(), bodyArray[6]->GetOmega(), bodyArray[7]->GetOmega());
+	m_omega[index] = dgVector3Sse(bodyArray[0]->GetOmega(), bodyArray[1]->GetOmega(), bodyArray[2]->GetOmega(), bodyArray[3]->GetOmega());
 }
 
 void dgBodySse::GetMatrix(dgInt32 index, dgDynamicBody** const bodyArray)
 {
-	m_rotation[index] = dgMatrix3x3Avx(bodyArray[0]->GetMatrix(), 
+	m_rotation[index] = dgMatrix3x3Sse(bodyArray[0]->GetMatrix(), 
 									   bodyArray[1]->GetMatrix(),
 									   bodyArray[2]->GetMatrix(),
-									   bodyArray[3]->GetMatrix(),
-									   bodyArray[4]->GetMatrix(),
-									   bodyArray[5]->GetMatrix(),
-									   bodyArray[6]->GetMatrix(),
-									   bodyArray[7]->GetMatrix());
+									   bodyArray[3]->GetMatrix());
 }
 
 void dgBodySse::GetInvMassMatrix(dgInt32 index, dgDynamicBody** const bodyArray)
 {
-	dgFloatAvx v0(bodyArray[0]->GetInvMass(), bodyArray[4]->GetInvMass());
-	dgFloatAvx v1(bodyArray[1]->GetInvMass(), bodyArray[5]->GetInvMass());
-	dgFloatAvx v2(bodyArray[2]->GetInvMass(), bodyArray[6]->GetInvMass());
-	dgFloatAvx v3(bodyArray[3]->GetInvMass(), bodyArray[7]->GetInvMass());
-	dgFloatAvx::Transpose4x8(v0, v1, v2, v3);
+	dgFloatSse v0(bodyArray[0]->GetInvMass());
+	dgFloatSse v1(bodyArray[1]->GetInvMass());
+	dgFloatSse v2(bodyArray[2]->GetInvMass());
+	dgFloatSse v3(bodyArray[3]->GetInvMass());
+	dgFloatSse::Transpose4x4(v0, v1, v2, v3);
 	m_invMass[index] = v3;
-	m_localInvInertia[index] = dgVector3Avx(v0, v1, v2);
+	m_localInvInertia[index] = dgVector3Sse(v0, v1, v2);
 }
 
 void dgBodySse::GetDampingCoef(dgInt32 index, dgDynamicBody** const bodyArray, float timestep)
 {
-	dgFloatAvx v0(bodyArray[0]->GetDampCoeffcient(timestep), bodyArray[4]->GetDampCoeffcient(timestep));
-	dgFloatAvx v1(bodyArray[1]->GetDampCoeffcient(timestep), bodyArray[5]->GetDampCoeffcient(timestep));
-	dgFloatAvx v2(bodyArray[2]->GetDampCoeffcient(timestep), bodyArray[6]->GetDampCoeffcient(timestep));
-	dgFloatAvx v3(bodyArray[3]->GetDampCoeffcient(timestep), bodyArray[7]->GetDampCoeffcient(timestep));
-	dgFloatAvx::Transpose4x8(v0, v1, v2, v3);
+	dgFloatSse v0(bodyArray[0]->GetDampCoeffcient(timestep));
+	dgFloatSse v1(bodyArray[1]->GetDampCoeffcient(timestep));
+	dgFloatSse v2(bodyArray[2]->GetDampCoeffcient(timestep));
+	dgFloatSse v3(bodyArray[3]->GetDampCoeffcient(timestep));
+	dgFloatSse::Transpose4x4(v0, v1, v2, v3);
 	m_linearDamp[index] = v3;
-	m_angularDamp[index] = dgVector3Avx(v0, v1, v2);
+	m_angularDamp[index] = dgVector3Sse(v0, v1, v2);
 }
 
 

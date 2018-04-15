@@ -24,7 +24,7 @@
 
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
-#include "dgMathAvx.h"
+#include "dgMathSse.h"
 
 class dgBodySse
 {
@@ -39,33 +39,33 @@ class dgBodySse
 
 	void ApplyDampingAndCalculateInvInertia(dgInt32 index);
 
-	dgGlobalArray<dgVector3Avx> m_veloc;
-	dgGlobalArray<dgVector3Avx> m_omega;
-	dgGlobalArray<dgVector3Avx> m_localInvInertia;
-	dgGlobalArray<dgFloatAvx> m_invMass;
-	dgGlobalArray<dgFloatAvx> m_linearDamp;
-	dgGlobalArray<dgVector3Avx> m_angularDamp;
-	dgGlobalArray<dgFloatAvx> m_weigh;
-	dgGlobalArray<dgFloatAvx> m_invWeigh;
-	dgGlobalArray<dgMatrix3x3Avx> m_rotation;
-	dgGlobalArray<dgMatrix3x3Avx> m_invInertia;
+	dgGlobalArray<dgVector3Sse> m_veloc;
+	dgGlobalArray<dgVector3Sse> m_omega;
+	dgGlobalArray<dgVector3Sse> m_localInvInertia;
+	dgGlobalArray<dgFloatSse> m_invMass;
+	dgGlobalArray<dgFloatSse> m_linearDamp;
+	dgGlobalArray<dgVector3Sse> m_angularDamp;
+	dgGlobalArray<dgFloatSse> m_weigh;
+	dgGlobalArray<dgFloatSse> m_invWeigh;
+	dgGlobalArray<dgMatrix3x3Sse> m_rotation;
+	dgGlobalArray<dgMatrix3x3Sse> m_invInertia;
 
-	dgGlobalArray<dgVector6Avx> m_veloc0;
-	dgGlobalArray<dgVector6Avx> m_internalForces;
+	dgGlobalArray<dgVector6Sse> m_veloc0;
+	dgGlobalArray<dgVector6Sse> m_internalForces;
 	dgInt32 m_count;
 };
 
 
 DG_INLINE void dgBodySse::ApplyDampingAndCalculateInvInertia(dgInt32 index)
 {
-	dgVector3Avx veloc(m_veloc[index].Scale(m_linearDamp[index]));
-	dgVector3Avx omega(m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index])));
+	dgVector3Sse veloc(m_veloc[index].Scale(m_linearDamp[index]));
+	dgVector3Sse omega(m_rotation[index].RotateVector(m_angularDamp[index] * m_rotation[index].UnrotateVector(m_omega[index])));
 	veloc.Store(&m_veloc[index]);
 	omega.Store(&m_omega[index]);
 	veloc.Store (&m_veloc0[index].m_linear);
 	omega.Store(&m_veloc0[index].m_angular);
 
-	dgMatrix3x3Avx invInertia(m_rotation[index].Transposed());
+	dgMatrix3x3Sse invInertia(m_rotation[index].Transposed());
 	invInertia.m_front = invInertia.m_front * m_localInvInertia[index];
 	invInertia.m_up = invInertia.m_up * m_localInvInertia[index];
 	invInertia.m_right = invInertia.m_right * m_localInvInertia[index];
