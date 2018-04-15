@@ -131,9 +131,9 @@ void dgWorldSse::InityBodyArray()
 		m_body.GetDampingCoef(i, body, m_timestep);
 	}
 
+	dgFloatSse::ClearFlops();
 	dgVector3Sse zero (dgFloatSse::m_zero, dgFloatSse::m_zero, dgFloatSse::m_zero);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
-		dgFloatSse::ClearFlops();
 		m_body.ApplyDampingAndCalculateInvInertia(i);
 		zero.Store(&m_body.m_internalForces[i].m_linear);
 		zero.Store(&m_body.m_internalForces[i].m_angular);
