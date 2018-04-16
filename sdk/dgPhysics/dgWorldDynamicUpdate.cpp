@@ -313,8 +313,9 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 
 						constraintArray[jointIndex].m_joint = constraint;
 						const dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
-						constraintArray[jointIndex].m_pairStart = dgInt16(0);
+						constraintArray[jointIndex].m_pairStart = 0;
 						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
+						constraintArray[jointIndex].m_paddedPairCount = dgInt16(rows);
 						jointCount++;
 
 						dgAssert(constraint->m_body0);
@@ -661,8 +662,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		}
 	}
 
-	jointInfo->m_pairCount = dof;
 	jointInfo->m_pairStart = rowCount;
+	jointInfo->m_pairCount = dgInt16 (dof);
+	jointInfo->m_paddedPairCount = dgInt16(dof);
 	for (dgInt32 i = 0; i < dof; i++) {
 		dgJacobianMatrixElement* const row = &matrixRow[rowCount];
 		dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
@@ -1038,7 +1040,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 dgInt32  dgWorldDynamicUpdate::CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed)
 {
 	dgInt32 countA = infoA->m_pairCount;
-	dgInt32 countB = infoA->m_pairCount;
+	dgInt32 countB = infoB->m_pairCount;
 
 	if (countA < countB) {
 		return 1;
@@ -1062,11 +1064,8 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 		bodyCount += srcCluster->m_bodyCount - 1;
 	}
 
-	world->m_jointsMemory.ResizeIfNecessary((m_joints + jointsCount) * sizeof(dgJointInfo));
 	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + 1) * sizeof(dgBodyInfo));
-
-	world->m_jointsMemory.ResizeIfNecessary((m_joints + jointsCount) * sizeof(dgJointInfo));
-	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + 1) * sizeof(dgBodyInfo));
+	world->m_jointsMemory.ResizeIfNecessary((m_joints + jointsCount + 32) * sizeof(dgJointInfo));
 
 	dgBodyInfo* const bodyPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
 	dgJointInfo* const constraintPtr = (dgJointInfo*)&world->m_jointsMemory[0];

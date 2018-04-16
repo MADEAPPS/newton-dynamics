@@ -102,7 +102,8 @@ class dgJointInfo
 	dgInt32 m_m0;
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
-	dgInt32 m_pairCount;
+	dgInt16 m_pairCount;
+	dgInt16 m_paddedPairCount;
 };
 
 
