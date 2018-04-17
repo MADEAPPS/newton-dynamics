@@ -50,15 +50,6 @@ dgVector dgBroadPhaseNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROAD
 dgVector dgBroadPhaseNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
 
-dgInt32 dgBroadPhase::m_obbTestSimplex[4][4] =
-{
-	{ 0, 1, 2, 3 },
-	{ 0, 2, 3, 1 },
-	{ 2, 1, 3, 0 },
-	{ 1, 0, 3, 2 },
-};
-
-
 class dgBroadPhase::dgSpliteInfo
 {
 	public:
@@ -163,9 +154,6 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_pendingSoftBodyPairsCount(0)
 	,m_contacJointLock(0)
 	,m_criticalSectionLock(0)
-	,m_dirtyNodesCount(0)
-	,m_scanTwoWays(false)
-	,m_recursiveChunks(false)
 {
 }
 
@@ -714,11 +702,8 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		if (body1->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
 			aggregate->m_isInEquilibrium = body1->m_equilibrium;
-			aggregate->SetAsDirty(m_lru + 1);
 		}
 
-		m_dirtyNodesCount += (node->m_nodeIsDirtyLru != (m_lru + 1)) ? 1 : 0;
-		node->SetAsDirty(m_lru + 1);
 		if (!dgBoxInclusionTest(body1->m_minAABB, body1->m_maxAABB, node->m_minBox, node->m_maxBox)) {
 			dgAssert(!node->IsAggregate());
 			node->SetAABB(body1->m_minAABB, body1->m_maxAABB);
@@ -1367,12 +1352,8 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	if (broadPhase->m_scanTwoWays) {
-		broadPhase->FindCollidingPairsForwardAndBackward(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
-	} else {
 		broadPhase->FindCollidingPairsForward(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
 	}
-}
 
 
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
@@ -1484,13 +1465,9 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
-	const dgInt32 lastDirtyCount = m_dirtyNodesCount;
-
     m_lru = m_lru + 1;
-	m_dirtyNodesCount = 0;
 	m_pendingSoftBodyPairsCount = 0;
 
-	m_recursiveChunks = true;
 	const dgInt32 threadsCount = m_world->GetThreadCount();
 
 	const dgBodyMasterList* const masterList = m_world;
@@ -1527,9 +1504,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 	UpdateFitness();
-
-	m_scanTwoWays = (lastDirtyCount * 100) < (40 * m_updateList.GetCount());
-m_scanTwoWays = 0;
 
 	dgActiveContacts* const contactList = m_world;
 	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
@@ -1571,7 +1545,7 @@ m_scanTwoWays = 0;
 	}
 
 
-	m_recursiveChunks = false;
+//	m_recursiveChunks = false;
 	if (m_generatedBodies.GetCount()) {
         dgAssert (0);
     /*

@@ -61,7 +61,6 @@ class dgBroadPhaseNode
 		,m_maxBox(dgFloat32(1.0e15f))
 		,m_parent(parent)
 		,m_surfaceArea(dgFloat32(1.0e20f))
-		,m_nodeIsDirtyLru(0)
 	{
 	}
 
@@ -82,16 +81,6 @@ class dgBroadPhaseNode
 	virtual bool IsAggregate() const
 	{
 		return false;
-	}
-
-	dgUnsigned32 GetDirtyLru() const
-	{
-		return m_nodeIsDirtyLru;
-	}
-
-	void SetAsDirty(dgInt32 lru)
-	{
-		m_nodeIsDirtyLru = lru;
 	}
 
 	void SetAABB(const dgVector& minBox, const dgVector& maxBox)
@@ -132,7 +121,6 @@ class dgBroadPhaseNode
 	dgVector m_maxBox;
 	dgBroadPhaseNode* m_parent;
 	dgFloat32 m_surfaceArea;
-	dgUnsigned32 m_nodeIsDirtyLru;
 
 	static dgVector m_broadPhaseScale;
 	static dgVector m_broadInvPhaseScale;
@@ -324,7 +312,6 @@ class dgBroadPhase
 	virtual dgInt32 Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 	virtual void FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
-	virtual void FindCollidingPairsForwardAndBackward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
 
 	void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
 
@@ -407,14 +394,10 @@ class dgBroadPhase
 	dgInt32 m_pendingSoftBodyPairsCount;
 	dgInt32 m_contacJointLock;
 	dgInt32 m_criticalSectionLock;
-	dgInt32 m_dirtyNodesCount;
-	bool m_scanTwoWays;
-	bool m_recursiveChunks;
 
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;
-	static dgInt32 m_obbTestSimplex[4][4];
 
 	friend class dgBody;
 	friend class dgWorld;

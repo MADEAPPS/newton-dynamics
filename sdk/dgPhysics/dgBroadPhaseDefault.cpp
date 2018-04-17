@@ -368,40 +368,4 @@ void dgBroadPhaseDefault::FindCollidingPairsForward(dgBroadphaseSyncDescriptor* 
 }
 
 
-void dgBroadPhaseDefault::FindCollidingPairsForwardAndBackward(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
-{
-	const dgFloat32 timestep = descriptor->m_timestep;
-
-	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
-	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
-	const dgUnsigned32 lru = m_lru + 1;
-	while (node) {
-		dgBroadPhaseNode* const broadPhaseNode = node->GetInfo();
-		dgAssert(broadPhaseNode->IsLeafNode());
-		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
-
-		if (lru == broadPhaseNode->GetDirtyLru()) {
-			if (broadPhaseNode->IsAggregate()) {
-				((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
-			}
-
-			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
-				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
-				dgAssert(!parent->IsLeafNode());
-				dgBroadPhaseNode* const rightSibling = parent->m_right;
-				if (rightSibling && (rightSibling != ptr)) {
-					SubmitPairs(broadPhaseNode, rightSibling, timestep, threadCount, threadID);
-				}
-				dgBroadPhaseNode* const leftSibling = parent->m_left;
-				if (leftSibling != ptr) {
-					SubmitPairs(broadPhaseNode, leftSibling, timestep, threadCount, threadID);
-				}
-			}
-		}
-
-		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = node ? node->GetNext() : NULL;
-		}
-	}
-}
 
