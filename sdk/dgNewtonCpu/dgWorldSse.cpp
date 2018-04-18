@@ -89,6 +89,19 @@ void dgWorldSse::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* 
 		m_bodyArray[i] = m_bodyArray[0];
 	}
 
+/*
+	for (dgInt32 i = 0; i < cluster.m_jointCount; i += 4) {
+		dgJointInfo* const jointInfo = &m_jointArray[i];
+		const dgInt16 rowCount = jointInfo->m_pairCount;
+		dgAssert(rowCount == jointInfo->m_paddedPairCount);
+		for (dgInt32 j = 1; j < 4; j ++) {
+			dgJointInfo* const jointInfo1 = &m_jointArray[i + j];
+			jointInfo1->m_paddedPairCount = rowCount;
+		}
+	}
+*/
+
+
 	float* const weights = &m_body.m_weigh[0].m_f[0];
 	memset (weights, 0, m_body.m_count * sizeof (dgFloatSse));
 	for (dgInt32 i = 0; i < cluster.m_jointCount; i++) {
@@ -105,7 +118,7 @@ void dgWorldSse::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* 
 		weights[i] = w;
 		invWeights[i] = 1.0f / w;
 	}
-
+	
 	InityBodyArray();
 }
 
