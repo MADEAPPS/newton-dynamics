@@ -81,7 +81,8 @@ class dgConvexHull3d: public dgList<dgConvexHull3DFace>
 	virtual void DeleteFace (dgListNode* const node) ;
 	virtual dgInt32 InitVertexArray(dgConvexHull3DVertex* const points, const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, void* const memoryPool, dgInt32 maxMemSize);
 
-	bool CalculateConvexHull2d (dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
+	bool CheckFlatSurface(dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
+	void CalculateConvexHull2d (dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
 	void CalculateConvexHull3d (dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
 	
 	dgInt32 SupportVertex (dgConvexHull3dAABBTreeNode** const tree, const dgConvexHull3DVertex* const points, const dgBigVector& dir, const bool removeEntry = true) const;

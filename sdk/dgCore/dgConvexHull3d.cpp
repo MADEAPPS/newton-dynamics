@@ -247,7 +247,9 @@ void dgConvexHull3d::BuildHull (const dgFloat64* const vertexCloud, dgInt32 stri
 	}
 #else
 	if (m_count >= 3) {
-		if (!CalculateConvexHull2d(&treePool[0], &points[0], count, distTol, maxVertexCount)) {
+		if (CheckFlatSurface(&treePool[0], &points[0], count, distTol, maxVertexCount)) {
+			CalculateConvexHull2d(&treePool[0], &points[0], count, distTol, maxVertexCount);
+		} else {
 			dgAssert(m_count == 4);
 			CalculateConvexHull3d(&treePool[0], &points[0], count, distTol, maxVertexCount);
 		}
@@ -743,7 +745,7 @@ bool dgConvexHull3d::Sanity() const
 	return true;
 }
 
-bool dgConvexHull3d::CalculateConvexHull2d(dgConvexHull3dAABBTreeNode* tree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount)
+bool dgConvexHull3d::CheckFlatSurface(dgConvexHull3dAABBTreeNode* tree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount)
 {
 	dgBigVector e0(m_points[1] - m_points[0]);
 	dgBigVector e1(m_points[2] - m_points[0]);
@@ -764,8 +766,7 @@ bool dgConvexHull3d::CalculateConvexHull2d(dgConvexHull3dAABBTreeNode* tree, dgC
 		m_points[3] = points[index];
 		volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
 		if (dgAbs(volume) < dgFloat32(1.0e-9f)) {
-			//this is a 3d flat plane build a 3d conve hull;
-			dgAssert(0);
+			return true;
 		}
 	}
 	points[index].m_mark = 1;
@@ -773,10 +774,14 @@ bool dgConvexHull3d::CalculateConvexHull2d(dgConvexHull3dAABBTreeNode* tree, dgC
 		dgSwap(m_points[2], m_points[3]);
 	}
 	dgAssert(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < dgFloat64(0.0f));
-
-
 	m_count = 4;
 	return false;
+}
+
+
+void dgConvexHull3d::CalculateConvexHull2d(dgConvexHull3dAABBTreeNode* tree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount)
+{
+
 }
 
 void dgConvexHull3d::CalculateConvexHull3d (dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount)
@@ -827,8 +832,6 @@ void dgConvexHull3d::CalculateConvexHull3d (dgConvexHull3dAABBTreeNode* vertexTr
 	dgListNode** const coneList = &stackPool[0];
 	dgListNode** const deleteList = &deleteListPool[0];
 
-
-
 	while (boundaryFaces.GetCount() && count && (maxVertexCount > 0)) {
 		// my definition of the optimal convex hull of a given vertex count,
 		// is the convex hull formed by a subset of the input vertex that minimizes the volume difference
@@ -848,7 +851,7 @@ void dgConvexHull3d::CalculateConvexHull3d (dgConvexHull3dAABBTreeNode* vertexTr
 			// using stack (faster)
 			dgListNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
 		#else
-			// using a queue (some what slower by better hull for reduce vertex count)
+			// using a queue (some what slower by better hull when reduced vertex count is desired)
 			dgListNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
 		#endif
 
