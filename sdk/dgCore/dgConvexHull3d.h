@@ -30,6 +30,8 @@
 #include "dgMatrix.h"
 #include "dgQuaternion.h"
 
+#define DG_OLD_CONVEXHULL_3D
+
 class dgMemoryAllocator;
 class dgConvexHull3DVertex;
 class dgConvexHull3dAABBTreeNode;
@@ -79,11 +81,13 @@ class dgConvexHull3d: public dgList<dgConvexHull3DFace>
 	virtual void DeleteFace (dgListNode* const node) ;
 	virtual dgInt32 InitVertexArray(dgConvexHull3DVertex* const points, const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, void* const memoryPool, dgInt32 maxMemSize);
 
-	void CalculateConvexHull (dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
+	bool CalculateConvexHull2d (dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
+	void CalculateConvexHull3d (dgConvexHull3dAABBTreeNode* vertexTree, dgConvexHull3DVertex* const points, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount);
 	
 	dgInt32 SupportVertex (dgConvexHull3dAABBTreeNode** const tree, const dgConvexHull3DVertex* const points, const dgBigVector& dir, const bool removeEntry = true) const;
 	dgFloat64 TetrahedrumVolume (const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3) const;
 
+	dgInt32 GetUniquePoints(dgConvexHull3DVertex* const points, const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, void* const memoryPool, dgInt32 maxMemSize);
 	dgConvexHull3dAABBTreeNode* BuildTree (dgConvexHull3dAABBTreeNode* const parent, dgConvexHull3DVertex* const points, dgInt32 count, dgInt32 baseIndex, dgInt8** const memoryPool, dgInt32& maxMemSize) const;
 	static dgInt32 ConvexCompareVertex(const dgConvexHull3DVertex* const A, const dgConvexHull3DVertex* const B, void* const context);
 	bool Sanity() const;
