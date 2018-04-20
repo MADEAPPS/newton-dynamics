@@ -29,61 +29,75 @@
 
 #define DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE		8
 
-dgConvexHull3d::dgNormalMap::dgNormalMap()
-	:m_count(sizeof (m_normal)/sizeof (m_normal[0]))
+#ifdef	DG_OLD_CONVEXHULL_3D
+class dgConvexHull3d::dgNormalMap
 {
-	dgVector p0(dgFloat32( 1.0f), dgFloat32( 0.0f), dgFloat32( 0.0f), dgFloat32(0.0f));
-	dgVector p1(dgFloat32(-1.0f), dgFloat32( 0.0f), dgFloat32( 0.0f), dgFloat32(0.0f));
-	dgVector p2(dgFloat32( 0.0f), dgFloat32( 1.0f), dgFloat32( 0.0f), dgFloat32(0.0f));
-	dgVector p3(dgFloat32( 0.0f), dgFloat32(-1.0f), dgFloat32( 0.0f), dgFloat32(0.0f));
-	dgVector p4(dgFloat32( 0.0f), dgFloat32( 0.0f), dgFloat32( 1.0f), dgFloat32(0.0f));
-	dgVector p5(dgFloat32( 0.0f), dgFloat32( 0.0f), dgFloat32(-1.0f), dgFloat32(0.0f));
+	public:
+	dgNormalMap()
+		:m_count(sizeof(m_normal) / sizeof(m_normal[0]))
+	{
+		dgVector p0(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		dgVector p1(dgFloat32(-1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		dgVector p2(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		dgVector p3(dgFloat32(0.0f), dgFloat32(-1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		dgVector p4(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f));
+		dgVector p5(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(-1.0f), dgFloat32(0.0f));
 
-	dgInt32 count = 0;
-	dgInt32 subdivitions = 2;
-	TessellateTriangle(subdivitions, p4, p0, p2, count);
-	TessellateTriangle(subdivitions, p0, p5, p2, count);
-	TessellateTriangle(subdivitions, p5, p1, p2, count);
-	TessellateTriangle(subdivitions, p1, p4, p2, count);
-	TessellateTriangle(subdivitions, p0, p4, p3, count);
-	TessellateTriangle(subdivitions, p5, p0, p3, count);
-	TessellateTriangle(subdivitions, p1, p5, p3, count);
-	TessellateTriangle(subdivitions, p4, p1, p3, count);
-}
-
-void dgConvexHull3d::dgNormalMap::TessellateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count)
-{
-	if (level) {
-		dgAssert(dgAbs(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgVector p01(p0 + p1);
-		dgVector p12(p1 + p2);
-		dgVector p20(p2 + p0);
-
-		p01 = p01.Scale3(dgRsqrt(p01.DotProduct3(p01)));
-		p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
-		p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
-
-		dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-
-		TessellateTriangle(level - 1, p0, p01, p20, count);
-		TessellateTriangle(level - 1, p1, p12, p01, count);
-		TessellateTriangle(level - 1, p2, p20, p12, count);
-		TessellateTriangle(level - 1, p01, p12, p20, count);
-	} else {
-		dgBigPlane n(p0, p1, p2);
-		n = n.Scale(dgFloat64(1.0f) / sqrt(n.DotProduct3(n)));
-		n.m_w = dgFloat64(0.0f);
-		dgInt32 index = dgBitReversal(count, sizeof (m_normal) / sizeof (m_normal[0]));
-		m_normal[index] = n;
-		count ++;
-		dgAssert (count <= sizeof (m_normal) / sizeof (m_normal[0]));
+		dgInt32 count = 0;
+		dgInt32 subdivitions = 2;
+		TessellateTriangle(subdivitions, p4, p0, p2, count);
+		TessellateTriangle(subdivitions, p0, p5, p2, count);
+		TessellateTriangle(subdivitions, p5, p1, p2, count);
+		TessellateTriangle(subdivitions, p1, p4, p2, count);
+		TessellateTriangle(subdivitions, p0, p4, p3, count);
+		TessellateTriangle(subdivitions, p5, p0, p3, count);
+		TessellateTriangle(subdivitions, p1, p5, p3, count);
+		TessellateTriangle(subdivitions, p4, p1, p3, count);
 	}
-}
 
+	static const dgNormalMap& GetNormaMap()
+	{
+		static dgNormalMap normalMap;
+		return normalMap;
+	}
+
+	void TessellateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count)
+	{
+		if (level) {
+			dgAssert(dgAbs(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbs(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbs(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgVector p01(p0 + p1);
+			dgVector p12(p1 + p2);
+			dgVector p20(p2 + p0);
+
+			p01 = p01.Scale3(dgRsqrt(p01.DotProduct3(p01)));
+			p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
+			p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
+
+			dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbs(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+
+			TessellateTriangle(level - 1, p0, p01, p20, count);
+			TessellateTriangle(level - 1, p1, p12, p01, count);
+			TessellateTriangle(level - 1, p2, p20, p12, count);
+			TessellateTriangle(level - 1, p01, p12, p20, count);
+		} else {
+			dgBigPlane n(p0, p1, p2);
+			n = n.Scale(dgFloat64(1.0f) / sqrt(n.DotProduct3(n)));
+			n.m_w = dgFloat64(0.0f);
+			dgInt32 index = dgBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
+			m_normal[index] = n;
+			count++;
+			dgAssert(count <= sizeof(m_normal) / sizeof(m_normal[0]));
+		}
+	}
+
+	dgBigVector m_normal[128];
+	dgInt32 m_count;
+};
+#endif
 
 class dgConvexHull3DVertex: public dgBigVector
 {
@@ -221,11 +235,6 @@ dgConvexHull3d::~dgConvexHull3d(void)
 {
 }
 
-const dgConvexHull3d::dgNormalMap& dgConvexHull3d::GetNormaMap()
-{
-	static dgNormalMap normalMap;
-	return normalMap;
-}
 
 void dgConvexHull3d::BuildHull (const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount)
 {
@@ -436,7 +445,7 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 	m_diag = dgFloat32 (sqrt (boxSize.DotProduct3(boxSize)));
 
 #ifdef DG_OLD_CONVEXHULL_3D
-	const dgNormalMap& normalMap = GetNormaMap();
+	const dgNormalMap& normalMap = dgNormalMap::GetNormaMap();
 
 	dgInt32 index0 = SupportVertex (&tree, points, normalMap.m_normal[0]);
 	m_points[0] = points[index0];
@@ -694,8 +703,6 @@ dgInt32 dgConvexHull3d::SupportVertex (dgConvexHull3dAABBTreeNode** const treePo
 	dgAssert (index != -1);
 	return index;
 }
-
-
 
 dgConvexHull3d::dgListNode* dgConvexHull3d::AddFace (dgInt32 i0, dgInt32 i1, dgInt32 i2)
 {

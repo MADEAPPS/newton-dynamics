@@ -59,6 +59,10 @@ class dgConvexHull3DFace
 
 class dgConvexHull3d: public dgList<dgConvexHull3DFace>
 {
+#ifdef	DG_OLD_CONVEXHULL_3D
+	class dgNormalMap;
+#endif
+
 	public:
 	dgConvexHull3d(const dgConvexHull3d& source);
 	dgConvexHull3d(dgMemoryAllocator* const allocator, const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, dgFloat64 distTol, dgInt32 maxVertexCount = 0x7fffffff);
@@ -93,20 +97,6 @@ class dgConvexHull3d: public dgList<dgConvexHull3DFace>
 	static dgInt32 ConvexCompareVertex(const dgConvexHull3DVertex* const A, const dgConvexHull3DVertex* const B, void* const context);
 	bool Sanity() const;
 	void Save (const char* const filename) const;
-
-	class dgNormalMap
-	{
-		public:
-		dgNormalMap();
-		private:
-		void TessellateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& start);
-
-		public:
-		dgBigVector m_normal[128];
-		dgInt32 m_count;
-	};
-
-	static const dgNormalMap& GetNormaMap();
 
 	dgInt32 m_count;
 	dgFloat64 m_diag;
