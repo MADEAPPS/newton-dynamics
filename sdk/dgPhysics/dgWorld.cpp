@@ -1518,6 +1518,13 @@ void dgWorld::DeserializeBodyArray (void* const userData, OnBodyDeserialize body
 				body = new (m_allocator)dgKinematicBody(this, &shapeMap, deserializeCallback, serializeHandle, revision);
 				break;
 			}
+
+			case dgBody::m_dynamicBodyAsymatric:
+			{
+				body = new (m_allocator)dgDynamicBodyAsymetric(this, &shapeMap, deserializeCallback, serializeHandle, revision);
+				break;
+			}
+
 		}
 
 		dgAssert(body);

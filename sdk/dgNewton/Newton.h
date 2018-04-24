@@ -75,6 +75,7 @@ extern "C" {
 
 	#define NEWTON_DYNAMIC_BODY								0
 	#define NEWTON_KINEMATIC_BODY							1
+	#define NEWTON_DYNAMIC_ASYMETRIC_BODY					2
 //	#define NEWTON_DEFORMABLE_BODY							2
 
 	#define SERIALIZE_ID_SPHERE								0

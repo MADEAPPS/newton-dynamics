@@ -110,7 +110,6 @@ class dgTemplateVector
 		return (*this = dgTemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w * B.m_w));
 	}
 
-
 	DG_INLINE dgTemplateVector<T> AddHorizontal() const
 	{
 		T val(m_x + m_y + m_z + m_w);
@@ -456,11 +455,6 @@ class dgVector
 		return dgVector (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-//	DG_INLINE dgVector InvMagSqrt () const
-//	{
-//		return dgVector (dgRsqrt (DotProduct4(*this).m_x));
-//	}
-
 	DG_INLINE dgVector Reciproc () const
 	{
 		return dgVector (dgFloat32 (1.0f) / m_x, dgFloat32 (1.0f) / m_y, dgFloat32 (1.0f) / m_z, dgFloat32 (1.0f) / m_w);
@@ -476,10 +470,18 @@ class dgVector
 		return dgVector (dgRsqrt (m_x), dgRsqrt (m_y), dgRsqrt (m_z), dgRsqrt (m_w));
 	}
 
+	DG_INLINE dgVector InvMagSqrt () const
+	{
+		return dgVector (dgRsqrt (DotProduct4(*this).m_x));
+	}
+
 	DG_INLINE dgVector Normalize () const
 	{
+		dgAssert (m_w == dgFloat32 (0.0f)));
 		//return *this * dgVector (dgRsqrt (DotProduct4(*this).m_x));
-		return Scale4 (dgRsqrt (DotProduct4(*this).GetScalar()));
+		//return Scale4 (dgRsqrt (DotProduct4(*this).GetScalar()));
+		const dgVector& me = *this; 
+		return me * InvMagSqrt();
 	}
 
 	dgVector Abs () const
@@ -873,16 +875,6 @@ class dgBigVector
 		return dgBigVector (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-//	DG_INLINE dgBigVector InvMagSqrt () const
-//	{
-//		return dgBigVector (dgFloat64 (1.0f) / sqrt (DotProduct4(*this).m_x));
-//	}
-
-	DG_INLINE dgVector Normalize() const
-	{
-		return *this * dgVector(dgRsqrt(DotProduct4(*this).m_x));
-	}
-
 	DG_INLINE dgBigVector Reciproc () const
 	{
 		return dgBigVector (dgFloat64 (1.0f) / m_x, dgFloat64 (1.0f) / m_y, dgFloat64 (1.0f) / m_z, dgFloat64 (1.0f) / m_w);
@@ -896,6 +888,19 @@ class dgBigVector
 	DG_INLINE dgBigVector InvSqrt () const
 	{
 		return dgBigVector (dgFloat64 (1.0f) / sqrt (m_x), dgFloat64 (1.0f) / sqrt (m_y), dgFloat64 (1.0f) / sqrt (m_z), dgFloat64 (1.0f) / sqrt (m_w));
+	}
+
+	DG_INLINE dgBigVector InvMagSqrt () const
+	{
+		return dgBigVector (dgFloat64 (1.0f) / sqrt (DotProduct4(*this).m_x));
+	}
+
+	DG_INLINE dgBigVector Normalize() const
+	{
+		dgAssert (m_w == dgFoat32 (0.0f));
+		const dgBigVector& me = *this;
+		//return *this * dgBigVector (dgRsqrt(DotProduct4(*this).m_x));
+		return *this * InvMagSqrt();
 	}
 
 	dgBigVector Abs () const
@@ -1439,12 +1444,21 @@ class dgVector
 	DG_INLINE dgVector InvSqrt () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
+		//return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
 		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
+	}
+
+	DG_INLINE dgVector InvMagSqrt () const
+	{
+		return DotProduct4(*this).InvSqrt();
 	}
 
 	DG_INLINE dgVector Normalize () const
 	{
-		return *this * (DotProduct4(*this).InvSqrt());
+		dgAssert (m_w == dgFloat32 (0.0f));
+		// somehow this function changes the behavior with 3.13
+		//return Scale4(dgFloat32 (1.0f) / dgSqrt(DotProduct4(*this).GetScalar()));
+		return *this * InvMagSqrt ();
 	}
 
 	// relational operators
@@ -1581,10 +1595,28 @@ class dgVector
 DG_MSC_VECTOR_ALIGMENT
 class dgBigVector
 {
-	#define PURMUT_MASK_DOUBLE(y, x)	_MM_SHUFFLE2 (y, x)
+	#define PERMUT_MASK_DOUBLE(y, x)	_MM_SHUFFLE2 (y, x)
 
 	public:
 	DG_INLINE dgBigVector()
+	{
+	}
+
+	DG_INLINE dgBigVector(const dgBigVector& copy)
+		:m_typeLow(copy.m_typeLow)
+		,m_typeHigh(copy.m_typeHigh)
+	{
+	}
+
+	DG_INLINE dgBigVector(const __m128d typeLow, const __m128d typeHigh)
+		:m_typeLow(typeLow)
+		, m_typeHigh(typeHigh)
+	{
+	}
+
+	DG_INLINE dgBigVector(const __m128i typeLow, const __m128i typeHigh)
+		: m_typeIntLow(typeLow)
+		, m_typeIntHigh(typeHigh)
 	{
 	}
 
@@ -1594,15 +1626,7 @@ class dgBigVector
 	{
 	}
 
-
 #ifdef _NEWTON_USE_DOUBLE
-	DG_INLINE dgBigVector(const dgVector& v)
-		:m_typeLow(v.m_typeLow)
-		,m_typeHigh(v.m_typeHigh)
-	{
-		//dgAssert(dgCheckVector((*this)));
-	}
-
 	DG_INLINE dgBigVector (const dgFloat32* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
 		,m_typeHigh(_mm_set_pd(dgFloat64(0.0f), ptr[2]))
@@ -1625,32 +1649,19 @@ class dgBigVector
 	}
 #endif
 
-	DG_INLINE dgBigVector(const __m128d typeLow, const __m128d typeHigh)
-		:m_typeLow(typeLow)
-		,m_typeHigh(typeHigh)
-	{
-	}
 
 	DG_INLINE dgBigVector(dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFloat64 w)
+		//:m_x(x), m_y(y), m_z(z), m_w(w)
 		: m_typeLow(_mm_set_pd(y, x))
 		, m_typeHigh(_mm_set_pd(w, z))
 	{
 	}
 
-	DG_INLINE dgBigVector(const __m128i typeLow, const __m128i typeHigh)
-		: m_typeIntLow(typeLow)
-		, m_typeIntHigh(typeHigh)
-	{
-	}
-
 	DG_INLINE dgBigVector(dgInt32 ix, dgInt32 iy, dgInt32 iz, dgInt32 iw)
+		:m_ix(dgInt64(ix)), m_iy(dgInt64(iy)), m_iz(dgInt64(iz)), m_iw(dgInt64(iw))
+//		:m_typeIntLow (_mm_set_epi64(dgM64FromInt(iy), dgM64FromInt(ix)))
+//		,m_typeIntHigh (_mm_set_epi64(dgM64FromInt(iw), dgM64FromInt(iz)))
 	{
-		dgInt64 x = ix;
-		dgInt64 y = iy;
-		dgInt64 z = iz;
-		dgInt64 w = iw;
-		m_typeLow = _mm_set_pd(*(dgFloat32*)&y, *(dgFloat32*)&x);
-		m_typeHigh = _mm_set_pd(*(dgFloat32*)&w, *(dgFloat32*)&z);
 	}
 
 	DG_INLINE dgFloat64& operator[] (dgInt32 i)
@@ -1689,6 +1700,7 @@ class dgBigVector
 
 	DG_INLINE dgBigVector& operator+= (const dgBigVector& A)
 	{
+//		return (*this = dgBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
 		m_typeLow = _mm_add_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_add_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
@@ -1696,6 +1708,7 @@ class dgBigVector
 
 	DG_INLINE dgBigVector& operator-= (const dgBigVector& A)
 	{
+		//return (*this = dgBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 		m_typeLow = _mm_sub_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_sub_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
@@ -1703,6 +1716,7 @@ class dgBigVector
 
 	DG_INLINE dgBigVector& operator*= (const dgBigVector& A)
 	{
+		//return (*this = dgBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
 		m_typeLow = _mm_mul_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_mul_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
@@ -1710,33 +1724,26 @@ class dgBigVector
 
 	DG_INLINE dgFloat64 DotProduct3(const dgBigVector& A) const
 	{
-		dgFloat64 ret;
-		__m128d tmp0(_mm_mul_pd(m_typeLow, A.m_typeLow));
-		__m128d tmp1(_mm_and_pd(m_typeHigh, dgBigVector::m_triplexMask.m_typeHigh));
-		__m128d tmp2(_mm_mul_pd(tmp1, A.m_typeHigh));
-		__m128d tmp3(_mm_add_pd(tmp0, tmp2));
-		__m128d dot(_mm_hadd_pd(tmp3, tmp3));
-		_mm_store_sd(&ret, dot);
-		return ret;
+		//dgFloat64 ret;
+		//__m128d tmp0(_mm_mul_pd(m_typeLow, A.m_typeLow));
+		//__m128d tmp1(_mm_and_pd(m_typeHigh, dgBigVector::m_triplexMask.m_typeHigh));
+		//__m128d tmp2(_mm_mul_pd(tmp1, A.m_typeHigh));
+		//__m128d tmp3(_mm_add_pd(tmp0, tmp2));
+		//__m128d dot(_mm_hadd_pd(tmp3, tmp3));
+		//_mm_store_sd(&ret, dot);
+		//return ret;
+		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 	}
 
 	// return cross product
 	DG_INLINE dgBigVector CrossProduct3(const dgBigVector& B) const
 	{
-		dgBigVector tmp0(ShiftTripleLeft());
-		dgBigVector tmp1(B.ShiftTripleRight());
-		dgBigVector tmp2(ShiftTripleRight());
-		dgBigVector tmp3(B.ShiftTripleLeft());
-		return tmp0 * tmp1 - tmp2 * tmp3;
-	}
-
-	DG_INLINE dgBigVector DotProduct4(const dgBigVector& A) const
-	{
-		__m128d tmp0(_mm_mul_pd(m_typeLow, A.m_typeLow));
-		__m128d tmp1(_mm_mul_pd(m_typeHigh, A.m_typeHigh));
-		__m128d tmp2(_mm_add_pd(tmp0, tmp1));
-		__m128d dot(_mm_hadd_pd(tmp2, tmp2));
-		return dgBigVector(dot, dot);
+		//dgBigVector tmp0(ShiftTripleLeft());
+		//dgBigVector tmp1(B.ShiftTripleRight());
+		//dgBigVector tmp2(ShiftTripleRight());
+		//dgBigVector tmp3(B.ShiftTripleLeft());
+		//return tmp0 * tmp1 - tmp2 * tmp3;
+		return dgBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
 	DG_INLINE dgBigVector AddHorizontal() const
@@ -1744,12 +1751,6 @@ class dgBigVector
 		__m128d tmp0(_mm_add_pd(m_typeHigh, m_typeLow));
 		__m128d tmp1(_mm_hadd_pd(tmp0, tmp0));
 		return dgBigVector(tmp1, tmp1);
-	}
-
-	// component wise multiplication
-	DG_INLINE dgBigVector CompProduct3(const dgBigVector& A) const
-	{
-		return dgBigVector(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_and_pd(_mm_mul_pd(m_typeHigh, A.m_typeHigh), m_triplexMask.m_typeHigh));
 	}
 
 	DG_INLINE dgBigVector BroadcastX() const
@@ -1774,20 +1775,21 @@ class dgBigVector
 
 	DG_INLINE dgBigVector Scale3(dgFloat64 s) const
 	{
-		__m128d tmp0(_mm_set1_pd(s));
-		__m128d tmp1(_mm_set_pd(dgFloat32(1.0f), s));
-		return dgBigVector(_mm_mul_pd(m_typeLow, tmp0), _mm_mul_pd(m_typeHigh, tmp1));
+		//__m128d tmp0(_mm_set1_pd(s));
+		//__m128d tmp1(_mm_set_pd(dgFloat32(1.0f), s));
+		//return dgBigVector(_mm_mul_pd(m_typeLow, tmp0), _mm_mul_pd(m_typeHigh, tmp1));
+		return dgBigVector(m_x * s, m_y * s, m_z * s, m_w);
 	}
 
 	DG_INLINE dgBigVector Scale4(dgFloat64 s) const
 	{
+		//return dgBigVector(m_x * s, m_y * s, m_z * s, m_w * s);
 		__m128d tmp0(_mm_set1_pd(s));
 		return dgBigVector(_mm_mul_pd(m_typeLow, tmp0), _mm_mul_pd(m_typeHigh, tmp0));
 	}
 
 	DG_INLINE dgBigVector Abs() const
 	{
-		//		return _mm_and_ps (m_type, m_signMask.m_type);
 		return dgBigVector(_mm_and_pd(m_typeLow, m_signMask.m_typeLow), _mm_and_pd(m_typeHigh, m_signMask.m_typeLow));
 	}
 
@@ -1806,10 +1808,12 @@ class dgBigVector
 		return Sqrt().Reciproc();
 	}
 
-
 	DG_INLINE dgBigVector Normalize() const
 	{
-		return *this * (DotProduct4(*this).InvSqrt());
+		dgAssert (m_w == dgFloat32 (0.0f));
+		//return *this * (DotProduct4(*this).InvSqrt());
+		dgFloat64 mag2 = DotProduct4(*this).GetScalar();
+		return Scale4(dgFloat64 (1.0f) / sqrt (mag2));
 	}
 
 	dgBigVector GetMax(const dgBigVector& data) const
@@ -1822,14 +1826,13 @@ class dgBigVector
 		return dgBigVector(_mm_min_pd(m_typeLow, data.m_typeLow), _mm_min_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-
 	DG_INLINE dgBigVector GetInt() const
 	{
 		dgBigVector temp(Floor());
 		dgInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
-		dgInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PURMUT_MASK_DOUBLE(1, 1)));
+		dgInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
 		dgInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
-		dgInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PURMUT_MASK_DOUBLE(1, 1)));
+		dgInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
 		return dgBigVector(_mm_set_pd(*(dgFloat32*)&y, *(dgFloat32*)&x), _mm_set_pd(*(dgFloat32*)&w, *(dgFloat32*)&z));
 	}
 
@@ -1882,19 +1885,19 @@ class dgBigVector
 
 	DG_INLINE dgBigVector ShiftTripleRight() const
 	{
-		return dgBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PURMUT_MASK_DOUBLE(0, 0)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PURMUT_MASK_DOUBLE(1, 1)));
+		return dgBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 0)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
 	}
 
 	DG_INLINE dgBigVector ShiftTripleLeft() const
 	{
-		return dgBigVector(_mm_shuffle_pd(m_typeLow, m_typeHigh, PURMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PURMUT_MASK_DOUBLE(1, 0)));
+		return dgBigVector(_mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 0)));
 	}
 
 	DG_INLINE dgBigVector ShiftRightLogical(int bits) const
 	{
+		//return dgBigVector(dgInt64(dgUnsigned64(m_ix) >> bits), dgInt64(dgUnsigned64(m_iy) >> bits), dgInt64(dgUnsigned64(m_iz) >> bits), dgInt64(dgUnsigned64(m_iw) >> bits));
 		return dgBigVector(_mm_srli_epi64(m_typeIntLow, bits), _mm_srli_epi64(m_typeIntHigh, bits));
 	}
-
 
 	DG_INLINE dgInt32 GetSignMask() const
 	{
@@ -1908,43 +1911,6 @@ class dgBigVector
 #else 
 		return dgBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
 #endif
-	}
-
-	DG_INLINE dgBigVector CrossProduct4(const dgBigVector& A, const dgBigVector& B) const
-	{
-		dgFloat64 array[4][4];
-		dgFloat64 cofactor[3][3];
-
-		const dgBigVector& me = *this;
-		for (dgInt32 i = 0; i < 4; i++) {
-			array[0][i] = me[i];
-			array[1][i] = A[i];
-			array[2][i] = B[i];
-			array[3][i] = dgFloat64(1.0f);
-		}
-
-		dgBigVector normal;
-		dgFloat64 sign = dgFloat32(-1.0f);
-		for (dgInt32 i = 0; i < 4; i++) {
-			for (dgInt32 j = 0; j < 3; j++) {
-				dgInt32 k0 = 0;
-				for (dgInt32 k = 0; k < 4; k++) {
-					if (k != i) {
-						cofactor[j][k0] = array[j][k];
-						k0++;
-					}
-				}
-			}
-			dgFloat64 x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
-			dgFloat64 y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
-			dgFloat64 z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
-			dgFloat64 det = x + y + z;
-
-			normal[i] = sign * det;
-			sign *= dgFloat64(-1.0f);
-		}
-
-		return normal;
 	}
 
 	DG_INLINE dgBigVector TestZero() const
@@ -1965,6 +1931,56 @@ class dgBigVector
 		dst1 = dgBigVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
 		dst2 = dgBigVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
 		dst3 = dgBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
+	}
+
+	DG_INLINE dgBigVector CompProduct3(const dgBigVector& A) const
+	{
+		return dgBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
+	}
+
+	// return dot 4d dot product
+	DG_INLINE dgBigVector DotProduct4(const dgBigVector &A) const
+	{
+		dgFloat64 val(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return dgBigVector(val, val, val, val);
+	}
+
+	DG_INLINE dgBigVector CrossProduct4(const dgBigVector& A, const dgBigVector& B) const
+	{
+		dgFloat64 cofactor[3][3];
+		dgFloat64 array[4][4];
+
+		const dgBigVector& me = *this;
+		for (dgInt32 i = 0; i < 4; i++) {
+			array[0][i] = me[i];
+			array[1][i] = A[i];
+			array[2][i] = B[i];
+			array[3][i] = dgFloat64(1.0f);
+		}
+
+		dgBigVector normal;
+		dgFloat64 sign = dgFloat64(-1.0f);
+		for (dgInt32 i = 0; i < 4; i++) {
+
+			for (dgInt32 j = 0; j < 3; j++) {
+				dgInt32 k0 = 0;
+				for (dgInt32 k = 0; k < 4; k++) {
+					if (k != i) {
+						cofactor[j][k0] = array[j][k];
+						k0++;
+					}
+				}
+			}
+			dgFloat64 x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
+			dgFloat64 y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
+			dgFloat64 z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
+			dgFloat64 det = x + y + z;
+
+			normal[i] = sign * det;
+			sign *= dgFloat64(-1.0f);
+		}
+
+		return normal;
 	}
 
 	DG_CLASS_ALLOCATOR(allocator)

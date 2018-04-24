@@ -109,57 +109,7 @@ void dgGetMinMax (dgBigVector &minOut, dgBigVector &maxOut, const dgFloat64* con
 }
 
 
-/*
-void dgGetMinMax (dgVector &minOut, dgVector &maxOut, const dgFloat32* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
-{
-	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
-	const dgFloat32* vArray = vertexArray + stride;
 
-	dgAssert (stride >= 3);
- 	minOut = dgVector (vertexArray[0], vertexArray[1], vertexArray[2], dgFloat32 (0.0f)); 
-	maxOut = dgVector (vertexArray[0], vertexArray[1], vertexArray[2], dgFloat32 (0.0f)); 
-
-	for (dgInt32 i = 1; i < vCount; i ++) {
-		minOut.m_x = dgMin (minOut.m_x, vArray[0]);
-		minOut.m_y = dgMin (minOut.m_y, vArray[1]);
-		minOut.m_z = dgMin (minOut.m_z, vArray[2]);
-
-		maxOut.m_x = dgMax (maxOut.m_x, vArray[0]);
-		maxOut.m_y = dgMax (maxOut.m_y, vArray[1]);
-		maxOut.m_z = dgMax (maxOut.m_z, vArray[2]);
-
-		vArray += stride;
-	}
-}
-
-
-
-#ifndef _NEWTON_USE_DOUBLE
-void dgGetMinMax (dgBigVector &minOut, dgBigVector &maxOut, const dgFloat64* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
-{
-	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
-	const dgFloat64* vArray = vertexArray + stride;
-
-	dgAssert (stride >= 3);
-	minOut = dgBigVector (vertexArray[0], vertexArray[1], vertexArray[2], dgFloat64 (0.0f)); 
-	maxOut = dgBigVector (vertexArray[0], vertexArray[1], vertexArray[2], dgFloat64 (0.0f)); 
-
-	for (dgInt32 i = 1; i < vCount; i ++) {
-		minOut.m_x = dgMin (minOut.m_x, vArray[0]);
-		minOut.m_y = dgMin (minOut.m_y, vArray[1]);
-		minOut.m_z = dgMin (minOut.m_z, vArray[2]);
-
-		maxOut.m_x = dgMax (maxOut.m_x, vArray[0]);
-		maxOut.m_y = dgMax (maxOut.m_y, vArray[1]);
-		maxOut.m_z = dgMax (maxOut.m_z, vArray[2]);
-
-		vArray += stride;
-	}
-}
-
-#endif
-
-*/
 
 static inline dgInt32 cmp_vertex (const dgFloat64* const v1, const dgFloat64* const v2, dgInt32 firstSortAxis)
 {

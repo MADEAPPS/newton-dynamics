@@ -4475,6 +4475,8 @@ int NewtonBodyGetType (const NewtonBody* const bodyPtr)
 		return NEWTON_DYNAMIC_BODY;
 	} else if (body->IsRTTIType(dgBody::m_kinematicBodyRTTI)) {
 		return NEWTON_KINEMATIC_BODY;
+	} else if (body->IsRTTIType(dgBody::m_dynamicBodyAsymentricRTTI)) {
+		return NEWTON_DYNAMIC_ASYMETRIC_BODY;
 //	} else if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
 //		return NEWTON_DEFORMABLE_BODY;
 	}

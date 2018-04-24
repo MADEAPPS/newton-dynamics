@@ -23,7 +23,6 @@
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgCollisionBox.h"
-#include "dgContactSolver.h"
 
 
 //////////////////////////////////////////////////////////////////////

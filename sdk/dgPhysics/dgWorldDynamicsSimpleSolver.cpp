@@ -557,6 +557,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1_50(const dgJointInfo* cons
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
 {
+#if 0
 	dgFloat32 accNorm = dgFloat32(0.0f);
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;
@@ -629,173 +630,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
 			angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
 		}
-#if 0
-		const dgFloat32 tol2 = dgFloat32(1.0e-4f);
-		if (accNorm > tol2) {
-			dgVector maxAccel (accNorm);
-			for (dgInt32 j = 0; (j < 4) && (maxAccel.GetScalar() > tol2); j++) {
-				maxAccel = dgFloat32(0.0f);
-				for (dgInt32 i = 0; i < rowsCount; i++) {
-					const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-
-					dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
-					dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
-					dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
-					dgAssert(row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32(0.0f));
-
-					dgVector diag(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
-								  row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
-
-					dgVector accel(b[i] - x[i] * diagDamp[i] - diag.AddHorizontal());
-					dgVector force(x[i] + invJinvMJt[i] * accel);
-
-					const dgVector frictionNormal (x[frictionIndex[i]]);
-					const dgVector lowerFrictionForce(frictionNormal * low[i]);
-					const dgVector upperFrictionForce(frictionNormal * high[i]);
-					const dgVector clampedForce (force.GetMax(lowerFrictionForce).GetMin(upperFrictionForce));
-
-					const dgVector deltaForce(clampedForce - x[i]);
-					x[i] = clampedForce;
-
-					const dgVector clampedAccel (accel.AndNot((force > upperFrictionForce) | (force < lowerFrictionForce)));
-					maxAccel += clampedAccel * clampedAccel;
-
-					const dgVector deltaforce0(scale0 * deltaForce);
-					const dgVector deltaforce1(scale1 * deltaForce);
-					linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
-					angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
-					linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
-					angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
-				}
-			}
-
-			if (maxAccel.GetScalar() > tol2) {
-				dgInt32 activeRows[DG_CONSTRAINT_MAX_ROWS];
-				dgInt32 passes = rowsCount;
-				dgFloat32 beta = dgFloat32(0.0f);
-				dgInt32 activeRowsCount = 0;
-				dgInt32 clampedIndex = rowsCount - 1;
-				for (dgInt32 i = 0; i < rowsCount; i++) {
-					const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-					const dgVector frictionNormal = x[frictionIndex[i]];
-					low[i] = low[i] * frictionNormal;
-					high[i] = high[i] * frictionNormal;
-
-					dgVector diag(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
-								  row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
-
-					b[i] -= (x[i] * diagDamp[i] + diag.AddHorizontal());
-					x0[i] = x[i];
-					const dgVector x1 (x[i] + invJinvMJt[i] * b[i]);
-					mask[i] = dgVector::m_one.AndNot ((x1 < low[i]) | (x1 > high[i])); 
-					delta_x[i] = b[i] * mask[i];
-					beta += (delta_x[i] * delta_x[i]).GetScalar();
-					const dgInt32 isClamped = mask[i].GetScalar() ? 0 : 1;
-					passes -= mask[i].GetScalar() ? 0 : 1;
-
-					activeRows[clampedIndex] = i;
-					activeRows[activeRowsCount] = i;
-					activeRowsCount += 1 - isClamped;
-					clampedIndex -= isClamped;
-				}
-
-				dgInt32 iter = 0;
-				for (dgInt32 k = 0; (k < passes) && (beta > tol2); k++) {
-					iter++;
-					dgJacobian delta_x0;
-					dgJacobian delta_x1;
-					delta_x0.m_linear = dgVector::m_zero;
-					delta_x0.m_angular = dgVector::m_zero;
-					delta_x1.m_linear = dgVector::m_zero;
-					delta_x1.m_angular = dgVector::m_zero;
-
-					for (dgInt32 i = 0; i < activeRowsCount; i++) {
-						const dgInt32 j = activeRows[i];
-						const dgJacobianMatrixElement* const row = &matrixRow[index + j];
-
-						dgVector deltaforce0(scale0 * delta_x[j]);
-						dgVector deltaforce1(scale1 * delta_x[j]);
-						delta_x0.m_linear += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
-						delta_x0.m_angular += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
-						delta_x1.m_linear += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
-						delta_x1.m_angular += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
-					}
-
-					dgFloat32 num = dgFloat32(0.0f);
-					dgFloat32 den = dgFloat32(0.0f);
-					for (dgInt32 i = 0; i < rowsCount; i++) {
-						const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-						dgVector diag(row->m_JMinv.m_jacobianM0.m_linear * delta_x0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * delta_x0.m_angular +
-									  row->m_JMinv.m_jacobianM1.m_linear * delta_x1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * delta_x1.m_angular);
-						delta_r[i] = diag.AddHorizontal() + delta_x[i] * diagDamp[i];
-
-						den += (delta_x[i] * delta_r[i]).GetScalar();
-						num += (b[i] * b[i] * mask[i]).GetScalar();
-					}
-
-					dgInt32 clampIndex = -1;
-					dgFloat32 alpha = num / den;
-					dgAssert(alpha > dgFloat32(0.0f));
-					for (dgInt32 i = 0; (i < activeRowsCount) && (alpha > dgFloat32(0.0f)); i++) {
-						const dgInt32 j = activeRows[i];
-						dgFloat32 x1 = x[j].GetScalar() + alpha * delta_x[j].GetScalar();
-						if (x1 < low[j].GetScalar()) {
-							clampIndex = i;
-							alpha = (low[j].GetScalar() - x[j].GetScalar()) / delta_x[j].GetScalar();
-						} else if (x1 > high[j].GetScalar()) {
-							clampIndex = i;
-							alpha = (high[j].GetScalar() - x[j].GetScalar()) / delta_x[j].GetScalar();
-						}
-						dgAssert(alpha >= dgFloat32(-1.0e-4f));
-						if (alpha < dgFloat32(1.0e-6f)) {
-							alpha = dgFloat32(0.0f);
-						}
-					}
-
-					beta = dgFloat32(0.0f);
-					dgVector alphav (alpha);
-					for (dgInt32 i = 0; i < rowsCount; i++) {
-						x[i] += alphav * delta_x[i];
-						b[i] -= alphav * delta_r[i];
-						beta += (b[i] * b[i] * mask[i]).GetScalar();
-					}
-
-					if (clampIndex >= 0) {
-						k = 0;
-						passes--;
-						beta = dgFloat32(0.0f);
-						const dgInt32 n = activeRows[clampIndex];
-						mask[n] = dgVector::m_zero;
-						delta_x[n] = dgVector::m_zero;
-						activeRowsCount --;
-						dgSwap (activeRows[clampIndex], activeRows[activeRowsCount]);
-						for (dgInt32 i = 0; i < activeRowsCount; i++) {
-							const dgInt32 j = activeRows[i];
-							delta_x[j] = b[j];
-							beta += (b[j] * b[j]).GetScalar();
-						}
-					} else {
-						dgVector gamma (beta / num);
-						for (dgInt32 i = 0; i < activeRowsCount; i++) {
-							const dgInt32 j = activeRows[i];
-							delta_x[j] = b[j] + gamma * delta_x[j];
-						}
-					}
-				}
-
-				for (dgInt32 i = 0; i < rowsCount; i++) {
-					const dgJacobianMatrixElement* const row = &matrixRow[index + i];
-					const dgVector deltax(x[i] - x0[i]);
-					const dgVector deltaforce0(scale0 * deltax);
-					const dgVector deltaforce1(scale1 * deltax);
-					linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
-					angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
-					linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
-					angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
-				}
-			}
-		}
-#else
 
 		dgVector maxAccel(accNorm);
 		dgVector sor(dgFloat32 (1.3f));
@@ -829,7 +663,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
 			}
 		}
-#endif
+
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[index + i];
@@ -844,6 +678,96 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	}
 
 	return accNorm;
+#else
+
+
+	dgVector accNorm(dgVector::m_zero);
+	dgFloat32 normalForce[DG_CONSTRAINT_MAX_ROWS + 4];
+
+	const dgInt32 m0 = jointInfo->m_m0;
+	const dgInt32 m1 = jointInfo->m_m1;
+	const dgBody* const body0 = bodyArray[m0].m_body;
+	const dgBody* const body1 = bodyArray[m1].m_body;
+
+	if (!(body0->m_resting & body1->m_resting)) {
+		dgInt32 rowsCount = jointInfo->m_pairCount;
+
+		dgVector linearM0(internalForces[m0].m_linear);
+		dgVector angularM0(internalForces[m0].m_angular);
+		dgVector linearM1(internalForces[m1].m_linear);
+		dgVector angularM1(internalForces[m1].m_angular);
+
+		const dgVector scale0(jointInfo->m_scale0);
+		const dgVector scale1(jointInfo->m_scale1);
+
+		dgVector maxAccel(dgVector::m_three);
+		dgVector predicateScale(dgVector::m_one);
+
+		normalForce[rowsCount] = dgFloat32(1.0f);
+		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > dgFloat32(1.0f)); i++) {
+			maxAccel = dgFloat32(0.0f);
+			dgInt32 index = jointInfo->m_pairStart;
+			for (dgInt32 k = 0; k < rowsCount; k++) {
+				dgJacobianMatrixElement* const row = &matrixRow[index];
+
+				dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
+				dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
+				dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
+				dgAssert(row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32(0.0f));
+
+				dgVector a(row->m_JMinv.m_jacobianM0.m_linear * (linearM0)+row->m_JMinv.m_jacobianM0.m_angular * (angularM0)+
+						   row->m_JMinv.m_jacobianM1.m_linear * (linearM1)+row->m_JMinv.m_jacobianM1.m_angular * (angularM1));
+				a = dgVector(row->m_coordenateAccel - row->m_force * row->m_diagDamp) - a.AddHorizontal();
+
+				dgVector f(row->m_force + row->m_invJinvMJt * a.m_x);
+				dgAssert(row->m_normalForceIndex >= 0);
+				dgAssert(row->m_normalForceIndex <= rowsCount);
+				dgInt32 frictionIndex = row->m_normalForceIndex;
+
+				dgFloat32 frictionNormal = normalForce[frictionIndex];
+				dgVector lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+				dgVector upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+
+				a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
+
+				maxAccel = maxAccel.GetMax(a.Abs());
+				dgAssert(maxAccel.m_x >= dgAbs(a.m_x));
+
+				accNorm = accNorm.GetMax(maxAccel * (predicateScale));
+
+
+				dgVector deltaForce(f - dgVector(row->m_force));
+
+				row->m_force = f.GetScalar();
+				normalForce[k] = f.GetScalar();
+
+				row->m_maxImpact = f.Abs().GetMax(row->m_maxImpact).m_x;
+
+				dgVector deltaforce0(scale0 * deltaForce);
+				dgVector deltaforce1(scale1 * deltaForce);
+				//linearM0 += row->m_Jt.m_jacobianM0.m_linear * (deltaForce);
+				//angularM0 += row->m_Jt.m_jacobianM0.m_angular * (deltaForce);
+				//linearM1 += row->m_Jt.m_jacobianM1.m_linear * (deltaForce);
+				//angularM1 += row->m_Jt.m_jacobianM1.m_angular * (deltaForce);
+				linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
+				angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
+				linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
+				angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
+
+				index++;
+			}
+			predicateScale = dgVector::m_zero;
+		}
+		internalForces[m0].m_linear = linearM0;
+		internalForces[m0].m_angular = angularM0;
+		internalForces[m1].m_linear = linearM1;
+		internalForces[m1].m_angular = angularM1;
+	}
+	return accNorm.GetScalar();
+
+
+#endif
 }
 
 
