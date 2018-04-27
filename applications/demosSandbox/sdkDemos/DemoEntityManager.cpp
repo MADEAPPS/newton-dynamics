@@ -47,7 +47,7 @@
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
-#define DEFAULT_SCENE	16			// uniform Scaled Collision
+//#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// continuous collision
@@ -71,9 +71,9 @@
 //#define DEFAULT_SCENE	37			// heavy vehicles
 //#define DEFAULT_SCENE	38			// basic player controller
 //#define DEFAULT_SCENE	39			// advanced player controller
-//#define DEFAULT_SCENE	30			// cloth patch			
+#define DEFAULT_SCENE	40			// cloth patch			
 //#define DEFAULT_SCENE	41			// soft bodies	
-//#define DEFAULT_SCENE	42          // joes joint test
+//#define DEFAULT_SCENE	42          // joe's joint test
 //#define DEFAULT_SCENE	43          // Misho's Rocket Test
 
 /// demos forward declaration 
@@ -168,7 +168,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
 	{"Joes joint test", "", JoesJointTest},
-	{ "Misho's Rocket Test", "", MishosRocketTest },
+	{"Misho's Rocket Test", "", MishosRocketTest},
 };
 
 

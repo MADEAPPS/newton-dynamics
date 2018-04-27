@@ -300,7 +300,6 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_omega = m_matrix.RotateVector(localOmega + gradientStep);
 
 		} else {
-			dgAssert (0);
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
 			lumpedMassShape->IntegrateForces(timestep);
 		}
