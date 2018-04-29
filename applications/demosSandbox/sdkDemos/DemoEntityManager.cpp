@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// box stacks
+#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -71,7 +71,7 @@
 //#define DEFAULT_SCENE	37			// heavy vehicles
 //#define DEFAULT_SCENE	38			// basic player controller
 //#define DEFAULT_SCENE	39			// advanced player controller
-#define DEFAULT_SCENE	40			// cloth patch			
+//#define DEFAULT_SCENE	40			// cloth patch			
 //#define DEFAULT_SCENE	41			// soft bodies	
 //#define DEFAULT_SCENE	42          // joe's joint test
 //#define DEFAULT_SCENE	43          // Misho's Rocket Test
@@ -254,7 +254,8 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
-//  m_solveSingleIslandInParallel(false)
+	m_solveLargeIslandInParallel = true;
+
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 

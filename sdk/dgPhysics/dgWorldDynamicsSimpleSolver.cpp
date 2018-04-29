@@ -733,7 +733,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			row->m_force = f.GetScalar();
 			normalForce[k] = f.GetScalar();
 
-			row->m_maxImpact = f.Abs().GetMax(row->m_maxImpact).GetScalar();
+			//row->m_maxImpact = f.Abs().GetMax(row->m_maxImpact).GetScalar();
 
 			dgVector deltaforce0(scale0 * deltaForce);
 			dgVector deltaforce1(scale1 * deltaForce);
@@ -746,9 +746,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		}
 
 		dgVector maxAccel(accNorm);
-//		const dgFloat32 tol2 = dgFloat32(1.0e-4f);
 		const dgFloat32 tol2 = dgFloat32(0.25f * 0.25f);
-//		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > dgFloat32(1.0f)); i++) {
 		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > tol2); i++) {
 			maxAccel = dgVector::m_zero;
 			dgInt32 index = jointInfo->m_pairStart;
@@ -776,8 +774,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				row->m_force = f.GetScalar();
 				normalForce[k] = f.GetScalar();
 
-				row->m_maxImpact = f.Abs().GetMax(row->m_maxImpact).GetScalar();
-
 				dgVector deltaforce0(scale0 * deltaForce);
 				dgVector deltaforce1(scale1 * deltaForce);
 				linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
@@ -789,6 +785,12 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			}
 		}
 
+		dgInt32 index = jointInfo->m_pairStart;
+		for (dgInt32 i = 0; i < rowsCount; i++) {
+			dgJacobianMatrixElement* const row = &matrixRow[index];
+			row->m_maxImpact = dgMax(dgAbs(row->m_force), row->m_maxImpact);
+			index++;
+		}
 
 		internalForces[m0].m_linear = linearM0;
 		internalForces[m0].m_angular = angularM0;
@@ -796,7 +798,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		internalForces[m1].m_angular = angularM1;
 	}
 	return accNorm.GetScalar();
-
 
 #endif
 }
