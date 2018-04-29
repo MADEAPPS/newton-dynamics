@@ -598,14 +598,6 @@ int NewtonGetSolverModel(const NewtonWorld* const newtonWorld)
 }
 
 
-
-void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	world->SetGetTimeInMicrosenconds ((dgWorld::OnGetTimeInMicrosenconds) callback);
-}
-
 /*!
   Advance the simulation by a user defined amount of time.
 

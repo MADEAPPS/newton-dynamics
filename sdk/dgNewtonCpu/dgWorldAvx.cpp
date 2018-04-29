@@ -131,6 +131,8 @@ void dgWorldAvx::InityBodyArray()
 		m_body.GetDampingCoef(i, body, m_timestep);
 	}
 
+	ResetMegaFlops();
+
 	dgFloatAvx::ClearFlops();
 	dgVector3Avx zero (dgFloatAvx::m_zero, dgFloatAvx::m_zero, dgFloatAvx::m_zero);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
@@ -139,4 +141,7 @@ void dgWorldAvx::InityBodyArray()
 		zero.Store(&m_body.m_internalForces[i].m_angular);
 	}
 	AddFlops(90 * 8 * bodyCount);
+
+
+	CalculateMegaFlops();
 }

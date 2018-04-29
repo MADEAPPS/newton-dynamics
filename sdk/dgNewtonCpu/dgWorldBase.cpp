@@ -34,7 +34,10 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 	,m_jointArray(NULL)
 	,m_cluster(NULL)
 	,m_timestep(dgFloat32(0.0f))
+	,m_flopsIndex(0)
 {
+	memset(m_flopsCount, 0, sizeof(m_flopsCount));
+	memset(m_ticksCount, 0, sizeof(m_ticksCount));
 }
 
 dgWorldBase::~dgWorldBase()
@@ -67,8 +70,8 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	__cpuid(info.data, 7);
 	if (info.ebx & (1 << 5)) {
 		//cpu support avx2
-		static dgWorldSse module(world, allocator);
-		//static dgWorldAvx module(world, allocator);
+		//static dgWorldSse module(world, allocator);
+		static dgWorldAvx module(world, allocator);
 		//static dgWorldAvx2 module(world, allocator);
 		return &module;
 	}
@@ -83,4 +86,28 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 
 	dgAssert(0);
 	return NULL;
+}
+
+void dgWorldBase::ResetMegaFlops()
+{
+	m_flopsCount[m_flopsIndex] = 0;
+	m_ticksCount[m_flopsIndex] = m_world->GetTimeInMicrosenconds();
+}
+
+void dgWorldBase::CalculateMegaFlops()
+{
+	const dgInt32 count = sizeof(m_ticksCount) / sizeof(m_ticksCount[0]);
+	m_ticksCount[m_flopsIndex] = m_world->GetTimeInMicrosenconds() - m_ticksCount[m_flopsIndex];
+	m_flopsIndex = (m_flopsIndex + 1) % count;
+
+	dgUnsigned64 flopsCount = 0;
+	dgUnsigned64 ticksCount = 0;
+	for (dgInt32 i = 0; i < count; i++) {
+		flopsCount += m_flopsCount[i];
+		ticksCount += m_ticksCount[i];
+	}
+	if (ticksCount) {
+		flopsCount = flopsCount * 1000000 / ticksCount;
+		m_averageMegaflops = dgInt32(flopsCount / 1000000);
+	}
 }

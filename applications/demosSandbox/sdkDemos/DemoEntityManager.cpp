@@ -536,9 +536,6 @@ void DemoEntityManager::Cleanup ()
 	// set the number of sub steps
 	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
-	// for debugging time spend on phys update
-	NewtonSetPerformanceClock (m_world, dGetTimeInMicrosenconds);
-
 	// we start without 2d render
 	m_renderDemoGUI = NULL;
 	m_renderHelpMenus = NULL;

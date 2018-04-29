@@ -27,16 +27,16 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-#define DG_AVERAGE_FLOPS_FILTER	16
+
 class dgWorldPlugin
 {
 	public:
 	dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
 	virtual ~dgWorldPlugin();
-	const dgInt32 GetMegaFlops() const{return m_averageMegaflops;}
-	void ResetMegaFlops();
-	void AddFlops (dgInt32 flops);
-	void CalculateMegaFlops();
+	const dgInt32 GetMegaFlops() const
+	{
+		return m_averageMegaflops;
+	}
 	
 	virtual const char* GetId() const = 0;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
@@ -44,10 +44,6 @@ class dgWorldPlugin
 	protected:
 	dgWorld* m_world;
 	dgMemoryAllocator* m_allocator;
-	
-	dgUnsigned64 m_flopsCount[DG_AVERAGE_FLOPS_FILTER];
-	dgUnsigned64 m_ticksCount[DG_AVERAGE_FLOPS_FILTER];
-	dgInt32 m_flopsIndex;
 	dgInt32 m_averageMegaflops;
 	friend class dgWorld;
 };
@@ -93,21 +89,14 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 
 inline dgWorldPlugin::dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:m_world(world)
-	, m_allocator(allocator)
-	, m_flopsIndex(0)
-	, m_averageMegaflops(0)
+	,m_allocator(allocator)
+	,m_averageMegaflops(0)
 {
-	memset(m_flopsCount, 0, sizeof(m_flopsCount));
-	memset(m_ticksCount, 0, sizeof(m_ticksCount));
 }
 
 inline dgWorldPlugin::~dgWorldPlugin()
 {
 }
 
-inline void dgWorldPlugin::AddFlops(dgInt32 flops)
-{
-	m_flopsCount[m_flopsIndex] += flops;
-}
 
 #endif

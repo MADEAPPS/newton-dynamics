@@ -458,7 +458,6 @@ extern "C" {
 
 	NEWTON_API void NewtonSetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld, int mode);
 	NEWTON_API int NewtonGetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld);
-	NEWTON_API void NewtonSetPerformanceClock (const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback);
 
 	NEWTON_API int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int algorithmType);

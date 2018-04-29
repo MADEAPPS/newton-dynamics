@@ -61,6 +61,7 @@ class dgGlobalArray: public dgArray<T>
 	T* m_ptr;
 };
 
+#define DG_AVERAGE_FLOPS_FILTER	16
 
 class dgWorldBase: public dgWorldPlugin
 {
@@ -72,12 +73,23 @@ class dgWorldBase: public dgWorldPlugin
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
 
 	protected:
+	void ResetMegaFlops();
+	void CalculateMegaFlops();
+	void AddFlops(dgInt32 flops)
+	{
+		m_flopsCount[m_flopsIndex] += flops;
+	}
+
+
 	virtual void InityBodyArray() = 0;
 
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
 	const dgBodyCluster* m_cluster;
 	dgFloat32 m_timestep;
+	dgUnsigned64 m_flopsCount[DG_AVERAGE_FLOPS_FILTER];
+	dgUnsigned64 m_ticksCount[DG_AVERAGE_FLOPS_FILTER];
+	dgInt32 m_flopsIndex;
 };
 
 #endif

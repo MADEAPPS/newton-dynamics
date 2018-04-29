@@ -24,29 +24,7 @@
 #include "dgWorldPlugins.h"
 
 
-void dgWorldPlugin::ResetMegaFlops()
-{
-	m_flopsCount[m_flopsIndex] = 0;
-	m_ticksCount[m_flopsIndex] = m_world->m_getDebugTime ? m_world->m_getDebugTime() : 0;
-}
 
-void dgWorldPlugin::CalculateMegaFlops()
-{
-	const dgInt32 count = sizeof (m_ticksCount)/sizeof (m_ticksCount[0]);
-	m_ticksCount[m_flopsIndex] = (m_world->m_getDebugTime ? m_world->m_getDebugTime() : 0) - m_ticksCount[m_flopsIndex];
-	m_flopsIndex = (m_flopsIndex + 1) % count;
-	
-	dgUnsigned64 flopsCount = 0;
-	dgUnsigned64 ticksCount = 0;
-	for (dgInt32 i = 0; i < count; i ++) {
-		flopsCount += m_flopsCount[i];
-		ticksCount += m_ticksCount[i];
-	}
-	if (ticksCount) {
-		flopsCount = flopsCount * 1000000 / ticksCount;
-		m_averageMegaflops = dgInt32 (flopsCount / 1000000);
-	}
-}
 
 dgWorldPluginList::dgWorldPluginList(dgMemoryAllocator* const allocator)
 	:dgList<dgWorldPluginModulePair>(allocator)

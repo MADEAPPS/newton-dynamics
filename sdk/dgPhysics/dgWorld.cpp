@@ -230,7 +230,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_savetimestep = dgFloat32 (0.0f);
 	m_allocator = allocator;
 	m_clusterUpdate = NULL;
-	m_getDebugTime = NULL;
 
 	m_onCollisionInstanceDestruction = NULL;
 	m_onCollisionInstanceCopyConstrutor = NULL;
@@ -959,7 +958,7 @@ void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32
 
 void dgWorld::RunStep ()
 {
-	dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
+	dgUnsigned64 timeAcc = dgGetTimeInMicrosenconds();
 	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
 	for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
 		dgInterlockedExchange(&m_delayDelateLock, 1);
@@ -986,7 +985,7 @@ void dgWorld::RunStep ()
 		m_postUpdateCallback (this, m_savetimestep);
 	}
 
-	m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
+	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
 
 	if (!m_concurrentUpdate) {
 		m_mutex.Release();
@@ -1030,19 +1029,11 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 	#endif
 }
 
-
-void dgWorld::SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback)
-{
-	m_getDebugTime = callback;
-}
-
 void dgWorld::SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor)
 {
 	m_onCollisionInstanceDestruction = destructor;
 	m_onCollisionInstanceCopyConstrutor = constructor;
 }
-
-
 
 dgInt32 dgWorld::GetBroadPhaseType() const
 {

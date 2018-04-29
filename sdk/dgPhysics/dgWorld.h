@@ -170,7 +170,6 @@ class dgWorld
 	,public dgWorldPluginList
 {
 	public:
-	typedef dgUnsigned64 (dgApi *OnGetTimeInMicrosenconds) ();
 	typedef dgUnsigned32 (dgApi *OnClusterUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
@@ -252,6 +251,7 @@ class dgWorld
 
 	void FlushCache();
 
+	virtual dgUnsigned64 GetTimeInMicrosenconds() const;
 	
 	void* GetUserData() const;
 	void SetUserData (void* const userData);
@@ -346,7 +346,6 @@ class dgWorld
 	dgInverseDynamics* CreateInverseDynamics();
 	void DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics);
 
-	void SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback);
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
 	static void OnDeserializeFromFile(void* const userData, void* const buffer, dgInt32 size);
@@ -503,7 +502,6 @@ class dgWorld
 
 	dgSemaphore m_mutex;
 	OnClusterUpdate m_clusterUpdate;
-	OnGetTimeInMicrosenconds m_getDebugTime;
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
 	OnJointSerializationCallback m_serializedJointCallback;	
@@ -588,6 +586,11 @@ inline dgFloat32 dgWorld::GetUpdateTime() const
 inline void dgWorld::SetPosUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback)
 {
 	m_postUpdateCallback = callback;
+}
+
+inline dgUnsigned64 dgWorld::GetTimeInMicrosenconds() const
+{
+	return dgGetTimeInMicrosenconds();
 }
 
 #endif

@@ -144,6 +144,8 @@ void dgWorldSse::InityBodyArray()
 		m_body.GetDampingCoef(i, body, m_timestep);
 	}
 
+	ResetMegaFlops();
+
 	dgFloatSse::ClearFlops();
 	dgVector3Sse zero (dgFloatSse::m_zero, dgFloatSse::m_zero, dgFloatSse::m_zero);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
@@ -152,4 +154,6 @@ void dgWorldSse::InityBodyArray()
 		zero.Store(&m_body.m_internalForces[i].m_angular);
 	}
 	AddFlops(90 * 4 * bodyCount);
+
+	CalculateMegaFlops();
 }
