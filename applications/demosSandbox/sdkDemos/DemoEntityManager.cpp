@@ -254,7 +254,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
-	m_solveLargeIslandInParallel = true;
+//	m_solveLargeIslandInParallel = true;
 
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
