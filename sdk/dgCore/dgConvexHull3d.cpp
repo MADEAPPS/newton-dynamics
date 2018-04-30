@@ -759,8 +759,8 @@ bool dgConvexHull3d::CheckFlatSurface(dgConvexHull3dAABBTreeNode* tree, dgConvex
 	dgAssert(e0.DotProduct3(e0) > dgFloat32(1.0e-4f));
 	dgAssert(e1.DotProduct3(e1) > dgFloat32(1.0e-4f));
 	dgBigVector normal(e1.CrossProduct3(e0));
-	dgFloat64 mag2 = normal.DotProduct3(normal);
-	dgAssert(mag2 > dgFloat32(1.0e-6f));
+	//dgFloat64 mag2 = normal.DotProduct3(normal);
+	dgAssert(normal.DotProduct3(normal) > dgFloat32(1.0e-6f));
 	normal = normal.Normalize();
 
 	dgInt32 index = SupportVertex(&tree, points, normal);

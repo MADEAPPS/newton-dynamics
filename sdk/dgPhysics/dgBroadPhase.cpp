@@ -761,7 +761,7 @@ dgBroadPhaseNode* dgBroadPhase::BuildTopDownBig(dgBroadPhaseNode** const leafArr
 	if (lastBox == firstBox) {
 		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
 	}
-
+/*
 	dgInt32 midPoint = -1;
 	const dgFloat32 scale = dgFloat32(10.0f);
 	const dgFloat32 scale2 = dgFloat32(3.0f) * scale * scale;
@@ -774,6 +774,22 @@ dgBroadPhaseNode* dgBroadPhase::BuildTopDownBig(dgBroadPhaseNode** const leafArr
 			break;
 		}
 	}
+*/
+
+
+	dgInt32 midPoint = -1;
+	const dgFloat32 scale = dgFloat32 (1.0f / 64.0f);
+	const dgBroadPhaseNode* const node0 = leafArray[firstBox];
+	const dgInt32 count = lastBox - firstBox;
+	dgFloat32 area0 = scale * node0->m_surfaceArea;
+	for (dgInt32 i = 1; i <= count; i++) {
+		const dgBroadPhaseNode* const node1 = leafArray[firstBox + i];
+		dgFloat32 area1 = node1->m_surfaceArea;
+		if (area0 > area1) {
+			midPoint = i - 1;
+			break;
+		}
+	}
 
 	if (midPoint == -1) {
 		return BuildTopDown(leafArray, firstBox, lastBox, nextNode);
@@ -782,22 +798,28 @@ dgBroadPhaseNode* dgBroadPhase::BuildTopDownBig(dgBroadPhaseNode** const leafArr
 
 		parent->m_parent = NULL;
 		*nextNode = (*nextNode)->GetNext();
-
-		dgVector minP(dgFloat32(1.0e15f));
-		dgVector maxP(-dgFloat32(1.0e15f));
+/*
+		dgVector minP__(dgFloat32(1.0e15f));
+		dgVector maxP__(-dgFloat32(1.0e15f));
 		for (dgInt32 i = 0; i <= count; i++) {
 			const dgBroadPhaseNode* const node = leafArray[firstBox + i];
 			dgAssert(node->IsLeafNode());
-			minP = minP.GetMin(node->m_minBox);
-			maxP = maxP.GetMax(node->m_maxBox);
+			minP__ = minP__.GetMin(node->m_minBox);
+			maxP__ = maxP__.GetMax(node->m_maxBox);
 		}
-
 		parent->SetAABB(minP, maxP);
-		parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + midPoint, nextNode);
+*/
+
+		parent->m_right = BuildTopDownBig(leafArray, firstBox, firstBox + midPoint, nextNode);
+		parent->m_right->m_parent = parent;
+
+		parent->m_left = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, nextNode);
 		parent->m_left->m_parent = parent;
 
-		parent->m_right = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, nextNode);
-		parent->m_right->m_parent = parent;
+		dgVector minP (parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
+		dgVector maxP (parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
+		parent->SetAABB(minP, maxP);
+
 		return parent;
 	}
 }
@@ -808,10 +830,10 @@ dgInt32 dgBroadPhase::CompareNodes(const dgBroadPhaseNode* const nodeA, const dg
 	dgFloat32 areaA = nodeA->m_surfaceArea;
 	dgFloat32 areaB = nodeB->m_surfaceArea;
 	if (areaA < areaB) {
-		return -1;
+		return 1;
 	}
 	if (areaA > areaB) {
-		return 1;
+		return -1;
 	}
 	return 0;
 }
@@ -824,7 +846,7 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 		(*root)->m_parent = NULL;
 		dgFloat64 entropy = CalculateEntropy(fitness, root);
 
-		if ((entropy > oldEntropy * dgFloat32(2.0f)) || (entropy < oldEntropy * dgFloat32(0.5f))) {
+		if ((entropy > oldEntropy * dgFloat32(1.5f)) || (entropy < oldEntropy * dgFloat32(0.75f))) {
 			if (fitness.GetFirst()) {
 				m_world->m_solverJacobiansMemory.ResizeIfNecessary ((fitness.GetCount() * 2 + 16) * sizeof (dgBroadPhaseNode*));
 				dgBroadPhaseNode** const leafArray = (dgBroadPhaseNode**)&m_world->m_solverJacobiansMemory[0];
@@ -861,9 +883,9 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 				dgAssert(!(*root)->m_parent);
 				entropy = CalculateEntropy(fitness, root);
 			}
+			oldEntropy = entropy;
 		}
 		(*root)->m_parent = parent;
-		oldEntropy = entropy;
 	}
 }
 
