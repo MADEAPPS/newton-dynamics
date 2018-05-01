@@ -4950,7 +4950,7 @@ void NewtonBodyGetRotation(const NewtonBody* const bodyPtr, dFloat* const rotPtr
 
   This function is only effective when called from *NewtonApplyForceAndTorque callback*
 
-  See also: ::NewtonBodyAddForce, ::NewtonBodyGetForce, ::NewtonBodyGetForceAcc
+  See also: ::NewtonBodyAddForce, ::NewtonBodyGetForce
 */
 void  NewtonBodySetForce(const NewtonBody* const bodyPtr, const dFloat* const vectorPtr)
 {
@@ -4970,7 +4970,7 @@ void  NewtonBodySetForce(const NewtonBody* const bodyPtr, const dFloat* const ve
 
   This function is only effective when called from *NewtonApplyForceAndTorque callback*
 
-  See also: ::NewtonBodySetForce, ::NewtonBodyGetForce, ::NewtonBodyGetForceAcc
+  See also: ::NewtonBodySetForce, ::NewtonBodyGetForce
 */
 void  NewtonBodyAddForce(const NewtonBody* const bodyPtr, const dFloat* const vectorPtr)
 {
@@ -4992,7 +4992,7 @@ void  NewtonBodyAddForce(const NewtonBody* const bodyPtr, const dFloat* const ve
 
   @return Nothing.
 
-  See also: ::NewtonBodyAddForce, ::NewtonBodyGetForce, ::NewtonBodyGetForceAcc
+  See also: ::NewtonBodyAddForce, ::NewtonBodyGetForce
 */
 void NewtonBodyGetForce(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
 {
@@ -5022,7 +5022,7 @@ void NewtonBodyGetForce(const NewtonBody* const bodyPtr, dFloat* const vectorPtr
 
   @return Nothing.
 
-  See also: ::NewtonBodySetForce, ::NewtonBodyAddForce, ::NewtonBodyGetForce, ::NewtonBodyGetForceAcc
+  See also: ::NewtonBodySetForce, ::NewtonBodyAddForce, ::NewtonBodyGetForce
 */
 void NewtonBodyCalculateInverseDynamicsForce(const NewtonBody* const bodyPtr, dFloat timestep, const dFloat* const desiredVeloc, dFloat* const forceOut)
 {
@@ -5046,7 +5046,7 @@ void NewtonBodyCalculateInverseDynamicsForce(const NewtonBody* const bodyPtr, dF
 
   This function is only effective when called from *NewtonApplyForceAndTorque callback*
 
-  See also: ::NewtonBodyAddTorque, ::NewtonBodyGetTorque, ::NewtonBodyGetTorqueAcc
+  See also: ::NewtonBodyAddTorque, ::NewtonBodyGetTorque
 */
 void  NewtonBodySetTorque(const NewtonBody* const bodyPtr, const dFloat* const vectorPtr)
 {
@@ -5067,7 +5067,7 @@ void  NewtonBodySetTorque(const NewtonBody* const bodyPtr, const dFloat* const v
 
   This function is only effective when called from *NewtonApplyForceAndTorque callback*
 
-  See also: ::NewtonBodySetTorque, ::NewtonBodyGetTorque, ::NewtonBodyGetTorqueAcc
+  See also: ::NewtonBodySetTorque, ::NewtonBodyGetTorque
 */
 void  NewtonBodyAddTorque(const NewtonBody* const bodyPtr, const dFloat* const vectorPtr)
 {
@@ -5085,7 +5085,7 @@ void  NewtonBodyAddTorque(const NewtonBody* const bodyPtr, const dFloat* const v
 
   @return Nothing.
 
-  See also: ::NewtonBodyAddTorque, ::NewtonBodyGetTorque, ::NewtonBodyGetTorqueAcc
+  See also: ::NewtonBodyAddTorque, ::NewtonBodyGetTorque
 */
 void NewtonBodyGetTorque(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
 {

@@ -475,7 +475,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 
 	return accNorm.GetScalar() * accNorm.GetScalar();
 }
-
+/*
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1_50(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
 {
 	dgFloat32 accNorm = dgFloat32(0.0f);
@@ -553,7 +553,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_1_50(const dgJointInfo* cons
 	}
 	return accNorm;
 }
-
+*/
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
 {

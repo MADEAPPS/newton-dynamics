@@ -1149,7 +1149,7 @@ DG_INLINE void dgInverseDynamics::CalculateRowJacobianDerivatives (dgInt32 index
 	dgAssert(diag > dgFloat32(0.0f));
 	row->m_diagDamp = diag * row->m_stiffness;
 	diag *= (dgFloat32(1.0f) + row->m_stiffness);
-	row->m_jinvMJt = diag;
+//	row->m_jinvMJt = diag;
 	row->m_invJinvMJt = dgFloat32(1.0f) / diag;
 	row->m_force = dgFloat32(0.0f);
 }
