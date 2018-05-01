@@ -477,7 +477,7 @@ class dgVector
 
 	DG_INLINE dgVector Normalize () const
 	{
-		dgAssert (m_w == dgFloat32 (0.0f)));
+		dgAssert (m_w == dgFloat32 (0.0f));
 		//return *this * dgVector (dgRsqrt (DotProduct4(*this).m_x));
 		//return Scale4 (dgRsqrt (DotProduct4(*this).GetScalar()));
 		const dgVector& me = *this; 
@@ -898,7 +898,7 @@ class dgBigVector
 	DG_INLINE dgBigVector Normalize() const
 	{
 		dgAssert (m_w == dgFoat32 (0.0f));
-		const dgBigVector& me = *this;
+		//const dgBigVector& me = *this;
 		//return *this * dgBigVector (dgRsqrt(DotProduct4(*this).m_x));
 		return *this * InvMagSqrt();
 	}
@@ -906,9 +906,9 @@ class dgBigVector
 	dgBigVector Abs () const
 	{
 		return dgBigVector ((m_x > dgFloat64 (0.0f)) ? m_x : -m_x,
-			(m_y > dgFloat64 (0.0f)) ? m_y : -m_y,
-			(m_z > dgFloat64 (0.0f)) ? m_z : -m_z,
-			(m_w > dgFloat64 (0.0f)) ? m_w : -m_w);
+							(m_y > dgFloat64 (0.0f)) ? m_y : -m_y,
+							(m_z > dgFloat64 (0.0f)) ? m_z : -m_z,
+							(m_w > dgFloat64 (0.0f)) ? m_w : -m_w);
 	}
 
 	dgBigVector GetMax (const dgBigVector& data) const

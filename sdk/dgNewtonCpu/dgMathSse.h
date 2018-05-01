@@ -47,9 +47,12 @@ class dgFloatSse
 	{
 	}
 
-	DG_INLINE dgFloatSse(const dgVector& low)
-		:m_type(low.m_type)
+	DG_INLINE dgFloatSse(const dgVector& copy)
 	{
+		m_f[0] = copy[0];
+		m_f[1] = copy[1];
+		m_f[2] = copy[2];
+		m_f[3] = copy[3];
 	}
 
 	DG_INLINE static void ClearFlops()
@@ -109,8 +112,8 @@ class dgFloatSse
 	{
 		__m128 m_type;
 		__m128i m_typeInt;
-		float m_f[8];
-		int m_i[8];
+		float m_f[4];
+		int m_i[4];
 	};
 
 	static dgFloatSse m_one;
