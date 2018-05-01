@@ -231,14 +231,18 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			//  we get
 			// dw * I + (w * dt) x ((w * dt) * I) = T * dt
 			// dw * I + dw x (dw * I) = dT
-			// discretized above equation and solve using multivariate Taylor expansion
-			// (w - w0) * I  + w x (w * I) * dt - T * dt = 0
+			// discretized above equation and solve using multivariate Taylor expansion and neglecting 
+			// second and higher order derivatives we can approximate w as w1 = w + d'w|dwx,dwy,dwz * dt 
+			// keeping dt constant
+			// (w1 - w) * I  + w x (w * I) * dt - T * dt = 0
 			//
 			// I and T are inertia and torque in local space.
 			// (good to resolve high angular velocity precession) 
 
-			// using mathematica script to calculate the derivatives of the Taylor expression
 			/*
+			// using Mathematica script to calculate the derivatives of the Taylor expression
+			// first expand w into it components
+
 			Wxx = wx * Ix + ((Iz - Iy) * wy * wz - Tx) * dt
 			Wyy = wy * Iy + ((Ix - Iz) * wz * wx - Ty) * dt
 			Wzz = wz * Iz + ((Iy - Ix) * wx * wy - Tz) * dt
