@@ -4449,7 +4449,7 @@ break;
 break;
 
 						case 68:// ClassVariableExpression : ClassVariableExpression = ClassVariableExpression 
-{entry.m_value = MyModule->NewExpressionNodeAssigment (parameter[0].m_value, parameter[2].m_value);}
+{entry.m_value = MyModule->NewExpresionNodeAssigment (parameter[0].m_value, parameter[2].m_value);}
 break;
 
 						case 69:// ClassVariableExpression : ClassVariableExpression _IDENTICAL ClassVariableExpression 
@@ -4557,19 +4557,19 @@ break;
 break;
 
 						case 54:// Expression : Expression _OP_INC 
-{entry.m_value = MyModule->NewExpressionNodePrefixPostfixOperator (parameter[0].m_value, false, true);}
+{entry.m_value = MyModule->NewExpresionNodePrefixPostfixOperator (parameter[0].m_value, false, true);}
 break;
 
 						case 55:// Expression : Expression _OP_DEC 
-{entry.m_value = MyModule->NewExpressionNodePrefixPostfixOperator (parameter[0].m_value, false, false);}
+{entry.m_value = MyModule->NewExpresionNodePrefixPostfixOperator (parameter[0].m_value, false, false);}
 break;
 
 						case 56:// Expression : _OP_INC Expression 
-{entry.m_value = MyModule->NewExpressionNodePrefixPostfixOperator (parameter[1].m_value, true, true);}
+{entry.m_value = MyModule->NewExpresionNodePrefixPostfixOperator (parameter[1].m_value, true, true);}
 break;
 
 						case 57:// Expression : _OP_DEC Expression 
-{entry.m_value = MyModule->NewExpressionNodePrefixPostfixOperator (parameter[1].m_value, true, false);}
+{entry.m_value = MyModule->NewExpresionNodePrefixPostfixOperator (parameter[1].m_value, true, false);}
 break;
 
 						case 63:// Expression : QualifiedName DimemsionExprList 
@@ -4617,7 +4617,7 @@ break;
 break;
 
 						case 38:// Expression : Expression = Expression 
-{entry.m_value = MyModule->NewExpressionNodeAssigment (parameter[0].m_value, parameter[2].m_value);}
+{entry.m_value = MyModule->NewExpresionNodeAssigment (parameter[0].m_value, parameter[2].m_value);}
 break;
 
 						case 42:// Expression : Expression / Expression 

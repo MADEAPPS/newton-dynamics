@@ -68,6 +68,7 @@ class dParserCompiler
 	class dGotoEntry;
 	class ActionEntry;
 	class dTransition;
+	class dDictionary;
 	class dActionEntry;
 	class dSentenceSymbol;
 	class dProductionRule;

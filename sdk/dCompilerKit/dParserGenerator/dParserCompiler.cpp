@@ -87,6 +87,31 @@ class dParserCompiler::dActionEntry
 	short m_ruleIndex;
 };
 
+
+class dParserCompiler::dDictionary
+{
+	public:
+	dDictionary()
+		:m_key(0)
+	{
+	}
+
+	int GetSymbol(const dString& word)
+	{
+		dTree<int, dString>::dTreeNode* node = m_dictionary.Find(word);
+		if (!node) {
+			m_key++;
+			node = m_dictionary.Insert(m_key, word);
+		}
+		return node->GetInfo();
+	}
+
+	private:
+	dTree<int, dString> m_dictionary;
+	int m_key;
+};
+
+
 class dParserCompiler::dSymbol
 {
 	public:
@@ -440,14 +465,20 @@ dParserCompiler::dParserCompiler(const dString& inputRules, const char* const ou
 	int lastTerminalToken;
 	dProductionRule ruleList;
 	dOperatorsPrecedence operatorPrecedence;
-	dTree<dTokenInfo, dCRCTYPE> symbolList;
+//	dTree<dTokenInfo, dCRCTYPE> symbolList;
+	dTree<dTokenInfo, int> symbolList;
 	dString userCodeBlock;
 	dString userVariableClass ("");
 	dString endUserCode ("\n");
+	dDictionary dictionary;
 
 	// scan grammar to a set of LR(1) rules
-	symbolList.Insert(dTokenInfo (DACCEPTING_TOKEN, TERMINAL, DACCEPT_SYMBOL), dCRC64 (DACCEPT_SYMBOL));
-	symbolList.Insert(dTokenInfo (DERROR_TOKEN, TERMINAL, DERROR_SYMBOL), dCRC64 (DERROR_SYMBOL));
+//	symbolList.Insert(dTokenInfo (DACCEPTING_TOKEN, TERMINAL, DACCEPT_SYMBOL), dCRC64 (DACCEPT_SYMBOL));
+//	symbolList.Insert(dTokenInfo(DERROR_TOKEN, TERMINAL, DERROR_SYMBOL), dCRC64(DERROR_SYMBOL));
+	symbolList.Insert(dTokenInfo(DACCEPTING_TOKEN, TERMINAL, DACCEPT_SYMBOL), dictionary.GetSymbol(DACCEPT_SYMBOL));
+	symbolList.Insert(dTokenInfo(DERROR_TOKEN, TERMINAL, DERROR_SYMBOL), dictionary.GetSymbol(DERROR_SYMBOL));
+dAssert(0);
+/*
 	ScanGrammarFile(inputRules, ruleList, symbolList, operatorPrecedence, userCodeBlock, userVariableClass, endUserCode, lastTerminalToken);
 
 	// convert the rules into a NFA.
@@ -470,6 +501,7 @@ dParserCompiler::dParserCompiler(const dString& inputRules, const char* const ou
 		dState* const state = iter.GetNode()->GetInfo();
 		delete state;
 	}
+*/
 }
 
 

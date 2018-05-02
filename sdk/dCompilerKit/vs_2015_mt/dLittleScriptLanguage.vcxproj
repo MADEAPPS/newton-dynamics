@@ -225,10 +225,6 @@
       <Project>{0bf56f49-1c3c-4d8c-9209-052e70919fe5}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="dLexicalGenerator.vcxproj">
-      <Project>{6fb5beb5-2a22-42e6-a575-6bce0da07684}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="dParcerGenerator.vcxproj">
       <Project>{b27af501-3f19-49ff-9db0-ff60b17508f6}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

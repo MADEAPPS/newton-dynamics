@@ -18,8 +18,7 @@
  *------------------------------------------------------------------
  */
 
-
- 
+  
 %{
 // Newton Tool embedded Lua script Language
 // based of https://www.lua.org/manual/5.3/manual.html#9

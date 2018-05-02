@@ -90,6 +90,17 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewReturnStatement(const dUserVariable& expression);
 	dUserVariable NewIFStatement(const dUserVariable& expression, const dUserVariable& thenExpression, const dUserVariable& elseExpression);
 
+
+dUserVariable NewExpresionNodePrefixPostfixOperator(const dUserVariable& expression, bool xxx, bool xxx1)
+{
+	dAssert(0);
+	return dUserVariable();
+}
+dUserVariable 	NewExpresionNodeAssigment(const dUserVariable& expression, const dUserVariable& expression1)
+{
+dAssert(0);
+return dUserVariable();
+}
 	
 	dUserVariable NewExpressionFunctionCall (const dString& name, const dUserVariable& argumnetList);
 	dUserVariable NewCaseStatement(const dString& constID, const dUserVariable& statement);

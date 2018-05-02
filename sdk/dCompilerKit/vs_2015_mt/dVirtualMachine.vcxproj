@@ -165,16 +165,15 @@
     <ClInclude Include="..\dVirtualMachine\dVirtualMachine.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\projects\visualStudio_2015_static_mt\dContainers.vcxproj">
+      <Project>{e6a31c39-173f-4000-97e0-f086db68dd42}</Project>
+    </ProjectReference>
     <ProjectReference Include="dFiniteAutomata.vcxproj">
       <Project>{a84e1056-fd95-416b-badd-e180e8be7aec}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="dIntermediateLanguage.vcxproj">
       <Project>{0bf56f49-1c3c-4d8c-9209-052e70919fe5}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="dLexicalGenerator.vcxproj">
-      <Project>{6fb5beb5-2a22-42e6-a575-6bce0da07684}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="dParcerGenerator.vcxproj">

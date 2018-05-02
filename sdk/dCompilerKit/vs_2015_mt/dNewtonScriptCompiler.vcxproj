@@ -194,9 +194,6 @@
     <ClCompile Include="..\dNewtonScriptCompiler\dScriptCompiler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\projects\visualStudio_2013_static_mt\dContainers.vcxproj">
-      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\projects\visualStudio_2015_static_mt\dContainers.vcxproj">
       <Project>{e6a31c39-173f-4000-97e0-f086db68dd42}</Project>
     </ProjectReference>
@@ -206,10 +203,6 @@
     </ProjectReference>
     <ProjectReference Include="dIntermediateLanguage.vcxproj">
       <Project>{0bf56f49-1c3c-4d8c-9209-052e70919fe5}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="dLexicalGenerator.vcxproj">
-      <Project>{6fb5beb5-2a22-42e6-a575-6bce0da07684}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="dLittleScriptLanguage.vcxproj">
