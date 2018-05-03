@@ -18,26 +18,9 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 
-
+// zero gravity for some effects
 static void ZeroGravityForce(const NewtonBody* body, dFloat timestep, int threadIndex)
 {
-/*
-	dMatrix inertia;
-	dVector omega;
-
-	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
-	NewtonBodyGetOmega(body, &omega[0]);
-	dVector L(inertia.RotateVector(omega));
-	dFloat e = L.DotProduct3(omega) * 0.5f;
-
-//dMatrix ii(dGetIdentityMatrix());
-//dMatrix matrix(dGetIdentityMatrix());
-//NewtonBodyGetMatrix(body, &matrix[0][0]);
-//NewtonBodyGetMass(body, &omega.m_w, &ii[0][0], &ii[1][1], &ii[2][2]);
-//ii = matrix.Inverse() * ii * matrix;
-
-	dTrace(("E=%f  L(%f %f %f) W(%f %f %f)\n", e, L.m_x, L.m_y, L.m_z, omega.m_x, omega.m_y, omega.m_z));
-*/
 }
 
 
@@ -250,7 +233,6 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonBodyGetMatrix(flyWheel, &matrix[0][0]);
 
-
 	dVector omega(speed, 0.0f, 0.0f);
 	dMatrix rotation(dRollMatrix(tiltAnsgle * dDegreeToRad));
 	NewtonBodyGetOmega(flyWheel, &omega[0]);
@@ -283,6 +265,27 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 }
 
 
+//static NewtonBody* TippeTop(DemoEntityManager* const scene, const dVector& posit, dVector omega, dFloat radius, dFloat lenght)
+static void TippeTop(DemoEntityManager* const scene, const dVector& posit, dVector omega, dFloat radius, dFloat lenght)
+{
+	NewtonBody* const top = CreateFlyWheel(scene, posit, 100.0f, 0.5f, 0.3f);
+
+	dMatrix matrix;
+//	dVector omega;
+
+	dMatrix rotation(dRollMatrix(75.0f * dDegreeToRad));
+
+	NewtonBodyGetOmega(top, &omega[0]);
+	NewtonBodyGetMatrix(top, &matrix[0][0]);
+
+	omega = rotation.RotateVector(omega);
+	matrix = rotation * matrix;
+
+	NewtonBodySetMatrix(top, &matrix[0][0]);
+	NewtonBodySetOmega(top, &omega[0]);
+}
+
+
 void GyroscopyPrecession(DemoEntityManager* const scene)
 {
 	scene->CreateSkyBox();
@@ -294,7 +297,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
-
+/*
 	// a body with an axis of symmetry should precesses 
 	TorqueFreePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
 
@@ -329,14 +332,15 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	RattleBack(scene, dVector(-2.0f, 0.5f, - 6.0, 1.0f), 2.0f, 1.0f);
 
 	RattleBack(scene, dVector(-2.0f, 0.5f, - 9.0, 1.0f), -2.0f, 1.0f);
-
+*/
 	// place a toy tops
 	const int topsCount = 4;
 
 	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
-		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
-		PhiTop(scene, dVector(12.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
+//		PrecessingTop(scene, dVector(0.0f, 0.3f, -spacing * i - spacing, 1.0f));
+//		PhiTop(scene, dVector(12.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
+		TippeTop(scene, dVector(-4.0f, 0.3f, -spacing * i - spacing, 1.0f), 0.0f, 0.0f, 0.0f);
 	}
 
 	// place camera into position
