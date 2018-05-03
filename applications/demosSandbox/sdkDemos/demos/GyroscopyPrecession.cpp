@@ -88,7 +88,6 @@ static NewtonBody* DzhanibekovEffect(DemoEntityManager* const scene, const dVect
 	return dzhanibekovBody;
 }
 
-
 static NewtonBody* TorqueFreePreccesion(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio, dFloat precessingAngle)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -194,7 +193,7 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 }
 
 
-static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
+static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
 {
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -246,7 +245,7 @@ static NewtonBody* CreateFryWheel (DemoEntityManager* const scene, const dVector
 
 static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght, dFloat tiltAnsgle)
 {
-	NewtonBody* const flyWheel = CreateFryWheel(scene, posit, speed, radius, lenght);
+	NewtonBody* const flyWheel = CreateFlyWheel(scene, posit, speed, radius, lenght);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonBodyGetMatrix(flyWheel, &matrix[0][0]);
@@ -266,7 +265,7 @@ static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& po
 
 static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 {
-	NewtonBody* const top = CreateFryWheel(scene, posit, 100.0f, 0.5f, 0.3f);
+	NewtonBody* const top = CreateFlyWheel(scene, posit, 100.0f, 0.5f, 0.3f);
 
 	dMatrix matrix;
 	dVector omega;
