@@ -164,11 +164,9 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 {
 	NewtonWorld* const world = scene->GetNewton();
 
-
 	dMatrix shapeMatrix(dYawMatrix(5.0f * dDegreeToRad));
 	NewtonCollision* const ballShape = NewtonCreateSphere(world, radio, 0, &shapeMatrix[0][0]);
 	NewtonCollisionSetScale(ballShape, 0.3f, 0.25f, 1.0f);
-
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = posit;
@@ -182,7 +180,7 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 
 	dVector com(0.0f, -0.1f, 0.0f, 0.0);
 	NewtonBodySetCentreOfMass(ball, &com[0]);
-	dVector angVelocity(0.0f, omega, -0.01f, 0.0f);
+	dVector angVelocity(0.0f, omega, 0.1f, 0.0f);
 	NewtonBodySetOmega(ball, &angVelocity[0]);
 
 	dVector damp(0.0f);

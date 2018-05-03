@@ -260,7 +260,6 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				*/
 
 				dgFloat32 dt = dgFloat32 (0.5f) * timestep;
-				dgMatrix jacobianMatrix(dgGetIdentityMatrix());
 #if 0
 				//two step of implicit integration 
 				for (dgInt32 i = 0; i < 2; i ++) 
@@ -277,6 +276,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 					dgVector gradientStep(deltaToque.Scale4(timestep));
 #endif
 					dgVector dw(localOmega.Scale4(dt));
+					dgFloat32 jacobianMatrix[3][3];
 					// calculates Jacobian matrix
 					//dWx / dwx = Ix
 					//dWx / dwy = (Iz - Iy) * wz * dt
@@ -299,7 +299,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 					jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
 					jacobianMatrix[2][2] = m_mass[2];
 
-					dgSolveGaussian(4, &jacobianMatrix[0][0], &gradientStep[0]);
+					dgSolveGaussian(3, &jacobianMatrix[0][0], &gradientStep[0]);
 					localOmega += gradientStep;
 				}
 			}
