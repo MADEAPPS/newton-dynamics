@@ -122,9 +122,6 @@ dgVector dgQuaternion::CalcAverageOmega (const dgQuaternion &q1, dgFloat32 invdt
 
 dgQuaternion dgQuaternion::Slerp (const dgQuaternion &QB, dgFloat32 t) const 
 {
-dgAssert (0);
-return dgQuaternion();
-/*
 	dgFloat32 dot;
 	dgFloat32 ang;
 	dgFloat32 Sclp;
@@ -180,7 +177,6 @@ return dgQuaternion();
 		Q.m_q3 *= dot;
 	}
 	return Q;
-*/
 }
 
 

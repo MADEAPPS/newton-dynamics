@@ -219,90 +219,96 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 {
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
-
-			// Simple Euler in local space step not enough to cope with high angular velocities)
-			// localAlpha = (Tl - (wl x (wl * Il)) * Il^1
-
-			// implicit integration is local space, 
-			// use angular velocity at dt, to solve equation
-			// dW/dt * I + w x (w * I) = T
-			// dW * I + w x (w * I) * dt = T * dt
-			// since c * (a x b) =  (c * a) x (c * b)
-			//  we get
-			// dw * I + (w * dt) x ((w * dt) * I) = T * dt
-			// dw * I + dw x (dw * I) = dT
-			// discretized above equation and solve using multivariate Taylor expansion and neglecting 
-			// second and higher order derivatives we can approximate w as w1 = w + d'w|dwx,dwy,dwz * dt 
-			// keeping dt constant
-			// (w1 - w) * I  + w x (w * I) * dt - T * dt = 0
-			//
-			// I and T are inertia and torque in local space.
-			// (good to resolve high angular velocity precession) 
-
-			/*
-			// using Mathematica script to calculate the derivatives of the Taylor expression
-			// first expand w into it components
-
-			Wxx = wx * Ix + ((Iz - Iy) * wy * wz - Tx) * dt
-			Wyy = wy * Iy + ((Ix - Iz) * wz * wx - Ty) * dt
-			Wzz = wz * Iz + ((Iy - Ix) * wx * wy - Tz) * dt
-
-			CreateDocument[{TextCell["Wx ="], Wxx,
-			TextCell["dwx/dwx ="], D[Wxx, { wx, 1 }],
-			TextCell["dwx/dwy ="], D[Wxx, { wy, 1 }],
-			TextCell["dwx/dwz ="], D[Wxx, { wz, 1 }]}]
-
-			CreateDocument[{TextCell["Wy ="], Wyy,
-			TextCell["dwy/dwx ="], D[Wyy, { wx, 1 }],
-			TextCell["dwy/dwy ="], D[Wyy, { wy, 1 }],
-			TextCell["dwy/dwz ="], D[Wyy, { wz, 1 }]}]
-
-			CreateDocument[{TextCell["Wz ="], Wzz,
-			TextCell["dwz/dwx ="], D[Wzz, { wx, 1 }],
-			TextCell["dwz/dwy ="], D[Wzz, { wy, 1 }],
-			TextCell["dwz/dwz ="], D[Wzz, { wz, 1 }]}]
-			*/
-
 			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
-			dgVector localTorque (m_matrix.UnrotateVector(m_externalTorque));
-			localTorque -= localOmega.CrossProduct3(localOmega * m_mass); 
-			
-			dgFloat32 dt = dgFloat32 (0.5f) * timestep;
-			dgVector dw(localOmega.Scale4(dt));
+			dgVector localExternalTorque (m_matrix.UnrotateVector(m_externalTorque));
+			dgVector localAlphaStep ((localExternalTorque - localOmega.CrossProduct3(localOmega * m_mass)) * m_invMass);
 
-			dgMatrix jacobianMatrix(dgGetIdentityMatrix());
-			// calculates Jacobian matrix
-			//dWx / dwx = Ix
-			//dWx / dwy = (Iz - Iy) * wz * dt
-			//dWx / dwz = (Iz - Iy) * wy * dt
-			jacobianMatrix[0][0] = m_mass[0];
-			jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
-			jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
+			const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
+			if (localAlphaStep.DotProduct4(localAlphaStep).GetScalar() < (localAlphaErr * localAlphaErr)) {
+				// omega step is very small no point on doing implicit integration 
+				localOmega += localAlphaStep.Scale4(timestep);
+			} else {
+				// Simple forward Euler in local space step no enough to cope with skew and high angular velocities
+				// Using simple backward Euler in local space step, implicit integration in local space. 
+				// use angular velocity at dt, to solve equation
+				// f(w + dw) = f(w0) + f'(w + dw) * dw
+				// let dw = w * dt
+				// and calculating dw as the  dw = f(w) | dwx, dwy, dwz
 
-			//dWy / dwx = (Ix - Iz) * wz * dt
-			//dWy / dwy = Iy				 
-			//dWy / dwz = (Ix - Iz) * wx * dt
-			jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
-			jacobianMatrix[1][1] = m_mass[1];
-			jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
+				// dw/dt = (Tl - (wl x (wl * Il)) * Il^1
+				// expanding f(w) 
+				// f(wx) = (Tx - (Iz - Iy) * wy * wz) / Ix 
+				// f(wy) = (Ty - (Ix - Iz) * wz * wx) / Iy
+				// f(wz) = (Tz - (Iy - Ix) * wx * wy) / Iz
 
-			//dWz / dwx = (Iy - Ix) * wy * dt 
-			//dWz / dwy = (Iy - Ix) * wx * dt 
-			//dWz / dwz = Iz
-			jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
-			jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
-			jacobianMatrix[2][2] = m_mass[2];
+				/*
+				// using Mathematica script to calculate the derivatives of the Taylor expression
+				CreateDocument[{TextCell["Wx ="], Wxx,
+				TextCell["dwx/dwx ="], D[Wxx, { wx, 1 }],
+				TextCell["dwx/dwy ="], D[Wxx, { wy, 1 }],
+				TextCell["dwx/dwz ="], D[Wxx, { wz, 1 }]}]
 
-			// calculate gradient
-			dgVector gradientStep (localTorque.Scale4(timestep)); 
-			dgSolveGaussian(4, &jacobianMatrix[0][0], &gradientStep[0]);
+				CreateDocument[{TextCell["Wy ="], Wyy,
+				TextCell["dwy/dwx ="], D[Wyy, { wx, 1 }],
+				TextCell["dwy/dwy ="], D[Wyy, { wy, 1 }],
+				TextCell["dwy/dwz ="], D[Wyy, { wz, 1 }]}]
+
+				CreateDocument[{TextCell["Wz ="], Wzz,
+				TextCell["dwz/dwx ="], D[Wzz, { wx, 1 }],
+				TextCell["dwz/dwy ="], D[Wzz, { wy, 1 }],
+				TextCell["dwz/dwz ="], D[Wzz, { wz, 1 }]}]
+				*/
+
+				dgFloat32 dt = dgFloat32 (0.5f) * timestep;
+				dgMatrix jacobianMatrix(dgGetIdentityMatrix());
+#if 0
+				//two step of implicit integration 
+				for (dgInt32 i = 0; i < 2; i ++) 
+				{
+					// calculate gradient
+					dgVector deltaToque (localExternalTorque - localOmega.CrossProduct3(localOmega * m_mass));
+					dgVector gradientStep(deltaToque.Scale4(dt));
+#else
+				//Note: two step of implicit integration loses too much energy, it is better to use a semi implicit
+				// that is, calculate derivative at half the time step instead of the end, similar to mid point Euler
+				{
+					// calculate gradient
+					dgVector deltaToque(localExternalTorque - localOmega.CrossProduct3(localOmega * m_mass));
+					dgVector gradientStep(deltaToque.Scale4(timestep));
+#endif
+					dgVector dw(localOmega.Scale4(dt));
+					// calculates Jacobian matrix
+					//dWx / dwx = Ix
+					//dWx / dwy = (Iz - Iy) * wz * dt
+					//dWx / dwz = (Iz - Iy) * wy * dt
+					jacobianMatrix[0][0] = m_mass[0];
+					jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
+					jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
+
+					//dWy / dwx = (Ix - Iz) * wz * dt
+					//dWy / dwy = Iy				 
+					//dWy / dwz = (Ix - Iz) * wx * dt
+					jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
+					jacobianMatrix[1][1] = m_mass[1];
+					jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
+
+					//dWz / dwx = (Iy - Ix) * wy * dt 
+					//dWz / dwy = (Iy - Ix) * wx * dt 
+					//dWz / dwz = Iz
+					jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
+					jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
+					jacobianMatrix[2][2] = m_mass[2];
+
+					dgSolveGaussian(4, &jacobianMatrix[0][0], &gradientStep[0]);
+					localOmega += gradientStep;
+				}
+			}
 
 			m_accel = m_externalForce.Scale4(m_invMass.m_w);
-			m_alpha = m_matrix.RotateVector(localTorque * m_invMass);
+			m_alpha = m_matrix.RotateVector(localAlphaStep);
 
 			m_veloc += m_accel.Scale4(timestep);
-			m_omega = m_matrix.RotateVector(localOmega + gradientStep);
-
+			m_omega = m_matrix.RotateVector(localOmega);
 		} else {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
 			lumpedMassShape->IntegrateForces(timestep);
