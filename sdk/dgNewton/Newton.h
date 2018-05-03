@@ -895,9 +895,6 @@ extern "C" {
 	NEWTON_API void  NewtonBodySetCollision (const NewtonBody* const body, const NewtonCollision* const collision);
 	NEWTON_API void  NewtonBodySetCollisionScale (const NewtonBody* const body, dFloat scaleX, dFloat  scaleY, dFloat scaleZ);
 
-	NEWTON_API dFloat NewtonBodyGetMaxRotationPerStep (const NewtonBody* const body);
-	NEWTON_API void NewtonBodySetMaxRotationPerStep (const NewtonBody* const body, dFloat angleInRadians);
-
 	NEWTON_API int  NewtonBodyGetSleepState (const NewtonBody* const body);
 	NEWTON_API void NewtonBodySetSleepState (const NewtonBody* const body, int state);
 

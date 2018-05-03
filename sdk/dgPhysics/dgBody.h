@@ -123,9 +123,6 @@ class dgBody
 	bool GetCollisionWithLinkedBodies () const;
 	void SetCollisionWithLinkedBodies (bool state);
 
-	dgFloat32 GetMaxRotationPerStep() const;
-	void SetMaxRotationPerStep(dgFloat32 angle);
-
 	void Freeze ();
 	void Unfreeze ();
 	bool GetFreeze () const;
@@ -245,7 +242,6 @@ class dgBody
 	dgVector m_impulseForce;	
 	dgVector m_impulseTorque;	
 
-	dgFloat32 m_maxAngulaRotationPerSet2;
 	dgInt32 m_criticalSectionLock;
 	union 
 	{
@@ -508,16 +504,6 @@ DG_INLINE bool dgBody::GetCollisionWithLinkedBodies () const
 DG_INLINE bool dgBody::GetFreeze () const
 {
 	return m_freeze;
-}
-
-DG_INLINE dgFloat32 dgBody::GetMaxRotationPerStep() const
-{
-	return dgSqrt (m_maxAngulaRotationPerSet2);
-}
-
-DG_INLINE void dgBody::SetMaxRotationPerStep(dgFloat32 angle)
-{
-	m_maxAngulaRotationPerSet2 = angle * angle;
 }
 
 

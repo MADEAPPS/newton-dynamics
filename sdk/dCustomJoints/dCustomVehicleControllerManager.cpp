@@ -696,11 +696,6 @@ void dEngineController::SetInfo(const dEngineInfo& info)
 		m_info.m_gearRatios[i + D_VEHICLE_FIRST_GEAR] = dAbs(info.m_gearRatios[i]);
 	}
 
-	for (dList<dWheelJoint*>::dListNode* tireNode = m_controller->m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-		dWheelJoint* const tire = tireNode->GetInfo();
-		dFloat angle = (1.0f / 30.0f) * (0.277778f) * info.m_vehicleTopSpeed / tire->m_radio;
-		NewtonBodySetMaxRotationPerStep(tire->GetTireBody(), angle);
-	}
 	m_controller->SetAerodynamicsDownforceCoefficient (info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
 }
 
@@ -1645,7 +1640,6 @@ dAssert(0);
 	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(differentialBody, 0);
 	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(differentialBody, dPi * 2.0f);
 	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
 	NewtonDestroyCollision(collision);
 
@@ -1709,7 +1703,6 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(differentialBody, 0);
 	NewtonBodySetAngularDamping(differentialBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(differentialBody, dPi * 2.0f);
 	NewtonBodySetForceAndTorqueCallback(differentialBody, m_forceAndTorqueCallback);
 	NewtonDestroyCollision(collision);
 
@@ -1765,7 +1758,6 @@ dEngineJoint* dCustomVehicleController::AddEngineJoint(dFloat mass, dFloat armat
 	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(engineBody, 0);
 	NewtonBodySetAngularDamping(engineBody, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(engineBody, dPi * 2.0f);
 	NewtonBodySetForceAndTorqueCallback(engineBody, m_forceAndTorqueCallback);
 	NewtonDestroyCollision(collision);
 

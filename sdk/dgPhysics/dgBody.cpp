@@ -35,9 +35,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DG_MAX_ANGLE_STEP   dgFloat32 (45.0f * dgDEG2RAD)
-
-
 dgBody::dgBody()
 	:m_invWorldInertiaMatrix(dgGetZeroMatrix())
 	,m_matrix (dgGetIdentityMatrix())
@@ -54,7 +51,6 @@ dgBody::dgBody()
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))		
-	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -97,7 +93,6 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))		
-	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -132,7 +127,6 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
-	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
 	serializeCallback (userData, &m_serializedEnum, sizeof(dgInt32));
 
 	dgInt32 id;
@@ -192,7 +186,6 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
 	serializeCallback(userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
-	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
 	serializeCallback(userData, &m_serializedEnum, sizeof(dgInt32));
 
 	dgTree<dgInt32, const dgCollision*>::dgTreeNode* const node = collisionRemapId.Find(m_collision->GetChildShape());
@@ -311,12 +304,10 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	dgAssert (m_veloc.m_w == dgFloat32 (0.0f));
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
 	m_globalCentreOfMass += m_veloc.Scale4 (timestep); 
-	while ((m_omega.DotProduct4(m_omega).GetScalar() * timestep * timestep) > m_maxAngulaRotationPerSet2) {
-		m_omega = m_omega.Scale4 (dgFloat32 (0.9f));
-	}
+	dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
+	dgAssert((omegaMag2 * timestep * timestep) < (dgFloat32(60.0f * dgDEG2RAD) * dgFloat32(60.0f * dgDEG2RAD)));
 
 	// this is correct
-	dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
 		dgVector omegaAxis (m_omega.Scale4 (invOmegaMag));
