@@ -283,7 +283,7 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 			if ((axisParam[0].m_minFriction > DG_MIN_BOUND) || (axisParam[0].m_maxFriction < DG_MAX_BOUND)) {
 				params.m_forceBounds[ret].m_low = axisParam[0].m_minFriction;
 				params.m_forceBounds[ret].m_upper = axisParam[0].m_maxFriction;
-				params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
+				params.m_forceBounds[ret].m_normalIndex = DG_INDEPENDENT_ROW;
 			}
 
 //			CalculatePointDerivative (ret, params, dir0, pointDataP, &m_jointForce[ret]); 
@@ -296,7 +296,7 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 			if ((axisParam[1].m_minFriction > DG_MIN_BOUND) || (axisParam[1].m_maxFriction < DG_MAX_BOUND)) {
 				params.m_forceBounds[ret].m_low = axisParam[1].m_minFriction;
 				params.m_forceBounds[ret].m_upper = axisParam[1].m_maxFriction;
-				params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
+				params.m_forceBounds[ret].m_normalIndex = DG_INDEPENDENT_ROW;
 			}
 			CalculateAngularDerivative (ret, params, dir1, m_stiffness, dgFloat32 (0.0f), &m_jointForce[ret]);
 			SetMotorAcceleration (ret, axisParam[1].m_accel, params);

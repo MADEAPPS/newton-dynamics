@@ -184,7 +184,7 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 			if ((axisParam.m_minFriction > DG_MIN_BOUND) || (axisParam.m_maxFriction < DG_MAX_BOUND)) {
 				params.m_forceBounds[5].m_low = axisParam.m_minFriction;
 				params.m_forceBounds[5].m_upper = axisParam.m_maxFriction;
-				params.m_forceBounds[5].m_normalIndex = DG_NORMAL_CONSTRAINT;
+				params.m_forceBounds[5].m_normalIndex = DG_INDEPENDENT_ROW;
 			}
 
 			CalculateAngularDerivative (5, params, dir0, m_stiffness, dgFloat32 (0.0f), &m_jointForce[5]);

@@ -166,7 +166,6 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (const dgMatrix& l
 	dgVector euler1;
 	relMatrix.CalcPitchYawRoll (euler0, euler1);
 	return euler0;
-
 }
 
 dgFloat32 dgBilateralConstraint::GetRowAcceleration (dgInt32 index, dgContraintDescritor& desc) const

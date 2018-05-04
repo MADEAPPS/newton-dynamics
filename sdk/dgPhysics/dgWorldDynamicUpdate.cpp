@@ -56,7 +56,7 @@ class dgWorldDynamicUpdateSyncDescriptor
 };
 
 
-void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes)
+void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount)
 {
 	world->m_solverJacobiansMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgJacobianMatrixElement));
 	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
@@ -104,7 +104,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	SortClustersByCount();
 
 	dgInt32 maxRowCount = 0;
-	dgInt32 blockMatrixSize = 0;
 	dgInt32 softBodiesCount = 0;
 	for (dgInt32 i = 0; i < m_clusters; i ++) {
 		dgBodyCluster& cluster = m_clusterMemory[i];
@@ -112,7 +111,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		maxRowCount += cluster.m_rowsCount;
 		softBodiesCount += cluster.m_hasSoftBodies;
 	}
-	m_solverMemory.Init (world, maxRowCount, m_bodies, blockMatrixSize);
+	m_solverMemory.Init (world, maxRowCount, m_bodies);
 
 	dgInt32 threadCount = world->GetThreadCount();	
 
@@ -599,7 +598,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		constraintParamOut.m_forceBounds[i].m_low = DG_MIN_BOUND;
 		constraintParamOut.m_forceBounds[i].m_upper = DG_MAX_BOUND;
 		constraintParamOut.m_forceBounds[i].m_jointForce = NULL;
-		constraintParamOut.m_forceBounds[i].m_normalIndex = DG_NORMAL_CONSTRAINT;
+		constraintParamOut.m_forceBounds[i].m_normalIndex = DG_INDEPENDENT_ROW;
 	}
 
 	dgAssert(constraint->m_body0);

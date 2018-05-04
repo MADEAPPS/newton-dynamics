@@ -1163,7 +1163,7 @@ DG_INLINE dgInt32 dgInverseDynamics::GetJacobianDerivatives (dgBilateralConstrai
 		constraintParams.m_forceBounds[i].m_low = DG_MIN_BOUND;
 		constraintParams.m_forceBounds[i].m_upper = DG_MAX_BOUND;
 		constraintParams.m_forceBounds[i].m_jointForce = NULL;
-		constraintParams.m_forceBounds[i].m_normalIndex = DG_NORMAL_CONSTRAINT;
+		constraintParams.m_forceBounds[i].m_normalIndex = DG_INDEPENDENT_ROW;
 	}
 	return constraint->JacobianDerivative(constraintParams);
 }

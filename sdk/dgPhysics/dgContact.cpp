@@ -219,7 +219,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_penetration[normalIndex] = penetration;
 	params.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	params.m_forceBounds[normalIndex].m_low = dgFloat32 (0.0f);
-	params.m_forceBounds[normalIndex].m_normalIndex = DG_NORMAL_CONSTRAINT;
+	params.m_forceBounds[normalIndex].m_normalIndex = DG_INDEPENDENT_ROW;
 	params.m_forceBounds[normalIndex].m_jointForce = (dgForceImpactPair*) &contact.m_normal_Force;
 	params.m_jointStiffness[normalIndex] = dgFloat32 (0.0f);
 
@@ -238,20 +238,18 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir0, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir0);
-		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_NORMAL_CONSTRAINT : normalIndex);
+		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_INDEPENDENT_ROW : normalIndex);
 
 		params.m_restitution[jacobIndex] = dgFloat32(0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32(0.0f);
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 
-//dgTrace(("[x(%f %f) ", contact.m_dir0_Force.m_force, relVelocErr * impulseOrForceScale));
 		if (contact.m_flags & dgContactMaterial::m_override0Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override
 			//dgAssert(dgAbs(relVelocErr * impulseOrForceScale - contact.m_dir0_Force.m_force) < 1.0e-3f);
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
-
 		} else {
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
@@ -271,15 +269,12 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir1, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir1);
-		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_NORMAL_CONSTRAINT : normalIndex);
+		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_INDEPENDENT_ROW : normalIndex);
 		
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_jointStiffness[jacobIndex] = dgFloat32(0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
-
-
-//dgTrace(("y(%f %f)] ", contact.m_dir1_Force.m_force, relVelocErr * impulseOrForceScale));
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override
 			//dgAssert(dgAbs(relVelocErr * impulseOrForceScale - contact.m_dir1_Force.m_force) < 1.0e-3f);
@@ -323,8 +318,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 		if (rowMatrix[k].m_restitution >= dgFloat32 (0.0f)) {
 			dgJacobianMatrixElement* const row = &rowMatrix[k];
 
-			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 + row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + 
-							   row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 + row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
+			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 + row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 + row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
 			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 			dgFloat32 aRel = row->m_deltaAccel;
 
@@ -351,7 +345,6 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 				vRel = vRel * restitution + penetrationVeloc;
 				vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
 			}
-
 			row->m_coordenateAccel = aRel - vRel * invTimestep;
 		}
 	}

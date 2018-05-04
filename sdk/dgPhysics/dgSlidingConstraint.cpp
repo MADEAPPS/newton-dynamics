@@ -190,7 +190,7 @@ dgUnsigned32 dgSlidingConstraint::JacobianDerivative (dgContraintDescritor& para
 			if ((axisParam.m_minFriction > DG_MIN_BOUND) || (axisParam.m_maxFriction < DG_MAX_BOUND)) {
 				params.m_forceBounds[5].m_low = axisParam.m_minFriction;
 				params.m_forceBounds[5].m_upper = axisParam.m_maxFriction;
-				params.m_forceBounds[5].m_normalIndex = DG_NORMAL_CONSTRAINT;
+				params.m_forceBounds[5].m_normalIndex = DG_INDEPENDENT_ROW;
 			}
 
 			CalculatePointDerivative (5, params, matrix0.m_front, pointDataP, &m_jointForce[5]); 

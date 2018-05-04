@@ -1222,17 +1222,14 @@ dgInt32 dgWorld::CompareJointByInvMass(const dgBilateralConstraint* const jointA
 
 	if (modeA < modeB) {
 		return -1;
-	}
-	else if (modeA > modeB) {
+	} else if (modeA > modeB) {
 		return 1;
-	}
-	else {
+	} else {
 		dgFloat32 invMassA = dgMin(jointA->GetBody0()->m_invMass.m_w, jointA->GetBody1()->m_invMass.m_w);
 		dgFloat32 invMassB = dgMin(jointB->GetBody0()->m_invMass.m_w, jointB->GetBody1()->m_invMass.m_w);
 		if (invMassA < invMassB) {
 			return -1;
-		}
-		else if (invMassA > invMassB) {
+		} else if (invMassA > invMassB) {
 			return 1;
 		}
 	}
@@ -1423,7 +1420,6 @@ dgInt32 dgWorld::SerializeToFileSort(const dgBody* const body0, const dgBody* co
 	return 0;
 }
 
-
 void dgWorld::SerializeScene(void* const userData, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const serializeHandle) const
 {
 	dgBody** const array = new dgBody*[GetBodiesCount()];
@@ -1468,7 +1464,6 @@ void dgWorld::DeserializeScene(void* const userData, OnBodyDeserialize bodyCallb
 void dgWorld::OnBodyDeserializeFromFile(dgBody& body, void* const userData, dgDeserialize deserializeCallback, void* const fileHandle)
 {
 }
-
 
 void dgWorld::DeserializeBodyArray (void* const userData, OnBodyDeserialize bodyCallback, dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize deserializeCallback, void* const serializeHandle)
 {
@@ -1526,8 +1521,6 @@ void dgWorld::DeserializeBodyArray (void* const userData, OnBodyDeserialize body
 		body->m_spawnnedFromCallback = false;
 		body->m_uniqueID = dgInt32(m_bodiesUniqueID);
 
-//if (body->m_uniqueID == 5 || body->m_uniqueID == 33)
-//{
 		dgBodyMasterList::AddBody(body);
 		body->SetMatrix(body->GetMatrix());
 		m_broadPhase->Add(body);
@@ -1540,9 +1533,6 @@ void dgWorld::DeserializeBodyArray (void* const userData, OnBodyDeserialize body
 		bodyCallback(*body, userData, deserializeCallback, serializeHandle);
 
 		bodyMap.Insert(body, body->m_serializedEnum);
-//} else {
-//delete body;
-//}
 
 		// sync to next body
 		dgDeserializeMarker(deserializeCallback, serializeHandle);

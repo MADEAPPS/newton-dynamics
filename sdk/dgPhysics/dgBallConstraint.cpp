@@ -276,7 +276,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 			dgAssert (penetrationErr >= dgFloat32 (0.0f));
 		
 			params.m_forceBounds[ret].m_low = dgFloat32 (0.0f);
-			params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
+			params.m_forceBounds[ret].m_normalIndex = DG_INDEPENDENT_ROW;
 			params.m_forceBounds[ret].m_jointForce = &m_jointForce[ret];
 			SetMotorAcceleration (ret, (relVelocErr + penetrationErr) * params.m_invTimestep, params);
 			ret ++;
@@ -296,7 +296,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 			dgAssert (penetrationErr >= dgFloat32 (0.0f));
 		
 			params.m_forceBounds[ret].m_low = dgFloat32 (0.0f);
-			params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
+			params.m_forceBounds[ret].m_normalIndex = DG_INDEPENDENT_ROW;
 			params.m_forceBounds[ret].m_jointForce = &m_jointForce[ret];
 			SetMotorAcceleration (ret, (relVelocErr + penetrationErr) * params.m_invTimestep, params);
 			ret ++;
@@ -330,7 +330,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 
 			CalculatePointDerivative (ret, params, normalDir, pointData, &m_jointForce[ret]); 
 			params.m_forceBounds[ret].m_low = dgFloat32 (0.0f);
-			params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
+			params.m_forceBounds[ret].m_normalIndex = DG_INDEPENDENT_ROW;
 			params.m_forceBounds[ret].m_jointForce = &m_jointForce[ret];
 			SetMotorAcceleration (ret, (relVelocErr + penetrationErr) * params.m_invTimestep, params);
 			ret ++;

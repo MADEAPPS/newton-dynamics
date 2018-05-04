@@ -26,7 +26,7 @@
 
 #define DG_MAX_BOUND				dgFloat32 (1.0e15f)
 #define DG_MIN_BOUND				(-DG_MAX_BOUND)
-#define DG_NORMAL_CONSTRAINT		-1 
+#define DG_INDEPENDENT_ROW			-1 
 #define DG_CONSTRAINT_MAX_ROWS		(3 * 16)
 #define MIN_JOINT_PIN_LENGTH		dgFloat32 (50.0f)
 

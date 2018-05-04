@@ -288,16 +288,6 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 	return maxT;
 }
 
-/*
-void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
-{
-//	if (m_matrixUpdate) {
-//		m_matrixUpdate (*this, m_matrix, threadIndex);
-//	}
-	UpdateCollisionMatrix (timestep, threadIndex);
-}
-*/
-
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	//dgTrace (("%d p(%f %f %f)\n", m_uniqueID, m_globalCentreOfMass[0], m_globalCentreOfMass[1], m_globalCentreOfMass[2]));

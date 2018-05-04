@@ -225,7 +225,7 @@ class dgJacobianMatrixElement
 class dgJacobianMemory
 {
 	public:
-	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes);
+	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
 	dgJacobian* m_internalForcesBuffer;
 	dgJacobianMatrixElement* m_jacobianBuffer;
@@ -264,7 +264,6 @@ class dgWorldDynamicUpdate
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void BuildJacobianMatrixParallel(const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgInt32* const bodyLocks, const dgFloat32* const weight, const dgFloat32* const invWeight) const;
-
 	void CalculateReactionForcesParallel (const dgBodyCluster* const clusters, dgInt32 clustersCount, dgFloat32 timestep) const;
 	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
