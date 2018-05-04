@@ -516,14 +516,11 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
-			//accNorm = accNorm.GetMax(a.Abs());
 			accNorm += a * a;
 			dgVector deltaForce(f - dgVector(row->m_force));
 
 			row->m_force = f.GetScalar();
 			normalForce[k] = f.GetScalar();
-
-			//row->m_maxImpact = f.Abs().GetMax(row->m_maxImpact).GetScalar();
 
 			dgVector deltaforce0(scale0 * deltaForce);
 			dgVector deltaforce1(scale1 * deltaForce);
@@ -589,7 +586,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	}
 	return accNorm.GetScalar();
 }
-
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
@@ -665,7 +661,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
 			}
 		}
-
 
 		if (timestepRK != dgFloat32(0.0f)) {
 			dgVector timestep4(timestepRK);
