@@ -42,11 +42,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\PluginBin\</OutDir>
+    <OutDir>$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\PluginBin\</OutDir>
+    <OutDir>$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -55,7 +57,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;NEWTONWRAPPER_EXPORTS;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\;wrapperSdk;$(NEWTON_DYNAMICS)\sdk\dMath;$(NEWTON_DYNAMICS)\sdk\dgNewton;$(NEWTON_DYNAMICS)\sdk\dContainers;$(NEWTON_DYNAMICS)\sdk\dCustomJoints;$(NEWTON_DYNAMICS)\sdk\dgTimeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\$(ProjectName);..\..\dgNewton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -88,7 +90,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../Demos/Assets/Plugins/*.*"  /F /Y /R</Com
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;NEWTONWRAPPER_EXPORTS;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\;wrapperSdk;$(NEWTON_DYNAMICS)\sdk\dMath;$(NEWTON_DYNAMICS)\sdk\dgNewton;$(NEWTON_DYNAMICS)\sdk\dContainers;$(NEWTON_DYNAMICS)\sdk\dCustomJoints;$(NEWTON_DYNAMICS)\sdk\dgTimeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\$(ProjectName);..\..\dgNewton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -114,66 +116,29 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../Demos/Assets/Plugins/*.*"  /F /Y /R</Com
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="dNewtonContact.h" />
-    <ClInclude Include="IUnityInterface.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="wrapperSdk\dAlloc.h" />
-    <ClInclude Include="wrapperSdk\dNewtonBody.h" />
-    <ClInclude Include="wrapperSdk\dNewtonCollision.h" />
-    <ClInclude Include="wrapperSdk\dNewtonJoint.h" />
-    <ClInclude Include="wrapperSdk\dNewtonJointBallAndSocket.h" />
-    <ClInclude Include="wrapperSdk\dNewtonJointHinge.h" />
-    <ClInclude Include="wrapperSdk\dNewtonJointRelational.h" />
-    <ClInclude Include="wrapperSdk\dNewtonJointSlider.h" />
-    <ClInclude Include="wrapperSdk\dNewtonJointSlidingHinge.h" />
-    <ClInclude Include="wrapperSdk\dNewtonJointDoubleHinge.h" />
-    <ClInclude Include="wrapperSdk\dNewtonVehicle.h" />
-    <ClInclude Include="wrapperSdk\dNewtonVehicleManager.h" />
-    <ClInclude Include="wrapperSdk\dNewtonWorld.h" />
+    <CustomBuild Include="..\python\newton.i">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\thirdParty\swigwin-3.0.12\swig.exe -I../../dgNewton -c++ -python -outdir ../$(ProjectName)  %(Identity)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">building newton sdk $(ProjectName) wraper %(Filename)_wrap.cs</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cxx</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cxx</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\thirdParty\swigwin-3.0.12\swig.exe -I../../dgNewton -c++ -python -outdir ../$(ProjectName)  %(Identity)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">building newton sdk $(ProjectName) wraper %(Filename)_wrap.cs</Message>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="dNewtonContact.cpp" />
-    <ClCompile Include="newton_wrap.cxx">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="..\python\dllmain.cpp" />
+    <ClCompile Include="..\python\newton_wrap.cxx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="..\python\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="wrapperSdk\dAlloc.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonBody.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonCollision.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonJoint.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonJointBallAndSocket.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonJointHinge.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonJointRelational.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonJointSlider.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonJointSlidingHinge.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonJointDoubleHinge.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonVehicle.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonVehicleManager.cpp" />
-    <ClCompile Include="wrapperSdk\dNewtonWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="newton.i">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\swigwin-3.0.8\swig.exe -IwrapperSdk -I$(NEWTON_DYNAMICS)/sdk/dMath -I$(NEWTON_DYNAMICS)/sdk/dContainers -I$(NEWTON_DYNAMICS)/sdk/dCustomJoints -c++ -csharp -outdir ../NewtonPlugin -outfile %(Filename)_wrap.cs  %(Filename)%(Extension)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\swigwin-3.0.8\swig.exe -IwrapperSdk -I$(NEWTON_DYNAMICS)/sdk/dMath -I$(NEWTON_DYNAMICS)/sdk/dContainers -I$(NEWTON_DYNAMICS)/sdk/dCustomJoints -c++ -csharp -outdir ../NewtonPlugin -outfile %(Filename)_wrap.cs  %(Filename)%(Extension)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">building newton sdk csharp wraper %(Filename)_wrap.cs</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">building newton sdk csharp wraper %(Filename)_wrap.cs</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cxx</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cxx</Outputs>
-    </CustomBuild>
+    <ClInclude Include="..\python\stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

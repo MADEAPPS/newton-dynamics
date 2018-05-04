@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        NewtonWraper.i
+// Name:        newton.i
 // Purpose:     
 // Author:      Julio Jerez
-// Copyright:   Copyright (c) <2010> <Newton Game Dynamics>
+// Copyright:   Copyright (c) <2018> <Newton Game Dynamics>
 // License:     
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -36,23 +36,24 @@
 	*/
 
 	#include "stdafx.h"
-	#include "dAlloc.h"
-	#include "dNewtonBody.h"
-	#include "dNewtonWorld.h"
-	#include "dNewtonJoint.h"
-	#include "dNewtonVehicle.h"
-	#include "dNewtonCollision.h"
-	#include "dNewtonJointHinge.h"
-	//#include "dNewtonJointPlane.h"
-	#include "dNewtonJointSlider.h"
-	#include "dNewtonVehicleManager.h"
-	#include "dNewtonJointDoubleHinge.h"
-	#include "dNewtonJointRelational.h"
-	#include "dNewtonJointSlidingHinge.h"
-	#include "dNewtonJointBallAndSocket.h"
-	#include "dNewtonContact.h"
+//	#include "dAlloc.h"
+//	#include "dNewtonBody.h"
+//	#include "dNewtonWorld.h"
+//	#include "dNewtonJoint.h"
+//	#include "dNewtonVehicle.h"
+//	#include "dNewtonCollision.h"
+//	#include "dNewtonJointHinge.h"
+//	#include "dNewtonJointPlane.h"
+//	#include "dNewtonJointSlider.h"
+//	#include "dNewtonVehicleManager.h"
+//	#include "dNewtonJointDoubleHinge.h"
+//	#include "dNewtonJointRelational.h"
+//	#include "dNewtonJointSlidingHinge.h"
+//	#include "dNewtonJointBallAndSocket.h"
+//	#include "dNewtonContact.h"
 %}
 
+/*
 // Wrap void* to IntPtr
 %typemap(ctype)  void* "void *"
 %typemap(in)     void* %{ $1 = $input; %}
@@ -156,7 +157,7 @@
 %include "dNewtonJoint.h"
 %include "dNewtonVehicle.h"
 %include "dNewtonCollision.h"
-//%include "dNewtonJointPlane.h"
+%include "dNewtonJointPlane.h"
 %include "dNewtonJointHinge.h"
 %include "dNewtonJointSlider.h"
 %include "dNewtonJointDoubleHinge.h"
@@ -164,4 +165,4 @@
 %include "dNewtonJointSlidingHinge.h"
 %include "dNewtonJointBallAndSocket.h"
 %include "dNewtonContact.h"
-
+*/

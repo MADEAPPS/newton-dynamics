@@ -3,7 +3,8 @@
 // are changed infrequently
 //
 
-#pragma once
+#ifndef __STD_AFX_012313__
+#define __STD_AFX_012313__
 
 #include "targetver.h"
 
@@ -14,6 +15,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <Newton.h>
+/*
 #include <dMathDefines.h>
 #include <dVector.h>
 #include <dMatrix.h>
@@ -38,8 +40,6 @@
 #include <dCustomSliderActuator.h>
 #include <dCustomDoubleHingeActuator.h>
 #include <dCustomVehicleControllerManager.h>
+*/
 
-#define RAD_TO_DEGREES	(180.0f / 3.141592f)
-#define DEGREES_TO_RAD	(3.141592f / 180.0f)
-
-
+#endif
