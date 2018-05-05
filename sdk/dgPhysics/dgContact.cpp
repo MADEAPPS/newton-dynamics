@@ -239,12 +239,12 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir0, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir0);
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_INDEPENDENT_ROW : normalIndex);
+		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 
 		params.m_restitution[jacobIndex] = dgFloat32(0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32(0.0f);
-		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
-		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 
+		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 		if (contact.m_flags & dgContactMaterial::m_override0Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override
 			//dgAssert(dgAbs(relVelocErr * impulseOrForceScale - contact.m_dir0_Force.m_force) < 1.0e-3f);
@@ -270,10 +270,10 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir1, pointData); 
 		relVelocErr = velocError.DotProduct3(contact.m_dir1);
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_INDEPENDENT_ROW : normalIndex);
+		params.m_jointStiffness[jacobIndex] = dgFloat32(0.0f);
 		
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
-		params.m_jointStiffness[jacobIndex] = dgFloat32(0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override

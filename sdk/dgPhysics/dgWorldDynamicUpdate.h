@@ -37,7 +37,7 @@
 #define	DG_SMALL_ISLAND_COUNT			2
 
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
-#define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_ACCEL * dgFloat32 (0.5f))
+#define	DG_SOLVER_MAX_ERROR			(DG_FREEZE_MAG * dgFloat32 (0.5f))
 
 #define DG_HEAVY_MASS_SCALE_FACTOR		dgFloat32 (25.0f)
 #define DG_HEAVY_MASS_INV_SCALE_FACTOR	(dgFloat32 (1.0f) / DG_HEAVY_MASS_SCALE_FACTOR)
@@ -203,23 +203,23 @@ class dgJacobianMatrixElement
 	dgJacobianPair m_JMinv;
 
 	dgFloat32 m_force;
-//	dgFloat32 m_jinvMJt;
 	dgFloat32 m_diagDamp;
 	dgFloat32 m_invJinvMJt;
-
-	dgFloat32 m_deltaAccel;
 	dgFloat32 m_coordenateAccel;
+
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
-
 	dgFloat32 m_maxImpact;
+	dgInt32 m_normalForceIndex;
+
+	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
 	dgFloat32 m_penetration;
 	dgFloat32 m_stiffness;
 
+//	dgFloat32 m_jinvMJt;
 	dgForceImpactPair* m_jointFeebackForce;
 	dgFloat32 m_penetrationStiffness;
-	dgInt32 m_normalForceIndex;
 } DG_GCC_VECTOR_ALIGMENT;
 
 class dgJacobianMemory
@@ -273,9 +273,10 @@ class dgWorldDynamicUpdate
 	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
 		
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	//dgFloat32 CalculateJointForce_1_50(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	dgFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	dgFloat32 CalculateJointForceParallel(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+
+	dgJacobian IntegrateForceAndToque(dgDynamicBody* const body, const dgJacobian& force, const dgVector& timestep) const ;
 
 	void SortClustersByCount ();
 	void IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;

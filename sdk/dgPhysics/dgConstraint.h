@@ -350,6 +350,5 @@ DG_INLINE bool dgConstraint::IsActive() const
 	return m_contactActive ? true : false;
 }
 
-
 #endif 
 

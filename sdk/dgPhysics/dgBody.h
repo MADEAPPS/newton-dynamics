@@ -37,8 +37,6 @@ class dgBroadPhaseBodyNode;
 class dgBroadPhaseAggregate;
 
 
-//#define DG_USE_FULL_INERTIA_MATRIX
-
 #define DG_MINIMUM_MASS		dgFloat32(1.0e-5f)
 #define DG_INFINITE_MASS	dgFloat32(1.0e15f)
 
@@ -226,9 +224,10 @@ class dgBody
 	dgVector CalculateLineraMomentum() const; 
 	dgVector CalculateAngularMomentum() const; 
 
-	dgMatrix m_invWorldInertiaMatrix;
 	dgMatrix m_matrix;
 	dgQuaternion m_rotation;
+	dgQuaternion m_savedRotation;
+	dgMatrix m_invWorldInertiaMatrix;
 	dgVector m_mass;
 	dgVector m_invMass;
 	dgVector m_veloc;

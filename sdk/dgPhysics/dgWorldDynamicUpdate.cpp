@@ -638,6 +638,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 
 		row->m_diagDamp = dgFloat32(0.0f);
 		row->m_stiffness = dgMax(DG_PSD_DAMP_TOL * (dgFloat32(1.0f) - constraintParamOut.m_jointStiffness[i]), dgFloat32(1.0e-5f));
+
 		dgAssert(row->m_stiffness >= dgFloat32(0.0f));
 		dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
 		dgAssert((dgFloat32(1.0f) - constraintParamOut.m_jointStiffness[i]) >= dgFloat32(0.0f));
@@ -773,7 +774,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 	internalForces[m1].m_angular += forceAcc1.m_angular;
 }
 
-
 void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
 	dgAssert(cluster->m_bodyCount >= 2);
@@ -796,7 +796,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 	if (timestep != dgFloat32(0.0f)) {
 		for (dgInt32 i = 1; i < bodyCount; i++) {
-			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+			dgBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 			dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 			if (!body->m_equilibrium) {
 				dgAssert(body->m_invMass.m_w > dgFloat32(0.0f));
@@ -807,6 +807,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 			// re use these variables for temp storage 
 			body->m_accel = body->m_veloc;
 			body->m_alpha = body->m_omega;
+			body->m_savedRotation = body->m_rotation;
 			internalForces[i].m_linear = dgVector::m_zero;
 			internalForces[i].m_angular = dgVector::m_zero;
 		}
@@ -823,6 +824,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 			// re use these variables for temp storage 
 			body->m_accel = body->m_veloc;
 			body->m_alpha = body->m_omega;
+			body->m_savedRotation = body->m_rotation;
 
 			internalForces[i].m_linear = dgVector::m_zero;
 			internalForces[i].m_angular = dgVector::m_zero;
@@ -1002,4 +1004,3 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		}
 	}
 }
-

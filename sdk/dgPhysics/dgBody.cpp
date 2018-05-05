@@ -36,9 +36,10 @@
 //////////////////////////////////////////////////////////////////////
 
 dgBody::dgBody()
-	:m_invWorldInertiaMatrix(dgGetZeroMatrix())
-	,m_matrix (dgGetIdentityMatrix())
+	:m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_savedRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_invWorldInertiaMatrix(dgGetZeroMatrix())
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
 	,m_invMass(dgFloat32 (0.0f))
 	,m_veloc(dgFloat32 (0.0f))
@@ -78,9 +79,10 @@ dgBody::dgBody()
 }
 
 dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
-	:m_invWorldInertiaMatrix(dgGetZeroMatrix())
-	,m_matrix (dgGetIdentityMatrix())
+	:m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_savedRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_invWorldInertiaMatrix(dgGetZeroMatrix())
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
 	,m_invMass(dgFloat32 (0.0f))
 	,m_veloc(dgFloat32 (0.0f))
@@ -248,6 +250,7 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 	if (m_broadPhaseNode) {
 		dgAssert (m_world);
 		
+		//if (!m_sleeping) {
 		if (!m_equilibrium) {
 			m_world->GetBroadPhase()->UpdateBody (this, threadIndex);
 		}
@@ -295,7 +298,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
 	m_globalCentreOfMass += m_veloc.Scale4 (timestep); 
 	dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
-	dgAssert((omegaMag2 * timestep * timestep) < (dgFloat32(60.0f * dgDEG2RAD) * dgFloat32(60.0f * dgDEG2RAD)));
+	dgAssert((omegaMag2 * timestep * timestep) < (dgFloat32(90.0f * dgDEG2RAD) * dgFloat32(90.0f * dgDEG2RAD)));
 
 	// this is correct
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
