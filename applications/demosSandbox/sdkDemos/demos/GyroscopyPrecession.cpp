@@ -262,7 +262,7 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 	dFloat m, Ixx, Iyy, Izz;
 	NewtonBodyGetMass(gyroTop, &m, &Ixx, &Iyy, &Izz);
 
-	dVector omega (matrix.m_up.Scale (60.0f));
+	dVector omega (matrix.m_up.Scale (40.0f));
 	NewtonBodySetOmega(gyroTop, &omega[0]);
 
 	dVector damp(0.0f);
@@ -348,7 +348,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
 		PrecessingTop(scene, dVector(0.0f, 0.5f, -spacing * i - spacing, 1.0f));
-		PhiTop(scene, dVector(8.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 20.0f, 1.0f);
+		PhiTop(scene, dVector(8.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 10.0f, 1.0f);
 //		TippeTop(scene, dVector(-6.0f, 0.3f, -spacing * i - spacing, 1.0f), 0.0f, 0.0f, 0.0f);
 	}
 

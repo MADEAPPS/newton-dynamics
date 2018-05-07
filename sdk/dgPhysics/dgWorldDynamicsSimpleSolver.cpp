@@ -589,8 +589,8 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	dgMatrix matrix (body->m_gyroRotation, dgVector::m_zero);
 	
 	dgVector localOmega (matrix.UnrotateVector(body->m_omega));
-	dgVector localExternalTorque (matrix.UnrotateVector(force.m_angular));
-	dgVector localAlphaStep ((localExternalTorque - localOmega.CrossProduct3(localOmega * mass)) * body->m_invMass);
+	dgVector locallTorque (matrix.UnrotateVector(force.m_angular));
+	dgVector localAlphaStep ((locallTorque - localOmega.CrossProduct3(localOmega * mass)) * body->m_invMass);
 	dgVector omegaStep (localAlphaStep * timestep);
 
 	const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
@@ -609,68 +609,70 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 		// f(wz) = (Tz - (Iy - Ix) * wx * wy) / Iz
 
 		dgVector localOmega1 (localOmega);
-		
-		// calculate gradient
-		dgVector gyroToque (localOmega1.CrossProduct3(localOmega1 * mass));
-		dgVector deltaToque (localExternalTorque - gyroToque);
-		dgVector gradientStep(deltaToque * timestep);
-		dgVector dw(localOmega1 * timestep);
+		// calculate gradient, two step of implicit integration !!
+		dgVector dt(timestep * dgVector::m_half);
+		for (dgInt32 i = 0; i < 2; i++) {
+			dgVector gyroToque(localOmega1.CrossProduct3(localOmega1 * mass));
+			dgVector deltaToque(locallTorque - gyroToque);
+			dgVector gradientStep(deltaToque * dt);
+			dgVector dw(localOmega1 * dt);
 
-		dgFloat32 jacobianMatrix[3][3];
-		// calculates Jacobian matrix
-		//dWx / dwx = Ix
-		//dWx / dwy = (Iz - Iy) * wz * dt
-		//dWx / dwz = (Iz - Iy) * wy * dt
-		jacobianMatrix[0][0] = mass[0];
-		jacobianMatrix[0][1] = (mass[2] - mass[1]) * dw[2];
-		jacobianMatrix[0][2] = (mass[2] - mass[1]) * dw[1];
+			dgFloat32 jacobianMatrix[3][3];
+			// calculates Jacobian matrix
+			//dWx / dwx = Ix
+			//dWx / dwy = (Iz - Iy) * wz * dt
+			//dWx / dwz = (Iz - Iy) * wy * dt
+			jacobianMatrix[0][0] = mass[0];
+			jacobianMatrix[0][1] = (mass[2] - mass[1]) * dw[2];
+			jacobianMatrix[0][2] = (mass[2] - mass[1]) * dw[1];
 
-		//dWy / dwx = (Ix - Iz) * wz * dt
-		//dWy / dwy = Iy				 
-		//dWy / dwz = (Ix - Iz) * wx * dt
-		jacobianMatrix[1][0] = (mass[0] - mass[2]) * dw[2];
-		jacobianMatrix[1][1] = mass[1];
-		jacobianMatrix[1][2] = (mass[0] - mass[2]) * dw[0];
+			//dWy / dwx = (Ix - Iz) * wz * dt
+			//dWy / dwy = Iy				 
+			//dWy / dwz = (Ix - Iz) * wx * dt
+			jacobianMatrix[1][0] = (mass[0] - mass[2]) * dw[2];
+			jacobianMatrix[1][1] = mass[1];
+			jacobianMatrix[1][2] = (mass[0] - mass[2]) * dw[0];
 
-		//dWz / dwx = (Iy - Ix) * wy * dt 
-		//dWz / dwy = (Iy - Ix) * wx * dt 
-		//dWz / dwz = Iz
-		jacobianMatrix[2][0] = (mass[1] - mass[0]) * dw[1];
-		jacobianMatrix[2][1] = (mass[1] - mass[0]) * dw[0];
-		jacobianMatrix[2][2] = mass[2];
+			//dWz / dwx = (Iy - Ix) * wy * dt 
+			//dWz / dwy = (Iy - Ix) * wx * dt 
+			//dWz / dwz = Iz
+			jacobianMatrix[2][0] = (mass[1] - mass[0]) * dw[1];
+			jacobianMatrix[2][1] = (mass[1] - mass[0]) * dw[0];
+			jacobianMatrix[2][2] = mass[2];
 
-		//dgFloat32 jacobianMatrix1[3][3];
-		//memcpy (jacobianMatrix1, jacobianMatrix, sizeof (jacobianMatrix));
-		//dgVector gradientStep1(gradientStep);
-		//dgSolveGaussian(3, &jacobianMatrix1[0][0], &gradientStep1[0]);
+			//dgFloat32 jacobianMatrix1[3][3];
+			//memcpy (jacobianMatrix1, jacobianMatrix, sizeof (jacobianMatrix));
+			//dgVector gradientStep1(gradientStep);
+			//dgSolveGaussian(3, &jacobianMatrix1[0][0], &gradientStep1[0]);
 
-		// since the matrix is well behave, we can unroll Gauss elimination with back substitution 
-		dgAssert(jacobianMatrix[0][0] > dgFloat32(0.0f));
-		dgFloat32 den = dgFloat32(1.0f) / jacobianMatrix[0][0];
-		dgFloat32 scale = jacobianMatrix[1][0] * den;
-		jacobianMatrix[1][0] -= jacobianMatrix[0][0] * scale;
-		jacobianMatrix[1][1] -= jacobianMatrix[0][1] * scale;
-		jacobianMatrix[1][2] -= jacobianMatrix[0][2] * scale;
-		gradientStep[1] -= gradientStep[0] * scale;
+			// since the matrix is well behave, we can unroll Gauss elimination with back substitution 
+			dgAssert(jacobianMatrix[0][0] > dgFloat32(0.0f));
+			dgFloat32 den = dgFloat32(1.0f) / jacobianMatrix[0][0];
+			dgFloat32 scale = jacobianMatrix[1][0] * den;
+			jacobianMatrix[1][0] -= jacobianMatrix[0][0] * scale;
+			jacobianMatrix[1][1] -= jacobianMatrix[0][1] * scale;
+			jacobianMatrix[1][2] -= jacobianMatrix[0][2] * scale;
+			gradientStep[1] -= gradientStep[0] * scale;
 
-		scale = jacobianMatrix[2][0] * den;
-		jacobianMatrix[2][0] -= jacobianMatrix[0][0] * scale;
-		jacobianMatrix[2][1] -= jacobianMatrix[0][1] * scale;
-		jacobianMatrix[2][2] -= jacobianMatrix[0][2] * scale;
-		gradientStep[2] -= gradientStep[0] * scale;
-			
-		dgAssert(jacobianMatrix[1][1] > dgFloat32(0.0f));
-		scale = jacobianMatrix[2][1] / jacobianMatrix[1][1];
-		jacobianMatrix[2][1] -= jacobianMatrix[1][1] * scale;
-		jacobianMatrix[2][2] -= jacobianMatrix[1][2] * scale;
-		gradientStep[2] -= gradientStep[1] * scale;
+			scale = jacobianMatrix[2][0] * den;
+			jacobianMatrix[2][0] -= jacobianMatrix[0][0] * scale;
+			jacobianMatrix[2][1] -= jacobianMatrix[0][1] * scale;
+			jacobianMatrix[2][2] -= jacobianMatrix[0][2] * scale;
+			gradientStep[2] -= gradientStep[0] * scale;
 
-		dgAssert(jacobianMatrix[2][2] > dgFloat32(0.0f));
-		gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
-		gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
-		gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
+			dgAssert(jacobianMatrix[1][1] > dgFloat32(0.0f));
+			scale = jacobianMatrix[2][1] / jacobianMatrix[1][1];
+			jacobianMatrix[2][1] -= jacobianMatrix[1][1] * scale;
+			jacobianMatrix[2][2] -= jacobianMatrix[1][2] * scale;
+			gradientStep[2] -= gradientStep[1] * scale;
 
-		localOmega1 += gradientStep;
+			dgAssert(jacobianMatrix[2][2] > dgFloat32(0.0f));
+			gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
+			gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
+			gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
+
+			localOmega1 += gradientStep;
+		}
 
 		dgVector localAngularMomentum(body->m_mass * localOmega1);
 		dgVector localGyroTorque(localOmega1.CrossProduct3(localAngularMomentum));
@@ -680,7 +682,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 		if (omegaMag2 > ((dgFloat32(0.0125f) * dgDEG2RAD) * (dgFloat32(0.0125f) * dgDEG2RAD))) {
 			dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
 			dgVector omegaAxis(omega.Scale4(invOmegaMag));
-			dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
+			dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt.GetScalar();
 			body->m_gyroRotation = body->m_gyroRotation * dgQuaternion(omegaAxis, omegaAngle);
 			matrix = dgMatrix (body->m_gyroRotation, dgVector::m_wOne);
 		}
