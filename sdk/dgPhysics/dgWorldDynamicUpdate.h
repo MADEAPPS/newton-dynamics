@@ -209,8 +209,8 @@ class dgJacobianMatrixElement
 
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
+	dgFloat32 m_gyroAccel;
 	dgFloat32 m_maxImpact;
-	dgInt32 m_normalForceIndex;
 
 	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
@@ -220,6 +220,7 @@ class dgJacobianMatrixElement
 //	dgFloat32 m_jinvMJt;
 	dgForceImpactPair* m_jointFeebackForce;
 	dgFloat32 m_penetrationStiffness;
+	dgInt32 m_normalForceIndex;
 } DG_GCC_VECTOR_ALIGMENT;
 
 class dgJacobianMemory

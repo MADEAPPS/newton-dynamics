@@ -31,6 +31,84 @@
 
 dgVector dgDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
 
+
+dgDynamicBodyAsymetric::dgDynamicBodyAsymetric()
+	:dgDynamicBody()
+	, m_principalAxis(dgGetIdentityMatrix())
+{
+	m_type = m_dynamicBody;
+	m_rtti |= m_dynamicBodyAsymentricRTTI;
+	dgAssert(dgInt32(sizeof(dgDynamicBody) & 0x0f) == 0);
+
+}
+
+dgDynamicBodyAsymetric::dgDynamicBodyAsymetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
+	:dgDynamicBody(world, collisionNode, serializeCallback, userData, revisionNumber)
+	, m_principalAxis(dgGetIdentityMatrix())
+{
+	m_type = m_dynamicBody;
+	m_rtti |= m_dynamicBodyRTTI;
+	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
+}
+
+void dgDynamicBodyAsymetric::Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
+{
+	dgDynamicBody::Serialize(collisionRemapId, serializeCallback, userData);
+	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
+}
+
+
+void dgDynamicBodyAsymetric::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
+{
+	dgVector II;
+	m_principalAxis = inertia;
+	m_principalAxis.EigenVectors(II);
+	dgMatrix massMatrix(dgGetIdentityMatrix());
+	massMatrix[0][0] = II[0];
+	massMatrix[1][1] = II[1];
+	massMatrix[2][2] = II[2];
+	dgBody::SetMassMatrix(mass, massMatrix);
+}
+
+dgMatrix dgDynamicBodyAsymetric::CalculateLocalInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBodyAsymetric::CalculateInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_invMass[0];
+	diagonal[1][1] = m_invMass[1];
+	diagonal[2][2] = m_invMass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+void dgDynamicBodyAsymetric::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
+{
+	dgDynamicBody::IntegrateOpenLoopExternalForce(timestep);
+}
+
+
 dgDynamicBody::dgDynamicBody()
 	:dgBody()
 	,m_externalForce(dgFloat32 (0.0f))
@@ -79,7 +157,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	serializeCallback(userData, &val, sizeof (dgInt32));
 	m_linearDampOn = (val & 1) ? true : false;
 	m_angularDampOn = (val & 2) ? true : false;
-
 }
 
 dgDynamicBody::~dgDynamicBody()
@@ -299,7 +376,32 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 					jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
 					jacobianMatrix[2][2] = m_mass[2];
 
-					dgSolveGaussian(3, &jacobianMatrix[0][0], &gradientStep[0]);
+					// since the matrix is well behave, we can unroll Gauss elimination with back substitution 
+					dgAssert (jacobianMatrix[0][0] > dgFloat32 (0.0f));
+					dgFloat32 den = dgFloat32 (1.0f) / jacobianMatrix[0][0];
+					dgFloat32 scale = jacobianMatrix[1][0] * den;
+					jacobianMatrix[1][0] -= jacobianMatrix[0][0] * scale;
+					jacobianMatrix[1][1] -= jacobianMatrix[0][1] * scale;
+					jacobianMatrix[1][2] -= jacobianMatrix[0][2] * scale;
+					gradientStep[1] -= gradientStep[0] * scale;
+
+					scale = jacobianMatrix[2][0] * den;
+					jacobianMatrix[2][0] -= jacobianMatrix[0][0] * scale;
+					jacobianMatrix[2][1] -= jacobianMatrix[0][1] * scale;
+					jacobianMatrix[2][2] -= jacobianMatrix[0][2] * scale;
+					gradientStep[2] -= gradientStep[0] * scale;
+
+					dgAssert(jacobianMatrix[1][1] > dgFloat32(0.0f));
+					scale = jacobianMatrix[2][1] / jacobianMatrix[1][1];
+					jacobianMatrix[2][1] -= jacobianMatrix[1][1] * scale;
+					jacobianMatrix[2][2] -= jacobianMatrix[1][2] * scale;
+					gradientStep[2] -= gradientStep[1] * scale;
+
+					dgAssert(jacobianMatrix[2][2] > dgFloat32(0.0f));
+					gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
+					gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
+					gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
+
 					localOmega += gradientStep;
 				}
 			}
@@ -320,81 +422,3 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 }
 
 
-dgDynamicBodyAsymetric::dgDynamicBodyAsymetric()
-	:dgDynamicBody()
-	,m_principalAxis(dgGetIdentityMatrix())
-{
-	m_type = m_dynamicBody;
-	m_rtti |= m_dynamicBodyAsymentricRTTI;
-	dgAssert(dgInt32(sizeof(dgDynamicBody) & 0x0f) == 0);
-
-}
-
-dgDynamicBodyAsymetric::dgDynamicBodyAsymetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
-	:dgDynamicBody(world, collisionNode, serializeCallback, userData, revisionNumber)
-	,m_principalAxis(dgGetIdentityMatrix())
-{
-	m_type = m_dynamicBody;
-	m_rtti |= m_dynamicBodyRTTI;
-	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
-}
-
-void dgDynamicBodyAsymetric::Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
-{
-	dgDynamicBody::Serialize(collisionRemapId, serializeCallback, userData);
-	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
-}
-
-
-void dgDynamicBodyAsymetric::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
-{
-	dgVector II;
-	m_principalAxis = inertia;
-	m_principalAxis.EigenVectors(II);
-	dgMatrix massMatrix(dgGetIdentityMatrix());
-	massMatrix[0][0] = II[0];
-	massMatrix[1][1] = II[1];
-	massMatrix[2][2] = II[2];
-	dgBody::SetMassMatrix(mass, massMatrix);
-}
-
-dgMatrix dgDynamicBodyAsymetric::CalculateLocalInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-dgMatrix dgDynamicBodyAsymetric::CalculateInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-dgMatrix dgDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_invMass[0];
-	diagonal[1][1] = m_invMass[1];
-	diagonal[2][2] = m_invMass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-void dgDynamicBodyAsymetric::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
-{
-//	dgMatrix saveMatrix(m_matrix);
-//  m_matrix = m_principalAxis * m_matrix;
-	dgDynamicBody::IntegrateOpenLoopExternalForce(timestep);
-//	m_matrix = saveMatrix;
-}

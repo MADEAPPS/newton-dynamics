@@ -38,7 +38,6 @@
 dgBody::dgBody()
 	:m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-	,m_savedRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_invWorldInertiaMatrix(dgGetZeroMatrix())
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
 	,m_invMass(dgFloat32 (0.0f))
@@ -52,6 +51,8 @@ dgBody::dgBody()
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))		
+	,m_gyroToque(dgFloat32 (0.0f))
+	,m_gyroRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -81,7 +82,6 @@ dgBody::dgBody()
 dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
 	:m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-	,m_savedRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_invWorldInertiaMatrix(dgGetZeroMatrix())
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
 	,m_invMass(dgFloat32 (0.0f))
@@ -95,6 +95,8 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))		
+	,m_gyroToque(dgFloat32 (0.0f))
+	,m_gyroRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -298,7 +300,14 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
 	m_globalCentreOfMass += m_veloc.Scale4 (timestep); 
 	dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
-	dgAssert((omegaMag2 * timestep * timestep) < (dgFloat32(90.0f * dgDEG2RAD) * dgFloat32(90.0f * dgDEG2RAD)));
+#ifdef _DEBUG
+	const dgFloat32 err = dgFloat32(90.0f * dgDEG2RAD);
+	const dgFloat32 err2 = err * err;
+	const dgFloat32 step2 = omegaMag2 * timestep * timestep;
+	if (step2 > err2) {
+		dgTrace (("warning bodies %d w(%f %f %f) with very high angular velocity, may be unstable\n", m_uniqueID, m_omega.m_x, m_omega.m_y, m_omega.m_z));
+	}
+#endif
 
 	// this is correct
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {

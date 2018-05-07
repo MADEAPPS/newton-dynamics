@@ -226,7 +226,6 @@ class dgBody
 
 	dgMatrix m_matrix;
 	dgQuaternion m_rotation;
-	dgQuaternion m_savedRotation;
 	dgMatrix m_invWorldInertiaMatrix;
 	dgVector m_mass;
 	dgVector m_invMass;
@@ -240,6 +239,8 @@ class dgBody
 	dgVector m_globalCentreOfMass;	
 	dgVector m_impulseForce;	
 	dgVector m_impulseTorque;	
+	dgVector m_gyroToque;
+	dgQuaternion m_gyroRotation;
 
 	dgInt32 m_criticalSectionLock;
 	union 

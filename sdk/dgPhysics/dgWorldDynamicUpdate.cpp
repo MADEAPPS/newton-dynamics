@@ -807,7 +807,11 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 			// re use these variables for temp storage 
 			body->m_accel = body->m_veloc;
 			body->m_alpha = body->m_omega;
-			body->m_savedRotation = body->m_rotation;
+			body->m_gyroRotation = body->m_rotation;
+			dgVector localOmega(body->m_matrix.UnrotateVector(body->m_omega));
+			dgVector localAngularMomentum(body->m_mass * localOmega);
+			body->m_gyroToque = body->m_matrix.RotateVector(localOmega.CrossProduct3(localAngularMomentum));
+
 			internalForces[i].m_linear = dgVector::m_zero;
 			internalForces[i].m_angular = dgVector::m_zero;
 		}
@@ -824,7 +828,11 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 			// re use these variables for temp storage 
 			body->m_accel = body->m_veloc;
 			body->m_alpha = body->m_omega;
-			body->m_savedRotation = body->m_rotation;
+			body->m_gyroRotation = body->m_rotation;
+
+			dgVector localOmega(body->m_matrix.UnrotateVector(body->m_omega));
+			dgVector localAngularMomentum(body->m_mass * localOmega);
+			body->m_gyroToque = body->m_matrix.RotateVector(localOmega.CrossProduct3(localAngularMomentum));
 
 			internalForces[i].m_linear = dgVector::m_zero;
 			internalForces[i].m_angular = dgVector::m_zero;

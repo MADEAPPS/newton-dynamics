@@ -496,7 +496,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			dgJacobianMatrixElement* const row = &matrixRow[j];
 			dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
 					   row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
-			a = dgVector(row->m_coordenateAccel - row->m_force * row->m_diagDamp) - a.AddHorizontal();
+			a = dgVector(row->m_coordenateAccel + row->m_gyroAccel - row->m_force * row->m_diagDamp) - a.AddHorizontal();
 
 			dgVector f(row->m_force + row->m_invJinvMJt * a.GetScalar());
 			dgAssert(row->m_normalForceIndex >= 0);
@@ -536,7 +536,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				dgJacobianMatrixElement* const row = &matrixRow[index];
 				dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
 						   row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
-				a = dgVector(row->m_coordenateAccel - row->m_force * row->m_diagDamp) - a.AddHorizontal();
+				a = dgVector(row->m_coordenateAccel + row->m_gyroAccel - row->m_force * row->m_diagDamp) - a.AddHorizontal();
 
 				dgVector f(row->m_force + row->m_invJinvMJt * a.GetScalar());
 				dgAssert(row->m_normalForceIndex >= 0);
@@ -585,9 +585,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgJacobian& force, const dgVector& timestep) const
 {
 	dgJacobian velocStep;
-
 	const dgVector& mass = body->m_mass;
-	const dgMatrix matrix (body->m_savedRotation, dgVector::m_zero);
+	dgMatrix matrix (body->m_gyroRotation, dgVector::m_zero);
 	
 	dgVector localOmega (matrix.UnrotateVector(body->m_omega));
 	dgVector localExternalTorque (matrix.UnrotateVector(force.m_angular));
@@ -609,52 +608,84 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 		// f(wy) = (Ty - (Ix - Iz) * wz * wx) / Iy
 		// f(wz) = (Tz - (Iy - Ix) * wx * wy) / Iz
 
-		dgFloat32 dt = dgFloat32 (0.5f) * timestep.GetScalar();
 		dgVector localOmega1 (localOmega);
-#if 1
-		//two step of implicit integration 
-		for (dgInt32 i = 0; i < 2; i ++) 
-		{
-			// calculate gradient
-			dgVector deltaToque (localExternalTorque - localOmega1.CrossProduct3(localOmega1 * mass));
-			dgVector gradientStep(deltaToque.Scale4(dt));
-#else
-		//Note: two step of implicit integration loses too much energy, it is better to use a semi implicit
-		// that is calculate derivative at half the time step, similar to mid point Euler
-		{
-			// calculate gradient
-			dgVector deltaToque(localExternalTorque - localOmega.CrossProduct3(localOmega1 * mass));
-			dgVector gradientStep(deltaToque * timestep);
-#endif
+		
+		// calculate gradient
+		dgVector gyroToque (localOmega1.CrossProduct3(localOmega1 * mass));
+		dgVector deltaToque (localExternalTorque - gyroToque);
+		dgVector gradientStep(deltaToque * timestep);
+		dgVector dw(localOmega1 * timestep);
 
-			dgVector dw(localOmega1.Scale4(dt));
+		dgFloat32 jacobianMatrix[3][3];
+		// calculates Jacobian matrix
+		//dWx / dwx = Ix
+		//dWx / dwy = (Iz - Iy) * wz * dt
+		//dWx / dwz = (Iz - Iy) * wy * dt
+		jacobianMatrix[0][0] = mass[0];
+		jacobianMatrix[0][1] = (mass[2] - mass[1]) * dw[2];
+		jacobianMatrix[0][2] = (mass[2] - mass[1]) * dw[1];
 
-			dgFloat32 jacobianMatrix[3][3];
-			// calculates Jacobian matrix
-			//dWx / dwx = Ix
-			//dWx / dwy = (Iz - Iy) * wz * dt
-			//dWx / dwz = (Iz - Iy) * wy * dt
-			jacobianMatrix[0][0] = mass[0];
-			jacobianMatrix[0][1] = (mass[2] - mass[1]) * dw[2];
-			jacobianMatrix[0][2] = (mass[2] - mass[1]) * dw[1];
+		//dWy / dwx = (Ix - Iz) * wz * dt
+		//dWy / dwy = Iy				 
+		//dWy / dwz = (Ix - Iz) * wx * dt
+		jacobianMatrix[1][0] = (mass[0] - mass[2]) * dw[2];
+		jacobianMatrix[1][1] = mass[1];
+		jacobianMatrix[1][2] = (mass[0] - mass[2]) * dw[0];
 
-			//dWy / dwx = (Ix - Iz) * wz * dt
-			//dWy / dwy = Iy				 
-			//dWy / dwz = (Ix - Iz) * wx * dt
-			jacobianMatrix[1][0] = (mass[0] - mass[2]) * dw[2];
-			jacobianMatrix[1][1] = mass[1];
-			jacobianMatrix[1][2] = (mass[0] - mass[2]) * dw[0];
+		//dWz / dwx = (Iy - Ix) * wy * dt 
+		//dWz / dwy = (Iy - Ix) * wx * dt 
+		//dWz / dwz = Iz
+		jacobianMatrix[2][0] = (mass[1] - mass[0]) * dw[1];
+		jacobianMatrix[2][1] = (mass[1] - mass[0]) * dw[0];
+		jacobianMatrix[2][2] = mass[2];
 
-			//dWz / dwx = (Iy - Ix) * wy * dt 
-			//dWz / dwy = (Iy - Ix) * wx * dt 
-			//dWz / dwz = Iz
-			jacobianMatrix[2][0] = (mass[1] - mass[0]) * dw[1];
-			jacobianMatrix[2][1] = (mass[1] - mass[0]) * dw[0];
-			jacobianMatrix[2][2] = mass[2];
+		//dgFloat32 jacobianMatrix1[3][3];
+		//memcpy (jacobianMatrix1, jacobianMatrix, sizeof (jacobianMatrix));
+		//dgVector gradientStep1(gradientStep);
+		//dgSolveGaussian(3, &jacobianMatrix1[0][0], &gradientStep1[0]);
 
-			dgSolveGaussian(3, &jacobianMatrix[0][0], &gradientStep[0]);
-			localOmega1 += gradientStep;
+		// since the matrix is well behave, we can unroll Gauss elimination with back substitution 
+		dgAssert(jacobianMatrix[0][0] > dgFloat32(0.0f));
+		dgFloat32 den = dgFloat32(1.0f) / jacobianMatrix[0][0];
+		dgFloat32 scale = jacobianMatrix[1][0] * den;
+		jacobianMatrix[1][0] -= jacobianMatrix[0][0] * scale;
+		jacobianMatrix[1][1] -= jacobianMatrix[0][1] * scale;
+		jacobianMatrix[1][2] -= jacobianMatrix[0][2] * scale;
+		gradientStep[1] -= gradientStep[0] * scale;
+
+		scale = jacobianMatrix[2][0] * den;
+		jacobianMatrix[2][0] -= jacobianMatrix[0][0] * scale;
+		jacobianMatrix[2][1] -= jacobianMatrix[0][1] * scale;
+		jacobianMatrix[2][2] -= jacobianMatrix[0][2] * scale;
+		gradientStep[2] -= gradientStep[0] * scale;
+			
+		dgAssert(jacobianMatrix[1][1] > dgFloat32(0.0f));
+		scale = jacobianMatrix[2][1] / jacobianMatrix[1][1];
+		jacobianMatrix[2][1] -= jacobianMatrix[1][1] * scale;
+		jacobianMatrix[2][2] -= jacobianMatrix[1][2] * scale;
+		gradientStep[2] -= gradientStep[1] * scale;
+
+		dgAssert(jacobianMatrix[2][2] > dgFloat32(0.0f));
+		gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
+		gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
+		gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
+
+		localOmega1 += gradientStep;
+
+		dgVector localAngularMomentum(body->m_mass * localOmega1);
+		dgVector localGyroTorque(localOmega1.CrossProduct3(localAngularMomentum));
+
+		dgVector omega (matrix.RotateVector(localOmega1));
+		dgFloat32 omegaMag2 = omega.DotProduct4(omega).GetScalar();
+		if (omegaMag2 > ((dgFloat32(0.0125f) * dgDEG2RAD) * (dgFloat32(0.0125f) * dgDEG2RAD))) {
+			dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
+			dgVector omegaAxis(omega.Scale4(invOmegaMag));
+			dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
+			body->m_gyroRotation = body->m_gyroRotation * dgQuaternion(omegaAxis, omegaAngle);
+			matrix = dgMatrix (body->m_gyroRotation, dgVector::m_wOne);
 		}
+
+		body->m_gyroToque = matrix.RotateVector(localGyroTorque);
 		omegaStep = localOmega1 - localOmega;
 	}
 
@@ -717,6 +748,15 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			joindDesc.m_rowsCount = jointInfo->m_pairCount;
 			joindDesc.m_rowMatrix = &matrixRow[jointInfo->m_pairStart];
 			constraint->JointAccelerations(&joindDesc);
+
+			dgJacobianMatrixElement* const rowMatrix = joindDesc.m_rowMatrix;
+			const dgVector& gyroTorque0 = constraint->m_body0->m_gyroToque;
+			const dgVector& gyroTorque1 = constraint->m_body1->m_gyroToque;
+			for (dgInt32 j = 0; j < jointInfo->m_pairCount; j ++) {
+				dgJacobianMatrixElement* const row = &rowMatrix[j];
+				dgVector gyroaccel(row->m_JMinv.m_jacobianM0.m_angular * gyroTorque0 + row->m_JMinv.m_jacobianM1.m_angular * gyroTorque1);
+				row->m_gyroAccel = gyroaccel.AddHorizontal().GetScalar();
+			}
 		}
 		joindDesc.m_firstPassCoefFlag = dgFloat32(1.0f);
 
@@ -753,16 +793,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 					if (!body->m_resting) {
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
-
-						dgFloat32 omegaMag2 = body->m_omega.DotProduct4(body->m_omega).GetScalar();
-						if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
-							dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
-							dgVector omegaAxis(body->m_omega.Scale4(invOmegaMag));
-							dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep4.GetScalar();
-							dgQuaternion rotation(omegaAxis, omegaAngle);
-							body->m_savedRotation = body->m_savedRotation * rotation;
-							//m_rotation.Scale(dgRsqrt(m_rotation.DotProduct(m_rotation)));
-						}
 					} else {
 						const dgVector velocStep2(velocStep.m_linear.DotProduct4(velocStep.m_linear));
 						const dgVector omegaStep2(velocStep.m_angular.DotProduct4(velocStep.m_angular));
