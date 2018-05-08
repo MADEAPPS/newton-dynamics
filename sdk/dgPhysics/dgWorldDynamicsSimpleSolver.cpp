@@ -589,15 +589,15 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	dgMatrix matrix (body->m_gyroRotation, dgVector::m_zero);
 	
 	dgVector localOmega (matrix.UnrotateVector(body->m_omega));
-	dgVector locallTorque (matrix.UnrotateVector(force.m_angular));
-	dgVector localAlphaStep ((locallTorque - localOmega.CrossProduct3(localOmega * mass)) * body->m_invMass);
+	dgVector localTorque (matrix.UnrotateVector(force.m_angular));
+	dgVector localAlphaStep ((localTorque - localOmega.CrossProduct3(localOmega * mass)) * body->m_invMass);
 	dgVector omegaStep (localAlphaStep * timestep);
 
 	const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
 	if (localAlphaStep.DotProduct4(localAlphaStep).GetScalar() > (localAlphaErr * localAlphaErr)) {
-		// Simple forward Euler in local space step no enough to cope with skew and high angular velocities
+		// Simple forward Euler in local space step not enough to cope with skew inertia and high angular velocities
 		// Using simple backward Euler in local space step, implicit integration in local space. 
-		// use angular velocity at dt, to solve equation
+		// keep velocity at dt const to solve equation
 		// f(w + dw) = f(w0) + f'(w + dw) * dw
 		// let dw = w * dt
 		// and calculating dw as the  dw = f(w) | dwx, dwy, dwz
@@ -613,7 +613,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 		dgVector dt(timestep * dgVector::m_half);
 		for (dgInt32 i = 0; i < 2; i++) {
 			dgVector gyroToque(localOmega1.CrossProduct3(localOmega1 * mass));
-			dgVector deltaToque(locallTorque - gyroToque);
+			dgVector deltaToque(localTorque - gyroToque);
 			dgVector gradientStep(deltaToque * dt);
 			dgVector dw(localOmega1 * dt);
 

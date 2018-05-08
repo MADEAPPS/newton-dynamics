@@ -307,7 +307,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			} else {
 				// Simple forward Euler in local space step no enough to cope with skew and high angular velocities
 				// Using simple backward Euler in local space step, implicit integration in local space. 
-				// use angular velocity at dt, to solve equation
+				// use angular velocity at dt, to solve equation keeping dt constant.
 				// f(w + dw) = f(w0) + f'(w + dw) * dw
 				// let dw = w * dt
 				// and calculating dw as the  dw = f(w) | dwx, dwy, dwz
