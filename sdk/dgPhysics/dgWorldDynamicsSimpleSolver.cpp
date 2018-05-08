@@ -590,9 +590,10 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	
 	dgVector localOmega (matrix.UnrotateVector(body->m_omega));
 	dgVector localTorque (matrix.UnrotateVector(force.m_angular));
-	dgVector localAlphaStep ((localTorque - localOmega.CrossProduct3(localOmega * mass)) * body->m_invMass);
+	dgVector localNetTorque (localTorque - localOmega.CrossProduct3(localOmega * mass));
+	dgVector localAlphaStep (localNetTorque * body->m_invMass);
 	dgVector omegaStep (localAlphaStep * timestep);
-
+dgTrace((" fix this bug !!!!!!\n"));
 	const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
 	if (localAlphaStep.DotProduct4(localAlphaStep).GetScalar() > (localAlphaErr * localAlphaErr)) {
 		// Simple forward Euler in local space step not enough to cope with skew inertia and high angular velocities
@@ -769,14 +770,15 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
-				if (!jointInfo->m_joint->IsSkeleton()) {
+				//if (!jointInfo->m_joint->IsSkeleton()) 
+				{
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
 					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 					accNorm += accel2;
 				}
 			}
 			for (dgInt32 j = 0; j < skeletonCount; j++) {
-				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
+//				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
 			}
 		}
 
