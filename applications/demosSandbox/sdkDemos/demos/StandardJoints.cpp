@@ -288,9 +288,11 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
 	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 2.0f, 0.0f), 1.0f, 0.5f);
-	NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.0f, 0.0f), 1.0f, 0.5f);
 
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	dVector damp(0.0f);
+	dVector omega(0.0f, 10.0f, 20.0f, 0.0f);
 
 	// align the object so that is looks nice
 	dMatrix matrix;
@@ -299,36 +301,37 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodySetMatrix(box1, &matrix[0][0]);
 	((DemoEntity*) NewtonBodyGetUserData(box1))->ResetMatrix (*scene, matrix);
 
+	// link the two boxes
+	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
+	joint1->SetHardMiddleAxis(0);
+
+	//	joint1->EnableLimits(true);
+	joint1->EnableLimits(false);
+	joint1->SetLimits(-5.0f * dPi, 2.0f * dPi);
+
+	NewtonBodySetOmega(box1, &omega[0]);
+	NewtonBodySetLinearDamping(box1, 0.0f);
+	NewtonBodySetAngularDamping(box1, &damp[0]);
+
+/*
+	NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.0f, 0.0f), 1.0f, 0.5f);
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	matrix = dYawMatrix(dPi * 0.5f) * matrix;
 	NewtonBodySetMatrix(box2, &matrix[0][0]);
 	((DemoEntity*) NewtonBodyGetUserData(box2))->ResetMatrix (*scene, matrix);
 
 	// link the two boxes
-	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
-	joint1->SetHardMiddleAxis(0);
-
-//	joint1->EnableLimits(true);
-	joint1->EnableLimits(false);
-	joint1->SetLimits (-5.0f * dPi, 2.0f * dPi);
-
-	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	dCustomDoubleHinge* const joint2 = new dCustomDoubleHinge(matrix, box2, box0);
 
-//	joint2->EnableLimits1(true);
+	joint2->EnableLimits1(true);
 	joint2->EnableLimits1(false);
 	joint2->SetLimits1 (-3.0f * dPi, 5.0f * dPi);
-
-	dVector damp(0.0f);
-	dVector omega (0.0f, 10.0f, 100.0f, 0.0f);
-	NewtonBodySetOmega(box1, &omega[0]);
 	NewtonBodySetOmega(box2, &omega[0]);
-	NewtonBodySetLinearDamping(box1, 0.0f);
-	NewtonBodySetAngularDamping(box1, &damp[0]);
 	NewtonBodySetLinearDamping(box2, 0.0f);
 	NewtonBodySetAngularDamping(box2, &damp[0]);
+*/
 }
 
 class JoesRagdollJoint: public dCustomBallAndSocket
@@ -1324,19 +1327,19 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
-//	AddDifferential(scene, dVector(-20.0f, 0.0f, 32.0f));
-	Add6DOF(scene, dVector(-20.0f, 0.0f, 32.0f));
-#if 0
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
-	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+//	Add6DOF(scene, dVector(-20.0f, 0.0f, 32.0f));
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  10.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 //	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
 
+	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 30.0f));
+
+#if 0
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1348,7 +1351,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
 	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 13.0f));
-	AddUniversal (scene, dVector (-20.0f, 0.0f, 17.0f));
+	AddDoubleHinge(scene, dVector (-20.0f, 0.0f, 17.0f));
 	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
