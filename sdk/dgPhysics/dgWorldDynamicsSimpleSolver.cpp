@@ -593,9 +593,12 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	dgVector localNetTorque (localTorque - localOmega.CrossProduct3(localOmega * mass));
 	dgVector localAlphaStep (localNetTorque * body->m_invMass);
 	dgVector omegaStep (localAlphaStep * timestep);
-dgTrace((" fix this bug !!!!!!\n"));
-	const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
-	if (localAlphaStep.DotProduct4(localAlphaStep).GetScalar() > (localAlphaErr * localAlphaErr)) {
+//	const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
+//	if (localAlphaStep.DotProduct4(localAlphaStep).GetScalar() > (localAlphaErr * localAlphaErr)) {
+	if (1) {
+		velocStep.m_angular = (body->m_invWorldInertiaMatrix.RotateVector(force.m_angular)) * timestep;
+		
+	} else {
 		// Simple forward Euler in local space step not enough to cope with skew inertia and high angular velocities
 		// Using simple backward Euler in local space step, implicit integration in local space. 
 		// keep velocity at dt const to solve equation
@@ -690,9 +693,11 @@ dgTrace((" fix this bug !!!!!!\n"));
 
 		body->m_gyroToque = matrix.RotateVector(localGyroTorque);
 		omegaStep = localOmega1 - localOmega;
+
+
+		velocStep.m_angular = matrix.RotateVector(omegaStep);
 	}
 
-	velocStep.m_angular = matrix.RotateVector(omegaStep);
 	velocStep.m_linear = force.m_linear.Scale4(body->m_invMass.m_w) * timestep;
 	return velocStep;
 }
@@ -758,7 +763,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			for (dgInt32 j = 0; j < jointInfo->m_pairCount; j ++) {
 				dgJacobianMatrixElement* const row = &rowMatrix[j];
 				dgVector gyroaccel(row->m_JMinv.m_jacobianM0.m_angular * gyroTorque0 + row->m_JMinv.m_jacobianM1.m_angular * gyroTorque1);
-				row->m_gyroAccel = gyroaccel.AddHorizontal().GetScalar();
+//				row->m_gyroAccel = gyroaccel.AddHorizontal().GetScalar();
+				row->m_gyroAccel = dgFloat32 (0.0f);
 			}
 		}
 		joindDesc.m_firstPassCoefFlag = dgFloat32(1.0f);
@@ -770,18 +776,16 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
-				//if (!jointInfo->m_joint->IsSkeleton()) 
-				{
+				if (!jointInfo->m_joint->IsSkeleton()) {
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
 					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 					accNorm += accel2;
 				}
 			}
 			for (dgInt32 j = 0; j < skeletonCount; j++) {
-//				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
+				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
 			}
 		}
-
 
 		if (timestepRK != dgFloat32(0.0f)) {
 			dgVector timestep4(timestepRK);

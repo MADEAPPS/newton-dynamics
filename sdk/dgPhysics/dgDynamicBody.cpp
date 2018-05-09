@@ -296,14 +296,14 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 {
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
-			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
-			dgVector localExternalTorque (m_matrix.UnrotateVector(m_externalTorque));
-			dgVector localAlphaStep ((localExternalTorque - localOmega.CrossProduct3(localOmega * m_mass)) * m_invMass);
+			dgVector localOmega(m_matrix.UnrotateVector(m_omega));
+			dgVector localTorque(m_matrix.UnrotateVector(m_externalTorque));
+			dgVector localAlpha((localTorque - localOmega.CrossProduct3(localOmega * m_mass)) * m_invMass);
+			const dgFloat32 localAlphaErr = dgFloat32 (0.005f);
 
-			const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
-			if (localAlphaStep.DotProduct4(localAlphaStep).GetScalar() < (localAlphaErr * localAlphaErr)) {
-				// omega step is very small no point on doing implicit integration 
-				localOmega += localAlphaStep.Scale4(timestep);
+			//if (m_uniformInertia || (localAlpha.DotProduct4(localAlpha).GetScalar() < (localAlphaErr * localAlphaErr))) {
+			if (localAlpha.DotProduct4(localAlpha).GetScalar() < (localAlphaErr * localAlphaErr)) {
+				localOmega += localAlpha.Scale4(timestep);
 			} else {
 				// Simple forward Euler in local space step no enough to cope with skew and high angular velocities
 				// Using simple backward Euler in local space step, implicit integration in local space. 
@@ -349,7 +349,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				// that is, calculate derivative at half the time step instead of the end, similar to mid point Euler
 				{
 					// calculate gradient
-					dgVector deltaToque(localExternalTorque - localOmega.CrossProduct3(localOmega * m_mass));
+					dgVector deltaToque(localTorque - localOmega.CrossProduct3(localOmega * m_mass));
 					dgVector gradientStep(deltaToque.Scale4(timestep));
 #endif
 					dgVector dw(localOmega.Scale4(dt));
@@ -407,7 +407,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			}
 
 			m_accel = m_externalForce.Scale4(m_invMass.m_w);
-			m_alpha = m_matrix.RotateVector(localAlphaStep);
+			m_alpha = m_matrix.RotateVector(localAlpha);
 
 			m_veloc += m_accel.Scale4(timestep);
 			m_omega = m_matrix.RotateVector(localOmega);

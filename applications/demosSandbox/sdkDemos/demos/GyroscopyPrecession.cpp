@@ -307,7 +307,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
-
+/*
 	// should spins very slowly, with a tilt angle of 45 degrees
 	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -8.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
 
@@ -323,10 +323,10 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	// a thin disk should precess with an angular velocity twice the spin rate, 
 	// this is also known as the Frisbee theorem
 	FrisbeePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
-
+*/
 	// intermediate Axis Theorem
 	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  0.0f, 1.0f), dVector (0.01f, 0.01f, 20.0f), 0.25f, 2.0f);
-	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  2.0f, 1.0f), dVector (0.01f, 20.0f, 0.01f), 0.25f, 2.0f);
+/*	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  2.0f, 1.0f), dVector (0.01f, 20.0f, 0.01f), 0.25f, 2.0f);
 	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  4.0f, 1.0f), dVector (20.0f, 0.01f, 0.01f), 0.25f, 2.0f);
 
 	//the effect only happens is there a residual angular velocity on the other two axis
@@ -350,7 +350,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 		PhiTop(scene, dVector(8.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 10.0f, 1.0f);
 //		TippeTop(scene, dVector(-6.0f, 0.3f, -spacing * i - spacing, 1.0f), 0.0f, 0.0f, 0.0f);
 	}
-
+*/
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);

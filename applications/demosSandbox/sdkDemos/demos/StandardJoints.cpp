@@ -293,6 +293,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 
 	dVector damp(0.0f);
 	dVector omega(0.0f, 10.0f, 20.0f, 0.0f);
+//	dVector omega (0.0f, 10.0f, 100.0f, 0.0f);
 
 	// align the object so that is looks nice
 	dMatrix matrix;
