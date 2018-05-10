@@ -735,7 +735,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	dgInt32 skeletonCount = 0;
 	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
-
+/*
 	for (dgInt32 i = 1; i < bodyCount; i++) {
 		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 		dgSkeletonContainer* const container = body->GetSkeleton();
@@ -747,7 +747,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
 		}
 	}
-
+*/
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
 
@@ -777,14 +777,15 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
-				if (!jointInfo->m_joint->IsSkeleton()) {
+				//if (!jointInfo->m_joint->IsSkeleton()) 
+				{
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
 					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 					accNorm += accel2;
 				}
 			}
 			for (dgInt32 j = 0; j < skeletonCount; j++) {
-				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
+				//skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
 			}
 		}
 

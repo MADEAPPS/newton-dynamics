@@ -47,6 +47,11 @@ class dCustomDoubleHinge: public dCustomHinge
 	void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
+void SubmitConstraints(dFloat timestep, int threadIndex)
+{
+//	dCustomHinge::SubmitConstraints(timestep, threadIndex);
+}
+
 	dAngularIntegration m_curJointAngle1;
 	dFloat m_minAngle1;
 	dFloat m_maxAngle1;
