@@ -596,7 +596,8 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 //	const dgFloat32 localAlphaErr = dgFloat32 (0.01f);
 //	if (localAlphaStep.DotProduct4(localAlphaStep).GetScalar() > (localAlphaErr * localAlphaErr)) {
 	if (1) {
-		velocStep.m_angular = (body->m_invWorldInertiaMatrix.RotateVector(force.m_angular)) * timestep;
+		//velocStep.m_angular = (body->m_invWorldInertiaMatrix.RotateVector(force.m_angular)) * timestep;
+		velocStep.m_angular = (body->m_invWorldInertiaMatrix.RotateVector(localTorque)) * timestep;
 		
 	} else {
 		// Simple forward Euler in local space step not enough to cope with skew inertia and high angular velocities
