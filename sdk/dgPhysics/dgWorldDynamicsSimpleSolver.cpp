@@ -586,7 +586,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 {
 	dgJacobian velocStep;
 	const dgVector& mass = body->m_mass;
-	dgMatrix matrix (body->m_gyroRotation, dgVector::m_zero);
+	const dgMatrix& matrix = body->m_matrix;
 	
 	dgVector localOmega (matrix.UnrotateVector(body->m_omega));
 	dgVector localTorque (matrix.UnrotateVector(force.m_angular));

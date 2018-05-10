@@ -240,7 +240,6 @@ class dgBody
 	dgVector m_impulseForce;	
 	dgVector m_impulseTorque;	
 	dgVector m_gyroToque;
-	dgQuaternion m_gyroRotation;
 
 	dgInt32 m_criticalSectionLock;
 	union 
