@@ -286,10 +286,10 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size(1.0f, 1.0f, 1.0f);
-	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
+//	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
 	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 2.0f, 0.0f), 1.0f, 0.5f);
 
-	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
+//	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	dVector damp(0.0f);
 	dVector omega(0.0f, 10.0f, 20.0f, 0.0f);
@@ -302,18 +302,18 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodySetMatrix(box1, &matrix[0][0]);
 	((DemoEntity*) NewtonBodyGetUserData(box1))->ResetMatrix (*scene, matrix);
 
-	// link the two boxes
-	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
-	joint1->SetHardMiddleAxis(0);
-
-	//	joint1->EnableLimits(true);
-	joint1->EnableLimits(false);
-	joint1->SetLimits(-5.0f * dPi, 2.0f * dPi);
-
 	NewtonBodySetOmega(box1, &omega[0]);
 	NewtonBodySetLinearDamping(box1, 0.0f);
 	NewtonBodySetAngularDamping(box1, &damp[0]);
+
+	// link the two boxes
+	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+//	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
+//	joint1->SetHardMiddleAxis(0);
+//	//	joint1->EnableLimits(true);
+//	joint1->EnableLimits(false);
+//	joint1->SetLimits(-5.0f * dPi, 2.0f * dPi);
+
 
 /*
 	NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.0f, 0.0f), 1.0f, 0.5f);

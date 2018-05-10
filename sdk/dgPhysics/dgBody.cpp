@@ -322,6 +322,9 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dgAssert (m_matrix.TestOrthogonal());
+
+dgVector xxx (CalculateAngularMomentum());
+xxx.Trace("L =");
 }
 
 
@@ -484,7 +487,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 			}
 		}
 
-		//m_uniformInertia = 1;
 	} else {
 		Ixx = dgAbs (Ixx);
 		Iyy = dgAbs (Iyy);
@@ -512,11 +514,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 			dgBodyMasterList& masterList (*m_world);
 			masterList.RotateToEnd (m_masterNode);
 		}
-		//bool uniformInertia = m_mass.m_x * m_invMass.m_y > dgFloat32 (0.999f);
-		//uniformInertia = uniformInertia && (m_mass.m_x * m_invMass.m_y < dgFloat32 (1.0f / 0.999f));
-		//uniformInertia = uniformInertia && (m_mass.m_x * m_invMass.m_z > dgFloat32 (0.999f));
-		//uniformInertia = uniformInertia && (m_mass.m_x * m_invMass.m_z < dgFloat32 (1.0f / 0.999f));
-		//m_uniformInertia = uniformInertia ? 1 : 0;
 	}
 
 

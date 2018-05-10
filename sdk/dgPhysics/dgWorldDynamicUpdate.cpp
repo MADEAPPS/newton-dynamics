@@ -900,8 +900,6 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 	const dgFloat32 accelFreeze = world->m_freezeAccel2 * ((cluster->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32(0.05f) : dgFloat32(1.0f));
 	dgVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32(0.0f));
 
-//static int xxxxx;
-//xxxxx++;
 	bool stackSleeping = true;
 	//bool isClusterResting = true;
 	dgInt32 sleepCounter = 10000;
@@ -910,7 +908,6 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBody));
 
 		body->m_equilibrium = 1;
-		//dgVector isMovingMask((body->m_veloc + body->m_omega + body->m_accel + body->m_alpha) & dgVector::m_signMask);
 		dgVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 		if ((isMovingMask.TestZero().GetSignMask() & 7) != 7) {
 			dgAssert(body->m_invMass.m_w);

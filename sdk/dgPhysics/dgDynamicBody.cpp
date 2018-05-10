@@ -301,7 +301,6 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			dgVector localAlpha((localTorque - localOmega.CrossProduct3(localOmega * m_mass)) * m_invMass);
 			const dgFloat32 localAlphaErr = dgFloat32 (0.005f);
 
-			//if (m_uniformInertia || (localAlpha.DotProduct4(localAlpha).GetScalar() < (localAlphaErr * localAlphaErr))) {
 			if (localAlpha.DotProduct4(localAlpha).GetScalar() < (localAlphaErr * localAlphaErr)) {
 				localOmega += localAlpha.Scale4(timestep);
 			} else {
@@ -336,74 +335,66 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				TextCell["dwz/dwz ="], D[Wzz, { wz, 1 }]}]
 				*/
 
-				dgFloat32 dt = dgFloat32 (0.5f) * timestep;
-#if 0
-				//two step of implicit integration 
-				for (dgInt32 i = 0; i < 2; i ++) 
-				{
-					// calculate gradient
-					dgVector deltaToque (localExternalTorque - localOmega.CrossProduct3(localOmega * m_mass));
-					dgVector gradientStep(deltaToque.Scale4(dt));
-#else
-				//Note: two step of implicit integration loses too much energy, it is better to use a semi implicit
-				// that is, calculate derivative at half the time step instead of the end, similar to mid point Euler
-				{
-					// calculate gradient
-					dgVector deltaToque(localTorque - localOmega.CrossProduct3(localOmega * m_mass));
-					dgVector gradientStep(deltaToque.Scale4(timestep));
-#endif
-					dgVector dw(localOmega.Scale4(dt));
-					dgFloat32 jacobianMatrix[3][3];
-					// calculates Jacobian matrix
-					//dWx / dwx = Ix
-					//dWx / dwy = (Iz - Iy) * wz * dt
-					//dWx / dwz = (Iz - Iy) * wy * dt
-					jacobianMatrix[0][0] = m_mass[0];
-					jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
-					jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
+				//Note: two step of implicit integration loses too much energy, 
+				//it is better to use a semi implicit that is, 
+				//calculate derivative at half the time step instead of the end, similar to mid point Euler
 
-					//dWy / dwx = (Ix - Iz) * wz * dt
-					//dWy / dwy = Iy				 
-					//dWy / dwz = (Ix - Iz) * wx * dt
-					jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
-					jacobianMatrix[1][1] = m_mass[1];
-					jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
+				// calculate gradient at a full time step
+				dgVector deltaToque(localTorque - localOmega.CrossProduct3(localOmega * m_mass));
+				dgVector gradientStep(deltaToque.Scale4(timestep));
 
-					//dWz / dwx = (Iy - Ix) * wy * dt 
-					//dWz / dwy = (Iy - Ix) * wx * dt 
-					//dWz / dwz = Iz
-					jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
-					jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
-					jacobianMatrix[2][2] = m_mass[2];
+				// derivative at half time step.
+				dgVector dw(localOmega.Scale4(dgFloat32(0.5f) * timestep));
+				dgFloat32 jacobianMatrix[3][3];
+				// calculates Jacobian matrix
+				//dWx / dwx = Ix
+				//dWx / dwy = (Iz - Iy) * wz * dt
+				//dWx / dwz = (Iz - Iy) * wy * dt
+				jacobianMatrix[0][0] = m_mass[0];
+				jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
+				jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
 
-					// since the matrix is well behave, we can unroll Gauss elimination with back substitution 
-					dgAssert (jacobianMatrix[0][0] > dgFloat32 (0.0f));
-					dgFloat32 den = dgFloat32 (1.0f) / jacobianMatrix[0][0];
-					dgFloat32 scale = jacobianMatrix[1][0] * den;
-					jacobianMatrix[1][0] -= jacobianMatrix[0][0] * scale;
-					jacobianMatrix[1][1] -= jacobianMatrix[0][1] * scale;
-					jacobianMatrix[1][2] -= jacobianMatrix[0][2] * scale;
-					gradientStep[1] -= gradientStep[0] * scale;
+				//dWy / dwx = (Ix - Iz) * wz * dt
+				//dWy / dwy = Iy				 
+				//dWy / dwz = (Ix - Iz) * wx * dt
+				jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
+				jacobianMatrix[1][1] = m_mass[1];
+				jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
 
-					scale = jacobianMatrix[2][0] * den;
-					jacobianMatrix[2][0] -= jacobianMatrix[0][0] * scale;
-					jacobianMatrix[2][1] -= jacobianMatrix[0][1] * scale;
-					jacobianMatrix[2][2] -= jacobianMatrix[0][2] * scale;
-					gradientStep[2] -= gradientStep[0] * scale;
+				//dWz / dwx = (Iy - Ix) * wy * dt 
+				//dWz / dwy = (Iy - Ix) * wx * dt 
+				//dWz / dwz = Iz
+				jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
+				jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
+				jacobianMatrix[2][2] = m_mass[2];
 
-					dgAssert(jacobianMatrix[1][1] > dgFloat32(0.0f));
-					scale = jacobianMatrix[2][1] / jacobianMatrix[1][1];
-					jacobianMatrix[2][1] -= jacobianMatrix[1][1] * scale;
-					jacobianMatrix[2][2] -= jacobianMatrix[1][2] * scale;
-					gradientStep[2] -= gradientStep[1] * scale;
+				// since the matrix is well behave, we can unroll Gauss elimination with back substitution 
+				dgAssert (jacobianMatrix[0][0] > dgFloat32 (0.0f));
+				dgFloat32 den = dgFloat32 (1.0f) / jacobianMatrix[0][0];
+				dgFloat32 scale = jacobianMatrix[1][0] * den;
+				jacobianMatrix[1][0] -= jacobianMatrix[0][0] * scale;
+				jacobianMatrix[1][1] -= jacobianMatrix[0][1] * scale;
+				jacobianMatrix[1][2] -= jacobianMatrix[0][2] * scale;
+				gradientStep[1] -= gradientStep[0] * scale;
 
-					dgAssert(jacobianMatrix[2][2] > dgFloat32(0.0f));
-					gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
-					gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
-					gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
+				scale = jacobianMatrix[2][0] * den;
+				jacobianMatrix[2][0] -= jacobianMatrix[0][0] * scale;
+				jacobianMatrix[2][1] -= jacobianMatrix[0][1] * scale;
+				jacobianMatrix[2][2] -= jacobianMatrix[0][2] * scale;
+				gradientStep[2] -= gradientStep[0] * scale;
 
-					localOmega += gradientStep;
-				}
+				dgAssert(jacobianMatrix[1][1] > dgFloat32(0.0f));
+				scale = jacobianMatrix[2][1] / jacobianMatrix[1][1];
+				jacobianMatrix[2][1] -= jacobianMatrix[1][1] * scale;
+				jacobianMatrix[2][2] -= jacobianMatrix[1][2] * scale;
+				gradientStep[2] -= gradientStep[1] * scale;
+
+				dgAssert(jacobianMatrix[2][2] > dgFloat32(0.0f));
+				gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
+				gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
+				gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
+
+				localOmega += gradientStep;
 			}
 
 			m_accel = m_externalForce.Scale4(m_invMass.m_w);
