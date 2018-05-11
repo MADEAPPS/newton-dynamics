@@ -68,7 +68,8 @@ class dParserCompiler
 	class dGotoEntry;
 	class ActionEntry;
 	class dTransition;
-	class dDictionary;
+//	class dDictionary;
+	class dSymbolName;
 	class dActionEntry;
 	class dSentenceSymbol;
 	class dProductionRule;
@@ -87,7 +88,7 @@ class dParserCompiler
 	void ReplaceMacro (dString& data, const dString& newName, const dString& macro) const;
 	void ReplaceAllMacros (dString& data, const dString& newName, const dString& macro) const;
 
-	void ScanGrammarFile(const dString& inputRules, dProductionRule& rules, dTree<dTokenInfo, dCRCTYPE>& symbolList, dOperatorsPrecedence& operatorPrecence,
+	void ScanGrammarFile(const dString& inputRules, dProductionRule& rules, dTree<dTokenInfo, dSymbolName>& symbolList, dOperatorsPrecedence& operatorPrecence,
 						 dString& userCodeBlock, dString& userVariableClass, dString& endUserCode, int& lastTokenEnum);
 	dToken ScanGrammarRule(dParserLexical& lexical, dProductionRule& rules, dTree<dTokenInfo, dCRCTYPE>& symbolList, int& ruleNumber, int& tokenEnumeration, const dOperatorsPrecedence& operatorPrecence);
 
@@ -98,7 +99,7 @@ class dParserCompiler
 	dState* Goto (const dState* const state, dCRCTYPE symbol, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
 	dState* Closure (const dList<dItem>& itemSet, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
 	void BuildParsingTable (const dTree<dState*, dCRCTYPE>& stateList, dCRCTYPE startSymbol, const dOperatorsPrecedence& operatorPrecence) const;
-	void CanonicalItemSets (dTree<dState*, dCRCTYPE>& states, const dProductionRule& rules, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dOperatorsPrecedence& operatorPrecence, const dString& fileName);
+	void CanonicalItemSets (dTree<dState*, dSymbolName>& states, const dProductionRule& rules, const dTree<dTokenInfo, dSymbolName>& symbolList, const dOperatorsPrecedence& operatorPrecence, const dString& fileName);
 
 	void GenerateHeaderFile (const dString& className, const dString& scannerClassName, const char* const outputFileName, 
 							 const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dString& userVariableClass); 
