@@ -97,7 +97,7 @@ class dParserCompiler
 	void First (dCRCTYPE symbol, dTree<int, dCRCTYPE>& symbolListMark, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap, dTree<int, dCRCTYPE>& firstSetOut) const;
 	void First (const dList<dCRCTYPE>& symbolSet, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap, dTree<int, dCRCTYPE>& firstSetOut) const;
 	dState* Goto (const dState* const state, dCRCTYPE symbol, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
-	dState* Closure (const dList<dItem>& itemSet, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
+	dState* Closure (const dList<dItem>& itemSet, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap) const;
 	void BuildParsingTable (const dTree<dState*, dCRCTYPE>& stateList, dCRCTYPE startSymbol, const dOperatorsPrecedence& operatorPrecence) const;
 	void CanonicalItemSets (dTree<dState*, dSymbolName>& states, const dProductionRule& rules, const dTree<dTokenInfo, dSymbolName>& symbolList, const dOperatorsPrecedence& operatorPrecence, const dString& fileName);
 
