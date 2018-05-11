@@ -90,12 +90,10 @@ class dParserCompiler
 
 	void ScanGrammarFile(const dString& inputRules, dProductionRule& rules, dTree<dTokenInfo, dSymbolName>& symbolList, dOperatorsPrecedence& operatorPrecence,
 						 dString& userCodeBlock, dString& userVariableClass, dString& endUserCode, int& lastTokenEnum);
-	dToken ScanGrammarRule(dParserLexical& lexical, dProductionRule& rules, dTree<dTokenInfo, dCRCTYPE>& symbolList, int& ruleNumber, int& tokenEnumeration, const dOperatorsPrecedence& operatorPrecence);
-
-	
-	bool DoesSymbolDeriveEmpty (dCRCTYPE symbol, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const ;
-	void First (dCRCTYPE symbol, dTree<int, dCRCTYPE>& symbolListMark, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap, dTree<int, dCRCTYPE>& firstSetOut) const;
-	void First (const dList<dCRCTYPE>& symbolSet, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap, dTree<int, dCRCTYPE>& firstSetOut) const;
+	dToken ScanGrammarRule(dParserLexical& lexical, dProductionRule& rules, dTree<dTokenInfo, dSymbolName>& symbolList, int& ruleNumber, int& tokenEnumeration, const dOperatorsPrecedence& operatorPrecence);
+	bool DoesSymbolDeriveEmpty (dSymbolName symbol, const dTree<dList<void*>, dSymbolName>& ruleMap) const ;
+	void First (dSymbolName symbol, dTree<int, dSymbolName>& symbolListMark, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap, dTree<int, dSymbolName>& firstSetOut) const;
+	void First (const dList<dSymbolName>& symbolSet, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap, dTree<int, dSymbolName>& firstSetOut) const;
 	dState* Goto (const dState* const state, dCRCTYPE symbol, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
 	dState* Closure (const dList<dItem>& itemSet, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap) const;
 	void BuildParsingTable (const dTree<dState*, dCRCTYPE>& stateList, dCRCTYPE startSymbol, const dOperatorsPrecedence& operatorPrecence) const;
