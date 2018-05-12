@@ -175,7 +175,6 @@ class dParserCompiler::dSymbol
 	dToken m_token;
 	dSymbolName m_name;
 	dString m_operatorPrecendeceOverrride;
-//	dCRCTYPE m_nameCRC;
 };
 
 
@@ -253,8 +252,6 @@ class dParserCompiler::dItem
 	}
 
 	int m_indexMarker;
-//	dCRCTYPE m_lookAheadSymbolCRC;
-//	dCRCTYPE m_lastOperatorSymbolCRC;
 	dSymbolName m_lookAheadSymbolName;
 	dSymbolName m_lastOperatorSymbolName;
 	dProductionRule::dListNode* m_ruleNode;
@@ -298,7 +295,6 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 			if (m_lookAheadSymbol < key.m_lookAheadSymbol) {
 				return true;	
 			} else if (m_lookAheadSymbol == key.m_lookAheadSymbol) {
-				//if (m_rule < key.m_rule) {
                 if (m_rule->GetInfo().m_ruleNumber < key.m_rule->GetInfo().m_ruleNumber) {
 					return true;	
 				} 
@@ -311,7 +307,6 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 			if (m_lookAheadSymbol > key.m_lookAheadSymbol) {
 				return true;	
 			} else if (m_lookAheadSymbol == key.m_lookAheadSymbol){
-				//if (m_rule > key.m_rule) {
                 if (m_rule->GetInfo().m_ruleNumber > key.m_rule->GetInfo().m_ruleNumber) {
 					return true;	
 				} 
@@ -351,7 +346,6 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 					m_hasErroItem = true;
 				}
 			}
-
 		}
 
 		dList<dState::dListNode*>& bucket = mapNode->GetInfo();
@@ -370,18 +364,15 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		int keylength = 0;
 		char key[1024 * 64];
 		key[0] = 0;
-		//dCRCTYPE key = 0;
 		for (dState::dListNode* itemNode = GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
 			dItem& item = itemNode->GetInfo();
 			int index = 0;
-			//key = dCRC64 (item.m_lookAheadSymbolName.GetStr(), key);
 			dAssert((keylength + item.m_lookAheadSymbolName.GetString().Size()) < sizeof(key));
 			strcpy(&key[keylength], item.m_lookAheadSymbolName.GetString().GetStr());
 			keylength += item.m_lookAheadSymbolName.GetString().Size();
 
 			for (dRuleInfo::dListNode* node = item.m_ruleNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
 				if (index == item.m_indexMarker) {
-					//key = dCRC64 (".", key);
 					dAssert((keylength + 1) < sizeof(key));
 					key[keylength] = '.';
 					keylength++;
@@ -403,7 +394,6 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 				key[keylength] = 0;
 			}
 		}
-		//m_key = key;
 		m_key = key;
 	}
 
@@ -542,7 +532,6 @@ dParserCompiler::dParserCompiler(const dString& inputRules, const char* const ou
 	int lastTerminalToken;
 	dProductionRule ruleList;
 	dOperatorsPrecedence operatorPrecedence;
-//	dTree<dTokenInfo, dCRCTYPE> symbolList;
 	dTree<dTokenInfo, dSymbolName> symbolList;
 	dString userCodeBlock;
 	dString userVariableClass ("");
@@ -1098,7 +1087,8 @@ void dParserCompiler::First (
 			deriveEmpty = false;  
 			for (iter.Begin(); iter; iter ++) {
 				dSymbolName symbol = iter.GetKey();
-				if (symbol.GetString() == "") {
+				static dSymbolName empty("");
+				if (symbol == empty) {
 					deriveEmpty = true;  
 				} else {
 					firstSetOut.Insert(0, symbol);
@@ -1115,7 +1105,6 @@ void dParserCompiler::First (
 		First (symbol, symbolListMark, symbolList, ruleMap, firstSetOut);
 	}
 }
-
 
 void dParserCompiler::First (
 	dSymbolName symbolOuter,
