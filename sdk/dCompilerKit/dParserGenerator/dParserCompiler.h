@@ -94,7 +94,7 @@ class dParserCompiler
 	bool DoesSymbolDeriveEmpty (dSymbolName symbol, const dTree<dList<void*>, dSymbolName>& ruleMap) const ;
 	void First (dSymbolName symbol, dTree<int, dSymbolName>& symbolListMark, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap, dTree<int, dSymbolName>& firstSetOut) const;
 	void First (const dList<dSymbolName>& symbolSet, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap, dTree<int, dSymbolName>& firstSetOut) const;
-	dState* Goto (const dState* const state, dCRCTYPE symbol, const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dTree<dList<void*>, dCRCTYPE>& ruleMap) const;
+	dState* Goto (const dState* const state, const dSymbolName& symbol, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap) const;
 	dState* Closure (const dList<dItem>& itemSet, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap) const;
 	void BuildParsingTable (const dTree<dState*, dCRCTYPE>& stateList, dCRCTYPE startSymbol, const dOperatorsPrecedence& operatorPrecence) const;
 	void CanonicalItemSets (dTree<dState*, dSymbolName>& states, const dProductionRule& rules, const dTree<dTokenInfo, dSymbolName>& symbolList, const dOperatorsPrecedence& operatorPrecence, const dString& fileName);

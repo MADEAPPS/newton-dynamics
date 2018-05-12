@@ -86,11 +86,6 @@ class dParserCompiler::dSymbolName
 	{
 	}
 
-	const void* GetPointer() const
-	{
-		return m_name;
-	}
-
 	const dString& GetString() const
 	{
 		dAssert(m_name);
@@ -99,7 +94,17 @@ class dParserCompiler::dSymbolName
 
 	const char* GetStr() const
 	{
-		return m_name ? m_name->GetKey().GetStr() : NULL;
+		return GetString().GetStr();
+	}
+
+	bool operator== (const dSymbolName& src) const
+	{
+		return m_name->GetKey() == src.m_name->GetKey();
+	}
+
+	bool operator!= (const dSymbolName& src) const
+	{
+		return m_name->GetKey() != src.m_name->GetKey();
 	}
 
 	bool operator< (const dSymbolName& src) const
@@ -119,7 +124,7 @@ class dParserCompiler::dSymbolName
 		return dictionary;
 	}
 
-	dDictionary::dTreeNode* m_name;
+	const dDictionary::dTreeNode* m_name;
 };
 
 
@@ -169,7 +174,7 @@ class dParserCompiler::dSymbol
 	dTokenType m_type;
 	dToken m_token;
 	dSymbolName m_name;
-	dString m_operatorPrecendeceOverright;
+	dString m_operatorPrecendeceOverrride;
 //	dCRCTYPE m_nameCRC;
 };
 
@@ -215,9 +220,9 @@ class dParserCompiler::dProductionRule: public dList<dParserCompiler::dRuleInfo>
 
 	dListNode* Find (dSymbolName name) const
 	{
-		const void* const key = name.GetPointer();
+		//const void* const key = name.GetPointer();
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			if (node->GetInfo().m_name.GetPointer() == key) {
+			if (node->GetInfo().m_name == name) {
 				return node;
 			}
 		}
@@ -230,8 +235,8 @@ class dParserCompiler::dProductionRule: public dList<dParserCompiler::dRuleInfo>
 class dParserCompiler::dTransition
 {
 	public:
-	dString m_name;
-	dCRCTYPE m_symbol;
+	dSymbolName m_name;
+	dSymbolName m_symbol;
 	dTokenType m_type;
 	dState* m_targetState;
 };
@@ -292,7 +297,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		{	
 			if (m_lookAheadSymbol < key.m_lookAheadSymbol) {
 				return true;	
-			} else if (m_lookAheadSymbol.GetPointer() == key.m_lookAheadSymbol.GetPointer()) {
+			} else if (m_lookAheadSymbol == key.m_lookAheadSymbol) {
 				//if (m_rule < key.m_rule) {
                 if (m_rule->GetInfo().m_ruleNumber < key.m_rule->GetInfo().m_ruleNumber) {
 					return true;	
@@ -305,7 +310,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		{
 			if (m_lookAheadSymbol > key.m_lookAheadSymbol) {
 				return true;	
-			} else if (m_lookAheadSymbol.GetPointer() == key.m_lookAheadSymbol.GetPointer()){
+			} else if (m_lookAheadSymbol == key.m_lookAheadSymbol){
 				//if (m_rule > key.m_rule) {
                 if (m_rule->GetInfo().m_ruleNumber > key.m_rule->GetInfo().m_ruleNumber) {
 					return true;	
@@ -342,7 +347,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 			const dRuleInfo& ruleInfo = item.m_ruleNode->GetInfo();
 			if (ruleInfo.GetCount()) {
 				const dSymbol& symbol = ruleInfo.GetFirst()->GetInfo();
-				if (symbol.m_name.GetPointer() == errorName.GetPointer()) {
+				if (symbol.m_name == errorName) {
 					m_hasErroItem = true;
 				}
 			}
@@ -362,27 +367,44 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 
 	void CalculateKey ()
 	{
-		dAssert(0);
-/*
-		dCRCTYPE key = 0;
+		int keylength = 0;
+		char key[1024 * 64];
+		key[0] = 0;
+		//dCRCTYPE key = 0;
 		for (dState::dListNode* itemNode = GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
 			dItem& item = itemNode->GetInfo();
 			int index = 0;
-			key = dCRC64 (item.m_lookAheadSymbolName.GetStr(), key);
+			//key = dCRC64 (item.m_lookAheadSymbolName.GetStr(), key);
+			dAssert((keylength + item.m_lookAheadSymbolName.GetString().Size()) < sizeof(key));
+			strcpy(&key[keylength], item.m_lookAheadSymbolName.GetString().GetStr());
+			keylength += item.m_lookAheadSymbolName.GetString().Size();
+
 			for (dRuleInfo::dListNode* node = item.m_ruleNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
 				if (index == item.m_indexMarker) {
-					key = dCRC64 (".", key);
+					//key = dCRC64 (".", key);
+					dAssert((keylength + 1) < sizeof(key));
+					key[keylength] = '.';
+					keylength++;
+					key[keylength] = 0;
 				}
+
 				const dSymbol& info = node->GetInfo();
-				key = dCRC64 (info.m_name.GetStr(), key);
+				//key = dCRC64 (info.m_name.GetStr(), key);
+				dAssert((keylength + info.m_name.GetString().Size()) < sizeof(key));
+				strcpy(&key[keylength], info.m_name.GetString().GetStr());
+				keylength += info.m_name.GetString().Size();
 				index ++;
 			}
 			if (item.m_indexMarker == item.m_ruleNode->GetInfo().GetCount()) {
-				key = dCRC64 (".", key);
+				//key = dCRC64 (".", key);
+				dAssert((keylength + 1) < sizeof(key));
+				key[keylength] = '.';
+				keylength++;
+				key[keylength] = 0;
 			}
 		}
+		//m_key = key;
 		m_key = key;
-*/
 	}
 
 	dListNode* FindItem (dProductionRule::dListNode* const rule, int marker, dSymbolName lookAheadSymbol) const
@@ -396,7 +418,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 				const dItem& item = nodeItem->GetInfo();
 				if (item.m_indexMarker == marker) {
 					dAssert(item.m_ruleNode == rule);
-					dAssert(item.m_lookAheadSymbolName.GetPointer() == lookAheadSymbol.GetPointer());
+					dAssert(item.m_lookAheadSymbolName == lookAheadSymbol);
 					return nodeItem;
 				}
 			}
@@ -406,8 +428,6 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 
 	void Trace(FILE* const debugFile) const
 	{
-		dAssert(0);
-/*
 		if (debugFile) {
 			fprintf(debugFile, "state %d:\n", m_number);
 			for (dState::dListNode* itemNode = GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
@@ -440,7 +460,6 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 			}
 			fprintf(debugFile, "\n");
 		}
-*/
 	}
 
 	dSymbolName m_key;
@@ -463,9 +482,9 @@ class dParserCompiler::dOperatorsAssociation: public dList <dSymbolName>
 
 	bool FindOperator(dSymbolName symbol) const
 	{
-		const void* const key = symbol.GetPointer();
+		//const void* const key = symbol.GetPointer();
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			if (key == node->GetInfo().GetPointer()) {
+			if (symbol == node->GetInfo()) {
 				return true;
 			}
 		}
@@ -493,29 +512,26 @@ class dParserCompiler::dOperatorsPrecedence: public dList <dOperatorsAssociation
 
 	void SaveLastOperationSymbol (const dState* const state) const
 	{
-		dAssert(0);
-/*
 		for (dState::dListNode* node = state->GetFirst(); node; node = node->GetNext()) {
 			dItem& item = node->GetInfo();
 			const dRuleInfo& ruleInfo = item.m_ruleNode->GetInfo();
 			for (dRuleInfo::dListNode* infoSymbolNode = ruleInfo.GetFirst(); infoSymbolNode; infoSymbolNode = infoSymbolNode->GetNext()) {
 				const dSymbol& infoSymbol = infoSymbolNode->GetInfo();
-				if (infoSymbol.m_operatorPrecendeceOverright.Size()) {
-					dCRCTYPE crc = dCRC64(infoSymbol.m_operatorPrecendeceOverright.GetStr());
-					if (FindAssociation(crc)) {
-						item.m_lastOperatorSymbolCRC = crc;
-						item.m_lastOperatorSymbolName = infoSymbol.m_operatorPrecendeceOverright;
+				if (infoSymbol.m_operatorPrecendeceOverrride.Size()) {
+					//dSymbolName crc (infoSymbol.m_operatorPrecendeceOverrride);
+					if (FindAssociation(infoSymbol.m_operatorPrecendeceOverrride)) {
+						//item.m_lastOperatorSymbolCRC = crc;
+						item.m_lastOperatorSymbolName = infoSymbol.m_operatorPrecendeceOverrride;
 					}
 
 				} else {
-					if (FindAssociation(infoSymbol.m_nameCRC)) {
-						item.m_lastOperatorSymbolCRC = infoSymbol.m_nameCRC;
+					if (FindAssociation(infoSymbol.m_name)) {
+						//item.m_lastOperatorSymbolCRC = infoSymbol.m_nameCRC;
 						item.m_lastOperatorSymbolName = infoSymbol.m_name;
 					}
 				}
 			}
 		}
-*/
 	}
 };
 
@@ -782,7 +798,8 @@ void dParserCompiler::ScanGrammarFile(
 	}
 
 	dProductionRule::dListNode* firtRuleNode = ruleList.GetFirst();	
-	if (startSymbol.GetPointer() != dSymbolName("").GetPointer()) {
+	dSymbolName empty;
+	if (startSymbol != empty) {
 		firtRuleNode = ruleList.Find (startSymbol);	
 	}
 
@@ -873,7 +890,7 @@ dParserCompiler::dToken dParserCompiler::ScanGrammarRule(
 					dSymbol& symbol = ruleNode->GetInfo();
 					if (operatorPrecedence.FindAssociation (symbol.m_name)) {
 						dTokenStringPair& pair = node->GetInfo();		
-						symbol.m_operatorPrecendeceOverright = pair.m_info;
+						symbol.m_operatorPrecendeceOverrride = pair.m_info;
 						break;
 					}
 				}
@@ -949,9 +966,6 @@ void dParserCompiler::CanonicalItemSets (
 	dState* const stateOuter = Closure (itemSet, symbolList, ruleMap);
 	operatorPrecedence.SaveLastOperationSymbol (stateOuter);
 
-dAssert(0);
-#if 0
-
 	stateMap.Insert(stateOuter, stateOuter->GetKey());
 	stateList.Append(stateOuter);
 
@@ -961,24 +975,22 @@ dAssert(0);
 	int stateNumber = 1;
 	for (dList<dState*>::dListNode* node = stateList.GetFirst(); node; node = node->GetNext()) {
 		dState* const state = node->GetInfo();
-
-		dTree<dTokenInfo, dCRCTYPE>::Iterator iter (symbolList);
+		dTree<dTokenInfo, dSymbolName>::Iterator iter (symbolList);
 		for (iter.Begin(); iter; iter ++) {
-
-			dCRCTYPE symbol = iter.GetKey();
+			dSymbolName symbol (iter.GetKey());
 			dState* const newState = Goto (state, symbol, symbolList, ruleMap);
 			dAssert (newState);
-
 			if (newState->GetCount()) {
+
 				const dTokenInfo& tokenInfo = iter.GetNode()->GetInfo();
 				dTransition& transition = state->m_transitions.Append()->GetInfo();
 				transition.m_symbol = symbol;
 				transition.m_name = tokenInfo.m_name; 
 				transition.m_type = tokenInfo.m_type;
-				dAssert (transition.m_symbol == dCRC64(transition.m_name.GetStr()));
+				dAssert (transition.m_symbol == transition.m_name);
 				transition.m_targetState = newState;
 
-				dTree<dState*, dCRCTYPE>::dTreeNode* const targetStateNode = stateMap.Find(newState->GetKey());
+				dTree<dState*, dSymbolName>::dTreeNode* const targetStateNode = stateMap.Find(newState->GetKey());
 				if (!targetStateNode) {
 					newState->m_number = stateNumber;
 
@@ -1003,7 +1015,6 @@ dAssert(0);
 	if (debugFile) {
 		fclose(debugFile);
 	}
-#endif
 }
 
 // Generate the closure for a Set of Item  
@@ -1040,7 +1051,7 @@ dParserCompiler::dState* dParserCompiler::Closure (
 				dAssert (matchingRulesList);
 				for (dList<void*>::dListNode* node = matchingRulesList.GetFirst(); node; node = node->GetNext()) {
 					dProductionRule::dListNode* const ruleNode = (dProductionRule::dListNode*) node->GetInfo();
-					dAssert (ruleNode->GetInfo().m_name.GetPointer() == sentenceSymbol.m_name.GetPointer());
+					dAssert (ruleNode->GetInfo().m_name == sentenceSymbol.m_name);
 					dTree<int, dSymbolName> firstList;
 					First (firstSymbolList, symbolList, ruleMap, firstList);
 					dTree<int, dSymbolName>::Iterator firstIter (firstList);
@@ -1170,7 +1181,7 @@ bool dParserCompiler::DoesSymbolDeriveEmpty (dSymbolName symbol, const dTree<dLi
 			dProductionRule::dListNode* const ruleInfoNode = (dProductionRule::dListNode*) node->GetInfo();
 
 			const dRuleInfo& info = ruleInfoNode->GetInfo();
-			if (symbol.GetPointer() == info.m_name.GetPointer()) {
+			if (symbol == info.m_name) {
 				if (!info.GetCount()) {
 					return true;
 				}
@@ -1183,13 +1194,10 @@ bool dParserCompiler::DoesSymbolDeriveEmpty (dSymbolName symbol, const dTree<dLi
 // generates the got state for this symbol
 dParserCompiler::dState* dParserCompiler::Goto (
 	const dState* const state, 
-	dCRCTYPE symbol, 
-	const dTree<dTokenInfo, dCRCTYPE>& symbolList,
-	const dTree<dList<void*>, dCRCTYPE>& ruleMap) const
+	const dSymbolName& symbol,
+	const dTree<dTokenInfo, dSymbolName>& symbolList,
+	const dTree<dList<void*>, dSymbolName>& ruleMap) const
 {
-dAssert(0);
-return NULL;
-#if 0
 	dList<dItem> itemSet;
 
 	// iterate over each item contained on state
@@ -1202,14 +1210,14 @@ return NULL;
 		for (dRuleInfo::dListNode* infoSymbolNode = ruleInfo.GetFirst(); infoSymbolNode; infoSymbolNode = infoSymbolNode->GetNext()) {
 			// see if this rule symbol match symbol
 			const dSymbol& infoSymbol = infoSymbolNode->GetInfo();
-			if (infoSymbol.m_nameCRC == symbol) {
+			if (infoSymbol.m_name == symbol) {
 				// a symbol was found, now see if it is at the right position in the rule
 				if (index == item.m_indexMarker) {
 					// the rule match symbol at the right position, add this rule to the new item set.
 					dItem& newItem = itemSet.Append()->GetInfo();
 					newItem.m_indexMarker = index + 1;
 					newItem.m_ruleNode = item.m_ruleNode;
-					newItem.m_lookAheadSymbolCRC = item.m_lookAheadSymbolCRC;
+					//newItem.m_lookAheadSymbolCRC = item.m_lookAheadSymbolCRC;
 					newItem.m_lookAheadSymbolName = item.m_lookAheadSymbolName;
 					break;
 				}
@@ -1221,7 +1229,6 @@ return NULL;
 	//find the closure for this new item set.
 	dState* const closureState = Closure (itemSet, symbolList, ruleMap);
 	return closureState;
-#endif
 }
 
 void dParserCompiler::ReplaceMacro (dString& data, const dString& newName, const dString& macro) const
