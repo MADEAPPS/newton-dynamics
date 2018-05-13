@@ -96,13 +96,13 @@ class dParserCompiler
 	void First (const dList<dSymbolName>& symbolSet, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap, dTree<int, dSymbolName>& firstSetOut) const;
 	dState* Goto (const dState* const state, const dSymbolName& symbol, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap) const;
 	dState* Closure (const dList<dItem>& itemSet, const dTree<dTokenInfo, dSymbolName>& symbolList, const dTree<dList<void*>, dSymbolName>& ruleMap) const;
-	void BuildParsingTable (const dTree<dState*, dCRCTYPE>& stateList, dCRCTYPE startSymbol, const dOperatorsPrecedence& operatorPrecence) const;
+	void BuildParsingTable (const dTree<dState*, dSymbolName>& stateList, const dSymbolName& startSymbol, const dOperatorsPrecedence& operatorPrecence) const;
 	void CanonicalItemSets (dTree<dState*, dSymbolName>& states, const dProductionRule& rules, const dTree<dTokenInfo, dSymbolName>& symbolList, const dOperatorsPrecedence& operatorPrecence, const dString& fileName);
 
 	void GenerateHeaderFile (const dString& className, const dString& scannerClassName, const char* const outputFileName, 
-							 const dTree<dTokenInfo, dCRCTYPE>& symbolList, const dString& userVariableClass); 
+							 const dTree<dTokenInfo, dSymbolName>& symbolList, const dString& userVariableClass);
 	void GenerateParserCode (const dString& className, const dString& scannerClassName, const char* const outputFileName, 
-							 const dTree<dTokenInfo, dCRCTYPE>& symbolList, dTree<dState*, dCRCTYPE>& stateList, const dString& userCode, const dString& endUserCode, int lastTerminalTokenEnum);
+							 const dTree<dTokenInfo, dSymbolName>& symbolList, dTree<dState*, dSymbolName>& stateList, const dString& userCode, const dString& endUserCode, int lastTerminalTokenEnum);
 
 	void DisplayError (const char* format, ...) const;
 
