@@ -2961,7 +2961,7 @@ break;
 break;
 
 						case 18:// expression : _STRING 
-{dAssert(0);}
+{entry.m_value = MyModule->EmitLoadString(parameter[0].m_value);}
 break;
 
 						case 15:// expression : _TRUE 

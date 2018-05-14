@@ -58,6 +58,7 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 
 	dUserVariable EmitLabel();
 	dUserVariable EmitReturn(const dUserVariable& expression);
+	dUserVariable EmitLoadString(const dUserVariable& constName);
 	dUserVariable EmitLoadVariable(const dUserVariable& varName);
 	dUserVariable EmitLoadConstant(const dUserVariable& constName);
 	

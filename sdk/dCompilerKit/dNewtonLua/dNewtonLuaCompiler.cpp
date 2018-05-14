@@ -142,6 +142,8 @@ void dNewtonLuaCompiler::CloseFunctionDeclaration()
 	TRACE_INSTRUCTION(functionEnd);
 m_currentClosure->Trace();
 
+static int xxx;
+xxx++;
 	dBasicBlocksGraph basicBlocks;
 	basicBlocks.Build(m_currentClosure->GetFirst());
 basicBlocks.Trace();
@@ -271,6 +273,15 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 	}
 	dAssert(definition);
 */
+	dString outVarName(m_currentClosure->NewTemp());
+	dCILInstr::dArgType type(dCILInstr::m_luaType);
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);
+	TRACE_INSTRUCTION(move);
+	return dUserVariable(move);
+}
+
+dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadString(const dUserVariable& varName)
+{
 	dString outVarName(m_currentClosure->NewTemp());
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
 	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);

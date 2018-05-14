@@ -178,7 +178,7 @@ expression
 	| _TRUE	{dAssert(0);}
 	| _FALSE {dAssert(0);}
 	| _FLOAT {dAssert(0);}
-	| _STRING {dAssert(0);}
+	| _STRING {$$ = MyModule->EmitLoadString($1);}
 	| _LABEL {$$ = MyModule->EmitLoadVariable($1);}
 	| _INTEGER {$$ = MyModule->EmitLoadConstant($1);}
 	;

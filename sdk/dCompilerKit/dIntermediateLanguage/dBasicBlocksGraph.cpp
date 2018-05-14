@@ -265,6 +265,39 @@ void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 //	dCIL* const cil = m_begin->GetInfo()->GetCil();
 //cil->Trace();
 	dAssert (m_begin->GetInfo()->GetAsLabel());
+	dTree<int, dCIL::dListNode*> labels;
+	for (dCIL::dListNode* node = m_begin->GetNext(); !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext())
+	{
+		if (node->GetInfo()->GetAsLabel()) {
+			labels.Insert(0, node);
+		}
+	}
+
+	for (dCIL::dListNode* node = m_begin->GetNext(); !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext())
+	{
+		if (node->GetInfo()->GetAsGoto()) {
+			dTree<int, dCIL::dListNode*>::dTreeNode* const targetNode = labels.Find(node->GetInfo()->GetAsGoto()->GetTarget());
+			dAssert(targetNode);
+			targetNode->GetInfo() = 1;
+		} else if (node->GetInfo()->GetAsIF()) {
+			dTree<int, dCIL::dListNode*>::dTreeNode* const targetNode0 = labels.Find(node->GetInfo()->GetAsIF()->GetTrueTarget());
+			dAssert(targetNode0);
+			targetNode0->GetInfo() = 1;
+			dTree<int, dCIL::dListNode*>::dTreeNode* const targetNode1 = labels.Find(node->GetInfo()->GetAsIF()->GetFalseTarget());
+			dAssert(targetNode1);
+			targetNode1->GetInfo() = 1;
+		}
+	}
+
+	dTree<int, dCIL::dListNode*>::Iterator iter (labels);
+	for (iter.Begin(); iter; iter++) {
+		dTree<int, dCIL::dListNode*>::dTreeNode* node = iter.GetNode();
+		if (node->GetInfo() == 0) {
+			dCIL::dListNode* const intrNode = iter.GetKey();
+			delete intrNode->GetInfo();
+		}
+	}
+
 	for (m_end = functionNode->GetNext(); !m_end->GetInfo()->GetAsFunctionEnd(); m_end = m_end->GetNext());
 
 	dCIL::dListNode* nextNode;
