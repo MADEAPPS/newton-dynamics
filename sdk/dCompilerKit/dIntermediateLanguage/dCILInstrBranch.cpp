@@ -518,6 +518,23 @@ void dCILInstrCall::Serialize(char* const textOut) const
 }
 
 
+bool dCILInstrCall::ReplaceArgument(const dArg& arg, const dArg& newArg)
+{
+	bool change = false;
+	for (dList<dArg>::dListNode* node = m_parameters.GetLast(); node; node = node->GetPrev()) {
+		dArg& paramArg = node->GetInfo();
+		if (arg.m_label == paramArg.m_label) {
+			if (paramArg.m_label != newArg.m_label) {
+				change = true;
+				//paramArg.m_label = newArg;
+				paramArg = newArg;
+			}
+		}
+	}
+
+	return dCILTwoArgInstr::ReplaceArgument(arg, newArg) | change;
+}
+
 void dCILInstrCall::AddUsedVariable (dInstructionVariableDictionary& dictionary) const
 {
 	dAssert(0);

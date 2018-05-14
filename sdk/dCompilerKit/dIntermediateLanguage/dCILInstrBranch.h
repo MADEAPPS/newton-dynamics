@@ -134,13 +134,12 @@ class dCILInstrReturn: public dCILSingleArgInstr
 
 	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
-	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
 	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
-
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
 };
 
 class dCILInstrCall: public dCILTwoArgInstr
@@ -164,6 +163,7 @@ class dCILInstrCall: public dCILTwoArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable ();
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
 
 	dList<dArg> m_parameters;
 //	dList<dCILInstr*>::dListNode* m_tagetNode;

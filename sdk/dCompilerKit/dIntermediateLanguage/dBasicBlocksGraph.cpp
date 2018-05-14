@@ -772,9 +772,9 @@ void dBasicBlocksGraph::InsertCommonSpillsSSA()
 			dCILInstr::dArg newArg(cil->NewTemp(), param.GetType());
 			for (dCIL::dListNode* node1 = node->GetNext(); node1 && !node1->GetInfo()->GetAsFunctionEnd(); node1 = node1->GetNext()) {
 				dCILInstr* const instruction = node1->GetInfo();
-				instruction->Trace();
+				//instruction->Trace();
 				instruction->ReplaceArgument(param, newArg);
-				instruction->Trace();
+				//instruction->Trace();
 			}
 			dCILInstrMove* const moveInstr = new dCILInstrMove(*cil, newArg.m_label, newArg.GetType(), param.m_label, param.GetType());
 			moveInstr->m_basicBlock = firstArg->m_basicBlock;

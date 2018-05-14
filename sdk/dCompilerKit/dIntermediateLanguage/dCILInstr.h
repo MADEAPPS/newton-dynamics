@@ -272,7 +272,7 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 	virtual bool ApplySemanticReordering () = 0;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
-	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) { dAssert(0); return false; }
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
 
 	const dArg& GetArg1 () const 
 	{

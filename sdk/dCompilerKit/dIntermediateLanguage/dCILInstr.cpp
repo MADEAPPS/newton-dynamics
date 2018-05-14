@@ -246,7 +246,6 @@ void dCILSingleArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& in
 
 bool dCILSingleArgInstr::ReplaceArgument(const dArg& arg, const dArg& newArg)
 {
-//	dAssert(0); 
 	bool change = false;
 	if (arg.m_label == m_arg0.m_label) {
 		if (m_arg0.m_label != newArg.m_label) {
@@ -255,10 +254,7 @@ bool dCILSingleArgInstr::ReplaceArgument(const dArg& arg, const dArg& newArg)
 		}
 	}
 	return change;
-	//	return false;
 }
-
-
 
 void dCILTwoArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
@@ -266,6 +262,18 @@ void dCILTwoArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& inter
 		m_arg1.m_label = interferenceGraph.GetRegisterName(m_arg1.m_label);
 	}
 	dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
+}
+
+bool dCILTwoArgInstr::ReplaceArgument(const dArg& arg, const dArg& newArg)
+{ 
+	bool change = false;
+	if (arg.m_label == m_arg1.m_label) {
+		if (m_arg1.m_label != newArg.m_label) {
+			change = true;
+			m_arg1 = newArg;
+		}
+	}
+	return dCILSingleArgInstr::ReplaceArgument(arg, newArg) | change;
 }
 
 void dCILThreeArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
