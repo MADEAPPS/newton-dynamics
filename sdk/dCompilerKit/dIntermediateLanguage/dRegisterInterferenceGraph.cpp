@@ -704,7 +704,7 @@ bool dRegisterInterferenceGraph::RemoveRedundantJumps ()
 		dCIL::dListNode* const node = iter.GetKey();
 	
 		if (node->GetInfo()->GetAsGoto()) {
-			const dCILInstrGoto* const stmt = node->GetInfo()->GetAsGoto();
+			dCILInstrGoto* const stmt = node->GetInfo()->GetAsGoto();
 //stmt->Trace();
 
 			dAssert (jumpWorkList.Find (stmt->GetTarget()));
@@ -717,13 +717,13 @@ bool dRegisterInterferenceGraph::RemoveRedundantJumps ()
 			}
 
 			if (stmt1->GetAsLabel() && nextNode->GetInfo()->GetAsGoto()) {
-				dAssert (0);
-/*
-				const dThreeAdressStmt& stmt2 = nextNode->GetInfo();
-				stmt.m_arg0.m_label = stmt2.m_arg0.m_label;
-				stmt.m_trueTargetJump = stmt2.m_trueTargetJump;
+				//stmt->Trace();
+				//nextNode->GetInfo()->Trace();
+				const dCILInstrGoto* const stmt2 = nextNode->GetInfo()->GetAsGoto();
+				stmt->SetTarget(stmt2->GetTarget()->GetInfo()->GetAsLabel());
+				//stmt->Trace();
 				ret = true;
-*/
+
 			}
 		} else if (node->GetInfo()->GetAsIF()) {
 			dCILInstrConditional* const stmt = node->GetInfo()->GetAsIF();

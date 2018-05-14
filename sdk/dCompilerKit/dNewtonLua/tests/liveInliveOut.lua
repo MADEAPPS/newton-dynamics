@@ -1,4 +1,4 @@
-	-- defines a factorial function
+	-- test liveness
     function RegisterAllocation (a, b, c, d)
 		local e = d + a
 		local f = b + c

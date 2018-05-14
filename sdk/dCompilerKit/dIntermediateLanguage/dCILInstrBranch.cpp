@@ -80,6 +80,7 @@ const dString& dCILInstrGoto::GetLabel() const
 void dCILInstrGoto::SetTarget (dCILInstrLabel* const target)
 {
 	m_tagetNode = target->GetNode();
+	SetLabel(target->GetLabel());
 	dAssert (m_label == target->GetLabel());
 }
 

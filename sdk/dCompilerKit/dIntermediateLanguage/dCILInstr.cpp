@@ -143,6 +143,7 @@ void dCILInstr::ReplaceInstruction (dCILInstr* const newIntruction)
 	newIntruction->m_myNode = node;
 }
 
+
 void dCILInstr::Serialize(char* const textOut) const
 {
 	textOut[0] = 0;
@@ -238,12 +239,26 @@ const char* dCILInstr::GetOperatorString(dOperator operatotion) const
 	return assignOperator;
 }
 
-
-
 void dCILSingleArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
 }
+
+bool dCILSingleArgInstr::ReplaceArgument(const dArg& arg, const dArg& newArg)
+{
+//	dAssert(0); 
+	bool change = false;
+	if (arg.m_label == m_arg0.m_label) {
+		if (m_arg0.m_label != newArg.m_label) {
+			change = true;
+			m_arg0 = newArg;
+		}
+	}
+	return change;
+	//	return false;
+}
+
+
 
 void dCILTwoArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {

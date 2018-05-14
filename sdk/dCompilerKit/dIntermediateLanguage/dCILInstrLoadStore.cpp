@@ -40,7 +40,6 @@ dCILInstrLocal::dCILInstrLocal (dCIL& program, const dString& name, const dArgTy
 {
 }
 
-
 void dCILInstrLocal::Serialize(char* const textOut) const
 {
 	sprintf (textOut, "\tlocal %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());

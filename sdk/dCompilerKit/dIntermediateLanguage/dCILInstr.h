@@ -243,11 +243,13 @@ class dCILSingleArgInstr: public dCILInstr
 		return false;
 	}
 
-	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
-	const dArg& GetArg0 () const 
+	const dArg& GetArg0() const
 	{
 		return m_arg0;
 	}
+
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg);
 	
 	dArg m_arg0;
 };
@@ -270,6 +272,7 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 	virtual bool ApplySemanticReordering () = 0;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) { dAssert(0); return false; }
 
 	const dArg& GetArg1 () const 
 	{
@@ -302,6 +305,7 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 	virtual bool ApplySemanticReordering () = 0;
 	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual bool ReplaceArgument(const dArg& arg, const dArg& newArg) { dAssert(0); return false; }
 
 	dArg m_arg2;
 };
