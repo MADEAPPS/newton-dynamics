@@ -454,7 +454,8 @@ void dRegisterInterferenceGraph::Build()
 			dCILInstrReturn* const retInstr = instr->GetAsReturn();
 
 			const dCILInstr::dArg& arg = retInstr->GetArg0();
-			if (arg.GetType().m_isPointer || (arg.GetType().m_intrinsicType != dCILInstr::m_void)) {
+			//if (arg.GetType().m_isPointer || (arg.GetType().m_intrinsicType != dCILInstr::m_void)) {
+			if (arg.GetType().m_intrinsicType != dCILInstr::m_void) {
 				switch (arg.GetType().m_intrinsicType)
 				{
 					case dCILInstr::m_int:
@@ -493,7 +494,8 @@ void dRegisterInterferenceGraph::Build()
 			dCILInstrCall* const callInstr = instr->GetAsCall();
 
 			const dCILInstr::dArg& retArg = callInstr->GetArg0();
-			if (retArg.GetType().m_isPointer || (retArg.GetType().m_intrinsicType != dCILInstr::m_void)) {
+			//if (retArg.GetType().m_isPointer || (retArg.GetType().m_intrinsicType != dCILInstr::m_void)) {
+			if (retArg.GetType().m_intrinsicType != dCILInstr::m_void) {
 				switch (retArg.GetType().m_intrinsicType)
 				{
 					case dCILInstr::m_int:

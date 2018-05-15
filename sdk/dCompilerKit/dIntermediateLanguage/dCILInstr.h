@@ -86,13 +86,13 @@ class dCILInstr
 		public:
 		dArgType ()
 			:m_intrinsicType(m_int)
-			,m_isPointer(false)
+//			,m_isPointer(false)
 		{
 		}
 
 		dArgType (dIntrisicType intrinsicType)
 			:m_intrinsicType(intrinsicType)
-			,m_isPointer(false)
+//			,m_isPointer(false)
 		{
 		}
 
@@ -102,7 +102,7 @@ class dCILInstr
 		void SetType (const dArgType& type);
 
 		dIntrisicType m_intrinsicType;
-		bool m_isPointer;
+//		bool m_isPointer;
 	};
 
 	class dArg: public dArgType

@@ -36,7 +36,7 @@ dCILInstr::dMapTable dCILInstr::m_maptable[] =
 
 void dCILInstr::dArgType::SetType (const dCILInstr::dArgType& type)
 {
-	m_isPointer = type.m_isPointer;
+//	m_isPointer = type.m_isPointer;
 	m_intrinsicType = type.m_intrinsicType;
 }
 
@@ -61,9 +61,10 @@ int dCILInstr::dArgType::GetSizeInByte() const
 dString dCILInstr::dArgType::GetTypeName () const 
 {
 	dAssert (m_intrinsicType < sizeof (m_maptable) / sizeof (m_maptable[0]));
-	if (m_isPointer) {
-		return m_maptable[m_intrinsicType].m_name + dCIL::m_pointerDecoration;
-	} else {
+	//if (m_isPointer) {
+	//	return m_maptable[m_intrinsicType].m_name + dCIL::m_pointerDecoration;
+	//} else 
+	{
 		return m_maptable[m_intrinsicType].m_name;
 	}
 }
@@ -76,7 +77,7 @@ void dCILInstr::dArg::SetType (const dArgType& type)
 
 void dCILInstr::dArg::SetType (dIntrisicType intrinsicType, bool pointer)
 {
-	m_isPointer = pointer;
+	//m_isPointer = pointer;
 	m_intrinsicType = intrinsicType;
 }
 

@@ -427,9 +427,10 @@ int dCILInstrReturn::GetByteCodeSize() const
 
 void dCILInstrReturn::GetUsedVariables (dList<dArg*>& variablesList)
 {
-	if (m_arg0.GetType().m_isPointer) {
-		variablesList.Append(&m_arg0);
-	} else {
+	//if (m_arg0.GetType().m_isPointer) {
+	//	variablesList.Append(&m_arg0);
+	//} else {
+	{
 		switch (m_arg0.GetType().m_intrinsicType) 
 		{
 			case m_void:
@@ -497,7 +498,8 @@ void dCILInstrCall::AddArgument (const dArg& argument)
 
 void dCILInstrCall::Serialize(char* const textOut) const
 {
-	if (m_arg0.m_isPointer || (m_arg0.m_intrinsicType != m_void)) {
+	//if (m_arg0.m_isPointer || (m_arg0.m_intrinsicType != m_void)) {
+	if (m_arg0.m_intrinsicType != m_void) {
 		sprintf (textOut, "\t%s %s = call %s (", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 	} else {
 		sprintf (textOut, "\t%s call %s (", m_arg0.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
@@ -570,7 +572,8 @@ void dCILInstrCall::GetUsedVariables(dList<dArg*>& variablesList)
 
 dCILInstr::dArg* dCILInstrCall::GetGeneratedVariable()
 {
-	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
+	//if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
+	if (m_arg0.GetType().m_intrinsicType != m_void) {
 		return &m_arg0;
 	} else {
 		return NULL;
@@ -580,7 +583,8 @@ dCILInstr::dArg* dCILInstrCall::GetGeneratedVariable()
 
 void dCILInstrCall::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
+	//if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
+	if (m_arg0.GetType().m_intrinsicType != m_void) {
 		m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
 	}
 

@@ -922,13 +922,13 @@ void dBasicBlocksGraph::OptimizeSSA()
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
 		actionFound |= ApplySimpleConstantPropagationSSA();
-//Trace();
+Trace();
 //		actionFound |= ApplyConditionalConstantPropagationSSA();
 //Trace();
 		actionFound |= ApplyCopyPropagationSSA();
-//Trace();
+Trace();
 		actionFound |= ApplyDeadCodeEliminationSSA();
-//Trace();
+Trace();
 	}
 	dAssert (!actionFound);
 }

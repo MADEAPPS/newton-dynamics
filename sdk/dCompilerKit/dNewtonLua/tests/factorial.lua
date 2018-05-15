@@ -8,6 +8,7 @@
       end
     end
     
-    print("enter a number:")
+	fact(10)
+    --print("enter a number:")
     --a = io.read("*number")        -- read a number
     --print(fact(a))

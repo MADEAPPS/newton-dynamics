@@ -241,8 +241,10 @@ bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
 {
 	bool ret = false;
 
-	bool arg1 = !m_arg1.m_isPointer && ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat));
-	bool arg2 = !m_arg2.m_isPointer && ((m_arg2.GetType().m_intrinsicType == m_constInt) || (m_arg2.GetType().m_intrinsicType == m_constFloat));
+//	bool arg1 = !m_arg1.m_isPointer && ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat));
+//	bool arg2 = !m_arg2.m_isPointer && ((m_arg2.GetType().m_intrinsicType == m_constInt) || (m_arg2.GetType().m_intrinsicType == m_constFloat));
+	bool arg1 = (m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat);
+	bool arg2 = (m_arg2.GetType().m_intrinsicType == m_constInt) || (m_arg2.GetType().m_intrinsicType == m_constFloat);
 	
 	if (arg1 && arg2) {
 /*

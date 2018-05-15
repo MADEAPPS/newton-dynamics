@@ -92,9 +92,10 @@ void dCILInstrMove::AddUsedVariable (dInstructionVariableDictionary& dictionary)
 
 void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 {
-	if (m_arg1.m_isPointer) {
-		variablesList.Append(&m_arg1);
-	} else {
+	//if (m_arg1.m_isPointer) {
+	//	variablesList.Append(&m_arg1);
+	//} else 
+	{
 		switch (m_arg1.GetType().m_intrinsicType) 
 		{
 			case m_constInt:
@@ -286,9 +287,10 @@ void dCILInstrPhy::GetUsedVariables (dList<dArg*>& variablesList)
 {
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
 		dArg* const arg = &node->GetInfo().m_arg;
-		if (arg->GetType().m_isPointer) {
-			variablesList.Append(arg);
-		} else {
+		//if (arg->GetType().m_isPointer) {
+		//	variablesList.Append(arg);
+		//} else 
+		{
 			switch (arg->GetType().m_intrinsicType) 
 			{
 				case m_constInt:

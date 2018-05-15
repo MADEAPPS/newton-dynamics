@@ -105,9 +105,6 @@ void dCIL::Trace()
 	}
 }
 
-
-
-
 dVirtualMachine* dCIL::BuilExecutable()
 {
 	dVirtualMachine* const program = new dVirtualMachine;
@@ -143,7 +140,8 @@ dVirtualMachine* dCIL::BuilExecutable()
 		dCILInstrFunction* const function = node->GetInfo()->GetAsFunction();
 
 		dVirtualMachine::dFunctionDescription::dReturnType type = dVirtualMachine::dFunctionDescription::m_void;
-		if (!function->m_name.m_isPointer) {
+		//if (!function->m_name.m_isPointer) 
+		{
 			switch (function->m_name.m_intrinsicType)
 			{
 				case dCILInstr::m_int:
@@ -155,8 +153,8 @@ dVirtualMachine* dCIL::BuilExecutable()
 				default: 
 					dAssert (0);
 			}
-		} else {
-			type = dVirtualMachine::dFunctionDescription::m_intReg;
+		//} else {
+		//	type = dVirtualMachine::dFunctionDescription::m_intReg;
 		}
 		program->AddFunction (function->m_name.m_label, function->GetByteCodeOffset(), type);
 	}
