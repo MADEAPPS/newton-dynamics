@@ -238,7 +238,8 @@ forBlock
 	;
 
 functionCallName
-	: _LABEL {$$ = $1; $$.m_tokenList.Append ($1.GetString());}
+	: _LABEL	{$$ = $1; $$.m_tokenList.Append ($1.GetString());}
+	| functionCallName '.' _LABEL	{$$ = $1; $$.m_tokenList.Append ($3.GetString());} 
 	;
 
 functionCall

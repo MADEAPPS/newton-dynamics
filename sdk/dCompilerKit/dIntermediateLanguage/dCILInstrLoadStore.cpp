@@ -96,6 +96,7 @@ void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 	{
 		case m_constInt:
 		case m_constFloat:
+		case m_constString:
 			break;
 		default:
 			variablesList.Append(&m_arg1);
@@ -117,7 +118,7 @@ bool dCILInstrMove::ReplaceArgument (const dArg& arg, const dArg& newArg)
 bool dCILInstrMove::ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 	bool ret = false;
-	if ((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+	if ((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constString)) {
 		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
 		if (node) {
 			//ret = true;
@@ -139,7 +140,7 @@ void dCILInstrMove::ApplyConditionalConstantPropagationSSA (dConditionalConstant
 	dAssert (0);
 	dConditionalConstantPropagationSolver::dVariable::dValueTypes type = dConditionalConstantPropagationSolver::dVariable::m_undefined;
 	dString value ("");
-	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
+	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constString)) {
 		type = dConditionalConstantPropagationSolver::dVariable::m_constant;
 		value = m_arg1.m_label;
 	} else {
@@ -156,7 +157,7 @@ void dCILInstrMove::ApplyConditionalConstantPropagationSSA (dConditionalConstant
 bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 	bool ret = false;
-	if (!((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat))) {
+	if (!((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constString))) {
 		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
 //Trace();
 		if (node) {
@@ -289,6 +290,7 @@ void dCILInstrPhy::GetUsedVariables (dList<dArg*>& variablesList)
 			{
 				case m_constInt:
 				case m_constFloat:
+				case m_constString:
 					break;
 
 				default:
@@ -320,7 +322,7 @@ bool dCILInstrPhy::ApplySimpleConstantPropagationSSA (dWorkList& workList, dStat
 	bool ret = false;
 	if (m_sources.GetCount()) {
 		const dArg& arg = m_sources.GetFirst()->GetInfo().m_arg;
-		if ((arg.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+		if ((arg.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg.GetType().m_intrinsicType == dCILInstr::m_constFloat) || (arg.GetType().m_intrinsicType == dCILInstr::m_constString)) {
 			ret = true;
 			for (dList<dArgPair>::dListNode* node = m_sources.GetFirst()->GetNext(); node; node = node->GetNext()) {
 				const dArg& arg1 = node->GetInfo().m_arg;
@@ -346,7 +348,7 @@ void dCILInstrPhy::ApplyConditionalConstantPropagationSSA (dConditionalConstantP
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
 		const dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
 
-		if ((arg->GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg->GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+		if ((arg->GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg->GetType().m_intrinsicType == dCILInstr::m_constFloat) || (arg.GetType().m_intrinsicType == dCILInstr::m_constString)) {
 			constList.Append(*arg);
 		} else {
 			dAssert(solver.m_variablesList.Find(arg->m_label));

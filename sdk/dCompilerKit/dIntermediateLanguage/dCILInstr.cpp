@@ -28,9 +28,11 @@ dCILInstr::dMapTable dCILInstr::m_maptable[] =
 	{dCILInstr::m_long, "long"}, 
 	{dCILInstr::m_float, "float"}, 
 	{dCILInstr::m_double, "double"}, 
+	{dCILInstr::m_string, "m_string" },
 	{dCILInstr::m_classPointer, "classPointer"},
 	{dCILInstr::m_constInt, "constInt"},
 	{dCILInstr::m_constFloat, "constFloat"},
+	{dCILInstr::m_constString, "m_constString"},
 	{dCILInstr::m_luaType, "luaType"}
 };
 
@@ -259,7 +261,7 @@ bool dCILSingleArgInstr::ReplaceArgument(const dArg& arg, const dArg& newArg)
 
 void dCILTwoArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	if ((m_arg1.m_intrinsicType != m_constInt) && (m_arg1.m_intrinsicType != m_constFloat)) {
+	if ((m_arg1.m_intrinsicType != m_constInt) && (m_arg1.m_intrinsicType != m_constFloat) && (m_arg1.m_intrinsicType != m_constString)) {
 		m_arg1.m_label = interferenceGraph.GetRegisterName(m_arg1.m_label);
 	}
 	dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
@@ -279,7 +281,7 @@ bool dCILTwoArgInstr::ReplaceArgument(const dArg& arg, const dArg& newArg)
 
 void dCILThreeArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	if ((m_arg2.m_intrinsicType != m_constInt) && (m_arg2.m_intrinsicType != m_constFloat)) {
+	if ((m_arg2.m_intrinsicType != m_constInt) && (m_arg2.m_intrinsicType != m_constFloat) && (m_arg2.m_intrinsicType != m_constString)) {
 		m_arg2.m_label = interferenceGraph.GetRegisterName(m_arg2.m_label);
 	}
 	dCILTwoArgInstr::AssignRegisterName(interferenceGraph);

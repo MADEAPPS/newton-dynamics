@@ -222,7 +222,13 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitFunctionCall(const dUs
 {
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
 	dString result(m_currentClosure->NewTemp());
-	dCILInstrCall* const functionCall = new dCILInstrCall(*m_currentClosure, result, type, functionName.GetString());
+	dString name(functionName.GetString());
+	for (dList<dString>::dListNode* node = functionName.m_tokenList.GetFirst()->GetNext(); node; node = node->GetNext()) {
+		name += '.';
+		name += node->GetInfo();
+	}
+
+	dCILInstrCall* const functionCall = new dCILInstrCall(*m_currentClosure, result, type, name);
 
 	for (dList<dCIL::dListNode*>::dListNode* node = argumentsList.m_nodeList.GetFirst(); node; node = node->GetNext()) {
 		dCILSingleArgInstr* const argInstruction = node->GetInfo()->GetInfo()->GetAsSingleArg();
@@ -283,8 +289,8 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadString(const dUserVariable& varName)
 {
 	dString outVarName(m_currentClosure->NewTemp());
-	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);
+	dCILInstr::dArgType type(dCILInstr::m_constString);
+	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, dCILInstr::dArgType(dCILInstr::m_string), varName.GetString(), type);
 	TRACE_INSTRUCTION(move);
 	return dUserVariable(move);
 }

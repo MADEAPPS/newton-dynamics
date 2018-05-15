@@ -481,6 +481,7 @@ void dRegisterInterferenceGraph::Build()
 
 					case dCILInstr::m_constInt:
 					case dCILInstr::m_constFloat:
+					case dCILInstr::m_constString:
 						break;		
 
 					default:

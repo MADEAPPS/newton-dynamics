@@ -68,9 +68,11 @@ class dCILInstr
 		m_long,
 		m_float,
 		m_double,
+		m_string,
 		m_classPointer,
 		m_constInt,
 		m_constFloat,
+		m_constString,
 		m_luaType,
 	};
 

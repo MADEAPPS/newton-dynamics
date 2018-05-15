@@ -195,11 +195,11 @@ bool dCILInstrConditional::IsBasicBlockEnd() const
 
 void dCILInstrConditional::GetUsedVariables (dList<dArg*>& variablesList)
 {
-	if (!((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat))) {
+	if (!((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat) || (m_arg0.GetType().m_intrinsicType == m_constString))) {
 		variablesList.Append(&m_arg0);
 	}
 
-	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat))) {
+	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat) || (m_arg1.GetType().m_intrinsicType == m_constString))) {
 		variablesList.Append(&m_arg1);
 	}
 }
@@ -306,7 +306,7 @@ void dCILInstrConditional::ApplyConditionalConstantPropagationSSA (dConditionalC
 	}
 */
 
-	if (!((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat))) {
+	if (!((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat) || (m_arg0.GetType().m_intrinsicType == m_constString))) {
 		dAssert(solver.m_variablesList.Find(m_arg0.m_label));
 		//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
 		dConditionalConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
@@ -322,7 +322,7 @@ void dCILInstrConditional::ApplyConditionalConstantPropagationSSA (dConditionalC
 		}
 	}
 
-	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat))) {
+	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat) || (m_arg1.GetType().m_intrinsicType == m_constString))) {
 		dAssert(solver.m_variablesList.Find(m_arg1.m_label));
 		//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
 		dConditionalConstantPropagationSolver::dBlockEdgeKey key0(GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
@@ -432,6 +432,7 @@ void dCILInstrReturn::GetUsedVariables (dList<dArg*>& variablesList)
 		case m_void:
 		case m_constInt:
 		case m_constFloat:
+		case m_constString:
 			break;
 		default:
 			variablesList.Append(&m_arg0);
