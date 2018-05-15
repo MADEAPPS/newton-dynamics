@@ -427,20 +427,14 @@ int dCILInstrReturn::GetByteCodeSize() const
 
 void dCILInstrReturn::GetUsedVariables (dList<dArg*>& variablesList)
 {
-	//if (m_arg0.GetType().m_isPointer) {
-	//	variablesList.Append(&m_arg0);
-	//} else {
+	switch (m_arg0.GetType().m_intrinsicType) 
 	{
-		switch (m_arg0.GetType().m_intrinsicType) 
-		{
-			case m_void:
-			case m_constInt:
-			case m_constFloat:
-				break;
-
-			default:
-				variablesList.Append(&m_arg0);
-		}
+		case m_void:
+		case m_constInt:
+		case m_constFloat:
+			break;
+		default:
+			variablesList.Append(&m_arg0);
 	}
 }
 

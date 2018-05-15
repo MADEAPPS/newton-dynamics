@@ -703,6 +703,7 @@ bool dBasicBlocksGraph::ApplySimpleConstantPropagationSSA()
 		dCILInstr* const instruction = node->GetInfo();
 //instruction->Trace();
 		bool change = instruction->ApplySimpleConstantPropagationSSA(workList, usedVariablesList);
+//instruction->Trace();
 		anyChanges |= change;
 	}
 	return anyChanges;
@@ -921,6 +922,7 @@ void dBasicBlocksGraph::OptimizeSSA()
 	bool actionFound = true;
 	for (int i = 0; actionFound && i < 32; i ++) {
 		actionFound = false;
+Trace();
 		actionFound |= ApplySimpleConstantPropagationSSA();
 Trace();
 //		actionFound |= ApplyConditionalConstantPropagationSSA();

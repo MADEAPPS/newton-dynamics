@@ -92,19 +92,13 @@ void dCILInstrMove::AddUsedVariable (dInstructionVariableDictionary& dictionary)
 
 void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 {
-	//if (m_arg1.m_isPointer) {
-	//	variablesList.Append(&m_arg1);
-	//} else 
+	switch (m_arg1.GetType().m_intrinsicType) 
 	{
-		switch (m_arg1.GetType().m_intrinsicType) 
-		{
-			case m_constInt:
-			case m_constFloat:
-				break;
-
-			default:
-				variablesList.Append(&m_arg1);
-		}
+		case m_constInt:
+		case m_constFloat:
+			break;
+		default:
+			variablesList.Append(&m_arg1);
 	}
 }
 
@@ -130,7 +124,7 @@ bool dCILInstrMove::ApplySimpleConstantPropagationSSA (dWorkList& workList, dSta
 			dStatementBlockBucket::Iterator iter (node->GetInfo());
 			for (iter.Begin(); iter; iter ++) {
 				dCILInstr* const instruction = iter.GetKey()->GetInfo();
-				if (!instruction->GetAsReturn()) {
+				if (!(instruction->GetAsReturn() || instruction->GetAsCall())) {
 					ret |= instruction->ReplaceArgument(m_arg0, m_arg1);
 					workList.Insert(instruction);
 				}
