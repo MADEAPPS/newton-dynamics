@@ -43,6 +43,11 @@ dNewtonLuaCompiler::dLuaClosure* dNewtonLuaCompiler::dLuaClosure::AddClosure(dLu
 	return closureNode;
 }
 
+dCILInstrLocal* dNewtonLuaCompiler::dLuaClosure::FindLocalVariable(const dString& varName) const
+{
+	return NULL;
+}
+
 dNewtonLuaCompiler::dNewtonLuaCompiler()
 	:dNewtonLuaParcer()
 	,m_closures()
@@ -279,6 +284,7 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 	}
 	dAssert(definition);
 */
+	dAssert(0);
 	dString outVarName(m_currentClosure->NewTemp());
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
 //	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);
@@ -379,10 +385,12 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 	dAssert(expressionList.m_nodeList.GetCount() >= 1);
 	int count = dMin (nameList.m_tokenList.GetCount(), expressionList.m_nodeList.GetCount());
 
-	dCILInstrMove* returnMove = NULL;
+	dCILInstr* returnMove = NULL;
 	for (int i = 0; i < count; i ++) {
 		//dCILSingleArgInstr* const dst = nameListNode->GetInfo(); 
 		const dString& dstName = nameListNode->GetInfo();
+
+
 
 /*
 		if (dest->GetAsLocal()) {
@@ -399,18 +407,20 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitAssigmentStatement(con
 		}
 */
 
-
-		dCILSingleArgInstr* const src = expressionListNode->GetInfo()->GetInfo()->GetAsSingleArg(); 
+		dCILSingleArgInstr* const src = expressionListNode->GetInfo()->GetInfo()->GetAsSingleArg();
 		dAssert(src);
-		//dAssert(dst);
-		//const dCILInstr::dArg& dstArg = dst->GetArg0();
 		const dCILInstr::dArg& srcArg = src->GetArg0();
-		dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, dstName, srcArg.GetType(), srcArg.m_label, srcArg.GetType());
-		TRACE_INSTRUCTION(move);
-
-		if (!returnMove) {
-			returnMove = move;
+		dCILInstr* storeInst = NULL;
+		if (m_currentClosure->FindLocalVariable(dstName)) {
+			dAssert(0);
+			storeInst = new dCILInstrMove(*m_currentClosure, dstName, srcArg.GetType(), srcArg.m_label, srcArg.GetType());
+		} else {
+			storeInst = new dCILInstrStoreImmidiate(*m_currentClosure, srcArg.m_label, srcArg.GetType(), dstName);
 		}
+		if (!returnMove) {
+			returnMove = storeInst;
+		}
+		TRACE_INSTRUCTION(storeInst);
 
 		nameListNode = nameListNode->GetNext();
 		expressionListNode = expressionListNode->GetNext();

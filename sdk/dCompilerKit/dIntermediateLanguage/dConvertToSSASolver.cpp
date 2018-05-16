@@ -63,15 +63,13 @@ void dConvertToSSASolver::BuildDomicanceFrontier(const dBasicBlock* const root)
 void dConvertToSSASolver::RenameVariables(const dBasicBlock* const root, dTree <dStatementBucket, dString>& stack) const
 {
 	//root->Trace();
-static int xxx;
 	bool terminate = false;
 	for (dCIL::dListNode* node = root->m_begin; !terminate; node = node->GetNext()) {
 		terminate = (node == root->m_end);
 		dCILInstr* const instruction = node->GetInfo();
-instruction->Trace();
+//instruction->Trace();
 		if (!instruction->GetAsPhi()) {
 			dList<dCILInstr::dArg*> variablesList;
-xxx++;
 			instruction->GetUsedVariables(variablesList);
 			for (dList<dCILInstr::dArg*>::dListNode* argNode = variablesList.GetFirst(); argNode; argNode = argNode->GetNext()) {
 				dCILInstr::dArg* const variable = argNode->GetInfo();

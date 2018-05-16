@@ -42,6 +42,7 @@ class dNewtonLuaCompiler: public dNewtonLuaParcer
 
 		void RemoveAll();
 		dLuaClosure* AddClosure(dLuaClosure* const parent);
+		dCILInstrLocal* FindLocalVariable(const dString& varName) const;
 
 		private:
 		dLuaClosure* m_parent;

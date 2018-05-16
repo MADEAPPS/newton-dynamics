@@ -206,6 +206,22 @@ void dCILInstrLoadImmidiate::AddDefinedVariable(dInstructionVariableDictionary& 
 	dAssert(0);
 }
 
+dCILInstrStoreImmidiate::dCILInstrStoreImmidiate(dCIL& program, const dString& name, const dArgType& type, const dString& offset)
+	:dCILSingleArgInstr(program, dArg(name, type))
+	,m_offset(offset)
+{
+}
+
+void dCILInstrStoreImmidiate::Serialize(char* const textOut) const
+{
+	sprintf(textOut, "\t[offset %s] = %s %s\n", m_offset.GetStr(), m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
+}
+
+void dCILInstrStoreImmidiate::GetUsedVariables(dList<dArg*>& variablesList) 
+{
+	variablesList.Append(&m_arg0);
+}
+
 
 dCILInstrLoad::dCILInstrLoad (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
