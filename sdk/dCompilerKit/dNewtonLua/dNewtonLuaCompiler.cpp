@@ -281,9 +281,10 @@ dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadVariable(const dUs
 */
 	dString outVarName(m_currentClosure->NewTemp());
 	dCILInstr::dArgType type(dCILInstr::m_luaType);
-	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);
-	TRACE_INSTRUCTION(move);
-	return dUserVariable(move);
+//	dCILInstrMove* const move = new dCILInstrMove(*m_currentClosure, outVarName, type, varName.GetString(), type);
+	dCILInstrLoadImmidiate* const load = new dCILInstrLoadImmidiate(*m_currentClosure, outVarName, type, varName.GetString());
+	TRACE_INSTRUCTION(load);
+	return dUserVariable(load);
 }
 
 dNewtonLuaCompiler::dUserVariable dNewtonLuaCompiler::EmitLoadString(const dUserVariable& varName)

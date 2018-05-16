@@ -124,6 +124,30 @@ class dCILInstrPhy: public dCILSingleArgInstr
 };
 
 
+class dCILInstrLoadImmidiate: public dCILSingleArgInstr
+{
+	public:
+	dCILInstrLoadImmidiate(dCIL& program, const dString& name, const dArgType& type, const dString& offset);
+	void Serialize(char* const textOut) const;
+
+	virtual bool ApplyDeadElimination() const
+	{
+		return true;
+	}
+
+	virtual bool ApplySemanticReordering() { return false; };
+	virtual void AddUsedVariable(dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const;
+
+	// ***********************
+	virtual bool ApplySimpleConstantPropagationSSA(dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false; }
+	virtual dArg* GetGeneratedVariable() { return &m_arg0; }
+	virtual void GetUsedVariables(dList<dArg*>& variablesList) {}
+
+	dString m_offset;
+};
+
+
 class dCILInstrLoad: public dCILTwoArgInstr
 {
 	public:
@@ -143,6 +167,7 @@ class dCILInstrLoad: public dCILTwoArgInstr
 	virtual bool ApplySimpleConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {dAssert (0); return false;}
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
+	dString m_offset;
 };
 
 class dCILInstrStore: public dCILTwoArgInstr

@@ -1,3 +1,5 @@
 	
 	-- classic Hello World in Lua
-    print("hello world")
+    --a = "hello world"
+	a = 10
+    print(a)

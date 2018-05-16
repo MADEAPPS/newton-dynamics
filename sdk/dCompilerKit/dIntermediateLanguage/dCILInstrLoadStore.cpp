@@ -184,9 +184,33 @@ void dCILInstrMove::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 }
 
 
+dCILInstrLoadImmidiate::dCILInstrLoadImmidiate(dCIL& program, const dString& name, const dArgType& type, const dString& offset)
+	:dCILSingleArgInstr(program, dArg(name, type))
+	,m_offset(offset)
+{
+}
+
+
+void dCILInstrLoadImmidiate::Serialize(char* const textOut) const
+{
+	sprintf(textOut, "\t%s %s = [offset %s]\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_offset.GetStr());
+}
+
+void dCILInstrLoadImmidiate::AddUsedVariable(dInstructionVariableDictionary& dictionary) const
+{
+	dAssert(0);
+}
+
+void dCILInstrLoadImmidiate::AddDefinedVariable(dInstructionVariableDictionary& dictionary) const
+{
+	dAssert(0);
+}
+
+
 dCILInstrLoad::dCILInstrLoad (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
 {
+	dAssert(0);
 }
 
 void dCILInstrLoad::Serialize(char* const textOut) const

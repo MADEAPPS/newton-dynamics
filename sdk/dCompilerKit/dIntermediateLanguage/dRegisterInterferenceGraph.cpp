@@ -407,7 +407,7 @@ void dRegisterInterferenceGraph::Build()
 	for (dLiveInLiveOutSolver::dListNode* instNode = liveInLiveOut.GetFirst(); instNode; instNode = instNode->GetNext()) {
 		dFlowGraphNode& point = instNode->GetInfo();
 		dCILInstr* const instr = point.m_instruction;
-		//instr->Trace();
+//instr->Trace();
 
 		if (instr->GetAsArgument()) {
 			dCILInstrArgument* const argInst = instr->GetAsArgument();
@@ -530,7 +530,7 @@ void dRegisterInterferenceGraph::Build()
 				dTreeNode* const regNode = Find (arg.m_label);
 				dAssert(regNode);
 				dRegisterInterferenceNode& registerInfo = regNode->GetInfo();
-				dAssert(registerInfo.m_registerIndex == -1);
+				//dAssert(registerInfo.m_registerIndex == -1);
 				registerInfo.m_registerIndex = D_PARMETER_IN_REGISTER_START + index;
 				index ++;
 				dAssert (index < D_PARMETER_IN_REGISTER_COUNT);
