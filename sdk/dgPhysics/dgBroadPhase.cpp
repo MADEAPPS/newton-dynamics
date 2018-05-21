@@ -822,8 +822,8 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 
 		if ((entropy > oldEntropy * dgFloat32(1.5f)) || (entropy < oldEntropy * dgFloat32(0.75f))) {
 			if (fitness.GetFirst()) {
-				m_world->m_solverJacobiansMemory.ResizeIfNecessary ((fitness.GetCount() * 2 + 16) * sizeof (dgBroadPhaseNode*));
-				dgBroadPhaseNode** const leafArray = (dgBroadPhaseNode**)&m_world->m_solverJacobiansMemory[0];
+				m_world->m_solverJacobianMemory.ResizeIfNecessary ((fitness.GetCount() * 2 + 16) * sizeof (dgBroadPhaseNode*));
+				dgBroadPhaseNode** const leafArray = (dgBroadPhaseNode**)&m_world->m_solverJacobianMemory[0];
 
 				dgInt32 leafNodesCount = 0;
 				for (dgFitnessList::dgListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {

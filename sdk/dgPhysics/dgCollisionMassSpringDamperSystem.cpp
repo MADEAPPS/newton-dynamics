@@ -261,9 +261,9 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	//dgVector deltaOmega(m_body->m_invWorldInertiaMatrix.RotateVector(m_body->m_externalTorque.Scale4(timestep)));
 
 	dgWorld* const world = m_body->GetWorld();
-	world->m_solverJacobiansMemory.ResizeIfNecessary(GetMemoryBufferSizeInBytes() + 1024);
+	world->m_solverJacobianMemory.ResizeIfNecessary(GetMemoryBufferSizeInBytes() + 1024);
 
-	dgVector* const normalAccel = (dgVector*)&world->m_solverJacobiansMemory[0];
+	dgVector* const normalAccel = (dgVector*)&world->m_solverJacobianMemory[0];
 	dgVector* const normalDir = &normalAccel[m_particlesCount];
 	dgVector* const diagonal = &normalDir[m_particlesCount];
 	dgFloat32* const frictionCoeffecient = (dgFloat32*)&diagonal[m_particlesCount];

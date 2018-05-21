@@ -223,12 +223,38 @@ class dgJacobianMatrixElement
 	dgInt32 m_normalForceIndex;
 } DG_GCC_VECTOR_ALIGMENT;
 
+
+class dgRightHandSide
+{
+	public:
+	dgFloat32 m_force;
+	dgFloat32 m_diagDamp;
+	dgFloat32 m_invJinvMJt;
+	dgFloat32 m_coordenateAccel;
+
+	dgFloat32 m_lowerBoundFrictionCoefficent;
+	dgFloat32 m_upperBoundFrictionCoefficent;
+	dgFloat32 m_gyroAccel;
+	dgFloat32 m_maxImpact;
+
+	dgFloat32 m_deltaAccel;
+	dgFloat32 m_restitution;
+	dgFloat32 m_penetration;
+	dgFloat32 m_stiffness;
+
+	//	dgFloat32 m_jinvMJt;
+	dgForceImpactPair* m_jointFeebackForce;
+	dgFloat32 m_penetrationStiffness;
+	dgInt32 m_normalForceIndex;
+};
+
 class dgJacobianMemory
 {
 	public:
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
 	dgJacobian* m_internalForcesBuffer;
+	dgRightHandSide* m_righHandSizeBuffer;
 	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 

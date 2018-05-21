@@ -212,7 +212,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_perInstanceData(allocator)
 	,m_bodiesMemory (allocator, 64)
 	,m_jointsMemory (allocator, 64)
-	,m_solverJacobiansMemory (allocator, 64)
+	,m_solverJacobianMemory (allocator, 64)
+	,m_solverRightHandSizeMemory(allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
 	,m_clusterMemory (allocator, 64)
 	,m_concurrentUpdate(false)
@@ -224,7 +225,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_bodiesMemory.Resize(1024 * 32);
 	m_jointsMemory.Resize(1024 * 32);
 	m_clusterMemory.Resize(1024 * 32);
-	m_solverJacobiansMemory.Resize(1024 * 64);
+	m_solverJacobianMemory.Resize(1024 * 64);
+	m_solverRightHandSizeMemory.Resize(1024 * 64);
 	m_solverForceAccumulatorMemory.Resize(1024 * 32);
 
 	m_savetimestep = dgFloat32 (0.0f);
@@ -1253,8 +1255,8 @@ void dgWorld::UpdateSkeletons()
 		dgUnsigned32 lru = m_dynamicsLru;
 
 		dgBodyMasterList& masterList = *this;
-		m_solverJacobiansMemory.ResizeIfNecessary((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgBilateralConstraint*));
-		dgBilateralConstraint** const jointList = (dgBilateralConstraint**)&m_solverJacobiansMemory[0];
+		m_solverJacobianMemory.ResizeIfNecessary((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgBilateralConstraint*));
+		dgBilateralConstraint** const jointList = (dgBilateralConstraint**)&m_solverJacobianMemory[0];
 
 		dgInt32 jointCount = 0;
 		for (dgBodyMasterList::dgListNode* node = masterList.GetFirst(); node; node = node->GetNext()) {

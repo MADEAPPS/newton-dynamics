@@ -58,8 +58,11 @@ class dgWorldDynamicUpdateSyncDescriptor
 
 void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount)
 {
-	world->m_solverJacobiansMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgJacobianMatrixElement));
-	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
+	world->m_solverJacobianMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgJacobianMatrixElement));
+	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobianMemory[0];
+
+	world->m_solverRightHandSizeMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgRightHandSide));
+	m_righHandSizeBuffer = (dgRightHandSide*)&world->m_solverRightHandSizeMemory[0];
 
 	world->m_solverForceAccumulatorMemory.ResizeIfNecessary((bodyCount + 8) * sizeof(dgJacobian));
 	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
@@ -174,8 +177,8 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	dgBodyMasterList& masterList = *world;
 
 	dgAssert (masterList.GetFirst()->GetInfo().GetBody() == world->m_sentinelBody);
-	world->m_solverJacobiansMemory.ResizeIfNecessary ((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgDynamicBody*));
-	dgDynamicBody** const stackPoolBuffer = (dgDynamicBody**)&world->m_solverJacobiansMemory[0];
+	world->m_solverJacobianMemory.ResizeIfNecessary ((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgDynamicBody*));
+	dgDynamicBody** const stackPoolBuffer = (dgDynamicBody**)&world->m_solverJacobianMemory[0];
 
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
 		const dgBodyMasterListRow& graphNode = node->GetInfo();

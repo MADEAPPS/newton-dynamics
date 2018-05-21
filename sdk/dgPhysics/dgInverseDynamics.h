@@ -91,9 +91,7 @@ class dgInverseDynamics
 	void SortGraph(dgNode* const root, dgInt32& index);
 		
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
-
 	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
-
 	
 	dgInt32 GetJacobianDerivatives(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep, dgInt32 threadIndex) const;
 	
