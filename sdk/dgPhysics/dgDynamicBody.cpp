@@ -307,63 +307,46 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				// Simple forward Euler in local space step no enough to cope with skew and high angular velocities
 				// Using simple backward Euler in local space step, implicit integration in local space. 
 				// use angular velocity at dt, to solve equation keeping dt constant.
-				// f(w + dw) = f(w0) + f'(w + dw) * dw
-				// let dw = w * dt
-				// and calculating dw as the  dw = f(w) | dwx, dwy, dwz
+				// f(w + dt) = f(w) + f'(w) * dt + f''(w) * dt^2 / 2! + ....
+				// let dw = w * dt, and negetion huget order derivatoves we get 
+				// f(w + dw) = f(w) + f'(w) * dw
+				// and calculating dw as the  f'(w) = f(wx, wy, wz) | dt
 
 				// dw/dt = (Tl - (wl x (wl * Il)) * Il^1
 				// expanding f(w) 
-				// f(wx) = (Tx - (Iz - Iy) * wy * wz) / Ix 
-				// f(wy) = (Ty - (Ix - Iz) * wz * wx) / Iy
-				// f(wz) = (Tz - (Iy - Ix) * wx * wy) / Iz
+				// f(wx) = ax = (Tx - (Iz - Iy) * wy * wz) / Ix 
+				// f(wy) = ay = (Ty - (Ix - Iz) * wz * wx) / Iy
+				// f(wz) = az = (Tz - (Iy - Ix) * wx * wy) / Iz
+				//
+				// calculation the expansion 
+				// Ix * ax = (Tx - (Iz - Iy) * wy * wz) - ((Iz - Iy) * wy * az + (Iz - Iy) * ay * wz) * dt
+				// Iy * ay = (Ty - (Ix - Iz) * wz * wx) - ((Ix - Iz) * wz * ax + (Ix - Iz) * az * wx) * dt
+				// Iz * az = (Tz - (Iy - Ix) * wx * wy) - ((Iy - Ix) * wx * ay + (Iy - Ix) * ax * wy) * dt   
+				//
+				// factorize alpha we get
+				// Ix * ax + (Iz - Iy) * dwy * az + (Iz - Iy) * dwz * ay = Tx - (Iz - Iy) * wy * wz
+				// Iy * ay + (Ix - Iz) * dwz * ax + (Ix - Iz) * dwx * az = Ty - (Ix - Iz) * wz * wx
+				// Iz * az + (Iy - Ix) * dwx * ay + (Iy - Ix) * dwy * ax = Tz - (Iy - Ix) * wx * wy
 
-				/*
-				// using Mathematica script to calculate the derivatives of the Taylor expression
-				CreateDocument[{TextCell["Wx ="], Wxx,
-				TextCell["dwx/dwx ="], D[Wxx, { wx, 1 }],
-				TextCell["dwx/dwy ="], D[Wxx, { wy, 1 }],
-				TextCell["dwx/dwz ="], D[Wxx, { wz, 1 }]}]
-
-				CreateDocument[{TextCell["Wy ="], Wyy,
-				TextCell["dwy/dwx ="], D[Wyy, { wx, 1 }],
-				TextCell["dwy/dwy ="], D[Wyy, { wy, 1 }],
-				TextCell["dwy/dwz ="], D[Wyy, { wz, 1 }]}]
-
-				CreateDocument[{TextCell["Wz ="], Wzz,
-				TextCell["dwz/dwx ="], D[Wzz, { wx, 1 }],
-				TextCell["dwz/dwy ="], D[Wzz, { wy, 1 }],
-				TextCell["dwz/dwz ="], D[Wzz, { wz, 1 }]}]
-				*/
-
-				//Note: two step of implicit integration loses too much energy, 
-				//it is better to use a semi implicit that is, 
-				//calculate derivative at half the time step instead of the end, similar to mid point Euler
-
+				// and solving for alpha we get the angular acceleration at t + dt
 				// calculate gradient at a full time step
 				dgVector deltaToque(localTorque - localOmega.CrossProduct3(localOmega * m_mass));
 				dgVector gradientStep(deltaToque.Scale4(timestep));
 
-				// derivative at half time step.
+				// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 				dgVector dw(localOmega.Scale4(dgFloat32(0.5f) * timestep));
+				//dgVector dw(localOmega.Scale4(dgFloat32(1.0f) * timestep));
+
 				dgFloat32 jacobianMatrix[3][3];
 				// calculates Jacobian matrix
-				//dWx / dwx = Ix
-				//dWx / dwy = (Iz - Iy) * wz * dt
-				//dWx / dwz = (Iz - Iy) * wy * dt
 				jacobianMatrix[0][0] = m_mass[0];
 				jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
 				jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
 
-				//dWy / dwx = (Ix - Iz) * wz * dt
-				//dWy / dwy = Iy				 
-				//dWy / dwz = (Ix - Iz) * wx * dt
 				jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
 				jacobianMatrix[1][1] = m_mass[1];
 				jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
 
-				//dWz / dwx = (Iy - Ix) * wy * dt 
-				//dWz / dwy = (Iy - Ix) * wx * dt 
-				//dWz / dwz = Iz
 				jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
 				jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
 				jacobianMatrix[2][2] = m_mass[2];
