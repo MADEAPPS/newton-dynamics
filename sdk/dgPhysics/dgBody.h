@@ -239,7 +239,7 @@ class dgBody
 	dgVector m_globalCentreOfMass;	
 	dgVector m_impulseForce;	
 	dgVector m_impulseTorque;	
-	dgVector m_gyroToque;
+//	dgVector m_gyroToque;
 
 	dgInt32 m_criticalSectionLock;
 	union 

@@ -253,6 +253,12 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 	if (m_applyExtForces) {
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
+
+//	dgVector localOmega(body->m_matrix.UnrotateVector(body->m_omega));
+//	dgVector localAngularMomentum(body->m_mass * localOmega);
+//	body->m_gyroToque = body->m_matrix.RotateVector(localOmega.CrossProduct3(localAngularMomentum));
+	m_externalTorque -= m_omega.CrossProduct3(CalculateAngularMomentum());
+
 	m_externalForce += m_impulseForce;
 	m_externalTorque += m_impulseTorque;
 	m_impulseForce = dgVector::m_zero;
@@ -298,9 +304,9 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			dgVector localOmega(m_matrix.UnrotateVector(m_omega));
 			dgVector localTorque(m_matrix.UnrotateVector(m_externalTorque));
-			dgVector localAlpha((localTorque - localOmega.CrossProduct3(localOmega * m_mass)) * m_invMass);
+			//dgVector localAlpha((localTorque - localOmega.CrossProduct3(localOmega * m_mass)) * m_invMass);
+			dgVector localAlpha(localTorque * m_invMass);
 			const dgFloat32 localAlphaErr = dgFloat32 (0.005f);
-
 			if (localAlpha.DotProduct4(localAlpha).GetScalar() < (localAlphaErr * localAlphaErr)) {
 				localOmega += localAlpha.Scale4(timestep);
 			} else {
@@ -308,7 +314,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				// Using simple backward Euler in local space step, implicit integration in local space. 
 				// use angular velocity at dt, to solve equation keeping dt constant.
 				// f(w + dt) = f(w) + f'(w) * dt + f''(w) * dt^2 / 2! + ....
-				// let dw = w * dt, and negetion huget order derivatoves we get 
+				// let dw = w * dt, and neglectinf higher order derivatives we get 
 				// f(w + dw) = f(w) + f'(w) * dw
 				// and calculating dw as the  f'(w) = f(wx, wy, wz) | dt
 
@@ -330,8 +336,9 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 				// and solving for alpha we get the angular acceleration at t + dt
 				// calculate gradient at a full time step
-				dgVector deltaToque(localTorque - localOmega.CrossProduct3(localOmega * m_mass));
-				dgVector gradientStep(deltaToque.Scale4(timestep));
+				//dgVector deltaToque(localTorque - localOmega.CrossProduct3(localOmega * m_mass));
+				//dgVector gradientStep(deltaToque.Scale4(timestep));
+				dgVector gradientStep(localTorque.Scale4(timestep));
 
 				// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 				dgVector dw(localOmega.Scale4(dgFloat32(0.5f) * timestep));
