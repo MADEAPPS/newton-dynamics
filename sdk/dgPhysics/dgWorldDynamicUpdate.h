@@ -209,7 +209,7 @@ class dgJacobianMatrixElement
 
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
-	dgFloat32 m_gyroAccel;
+//	dgFloat32 m_gyroAccel;
 	dgFloat32 m_maxImpact;
 
 	dgFloat32 m_deltaAccel;

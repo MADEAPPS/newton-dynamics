@@ -221,7 +221,7 @@ class dgBody
 	protected:
 	void UpdateLumpedMatrix();
 	void CalcInvInertiaMatrix ();
-	dgVector CalculateLineraMomentum() const; 
+	dgVector CalculateLinearMomentum() const; 
 	dgVector CalculateAngularMomentum() const; 
 
 	dgMatrix m_matrix;
@@ -239,7 +239,7 @@ class dgBody
 	dgVector m_globalCentreOfMass;	
 	dgVector m_impulseForce;	
 	dgVector m_impulseTorque;	
-//	dgVector m_gyroToque;
+	dgVector m_gyroToque;
 
 	dgInt32 m_criticalSectionLock;
 	union 
@@ -584,7 +584,7 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
 
-DG_INLINE dgVector dgBody::CalculateLineraMomentum() const
+DG_INLINE dgVector dgBody::CalculateLinearMomentum() const
 {
 	return dgVector (m_veloc.Scale4 (m_mass.m_w));
 }

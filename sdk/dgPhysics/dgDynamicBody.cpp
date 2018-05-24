@@ -254,10 +254,8 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
 
-//	dgVector localOmega(body->m_matrix.UnrotateVector(body->m_omega));
-//	dgVector localAngularMomentum(body->m_mass * localOmega);
-//	body->m_gyroToque = body->m_matrix.RotateVector(localOmega.CrossProduct3(localAngularMomentum));
-	m_externalTorque -= m_omega.CrossProduct3(CalculateAngularMomentum());
+	//m_gyroToque = m_omega.CrossProduct3(CalculateAngularMomentum());
+	m_gyroToque = CalculateAngularMomentum().CrossProduct3(m_omega);
 
 	m_externalForce += m_impulseForce;
 	m_externalTorque += m_impulseTorque;
@@ -303,8 +301,8 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			dgVector localOmega(m_matrix.UnrotateVector(m_omega));
-			dgVector localTorque(m_matrix.UnrotateVector(m_externalTorque));
-			//dgVector localAlpha((localTorque - localOmega.CrossProduct3(localOmega * m_mass)) * m_invMass);
+			dgVector localTorque(m_matrix.UnrotateVector(m_externalTorque + m_gyroToque));
+			
 			dgVector localAlpha(localTorque * m_invMass);
 			const dgFloat32 localAlphaErr = dgFloat32 (0.005f);
 			if (localAlpha.DotProduct4(localAlpha).GetScalar() < (localAlphaErr * localAlphaErr)) {
@@ -346,14 +344,23 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 				dgFloat32 jacobianMatrix[3][3];
 				// calculates Jacobian matrix
+				//dWx / dwx = Ix
+				//dWx / dwy = (Iz - Iy) * wz * dt
+				//dWx / dwz = (Iz - Iy) * wy * dt
 				jacobianMatrix[0][0] = m_mass[0];
 				jacobianMatrix[0][1] = (m_mass[2] - m_mass[1]) * dw[2];
 				jacobianMatrix[0][2] = (m_mass[2] - m_mass[1]) * dw[1];
 
+				//dWy / dwx = (Ix - Iz) * wz * dt
+				//dWy / dwy = Iy				 
+				//dWy / dwz = (Ix - Iz) * wx * dt
 				jacobianMatrix[1][0] = (m_mass[0] - m_mass[2]) * dw[2];
 				jacobianMatrix[1][1] = m_mass[1];
 				jacobianMatrix[1][2] = (m_mass[0] - m_mass[2]) * dw[0];
 
+				//dWz / dwx = (Iy - Ix) * wy * dt 
+				//dWz / dwy = (Iy - Ix) * wx * dt 
+				//dWz / dwz = Iz
 				jacobianMatrix[2][0] = (m_mass[1] - m_mass[0]) * dw[1];
 				jacobianMatrix[2][1] = (m_mass[1] - m_mass[0]) * dw[0];
 				jacobianMatrix[2][2] = m_mass[2];

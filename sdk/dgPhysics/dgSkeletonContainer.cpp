@@ -1226,7 +1226,8 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 			const dgJacobianMatrixElement* const row = &matrixRow[first + k];
 			dgVector diag(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 						  row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-			a.m_joint[j] = -(row->m_coordenateAccel + row->m_gyroAccel - row->m_force * row->m_diagDamp - diag.AddHorizontal().GetScalar());
+			//a.m_joint[j] = -(row->m_coordenateAccel + row->m_gyroAccel - row->m_force * row->m_diagDamp - diag.AddHorizontal().GetScalar());
+			a.m_joint[j] = -(row->m_coordenateAccel - row->m_force * row->m_diagDamp - diag.AddHorizontal().GetScalar());
 		}
 	}
 	dgAssert((m_nodeCount - 1) == m_nodesOrder[m_nodeCount - 1]->m_index);
@@ -1292,7 +1293,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			f[auxiliaryIndex + primaryCount] = dgFloat32 (0.0f);
 			dgVector acc(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 						 row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-			b[auxiliaryIndex] = row->m_coordenateAccel + row->m_gyroAccel - acc.AddHorizontal().GetScalar();
+			//b[auxiliaryIndex] = row->m_coordenateAccel + row->m_gyroAccel - acc.AddHorizontal().GetScalar();
+			b[auxiliaryIndex] = row->m_coordenateAccel - acc.AddHorizontal().GetScalar();
 			
 			dgAssert(row->m_force >= row->m_lowerBoundFrictionCoefficent * dgFloat32(2.0f));
 			dgAssert(row->m_force <= row->m_upperBoundFrictionCoefficent * dgFloat32(2.0f));
@@ -1320,7 +1322,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
 			dgVector acc(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 						 row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
-			b[auxiliaryIndex] = row->m_coordenateAccel + row->m_gyroAccel - acc.AddHorizontal().GetScalar();
+			//b[auxiliaryIndex] = row->m_coordenateAccel + row->m_gyroAccel - acc.AddHorizontal().GetScalar();
+			b[auxiliaryIndex] = row->m_coordenateAccel - acc.AddHorizontal().GetScalar();
 			
 			dgInt32 frictionIndex = row->m_normalForceIndex;
 			dgAssert(frictionIndex >= 0);

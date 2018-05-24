@@ -51,7 +51,7 @@ dgBody::dgBody()
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))		
-//	,m_gyroToque(dgFloat32 (0.0f))
+	,m_gyroToque(dgFloat32 (0.0f))
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -94,7 +94,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))		
-//	,m_gyroToque(dgFloat32 (0.0f))
+	,m_gyroToque(dgFloat32 (0.0f))
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -322,7 +322,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	dgAssert (m_matrix.TestOrthogonal());
 
 dgVector xxx (CalculateAngularMomentum());
-xxx.Trace("L =");
+dgTrace(("W(%f %f %f) L(%f %f %f)\n", m_omega.m_x, m_omega.m_y, m_omega.m_z, xxx.m_x, xxx.m_y, xxx.m_z));
 }
 
 

@@ -1378,11 +1378,11 @@ class dgVector
 	}
 
 	// component wise multiplication
-	DG_INLINE dgVector CompProduct3 (const dgVector& A) const
-	{
-		dgVector tmp ((A & m_triplexMask) | m_wOne);
-		return _mm_mul_ps (m_type, tmp.m_type);
-	}
+//	DG_INLINE dgVector CompProduct3 (const dgVector& A) const
+//	{
+//		dgVector tmp ((A & m_triplexMask) | m_wOne);
+//		return _mm_mul_ps (m_type, tmp.m_type);
+//	}
 
 	DG_INLINE dgVector Reciproc () const
 	{

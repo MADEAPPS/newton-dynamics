@@ -469,10 +469,8 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
 			} else {
 				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
-				dgVector relVeloc (Jt.m_jacobianM0.m_linear.CompProduct3(bodyVeloc0) +
-								   Jt.m_jacobianM0.m_angular.CompProduct3(bodyOmega0) +
-								   Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1) +
-								   Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
+				dgVector relVeloc (Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
+								   Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
 
 				dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 				jacobianMatrixElements[k].m_coordenateAccel = jacobianMatrixElements[k].m_deltaAccel - vRel;

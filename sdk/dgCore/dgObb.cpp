@@ -104,27 +104,29 @@ namespace InternalSphere
 	}
 
 
-	static void Statistics (dgObb &sphere, dgVector &eigenValues, dgVector &scaleVector, const dgFloat32 vertex[], const dgInt32 faceIndex[], dgInt32 indexCount, dgInt32 stride)
+	static void Statistics (dgObb &sphere, dgVector &eigenValues, const dgVector &scale, const dgFloat32 vertex[], const dgInt32 faceIndex[], dgInt32 indexCount, dgInt32 stride)
 	{
-		dgVector var (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector cov (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector centre (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector massCenter (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector var (dgFloat32 (0.0f));
+		dgVector cov (dgFloat32 (0.0f));
+		dgVector centre (dgFloat32 (0.0f));
+		dgVector massCenter (dgFloat32 (0.0f));
+
+		dgVector scaleVector (scale & dgVector::m_triplexMask);
 
 		dgFloat64 totalArea = dgFloat32 (0.0f);
 		const dgFloat32* const ptr = vertex;
 		for (dgInt32 i = 0; i < indexCount; i += 3) {
 			dgInt32 index = faceIndex[i] * stride;
 			dgVector p0 (&ptr[index]);
-			p0 = p0.CompProduct3 (scaleVector);
+			p0 = p0 * scaleVector;
 
 			index = faceIndex[i + 1] * stride;;
 			dgVector p1 (&ptr[index]);
-			p1 = p1.CompProduct3 (scaleVector);
+			p1 = p1 * scaleVector;
 
 			index = faceIndex[i + 2] * stride;;
 			dgVector p2 (&ptr[index]);
-			p2 = p2.CompProduct3 (scaleVector);
+			p2 = p2 * scaleVector;
 
 			dgVector normal ((p1 - p0).CrossProduct3(p2 - p0));
 
