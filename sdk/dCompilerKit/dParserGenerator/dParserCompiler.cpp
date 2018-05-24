@@ -99,22 +99,22 @@ class dParserCompiler::dSymbolName
 
 	bool operator== (const dSymbolName& src) const
 	{
-		return m_name->GetKey() == src.m_name->GetKey();
+		return m_name == src.m_name;
 	}
 
 	bool operator!= (const dSymbolName& src) const
 	{
-		return m_name->GetKey() != src.m_name->GetKey();
+		return m_name != src.m_name;
 	}
 
 	bool operator< (const dSymbolName& src) const
 	{
-		return m_name->GetKey() < src.m_name->GetKey();
+		return m_name < src.m_name;
 	}
 
 	bool operator> (const dSymbolName& src) const
 	{
-		return m_name->GetKey() > src.m_name->GetKey();
+		return m_name > src.m_name;
 	}
 
 	private:
@@ -218,7 +218,6 @@ class dParserCompiler::dProductionRule: public dList<dParserCompiler::dRuleInfo>
 
 	dListNode* Find (dSymbolName name) const
 	{
-		//const void* const key = name.GetPointer();
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 			if (node->GetInfo().m_name == name) {
 				return node;
@@ -244,8 +243,8 @@ class dParserCompiler::dItem
 	public:
 	dItem ()
 		:m_indexMarker(0)
-		,m_lookAheadSymbol("")
-		,m_lastOperatorSymbol ("")
+		,m_lookAheadSymbol()
+		,m_lastOperatorSymbol ()
 		,m_ruleNode(NULL)
 	{
 	}
@@ -377,7 +376,6 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 					keylength++;
 					key[keylength] = 0;
 				}
-
 				const dSymbol& info = node->GetInfo();
 				//key = dCRC64 (info.m_name.GetStr(), key);
 				dAssert((keylength + info.m_name.GetString().Size()) < sizeof(key));
@@ -471,7 +469,6 @@ class dParserCompiler::dOperatorsAssociation: public dList <dSymbolName>
 
 	bool FindOperator(dSymbolName symbol) const
 	{
-		//const void* const key = symbol.GetPointer();
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 			if (symbol == node->GetInfo()) {
 				return true;
@@ -507,15 +504,12 @@ class dParserCompiler::dOperatorsPrecedence: public dList <dOperatorsAssociation
 			for (dRuleInfo::dListNode* infoSymbolNode = ruleInfo.GetFirst(); infoSymbolNode; infoSymbolNode = infoSymbolNode->GetNext()) {
 				const dSymbol& infoSymbol = infoSymbolNode->GetInfo();
 				if (infoSymbol.m_operatorPrecendeceOverrride.Size()) {
-					//dSymbolName crc (infoSymbol.m_operatorPrecendeceOverrride);
 					if (FindAssociation(infoSymbol.m_operatorPrecendeceOverrride)) {
-						//item.m_lastOperatorSymbolCRC = crc;
 						item.m_lastOperatorSymbol = infoSymbol.m_operatorPrecendeceOverrride;
 					}
 
 				} else {
 					if (FindAssociation(infoSymbol.m_name)) {
-						//item.m_lastOperatorSymbolCRC = infoSymbol.m_nameCRC;
 						item.m_lastOperatorSymbol = infoSymbol.m_name;
 					}
 				}
@@ -657,7 +651,7 @@ void dParserCompiler::ScanGrammarFile(
 	dString& endUserCode,
 	int& lastTokenEnum)
 {
-	dSymbolName startSymbol ("");
+	dSymbolName startSymbol;
 	int tokenEnumeration = 256;
 	int operatorPrecedencePriority = 0;
 
@@ -803,7 +797,6 @@ void dParserCompiler::ScanGrammarFile(
 	symbol.m_token = firstRule.m_token;
 	symbol.m_type = firstRule.m_type;
 	symbol.m_name = firstRule.m_name;
-//	symbol.m_nameCRC = firstRule.m_nameCRC;
 
 	// scan literal use code
 	if (token1 == GRAMMAR_SEGMENT) {
@@ -964,7 +957,6 @@ void dParserCompiler::CanonicalItemSets (
 			dState* const newState = Goto (state, symbol, symbolList, ruleMap);
 			dAssert (newState);
 			if (newState->GetCount()) {
-
 				const dTokenInfo& tokenInfo = iter.GetNode()->GetInfo();
 				dTransition& transition = state->m_transitions.Append()->GetInfo();
 				transition.m_symbol = symbol;
@@ -1045,7 +1037,6 @@ dParserCompiler::dState* dParserCompiler::Closure (
 							dItem newItem;
 							newItem.m_indexMarker = 0;
 							newItem.m_ruleNode = ruleNode;
-							newItem.m_lookAheadSymbol = symbol;
 							newItem.m_lookAheadSymbol = symbolList.Find (symbol)->GetInfo().m_name;
 							state->AddItem(newItem);
 						}
@@ -1081,7 +1072,7 @@ void dParserCompiler::First (
 			deriveEmpty = false;  
 			for (iter.Begin(); iter; iter ++) {
 				dSymbolName symbol = iter.GetKey();
-				static dSymbolName empty("");
+				static dSymbolName empty;
 				if (symbol == empty) {
 					deriveEmpty = true;  
 				} else {
@@ -1200,7 +1191,6 @@ dParserCompiler::dState* dParserCompiler::Goto (
 					dItem& newItem = itemSet.Append()->GetInfo();
 					newItem.m_indexMarker = index + 1;
 					newItem.m_ruleNode = item.m_ruleNode;
-					//newItem.m_lookAheadSymbolCRC = item.m_lookAheadSymbolCRC;
 					newItem.m_lookAheadSymbol = item.m_lookAheadSymbol;
 					break;
 				}
@@ -1267,7 +1257,6 @@ void dParserCompiler::GenerateHeaderFile (
 
 	for (iter1.Begin(); iter1; iter1 ++) {
 		dTree<dTokenInfo, dSymbolName>::dTreeNode* const node = iter1.GetNode()->GetInfo();
-		//const dString& name = node->GetKey();
 		const dString& name = node->GetInfo().m_name.GetString();
 		enumdTokens += "\t\t";
 		enumdTokens += name;
@@ -1475,7 +1464,6 @@ void dParserCompiler::GenerateParserCode (
 	ReplaceMacro (templateHeader, nextActionsStateList, "$(actionTable)");
 
 	ReplaceMacro (templateHeader, sematicActions, "$(semanticActionsCode)");
-
 
 	dString stateGotoStart ("");
 	dString stateGotoCount ("");
