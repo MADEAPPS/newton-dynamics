@@ -253,9 +253,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 	if (m_applyExtForces) {
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
-
-	//m_gyroToque = m_omega.CrossProduct3(CalculateAngularMomentum());
-	m_gyroToque = CalculateAngularMomentum().CrossProduct3(m_omega);
+	m_gyroToque = m_omega.CrossProduct3(CalculateAngularMomentum());
 
 	m_externalForce += m_impulseForce;
 	m_externalTorque += m_impulseTorque;
@@ -301,7 +299,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			dgVector localOmega(m_matrix.UnrotateVector(m_omega));
-			dgVector localTorque(m_matrix.UnrotateVector(m_externalTorque + m_gyroToque));
+			dgVector localTorque(m_matrix.UnrotateVector(m_externalTorque - m_gyroToque));
 			
 			dgVector localAlpha(localTorque * m_invMass);
 			const dgFloat32 localAlphaErr = dgFloat32 (0.005f);

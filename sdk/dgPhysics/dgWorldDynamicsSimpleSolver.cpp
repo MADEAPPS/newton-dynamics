@@ -583,17 +583,17 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	return accNorm.GetScalar();
 }
 
-dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgJacobian& force, const dgVector& timestep) const
+dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const
 {
 	dgJacobian velocStep;
+	//dgVector totalTorque(torque - body->m_gyroToque);
+	dgVector totalTorque(torque);
+#if 0
 	const dgVector& mass = body->m_mass;
 	const dgMatrix& matrix = body->m_matrix;
 	
 	dgVector localOmega (matrix.UnrotateVector(body->m_omega));
-	dgVector localTorque (matrix.UnrotateVector(force.m_angular));
-//	dgVector localNetTorque (localTorque - localOmega.CrossProduct3(localOmega * mass));
-//	dgVector gradientStep(localNetTorque * timestep);
-
+	dgVector localTorque (matrix.UnrotateVector(totalTorque));
 	dgVector gradientStep(localTorque * timestep);
 	dgVector dw(localOmega * timestep * dgVector::m_half);
 
@@ -636,10 +636,13 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
 	gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
 	gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
-	//localOmega += gradientStep;
 
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
-	velocStep.m_linear = force.m_linear.Scale4(body->m_invMass.m_w) * timestep;
+#else
+	
+	velocStep.m_angular = body->m_invWorldInertiaMatrix.RotateVector(totalTorque) * timestep;
+#endif
+	velocStep.m_linear = force.Scale4(body->m_invMass.m_w) * timestep;
 	return velocStep;
 }
 
@@ -742,33 +745,13 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 				dgAssert(body->m_index == i);
 				if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-#if 1
-					dgJacobian forceAndTorque(internalForces[i]);
 					const dgVector force(internalForces[i].m_linear + body->m_externalForce);
-					//const dgVector torque(internalForces[i].m_angular + body->m_externalTorque + body->m_gyroToque);
 					const dgVector torque(internalForces[i].m_angular + body->m_externalTorque);
-					const dgVector velocStep(force.Scale4(body->m_invMass.m_w) * timestep4);
-					const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
-					if (!body->m_resting) {
-						body->m_veloc += velocStep;
-						body->m_omega += omegaStep;
-						body->m_gyroToque = (body->CalculateAngularMomentum()).CrossProduct3(body->m_omega);
-					} else {
-						const dgVector velocStep2(velocStep.DotProduct4(velocStep));
-						const dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
-						const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dgVector::m_negOne);
-						const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-						body->m_resting &= equilibrium;
-					}
-#else
-				
-					dgJacobian forceAndTorque(internalForces[i]);
-					forceAndTorque.m_linear += body->m_externalForce;
-					forceAndTorque.m_angular += body->m_externalTorque;
-					dgJacobian velocStep(IntegrateForceAndToque(body, forceAndTorque, timestep4));
+					dgJacobian velocStep(IntegrateForceAndToque(body, force, torque, timestep4));
 					if (!body->m_resting) {
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
+						body->m_gyroToque = body->m_omega.CrossProduct3(body->CalculateAngularMomentum());
 					} else {
 						const dgVector velocStep2(velocStep.m_linear.DotProduct4(velocStep.m_linear));
 						const dgVector omegaStep2(velocStep.m_angular.DotProduct4(velocStep.m_angular));
@@ -776,8 +759,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 						const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 						body->m_resting &= equilibrium;
 					}
-#endif
-
 
 					dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
 					dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
