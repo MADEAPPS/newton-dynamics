@@ -322,7 +322,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	dgAssert (m_matrix.TestOrthogonal());
 
 dgVector xxx (CalculateAngularMomentum());
-dgTrace(("W(%f %f %f) L(%f %f %f)\n", m_omega.m_x, m_omega.m_y, m_omega.m_z, xxx.m_x, xxx.m_y, xxx.m_z));
+dgTrace(("body %d W(%f %f %f) L(%f %f %f)\n", m_uniqueID, m_omega.m_x, m_omega.m_y, m_omega.m_z, xxx.m_x, xxx.m_y, xxx.m_z));
 }
 
 
