@@ -201,7 +201,12 @@ class dgJacobianMatrixElement
 	public:
 	dgJacobianPair m_Jt;
 	dgJacobianPair m_JMinv;
+} DG_GCC_VECTOR_ALIGMENT;
 
+
+class dgRightHandSide
+{
+	public:
 	dgFloat32 m_force;
 	dgFloat32 m_diagDamp;
 	dgFloat32 m_invJinvMJt;
@@ -209,7 +214,7 @@ class dgJacobianMatrixElement
 
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
-//	dgFloat32 m_gyroAccel;
+	dgFloat32 m_gyroAccel;
 	dgFloat32 m_maxImpact;
 
 	dgFloat32 m_deltaAccel;
@@ -217,11 +222,12 @@ class dgJacobianMatrixElement
 	dgFloat32 m_penetration;
 	dgFloat32 m_stiffness;
 
-//	dgFloat32 m_jinvMJt;
+	//	dgFloat32 m_jinvMJt;
 	dgForceImpactPair* m_jointFeebackForce;
 	dgFloat32 m_penetrationStiffness;
 	dgInt32 m_normalForceIndex;
-} DG_GCC_VECTOR_ALIGMENT;
+};
+
 
 class dgJacobianMemory
 {
@@ -229,6 +235,7 @@ class dgJacobianMemory
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
 	dgJacobian* m_internalForcesBuffer;
+	dgRightHandSide* m_righHandSizeBuffer;
 	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 
@@ -264,19 +271,18 @@ class dgWorldDynamicUpdate
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const; 
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesParallel (dgParallelSolverSyncData* const syncData) const; 
-	void BuildJacobianMatrixParallel(const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgInt32* const bodyLocks, const dgFloat32* const weight, const dgFloat32* const invWeight) const;
+	void BuildJacobianMatrixParallel(const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32* const bodyLocks, const dgFloat32* const weight, const dgFloat32* const invWeight) const;
 	void CalculateReactionForcesParallel (const dgBodyCluster* const clusters, dgInt32 clustersCount, dgFloat32 timestep) const;
 	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void ResolveClusterForces (dgBodyCluster* const cluste, dgInt32 threadID, dgFloat32 timestep) const;
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void CalculateClusterReactionForces (const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
-	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
+	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const;
 		
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	dgFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	dgFloat32 CalculateJointForceParallel(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-
+	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide) const;
+	dgFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide) const;
+	dgFloat32 CalculateJointForceParallel(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide) const;
 	dgJacobian IntegrateForceAndToque(dgDynamicBody* const body, const dgJacobian& force, const dgVector& timestep) const ;
 
 	void SortClustersByCount ();
@@ -284,7 +290,7 @@ class dgWorldDynamicUpdate
 	void IntegrateVelocity (const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 
 	void CalculateClusterContacts (dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
-	dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const;
+	dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const;
 	
 	dgInt32 m_bodies;
 	dgInt32 m_joints;

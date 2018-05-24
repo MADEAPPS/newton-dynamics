@@ -42,7 +42,7 @@ class dgMinkFace
 #define DG_CONVEX_MINK_MAX_FACES		512
 #define DG_CONVEX_MINK_MAX_POINTS		256
 #define DG_MAX_EDGE_COUNT				2048
-#define DG_PENETRATION_TOL			dgFloat32 (1.0f / 1024.0f)
+#define DG_PENETRATION_TOL				dgFloat32 (1.0f / 1024.0f)
 #define DG_MINK_VERTEX_ERR				(dgFloat32 (1.0e-3f))
 #define DG_MINK_VERTEX_ERR2				(DG_MINK_VERTEX_ERR * DG_MINK_VERTEX_ERR)
 

@@ -410,7 +410,6 @@ dgFloat32 dgBilateralConstraint::GetInverseDynamicAcceleration(dgInt32 index) co
 
 void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
-	dgJacobianMatrixElement* const jacobianMatrixElements = params->m_rowMatrix;
 	const dgVector& bodyVeloc0 = m_body0->m_veloc;
 	const dgVector& bodyOmega0 = m_body0->m_omega;
 	const dgVector& bodyVeloc1 = m_body1->m_veloc;
@@ -418,6 +417,9 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 
 // remember the impulse branch 
 //dgAssert (params->m_timeStep > dgFloat32 (0.0f));
+
+	dgRightHandSide* const rhs = params->m_rightHandSide;
+	const dgJacobianMatrixElement* const row = params->m_rowMatrix;
 	if (params->m_timeStep > dgFloat32 (0.0f)) {
 		//const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.25f);
 		//const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
@@ -426,16 +428,16 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 		const dgFloat32 dt = params->m_timeStep;
 		for (dgInt32 k = 0; k < params->m_rowsCount; k ++) {
 			if (m_rowIsMotor & (1 << k)) {
-   				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
+   				rhs[k].m_coordenateAccel = m_motorAcceleration[k] + rhs[k].m_deltaAccel;
 			} else {
-				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
+				const dgJacobianPair& Jt = row[k].m_Jt;
 
 				#if 1
-				dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
+				dgFloat32 aRel = params->m_firstPassCoefFlag ? rhs[k].m_deltaAccel : rhs[k].m_coordenateAccel;
 				#else			
 				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_angular) +
 							   bodyVeloc1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_angular));
-				dgFloat32 aRel = jacobianMatrixElements[k].m_deltaAccel - accel.AddHorizontal().GetScalar(); 
+				dgFloat32 aRel = rhs[k].m_deltaAccel - accel.AddHorizontal().GetScalar(); 
 				#endif
 
 				dgVector relVeloc (Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
@@ -453,27 +455,28 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				//dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 				//accelError = num / den;
 
-				dgFloat32 relPosit = jacobianMatrixElements[k].m_penetration - vRel * dt * params->m_firstPassCoefFlag;
-				jacobianMatrixElements[k].m_penetration = relPosit;
+				dgFloat32 relPosit = rhs[k].m_penetration - vRel * dt * params->m_firstPassCoefFlag;
+				rhs[k].m_penetration = relPosit;
 
 				dgFloat32 ksd = dt * ks;
 				dgFloat32 num = ks * relPosit - kd * vRel - ksd * vRel;
 				dgFloat32 den = dgFloat32(1.0f) + dt * kd + dt * ksd;
 				dgFloat32 aRelErr = num / den;
-				jacobianMatrixElements[k].m_coordenateAccel = aRelErr + aRel;
+				rhs[k].m_coordenateAccel = aRelErr + aRel;
 			}
 		}
 	} else {
+
 		for (dgInt32 k = 0; k < params->m_rowsCount; k ++) {
 			if (m_rowIsMotor & (1 << k)) {
-				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
+				rhs[k].m_coordenateAccel = m_motorAcceleration[k] + rhs[k].m_deltaAccel;
 			} else {
-				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
+				const dgJacobianPair& Jt = row[k].m_Jt;
 				dgVector relVeloc (Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
 								   Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
 
 				dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-				jacobianMatrixElements[k].m_coordenateAccel = jacobianMatrixElements[k].m_deltaAccel - vRel;
+				rhs[k].m_coordenateAccel = rhs[k].m_deltaAccel - vRel;
 			}
 		}
 	}

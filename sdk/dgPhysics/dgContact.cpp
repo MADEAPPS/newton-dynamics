@@ -298,7 +298,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 
 void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
-	dgJacobianMatrixElement* const rowMatrix = params->m_rowMatrix;
+	
 	const dgVector& bodyVeloc0 = m_body0->m_veloc;
 	const dgVector& bodyOmega0 = m_body0->m_omega;
 	const dgVector& bodyVeloc1 = m_body1->m_veloc;
@@ -313,39 +313,43 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 		invTimestep = params->m_invTimeStep;
 	}
 
+	dgRightHandSide* const rightHandSide = params->m_rightHandSide;
+	const dgJacobianMatrixElement* const rowMatrix = params->m_rowMatrix;
+
 	for (dgInt32 k = 0; k < count; k ++) {
 		// note: using restitution been negative to indicate that the acceleration was override
-		if (rowMatrix[k].m_restitution >= dgFloat32 (0.0f)) {
-			dgJacobianMatrixElement* const row = &rowMatrix[k];
+		if (rightHandSide[k].m_restitution >= dgFloat32 (0.0f)) {
+			dgRightHandSide* const rhs = &rightHandSide[k];
+			const dgJacobianMatrixElement* const row = &rowMatrix[k];
 
 			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 + row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 + row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
 			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
-			dgFloat32 aRel = row->m_deltaAccel;
+			dgFloat32 aRel = rhs->m_deltaAccel;
 
-			if (row->m_normalForceIndex == count) {
-				dgAssert (row->m_restitution >= 0.0f);
-				dgAssert (row->m_restitution <= 2.0f);
-				dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + row->m_restitution) : dgFloat32 (1.0f);
+			if (rhs->m_normalForceIndex == count) {
+				dgAssert (rhs->m_restitution >= 0.0f);
+				dgAssert (rhs->m_restitution <= 2.0f);
+				dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + rhs->m_restitution) : dgFloat32 (1.0f);
 
 				dgFloat32 penetrationVeloc = dgFloat32 (0.0f);
-				if (row->m_penetration > DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.125f)) {
+				if (rhs->m_penetration > DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.125f)) {
 					if (vRel > dgFloat32 (0.0f)) {
 						dgFloat32 penetrationCorrection = vRel * timestep;
 						dgAssert (penetrationCorrection >= dgFloat32 (0.0f));
-						row->m_penetration = dgMax (dgFloat32 (0.0f), row->m_penetration - penetrationCorrection);
+						rhs->m_penetration = dgMax (dgFloat32 (0.0f), rhs->m_penetration - penetrationCorrection);
 					} else {
-						dgFloat32 penetrationCorrection = -vRel * timestep * row->m_restitution * dgFloat32 (8.0f);
-						if (penetrationCorrection > row->m_penetration) {
-							row->m_penetration = dgFloat32 (0.001f);
+						dgFloat32 penetrationCorrection = -vRel * timestep * rhs->m_restitution * dgFloat32 (8.0f);
+						if (penetrationCorrection > rhs->m_penetration) {
+							rhs->m_penetration = dgFloat32 (0.001f);
 						}
 					}
-					penetrationVeloc = -(row->m_penetration * row->m_penetrationStiffness);
+					penetrationVeloc = -(rhs->m_penetration * rhs->m_penetrationStiffness);
 				}
 
 				vRel = vRel * restitution + penetrationVeloc;
 				vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
 			}
-			row->m_coordenateAccel = aRel - vRel * invTimestep;
+			rhs->m_coordenateAccel = aRel - vRel * invTimestep;
 		}
 	}
 }

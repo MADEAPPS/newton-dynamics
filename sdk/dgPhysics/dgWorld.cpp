@@ -213,6 +213,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_bodiesMemory (allocator, 64)
 	,m_jointsMemory (allocator, 64)
 	,m_solverJacobiansMemory (allocator, 64)
+	,m_solverRightHandSideMemory (allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
 	,m_clusterMemory (allocator, 64)
 	,m_concurrentUpdate(false)
@@ -225,6 +226,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_jointsMemory.Resize(1024 * 32);
 	m_clusterMemory.Resize(1024 * 32);
 	m_solverJacobiansMemory.Resize(1024 * 64);
+	m_solverRightHandSideMemory.Resize(1024 * 64);
 	m_solverForceAccumulatorMemory.Resize(1024 * 32);
 
 	m_savetimestep = dgFloat32 (0.0f);
@@ -1017,7 +1019,7 @@ void dgWorld::Update (dgFloat32 timestep)
 void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
 	m_concurrentUpdate = true;
-	Sync();
+	Sync ();
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;

@@ -96,6 +96,7 @@ class dgJacobianPair
 	dgJacobian m_jacobianM1;
 } DG_GCC_VECTOR_ALIGMENT;
 
+class dgRightHandSide;
 class dgJacobianMatrixElement;
 class dgJointAccelerationDecriptor
 {
@@ -104,7 +105,8 @@ class dgJointAccelerationDecriptor
 	dgFloat32 m_timeStep;
 	dgFloat32 m_invTimeStep;
 	dgFloat32 m_firstPassCoefFlag;
-	dgJacobianMatrixElement *m_rowMatrix;
+	dgRightHandSide* m_rightHandSide;
+	const dgJacobianMatrixElement* m_rowMatrix;
 };
 
 
