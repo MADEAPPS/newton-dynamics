@@ -407,9 +407,9 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep)
 	m_alpha = externalTorque * m_invMass;
 	m_veloc += m_accel.Scale4(timestep);
 
-	timestep *= dgFloat32(0.25f);
+	dgVector dt (timestep * dgFloat32(0.25f));
 
-	dgInt32 method = 0;
+	dgInt32 method = 1;
 	switch (method)
 	{
 		case 0:
@@ -417,23 +417,27 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep)
 			// subdivide time step and keep everything constants during the sub steps.
 			for (dgInt32 i = 0; i < 4; i++) {
 				dgVector toque(m_externalTorque - m_gyroToque);
-				dgVector alpha(toque.Scale4(m_invMass.m_w));
-				m_omega += alpha.Scale4(timestep);
+				dgVector alpha(m_matrix.RotateVector(m_invMass * m_matrix.UnrotateVector(toque)));
+				m_omega += alpha * dt;
 			}
 			break;
 		}
 
 		case 1:
 		{
-			// subdivide time step and recalculate gyro toque, keep everything else constants during the sub steps.
+			// subdivide time step and recalculate gyro toque, 
+			// but keeps everything else constants during the sub steps.
+			dgVector externTorque(m_matrix.UnrotateVector(m_externalTorque));
 			for (dgInt32 i = 0; i < 4; i++) {
-				dgVector toque(m_externalTorque - m_gyroToque);
-				dgVector alpha(toque.Scale4(m_invMass.m_w));
-				m_omega += alpha.Scale4(timestep);
+				dgVector localOmega(m_matrix.UnrotateVector(m_omega));
+				dgVector gyroTorque(localOmega.CrossProduct3(m_mass * localOmega));
+				dgVector torque(externTorque - gyroTorque);
+				dgVector alpha(torque * m_invMass);
+				localOmega += alpha * dt;
+				m_omega = m_matrix.RotateVector(localOmega);
 			}
 			break;
 		}
-
 
 	}
 
@@ -444,9 +448,11 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 	if (!m_equilibrium) {
 		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 if (m_uniqueID == 3)
+{
 			IntegrateExplicit(timestep);
-else
+} else {
 			IntegrateImplicit(timestep);
+}
 
 		} else {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;

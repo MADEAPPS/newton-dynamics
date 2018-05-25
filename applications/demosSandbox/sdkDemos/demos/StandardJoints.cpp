@@ -303,7 +303,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodySetOmega(box1, &omega[0]);
 	NewtonBodySetLinearDamping(box1, 0.0f);
 	NewtonBodySetAngularDamping(box1, &damp[0]);
-
+/*
 	NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.0f, 0.0f), 1.0f, 0.5f);
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	matrix = dYawMatrix(dPi * 0.5f) * matrix;
@@ -312,7 +312,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodySetOmega(box2, &omega[0]);
 	NewtonBodySetLinearDamping(box2, 0.0f);
 	NewtonBodySetAngularDamping(box2, &damp[0]);
-
+*/
 	// link the two boxes
 //	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	//dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
