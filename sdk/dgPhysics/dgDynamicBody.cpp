@@ -409,7 +409,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep)
 
 	dgVector dt (timestep * dgFloat32(0.25f));
 
-	dgInt32 method = 1;
+	dgInt32 method = 2;
 	switch (method)
 	{
 		case 0:
@@ -428,13 +428,32 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep)
 			// subdivide time step and recalculate gyro toque, 
 			// but keeps everything else constants during the sub steps.
 			dgVector externTorque(m_matrix.UnrotateVector(m_externalTorque));
+			dgVector localOmega(m_matrix.UnrotateVector(m_omega));
 			for (dgInt32 i = 0; i < 4; i++) {
-				dgVector localOmega(m_matrix.UnrotateVector(m_omega));
 				dgVector gyroTorque(localOmega.CrossProduct3(m_mass * localOmega));
 				dgVector torque(externTorque - gyroTorque);
 				dgVector alpha(torque * m_invMass);
 				localOmega += alpha * dt;
-				m_omega = m_matrix.RotateVector(localOmega);
+			}
+			m_omega = m_matrix.RotateVector(localOmega);
+			break;
+		}
+
+		case 2:
+		{
+			// subdivide time step, recalculate gyro toque and rotation matrix, 
+			// but still doing forward Euler steps.
+			dgVector externTorque(m_matrix.UnrotateVector(m_externalTorque));
+			dgQuaternion rotation(m_rotation);
+			for (dgInt32 i = 0; i < 4; i++) {
+				dgMatrix matrix(rotation, dgVector::m_wOne);
+				dgVector localOmega(matrix.UnrotateVector(m_omega));
+				dgVector gyroTorque(localOmega.CrossProduct3(m_mass * localOmega));
+				dgVector torque(externTorque - gyroTorque);
+				dgVector alpha(torque * m_invMass);
+				localOmega += alpha * dt;
+				m_omega = matrix.RotateVector(localOmega);
+				// integrate rotation here
 			}
 			break;
 		}
