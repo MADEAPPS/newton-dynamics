@@ -408,10 +408,33 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep)
 	m_veloc += m_accel.Scale4(timestep);
 
 	timestep *= dgFloat32(0.25f);
-	for (dgInt32 i = 0; i < 4; i++) {
-		dgVector toque(m_externalTorque - m_gyroToque);
-		dgVector alpha(toque.Scale4(m_invMass.m_w));
-		m_omega += alpha.Scale4(timestep);
+
+	dgInt32 method = 0;
+	switch (method)
+	{
+		case 0:
+		{
+			// subdivide time step and keep everything constants during the sub steps.
+			for (dgInt32 i = 0; i < 4; i++) {
+				dgVector toque(m_externalTorque - m_gyroToque);
+				dgVector alpha(toque.Scale4(m_invMass.m_w));
+				m_omega += alpha.Scale4(timestep);
+			}
+			break;
+		}
+
+		case 1:
+		{
+			// subdivide time step and recalculate gyro toque, keep everything else constants during the sub steps.
+			for (dgInt32 i = 0; i < 4; i++) {
+				dgVector toque(m_externalTorque - m_gyroToque);
+				dgVector alpha(toque.Scale4(m_invMass.m_w));
+				m_omega += alpha.Scale4(timestep);
+			}
+			break;
+		}
+
+
 	}
 
 }
