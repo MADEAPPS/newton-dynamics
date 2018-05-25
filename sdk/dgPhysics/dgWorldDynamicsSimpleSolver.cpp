@@ -583,12 +583,15 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	return accNorm.GetScalar();
 }
 
+//#define DG_TEST_GYRO
+#define DG_USE_SKEL
+
 dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const
 {
 	dgJacobian velocStep;
 	//dgVector totalTorque(torque - body->m_gyroToque);
 	dgVector totalTorque(torque);
-#if 0
+#ifdef DG_TEST_GYRO
 	const dgVector& mass = body->m_mass;
 	const dgMatrix& matrix = body->m_matrix;
 	
@@ -639,7 +642,6 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 #else
-	
 	velocStep.m_angular = body->m_invWorldInertiaMatrix.RotateVector(totalTorque) * timestep;
 #endif
 	velocStep.m_linear = force.Scale4(body->m_invMass.m_w) * timestep;
@@ -677,7 +679,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
 
 	dgInt32 skeletonCount = 0;
-/*
+#ifdef DG_USE_SKEL
 	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 	for (dgInt32 i = 1; i < bodyCount; i++) {
@@ -686,12 +688,12 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 		if (container && (container->m_lru != lru)) {
 			container->m_lru = lru;
 			skeletonArray[skeletonCount] = container;
-			container->InitMassMatrix(constraintArray, matrixRow);
+			container->InitMassMatrix(constraintArray, matrixRow, rightHandSide);
 			skeletonCount++;
 			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
 		}
 	}
-*/
+#endif
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
@@ -705,18 +707,20 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			joindDesc.m_rowMatrix = &matrixRow[pairStart];
 			joindDesc.m_rightHandSide = &rightHandSide[pairStart];
 			constraint->JointAccelerations(&joindDesc);
-			
+
 			const dgVector& gyroTorque0 = constraint->m_body0->m_gyroToque;
 			const dgVector& gyroTorque1 = constraint->m_body1->m_gyroToque;
 			const dgJacobianMatrixElement* const rowMatrix = joindDesc.m_rowMatrix;
 			for (dgInt32 j = 0; j < jointInfo->m_pairCount; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[pairStart + j];
+
 				const dgJacobianMatrixElement* const row = &rowMatrix[pairStart + j];
 				dgVector gyroaccel(row->m_JMinv.m_jacobianM0.m_angular * gyroTorque0 + row->m_JMinv.m_jacobianM1.m_angular * gyroTorque1);
 				rhs->m_gyroAccel = gyroaccel.AddHorizontal().GetScalar();
+#ifndef DG_TEST_GYRO
 				rhs->m_gyroAccel = dgFloat32 (0.0f);
+#endif
 			}
-
 		}
 		joindDesc.m_firstPassCoefFlag = dgFloat32(1.0f);
 
@@ -727,7 +731,9 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
-				//if (!jointInfo->m_joint->IsSkeleton()) 
+#ifdef DG_USE_SKEL
+				if (!jointInfo->m_joint->IsSkeleton()) 
+#endif
 				{
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
 					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, rightHandSide);
@@ -735,7 +741,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				}
 			}
 			for (dgInt32 j = 0; j < skeletonCount; j++) {
-				//skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
+				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow, rightHandSide);
 			}
 		}
 
