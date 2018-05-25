@@ -402,13 +402,18 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep)
 	// therefore: 
 	// f(t + dt) = f(t) + f'(t) * dt
 
-//	dgVector torque(m_externalTorque - m_gyroToque);
-	dgVector torque(m_externalTorque);
+	dgVector externalTorque(m_externalTorque - m_gyroToque);
 	m_accel = m_externalForce.Scale4(m_invMass.m_w);
-	m_alpha = torque * m_invMass;
-
+	m_alpha = externalTorque * m_invMass;
 	m_veloc += m_accel.Scale4(timestep);
-	m_omega += m_alpha.Scale4(timestep);
+
+	timestep *= dgFloat32(0.25f);
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgVector toque(m_externalTorque - m_gyroToque);
+		dgVector alpha(toque.Scale4(m_invMass.m_w));
+		m_omega += alpha.Scale4(timestep);
+	}
+
 }
 
 void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
