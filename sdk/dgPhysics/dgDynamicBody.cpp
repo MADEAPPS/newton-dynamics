@@ -453,7 +453,20 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep)
 				dgVector alpha(torque * m_invMass);
 				localOmega += alpha * dt;
 				m_omega = matrix.RotateVector(localOmega);
+
 				// integrate rotation here
+				dgAssert(m_veloc.m_w == dgFloat32(0.0f));
+				dgAssert(m_omega.m_w == dgFloat32(0.0f));
+				dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
+				if (omegaMag2 > ((dgFloat32(0.0125f) * dgDEG2RAD) * (dgFloat32(0.0125f) * dgDEG2RAD))) {
+					dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
+					dgVector omegaAxis(m_omega.Scale4(invOmegaMag));
+					dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt.GetScalar();
+					dgQuaternion deltaRotation(omegaAxis, omegaAngle);
+					rotation = rotation * deltaRotation;
+					//rotation.Scale(dgRsqrt(rotation.DotProduct(rotation)));
+					dgAssert((rotation.DotProduct(rotation) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f));
+				}
 			}
 			break;
 		}
