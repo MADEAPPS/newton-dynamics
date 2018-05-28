@@ -314,9 +314,9 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodySetAngularDamping(box2, &damp[0]);
 
 	// link the two boxes
-//	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	//dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
-//	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1);
+	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1);
 //	joint1->SetHardMiddleAxis(0);
 //	joint1->EnableLimits(false);
 //	joint1->SetLimits(-5.0f * dPi, 2.0f * dPi);

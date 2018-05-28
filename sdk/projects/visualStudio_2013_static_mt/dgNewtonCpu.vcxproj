@@ -140,7 +140,7 @@
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
 xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -162,7 +162,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
 xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

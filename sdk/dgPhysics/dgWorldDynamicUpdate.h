@@ -24,7 +24,7 @@
 
 
 #include "dgPhysicsStdafx.h"
-
+#include "dgWorldDynamicsParallelSolver.h"
 
 //#define DG_PSD_DAMP_TOL				dgFloat32 (1.0e-2f)
 #define DG_PSD_DAMP_TOL					dgFloat32 (1.0e-3f)
@@ -92,7 +92,6 @@ class dgBodyCluster
 	dgInt16 m_hasSoftBodies;
 };
 
-
 class dgJointInfo
 {
 	public:
@@ -106,7 +105,7 @@ class dgJointInfo
 	dgInt16 m_paddedPairCount;
 };
 
-
+/*
 class dgParallelSolverSyncData
 {
 	public:
@@ -142,7 +141,7 @@ class dgParallelSolverSyncData
 
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
-
+*/
 
 template<class T>
 class dgQueue
@@ -228,7 +227,6 @@ class dgRightHandSide
 	dgInt32 m_normalForceIndex;
 };
 
-
 class dgJacobianMemory
 {
 	public:
@@ -242,7 +240,7 @@ class dgJacobianMemory
 class dgWorldDynamicUpdate
 {
 	public:
-	dgWorldDynamicUpdate();
+	dgWorldDynamicUpdate(dgMemoryAllocator* const allocator);
 	void UpdateDynamics (dgFloat32 timestep);
 	dgBody* GetClusterBody (const void* const cluster, dgInt32 index) const;
 
@@ -272,7 +270,7 @@ class dgWorldDynamicUpdate
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void BuildJacobianMatrixParallel(const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32* const bodyLocks, const dgFloat32* const weight, const dgFloat32* const invWeight) const;
-	void CalculateReactionForcesParallel (const dgBodyCluster* const clusters, dgInt32 clustersCount, dgFloat32 timestep) const;
+	void CalculateReactionForcesParallel (const dgBodyCluster* const clusters, dgInt32 clustersCount, dgFloat32 timestep);
 	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void ResolveClusterForces (dgBodyCluster* const cluste, dgInt32 threadID, dgFloat32 timestep) const;
@@ -300,6 +298,7 @@ class dgWorldDynamicUpdate
 	dgInt32 m_softBodyCriticalSectionLock;
 	dgBodyCluster* m_clusterMemory;
 	
+	dgParallelBodySolver m_parallelSolver;
 	static dgVector m_velocTol;
 	
 

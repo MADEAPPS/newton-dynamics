@@ -80,25 +80,6 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 		5, 5, 5,    // two coplanar face can even has different normals 
 		3, 2, 0,    
 	}; 
-	
-/*
-	// the UV are encode the same way as the vertex an the normals, a UV list and an index list
-	// since we do not have UV we can assign the all to zero
-	static dFloat uv0[] = { 0, 0};
-	static int uv0_indexList [] = { 
-		0, 0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-	};
-*/	
-
 
 	dBigVector array[8];
 	dBigVector scale1 (scale);
@@ -149,37 +130,74 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	return body;
 }
 
-
-
+#if 0
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
-//	scene->CreateSkyBox();
+	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
-//	CreateLevelMesh (scene, "playground.ngd", true);
-//	CreateLevelMesh (scene, "sponza.ngd", true);
-
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	// using my own interpretation
 
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
-	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (0.7f, 0.25f, 0.7f, 0.0f), 0.0f);
-	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
-	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 0.5f, 1.0f, 0.0f), 0.0f);
-
 	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
-
-	// place camera into position
-//	dQuaternion rot (- 0.112522639f, - 0.620757043f, 0.770572960f, 0.0906458423f);
-//	dVector origin (- 24.5024796f, 48.2213058f, - 97.0880356f, 1.0f);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
+}
+#else
 
-//	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");
+
+static NewtonBody* CreateBox(DemoEntityManager* const scene, dFloat mass, const dMatrix& location, const dVector& size)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
 }
 
+
+// black_birth demo
+void UsingNewtonMeshTool(DemoEntityManager* const scene)
+{
+	// load the skybox
+	scene->CreateSkyBox();
+
+	// load the scene from a ngd file format
+	CreateLevelMesh(scene, "flatPlane.ngd", true);
+
+	dMatrix matrix;
+
+	// make the chassis
+	dMatrix location (dGetIdentityMatrix());
+	location.m_posit = dVector (0.0f, 1.2f, 0.0f, 1.0f);
+	NewtonBody* const chassis = CreateBox(scene, 2500.0f, location, dVector (1.1f, 0.8f, 1.0f, 0.0f));
+	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
+    dCustomSlider* const slider = new dCustomSlider (matrix, chassis, NULL);
+
+	// make the fork
+	location.m_posit += dVector(-1.0f, 0.0f, 0.0f, 0.0f);
+	NewtonBody* const fork = CreateBox(scene, 50.0f, location, dVector(1.0f, 0.1f, 0.1f, 0.0f));
+	dMatrix jointMatrix (dYawMatrix(dPi * 0.5f) * location);
+	dCustomSliderActuator* const actuator = new dCustomSliderActuator (jointMatrix, fork, chassis);
+
+	// make obstacle
+	location.m_posit += dVector(-2.0f, 0.0f, 0.0f, 0.0f);
+	CreateBox(scene, 0.0f, location, dVector (1.1f, 0.8f, 1.0f, 0.0f));
+
+
+	dQuaternion rot;
+	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	scene->SetCameraMatrix(rot, origin);
+}
+
+
+#endif
 

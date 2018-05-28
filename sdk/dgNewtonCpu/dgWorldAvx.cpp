@@ -142,6 +142,6 @@ void dgWorldAvx::InityBodyArray()
 	}
 	AddFlops(90 * 8 * bodyCount);
 
-
 	CalculateMegaFlops();
 }
+

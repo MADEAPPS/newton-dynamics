@@ -51,7 +51,8 @@ dgBody::dgBody()
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))	
-	,m_gyroToque(dgFloat32 (0.0f))
+	,m_gyroTorque(dgFloat32 (0.0f))
+	,m_gyroRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -94,7 +95,8 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_impulseForce(dgFloat32 (0.0f))		
 	,m_impulseTorque(dgFloat32 (0.0f))		
-	,m_gyroToque(dgFloat32 (0.0f))
+	,m_gyroTorque(dgFloat32 (0.0f))
+	,m_gyroRotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_criticalSectionLock(0)
 	,m_flags(0)
 	,m_userData(NULL)
@@ -293,7 +295,6 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
-	//dgTrace (("%d p(%f %f %f)\n", m_uniqueID, m_globalCentreOfMass[0], m_globalCentreOfMass[1], m_globalCentreOfMass[2]));
 	dgAssert (m_veloc.m_w == dgFloat32 (0.0f));
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
 	m_globalCentreOfMass += m_veloc.Scale4 (timestep); 
@@ -321,8 +322,8 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dgAssert (m_matrix.TestOrthogonal());
 
-dgVector xxx (CalculateAngularMomentum());
-dgTrace(("body %d W(%f %f %f) L(%f %f %f)\n", m_uniqueID, m_omega.m_x, m_omega.m_y, m_omega.m_z, xxx.m_x, xxx.m_y, xxx.m_z));
+//dgVector angularMomentum (CalculateAngularMomentum());
+//dgTrace(("E(%f) L(%f %f %f) W(%f %f %f)\n", m_omega.DotProduct3(angularMomentum), angularMomentum.m_x, angularMomentum.m_y, angularMomentum.m_z, m_omega.m_x, m_omega.m_y, m_omega.m_z));
 }
 
 

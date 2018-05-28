@@ -26,9 +26,10 @@
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
 #include "dgWorldDynamicUpdate.h"
+#include "dgWorldDynamicsParallelSolver.h"
 
 
-void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep) const
+void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep)
 {
 	dgWorld* const world = (dgWorld*) this;
 
@@ -39,6 +40,13 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 
 	dgBodyInfo* const bodyArray = &bodyPtr[m_bodies];
 	dgJointInfo* const jointArray = &constraintArray[m_joints];
+
+	if (world->m_currentPlugin) {
+		dgWorldPlugin* const plugin = world->m_currentPlugin->GetInfo().m_plugin;
+		plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);
+	} else {
+		m_parallelSolver.CalculateJointForces(cluster, bodyArray, jointArray, timestep);
+/*
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 	internalForces[0].m_linear = dgVector::m_zero;
 	internalForces[0].m_angular = dgVector::m_zero;
@@ -88,14 +96,11 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	syncData.m_cluster = &cluster;
 	syncData.m_weight = weights;
 
-	if (world->m_currentPlugin) {
-		dgWorldPlugin* const plugin = world->m_currentPlugin->GetInfo().m_plugin;
-		plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);
-	} else {
 		InitilizeBodyArrayParallel(&syncData);
 		BuildJacobianMatrixParallel(&syncData);
 		CalculateForcesParallel(&syncData);
 		IntegrateClusterParallel(&syncData);
+*/
 	}
 }
 
@@ -126,7 +131,7 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 		bodyCount += srcCluster->m_bodyCount - 1;
 	}
 
-	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + 1) * sizeof(dgBodyInfo));
+	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + DG_WORK_GROUP_SIZE + 1) * sizeof(dgBodyInfo));
 	world->m_jointsMemory.ResizeIfNecessary((m_joints + jointsCount + 32) * sizeof(dgJointInfo));
 
 	dgBodyInfo* const bodyPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
@@ -833,3 +838,133 @@ void dgWorldDynamicUpdate::CalculateForcesParallel(dgParallelSolverSyncData* con
 	}
 }
 
+
+//****************************************************************************************
+//
+//
+//****************************************************************************************
+
+dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
+	:m_weigh(allocator)
+	,m_invWeigh(allocator)
+	,m_world(NULL)
+	,m_cluster(NULL)
+	,m_jointArray(NULL)
+	,m_count(0)
+	,m_atomicIndex(0)
+{
+}
+
+dgParallelBodySolver::~dgParallelBodySolver()
+{
+}
+
+void dgParallelBodySolver::Reserve (dgInt32 count)
+{
+	m_count = ((count + DG_WORK_GROUP_SIZE - 1) & -(DG_WORK_GROUP_SIZE - 1)) >> DG_WORK_GROUP_BITS;
+
+	m_weigh.Reserve(m_count);
+	m_invWeigh.Reserve(m_count);
+
+//	m_veloc.Reserve(m_count);
+//	m_omega.Reserve(m_count);
+//	m_localInvInertia.Reserve(m_count);
+//	m_invMass.Reserve(m_count);
+//	m_angularDamp.Reserve(m_count);
+//	m_linearDamp.Reserve(m_count);
+//	m_rotation.Reserve(m_count);
+//	m_invInertia.Reserve(m_count);
+//	m_veloc0.Reserve(m_count);
+//	m_internalForces.Reserve(m_count);
+}
+
+void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
+{
+	m_cluster = &cluster;
+	m_jointArray = jointArray;
+	Reserve(cluster.m_bodyCount);
+	
+	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
+
+	for (dgInt32 i = cluster.m_bodyCount; i < bodyCount; i++) {
+		bodyArray[i] = bodyArray[0];
+	}
+
+	dgFloat32* const weights = &m_weigh[0].m_value[0][0];
+	memset(weights, 0, m_count * sizeof (dgWorkGroupFloat));
+
+	m_atomicIndex = 0;
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	for (dgInt32 i = 0; i < threadCounts; i++) {
+		m_world->QueueJob(InitWeightKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+
+	m_atomicIndex = 0;
+	for (dgInt32 i = 0; i < threadCounts; i++) {
+		m_world->QueueJob(InitInvWeightKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+
+
+//	InityBodyArray();
+}
+
+void dgParallelBodySolver::InitWeightKernel (void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->InitWeights();
+}
+
+void dgParallelBodySolver::InitInvWeightKernel (void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->InitInvWeights();
+}
+
+void dgParallelBodySolver::InitWeights()
+{
+	dgFloat32* const weights = &m_weigh[0].m_value[0][0];
+	const dgInt32 jointCount = m_cluster->m_jointCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < jointCount;  i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
+		dgJointInfo* const jointInfo = &m_jointArray[i];
+		const dgInt32 m0 = jointInfo->m_m0;
+		const dgInt32 m1 = jointInfo->m_m1;
+		dgBody* const body0 = jointInfo->m_joint->GetBody0();
+		dgBody* const body1 = jointInfo->m_joint->GetBody1();
+		{
+			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
+			weights[m0] += dgFloat32(1.0f);
+		}
+		{
+			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
+			weights[m1] += dgFloat32(1.0f);
+		}
+	}
+}
+
+void dgParallelBodySolver::InitInvWeights()
+{
+	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
+	dgFloat32* const weights = &m_weigh[0].m_value[0][0];
+	dgFloat32* const invWeights = &m_invWeigh[0].m_value[0][0];
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount;  i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
+		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j ++) {
+			const dgFloat32 w = weights[j + i] ? weights[j + i] : 1.0f;
+			weights[j + i] = w;
+			invWeights[j + i] = 1.0f / w;
+		}
+	}
+}
+
+void dgParallelBodySolver::InityBodyArray()
+{
+/*
+//	syncData->m_atomicIndex = 0;
+	const dgInt32 threadCounts = m_world->GetThreadCount();	
+	for (dgInt32 i = 0; i < threadCounts; i++) {
+		m_world->QueueJob(CalculateJointsAccelParallelKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+*/
+}

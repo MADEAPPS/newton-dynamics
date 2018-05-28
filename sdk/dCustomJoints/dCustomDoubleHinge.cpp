@@ -247,7 +247,6 @@ void dCustomDoubleHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix
 
 void dCustomDoubleHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
 {
-return;
 	// save the current joint Omega
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);

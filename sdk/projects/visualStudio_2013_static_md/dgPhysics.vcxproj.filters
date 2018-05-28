@@ -338,5 +338,8 @@
     <ClInclude Include="..\..\dgPhysics\dgInverseDynamics.h">
       <Filter>systems</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.h">
+      <Filter>systems</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

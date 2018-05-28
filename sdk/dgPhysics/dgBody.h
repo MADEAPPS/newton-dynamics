@@ -239,7 +239,8 @@ class dgBody
 	dgVector m_globalCentreOfMass;	
 	dgVector m_impulseForce;	
 	dgVector m_impulseTorque;	
-	dgVector m_gyroToque;
+	dgVector m_gyroTorque;
+	dgQuaternion m_gyroRotation;
 
 	dgInt32 m_criticalSectionLock;
 	union 
@@ -291,6 +292,7 @@ class dgBody
 	friend class dgCollisionCompound;
 	friend class dgCollisionUserMesh;
 	friend class dgBodyMasterListRow;
+	friend class dgParallelBodySolver;
 	friend class dgWorldDynamicUpdate;
 	friend class dgBroadPhaseBodyNode;
 	friend class dgBilateralConstraint;

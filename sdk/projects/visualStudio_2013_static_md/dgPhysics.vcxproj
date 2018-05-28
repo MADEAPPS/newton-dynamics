@@ -151,6 +151,7 @@
     <ClInclude Include="..\..\dgPhysics\dgUpVectorConstraint.h" />
     <ClInclude Include="..\..\dgPhysics\dgUserConstraint.h" />
     <ClInclude Include="..\..\dgPhysics\dgWorld.h" />
+    <ClInclude Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.h" />
     <ClInclude Include="..\..\dgPhysics\dgWorldDynamicUpdate.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

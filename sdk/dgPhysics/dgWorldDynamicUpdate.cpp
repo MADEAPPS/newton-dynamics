@@ -76,14 +76,16 @@ void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bod
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dgWorldDynamicUpdate::dgWorldDynamicUpdate()
+dgWorldDynamicUpdate::dgWorldDynamicUpdate(dgMemoryAllocator* const allocator)
 	:m_bodies(0)
 	,m_joints(0)
 	,m_clusters(0)
 	,m_markLru(0)
 	,m_softBodyCriticalSectionLock(0)
 	,m_clusterMemory(NULL)
+	,m_parallelSolver(allocator)
 {
+	m_parallelSolver.m_world = (dgWorld*) this;
 }
 
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
@@ -128,9 +130,10 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_clusterCount = m_clusters - index;
 
 	dgInt32 useParallelSolver = world->m_useParallelSolver;
+//useParallelSolver = 1;
 	if (useParallelSolver) {
 		dgInt32 count = 0;
-		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
+		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
 			count++;
 		}
 		if (count) {
@@ -625,9 +628,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		if (skeleton0 && (skeleton0 == skeleton1)) {
 			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
 		} else if (skeleton0 && !skeleton1) {
-			//			skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
+			//skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
 		} else if (skeleton1 && !skeleton0) {
-			//			skeleton1->AddSelfCollisionJoint((dgContact*)constraint);
+			//skeleton1->AddSelfCollisionJoint((dgContact*)constraint);
 		}
 	}
 
@@ -659,8 +662,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		rhs->m_normalForceIndex = frictionIndex;
 		rowCount++;
 	}
-	rowCount = (rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) ? ((rowCount & (-dgInt32(sizeof(dgVector) / sizeof(dgFloat32)))) + dgInt32(sizeof(dgVector) / sizeof(dgFloat32))) : rowCount;
-	dgAssert((rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) == 0);
+//  we separate left and right hand side not to align row to near multiple of 4
+//	rowCount = (rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) ? ((rowCount & (-dgInt32(sizeof(dgVector) / sizeof(dgFloat32)))) + dgInt32(sizeof(dgVector) / sizeof(dgFloat32))) : rowCount;
+//	dgAssert((rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) == 0);
 
 	constraint->ResetInverseDynamics();
 

@@ -344,5 +344,8 @@
     <ClInclude Include="..\..\dgPhysics\dgWorldPlugins.h">
       <Filter>systems</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.h">
+      <Filter>systems</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

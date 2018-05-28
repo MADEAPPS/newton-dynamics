@@ -492,7 +492,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		const dgVector scale1(jointInfo->m_scale1);
 
 		normalForce[rowsCount] = dgFloat32(1.0f);
-//		const dgInt32 j = jointInfo->m_pairStart;
 		const dgInt32 rowStart = jointInfo->m_pairStart;
 		for (dgInt32 k = 0; k < rowsCount; k++) {
 			dgRightHandSide* const rhs = &rightHandSide[rowStart + k];
@@ -532,7 +531,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		const dgFloat32 tol2 = tol * tol;
 		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > tol2); i++) {
 			maxAccel = dgVector::m_zero;
-			//const dgInt32 index = jointInfo->m_pairStart;
 			for (dgInt32 k = 0; k < rowsCount; k++) {
 				dgRightHandSide* const rhs = &rightHandSide[rowStart + k];
 				const dgJacobianMatrixElement* const row = &matrixRow[rowStart + k];
@@ -568,7 +566,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			}
 		}
 
-		//const dgInt32 index = jointInfo->m_pairStart;
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[rowStart + i];
 			//dgJacobianMatrixElement* const row = &matrixRow[rowStart + i];
@@ -583,38 +580,41 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	return accNorm.GetScalar();
 }
 
-//#define DG_TEST_GYRO
-#define DG_USE_SKEL
+#define DG_TEST_GYRO
+//#define DG_USE_SKEL
 
 dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const
 {
 	dgJacobian velocStep;
-	//dgVector totalTorque(torque - body->m_gyroToque);
-	dgVector totalTorque(torque);
-#ifdef DG_TEST_GYRO
-	const dgVector& mass = body->m_mass;
-	const dgMatrix& matrix = body->m_matrix;
 	
-	dgVector localOmega (matrix.UnrotateVector(body->m_omega));
-	dgVector localTorque (matrix.UnrotateVector(totalTorque));
+#ifdef DG_TEST_GYRO
+	dgVector dtHalf(timestep * dgVector::m_half);
+	dgMatrix matrix(body->m_gyroRotation, dgVector::m_wOne);
+	dgVector localOmega(matrix.UnrotateVector(body->m_omega));
+	dgVector localTorque(matrix.UnrotateVector(torque));
+	
+	// and solving for alpha we get the angular acceleration at t + dt
+	// calculate gradient at a full time step
 	dgVector gradientStep(localTorque * timestep);
-	dgVector dw(localOmega * timestep * dgVector::m_half);
 
+	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
+	dgVector dw(localOmega * dtHalf);
+
+	dgVector inertia (body->m_mass);
 	dgFloat32 jacobianMatrix[3][3];
-	// calculates Jacobian matrix
-	jacobianMatrix[0][0] = mass[0];
-	jacobianMatrix[0][1] = (mass[2] - mass[1]) * dw[2];
-	jacobianMatrix[0][2] = (mass[2] - mass[1]) * dw[1];
 
-	jacobianMatrix[1][0] = (mass[0] - mass[2]) * dw[2];
-	jacobianMatrix[1][1] = mass[1];
-	jacobianMatrix[1][2] = (mass[0] - mass[2]) * dw[0];
+	jacobianMatrix[0][0] = inertia[0];
+	jacobianMatrix[0][1] = (inertia[2] - inertia[1]) * dw[2];
+	jacobianMatrix[0][2] = (inertia[2] - inertia[1]) * dw[1];
 
-	jacobianMatrix[2][0] = (mass[1] - mass[0]) * dw[1];
-	jacobianMatrix[2][1] = (mass[1] - mass[0]) * dw[0];
-	jacobianMatrix[2][2] = mass[2];
+	jacobianMatrix[1][0] = (inertia[0] - inertia[2]) * dw[2];
+	jacobianMatrix[1][1] = inertia[1];
+	jacobianMatrix[1][2] = (inertia[0] - inertia[2]) * dw[0];
 
-	// since the matrix is well behave, we can unroll Gauss elimination with back substitution 
+	jacobianMatrix[2][0] = (inertia[1] - inertia[0]) * dw[1];
+	jacobianMatrix[2][1] = (inertia[1] - inertia[0]) * dw[0];
+	jacobianMatrix[2][2] = inertia[2];
+
 	dgAssert(jacobianMatrix[0][0] > dgFloat32(0.0f));
 	dgFloat32 den = dgFloat32(1.0f) / jacobianMatrix[0][0];
 	dgFloat32 scale = jacobianMatrix[1][0] * den;
@@ -640,9 +640,29 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
 	gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
 
+	dgVector omega (matrix.RotateVector(localOmega + gradientStep));
+	dgAssert(omega.m_w == dgFloat32(0.0f));
+
+	// integrate rotation here
+	dgFloat32 omegaMag2 = omega.DotProduct4(omega).GetScalar() + dgFloat32(1.0e-12f);
+	dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
+	dgVector omegaAxis(omega.Scale4(invOmegaMag));
+	dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
+	dgQuaternion deltaRotation(omegaAxis, omegaAngle);
+	body->m_gyroRotation = body->m_gyroRotation * deltaRotation;
+	dgAssert((body->m_gyroRotation.DotProduct(body->m_gyroRotation) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f));
+
+	// calculate new gyro torque
+	matrix = dgMatrix (body->m_gyroRotation, dgVector::m_wOne);
+	localOmega = matrix.UnrotateVector(omega);
+	dgVector angularMomentum(inertia * localOmega);
+	body->m_gyroTorque = matrix.RotateVector(localOmega.CrossProduct3(angularMomentum));
+	
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 #else
-	velocStep.m_angular = body->m_invWorldInertiaMatrix.RotateVector(totalTorque) * timestep;
+	//dgVector externTorque(torque - body->m_gyroToque);
+	dgVector externTorque(torque);
+	velocStep.m_angular = body->m_invWorldInertiaMatrix.RotateVector(externTorque) * timestep;
 #endif
 	velocStep.m_linear = force.Scale4(body->m_invMass.m_w) * timestep;
 	return velocStep;
@@ -679,9 +699,9 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
 
 	dgInt32 skeletonCount = 0;
+	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 #ifdef DG_USE_SKEL
 	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
-	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 	for (dgInt32 i = 1; i < bodyCount; i++) {
 		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 		dgSkeletonContainer* const container = body->GetSkeleton();
@@ -708,13 +728,12 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			joindDesc.m_rightHandSide = &rightHandSide[pairStart];
 			constraint->JointAccelerations(&joindDesc);
 
-			const dgVector& gyroTorque0 = constraint->m_body0->m_gyroToque;
-			const dgVector& gyroTorque1 = constraint->m_body1->m_gyroToque;
-			const dgJacobianMatrixElement* const rowMatrix = joindDesc.m_rowMatrix;
+			const dgVector& gyroTorque0 = constraint->m_body0->m_gyroTorque;
+			const dgVector& gyroTorque1 = constraint->m_body1->m_gyroTorque;
 			for (dgInt32 j = 0; j < jointInfo->m_pairCount; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[pairStart + j];
+				const dgJacobianMatrixElement* const row = &matrixRow[pairStart + j];
 
-				const dgJacobianMatrixElement* const row = &rowMatrix[pairStart + j];
 				dgVector gyroaccel(row->m_JMinv.m_jacobianM0.m_angular * gyroTorque0 + row->m_JMinv.m_jacobianM1.m_angular * gyroTorque1);
 				rhs->m_gyroAccel = gyroaccel.AddHorizontal().GetScalar();
 #ifndef DG_TEST_GYRO
@@ -752,12 +771,11 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				dgAssert(body->m_index == i);
 				if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 					const dgVector force(internalForces[i].m_linear + body->m_externalForce);
-					const dgVector torque(internalForces[i].m_angular + body->m_externalTorque);
+					const dgVector torque(internalForces[i].m_angular + body->m_externalTorque - body->m_gyroTorque);
 					dgJacobian velocStep(IntegrateForceAndToque(body, force, torque, timestep4));
 					if (!body->m_resting) {
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
-						body->m_gyroToque = body->m_omega.CrossProduct3(body->CalculateAngularMomentum());
 					} else {
 						const dgVector velocStep2(velocStep.m_linear.DotProduct4(velocStep.m_linear));
 						const dgVector omegaStep2(velocStep.m_angular.DotProduct4(velocStep.m_angular));
@@ -825,6 +843,4 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 		}
 	}
 }
-
-
 

@@ -35,13 +35,16 @@ class dgQuaternion
 	dgQuaternion (const dgMatrix& matrix);
 	dgQuaternion (dgFloat32 q0, dgFloat32 q1, dgFloat32 q2, dgFloat32 q3); 
 	dgQuaternion (const dgVector &unit_Axis, dgFloat32 angle = dgFloat32 (0.0f));
-	
+
+	dgFloat32& operator[] (dgInt32 i);
+	const dgFloat32& operator[] (dgInt32 i) const;
+
 	void Scale (dgFloat32 scale); 
 	void Normalize (); 
-	inline dgFloat32 DotProduct (const dgQuaternion &QB) const;
 	dgQuaternion Inverse () const; 
-
 	dgQuaternion Slerp (const dgQuaternion &q1, dgFloat32 t) const;
+
+	dgFloat32 DotProduct (const dgQuaternion &QB) const;
 	dgVector CalcAverageOmega (const dgQuaternion &q1, dgFloat32 invdt) const;
 
 	dgQuaternion operator* (const dgQuaternion &B) const;
@@ -52,31 +55,42 @@ class dgQuaternion
 	dgFloat32 m_q1;
 	dgFloat32 m_q2;
 	dgFloat32 m_q3;
-}DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 
-
-
-inline dgQuaternion::dgQuaternion () 
+DG_INLINE dgQuaternion::dgQuaternion()
 {
-	m_q0 = dgFloat32 (1.0f);
-	m_q1 = dgFloat32 (0.0f);
-	m_q2 = dgFloat32 (0.0f);
-	m_q3 = dgFloat32 (0.0f);
+	m_q0 = dgFloat32(1.0f);
+	m_q1 = dgFloat32(0.0f);
+	m_q2 = dgFloat32(0.0f);
+	m_q3 = dgFloat32(0.0f);
 }
 
-inline dgQuaternion::dgQuaternion (dgFloat32 Q0, dgFloat32 Q1, dgFloat32 Q2, dgFloat32 Q3) 
+DG_INLINE dgQuaternion::dgQuaternion(dgFloat32 Q0, dgFloat32 Q1, dgFloat32 Q2, dgFloat32 Q3)
 {
 	m_q0 = Q0;
 	m_q1 = Q1;
 	m_q2 = Q2;
 	m_q3 = Q3;
-//	dgAssert (dgAbs (DotProduct (*this) -dgFloat32 (1.0f)) < dgFloat32(1.0e-4f));
+	//	dgAssert (dgAbs (DotProduct (*this) -dgFloat32 (1.0f)) < dgFloat32(1.0e-4f));
 }
 
 
+DG_INLINE dgFloat32& dgQuaternion::operator[] (dgInt32 i)
+{
+	dgAssert(i < 4);
+	dgAssert(i >= 0);
+	return (&m_q0)[i];
+}
 
-inline void dgQuaternion::Scale (dgFloat32 scale) 
+DG_INLINE const dgFloat32& dgQuaternion::operator[] (dgInt32 i) const
+{
+	dgAssert(i < 4);
+	dgAssert(i >= 0);
+	return (&m_q0)[i];
+}
+
+DG_INLINE void dgQuaternion::Scale (dgFloat32 scale) 
 {
 	m_q0 *= scale;
 	m_q1 *= scale;
@@ -84,33 +98,32 @@ inline void dgQuaternion::Scale (dgFloat32 scale)
 	m_q3 *= scale;
 }
 
-inline void dgQuaternion::Normalize () 
+DG_INLINE void dgQuaternion::Normalize () 
 {
 	Scale (dgRsqrt (DotProduct (*this)));
 }
 
-inline dgFloat32 dgQuaternion::DotProduct (const dgQuaternion &QB) const
+DG_INLINE dgFloat32 dgQuaternion::DotProduct (const dgQuaternion &QB) const
 {
 	return m_q0 * QB.m_q0 + m_q1 * QB.m_q1 + m_q2 * QB.m_q2 + m_q3 * QB.m_q3;
 }
 
-inline dgQuaternion dgQuaternion::Inverse () const 
+DG_INLINE dgQuaternion dgQuaternion::Inverse () const 
 {
 	return dgQuaternion (m_q0, -m_q1, -m_q2, -m_q3);
 }
 
-inline dgQuaternion dgQuaternion::operator+ (const dgQuaternion &B) const
+DG_INLINE dgQuaternion dgQuaternion::operator+ (const dgQuaternion &B) const
 {
 	return dgQuaternion (m_q0 + B.m_q0, m_q1 + B.m_q1, m_q2 + B.m_q2, m_q3 + B.m_q3);
 }
 
-inline dgQuaternion dgQuaternion::operator- (const dgQuaternion &B) const
+DG_INLINE dgQuaternion dgQuaternion::operator- (const dgQuaternion &B) const
 {
 	return dgQuaternion (m_q0 - B.m_q0, m_q1 - B.m_q1, m_q2 - B.m_q2, m_q3 - B.m_q3);
 }
 
-
-inline dgQuaternion dgQuaternion::operator* (const dgQuaternion &B) const
+DG_INLINE dgQuaternion dgQuaternion::operator* (const dgQuaternion &B) const
 {
 	return dgQuaternion (B.m_q0 * m_q0 - B.m_q1 * m_q1 - B.m_q2 * m_q2 - B.m_q3 * m_q3, 
 				 		 B.m_q1 * m_q0 + B.m_q0 * m_q1 - B.m_q3 * m_q2 + B.m_q2 * m_q3, 

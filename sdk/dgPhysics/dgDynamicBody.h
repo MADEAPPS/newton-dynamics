@@ -82,7 +82,7 @@ class dgDynamicBody : public dgBody
 	void SetSkeleton(dgSkeletonContainer* const skeleton);
 
 	void IntegrateImplicit(dgFloat32 timeStep);
-	void IntegrateExplicit(dgFloat32 timeStep);
+	void IntegrateExplicit(dgFloat32 timeStep, dgInt32 method);
 
 	virtual void IntegrateOpenLoopExternalForce(dgFloat32 timeStep);
 	const dgVector& GetDampCoeffcient (dgFloat32 timestep);
