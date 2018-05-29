@@ -774,6 +774,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	const dgContactMaterial* const material = contact->m_material;
 	const dgContactPoint* const contactArray = pair->m_contactBuffer;
 
+pair->m_contactCount = 1;
 	dgInt32 contactCount = pair->m_contactCount;
 	dgList<dgContactMaterial>& list = *contact;
 

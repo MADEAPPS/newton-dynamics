@@ -161,7 +161,6 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 	jacobian0.m_angular[2] = r0CrossDir.m_z;
 	jacobian0.m_angular[3] = dgFloat32 (0.0f);
 
-
 	dgVector r1CrossDir (dir.CrossProduct3(param.m_r1));
 	dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
 	jacobian1.m_linear[0] = -dir.m_x;
@@ -217,6 +216,10 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 
 	params.m_restitution[normalIndex] = restitution;
 	params.m_penetration[normalIndex] = penetration;
+
+params.m_restitution[normalIndex] = 0.0f;
+params.m_penetration[normalIndex] = 0.0f;
+
 	params.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	params.m_forceBounds[normalIndex].m_low = dgFloat32 (0.0f);
 	params.m_forceBounds[normalIndex].m_normalIndex = DG_INDEPENDENT_ROW;
@@ -231,7 +234,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 
-//return;
+return;
 	// first dir friction force
 	if (contact.m_flags & dgContactMaterial::m_friction0Enable) {
 		dgInt32 jacobIndex = frictionIndex;
@@ -298,7 +301,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 
 void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
-	
 	const dgVector& bodyVeloc0 = m_body0->m_veloc;
 	const dgVector& bodyOmega0 = m_body0->m_omega;
 	const dgVector& bodyVeloc1 = m_body1->m_veloc;

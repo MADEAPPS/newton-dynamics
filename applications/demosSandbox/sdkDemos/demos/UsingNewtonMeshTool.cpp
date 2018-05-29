@@ -186,7 +186,13 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 	location.m_posit += dVector(-1.0f, 0.0f, 0.0f, 0.0f);
 	NewtonBody* const fork = CreateBox(scene, 50.0f, location, dVector(1.0f, 0.1f, 0.1f, 0.0f));
 	dMatrix jointMatrix (dYawMatrix(dPi * 0.5f) * location);
+	dVector inertia;
+	NewtonBodyGetMass(fork, &inertia.m_w, &inertia.m_x, &inertia.m_y, &inertia.m_z);
+	inertia.m_x = inertia.m_y;
+	NewtonBodySetMassMatrix(fork, inertia.m_w, inertia.m_x, inertia.m_y, inertia.m_z);
+
 	dCustomSliderActuator* const actuator = new dCustomSliderActuator (jointMatrix, fork, chassis);
+	//dCustomSlider* const actuator = new dCustomSlider (jointMatrix, fork, chassis);
 
 	// make obstacle
 	location.m_posit += dVector(-2.0f, 0.0f, 0.0f, 0.0f);
