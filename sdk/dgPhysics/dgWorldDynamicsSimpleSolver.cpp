@@ -739,7 +739,7 @@ xxx ++;
 		}
 */
 
-dgTrace (("%d %f ", xxx, maxAccel.GetScalar()));
+dgTrace (("%f ", maxAccel.GetScalar()));
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[rowStart + i];
 			//dgJacobianMatrixElement* const row = &matrixRow[rowStart + i];
@@ -890,8 +890,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 #endif
 
 static int xxx;
-xxx ++;
-dgTrace (("\n"));
+
 //	const dgInt32 passes = world->m_solverMode;
 const dgInt32 passes = 8;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
@@ -926,7 +925,7 @@ const dgInt32 passes = 8;
 
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
-dgTrace (("%d \n", i));
+xxx++;
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 #ifdef DG_USE_SKEL
@@ -953,6 +952,8 @@ dgTrace (("%d \n", i));
 					const dgVector torque(internalForces[i].m_angular + body->m_externalTorque - body->m_gyroTorque);
 					dgJacobian velocStep(IntegrateForceAndToque(body, force, torque, timestep4));
 					if (!body->m_resting) {
+if (body->m_uniqueID == 4)
+dgTrace(("%d f(%f %f %f) v(%f %f %f)\n", xxx, force[0], force[1], force[2], body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]));
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
 					} else {

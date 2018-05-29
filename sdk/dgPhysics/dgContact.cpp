@@ -150,27 +150,21 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 	dgAssert (m_body0);
 	dgAssert (m_body1);
 
-	dgVector r0CrossDir (param.m_r0.CrossProduct3(dir));
 	dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
-	jacobian0.m_linear[0] = dir.m_x;
-	jacobian0.m_linear[1] = dir.m_y;
-	jacobian0.m_linear[2] = dir.m_z;
-	jacobian0.m_linear[3] = dgFloat32 (0.0f);
-	jacobian0.m_angular[0] = r0CrossDir.m_x;
-	jacobian0.m_angular[1] = r0CrossDir.m_y;
-	jacobian0.m_angular[2] = r0CrossDir.m_z;
-	jacobian0.m_angular[3] = dgFloat32 (0.0f);
+	dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
+	jacobian0.m_linear = dir;
+	jacobian1.m_linear = dir * dgVector::m_negOne;
 
-	dgVector r1CrossDir (dir.CrossProduct3(param.m_r1));
-	dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
-	jacobian1.m_linear[0] = -dir.m_x;
-	jacobian1.m_linear[1] = -dir.m_y;
-	jacobian1.m_linear[2] = -dir.m_z;
-	jacobian1.m_linear[3] =  dgFloat32 (0.0f);
-	jacobian1.m_angular[0] = r1CrossDir.m_x;
-	jacobian1.m_angular[1] = r1CrossDir.m_y;
-	jacobian1.m_angular[2] = r1CrossDir.m_z;
-	jacobian1.m_angular[3] = dgFloat32 (0.0f);
+	jacobian0.m_angular = param.m_r0.CrossProduct3(dir);
+	jacobian1.m_angular = dir.CrossProduct3(param.m_r1);
+
+jacobian0.m_angular = dgVector::m_zero;
+jacobian1.m_angular = dgVector::m_zero;
+
+	dgAssert(jacobian0.m_linear.m_w == dgFloat32(0.0f));
+	dgAssert(jacobian0.m_angular.m_w == dgFloat32(0.0f));
+	dgAssert(jacobian1.m_linear.m_w == dgFloat32(0.0f));
+	dgAssert(jacobian1.m_angular.m_w == dgFloat32(0.0f));
 }
 
 dgUnsigned32 dgContact::JacobianDerivative (dgContraintDescritor& params)

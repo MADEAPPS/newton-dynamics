@@ -135,7 +135,7 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 	dVector p0(m_camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
 
-#if 0
+#if 1
 	struct dReplay
 	{
 		dVector m_p0;
