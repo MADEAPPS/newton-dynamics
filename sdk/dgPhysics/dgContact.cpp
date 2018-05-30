@@ -310,13 +310,13 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 	}
 
 	dgRightHandSide* const rightHandSide = params->m_rightHandSide;
-	const dgJacobianMatrixElement* const rowMatrix = params->m_rowMatrix;
+	const dgLeftHandSide* const rowMatrix = params->m_rowMatrix;
 
 	for (dgInt32 k = 0; k < count; k ++) {
 		// note: using restitution been negative to indicate that the acceleration was override
 		if (rightHandSide[k].m_restitution >= dgFloat32 (0.0f)) {
 			dgRightHandSide* const rhs = &rightHandSide[k];
-			const dgJacobianMatrixElement* const row = &rowMatrix[k];
+			const dgLeftHandSide* const row = &rowMatrix[k];
 
 			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 + row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 + row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
 			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();

@@ -85,19 +85,19 @@ class dgInverseDynamics
 	DG_INLINE void CalculateOpenLoopForce (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE dgInt32 GetJacobianDerivatives (dgBilateralConstraint* const constraint, dgContraintDescritor& constraintParams) const;
 	DG_INLINE void CalculateJointAccel(dgJointInfo* const jointInfoArray, dgRightHandSide* const rightHandSide, dgForcePair* const accel) const;
-	DG_INLINE void CalculateRowJacobianDerivatives(dgInt32 index, const dgVector& invMass0, const dgVector& invMass1, const dgMatrix& invInertia0, const dgMatrix& invInertia1, const dgContraintDescritor& constraintParams, dgJacobianMatrixElement* const row, dgRightHandSide* const rightHandSide, int isIkRow) const;
+	DG_INLINE void CalculateRowJacobianDerivatives(dgInt32 index, const dgVector& invMass0, const dgVector& invMass1, const dgMatrix& invInertia0, const dgMatrix& invInertia1, const dgContraintDescritor& constraintParams, dgLeftHandSide* const row, dgRightHandSide* const rightHandSide, int isIkRow) const;
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
 		
-	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgInt8* const memoryBuffer);
+	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgInt8* const memoryBuffer);
 
 	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgRightHandSide* const rightHandSide) const;
 
-	dgInt32 GetJacobianDerivatives(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgFloat32 timestep, dgInt32 threadIndex) const;
-	void CalculateInternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, const dgForcePair* const force) const;
+	dgInt32 GetJacobianDerivatives(dgJointInfo* const jointInfoArray, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgFloat32 timestep, dgInt32 threadIndex) const;
+	void CalculateInternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, const dgForcePair* const force) const;
 	void CalculateCloseLoopsForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgRightHandSide* const rightHandSide, const dgForcePair* const accel, dgForcePair* const force) const;
-	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const;
+	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgLeftHandSide* const matrixRow, dgFloat32 timestep) const;
 	void RemoveLoopJoint(dgList<dgLoopingJoint>::dgListNode* const node);
 	dgList<dgLoopingJoint>::dgListNode* FindLoopJointNode(dgBilateralConstraint* const joint) const;
 
@@ -110,7 +110,7 @@ class dgInverseDynamics
 	dgFloat32* m_massMatrix10;
 //	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgRightHandSide** m_righHandSize;
-	dgJacobianMatrixElement** m_rowArray;
+	dgLeftHandSide** m_rowArray;
 	dgInverseDynamicsList::dgListNode* m_reference;
 	dgList<dgLoopingJoint> m_loopingJoints;
 	dgInt16 m_nodeCount;

@@ -58,8 +58,8 @@ class dgWorldDynamicUpdateSyncDescriptor
 
 void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount)
 {
-	world->m_solverJacobiansMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgJacobianMatrixElement));
-	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
+	world->m_solverJacobiansMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgLeftHandSide));
+	m_jacobianBuffer = (dgLeftHandSide*)&world->m_solverJacobiansMemory[0];
 
 	world->m_solverRightHandSideMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgRightHandSide));
 	m_righHandSizeBuffer = (dgRightHandSide*)&world->m_solverRightHandSideMemory[0];
@@ -596,7 +596,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 }
 
 
-dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const
+dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const
 {
 	dgInt32 dof = dgInt32(constraint->m_maxDOF);
 	dgAssert(dof <= DG_CONSTRAINT_MAX_ROWS);
@@ -639,7 +639,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 	jointInfo->m_paddedPairCount = dgInt16(dof);
 	for (dgInt32 i = 0; i < dof; i++) {
 		dgRightHandSide* const rhs = &rightHandSide[rowCount];
-		dgJacobianMatrixElement* const row = &matrixRow[rowCount];
+		dgLeftHandSide* const row = &matrixRow[rowCount];
 		
 		dgAssert(constraintParam.m_forceBounds[i].m_jointForce);
 		row->m_Jt = constraintParam.m_jacobian[i];
@@ -672,7 +672,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 }
 
 
-void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoArray, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const
+void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoArray, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const
 {
 	const dgInt32 index = jointInfo->m_pairStart;
 	const dgInt32 count = jointInfo->m_pairCount;
@@ -725,7 +725,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 
 	for (dgInt32 i = 0; i < count; i++) {
 		dgRightHandSide* const rhs = &rightHandSide[index + i];
-		dgJacobianMatrixElement* const row = &matrixRow[index + i];
+		dgLeftHandSide* const row = &matrixRow[index + i];
 
 		row->m_JMinv.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear * invMass0;
 		row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
@@ -846,7 +846,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
-	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
+	dgLeftHandSide* const matrixRow = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowsStart];
 
 	dgInt32 rowCount = 0;

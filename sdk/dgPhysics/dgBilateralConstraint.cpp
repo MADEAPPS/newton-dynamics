@@ -419,7 +419,7 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 //dgAssert (params->m_timeStep > dgFloat32 (0.0f));
 
 	dgRightHandSide* const rhs = params->m_rightHandSide;
-	const dgJacobianMatrixElement* const row = params->m_rowMatrix;
+	const dgLeftHandSide* const row = params->m_rowMatrix;
 	if (params->m_timeStep > dgFloat32 (0.0f)) {
 		//const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.25f);
 		//const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
