@@ -289,23 +289,23 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel(const dgBodyInfo* const b
 		torque1 = ((dgDynamicBody*)body1)->m_externalTorque * invW1;
 	}
 
-	jointInfo->m_scale0 = dgFloat32(1.0f);
-	jointInfo->m_scale1 = dgFloat32(1.0f);
+	jointInfo->m_preconditioner0 = dgFloat32(1.0f);
+	jointInfo->m_preconditioner1 = dgFloat32(1.0f);
 	const dgFloat32 diagonalPreconditioner = jointInfo->m_joint->m_diagonalPreconditioner;
 	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
 		if (mass0 > (diagonalPreconditioner * mass1)) {
-			jointInfo->m_scale0 = mass0 / (mass1 * diagonalPreconditioner);
+			jointInfo->m_preconditioner0 = mass0 / (mass1 * diagonalPreconditioner);
 		} else if (mass1 > (diagonalPreconditioner * mass0)) {
-			jointInfo->m_scale1 = mass1 / (mass0 * diagonalPreconditioner);
+			jointInfo->m_preconditioner1 = mass1 / (mass0 * diagonalPreconditioner);
 		}
 	}
 
 	dgJacobian forceAcc0;
 	dgJacobian forceAcc1;
-	const dgVector scale0(jointInfo->m_scale0);
-	const dgVector scale1(jointInfo->m_scale1);
+	const dgVector preconditioner0(jointInfo->m_preconditioner0);
+	const dgVector preconditioner1(jointInfo->m_preconditioner1);
 	forceAcc0.m_linear = dgVector::m_zero;
 	forceAcc0.m_angular = dgVector::m_zero;
 	forceAcc1.m_linear = dgVector::m_zero;
@@ -333,10 +333,10 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel(const dgBodyInfo* const b
 		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
-		dgVector jMinvM0linear(scale0 * row->m_JMinv.m_jacobianM0.m_linear);
-		dgVector jMinvM0angular(scale0 * row->m_JMinv.m_jacobianM0.m_angular);
-		dgVector jMinvM1linear(scale1 * row->m_JMinv.m_jacobianM1.m_linear);
-		dgVector jMinvM1angular(scale1 * row->m_JMinv.m_jacobianM1.m_angular);
+		dgVector jMinvM0linear(preconditioner0 * row->m_JMinv.m_jacobianM0.m_linear);
+		dgVector jMinvM0angular(preconditioner0 * row->m_JMinv.m_jacobianM0.m_angular);
+		dgVector jMinvM1linear(preconditioner1 * row->m_JMinv.m_jacobianM1.m_linear);
+		dgVector jMinvM1angular(preconditioner1 * row->m_JMinv.m_jacobianM1.m_angular);
 
 		dgVector tmpDiag(jMinvM0linear * row->m_Jt.m_jacobianM0.m_linear + jMinvM0angular * row->m_Jt.m_jacobianM0.m_angular +
 						 jMinvM1linear * row->m_Jt.m_jacobianM1.m_linear + jMinvM1angular * row->m_Jt.m_jacobianM1.m_angular);
@@ -357,10 +357,10 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel(const dgBodyInfo* const b
 		forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
 	}
 
-	forceAcc0.m_linear = forceAcc0.m_linear * scale0;
-	forceAcc0.m_angular = forceAcc0.m_angular * scale0;
-	forceAcc1.m_linear = forceAcc1.m_linear * scale1;
-	forceAcc1.m_angular = forceAcc1.m_angular * scale1;
+	forceAcc0.m_linear = forceAcc0.m_linear * preconditioner0;
+	forceAcc0.m_angular = forceAcc0.m_angular * preconditioner0;
+	forceAcc1.m_linear = forceAcc1.m_linear * preconditioner1;
+	forceAcc1.m_angular = forceAcc1.m_angular * preconditioner1;
 
 	if (m0) {
 		dgScopeSpinLock lock(&bodyLocks[m0]);
@@ -516,12 +516,12 @@ void dgWorldDynamicUpdate::CalculateBodiesForceParallelKernel(void* const contex
 			forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
 		}
 
-		const dgVector scale0(jointInfo->m_scale0 * weight[m0]);
-		const dgVector scale1(jointInfo->m_scale1 * weight[m1]);
-		forceAcc0.m_linear = forceAcc0.m_linear * scale0;
-		forceAcc0.m_angular = forceAcc0.m_angular * scale0;
-		forceAcc1.m_linear = forceAcc1.m_linear * scale1;
-		forceAcc1.m_angular = forceAcc1.m_angular * scale1;
+		const dgVector preconditioner0(jointInfo->m_preconditioner0 * weight[m0]);
+		const dgVector preconditioner1(jointInfo->m_preconditioner1 * weight[m1]);
+		forceAcc0.m_linear = forceAcc0.m_linear * preconditioner0;
+		forceAcc0.m_angular = forceAcc0.m_angular * preconditioner0;
+		forceAcc1.m_linear = forceAcc1.m_linear * preconditioner1;
+		forceAcc1.m_angular = forceAcc1.m_angular * preconditioner1;
 
 		if (m0) {
 			dgScopeSpinLock lock(&bodyLocks[m0]);
@@ -658,8 +658,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceParallel(const dgJointInfo* c
 		dgVector linearM1(internalForces[m1].m_linear);
 		dgVector angularM1(internalForces[m1].m_angular);
 
-		const dgVector scale0(jointInfo->m_scale0);
-		const dgVector scale1(jointInfo->m_scale1);
+		const dgVector preconditioner0(jointInfo->m_preconditioner0);
+		const dgVector preconditioner1(jointInfo->m_preconditioner1);
 
 		normalForce[rowsCount] = dgFloat32(1.0f);
 		//dgInt32 j = jointInfo->m_pairStart;
@@ -696,8 +696,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceParallel(const dgJointInfo* c
 			rhs->m_force = f.GetScalar();
 			normalForce[k] = f.GetScalar();
 
-			dgVector deltaforce0(scale0 * deltaForce);
-			dgVector deltaforce1(scale1 * deltaForce);
+			dgVector deltaforce0(preconditioner0 * deltaForce);
+			dgVector deltaforce1(preconditioner1 * deltaForce);
 			linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
 			angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
 			linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
@@ -734,8 +734,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceParallel(const dgJointInfo* c
 				rhs->m_force = f.GetScalar();
 				normalForce[k] = f.GetScalar();
 
-				dgVector deltaforce0(scale0 * deltaForce);
-				dgVector deltaforce1(scale1 * deltaForce);
+				dgVector deltaforce0(preconditioner0 * deltaForce);
+				dgVector deltaforce1(preconditioner1 * deltaForce);
 				linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
 				angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
 				linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;

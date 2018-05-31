@@ -395,8 +395,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 		dgVector linearM1(internalForces[m1].m_linear);
 		dgVector angularM1(internalForces[m1].m_angular);
 
-		const dgVector scale0(jointInfo->m_scale0);
-		const dgVector scale1(jointInfo->m_scale1);
+		const dgVector preconditioner0(jointInfo->m_preconditioner0);
+		const dgVector preconditioner1(jointInfo->m_preconditioner1);
 
 		const dgInt32 index = jointInfo->m_pairStart;
 		const dgInt32 rowsCount = jointInfo->m_pairCount;
@@ -443,8 +443,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 				rhs->m_force = force.GetScalar();
 				normalForce[k] = force.GetScalar();
 
-				dgVector deltaforce0(scale0 * deltaForce);
-				dgVector deltaforce1(scale1 * deltaForce);
+				dgVector deltaforce0(preconditioner0 * deltaForce);
+				dgVector deltaforce1(preconditioner1 * deltaForce);
 
 				linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
 				angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
@@ -488,8 +488,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		dgVector linearM1(internalForces[m1].m_linear);
 		dgVector angularM1(internalForces[m1].m_angular);
 
-		const dgVector scale0(jointInfo->m_scale0);
-		const dgVector scale1(jointInfo->m_scale1);
+		const dgVector preconditioner0(jointInfo->m_preconditioner0);
+		const dgVector preconditioner1(jointInfo->m_preconditioner1);
 
 		normalForce[rowsCount] = dgFloat32(1.0f);
 		const dgInt32 rowStart = jointInfo->m_pairStart;
@@ -518,8 +518,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			rhs->m_force = f.GetScalar();
 			normalForce[k] = f.GetScalar();
 
-			dgVector deltaforce0(scale0 * deltaForce);
-			dgVector deltaforce1(scale1 * deltaForce);
+			dgVector deltaforce0(preconditioner0 * deltaForce);
+			dgVector deltaforce1(preconditioner1 * deltaForce);
 			linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
 			angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
 			linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
@@ -557,8 +557,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				rhs->m_force = f.GetScalar();
 				normalForce[k] = f.GetScalar();
 
-				dgVector deltaforce0(scale0 * deltaForce);
-				dgVector deltaforce1(scale1 * deltaForce);
+				dgVector deltaforce0(preconditioner0 * deltaForce);
+				dgVector deltaforce1(preconditioner1 * deltaForce);
 				linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
 				angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
 				linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;

@@ -92,8 +92,8 @@ class dgJointInfo
 {
 	public:
 	dgConstraint* m_joint;
-	dgFloat32 m_scale0;
-	dgFloat32 m_scale1;
+	dgFloat32 m_preconditioner0;
+	dgFloat32 m_preconditioner1;
 	dgInt32 m_m0;
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
