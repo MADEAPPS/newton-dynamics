@@ -710,9 +710,9 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
 		if (mass0 > (diagonalPreconditioner * mass1)) {
-			jointInfo->m_scale0 = invMass1.GetScalar() * mass0 / diagonalPreconditioner;
+			jointInfo->m_scale0 = mass0 / (mass1 * diagonalPreconditioner);
 		} else if (mass1 > (diagonalPreconditioner * mass0)) {
-			jointInfo->m_scale1 = invMass0.GetScalar() * mass1 / diagonalPreconditioner;
+			jointInfo->m_scale1 = mass1 / (mass0 * diagonalPreconditioner);
 		}
 	}
 
