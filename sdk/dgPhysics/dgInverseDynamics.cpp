@@ -192,7 +192,7 @@ class dgInverseDynamics::dgNode
 
 			for (dgInt32 i = 0; i < count; i++) {
 				dgInt32 k = m_sourceJacobianIndex[i];
-				//const dgJacobianMatrixElement* const row = &matrixRow[k + first];
+				//const dgLeftHandSide* const row = &matrixRow[k + first];
 				const dgRightHandSide* const rhs = &rightHandSide[k + first];
 				if (rhs->m_normalForceIndex) {
 					bool test0 = rhs->m_lowerBoundFrictionCoefficent <= dgFloat32 (-DG_LCP_MAX_VALUE);
@@ -209,7 +209,7 @@ class dgInverseDynamics::dgNode
 
 			for (dgInt32 i = 0; i < count; i++) {
 				dgInt32 k = m_sourceJacobianIndex[i];
-				//const dgJacobianMatrixElement* const row = &matrixRow[k + first];
+				//const dgLeftHandSide* const row = &matrixRow[k + first];
 				const dgRightHandSide* const rhs = &rightHandSide[k + first];
 				if ((rhs->m_lowerBoundFrictionCoefficent <= dgFloat32 (-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32 (DG_LCP_MAX_VALUE))) {
 					m_dof ++;
@@ -375,7 +375,7 @@ class dgInverseDynamics::dgNode
 			dgInt32 count = jointInfo->m_pairCount;
 			const dgInt32 first = jointInfo->m_pairStart;
 			for (dgInt32 i = 0; i < count; i++) {
-				//const dgJacobianMatrixElement* const row = &matrixRow[i + first];
+				//const dgLeftHandSide* const row = &matrixRow[i + first];
 				const dgRightHandSide* const rhs = &rightHandSide[i + first];
 				if (!((rhs->m_lowerBoundFrictionCoefficent <= dgFloat32 (-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32 (DG_LCP_MAX_VALUE)))) {
 					rowCount++;
@@ -976,7 +976,7 @@ DG_INLINE void dgInverseDynamics::CalculateJointAccel(dgJointInfo* const jointIn
 		for (dgInt32 j = 0; j < dof; j++) {
 			const dgInt32 k = node->m_sourceJacobianIndex[j];
 			dgRightHandSide* const rhs = &rightHandSide[first + k];
-			//const dgJacobianMatrixElement* const row = &matrixRow[first + k];
+			//const dgLeftHandSide* const row = &matrixRow[first + k];
 			a.m_joint[j] = - rhs->m_penetrationStiffness;
 		}
 	}
@@ -1067,7 +1067,7 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
 			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 			dgRightHandSide* const rhs = &rightHandSide[first + index];
-			//dgJacobianMatrixElement* const row = &matrixRow[first + index];
+			//dgLeftHandSide* const row = &matrixRow[first + index];
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
 			b[auxiliaryIndex] = -dgFloat32(accelSpatial[primaryDof + j]);
 			low[auxiliaryIndex] = dgClamp(rhs->m_lowerBoundFrictionCoefficent, -DG_MAX_BOUND, dgFloat32(0.0f));
@@ -1084,7 +1084,7 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 
 		for (dgInt32 i = 0; i < auxiliaryDof; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[first + i];
-			//const dgJacobianMatrixElement* const row = &matrixRow[first + i];
+			//const dgLeftHandSide* const row = &matrixRow[first + i];
 			f[auxiliaryIndex + primaryCount] = dgFloat32(0.0f);
 			b[auxiliaryIndex] = rhs->m_penetrationStiffness;
 			low[auxiliaryIndex] = dgClamp(rhs->m_lowerBoundFrictionCoefficent, -DG_MAX_BOUND, dgFloat32(0.0f));

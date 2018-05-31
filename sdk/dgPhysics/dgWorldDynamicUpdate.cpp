@@ -702,15 +702,17 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		torque1 = ((dgDynamicBody*)body1)->m_externalTorque;
 	}
 
+	const dgFloat32 diagonalPreconditioner = jointInfo->m_joint->m_diagonalPreconditioner;
 	jointInfo->m_scale0 = dgFloat32(1.0f);
 	jointInfo->m_scale1 = dgFloat32(1.0f);
-	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())) {
+//	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())) {
+	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
-		if (mass0 > (DG_HEAVY_MASS_SCALE_FACTOR * mass1)) {
-			jointInfo->m_scale0 = invMass1.GetScalar() * mass0 * DG_HEAVY_MASS_INV_SCALE_FACTOR;
-		} else if (mass1 > (DG_HEAVY_MASS_SCALE_FACTOR * mass0)) {
-			jointInfo->m_scale1 = invMass0.GetScalar() * mass1 * DG_HEAVY_MASS_INV_SCALE_FACTOR;
+		if (mass0 > (diagonalPreconditioner * mass1)) {
+			jointInfo->m_scale0 = invMass1.GetScalar() * mass0 / diagonalPreconditioner;
+		} else if (mass1 > (diagonalPreconditioner * mass0)) {
+			jointInfo->m_scale1 = invMass0.GetScalar() * mass1 / diagonalPreconditioner;
 		}
 	}
 

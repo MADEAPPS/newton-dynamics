@@ -29,6 +29,8 @@
 #define DG_INDEPENDENT_ROW			-1 
 #define DG_CONSTRAINT_MAX_ROWS		(3 * 16)
 #define MIN_JOINT_PIN_LENGTH		dgFloat32 (50.0f)
+#define DG_DIAGONAL_PRECONDITIONER	dgFloat32 (20.0f)
+
 
 class dgBody;
 class dgWorld;
@@ -96,8 +98,9 @@ class dgJacobianPair
 	dgJacobian m_jacobianM1;
 } DG_GCC_VECTOR_ALIGMENT;
 
-class dgRightHandSide;
 class dgLeftHandSide;
+class dgRightHandSide;
+
 class dgJointAccelerationDecriptor
 {
 	public: 
@@ -150,7 +153,6 @@ class dgConstraint
 		m_unknownConstraint
 	};
 
-
 	dgUnsigned32 GetId () const;
 	dgBody* GetBody0 ()	const;
 	dgBody* GetBody1 ()	const;
@@ -178,6 +180,9 @@ class dgConstraint
 	
 	virtual dgInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dgInt32 model);
+
+	virtual dgFloat32 GetPreconditioner() const;
+	virtual void SetPreconditioner(dgFloat32 preconditioner);
 
 	virtual void GetInfo (dgConstraintInfo* const info) const;
 
@@ -213,10 +218,10 @@ class dgConstraint
 	dgBodyMasterListRow::dgListNode* m_link0;
 	dgBodyMasterListRow::dgListNode* m_link1;
 	ConstraintsForceFeeback m_updaFeedbackCallback;
+	dgFloat32 m_diagonalPreconditioner;
 	dgInt32 m_clusterLRU;
-	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_index;
-	
+	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_maxDOF				: 6;
 	dgUnsigned32 m_constId				: 6;		
 	dgUnsigned32 m_solverModel			: 2;
@@ -244,9 +249,10 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_link0(NULL)
 	,m_link1(NULL)
 	,m_updaFeedbackCallback(NULL)
-	,m_clusterLRU (-1)
-	,m_dynamicsLru(0)
+	,m_diagonalPreconditioner(DG_DIAGONAL_PRECONDITIONER)
+	,m_clusterLRU(-1)
 	,m_index(0)
+	,m_dynamicsLru(0)
 	,m_maxDOF(6)
 	,m_constId(m_unknownConstraint)
 	,m_solverModel(2)
@@ -350,6 +356,16 @@ DG_INLINE dgInt32 dgConstraint::GetMaxDOF() const
 DG_INLINE bool dgConstraint::IsActive() const
 {
 	return m_contactActive ? true : false;
+}
+
+DG_INLINE dgFloat32 dgConstraint::GetPreconditioner() const
+{
+	return m_diagonalPreconditioner;
+}
+
+DG_INLINE void dgConstraint::SetPreconditioner(dgFloat32 preconditioner)
+{
+	m_diagonalPreconditioner = dgClamp (preconditioner, dgFloat32 (5.0f), dgFloat32(100.0f));
 }
 
 #endif 

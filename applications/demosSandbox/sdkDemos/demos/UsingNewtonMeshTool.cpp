@@ -192,6 +192,7 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 	NewtonBodySetMassMatrix(fork, inertia.m_w, inertia.m_x, inertia.m_y, inertia.m_z);
 
 	dCustomSliderActuator* const actuator = new dCustomSliderActuator (jointMatrix, fork, chassis);
+	actuator->SetPreconditioner(10.0f);
 	//dCustomSlider* const actuator = new dCustomSlider (jointMatrix, fork, chassis);
 
 	// make obstacle

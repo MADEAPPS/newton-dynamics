@@ -251,6 +251,9 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API dFloat GetStiffness () const;
 	CUSTOM_JOINTS_API void SetStiffness (dFloat stiffness);
 
+	CUSTOM_JOINTS_API dFloat GetPreconditioner() const;
+	CUSTOM_JOINTS_API void SetPreconditioner(dFloat preconditioner);
+
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
 	CUSTOM_JOINTS_API int GetSolverModel() const;
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }

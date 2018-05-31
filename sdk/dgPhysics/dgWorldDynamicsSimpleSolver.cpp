@@ -455,7 +455,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 		}
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
-			//dgJacobianMatrixElement* const row = &matrixRow[index + i];
+			//dgLeftHandSide* const row = &matrixRow[index + i];
 			dgRightHandSide* const rhs = &rightHandSide[index + i];
 			rhs->m_maxImpact = dgMax(dgAbs(rhs->m_force), rhs->m_maxImpact);
 		}
@@ -568,7 +568,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[rowStart + i];
-			//dgJacobianMatrixElement* const row = &matrixRow[rowStart + i];
+			//dgLeftHandSide* const row = &matrixRow[rowStart + i];
 			rhs->m_maxImpact = dgMax(dgAbs(rhs->m_force), rhs->m_maxImpact);
 		}
 
@@ -581,7 +581,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 }
 
 //#define DG_TEST_GYRO
-#define DG_USE_SKEL
+//#define DG_USE_SKEL
 
 dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const
 {
@@ -719,7 +719,7 @@ static int xxx;
 static int xxx0;
 
 //	const dgInt32 passes = world->m_solverMode;
-const dgInt32 passes = 1000;
+const dgInt32 passes = 64;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
 
 		for (dgInt32 i = 0; i < jointCount; i++) {
@@ -781,7 +781,7 @@ xxxxx++;
 					dgJacobian velocStep(IntegrateForceAndToque(body, force, torque, timestep4));
 					if (!body->m_resting) {
 //if ((body->m_uniqueID == 4) && (xxxxx > xxx0)) {
-if ((body->m_uniqueID == 4) && (xxxxx > 20)) {
+if ((body->m_uniqueID == 4) && (xxxxx > 30)) {
 xxx0 = xxxxx;
 dgTrace(("iter(%d) f(%f %f %f) v(%f %f %f)\n", xxxxx, force[0], force[1], force[2], body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]));
 }
@@ -823,7 +823,7 @@ dgTrace(("iter(%d) f(%f %f %f) v(%f %f %f)\n", xxxxx, force[0], force[1], force[
 
 			for (dgInt32 j = 0; j < count; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[j + first];
-				//const dgJacobianMatrixElement* const row = &matrixRow[j + first];
+				//const dgLeftHandSide* const row = &matrixRow[j + first];
 				dgAssert(dgCheckFloat(rhs->m_force));
 				rhs->m_jointFeebackForce->m_force = rhs->m_force;
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;

@@ -291,13 +291,14 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel(const dgBodyInfo* const b
 
 	jointInfo->m_scale0 = dgFloat32(1.0f);
 	jointInfo->m_scale1 = dgFloat32(1.0f);
+	const dgFloat32 diagonalPreconditioner = jointInfo->m_joint->m_diagonalPreconditioner;
 	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
-		if (mass0 > (DG_HEAVY_MASS_SCALE_FACTOR * mass1)) {
-			jointInfo->m_scale0 = invMass1.GetScalar() * mass0 * DG_HEAVY_MASS_INV_SCALE_FACTOR;
-		} else if (mass1 > (DG_HEAVY_MASS_SCALE_FACTOR * mass0)) {
-			jointInfo->m_scale1 = invMass0.GetScalar() * mass1 * DG_HEAVY_MASS_INV_SCALE_FACTOR;
+		if (mass0 > (diagonalPreconditioner * mass1)) {
+			jointInfo->m_scale0 = invMass1.GetScalar() * mass0 / diagonalPreconditioner;
+		} else if (mass1 > (diagonalPreconditioner * mass0)) {
+			jointInfo->m_scale1 = invMass0.GetScalar() * mass1 / diagonalPreconditioner;
 		}
 	}
 
@@ -585,7 +586,7 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernel(void* const contex
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*)context;
 	dgJointInfo* const constraintArray = syncData->m_jointsArray;
 	dgRightHandSide* const rightHandSide = &world->m_solverMemory.m_righHandSizeBuffer[0];
-	//dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
+	//dgLeftHandSide* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 
 	dgInt32 hasJointFeeback = 0;
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
@@ -598,7 +599,7 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernel(void* const contex
 
 		for (dgInt32 j = 0; j < count; j++) {
 			dgRightHandSide* const rhs = &rightHandSide[j + first];
-			//dgJacobianMatrixElement* const row = &matrixRow[j + first];
+			//dgLeftHandSide* const row = &matrixRow[j + first];
 			dgAssert(dgCheckFloat(rhs->m_force));
 			rhs->m_jointFeebackForce->m_force = rhs->m_force;
 			rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * syncData->m_timestepRK;
@@ -744,7 +745,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceParallel(const dgJointInfo* c
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[index + i];
-			//dgJacobianMatrixElement* const row = &matrixRow[index];
+			//dgLeftHandSide* const row = &matrixRow[index];
 			rhs->m_maxImpact = dgMax(dgAbs(rhs->m_force), rhs->m_maxImpact);
 		}
 	}

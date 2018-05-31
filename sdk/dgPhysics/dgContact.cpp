@@ -84,6 +84,7 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	m_maxDOF = 0;
 	m_enableCollision = true;
 	m_constId = m_contactConstraint;
+	m_diagonalPreconditioner = dgFloat32 (25.0f);
 }
 
 dgContact::dgContact(dgContact* const clone)
@@ -109,6 +110,7 @@ dgContact::dgContact(dgContact* const clone)
 	m_constId = m_contactConstraint;
 	m_contactActive = clone->m_contactActive;
 	m_enableCollision = clone->m_enableCollision;
+	m_diagonalPreconditioner = dgFloat32 (25.0f);
 	Merge (*clone);
 }
 
@@ -157,9 +159,6 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 
 	jacobian0.m_angular = param.m_r0.CrossProduct3(dir);
 	jacobian1.m_angular = dir.CrossProduct3(param.m_r1);
-
-jacobian0.m_angular = dgVector::m_zero;
-jacobian1.m_angular = dgVector::m_zero;
 
 	dgAssert(jacobian0.m_linear.m_w == dgFloat32(0.0f));
 	dgAssert(jacobian0.m_angular.m_w == dgFloat32(0.0f));
@@ -228,7 +227,6 @@ params.m_penetration[normalIndex] = 0.0f;
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 
-return;
 	// first dir friction force
 	if (contact.m_flags & dgContactMaterial::m_friction0Enable) {
 		dgInt32 jacobIndex = frictionIndex;

@@ -163,7 +163,7 @@ class dgSkeletonContainer::dgNode
 		}
 	}
 
-	//DG_INLINE dgInt32 Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow)
+	//DG_INLINE dgInt32 Factorize(const dgJointInfo* const jointInfoArray, dgLeftHandSide* const matrixRow)
 	dgInt32 Factorize(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
 	{
 		CalculateInertiaMatrix(bodyMassArray);
@@ -180,7 +180,7 @@ class dgSkeletonContainer::dgNode
 			const dgInt32 first = jointInfo->m_pairStart;
 			for (dgInt32 i = 0; i < count; i++) {
 				dgInt32 k = m_sourceJacobianIndex[i];
-				//const dgJacobianMatrixElement* const row = &matrixRow[k + first];
+				//const dgLeftHandSide* const row = &matrixRow[k + first];
 				const dgRightHandSide* const rhs = &rightHandSide[k + first];
 				if ((rhs->m_lowerBoundFrictionCoefficent <= dgFloat32 (-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32 (DG_LCP_MAX_VALUE))) {
 					m_dof ++;
@@ -349,7 +349,7 @@ class dgSkeletonContainer::dgNode
 			dgInt32 count = jointInfo->m_pairCount;
 			const dgInt32 first = jointInfo->m_pairStart;
 			for (dgInt32 i = 0; i < count; i++) {
-				//const dgJacobianMatrixElement* const row = &matrixRow[i + first];
+				//const dgLeftHandSide* const row = &matrixRow[i + first];
 				const dgRightHandSide* const rhs = &rightHandSide[i + first];
 				if (!((rhs->m_lowerBoundFrictionCoefficent <= dgFloat32 (-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32 (DG_LCP_MAX_VALUE)))) {
 					rowCount++;
@@ -1286,7 +1286,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
 		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
 			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
-			//dgJacobianMatrixElement* const row = &matrixRow[first + index];
+			//dgLeftHandSide* const row = &matrixRow[first + index];
 			dgRightHandSide* const rhs = &rightHandSide[first + index];
 			f[auxiliaryIndex + primaryCount] = dgFloat32 (0.0f);
 			b[auxiliaryIndex] = -dgFloat32(accelSpatial[primaryDof + j]);

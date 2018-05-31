@@ -196,6 +196,17 @@ void dCustomJoint::SetSolverModel(int model)
 	NewtonUserJointSetSolverModel (m_joint, model);
 }
 
+dFloat dCustomJoint::GetPreconditioner() const
+{
+	return NewtonJointGetPreconditioner(m_joint);
+}
+
+void dCustomJoint::SetPreconditioner(dFloat preconditioner)
+{
+	NewtonJointSetPreconditioner(m_joint, preconditioner);
+}
+
+
 int dCustomJoint::GetSolverModel() const
 {
 	return NewtonUserJointGetSolverModel(m_joint);
