@@ -164,6 +164,21 @@ static NewtonBody* CreateBox(DemoEntityManager* const scene, dFloat mass, const 
 }
 
 
+static NewtonBody* CreateSphere(DemoEntityManager* const scene, dFloat mass, const dMatrix& location, const dVector& size)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
+
 // black_birth demo
 void UsingNewtonMeshTool(DemoEntityManager* const scene)
 {
@@ -174,7 +189,7 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 	dMatrix matrix;
-
+#if 0
 	// make the chassis
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 1.2f, 0.0f, 1.0f);
@@ -198,7 +213,15 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 	// make obstacle
 	location.m_posit += dVector(-2.0f, 0.0f, 0.0f, 0.0f);
 	CreateBox(scene, 0.0f, location, dVector (1.1f, 0.8f, 1.0f, 0.0f));
+#else
 
+	dMatrix location(dGetIdentityMatrix());
+	location.m_posit = dVector(0.0f, 0.5f, 0.0f, 1.0f);
+	NewtonBody* const sphe0 = CreateSphere(scene, 1.0f, location, dVector(1.0f));
+
+	location.m_posit += dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	NewtonBody* const sphe1 = CreateSphere(scene, 100.0f, location, dVector(1.0f));
+#endif
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
