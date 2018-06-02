@@ -217,10 +217,10 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit = dVector(0.0f, 0.5f, 0.0f, 1.0f);
-	NewtonBody* const sphe0 = CreateSphere(scene, 1.0f, location, dVector(1.0f));
+	CreateSphere(scene, 1.0f, location, dVector(1.0f));
 
 	location.m_posit += dVector(0.0f, 1.0f, 0.0f, 0.0f);
-	NewtonBody* const sphe1 = CreateSphere(scene, 100.0f, location, dVector(1.0f));
+	CreateSphere(scene, 100.0f, location, dVector(1.0f));
 #endif
 
 	dQuaternion rot;

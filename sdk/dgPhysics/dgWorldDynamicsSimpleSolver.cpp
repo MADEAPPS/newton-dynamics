@@ -30,6 +30,8 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 
+//#define DG_TEST_GYRO
+//#define DG_USE_SKEL
 
 void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
@@ -580,8 +582,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	return accNorm.GetScalar();
 }
 
-//#define DG_TEST_GYRO
-//#define DG_USE_SKEL
 
 dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const
 {
