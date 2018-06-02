@@ -216,10 +216,10 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 #else
 
 	dMatrix location(dGetIdentityMatrix());
-	location.m_posit = dVector(0.0f, 0.5f, 0.0f, 1.0f);
+	location.m_posit = dVector(0.0f, 0.49f, 0.0f, 1.0f);
 	CreateSphere(scene, 1.0f, location, dVector(1.0f));
 
-	location.m_posit += dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	location.m_posit += dVector(0.0f, 0.95f, 0.0f, 0.0f);
 	CreateSphere(scene, 100.0f, location, dVector(1.0f));
 #endif
 

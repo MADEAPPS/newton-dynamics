@@ -36,6 +36,7 @@ class dgCollisionInstance;
 
 #define DG_MAX_CONTATCS					128
 #define DG_RESTING_CONTACT_PENETRATION	(DG_PENETRATION_TOL + dgFloat32 (1.0f / 1024.0f))
+#define DG_DIAGONAL_PRECONDITIONER		dgFloat32 (25.0f)
 
 class dgActiveContacts: public dgList<dgContact*>
 {

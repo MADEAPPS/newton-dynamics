@@ -995,9 +995,6 @@ extern "C" {
 
 	NEWTON_API dFloat NewtonJointGetStiffness (const NewtonJoint* const joint);
 	NEWTON_API void NewtonJointSetStiffness (const NewtonJoint* const joint, dFloat state);
-
-	NEWTON_API dFloat NewtonJointGetPreconditioner(const NewtonJoint* const joint);
-	NEWTON_API void NewtonJointSetPreconditioner(const NewtonJoint* const joint, dFloat preconditioner);
 	
 	NEWTON_API void NewtonDestroyJoint(const NewtonWorld* const newtonWorld, const NewtonJoint* const joint);
 	NEWTON_API void NewtonJointSetDestructor (const NewtonJoint* const joint, NewtonConstraintDestructor destructor);

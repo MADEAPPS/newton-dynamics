@@ -84,7 +84,6 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	m_maxDOF = 0;
 	m_enableCollision = true;
 	m_constId = m_contactConstraint;
-	m_diagonalPreconditioner = dgFloat32 (25.0f);
 }
 
 dgContact::dgContact(dgContact* const clone)
@@ -110,7 +109,6 @@ dgContact::dgContact(dgContact* const clone)
 	m_constId = m_contactConstraint;
 	m_contactActive = clone->m_contactActive;
 	m_enableCollision = clone->m_enableCollision;
-	m_diagonalPreconditioner = dgFloat32 (25.0f);
 	Merge (*clone);
 }
 

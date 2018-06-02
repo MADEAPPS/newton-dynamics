@@ -291,14 +291,15 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel(const dgBodyInfo* const b
 
 	jointInfo->m_preconditioner0 = dgFloat32(1.0f);
 	jointInfo->m_preconditioner1 = dgFloat32(1.0f);
-	const dgFloat32 diagonalPreconditioner = jointInfo->m_joint->m_diagonalPreconditioner;
-	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
+//	const dgFloat32 diagonalPreconditioner = jointInfo->m_joint->m_diagonalPreconditioner;
+//	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
+	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
-		if (mass0 > (diagonalPreconditioner * mass1)) {
-			jointInfo->m_preconditioner0 = mass0 / (mass1 * diagonalPreconditioner);
-		} else if (mass1 > (diagonalPreconditioner * mass0)) {
-			jointInfo->m_preconditioner1 = mass1 / (mass0 * diagonalPreconditioner);
+		if (mass0 > (DG_DIAGONAL_PRECONDITIONER * mass1)) {
+			jointInfo->m_preconditioner0 = mass0 / (mass1 * DG_DIAGONAL_PRECONDITIONER);
+		} else if (mass1 > (DG_DIAGONAL_PRECONDITIONER * mass0)) {
+			jointInfo->m_preconditioner1 = mass1 / (mass0 * DG_DIAGONAL_PRECONDITIONER);
 		}
 	}
 

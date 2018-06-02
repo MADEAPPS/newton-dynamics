@@ -7604,21 +7604,6 @@ dFloat NewtonJointGetStiffness(const NewtonJoint* const joint)
 	return contraint->GetStiffness();
 }
 
-dFloat NewtonJointGetPreconditioner(const NewtonJoint* const joint)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgConstraint* const contraint = (dgConstraint*)joint;
-	return contraint->GetPreconditioner();
-}
-
-void NewtonJointSetPreconditioner(const NewtonJoint* const joint, dFloat preconditioner)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgConstraint* const contraint = (dgConstraint*)joint;
-	contraint->SetPreconditioner(preconditioner);
-}
-
-
 /*!
   Register a destructor callback to be called when the joint is about to be destroyed.
 

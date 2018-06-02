@@ -29,8 +29,6 @@
 #define DG_INDEPENDENT_ROW			-1 
 #define DG_CONSTRAINT_MAX_ROWS		(3 * 16)
 #define MIN_JOINT_PIN_LENGTH		dgFloat32 (50.0f)
-#define DG_DIAGONAL_PRECONDITIONER	dgFloat32 (20.0f)
-
 
 class dgBody;
 class dgWorld;
@@ -181,9 +179,6 @@ class dgConstraint
 	virtual dgInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dgInt32 model);
 
-	virtual dgFloat32 GetPreconditioner() const;
-	virtual void SetPreconditioner(dgFloat32 preconditioner);
-
 	virtual void GetInfo (dgConstraintInfo* const info) const;
 
 	class dgPointParam
@@ -218,7 +213,6 @@ class dgConstraint
 	dgBodyMasterListRow::dgListNode* m_link0;
 	dgBodyMasterListRow::dgListNode* m_link1;
 	ConstraintsForceFeeback m_updaFeedbackCallback;
-	dgFloat32 m_diagonalPreconditioner;
 	dgInt32 m_clusterLRU;
 	dgUnsigned32 m_index;
 	dgUnsigned32 m_dynamicsLru;
@@ -249,7 +243,6 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_link0(NULL)
 	,m_link1(NULL)
 	,m_updaFeedbackCallback(NULL)
-	,m_diagonalPreconditioner(DG_DIAGONAL_PRECONDITIONER)
 	,m_clusterLRU(-1)
 	,m_index(0)
 	,m_dynamicsLru(0)
@@ -358,15 +351,6 @@ DG_INLINE bool dgConstraint::IsActive() const
 	return m_contactActive ? true : false;
 }
 
-DG_INLINE dgFloat32 dgConstraint::GetPreconditioner() const
-{
-	return m_diagonalPreconditioner;
-}
-
-DG_INLINE void dgConstraint::SetPreconditioner(dgFloat32 preconditioner)
-{
-	m_diagonalPreconditioner = dgClamp (preconditioner, dgFloat32 (5.0f), dgFloat32(100.0f));
-}
 
 #endif 
 
