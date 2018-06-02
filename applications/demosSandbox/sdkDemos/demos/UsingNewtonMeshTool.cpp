@@ -189,26 +189,27 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 	dMatrix matrix;
-#if 0
+#if 1
 	// make the chassis
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 1.2f, 0.0f, 1.0f);
-	NewtonBody* const chassis = CreateBox(scene, 2500.0f, location, dVector (1.1f, 0.8f, 1.0f, 0.0f));
+//	NewtonBody* const chassis = CreateBox(scene, 2500.0f, location, dVector (1.1f, 0.8f, 1.0f, 0.0f));
+	NewtonBody* const chassis = CreateSphere(scene, 2500.0f, location, dVector(1.0f));
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
-    dCustomSlider* const slider = new dCustomSlider (matrix, chassis, NULL);
+//  dCustomSlider* const slider = new dCustomSlider (matrix, chassis, NULL);
 
 	// make the fork
 	location.m_posit += dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	NewtonBody* const fork = CreateBox(scene, 50.0f, location, dVector(1.0f, 0.1f, 0.1f, 0.0f));
+//	NewtonBody* const fork = CreateBox(scene, 50.0f, location, dVector(1.0f, 0.1f, 0.1f, 0.0f));
+	NewtonBody* const fork = CreateSphere(scene, 50.0f, location, dVector(1.0f));
 	dMatrix jointMatrix (dYawMatrix(dPi * 0.5f) * location);
 	dVector inertia;
 	NewtonBodyGetMass(fork, &inertia.m_w, &inertia.m_x, &inertia.m_y, &inertia.m_z);
 	inertia.m_x = inertia.m_y;
 	NewtonBodySetMassMatrix(fork, inertia.m_w, inertia.m_x, inertia.m_y, inertia.m_z);
 
-	dCustomSliderActuator* const actuator = new dCustomSliderActuator (jointMatrix, fork, chassis);
-	actuator->SetPreconditioner(10.0f);
-	//dCustomSlider* const actuator = new dCustomSlider (jointMatrix, fork, chassis);
+	//dCustomSliderActuator* const actuator = new dCustomSliderActuator (jointMatrix, fork, chassis);
+	dCustomSlider* const actuator = new dCustomSlider (jointMatrix, fork, chassis);
 
 	// make obstacle
 	location.m_posit += dVector(-2.0f, 0.0f, 0.0f, 0.0f);

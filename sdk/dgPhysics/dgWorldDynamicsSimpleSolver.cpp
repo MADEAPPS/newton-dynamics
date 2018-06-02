@@ -31,7 +31,7 @@
 #include "dgBilateralConstraint.h"
 
 //#define DG_TEST_GYRO
-//#define DG_USE_SKEL
+#define DG_USE_SKEL
 
 void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
