@@ -761,8 +761,8 @@ xxxxx++;
 #endif
 				{
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
-					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, rightHandSide);
-					accNorm += accel2;
+					//dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, rightHandSide);
+					//accNorm += accel2;
 				}
 			}
 			for (dgInt32 j = 0; j < skeletonCount; j++) {
