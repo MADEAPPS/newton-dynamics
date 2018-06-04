@@ -1091,7 +1091,8 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 	if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 		dgInt32 processContacts = 1;
 		if (material->m_aabbOverlap) {
-			processContacts = material->m_aabbOverlap (*material, *body0, *body1, threadIndex);
+			//processContacts = material->m_aabbOverlap (*material, *body0, *body1, threadIndex);
+			processContacts = material->m_aabbOverlap(*contact, timestep, threadIndex);
 		}
 		if (processContacts) {
             dgPair pair;

@@ -5452,6 +5452,13 @@ dFloat NewtonContactJointGetClosestDistance(const NewtonJoint* const contactJoin
 	return joint->GetClosestDistance();
 }
 
+void NewtonContactJointResetSelfJointsCollision(const NewtonJoint* const contactJoint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+//	dgContact* const joint = (dgContact *)contactJoint;
+	dgAssert(0);
+}
+
 /*!
   Return to the next contact from the contact array of the contact joint.
 

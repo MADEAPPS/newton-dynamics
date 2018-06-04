@@ -283,7 +283,8 @@ class ComplexScene: public DemoEntity
 
 // called when the a body touches the aabb of the scene collision, in most case must return true and let
 // OnSubShapeAABBOverlapTest handle specific overlap with sun collision shapes in the scene collision
-static int OnBodyAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+//static int OnBodyAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+static int OnBodyAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
 	return 1;
 }

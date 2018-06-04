@@ -319,7 +319,8 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 				dgInt32 processContacts = 1;
 				if (material->m_aabbOverlap) {
-					processContacts = material->m_aabbOverlap (*material, *contact->GetBody0(), *contact->GetBody1(), threadID);
+					//processContacts = material->m_aabbOverlap (*material, *contact->GetBody0(), *contact->GetBody1(), threadID);
+					processContacts = material->m_aabbOverlap(*contact, timestep, threadID);
 				}
 
 				if (processContacts) {

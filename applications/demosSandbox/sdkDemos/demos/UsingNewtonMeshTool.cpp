@@ -178,8 +178,9 @@ static NewtonBody* CreateSphere(DemoEntityManager* const scene, dFloat mass, con
 	return body;
 }
 
-static int OnAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+static int OnAABBOverlap(const NewtonJoint* const contact, dFloat timestep, int threadIndex)
 {
+//	NewtonContactJointResetSelfJointsCollision(contact);
 	return 1;
 }
 

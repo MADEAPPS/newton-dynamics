@@ -100,12 +100,15 @@ class CrashDummyManager: public dCustomTransformManager
 	{
 	}
 
-	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+//	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+	static int OnBoneAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
-		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		dCustomTransformController::dSkeletonBone* const bone0 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-		dCustomTransformController::dSkeletonBone* const bone1 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+		const dCustomTransformController::dSkeletonBone* const bone0 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+		const dCustomTransformController::dSkeletonBone* const bone1 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 
 //		dAssert(0);
 		dAssert (bone0);

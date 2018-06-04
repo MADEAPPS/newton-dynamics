@@ -201,10 +201,12 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		}
 	}
 
-	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+	static int OnBoneAABBOverlap (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
-		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 		ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id0 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID (NewtonCollisionGetUserID(collision0));
 		ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id1 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID (NewtonCollisionGetUserID(collision1));
 		dAssert(id0 != ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);

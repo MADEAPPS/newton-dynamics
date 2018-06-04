@@ -675,6 +675,7 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	CUSTOM_JOINTS_API virtual dCustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	CUSTOM_JOINTS_API virtual void DestroyController (dCustomVehicleController* const controller);
 	CUSTOM_JOINTS_API virtual int OnTireAabbOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const;
+//	CUSTOM_JOINTS_API virtual int OnTireAabbOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex) const;
 
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
 
@@ -682,8 +683,8 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	void OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);
 	int OnContactGeneration(const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
 	
+	static int OnTireAabbOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
-	static int OnTireAabbOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 	static int OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex);
 
 	const void* m_tireShapeTemplateData;

@@ -1840,7 +1840,8 @@ void dCustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat downWe
 	m_aerodynamicsDownForceCoefficient = m_aerodynamicsDownForce0 / (m_aerodynamicsDownSpeedCutOff * m_aerodynamicsDownSpeedCutOff);
 }
 
-int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+//int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
 	dAssert (0);
 	return 0;
@@ -1865,6 +1866,7 @@ int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* con
 }
 
 int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const
+//int dCustomVehicleControllerManager::OnTireAabbOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
 	for (int i = 0; i < tire->m_contactCount; i ++) {
 		if (otherBody == tire->m_contactInfo[i].m_hitBody) {

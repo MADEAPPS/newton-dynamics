@@ -17,7 +17,7 @@
 #include "PhysicsUtils.h"
 
 
-static int UserOnAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+static int UserOnAABBOverlap (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
 	return 1;
 }
