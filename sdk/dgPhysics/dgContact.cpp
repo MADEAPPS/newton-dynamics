@@ -100,7 +100,7 @@ dgContact::dgContact(dgContact* const clone)
 	,m_contactPruningTolereance(clone->m_contactPruningTolereance)
 	,m_broadphaseLru(clone->m_broadphaseLru)
 	,m_isNewContact(clone->m_isNewContact)
-	,m_skeletonSelfCollision(0)
+	,m_skeletonSelfCollision(clone->m_skeletonSelfCollision)
 {
 	dgAssert((((dgUnsigned64) this) & 15) == 0);
 	m_body0 = clone->m_body0;
@@ -167,7 +167,6 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 dgUnsigned32 dgContact::JacobianDerivative (dgContraintDescritor& params)
 {
 	dgInt32 frictionIndex = 0;
-	m_skeletonSelfCollision = 0;
 	if (m_maxDOF) {
 		dgInt32 i = 0;
 		frictionIndex = GetCount();
