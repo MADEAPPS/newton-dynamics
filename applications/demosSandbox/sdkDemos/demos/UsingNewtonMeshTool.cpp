@@ -178,6 +178,15 @@ static NewtonBody* CreateSphere(DemoEntityManager* const scene, dFloat mass, con
 	return body;
 }
 
+static int OnAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+{
+	return 1;
+}
+
+static void OnAdjacentContacts(const NewtonJoint* const contact, dFloat timestep, int threadIndex)
+{
+}
+
 
 // black_birth demo
 void UsingNewtonMeshTool(DemoEntityManager* const scene)
@@ -190,6 +199,7 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	NewtonMaterialSetDefaultElasticity(scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.0f);
+	NewtonMaterialSetCollisionCallback(scene->GetNewton(), defaultMaterialID, defaultMaterialID, OnAABBOverlap, OnAdjacentContacts);
 
 	dMatrix matrix;
 #if 1
