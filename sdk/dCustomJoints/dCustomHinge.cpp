@@ -274,7 +274,7 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
-//	SubmitLinearRows(0x07, matrix0, matrix1);
+	SubmitLinearRows(0x07, matrix0, matrix1);
 
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
