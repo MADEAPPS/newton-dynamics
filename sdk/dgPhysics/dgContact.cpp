@@ -208,9 +208,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_restitution[normalIndex] = restitution;
 	params.m_penetration[normalIndex] = penetration;
 
-//params.m_restitution[normalIndex] = 0.0f;
-//params.m_penetration[normalIndex] = 0.0f;
-
 	params.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	params.m_forceBounds[normalIndex].m_low = dgFloat32 (0.0f);
 	params.m_forceBounds[normalIndex].m_normalIndex = DG_INDEPENDENT_ROW;

@@ -188,6 +188,9 @@ void UsingNewtonMeshTool(DemoEntityManager* const scene)
 	// load the scene from a ngd file format
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	NewtonMaterialSetDefaultElasticity(scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.0f);
+
 	dMatrix matrix;
 #if 1
 	// make the chassis
