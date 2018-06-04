@@ -718,8 +718,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	}
 #endif
 
-//	const dgInt32 passes = world->m_solverMode;
-const dgInt32 passes = 64;
+	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
 
 		for (dgInt32 i = 0; i < jointCount; i++) {
