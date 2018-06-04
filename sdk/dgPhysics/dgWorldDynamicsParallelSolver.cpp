@@ -892,7 +892,7 @@ void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyIn
 		bodyArray[i] = bodyArray[0];
 	}
 
-	dgFloat32* const weights = &m_weigh[0].m_value[0][0];
+	dgFloat32* const weights = &m_weigh[0][0];
 	memset(weights, 0, m_count * sizeof (dgWorkGroupFloat));
 
 	m_atomicIndex = 0;
@@ -926,7 +926,7 @@ void dgParallelBodySolver::InitInvWeightKernel (void* const context, void* const
 
 void dgParallelBodySolver::InitWeights()
 {
-	dgFloat32* const weights = &m_weigh[0].m_value[0][0];
+	dgFloat32* const weights = &m_weigh[0][0];
 	const dgInt32 jointCount = m_cluster->m_jointCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < jointCount;  i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
@@ -948,8 +948,8 @@ void dgParallelBodySolver::InitWeights()
 void dgParallelBodySolver::InitInvWeights()
 {
 	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
-	dgFloat32* const weights = &m_weigh[0].m_value[0][0];
-	dgFloat32* const invWeights = &m_invWeigh[0].m_value[0][0];
+	dgFloat32* const weights = &m_weigh[0][0];
+	dgFloat32* const invWeights = &m_invWeigh[0][0];
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount;  i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
 		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j ++) {
 			const dgFloat32 w = weights[j + i] ? weights[j + i] : 1.0f;

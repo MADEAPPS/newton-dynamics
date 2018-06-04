@@ -41,7 +41,57 @@ class dgWorkGroupFloat
 	{
 	}
 
-	dgVector m_value[2];
+	DG_INLINE dgWorkGroupFloat(const dgWorkGroupFloat& me)
+		:m_low(me.m_low)
+		,m_high(me.m_high)
+	{
+	}
+
+	DG_INLINE dgWorkGroupFloat(const dgVector& low, const dgVector& high)
+		:m_low(low)
+		,m_high(high)
+	{
+	}
+
+
+
+	DG_INLINE dgFloat32& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 8);
+		dgAssert(i >= 0);
+		return m_f[i];
+	}
+
+	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 8);
+		dgAssert(i >= 0);
+		return m_f[i];
+	}
+
+	DG_INLINE dgWorkGroupFloat operator+ (const dgWorkGroupFloat& A) const
+	{
+		return dgWorkGroupFloat(m_low + A.m_low, m_high + A.m_high);
+	}
+
+	DG_INLINE dgWorkGroupFloat operator* (const dgWorkGroupFloat& A) const
+	{
+		return dgWorkGroupFloat(m_low * A.m_low, m_high * A.m_high);
+	}
+
+	DG_INLINE dgWorkGroupFloat MulAdd (const dgWorkGroupFloat& B, const dgWorkGroupFloat& C) const
+	{
+		return *this + B * C;
+	}
+
+
+	union {
+		dgFloat32 m_f[8];
+		struct {
+			dgVector m_low;
+			dgVector m_high;
+		};
+	};
 } DG_GCC_VECTOR_ALIGMENT;
 
 
