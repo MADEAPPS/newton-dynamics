@@ -570,7 +570,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[rowStart + i];
-			//dgLeftHandSide* const row = &matrixRow[rowStart + i];
+			//dgLeftHandSide* const row = &leftHandSide[rowStart + i];
 			rhs->m_maxImpact = dgMax(dgAbs(rhs->m_force), rhs->m_maxImpact);
 		}
 
@@ -681,7 +681,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowsStart];
-	const dgLeftHandSide* const matrixRow = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
+	const dgLeftHandSide* const leftHandSide = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
 
 	const dgInt32 derivativesEvaluationsRK4 = 4;
 	dgFloat32 invTimestep = (timestep > dgFloat32(0.0f)) ? dgFloat32(1.0f) / timestep : dgFloat32(0.0f);
@@ -698,6 +698,9 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	joindDesc.m_invTimeStep = invTimestepRK;
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
 
+//static int xxx;
+//static int xxx0;
+
 	dgInt32 skeletonCount = 0;
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 #ifdef DG_USE_SKEL
@@ -708,15 +711,12 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 		if (container && (container->m_lru != lru)) {
 			container->m_lru = lru;
 			skeletonArray[skeletonCount] = container;
-			container->InitMassMatrix(constraintArray, matrixRow, rightHandSide);
+			container->InitMassMatrix(constraintArray, leftHandSide, rightHandSide);
 			skeletonCount++;
 			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
 		}
 	}
 #endif
-
-static int xxx;
-static int xxx0;
 
 //	const dgInt32 passes = world->m_solverMode;
 const dgInt32 passes = 64;
@@ -728,7 +728,7 @@ const dgInt32 passes = 64;
 			const dgInt32 pairStart = jointInfo->m_pairStart;
 
 			joindDesc.m_rowsCount = jointInfo->m_pairCount;
-			joindDesc.m_rowMatrix = &matrixRow[pairStart];
+			joindDesc.m_rowMatrix = &leftHandSide[pairStart];
 			joindDesc.m_rightHandSide = &rightHandSide[pairStart];
 			constraint->JointAccelerations(&joindDesc);
 
@@ -736,7 +736,7 @@ const dgInt32 passes = 64;
 			const dgVector& gyroTorque1 = constraint->m_body1->m_gyroTorque;
 			for (dgInt32 j = 0; j < jointInfo->m_pairCount; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[pairStart + j];
-				const dgLeftHandSide* const row = &matrixRow[pairStart + j];
+				const dgLeftHandSide* const row = &leftHandSide[pairStart + j];
 
 				dgVector gyroaccel(row->m_JMinv.m_jacobianM0.m_angular * gyroTorque0 + row->m_JMinv.m_jacobianM1.m_angular * gyroTorque1);
 				rhs->m_gyroAccel = gyroaccel.AddHorizontal().GetScalar();
@@ -749,24 +749,24 @@ const dgInt32 passes = 64;
 
 		dgFloat32 maxAccNorm = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR;
 		dgFloat32 accNorm = maxAccNorm * dgFloat32(2.0f);
-int xxxxx = 0;
+
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
-xxx++;
-xxxxx++;
+//xxx++;
+
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 #ifdef DG_USE_SKEL
 				if (!jointInfo->m_joint->IsSkeleton()) 
 #endif
 				{
-					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, matrixRow);
-					//dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, rightHandSide);
-					//accNorm += accel2;
+					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, leftHandSide);
+					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, leftHandSide, rightHandSide);
+					accNorm += accel2;
 				}
 			}
 			for (dgInt32 j = 0; j < skeletonCount; j++) {
-				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow, rightHandSide);
+				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces);
 			}
 		}
 
@@ -780,14 +780,14 @@ xxxxx++;
 					const dgVector torque(internalForces[i].m_angular + body->m_externalTorque - body->m_gyroTorque);
 					dgJacobian velocStep(IntegrateForceAndToque(body, force, torque, timestep4));
 					if (!body->m_resting) {
-//if ((body->m_uniqueID == 4) && (xxxxx > xxx0)) {
-if ((body->m_uniqueID == 4) && (xxxxx > 30)) {
-xxx0 = xxxxx;
-dgTrace(("iter(%d) f(%f %f %f) v(%f %f %f)\n", xxxxx, force[0], force[1], force[2], body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]));
-}
-
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
+
+//if (jointCount == 2) {
+//dgTrace(("iter(%d) f(%f %f %f) v(%f %f %f)\n", xxx, force[0], force[1], force[2], body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]));
+//xxx0 = xxx;
+//}
+
 					} else {
 						const dgVector velocStep2(velocStep.m_linear.DotProduct4(velocStep.m_linear));
 						const dgVector omegaStep2(velocStep.m_angular.DotProduct4(velocStep.m_angular));
@@ -823,7 +823,7 @@ dgTrace(("iter(%d) f(%f %f %f) v(%f %f %f)\n", xxxxx, force[0], force[1], force[
 
 			for (dgInt32 j = 0; j < count; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[j + first];
-				//const dgLeftHandSide* const row = &matrixRow[j + first];
+				//const dgLeftHandSide* const row = &leftHandSide[j + first];
 				dgAssert(dgCheckFloat(rhs->m_force));
 				rhs->m_jointFeebackForce->m_force = rhs->m_force;
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;

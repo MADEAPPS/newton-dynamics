@@ -596,7 +596,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 }
 
 
-dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const
+dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const
 {
 	dgInt32 dof = dgInt32(constraint->m_maxDOF);
 	dgAssert(dof <= DG_CONSTRAINT_MAX_ROWS);
@@ -641,12 +641,12 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 	jointInfo->m_pairCount = dgInt16 (dof);
 	jointInfo->m_paddedPairCount = dgInt16(dof);
 	for (dgInt32 i = 0; i < dof; i++) {
-		dgRightHandSide* const rhs = &rightHandSide[rowCount];
-		dgLeftHandSide* const row = &matrixRow[rowCount];
-		
 		dgAssert(constraintParam.m_forceBounds[i].m_jointForce);
-		row->m_Jt = constraintParam.m_jacobian[i];
 
+		dgLeftHandSide* const row = &leftHandSide[rowCount];
+		dgRightHandSide* const rhs = &rightHandSide[rowCount];
+		
+		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = dgFloat32(0.0f);
 		rhs->m_stiffness = dgMax(DG_PSD_DAMP_TOL * (dgFloat32(1.0f) - constraintParam.m_jointStiffness[i]), dgFloat32(1.0e-5f));
 
@@ -675,7 +675,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 }
 
 
-void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoArray, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const
+void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoArray, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const
 {
 	const dgInt32 index = jointInfo->m_pairStart;
 	const dgInt32 count = jointInfo->m_pairCount;
@@ -728,8 +728,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 	forceAcc1.m_angular = dgVector::m_zero;
 
 	for (dgInt32 i = 0; i < count; i++) {
+		dgLeftHandSide* const row = &leftHandSide[index + i];
 		dgRightHandSide* const rhs = &rightHandSide[index + i];
-		dgLeftHandSide* const row = &matrixRow[index + i];
 
 		row->m_JMinv.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear * invMass0;
 		row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
@@ -850,7 +850,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
-	dgLeftHandSide* const matrixRow = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
+	dgLeftHandSide* const leftHandSide = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowsStart];
 
 	dgInt32 rowCount = 0;
@@ -864,14 +864,14 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 		dgAssert(jointInfo->m_m1 < cluster->m_bodyCount);
 		//dgAssert (constraint->m_index == dgUnsigned32(j));
 
-		rowCount = GetJacobianDerivatives(constraintParams, jointInfo, constraint, matrixRow, rightHandSide, rowCount);
+		rowCount = GetJacobianDerivatives(constraintParams, jointInfo, constraint, leftHandSide, rightHandSide, rowCount);
 		dgAssert(rowCount <= cluster->m_rowsCount);
 
 		dgAssert(jointInfo->m_m0 >= 0);
 		dgAssert(jointInfo->m_m0 < bodyCount);
 		dgAssert(jointInfo->m_m1 >= 0);
 		dgAssert(jointInfo->m_m1 < bodyCount);
-		BuildJacobianMatrix(bodyArray, jointInfo, internalForces, matrixRow, rightHandSide, forceOrImpulseScale);
+		BuildJacobianMatrix(bodyArray, jointInfo, internalForces, leftHandSide, rightHandSide, forceOrImpulseScale);
 	}
 }
 

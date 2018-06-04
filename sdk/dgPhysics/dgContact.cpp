@@ -208,8 +208,8 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_restitution[normalIndex] = restitution;
 	params.m_penetration[normalIndex] = penetration;
 
-params.m_restitution[normalIndex] = 0.0f;
-params.m_penetration[normalIndex] = 0.0f;
+//params.m_restitution[normalIndex] = 0.0f;
+//params.m_penetration[normalIndex] = 0.0f;
 
 	params.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	params.m_forceBounds[normalIndex].m_low = dgFloat32 (0.0f);
@@ -225,7 +225,7 @@ params.m_penetration[normalIndex] = 0.0f;
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 
-return;
+//return;
 	// first dir friction force
 	if (contact.m_flags & dgContactMaterial::m_friction0Enable) {
 		dgInt32 jacobIndex = frictionIndex;
