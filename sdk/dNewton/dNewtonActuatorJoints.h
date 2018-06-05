@@ -49,7 +49,6 @@ class dNewtonSliderActuator: public dNewtonJoint
 {
 	public:
 	CNEWTON_API dNewtonSliderActuator(const dFloat* const pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1);
-	CNEWTON_API bool GetEnableFlag () const;
 	CNEWTON_API dFloat GetTargetPosit() const;
 	CNEWTON_API dFloat GetLinearRate() const;
 	CNEWTON_API dFloat GetMinPositLimit() const;
@@ -58,7 +57,6 @@ class dNewtonSliderActuator: public dNewtonJoint
 	CNEWTON_API void SetMinPositLimit(dFloat limit);
 	CNEWTON_API void SetMaxPositLimit(dFloat limit);
 	CNEWTON_API void SetLinearRate(dFloat rate);
-	CNEWTON_API void SetEnableFlag (bool flag);
 	CNEWTON_API dFloat GetActuatorPosit() const;
 };
 

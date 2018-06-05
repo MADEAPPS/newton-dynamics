@@ -98,11 +98,6 @@ dNewtonSliderActuator::dNewtonSliderActuator(const dFloat* const pinAndPivotFram
 	SetJoint (new dCustomSliderActuator (pinAndPivotFrame, speed, minPosit, maxPosit, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL)); 
 }
 
-bool dNewtonSliderActuator::GetEnableFlag () const
-{
-	return ((dCustomSliderActuator*)m_joint)->GetEnableFlag ();
-}
-
 dFloat dNewtonSliderActuator::GetTargetPosit() const
 {
 	return ((dCustomSliderActuator*)m_joint)->GetTargetPosit();
@@ -146,17 +141,10 @@ void dNewtonSliderActuator::SetLinearRate(dFloat rate)
 	((dCustomSliderActuator*)m_joint)->SetLinearRate (rate);
 }
 
-void dNewtonSliderActuator::SetEnableFlag (bool flag)
-{
-	((dCustomSliderActuator*)m_joint)->SetEnableFlag (flag);
-}
-
 dFloat dNewtonSliderActuator::GetActuatorPosit() const
 {
 	return ((dCustomSliderActuator*)m_joint)->GetActuatorPosit();
 }
-
-
 
 dNewtonUniversalActuator::dNewtonUniversalActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_universalActuator)

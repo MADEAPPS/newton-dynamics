@@ -27,9 +27,6 @@ class dCustomSliderActuator: public dCustomSlider
 	CUSTOM_JOINTS_API dCustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomSliderActuator();
 
-	CUSTOM_JOINTS_API bool GetEnableFlag () const;
-	CUSTOM_JOINTS_API void SetEnableFlag (bool flag);
-
 	CUSTOM_JOINTS_API dFloat GetActuatorPosit() const;
 	CUSTOM_JOINTS_API dFloat GetTargetPosit() const;
 	CUSTOM_JOINTS_API void SetTargetPosit(dFloat posit);

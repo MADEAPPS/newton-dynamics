@@ -127,34 +127,40 @@ void dNewton::OnContactProcess (dNewtonContactMaterial* const contactMaterial, d
 }
 
 
-int dNewton::OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+int dNewton::OnCompoundSubCollisionAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 {
-	dAssert (NewtonBodyGetWorld (body0) == NewtonBodyGetWorld (body1));
-	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body0));
-	dNewtonBody* const dBody0 = (dNewtonBody*) NewtonBodyGetUserData (body0);
-	dNewtonBody* const dBody1 = (dNewtonBody*) NewtonBodyGetUserData (body1);
-
-	return world->OnBodiesAABBOverlap(dBody0, dBody1, threadIndex);
-}
-
-int dNewton::OnCompoundSubCollisionAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
-{
-	dAssert (NewtonBodyGetWorld (body0) == NewtonBodyGetWorld (body1));
-	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body0));
-	dNewtonBody* const dBody0 = (dNewtonBody*) NewtonBodyGetUserData (body0);
-	dNewtonBody* const dBody1 = (dNewtonBody*) NewtonBodyGetUserData (body1);
+	dAssert(NewtonBodyGetWorld(body0) == NewtonBodyGetWorld(body1));
+	dNewton* const world = (dNewton*)NewtonWorldGetUserData(NewtonBodyGetWorld(body0));
+	dNewtonBody* const dBody0 = (dNewtonBody*)NewtonBodyGetUserData(body0);
+	dNewtonBody* const dBody1 = (dNewtonBody*)NewtonBodyGetUserData(body1);
 
 	NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 	NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-	NewtonCollision* const subCollision0 = collisionNode0 ? (NewtonCollision*) NewtonCompoundCollisionGetCollisionFromNode (collision0, (void*)collisionNode0) : collision0;
-	NewtonCollision* const subCollision1 = collisionNode1 ? (NewtonCollision*) NewtonCompoundCollisionGetCollisionFromNode (collision1, (void*)collisionNode1) : collision1;
+	NewtonCollision* const subCollision0 = collisionNode0 ? (NewtonCollision*)NewtonCompoundCollisionGetCollisionFromNode(collision0, (void*)collisionNode0) : collision0;
+	NewtonCollision* const subCollision1 = collisionNode1 ? (NewtonCollision*)NewtonCompoundCollisionGetCollisionFromNode(collision1, (void*)collisionNode1) : collision1;
 
 	dNewtonCollision* const dsubCollision0 = (dNewtonCollision*)NewtonCollisionGetUserData(subCollision0);
 	dNewtonCollision* const dsubCollision1 = (dNewtonCollision*)NewtonCollisionGetUserData(subCollision1);
-	dAssert (dsubCollision0);
-	dAssert (dsubCollision1);
-	return world->OnCompoundSubCollisionAABBOverlap (dBody0, dsubCollision0, dBody1, dsubCollision1, threadIndex);
+	dAssert(dsubCollision0);
+	dAssert(dsubCollision1);
+	return world->OnCompoundSubCollisionAABBOverlap(dBody0, dsubCollision0, dBody1, dsubCollision1, threadIndex);
 }
+
+//int dNewton::OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+int dNewton::OnBodiesAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+{
+//	dAssert (NewtonBodyGetWorld (body0) == NewtonBodyGetWorld (body1));
+//	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body0));
+//	dNewtonBody* const dBody0 = (dNewtonBody*) NewtonBodyGetUserData (body0);
+//	dNewtonBody* const dBody1 = (dNewtonBody*) NewtonBodyGetUserData (body1);
+//	return world->OnBodiesAABBOverlap(dBody0, dBody1, threadIndex);
+
+	NewtonBody* const body = NewtonJointGetBody0(contactJoint);
+	dNewton* const world = (dNewton*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+	dNewtonContactMaterial contactMaterial((void*)contactJoint);
+	return world->OnBodiesAABBOverlap(&contactMaterial, timestep, threadIndex);
+}
+
 
 void dNewton::OnContactProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {

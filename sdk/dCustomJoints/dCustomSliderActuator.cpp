@@ -65,14 +65,6 @@ void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, voi
 	callback(userData, &m_maxForce, sizeof(dFloat));
 }
 
-
-bool dCustomSliderActuator::GetEnableFlag () const
-{
-	dAssert (0);
-	return false;
-//	return m_actuatorFlag;
-}
-
 dFloat dCustomSliderActuator::GetTargetPosit() const
 {
 	return m_targetPosit;
@@ -112,14 +104,6 @@ void dCustomSliderActuator::SetMaxPositLimit(dFloat limit)
 {
 	SetLimits(m_minDist, limit);
 }
-
-
-void dCustomSliderActuator::SetEnableFlag (bool flag)
-{
-	dAssert (0);
-//	m_actuatorFlag = flag;
-}
-
 
 dFloat dCustomSliderActuator::GetActuatorPosit() const
 {
