@@ -136,7 +136,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
 			count++;
 		}
-		if (count) {
+		//if (count) {
+		if (count >= 2) {
 			CalculateReactionForcesParallel(&m_clusterMemory[index], count, timestep);
 			index += count;
 		}
@@ -284,10 +285,11 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						constraint->m_dynamicsLru = lruMark;
 
 						constraintArray[jointIndex].m_joint = constraint;
-						const dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
+						//const dgInt16 rows = dgInt16((constraint->m_maxDOF + vectorStride - 1) & (-vectorStride));
+						const dgInt16 rows = dgInt16(constraint->m_maxDOF);
 						constraintArray[jointIndex].m_pairStart = 0;
-						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
-						constraintArray[jointIndex].m_paddedPairCount = dgInt16(rows);
+						constraintArray[jointIndex].m_pairCount = rows;
+						constraintArray[jointIndex].m_paddedPairCount = rows;
 						jointCount++;
 
 						dgAssert(constraint->m_body0);

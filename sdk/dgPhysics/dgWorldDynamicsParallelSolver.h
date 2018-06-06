@@ -53,8 +53,6 @@ class dgWorkGroupFloat
 	{
 	}
 
-
-
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 8);
@@ -85,6 +83,23 @@ class dgWorkGroupFloat
 	}
 
 
+	DG_INLINE static void Transpose4x8(dgWorkGroupFloat& src0, dgWorkGroupFloat& src1, dgWorkGroupFloat& src2, dgWorkGroupFloat& src3)
+	{
+		/*
+		__m256 tmp0(_mm256_unpacklo_ps(src0.m_type, src1.m_type));
+		__m256 tmp1(_mm256_unpacklo_ps(src2.m_type, src3.m_type));
+		__m256 tmp2(_mm256_unpackhi_ps(src0.m_type, src1.m_type));
+		__m256 tmp3(_mm256_unpackhi_ps(src2.m_type, src3.m_type));
+
+		src0 = _mm256_shuffle_ps(tmp0, tmp1, PERMUTE_MASK(1, 0, 1, 0));
+		src1 = _mm256_shuffle_ps(tmp0, tmp1, PERMUTE_MASK(3, 2, 3, 2));
+		src2 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(1, 0, 1, 0));
+		src3 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(3, 2, 3, 2));
+		*/
+	}
+
+
+
 	union {
 		dgFloat32 m_f[8];
 		struct {
@@ -94,6 +109,37 @@ class dgWorkGroupFloat
 	};
 } DG_GCC_VECTOR_ALIGMENT;
 
+DG_MSC_VECTOR_ALIGMENT
+class dgWorkGroupVector3
+{
+	public:
+	DG_INLINE dgWorkGroupVector3()
+		:m_x()
+		,m_y()
+		,m_z()
+	{
+	}
+
+	DG_INLINE dgWorkGroupVector3(const dgVector& v0, const dgVector& v1, const dgVector& v2, const dgVector& v3, const dgVector& v4, const dgVector& v5, const dgVector& v6, const dgVector& v7)
+		:m_x()
+		,m_y()
+		,m_z()
+	{
+		dgWorkGroupFloat r0(v0, v4);
+		dgWorkGroupFloat r1(v1, v5);
+		dgWorkGroupFloat r2(v2, v6);
+		dgWorkGroupFloat r3(v3, v7);
+		dgWorkGroupFloat::Transpose4x8(r0, r1, r2, r3);
+		m_x = r0;
+		m_y = r1;
+		m_z = r2;
+	}
+
+
+	dgWorkGroupFloat m_x;
+	dgWorkGroupFloat m_y;
+	dgWorkGroupFloat m_z;
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 template<class T>
@@ -102,28 +148,8 @@ class dgParallelVector: public dgArray<T>
 	public:
 	dgParallelVector(dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
 		:dgArray<T>(allocator, aligmentInBytes)
-		, m_ptr(NULL)
 	{
 	}
-
-	void Reserve(dgInt32 count)
-	{
-		ResizeIfNecessary(count);
-		dgArray<T>& me = *this;
-		m_ptr = &me[0];
-	}
-
-	DG_INLINE T& operator[] (dgInt32 i)
-	{
-		return m_ptr[i];
-	}
-
-	DG_INLINE const T& operator[] (dgInt32 i) const
-	{
-		return m_ptr[i];
-	}
-
-	T* m_ptr;
 };
 
 class dgParallelSolverSyncData
@@ -165,7 +191,6 @@ class dgParallelSolverSyncData
 class dgParallelBodySolver
 {
 	public:
-
 	dgParallelBodySolver(dgMemoryAllocator* const allocator);
 	~dgParallelBodySolver();
 	void CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
@@ -175,16 +200,23 @@ class dgParallelBodySolver
 	void InitWeights();
 	void InitInvWeights();
 	void InityBodyArray();
+	
+	static void InitWeightKernel(void* const context, void* const, dgInt32 threadID);
+	static void InitInvWeightKernel(void* const context, void* const, dgInt32 threadID);
+	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 
-	static void InitWeightKernel (void* const context, void* const, dgInt32 threadID);
-	static void InitInvWeightKernel (void* const context, void* const, dgInt32 threadID);
 
+	void GetVeloc(dgInt32 index);
+	void GetOmega(dgInt32 index);
 
 	dgParallelVector<dgWorkGroupFloat> m_weigh;
 	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
+	dgParallelVector<dgWorkGroupVector3> m_veloc;
+	dgParallelVector<dgWorkGroupVector3> m_omega;
 
 	dgWorld* m_world;
 	dgBodyCluster* m_cluster;
+	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
 	dgInt32 m_count;
 	dgInt32 m_atomicIndex;

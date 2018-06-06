@@ -96,10 +96,10 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	syncData.m_cluster = &cluster;
 	syncData.m_weight = weights;
 
-		InitilizeBodyArrayParallel(&syncData);
-		BuildJacobianMatrixParallel(&syncData);
-		CalculateForcesParallel(&syncData);
-		IntegrateClusterParallel(&syncData);
+	InitilizeBodyArrayParallel(&syncData);
+	BuildJacobianMatrixParallel(&syncData);
+	CalculateForcesParallel(&syncData);
+	IntegrateClusterParallel(&syncData);
 */
 	}
 }
@@ -849,8 +849,11 @@ void dgWorldDynamicUpdate::CalculateForcesParallel(dgParallelSolverSyncData* con
 dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	:m_weigh(allocator)
 	,m_invWeigh(allocator)
+	,m_veloc(allocator)
+	,m_omega(allocator)
 	,m_world(NULL)
 	,m_cluster(NULL)
+	,m_bodyArray(NULL)
 	,m_jointArray(NULL)
 	,m_count(0)
 	,m_atomicIndex(0)
@@ -865,8 +868,8 @@ void dgParallelBodySolver::Reserve (dgInt32 count)
 {
 	m_count = ((count + DG_WORK_GROUP_SIZE - 1) & -(DG_WORK_GROUP_SIZE - 1)) >> DG_WORK_GROUP_BITS;
 
-	m_weigh.Reserve(m_count);
-	m_invWeigh.Reserve(m_count);
+	m_weigh.ResizeIfNecessary(m_count);
+	m_invWeigh.ResizeIfNecessary(m_count);
 
 //	m_veloc.Reserve(m_count);
 //	m_omega.Reserve(m_count);
@@ -883,11 +886,11 @@ void dgParallelBodySolver::Reserve (dgInt32 count)
 void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	m_cluster = &cluster;
+	m_bodyArray = bodyArray;
 	m_jointArray = jointArray;
 	Reserve(cluster.m_bodyCount);
 	
 	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
-
 	for (dgInt32 i = cluster.m_bodyCount; i < bodyCount; i++) {
 		bodyArray[i] = bodyArray[0];
 	}
@@ -908,8 +911,11 @@ void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyIn
 	}
 	m_world->SynchronizationBarrier();
 
-
-//	InityBodyArray();
+	m_atomicIndex = 0;
+	for (dgInt32 i = 0; i < threadCounts; i++) {
+		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
 }
 
 void dgParallelBodySolver::InitWeightKernel (void* const context, void* const, dgInt32 threadID)
@@ -918,10 +924,16 @@ void dgParallelBodySolver::InitWeightKernel (void* const context, void* const, d
 	me->InitWeights();
 }
 
-void dgParallelBodySolver::InitInvWeightKernel (void* const context, void* const, dgInt32 threadID)
+void dgParallelBodySolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
 {
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->InitInvWeights();
+}
+
+void dgParallelBodySolver::InitInvWeightKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->InityBodyArray();
 }
 
 void dgParallelBodySolver::InitWeights()
@@ -959,6 +971,21 @@ void dgParallelBodySolver::InitInvWeights()
 	}
 }
 
+void dgParallelBodySolver::GetVeloc(dgInt32 index)
+{
+	dgBodyInfo* const bodyArray = &m_bodyArray[index];
+	m_veloc[index] = dgWorkGroupVector3(bodyArray[0].m_body->GetVelocity(), bodyArray[1].m_body->GetVelocity(), bodyArray[2].m_body->GetVelocity(), bodyArray[3].m_body->GetVelocity(),
+									    bodyArray[4].m_body->GetVelocity(), bodyArray[5].m_body->GetVelocity(), bodyArray[6].m_body->GetVelocity(), bodyArray[7].m_body->GetVelocity());
+}
+
+void dgParallelBodySolver::GetOmega(dgInt32 index)
+{
+	dgBodyInfo* const bodyArray = &m_bodyArray[index];
+	m_omega[index] = dgWorkGroupVector3(bodyArray[0].m_body->GetOmega(), bodyArray[1].m_body->GetOmega(), bodyArray[2].m_body->GetOmega(), bodyArray[3].m_body->GetOmega(),
+										bodyArray[4].m_body->GetOmega(), bodyArray[5].m_body->GetOmega(), bodyArray[6].m_body->GetOmega(), bodyArray[7].m_body->GetOmega());
+}
+
+
 void dgParallelBodySolver::InityBodyArray()
 {
 /*
@@ -969,4 +996,12 @@ void dgParallelBodySolver::InityBodyArray()
 	}
 	m_world->SynchronizationBarrier();
 */
+
+	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
+		GetVeloc(i);
+		GetOmega(i);
+//		m_body.GetMatrix(i, body);
+//		m_body.GetDampingCoef(i, body, m_timestep);
+	}
 }
