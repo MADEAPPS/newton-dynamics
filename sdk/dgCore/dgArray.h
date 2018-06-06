@@ -53,8 +53,9 @@ class dgArray
 	dgMemoryAllocator* GetAllocator() const;
 	void SetAllocator(dgMemoryAllocator* const allocator);
 
-	private:
+	protected:
 	mutable T *m_array;
+	private:
 	mutable dgInt32 m_maxSize;
 	dgInt32 m_aligmentInBytes;
 	dgMemoryAllocator* m_allocator;

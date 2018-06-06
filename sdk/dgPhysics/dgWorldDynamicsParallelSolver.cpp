@@ -29,6 +29,10 @@
 #include "dgWorldDynamicsParallelSolver.h"
 
 
+dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one, dgVector::m_one);
+dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero, dgVector::m_zero);
+
+
 void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep)
 {
 	dgWorld* const world = (dgWorld*) this;
@@ -850,12 +854,16 @@ dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	:m_weigh(allocator)
 	,m_invWeigh(allocator)
 	,m_veloc(allocator)
-	,m_omega(allocator)
+	,m_veloc0(allocator)
 	,m_rotation(allocator)
+//	,m_angularDamp(allocator)
+//	,m_linearDamp(allocator)
+	,m_internalForces(allocator)
 	,m_world(NULL)
 	,m_cluster(NULL)
 	,m_bodyArray(NULL)
 	,m_jointArray(NULL)
+	,m_timestep(dgFloat32 (0.0f))
 	,m_count(0)
 	,m_atomicIndex(0)
 {
@@ -871,17 +879,14 @@ void dgParallelBodySolver::Reserve (dgInt32 count)
 
 	m_weigh.ResizeIfNecessary(m_count);
 	m_invWeigh.ResizeIfNecessary(m_count);
+	m_veloc.ResizeIfNecessary(m_count);
+	m_veloc0.ResizeIfNecessary(m_count);
+	m_rotation.ResizeIfNecessary(m_count);
+	m_internalForces.ResizeIfNecessary(m_count);
 
-//	m_veloc.Reserve(m_count);
-//	m_omega.Reserve(m_count);
 //	m_localInvInertia.Reserve(m_count);
 //	m_invMass.Reserve(m_count);
-//	m_angularDamp.Reserve(m_count);
-//	m_linearDamp.Reserve(m_count);
-//	m_rotation.Reserve(m_count);
 //	m_invInertia.Reserve(m_count);
-//	m_veloc0.Reserve(m_count);
-//	m_internalForces.Reserve(m_count);
 }
 
 void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
@@ -889,6 +894,7 @@ void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyIn
 	m_cluster = &cluster;
 	m_bodyArray = bodyArray;
 	m_jointArray = jointArray;
+	m_timestep = timestep;
 	Reserve(cluster.m_bodyCount);
 	
 	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
@@ -985,16 +991,48 @@ void dgParallelBodySolver::InityBodyArray()
 */
 
 	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
+	dgWorkGroupVector3 zero(dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero);
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
 		dgBodyInfo* const bodyArray = &m_bodyArray[i];
+		dgDynamicBody* const body0 = (dgDynamicBody*)bodyArray[0].m_body;
+		dgDynamicBody* const body1 = (dgDynamicBody*)bodyArray[1].m_body;
+		dgDynamicBody* const body2 = (dgDynamicBody*)bodyArray[2].m_body;
+		dgDynamicBody* const body3 = (dgDynamicBody*)bodyArray[3].m_body;
+		dgDynamicBody* const body4 = (dgDynamicBody*)bodyArray[4].m_body;
+		dgDynamicBody* const body5 = (dgDynamicBody*)bodyArray[7].m_body;
+		dgDynamicBody* const body6 = (dgDynamicBody*)bodyArray[6].m_body;
+		dgDynamicBody* const body7 = (dgDynamicBody*)bodyArray[7].m_body;
 
-		m_veloc[i] = dgWorkGroupVector3(bodyArray[0].m_body->GetVelocity(), bodyArray[1].m_body->GetVelocity(), bodyArray[2].m_body->GetVelocity(), bodyArray[3].m_body->GetVelocity(),
-										bodyArray[4].m_body->GetVelocity(), bodyArray[5].m_body->GetVelocity(), bodyArray[6].m_body->GetVelocity(), bodyArray[7].m_body->GetVelocity());
-		m_omega[i] = dgWorkGroupVector3(bodyArray[0].m_body->GetOmega(), bodyArray[1].m_body->GetOmega(), bodyArray[2].m_body->GetOmega(), bodyArray[3].m_body->GetOmega(),
-										bodyArray[4].m_body->GetOmega(), bodyArray[5].m_body->GetOmega(), bodyArray[6].m_body->GetOmega(), bodyArray[7].m_body->GetOmega());
-		m_rotation[i] = dgWorkGroupMatrix3x3(bodyArray[0].m_body->GetMatrix(), bodyArray[1].m_body->GetMatrix(), bodyArray[2].m_body->GetMatrix(), bodyArray[3].m_body->GetMatrix(),
-											 bodyArray[4].m_body->GetMatrix(), bodyArray[5].m_body->GetMatrix(), bodyArray[6].m_body->GetMatrix(), bodyArray[7].m_body->GetMatrix());
+		m_rotation[i] = dgWorkGroupMatrix3x3(
+			body0->GetMatrix(), body1->GetMatrix(), body2->GetMatrix(), body3->GetMatrix(),
+			body4->GetMatrix(), body5->GetMatrix(), body6->GetMatrix(), body7->GetMatrix());
 
-//		m_body.GetDampingCoef(i, body, m_timestep);
+		dgWorkGroupFloat damp_ang_x(body0->GetDampCoeffcient(m_timestep), body4->GetDampCoeffcient(m_timestep));
+		dgWorkGroupFloat damp_ang_y(body1->GetDampCoeffcient(m_timestep), body5->GetDampCoeffcient(m_timestep));
+		dgWorkGroupFloat damp_ang_z(body2->GetDampCoeffcient(m_timestep), body6->GetDampCoeffcient(m_timestep));
+		dgWorkGroupFloat damp_linear(body3->GetDampCoeffcient(m_timestep), body7->GetDampCoeffcient(m_timestep));
+		dgWorkGroupFloat::Transpose4x8(damp_ang_x, damp_ang_y, damp_ang_z, damp_linear);
+
+		dgWorkGroupVector3 omega(
+			body0->GetOmega(), body1->GetOmega(), body2->GetOmega(), body3->GetOmega(),
+			body4->GetOmega(), body5->GetOmega(), body6->GetOmega(), body7->GetOmega());
+		m_veloc[i].m_angular = m_rotation[i].RotateVector(m_rotation[i].UnrotateVector(omega) * dgWorkGroupVector3(damp_ang_x, damp_ang_y, damp_ang_z));
+
+		dgWorkGroupVector3 veloc(
+			body0->GetVelocity(), body1->GetVelocity(), body2->GetVelocity(), body3->GetVelocity(),
+			body4->GetVelocity(), body5->GetVelocity(), body6->GetVelocity(), body7->GetVelocity());
+		m_veloc[i].m_linear = veloc.Scale(damp_linear);
+
+		m_veloc0[i] = m_veloc[i];
+
+//		dgMatrix3x3Avx invInertia(m_rotation[index].Transposed());
+//		invInertia.m_front = invInertia.m_front * m_localInvInertia[index];
+//		invInertia.m_up = invInertia.m_up * m_localInvInertia[index];
+//		invInertia.m_right = invInertia.m_right * m_localInvInertia[index];
+//		invInertia = invInertia * m_rotation[index];
+//		invInertia.Store(&m_invInertia[index]);
+
+		m_internalForces[i].m_linear = zero;
+		m_internalForces[i].m_angular = zero;
 	}
 }

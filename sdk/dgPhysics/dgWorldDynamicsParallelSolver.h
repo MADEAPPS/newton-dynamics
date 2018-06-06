@@ -82,6 +82,11 @@ class dgWorkGroupFloat
 		return *this + B * C;
 	}
 
+	DG_INLINE void Store(dgFloat32* const ptr) const
+	{
+		m_low.Store(ptr);
+		m_high.Store(&ptr[4]);
+	}
 
 	DG_INLINE static void Transpose4x8(dgWorkGroupFloat& src0, dgWorkGroupFloat& src1, dgWorkGroupFloat& src2, dgWorkGroupFloat& src3)
 	{
@@ -96,6 +101,9 @@ class dgWorkGroupFloat
 			dgVector m_high;
 		};
 	};
+
+	static dgWorkGroupFloat m_one;
+	static dgWorkGroupFloat m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
 DG_MSC_VECTOR_ALIGMENT
@@ -106,6 +114,13 @@ class dgWorkGroupVector3
 		:m_x()
 		,m_y()
 		,m_z()
+	{
+	}
+
+	DG_INLINE dgWorkGroupVector3(const dgWorkGroupFloat& x, const dgWorkGroupFloat& y, const dgWorkGroupFloat& z)
+		:m_x(x)
+		,m_y(y)
+		,m_z(z)
 	{
 	}
 
@@ -124,12 +139,37 @@ class dgWorkGroupVector3
 		m_z = r2;
 	}
 
+	DG_INLINE dgWorkGroupVector3 Scale(const dgWorkGroupFloat& a) const
+	{
+		return dgWorkGroupVector3(m_x * a, m_y * a, m_z * a);
+	}
+
+	DG_INLINE dgWorkGroupVector3 operator* (const dgWorkGroupVector3& a) const
+	{
+		return dgWorkGroupVector3(m_x * a.m_x, m_y * a.m_y, m_z * a.m_z);
+	}
+
+
+	DG_INLINE void Store(dgFloat32* const ptr) const
+	{
+		m_x.Store(&ptr[0 * DG_WORK_GROUP_SIZE]);
+		m_y.Store(&ptr[1 * DG_WORK_GROUP_SIZE]);
+		m_z.Store(&ptr[2 * DG_WORK_GROUP_SIZE]);
+	}
 
 	dgWorkGroupFloat m_x;
 	dgWorkGroupFloat m_y;
 	dgWorkGroupFloat m_z;
 } DG_GCC_VECTOR_ALIGMENT;
 
+
+DG_MSC_AVX_ALIGMENT
+class dgWorkGroupVector6
+{
+	public:
+	dgWorkGroupVector3 m_linear;
+	dgWorkGroupVector3 m_angular;
+} DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupMatrix3x3
@@ -146,6 +186,23 @@ class dgWorkGroupMatrix3x3
 	{
 	}
 
+	DG_INLINE dgWorkGroupVector3 RotateVector(const dgWorkGroupVector3& a) const
+	{
+		dgWorkGroupFloat x(a.m_x * m_front.m_x + a.m_y * m_up.m_x + a.m_z * m_right.m_x);
+		dgWorkGroupFloat y(a.m_x * m_front.m_y + a.m_y * m_up.m_y + a.m_z * m_right.m_y);
+		dgWorkGroupFloat z(a.m_x * m_front.m_z + a.m_y * m_up.m_z + a.m_z * m_right.m_z);
+		return dgWorkGroupVector3(x, y, z);
+	}
+
+	DG_INLINE dgWorkGroupVector3 UnrotateVector(const dgWorkGroupVector3& a) const
+	{
+		dgWorkGroupFloat x(a.m_x * m_front.m_x + a.m_y * m_front.m_y + a.m_z * m_front.m_z);
+		dgWorkGroupFloat y(a.m_x * m_up.m_x + a.m_y * m_up.m_y + a.m_z * m_up.m_z);
+		dgWorkGroupFloat z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);
+		return dgWorkGroupVector3(x, y, z);
+	}
+
+
 	dgWorkGroupVector3 m_front;
 	dgWorkGroupVector3 m_up;
 	dgWorkGroupVector3 m_right;
@@ -160,6 +217,16 @@ class dgParallelVector: public dgArray<T>
 	dgParallelVector(dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
 		:dgArray<T>(allocator, aligmentInBytes)
 	{
+	}
+
+	DG_INLINE T& operator[] (dgInt32 i)
+	{
+		return m_array[i];
+	}
+
+	DG_INLINE const T& operator[] (dgInt32 i) const
+	{
+		return m_array[i];
 	}
 };
 
@@ -218,14 +285,19 @@ class dgParallelBodySolver
 
 	dgParallelVector<dgWorkGroupFloat> m_weigh;
 	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
-	dgParallelVector<dgWorkGroupVector3> m_veloc;
-	dgParallelVector<dgWorkGroupVector3> m_omega;
+	dgParallelVector<dgWorkGroupVector6> m_veloc;
+	dgParallelVector<dgWorkGroupVector6> m_veloc0;
 	dgParallelVector<dgWorkGroupMatrix3x3> m_rotation;
+//	dgParallelVector<dgWorkGroupVector3> m_angularDamp;
+//	dgParallelVector<dgWorkGroupFloat> m_linearDamp;
+
+	dgParallelVector<dgWorkGroupVector6> m_internalForces;
 
 	dgWorld* m_world;
 	dgBodyCluster* m_cluster;
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
+	dgFloat32 m_timestep;
 	dgInt32 m_count;
 	dgInt32 m_atomicIndex;
 
