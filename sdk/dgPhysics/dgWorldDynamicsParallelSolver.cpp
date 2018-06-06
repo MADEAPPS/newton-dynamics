@@ -855,9 +855,10 @@ dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	,m_invWeigh(allocator)
 	,m_veloc(allocator)
 	,m_veloc0(allocator)
-	,m_rotation(allocator)
-//	,m_angularDamp(allocator)
-//	,m_linearDamp(allocator)
+//	,m_rotation(allocator)
+	,m_invMass(allocator)
+	,m_localInvInertia(allocator)
+	,m_invInertia(allocator)
 	,m_internalForces(allocator)
 	,m_world(NULL)
 	,m_cluster(NULL)
@@ -881,7 +882,7 @@ void dgParallelBodySolver::Reserve (dgInt32 count)
 	m_invWeigh.ResizeIfNecessary(m_count);
 	m_veloc.ResizeIfNecessary(m_count);
 	m_veloc0.ResizeIfNecessary(m_count);
-	m_rotation.ResizeIfNecessary(m_count);
+//	m_rotation.ResizeIfNecessary(m_count);
 	m_internalForces.ResizeIfNecessary(m_count);
 
 //	m_localInvInertia.Reserve(m_count);
@@ -981,15 +982,6 @@ void dgParallelBodySolver::InitInvWeights()
 
 void dgParallelBodySolver::InityBodyArray()
 {
-/*
-//	syncData->m_atomicIndex = 0;
-	const dgInt32 threadCounts = m_world->GetThreadCount();	
-	for (dgInt32 i = 0; i < threadCounts; i++) {
-		m_world->QueueJob(CalculateJointsAccelParallelKernel, this, NULL);
-	}
-	m_world->SynchronizationBarrier();
-*/
-
 	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
 	dgWorkGroupVector3 zero(dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero);
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
@@ -1003,10 +995,6 @@ void dgParallelBodySolver::InityBodyArray()
 		dgDynamicBody* const body6 = (dgDynamicBody*)bodyArray[6].m_body;
 		dgDynamicBody* const body7 = (dgDynamicBody*)bodyArray[7].m_body;
 
-		m_rotation[i] = dgWorkGroupMatrix3x3(
-			body0->GetMatrix(), body1->GetMatrix(), body2->GetMatrix(), body3->GetMatrix(),
-			body4->GetMatrix(), body5->GetMatrix(), body6->GetMatrix(), body7->GetMatrix());
-
 		dgWorkGroupFloat damp_ang_x(body0->GetDampCoeffcient(m_timestep), body4->GetDampCoeffcient(m_timestep));
 		dgWorkGroupFloat damp_ang_y(body1->GetDampCoeffcient(m_timestep), body5->GetDampCoeffcient(m_timestep));
 		dgWorkGroupFloat damp_ang_z(body2->GetDampCoeffcient(m_timestep), body6->GetDampCoeffcient(m_timestep));
@@ -1016,7 +1004,11 @@ void dgParallelBodySolver::InityBodyArray()
 		dgWorkGroupVector3 omega(
 			body0->GetOmega(), body1->GetOmega(), body2->GetOmega(), body3->GetOmega(),
 			body4->GetOmega(), body5->GetOmega(), body6->GetOmega(), body7->GetOmega());
-		m_veloc[i].m_angular = m_rotation[i].RotateVector(m_rotation[i].UnrotateVector(omega) * dgWorkGroupVector3(damp_ang_x, damp_ang_y, damp_ang_z));
+
+		dgWorkGroupMatrix3x3 rotation(
+			body0->GetMatrix(), body1->GetMatrix(), body2->GetMatrix(), body3->GetMatrix(),
+			body4->GetMatrix(), body5->GetMatrix(), body6->GetMatrix(), body7->GetMatrix());
+		m_veloc[i].m_angular = rotation.RotateVector(rotation.UnrotateVector(omega) * dgWorkGroupVector3(damp_ang_x, damp_ang_y, damp_ang_z));
 
 		dgWorkGroupVector3 veloc(
 			body0->GetVelocity(), body1->GetVelocity(), body2->GetVelocity(), body3->GetVelocity(),
@@ -1025,12 +1017,19 @@ void dgParallelBodySolver::InityBodyArray()
 
 		m_veloc0[i] = m_veloc[i];
 
-//		dgMatrix3x3Avx invInertia(m_rotation[index].Transposed());
-//		invInertia.m_front = invInertia.m_front * m_localInvInertia[index];
-//		invInertia.m_up = invInertia.m_up * m_localInvInertia[index];
-//		invInertia.m_right = invInertia.m_right * m_localInvInertia[index];
-//		invInertia = invInertia * m_rotation[index];
-//		invInertia.Store(&m_invInertia[index]);
+		dgWorkGroupFloat invIIx(body0->GetInvMass(), body4->GetInvMass());
+		dgWorkGroupFloat invIIy(body1->GetInvMass(), body5->GetInvMass());
+		dgWorkGroupFloat invIIz(body2->GetInvMass(), body6->GetInvMass());
+		dgWorkGroupFloat invMass(body3->GetInvMass(), body7->GetInvMass());
+		dgWorkGroupFloat::Transpose4x8(invIIx, invIIy, invIIz, invMass);
+		m_invMass[i] = invMass;
+		m_localInvInertia[i] = dgWorkGroupVector3(invIIx, invIIy, invIIz);
+
+		dgWorkGroupMatrix3x3 invInertia(rotation.Transposed());
+		invInertia.m_front = invInertia.m_front * m_localInvInertia[i];
+		invInertia.m_up = invInertia.m_up * m_localInvInertia[i];
+		invInertia.m_right = invInertia.m_right * m_localInvInertia[i];
+		m_invInertia[i] = invInertia * rotation;
 
 		m_internalForces[i].m_linear = zero;
 		m_internalForces[i].m_angular = zero;

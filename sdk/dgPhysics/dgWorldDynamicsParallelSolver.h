@@ -179,12 +179,25 @@ class dgWorkGroupMatrix3x3
 	{
 	}
 
+	DG_INLINE dgWorkGroupMatrix3x3(const dgWorkGroupVector3& right, const dgWorkGroupVector3& up, const dgWorkGroupVector3& front)
+		:m_right(right)
+		,m_up(up)
+		,m_front(front)
+	{
+	}
+
 	DG_INLINE dgWorkGroupMatrix3x3(const dgMatrix& matrix0, const dgMatrix& matrix1, const dgMatrix& matrix2, const dgMatrix& matrix3, const dgMatrix& matrix4, const dgMatrix& matrix5, const dgMatrix& matrix6, const dgMatrix& matrix7)
 		:m_right(matrix0[0], matrix1[0], matrix2[0], matrix3[0], matrix4[0], matrix5[0], matrix6[0], matrix7[0])
 		,m_up(matrix0[1], matrix1[1], matrix2[1], matrix3[1], matrix4[1], matrix5[1], matrix6[1], matrix7[1])
 		,m_front(matrix0[2], matrix1[2], matrix2[2], matrix3[2], matrix4[2], matrix5[2], matrix6[2], matrix7[2])
 	{
 	}
+
+	DG_INLINE dgWorkGroupMatrix3x3 operator* (const dgWorkGroupMatrix3x3& a) const
+	{
+		return dgWorkGroupMatrix3x3(a.RotateVector(m_front), a.RotateVector(m_up), a.RotateVector(m_right));
+	}
+
 
 	DG_INLINE dgWorkGroupVector3 RotateVector(const dgWorkGroupVector3& a) const
 	{
@@ -200,6 +213,14 @@ class dgWorkGroupMatrix3x3
 		dgWorkGroupFloat y(a.m_x * m_up.m_x + a.m_y * m_up.m_y + a.m_z * m_up.m_z);
 		dgWorkGroupFloat z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);
 		return dgWorkGroupVector3(x, y, z);
+	}
+
+	DG_INLINE dgWorkGroupMatrix3x3 Transposed() const
+	{
+		return dgWorkGroupMatrix3x3(
+			dgWorkGroupVector3(m_front.m_x, m_up.m_x, m_right.m_x),
+			dgWorkGroupVector3(m_front.m_y, m_up.m_y, m_right.m_y),
+			dgWorkGroupVector3(m_front.m_z, m_up.m_z, m_right.m_z));
 	}
 
 
@@ -287,7 +308,11 @@ class dgParallelBodySolver
 	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
 	dgParallelVector<dgWorkGroupVector6> m_veloc;
 	dgParallelVector<dgWorkGroupVector6> m_veloc0;
-	dgParallelVector<dgWorkGroupMatrix3x3> m_rotation;
+	dgParallelVector<dgWorkGroupFloat> m_invMass;
+	dgParallelVector<dgWorkGroupVector3> m_localInvInertia;
+	dgParallelVector<dgWorkGroupMatrix3x3> m_invInertia;
+
+//	dgParallelVector<dgWorkGroupMatrix3x3> m_rotation;
 //	dgParallelVector<dgWorkGroupVector3> m_angularDamp;
 //	dgParallelVector<dgWorkGroupFloat> m_linearDamp;
 
