@@ -85,20 +85,9 @@ class dgWorkGroupFloat
 
 	DG_INLINE static void Transpose4x8(dgWorkGroupFloat& src0, dgWorkGroupFloat& src1, dgWorkGroupFloat& src2, dgWorkGroupFloat& src3)
 	{
-		/*
-		__m256 tmp0(_mm256_unpacklo_ps(src0.m_type, src1.m_type));
-		__m256 tmp1(_mm256_unpacklo_ps(src2.m_type, src3.m_type));
-		__m256 tmp2(_mm256_unpackhi_ps(src0.m_type, src1.m_type));
-		__m256 tmp3(_mm256_unpackhi_ps(src2.m_type, src3.m_type));
-
-		src0 = _mm256_shuffle_ps(tmp0, tmp1, PERMUTE_MASK(1, 0, 1, 0));
-		src1 = _mm256_shuffle_ps(tmp0, tmp1, PERMUTE_MASK(3, 2, 3, 2));
-		src2 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(1, 0, 1, 0));
-		src3 = _mm256_shuffle_ps(tmp2, tmp3, PERMUTE_MASK(3, 2, 3, 2));
-		*/
+		dgVector::Transpose4x4(src0.m_low, src1.m_low, src2.m_low, src3.m_low, src0.m_low, src1.m_low, src2.m_low, src3.m_low);
+		dgVector::Transpose4x4(src0.m_high, src1.m_high, src2.m_high, src3.m_high, src0.m_high, src1.m_high, src2.m_high, src3.m_high);
 	}
-
-
 
 	union {
 		dgFloat32 m_f[8];
@@ -140,6 +129,28 @@ class dgWorkGroupVector3
 	dgWorkGroupFloat m_y;
 	dgWorkGroupFloat m_z;
 } DG_GCC_VECTOR_ALIGMENT;
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgWorkGroupMatrix3x3
+{
+	public:
+	DG_INLINE dgWorkGroupMatrix3x3()
+	{
+	}
+
+	DG_INLINE dgWorkGroupMatrix3x3(const dgMatrix& matrix0, const dgMatrix& matrix1, const dgMatrix& matrix2, const dgMatrix& matrix3, const dgMatrix& matrix4, const dgMatrix& matrix5, const dgMatrix& matrix6, const dgMatrix& matrix7)
+		:m_right(matrix0[0], matrix1[0], matrix2[0], matrix3[0], matrix4[0], matrix5[0], matrix6[0], matrix7[0])
+		,m_up(matrix0[1], matrix1[1], matrix2[1], matrix3[1], matrix4[1], matrix5[1], matrix6[1], matrix7[1])
+		,m_front(matrix0[2], matrix1[2], matrix2[2], matrix3[2], matrix4[2], matrix5[2], matrix6[2], matrix7[2])
+	{
+	}
+
+	dgWorkGroupVector3 m_front;
+	dgWorkGroupVector3 m_up;
+	dgWorkGroupVector3 m_right;
+} DG_GCC_VECTOR_ALIGMENT;
+
 
 
 template<class T>
@@ -205,14 +216,11 @@ class dgParallelBodySolver
 	static void InitInvWeightKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 
-
-	void GetVeloc(dgInt32 index);
-	void GetOmega(dgInt32 index);
-
 	dgParallelVector<dgWorkGroupFloat> m_weigh;
 	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
 	dgParallelVector<dgWorkGroupVector3> m_veloc;
 	dgParallelVector<dgWorkGroupVector3> m_omega;
+	dgParallelVector<dgWorkGroupMatrix3x3> m_rotation;
 
 	dgWorld* m_world;
 	dgBodyCluster* m_cluster;

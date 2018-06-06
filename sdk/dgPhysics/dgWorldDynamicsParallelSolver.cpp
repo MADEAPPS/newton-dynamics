@@ -851,6 +851,7 @@ dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	,m_invWeigh(allocator)
 	,m_veloc(allocator)
 	,m_omega(allocator)
+	,m_rotation(allocator)
 	,m_world(NULL)
 	,m_cluster(NULL)
 	,m_bodyArray(NULL)
@@ -971,20 +972,6 @@ void dgParallelBodySolver::InitInvWeights()
 	}
 }
 
-void dgParallelBodySolver::GetVeloc(dgInt32 index)
-{
-	dgBodyInfo* const bodyArray = &m_bodyArray[index];
-	m_veloc[index] = dgWorkGroupVector3(bodyArray[0].m_body->GetVelocity(), bodyArray[1].m_body->GetVelocity(), bodyArray[2].m_body->GetVelocity(), bodyArray[3].m_body->GetVelocity(),
-									    bodyArray[4].m_body->GetVelocity(), bodyArray[5].m_body->GetVelocity(), bodyArray[6].m_body->GetVelocity(), bodyArray[7].m_body->GetVelocity());
-}
-
-void dgParallelBodySolver::GetOmega(dgInt32 index)
-{
-	dgBodyInfo* const bodyArray = &m_bodyArray[index];
-	m_omega[index] = dgWorkGroupVector3(bodyArray[0].m_body->GetOmega(), bodyArray[1].m_body->GetOmega(), bodyArray[2].m_body->GetOmega(), bodyArray[3].m_body->GetOmega(),
-										bodyArray[4].m_body->GetOmega(), bodyArray[5].m_body->GetOmega(), bodyArray[6].m_body->GetOmega(), bodyArray[7].m_body->GetOmega());
-}
-
 
 void dgParallelBodySolver::InityBodyArray()
 {
@@ -999,9 +986,15 @@ void dgParallelBodySolver::InityBodyArray()
 
 	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
-		GetVeloc(i);
-		GetOmega(i);
-//		m_body.GetMatrix(i, body);
+		dgBodyInfo* const bodyArray = &m_bodyArray[i];
+
+		m_veloc[i] = dgWorkGroupVector3(bodyArray[0].m_body->GetVelocity(), bodyArray[1].m_body->GetVelocity(), bodyArray[2].m_body->GetVelocity(), bodyArray[3].m_body->GetVelocity(),
+										bodyArray[4].m_body->GetVelocity(), bodyArray[5].m_body->GetVelocity(), bodyArray[6].m_body->GetVelocity(), bodyArray[7].m_body->GetVelocity());
+		m_omega[i] = dgWorkGroupVector3(bodyArray[0].m_body->GetOmega(), bodyArray[1].m_body->GetOmega(), bodyArray[2].m_body->GetOmega(), bodyArray[3].m_body->GetOmega(),
+										bodyArray[4].m_body->GetOmega(), bodyArray[5].m_body->GetOmega(), bodyArray[6].m_body->GetOmega(), bodyArray[7].m_body->GetOmega());
+		m_rotation[i] = dgWorkGroupMatrix3x3(bodyArray[0].m_body->GetMatrix(), bodyArray[1].m_body->GetMatrix(), bodyArray[2].m_body->GetMatrix(), bodyArray[3].m_body->GetMatrix(),
+											 bodyArray[4].m_body->GetMatrix(), bodyArray[5].m_body->GetMatrix(), bodyArray[6].m_body->GetMatrix(), bodyArray[7].m_body->GetMatrix());
+
 //		m_body.GetDampingCoef(i, body, m_timestep);
 	}
 }
