@@ -29,8 +29,7 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-#define DG_WORK_GROUP_BITS	3
-#define DG_WORK_GROUP_SIZE	(1<<DG_WORK_GROUP_BITS) 
+#define DG_WORK_GROUP_SIZE	(2 * sizeof (dgVector)/sizeof (dgFloat32)) 
 
 
 DG_MSC_VECTOR_ALIGMENT
@@ -55,14 +54,14 @@ class dgWorkGroupFloat
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
-		dgAssert(i < 8);
+		dgAssert(i < DG_WORK_GROUP_SIZE);
 		dgAssert(i >= 0);
 		return m_f[i];
 	}
 
 	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
 	{
-		dgAssert(i < 8);
+		dgAssert(i < DG_WORK_GROUP_SIZE);
 		dgAssert(i >= 0);
 		return m_f[i];
 	}
@@ -75,6 +74,22 @@ class dgWorkGroupFloat
 	DG_INLINE dgWorkGroupFloat operator* (const dgWorkGroupFloat& A) const
 	{
 		return dgWorkGroupFloat(m_low * A.m_low, m_high * A.m_high);
+	}
+
+	DG_INLINE dgWorkGroupFloat Reciproc () const
+	{
+		return dgWorkGroupFloat(m_low.Reciproc(), m_high.Reciproc());
+	}
+
+
+	DG_INLINE dgWorkGroupFloat operator> (const dgWorkGroupFloat& A) const
+	{
+		return dgWorkGroupFloat(m_low > A.m_low, m_high > A.m_high);
+	}
+
+	DG_INLINE dgWorkGroupFloat Select (const dgWorkGroupFloat& A, const dgWorkGroupFloat& B) const
+	{
+		return dgWorkGroupFloat((A.m_low & m_low) | B.m_low.AndNot(m_low), (A.m_high & m_high) | B.m_high.AndNot(m_high));
 	}
 
 	DG_INLINE dgWorkGroupFloat MulAdd (const dgWorkGroupFloat& B, const dgWorkGroupFloat& C) const
@@ -95,7 +110,7 @@ class dgWorkGroupFloat
 	}
 
 	union {
-		dgFloat32 m_f[8];
+		dgFloat32 m_f[DG_WORK_GROUP_SIZE];
 		struct {
 			dgVector m_low;
 			dgVector m_high;
@@ -297,12 +312,12 @@ class dgParallelBodySolver
 	private:
 	void Reserve (dgInt32 count);
 	void InitWeights();
-	void InitInvWeights();
 	void InityBodyArray();
+	void BuildJacobianMatrix();
 	
 	static void InitWeightKernel(void* const context, void* const, dgInt32 threadID);
-	static void InitInvWeightKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
+	static void BuildJacobianMatrixParallelKernel(void* const context, void* const, dgInt32 threadID);
 
 	dgParallelVector<dgWorkGroupFloat> m_weigh;
 	dgParallelVector<dgWorkGroupFloat> m_invWeigh;

@@ -876,18 +876,18 @@ dgParallelBodySolver::~dgParallelBodySolver()
 
 void dgParallelBodySolver::Reserve (dgInt32 count)
 {
-	m_count = ((count + DG_WORK_GROUP_SIZE - 1) & -(DG_WORK_GROUP_SIZE - 1)) >> DG_WORK_GROUP_BITS;
+	count = (count + DG_WORK_GROUP_SIZE - 1) & -dgInt32 (DG_WORK_GROUP_SIZE - 1);
+	m_count = count / DG_WORK_GROUP_SIZE;
 
 	m_weigh.ResizeIfNecessary(m_count);
 	m_invWeigh.ResizeIfNecessary(m_count);
 	m_veloc.ResizeIfNecessary(m_count);
 	m_veloc0.ResizeIfNecessary(m_count);
+	m_invMass.ResizeIfNecessary(m_count);
+	m_invInertia.ResizeIfNecessary(m_count);
 //	m_rotation.ResizeIfNecessary(m_count);
 	m_internalForces.ResizeIfNecessary(m_count);
-
-//	m_localInvInertia.Reserve(m_count);
-//	m_invMass.Reserve(m_count);
-//	m_invInertia.Reserve(m_count);
+	m_localInvInertia.ResizeIfNecessary(m_count);
 }
 
 void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
@@ -915,15 +915,16 @@ void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyIn
 
 	m_atomicIndex = 0;
 	for (dgInt32 i = 0; i < threadCounts; i++) {
-		m_world->QueueJob(InitInvWeightKernel, this, NULL);
+		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
 	}
 	m_world->SynchronizationBarrier();
 
 	m_atomicIndex = 0;
 	for (dgInt32 i = 0; i < threadCounts; i++) {
-		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
+		m_world->QueueJob(BuildJacobianMatrixParallelKernel, this, NULL);
 	}
 	m_world->SynchronizationBarrier();
+
 }
 
 void dgParallelBodySolver::InitWeightKernel (void* const context, void* const, dgInt32 threadID)
@@ -932,17 +933,19 @@ void dgParallelBodySolver::InitWeightKernel (void* const context, void* const, d
 	me->InitWeights();
 }
 
-void dgParallelBodySolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
-{
-	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
-	me->InitInvWeights();
-}
 
-void dgParallelBodySolver::InitInvWeightKernel(void* const context, void* const, dgInt32 threadID)
+void dgParallelBodySolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
 {
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->InityBodyArray();
 }
+
+void dgParallelBodySolver::BuildJacobianMatrixParallelKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->BuildJacobianMatrix();
+}
+
 
 void dgParallelBodySolver::InitWeights()
 {
@@ -956,29 +959,14 @@ void dgParallelBodySolver::InitWeights()
 		dgBody* const body1 = jointInfo->m_joint->GetBody1();
 		{
 			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
-			weights[m0] += dgFloat32(1.0f);
+			weights[m0] += dgFloat32 (1.0f);
 		}
 		{
 			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
-			weights[m1] += dgFloat32(1.0f);
+			weights[m1] += dgFloat32 (1.0f);
 		}
 	}
 }
-
-void dgParallelBodySolver::InitInvWeights()
-{
-	const dgInt32 bodyCount = m_count * DG_WORK_GROUP_SIZE;
-	dgFloat32* const weights = &m_weigh[0][0];
-	dgFloat32* const invWeights = &m_invWeigh[0][0];
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount;  i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
-		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j ++) {
-			const dgFloat32 w = weights[j + i] ? weights[j + i] : 1.0f;
-			weights[j + i] = w;
-			invWeights[j + i] = 1.0f / w;
-		}
-	}
-}
-
 
 void dgParallelBodySolver::InityBodyArray()
 {
@@ -1031,7 +1019,16 @@ void dgParallelBodySolver::InityBodyArray()
 		invInertia.m_right = invInertia.m_right * m_localInvInertia[i];
 		m_invInertia[i] = invInertia * rotation;
 
+		dgWorkGroupFloat mask(m_weigh[i] > dgWorkGroupFloat::m_zero);
+		dgWorkGroupFloat weight(mask.Select(m_weigh[i], dgWorkGroupFloat::m_one));
+		m_weigh[i] = weight;
+		m_invWeigh[i] = weight.Reciproc();
+
 		m_internalForces[i].m_linear = zero;
 		m_internalForces[i].m_angular = zero;
 	}
+}
+
+void dgParallelBodySolver::BuildJacobianMatrix()
+{
 }
