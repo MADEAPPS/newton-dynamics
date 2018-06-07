@@ -310,13 +310,15 @@ class dgParallelBodySolver
 	void CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	private:
-	void Reserve (dgInt32 count);
-	void InitWeights();
-	void InityBodyArray();
-	void BuildJacobianMatrix();
+	void Reserve (dgInt32 bodyCount, dgInt32 jointCount);
+	void InitWeights(dgInt32 threadID);
+	void InityBodyArray(dgInt32 threadID);
+	void GeJacobianMatrix(dgInt32 threadID);
+	void BuildJacobianMatrix(dgInt32 threadID);
 	
 	static void InitWeightKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
+	static void GetJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void BuildJacobianMatrixParallelKernel(void* const context, void* const, dgInt32 threadID);
 
 	dgParallelVector<dgWorkGroupFloat> m_weigh;
@@ -338,8 +340,11 @@ class dgParallelBodySolver
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
 	dgFloat32 m_timestep;
-	dgInt32 m_count;
+	dgFloat32 m_invTimestep;
+	dgInt32 m_bodyCount;
+	dgInt32 m_jointCount;
 	dgInt32 m_atomicIndex;
+	dgInt32 m_jacobianMatrixRowAtomicIndex;
 
 	friend class dgWorldDynamicUpdate;
 };
