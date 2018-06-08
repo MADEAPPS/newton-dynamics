@@ -29,9 +29,9 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-/*
-#define DG_WORK_GROUP_SIZE	(2 * sizeof (dgVector)/sizeof (dgFloat32)) 
 
+#define DG_WORK_GROUP_SIZE	(2 * sizeof (dgVector)/sizeof (dgFloat32)) 
+/*
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupFloat
 {
@@ -312,14 +312,18 @@ class dgParallelBodySolver
 	private:
 	void Reserve (dgInt32 bodyCount, dgInt32 jointCount);
 	void InitWeights(dgInt32 threadID);
-	void InityBodyArray(dgInt32 threadID);
-	void GeJacobianMatrix(dgInt32 threadID);
-
-	void BuildJacobianMatrix(dgJointInfo* const jointInfo);
+	void InitBodyArray(dgInt32 threadID);
+	void InitJacobianMatrix(dgInt32 threadID);
+//	void GeJacobianMatrix(dgInt32 threadID);
+//	void BuildJacobianMatrix(dgJointInfo* const jointInfo);
 	
+	void InitWeights();
+	void InitBodyArray();
+	void InitJacobianMatrix();
+
 	static void InitWeightKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
-	static void GetJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
+	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 
 //	dgParallelVector<dgWorkGroupFloat> m_weigh;
 //	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
@@ -338,9 +342,11 @@ class dgParallelBodySolver
 	dgBodyCluster* m_cluster;
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
+	dgFloat32* m_weight;
+	dgFloat32* m_invWeight;
 	dgFloat32 m_timestep;
 	dgFloat32 m_invTimestep;
-	dgInt32 m_bodyCount;
+//	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_atomicIndex;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
