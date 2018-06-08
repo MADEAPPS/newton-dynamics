@@ -314,12 +314,12 @@ class dgParallelBodySolver
 	void InitWeights(dgInt32 threadID);
 	void InityBodyArray(dgInt32 threadID);
 	void GeJacobianMatrix(dgInt32 threadID);
-	void BuildJacobianMatrix(dgInt32 threadID);
+
+	void BuildJacobianMatrix(dgJointInfo* const jointInfo);
 	
 	static void InitWeightKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void GetJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
-	static void BuildJacobianMatrixParallelKernel(void* const context, void* const, dgInt32 threadID);
 
 	dgParallelVector<dgWorkGroupFloat> m_weigh;
 	dgParallelVector<dgWorkGroupFloat> m_invWeigh;

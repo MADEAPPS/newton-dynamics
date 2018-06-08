@@ -301,6 +301,7 @@ class dgWorldDynamicUpdate
 	friend class dgWorld;
 	friend class dgJacobianMemory;
 	friend class dgSkeletonContainer;
+	friend class dgParallelBodySolver;
 	friend class dgSolverWorlkerThreads;
 };
 
