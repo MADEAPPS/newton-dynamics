@@ -29,8 +29,8 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
+/*
 #define DG_WORK_GROUP_SIZE	(2 * sizeof (dgVector)/sizeof (dgFloat32)) 
-
 
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupFloat
@@ -80,7 +80,6 @@ class dgWorkGroupFloat
 	{
 		return dgWorkGroupFloat(m_low.Reciproc(), m_high.Reciproc());
 	}
-
 
 	DG_INLINE dgWorkGroupFloat operator> (const dgWorkGroupFloat& A) const
 	{
@@ -265,7 +264,7 @@ class dgParallelVector: public dgArray<T>
 		return m_array[i];
 	}
 };
-
+*/
 class dgParallelSolverSyncData
 {
 	public:
@@ -302,6 +301,7 @@ class dgParallelSolverSyncData
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
 
+
 class dgParallelBodySolver
 {
 	public:
@@ -321,19 +321,18 @@ class dgParallelBodySolver
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void GetJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 
-	dgParallelVector<dgWorkGroupFloat> m_weigh;
-	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
-	dgParallelVector<dgWorkGroupVector6> m_veloc;
-	dgParallelVector<dgWorkGroupVector6> m_veloc0;
-	dgParallelVector<dgWorkGroupFloat> m_invMass;
-	dgParallelVector<dgWorkGroupVector3> m_localInvInertia;
-	dgParallelVector<dgWorkGroupMatrix3x3> m_invInertia;
+//	dgParallelVector<dgWorkGroupFloat> m_weigh;
+//	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
+//	dgParallelVector<dgWorkGroupVector6> m_veloc;
+//	dgParallelVector<dgWorkGroupVector6> m_veloc0;
+//	dgParallelVector<dgWorkGroupFloat> m_invMass;
+//	dgParallelVector<dgWorkGroupVector3> m_localInvInertia;
+//	dgParallelVector<dgWorkGroupMatrix3x3> m_invInertia;
 
 //	dgParallelVector<dgWorkGroupMatrix3x3> m_rotation;
 //	dgParallelVector<dgWorkGroupVector3> m_angularDamp;
 //	dgParallelVector<dgWorkGroupFloat> m_linearDamp;
-
-	dgParallelVector<dgWorkGroupVector6> m_internalForces;
+//	dgParallelVector<dgWorkGroupVector6> m_internalForces;
 
 	dgWorld* m_world;
 	dgBodyCluster* m_cluster;
