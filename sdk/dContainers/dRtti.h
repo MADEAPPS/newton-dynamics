@@ -17,7 +17,7 @@
 
 #define dRttiCommon(className,exportType)					\
 	private:												\
-	static dCRCTYPE m_rtti; 								\
+	exportType static dCRCTYPE m_rtti; 					\
 	public:													\
 	exportType static dCRCTYPE GetRttiType()				\
 	{														\

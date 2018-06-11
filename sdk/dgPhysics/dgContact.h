@@ -182,7 +182,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	public:
 	void ResetSkeleton();
 	dgFloat32 GetTimeOfImpact() const;
-    dgFloat32 GetClosestDistance() const;
+	dgFloat32 GetClosestDistance() const;
 	void SetTimeOfImpact(dgFloat32 timetoImpact);
 	const dgContactMaterial* GetMaterial() const;
 
@@ -202,10 +202,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
 	virtual void JointAccelerations (dgJointAccelerationDecriptor* const params); 
 	virtual bool IsDeformable() const ;
-
-	
 	virtual bool IsSkeleton() const;
-	
 	virtual void SetDestructorCallback (OnConstraintDestroy destructor);
 
 	void JacobianContactDerivative (dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex, dgInt32& frictionIndex); 

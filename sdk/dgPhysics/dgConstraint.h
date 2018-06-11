@@ -107,7 +107,7 @@ class dgJointAccelerationDecriptor
 	dgFloat32 m_invTimeStep;
 	dgFloat32 m_firstPassCoefFlag;
 	dgRightHandSide* m_rightHandSide;
-	const dgLeftHandSide* m_rowMatrix;
+	const dgLeftHandSide* m_leftHandSide;
 };
 
 
@@ -132,7 +132,6 @@ class dgContraintDescritor
 
 typedef void (dgApi *OnConstraintDestroy) (dgConstraint& me);
 
-//DG_MSC_VECTOR_ALIGMENT
 DG_MSC_VECTOR_ALIGMENT
 class dgConstraint
 {
@@ -230,6 +229,7 @@ class dgConstraint
 	friend class dgInverseDynamics;
 	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
+	friend class dgParallelBodySolver;
 	friend class dgParallelSolverJointAcceleration;
 	friend class dgParallelSolverInitFeedbackUpdate;
 	friend class dgParallelSolverBuildJacobianMatrix;

@@ -728,7 +728,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			const dgInt32 pairStart = jointInfo->m_pairStart;
 
 			joindDesc.m_rowsCount = jointInfo->m_pairCount;
-			joindDesc.m_rowMatrix = &leftHandSide[pairStart];
+			joindDesc.m_leftHandSide = &leftHandSide[pairStart];
 			joindDesc.m_rightHandSide = &rightHandSide[pairStart];
 			constraint->JointAccelerations(&joindDesc);
 

@@ -116,6 +116,7 @@ class dgDynamicBody : public dgBody
 	friend class dgInverseDynamics;
 	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
+	friend class dgParallelBodySolver;
 	friend class dgCollisionDeformableMesh;
 	friend class dgCollisionDeformableSolidMesh;
 	friend class dgCollisionMassSpringDamperSystem;

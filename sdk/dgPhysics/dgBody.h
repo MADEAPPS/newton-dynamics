@@ -242,7 +242,7 @@ class dgBody
 	dgVector m_gyroTorque;
 	dgQuaternion m_gyroRotation;
 
-	dgInt32 m_criticalSectionLock;
+	mutable dgInt32 m_criticalSectionLock;
 	union 
 	{
 		dgUnsigned32 m_flags;
