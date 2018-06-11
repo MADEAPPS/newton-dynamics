@@ -999,6 +999,11 @@ void dgParallelBodySolver::UpdateForceFeedbackKernel(void* const context, void* 
 	me->UpdateForceFeedback(threadID);
 }
 
+void dgParallelBodySolver::UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->UpdateKinematicFeedback(threadID);
+}
 
 void dgParallelBodySolver::InitWeights()
 {
@@ -1089,6 +1094,15 @@ void dgParallelBodySolver::UpdateForceFeedback()
 	m_world->SynchronizationBarrier();
 }
 
+void dgParallelBodySolver::UpdateKinematicFeedback()
+{
+	m_atomicIndex = 0;
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+//		m_world->QueueJob(KinematicCallbackUpdateParallelKernel, syncData, world);
+		m_world->QueueJob(UpdateKinematicFeedbackKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+}
 
 void dgParallelBodySolver::InitWeights(dgInt32 threadID)
 {
@@ -1472,6 +1486,22 @@ void dgParallelBodySolver::UpdateForceFeedback(dgInt32 threadID)
 }
 
 
+void dgParallelBodySolver::UpdateKinematicFeedback(dgInt32 threadID)
+{
+//	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*)context;
+//	dgJointInfo* const constraintArray = syncData->m_jointsArray;
+
+	dgInt32* const atomicIndex = &m_atomicIndex;
+	const int jointCount = m_cluster->m_jointCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		dgJointInfo* const jointInfo = &m_jointArray[i];
+		if (jointInfo->m_joint->m_updaFeedbackCallback) {
+			jointInfo->m_joint->m_updaFeedbackCallback(*jointInfo->m_joint, m_timestep, threadID);
+		}
+	}
+}
+
+
 void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgJacobian* const internalForces)
 {
 	const dgInt32 m0 = jointInfo->m_m0;
@@ -1655,13 +1685,7 @@ void dgParallelBodySolver::CalculateForces()
 	CalculateBodiesAcceleration();
 
 	if (hasJointFeeback) {
-/*
-		syncData->m_atomicIndex = 0;
-		for (dgInt32 j = 0; j < threadCounts; j++) {
-			world->QueueJob(KinematicCallbackUpdateParallelKernel, syncData, world);
-		}
-		world->SynchronizationBarrier();
-*/
+		UpdateKinematicFeedback();
 	}
 }
 

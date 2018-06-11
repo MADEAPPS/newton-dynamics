@@ -318,6 +318,7 @@ class dgParallelBodySolver
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
+	void UpdateKinematicFeedback();
 	void CalculateJointsAcceleration();
 	void CalculateBodiesAcceleration();
 	
@@ -328,6 +329,7 @@ class dgParallelBodySolver
 	void UpdateForceFeedback(dgInt32 threadID);
 	void CalculateJointsForce(dgInt32 threadID);
 	void IntegrateBodiesVelocity(dgInt32 threadID);
+	void UpdateKinematicFeedback(dgInt32 threadID);
 	void CalculateJointsAcceleration(dgInt32 threadID);
 	void CalculateBodiesAcceleration(dgInt32 threadID);
 
@@ -338,6 +340,7 @@ class dgParallelBodySolver
 	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);
 	static void IntegrateBodiesVelocityKernel(void* const context, void* const, dgInt32 threadID);
+	static void UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 
