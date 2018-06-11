@@ -310,34 +310,38 @@ class dgParallelBodySolver
 	void CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	private:
-	void Reserve (dgInt32 bodyCount, dgInt32 jointCount);
+	void InitWeights();
+	void InitBodyArray();
+	void CalculateForces();
+	void InitJacobianMatrix();
+	void CalculateBodyForce();
+	void UpdateForceFeedback();
+	void CalculateJointsForce();
+	void IntegrateBodiesVelocity();
+	void CalculateJointsAcceleration();
+	
 	void InitWeights(dgInt32 threadID);
 	void InitBodyArray(dgInt32 threadID);
 	void InitJacobianMatrix(dgInt32 threadID);
 	void CalculateBodyForce(dgInt32 threadID);
+	void UpdateForceFeedback(dgInt32 threadID);
 	void CalculateJointsForce(dgInt32 threadID);
 	void IntegrateBodiesVelocity(dgInt32 threadID);
 	void CalculateJointsAcceleration(dgInt32 threadID);
-	
-	void InitWeights();
-	void InitBodyArray();
-	void InitJacobianMatrix();
-	void CalculateForces();
-	void CalculateBodyForce();
-	void CalculateJointsForce();
-	void IntegrateBodiesVelocity();
-	void CalculateJointsAcceleration();
-	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, const dgJacobian* const internalForces) const;
 
 	static void InitWeightKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodyForceKernel(void* const context, void* const, dgInt32 threadID);
+	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);
 	static void IntegrateBodiesVelocityKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
-	
+
+	void Reserve(dgInt32 bodyCount, dgInt32 jointCount);
+	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
+	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, const dgJacobian* const internalForces) const;
+
 
 //	dgParallelVector<dgWorkGroupFloat> m_weigh;
 //	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
@@ -365,6 +369,7 @@ class dgParallelBodySolver
 	dgFloat32 m_invTimestepRK;
 	dgFloat32 m_firstPassCoef;
 	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
+	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 //	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_atomicIndex;
