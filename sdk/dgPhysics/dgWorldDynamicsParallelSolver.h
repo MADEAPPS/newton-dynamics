@@ -316,6 +316,7 @@ class dgParallelBodySolver
 	void InitJacobianMatrix(dgInt32 threadID);
 	void CalculateBodyForce(dgInt32 threadID);
 	void CalculateJointsForce(dgInt32 threadID);
+	void IntegrateBodiesVelocity(dgInt32 threadID);
 	void CalculateJointsAcceleration(dgInt32 threadID);
 	
 	void InitWeights();
@@ -324,6 +325,7 @@ class dgParallelBodySolver
 	void CalculateForces();
 	void CalculateBodyForce();
 	void CalculateJointsForce();
+	void IntegrateBodiesVelocity();
 	void CalculateJointsAcceleration();
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, const dgJacobian* const internalForces) const;
@@ -333,6 +335,7 @@ class dgParallelBodySolver
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodyForceKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);
+	static void IntegrateBodiesVelocityKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	
 

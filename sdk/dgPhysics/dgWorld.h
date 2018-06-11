@@ -533,6 +533,7 @@ class dgWorld
 	friend class dgCollisionConvex;
 	friend class dgCollisionInstance;
 	friend class dgCollisionCompound;
+	friend class dgParallelBodySolver;
 	friend class dgWorldDynamicUpdate;
 	friend class dgParallelSolverClear;	
 	friend class dgParallelSolverSolve;
