@@ -298,10 +298,10 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	}
 
 	high = 20;
-	high = 1;
+	high = 2;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, -4.0f + i * 8, 0.0f), dVector(0.5f, 0.5f, 0.5f, 0.0f), high);
+//BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, -4.0f + i * 8, 0.0f), dVector(0.5f, 0.5f, 0.5f, 0.0f), high);
 			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 //			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, 0.0f + i * 8, 0.0f), dVector (0.5f, 4.0f, 0.5f, 0.0f), high);
 //			BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);

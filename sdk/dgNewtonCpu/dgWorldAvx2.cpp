@@ -112,12 +112,6 @@ void dgWorldAvx2::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 
 void dgWorldAvx2::InityBodyArray()
 {
-//	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*)context;
-//	dgWorld* const world = (dgWorld*)worldContext;
-//	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-//	dgBodyInfo* const bodyArray = syncData->m_bodyArray;
-//	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
-
 	const dgInt32 bodyCount = m_avxBody.m_count;
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		dgDynamicBody* body[8];

@@ -265,6 +265,42 @@ class dgParallelVector: public dgArray<T>
 	}
 };
 */
+class dgParallelSolverSyncData
+{
+	public:
+	dgParallelSolverSyncData()
+	{
+		memset (this, 0, sizeof (dgParallelSolverSyncData));
+	}
+
+	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
+
+	dgFloat32 m_timestep;
+	dgFloat32 m_invTimestep;
+	dgFloat32 m_invStepRK;
+	dgFloat32 m_timestepRK;
+	dgFloat32 m_invTimestepRK;
+	dgFloat32 m_firstPassCoef;
+
+	dgInt32 m_passes;
+	dgInt32 m_rkSubSteps;
+	dgInt32 m_bodyCount;
+	dgInt32 m_jointCount;
+	dgInt32 m_rowCount;
+	dgInt32 m_atomicIndex;
+	dgInt32 m_clusterCount;
+	dgInt32 m_jacobianMatrixRowAtomicIndex;
+
+	dgInt32* m_bodyLocks;  
+	dgBodyInfo* m_bodyArray;
+	dgJointInfo* m_jointsArray;
+	dgBodyCluster* m_cluster;
+	dgFloat32* m_weight;
+	const dgBodyCluster* m_clusterArray;
+
+	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
+};
+
 
 class dgParallelBodySolver
 {
