@@ -837,7 +837,17 @@ DG_INLINE void dgThreadYield()
 	#endif
 }
 
-void dgSpinLock (dgInt32* const ptr);
+
+DG_INLINE void dgSpinLock(dgInt32* const ptr)
+{
+#ifndef DG_USE_THREAD_EMULATION 
+	while (dgInterlockedExchange(ptr, 1)) {
+		dgThreadYield();
+		//_mm_pause();
+	}
+#endif
+}
+
 
 DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 {

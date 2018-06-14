@@ -152,7 +152,7 @@ dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	,m_cluster(NULL)
 	,m_bodyArray(NULL)
 	,m_jointArray(NULL)
-	,m_weight____(NULL)
+	,m_weight(NULL)
 	,m_invWeight____(NULL)
 	,m_timestep(dgFloat32 (0.0f))
 	,m_invTimestep(dgFloat32(0.0f))
@@ -233,7 +233,7 @@ m_solverPasses = 16;
 		memset(&jointArray[i], 0, sizeof(dgBodyInfo));
 	}
 
-	m_weight____ = dgAlloca(dgFloat32, cluster.m_bodyCount);
+	m_weight = dgAlloca(dgFloat32, cluster.m_bodyCount);
 	m_invWeight____ = dgAlloca(dgFloat32, cluster.m_bodyCount);
 
 	InitWeights();
@@ -304,13 +304,13 @@ void dgParallelBodySolver::UpdateKinematicFeedbackKernel(void* const context, vo
 
 void dgParallelBodySolver::InitWeights()
 {
-	memset(m_weight____, 0, m_cluster->m_bodyCount * sizeof(dgFloat32));
-
 	m_atomicIndex = 0;
+	memset(m_weight, 0, m_cluster->m_bodyCount * sizeof(dgFloat32));
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(InitWeightKernel, this, NULL);
 	}
 	m_world->SynchronizationBarrier();
+	m_weight[0] = dgFloat32(1.0f);
 }
 
 void dgParallelBodySolver::InitBodyArray()
@@ -404,21 +404,22 @@ void dgParallelBodySolver::UpdateKinematicFeedback()
 
 void dgParallelBodySolver::InitWeights(dgInt32 threadID)
 {
-	dgFloat32* const invWeight = m_invWeight____;
+	dgFloat32* const weight = m_weight;
+	const dgJointInfo* const jointArray = m_jointArray;
 	const dgInt32 jointCount = m_cluster->m_jointCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
-		dgJointInfo* const jointInfo = &m_jointArray[i];
+		const dgJointInfo* const jointInfo = &jointArray[i];
 		const dgInt32 m0 = jointInfo->m_m0;
 		const dgInt32 m1 = jointInfo->m_m1;
 		dgBody* const body0 = jointInfo->m_joint->GetBody0();
 		dgBody* const body1 = jointInfo->m_joint->GetBody1();
-		{
+		if (m0) {
 			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
-			invWeight[m0] += dgFloat32(1.0f);
+			weight[m0] += dgFloat32(1.0f);
 		}
-		{
+		if (m1) {
 			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
-			invWeight[m1] += dgFloat32(1.0f);
+			weight[m1] += dgFloat32(1.0f);
 		}
 	}
 }
@@ -428,11 +429,13 @@ void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 {
 //	const dgInt32 bodyCount = m_bodyCount * DG_WORK_GROUP_SIZE;
 //	dgWorkGroupVector3 zero(dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero);
+	dgFloat32* const weight = m_weight;
+	const dgBodyInfo* const bodyArray = m_bodyArray;
 
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 //	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, DG_WORK_GROUP_SIZE)) {
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
-		dgBodyInfo* const bodyInfo = &m_bodyArray[i];
+		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 
 		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
 //		dgDynamicBody* const body0 = (dgDynamicBody*)bodyArray[0].m_body;
@@ -491,13 +494,9 @@ void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 		body->m_accel = body->m_veloc;
 		body->m_alpha = body->m_omega;
 
-		dgAssert (0);
-/*
-		const dgFloat32 weight = m_weight[i] ? m_weight[i] : dgFloat32(1.0f);
-		//m_weight[i] = weight;
-		//m_invWeight[i] = dgFloat32 (1.0f) / weight;
-		m_weight[i] = dgFloat32 (1.0f) / weight;
-*/
+		const dgFloat32 w = weight[i] ? weight[i] : dgFloat32(1.0f);
+		weight[i] = w;
+		//m_invWeight[i] = dgFloat32 (1.0f) / w;
 	}
 }
 
@@ -819,40 +818,23 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 	const dgDynamicBody* const body1 = (dgDynamicBody*)m_bodyArray[m1].m_body;
 	const bool isBilateral = jointInfo->m_joint->IsBilateral();
 
-	dgMatrix invInertia0(body0->m_invWorldInertiaMatrix);
-	dgMatrix invInertia1(body1->m_invWorldInertiaMatrix);
-
-//	const dgVector invWeight0(m_invWeight[m0]);
-//	const dgVector invWeight1(m_invWeight[m1]);
-	dgAssert (0);
-/*
-	const dgVector invWeight0(m_weight[m0]);
-	const dgVector invWeight1(m_weight[m1]);
-	const dgVector invMass0(body0->m_invMass[3] * invWeight0.GetScalar());
-	const dgVector invMass1(body1->m_invMass[3] * invWeight1.GetScalar());
-	invInertia0.m_front *= invWeight0;
-	invInertia0.m_up *= invWeight0;
-	invInertia0.m_right *= invWeight0;
-	invInertia1.m_front *= invWeight1;
-	invInertia1.m_up *= invWeight1;
-	invInertia1.m_right *= invWeight1;
+	const dgMatrix invInertia0 = body0->m_invWorldInertiaMatrix;
+	const dgMatrix invInertia1 = body1->m_invWorldInertiaMatrix;
+	const dgVector invMass0(body0->m_invMass[3]);
+	const dgVector invMass1(body1->m_invMass[3]);
 
 	dgVector force0(dgVector::m_zero);
 	dgVector torque0(dgVector::m_zero);
 	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		//dgVector weight0(dgFloat32 (1.0f) / m_weight[m0]);
-		dgVector weight0(m_weight[m0]);
-		force0 = body0->m_externalForce * weight0;
-		torque0 = body0->m_externalTorque * weight0;
+		force0 = body0->m_externalForce;
+		torque0 = body0->m_externalTorque;
 	}
 
 	dgVector force1(dgVector::m_zero);
 	dgVector torque1(dgVector::m_zero);
 	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		//dgVector weight1(dgFloat32 (1.0f) / m_weight[m1]);
-		dgVector weight1(m_weight[m1]);
-		force1 = body1->m_externalForce * weight1;
-		torque1 = body1->m_externalTorque * weight1;
+		force1 = body1->m_externalForce;
+		torque1 = body1->m_externalTorque;
 	}
 
 	jointInfo->m_preconditioner0 = dgFloat32(1.0f);
@@ -869,8 +851,6 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 
 	dgJacobian forceAcc0;
 	dgJacobian forceAcc1;
-	const dgVector preconditioner0(jointInfo->m_preconditioner0);
-	const dgVector preconditioner1(jointInfo->m_preconditioner1);
 	forceAcc0.m_linear = dgVector::m_zero;
 	forceAcc0.m_angular = dgVector::m_zero;
 	forceAcc1.m_linear = dgVector::m_zero;
@@ -878,6 +858,8 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 
 	const dgFloat32 forceImpulseScale = dgFloat32(1.0f);
 
+	const dgVector weight0(m_weight[m0] * jointInfo->m_preconditioner0);
+	const dgVector weight1(m_weight[m1] * jointInfo->m_preconditioner0);
 	for (dgInt32 i = 0; i < count; i++) {
 		dgLeftHandSide* const row = &leftHandSide[index + i];
 		dgRightHandSide* const rhs = &rightHandSide[index + i];
@@ -886,7 +868,6 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
 		row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
 		row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
-
 		dgVector tmpAccel(row->m_JMinv.m_jacobianM0.m_linear * force0 + row->m_JMinv.m_jacobianM0.m_angular * torque0 +
 						  row->m_JMinv.m_jacobianM1.m_linear * force1 + row->m_JMinv.m_jacobianM1.m_angular * torque1);
 
@@ -899,11 +880,10 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
-		dgVector jMinvM0linear(preconditioner0 * row->m_JMinv.m_jacobianM0.m_linear);
-		dgVector jMinvM0angular(preconditioner0 * row->m_JMinv.m_jacobianM0.m_angular);
-		dgVector jMinvM1linear(preconditioner1 * row->m_JMinv.m_jacobianM1.m_linear);
-		dgVector jMinvM1angular(preconditioner1 * row->m_JMinv.m_jacobianM1.m_angular);
-
+		dgVector jMinvM0linear(weight0 * row->m_JMinv.m_jacobianM0.m_linear);
+		dgVector jMinvM0angular(weight0 * row->m_JMinv.m_jacobianM0.m_angular);
+		dgVector jMinvM1linear(weight1 * row->m_JMinv.m_jacobianM1.m_linear);
+		dgVector jMinvM1angular(weight1 * row->m_JMinv.m_jacobianM1.m_angular);
 		dgVector tmpDiag(jMinvM0linear * row->m_Jt.m_jacobianM0.m_linear + jMinvM0angular * row->m_Jt.m_jacobianM0.m_angular +
 						 jMinvM1linear * row->m_Jt.m_jacobianM1.m_linear + jMinvM1angular * row->m_Jt.m_jacobianM1.m_angular);
 
@@ -912,7 +892,7 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		dgAssert(diag > dgFloat32(0.0f));
 		rhs->m_diagDamp = diag * rhs->m_stiffness;
 		diag *= (dgFloat32(1.0f) + rhs->m_stiffness);
-		//		rhs->m_jinvMJt = diag;
+		//rhs->m_jinvMJt = diag;
 		rhs->m_invJinvMJt = dgFloat32(1.0f) / diag;
 
 		dgAssert(dgCheckFloat(rhs->m_force));
@@ -923,6 +903,8 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
 	}
 
+	const dgVector preconditioner0(jointInfo->m_preconditioner0);
+	const dgVector preconditioner1(jointInfo->m_preconditioner1);
 	forceAcc0.m_linear = forceAcc0.m_linear * preconditioner0;
 	forceAcc0.m_angular = forceAcc0.m_angular * preconditioner0;
 	forceAcc1.m_linear = forceAcc1.m_linear * preconditioner1;
@@ -938,7 +920,6 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		internalForces[m1].m_linear += forceAcc1.m_linear;
 		internalForces[m1].m_angular += forceAcc1.m_angular;
 	}
-*/
 }
 
 
