@@ -149,7 +149,7 @@ baseMatrix.m_posit.m_y -= 0.1f;
 
 	for (int i = 0; i < count; i++) {
 		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
-		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
+		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x - 0.1f);
 	}
 
 	//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);

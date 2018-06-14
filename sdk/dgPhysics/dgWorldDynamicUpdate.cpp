@@ -137,7 +137,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 			count++;
 		}
 		//if (count) {
-		if (count >= 2) {
+		if (count >= 1) {
 			CalculateReactionForcesParallel(&m_clusterMemory[index], count, timestep);
 			index += count;
 		}

@@ -330,8 +330,8 @@ class dgParallelBodySolver
 	dgBodyCluster* m_cluster;
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
-	dgFloat32* m_weight;
-	dgFloat32* m_invWeight;
+	dgFloat32* m_weight____;
+	dgFloat32* m_invWeight____;
 	dgFloat32 m_timestep;
 	dgFloat32 m_invTimestep;
 	dgFloat32 m_invStepRK;

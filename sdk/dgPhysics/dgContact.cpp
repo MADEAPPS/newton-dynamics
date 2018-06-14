@@ -193,10 +193,12 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 
 	dgVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 	dgFloat32 restitution = contact.m_restitution;
-
 	dgFloat32 relVelocErr = velocError.DotProduct3(contact.m_normal);
-
 	dgFloat32 penetration = dgClamp (contact.m_penetration - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f), dgFloat32(0.5f));
+
+//restitution = 0.0f;
+//penetration = 0.0f;
+
 	dgFloat32 penetrationStiffness = MAX_PENETRATION_STIFFNESS * contact.m_softness;
 	dgFloat32 penetrationVeloc = penetration * penetrationStiffness;
 	dgAssert (dgAbs (penetrationVeloc - MAX_PENETRATION_STIFFNESS * contact.m_softness * penetration) < dgFloat32 (1.0e-6f));
