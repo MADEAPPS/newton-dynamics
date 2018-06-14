@@ -721,9 +721,10 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 		dgAssert(body->m_index == i);
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+			const dgVector weight(dgFloat32(1.0f) / m_weight[i]);
 			const dgJacobian& forceAndTorque = internalForces[i];
-			const dgVector force(body->m_externalForce + forceAndTorque.m_linear);
-			const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
+			const dgVector force(body->m_externalForce * weight + forceAndTorque.m_linear);
+			const dgVector torque(body->m_externalTorque * weight + forceAndTorque.m_angular);
 
 			const dgVector velocStep((force.Scale4(body->m_invMass.m_w)) * timestep4);
 			const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);

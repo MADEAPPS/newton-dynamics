@@ -137,7 +137,7 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 	dFloat startElevation = 100.0f;
 	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
-baseMatrix.m_posit.m_y -= 0.1f;
+//baseMatrix.m_posit.m_y -= 0.1f;
 
 	// create a material to control collision with this objects
 	int defaultMaterialID;
@@ -149,7 +149,7 @@ baseMatrix.m_posit.m_y -= 0.1f;
 
 	for (int i = 0; i < count; i++) {
 		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
-		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x - 0.1f);
+		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 	}
 
 	//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);
@@ -298,10 +298,10 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	}
 
 	high = 20;
-	high = 2;
+//	high = 2;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-//BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, -4.0f + i * 8, 0.0f), dVector(0.5f, 0.5f, 0.5f, 0.0f), high);
+BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, -4.0f + i * 8, 0.0f), dVector(0.5f, 0.5f, 0.5f, 0.0f), high);
 			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 //			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, 0.0f + i * 8, 0.0f), dVector (0.5f, 4.0f, 0.5f, 0.0f), high);
 //			BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
