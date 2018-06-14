@@ -50,7 +50,6 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 		m_parallelSolver.CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 	}
 
-
 	dgInt32 atomicIndex = 0;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&atomicIndex, 1); i < clustersCount; i = dgAtomicExchangeAndAdd(&atomicIndex, 1)) {
 		world->IntegrateVelocity(&clusterArray[i], DG_SOLVER_MAX_ERROR, timestep, 0);
@@ -226,11 +225,10 @@ m_solverPasses = 16;
 //	for (dgInt32 i = cluster.m_bodyCount; i < bodyCount; i++) {
 //		bodyArray[i] = bodyArray[0];
 //	}
-
-	const dgInt32 jointCount = m_jointCount * DG_WORK_GROUP_SIZE;
-	for (dgInt32 i = cluster.m_jointCount; i < jointCount; i++) {
-		memset(&jointArray[i], 0, sizeof(dgBodyInfo));
-	}
+//	const dgInt32 jointCount = m_jointCount * DG_WORK_GROUP_SIZE;
+//	for (dgInt32 i = cluster.m_jointCount; i < jointCount; i++) {
+//		memset(&jointArray[i], 0, sizeof(dgBodyInfo));
+//	}
 	m_weight = dgAlloca(dgFloat32, cluster.m_bodyCount);
 
 	InitWeights();
@@ -385,7 +383,7 @@ void dgParallelBodySolver::UpdateForceFeedback()
 {
 	m_atomicIndex = 0;
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitJacobianMatrixKernel, this, NULL);
+		m_world->QueueJob(UpdateForceFeedbackKernel, this, NULL);
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -970,6 +968,7 @@ xxx++;
 	if (hasJointFeeback) {
 		UpdateKinematicFeedback();
 	}
+
 }
 
 
