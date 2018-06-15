@@ -215,7 +215,7 @@ void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyIn
 
 	m_threadCounts = m_world->GetThreadCount();
 	m_solverPasses = m_world->GetSolverMode();
-m_solverPasses = 16;
+//m_solverPasses = 16;
 
 //	m_jacobianMatrixRowAtomicIndex = 0;
 	
@@ -518,7 +518,6 @@ void dgParallelBodySolver::CalculateJointsAcceleration(dgInt32 threadID)
 	}
 }
 
-
 dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, const dgJacobian* const internalForces) const
 {
 	dgVector accNorm(dgVector::m_zero);
@@ -528,7 +527,6 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 	const dgInt32 m1 = jointInfo->m_m1;
 	const dgBody* const body0 = m_bodyArray[m0].m_body;
 	const dgBody* const body1 = m_bodyArray[m1].m_body;
-
 
 	if (!(body0->m_resting & body1->m_resting)) {
 		dgVector linearM0(internalForces[m0].m_linear);
