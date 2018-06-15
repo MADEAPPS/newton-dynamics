@@ -44,6 +44,11 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
+//static int xxx;
+//xxx++;
+//if ((xxx == 44083) || (xxx == 13594) || (xxx == 5791))
+//xxx *= 1;
+
 	if (!cluster->m_isContinueCollision) {
 		if (activeJoint >= 1) {
 			BuildJacobianMatrix(cluster, threadID, timestep);
@@ -700,7 +705,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
 
 //static int xxx;
-//static int xxx0;
 
 	dgInt32 skeletonCount = 0;
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
@@ -752,8 +756,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
-//xxx++;
-
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 #ifdef DG_USE_SKEL
@@ -783,9 +785,10 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
 
-//if (jointCount == 2) {
-//dgTrace(("iter(%d) f(%f %f %f) v(%f %f %f)\n", xxx, force[0], force[1], force[2], body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]));
-//xxx0 = xxx;
+//if (body->m_uniqueID == 187) {
+//if (body->m_uniqueID == 205) {
+//if (body->m_uniqueID == 307) {
+//dgTrace(("T(%f %f %f) w(%f %f %f)\n", torque[0], torque[1], torque[2], body->m_omega[0], body->m_omega[1], body->m_omega[2]));
 //}
 
 					} else {

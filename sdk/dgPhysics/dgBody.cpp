@@ -322,6 +322,9 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dgAssert (m_matrix.TestOrthogonal());
 
+//if (m_uniqueID == 307) {
+//dgTrace(("w(%f %f %f)\n", m_omega[0], m_omega[1], m_omega[2]));
+//}
 //dgVector angularMomentum (CalculateAngularMomentum());
 //dgTrace(("E(%f) L(%f %f %f) W(%f %f %f)\n", m_omega.DotProduct3(angularMomentum), angularMomentum.m_x, angularMomentum.m_y, angularMomentum.m_z, m_omega.m_x, m_omega.m_y, m_omega.m_z));
 }
