@@ -152,6 +152,7 @@ dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	,m_bodyArray(NULL)
 	,m_jointArray(NULL)
 	,m_weight(NULL)
+	,m_invWeight(NULL)
 	,m_timestep(dgFloat32 (0.0f))
 	,m_invTimestep(dgFloat32(0.0f))
 	,m_invStepRK(dgFloat32(0.0f))
@@ -230,6 +231,7 @@ void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyIn
 //		memset(&jointArray[i], 0, sizeof(dgBodyInfo));
 //	}
 	m_weight = dgAlloca(dgFloat32, cluster.m_bodyCount);
+	m_invWeight = dgAlloca(dgFloat32, cluster.m_bodyCount);
 
 	InitWeights();
 	InitBodyArray();
@@ -425,6 +427,7 @@ void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 //	const dgInt32 bodyCount = m_bodyCount * DG_WORK_GROUP_SIZE;
 //	dgWorkGroupVector3 zero(dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero, dgWorkGroupFloat::m_zero);
 	dgFloat32* const weight = m_weight;
+	dgFloat32* const invWeight = m_invWeight;
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
@@ -491,10 +494,9 @@ void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 
 		const dgFloat32 w = weight[i] ? weight[i] : dgFloat32(1.0f);
 		weight[i] = w;
-		//m_invWeight[i] = dgFloat32 (1.0f) / w;
+		invWeight[i] = dgFloat32 (1.0f) / w;
 	}
 }
-
 
 void dgParallelBodySolver::CalculateJointsAcceleration(dgInt32 threadID)
 {
@@ -623,7 +625,6 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 			dgRightHandSide* const rhs = &rightHandSide[index + i];
 			rhs->m_maxImpact = dgMax(dgAbs(rhs->m_force), rhs->m_maxImpact);
 		}
-
 	}
 	return accNorm.GetScalar();
 }
@@ -651,6 +652,7 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 	const dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_jacobianBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
 	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+	const dgFloat32* const invWeight = m_invWeight;
 
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	const int jointCount = m_cluster->m_jointCount;
@@ -681,7 +683,7 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 
 		if (m0)
 		{
-			const dgVector weight0(dgFloat32 (1.0f) / m_weight[m0]);
+			const dgVector weight0(invWeight[m0]);
 			dgBody* const body0 = jointInfo->m_joint->GetBody0();
 			forceAcc0.m_linear = forceAcc0.m_linear * weight0;
 			forceAcc0.m_angular = forceAcc0.m_angular * weight0;
@@ -691,7 +693,7 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 		}
 		if (m1) 
 		{
-			const dgVector weight1(dgFloat32(1.0f) / m_weight[m1]);
+			const dgVector weight1(invWeight[m1]);
 			dgBody* const body1 = jointInfo->m_joint->GetBody1();
 			forceAcc1.m_linear = forceAcc1.m_linear * weight1;
 			forceAcc1.m_angular = forceAcc1.m_angular * weight1;
@@ -709,6 +711,7 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 	dgVector freezeOmega2(m_world->m_freezeOmega2 * dgFloat32(0.1f));
 
 	dgVector timestep4(m_timestepRK);
+	const dgFloat32* const weight = m_weight;
 	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
@@ -717,11 +720,10 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 		dgAssert(body->m_index == i);
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			//const dgVector weight(dgFloat32(1.0f) / m_weight[i]);
-			const dgVector weight(m_weight[i]);
+			const dgVector w(weight[i]);
 			const dgJacobian& forceAndTorque = internalForces[i];
-			const dgVector force(body->m_externalForce + forceAndTorque.m_linear * weight);
-			const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular * weight);
+			const dgVector force(body->m_externalForce + forceAndTorque.m_linear * w);
+			const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular * w);
 
 			const dgVector velocStep((force.Scale4(body->m_invMass.m_w)) * timestep4);
 			const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
@@ -965,7 +967,6 @@ void dgParallelBodySolver::CalculateForces()
 	if (hasJointFeeback) {
 		UpdateKinematicFeedback();
 	}
-
 }
 
 

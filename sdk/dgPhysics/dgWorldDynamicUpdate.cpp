@@ -140,8 +140,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 			index += count;
 		}
 	}
-//static int xxx;
-//xxx++;
 
 	if (index < m_clusters) {
 		descriptor.m_atomicCounter = 0;

@@ -38,6 +38,7 @@ dgWorldPluginList::~dgWorldPluginList()
 
 void dgWorldPluginList::LoadPlugins()
 {
+/*
 	char plugInPath[2048];
 	char rootPathInPath[2048];
 
@@ -85,6 +86,7 @@ void dgWorldPluginList::LoadPlugins()
 
 		_findclose(handle);
 	}
+*/
 }
 
 void dgWorldPluginList::UnloadPlugins()
