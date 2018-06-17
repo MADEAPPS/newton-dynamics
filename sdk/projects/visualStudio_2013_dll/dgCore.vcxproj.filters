@@ -96,9 +96,6 @@
     <ClCompile Include="..\..\dgCore\dgSmallDeterminant.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dgCore\dgAsyncThread.cpp">
-      <Filter>threading</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dgCore\dgMutexThread.cpp">
       <Filter>threading</Filter>
     </ClCompile>
@@ -220,9 +217,6 @@
     </ClInclude>
     <ClInclude Include="..\..\dgCore\dgVector.h">
       <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dgCore\dgAsyncThread.h">
-      <Filter>threading</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgCore\dgMutexThread.h">
       <Filter>threading</Filter>
