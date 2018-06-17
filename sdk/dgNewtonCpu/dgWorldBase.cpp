@@ -59,16 +59,16 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		};
 	} info;
 
-	dgFloatSse::m_one = dgFloatSse(1.0f);
-	dgFloatSse::m_zero = dgFloatSse(0.0f);
-	dgFloatAvx::m_one = dgFloatAvx(1.0f);
-	dgFloatAvx::m_zero = dgFloatAvx(0.0f);
-	dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
-	dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
-
 	// avx2 support in code 7, register ebx bit5
 	__cpuid(info.data, 7);
 	if (info.ebx & (1 << 5)) {
+		dgFloatSse::m_one = dgFloatSse(1.0f);
+		dgFloatSse::m_zero = dgFloatSse(0.0f);
+		dgFloatAvx::m_one = dgFloatAvx(1.0f);
+		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
+		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
+		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
+
 		//cpu support avx2
 		//static dgWorldSse module(world, allocator);
 		static dgWorldAvx module(world, allocator);
@@ -79,12 +79,19 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	// avx support is encoded on register ecx bit 28
 	__cpuid(info.data, 1);
 	if (info.ecx & (1 << 28)) {
+		dgFloatSse::m_one = dgFloatSse(1.0f);
+		dgFloatSse::m_zero = dgFloatSse(0.0f);
+		dgFloatAvx::m_one = dgFloatAvx(1.0f);
+		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
+		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
+		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
+
 		//cpu support avx
 		static dgWorldAvx module(world, allocator);
 		return &module;
 	}
 
-	dgAssert(0);
+//	dgAssert(0);
 	return NULL;
 }
 
