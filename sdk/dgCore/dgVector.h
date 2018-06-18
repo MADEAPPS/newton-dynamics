@@ -181,6 +181,10 @@ class dgTemplateVector
 		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
 
+	T GetMax () const
+	{
+		return dgMax(dgMax(m_x, m_y), dgMax(m_z, m_w));
+	}
 
 	DG_INLINE dgTemplateVector<T> GetMax(const dgTemplateVector<T>& data) const
 	{
@@ -490,6 +494,11 @@ class dgVector
 			(m_y > dgFloat32 (0.0f)) ? m_y : -m_y,
 			(m_z > dgFloat32 (0.0f)) ? m_z : -m_z,
 			(m_w > dgFloat32 (0.0f)) ? m_w : -m_w);
+	}
+
+	dgFloat32 GetMax () const
+	{
+		return dgMax(dgMax(m_x, m_y), dgMax(m_z, m_w));
 	}
 
 	dgVector GetMax (const dgVector& data) const
@@ -909,6 +918,11 @@ class dgBigVector
 							(m_y > dgFloat64 (0.0f)) ? m_y : -m_y,
 							(m_z > dgFloat64 (0.0f)) ? m_z : -m_z,
 							(m_w > dgFloat64 (0.0f)) ? m_w : -m_w);
+	}
+
+	dgFloat64 GetMax () const
+	{
+		return dgMax(dgMax(m_x, m_y), dgMax(m_z, m_w));
 	}
 
 	dgBigVector GetMax (const dgBigVector& data) const
@@ -1392,6 +1406,12 @@ class dgVector
 		return _mm_and_ps (m_type, m_signMask.m_type);
 	}
 
+	dgFloat32 GetMax () const
+	{
+		__m128 tmp (_mm_max_ps (m_type, _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
+		return dgVector (_mm_max_ps (tmp, _mm_shuffle_ps (tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)))).GetScalar();
+	}
+
 	dgVector GetMax (const dgVector& data) const
 	{
 		return _mm_max_ps (m_type, data.m_type);
@@ -1806,6 +1826,12 @@ class dgBigVector
 		//return *this * (DotProduct4(*this).InvSqrt());
 		dgFloat64 mag2 = DotProduct4(*this).GetScalar();
 		return Scale4(dgFloat64 (1.0f) / sqrt (mag2));
+	}
+
+	dgFloat64 GetMax() const
+	{
+		__m128d tmp(_mm_max_pd(m_typeLow, m_typeHigh));
+		return dgBigVector(_mm_max_pd(tmp, _mm_shuffle_pd(tmp, tmp, PERMUT_MASK_DOUBLE(0, 1))), tmp).GetScalar();
 	}
 
 	dgBigVector GetMax(const dgBigVector& data) const

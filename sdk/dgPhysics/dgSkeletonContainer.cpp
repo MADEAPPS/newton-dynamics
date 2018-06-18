@@ -466,13 +466,10 @@ void dgSkeletonContainer::ClearSelfCollision()
 
 void dgSkeletonContainer::AddSelfCollisionJoint(dgContact* const contact)
 {
-//	joint->m_isInSkeleton = true;
-#if 1
 	m_world->GlobalLock();
 	m_loopingJoints[m_loopCount + m_selfContactCount] = contact;
 	m_selfContactCount++;
 	m_world->GlobalUnlock();
-#endif
 }
 
 void dgSkeletonContainer::SortGraph(dgNode* const root, dgInt32& index)
@@ -1051,7 +1048,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		const dgJacobian& y1 = internalForces[m1];
 
 		dgFloat32 normalForce[DG_CONSTRAINT_MAX_ROWS + 1];
-		normalForce[auxiliaryDof] = dgFloat32 (1.0f);
+		normalForce[0] = dgFloat32 (1.0f);
 		for (dgInt32 i = 0; i < auxiliaryDof; i++) {
 			const dgLeftHandSide* const row = &m_leftHandSide[first + i];
 			const dgRightHandSide* const rhs = &m_rightHandSide[first + i];
@@ -1060,10 +1057,10 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			dgVector acc(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 						 row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
 			b[auxiliaryIndex] = rhs->m_coordenateAccel - acc.AddHorizontal().GetScalar();
-			
-			dgInt32 frictionIndex = rhs->m_normalForceIndex;
-			dgAssert(frictionIndex >= 0);
-			dgAssert(frictionIndex <= auxiliaryDof);
+
+			dgAssert(rhs->m_normalForceIndex >= -1);
+			dgAssert(rhs->m_normalForceIndex <= auxiliaryDof);
+			dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
 			dgFloat32 frictionNormal = normalForce[frictionIndex];
 			dgFloat32 lowerFrictionForce = frictionNormal * rhs->m_lowerBoundFrictionCoefficent;
 			dgFloat32 upperFrictionForce = frictionNormal * rhs->m_upperBoundFrictionCoefficent;
@@ -1075,7 +1072,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			low[auxiliaryIndex] = dgClamp(lowerFrictionForce - rhs->m_force, -DG_MAX_BOUND, dgFloat32(0.0f));
 			high[auxiliaryIndex] = dgClamp(upperFrictionForce - rhs->m_force, dgFloat32(0.0f), DG_MAX_BOUND);
 
-			normalForce[i] = rhs->m_force;
+			normalForce[i + 1] = rhs->m_force;
 			auxiliaryIndex++;
 		}
 	}
@@ -1171,7 +1168,6 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 			const dgJointInfo& info = jointInfoArray[node->m_joint->m_index];
 			rowCount += info.m_pairCount;
 			auxiliaryCount += node->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
-
 		}
 		m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
 	}

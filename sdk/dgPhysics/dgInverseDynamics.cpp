@@ -192,7 +192,6 @@ class dgInverseDynamics::dgNode
 
 			for (dgInt32 i = 0; i < count; i++) {
 				dgInt32 k = m_sourceJacobianIndex[i];
-				//const dgLeftHandSide* const row = &matrixRow[k + first];
 				const dgRightHandSide* const rhs = &rightHandSide[k + first];
 				if (rhs->m_normalForceIndex) {
 					bool test0 = rhs->m_lowerBoundFrictionCoefficent <= dgFloat32 (-DG_LCP_MAX_VALUE);

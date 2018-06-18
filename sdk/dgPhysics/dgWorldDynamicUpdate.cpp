@@ -34,8 +34,8 @@
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 //#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(256)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(128)
-//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(1)
+//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(128)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(1)
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
 
@@ -59,7 +59,7 @@ class dgWorldDynamicUpdateSyncDescriptor
 void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount)
 {
 	world->m_solverJacobiansMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgLeftHandSide));
-	m_jacobianBuffer = (dgLeftHandSide*)&world->m_solverJacobiansMemory[0];
+	m_leftHandSizeBuffer = (dgLeftHandSide*)&world->m_solverJacobiansMemory[0];
 
 	world->m_solverRightHandSideMemory.ResizeIfNecessary((rowsCount + 1) * sizeof(dgRightHandSide));
 	m_righHandSizeBuffer = (dgRightHandSide*)&world->m_solverRightHandSideMemory[0];
@@ -68,7 +68,7 @@ void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bod
 	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
 	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof(dgJacobian))) & (-8)));
 
-	dgAssert((dgUnsigned64(m_jacobianBuffer) & 0x01f) == 0);
+	dgAssert((dgUnsigned64(m_leftHandSizeBuffer) & 0x01f) == 0);
 	dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
 }
 
@@ -283,11 +283,9 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						constraint->m_dynamicsLru = lruMark;
 
 						constraintArray[jointIndex].m_joint = constraint;
-						//const dgInt16 rows = dgInt16((constraint->m_maxDOF + vectorStride - 1) & (-vectorStride));
-						const dgInt16 rows = dgInt16(constraint->m_maxDOF);
+						const dgInt32 rows = constraint->m_maxDOF;
 						constraintArray[jointIndex].m_pairStart = 0;
 						constraintArray[jointIndex].m_pairCount = rows;
-						constraintArray[jointIndex].m_paddedPairCount = rows;
 						jointCount++;
 
 						dgAssert(constraint->m_body0);
@@ -303,7 +301,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			}
 		}
 	}
-
 
 	dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	if (globalAutoSleep) {
@@ -595,7 +592,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 	}
 }
 
-
 dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const
 {
 	dgInt32 dof = dgInt32(constraint->m_maxDOF);
@@ -637,9 +633,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		}
 	}
 
+	jointInfo->m_pairCount = dof;
 	jointInfo->m_pairStart = rowCount;
-	jointInfo->m_pairCount = dgInt16 (dof);
-	jointInfo->m_paddedPairCount = dgInt16(dof);
+	//jointInfo->m_paddedPairCount = dgInt16(dof);
 	for (dgInt32 i = 0; i < dof; i++) {
 		dgAssert(constraintParam.m_forceBounds[i].m_jointForce);
 
@@ -661,16 +657,16 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
 
-		dgInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex < 0 ? dof : constraintParam.m_forceBounds[i].m_normalIndex;
-		rhs->m_normalForceIndex = frictionIndex;
+//		dgInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex < 0 ? dof : constraintParam.m_forceBounds[i].m_normalIndex;
+//		rhs->m_normalForceIndex = frictionIndex;
+		dgAssert (constraintParam.m_forceBounds[i].m_normalIndex >= -1);
+		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		rowCount++;
 	}
 //  we separate left and right hand side not to align row to near multiple of 4
 //	rowCount = (rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) ? ((rowCount & (-dgInt32(sizeof(dgVector) / sizeof(dgFloat32)))) + dgInt32(sizeof(dgVector) / sizeof(dgFloat32))) : rowCount;
 //	dgAssert((rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) == 0);
-
 	constraint->ResetInverseDynamics();
-
 	return rowCount;
 }
 
@@ -850,7 +846,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
-	dgLeftHandSide* const leftHandSide = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
+	dgLeftHandSide* const leftHandSide = &m_solverMemory.m_leftHandSizeBuffer[cluster->m_rowsStart];
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowsStart];
 
 	dgInt32 rowCount = 0;

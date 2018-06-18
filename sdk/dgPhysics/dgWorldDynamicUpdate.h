@@ -96,8 +96,7 @@ class dgJointInfo
 	dgInt32 m_m0;
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
-	dgInt16 m_pairCount;
-	dgInt16 m_paddedPairCount;
+	dgInt32 m_pairCount;
 };
 
 
@@ -191,8 +190,8 @@ class dgJacobianMemory
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
 	dgJacobian* m_internalForcesBuffer;
+	dgLeftHandSide* m_leftHandSizeBuffer;
 	dgRightHandSide* m_righHandSizeBuffer;
-	dgLeftHandSide* m_jacobianBuffer;
 };
 
 class dgWorldDynamicUpdate
@@ -208,7 +207,6 @@ class dgWorldDynamicUpdate
 	dgInt32 SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
-	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	static dgInt32 CompareClusters(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
@@ -217,7 +215,7 @@ class dgWorldDynamicUpdate
 	void ResolveClusterForces (dgBodyCluster* const cluste, dgInt32 threadID, dgFloat32 timestep) const;
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const;
-	void CalculateClusterReactionForces (const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
+	void CalculateClusterReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void CalculateReactionForcesParallel(const dgBodyCluster* const clusters, dgInt32 clustersCount, dgFloat32 timestep);
 		
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;

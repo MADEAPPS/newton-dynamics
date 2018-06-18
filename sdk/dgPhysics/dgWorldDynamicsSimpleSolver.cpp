@@ -392,7 +392,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 	const dgBody* const body1 = bodyArray[m1].m_body;
 
 	if (!(body0->m_resting & body1->m_resting)) {
-		dgFloat32 normalForce[DG_CONSTRAINT_MAX_ROWS + 4];
+		dgFloat32 normalForce[DG_CONSTRAINT_MAX_ROWS + 1];
 		dgVector linearM0(internalForces[m0].m_linear);
 		dgVector angularM0(internalForces[m0].m_angular);
 		dgVector linearM1(internalForces[m1].m_linear);
@@ -404,16 +404,15 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 		const dgInt32 index = jointInfo->m_pairStart;
 		const dgInt32 rowsCount = jointInfo->m_pairCount;
 
-		normalForce[rowsCount] = dgFloat32 (1.0f);
-		
+		normalForce[0] = dgFloat32 (1.0f);
 		dgVector firstPass(dgVector::m_one);
 		dgVector maxAccel(dgVector::m_three);
 		const dgFloat32 restAcceleration = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR * dgFloat32(4.0f);
 		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > restAcceleration); i++) {
 			maxAccel = dgFloat32(0.0f);
-			for (dgInt32 k = 0; k < rowsCount; k++) {
-				dgRightHandSide* const rhs = &rightHandSide[index + k];
-				const dgLeftHandSide* const row = &matrixRow[index + k];
+			for (dgInt32 j = 0; j < rowsCount; j++) {
+				dgRightHandSide* const rhs = &rightHandSide[index + j];
+				const dgLeftHandSide* const row = &matrixRow[index + j];
 
 				dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
 				dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
@@ -426,9 +425,9 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 				dgVector accel(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp - (diag.AddHorizontal()).GetScalar());
 				dgVector force(rhs->m_force + rhs->m_invJinvMJt * accel.GetScalar());
 
-				dgInt32 frictionIndex = rhs->m_normalForceIndex;
-				dgAssert (frictionIndex >= 0);
-				dgAssert (frictionIndex <= rowsCount);
+				dgAssert (rhs->m_normalForceIndex >= -1);
+				dgAssert (rhs->m_normalForceIndex <= rowsCount);
+				dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
 
 				dgFloat32 frictionNormal = normalForce[frictionIndex];
 				dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
@@ -444,7 +443,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 
 				dgVector deltaForce(force - dgVector(rhs->m_force));
 				rhs->m_force = force.GetScalar();
-				normalForce[k] = force.GetScalar();
+				normalForce[j + 1] = force.GetScalar();
 
 				dgVector deltaforce0(preconditioner0 * deltaForce);
 				dgVector deltaforce1(preconditioner1 * deltaForce);
@@ -494,19 +493,19 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		const dgVector preconditioner0(jointInfo->m_preconditioner0);
 		const dgVector preconditioner1(jointInfo->m_preconditioner1);
 
-		normalForce[rowsCount] = dgFloat32(1.0f);
+		normalForce[0] = dgFloat32(1.0f);
 		const dgInt32 rowStart = jointInfo->m_pairStart;
-		for (dgInt32 k = 0; k < rowsCount; k++) {
-			dgRightHandSide* const rhs = &rightHandSide[rowStart + k];
-			const dgLeftHandSide* const row = &matrixRow[rowStart + k];
+		for (dgInt32 j = 0; j < rowsCount; j++) {
+			dgRightHandSide* const rhs = &rightHandSide[rowStart + j];
+			const dgLeftHandSide* const row = &matrixRow[rowStart + j];
 			dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
 					   row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
 			a = dgVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 
 			dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
-			dgAssert(rhs->m_normalForceIndex >= 0);
+			dgAssert(rhs->m_normalForceIndex >= -1);
 			dgAssert(rhs->m_normalForceIndex <= rowsCount);
-			dgInt32 frictionIndex = rhs->m_normalForceIndex;
+			dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
 
 			dgFloat32 frictionNormal = normalForce[frictionIndex];
 			dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
@@ -519,7 +518,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			dgVector deltaForce(f - dgVector(rhs->m_force));
 
 			rhs->m_force = f.GetScalar();
-			normalForce[k] = f.GetScalar();
+			normalForce[j + 1] = f.GetScalar();
 
 			dgVector deltaforce0(preconditioner0 * deltaForce);
 			dgVector deltaforce1(preconditioner1 * deltaForce);
@@ -534,18 +533,18 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		const dgFloat32 tol2 = tol * tol;
 		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > tol2); i++) {
 			maxAccel = dgVector::m_zero;
-			for (dgInt32 k = 0; k < rowsCount; k++) {
-				dgRightHandSide* const rhs = &rightHandSide[rowStart + k];
-				const dgLeftHandSide* const row = &matrixRow[rowStart + k];
+			for (dgInt32 j = 0; j < rowsCount; j++) {
+				dgRightHandSide* const rhs = &rightHandSide[rowStart + j];
+				const dgLeftHandSide* const row = &matrixRow[rowStart + j];
 
 				dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
 						   row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
 				a = dgVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 
 				dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
-				dgAssert(rhs->m_normalForceIndex >= 0);
+				dgAssert(rhs->m_normalForceIndex >= -1);
 				dgAssert(rhs->m_normalForceIndex <= rowsCount);
-				dgInt32 frictionIndex = rhs->m_normalForceIndex;
+				dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
 
 				dgFloat32 frictionNormal = normalForce[frictionIndex];
 				dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
@@ -558,7 +557,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				dgVector deltaForce(f - dgVector(rhs->m_force));
 
 				rhs->m_force = f.GetScalar();
-				normalForce[k] = f.GetScalar();
+				normalForce[j + 1] = f.GetScalar();
 
 				dgVector deltaforce0(preconditioner0 * deltaForce);
 				dgVector deltaforce1(preconditioner1 * deltaForce);
@@ -571,7 +570,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[rowStart + i];
-			//dgLeftHandSide* const row = &leftHandSide[rowStart + i];
 			rhs->m_maxImpact = dgMax(dgAbs(rhs->m_force), rhs->m_maxImpact);
 		}
 
@@ -593,7 +591,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	dgMatrix matrix(body->m_gyroRotation, dgVector::m_wOne);
 	dgVector localOmega(matrix.UnrotateVector(body->m_omega));
 	dgVector localTorque(matrix.UnrotateVector(torque));
-	
+
 	// and solving for alpha we get the angular acceleration at t + dt
 	// calculate gradient at a full time step
 	dgVector gradientStep(localTorque * timestep);
@@ -682,7 +680,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowsStart];
-	const dgLeftHandSide* const leftHandSide = &m_solverMemory.m_jacobianBuffer[cluster->m_rowsStart];
+	const dgLeftHandSide* const leftHandSide = &m_solverMemory.m_leftHandSizeBuffer[cluster->m_rowsStart];
 
 	const dgInt32 derivativesEvaluationsRK4 = 4;
 	dgFloat32 invTimestep = (timestep > dgFloat32(0.0f)) ? dgFloat32(1.0f) / timestep : dgFloat32(0.0f);
@@ -728,7 +726,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			joindDesc.m_leftHandSide = &leftHandSide[pairStart];
 			joindDesc.m_rightHandSide = &rightHandSide[pairStart];
 			constraint->JointAccelerations(&joindDesc);
-
+			
 			const dgVector& gyroTorque0 = constraint->m_body0->m_gyroTorque;
 			const dgVector& gyroTorque1 = constraint->m_body1->m_gyroTorque;
 			for (dgInt32 j = 0; j < jointInfo->m_pairCount; j++) {

@@ -317,7 +317,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 			dgFloat32 aRel = rhs->m_deltaAccel;
 
-			if (rhs->m_normalForceIndex == count) {
+			if (rhs->m_normalForceIndex == DG_INDEPENDENT_ROW) {
 				dgAssert (rhs->m_restitution >= 0.0f);
 				dgAssert (rhs->m_restitution <= 2.0f);
 				dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + rhs->m_restitution) : dgFloat32 (1.0f);

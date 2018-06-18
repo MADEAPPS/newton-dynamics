@@ -29,9 +29,9 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-
+//#define DG_SOLVER_USES_SOA
 #define DG_WORK_GROUP_SIZE	(2 * sizeof (dgVector)/sizeof (dgFloat32)) 
-/*
+
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupFloat
 {
@@ -71,14 +71,14 @@ class dgWorkGroupFloat
 		return dgWorkGroupFloat(m_low + A.m_low, m_high + A.m_high);
 	}
 
+	DG_INLINE dgWorkGroupFloat operator- (const dgWorkGroupFloat& A) const
+	{
+		return dgWorkGroupFloat(m_low - A.m_low, m_high - A.m_high);
+	}
+
 	DG_INLINE dgWorkGroupFloat operator* (const dgWorkGroupFloat& A) const
 	{
 		return dgWorkGroupFloat(m_low * A.m_low, m_high * A.m_high);
-	}
-
-	DG_INLINE dgWorkGroupFloat Reciproc () const
-	{
-		return dgWorkGroupFloat(m_low.Reciproc(), m_high.Reciproc());
 	}
 
 	DG_INLINE dgWorkGroupFloat operator> (const dgWorkGroupFloat& A) const
@@ -86,20 +86,34 @@ class dgWorkGroupFloat
 		return dgWorkGroupFloat(m_low > A.m_low, m_high > A.m_high);
 	}
 
-	DG_INLINE dgWorkGroupFloat Select (const dgWorkGroupFloat& A, const dgWorkGroupFloat& B) const
+	DG_INLINE dgWorkGroupFloat operator< (const dgWorkGroupFloat& A) const
 	{
-		return dgWorkGroupFloat((A.m_low & m_low) | B.m_low.AndNot(m_low), (A.m_high & m_high) | B.m_high.AndNot(m_high));
+		return dgWorkGroupFloat(m_low < A.m_low, m_high < A.m_high);
 	}
 
-	DG_INLINE dgWorkGroupFloat MulAdd (const dgWorkGroupFloat& B, const dgWorkGroupFloat& C) const
+	DG_INLINE dgWorkGroupFloat operator| (const dgWorkGroupFloat& A) const
 	{
-		return *this + B * C;
+		return dgWorkGroupFloat(m_low | A.m_low, m_high | A.m_high);
 	}
 
-	DG_INLINE void Store(dgFloat32* const ptr) const
+	DG_INLINE dgWorkGroupFloat AndNot (const dgWorkGroupFloat& A) const
 	{
-		m_low.Store(ptr);
-		m_high.Store(&ptr[4]);
+		return dgWorkGroupFloat(m_low.AndNot(A.m_low), m_high.AndNot(A.m_high));
+	}
+
+	DG_INLINE dgWorkGroupFloat GetMin(const dgWorkGroupFloat& A) const
+	{
+		return dgWorkGroupFloat(m_low.GetMin(A.m_low), m_high.GetMin(A.m_high));
+	}
+
+	DG_INLINE dgWorkGroupFloat GetMax(const dgWorkGroupFloat& A) const
+	{
+		return dgWorkGroupFloat(m_low.GetMax(A.m_low), m_high.GetMax(A.m_high));
+	}
+
+	DG_INLINE dgFloat32 GetMax() const
+	{
+		return (m_low.GetMax(m_high)).GetMax();
 	}
 
 	DG_INLINE static void Transpose4x8(dgWorkGroupFloat& src0, dgWorkGroupFloat& src1, dgWorkGroupFloat& src2, dgWorkGroupFloat& src3)
@@ -110,6 +124,7 @@ class dgWorkGroupFloat
 
 	union {
 		dgFloat32 m_f[DG_WORK_GROUP_SIZE];
+		dgInt32 m_i[DG_WORK_GROUP_SIZE];
 		struct {
 			dgVector m_low;
 			dgVector m_high;
@@ -120,64 +135,18 @@ class dgWorkGroupFloat
 	static dgWorkGroupFloat m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
+
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupVector3
 {
 	public:
-	DG_INLINE dgWorkGroupVector3()
-		:m_x()
-		,m_y()
-		,m_z()
-	{
-	}
-
-	DG_INLINE dgWorkGroupVector3(const dgWorkGroupFloat& x, const dgWorkGroupFloat& y, const dgWorkGroupFloat& z)
-		:m_x(x)
-		,m_y(y)
-		,m_z(z)
-	{
-	}
-
-	DG_INLINE dgWorkGroupVector3(const dgVector& v0, const dgVector& v1, const dgVector& v2, const dgVector& v3, const dgVector& v4, const dgVector& v5, const dgVector& v6, const dgVector& v7)
-		:m_x()
-		,m_y()
-		,m_z()
-	{
-		dgWorkGroupFloat r0(v0, v4);
-		dgWorkGroupFloat r1(v1, v5);
-		dgWorkGroupFloat r2(v2, v6);
-		dgWorkGroupFloat r3(v3, v7);
-		dgWorkGroupFloat::Transpose4x8(r0, r1, r2, r3);
-		m_x = r0;
-		m_y = r1;
-		m_z = r2;
-	}
-
-	DG_INLINE dgWorkGroupVector3 Scale(const dgWorkGroupFloat& a) const
-	{
-		return dgWorkGroupVector3(m_x * a, m_y * a, m_z * a);
-	}
-
-	DG_INLINE dgWorkGroupVector3 operator* (const dgWorkGroupVector3& a) const
-	{
-		return dgWorkGroupVector3(m_x * a.m_x, m_y * a.m_y, m_z * a.m_z);
-	}
-
-
-	DG_INLINE void Store(dgFloat32* const ptr) const
-	{
-		m_x.Store(&ptr[0 * DG_WORK_GROUP_SIZE]);
-		m_y.Store(&ptr[1 * DG_WORK_GROUP_SIZE]);
-		m_z.Store(&ptr[2 * DG_WORK_GROUP_SIZE]);
-	}
-
 	dgWorkGroupFloat m_x;
 	dgWorkGroupFloat m_y;
 	dgWorkGroupFloat m_z;
 } DG_GCC_VECTOR_ALIGMENT;
 
 
-DG_MSC_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupVector6
 {
 	public:
@@ -186,85 +155,30 @@ class dgWorkGroupVector6
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_VECTOR_ALIGMENT
-class dgWorkGroupMatrix3x3
+class dgSolverSoaJacobianPair
 {
 	public:
-	DG_INLINE dgWorkGroupMatrix3x3()
-	{
-	}
-
-	DG_INLINE dgWorkGroupMatrix3x3(const dgWorkGroupVector3& right, const dgWorkGroupVector3& up, const dgWorkGroupVector3& front)
-		:m_right(right)
-		,m_up(up)
-		,m_front(front)
-	{
-	}
-
-	DG_INLINE dgWorkGroupMatrix3x3(const dgMatrix& matrix0, const dgMatrix& matrix1, const dgMatrix& matrix2, const dgMatrix& matrix3, const dgMatrix& matrix4, const dgMatrix& matrix5, const dgMatrix& matrix6, const dgMatrix& matrix7)
-		:m_right(matrix0[0], matrix1[0], matrix2[0], matrix3[0], matrix4[0], matrix5[0], matrix6[0], matrix7[0])
-		,m_up(matrix0[1], matrix1[1], matrix2[1], matrix3[1], matrix4[1], matrix5[1], matrix6[1], matrix7[1])
-		,m_front(matrix0[2], matrix1[2], matrix2[2], matrix3[2], matrix4[2], matrix5[2], matrix6[2], matrix7[2])
-	{
-	}
-
-	DG_INLINE dgWorkGroupMatrix3x3 operator* (const dgWorkGroupMatrix3x3& a) const
-	{
-		return dgWorkGroupMatrix3x3(a.RotateVector(m_front), a.RotateVector(m_up), a.RotateVector(m_right));
-	}
-
-
-	DG_INLINE dgWorkGroupVector3 RotateVector(const dgWorkGroupVector3& a) const
-	{
-		dgWorkGroupFloat x(a.m_x * m_front.m_x + a.m_y * m_up.m_x + a.m_z * m_right.m_x);
-		dgWorkGroupFloat y(a.m_x * m_front.m_y + a.m_y * m_up.m_y + a.m_z * m_right.m_y);
-		dgWorkGroupFloat z(a.m_x * m_front.m_z + a.m_y * m_up.m_z + a.m_z * m_right.m_z);
-		return dgWorkGroupVector3(x, y, z);
-	}
-
-	DG_INLINE dgWorkGroupVector3 UnrotateVector(const dgWorkGroupVector3& a) const
-	{
-		dgWorkGroupFloat x(a.m_x * m_front.m_x + a.m_y * m_front.m_y + a.m_z * m_front.m_z);
-		dgWorkGroupFloat y(a.m_x * m_up.m_x + a.m_y * m_up.m_y + a.m_z * m_up.m_z);
-		dgWorkGroupFloat z(a.m_x * m_right.m_x + a.m_y * m_right.m_y + a.m_z * m_right.m_z);
-		return dgWorkGroupVector3(x, y, z);
-	}
-
-	DG_INLINE dgWorkGroupMatrix3x3 Transposed() const
-	{
-		return dgWorkGroupMatrix3x3(
-			dgWorkGroupVector3(m_front.m_x, m_up.m_x, m_right.m_x),
-			dgWorkGroupVector3(m_front.m_y, m_up.m_y, m_right.m_y),
-			dgWorkGroupVector3(m_front.m_z, m_up.m_z, m_right.m_z));
-	}
-
-
-	dgWorkGroupVector3 m_front;
-	dgWorkGroupVector3 m_up;
-	dgWorkGroupVector3 m_right;
+	dgWorkGroupVector6 m_jacobianM0;
+	dgWorkGroupVector6 m_jacobianM1;
 } DG_GCC_VECTOR_ALIGMENT;
 
 
-
-template<class T>
-class dgParallelVector: public dgArray<T>
+DG_MSC_VECTOR_ALIGMENT
+class dgSolverSoaElement
 {
 	public:
-	dgParallelVector(dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
-		:dgArray<T>(allocator, aligmentInBytes)
-	{
-	}
+	dgSolverSoaJacobianPair m_Jt;
+	dgSolverSoaJacobianPair m_JMinv;
 
-	DG_INLINE T& operator[] (dgInt32 i)
-	{
-		return m_array[i];
-	}
+	dgWorkGroupFloat m_force;
+	dgWorkGroupFloat m_diagDamp;
+	dgWorkGroupFloat m_invJinvMJt;
+	dgWorkGroupFloat m_coordenateAccel;
+	dgWorkGroupFloat m_normalForceIndex;
+	dgWorkGroupFloat m_lowerBoundFrictionCoefficent;
+	dgWorkGroupFloat m_upperBoundFrictionCoefficent;
+} DG_GCC_VECTOR_ALIGMENT;
 
-	DG_INLINE const T& operator[] (dgInt32 i) const
-	{
-		return m_array[i];
-	}
-};
-*/
 
 class dgParallelBodySolver
 {
@@ -291,6 +205,7 @@ class dgParallelBodySolver
 	void InitJacobianMatrix(dgInt32 threadID);
 	void CalculateBodyForce(dgInt32 threadID);
 	void UpdateForceFeedback(dgInt32 threadID);
+	void TransposeMassMatrix(dgInt32 threadID);
 	void CalculateJointsForce(dgInt32 threadID);
 	void IntegrateBodiesVelocity(dgInt32 threadID);
 	void UpdateKinematicFeedback(dgInt32 threadID);
@@ -302,29 +217,22 @@ class dgParallelBodySolver
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodyForceKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);
+	static void TransposeMassMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);
 	static void IntegrateBodiesVelocityKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
+	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 
-	void Reserve(dgInt32 bodyCount, dgInt32 jointCount);
+	void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
+
+	#ifdef DG_SOLVER_USES_SOA
+	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
+	#else
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, const dgJacobian* const internalForces) const;
-
-
-//	dgParallelVector<dgWorkGroupFloat> m_weigh;
-//	dgParallelVector<dgWorkGroupFloat> m_invWeigh;
-//	dgParallelVector<dgWorkGroupVector6> m_veloc;
-//	dgParallelVector<dgWorkGroupVector6> m_veloc0;
-//	dgParallelVector<dgWorkGroupFloat> m_invMass;
-//	dgParallelVector<dgWorkGroupVector3> m_localInvInertia;
-//	dgParallelVector<dgWorkGroupMatrix3x3> m_invInertia;
-
-//	dgParallelVector<dgWorkGroupMatrix3x3> m_rotation;
-//	dgParallelVector<dgWorkGroupVector3> m_angularDamp;
-//	dgParallelVector<dgWorkGroupFloat> m_linearDamp;
-//	dgParallelVector<dgWorkGroupVector6> m_internalForces;
+	#endif
 
 	dgWorld* m_world;
 	dgBodyCluster* m_cluster;
@@ -340,13 +248,15 @@ class dgParallelBodySolver
 	dgFloat32 m_firstPassCoef;
 	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
-//	dgInt32 m_bodyCount;
+
 	dgInt32 m_jointCount;
 	dgInt32 m_atomicIndex;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
 	dgInt32 m_solverPasses;
 	dgInt32 m_threadCounts;
-
+	dgInt32 m_soaRowsCount;
+	dgInt32* m_soaRowStart;
+	dgArray<dgSolverSoaElement> m_massMatrix;
 	friend class dgWorldDynamicUpdate;
 };
 
