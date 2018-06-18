@@ -626,6 +626,7 @@ class dgVector
 	DG_CLASS_ALLOCATOR(allocator)
 
 	union {
+		dgInt32 m_i[4];
 		struct {
 			dgFloat32 m_x;
 			dgFloat32 m_y;
@@ -906,7 +907,7 @@ class dgBigVector
 
 	DG_INLINE dgBigVector Normalize() const
 	{
-		dgAssert (m_w == dgFoat32 (0.0f));
+		dgAssert (m_w == dgFloat64 (0.0f));
 		//const dgBigVector& me = *this;
 		//return *this * dgBigVector (dgRsqrt(DotProduct4(*this).m_x));
 		return *this * InvMagSqrt();
@@ -1050,6 +1051,7 @@ class dgBigVector
 
 	union 
 	{
+		dgInt64 m_i[4];
 		struct 
 		{
 			dgFloat64 m_x;
@@ -1566,6 +1568,7 @@ class dgVector
 
 	union {
 		dgFloat32 m_f[4];
+		dgInt32 m_i[4];
 		__m128 m_type;
 		__m128i m_typeInt;
 		struct {
@@ -2006,6 +2009,7 @@ class dgBigVector
 	union
 	{
 		dgFloat64 m_f[4];
+		dgInt64 m_i[4];
 		struct
 		{
 			__m128d m_typeLow;

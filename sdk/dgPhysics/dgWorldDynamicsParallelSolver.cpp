@@ -28,8 +28,13 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgWorldDynamicsParallelSolver.h"
 
+#if (DG_WORK_GROUP_SIZE > 4)
 dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one, dgVector::m_one);
 dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero, dgVector::m_zero);
+#else
+dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one);
+dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero);
+#endif
 
 void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep)
 {
@@ -553,7 +558,7 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 			for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
 				dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
 				dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
-				const dgInt32 frictionIndex = row->m_normalForceIndex.m_i[k] + 1;
+				const dgInt32 frictionIndex = dgInt32(row->m_normalForceIndex.m_i[k] + 1);
 				frictionNormal[k] = normalForce[frictionIndex][k];
 			}
 
@@ -638,7 +643,7 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 				for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
 					dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
 					dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
-					const dgInt32 frictionIndex = row->m_normalForceIndex.m_i[k] + 1;
+					const dgInt32 frictionIndex = dgInt32 (row->m_normalForceIndex.m_i[k] + 1);
 					frictionNormal[k] = normalForce[frictionIndex][k];
 				}
 
@@ -851,13 +856,13 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	const int jointCount = m_jointCount;
-	for (dgInt32 j = dgAtomicExchangeAndAdd(atomicIndex, 1); j < jointCount; j = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		//dgJacobian forceAcc0;
 		//dgJacobian forceAcc1;
 		dgWorkGroupVector6 forceAcc0;
 		dgWorkGroupVector6 forceAcc1;
 
-		const dgJointInfo* const jointInfoBase = &jointInfoArray[j * DG_WORK_GROUP_SIZE];
+		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_WORK_GROUP_SIZE];
 		const dgInt32 count = jointInfoBase->m_pairCount;
 
 		forceAcc0.m_linear.m_x = dgWorkGroupFloat::m_zero;
@@ -874,11 +879,11 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 		forceAcc1.m_angular.m_y = dgWorkGroupFloat::m_zero;
 		forceAcc1.m_angular.m_z = dgWorkGroupFloat::m_zero;
 		
-		const dgInt32 rowStart = soaRowStart[j];
-		for (dgInt32 i = 0; i < count; i++) {
+		const dgInt32 rowStart = soaRowStart[i];
+		for (dgInt32 j = 0; j < count; j++) {
 			//const dgLeftHandSide* const row = &leftHandSide[index + i];
 			//const dgRightHandSide* const rhs = &rightHandSide[index + i];
-			const dgSolverSoaElement* const row = &massMatrix[rowStart + i];
+			const dgSolverSoaElement* const row = &massMatrix[rowStart + j];
 
 			//dgAssert(dgCheckFloat(rhs->m_force));
 			//dgVector val(rhs->m_force);
@@ -901,15 +906,15 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 			forceAcc1.m_angular.m_z = forceAcc1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * row->m_force;
 		}
 
-		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
-			const dgJointInfo* const jointInfo = &jointInfoBase[i];
+		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
+			const dgJointInfo* const jointInfo = &jointInfoBase[j];
 			if (jointInfo->m_joint) {
 				dgInt32 const rowCount = jointInfo->m_pairCount;
 				dgInt32 const rowStartBase = jointInfo->m_pairStart;
-				for (dgInt32 j = 0; j < rowCount; j++) {
-					const dgSolverSoaElement* const row = &massMatrix[rowStart + j];
-					rightHandSide[j + rowStartBase].m_force = row->m_force[i];
-dgTrace (("%f ", row->m_force[i]));
+				for (dgInt32 k = 0; k < rowCount; k++) {
+					const dgSolverSoaElement* const row = &massMatrix[rowStart + k];
+					rightHandSide[k + rowStartBase].m_force = row->m_force[j];
+//dgTrace (("%f ", row->m_force[i]));
 				}
 				
 				const dgInt32 m0 = jointInfo->m_m0;
@@ -920,8 +925,8 @@ dgTrace (("%f ", row->m_force[i]));
 					dgBody* const body0 = jointInfo->m_joint->GetBody0();
 					//forceAcc0.m_linear = forceAcc0.m_linear * weight;
 					//forceAcc0.m_angular = forceAcc0.m_angular * weight;
-					dgVector linear (weight * dgVector (forceAcc0.m_linear.m_x[i], forceAcc0.m_linear.m_y[i], forceAcc0.m_linear.m_z[i], dgFloat32 (0.0f)));
-					dgVector angular (weight * dgVector (forceAcc0.m_angular.m_x[i], forceAcc0.m_angular.m_y[i], forceAcc0.m_angular.m_z[i], dgFloat32 (0.0f)));
+					dgVector linear (weight * dgVector (forceAcc0.m_linear.m_x[j], forceAcc0.m_linear.m_y[j], forceAcc0.m_linear.m_z[j], dgFloat32 (0.0f)));
+					dgVector angular (weight * dgVector (forceAcc0.m_angular.m_x[j], forceAcc0.m_angular.m_y[j], forceAcc0.m_angular.m_z[j], dgFloat32 (0.0f)));
 					dgScopeSpinLock lock(&body0->m_criticalSectionLock);
 					internalForces[m0].m_linear += linear;
 					internalForces[m0].m_angular += angular;
@@ -933,14 +938,14 @@ dgTrace (("%f ", row->m_force[i]));
 					//forceAcc1.m_linear = forceAcc1.m_linear * weight;
 					//forceAcc1.m_angular = forceAcc1.m_angular * weight;
 
-					dgVector linear(weight * dgVector(forceAcc1.m_linear.m_x[i], forceAcc1.m_linear.m_y[i], forceAcc1.m_linear.m_z[i], dgFloat32(0.0f)));
-					dgVector angular(weight * dgVector(forceAcc1.m_angular.m_x[i], forceAcc1.m_angular.m_y[i], forceAcc1.m_angular.m_z[i], dgFloat32(0.0f)));
+					dgVector linear(weight * dgVector(forceAcc1.m_linear.m_x[j], forceAcc1.m_linear.m_y[j], forceAcc1.m_linear.m_z[j], dgFloat32(0.0f)));
+					dgVector angular(weight * dgVector(forceAcc1.m_angular.m_x[j], forceAcc1.m_angular.m_y[j], forceAcc1.m_angular.m_z[j], dgFloat32(0.0f)));
 					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
 					internalForces[m1].m_linear += linear;
 					internalForces[m1].m_angular += angular;
 				}
 			}
-dgTrace (("\n"));
+//dgTrace (("\n"));
 		}
 	}
 

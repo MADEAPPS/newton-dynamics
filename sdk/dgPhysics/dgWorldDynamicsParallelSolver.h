@@ -29,9 +29,11 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-//#define DG_SOLVER_USES_SOA
-#define DG_WORK_GROUP_SIZE	(2 * sizeof (dgVector)/sizeof (dgFloat32)) 
+#define DG_SOLVER_USES_SOA
+#define DG_WORK_GROUP_SIZE	4 
+//#define DG_WORK_GROUP_SIZE	8 
 
+#if (DG_WORK_GROUP_SIZE > 4)
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupFloat
 {
@@ -46,8 +48,8 @@ class dgWorkGroupFloat
 	{
 	}
 
-	DG_INLINE dgWorkGroupFloat(const dgVector& low, const dgVector& high)
-		:m_low(low)
+	DG_INLINE dgWorkGroupFloat(const dgVector& v, const dgVector& high)
+		:m_low(v)
 		,m_high(high)
 	{
 	}
@@ -135,6 +137,31 @@ class dgWorkGroupFloat
 	static dgWorkGroupFloat m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
+#else
+
+DG_MSC_VECTOR_ALIGMENT
+class dgWorkGroupFloat: public dgVector
+{
+	public:
+	DG_INLINE dgWorkGroupFloat()
+	{
+	}
+
+	DG_INLINE dgWorkGroupFloat(const dgWorkGroupFloat& me)
+		:dgVector(me)
+	{
+	}
+
+	DG_INLINE dgWorkGroupFloat(const dgVector& v)
+		:dgVector(v)
+	{
+	}
+
+	static dgWorkGroupFloat m_one;
+	static dgWorkGroupFloat m_zero;
+} DG_GCC_VECTOR_ALIGMENT;
+
+#endif
 
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupVector3
