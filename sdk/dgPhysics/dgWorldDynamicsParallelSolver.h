@@ -29,7 +29,7 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-#define DG_SOLVER_USES_SOA
+//#define DG_SOLVER_USES_SOA
 #define DG_WORK_GROUP_SIZE	4 
 //#define DG_WORK_GROUP_SIZE	8 
 
