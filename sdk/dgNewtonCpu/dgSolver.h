@@ -19,21 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_PARALLEL_SOLVER_H_
-#define _DG_PARALLEL_SOLVER_H_
+#ifndef _DG_SOLVER_H_
+#define _DG_SOLVER_H_
 
 
 #include "dgPhysicsStdafx.h"
 
+#if 0
 class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-#define DG_SOLVER_USES_SOA
-//#define DG_WORK_GROUP_SIZE	4 
 #define DG_WORK_GROUP_SIZE	8 
 
-#if (DG_WORK_GROUP_SIZE > 4)
+
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupFloat
 {
@@ -137,31 +136,6 @@ class dgWorkGroupFloat
 	static dgWorkGroupFloat m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
-#else
-
-DG_MSC_VECTOR_ALIGMENT
-class dgWorkGroupFloat: public dgVector
-{
-	public:
-	DG_INLINE dgWorkGroupFloat()
-	{
-	}
-
-	DG_INLINE dgWorkGroupFloat(const dgWorkGroupFloat& me)
-		:dgVector(me)
-	{
-	}
-
-	DG_INLINE dgWorkGroupFloat(const dgVector& v)
-		:dgVector(v)
-	{
-	}
-
-	static dgWorkGroupFloat m_one;
-	static dgWorkGroupFloat m_zero;
-} DG_GCC_VECTOR_ALIGMENT;
-
-#endif
 
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupVector3
@@ -205,15 +179,13 @@ class dgSolverSoaElement
 	dgWorkGroupFloat m_lowerBoundFrictionCoefficent;
 	dgWorkGroupFloat m_upperBoundFrictionCoefficent;
 } DG_GCC_VECTOR_ALIGMENT;
+#endif
 
-
-class dgParallelBodySolver
+class dgSolver: public dgParallelBodySolver
 {
 	public:
-	dgParallelBodySolver() {}
-	~dgParallelBodySolver() {}
-	dgParallelBodySolver(dgMemoryAllocator* const allocator);
-
+	dgSolver();
+	~dgSolver();
 	void CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	private:
@@ -258,37 +230,7 @@ class dgParallelBodySolver
 
 	void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
-
-	#ifdef DG_SOLVER_USES_SOA
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
-	#else
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, const dgJacobian* const internalForces) const;
-	#endif
-
-	dgWorld* m_world;
-	dgBodyCluster* m_cluster;
-	dgBodyInfo* m_bodyArray;
-	dgJointInfo* m_jointArray;
-	dgFloat32* m_weight;
-	dgFloat32* m_invWeight;
-	dgFloat32 m_timestep;
-	dgFloat32 m_invTimestep;
-	dgFloat32 m_invStepRK;
-	dgFloat32 m_timestepRK;
-	dgFloat32 m_invTimestepRK;
-	dgFloat32 m_firstPassCoef;
-	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
-	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
-
-	dgInt32 m_jointCount;
-	dgInt32 m_atomicIndex;
-	dgInt32 m_jacobianMatrixRowAtomicIndex;
-	dgInt32 m_solverPasses;
-	dgInt32 m_threadCounts;
-	dgInt32 m_soaRowsCount;
-	dgInt32* m_soaRowStart;
-	dgArray<dgSolverSoaElement> m_massMatrix;
-	friend class dgWorldDynamicUpdate;
 };
 
 
