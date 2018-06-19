@@ -19,36 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dgNewtonCpu\dgBodyAvx.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgBodyAvx2.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgBodySse.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgMathAvx.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgMathAvx2.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgMathSse.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dgNewtonPluginStdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\dgNewtonCpu\dgWorldAvx.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgWorldAvx2.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dgWorldBase.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgWorldSse.cpp" />
     <ClCompile Include="..\..\dgNewtonCpu\dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dgNewtonCpu\dgBodyAvx.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgBodyAvx2.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgBodySse.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgMathAvx.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgMathAvx2.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgMathSse.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgNewtonPluginStdafx.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgWorldAvx.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgWorldAvx2.h" />
     <ClInclude Include="..\..\dgNewtonCpu\dgWorldBase.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgWorldSse.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}</ProjectGuid>
