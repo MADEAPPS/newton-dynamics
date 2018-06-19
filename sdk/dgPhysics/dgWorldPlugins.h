@@ -33,10 +33,6 @@ class dgWorldPlugin
 	public:
 	dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
 	virtual ~dgWorldPlugin();
-	const dgInt32 GetMegaFlops() const
-	{
-		return m_averageMegaflops;
-	}
 
 	virtual const char* GetId() const = 0;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
@@ -44,7 +40,6 @@ class dgWorldPlugin
 	protected:
 	dgWorld* m_world;
 	dgMemoryAllocator* m_allocator;
-	dgInt32 m_averageMegaflops;
 	friend class dgWorld;
 };
 
@@ -89,8 +84,7 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 
 inline dgWorldPlugin::dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:m_world(world)
-	, m_allocator(allocator)
-	, m_averageMegaflops(0)
+	,m_allocator(allocator)
 {
 }
 

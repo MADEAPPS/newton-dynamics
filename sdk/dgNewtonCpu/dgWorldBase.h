@@ -31,65 +31,14 @@ extern "C"
 #endif
 
 
-template<class T>
-class dgGlobalArray: public dgArray<T>
-{
-	public:
-	dgGlobalArray(dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY)
-		:dgArray<T>(allocator, aligmentInBytes)
-		, m_ptr(NULL)
-	{
-	}
-
-	void Reserve(dgInt32 count)
-	{
-		ResizeIfNecessary(count);
-		dgArray<T>& me = *this;
-		m_ptr = &me[0];
-	}
-
-	DG_INLINE T& operator[] (dgInt32 i)
-	{
-		return m_ptr[i];
-	}
-
-	DG_INLINE const T& operator[] (dgInt32 i) const
-	{
-		return m_ptr[i];
-	}
-
-	T* m_ptr;
-};
-
-#define DG_AVERAGE_FLOPS_FILTER	16
-
 class dgWorldBase: public dgWorldPlugin
 {
 	public:
 	dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator);
 	virtual ~dgWorldBase();
 
-	virtual const char* GetId() const = 0;
-	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
-
-	protected:
-	void ResetMegaFlops();
-	void CalculateMegaFlops();
-	void AddFlops(dgInt32 flops)
-	{
-		m_flopsCount[m_flopsIndex] += flops;
-	}
-
-
-	virtual void InityBodyArray() = 0;
-
-	dgBodyInfo* m_bodyArray;
-	dgJointInfo* m_jointArray;
-	const dgBodyCluster* m_cluster;
-	dgFloat32 m_timestep;
-	dgUnsigned64 m_flopsCount[DG_AVERAGE_FLOPS_FILTER];
-	dgUnsigned64 m_ticksCount[DG_AVERAGE_FLOPS_FILTER];
-	dgInt32 m_flopsIndex;
+	virtual const char* GetId() const;
+	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 };
 
 #endif

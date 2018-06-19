@@ -21,33 +21,11 @@
 
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
-#include "dgMathSse.h"
-#include "dgWorldSse.h"
-#include "dgWorldAvx.h"
-#include "dgMathAvx2.h"
-#include "dgMathAvx2.h"
-#include "dgWorldAvx2.h"
 
-dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator)
-	:dgWorldPlugin(world, allocator)
-	,m_bodyArray(NULL)
-	,m_jointArray(NULL)
-	,m_cluster(NULL)
-	,m_timestep(dgFloat32(0.0f))
-	,m_flopsIndex(0)
-{
-	memset(m_flopsCount, 0, sizeof(m_flopsCount));
-	memset(m_ticksCount, 0, sizeof(m_ticksCount));
-}
-
-dgWorldBase::~dgWorldBase()
-{
-}
 
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
-/*
 	union cpuInfo
 	{
 		int m_data[4];
@@ -58,79 +36,64 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 			int m_ecx;
 			int m_edx;
 		};
-		struct
-		{
-			int m_maxCode;
-			char m_vendor[3 * 4];
-		};
-		char m_end;
 	} info;
+/*
+	//check Intel CPU
+	// avx2 support in code 7, register ebx bit5
+	__cpuid(info.m_data, 7);
+	if (info.m_ebx & (1 << 5)) {
+		dgFloatSse::m_one = dgFloatSse(1.0f);
+		dgFloatSse::m_zero = dgFloatSse(0.0f);
+		dgFloatAvx::m_one = dgFloatAvx(1.0f);
+		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
+		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
+		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
 
-	__cpuid(info.m_data, 0);
-	info.m_end = 0;
-	dgSwap(info.m_ecx, info.m_edx);
-	if (strstr(info.m_vendor, "Intel")) {
-		//check Intel CPU
-		// avx2 support in code 7, register ebx bit5
-		__cpuid(info.m_data, 7);
-		if (info.m_ebx & (1 << 5)) {
-			dgFloatSse::m_one = dgFloatSse(1.0f);
-			dgFloatSse::m_zero = dgFloatSse(0.0f);
-			dgFloatAvx::m_one = dgFloatAvx(1.0f);
-			dgFloatAvx::m_zero = dgFloatAvx(0.0f);
-			dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
-			dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
-
-			//cpu support avx2
-			//static dgWorldSse module(world, allocator);
-			static dgWorldAvx module(world, allocator);
-			//static dgWorldAvx2 module(world, allocator);
-			return &module;
-		}
-
-		// avx support is encoded on register ecx bit 28
-		__cpuid(info.m_data, 1);
-		if (info.m_ecx & (1 << 28)) {
-			dgFloatSse::m_one = dgFloatSse(1.0f);
-			dgFloatSse::m_zero = dgFloatSse(0.0f);
-			dgFloatAvx::m_one = dgFloatAvx(1.0f);
-			dgFloatAvx::m_zero = dgFloatAvx(0.0f);
-			dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
-			dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
-
-			//cpu support avx
-			static dgWorldAvx module(world, allocator);
-			return &module;
-		}
-
-	} else {
-		// assume amd cpu
-		dgAssert(0);
+		//cpu support avx2
+		//static dgWorldSse module(world, allocator);
+		static dgWorldAvx module(world, allocator);
+		//static dgWorldAvx2 module(world, allocator);
+		return &module;
 	}
 */
-	return NULL;
+	// avx support is encoded on register ecx bit 28
+	__cpuid(info.m_data, 1);
+	if (!(info.m_ecx & (1 << 28))) {
+		return NULL;
+	}
+return NULL;
+
+//	dgFloatSse::m_one = dgFloatSse(1.0f);
+//	dgFloatSse::m_zero = dgFloatSse(0.0f);
+//	dgFloatAvx::m_one = dgFloatAvx(1.0f);
+//	dgFloatAvx::m_zero = dgFloatAvx(0.0f);
+//	dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
+//	dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
+
+	//cpu support avx
+	static dgWorldBase module(world, allocator);
+	return &module;
 }
 
-void dgWorldBase::ResetMegaFlops()
+dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator)
+	:dgWorldPlugin(world, allocator)
 {
-	m_flopsCount[m_flopsIndex] = 0;
-	m_ticksCount[m_flopsIndex] = m_world->GetTimeInMicrosenconds();
 }
 
-void dgWorldBase::CalculateMegaFlops()
+dgWorldBase::~dgWorldBase()
 {
-	const dgInt32 count = sizeof(m_ticksCount) / sizeof(m_ticksCount[0]);
-	m_ticksCount[m_flopsIndex] = m_world->GetTimeInMicrosenconds() - m_ticksCount[m_flopsIndex];
-	m_flopsIndex = (m_flopsIndex + 1) % count;
+}
 
-	dgUnsigned64 flopsCount = 0;
-	dgUnsigned64 ticksCount = 0;
-	for (dgInt32 i = 0; i < count; i++) {
-		flopsCount += m_flopsCount[i];
-		ticksCount += m_ticksCount[i];
-	}
-	if (ticksCount) {
-		flopsCount = flopsCount * 1000000 / ticksCount;
-		m_averageMegaflops = dgInt32(flopsCount / 1000000);
-	}
+const char* dgWorldBase::GetId() const
+{
+#ifdef _DEBUG
+	return "newtonAVX_d";
+#else
+	return "newtonAVX";
+#endif
+}
+
+void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
+{
+	dgAssert(0);
 }

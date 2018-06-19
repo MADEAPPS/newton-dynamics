@@ -879,9 +879,6 @@ void DemoEntityManager::RenderStats()
 					if (index == m_currentPlugin) {
 						sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
 						ImGui::Text(text);
-
-						sprintf(text, "plugin mflops: %d", NewtonPluginGetMFlops(m_world));
-						ImGui::Text(text);
 					}
 					index++;
 				}
