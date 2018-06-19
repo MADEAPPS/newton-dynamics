@@ -64,7 +64,7 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOLVER_USES_SOA + 1);
 
 	InitWeights();
-//	InitBodyArray();
+	InitBodyArray();
 //	InitJacobianMatrix();
 //	CalculateForces();
 }
@@ -99,25 +99,58 @@ void dgSolver::InitWeights(dgInt32 threadID)
 		dgBody* const body1 = jointInfo->m_joint->GetBody1();
 		if (m0) {
 			dgAssert(0);
-//			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
+			dgScopeSpinLock lock(body0->GetLock());
 			weight[m0] += dgFloat32(1.0f);
 		}
 		if (m1) {
 			dgAssert(0);
-//			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
+			dgScopeSpinLock lock(body1->GetLock());
 			weight[m1] += dgFloat32(1.0f);
 		}
 	}
 }
 
+void dgSolver::InitBodyArray()
+{
+	m_atomicIndex = 1;
+	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
+	memset(internalForces, 0, m_cluster->m_bodyCount * sizeof(dgJacobian));
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+}
 
-#if 0
 void dgSolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
 {
 	dgSolver* const me = (dgSolver*)context;
 	me->InitBodyArray(threadID);
 }
 
+void dgSolver::InitBodyArray(dgInt32 threadID)
+{
+	dgFloat32* const weight = m_weight;
+	dgFloat32* const invWeight = m_invWeight;
+	const dgBodyInfo* const bodyArray = m_bodyArray;
+
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
+		const dgBodyInfo* const bodyInfo = &bodyArray[i];
+		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
+		body->AddDampingAcceleration(m_timestep);
+		body->CalcInvInertiaMatrix();
+
+		body->SetAlpha(body->GetOmega());
+		body->SetAccel(body->GetVelocity());
+
+		const dgFloat32 w = weight[i] ? weight[i] : dgFloat32(1.0f);
+		weight[i] = w;
+		invWeight[i] = dgFloat32(1.0f) / w;
+	}
+}
+
+
+#if 0
 void dgSolver::InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID)
 {
 	dgSolver* const me = (dgSolver*)context;
@@ -179,16 +212,6 @@ void dgSolver::UpdateRowAccelerationKernel(void* const context, void* const, dgI
 }
 
 
-void dgSolver::InitBodyArray()
-{
-	m_atomicIndex = 1;
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-	memset(internalForces, 0, m_cluster->m_bodyCount * sizeof(dgJacobian));
-	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
-	}
-	m_world->SynchronizationBarrier();
-}
 
 void dgSolver::InitJacobianMatrix()
 {
@@ -302,27 +325,6 @@ void dgSolver::UpdateKinematicFeedback()
 }
 
 
-void dgSolver::InitBodyArray(dgInt32 threadID)
-{
-	dgFloat32* const weight = m_weight;
-	dgFloat32* const invWeight = m_invWeight;
-	const dgBodyInfo* const bodyArray = m_bodyArray;
-
-	const dgInt32 bodyCount = m_cluster->m_bodyCount;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
-		const dgBodyInfo* const bodyInfo = &bodyArray[i];
-		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
-		body->AddDampingAcceleration(m_timestep);
-		body->CalcInvInertiaMatrix();
-
-		body->m_accel = body->m_veloc;
-		body->m_alpha = body->m_omega;
-
-		const dgFloat32 w = weight[i] ? weight[i] : dgFloat32(1.0f);
-		weight[i] = w;
-		invWeight[i] = dgFloat32 (1.0f) / w;
-	}
-}
 
 void dgSolver::CalculateJointsAcceleration(dgInt32 threadID)
 {

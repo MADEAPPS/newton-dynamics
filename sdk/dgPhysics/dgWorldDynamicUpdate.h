@@ -201,6 +201,8 @@ class dgWorldDynamicUpdate
 	void UpdateDynamics (dgFloat32 timestep);
 	dgBody* GetClusterBody (const void* const cluster, dgInt32 index) const;
 
+	dgJacobianMemory& GetSolverMemory() { return m_solverMemory; }
+
 	private:
 	void BuildClusters(dgFloat32 timestep);
 	dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const;
