@@ -80,8 +80,10 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 				EventCallback (controller, m_inTrigger, passangerBody);
 
 			} else {
-				dCustomScopeLock lock (&m_lock);
-				manifest.Insert (passangerBody, passangerBody);
+				{
+					dCustomScopeLock lock(&m_lock);
+					manifest.Insert(passangerBody, passangerBody);
+				}
 				EventCallback (controller, m_enterTrigger, passangerBody);
 			} 
 		} else {
