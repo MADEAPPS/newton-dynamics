@@ -77,6 +77,7 @@ return NULL;
 
 dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:dgWorldPlugin(world, allocator)
+	,dgSolver(world, allocator)
 {
 }
 

@@ -184,7 +184,7 @@ class dgSolverSoaElement
 class dgSolver: public dgParallelBodySolver
 {
 	public:
-	dgSolver();
+	dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator);
 	~dgSolver();
 	void CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
@@ -226,11 +226,13 @@ class dgSolver: public dgParallelBodySolver
 	static void UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
-	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 
 	void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
+
+//	dgArray<dgSolverSoaElement> m_massMatrix;
+	dgArray<dgInt32> m_massMatrix;
 };
 
 

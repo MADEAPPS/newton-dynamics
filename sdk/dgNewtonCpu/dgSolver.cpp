@@ -33,33 +33,20 @@
 //dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one, dgVector::m_one);
 //dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero, dgVector::m_zero);
 
-dgSolver::dgSolver()
-	:dgParallelBodySolver()
+dgSolver::dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator)
+	:dgParallelBodySolver(allocator)
+	,m_massMatrix(allocator)
 {
+	m_world = world;
 }
 
 dgSolver::~dgSolver()
 {
 }
 
+
+
 #if 0
-dgInt32 dgSolver::CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed)
-{
-	const dgInt32 restingA = (infoA->m_joint->m_body0->m_resting & infoA->m_joint->m_body0->m_resting) ? 1 : 0;
-	const dgInt32 restingB = (infoB->m_joint->m_body0->m_resting & infoB->m_joint->m_body0->m_resting) ? 1 : 0;
-
-	const dgInt32 countA = infoA->m_pairCount * 2 + restingA;
-	const dgInt32 countB = infoB->m_pairCount * 2 + restingB;
-
-	if (countA < countB) {
-		return 1;
-	}
-	if (countA > countB) {
-		return -1;
-	}
-	return 0;
-}
-
 void dgSolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	m_cluster = &cluster;

@@ -22,6 +22,7 @@
 #ifndef _DG_WORLD_BASE_H_
 #define _DG_WORLD_BASE_H_
 #include "dgNewtonPluginStdafx.h"
+#include "dgSolver.h"
 
 #ifdef __cplusplus 
 extern "C"
@@ -31,7 +32,7 @@ extern "C"
 #endif
 
 
-class dgWorldBase: public dgWorldPlugin
+class dgWorldBase: public dgWorldPlugin, public dgSolver
 {
 	public:
 	dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator);

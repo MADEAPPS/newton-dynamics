@@ -135,34 +135,10 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 	return cluster;
 }
 
-dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
-	:m_world(NULL)
-	,m_cluster(NULL)
-	,m_bodyArray(NULL)
-	,m_jointArray(NULL)
-	,m_weight(NULL)
-	,m_invWeight(NULL)
-	,m_timestep(dgFloat32 (0.0f))
-	,m_invTimestep(dgFloat32(0.0f))
-	,m_invStepRK(dgFloat32(0.0f))
-	,m_timestepRK(dgFloat32(0.0f))
-	,m_invTimestepRK(dgFloat32(0.0f))
-	,m_firstPassCoef(dgFloat32(0.0f))
-	,m_jointCount(0)
-	,m_atomicIndex(0)
-	,m_jacobianMatrixRowAtomicIndex(0)
-	,m_solverPasses(0)
-	,m_threadCounts(0)
-	,m_soaRowsCount(0)
-	,m_soaRowStart(NULL)
-	,m_massMatrix(allocator)
-{
-}
-
 dgInt32 dgParallelBodySolver::CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed)
 {
-	const dgInt32 restingA = (infoA->m_joint->m_body0->m_resting & infoA->m_joint->m_body0->m_resting) ? 1 : 0;
-	const dgInt32 restingB = (infoB->m_joint->m_body0->m_resting & infoB->m_joint->m_body0->m_resting) ? 1 : 0;
+	const dgInt32 restingA = (infoA->m_joint->m_body0->m_resting & infoA->m_joint->m_body1->m_resting) ? 1 : 0;
+	const dgInt32 restingB = (infoB->m_joint->m_body0->m_resting & infoB->m_joint->m_body1->m_resting) ? 1 : 0;
 
 	const dgInt32 countA = infoA->m_pairCount * 2 + restingA;
 	const dgInt32 countB = infoB->m_pairCount * 2 + restingB;

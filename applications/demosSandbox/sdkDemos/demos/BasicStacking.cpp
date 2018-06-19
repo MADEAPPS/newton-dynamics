@@ -279,7 +279,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 //	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
 	int high = 20;
-//high = 40;
+high = 40;
 //high = 10;
 //high = 30;
 //high = 2;
