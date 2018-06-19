@@ -186,7 +186,7 @@ class dgSolver: public dgParallelBodySolver
 	public:
 	dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator);
 	~dgSolver();
-	void CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
+	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	private:
 	void InitWeights();

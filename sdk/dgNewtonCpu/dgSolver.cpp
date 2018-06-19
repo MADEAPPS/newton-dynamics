@@ -44,10 +44,7 @@ dgSolver::~dgSolver()
 {
 }
 
-
-
-#if 0
-void dgSolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
+void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	m_cluster = &cluster;
 	m_bodyArray = bodyArray;
@@ -64,13 +61,23 @@ void dgSolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bo
 
 	m_weight = dgAlloca(dgFloat32, cluster.m_bodyCount);
 	m_invWeight = dgAlloca(dgFloat32, cluster.m_bodyCount);
-
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOLVER_USES_SOA + 1);
 
 	InitWeights();
-	InitBodyArray();
-	InitJacobianMatrix();
-	CalculateForces();
+//	InitBodyArray();
+//	InitJacobianMatrix();
+//	CalculateForces();
+}
+
+void dgSolver::InitWeights()
+{
+	m_atomicIndex = 0;
+	memset(m_weight, 0, m_cluster->m_bodyCount * sizeof(dgFloat32));
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+		m_world->QueueJob(InitWeightKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+	m_weight[0] = dgFloat32(1.0f);
 }
 
 void dgSolver::InitWeightKernel(void* const context, void* const, dgInt32 threadID)
@@ -79,6 +86,32 @@ void dgSolver::InitWeightKernel(void* const context, void* const, dgInt32 thread
 	me->InitWeights(threadID);
 }
 
+void dgSolver::InitWeights(dgInt32 threadID)
+{
+	dgFloat32* const weight = m_weight;
+	const dgJointInfo* const jointArray = m_jointArray;
+	const dgInt32 jointCount = m_cluster->m_jointCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
+		const dgJointInfo* const jointInfo = &jointArray[i];
+		const dgInt32 m0 = jointInfo->m_m0;
+		const dgInt32 m1 = jointInfo->m_m1;
+		dgBody* const body0 = jointInfo->m_joint->GetBody0();
+		dgBody* const body1 = jointInfo->m_joint->GetBody1();
+		if (m0) {
+			dgAssert(0);
+//			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
+			weight[m0] += dgFloat32(1.0f);
+		}
+		if (m1) {
+			dgAssert(0);
+//			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
+			weight[m1] += dgFloat32(1.0f);
+		}
+	}
+}
+
+
+#if 0
 void dgSolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
 {
 	dgSolver* const me = (dgSolver*)context;
@@ -145,16 +178,6 @@ void dgSolver::UpdateRowAccelerationKernel(void* const context, void* const, dgI
 	me->UpdateRowAcceleration(threadID);
 }
 
-void dgSolver::InitWeights()
-{
-	m_atomicIndex = 0;
-	memset(m_weight, 0, m_cluster->m_bodyCount * sizeof(dgFloat32));
-	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitWeightKernel, this, NULL);
-	}
-	m_world->SynchronizationBarrier();
-	m_weight[0] = dgFloat32(1.0f);
-}
 
 void dgSolver::InitBodyArray()
 {
@@ -278,27 +301,6 @@ void dgSolver::UpdateKinematicFeedback()
 	m_world->SynchronizationBarrier();
 }
 
-void dgSolver::InitWeights(dgInt32 threadID)
-{
-	dgFloat32* const weight = m_weight;
-	const dgJointInfo* const jointArray = m_jointArray;
-	const dgInt32 jointCount = m_cluster->m_jointCount;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
-		const dgJointInfo* const jointInfo = &jointArray[i];
-		const dgInt32 m0 = jointInfo->m_m0;
-		const dgInt32 m1 = jointInfo->m_m1;
-		dgBody* const body0 = jointInfo->m_joint->GetBody0();
-		dgBody* const body1 = jointInfo->m_joint->GetBody1();
-		if (m0) {
-			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
-			weight[m0] += dgFloat32(1.0f);
-		}
-		if (m1) {
-			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
-			weight[m1] += dgFloat32(1.0f);
-		}
-	}
-}
 
 void dgSolver::InitBodyArray(dgInt32 threadID)
 {

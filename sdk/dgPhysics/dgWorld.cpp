@@ -389,16 +389,6 @@ dgDynamicBody* dgWorld::GetSentinelBody() const
 }
 
 
-void dgWorld::SetSolverMode (dgInt32 mode)
-{
-	m_solverMode = dgUnsigned32 (dgMax (1, mode));
-}
-
-dgInt32 dgWorld::GetSolverMode() const
-{
-	return m_solverMode;
-}
-
 dgFloat32 dgWorld::GetContactMergeTolerance() const
 {
 	return m_contactTolerance;

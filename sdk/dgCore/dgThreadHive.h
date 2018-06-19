@@ -95,8 +95,8 @@ class dgThreadHive
 	dgInt32 GetMaxThreadCount() const;
 	void SetThreadsCount (dgInt32 count);
 
-	void QueueJob (dgWorkerThreadTaskCallback callback, void* const context0, void* const context1);
-	void SynchronizationBarrier ();
+	virtual void QueueJob (dgWorkerThreadTaskCallback callback, void* const context0, void* const context1);
+	virtual void SynchronizationBarrier ();
 
 	private:
 	void DestroyThreads();
@@ -114,6 +114,17 @@ class dgThreadHive
 };
 
 
+DG_INLINE dgInt32 dgThreadHive::GetThreadCount() const
+{
+	return m_beesCount ? m_beesCount : 1;
+}
+
+DG_INLINE dgInt32 dgThreadHive::GetMaxThreadCount() const
+{
+	return DG_MAX_THREADS_HIVE_COUNT;
+}
+
+
 DG_INLINE void dgThreadHive::GlobalLock() const
 {
 	GetIndirectLock(&m_globalCriticalSection);
@@ -123,7 +134,6 @@ DG_INLINE void dgThreadHive::GlobalUnlock() const
 {	
 	ReleaseIndirectLock(&m_globalCriticalSection);
 }
-
 
 DG_INLINE void dgThreadHive::GetIndirectLock (dgInt32* const criticalSectionLock) const
 {

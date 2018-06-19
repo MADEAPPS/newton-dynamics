@@ -130,16 +130,6 @@ void dgThreadHive::DestroyThreads()
 	}
 }
 
-dgInt32 dgThreadHive::GetThreadCount() const
-{
-	return m_beesCount ? m_beesCount : 1;
-}
-
-dgInt32 dgThreadHive::GetMaxThreadCount() const
-{
-	return DG_MAX_THREADS_HIVE_COUNT;
-}
-
 void dgThreadHive::SetThreadsCount (dgInt32 threads)
 {
 	DestroyThreads();

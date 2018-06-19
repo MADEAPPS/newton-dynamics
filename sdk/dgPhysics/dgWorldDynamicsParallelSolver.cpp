@@ -152,7 +152,7 @@ dgInt32 dgParallelBodySolver::CompareJointInfos(const dgJointInfo* const infoA, 
 	return 0;
 }
 
-void dgParallelBodySolver::CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
+void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	m_cluster = &cluster;
 	m_bodyArray = bodyArray;

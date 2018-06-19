@@ -595,4 +595,14 @@ inline dgUnsigned64 dgWorld::GetTimeInMicrosenconds() const
 	return dgGetTimeInMicrosenconds();
 }
 
+inline void dgWorld::SetSolverMode(dgInt32 mode)
+{
+	m_solverMode = dgUnsigned32(dgMax(1, mode));
+}
+
+inline dgInt32 dgWorld::GetSolverMode() const
+{
+	return m_solverMode;
+}
+
 #endif

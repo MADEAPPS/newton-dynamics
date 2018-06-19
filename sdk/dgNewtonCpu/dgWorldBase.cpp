@@ -96,5 +96,5 @@ const char* dgWorldBase::GetId() const
 
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
-	dgAssert(0);
+	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }

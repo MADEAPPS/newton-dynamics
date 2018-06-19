@@ -213,7 +213,7 @@ class dgParallelBodySolver
 	~dgParallelBodySolver() {}
 	dgParallelBodySolver(dgMemoryAllocator* const allocator);
 
-	void CalculateJointForces(dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
+	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	private:
 	void InitWeights();
@@ -268,7 +268,7 @@ class dgParallelBodySolver
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 
 	dgWorld* m_world;
-	dgBodyCluster* m_cluster;
+	const dgBodyCluster* m_cluster;
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
 	dgFloat32* m_weight;
