@@ -29,9 +29,9 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-//#define DG_SOLVER_USES_SOA
-#define DG_WORK_GROUP_SIZE	4 
-//#define DG_WORK_GROUP_SIZE	8 
+#define DG_SOLVER_USES_SOA
+//#define DG_WORK_GROUP_SIZE	4 
+#define DG_WORK_GROUP_SIZE	8 
 
 #if (DG_WORK_GROUP_SIZE > 4)
 DG_MSC_VECTOR_ALIGMENT
@@ -234,6 +234,7 @@ class dgParallelBodySolver
 	void UpdateForceFeedback(dgInt32 threadID);
 	void TransposeMassMatrix(dgInt32 threadID);
 	void CalculateJointsForce(dgInt32 threadID);
+	void UpdateRowAcceleration(dgInt32 threadID);
 	void IntegrateBodiesVelocity(dgInt32 threadID);
 	void UpdateKinematicFeedback(dgInt32 threadID);
 	void CalculateJointsAcceleration(dgInt32 threadID);
@@ -246,6 +247,7 @@ class dgParallelBodySolver
 	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void TransposeMassMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);
+	static void UpdateRowAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static void IntegrateBodiesVelocityKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);

@@ -282,6 +282,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 high = 40;
 //high = 10;
 //high = 30;
+//high = 2;
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
 //		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
@@ -299,7 +300,7 @@ high = 40;
 	}
 
 	high = 20;
-//	high = 2;
+//high = 1;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 //BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, -4.0f + i * 8, 0.0f), dVector(0.5f, 0.5f, 0.5f, 0.0f), high);

@@ -271,6 +271,11 @@ void dgParallelBodySolver::TransposeMassMatrixKernel(void* const context, void* 
 	me->TransposeMassMatrix(threadID);
 }
 
+void dgParallelBodySolver::UpdateRowAccelerationKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->UpdateRowAcceleration(threadID);
+}
 
 void dgParallelBodySolver::InitWeights()
 {
@@ -339,6 +344,14 @@ void dgParallelBodySolver::CalculateJointsAcceleration()
 	}
 	m_world->SynchronizationBarrier();
 	m_firstPassCoef = dgFloat32(1.0f);
+
+#ifdef DG_SOLVER_USES_SOA
+	m_atomicIndex = 0;
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+		m_world->QueueJob(UpdateRowAccelerationKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+#endif
 }
 
 void dgParallelBodySolver::CalculateBodiesAcceleration()
@@ -420,7 +433,6 @@ void dgParallelBodySolver::InitWeights(dgInt32 threadID)
 		}
 	}
 }
-
 
 void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 {
@@ -841,6 +853,35 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 #endif
 }
 
+void dgParallelBodySolver::UpdateRowAcceleration(dgInt32 threadID)
+{
+#ifdef DG_SOLVER_USES_SOA
+	dgSolverSoaElement* const massMatrix = &m_massMatrix[0];
+	const dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
+
+	const dgInt32* const soaRowStart = m_soaRowStart;
+	const dgJointInfo* const jointInfoArray = m_jointArray;
+	const int jointCount = m_jointCount;
+	dgInt32* const atomicIndex = &m_atomicIndex;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_WORK_GROUP_SIZE];
+
+		const dgInt32 rowStart = soaRowStart[i];
+		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
+			const dgJointInfo* const jointInfo = &jointInfoBase[j];
+			if (jointInfo->m_joint) {
+				dgInt32 const rowCount = jointInfo->m_pairCount;
+				dgInt32 const rowStartBase = jointInfo->m_pairStart;
+				for (dgInt32 k = 0; k < rowCount; k++) {
+					dgSolverSoaElement* const row = &massMatrix[rowStart + k];
+					row->m_coordenateAccel[j] = rightHandSide[k + rowStartBase].m_coordenateAccel;
+				}
+			}
+		}
+	}
+#endif
+}
+
 void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 {
 #ifdef DG_SOLVER_USES_SOA
@@ -914,7 +955,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 				for (dgInt32 k = 0; k < rowCount; k++) {
 					const dgSolverSoaElement* const row = &massMatrix[rowStart + k];
 					rightHandSide[k + rowStartBase].m_force = row->m_force[j];
-//dgTrace (("%f ", row->m_force[i]));
 				}
 				
 				const dgInt32 m0 = jointInfo->m_m0;
@@ -945,7 +985,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 					internalForces[m1].m_angular += angular;
 				}
 			}
-//dgTrace (("\n"));
 		}
 	}
 
@@ -1242,19 +1281,6 @@ void dgParallelBodySolver::TransposeRow (dgSolverSoaElement* const row, const dg
 	const dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
 	if (jointInfoArray[0].m_pairCount == jointInfoArray[DG_WORK_GROUP_SIZE - 1].m_pairCount) {
-/*
-		const dgLeftHandSide* const lhs0 = &leftHandSide[jointInfoArray[0].m_pairStart + index];
-		const dgLeftHandSide* const lhs1 = &leftHandSide[jointInfoArray[1].m_pairStart + index];
-		const dgLeftHandSide* const lhs2 = &leftHandSide[jointInfoArray[2].m_pairStart + index];
-		const dgLeftHandSide* const lhs3 = &leftHandSide[jointInfoArray[3].m_pairStart + index];
-		const dgLeftHandSide* const lhs4 = &leftHandSide[jointInfoArray[4].m_pairStart + index];
-		const dgLeftHandSide* const lhs5 = &leftHandSide[jointInfoArray[5].m_pairStart + index];
-		const dgLeftHandSide* const lhs6 = &leftHandSide[jointInfoArray[6].m_pairStart + index];
-		const dgLeftHandSide* const lhs7 = &leftHandSide[jointInfoArray[7].m_pairStart + index];
-		row->m_Jt = dgSolverSoaJacobianPair(lhs0->m_Jt, lhs1->m_Jt, lhs2->m_Jt, lhs3->m_Jt, lhs4->m_Jt, lhs5->m_Jt, lhs6->m_Jt, lhs7->m_Jt);
-		row->m_JMinv = dgSolverSoaJacobianPair(lhs0->m_JMinv, lhs1->m_JMinv, lhs2->m_JMinv, lhs3->m_JMinv, lhs4->m_JMinv, lhs5->m_JMinv, lhs6->m_JMinv, lhs7->m_JMinv);
-*/
-		
 		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
 			const dgJointInfo* const jointInfo = &jointInfoArray[i];
 			const dgLeftHandSide* const lhs = &leftHandSide[jointInfo->m_pairStart + index];
@@ -1366,15 +1392,11 @@ void dgParallelBodySolver::CalculateForces()
 	m_firstPassCoef = dgFloat32(0.0f);
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 
-static int xxx;
-xxx++;
-
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAcceleration();
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
 		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
 			CalculateJointsForce();
-dgTrace (("\n %d: ", xxx));
 			CalculateBodyForce();
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < threadCounts; i++) {
