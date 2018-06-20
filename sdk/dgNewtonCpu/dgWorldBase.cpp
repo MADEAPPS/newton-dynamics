@@ -37,33 +37,15 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 			int m_edx;
 		};
 	} info;
-/*
-	//check Intel CPU
-	// avx2 support in code 7, register ebx bit5
-	__cpuid(info.m_data, 7);
-	if (info.m_ebx & (1 << 5)) {
-		dgFloatSse::m_one = dgFloatSse(1.0f);
-		dgFloatSse::m_zero = dgFloatSse(0.0f);
-		dgFloatAvx::m_one = dgFloatAvx(1.0f);
-		dgFloatAvx::m_zero = dgFloatAvx(0.0f);
-		dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
-		dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
 
-		//cpu support avx2
-		//static dgWorldSse module(world, allocator);
-		static dgWorldAvx module(world, allocator);
-		//static dgWorldAvx2 module(world, allocator);
-		return &module;
-	}
-*/
-	// avx support is encoded on register ecx bit 28
+	// check for instruction set support (avx is bit 28 in reg ecx)
 	__cpuid(info.m_data, 1);
 	if (!(info.m_ecx & (1 << 28))) {
 		return NULL;
 	}
 
-	dgAvxFloat::m_one = dgAvxFloat(1.0f);
-	dgAvxFloat::m_zero = dgAvxFloat(0.0f);
+	dgSoaFloat::m_one = dgSoaFloat(1.0f);
+	dgSoaFloat::m_zero = dgSoaFloat(0.0f);
 	dgSolver::m_zero = dgVector(0.0f);
 	dgSolver::m_negOne = dgVector(-1.0f);
 	

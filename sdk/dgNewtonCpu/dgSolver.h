@@ -30,29 +30,29 @@
 
 
 DG_MSC_AVX_ALIGMENT
-class dgAvxFloat
+class dgSoaFloat
 {
 	public:
-	DG_INLINE dgAvxFloat()
+	DG_INLINE dgSoaFloat()
 	{
 	}
 
-	DG_INLINE dgAvxFloat(const float val)
+	DG_INLINE dgSoaFloat(const float val)
 		:m_type(_mm256_set1_ps (val))
 	{
 	}
 
-	DG_INLINE dgAvxFloat(const __m256 type)
+	DG_INLINE dgSoaFloat(const __m256 type)
 		:m_type(type)
 	{
 	}
 
-	DG_INLINE dgAvxFloat(const dgAvxFloat& copy)
+	DG_INLINE dgSoaFloat(const dgSoaFloat& copy)
 		:m_type(copy.m_type)
 	{
 	}
 
-	DG_INLINE dgAvxFloat(const dgVector& low, const dgVector& high)
+	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
 		:m_type(_mm256_loadu2_m128(&high.m_x, &low.m_x))
 	{
 	}
@@ -71,47 +71,47 @@ class dgAvxFloat
 		return m_f[i];
 	}
 
-	DG_INLINE dgAvxFloat operator+ (const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
 	{
 		return _mm256_add_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgAvxFloat operator- (const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
 	{
 		return _mm256_sub_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgAvxFloat operator* (const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
 	{
 		return _mm256_mul_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgAvxFloat operator> (const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
 	{
 		return _mm256_cmp_ps (m_type, A.m_type, _CMP_GT_OQ);
 	}
 
-	DG_INLINE dgAvxFloat operator< (const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
 	{
 		return _mm256_cmp_ps (m_type, A.m_type, _CMP_LT_OQ);
 	}
 
-	DG_INLINE dgAvxFloat operator| (const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
 	{
 		return _mm256_or_ps (m_type, A.m_type);
 	}
 
-	DG_INLINE dgAvxFloat AndNot (const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat AndNot (const dgSoaFloat& A) const
 	{
 		return  _mm256_andnot_ps (A.m_type, m_type);
 	}
 
-	DG_INLINE dgAvxFloat GetMin(const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
 	{
 		return _mm256_min_ps (m_type, A.m_type);
 	}
 
-	DG_INLINE dgAvxFloat GetMax(const dgAvxFloat& A) const
+	DG_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
 	{
 		return _mm256_max_ps (m_type, A.m_type);
 	}
@@ -120,7 +120,7 @@ class dgAvxFloat
 	{
 		__m256 tmp0 (_mm256_add_ps(m_type, _mm256_permute2f128_ps (m_type, m_type, 1)));
 		__m256 tmp1 (_mm256_hadd_ps (tmp0, tmp0));
-		dgAvxFloat sum (_mm256_hadd_ps (tmp1, tmp1));
+		dgSoaFloat sum (_mm256_hadd_ps (tmp1, tmp1));
 		return  sum[0];
 	}
 
@@ -131,50 +131,50 @@ class dgAvxFloat
 		float m_f[DG_AVX_WORD_GROUP_SIZE];
 	};
 
-	static dgAvxFloat m_one;
-	static dgAvxFloat m_zero;
+	static dgSoaFloat m_one;
+	static dgSoaFloat m_zero;
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT
-class dgAvxVector3
+class dgSoaVector3
 {
 	public:
-	dgAvxFloat m_x;
-	dgAvxFloat m_y;
-	dgAvxFloat m_z;
+	dgSoaFloat m_x;
+	dgSoaFloat m_y;
+	dgSoaFloat m_z;
 } DG_GCC_AVX_ALIGMENT;
 
 
 DG_MSC_AVX_ALIGMENT
-class dgAvxVector6
+class dgSoaVector6
 {
 	public:
-	dgAvxVector3 m_linear;
-	dgAvxVector3 m_angular;
+	dgSoaVector3 m_linear;
+	dgSoaVector3 m_angular;
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT
-class dgAvxJacobianPair
+class dgSoaJacobianPair
 {
 	public:
-	dgAvxVector6 m_jacobianM0;
-	dgAvxVector6 m_jacobianM1;
+	dgSoaVector6 m_jacobianM0;
+	dgSoaVector6 m_jacobianM1;
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT
-class dgAvxMatrixElement
+class dgSoaMatrixElement
 {
 	public:
-	dgAvxJacobianPair m_Jt;
-	dgAvxJacobianPair m_JMinv;
+	dgSoaJacobianPair m_Jt;
+	dgSoaJacobianPair m_JMinv;
 
-	dgAvxFloat m_force;
-	dgAvxFloat m_diagDamp;
-	dgAvxFloat m_invJinvMJt;
-	dgAvxFloat m_coordenateAccel;
-	dgAvxFloat m_normalForceIndex;
-	dgAvxFloat m_lowerBoundFrictionCoefficent;
-	dgAvxFloat m_upperBoundFrictionCoefficent;
+	dgSoaFloat m_force;
+	dgSoaFloat m_diagDamp;
+	dgSoaFloat m_invJinvMJt;
+	dgSoaFloat m_coordenateAccel;
+	dgSoaFloat m_normalForceIndex;
+	dgSoaFloat m_lowerBoundFrictionCoefficent;
+	dgSoaFloat m_upperBoundFrictionCoefficent;
 } DG_GCC_AVX_ALIGMENT;
 
 
@@ -225,11 +225,11 @@ class dgSolver: public dgParallelBodySolver
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 
-	void TransposeRow (dgAvxMatrixElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
+	void TransposeRow (dgSoaMatrixElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
-	float CalculateJointForce(const dgJointInfo* const jointInfo, dgAvxMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
+	float CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 
-	dgArray<dgAvxMatrixElement> m_massMatrix;
+	dgArray<dgSoaMatrixElement> m_massMatrix;
 
 	public:
 	static dgVector m_zero;
