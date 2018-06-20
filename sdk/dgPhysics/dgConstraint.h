@@ -180,6 +180,10 @@ class dgConstraint
 
 	virtual void GetInfo (dgConstraintInfo* const info) const;
 
+	ConstraintsForceFeeback GetUpdateFeedbackFunction ();
+	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params) = 0; 
+
+
 	class dgPointParam
 	{
 		public:
@@ -200,8 +204,7 @@ class dgConstraint
 
 	virtual void ResetInverseDynamics() = 0;
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params) = 0; 
-	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params) = 0; 
-
+	
 	void SetUpdateFeedbackFunction (ConstraintsForceFeeback function);
 	void InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const;
 	void InitInfo (dgConstraintInfo* const info) const;
@@ -259,6 +262,11 @@ DG_INLINE dgConstraint::dgConstraint()
 
 DG_INLINE dgConstraint::~dgConstraint()
 {
+}
+
+DG_INLINE ConstraintsForceFeeback dgConstraint::GetUpdateFeedbackFunction ()
+{
+	return m_updaFeedbackCallback;
 }
 
 DG_INLINE void dgConstraint::SetUpdateFeedbackFunction (ConstraintsForceFeeback function)

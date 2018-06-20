@@ -279,7 +279,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 //	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
 	int high = 20;
-//high = 40;
+high = 40;
 //high = 10;
 //high = 30;
 //high = 2;
@@ -292,14 +292,13 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	}
 
 	high = 20;
-	high = 2;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 //			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high);
 		}
 	}
 
-	high = 20;
+//	high = 20;
 //high = 1;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {

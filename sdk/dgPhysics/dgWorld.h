@@ -520,6 +520,7 @@ class dgWorld
 	bool m_concurrentUpdate;
 	
 	friend class dgBody;
+	friend class dgSolver;
 	friend class dgContact;
 	friend class dgBroadPhase;
 	friend class dgDeadBodies;

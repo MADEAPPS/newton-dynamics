@@ -25,168 +25,165 @@
 
 #include "dgPhysicsStdafx.h"
 
-#if 0
-class dgBodyInfo;
-class dgJointInfo;
-class dgBodyCluster;
 
-#define DG_WORK_GROUP_SIZE	8 
+#define DG_AVX_WORD_GROUP_SIZE	8 
 
 
-DG_MSC_VECTOR_ALIGMENT
-class dgWorkGroupFloat
+DG_MSC_AVX_ALIGMENT
+class dgAvxFloat
 {
 	public:
-	DG_INLINE dgWorkGroupFloat()
+	DG_INLINE dgAvxFloat()
 	{
 	}
 
-	DG_INLINE dgWorkGroupFloat(const dgWorkGroupFloat& me)
-		:m_low(me.m_low)
-		,m_high(me.m_high)
+	DG_INLINE dgAvxFloat(const float val)
+		:m_type(_mm256_set1_ps (val))
 	{
 	}
 
-	DG_INLINE dgWorkGroupFloat(const dgVector& v, const dgVector& high)
-		:m_low(v)
-		,m_high(high)
+	DG_INLINE dgAvxFloat(const __m256 type)
+		:m_type(type)
 	{
 	}
 
-	DG_INLINE dgFloat32& operator[] (dgInt32 i)
+	DG_INLINE dgAvxFloat(const dgAvxFloat& copy)
+		:m_type(copy.m_type)
 	{
-		dgAssert(i < DG_WORK_GROUP_SIZE);
+	}
+
+	DG_INLINE dgAvxFloat(const dgVector& low, const dgVector& high)
+		:m_type(_mm256_loadu2_m128(&high.m_x, &low.m_x))
+	{
+	}
+
+	DG_INLINE float& operator[] (dgInt32 i)
+	{
+		dgAssert(i < DG_AVX_WORD_GROUP_SIZE);
 		dgAssert(i >= 0);
 		return m_f[i];
 	}
 
-	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
+	DG_INLINE const float& operator[] (dgInt32 i) const
 	{
-		dgAssert(i < DG_WORK_GROUP_SIZE);
+		dgAssert(i < DG_AVX_WORD_GROUP_SIZE);
 		dgAssert(i >= 0);
 		return m_f[i];
 	}
 
-	DG_INLINE dgWorkGroupFloat operator+ (const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat operator+ (const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low + A.m_low, m_high + A.m_high);
+		return _mm256_add_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgWorkGroupFloat operator- (const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat operator- (const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low - A.m_low, m_high - A.m_high);
+		return _mm256_sub_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgWorkGroupFloat operator* (const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat operator* (const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low * A.m_low, m_high * A.m_high);
+		return _mm256_mul_ps(m_type, A.m_type);
 	}
 
-	DG_INLINE dgWorkGroupFloat operator> (const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat operator> (const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low > A.m_low, m_high > A.m_high);
+		return _mm256_cmp_ps (m_type, A.m_type, _CMP_GT_OQ);
 	}
 
-	DG_INLINE dgWorkGroupFloat operator< (const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat operator< (const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low < A.m_low, m_high < A.m_high);
+		return _mm256_cmp_ps (m_type, A.m_type, _CMP_LT_OQ);
 	}
 
-	DG_INLINE dgWorkGroupFloat operator| (const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat operator| (const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low | A.m_low, m_high | A.m_high);
+		return _mm256_or_ps (m_type, A.m_type);
 	}
 
-	DG_INLINE dgWorkGroupFloat AndNot (const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat AndNot (const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low.AndNot(A.m_low), m_high.AndNot(A.m_high));
+		return  _mm256_andnot_ps (A.m_type, m_type);
 	}
 
-	DG_INLINE dgWorkGroupFloat GetMin(const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat GetMin(const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low.GetMin(A.m_low), m_high.GetMin(A.m_high));
+		return _mm256_min_ps (m_type, A.m_type);
 	}
 
-	DG_INLINE dgWorkGroupFloat GetMax(const dgWorkGroupFloat& A) const
+	DG_INLINE dgAvxFloat GetMax(const dgAvxFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low.GetMax(A.m_low), m_high.GetMax(A.m_high));
+		return _mm256_max_ps (m_type, A.m_type);
 	}
 
-	DG_INLINE dgFloat32 GetMax() const
+	DG_INLINE float GetMax() const
 	{
-		return (m_low.GetMax(m_high)).GetMax();
+		__m256 tmp0 (_mm256_add_ps(m_type, _mm256_permute2f128_ps (m_type, m_type, 1)));
+		__m256 tmp1 (_mm256_hadd_ps (tmp0, tmp0));
+		dgAvxFloat sum (_mm256_hadd_ps (tmp1, tmp1));
+		return  sum[0];
 	}
 
-	DG_INLINE static void Transpose4x8(dgWorkGroupFloat& src0, dgWorkGroupFloat& src1, dgWorkGroupFloat& src2, dgWorkGroupFloat& src3)
+	union
 	{
-		dgVector::Transpose4x4(src0.m_low, src1.m_low, src2.m_low, src3.m_low, src0.m_low, src1.m_low, src2.m_low, src3.m_low);
-		dgVector::Transpose4x4(src0.m_high, src1.m_high, src2.m_high, src3.m_high, src0.m_high, src1.m_high, src2.m_high, src3.m_high);
-	}
-
-	union {
-		dgFloat32 m_f[DG_WORK_GROUP_SIZE];
-		dgInt32 m_i[DG_WORK_GROUP_SIZE];
-		struct {
-			dgVector m_low;
-			dgVector m_high;
-		};
+		__m256 m_type;
+		int m_i[DG_AVX_WORD_GROUP_SIZE];
+		float m_f[DG_AVX_WORD_GROUP_SIZE];
 	};
 
-	static dgWorkGroupFloat m_one;
-	static dgWorkGroupFloat m_zero;
-} DG_GCC_VECTOR_ALIGMENT;
-
-
-DG_MSC_VECTOR_ALIGMENT
-class dgWorkGroupVector3
-{
-	public:
-	dgWorkGroupFloat m_x;
-	dgWorkGroupFloat m_y;
-	dgWorkGroupFloat m_z;
-} DG_GCC_VECTOR_ALIGMENT;
-
-
-DG_MSC_VECTOR_ALIGMENT
-class dgWorkGroupVector6
-{
-	public:
-	dgWorkGroupVector3 m_linear;
-	dgWorkGroupVector3 m_angular;
+	static dgAvxFloat m_one;
+	static dgAvxFloat m_zero;
 } DG_GCC_AVX_ALIGMENT;
 
-DG_MSC_VECTOR_ALIGMENT
-class dgSolverSoaJacobianPair
+DG_MSC_AVX_ALIGMENT
+class dgAvxVector3
 {
 	public:
-	dgWorkGroupVector6 m_jacobianM0;
-	dgWorkGroupVector6 m_jacobianM1;
-} DG_GCC_VECTOR_ALIGMENT;
+	dgAvxFloat m_x;
+	dgAvxFloat m_y;
+	dgAvxFloat m_z;
+} DG_GCC_AVX_ALIGMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
-class dgSolverSoaElement
+DG_MSC_AVX_ALIGMENT
+class dgAvxVector6
 {
 	public:
-	dgSolverSoaJacobianPair m_Jt;
-	dgSolverSoaJacobianPair m_JMinv;
+	dgAvxVector3 m_linear;
+	dgAvxVector3 m_angular;
+} DG_GCC_AVX_ALIGMENT;
 
-	dgWorkGroupFloat m_force;
-	dgWorkGroupFloat m_diagDamp;
-	dgWorkGroupFloat m_invJinvMJt;
-	dgWorkGroupFloat m_coordenateAccel;
-	dgWorkGroupFloat m_normalForceIndex;
-	dgWorkGroupFloat m_lowerBoundFrictionCoefficent;
-	dgWorkGroupFloat m_upperBoundFrictionCoefficent;
-} DG_GCC_VECTOR_ALIGMENT;
-#endif
+DG_MSC_AVX_ALIGMENT
+class dgAvxJacobianPair
+{
+	public:
+	dgAvxVector6 m_jacobianM0;
+	dgAvxVector6 m_jacobianM1;
+} DG_GCC_AVX_ALIGMENT;
+
+DG_MSC_AVX_ALIGMENT
+class dgAvxMatrixElement
+{
+	public:
+	dgAvxJacobianPair m_Jt;
+	dgAvxJacobianPair m_JMinv;
+
+	dgAvxFloat m_force;
+	dgAvxFloat m_diagDamp;
+	dgAvxFloat m_invJinvMJt;
+	dgAvxFloat m_coordenateAccel;
+	dgAvxFloat m_normalForceIndex;
+	dgAvxFloat m_lowerBoundFrictionCoefficent;
+	dgAvxFloat m_upperBoundFrictionCoefficent;
+} DG_GCC_AVX_ALIGMENT;
+
 
 class dgSolver: public dgParallelBodySolver
 {
 	public:
 	dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator);
 	~dgSolver();
-	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
+	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, float timestep);
 
 	private:
 	void InitWeights();
@@ -226,13 +223,15 @@ class dgSolver: public dgParallelBodySolver
 	static void UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
+	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 
-	void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
+	void TransposeRow (dgAvxMatrixElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
+	float CalculateJointForce(const dgJointInfo* const jointInfo, dgAvxMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 
-//	dgArray<dgSolverSoaElement> m_massMatrix;
-	dgArray<dgInt32> m_massMatrix;
+	static dgVector m_zero;
+	static dgVector m_negOne;
+	dgArray<dgAvxMatrixElement> m_massMatrix;
 };
 
 

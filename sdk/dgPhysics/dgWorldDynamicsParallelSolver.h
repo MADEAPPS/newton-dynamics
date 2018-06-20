@@ -118,12 +118,6 @@ class dgWorkGroupFloat
 		return (m_low.GetMax(m_high)).GetMax();
 	}
 
-	DG_INLINE static void Transpose4x8(dgWorkGroupFloat& src0, dgWorkGroupFloat& src1, dgWorkGroupFloat& src2, dgWorkGroupFloat& src3)
-	{
-		dgVector::Transpose4x4(src0.m_low, src1.m_low, src2.m_low, src3.m_low, src0.m_low, src1.m_low, src2.m_low, src3.m_low);
-		dgVector::Transpose4x4(src0.m_high, src1.m_high, src2.m_high, src3.m_high, src0.m_high, src1.m_high, src2.m_high, src3.m_high);
-	}
-
 	union {
 		dgFloat32 m_f[DG_WORK_GROUP_SIZE];
 		dgInt32 m_i[DG_WORK_GROUP_SIZE];

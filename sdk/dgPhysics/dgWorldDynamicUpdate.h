@@ -198,10 +198,13 @@ class dgWorldDynamicUpdate
 {
 	public:
 	dgWorldDynamicUpdate(dgMemoryAllocator* const allocator);
+	~dgWorldDynamicUpdate() {}
 	void UpdateDynamics (dgFloat32 timestep);
 	dgBody* GetClusterBody (const void* const cluster, dgInt32 index) const;
 
 	dgJacobianMemory& GetSolverMemory() { return m_solverMemory; }
+	virtual dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const;
+	virtual void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 
 	private:
 	void BuildClusters(dgFloat32 timestep);
@@ -212,7 +215,7 @@ class dgWorldDynamicUpdate
 	static dgInt32 CompareClusters(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
-	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
+	
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void ResolveClusterForces (dgBodyCluster* const cluste, dgInt32 threadID, dgFloat32 timestep) const;
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
@@ -227,9 +230,7 @@ class dgWorldDynamicUpdate
 	void SortClustersByCount ();
 	void IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void IntegrateVelocity (const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
-
 	void CalculateClusterContacts (dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
-	dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const;
 	
 	dgInt32 m_bodies;
 	dgInt32 m_joints;

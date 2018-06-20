@@ -280,8 +280,9 @@ class dgBody
 	dgUnsigned32 m_genericLRUMark;
 
 	friend class dgWorld;
+	friend class dgSolver;
 	friend class dgContact;
-	friend class dgConstraint;
+	friend class dgConstraint;	
 	friend class dgBroadPhase;
 	friend class dgCollisionBVH;
 	friend class dgBroadPhaseNode;

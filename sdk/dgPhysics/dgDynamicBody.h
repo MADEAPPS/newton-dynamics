@@ -111,6 +111,7 @@ class dgDynamicBody : public dgBody
 	static dgVector m_equilibriumError2;
 
 	friend class dgWorld;
+	friend class dgSolver;
 	friend class dgBroadPhase;
 	friend class dgBodyMasterList;
 	friend class dgInverseDynamics;
