@@ -61,7 +61,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	if (!(info.m_ecx & (1 << 28))) {
 		return NULL;
 	}
-return NULL;
+//return NULL;
 
 //	dgFloatSse::m_one = dgFloatSse(1.0f);
 //	dgFloatSse::m_zero = dgFloatSse(0.0f);

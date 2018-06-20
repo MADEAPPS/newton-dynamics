@@ -98,12 +98,10 @@ void dgSolver::InitWeights(dgInt32 threadID)
 		dgBody* const body0 = jointInfo->m_joint->GetBody0();
 		dgBody* const body1 = jointInfo->m_joint->GetBody1();
 		if (m0) {
-			dgAssert(0);
 			dgScopeSpinLock lock(body0->GetLock());
 			weight[m0] += dgFloat32(1.0f);
 		}
 		if (m1) {
-			dgAssert(0);
 			dgScopeSpinLock lock(body1->GetLock());
 			weight[m1] += dgFloat32(1.0f);
 		}
