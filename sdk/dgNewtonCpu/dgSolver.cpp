@@ -30,13 +30,12 @@
 #include "dgWorldDynamicsParallelSolver.h"
 
 
-dgSoaFloat dgSoaFloat::m_one;
-dgSoaFloat dgSoaFloat::m_zero;
-dgVector dgSolver::m_zero;
-dgVector dgSolver::m_negOne;
-
 dgSolver::dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:dgParallelBodySolver(allocator)
+	,m_soaOne(1.0f)
+	,m_soaZero(0.0f)
+	,m_zero(0.0f)
+	,m_negOne(-1.0f)
 	,m_massMatrix(allocator)
 {
 	m_world = world;
@@ -617,7 +616,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 	dgSoaVector6 forceM1;
 	dgSoaFloat preconditioner0;
 	dgSoaFloat preconditioner1;
-	dgSoaFloat accNorm(dgSoaFloat::m_zero);
+	dgSoaFloat accNorm(m_soaZero);
 	dgSoaFloat normalForce[DG_CONSTRAINT_MAX_ROWS + 1];
 
 	bool isSleeping = true;
@@ -656,7 +655,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 		}
 
 		const dgInt32 rowsCount = jointInfo->m_pairCount;
-		normalForce[0] = dgSoaFloat::m_one;
+		normalForce[0] = m_soaOne;
 		for (dgInt32 j = 0; j < rowsCount; j++) {
 			dgSoaMatrixElement* const row = &massMatrix[j];
 			dgSoaFloat a((row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
@@ -717,7 +716,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 		dgSoaFloat maxAccel(accNorm);
 
 		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetMax() > tol2); i++) {
-			maxAccel = dgSoaFloat::m_zero;
+			maxAccel = m_soaZero;
 			for (dgInt32 j = 0; j < rowsCount; j++) {
 				dgSoaMatrixElement* const row = &massMatrix[j];
 				dgSoaFloat a(preconditioner0 * (
@@ -843,27 +842,25 @@ void dgSolver::CalculateBodyForce(dgInt32 threadID)
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	const int jointCount = m_jointCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		//dgJacobian forceAcc0;
-		//dgJacobian forceAcc1;
 		dgSoaVector6 forceAcc0;
 		dgSoaVector6 forceAcc1;
 
 		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_WORK_GROUP_SIZE];
 		const dgInt32 count = jointInfoBase->m_pairCount;
 
-		forceAcc0.m_linear.m_x = dgSoaFloat::m_zero;
-		forceAcc0.m_linear.m_y = dgSoaFloat::m_zero;
-		forceAcc0.m_linear.m_z = dgSoaFloat::m_zero;
-		forceAcc0.m_angular.m_x = dgSoaFloat::m_zero;
-		forceAcc0.m_angular.m_y = dgSoaFloat::m_zero;
-		forceAcc0.m_angular.m_z = dgSoaFloat::m_zero;
+		forceAcc0.m_linear.m_x = m_soaZero;
+		forceAcc0.m_linear.m_y = m_soaZero;
+		forceAcc0.m_linear.m_z = m_soaZero;
+		forceAcc0.m_angular.m_x = m_soaZero;
+		forceAcc0.m_angular.m_y = m_soaZero;
+		forceAcc0.m_angular.m_z = m_soaZero;
 
-		forceAcc1.m_linear.m_x = dgSoaFloat::m_zero;
-		forceAcc1.m_linear.m_y = dgSoaFloat::m_zero;
-		forceAcc1.m_linear.m_z = dgSoaFloat::m_zero;
-		forceAcc1.m_angular.m_x = dgSoaFloat::m_zero;
-		forceAcc1.m_angular.m_y = dgSoaFloat::m_zero;
-		forceAcc1.m_angular.m_z = dgSoaFloat::m_zero;
+		forceAcc1.m_linear.m_x = m_soaZero;
+		forceAcc1.m_linear.m_y = m_soaZero;
+		forceAcc1.m_linear.m_z = m_soaZero;
+		forceAcc1.m_angular.m_x = m_soaZero;
+		forceAcc1.m_angular.m_y = m_soaZero;
+		forceAcc1.m_angular.m_z = m_soaZero;
 		
 		const dgInt32 rowStart = soaRowStart[i];
 		for (dgInt32 j = 0; j < count; j++) {

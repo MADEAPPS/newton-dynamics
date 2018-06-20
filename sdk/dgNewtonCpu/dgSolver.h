@@ -130,9 +130,6 @@ class dgSoaFloat
 		int m_i[DG_AVX_WORD_GROUP_SIZE];
 		float m_f[DG_AVX_WORD_GROUP_SIZE];
 	};
-
-	static dgSoaFloat m_one;
-	static dgSoaFloat m_zero;
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT
@@ -177,7 +174,7 @@ class dgSoaMatrixElement
 	dgSoaFloat m_upperBoundFrictionCoefficent;
 } DG_GCC_AVX_ALIGMENT;
 
-
+DG_MSC_AVX_ALIGMENT
 class dgSolver: public dgParallelBodySolver
 {
 	public:
@@ -229,12 +226,13 @@ class dgSolver: public dgParallelBodySolver
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 	float CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 
-	dgArray<dgSoaMatrixElement> m_massMatrix;
+	dgSoaFloat m_soaOne;
+	dgSoaFloat m_soaZero;
+	dgVector m_zero;
+	dgVector m_negOne;
 
-	public:
-	static dgVector m_zero;
-	static dgVector m_negOne;
-};
+	dgArray<dgSoaMatrixElement> m_massMatrix;
+} DG_GCC_AVX_ALIGMENT;
 
 
 #endif
