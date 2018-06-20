@@ -61,15 +61,12 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	if (!(info.m_ecx & (1 << 28))) {
 		return NULL;
 	}
-//return NULL;
 
-//	dgFloatSse::m_one = dgFloatSse(1.0f);
-//	dgFloatSse::m_zero = dgFloatSse(0.0f);
-//	dgFloatAvx::m_one = dgFloatAvx(1.0f);
-//	dgFloatAvx::m_zero = dgFloatAvx(0.0f);
-//	dgFloatAvx2::m_one = dgFloatAvx2(1.0f);
-//	dgFloatAvx2::m_zero = dgFloatAvx2(0.0f);
-
+	dgAvxFloat::m_one = dgAvxFloat(1.0f);
+	dgAvxFloat::m_zero = dgAvxFloat(0.0f);
+	dgSolver::m_zero = dgVector(0.0f);
+	dgSolver::m_negOne = dgVector(-1.0f);
+	
 	//cpu support avx
 	static dgWorldBase module(world, allocator);
 	return &module;

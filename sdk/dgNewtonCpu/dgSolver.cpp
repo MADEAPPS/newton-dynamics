@@ -30,10 +30,10 @@
 #include "dgWorldDynamicsParallelSolver.h"
 
 
-dgAvxFloat dgAvxFloat::m_one(1.0f);
-dgAvxFloat dgAvxFloat::m_zero(0.0f);
-dgVector dgSolver::m_zero (0.0f);
-dgVector dgSolver::m_negOne (-1.0f);
+dgAvxFloat dgAvxFloat::m_one;
+dgAvxFloat dgAvxFloat::m_zero;
+dgVector dgSolver::m_zero;
+dgVector dgSolver::m_negOne;
 
 dgSolver::dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:dgParallelBodySolver(allocator)

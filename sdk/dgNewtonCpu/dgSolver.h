@@ -229,9 +229,11 @@ class dgSolver: public dgParallelBodySolver
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 	float CalculateJointForce(const dgJointInfo* const jointInfo, dgAvxMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 
+	dgArray<dgAvxMatrixElement> m_massMatrix;
+
+	public:
 	static dgVector m_zero;
 	static dgVector m_negOne;
-	dgArray<dgAvxMatrixElement> m_massMatrix;
 };
 
 
