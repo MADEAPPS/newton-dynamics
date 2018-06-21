@@ -26,7 +26,7 @@
 #include "dgPhysicsStdafx.h"
 
 
-#define DG_AVX_WORD_GROUP_SIZE	8 
+#define DG_SOA_WORD_GROUP_SIZE	8 
 
 
 DG_MSC_AVX_ALIGMENT
@@ -59,14 +59,14 @@ class dgSoaFloat
 
 	DG_INLINE float& operator[] (dgInt32 i)
 	{
-		dgAssert(i < DG_AVX_WORD_GROUP_SIZE);
+		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 		dgAssert(i >= 0);
 		return m_f[i];
 	}
 
 	DG_INLINE const float& operator[] (dgInt32 i) const
 	{
-		dgAssert(i < DG_AVX_WORD_GROUP_SIZE);
+		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 		dgAssert(i >= 0);
 		return m_f[i];
 	}
@@ -127,8 +127,8 @@ class dgSoaFloat
 	union
 	{
 		__m256 m_type;
-		int m_i[DG_AVX_WORD_GROUP_SIZE];
-		float m_f[DG_AVX_WORD_GROUP_SIZE];
+		int m_i[DG_SOA_WORD_GROUP_SIZE];
+		float m_f[DG_SOA_WORD_GROUP_SIZE];
 	};
 } DG_GCC_AVX_ALIGMENT;
 

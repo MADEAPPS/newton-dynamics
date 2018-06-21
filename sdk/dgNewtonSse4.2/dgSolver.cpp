@@ -62,7 +62,7 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 
 	m_weight = dgAlloca(dgFloat32, cluster.m_bodyCount);
 	m_invWeight = dgAlloca(dgFloat32, cluster.m_bodyCount);
-	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOLVER_USES_SOA + 1);
+	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOA_WORD_GROUP_SIZE + 1);
 
 	InitWeights();
 	InitBodyArray();
@@ -327,7 +327,6 @@ void dgSolver::TransposeRow(dgSoaMatrixElement* const row, const dgJointInfo* co
 	}
 }
 
-
 void dgSolver::TransposeMassMatrix(dgInt32 threadID)
 {
 	const dgJointInfo* const jointInfoArray = m_jointArray;
@@ -503,7 +502,6 @@ void dgSolver::UpdateKinematicFeedbackKernel(void* const context, void* const, d
 	me->UpdateKinematicFeedback(threadID);
 }
 
-
 void dgSolver::UpdateRowAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
 	dgSolver* const me = (dgSolver*)context;
@@ -535,7 +533,6 @@ void dgSolver::CalculateBodiesAcceleration()
 	}
 	m_world->SynchronizationBarrier();
 }
-
 
 void dgSolver::CalculateJointsForce()
 {
@@ -781,7 +778,6 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 	}
 	return accNorm.GetMax();
 }
-
 
 
 void dgSolver::CalculateJointsForce(dgInt32 threadID)

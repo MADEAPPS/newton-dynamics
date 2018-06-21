@@ -501,7 +501,8 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 		normalForce[0] = dgWorkGroupFloat::m_one;
 		for (dgInt32 j = 0; j < rowsCount; j++) {
 			dgSolverSoaElement* const row = &massMatrix[j];
-			dgWorkGroupFloat a((row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
+			dgWorkGroupFloat a(
+				(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
 				row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
 				row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
 				row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
@@ -561,20 +562,21 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 			maxAccel = dgWorkGroupFloat::m_zero;
 			for (dgInt32 j = 0; j < rowsCount; j++) {
 				dgSolverSoaElement* const row = &massMatrix[j];
-				dgWorkGroupFloat a(preconditioner0 * (
-					row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
+				dgWorkGroupFloat a(
+					(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
 					row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
 					row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
 					row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
 					row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-					row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z) + 
-					preconditioner1 * (
-					row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
+					row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z) *
+					preconditioner0 +
+					(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
 					row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
 					row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
 					row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
 					row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-					row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z));
+					row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z) *
+					preconditioner1);
 
 				a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
 				dgWorkGroupFloat f (row->m_force + row->m_invJinvMJt * a);

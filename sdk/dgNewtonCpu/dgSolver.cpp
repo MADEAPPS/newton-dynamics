@@ -62,7 +62,7 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 
 	m_weight = dgAlloca(dgFloat32, cluster.m_bodyCount);
 	m_invWeight = dgAlloca(dgFloat32, cluster.m_bodyCount);
-	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOLVER_USES_SOA + 1);
+	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOA_WORD_GROUP_SIZE + 1);
 
 	InitWeights();
 	InitBodyArray();
@@ -658,20 +658,21 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 		normalForce[0] = m_soaOne;
 		for (dgInt32 j = 0; j < rowsCount; j++) {
 			dgSoaMatrixElement* const row = &massMatrix[j];
-			dgSoaFloat a((row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
+			dgSoaFloat a(
+				preconditioner0 * (
+				row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
 				row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
 				row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
 				row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
 				row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-				row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z) *
-				preconditioner0 +
-				(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
+				row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z) +
+				preconditioner1 * (
+				row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
 				row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
 				row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
 				row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
 				row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-				row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z) *
-				preconditioner1);
+				row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z));
 
 			a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
 			dgSoaFloat f (row->m_force + row->m_invJinvMJt * a);
@@ -719,7 +720,8 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 			maxAccel = m_soaZero;
 			for (dgInt32 j = 0; j < rowsCount; j++) {
 				dgSoaMatrixElement* const row = &massMatrix[j];
-				dgSoaFloat a(preconditioner0 * (
+				dgSoaFloat a(
+					preconditioner0 * (
 					row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
 					row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
 					row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
@@ -864,14 +866,8 @@ void dgSolver::CalculateBodyForce(dgInt32 threadID)
 		
 		const dgInt32 rowStart = soaRowStart[i];
 		for (dgInt32 j = 0; j < count; j++) {
-			//const dgLeftHandSide* const row = &leftHandSide[index + i];
-			//const dgRightHandSide* const rhs = &rightHandSide[index + i];
 			const dgSoaMatrixElement* const row = &massMatrix[rowStart + j];
 
-			//dgAssert(dgCheckFloat(rhs->m_force));
-			//dgVector val(rhs->m_force);
-			//forceAcc0.m_linear += row->m_Jt.m_jacobianM0.m_linear * val;
-			//forceAcc0.m_angular += row->m_Jt.m_jacobianM0.m_angular * val;
 			forceAcc0.m_linear.m_x = forceAcc0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * row->m_force;
 			forceAcc0.m_linear.m_y = forceAcc0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * row->m_force;
 			forceAcc0.m_linear.m_z = forceAcc0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * row->m_force;
@@ -879,8 +875,6 @@ void dgSolver::CalculateBodyForce(dgInt32 threadID)
 			forceAcc0.m_angular.m_y = forceAcc0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * row->m_force;
 			forceAcc0.m_angular.m_z = forceAcc0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * row->m_force;
 
-			//forceAcc1.m_linear += row->m_Jt.m_jacobianM1.m_linear * val;
-			//forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
 			forceAcc1.m_linear.m_x = forceAcc1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * row->m_force;
 			forceAcc1.m_linear.m_y = forceAcc1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * row->m_force;
 			forceAcc1.m_linear.m_z = forceAcc1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * row->m_force;
@@ -905,8 +899,6 @@ void dgSolver::CalculateBodyForce(dgInt32 threadID)
 				{
 					const dgVector weight(invWeight[m0]);
 					dgBody* const body0 = jointInfo->m_joint->GetBody0();
-					//forceAcc0.m_linear = forceAcc0.m_linear * weight;
-					//forceAcc0.m_angular = forceAcc0.m_angular * weight;
 					dgVector linear (weight * dgVector (forceAcc0.m_linear.m_x[j], forceAcc0.m_linear.m_y[j], forceAcc0.m_linear.m_z[j], dgFloat32 (0.0f)));
 					dgVector angular (weight * dgVector (forceAcc0.m_angular.m_x[j], forceAcc0.m_angular.m_y[j], forceAcc0.m_angular.m_z[j], dgFloat32 (0.0f)));
 					dgScopeSpinLock lock(&body0->m_criticalSectionLock);
@@ -917,9 +909,6 @@ void dgSolver::CalculateBodyForce(dgInt32 threadID)
 				{
 					const dgVector weight(invWeight[m1]);
 					dgBody* const body1 = jointInfo->m_joint->GetBody1();
-					//forceAcc1.m_linear = forceAcc1.m_linear * weight;
-					//forceAcc1.m_angular = forceAcc1.m_angular * weight;
-
 					dgVector linear(weight * dgVector(forceAcc1.m_linear.m_x[j], forceAcc1.m_linear.m_y[j], forceAcc1.m_linear.m_z[j], dgFloat32(0.0f)));
 					dgVector angular(weight * dgVector(forceAcc1.m_angular.m_x[j], forceAcc1.m_angular.m_y[j], forceAcc1.m_angular.m_z[j], dgFloat32(0.0f)));
 					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
@@ -966,7 +955,6 @@ void dgSolver::IntegrateBodiesVelocity(dgInt32 threadID)
 			}
 			dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
 			dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
-			//dgTrace(("%d v(%f %f %f)\n", body->m_uniqueID, body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]));
 		}
 	}
 }
@@ -997,7 +985,6 @@ void dgSolver::UpdateForceFeedback(dgInt32 threadID)
 
 		for (dgInt32 j = 0; j < count; j++) {
 			const dgRightHandSide* const rhs = &rightHandSide[j + first];
-			//dgLeftHandSide* const row = &matrixRow[j + first];
 			dgAssert(dgCheckFloat(rhs->m_force));
 			rhs->m_jointFeebackForce->m_force = rhs->m_force;
 			rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * m_timestepRK;
@@ -1019,7 +1006,6 @@ void dgSolver::UpdateKinematicFeedback(dgInt32 threadID)
 		}
 	}
 }
-
 
 void dgSolver::CalculateForces()
 {
