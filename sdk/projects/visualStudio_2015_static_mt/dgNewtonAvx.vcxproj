@@ -19,20 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dgNewtonCpu\dgNewtonPluginStdafx.cpp">
+    <ClCompile Include="..\..\dgNewtonAvx\dgNewtonPluginStdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\dgNewtonCpu\dgSolver.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dgWorldBase.cpp" />
-    <ClCompile Include="..\..\dgNewtonCpu\dllmain.cpp" />
+    <ClCompile Include="..\..\dgNewtonAvx\dgSolver.cpp" />
+    <ClCompile Include="..\..\dgNewtonAvx\dgWorldBase.cpp" />
+    <ClCompile Include="..\..\dgNewtonAvx\dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dgNewtonCpu\dgNewtonPluginStdafx.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgSolver.h" />
-    <ClInclude Include="..\..\dgNewtonCpu\dgWorldBase.h" />
+    <ClInclude Include="..\..\dgNewtonAvx\dgNewtonPluginStdafx.h" />
+    <ClInclude Include="..\..\dgNewtonAvx\dgSolver.h" />
+    <ClInclude Include="..\..\dgNewtonAvx\dgWorldBase.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}</ProjectGuid>
