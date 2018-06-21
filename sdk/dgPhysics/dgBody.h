@@ -132,8 +132,6 @@ class dgBody
 	bool GetAutoSleep () const;
 	void SetAutoSleep (bool state);
 
-	dgInt32* GetLock();
-
 	dgCollisionInstance* GetCollision () const;
 	dgBodyMasterList::dgListNode* GetMasterList() const;
 
@@ -607,11 +605,6 @@ DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
 DG_INLINE dgInt32 dgBody::GetSerializedID() const
 {
 	return m_serializedEnum;
-}
-
-DG_INLINE dgInt32* dgBody::GetLock()
-{
-	return &m_criticalSectionLock;
 }
 
 #endif 

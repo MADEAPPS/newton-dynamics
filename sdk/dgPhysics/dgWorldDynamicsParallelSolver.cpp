@@ -1028,7 +1028,6 @@ void dgParallelBodySolver::UpdateRowAcceleration(dgInt32 threadID)
 void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 {
 #ifdef DG_SOLVER_USES_SOA
-//	const dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
 	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
 	
 	dgSolverSoaElement* const massMatrix = &m_massMatrix[0];
@@ -1041,8 +1040,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	const int jointCount = m_jointCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		//dgJacobian forceAcc0;
-		//dgJacobian forceAcc1;
 		dgWorkGroupVector6 forceAcc0;
 		dgWorkGroupVector6 forceAcc1;
 
@@ -1065,14 +1062,8 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 		
 		const dgInt32 rowStart = soaRowStart[i];
 		for (dgInt32 j = 0; j < count; j++) {
-			//const dgLeftHandSide* const row = &leftHandSide[index + i];
-			//const dgRightHandSide* const rhs = &rightHandSide[index + i];
 			const dgSolverSoaElement* const row = &massMatrix[rowStart + j];
 
-			//dgAssert(dgCheckFloat(rhs->m_force));
-			//dgVector val(rhs->m_force);
-			//forceAcc0.m_linear += row->m_Jt.m_jacobianM0.m_linear * val;
-			//forceAcc0.m_angular += row->m_Jt.m_jacobianM0.m_angular * val;
 			forceAcc0.m_linear.m_x = forceAcc0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * row->m_force;
 			forceAcc0.m_linear.m_y = forceAcc0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * row->m_force;
 			forceAcc0.m_linear.m_z = forceAcc0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * row->m_force;
@@ -1080,8 +1071,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 			forceAcc0.m_angular.m_y = forceAcc0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * row->m_force;
 			forceAcc0.m_angular.m_z = forceAcc0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * row->m_force;
 
-			//forceAcc1.m_linear += row->m_Jt.m_jacobianM1.m_linear * val;
-			//forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
 			forceAcc1.m_linear.m_x = forceAcc1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * row->m_force;
 			forceAcc1.m_linear.m_y = forceAcc1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * row->m_force;
 			forceAcc1.m_linear.m_z = forceAcc1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * row->m_force;
@@ -1106,8 +1095,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 				{
 					const dgVector weight(invWeight[m0]);
 					dgBody* const body0 = jointInfo->m_joint->GetBody0();
-					//forceAcc0.m_linear = forceAcc0.m_linear * weight;
-					//forceAcc0.m_angular = forceAcc0.m_angular * weight;
 					dgVector linear (weight * dgVector (forceAcc0.m_linear.m_x[j], forceAcc0.m_linear.m_y[j], forceAcc0.m_linear.m_z[j], dgFloat32 (0.0f)));
 					dgVector angular (weight * dgVector (forceAcc0.m_angular.m_x[j], forceAcc0.m_angular.m_y[j], forceAcc0.m_angular.m_z[j], dgFloat32 (0.0f)));
 					dgScopeSpinLock lock(&body0->m_criticalSectionLock);
@@ -1118,9 +1105,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 				{
 					const dgVector weight(invWeight[m1]);
 					dgBody* const body1 = jointInfo->m_joint->GetBody1();
-					//forceAcc1.m_linear = forceAcc1.m_linear * weight;
-					//forceAcc1.m_angular = forceAcc1.m_angular * weight;
-
 					dgVector linear(weight * dgVector(forceAcc1.m_linear.m_x[j], forceAcc1.m_linear.m_y[j], forceAcc1.m_linear.m_z[j], dgFloat32(0.0f)));
 					dgVector angular(weight * dgVector(forceAcc1.m_angular.m_x[j], forceAcc1.m_angular.m_y[j], forceAcc1.m_angular.m_z[j], dgFloat32(0.0f)));
 					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
@@ -1377,6 +1361,7 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 
 	const dgVector preconditioner0(jointInfo->m_preconditioner0);
 	const dgVector preconditioner1(jointInfo->m_preconditioner1);
+
 	forceAcc0.m_linear = forceAcc0.m_linear * preconditioner0;
 	forceAcc0.m_angular = forceAcc0.m_angular * preconditioner0;
 	forceAcc1.m_linear = forceAcc1.m_linear * preconditioner1;
