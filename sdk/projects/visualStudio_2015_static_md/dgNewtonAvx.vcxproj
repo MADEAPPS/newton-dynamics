@@ -38,7 +38,7 @@
     <ProjectGuid>{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>NewtonCpu</RootNamespace>
-    <ProjectName>dgNewtonCpu</ProjectName>
+    <ProjectName>dgNewtonAvx</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
