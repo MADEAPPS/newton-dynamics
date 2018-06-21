@@ -62,9 +62,9 @@ dgWorldBase::~dgWorldBase()
 const char* dgWorldBase::GetId() const
 {
 #ifdef _DEBUG
-	return "newtonAVX_d";
+	return "newtonSSE4.2_d";
 #else
-	return "newtonAVX";
+	return "newtonSSE4.2";
 #endif
 }
 
