@@ -1120,7 +1120,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 	test = test || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 	if (test) {
 		dgContact* contact = m_world->FindContactJoint(body0, body1);
-		dgContact* contact1 = m_contactCache.FindContactJoint(body0, body1);
+		//dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
 
 		if (!contact) {
 			const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);

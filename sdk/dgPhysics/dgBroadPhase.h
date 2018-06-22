@@ -217,6 +217,7 @@ class dgBroadPhaseTreeNode: public dgBroadPhaseNode
 	dgList<dgBroadPhaseTreeNode*>::dgListNode* m_fitnessNode;
 } DG_GCC_VECTOR_ALIGMENT;
 
+#define DG_CONTACT_CACHE_LINE_SIZE 4
 
 class dgBroadPhase
 {
@@ -257,9 +258,9 @@ class dgBroadPhase
 
 		dgInt32 m_count;
 		dgUnsigned32 m_key;
-		CacheEntryTag m_tags[4];
-		dgInt32 m_hashKey[4];
-		dgContact* m_contact[4];
+		dgContact* m_contact[DG_CONTACT_CACHE_LINE_SIZE];
+		dgInt32 m_hashKey[DG_CONTACT_CACHE_LINE_SIZE];
+		CacheEntryTag m_tags[DG_CONTACT_CACHE_LINE_SIZE];
 	};
 
 	class dgContactCache: public dgArray<dgContactCacheLine>
@@ -267,9 +268,9 @@ class dgBroadPhase
 		public:
 		dgContactCache (dgMemoryAllocator* const allocator)
 			:dgArray<dgContactCacheLine>(allocator)
-			,m_count(1<<8)
+			,m_count(1<<10)
 		{
-			ResizeIfNecessary(m_count * 4);
+			ResizeIfNecessary(m_count);
 			dgContactCacheLine* const cache = &(*this)[0];
 			memset(cache, 0, m_count * sizeof(dgContactCacheLine));
 		}
@@ -306,7 +307,7 @@ class dgBroadPhase
 				cacheLine->m_key = hash;
 			}
 
-			dgInt32 index = cacheLine->m_count;
+			const dgInt32 index = cacheLine->m_count;
 			cacheLine->m_count++;
 			cacheLine->m_tags[index] = tag;
 			cacheLine->m_hashKey[index] = hash;
@@ -321,7 +322,34 @@ class dgBroadPhase
 		private:
 		void Rehash()
 		{
-			dgAssert(0);
+			const dgInt32 newCount = m_count * 2;
+			ResizeIfNecessary(newCount);
+			dgContactCacheLine* const cache0 = &(*this)[0];
+			dgContactCacheLine* const cache1 = &cache0[m_count];
+	
+			const dgInt32 mask = newCount - 1;
+			for (dgInt32 i = 0; i < m_count; i++) {
+				dgContactCacheLine* const src = &cache0[i];
+				dgContactCacheLine* const dst = &cache1[i];
+				dst->m_count = 0;
+				for (dgInt32 j = src->m_count - 1; j >= 0; j--) {
+					dgInt32 entry = src->m_hashKey[j] & mask;
+					if (entry >= m_count) {
+						const dgInt32 dstIndex = dst->m_count;
+						dst->m_count++;
+						dst->m_tags[dstIndex] = src->m_tags[j];
+						dst->m_hashKey[dstIndex] = src->m_hashKey[j];
+						dst->m_contact[dstIndex] = src->m_contact[j];
+
+						src->m_count--;
+						const dgInt32 srcIndex = src->m_count;
+						src->m_tags[j] = src->m_tags[srcIndex];
+						src->m_hashKey[j] = src->m_hashKey[srcIndex];
+						src->m_contact[j] = src->m_contact[srcIndex];
+					}
+				}
+			}
+			m_count = newCount;
 		}
 
 		dgInt32 m_count;
