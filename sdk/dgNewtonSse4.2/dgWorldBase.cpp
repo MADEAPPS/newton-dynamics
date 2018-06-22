@@ -38,13 +38,12 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		};
 	} info;
 
-	// check for instruction set support (avx is bit 28 in reg ecx)
+	//static bool FMA(void) { return CPU_Rep.f_1_ECX_[12]; }
 	__cpuid(info.m_data, 1);
-	if (!(info.m_ecx & (1 << 28))) {
+	if (!(info.m_ecx & (1 << 12))) {
 		return NULL;
 	}
 	
-	//cpu support avx
 	static dgWorldBase module(world, allocator);
 	return &module;
 }
