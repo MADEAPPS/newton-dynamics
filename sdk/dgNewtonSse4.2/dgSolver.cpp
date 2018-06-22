@@ -671,22 +671,23 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 		normalForce[0] = m_soaOne;
 		for (dgInt32 j = 0; j < rowsCount; j++) {
 			dgSoaMatrixElement* const row = &massMatrix[j];
-			dgSoaFloat a(
-				row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
-				row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
-				row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
-				row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
-				row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-				row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z +
-				row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
-				row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
-				row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
-				row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
-				row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-				row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z);
+			dgSoaFloat a(row->m_coordenateAccel);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_x, forceM0.m_linear.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_y, forceM0.m_angular.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
 
-			a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
-			dgSoaFloat f (row->m_force + row->m_invJinvMJt * a);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_x, forceM1.m_linear.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_y, forceM1.m_linear.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_z, forceM1.m_linear.m_z);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_x, forceM1.m_angular.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+			a = a.NegMulAdd(row->m_force, row->m_diagDamp);
+
+			dgSoaFloat f(row->m_force.MulAdd (row->m_invJinvMJt,  a));
 
 			dgSoaFloat frictionNormal;
 			for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
@@ -711,19 +712,19 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 			dgSoaFloat deltaForce0(deltaForce * preconditioner0);
 			dgSoaFloat deltaForce1(deltaForce * preconditioner1);
 
-			forceM0.m_linear.m_x = forceM0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * deltaForce0;
-			forceM0.m_linear.m_y = forceM0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * deltaForce0;
-			forceM0.m_linear.m_z = forceM0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * deltaForce0;
-			forceM0.m_angular.m_x = forceM0.m_angular.m_x + row->m_Jt.m_jacobianM0.m_angular.m_x * deltaForce0;
-			forceM0.m_angular.m_y = forceM0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * deltaForce0;
-			forceM0.m_angular.m_z = forceM0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * deltaForce0;
+			forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
+			forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
+			forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, deltaForce0);
+			forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, deltaForce0);
+			forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, deltaForce0);
+			forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, deltaForce0);
 
-			forceM1.m_linear.m_x = forceM1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * deltaForce1;
-			forceM1.m_linear.m_y = forceM1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * deltaForce1;
-			forceM1.m_linear.m_z = forceM1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * deltaForce1;
-			forceM1.m_angular.m_x = forceM1.m_angular.m_x + row->m_Jt.m_jacobianM1.m_angular.m_x * deltaForce1;
-			forceM1.m_angular.m_y = forceM1.m_angular.m_y + row->m_Jt.m_jacobianM1.m_angular.m_y * deltaForce1;
-			forceM1.m_angular.m_z = forceM1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * deltaForce1;
+			forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, deltaForce1);
+			forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, deltaForce1);
+			forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, deltaForce1);
+			forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, deltaForce1);
+			forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
+			forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
 		}
 
 		const dgFloat32 tol = dgFloat32(0.5f);
@@ -734,22 +735,24 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 			maxAccel = m_soaZero;
 			for (dgInt32 j = 0; j < rowsCount; j++) {
 				dgSoaMatrixElement* const row = &massMatrix[j];
-				dgSoaFloat a(
-					row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
-					row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
-					row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
-					row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
-					row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-					row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z + 
-					row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
-					row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
-					row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
-					row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
-					row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-					row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z);
 
-				a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
-				dgSoaFloat f (row->m_force + row->m_invJinvMJt * a);
+				dgSoaFloat a(row->m_coordenateAccel);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_x, forceM0.m_linear.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_y, forceM0.m_angular.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
+
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_x, forceM1.m_linear.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_y, forceM1.m_linear.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_z, forceM1.m_linear.m_z);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_x, forceM1.m_angular.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+				a = a.NegMulAdd(row->m_force, row->m_diagDamp);
+
+				dgSoaFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a));
 
 				dgSoaFloat frictionNormal;
 				for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
@@ -774,19 +777,19 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 				dgSoaFloat deltaForce0(deltaForce * preconditioner0);
 				dgSoaFloat deltaForce1(deltaForce * preconditioner1);
 
-				forceM0.m_linear.m_x = forceM0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * deltaForce0;
-				forceM0.m_linear.m_y = forceM0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * deltaForce0;
-				forceM0.m_linear.m_z = forceM0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * deltaForce0;
-				forceM0.m_angular.m_x = forceM0.m_angular.m_x + row->m_Jt.m_jacobianM0.m_angular.m_x * deltaForce0;
-				forceM0.m_angular.m_y = forceM0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * deltaForce0;
-				forceM0.m_angular.m_z = forceM0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * deltaForce0;
+				forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
+				forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
+				forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, deltaForce0);
+				forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, deltaForce0);
+				forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, deltaForce0);
+				forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, deltaForce0);
 
-				forceM1.m_linear.m_x = forceM1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * deltaForce1;
-				forceM1.m_linear.m_y = forceM1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * deltaForce1;
-				forceM1.m_linear.m_z = forceM1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * deltaForce1;
-				forceM1.m_angular.m_x = forceM1.m_angular.m_x + row->m_Jt.m_jacobianM1.m_angular.m_x * deltaForce1;
-				forceM1.m_angular.m_y = forceM1.m_angular.m_y + row->m_Jt.m_jacobianM1.m_angular.m_y * deltaForce1;
-				forceM1.m_angular.m_z = forceM1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * deltaForce1;
+				forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, deltaForce1);
+				forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, deltaForce1);
+				forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, deltaForce1);
+				forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, deltaForce1);
+				forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
+				forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
 			}
 		}
 /*
