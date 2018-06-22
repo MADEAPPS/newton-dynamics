@@ -221,6 +221,112 @@ class dgBroadPhaseTreeNode: public dgBroadPhaseNode
 class dgBroadPhase
 {
 	protected:
+
+	class CacheEntryTag
+	{
+		public:
+		CacheEntryTag() {}
+		CacheEntryTag(dgUnsigned32 tag0, dgUnsigned32 tag1)
+			:m_tagLow(dgMin(tag0, tag1))
+			,m_tagHigh(dgMax(tag0, tag1))
+		{
+		}
+
+		dgUnsigned32 GetHash() const
+		{
+			return m_tagHigh * 31415821u + m_tagLow;
+		}
+	
+		union
+		{
+			dgUnsigned64 m_tag;
+			struct 
+			{
+				dgUnsigned32 m_tagLow;
+				dgUnsigned32 m_tagHigh;
+			};
+		};
+	};
+
+	class dgContactCacheLine
+	{
+		public:
+		dgContactCacheLine()
+		{
+		}
+
+		dgInt32 m_count;
+		dgUnsigned32 m_key;
+		CacheEntryTag m_tags[4];
+		dgInt32 m_hashKey[4];
+		dgContact* m_contact[4];
+	};
+
+	class dgContactCache: public dgArray<dgContactCacheLine>
+	{
+		public:
+		dgContactCache (dgMemoryAllocator* const allocator)
+			:dgArray<dgContactCacheLine>(allocator)
+			,m_count(1<<8)
+		{
+			ResizeIfNecessary(m_count * 4);
+			dgContactCacheLine* const cache = &(*this)[0];
+			memset(cache, 0, m_count * sizeof(dgContactCacheLine));
+		}
+
+		dgContact* FindContactJoint(const dgBody* const body0, const dgBody* const body1) const
+		{
+			CacheEntryTag tag(body0->m_uniqueID, body1->m_uniqueID);
+			dgUnsigned32 hash = tag.GetHash();
+
+			dgInt32 entry = hash & (m_count - 1);
+
+			const dgContactCacheLine& cacheLine = (*this)[entry];
+			for (dgInt32 i = 0; i < cacheLine.m_count; i++) {
+				if (cacheLine.m_tags[i].m_tag == tag.m_tag) {
+					return cacheLine.m_contact[i];
+				}
+			}
+			return NULL;
+		}
+
+		void AddContactJoint(dgContact* const joint)
+		{
+			CacheEntryTag tag(joint->m_body0->m_uniqueID, joint->m_body1->m_uniqueID);
+			dgUnsigned32 hash = tag.GetHash();
+
+			dgInt32 entry = hash & (m_count - 1);
+			dgContactCacheLine* cacheLine = &(*this)[entry];
+			while (cacheLine->m_count == 4) {
+				Rehash();
+				entry = hash & (m_count - 1);
+				cacheLine = &(*this)[entry];
+			}
+			if (cacheLine->m_count == 0) {
+				cacheLine->m_key = hash;
+			}
+
+			dgInt32 index = cacheLine->m_count;
+			cacheLine->m_count++;
+			cacheLine->m_tags[index] = tag;
+			cacheLine->m_hashKey[index] = hash;
+			cacheLine->m_contact[index] = joint;
+		}
+
+		void RemoveContactJoint(dgContact* const joint)
+		{
+			dgAssert(0);
+		}
+
+		private:
+		void Rehash()
+		{
+			dgAssert(0);
+		}
+
+		dgInt32 m_count;
+	};
+
 	class dgSpliteInfo;
 	class dgBroadphaseSyncDescriptor
 	{
@@ -390,6 +496,7 @@ class dgBroadPhase
 	dgList<dgBroadPhaseNode*> m_updateList;
 	dgList<dgBroadPhaseAggregate*> m_aggregateList;
 	dgUnsigned32 m_lru;
+	dgContactCache m_contactCache;
 	dgArray<dgPendingCollisionSofBodies> m_pendingSoftBodyCollisions;
 	dgInt32 m_pendingSoftBodyPairsCount;
 	dgInt32 m_contacJointLock;
