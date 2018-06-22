@@ -38,22 +38,26 @@ class dgSoaFloat
 	}
 
 	DG_INLINE dgSoaFloat(const float val)
-		:m_type(_mm256_set1_ps (val))
+		:m_low(_mm_set1_ps (val))
+		,m_high(_mm_set1_ps(val))
 	{
 	}
 
-	DG_INLINE dgSoaFloat(const __m256 type)
-		:m_type(type)
+	DG_INLINE dgSoaFloat(const dgVector& type)
+		:m_low(type)
+		,m_high(type)
 	{
 	}
 
 	DG_INLINE dgSoaFloat(const dgSoaFloat& copy)
-		:m_type(copy.m_type)
+		:m_low(copy.m_low)
+		,m_high(copy.m_high)
 	{
 	}
 
 	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
-		:m_type(_mm256_loadu2_m128(&high.m_x, &low.m_x))
+		:m_low(low)
+		,m_high(high)
 	{
 	}
 
@@ -73,62 +77,77 @@ class dgSoaFloat
 
 	DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
 	{
-		return _mm256_add_ps(m_type, A.m_type);
+		return dgSoaFloat(m_low + A.m_low, m_high + A.m_high);
 	}
 
 	DG_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
 	{
-		return _mm256_sub_ps(m_type, A.m_type);
+		return dgSoaFloat(m_low - A.m_low, m_high - A.m_high);
 	}
 
 	DG_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
 	{
-		return _mm256_mul_ps(m_type, A.m_type);
+		return dgSoaFloat(m_low * A.m_low, m_high * A.m_high);
 	}
 
+	DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
+	{
+		//__m128 _mm_fmadd_ps(__m128 a, __m128 b, __m128 c)
+		//return dgSoaFloat(A.m_low * B.m_low + m_low, A.m_high * B.m_high + m_high);
+		return dgSoaFloat(_mm_fmadd_ps (A.m_low.m_type, B.m_low.m_type, m_low.m_type), _mm_fmadd_ps(A.m_high.m_type, B.m_high.m_type, m_high.m_type));
+	}
+
+	DG_INLINE dgSoaFloat NegMulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
+	{
+		//__m128 _mm_fmadd_ps(__m128 a, __m128 b, __m128 c)
+		//return dgSoaFloat(A.m_low * B.m_low + m_low, A.m_high * B.m_high + m_high);
+		return dgSoaFloat(_mm_fnmadd_ps(A.m_low.m_type, B.m_low.m_type, m_low.m_type), _mm_fnmadd_ps(A.m_high.m_type, B.m_high.m_type, m_high.m_type));
+	}
+	
 	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
 	{
-		return _mm256_cmp_ps (m_type, A.m_type, _CMP_GT_OQ);
+		return dgSoaFloat(m_low > A.m_low, m_high > A.m_high);
 	}
 
 	DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
 	{
-		return _mm256_cmp_ps (m_type, A.m_type, _CMP_LT_OQ);
+		return dgSoaFloat(m_low < A.m_low, m_high < A.m_high);
 	}
 
 	DG_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
 	{
-		return _mm256_or_ps (m_type, A.m_type);
+		return dgSoaFloat(m_low | A.m_low, m_high | A.m_high);
 	}
 
 	DG_INLINE dgSoaFloat AndNot (const dgSoaFloat& A) const
 	{
-		return  _mm256_andnot_ps (A.m_type, m_type);
+		return dgSoaFloat(m_low.AndNot(A.m_low), m_high.AndNot(A.m_high));
 	}
 
 	DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
 	{
-		return _mm256_min_ps (m_type, A.m_type);
+		return dgSoaFloat(m_low.GetMin(A.m_low), m_high.GetMin(A.m_high));
 	}
 
 	DG_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
 	{
-		return _mm256_max_ps (m_type, A.m_type);
+		return dgSoaFloat(m_low.GetMax(A.m_low), m_high.GetMax(A.m_high));
 	}
 
 	DG_INLINE float GetMax() const
 	{
-		__m256 tmp0 (_mm256_add_ps(m_type, _mm256_permute2f128_ps (m_type, m_type, 1)));
-		__m256 tmp1 (_mm256_hadd_ps (tmp0, tmp0));
-		dgSoaFloat sum (_mm256_hadd_ps (tmp1, tmp1));
-		return  sum[0];
+		return (m_low.GetMax(m_high)).GetMax();
 	}
 
 	union
 	{
-		__m256 m_type;
-		int m_i[DG_SOA_WORD_GROUP_SIZE];
 		float m_f[DG_SOA_WORD_GROUP_SIZE];
+		int m_i[DG_SOA_WORD_GROUP_SIZE];
+		struct
+		{
+			dgVector m_low;
+			dgVector m_high;
+		};
 	};
 } DG_GCC_AVX_ALIGMENT;
 

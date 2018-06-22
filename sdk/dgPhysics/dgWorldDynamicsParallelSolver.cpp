@@ -28,13 +28,9 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgWorldDynamicsParallelSolver.h"
 
-#if (DG_WORK_GROUP_SIZE > 4)
-dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one, dgVector::m_one);
-dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero, dgVector::m_zero);
-#else
+
 dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one);
 dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero);
-#endif
 
 void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep)
 {

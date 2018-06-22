@@ -248,7 +248,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
 //	m_workerThreades = 4;
-//	m_currentPlugin = 1;
+	m_currentPlugin = 2;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;

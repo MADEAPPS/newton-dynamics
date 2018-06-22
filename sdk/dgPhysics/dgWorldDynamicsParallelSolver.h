@@ -48,8 +48,15 @@ class dgWorkGroupFloat
 	{
 	}
 
-	DG_INLINE dgWorkGroupFloat(const dgVector& v, const dgVector& high)
+	DG_INLINE dgWorkGroupFloat(const dgVector& v)
 		:m_low(v)
+		,m_high(v)
+	{
+	}
+
+
+	DG_INLINE dgWorkGroupFloat(const dgVector& low, const dgVector& high)
+		:m_low(low)
 		,m_high(high)
 	{
 	}

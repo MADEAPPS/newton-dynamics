@@ -1201,7 +1201,7 @@ class dgVector
 	}
 
 	DG_INLINE dgVector (const dgFloat32 a)
-		: m_type(_mm_set_ps1(a)) 
+		:m_type(_mm_set_ps1(a)) 
 	{
 	}
 
