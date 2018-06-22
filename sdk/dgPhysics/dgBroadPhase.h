@@ -316,7 +316,21 @@ class dgBroadPhase
 
 		void RemoveContactJoint(dgContact* const joint)
 		{
-			dgAssert(0);
+			CacheEntryTag tag(joint->m_body0->m_uniqueID, joint->m_body1->m_uniqueID);
+			dgUnsigned32 hash = tag.GetHash();
+
+			dgInt32 entry = hash & (m_count - 1);
+			dgContactCacheLine* const cacheLine = &(*this)[entry];
+			for (dgInt32 i = cacheLine->m_count - 1; i >= 0 ; i--) {
+				if (cacheLine->m_tags[i].m_tag == tag.m_tag) {
+					cacheLine->m_count--;
+					const dgInt32 index = cacheLine->m_count;
+					cacheLine->m_tags[i] = cacheLine->m_tags[index];
+					cacheLine->m_hashKey[i] = cacheLine->m_hashKey[index];
+					cacheLine->m_contact[i] = cacheLine->m_contact[index];
+					break;
+				}
+			}
 		}
 
 		private:

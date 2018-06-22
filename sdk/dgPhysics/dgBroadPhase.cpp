@@ -1119,8 +1119,8 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 	test = test || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 	test = test || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 	if (test) {
-		dgContact* contact = m_world->FindContactJoint(body0, body1);
-		//dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
+		//dgContact* contact = m_world->FindContactJoint(body0, body1);
+		dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
 
 		if (!contact) {
 			const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
@@ -1511,7 +1511,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = contactNode->GetNext()) {
 		dgContact* const contact = contactNode->GetInfo();
 		m_world->AttachConstraint(contact, contact->m_body0, contact->m_body1);
-//		m_contactCache.AddContactJoint(contact);
+		m_contactCache.AddContactJoint(contact);
 	}
 
 	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
@@ -1526,7 +1526,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 			contact->m_broadphaseLru = lru;
 		}
 		if (contact->m_broadphaseLru < lru) {
-//			m_contactCache.RemoveContactJoint(contact);
+			m_contactCache.RemoveContactJoint(contact);
 			m_world->DestroyConstraint(contact);
 		}
 	}
