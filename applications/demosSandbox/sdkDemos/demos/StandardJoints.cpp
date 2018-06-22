@@ -1332,9 +1332,9 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 //	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
 
-	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 30.0f));
+//	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 30.0f));
 
-#if 0
+#if 1
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1346,7 +1346,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
 	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 13.0f));
-	AddDoubleHinge(scene, dVector (-20.0f, 0.0f, 17.0f));
+//	AddDoubleHinge(scene, dVector (-20.0f, 0.0f, 17.0f));
 	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));

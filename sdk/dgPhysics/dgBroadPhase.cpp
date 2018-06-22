@@ -1526,7 +1526,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 			contact->m_broadphaseLru = lru;
 		}
 		if (contact->m_broadphaseLru < lru) {
-			m_contactCache.RemoveContactJoint(contact);
+//			m_contactCache.RemoveContactJoint(contact);
 			m_world->DestroyConstraint(contact);
 		}
 	}
