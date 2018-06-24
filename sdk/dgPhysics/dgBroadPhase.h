@@ -226,14 +226,14 @@ class dgBroadPhase
 	class CacheEntryTag
 	{
 		public:
-		CacheEntryTag() {}
-		CacheEntryTag(dgUnsigned32 tag0, dgUnsigned32 tag1)
+		DG_INLINE CacheEntryTag() {}
+		DG_INLINE CacheEntryTag(dgUnsigned32 tag0, dgUnsigned32 tag1)
 			:m_tagLow(dgMin(tag0, tag1))
 			,m_tagHigh(dgMax(tag0, tag1))
 		{
 		}
 
-		dgUnsigned32 GetHash() const
+		DG_INLINE dgUnsigned32 GetHash() const
 		{
 			return m_tagHigh * 31415821u + m_tagLow;
 		}
@@ -252,7 +252,7 @@ class dgBroadPhase
 	class dgContactCacheLine
 	{
 		public:
-		dgContactCacheLine()
+		DG_INLINE dgContactCacheLine()
 		{
 		}
 
@@ -275,7 +275,7 @@ class dgBroadPhase
 			memset(cache, 0, m_count * sizeof(dgContactCacheLine));
 		}
 
-		dgContact* FindContactJoint(const dgBody* const body0, const dgBody* const body1) const
+		DG_INLINE dgContact* FindContactJoint(const dgBody* const body0, const dgBody* const body1) const
 		{
 			CacheEntryTag tag(body0->m_uniqueID, body1->m_uniqueID);
 			dgUnsigned32 hash = tag.GetHash();
@@ -291,9 +291,9 @@ class dgBroadPhase
 			return NULL;
 		}
 
-		void AddContactJoint(dgContact* const joint)
+		DG_INLINE void AddContactJoint(dgContact* const joint)
 		{
-			CacheEntryTag tag(joint->m_body0->m_uniqueID, joint->m_body1->m_uniqueID);
+			CacheEntryTag tag(joint->GetBody0()->m_uniqueID, joint->GetBody1()->m_uniqueID);
 			dgUnsigned32 hash = tag.GetHash();
 
 			dgInt32 entry = hash & (m_count - 1);
@@ -314,9 +314,9 @@ class dgBroadPhase
 			cacheLine->m_contact[index] = joint;
 		}
 
-		void RemoveContactJoint(dgContact* const joint)
+		DG_INLINE void RemoveContactJoint(dgContact* const joint)
 		{
-			CacheEntryTag tag(joint->m_body0->m_uniqueID, joint->m_body1->m_uniqueID);
+			CacheEntryTag tag(joint->GetBody0()->m_uniqueID, joint->GetBody1()->m_uniqueID);
 			dgUnsigned32 hash = tag.GetHash();
 
 			dgInt32 entry = hash & (m_count - 1);
@@ -489,8 +489,10 @@ class dgBroadPhase
 
 	void CalculatePairContacts (dgPair* const pair, dgInt32 threadID);
 	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
-    void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
+	void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
 	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
+
+	bool TestOverlaping(const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;
 
 	void ForEachBodyInAABB (const dgBroadPhaseNode** stackPool, dgInt32 stack, const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const;
 	void RayCast (const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& l0, const dgVector& l1, dgFastRayTest& ray, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;

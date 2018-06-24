@@ -38,9 +38,14 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		};
 	} info;
 
-	// check for instruction set support (avx is bit 28 in reg ecx)
-	__cpuid(info.m_data, 1);
-	if (!(info.m_ecx & (1 << 28))) {
+	__cpuid(info.m_data, 0);
+	if (info.m_eax < 7) {
+		return NULL;
+	}
+
+	// check for instruction set support (avx2 is bit 5 in reg ebx)
+	__cpuid(info.m_data, 7);
+	if (!(info.m_ebx & (1 << 5))) {
 		return NULL;
 	}
 	
@@ -61,9 +66,9 @@ dgWorldBase::~dgWorldBase()
 const char* dgWorldBase::GetId() const
 {
 #ifdef _DEBUG
-	return "newtonAVX_d";
+	return "newtonAVX2_d";
 #else
-	return "newtonAVX";
+	return "newtonAVX2";
 #endif
 }
 

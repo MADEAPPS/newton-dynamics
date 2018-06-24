@@ -70,7 +70,6 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 		jointsCount += srcCluster->m_jointCount;
 	}
 
-//	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + DG_WORK_GROUP_SIZE + 1) * sizeof(dgBodyInfo));
 	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + 1) * sizeof(dgBodyInfo));
 	world->m_jointsMemory.ResizeIfNecessary((m_joints + jointsCount + 32) * sizeof(dgJointInfo));
 
@@ -163,8 +162,8 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_threadCounts = m_world->GetThreadCount();
 	m_solverPasses = m_world->GetSolverMode();
 
-	m_weight = dgAlloca(dgFloat32, cluster.m_bodyCount);
-	m_invWeight = dgAlloca(dgFloat32, cluster.m_bodyCount);
+	m_bodyProxyArray = dgAlloca(dgBodyProxy, cluster.m_bodyCount);
+	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
 #ifdef DG_SOLVER_USES_SOA
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOLVER_USES_SOA + 1);
 #endif
@@ -173,12 +172,6 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	InitBodyArray();
 	InitJacobianMatrix();
 	CalculateForces();
-}
-
-void dgParallelBodySolver::InitWeightKernel(void* const context, void* const, dgInt32 threadID)
-{
-	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
-	me->InitWeights(threadID);
 }
 
 void dgParallelBodySolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
@@ -191,6 +184,12 @@ void dgParallelBodySolver::InitJacobianMatrixKernel(void* const context, void* c
 {
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->InitJacobianMatrix(threadID);
+}
+
+void dgParallelBodySolver::InitInternalForcesKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->InitInternalForces(threadID);
 }
 
 void dgParallelBodySolver::CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID)
@@ -249,24 +248,38 @@ void dgParallelBodySolver::UpdateRowAccelerationKernel(void* const context, void
 
 void dgParallelBodySolver::InitWeights()
 {
-	m_atomicIndex = 0;
-	memset(m_weight, 0, m_cluster->m_bodyCount * sizeof(dgFloat32));
-	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitWeightKernel, this, NULL);
+	const dgJointInfo* const jointArray = m_jointArray;
+	const dgInt32 jointCount = m_cluster->m_jointCount;
+	dgBodyProxy* const weight = m_bodyProxyArray;
+	memset(m_bodyProxyArray, 0, m_cluster->m_bodyCount * sizeof(dgBodyProxy));
+	for (dgInt32 i = 0; i < jointCount; i++) {
+		const dgJointInfo* const jointInfo = &jointArray[i];
+		const dgInt32 m0 = jointInfo->m_m0;
+		const dgInt32 m1 = jointInfo->m_m1;
+		weight[m0].m_weight += dgFloat32(1.0f);
+		weight[m1].m_weight += dgFloat32(1.0f);
 	}
-	m_world->SynchronizationBarrier();
-	m_weight[0] = dgFloat32(1.0f);
+	m_bodyProxyArray[0].m_weight = dgFloat32(1.0f);
 }
 
 void dgParallelBodySolver::InitBodyArray()
 {
 	m_atomicIndex = 1;
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-	memset(internalForces, 0, m_cluster->m_bodyCount * sizeof(dgJacobian));
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
 	}
 	m_world->SynchronizationBarrier();
+	m_bodyProxyArray->m_invWeight = 1.0f; 
+}
+
+dgInt32 dgParallelBodySolver::CompareBodyJointsPairs(const dgBodyJacobianPair* const pairA, const dgBodyJacobianPair* const pairB, void* notUsed)
+{
+	if (pairA->m_bodyIndex < pairB->m_bodyIndex) {
+		return -1;
+	} else if (pairA->m_bodyIndex > pairB->m_bodyIndex) {
+		return 1;
+	}
+	return 0;
 }
 
 void dgParallelBodySolver::InitJacobianMatrix()
@@ -278,6 +291,27 @@ void dgParallelBodySolver::InitJacobianMatrix()
 	}
 	m_world->SynchronizationBarrier();
 
+	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
+	dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
+
+	const dgInt32 entryCount = m_cluster->m_jointCount * 2;
+	dgSort(bodyJacobiansPairs, entryCount, CompareBodyJointsPairs);
+	for (dgInt32 i = entryCount - 1; i >= 0; i --) {
+		dgInt32 index = bodyJacobiansPairs[i].m_bodyIndex;
+		bodyProxyArray[index].m_jointStart = i;
+	}
+
+	m_atomicIndex = 1;
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+		m_world->QueueJob(InitInternalForcesKernel, this, NULL);
+	}
+	m_world->SynchronizationBarrier();
+
+	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+	internalForces[0].m_linear = dgVector::m_zero;
+	internalForces[0].m_angular = dgVector::m_zero;
+
+#ifdef DG_SOLVER_USES_SOA
 	dgJointInfo* const jointArray = m_jointArray;
 	dgSort(jointArray, m_cluster->m_jointCount, CompareJointInfos);
 
@@ -287,10 +321,6 @@ void dgParallelBodySolver::InitJacobianMatrix()
 		memset(&jointArray[i], 0, sizeof(dgJointInfo));
 	}
 
-int xxx = sizeof (dgSolverSoaElement);
-xxx*=1;
-
-#ifdef DG_SOLVER_USES_SOA
 	dgInt32 size = 0;
 	for (dgInt32 i = 0; i < jointCount; i+= DG_WORK_GROUP_SIZE) {
 		size += jointArray[i].m_pairCount;
@@ -345,13 +375,15 @@ void dgParallelBodySolver::CalculateJointsForce()
 
 void dgParallelBodySolver::CalculateBodyForce()
 {
-	m_atomicIndex = 0;
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-	memset(internalForces, 0, m_cluster->m_bodyCount * sizeof(dgJacobian));
+	m_atomicIndex = 1;
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(CalculateBodyForceKernel, this, NULL);
 	}
 	m_world->SynchronizationBarrier();
+
+	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+	internalForces[0].m_linear = dgVector::m_zero;
+	internalForces[0].m_angular = dgVector::m_zero;
 }
 
 void dgParallelBodySolver::IntegrateBodiesVelocity()
@@ -382,34 +414,10 @@ void dgParallelBodySolver::UpdateKinematicFeedback()
 	m_world->SynchronizationBarrier();
 }
 
-void dgParallelBodySolver::InitWeights(dgInt32 threadID)
-{
-	dgFloat32* const weight = m_weight;
-	const dgJointInfo* const jointArray = m_jointArray;
-	const dgInt32 jointCount = m_cluster->m_jointCount;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
-		const dgJointInfo* const jointInfo = &jointArray[i];
-		const dgInt32 m0 = jointInfo->m_m0;
-		const dgInt32 m1 = jointInfo->m_m1;
-		dgBody* const body0 = jointInfo->m_joint->GetBody0();
-		dgBody* const body1 = jointInfo->m_joint->GetBody1();
-		if (m0) {
-			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
-			weight[m0] += dgFloat32(1.0f);
-		}
-		if (m1) {
-			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
-			weight[m1] += dgFloat32(1.0f);
-		}
-	}
-}
-
 void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 {
-	dgFloat32* const weight = m_weight;
-	dgFloat32* const invWeight = m_invWeight;
 	const dgBodyInfo* const bodyArray = m_bodyArray;
-
+	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
@@ -420,9 +428,9 @@ void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 		body->m_accel = body->m_veloc;
 		body->m_alpha = body->m_omega;
 
-		const dgFloat32 w = weight[i] ? weight[i] : dgFloat32(1.0f);
-		weight[i] = w;
-		invWeight[i] = dgFloat32 (1.0f) / w;
+		const dgFloat32 w = bodyProxyArray[i].m_weight ? bodyProxyArray[i].m_weight : dgFloat32(1.0f);
+		bodyProxyArray[i].m_weight = w;
+		bodyProxyArray[i].m_invWeight = dgFloat32 (1.0f) / w;
 	}
 }
 
@@ -449,7 +457,7 @@ void dgParallelBodySolver::CalculateJointsAcceleration(dgInt32 threadID)
 }
 
 #ifdef DG_SOLVER_USES_SOA
-dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const
+dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForcesPtr) const
 {
 	dgWorkGroupVector6 forceM0;
 	dgWorkGroupVector6 forceM1;
@@ -457,6 +465,7 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 	dgWorkGroupFloat preconditioner1;
 	dgWorkGroupFloat accNorm(dgWorkGroupFloat::m_zero);
 	dgWorkGroupFloat normalForce[DG_CONSTRAINT_MAX_ROWS + 1];
+	const dgWorkGroupFloat* const internalForces = (dgWorkGroupFloat*)internalForcesPtr;
 
 	bool isSleeping = true;
 	const dgBodyInfo* const bodyArray = m_bodyArray;
@@ -470,149 +479,29 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 	}
 
 	if (!isSleeping) {
-		const dgFloat32* const weight = m_weight;
+		const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
 			const dgInt32 m0 = jointInfo[i].m_m0;
 			const dgInt32 m1 = jointInfo[i].m_m1;
 
-			forceM0.m_linear.m_x[i] = internalForces[m0].m_linear.m_x;
-			forceM0.m_linear.m_y[i] = internalForces[m0].m_linear.m_y;
-			forceM0.m_linear.m_z[i] = internalForces[m0].m_linear.m_z;
-			forceM0.m_angular.m_x[i] = internalForces[m0].m_angular.m_x;
-			forceM0.m_angular.m_y[i] = internalForces[m0].m_angular.m_y;
-			forceM0.m_angular.m_z[i] = internalForces[m0].m_angular.m_z;
+			forceM0.m_linear.m_x[i] = internalForces[m0][0];
+			forceM0.m_linear.m_y[i] = internalForces[m0][1];
+			forceM0.m_linear.m_z[i] = internalForces[m0][2];
+			forceM0.m_angular.m_x[i] = internalForces[m0][4];
+			forceM0.m_angular.m_y[i] = internalForces[m0][5];
+			forceM0.m_angular.m_z[i] = internalForces[m0][6];
 
-			forceM1.m_linear.m_x[i] = internalForces[m1].m_linear.m_x;
-			forceM1.m_linear.m_y[i] = internalForces[m1].m_linear.m_y;
-			forceM1.m_linear.m_z[i] = internalForces[m1].m_linear.m_z;
-			forceM1.m_angular.m_x[i] = internalForces[m1].m_angular.m_x;
-			forceM1.m_angular.m_y[i] = internalForces[m1].m_angular.m_y;
-			forceM1.m_angular.m_z[i] = internalForces[m1].m_angular.m_z;
+			forceM1.m_linear.m_x[i] = internalForces[m1][0];
+			forceM1.m_linear.m_y[i] = internalForces[m1][1];
+			forceM1.m_linear.m_z[i] = internalForces[m1][2];
+			forceM1.m_angular.m_x[i] = internalForces[m1][4];
+			forceM1.m_angular.m_y[i] = internalForces[m1][5];
+			forceM1.m_angular.m_z[i] = internalForces[m1][6];
 
-			preconditioner0[i] = jointInfo[i].m_preconditioner0 * weight[m0];
-			preconditioner1[i] = jointInfo[i].m_preconditioner1 * weight[m1];
-		}
-#if 0
-		const dgInt32 rowsCount = jointInfo->m_pairCount;
-		normalForce[0] = dgWorkGroupFloat::m_one;
-		for (dgInt32 j = 0; j < rowsCount; j++) {
-			dgSolverSoaElement* const row = &massMatrix[j];
-			dgWorkGroupFloat a(
-				(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
-				row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
-				row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
-				row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
-				row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-				row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z) *
-				preconditioner0 +
-				(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
-				row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
-				row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
-				row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
-				row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-				row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z) *
-				preconditioner1);
-
-			a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
-			dgWorkGroupFloat f (row->m_force + row->m_invJinvMJt * a);
-
-			dgWorkGroupFloat frictionNormal;
-			for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
-				dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
-				dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
-				const dgInt32 frictionIndex = dgInt32(row->m_normalForceIndex.m_i[k] + 1);
-				frictionNormal[k] = normalForce[frictionIndex][k];
-			}
-
-			dgWorkGroupFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-			dgWorkGroupFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
-
-			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
-			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
-			accNorm = accNorm + a * a;
-			dgWorkGroupFloat deltaForce(f - row->m_force);
-
-			row->m_force = f;
-			normalForce[j + 1] = f;
-
-			forceM0.m_linear.m_x = forceM0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * deltaForce;
-			forceM0.m_linear.m_y = forceM0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * deltaForce;
-			forceM0.m_linear.m_z = forceM0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * deltaForce;
-			forceM0.m_angular.m_x = forceM0.m_angular.m_x + row->m_Jt.m_jacobianM0.m_angular.m_x * deltaForce;
-			forceM0.m_angular.m_y = forceM0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * deltaForce;
-			forceM0.m_angular.m_z = forceM0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * deltaForce;
-
-			forceM1.m_linear.m_x = forceM1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * deltaForce;
-			forceM1.m_linear.m_y = forceM1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * deltaForce;
-			forceM1.m_linear.m_z = forceM1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * deltaForce;
-			forceM1.m_angular.m_x = forceM1.m_angular.m_x + row->m_Jt.m_jacobianM1.m_angular.m_x * deltaForce;
-			forceM1.m_angular.m_y = forceM1.m_angular.m_y + row->m_Jt.m_jacobianM1.m_angular.m_y * deltaForce;
-			forceM1.m_angular.m_z = forceM1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * deltaForce;
+			preconditioner0[i] = jointInfo[i].m_preconditioner0 * bodyProxyArray[m0].m_weight;
+			preconditioner1[i] = jointInfo[i].m_preconditioner1 * bodyProxyArray[m1].m_weight;
 		}
 
-		const dgFloat32 tol = dgFloat32(0.5f);
-		const dgFloat32 tol2 = tol * tol;
-		dgWorkGroupFloat maxAccel(accNorm);
-		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetMax() > tol2); i++) {
-			maxAccel = dgWorkGroupFloat::m_zero;
-			for (dgInt32 j = 0; j < rowsCount; j++) {
-				dgSolverSoaElement* const row = &massMatrix[j];
-				dgWorkGroupFloat a(
-					(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
-					row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
-					row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
-					row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
-					row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-					row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z) *
-					preconditioner0 +
-					(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
-					row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
-					row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
-					row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
-					row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-					row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z) *
-					preconditioner1);
-
-				a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
-				dgWorkGroupFloat f (row->m_force + row->m_invJinvMJt * a);
-
-				dgWorkGroupFloat frictionNormal;
-				for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
-					dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
-					dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
-					const dgInt32 frictionIndex = dgInt32 (row->m_normalForceIndex.m_i[k] + 1);
-					frictionNormal[k] = normalForce[frictionIndex][k];
-				}
-
-				dgWorkGroupFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-				dgWorkGroupFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
-
-				a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
-				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-				maxAccel = maxAccel + a * a;
-
-				dgWorkGroupFloat deltaForce(f - row->m_force);
-
-				row->m_force = f;
-				normalForce[j + 1] = f;
-
-				forceM0.m_linear.m_x = forceM0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * deltaForce;
-				forceM0.m_linear.m_y = forceM0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * deltaForce;
-				forceM0.m_linear.m_z = forceM0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * deltaForce;
-				forceM0.m_angular.m_x = forceM0.m_angular.m_x + row->m_Jt.m_jacobianM0.m_angular.m_x * deltaForce;
-				forceM0.m_angular.m_y = forceM0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * deltaForce;
-				forceM0.m_angular.m_z = forceM0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * deltaForce;
-
-				forceM1.m_linear.m_x = forceM1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * deltaForce;
-				forceM1.m_linear.m_y = forceM1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * deltaForce;
-				forceM1.m_linear.m_z = forceM1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * deltaForce;
-				forceM1.m_angular.m_x = forceM1.m_angular.m_x + row->m_Jt.m_jacobianM1.m_angular.m_x * deltaForce;
-				forceM1.m_angular.m_y = forceM1.m_angular.m_y + row->m_Jt.m_jacobianM1.m_angular.m_y * deltaForce;
-				forceM1.m_angular.m_z = forceM1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * deltaForce;
-			}
-		}
-#else
 		forceM0.m_linear.m_x = forceM0.m_linear.m_x * preconditioner0;
 		forceM0.m_linear.m_y = forceM0.m_linear.m_y * preconditioner0;
 		forceM0.m_linear.m_z = forceM0.m_linear.m_z * preconditioner0;
@@ -629,31 +518,33 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 
 		const dgInt32 rowsCount = jointInfo->m_pairCount;
 		normalForce[0] = dgWorkGroupFloat::m_one;
-		for (dgInt32 j = 0; j < rowsCount; j++) {
-			dgSolverSoaElement* const row = &massMatrix[j];
-			dgWorkGroupFloat a(
-				row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
-				row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
-				row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
-				row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
-				row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-				row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z +
-				row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
-				row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
-				row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
-				row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
-				row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-				row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z);
+		for (dgInt32 i = 0; i < rowsCount; i++) {
+			dgSolverSoaElement* const row = &massMatrix[i];
 
-			a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
-			dgWorkGroupFloat f(row->m_force + row->m_invJinvMJt * a);
+			dgWorkGroupFloat a;
+			a = row->m_coordenateAccel.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_x, forceM0.m_linear.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_y, forceM0.m_angular.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
+
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_x, forceM1.m_linear.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_y, forceM1.m_linear.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_z, forceM1.m_linear.m_z);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_x, forceM1.m_angular.m_x);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+			a = a.NegMulAdd(row->m_force, row->m_diagDamp);
+
+			dgWorkGroupFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a));
 
 			dgWorkGroupFloat frictionNormal;
-			for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
-				dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
-				dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
-				const dgInt32 frictionIndex = dgInt32(row->m_normalForceIndex.m_i[k] + 1);
-				frictionNormal[k] = normalForce[frictionIndex][k];
+			for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
+				dgAssert(row->m_normalForceIndex.m_i[j] >= -1);
+				dgAssert(row->m_normalForceIndex.m_i[j] <= rowsCount);
+				const dgInt32 frictionIndex = dgInt32(row->m_normalForceIndex.m_i[j] + 1);
+				frictionNormal[j] = normalForce[frictionIndex][j];
 			}
 
 			dgWorkGroupFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
@@ -666,24 +557,24 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 			dgWorkGroupFloat deltaForce(f - row->m_force);
 
 			row->m_force = f;
-			normalForce[j + 1] = f;
+			normalForce[i + 1] = f;
 
 			dgWorkGroupFloat deltaForce0(deltaForce * preconditioner0);
 			dgWorkGroupFloat deltaForce1(deltaForce * preconditioner1);
 
-			forceM0.m_linear.m_x = forceM0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * deltaForce0;
-			forceM0.m_linear.m_y = forceM0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * deltaForce0;
-			forceM0.m_linear.m_z = forceM0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * deltaForce0;
-			forceM0.m_angular.m_x = forceM0.m_angular.m_x + row->m_Jt.m_jacobianM0.m_angular.m_x * deltaForce0;
-			forceM0.m_angular.m_y = forceM0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * deltaForce0;
-			forceM0.m_angular.m_z = forceM0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * deltaForce0;
+			forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
+			forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
+			forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, deltaForce0);
+			forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, deltaForce0);
+			forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, deltaForce0);
+			forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, deltaForce0);
 
-			forceM1.m_linear.m_x = forceM1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * deltaForce1;
-			forceM1.m_linear.m_y = forceM1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * deltaForce1;
-			forceM1.m_linear.m_z = forceM1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * deltaForce1;
-			forceM1.m_angular.m_x = forceM1.m_angular.m_x + row->m_Jt.m_jacobianM1.m_angular.m_x * deltaForce1;
-			forceM1.m_angular.m_y = forceM1.m_angular.m_y + row->m_Jt.m_jacobianM1.m_angular.m_y * deltaForce1;
-			forceM1.m_angular.m_z = forceM1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * deltaForce1;
+			forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, deltaForce1);
+			forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, deltaForce1);
+			forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, deltaForce1);
+			forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, deltaForce1);
+			forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
+			forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
 		}
 
 		const dgFloat32 tol = dgFloat32(0.5f);
@@ -693,22 +584,24 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 			maxAccel = dgWorkGroupFloat::m_zero;
 			for (dgInt32 j = 0; j < rowsCount; j++) {
 				dgSolverSoaElement* const row = &massMatrix[j];
-				dgWorkGroupFloat a(
-					row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x +
-					row->m_JMinv.m_jacobianM0.m_linear.m_y * forceM0.m_linear.m_y +
-					row->m_JMinv.m_jacobianM0.m_linear.m_z * forceM0.m_linear.m_z +
-					row->m_JMinv.m_jacobianM0.m_angular.m_x * forceM0.m_angular.m_x +
-					row->m_JMinv.m_jacobianM0.m_angular.m_y * forceM0.m_angular.m_y +
-					row->m_JMinv.m_jacobianM0.m_angular.m_z * forceM0.m_angular.m_z +
-					row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x +
-					row->m_JMinv.m_jacobianM1.m_linear.m_y * forceM1.m_linear.m_y +
-					row->m_JMinv.m_jacobianM1.m_linear.m_z * forceM1.m_linear.m_z +
-					row->m_JMinv.m_jacobianM1.m_angular.m_x * forceM1.m_angular.m_x +
-					row->m_JMinv.m_jacobianM1.m_angular.m_y * forceM1.m_angular.m_y +
-					row->m_JMinv.m_jacobianM1.m_angular.m_z * forceM1.m_angular.m_z);
 
-				a = row->m_coordenateAccel - row->m_force * row->m_diagDamp - a;
-				dgWorkGroupFloat f(row->m_force + row->m_invJinvMJt * a);
+				dgWorkGroupFloat a;
+				a = row->m_coordenateAccel.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_x, forceM0.m_linear.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_y, forceM0.m_angular.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
+
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_x, forceM1.m_linear.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_y, forceM1.m_linear.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_z, forceM1.m_linear.m_z);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_x, forceM1.m_angular.m_x);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
+				a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+				a = a.NegMulAdd(row->m_force, row->m_diagDamp);
+
+				dgWorkGroupFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a));
 
 				dgWorkGroupFloat frictionNormal;
 				for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
@@ -733,29 +626,21 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 				dgWorkGroupFloat deltaForce0(deltaForce * preconditioner0);
 				dgWorkGroupFloat deltaForce1(deltaForce * preconditioner1);
 
-				forceM0.m_linear.m_x = forceM0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * deltaForce0;
-				forceM0.m_linear.m_y = forceM0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * deltaForce0;
-				forceM0.m_linear.m_z = forceM0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * deltaForce0;
-				forceM0.m_angular.m_x = forceM0.m_angular.m_x + row->m_Jt.m_jacobianM0.m_angular.m_x * deltaForce0;
-				forceM0.m_angular.m_y = forceM0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * deltaForce0;
-				forceM0.m_angular.m_z = forceM0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * deltaForce0;
+				forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
+				forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
+				forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, deltaForce0);
+				forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, deltaForce0);
+				forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, deltaForce0);
+				forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, deltaForce0);
 
-				forceM1.m_linear.m_x = forceM1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * deltaForce1;
-				forceM1.m_linear.m_y = forceM1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * deltaForce1;
-				forceM1.m_linear.m_z = forceM1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * deltaForce1;
-				forceM1.m_angular.m_x = forceM1.m_angular.m_x + row->m_Jt.m_jacobianM1.m_angular.m_x * deltaForce1;
-				forceM1.m_angular.m_y = forceM1.m_angular.m_y + row->m_Jt.m_jacobianM1.m_angular.m_y * deltaForce1;
-				forceM1.m_angular.m_z = forceM1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * deltaForce1;
+				forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, deltaForce1);
+				forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, deltaForce1);
+				forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, deltaForce1);
+				forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, deltaForce1);
+				forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
+				forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
 			}
 		}
-#endif
-
-/*
-		for (dgInt32 i = 0; i < rowsCount; i++) {
-			dgRightHandSide* const rhs = &rightHandSide[index + i];
-			rhs->m_maxImpact = dgMax(dgAbs(rhs->m_force), rhs->m_maxImpact);
-		}
-*/
 	}
 	return accNorm.GetMax();
 }
@@ -773,97 +658,9 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 	const dgBody* const body1 = m_bodyArray[m1].m_body;
 
 	if (!(body0->m_resting & body1->m_resting)) {
-		const dgVector preconditioner0(jointInfo->m_preconditioner0 * m_weight[m0]);
-		const dgVector preconditioner1(jointInfo->m_preconditioner1 * m_weight[m1]);
+		const dgVector preconditioner0(jointInfo->m_preconditioner0 * m_bodyProxyArray[m0].m_weight);
+		const dgVector preconditioner1(jointInfo->m_preconditioner1 * m_bodyProxyArray[m1].m_weight);
 
-#if 0
-		dgVector linearM0(internalForces[m0].m_linear);
-		dgVector angularM0(internalForces[m0].m_angular);
-		dgVector linearM1(internalForces[m1].m_linear);
-		dgVector angularM1(internalForces[m1].m_angular);
-
-		normalForce[0] = dgFloat32(1.0f);
-		const dgInt32 index = jointInfo->m_pairStart;
-		const dgInt32 rowsCount = jointInfo->m_pairCount;
-		for (dgInt32 j = 0; j < rowsCount; j++) {
-			dgRightHandSide* const rhs = &rightHandSide[index + j];
-			const dgLeftHandSide* const row = &leftHandSide[index + j];
-
-			dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
-			dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
-			dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
-			dgAssert(row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32(0.0f));
-
-			dgVector a((row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0) * preconditioner0 +
-					   (row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1) * preconditioner1);
-			a = dgVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-
-			dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
-			dgAssert(rhs->m_normalForceIndex >= -1);
-			dgAssert(rhs->m_normalForceIndex <= rowsCount);
-			dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
-
-			dgFloat32 frictionNormal = normalForce[frictionIndex];
-			dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
-			dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
-
-			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
-			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
-			//accNorm = accNorm.GetMax(a.Abs());
-			accNorm += a * a;
-			dgVector deltaForce(f - dgVector(rhs->m_force));
-
-			rhs->m_force = f.GetScalar();
-			normalForce[j + 1] = f.GetScalar();
-
-			//dgVector deltaforce0(preconditioner0 * deltaForce);
-			//dgVector deltaforce1(preconditioner1 * deltaForce);
-			linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaForce;
-			angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaForce;
-			linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaForce;
-			angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaForce;
-		}
-
-		dgVector maxAccel(accNorm);
-		const dgFloat32 tol = dgFloat32(0.5f);
-		const dgFloat32 tol2 = tol * tol;
-		for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > tol2); i++) {
-			maxAccel = dgVector::m_zero;
-			for (dgInt32 j = 0; j < rowsCount; j++) {
-				dgRightHandSide* const rhs = &rightHandSide[index + j];
-				const dgLeftHandSide* const row = &leftHandSide[index + j];
-				dgVector a((row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0) * preconditioner0 +
-						   (row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1) * preconditioner1);
-				a = dgVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-
-				dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
-				dgAssert(rhs->m_normalForceIndex >= -1);
-				dgAssert(rhs->m_normalForceIndex <= rowsCount);
-				dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
-
-				dgFloat32 frictionNormal = normalForce[frictionIndex];
-				dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
-				dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
-
-				a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
-				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-				maxAccel = a * a;
-
-				dgVector deltaForce(f - dgVector(rhs->m_force));
-
-				rhs->m_force = f.GetScalar();
-				normalForce[j + 1] = f.GetScalar();
-
-				//dgVector deltaforce0(preconditioner0 * deltaForce);
-				//dgVector deltaforce1(weight * deltaForce);
-				linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaForce;
-				angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaForce;
-				linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaForce;
-				angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaForce;
-			}
-		}
-#else
 		dgVector linearM0(internalForces[m0].m_linear * preconditioner0);
 		dgVector angularM0(internalForces[m0].m_angular * preconditioner0);
 		dgVector linearM1(internalForces[m1].m_linear * preconditioner1);
@@ -893,7 +690,6 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
-			//accNorm = accNorm.GetMax(a.Abs());
 			accNorm += a * a;
 			dgVector deltaForce(f - dgVector(rhs->m_force));
 
@@ -947,7 +743,6 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 				angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaForce1;
 			}
 		}
-#endif
 
 		for (dgInt32 i = 0; i < rowsCount; i++) {
 			dgRightHandSide* const rhs = &rightHandSide[index + i];
@@ -962,15 +757,31 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 {
 #ifdef DG_SOLVER_USES_SOA
 	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
 	dgSolverSoaElement* const massMatrix = &m_massMatrix[0];
+	const dgInt32* const soaRowStart = m_soaRowStart;
 
 	dgFloat32 accNorm = dgFloat32(0.0f);
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	const int jointCount = m_jointCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		const dgInt32 rowStart = m_soaRowStart[i];
+		const dgInt32 rowStart = soaRowStart[i];
 		dgJointInfo* const jointInfo = &m_jointArray[i * DG_WORK_GROUP_SIZE];
 		dgFloat32 accel2 = CalculateJointForce(jointInfo, &massMatrix[rowStart], internalForces);
+		
+		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
+			const dgJointInfo* const joint = &jointInfo[j];
+			if (joint->m_joint) {
+				dgInt32 const rowCount = joint->m_pairCount;
+				dgInt32 const rowStartBase = joint->m_pairStart;
+				for (dgInt32 k = 0; k < rowCount; k++) {
+					const dgSolverSoaElement* const row = &massMatrix[rowStart + k];
+					rightHandSide[k + rowStartBase].m_force = row->m_force[j];
+					rightHandSide[k + rowStartBase].m_maxImpact = dgMax(dgAbs(row->m_force[j]), rightHandSide[k + rowStartBase].m_maxImpact);
+				}
+			}
+		}
+
 		accNorm += accel2;
 	}
 	m_accelNorm[threadID] = accNorm;
@@ -1023,152 +834,71 @@ void dgParallelBodySolver::UpdateRowAcceleration(dgInt32 threadID)
 
 void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 {
-#ifdef DG_SOLVER_USES_SOA
-	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
-	
-	dgSolverSoaElement* const massMatrix = &m_massMatrix[0];
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-
-	const dgFloat32* const invWeight = m_invWeight;
-	const dgInt32* const soaRowStart = m_soaRowStart;
-	const dgJointInfo* const jointInfoArray = m_jointArray;
+	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
+	const dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
+	dgWorkGroupFloat* const internalForces = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_internalForcesBuffer[0];
+	const dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
+	const dgWorkGroupFloat* const leftHandSide = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_leftHandSizeBuffer[0].m_Jt.m_jacobianM0;
 
 	dgInt32* const atomicIndex = &m_atomicIndex;
-	const int jointCount = m_jointCount;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		dgWorkGroupVector6 forceAcc0;
-		dgWorkGroupVector6 forceAcc1;
+	const int bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		dgWorkGroupFloat forceAcc(dgVector::m_zero);
 
-		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_WORK_GROUP_SIZE];
-		const dgInt32 count = jointInfoBase->m_pairCount;
+		const dgBodyProxy* const startJoints = &bodyProxyArray[i];
+		const dgInt32 jointsCount = dgInt32(startJoints->m_weight);
+		const dgBodyJacobianPair* const jointsStart = &bodyJacobiansPairs[startJoints->m_jointStart];
 
-		forceAcc0.m_linear.m_x = dgWorkGroupFloat::m_zero;
-		forceAcc0.m_linear.m_y = dgWorkGroupFloat::m_zero;
-		forceAcc0.m_linear.m_z = dgWorkGroupFloat::m_zero;
-		forceAcc0.m_angular.m_x = dgWorkGroupFloat::m_zero;
-		forceAcc0.m_angular.m_y = dgWorkGroupFloat::m_zero;
-		forceAcc0.m_angular.m_z = dgWorkGroupFloat::m_zero;
-
-		forceAcc1.m_linear.m_x = dgWorkGroupFloat::m_zero;
-		forceAcc1.m_linear.m_y = dgWorkGroupFloat::m_zero;
-		forceAcc1.m_linear.m_z = dgWorkGroupFloat::m_zero;
-		forceAcc1.m_angular.m_x = dgWorkGroupFloat::m_zero;
-		forceAcc1.m_angular.m_y = dgWorkGroupFloat::m_zero;
-		forceAcc1.m_angular.m_z = dgWorkGroupFloat::m_zero;
-		
-		const dgInt32 rowStart = soaRowStart[i];
-		for (dgInt32 j = 0; j < count; j++) {
-			const dgSolverSoaElement* const row = &massMatrix[rowStart + j];
-
-			forceAcc0.m_linear.m_x = forceAcc0.m_linear.m_x + row->m_Jt.m_jacobianM0.m_linear.m_x * row->m_force;
-			forceAcc0.m_linear.m_y = forceAcc0.m_linear.m_y + row->m_Jt.m_jacobianM0.m_linear.m_y * row->m_force;
-			forceAcc0.m_linear.m_z = forceAcc0.m_linear.m_z + row->m_Jt.m_jacobianM0.m_linear.m_z * row->m_force;
-			forceAcc0.m_angular.m_x = forceAcc0.m_angular.m_x + row->m_Jt.m_jacobianM0.m_angular.m_x * row->m_force;
-			forceAcc0.m_angular.m_y = forceAcc0.m_angular.m_y + row->m_Jt.m_jacobianM0.m_angular.m_y * row->m_force;
-			forceAcc0.m_angular.m_z = forceAcc0.m_angular.m_z + row->m_Jt.m_jacobianM0.m_angular.m_z * row->m_force;
-
-			forceAcc1.m_linear.m_x = forceAcc1.m_linear.m_x + row->m_Jt.m_jacobianM1.m_linear.m_x * row->m_force;
-			forceAcc1.m_linear.m_y = forceAcc1.m_linear.m_y + row->m_Jt.m_jacobianM1.m_linear.m_y * row->m_force;
-			forceAcc1.m_linear.m_z = forceAcc1.m_linear.m_z + row->m_Jt.m_jacobianM1.m_linear.m_z * row->m_force;
-			forceAcc1.m_angular.m_x = forceAcc1.m_angular.m_x + row->m_Jt.m_jacobianM1.m_angular.m_x * row->m_force;
-			forceAcc1.m_angular.m_y = forceAcc1.m_angular.m_y + row->m_Jt.m_jacobianM1.m_angular.m_y * row->m_force;
-			forceAcc1.m_angular.m_z = forceAcc1.m_angular.m_z + row->m_Jt.m_jacobianM1.m_angular.m_z * row->m_force;
-		}
-
-		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
-			const dgJointInfo* const jointInfo = &jointInfoBase[j];
-			if (jointInfo->m_joint) {
-				dgInt32 const rowCount = jointInfo->m_pairCount;
-				dgInt32 const rowStartBase = jointInfo->m_pairStart;
-				for (dgInt32 k = 0; k < rowCount; k++) {
-					const dgSolverSoaElement* const row = &massMatrix[rowStart + k];
-					rightHandSide[k + rowStartBase].m_force = row->m_force[j];
-				}
-				
-				const dgInt32 m0 = jointInfo->m_m0;
-				const dgInt32 m1 = jointInfo->m_m1;
-				if (m0)
-				{
-					const dgVector weight(invWeight[m0]);
-					dgBody* const body0 = jointInfo->m_joint->GetBody0();
-					dgVector linear (weight * dgVector (forceAcc0.m_linear.m_x[j], forceAcc0.m_linear.m_y[j], forceAcc0.m_linear.m_z[j], dgFloat32 (0.0f)));
-					dgVector angular (weight * dgVector (forceAcc0.m_angular.m_x[j], forceAcc0.m_angular.m_y[j], forceAcc0.m_angular.m_z[j], dgFloat32 (0.0f)));
-					dgScopeSpinLock lock(&body0->m_criticalSectionLock);
-					internalForces[m0].m_linear += linear;
-					internalForces[m0].m_angular += angular;
-				}
-				if (m1) 
-				{
-					const dgVector weight(invWeight[m1]);
-					dgBody* const body1 = jointInfo->m_joint->GetBody1();
-					dgVector linear(weight * dgVector(forceAcc1.m_linear.m_x[j], forceAcc1.m_linear.m_y[j], forceAcc1.m_linear.m_z[j], dgFloat32(0.0f)));
-					dgVector angular(weight * dgVector(forceAcc1.m_angular.m_x[j], forceAcc1.m_angular.m_y[j], forceAcc1.m_angular.m_z[j], dgFloat32(0.0f)));
-					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
-					internalForces[m1].m_linear += linear;
-					internalForces[m1].m_angular += angular;
-				}
+		for (dgInt32 j = 0; j < jointsCount; j++) {
+			const dgInt32 rowsCount = jointsStart[j].m_rowCount - 2;
+			const dgWorkGroupFloat* const lhs = &leftHandSide[jointsStart[j].m_rowStart];
+			const dgRightHandSide* const rhs = &rightHandSide[jointsStart[j].m_righHandStart];
+			for (dgInt32 k = 0; k < rowsCount; k += 2) {
+				forceAcc = forceAcc.MulAdd(lhs[(k + 0) * 4], dgWorkGroupFloat(rhs[k + 0].m_force));
+				forceAcc = forceAcc.MulAdd(lhs[(k + 1) * 4], dgWorkGroupFloat(rhs[k + 1].m_force));
+			}
+			if (jointsStart[j].m_rowCount & 1) {
+				const dgInt32 k = jointsStart[j].m_rowCount - 1;
+				forceAcc = forceAcc.MulAdd(lhs[k * 4], dgWorkGroupFloat(rhs[k].m_force));
 			}
 		}
+		internalForces[i] = forceAcc * dgWorkGroupFloat (startJoints->m_invWeight);
 	}
+}
 
-#else
-	const dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
+void dgParallelBodySolver::InitInternalForces(dgInt32 threadID)
+{
+	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
+	const dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
+	dgWorkGroupFloat* const internalForces = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_internalForcesBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-
-	const dgFloat32* const invWeight = m_invWeight;
-	const dgJointInfo* const jointInfoArray = m_jointArray;
+	const dgWorkGroupFloat* const leftHandSide = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_leftHandSizeBuffer[0].m_Jt.m_jacobianM0;
 
 	dgInt32* const atomicIndex = &m_atomicIndex;
-	const int jointCount = m_cluster->m_jointCount;
-	for (dgInt32 j = dgAtomicExchangeAndAdd(atomicIndex, 1); j < jointCount; j = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	const int bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		dgWorkGroupFloat forceAcc(dgVector::m_zero);
+		
+		const dgBodyProxy* const startJoints = &bodyProxyArray[i];
+		const dgInt32 jointsCount = dgInt32 (startJoints->m_weight);
+		const dgBodyJacobianPair* const jointsStart = &bodyJacobiansPairs[startJoints->m_jointStart];
 
-		dgJacobian forceAcc0;
-		dgJacobian forceAcc1;
-		const dgJointInfo* const jointInfoBase = &jointInfoArray[j];
-		const dgInt32 index = jointInfoBase->m_pairStart;
-		const dgInt32 count = jointInfoBase->m_pairCount;
-		const dgInt32 m0 = jointInfoBase->m_m0;
-		const dgInt32 m1 = jointInfoBase->m_m1;
-
-		forceAcc0.m_linear = dgVector::m_zero;
-		forceAcc0.m_angular = dgVector::m_zero;
-		forceAcc1.m_linear = dgVector::m_zero;
-		forceAcc1.m_angular = dgVector::m_zero;
-		for (dgInt32 i = 0; i < count; i++) {
-			const dgLeftHandSide* const row = &leftHandSide[index + i];
-			const dgRightHandSide* const rhs = &rightHandSide[index + i];
-			dgAssert(dgCheckFloat(rhs->m_force));
-			dgVector val(rhs->m_force);
-			forceAcc0.m_linear += row->m_Jt.m_jacobianM0.m_linear * val;
-			forceAcc0.m_angular += row->m_Jt.m_jacobianM0.m_angular * val;
-			forceAcc1.m_linear += row->m_Jt.m_jacobianM1.m_linear * val;
-			forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
+		for (dgInt32 j = 0; j < jointsCount; j ++) {
+			const dgInt32 rowsCount = jointsStart[j].m_rowCount - 2;	
+			const dgFloat32 preconditioner = jointsStart[j].m_preconditioner;
+			const dgWorkGroupFloat* const lhs = &leftHandSide[jointsStart[j].m_rowStart];
+			const dgRightHandSide* const rhs = &rightHandSide[jointsStart[j].m_righHandStart];
+			for (dgInt32 k = 0; k < rowsCount; k += 2) {
+				forceAcc = forceAcc.MulAdd (lhs[(k + 0) * 4], dgWorkGroupFloat (rhs[k + 0].m_force * preconditioner));
+				forceAcc = forceAcc.MulAdd (lhs[(k + 1) * 4], dgWorkGroupFloat (rhs[k + 1].m_force * preconditioner));
+			}
+			if (jointsStart[j].m_rowCount & 1) {
+				const dgInt32 k = jointsStart[j].m_rowCount - 1;
+				forceAcc = forceAcc.MulAdd (lhs[k * 4], dgWorkGroupFloat (rhs[k].m_force * preconditioner));
+			}
 		}
-
-		if (m0)
-		{
-			const dgVector weight(invWeight[m0]);
-			dgBody* const body0 = jointInfoBase->m_joint->GetBody0();
-			forceAcc0.m_linear = forceAcc0.m_linear * weight;
-			forceAcc0.m_angular = forceAcc0.m_angular * weight;
-			dgScopeSpinLock lock(&body0->m_criticalSectionLock);
-			internalForces[m0].m_linear += forceAcc0.m_linear;
-			internalForces[m0].m_angular += forceAcc0.m_angular;
-		}
-		if (m1) 
-		{
-			const dgVector weight(invWeight[m1]);
-			dgBody* const body1 = jointInfoBase->m_joint->GetBody1();
-			forceAcc1.m_linear = forceAcc1.m_linear * weight;
-			forceAcc1.m_angular = forceAcc1.m_angular * weight;
-
-			dgScopeSpinLock lock(&body1->m_criticalSectionLock);
-			internalForces[m1].m_linear += forceAcc1.m_linear;
-			internalForces[m1].m_angular += forceAcc1.m_angular;
-		}
+		internalForces[i] = forceAcc;
 	}
-#endif
 }
 
 void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
@@ -1177,7 +907,7 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 	dgVector freezeOmega2(m_world->m_freezeOmega2 * dgFloat32(0.1f));
 
 	dgVector timestep4(m_timestepRK);
-	const dgFloat32* const weight = m_weight;
+	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
@@ -1186,7 +916,7 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 		dgAssert(body->m_index == i);
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			const dgVector w(weight[i]);
+			const dgVector w(bodyProxyArray[i].m_weight);
 			const dgJacobian& forceAndTorque = internalForces[i];
 			const dgVector force(body->m_externalForce + forceAndTorque.m_linear * w);
 			const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular * w);
@@ -1206,7 +936,6 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 			}
 			dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
 			dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
-			//dgTrace(("%d v(%f %f %f)\n", body->m_uniqueID, body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]));
 		}
 	}
 }
@@ -1237,7 +966,6 @@ void dgParallelBodySolver::UpdateForceFeedback(dgInt32 threadID)
 
 		for (dgInt32 j = 0; j < count; j++) {
 			const dgRightHandSide* const rhs = &rightHandSide[j + first];
-			//dgLeftHandSide* const row = &matrixRow[j + first];
 			dgAssert(dgCheckFloat(rhs->m_force));
 			rhs->m_jointFeebackForce->m_force = rhs->m_force;
 			rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * m_timestepRK;
@@ -1260,7 +988,7 @@ void dgParallelBodySolver::UpdateKinematicFeedback(dgInt32 threadID)
 	}
 }
 
-void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgJacobian* const internalForces)
+void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide)
 {
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;
@@ -1275,18 +1003,14 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 	const dgVector invMass0(body0->m_invMass[3]);
 	const dgVector invMass1(body1->m_invMass[3]);
 
-	dgVector force0(dgVector::m_zero);
-	dgVector torque0(dgVector::m_zero);
+	dgWorkGroupFloat force0(dgVector::m_zero);
 	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		force0 = body0->m_externalForce;
-		torque0 = body0->m_externalTorque;
+		force0 = dgWorkGroupFloat (body0->m_externalForce, body0->m_externalTorque);
 	}
 
-	dgVector force1(dgVector::m_zero);
-	dgVector torque1(dgVector::m_zero);
+	dgWorkGroupFloat force1(dgVector::m_zero);
 	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		force1 = body1->m_externalForce;
-		torque1 = body1->m_externalTorque;
+		force1 = dgWorkGroupFloat (body1->m_externalForce, body1->m_externalTorque);
 	}
 
 	jointInfo->m_preconditioner0 = dgFloat32(1.0f);
@@ -1301,17 +1025,9 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		}
 	}
 
-	dgJacobian forceAcc0;
-	dgJacobian forceAcc1;
-	forceAcc0.m_linear = dgVector::m_zero;
-	forceAcc0.m_angular = dgVector::m_zero;
-	forceAcc1.m_linear = dgVector::m_zero;
-	forceAcc1.m_angular = dgVector::m_zero;
-
 	const dgFloat32 forceImpulseScale = dgFloat32(1.0f);
-
-	const dgVector weight0(m_weight[m0] * jointInfo->m_preconditioner0);
-	const dgVector weight1(m_weight[m1] * jointInfo->m_preconditioner0);
+	const dgWorkGroupFloat weight0(m_bodyProxyArray[m0].m_weight * jointInfo->m_preconditioner0);
+	const dgWorkGroupFloat weight1(m_bodyProxyArray[m1].m_weight * jointInfo->m_preconditioner0);
 	for (dgInt32 i = 0; i < count; i++) {
 		dgLeftHandSide* const row = &leftHandSide[index + i];
 		dgRightHandSide* const rhs = &rightHandSide[index + i];
@@ -1320,11 +1036,12 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
 		row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
 		row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
-		dgVector tmpAccel(row->m_JMinv.m_jacobianM0.m_linear * force0 + row->m_JMinv.m_jacobianM0.m_angular * torque0 +
-						  row->m_JMinv.m_jacobianM1.m_linear * force1 + row->m_JMinv.m_jacobianM1.m_angular * torque1);
 
-		dgAssert(tmpAccel.m_w == dgFloat32(0.0f));
-		dgFloat32 extenalAcceleration = -(tmpAccel.AddHorizontal()).GetScalar();
+		const dgWorkGroupFloat& JMinvM0 = (dgWorkGroupFloat&)row->m_JMinv.m_jacobianM0;
+		const dgWorkGroupFloat& JMinvM1 = (dgWorkGroupFloat&)row->m_JMinv.m_jacobianM1;
+		dgWorkGroupFloat tmpAccel((JMinvM0 * force0).MulAdd(JMinvM1, force1));
+
+		dgFloat32 extenalAcceleration = -tmpAccel.AddHorizontal();
 		rhs->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 		rhs->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dgAssert(rhs->m_jointFeebackForce);
@@ -1332,46 +1049,16 @@ void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgL
 		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
-		dgVector jMinvM0linear(weight0 * row->m_JMinv.m_jacobianM0.m_linear);
-		dgVector jMinvM0angular(weight0 * row->m_JMinv.m_jacobianM0.m_angular);
-		dgVector jMinvM1linear(weight1 * row->m_JMinv.m_jacobianM1.m_linear);
-		dgVector jMinvM1angular(weight1 * row->m_JMinv.m_jacobianM1.m_angular);
-		dgVector tmpDiag(jMinvM0linear * row->m_Jt.m_jacobianM0.m_linear + jMinvM0angular * row->m_Jt.m_jacobianM0.m_angular +
-						 jMinvM1linear * row->m_Jt.m_jacobianM1.m_linear + jMinvM1angular * row->m_Jt.m_jacobianM1.m_angular);
+		const dgWorkGroupFloat& JtM0 = (dgWorkGroupFloat&)row->m_Jt.m_jacobianM0;
+		const dgWorkGroupFloat& JtM1 = (dgWorkGroupFloat&)row->m_Jt.m_jacobianM1;
 
-		dgAssert(tmpDiag.m_w == dgFloat32(0.0f));
-		dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
+		dgWorkGroupFloat tmpDiag((weight0 * JMinvM0 * JtM0).MulAdd(weight1, JMinvM1 * JtM1));
+		dgFloat32 diag = tmpDiag.AddHorizontal();
 		dgAssert(diag > dgFloat32(0.0f));
 		rhs->m_diagDamp = diag * rhs->m_stiffness;
 		diag *= (dgFloat32(1.0f) + rhs->m_stiffness);
-		//		rhs->m_jinvMJt = diag;
+		//rhs->m_jinvMJt = diag;
 		rhs->m_invJinvMJt = dgFloat32(1.0f) / diag;
-
-		dgAssert(dgCheckFloat(rhs->m_force));
-		dgVector val(rhs->m_force);
-		forceAcc0.m_linear += row->m_Jt.m_jacobianM0.m_linear * val;
-		forceAcc0.m_angular += row->m_Jt.m_jacobianM0.m_angular * val;
-		forceAcc1.m_linear += row->m_Jt.m_jacobianM1.m_linear * val;
-		forceAcc1.m_angular += row->m_Jt.m_jacobianM1.m_angular * val;
-	}
-
-	const dgVector preconditioner0(jointInfo->m_preconditioner0);
-	const dgVector preconditioner1(jointInfo->m_preconditioner1);
-
-	forceAcc0.m_linear = forceAcc0.m_linear * preconditioner0;
-	forceAcc0.m_angular = forceAcc0.m_angular * preconditioner0;
-	forceAcc1.m_linear = forceAcc1.m_linear * preconditioner1;
-	forceAcc1.m_angular = forceAcc1.m_angular * preconditioner1;
-
-	if (m0) {
-		dgScopeSpinLock lock(&body0->m_criticalSectionLock);
-		internalForces[m0].m_linear += forceAcc0.m_linear;
-		internalForces[m0].m_angular += forceAcc0.m_angular;
-	}
-	if (m1) {
-		dgScopeSpinLock lock(&body1->m_criticalSectionLock);
-		internalForces[m1].m_linear += forceAcc1.m_linear;
-		internalForces[m1].m_angular += forceAcc1.m_angular;
 	}
 }
 
@@ -1379,7 +1066,7 @@ void dgParallelBodySolver::InitJacobianMatrix(dgInt32 threadID)
 {
 	dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
 	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+	dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
 
 	dgContraintDescritor constraintParams;
 	constraintParams.m_world = m_world;
@@ -1396,7 +1083,19 @@ void dgParallelBodySolver::InitJacobianMatrix(dgInt32 threadID)
 		dgAssert(jointInfo->m_m0 != jointInfo->m_m1);
 		const dgInt32 rowBase = dgAtomicExchangeAndAdd(&m_jacobianMatrixRowAtomicIndex, jointInfo->m_pairCount);
 		m_world->GetJacobianDerivatives(constraintParams, jointInfo, constraint, leftHandSide, rightHandSide, rowBase);
-		BuildJacobianMatrix(jointInfo, leftHandSide, rightHandSide, internalForces);
+		BuildJacobianMatrix(jointInfo, leftHandSide, rightHandSide);
+
+		bodyJacobiansPairs[i * 2 + 0].m_bodyIndex = jointInfo->m_m0;
+		bodyJacobiansPairs[i * 2 + 0].m_rowCount = jointInfo->m_pairCount;
+		bodyJacobiansPairs[i * 2 + 0].m_rowStart = jointInfo->m_pairStart * 4;
+		bodyJacobiansPairs[i * 2 + 0].m_righHandStart = jointInfo->m_pairStart;
+		bodyJacobiansPairs[i * 2 + 0].m_preconditioner = jointInfo->m_preconditioner0;
+
+		bodyJacobiansPairs[i * 2 + 1].m_bodyIndex = jointInfo->m_m1;
+		bodyJacobiansPairs[i * 2 + 1].m_rowCount = jointInfo->m_pairCount;
+		bodyJacobiansPairs[i * 2 + 1].m_rowStart = jointInfo->m_pairStart * 4 + 1;
+		bodyJacobiansPairs[i * 2 + 1].m_righHandStart = jointInfo->m_pairStart;
+		bodyJacobiansPairs[i * 2 + 1].m_preconditioner = jointInfo->m_preconditioner1;
 	}
 }
 

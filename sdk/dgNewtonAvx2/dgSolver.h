@@ -88,12 +88,12 @@ class dgSoaFloat
 
 	DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
 	{
-		return *this + A * B;
+		return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
 	}
 
 	DG_INLINE dgSoaFloat NegMulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
 	{
-		return *this - A * B;
+		return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
 	}
 
 	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const

@@ -1108,16 +1108,69 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 }
 
 
+bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
+{
+	bool mass0 = (body0->m_invMass.m_w != dgFloat32(0.0f));
+	bool mass1 = (body1->m_invMass.m_w != dgFloat32(0.0f));
+	bool isDynamic0 = body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) != 0;
+	bool isDynamic1 = body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) != 0;
+	bool isKinematic0 = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) != 0;
+	bool isKinematic1 = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) != 0;
+
+	dgAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
+	dgAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
+
+	//bool tier1 = !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
+	bool tier1 = true;
+	bool tier2 = !(body0->m_sleeping & body1->m_sleeping);
+	bool tier3 = isDynamic0 & mass0;
+	bool tier4 = isDynamic1 & mass1;
+	bool tier5 = isKinematic0 & mass1;
+	bool tier6 = isKinematic1 & mass0;
+	bool ret = tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
+
+	if (ret) {
+		const dgCollisionInstance* const instance0 = body0->GetCollision();
+		const dgCollisionInstance* const instance1 = body1->GetCollision();
+
+		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+			dgVector box0_p0;
+			dgVector box0_p1;
+			dgVector box1_p0;
+			dgVector box1_p1;
+
+			instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
+			instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
+
+			dgVector boxp0(box0_p0 - box1_p1);
+			dgVector boxp1(box0_p1 - box1_p0);
+
+			dgVector velRelative(body1->GetVelocity() - body0->GetVelocity());
+			dgFastRayTest ray(dgVector(dgFloat32(0.0f)), velRelative.Scale4(timestep * dgFloat32(4.0f)));
+			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
+			ret = (distance < dgFloat32(1.0f));
+		} else {
+			ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
+			//if (ret) {
+			//	dgVector size0;
+			//	dgVector size1;
+			//	dgVector origin0;
+			//	dgVector origin1;
+			//	instance0->CalcObb (origin0, size0);
+			//	instance1->CalcObb (origin1, size1);
+			//	ret = dgObbTest (origin0, size0, instance0->GetGlobalMatrix(), origin1, size1, instance1->GetGlobalMatrix());
+			//}
+		}
+	}
+	return ret;
+}
+
+
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
-//	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)));
 	dgAssert(body0);
 	dgAssert(body1);
-	bool test = body0->GetInvMass().m_w != dgFloat32(0.0f);
-	test = test || (body1->GetInvMass().m_w != dgFloat32(0.0f));
-	test = test || (body1->GetInvMass().m_w != dgFloat32(0.0f));
-	test = test || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
-	test = test || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+	const bool test = TestOverlaping (body0, body1, timestep);
 	if (test) {
 		//dgContact* contact = m_world->FindContactJoint(body0, body1);
 		dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
