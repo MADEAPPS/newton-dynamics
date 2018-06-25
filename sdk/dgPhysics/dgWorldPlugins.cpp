@@ -39,6 +39,7 @@ dgWorldPluginList::~dgWorldPluginList()
 
 void dgWorldPluginList::LoadPlugins()
 {
+#ifndef _NEWTON_USE_DOUBLE
 	char plugInPath[2048];
 	char rootPathInPath[2048];
 
@@ -95,6 +96,7 @@ void dgWorldPluginList::LoadPlugins()
 
 		_findclose(handle);
 	}
+#endif
 }
 
 void dgWorldPluginList::UnloadPlugins()

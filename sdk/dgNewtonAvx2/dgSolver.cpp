@@ -194,14 +194,14 @@ void dgSolver::InitJacobianMatrix()
 	dgJointInfo* const jointArray = m_jointArray;
 	dgSort(jointArray, m_cluster->m_jointCount, CompareJointInfos);
 
-	m_jointCount = ((m_cluster->m_jointCount + DG_WORK_GROUP_SIZE - 1) & -dgInt32(DG_WORK_GROUP_SIZE - 1)) / DG_WORK_GROUP_SIZE;
-	const dgInt32 jointCount = m_jointCount * DG_WORK_GROUP_SIZE;
+	m_jointCount = ((m_cluster->m_jointCount + DG_SOA_WORD_GROUP_SIZE - 1) & -dgInt32(DG_SOA_WORD_GROUP_SIZE - 1)) / DG_SOA_WORD_GROUP_SIZE;
+	const dgInt32 jointCount = m_jointCount * DG_SOA_WORD_GROUP_SIZE;
 	for (dgInt32 i = m_cluster->m_jointCount; i < jointCount; i++) {
 		memset(&jointArray[i], 0, sizeof(dgJointInfo));
 	}
 
 	dgInt32 size = 0;
-	for (dgInt32 i = 0; i < jointCount; i+= DG_WORK_GROUP_SIZE) {
+	for (dgInt32 i = 0; i < jointCount; i+= DG_SOA_WORD_GROUP_SIZE) {
 		size += jointArray[i].m_pairCount;
 	}
 	m_massMatrix.ResizeIfNecessary(size);
@@ -297,8 +297,8 @@ void dgSolver::TransposeRow(dgSoaMatrixElement* const row, const dgJointInfo* co
 {
 	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
-	if (jointInfoArray[0].m_pairCount == jointInfoArray[DG_WORK_GROUP_SIZE - 1].m_pairCount) {
-		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
+	if (jointInfoArray[0].m_pairCount == jointInfoArray[DG_SOA_WORD_GROUP_SIZE - 1].m_pairCount) {
+		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
 			const dgJointInfo* const jointInfo = &jointInfoArray[i];
 			const dgLeftHandSide* const lhs = &leftHandSide[jointInfo->m_pairStart + index];
 			const dgRightHandSide* const rhs = &rightHandSide[jointInfo->m_pairStart + index];
@@ -339,7 +339,7 @@ void dgSolver::TransposeRow(dgSoaMatrixElement* const row, const dgJointInfo* co
 		}
 	} else {
 		memset(row, 0, sizeof (dgSoaMatrixElement));
-		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
+		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
 			if (index < jointInfoArray[i].m_pairCount) {
 				const dgJointInfo* const jointInfo = &jointInfoArray[i];
 				const dgLeftHandSide* const lhs = &leftHandSide[jointInfo->m_pairStart + index];
@@ -392,7 +392,7 @@ void dgSolver::TransposeMassMatrix(dgInt32 threadID)
 	const dgInt32 jointCount = m_jointCount;
 
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
-		const dgInt32 index = i * DG_WORK_GROUP_SIZE;
+		const dgInt32 index = i * DG_SOA_WORD_GROUP_SIZE;
 		const dgInt32 rowCount = jointInfoArray[index].m_pairCount;
 		const dgInt32 rowSoaStart = dgAtomicExchangeAndAdd(&m_soaRowsCount, rowCount);
 		m_soaRowStart[i] = rowSoaStart;
@@ -635,7 +635,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 
 	bool isSleeping = true;
 	const dgBodyInfo* const bodyArray = m_bodyArray;
-	for (dgInt32 i = 0; (i < DG_WORK_GROUP_SIZE) && isSleeping; i++) {
+	for (dgInt32 i = 0; (i < DG_SOA_WORD_GROUP_SIZE) && isSleeping; i++) {
 		const dgInt32 m0 = jointInfo[i].m_m0;
 		const dgInt32 m1 = jointInfo[i].m_m1;
 		const dgBody* const body0 = bodyArray[m0].m_body;
@@ -647,7 +647,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 	if (!isSleeping) {
 		//const dgFloat32* const weight = m_weight;
 		const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
-		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
+		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
 			const dgInt32 m0 = jointInfo[i].m_m0;
 			const dgInt32 m1 = jointInfo[i].m_m1;
 
@@ -707,7 +707,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 			dgSoaFloat f(row->m_force.MulAdd(row->m_invJinvMJt,  a));
 
 			dgSoaFloat frictionNormal;
-			for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
+			for (dgInt32 k = 0; k < DG_SOA_WORD_GROUP_SIZE; k++) {
 				dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
 				dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
 				const dgInt32 frictionIndex = dgInt32(row->m_normalForceIndex.m_i[k] + 1);
@@ -772,7 +772,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 				dgSoaFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a));
 
 				dgSoaFloat frictionNormal;
-				for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
+				for (dgInt32 k = 0; k < DG_SOA_WORD_GROUP_SIZE; k++) {
 					dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
 					dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
 					const dgInt32 frictionIndex = dgInt32 (row->m_normalForceIndex.m_i[k] + 1);
@@ -825,11 +825,11 @@ void dgSolver::CalculateJointsForce(dgInt32 threadID)
 	const int jointCount = m_jointCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		const dgInt32 rowStart = soaRowStart[i];
-		dgJointInfo* const jointInfo = &m_jointArray[i * DG_WORK_GROUP_SIZE];
+		dgJointInfo* const jointInfo = &m_jointArray[i * DG_SOA_WORD_GROUP_SIZE];
 		dgFloat32 accel2 = CalculateJointForce(jointInfo, &massMatrix[rowStart], internalForces);
 		accNorm += accel2;
 
-		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
+		for (dgInt32 j = 0; j < DG_SOA_WORD_GROUP_SIZE; j++) {
 			const dgJointInfo* const joint = &jointInfo[j];
 			if (joint->m_joint) {
 				dgInt32 const rowCount = joint->m_pairCount;
@@ -855,10 +855,10 @@ void dgSolver::UpdateRowAcceleration(dgInt32 threadID)
 	const int jointCount = m_jointCount;
 	dgInt32* const atomicIndex = &m_atomicIndex;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < jointCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_WORK_GROUP_SIZE];
+		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_SOA_WORD_GROUP_SIZE];
 
 		const dgInt32 rowStart = soaRowStart[i];
-		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
+		for (dgInt32 j = 0; j < DG_SOA_WORD_GROUP_SIZE; j++) {
 			const dgJointInfo* const jointInfo = &jointInfoBase[j];
 			if (jointInfo->m_joint) {
 				dgInt32 const rowCount = jointInfo->m_pairCount;
