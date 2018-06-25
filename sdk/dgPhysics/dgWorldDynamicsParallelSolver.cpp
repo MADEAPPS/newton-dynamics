@@ -166,6 +166,25 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_WORK_GROUP_SIZE + 1);
 
+
+	dgInt32 bodyBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
+	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT + 1; i++) {
+		bodyBatches[i] = cluster.m_bodyCount;
+	}
+	dgInt32 count = cluster.m_bodyCount - 1;
+	dgInt32 stepSize = count / m_threadCounts;
+	dgInt32 residual = count - stepSize * m_threadCounts - m_threadCounts / 2;
+	dgInt32 acc = 0;
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+		bodyBatches[i] = acc;
+		acc += stepSize;
+		residual++;
+		if (residual >= 0) {
+			acc++;
+			residual -= m_threadCounts;
+		}
+	}
+
 	InitWeights();
 	InitBodyArray();
 	InitJacobianMatrix();
