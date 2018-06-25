@@ -45,7 +45,17 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	}
 	
 	static dgWorldBase module(world, allocator);
-	module.m_score = 2;
+	union {
+		char m_vendor[256];
+		int m_reg[3];
+	};
+	memset(m_vendor, 0, sizeof(m_vendor));
+	__cpuid(info.m_data, 0);
+
+	m_reg[0] = info.m_ebx;
+	m_reg[1] = info.m_edx;
+	m_reg[2] = info.m_ecx;
+	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 1 : 2;
 	return &module;
 }
 
