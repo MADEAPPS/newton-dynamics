@@ -29,11 +29,10 @@ class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
 
-#define DG_SOLVER_USES_SOA
-//#define DG_WORK_GROUP_SIZE	4 
-#define DG_WORK_GROUP_SIZE	8 
 
-#if (DG_WORK_GROUP_SIZE > 4)
+#define DG_WORK_GROUP_SIZE		8 
+
+
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupFloat
 {
@@ -153,32 +152,6 @@ class dgWorkGroupFloat
 	static dgWorkGroupFloat m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
-#else
-
-DG_MSC_VECTOR_ALIGMENT
-class dgWorkGroupFloat: public dgVector
-{
-	public:
-	DG_INLINE dgWorkGroupFloat()
-	{
-	}
-
-	DG_INLINE dgWorkGroupFloat(const dgWorkGroupFloat& me)
-		:dgVector(me)
-	{
-	}
-
-	DG_INLINE dgWorkGroupFloat(const dgVector& v)
-		:dgVector(v)
-	{
-	}
-
-	static dgWorkGroupFloat m_one;
-	static dgWorkGroupFloat m_zero;
-} DG_GCC_VECTOR_ALIGMENT;
-
-#endif
-
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupVector3
 {
@@ -290,12 +263,7 @@ class dgParallelBodySolver
 	
 	void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
-
-	#ifdef DG_SOLVER_USES_SOA
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
-	#else
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, const dgJacobian* const internalForces) const;
-	#endif
 
 	protected:
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);

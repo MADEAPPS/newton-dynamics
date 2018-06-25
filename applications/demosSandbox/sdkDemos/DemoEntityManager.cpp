@@ -334,7 +334,6 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_synchronousPhysicsUpdateMode = false;
-	m_currentPlugin = 1;
 	m_solveLargeIslandInParallel = true;
 
 	m_currentPlugin = 0;
@@ -345,7 +344,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-
+m_currentPlugin = 0;
 /*
 	dFloat A[2][2];
 	dFloat x[2];
