@@ -35,6 +35,7 @@ class dgWorldPlugin
 	virtual ~dgWorldPlugin();
 
 	virtual const char* GetId() const = 0;
+	virtual dgInt32 GetScore() const = 0;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
 
 	protected:
@@ -74,11 +75,13 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 
 	dgListNode* GetFirstPlugin();
 	dgListNode* GetCurrentPlugin();
+	dgListNode* GetpreferedPlugin();
 	dgListNode* GetNextPlugin(dgListNode* const plugin);
 	const char* GetPluginId(dgListNode* const plugin);
 	void SelectPlugin(dgListNode* const plugin);
 
 	dgListNode* m_currentPlugin;
+	dgListNode* m_preferedPlugin;
 };
 
 

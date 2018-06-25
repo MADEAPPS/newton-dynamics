@@ -45,6 +45,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	}
 	
 	static dgWorldBase module(world, allocator);
+	module.m_score = 2;
 	return &module;
 }
 
@@ -66,6 +67,12 @@ const char* dgWorldBase::GetId() const
 	return "newtonAVX";
 #endif
 }
+
+dgInt32 dgWorldBase::GetScore() const
+{
+	return m_score;
+}
+
 
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {

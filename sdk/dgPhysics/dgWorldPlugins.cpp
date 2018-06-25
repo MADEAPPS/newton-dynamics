@@ -29,6 +29,7 @@
 dgWorldPluginList::dgWorldPluginList(dgMemoryAllocator* const allocator)
 	:dgList<dgWorldPluginModulePair>(allocator)
 	,m_currentPlugin(NULL)
+	,m_preferedPlugin(NULL)
 {
 }
 
@@ -58,7 +59,7 @@ void dgWorldPluginList::LoadPlugins()
 #endif
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
-
+	dgInt32 score = 0;
 	dgWorld* const world = (dgWorld*) this;
 
 	// scan for all plugins in this folder
@@ -76,7 +77,12 @@ void dgWorldPluginList::LoadPlugins()
 					dgWorldPlugin* const plugin = initModule(world, GetAllocator ());
 					if (plugin) {
 						dgWorldPluginModulePair entry(plugin, module);
-						Append(entry);
+						dgListNode* const node = Append(entry);
+						dgInt32 pluginValue = plugin->GetScore();
+						if (pluginValue > score) {
+							score = pluginValue;
+							m_preferedPlugin = node; 
+						}
 					} else {
 						FreeLibrary(module);
 					}
@@ -98,11 +104,18 @@ void dgWorldPluginList::UnloadPlugins()
 		HMODULE module = (HMODULE)node->GetInfo().m_module;
 		FreeLibrary(module);
 	}
+	m_currentPlugin = NULL;
+	m_preferedPlugin = NULL;
 }
 
 dgWorldPluginList::dgListNode* dgWorldPluginList::GetCurrentPlugin()
 {
 	return m_currentPlugin;
+}
+
+dgWorldPluginList::dgListNode* dgWorldPluginList::GetpreferedPlugin()
+{
+	return m_preferedPlugin;
 }
 
 dgWorldPluginList::dgListNode* dgWorldPluginList::GetFirstPlugin()
@@ -127,4 +140,3 @@ void dgWorldPluginList::SelectPlugin(dgListNode* const plugin)
 {
 	m_currentPlugin = plugin;
 }
-

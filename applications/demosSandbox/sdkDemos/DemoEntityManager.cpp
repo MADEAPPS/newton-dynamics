@@ -240,22 +240,6 @@ DemoEntityManager::DemoEntityManager ()
 	,m_asynchronousPhysicsUpdate(false)
 	,m_solveLargeIslandInParallel(false)
 {
-//	m_showUI = true;
-//	m_showAABB = false;
-//	m_showContactPoints = false;
-//	m_hideVisualMeshes = true;
-//	m_autoSleepMode = true;
-//	m_broadPhaseType = 1;
-//	m_solverPasses = 4;
-//	m_workerThreades = 4;
-//	m_currentPlugin = 1;
-//	m_showNormalForces = false;
-//	m_showCenterOfMass = false;
-//	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
-//	m_synchronousPhysicsUpdateMode = false;
-	m_solveLargeIslandInParallel = true;
-
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 
@@ -335,6 +319,32 @@ DemoEntityManager::DemoEntityManager ()
 	// initialized the physics world for the new scene
 	Cleanup ();
 	ResetTimer();
+
+
+//	m_showUI = true;
+//	m_showAABB = false;
+//	m_showContactPoints = false;
+//	m_hideVisualMeshes = true;
+//	m_autoSleepMode = true;
+//	m_broadPhaseType = 1;
+//	m_solverPasses = 4;
+//	m_workerThreades = 4;
+//	m_showNormalForces = false;
+//	m_showCenterOfMass = false;
+//	m_showJointDebugInfo = true;
+//	m_collisionDisplayMode = 2;
+//	m_synchronousPhysicsUpdateMode = false;
+	m_currentPlugin = 1;
+	m_solveLargeIslandInParallel = true;
+
+	m_currentPlugin = 0;
+	void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
+	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
+		m_currentPlugin ++;
+		if (ptr == preferedPlugin) {
+			break;
+		}
+	}
 
 /*
 	dFloat A[2][2];

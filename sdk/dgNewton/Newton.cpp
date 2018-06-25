@@ -354,6 +354,14 @@ void NewtonSelectPlugin(const NewtonWorld* const newtonWorld, const void* const 
 	return world->SelectPlugin(node);
 }
 
+void* NewtonGetPreferedPlugin(const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->GetpreferedPlugin();
+}
+
+
 /*!
   this function block all other threads from executing the same subsequent code simultaneously.
 

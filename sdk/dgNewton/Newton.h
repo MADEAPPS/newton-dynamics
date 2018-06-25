@@ -444,6 +444,7 @@ extern "C" {
 
 	NEWTON_API void* NewtonCurrentPlugin(const NewtonWorld* const newtonWorld);
 	NEWTON_API void* NewtonGetFirstPlugin(const NewtonWorld* const newtonWorld);
+	NEWTON_API void* NewtonGetPreferedPlugin(const NewtonWorld* const newtonWorld);
 	NEWTON_API void* NewtonGetNextPlugin(const NewtonWorld* const newtonWorld, const void* const plugin);
 	NEWTON_API const char* NewtonGetPluginString(const NewtonWorld* const newtonWorld, const void* const plugin);
 	NEWTON_API void NewtonSelectPlugin(const NewtonWorld* const newtonWorld, const void* const plugin);
