@@ -10,10 +10,10 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-if(WIN32)
+if(WIN32 OR NEWTON_DEMOS_SANDBOX)
   # Required dependencies
   add_subdirectory(thirdParty)
-endif(WIN32)
+endif()
 
 file(GLOB dgCore_srcs dgCore/*.cpp)               # low level core
 file(GLOB dgMeshUtil_srcs dgMeshUtil/*.cpp)       # mesh geometry
