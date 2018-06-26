@@ -160,9 +160,8 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_timestepRK = m_timestep * m_invStepRK;
 	m_invTimestepRK = m_invTimestep * dgFloat32 (4.0f);
 
-	m_threadCounts = m_world->GetThreadCount();
 	m_solverPasses = m_world->GetSolverMode();
-
+	m_threadCounts = m_world->GetThreadCount();
 	m_jointCount = ((m_cluster->m_jointCount + DG_WORK_GROUP_SIZE - 1) & -dgInt32(DG_WORK_GROUP_SIZE - 1)) / DG_WORK_GROUP_SIZE;
 
 	m_bodyProxyArray = dgAlloca(dgBodyProxy, cluster.m_bodyCount);
@@ -265,6 +264,14 @@ void dgParallelBodySolver::InitWeights()
 		weight[m1].m_weight += dgFloat32(1.0f);
 	}
 	m_bodyProxyArray[0].m_weight = dgFloat32(1.0f);
+
+	dgFloat32 extraPasses = dgFloat32(0.0f);
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = 1; i < bodyCount; i++) {
+		extraPasses = dgMax(weight[i].m_weight, extraPasses);
+	}
+	const dgInt32 conectivity = 7;
+	m_solverPasses += 2 * dgInt32(extraPasses) / conectivity + 1;
 }
 
 void dgParallelBodySolver::InitBodyArray()
@@ -1080,7 +1087,7 @@ void dgParallelBodySolver::TransposeMassMatrix(dgInt32 threadID)
 
 void dgParallelBodySolver::CalculateForces()
 {
-	const dgInt32 passes = m_solverPasses + 1;
+	const dgInt32 passes = m_solverPasses;
 	m_firstPassCoef = dgFloat32(0.0f);
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 

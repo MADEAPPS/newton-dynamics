@@ -91,6 +91,14 @@ void dgSolver::InitWeights()
 		weight[m1].m_weight += dgFloat32(1.0f);
 	}
 	m_bodyProxyArray[0].m_weight = dgFloat32(1.0f);
+
+	dgFloat32 extraPasses = dgFloat32(0.0f);
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = 1; i < bodyCount; i++) {
+		extraPasses = dgMax(weight[i].m_weight, extraPasses);
+	}
+	const dgInt32 conectivity = 7;
+	m_solverPasses += 2 * dgInt32(extraPasses) / conectivity + 1;
 }
 
 void dgSolver::InitBodyArray()
@@ -986,7 +994,7 @@ void dgSolver::UpdateKinematicFeedback(dgInt32 threadID)
 void dgSolver::CalculateForces()
 {
 	m_firstPassCoef = dgFloat32(0.0f);
-	const dgInt32 passes = m_solverPasses + 1;
+	const dgInt32 passes = m_solverPasses;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 
 	for (dgInt32 step = 0; step < 4; step++) {
