@@ -265,11 +265,11 @@ class dgParallelBodySolver
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
 
-	void CalculateThreadLoads(dgInt32* const output, dgInt32 start, dgInt32 end);
-
-	protected:
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	static dgInt32 CompareBodyJointsPairs(const dgBodyJacobianPair* const pairA, const dgBodyJacobianPair* const pairB, void* notUsed);
+
+	protected:
+	void CalculateThreadLoads(dgInt32* const output, dgInt32 start, dgInt32 end);
 
 	dgWorld* m_world;
 	const dgBodyCluster* m_cluster;
@@ -286,9 +286,10 @@ class dgParallelBodySolver
 	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 	dgInt32 m_bodyBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
+	dgInt32 m_jointBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
+	dgInt32 m_soaJointBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
 
 	dgInt32 m_jointCount;
-	dgInt32 m_atomicIndex;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
 	dgInt32 m_solverPasses;
 	dgInt32 m_threadCounts;
@@ -315,7 +316,6 @@ inline dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const alloc
 	,m_invTimestepRK(dgFloat32(0.0f))
 	,m_firstPassCoef(dgFloat32(0.0f))
 	,m_jointCount(0)
-	,m_atomicIndex(0)
 	,m_jacobianMatrixRowAtomicIndex(0)
 	,m_solverPasses(0)
 	,m_threadCounts(0)
@@ -324,6 +324,24 @@ inline dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const alloc
 	,m_bodyRowStart(NULL)
 	,m_massMatrix(allocator)
 {
+}
+
+inline void dgParallelBodySolver::CalculateThreadLoads(dgInt32* const output, dgInt32 start, dgInt32 end)
+{
+	dgInt32 count = end - start;
+	dgInt32 stepSize = count / m_threadCounts;
+	dgInt32 residual = count - stepSize * m_threadCounts - m_threadCounts / 2;
+	dgInt32 acc = start;
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+		output[i] = acc;
+		acc += stepSize;
+		residual++;
+		if (residual >= 0) {
+			acc++;
+			residual -= m_threadCounts;
+		}
+	}
+	output[m_threadCounts] = end;
 }
 
 

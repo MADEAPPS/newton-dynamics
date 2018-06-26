@@ -218,8 +218,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_clusterMemory (allocator, 64)
 	,m_concurrentUpdate(false)
 {
-	dgMutexThread* const mutexThread = this;
-	SetParentThread (mutexThread);
+	dgMutexThread* const myThread = this;
+	SetParentThread (myThread);
 
 	// avoid small memory fragmentations on initialization
 	m_bodiesMemory.Resize(1024 * 32);

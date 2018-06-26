@@ -29,8 +29,8 @@
 
 
 
-//#define DG_THREAD_POOL_JOB_SIZE (512)
-#define DG_THREAD_POOL_JOB_SIZE (1024 * 8)
+#define DG_THREAD_POOL_JOB_SIZE (256)
+//#define DG_THREAD_POOL_JOB_SIZE (1024 * 8)
 
 typedef void (*dgWorkerThreadTaskCallback) (void* const context0, void* const context1, dgInt32 threadID);
 
@@ -51,30 +51,33 @@ class dgThreadHive
 			,m_callback(callback)
 		{
 		}
+
 		void* m_context0;
 		void* m_context1;
 		dgWorkerThreadTaskCallback m_callback;
 	};
 
-
-	class dgThreadBee: public dgThread
+	class dgWorkerThread: public dgThread
 	{
 		public:
 		DG_CLASS_ALLOCATOR(allocator)
 
-		dgThreadBee();
-		~dgThreadBee();
+		dgWorkerThread();
+		~dgWorkerThread();
 
 		bool IsBusy() const;
 		void SetUp(dgMemoryAllocator* const allocator, const char* const name, dgInt32 id, dgThreadHive* const hive);
 		virtual void Execute (dgInt32 threadId);
 
+		dgInt32 PushJob(const dgThreadJob& job);
 		void RunNextJobInQueue(dgInt32 threadId);
 
-		dgInt32 m_isBusy;
-		dgSemaphore m_myMutex;
 		dgThreadHive* m_hive;
 		dgMemoryAllocator* m_allocator; 
+		dgInt32 m_isBusy;
+		dgInt32 m_jobsCount;
+		dgSemaphore m_workerSemaphore;
+		dgThreadJob m_jobPool[DG_THREAD_POOL_JOB_SIZE];
 	};
 
 	dgThreadHive(dgMemoryAllocator* const allocator);
@@ -101,23 +104,21 @@ class dgThreadHive
 	private:
 	void DestroyThreads();
 
-	dgThreadBee* m_workerBees;
 	dgThread* m_parentThread;
+	dgWorkerThread* m_workerThreads;
 	dgMemoryAllocator* m_allocator;
-	dgInt32 m_beesCount;
-	dgInt32 m_currentIdleBee;
-	dgInt32 m_jobsCriticalSection;
+	dgInt32 m_jobsCount;
+	dgInt32 m_workerThreadsCount;
+
+//	dgInt32 m_currentIdleBee;
+//	dgInt32 m_jobsCriticalSection;
 	mutable dgInt32 m_globalCriticalSection;
-	dgInt32 m_emulationThreadId;
-
-	dgThread::dgSemaphore m_myMutex[DG_MAX_THREADS_HIVE_COUNT];
-	dgFastQueue<dgThreadJob, DG_THREAD_POOL_JOB_SIZE> m_jobsPool;
+	dgThread::dgSemaphore m_semaphore[DG_MAX_THREADS_HIVE_COUNT];
 };
-
 
 DG_INLINE dgInt32 dgThreadHive::GetThreadCount() const
 {
-	return m_beesCount ? m_beesCount : 1;
+	return m_workerThreadsCount ? m_workerThreadsCount : 1;
 }
 
 DG_INLINE dgInt32 dgThreadHive::GetMaxThreadCount() const
@@ -132,22 +133,20 @@ DG_INLINE void dgThreadHive::GlobalLock() const
 }
 
 DG_INLINE void dgThreadHive::GlobalUnlock() const
-{	
+{
 	ReleaseIndirectLock(&m_globalCriticalSection);
 }
 
 DG_INLINE void dgThreadHive::GetIndirectLock (dgInt32* const criticalSectionLock) const
 {
-	if (m_beesCount) {	
-		//criticalSectionLock->Lock();
+	if (m_workerThreadsCount) {	
 		dgSpinLock(criticalSectionLock);
 	}
 }
 
 DG_INLINE void dgThreadHive::ReleaseIndirectLock (dgInt32* const criticalSectionLock) const
 {
-	if (m_beesCount) {	
-		//criticalSectionLock->Unlock();
+	if (m_workerThreadsCount) {	
 		dgSpinUnlock(criticalSectionLock);
 	}
 }
