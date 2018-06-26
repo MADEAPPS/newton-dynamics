@@ -85,24 +85,6 @@ dgInt32 dgThreadHive::dgWorkerThread::PushJob(const dgThreadJob& job)
 
 void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
 {
-/*
-	bool isEmpty = false;
-	do {
-		dgThreadJob job;
-		dgAssert (threadId == m_id);
-		dgSpinLock(&m_hive->m_jobsCriticalSection);
-		isEmpty = m_hive->m_jobsPool.IsEmpty();
-		if (!isEmpty) {
-			job = m_hive->m_jobsPool.GetHead();
-			m_hive->m_jobsPool.Pop();
-		}
-		dgSpinUnlock(&m_hive->m_jobsCriticalSection);
-
-		if (!isEmpty) {
-			job.m_callback (job.m_context0, job.m_context1, m_id);
-		}
-	} while (!isEmpty);
-*/
 	for (dgInt32 i = 0; i < m_jobsCount; i ++) {
 		const dgThreadJob& job = m_jobPool[i];
 		job.m_callback (job.m_context0, job.m_context1, m_id);
@@ -116,8 +98,6 @@ dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
 	,m_allocator(allocator)
 	,m_jobsCount(0)
 	,m_workerThreadsCount(0)
-//	,m_currentIdleBee(0)
-//	,m_jobsCriticalSection(0)
 	,m_globalCriticalSection(0)
 {
 }
@@ -166,13 +146,10 @@ void dgThreadHive::QueueJob (dgWorkerThreadTaskCallback callback, void* const co
 	if (!m_workerThreadsCount) {
 		callback (context0, context1, 0);
 	} else {
-
+		dgInt32 workerTreadEntry = m_jobsCount % m_workerThreadsCount;
 		#ifdef DG_USE_THREAD_EMULATION
-			dgAssert (0);
-//			callback (context0, context1, m_emulationThreadId);
-//			m_emulationThreadId++;
+			callback (context0, context1, workerTreadEntry);
 		#else 
-			dgInt32 workerTreadEntry = m_jobsCount % m_workerThreadsCount;
 			dgInt32 index = m_workerThreads[workerTreadEntry].PushJob(dgThreadJob(context0, context1, callback));
 			if (index >= DG_THREAD_POOL_JOB_SIZE) {
 				dgAssert (0);

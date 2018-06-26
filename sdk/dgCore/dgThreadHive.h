@@ -28,10 +28,7 @@
 #include "dgFastQueue.h"
 
 
-
 #define DG_THREAD_POOL_JOB_SIZE (256)
-//#define DG_THREAD_POOL_JOB_SIZE (1024 * 8)
-
 typedef void (*dgWorkerThreadTaskCallback) (void* const context0, void* const context1, dgInt32 threadID);
 
 class dgThreadHive  
@@ -109,9 +106,6 @@ class dgThreadHive
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_jobsCount;
 	dgInt32 m_workerThreadsCount;
-
-//	dgInt32 m_currentIdleBee;
-//	dgInt32 m_jobsCriticalSection;
 	mutable dgInt32 m_globalCriticalSection;
 	dgThread::dgSemaphore m_semaphore[DG_MAX_THREADS_HIVE_COUNT];
 };
