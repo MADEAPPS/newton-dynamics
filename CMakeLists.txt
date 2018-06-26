@@ -119,6 +119,5 @@ add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk")
 
 # demos sandbox
 if(NEWTON_DEMOS_SANDBOX)
-  add_subdirectory("${NewtonSDK_SOURCE_DIR}/sdk/thirdParty")
   add_subdirectory("${NewtonSDK_SOURCE_DIR}/applications/demosSandbox")
 endif()
