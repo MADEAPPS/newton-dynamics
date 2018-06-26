@@ -54,6 +54,11 @@ dNewtonCollision::~dNewtonCollision()
 	}
 }
 
+dNewtonCollision::dCollsionType dNewtonCollision::GetType() const
+{
+    return m_type;
+}
+
 void* dNewtonCollision::GetUserData() const
 {
 	return m_userData;
@@ -141,6 +146,16 @@ dNewtonCollisionMesh::dNewtonCollisionMesh (dNewton* const world, const dNewtonM
 
 
 
+dNewtonCollisionMesh::dNewtonCollisionMesh(const dNewtonCollisionMesh& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollision* dNewtonCollisionMesh::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionMesh(*this, shape);
+}
+
 void dNewtonCollisionMesh::BeginFace()
 {
 	NewtonTreeCollisionBeginBuild(m_shape);
@@ -164,6 +179,16 @@ dNewtonCollisionScene::dNewtonCollisionScene(dNewton* const world, dLong collisi
 	SetShape (NewtonCreateSceneCollision(world->GetNewton(), 0));
 }
 
+
+dNewtonCollisionScene::dNewtonCollisionScene(const dNewtonCollisionScene& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollision* dNewtonCollisionScene::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionScene(*this, shape);
+}
 
 void dNewtonCollisionScene::BeginAddRemoveCollision()
 {
@@ -208,6 +233,26 @@ dNewtonCollisionConvexHull::dNewtonCollisionConvexHull (dNewton* const world, co
 	SetShape (NewtonCreateConvexHullFromMesh (world->GetNewton(), mesh.GetMesh(), 0.001f, 0));
 }
 
+dNewtonCollisionConvexHull::dNewtonCollisionConvexHull(const dNewtonCollisionConvexHull& srcCollision, NewtonCollision* const shape) : dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionConvexHull::dNewtonCollisionConvexHull(dNewton* const world, int vertexCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, dLong collisionMask) : dNewtonCollision(m_convex, collisionMask)
+{
+    SetShape(NewtonCreateConvexHull(world->GetNewton(), vertexCount, vertexCloud, strideInBytes, tolerance, 0, NULL));
+}
+
+dNewtonCollisionConvexHull::dNewtonCollisionConvexHull(NewtonCollision* const shape, dLong collisionMask) : dNewtonCollision(m_convex, collisionMask)
+{
+    SetShape(shape);
+}
+
+dNewtonCollision* dNewtonCollisionConvexHull::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionConvexHull(*this, shape);
+}
+
 dNewtonCollisionCompound::dNewtonCollisionCompound (dNewton* const world, const dNewtonMesh& mesh, dLong collisionMask)
 	:dNewtonCollision(m_compound, collisionMask)
 {
@@ -220,6 +265,26 @@ dNewtonCollisionCompound::dNewtonCollisionCompound (dNewton* const world, const 
 	}
 }
 
+
+dNewtonCollisionCompound::dNewtonCollisionCompound(const dNewtonCollisionCompound& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionCompound::dNewtonCollisionCompound(dNewton* const world, dLong collisionMask) : dNewtonCollision(m_compound, collisionMask)
+{
+    SetShape(NewtonCreateCompoundCollision(world->GetNewton(), 0));
+}
+
+dNewtonCollisionCompound::dNewtonCollisionCompound(NewtonCollision* const shape, dLong collisionMask) : dNewtonCollision(m_compound, collisionMask)
+{
+    SetShape(shape);
+}
+
+dNewtonCollision* dNewtonCollisionCompound::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionCompound(*this, shape);
+}
 
 void dNewtonCollisionCompound::BeginAddRemoveCollision()
 {
@@ -255,4 +320,139 @@ dNewtonCollision* dNewtonCollisionCompound::GetChildFromNode(void* const collisi
 {
 	NewtonCollision* const collision = NewtonCompoundCollisionGetCollisionFromNode (m_shape, collisionNode);
 	return (dNewtonCollision*) NewtonCollisionGetUserData (collision);
+}
+
+dNewtonCollisionChamferedCylinder::dNewtonCollisionChamferedCylinder(const dNewtonCollisionChamferedCylinder& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionChamferedCylinder::dNewtonCollisionChamferedCylinder(dNewton* const world, dFloat radio, dFloat height, dLong collisionMask) : dNewtonCollision(m_chamferedCylinder, collisionMask)
+{
+    SetShape(NewtonCreateChamferCylinder(world->GetNewton(), radio, height, 0, NULL));
+}
+
+dNewtonCollision* dNewtonCollisionChamferedCylinder::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionChamferedCylinder(*this, shape);
+}
+
+dNewtonCollisionCylinder::dNewtonCollisionCylinder(const dNewtonCollisionCylinder& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionCylinder::dNewtonCollisionCylinder(dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask) : dNewtonCollision(m_cylinder, collisionMask)
+{
+    SetShape(NewtonCreateCylinder(world->GetNewton(), radio0, radio1, height, 0, NULL));
+}
+
+dNewtonCollisionCylinder::dNewtonCollisionCylinder(NewtonCollision* const shape, dLong collisionMask) : dNewtonCollision(m_cylinder, collisionMask)
+{
+    SetShape(shape);
+}
+
+dNewtonCollision* dNewtonCollisionCylinder::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionCylinder(*this, shape);
+}
+
+dNewtonCollisionCone::dNewtonCollisionCone(const dNewtonCollisionCone& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionCone::dNewtonCollisionCone(dNewton* const world, dFloat radio, dFloat height, dLong collisionMask) : dNewtonCollision(m_cone, collisionMask)
+{
+    SetShape(NewtonCreateCone(world->GetNewton(), radio, height, 0, NULL));
+}
+
+dNewtonCollision* dNewtonCollisionCone::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionCone(*this, shape);
+}
+
+dNewtonCollisionCapsule::dNewtonCollisionCapsule(const dNewtonCollisionCapsule& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionCapsule::dNewtonCollisionCapsule(dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask) : dNewtonCollision(m_capsule, collisionMask)
+{
+    SetShape(NewtonCreateCapsule(world->GetNewton(), radio0, radio1, height, 0, NULL));
+}
+
+dNewtonCollisionCapsule::dNewtonCollisionCapsule(NewtonCollision* const shape, dLong collisionMask) : dNewtonCollision(m_capsule, collisionMask)
+{
+    SetShape(shape);
+}
+
+dNewtonCollision* dNewtonCollisionCapsule::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionCapsule(*this, shape);
+}
+
+dNewtonCollisionSphere::dNewtonCollisionSphere(const dNewtonCollisionSphere& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionSphere::dNewtonCollisionSphere(dNewton* const world, dFloat radio, dLong collisionMask) : dNewtonCollision(m_sphere, collisionMask)
+{
+    SetShape(NewtonCreateSphere(world->GetNewton(), radio, 0, NULL));
+}
+
+dNewtonCollision* dNewtonCollisionSphere::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionSphere(*this, shape);
+}
+
+dNewtonCollisionBox::dNewtonCollisionBox(const dNewtonCollisionBox& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionBox::dNewtonCollisionBox(dNewton* const world, dFloat x, dFloat y, dFloat z, dLong collisionMask) : dNewtonCollision(m_box, collisionMask)
+{
+    SetShape(NewtonCreateBox(world->GetNewton(), x, y, z, 0, NULL));
+}
+
+dNewtonCollision* dNewtonCollisionBox::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionBox(*this, shape);
+}
+
+dNewtonCollisionNull::dNewtonCollisionNull(const dNewtonCollisionNull& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionNull::dNewtonCollisionNull(dNewton* const world) : dNewtonCollision(m_null, 0)
+{
+    SetShape(NewtonCreateNull(world->GetNewton()));
+}
+
+dNewtonCollision* dNewtonCollisionNull::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionNull(*this, shape);
+}
+
+dNewtonCollisionHeightField::dNewtonCollisionHeightField(const dNewtonCollisionHeightField& srcCollision, NewtonCollision* const shape) :dNewtonCollision(srcCollision, shape)
+{
+
+}
+
+dNewtonCollisionHeightField::dNewtonCollisionHeightField(dNewton* const world, int width, int height, int gridsDiagonals, int elevationdataType, dFloat vertcalScale, dFloat horizontalScale_x, dFloat horizontalScale_z, const void* const elevationMap, const char* const attributeMap, dLong collisionMask) : dNewtonCollision(m_heighfield, collisionMask)
+{
+    SetShape(NewtonCreateHeightFieldCollision(world->GetNewton(), width, height, gridsDiagonals, elevationdataType, elevationMap, attributeMap, vertcalScale, horizontalScale_x, horizontalScale_z, 0));
+}
+
+dNewtonCollision* dNewtonCollisionHeightField::Clone(NewtonCollision* const shape) const
+{
+    return new dNewtonCollisionHeightField(*this, shape);
+}
+
+dNewtonCollision::dDebugRenderer::dDebugRenderer(dNewtonCollision* const me) :m_collision(me)
+{
+
 }

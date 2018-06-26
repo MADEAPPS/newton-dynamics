@@ -54,10 +54,7 @@ class dNewtonCollision: virtual public dNewtonAlloc, public dNewtonMaterial
 	class dDebugRenderer
 	{
 		public:
-		CNEWTON_API dDebugRenderer (dNewtonCollision* const me)
-			:m_collision(me)
-		{
-		}
+		CNEWTON_API dDebugRenderer (dNewtonCollision* const me);
 		
 		CNEWTON_API virtual void OnDrawFace (int vertexCount, const dFloat* const faceVertex, int faceId) = 0;
 
@@ -67,7 +64,7 @@ class dNewtonCollision: virtual public dNewtonAlloc, public dNewtonMaterial
 	CNEWTON_API dNewtonCollision (dCollsionType type, dLong collisionMask);
 	CNEWTON_API virtual ~dNewtonCollision();
 
-	CNEWTON_API dCollsionType GetType() const {return m_type;}
+	CNEWTON_API dCollsionType GetType() const;
 	CNEWTON_API NewtonCollision* GetShape() const;
 	CNEWTON_API virtual dNewtonCollision* Clone (NewtonCollision* const shape) const = 0; 
 
@@ -107,20 +104,14 @@ class dNewtonCollisionMesh: public dNewtonCollision
 	CNEWTON_API dNewtonCollisionMesh (dNewton* const world, dLong collisionMask);
 	CNEWTON_API dNewtonCollisionMesh (dNewton* const world, const dNewtonMesh& mesh, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone (NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionMesh (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone (NewtonCollision* const shape) const;
 
 	CNEWTON_API virtual void BeginFace();
 	CNEWTON_API virtual void AddFace(int vertexCount, const dFloat* const vertexPtr, int strideInBytes, int faceAttribute);
 	CNEWTON_API virtual void EndFace();
 
 	protected:
-	CNEWTON_API dNewtonCollisionMesh (const dNewtonCollisionMesh& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionMesh (const dNewtonCollisionMesh& srcCollision, NewtonCollision* const shape);
 };
 
 
@@ -128,10 +119,7 @@ class dNewtonCollisionScene: public dNewtonCollision
 {
 	public: 
 	CNEWTON_API dNewtonCollisionScene (dNewton* const world, dLong collisionMask);
-	CNEWTON_API dNewtonCollision* Clone (NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionScene (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone (NewtonCollision* const shape) const;
 
 	CNEWTON_API virtual void BeginAddRemoveCollision();
 	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);
@@ -143,176 +131,95 @@ class dNewtonCollisionScene: public dNewtonCollision
 	CNEWTON_API dNewtonCollision* GetChildFromNode(void* const collisionNode) const; 
 
 	protected:
-	CNEWTON_API dNewtonCollisionScene (const dNewtonCollisionScene& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionScene (const dNewtonCollisionScene& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionHeightField: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionHeightField (dNewton* const world, int width, int height, int gridsDiagonals, int elevationdataType, dFloat vertcalScale, dFloat horizontalScale_x, dFloat horizontalScale_z, const void* const elevationMap, const char* const attributeMap, dLong collisionMask)
-		:dNewtonCollision(m_heighfield, collisionMask)
-	{
-		SetShape (NewtonCreateHeightFieldCollision (world->GetNewton(), width, height, gridsDiagonals, elevationdataType, elevationMap, attributeMap, vertcalScale, horizontalScale_x, horizontalScale_z, 0));
-	}
+	CNEWTON_API dNewtonCollisionHeightField (dNewton* const world, int width, int height, int gridsDiagonals, int elevationdataType, dFloat vertcalScale, dFloat horizontalScale_x, dFloat horizontalScale_z, const void* const elevationMap, const char* const attributeMap, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone (NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionHeightField (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone (NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionHeightField (const dNewtonCollisionHeightField& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionHeightField (const dNewtonCollisionHeightField& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionNull: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionNull (dNewton* const world)
-		:dNewtonCollision(m_null, 0)
-	{
-		SetShape (NewtonCreateNull(world->GetNewton()));
-	}
+	CNEWTON_API dNewtonCollisionNull (dNewton* const world);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionNull (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionNull (const dNewtonCollisionNull& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionNull (const dNewtonCollisionNull& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionBox: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionBox (dNewton* const world, dFloat x, dFloat y, dFloat z, dLong collisionMask)
-		:dNewtonCollision(m_box, collisionMask)
-	{
-		SetShape (NewtonCreateBox(world->GetNewton(), x, y, z, 0, NULL));
-	}
+	CNEWTON_API dNewtonCollisionBox (dNewton* const world, dFloat x, dFloat y, dFloat z, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionBox (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionBox (const dNewtonCollisionBox& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionBox (const dNewtonCollisionBox& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionSphere: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionSphere (dNewton* const world, dFloat radio, dLong collisionMask)
-		:dNewtonCollision(m_sphere, collisionMask)
-	{
-		SetShape (NewtonCreateSphere(world->GetNewton(), radio, 0, NULL));
-	}
+	CNEWTON_API dNewtonCollisionSphere (dNewton* const world, dFloat radio, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionSphere (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionSphere (const dNewtonCollisionSphere& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionSphere (const dNewtonCollisionSphere& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionCapsule: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionCapsule (NewtonCollision* const shape, dLong collisionMask)
-		:dNewtonCollision(m_capsule, collisionMask)
-	{
-		SetShape (shape);
-	}
+	CNEWTON_API dNewtonCollisionCapsule (NewtonCollision* const shape, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollisionCapsule (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask)
-		:dNewtonCollision(m_capsule, collisionMask)
-	{
-		SetShape (NewtonCreateCapsule (world->GetNewton(), radio0, radio1, height, 0, NULL));
-	}
+	CNEWTON_API dNewtonCollisionCapsule (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionCapsule (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionCapsule (const dNewtonCollisionCapsule& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionCapsule (const dNewtonCollisionCapsule& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionCone: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionCone (dNewton* const world, dFloat radio, dFloat height, dLong collisionMask)
-		:dNewtonCollision(m_cone, collisionMask)
-	{
-		SetShape (NewtonCreateCone (world->GetNewton(), radio, height, 0, NULL));
-	}
+	CNEWTON_API dNewtonCollisionCone (dNewton* const world, dFloat radio, dFloat height, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionCone (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionCone (const dNewtonCollisionCone& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionCone (const dNewtonCollisionCone& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionCylinder: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionCylinder (NewtonCollision* const shape, dLong collisionMask)
-		:dNewtonCollision(m_cylinder, collisionMask)
-	{
-		SetShape (shape);
-	}
+	CNEWTON_API dNewtonCollisionCylinder (NewtonCollision* const shape, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollisionCylinder (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask)
-		:dNewtonCollision(m_cylinder, collisionMask)
-	{
-		SetShape (NewtonCreateCylinder (world->GetNewton(), radio0, radio1, height, 0, NULL));
-	}
+	CNEWTON_API dNewtonCollisionCylinder (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionCylinder (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionCylinder (const dNewtonCollisionCylinder& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionCylinder (const dNewtonCollisionCylinder& srcCollision, NewtonCollision* const shape);
 };
 
 
@@ -320,77 +227,42 @@ class dNewtonCollisionCylinder: public dNewtonCollision
 class dNewtonCollisionChamferedCylinder: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionChamferedCylinder (dNewton* const world, dFloat radio, dFloat height, dLong collisionMask)
-		:dNewtonCollision(m_chamferedCylinder, collisionMask)
-	{
-		SetShape (NewtonCreateChamferCylinder (world->GetNewton(), radio, height, 0, NULL));
-	}
+	CNEWTON_API dNewtonCollisionChamferedCylinder (dNewton* const world, dFloat radio, dFloat height, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionChamferedCylinder (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionChamferedCylinder (const dNewtonCollisionChamferedCylinder& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionChamferedCylinder (const dNewtonCollisionChamferedCylinder& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionConvexHull: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionConvexHull (NewtonCollision* const shape, dLong collisionMask)
-		:dNewtonCollision(m_convex, collisionMask)
-	{
-		SetShape (shape);
-	}
+	CNEWTON_API dNewtonCollisionConvexHull (NewtonCollision* const shape, dLong collisionMask);
 
 	CNEWTON_API dNewtonCollisionConvexHull (dNewton* const world, const dNewtonMesh& mesh, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollisionConvexHull (dNewton* const world, int vertexCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, dLong collisionMask)
-		:dNewtonCollision(m_convex, collisionMask)
-	{
-		SetShape (NewtonCreateConvexHull (world->GetNewton(), vertexCount, vertexCloud, strideInBytes, tolerance, 0, NULL));
-	}
+	CNEWTON_API dNewtonCollisionConvexHull (dNewton* const world, int vertexCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionConvexHull (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	protected:
-	CNEWTON_API dNewtonCollisionConvexHull (const dNewtonCollisionConvexHull& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionConvexHull (const dNewtonCollisionConvexHull& srcCollision, NewtonCollision* const shape);
 };
 
 
 class dNewtonCollisionCompound: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionCompound (NewtonCollision* const shape, dLong collisionMask)
-		:dNewtonCollision(m_compound, collisionMask)
-	{
-		SetShape (shape);
-	}
+	CNEWTON_API dNewtonCollisionCompound (NewtonCollision* const shape, dLong collisionMask);
 
-	CNEWTON_API dNewtonCollisionCompound (dNewton* const world, dLong collisionMask)
-		:dNewtonCollision(m_compound, collisionMask)
-	{
-		SetShape (NewtonCreateCompoundCollision (world->GetNewton(), 0));
-	}
+	CNEWTON_API dNewtonCollisionCompound (dNewton* const world, dLong collisionMask);
 
 	CNEWTON_API dNewtonCollisionCompound (dNewton* const world, const dNewtonMesh& mesh, dLong collisionMask);
 
 
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionCompound (*this, shape);
-	}
+	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
 
 	CNEWTON_API virtual void BeginAddRemoveCollision();
 	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);
@@ -402,10 +274,7 @@ class dNewtonCollisionCompound: public dNewtonCollision
 	CNEWTON_API dNewtonCollision* GetChildFromNode(void* const collisionNode) const; 
 
 	protected:
-	CNEWTON_API dNewtonCollisionCompound (const dNewtonCollisionCompound& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
+	CNEWTON_API dNewtonCollisionCompound (const dNewtonCollisionCompound& srcCollision, NewtonCollision* const shape);
 };
 
 
