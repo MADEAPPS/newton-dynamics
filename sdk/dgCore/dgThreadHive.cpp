@@ -108,6 +108,7 @@ dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
 	,m_jobsCriticalSection(0)
 	,m_globalCriticalSection(0)
     ,m_jobsPool(allocator)
+	,m_emulationThreadId(0)
 {
 }
 
@@ -157,7 +158,8 @@ void dgThreadHive::QueueJob (dgWorkerThreadTaskCallback callback, void* const co
 		callback (context0, context1, 0);
 	} else {
 		#ifdef DG_USE_THREAD_EMULATION
-			callback (context0, context1, 0);
+			callback (context0, context1, m_emulationThreadId);
+			m_emulationThreadId++;
 		#else 
 			dgThreadJob job (context0, context1, callback);
 			m_jobsPool.Push(job);
@@ -188,6 +190,9 @@ void dgThreadHive::SynchronizationBarrier ()
 		m_parentThread->SuspendExecution(m_beesCount, m_myMutex);
 		dgAssert (m_jobsPool.IsEmpty());
 	}
+	#ifdef DG_USE_THREAD_EMULATION
+		m_emulationThreadId = 0;
+	#endif
 }
 
 

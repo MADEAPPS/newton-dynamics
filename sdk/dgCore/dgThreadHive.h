@@ -108,6 +108,7 @@ class dgThreadHive
 	dgInt32 m_currentIdleBee;
 	dgInt32 m_jobsCriticalSection;
 	mutable dgInt32 m_globalCriticalSection;
+	dgInt32 m_emulationThreadId;
 
 	dgThread::dgSemaphore m_myMutex[DG_MAX_THREADS_HIVE_COUNT];
 	dgFastQueue<dgThreadJob, DG_THREAD_POOL_JOB_SIZE> m_jobsPool;

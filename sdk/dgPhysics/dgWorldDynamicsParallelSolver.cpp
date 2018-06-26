@@ -432,8 +432,10 @@ void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 {
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
+
+	dgInt32* const atomicIndex = &m_atomicIndex;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(&m_atomicIndex, 1)) {
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
 		body->AddDampingAcceleration(m_timestep);
@@ -830,8 +832,8 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 void dgParallelBodySolver::CalculateBodiesAcceleration(dgInt32 threadID)
 {
 	dgVector invTime(m_invTimestep);
-	dgInt32* const atomicIndex = &m_atomicIndex;
 	dgFloat32 maxAccNorm2 = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR;
+	dgInt32* const atomicIndex = &m_atomicIndex;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgDynamicBody* const body = (dgDynamicBody*)m_bodyArray[i].m_body;
