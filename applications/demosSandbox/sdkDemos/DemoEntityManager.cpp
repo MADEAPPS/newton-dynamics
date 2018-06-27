@@ -1505,7 +1505,7 @@ void DemoEntityManager::FileBrowserModal::Update()
 	if (ImGui::BeginPopupModal(m_title.GetStr(), &isOpen, modal_flags)) {
 		int selection;
 		if (ImGui::ListBox("##", &selection, GetNameItemCallback, xxxx, 3, -1)) {
-			selection *= 1;
+			strcpy(ssssssssss, xxxx[selection]);
 /*
 			//Update current path to the selected list item.
 			m_currentPath = m_filesInScope[m_selection].path;
@@ -1519,10 +1519,13 @@ void DemoEntityManager::FileBrowserModal::Update()
 		}
 
 		//Auto resize text wrap to popup width.
-		ImGui::PushItemWidth(-1);
+//		ImGui::PushItemWidth(-1);
 //		ImGui::TextWrapped(m_currentPath.string().data());
-		ImGui::TextWrapped("zzzzzzzzzzzz");
-		ImGui::PopItemWidth();
+//		ImGui::TextWrapped("zzzzzzzzzzzz");
+		ImGui::Text("zzzzzzzzzzzz");
+		ImGui::SetKeyboardFocusHere();
+		ImGui::InputText("", ssssssssss, sizeof (ssssssssss));
+//		ImGui::PopItemWidth();
 
 		ImGui::Spacing();
 		ImGui::SameLine(ImGui::GetWindowWidth() - 60);
@@ -1547,6 +1550,9 @@ void DemoEntityManager::FileBrowserModal::Update()
 
 				outPath = m_currentPath.string();
 				result = true;
+
+				m_modalMode____ = false;
+				m_modalMode = false;
 			}
 		}
 */

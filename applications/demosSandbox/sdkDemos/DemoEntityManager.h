@@ -36,6 +36,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 		dString m_title;
 		bool m_modalMode;
 		bool m_modalMode____;
+		char ssssssssss[32];
 	};
 
 	public:
