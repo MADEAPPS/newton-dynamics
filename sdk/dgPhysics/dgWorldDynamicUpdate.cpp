@@ -229,7 +229,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	bodyArray0[m_bodies].m_body = world->m_sentinelBody;
 	dgAssert(world->m_sentinelBody->m_index == 0);
 	dgAssert(dgInt32(world->m_sentinelBody->m_dynamicsLru) == m_markLru);
-//	const dgInt32 vectorStride = dgInt32 (sizeof (dgVector) / sizeof (dgFloat32));
 
 	bool globalAutoSleep = true;
 	while (stack) {
@@ -264,38 +263,40 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 				dgConstraint* const constraint = cell->m_joint;
 				dgAssert(constraint);
-				dgBody* const linkBody = cell->m_bodyNode;
-				dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
-				dgAssert((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
-				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
+				if (constraint->m_clusterLRU != clusterLRU) {
+					dgBody* const linkBody = cell->m_bodyNode;
+					dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
+					dgAssert((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
+					const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
 
-				bool check0 = linkBody->IsCollidable();
-				check0 = check0 && (!contact || (contact->m_contactActive && contact->m_maxDOF) || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode));
-				if (check0) {
-					bool check1 = constraint->m_dynamicsLru != lruMark;
-					if (check1) {
-						const dgInt32 jointIndex = m_joints + jointCount;
-						world->m_jointsMemory.ResizeIfNecessary ((jointIndex + 1) * sizeof (dgJointInfo));
-						dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
+					bool check0 = linkBody->IsCollidable();
+					check0 = check0 && (!contact || (contact->m_contactActive && contact->m_maxDOF) || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode));
+					if (check0) {
+						bool check1 = constraint->m_dynamicsLru != lruMark;
+						if (check1) {
+							const dgInt32 jointIndex = m_joints + jointCount;
+							world->m_jointsMemory.ResizeIfNecessary((jointIndex + 1) * sizeof(dgJointInfo));
+							dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
-						constraint->m_index = jointCount;
-						constraint->m_clusterLRU = clusterLRU;
-						constraint->m_dynamicsLru = lruMark;
+							constraint->m_index = jointCount;
+							constraint->m_clusterLRU = clusterLRU;
+							constraint->m_dynamicsLru = lruMark;
 
-						constraintArray[jointIndex].m_joint = constraint;
-						const dgInt32 rows = constraint->m_maxDOF;
-						constraintArray[jointIndex].m_pairStart = 0;
-						constraintArray[jointIndex].m_pairCount = rows;
-						jointCount++;
+							constraintArray[jointIndex].m_joint = constraint;
+							const dgInt32 rows = constraint->m_maxDOF;
+							constraintArray[jointIndex].m_pairStart = 0;
+							constraintArray[jointIndex].m_pairCount = rows;
+							jointCount++;
 
-						dgAssert(constraint->m_body0);
-						dgAssert(constraint->m_body1);
-					}
+							dgAssert(constraint->m_body0);
+							dgAssert(constraint->m_body1);
+						}
 
-					dgDynamicBody* const adjacentBody = (dgDynamicBody*)linkBody;
-					if ((adjacentBody->m_dynamicsLru != lruMark) && (adjacentBody->GetInvMass().m_w > dgFloat32(0.0f))) {
-						queueBuffer[stack] = adjacentBody;
-						stack ++;
+						dgDynamicBody* const adjacentBody = (dgDynamicBody*)linkBody;
+						if ((adjacentBody->m_dynamicsLru != lruMark) && (adjacentBody->GetInvMass().m_w > dgFloat32(0.0f))) {
+							queueBuffer[stack] = adjacentBody;
+							stack++;
+						}
 					}
 				}
 			}
