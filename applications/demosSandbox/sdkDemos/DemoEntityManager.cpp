@@ -31,7 +31,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// gyroscope precession
@@ -61,7 +61,7 @@
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// servo joints
-#define DEFAULT_SCENE	30			// articulated joints
+//#define DEFAULT_SCENE	30			// articulated joints
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
@@ -195,6 +195,13 @@ int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 }
 
 
+
+#include <vector>
+#include <string>
+#include <experimental/filesystem>
+#include <filesystem>
+
+
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 DemoEntityManager::DemoEntityManager ()
@@ -224,6 +231,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_solverPasses(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
+	,m_fileBrowser("Select file name")
 	,m_showUI(true)
 	,m_showAABB(false)
 	,m_showStats(true)
@@ -646,17 +654,37 @@ void DemoEntityManager::ShowMainMenuBar()
 			if (ImGui::MenuItem("New", "")) {
 				mainMenu = 1;
 			}
-			ImGui::Separator();
-			if (ImGui::MenuItem("Open", "")) {
-				dAssert (0);
-			}
-			if (ImGui::MenuItem("Save", "")) {
-				dAssert (0);
-			}
+//			ImGui::Separator();
+//			if (ImGui::MenuItem("Open", "")) {
+//				dAssert (0);
+//			}
+//			if (ImGui::MenuItem("Save", "")) {
+//				dAssert (0);
+//			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Serialize", "")) {
+				m_fileBrowser.SetModalMode(true);
+/*
 				//mainMenu = 2;
-				dAssert (0);
+				//static imgui_ext::file_browser_modal fileBrowser("Import");
+				//bool isImportClicked = false;
+//				if (ImGui::BeginMainMenuBar()) {
+					if (ImGui::BeginMenu("File")) {
+//						if (ImGui::MenuItem("Import")) {
+//							isImportClicked = true;
+//						}
+//						ImGui::EndMenu();
+					}
+//					ImGui::EndMainMenuBar();
+//				}
+*/
+/*
+				std::string path;
+				if (fileBrowser.render(isImportClicked, path)) {
+					// The "path" string will hold a valid file path here.
+				}
+*/
+
 			}
 			if (ImGui::MenuItem("Deserialize", "")) {
 				dAssert (0);
@@ -900,17 +928,6 @@ void DemoEntityManager::RenderStats()
 			sprintf (text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
 			ImGui::Text(text);
 
-/*
-			wxString statusText;
-			NewtonWorld* const world = m_world;
-			char platform[256];
-			NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
-
-			char floatMode[128];
-			NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
-			statusText.Printf (wxT ("instructions: %s",  wxString::FromAscii(floatMode).wc_str());
-			m_statusbar->SetStatusText (statusText, 6);
-*/
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
 		}
@@ -926,6 +943,7 @@ void DemoEntityManager::RenderStats()
 
 	ShowMainMenuBar();
 }
+
 
 void DemoEntityManager::CalculateFPS(dFloat timestep)
 {
@@ -1442,6 +1460,100 @@ void DemoEntityManager::RenderScene()
 	glPopMatrix();
 }
 
+DemoEntityManager::FileBrowserModal::FileBrowserModal(const char* const title)
+	:m_title(title)
+	,m_modalMode(false)
+	,m_modalMode____(false)
+	//m_oldVisibility(false),
+	//m_selection(0),
+	//m_currentPath(fs::current_path()),
+	//m_currentPathIsDir(true)
+{
+}
+
+void DemoEntityManager::FileBrowserModal::SetModalMode(bool mode)
+{
+	m_modalMode____ = true;
+}
+
+char* xxxx[] = { "xxxx0", "xxxx1", "xxxx2" };
+bool DemoEntityManager::FileBrowserModal::GetNameItemCallback(void* data, int idx, const char** out_text) 
+{
+	const char** xxxxxxx = (const char**)data;
+	*out_text = xxxxxxx[idx];
+	return true;
+}
+
+void DemoEntityManager::FileBrowserModal::Update()
+{
+	if (!m_modalMode____) {
+		return;
+	}
+
+	if (!m_modalMode) {
+		m_modalMode = true;
+		ImGui::OpenPopup(m_title.GetStr());
+	}
+
+	bool isOpen = true;
+	int modal_flags =
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_AlwaysAutoResize;
+
+	if (ImGui::BeginPopupModal(m_title.GetStr(), &isOpen, modal_flags)) {
+		int selection;
+		if (ImGui::ListBox("##", &selection, GetNameItemCallback, xxxx, 3, -1)) {
+			selection *= 1;
+/*
+			//Update current path to the selected list item.
+			m_currentPath = m_filesInScope[m_selection].path;
+			m_currentPathIsDir = fs::is_directory(m_currentPath);
+
+			//If the selection is a directory, repopulate the list with the contents of that directory.
+			if (m_currentPathIsDir) {
+				get_files_in_path(m_currentPath, m_filesInScope);
+			}
+*/
+		}
+
+		//Auto resize text wrap to popup width.
+		ImGui::PushItemWidth(-1);
+//		ImGui::TextWrapped(m_currentPath.string().data());
+		ImGui::TextWrapped("zzzzzzzzzzzz");
+		ImGui::PopItemWidth();
+
+		ImGui::Spacing();
+		ImGui::SameLine(ImGui::GetWindowWidth() - 60);
+/*
+		// Make the "Select" button look / act disabled if the current selection is a directory.
+		if (m_currentPathIsDir) {
+			static const ImVec4 disabledColor = { 0.3f, 0.3f, 0.3f, 1.0f };
+
+			ImGui::PushStyleColor(ImGuiCol_Button, disabledColor);
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, disabledColor);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, disabledColor);
+
+			ImGui::Button("Select");
+
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+
+		} else {
+			if (ImGui::Button("Select")) {
+				ImGui::CloseCurrentPopup();
+
+				outPath = m_currentPath.string();
+				result = true;
+			}
+		}
+*/
+		ImGui::EndPopup();
+	}
+}
+
 
 
 void DemoEntityManager::Run()
@@ -1453,6 +1565,7 @@ void DemoEntityManager::Run()
 
 		BeginFrame();
 		RenderStats();
+		m_fileBrowser.Update();
 
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);
