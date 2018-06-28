@@ -160,8 +160,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
-	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
 
+	static void CharCallback(GLFWwindow* window, unsigned int ch);
+	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
 	static void CursorposCallback  (GLFWwindow* const window, double x, double y);
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);

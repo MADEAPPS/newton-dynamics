@@ -202,6 +202,9 @@ int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 #include <filesystem>
 
 
+
+
+
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 DemoEntityManager::DemoEntityManager ()
@@ -312,6 +315,7 @@ DemoEntityManager::DemoEntityManager ()
 
 	glfwSwapInterval(0);
 	glfwSetKeyCallback(m_mainFrame, KeyCallback);
+	glfwSetCharCallback(m_mainFrame, CharCallback);
 	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
@@ -857,6 +861,11 @@ bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 }
 
 
+void DemoEntityManager::CharCallback(GLFWwindow* window, unsigned int ch)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddInputCharacter((unsigned short)ch);
+}
 
 
 void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int action, int mods)
@@ -1568,6 +1577,7 @@ void DemoEntityManager::Run()
     while (!glfwWindowShouldClose(m_mainFrame))
     {
 		m_suspendPhysicsUpdate = false;
+		//glfwPollEvents();
 
 		BeginFrame();
 		RenderStats();
