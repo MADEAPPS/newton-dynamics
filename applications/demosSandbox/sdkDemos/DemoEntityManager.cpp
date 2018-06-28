@@ -194,17 +194,6 @@ int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 	return m_state ? 1 : 0;
 }
 
-
-
-#include <vector>
-#include <string>
-#include <experimental/filesystem>
-#include <filesystem>
-
-
-
-
-
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 DemoEntityManager::DemoEntityManager ()
