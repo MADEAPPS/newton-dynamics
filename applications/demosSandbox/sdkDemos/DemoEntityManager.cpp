@@ -250,6 +250,8 @@ DemoEntityManager::DemoEntityManager ()
 	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
 
+    IMGUI_CHECKVERSION();
+
 	int monitorsCount;
 	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
 	if (monitorsCount > 1) {
@@ -267,6 +269,7 @@ DemoEntityManager::DemoEntityManager ()
 	glfwSetWindowUserPointer(m_mainFrame, this);
 
 	// Setup ImGui binding
+	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.UserData = this;
 
@@ -395,7 +398,11 @@ DemoEntityManager::~DemoEntityManager ()
 	glDeleteTextures(1, &font_texture);
 	ImGui::GetIO().Fonts->TexID = 0;
 
-	ImGui::Shutdown();
+//	ImGui::Shutdown();
+
+	ImGui::DestroyContext();
+	glfwDestroyWindow(m_mainFrame);
+	glfwTerminate();
 
 	dAssert (NewtonGetMemoryUsed () == 0);
 }
@@ -843,9 +850,13 @@ void DemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
 
 bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 {
+	posX = 0;
+	posY = 0;
 	const ImGuiIO& io = ImGui::GetIO();
-	posX = int (io.MousePos.x);
-	posY = int (io.MousePos.y);
+	if (ImGui::IsMousePosValid(&io.MousePos) && ImGui::IsMousePosValid(&io.MousePosPrev)) {
+		posX = int (io.MousePos.x);
+		posY = int (io.MousePos.y);
+	}
 	return true;
 }
 
@@ -1471,7 +1482,7 @@ DemoEntityManager::FileBrowserModal::FileBrowserModal(const char* const title)
 
 void DemoEntityManager::FileBrowserModal::SetModalMode(bool mode)
 {
-	m_modalMode____ = true;
+//	m_modalMode____ = true;
 }
 
 char* xxxx[] = { "xxxx0", "xxxx1", "xxxx2" };
@@ -1520,6 +1531,7 @@ void DemoEntityManager::FileBrowserModal::Update()
 //		ImGui::PushItemWidth(-1);
 //		ImGui::TextWrapped(m_currentPath.string().data());
 //		ImGui::TextWrapped("zzzzzzzzzzzz");
+		ImGui::Text("");
 		ImGui::Text("zzzzzzzzzzzz");
 		ImGui::SetKeyboardFocusHere();
 		ImGui::InputText("", ssssssssss, sizeof (ssssssssss));
