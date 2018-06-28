@@ -144,7 +144,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	private:
 	void BeginFrame();
 	void RenderStats();
-	
 	void LoadFont();
 	void Cleanup();
 

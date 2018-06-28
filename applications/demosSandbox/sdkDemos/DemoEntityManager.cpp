@@ -31,7 +31,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// gyroscope precession
@@ -61,7 +61,7 @@
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// servo joints
-//#define DEFAULT_SCENE	30			// articulated joints
+#define DEFAULT_SCENE	30			// articulated joints
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
@@ -194,6 +194,7 @@ int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 	return m_state ? 1 : 0;
 }
 
+
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 DemoEntityManager::DemoEntityManager ()
@@ -250,8 +251,6 @@ DemoEntityManager::DemoEntityManager ()
 	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
 
-    IMGUI_CHECKVERSION();
-
 	int monitorsCount;
 	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
 	if (monitorsCount > 1) {
@@ -269,7 +268,7 @@ DemoEntityManager::DemoEntityManager ()
 	glfwSetWindowUserPointer(m_mainFrame, this);
 
 	// Setup ImGui binding
-	ImGui::CreateContext();
+//	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.UserData = this;
 
@@ -324,7 +323,6 @@ DemoEntityManager::DemoEntityManager ()
 	Cleanup ();
 	ResetTimer();
 
-
 //	m_showUI = true;
 //	m_showAABB = false;
 //	m_showContactPoints = false;
@@ -348,7 +346,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-//m_currentPlugin = 0;
+m_currentPlugin = 0;
 
 /*
 	dFloat A[2][2];
@@ -398,11 +396,11 @@ DemoEntityManager::~DemoEntityManager ()
 	glDeleteTextures(1, &font_texture);
 	ImGui::GetIO().Fonts->TexID = 0;
 
-//	ImGui::Shutdown();
+	ImGui::Shutdown();
 
-	ImGui::DestroyContext();
-	glfwDestroyWindow(m_mainFrame);
-	glfwTerminate();
+//	ImGui::DestroyContext();
+//	glfwDestroyWindow(m_mainFrame);
+//	glfwTerminate();
 
 	dAssert (NewtonGetMemoryUsed () == 0);
 }
@@ -654,37 +652,17 @@ void DemoEntityManager::ShowMainMenuBar()
 			if (ImGui::MenuItem("New", "")) {
 				mainMenu = 1;
 			}
-//			ImGui::Separator();
-//			if (ImGui::MenuItem("Open", "")) {
-//				dAssert (0);
-//			}
-//			if (ImGui::MenuItem("Save", "")) {
-//				dAssert (0);
-//			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Open", "")) {
+				dAssert (0);
+					}
+			if (ImGui::MenuItem("Save", "")) {
+				dAssert (0);
+				}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Serialize", "")) {
-				m_fileBrowser.SetModalMode(true);
-/*
 				//mainMenu = 2;
-				//static imgui_ext::file_browser_modal fileBrowser("Import");
-				//bool isImportClicked = false;
-//				if (ImGui::BeginMainMenuBar()) {
-					if (ImGui::BeginMenu("File")) {
-//						if (ImGui::MenuItem("Import")) {
-//							isImportClicked = true;
-//						}
-//						ImGui::EndMenu();
-					}
-//					ImGui::EndMainMenuBar();
-//				}
-*/
-/*
-				std::string path;
-				if (fileBrowser.render(isImportClicked, path)) {
-					// The "path" string will hold a valid file path here.
-				}
-*/
-
+				dAssert (0);
 			}
 			if (ImGui::MenuItem("Deserialize", "")) {
 				dAssert (0);
@@ -852,11 +830,12 @@ bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 {
 	posX = 0;
 	posY = 0;
-	const ImGuiIO& io = ImGui::GetIO();
-	if (ImGui::IsMousePosValid(&io.MousePos) && ImGui::IsMousePosValid(&io.MousePosPrev)) {
-		posX = int (io.MousePos.x);
-		posY = int (io.MousePos.y);
-	}
+//	const ImGuiIO& io = ImGui::GetIO();
+	ImVec2 posit(ImGui::GetMousePos());
+//	if (ImGui::IsMousePosValid(&io.MousePos) && ImGui::IsMousePosValid(&io.MousePosPrev)) {
+		posX = int (posit.x);
+		posY = int (posit.y);
+//	}
 	return true;
 }
 
@@ -952,7 +931,6 @@ void DemoEntityManager::RenderStats()
 
 	ShowMainMenuBar();
 }
-
 
 void DemoEntityManager::CalculateFPS(dFloat timestep)
 {
@@ -1582,7 +1560,7 @@ void DemoEntityManager::Run()
 
 		BeginFrame();
 		RenderStats();
-		m_fileBrowser.Update();
+		//m_fileBrowser.Update();
 
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);

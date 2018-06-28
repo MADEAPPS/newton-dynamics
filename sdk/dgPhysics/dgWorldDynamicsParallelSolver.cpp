@@ -170,7 +170,7 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 
 	CalculateThreadLoads(m_bodyBatches, 1, cluster.m_bodyCount);
 	CalculateThreadLoads(m_jointBatches, 0, cluster.m_jointCount);
-	CalculateThreadLoads(m_soaJointBatches, 0, m_jointCount);
+//	CalculateThreadLoads(m_soaJointBatches, 0, m_jointCount);
 
 	InitWeights();
 	InitBodyArray();
@@ -651,9 +651,11 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 	const dgInt32* const soaRowStart = m_soaRowStart;
 	dgFloat32 accNorm = dgFloat32(0.0f);
 
-	const dgInt32 jointCount = m_soaJointBatches[threadID + 1];
-	for (dgInt32 i = m_soaJointBatches[threadID]; i < jointCount; i++) {
-
+	const dgInt32 step = m_threadCounts;
+	const dgInt32 jointCount = m_jointCount;
+//	const dgInt32 jointCount = m_soaJointBatches[threadID + 1];
+//	for (dgInt32 i = m_soaJointBatches[threadID]; i < jointCount; i++) {
+	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		const dgInt32 rowStart = soaRowStart[i];
 		dgJointInfo* const jointInfo = &m_jointArray[i * DG_WORK_GROUP_SIZE];
 		dgFloat32 accel2 = CalculateJointForce(jointInfo, &massMatrix[rowStart], internalForces);
@@ -684,12 +686,14 @@ void dgParallelBodySolver::UpdateRowAcceleration(dgInt32 threadID)
 	const dgInt32* const soaRowStart = m_soaRowStart;
 	const dgJointInfo* const jointInfoArray = m_jointArray;
 
-	const dgInt32 jointCount = m_soaJointBatches[threadID + 1];
-	for (dgInt32 i = m_soaJointBatches[threadID]; i < jointCount; i++) {
-
-		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_WORK_GROUP_SIZE];
-
+//	const dgInt32 jointCount = m_soaJointBatches[threadID + 1];
+//	for (dgInt32 i = m_soaJointBatches[threadID]; i < jointCount; i++) {
+	const dgInt32 step = m_threadCounts;
+	const dgInt32 jointCount = m_jointCount;
+	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		const dgInt32 rowStart = soaRowStart[i];
+		const dgJointInfo* const jointInfoBase = &jointInfoArray[i * DG_WORK_GROUP_SIZE];
+		
 		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
 			const dgJointInfo* const jointInfo = &jointInfoBase[j];
 			if (jointInfo->m_joint) {
@@ -1071,9 +1075,11 @@ void dgParallelBodySolver::TransposeMassMatrix(dgInt32 threadID)
 	const dgJointInfo* const jointInfoArray = m_jointArray;
 	dgSolverSoaElement* const massMatrixArray = &m_massMatrix[0];
 
-	const dgInt32 jointCount = m_soaJointBatches[threadID + 1];
-	for (dgInt32 i = m_soaJointBatches[threadID]; i < jointCount; i++) {
-
+//	const dgInt32 jointCount = m_soaJointBatches[threadID + 1];
+//	for (dgInt32 i = m_soaJointBatches[threadID]; i < jointCount; i++) {
+	const dgInt32 step = m_threadCounts;
+	const dgInt32 jointCount = m_jointCount;
+	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		const dgInt32 index = i * DG_WORK_GROUP_SIZE;
 		const dgInt32 rowCount = jointInfoArray[index].m_pairCount;
 		const dgInt32 rowSoaStart = dgAtomicExchangeAndAdd(&m_soaRowsCount, rowCount);
