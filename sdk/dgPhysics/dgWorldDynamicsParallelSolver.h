@@ -285,9 +285,7 @@ class dgParallelBodySolver
 	dgFloat32 m_firstPassCoef;
 	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
-	dgInt32 m_bodyBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
-	dgInt32 m_jointBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
-//	dgInt32 m_soaJointBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
+//	dgInt32 m_jointBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
 
 	dgInt32 m_jointCount;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
