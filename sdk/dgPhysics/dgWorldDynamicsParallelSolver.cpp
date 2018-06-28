@@ -135,8 +135,8 @@ dgInt32 dgParallelBodySolver::CompareJointInfos(const dgJointInfo* const infoA, 
 	const dgInt32 restingA = (infoA->m_joint->m_body0->m_resting & infoA->m_joint->m_body1->m_resting) ? 1 : 0;
 	const dgInt32 restingB = (infoB->m_joint->m_body0->m_resting & infoB->m_joint->m_body1->m_resting) ? 1 : 0;
 
-	const dgInt32 countA = infoA->m_pairCount * 2 + restingA;
-	const dgInt32 countB = infoB->m_pairCount * 2 + restingB;
+	const dgInt32 countA = (restingA << 24) + infoA->m_pairCount;
+	const dgInt32 countB = (restingB << 24) + infoB->m_pairCount;
 
 	if (countA < countB) {
 		return 1;
