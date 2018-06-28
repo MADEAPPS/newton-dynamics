@@ -326,6 +326,13 @@ void dgParallelBodySolver::InitJacobianMatrix()
 
 	dgInt32 size = 0;
 	for (dgInt32 i = 0; i < jointCount; i+= DG_WORK_GROUP_SIZE) {
+		const dgConstraint* const joint1 = jointArray[i + DG_WORK_GROUP_SIZE - 1].m_joint;
+		if (!joint1 || !(joint1->m_body0->m_resting & joint1->m_body1->m_resting)) {
+			const dgConstraint* const joint0 = jointArray[i].m_joint;
+			if (joint0->m_body0->m_resting & joint0->m_body1->m_resting) {
+				dgAssert(0);
+			}
+		}
 		size += jointArray[i].m_pairCount;
 	}
 	m_massMatrix.ResizeIfNecessary(size);
