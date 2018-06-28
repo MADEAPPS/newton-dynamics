@@ -413,7 +413,6 @@ void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 	const dgInt32 step = m_threadCounts;;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	for (dgInt32 i = threadID; i < bodyCount; i += step) {
-
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
 		body->AddDampingAcceleration(m_timestep);

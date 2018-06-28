@@ -269,8 +269,6 @@ class dgParallelBodySolver
 	static dgInt32 CompareBodyJointsPairs(const dgBodyJacobianPair* const pairA, const dgBodyJacobianPair* const pairB, void* notUsed);
 
 	protected:
-	void CalculateThreadLoads(dgInt32* const output, dgInt32 start, dgInt32 end);
-
 	dgWorld* m_world;
 	const dgBodyCluster* m_cluster;
 	dgBodyInfo* m_bodyArray;
@@ -285,7 +283,6 @@ class dgParallelBodySolver
 	dgFloat32 m_firstPassCoef;
 	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
-//	dgInt32 m_jointBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
 
 	dgInt32 m_jointCount;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
@@ -323,25 +320,6 @@ inline dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const alloc
 	,m_massMatrix(allocator)
 {
 }
-
-inline void dgParallelBodySolver::CalculateThreadLoads(dgInt32* const output, dgInt32 start, dgInt32 end)
-{
-	dgInt32 count = end - start;
-	dgInt32 stepSize = count / m_threadCounts;
-	dgInt32 residual = count - stepSize * m_threadCounts - m_threadCounts / 2;
-	dgInt32 acc = start;
-	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		output[i] = acc;
-		acc += stepSize;
-		residual++;
-		if (residual >= 0) {
-			acc++;
-			residual -= m_threadCounts;
-		}
-	}
-	output[m_threadCounts] = end;
-}
-
 
 #endif
 

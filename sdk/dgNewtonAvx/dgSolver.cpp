@@ -67,9 +67,6 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 	m_bodyJacobiansPairs = dgAlloca(dgBodyJacobianPair, cluster.m_jointCount * 2);
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOA_WORD_GROUP_SIZE + 1);
 
-	CalculateThreadLoads(m_bodyBatches, 1, cluster.m_bodyCount);
-	CalculateThreadLoads(m_jointBatches, 0, cluster.m_jointCount);
-
 	InitWeights();
 	InitBodyArray();
 	InitJacobianMatrix();
@@ -119,9 +116,10 @@ void dgSolver::InitBodyArray(dgInt32 threadID)
 {
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
-	const dgInt32 bodyCount = m_bodyBatches[threadID + 1];
-	for (dgInt32 i = m_bodyBatches[threadID]; i < bodyCount; i++) {
 
+	const dgInt32 step = m_threadCounts;;
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
 		body->AddDampingAcceleration(m_timestep);
@@ -150,9 +148,9 @@ void dgSolver::InitInternalForces(dgInt32 threadID)
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	const dgSoaFloat* const leftHandSide = (dgSoaFloat*) &m_world->GetSolverMemory().m_leftHandSizeBuffer[0].m_Jt.m_jacobianM0;
 
-	const dgInt32 bodyCount = m_bodyBatches[threadID + 1];
-	for (dgInt32 i = m_bodyBatches[threadID]; i < bodyCount; i++) {
-
+	const dgInt32 step = m_threadCounts;;
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		dgSoaFloat forceAcc (m_soaZero);
 
 		const dgBodyProxy* const startJoints = &bodyProxyArray[i];
@@ -276,8 +274,9 @@ void dgSolver::InitJacobianMatrix(dgInt32 threadID)
 	constraintParams.m_timestep = m_timestep;
 	constraintParams.m_invTimestep = m_invTimestep;
 
-	const dgInt32 jointCount = m_jointBatches[threadID + 1];
-	for (dgInt32 i = m_jointBatches[threadID]; i < jointCount; i++) {
+	const dgInt32 step = m_threadCounts;
+	const dgInt32 jointCount = m_cluster->m_jointCount;
+	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
 		dgAssert(jointInfo->m_m0 >= 0);
@@ -610,8 +609,9 @@ void dgSolver::CalculateJointsAcceleration(dgInt32 threadID)
 	dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
 
-	const dgInt32 jointCount = m_jointBatches[threadID + 1];
-	for (dgInt32 i = m_jointBatches[threadID]; i < jointCount; i++) {
+	const dgInt32 step = m_threadCounts;
+	const dgInt32 jointCount = m_cluster->m_jointCount;
+	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
 		const dgInt32 pairStart = jointInfo->m_pairStart;
@@ -880,8 +880,9 @@ void dgSolver::CalculateBodyForce(dgInt32 threadID)
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	const dgSoaFloat* const leftHandSide = (dgSoaFloat*)&m_world->GetSolverMemory().m_leftHandSizeBuffer[0].m_Jt.m_jacobianM0;
 
-	const dgInt32 bodyCount = m_bodyBatches[threadID + 1];
-	for (dgInt32 i = m_bodyBatches[threadID]; i < bodyCount; i++) {
+	const dgInt32 step = m_threadCounts;;
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		dgSoaFloat forceAcc (m_soaZero);
 
 		const dgBodyProxy* const startJoints = &bodyProxyArray[i];
@@ -914,8 +915,9 @@ void dgSolver::IntegrateBodiesVelocity(dgInt32 threadID)
 	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
 
-	const dgInt32 bodyCount = m_bodyBatches[threadID + 1];
-	for (dgInt32 i = m_bodyBatches[threadID]; i < bodyCount; i++) {
+	const dgInt32 step = m_threadCounts;;
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		dgDynamicBody* const body = (dgDynamicBody*)m_bodyArray[i].m_body;
 		dgAssert(body->m_index == i);
 
@@ -949,8 +951,9 @@ void dgSolver::CalculateBodiesAcceleration(dgInt32 threadID)
 	dgVector invTime(m_invTimestep);
 	dgFloat32 maxAccNorm2 = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR;
 
-	const dgInt32 bodyCount = m_bodyBatches[threadID + 1];
-	for (dgInt32 i = m_bodyBatches[threadID]; i < bodyCount; i++) {
+	const dgInt32 step = m_threadCounts;;
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		dgDynamicBody* const body = (dgDynamicBody*)m_bodyArray[i].m_body;
 		m_world->CalculateNetAcceleration(body, invTime, maxAccNorm2);
 	}
@@ -961,9 +964,9 @@ void dgSolver::UpdateForceFeedback(dgInt32 threadID)
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	dgInt32 hasJointFeeback = 0;
 
-	const dgInt32 jointCount = m_jointBatches[threadID + 1];
-	for (dgInt32 i = m_jointBatches[threadID]; i < jointCount; i++) {
-
+	const dgInt32 step = m_threadCounts;
+	const dgInt32 jointCount = m_cluster->m_jointCount;
+	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
 		const dgInt32 first = jointInfo->m_pairStart;
@@ -983,9 +986,9 @@ void dgSolver::UpdateForceFeedback(dgInt32 threadID)
 
 void dgSolver::UpdateKinematicFeedback(dgInt32 threadID)
 {
-	const dgInt32 jointCount = m_jointBatches[threadID + 1];
-	for (dgInt32 i = m_jointBatches[threadID]; i < jointCount; i++) {
-
+	const dgInt32 step = m_threadCounts;
+	const dgInt32 jointCount = m_cluster->m_jointCount;
+	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		dgJointInfo* const jointInfo = &m_jointArray[i];
 		if (jointInfo->m_joint->GetUpdateFeedbackFunction()) {
 			jointInfo->m_joint->GetUpdateFeedbackFunction()(*jointInfo->m_joint, m_timestep, threadID);

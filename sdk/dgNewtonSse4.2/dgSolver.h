@@ -252,9 +252,6 @@ class dgSolver: public dgParallelBodySolver
 	dgSoaFloat m_soaZero;
 	dgVector m_zero;
 	dgVector m_negOne;
-dgInt32 m_jointBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
-dgInt32 m_bodyBatches[DG_MAX_THREADS_HIVE_COUNT + 1];
-
 	dgArray<dgSoaMatrixElement> m_massMatrix;
 } DG_GCC_AVX_ALIGMENT;
 
