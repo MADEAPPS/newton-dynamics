@@ -263,10 +263,12 @@ class dgParallelBodySolver
 	
 	void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
 
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	static dgInt32 CompareBodyJointsPairs(const dgBodyJacobianPair* const pairA, const dgBodyJacobianPair* const pairB, void* notUsed);
+
+	DG_INLINE void SortWorkGroup (dgInt32 base) const; 
+	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
 
 	protected:
 	dgWorld* m_world;
@@ -298,7 +300,7 @@ class dgParallelBodySolver
 };
 
 
-inline dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
+DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	:m_world(NULL)
 	,m_cluster(NULL)
 	,m_bodyArray(NULL)
@@ -320,6 +322,7 @@ inline dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const alloc
 	,m_massMatrix(allocator)
 {
 }
+
 
 #endif
 

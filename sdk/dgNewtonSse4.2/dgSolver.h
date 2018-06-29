@@ -246,7 +246,9 @@ class dgSolver: public dgParallelBodySolver
 
 	void TransposeRow (dgSoaMatrixElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
-	float CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const;
+	
+	DG_INLINE void SortWorkGroup(dgInt32 base) const;
+	DG_INLINE float CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const;
 
 	dgSoaFloat m_soaOne;
 	dgSoaFloat m_soaZero;

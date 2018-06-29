@@ -175,6 +175,20 @@ void dgSolver::InitInternalForces(dgInt32 threadID)
 	}
 }
 
+DG_INLINE void dgSolver::SortWorkGroup(dgInt32 base) const
+{
+	dgJointInfo* const jointArray = m_jointArray;
+	for (dgInt32 i = 1; i < DG_WORK_GROUP_SIZE; i++) {
+		dgInt32 index = base + i;
+		const dgJointInfo tmp(jointArray[index]);
+		for (; (index > base) && (jointArray[index - 1].m_pairCount < tmp.m_pairCount); index--) {
+			jointArray[index] = jointArray[index - 1];
+		}
+		jointArray[index] = tmp;
+	}
+}
+
+
 void dgSolver::InitJacobianMatrix()
 {
 	m_jacobianMatrixRowAtomicIndex = 0;
@@ -210,7 +224,18 @@ void dgSolver::InitJacobianMatrix()
 	}
 
 	dgInt32 size = 0;
-	for (dgInt32 i = 0; i < jointCount; i+= DG_SOA_WORD_GROUP_SIZE) {
+	for (dgInt32 i = 0; i < jointCount; i += DG_WORK_GROUP_SIZE) {
+		const dgConstraint* const joint1 = jointArray[i + DG_WORK_GROUP_SIZE - 1].m_joint;
+		if (joint1) {
+			if (!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting)) {
+				const dgConstraint* const joint0 = jointArray[i].m_joint;
+				if (joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting) {
+					SortWorkGroup(i);
+				}
+			}
+		} else {
+			SortWorkGroup(i);
+		}
 		size += jointArray[i].m_pairCount;
 	}
 	m_massMatrix.ResizeIfNecessary(size);
@@ -238,8 +263,8 @@ dgInt32 dgSolver::CompareJointInfos(const dgJointInfo* const infoA, const dgJoin
 	const dgInt32 restingA = (infoA->m_joint->GetBody0()->m_resting & infoA->m_joint->GetBody1()->m_resting) ? 1 : 0;
 	const dgInt32 restingB = (infoB->m_joint->GetBody0()->m_resting & infoB->m_joint->GetBody1()->m_resting) ? 1 : 0;
 
-	const dgInt32 countA = infoA->m_pairCount * 2 + restingA;
-	const dgInt32 countB = infoB->m_pairCount * 2 + restingB;
+	const dgInt32 countA = (restingA << 24) + infoA->m_pairCount;
+	const dgInt32 countB = (restingB << 24) + infoB->m_pairCount;
 
 	if (countA < countB) {
 		return 1;
@@ -623,7 +648,7 @@ void dgSolver::CalculateJointsAcceleration(dgInt32 threadID)
 	}
 }
 
-dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const
+DG_INLINE dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const
 {
 	dgSoaVector6 forceM0;
 	dgSoaVector6 forceM1;
@@ -631,7 +656,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 	dgSoaFloat preconditioner1;
 	dgSoaFloat accNorm(m_soaZero);
 	dgSoaFloat normalForce[DG_CONSTRAINT_MAX_ROWS + 1];
-
+/*
 	bool isSleeping = true;
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	for (dgInt32 i = 0; (i < DG_SOA_WORD_GROUP_SIZE) && isSleeping; i++) {
@@ -642,9 +667,9 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 		isSleeping &= body0->m_resting;
 		isSleeping &= body1->m_resting;
 	}
-
-	if (!isSleeping) {
-		//const dgFloat32* const weight = m_weight;
+	if (!isSleeping) 
+*/
+	{
 		const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
 			const dgInt32 m0 = jointInfo[i].m_m0;
@@ -815,6 +840,7 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 void dgSolver::CalculateJointsForce(dgInt32 threadID)
 {
 	const dgInt32* const soaRowStart = m_soaRowStart;
+	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgSoaMatrixElement* const massMatrix = &m_massMatrix[0];
 	dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	dgSoaFloat* const internalForces = (dgSoaFloat*)&m_world->GetSolverMemory().m_internalForcesBuffer[0];
@@ -825,18 +851,31 @@ void dgSolver::CalculateJointsForce(dgInt32 threadID)
 	for (dgInt32 i = threadID; i < jointCount; i += step) {
 		const dgInt32 rowStart = soaRowStart[i];
 		dgJointInfo* const jointInfo = &m_jointArray[i * DG_SOA_WORD_GROUP_SIZE];
-		dgFloat32 accel2 = CalculateJointForce(jointInfo, &massMatrix[rowStart], internalForces);
-		accNorm += accel2;
 
-		for (dgInt32 j = 0; j < DG_SOA_WORD_GROUP_SIZE; j++) {
-			const dgJointInfo* const joint = &jointInfo[j];
-			if (joint->m_joint) {
-				dgInt32 const rowCount = joint->m_pairCount;
-				dgInt32 const rowStartBase = joint->m_pairStart;
-				for (dgInt32 k = 0; k < rowCount; k++) {
-					const dgSoaMatrixElement* const row = &massMatrix[rowStart + k];
-					rightHandSide[k + rowStartBase].m_force = row->m_force[j];
-					rightHandSide[k + rowStartBase].m_maxImpact = dgMax(dgAbs(row->m_force[j]), rightHandSide[k + rowStartBase].m_maxImpact);
+		bool isSleeping = true;
+		dgFloat32 accel2 = dgFloat32(0.0f);
+		for (dgInt32 j = 0; (j < DG_WORK_GROUP_SIZE) && isSleeping; j++) {
+			const dgInt32 m0 = jointInfo[j].m_m0;
+			const dgInt32 m1 = jointInfo[j].m_m1;
+			const dgBody* const body0 = bodyArray[m0].m_body;
+			const dgBody* const body1 = bodyArray[m1].m_body;
+			isSleeping &= body0->m_resting;
+			isSleeping &= body1->m_resting;
+		}
+		if (!isSleeping) {
+			accel2 = CalculateJointForce(jointInfo, &massMatrix[rowStart], internalForces);
+			accNorm += accel2;
+
+			for (dgInt32 j = 0; j < DG_SOA_WORD_GROUP_SIZE; j++) {
+				const dgJointInfo* const joint = &jointInfo[j];
+				if (joint->m_joint) {
+					dgInt32 const rowCount = joint->m_pairCount;
+					dgInt32 const rowStartBase = joint->m_pairStart;
+					for (dgInt32 k = 0; k < rowCount; k++) {
+						const dgSoaMatrixElement* const row = &massMatrix[rowStart + k];
+						rightHandSide[k + rowStartBase].m_force = row->m_force[j];
+						rightHandSide[k + rowStartBase].m_maxImpact = dgMax(dgAbs(row->m_force[j]), rightHandSide[k + rowStartBase].m_maxImpact);
+					}
 				}
 			}
 		}
