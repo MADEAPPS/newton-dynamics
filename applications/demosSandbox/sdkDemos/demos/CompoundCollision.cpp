@@ -104,7 +104,7 @@ static void OnGettingTheCollisionSubShapeFromMaterialCallback (const NewtonJoint
 	GetCollisionSubShape(contactJoint, body1);
 }
 
-static int OnSubShapeAABBOverlapTest (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex)
+static int OnSubShapeAABBOverlapTest (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex)
 {
 	return 1;
 }

@@ -290,7 +290,7 @@ static int OnBodyAABBOverlap(const NewtonJoint* const contactJoint, dFloat times
 }
 
 
-static int OnSubShapeAABBOverlapTest (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex)
+static int OnSubShapeAABBOverlapTest (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex)
 {
 	return 1;
 }

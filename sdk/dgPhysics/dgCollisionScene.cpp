@@ -74,10 +74,9 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
 	dgAssert (proxy.m_contactJoint == pair->m_contact);
-	dgContact* const constraint = pair->m_contact;
-
-	dgBody* const otherBody = constraint->GetBody0();
-	dgBody* const sceneBody = constraint->GetBody1();
+	dgContact* const contactJoint = pair->m_contact;
+	dgBody* const otherBody = contactJoint->GetBody0();
+	dgBody* const sceneBody = contactJoint->GetBody1();
 	dgAssert (sceneBody->GetCollision()->GetChildShape() == this);
 	dgAssert (sceneBody->GetCollision()->IsType(dgCollision::dgCollisionScene_RTTI));
 
@@ -87,7 +86,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 	dgAssert (sceneInstance->GetChildShape() == this);
 	dgAssert (otherInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
-	const dgContactMaterial* const material = constraint->GetMaterial();
+	const dgContactMaterial* const material = contactJoint->GetMaterial();
 
 	const dgMatrix& myMatrix = sceneInstance->GetGlobalMatrix();
 	const dgMatrix& otherMatrix = otherInstance->GetGlobalMatrix();
@@ -96,6 +95,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 	const dgVector& hullVeloc = otherBody->m_veloc;
 	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
 
+	dgFloat32 timestep = pair->m_timestep;
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	dgFloat32 separatingDist = dgFloat32 (1.0e10f);
 	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
@@ -129,7 +129,8 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 					dgAssert (!me->m_right);
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, sceneBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
+						//processContacts = material->m_compoundAABBOverlap (*material, sceneBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap(*contactJoint, timestep, sceneBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
 					}
 
 					if (processContacts) {
@@ -159,7 +160,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 								}
 							}
 						}
-						closestDist = dgMin(closestDist, constraint->m_closestDistance);
+						closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
 					}
 
 				} else {
@@ -195,7 +196,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 					dgAssert (!me->m_right);
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, sceneBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*contactJoint, timestep, sceneBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
 					}
 
 					if (processContacts) {
@@ -217,7 +218,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 						} else if (pair->m_contactCount == -1) {
 							break;
 						}
-						closestDist = dgMin(closestDist, constraint->m_closestDistance);
+						closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
 					}
 
 				} else {
@@ -234,8 +235,8 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 		}
 		separatingDist = dgMin (separatingDist, data.m_separatingDistance);
 	}
-	constraint->m_closestDistance = closestDist;
-	constraint->m_separationDistance = separatingDist;
+	contactJoint->m_closestDistance = closestDist;
+	contactJoint->m_separationDistance = separatingDist;
 }
 
 
@@ -243,9 +244,9 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 {
 	const dgNodeBase* stackPool[4 * DG_COMPOUND_STACK_DEPTH][2];
 
-	dgContact* const constraint = pair->m_contact;
-	dgBody* const myBody = constraint->GetBody1();
-	dgBody* const otherBody = constraint->GetBody0();
+	dgContact* const contactJoint = pair->m_contact;
+	dgBody* const myBody = contactJoint->GetBody1();
+	dgBody* const otherBody = contactJoint->GetBody0();
 
 	dgAssert (myBody == proxy.m_body1);
 	dgAssert (otherBody == proxy.m_body0);
@@ -257,7 +258,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 	dgAssert (otherCompoundInstance->IsType (dgCollision::dgCollisionCompound_RTTI));
 	dgCollisionCompound* const otherCompound = (dgCollisionCompound*)otherCompoundInstance->GetChildShape();
 
-	const dgContactMaterial* const material = constraint->GetMaterial();
+	const dgContactMaterial* const material = contactJoint->GetMaterial();
 
 	dgMatrix myMatrix (myCompoundInstance->GetLocalMatrix() * myBody->m_matrix);
 	dgMatrix otherMatrix (otherCompoundInstance->GetLocalMatrix() * otherBody->m_matrix);
@@ -270,6 +271,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 	const dgVector& hullVeloc = otherBody->m_veloc;
 	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
 
+	dgFloat32 timestep = pair->m_timestep;
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	dgFloat32 separatingDist = dgFloat32 (1.0e10f);
 	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
@@ -289,7 +291,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, otherBody, other->m_myNode, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*contactJoint, timestep, myBody, me->m_myNode, otherBody, other->m_myNode, proxy.m_threadIndex);
 					}
 
 					if (processContacts) {
@@ -320,7 +322,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 							}
 						}
 
-						closestDist = dgMin(closestDist, constraint->m_closestDistance);
+						closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
 						data.m_separatingDistance = dgMin(proxy.m_contactJoint->m_separationDistance, data.m_separatingDistance);
 					}
 
@@ -378,8 +380,8 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 		}
 		separatingDist = dgMin (separatingDist, data.m_separatingDistance);
 	}
-	constraint->m_closestDistance = closestDist;
-	constraint->m_separationDistance = separatingDist;
+	contactJoint->m_closestDistance = closestDist;
+	contactJoint->m_separationDistance = separatingDist;
 }
 
 

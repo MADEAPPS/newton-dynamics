@@ -20,7 +20,7 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
-#define ARTICULATED_SIMULATE_THREADS				1
+//#define ARTICULATED_SIMULATE_THREADS				1
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			13.0f
@@ -188,16 +188,18 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		}
 
 		// apply crane controls
-		vehicleModel->m_angularActuator1->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
-		vehicleModel->m_angularActuator0->SetTargetAngle(vehicleModel->m_inputs.m_liftValue);
-		vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
-		vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
-		vehicleModel->m_gripperRotator->SetTargetAngle0(vehicleModel->m_inputs.m_gripperPitchValue);
-		vehicleModel->m_gripperRotator->SetTargetAngle1(vehicleModel->m_inputs.m_gripperRollValue);
+		if (vehicleModel->m_angularActuator0) {
+			vehicleModel->m_angularActuator1->SetTargetAngle(vehicleModel->m_inputs.m_turnValue);
+			vehicleModel->m_angularActuator0->SetTargetAngle(vehicleModel->m_inputs.m_liftValue);
+			vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
+			vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_slideValue);
+			vehicleModel->m_gripperRotator->SetTargetAngle0(vehicleModel->m_inputs.m_gripperPitchValue);
+			vehicleModel->m_gripperRotator->SetTargetAngle1(vehicleModel->m_inputs.m_gripperRollValue);
 
-		// open Close palette position
-		for (int i = 0; i < vehicleModel->m_paletteActuatorsCount; i ++) {
-			vehicleModel->m_paletteJoints[i]->SetTargetPosit(vehicleModel->m_inputs.m_gripperValue);
+			// open Close palette position
+			for (int i = 0; i < vehicleModel->m_paletteActuatorsCount; i++) {
+				vehicleModel->m_paletteJoints[i]->SetTargetPosit(vehicleModel->m_inputs.m_gripperValue);
+			}
 		}
 	}
 
@@ -219,6 +221,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 			case ARTICULATED_VEHICLE_DEFINITION::m_tirePart | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tirePart:
 			case ARTICULATED_VEHICLE_DEFINITION::m_woodSlab | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
+			case ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing | ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing:
 			{
 				return 0;
 				break;
@@ -245,9 +248,10 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		}
 	}
 
-	static int CompoundSubCollisionAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
+	static int CompoundSubCollisionAABBOverlap (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 	{
 		dAssert(collisionNode0);
+		//const NewtonMaterial* const material
 		NewtonCollision* const collision0 = NewtonCompoundCollisionGetCollisionFromNode (NewtonBodyGetCollision(body0), collisionNode0);
 		NewtonCollision* const collision1 = collisionNode1 ? NewtonCompoundCollisionGetCollisionFromNode(NewtonBodyGetCollision(body1), collisionNode1) : NewtonBodyGetCollision(body1);
 
@@ -555,9 +559,9 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		return new dCustomMotor2(engineMatrix.m_front, engineMatrix.m_up, engine, engine, chassis);
 	}
 
-	NewtonCollision* MakeRobotTireShape(DemoEntity* const bodyPart, bool hasInnerRing) const
+	void GetTireDimensions(DemoEntity* const bodyPart, dFloat& radius, dFloat& width)
 	{
-		dFloat radius = 0.0f;
+		radius = 0.0f;
 		dFloat maxWidth = 0.0f;
 		dFloat minWidth = 0.0f;
 
@@ -571,40 +575,15 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 			minWidth = dMin(p.m_y, minWidth);
 			radius = dMax(p.m_x, radius);
 		}
-		dFloat width = maxWidth - minWidth;
+		width = maxWidth - minWidth;
 		radius -= width * 0.5f;
-
-		NewtonCollision* tireShape = NULL;
-		dMatrix align (dRollMatrix(90.0f * dDegreeToRad));
-		if (hasInnerRing) {
-			NewtonCollision* const innerRing = NewtonCreateChamferCylinder(GetWorld(), radius, width, ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing, &align[0][0]);
-			NewtonCollision* const outerRing = NewtonCreateChamferCylinder(GetWorld(), radius + 0.07f, width, ARTICULATED_VEHICLE_DEFINITION::m_tirePart, &align[0][0]);
-
-			tireShape = NewtonCreateCompoundCollision(GetWorld(), ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
-			NewtonCompoundCollisionBeginAddRemove(tireShape);
-			NewtonCompoundCollisionAddSubCollision(tireShape, innerRing);
-			NewtonCompoundCollisionAddSubCollision(tireShape, outerRing);
-			NewtonCompoundCollisionEndAddRemove (tireShape);	
-
-			NewtonDestroyCollision(innerRing);
-			NewtonDestroyCollision(outerRing);
-			
-		} else {
-			//tireShape =  NewtonCreateChamferCylinder(GetWorld(), radius, width, ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing, &align[0][0]);
-			tireShape = NewtonCreateChamferCylinder(GetWorld(), radius, width, ARTICULATED_VEHICLE_DEFINITION::m_tirePart, &align[0][0]);
-		}
-
-		return tireShape;
 	}
 
-
-	dCustomTransformController::dSkeletonBone* MakeTireBody(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone, bool hasInnerRing)
+	dCustomTransformController::dSkeletonBone* MakeTireBody(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone, NewtonCollision* const tireCollision)
 	{
 		NewtonBody* const parentBody = parentBone->m_body;
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
 		DemoEntity* const tireModel = parentModel->Find(entName);
-
-		NewtonCollision* const tireCollision = MakeRobotTireShape(tireModel, hasInnerRing);
 
 		// calculate the bone matrix
 		dMatrix matrix(tireModel->CalculateGlobalMatrix());
@@ -613,9 +592,6 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 		// create the rigid body that will make this bone
 		NewtonBody* const tireBody = NewtonCreateDynamicBody(world, tireCollision, &matrix[0][0]);
-
-		// destroy the collision helper shape 
-		NewtonDestroyCollision(tireCollision);
 
 		// get the collision from body
 		NewtonCollision* const collision = NewtonBodyGetCollision(tireBody);
@@ -628,46 +604,43 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
-		
+
 		return controller->AddBone(tireBody, dGetIdentityMatrix(), parentBone);
 	}
 
-	dCustomTransformController::dSkeletonBone* MakeTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone, bool hasInnerRing)
+	NewtonCollision* const MakeDoubleRingTireShape(DemoEntity* const tireModel)
 	{
-		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody (entName, tireName, controller, parentBone, hasInnerRing);
+		dFloat width;
+		dFloat radius;
+		GetTireDimensions(tireModel, radius, width);
 
-		// connect the tire the body with a hinge
-		dMatrix matrix;
-		NewtonBodyGetMatrix (bone->m_body, &matrix[0][0]);
-		//dMatrix hingeFrame (dRollMatrix(90.0f * dDegreeToRad) * matrix);
-		dMatrix hingeFrame(dRollMatrix(0.0f * dDegreeToRad) * matrix);
+		dMatrix align(dRollMatrix(90.0f * dDegreeToRad));
+		NewtonCollision* const innerRing = NewtonCreateChamferCylinder(GetWorld(), radius, width, ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing, &align[0][0]);
+		NewtonCollision* const outerRing = NewtonCreateChamferCylinder(GetWorld(), radius + 0.1f, width, ARTICULATED_VEHICLE_DEFINITION::m_tirePart, &align[0][0]);
+		NewtonCollision* const tireShape = NewtonCreateCompoundCollision(GetWorld(), ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
 
-		dCustomSlidingContact* const tire = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
-		tire->EnableLimits(true);
-		tire->SetLimits(0.0f, 0.0f);
-		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
-		return bone;
-	}
+		NewtonCompoundCollisionBeginAddRemove(tireShape);
+		NewtonCompoundCollisionAddSubCollision(tireShape, innerRing);
+		NewtonCompoundCollisionAddSubCollision(tireShape, outerRing);
+		NewtonCompoundCollisionEndAddRemove(tireShape);
 
-	dCustomTransformController::dSkeletonBone* MakeSuspensionTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
-	{
-		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone, true);
+		NewtonDestroyCollision(innerRing);
+		NewtonDestroyCollision(outerRing);
 
-		// connect the tire tp the body with a hinge
-		dMatrix matrix;
-		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		dMatrix hingeFrame(dRollMatrix (0.0f * dDegreeToRad) * matrix);
-		dCustomSlidingContact* const joint = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
-		joint->EnableLimits(true);
-		joint->SetLimits(-0.5f, 0.01f);
-		joint->SetAsSpringDamper(true, 0.97f, 2050.0f, 200.0f);
-		return bone;
+		return tireShape;
 	}
 
 	dCustomTransformController::dSkeletonBone* MakeTractionTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
 	{
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
-		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone, false);
+
+		NewtonBody* const parentBody = parentBone->m_body;
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const tireModel = parentModel->Find(entName);
+
+		NewtonCollision* const tireCollision = MakeDoubleRingTireShape(tireModel);
+		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone, tireCollision);
+		NewtonDestroyCollision(tireCollision);
 
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
@@ -689,32 +662,112 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
 		vehicleModel->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
-//dFloat m, x, y, z;
-//NewtonBodyGetMass(engine, &m, &x, &y, &z);
-
 		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
 		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
 		return bone;
 	}
 
+	dCustomTransformController::dSkeletonBone* MakeRollerTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
+	{
+		NewtonBody* const parentBody = parentBone->m_body;
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const tireModel = parentModel->Find(entName);
+
+		NewtonCollision* const tireCollision = MakeDoubleRingTireShape(tireModel);
+		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone, tireCollision);
+		NewtonDestroyCollision(tireCollision);
+
+		// connect the tire the body with a hinge
+		dMatrix matrix;
+		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
+		//dMatrix hingeFrame (dRollMatrix(90.0f * dDegreeToRad) * matrix);
+		dMatrix hingeFrame(dRollMatrix(0.0f * dDegreeToRad) * matrix);
+
+		dCustomSlidingContact* const tire = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
+		tire->EnableLimits(true);
+		tire->SetLimits(0.0f, 0.0f);
+		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
+		return bone;
+	}
+
+	dCustomTransformController::dSkeletonBone* MakeSuspensionTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
+	{
+		NewtonBody* const parentBody = parentBone->m_body;
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const tireModel = parentModel->Find(entName);
+
+		NewtonCollision* const tireCollision = MakeDoubleRingTireShape(tireModel);
+		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone, tireCollision);
+		NewtonDestroyCollision(tireCollision);
+
+		// connect the tire tp the body with a hinge
+		dMatrix matrix;
+		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
+		dMatrix hingeFrame(dRollMatrix(0.0f * dDegreeToRad) * matrix);
+		dCustomSlidingContact* const joint = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
+		joint->EnableLimits(true);
+		joint->SetLimits(-0.5f, 0.01f);
+		joint->SetAsSpringDamper(true, 0.97f, 2050.0f, 200.0f);
+		return bone;
+	}
+
+	dCustomTransformController::dSkeletonBone* MakeSupportTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
+	{
+		dFloat width;
+		dFloat radius;
+		NewtonBody* const parentBody = parentBone->m_body;
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const tireModel = parentModel->Find(entName);
+
+		GetTireDimensions(tireModel, radius, width);
+
+		dMatrix align(dRollMatrix(90.0f * dDegreeToRad));
+		NewtonCollision* const tireCollision = NewtonCreateChamferCylinder(GetWorld(), radius, width, ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing, &align[0][0]);
+		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone, tireCollision);
+		NewtonDestroyCollision(tireCollision);
+
+		// connect the tire the body with a hinge
+		dMatrix matrix;
+		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
+		//dMatrix hingeFrame (dRollMatrix(90.0f * dDegreeToRad) * matrix);
+		dMatrix hingeFrame(dRollMatrix(0.0f * dDegreeToRad) * matrix);
+
+		dCustomSlidingContact* const tire = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
+		tire->EnableLimits(true);
+		tire->SetLimits(0.0f, 0.0f);
+		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
+		return bone;
+	}
+
+
 	dCustomJoint* LinkTires(dCustomTransformController::dSkeletonBone* const master, dCustomTransformController::dSkeletonBone* const slave, dCustomTransformController::dSkeletonBone* const root)
 	{
-		NewtonCollisionInfoRecord masterTire;
 		NewtonCollisionInfoRecord slaveTire;
-
-		NewtonCollisionGetInfo(NewtonBodyGetCollision(master->m_body), &masterTire);
-		NewtonCollisionGetInfo(NewtonBodyGetCollision(slave->m_body), &slaveTire);
-		if (slaveTire.m_collisionType == SERIALIZE_ID_COMPOUND) {
+		NewtonCollisionInfoRecord masterTire;
+		{
+			// shape 0 is the inner ring
+			NewtonCollisionGetInfo(NewtonBodyGetCollision(slave->m_body), &slaveTire);
+			dAssert(slaveTire.m_collisionType == SERIALIZE_ID_COMPOUND);
 			NewtonCollision* const tire = NewtonBodyGetCollision(slave->m_body);
-			void* const node = NewtonCompoundCollisionGetNodeByIndex (tire, 1);
-			NewtonCollision* const innerRing = NewtonCompoundCollisionGetCollisionFromNode (tire, node);
+			void* const node = NewtonCompoundCollisionGetNodeByIndex(tire, 0);
+			NewtonCollision* const innerRing = NewtonCompoundCollisionGetCollisionFromNode(tire, node);
 			NewtonCollisionGetInfo(innerRing, &slaveTire);
+		}
+
+		{
+			// shape 0 is the inner ring
+			NewtonCollisionGetInfo(NewtonBodyGetCollision(master->m_body), &masterTire);
+			dAssert(masterTire.m_collisionType == SERIALIZE_ID_COMPOUND);
+			NewtonCollision* const tire = NewtonBodyGetCollision(master->m_body);
+			void* const node = NewtonCompoundCollisionGetNodeByIndex(tire, 0);
+			NewtonCollision* const innerRing = NewtonCompoundCollisionGetCollisionFromNode(tire, node);
+			NewtonCollisionGetInfo(innerRing, &masterTire);
 		}
 
 		dAssert(masterTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
 		dAssert(slaveTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
-		dAssert(masterTire.m_collisionUserID == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
-		dAssert(slaveTire.m_collisionUserID == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
+		dAssert(masterTire.m_collisionUserID == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);
+		dAssert(slaveTire.m_collisionUserID == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);
 
 		dFloat masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radio;
 		dFloat slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radio;
@@ -728,12 +781,12 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 	{
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		
+		dCustomTransformController::dSkeletonBone* const leftTire_7 = MakeRollerTire("leftTire_7", "tire", controller, chassisBone);
 		dCustomTransformController::dSkeletonBone* const leftTire_0 = MakeTractionTire ("leftTire_0", "tractionLeftTire", controller, chassisBone);
-		dCustomTransformController::dSkeletonBone* const leftTire_7 = MakeTire ("leftTire_7", "tire", controller, chassisBone, false);
 		LinkTires (leftTire_0, leftTire_7, chassisBone);
 
-		MakeTire ("leftTireSuport_0", "suportTire", controller, chassisBone, false);
-		MakeTire ("leftTireSuport_1", "suportTire", controller, chassisBone, false);
+		MakeSupportTire("leftTireSuport_0", "suportTire", controller, chassisBone);
+		MakeSupportTire("leftTireSuport_1", "suportTire", controller, chassisBone);
 
 		for (int i = 1; i < 7; i++) {
 			char name[64];
@@ -741,18 +794,19 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 			dCustomTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
 			LinkTires (leftTire_0, childBone, chassisBone);
 		}
+
 	}
 
 	void MakeRightTrack(dCustomTransformController* const controller)
 	{
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 
+		dCustomTransformController::dSkeletonBone* const rightTire_7 = MakeRollerTire("rightTire_7", "tire", controller, chassisBone);
 		dCustomTransformController::dSkeletonBone* const rightTire_0 = MakeTractionTire("rightTire_0", "tractionrightTire", controller, chassisBone);
-		dCustomTransformController::dSkeletonBone* const rightTire_7 = MakeTire("rightTire_7", "tire", controller, chassisBone, false);
 		LinkTires (rightTire_0, rightTire_7, chassisBone);
 
-		MakeTire("rightTireSuport_0", "suportTire", controller, chassisBone, false);
-		MakeTire("rightTireSuport_1", "suportTire", controller, chassisBone, false);
+		MakeSupportTire("rightTireSuport_0", "suportTire", controller, chassisBone);
+		MakeSupportTire("rightTireSuport_1", "suportTire", controller, chassisBone);
 
 		for (int i = 1; i < 7; i++) {
 			char name[64];
@@ -1160,7 +1214,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		// set the steering torque 
 		vehicleModel->m_engineJoint->SetFriction(500.0f);
 
-		AddCraneBase (controller);
+//		AddCraneBase (controller);
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
@@ -1169,7 +1223,6 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 			MakeLeftThread(controller);
 			MakeRightThread(controller);
 		#endif
-
 
 		dCustomTransformController::dSkeletonBone* stackPool[32];
 		stackPool[0] = chassisBone;
@@ -1375,13 +1428,13 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
-//	dCustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
-//	inputManager->AddPlayer (robot);
+	dCustomTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
+	inputManager->AddPlayer (robot);
 
 	matrix.m_posit.m_z += 4.0f;
 
 	// add some object to play with
-	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
+//	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 //	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 //	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 //	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
