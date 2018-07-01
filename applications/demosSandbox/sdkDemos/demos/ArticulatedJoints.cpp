@@ -30,12 +30,19 @@ struct ARTICULATED_VEHICLE_DEFINITION
 {
 	enum SHAPES_ID
 	{
-		m_terrain		= 1<<0,
-		m_woodSlab		= 1<<1,
-		m_bodyPart		= 1<<2,
-		m_linkPart 		= 1<<3,
-		m_tirePart		= 1<<4,
-		m_tireInnerRing = 1<<5,
+//		m_terrain		= 1<<0,
+//		m_woodSlab		= 1<<1,
+//		m_bodyPart		= 1<<2,
+//		m_linkPart 		= 1<<3,
+//		m_tirePart		= 1<<4,
+//		m_tireInnerRing = 1<<5,
+
+		m___terrain,
+		m___woodSlab,
+		m___bodyPart,
+		m___linkPart,
+		m___tirePart,
+		m___tireInnerRing,
 	};
 
 	char m_boneName[32];
@@ -205,6 +212,9 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 	static int OnBoneAABBOverlap (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
+		dAssert (0);
+		return 0;
+/*
 		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
 		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
@@ -246,10 +256,14 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 				return 1;
 			}
 		}
+*/
 	}
 
 	static int CompoundSubCollisionAABBOverlap (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 	{
+		dAssert(0);
+		return 0;
+/*
 		dAssert(collisionNode0);
 		//const NewtonMaterial* const material
 		NewtonCollision* const collision0 = NewtonCompoundCollisionGetCollisionFromNode (NewtonBodyGetCollision(body0), collisionNode0);
@@ -287,10 +301,13 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 				return 0;
 			}
 		}
+*/
 	}
 	
 	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
+		dAssert(0);
+/*
 		int countCount = 0;
 		void* contactList[32];
 
@@ -355,7 +372,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 				}
 			}
 		}
-
+*/
 
 //dAssert (0);
 /*
@@ -610,6 +627,9 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 	NewtonCollision* const MakeDoubleRingTireShape(DemoEntity* const tireModel)
 	{
+		dAssert(0);
+		return 0;
+/*
 		dFloat width;
 		dFloat radius;
 		GetTireDimensions(tireModel, radius, width);
@@ -626,8 +646,8 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 		NewtonDestroyCollision(innerRing);
 		NewtonDestroyCollision(outerRing);
-
 		return tireShape;
+*/
 	}
 
 	dCustomTransformController::dSkeletonBone* MakeTractionTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
@@ -713,6 +733,9 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 	dCustomTransformController::dSkeletonBone* MakeSupportTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
 	{
+		dAssert(0);
+		return 0;
+/*
 		dFloat width;
 		dFloat radius;
 		NewtonBody* const parentBody = parentBone->m_body;
@@ -737,11 +760,14 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		tire->SetLimits(0.0f, 0.0f);
 		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 		return bone;
+*/
 	}
-
 
 	dCustomJoint* LinkTires(dCustomTransformController::dSkeletonBone* const master, dCustomTransformController::dSkeletonBone* const slave, dCustomTransformController::dSkeletonBone* const root)
 	{
+		dAssert(0);
+		return 0;
+/*
 		NewtonCollisionInfoRecord slaveTire;
 		NewtonCollisionInfoRecord masterTire;
 		{
@@ -766,8 +792,8 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 		dAssert(masterTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
 		dAssert(slaveTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
-		dAssert(masterTire.m_collisionUserID == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);
-		dAssert(slaveTire.m_collisionUserID == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);
+		dAssert(masterTire.m_collisionMaterial.m_shapeId == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);
+		dAssert(slaveTire.m_collisionMaterial.m_shapeId == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing);
 
 		dFloat masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radio;
 		dFloat slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radio;
@@ -775,6 +801,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		dMatrix pinMatrix;
 		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
 		return new dCustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
+*/
 	}
 
 	void MakeLeftTrack(dCustomTransformController* const controller)
@@ -854,6 +881,8 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, dFloat offset, dCustomTransformController::dSkeletonBone* const rootNode, dCustomTransformController* const controller)
 	{
+		dAssert(0);
+/*
 		dFloat linkLength = 0.33f;
 
 		DemoEntity* const threadPath = chassis->Find("trackPath");
@@ -1001,6 +1030,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		dMatrix planeMatrix;
 		NewtonBodyGetMatrix(chassisBody, &planeMatrix[0][0]);
 		new dCustomPlane (com, planeMatrix.m_right, chainBody, chassisBody);
+*/
 	}
 
 	void MakeLeftThread(dCustomTransformController* const controller)
@@ -1021,6 +1051,9 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 	
 	dCustomTransformController::dSkeletonBone* AddCraneBoom(dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const baseBone, const char* name)
 	{
+		dAssert(0);
+		return 0;
+/*
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
@@ -1045,10 +1078,13 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		vehicleModel->m_liftActuatorsCount++;
 		dCustomTransformController::dSkeletonBone* const boomBone = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
 		return boomBone;
+*/
 	}
 
 	void AddCranekPaletteActuator(dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const baseBone, const char* const name)
 	{
+		dAssert(0);
+/*
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
@@ -1074,11 +1110,13 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount]->SetMaxForcePower(10000.0f);
 		vehicleModel->m_paletteActuatorsCount++;
 		controller->AddBone(paletteBody, dGetIdentityMatrix(), baseBone);
+*/
 	}
 
 	void AddCraneGripper(dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const baseBone)
 	{
-
+		dAssert(0);
+/*
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
@@ -1104,10 +1142,13 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		dCustomTransformController::dSkeletonBone* const gripperBone = controller->AddBone(gripperBody, dGetIdentityMatrix(), baseBone);
 		AddCranekPaletteActuator (controller, gripperBone, "leftHand");
 		AddCranekPaletteActuator (controller, gripperBone, "rightHand");
+*/
 	}
 
 	void AddCraneLift(dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const baseBone)
 	{
+		dAssert(0);
+/*
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
@@ -1134,10 +1175,13 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		dCustomTransformController::dSkeletonBone* const boomBone2 = AddCraneBoom (controller, boomBone1, "Boom2");
 		dCustomTransformController::dSkeletonBone* const boomBone3 = AddCraneBoom (controller, boomBone2, "Boom3");
 		AddCraneGripper(controller, boomBone3);
+*/
 	}
 
 	void AddCraneBase(dCustomTransformController* const controller)
 	{
+		dAssert(0);
+/*
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
@@ -1162,10 +1206,14 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		dCustomTransformController::dSkeletonBone* const baseBone = controller->AddBone(baseBody, dGetIdentityMatrix(), chassisBone);
 
 		AddCraneLift(controller, baseBone);
+*/
 	}
 
 	dCustomTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
 	{
+		dAssert(0);
+		return 0;
+/*
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
@@ -1248,6 +1296,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		}
 
 		return controller;
+*/
 	}
 };
 
@@ -1407,6 +1456,8 @@ class AriculatedJointInputManager: public dCustomInputManager
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {
+	dAssert(0);
+/*
 	// load the sky box
 	scene->CreateSkyBox();
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -1447,4 +1498,5 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
+*/
 }

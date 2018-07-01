@@ -52,7 +52,7 @@ dCollisionBoxNodeInfo::dCollisionBoxNodeInfo(NewtonCollision* const box)
 	SetName ("box collision");
 	m_size = dVector (record.m_box.m_x, record.m_box.m_y, record.m_box.m_z); 
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionUserID);
+	SetShapeId (record.m_collisionMaterial.m_userId);
 
 	CalculateGeometryProperies (box, m_geometricInertia, m_geometricCenterAndVolume); 
 }

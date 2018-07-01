@@ -79,6 +79,19 @@ DG_MSC_VECTOR_ALIGMENT
 class dgCollisionInfo
 {
 	public:
+	class dgInstanceMaterial
+	{
+		public:
+		dgInstanceMaterial()
+		{
+			memset(this, 0, sizeof (dgInstanceMaterial));
+		}
+
+		void* m_userData;
+		dgInt32 m_userId;
+		dgInt32 m_userFlags;
+		dgFloat32 m_userParam[4];
+	};
 
 	struct dgBoxData
 	{
@@ -175,8 +188,8 @@ class dgCollisionInfo
 	};
 
 	dgMatrix m_offsetMatrix;
+	dgInstanceMaterial m_collisionMaterial;
 	dgInt32 m_collisionType;
-	dgInt32 m_userDadaID;
 	union 
 	{
 		dgBoxData m_box;

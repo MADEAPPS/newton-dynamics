@@ -1514,7 +1514,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	}
 }
 
-
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
     m_lru = m_lru + 1;

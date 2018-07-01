@@ -1626,7 +1626,7 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 			proxy.m_instance0 = &childInstance; 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
 
-			childInstance.m_userData = NULL;
+			childInstance.m_material.m_userData = NULL;
 
 			if (flag) {
 				retFlag = 1;
@@ -1714,8 +1714,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
 
-			myChildInstance.m_userData = NULL;
-			otherChildInstance.m_userData = NULL;
+			myChildInstance.m_material.m_userData = NULL;
+			otherChildInstance.m_material.m_userData = NULL;
 			if (flag) {
 				retFlag = 1;
 				dgFloat32 dist2 = proxy.m_contactJoint->m_closestDistance * proxy.m_contactJoint->m_closestDistance;
@@ -1837,10 +1837,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 							contactCount = -1;
 							break;
 						}
-						//childInstance.SetUserData(NULL);
-						//otherChildInstance.SetUserData(NULL);
-						childInstance.m_userData = NULL;
-						otherChildInstance.m_userData = NULL;
+						childInstance.m_material.m_userData = NULL;
+						otherChildInstance.m_material.m_userData = NULL;
 
 						proxy.m_instance0 = NULL;
 						proxy.m_instance1 = NULL; 
@@ -1994,11 +1992,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 							contactCount = -1;
 							break;
 						}
-						//childInstance.SetUserData(NULL);
-
-						childInstance.m_userData = NULL;
-						//otherChildInstance.m_userData = NULL;
-
+						childInstance.m_material.m_userData = NULL;
 						proxy.m_instance0 = NULL;
 					}
 				}
@@ -2100,9 +2094,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 							contactCount = -1;
 							break;
 						}
-						//childInstance.SetUserData(NULL);
-
-						childInstance.m_userData = NULL;
+						childInstance.m_material.m_userData = NULL;
 						proxy.m_instance0 = NULL;
 					}
 				}
@@ -2198,9 +2190,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 							contactCount = -1;
 							break;
 						}
-						//childInstance.SetUserData(NULL);
-
-						childInstance.m_userData = NULL;
+						childInstance.m_material.m_userData = NULL;
 						proxy.m_instance0 = NULL;
 					}
 				}
@@ -2323,7 +2313,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 						}
 						//childInstance.SetUserData(NULL);
 
-						childInstance.m_userData = NULL;
+						childInstance.m_material.m_userData = NULL;
 						proxy.m_instance0 = NULL; 
 					}
 				}
@@ -2573,7 +2563,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 							}
 						}
 
-						childInstance.m_userData = NULL;
+						childInstance.m_material.m_userData = NULL;
 						proxy.m_instance0 = NULL; 
 					}
 				}
@@ -2726,8 +2716,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 							}
 						}
 
-						childInstance.m_userData = NULL;
-						otherChildInstance.m_userData = NULL;
+						childInstance.m_material.m_userData = NULL;
+						otherChildInstance.m_material.m_userData = NULL;
 
 						proxy.m_instance0 = NULL; 
 						proxy.m_instance1 = NULL; 
@@ -2936,7 +2926,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 								}
 							}
 						}
-						childInstance.m_userData = NULL;
+						childInstance.m_material.m_userData = NULL;
 						proxy.m_instance0 = NULL; 
 					}
 				}

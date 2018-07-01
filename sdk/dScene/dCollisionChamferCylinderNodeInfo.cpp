@@ -55,7 +55,7 @@ dCollisionChamferCylinderNodeInfo::dCollisionChamferCylinderNodeInfo(NewtonColli
 	m_height = record.m_chamferCylinder.m_height;
 
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionUserID);
+	SetShapeId (record.m_collisionMaterial.m_userId);
 
 	CalculateGeometryProperies (cylinder, m_geometricInertia, m_geometricCenterAndVolume); 
 }

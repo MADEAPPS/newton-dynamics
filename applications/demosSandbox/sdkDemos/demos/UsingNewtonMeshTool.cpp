@@ -130,7 +130,7 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	return body;
 }
 
-#if 0
+
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
@@ -146,104 +146,3 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
-#else
-
-
-static NewtonBody* CreateBox(DemoEntityManager* const scene, dFloat mass, const dMatrix& location, const dVector& size)
-{
-	NewtonWorld* const world = scene->GetNewton();
-	int materialID = NewtonMaterialGetDefaultGroupID(world);
-	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-
-	geometry->Release();
-	NewtonDestroyCollision(collision);
-	return body;
-}
-
-
-static NewtonBody* CreateSphere(DemoEntityManager* const scene, dFloat mass, const dMatrix& location, const dVector& size)
-{
-	NewtonWorld* const world = scene->GetNewton();
-	int materialID = NewtonMaterialGetDefaultGroupID(world);
-	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-
-	geometry->Release();
-	NewtonDestroyCollision(collision);
-	return body;
-}
-
-static int OnAABBOverlap(const NewtonJoint* const contact, dFloat timestep, int threadIndex)
-{
-//	NewtonContactJointResetSelfJointsCollision(contact);
-	return 1;
-}
-
-static void OnAdjacentContacts(const NewtonJoint* const contact, dFloat timestep, int threadIndex)
-{
-}
-
-
-// black_birth demo
-void UsingNewtonMeshTool(DemoEntityManager* const scene)
-{
-	// load the skybox
-	scene->CreateSkyBox();
-
-	// load the scene from a ngd file format
-	CreateLevelMesh(scene, "flatPlane.ngd", true);
-
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	NewtonMaterialSetDefaultElasticity(scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.0f);
-	NewtonMaterialSetCollisionCallback(scene->GetNewton(), defaultMaterialID, defaultMaterialID, OnAABBOverlap, OnAdjacentContacts);
-
-	dMatrix matrix;
-#if 1
-	// make the chassis
-	dMatrix location (dGetIdentityMatrix());
-	location.m_posit = dVector (0.0f, 1.2f, 0.0f, 1.0f);
-	NewtonBody* const chassis = CreateBox(scene, 2500.0f, location, dVector (1.1f, 0.8f, 1.0f, 0.0f));
-	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
-	new dCustomSlider (matrix, chassis, NULL);
-
-	// make the fork
-	location.m_posit += dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	NewtonBody* const fork = CreateBox(scene, 50.0f, location, dVector(1.0f, 0.1f, 0.1f, 0.0f));
-
-//  note this trick is very help hull for making the mass matrix more well behave
-//	dVector inertia;
-//	NewtonBodyGetMass(fork, &inertia.m_w, &inertia.m_x, &inertia.m_y, &inertia.m_z);
-//	inertia.m_x = inertia.m_y;
-//	NewtonBodySetMassMatrix(fork, inertia.m_w, inertia.m_x, inertia.m_y, inertia.m_z);
-
-	dMatrix jointMatrix (dYawMatrix(dPi * 0.5f) * location);
-	dCustomSliderActuator* const actuator = new dCustomSliderActuator (jointMatrix, fork, chassis);
-	actuator->SetMaxForcePower(1000.0f);
-	//dCustomSlider* const actuator = new dCustomSlider (jointMatrix, fork, chassis);
-
-	// make obstacle
-	location.m_posit += dVector(-2.0f, 0.0f, 0.0f, 0.0f);
-	CreateBox(scene, 0.0f, location, dVector (1.1f, 0.8f, 1.0f, 0.0f));
-#else
-
-	dMatrix location(dGetIdentityMatrix());
-	location.m_posit = dVector(0.0f, 0.49f, 0.0f, 1.0f);
-	CreateSphere(scene, 1.0f, location, dVector(1.0f));
-
-	location.m_posit += dVector(0.0f, 0.95f, 0.0f, 0.0f);
-	CreateSphere(scene, 100.0f, location, dVector(1.0f));
-#endif
-
-	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
-}
-
-
-#endif
-

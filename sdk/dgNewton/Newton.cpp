@@ -3936,7 +3936,6 @@ void NewtonCollisionSetUserID(const NewtonCollision* const collision, unsigned i
 	instance->SetUserDataID (id);
 }
 
-
 /*!
   Return a user define value with a convex collision primitive.
 
@@ -3967,6 +3966,33 @@ void* NewtonCollisionGetUserData (const NewtonCollision* const collision)
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
 	return instance->GetUserData();
+}
+
+void NewtonCollisionSetMaterial (const NewtonCollision* const collision, const NewtonCollisionMaterial* const userData)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
+	dgCollisionInfo::dgInstanceMaterial& data = instance->m_material;
+	data.m_userData = userData->m_userData;
+	data.m_userId = userData->m_userId;
+	data.m_userFlags = userData->m_userFlags;
+	for (dgInt32 i = 0; i < 4; i++) {
+		data.m_userParam[i] = userData->m_userParam[i];
+	}
+	instance->SetMaterial (data);
+}
+
+void NewtonCollisionGetMaterial (const NewtonCollision* const collision, NewtonCollisionMaterial* const userData)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
+	const dgCollisionInfo::dgInstanceMaterial data(instance->GetMaterial());
+	userData->m_userData = data.m_userData;
+	userData->m_userId = data.m_userId;
+	userData->m_userFlags = data.m_userFlags;
+	for (dgInt32 i = 0; i < 4; i ++) {
+		userData->m_userParam[i] = data.m_userParam[i];
+	}
 }
 
 void* NewtonCollisionGetSubCollisionHandle (const NewtonCollision* const collision)
@@ -8427,8 +8453,6 @@ void NewtonMeshCalculateFaceNormal (const NewtonMesh* const mesh, const void* co
 	normal[1] = n.m_y;
 	normal[2] = n.m_z;
 }
-
-
 
 NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID)
 {

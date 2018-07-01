@@ -761,7 +761,7 @@ dgFloat32 dgCollisionConvex::RayCast(const dgVector& localP0, const dgVector& lo
 {
 	dgCollisionInstance instance(*body->GetCollision(), this);
 	dgContactSolver rayCaster(&instance);
-	instance.m_userData = NULL;
+	instance.m_material.m_userData = NULL;
 	return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }
 

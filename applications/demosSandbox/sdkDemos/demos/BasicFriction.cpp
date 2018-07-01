@@ -24,25 +24,23 @@ static int UserOnAABBOverlap (const NewtonJoint* const contactJoint, dFloat time
 
 static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex)
 {
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-
 	// call  the basic call back
 	GenericContactProcess (contactJoint, timestep, threadIndex);
 
 	const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 	const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-	const NewtonBody* body = body0;
-	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
-	if (mass == 0.0f) {
-		body = body1;
-	}
 
-	//now core 300 can have per collision user data 		
-	NewtonCollision* const collision = NewtonBodyGetCollision(body);
-	dFloat frictionValue = dFloat(NewtonCollisionGetUserID(collision)) * 1.0e-3f;
+	//now core 3.14 can have per collision user data
+	const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+	const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+
+	NewtonCollisionMaterial material0;
+	NewtonCollisionMaterial material1;
+	NewtonCollisionGetMaterial(collision0, &material0);
+	NewtonCollisionGetMaterial(collision1, &material1);
+	dAssert ((material0.m_userId == 1) || (material1.m_userId == 1));
+	dFloat frictionValue = dMax (material0.m_userParam[0], material1.m_userParam[0]);
+
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 		NewtonMaterialSetContactFrictionCoef (material, frictionValue + 0.1f, frictionValue, 0);
@@ -85,8 +83,18 @@ void Friction (DemoEntityManager* const scene)
 
 			// use the collision user data to save the coefficient of friction 
 			dFloat coefficientOfFriction = dFloat (index) * 0.03f; 
-			//NewtonCollisionSetUserData (collision, *((void**)&coefficientOfFriction));
-			NewtonCollisionSetUserID(collision, int(coefficientOfFriction * 1000.0f));
+
+			// save the restitution coefficient with the collision user data
+			NewtonCollisionMaterial material;
+			NewtonCollisionGetMaterial(collision, &material);
+			material.m_userId = 1;
+
+			// save kinetic friction in param[0]
+			material.m_userParam[0] = coefficientOfFriction;
+
+			// save static friction in param[1]
+			material.m_userParam[1] = coefficientOfFriction;
+			NewtonCollisionSetMaterial(collision, &material);
 
 			index ++;
 		}

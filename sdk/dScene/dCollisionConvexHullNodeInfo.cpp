@@ -63,13 +63,10 @@ dCollisionConvexHullNodeInfo::dCollisionConvexHullNodeInfo(NewtonCollision* cons
 		m_vertexCloud[i] = dVector (record.m_convexHull.m_vertex[i * stride + 0], record.m_convexHull.m_vertex[i * stride + 1], record.m_convexHull.m_vertex[i * stride + 2], 0.0f);
 	}
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionUserID);
+	SetShapeId (record.m_collisionMaterial.m_userId);
 
 	CalculateGeometryProperies (hull, m_geometricInertia, m_geometricCenterAndVolume); 
 }
-
-
-
 
 dCollisionConvexHullNodeInfo::~dCollisionConvexHullNodeInfo(void)
 {

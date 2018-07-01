@@ -118,6 +118,13 @@ extern "C" {
 	typedef struct NewtonFracturedCompoundMeshPart{} NewtonFracturedCompoundMeshPart;
 #endif
 
+	typedef struct NewtonCollisionMaterial
+	{
+		void* m_userData;
+		int m_userId;
+		int m_userFlags;
+		dFloat m_userParam[4];
+	} NewtonCollisionMaterial;
 
 	typedef struct NewtonBoxParam
 	{
@@ -210,9 +217,8 @@ extern "C" {
 	typedef struct NewtonCollisionInfoRecord
 	{
 		dFloat m_offsetMatrix[4][4];
+		NewtonCollisionMaterial m_collisionMaterial;
 		int m_collisionType;				// tag id to identify the collision primitive
-		int m_collisionUserID;				
-		
 		union {
 			NewtonBoxParam m_box;									
 			NewtonConeParam m_cone;
@@ -781,6 +787,9 @@ extern "C" {
 	
 	NEWTON_API void NewtonCollisionSetUserID (const NewtonCollision* const collision, unsigned id);
 	NEWTON_API unsigned NewtonCollisionGetUserID (const NewtonCollision* const collision);
+
+	NEWTON_API void NewtonCollisionGetMaterial (const NewtonCollision* const collision, NewtonCollisionMaterial* const userData);
+	NEWTON_API void NewtonCollisionSetMaterial (const NewtonCollision* const collision, const NewtonCollisionMaterial* const userData);
 
 	NEWTON_API void* NewtonCollisionGetSubCollisionHandle (const NewtonCollision* const collision);
 	NEWTON_API NewtonCollision* NewtonCollisionGetParentInstance (const NewtonCollision* const collision);

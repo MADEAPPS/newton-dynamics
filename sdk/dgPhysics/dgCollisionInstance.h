@@ -70,6 +70,9 @@ class dgCollisionInstance
 	void* GetUserData () const;
 	void SetUserData (void* const userData);
 
+	dgCollisionInfo::dgInstanceMaterial GetMaterial () const;
+	void SetMaterial (const dgCollisionInfo::dgInstanceMaterial& userData);
+
 	const void* GetCollisionHandle () const;
 	const dgCollisionInstance* GetParent () const;
 
@@ -133,14 +136,13 @@ class dgCollisionInstance
 	dgVector m_scale;
 	dgVector m_invScale;
 	dgVector m_maxScale;
-	void* m_userData;
+	dgCollisionInfo::dgInstanceMaterial m_material;
 	const dgWorld* m_world;
 	const dgCollision* m_childShape;
 	const void* m_subCollisionHandle;
 	const dgCollisionInstance* m_parent;
 	dgFloat32 m_skinThickness;
 	dgInt32 m_collisionMode;
-	dgUnsigned32 m_userDataID;
 	dgInt32 m_refCount;
 	dgScaleType m_scaleType;
 
@@ -154,14 +156,13 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_scale(meshInstance.m_scale)
 	,m_invScale(meshInstance.m_invScale)
 	,m_maxScale(meshInstance.m_maxScale)
-	,m_userData(meshInstance.m_userData)
+	,m_material(meshInstance.m_material)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
 	,m_skinThickness(meshInstance.m_skinThickness)
 	,m_collisionMode(meshInstance.m_collisionMode)
-	,m_userDataID(meshInstance.m_userDataID)
 	,m_refCount(1)
 	,m_scaleType(meshInstance.m_scaleType)
 {
@@ -169,7 +170,6 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 		m_childShape->AddRef();
 	}
 }
-
 
 DG_INLINE dgCollisionInstance* dgCollisionInstance::AddRef () 
 {
@@ -223,8 +223,7 @@ DG_INLINE void dgCollisionInstance::SetChildShape (dgCollision* const shape)
 DG_INLINE void dgCollisionInstance::GetCollisionInfo(dgCollisionInfo* const info) const
 {
 	info->m_offsetMatrix = m_localMatrix;
-	info->m_userDadaID = m_userDataID;
-//	info->m_scale = m_scale;
+	info->m_collisionMaterial = m_material;
 	m_childShape->GetCollisionInfo(info);
 }
 
@@ -295,12 +294,6 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBreakImpulse() const
 	return dgFloat32 (1.0e20f);
 }
 
-DG_INLINE void* dgCollisionInstance::GetUserData () const
-{
-	return m_userData;
-}
-
-
 DG_INLINE const void* dgCollisionInstance::GetCollisionHandle () const
 {
 	return m_subCollisionHandle;
@@ -311,19 +304,34 @@ DG_INLINE const dgCollisionInstance* dgCollisionInstance::GetParent () const
 	return m_parent;
 }
 
-DG_INLINE void dgCollisionInstance::SetUserData (void* const userData)
-{
-	m_userData = userData;
-}
-
 DG_INLINE dgUnsigned32 dgCollisionInstance::GetUserDataID () const
 {
-	return m_userDataID;
+	return m_material.m_userId;
 }
 
 DG_INLINE void dgCollisionInstance::SetUserDataID (dgUnsigned32 userDataId)
 {
-	m_userDataID = userDataId;
+	m_material.m_userId = userDataId;
+}
+
+DG_INLINE void* dgCollisionInstance::GetUserData () const
+{
+	return m_material.m_userData;
+}
+
+DG_INLINE void dgCollisionInstance::SetUserData (void* const userData)
+{
+	m_material.m_userData = userData;
+}
+
+DG_INLINE dgCollisionInfo::dgInstanceMaterial dgCollisionInstance::GetMaterial () const
+{
+	return m_material;
+}
+
+DG_INLINE void dgCollisionInstance::SetMaterial(const dgCollisionInfo::dgInstanceMaterial& userData)
+{
+	m_material = userData;
 }
 
 DG_INLINE dgUnsigned32 dgCollisionInstance::GetSignature () const

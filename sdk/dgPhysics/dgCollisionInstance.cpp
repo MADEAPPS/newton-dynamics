@@ -54,14 +54,13 @@ dgCollisionInstance::dgCollisionInstance()
 	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
-	,m_userData(NULL)
+	,m_material()
 	,m_world(NULL)
 	,m_childShape (NULL)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
 	,m_skinThickness(dgFloat32 (0.0f))
 	,m_collisionMode(1)
-	,m_userDataID(0)
 	,m_refCount(1)
 	,m_scaleType(m_unit)
 {
@@ -74,17 +73,17 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCol
 	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
-	,m_userData(NULL)
+	,m_material()
 	,m_world(world)
 	,m_childShape (childCollision)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
 	,m_skinThickness(dgFloat32 (0.0f))
 	,m_collisionMode(1)
-	,m_userDataID(shapeID)
 	,m_refCount(1)
 	,m_scaleType(m_unit)
 {
+	m_material.m_userId = shapeID;
 	m_childShape->AddRef();
 }
 
@@ -95,14 +94,13 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	,m_scale(instance.m_scale)
 	,m_invScale(instance.m_invScale)
 	,m_maxScale(instance.m_maxScale)
-	,m_userData(instance.m_userData)
+	,m_material(instance.m_material)
 	,m_world(instance.m_world)
 	,m_childShape (instance.m_childShape)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
 	,m_skinThickness(instance.m_skinThickness)
 	,m_collisionMode(instance.m_collisionMode)
-	,m_userDataID(instance.m_userDataID)
 	,m_refCount(1)
 	,m_scaleType(instance.m_scaleType)
 {
@@ -139,14 +137,13 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
-	,m_userData(NULL)
+	,m_material()
 	,m_world(constWorld)
 	,m_childShape (NULL)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
 	,m_skinThickness(dgFloat32 (0.0f))
 	,m_collisionMode(1)
-	,m_userDataID(0)
 	,m_refCount(1)
 	,m_scaleType(m_unit)
 {
@@ -162,7 +159,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	serialize (userData, &m_invScale, sizeof (m_invScale));
 	serialize (userData, &m_maxScale, sizeof (m_maxScale));
 	serialize (userData, &m_skinThickness, sizeof (m_skinThickness));
-	serialize (userData, &m_userDataID, sizeof (m_userDataID));
+	serialize (userData, &m_material, sizeof (m_material));
 	serialize (userData, &m_collisionMode, sizeof (m_collisionMode));
 	serialize (userData, &scaleType, sizeof (scaleType));
 	serialize (userData, &primitive, sizeof (primitive));
@@ -320,7 +317,7 @@ void dgCollisionInstance::Serialize(dgSerialize serialize, void* const userData,
 	serialize (userData, &m_invScale, sizeof (m_invScale));
 	serialize (userData, &m_maxScale, sizeof (m_maxScale));
 	serialize (userData, &m_skinThickness, sizeof (m_skinThickness));
-	serialize (userData, &m_userDataID, sizeof (m_userDataID));
+	serialize (userData, &m_material, sizeof (m_material));
 	serialize (userData, &m_collisionMode, sizeof (m_collisionMode));
 	serialize (userData, &scaleType, sizeof (scaleType));
 	serialize (userData, &primitiveType, sizeof (primitiveType));
