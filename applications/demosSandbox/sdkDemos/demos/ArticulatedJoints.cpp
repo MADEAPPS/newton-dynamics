@@ -216,6 +216,10 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		NewtonCollisionGetMaterial(collision1, &material1);
 
 		int mask = material0.m_userId | material1.m_userId;
+		if (mask == (ARTICULATED_VEHICLE_DEFINITION::m___terrain + ARTICULATED_VEHICLE_DEFINITION::m___tirePart)) {
+			NewtonContactJointResetSelfJointsCollision(contactJoint);
+		}
+
 		int filter0 = material0.m_userId & material1.m_userFlags;
 		int filter1 = material1.m_userId & material0.m_userFlags;
 		return ((filter0 + filter1) == mask) ? 1 : 0;
