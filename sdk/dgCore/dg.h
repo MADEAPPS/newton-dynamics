@@ -43,6 +43,7 @@
 #include "dgMemory.h"
 #include "dgRandom.h"
 #include "dgThread.h"
+#include "dgProfiler.h"
 #include "dgFastQueue.h"
 #include "dgPolyhedra.h"
 #include "dgThreadHive.h"

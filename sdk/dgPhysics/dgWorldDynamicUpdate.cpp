@@ -90,11 +90,12 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate(dgMemoryAllocator* const allocator)
 
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
-	dgWorld* const world = (dgWorld*) this;
+	DG_TRACKTIME(__FUNCTION__);
 
 	m_bodies = 0;
 	m_joints = 0;
 	m_clusters = 0;
+	dgWorld* const world = (dgWorld*) this;
 	world->m_dynamicsLru = world->m_dynamicsLru + DG_BODY_LRU_STEP;
 	m_markLru = world->m_dynamicsLru;
 

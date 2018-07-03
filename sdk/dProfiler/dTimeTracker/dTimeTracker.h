@@ -25,19 +25,6 @@
 #define DTIMETRACKER_API __declspec(dllimport)
 #endif
 
-/*
-// This class is exported from the dTimeTracker.dll
-class DTIMETRACKER_API CdTimeTracker {
-public:
-	CdTimeTracker(void);
-	// TODO: add your methods here.
-};
-
-extern DTIMETRACKER_API int ndTimeTracker;
-
-DTIMETRACKER_API int fndTimeTracker(void);
-*/
-
 DTIMETRACKER_API int ttOpenRecord(const char* const name);
 DTIMETRACKER_API void ttCloseRecord(int record);
 

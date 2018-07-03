@@ -1516,6 +1516,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
+	DG_TRACKTIME(__FUNCTION__);
     m_lru = m_lru + 1;
 	m_pendingSoftBodyPairsCount = 0;
 

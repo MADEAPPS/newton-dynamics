@@ -886,6 +886,7 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 
 	m_inUpdate ++;
 
+	DG_TRACKTIME(__FUNCTION__);
 	UpdateSkeletons();
 	UpdateBroadphase(timestep);
 	UpdateDynamics (timestep);
@@ -950,6 +951,7 @@ void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32
 
 void dgWorld::RunStep ()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgUnsigned64 timeAcc = dgGetTimeInMicrosenconds();
 	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
 	for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
@@ -1231,6 +1233,7 @@ dgInt32 dgWorld::CompareJointByInvMass(const dgBilateralConstraint* const jointA
 
 void dgWorld::UpdateSkeletons()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSkeletonList& skelManager = *this;
 	if (skelManager.m_skelListIsDirty) {
 		skelManager.m_skelListIsDirty = false;

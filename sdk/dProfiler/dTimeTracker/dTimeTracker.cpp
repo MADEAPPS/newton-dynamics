@@ -16,31 +16,13 @@
 #include "stdafx.h"
 #include "dTimeTracker.h"
 
-/*
-// This is an example of an exported variable
-DTIMETRACKER_API int ndTimeTracker=0;
-
-// This is an example of an exported function.
-DTIMETRACKER_API int fndTimeTracker(void)
-{
-	return 42;
-}
-
-// This is the constructor of a class that has been exported.
-// see dTimeTracker.h for the class definition
-CdTimeTracker::CdTimeTracker()
-{
-	return;
-}
-*/
-
-
 int ttOpenRecord(const char* const name)
 {
+	DWORD64 time = __rdtsc();
 	return 0;
 }
 
 void ttCloseRecord(int record)
 {
-
+	DWORD64 time = __rdtsc();
 }
