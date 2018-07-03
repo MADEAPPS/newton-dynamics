@@ -18,7 +18,6 @@
 
 #define DG_MAX_ENTRIES (1<<11)
 
-
 class dTimeTrackeFrame
 {
 	public:
@@ -75,6 +74,70 @@ static dTimeTrackeFrame& GetFrame()
 {
 	thread_local dTimeTrackeFrame frame;
 	return frame;
+}
+
+
+class dTimeTrackerServer
+{
+	public:
+	dTimeTrackerServer()
+		:m_initialized(false)
+		,m_socket(-1)
+	{
+		memset(&m_client, 0, sizeof(m_client));
+		memset(&m_server, 0, sizeof(m_server));
+	}
+
+	~dTimeTrackerServer()
+	{
+		if (m_initialized) {
+			closesocket(m_socket);
+			WSACleanup();
+		}
+	}
+
+	static dTimeTrackerServer& GetServer()
+	{
+		static dTimeTrackerServer server;
+		return server;
+	}
+
+	bool StartServer()
+	{
+		if (!m_initialized) {
+			// initialized win socket
+			WORD version = MAKEWORD(2, 2);
+			int state = WSAStartup(version, &m_wsaData);
+			if (!state) {
+				// bind socket to ip address
+				m_socket = socket(AF_INET, SOCK_DGRAM, 0);
+				
+				m_server.sin_addr.S_un.S_addr = ADDR_ANY;
+				m_server.sin_family = AF_INET;
+				if (!bind(m_socket, (SOCKADDR*) &m_server, sizeof(m_server))) {
+					m_initialized = true;
+				}
+			}
+		}
+		return m_initialized;
+	}
+
+	bool IsValid() const
+	{
+		return m_initialized;
+	}
+
+	bool m_initialized;
+	SOCKET m_socket;
+	SOCKADDR_IN m_client;
+	SOCKADDR_IN m_server;
+	WSADATA m_wsaData;
+};
+
+bool StartServer()
+{
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	return server.StartServer();
 }
 
 int ttOpenRecord(const char* const name)

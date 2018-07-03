@@ -34,6 +34,8 @@ class dTimeTarckerRecord
 	DWORD64 m_nameHash;
 };
 
+bool StartServer();
+
 DTIMETRACKER_API int ttOpenRecord(const char* const name);
 DTIMETRACKER_API void ttCloseRecord(int record);
 
