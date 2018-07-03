@@ -25,6 +25,15 @@
 #define DTIMETRACKER_API __declspec(dllimport)
 #endif
 
+
+class dTimeTarckerRecord
+{
+	public:
+	DWORD64 m_start;
+	DWORD64 m_end;
+	DWORD64 m_nameHash;
+};
+
 DTIMETRACKER_API int ttOpenRecord(const char* const name);
 DTIMETRACKER_API void ttCloseRecord(int record);
 
