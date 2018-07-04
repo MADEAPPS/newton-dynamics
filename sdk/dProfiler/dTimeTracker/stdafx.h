@@ -23,10 +23,15 @@
 // Windows Header Files:
 #include <windows.h>
 #include <winsock2.h>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+
 
 #include "dCRC.h"
 #include <dTree.h>
 #include <dString.h>
+
 
 #endif
 

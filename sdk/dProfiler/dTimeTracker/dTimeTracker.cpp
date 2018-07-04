@@ -16,6 +16,11 @@
 #include "stdafx.h"
 #include "dTimeTracker.h"
 
+#if _MSC_VER < 1900
+#define thread_local __declspec(thread)
+#endif
+
+
 #define DG_MAX_ENTRIES (1<<11)
 
 class dTimeTrackeFrame
@@ -23,7 +28,7 @@ class dTimeTrackeFrame
 	public:
 	dTimeTrackeFrame()
 		:m_count(0)
-		, m_baseCount(0)
+		,m_baseCount(0)
 	{
 		m_buffer = new dTimeTarckerRecord[DG_MAX_ENTRIES * 2];
 	}
@@ -70,9 +75,11 @@ class dTimeTrackeFrame
 	dTree<dString, dCRCTYPE> m_nameMap;
 };
 
+
 static dTimeTrackeFrame& GetFrame()
 {
-	thread_local dTimeTrackeFrame frame;
+//	thread_local static dTimeTrackeFrame frame;
+	static dTimeTrackeFrame frame;
 	return frame;
 }
 
