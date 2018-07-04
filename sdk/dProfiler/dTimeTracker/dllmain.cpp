@@ -14,6 +14,9 @@
 #include "stdafx.h"
 #include "dTimeTracker.h"
 
+#pragma warning (disable: 4100) //unreferenced formal parameter
+
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved

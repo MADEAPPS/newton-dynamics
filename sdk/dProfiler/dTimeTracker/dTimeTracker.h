@@ -39,6 +39,7 @@ bool StartServer();
 DTIMETRACKER_API int ttOpenRecord(const char* const name);
 DTIMETRACKER_API void ttCloseRecord(int record);
 
-
+DTIMETRACKER_API void ttDeleteTrack();
+DTIMETRACKER_API void ttSetTrackName(const char* const threadName);
 
 #endif

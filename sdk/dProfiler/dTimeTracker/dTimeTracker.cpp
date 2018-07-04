@@ -21,15 +21,16 @@
 #endif
 
 
-#define DG_MAX_ENTRIES (1<<11)
+#define DG_MAX_ENTRIES (1<<12)
 
 class dTimeTrackeFrame
 {
 	public:
-	dTimeTrackeFrame()
+	dTimeTrackeFrame(const char* const name)
 		:m_count(0)
 		,m_baseCount(0)
 	{
+		strncpy (m_threadName, name, sizeof (m_threadName) - 1);
 		m_buffer = new dTimeTarckerRecord[DG_MAX_ENTRIES * 2];
 	}
 
@@ -58,13 +59,19 @@ class dTimeTrackeFrame
 
 	void CloseEntry(int index)
 	{
-		dTimeTarckerRecord& record = m_buffer[m_count - m_baseCount];
+		dTimeTarckerRecord& record = m_buffer[index - m_baseCount];
 		record.m_end = __rdtsc();
+	}
+
+	void SetName(const char* const name)
+	{
+		strncpy(m_threadName, name, sizeof (m_threadName) - 1);
 	}
 
 	private:
 	void SaveBuffer()
 	{
+		dAssert (0);
 		memcpy(m_buffer, m_buffer + DG_MAX_ENTRIES, DG_MAX_ENTRIES * sizeof(dTimeTarckerRecord));
 		m_baseCount += DG_MAX_ENTRIES;
 	}
@@ -73,15 +80,8 @@ class dTimeTrackeFrame
 	int m_baseCount;
 	dTimeTarckerRecord* m_buffer;
 	dTree<dString, dCRCTYPE> m_nameMap;
+	char m_threadName[64];
 };
-
-
-static dTimeTrackeFrame& GetFrame()
-{
-//	thread_local static dTimeTrackeFrame frame;
-	static dTimeTrackeFrame frame;
-	return frame;
-}
 
 
 class dTimeTrackerServer
@@ -89,7 +89,9 @@ class dTimeTrackerServer
 	public:
 	dTimeTrackerServer()
 		:m_initialized(false)
-		,m_socket(-1)
+		,m_socket(0)
+		,m_trackEnum(0)
+		,m_tracks()
 	{
 		memset(&m_client, 0, sizeof(m_client));
 		memset(&m_server, 0, sizeof(m_server));
@@ -97,6 +99,12 @@ class dTimeTrackerServer
 
 	~dTimeTrackerServer()
 	{
+		while (m_tracks.GetCount()) {
+			dTree<dTimeTrackeFrame*, DWORD>::dTreeNode* const node = m_tracks.GetRoot();
+			delete node->GetInfo();
+			m_tracks.Remove(node);
+		}
+
 		if (m_initialized) {
 			closesocket(m_socket);
 			WSACleanup();
@@ -134,11 +142,39 @@ class dTimeTrackerServer
 		return m_initialized;
 	}
 
+	dTimeTrackeFrame& GetFrame()
+	{
+		// I have to do this because VS 2013 do not fully supports thread_local initialization 
+		static thread_local dTimeTrackeFrame* frame = NULL;
+		if (!frame) {
+			char name[64];
+			sprintf(name, "thread_%2d", m_trackEnum);
+			frame = new dTimeTrackeFrame (name);
+			DWORD threadID = GetThreadId(GetCurrentThread());
+			m_tracks.Insert(frame, threadID);
+			m_trackEnum ++;
+		}
+		return *frame;
+	}
+
+	void DeleteTrack()
+	{
+		DWORD threadID = GetThreadId(GetCurrentThread());
+		dTree<dTimeTrackeFrame*, DWORD>::dTreeNode* const node = m_tracks.Find(threadID);
+		if (node) {
+			delete node->GetInfo();
+			m_tracks.Remove(node);
+		}
+	}
+
 	bool m_initialized;
 	SOCKET m_socket;
 	SOCKADDR_IN m_client;
 	SOCKADDR_IN m_server;
 	WSADATA m_wsaData;
+
+	int m_trackEnum;
+	dTree<dTimeTrackeFrame*, DWORD> m_tracks;
 };
 
 bool StartServer()
@@ -147,14 +183,29 @@ bool StartServer()
 	return server.StartServer();
 }
 
+void ttSetTrackName(const char* const threadName)
+{
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	dTimeTrackeFrame& frame = server.GetFrame();
+	frame.SetName(threadName);
+}
+
+void ttDeleteTrack()
+{
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	server.DeleteTrack();
+}
+
 int ttOpenRecord(const char* const name)
 {
-	dTimeTrackeFrame& frame = GetFrame();
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	dTimeTrackeFrame& frame = server.GetFrame();
 	return frame.AddEntry(name);
 }
 
 void ttCloseRecord(int recordIndex)
 {
-	dTimeTrackeFrame& frame = GetFrame();
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	dTimeTrackeFrame& frame = server.GetFrame();
 	frame.CloseEntry(recordIndex);
 }

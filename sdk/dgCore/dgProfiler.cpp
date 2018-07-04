@@ -25,6 +25,16 @@
 #ifdef _DG_USE_PROFILER
 #include <dTimeTracker.h>
 
+void dProfilerSetTrackName(const char* const name)
+{
+	ttSetTrackName(name);
+}
+
+void dProfilerDeleteTrack()
+{
+	ttDeleteTrack();
+}
+
 dgProfile::dgProfile(const char* const functionName)
 	:m_entry(ttOpenRecord(functionName))
 	,m_name(functionName)
@@ -35,6 +45,5 @@ dgProfile::~dgProfile()
 {
 	ttCloseRecord(m_entry);
 }
-
 
 #endif

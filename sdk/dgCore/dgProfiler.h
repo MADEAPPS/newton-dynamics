@@ -22,9 +22,10 @@
 #ifndef __DG_PROFILER_H__
 #define __DG_PROFILER_H__
 
-#define _DG_USE_PROFILER
+//#define _DG_USE_PROFILER
 
 #ifdef _DG_USE_PROFILER
+
 class dgProfile
 {
 	public:
@@ -36,11 +37,19 @@ class dgProfile
 	const char* m_name;
 };
 
-#define DG_TRACKTIME(name) \
-	dgProfile _profile##name(name);
+void dProfilerDeleteTrack();
+void dProfilerSetTrackName(const char* const name);
+
+#define DG_DELETE_TRACK() dProfilerDeleteTrack();
+#define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName);
+#define DG_TRACKTIME(name) dgProfile _profile##name(name);
 
 #else
+
 #define DG_TRACKTIME(name)
+#define DG_SET_TRACK_NAME(trackName)
+#define DG_DELETE_TRACK()
+
 #endif
 
 #endif

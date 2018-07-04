@@ -21,7 +21,7 @@
 
 #include "dgStdafx.h"
 #include "dgThread.h"
-
+#include "dgProfiler.h"
 
 
 dgThread::dgThread ()
@@ -166,8 +166,12 @@ void* dgThread::dgThreadSystemCallback(void* threadData)
 
 	dgThread* const me = (dgThread*) threadData;
 
+	DG_SET_TRACK_NAME(me->m_name);
+
 	me->Execute(me->m_id);
 	dgInterlockedExchange(&me->m_threadRunning, 0);
+
+	DG_DELETE_TRACK();
 	return 0;
 }
 
