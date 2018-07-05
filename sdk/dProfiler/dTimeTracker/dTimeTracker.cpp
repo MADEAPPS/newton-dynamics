@@ -52,6 +52,15 @@ class dTimeTrack
 	{
 	}
 
+	void Clear()
+	{
+		m_count = 0;
+		m_banks[0] = DG_TIME_TRACKER_PAGE_ENTRIES;
+		m_banks[1] = DG_TIME_TRACKER_PAGE_ENTRIES;
+		memset (m_buffer, 0, sizeof (m_buffer));
+		m_nameMap.RemoveAll();
+	}
+
 	int AddEntry(const char* const name);
 	void CloseEntry(int index);
 
@@ -161,6 +170,23 @@ class dTimeTrackerServer
 		}
 	}
 
+	void StartRecording(const char* const fileName)
+	{
+		dTree<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
+		for (iter.Begin(); iter; iter++) {
+			dTimeTrack* const track = iter.GetNode()->GetInfo();
+			track->Clear();
+		}
+
+		m_currentFile = (FILE*)1000;
+		m_baseCount = __rdtsc();
+	}
+
+	void StopRecording()
+	{
+
+	}
+
 	bool m_initialized;
 	SOCKET m_socket;
 	SOCKADDR_IN m_client;
@@ -182,12 +208,14 @@ bool StartServer()
 
 void ttStartRecording(const char* const fileName)
 {
-
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	server.StartRecording(fileName);
 }
 
 void ttStopRecording()
 {
-
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	server.StopRecording();
 }
 
 
