@@ -100,7 +100,7 @@ void dgSolver::InitWeights()
 void dgSolver::InitBodyArray()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
+		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgSolver::InitBodyArray");
 	}
 	m_world->SynchronizationBarrier();
 	m_bodyProxyArray->m_invWeight = dgFloat32 (1.0f);
@@ -193,7 +193,7 @@ void dgSolver::InitJacobianMatrix()
 {
 	m_jacobianMatrixRowAtomicIndex = 0;
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitJacobianMatrixKernel, this, NULL);
+		m_world->QueueJob(InitJacobianMatrixKernel, this, NULL, "dgSolver::InitJacobianMatrix");
 	}
 	m_world->SynchronizationBarrier();
 
@@ -207,7 +207,7 @@ void dgSolver::InitJacobianMatrix()
 	}
 
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitInternalForcesKernel, this, NULL);
+		m_world->QueueJob(InitInternalForcesKernel, this, NULL, "dgSolver::InitInternalForces");
 	}
 	m_world->SynchronizationBarrier();
 
@@ -242,7 +242,7 @@ void dgSolver::InitJacobianMatrix()
 
 	m_soaRowsCount = 0;
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(TransposeMassMatrixKernel, this, NULL);
+		m_world->QueueJob(TransposeMassMatrixKernel, this, NULL, "dgSolver::TransposeMassMatrix");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -561,13 +561,13 @@ void dgSolver::UpdateRowAccelerationKernel(void* const context, void* const, dgI
 void dgSolver::CalculateJointsAcceleration()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateJointsAccelerationKernel, this, NULL);
+		m_world->QueueJob(CalculateJointsAccelerationKernel, this, NULL, "dgSolver::CalculateJointsAcceleration");
 	}
 	m_world->SynchronizationBarrier();
 	m_firstPassCoef = dgFloat32(1.0f);
 
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(UpdateRowAccelerationKernel, this, NULL);
+		m_world->QueueJob(UpdateRowAccelerationKernel, this, NULL, "dgSolver::UpdateRowAcceleration");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -575,7 +575,7 @@ void dgSolver::CalculateJointsAcceleration()
 void dgSolver::CalculateBodiesAcceleration()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateBodiesAccelerationKernel, this, NULL);
+		m_world->QueueJob(CalculateBodiesAccelerationKernel, this, NULL, "dgSolver::CalculateBodiesAcceleration");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -583,7 +583,7 @@ void dgSolver::CalculateBodiesAcceleration()
 void dgSolver::CalculateJointsForce()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateJointsForceKernel, this, NULL);
+		m_world->QueueJob(CalculateJointsForceKernel, this, NULL, "dgSolver::CalculateJointsForce");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -591,7 +591,7 @@ void dgSolver::CalculateJointsForce()
 void dgSolver::CalculateBodyForce()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateBodyForceKernel, this, NULL);
+		m_world->QueueJob(CalculateBodyForceKernel, this, NULL, "dgSolver::CalculateBodyForce");
 	}
 	m_world->SynchronizationBarrier();
 
@@ -603,7 +603,7 @@ void dgSolver::CalculateBodyForce()
 void dgSolver::IntegrateBodiesVelocity()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(IntegrateBodiesVelocityKernel, this, NULL);
+		m_world->QueueJob(IntegrateBodiesVelocityKernel, this, NULL, "dgSolver::IntegrateBodiesVelocity");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -612,7 +612,7 @@ void dgSolver::IntegrateBodiesVelocity()
 void dgSolver::UpdateForceFeedback()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(UpdateForceFeedbackKernel, this, NULL);
+		m_world->QueueJob(UpdateForceFeedbackKernel, this, NULL, "dgSolver::UpdateForceFeedback");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -620,7 +620,7 @@ void dgSolver::UpdateForceFeedback()
 void dgSolver::UpdateKinematicFeedback()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(UpdateKinematicFeedbackKernel, this, NULL);
+		m_world->QueueJob(UpdateKinematicFeedbackKernel, this, NULL, "dgSolver::UpdateKinematicFeedback");
 	}
 	m_world->SynchronizationBarrier();
 }

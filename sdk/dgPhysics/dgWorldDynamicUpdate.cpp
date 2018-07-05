@@ -147,7 +147,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		descriptor.m_firstCluster = index;
 		descriptor.m_clusterCount = m_clusters - index;
 		for (dgInt32 i = 0; i < threadCount; i ++) {
-			world->QueueJob (CalculateClusterReactionForcesKernel, &descriptor, world);
+			world->QueueJob (CalculateClusterReactionForcesKernel, &descriptor, world, "dgWorldDynamicUpdate::CalculateClusterReactionForces");
 		}
 		world->SynchronizationBarrier();
 	}

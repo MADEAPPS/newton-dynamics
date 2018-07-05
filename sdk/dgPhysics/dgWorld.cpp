@@ -548,7 +548,7 @@ void dgWorld::DestroyConstraint(dgConstraint* const constraint)
 
 void dgWorld::ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext)
 {
-	QueueJob (userJobKernel, this, userJobKernelContext);
+	QueueJob (userJobKernel, this, userJobKernelContext, __FUNCTION__);
 }
 
 
@@ -980,7 +980,7 @@ void dgWorld::RunStep ()
 	dgBodyMasterList::dgListNode* node = masterList->GetFirst();
 	const dgInt32 threadsCount = GetThreadCount();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		QueueJob(UpdateTransforms, this, node);
+		QueueJob(UpdateTransforms, this, node, "dgWorld::UpdateTransforms");
 		node = node ? node->GetNext() : NULL;
 	}
 	SynchronizationBarrier();

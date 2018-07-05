@@ -95,7 +95,7 @@ class dgThreadHive
 	dgInt32 GetMaxThreadCount() const;
 	void SetThreadsCount (dgInt32 count);
 
-	virtual void QueueJob (dgWorkerThreadTaskCallback callback, void* const context0, void* const context1);
+	virtual void QueueJob (dgWorkerThreadTaskCallback callback, void* const context0, void* const context1, const char* const functionName);
 	virtual void SynchronizationBarrier ();
 
 	private:

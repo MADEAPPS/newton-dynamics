@@ -1422,7 +1422,7 @@ void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 	dgInt32 threadsCount = m_world->GetThreadCount();
 	dgList<dgBroadPhaseNode*>::dgListNode* node = m_updateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(CollidingPairsKernel, &syncPoints, node);
+		m_world->QueueJob(CollidingPairsKernel, &syncPoints, node, "dgBroadPhase::CollidingPairs");
 		node = node ? node->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
@@ -1527,7 +1527,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	dgBodyMasterList::dgListNode* node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(ForceAndToqueKernel, &syncPoints, node);
+		m_world->QueueJob(ForceAndToqueKernel, &syncPoints, node, "dgBroadPhase::ForceAndToque");
 		node = node ? node->GetPrev() : NULL;
 	}
 	m_world->SynchronizationBarrier();
@@ -1544,14 +1544,14 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(SleepingStateKernel, &syncPoints, node);
+		m_world->QueueJob(SleepingStateKernel, &syncPoints, node, "dgBroadPhase::SleepingState");
 		node = node ? node->GetPrev() : NULL;
 	}
 	m_world->SynchronizationBarrier();
 
 	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob (UpdateAggregateEntropyKernel, &syncPoints, aggregateNode);
+		m_world->QueueJob (UpdateAggregateEntropyKernel, &syncPoints, aggregateNode, "dgBroadPhase::UpdateAggregateEntropy");
 		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
@@ -1586,14 +1586,14 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode);
+		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
 		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
 
 	if (m_pendingSoftBodyPairsCount) {
 		for (dgInt32 i = 0; i < threadsCount; i++) {
-			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode);
+			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateSoftBodyContact");
 		}
 		m_world->SynchronizationBarrier();
 	}

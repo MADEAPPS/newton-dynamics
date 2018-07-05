@@ -30,8 +30,8 @@
 class dTimeTarckerRecord
 {
 	public:
-	DWORD64 m_start;
-	DWORD64 m_end;
+	unsigned m_start;
+	unsigned m_duration;
 	DWORD64 m_nameHash;
 };
 

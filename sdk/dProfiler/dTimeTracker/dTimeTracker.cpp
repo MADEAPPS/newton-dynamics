@@ -79,6 +79,7 @@ class dTimeTrackerServer
 		,m_socket(0)
 		,m_trackEnum(0)
 		,m_tracks()
+		,m_baseCount(__rdtsc())
 		,m_currentFile(NULL)
 	{
 		memset(&m_client, 0, sizeof(m_client));
@@ -103,6 +104,11 @@ class dTimeTrackerServer
 	{
 		static dTimeTrackerServer server;
 		return server;
+	}
+
+	unsigned GetTime() const
+	{
+		return unsigned ((__rdtsc() - m_baseCount) >> 10);
 	}
 
 	bool StartServer()
@@ -164,6 +170,7 @@ class dTimeTrackerServer
 	int m_trackEnum;
 	dTree<dTimeTrack*, DWORD> m_tracks;
 
+	DWORD64 m_baseCount;
 	FILE* m_currentFile;
 };
 
@@ -213,9 +220,10 @@ void ttCloseRecord(int recordIndex)
 
 int dTimeTrack::AddEntry(const char* const name)
 {
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
 	int index = m_count;
 	dTimeTarckerRecord& record = m_buffer[index];
-	record.m_start = __rdtsc();
+	record.m_start = server.GetTime();
 
 	dCRCTYPE nameHash = dCRC64(name);
 	m_nameMap.Insert(name, nameHash);
@@ -227,8 +235,9 @@ int dTimeTrack::AddEntry(const char* const name)
 
 void dTimeTrack::CloseEntry(int index)
 {
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
 	dTimeTarckerRecord& record = m_buffer[index];
-	record.m_end = __rdtsc() - record.m_start;
+	record.m_duration = server.GetTime() - record.m_start;
 
 	int bank = index >> DG_TIME_TRACKER_ENTRIES_POWER;
 	m_banks[bank]--;

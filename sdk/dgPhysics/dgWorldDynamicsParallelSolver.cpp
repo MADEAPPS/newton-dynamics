@@ -272,7 +272,7 @@ void dgParallelBodySolver::InitWeights()
 void dgParallelBodySolver::InitBodyArray()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitBodyArrayKernel, this, NULL);
+		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgParallelBodySolver::InitBodyArray");
 	}
 	m_world->SynchronizationBarrier();
 	m_bodyProxyArray->m_invWeight = 1.0f; 
@@ -305,7 +305,7 @@ void dgParallelBodySolver::InitJacobianMatrix()
 {
 	m_jacobianMatrixRowAtomicIndex = 0;
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitJacobianMatrixKernel, this, NULL);
+		m_world->QueueJob(InitJacobianMatrixKernel, this, NULL, "dgParallelBodySolver::InitJacobianMatrix");
 	}
 	m_world->SynchronizationBarrier();
 
@@ -320,7 +320,7 @@ void dgParallelBodySolver::InitJacobianMatrix()
 	}
 
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitInternalForcesKernel, this, NULL);
+		m_world->QueueJob(InitInternalForcesKernel, this, NULL, "dgParallelBodySolver::InitInternalForces");
 	}
 	m_world->SynchronizationBarrier();
 
@@ -355,7 +355,7 @@ void dgParallelBodySolver::InitJacobianMatrix()
 
 	m_soaRowsCount = 0;
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(TransposeMassMatrixKernel, this, NULL);
+		m_world->QueueJob(TransposeMassMatrixKernel, this, NULL, "dgParallelBodySolver::TransposeMassMatrix");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -363,13 +363,13 @@ void dgParallelBodySolver::InitJacobianMatrix()
 void dgParallelBodySolver::CalculateJointsAcceleration()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateJointsAccelerationKernel, this, NULL);
+		m_world->QueueJob(CalculateJointsAccelerationKernel, this, NULL, "dgParallelBodySolver::CalculateJointsAcceleration");
 	}
 	m_world->SynchronizationBarrier();
 	m_firstPassCoef = dgFloat32(1.0f);
 
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(UpdateRowAccelerationKernel, this, NULL);
+		m_world->QueueJob(UpdateRowAccelerationKernel, this, NULL, "dgParallelBodySolver::UpdateRowAcceleration");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -377,7 +377,7 @@ void dgParallelBodySolver::CalculateJointsAcceleration()
 void dgParallelBodySolver::CalculateBodiesAcceleration()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateBodiesAccelerationKernel, this, NULL);
+		m_world->QueueJob(CalculateBodiesAccelerationKernel, this, NULL, "dgParallelBodySolver::CalculateBodiesAcceleration");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -386,7 +386,7 @@ void dgParallelBodySolver::CalculateBodiesAcceleration()
 void dgParallelBodySolver::CalculateJointsForce()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateJointsForceKernel, this, NULL);
+		m_world->QueueJob(CalculateJointsForceKernel, this, NULL, "dgParallelBodySolver::CalculateJointsForce");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -394,7 +394,7 @@ void dgParallelBodySolver::CalculateJointsForce()
 void dgParallelBodySolver::CalculateBodyForce()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateBodyForceKernel, this, NULL);
+		m_world->QueueJob(CalculateBodyForceKernel, this, NULL, "dgParallelBodySolver::CalculateBodyForce");
 	}
 	m_world->SynchronizationBarrier();
 
@@ -406,7 +406,7 @@ void dgParallelBodySolver::CalculateBodyForce()
 void dgParallelBodySolver::IntegrateBodiesVelocity()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(IntegrateBodiesVelocityKernel, this, NULL);
+		m_world->QueueJob(IntegrateBodiesVelocityKernel, this, NULL, "dgParallelBodySolver::IntegrateBodiesVelocity");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -415,7 +415,7 @@ void dgParallelBodySolver::IntegrateBodiesVelocity()
 void dgParallelBodySolver::UpdateForceFeedback()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(UpdateForceFeedbackKernel, this, NULL);
+		m_world->QueueJob(UpdateForceFeedbackKernel, this, NULL, "dgParallelBodySolver::UpdateForceFeedback");
 	}
 	m_world->SynchronizationBarrier();
 }
@@ -423,7 +423,7 @@ void dgParallelBodySolver::UpdateForceFeedback()
 void dgParallelBodySolver::UpdateKinematicFeedback()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(UpdateKinematicFeedbackKernel, this, NULL);
+		m_world->QueueJob(UpdateKinematicFeedbackKernel, this, NULL, "dgParallelBodySolver::UpdateKinematicFeedback");
 	}
 	m_world->SynchronizationBarrier();
 }
