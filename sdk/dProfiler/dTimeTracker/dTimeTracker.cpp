@@ -20,8 +20,7 @@
 #define thread_local __declspec(thread)
 #endif
 
-#define DG_ENTRIES_POWER	10
-#define DG_MAX_ENTRIES		(1<<DG_ENTRIES_POWER)
+#define DG_TIME_TRACKER_PAGE_ENTRIES (1<<DG_TIME_TRACKER_ENTRIES_POWER)
 
 class dTrackeString
 {
@@ -63,8 +62,8 @@ class dTimeTrack
 	dTimeTrack(const char* const name)
 		:m_count(0)
 	{
-		m_banks[0] = DG_MAX_ENTRIES;
-		m_banks[1] = DG_MAX_ENTRIES;
+		m_banks[0] = DG_TIME_TRACKER_PAGE_ENTRIES;
+		m_banks[1] = DG_TIME_TRACKER_PAGE_ENTRIES;
 		strncpy (m_threadName, name, sizeof (m_threadName) - 1);
 	}
 
@@ -85,7 +84,7 @@ class dTimeTrack
 
 	int m_count;
 	int m_banks[2];
-	dTimeTarckerRecord m_buffer[DG_MAX_ENTRIES * 2];
+	dTimeTarckerRecord m_buffer[DG_TIME_TRACKER_PAGE_ENTRIES * 2];
 	dTree<dTrackeString, dCRCTYPE> m_nameMap;
 	char m_threadName[64];
 };
@@ -190,6 +189,17 @@ bool StartServer()
 	return server.StartServer();
 }
 
+void ttStartRecording(const char* const fileName)
+{
+
+}
+
+void ttStopRecording()
+{
+
+}
+
+
 void ttSetTrackName(const char* const threadName)
 {
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
@@ -217,7 +227,6 @@ void ttCloseRecord(int recordIndex)
 	frame.CloseEntry(recordIndex);
 }
 
-
 int dTimeTrack::AddEntry(const char* const name)
 {
 	int index = m_count;
@@ -228,7 +237,7 @@ int dTimeTrack::AddEntry(const char* const name)
 	m_nameMap.Insert(name, nameHash);
 	record.m_nameHash = nameHash;
 
-	m_count = (m_count + 1) & (DG_MAX_ENTRIES * 2 - 1);
+	m_count = (m_count + 1) & (DG_TIME_TRACKER_PAGE_ENTRIES * 2 - 1);
 	return index;
 }
 
@@ -237,7 +246,7 @@ void dTimeTrack::CloseEntry(int index)
 	dTimeTarckerRecord& record = m_buffer[index];
 	record.m_end = __rdtsc() - record.m_start;
 
-	int bank = index >> DG_ENTRIES_POWER;
+	int bank = index >> DG_TIME_TRACKER_ENTRIES_POWER;
 	m_banks[bank]--;
 	if (!m_banks[bank]) {
 		SaveBuffer(bank);
@@ -246,13 +255,13 @@ void dTimeTrack::CloseEntry(int index)
 
 void dTimeTrack::SaveBuffer(int bank)
 {
-	int sizeInByte = sizeof (dTimeTarckerRecord) * DG_MAX_ENTRIES;
+	int sizeInByte = sizeof (dTimeTarckerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
 	Bytef* const buffer = dAlloca (Bytef, sizeInByte);
 
 	uLongf destLen;
-	int comporessSize = compress (buffer, &destLen, (Bytef*)&m_buffer[bank * DG_MAX_ENTRIES], sizeInByte);
+	int comporessSize = compress (buffer, &destLen, (Bytef*)&m_buffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
 	dAssert (comporessSize == Z_OK);
 
 
-	m_banks[bank] = DG_MAX_ENTRIES;
+	m_banks[bank] = DG_TIME_TRACKER_PAGE_ENTRIES;
 }

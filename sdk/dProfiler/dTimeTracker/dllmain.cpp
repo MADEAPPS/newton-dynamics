@@ -16,6 +16,7 @@
 
 #pragma warning (disable: 4100) //unreferenced formal parameter
 
+extern bool StartServer();
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,

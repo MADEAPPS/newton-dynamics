@@ -25,6 +25,7 @@
 #define DTIMETRACKER_API __declspec(dllimport)
 #endif
 
+#define DG_TIME_TRACKER_ENTRIES_POWER	10
 
 class dTimeTarckerRecord
 {
@@ -34,7 +35,9 @@ class dTimeTarckerRecord
 	DWORD64 m_nameHash;
 };
 
-bool StartServer();
+
+DTIMETRACKER_API void ttStartRecording(const char* const fileName);
+DTIMETRACKER_API void ttStopRecording();
 
 DTIMETRACKER_API int ttOpenRecord(const char* const name);
 DTIMETRACKER_API void ttCloseRecord(int record);
