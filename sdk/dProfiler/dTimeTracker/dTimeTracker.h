@@ -25,7 +25,7 @@
 #define DTIMETRACKER_API __declspec(dllimport)
 #endif
 
-#define DG_TIME_TRACKER_ENTRIES_POWER	10
+#define DG_TIME_TRACKER_ENTRIES_POWER	13
 
 class dTimeTarckerRecord
 {

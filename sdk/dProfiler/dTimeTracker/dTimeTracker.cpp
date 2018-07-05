@@ -34,26 +34,7 @@ class dTrackeString
 	{
 		strcpy (m_string, src.m_string);
 	}
-/*
-	bool operator== (const dTrackeString& src) const
-	{
-		dAssert(0);
-		return false;
-	}
-
-	bool operator< (const dTrackeString& src) const
-	{
-		dAssert (0);
-		return false;
-	}
-
-	bool operator> (const dTrackeString& src) const
-	{
-		dAssert (0);
-		return false;
-	}
-*/
-	char m_string[64];
+	char m_string[128];
 };
 
 class dTimeTrack
@@ -98,6 +79,7 @@ class dTimeTrackerServer
 		,m_socket(0)
 		,m_trackEnum(0)
 		,m_tracks()
+		,m_currentFile(NULL)
 	{
 		memset(&m_client, 0, sizeof(m_client));
 		memset(&m_server, 0, sizeof(m_server));
@@ -181,6 +163,8 @@ class dTimeTrackerServer
 
 	int m_trackEnum;
 	dTree<dTimeTrack*, DWORD> m_tracks;
+
+	FILE* m_currentFile;
 };
 
 bool StartServer()
@@ -248,6 +232,7 @@ void dTimeTrack::CloseEntry(int index)
 
 	int bank = index >> DG_TIME_TRACKER_ENTRIES_POWER;
 	m_banks[bank]--;
+	dAssert(m_banks[bank] >= 0);
 	if (!m_banks[bank]) {
 		SaveBuffer(bank);
 	}
@@ -255,13 +240,15 @@ void dTimeTrack::CloseEntry(int index)
 
 void dTimeTrack::SaveBuffer(int bank)
 {
-	int sizeInByte = sizeof (dTimeTarckerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
-	Bytef* const buffer = dAlloca (Bytef, sizeInByte);
+	dAssert((bank && (m_count < DG_TIME_TRACKER_PAGE_ENTRIES)) || (!bank && (m_count >= DG_TIME_TRACKER_PAGE_ENTRIES)));
+	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
+	if (server.m_currentFile) {
+		int sizeInByte = sizeof(dTimeTarckerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
+		Bytef* const buffer = dAlloca(Bytef, sizeInByte);
 
-	uLongf destLen;
-	int comporessSize = compress (buffer, &destLen, (Bytef*)&m_buffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
-	dAssert (comporessSize == Z_OK);
-
-
+		uLongf destLen;
+		int comporessSize = compress(buffer, &destLen, (Bytef*)&m_buffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
+		dAssert(comporessSize == Z_OK);
+	}
 	m_banks[bank] = DG_TIME_TRACKER_PAGE_ENTRIES;
 }
