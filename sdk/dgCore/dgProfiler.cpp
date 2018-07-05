@@ -25,6 +25,17 @@
 #ifdef _DG_USE_PROFILER
 #include <dTimeTracker.h>
 
+void dProfilerStartRecording(const char* const fileName)
+{
+	ttStartRecording(fileName);
+}
+
+void dProfilerStopRecording()
+{
+	ttStopRecording();
+}
+
+
 void dProfilerSetTrackName(const char* const name)
 {
 	ttSetTrackName(name);

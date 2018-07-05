@@ -39,16 +39,23 @@ class dgProfile
 
 void dProfilerDeleteTrack();
 void dProfilerSetTrackName(const char* const name);
+void dProfilerStartRecording(const char* const fileName);
+void dProfilerStopRecording();
 
-#define DG_DELETE_TRACK() dProfilerDeleteTrack();
-#define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName);
+#define DG_START_RECORDING(fileName) dProfilerStartRecording(fileName)
+#define DG_STOP_RECORDING() dProfilerStopRecording()
+
+#define DG_DELETE_TRACK() dProfilerDeleteTrack()
+#define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
 #define DG_TRACKTIME(name) dgProfile _profile##name(name);
 
 #else
 
-#define DG_TRACKTIME(name)
-#define DG_SET_TRACK_NAME(trackName)
-#define DG_DELETE_TRACK()
+#define DG_START_RECORDING(fileName);
+#define DG_STOP_RECORDING();
+#define DG_TRACKTIME(name);
+#define DG_SET_TRACK_NAME(trackName);
+#define DG_DELETE_TRACK();
 
 #endif
 

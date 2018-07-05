@@ -951,6 +951,16 @@ void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32
 
 void dgWorld::RunStep ()
 {
+	static int xxxx;
+	if (xxxx == 1000) {
+		DG_START_RECORDING("xxxx.tt");
+	}
+	if (xxxx == 2000) {
+		DG_STOP_RECORDING();
+	}
+	xxxx++;
+
+
 	DG_TRACKTIME(__FUNCTION__);
 	dgUnsigned64 timeAcc = dgGetTimeInMicrosenconds();
 	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
