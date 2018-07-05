@@ -69,6 +69,11 @@ class dTimeTrack
 		strncpy(m_threadName, name, sizeof (m_threadName) - 1);
 	}
 
+	const dTree<dTrackeString, dCRCTYPE>& GetStringMap() const
+	{
+		return m_nameMap;
+	}
+
 	private:
 	void SaveBuffer(int bank);
 
@@ -178,13 +183,38 @@ class dTimeTrackerServer
 			track->Clear();
 		}
 
-		m_currentFile = (FILE*)1000;
+		if (m_currentFile) {
+			StopRecording();
+		}
+
+		m_currentFile = fopen (fileName, "wb");
+		dAssert(m_currentFile);
 		m_baseCount = __rdtsc();
 	}
 
 	void StopRecording()
 	{
-
+		dAssert(m_currentFile);
+		dTree<int, dCRCTYPE> filter;
+		dTree<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
+		for (iter.Begin(); iter; iter++) {
+			dTimeTrack* const track = iter.GetNode()->GetInfo();
+			dTree<dTrackeString, dCRCTYPE>::Iterator nameIter (track->GetStringMap());
+			for (nameIter.Begin(); nameIter; nameIter++) {
+				dCRCTYPE key = nameIter.GetKey();
+				if (!filter.Find(key)) {
+					const dTrackeString& name = nameIter.GetNode()->GetInfo();
+					int size = strlen(name.m_string);
+					fwrite(&key, sizeof(dCRCTYPE), 1, m_currentFile);
+					fwrite(&size, sizeof(int), 1, m_currentFile);
+					fwrite(name.m_string, size,1,  m_currentFile);
+					filter.Insert(0, key);
+				}
+			}
+		}
+		
+		fclose(m_currentFile);
+		m_currentFile = NULL;
 	}
 
 	bool m_initialized;
