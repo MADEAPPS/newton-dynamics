@@ -519,7 +519,8 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 	}
 
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+#if 0
 	dgBodyMasterList& me = *m_world;
 	for (dgBodyMasterList::dgListNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
 		dgBody* const body0 = refNode->GetInfo().GetBody();

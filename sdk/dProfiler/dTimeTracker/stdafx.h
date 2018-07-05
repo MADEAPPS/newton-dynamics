@@ -27,12 +27,11 @@
 #include <thread>
 #include <condition_variable>
 
-
-#include "dCRC.h"
+#include <zlib.h>
+#include <dCRC.h>
 #include <dTree.h>
 #include <dString.h>
 
 
 #endif
 
-// TODO: reference additional headers your program requires here

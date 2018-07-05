@@ -22,6 +22,7 @@
 #include "dgStdafx.h"
 #include "dgTypes.h"
 #include "dgMemory.h"
+#include "dgProfiler.h"
 #include "dgThreadHive.h"
 
 
@@ -85,6 +86,7 @@ dgInt32 dgThreadHive::dgWorkerThread::PushJob(const dgThreadJob& job)
 
 void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	for (dgInt32 i = 0; i < m_jobsCount; i ++) {
 		const dgThreadJob& job = m_jobPool[i];
 		job.m_callback (job.m_context0, job.m_context1, m_id);
@@ -144,10 +146,12 @@ void dgThreadHive::SetThreadsCount (dgInt32 threads)
 void dgThreadHive::QueueJob (dgWorkerThreadTaskCallback callback, void* const context0, void* const context1)
 {
 	if (!m_workerThreadsCount) {
+		DG_TRACKTIME(__FUNCTION__);
 		callback (context0, context1, 0);
 	} else {
 		dgInt32 workerTreadEntry = m_jobsCount % m_workerThreadsCount;
 		#ifdef DG_USE_THREAD_EMULATION
+			DG_TRACKTIME(__FUNCTION__);
 			callback (context0, context1, workerTreadEntry);
 		#else 
 			dgInt32 index = m_workerThreads[workerTreadEntry].PushJob(dgThreadJob(context0, context1, callback));

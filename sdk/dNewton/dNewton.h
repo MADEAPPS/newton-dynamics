@@ -87,7 +87,8 @@ class dNewton: public dNewtonAlloc
 	//CNEWTON_API static int OnBodiesAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 	CNEWTON_API static int OnBodiesAABBOverlap(const NewtonJoint* const contact, dFloat timestep, int threadIndex);
 	CNEWTON_API static void OnContactProcess (const NewtonJoint* const contact, dFloat timestep, int threadIndex);
-	CNEWTON_API static int OnCompoundSubCollisionAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex);
+	//CNEWTON_API static int OnCompoundSubCollisionAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex);
+	CNEWTON_API static int OnCompoundSubCollisionAABBOverlap(const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex);
 
 	NewtonWorld* m_world;
 	dLong m_frequency;

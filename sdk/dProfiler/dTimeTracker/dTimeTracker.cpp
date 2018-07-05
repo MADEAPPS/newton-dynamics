@@ -20,48 +20,60 @@
 #define thread_local __declspec(thread)
 #endif
 
+#define DG_ENTRIES_POWER	10
+#define DG_MAX_ENTRIES		(1<<DG_ENTRIES_POWER)
 
-#define DG_MAX_ENTRIES (1<<12)
-
-class dTimeTrackeFrame
+class dTrackeString
 {
 	public:
-	dTimeTrackeFrame(const char* const name)
+	dTrackeString(const char* const string)
+	{
+		strcpy (m_string, string);
+	}
+
+	dTrackeString(const dTrackeString& src)
+	{
+		strcpy (m_string, src.m_string);
+	}
+/*
+	bool operator== (const dTrackeString& src) const
+	{
+		dAssert(0);
+		return false;
+	}
+
+	bool operator< (const dTrackeString& src) const
+	{
+		dAssert (0);
+		return false;
+	}
+
+	bool operator> (const dTrackeString& src) const
+	{
+		dAssert (0);
+		return false;
+	}
+*/
+	char m_string[64];
+};
+
+class dTimeTrack
+{
+	public:
+	dTimeTrack(const char* const name)
 		:m_count(0)
-		,m_baseCount(0)
 	{
+		m_banks[0] = DG_MAX_ENTRIES;
+		m_banks[1] = DG_MAX_ENTRIES;
 		strncpy (m_threadName, name, sizeof (m_threadName) - 1);
-		m_buffer = new dTimeTarckerRecord[DG_MAX_ENTRIES * 2];
 	}
 
-	~dTimeTrackeFrame()
+	~dTimeTrack()
 	{
-		delete[] m_buffer;
 	}
 
-	int AddEntry(const char* const name)
-	{
-		int index = m_count - m_baseCount;
-		if ((index + 1) == DG_MAX_ENTRIES * 2) {
-			SaveBuffer();
-			index = m_count - m_baseCount;
-		}
-		dTimeTarckerRecord& record = m_buffer[index];
-		record.m_start = __rdtsc();
-
-		dCRCTYPE nameHash = dCRC64(name);
-		m_nameMap.Insert (name, nameHash);
-		record.m_nameHash = nameHash;
-
-		m_count++;
-		return m_count - 1;
-	}
-
-	void CloseEntry(int index)
-	{
-		dTimeTarckerRecord& record = m_buffer[index - m_baseCount];
-		record.m_end = __rdtsc();
-	}
+	int AddEntry(const char* const name);
+	void CloseEntry(int index);
 
 	void SetName(const char* const name)
 	{
@@ -69,17 +81,12 @@ class dTimeTrackeFrame
 	}
 
 	private:
-	void SaveBuffer()
-	{
-		dAssert (0);
-		memcpy(m_buffer, m_buffer + DG_MAX_ENTRIES, DG_MAX_ENTRIES * sizeof(dTimeTarckerRecord));
-		m_baseCount += DG_MAX_ENTRIES;
-	}
+	void SaveBuffer(int bank);
 
 	int m_count;
-	int m_baseCount;
-	dTimeTarckerRecord* m_buffer;
-	dTree<dString, dCRCTYPE> m_nameMap;
+	int m_banks[2];
+	dTimeTarckerRecord m_buffer[DG_MAX_ENTRIES * 2];
+	dTree<dTrackeString, dCRCTYPE> m_nameMap;
 	char m_threadName[64];
 };
 
@@ -100,7 +107,7 @@ class dTimeTrackerServer
 	~dTimeTrackerServer()
 	{
 		while (m_tracks.GetCount()) {
-			dTree<dTimeTrackeFrame*, DWORD>::dTreeNode* const node = m_tracks.GetRoot();
+			dTree<dTimeTrack*, DWORD>::dTreeNode* const node = m_tracks.GetRoot();
 			delete node->GetInfo();
 			m_tracks.Remove(node);
 		}
@@ -142,14 +149,14 @@ class dTimeTrackerServer
 		return m_initialized;
 	}
 
-	dTimeTrackeFrame& GetFrame()
+	dTimeTrack& GetFrame()
 	{
 		// I have to do this because VS 2013 do not fully supports thread_local initialization 
-		static thread_local dTimeTrackeFrame* frame = NULL;
+		static thread_local dTimeTrack* frame = NULL;
 		if (!frame) {
 			char name[64];
 			sprintf(name, "thread_%2d", m_trackEnum);
-			frame = new dTimeTrackeFrame (name);
+			frame = new dTimeTrack (name);
 			DWORD threadID = GetThreadId(GetCurrentThread());
 			m_tracks.Insert(frame, threadID);
 			m_trackEnum ++;
@@ -160,7 +167,7 @@ class dTimeTrackerServer
 	void DeleteTrack()
 	{
 		DWORD threadID = GetThreadId(GetCurrentThread());
-		dTree<dTimeTrackeFrame*, DWORD>::dTreeNode* const node = m_tracks.Find(threadID);
+		dTree<dTimeTrack*, DWORD>::dTreeNode* const node = m_tracks.Find(threadID);
 		if (node) {
 			delete node->GetInfo();
 			m_tracks.Remove(node);
@@ -174,7 +181,7 @@ class dTimeTrackerServer
 	WSADATA m_wsaData;
 
 	int m_trackEnum;
-	dTree<dTimeTrackeFrame*, DWORD> m_tracks;
+	dTree<dTimeTrack*, DWORD> m_tracks;
 };
 
 bool StartServer()
@@ -186,7 +193,7 @@ bool StartServer()
 void ttSetTrackName(const char* const threadName)
 {
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
-	dTimeTrackeFrame& frame = server.GetFrame();
+	dTimeTrack& frame = server.GetFrame();
 	frame.SetName(threadName);
 }
 
@@ -199,13 +206,53 @@ void ttDeleteTrack()
 int ttOpenRecord(const char* const name)
 {
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
-	dTimeTrackeFrame& frame = server.GetFrame();
+	dTimeTrack& frame = server.GetFrame();
 	return frame.AddEntry(name);
 }
 
 void ttCloseRecord(int recordIndex)
 {
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
-	dTimeTrackeFrame& frame = server.GetFrame();
+	dTimeTrack& frame = server.GetFrame();
 	frame.CloseEntry(recordIndex);
+}
+
+
+int dTimeTrack::AddEntry(const char* const name)
+{
+	int index = m_count;
+	dTimeTarckerRecord& record = m_buffer[index];
+	record.m_start = __rdtsc();
+
+	dCRCTYPE nameHash = dCRC64(name);
+	m_nameMap.Insert(name, nameHash);
+	record.m_nameHash = nameHash;
+
+	m_count = (m_count + 1) & (DG_MAX_ENTRIES * 2 - 1);
+	return index;
+}
+
+void dTimeTrack::CloseEntry(int index)
+{
+	dTimeTarckerRecord& record = m_buffer[index];
+	record.m_end = __rdtsc() - record.m_start;
+
+	int bank = index >> DG_ENTRIES_POWER;
+	m_banks[bank]--;
+	if (!m_banks[bank]) {
+		SaveBuffer(bank);
+	}
+}
+
+void dTimeTrack::SaveBuffer(int bank)
+{
+	int sizeInByte = sizeof (dTimeTarckerRecord) * DG_MAX_ENTRIES;
+	Bytef* const buffer = dAlloca (Bytef, sizeInByte);
+
+	uLongf destLen;
+	int comporessSize = compress (buffer, &destLen, (Bytef*)&m_buffer[bank * DG_MAX_ENTRIES], sizeInByte);
+	dAssert (comporessSize == Z_OK);
+
+
+	m_banks[bank] = DG_MAX_ENTRIES;
 }

@@ -23,7 +23,6 @@
 #include "dgThread.h"
 #include "dgProfiler.h"
 
-
 dgThread::dgThread ()
 	:m_id(0)
 	,m_terminate(0)

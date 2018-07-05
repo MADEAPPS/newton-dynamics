@@ -127,8 +127,9 @@ void dNewton::OnContactProcess (dNewtonContactMaterial* const contactMaterial, d
 }
 
 
-int dNewton::OnCompoundSubCollisionAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
+int dNewton::OnCompoundSubCollisionAABBOverlap(const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 {
+	//const NewtonMaterial* const material, 
 	dAssert(NewtonBodyGetWorld(body0) == NewtonBodyGetWorld(body1));
 	dNewton* const world = (dNewton*)NewtonWorldGetUserData(NewtonBodyGetWorld(body0));
 	dNewtonBody* const dBody0 = (dNewtonBody*)NewtonBodyGetUserData(body0);
