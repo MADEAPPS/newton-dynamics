@@ -74,6 +74,11 @@ class dTimeTrack
 		return m_nameMap;
 	}
 
+	const dTimeTarckerRecord* GetBuffer() const
+	{
+		return m_buffer;
+	}
+
 	private:
 	void SaveBuffer(int bank);
 
@@ -217,6 +222,20 @@ class dTimeTrackerServer
 		m_currentFile = NULL;
 	}
 
+	void SaveTrack(dTimeTrack& track, int bank)
+	{
+		int sizeInByte = sizeof(dTimeTarckerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
+		Bytef* const buffer = dAlloca(Bytef, sizeInByte);
+
+		uLongf destLen;
+		const dTimeTarckerRecord* const trackBuffer = track.GetBuffer();
+		int compressError = compress(buffer, &destLen, (Bytef*)&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
+		dAssert(compressError == Z_OK);
+
+		fwrite(&destLen, sizeof(uLongf), 1, m_currentFile);
+		fwrite(buffer, destLen, 1, m_currentFile);
+	}
+
 	bool m_initialized;
 	SOCKET m_socket;
 	SOCKADDR_IN m_client;
@@ -310,12 +329,7 @@ void dTimeTrack::SaveBuffer(int bank)
 	dAssert((bank && (m_count < DG_TIME_TRACKER_PAGE_ENTRIES)) || (!bank && (m_count >= DG_TIME_TRACKER_PAGE_ENTRIES)));
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
 	if (server.m_currentFile) {
-		int sizeInByte = sizeof(dTimeTarckerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
-		Bytef* const buffer = dAlloca(Bytef, sizeInByte);
-
-		uLongf destLen;
-		int comporessSize = compress(buffer, &destLen, (Bytef*)&m_buffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
-		dAssert(comporessSize == Z_OK);
+		server.SaveTrack(*this, bank);
 	}
 	m_banks[bank] = DG_TIME_TRACKER_PAGE_ENTRIES;
 }
