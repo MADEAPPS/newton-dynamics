@@ -25,17 +25,6 @@
 #define DTIMETRACKER_API __declspec(dllimport)
 #endif
 
-#define DG_TIME_TRACKER_ENTRIES_POWER	13
-
-class dTimeTarckerRecord
-{
-	public:
-	unsigned m_start;
-	unsigned m_duration;
-	DWORD64 m_nameHash;
-};
-
-
 DTIMETRACKER_API void ttStartRecording(const char* const fileName);
 DTIMETRACKER_API void ttStopRecording();
 

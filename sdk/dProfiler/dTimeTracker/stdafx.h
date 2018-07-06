@@ -26,8 +26,8 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
-
 #include <zlib.h>
+
 #include <dCRC.h>
 #include <dTree.h>
 #include <dString.h>

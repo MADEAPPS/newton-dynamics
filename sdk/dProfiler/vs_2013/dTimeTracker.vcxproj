@@ -19,6 +19,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dTimeTracker\dTimeTarckerRecord.h" />
     <ClInclude Include="..\dTimeTracker\dTimeTracker.h" />
     <ClInclude Include="..\dTimeTracker\stdafx.h" />
     <ClInclude Include="..\dTimeTracker\targetver.h" />
