@@ -37,6 +37,7 @@ namespace dTimeTrackerViewer {
 	private: System::Windows::Forms::ToolStrip^  toolStrip1;
 	protected:
 	private: System::Windows::Forms::ToolStripButton^  toolStripButton1;
+	private: System::Windows::Forms::OpenFileDialog^  openFileDialog1;
 
 	private:
 		/// <summary>
@@ -54,6 +55,7 @@ namespace dTimeTrackerViewer {
 			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(Form1::typeid));
 			this->toolStrip1 = (gcnew System::Windows::Forms::ToolStrip());
 			this->toolStripButton1 = (gcnew System::Windows::Forms::ToolStripButton());
+			this->openFileDialog1 = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->toolStrip1->SuspendLayout();
 			this->SuspendLayout();
 			// 
@@ -76,6 +78,14 @@ namespace dTimeTrackerViewer {
 			this->toolStripButton1->Text = L"Load Capture";
 			this->toolStripButton1->Click += gcnew System::EventHandler(this, &Form1::toolStripButton1_Click);
 			// 
+			// openFileDialog1
+			// 
+			this->openFileDialog1->DefaultExt = L"tt";
+			this->openFileDialog1->Filter = L"capture  files (*.tt)|*.tt";
+			this->openFileDialog1->InitialDirectory = L"./";
+			this->openFileDialog1->Title = L"Open Capture";
+			this->openFileDialog1->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &Form1::openFileDialog1_FileOk);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -95,6 +105,11 @@ namespace dTimeTrackerViewer {
 	private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
 	}
 	private: System::Void toolStripButton1_Click(System::Object^  sender, System::EventArgs^  e) {
+		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+
+		}
+	}
+	private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
 	}
 	};
 }
