@@ -86,9 +86,10 @@ dgInt32 dgThreadHive::dgWorkerThread::PushJob(const dgThreadJob& job)
 
 void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	//DG_TRACKTIME(__FUNCTION__);
 	for (dgInt32 i = 0; i < m_jobsCount; i ++) {
 		const dgThreadJob& job = m_jobPool[i];
+		DG_TRACKTIME_NAMED(job.m_jobName);
 		job.m_callback (job.m_context0, job.m_context1, m_id);
 	}
 	m_jobsCount = 0;
@@ -154,7 +155,7 @@ void dgThreadHive::QueueJob (dgWorkerThreadTaskCallback callback, void* const co
 			DG_TRACKTIME(functionName);
 			callback (context0, context1, workerTreadEntry);
 		#else 
-			dgInt32 index = m_workerThreads[workerTreadEntry].PushJob(dgThreadJob(context0, context1, callback));
+			dgInt32 index = m_workerThreads[workerTreadEntry].PushJob(dgThreadJob(context0, context1, callback, functionName));
 			if (index >= DG_THREAD_POOL_JOB_SIZE) {
 				dgAssert (0);
 				SynchronizationBarrier ();

@@ -13,8 +13,14 @@
 #define __D_TRACKER_RECORD__
 #include <dCRC.h>
 
-
 #define DG_TIME_TRACKER_ENTRIES_POWER	13
+
+enum dTrackerChunkType
+{
+	m_traceSamples,
+	m_traceLabel,
+	m_traceEnd = 0x7fffffff
+};
 
 class dTimeTarckerRecord
 {

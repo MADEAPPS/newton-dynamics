@@ -42,15 +42,17 @@ class dgThreadHive
 		{
 		}
 
-		dgThreadJob (void* const context0, void* const context1, dgWorkerThreadTaskCallback callback)
+		dgThreadJob (void* const context0, void* const context1, dgWorkerThreadTaskCallback callback, const char* const jobName)
 			:m_context0(context0)
 			,m_context1(context1)
 			,m_callback(callback)
+			,m_jobName(jobName)
 		{
 		}
 
 		void* m_context0;
 		void* m_context1;
+		const char* m_jobName;
 		dgWorkerThreadTaskCallback m_callback;
 	};
 

@@ -49,11 +49,14 @@ void dProfilerStopRecording();
 #define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
 #define DG_TRACKTIME(name) dgProfile _profile##name(name);
 
+#define DG_TRACKTIME_NAMED(name) dgProfile _profile(name);
+
 #else
 
 #define DG_START_RECORDING(fileName);
 #define DG_STOP_RECORDING();
 #define DG_TRACKTIME(name);
+#define DG_TRACKTIME_NAMED(name);
 #define DG_SET_TRACK_NAME(trackName);
 #define DG_DELETE_TRACK();
 

@@ -203,6 +203,8 @@ class dTimeTrackerServer
 		dAssert(m_currentFile);
 		dTree<int, dCRCTYPE> filter;
 		dTree<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
+
+		int chunkType = m_traceLabel;
 		for (iter.Begin(); iter; iter++) {
 			dTimeTrack* const track = iter.GetNode()->GetInfo();
 			dTree<dTrackeString, dCRCTYPE>::Iterator nameIter (track->GetStringMap());
@@ -211,6 +213,7 @@ class dTimeTrackerServer
 				if (!filter.Find(key)) {
 					const dTrackeString& name = nameIter.GetNode()->GetInfo();
 					int size = strlen(name.m_string);
+					fwrite(&chunkType, sizeof(int), 1, m_currentFile);
 					fwrite(&key, sizeof(dCRCTYPE), 1, m_currentFile);
 					fwrite(&size, sizeof(int), 1, m_currentFile);
 					fwrite(name.m_string, size,1,  m_currentFile);
@@ -219,6 +222,8 @@ class dTimeTrackerServer
 			}
 		}
 		
+		chunkType = m_traceEnd;
+		fwrite(&chunkType, sizeof(int), 1, m_currentFile);
 		fclose(m_currentFile);
 		m_currentFile = NULL;
 	}
@@ -233,6 +238,8 @@ class dTimeTrackerServer
 		int compressError = compress(buffer, &destLen, (Bytef*)&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
 		dAssert(compressError == Z_OK);
 
+		int chunkType = m_traceSamples;
+		fwrite(&chunkType, sizeof(int), 1, m_currentFile);
 		fwrite(&destLen, sizeof(uLongf), 1, m_currentFile);
 		fwrite(buffer, destLen, 1, m_currentFile);
 	}

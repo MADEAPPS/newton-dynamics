@@ -30,6 +30,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+*.tt
 *.db
 *.suo
 *.obj
@@ -81,6 +82,3 @@ sdk/dCompilerKit/dNewtonLua/dNewtonLuaParcer.cpp.txt
 sdk/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
 sdk/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 
-
-
-*.tt
