@@ -15,7 +15,7 @@
 
 #include "stdafx.h"
 #include "dTimeTracker.h"
-#include "dTimeTarckerRecord.h"
+#include "dTimeTrackerRecord.h"
 
 #if _MSC_VER < 1900
 #define thread_local __declspec(thread)
