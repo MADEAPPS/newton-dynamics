@@ -54,7 +54,7 @@ namespace dTimeTrackerViewer {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1025, 540);
+			this->ClientSize = System::Drawing::Size(1023, 540);
 			this->Name = L"Form1";
 			this->Text = L"Form1";
 			this->ResumeLayout(false);
