@@ -59,7 +59,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsManaged>true</CompileAsManaged>
-      <AdditionalIncludeDirectories>../../dMath;../../dContainers;../dTimeTracker;../dTimeTrackerViewer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dTimeTracker;../dTimeTrackerViewer</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -75,7 +75,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsManaged>true</CompileAsManaged>
-      <AdditionalIncludeDirectories>../../dMath;../../dContainers;../dTimeTracker;../dTimeTrackerViewer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dTimeTracker;../dTimeTrackerViewer</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

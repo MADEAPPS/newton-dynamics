@@ -46,7 +46,9 @@ class dTimeTrack
 	{
 		m_banks[0] = DG_TIME_TRACKER_PAGE_ENTRIES;
 		m_banks[1] = DG_TIME_TRACKER_PAGE_ENTRIES;
-		strncpy (m_threadName, name, sizeof (m_threadName) - 1);
+		//strncpy (m_threadName, name, sizeof (m_threadName) - 1);
+		m_threadName = unsigned(dCRC64(name));
+		m_nameMap.Insert(name, m_threadName);
 	}
 
 	~dTimeTrack()
@@ -67,10 +69,16 @@ class dTimeTrack
 
 	void SetName(const char* const name)
 	{
-		strncpy(m_threadName, name, sizeof (m_threadName) - 1);
+		m_threadName = unsigned(dCRC64(name));
+		m_nameMap.Insert(name, m_threadName);
 	}
 
-	const dTree<dTrackeString, dCRCTYPE>& GetStringMap() const
+	unsigned GetName() const
+	{
+		return m_threadName;
+	}
+
+	const dTree<dTrackeString, unsigned>& GetStringMap() const
 	{
 		return m_nameMap;
 	}
@@ -86,8 +94,8 @@ class dTimeTrack
 	int m_count;
 	int m_banks[2];
 	dTimeTarckerRecord m_buffer[DG_TIME_TRACKER_PAGE_ENTRIES * 2];
-	dTree<dTrackeString, dCRCTYPE> m_nameMap;
-	char m_threadName[64];
+	dTree<dTrackeString, unsigned> m_nameMap;
+	unsigned m_threadName;
 };
 
 
@@ -201,27 +209,28 @@ class dTimeTrackerServer
 	void StopRecording()
 	{
 		dAssert(m_currentFile);
-		dTree<int, dCRCTYPE> filter;
+		dTree<unsigned, unsigned> filter;
 		dTree<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
-
 		int chunkType = m_traceLabel;
+
 		for (iter.Begin(); iter; iter++) {
+
 			dTimeTrack* const track = iter.GetNode()->GetInfo();
-			dTree<dTrackeString, dCRCTYPE>::Iterator nameIter (track->GetStringMap());
+			dTree<dTrackeString, unsigned>::Iterator nameIter (track->GetStringMap());
 			for (nameIter.Begin(); nameIter; nameIter++) {
-				dCRCTYPE key = nameIter.GetKey();
+				unsigned key = nameIter.GetKey();
 				if (!filter.Find(key)) {
 					const dTrackeString& name = nameIter.GetNode()->GetInfo();
 					int size = strlen(name.m_string);
-					fwrite(&chunkType, sizeof(int), 1, m_currentFile);
-					fwrite(&key, sizeof(dCRCTYPE), 1, m_currentFile);
-					fwrite(&size, sizeof(int), 1, m_currentFile);
+					fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
+					fwrite(&key, sizeof(unsigned), 1, m_currentFile);
+					fwrite(&size, sizeof(unsigned), 1, m_currentFile);
 					fwrite(name.m_string, size,1,  m_currentFile);
-					filter.Insert(0, key);
+					filter.Insert(key, key);
 				}
 			}
 		}
-		
+
 		chunkType = m_traceEnd;
 		fwrite(&chunkType, sizeof(int), 1, m_currentFile);
 		fclose(m_currentFile);
@@ -239,9 +248,12 @@ class dTimeTrackerServer
 		dAssert(compressError == Z_OK);
 
 		int chunkType = m_traceSamples;
-		fwrite(&chunkType, sizeof(int), 1, m_currentFile);
-		fwrite(&destLen, sizeof(uLongf), 1, m_currentFile);
-		fwrite(buffer, destLen, 1, m_currentFile);
+		int size = unsigned (destLen);
+		unsigned threadName = track.GetName();
+		fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
+		fwrite(&threadName, sizeof(unsigned), 1, m_currentFile);
+		fwrite(&size, sizeof(unsigned), 1, m_currentFile);
+		fwrite(buffer, size, 1, m_currentFile);
 	}
 
 	bool m_initialized;
@@ -310,7 +322,7 @@ int dTimeTrack::AddEntry(const char* const name)
 	dTimeTarckerRecord& record = m_buffer[index];
 	record.m_start = server.GetTime();
 
-	dCRCTYPE nameHash = dCRC64(name);
+	unsigned  nameHash = unsigned  (dCRC64(name));
 	m_nameMap.Insert(name, nameHash);
 	record.m_nameHash = nameHash;
 

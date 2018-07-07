@@ -11,7 +11,6 @@
 
 #ifndef __D_TRACKER_RECORD__
 #define __D_TRACKER_RECORD__
-#include <dCRC.h>
 
 #define DG_TIME_TRACKER_ENTRIES_POWER	13
 
@@ -27,7 +26,7 @@ class dTimeTarckerRecord
 	public:
 	unsigned m_start;
 	unsigned m_duration;
-	dCRCTYPE m_nameHash;
+	unsigned m_nameHash;
 };
 
 #endif
