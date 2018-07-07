@@ -43,12 +43,12 @@ class dTimeTrack
 	public:
 	dTimeTrack(const char* const name)
 		:m_count(0)
+		,m_threadName (name)
 	{
 		m_banks[0] = DG_TIME_TRACKER_PAGE_ENTRIES;
 		m_banks[1] = DG_TIME_TRACKER_PAGE_ENTRIES;
-		//strncpy (m_threadName, name, sizeof (m_threadName) - 1);
-		m_threadName = unsigned(dCRC64(name));
-		m_nameMap.Insert(name, m_threadName);
+		//m_threadName = unsigned(dCRC64(name));
+		//m_nameMap.Insert(name, m_threadName);
 	}
 
 	~dTimeTrack()
@@ -69,16 +69,17 @@ class dTimeTrack
 
 	void SetName(const char* const name)
 	{
-		m_threadName = unsigned(dCRC64(name));
-		m_nameMap.Insert(name, m_threadName);
+//		m_threadName = unsigned(dCRC64(name));
+//		m_nameMap.Insert(name, m_threadName);
+		m_threadName = name;
 	}
 
-	unsigned GetName() const
+	const dTrackeString& GetName() const
 	{
 		return m_threadName;
 	}
 
-	const dTree<dTrackeString, unsigned>& GetStringMap() const
+	dTree<dTrackeString, unsigned>& GetStringMap()
 	{
 		return m_nameMap;
 	}
@@ -95,7 +96,7 @@ class dTimeTrack
 	int m_banks[2];
 	dTimeTarckerRecord m_buffer[DG_TIME_TRACKER_PAGE_ENTRIES * 2];
 	dTree<dTrackeString, unsigned> m_nameMap;
-	unsigned m_threadName;
+	dTrackeString m_threadName;
 };
 
 
@@ -214,9 +215,14 @@ class dTimeTrackerServer
 		int chunkType = m_traceLabel;
 
 		for (iter.Begin(); iter; iter++) {
-
 			dTimeTrack* const track = iter.GetNode()->GetInfo();
-			dTree<dTrackeString, unsigned>::Iterator nameIter (track->GetStringMap());
+			dTree<dTrackeString, unsigned>& nameMap = track->GetStringMap();
+
+			const dTrackeString& threadName = track->GetName();
+			unsigned threadNameCrc = unsigned(dCRC64(threadName.m_string));
+			nameMap.Insert(threadName, threadNameCrc);
+
+			dTree<dTrackeString, unsigned>::Iterator nameIter (nameMap);
 			for (nameIter.Begin(); nameIter; nameIter++) {
 				unsigned key = nameIter.GetKey();
 				if (!filter.Find(key)) {
@@ -249,9 +255,11 @@ class dTimeTrackerServer
 
 		int chunkType = m_traceSamples;
 		int size = unsigned (destLen);
-		unsigned threadName = track.GetName();
+		const dTrackeString& threadName = track.GetName();
+		unsigned threadNameCrc = unsigned(dCRC64(threadName.m_string));
+
 		fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
-		fwrite(&threadName, sizeof(unsigned), 1, m_currentFile);
+		fwrite(&threadNameCrc, sizeof(unsigned), 1, m_currentFile);
 		fwrite(&size, sizeof(unsigned), 1, m_currentFile);
 		fwrite(buffer, size, 1, m_currentFile);
 	}

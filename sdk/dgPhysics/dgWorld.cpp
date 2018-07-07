@@ -955,7 +955,7 @@ void dgWorld::RunStep ()
 	if (xxxx == 100) {
 		DG_START_RECORDING("../../../../sdk/dProfiler/xxxx.tt");
 	}
-	if (xxxx == 500) {
+	if (xxxx == 800) {
 		DG_STOP_RECORDING();
 	}
 	xxxx++;
