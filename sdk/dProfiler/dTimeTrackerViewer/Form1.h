@@ -82,7 +82,6 @@ namespace dTimeTrackerViewer {
 			// 
 			this->openFileDialog1->DefaultExt = L"tt";
 			this->openFileDialog1->Filter = L"capture  files (*.tt)|*.tt";
-			this->openFileDialog1->InitialDirectory = L"./";
 			this->openFileDialog1->Title = L"Open Capture";
 			this->openFileDialog1->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &Form1::openFileDialog1_FileOk);
 			// 
@@ -106,7 +105,13 @@ namespace dTimeTrackerViewer {
 	}
 	private: System::Void toolStripButton1_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
-
+			String^ fileName(openFileDialog1->InitialDirectory + openFileDialog1->FileName);
+//			char stringName[2048];
+//			for (int i = 0; i < fileName->Length; i ++) {
+//				stringName[i] = char (fileName[i]);
+//			}
+//			stringName[fileName->Length] = 0;
+//			FILE* file = fopen(stringName, "rb");
 		}
 	}
 	private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
