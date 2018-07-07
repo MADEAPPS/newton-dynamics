@@ -473,21 +473,23 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 	m_world->GetBroadPhase()->CheckStaticDynamic(this, mass);
 
 	if (mass >= DG_INFINITE_MASS) {
+		if (m_masterNode) {
+			if (m_invMass.m_w != dgFloat32 (0.0f)) {
+				dgBodyMasterList& masterList (*m_world);
+				if (masterList.GetFirst() != m_masterNode) {
+					masterList.InsertAfter (masterList.GetFirst(), m_masterNode);
+				}
+			}
+		}
+
 		m_mass.m_x = DG_INFINITE_MASS;
 		m_mass.m_y = DG_INFINITE_MASS;
 		m_mass.m_z = DG_INFINITE_MASS;
 		m_mass.m_w = DG_INFINITE_MASS;
-		m_invMass.m_x = dgFloat32 (0.0f);
-		m_invMass.m_y = dgFloat32 (0.0f);
-		m_invMass.m_z = dgFloat32 (0.0f);
-		m_invMass.m_w = dgFloat32 (0.0f);
-
-		if (m_masterNode) {
-			dgBodyMasterList& masterList (*m_world);
-			if (masterList.GetFirst() != m_masterNode) {
-				masterList.InsertAfter (masterList.GetFirst(), m_masterNode);
-			}
-		}
+		m_invMass.m_x = dgFloat32(0.0f);
+		m_invMass.m_y = dgFloat32(0.0f);
+		m_invMass.m_z = dgFloat32(0.0f);
+		m_invMass.m_w = dgFloat32(0.0f);
 
 	} else {
 		Ixx = dgAbs (Ixx);
@@ -502,6 +504,13 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		dgAssert (Iyy > dgFloat32 (0.0f));
 		dgAssert (Izz > dgFloat32 (0.0f));
 
+		if (m_masterNode) {
+			if (m_invMass.m_w == dgFloat32 (0.0f)) {
+				dgBodyMasterList& masterList(*m_world);
+				masterList.RotateToEnd(m_masterNode);
+			}
+		}
+
 		m_mass.m_x = Ixx1;
 		m_mass.m_y = Iyy1;
 		m_mass.m_z = Izz1;
@@ -511,11 +520,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		m_invMass.m_y = dgFloat32 (1.0f) / Iyy1;
 		m_invMass.m_z = dgFloat32 (1.0f) / Izz1;
 		m_invMass.m_w = dgFloat32 (1.0f) / mass;
-
-		if (m_masterNode) {
-			dgBodyMasterList& masterList (*m_world);
-			masterList.RotateToEnd (m_masterNode);
-		}
 	}
 
 
