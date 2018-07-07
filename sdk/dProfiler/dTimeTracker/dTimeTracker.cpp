@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "dTimeTracker.h"
 #include "dTimeTrackerRecord.h"
+#include "dTimeTrackerMap.h"
 
 #if _MSC_VER < 1900
 #define thread_local __declspec(thread)
@@ -47,8 +48,6 @@ class dTimeTrack
 	{
 		m_banks[0] = DG_TIME_TRACKER_PAGE_ENTRIES;
 		m_banks[1] = DG_TIME_TRACKER_PAGE_ENTRIES;
-		//m_threadName = unsigned(dCRC64(name));
-		//m_nameMap.Insert(name, m_threadName);
 	}
 
 	~dTimeTrack()
@@ -62,6 +61,7 @@ class dTimeTrack
 		m_banks[1] = DG_TIME_TRACKER_PAGE_ENTRIES;
 		memset (m_buffer, 0, sizeof (m_buffer));
 		m_nameMap.RemoveAll();
+		//m_nameMap.clear();
 	}
 
 	int AddEntry(const char* const name);
@@ -69,8 +69,6 @@ class dTimeTrack
 
 	void SetName(const char* const name)
 	{
-//		m_threadName = unsigned(dCRC64(name));
-//		m_nameMap.Insert(name, m_threadName);
 		m_threadName = name;
 	}
 
@@ -79,7 +77,7 @@ class dTimeTrack
 		return m_threadName;
 	}
 
-	dTree<dTrackeString, unsigned>& GetStringMap()
+	dTimeTrackerMap<dTrackeString, unsigned>& GetStringMap()
 	{
 		return m_nameMap;
 	}
@@ -95,7 +93,7 @@ class dTimeTrack
 	int m_count;
 	int m_banks[2];
 	dTimeTarckerRecord m_buffer[DG_TIME_TRACKER_PAGE_ENTRIES * 2];
-	dTree<dTrackeString, unsigned> m_nameMap;
+	dTimeTrackerMap<dTrackeString, unsigned> m_nameMap;
 	dTrackeString m_threadName;
 };
 
@@ -118,7 +116,7 @@ class dTimeTrackerServer
 	~dTimeTrackerServer()
 	{
 		while (m_tracks.GetCount()) {
-			dTree<dTimeTrack*, DWORD>::dTreeNode* const node = m_tracks.GetRoot();
+			dTimeTrackerMap<dTimeTrack*, DWORD>::dTreeNode* const node = m_tracks.GetRoot();
 			delete node->GetInfo();
 			m_tracks.Remove(node);
 		}
@@ -183,7 +181,7 @@ class dTimeTrackerServer
 	void DeleteTrack()
 	{
 		DWORD threadID = GetThreadId(GetCurrentThread());
-		dTree<dTimeTrack*, DWORD>::dTreeNode* const node = m_tracks.Find(threadID);
+		dTimeTrackerMap<dTimeTrack*, DWORD>::dTreeNode* const node = m_tracks.Find(threadID);
 		if (node) {
 			delete node->GetInfo();
 			m_tracks.Remove(node);
@@ -192,7 +190,7 @@ class dTimeTrackerServer
 
 	void StartRecording(const char* const fileName)
 	{
-		dTree<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
+		dTimeTrackerMap<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
 		for (iter.Begin(); iter; iter++) {
 			dTimeTrack* const track = iter.GetNode()->GetInfo();
 			track->Clear();
@@ -210,19 +208,18 @@ class dTimeTrackerServer
 	void StopRecording()
 	{
 		dAssert(m_currentFile);
-		dTree<unsigned, unsigned> filter;
-		dTree<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
+		dTimeTrackerMap<unsigned, unsigned> filter;
+		dTimeTrackerMap<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
 		int chunkType = m_traceLabel;
-
 		for (iter.Begin(); iter; iter++) {
 			dTimeTrack* const track = iter.GetNode()->GetInfo();
-			dTree<dTrackeString, unsigned>& nameMap = track->GetStringMap();
+			dTimeTrackerMap<dTrackeString, unsigned>& nameMap = track->GetStringMap();
 
 			const dTrackeString& threadName = track->GetName();
 			unsigned threadNameCrc = unsigned(dCRC64(threadName.m_string));
 			nameMap.Insert(threadName, threadNameCrc);
 
-			dTree<dTrackeString, unsigned>::Iterator nameIter (nameMap);
+			dTimeTrackerMap<dTrackeString, unsigned>::Iterator nameIter (nameMap);
 			for (nameIter.Begin(); nameIter; nameIter++) {
 				unsigned key = nameIter.GetKey();
 				if (!filter.Find(key)) {
@@ -237,9 +234,13 @@ class dTimeTrackerServer
 			}
 		}
 
+		chunkType = 0;
+		fwrite(&chunkType, sizeof(int), 1, m_currentFile);
+
 		chunkType = m_traceEnd;
 		fwrite(&chunkType, sizeof(int), 1, m_currentFile);
 		fclose(m_currentFile);
+
 		m_currentFile = NULL;
 	}
 
@@ -271,7 +272,7 @@ class dTimeTrackerServer
 	WSADATA m_wsaData;
 
 	int m_trackEnum;
-	dTree<dTimeTrack*, DWORD> m_tracks;
+	dTimeTrackerMap<dTimeTrack*, DWORD> m_tracks;
 
 	DWORD64 m_baseCount;
 	FILE* m_currentFile;

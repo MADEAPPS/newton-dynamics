@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dTimeTrackerRecord.h"
+#include "dProfilerTrace.h"
 
 namespace dTimeTrackerViewer {
 
@@ -41,6 +42,7 @@ namespace dTimeTrackerViewer {
 	private: System::Windows::Forms::ToolStripButton^  toolStripButton1;
 	private: System::Windows::Forms::OpenFileDialog^  openFileDialog1;
 
+	dProfilerTrace^ m_database; 
 	private:
 		/// <summary>
 		/// Required designer variable.
@@ -112,7 +114,7 @@ namespace dTimeTrackerViewer {
 			if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
 				System::IO::Stream^ file = openFileDialog1->OpenFile();
 				if (file != nullptr) {
-					ParseFile(file);
+					m_database = gcnew dProfilerTrace(file);
 					file->Close();
 				}
 			}
@@ -120,39 +122,6 @@ namespace dTimeTrackerViewer {
 
 		private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) 
 		{
-		}
-
-		 private: int ReadInt(System::IO::Stream^ file)
-		 {
-			 char code[4];
-			 code[0] = file->ReadByte();
-			 code[1] = file->ReadByte();
-			 code[2] = file->ReadByte();
-			 code[3] = file->ReadByte();
-			 return *(int*)&code[0];
-		 }
-
-		private: System::Void ParseFile(System::IO::Stream^ file)
-		{
-			while (1)
-			{
-				dTrackerChunkType chunkType = (dTrackerChunkType)ReadInt(file);
-				switch (chunkType)
-				{
-					case m_traceSamples:
-					{
-						//assert(0);
-						return;
-						break;
-					}
-
-					default:
-						assert(0);
-						break;
-				}
-
-			}
-			
 		}
 	};
 }

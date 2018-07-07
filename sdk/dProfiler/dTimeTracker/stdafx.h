@@ -29,8 +29,7 @@
 #include <zlib.h>
 
 #include <dCRC.h>
-#include <dTree.h>
-#include <dString.h>
+
 
 
 #endif

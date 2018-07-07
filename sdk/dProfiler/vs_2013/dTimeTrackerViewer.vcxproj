@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dTimeTrackerViewer\AssemblyInfo.cpp" />
+    <ClCompile Include="..\dTimeTrackerViewer\dProfilerTrace.cpp" />
     <ClCompile Include="..\dTimeTrackerViewer\dTimeTrackerViewer.cpp" />
     <ClCompile Include="..\dTimeTrackerViewer\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -104,6 +105,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dTimeTrackerViewer\dProfilerTrace.h" />
     <ClInclude Include="..\dTimeTracker\dTimeTrackerRecord.h" />
     <ClInclude Include="..\dTimeTrackerViewer\Form1.h">
       <FileType>CppForm</FileType>
