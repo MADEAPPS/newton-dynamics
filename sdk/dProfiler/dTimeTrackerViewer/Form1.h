@@ -1,5 +1,7 @@
 #pragma once
 
+#include "dTimeTrackerRecord.h"
+
 namespace dTimeTrackerViewer {
 
 	using namespace System;
@@ -101,21 +103,57 @@ namespace dTimeTrackerViewer {
 
 		}
 #pragma endregion
-	private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
-	}
-	private: System::Void toolStripButton1_Click(System::Object^  sender, System::EventArgs^  e) {
-		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
-			String^ fileName(openFileDialog1->InitialDirectory + openFileDialog1->FileName);
-//			char stringName[2048];
-//			for (int i = 0; i < fileName->Length; i ++) {
-//				stringName[i] = char (fileName[i]);
-//			}
-//			stringName[fileName->Length] = 0;
-//			FILE* file = fopen(stringName, "rb");
+		private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) 
+		{
 		}
-	}
-	private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
-	}
+
+		private: System::Void toolStripButton1_Click(System::Object^  sender, System::EventArgs^  e) 
+		{
+			if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+				System::IO::Stream^ file = openFileDialog1->OpenFile();
+				if (file != nullptr) {
+					ParseFile(file);
+					file->Close();
+				}
+			}
+		}
+
+		private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) 
+		{
+		}
+
+		 private: int ReadInt(System::IO::Stream^ file)
+		 {
+			 char code[4];
+			 code[0] = file->ReadByte();
+			 code[1] = file->ReadByte();
+			 code[2] = file->ReadByte();
+			 code[3] = file->ReadByte();
+			 return *(int*)&code[0];
+		 }
+
+		private: System::Void ParseFile(System::IO::Stream^ file)
+		{
+			while (1)
+			{
+				dTrackerChunkType chunkType = (dTrackerChunkType)ReadInt(file);
+				switch (chunkType)
+				{
+					case m_traceSamples:
+					{
+						//assert(0);
+						return;
+						break;
+					}
+
+					default:
+						assert(0);
+						break;
+				}
+
+			}
+			
+		}
 	};
 }
 
