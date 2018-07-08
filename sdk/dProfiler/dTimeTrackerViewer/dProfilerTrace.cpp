@@ -2,6 +2,7 @@
 #include "dProfilerTrace.h"
 
 
+
 ref class dProfilerTrace::dDataBase
 {
 	public: dDataBase(System::IO::Stream^ file)
@@ -53,6 +54,8 @@ ref class dProfilerTrace::dDataBase
 dProfilerTrace::dProfilerTrace(System::IO::Stream^ file)
 	:m_dictionary(nullptr)
 {
+	m_rootNode = gcnew dTraceCapture;
+
 	dDataBase^ database = gcnew dDataBase(file); 
 	for (dTrackerChunkType chunkType = database->ReadChunkType(); chunkType != m_traceEnd; chunkType = database->ReadChunkType()) {
 		switch (chunkType) 
@@ -93,7 +96,7 @@ void dProfilerTrace::ReadTrack(dDataBase^ database)
 
 void dProfilerTrace::ReadLabels(dDataBase^ database)
 {
-	m_dictionary = new dTimeTrackerMap<dTrackeString, unsigned>;
+	m_dictionary = new dTimeTrackerMap<dTrackerString, unsigned>;
 	for (dTrackerChunkType chunkType = database->ReadChunkType(); chunkType == m_traceLabel; chunkType = database->ReadChunkType()) {
 		char name[1024];
 		unsigned key = database->ReadInt();

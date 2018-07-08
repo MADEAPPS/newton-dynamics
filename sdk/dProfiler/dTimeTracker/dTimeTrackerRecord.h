@@ -14,30 +14,6 @@
 
 #define DG_TIME_TRACKER_ENTRIES_POWER	13
 
-class dTrackeString
-{
-	public:
-	dTrackeString(const char* const string)
-	{
-		Copy(string);
-	}
-
-	dTrackeString(const dTrackeString& src)
-	{
-		Copy(src.m_string);
-	}
-
-	void Copy(const char* const src)
-	{
-		int i = 0;
-		do {
-			m_string[i] = src[i];
-			i ++;
-
-		} while (src[i]);
-	}
-	char m_string[128];
-};
 
 
 enum dTrackerChunkType
@@ -45,14 +21,6 @@ enum dTrackerChunkType
 	m_traceSamples,
 	m_traceLabel,
 	m_traceEnd = 0x7fffffff
-};
-
-class dTimeTarckerRecord
-{
-	public:
-	unsigned m_start;
-	unsigned m_duration;
-	unsigned m_nameHash;
 };
 
 #endif

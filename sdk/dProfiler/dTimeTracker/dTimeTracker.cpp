@@ -27,6 +27,37 @@
 class dTimeTrack
 {
 	public:
+	class dTrackerString
+	{
+		public:
+		dTrackerString(const char* const string)
+		{
+			Copy(string);
+		}
+
+		dTrackerString(const dTrackerString& src)
+		{
+			Copy(src.m_string);
+		}
+
+		void Copy(const char* const src)
+		{
+			int i = 0;
+			do {
+				m_string[i] = src[i];
+			} while (src[i++]);
+		}
+		char m_string[128];
+	};
+
+	class dTimeTrackerRecord
+	{
+		public:
+		unsigned m_start;
+		unsigned m_duration;
+		unsigned m_nameHash;
+	};
+
 	dTimeTrack(const char* const name)
 		:m_count(0)
 		,m_threadName (name)
@@ -57,17 +88,17 @@ class dTimeTrack
 		m_threadName = name;
 	}
 
-	const dTrackeString& GetName() const
+	const dTrackerString& GetName() const
 	{
 		return m_threadName;
 	}
 
-	dTimeTrackerMap<dTrackeString, unsigned>& GetStringMap()
+	dTimeTrackerMap<dTrackerString, unsigned>& GetStringMap()
 	{
 		return m_nameMap;
 	}
 
-	const dTimeTarckerRecord* GetBuffer() const
+	const dTimeTrackerRecord* GetBuffer() const
 	{
 		return m_buffer;
 	}
@@ -77,9 +108,9 @@ class dTimeTrack
 
 	int m_count;
 	int m_banks[2];
-	dTimeTarckerRecord m_buffer[DG_TIME_TRACKER_PAGE_ENTRIES * 2];
-	dTimeTrackerMap<dTrackeString, unsigned> m_nameMap;
-	dTrackeString m_threadName;
+	dTimeTrackerRecord m_buffer[DG_TIME_TRACKER_PAGE_ENTRIES * 2];
+	dTimeTrackerMap<dTrackerString, unsigned> m_nameMap;
+	dTrackerString m_threadName;
 };
 
 
@@ -199,17 +230,17 @@ class dTimeTrackerServer
 		fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
 		for (iter.Begin(); iter; iter++) {
 			dTimeTrack* const track = iter.GetNode()->GetInfo();
-			dTimeTrackerMap<dTrackeString, unsigned>& nameMap = track->GetStringMap();
+			dTimeTrackerMap<dTimeTrack::dTrackerString, unsigned>& nameMap = track->GetStringMap();
 
-			const dTrackeString& threadName = track->GetName();
+			const dTimeTrack::dTrackerString& threadName = track->GetName();
 			unsigned threadNameCrc = unsigned(dCRC64(threadName.m_string));
 			nameMap.Insert(threadName, threadNameCrc);
 
-			dTimeTrackerMap<dTrackeString, unsigned>::Iterator nameIter (nameMap);
+			dTimeTrackerMap<dTimeTrack::dTrackerString, unsigned>::Iterator nameIter (nameMap);
 			for (nameIter.Begin(); nameIter; nameIter++) {
 				unsigned key = nameIter.GetKey();
 				if (!filter.Find(key)) {
-					const dTrackeString& name = nameIter.GetNode()->GetInfo();
+					const dTimeTrack::dTrackerString& name = nameIter.GetNode()->GetInfo();
 					int size = strlen(name.m_string);
 					fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
 					fwrite(&key, sizeof(unsigned), 1, m_currentFile);
@@ -232,17 +263,17 @@ class dTimeTrackerServer
 
 	void SaveTrack(dTimeTrack& track, int bank)
 	{
-		int sizeInByte = sizeof(dTimeTarckerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
+		int sizeInByte = sizeof(dTimeTrack::dTimeTrackerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
 		Bytef* const buffer = dAlloca(Bytef, sizeInByte);
 
 		uLongf destLen;
-		const dTimeTarckerRecord* const trackBuffer = track.GetBuffer();
+		const dTimeTrack::dTimeTrackerRecord* const trackBuffer = track.GetBuffer();
 		int compressError = compress(buffer, &destLen, (Bytef*)&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
 		dAssert(compressError == Z_OK);
 
 		int chunkType = m_traceSamples;
 		int size = unsigned (destLen);
-		const dTrackeString& threadName = track.GetName();
+		const dTimeTrack::dTrackerString& threadName = track.GetName();
 		unsigned threadNameCrc = unsigned(dCRC64(threadName.m_string));
 
 		fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
@@ -314,7 +345,7 @@ int dTimeTrack::AddEntry(const char* const name)
 {
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
 	int index = m_count;
-	dTimeTarckerRecord& record = m_buffer[index];
+	dTimeTrackerRecord& record = m_buffer[index];
 	record.m_start = server.GetTime();
 
 	unsigned  nameHash = unsigned  (dCRC64(name));
@@ -328,7 +359,7 @@ int dTimeTrack::AddEntry(const char* const name)
 void dTimeTrack::CloseEntry(int index)
 {
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
-	dTimeTarckerRecord& record = m_buffer[index];
+	dTimeTrackerRecord& record = m_buffer[index];
 	record.m_duration = server.GetTime() - record.m_start;
 
 	int bank = index >> DG_TIME_TRACKER_ENTRIES_POWER;
