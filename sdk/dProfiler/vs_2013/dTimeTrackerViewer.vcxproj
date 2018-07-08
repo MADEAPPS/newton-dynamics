@@ -58,7 +58,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>../dTimeTracker;../dTimeTrackerViewer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dTimeTracker;../dTimeTrackerViewer;../../thirdParty/zlib-1.2.11</AdditionalIncludeDirectories>
       <CompileAsManaged>true</CompileAsManaged>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>../dTimeTracker;../dTimeTrackerViewer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dTimeTracker;../dTimeTrackerViewer;../../thirdParty/zlib-1.2.11</AdditionalIncludeDirectories>
       <CompileAsManaged>true</CompileAsManaged>
     </ClCompile>
     <Link>
@@ -121,6 +121,11 @@
     <EmbeddedResource Include="..\dTimeTrackerViewer\Form1.resx">
       <DependentUpon>..\dTimeTrackerViewer\Form1.h</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\thirdParty\zlib-1.2.11\vs_2013_static_mt\zlib.vcxproj">
+      <Project>{f6c16e64-a07f-49cd-ab90-19733163792b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

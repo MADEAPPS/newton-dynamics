@@ -32,30 +32,15 @@ class dTimeTrack
 		public:
 		dTrackerString(const char* const string)
 		{
-			Copy(string);
+			strncpy (m_string, string, sizeof (m_string) - 1);
 		}
 
 		dTrackerString(const dTrackerString& src)
 		{
-			Copy(src.m_string);
+			strcpy (m_string, src.m_string);
 		}
 
-		void Copy(const char* const src)
-		{
-			int i = 0;
-			do {
-				m_string[i] = src[i];
-			} while (src[i++]);
-		}
 		char m_string[128];
-	};
-
-	class dTimeTrackerRecord
-	{
-		public:
-		unsigned m_start;
-		unsigned m_duration;
-		unsigned m_nameHash;
 	};
 
 	dTimeTrack(const char* const name)
@@ -77,7 +62,6 @@ class dTimeTrack
 		m_banks[1] = DG_TIME_TRACKER_PAGE_ENTRIES;
 		memset (m_buffer, 0, sizeof (m_buffer));
 		m_nameMap.RemoveAll();
-		//m_nameMap.clear();
 	}
 
 	int AddEntry(const char* const name);
@@ -263,11 +247,11 @@ class dTimeTrackerServer
 
 	void SaveTrack(dTimeTrack& track, int bank)
 	{
-		int sizeInByte = sizeof(dTimeTrack::dTimeTrackerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
+		int sizeInByte = sizeof(dTimeTrackerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
 		Bytef* const buffer = dAlloca(Bytef, sizeInByte);
 
 		uLongf destLen;
-		const dTimeTrack::dTimeTrackerRecord* const trackBuffer = track.GetBuffer();
+		const dTimeTrackerRecord* const trackBuffer = track.GetBuffer();
 		int compressError = compress(buffer, &destLen, (Bytef*)&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
 		dAssert(compressError == Z_OK);
 

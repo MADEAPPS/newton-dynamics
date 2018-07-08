@@ -15,12 +15,20 @@
 #define DG_TIME_TRACKER_ENTRIES_POWER	13
 
 
-
 enum dTrackerChunkType
 {
 	m_traceSamples,
 	m_traceLabel,
 	m_traceEnd = 0x7fffffff
 };
+
+class dTimeTrackerRecord
+{
+	public:
+	unsigned m_start;
+	unsigned m_duration;
+	unsigned m_nameHash;
+};
+
 
 #endif

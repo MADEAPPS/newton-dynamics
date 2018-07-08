@@ -1,7 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dTimeTrackerViewer", "dTimeTrackerViewer.vcxproj", "{5F8B5B74-52FA-4787-A298-B78AB8C04417}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\thirdParty\zlib-1.2.11\vs_2013_static_mt\zlib.vcxproj", "{F6C16E64-A07F-49CD-AB90-19733163792B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,10 @@ Global
 		{5F8B5B74-52FA-4787-A298-B78AB8C04417}.Debug|Win32.Build.0 = Debug|Win32
 		{5F8B5B74-52FA-4787-A298-B78AB8C04417}.Release|Win32.ActiveCfg = Release|Win32
 		{5F8B5B74-52FA-4787-A298-B78AB8C04417}.Release|Win32.Build.0 = Release|Win32
+		{F6C16E64-A07F-49CD-AB90-19733163792B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F6C16E64-A07F-49CD-AB90-19733163792B}.Debug|Win32.Build.0 = Debug|Win32
+		{F6C16E64-A07F-49CD-AB90-19733163792B}.Release|Win32.ActiveCfg = Release|Win32
+		{F6C16E64-A07F-49CD-AB90-19733163792B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

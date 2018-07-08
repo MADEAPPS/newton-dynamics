@@ -3,70 +3,44 @@
 #include "dTimeTrackerMap.h"
 #include "dTimeTrackerRecord.h"
 
-class dTrackerString
-{
-	public:
-	dTrackerString(const char* const string)
-	{
-		Copy(string);
-	}
-
-	dTrackerString(const dTrackerString& src)
-	{
-		Copy(src.m_string);
-	}
-
-	void Copy(const char* const src)
-	{
-		int i = 0;
-		do {
-			m_string[i] = src[i];
-		} while (src[i++]);
-	}
-
-	char m_string[128];
-};
 
 
 ref class dProfilerTrace
 {
 	ref class dDataBase;
-	ref class dTrackNode 
+
+	ref class dTrace
 	{
-		public: dTrackNode ()
-			:m_children (gcnew array<dTrackNode^>(0))
-		{
-		}
-		virtual ~dTrackNode()
+		public: dTrace()
+			:m_children (gcnew array<dTrace^>(0))
 		{
 		}
 
-		array<dTrackNode^>^ m_children;
+		unsigned m_name;
+		unsigned m_start;
+		unsigned m_duration;
+		
+		array<dTrace^>^ m_children; 
 	};
 
-	ref class dThreadTrace: public dTrackNode 
+	ref class dThread
 	{
-		public: dThreadTrace(unsigned threadName)
-			:dTrackNode()
-			,m_threadName(threadName)
-			,m_name(gcnew array<unsigned>(0))
-			,m_start(gcnew array<unsigned>(0))
-			,m_duration(gcnew array<unsigned>(0))
+		public: dThread(unsigned threadName)
+			:m_frames (gcnew array<dTrace^>(0))
 		{
 		}
 
-		unsigned m_threadName;
-		array<unsigned>^ m_name; 
-		array<unsigned>^ m_start; 
-		array<unsigned>^ m_duration; 
+		array<dTrace^>^ m_frames; 
 	};
 
-	ref class dTraceCapture: public dTrackNode 
+	ref class dTraceCapture
 	{
 		public: dTraceCapture ()
-			:dTrackNode ()
+			:m_treads (gcnew array<dThread^>(0))
 		{
 		}
+
+		array<dThread^>^ m_treads;
 	};
 
 	public: dProfilerTrace(System::IO::Stream^ file);
@@ -76,6 +50,6 @@ ref class dProfilerTrace
 	private: void ReadLabels(dDataBase^ database);
 
 	dTraceCapture^ m_rootNode;
-	dTimeTrackerMap<dTrackerString, unsigned>* m_dictionary;	
+	array<System::String^>^ m_nameList;
 };
 

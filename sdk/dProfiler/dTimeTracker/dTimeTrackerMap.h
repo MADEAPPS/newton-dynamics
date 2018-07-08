@@ -776,7 +776,7 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 	}
 	m_count	++;
 
-	ptr = new (GetAllocator().Alloc()) dTreeNode (key, parent);
+	ptr = new dTreeNode (key, parent);
 	if (!parent) {
 		m_head = ptr;
 	} else {
@@ -786,7 +786,7 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 			parent->m_right = ptr;
 		}
 	}
-	ptr->InsertFixup ((dTrackerRedBlackTree**)&m_head);
+	ptr->InsertFixup ((dTreeNode**)&m_head);
 	return ptr;
 }
 
@@ -896,7 +896,7 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 		}
 	}
 
-	ptr = new (GetAllocator().Alloc()) dTreeNode (element, key, parent);
+	ptr = new dTreeNode (element, key, parent);
 	if (!parent) {
 		m_head = ptr;
 	} else {
