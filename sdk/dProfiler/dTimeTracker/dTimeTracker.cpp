@@ -24,21 +24,6 @@
 
 #define DG_TIME_TRACKER_PAGE_ENTRIES (1<<DG_TIME_TRACKER_ENTRIES_POWER)
 
-class dTrackeString
-{
-	public:
-	dTrackeString(const char* const string)
-	{
-		strcpy (m_string, string);
-	}
-
-	dTrackeString(const dTrackeString& src)
-	{
-		strcpy (m_string, src.m_string);
-	}
-	char m_string[128];
-};
-
 class dTimeTrack
 {
 	public:
@@ -211,6 +196,7 @@ class dTimeTrackerServer
 		dTimeTrackerMap<unsigned, unsigned> filter;
 		dTimeTrackerMap<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
 		int chunkType = m_traceLabel;
+		fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
 		for (iter.Begin(); iter; iter++) {
 			dTimeTrack* const track = iter.GetNode()->GetInfo();
 			dTimeTrackerMap<dTrackeString, unsigned>& nameMap = track->GetStringMap();

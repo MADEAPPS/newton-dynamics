@@ -13,14 +13,11 @@
 #ifndef __dTIME_TRACKER_MAP__
 #define __dTIME_TRACKER_MAP__
 
-#include "stdafx.h"
-
 
 template<class OBJECT, class KEY>
 class dTimeTrackerMap
 {
 	public:
-	//class dTreeNode: public dTrackerRedBlackTree
 	class dTreeNode
 	{
 		enum REDBLACK_COLOR
@@ -32,8 +29,8 @@ class dTimeTrackerMap
 		dTreeNode (const KEY &key, dTreeNode* parentNode)
 			:m_info()
 			,m_key(key)
-			,m_left(NULL)
-			,m_right(NULL)
+			,m_left(nullptr)
+			,m_right(nullptr)
 			,m_parent(parentNode)
 			,m_color(false)
 			,m_inTree(false)
@@ -45,8 +42,8 @@ class dTimeTrackerMap
 		dTreeNode (const OBJECT &info, const KEY &key, dTreeNode* parentNode)
 			:m_info(info)
 			,m_key(key)
-			,m_left(NULL)
-			,m_right(NULL)
+			,m_left(nullptr)
+			,m_right(nullptr)
 			,m_parent(parentNode)
 			,m_color(false)
 			,m_inTree(false)
@@ -148,7 +145,7 @@ class dTimeTrackerMap
 			node->SetInTreeFlag(false);
 
 			if (!node->m_left || !node->m_right) {
-				// y has a NULL node as a child 
+				// y has a nullptr node as a child 
 				dTreeNode* const endNode = node;
 
 				// x is y's only child 
@@ -177,9 +174,9 @@ class dTimeTrackerMap
 				}
 			} else {
 
-				// find tree successor with a NULL node as a child 
+				// find tree successor with a nullptr node as a child 
 				dTreeNode* endNode = node->m_right;
-				while (endNode->m_left != NULL) {
+				while (endNode->m_left != nullptr) {
 					endNode = endNode->m_left;
 				}
 
@@ -225,13 +222,13 @@ class dTimeTrackerMap
 			dTreeNode* const me = this;
 			dTreeNode* const child = me->m_right;
 
-			dAssert(child);
+			//dAssert(child);
 			me->m_right = child->m_left;
-			if (child->m_left != NULL) {
+			if (child->m_left != nullptr) {
 				child->m_left->m_parent = me;
 			}
 
-			if (child != NULL) {
+			if (child != nullptr) {
 				child->m_parent = me->m_parent;
 			}
 			if (me->m_parent) {
@@ -246,7 +243,7 @@ class dTimeTrackerMap
 
 			// link child and me 
 			child->m_left = me;
-			if (me != NULL) {
+			if (me != nullptr) {
 				me->m_parent = child;
 			}
 		}
@@ -257,14 +254,14 @@ class dTimeTrackerMap
 			dTreeNode* const me = this;
 			dTreeNode* const child = me->m_left;
 
-			dAssert(child);
+			//dAssert(child);
 			me->m_left = child->m_right;
-			if (child->m_right != NULL) {
+			if (child->m_right != nullptr) {
 				child->m_right->m_parent = me;
 			}
 
 			// establish child->m_parent link 
-			if (child != NULL) {
+			if (child != nullptr) {
 				child->m_parent = me->m_parent;
 			}
 			if (me->m_parent) {
@@ -279,7 +276,7 @@ class dTimeTrackerMap
 
 			// link me and child 
 			child->m_right = me;
-			if (me != NULL) {
+			if (me != nullptr) {
 				me->m_parent = child;
 			}
 		}
@@ -386,11 +383,11 @@ class dTimeTrackerMap
 		{
 			dTreeNode* ptr = this;
 			// check Red-Black properties 
-			dAssert((ptr == *head) || ptr->m_parent);
+			//dAssert((ptr == *head) || ptr->m_parent);
 			while ((ptr != *head) && (ptr->m_parent->GetColor() == RED)) {
 				// we have a violation 
-				dAssert(ptr->m_parent);
-				dAssert(ptr->m_parent->m_parent);
+				//dAssert(ptr->m_parent);
+				//dAssert(ptr->m_parent->m_parent);
 				if (ptr->m_parent == ptr->m_parent->m_parent->m_left) {
 					dTreeNode* const tmp = ptr->m_parent->m_parent->m_right;
 					if (tmp && (tmp->GetColor() == RED)) {
@@ -457,7 +454,7 @@ class dTimeTrackerMap
 		public:
 		Iterator(const dTimeTrackerMap<OBJECT,KEY> &me)
 		{
-			m_ptr = NULL;
+			m_ptr = nullptr;
 			m_tree = &me;
 		}
 
@@ -482,7 +479,7 @@ class dTimeTrackerMap
 
 		operator int() const 
 		{
-			return m_ptr != NULL;
+			return m_ptr != nullptr;
 		}
 
 		void operator++ ()
@@ -588,7 +585,7 @@ template<class OBJECT, class KEY>
 dTimeTrackerMap<OBJECT, KEY>::dTimeTrackerMap ()
 {
 	m_count	= 0;
-	m_head = NULL;
+	m_head = nullptr;
 }
 
 template<class OBJECT, class KEY>
@@ -601,7 +598,7 @@ dTimeTrackerMap<OBJECT, KEY>::~dTimeTrackerMap ()
 template<class OBJECT, class KEY>
 dTimeTrackerMap<OBJECT, KEY>::operator int() const
 {
-	return m_head != NULL;
+	return m_head != nullptr;
 }
 
 template<class OBJECT, class KEY>
@@ -613,13 +610,13 @@ int dTimeTrackerMap<OBJECT, KEY>::GetCount() const
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::Minimum () const
 {
-	return m_head ? (dTreeNode*) m_head->Minimum() : NULL;
+	return m_head ? (dTreeNode*) m_head->Minimum() : nullptr;
 }
 
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::Maximum () const
 {
-	return m_head ? (dTreeNode*) m_head->Maximum() : NULL;
+	return m_head ? (dTreeNode*) m_head->Maximum() : nullptr;
 }
 
 template<class OBJECT, class KEY>
@@ -631,12 +628,12 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::Find (KEY key) const
 {
-	if (m_head == NULL) {
-		return NULL;
+	if (m_head == nullptr) {
+		return nullptr;
 	}
 
 	dTreeNode* ptr = m_head;
-	while (ptr != NULL) {
+	while (ptr != nullptr) {
 		int val = CompareKeys (ptr->m_key, key);
 		if (!val) {
 			break;
@@ -659,20 +656,20 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 
 //	dAssert (node->IsInTree ());
 	dAssert (&node->GetInfo () == &info);
-	return (node->IsInTree ()) ? node : NULL;
+	return (node->IsInTree ()) ? node : nullptr;
 }
 
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::FindGreater (KEY key) const
 {
-	if (m_head == NULL) {
-		return NULL;
+	if (m_head == nullptr) {
+		return nullptr;
 	}
 
-	dTreeNode* prev = NULL;
+	dTreeNode* prev = nullptr;
 	dTreeNode* ptr = m_head;
 	int val = 0;
-	while (ptr != NULL) {
+	while (ptr != nullptr) {
 		val = CompareKeys (ptr->m_key, key);
 		if (!val) {
 			return (dTreeNode*) ptr->Next();
@@ -697,14 +694,14 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::FindGreaterEqual (KEY key) const
 {
-	if (m_head == NULL) {
-		return NULL;
+	if (m_head == nullptr) {
+		return nullptr;
 	}
 
-	dTreeNode* prev = NULL;
+	dTreeNode* prev = nullptr;
 	dTreeNode* ptr = m_head;
 	int val = 0;
-	while (ptr != NULL) {
+	while (ptr != nullptr) {
 		val = CompareKeys (ptr->m_key, key);
 		if (!val) {
 			return ptr;
@@ -729,14 +726,14 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::FindLessEqual (KEY key) const
 {
-	if (m_head == NULL) {
-		return NULL;
+	if (m_head == nullptr) {
+		return nullptr;
 	}
 
-	dTreeNode* prev = NULL;
+	dTreeNode* prev = nullptr;
 	dTreeNode* ptr = m_head;
 	int val = 0;
-	while (ptr != NULL) {
+	while (ptr != nullptr) {
 		val = CompareKeys (ptr->m_key, key);
 		if (!val) {
 			return ptr;
@@ -762,10 +759,10 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::Insert (KEY key)
 {
-	dTreeNode* parent = NULL;
+	dTreeNode* parent = nullptr;
 	dTreeNode* ptr = m_head;
 	int val = 0;
-	while (ptr != NULL) {
+	while (ptr != nullptr) {
 		parent = ptr;
 		val = CompareKeys (ptr->m_key, key);
 
@@ -797,11 +794,11 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::Insert (const OBJECT &element, KEY key, bool& elementWasInTree)
 {
-	dTreeNode* parent = NULL;
+	dTreeNode* parent = nullptr;
 	dTreeNode* ptr = m_head;
 	int val = 0;
 	elementWasInTree = false;
-	while (ptr != NULL) {
+	while (ptr != nullptr) {
 		parent = ptr;
 		val = CompareKeys (ptr->m_key, key);
 
@@ -836,7 +833,7 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 	bool foundState;
 	dTreeNode* node = Insert (element, key, foundState);
 	if (foundState) {
-		node = NULL;
+		node = nullptr;
 	}
 	return node;
 }
@@ -846,8 +843,8 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 {
 	int val = 0;
 	dTreeNode* ptr = m_head;
-	dTreeNode* parent = NULL;
-	while (ptr != NULL) {
+	dTreeNode* parent = nullptr;
+	while (ptr != nullptr) {
 		parent = ptr;
 		val = CompareKeys (ptr->m_key, key);
 
@@ -856,7 +853,7 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 		} else if (val > 0) {
 			ptr = ptr->GetRight();
 		} else {
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -882,10 +879,10 @@ typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::
 template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::Replace (OBJECT &element, KEY key)
 {
-	dTreeNode* parent = NULL;
+	dTreeNode* parent = nullptr;
 	dTreeNode* ptr = m_head;
 	int val = 0;
-	while (ptr != NULL) {
+	while (ptr != nullptr) {
 		parent = ptr;
 		val = CompareKeys (ptr->m_key, key);
 		if (val == 0) {
@@ -927,7 +924,7 @@ template<class OBJECT, class KEY>
 typename dTimeTrackerMap<OBJECT, KEY>::dTreeNode* dTimeTrackerMap<OBJECT, KEY>::ReplaceKey (KEY oldKey, KEY newKey)
 {
 	dTreeNode* const node = Find (oldKey);
-	return node ? ReplaceKey (node, newKey) : NULL;
+	return node ? ReplaceKey (node, newKey) : nullptr;
 }
 
 template<class OBJECT, class KEY>
@@ -979,7 +976,7 @@ void dTimeTrackerMap<OBJECT, KEY>::RemoveAll ()
 		dTreeNode* root;
 		for (root = m_head; root->m_parent; root = (dTreeNode*)root->m_parent);
 		RemoveAllLow(root);
-		m_head = NULL;
+		m_head = nullptr;
 	}
 }
 
