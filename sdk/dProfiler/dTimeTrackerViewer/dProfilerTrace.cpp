@@ -34,6 +34,9 @@ class dThreadTrace
 		,m_maxCount(1<<DG_TIME_TRACKER_ENTRIES_POWER)
 		,m_buffer (new dTimeTrackerRecord[m_maxCount])
 	{
+		static int xxxx;
+		xxxxx = xxxx;
+		xxxx ++;
 	}
 
 	~dThreadTrace ()
@@ -53,6 +56,9 @@ class dThreadTrace
 
 		uLongf destLen;
 		int compressError = uncompress((Bytef*)buffer, &destLen, compressedData, compressesDataSize);
+		if (compressError != Z_OK) {
+			while(1);
+		}
 		
 		m_count += 1<<DG_TIME_TRACKER_ENTRIES_POWER;
 	}
@@ -71,6 +77,7 @@ class dThreadTrace
 		return m_buffer[i];
 	}
 
+	int xxxxx;
 	int m_count;
 	int m_maxCount;
 	dTimeTrackerRecord* m_buffer;
@@ -166,23 +173,21 @@ dProfilerTrace::dProfilerTrace(System::IO::Stream^ file)
 	for (iter.Begin(); iter; iter ++) {
 		const dTrackerString& name = iter.GetNode()->GetInfo();
 		m_nameList[index] = gcnew System::String(name.m_string);
-		nameMap.Insert(index, iter.GetKey());
+		unsigned key = iter.GetKey();
+		nameMap.Insert(index, key);
 		index ++;
 	}
 
+	index = 0;
 	dTimeTrackerMap<dThreadTrace, unsigned>::Iterator traceIter (*database->m_trace);
 	for (traceIter.Begin(); traceIter; traceIter ++) {
 		dThreadTrace& track = traceIter.GetNode()->GetInfo();
 		for (int i = 0; i < track.m_count; i ++) {
 			track[i].m_nameHash = nameMap.Find(track[i].m_nameHash)->GetInfo();
 		}
-
-		for (int i = 0; i < track.m_count; i++) {
-//			track[i].m_nameHash = nameMap.Find(track[i].m_nameHash)->GetInfo();
-		}
-
+		m_rootNode->m_treads->Push(gcnew dThread(nameMap.Find(traceIter.GetKey())->GetInfo(), track, m_nameList));
+		index ++;
 	}
-
 }
 
 dProfilerTrace::~dProfilerTrace()
@@ -215,4 +220,40 @@ void dProfilerTrace::ReadTrack(dDataBase^ database)
 	dThreadTrace& track = threadNode->GetInfo();
 	track.AddTrace((Bytef*)compressedData, compressesDataSize);
 	delete[] compressedData;
+}
+
+
+dProfilerTrace::dThread::dThread(unsigned threadName, dThreadTrace& track, array<System::String^>^ xxxx)
+	:m_frames(gcnew dArray<dTrace^>)
+	,m_name(threadName)
+{
+System::String^ xxxxxxxxxxx = xxxx[threadName];
+
+	int index = 0;
+	const int maxSize = track.m_count;
+	do {
+		const dTimeTrackerRecord& record = track[index];
+		dTrace^ trace = gcnew dTrace(record.m_nameHash, record.m_start, record.m_duration);
+
+		bool isRootTrace = true;
+		const int framesCount = m_frames->GetSize(); 
+
+System::String^ xxxxxxxxx= xxxx[record.m_nameHash];
+		if (framesCount) {
+			int x0 = record.m_start;
+			//int x1 = x0 + record.m_duration;
+			int y0 = m_frames[framesCount - 1]->m_start;
+			int y1 = y0 + m_frames[framesCount - 1]->m_duration;
+			if (x0 >= y1) {
+				m_frames->Push(trace);
+			} else {
+				index*=1;
+				//assert (0);
+			}
+		} else {
+			m_frames->Push(trace);
+		}
+		index ++;
+	} while (index < maxSize);
+
 }
