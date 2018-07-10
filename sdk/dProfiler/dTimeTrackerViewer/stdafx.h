@@ -9,6 +9,9 @@
 #include <tchar.h>
 
 // TODO: reference additional headers your program requires here
+
+#include <dString.h>
+
 #include <imgui.h>
 #include <glfw3.h>
 #ifdef _WIN32
