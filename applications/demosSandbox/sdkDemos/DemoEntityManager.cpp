@@ -641,10 +641,10 @@ void DemoEntityManager::ShowMainMenuBar()
 		if (ImGui::BeginMenu("File")) {
 			m_suspendPhysicsUpdate = true;
 
-			if (ImGui::MenuItem("About", "")) {
-				dAssert (0);
-			}
-			ImGui::Separator();
+			//if (ImGui::MenuItem("About", "")) {
+			//	dAssert (0);
+			//}
+			//ImGui::Separator();
 			if (ImGui::MenuItem("Preferences", "")) {
 				dAssert (0);
 			}
@@ -655,10 +655,10 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 			if (ImGui::MenuItem("Open", "")) {
 				dAssert (0);
-					}
+			}
 			if (ImGui::MenuItem("Save", "")) {
 				dAssert (0);
-				}
+			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Serialize", "")) {
 				//mainMenu = 2;

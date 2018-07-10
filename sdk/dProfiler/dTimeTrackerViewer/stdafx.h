@@ -10,6 +10,7 @@
 
 // TODO: reference additional headers your program requires here
 
+#include <dList.h>
 #include <dString.h>
 
 #include <imgui.h>

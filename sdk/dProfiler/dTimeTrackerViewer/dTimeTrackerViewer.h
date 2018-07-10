@@ -19,5 +19,6 @@ class dTimeTrackerViewer
 	GLFWwindow* m_window;
 	ImVec4 m_clear_color;
 	GLFWkeyfun m_keyboardChainCallback;
+	dList<dString> m_recentFiles;
 };
 

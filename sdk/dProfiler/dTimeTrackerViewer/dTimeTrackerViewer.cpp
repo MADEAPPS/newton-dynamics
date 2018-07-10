@@ -15,6 +15,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 dTimeTrackerViewer::dTimeTrackerViewer()
+	:m_recentFiles()
 {
 	// Setup window
 	glfwSetErrorCallback(error_callback);
@@ -45,6 +46,10 @@ dTimeTrackerViewer::dTimeTrackerViewer()
 	bool show_another_window = false;
 	m_clear_color = ImColor(114, 144, 154);
 	m_keyboardChainCallback = glfwSetKeyCallback(m_window, KeyCallback);
+
+
+	// 
+	m_recentFiles.Append("../xxxx.tt");
 }
 
 dTimeTrackerViewer::~dTimeTrackerViewer()
@@ -77,7 +82,21 @@ void dTimeTrackerViewer::Run()
 		ImGui_ImplGlfw_NewFrame();
 
 		if (ImGui::BeginMainMenuBar()) {
-			if (ImGui::BeginMenu("OpenTrace")) {
+			if (ImGui::BeginMenu("File")) {
+				if (ImGui::MenuItem("Open", "")) {
+					dAssert(0);
+				}
+				if (m_recentFiles.GetCount()) {
+					int xxx = 0;
+					ImGui::Separator();
+					for (dList<dString>::dListNode* node = m_recentFiles.GetFirst(); node; node = node->GetNext()) {
+						const dString& name = node->GetInfo();
+						if (ImGui::MenuItem(name.GetStr(), "")) {
+							xxx = 1;
+							//m_currentScene = i;
+						}
+					}
+				}
 
 				ImGui::EndMenu();
 			}
