@@ -1556,8 +1556,6 @@ void DemoEntityManager::Run()
     while (!glfwWindowShouldClose(m_mainFrame))
     {
 		m_suspendPhysicsUpdate = false;
-		//glfwPollEvents();
-
 		BeginFrame();
 		RenderStats();
 		//m_fileBrowser.Update();

@@ -2,24 +2,31 @@
 //
 
 #include "stdafx.h"
-#include "imgui_impl_glfw.h"
 
-static void error_callback(int error, const char* description)
-{
-	fprintf(stderr, "Error %d: %s\n", error, description);
-}
+#include "imgui_impl_glfw.h"
+#include "dTimeTrackerViewer.h"
+
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	dTimeTrackerViewer app;
+	app.Run();
+}
+
+
+dTimeTrackerViewer::dTimeTrackerViewer()
+{
 	// Setup window
 	glfwSetErrorCallback(error_callback);
-	if (!glfwInit())
-		return 1;
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui OpenGL2 example", NULL, NULL);
-	glfwMakeContextCurrent(window);
+//	if (!glfwInit()) {
+//		return 1;
+	glfwInit();
+
+	m_window = glfwCreateWindow(1280, 720, "Time Tracker visualizer", NULL, NULL);
+	glfwMakeContextCurrent(m_window);
 
 	// Setup ImGui binding
-	ImGui_ImplGlfw_Init(window, true);
+	ImGui_ImplGlfw_Init(m_window, true);
 
 	// Load Fonts
 	// (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
@@ -31,15 +38,57 @@ int _tmain(int argc, _TCHAR* argv[])
 	//io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
 	//io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 
+	ImGuiIO& io = ImGui::GetIO();
+	io.UserData = this;
+
 	bool show_test_window = true;
 	bool show_another_window = false;
-	ImVec4 clear_color = ImColor(114, 144, 154);
+	m_clear_color = ImColor(114, 144, 154);
+	m_keyboardChainCallback = glfwSetKeyCallback(m_window, KeyCallback);
+}
 
+dTimeTrackerViewer::~dTimeTrackerViewer()
+{
+	// Cleanup
+	ImGui_ImplGlfw_Shutdown();
+	glfwTerminate();
+}
+
+void dTimeTrackerViewer::error_callback(int error, const char* description)
+{
+	fprintf(stderr, "Error %d: %s\n", error, description);
+}
+
+void dTimeTrackerViewer::KeyCallback(GLFWwindow* const window, int key, int, int action, int mods)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	dTimeTrackerViewer* const me = (dTimeTrackerViewer*) io.UserData;
+	me->m_keyboardChainCallback(window, key, 0, action, mods);
+	if (key == GLFW_KEY_ESCAPE) {
+		glfwSetWindowShouldClose(window, 1);
+	}
+}
+
+void dTimeTrackerViewer::Run()
+{
 	// Main loop
-	while (!glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(m_window)) {
 		glfwPollEvents();
 		ImGui_ImplGlfw_NewFrame();
 
+		if (ImGui::BeginMainMenuBar()) {
+			if (ImGui::BeginMenu("OpenTrace")) {
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Help")) {
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+
+/*
 		// 1. Show a simple window
 		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
 		{
@@ -65,21 +114,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
 			ImGui::ShowTestWindow(&show_test_window);
 		}
-
+*/
 		// Rendering
 		int display_w, display_h;
-		glfwGetFramebufferSize(window, &display_w, &display_h);
+		glfwGetFramebufferSize(m_window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
-		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z, m_clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui::Render();
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(m_window);
 	}
-
-	// Cleanup
-	ImGui_ImplGlfw_Shutdown();
-	glfwTerminate();
-
-	return 0;
 }
-
