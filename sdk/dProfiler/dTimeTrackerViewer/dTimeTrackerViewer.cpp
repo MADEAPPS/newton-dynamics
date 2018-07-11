@@ -91,7 +91,6 @@ void dTimeTrackerViewer::Run()
 					dAssert(0);
 				}
 				if (m_recentFiles.GetCount()) {
-					int xxx = 0;
 					ImGui::Separator();
 					for (dList<dString>::dListNode* node = m_recentFiles.GetFirst(); node; node = node->GetNext()) {
 						const dString& name = node->GetInfo();

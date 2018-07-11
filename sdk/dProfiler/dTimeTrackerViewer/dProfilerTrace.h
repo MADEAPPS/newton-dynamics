@@ -22,6 +22,12 @@ class dArray
 		return m_data[i];
 	}
 
+	const T& operator[] (int i) const
+	{
+		return m_data[i];
+	}
+
+
 	int GetSize()
 	{
 		return m_count;
@@ -47,19 +53,40 @@ class dArray
 		}
 	}
 
+	protected:
 	T* m_data;
 	int m_count;
 	int m_maxCount;
 };
 
-
 class dProfilerTrace
 {
 	class dDataBase;
+
+	class dTrackerString
+	{
+		public:
+		dTrackerString()
+		{
+			m_string[0] = 0;
+		}
+
+		dTrackerString(const char* const string)
+		{
+			strcpy(m_string, string);
+		}
+
+		dTrackerString(const dTrackerString& src)
+		{
+			strcpy(m_string, src.m_string);
+		}
+
+		char m_string[128];
+	};
+
 	class dSample
 	{
 		public: 
-
 		dSample(unsigned name, unsigned start, unsigned duration)
 			:m_name(name)
 			,m_start(start)
@@ -77,7 +104,7 @@ class dProfilerTrace
 	class dThread
 	{
 		public: 
-		dThread(unsigned threadName, dThreadTrace& track, dArray<dString>& xxxxx);
+		dThread(unsigned threadName, dThreadTrace& track, const dArray<dTrackerString>& xxxxx);
 
 		dArray<dSample*> m_frames; 
 		int m_name;
@@ -101,6 +128,6 @@ class dProfilerTrace
 	void ReadLabels(dDataBase& database);
 
 	dTraceCapture m_rootNode;
-	dArray<dString> m_nameList;
+	dArray<dTrackerString> m_nameList;
 };
 
