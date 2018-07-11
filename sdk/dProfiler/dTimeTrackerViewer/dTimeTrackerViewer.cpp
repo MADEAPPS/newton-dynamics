@@ -143,6 +143,9 @@ void dTimeTrackerViewer::Run()
 			ImGui::ShowTestWindow(&show_test_window);
 		}
 */
+		bool show_test_window;
+		ImGui::ShowTestWindow(&show_test_window);
+
 		// Rendering
 		int display_w, display_h;
 		glfwGetFramebufferSize(m_window, &display_w, &display_h);
