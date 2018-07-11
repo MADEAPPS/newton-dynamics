@@ -7,24 +7,13 @@ class dThreadTrace: public dArray<dTimeTrackerRecord>
 	public:
 	dThreadTrace ()
 		:dArray<dTimeTrackerRecord>()
-//		:m_count(0)
-//		,m_maxCount(1<<DG_TIME_TRACKER_ENTRIES_POWER)
-//		,m_buffer (new dTimeTrackerRecord[m_maxCount])
 	{
-		static int xxxx;
-		xxxxx = xxxx;
-		xxxx ++;
 	}
 
 	~dThreadTrace ()
 	{
 	}
-/*
-	int GetCount() const
-	{
-		return m_count; 
-	}
-*/
+
 	void AddTrace(Bytef* const compressedData, int compressesDataSize)
 	{
 		dThreadTrace& me = *this;
@@ -38,8 +27,6 @@ class dThreadTrace: public dArray<dTimeTrackerRecord>
 		dAssert (compressError == Z_OK);
 		m_count += 1 << DG_TIME_TRACKER_ENTRIES_POWER;
 	}
-
-	int xxxxx;
 };
 
 class dProfilerTrace::dDataBase
@@ -49,7 +36,6 @@ class dProfilerTrace::dDataBase
 		:m_file(file)
 		,m_trace()
 		,m_dictionary()
-//		,m_index(0)
 	{
 	}
 
@@ -89,8 +75,8 @@ class dProfilerTrace::dDataBase
 
 
 dProfilerTrace::dProfilerTrace(FILE* const file)
-//	:m_rootNode (gcnew dTraceCapture())
-//	,m_nameList (gcnew array<System::String^>(0))
+	:m_rootNode()
+	,m_nameList()
 {
 	dDataBase database(file); 
 

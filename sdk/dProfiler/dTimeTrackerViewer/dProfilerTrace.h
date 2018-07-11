@@ -95,6 +95,13 @@ class dProfilerTrace
 		{
 		}
 
+		~dSample()
+		{
+			for (int i = 0; i < m_children.GetSize(); i++) {
+				delete m_children[i];
+			}
+		}
+
 		unsigned m_name;
 		unsigned m_start;
 		unsigned m_duration;
@@ -106,6 +113,13 @@ class dProfilerTrace
 		public: 
 		dThread(unsigned threadName, dThreadTrace& track, const dArray<dTrackerString>& xxxxx);
 
+		~dThread()
+		{
+			for (int i = 0; i < m_frames.GetSize(); i++) {
+				delete m_frames[i];
+			}
+		}
+
 		dArray<dSample*> m_frames; 
 		int m_name;
 	};
@@ -116,6 +130,14 @@ class dProfilerTrace
 			:m_treads (dArray<dThread*>())
 		{
 		}
+
+		~dTraceCapture()
+		{
+			for (int i = 0; i < m_treads.GetSize(); i++) {
+				delete m_treads[i];
+			}
+		}
+
 		dArray<dThread*> m_treads;
 	};
 
