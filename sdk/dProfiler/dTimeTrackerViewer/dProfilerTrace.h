@@ -5,46 +5,57 @@
 
 class dThreadTrace;
 
+template<class T>
+class dArray
+{
+	public:
+	dArray()
+		:m_data(new T[1])
+		, m_count(0)
+		, m_maxCount(1)
+	{
+	}
+
+	T& operator[] (int i)
+	{
+		Resize(i);
+		return m_data[i];
+	}
+
+	int GetSize()
+	{
+		return m_count;
+	}
+
+	void Push(T val)
+	{
+		Resize(m_count + 1);
+		m_data[m_count] = val;
+		m_count++;
+	}
+
+	private:
+	void Resize(int index)
+	{
+		int currentMaxCount = m_maxCount;
+		while (index >= m_maxCount) {
+			T* const data = new T[m_maxCount * 2];
+			memcpy (data, m_data, currentMaxCount * sizeof (T));
+			delete[] m_data;
+			m_data = data;
+			m_maxCount = m_maxCount * 2;
+		}
+	}
+
+	T* m_data;
+	int m_count;
+	int m_maxCount;
+};
+
+
 class dProfilerTrace
 {
 	class dDataBase;
-
-	template<class T>
-	class dArray
-	{
-		public: 
-		dArray()
-			:m_data (new T[1]) 
-			,m_count(0)
-			,m_maxCount(1)
-		{
-		}
-
-		T operator[] (int i)
-		{
-			assert (0);
-			return m_data[i];
-		}
-
-		int GetSize()
-		{
-			return m_count;
-		}
-
-		void Push(T val)
-		{
-			while (m_count >= m_data->Length) {
-				array<T>::Resize(m_data, m_data->Length * 2);
-			}
-			m_data[m_count] = val;
-			m_count ++;
-		}
-
-		T* m_data;
-		int m_count;
-		int m_maxCount;
-	};
-
 	class dSample
 	{
 		public: 
@@ -81,11 +92,13 @@ class dProfilerTrace
 		dArray<dThread*> m_treads;
 	};
 
-	public: dProfilerTrace(FILE* const file);
-	public: ~dProfilerTrace();
+	public: 
+	dProfilerTrace(FILE* const file);
+	~dProfilerTrace();
 
-	private: void ReadTrack(dDataBase database);
-	private: void ReadLabels(dDataBase database);
+	private: 
+	void ReadTrack(dDataBase& database);
+	void ReadLabels(dDataBase& database);
 
 	dTraceCapture m_rootNode;
 	dArray<dString> m_nameList;

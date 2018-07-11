@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "imgui_impl_glfw.h"
 
+class dProfilerTrace;
+
 class dTimeTrackerViewer
 {
 	public:
@@ -20,5 +22,6 @@ class dTimeTrackerViewer
 	ImVec4 m_clear_color;
 	GLFWkeyfun m_keyboardChainCallback;
 	dList<dString> m_recentFiles;
+	dProfilerTrace* m_currentTrace;
 };
 

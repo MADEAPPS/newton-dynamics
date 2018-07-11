@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dProfilerTrace.h"
-#include <zlib.h>
+
 
 /*
 class dTrackerString
@@ -28,13 +28,14 @@ class dTrackerString
 };
 */
 
-class dThreadTrace
+class dThreadTrace: public dArray<dTimeTrackerRecord>
 {
 	public:
 	dThreadTrace ()
-		:m_count(0)
-		,m_maxCount(1<<DG_TIME_TRACKER_ENTRIES_POWER)
-		,m_buffer (new dTimeTrackerRecord[m_maxCount])
+		:dArray<dTimeTrackerRecord>()
+//		:m_count(0)
+//		,m_maxCount(1<<DG_TIME_TRACKER_ENTRIES_POWER)
+//		,m_buffer (new dTimeTrackerRecord[m_maxCount])
 	{
 		static int xxxx;
 		xxxxx = xxxx;
@@ -43,28 +44,26 @@ class dThreadTrace
 
 	~dThreadTrace ()
 	{
-		delete[] m_buffer;
 	}
-
+/*
 	int GetCount() const
 	{
 		return m_count; 
 	}
-
+*/
 	void AddTrace(Bytef* const compressedData, int compressesDataSize)
 	{
 		dThreadTrace& me = *this;
-		dTimeTrackerRecord* const buffer = &me[m_count];
+
+		me[me.GetSize() + (1<<DG_TIME_TRACKER_ENTRIES_POWER) - 1].m_start = 0;
+		dTimeTrackerRecord* const buffer = &me[me.GetSize()];
 
 		uLongf destLen;
 		int compressError = uncompress((Bytef*)buffer, &destLen, compressedData, compressesDataSize);
-		if (compressError != Z_OK) {
-			while(1);
-		}
-		
-		m_count += 1<<DG_TIME_TRACKER_ENTRIES_POWER;
+		dAssert (compressError == Z_OK);
 	}
 
+/*
 	dTimeTrackerRecord& operator[] (int i)
 	{
 		while (i >= m_maxCount) {
@@ -78,23 +77,23 @@ class dThreadTrace
 		}
 		return m_buffer[i];
 	}
-
+*/
 	int xxxxx;
-	int m_count;
-	int m_maxCount;
-	dTimeTrackerRecord* m_buffer;
+//	int m_count;
+//	int m_maxCount;
+//	dTimeTrackerRecord* m_buffer;
+//	dArray<dTimeTrackerRecord> m_buffer;
 };
 
 class dProfilerTrace::dDataBase
 {
-	public: dDataBase(FILE* const file)
-//		:m_data(dArray<unsigned char>(int(file->Length)))
-//		,m_trace(new dTimeTrackerMap<dThreadTrace, unsigned>())
-//		,m_dictionary(new dTimeTrackerMap<dTrackerString, unsigned>())
+	public: 
+	dDataBase(FILE* const file)
+		:m_file(file)
+		,m_trace()
+		,m_dictionary()
 //		,m_index(0)
 	{
-		assert (0);
-//		file->Read(m_data, 0, m_data->Length);
 	}
 
 	public: ~dDataBase()
@@ -103,12 +102,9 @@ class dProfilerTrace::dDataBase
 
 	int ReadInt()
 	{
-		char code[4];
-		code[0] = m_data[m_index++];
-		code[1] = m_data[m_index++];
-		code[2] = m_data[m_index++];
-		code[3] = m_data[m_index++];
-		return *(int*)&code[0];
+		int code;
+		fread (&code, sizeof (int), 1, m_file);
+		return code;
 	}
 
 	dTrackerChunkType ReadChunkType()
@@ -118,26 +114,27 @@ class dProfilerTrace::dDataBase
 
 	int ReadName(char* const name)
 	{
+		dAssert (0);
+		return 0;
+/*
 		unsigned size = ReadInt();
 		for (unsigned i = 0; i < size; i++) {
 			name[i] = m_data[m_index++];
 		}
 		name[size] = 0;
 		return size;
+*/
 	}
 
 	void ReadCompressedTrack(char* const buffer, int size)
 	{
-		for (int i = 0; i < size; i++) {
-			buffer[i] = m_data[m_index++];
-		}
+		fread (buffer, size, 1, m_file);
 	}
 
-
-	dArray<unsigned char> m_data;
+	FILE* m_file;
 	dTimeTrackerMap<dThreadTrace, unsigned> m_trace;	
 	dTimeTrackerMap<dString, unsigned> m_dictionary;
-	int m_index;
+//	int m_index;
 };
 
 
@@ -145,11 +142,10 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 //	:m_rootNode (gcnew dTraceCapture())
 //	,m_nameList (gcnew array<System::String^>(0))
 {
+	dDataBase database(file); 
 
-	assert (0);
-/*
-	dDataBase^ database = gcnew dDataBase(file); 
-	for (dTrackerChunkType chunkType = database->ReadChunkType(); chunkType != m_traceEnd; chunkType = database->ReadChunkType()) {
+	for (dTrackerChunkType chunkType = database.ReadChunkType(); chunkType != m_traceEnd; chunkType = database.ReadChunkType()) {
+
 		switch (chunkType) 
 		{
 			case m_traceSamples:
@@ -160,16 +156,18 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 
 			case m_traceLabel:
 			{
-				ReadLabels(database);
+				dAssert(0);
+				//ReadLabels(database);
 				break;
 			}
 
 			default:
-				assert(0);
+				dAssert(0);
 				break;
 		}
 	}
-
+	dAssert(0);
+/*
 	int index = 0;
 	dTimeTrackerMap<int, unsigned> nameMap;
 	dTimeTrackerMap<dTrackerString, unsigned>::Iterator iter (*database->m_dictionary);
@@ -211,21 +209,6 @@ void dProfilerTrace::ReadLabels(dDataBase^ database)
 	}
 }
 
-void dProfilerTrace::ReadTrack(dDataBase^ database)
-{
-	unsigned nameCRC = database->ReadInt();
-	unsigned compressesDataSize = database->ReadInt();
-	char* const compressedData = new char[compressesDataSize + 1024];
-	database->ReadCompressedTrack(compressedData, compressesDataSize);
-
-	dTimeTrackerMap<dThreadTrace, unsigned>::dTreeNode* threadNode = database->m_trace->Find(nameCRC);
-	if (!threadNode) {
-		threadNode = database->m_trace->Insert(nameCRC);
-	}
-	dThreadTrace& track = threadNode->GetInfo();
-	track.AddTrace((Bytef*)compressedData, compressesDataSize);
-	delete[] compressedData;
-}
 
 
 dProfilerTrace::dThread::dThread(unsigned threadName, dThreadTrace& track, array<System::String^>^ xxxx)
@@ -263,3 +246,20 @@ System::String^ xxxxxxxxx= xxxx[record.m_nameHash];
 
 }
 */
+
+
+void dProfilerTrace::ReadTrack(dDataBase& database)
+{
+	unsigned nameCRC = database.ReadInt();
+	unsigned compressesDataSize = database.ReadInt();
+
+	char* compressedData = dAlloca (char, compressesDataSize + 1024);
+	database.ReadCompressedTrack(compressedData, compressesDataSize);
+
+	dTimeTrackerMap<dThreadTrace, unsigned>::dTreeNode* threadNode = database.m_trace.Find(nameCRC);
+	if (!threadNode) {
+		threadNode = database.m_trace.Insert(nameCRC);
+	}
+	dThreadTrace& track = threadNode->GetInfo();
+	track.AddTrace((Bytef*)compressedData, compressesDataSize);
+}

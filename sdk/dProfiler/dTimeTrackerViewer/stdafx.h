@@ -9,7 +9,7 @@
 #include <tchar.h>
 
 // TODO: reference additional headers your program requires here
-
+#include <zlib.h>
 #include <dList.h>
 #include <dString.h>
 

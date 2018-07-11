@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-
+#include "dProfilerTrace.h"
 #include "imgui_impl_glfw.h"
 #include "dTimeTrackerViewer.h"
 
@@ -16,6 +16,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 dTimeTrackerViewer::dTimeTrackerViewer()
 	:m_recentFiles()
+	,m_currentTrace(NULL)
 {
 	// Setup window
 	glfwSetErrorCallback(error_callback);
@@ -54,6 +55,9 @@ dTimeTrackerViewer::dTimeTrackerViewer()
 
 dTimeTrackerViewer::~dTimeTrackerViewer()
 {
+	if (m_currentTrace) {
+		delete m_currentTrace;
+	}
 	// Cleanup
 	ImGui_ImplGlfw_Shutdown();
 	glfwTerminate();
@@ -92,8 +96,14 @@ void dTimeTrackerViewer::Run()
 					for (dList<dString>::dListNode* node = m_recentFiles.GetFirst(); node; node = node->GetNext()) {
 						const dString& name = node->GetInfo();
 						if (ImGui::MenuItem(name.GetStr(), "")) {
-							xxx = 1;
-							//m_currentScene = i;
+							FILE* const file = fopen (name.GetStr(), "rb");
+							if (file) {
+								if (m_currentTrace) {
+									delete m_currentTrace;
+								}
+								m_currentTrace = new dProfilerTrace(file);
+								fclose (file);
+							}
 						}
 					}
 				}
