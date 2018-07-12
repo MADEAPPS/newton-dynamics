@@ -194,9 +194,6 @@ const dTrackerString& xxxxxxxxx = xxxxx[record.m_nameHash];
 
 void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
 {
-//	bool show_test_window;
-//	ImGui::ShowTestWindow(&show_test_window);
-
 /*
     if (ImGui::CollapsingHeader("Layout"))
     {
@@ -656,13 +653,7 @@ void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
     }
 */
 
-	// Right align, keep 140 pixels for labels
-	int width; 
-	int height;
-	glfwGetFramebufferSize(viewer->GetWindow(), &width, &height);
-	ImGui::SetNextWindowContentWidth(width);
-//	ImGui::PushItemWidth(float (width));
-	ImGui::Text("xxxxx Dear ImGui says hello.");
+	m_rootNode.Render(viewer, m_nameList);
 /*
 	if (ImGui::CollapsingHeader("Graphs widgets")) {
 		static bool animate = true;
@@ -722,6 +713,32 @@ void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
 		sprintf(buf, "%d/%d", (int)(progress_saturated * 1753), 1753);
 		ImGui::ProgressBar(progress, ImVec2(0.f, 0.f), buf);
 	}
-*/   
+*/
+}
 
+void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
+{
+	for (int i = 0; i < m_treads.GetSize(); i++) {
+		m_treads[i]->Render(viewer, nameList);
+	}
+}
+
+void dProfilerTrace::dThread::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
+{
+	const char* const threadName = nameList[m_name].m_string;
+	static bool xxxxxxxx = true;
+	if (ImGui::CollapsingHeader(threadName, &xxxxxxxx)) {
+		//GLFWwindow* const window = viewer->GetWindow();
+		//ImDrawList* const draw = window->DrawList;
+		ImDrawList* const draw = ImGui::GetWindowDrawList();
+		ImVec2 xxx(0, 50);
+		ImGui::BeginChild("", xxx);
+				ImVec2 wpos (ImGui::GetCursorScreenPos());
+				ImVec2 p0(wpos.x + 0, wpos.y + 2);
+				ImVec2 p1(p0.x + 100, p0.y + 30);
+				draw->AddRectFilled(p0, p1, 0x448888DD);
+				draw->AddRect(p0, p1, 0x888888DD);
+				draw->AddText(p0, 0xFF888888, "function1");
+		ImGui::EndChild();
+	}
 }

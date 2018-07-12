@@ -121,6 +121,8 @@ class dProfilerTrace
 			}
 		}
 
+		void Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList);
+
 		dArray<dSample*> m_frames; 
 		int m_name;
 	};
@@ -138,6 +140,8 @@ class dProfilerTrace
 				delete m_treads[i];
 			}
 		}
+
+		void Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList);
 
 		dArray<dThread*> m_treads;
 	};
