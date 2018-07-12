@@ -14,6 +14,11 @@ class dTimeTrackerViewer
 
 	void Run();
 
+	GLFWwindow* GetWindow() const 
+	{
+		return m_window;
+	}
+
 	private:
 	static void error_callback(int error, const char* description);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);

@@ -4,6 +4,7 @@
 #include "dTimeTrackerRecord.h"
 
 class dThreadTrace;
+class dTimeTrackerViewer;
 
 template<class T>
 class dArray
@@ -144,6 +145,8 @@ class dProfilerTrace
 	public: 
 	dProfilerTrace(FILE* const file);
 	~dProfilerTrace();
+
+	void Render (dTimeTrackerViewer* const viewer);
 
 	private: 
 	void ReadTrack(dDataBase& database);
