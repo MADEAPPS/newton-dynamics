@@ -120,7 +120,7 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 			track[i].m_nameHash = remapHashIndex;
 		}
 		int treadHashIndex = nameMap.Find(traceIter.GetKey())->GetInfo();
-		m_rootNode.m_treads.Push(new dThread(treadHashIndex, track, m_nameList));
+		m_rootNode.m_treads.Push(new dTrackerThread(treadHashIndex, track, m_nameList));
 	}
 }
 
@@ -154,9 +154,10 @@ void dProfilerTrace::ReadLabels(dDataBase& database)
 	}
 }
 
-dProfilerTrace::dThread::dThread(unsigned threadName, dThreadTrace& track, const dArray<dTrackerString>& xxxxx)
+dProfilerTrace::dTrackerThread::dTrackerThread(unsigned threadName, dThreadTrace& track, const dArray<dTrackerString>& xxxxx)
 	:m_frames()
 	,m_name(threadName)
+	,m_isOpen(true)
 {
 	const dTrackerString& xxxxxxxxxxx = xxxxx[threadName];
 
@@ -164,7 +165,7 @@ dProfilerTrace::dThread::dThread(unsigned threadName, dThreadTrace& track, const
 	const int maxSize = track.GetSize();
 	do {
 		const dTimeTrackerRecord& record = track[index];
-		dSample* const trace = new dSample(record.m_nameHash, record.m_start, record.m_duration);
+		dTrackerSample* const trace = new dTrackerSample(record.m_nameHash, record.m_start, record.m_duration);
 
 const dTrackerString& xxxxxxxxx = xxxxx[record.m_nameHash];
 
@@ -723,13 +724,21 @@ void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer, con
 	}
 }
 
-void dProfilerTrace::dThread::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
+void dProfilerTrace::dTrackerSample::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
+{
+
+}
+
+void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
 {
 	const char* const threadName = nameList[m_name].m_string;
-	static bool xxxxxxxx = true;
-	if (ImGui::CollapsingHeader(threadName, &xxxxxxxx)) {
+
+	if (ImGui::CollapsingHeader(threadName, &m_isOpen)) {
 		//GLFWwindow* const window = viewer->GetWindow();
 		//ImDrawList* const draw = window->DrawList;
+
+		ImGui::Text("function");
+/*
 		ImDrawList* const draw = ImGui::GetWindowDrawList();
 		ImVec2 xxx(0, 50);
 		ImGui::BeginChild("", xxx);
@@ -740,5 +749,6 @@ void dProfilerTrace::dThread::Render(dTimeTrackerViewer* const viewer, const dAr
 				draw->AddRect(p0, p1, 0x888888DD);
 				draw->AddText(p0, 0xFF888888, "function1");
 		ImGui::EndChild();
+*/
 	}
 }

@@ -85,36 +85,38 @@ class dProfilerTrace
 		char m_string[128];
 	};
 
-	class dSample
+	class dTrackerSample
 	{
 		public: 
-		dSample(unsigned name, unsigned start, unsigned duration)
+		dTrackerSample(unsigned name, unsigned start, unsigned duration)
 			:m_name(name)
 			,m_start(start)
 			,m_duration(duration)
-			,m_children (dArray<dSample*>())
+			,m_children (dArray<dTrackerSample*>())
 		{
 		}
 
-		~dSample()
+		~dTrackerSample()
 		{
 			for (int i = 0; i < m_children.GetSize(); i++) {
 				delete m_children[i];
 			}
 		}
 
+		void Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList);
+
 		unsigned m_name;
 		unsigned m_start;
 		unsigned m_duration;
-		dArray<dSample*> m_children; 
+		dArray<dTrackerSample*> m_children; 
 	};
 
-	class dThread
+	class dTrackerThread
 	{
 		public: 
-		dThread(unsigned threadName, dThreadTrace& track, const dArray<dTrackerString>& xxxxx);
+		dTrackerThread(unsigned threadName, dThreadTrace& track, const dArray<dTrackerString>& xxxxx);
 
-		~dThread()
+		~dTrackerThread()
 		{
 			for (int i = 0; i < m_frames.GetSize(); i++) {
 				delete m_frames[i];
@@ -123,14 +125,15 @@ class dProfilerTrace
 
 		void Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList);
 
-		dArray<dSample*> m_frames; 
+		dArray<dTrackerSample*> m_frames; 
 		int m_name;
+		bool m_isOpen;
 	};
 
 	class dTraceCapture
 	{
 		public: dTraceCapture ()
-			:m_treads (dArray<dThread*>())
+			:m_treads (dArray<dTrackerThread*>())
 		{
 		}
 
@@ -143,7 +146,7 @@ class dProfilerTrace
 
 		void Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList);
 
-		dArray<dThread*> m_treads;
+		dArray<dTrackerThread*> m_treads;
 	};
 
 	public: 
