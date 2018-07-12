@@ -737,18 +737,35 @@ void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer, co
 		//GLFWwindow* const window = viewer->GetWindow();
 		//ImDrawList* const draw = window->DrawList;
 
-		ImGui::Text("function");
-/*
+		ImVec2 wpos(ImGui::GetCursorPosX(), ImGui::GetCursorPosY());
+		ImGui::Text("");
+		ImGui::Text("");
+
+		wpos.x += 50.0f;
+		wpos.y += 20.0f;
+
 		ImDrawList* const draw = ImGui::GetWindowDrawList();
-		ImVec2 xxx(0, 50);
-		ImGui::BeginChild("", xxx);
-				ImVec2 wpos (ImGui::GetCursorScreenPos());
-				ImVec2 p0(wpos.x + 0, wpos.y + 2);
-				ImVec2 p1(p0.x + 100, p0.y + 30);
-				draw->AddRectFilled(p0, p1, 0x448888DD);
-				draw->AddRect(p0, p1, 0x888888DD);
-				draw->AddText(p0, 0xFF888888, "function1");
-		ImGui::EndChild();
-*/
+		{
+			ImVec2 p0(wpos.x + 0, wpos.y);
+			ImVec2 p1(p0.x + 100, p0.y + 20);
+			draw->AddRectFilled(p0, p1, 0x448888DD);
+			draw->AddRect(p0, p1, 0x888888DD);
+
+			p0.x += 10.0f;
+			p0.y += 4.0f;
+			draw->AddText(p0, 0xffffffff, "function1");
+		}
+		
+		{
+			ImVec2 p0(wpos.x + 120, wpos.y);
+			ImVec2 p1(p0.x + 100, p0.y + 20);
+			draw->AddRectFilled(p0, p1, 0x448888DD);
+			draw->AddRect(p0, p1, 0x888888DD);
+
+			p0.x += 10.0f;
+			p0.y += 4.0f;
+			draw->AddText(p0, 0xffffffff, "function2");
+		}
+
 	}
 }
