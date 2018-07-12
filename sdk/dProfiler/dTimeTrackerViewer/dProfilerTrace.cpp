@@ -748,8 +748,8 @@ void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer, co
 		{
 			ImVec2 p0(wpos.x + 0, wpos.y);
 			ImVec2 p1(p0.x + 100, p0.y + 20);
-			draw->AddRectFilled(p0, p1, 0x448888DD);
-			draw->AddRect(p0, p1, 0x888888DD);
+			draw->AddRectFilled(p0, p1, 0x448888ff);
+			draw->AddRect(p0, p1, 0x888888ff);
 
 			p0.x += 10.0f;
 			p0.y += 4.0f;
@@ -759,8 +759,8 @@ void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer, co
 		{
 			ImVec2 p0(wpos.x + 120, wpos.y);
 			ImVec2 p1(p0.x + 100, p0.y + 20);
-			draw->AddRectFilled(p0, p1, 0x448888DD);
-			draw->AddRect(p0, p1, 0x888888DD);
+			draw->AddRectFilled(p0, p1, 0x448888ff);
+			draw->AddRect(p0, p1, 0x888888ff);
 
 			p0.x += 10.0f;
 			p0.y += 4.0f;
