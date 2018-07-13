@@ -33,9 +33,11 @@ dTimeTrackerViewer::dTimeTrackerViewer()
 	ImGuiIO& io = ImGui::GetIO();
 	io.UserData = this;
 
+//	io.Fonts->AddFontDefault();
+
 	bool show_test_window = true;
 	bool show_another_window = false;
-	m_clear_color = ImColor(64, 64, 64);
+	m_clear_color = ImColor(255, 255, 255);
 	m_keyboardChainCallback = glfwSetKeyCallback(m_window, KeyCallback);
 
 	// 
@@ -124,11 +126,14 @@ void dTimeTrackerViewer::Run()
 
 			ImGui::SetNextWindowPos(windowsPosit, ImGuiSetCond_Always);
 			ImGui::SetNextWindowSize(windowsSize, ImGuiSetCond_Always);
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
 			ImGui::Begin("", &openflag, window_flags);
-			m_currentTrace->Render(this);
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+				m_currentTrace->Render(this);
+				ImGui::PopStyleColor();
 			ImGui::End();
+
 			ImGui::PopStyleColor();
 		}
 

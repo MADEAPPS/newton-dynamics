@@ -111,8 +111,8 @@ class dProfilerTrace::dTrackerThread
 			//GLFWwindow* const window = viewer->GetWindow();
 			//ImDrawList* const draw = window->DrawList;
 
+			ImU32 test_color = ImGui::GetColorU32(ImGuiCol_Text);
 			ImVec2 text_size = ImGui::CalcTextSize("");
-			//ImVec2 cursorPosit(ImGui::GetCursorPosX(), ImGui::GetCursorPosY());
 			ImVec2 cursorPosit(ImGui::GetCursorScreenPos());
 
 			float textPadd = 2.0f;
@@ -132,7 +132,7 @@ class dProfilerTrace::dTrackerThread
 
 				p0.x += 10.0f;
 				p0.y += textPadd;
-				draw->AddText(p0, 0xffffffff, "function1");
+				draw->AddText(p0, test_color, "function1");
 			}
 
 			{
@@ -143,7 +143,7 @@ class dProfilerTrace::dTrackerThread
 
 				p0.x += 10.0f;
 				p0.y += textPadd;
-				draw->AddText(p0, 0xffffffff, "function2");
+				draw->AddText(p0, test_color, "function2");
 			}
 		}
 	}
@@ -834,6 +834,8 @@ void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer)
 {
 	// display time line
 	ImGui::Text("time line");
+
+	ImGui::Text("");
 	for (int i = 0; i < m_treads.GetSize(); i++) {
 		m_treads[i]->Render(viewer);
 	}
