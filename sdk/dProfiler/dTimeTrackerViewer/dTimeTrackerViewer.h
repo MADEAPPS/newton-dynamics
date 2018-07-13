@@ -19,6 +19,11 @@ class dTimeTrackerViewer
 		return m_window;
 	}
 
+	dProfilerTrace* GetTrace() const
+	{
+		return m_currentTrace;
+	}
+
 	private:
 	static void error_callback(int error, const char* description);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);

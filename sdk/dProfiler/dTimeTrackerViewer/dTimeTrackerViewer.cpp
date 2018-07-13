@@ -30,24 +30,13 @@ dTimeTrackerViewer::dTimeTrackerViewer()
 	// Setup ImGui binding
 	ImGui_ImplGlfw_Init(m_window, true);
 
-	// Load Fonts
-	// (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-	//ImGuiIO& io = ImGui::GetIO();
-	//io.Fonts->AddFontDefault();
-	//io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf", 15.0f);
-	//io.Fonts->AddFontFromFileTTF("../../extra_fonts/DroidSans.ttf", 16.0f);
-	//io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
-	//io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
-	//io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-
 	ImGuiIO& io = ImGui::GetIO();
 	io.UserData = this;
 
 	bool show_test_window = true;
 	bool show_another_window = false;
-	m_clear_color = ImColor(114, 144, 154);
+	m_clear_color = ImColor(64, 64, 64);
 	m_keyboardChainCallback = glfwSetKeyCallback(m_window, KeyCallback);
-
 
 	// 
 	m_recentFiles.Append("../xxxx.tt");
@@ -85,6 +74,7 @@ void dTimeTrackerViewer::Run()
 		glfwPollEvents();
 		ImGui_ImplGlfw_NewFrame();
 
+		ImGuiIO& io = ImGui::GetIO();
 		if (ImGui::BeginMainMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
 				if (ImGui::MenuItem("Open", "")) {
@@ -116,35 +106,28 @@ void dTimeTrackerViewer::Run()
 			ImGui::EndMainMenuBar();
 		}
 
-/*
-		// 1. Show a simple window
-		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-		{
-			static float f = 0.0f;
-			ImGui::Text("Hello, world!");
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-			ImGui::ColorEdit3("clear color", (float*)&clear_color);
-			if (ImGui::Button("Test Window")) show_test_window ^= 1;
-			if (ImGui::Button("Another Window")) show_another_window ^= 1;
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		}
-
-		// 2. Show another simple window, this time using an explicit Begin/End pair
-		if (show_another_window) {
-			ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);
-			ImGui::Begin("Another Window", &show_another_window);
-			ImGui::Text("Hello");
-			ImGui::End();
-		}
-
-		// 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-		if (show_test_window) {
-			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-			ImGui::ShowTestWindow(&show_test_window);
-		}
-*/
 		if (m_currentTrace) {
+			bool openflag = true;
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoTitleBar;
+			window_flags |= ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoSavedSettings;
+
+			//ImVec2 cursorPosit(ImGui::GetCursorScreenPos());
+			//ImVec2 windowsPosit(ImGui::GetCursorPos());
+			//ImVec2 windowsSize(ImGui::GetWindowSize());
+			ImVec2 windowsPosit(io.DisplayVisibleMin);
+			ImVec2 windowsSize(io.DisplaySize);
+			windowsPosit.y += 20.0f;
+			windowsSize.y -= 20.0f;
+
+			ImGui::SetNextWindowPos(windowsPosit, ImGuiSetCond_Always);
+			ImGui::SetNextWindowSize(windowsSize, ImGuiSetCond_Always);
+
+			ImGui::Begin("", &openflag, window_flags);
 			m_currentTrace->Render(this);
+			ImGui::End();
 		}
 
 		// Rendering

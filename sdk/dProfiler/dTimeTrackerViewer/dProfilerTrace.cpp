@@ -2,15 +2,15 @@
 #include "dProfilerTrace.h"
 #include "dTimeTrackerViewer.h"
 
-class dThreadTrace: public dArray<dTimeTrackerRecord>
+class dProfilerTrace::dThreadTrace : public dArray<dTimeTrackerRecord>
 {
 	public:
-	dThreadTrace ()
+	dThreadTrace()
 		:dArray<dTimeTrackerRecord>()
 	{
 	}
 
-	~dThreadTrace ()
+	~dThreadTrace()
 	{
 	}
 
@@ -18,15 +18,140 @@ class dThreadTrace: public dArray<dTimeTrackerRecord>
 	{
 		dThreadTrace& me = *this;
 
-		me[me.GetSize() + (1<<DG_TIME_TRACKER_ENTRIES_POWER) - 1].m_start = 0;
-		
+		me[me.GetSize() + (1 << DG_TIME_TRACKER_ENTRIES_POWER) - 1].m_start = 0;
+
 		dTimeTrackerRecord* const buffer = &me[me.GetSize()];
 
 		uLongf destLen;
 		int compressError = uncompress((Bytef*)buffer, &destLen, compressedData, compressesDataSize);
-		dAssert (compressError == Z_OK);
+		dAssert(compressError == Z_OK);
 		m_count += 1 << DG_TIME_TRACKER_ENTRIES_POWER;
 	}
+};
+
+class dProfilerTrace::dTrackerSample
+{
+	public:
+	dTrackerSample(unsigned name, unsigned start, unsigned duration)
+		:m_name(name)
+		,m_start(start)
+		,m_duration(duration)
+		,m_children(dArray<dTrackerSample*>())
+	{
+	}
+
+	~dTrackerSample()
+	{
+		for (int i = 0; i < m_children.GetSize(); i++) {
+			delete m_children[i];
+		}
+	}
+
+	void Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
+	{
+
+	}
+
+	unsigned m_name;
+	unsigned m_start;
+	unsigned m_duration;
+	dArray<dTrackerSample*> m_children;
+};
+
+class dProfilerTrace::dTrackerThread
+{
+	public:
+	dTrackerThread(unsigned threadName, dThreadTrace& track)
+		:m_frames()
+		,m_name(threadName)
+		,m_levels_deep(1)
+		,m_isOpen(true)
+	{
+		int index = 0;
+		const int maxSize = track.GetSize();
+		do {
+			const dTimeTrackerRecord& record = track[index];
+			dTrackerSample* const trace = new dTrackerSample(record.m_nameHash, record.m_start, record.m_duration);
+
+			bool isRootTrace = true;
+			const int framesCount = m_frames.GetSize();
+
+			if (framesCount) {
+				int x0 = record.m_start;
+				//int x1 = x0 + record.m_duration;
+				int y0 = m_frames[framesCount - 1]->m_start;
+				int y1 = y0 + m_frames[framesCount - 1]->m_duration;
+				if (x0 >= y1) {
+					m_frames.Push(trace);
+				} else {
+					index *= 1;
+					//assert (0);
+				}
+			} else {
+				m_frames.Push(trace);
+			}
+
+			index++;
+		} while (index < maxSize);
+	}
+
+	~dTrackerThread()
+	{
+		for (int i = 0; i < m_frames.GetSize(); i++) {
+			delete m_frames[i];
+		}
+	}
+
+	void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer)
+	{
+		const dProfilerTrace& root = *viewer->GetTrace();
+		const char* const threadName = root.m_nameList[m_name].m_string;
+
+		if (ImGui::CollapsingHeader(threadName, &m_isOpen)) {
+			//GLFWwindow* const window = viewer->GetWindow();
+			//ImDrawList* const draw = window->DrawList;
+
+			ImVec2 text_size = ImGui::CalcTextSize("");
+			//ImVec2 cursorPosit(ImGui::GetCursorPosX(), ImGui::GetCursorPosY());
+			ImVec2 cursorPosit(ImGui::GetCursorScreenPos());
+
+			float textPadd = 2.0f;
+			float textWitdh = text_size.y;
+
+			// make space for displaying the traces
+			for (int i = 0; i < m_levels_deep + 1; i++) {
+				ImGui::Text("");
+			}
+
+			ImDrawList* const draw = ImGui::GetWindowDrawList();
+			{
+				ImVec2 p0(cursorPosit.x, cursorPosit.y);
+				ImVec2 p1(p0.x + 100, p0.y + textWitdh + textPadd * 2);
+				draw->AddRectFilled(p0, p1, 0x448888ff);
+				draw->AddRect(p0, p1, 0x888888ff);
+
+				p0.x += 10.0f;
+				p0.y += textPadd;
+				draw->AddText(p0, 0xffffffff, "function1");
+			}
+
+			{
+				ImVec2 p0(cursorPosit.x + 120, cursorPosit.y);
+				ImVec2 p1(p0.x + 100, p0.y + textWitdh + textPadd * 2);
+				draw->AddRectFilled(p0, p1, 0x448888ff);
+				draw->AddRect(p0, p1, 0x888888ff);
+
+				p0.x += 10.0f;
+				p0.y += textPadd;
+				draw->AddText(p0, 0xffffffff, "function2");
+			}
+		}
+	}
+
+	dArray<dTrackerSample*> m_frames;
+	int m_name;
+	int m_levels_deep;
+	bool m_isOpen;
 };
 
 class dProfilerTrace::dDataBase
@@ -73,7 +198,6 @@ class dProfilerTrace::dDataBase
 	dTimeTrackerMap<dTrackerString, unsigned> m_dictionary;
 };
 
-
 dProfilerTrace::dProfilerTrace(FILE* const file)
 	:m_rootNode()
 	,m_nameList()
@@ -112,6 +236,8 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	}
 
 	dTimeTrackerMap<dThreadTrace, unsigned>::Iterator traceIter (database.m_trace);
+	unsigned maxTime = 0;
+	unsigned minTime = -1;
 	for (traceIter.Begin(); traceIter; traceIter ++) {
 		dThreadTrace& track = traceIter.GetNode()->GetInfo();
 		const int threadsCount = track.GetSize();
@@ -120,8 +246,16 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 			track[i].m_nameHash = remapHashIndex;
 		}
 		int treadHashIndex = nameMap.Find(traceIter.GetKey())->GetInfo();
-		m_rootNode.m_treads.Push(new dTrackerThread(treadHashIndex, track, m_nameList));
+
+		dTrackerThread* const thread = new dTrackerThread(treadHashIndex, track);
+		m_rootNode.m_treads.Push(thread);
+
+		const dArray<dTrackerSample*>& frames = thread->m_frames;
+		minTime = dMin(minTime, frames[0]->m_start);
+		maxTime = dMax(maxTime, frames[frames.GetSize() - 1]->m_start);
 	}
+	m_rootNode.m_minTime = minTime;
+	m_rootNode.m_maxTime = maxTime;
 }
 
 dProfilerTrace::~dProfilerTrace()
@@ -155,7 +289,7 @@ void dProfilerTrace::ReadLabels(dDataBase& database)
 }
 
 
-#define IM_ARRAYSIZE(_ARR)      ((int)(sizeof(_ARR)/sizeof(*_ARR)))
+//#define IM_ARRAYSIZE(_ARR)      ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
 {
@@ -618,7 +752,7 @@ void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
     }
 */
 
-	m_rootNode.Render(viewer, m_nameList);
+	m_rootNode.Render(viewer);
 /*
 	if (ImGui::CollapsingHeader("Graphs widgets")) {
 		static bool animate = true;
@@ -682,141 +816,10 @@ void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
 }
 
 
-
-// ******************************************************
-//
-// dTrackerSample
-//
-// ******************************************************
-dProfilerTrace::dTrackerSample::dTrackerSample(unsigned name, unsigned start, unsigned duration)
-	:m_name(name)
-	,m_start(start)
-	,m_duration(duration)
-	,m_children(dArray<dTrackerSample*>())
-{
-}
-
-dProfilerTrace::dTrackerSample::~dTrackerSample()
-{
-	for (int i = 0; i < m_children.GetSize(); i++) {
-		delete m_children[i];
-	}
-}
-
-void dProfilerTrace::dTrackerSample::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
-{
-
-}
-
-// ******************************************************
-//
-// dTrackerThread
-//
-// ******************************************************
-dProfilerTrace::dTrackerThread::dTrackerThread(unsigned threadName, dThreadTrace& track, const dArray<dTrackerString>& xxxxx)
-	:m_frames()
-	,m_name(threadName)
-	,m_levels_deep(1)
-	,m_isOpen(true)
-{
-	const dTrackerString& xxxxxxxxxxx = xxxxx[threadName];
-
-	int index = 0;
-	const int maxSize = track.GetSize();
-	do {
-		const dTimeTrackerRecord& record = track[index];
-		dTrackerSample* const trace = new dTrackerSample(record.m_nameHash, record.m_start, record.m_duration);
-
-		const dTrackerString& xxxxxxxxx = xxxxx[record.m_nameHash];
-
-		bool isRootTrace = true;
-		const int framesCount = m_frames.GetSize();
-
-		if (framesCount) {
-			int x0 = record.m_start;
-			//int x1 = x0 + record.m_duration;
-			int y0 = m_frames[framesCount - 1]->m_start;
-			int y1 = y0 + m_frames[framesCount - 1]->m_duration;
-			if (x0 >= y1) {
-				m_frames.Push(trace);
-			}
-			else {
-				index *= 1;
-				//assert (0);
-			}
-		}
-		else {
-			m_frames.Push(trace);
-		}
-
-		index++;
-	} while (index < maxSize);
-}
-
-dProfilerTrace::dTrackerThread::~dTrackerThread()
-{
-	for (int i = 0; i < m_frames.GetSize(); i++) {
-		delete m_frames[i];
-	}
-}
-
-
-void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
-{
-	const char* const threadName = nameList[m_name].m_string;
-
-	if (ImGui::CollapsingHeader(threadName, &m_isOpen)) {
-		//GLFWwindow* const window = viewer->GetWindow();
-		//ImDrawList* const draw = window->DrawList;
-
-		ImVec2 text_size = ImGui::CalcTextSize("");
-		//ImVec2 cursorPosit(ImGui::GetCursorPosX(), ImGui::GetCursorPosY());
-		ImVec2 cursorPosit(ImGui::GetCursorScreenPos());
-		// make space for displaying the traces
-		for (int i = 0; i < m_levels_deep; i ++) {
-//			ImVec2 cursorPosit0(ImGui::GetCursorScreenPos());
-			ImGui::Text("");
-//			ImVec2 cursorPosit1(ImGui::GetCursorScreenPos());
-//			ImGui::Text("y");
-//			ImVec2 cursorPosit2(ImGui::GetCursorScreenPos());
-//			ImGui::Text("z");
-		}
-	
-		//cursorPosit.x += 50.0f;
-		//cursorPosit.y += 20.0f;
-		ImDrawList* const draw = ImGui::GetWindowDrawList();
-		{
-			ImVec2 p0(cursorPosit.x, cursorPosit.y);
-			ImVec2 p1(p0.x + 100, p0.y + 17);
-			draw->AddRectFilled(p0, p1, 0x448888ff);
-			draw->AddRect(p0, p1, 0x888888ff);
-
-			p0.x += 10.0f;
-			p0.y += 2.0f;
-			draw->AddText(p0, 0xffffffff, "function1");
-		}
-
-		{
-			ImVec2 p0(cursorPosit.x + 120, cursorPosit.y);
-			ImVec2 p1(p0.x + 100, p0.y + 17);
-			draw->AddRectFilled(p0, p1, 0x448888ff);
-			draw->AddRect(p0, p1, 0x888888ff);
-
-			p0.x += 10.0f;
-			p0.y += 2.0f;
-			draw->AddText(p0, 0xffffffff, "function2");
-		}
-	}
-}
-
-
-// ******************************************************
-//
-// dTraceCapture
-//
-// ******************************************************
 dProfilerTrace::dTraceCapture::dTraceCapture()
 	:m_treads(dArray<dTrackerThread*>())
+	,m_minTime(0)
+	,m_maxTime(0)
 {
 }
 
@@ -827,9 +830,11 @@ dProfilerTrace::dTraceCapture::~dTraceCapture()
 	}
 }
 
-void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
+void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer)
 {
+	// display time line
+	ImGui::Text("time line");
 	for (int i = 0; i < m_treads.GetSize(); i++) {
-		m_treads[i]->Render(viewer, nameList);
+		m_treads[i]->Render(viewer);
 	}
 }
