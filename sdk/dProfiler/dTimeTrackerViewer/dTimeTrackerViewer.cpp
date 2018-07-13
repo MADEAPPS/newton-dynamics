@@ -125,9 +125,11 @@ void dTimeTrackerViewer::Run()
 			ImGui::SetNextWindowPos(windowsPosit, ImGuiSetCond_Always);
 			ImGui::SetNextWindowSize(windowsSize, ImGuiSetCond_Always);
 
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
 			ImGui::Begin("", &openflag, window_flags);
 			m_currentTrace->Render(this);
 			ImGui::End();
+			ImGui::PopStyleColor();
 		}
 
 		// Rendering
