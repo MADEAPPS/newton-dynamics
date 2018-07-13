@@ -774,7 +774,12 @@ void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer, co
 		ImVec2 cursorPosit(ImGui::GetCursorScreenPos());
 		// make space for displaying the traces
 		for (int i = 0; i < m_levels_deep; i ++) {
+//			ImVec2 cursorPosit0(ImGui::GetCursorScreenPos());
 			ImGui::Text("");
+//			ImVec2 cursorPosit1(ImGui::GetCursorScreenPos());
+//			ImGui::Text("y");
+//			ImVec2 cursorPosit2(ImGui::GetCursorScreenPos());
+//			ImGui::Text("z");
 		}
 	
 		//cursorPosit.x += 50.0f;
@@ -782,23 +787,23 @@ void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer, co
 		ImDrawList* const draw = ImGui::GetWindowDrawList();
 		{
 			ImVec2 p0(cursorPosit.x, cursorPosit.y);
-			ImVec2 p1(p0.x + 100, p0.y + 20);
+			ImVec2 p1(p0.x + 100, p0.y + 17);
 			draw->AddRectFilled(p0, p1, 0x448888ff);
 			draw->AddRect(p0, p1, 0x888888ff);
 
 			p0.x += 10.0f;
-			p0.y += 4.0f;
+			p0.y += 2.0f;
 			draw->AddText(p0, 0xffffffff, "function1");
 		}
 
 		{
 			ImVec2 p0(cursorPosit.x + 120, cursorPosit.y);
-			ImVec2 p1(p0.x + 100, p0.y + 20);
+			ImVec2 p1(p0.x + 100, p0.y + 17);
 			draw->AddRectFilled(p0, p1, 0x448888ff);
 			draw->AddRect(p0, p1, 0x888888ff);
 
 			p0.x += 10.0f;
-			p0.y += 4.0f;
+			p0.y += 2.0f;
 			draw->AddText(p0, 0xffffffff, "function2");
 		}
 	}
