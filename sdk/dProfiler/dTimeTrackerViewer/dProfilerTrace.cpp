@@ -820,6 +820,8 @@ dProfilerTrace::dTraceCapture::dTraceCapture()
 	:m_treads(dArray<dTrackerThread*>())
 	,m_minTime(0)
 	,m_maxTime(0)
+	,m_timeLineState(-1)
+	,m_timeLinePosition(100.0f)
 {
 }
 
@@ -830,12 +832,64 @@ dProfilerTrace::dTraceCapture::~dTraceCapture()
 	}
 }
 
+void dProfilerTrace::dTraceCapture::DrawTimeLine()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui::Text("time line");
+	ImGui::Text("");
+
+	ImDrawList* const draw = ImGui::GetWindowDrawList();
+	ImVec2 p0(ImGui::GetCursorScreenPos());
+	ImVec2 size(ImGui::GetWindowSize());
+	ImVec2 p1(p0);
+	p1.x += size.x;
+	draw->AddLine(p0, p1, IM_COL32_A_MASK + 0x8040);
+
+	float width = 40.0f;
+	ImVec2 q0(p0);
+	q0.x = m_timeLinePosition - width * 0.5f;
+	q0.y -= 4.0f;
+
+	ImVec2 q1(q0);
+	q1.x += width;
+	q1.y += 8.0f;
+	switch (m_timeLineState)
+	{
+		case 0:
+		{
+			if (ImGui::IsMouseDown(0)) {
+				ImVec2 mousePos(ImGui::GetMousePos());
+				m_timeLinePosition = mousePos.x;
+				q0.x = m_timeLinePosition - width * 0.5f;
+				q1.x = q0.x + width;
+			} else {
+				m_timeLineState = -1;
+			}
+			break;
+		}
+
+		default: 
+		{
+			if (ImGui::IsMouseDown(0) && ImGui::IsMouseHoveringRect(q0, q1, false)) {
+				m_timeLineState = 0;
+			}
+		}
+	}
+
+//	ImGui::Text("MouseWheel: %f", io.MouseWheel);
+//if (io.MouseWheel)
+//dTrace(("%f\n", io.MouseWheel));
+
+	draw->AddRectFilled(q0, q1, IM_COL32_A_MASK + 0x8040);
+
+	ImGui::Text("");
+}
+
 void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer)
 {
 	// display time line
-	ImGui::Text("time line");
+	DrawTimeLine();
 
-	ImGui::Text("");
 	for (int i = 0; i < m_treads.GetSize(); i++) {
 		m_treads[i]->Render(viewer);
 	}

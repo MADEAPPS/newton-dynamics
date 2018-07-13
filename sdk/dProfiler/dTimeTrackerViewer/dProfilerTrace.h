@@ -29,9 +29,14 @@ class dProfilerTrace
 		~dTraceCapture();
 		void Render(dTimeTrackerViewer* const viewer);
 
+		void DrawTimeLine();
+		
 		dArray<dTrackerThread*> m_treads;
 		unsigned m_minTime;
 		unsigned m_maxTime;
+		int m_timeLineState;
+		float m_timeLinePosition;
+		
 	};
 
 	public: 
