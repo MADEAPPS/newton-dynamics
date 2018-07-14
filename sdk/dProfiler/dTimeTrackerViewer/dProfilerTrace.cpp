@@ -140,10 +140,12 @@ class dProfilerTrace::dTrackerThread
 			ImVec2 box1(0.0f, cursorPosit0.y + textWitdh + textPadd * 2.0f);
 			
 			ImU32 rectColor = 0xff00c000;
+			ImU32 groupColor = 0xffa00000;
+			ImU32 textColor = 0xff000000;
 			//ImU32 borderColor = 0xff00ff00;
 
 			ImDrawList* const draw = ImGui::GetWindowDrawList();
-			
+int xxx = 0;			
 			for (int i = 0; i < m_frames.GetSize(); i ++) {
 				const dTrackerSample* const sample0 = m_frames[i];
 
@@ -156,20 +158,48 @@ class dProfilerTrace::dTrackerThread
 				float x1 = origin + scale * (sample0->m_start + sample0->m_duration - p0);
 
 				if (x1 >= 0.0f) {
+					ImU32 color = rectColor;
 					while (((x1 - x0) < grouping) && (i < m_frames.GetSize())) {
+						const dTrackerSample* const sample1 = m_frames[i + 1];
+						float z0 = origin + scale * (sample1->m_start - p0);
+						float z1 = origin + scale * (sample1->m_start + sample1->m_duration - p0);
+						color = groupColor;
+						if ((z1 - z0) >= grouping) {
+							break;
+						}
 						i ++;
-						const dTrackerSample* const sample1 = m_frames[i];
-						x1 = origin + scale * (sample1->m_start + sample1->m_duration - p0);
 					} 
 
 					box0.x = x0;
 					box1.x = x1;
-					draw->AddRectFilled(box0, box1, rectColor);
+					draw->AddRectFilled(box0, box1, color);
 
 					if (sample0 == m_frames[i]) {
-						//textPost.x = box0.x;
-						//const char* const functionName = root.m_nameList[sample0->m_name].m_string;
-						//draw->AddText(textPost, test_color, functionName);
+						const char* const functionName = root.m_nameList[sample0->m_name].m_string;
+						ImVec2 text_size = ImGui::CalcTextSize(functionName);
+						int t1 = strlen (functionName);
+						const char* functionNameEnd = functionName + t1;
+						if (text_size.x > (x1 - x0)) {
+							int t0 = 0;
+							while ((t1 - t0) >= 5) {
+								int t = (t0 + t1) / 2;
+								text_size = ImGui::CalcTextSize(functionName, functionName + t);
+								if (text_size.x > (x1 - x0)) {
+									t1 = t;
+								} else {
+									t0 = t;
+								}
+							}
+							functionNameEnd = functionName + t0;
+							text_size = ImGui::CalcTextSize(functionName, functionName + t0);
+						}
+
+						if (text_size.x <= (x1 - x0)) {
+							ImVec2 textPost (box0);
+							textPost.y += textPadd;
+							textPost.x += (x1 - x0 - text_size.x) * 0.5f;
+							draw->AddText(textPost, textColor, functionName, functionNameEnd);
+						}
 
 						sample0->Render(viewer);
 					}
@@ -262,12 +292,12 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 		dTrackerString name (iter.GetNode()->GetInfo());
 		unsigned key = iter.GetKey();
 		nameMap.Insert(m_nameList.GetSize(), key);
-		strrev (name.m_string);
+		_strrev (name.m_string);
 		char* const ptr = strstr (name.m_string, "::");
 		if (ptr) {
 			*ptr = 0;
 		}
-		strrev (name.m_string);
+		_strrev (name.m_string);
 		m_nameList.Push (name);
 	}
 
@@ -293,7 +323,7 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	m_rootNode.m_minTime = float (minTime);
 	m_rootNode.m_maxTime = float (maxTime);
 
-	m_rootNode.m_scale = 100.0f;
+	m_rootNode.m_scale = 2500.0f;
 	m_rootNode.m_origin = m_rootNode.m_minTime;
 }
 
