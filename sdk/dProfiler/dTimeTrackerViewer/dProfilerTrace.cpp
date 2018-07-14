@@ -104,46 +104,87 @@ class dProfilerTrace::dTrackerThread
 
 	void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer)
 	{
-		const dProfilerTrace& root = *viewer->GetTrace();
+		dProfilerTrace& root = *viewer->GetTrace();
 		const char* const threadName = root.m_nameList[m_name].m_string;
 
 		if (ImGui::CollapsingHeader(threadName, &m_isOpen)) {
-			//GLFWwindow* const window = viewer->GetWindow();
-			//ImDrawList* const draw = window->DrawList;
 
-			ImU32 test_color = ImGui::GetColorU32(ImGuiCol_Text);
+			// calculate vew area rectangle
+			ImVec2 cursorPosit0(ImGui::GetCursorScreenPos());
+			for (int i = 0; i < m_levels_deep + 1; i++) {
+				ImGui::Text("");
+			}
+			ImVec2 cursorPosit1(ImGui::GetCursorScreenPos());
+			cursorPosit1.x += ImGui::GetWindowSize().x;
+
+			if (ImGui::IsMouseHoveringRect(cursorPosit0, cursorPosit1, false)) {
+				// if mouse is over this area save the the rectangle
+				root.m_rootNode.m_mouseBoxp0 = cursorPosit0;
+				root.m_rootNode.m_mouseBoxp1 = cursorPosit1;
+			}
+
+			const dTraceCapture& capture = viewer->GetTrace()->m_rootNode; 
+
+			//ImU32 test_color = ImGui::GetColorU32(ImGuiCol_Text);
 			ImVec2 text_size = ImGui::CalcTextSize("");
-			ImVec2 cursorPosit(ImGui::GetCursorScreenPos());
 
 			float textPadd = 2.0f;
 			float textWitdh = text_size.y;
 
-			// make space for displaying the traces
-			for (int i = 0; i < m_levels_deep + 1; i++) {
-				ImGui::Text("");
-			}
+/*			
+			float p0 = capture.m_timeLinePosition - capture.m_timeWidth * 0.5f;
+			float p1 = capture.m_timeLinePosition + capture.m_timeWidth * 0.5f;
+
+			float h = (capture.m_timeLineP1 - capture.m_timeLineP0) / capture.m_timeWidth;
+			float o = (capture.m_timeLineP1 + capture.m_timeLineP0) * 0.5f;
+			float x0 = o + h * (capture.m_timeLineP0 - capture.m_timeLinePosition);
+			float x1 = o + h * (capture.m_timeLineP1 - capture.m_timeLinePosition);
+
+			float scale = (x1 - x0) / (capture.m_maxTime - capture.m_minTime);
+
+			ImVec2 box0(0.0f, cursorPosit.y);
+			ImVec2 box1(0.0f, cursorPosit.y + textWitdh + textPadd * 2.0f);
+
+			ImVec2 textPost(box0);
+			textPost.y += 2.0f;
+
+			
+			//ImU32 borderColor = 0xff00ff00;
+*/
+			
+			float origin = capture.m_origin;
+			float p0 = capture.m_minTime;
+			float width = capture.m_windowSize;
+			float scale = capture.m_windowSize / (capture.m_scale * (capture.m_maxTime - capture.m_minTime));
+
+			ImVec2 box0(0.0f, cursorPosit0.y);
+			ImVec2 box1(0.0f, cursorPosit0.y + textWitdh + textPadd * 2.0f);
+			
+			ImU32 rectColor = 0xff00c000;
 
 			ImDrawList* const draw = ImGui::GetWindowDrawList();
-			{
-				ImVec2 p0(cursorPosit.x, cursorPosit.y);
-				ImVec2 p1(p0.x + 100, p0.y + textWitdh + textPadd * 2);
-				draw->AddRectFilled(p0, p1, 0x448888ff);
-				draw->AddRect(p0, p1, 0x888888ff);
+			
+			for (int i = 0; i < m_frames.GetSize(); i ++) {
+				dTrackerSample* const sample = m_frames[i];
 
-				p0.x += 10.0f;
-				p0.y += textPadd;
-				draw->AddText(p0, test_color, "function1");
-			}
+				float x0 = origin + scale * (sample->m_start - p0);
 
-			{
-				ImVec2 p0(cursorPosit.x + 120, cursorPosit.y);
-				ImVec2 p1(p0.x + 100, p0.y + textWitdh + textPadd * 2);
-				draw->AddRectFilled(p0, p1, 0x448888ff);
-				draw->AddRect(p0, p1, 0x888888ff);
+				if (x0 >= width) {
+					break;
+				}
 
-				p0.x += 10.0f;
-				p0.y += textPadd;
-				draw->AddText(p0, test_color, "function2");
+				float x1 = origin + scale * (sample->m_start + sample->m_duration - p0);
+
+				if (x1 >= 0.0f) {
+					box0.x = x0;
+					box1.x = x1;
+					draw->AddRectFilled(box0, box1, rectColor);
+					//draw->AddRect(box0, box1, borderColor);
+
+					//textPost.x = box0.x;
+					//const char* const functionName = root.m_nameList[sample->m_name].m_string;
+					//draw->AddText(textPost, test_color, functionName);
+				}
 			}
 		}
 	}
@@ -254,8 +295,11 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 		minTime = dMin(minTime, frames[0]->m_start);
 		maxTime = dMax(maxTime, frames[frames.GetSize() - 1]->m_start);
 	}
-	m_rootNode.m_minTime = minTime;
-	m_rootNode.m_maxTime = maxTime;
+	m_rootNode.m_minTime = float (minTime);
+	m_rootNode.m_maxTime = float (maxTime);
+
+	m_rootNode.m_scale = 1.0f;
+	m_rootNode.m_origin = m_rootNode.m_minTime;
 }
 
 dProfilerTrace::~dProfilerTrace()
@@ -818,11 +862,17 @@ void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
 
 dProfilerTrace::dTraceCapture::dTraceCapture()
 	:m_treads(dArray<dTrackerThread*>())
-	,m_minTime(0)
-	,m_maxTime(0)
-	,m_timeLineState(-1)
-	,m_timeWidth(40.0f)
-	,m_timeLinePosition(100.0f)
+	,m_minTime(0.0f)
+	,m_maxTime(0.0f)
+	,m_windowSize(0.0f)
+	,m_scale(1.0f)
+//	,m_mouseBoxp0()
+//	,m_mouseBoxp1()
+//	,m_timeWidth(2.0f)
+//	,m_timeLineP0(0.0f)
+//	,m_timeLineP1(0.0f)
+//	,m_timeLinePosition(100.0f)
+//	,m_timeLineState(-1)
 {
 }
 
@@ -837,14 +887,15 @@ void dProfilerTrace::dTraceCapture::DrawTimeLine()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui::Text("time line");
-//	ImGui::Text("");
-
+/*
 	ImDrawList* const draw = ImGui::GetWindowDrawList();
 	ImVec2 p0(ImGui::GetCursorScreenPos());
 	ImVec2 size(ImGui::GetWindowSize());
 	ImVec2 p1(p0);
 	p1.x += size.x - 40.0f;
 	draw->AddLine(p0, p1, IM_COL32_A_MASK + 0x8040);
+	m_timeLineP0 = p0.x;
+	m_timeLineP1 = p1.x;
 
 	ImVec2 q0(p0);
 	q0.x = m_timeLinePosition - m_timeWidth * 0.5f;
@@ -853,44 +904,56 @@ void dProfilerTrace::dTraceCapture::DrawTimeLine()
 	ImVec2 q1(q0);
 	q1.x += m_timeWidth;
 	q1.y += 10.0f;
-	switch (m_timeLineState)
+
+	draw->AddRectFilled(q0, q1, IM_COL32_A_MASK + 0x8040);
+*/
+	ImGui::Text("");
+}
+
+void dProfilerTrace::dTraceCapture::MouseMove()
+{
+/*
+	switch (m_timeLineState) 
 	{
 		case 0:
 		{
 			if (ImGui::IsMouseDown(0)) {
 				ImVec2 mousePos(ImGui::GetMousePos());
-				m_timeLinePosition = dClamp(mousePos.x, p0.x + m_timeWidth * 0.5f, p1.x - m_timeWidth * 0.5f);
-				q0.x = m_timeLinePosition - m_timeWidth * 0.5f;
-				q1.x = q0.x + m_timeWidth;
+				//m_timeLinePosition = dClamp(mousePos.x, p0.x + m_timeWidth * 0.5f, p1.x - m_timeWidth * 0.5f);
+				//q0.x = m_timeLinePosition - m_timeWidth * 0.5f;
+				//q1.x = q0.x + m_timeWidth;
 			} else {
 				m_timeLineState = -1;
 			}
+
 			break;
 		}
 
-		default: 
+		default:
 		{
-			if (ImGui::IsMouseDown(0) && ImGui::IsMouseHoveringRect(q0, q1, false)) {
-				m_timeLineState = 0;
-			}
+		   if (ImGui::IsMouseDown(0) && ImGui::IsMouseHoveringRect(m_mouseBoxp0, m_mouseBoxp1, false)) {
+			   ImVec2 mousePos(ImGui::GetMousePos());
+			   m_timeLineOffset = ;
+			   m_timeLineState = 0;
+		   }
 		}
 	}
-
-//	ImGui::Text("MouseWheel: %f", io.MouseWheel);
-//if (io.MouseWheel)
-//dTrace(("%f\n", io.MouseWheel));
-
-	draw->AddRectFilled(q0, q1, IM_COL32_A_MASK + 0x8040);
-
-	ImGui::Text("");
+*/
 }
 
 void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer)
 {
+	ImVec2 size(ImGui::GetWindowSize());
+	m_windowSize = size.x;
+
 	// display time line
 	DrawTimeLine();
 
+	// render all traces
 	for (int i = 0; i < m_treads.GetSize(); i++) {
 		m_treads[i]->Render(viewer);
 	}
+
+	// update mouse motion
+	MouseMove();
 }
