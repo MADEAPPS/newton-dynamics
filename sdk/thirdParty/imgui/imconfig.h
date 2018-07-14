@@ -52,4 +52,3 @@ namespace ImGui
 }
 */
 
-#define ImDrawIdx unsigned int

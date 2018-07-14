@@ -47,7 +47,7 @@ class dProfilerTrace::dTrackerSample
 		}
 	}
 
-	void Render(dTimeTrackerViewer* const viewer, const dArray<dTrackerString>& nameList)
+	const void Render(dTimeTrackerViewer* const viewer) const
 	{
 
 	}
@@ -109,7 +109,7 @@ class dProfilerTrace::dTrackerThread
 
 		if (ImGui::CollapsingHeader(threadName, &m_isOpen)) {
 
-			// calculate vew area rectangle
+			// calculate view area rectangle
 			ImVec2 cursorPosit0(ImGui::GetCursorScreenPos());
 			for (int i = 0; i < m_levels_deep + 1; i++) {
 				ImGui::Text("");
@@ -125,65 +125,54 @@ class dProfilerTrace::dTrackerThread
 
 			const dTraceCapture& capture = viewer->GetTrace()->m_rootNode; 
 
-			//ImU32 test_color = ImGui::GetColorU32(ImGuiCol_Text);
 			ImVec2 text_size = ImGui::CalcTextSize("");
 
 			float textPadd = 2.0f;
 			float textWitdh = text_size.y;
 
-/*			
-			float p0 = capture.m_timeLinePosition - capture.m_timeWidth * 0.5f;
-			float p1 = capture.m_timeLinePosition + capture.m_timeWidth * 0.5f;
-
-			float h = (capture.m_timeLineP1 - capture.m_timeLineP0) / capture.m_timeWidth;
-			float o = (capture.m_timeLineP1 + capture.m_timeLineP0) * 0.5f;
-			float x0 = o + h * (capture.m_timeLineP0 - capture.m_timeLinePosition);
-			float x1 = o + h * (capture.m_timeLineP1 - capture.m_timeLinePosition);
-
-			float scale = (x1 - x0) / (capture.m_maxTime - capture.m_minTime);
-
-			ImVec2 box0(0.0f, cursorPosit.y);
-			ImVec2 box1(0.0f, cursorPosit.y + textWitdh + textPadd * 2.0f);
-
-			ImVec2 textPost(box0);
-			textPost.y += 2.0f;
-
-			
-			//ImU32 borderColor = 0xff00ff00;
-*/
-			
+			float grouping = 4.0f;
 			float origin = capture.m_origin;
 			float p0 = capture.m_minTime;
 			float width = capture.m_windowSize;
-			float scale = capture.m_windowSize / (capture.m_scale * (capture.m_maxTime - capture.m_minTime));
+			float scale = capture.m_windowSize * capture.m_scale / (capture.m_maxTime - capture.m_minTime);
 
 			ImVec2 box0(0.0f, cursorPosit0.y);
 			ImVec2 box1(0.0f, cursorPosit0.y + textWitdh + textPadd * 2.0f);
 			
 			ImU32 rectColor = 0xff00c000;
+			//ImU32 borderColor = 0xff00ff00;
 
 			ImDrawList* const draw = ImGui::GetWindowDrawList();
 			
 			for (int i = 0; i < m_frames.GetSize(); i ++) {
-				dTrackerSample* const sample = m_frames[i];
+				const dTrackerSample* const sample0 = m_frames[i];
 
-				float x0 = origin + scale * (sample->m_start - p0);
+				float x0 = origin + scale * (sample0->m_start - p0);
 
 				if (x0 >= width) {
 					break;
 				}
 
-				float x1 = origin + scale * (sample->m_start + sample->m_duration - p0);
+				float x1 = origin + scale * (sample0->m_start + sample0->m_duration - p0);
 
 				if (x1 >= 0.0f) {
+					while (((x1 - x0) < grouping) && (i < m_frames.GetSize())) {
+						i ++;
+						const dTrackerSample* const sample1 = m_frames[i];
+						x1 = origin + scale * (sample1->m_start + sample1->m_duration - p0);
+					} 
+
 					box0.x = x0;
 					box1.x = x1;
 					draw->AddRectFilled(box0, box1, rectColor);
-					//draw->AddRect(box0, box1, borderColor);
 
-					//textPost.x = box0.x;
-					//const char* const functionName = root.m_nameList[sample->m_name].m_string;
-					//draw->AddText(textPost, test_color, functionName);
+					if (sample0 == m_frames[i]) {
+						//textPost.x = box0.x;
+						//const char* const functionName = root.m_nameList[sample0->m_name].m_string;
+						//draw->AddText(textPost, test_color, functionName);
+
+						sample0->Render(viewer);
+					}
 				}
 			}
 		}
@@ -270,9 +259,15 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	dTimeTrackerMap<int, unsigned> nameMap;
 	dTimeTrackerMap<dTrackerString, unsigned>::Iterator iter (database.m_dictionary);
 	for (iter.Begin(); iter; iter ++) {
-		const dTrackerString& name = iter.GetNode()->GetInfo();
+		dTrackerString name (iter.GetNode()->GetInfo());
 		unsigned key = iter.GetKey();
 		nameMap.Insert(m_nameList.GetSize(), key);
+		strrev (name.m_string);
+		char* const ptr = strstr (name.m_string, "::");
+		if (ptr) {
+			*ptr = 0;
+		}
+		strrev (name.m_string);
 		m_nameList.Push (name);
 	}
 
@@ -298,7 +293,7 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	m_rootNode.m_minTime = float (minTime);
 	m_rootNode.m_maxTime = float (maxTime);
 
-	m_rootNode.m_scale = 1.0f;
+	m_rootNode.m_scale = 100.0f;
 	m_rootNode.m_origin = m_rootNode.m_minTime;
 }
 
@@ -822,7 +817,7 @@ void dProfilerTrace::Render (dTimeTrackerViewer* const viewer)
 		ImGui::PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80));
 
 		// Use functions to generate output
-		// FIXME: This is rather awkward because current plot API only pass in indices. We probably want an API passing floats and user provide sample rate/count.
+		// FIXME: This is rather awkward because current plot API only pass in indices. We probably want an API passing floats and user provide sample0 rate/count.
 		struct Funcs
 		{
 			static float Sin(void*, int i) { return sinf(i * 0.1f); }

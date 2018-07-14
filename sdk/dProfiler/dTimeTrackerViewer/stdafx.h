@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
+#include <string.h>
 
 // TODO: reference additional headers your program requires here
 #include <zlib.h>
