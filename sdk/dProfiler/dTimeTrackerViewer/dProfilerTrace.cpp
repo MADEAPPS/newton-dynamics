@@ -821,6 +821,7 @@ dProfilerTrace::dTraceCapture::dTraceCapture()
 	,m_minTime(0)
 	,m_maxTime(0)
 	,m_timeLineState(-1)
+	,m_timeWidth(40.0f)
 	,m_timeLinePosition(100.0f)
 {
 }
@@ -836,32 +837,31 @@ void dProfilerTrace::dTraceCapture::DrawTimeLine()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui::Text("time line");
-	ImGui::Text("");
+//	ImGui::Text("");
 
 	ImDrawList* const draw = ImGui::GetWindowDrawList();
 	ImVec2 p0(ImGui::GetCursorScreenPos());
 	ImVec2 size(ImGui::GetWindowSize());
 	ImVec2 p1(p0);
-	p1.x += size.x;
+	p1.x += size.x - 40.0f;
 	draw->AddLine(p0, p1, IM_COL32_A_MASK + 0x8040);
 
-	float width = 40.0f;
 	ImVec2 q0(p0);
-	q0.x = m_timeLinePosition - width * 0.5f;
-	q0.y -= 4.0f;
+	q0.x = m_timeLinePosition - m_timeWidth * 0.5f;
+	q0.y -= 5.0f;
 
 	ImVec2 q1(q0);
-	q1.x += width;
-	q1.y += 8.0f;
+	q1.x += m_timeWidth;
+	q1.y += 10.0f;
 	switch (m_timeLineState)
 	{
 		case 0:
 		{
 			if (ImGui::IsMouseDown(0)) {
 				ImVec2 mousePos(ImGui::GetMousePos());
-				m_timeLinePosition = mousePos.x;
-				q0.x = m_timeLinePosition - width * 0.5f;
-				q1.x = q0.x + width;
+				m_timeLinePosition = dClamp(mousePos.x, p0.x + m_timeWidth * 0.5f, p1.x - m_timeWidth * 0.5f);
+				q0.x = m_timeLinePosition - m_timeWidth * 0.5f;
+				q1.x = q0.x + m_timeWidth;
 			} else {
 				m_timeLineState = -1;
 			}

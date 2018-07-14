@@ -35,6 +35,7 @@ class dProfilerTrace
 		unsigned m_minTime;
 		unsigned m_maxTime;
 		int m_timeLineState;
+		float m_timeWidth;
 		float m_timeLinePosition;
 		
 	};
