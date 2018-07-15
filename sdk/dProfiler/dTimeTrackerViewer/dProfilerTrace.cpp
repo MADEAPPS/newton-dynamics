@@ -61,7 +61,7 @@ class dProfilerTrace::dTrackerSample
 class dProfilerTrace::dTrackerThread
 {
 	public:
-	dTrackerThread(unsigned threadName, dThreadTrace& track)
+	dTrackerThread(unsigned threadName, const dThreadTrace& track)
 		:m_frames()
 		,m_name(threadName)
 		,m_levels_deep(1)
@@ -70,15 +70,13 @@ class dProfilerTrace::dTrackerThread
 		int index = 0;
 		const int maxSize = track.GetSize();
 		do {
-			const dTimeTrackerRecord& record = track[index];
-			dTrackerSample* const trace = new dTrackerSample(record.m_nameHash, record.m_start, record.m_duration);
+			dTrackerSample* const trace = GetSample(track, index);
 
 			bool isRootTrace = true;
 			const int framesCount = m_frames.GetSize();
 
 			if (framesCount) {
-				int x0 = record.m_start;
-				//int x1 = x0 + record.m_duration;
+				int x0 = trace->m_start;
 				int y0 = m_frames[framesCount - 1]->m_start;
 				int y1 = y0 + m_frames[framesCount - 1]->m_duration;
 				if (x0 >= y1) {
@@ -90,8 +88,6 @@ class dProfilerTrace::dTrackerThread
 			} else {
 				m_frames.Push(trace);
 			}
-
-			index++;
 		} while (index < maxSize);
 	}
 
@@ -100,6 +96,14 @@ class dProfilerTrace::dTrackerThread
 		for (int i = 0; i < m_frames.GetSize(); i++) {
 			delete m_frames[i];
 		}
+	}
+
+	dTrackerSample* GetSample (const dThreadTrace& track, int& index)
+	{
+		const dTimeTrackerRecord& record = track[index];
+		dTrackerSample* const trace = new dTrackerSample(record.m_nameHash, record.m_start, record.m_duration);
+		index ++;
+		return trace;
 	}
 
 	void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer)

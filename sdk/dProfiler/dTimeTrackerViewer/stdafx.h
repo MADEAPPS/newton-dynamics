@@ -31,9 +31,10 @@ class dArray
 	public:
 	dArray()
 		:m_data(new T[1])
-		, m_count(0)
-		, m_maxCount(1)
+		,m_count(0)
+		,m_maxCount(1)
 	{
+		memset (m_data, 0, sizeof (T));
 	}
 
 	T& operator[] (int i)
@@ -46,7 +47,6 @@ class dArray
 	{
 		return m_data[i];
 	}
-
 
 	int GetSize() const
 	{
