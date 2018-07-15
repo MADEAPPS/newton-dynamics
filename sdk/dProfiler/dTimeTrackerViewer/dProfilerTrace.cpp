@@ -145,7 +145,7 @@ class dProfilerTrace::dTrackerThread
 			//ImU32 borderColor = 0xff00ff00;
 
 			ImDrawList* const draw = ImGui::GetWindowDrawList();
-int xxx = 0;			
+
 			for (int i = 0; i < m_frames.GetSize(); i ++) {
 				const dTrackerSample* const sample0 = m_frames[i];
 
@@ -175,7 +175,9 @@ int xxx = 0;
 					draw->AddRectFilled(box0, box1, color);
 
 					if (sample0 == m_frames[i]) {
-						const char* const functionName = root.m_nameList[sample0->m_name].m_string;
+						char functionName[256];
+						//const char* const functionName = root.m_nameList[sample0->m_name].m_string;
+						sprintf (functionName, "%s %d", root.m_nameList[sample0->m_name].m_string, sample0->m_duration);
 						ImVec2 text_size = ImGui::CalcTextSize(functionName);
 						int t1 = strlen (functionName);
 						const char* functionNameEnd = functionName + t1;
@@ -323,8 +325,24 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	m_rootNode.m_minTime = float (minTime);
 	m_rootNode.m_maxTime = float (maxTime);
 
-	m_rootNode.m_scale = 2500.0f;
+	m_rootNode.m_scale = 500.0f;
 	m_rootNode.m_origin = m_rootNode.m_minTime;
+
+	for (int i = 1; i < m_rootNode.m_treads.GetSize(); i ++) {
+		dTrackerThread* const tmp = m_rootNode.m_treads[i];
+		const dTrackerString& name0 = m_nameList[tmp->m_name];
+		int index = i;
+		for (; index > 0; index --) {
+			dTrackerThread* const tread = m_rootNode.m_treads[index - 1];
+			const dTrackerString& name1 = m_nameList[tread->m_name];
+			int test = strcmp (name0.m_string, name1.m_string);
+			if (test <= 0) {
+				break;
+			}
+			m_rootNode.m_treads[index] = tread;
+		}
+		m_rootNode.m_treads[index] = tmp;
+	}
 }
 
 dProfilerTrace::~dProfilerTrace()
@@ -891,13 +909,6 @@ dProfilerTrace::dTraceCapture::dTraceCapture()
 	,m_maxTime(0.0f)
 	,m_windowSize(0.0f)
 	,m_scale(1.0f)
-//	,m_mouseBoxp0()
-//	,m_mouseBoxp1()
-//	,m_timeWidth(2.0f)
-//	,m_timeLineP0(0.0f)
-//	,m_timeLineP1(0.0f)
-//	,m_timeLinePosition(100.0f)
-//	,m_timeLineState(-1)
 {
 }
 
@@ -965,6 +976,7 @@ void dProfilerTrace::dTraceCapture::MouseMove()
 	}
 */
 }
+
 
 void dProfilerTrace::dTraceCapture::Render(dTimeTrackerViewer* const viewer)
 {

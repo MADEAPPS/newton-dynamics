@@ -31,7 +31,7 @@ class dProfilerTrace
 
 		void MouseMove();
 		void DrawTimeLine();
-		
+
 		dArray<dTrackerThread*> m_treads;
 		ImVec2 m_mouseBoxp0;
 		ImVec2 m_mouseBoxp1;
@@ -40,15 +40,6 @@ class dProfilerTrace
 		float m_windowSize;
 		float m_scale;
 		float m_origin;
-
-/*
-		float m_timeWidth;
-		float m_timeLineP0;
-		float m_timeLineP1;
-		float m_timeLinePosition;
-		float m_timeLineOffset;
-		int m_timeLineState;
-*/
 	};
 
 	public: 
