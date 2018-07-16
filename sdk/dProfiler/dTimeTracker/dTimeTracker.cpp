@@ -225,7 +225,7 @@ class dTimeTrackerServer
 				unsigned key = nameIter.GetKey();
 				if (!filter.Find(key)) {
 					const dTimeTrack::dTrackerString& name = nameIter.GetNode()->GetInfo();
-					int size = strlen(name.m_string);
+					int size = int (strlen(name.m_string));
 					fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
 					fwrite(&key, sizeof(unsigned), 1, m_currentFile);
 					fwrite(&size, sizeof(unsigned), 1, m_currentFile);
