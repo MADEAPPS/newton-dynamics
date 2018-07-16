@@ -76,6 +76,7 @@ class dProfilerTrace::dTrackerSample
 		ImU32 rectColor = 0xff00c000;
 		ImU32 groupColor = 0xffa00000;
 		ImU32 textColor = 0xff000000;
+		ImU32 borderColor = 0xffffffff;
 
 		ImDrawList* const draw = ImGui::GetWindowDrawList();
 
@@ -83,21 +84,11 @@ class dProfilerTrace::dTrackerSample
 		float x1 = origin + scale * (m_start + m_duration - p0);
 
 		ImU32 color = rectColor;
-//		while ((x1 - x0) < grouping) {
-//			const dTrackerSample* const sample1 = m_children[i + 1];
-//			float z0 = origin + scale * (sample1->m_start - p0);
-//			float z1 = origin + scale * (sample1->m_start + sample1->m_duration - p0);
-//			color = groupColor;
-//			if ((z1 - z0) >= grouping) {
-//				break;
-//			}
-//			i++;
-//		}
 
 		box0.x = x0;
 		box1.x = x1;
 		draw->AddRectFilled(box0, box1, color);
-
+		draw->AddRect(box0, box1, borderColor);
 		
 		char functionName[256];
 		sprintf(functionName, "%s %d", root.m_nameList[m_name].m_string, m_duration);
@@ -191,17 +182,37 @@ class dProfilerTrace::dTrackerThread
 		dAssert ((childX0 >= root->m_start) && (childX1 <= root->m_start + root->m_duration));
 
 		if (root->m_children.GetSize()) {
-			for (int i = 0; i < root->m_children.GetSize(); i ++) {
+#if 1
+			dTrackerSample* const lastSibling = root->m_children[root->m_children.GetSize() - 1];
+			unsigned siblingX0 = lastSibling->m_start;
+			unsigned siblingX1 = lastSibling->m_start + lastSibling->m_duration;
+			if (siblingX1 <= childX0) {
+				root->m_children.Push(child);
+			} else {
+				for (int i = root->m_children.GetSize() - 1; i >= 0 ; i--) {
+					dTrackerSample* const sibling = root->m_children[i];
+					unsigned siblingX0 = sibling->m_start;
+					unsigned siblingX1 = sibling->m_start + sibling->m_duration;
+					if ((childX0 >= siblingX0) && (childX1 <= siblingX1)) {
+						stackDepth++;
+						InsertChild(sibling, child, stackDepth);
+						break;
+					}
+				}
+			}
+#else
+			for (int i = 0; i < root->m_children.GetSize(); i++) {
 				dTrackerSample* const sibling = root->m_children[i];
 				unsigned siblingX0 = sibling->m_start;
 				unsigned siblingX1 = sibling->m_start + sibling->m_duration;
 				if ((childX0 >= siblingX0) && (childX1 <= siblingX1)) {
-					stackDepth ++;
-					InsertChild (sibling, child, stackDepth);
+					stackDepth++;
+					InsertChild(sibling, child, stackDepth);
 					return;
 				}
 			}
 			root->m_children.Push(child);
+#endif
 		} else {
 			root->m_children.Push(child);
 		}
@@ -216,7 +227,7 @@ class dProfilerTrace::dTrackerThread
 
 			// calculate view area rectangle
 			ImVec2 cursorPosit0(ImGui::GetCursorScreenPos());
-			for (int i = 0; i < m_levels_deep + 1; i++) {
+			for (int i = 0; i < m_levels_deep + 2; i++) {
 				ImGui::Text("");
 			}
 			ImVec2 cursorPosit1(ImGui::GetCursorScreenPos());
@@ -247,7 +258,7 @@ class dProfilerTrace::dTrackerThread
 			ImU32 rectColor = 0xff00c000;
 			ImU32 groupColor = 0xffa00000;
 			ImU32 textColor = 0xff000000;
-			//ImU32 borderColor = 0xff00ff00;
+			ImU32 borderColor = 0xffffffff;
 
 			ImDrawList* const draw = ImGui::GetWindowDrawList();
 
@@ -278,6 +289,7 @@ class dProfilerTrace::dTrackerThread
 					box0.x = x0;
 					box1.x = x1;
 					draw->AddRectFilled(box0, box1, color);
+					draw->AddRect(box0, box1, borderColor);
 
 					if (sample0 == m_frames[i]) {
 						char functionName[256];
@@ -431,7 +443,7 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	m_rootNode.m_minTime = float (minTime);
 	m_rootNode.m_maxTime = float (maxTime);
 
-	m_rootNode.m_scale = 2000.0f;
+	m_rootNode.m_scale = 3000.0f;
 	m_rootNode.m_origin = m_rootNode.m_minTime;
 
 	for (int i = 1; i < m_rootNode.m_treads.GetSize(); i ++) {
