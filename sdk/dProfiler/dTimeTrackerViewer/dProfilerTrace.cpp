@@ -7,6 +7,7 @@ class dProfilerTrace::dThreadTrace : public dArray<dTimeTrackerRecord>
 	public:
 	dThreadTrace()
 		:dArray<dTimeTrackerRecord>()
+		,m_index(0)
 	{
 	}
 
@@ -27,6 +28,10 @@ class dProfilerTrace::dThreadTrace : public dArray<dTimeTrackerRecord>
 		dAssert(compressError == Z_OK);
 		m_count += 1 << DG_TIME_TRACKER_ENTRIES_POWER;
 	}
+
+	dTrackerSample* GetNextSample();
+
+	int m_index;
 };
 
 class dProfilerTrace::dTrackerSample
@@ -47,9 +52,83 @@ class dProfilerTrace::dTrackerSample
 		}
 	}
 
-	const void Render(dTimeTrackerViewer* const viewer) const
+	const void Render(dTimeTrackerViewer* const viewer, float y0) const
 	{
+		dProfilerTrace& root = *viewer->GetTrace();
 
+		// calculate view area rectangle
+		const dTraceCapture& capture = viewer->GetTrace()->m_rootNode;
+
+		ImVec2 text_size = ImGui::CalcTextSize("");
+
+		float textPadd = 2.0f;
+		float textWitdh = text_size.y;
+
+		float grouping = 4.0f;
+		float origin = capture.m_origin;
+		float p0 = capture.m_minTime;
+		float width = capture.m_windowSize;
+		float scale = capture.m_windowSize * capture.m_scale / (capture.m_maxTime - capture.m_minTime);
+
+		ImVec2 box0(0.0f, y0);
+		ImVec2 box1(0.0f, y0 + textWitdh + textPadd * 2.0f - 1.0f);
+
+		ImU32 rectColor = 0xff00c000;
+		ImU32 groupColor = 0xffa00000;
+		ImU32 textColor = 0xff000000;
+
+		ImDrawList* const draw = ImGui::GetWindowDrawList();
+
+		float x0 = origin + scale * (m_start - p0);
+		float x1 = origin + scale * (m_start + m_duration - p0);
+
+		ImU32 color = rectColor;
+//		while ((x1 - x0) < grouping) {
+//			const dTrackerSample* const sample1 = m_children[i + 1];
+//			float z0 = origin + scale * (sample1->m_start - p0);
+//			float z1 = origin + scale * (sample1->m_start + sample1->m_duration - p0);
+//			color = groupColor;
+//			if ((z1 - z0) >= grouping) {
+//				break;
+//			}
+//			i++;
+//		}
+
+		box0.x = x0;
+		box1.x = x1;
+		draw->AddRectFilled(box0, box1, color);
+
+		
+		char functionName[256];
+		sprintf(functionName, "%s %d", root.m_nameList[m_name].m_string, m_duration);
+		text_size = ImGui::CalcTextSize(functionName);
+		int t1 = strlen(functionName);
+		const char* functionNameEnd = functionName + t1;
+		if (text_size.x > (x1 - x0)) {
+			int t0 = 0;
+			while ((t1 - t0) >= 5) {
+				int t = (t0 + t1) / 2;
+				text_size = ImGui::CalcTextSize(functionName, functionName + t);
+				if (text_size.x > (x1 - x0)) {
+					t1 = t;
+				} else {
+					t0 = t;
+				}
+			}
+			functionNameEnd = functionName + t0;
+			text_size = ImGui::CalcTextSize(functionName, functionName + t0);
+		}
+
+		if (text_size.x <= (x1 - x0)) {
+			ImVec2 textPost(box0);
+			textPost.y += textPadd;
+			textPost.x += (x1 - x0 - text_size.x) * 0.5f;
+			draw->AddText(textPost, textColor, functionName, functionNameEnd);
+		}
+
+		for (int i = 0; i < m_children.GetSize(); i++) {
+			m_children[i]->Render(viewer, box1.y + 1.0f);
+		}
 	}
 
 	unsigned m_name;
@@ -58,37 +137,44 @@ class dProfilerTrace::dTrackerSample
 	dArray<dTrackerSample*> m_children;
 };
 
+dProfilerTrace::dTrackerSample* dProfilerTrace::dThreadTrace::GetNextSample()
+{
+	dTrackerSample* sample = NULL;
+	if (m_index < GetSize()) {
+		dThreadTrace& me = *this;
+		const dTimeTrackerRecord& record = me[m_index];
+		sample = new dTrackerSample(record.m_nameHash, record.m_start, record.m_duration);
+	}
+	m_index++;
+	return sample;
+}
+
+
 class dProfilerTrace::dTrackerThread
 {
 	public:
-	dTrackerThread(unsigned threadName, const dThreadTrace& track)
+	dTrackerThread(unsigned threadName, dThreadTrace& track)
 		:m_frames()
 		,m_name(threadName)
 		,m_levels_deep(1)
 		,m_isOpen(true)
 	{
 		int index = 0;
-		const int maxSize = track.GetSize();
-		do {
-			dTrackerSample* const trace = GetSample(track, index);
 
-			bool isRootTrace = true;
-			const int framesCount = m_frames.GetSize();
-
-			if (framesCount) {
-				int x0 = trace->m_start;
-				int y0 = m_frames[framesCount - 1]->m_start;
-				int y1 = y0 + m_frames[framesCount - 1]->m_duration;
-				if (x0 >= y1) {
-					m_frames.Push(trace);
-				} else {
-					index *= 1;
-					//assert (0);
-				}
+		dTrackerSample* currentSample = track.GetNextSample();
+		m_frames.Push(currentSample);
+		while (dTrackerSample* nextSample = track.GetNextSample()) {
+			unsigned maxX = currentSample->m_start + currentSample->m_duration;
+			unsigned minX = nextSample->m_start;
+			if (minX >= maxX) {
+				m_frames.Push(nextSample);
+				currentSample = nextSample;
 			} else {
-				m_frames.Push(trace);
-			}
-		} while (index < maxSize);
+				int stackDepth = 1;
+				InsertChild (currentSample, nextSample, stackDepth);
+				m_levels_deep = dMax (stackDepth, m_levels_deep);
+			} 
+		}
 	}
 
 	~dTrackerThread()
@@ -98,12 +184,27 @@ class dProfilerTrace::dTrackerThread
 		}
 	}
 
-	dTrackerSample* GetSample (const dThreadTrace& track, int& index)
+	void InsertChild (dTrackerSample* root, dTrackerSample* const child, int& stackDepth)
 	{
-		const dTimeTrackerRecord& record = track[index];
-		dTrackerSample* const trace = new dTrackerSample(record.m_nameHash, record.m_start, record.m_duration);
-		index ++;
-		return trace;
+		unsigned childX0 = child->m_start;
+		unsigned childX1 = child->m_start + child->m_duration;
+		dAssert ((childX0 >= root->m_start) && (childX1 <= root->m_start + root->m_duration));
+
+		if (root->m_children.GetSize()) {
+			for (int i = 0; i < root->m_children.GetSize(); i ++) {
+				dTrackerSample* const sibling = root->m_children[i];
+				unsigned siblingX0 = sibling->m_start;
+				unsigned siblingX1 = sibling->m_start + sibling->m_duration;
+				if ((childX0 >= siblingX0) && (childX1 <= siblingX1)) {
+					stackDepth ++;
+					InsertChild (sibling, child, stackDepth);
+					return;
+				}
+			}
+			root->m_children.Push(child);
+		} else {
+			root->m_children.Push(child);
+		}
 	}
 
 	void dProfilerTrace::dTrackerThread::Render(dTimeTrackerViewer* const viewer)
@@ -141,7 +242,7 @@ class dProfilerTrace::dTrackerThread
 			float scale = capture.m_windowSize * capture.m_scale / (capture.m_maxTime - capture.m_minTime);
 
 			ImVec2 box0(0.0f, cursorPosit0.y);
-			ImVec2 box1(0.0f, cursorPosit0.y + textWitdh + textPadd * 2.0f);
+			ImVec2 box1(0.0f, cursorPosit0.y + textWitdh + textPadd * 2.0f - 1.0f);
 			
 			ImU32 rectColor = 0xff00c000;
 			ImU32 groupColor = 0xffa00000;
@@ -180,7 +281,6 @@ class dProfilerTrace::dTrackerThread
 
 					if (sample0 == m_frames[i]) {
 						char functionName[256];
-						//const char* const functionName = root.m_nameList[sample0->m_name].m_string;
 						sprintf (functionName, "%s %d", root.m_nameList[sample0->m_name].m_string, sample0->m_duration);
 						ImVec2 text_size = ImGui::CalcTextSize(functionName);
 						int t1 = strlen (functionName);
@@ -207,7 +307,9 @@ class dProfilerTrace::dTrackerThread
 							draw->AddText(textPost, textColor, functionName, functionNameEnd);
 						}
 
-						sample0->Render(viewer);
+						for (int j = 0; j < sample0->m_children.GetSize(); j ++) {
+							sample0->m_children[j]->Render(viewer, box1.y + 1.0f);
+						}
 					}
 				}
 			}
@@ -329,7 +431,7 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	m_rootNode.m_minTime = float (minTime);
 	m_rootNode.m_maxTime = float (maxTime);
 
-	m_rootNode.m_scale = 500.0f;
+	m_rootNode.m_scale = 2000.0f;
 	m_rootNode.m_origin = m_rootNode.m_minTime;
 
 	for (int i = 1; i < m_rootNode.m_treads.GetSize(); i ++) {
