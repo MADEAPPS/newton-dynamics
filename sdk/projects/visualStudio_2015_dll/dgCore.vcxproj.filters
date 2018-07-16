@@ -105,6 +105,9 @@
     <ClCompile Include="..\..\dgCore\dgThreadHive.cpp">
       <Filter>threading</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dgCore\dgProfiler.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgCore\dgNode.h">
@@ -226,6 +229,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dgCore\dgThreadHive.h">
       <Filter>threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dgCore\dgProfiler.h">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

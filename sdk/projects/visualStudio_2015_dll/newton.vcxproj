@@ -53,6 +53,9 @@
     <ClInclude Include="..\..\dgNewton\NewtonStdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\dProfiler\vs_2015\dTimeTracker.vcxproj">
+      <Project>{89509957-ce86-4ace-946c-7a65e63f0f23}</Project>
+    </ProjectReference>
     <ProjectReference Include="dgCore.vcxproj">
       <Project>{75a4a856-914e-4d41-a28d-23eaf8f8f9c9}</Project>
     </ProjectReference>
