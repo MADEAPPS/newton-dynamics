@@ -22,6 +22,8 @@
     <ClCompile Include="..\..\dContainers\dCRC.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\dTimeTracker\dllmain.cpp" />
     <ClCompile Include="..\dTimeTracker\dTimeTracker.cpp" />
@@ -38,9 +40,6 @@
     <ClInclude Include="..\dTimeTracker\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\projects\visualStudio_2015_dll\dMath.vcxproj">
-      <Project>{2928f15f-0650-4261-b759-36c7792267dc}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\thirdParty\zlib-1.2.11\vs_2015_static_mt\zlib.vcxproj">
       <Project>{f6c16e64-a07f-49cd-ab90-19733163792b}</Project>
     </ProjectReference>
