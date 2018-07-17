@@ -21,5 +21,9 @@ DCONTAINERS_API dCRCTYPE dCRC64 (const void* const buffer, int size, dCRCTYPE cr
 
 DCONTAINERS_API dCRCTYPE dCombineCRC (dCRCTYPE a, dCRCTYPE b);
 
+
+DCONTAINERS_API int dCompressLZW(void* const outBuffer, int outBufferMaxSize, const void* const inBuffer, int inBufferSize);
+DCONTAINERS_API int dUnCompressLZW(void* const outBuffer, const void* const inBuffer, int outBufferMaxSize);
+
 #endif
 

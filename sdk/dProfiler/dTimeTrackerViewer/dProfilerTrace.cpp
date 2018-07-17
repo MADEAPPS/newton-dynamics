@@ -381,8 +381,8 @@ class dProfilerTrace::dDataBase
 	}
 
 	FILE* m_file;
-	dTimeTrackerMap<dThreadTrace, unsigned> m_trace;	
-	dTimeTrackerMap<dTrackerString, unsigned> m_dictionary;
+	dMap<dThreadTrace, unsigned> m_trace;	
+	dMap<dTrackerString, unsigned> m_dictionary;
 };
 
 dProfilerTrace::dProfilerTrace(FILE* const file)
@@ -413,8 +413,8 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 		}
 	}
 
-	dTimeTrackerMap<int, unsigned> nameMap;
-	dTimeTrackerMap<dTrackerString, unsigned>::Iterator iter (database.m_dictionary);
+	dMap<int, unsigned> nameMap;
+	dMap<dTrackerString, unsigned>::Iterator iter (database.m_dictionary);
 	for (iter.Begin(); iter; iter ++) {
 		dTrackerString name (iter.GetNode()->GetInfo());
 		unsigned key = iter.GetKey();
@@ -428,7 +428,7 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 		m_nameList.Push (name);
 	}
 
-	dTimeTrackerMap<dThreadTrace, unsigned>::Iterator traceIter (database.m_trace);
+	dMap<dThreadTrace, unsigned>::Iterator traceIter (database.m_trace);
 	unsigned maxTime = 0;
 	unsigned minTime = -1;
 	for (traceIter.Begin(); traceIter; traceIter ++) {
@@ -482,7 +482,7 @@ void dProfilerTrace::ReadTrack(dDataBase& database)
 	char* compressedData = dAlloca (char, compressesDataSize + 1024);
 	database.ReadCompressedTrack(compressedData, compressesDataSize);
 
-	dTimeTrackerMap<dThreadTrace, unsigned>::dTreeNode* threadNode = database.m_trace.Find(nameCRC);
+	dMap<dThreadTrace, unsigned>::dTreeNode* threadNode = database.m_trace.Find(nameCRC);
 	if (!threadNode) {
 		threadNode = database.m_trace.Insert(nameCRC);
 	}

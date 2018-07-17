@@ -11,6 +11,7 @@
 
 // TODO: reference additional headers your program requires here
 #include <zlib.h>
+#include <dMap.h>
 #include <dList.h>
 #include <dString.h>
 #include <dMathDefines.h>
