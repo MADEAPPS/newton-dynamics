@@ -7,6 +7,7 @@ class dTimeTrackerViewer;
 
 class dProfilerTrace
 {
+	enum dMouseState;
 	class dDataBase;
 	class dThreadTrace;
 	class dTrackerSample;
@@ -40,6 +41,8 @@ class dProfilerTrace
 		float m_windowSize;
 		float m_scale;
 		float m_origin;
+		float m_mouseOrigin;
+		dMouseState m_mouseState;
 	};
 
 	public: 
