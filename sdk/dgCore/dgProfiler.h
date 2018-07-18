@@ -22,6 +22,8 @@
 #ifndef __DG_PROFILER_H__
 #define __DG_PROFILER_H__
 
+// uncomment out _DG_USE_PROFILER to enable profiler frame capture profiler traces
+// alternatively the end application can use a command line option to enable this define
 //#define _DG_USE_PROFILER
 
 #ifdef _DG_USE_PROFILER
