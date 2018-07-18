@@ -328,7 +328,8 @@ class dgVector;
 //		#define dgCheckFloat(x) 1
 #endif
 
-
+// adding frame capture profiler macros
+#include "dgProfiler.h"
 
 typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, dgInt32 size);
 typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, dgInt32 size);
@@ -842,6 +843,7 @@ DG_INLINE void dgSpinLock(dgInt32* const ptr)
 {
 #ifndef DG_USE_THREAD_EMULATION 
 	while (dgInterlockedExchange(ptr, 1)) {
+		DG_TRACKTIME_NAMED("lock");
 		dgThreadYield();
 		//_mm_pause();
 	}

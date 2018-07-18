@@ -299,6 +299,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 
 void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
@@ -697,18 +698,19 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		dgAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
 
 		const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
-
-		//dgThreadHiveScopeLock lock(m_world, &m_criticalSectionLock);
-		dgScopeSpinLock lock(&m_criticalSectionLock);
+		
 		if (body1->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
+			dgScopeSpinLock lock(&aggregate->m_criticalSectionLock);
 			aggregate->m_isInEquilibrium = body1->m_equilibrium;
 		}
-
+		
 		if (!dgBoxInclusionTest(body1->m_minAABB, body1->m_maxAABB, node->m_minBox, node->m_maxBox)) {
+			
 			dgAssert(!node->IsAggregate());
 			node->SetAABB(body1->m_minAABB, body1->m_maxAABB);
 			for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
+				dgScopeSpinLock lock(&parent->m_criticalSectionLock);
 				if (!parent->IsAggregate()) {
 					dgVector minBox;
 					dgVector maxBox;

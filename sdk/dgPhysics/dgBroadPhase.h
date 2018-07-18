@@ -61,6 +61,7 @@ class dgBroadPhaseNode
 		,m_maxBox(dgFloat32(1.0e15f))
 		,m_parent(parent)
 		,m_surfaceArea(dgFloat32(1.0e20f))
+		,m_criticalSectionLock(0)
 	{
 	}
 
@@ -121,6 +122,7 @@ class dgBroadPhaseNode
 	dgVector m_maxBox;
 	dgBroadPhaseNode* m_parent;
 	dgFloat32 m_surfaceArea;
+	dgInt32 m_criticalSectionLock;
 
 	static dgVector m_broadPhaseScale;
 	static dgVector m_broadInvPhaseScale;
