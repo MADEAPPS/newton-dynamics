@@ -22,7 +22,7 @@
 #ifndef __DG_PROFILER_H__
 #define __DG_PROFILER_H__
 
-#define _DG_USE_PROFILER
+//#define _DG_USE_PROFILER
 
 #ifdef _DG_USE_PROFILER
 
