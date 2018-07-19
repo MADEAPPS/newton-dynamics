@@ -394,6 +394,8 @@ class dgBroadPhase
 		public:
 		dgFitnessList(dgMemoryAllocator* const allocator)
 			:dgList <dgBroadPhaseTreeNode*>(allocator)
+			,m_index(0)
+			,m_prevCost(dgFloat32 (0.0f))
 		{
 		}
 
@@ -406,6 +408,9 @@ class dgBroadPhase
 			}
 			return cost;
 		}
+
+		dgInt32 m_index;
+		dgFloat64 m_prevCost;
 	};
 
 	public:

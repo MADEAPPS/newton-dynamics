@@ -818,6 +818,7 @@ dgInt32 dgBroadPhase::CompareNodes(const dgBroadPhaseNode* const nodeA, const dg
 void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root)
 {
 	if (*root) {
+		DG_TRACKTIME(__FUNCTION__);
 		dgBroadPhaseNode* const parent = (*root)->m_parent;
 		(*root)->m_parent = NULL;
 		dgFloat64 entropy = CalculateEntropy(fitness, root);
@@ -857,7 +858,8 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 				dgSortIndirect(leafArray, leafNodesCount, CompareNodes);
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
 				dgAssert(!(*root)->m_parent);
-				entropy = CalculateEntropy(fitness, root);
+				//entropy = CalculateEntropy(fitness, root);
+				entropy = fitness.TotalCost();
 			}
 			oldEntropy = entropy;
 		}
@@ -1351,9 +1353,12 @@ void dgBroadPhase::ImproveNodeFitness(dgBroadPhaseTreeNode* const node, dgBroadP
 
 dgFloat64 dgBroadPhase::CalculateEntropy (dgFitnessList& fitness, dgBroadPhaseNode** const root)
 {
+	DG_TRACKTIME(__FUNCTION__);
+#if 0
 	dgFloat64 cost0 = fitness.TotalCost();
 	dgFloat64 cost1 = cost0;
 	do {
+		DG_TRACKTIME_NAMED("Entropy");
 		cost0 = cost1;
 		for (dgFitnessList::dgListNode* node = fitness.GetFirst(); node; node = node->GetNext()) {
 			ImproveNodeFitness(node->GetInfo(), root);
@@ -1361,8 +1366,39 @@ dgFloat64 dgBroadPhase::CalculateEntropy (dgFitnessList& fitness, dgBroadPhaseNo
 		cost1 = fitness.TotalCost();
 	} while (cost1 < (dgFloat32(0.99f)) * cost0);
 	return cost1;
-}
+#else
+	dgFloat64 cost = dgFloat32 (0.0f);
+	if (fitness.GetCount() < 32) {
+		for (dgFitnessList::dgListNode* node = fitness.GetFirst(); node; node = node->GetNext()) {
+			ImproveNodeFitness(node->GetInfo(), root);
+		}
+		cost = fitness.TotalCost();
+		fitness.m_prevCost = cost;
+	} else {
+		const dgInt32 mod = 16;
+		cost = fitness.m_prevCost;
+		dgFitnessList::dgListNode* node = fitness.GetFirst();
+		for (dgInt32 i = 0; i < fitness.m_index; i++) {
+			node = node->GetNext();
+		}
 
+		do {
+			ImproveNodeFitness(node->GetInfo(), root);
+			for (dgInt32 i = 0; i < mod; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+		
+		fitness.m_index++;
+		if (fitness.m_index >= mod) {
+			fitness.m_index = 0;
+			cost = fitness.TotalCost();
+			fitness.m_prevCost = cost;
+		}
+	}
+	return cost;
+#endif
+}
 
 void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 {

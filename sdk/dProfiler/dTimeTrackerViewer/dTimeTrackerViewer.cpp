@@ -42,6 +42,7 @@ dTimeTrackerViewer::dTimeTrackerViewer()
 
 	// 
 	m_recentFiles.Append("../xxxx.tt");
+	m_recentFiles.Append("../xxxx1.tt");
 }
 
 dTimeTrackerViewer::~dTimeTrackerViewer()
