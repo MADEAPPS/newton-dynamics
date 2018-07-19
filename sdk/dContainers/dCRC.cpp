@@ -131,13 +131,5 @@ dCRCTYPE dCRC64 (const void* const buffer, int size, dCRCTYPE crcAcc)
 }
 
 
-int dUnCompressLZW(void* const outBuffer, const void* const inBuffer, int outBufferMaxSize)
-{
-	return 0;
-}
 
-int dCompressLZW(void* const outBuffer, int outBufferMaxSize, const void* const inBuffer, int inBufferSize)
-{
-	return 0;
-}
 

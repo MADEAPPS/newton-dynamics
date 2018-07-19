@@ -264,7 +264,9 @@ void DemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix,
 	if (ent) {
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 		dMatrix transform(matrix);
-		dQuaternion rot(transform);
+		//dQuaternion rot1(transform);
+		dQuaternion rot;
+		NewtonBodyGetRotation(body, &rot.m_q0);
 		ent->SetMatrix(*scene, rot, transform.m_posit);
 	}
 }

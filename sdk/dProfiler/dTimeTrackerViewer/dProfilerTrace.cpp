@@ -22,7 +22,7 @@ class dProfilerTrace::dThreadTrace : public dArray<dTimeTrackerRecord>
 	{
 	}
 
-	void AddTrace(Bytef* const compressedData, int compressesDataSize)
+	void AddTrace(const void* const inputBuffer, int dataSize)
 	{
 		dThreadTrace& me = *this;
 
@@ -30,9 +30,10 @@ class dProfilerTrace::dThreadTrace : public dArray<dTimeTrackerRecord>
 
 		dTimeTrackerRecord* const buffer = &me[me.GetSize()];
 
-		uLongf destLen;
-		int compressError = uncompress((Bytef*)buffer, &destLen, compressedData, compressesDataSize);
-		dAssert(compressError == Z_OK);
+		//uLongf destLen;
+		//int compressError = uncompress((Bytef*)buffer, &destLen, compressedData, compressesDataSize);
+		//dAssert(compressError == Z_OK);
+		memcpy (buffer, inputBuffer, dataSize);
 		m_count += 1 << DG_TIME_TRACKER_ENTRIES_POWER;
 	}
 
@@ -487,7 +488,7 @@ void dProfilerTrace::ReadTrack(dDataBase& database)
 		threadNode = database.m_trace.Insert(nameCRC);
 	}
 	dThreadTrace& track = threadNode->GetInfo();
-	track.AddTrace((Bytef*)compressedData, compressesDataSize);
+	track.AddTrace(compressedData, compressesDataSize);
 }
 
 void dProfilerTrace::ReadLabels(dDataBase& database)

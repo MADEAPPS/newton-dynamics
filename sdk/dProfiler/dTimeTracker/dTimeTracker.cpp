@@ -30,6 +30,11 @@ class dTimeTrack
 	class dTrackerString
 	{
 		public:
+		dTrackerString()
+		{
+			m_string[0] = 0;
+		}
+
 		dTrackerString(const char* const string)
 		{
 			strncpy (m_string, string, sizeof (m_string) - 1);
@@ -248,23 +253,15 @@ class dTimeTrackerServer
 	void SaveTrack(dTimeTrack& track, int bank)
 	{
 		int sizeInByte = sizeof(dTimeTrackerRecord) * DG_TIME_TRACKER_PAGE_ENTRIES;
-		Bytef* const buffer = dAlloca(Bytef, sizeInByte);
-
-		uLongf destLen;
 		const dTimeTrackerRecord* const trackBuffer = track.GetBuffer();
-		int compressError = compress(buffer, &destLen, (Bytef*)&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
-int xxxx = dCompressLZW(buffer, sizeInByte, (void*)&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte);
-		dAssert(compressError == Z_OK);
 
 		int chunkType = m_traceSamples;
-		int size = unsigned (destLen);
-		const dTimeTrack::dTrackerString& threadName = track.GetName();
-		unsigned threadNameCrc = unsigned(dCRC64(threadName.m_string));
+		unsigned threadName = unsigned(dCRC64(track.GetName().m_string));
 
 		fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
-		fwrite(&threadNameCrc, sizeof(unsigned), 1, m_currentFile);
-		fwrite(&size, sizeof(unsigned), 1, m_currentFile);
-		fwrite(buffer, size, 1, m_currentFile);
+		fwrite(&threadName, sizeof(unsigned), 1, m_currentFile);
+		fwrite(&sizeInByte, sizeof(unsigned), 1, m_currentFile);
+		fwrite(&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte, 1, m_currentFile);
 	}
 
 	bool m_initialized;

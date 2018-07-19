@@ -30,9 +30,5 @@
 #include <dMap.h>
 #include <dCRC.h>
 
-#include <zlib.h>
-
-
-
 #endif
 

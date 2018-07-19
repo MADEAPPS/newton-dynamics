@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "..\..\thirdParty\i
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "..\..\projects\visualStudio_2013_static_mt\dContainers.vcxproj", "{E6A31C39-173F-4000-97E0-F086DB68DD42}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\thirdParty\zlib-1.2.11\vs_2013_static_mt\zlib.vcxproj", "{F6C16E64-A07F-49CD-AB90-19733163792B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_double|Win32 = debug_double|Win32
@@ -85,18 +83,6 @@ Global
 		{E6A31C39-173F-4000-97E0-F086DB68DD42}.Release|Win32.Build.0 = Release|Win32
 		{E6A31C39-173F-4000-97E0-F086DB68DD42}.Release|x64.ActiveCfg = Release|x64
 		{E6A31C39-173F-4000-97E0-F086DB68DD42}.Release|x64.Build.0 = Release|x64
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.debug_double|Win32.ActiveCfg = Debug|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.debug_double|Win32.Build.0 = Debug|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.debug_double|x64.ActiveCfg = Debug|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.Debug|Win32.Build.0 = Debug|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.Debug|x64.ActiveCfg = Debug|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.release_double|Win32.ActiveCfg = Release|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.release_double|Win32.Build.0 = Release|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.release_double|x64.ActiveCfg = Release|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.Release|Win32.ActiveCfg = Release|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.Release|Win32.Build.0 = Release|Win32
-		{F6C16E64-A07F-49CD-AB90-19733163792B}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -63,6 +63,7 @@
     <ClInclude Include="..\..\dContainers\dCRC.h" />
     <ClInclude Include="..\..\dContainers\dHeap.h" />
     <ClInclude Include="..\..\dContainers\dList.h" />
+    <ClInclude Include="..\..\dContainers\dMap.h" />
     <ClInclude Include="..\..\dContainers\dRefCounter.h" />
     <ClInclude Include="..\..\dContainers\dRtti.h" />
     <ClInclude Include="..\..\dContainers\dString.h" />

@@ -35,9 +35,6 @@
     <ProjectReference Include="..\..\thirdParty\imgui\vs2013\imgui.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\zlib-1.2.11\vs_2013_static_mt\zlib.vcxproj">
-      <Project>{f6c16e64-a07f-49cd-ab90-19733163792b}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F4313333-910B-4BE5-8464-D1A54DBE2900}</ProjectGuid>

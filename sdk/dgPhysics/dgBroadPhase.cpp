@@ -706,7 +706,6 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		}
 		
 		if (!dgBoxInclusionTest(body1->m_minAABB, body1->m_maxAABB, node->m_minBox, node->m_maxBox)) {
-			
 			dgAssert(!node->IsAggregate());
 			node->SetAABB(body1->m_minAABB, body1->m_maxAABB);
 			for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
