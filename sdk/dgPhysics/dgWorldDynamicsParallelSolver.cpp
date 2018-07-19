@@ -34,6 +34,7 @@ dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero);
 
 void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 
 	dgBodyCluster cluster(MergeClusters(clusterArray, clustersCount));

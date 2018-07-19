@@ -174,6 +174,7 @@ void dgWorldDynamicUpdate::SortClustersByCount ()
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	dgUnsigned32 lru = m_markLru - 1;
 

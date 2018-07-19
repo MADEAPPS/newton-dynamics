@@ -451,7 +451,7 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	m_rootNode.m_minTime = float (minTime);
 	m_rootNode.m_maxTime = float (maxTime);
 
-	m_rootNode.m_scale = 3000.0f;
+	m_rootNode.m_scale = 50000.0f;
 	m_rootNode.m_origin = m_rootNode.m_minTime;
 
 	for (int i = 1; i < m_rootNode.m_treads.GetSize(); i ++) {
