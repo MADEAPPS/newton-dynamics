@@ -190,7 +190,6 @@ class dProfilerTrace::dTrackerThread
 		dAssert ((childX0 >= root->m_start) && (childX1 <= root->m_start + root->m_duration));
 
 		if (root->m_children.GetSize()) {
-#if 1
 			dTrackerSample* const lastSibling = root->m_children[root->m_children.GetSize() - 1];
 			unsigned siblingX0 = lastSibling->m_start;
 			unsigned siblingX1 = lastSibling->m_start + lastSibling->m_duration;
@@ -208,19 +207,6 @@ class dProfilerTrace::dTrackerThread
 					}
 				}
 			}
-#else
-			for (int i = 0; i < root->m_children.GetSize(); i++) {
-				dTrackerSample* const sibling = root->m_children[i];
-				unsigned siblingX0 = sibling->m_start;
-				unsigned siblingX1 = sibling->m_start + sibling->m_duration;
-				if ((childX0 >= siblingX0) && (childX1 <= siblingX1)) {
-					stackDepth++;
-					InsertChild(sibling, child, stackDepth);
-					return;
-				}
-			}
-			root->m_children.Push(child);
-#endif
 		} else {
 			root->m_children.Push(child);
 		}
@@ -264,7 +250,7 @@ class dProfilerTrace::dTrackerThread
 			ImVec2 box1(0.0f, cursorPosit0.y + textWitdh + textPadd * 2.0f - 1.0f);
 			
 			ImU32 rectColor = 0xff00c000;
-			ImU32 groupColor = 0xffa00000;
+			ImU32 groupColor = 0xff00c0a0;
 			ImU32 textColor = 0xff000000;
 			ImU32 borderColor = 0xffffffff;
 
@@ -283,7 +269,7 @@ class dProfilerTrace::dTrackerThread
 
 				if (x1 >= 0.0f) {
 					ImU32 color = rectColor;
-					while (((x1 - x0) < grouping) && (i < m_frames.GetSize())) {
+					while (((x1 - x0) < grouping) && (i < m_frames.GetSize() - 1)) {
 						const dTrackerSample* const sample1 = m_frames[i + 1];
 						float z0 = origin + scale * (sample1->m_start - p0);
 						float z1 = origin + scale * (sample1->m_start + sample1->m_duration - p0);
@@ -291,6 +277,7 @@ class dProfilerTrace::dTrackerThread
 						if ((z1 - z0) >= grouping) {
 							break;
 						}
+						x1 = z1;
 						i ++;
 					} 
 
@@ -451,7 +438,8 @@ dProfilerTrace::dProfilerTrace(FILE* const file)
 	m_rootNode.m_minTime = float (minTime);
 	m_rootNode.m_maxTime = float (maxTime);
 
-	m_rootNode.m_scale = 50000.0f;
+	m_rootNode.m_scale = 5000.0f;
+	//m_rootNode.m_scale = 1.0f;
 	m_rootNode.m_origin = m_rootNode.m_minTime;
 
 	for (int i = 1; i < m_rootNode.m_treads.GetSize(); i ++) {

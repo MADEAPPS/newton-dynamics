@@ -213,6 +213,8 @@ class dTimeTrackerServer
 	void StopRecording()
 	{
 		dAssert(m_currentFile);
+
+		m_criticalSection.lock();
 		dMap<unsigned, unsigned> filter;
 		dMap<dTimeTrack*, DWORD>::Iterator iter(m_tracks);
 		int chunkType = m_traceLabel;
@@ -248,6 +250,7 @@ class dTimeTrackerServer
 		fclose(m_currentFile);
 
 		m_currentFile = NULL;
+		m_criticalSection.unlock();
 	}
 
 	void SaveTrack(dTimeTrack& track, int bank)
@@ -258,10 +261,12 @@ class dTimeTrackerServer
 		int chunkType = m_traceSamples;
 		unsigned threadName = unsigned(dCRC64(track.GetName().m_string));
 
+		m_criticalSection.lock();
 		fwrite(&chunkType, sizeof(unsigned), 1, m_currentFile);
 		fwrite(&threadName, sizeof(unsigned), 1, m_currentFile);
 		fwrite(&sizeInByte, sizeof(unsigned), 1, m_currentFile);
 		fwrite(&trackBuffer[bank * DG_TIME_TRACKER_PAGE_ENTRIES], sizeInByte, 1, m_currentFile);
+		m_criticalSection.unlock();
 	}
 
 	bool m_initialized;
@@ -269,6 +274,7 @@ class dTimeTrackerServer
 	SOCKADDR_IN m_client;
 	SOCKADDR_IN m_server;
 	WSADATA m_wsaData;
+	std::mutex m_criticalSection;
 
 	int m_trackEnum;
 	dMap<dTimeTrack*, DWORD> m_tracks;
@@ -354,10 +360,12 @@ void dTimeTrack::CloseEntry(int index)
 
 void dTimeTrack::SaveBuffer(int bank)
 {
+	int recordIndex = ttOpenRecord("profiler");
 	dAssert((bank && (m_count < DG_TIME_TRACKER_PAGE_ENTRIES)) || (!bank && (m_count >= DG_TIME_TRACKER_PAGE_ENTRIES)));
 	dTimeTrackerServer& server = dTimeTrackerServer::GetServer();
 	if (server.m_currentFile) {
 		server.SaveTrack(*this, bank);
 	}
 	m_banks[bank] = DG_TIME_TRACKER_PAGE_ENTRIES;
+	ttCloseRecord(recordIndex);
 }

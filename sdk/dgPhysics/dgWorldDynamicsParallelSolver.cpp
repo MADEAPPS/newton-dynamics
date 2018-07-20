@@ -150,6 +150,7 @@ dgInt32 dgParallelBodySolver::CompareJointInfos(const dgJointInfo* const infoA, 
 
 void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	m_cluster = &cluster;
 	m_bodyArray = bodyArray;
 	m_jointArray = jointArray;
@@ -164,9 +165,9 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_threadCounts = m_world->GetThreadCount();
 	m_jointCount = ((m_cluster->m_jointCount + DG_WORK_GROUP_SIZE - 1) & -dgInt32(DG_WORK_GROUP_SIZE - 1)) / DG_WORK_GROUP_SIZE;
 
+	m_soaRowStart = dgAlloca(dgInt32, m_jointCount);
 	m_bodyProxyArray = dgAlloca(dgBodyProxy, cluster.m_bodyCount);
 	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
-	m_soaRowStart = dgAlloca(dgInt32, m_jointCount);
 
 	InitWeights();
 	InitBodyArray();
@@ -248,6 +249,7 @@ void dgParallelBodySolver::UpdateRowAccelerationKernel(void* const context, void
 
 void dgParallelBodySolver::InitWeights()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgJointInfo* const jointArray = m_jointArray;
 	const dgInt32 jointCount = m_cluster->m_jointCount;
 	dgBodyProxy* const weight = m_bodyProxyArray;

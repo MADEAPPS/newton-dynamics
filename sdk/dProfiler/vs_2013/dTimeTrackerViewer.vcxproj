@@ -82,7 +82,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../dTimeTracker;../../thirdParty/imgui;../../../sdk/dMath;../../../sdk/dContainers;../../thirdParty/zlib-1.2.11;../../thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dTimeTracker;../../../sdk/dMath;../../../sdk/dContainers;../../thirdParty/imgui;../../thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -99,7 +99,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../dTimeTracker;../../thirdParty/imgui;../../../sdk/dMath;../../../sdk/dContainers;../../thirdParty/zlib-1.2.11;../../thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dTimeTracker;../../../sdk/dMath;../../../sdk/dContainers;../../thirdParty/imgui;../../thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
