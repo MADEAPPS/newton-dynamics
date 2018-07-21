@@ -170,6 +170,13 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
 
 	InitWeights();
+/*
+	m_semaphore0 = m_threadCounts + 1;
+	for (dgInt32 i = 0; i < m_threadCounts; i++) {
+		m_world->QueueJob(ParallelSolverKernel, this, NULL, "dgParallelBodySolver::ParallelSolverKernel");
+	}
+	m_world->SynchronizationBarrier();
+*/
 	InitBodyArray();
 	InitJacobianMatrix();
 	CalculateForces();
@@ -433,6 +440,7 @@ void dgParallelBodySolver::UpdateKinematicFeedback()
 
 void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 
@@ -762,6 +770,7 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 
 void dgParallelBodySolver::InitInternalForces(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 	const dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
 	dgWorkGroupFloat* const internalForces = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_internalForcesBuffer[0];
@@ -961,6 +970,7 @@ DG_INLINE void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const join
 
 void dgParallelBodySolver::InitJacobianMatrix(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
 	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
 	dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
@@ -1091,6 +1101,7 @@ DG_INLINE void dgParallelBodySolver::TransposeRow (dgSolverSoaElement* const row
 
 void dgParallelBodySolver::TransposeMassMatrix(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgJointInfo* const jointInfoArray = m_jointArray;
 	dgSolverSoaElement* const massMatrixArray = &m_massMatrix[0];
 
@@ -1141,4 +1152,89 @@ void dgParallelBodySolver::CalculateForces()
 	}
 }
 
+// *************************************************************
+//
+//
+// *************************************************************
 
+void dgParallelBodySolver::ParallelSolverKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->ParallelSolver(threadID);
+}
+
+void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
+{
+	InitBodyArray(threadID);
+	if (threadID == 0) {
+		m_bodyProxyArray->m_invWeight = 1.0f;
+		m_jacobianMatrixRowAtomicIndex = 0;
+
+		m_semaphore1 = 1;
+		dgInterlockedExchange(&m_semaphore0, 0);
+	}
+	SemaphoreLock(&m_semaphore0);
+
+	InitJacobianMatrix(threadID);
+	if (threadID == 0) {
+		dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
+		dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
+
+		const dgInt32 entryCount = m_cluster->m_jointCount * 2;
+		dgSort(bodyJacobiansPairs, entryCount, CompareBodyJointsPairs);
+		for (dgInt32 i = entryCount - 1; i >= 0; i--) {
+			dgInt32 index = bodyJacobiansPairs[i].m_bodyIndex;
+			bodyProxyArray[index].m_jointStart = i;
+		}
+
+		m_semaphore0 = 1;
+		dgInterlockedExchange(&m_semaphore1, 0);
+	}
+	SemaphoreLock(&m_semaphore1);
+
+	
+	InitInternalForces(threadID);
+	if (threadID == 0) {
+		dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+		internalForces[0].m_linear = dgVector::m_zero;
+		internalForces[0].m_angular = dgVector::m_zero;
+
+		dgJointInfo* const jointArray = m_jointArray;
+		dgSort(jointArray, m_cluster->m_jointCount, CompareJointInfos);
+
+		const dgInt32 jointCount = m_jointCount * DG_WORK_GROUP_SIZE;
+		for (dgInt32 i = m_cluster->m_jointCount; i < jointCount; i++) {
+			memset(&jointArray[i], 0, sizeof(dgJointInfo));
+		}
+
+		dgInt32 size = 0;
+		for (dgInt32 i = 0; i < jointCount; i += DG_WORK_GROUP_SIZE) {
+			const dgConstraint* const joint1 = jointArray[i + DG_WORK_GROUP_SIZE - 1].m_joint;
+			if (joint1) {
+				if (!(joint1->m_body0->m_resting & joint1->m_body1->m_resting)) {
+					const dgConstraint* const joint0 = jointArray[i].m_joint;
+					if (joint0->m_body0->m_resting & joint0->m_body1->m_resting) {
+						SortWorkGroup(i);
+					}
+				}
+			} else {
+				SortWorkGroup(i);
+			}
+			size += jointArray[i].m_pairCount;
+		}
+		m_massMatrix.ResizeIfNecessary(size);
+		m_soaRowsCount = 0;
+
+		m_semaphore1 = 1;
+		dgInterlockedExchange(&m_semaphore0, 0);
+	}
+	SemaphoreLock(&m_semaphore0);
+
+	TransposeMassMatrix(threadID);
+	if (threadID == 0) {
+		m_semaphore0 = 1;
+		dgInterlockedExchange(&m_semaphore1, 0);
+	}
+	SemaphoreLock(&m_semaphore1);
+
+}
