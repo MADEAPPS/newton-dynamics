@@ -186,6 +186,8 @@
 #endif
 
 
+#include <dTimeTracker.h>
+
 //************************************************************
 #ifdef DG_DISABLE_ASSERT
 	#define dgAssert(x)

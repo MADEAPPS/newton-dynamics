@@ -28,21 +28,45 @@
 
 #ifdef _DG_USE_PROFILER
 
+inline void dProfilerSetTrackName(const char* const name)
+{
+	ttSetTrackName(name);
+}
+
+inline void dProfilerDeleteTrack()
+{
+	ttDeleteTrack();
+}
+
+inline void dProfilerStartRecording(const char* const fileName)
+{
+	ttStartRecording(fileName);
+}
+
+inline void dProfilerStopRecording()
+{
+	ttStopRecording();
+}
+
+
 class dgProfile
 {
 	public:
-	dgProfile(const char* const functionName);
-	~dgProfile();
+	dgProfile(const char* const functionName)
+		:m_entry(ttOpenRecord(functionName))
+		,m_name(functionName)
+	{
+	}
+
+	~dgProfile()
+	{
+		ttCloseRecord(m_entry);
+	}
 
 	private:
 	dgInt32 m_entry;
 	const char* m_name;
 };
-
-void dProfilerDeleteTrack();
-void dProfilerSetTrackName(const char* const name);
-void dProfilerStartRecording(const char* const fileName);
-void dProfilerStopRecording();
 
 #define DG_START_RECORDING(fileName) dProfilerStartRecording(fileName)
 #define DG_STOP_RECORDING() dProfilerStopRecording()

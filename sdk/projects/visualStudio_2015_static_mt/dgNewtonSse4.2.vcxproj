@@ -34,6 +34,11 @@
     <ClInclude Include="..\..\dgNewtonSse4.2\dgSolver.h" />
     <ClInclude Include="..\..\dgNewtonSse4.2\dgWorldBase.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\dProfiler\vs_2015\dTimeTracker.vcxproj">
+      <Project>{89509957-ce86-4ace-946c-7a65e63f0f23}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4D0FAACB-013E-4B74-B4C2-A83AEEE32186}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -115,7 +120,7 @@
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -137,7 +142,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -161,7 +166,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -187,7 +192,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

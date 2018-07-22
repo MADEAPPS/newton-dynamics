@@ -182,7 +182,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_WIN_32_VER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -205,7 +205,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_NEWTON_STATIC_LIB;_WIN_32_VER;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -228,7 +228,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_NEWTON_STATIC_LIB;_WIN_64_VER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -251,7 +251,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_NEWTON_STATIC_LIB;_WIN_64_VER;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -276,7 +276,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB;_WIN_32_VER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -303,7 +303,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB;_WIN_32_VER;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -330,7 +330,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB;_WIN_64_VER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -357,7 +357,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB;_WIN_64_VER;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dgPhysics;../../dgMeshUtil;../../dProfiler/dTimeTracker</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
