@@ -86,7 +86,6 @@ dgInt32 dgThreadHive::dgWorkerThread::PushJob(const dgThreadJob& job)
 
 void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
 {
-	//DG_TRACKTIME(__FUNCTION__);
 	for (dgInt32 i = 0; i < m_jobsCount; i ++) {
 		const dgThreadJob& job = m_jobPool[i];
 		DG_TRACKTIME_NAMED(job.m_jobName);

@@ -150,7 +150,6 @@ dgInt32 dgParallelBodySolver::CompareJointInfos(const dgJointInfo* const infoA, 
 
 void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
-	DG_TRACKTIME(__FUNCTION__);
 	m_cluster = &cluster;
 	m_bodyArray = bodyArray;
 	m_jointArray = jointArray;
@@ -170,16 +169,20 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
 
 	InitWeights();
-/*
-	m_semaphore0 = m_threadCounts + 1;
+#if 1
+	m_sync0 = 0;
+	m_sync1 = 0;
+	m_syncIndex = 0;
+	m_firstPassCoef = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(ParallelSolverKernel, this, NULL, "dgParallelBodySolver::ParallelSolverKernel");
 	}
 	m_world->SynchronizationBarrier();
-*/
+#else
 	InitBodyArray();
 	InitJacobianMatrix();
 	CalculateForces();
+#endif
 }
 
 void dgParallelBodySolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
@@ -440,7 +443,6 @@ void dgParallelBodySolver::UpdateKinematicFeedback()
 
 void dgParallelBodySolver::InitBodyArray(dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 
@@ -770,7 +772,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 
 void dgParallelBodySolver::InitInternalForces(dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
 	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 	const dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
 	dgWorkGroupFloat* const internalForces = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_internalForcesBuffer[0];
@@ -970,7 +971,6 @@ DG_INLINE void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const join
 
 void dgParallelBodySolver::InitJacobianMatrix(dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
 	dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
 	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
 	dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
@@ -1101,7 +1101,6 @@ DG_INLINE void dgParallelBodySolver::TransposeRow (dgSolverSoaElement* const row
 
 void dgParallelBodySolver::TransposeMassMatrix(dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
 	const dgJointInfo* const jointInfoArray = m_jointArray;
 	dgSolverSoaElement* const massMatrixArray = &m_massMatrix[0];
 
@@ -1163,38 +1162,35 @@ void dgParallelBodySolver::ParallelSolverKernel(void* const context, void* const
 	me->ParallelSolver(threadID);
 }
 
+
 void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	InitBodyArray(threadID);
-	if (threadID == 0) {
+	Sync();
+	if (!threadID) {
 		m_bodyProxyArray->m_invWeight = 1.0f;
 		m_jacobianMatrixRowAtomicIndex = 0;
-
-		m_semaphore1 = 1;
-		dgInterlockedExchange(&m_semaphore0, 0);
 	}
-	SemaphoreLock(&m_semaphore0);
-
+	Sync();
+	
 	InitJacobianMatrix(threadID);
-	if (threadID == 0) {
+	Sync();
+	if (!threadID) {
 		dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 		dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
-
 		const dgInt32 entryCount = m_cluster->m_jointCount * 2;
 		dgSort(bodyJacobiansPairs, entryCount, CompareBodyJointsPairs);
 		for (dgInt32 i = entryCount - 1; i >= 0; i--) {
 			dgInt32 index = bodyJacobiansPairs[i].m_bodyIndex;
 			bodyProxyArray[index].m_jointStart = i;
 		}
-
-		m_semaphore0 = 1;
-		dgInterlockedExchange(&m_semaphore1, 0);
 	}
-	SemaphoreLock(&m_semaphore1);
+	Sync();
 
-	
 	InitInternalForces(threadID);
-	if (threadID == 0) {
+	Sync();
+	if (!threadID) {
 		dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
 		internalForces[0].m_linear = dgVector::m_zero;
 		internalForces[0].m_angular = dgVector::m_zero;
@@ -1224,17 +1220,43 @@ void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
 		}
 		m_massMatrix.ResizeIfNecessary(size);
 		m_soaRowsCount = 0;
-
-		m_semaphore1 = 1;
-		dgInterlockedExchange(&m_semaphore0, 0);
 	}
-	SemaphoreLock(&m_semaphore0);
+	Sync();
 
 	TransposeMassMatrix(threadID);
-	if (threadID == 0) {
-		m_semaphore0 = 1;
-		dgInterlockedExchange(&m_semaphore1, 0);
-	}
-	SemaphoreLock(&m_semaphore1);
+	Sync();
 
+	const dgInt32 passes = m_solverPasses;
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	for (dgInt32 step = 0; step < 4; step++) {
+		CalculateJointsAcceleration(threadID);
+		Sync();
+		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
+		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
+			CalculateJointsForce(threadID);
+			Sync();
+			CalculateBodyForce(threadID);
+			Sync();
+			accNorm = dgFloat32(0.0f);
+			for (dgInt32 i = 0; i < threadCounts; i++) {
+				accNorm = dgMax(accNorm, m_accelNorm[i]);
+			}
+		}
+		IntegrateBodiesVelocity(threadID);
+		Sync();
+	}
+
+	UpdateForceFeedback(threadID);
+	Sync();
+	dgInt32 hasJointFeeback = 0;
+	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
+		hasJointFeeback |= m_hasJointFeeback[i];
+	}
+	Sync();
+
+	CalculateBodiesAcceleration(threadID);
+	if (hasJointFeeback) {
+		Sync();
+		UpdateKinematicFeedback(threadID);
+	}
 }

@@ -248,8 +248,6 @@ class dgParallelBodySolver
 	void CalculateJointsAcceleration(dgInt32 threadID);
 	void CalculateBodiesAcceleration(dgInt32 threadID);
 
-	DG_INLINE void SemaphoreLock(dgInt32* const semaphore);
-	
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodyForceKernel(void* const context, void* const, dgInt32 threadID);
@@ -263,10 +261,6 @@ class dgParallelBodySolver
 	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 
-
-	void ParallelSolver(dgInt32 threadID);
-	static void ParallelSolverKernel(void* const context, void* const, dgInt32 threadID);
-	
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	static dgInt32 CompareBodyJointsPairs(const dgBodyJacobianPair* const pairA, const dgBodyJacobianPair* const pairB, void* notUsed);
 
@@ -274,6 +268,11 @@ class dgParallelBodySolver
 	DG_INLINE void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
 	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
+
+	void Sync();
+	void ParallelSolver(dgInt32 threadID);
+	static void ParallelSolverKernel(void* const context, void* const, dgInt32 threadID);
+
 
 	protected:
 	dgWorld* m_world;
@@ -296,6 +295,9 @@ class dgParallelBodySolver
 	dgInt32 m_solverPasses;
 	dgInt32 m_threadCounts;
 	dgInt32 m_soaRowsCount;
+	dgInt32 m_sync0;
+	dgInt32 m_sync1;
+	dgInt32 m_syncIndex;
 	dgInt32 m_semaphore0;
 	dgInt32 m_semaphore1;
 	dgInt32* m_soaRowStart;
@@ -325,21 +327,34 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_solverPasses(0)
 	,m_threadCounts(0)
 	,m_soaRowsCount(0)
-	,m_semaphore0(0)
-	,m_semaphore1(0)
+	,m_sync0(0)
+	,m_sync1(0)
+	,m_syncIndex(0)
 	,m_soaRowStart(NULL)
 	,m_bodyRowStart(NULL)
 	,m_massMatrix(allocator)
 {
 }
 
-DG_INLINE void dgParallelBodySolver::SemaphoreLock(dgInt32* const semaphore)
+inline void dgParallelBodySolver::Sync()
 {
-	while (dgInterlockedTest(semaphore, 0)) {
-		//DG_TRACKTIME_NAMED("blocked");
-//		dgThreadYield();
+	if (m_threadCounts > 1) 
+	{
+		//DG_TRACKTIME(__FUNCTION__);
+		dgInt32* const ptr = (dgAtomicExchangeAndAdd(&m_syncIndex, 1) / m_threadCounts) & 1 ? &m_sync1 : &m_sync0;
+		dgAtomicExchangeAndAdd(ptr, 1);
+		dgInt32 count = 0;
+		while (*ptr % m_threadCounts) {
+			count++;
+			dgThreadPause();
+			if (count >= 1024 * 64) {
+				count = 0;
+				dgThreadYield();
+			}
+		}
 	}
 }
+
 
 #endif
 

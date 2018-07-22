@@ -847,14 +847,21 @@ DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 #endif
 }
 
-
 DG_INLINE void dgThreadYield()
 {
-	#ifndef DG_USE_THREAD_EMULATION
-		std::this_thread::yield(); 
-	#endif
+#ifndef DG_USE_THREAD_EMULATION
+	std::this_thread::yield();
+#endif
 }
 
+DG_INLINE void dgThreadPause()
+{
+#ifndef DG_USE_THREAD_EMULATION
+	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
+		_mm_pause();
+	#endif
+#endif
+}
 
 DG_INLINE void dgSpinLock(dgInt32* const ptr)
 {

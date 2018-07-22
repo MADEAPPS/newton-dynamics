@@ -952,10 +952,10 @@ void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32
 void dgWorld::RunStep ()
 {
 	static int xxxx;
-	if (xxxx == 100) {
+	if (xxxx == 10) {
 		DG_START_RECORDING("../../../../sdk/dProfiler/xxxx.tt");
 	}
-	if (xxxx == 800) {
+	if (xxxx == 400) {
 		DG_STOP_RECORDING();
 	}
 	xxxx++;
