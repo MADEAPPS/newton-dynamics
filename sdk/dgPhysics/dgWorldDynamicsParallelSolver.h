@@ -268,13 +268,13 @@ class dgParallelBodySolver
 	DG_INLINE void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
 	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
-
-	void Sync();
+	
 	void ParallelSolver(dgInt32 threadID);
 	static void ParallelSolverKernel(void* const context, void* const, dgInt32 threadID);
 
-
 	protected:
+	void Sync();
+
 	dgWorld* m_world;
 	const dgBodyCluster* m_cluster;
 	dgBodyInfo* m_bodyArray;
@@ -302,7 +302,6 @@ class dgParallelBodySolver
 	dgInt32 m_semaphore1;
 	dgInt32* m_soaRowStart;
 	dgInt32* m_bodyRowStart;
-	
 
 	private:
 	dgArray<dgSolverSoaElement> m_massMatrix;

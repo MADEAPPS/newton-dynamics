@@ -346,7 +346,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-m_currentPlugin = 1;
+//m_currentPlugin = 2;
 
 /*
 	dFloat A[2][2];
