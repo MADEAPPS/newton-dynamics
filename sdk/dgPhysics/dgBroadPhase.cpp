@@ -1551,6 +1551,41 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	}
 }
 
+void dgBroadPhase::AttachNewContacts(dgActiveContacts::dgListNode* const lastNode)
+{
+	DG_TRACKTIME(__FUNCTION__);
+	dgActiveContacts* const contactList = m_world;
+	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = contactNode->GetNext()) {
+		dgContact* const contact = contactNode->GetInfo();
+		m_world->AttachConstraint(contact, contact->m_body0, contact->m_body1);
+		m_contactCache.AddContactJoint(contact);
+	}
+}
+
+void dgBroadPhase::RemoveOldContacts()
+{
+	DG_TRACKTIME(__FUNCTION__);
+
+	dgActiveContacts* const contactList = m_world;
+	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
+	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
+		dgContact* const contact = contactNode->GetInfo();
+		contactNode = contactNode->GetNext();
+		const dgBody* const body0 = contact->GetBody0();
+		const dgBody* const body1 = contact->GetBody1();
+		const dgInt32 equilbriun0 = body0->m_equilibrium;
+		const dgInt32 equilbriun1 = body1->m_equilibrium;
+		if (equilbriun0 & equilbriun1) {
+			contact->m_broadphaseLru = lru;
+		}
+		if (contact->m_broadphaseLru < lru) {
+			m_contactCache.RemoveContactJoint(contact);
+			m_world->DestroyConstraint(contact);
+		}
+	}
+}
+
+
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
 	DG_TRACKTIME(__FUNCTION__);
@@ -1598,28 +1633,8 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
 	ScanForContactJoints (syncPoints);
 
-	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = contactNode->GetNext()) {
-		dgContact* const contact = contactNode->GetInfo();
-		m_world->AttachConstraint(contact, contact->m_body0, contact->m_body1);
-		m_contactCache.AddContactJoint(contact);
-	}
-
-	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
-	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
-		dgContact* const contact = contactNode->GetInfo();
-		contactNode = contactNode->GetNext();
-		const dgBody* const body0 = contact->GetBody0();
-		const dgBody* const body1 = contact->GetBody1();
-		const dgInt32 equilbriun0 = body0->m_equilibrium;
-		const dgInt32 equilbriun1 = body1->m_equilibrium;
-		if (equilbriun0 & equilbriun1) {
-			contact->m_broadphaseLru = lru;
-		}
-		if (contact->m_broadphaseLru < lru) {
-			m_contactCache.RemoveContactJoint(contact);
-			m_world->DestroyConstraint(contact);
-		}
-	}
+	AttachNewContacts(lastNode);
+	RemoveOldContacts();
 	
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {

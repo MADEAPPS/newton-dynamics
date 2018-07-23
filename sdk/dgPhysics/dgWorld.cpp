@@ -951,14 +951,14 @@ void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32
 
 void dgWorld::RunStep ()
 {
-	static int xxxx;
-	if (xxxx == 10) {
+	static int zzzz;
+	if (zzzz == 500) {
 		DG_START_RECORDING("../../../../sdk/dProfiler/xxxx.tt");
 	}
-	if (xxxx == 600) {
+	if (zzzz == 1000) {
 		DG_STOP_RECORDING();
 	}
-	xxxx++;
+	zzzz++;
 
 
 	DG_TRACKTIME(__FUNCTION__);
