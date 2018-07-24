@@ -1173,7 +1173,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 	dgAssert(body1);
 	const bool test = TestOverlaping (body0, body1, timestep);
 	if (test) {
-		//dgContact* contact = m_world->FindContactJoint(body0, body1);
 		dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
 
 		if (!contact) {
@@ -1571,9 +1570,9 @@ void dgBroadPhase::RemoveOldContacts()
 		contactNode = contactNode->GetNext();
 		const dgBody* const body0 = contact->GetBody0();
 		const dgBody* const body1 = contact->GetBody1();
-		const dgInt32 equilbriun0 = body0->m_equilibrium;
-		const dgInt32 equilbriun1 = body1->m_equilibrium;
-		if (equilbriun0 & equilbriun1) {
+		const dgInt32 equilbrium0 = body0->m_equilibrium;
+		const dgInt32 equilbrium1 = body1->m_equilibrium;
+		if (equilbrium0 & equilbrium1) {
 			contact->m_broadphaseLru = lru;
 		}
 		if (contact->m_broadphaseLru < lru) {
@@ -1631,8 +1630,8 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	ScanForContactJoints (syncPoints);
 
 	AttachNewContacts(lastNode);
-
-	
+	RemoveOldContacts();
+		
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
@@ -1667,6 +1666,5 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 */
 	}
 
-	RemoveOldContacts();
 	UpdateFitness();
 }

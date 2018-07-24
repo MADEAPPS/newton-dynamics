@@ -173,7 +173,6 @@ bool dMatrix::TestOrthogonal() const
 }
 
 
-//dVector dMatrix::GetEulerAngles (dEulerAngleOrder order) const
 void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder order) const
 {
 	switch (order)
