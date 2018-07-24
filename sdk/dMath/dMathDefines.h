@@ -96,6 +96,12 @@ enum dEulerAngleOrder
 {
 	m_pitchYawRoll,
 	m_pitchRollYaw,
+	PYR = (0 << 8) + (1 << 4) + (2 << 0),
+	PRY = (0 << 8) + (2 << 4) + (1 << 0),
+	YPR = (1 << 8) + (0 << 4) + (2 << 0),
+	YRP = (1 << 8) + (2 << 4) + (0 << 0),
+	RYP = (2 << 8) + (1 << 4) + (0 << 0),
+	RPY = (2 << 8) + (0 << 4) + (1 << 0),
 };
 
 #define dAlloca(type, size) (type*) alloca ((size) * sizeof (type))
