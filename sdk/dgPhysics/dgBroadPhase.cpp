@@ -296,10 +296,8 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 	}
 }
 
-
 void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
@@ -1441,7 +1439,7 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-		broadPhase->FindCollidingPairsForward(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
+		broadPhase->FindCollidingPairs(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
 	}
 
 
@@ -1604,7 +1602,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
-	// update pre-listeners after the force and true are applied
+	// update pre-listeners after the force and torque are applied
 	if (m_world->m_listeners.GetCount()) {
 		for (dgWorld::dgListenerList::dgListNode* node1 = m_world->m_listeners.GetFirst(); node1; node1 = node1->GetNext()) {
 			dgWorld::dgListener& listener = node1->GetInfo();
@@ -1627,14 +1625,13 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
-	UpdateFitness();
 
 	dgActiveContacts* const contactList = m_world;
 	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
 	ScanForContactJoints (syncPoints);
 
 	AttachNewContacts(lastNode);
-	RemoveOldContacts();
+
 	
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1669,4 +1666,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_generatedBodies.RemoveAll();
 */
 	}
+
+	RemoveOldContacts();
+	UpdateFitness();
 }

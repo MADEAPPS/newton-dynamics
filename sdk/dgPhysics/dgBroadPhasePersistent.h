@@ -45,7 +45,7 @@ class dgBroadPhasePersistent: public dgBroadPhase
 	virtual void CheckStaticDynamic(dgBody* const body, dgFloat32 mass);
 	virtual void LinkAggregate(dgBroadPhaseAggregate* const aggregate);
 	virtual void UnlinkAggregate(dgBroadPhaseAggregate* const aggregate);
-	virtual void FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
+	virtual void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
 
 	virtual void ResetEntropy();
 	virtual void UpdateFitness();

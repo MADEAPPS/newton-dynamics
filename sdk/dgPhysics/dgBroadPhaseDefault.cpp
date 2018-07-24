@@ -337,7 +337,7 @@ void dgBroadPhaseDefault::DestroyAggregate(dgBroadPhaseAggregate* const aggregat
 	RemoveNode(aggregate);
 }
 
-void dgBroadPhaseDefault::FindCollidingPairsForward(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
+void dgBroadPhaseDefault::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
 {
 	const dgFloat32 timestep = descriptor->m_timestep;
 

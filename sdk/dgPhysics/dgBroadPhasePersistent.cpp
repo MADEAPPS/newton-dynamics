@@ -497,7 +497,7 @@ dgInt32 dgBroadPhasePersistent::Collide(dgCollisionInstance* const shape, const 
 	return totalCount;
 }
 
-void dgBroadPhasePersistent::FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
+void dgBroadPhasePersistent::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
 {
 	const dgFloat32 timestep = descriptor->m_timestep;
 
