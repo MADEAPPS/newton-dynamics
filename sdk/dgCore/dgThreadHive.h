@@ -31,10 +31,54 @@
 #define DG_THREAD_POOL_JOB_SIZE (256)
 typedef void (*dgWorkerThreadTaskCallback) (void* const context0, void* const context1, dgInt32 threadID);
 
+class dThreadHiveSync
+{
+	public:
+	dThreadHiveSync()
+		:m_sync0(0)
+		,m_sync1(0)
+		,m_syncIndex(0)
+		,m_threadCounts(1)
+	{
+	}
+
+	void Reset(dgInt32 threadCount)
+	{
+		m_sync0 = 0;
+		m_sync1 = 0;
+		m_syncIndex = 0;
+		m_threadCounts = threadCount;
+	}
+
+	void Sync()
+	{
+		if (m_threadCounts > 1) {
+			//DG_TRACKTIME(__FUNCTION__);
+			dgInt32* const ptr = (dgAtomicExchangeAndAdd(&m_syncIndex, 1) / m_threadCounts) & 1 ? &m_sync1 : &m_sync0;
+			dgAtomicExchangeAndAdd(ptr, 1);
+			dgInt32 count = 0;
+			while (*ptr % m_threadCounts) {
+				count++;
+				dgThreadPause();
+				if (count >= 1024 * 64) {
+					count = 0;
+					dgThreadYield();
+				}
+			}
+		}
+	}
+
+	private:
+	dgInt32 m_sync0;
+	dgInt32 m_sync1;
+	dgInt32 m_syncIndex;
+	dgInt32 m_threadCounts;
+};
+
+
 class dgThreadHive  
 {
 	public:
-
 	class dgThreadJob
 	{
 		public:

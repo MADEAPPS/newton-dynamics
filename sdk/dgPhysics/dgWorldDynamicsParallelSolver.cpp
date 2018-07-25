@@ -170,9 +170,7 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 
 	InitWeights();
 #if 1
-	m_sync0 = 0;
-	m_sync1 = 0;
-	m_syncIndex = 0;
+	m_threadSync.Reset(m_threadCounts);
 	m_firstPassCoef = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(ParallelSolverKernel, this, NULL, "dgParallelBodySolver::ParallelSolverKernel");
@@ -1167,15 +1165,15 @@ void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	InitBodyArray(threadID);
-	Sync();
+	m_threadSync.Sync();
 	if (!threadID) {
 		m_bodyProxyArray->m_invWeight = 1.0f;
 		m_jacobianMatrixRowAtomicIndex = 0;
 	}
-	Sync();
+	m_threadSync.Sync();
 	
 	InitJacobianMatrix(threadID);
-	Sync();
+	m_threadSync.Sync();
 	if (!threadID) {
 		dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 		dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
@@ -1186,10 +1184,10 @@ void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
 			bodyProxyArray[index].m_jointStart = i;
 		}
 	}
-	Sync();
+	m_threadSync.Sync();
 
 	InitInternalForces(threadID);
-	Sync();
+	m_threadSync.Sync();
 	if (!threadID) {
 		dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
 		internalForces[0].m_linear = dgVector::m_zero;
@@ -1221,42 +1219,42 @@ void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
 		m_massMatrix.ResizeIfNecessary(size);
 		m_soaRowsCount = 0;
 	}
-	Sync();
+	m_threadSync.Sync();
 
 	TransposeMassMatrix(threadID);
-	Sync();
+	m_threadSync.Sync();
 
 	const dgInt32 passes = m_solverPasses;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAcceleration(threadID);
-		Sync();
+		m_threadSync.Sync();
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
 		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
 			CalculateJointsForce(threadID);
-			Sync();
+			m_threadSync.Sync();
 			CalculateBodyForce(threadID);
-			Sync();
+			m_threadSync.Sync();
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < threadCounts; i++) {
 				accNorm = dgMax(accNorm, m_accelNorm[i]);
 			}
 		}
 		IntegrateBodiesVelocity(threadID);
-		Sync();
+		m_threadSync.Sync();
 	}
 
 	UpdateForceFeedback(threadID);
-	Sync();
+	m_threadSync.Sync();
 	dgInt32 hasJointFeeback = 0;
 	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
 		hasJointFeeback |= m_hasJointFeeback[i];
 	}
-	Sync();
+	m_threadSync.Sync();
 
 	CalculateBodiesAcceleration(threadID);
 	if (hasJointFeeback) {
-		Sync();
+		m_threadSync.Sync();
 		UpdateKinematicFeedback(threadID);
 	}
 }

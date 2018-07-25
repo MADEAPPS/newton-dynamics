@@ -273,8 +273,6 @@ class dgParallelBodySolver
 	static void ParallelSolverKernel(void* const context, void* const, dgInt32 threadID);
 
 	protected:
-	void Sync();
-
 	dgWorld* m_world;
 	const dgBodyCluster* m_cluster;
 	dgBodyInfo* m_bodyArray;
@@ -295,11 +293,7 @@ class dgParallelBodySolver
 	dgInt32 m_solverPasses;
 	dgInt32 m_threadCounts;
 	dgInt32 m_soaRowsCount;
-	dgInt32 m_sync0;
-	dgInt32 m_sync1;
-	dgInt32 m_syncIndex;
-	dgInt32 m_semaphore0;
-	dgInt32 m_semaphore1;
+	dThreadHiveSync m_threadSync;
 	dgInt32* m_soaRowStart;
 	dgInt32* m_bodyRowStart;
 
@@ -307,7 +301,6 @@ class dgParallelBodySolver
 	dgArray<dgSolverSoaElement> m_massMatrix;
 	friend class dgWorldDynamicUpdate;
 };
-
 
 DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
 	:m_world(NULL)
@@ -326,32 +319,11 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_solverPasses(0)
 	,m_threadCounts(0)
 	,m_soaRowsCount(0)
-	,m_sync0(0)
-	,m_sync1(0)
-	,m_syncIndex(0)
+	,m_threadSync()
 	,m_soaRowStart(NULL)
 	,m_bodyRowStart(NULL)
 	,m_massMatrix(allocator)
 {
-}
-
-inline void dgParallelBodySolver::Sync()
-{
-	if (m_threadCounts > 1) 
-	{
-		//DG_TRACKTIME(__FUNCTION__);
-		dgInt32* const ptr = (dgAtomicExchangeAndAdd(&m_syncIndex, 1) / m_threadCounts) & 1 ? &m_sync1 : &m_sync0;
-		dgAtomicExchangeAndAdd(ptr, 1);
-		dgInt32 count = 0;
-		while (*ptr % m_threadCounts) {
-			count++;
-			dgThreadPause();
-			if (count >= 1024 * 64) {
-				count = 0;
-				dgThreadYield();
-			}
-		}
-	}
 }
 
 

@@ -469,11 +469,8 @@ class dgBroadPhase
 	virtual void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
 
 	void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
-
 	void RemoveOldContacts();
 	void AttachNewContacts(dgActiveContacts::dgListNode* const lastNode);
-	
-
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)
 	{
