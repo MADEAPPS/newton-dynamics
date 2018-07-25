@@ -43,7 +43,6 @@ dgBodyMasterListRow::~dgBodyMasterListRow()
 
 dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstraint* const joint, dgBody* const body)
 {
-//	dgThreadHiveScopeLock lock (body->m_world, &m_body->m_criticalSectionLock);
 	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 
 	body->m_world->GlobalLock();
