@@ -330,7 +330,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-	m_workerThreades = 4;
+//	m_workerThreades = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
