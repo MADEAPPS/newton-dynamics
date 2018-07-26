@@ -368,5 +368,35 @@ void dgBroadPhaseDefault::FindCollidingPairs(dgBroadphaseSyncDescriptor* const d
 	}
 }
 
+void dgBroadPhaseDefault::MakeNewCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
+{
+	DG_TRACKTIME(__FUNCTION__);
+	const dgFloat32 timestep = descriptor->m_timestep;
+
+	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
+	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
+	while (node) {
+		dgBroadPhaseNode* const broadPhaseNode = node->GetInfo();
+		dgAssert(broadPhaseNode->IsLeafNode());
+		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
+
+		if (broadPhaseNode->IsAggregate()) {
+			((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
+		}
+
+		for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
+			dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
+			dgAssert(!parent->IsLeafNode());
+			dgBroadPhaseNode* const sibling = parent->m_right;
+			if (sibling != ptr) {
+				SubmitPairs(broadPhaseNode, sibling, timestep, 0, threadID);
+			}
+		}
+
+		for (dgInt32 i = 0; i < threadCount; i++) {
+			node = node ? node->GetNext() : NULL;
+		}
+	}
+}
 
 

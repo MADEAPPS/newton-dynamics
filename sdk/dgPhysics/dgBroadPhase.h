@@ -537,6 +537,9 @@ class dgBroadPhase
 	static void UpdateParallelKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	void UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 
+	static void MakeNewCollidingPairsKernel(void* const context, void* const node, dgInt32 threadID);
+	virtual void MakeNewCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
+
 	class dgPendingCollisionSofBodies
 	{
 		public:

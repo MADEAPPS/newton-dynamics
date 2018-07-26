@@ -1432,13 +1432,20 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 	}
 }
 
-
 void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
 {
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
 	broadPhase->FindCollidingPairs(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
+}
+
+void dgBroadPhase::MakeNewCollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
+{
+	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
+	dgWorld* const world = descriptor->m_world;
+	dgBroadPhase* const broadPhase = world->GetBroadPhase();
+	broadPhase->MakeNewCollidingPairs(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
 }
 
 
@@ -1643,6 +1650,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 
 #else
+
 	dgActiveContacts* const contactList = m_world;
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1658,10 +1666,10 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_world->SynchronizationBarrier();
 	}
 
-//	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
+	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
 	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
+		m_world->QueueJob(MakeNewCollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::MakeNewCollidingPairs");
 		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
