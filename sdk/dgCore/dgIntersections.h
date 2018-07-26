@@ -58,7 +58,9 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 
 DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
-	dgVector val ((p0 < q1) & (p1 > q0));
+//	dgVector val0 ((p0 < q1) & (p1 > q0));
+//	dgInt32 mask1 = val0.GetSignMask();
+	dgVector val((p0 - q1) * (p1 - q0));
 	dgInt32 mask = val.GetSignMask();
 	return ((mask & 0x07) == 0x07);
 }
@@ -66,7 +68,7 @@ DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const d
 
 DG_INLINE dgInt32 dgBoxInclusionTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
-	dgVector val ((p0 >= q0) & (p1 <= q1));
+	dgVector val (dgVector::m_negOne & ((p0 >= q0) & (p1 <= q1)));
 	dgInt32 mask = val.GetSignMask();
 	return ((mask & 0x07) == 0x07);
 }

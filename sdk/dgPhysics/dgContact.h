@@ -41,10 +41,14 @@ class dgCollisionInstance;
 class dgActiveContacts: public dgList<dgContact*>
 {
 	public:
-	dgActiveContacts (dgMemoryAllocator* const allocator)
+	dgActiveContacts(dgMemoryAllocator* const allocator)
 		:dgList<dgContact*>(allocator)
+		,m_deadContactsCount(0)
 	{
 	}
+
+	dgInt32 m_deadContactsCount;
+	dgActiveContacts::dgListNode* m_deadContacts[128];
 };
 
 
