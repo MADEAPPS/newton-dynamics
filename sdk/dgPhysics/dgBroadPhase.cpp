@@ -1440,15 +1440,6 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 	broadPhase->FindCollidingPairs(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
 }
 
-void dgBroadPhase::MakeNewCollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
-{
-	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
-	dgWorld* const world = descriptor->m_world;
-	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	broadPhase->MakeNewCollidingPairs(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
-}
-
-
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
@@ -1578,7 +1569,6 @@ void dgBroadPhase::RemoveOldContacts()
 	}
 }
 
-
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
 	DG_TRACKTIME(__FUNCTION__);
@@ -1608,18 +1598,11 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 
 #if 1
+
 	node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(SleepingStateKernel, &syncPoints, node, "dgBroadPhase::SleepingState");
 		node = node ? node->GetPrev() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-#if 1
-	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob (UpdateAggregateEntropyKernel, &syncPoints, aggregateNode, "dgBroadPhase::UpdateAggregateEntropy");
-		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
 
@@ -1649,57 +1632,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_world->SynchronizationBarrier();
 	}
 
-#else
-
-	dgActiveContacts* const contactList = m_world;
-	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
-		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-	if (m_pendingSoftBodyPairsCount) {
-		for (dgInt32 i = 0; i < threadsCount; i++) {
-			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateSoftBodyContact");
-		}
-		m_world->SynchronizationBarrier();
-	}
-
-	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
-	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(MakeNewCollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::MakeNewCollidingPairs");
-		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-
-/*
-	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(UpdateAggregateEntropyKernel, &syncPoints, aggregateNode, "dgBroadPhase::UpdateAggregateEntropy");
-		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-	
-	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
-	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
-		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-
-	AttachNewContacts(lastNode);
-	RemoveOldContacts();
-
-*/
-#endif
-
-
 //	m_recursiveChunks = false;
 	if (m_generatedBodies.GetCount()) {
         dgAssert (0);
@@ -1719,54 +1651,13 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 */
 	}
 #else
-//	node = masterList->GetLast();
-//	for (dgInt32 i = 0; i < threadsCount; i++) {
-//		m_world->QueueJob(SleepingStateKernel, &syncPoints, node, "dgBroadPhase::SleepingState");
-//		node = node ? node->GetPrev() : NULL;
-//	}
-//	m_world->SynchronizationBarrier();
-
-//	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
-//	for (dgInt32 i = 0; i < threadsCount; i++) {
-//		m_world->QueueJob(UpdateAggregateEntropyKernel, &syncPoints, aggregateNode, "dgBroadPhase::UpdateAggregateEntropy");
-//		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
-//	}
-//	m_world->SynchronizationBarrier();
-
-//	dgActiveContacts* const contactList = m_world;
-//	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
-//	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-//	for (dgInt32 i = 0; i < threadsCount; i++) {
-//		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
-//		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-//	}
-//	m_world->SynchronizationBarrier();
-
-//	AttachNewContacts(lastNode);
-//	RemoveOldContacts();
-
-//	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
-//	for (dgInt32 i = 0; i < threadsCount; i++) {
-//		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
-//		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
-//	}
-//	m_world->SynchronizationBarrier();
-
-//	if (m_pendingSoftBodyPairsCount) {
-//		for (dgInt32 i = 0; i < threadsCount; i++) {
-//			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateSoftBodyContact");
-//		}
-//		m_world->SynchronizationBarrier();
-//	}
-
-
 	m_threadSync.Reset(threadsCount);
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateParallelKernel, &syncPoints, m_world, "dgBroadPhase::UpdateParallelKernel");
 	}
 	m_world->SynchronizationBarrier();
 
-	//	m_recursiveChunks = false;
+	//m_recursiveChunks = false;
 	if (m_generatedBodies.GetCount()) {
 		dgAssert(0);
 		//syncPoints.m_newBodiesNodes = m_generatedBodies.GetFirst();
@@ -1785,6 +1676,14 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 #endif
 
+	// this will move to an asynchronous thread 
+	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob (UpdateAggregateEntropyKernel, &syncPoints, aggregateNode, "dgBroadPhase::UpdateAggregateEntropy");
+		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
+	}
+	m_world->SynchronizationBarrier();
+
 	UpdateFitness();
 }
 
@@ -1800,7 +1699,6 @@ void dgBroadPhase::UpdateParallelKernel(void* const context, void* const node, d
 void dgBroadPhase::UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
 	// do the sleeping 
-	const dgInt32 threadsCount = m_world->GetThreadCount();
 	const dgBodyMasterList* const masterList = m_world;
 	dgBodyMasterList::dgListNode* node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadID; i++) {
@@ -1809,12 +1707,12 @@ void dgBroadPhase::UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, 
 	SleepingState(descriptor, node, threadID);
 	m_threadSync.Sync();
 
-	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
-	for (dgInt32 i = 0; i < threadID; i++) {
-		aggregateNode = aggregateNode ? aggregateNode->GetPrev() : NULL;
-	}
-	UpdateAggregateEntropy(descriptor, aggregateNode, threadID);
-	m_threadSync.Sync();
+//	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
+//	for (dgInt32 i = 0; i < threadID; i++) {
+//		aggregateNode = aggregateNode ? aggregateNode->GetPrev() : NULL;
+//	}
+//	UpdateAggregateEntropy(descriptor, aggregateNode, threadID);
+//	m_threadSync.Sync();
 
 	dgActiveContacts* const contactList = m_world;
 	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();

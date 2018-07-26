@@ -529,8 +529,3 @@ void dgBroadPhasePersistent::FindCollidingPairs (dgBroadphaseSyncDescriptor* con
 	}	
 }
 
-
-void dgBroadPhasePersistent::MakeNewCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID)
-{
-	dgAssert(0);
-}
