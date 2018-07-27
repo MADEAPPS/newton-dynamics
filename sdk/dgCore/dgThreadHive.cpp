@@ -50,6 +50,10 @@ void dgThreadHive::dgWorkerThread::SetUp(dgMemoryAllocator* const allocator, con
 	m_hive = hive;
 	m_allocator = allocator;
 	Init (name, id);
+
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	SetThreadPriority(m_handle.native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
+#endif
 }
 
 bool dgThreadHive::dgWorkerThread::IsBusy() const
