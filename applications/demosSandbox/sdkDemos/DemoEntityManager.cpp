@@ -346,7 +346,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-//m_currentPlugin = 2;
+m_currentPlugin = 0;
 
 /*
 	dFloat A[2][2];
@@ -739,8 +739,9 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("two", &m_workerThreades, 2);
 			ImGui::RadioButton("three", &m_workerThreades, 3);
 			ImGui::RadioButton("four", &m_workerThreades, 4);
+			ImGui::RadioButton("six", &m_workerThreades, 6);
 			ImGui::RadioButton("eight", &m_workerThreades, 8);
-			ImGui::RadioButton("sixteen", &m_workerThreades, 16);
+			ImGui::RadioButton("twelve", &m_workerThreades, 12);
 
 			ImGui::EndMenu();
 
