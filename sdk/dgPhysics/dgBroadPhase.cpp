@@ -1629,6 +1629,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	const dgBodyMasterList* const masterList = m_world;
 	dgBroadphaseSyncDescriptor syncPoints(timestep, m_world);
 
+	dgActiveContacts* const contactList = m_world;
+	contactList->m_deadContactsCount = 0;
+
 	dgBodyMasterList::dgListNode* node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(ForceAndToqueKernel, &syncPoints, node, "dgBroadPhase::ForceAndToque");
@@ -1654,8 +1657,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
-	dgActiveContacts* const contactList = m_world;
-	contactList->m_deadContactsCount = 0;
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
@@ -1763,28 +1764,7 @@ void dgBroadPhase::UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, 
 	SleepingState(descriptor, node, threadID);
 	m_threadSync.Sync();
 
-//	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
-//	for (dgInt32 i = 0; i < threadID; i++) {
-//		aggregateNode = aggregateNode ? aggregateNode->GetPrev() : NULL;
-//	}
-//	UpdateAggregateEntropy(descriptor, aggregateNode, threadID);
-//	m_threadSync.Sync();
-
 	dgActiveContacts* const contactList = m_world;
-	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
-	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-	for (dgInt32 i = 0; i < threadID; i++) {
-		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-	}
-	FindCollidingPairs(descriptor, broadPhaseNode, threadID);
-	m_threadSync.Sync();
-
-	if (!threadID) {
-		AttachNewContacts(lastNode);
-		RemoveOldContacts();
-	}
-	m_threadSync.Sync();
-
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadID; i++) {
 		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
@@ -1799,4 +1779,29 @@ void dgBroadPhase::UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, 
 		m_world->SynchronizationBarrier();
 	}
 */
+	
+	dgActiveContacts::dgListNode* const lastNode = contactList->GetFirst();
+	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
+	for (dgInt32 i = 0; i < threadID; i++) {
+		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
+	}
+	FindCollidingPairs(descriptor, broadPhaseNode, threadID);
+	m_threadSync.Sync();
+
+	if (!threadID) {
+		AttachNewContacts(lastNode);
+	}
+	m_threadSync.Sync();
+
+	dgActiveContacts::dgListNode* newContact = lastNode ? lastNode->GetPrev() : NULL;
+	for (dgInt32 i = 0; i < threadID; i++) {
+		newContact = newContact ? newContact->GetPrev() : NULL;
+	}
+	AddNewContacts(descriptor, newContact, threadID);
+	m_threadSync.Sync();
+
+	if (!threadID) {
+		RemoveOldContacts();
+	}
+//	m_threadSync.Sync();
 }

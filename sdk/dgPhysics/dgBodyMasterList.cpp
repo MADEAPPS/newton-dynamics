@@ -112,7 +112,6 @@ void dgBodyMasterListRow::RemoveAllJoints ()
 
 void dgBodyMasterListRow::RemoveContactJoint (dgListNode* const link)
 {
-//	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
 	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	
 	m_body->m_world->GlobalLock();
