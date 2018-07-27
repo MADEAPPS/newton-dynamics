@@ -169,9 +169,9 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
 
 	InitWeights();
-#if 0
-	m_threadSync.Reset(m_threadCounts);
+#if 1
 	m_firstPassCoef = dgFloat32(0.0f);
+	m_threadSync.Reset(m_threadCounts);
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(ParallelSolverKernel, this, NULL, "dgParallelBodySolver::ParallelSolverKernel");
 	}
@@ -1229,6 +1229,10 @@ void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAcceleration(threadID);
 		m_threadSync.Sync();
+		m_firstPassCoef = dgFloat32(1.0f);
+		UpdateRowAcceleration(threadID);
+		m_threadSync.Sync();
+
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
 		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
 			CalculateJointsForce(threadID);
