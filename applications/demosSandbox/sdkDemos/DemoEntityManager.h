@@ -198,7 +198,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	int m_solverPasses;
 	int m_broadPhaseType;
-	int m_workerThreades;
+	int m_workerThreads;
 	int m_debugDisplayMode;
 	int m_collisionDisplayMode;
 	FileBrowserModal m_fileBrowser;

@@ -220,7 +220,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_broadPhaseType(0)
-	,m_workerThreades(1)
+	,m_workerThreads(1)
 	,m_solverPasses(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
@@ -330,7 +330,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-	m_workerThreades = 4;
+	m_workerThreads = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
@@ -610,7 +610,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	// clean up all caches the engine have saved
 	//NewtonInvalidateCache(m_world);
 	NewtonSetSolverModel(m_world, m_solverPasses);
-	NewtonSetThreadsCount(m_world, m_workerThreades);
+	NewtonSetThreadsCount(m_world, m_workerThreads);
 
 	int state = m_autoSleepMode ? 1 : 0;
 	for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
@@ -735,13 +735,14 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 			
 			ImGui::Text ("select worker threads");
-			ImGui::RadioButton("one", &m_workerThreades, 1);
-			ImGui::RadioButton("two", &m_workerThreades, 2);
-			ImGui::RadioButton("three", &m_workerThreades, 3);
-			ImGui::RadioButton("four", &m_workerThreades, 4);
-			ImGui::RadioButton("six", &m_workerThreades, 6);
-			ImGui::RadioButton("eight", &m_workerThreades, 8);
-			ImGui::RadioButton("twelve", &m_workerThreades, 12);
+			ImGui::RadioButton("one", &m_workerThreads, 1);
+			ImGui::RadioButton("two", &m_workerThreads, 2);
+			ImGui::RadioButton("three", &m_workerThreads, 3);
+			ImGui::RadioButton("four", &m_workerThreads, 4);
+			ImGui::RadioButton("six", &m_workerThreads, 6);
+			ImGui::RadioButton("eight", &m_workerThreads, 8);
+			ImGui::RadioButton("twelve", &m_workerThreads, 12);
+			ImGui::RadioButton("sixteen", &m_workerThreads, 16);
 
 			ImGui::EndMenu();
 
