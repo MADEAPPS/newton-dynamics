@@ -25,7 +25,7 @@ option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" ON)
 option(GLFW_BUILD_TESTS "Build the GLFW test programs" ON)
 option(GLFW_BUILD_DOCS "Build the GLFW documentation" ON)
 option(GLFW_INSTALL "Generate installation target" ON)
-option(GLFW_VULKAN_STATIC "Use the Vulkan loader statically linked into application" OFF)
+#option(GLFW_VULKAN_STATIC "Use the Vulkan loader statically linked into application" OFF)
 option(GLFW_DOCUMENT_INTERNALS "Include internals in documentation" OFF)
 
 if (WIN32)
@@ -58,14 +58,14 @@ else()
     set(GLFW_LIB_NAME glfw3)
 endif()
 
-if (GLFW_VULKAN_STATIC)
-    set(_GLFW_VULKAN_STATIC 1)
-endif()
+#if (GLFW_VULKAN_STATIC)
+#    set(_GLFW_VULKAN_STATIC 1)
+#endif()
 
 list(APPEND CMAKE_MODULE_PATH "${GLFW_SOURCE_DIR}/CMake/modules")
 
 find_package(Threads REQUIRED)
-find_package(Vulkan)
+#find_package(Vulkan)
 
 if (GLFW_BUILD_DOCS)
     set(DOXYGEN_SKIP_DOT TRUE)
@@ -156,17 +156,17 @@ endif()
 #--------------------------------------------------------------------
 # Add Vulkan static library if requested
 #--------------------------------------------------------------------
-if (GLFW_VULKAN_STATIC)
-    if (VULKAN_FOUND AND VULKAN_STATIC_LIBRARY)
-        list(APPEND glfw_LIBRARIES ${VULKAN_STATIC_LIBRARY})
-    else()
-        if (BUILD_SHARED_LIBS OR GLFW_BUILD_EXAMPLES OR GLFW_BUILD_TESTS)
-            message(FATAL_ERROR "Vulkan loader static library not found")
-        else()
-            message(WARNING "Vulkan loader static library not found")
-        endif()
-    endif()
-endif()
+#if (GLFW_VULKAN_STATIC)
+#    if (VULKAN_FOUND AND VULKAN_STATIC_LIBRARY)
+#        list(APPEND glfw_LIBRARIES ${VULKAN_STATIC_LIBRARY})
+#    else()
+#        if (BUILD_SHARED_LIBS OR GLFW_BUILD_EXAMPLES OR GLFW_BUILD_TESTS)
+#            message(FATAL_ERROR "Vulkan loader static library not found")
+#        else()
+#            message(WARNING "Vulkan loader static library not found")
+#        endif()
+#    endif()
+#endif()
 
 #--------------------------------------------------------------------
 # Find and add Unix math and time libraries

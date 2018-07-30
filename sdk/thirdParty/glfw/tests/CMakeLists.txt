@@ -46,14 +46,14 @@ set(WINDOWS_BINARIES empty gamma icon joysticks sharing tearing threads timeout
 set(CONSOLE_BINARIES clipboard events msaa glfwinfo iconify monitors reopen
                      cursor)
 
-if (VULKAN_FOUND)
-    add_executable(vulkan WIN32 vulkan.c ${ICON})
-    target_include_directories(vulkan PRIVATE "${VULKAN_INCLUDE_DIR}")
-    if (NOT GLFW_VULKAN_STATIC)
-        target_link_libraries(vulkan "${VULKAN_LIBRARY}")
-    endif()
-    list(APPEND WINDOWS_BINARIES vulkan)
-endif()
+#if (VULKAN_FOUND)
+#    add_executable(vulkan WIN32 vulkan.c ${ICON})
+#    target_include_directories(vulkan PRIVATE "${VULKAN_INCLUDE_DIR}")
+#    if (NOT GLFW_VULKAN_STATIC)
+#        target_link_libraries(vulkan "${VULKAN_LIBRARY}")
+#    endif()
+#    list(APPEND WINDOWS_BINARIES vulkan)
+#endif()
 
 set_target_properties(${WINDOWS_BINARIES} ${CONSOLE_BINARIES} PROPERTIES
                       FOLDER "GLFW3/Tests")
