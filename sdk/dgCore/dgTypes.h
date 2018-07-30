@@ -568,6 +568,7 @@ void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 r
 template <class T> 
 void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
+	DG_TRACKTIME_NAMED("dgSort");
 	dgInt32 stride = 8;
 	dgInt32 stack[1024][2];
 

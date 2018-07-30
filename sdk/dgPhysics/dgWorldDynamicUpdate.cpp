@@ -106,6 +106,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_dynamicsLru = m_markLru;
 
+	//BuildClusters1(timestep);
 	BuildClusters(timestep);
 	SortClustersByCount();
 
@@ -170,6 +171,137 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 void dgWorldDynamicUpdate::SortClustersByCount ()
 {
 	dgSort(m_clusterMemory, m_clusters, CompareClusters);
+}
+
+DG_INLINE dgBody* dgWorldDynamicUpdate::Find(dgBody* const body) const
+{
+	dgBody* node = body;
+	for (node = body; node->m_disjointParent != node; node = node->m_disjointParent);
+	return node;
+}
+
+DG_INLINE dgBody* dgWorldDynamicUpdate::FindAndSplit(dgBody* const body) const
+{
+	dgBody* node = body;
+	while (node->m_disjointParent != node) 
+	{
+		dgBody* const prev = body;
+		node = node->m_disjointParent;
+		prev->m_disjointParent = node->m_disjointParent;
+	}
+	return node;
+}
+
+DG_INLINE void dgWorldDynamicUpdate::UnionSet(const dgConstraint* const joint) const
+{
+	dgBody* root0 = FindAndSplit(joint->GetBody0());
+	dgBody* root1 = FindAndSplit(joint->GetBody1());
+	if (root0 != root1) {
+		if (root0->m_disjointSetRank < root1->m_disjointSetRank) {
+			dgSwap(root0, root1);
+		}
+		root1->m_disjointParent = root0;
+		if (root0->m_disjointSetRank == root1->m_disjointSetRank) {
+			root0->m_disjointSetRank += 1;
+		}
+	}
+}
+
+dgInt32 dgWorldDynamicUpdate::CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void*)
+{
+	if (infoA->m_clusterKey < infoB->m_clusterKey) {
+		return -1;
+	}
+	else if (infoA->m_clusterKey > infoB->m_clusterKey) {
+		return 1;
+	}
+	return 0;
+}
+
+dgInt32 dgWorldDynamicUpdate::CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void*)
+{
+	if (infoA->m_m0 < infoB->m_m0) {
+		return -1;
+	} else if (infoA->m_m0 > infoB->m_m0) {
+		return 1;
+	}
+	return 0;
+}
+
+void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
+{
+	DG_TRACKTIME(__FUNCTION__);
+	dgWorld* const world = (dgWorld*) this;
+	dgBodyMasterList& masterList = *world;
+	dgActiveContacts& contactList = *world;
+	for (dgActiveContacts::dgListNode* node = contactList.GetFirst(); node; node = node->GetNext()) {
+		dgContact* const contact = node->GetInfo();
+		if (contact->m_contactActive && contact->m_maxDOF) {
+			if (contact->GetBody1()->m_invMass.m_w > dgFloat32 (0.0f)) {
+				dgAssert (contact->GetBody0()->m_invMass.m_w > dgFloat32 (0.0f));
+				UnionSet(contact);
+			}
+		}
+	}
+	
+	world->m_bodiesMemory.ResizeIfNecessary(2 * masterList.GetCount() * sizeof (dgBodyInfo));
+	dgBodyInfo* const bodyArray = (dgBodyInfo*)&world->m_bodiesMemory[0];
+
+//	m_bodies = 0;
+	dgInt32 bodiesCount = 0;
+	dgInt32 inslandCount = 0;
+
+	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
+		const dgBodyMasterListRow& graphNode = node->GetInfo();
+		dgBody* const body = graphNode.GetBody();
+		if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
+			#ifdef _DEBUG
+			for (; node; node = node->GetPrev()) {
+				//dgAssert ((body->GetType() == dgBody::m_kinamticBody) ||(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f)));
+				dgAssert(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f));
+			}
+			#endif
+			break;
+		}
+
+		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+			dgBody* const root = Find(body);
+			if (root->m_index == -1) {
+				root->m_index = inslandCount;
+				bodyArray[bodiesCount].m_body = world->m_sentinelBody;
+				bodyArray[bodiesCount].m_clusterKey = inslandCount * 2;
+				bodiesCount ++;
+				inslandCount ++;
+			}
+			bodyArray[bodiesCount].m_body = body;
+			bodyArray[bodiesCount].m_clusterKey = root->m_index * 2 + 1;
+			bodiesCount ++;
+//			dynamicBody->m_spawnnedFromCallback = false;
+		}
+	}
+
+	dgSort(bodyArray, bodiesCount, CompareBodyInfos);
+
+	world->m_jointsMemory.ResizeIfNecessary((contactList.GetCount() + 32) * sizeof(dgJointInfo));
+	dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
+
+	dgInt32 jointCount = 0;
+	for (dgActiveContacts::dgListNode* node = contactList.GetFirst(); node; node = node->GetNext()) {
+		dgContact* const contact = node->GetInfo();
+		if (contact->m_contactActive && contact->m_maxDOF) {
+			dgBody* const root = Find(contact->GetBody0());
+
+			const dgInt32 rows = contact->m_maxDOF;
+			dgJointInfo& info = constraintArray[jointCount];
+			info.m_joint = contact;
+			info.m_pairStart = 0;
+			info.m_pairCount = rows;
+			info.m_m0 = root->m_uniqueID;
+			jointCount ++;
+		}
+	}
+
+	dgSort(constraintArray, jointCount, CompareJointInfos);
 }
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
