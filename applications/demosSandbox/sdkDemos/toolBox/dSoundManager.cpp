@@ -14,6 +14,7 @@
 #include "dSoundManager.h"
 #include "DemoEntityManager.h"
 
+#if 0
 dSoundManager::dSoundChannel::dSoundChannel()
 	:m_source(0)
 	,m_myAssetNode(NULL)
@@ -446,3 +447,5 @@ void dSoundManager::Update()
 		}
 	}
 }
+
+#endif

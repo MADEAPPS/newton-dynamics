@@ -15,6 +15,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 include_directories(sdkDemos/)
 include_directories(sdkDemos/toolBox/)
+include_directories(../../sdk/thirdParty/glfw/include/GLFW/)
 
 file(GLOB_RECURSE sandbox_srcs RELATIVE ${CMAKE_CURRENT_LIST_DIR} sdkDemos/*.cpp)
 

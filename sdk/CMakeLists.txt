@@ -27,7 +27,7 @@ target_include_directories(NewtonObj PRIVATE dgCore/)
 target_include_directories(NewtonObj PRIVATE dgMeshUtil/)
 target_include_directories(NewtonObj PRIVATE dgNewton/)
 target_include_directories(NewtonObj PRIVATE dgPhysics/)
-target_include_directories(NewtonObj PRIVATE dgTimeTracker/)
+target_include_directories(NewtonObj PRIVATE dProfiler/dTimeTracker/)
 
 # create static library
 add_library(NewtonStatic STATIC $<TARGET_OBJECTS:NewtonObj>)

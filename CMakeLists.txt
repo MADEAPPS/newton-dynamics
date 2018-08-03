@@ -48,7 +48,7 @@ if (MSVC)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
   
   # dgVector uses sse3 instrinsics
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:sse3")
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:sse3")
   # and clang needs this additional enabling (this is probably a bug
   # in clang as it doesn't seem to understand the msvc style arch
   # flag)

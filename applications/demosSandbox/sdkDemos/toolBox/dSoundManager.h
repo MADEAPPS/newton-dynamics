@@ -12,8 +12,7 @@
 #ifndef __DSOUND_MANAGER_H__
 #define __DSOUND_MANAGER_H__
 
-
-
+#if 0
 class dSoundManager  
 {
 	class dSoundAsset;
@@ -112,5 +111,5 @@ class dSoundManager
 	dSoundChannelPlaying m_channelPlaying;
 	dMatrix m_coordinateSystem;
 };
-
+#endif
 #endif
