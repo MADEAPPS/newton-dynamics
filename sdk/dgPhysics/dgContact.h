@@ -38,17 +38,19 @@ class dgCollisionInstance;
 #define DG_RESTING_CONTACT_PENETRATION	(DG_PENETRATION_TOL + dgFloat32 (1.0f / 1024.0f))
 #define DG_DIAGONAL_PRECONDITIONER		dgFloat32 (25.0f)
 
-class dgActiveContacts: public dgList<dgContact*>
+class dgContactsList: public dgList<dgContact*>
 {
 	public:
-	dgActiveContacts(dgMemoryAllocator* const allocator)
+	dgContactsList(dgMemoryAllocator* const allocator)
 		:dgList<dgContact*>(allocator)
+		,m_activeContacts(0)
 		,m_deadContactsCount(0)
 	{
 	}
 
+	dgInt32 m_activeContacts;
 	dgInt32 m_deadContactsCount;
-	dgActiveContacts::dgListNode* m_deadContacts[128];
+	dgContactsList::dgListNode* m_deadContacts[128];
 };
 
 
@@ -213,7 +215,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	void JacobianContactDerivative (dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex, dgInt32& frictionIndex); 
 	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& dir, const dgPointParam& param) const;
 
-	void AppendToActiveList();
+	void AppendToContactList();
 	void SwapBodies();
 
 	dgVector m_positAcc;
@@ -224,7 +226,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgFloat32 m_timeOfImpact;
 	dgWorld* m_world;
 	const dgContactMaterial* m_material;
-	dgActiveContacts::dgListNode* m_contactNode;
+	dgContactsList::dgListNode* m_contactNode;
 	dgFloat32 m_contactPruningTolereance;
 	dgUnsigned32 m_broadphaseLru;
 	dgUnsigned32 m_isNewContact				: 1;
@@ -233,8 +235,8 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
     friend class dgBody;
 	friend class dgWorld;
 	friend class dgBroadPhase;
+	friend class dgContactsList;
 	friend class dgContactSolver;
-	friend class dgActiveContacts;
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
 	friend class dgCollisionCompound;

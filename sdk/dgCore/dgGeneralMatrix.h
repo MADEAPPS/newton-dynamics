@@ -37,7 +37,7 @@ class dgSymmetricBiconjugateGradientSolve
 {
 	public:
 	dgSymmetricBiconjugateGradientSolve();
-	~dgSymmetricBiconjugateGradientSolve();
+	virtual ~dgSymmetricBiconjugateGradientSolve();
 
 	dgFloat64 Solve(dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
 

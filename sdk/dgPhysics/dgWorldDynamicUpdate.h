@@ -70,8 +70,8 @@ class dgClusterCallbackStruct
 class dgBodyInfo
 {
 	public:
-	dgInt32 m_clusterKey;
 	dgBody* m_body;
+	dgInt32 m_clusterKey;
 };
 
 class dgBodyCluster

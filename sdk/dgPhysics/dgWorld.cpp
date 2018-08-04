@@ -194,7 +194,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgBodyCollisionList(allocator)
 	,dgSkeletonList(allocator)
 	,dgInverseDynamicsList(allocator)
-	,dgActiveContacts(allocator) 
+	,dgContactsList(allocator) 
 	,dgWorldDynamicUpdate(allocator)
 	,dgMutexThread("newtonMainThread", 0)
 	,dgWorldThreadPool(allocator)
@@ -860,8 +860,8 @@ bool dgWorld::AreBodyConnectedByJoints (dgBody* const originSrc, dgBody* const t
 void dgWorld::FlushCache()
 {
 	// delete all contacts
-	dgActiveContacts& contactList = *this;
-	for (dgActiveContacts::dgListNode* contactNode = contactList.GetFirst(); contactNode; ) {
+	dgContactsList& contactList = *this;
+	for (dgContactsList::dgListNode* contactNode = contactList.GetFirst(); contactNode; ) {
 		dgContact* contact;
 		contact = contactNode->GetInfo();
 		contactNode = contactNode->GetNext();

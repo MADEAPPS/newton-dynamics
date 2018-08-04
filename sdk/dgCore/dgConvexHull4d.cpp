@@ -609,7 +609,7 @@ dgConvexHull4dAABBTreeNode* dgConvexHull4d::BuildTree (dgConvexHull4dAABBTreeNod
 
 dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, const dgFloat64* const vertexCloud, dgInt32 strideInBytes, dgInt32 count, void* const memoryPool, dgInt32 maxMemSize)
 {
-	dgInt32 stride = strideInBytes / sizeof (dgFloat64);
+	dgInt32 stride = dgInt32(strideInBytes / sizeof (dgFloat64));
 	for (dgInt32 i = 0; i < count; i ++) {
 		points[i] = dgBigVector (vertexCloud[i * stride + 0], vertexCloud[i * stride + 1], vertexCloud[i * stride + 2], vertexCloud[i * stride + 3]);
 		points[i].m_index = i;

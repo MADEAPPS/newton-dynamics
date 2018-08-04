@@ -117,16 +117,16 @@ dgContact::~dgContact()
 	dgList<dgContactMaterial>::RemoveAll();
 
 	if (m_contactNode) {
-		dgActiveContacts* const activeContacts = m_world;
+		dgContactsList* const activeContacts = m_world;
 		activeContacts->Remove (m_contactNode);
 	}
 }
 
-void dgContact::AppendToActiveList()
+void dgContact::AppendToContactList()
 {
 	dgAssert (!m_contactNode);
-	dgActiveContacts* const activeContacts = m_world;
-	m_contactNode = activeContacts->Addtop(this);
+	dgContactsList* const contactsList = m_world;
+	m_contactNode = contactsList->Addtop(this);
 }
 
 void dgContact::SwapBodies()

@@ -417,7 +417,7 @@ void dgPolyhedra::DeleteFace(dgEdge* const face)
 
 dgBigVector dgPolyhedra::FaceNormal (const dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes) const
 {
-	dgInt32 stride = strideInBytes / sizeof (dgFloat64);
+	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 	const dgEdge* edge = face;
 	dgBigVector p0 (&pool[edge->m_incidentVertex * stride]);
 	edge = edge->m_next;
@@ -1111,7 +1111,7 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 		do {
 			ptr->m_mark = faceMark;
 			faceIndex[faceIndexCount] = ptr->m_incidentVertex;
-			userIndex[faceIndexCount] = ptr->m_userData;
+			userIndex[faceIndexCount] = dgInt64 (ptr->m_userData);
 			faceIndexCount ++;
 			dgAssert (faceIndexCount < dgInt32 (sizeof (faceIndex) / sizeof (faceIndex[0])));
 			ptr = ptr ->m_next;
@@ -1139,7 +1139,7 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 						do {
 							ptr2->m_mark = faceMark;
 							faceIndex[faceIndexCount] = ptr2->m_incidentVertex;
-							userIndex[faceIndexCount] = ptr2->m_userData;
+							userIndex[faceIndexCount] = dgInt64 (ptr2->m_userData);
 							dgAssert (faceIndexCount < dgInt32 (sizeof (faceIndex) / sizeof (faceIndex[0])));
 							faceIndexCount ++;
 							ptr2 = ptr2 ->m_next;
@@ -1407,7 +1407,7 @@ void dgPolyhedra::OptimizeTriangulation (const dgFloat64* const vertex, dgInt32 
 							dgInt32 vertexCount = 0;
 							do {
 								polygon[vertexCount] = ptr->m_incidentVertex;				
-								userData[vertexCount] = ptr->m_userData;
+								userData[vertexCount] = dgInt64 (ptr->m_userData);
 								vertexCount ++;
 								dgAssert (vertexCount < dgInt32 (sizeof (polygon) / sizeof (polygon[0])));
 								ptr->m_mark = mark;

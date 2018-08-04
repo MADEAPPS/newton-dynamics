@@ -152,9 +152,9 @@ dgMemoryAllocator::dgMemoryAllocator ()
 dgMemoryAllocator::dgMemoryAllocator (dgMemAlloc memAlloc, dgMemFree memFree)
 	:m_emumerator(0)
 	,m_memoryUsed(0)
-	,m_isInList(false)
 	,m_free(NULL)
 	,m_malloc(NULL)
+	,m_isInList(false)
 {
 	SetAllocatorsCallback (memAlloc, memFree);
 	memset (m_memoryDirectory, 0, sizeof (m_memoryDirectory));
@@ -202,7 +202,7 @@ void *dgMemoryAllocator::MallocLow (dgInt32 workingSize, dgInt32 alignment)
 	void* const ptr = m_malloc(dgUnsigned32 (size));
 	dgAssert (ptr);
 #ifdef _DEBUG
-	memset(ptr, 99, size);
+	memset(ptr, 99, size_t(size));
 #endif
 
 	dgUnsigned64 val = dgUnsigned64 (PointerToInt(ptr));
@@ -224,7 +224,7 @@ void dgMemoryAllocator::FreeLow (void* const retPtr)
 	dgAtomicExchangeAndAdd (&m_memoryUsed, -info->m_size);
 
 #ifdef _DEBUG
-	memset (retPtr, 0, info->m_workingSize);
+	memset (retPtr, 0, size_t(info->m_workingSize));
 #endif
 
 	m_free (info->m_ptr, dgUnsigned32 (info->m_size));
@@ -336,7 +336,7 @@ void dgMemoryAllocator::Free (void* const retPtr)
 		dgAssert (bin);
 #ifdef _DEBUG
 		dgAssert ((bin->m_info.m_stepInBites - DG_MEMORY_GRANULARITY) > 0);
-		memset (retPtr, 0, bin->m_info.m_stepInBites - DG_MEMORY_GRANULARITY);
+		memset (retPtr, 0, size_t(bin->m_info.m_stepInBites - DG_MEMORY_GRANULARITY));
 #endif
 
 		bin->m_info.m_count --;

@@ -388,10 +388,10 @@ class dgFastAABBInfo: public dgObb
 	}
 
 	protected:
-	mutable dgFloat32 m_separationDistance;
 	dgMatrix m_absDir;
 	dgVector m_p0;
 	dgVector m_p1;
+	mutable dgFloat32 m_separationDistance;
 
 	friend class dgAABBPolygonSoup;
 	friend class dgCollisionUserMesh;

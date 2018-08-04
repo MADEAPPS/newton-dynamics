@@ -12,11 +12,11 @@ cmake_minimum_required(VERSION 3.12.0)
 
 
  # low level core
-file(GLOB dgCore_srcs *.cpp *.h)
+file(GLOB source *.cpp *.h)
 
-add_library(dgCore STATIC ${dgCore_srcs})
+add_library(dgPhysics STATIC ${source})
 
 if (MSVC)
-	set_target_properties(dgCore PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
+	set_target_properties(dgPhysics PROPERTIES COMPILE_FLAGS "/YudgPhysicsStdafx.h")
+	set_source_files_properties(dgWorld.cpp PROPERTIES COMPILE_FLAGS "/YcdgPhysicsStdafx.h")
 endif(MSVC)

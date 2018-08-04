@@ -49,10 +49,16 @@
 	#pragma warning (disable: 4100) //unreferenced formal parameter
 	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
 	#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
-	#pragma warning (disable: 4530) // C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+	#pragma warning (disable: 4514) //unreferenced inline function has been removed
+	#pragma warning (disable: 4530) //C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+	#pragma warning (disable: 4625) //copy constructor could not be generated because a base class copy constructor is inaccessible or deleted
+	#pragma warning (disable: 4626) //assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
+	#pragma warning (disable: 4640) //construction of local static object is not thread-safe
+	#pragma warning (disable: 4820) //bytes padding added after data member
+	
     #if _MSC_VER >= 1400
 	  #pragma warning (disable: 4005) //'__useHeader': macro redefinition
- 	  #pragma warning (disable: 4577) // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
+// 	  #pragma warning (disable: 4577) // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
     #endif
 	#include <io.h> 
 	#include <direct.h> 
@@ -889,12 +895,33 @@ DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 class dgScopeSpinLock
 {
 	public:
-		dgScopeSpinLock(dgInt32* const lock)
+	DG_INLINE dgScopeSpinLock(dgInt32* const lock)
 		:m_atomicLock(lock)
 	{
 		dgSpinLock(m_atomicLock);
 	}
-	~dgScopeSpinLock()
+
+	DG_INLINE ~dgScopeSpinLock()
+	{
+		dgSpinUnlock(m_atomicLock);
+	}
+
+	dgInt32* m_atomicLock;
+};
+
+class dgScopeSpinPause
+{
+	public:
+	DG_INLINE dgScopeSpinPause(dgInt32* const lock)
+		:m_atomicLock(lock)
+	{
+		while (dgInterlockedExchange(m_atomicLock, 1)) {
+			DG_TRACKTIME_NAMED("pause");
+			_mm_pause();
+		}
+	}
+
+	DG_INLINE ~dgScopeSpinPause()
 	{
 		dgSpinUnlock(m_atomicLock);
 	}

@@ -10,13 +10,10 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
+include_directories(dgCore/)
+include_directories(dgPhysics/)
+include_directories(dgMeshUtil/)
+include_directories(dProfiler/dTimeTracker/)
 
- # low level core
-file(GLOB dgCore_srcs *.cpp *.h)
-
-add_library(dgCore STATIC ${dgCore_srcs})
-
-if (MSVC)
-	set_target_properties(dgCore PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
-endif(MSVC)
+add_subdirectory(dgCore)
+add_subdirectory(dgPhysics)

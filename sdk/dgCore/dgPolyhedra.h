@@ -75,8 +75,8 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 		}
 
 		dgPairKey(dgInt32 keyHigh, dgInt32 keyLow)
-			:m_keyLow(keyLow)
-			,m_keyHigh(keyHigh)
+			:m_keyLow(dgUnsigned32 (keyLow))
+			,m_keyHigh(dgUnsigned32 (keyHigh))
 		{
 		}
 
@@ -87,12 +87,12 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 
 		dgInt32 GetLowKey() const
 		{
-			return m_keyLow;
+			return dgInt32(m_keyLow);
 		}
 
 		dgInt32 GetHighKey() const
 		{
-			return m_keyHigh;
+			return dgInt32(m_keyHigh);
 		}
 
 		bool operator<(const dgPairKey& key) const

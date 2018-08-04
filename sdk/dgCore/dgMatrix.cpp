@@ -147,8 +147,8 @@ dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 
 void dgMatrix::TransformTriplex (dgFloat32* const dst, dgInt32 dstStrideInBytes, const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const
 {
-	dgInt32 dstStride = dstStrideInBytes /sizeof (dgFloat32);
-	dgInt32 srcStride = srcStrideInBytes / sizeof (dgFloat32);
+	dgInt32 dstStride = dgInt32 (dstStrideInBytes /sizeof (dgFloat32));
+	dgInt32 srcStride = dgInt32 (srcStrideInBytes / sizeof (dgFloat32));
 
 	dgInt32 dstIndex = 0;
 	dgInt32 srcIndex = 0;
@@ -167,8 +167,8 @@ void dgMatrix::TransformTriplex (dgFloat32* const dst, dgInt32 dstStrideInBytes,
 #ifndef _NEWTON_USE_DOUBLE
 void dgMatrix::TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes, const dgFloat64* const src, dgInt32 srcStrideInBytes, dgInt32 count) const
 {
-	dgInt32 dstStride = dstStrideInBytes /sizeof (dgFloat64);
-	dgInt32 srcStride = srcStrideInBytes / sizeof (dgFloat64);
+	dgInt32 dstStride = dgInt32 (dstStrideInBytes /sizeof (dgFloat64));
+	dgInt32 srcStride = dgInt32 (srcStrideInBytes / sizeof (dgFloat64));
 
 	dgInt32 dstIndex = 0;
 	dgInt32 srcIndex = 0;
@@ -186,8 +186,8 @@ void dgMatrix::TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes,
 
 void dgMatrix::TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes, const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const
 {
-	dgInt32 dstStride = dstStrideInBytes /sizeof (dgFloat64);
-	dgInt32 srcStride = srcStrideInBytes / sizeof (dgFloat32);
+	dgInt32 dstStride = dgInt32 (dstStrideInBytes /sizeof (dgFloat64));
+	dgInt32 srcStride = dgInt32 (srcStrideInBytes / sizeof (dgFloat32));
 
 	dgInt32 dstIndex = 0;
 	dgInt32 srcIndex = 0;

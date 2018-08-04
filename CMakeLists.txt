@@ -8,20 +8,54 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.12.0)
 
-option("CONFIG_STATIC_SYSTEM_LIBRARIES" "use windows static libraries" ON)
-option("DOUBLE_PRECISION" "Use Double Precision" OFF)
+option("STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
+option("DOUBLE_PRECISION" "Generate double precision" OFF)
 
+
+set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W4")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -W4")
+set(CMAKE_CXX_FLAGS "-W4" ) 
+set(CMAKE_CXX_FLAGS_DEBUG "-W4")
+set(CMAKE_CXX_FLAGS_RELEASE "-W4")
+
+project(NewtonSDK)
+
+
+
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (DOUBLE_PRECISION)
 	add_definitions(-D_NEWTON_USE_DOUBLE)
 endif(DOUBLE_PRECISION)
 
-project(NewtonSDK)
+if (MSVC)
+	message ("build visual studio projects")
 
-add_subdirectory(sdk/dgCore)
+	if(CMAKE_CL_64)
+		message ("build 64 bit")
+		add_definitions(-D_WIN_64_VER)
+	else()
+		message ("build 32 bit")
+		add_definitions(-D_WIN_32_VER)
+	endif()
+
+	if(STATIC_RUNTIME_LIBRARIES)
+		message ("link to static runtime libraries")
+		set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+		set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+	else()
+		message ("link to dynamic runtime libraries")
+		set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
+		set(CMAKE_CXX_FLAGS_RELEASE "/MD")
+	endif()
+
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Od /fp:fast")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Oi /Ot /Ob2 /fp:fast")
+
+	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
+	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
+endif()
+
+add_subdirectory(sdk)

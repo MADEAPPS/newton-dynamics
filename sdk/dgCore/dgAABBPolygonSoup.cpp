@@ -457,7 +457,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 	for (dgInt32 i = 0; i < m_nodesCount; i ++) {
 		const dgNode* const node = &m_aabb[i];
 		if (node->m_left.IsLeaf()) {
-			dgInt32 vCount = node->m_left.GetCount();
+			dgInt32 vCount = dgInt32 (node->m_left.GetCount());
 			if (vCount) {
 				dgInt32 index = dgInt32 (node->m_left.GetIndex());
 				dgInt32* const face = &m_indices[index];
@@ -487,7 +487,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 		}
 
 		if (node->m_right.IsLeaf()) {
-			dgInt32 vCount = node->m_right.GetCount();
+			dgInt32 vCount = dgInt32 (node->m_right.GetCount());
 			if (vCount) {
 				dgInt32 index = dgInt32 (node->m_right.GetIndex());
 				dgInt32* const face = &m_indices[index];
@@ -533,7 +533,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 		for (dgInt32 i = 0; i < m_nodesCount; i ++) {
 			const dgNode* const node = &m_aabb[i];
 			if (node->m_left.IsLeaf()) {
-				dgInt32 vCount = node->m_left.GetCount();
+				dgInt32 vCount = dgInt32 (node->m_left.GetCount());
 				dgInt32 index = dgInt32 (node->m_left.GetIndex());
 				dgInt32* const face = &m_indices[index];
 				for (dgInt32 j = 0; j < vCount; j ++) {
@@ -549,7 +549,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 			}
 
 			if (node->m_right.IsLeaf()) {
-				dgInt32 vCount = node->m_right.GetCount();
+				dgInt32 vCount = dgInt32 (node->m_right.GetCount());
 				dgInt32 index = dgInt32 (node->m_right.GetIndex());
 				dgInt32* const face = &m_indices[index];
 				for (dgInt32 j = 0; j < vCount; j ++) {
@@ -881,10 +881,10 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 
 			if (node->m_parent) {
 				if (node->m_parent->m_left == node) {
-					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (node->m_indexCount, indexMap);
+					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (dgUnsigned32(node->m_indexCount), dgUnsigned32(indexMap));
 				} else {
 					dgAssert (node->m_parent->m_right == node);
-					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (node->m_indexCount, indexMap);
+					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (dgUnsigned32(node->m_indexCount), dgUnsigned32(indexMap));
 				}
 			}
 
@@ -947,9 +947,9 @@ void dgAABBPolygonSoup::Serialize (dgSerialize callback, void* const userData) c
 	callback (userData, &m_nodesCount, sizeof (dgInt32));
 	callback (userData, &m_nodesCount, sizeof (dgInt32));
 	if (m_aabb) {
-		callback (userData,  m_localVertex, sizeof (dgTriplex) * m_vertexCount);
-		callback (userData,  m_indices, sizeof (dgInt32) * m_indexCount);
-		callback (userData, m_aabb, sizeof (dgNode) * m_nodesCount);
+		callback (userData,  m_localVertex, dgInt32 (sizeof (dgTriplex) * m_vertexCount));
+		callback (userData,  m_indices, dgInt32 (sizeof (dgInt32) * m_indexCount));
+		callback (userData, m_aabb, dgInt32 (sizeof (dgNode) * m_nodesCount));
 	}
 }
 
@@ -966,9 +966,9 @@ void dgAABBPolygonSoup::Deserialize (dgDeserialize callback, void* const userDat
 		m_indices = (dgInt32*) dgMallocStack (sizeof (dgInt32) * m_indexCount);
 		m_aabb = (dgNode*) dgMallocStack (sizeof (dgNode) * m_nodesCount);
 
-		callback (userData, m_localVertex, sizeof (dgTriplex) * m_vertexCount);
-		callback (userData, m_indices, sizeof (dgInt32) * m_indexCount);
-		callback (userData, m_aabb, sizeof (dgNode) * m_nodesCount);
+		callback (userData, m_localVertex, dgInt32 (sizeof (dgTriplex) * m_vertexCount));
+		callback (userData, m_indices, dgInt32 (sizeof (dgInt32) * m_indexCount));
+		callback (userData, m_aabb, dgInt32 (sizeof (dgNode) * m_nodesCount));
 	} else {
 		m_localVertex = NULL;
 		m_indices = NULL;
@@ -1007,7 +1007,7 @@ dgVector dgAABBPolygonSoup::ForAllSectorsSupportVectex (const dgVector& dir) con
 				if (me->m_left.IsLeaf()) {
 					backSupportDist = dgFloat32 (-1.0e20f);
 					dgInt32 index = dgInt32 (me->m_left.GetIndex());
-					dgInt32 vCount = me->m_left.GetCount();
+					dgInt32 vCount = dgInt32 (me->m_left.GetCount());
 					dgVector vertex (dgFloat32 (0.0f));
 					for (dgInt32 j = 0; j < vCount; j ++) {
 						dgInt32 i0 = m_indices[index + j] * dgInt32 (sizeof (dgTriplex) / sizeof (dgFloat32));
@@ -1041,7 +1041,7 @@ dgVector dgAABBPolygonSoup::ForAllSectorsSupportVectex (const dgVector& dir) con
 				if (me->m_right.IsLeaf()) {
 					frontSupportDist = dgFloat32 (-1.0e20f);
 					dgInt32 index = dgInt32 (me->m_right.GetIndex());
-					dgInt32 vCount = me->m_right.GetCount();
+					dgInt32 vCount = dgInt32 (me->m_right.GetCount());
 					dgVector vertex (dgFloat32 (0.0f));
 					for (dgInt32 j = 0; j < vCount; j ++) {
 						dgInt32 i0 = m_indices[index + j] * dgInt32 (sizeof (dgTriplex) / sizeof (dgFloat32));
@@ -1124,7 +1124,7 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 		} else {
 			const dgNode *const me = stackPool[stack];
 			if (me->m_left.IsLeaf()) {
-				dgInt32 vCount = me->m_left.GetCount();
+				dgInt32 vCount = dgInt32 (me->m_left.GetCount());
 				if (vCount > 0) {
 					dgInt32 index = dgInt32 (me->m_left.GetIndex());
 					dgFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), &m_indices[index], vCount);
@@ -1154,7 +1154,7 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 			}
 
 			if (me->m_right.IsLeaf()) {
-				dgInt32 vCount = me->m_right.GetCount();
+				dgInt32 vCount = dgInt32 (me->m_right.GetCount());
 				if (vCount > 0) {
 					dgInt32 index = dgInt32 (me->m_right.GetIndex());
 					dgFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), &m_indices[index], vCount);
@@ -1219,7 +1219,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 					const dgNode* const me = stackPool[stack];
 					if (me->m_left.IsLeaf()) {
 						dgInt32 index = dgInt32 (me->m_left.GetIndex());
-						dgInt32 vCount = me->m_left.GetCount();
+						dgInt32 vCount = dgInt32 (me->m_left.GetCount());
 						if (vCount > 0) {
 							const dgInt32* const indices = &m_indices[index];
 							dgInt32 normalIndex = indices[vCount + 1];
@@ -1256,7 +1256,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					if (me->m_right.IsLeaf()) {
 						dgInt32 index = dgInt32 (me->m_right.GetIndex());
-						dgInt32 vCount = me->m_right.GetCount();
+						dgInt32 vCount = dgInt32 (me->m_right.GetCount());
 						if (vCount > 0) {
 							const dgInt32* const indices = &m_indices[index];
 							dgInt32 normalIndex = indices[vCount + 1];
@@ -1308,7 +1308,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					if (me->m_left.IsLeaf()) {
 						dgInt32 index = dgInt32 (me->m_left.GetIndex());
-						dgInt32 vCount = me->m_left.GetCount();
+						dgInt32 vCount = dgInt32 (me->m_left.GetCount());
 						if (vCount > 0) {
 							const dgInt32* const indices = &m_indices[index];
 							dgInt32 normalIndex = indices[vCount + 1];
@@ -1340,7 +1340,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					if (me->m_right.IsLeaf()) {
 						dgInt32 index = dgInt32 (me->m_right.GetIndex());
-						dgInt32 vCount = me->m_right.GetCount();
+						dgInt32 vCount = dgInt32 (me->m_right.GetCount());
 						if (vCount > 0) {
 							const dgInt32* const indices = &m_indices[index];
 							dgInt32 normalIndex = indices[vCount + 1];

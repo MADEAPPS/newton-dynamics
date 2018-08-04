@@ -49,7 +49,7 @@ dgGoogol dgGoogol::m_half(0.5);
 		m_sign = (value >= 0) ? 0 : 1;
 
 		memset (m_mantissa, 0, sizeof (m_mantissa));
-		m_mantissa[0] = (dgInt64 (dgFloat64 (dgUnsigned64(1)<<62) * mantissa));
+		m_mantissa[0] = dgUnsigned64 (dgFloat64 (dgUnsigned64(1)<<62) * mantissa);
 
 		// it looks like GCC have problems with this
 		//dgAssert (m_mantissa[0] >= 0);
@@ -186,7 +186,8 @@ dgGoogol dgGoogol::m_half(0.5);
 			}
 
 			dgUnsigned64 carrier = 0;
-			dgInt32 bits = dgUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
+			//dgInt32 bits = dgUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
+			dgInt32 bits = LeadingZeros (mantissaAcc[0]) - 2;
 			for (dgInt32 i = 0; i < 2 * DG_GOOGOL_SIZE; i ++) {
 				const dgInt32 k = 2 * DG_GOOGOL_SIZE - 1 - i;
 				dgUnsigned64 a = mantissaAcc[k];
@@ -486,7 +487,7 @@ dgInt32 dgGoogol::NormalizeMantissa (dgUnsigned64* const mantissa) const
 
 dgUnsigned64 dgGoogol::CheckCarrier (dgUnsigned64 a, dgUnsigned64 b) const
 {
-	return ((dgUnsigned64 (-1) - b) < a) ? 1 : 0;
+	return ((dgUnsigned64 (-1) - b) < a) ? dgUnsigned64(1) : 0;
 }
 
 

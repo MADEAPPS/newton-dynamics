@@ -392,12 +392,12 @@ dgInt32 dgVertexListToIndexList (dgFloat64* const vertList, dgInt32 strideInByte
 
 dgInt32 dgVertexListToIndexList (dgFloat32* const vertList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexList, dgFloat32 tolerance)
 {
-	dgInt32 stride = strideInBytes / sizeof (dgFloat32);
+	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
 
 	dgAssert (!unsignedSizeInBytes);
 	dgStack<dgFloat64> pool(vertexCount * stride);
 
-	dgInt32 floatCount = floatSizeInBytes / sizeof (dgFloat32);
+	dgInt32 floatCount = dgInt32 (floatSizeInBytes / sizeof (dgFloat32));
 
 	dgFloat64* const data = &pool[0];
 	for (dgInt32 i = 0; i < vertexCount; i ++) {
@@ -409,7 +409,7 @@ dgInt32 dgVertexListToIndexList (dgFloat32* const vertList, dgInt32 strideInByte
 		}
 	}
 
-	dgInt32 count = dgVertexListToIndexList (data, stride * sizeof (dgFloat64), floatCount, vertexCount, indexList, dgFloat64 (tolerance));
+	dgInt32 count = dgVertexListToIndexList (data, dgInt32 (stride * sizeof (dgFloat64)), floatCount, vertexCount, indexList, dgFloat64 (tolerance));
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgFloat64* const src = &data[i * stride];
 		dgFloat32* const dst = &vertList[i * stride];
@@ -501,7 +501,7 @@ dgSetPrecisionDouble::dgSetPrecisionDouble()
 {
 	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
 		dgClearFP();
-		m_mask = dgControlFP(0, 0);
+		m_mask = dgInt32 (dgControlFP(0, 0));
 		dgControlFP (_PC_53, _MCW_PC);
 	#endif
 }
@@ -510,7 +510,7 @@ dgSetPrecisionDouble::~dgSetPrecisionDouble()
 {
 	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
 		dgClearFP();
-		dgControlFP (m_mask, _MCW_PC);
+		dgControlFP (dgUnsigned32(m_mask), _MCW_PC);
 	#endif
 }
 

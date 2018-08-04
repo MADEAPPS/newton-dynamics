@@ -161,7 +161,7 @@ class dgWorld
 	,public dgBodyCollisionList
 	,public dgSkeletonList
 	,public dgInverseDynamicsList
-	,public dgActiveContacts 
+	,public dgContactsList 
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
 	,public dgWorldThreadPool
@@ -526,7 +526,7 @@ class dgWorld
 	friend class dgDeadBodies;
 	friend class dgDeadJoints;
 	friend class dgWorldPlugin;
-	friend class dgActiveContacts;
+	friend class dgContactsList;
 	friend class dgUserConstraint;
 	friend class dgBodyMasterList;
 	friend class dgJacobianMemory;
