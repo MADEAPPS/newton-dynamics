@@ -24,8 +24,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "-W4")
 project(NewtonSDK)
 
 
-
-
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (DOUBLE_PRECISION)
 	add_definitions(-D_NEWTON_USE_DOUBLE)
@@ -62,4 +60,7 @@ endif()
 add_subdirectory(sdk)
 
 add_dependencies (dgPhysics dgCore)
+add_dependencies (dContainers dMath dTimeTracker)
 add_dependencies (newton dgCore dgPhysics dTimeTracker)
+add_dependencies (dAnimation dMath dContainers dTimeTracker)
+add_dependencies (dCustomJoints dMath dContainers dTimeTracker)
