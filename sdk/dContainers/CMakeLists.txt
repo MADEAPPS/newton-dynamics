@@ -10,16 +10,23 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
-set (projectName "dgCore")
+set (projectName "dContainers")
 message (${projectName})
-
 
  # low level core
 file(GLOB source *.cpp *.h)
 
-add_library(${projectName} STATIC ${source})
+if (GENERATE_DLL)
+	add_definitions(-D_DCONTAINERS_DLL)
+	add_definitions(-D_DCONTAINERS_EXPORT)
+	add_library(${projectName} SHARED ${source})
+	target_link_libraries (${projectName} newton dTimeTracker)
+else()
+	add_definitions(-D_NEWTON_STATIC_LIB)
+	add_library(${projectName} STATIC ${source})
+endif()
 
 if (MSVC)
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudContainersStdAfx.h")
+	set_source_files_properties(dContainersStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdContainersStdAfx.h")
 endif(MSVC)

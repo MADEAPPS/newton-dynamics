@@ -10,16 +10,18 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
-set (projectName "dgCore")
+set (projectName "dTimeTracker")
 message (${projectName})
 
-
- # low level core
+# low level core
 file(GLOB source *.cpp *.h)
 
-add_library(${projectName} STATIC ${source})
+
+add_definitions(-DDTIMETRACKER_EXPORTS)
+add_library(${projectName} SHARED ${source})
+target_link_libraries (${projectName} ws2_32.lib)
 
 if (MSVC)
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yustdafx.h")
+	set_source_files_properties(stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
 endif(MSVC)

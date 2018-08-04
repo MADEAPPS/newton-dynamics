@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 3.12.0)
 
 option("STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
 option("DOUBLE_PRECISION" "Generate double precision" OFF)
+option("GENERATE_DLL" "build dll libraries" ON)
 
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
@@ -59,3 +60,6 @@ if (MSVC)
 endif()
 
 add_subdirectory(sdk)
+
+add_dependencies (dgPhysics dgCore)
+add_dependencies (newton dgCore dgPhysics dTimeTracker)

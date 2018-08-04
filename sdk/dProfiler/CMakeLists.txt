@@ -10,16 +10,12 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
-set (projectName "dgCore")
-message (${projectName})
+include_directories(dTimeTracker/)
+include_directories(../dMath/)
+include_directories(../dContainers/)
 
+#include_directories(dTimeTrackerViewer)
 
- # low level core
-file(GLOB source *.cpp *.h)
+add_subdirectory(dTimeTracker)
+#add_subdirectory(dTimeTrackerViewer)
 
-add_library(${projectName} STATIC ${source})
-
-if (MSVC)
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
-endif(MSVC)

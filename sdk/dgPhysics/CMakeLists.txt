@@ -10,13 +10,16 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
+set (projectName "dgPhysics")
+message (${projectName})
+
 
  # low level core
-file(GLOB source *.cpp *.h)
+file(GLOB source *.cpp *.h ../dgMeshUtil/*.cpp ../dgMeshUtil/*.h)
 
-add_library(dgPhysics STATIC ${source})
+add_library(${projectName} STATIC ${source})
 
 if (MSVC)
-	set_target_properties(dgPhysics PROPERTIES COMPILE_FLAGS "/YudgPhysicsStdafx.h")
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgPhysicsStdafx.h")
 	set_source_files_properties(dgWorld.cpp PROPERTIES COMPILE_FLAGS "/YcdgPhysicsStdafx.h")
 endif(MSVC)

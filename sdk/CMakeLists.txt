@@ -10,10 +10,16 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
+include_directories(dMath/)
 include_directories(dgCore/)
 include_directories(dgPhysics/)
 include_directories(dgMeshUtil/)
+include_directories(dContainers/)
 include_directories(dProfiler/dTimeTracker/)
 
 add_subdirectory(dgCore)
 add_subdirectory(dgPhysics)
+add_subdirectory(dProfiler)
+add_subdirectory(dgNewton)
+add_subdirectory(dMath)
+add_subdirectory(dContainers)

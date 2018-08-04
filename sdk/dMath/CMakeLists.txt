@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
-set (projectName "dgCore")
+set (projectName "dMath")
 message (${projectName})
 
 
@@ -20,6 +20,6 @@ file(GLOB source *.cpp *.h)
 add_library(${projectName} STATIC ${source})
 
 if (MSVC)
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudStdAfxMath.h")
+	set_source_files_properties(dStdAfxMath.cpp PROPERTIES COMPILE_FLAGS "/YcdStdAfxMath.h")
 endif(MSVC)
