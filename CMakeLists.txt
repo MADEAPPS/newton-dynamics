@@ -17,16 +17,13 @@ option("STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
-set(CMAKE_CXX_FLAGS "-W4" ) 
-set(CMAKE_CXX_FLAGS_DEBUG "-W4")
-set(CMAKE_CXX_FLAGS_RELEASE "-W4")
 
 project(NewtonSDK)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (DOUBLE_PRECISION)
 	add_definitions(-D_NEWTON_USE_DOUBLE)
-endif(DOUBLE_PRECISION)
+endif ()
 
 if (MSVC)
 	message ("build visual studio projects")
@@ -58,6 +55,14 @@ if (MSVC)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Od /fp:fast")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Oi /Ot /Ob2 /fp:fast")
 
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -W4")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -W4")
+
+	set(CMAKE_C_FLAGS_DEBUG  "${CMAKE_C_FLAGS_DEBUG} -Zi")
+	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Zi")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Zi")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Zi")
+
 	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
 endif()
@@ -65,7 +70,7 @@ endif()
 set (dllPath "${PROJECT_BINARY_DIR}/build/bin")
 set (libraryPath "${PROJECT_BINARY_DIR}/build/lib")
 set (includePath "${PROJECT_BINARY_DIR}/build/include")
-#message (${libraryPath})
+
 
 add_subdirectory(sdk)
 if (BUILD_SANDBOX_DEMOS)

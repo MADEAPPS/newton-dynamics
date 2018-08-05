@@ -55,4 +55,11 @@ if (MSVC)
 	set_source_files_properties(sdkDemos/toolBox/toolbox_stdafx.cpp PROPERTIES COMPILE_FLAGS "/Yctoolbox_stdafx.h")
 endif(MSVC)
 
+
+message (${CMAKE_CONFIGURATION_TYPES})
+
+file(GLOB media ../media/*.*)
+install(FILES ${media} DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
+
+
 #install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

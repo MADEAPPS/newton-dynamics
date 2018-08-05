@@ -29,4 +29,10 @@ endif(MSVC)
 file(GLOB includes *.h)
 install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
 
+install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
 install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+
+if (BUILD_SANDBOX_DEMOS)
+	install(TARGETS ${projectName} RUNTIME DESTINATION "${PROJECT_BINARY_DIR}/applications/demosSandbox/debug")
+	install(TARGETS ${projectName} RUNTIME DESTINATION "${PROJECT_BINARY_DIR}/applications/demosSandbox/Release")
+endif ()
