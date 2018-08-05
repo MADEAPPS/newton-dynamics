@@ -207,7 +207,7 @@ class dEffectorTreeFixPose: public dEffectorTreePose
 	dEffectorPose& GetPose() {return m_pose;}
 
 	protected:
-	void Evaluate(dEffectorPose& output, dFloat timestep);
+	CUSTOM_JOINTS_API void Evaluate(dEffectorPose& output, dFloat timestep);
 	dEffectorPose m_pose;
 };
 

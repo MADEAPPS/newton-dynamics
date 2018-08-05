@@ -41,7 +41,8 @@ add_executable(${projectName} ${source})
 target_link_libraries (${projectName} newton dMath dContainers dCustomJoints dScene dNewton dCustomJoints dTimeTracker tinyxml glfw imgui glu32 opengl32)
 
 if (GENERATE_DLL)
-
+	add_definitions(-D_DSCENE_DLL)
+	add_definitions(-D_DCONTAINERS_DLL)
 else ()
 	add_definitions(-D_NEWTON_STATIC_LIB)
 	add_definitions(-D_CNEWTON_STATIC_LIB)

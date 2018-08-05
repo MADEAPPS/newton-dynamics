@@ -34,7 +34,7 @@ class dCustomTransformController: public dCustomControllerBase
 		dSkeletonBone* m_parent;
 		dCustomTransformController* m_controller;
 
-		dCustomJoint* FindJoint() const; 
+		CUSTOM_JOINTS_API dCustomJoint* FindJoint() const; 
 	};
 
 	CUSTOM_JOINTS_API dCustomTransformController();
