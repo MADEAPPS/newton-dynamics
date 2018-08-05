@@ -10,9 +10,11 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
-option("STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
-option("DOUBLE_PRECISION" "Generate double precision" OFF)
 option("GENERATE_DLL" "build dll libraries" ON)
+option("BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
+option("DOUBLE_PRECISION" "Generate double precision" OFF)
+option("STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
+
 
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
@@ -64,7 +66,9 @@ if (MSVC)
 endif()
 
 add_subdirectory(sdk)
-add_subdirectory(applications/demosSandbox)
+if (BUILD_SANDBOX_DEMOS)
+	add_subdirectory(applications/demosSandbox)
+endif()
 
 add_dependencies (dgPhysics dgCore)
 add_dependencies (dContainers dMath dTimeTracker)
@@ -72,5 +76,7 @@ add_dependencies (newton dgCore dgPhysics dTimeTracker)
 add_dependencies (dAnimation dMath dContainers dTimeTracker)
 add_dependencies (dCustomJoints dMath dContainers dTimeTracker)
 add_dependencies (dNewton newton dMath dContainers dCustomJoints dTimeTracker)
-add_dependencies (demosSandbox newton dMath dScene dNewton dContainers dCustomJoints dTimeTracker tinyxml imgui glfw)
+if (BUILD_SANDBOX_DEMOS)
+	add_dependencies (demosSandbox newton dMath dScene dNewton dContainers dCustomJoints dTimeTracker tinyxml imgui glfw)
+endif()
 
