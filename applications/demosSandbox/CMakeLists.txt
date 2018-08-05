@@ -1,66 +1,55 @@
 # Copyright (c) <2014-2017> <Newton Game Dynamics>
-# 
+#
 # This software is provided 'as-is', without any express or implied
 # warranty. In no event will the authors be held liable for any damages
 # arising from the use of this software.
-# 
+#
 # Permission is granted to anyone to use this software for any purpose,
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-project(demosSandbox)
+cmake_minimum_required(VERSION 3.12.0)
 
-# keep in demo folder otherwise media won't be found
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+set (projectName "demosSandbox")
+message (${projectName})
+
+
+ # low level core
+file(GLOB source sdkDemos/*.cpp sdkDemos/*.h sdkDemos/toolBox/*.cpp sdkDemos/toolBox/*.h sdkDemos/demos/*.cpp sdkDemos/demos/*.h)
 
 include_directories(sdkDemos/)
+include_directories(sdkDemos/demos/)
 include_directories(sdkDemos/toolBox/)
-include_directories(../../sdk/thirdParty/glfw/include/GLFW/)
+include_directories(../../sdk/dMath/)
+include_directories(../../sdk/dgCore/)
+include_directories(../../sdk/dScene/)
+include_directories(../../sdk/dNewton/)
+include_directories(../../sdk/dgNewton/)
+include_directories(../../sdk/dgPhysics/)
+include_directories(../../sdk/dAnimation/)
+include_directories(../../sdk/dgMeshUtil/)
+include_directories(../../sdk/dContainers/)
+include_directories(../../sdk/dCustomJoints/)
+include_directories(../../sdk/thirdParty/tinyxml/)
+include_directories(../../sdk/dProfiler/dTimeTracker/)
 
-file(GLOB_RECURSE sandbox_srcs RELATIVE ${CMAKE_CURRENT_LIST_DIR} sdkDemos/*.cpp)
+include_directories(../../sdk/thirdParty/glfw/)
+include_directories(../../sdk/thirdParty/imgui/)
+include_directories(../../sdk/thirdParty/glfw/include/glfw/)
+add_executable(${projectName} ${source})
 
-# these can't be compiled
-list(REMOVE_ITEM sandbox_srcs "sdkDemos/demos/SpecialTrackJoints.cpp")
-list(REMOVE_ITEM sandbox_srcs "sdkDemos/toolBox/LevelPrimitive.cpp")
-list(REMOVE_ITEM sandbox_srcs "sdkDemos/toolBox/ShaderPrograms.cpp")
+target_link_libraries (${projectName} newton dMath dContainers dCustomJoints dScene dNewton dCustomJoints dTimeTracker tinyxml glfw imgui glu32 opengl32)
 
-add_executable(demosSandbox ${sandbox_srcs})
-target_link_libraries(demosSandbox dMath dScene dCustomJoints dContainers dAnimation imgui)
+if (GENERATE_DLL)
 
-
-# 3rd party dependencies
-
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIRS})
-target_link_libraries(demosSandbox ${OPENGL_LIBRARIES})
-
-#find_package(OpenAL REQUIRED)
-#include_directories(${OPENAL_INCLUDE_DIR})
-#target_link_libraries(demosSandbox ${OPENAL_LIBRARY})
-
-if (WIN32 OR APPLE)
-  target_link_libraries(demosSandbox glfw tinyxml)
 else ()
-  find_package(TinyXML REQUIRED)
-  include_directories(${TinyXML_INCLUDE_DIRS})
-  target_link_libraries(demosSandbox ${TinyXML_LIBRARIES})
+	add_definitions(-D_NEWTON_STATIC_LIB)
+	add_definitions(-D_CNEWTON_STATIC_LIB)
+	add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
+	target_link_libraries (${projectName} dgCore dgPhysics)
+endif()
 
-  find_package(glfw3 REQUIRED)
-  target_link_libraries(demosSandbox glfw)
-endif ()
-
-
-if (UNIX)
-  add_definitions(-DD_JOINTLIBRARY_STATIC_LIB)
-
-  if (BUILD_64)
-    add_definitions(-D_POSIX_VER_64)
-  else (BUILD_64)
-    add_definitions(-D_POSIX_VER)
-  endif (BUILD_64)
-endif(UNIX)
-
-if (CMAKE_COMPILER_IS_GNUCC)
-  add_definitions(-fpic -msse -msse2 -c -Wall -std=c++11) 
-endif(CMAKE_COMPILER_IS_GNUCC)
- 
+if (MSVC)
+	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yutoolbox_stdafx.h")
+	set_source_files_properties(sdkDemos/toolBox/toolbox_stdafx.cpp PROPERTIES COMPILE_FLAGS "/Yctoolbox_stdafx.h")
+endif(MSVC)
