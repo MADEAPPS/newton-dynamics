@@ -23,3 +23,7 @@ if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
 	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
 endif(MSVC)
+
+if (NOT GENERATE_DLL)
+	install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+endif ()

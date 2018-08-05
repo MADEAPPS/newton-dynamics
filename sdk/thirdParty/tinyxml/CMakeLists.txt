@@ -19,3 +19,6 @@ file(GLOB source *.cpp *.h)
 
 add_library(${projectName} STATIC ${source})
 
+file(GLOB includes *.h)
+install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
+install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

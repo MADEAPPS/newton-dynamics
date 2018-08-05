@@ -15,8 +15,6 @@ option("BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
 option("DOUBLE_PRECISION" "Generate double precision" OFF)
 option("STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
 
-
-
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_CXX_FLAGS "-W4" ) 
@@ -24,7 +22,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-W4")
 set(CMAKE_CXX_FLAGS_RELEASE "-W4")
 
 project(NewtonSDK)
-
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (DOUBLE_PRECISION)
@@ -64,6 +61,11 @@ if (MSVC)
 	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
 endif()
+
+set (dllPath "${PROJECT_BINARY_DIR}/build/bin")
+set (libraryPath "${PROJECT_BINARY_DIR}/build/lib")
+set (includePath "${PROJECT_BINARY_DIR}/build/include")
+#message (${libraryPath})
 
 add_subdirectory(sdk)
 if (BUILD_SANDBOX_DEMOS)

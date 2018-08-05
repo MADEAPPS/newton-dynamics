@@ -25,3 +25,8 @@ if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yustdafx.h")
 	set_source_files_properties(stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
 endif(MSVC)
+
+file(GLOB includes *.h)
+install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
+
+install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

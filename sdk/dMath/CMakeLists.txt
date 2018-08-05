@@ -23,3 +23,8 @@ if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudStdAfxMath.h")
 	set_source_files_properties(dStdAfxMath.cpp PROPERTIES COMPILE_FLAGS "/YcdStdAfxMath.h")
 endif(MSVC)
+
+file(GLOB includes *.h)
+install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
+
+install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

@@ -54,3 +54,5 @@ if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yutoolbox_stdafx.h")
 	set_source_files_properties(sdkDemos/toolBox/toolbox_stdafx.cpp PROPERTIES COMPILE_FLAGS "/Yctoolbox_stdafx.h")
 endif(MSVC)
+
+#install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
