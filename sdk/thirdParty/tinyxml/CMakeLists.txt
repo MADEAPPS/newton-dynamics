@@ -10,8 +10,12 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
-add_subdirectory(glfw)
-add_subdirectory(imgui)
-add_subdirectory(tinyxml)
+set (projectName "tinyxml")
+message (${projectName})
 
+
+ # low level core
+file(GLOB source *.cpp *.h)
+
+add_library(${projectName} STATIC ${source})
 
