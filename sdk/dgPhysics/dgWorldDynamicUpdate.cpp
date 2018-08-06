@@ -234,7 +234,7 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 	dgWorld* const world = (dgWorld*) this;
 	dgContactsList& contactList = *world;
 	dgBodyMasterList& masterList = *world;
-	const dgInt32 conctactCount = contactList.m_activeContacts;
+	dgInt32 conctactCount = contactList.m_activeContacts;
 
 	dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 	for (dgInt32 i = 0; i < conctactCount; i ++) {
@@ -242,6 +242,19 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 		if (contact->GetBody1()->m_invMass.m_w > dgFloat32 (0.0f)) {
 			dgAssert (contact->GetBody0()->m_invMass.m_w > dgFloat32 (0.0f));
 			UnionSet(contact);
+		}
+	}
+
+	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node && (node->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32(0.0f)); node = node->GetPrev()) {
+		dgBody* const body = node->GetInfo().GetBody();
+		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+			dgBody* root = body;
+			bool state = true;
+			do {
+				state &= root->m_equilibrium;
+				root = root->m_disjointParent;
+			} while (root->m_disjointParent != root);
+			root->m_resting &= state;
 		}
 	}
 
@@ -259,19 +272,7 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 	}
 #endif
 
-	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node && (node->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32 (0.0f)); node = node->GetPrev()) {
-		dgBody* const body = node->GetInfo().GetBody();
-		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			dgBody* root = body;
-			bool state = true;
-			do {
-				state &= root->m_equilibrium;
-				root = root->m_disjointParent;
-			} while (root->m_disjointParent != root);
-			root->m_resting &= state;
-		}
-	}
-
+	dgInt32 hasSoftBodies = 0;
 	dgInt32 jointCount = 0;
 	dgInt32 bodiesCount = 0;
 	dgInt32 clusterCount = 0;
@@ -299,19 +300,18 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 	}
 
 	dgSort(bodyArray, bodiesCount, CompareBodyInfos);
-	for (dgInt32 i = 0; i < conctactCount; i ++) {
+	for (dgInt32 i = conctactCount - 1; i >= 0; i --) {
 		dgJointInfo& info = constraintArray[i];
 		dgConstraint* const contact = info.m_joint;
 		dgBody* const root = Find(contact->GetBody0());
 		if (!root->m_resting) {
-			if (root->m_index == -1) {
-				root->m_index = clusterCount;
-				clusterCount ++;
-			}
 			info.m_pairStart = 0;
 			info.m_m0 = root->m_index;
 			info.m_pairCount = contact->m_maxDOF;
 			jointCount++;
+		} else {
+			conctactCount --;
+			constraintArray[i] = constraintArray[conctactCount];
 		}
 	}
 	dgSort(constraintArray, jointCount, CompareJointInfos);
@@ -326,14 +326,36 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 		dgInt32 index = bodyInfo.m_clusterKey >> 1;
 		m_clusterMemory[index].m_bodyCount ++;
 	}
+	world->m_sentinelBody->m_index = 0;
 
+//	dgInt32 pairStart = 0;
 	for (dgInt32 i = 0; i < jointCount; i++) {
 		dgJointInfo& info = constraintArray[i];
 		dgInt32 index = info.m_m0;
 		m_clusterMemory[index].m_jointCount++;
+		m_clusterMemory[index].m_rowsCount += info.m_pairCount;
+//		info.m_pairStart = pairStart;
+//		pairStart += info.m_pairCount;
 	}
 
+	dgInt32 bodyStart = 0;
+	dgInt32 jointStart = 0;
+	for (dgInt32 i = 0; i < clusterCount; i++) {
+		dgBodyCluster& cluster = m_clusterMemory[i];
+		cluster.m_bodyStart = bodyStart;
+		cluster.m_jointStart = jointStart;
 
+		cluster.m_rowsStart = 0;
+		cluster.m_isContinueCollision = 0;
+		cluster.m_hasSoftBodies = dgInt16(hasSoftBodies);
+
+		jointStart += cluster.m_jointCount;
+		bodyStart += cluster.m_bodyCount;
+	}
+
+	m_bodies += bodiesCount;
+	m_joints += jointCount;
+	m_clusters = clusterCount;
 }
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
@@ -344,6 +366,9 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 
 	dgBodyMasterList& masterList = *world;
 
+	m_bodies = 0;
+	m_joints = 0;
+	m_clusters = 0;
 	dgAssert (masterList.GetFirst()->GetInfo().GetBody() == world->m_sentinelBody);
 	world->m_solverJacobiansMemory.ResizeIfNecessary ((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgDynamicBody*));
 	dgDynamicBody** const stackPoolBuffer = (dgDynamicBody**)&world->m_solverJacobiansMemory[0];
@@ -429,7 +454,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 				dgConstraint* const constraint = cell->m_joint;
 				dgAssert(constraint);
-				if (constraint->m_clusterLRU != clusterLRU) {
+				if (constraint->m_clusterLRU____ != clusterLRU) {
 					dgBody* const linkBody = cell->m_bodyNode;
 					dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 					dgAssert((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
@@ -445,7 +470,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 							dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
 							constraint->m_index = jointCount;
-							constraint->m_clusterLRU = clusterLRU;
+							constraint->m_clusterLRU____ = clusterLRU;
 							constraint->m_dynamicsLru = lruMark;
 
 							constraintArray[jointIndex].m_joint = constraint;
@@ -499,7 +524,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 		cluster.m_bodyStart = m_bodies;
 		cluster.m_jointStart = m_joints;
 		cluster.m_bodyCount = bodyCount;
-		cluster.m_clusterLRU = clusterLRU;
+		cluster.m_clusterLRU____ = clusterLRU;
 		cluster.m_jointCount = jointCount;
 		
 		cluster.m_rowsStart = 0;
@@ -590,9 +615,19 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	}
 }
 
+dgInt32 dgWorldDynamicUpdate::CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed)
+{
+	if (infoA->m_bodyIndex < infoB->m_bodyIndex) {
+		return -1;
+	} else if (infoA->m_bodyIndex > infoB->m_bodyIndex) {
+		return 1;
+	}
+	return 0;
+}
 
 dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
@@ -600,21 +635,27 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
+	const dgInt32 bodyCount = cluster->m_bodyCount;
+	const dgInt32 jointCount = cluster->m_jointCount;
+
 	dgJointInfo* const tmpInfoList = dgAlloca(dgJointInfo, cluster->m_jointCount);
 	dgJointInfo** queueBuffer = dgAlloca(dgJointInfo*, cluster->m_jointCount * 2 + 1024 * 8);
+	dgBodyJacobianPair* const bodyJoint = dgAlloca (dgBodyJacobianPair, cluster->m_jointCount * 2);
+	dgInt32* const bodyJointList = dgAlloca (dgInt32, bodyCount + 1);
+
 	dgQueue<dgJointInfo*> queue(queueBuffer, cluster->m_jointCount * 2 + 1024 * 8);
 	dgFloat32 heaviestMass = dgFloat32(1.0e20f);
 	dgInt32 infoIndex = 0;
 	dgInt32 activeJoints = 0;
-	const dgInt32 lru = cluster->m_clusterLRU;
+//	const dgInt32 lru = cluster->m_clusterLRU____;
 	dgJointInfo* heaviestBody = NULL;
 
-	const dgInt32 jointCount = cluster->m_jointCount;
 	for (dgInt32 i = 0; i < jointCount; i++) {
 		dgJointInfo& jointInfo = constraintArray[i];
 		tmpInfoList[i] = jointInfo;
 		tmpInfoList[i].m_preconditioner0 = dgFloat32 (0.0f);
 
+		jointInfo.m_joint->m_graphTagged = 0;
 		const dgInt32 m0 = jointInfo.m_m0;
 		const dgInt32 m1 = jointInfo.m_m1;
 		dgBody* const body0 = bodyArray[m0].m_body;
@@ -637,12 +678,31 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 			heaviestMass = invMass1;
 			heaviestBody = &tmpInfoList[i];
 		}
+
+		bodyJoint[i * 2 + 0].m_bodyIndex = m0;
+		bodyJoint[i * 2 + 0].m_JointIndex = i;
+		bodyJoint[i * 2 + 1].m_bodyIndex = m1;
+		bodyJoint[i * 2 + 1].m_JointIndex = i;
 	}
 
 	if (queue.IsEmpty()) {
 		dgAssert(heaviestBody);
 		queue.Insert(heaviestBody);
 		heaviestBody->m_preconditioner0 = dgFloat32 (1.0f);
+	}
+
+	dgSort (bodyJoint, jointCount * 2, CompareBodyJacobianPair);
+	memset (bodyJointList, 0, sizeof (dgInt32) * (cluster->m_bodyCount + 1));
+	for (dgInt32 i = 0; i < jointCount * 2; i++) {
+		dgInt32 index = bodyJoint[i].m_bodyIndex;
+		bodyJointList[index] ++;
+	}
+
+	dgInt32 startIndex = 0;
+	for (dgInt32 i = 0; i <= bodyCount; i++) {
+		dgInt32 count = bodyJointList[i];
+		bodyJointList[i] = startIndex;
+		startIndex += count; 
 	}
 
 	while (!queue.IsEmpty()) {
@@ -654,14 +714,16 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 		dgInt32 index = queue.m_lastIndex;
 		queue.Reset();
 
-		for (dgInt32 j = 0; j < count; j++) {
+		for (dgInt32 i = 0; i < count; i++) {
 			dgJointInfo* const jointInfo = queue.m_pool[index];
 			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_clusterLRU == lru) {
+			//if (constraint->m_clusterLRU____ == lru) {
+			if (!constraint->m_graphTagged) {
 				dgAssert (dgInt32 (constraint->m_index) < cluster->m_jointCount);
 				constraint->m_index = infoIndex;
 				constraintArray[infoIndex] = *jointInfo;
-				constraint->m_clusterLRU--;
+				//constraint->m_clusterLRU____--;
+				constraint->m_graphTagged = 1;
 				infoIndex++;
 				dgAssert(infoIndex <= cluster->m_jointCount);
 
@@ -673,29 +735,32 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 				activeJoints += !(body0->m_resting & body1->m_resting);
 				
 				if (body0->GetInvMass().m_w > dgFloat32(0.0f)) {
-					for (dgBodyMasterListRow::dgListNode* jointNode1 = body0->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
-						dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
-						dgConstraint* const constraint1 = cell1->m_joint;
-						if (constraint1->m_clusterLRU == lru) {
-							dgJointInfo* const nextInfo = &tmpInfoList[constraint1->m_index];
-							if (!nextInfo->m_preconditioner0) {
-								queue.Insert(nextInfo);
-								nextInfo->m_preconditioner0 = dgFloat32 (1.0f);
+					const dgInt32 endJoint = bodyJointList[m0 + 1];
+					for (dgInt32 j = bodyJointList[m0]; j < endJoint; j ++ ) {
+						dgJointInfo* const info = &tmpInfoList[bodyJoint[j].m_JointIndex];
+						dgConstraint* const nextConstraint = info->m_joint;
+						dgAssert (nextConstraint->m_clusterLRU____ == cluster->m_clusterLRU____);
+						//if (nextConstraint->m_clusterLRU____ == lru) 
+						if (!nextConstraint->m_graphTagged)	{
+							if (!info->m_preconditioner0) {
+								queue.Insert(info);
+								info->m_preconditioner0 = dgFloat32 (1.0f);
 							}
 						}
 					}
 				}
 
 				if (body1->GetInvMass().m_w > dgFloat32(0.0f)) {
-					for (dgBodyMasterListRow::dgListNode* jointNode1 = body1->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
-						dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
-						dgConstraint* const constraint1 = cell1->m_joint;
-
-						if (constraint1->m_clusterLRU == lru){
-							dgJointInfo* const nextInfo = &tmpInfoList[constraint1->m_index];
-							if (!nextInfo->m_preconditioner0) {
-								queue.Insert(nextInfo);
-								nextInfo->m_preconditioner0 = dgFloat32 (1.0f);
+					const dgInt32 endJoint = bodyJointList[m1 + 1];
+					for (dgInt32 j = bodyJointList[m1]; j < endJoint; j++) {
+						dgJointInfo* const info = &tmpInfoList[bodyJoint[j].m_JointIndex];
+						dgConstraint* const nextConstraint = info->m_joint;
+						dgAssert (nextConstraint->m_clusterLRU____ == cluster->m_clusterLRU____);
+						//if (nextConstraint->m_clusterLRU____ == lru)
+						if (!nextConstraint->m_graphTagged)	{
+							if (!info->m_preconditioner0) {
+								queue.Insert(info);
+								info->m_preconditioner0 = dgFloat32 (1.0f);
 							}
 						}
 					}
@@ -1025,7 +1090,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 		dgAssert(dgInt32(constraint->m_index) == i);
 		dgAssert(jointInfo->m_m0 < cluster->m_bodyCount);
 		dgAssert(jointInfo->m_m1 < cluster->m_bodyCount);
-		//dgAssert (constraint->m_index == dgUnsigned32(j));
+		//dgAssert (constraint->m_index == dgUnsigned32(i));
 
 		rowCount = GetJacobianDerivatives(constraintParams, jointInfo, constraint, leftHandSide, rightHandSide, rowCount);
 		dgAssert(rowCount <= cluster->m_rowsCount);

@@ -215,7 +215,7 @@ class dgConstraint
 	dgBodyMasterListRow::dgListNode* m_link0;
 	dgBodyMasterListRow::dgListNode* m_link1;
 	ConstraintsForceFeeback m_updaFeedbackCallback;
-	dgInt32 m_clusterLRU;
+	dgInt32 m_clusterLRU____;
 	dgUnsigned32 m_index;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_maxDOF				: 6;
@@ -225,6 +225,7 @@ class dgConstraint
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
 	dgUnsigned32 m_isInSkeleton			: 1;
+	dgUnsigned32 m_graphTagged			: 1;
 	
 	friend class dgWorld;
 	friend class dgJacobianMemory;
@@ -246,7 +247,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_link0(NULL)
 	,m_link1(NULL)
 	,m_updaFeedbackCallback(NULL)
-	,m_clusterLRU(-1)
+	,m_clusterLRU____(-1)
 	,m_index(0)
 	,m_dynamicsLru(0)
 	,m_maxDOF(6)
@@ -256,6 +257,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_contactActive(false)
 	,m_isBilateral(false)
 	,m_isInSkeleton(false)
+	,m_graphTagged(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }

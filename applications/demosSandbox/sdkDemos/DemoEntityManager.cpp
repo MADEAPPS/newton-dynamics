@@ -399,11 +399,7 @@ DemoEntityManager::~DemoEntityManager ()
 	ImGui::GetIO().Fonts->TexID = 0;
 
 	ImGui::Shutdown();
-
-//	ImGui::DestroyContext();
-//	glfwDestroyWindow(m_mainFrame);
-//	glfwTerminate();
-
+	glfwTerminate();
 	dAssert (NewtonGetMemoryUsed () == 0);
 }
 

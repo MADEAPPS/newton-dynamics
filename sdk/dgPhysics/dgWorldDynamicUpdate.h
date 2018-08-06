@@ -74,18 +74,26 @@ class dgBodyInfo
 	dgInt32 m_clusterKey;
 };
 
+class dgBodyJacobianPair
+{
+	public:
+	dgInt32 m_bodyIndex;
+	dgInt32 m_JointIndex;
+};
+
 class dgBodyCluster
 {
 	public:
-	dgInt32 m_bodyStart;
 	dgInt32 m_bodyCount;
-	dgInt32 m_jointStart;	
 	dgInt32 m_jointCount;
-	dgInt32 m_rowsStart;
 	dgInt32 m_rowsCount;
-	dgInt32 m_clusterLRU;
-	dgInt16 m_isContinueCollision;
+	dgInt32 m_bodyStart;
+	dgInt32 m_jointStart;	
+	dgInt32 m_rowsStart;
 	dgInt16 m_hasSoftBodies;
+	dgInt16 m_isContinueCollision;
+
+dgInt32 m_clusterLRU____;
 };
 
 class dgJointInfo
@@ -221,9 +229,10 @@ class dgWorldDynamicUpdate
 	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	static dgInt32 CompareClusters(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
+	static dgInt32 CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed);
+
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
-	
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void ResolveClusterForces (dgBodyCluster* const cluste, dgInt32 threadID, dgFloat32 timestep) const;
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
