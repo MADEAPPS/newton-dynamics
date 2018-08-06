@@ -24,18 +24,24 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
-
+dgInt32 dgMemoryAllocator::m_threadSanityCheck = 0;
+#if 0
 #ifdef _DEBUG
-static dgInt32 m_threadSanityCheck = 0;
-#define DG_MEMORY_THREAD_SANITY_CHECK_LOCK()		\
-	dgAssert (!m_threadSanityCheck);				\
-	dgAtomicExchangeAndAdd(&m_threadSanityCheck, 1);
-	#define DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK()	  dgAtomicExchangeAndAdd(&m_threadSanityCheck, -1);	
+#define DG_MEMORY_THREAD_SANITY_CHECK_LOCK()				\
+	dgAssert (!dgMemoryAllocator::m_threadSanityCheck);		\
+	dgAtomicExchangeAndAdd(&dgMemoryAllocator::m_threadSanityCheck, 1);
+
+#define DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK() dgAtomicExchangeAndAdd(&dgMemoryAllocator::m_threadSanityCheck, -1);	
+
 #else 
 	#define DG_MEMORY_THREAD_SANITY_CHECK_LOCK()
 	#define DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK()
 #endif
+#else 
 
+#define DG_MEMORY_THREAD_SANITY_CHECK_LOCK() dgScopeSpinPause lock (&dgMemoryAllocator::m_threadSanityCheck)
+#define DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK()
+#endif
 
 class dgMemoryAllocator::dgMemoryBin
 {
@@ -389,7 +395,6 @@ void* dgApi dgMallocAligned (size_t size, dgInt32 align)
 	void * const ptr = dgGlobalAllocator::GetGlobalAllocator().MallocLow (dgInt32 (size), align);
 	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
-	
 }
 
 // this can be used by function that allocates large memory pools memory locally on the stack
@@ -417,7 +422,6 @@ void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator)
 	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
 }
-
 
 // general deletion allocation for all data in the library
 void dgApi dgFree (void* const ptr)
