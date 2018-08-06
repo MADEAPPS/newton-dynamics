@@ -34,4 +34,17 @@ add_subdirectory(dAnimation)
 add_subdirectory(dContainers)
 add_subdirectory(dCustomJoints)
 
+if (WITH_SSE4_PLUGIN)
+	add_subdirectory(dgNewtonSse4.2)
+endif()
+
+if (WITH_AVX_PLUGIN)
+	add_subdirectory(dgNewtonAvx)
+endif()
+
+if (WITH_AVX2_PLUGIN)
+	add_subdirectory(dgNewtonAvx2)
+endif()
+
+
 add_subdirectory(thirdParty)

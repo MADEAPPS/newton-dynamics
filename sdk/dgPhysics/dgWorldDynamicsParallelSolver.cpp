@@ -60,8 +60,8 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 
 dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgBodyCluster cluster;
-
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 bodyCount = 0;
 	dgInt32 jointsCount = 0;
