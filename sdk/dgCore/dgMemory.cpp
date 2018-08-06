@@ -132,8 +132,6 @@ class dgGlobalAllocator: public dgMemoryAllocator, public dgList<dgMemoryAllocat
 	}
 };
 
-//dgGlobalAllocator dgGlobalAllocator::m_globalAllocator;
-
 dgMemoryAllocator::dgMemoryAllocator ()
 	:m_free(NULL)
 	,m_malloc(NULL)
@@ -157,7 +155,6 @@ dgMemoryAllocator::dgMemoryAllocator (dgMemAlloc memAlloc, dgMemFree memFree)
 	memset (m_memoryDirectory, 0, sizeof (m_memoryDirectory));
 }
 
-
 dgMemoryAllocator::~dgMemoryAllocator  ()
 {
 	if (m_isInList) {
@@ -177,7 +174,6 @@ void dgMemoryAllocator::operator delete (void* const ptr)
 	dgFreeStack(ptr); 
 }
 
-
 dgInt32 dgMemoryAllocator::GetMemoryUsed() const
 {
 	return m_memoryUsed;
@@ -188,8 +184,6 @@ void dgMemoryAllocator::SetAllocatorsCallback (dgMemAlloc memAlloc, dgMemFree me
 	m_free = memFree;
 	m_malloc = memAlloc;
 }
-
-
 
 void *dgMemoryAllocator::MallocLow (dgInt32 workingSize, dgInt32 alignment)
 {
@@ -291,11 +285,6 @@ void *dgMemoryAllocator::Malloc (dgInt32 memsize)
 
 		dgMemoryBin* const bin = (dgMemoryBin*) info->m_ptr;
 		bin->m_info.m_count ++;
-
-		#ifdef __TRACK_MEMORY_LEAKS__
-		m_leaklTracker.InsertBlock (dgInt32 (memsize), ptr);
-		#endif
-
 	}
 	return ptr;
 }
@@ -312,10 +301,6 @@ void dgMemoryAllocator::Free (void* const retPtr)
 	if (entry >= DG_MEMORY_BIN_ENTRIES) {
 		FreeLow (retPtr);
 	} else {
-		#ifdef __TRACK_MEMORY_LEAKS__
-		m_leaklTracker.RemoveBlock (retPtr);
-		#endif
-
 		dgMemoryCacheEntry* const cashe = (dgMemoryCacheEntry*) (((char*)retPtr) - DG_MEMORY_GRANULARITY) ;
 
 		dgMemoryCacheEntry* const tmpCashe = m_memoryDirectory[entry].m_cache;
@@ -375,81 +360,6 @@ void dgMemoryAllocator::Free (void* const retPtr)
 	}
 }
 
-
-
-	// this is a simple memory leak tracker, it uses an flat array of two megabyte indexed by a hatch code
-#ifdef __TRACK_MEMORY_LEAKS__
-
-dgMemoryAllocator::dgMemoryLeaksTracker::dgMemoryLeaksTracker()
-{
-	m_density = 0;
-	m_totalAllocatedBytes = 0; 
-	m_totalAllocatedCalls = 0; 
-	m_leakAllocationCounter = 0;
-
-	memset (m_pool, 0, sizeof (m_pool));
-}
-
-dgMemoryAllocator::dgMemoryLeaksTracker::~dgMemoryLeaksTracker ()
-{
-	if (m_totalAllocatedBytes) {
-		for (dgInt32 i = 0; i < DG_TRACK_MEMORY_LEAKS_ENTRIES; i ++) {
-			if (m_pool[i].m_ptr) {
-				dgTrace (("MemoryLeak: (0x%08x), size (%d)  allocationNumber (%d)\n", m_pool[i].m_ptr, m_pool[i].m_size, m_pool[i].m_allocationNumber));
-			}
-		}
-	}
-}
-
-void dgMemoryAllocator::dgMemoryLeaksTracker::InsertBlock (dgInt32 size, void* const ptr)
-{
-	dgUnsigned32 key = dgHash (&ptr, sizeof (void*));
-	dgUnsigned32 index = key % DG_TRACK_MEMORY_LEAKS_ENTRIES;
-
-	dgInt32 i = 0;
-	for (; m_pool[index].m_ptr && (i < DG_TRACK_MEMORY_LEAKS_ENTRIES); i ++) {
-		index = ((index + 1) < DG_TRACK_MEMORY_LEAKS_ENTRIES) ? index + 1 : 0;
-	}
-
-	dgAssert (i < 8);
-	dgAssert (i < DG_TRACK_MEMORY_LEAKS_ENTRIES);
-
-	m_density ++;
-	m_pool[index].m_size = size;
-	m_pool[index].m_ptr = ptr;
-	m_pool[index].m_allocationNumber = m_leakAllocationCounter;
-
-//	dgAssert (m_leakAllocationCounter != 129);
-
-	m_leakAllocationCounter ++;
-	m_totalAllocatedBytes += size; 
-	m_totalAllocatedCalls ++;
-}
-
-void dgMemoryAllocator::dgMemoryLeaksTracker::RemoveBlock (void* const ptr)
-{
-	dgUnsigned32 key = dgHash (&ptr, sizeof (void*));
-	dgUnsigned32 index = key % DG_TRACK_MEMORY_LEAKS_ENTRIES;
-
-	dgInt32 i = 0;
-	for (; i < DG_TRACK_MEMORY_LEAKS_ENTRIES; i ++) {
-		if (m_pool[index].m_ptr == ptr) {
-			m_density --;
-			m_totalAllocatedCalls--;
-			m_totalAllocatedBytes -= m_pool[index].m_size; 
-			dgAssert (m_totalAllocatedBytes >= 0);
-			m_pool[index].m_size = 0;
-			m_pool[index].m_ptr = NULL;
-			break;
-		}
-		index = ((index + 1) < DG_TRACK_MEMORY_LEAKS_ENTRIES) ? index + 1 : 0;
-	}
-
-	dgAssert (i < DG_TRACK_MEMORY_LEAKS_ENTRIES);
-}
-#endif
-
-
 // Set the pointer of memory allocation functions
 void dgMemoryAllocator::SetGlobalAllocators (dgMemAlloc malloc, dgMemFree free)
 {
@@ -493,7 +403,6 @@ void  dgApi dgFreeStack (void* const ptr)
 	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 }
 
-
 // general memory allocation for all data in the library
 void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator) 
 {
@@ -522,8 +431,3 @@ void dgApi dgFree (void* const ptr)
 		DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	}
 }
-
-
-
-
-

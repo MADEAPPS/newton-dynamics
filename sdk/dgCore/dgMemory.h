@@ -24,10 +24,6 @@
 
 #include "dgStdafx.h"
 
-#ifdef _DEBUG
-//#define __TRACK_MEMORY_LEAKS__
-#endif
-
 class dgMemoryAllocator;
 
 void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator);
@@ -85,33 +81,6 @@ class dgMemoryAllocator
 		dgMemoryCacheEntry* m_cache;
 	};
 
-	// this is a simple memory leak tracker, it uses an flat array of two megabyte indexed by a hatch code
-#ifdef __TRACK_MEMORY_LEAKS__
-	class dgMemoryLeaksTracker
-	{
-		#define DG_TRACK_MEMORY_LEAKS_ENTRIES (1024 * 1024 * 4)
-		class Pool
-		{	
-			public: 
-			void* m_ptr;
-			dgInt32 m_size;
-			dgInt32 m_allocationNumber;
-		};
-
-		public:
-		dgMemoryLeaksTracker();
-		~dgMemoryLeaksTracker ();
-		void RemoveBlock (void* const ptr);
-		void InsertBlock (dgInt32 size, void* const ptr);
-
-		dgInt32 m_density;
-		dgInt32 m_totalAllocatedBytes; 
-		dgInt32 m_totalAllocatedCalls; 
-		dgInt32 m_leakAllocationCounter;
-		Pool m_pool[DG_TRACK_MEMORY_LEAKS_ENTRIES];
-
-	};
-#endif
 	dgMemoryAllocator ();
 	virtual ~dgMemoryAllocator ();
 
@@ -146,10 +115,6 @@ class dgMemoryAllocator
 	dgInt32 m_enumerator;
 	dgInt32 m_memoryUsed;
 	dgInt32 m_isInList;
-
-#ifdef __TRACK_MEMORY_LEAKS__
-	dgMemoryLeaksTracker m_leaklTracker;
-#endif
 };
 
 class dgStackMemoryAllocator: public dgMemoryAllocator 
