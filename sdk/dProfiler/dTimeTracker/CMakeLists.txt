@@ -33,6 +33,8 @@ install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
 install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
 
 if (BUILD_SANDBOX_DEMOS)
-	install(TARGETS ${projectName} RUNTIME DESTINATION "${PROJECT_BINARY_DIR}/applications/demosSandbox/debug")
-	install(TARGETS ${projectName} RUNTIME DESTINATION "${PROJECT_BINARY_DIR}/applications/demosSandbox/Release")
+	add_custom_command(
+		TARGET ${projectName} POST_BUILD
+		COMMAND ${CMAKE_COMMAND}
+		ARGS -E copy $(TargetPath) ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/$(TargetFileName))
 endif ()

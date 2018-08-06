@@ -23,8 +23,10 @@ if (GENERATE_DLL)
 	target_link_libraries (${projectName} dgCore dgPhysics dTimeTracker)
 	install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
 	if (BUILD_SANDBOX_DEMOS)
-		install(TARGETS ${projectName} RUNTIME DESTINATION "${PROJECT_BINARY_DIR}/applications/demosSandbox/debug")
-		install(TARGETS ${projectName} RUNTIME DESTINATION "${PROJECT_BINARY_DIR}/applications/demosSandbox/Release")
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy $(TargetPath) ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/$(TargetFileName))
 	endif ()
 else()
 	add_definitions(-D_NEWTON_STATIC_LIB)
