@@ -374,8 +374,6 @@ DemoEntityManager::DemoEntityManager ()
 */
 }
 
-
-
 DemoEntityManager::~DemoEntityManager ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
@@ -389,6 +387,10 @@ DemoEntityManager::~DemoEntityManager ()
 	if (m_world) {
 		NewtonDestroy (m_world);
 		m_world = NULL;
+	}
+
+	if (m_cameraManager) {
+		delete m_cameraManager;
 	}
 
 	// Cleanup
@@ -512,6 +514,10 @@ void DemoEntityManager::Cleanup ()
 	// destroy all remaining visual objects
 	while (dList<DemoEntity*>::GetFirst()) {
 		RemoveEntity (dList<DemoEntity*>::GetFirst());
+	}
+
+	if (m_cameraManager) {
+		delete m_cameraManager;
 	}
 
 	m_sky = NULL;
