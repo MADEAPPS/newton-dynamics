@@ -113,10 +113,8 @@ class dgGlobalAllocator: public dgMemoryAllocator, public dgList<dgMemoryAllocat
 	void operator delete (void* const ptr)
 	{
 		dgAssert (0);
-		//::delete (ptr);
 		free (ptr);
 	}
-
 
 	dgInt32 GetMemoryUsed () const
 	{
@@ -127,7 +125,6 @@ class dgGlobalAllocator: public dgMemoryAllocator, public dgList<dgMemoryAllocat
 		return mem;
 	}
 
-	//static dgGlobalAllocator m_globalAllocator;
 	static dgGlobalAllocator& GetGlobalAllocator()
 	{
 		static dgGlobalAllocator m_globalAllocator;
@@ -138,11 +135,11 @@ class dgGlobalAllocator: public dgMemoryAllocator, public dgList<dgMemoryAllocat
 //dgGlobalAllocator dgGlobalAllocator::m_globalAllocator;
 
 dgMemoryAllocator::dgMemoryAllocator ()
-	:m_emumerator(0)
-	,m_memoryUsed(0)
-	,m_isInList(true)
-	,m_free(NULL)
+	:m_free(NULL)
 	,m_malloc(NULL)
+	,m_enumerator(0)
+	,m_memoryUsed(0)
+	,m_isInList(1)
 {
 	SetAllocatorsCallback (dgGlobalAllocator::GetGlobalAllocator().m_malloc, dgGlobalAllocator::GetGlobalAllocator().m_free);
 	memset (m_memoryDirectory, 0, sizeof (m_memoryDirectory));
@@ -150,11 +147,11 @@ dgMemoryAllocator::dgMemoryAllocator ()
 }
 
 dgMemoryAllocator::dgMemoryAllocator (dgMemAlloc memAlloc, dgMemFree memFree)
-	:m_emumerator(0)
-	,m_memoryUsed(0)
-	,m_free(NULL)
+	:m_free(NULL)
 	,m_malloc(NULL)
-	,m_isInList(false)
+	,m_enumerator(0)
+	,m_memoryUsed(0)
+	,m_isInList(0)
 {
 	SetAllocatorsCallback (memAlloc, memFree);
 	memset (m_memoryDirectory, 0, sizeof (m_memoryDirectory));
@@ -210,7 +207,7 @@ void *dgMemoryAllocator::MallocLow (dgInt32 workingSize, dgInt32 alignment)
 	void* const retPtr = IntToPointer (val);
 
 	dgMemoryInfo* const info = ((dgMemoryInfo*) (retPtr)) - 1;
-	info->SaveInfo(this, ptr, size, m_emumerator, workingSize);
+	info->SaveInfo(this, ptr, size, m_enumerator, workingSize);
 
 	dgAtomicExchangeAndAdd (&m_memoryUsed, size);
 	return retPtr;
@@ -269,7 +266,7 @@ void *dgMemoryAllocator::Malloc (dgInt32 memsize)
 				cashe->m_next = (dgMemoryCacheEntry*) (charPtr + paddedSize);
 				cashe->m_prev = (dgMemoryCacheEntry*) (charPtr - paddedSize);
 				dgMemoryInfo* const info = ((dgMemoryInfo*) (charPtr + DG_MEMORY_GRANULARITY)) - 1;						
-				info->SaveInfo(this, bin, entry, m_emumerator, memsize);
+				info->SaveInfo(this, bin, entry, m_enumerator, memsize);
 				charPtr += paddedSize;
 			}
 			dgMemoryCacheEntry* const cashe = (dgMemoryCacheEntry*) (charPtr - paddedSize);

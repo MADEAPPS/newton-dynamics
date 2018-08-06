@@ -61,9 +61,6 @@ typedef void (dgApi *dgMemFree) (void* const ptr, dgUnsigned32 size);
 	DG_CLASS_ALLOCATOR_DELETE_DUMMY					\
 	DG_CLASS_ALLOCATOR_DELETE_ARRAY_DUMMY
 
-
-
-
 class dgMemoryAllocator
 {
 	#if (defined (_WIN_64_VER) || defined (_MINGW_64_VER) || defined (_POSIX_VER_64) || defined (_MACOSX_VER))
@@ -133,30 +130,27 @@ class dgMemoryAllocator
 
 	protected:
 	dgMemoryAllocator (bool init)
-		:m_emumerator(0)
-		,m_memoryUsed(0)
-		,m_free(NULL)
+		:m_free(NULL)
 		,m_malloc(NULL)
-		,m_isInList(false)
+		,m_enumerator(0)
+		,m_memoryUsed(0)
+		,m_isInList(0)
 	{	
-		//m_memoryUsed = 0;
-		//m_isInList = false;
 	}
 
 	dgMemoryAllocator (dgMemAlloc memAlloc, dgMemFree memFree);
 
-	dgInt32 m_emumerator;
-	dgInt32 m_memoryUsed;
 	dgMemFree m_free;
 	dgMemAlloc m_malloc;
 	dgMemDirectory m_memoryDirectory[DG_MEMORY_BIN_ENTRIES + 1]; 
+	dgInt32 m_enumerator;
+	dgInt32 m_memoryUsed;
+	dgInt32 m_isInList;
 
 #ifdef __TRACK_MEMORY_LEAKS__
 	dgMemoryLeaksTracker m_leaklTracker;
 #endif
-	bool m_isInList;
 };
-
 
 class dgStackMemoryAllocator: public dgMemoryAllocator 
 {
@@ -165,7 +159,7 @@ class dgStackMemoryAllocator: public dgMemoryAllocator
 		:dgMemoryAllocator (false)
 		,m_pool((dgInt8*) pool)
 		,m_index(0)
-		,m_size (size)
+		,m_size(size)
 	{
 	}
 
@@ -175,7 +169,6 @@ class dgStackMemoryAllocator: public dgMemoryAllocator
 
 	DG_INLINE void* Alloc(dgInt32 size)
 	{
-		//dgInt8* const ptr = (dgInt8*) (dgInt64 (m_pool + m_index + 15) & -0x10);
 		dgInt8* const ptr = (dgInt8*) (reinterpret_cast<uintptr_t>(m_pool + m_index + 15) & -0x10);
 		m_index = dgInt32 (ptr - m_pool) + size;
 		dgAssert (m_index < m_size);
