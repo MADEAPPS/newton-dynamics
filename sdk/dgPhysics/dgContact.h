@@ -43,12 +43,12 @@ class dgContactsList: public dgList<dgContact*>
 	public:
 	dgContactsList(dgMemoryAllocator* const allocator)
 		:dgList<dgContact*>(allocator)
-		,m_activeContacts(0)
+//		,m_activeContacts(0)
 		,m_deadContactsCount(0)
 	{
 	}
 
-	dgInt32 m_activeContacts;
+//	dgInt32 m_activeContacts;
 	dgInt32 m_deadContactsCount;
 	dgContactsList::dgListNode* m_deadContacts[128];
 };

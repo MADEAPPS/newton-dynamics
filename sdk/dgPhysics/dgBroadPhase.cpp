@@ -1499,7 +1499,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	const dgFloat32 timestep = descriptor->m_timestep;
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
 	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
-	dgJointInfo* const constraintArray = (dgJointInfo*)&m_world->m_jointsMemory[0];
+//	dgJointInfo* const constraintArray = (dgJointInfo*)&m_world->m_jointsMemory[0];
 
 	while (node) {
 		dgContact* const contact = node->GetInfo();
@@ -1559,10 +1559,10 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 			contact->m_broadphaseLru = m_lru;
 		}
 
-		if (contact->m_maxDOF) {
-			dgInt32 index = dgAtomicExchangeAndAdd (&contactList->m_activeContacts, 1);
-			constraintArray[index].m_joint = contact;
-		}
+//		if (contact->m_maxDOF) {
+//			dgInt32 index = dgAtomicExchangeAndAdd (&contactList->m_activeContacts, 1);
+//			constraintArray[index].m_joint = contact;
+//		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
 			node = node ? node->GetNext() : NULL;
@@ -1591,18 +1591,17 @@ void dgBroadPhase::AttachNewContacts(dgContactsList::dgListNode* const lastNode)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgContactsList* const contactList = m_world;
-	m_world->m_jointsMemory.ResizeIfNecessary(contactList->GetCount() * sizeof(dgJointInfo));
-
-	dgJointInfo* const constraintArray = (dgJointInfo*)&m_world->m_jointsMemory[0];
+//	m_world->m_jointsMemory.ResizeIfNecessary(contactList->GetCount() * sizeof(dgJointInfo));
+//	dgJointInfo* const constraintArray = (dgJointInfo*)&m_world->m_jointsMemory[0];
 	for (dgContactsList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
 		dgContact* const contact = contactNode->GetInfo();
 		m_world->AttachConstraint(contact, contact->m_body0, contact->m_body1);
 		m_contactCache.AddContactJoint(contact);
 
-		if (contact->m_maxDOF) {
-			constraintArray[contactList->m_activeContacts].m_joint = contact;
-			contactList->m_activeContacts++;
-		}
+//		if (contact->m_maxDOF) {
+//			constraintArray[contactList->m_activeContacts].m_joint = contact;
+//			contactList->m_activeContacts++;
+//		}
 	}
 }
 
@@ -1647,7 +1646,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 
 	dgContactsList* const contactList = m_world;
-	contactList->m_activeContacts = 0;
+	//contactList->m_activeContacts = 0;
 	contactList->m_deadContactsCount = 0;
 	dgContactsList::dgListNode* const lastNode = contactList->GetFirst();
 

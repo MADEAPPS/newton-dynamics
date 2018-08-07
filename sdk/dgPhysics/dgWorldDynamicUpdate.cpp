@@ -106,8 +106,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_dynamicsLru = m_markLru;
 
+//	BuildClustersExperimental(timestep);
 	BuildClusters(timestep);
-	BuildClustersOld(timestep);
 	SortClustersByCount();
 
 	dgInt32 maxRowCount = 0;
@@ -229,7 +229,7 @@ dgInt32 dgWorldDynamicUpdate::CompareJointInfos(const dgJointInfo* const infoA, 
 	return 0;
 }
 
-void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
+void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
@@ -380,15 +380,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
 	DG_TRACKTIME(__FUNCTION__);
-//	dgWorld* const world = (dgWorld*) this;
-//	dgContactsList& contactList = *world;
-//	dgBodyMasterList& masterList = *world;
-//	dgInt32 conctactCount = contactList.m_activeContacts;
-}
-
-void dgWorldDynamicUpdate::BuildClustersOld(dgFloat32 timestep)
-{
-	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	dgUnsigned32 lru = m_markLru - 1;
 
@@ -482,7 +473,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 				dgConstraint* const constraint = cell->m_joint;
 				dgAssert(constraint);
-				if (constraint->m_clusterLRU____ != clusterLRU) {
+				if (constraint->m_clusterLRU != clusterLRU) {
 					dgBody* const linkBody = cell->m_bodyNode;
 					dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 					dgAssert((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
@@ -498,7 +489,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 							dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
 							constraint->m_index = jointCount;
-							constraint->m_clusterLRU____ = clusterLRU;
+							constraint->m_clusterLRU = clusterLRU;
 							constraint->m_dynamicsLru = lruMark;
 
 							constraintArray[jointIndex].m_joint = constraint;
@@ -552,7 +543,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 		cluster.m_bodyStart = m_bodies;
 		cluster.m_jointStart = m_joints;
 		cluster.m_bodyCount = bodyCount;
-		cluster.m_clusterLRU____ = clusterLRU;
 		cluster.m_jointCount = jointCount;
 		
 		cluster.m_rowsStart = 0;
