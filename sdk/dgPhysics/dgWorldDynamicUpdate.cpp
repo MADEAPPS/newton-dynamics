@@ -106,8 +106,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_dynamicsLru = m_markLru;
 
-//	BuildClusters1(timestep);
-	BuildClusters(timestep);
+//	BuildClusters(timestep);
+	BuildClustersOld(timestep);
 	SortClustersByCount();
 
 	dgInt32 maxRowCount = 0;
@@ -228,7 +228,7 @@ dgInt32 dgWorldDynamicUpdate::CompareJointInfos(const dgJointInfo* const infoA, 
 	return 0;
 }
 
-void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
+void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
@@ -291,6 +291,7 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 					bodiesCount++;
 					clusterCount++;
 				}
+				root->m_index = root->m_index;
 				bodyArray[bodiesCount].m_body = body;
 				bodyArray[bodiesCount].m_clusterKey = root->m_index * 2 + 1;
 				bodiesCount++;
@@ -299,6 +300,7 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 		}
 	}
 
+/*
 	dgSort(bodyArray, bodiesCount, CompareBodyInfos);
 	for (dgInt32 i = conctactCount - 1; i >= 0; i --) {
 		dgJointInfo& info = constraintArray[i];
@@ -322,20 +324,15 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 
 	for (dgInt32 i = 0; i < bodiesCount; i++) {
 		dgBodyInfo& bodyInfo = bodyArray[i];
-		bodyInfo.m_body->m_index = i;
 		dgInt32 index = bodyInfo.m_clusterKey >> 1;
 		m_clusterMemory[index].m_bodyCount ++;
 	}
-	world->m_sentinelBody->m_index = 0;
 
-//	dgInt32 pairStart = 0;
 	for (dgInt32 i = 0; i < jointCount; i++) {
 		dgJointInfo& info = constraintArray[i];
 		dgInt32 index = info.m_m0;
 		m_clusterMemory[index].m_jointCount++;
 		m_clusterMemory[index].m_rowsCount += info.m_pairCount;
-//		info.m_pairStart = pairStart;
-//		pairStart += info.m_pairCount;
 	}
 
 	dgInt32 bodyStart = 0;
@@ -353,12 +350,34 @@ void dgWorldDynamicUpdate::BuildClusters1(dgFloat32 timestep)
 		bodyStart += cluster.m_bodyCount;
 	}
 
+	for (dgInt32 i = 0; i < bodiesCount; i++) {
+		dgBodyInfo& bodyInfo = bodyArray[i];
+		const dgInt32 index = bodyInfo.m_clusterKey >> 1;
+		bodyInfo.m_body->m_index = i - m_clusterMemory[index].m_bodyStart;
+	}
+	world->m_sentinelBody->m_index = 0;
+
+	for (dgInt32 i = 0; i < jointCount; i++) {
+		dgJointInfo& jointInfo = constraintArray[i];
+		dgConstraint* const joint = jointInfo.m_joint;
+		dgBody* const body0 = joint->m_body0;
+		dgBody* const body1 = joint->m_body1;
+		
+		const dgInt32 m0 = (body0->GetInvMass().m_w != dgFloat32(0.0f)) ? body0->m_index: 0;
+		const dgInt32 m1 = (body1->GetInvMass().m_w != dgFloat32(0.0f)) ? body1->m_index: 0;
+		dgAssert (m0 >= 0);
+		dgAssert (m1 >= 0);
+		jointInfo.m_m0 = m0;
+		jointInfo.m_m1 = m1;
+	}
+
 	m_bodies += bodiesCount;
 	m_joints += jointCount;
 	m_clusters = clusterCount;
+*/
 }
 
-void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
+void dgWorldDynamicUpdate::BuildClustersOld(dgFloat32 timestep)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
@@ -647,7 +666,6 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 	dgFloat32 heaviestMass = dgFloat32(1.0e20f);
 	dgInt32 infoIndex = 0;
 	dgInt32 activeJoints = 0;
-//	const dgInt32 lru = cluster->m_clusterLRU____;
 	dgJointInfo* heaviestBody = NULL;
 
 	for (dgInt32 i = 0; i < jointCount; i++) {
@@ -717,12 +735,10 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 		for (dgInt32 i = 0; i < count; i++) {
 			dgJointInfo* const jointInfo = queue.m_pool[index];
 			dgConstraint* const constraint = jointInfo->m_joint;
-			//if (constraint->m_clusterLRU____ == lru) {
 			if (!constraint->m_graphTagged) {
-				dgAssert (dgInt32 (constraint->m_index) < cluster->m_jointCount);
+				//dgAssert (dgInt32 (constraint->m_index) < cluster->m_jointCount);
 				constraint->m_index = infoIndex;
 				constraintArray[infoIndex] = *jointInfo;
-				//constraint->m_clusterLRU____--;
 				constraint->m_graphTagged = 1;
 				infoIndex++;
 				dgAssert(infoIndex <= cluster->m_jointCount);
@@ -739,8 +755,6 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 					for (dgInt32 j = bodyJointList[m0]; j < endJoint; j ++ ) {
 						dgJointInfo* const info = &tmpInfoList[bodyJoint[j].m_JointIndex];
 						dgConstraint* const nextConstraint = info->m_joint;
-						dgAssert (nextConstraint->m_clusterLRU____ == cluster->m_clusterLRU____);
-						//if (nextConstraint->m_clusterLRU____ == lru) 
 						if (!nextConstraint->m_graphTagged)	{
 							if (!info->m_preconditioner0) {
 								queue.Insert(info);
@@ -755,8 +769,6 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 					for (dgInt32 j = bodyJointList[m1]; j < endJoint; j++) {
 						dgJointInfo* const info = &tmpInfoList[bodyJoint[j].m_JointIndex];
 						dgConstraint* const nextConstraint = info->m_joint;
-						dgAssert (nextConstraint->m_clusterLRU____ == cluster->m_clusterLRU____);
-						//if (nextConstraint->m_clusterLRU____ == lru)
 						if (!nextConstraint->m_graphTagged)	{
 							if (!info->m_preconditioner0) {
 								queue.Insert(info);

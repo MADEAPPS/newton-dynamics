@@ -221,7 +221,7 @@ class dgWorldDynamicUpdate
 	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
 
 	void BuildClusters(dgFloat32 timestep);
-	void BuildClusters1(dgFloat32 timestep);
+	void BuildClustersOld(dgFloat32 timestep);
 	dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const;
 	dgInt32 SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
