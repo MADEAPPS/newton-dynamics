@@ -106,7 +106,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_dynamicsLru = m_markLru;
 
-//	BuildClusters(timestep);
+	BuildClusters(timestep);
 	BuildClustersOld(timestep);
 	SortClustersByCount();
 
@@ -173,6 +173,7 @@ void dgWorldDynamicUpdate::SortClustersByCount ()
 	dgSort(m_clusterMemory, m_clusters, CompareClusters);
 }
 
+/*
 DG_INLINE dgBody* dgWorldDynamicUpdate::Find(dgBody* const body) const
 {
 	dgBody* node = body;
@@ -300,7 +301,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		}
 	}
 
-/*
 	dgSort(bodyArray, bodiesCount, CompareBodyInfos);
 	for (dgInt32 i = conctactCount - 1; i >= 0; i --) {
 		dgJointInfo& info = constraintArray[i];
@@ -374,7 +374,16 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	m_bodies += bodiesCount;
 	m_joints += jointCount;
 	m_clusters = clusterCount;
+}
 */
+
+void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
+{
+	DG_TRACKTIME(__FUNCTION__);
+//	dgWorld* const world = (dgWorld*) this;
+//	dgContactsList& contactList = *world;
+//	dgBodyMasterList& masterList = *world;
+//	dgInt32 conctactCount = contactList.m_activeContacts;
 }
 
 void dgWorldDynamicUpdate::BuildClustersOld(dgFloat32 timestep)

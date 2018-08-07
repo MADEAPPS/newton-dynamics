@@ -24,23 +24,24 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
-dgInt32 dgMemoryAllocator::m_threadSanityCheck = 0;
+dgInt32 dgMemoryAllocator::m_lock = 0;
 #if 0
-#ifdef _DEBUG
-#define DG_MEMORY_THREAD_SANITY_CHECK_LOCK()				\
-	dgAssert (!dgMemoryAllocator::m_threadSanityCheck);		\
-	dgAtomicExchangeAndAdd(&dgMemoryAllocator::m_threadSanityCheck, 1);
-
-#define DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK() dgAtomicExchangeAndAdd(&dgMemoryAllocator::m_threadSanityCheck, -1);	
-
+class dgAllocDebugCheck
+{
+	public:
+	dgAllocDebugCheck()
+	{
+		dgAssert(!dgMemoryAllocator::m_lock);
+		dgAtomicExchangeAndAdd(&dgMemoryAllocator::m_lock, 1);
+	}
+	~dgAllocDebugCheck()
+	{
+		dgAtomicExchangeAndAdd(&dgMemoryAllocator::m_lock, -1);
+	}
+};
+#define DG_MEMORY_LOCK() dgAllocDebugCheck m_lock;
 #else 
-	#define DG_MEMORY_THREAD_SANITY_CHECK_LOCK()
-	#define DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK()
-#endif
-#else 
-
-#define DG_MEMORY_THREAD_SANITY_CHECK_LOCK() dgScopeSpinPause lock (&dgMemoryAllocator::m_threadSanityCheck)
-#define DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK()
+#define DG_MEMORY_LOCK() dgScopeSpinPause lock (&dgMemoryAllocator::m_lock);
 #endif
 
 class dgMemoryAllocator::dgMemoryBin
@@ -383,17 +384,15 @@ dgInt32 dgMemoryAllocator::GetGlobalMemoryUsed ()
 // but because of many complaint I changed it to use malloc and free
 void* dgApi dgMallocStack (size_t size)
 {
-	DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
+	DG_MEMORY_LOCK();
 	void * const ptr = dgGlobalAllocator::GetGlobalAllocator().MallocLow (dgInt32 (size));
-	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
 }
 
 void* dgApi dgMallocAligned (size_t size, dgInt32 align)
 {
-	DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
+	DG_MEMORY_LOCK();
 	void * const ptr = dgGlobalAllocator::GetGlobalAllocator().MallocLow (dgInt32 (size), align);
-	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
 }
 
@@ -403,9 +402,8 @@ void* dgApi dgMallocAligned (size_t size, dgInt32 align)
 // but because of many complaint I changed it to use malloc and free
 void  dgApi dgFreeStack (void* const ptr)
 {
-	DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
+	DG_MEMORY_LOCK();
 	dgGlobalAllocator::GetGlobalAllocator().FreeLow (ptr);
-	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 }
 
 // general memory allocation for all data in the library
@@ -414,12 +412,10 @@ void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator)
 	void* ptr = NULL;
 	dgAssert (allocator);
 
-	DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
+	DG_MEMORY_LOCK();
 	if (size) {
 		ptr = allocator->Malloc (dgInt32 (size));
 	}
-
-	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
 }
 
@@ -427,11 +423,9 @@ void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator)
 void dgApi dgFree (void* const ptr)
 {
 	if (ptr) {
-		DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
-		dgMemoryAllocator::dgMemoryInfo* info;
-		info = ((dgMemoryAllocator::dgMemoryInfo*) ptr) - 1; 
+		DG_MEMORY_LOCK();
+		dgMemoryAllocator::dgMemoryInfo* const info = ((dgMemoryAllocator::dgMemoryInfo*) ptr) - 1;
 		dgAssert (info->m_allocator);
 		info->m_allocator->Free (ptr);
-		DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	}
 }

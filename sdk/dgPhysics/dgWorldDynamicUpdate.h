@@ -216,9 +216,9 @@ class dgWorldDynamicUpdate
 	virtual void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 
 	private:
-	DG_INLINE dgBody* Find(dgBody* const body) const;
-	DG_INLINE dgBody* FindAndSplit(dgBody* const body) const;
-	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
+//	DG_INLINE dgBody* Find(dgBody* const body) const;
+//	DG_INLINE dgBody* FindAndSplit(dgBody* const body) const;
+//	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
 
 	void BuildClusters(dgFloat32 timestep);
 	void BuildClustersOld(dgFloat32 timestep);
@@ -226,8 +226,8 @@ class dgWorldDynamicUpdate
 	dgInt32 SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
-	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
-	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
+//	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
+//	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	static dgInt32 CompareClusters(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
 	static dgInt32 CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed);
 

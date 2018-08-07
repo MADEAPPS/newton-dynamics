@@ -117,7 +117,7 @@ class dgMemoryAllocator
 	dgInt32 m_isInList;
 
 	public:
-	static dgInt32 m_threadSanityCheck;
+	static dgInt32 m_lock;
 };
 
 class dgStackMemoryAllocator: public dgMemoryAllocator 
