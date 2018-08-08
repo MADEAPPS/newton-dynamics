@@ -58,12 +58,12 @@ class dgBodyMasterListRow: public dgList<dgBodyMasterListCell>
 
 	void RemoveAllJoints ();
 	
-	void SetAcceleratedSearch();
+//	void SetAcceleratedSearch();
 
 	dgBody* m_body;
-	dgListNode* m_acceleratedSearch[3];
-	dgInt32 m_contactCount;
-	static dgInt32 m_contactCountReversal[];
+//	dgListNode* m_acceleratedSearch[3];
+//	dgInt32 m_contactCount;
+//	static dgInt32 m_contactCountReversal[];
 	friend class dgBodyMasterList;
 };
 

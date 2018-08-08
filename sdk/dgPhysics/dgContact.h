@@ -240,10 +240,12 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
 	friend class dgCollisionCompound;
+	friend class dgBodyMasterListRow;
 	friend class dgWorldDynamicUpdate;
 	friend class dgSolverWorlkerThreads;
 	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
+	
 }DG_GCC_VECTOR_ALIGMENT;
 
 DG_INLINE void dgContactMaterial::SetCollisionCallback (OnAABBOverlap aabbOverlap, OnContactCallback contact) 

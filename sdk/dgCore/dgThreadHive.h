@@ -60,13 +60,13 @@ class dThreadHiveSync
 	private:
 	virtual void Wait()
 	{
-		//DG_TRACKTIME(__FUNCTION__);
 		dgAtomicExchangeAndAdd(&m_sync, 1);
 		dgInt32 count = 0;
 		while (m_sync % m_threadCounts) {
 			count++;
 			dgThreadPause();
 			if (count >= 1024 * 64) {
+				DG_TRACKTIME(__FUNCTION__);
 				count = 0;
 				dgThreadYield();
 			}

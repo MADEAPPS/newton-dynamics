@@ -1166,21 +1166,23 @@ void dgSolver::ParallelSolver(dgInt32 threadID)
 				accNorm = dgMax(accNorm, m_accelNorm[i]);
 			}
 		}
-		IntegrateBodiesVelocity(threadID);
 		m_threadSync1.Sync();
+
+		IntegrateBodiesVelocity(threadID);
+		m_threadSync0.Sync();
 	}
 
 	UpdateForceFeedback(threadID);
-	m_threadSync0.Sync();
+	m_threadSync1.Sync();
 	dgInt32 hasJointFeeback = 0;
 	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
 		hasJointFeeback |= m_hasJointFeeback[i];
 	}
-	m_threadSync1.Sync();
+	m_threadSync0.Sync();
 
 	CalculateBodiesAcceleration(threadID);
 	if (hasJointFeeback) {
-		m_threadSync0.Sync();
+		m_threadSync1.Sync();
 		UpdateKinematicFeedback(threadID);
 	}
 }
