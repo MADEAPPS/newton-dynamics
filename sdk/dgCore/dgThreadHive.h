@@ -41,7 +41,7 @@ class dgThreadHiveSync
 		{
 		}
 
-		virtual ~dgSync()
+		~dgSync()
 		{
 		}
 
@@ -50,7 +50,7 @@ class dgThreadHiveSync
 			m_sync = 0;
 		}
 
-		virtual void Wait(dgInt32 threadsCount)
+		void Wait(dgInt32 threadsCount)
 		{
 			dgAtomicExchangeAndAdd(&m_sync, 1);
 			dgInt32 count = 0;
@@ -72,39 +72,85 @@ class dgThreadHiveSync
 	dgThreadHiveSync()
 		:m_syn0()
 		,m_syn1()
+		,m_mod(0)
 		,m_threadsCount(1)
 	{
 	}
 
-	~dgThreadHiveSync()
+	virtual ~dgThreadHiveSync()
 	{
+	}
+
+	void Reset(dgInt32 threadCount)
+	{
+		dgAssert (threadCount >= 1);
+
+		m_mod = 0;
+		m_threadsCount = threadCount;
+		m_syn0.Reset();
+		m_syn1.Reset();
+	}
+
+#if 0
+	virtual void Wait0()
+	{
+		m_syn0.Wait(m_threadsCount);
+	}
+
+	virtual void Wait1()
+	{
+		m_syn1.Wait(m_threadsCount);
 	}
 
 	void Sync0()
 	{
 		if (m_threadsCount > 1) {
-			m_syn0.Wait(m_threadsCount);
+			Wait0();
 		}
 	}
 
 	void Sync1()
 	{
 		if (m_threadsCount > 1) {
-			m_syn1.Wait(m_threadsCount);
+			Wait1();
+		}
+	}
+#else
+	void Sync()
+	{
+		if (m_threadsCount > 1) {
+			Wait();
 		}
 	}
 
-	void Reset(dgInt32 threadCount)
+	void Sync0()
 	{
-		dgAssert (threadCount >= 1);
-		m_threadsCount = threadCount;
-		m_syn0.Reset();
-		m_syn1.Reset();
+		Sync();
 	}
+
+	void Sync1()
+	{
+		Sync();
+	}
+
+	private:
+	virtual void Wait()
+	{
+		dgInt32 index = dgAtomicExchangeAndAdd(&m_mod, 1) / m_threadsCount;
+		if (index & 1) {
+			m_syn1.Wait(m_threadsCount);
+		}
+		else {
+			m_syn0.Wait(m_threadsCount);
+		}
+	}
+
+#endif
 
 	private: 
 	dgSync m_syn0;
 	dgSync m_syn1;
+	dgInt32 m_mod;
 	dgInt32 m_threadsCount;
 };
 
