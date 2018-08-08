@@ -155,8 +155,7 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_pendingSoftBodyPairsCount(0)
 	,m_contacJointLock(0)
 	,m_criticalSectionLock(0)
-	,m_threadSync0()
-	,m_threadSync1()
+	,m_threadSync()
 {
 }
 
@@ -1715,8 +1714,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	m_world->SynchronizationBarrier();
 
 #else
-	m_threadSync0.Reset(threadsCount);
-	m_threadSync1.Reset(threadsCount);
+	m_threadSync.Reset(threadsCount);
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateParallelKernel, &syncPoints, m_world, "dgBroadPhase::UpdateParallelKernel");
 	}
@@ -1763,7 +1761,7 @@ void dgBroadPhase::UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, 
 		node = node ? node->GetPrev() : NULL;
 	}
 	SleepingState(descriptor, node, threadID);
-	m_threadSync0.Sync();
+	m_threadSync.Sync0();
 
 	dgContactsList* const contactList = m_world;
 	dgContactsList::dgListNode* contactListNode = contactList->GetFirst();
@@ -1771,16 +1769,16 @@ void dgBroadPhase::UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, 
 		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
 	}
 	UpdateRigidBodyContacts(descriptor, contactListNode, descriptor->m_timestep, threadID);
-	m_threadSync1.Sync();
+	m_threadSync.Sync1();
 
 	if (m_pendingSoftBodyPairsCount) {
-		m_threadSync0.Sync();
+		m_threadSync.Sync0();
 		dgAssert (0);
 //		for (dgInt32 i = 0; i < threadsCount; i++) {
 //			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateSoftBodyContact");
 //		}
 //		m_world->SynchronizationBarrier();
-		m_threadSync1.Sync();
+		m_threadSync.Sync1();
 	}
 	
 	dgContactsList::dgListNode* const lastNode = contactList->GetFirst();
@@ -1789,14 +1787,14 @@ void dgBroadPhase::UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, 
 		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
 	}
 	FindCollidingPairs(descriptor, broadPhaseNode, threadID);
-	m_threadSync0.Sync();
+	m_threadSync.Sync0();
 
 	dgContactsList::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
 	for (dgInt32 i = 0; i < threadID; i++) {
 		newContact = newContact ? newContact->GetPrev() : NULL;
 	}
 	AddNewContacts(descriptor, newContact, threadID);
-	m_threadSync1.Sync();
+	m_threadSync.Sync1();
 
 	// this will move to an asynchronous thread 
 	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();

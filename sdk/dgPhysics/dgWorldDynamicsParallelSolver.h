@@ -293,8 +293,7 @@ class dgParallelBodySolver
 	dgInt32 m_solverPasses;
 	dgInt32 m_threadCounts;
 	dgInt32 m_soaRowsCount;
-	dThreadHiveSync m_threadSync0;
-	dThreadHiveSync m_threadSync1;
+	dgThreadHiveSync m_threadSync;
 	dgInt32* m_soaRowStart;
 	dgInt32* m_bodyRowStart;
 
@@ -320,8 +319,7 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_solverPasses(0)
 	,m_threadCounts(0)
 	,m_soaRowsCount(0)
-	,m_threadSync0()
-	,m_threadSync1()
+	,m_threadSync()
 	,m_soaRowStart(NULL)
 	,m_bodyRowStart(NULL)
 	,m_massMatrix(allocator)

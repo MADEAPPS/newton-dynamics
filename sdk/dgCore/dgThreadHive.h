@@ -31,50 +31,81 @@
 #define DG_THREAD_POOL_JOB_SIZE (256)
 typedef void (*dgWorkerThreadTaskCallback) (void* const context0, void* const context1, dgInt32 threadID);
 
-class dThreadHiveSync
+class dgThreadHiveSync
 {
+	class dgSync
+	{
+		public:
+		dgSync()
+			:m_sync(0)
+		{
+		}
+
+		virtual ~dgSync()
+		{
+		}
+
+		void Reset()
+		{
+			m_sync = 0;
+		}
+
+		virtual void Wait(dgInt32 threadsCount)
+		{
+			dgAtomicExchangeAndAdd(&m_sync, 1);
+			dgInt32 count = 0;
+			while (m_sync % threadsCount) {
+				count++;
+				dgThreadPause();
+				if (count >= 1024 * 64) {
+					DG_TRACKTIME(__FUNCTION__);
+					count = 0;
+					dgThreadYield();
+				}
+			}
+		}
+
+		dgInt32 m_sync;
+	};
+
 	public:
-	dThreadHiveSync()
-		:m_sync(0)
-		,m_threadCounts(1)
+	dgThreadHiveSync()
+		:m_syn0()
+		,m_syn1()
+		,m_threadsCount(1)
 	{
 	}
 
-	virtual ~dThreadHiveSync()
+	~dgThreadHiveSync()
 	{
+	}
+
+	void Sync0()
+	{
+		if (m_threadsCount > 1) {
+			m_syn0.Wait(m_threadsCount);
+		}
+	}
+
+	void Sync1()
+	{
+		if (m_threadsCount > 1) {
+			m_syn1.Wait(m_threadsCount);
+		}
 	}
 
 	void Reset(dgInt32 threadCount)
 	{
-		m_sync = 0;
-		m_threadCounts = threadCount;
+		dgAssert (threadCount >= 1);
+		m_threadsCount = threadCount;
+		m_syn0.Reset();
+		m_syn1.Reset();
 	}
 
-	void Sync()
-	{
-		if (m_threadCounts > 1) {
-			Wait();
-		}
-	}
-
-	private:
-	virtual void Wait()
-	{
-		dgAtomicExchangeAndAdd(&m_sync, 1);
-		dgInt32 count = 0;
-		while (m_sync % m_threadCounts) {
-			count++;
-			dgThreadPause();
-			if (count >= 1024 * 64) {
-				DG_TRACKTIME(__FUNCTION__);
-				count = 0;
-				dgThreadYield();
-			}
-		}
-	}
-
-	dgInt32 m_sync;
-	dgInt32 m_threadCounts;
+	private: 
+	dgSync m_syn0;
+	dgSync m_syn1;
+	dgInt32 m_threadsCount;
 };
 
 class dgThreadHive  
