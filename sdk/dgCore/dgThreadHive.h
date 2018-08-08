@@ -42,6 +42,10 @@ class dThreadHiveSync
 	{
 	}
 
+	virtual ~dThreadHiveSync()
+	{
+	}
+
 	void Reset(dgInt32 threadCount)
 	{
 		m_sync0 = 0;
@@ -50,7 +54,7 @@ class dThreadHiveSync
 		m_threadCounts = threadCount;
 	}
 
-	void Sync()
+	virtual void Sync()
 	{
 		if (m_threadCounts > 1) {
 			//DG_TRACKTIME(__FUNCTION__);
