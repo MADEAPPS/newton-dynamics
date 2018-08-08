@@ -27,12 +27,9 @@
 #include "dgBodyMasterList.h"
 #include "dgSkeletonContainer.h"
 
-//dgInt32 dgBodyMasterListRow::m_contactCountReversal[] = {1, 0, 2};
-
 dgBodyMasterListRow::dgBodyMasterListRow ()
 	:dgList<dgBodyMasterListCell>(NULL)
 	,m_body (NULL)
-//	,m_contactCount(0)
 {
 }
 
@@ -41,10 +38,26 @@ dgBodyMasterListRow::~dgBodyMasterListRow()
 	dgAssert (GetCount() == 0);
 }
 
+void dgBodyMasterListRow::OrderContactJoint(dgBodyMasterListRow::dgListNode* const node)
+{
+	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
+
+	dgContact* const contact = (dgContact*)node->GetInfo().m_joint;
+	if (contact->m_maxDOF) {
+		RotateToBegin(node);
+	} else {
+		dgListNode* ptr = GetLast();
+		for (; ptr && (ptr->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint); ptr = ptr->GetPrev());
+		if (ptr && (ptr != node)) {
+			InsertAfter(ptr, node);
+		}
+	}
+}
+
 dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstraint* const joint, dgBody* const body)
 {
+// no need for lock since this is called from the main thread only
 //	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
-//	body->m_world->GlobalLock();
 
 	dgListNode* node;
 	dgContact* const contact = (dgContact*)joint;
@@ -60,21 +73,16 @@ dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstra
 			}
 		}
 	}
-//	body->m_world->GlobalUnlock();
 
 	node->GetInfo().m_joint = joint;
 	node->GetInfo().m_bodyNode = body;
 	return node;
 }
 
-
 dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddBilateralJoint (dgConstraint* const joint, dgBody* const body)
 {
 	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
-
-//	body->m_world->GlobalLock();
 	dgListNode* const node = Append();
-//	body->m_world->GlobalUnlock();
 	
 	node->GetInfo().m_joint = joint;
 	node->GetInfo().m_bodyNode = body;
@@ -99,14 +107,10 @@ void dgBodyMasterListRow::RemoveContactJoint (dgListNode* const link)
 	m_body->m_world->GlobalLock();
 	Remove(link);
 	m_body->m_world->GlobalUnlock();
-	
-//	m_contactCount --;
-//	SetAcceleratedSearch();
 }
 
 void dgBodyMasterListRow::RemoveBilateralJoint (dgListNode* const link)
 {
-//	dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
 	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	
 	m_body->m_world->GlobalLock();
@@ -156,39 +160,6 @@ dgBilateralConstraint* dgBodyMasterListRow::FindBilateralJoint (const dgBody* co
 	return NULL;
 }
 
-/*
-void dgBodyMasterListRow::SetAcceleratedSearch()
-{
-	if (GetFirst()) {
-		dgInt32 index = 0;
-		dgInt32 dx = 2 * m_contactCount;
-		dgInt32 dy = 2 * sizeof (m_acceleratedSearch) / sizeof (m_acceleratedSearch[0]);
-		dgInt32 acc = dy - m_contactCount;
-		dgListNode* ptr = GetFirst();
-		for (dgInt32 i = 0; i < m_contactCount; i ++) { 
-			dgAssert (ptr->GetInfo().m_joint->GetId() ==  dgConstraint::m_contactConstraint);
-			if (acc > 0) {
-				dgInt32 j = m_contactCountReversal[index];
-				m_acceleratedSearch[j] = ptr;
-				index++;
-				dgAssert(index <= m_contactCount);
-				acc -= dx;
-			}
-			acc += dy;
-			ptr = ptr->GetNext();
-		}
-
-		dgAssert ((index <= 2) || ((m_acceleratedSearch[0]->GetInfo().m_bodyNode->m_uniqueID > m_acceleratedSearch[1]->GetInfo().m_bodyNode->m_uniqueID) && 
-								   (m_acceleratedSearch[0]->GetInfo().m_bodyNode->m_uniqueID < m_acceleratedSearch[2]->GetInfo().m_bodyNode->m_uniqueID)));
-
-		for (dgInt32 i = index; i < dgInt32 (sizeof (m_acceleratedSearch) / sizeof (m_acceleratedSearch[0])); i++) {
-			dgInt32 j = m_contactCountReversal[i];
-			m_acceleratedSearch[j] = GetFirst();
-		}
-	}
-}
-*/
-
 void dgBodyMasterListRow::SortList()
 {
 	//dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
@@ -219,7 +190,6 @@ void dgBodyMasterListRow::SortList()
 	}
 }
 
-
 dgBodyMasterList::dgBodyMasterList (dgMemoryAllocator* const allocator)
 	:dgList<dgBodyMasterListRow>(allocator)
 	,m_disableBodies(allocator)
@@ -227,11 +197,9 @@ dgBodyMasterList::dgBodyMasterList (dgMemoryAllocator* const allocator)
 {
 }
 
-
 dgBodyMasterList::~dgBodyMasterList(void)
 {
 }
-
 
 void dgBodyMasterList::AddBody (dgBody* const body)
 {
@@ -257,7 +225,6 @@ void dgBodyMasterList::RemoveBody (dgBody* const body)
 	body->m_masterNode = NULL;
 }
 
-
 dgBodyMasterListRow::dgListNode* dgBodyMasterList::FindConstraintLink (const dgBody* const body0, const dgBody* const body1) const
 {
 	dgAssert (body0);
@@ -272,7 +239,6 @@ dgBodyMasterListRow::dgListNode* dgBodyMasterList::FindConstraintLink (const dgB
 	return NULL;
 }
 
-
 dgContact* dgBodyMasterList::FindContactJoint (const dgBody* body0, const dgBody* body1) const
 {
 	dgInt32 count0 = body0->m_masterNode->GetInfo().GetCount();
@@ -285,12 +251,10 @@ dgContact* dgBodyMasterList::FindContactJoint (const dgBody* body0, const dgBody
 	return contact;
 }
 
-
 dgBilateralConstraint* dgBodyMasterList::FindBilateralJoint (const dgBody* body0, const dgBody* body1) const
 {
 	return body0->m_masterNode->GetInfo().FindBilateralJoint (body1);
 }
-
 
 void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* const body0, dgBody* const srcbody1)
 {
@@ -319,7 +283,6 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 	dgAtomicExchangeAndAdd((dgInt32*) &m_constraintCount, 1);
 }
 
-
 void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 {
 	dgAtomicExchangeAndAdd((dgInt32*) &m_constraintCount, -1);
@@ -339,18 +302,12 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 		dgDynamicBody* const dynBody0 = (dgDynamicBody*)body0;
 		dynBody0->m_savedExternalForce = dgVector(dgFloat32(0.0f));
 		dynBody0->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
-//		if ((constraint->GetId() == dgConstraint::m_contactConstraint) && dynBody0->GetSkeleton()) {
-//			dynBody0->GetSkeleton()->RemoveCyclingJoint((dgBilateralConstraint*)constraint);
-//		}
 	}
 
 	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 		dgDynamicBody* const dynBody1 = (dgDynamicBody*)body1;
 		dynBody1->m_savedExternalForce = dgVector(dgFloat32(0.0f));
 		dynBody1->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
-//		if ((constraint->GetId() == dgConstraint::m_contactConstraint) && dynBody1->GetSkeleton()) {
-//			dynBody1->GetSkeleton()->RemoveCyclingJoint((dgBilateralConstraint*)constraint);
-//		}
 	}
 
 	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
@@ -379,6 +336,17 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 	}
 }
 
+void dgBodyMasterList::OrderContactJoint(dgContact* const contact)
+{
+	dgBody* const body0 = contact->m_body0;
+	dgBody* const body1 = contact->m_body1;
+	dgAssert(body0);
+	dgAssert(body1);
+	dgBodyMasterListRow& row0 = body0->m_masterNode->GetInfo();
+	dgBodyMasterListRow& row1 = body1->m_masterNode->GetInfo();
+	row0.OrderContactJoint(contact->GetLink0());
+	row1.OrderContactJoint(contact->GetLink1());
+}
 
 DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) const
 {

@@ -95,16 +95,14 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	dVector maxP(0.0f);
 	CalculateAABB (collision, dGetIdentityMatrix(), minP, maxP);
 
-	//dFloat stepz = size.m_z + 0.01f;
 	dFloat stepz = maxP.m_z - minP.m_z + 0.03125f;
-	dFloat stepy = (maxP.m_y - minP.m_y);
+	dFloat stepy = (maxP.m_y - minP.m_y) - 0.01f;
 
 	dFloat y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
 	for (int j = 0; j < count; j ++) {
-//	for (int j = 0; j < 10; j ++) {
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {
 			CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
