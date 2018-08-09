@@ -168,7 +168,8 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
 
 	InitWeights();
-#if 1
+
+#ifdef DG_USE_OLD_THREAD_SYNC
 	m_firstPassCoef = dgFloat32(0.0f);
 	m_threadSync.Reset(m_threadCounts);
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {

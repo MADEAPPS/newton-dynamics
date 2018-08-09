@@ -68,7 +68,8 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOA_WORD_GROUP_SIZE + 1);
 
 	InitWeights();
-#if 1
+
+#ifdef DG_USE_OLD_THREAD_SYNC
 	m_threadSync.Reset(m_threadCounts);
 	m_firstPassCoef = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {

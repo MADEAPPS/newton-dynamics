@@ -1651,7 +1651,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	contactList->m_deadContactsCount = 0;
 	dgContactsList::dgListNode* const lastNode = contactList->GetFirst();
 
-#if 0
+#ifdef DG_USE_OLD_THREAD_SYNC
 	node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(SleepingStateKernel, &syncPoints, node, "dgBroadPhase::SleepingState");
@@ -1659,7 +1659,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
-	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
+	dgContactsList::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
 		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
@@ -1680,7 +1680,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
-	dgActiveContacts::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
+	dgContactsList::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(AddNewContactsKernel, &syncPoints, newContact, "dgBroadPhase::AddNewContacts");
 		newContact = newContact ? newContact->GetPrev() : NULL;
