@@ -169,7 +169,7 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 
 	InitWeights();
 
-#ifdef DG_USE_OLD_THREAD_SYNC
+#ifdef DG_USE_NEW_THREAD_SYNC
 	m_firstPassCoef = dgFloat32(0.0f);
 	m_threadSync.Reset(m_threadCounts);
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {

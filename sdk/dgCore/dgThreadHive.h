@@ -30,8 +30,7 @@
 #define DG_THREAD_POOL_JOB_SIZE (256)
 typedef void (*dgWorkerThreadTaskCallback) (void* const context0, void* const context1, dgInt32 threadID);
 
-
-#define DG_USE_OLD_THREAD_SYNC
+//#define DG_USE_NEW_THREAD_SYNC
 class dgThreadHiveSync
 {
 	class dgSync
