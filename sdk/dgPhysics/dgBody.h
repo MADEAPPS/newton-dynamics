@@ -261,7 +261,6 @@ class dgBody
 
 	void* m_userData;
 	dgWorld* m_world;
-	dgBody* m_disjointParent;
 	dgCollisionInstance* m_collision;
 	dgBroadPhaseBodyNode* m_broadPhaseNode;
 	dgBodyMasterList::dgListNode* m_masterNode;
@@ -275,7 +274,6 @@ class dgBody
 	dgInt32 m_rtti;
 	dgInt32 m_type;
 	dgInt32 m_serializedEnum;
-	dgInt32 m_disjointSetRank;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_genericLRUMark;
 

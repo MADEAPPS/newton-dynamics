@@ -168,19 +168,9 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_bodyJacobiansPairs = dgAlloca (dgBodyJacobianPair, cluster.m_jointCount * 2);
 
 	InitWeights();
-
-#ifdef DG_USE_NEW_THREAD_SYNC
-	m_firstPassCoef = dgFloat32(0.0f);
-	m_threadSync.Reset(m_threadCounts);
-	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(ParallelSolverKernel, this, NULL, "dgParallelBodySolver::ParallelSolverKernel");
-	}
-	m_world->SynchronizationBarrier();
-#else
 	InitBodyArray();
 	InitJacobianMatrix();
 	CalculateForces();
-#endif
 }
 
 void dgParallelBodySolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
@@ -1149,125 +1139,4 @@ void dgParallelBodySolver::CalculateForces()
 	}
 }
 
-// *************************************************************
-//
-//
-// *************************************************************
 
-void dgParallelBodySolver::ParallelSolverKernel(void* const context, void* const, dgInt32 threadID)
-{
-	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
-	me->ParallelSolver(threadID);
-}
-
-
-void dgParallelBodySolver::ParallelSolver(dgInt32 threadID)
-{
-	DG_TRACKTIME(__FUNCTION__);
-	InitBodyArray(threadID);
-	m_threadSync.Sync0();
-
-	if (!threadID) {
-		m_bodyProxyArray->m_invWeight = 1.0f;
-		m_jacobianMatrixRowAtomicIndex = 0;
-	}
-	m_threadSync.Sync1();
-	
-	InitJacobianMatrix(threadID);
-	m_threadSync.Sync0();
-
-	if (!threadID) {
-		dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
-		dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
-		const dgInt32 entryCount = m_cluster->m_jointCount * 2;
-		dgSort(bodyJacobiansPairs, entryCount, CompareBodyJointsPairs);
-		for (dgInt32 i = entryCount - 1; i >= 0; i--) {
-			dgInt32 index = bodyJacobiansPairs[i].m_bodyIndex;
-			bodyProxyArray[index].m_jointStart = i;
-		}
-	}
-	m_threadSync.Sync1();
-
-	InitInternalForces(threadID);
-	m_threadSync.Sync0();
-
-	if (!threadID) {
-		dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-		internalForces[0].m_linear = dgVector::m_zero;
-		internalForces[0].m_angular = dgVector::m_zero;
-
-		dgJointInfo* const jointArray = m_jointArray;
-		dgSort(jointArray, m_cluster->m_jointCount, CompareJointInfos);
-
-		const dgInt32 jointCount = m_jointCount * DG_WORK_GROUP_SIZE;
-		for (dgInt32 i = m_cluster->m_jointCount; i < jointCount; i++) {
-			memset(&jointArray[i], 0, sizeof(dgJointInfo));
-		}
-
-		dgInt32 size = 0;
-		for (dgInt32 i = 0; i < jointCount; i += DG_WORK_GROUP_SIZE) {
-			const dgConstraint* const joint1 = jointArray[i + DG_WORK_GROUP_SIZE - 1].m_joint;
-			if (joint1) {
-				if (!(joint1->m_body0->m_resting & joint1->m_body1->m_resting)) {
-					const dgConstraint* const joint0 = jointArray[i].m_joint;
-					if (joint0->m_body0->m_resting & joint0->m_body1->m_resting) {
-						SortWorkGroup(i);
-					}
-				}
-			} else {
-				SortWorkGroup(i);
-			}
-			size += jointArray[i].m_pairCount;
-		}
-		m_massMatrix.ResizeIfNecessary(size);
-		m_soaRowsCount = 0;
-	}
-	m_threadSync.Sync1();
-
-	TransposeMassMatrix(threadID);
-	m_threadSync.Sync0();
-
-	const dgInt32 passes = m_solverPasses;
-	const dgInt32 threadCounts = m_world->GetThreadCount();
-	for (dgInt32 step = 0; step < 4; step++) {
-		CalculateJointsAcceleration(threadID);
-		m_threadSync.Sync1();
-
-		m_firstPassCoef = dgFloat32(1.0f);
-		UpdateRowAcceleration(threadID);
-		m_threadSync.Sync0();
-
-		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
-		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
-			CalculateJointsForce(threadID);
-			m_threadSync.Sync1();
-
-			CalculateBodyForce(threadID);
-			m_threadSync.Sync0();
-
-			accNorm = dgFloat32(0.0f);
-			for (dgInt32 i = 0; i < threadCounts; i++) {
-				accNorm = dgMax(accNorm, m_accelNorm[i]);
-			}
-		}
-		m_threadSync.Sync1();
-
-		IntegrateBodiesVelocity(threadID);
-		m_threadSync.Sync0();
-	}
-
-	UpdateForceFeedback(threadID);
-	m_threadSync.Sync1();
-
-	dgInt32 hasJointFeeback = 0;
-	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
-		hasJointFeeback |= m_hasJointFeeback[i];
-	}
-
-	CalculateBodiesAcceleration(threadID);
-	m_threadSync.Sync0();
-
-	if (hasJointFeeback) {
-		UpdateKinematicFeedback(threadID);
-	}
-}

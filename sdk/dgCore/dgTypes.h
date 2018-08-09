@@ -89,6 +89,7 @@
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
+#include <atomic>
 
 #if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	#include <io.h> 

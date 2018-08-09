@@ -247,9 +247,6 @@ class dgSolver: public dgParallelBodySolver
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
 	DG_INLINE float CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const;
 
-	void ParallelSolver(dgInt32 threadID);
-	static void ParallelSolverKernel(void* const context, void* const, dgInt32 threadID);
-
 	dgSoaFloat m_soaOne;
 	dgSoaFloat m_soaZero;
 	dgVector m_zero;

@@ -268,9 +268,6 @@ class dgParallelBodySolver
 	DG_INLINE void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
 	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
-	
-	void ParallelSolver(dgInt32 threadID);
-	static void ParallelSolverKernel(void* const context, void* const, dgInt32 threadID);
 
 	protected:
 	dgWorld* m_world;
@@ -293,7 +290,6 @@ class dgParallelBodySolver
 	dgInt32 m_solverPasses;
 	dgInt32 m_threadCounts;
 	dgInt32 m_soaRowsCount;
-	dgThreadHiveSync m_threadSync;
 	dgInt32* m_soaRowStart;
 	dgInt32* m_bodyRowStart;
 
@@ -319,7 +315,6 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_solverPasses(0)
 	,m_threadCounts(0)
 	,m_soaRowsCount(0)
-	,m_threadSync()
 	,m_soaRowStart(NULL)
 	,m_bodyRowStart(NULL)
 	,m_massMatrix(allocator)

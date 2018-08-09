@@ -536,9 +536,6 @@ class dgBroadPhase
 	static void UpdateSoftBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
 
-	static void UpdateParallelKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
-	void UpdateParallel(dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
-
 	class dgPendingCollisionSofBodies
 	{
 		public:
@@ -557,7 +554,6 @@ class dgBroadPhase
 	dgInt32 m_pendingSoftBodyPairsCount;
 	dgInt32 m_contacJointLock;
 	dgInt32 m_criticalSectionLock;
-	dgThreadHiveSync m_threadSync;
 
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;

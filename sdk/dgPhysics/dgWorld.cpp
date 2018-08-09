@@ -960,7 +960,6 @@ void dgWorld::RunStep ()
 	}
 	zzzz++;
 
-
 	DG_TRACKTIME(__FUNCTION__);
 	dgUnsigned64 timeAcc = dgGetTimeInMicrosenconds();
 	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
@@ -994,6 +993,10 @@ void dgWorld::RunStep ()
 	if (!m_concurrentUpdate) {
 		m_mutex.Release();
 	}
+
+//	std::atomic<int> value;
+//	value.fetch_add(5, std::memory_order_release);
+//	value.fetch_add(1, std::memory_order_relaxed);
 }
 
 void dgWorld::TickCallback (dgInt32 threadID)
