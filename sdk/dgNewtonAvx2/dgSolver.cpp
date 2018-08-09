@@ -1173,15 +1173,16 @@ void dgSolver::ParallelSolver(dgInt32 threadID)
 
 	UpdateForceFeedback(threadID);
 	m_threadSync.Sync1();
+
 	dgInt32 hasJointFeeback = 0;
 	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
 		hasJointFeeback |= m_hasJointFeeback[i];
 	}
-	m_threadSync.Sync0();
 
 	CalculateBodiesAcceleration(threadID);
+	m_threadSync.Sync0();
+
 	if (hasJointFeeback) {
-		m_threadSync.Sync1();
 		UpdateKinematicFeedback(threadID);
 	}
 }
