@@ -54,10 +54,8 @@ class dgBodyMasterListRow: public dgList<dgBodyMasterListCell>
 
 	void RemoveContactJoint (dgListNode* const link);
 	void RemoveBilateralJoint (dgListNode* const link);
-
 	void RemoveAllJoints ();
-	void OrderContactJoint(dgBodyMasterListRow::dgListNode* const node);
-
+	
 	dgBody* m_body;
 	friend class dgBodyMasterList;
 };
@@ -72,7 +70,6 @@ class dgBodyMasterList: public dgList<dgBodyMasterListRow>
 	void RemoveBody (dgBody* const body);
 	void RemoveConstraint (dgConstraint* const constraint);
 	void AttachConstraint (dgConstraint* const constraint, dgBody* const body0, dgBody* const body1);
-	void OrderContactJoint(dgContact* const contact);
 
 	dgContact* FindContactJoint (const dgBody* body0, const dgBody* body1) const;
 	dgBilateralConstraint* FindBilateralJoint (const dgBody* body0, const dgBody* body1) const;

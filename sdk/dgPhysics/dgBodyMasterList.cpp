@@ -38,26 +38,10 @@ dgBodyMasterListRow::~dgBodyMasterListRow()
 	dgAssert (GetCount() == 0);
 }
 
-void dgBodyMasterListRow::OrderContactJoint(dgBodyMasterListRow::dgListNode* const node)
-{
-	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
-
-	dgContact* const contact = (dgContact*)node->GetInfo().m_joint;
-	if (contact->m_maxDOF) {
-		RotateToBegin(node);
-	} else {
-		dgListNode* ptr = GetLast();
-		for (; ptr && (ptr->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint); ptr = ptr->GetPrev());
-		if (ptr && (ptr != node)) {
-			InsertAfter(ptr, node);
-		}
-	}
-}
-
 dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstraint* const joint, dgBody* const body)
 {
-// no need for lock since this is called from the main thread only
-//	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
+	//no need for lock since this is called from the main thread only
+	//dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 
 	dgListNode* node;
 	dgContact* const contact = (dgContact*)joint;
@@ -336,25 +320,12 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 	}
 }
 
-void dgBodyMasterList::OrderContactJoint(dgContact* const contact)
-{
-	dgBody* const body0 = contact->m_body0;
-	dgBody* const body1 = contact->m_body1;
-	dgAssert(body0);
-	dgAssert(body1);
-	dgBodyMasterListRow& row0 = body0->m_masterNode->GetInfo();
-	dgBodyMasterListRow& row1 = body1->m_masterNode->GetInfo();
-	row0.OrderContactJoint(contact->GetLink0());
-	row1.OrderContactJoint(contact->GetLink1());
-}
-
 DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) const
 {
 	dgUnsigned32 val0 = body->IsRTTIType(dgBody::m_dynamicBodyRTTI) ? (body->GetInvMass().m_w > 0.0f) << 30 : 0;
 	dgUnsigned32 val1 = body->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? 1<<29 : 0;
 	return body->m_uniqueID | val0 | val1;
 }
-
 
 void dgBodyMasterList::SortMasterList()
 {

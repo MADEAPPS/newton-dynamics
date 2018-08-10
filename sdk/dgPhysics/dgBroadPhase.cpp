@@ -1491,7 +1491,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	DG_TRACKTIME(__FUNCTION__);
 	dgContactsList::dgListNode* node = nodePtr;
 	dgContactsList* const contactList = m_world;
-	dgBodyMasterList* const masterList = m_world;
 	const dgFloat32 timestep = descriptor->m_timestep;
 	const dgInt32 threadCount = m_world->GetThreadCount();
 	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
@@ -1499,7 +1498,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	while (node) {
 		dgContact* const contact = node->GetInfo();
 
-		bool stateChange = contact->m_maxDOF ? true : false;
 		const dgBody* const body0 = contact->GetBody0();
 		const dgBody* const body1 = contact->GetBody1();
 		if (!(body0->m_equilibrium & body1->m_equilibrium)) {
@@ -1553,11 +1551,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 			}
 		} else {
 			contact->m_broadphaseLru = m_lru;
-		}
-
-		stateChange = stateChange ^ (contact->m_maxDOF ? true : false);
-		if (stateChange) {
-			masterList->OrderContactJoint(contact);
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
