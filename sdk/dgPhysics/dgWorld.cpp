@@ -194,7 +194,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgBodyCollisionList(allocator)
 	,dgSkeletonList(allocator)
 	,dgInverseDynamicsList(allocator)
-	,dgContactsList(allocator) 
+	,dgContactList(allocator) 
 	,dgWorldDynamicUpdate(allocator)
 	,dgMutexThread("newtonMainThread", 0)
 	,dgWorldThreadPool(allocator)
@@ -539,7 +539,6 @@ void dgWorld::DestroyBody(dgBody* const body)
 	delete body;
 }
 
-
 void dgWorld::DestroyConstraint(dgConstraint* const constraint)
 {
 	RemoveConstraint (constraint);
@@ -860,8 +859,8 @@ bool dgWorld::AreBodyConnectedByJoints (dgBody* const originSrc, dgBody* const t
 void dgWorld::FlushCache()
 {
 	// delete all contacts
-	dgContactsList& contactList = *this;
-	for (dgContactsList::dgListNode* contactNode = contactList.GetFirst(); contactNode; ) {
+	dgContactList& contactList = *this;
+	for (dgContactList::dgListNode* contactNode = contactList.GetFirst(); contactNode; ) {
 		dgContact* contact;
 		contact = contactNode->GetInfo();
 		contactNode = contactNode->GetNext();
@@ -1089,6 +1088,12 @@ void dgWorld::ResetBroadPhase()
 	m_broadPhase->MoveNodes(newBroadPhase);
 	delete m_broadPhase;
 	m_broadPhase = newBroadPhase;
+}
+
+dgContact* dgWorld::FindContactJoint (const dgBody* body0, const dgBody* body1) const
+{
+	dgAssert (m_broadPhase);
+	return m_broadPhase->m_contactCache.FindContactJoint(body0, body1);
 }
 
 dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootBone)

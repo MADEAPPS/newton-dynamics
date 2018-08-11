@@ -161,7 +161,7 @@ class dgWorld
 	,public dgBodyCollisionList
 	,public dgSkeletonList
 	,public dgInverseDynamicsList
-	,public dgContactsList 
+	,public dgContactList 
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
 	,public dgWorldThreadPool
@@ -392,6 +392,7 @@ class dgWorld
 
 	dgContactMaterial* GetFirstMaterial () const;
 	dgContactMaterial* GetNextMaterial (dgContactMaterial* material) const;
+	dgContact* FindContactJoint (const dgBody* body0, const dgBody* body1) const;
 
 	void SetThreadsCount (dgInt32 count);
 	
@@ -446,7 +447,7 @@ class dgWorld
 	
 	void SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	void SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-
+	
 	dgFloat32 CalculateTimeToImpact (dgContact* const contactJoint, dgFloat32 timestep, dgInt32 threadIndex, dgVector& p, dgVector& q, dgVector& normal, dgFloat32 dist) const;
 	dgInt32 ClosestPoint (dgCollisionParamProxy& proxy) const;
 	//dgInt32 ClosestCompoundPoint (dgBody* const compoundConvexA, dgBody* const collisionB, dgTriplex& contactA, dgTriplex& contactB, dgTriplex& normalAB, dgInt32 threadIndex) const;
@@ -460,7 +461,6 @@ class dgWorld
 	void AddSentinelBody();
 	void InitConvexCollision ();
 	
-
 	virtual void Execute (dgInt32 threadID);
 	virtual void TickCallback (dgInt32 threadID);
 	void UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID);
@@ -526,7 +526,7 @@ class dgWorld
 	friend class dgDeadBodies;
 	friend class dgDeadJoints;
 	friend class dgWorldPlugin;
-	friend class dgContactsList;
+	friend class dgContactList;
 	friend class dgUserConstraint;
 	friend class dgBodyMasterList;
 	friend class dgJacobianMemory;

@@ -117,7 +117,7 @@ dgContact::~dgContact()
 	dgList<dgContactMaterial>::RemoveAll();
 
 	if (m_contactNode) {
-		dgContactsList* const activeContacts = m_world;
+		dgContactList* const activeContacts = m_world;
 		activeContacts->Remove (m_contactNode);
 	}
 }
@@ -125,7 +125,7 @@ dgContact::~dgContact()
 void dgContact::AppendToContactList()
 {
 	dgAssert (!m_contactNode);
-	dgContactsList* const contactsList = m_world;
+	dgContactList* const contactsList = m_world;
 	m_contactNode = contactsList->Addtop(this);
 }
 

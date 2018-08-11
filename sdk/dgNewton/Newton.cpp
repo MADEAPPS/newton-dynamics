@@ -1867,22 +1867,19 @@ NewtonCollision* NewtonMaterialGetBodyCollidingShape(const NewtonMaterial* const
 }
 
 
-dFloat NewtonMaterialGetContactPruningTolerance(const NewtonBody* const body0, const NewtonBody* const body1)
+//dFloat NewtonMaterialGetContactPruningTolerance(const NewtonBody* const body0, const NewtonBody* const body1)
+dFloat NewtonMaterialGetContactPruningTolerance(const NewtonJoint* const contactJointPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	const dgBody* const bodyPtr0 = (dgBody*)body0;
-	const dgBody* const bodyPtr1 = (dgBody*)body1;
-	const dgContact* const contact = bodyPtr0->GetWorld()->FindContactJoint(bodyPtr0, bodyPtr1);
-	dgAssert(contact);
+	dgContact* const contact = (dgContact*) contactJointPtr;
 	return contact->GetPruningTolerance ();
 }
 
-void NewtonMaterialSetContactPruningTolerance(const NewtonBody* const body0, const NewtonBody* const body1, dFloat tolerance)
+void NewtonMaterialSetContactPruningTolerance(const NewtonJoint* const contactJointPtr, dFloat tolerance)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	const dgBody* const bodyPtr0 = (dgBody*)body0;
-	const dgBody* const bodyPtr1 = (dgBody*)body1;
-	dgContact* const contact = bodyPtr0->GetWorld()->FindContactJoint(bodyPtr0, bodyPtr1);
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContact* const contact = (dgContact*) contactJointPtr;
 	dgAssert(contact);
 	contact->SetPruningTolerance (dgMax (tolerance, dFloat (1.0e-3f)));
 }
@@ -5275,6 +5272,23 @@ NewtonJoint* NewtonBodyGetNextContactJoint(const NewtonBody* const bodyPtr, cons
 }
 
 
+/*!
+  Return a pointer to the next contact joint the connect these two bodies, if the are colliding
+
+  @param *body0 pointer to one body.
+  @param *body1 pointer to secund body.
+
+  @return Contact if the body is colliding with anther body, NULL otherwise
+
+  See also: ::NewtonBodyGetFirstContactJoint, ::NewtonContactJointGetFirstContact, ::NewtonContactJointGetNextContact, ::NewtonContactJointRemoveContact
+*/
+NewtonJoint* NewtonBodyFindContact(const NewtonBody* const body0, const NewtonBody* const body1)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	const dgBody* const bodyPtr0 = (dgBody*)body0;
+	const dgBody* const bodyPtr1 = (dgBody*)body1;
+	return (NewtonJoint*)bodyPtr0->GetWorld()->FindContactJoint(bodyPtr0, bodyPtr1);
+}
 
 int NewtonJointIsActive(const NewtonJoint* const jointPtr)
 {

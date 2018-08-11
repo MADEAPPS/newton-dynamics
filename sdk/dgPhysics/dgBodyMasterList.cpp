@@ -38,26 +38,11 @@ dgBodyMasterListRow::~dgBodyMasterListRow()
 	dgAssert (GetCount() == 0);
 }
 
-dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstraint* const joint, dgBody* const body)
+DG_INLINE dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgContact* const joint, dgBody* const body)
 {
 	//no need for lock since this is called from the main thread only
 	//dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
-
-	dgListNode* node;
-	dgContact* const contact = (dgContact*)joint;
-	if (contact->m_maxDOF) {
-		node = Addtop();
-	} else {
-		node = Append();
-		dgListNode* ptr = node->GetPrev();
-		if (ptr) {
-			for (; ptr && (ptr->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint); ptr = ptr->GetPrev());
-			if (ptr) {
-				InsertAfter(ptr, node);
-			}
-		}
-	}
-
+	dgListNode* const node = Addtop();
 	node->GetInfo().m_joint = joint;
 	node->GetInfo().m_bodyNode = body;
 	return node;
@@ -102,43 +87,14 @@ void dgBodyMasterListRow::RemoveBilateralJoint (dgListNode* const link)
 	m_body->m_world->GlobalUnlock();
 }
 
-
-dgContact* dgBodyMasterListRow::FindContactJoint (const dgBody* const otherBody) const
+DG_INLINE dgBilateralConstraint* dgBodyMasterListRow::FindBilateralJoint (const dgBody* const otherBody) const
 {
-	dgAssert (0);
-//	if (m_body->m_masterNode->GetInfo().m_contactCount) {
-//		dgInt32 key = otherBody->m_uniqueID;
-//		dgBodyMasterListRow::dgListNode* link = NULL;
-//		if (key < m_acceleratedSearch[0]->GetInfo().m_bodyNode->m_uniqueID) {
-//			link = (key < m_acceleratedSearch[1]->GetInfo().m_bodyNode->m_uniqueID) ? GetFirst() : m_acceleratedSearch[1];
-//		} else {
-//			link = (key < m_acceleratedSearch[2]->GetInfo().m_bodyNode->m_uniqueID) ? m_acceleratedSearch[0] : m_acceleratedSearch[2];
-//		}
-//		for (; link && (key >= link->GetInfo().m_bodyNode->m_uniqueID); link = link->GetNext()) {
-		for (dgBodyMasterListRow::dgListNode* link = GetFirst(); link; link = link->GetNext()) {
-			dgConstraint* const constraint = link->GetInfo().m_joint;
-			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
-				return NULL;
-			}
-			if (link->GetInfo().m_bodyNode == otherBody) {
-				return (dgContact*)constraint;
-			}
-		}
-//	}
-	return NULL;
-}
-
-dgBilateralConstraint* dgBodyMasterListRow::FindBilateralJoint (const dgBody* const otherBody) const
-{
-	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
-	for (dgBodyMasterListRow::dgListNode* link = GetLast(); link; link = link->GetPrev()) {
-		dgConstraint* const constraint = link->GetInfo().m_joint;
-		if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-			return NULL;
-		}
+	//no need for lock since this is called from the main thread only
+	//dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
+	for (dgBodyMasterListRow::dgListNode* link = GetLast(); link && (link->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint); link = link->GetPrev()) {
 		if (link->GetInfo().m_bodyNode == otherBody) {
-			dgAssert (constraint->IsBilateral());
-			return (dgBilateralConstraint*) constraint;
+			dgAssert (link->GetInfo().m_joint->IsBilateral());
+			return (dgBilateralConstraint*) link->GetInfo().m_joint;
 		}
 	}
 	return NULL;
@@ -146,7 +102,6 @@ dgBilateralConstraint* dgBodyMasterListRow::FindBilateralJoint (const dgBody* co
 
 void dgBodyMasterListRow::SortList()
 {
-	//dgThreadHiveScopeLock lock (m_body->m_world, &m_body->m_criticalSectionLock);
 	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	if (GetFirst()) {
 		dgAssert (GetFirst()->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint);
@@ -223,27 +178,16 @@ dgBodyMasterListRow::dgListNode* dgBodyMasterList::FindConstraintLink (const dgB
 	return NULL;
 }
 
-dgContact* dgBodyMasterList::FindContactJoint (const dgBody* body0, const dgBody* body1) const
-{
-	dgInt32 count0 = body0->m_masterNode->GetInfo().GetCount();
-	dgInt32 count1 = body1->m_masterNode->GetInfo().GetCount();
-	if (count0 > count1) {
-		dgSwap(body0, body1);
-	}
-	dgContact* const contact = body0->m_masterNode->GetInfo().FindContactJoint (body1);
-	dgAssert (contact || !FindConstraintLink (body0, body1) || FindConstraintLink (body0, body1)->GetInfo().m_joint->IsBilateral());
-	return contact;
-}
 
 dgBilateralConstraint* dgBodyMasterList::FindBilateralJoint (const dgBody* body0, const dgBody* body1) const
 {
 	return body0->m_masterNode->GetInfo().FindBilateralJoint (body1);
 }
 
-void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* const body0, dgBody* const srcbody1)
+void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* const body0, dgBody* const otherBody)
 {
 	dgAssert (body0);
-	dgBody* body1 = srcbody1;
+	dgBody* body1 = otherBody;
 	if (!body1) {
 		body1 = body0->GetWorld()->GetSentinelBody();
 	}
@@ -252,18 +196,15 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 	constraint->m_body0 = body0;
 	constraint->m_body1 = body1;
 
-	if (constraint->GetId() != dgConstraint::m_contactConstraint) {
-		dgWorld* const world = body0->GetWorld();
-		world->m_skelListIsDirty = world->m_skelListIsDirty || (constraint->m_solverModel != 2);
+	dgAssert(constraint->GetId() != dgConstraint::m_contactConstraint);
 
-		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
-		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
-		constraint->m_link0 = body0->m_masterNode->GetInfo().AddBilateralJoint (constraint, body1);
-		constraint->m_link1 = body1->m_masterNode->GetInfo().AddBilateralJoint (constraint, body0);
-	} else {
-		constraint->m_link0 = body0->m_masterNode->GetInfo().AddContactJoint (constraint, body1);
-		constraint->m_link1 = body1->m_masterNode->GetInfo().AddContactJoint (constraint, body0);
-	}
+	dgWorld* const world = body0->GetWorld();
+	world->m_skelListIsDirty = world->m_skelListIsDirty || (constraint->m_solverModel != 2);
+
+	body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
+	body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+	constraint->m_link0 = body0->m_masterNode->GetInfo().AddBilateralJoint (constraint, body1);
+	constraint->m_link1 = body1->m_masterNode->GetInfo().AddBilateralJoint (constraint, body0);
 	dgAtomicExchangeAndAdd((dgInt32*) &m_constraintCount, 1);
 }
 
@@ -318,6 +259,47 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 		row0.RemoveBilateralJoint(constraint->m_link0);
 		row1.RemoveBilateralJoint(constraint->m_link1);
 	}
+}
+
+void dgBodyMasterList::AttachContact(dgContact* const contact)
+{
+	dgBody* const body0 = contact->m_body0;
+	dgBody* const body1 = contact->m_body1;
+	contact->m_link0 = body0->m_masterNode->GetInfo().AddContactJoint(contact, body1);
+	contact->m_link1 = body1->m_masterNode->GetInfo().AddContactJoint(contact, body0);
+	m_constraintCount++;
+}
+
+void dgBodyMasterList::RemoveContact(dgContact* const contact)
+{
+	m_constraintCount --;
+	dgAssert(((dgInt32)m_constraintCount) >= 0);
+	dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
+	dgAssert(!contact->m_maxDOF);
+
+	dgBody* const body0 = contact->m_body0;
+	dgBody* const body1 = contact->m_body1;
+	dgAssert(body0);
+	dgAssert(body1);
+	dgAssert(body0 == contact->m_link1->GetInfo().m_bodyNode);
+	dgAssert(body1 == contact->m_link0->GetInfo().m_bodyNode);
+
+	dgBodyMasterListRow& row0 = body0->m_masterNode->GetInfo();
+	dgBodyMasterListRow& row1 = body1->m_masterNode->GetInfo();
+
+//	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+//		dgDynamicBody* const dynBody0 = (dgDynamicBody*)body0;
+//		dynBody0->m_savedExternalForce = dgVector(dgFloat32(0.0f));
+//		dynBody0->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
+//	}
+//	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+//		dgDynamicBody* const dynBody1 = (dgDynamicBody*)body1;
+//		dynBody1->m_savedExternalForce = dgVector(dgFloat32(0.0f));
+//		dynBody1->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
+//	}
+	
+	row0.Remove(contact->m_link0);
+	row1.Remove(contact->m_link1);
 }
 
 DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) const

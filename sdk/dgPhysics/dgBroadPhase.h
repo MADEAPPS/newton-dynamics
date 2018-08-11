@@ -469,7 +469,7 @@ class dgBroadPhase
 	virtual void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
 
 	void RemoveOldContacts();
-	void AttachNewContacts(dgContactsList::dgListNode* const lastNode);
+	void AttachNewContacts(dgContactList::dgListNode* const lastNode);
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)
 	{
@@ -522,9 +522,9 @@ class dgBroadPhase
 	
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID);
-	void UpdateRigidBodyContacts (dgBroadphaseSyncDescriptor* const descriptor, dgContactsList::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
+	void UpdateRigidBodyContacts (dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
-	void AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactsList::dgListNode* const nodeConstactNode, dgInt32 threadID);
+	void AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodeConstactNode, dgInt32 threadID);
 		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);

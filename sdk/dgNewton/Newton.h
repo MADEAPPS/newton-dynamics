@@ -611,8 +611,10 @@ extern "C" {
 	NEWTON_API void NewtonMaterialSetContactTangentAcceleration (const NewtonMaterial* const material, dFloat accel, int index);
 	NEWTON_API void NewtonMaterialContactRotateTangentDirections (const NewtonMaterial* const material, const dFloat* const directionVector);
 
-	NEWTON_API dFloat NewtonMaterialGetContactPruningTolerance (const NewtonBody* const body0, const NewtonBody* const body1);
-	NEWTON_API void NewtonMaterialSetContactPruningTolerance (const NewtonBody* const body0, const NewtonBody* const body1, dFloat tolerance);
+	//NEWTON_API dFloat NewtonMaterialGetContactPruningTolerance (const NewtonBody* const body0, const NewtonBody* const body1);
+	//NEWTON_API void NewtonMaterialSetContactPruningTolerance (const NewtonBody* const body0, const NewtonBody* const body1, dFloat tolerance);
+	NEWTON_API dFloat NewtonMaterialGetContactPruningTolerance(const NewtonJoint* const contactJoint);
+	NEWTON_API void NewtonMaterialSetContactPruningTolerance(const NewtonJoint* const contactJoint, dFloat tolerance);
 
 	// **********************************************************************************************
 	//
@@ -964,8 +966,10 @@ extern "C" {
 
 	NEWTON_API NewtonJoint* NewtonBodyGetFirstJoint (const NewtonBody* const body);
 	NEWTON_API NewtonJoint* NewtonBodyGetNextJoint (const NewtonBody* const body, const NewtonJoint* const joint);
+
 	NEWTON_API NewtonJoint* NewtonBodyGetFirstContactJoint (const NewtonBody* const body);
 	NEWTON_API NewtonJoint* NewtonBodyGetNextContactJoint (const NewtonBody* const body, const NewtonJoint* const contactJoint);
+	NEWTON_API NewtonJoint* NewtonBodyFindContact (const NewtonBody* const body0, const NewtonBody* const body1);
 	
 	// **********************************************************************************************
 	//

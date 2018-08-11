@@ -19,6 +19,14 @@
 
 static int UserOnAABBOverlap (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
+	#ifdef _DEBUG
+	NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+	NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+	NewtonJoint* const contact0 = NewtonBodyFindContact (body0, body1);
+	NewtonJoint* const contact1 = NewtonBodyFindContact (body1, body0);
+	dAssert (!contact0 || contact0 == contactJoint);
+	dAssert (!contact1 || contact1 == contactJoint);
+	#endif	
 	return 1;
 }
 

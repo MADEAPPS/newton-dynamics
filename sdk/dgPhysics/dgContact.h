@@ -38,10 +38,10 @@ class dgCollisionInstance;
 #define DG_RESTING_CONTACT_PENETRATION	(DG_PENETRATION_TOL + dgFloat32 (1.0f / 1024.0f))
 #define DG_DIAGONAL_PRECONDITIONER		dgFloat32 (25.0f)
 
-class dgContactsList: public dgList<dgContact*>
+class dgContactList: public dgList<dgContact*>
 {
 	public:
-	dgContactsList(dgMemoryAllocator* const allocator)
+	dgContactList(dgMemoryAllocator* const allocator)
 		:dgList<dgContact*>(allocator)
 //		,m_activeContacts(0)
 		,m_deadContactsCount(0)
@@ -50,7 +50,7 @@ class dgContactsList: public dgList<dgContact*>
 
 //	dgInt32 m_activeContacts;
 	dgInt32 m_deadContactsCount;
-	dgContactsList::dgListNode* m_deadContacts[128];
+	dgContactList::dgListNode* m_deadContacts[128];
 };
 
 
@@ -226,7 +226,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgFloat32 m_timeOfImpact;
 	dgWorld* m_world;
 	const dgContactMaterial* m_material;
-	dgContactsList::dgListNode* m_contactNode;
+	dgContactList::dgListNode* m_contactNode;
 	dgFloat32 m_contactPruningTolereance;
 	dgUnsigned32 m_broadphaseLru;
 	dgUnsigned32 m_isNewContact				: 1;
@@ -235,7 +235,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
     friend class dgBody;
 	friend class dgWorld;
 	friend class dgBroadPhase;
-	friend class dgContactsList;
+	friend class dgContactList;
 	friend class dgContactSolver;
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;

@@ -1440,7 +1440,7 @@ void dgBroadPhase::AddNewContactsKernel(void* const context, void* const newCont
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	broadPhase->AddNewContacts(descriptor, (dgContactsList::dgListNode*) newContactNode, threadID);
+	broadPhase->AddNewContacts(descriptor, (dgContactList::dgListNode*) newContactNode, threadID);
 }
 
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
@@ -1464,7 +1464,7 @@ void dgBroadPhase::UpdateRigidBodyContactKernel(void* const context, void* const
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	broadPhase->UpdateRigidBodyContacts(descriptor, (dgContactsList::dgListNode*) node, descriptor->m_timestep, threadID);
+	broadPhase->UpdateRigidBodyContacts(descriptor, (dgContactList::dgListNode*) node, descriptor->m_timestep, threadID);
 }
 
 void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID)
@@ -1486,11 +1486,11 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 	}
 }
 
-void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactsList::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
+void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
 {
 	DG_TRACKTIME(__FUNCTION__);
-	dgContactsList::dgListNode* node = nodePtr;
-	dgContactsList* const contactList = m_world;
+	dgContactList::dgListNode* node = nodePtr;
+	dgContactList* const contactList = m_world;
 	const dgFloat32 timestep = descriptor->m_timestep;
 	const dgInt32 threadCount = m_world->GetThreadCount();
 	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
@@ -1559,12 +1559,12 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	}
 }
 
-void dgBroadPhase::AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactsList::dgListNode* const nodeConstactNode, dgInt32 threadID)
+void dgBroadPhase::AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodeConstactNode, dgInt32 threadID)
 {
 	const dgFloat32 timestep = descriptor->m_timestep;
 	const dgInt32 threadCount = m_world->GetThreadCount();
 
-	dgContactsList::dgListNode* node = nodeConstactNode;
+	dgContactList::dgListNode* node = nodeConstactNode;
 	while (node) {
 		dgContact* const contact = node->GetInfo();
 		AddPair(contact, timestep, threadID);
@@ -1576,15 +1576,15 @@ void dgBroadPhase::AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, 
 	}
 }
 
-void dgBroadPhase::AttachNewContacts(dgContactsList::dgListNode* const lastNode)
+void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 {
 	DG_TRACKTIME(__FUNCTION__);
-	dgContactsList* const contactList = m_world;
+	dgContactList* const contactList = m_world;
 //	m_world->m_jointsMemory.ResizeIfNecessary(contactList->GetCount() * sizeof(dgJointInfo));
 //	dgJointInfo* const constraintArray = (dgJointInfo*)&m_world->m_jointsMemory[0];
-	for (dgContactsList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
+	for (dgContactList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
 		dgContact* const contact = contactNode->GetInfo();
-		m_world->AttachConstraint(contact, contact->m_body0, contact->m_body1);
+		m_world->AttachContact(contact);
 		m_contactCache.AddContactJoint(contact);
 
 //		if (contact->m_maxDOF) {
@@ -1597,12 +1597,14 @@ void dgBroadPhase::AttachNewContacts(dgContactsList::dgListNode* const lastNode)
 void dgBroadPhase::RemoveOldContacts()
 {
 	DG_TRACKTIME(__FUNCTION__);
-	dgContactsList* const contactList = m_world;
+	dgContactList* const contactList = m_world;
 	const dgInt32 count = dgMin(contactList->m_deadContactsCount, dgInt32 (sizeof(contactList->m_deadContacts) / sizeof(contactList->m_deadContacts[0])));
 	for (dgInt32 i = 0; i < count; i++) {
 		dgContact* const contact = contactList->m_deadContacts[i]->GetInfo();
 		m_contactCache.RemoveContactJoint(contact);
-		m_world->DestroyConstraint(contact);
+//		m_world->DestroyConstraint(contact);
+		m_world->RemoveContact(contact);
+		delete contact;
 	}
 }
 
@@ -1634,9 +1636,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		}
 	}
 
-	dgContactsList* const contactList = m_world;
+	dgContactList* const contactList = m_world;
 	contactList->m_deadContactsCount = 0;
-	dgContactsList::dgListNode* const lastNode = contactList->GetFirst();
+	dgContactList::dgListNode* const lastNode = contactList->GetFirst();
 
 	node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1645,7 +1647,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
-	dgContactsList::dgListNode* contactListNode = contactList->GetFirst();
+	dgContactList::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
 		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
@@ -1666,7 +1668,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
-	dgContactsList::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
+	dgContactList::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(AddNewContactsKernel, &syncPoints, newContact, "dgBroadPhase::AddNewContacts");
 		newContact = newContact ? newContact->GetPrev() : NULL;

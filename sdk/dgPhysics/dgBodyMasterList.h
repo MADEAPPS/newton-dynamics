@@ -46,10 +46,8 @@ class dgBodyMasterListRow: public dgList<dgBodyMasterListCell>
 	void SortList();
 	void SetBody(dgBody* const body) {m_body = body;}
 
-	dgContact* FindContactJoint (const dgBody* const body) const;
 	dgBilateralConstraint* FindBilateralJoint (const dgBody* const body) const;
-
-	dgListNode* AddContactJoint (dgConstraint* const joint, dgBody* const body);
+	dgListNode* AddContactJoint (dgContact* const contact, dgBody* const body);
 	dgListNode* AddBilateralJoint (dgConstraint* const joint, dgBody* const body);
 
 	void RemoveContactJoint (dgListNode* const link);
@@ -71,9 +69,10 @@ class dgBodyMasterList: public dgList<dgBodyMasterListRow>
 	void RemoveConstraint (dgConstraint* const constraint);
 	void AttachConstraint (dgConstraint* const constraint, dgBody* const body0, dgBody* const body1);
 
-	dgContact* FindContactJoint (const dgBody* body0, const dgBody* body1) const;
-	dgBilateralConstraint* FindBilateralJoint (const dgBody* body0, const dgBody* body1) const;
+	void AttachContact(dgContact* const contact);
+	void RemoveContact(dgContact* const contact);
 
+	dgBilateralConstraint* FindBilateralJoint (const dgBody* body0, const dgBody* body1) const;
 	dgBodyMasterListRow::dgListNode* FindConstraintLink (const dgBody* const body0, const dgBody* const body1) const;
 	dgUnsigned32 MakeSortMask(const dgBody* const body) const;
 	void SortMasterList();
