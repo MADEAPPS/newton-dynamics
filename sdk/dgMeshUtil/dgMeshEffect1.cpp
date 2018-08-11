@@ -2072,7 +2072,8 @@ void dgMeshEffect::PackPoints (dgFloat64 tol)
 			} while (ptr != edge);
 			dgEdge* const face = AddFace(indexCount, index, userData);
 			if (!face) {
-				dgAssert (0);
+				dgTrace (("skiping degeneraded face\n"));
+				//dgAssert (0);
 			}
 		}
 	}
