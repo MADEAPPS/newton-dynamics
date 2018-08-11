@@ -224,7 +224,6 @@ DemoEntityManager::DemoEntityManager ()
 	,m_solverPasses(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
-	,m_fileBrowser("Select file name")
 	,m_showUI(true)
 	,m_showAABB(false)
 	,m_showStats(true)
@@ -832,14 +831,9 @@ void DemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
 
 bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 {
-	posX = 0;
-	posY = 0;
-//	const ImGuiIO& io = ImGui::GetIO();
 	ImVec2 posit(ImGui::GetMousePos());
-//	if (ImGui::IsMousePosValid(&io.MousePos) && ImGui::IsMousePosValid(&io.MousePosPrev)) {
-		posX = int (posit.x);
-		posY = int (posit.y);
-//	}
+	posX = int (posit.x);
+	posY = int (posit.y);
 	return true;
 }
 
@@ -1451,107 +1445,6 @@ void DemoEntityManager::RenderScene()
 	glPopMatrix();
 }
 
-DemoEntityManager::FileBrowserModal::FileBrowserModal(const char* const title)
-	:m_title(title)
-	,m_modalMode(false)
-	,m_modalMode____(false)
-	//m_oldVisibility(false),
-	//m_selection(0),
-	//m_currentPath(fs::current_path()),
-	//m_currentPathIsDir(true)
-{
-}
-
-void DemoEntityManager::FileBrowserModal::SetModalMode(bool mode)
-{
-//	m_modalMode____ = true;
-}
-
-char* xxxx[] = { "xxxx0", "xxxx1", "xxxx2" };
-bool DemoEntityManager::FileBrowserModal::GetNameItemCallback(void* data, int idx, const char** out_text) 
-{
-	const char** xxxxxxx = (const char**)data;
-	*out_text = xxxxxxx[idx];
-	return true;
-}
-
-void DemoEntityManager::FileBrowserModal::Update()
-{
-	if (!m_modalMode____) {
-		return;
-	}
-
-	if (!m_modalMode) {
-		m_modalMode = true;
-		ImGui::OpenPopup(m_title.GetStr());
-	}
-
-	bool isOpen = true;
-	int modal_flags =
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_AlwaysAutoResize;
-
-	if (ImGui::BeginPopupModal(m_title.GetStr(), &isOpen, modal_flags)) {
-		int selection;
-		if (ImGui::ListBox("##", &selection, GetNameItemCallback, xxxx, 3, -1)) {
-			strcpy(ssssssssss, xxxx[selection]);
-/*
-			//Update current path to the selected list item.
-			m_currentPath = m_filesInScope[m_selection].path;
-			m_currentPathIsDir = fs::is_directory(m_currentPath);
-
-			//If the selection is a directory, repopulate the list with the contents of that directory.
-			if (m_currentPathIsDir) {
-				get_files_in_path(m_currentPath, m_filesInScope);
-			}
-*/
-		}
-
-		//Auto resize text wrap to popup width.
-//		ImGui::PushItemWidth(-1);
-//		ImGui::TextWrapped(m_currentPath.string().data());
-//		ImGui::TextWrapped("zzzzzzzzzzzz");
-		ImGui::Text("");
-		ImGui::Text("zzzzzzzzzzzz");
-		ImGui::SetKeyboardFocusHere();
-		ImGui::InputText("", ssssssssss, sizeof (ssssssssss));
-//		ImGui::PopItemWidth();
-
-		ImGui::Spacing();
-		ImGui::SameLine(ImGui::GetWindowWidth() - 60);
-/*
-		// Make the "Select" button look / act disabled if the current selection is a directory.
-		if (m_currentPathIsDir) {
-			static const ImVec4 disabledColor = { 0.3f, 0.3f, 0.3f, 1.0f };
-
-			ImGui::PushStyleColor(ImGuiCol_Button, disabledColor);
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, disabledColor);
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, disabledColor);
-
-			ImGui::Button("Select");
-
-			ImGui::PopStyleColor();
-			ImGui::PopStyleColor();
-			ImGui::PopStyleColor();
-
-		} else {
-			if (ImGui::Button("Select")) {
-				ImGui::CloseCurrentPopup();
-
-				outPath = m_currentPath.string();
-				result = true;
-
-				m_modalMode____ = false;
-				m_modalMode = false;
-			}
-		}
-*/
-		ImGui::EndPopup();
-	}
-}
-
 
 
 void DemoEntityManager::Run()
@@ -1560,9 +1453,9 @@ void DemoEntityManager::Run()
     while (!glfwWindowShouldClose(m_mainFrame))
     {
 		m_suspendPhysicsUpdate = false;
+
 		BeginFrame();
 		RenderStats();
-		//m_fileBrowser.Update();
 
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);

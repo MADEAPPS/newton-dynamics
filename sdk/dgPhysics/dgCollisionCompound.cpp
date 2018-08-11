@@ -844,9 +844,9 @@ void dgCollisionCompound::MassProperties ()
 
 
 	dgFloat32 volume = dgFloat32 (0.0f);
-	dgVector origin (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector inertiaII (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector inertiaIJ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector origin (dgFloat32 (0.0f));
+	dgVector inertiaII (dgFloat32 (0.0f));
+	dgVector inertiaIJ (dgFloat32 (0.0f));
 	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgCollisionInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
@@ -855,7 +855,7 @@ void dgCollisionCompound::MassProperties ()
 
 		volume += shapeVolume;
 		origin += shapeInertia.m_posit.Scale3(shapeVolume);
-		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[0][0], shapeInertia[0][0], dgFloat32 (0.0f)).Scale3 (shapeVolume);
+		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[1][1], shapeInertia[2][2], dgFloat32 (0.0f)).Scale3 (shapeVolume);
 		inertiaIJ += dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale3 (shapeVolume);
 	}
 	if (volume > dgFloat32 (0.0f)) { 

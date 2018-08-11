@@ -454,7 +454,6 @@ void dgBody::Unfreeze ()
 	}
 }
 
-
 void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 {
 	dgFloat32 Ixx = inertia[0][0];
@@ -463,6 +462,13 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 	mass = dgAbs (mass);
 	if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI) || m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
 		mass = DG_INFINITE_MASS * 2.0f;
+	}
+
+	if (m_collision->IsType(dgCollision::dgCollisionCompound_RTTI)) {
+		const dgCollision* const childShape = m_collision->GetChildShape();
+		if ((childShape->m_inertia.m_x < dgFloat32 (1.0e-5f)) || (childShape->m_inertia.m_y < dgFloat32 (1.0e-5f)) || (childShape->m_inertia.m_z < dgFloat32 (1.0e-5f))){
+			mass = DG_INFINITE_MASS * 2.0f;
+		}
 	}
 
 	if (mass < DG_MINIMUM_MASS) {

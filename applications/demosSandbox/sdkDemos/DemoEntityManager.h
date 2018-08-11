@@ -23,22 +23,6 @@ class DemoCameraManager;
 
 class DemoEntityManager: public dList <DemoEntity*>
 {
-	class FileBrowserModal
-	{
-		public:
-		FileBrowserModal(const char* const title);
-		void SetModalMode(bool mode);
-		void Update();
-
-		private:
-		static bool GetNameItemCallback(void* data, int idx, const char** outText);
-
-		dString m_title;
-		bool m_modalMode;
-		bool m_modalMode____;
-		char ssssssssss[32];
-	};
-
 	public:
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
 	typedef void (*RenderGuiHelpCallback) (DemoEntityManager* const manager, void* const context);
@@ -201,7 +185,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	int m_workerThreads;
 	int m_debugDisplayMode;
 	int m_collisionDisplayMode;
-	FileBrowserModal m_fileBrowser;
 	
 	bool m_showUI;
 	bool m_showAABB;
