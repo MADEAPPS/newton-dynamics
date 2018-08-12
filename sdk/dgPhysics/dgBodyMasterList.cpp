@@ -275,7 +275,7 @@ void dgBodyMasterList::RemoveContact(dgContact* const contact)
 	m_constraintCount --;
 	dgAssert(((dgInt32)m_constraintCount) >= 0);
 	dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
-	dgAssert(!contact->m_maxDOF);
+//	dgAssert(!contact->m_maxDOF);
 
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
@@ -287,16 +287,21 @@ void dgBodyMasterList::RemoveContact(dgContact* const contact)
 	dgBodyMasterListRow& row0 = body0->m_masterNode->GetInfo();
 	dgBodyMasterListRow& row1 = body1->m_masterNode->GetInfo();
 
-	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		dgDynamicBody* const dynBody0 = (dgDynamicBody*)body0;
-		dynBody0->m_savedExternalForce = dgVector(dgFloat32(0.0f));
-		dynBody0->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
-	}
-	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		dgDynamicBody* const dynBody1 = (dgDynamicBody*)body1;
-		dynBody1->m_savedExternalForce = dgVector(dgFloat32(0.0f));
-		dynBody1->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
-	}
+//	if (contact->m_maxDOF) {
+//		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
+//		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+//	}
+
+//	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+//		dgDynamicBody* const dynBody0 = (dgDynamicBody*)body0;
+//		dynBody0->m_savedExternalForce = dgVector(dgFloat32(0.0f));
+//		dynBody0->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
+//	}
+//	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+//		dgDynamicBody* const dynBody1 = (dgDynamicBody*)body1;
+//		dynBody1->m_savedExternalForce = dgVector(dgFloat32(0.0f));
+//		dynBody1->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
+//	}
 	
 	row0.Remove(contact->m_link0);
 	row1.Remove(contact->m_link1);
