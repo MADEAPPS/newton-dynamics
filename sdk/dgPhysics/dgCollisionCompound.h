@@ -216,13 +216,13 @@ class dgCollisionCompound: public dgCollision
 	static dgInt32 CompareNodes (const dgNodeBase* const nodeA, const dgNodeBase* const nodeB, void* notUsed);
 
 
-	dgFloat32 m_boxMinRadius;
-	dgFloat32 m_boxMaxRadius;
-	dgFloat64 m_treeEntropy;
 	dgWorld* m_world;	
 	dgNodeBase* m_root;
 	const dgCollisionInstance* m_myInstance;
 	dgTreeArray m_array;
+	dgFloat64 m_treeEntropy;
+	dgFloat32 m_boxMinRadius;
+	dgFloat32 m_boxMaxRadius;
 	dgInt32 m_idIndex;
 	dgInt32 m_criticalSectionLock;
 

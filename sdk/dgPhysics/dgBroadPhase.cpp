@@ -50,9 +50,6 @@ dgVector dgBroadPhaseNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROAD
 dgVector dgBroadPhaseNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
 
-static int xxxxxx;
-static bool space = false;
-
 class dgBroadPhase::dgSpliteInfo
 {
 	public:
@@ -291,11 +288,6 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
 				dynamicBody->ApplyExtenalForces(timestep, threadID);
-if (dynamicBody->m_externalForce.m_x != 0) {
-space = true;
-dgTrace (("frame(%d) body(%d) %x %f %f %f\n", xxxxxx, dynamicBody->m_uniqueID, dynamicBody->m_userData, dynamicBody->m_externalForce.m_x, dynamicBody->m_externalForce.m_y, dynamicBody->m_externalForce.m_z));
-}
-
 			}
 		}
 
@@ -1621,11 +1613,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	DG_TRACKTIME(__FUNCTION__);
     m_lru = m_lru + 1;
 	m_pendingSoftBodyPairsCount = 0;
-
-xxxxxx ++;
-if (space)
-dgTrace (("\n"));
-space = false;
 
 	const dgInt32 threadsCount = m_world->GetThreadCount();
 

@@ -138,10 +138,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 		void Reserve (dgInt32 size)
 		{
-			//T dommy;
-			//memset (&dommy, 0, sizeof (T));
-			//dgArray<T>& me = *this;
-			//me[size - 1] = dommy;
 			dgArray<T>::Resize(size);
 			m_count = size;
 		}
@@ -331,6 +327,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	// create a planar Mesh
 	dgMeshEffect(dgMemoryAllocator* const allocator, const dgMatrix& planeMatrix, dgFloat32 witdth, dgFloat32 breadth, dgInt32 material, const dgMatrix& textureMatrix0, const dgMatrix& textureMatrix1);
 	virtual ~dgMeshEffect(void);
+
+	void Init();
 
 	void Trace () const;
 	void SaveOFF (const char* const fileName) const;

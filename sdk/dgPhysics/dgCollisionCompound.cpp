@@ -458,17 +458,15 @@ class dgCollisionCompound::dgSpliteInfo
 };
 
 
-
-
 dgCollisionCompound::dgCollisionCompound(dgWorld* const world)
 	:dgCollision (world->GetAllocator(), 0, m_compoundCollision) 
-	,m_boxMinRadius (dgFloat32 (0.0f))
-	,m_boxMaxRadius (dgFloat32 (0.0f))
-	,m_treeEntropy (dgFloat32 (0.0f))
 	,m_world(world)
 	,m_root(NULL)
 	,m_myInstance(NULL)
 	,m_array (world->GetAllocator())
+	,m_treeEntropy (dgFloat32 (0.0f))
+	,m_boxMinRadius(dgFloat32(0.0f))
+	,m_boxMaxRadius(dgFloat32(0.0f))
 	,m_idIndex(0)
 	,m_criticalSectionLock(0)
 {
@@ -477,13 +475,13 @@ dgCollisionCompound::dgCollisionCompound(dgWorld* const world)
 
 dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source, const dgCollisionInstance* const myInstance)
 	:dgCollision (source) 
-	,m_boxMinRadius(source.m_boxMinRadius)
-	,m_boxMaxRadius(source.m_boxMaxRadius)
-	,m_treeEntropy(source.m_treeEntropy)
 	,m_world (source.m_world)	
 	,m_root(NULL)
 	,m_myInstance(myInstance)
 	,m_array (source.GetAllocator())
+	,m_treeEntropy(source.m_treeEntropy)
+	,m_boxMinRadius(source.m_boxMinRadius)
+	,m_boxMaxRadius(source.m_boxMaxRadius)
 	,m_idIndex(source.m_idIndex)
 	,m_criticalSectionLock(0)
 {
@@ -558,13 +556,13 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source, con
 
 dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber)
 	:dgCollision (world, deserialization, userData, revisionNumber)
-	,m_boxMinRadius (dgFloat32 (0.0f))
-	,m_boxMaxRadius (dgFloat32 (0.0f))
-	,m_treeEntropy (dgFloat32 (0.0f))
 	,m_world(world)
 	,m_root(NULL)
 	,m_myInstance(myInstance)
 	,m_array (world->GetAllocator())
+	,m_treeEntropy(dgFloat32(0.0f))
+	,m_boxMinRadius(dgFloat32(0.0f))
+	,m_boxMaxRadius(dgFloat32(0.0f))
 	,m_idIndex(0)
 	,m_criticalSectionLock(0)
 {

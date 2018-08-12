@@ -122,8 +122,8 @@ void dgMeshEffect::dgPointFormat::CompressData(dgInt32* const indexList)
 	sortContext.m_vertexSortIndex = firstSortAxis;
 	dgSort(indirectList, m_vertex.m_count, dgFormat::CompareVertex, &sortContext);
 
-	const dgFloat64 tolerance = DG_VERTEXLIST_INDEXLIST_TOL * minDist + dgFloat64(1.0e-12f);
-	const dgFloat64 sweptWindow = dgFloat64(2.0f) * tolerance + dgFloat64(1.0e-4f);
+	const dgFloat64 tolerance = dgMin (minDist, dgFloat64 (1.0e-12f));
+	const dgFloat64 sweptWindow = dgFloat64(2.0f) * tolerance + dgFloat64 (1.0e-10f);
 
 	dgInt32 newCount = 0;
 	for (dgInt32 i = 0; i < tmpFormat.m_vertex.m_count; i++) {
@@ -131,21 +131,26 @@ void dgMeshEffect::dgPointFormat::CompressData(dgInt32* const indexList)
 		if (ii == -1) {
 			const dgInt32 i0 = indirectList[i].m_ordinal;
 			const dgInt32 iii = indirectList[i].m_vertexIndex;
-			const dgFloat64 swept = tmpFormat.m_vertex[iii][firstSortAxis] + sweptWindow;
+			const dgBigVector& p = tmpFormat.m_vertex[iii];
+			//const dgFloat64 swept = tmpFormat.m_vertex[iii][firstSortAxis] + sweptWindow;
+			const dgFloat64 swept = p[firstSortAxis] + sweptWindow;
 			for (dgInt32 j = i + 1; j < tmpFormat.m_vertex.m_count; j++) {
 
 				const dgInt32 jj = indirectList[j].m_mask;
 				if (jj == -1) {
 					const dgInt32 j0 = indirectList[j].m_ordinal;
-					const dgInt32 jjj = indirectList[j].m_vertexIndex;;
-					dgFloat64 val = tmpFormat.m_vertex[jjj][firstSortAxis];
+					const dgInt32 jjj = indirectList[j].m_vertexIndex;
+					const dgBigVector& q = tmpFormat.m_vertex[jjj];
+					//dgFloat64 val = tmpFormat.m_vertex[jjj][firstSortAxis];
+					dgFloat64 val = q[firstSortAxis];
 					if (val >= swept) {
 						break;
 					}
 
 					bool test = true;
 					if (iii != jjj) {
-						dgBigVector dp(tmpFormat.m_vertex[iii] - tmpFormat.m_vertex[jjj]);
+						//dgBigVector dp(tmpFormat.m_vertex[iii] - tmpFormat.m_vertex[jjj]);
+						dgBigVector dp(p - q);
 						for (dgInt32 k = 0; k < 3; k++) {
 							test &= (fabs(dp[k]) <= tolerance);
 						}
@@ -276,8 +281,10 @@ void dgMeshEffect::dgAttibutFormat::CompressData (const dgPointFormat& points, d
 	dgAttibutFormat tmpFormat (*this);
 	Clear();
 
-	const dgFloat64 tolerance = DG_VERTEXLIST_INDEXLIST_TOL * minDist + dgFloat64(1.0e-12f);
-	const dgFloat64 sweptWindow = dgFloat64(2.0f) * tolerance + dgFloat64(1.0e-4f);
+//	const dgFloat64 tolerance = DG_VERTEXLIST_INDEXLIST_TOL * minDist + dgFloat64(1.0e-12f);
+//	const dgFloat64 sweptWindow = dgFloat64(2.0f) * tolerance + dgFloat64(1.0e-4f);
+	const dgFloat64 tolerance = dgMin(minDist, dgFloat64(1.0e-12f));
+	const dgFloat64 sweptWindow = dgFloat64(2.0f) * tolerance + dgFloat64(1.0e-10f);
 
 	dgInt32 newCount = 0;
 	for (dgInt32 i = 0; i < tmpFormat.m_pointChannel.m_count; i ++) {
@@ -1195,7 +1202,7 @@ dgMeshEffect::dgMeshEffect ()
 	,m_points(NULL)
 	,m_attrib(NULL)
 {
-	dgAssert (0);
+	Init();
 }
 
 dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator)
@@ -1204,6 +1211,7 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator)
 	,m_attrib(allocator)
 	,m_constructionIndex(0)
 {
+	Init();
 }
 
 dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgMatrix& planeMatrix, dgFloat32 witdth, dgFloat32 breadth, dgInt32 material, const dgMatrix& textureMatrix0, const dgMatrix& textureMatrix1)
@@ -1213,6 +1221,7 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgMatrix& 
 	,m_constructionIndex(0)
 {
 	dgAssert (0);
+	Init();
 /*
 	dgInt32 index[4];
 	dgInt64 attrIndex[4];
@@ -1267,6 +1276,7 @@ dgMeshEffect::dgMeshEffect(dgPolyhedra& mesh, const dgMeshEffect& source)
 	,m_attrib(source.m_attrib)
 	,m_constructionIndex(0)
 {
+	Init();
 }
 
 dgMeshEffect::dgMeshEffect(const dgMeshEffect& source)
@@ -1275,6 +1285,7 @@ dgMeshEffect::dgMeshEffect(const dgMeshEffect& source)
 	,m_attrib(source.m_attrib)
 	,m_constructionIndex(0)
 {
+	Init();
 }
 
 dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
@@ -1321,6 +1332,7 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 	};
 	dgMeshEffectBuilder builder(GetAllocator());
 
+	Init();
 	if (collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		dgCollisionInfo collisionInfo;
 		collision->GetCollisionInfo (&collisionInfo);
@@ -1366,6 +1378,7 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const dgFloat64* 
 	,m_points(allocator)
 	,m_attrib(allocator)
 {
+	Init();
 	if (count >= 4) {
 		dgConvexHull3d convexHull(allocator, vertexCloud, strideInByte, count, distTol);
 		if (convexHull.GetCount()) {
@@ -1400,6 +1413,7 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize de
 	,m_attrib(allocator)
 	,m_constructionIndex(0)
 {
+	Init();
 dgAssert (0);
 /*
 	dgInt32 faceCount;
@@ -1436,6 +1450,10 @@ dgMeshEffect::~dgMeshEffect(void)
 {
 }
 
+void dgMeshEffect::Init()
+{
+//	dgAssert ();
+}
 
 void dgMeshEffect::BeginFace()
 {
