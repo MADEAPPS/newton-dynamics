@@ -49,6 +49,7 @@ dgVector dgBroadPhase::m_linearContactError2(DG_CONTACT_TRANSLATION_ERROR * DG_C
 dgVector dgBroadPhaseNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f));
 dgVector dgBroadPhaseNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
+//int xxxxxx;
 
 class dgBroadPhase::dgSpliteInfo
 {
@@ -288,6 +289,21 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
 				dynamicBody->ApplyExtenalForces(timestep, threadID);
+/*
+//if (dynamicBody->m_externalForce.m_x != 0) {
+//space = true;
+//dgTrace (("frame(%d) body(%d) %x %f %f %f\n", xxxxxx, dynamicBody->m_uniqueID, dynamicBody->m_userData, dynamicBody->m_externalForce.m_x, dynamicBody->m_externalForce.m_y, dynamicBody->m_externalForce.m_z));
+//}
+				//frame(1142) body(33) 38a548a8 0.000000 4.673497 -0.000000
+				if ((xxxxxx >= 2000) && (xxxxxx < 2100)) {
+					if (dynamicBody->m_uniqueID == 33) {
+						dynamicBody->m_externalForce = dgVector (0.000000f, 4.673497f, -100.000000f, 0.0f);
+					}
+					if (dynamicBody->m_veloc.DotProduct3(dynamicBody->m_veloc) > 0.5f) {
+						dgTrace (("body(%d)\n", dynamicBody->m_uniqueID));
+					}
+				}
+*/
 			}
 		}
 
@@ -306,6 +322,10 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 	while (node) {
 		if (DoNeedUpdate(node)) {
 			dgBody* const body = node->GetInfo().GetBody();
+
+//if ((xxxxxx >= 2000) && (xxxxxx < 2100) && body->m_uniqueID == 815) {
+//xxxxxx *=1;
+//}
 
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
@@ -1498,9 +1518,10 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	while (node) {
 		dgContact* const contact = node->GetInfo();
 
-		const dgBody* const body0 = contact->GetBody0();
-		const dgBody* const body1 = contact->GetBody1();
+		dgBody* const body0 = contact->GetBody0();
+		dgBody* const body1 = contact->GetBody1();
 		if (!(body0->m_equilibrium & body1->m_equilibrium)) {
+			bool contactActive = contact->m_contactActive;
 			if (ValidateContactCache(contact, timestep)) {
 				contact->m_broadphaseLru = m_lru;
 				contact->m_timeOfImpact = dgFloat32(1.0e10f);
@@ -1549,6 +1570,15 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					}
 				}
 			}
+			if (contactActive ^ contact->m_contactActive) {
+				if (body0->GetInvMass().m_w) {
+					body0->m_equilibrium = false;
+				}
+				if (body1->GetInvMass().m_w) {
+					body1->m_equilibrium = false;
+				}
+			}
+
 		} else {
 			contact->m_broadphaseLru = m_lru;
 		}
@@ -1613,6 +1643,11 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	DG_TRACKTIME(__FUNCTION__);
     m_lru = m_lru + 1;
 	m_pendingSoftBodyPairsCount = 0;
+
+//xxxxxx ++;
+//if (space)
+//dgTrace (("\n"));
+//space = false;
 
 	const dgInt32 threadsCount = m_world->GetThreadCount();
 
