@@ -51,11 +51,11 @@ void dgThreadHive::dgWorkerThread::SetUp(dgMemoryAllocator* const allocator, con
 	m_allocator = allocator;
 	Init (name, id);
 
-#ifndef DG_USE_THREAD_EMULATION
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	SetThreadPriority(m_handle.native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
-#endif
-#endif
+	#ifndef DG_USE_THREAD_EMULATION
+		#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+			SetThreadPriority(m_handle.native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
+		#endif
+	#endif
 }
 
 bool dgThreadHive::dgWorkerThread::IsBusy() const

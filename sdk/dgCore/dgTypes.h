@@ -857,6 +857,26 @@ DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 #endif
 }
 
+class dgAtomic: protected std::atomic<dgInt32>
+{
+	public:
+	dgAtomic()
+		:std::atomic<dgInt32>()
+	{
+	}
+
+	DG_INLINE operator dgInt32() const 
+	{
+		const std::atomic<dgInt32>& me = *this;
+		return me;
+	}
+
+	DG_INLINE dgInt32 Exchange(dgInt32 value)
+	{
+		return exchange(value);
+	}
+};
+
 DG_INLINE void dgThreadYield()
 {
 #ifndef DG_USE_THREAD_EMULATION
@@ -877,9 +897,8 @@ DG_INLINE void dgSpinLock(dgInt32* const ptr)
 {
 #ifndef DG_USE_THREAD_EMULATION 
 	while (dgInterlockedExchange(ptr, 1)) {
-		DG_TRACKTIME_NAMED("lock");
+//		DG_TRACKTIME_NAMED("lock");
 		dgThreadYield();
-		//_mm_pause();
 	}
 #endif
 }
@@ -917,7 +936,7 @@ class dgScopeSpinPause
 		:m_atomicLock(lock)
 	{
 		while (dgInterlockedExchange(m_atomicLock, 1)) {
-			DG_TRACKTIME_NAMED("pause");
+			//DG_TRACKTIME_NAMED("pause");
 			_mm_pause();
 		}
 	}

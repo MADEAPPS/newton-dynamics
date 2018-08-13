@@ -721,7 +721,7 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		
 		if (body1->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
-			dgScopeSpinLock lock(&aggregate->m_criticalSectionLock);
+			dgScopeSpinPause lock(&aggregate->m_criticalSectionLock);
 			aggregate->m_isInEquilibrium = body1->m_equilibrium;
 		}
 		
@@ -729,7 +729,7 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 			dgAssert(!node->IsAggregate());
 			node->SetAABB(body1->m_minAABB, body1->m_maxAABB);
 			for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
-				dgScopeSpinLock lock(&parent->m_criticalSectionLock);
+				dgScopeSpinPause lock(&parent->m_criticalSectionLock);
 				if (!parent->IsAggregate()) {
 					dgVector minBox;
 					dgVector maxBox;
@@ -1222,7 +1222,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 							m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
 							m_pendingSoftBodyPairsCount++;
 						} else {
-							dgScopeSpinLock lock(&m_contacJointLock);
+							dgScopeSpinPause lock(&m_contacJointLock);
 							contact = new (m_world->m_allocator) dgContact(m_world, material);
 							contact->AppendToContactList();
 							dgAssert(contact);
@@ -1424,8 +1424,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 					dgVector relOmega (body0->m_omega - body1->m_omega);
 					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
 
-					//dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock);
-					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
+					dgScopeSpinPause lock(&body1->m_criticalSectionLock);
 					body1->m_sleeping = false;
 					body1->m_equilibrium = mask2.GetSignMask() ? true : false;
 				}
@@ -1437,8 +1436,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 					dgVector relOmega (body0->m_omega - body1->m_omega);
 					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
 
-					//dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock);
-					dgScopeSpinLock lock(&body1->m_criticalSectionLock);
+					dgScopeSpinPause lock(&body1->m_criticalSectionLock);
 					body0->m_sleeping = false;
 					body0->m_equilibrium = mask2.GetSignMask() ? true : false;
 				}
