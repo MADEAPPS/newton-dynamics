@@ -74,6 +74,19 @@ class dgBodyInfo
 	dgInt32 m_clusterKey;
 };
 
+class dgJointInfo
+{
+	public:
+	dgConstraint* m_joint;
+	dgFloat32 m_preconditioner0;
+	dgFloat32 m_preconditioner1;
+	dgInt32 m_m0;
+	dgInt32 m_m1;
+	dgInt32 m_pairStart;
+	dgInt32 m_pairCount;
+};
+
+
 class dgBodyJacobianPair
 {
 	public:
@@ -93,19 +106,6 @@ class dgBodyCluster
 	dgInt16 m_hasSoftBodies;
 	dgInt16 m_isContinueCollision;
 };
-
-class dgJointInfo
-{
-	public:
-	dgConstraint* m_joint;
-	dgFloat32 m_preconditioner0;
-	dgFloat32 m_preconditioner1;
-	dgInt32 m_m0;
-	dgInt32 m_m1;
-	dgInt32 m_pairStart;
-	dgInt32 m_pairCount;
-};
-
 
 template<class T>
 class dgQueue
@@ -218,10 +218,12 @@ class dgWorldDynamicUpdate
 	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	DG_INLINE dgBody* Find(dgBody* const body) const;
+	
+*/
 	DG_INLINE dgBody* FindAndSplit(dgBody* const body) const;
 	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
 	void BuildClustersExperimental(dgFloat32 timestep);
-*/
+
 	void BuildClusters(dgFloat32 timestep);
 	dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const;
 	dgInt32 SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;

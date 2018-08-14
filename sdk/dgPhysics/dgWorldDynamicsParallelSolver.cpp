@@ -40,7 +40,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	dgBodyCluster cluster(MergeClusters(clusterArray, clustersCount));
 
 	dgBodyInfo* const bodyPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-	dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
+	dgJointInfo* const constraintArray = &world->m_jointsMemory[0];
 
 	dgBodyInfo* const bodyArray = &bodyPtr[m_bodies];
 	dgJointInfo* const jointArray = &constraintArray[m_joints];
@@ -72,10 +72,10 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 	}
 
 	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + 1) * sizeof(dgBodyInfo));
-	world->m_jointsMemory.ResizeIfNecessary((m_joints + jointsCount + 32) * sizeof(dgJointInfo));
+	world->m_jointsMemory.ResizeIfNecessary(m_joints + jointsCount + 32);
 
 	dgBodyInfo* const bodyPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-	dgJointInfo* const constraintPtr = (dgJointInfo*)&world->m_jointsMemory[0];
+	dgJointInfo* const constraintPtr = &world->m_jointsMemory[0];
 
 	dgBodyInfo* const bodyArray = &bodyPtr[m_bodies];
 	dgJointInfo* const jointArray = &constraintPtr[m_joints];

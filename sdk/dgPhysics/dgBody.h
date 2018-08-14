@@ -265,6 +265,7 @@ class dgBody
 	dgBroadPhaseBodyNode* m_broadPhaseNode;
 	dgBodyMasterList::dgListNode* m_masterNode;
 	dgBroadPhaseAggregate* m_broadPhaseaggregateNode;
+	dgBody* m_disjointParent;
 	OnBodyDestroy m_destructor;
 	OnMatrixUpdateCallback m_matrixUpdate;
 	
@@ -274,6 +275,7 @@ class dgBody
 	dgInt32 m_rtti;
 	dgInt32 m_type;
 	dgInt32 m_serializedEnum;
+	dgInt32 m_disjointRank;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_genericLRUMark;
 

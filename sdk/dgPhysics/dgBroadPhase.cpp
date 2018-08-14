@@ -49,7 +49,6 @@ dgVector dgBroadPhase::m_linearContactError2(DG_CONTACT_TRANSLATION_ERROR * DG_C
 dgVector dgBroadPhaseNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f));
 dgVector dgBroadPhaseNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
-//int xxxxxx;
 
 class dgBroadPhase::dgSpliteInfo
 {
@@ -285,25 +284,12 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 		body->m_resting = 1;
+		body->m_disjointRank = 0;
+		body->m_disjointParent = body;
 		if (DoNeedUpdate(node)) {
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
 				dynamicBody->ApplyExtenalForces(timestep, threadID);
-/*
-//if (dynamicBody->m_externalForce.m_x != 0) {
-//space = true;
-//dgTrace (("frame(%d) body(%d) %x %f %f %f\n", xxxxxx, dynamicBody->m_uniqueID, dynamicBody->m_userData, dynamicBody->m_externalForce.m_x, dynamicBody->m_externalForce.m_y, dynamicBody->m_externalForce.m_z));
-//}
-				//frame(1142) body(33) 38a548a8 0.000000 4.673497 -0.000000
-				if ((xxxxxx >= 2000) && (xxxxxx < 2100)) {
-					if (dynamicBody->m_uniqueID == 33) {
-						dynamicBody->m_externalForce = dgVector (0.000000f, 4.673497f, -100.000000f, 0.0f);
-					}
-					if (dynamicBody->m_veloc.DotProduct3(dynamicBody->m_veloc) > 0.5f) {
-						dgTrace (("body(%d)\n", dynamicBody->m_uniqueID));
-					}
-				}
-*/
 			}
 		}
 
@@ -322,10 +308,6 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 	while (node) {
 		if (DoNeedUpdate(node)) {
 			dgBody* const body = node->GetInfo().GetBody();
-
-//if ((xxxxxx >= 2000) && (xxxxxx < 2100) && body->m_uniqueID == 815) {
-//xxxxxx *=1;
-//}
 
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
@@ -1504,6 +1486,35 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 	}
 }
 
+/*
+DG_INLINE dgBody* dgBroadPhase::FindAndSplit(dgBody* const body) const
+{
+	dgBody* node = body;
+	while (node->m_disjointParent != node) {
+		dgBody* const prev = body;
+		node = node->m_disjointParent;
+		prev->m_disjointParent = node->m_disjointParent;
+	}
+	return node;
+}
+
+
+DG_INLINE void dgBroadPhase::UnionSet(const dgConstraint* const joint) const
+{
+	dgBody* root0 = FindAndSplit(joint->GetBody0());
+	dgBody* root1 = FindAndSplit(joint->GetBody1());
+	if (root0 != root1) {
+		if (root0->m_disjointRank < root1->m_disjointRank) {
+			dgSwap(root0, root1);
+		}
+		root1->m_disjointParent = root0;
+		if (root0->m_disjointRank == root1->m_disjointRank) {
+			root0->m_disjointRank += 1;
+		}
+	}
+}
+*/
+
 void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
 {
 	DG_TRACKTIME(__FUNCTION__);
@@ -1512,6 +1523,9 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	const dgFloat32 timestep = descriptor->m_timestep;
 	const dgInt32 threadCount = m_world->GetThreadCount();
 	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
+
+	dgJointInfo* const constraintArray = &m_world->m_jointsMemory[0];
+	const dgInt32 maxActiveCount = m_world->m_jointsMemory.GetElementsCapacity();
 
 	while (node) {
 		dgContact* const contact = node->GetInfo();
@@ -1581,6 +1595,20 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 			contact->m_broadphaseLru = m_lru;
 		}
 
+		if (contact->m_maxDOF && contact->m_contactActive) {
+			dgInt32 activeCount = dgAtomicExchangeAndAdd(&contactList->m_activeContacts, 1);
+			if (activeCount < maxActiveCount) {
+				constraintArray[activeCount].m_joint = contact;
+			}
+/*
+			if (contact->GetBody1()->m_invMass.m_w > dgFloat32(0.0f)) {
+				dgScopeSpinPause lock(&m_contacJointLock);
+				dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
+				UnionSet(contact);
+			}
+*/
+		}
+
 		for (dgInt32 i = 0; i < threadCount; i++) {
 			node = node ? node->GetNext() : NULL;
 		}
@@ -1608,18 +1636,60 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgContactList* const contactList = m_world;
-//	m_world->m_jointsMemory.ResizeIfNecessary(contactList->GetCount() * sizeof(dgJointInfo));
-//	dgJointInfo* const constraintArray = (dgJointInfo*)&m_world->m_jointsMemory[0];
+
+	dgInt32 activeCount = contactList->m_activeContacts;
+	if (activeCount < m_world->m_jointsMemory.GetElementsCapacity()) {
 	for (dgContactList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
 		dgContact* const contact = contactNode->GetInfo();
 		m_world->AttachContact(contact);
 		m_contactCache.AddContactJoint(contact);
 
-//		if (contact->m_maxDOF) {
-//			constraintArray[contactList->m_activeContacts].m_joint = contact;
-//			contactList->m_activeContacts++;
-//		}
+			if (contact->m_maxDOF) {
+				m_world->m_jointsMemory[activeCount].m_joint = contact;
+				activeCount++;
+/*
+				if (contact->GetBody1()->m_invMass.m_w > dgFloat32(0.0f)) {
+					dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
+					UnionSet(contact);
+				}
+*/
+			}
+		}
+
+	} else {
+
+		dgAssert (0);
+		for (dgContactList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
+			dgContact* const contact = contactNode->GetInfo();
+			m_world->AttachContact(contact);
+			m_contactCache.AddContactJoint(contact);
+		}
+
+		dgBodyMasterList& masterList = *m_world;
+		for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
+			const dgBodyMasterListRow& graphNode = node->GetInfo();
+			dgBody* const body = graphNode.GetBody();
+			body->m_disjointRank = 0;
+			body->m_disjointParent = body;
+		}
+
+		activeCount = 0;
+		for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
+			dgContact* const contact = contactNode->GetInfo();
+			if (contact->m_maxDOF) {
+				m_world->m_jointsMemory[activeCount].m_joint = contact;
+				activeCount++;
+/*
+				if (contact->GetBody1()->m_invMass.m_w > dgFloat32(0.0f)) {
+					dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
+					UnionSet(contact);
+				}
+*/
+			}
+		}
 	}
+
+	contactList->m_activeContacts = activeCount;
 }
 
 void dgBroadPhase::RemoveOldContacts()
@@ -1641,11 +1711,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	DG_TRACKTIME(__FUNCTION__);
     m_lru = m_lru + 1;
 	m_pendingSoftBodyPairsCount = 0;
-
-//xxxxxx ++;
-//if (space)
-//dgTrace (("\n"));
-//space = false;
 
 	const dgInt32 threadsCount = m_world->GetThreadCount();
 
@@ -1670,6 +1735,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 
 	dgContactList* const contactList = m_world;
+	contactList->m_activeContacts = 0;
 	contactList->m_deadContactsCount = 0;
 	dgContactList::dgListNode* const lastNode = contactList->GetFirst();
 

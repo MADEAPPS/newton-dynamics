@@ -223,7 +223,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	// avoid small memory fragmentations on initialization
 	m_bodiesMemory.Resize(1024 * 32);
-	m_jointsMemory.Resize(1024 * 32);
+	m_jointsMemory.Resize(1024 * 2);
 	m_clusterMemory.Resize(1024 * 32);
 	m_solverJacobiansMemory.Resize(1024 * 64);
 	m_solverRightHandSideMemory.Resize(1024 * 64);

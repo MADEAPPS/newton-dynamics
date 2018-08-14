@@ -511,7 +511,7 @@ class dgWorld
 	dgListenerList m_listeners;
 	dgTree<void*, unsigned> m_perInstanceData;
 	dgArray<dgUnsigned8> m_bodiesMemory; 
-	dgArray<dgUnsigned8> m_jointsMemory; 
+	dgArray<dgJointInfo> m_jointsMemory; 
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverRightHandSideMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;

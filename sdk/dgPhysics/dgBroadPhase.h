@@ -536,6 +536,11 @@ class dgBroadPhase
 	static void UpdateSoftBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
 
+
+//	dgBody* FindAndSplit(dgBody* const body) const;
+//	void UnionSet(const dgConstraint* const joint) const;
+
+
 	class dgPendingCollisionSofBodies
 	{
 		public:

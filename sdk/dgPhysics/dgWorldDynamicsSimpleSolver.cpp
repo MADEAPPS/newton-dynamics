@@ -41,7 +41,7 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 	}
 
 	dgWorld* const world = (dgWorld*) this;
-	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
+	dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
 	if (!cluster->m_isContinueCollision) {
@@ -307,7 +307,7 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 {
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 jointCount = cluster->m_jointCount;
-	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
+	dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
 	dgBroadPhase::dgPair pair;
@@ -675,7 +675,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
+	dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
