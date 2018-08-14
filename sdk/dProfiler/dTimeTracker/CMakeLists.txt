@@ -16,12 +16,11 @@ message (${projectName})
 # low level core
 file(GLOB source *.cpp *.h)
 
-
 add_definitions(-DDTIMETRACKER_EXPORTS)
 add_library(${projectName} SHARED ${source})
-target_link_libraries (${projectName} ws2_32.lib)
 
 if (MSVC)
+	target_link_libraries (${projectName} ws2_32.lib)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yustdafx.h")
 	set_source_files_properties(stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
 endif(MSVC)
