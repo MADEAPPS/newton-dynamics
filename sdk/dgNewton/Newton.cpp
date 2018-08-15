@@ -6022,10 +6022,10 @@ void NewtonBodyGetAlpha(const NewtonBody* const bodyPtr, dFloat* const alpha)
 
 
 /*!
-Get the global linear velocity of the body.
+Get the global linear Acceleration of the body.
 
 @param *bodyPtr is the pointer to the body.
-@param *velocity pointer to an array of at least three floats to hold the velocity vector.
+@param *acceleration pointer to an array of at least three floats to hold the acceleration vector.
 
 See also: ::NewtonBodySetVelocity
 */
