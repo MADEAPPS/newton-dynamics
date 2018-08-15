@@ -1206,11 +1206,10 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 						} else {
 							dgScopeSpinPause lock(&m_contacJointLock);
 							contact = new (m_world->m_allocator) dgContact(m_world, material);
-							contact->AppendToContactList();
 							dgAssert(contact);
 							contact->m_body0 = body0;
 							contact->m_body1 = body1;
-
+							contact->AppendToContactList();
 							contact->m_contactActive = 0;
 							contact->m_positAcc = dgVector(dgFloat32(10.0f));
 							contact->m_timeOfImpact = dgFloat32(1.0e10f);
@@ -1471,7 +1470,7 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 {
 	const dgInt32 count = m_pendingSoftBodyPairsCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
-		dgPendingCollisionSofBodies& pair = m_pendingSoftBodyCollisions[i];
+		dgPendingCollisionSoftBodies& pair = m_pendingSoftBodyCollisions[i];
 		if (pair.m_body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)pair.m_body0->m_collision->GetChildShape();
 			dgAssert(pair.m_body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
@@ -1485,35 +1484,6 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 		}
 	}
 }
-
-/*
-DG_INLINE dgBody* dgBroadPhase::FindAndSplit(dgBody* const body) const
-{
-	dgBody* node = body;
-	while (node->m_disjointParent != node) {
-		dgBody* const prev = body;
-		node = node->m_disjointParent;
-		prev->m_disjointParent = node->m_disjointParent;
-	}
-	return node;
-}
-
-
-DG_INLINE void dgBroadPhase::UnionSet(const dgConstraint* const joint) const
-{
-	dgBody* root0 = FindAndSplit(joint->GetBody0());
-	dgBody* root1 = FindAndSplit(joint->GetBody1());
-	if (root0 != root1) {
-		if (root0->m_disjointRank < root1->m_disjointRank) {
-			dgSwap(root0, root1);
-		}
-		root1->m_disjointParent = root0;
-		if (root0->m_disjointRank == root1->m_disjointRank) {
-			root0->m_disjointRank += 1;
-		}
-	}
-}
-*/
 
 void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
 {
@@ -1600,13 +1570,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 			if (activeCount < maxActiveCount) {
 				constraintArray[activeCount].m_joint = contact;
 			}
-/*
-			if (contact->GetBody1()->m_invMass.m_w > dgFloat32(0.0f)) {
-				dgScopeSpinPause lock(&m_contacJointLock);
-				dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
-				UnionSet(contact);
-			}
-*/
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
@@ -1639,52 +1602,35 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 
 	dgInt32 activeCount = contactList->m_activeContacts;
 	if (activeCount < m_world->m_jointsMemory.GetElementsCapacity()) {
-	for (dgContactList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
-		dgContact* const contact = contactNode->GetInfo();
-		m_world->AttachContact(contact);
-		m_contactCache.AddContactJoint(contact);
+		for (dgContactList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
+			dgContact* const contact = contactNode->GetInfo();
+			m_world->AttachContact(contact);
+			m_contactCache.AddContactJoint(contact);
 
-			if (contact->m_maxDOF) {
+			if (contact->m_contactActive || contact->m_maxDOF) {
+				dgAssert(contact->m_maxDOF);
+				dgAssert(contact->m_contactActive);
+
 				m_world->m_jointsMemory[activeCount].m_joint = contact;
 				activeCount++;
-/*
-				if (contact->GetBody1()->m_invMass.m_w > dgFloat32(0.0f)) {
-					dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
-					UnionSet(contact);
-				}
-*/
 			}
 		}
 
 	} else {
-
-		dgAssert (0);
 		for (dgContactList::dgListNode* contactNode = lastNode ? lastNode->GetPrev() : contactList->GetLast(); contactNode; contactNode = contactNode->GetPrev()) {
 			dgContact* const contact = contactNode->GetInfo();
 			m_world->AttachContact(contact);
 			m_contactCache.AddContactJoint(contact);
 		}
 
-		dgBodyMasterList& masterList = *m_world;
-		for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
-			const dgBodyMasterListRow& graphNode = node->GetInfo();
-			dgBody* const body = graphNode.GetBody();
-			body->m_disjointRank = 0;
-			body->m_disjointParent = body;
-		}
-
 		activeCount = 0;
 		for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 			dgContact* const contact = contactNode->GetInfo();
-			if (contact->m_maxDOF) {
+			if (contact->m_contactActive || contact->m_maxDOF) {
+				dgAssert (contact->m_maxDOF);
+				dgAssert (contact->m_contactActive);
 				m_world->m_jointsMemory[activeCount].m_joint = contact;
 				activeCount++;
-/*
-				if (contact->GetBody1()->m_invMass.m_w > dgFloat32(0.0f)) {
-					dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
-					UnionSet(contact);
-				}
-*/
 			}
 		}
 	}

@@ -24,7 +24,17 @@
 
 #include "dgConstraint.h"
 
+class dgBilateralConstraint;
 #define DG_BILATERAL_CONTRAINT_DOF	8
+
+class dgBilateralConstraintList: public dgList<dgBilateralConstraint*>
+{
+	public:
+	dgBilateralConstraintList(dgMemoryAllocator* const allocator)
+		:dgList<dgBilateralConstraint*>(allocator)
+	{
+	}
+};
 
 class dgBilateralConstraint: public dgConstraint  
 {
@@ -64,15 +74,19 @@ class dgBilateralConstraint: public dgConstraint
 	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* const jacobianA, const dgFloat32* const jacobianB, dgForceImpactPair* const jointForce);
 	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, const dgPointParam& param, dgForceImpactPair* const jointForce);
 	void CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce);
+
+	void AppendToJointList();
 	
 	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_inverseDynamicsAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_stiffness;
 	OnConstraintDestroy m_destructor;
+	dgBilateralConstraintList::dgListNode* m_jointNode;
 	dgInt8	  m_rowIsMotor;
 	dgInt8	  m_rowIsIk;
 
+	friend class dgBodyMasterList;
 	friend class dgInverseDynamics;
 	friend class dgWorldDynamicUpdate;
 };

@@ -21,7 +21,7 @@
 
 #include "dgPhysicsStdafx.h"
 #include "dgBody.h"
-
+#include "dgWorld.h"
 #include "dgConstraint.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
@@ -38,6 +38,7 @@
 dgBilateralConstraint::dgBilateralConstraint ()
 	:dgConstraint () 
 	,m_destructor(NULL)
+	,m_jointNode(NULL)
 {
 	m_maxDOF = 6;
 	m_isBilateral = true;
@@ -58,7 +59,23 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 	if (m_destructor) {
 		m_destructor(*this);
 	}
+
+	if (m_jointNode) {
+		dgAssert(m_body0);
+		dgBilateralConstraintList* const jointList = m_body0->m_world;
+		jointList->Remove(m_jointNode);
+	}
 }
+
+void dgBilateralConstraint::AppendToJointList()
+{
+	dgAssert(m_body0);
+	dgAssert(!m_jointNode);
+	
+	dgBilateralConstraintList* const jointList = m_body0->m_world;
+	m_jointNode = jointList->Addtop(this);
+}
+
 
 void dgBilateralConstraint::ResetInverseDynamics()
 {

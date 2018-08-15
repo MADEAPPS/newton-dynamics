@@ -72,7 +72,6 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	,m_closestDistance (dgFloat32 (0.0f))
 	,m_separationDistance(dgFloat32 (0.0f))
 	,m_timeOfImpact(dgFloat32 (0.0f))
-	,m_world(world)
 	,m_material(material)
 	,m_contactNode(NULL)
 	,m_contactPruningTolereance(world->GetContactMergeTolerance())
@@ -94,7 +93,6 @@ dgContact::dgContact(dgContact* const clone)
 	,m_closestDistance(clone->m_closestDistance)
 	,m_separationDistance(clone->m_separationDistance)
 	,m_timeOfImpact(clone->m_timeOfImpact)
-	,m_world(clone->m_world)
 	,m_material(clone->m_material)
 	,m_contactNode(clone->m_contactNode)
 	,m_contactPruningTolereance(clone->m_contactPruningTolereance)
@@ -117,15 +115,17 @@ dgContact::~dgContact()
 	dgList<dgContactMaterial>::RemoveAll();
 
 	if (m_contactNode) {
-		dgContactList* const activeContacts = m_world;
+		dgAssert (m_body0);
+		dgContactList* const activeContacts = m_body0->m_world;
 		activeContacts->Remove (m_contactNode);
 	}
 }
 
 void dgContact::AppendToContactList()
 {
+	dgAssert (m_body0);
 	dgAssert (!m_contactNode);
-	dgContactList* const contactsList = m_world;
+	dgContactList* const contactsList = m_body0->m_world;
 	m_contactNode = contactsList->Addtop(this);
 }
 

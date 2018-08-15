@@ -536,12 +536,7 @@ class dgBroadPhase
 	static void UpdateSoftBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
 
-
-//	dgBody* FindAndSplit(dgBody* const body) const;
-//	void UnionSet(const dgConstraint* const joint) const;
-
-
-	class dgPendingCollisionSofBodies
+	class dgPendingCollisionSoftBodies
 	{
 		public:
 		dgBody* m_body0;
@@ -555,7 +550,7 @@ class dgBroadPhase
 	dgList<dgBroadPhaseAggregate*> m_aggregateList;
 	dgUnsigned32 m_lru;
 	dgContactCache m_contactCache;
-	dgArray<dgPendingCollisionSofBodies> m_pendingSoftBodyCollisions;
+	dgArray<dgPendingCollisionSoftBodies> m_pendingSoftBodyCollisions;
 	dgInt32 m_pendingSoftBodyPairsCount;
 	dgInt32 m_contacJointLock;
 	dgInt32 m_criticalSectionLock;

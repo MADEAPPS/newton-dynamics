@@ -237,7 +237,7 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	dgContactList& contactList = *world;
-	dgBodyMasterList& masterList = *world;
+//	dgBodyMasterList& masterList = *world;
 	dgInt32 conctactCount = contactList.m_activeContacts;
 
 	dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
@@ -247,6 +247,12 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 			dgAssert (contact->GetBody0()->m_invMass.m_w > dgFloat32 (0.0f));
 			UnionSet(contact);
 		}
+	}
+
+	const dgBilateralConstraintList& jointList = *world;
+	for (dgBilateralConstraintList::dgListNode* node = jointList.GetFirst(); node; node = node->GetNext()) {
+		dgConstraint* const contact = node->GetInfo();
+		UnionSet(contact);
 	}
 /*
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node && (node->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32(0.0f)); node = node->GetPrev()) {

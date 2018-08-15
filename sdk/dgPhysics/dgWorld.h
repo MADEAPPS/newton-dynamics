@@ -30,6 +30,7 @@
 #include "dgCollisionScene.h"
 #include "dgBodyMasterList.h"
 #include "dgWorldDynamicUpdate.h"
+#include "dgBilateralConstraint.h"
 //#include "dgDeformableBodiesUpdate.h"
 #include "dgCollisionCompoundFractured.h"
 
@@ -162,6 +163,7 @@ class dgWorld
 	,public dgSkeletonList
 	,public dgInverseDynamicsList
 	,public dgContactList 
+	,public dgBilateralConstraintList
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
 	,public dgWorldThreadPool

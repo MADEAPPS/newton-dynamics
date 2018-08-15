@@ -198,6 +198,12 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 
 	dgAssert(constraint->GetId() != dgConstraint::m_contactConstraint);
 
+	dgBilateralConstraint* const bilateralJoint = constraint->IsBilateral() ? (dgBilateralConstraint*)constraint : NULL;
+	dgAssert (bilateralJoint);
+	if (bilateralJoint) {
+		bilateralJoint->AppendToJointList();
+	}
+
 	dgWorld* const world = body0->GetWorld();
 	world->m_skelListIsDirty = world->m_skelListIsDirty || (constraint->m_solverModel != 2);
 
