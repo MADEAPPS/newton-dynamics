@@ -444,7 +444,7 @@ extern "C" {
 	NEWTON_API void NewtonDestroy (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonDestroyAllBodies (const NewtonWorld* const newtonWorld);
 
-	NEWTON_API void NewtonSetPosUpdateCallback (const NewtonWorld* const newtonWorld, NewtonPostUpdateCallback callback);
+	NEWTON_API void NewtonSetPostUpdateCallback (const NewtonWorld* const newtonWorld, NewtonPostUpdateCallback callback);
 
 	NEWTON_API void* NewtonAlloc (int sizeInBytes);
 	NEWTON_API void NewtonFree (void* const ptr);

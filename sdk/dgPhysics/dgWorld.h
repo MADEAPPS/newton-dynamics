@@ -246,7 +246,7 @@ class dgWorld
 	dgInt32 GetSolverMode() const;
 	void SetSolverMode (dgInt32 mode);
 
-	void SetPosUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback);
+	void SetPostUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback);
 
 	void EnableThreadOnSingleIsland(dgInt32 mode);
 	dgInt32 GetThreadOnSingleIsland() const;
@@ -588,7 +588,7 @@ inline dgFloat32 dgWorld::GetUpdateTime() const
 	return m_lastExecutionTime;
 }
 
-inline void dgWorld::SetPosUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback)
+inline void dgWorld::SetPostUpdateCallback(const dgWorld* const newtonWorld, dgPostUpdateCallback callback)
 {
 	m_postUpdateCallback = callback;
 }

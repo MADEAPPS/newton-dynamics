@@ -532,7 +532,7 @@ void DemoEntityManager::Cleanup ()
 	m_world = NewtonCreate();
 
 	// set a post update callback which is call after all simulation and all listeners updates
-	NewtonSetPosUpdateCallback (m_world, PostUpdateCallback);
+	NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
 
 	// link the work with this user data
 	NewtonWorldSetUserData(m_world, this);
