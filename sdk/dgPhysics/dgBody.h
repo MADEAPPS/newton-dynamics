@@ -79,6 +79,27 @@ class dgBody
 		//m_deformableBody,
 	};
 
+	class dgSetInfo
+	{
+		public:
+		dgSetInfo()
+		{
+		}
+
+		void Init(dgBody* const self)
+		{
+			m_parent = self;
+			m_rank = 0;
+			m_bodyCount = 1;
+			m_jointCount = 0;
+		}
+
+		dgBody* m_parent;
+		dgInt32 m_rank;
+		dgInt32 m_bodyCount;
+		dgInt32 m_jointCount;
+	};
+
 	DG_CLASS_ALLOCATOR(allocator)
 
 	dgBody();
@@ -215,6 +236,8 @@ class dgBody
 	dgInt32 GetSerializedID() const;
 	void CalcInvInertiaMatrix();
 
+	void InitJointSet ();
+
 	protected:
 	void UpdateWorlCollisionMatrix() const;
 	void UpdateLumpedMatrix();
@@ -265,9 +288,10 @@ class dgBody
 	dgBroadPhaseBodyNode* m_broadPhaseNode;
 	dgBodyMasterList::dgListNode* m_masterNode;
 	dgBroadPhaseAggregate* m_broadPhaseaggregateNode;
-	dgBody* m_disjointParent;
 	OnBodyDestroy m_destructor;
 	OnMatrixUpdateCallback m_matrixUpdate;
+
+	dgSetInfo m_disjointInfo;
 	
 	dgInt32 m_index;
 	dgInt32 m_uniqueID;
@@ -275,7 +299,6 @@ class dgBody
 	dgInt32 m_rtti;
 	dgInt32 m_type;
 	dgInt32 m_serializedEnum;
-	dgInt32 m_disjointRank;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_genericLRUMark;
 
@@ -607,6 +630,11 @@ DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
 DG_INLINE dgInt32 dgBody::GetSerializedID() const
 {
 	return m_serializedEnum;
+}
+
+DG_INLINE void dgBody::InitJointSet ()
+{
+	m_disjointInfo.Init (this);
 }
 
 #endif 

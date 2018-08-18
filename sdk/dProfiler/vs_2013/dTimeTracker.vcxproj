@@ -19,12 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dContainers\dCRC.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="..\dTimeTracker\dCRC.cpp" />
     <ClCompile Include="..\dTimeTracker\dllmain.cpp" />
     <ClCompile Include="..\dTimeTracker\dTimeTracker.cpp" />
     <ClCompile Include="..\dTimeTracker\stdafx.cpp">
@@ -35,7 +30,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dContainers\dCRC.h" />
+    <ClInclude Include="..\dTimeTracker\dCRC.h" />
     <ClInclude Include="..\dTimeTracker\dTimeTracker.h" />
     <ClInclude Include="..\dTimeTracker\dTimeTrackerRecord.h" />
     <ClInclude Include="..\dTimeTracker\dTimeTrackerMap.h" />

@@ -284,8 +284,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 		body->m_resting = 1;
-		body->m_disjointRank = 0;
-		body->m_disjointParent = body;
+		body->InitJointSet();
 		if (DoNeedUpdate(node)) {
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
