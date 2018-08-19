@@ -241,22 +241,21 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	dgContactList& contactList = *world;
 	dgBodyMasterList& masterList = *world;
 	const dgBilateralConstraintList& jointList = *world;
-	dgInt32 contactCount = contactList.m_activeContacts;
+	dgInt32 jointCount = contactList.m_activeContacts;
 
 	dgArray<dgJointInfo>& jointArray = world->m_jointsMemory;
-	jointArray.ResizeIfNecessary(contactCount + jointList.GetCount());
+	jointArray.ResizeIfNecessary(jointCount + jointList.GetCount());
 	dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
 	// add bilateral joints to the joint array
 	for (dgBilateralConstraintList::dgListNode* node = jointList.GetFirst(); node; node = node->GetNext()) {
 		dgConstraint* const contact = node->GetInfo();
-		constraintArray[contactCount].m_joint = contact;
-		contactCount++;
+		constraintArray[jointCount].m_joint = contact;
+		jointCount++;
 	}
 
-	// form all disjoints that do not have a link to a static bodies
-	// also separate the joint lint into dynamic/dynamic and dynamics/static joints
-	for (dgInt32 i = 0; i < contactCount; i ++) {
+	// form all disjoints sets
+	for (dgInt32 i = 0; i < jointCount; i ++) {
 		dgConstraint* const contact = constraintArray[i].m_joint;
 		dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
 		if (contact->GetBody1()->m_invMass.m_w > dgFloat32 (0.0f)) {
@@ -267,8 +266,9 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 		}
 	}
 
-	// find and tag all sleeping disjoint sets
-	dgInt32 totalJointCount = contactCount;
+	// find and tag all sleeping disjoint sets, 
+	// and add single bodies as a set of zero joints and one body
+	dgInt32 augmentedJointCount = jointCount;
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node && (node->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32(0.0f)); node = node->GetPrev()) {
 		dgBody* const body = node->GetInfo().GetBody();
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
@@ -282,22 +282,23 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 
 			if (!root->m_resting && !root->m_disjointInfo.m_jointCount) {
 				dgAssert (root->m_disjointInfo.m_bodyCount == 1);
-				dgJointInfo& info = jointArray[totalJointCount];
+				dgJointInfo& info = jointArray[augmentedJointCount];
 
 				info.m_body = body;
 				info.m_m0 = 0;
 				info.m_m1 = root->m_disjointInfo.m_bodyCount;
-				totalJointCount ++;
+				augmentedJointCount ++;
 			}
 		}
 	}
 
-	for (dgInt32 i = contactCount - 1; i >= 0; i --) {
+	// remove all sleeping joints sets
+	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
 		dgConstraint* const contact = constraintArray[i].m_joint;
 		dgBody* const root = Find (contact->GetBody0());
 		if (root->m_resting) {
-			totalJointCount --;
-			constraintArray[i] = constraintArray[totalJointCount];
+			augmentedJointCount --;
+			constraintArray[i] = constraintArray[augmentedJointCount];
 		} else {
 			constraintArray[i].m_m0 = root->m_disjointInfo.m_jointCount;
 			constraintArray[i].m_m1 = root->m_disjointInfo.m_bodyCount;
@@ -306,7 +307,7 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 
 	if (world->m_useParallelSolver) {
 		dgInt32 i0 = 0;
-		dgInt32 i1 = totalJointCount - 1;
+		dgInt32 i1 = augmentedJointCount - 1;
 		do {
 			while ((i0 < i1) && constraintArray[i0].m_m0 >= DG_PARALLEL_JOINT_COUNT_CUT_OFF) i0 ++;
 			while ((i0 < i1) && constraintArray[i1].m_m0  < DG_PARALLEL_JOINT_COUNT_CUT_OFF) i1 --;
@@ -360,7 +361,7 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	}
 
 	dgSort(bodyArray, bodiesCount, CompareBodyInfos);
-	for (dgInt32 i = contactCount - 1; i >= 0; i --) {
+	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
 		dgJointInfo& info = constraintArray[i];
 		dgConstraint* const contact = info.m_joint;
 		dgBody* const root = Find(contact->GetBody0());
@@ -370,8 +371,8 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 			info.m_pairCount = contact->m_maxDOF;
 			jointCount++;
 		} else {
-			contactCount --;
-			constraintArray[i] = constraintArray[contactCount];
+			jointCount --;
+			constraintArray[i] = constraintArray[jointCount];
 		}
 	}
 	dgSort(constraintArray, jointCount, CompareJointInfos);
