@@ -591,8 +591,8 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 			dgInt32 j = hi;
 			T val (array[(lo + hi) >> 1]);
 			do {    
-				while (compare (&array[i], &val, context) < 0) i ++;
-				while (compare (&array[j], &val, context) > 0) j --;
+				while ((i <= j) && compare (&array[i], &val, context) < 0) i ++;
+				while ((i <= j) && compare (&array[j], &val, context) > 0) j --;
 
 				if (i <= j)	{
 					dgSwap(array[i], array[j]);
@@ -661,8 +661,8 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 			dgInt32 j = hi;
 			T* val (array[(lo + hi) >> 1]);
 			do {    
-				while (compare (array[i], val, context) < 0) i ++;
-				while (compare (array[j], val, context) > 0) j --;
+				while ((i <= j) && compare (array[i], val, context) < 0) i ++;
+				while ((i <= j) && compare (array[j], val, context) > 0) j --;
 
 				if (i <= j)	{
 					dgSwap(array[i], array[j]);

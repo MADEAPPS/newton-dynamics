@@ -77,7 +77,11 @@ class dgBodyInfo
 class dgJointInfo
 {
 	public:
-	dgConstraint* m_joint;
+	union 
+	{
+		dgBody* m_body;
+		dgConstraint* m_joint;
+	};
 	dgFloat32 m_preconditioner0;
 	dgFloat32 m_preconditioner1;
 	dgInt32 m_m0;
@@ -217,9 +221,8 @@ class dgWorldDynamicUpdate
 /*
 	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
-	DG_INLINE dgBody* Find(dgBody* const body) const;
-	
 */
+	DG_INLINE dgBody* Find(dgBody* const body) const;
 	DG_INLINE dgBody* FindAndSplit(dgBody* const body) const;
 	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
 	void BuildClustersExperimental(dgFloat32 timestep);
