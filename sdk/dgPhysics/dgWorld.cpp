@@ -49,11 +49,26 @@
 #include "dgUniversalConstraint.h"
 #include "dgCorkscrewConstraint.h"
 
-
 #define DG_DEFAULT_SOLVER_ITERATION_COUNT	4
 
-
 /*
+static dgInt32 TestSort(const dgInt32* const  A, const dgInt32* const B, void* const)
+{
+	if (*A < *B) {
+		return -1;
+	} else if (*A > *B) {
+		return 1;
+	}
+	return 0;
+}
+
+static void TestSort()
+{
+	int array[] = { 10, 10, 10, 10, 10, 5, 10, 10, 10, 10, 10, 10 };
+	dgSort(array, sizeof(array) / sizeof(array[0]), TestSort);
+}
+
+
 static  char *xxx[10] = {"bbbbbbbbbb",
 						 "baaaaaaaab",
 						 "babbbbbaab",
@@ -166,7 +181,7 @@ struct myPath: public dgPathFinder<dgInt32, float>
 };
 
 
-void xxxxx()
+static void TestAStart()
 {
 	myPath path; 
 	const dgPathNode<dgInt32, float>* firtNode;
@@ -219,6 +234,9 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_clusterMemory (allocator, 64)
 	,m_concurrentUpdate(false)
 {
+	//TestAStart();
+	//TestSort();
+
 	dgMutexThread* const myThread = this;
 	SetParentThread (myThread);
 
@@ -876,9 +894,10 @@ void dgWorld::FlushCache()
 }
 
 
+
+
 void dgWorld::StepDynamics (dgFloat32 timestep)
 {
-	//xxxxx();
 	//SerializeToFile ("xxx.bin");
 
 	dgAssert (m_inUpdate == 0);

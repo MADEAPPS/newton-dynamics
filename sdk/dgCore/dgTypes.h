@@ -587,12 +587,22 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 		dgInt32 lo = stack[stackIndex][0];
 		dgInt32 hi = stack[stackIndex][1];
 		if ((hi - lo) > stride) {
-			dgInt32 i = lo;
-			dgInt32 j = hi;
-			T val (array[(lo + hi) >> 1]);
+			dgInt32 mid = (lo + hi) >> 1;
+			if (compare(&array[lo], &array[mid], context) > 0) {
+				dgSwap(array[lo], array[mid]);
+			}
+			if (compare(&array[mid], &array[hi], context) > 0) {
+				dgSwap(array[mid], array[hi]);
+			}
+			if (compare(&array[lo], &array[mid], context) > 0) {
+				dgSwap(array[lo], array[mid]);
+			}
+			dgInt32 i = lo + 1;
+			dgInt32 j = hi - 1;
+			T val (array[mid]);
 			do {    
-				while ((i <= j) && compare (&array[i], &val, context) < 0) i ++;
-				while ((i <= j) && compare (&array[j], &val, context) > 0) j --;
+				while (compare (&array[i], &val, context) < 0) i ++;
+				while (compare (&array[j], &val, context) > 0) j --;
 
 				if (i <= j)	{
 					dgSwap(array[i], array[j]);
@@ -657,12 +667,22 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 		dgInt32 lo = stack[stackIndex][0];
 		dgInt32 hi = stack[stackIndex][1];
 		if ((hi - lo) > stride) {
-			dgInt32 i = lo;
-			dgInt32 j = hi;
-			T* val (array[(lo + hi) >> 1]);
+			dgInt32 mid = (lo + hi) >> 1;
+			if (compare(array[lo], array[mid], context) > 0) {
+				dgSwap(array[lo], array[mid]);
+			}
+			if (compare(array[mid], array[hi], context) > 0) {
+				dgSwap(array[mid], array[hi]);
+			}
+			if (compare(array[lo], array[mid], context) > 0) {
+				dgSwap(array[lo], array[mid]);
+			}
+			dgInt32 i = lo + 1;
+			dgInt32 j = hi - 1;
+			T* val (array[mid]);
 			do {    
-				while ((i <= j) && compare (array[i], val, context) < 0) i ++;
-				while ((i <= j) && compare (array[j], val, context) > 0) j --;
+				while (compare (array[i], val, context) < 0) i ++;
+				while (compare (array[j], val, context) > 0) j --;
 
 				if (i <= j)	{
 					dgSwap(array[i], array[j]);
