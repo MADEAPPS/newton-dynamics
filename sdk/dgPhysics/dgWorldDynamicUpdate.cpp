@@ -236,7 +236,6 @@ DG_INLINE void dgWorldDynamicUpdate::UnionSet(const dgConstraint* const joint) c
 
 void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 {
-
 	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	dgContactList& contactList = *world;
@@ -257,24 +256,15 @@ void dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 
 	// form all disjoints that do not have a link to a static bodies
 	// also separate the joint lint into dynamic/dynamic and dynamics/static joints
-	dgInt32 staticJointsStart = contactCount;
-	for (dgInt32 i = staticJointsStart - 1; i >= 0; i --) {
+	for (dgInt32 i = 0; i < contactCount; i ++) {
 		dgConstraint* const contact = constraintArray[i].m_joint;
+		dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
 		if (contact->GetBody1()->m_invMass.m_w > dgFloat32 (0.0f)) {
-			dgAssert (contact->GetBody0()->m_invMass.m_w > dgFloat32 (0.0f));
 			UnionSet(contact);
 		} else {
-			staticJointsStart --;
-			dgSwap(constraintArray[i], constraintArray[staticJointsStart]);
+			dgBody* const root = Find(contact->GetBody0());
+			root->m_disjointInfo.m_jointCount += 1;
 		}
-	}
-
-	// add dynamics/static to the disjoints set
-	for (dgInt32 i = staticJointsStart; i < contactCount; i ++) {
-		dgConstraint* const contact = constraintArray[i].m_joint;
-		dgAssert (contact->GetBody0()->m_invMass.m_w > dgFloat32 (0.0f));
-		dgBody* const root = Find(contact->GetBody0());
-		root->m_disjointInfo.m_jointCount += 1;
 	}
 
 	// find and tag all sleeping disjoint sets
