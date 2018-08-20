@@ -79,15 +79,25 @@ class dgJointInfo
 	public:
 	union 
 	{
-		dgBody* m_body;
-		dgConstraint* m_joint;
+		struct 
+		{
+			dgConstraint* m_joint;
+			dgInt32 m_m0;
+			dgInt32 m_m1;
+			dgInt32 m_pairStart;
+			dgInt32 m_pairCount;
+		};
+		struct
+		{
+			dgBody* m_body;
+			dgInt32 m_bodyCount;
+			dgInt32 m_jointCount;
+			dgInt32 m_setId;
+			dgInt32 m_unUsed;
+		};
 	};
 	dgFloat32 m_preconditioner0;
 	dgFloat32 m_preconditioner1;
-	dgInt32 m_m0;
-	dgInt32 m_m1;
-	dgInt32 m_pairStart;
-	dgInt32 m_pairCount;
 };
 
 
@@ -225,7 +235,7 @@ class dgWorldDynamicUpdate
 	DG_INLINE dgBody* Find(dgBody* const body) const;
 	DG_INLINE dgBody* FindAndSplit(dgBody* const body) const;
 	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
-	void BuildClustersExperimental(dgFloat32 timestep);
+	dgInt32 BuildClustersExperimental(dgFloat32 timestep);
 
 	void BuildClusters(dgFloat32 timestep);
 	dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const;
