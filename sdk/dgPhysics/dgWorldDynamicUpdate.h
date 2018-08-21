@@ -228,12 +228,11 @@ class dgWorldDynamicUpdate
 	virtual void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 
 	private:
-/*
-	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
+//	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
-*/
-	DG_INLINE dgBody* Find(dgBody* const body) const;
-	DG_INLINE dgBody* FindAndSplit(dgBody* const body) const;
+
+	DG_INLINE dgBody* FindRoot(dgBody* const body) const;
+	DG_INLINE dgBody* FindRootAndSplit(dgBody* const body) const;
 	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
 	dgInt32 BuildClustersExperimental(dgFloat32 timestep);
 

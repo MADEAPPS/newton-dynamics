@@ -120,7 +120,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 	m_solverMemory.Init (world, maxRowCount, m_bodies);
 
-	dgInt32 threadCount = world->GetThreadCount();	
+
 
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
 	descriptor.m_timestep = timestep;
@@ -143,6 +143,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		}
 	}
 
+	const dgInt32 threadCount = world->GetThreadCount();	
 	if (index < m_clusters) {
 		descriptor.m_atomicCounter = 0;
 		descriptor.m_firstCluster = index;
@@ -154,10 +155,61 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 #else
 
-	BuildClustersExperimental(timestep);
+	m_joints = BuildClustersExperimental(timestep);
+	dgJointInfo* const jointArray = (dgJointInfo*)&world->m_jointsMemory[0];
+
+	dgInt32 smallSetStart = 0;
+	if (world->m_useParallelSolver) {
+		dgAssert (0);
+		smallSetStart = m_joints;
+		for (dgInt32 i = m_joints - 1; i; i --) {
+			if (jointArray[i].m_jointCount <= DG_PARALLEL_JOINT_COUNT_CUT_OFF) {
+				smallSetStart --;
+				if (i != smallSetStart) {
+					dgSwap(jointArray[i], jointArray[smallSetStart]);
+				}
+			}
+		}
+	}
+
+	dgInt32 setCount = 0;
+	const dgUnsigned32 lru = m_markLru - 1;
+	const dgInt32 smallJointCount = m_joints - smallSetStart;
+	for (dgInt32 i = 0; i < smallJointCount; i ++) {
+		dgJointInfo* const info = &jointArray[i + smallSetStart];
+		dgBody* const body = info->m_jointCount ? info->m_joint->GetBody0() : info->m_body;
+		dgBody* const root = FindRoot(body);
+		if (root->m_dynamicsLru < lru) {
+			root->m_index = setCount;
+			root->m_dynamicsLru = lru;
+			setCount ++;
+		}
+		info->m_setId = root->m_index;
+	}
+
+	dgInt32 smallJointCount = m_joints - smallSetStart;
+	dgSort (&jointArray[smallSetStart], smallJointCount, CompareJointInfos);
+
+
+	for (dgInt32 i = 0; i < smallJointCount; i ++) {
+	}
+
+	dgWorldDynamicUpdateSyncDescriptor descriptor;
+	if (smallSetStart != m_joints) {
+		descriptor.m_atomicCounter = 0;
+	//	descriptor.m_firstCluster = index;
+	//	descriptor.m_clusterCount = m_clusters - index;
+	//	for (dgInt32 i = 0; i < threadCount; i++) {
+	//		world->QueueJob(CalculateClusterReactionForcesKernel, &descriptor, world, "dgWorldDynamicUpdate::CalculateClusterReactionForces");
+	//	}
+	//	world->SynchronizationBarrier();
+	}
+
+	
+	
 /*
-	BuildClusters(timestep);
-	SortClustersByCount();
+//	BuildClusters(timestep);
+//	SortClustersByCount();
 
 	dgInt32 maxRowCount = 0;
 	dgInt32 softBodiesCount = 0;
@@ -169,9 +221,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 	m_solverMemory.Init(world, maxRowCount, m_bodies);
 
-	dgInt32 threadCount = world->GetThreadCount();
-
-	dgWorldDynamicUpdateSyncDescriptor descriptor;
+	
 	descriptor.m_timestep = timestep;
 
 	dgInt32 index = softBodiesCount;
@@ -236,26 +286,34 @@ dgInt32 dgWorldDynamicUpdate::CompareBodyInfos(const dgBodyInfo* const infoA, co
 	}
 	return 0;
 }
+*/
 
 dgInt32 dgWorldDynamicUpdate::CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void*)
 {
-	if (infoA->m_m0 < infoB->m_m0) {
+//	dgUnsigned64 keyA = (dgUnsigned64(infoA->m_jointCount) << 32) + infoA->m_setId;
+//	dgUnsigned64 keyB = (dgUnsigned64(infoB->m_jointCount) << 32) + infoB->m_setId;
+	if (infoA->m_jointCount < infoB->m_jointCount) {
+		return 1;
+	} else if (infoA->m_jointCount > infoB->m_jointCount) {
 		return -1;
-	} else if (infoA->m_m0 > infoB->m_m0) {
+	}
+	if (infoA->m_setId < infoB->m_setId) {
+		return -1;
+	} else if (infoA->m_setId > infoB->m_setId) {
 		return 1;
 	}
 	return 0;
 }
-*/
 
-DG_INLINE dgBody* dgWorldDynamicUpdate::Find(dgBody* const body) const
+
+DG_INLINE dgBody* dgWorldDynamicUpdate::FindRoot(dgBody* const body) const
 {
 	dgBody* node = body;
 	for (node = body; node->m_disjointInfo.m_parent != node; node = node->m_disjointInfo.m_parent);
 	return node;
 }
 
-DG_INLINE dgBody* dgWorldDynamicUpdate::FindAndSplit(dgBody* const body) const
+DG_INLINE dgBody* dgWorldDynamicUpdate::FindRootAndSplit(dgBody* const body) const
 {
 	dgBody* node = body;
 	while (node->m_disjointInfo.m_parent != node) {
@@ -270,8 +328,8 @@ DG_INLINE void dgWorldDynamicUpdate::UnionSet(const dgConstraint* const joint) c
 {
 	dgBody* const body0 = joint->GetBody0();
 	dgBody* const body1 = joint->GetBody1();
-	dgBody* root0 = FindAndSplit(body0);
-	dgBody* root1 = FindAndSplit(body1);
+	dgBody* root0 = FindRootAndSplit(body0);
+	dgBody* root1 = FindRootAndSplit(body1);
 	if (root0 != root1) {
 		if (root0->m_disjointInfo.m_rank < root1->m_disjointInfo.m_rank) {
 			dgSwap(root0, root1);
@@ -313,7 +371,7 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 		if (contact->GetBody1()->m_invMass.m_w > dgFloat32 (0.0f)) {
 			UnionSet(contact);
 		} else {
-			dgBody* const root = Find(contact->GetBody0());
+			dgBody* const root = FindRoot(contact->GetBody0());
 			root->m_disjointInfo.m_jointCount += 1;
 		}
 	}
@@ -348,7 +406,7 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	dgJointInfo* const augmentedJointArray = (dgJointInfo*)&world->m_jointsMemory[0];
 	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
 		dgConstraint* const contact = augmentedJointArray[i].m_joint;
-		dgBody* const root = Find (contact->GetBody0());
+		dgBody* const root = FindRoot (contact->GetBody0());
 		if (root->m_resting) {
 			augmentedJointCount --;
 			augmentedJointArray[i] = augmentedJointArray[augmentedJointCount];
@@ -397,7 +455,7 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node && (node->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32(0.0f)); node = node->GetPrev()) {
 		dgBody* const body = node->GetInfo().GetBody();
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			dgBody* const root = Find(body);
+			dgBody* const root = FindRoot(body);
 			if (!root->m_resting) {
 				if (root->m_index == -1) {
 					root->m_index = clusterCount;
@@ -419,7 +477,7 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
 		dgJointInfo& info = constraintArray[i];
 		dgConstraint* const contact = info.m_joint;
-		dgBody* const root = Find(contact->GetBody0());
+		dgBody* const root = FindRoot(contact->GetBody0());
 		if (!root->m_resting) {
 			info.m_pairStart = 0;
 			info.m_m0 = root->m_index;
