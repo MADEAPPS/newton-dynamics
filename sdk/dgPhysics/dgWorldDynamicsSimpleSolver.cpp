@@ -303,6 +303,24 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 }
 
 
+void dgWorldDynamicUpdate::ResolveSmallClusterForces(dgJointInfo* const jointInfo, dgInt32 jointCount, dgInt32 threadID, dgFloat32 timestep) const
+{
+//	dgInt32 activeJoint = cluster->m_jointCount;
+	if (jointCount == 1) {
+		if (jointInfo->m_jointCount == 0) {
+			dgDynamicBody* const body = (dgDynamicBody*) jointInfo->m_body;
+			body->AddDampingAcceleration(timestep);
+			body->IntegrateOpenLoopExternalForce(timestep);
+			dgAssert(0);
+//			IntegrateVelocity(cluster, DG_SOLVER_MAX_ERROR, timestep, threadID);
+		} else {
+			dgAssert(0);
+		}
+	} else {
+		dgAssert(0);
+	}
+}
+
 void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const
 {
 	dgWorld* const world = (dgWorld*) this;
