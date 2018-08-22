@@ -3424,14 +3424,14 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
   Create a height field collision geometry.
 
   @param *newtonWorld Pointer to the Newton world.
-  @param width fixme
-  @param height fixme
+  @param width the number of sample points in the x direction (fixme)
+  @param height the number of sample points in the y direction (fixme)
   @param gridsDiagonals fixme
   @param elevationdatType fixme
-  @param elevationMap fixme
-  @param attributeMap fixme
-  @param verticalScale fixme
-  @param horizontalScale fixme
+  @param elevationMap array holding elevation data of size = width*height (fixme)
+  @param attributeMap array holding attribute data of size = width*height (fixme)
+  @param verticalScale scale of the elevation (fixme)
+  @param horizontalScale scale in the xy direction. (fixme)
   @param shapeID fixme
 
   @return Pointer to the collision.
