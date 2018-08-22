@@ -79,14 +79,6 @@ class dgJointInfo
 	public:
 	union 
 	{
-		struct 
-		{
-			dgConstraint* m_joint;
-			dgInt32 m_m0;
-			dgInt32 m_m1;
-			dgInt32 m_pairStart;
-			dgInt32 m_pairCount;
-		};
 		struct
 		{
 			dgBody* m_body;
@@ -94,6 +86,14 @@ class dgJointInfo
 			dgInt32 m_jointCount;
 			dgInt32 m_setId;
 			dgInt32 m_unUsed;
+		};
+		struct 
+		{
+			dgConstraint* m_joint;
+			dgInt32 m_m0;
+			dgInt32 m_m1;
+			dgInt32 m_pairStart;
+			dgInt32 m_pairCount;
 		};
 	};
 	dgFloat32 m_preconditioner0;
@@ -234,21 +234,17 @@ class dgWorldDynamicUpdate
 	DG_INLINE dgBody* FindRoot(dgBody* const body) const;
 	DG_INLINE dgBody* FindRootAndSplit(dgBody* const body) const;
 	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
-	dgInt32 BuildClustersExperimental(dgFloat32 timestep);
-	void UpdateSmallClusters(dgJointInfo* const jointArray, dgInt32 jointCount, dgFloat32 timestep);
 
 	void BuildClusters(dgFloat32 timestep);
+	dgInt32 BuildClustersExperimental(dgFloat32 timestep);
+
 	dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const;
 	dgInt32 SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
 	static dgInt32 CompareClusters(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
 	static dgInt32 CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed);
-
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
-	static void CalculateSmallClusterReactionForcesKernel(void* const context, void* const worldContext, dgInt32 threadID);
-
-	void ResolveSmallClusterForces(dgJointInfo* const jointInfo, dgInt32 jointCount, dgInt32 threadID, dgFloat32 timestep) const;
 
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void ResolveClusterForces (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;

@@ -634,6 +634,8 @@ DG_INLINE dgInt32 dgBody::GetSerializedID() const
 
 DG_INLINE void dgBody::InitJointSet ()
 {
+	m_index = -1;
+	m_resting = 1;
 	m_disjointInfo.Init (this);
 }
 

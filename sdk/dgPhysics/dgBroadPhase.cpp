@@ -283,7 +283,6 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 	const dgInt32 threadCount = m_world->GetThreadCount();
 	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
-		body->m_resting = 1;
 		body->InitJointSet();
 		if (DoNeedUpdate(node)) {
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {

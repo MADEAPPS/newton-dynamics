@@ -109,7 +109,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_dynamicsLru = m_markLru;
 
-#if 1
+//	BuildClustersExperimental(timestep);
 	BuildClusters(timestep);
 	SortClustersByCount();
 
@@ -156,75 +156,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		}
 		world->SynchronizationBarrier();
 	}
-#else
-
-	m_joints = BuildClustersExperimental(timestep);
-	dgJointInfo* const jointArray = (dgJointInfo*)&world->m_jointsMemory[0];
-	dgInt32 smallSetStart = 0;
-	dgInt32 smallJointCount = m_joints - smallSetStart;
-
-	if (world->m_useParallelSolver) {
-		dgAssert (0);
-		smallSetStart = m_joints;
-		for (dgInt32 i = m_joints - 1; i; i --) {
-			if (jointArray[i].m_jointCount <= DG_PARALLEL_JOINT_COUNT_CUT_OFF) {
-				smallSetStart --;
-				if (i != smallSetStart) {
-					dgSwap(jointArray[i], jointArray[smallSetStart]);
-				}
-			}
-		}
-	}
-
-	UpdateSmallClusters(&jointArray[smallSetStart], smallJointCount, timestep);
-
-	
-/*
-//	BuildClusters(timestep);
-//	SortClustersByCount();
-
-	dgInt32 maxRowCount = 0;
-	dgInt32 softBodiesCount = 0;
-	for (dgInt32 i = 0; i < m_clusters; i++) {
-		dgBodyCluster& cluster = m_clusterMemory[i];
-		cluster.m_rowsStart = maxRowCount;
-		maxRowCount += cluster.m_rowsCount;
-		softBodiesCount += cluster.m_hasSoftBodies;
-	}
-	m_solverMemory.Init(world, maxRowCount, m_bodies);
-
-	
-	descriptor.m_timestep = timestep;
-
-	dgInt32 index = softBodiesCount;
-	descriptor.m_atomicCounter = 0;
-	descriptor.m_firstCluster = index;
-	descriptor.m_clusterCount = m_clusters - index;
-
-	dgInt32 useParallelSolver = world->m_useParallelSolver;
-	//useParallelSolver = 0;
-	if (useParallelSolver) {
-		dgInt32 count = 0;
-		for (dgInt32 i = 0; (i < m_clusters) && (m_clusterMemory[index + i].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF); i++) {
-			count++;
-		}
-		if (count) {
-			CalculateReactionForcesParallel(&m_clusterMemory[index], count, timestep);
-			index += count;
-		}
-	}
-
-	if (index < m_clusters) {
-		descriptor.m_atomicCounter = 0;
-		descriptor.m_firstCluster = index;
-		descriptor.m_clusterCount = m_clusters - index;
-		for (dgInt32 i = 0; i < threadCount; i++) {
-			world->QueueJob(CalculateClusterReactionForcesKernel, &descriptor, world, "dgWorldDynamicUpdate::CalculateClusterReactionForces");
-		}
-		world->SynchronizationBarrier();
-	}
-*/
-#endif
 
 /*
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
@@ -329,6 +260,20 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	jointArray.ResizeIfNecessary(jointCount + jointList.GetCount());
 	dgJointInfo* const baseJointArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
+#ifdef _DEBUG
+	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
+		const dgBodyMasterListRow& graphNode = node->GetInfo();
+		dgBody* const body = graphNode.GetBody();
+		if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
+			for (; node; node = node->GetPrev()) {
+				//dgAssert ((body->GetType() == dgBody::m_kinamticBody) ||(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f)));
+				dgAssert(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f));
+			}
+			break;
+		}
+	}
+#endif
+
 	// add bilateral joints to the joint array
 	for (dgBilateralConstraintList::dgListNode* node = jointList.GetFirst(); node; node = node->GetNext()) {
 		dgConstraint* const contact = node->GetInfo();
@@ -350,6 +295,8 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 
 	// find and tag all sleeping disjoint sets, 
 	// and add single bodies as a set of zero joints and one body
+	dgInt32 bodyInfo = 0;
+	dgInt32 clustersCount = 0;
 	dgInt32 augmentedJointCount = jointCount;
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node && (node->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32(0.0f)); node = node->GetPrev()) {
 		dgBody* const body = node->GetInfo().GetBody();
@@ -368,7 +315,10 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 				dgJointInfo& info = jointArray[augmentedJointCount];
 				info.m_body = body;
 				info.m_jointCount = 0;
+				info.m_setId = clustersCount;
 				info.m_bodyCount = root->m_disjointInfo.m_bodyCount;
+				clustersCount ++;
+				bodyInfo += 2;
 				augmentedJointCount ++;
 			}
 		}
@@ -377,7 +327,8 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	// remove all sleeping joints sets
 	dgJointInfo* const augmentedJointArray = (dgJointInfo*)&world->m_jointsMemory[0];
 	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
-		dgConstraint* const contact = augmentedJointArray[i].m_joint;
+		dgJointInfo* const info = &augmentedJointArray[i];
+		dgConstraint* const contact = info->m_joint;
 		dgBody* const root = FindRoot (contact->GetBody0());
 		if (root->m_resting) {
 			augmentedJointCount --;
@@ -385,25 +336,48 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 		} else {
 			augmentedJointArray[i].m_bodyCount = root->m_disjointInfo.m_bodyCount;
 			augmentedJointArray[i].m_jointCount = root->m_disjointInfo.m_jointCount;
+			if (root->m_index == -1) {
+				root->m_index = clustersCount;
+				clustersCount++;
+				bodyInfo += root->m_disjointInfo.m_bodyCount + 1;
+			}
+			info->m_setId = root->m_index;
 		}
 	}
+
+//	dgInt32 setCount = 0;
+//	const dgUnsigned32 lru = m_markLru - 1;
+//	for (dgInt32 i = 0; i < jointCount; i++) {
+//		dgJointInfo* const info = &jointArray[i];
+//		dgBody* const body = info->m_jointCount ? info->m_joint->GetBody0() : info->m_body;
+//		dgBody* const root = FindRoot(body);
+//		if (root->m_dynamicsLru < lru) {
+//			root->m_index = setCount;
+//			root->m_dynamicsLru = lru;
+//			setCount++;
+//		}
+//		info->m_setId = root->m_index;
+//	}
+	dgSort(augmentedJointArray, augmentedJointCount, CompareJointInfos);
+
+/*
+	dgInt32* const batches = dgAlloca(dgInt32, setCount + 1);
+	memset(batches, 0, sizeof(dgInt32) * (setCount + 1));
+	for (dgInt32 i = 0; i < jointCount; i++) {
+		dgJointInfo* const info = &jointArray[i];
+		batches[info->m_setId] ++;
+	}
+	dgInt32 start = 0;
+	for (dgInt32 i = 0; i <= setCount; i++) {
+		dgInt32 count = batches[i];
+		batches[i] = start;
+		start += count;
+	}
+*/
 
 	return augmentedJointCount;
 
 /*
-#ifdef _DEBUG
-	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
-		const dgBodyMasterListRow& graphNode = node->GetInfo();
-		dgBody* const body = graphNode.GetBody();
-		if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
-			for (; node; node = node->GetPrev()) {
-				//dgAssert ((body->GetType() == dgBody::m_kinamticBody) ||(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f)));
-				dgAssert(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f));
-			}
-			break;
-		}
-	}
-#endif
 
 	dgInt32 hasSoftBodies = 0;
 	dgInt32 jointCount = 0;
@@ -508,50 +482,6 @@ dgInt32 dgWorldDynamicUpdate::BuildClustersExperimental(dgFloat32 timestep)
 	m_clusters = clusterCount;
 */
 }
-
-void dgWorldDynamicUpdate::UpdateSmallClusters(dgJointInfo* const jointArray, dgInt32 jointCount, dgFloat32 timestep)
-{
-	dgInt32 setCount = 0;
-	const dgUnsigned32 lru = m_markLru - 1;
-	for (dgInt32 i = 0; i < jointCount; i++) {
-		dgJointInfo* const info = &jointArray[i];
-		dgBody* const body = info->m_jointCount ? info->m_joint->GetBody0() : info->m_body;
-		dgBody* const root = FindRoot(body);
-		if (root->m_dynamicsLru < lru) {
-			root->m_index = setCount;
-			root->m_dynamicsLru = lru;
-			setCount++;
-		}
-		info->m_setId = root->m_index;
-	}
-	dgSort(jointArray, jointCount, CompareJointInfos);
-	dgInt32* const batches = dgAlloca(dgInt32, setCount + 1);
-	memset(batches, 0, sizeof(dgInt32) * (setCount + 1));
-	for (dgInt32 i = 0; i < jointCount; i++) {
-		dgJointInfo* const info = &jointArray[i];
-		batches[info->m_setId] ++;
-	}
-	dgInt32 start = 0;
-	for (dgInt32 i = 0; i <= setCount; i++) {
-		dgInt32 count = batches[i];
-		batches[i] = start;
-		start += count;
-	}
-
-	dgWorldDynamicUpdateSyncDescriptor descriptor;
-	descriptor.m_atomicCounter = 0;
-	descriptor.m_clusterCount = setCount;
-	descriptor.m_jointBatches = batches;
-	descriptor.m_jointArray = jointArray;
-
-	dgWorld* const world = (dgWorld*) this;
-	const dgInt32 threadCount = world->GetThreadCount();
-	for (dgInt32 i = 0; i < threadCount; i++) {
-		world->QueueJob(CalculateSmallClusterReactionForcesKernel, &descriptor, world, "dgWorldDynamicUpdate::CalculateSmallClusterReactionForcesKernel");
-	}
-	world->SynchronizationBarrier();
-}
-
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
@@ -1011,23 +941,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 		world->ResolveClusterForces (cluster, threadID, timestep);
 	}
 }
-
-void dgWorldDynamicUpdate::CalculateSmallClusterReactionForcesKernel(void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*)context;
-
-	dgFloat32 timestep = descriptor->m_timestep;
-	dgWorld* const world = (dgWorld*)worldContext;
-	dgInt32 count = descriptor->m_clusterCount;
-	const dgInt32* const jointBatches = descriptor->m_jointBatches;
-	dgJointInfo* const jointArray = descriptor->m_jointArray;
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
-		dgInt32 jointStart = jointBatches[i];
-		dgInt32 jointCount = jointBatches[i + 1] - jointStart;
-		world->ResolveSmallClusterForces(&jointArray[jointStart], jointCount, threadID, timestep);
-	}
-}
-
 
 dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgInt32 rowCount) const
 {
