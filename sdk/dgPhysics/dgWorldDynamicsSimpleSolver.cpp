@@ -52,8 +52,9 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 			IntegrateExternalForce(cluster, timestep, threadID);
 		} else {
 			dgAssert((activeJoint == 0) && cluster->m_jointCount);
-			dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-			dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+			//dgBodyInfo* const bodyArrayPtr = &world->m_bodiesMemory[0];
+			//dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+			dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 			dgVector zero(dgVector::m_zero);
 			for (dgInt32 i = 1; i < cluster->m_bodyCount; i++) {
 				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
@@ -74,8 +75,9 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 		dgInt32 sleepCounter = 10000;
 
 		const dgInt32 bodyCount = cluster->m_bodyCount;
-		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-		dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+		//dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+		//dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+		dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 
 		const dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
 		dgFloat32 maxAccel = dgFloat32 (0.0f);
@@ -345,8 +347,9 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 void dgWorldDynamicUpdate::IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
 	dgWorld* const world = (dgWorld*) this;
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+	//dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+	//dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 
 	dgAssert (timestep > dgFloat32 (0.0f));
 	const dgInt32 bodyCount = cluster->m_bodyCount;
@@ -673,11 +676,14 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	const dgInt32 jointCount = cluster->m_jointCount;
 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-	dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
+	//dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
+	//dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
-	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
+	//dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
+	//dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
+	dgJointInfo* const constraintArray = &world->m_jointsMemory[cluster->m_jointStart];
+
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowsStart];
 	const dgLeftHandSide* const leftHandSide = &m_solverMemory.m_leftHandSizeBuffer[cluster->m_rowsStart];
 

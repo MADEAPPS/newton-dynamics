@@ -512,12 +512,13 @@ class dgWorld
 
 	dgListenerList m_listeners;
 	dgTree<void*, unsigned> m_perInstanceData;
-	dgArray<dgUnsigned8> m_bodiesMemory; 
+	dgArray<dgBodyInfo> m_bodiesMemory; 
 	dgArray<dgJointInfo> m_jointsMemory; 
+	dgArray<dgBodyCluster> m_clusterMemory;
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverRightHandSideMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
-	dgArray<dgUnsigned8> m_clusterMemory;
+	
 	
 	bool m_concurrentUpdate;
 	

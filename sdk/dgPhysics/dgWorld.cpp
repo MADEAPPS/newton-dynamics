@@ -228,10 +228,10 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_perInstanceData(allocator)
 	,m_bodiesMemory (allocator, 64)
 	,m_jointsMemory (allocator, 64)
+	,m_clusterMemory (allocator, 64)
 	,m_solverJacobiansMemory (allocator, 64)
 	,m_solverRightHandSideMemory (allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
-	,m_clusterMemory (allocator, 64)
 	,m_concurrentUpdate(false)
 {
 	//TestAStart();
@@ -241,9 +241,9 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	SetParentThread (myThread);
 
 	// avoid small memory fragmentations on initialization
-	m_bodiesMemory.Resize(1024 * 32);
+	m_bodiesMemory.Resize(1024);
+	m_clusterMemory.Resize(1024);
 	m_jointsMemory.Resize(1024 * 2);
-	m_clusterMemory.Resize(1024 * 32);
 	m_solverJacobiansMemory.Resize(1024 * 64);
 	m_solverRightHandSideMemory.Resize(1024 * 64);
 	m_solverForceAccumulatorMemory.Resize(1024 * 32);
@@ -892,8 +892,6 @@ void dgWorld::FlushCache()
 	// sort body list
 	SortMasterList();
 }
-
-
 
 
 void dgWorld::StepDynamics (dgFloat32 timestep)

@@ -71,7 +71,6 @@ class dgBodyInfo
 {
 	public:
 	dgBody* m_body;
-	dgInt32 m_clusterKey;
 };
 
 class dgJointInfo
@@ -235,8 +234,8 @@ class dgWorldDynamicUpdate
 	DG_INLINE dgBody* FindRootAndSplit(dgBody* const body) const;
 	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
 
+	void BuildClustersOld(dgFloat32 timestep);
 	void BuildClusters(dgFloat32 timestep);
-	dgInt32 BuildClustersExperimental(dgFloat32 timestep);
 
 	dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const;
 	dgInt32 SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
@@ -268,7 +267,7 @@ class dgWorldDynamicUpdate
 	dgInt32 m_markLru;
 	dgJacobianMemory m_solverMemory;
 	dgInt32 m_softBodyCriticalSectionLock;
-	dgBodyCluster* m_clusterMemory;
+	dgBodyCluster* m_clusterData;
 	
 	dgParallelBodySolver m_parallelSolver;
 	static dgVector m_velocTol;
