@@ -30,6 +30,7 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomKinematicController();
 
 	CUSTOM_JOINTS_API void SetPickMode (int mode);
+    CUSTOM_JOINTS_API void SetLimitRotationVelocity(int limit);
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
 	
@@ -54,6 +55,7 @@ class dCustomKinematicController: public dCustomJoint
 	dFloat m_maxLinearFriction;
 	dFloat m_maxAngularFriction;
 	bool m_isSixdof;
+    bool m_limitRotVel;
 	bool m_autoSleepState;
 
 	DECLARE_CUSTOM_JOINT(dCustomKinematicController, dCustomJoint)
