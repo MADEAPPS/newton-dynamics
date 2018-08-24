@@ -110,6 +110,7 @@ class dgBodyJacobianPair
 class dgBodyCluster
 {
 	public:
+dgBody* m_bodyInfo;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_rowsCount;
@@ -229,6 +230,7 @@ class dgWorldDynamicUpdate
 	private:
 //	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
+	static dgInt32 CompareClusterInfos (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
 
 	DG_INLINE dgBody* FindRoot(dgBody* const body) const;
 	DG_INLINE dgBody* FindRootAndSplit(dgBody* const body) const;

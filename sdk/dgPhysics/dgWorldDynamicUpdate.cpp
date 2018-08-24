@@ -203,6 +203,24 @@ dgInt32 dgWorldDynamicUpdate::CompareJointInfos(const dgJointInfo* const infoA, 
 	return 0;
 }
 
+dgInt32 dgWorldDynamicUpdate::CompareClusterInfos(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed)
+{
+	const dgBody* const bodyA = clusterA->m_bodyInfo;
+	const dgBody* const bodyB = clusterB->m_bodyInfo;
+
+	if (bodyA->m_disjointInfo.m_jointCount < bodyB->m_disjointInfo.m_jointCount) {
+		return 1;
+	} else if (bodyA->m_disjointInfo.m_jointCount > bodyB->m_disjointInfo.m_jointCount) {
+		return -1;
+	}
+	if (bodyA->m_index < bodyB->m_index) {
+		return -1;
+	} else if (bodyA->m_index > bodyB->m_index) {
+		return 1;
+	}
+	return 0;
+}
+
 DG_INLINE dgBody* dgWorldDynamicUpdate::FindRoot(dgBody* const body) const
 {
 	dgBody* node = body;
@@ -316,9 +334,10 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 				info.m_setId = clustersCount;
 				info.m_bodyCount = root->m_disjointInfo.m_bodyCount;
 
-				dgBodyCluster& cluster = clusterMemory[clustersCount];
-				cluster.m_bodyCount = 2;
-				cluster.m_jointCount = 0;
+				//dgBodyCluster& cluster = clusterMemory[clustersCount];
+				//cluster.m_bodyCount = 2;
+				//cluster.m_jointCount = 0;
+				clusterMemory[clustersCount].m_bodyInfo = root;
 
 				clustersCount ++;
 				bodyInfoCount += 2;
@@ -342,9 +361,10 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 			if (root->m_index == -1) {
 				root->m_index = clustersCount;
 
-				dgBodyCluster& cluster = clusterMemory[clustersCount];
-				cluster.m_bodyCount = root->m_disjointInfo.m_bodyCount + 1;
-				cluster.m_jointCount = root->m_disjointInfo.m_jointCount;
+				//dgBodyCluster& cluster = clusterMemory[clustersCount];
+				//cluster.m_bodyCount = root->m_disjointInfo.m_bodyCount + 1;
+				//cluster.m_jointCount = root->m_disjointInfo.m_jointCount;
+				clusterMemory[clustersCount].m_bodyInfo = root;
 
 				clustersCount++;
 				bodyInfoCount += root->m_disjointInfo.m_bodyCount + 1;
@@ -496,6 +516,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 */
 
 	dgSort(augmentedJointArray, augmentedJointCount, CompareJointInfos);
+	dgSort(&world->m_clusterMemory[0], clustersCount, CompareClusterInfos);
 
 }
 
