@@ -90,7 +90,7 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 	dgInt32 jointIndex = 0;
 	for (dgInt32 i = 0; i < clustersCount; i++) {
 		const dgBodyCluster* const srcCluster = &clusterArray[i];
-		rowsCount += srcCluster->m_rowsCount;
+		rowsCount += srcCluster->m_rowCount;
 
 		dgBodyInfo* const srcBodyArray = &bodyPtr[srcCluster->m_bodyStart];
 		const dgInt32 count = srcCluster->m_bodyCount;
@@ -123,9 +123,9 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 	cluster.m_jointStart = 0;
 	cluster.m_bodyCount = bodyIndex;
 	cluster.m_jointCount = jointsCount;
-	cluster.m_rowsCount = rowsCount;
+	cluster.m_rowCount = rowsCount;
 
-	cluster.m_rowsStart = 0;
+	cluster.m_rowStart = 0;
 	cluster.m_isContinueCollision = 0;
 	cluster.m_hasSoftBodies = 0;
 

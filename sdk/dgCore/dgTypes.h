@@ -575,8 +575,9 @@ void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 r
 template <class T> 
 void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
-	DG_TRACKTIME_NAMED("dgSort");
-	dgInt32 stride = 8;
+//	DG_TRACKTIME_NAMED("dgSort");
+	DG_TRACKTIME(__FUNCTION__);
+	const dgInt32 batchSize = 8;
 	dgInt32 stack[1024][2];
 
 	stack[0][0] = 0;
@@ -586,7 +587,7 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 		stackIndex --;
 		dgInt32 lo = stack[stackIndex][0];
 		dgInt32 hi = stack[stackIndex][1];
-		if ((hi - lo) > stride) {
+		if ((hi - lo) > batchSize) {
 			dgInt32 mid = (lo + hi) >> 1;
 			if (compare(&array[lo], &array[mid], context) > 0) {
 				dgSwap(array[lo], array[mid]);
@@ -625,7 +626,7 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 		}
 	}
 
-//	stride = stride * 2;
+	dgInt32 stride = batchSize + 1;
 	if (elements < stride) {
 		stride = elements;
 	}
@@ -656,7 +657,8 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 template <class T> 
 void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
-	dgInt32 stride = 8;
+	DG_TRACKTIME(__FUNCTION__);
+	const dgInt32 batchSize = 8;
 	dgInt32 stack[1024][2];
 
 	stack[0][0] = 0;
@@ -666,7 +668,7 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 		stackIndex --;
 		dgInt32 lo = stack[stackIndex][0];
 		dgInt32 hi = stack[stackIndex][1];
-		if ((hi - lo) > stride) {
+		if ((hi - lo) > batchSize) {
 			dgInt32 mid = (lo + hi) >> 1;
 			if (compare(array[lo], array[mid], context) > 0) {
 				dgSwap(array[lo], array[mid]);
@@ -705,7 +707,8 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 		}
 	}
 
-//	stride = stride * 2;
+
+	dgInt32 stride = batchSize + 1;
 	if (elements < stride) {
 		stride = elements;
 	}

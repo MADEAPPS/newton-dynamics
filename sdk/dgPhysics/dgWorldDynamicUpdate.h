@@ -110,13 +110,12 @@ class dgBodyJacobianPair
 class dgBodyCluster
 {
 	public:
-dgBody* m_bodyInfo;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
-	dgInt32 m_rowsCount;
+	dgInt32 m_rowCount;
 	dgInt32 m_bodyStart;
 	dgInt32 m_jointStart;	
-	dgInt32 m_rowsStart;
+	dgInt32 m_rowStart;
 	dgInt16 m_hasSoftBodies;
 	dgInt16 m_isContinueCollision;
 };
@@ -229,6 +228,7 @@ class dgWorldDynamicUpdate
 
 	private:
 //	static dgInt32 CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void* notUsed);
+	static DG_INLINE dgInt32 CompareKey(dgInt32 highA, dgInt32 lowA, dgInt32 highB, dgInt32 lowB);
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
 	static dgInt32 CompareClusterInfos (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
 
@@ -258,7 +258,6 @@ class dgWorldDynamicUpdate
 	dgFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;
 	dgJacobian IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const ;
 
-	void SortClustersByCount ();
 	void IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void IntegrateVelocity (const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	void CalculateClusterContacts (dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
@@ -267,6 +266,7 @@ class dgWorldDynamicUpdate
 	dgInt32 m_joints;
 	dgInt32 m_clusters;
 	dgInt32 m_markLru;
+	dgInt32 m_softBodiesCount;
 	dgJacobianMemory m_solverMemory;
 	dgInt32 m_softBodyCriticalSectionLock;
 	dgBodyCluster* m_clusterData;

@@ -92,12 +92,14 @@ class dgBody
 			m_rank = 0;
 			m_bodyCount = 1;
 			m_jointCount = 0;
+			m_rowCount = 0;
 		}
 
 		dgBody* m_parent;
 		dgInt32 m_rank;
 		dgInt32 m_bodyCount;
 		dgInt32 m_jointCount;
+		dgInt32 m_rowCount;
 	};
 
 	DG_CLASS_ALLOCATOR(allocator)
@@ -292,7 +294,6 @@ class dgBody
 	OnMatrixUpdateCallback m_matrixUpdate;
 
 	dgSetInfo m_disjointInfo;
-	
 	dgInt32 m_index;
 	dgInt32 m_uniqueID;
 	dgInt32 m_bodyGroupId;
