@@ -38,13 +38,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	dgWorld* const world = (dgWorld*) this;
 
 	dgBodyCluster cluster(MergeClusters(clusterArray, clustersCount));
-
-//	dgBodyInfo* const bodyPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-//	dgBodyInfo* const bodyArray = &bodyPtr[m_bodies];
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[m_bodies];
-
-//	dgJointInfo* const constraintArray = &world->m_jointsMemory[0];
-//	dgJointInfo* const jointArray = &constraintArray[m_joints];
 	dgJointInfo* const jointArray = &world->m_jointsMemory[m_joints];
 
 	if (world->m_currentPlugin) {

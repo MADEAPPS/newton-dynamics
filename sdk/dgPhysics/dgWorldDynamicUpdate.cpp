@@ -247,7 +247,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 
 	dgArray<dgJointInfo>& jointArray = world->m_jointsMemory;
 	jointArray.ResizeIfNecessary(jointCount + jointList.GetCount());
-	dgJointInfo* const baseJointArray = (dgJointInfo*)&world->m_jointsMemory[0];
+	dgJointInfo* const baseJointArray = &jointArray[0];
 
 #ifdef _DEBUG
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
@@ -331,7 +331,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	}
 
 	// remove all sleeping joints sets
-	dgJointInfo* const augmentedJointArray = (dgJointInfo*)&world->m_jointsMemory[0];
+	dgJointInfo* const augmentedJointArray = &jointArray[0];
 	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
 		dgJointInfo* const info = &augmentedJointArray[i];
 		dgConstraint* const contact = info->m_joint;
@@ -383,6 +383,50 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	}
 
 	m_solverMemory.Init(world, rowStart, bodyStart);
+	world->m_bodiesMemory.ResizeIfNecessary(bodyStart);
+	for (dgInt32 i = 0; i < clustersCount; i++) {
+		const dgBodyCluster& cluster = m_clusterData[i];
+		dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster.m_bodyStart];
+		dgJointInfo* const jointSetArray = &augmentedJointArray[cluster.m_jointStart];
+		bodyArray[0].m_body = world->GetSentinelBody();
+
+		if (cluster.m_jointCount) {
+			dgInt32 bodyIndex = 1;
+			for (dgInt32 j = 0; j < cluster.m_jointCount; j++) {
+				dgJointInfo* const jointInfo = &jointSetArray[j];
+				dgConstraint* const joint = jointInfo->m_joint;
+				dgBody* const body0 = joint->m_body0;
+				dgBody* const body1 = joint->m_body1;
+
+				dgAssert(body0->GetInvMass().m_w != dgFloat32(0.0f));
+				if (body0->m_disjointInfo.m_rank >= 0) {
+					body0->m_disjointInfo.m_rank = -1;
+					body0->m_index = bodyIndex;
+					bodyArray[bodyIndex].m_body = body0;
+					bodyIndex++;
+					dgAssert(bodyIndex <= cluster.m_bodyCount);
+				}
+
+				dgInt32 m1 = 0;
+				dgInt32 m0 = body0->m_index;
+				if (body1->GetInvMass().m_w != dgFloat32(0.0f)) {
+					if (body1->m_disjointInfo.m_rank >= 0) {
+						body1->m_disjointInfo.m_rank = -1;
+						body1->m_index = bodyIndex;
+						bodyArray[bodyIndex].m_body = body1;
+						bodyIndex++;
+						dgAssert(bodyIndex <= cluster.m_bodyCount);
+					}
+					m0 = body1->m_index;
+				}
+				jointInfo->m_m0 = m0;
+				jointInfo->m_m1 = m1;
+			}
+		} else {
+			dgAssert(cluster.m_bodyCount == 2);
+			bodyArray[1].m_body = jointSetArray[0].m_body;
+		}
+	}
 
 	m_softBodiesCount = softBodiesCount;
 	m_bodies = bodyStart;
@@ -514,8 +558,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						bool check1 = constraint->m_dynamicsLru != lruMark;
 						if (check1) {
 							const dgInt32 jointIndex = m_joints + jointCount;
-							//dgAssert (0);
-							//world->m_jointsMemory.ResizeIfNecessary(jointIndex + 1);
 							dgJointInfo* const jointInfo = &world->m_jointsMemory[jointIndex];
 
 							constraint->m_index = jointCount;
@@ -680,12 +722,7 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
-//	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-//	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
-
-//	dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
-//	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 	dgJointInfo* const constraintArray = &world->m_jointsMemory[cluster->m_jointStart];
 
 	const dgInt32 bodyCount = cluster->m_bodyCount;
@@ -862,7 +899,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 	dgFloat32 timestep = descriptor->m_timestep;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgInt32 count = descriptor->m_clusterCount;
-	//dgBodyCluster* const clusters = &((dgBodyCluster*)&world->m_clusterData[0])[descriptor->m_firstCluster];
 	dgBodyCluster* const clusters = &world->m_clusterData[descriptor->m_firstCluster];
 
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
