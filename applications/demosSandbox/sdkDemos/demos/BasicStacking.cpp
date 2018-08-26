@@ -277,11 +277,8 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 //	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
 	int high = 20;
-//high = 10;
-high = 30;
 //high = 40;
-//high = 20;
-high = 4;
+high = 30;
 
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
@@ -310,8 +307,8 @@ high = 10;
 
 	// place camera into position
 	dQuaternion rot;
-//	dVector origin(-40.0f, 10.0f, 0.0f, 0.0f);
-dVector origin(-5.0f, 2.0f, 0.0f, 0.0f);
+	dVector origin(-40.0f, 10.0f, 0.0f, 0.0f);
+//dVector origin(-5.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
