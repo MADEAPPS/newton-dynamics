@@ -860,6 +860,7 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 				dgAssert(!(*root)->m_parent);
 				//entropy = CalculateEntropy(fitness, root);
 				entropy = fitness.TotalCost();
+				fitness.m_prevCost = entropy;
 			}
 			oldEntropy = entropy;
 		}
@@ -1379,13 +1380,12 @@ dgFloat64 dgBroadPhase::CalculateEntropy (dgFitnessList& fitness, dgBroadPhaseNo
 				node = node ? node->GetNext() : NULL;
 			}
 		} while (node);
-		
-		fitness.m_index++;
-		if (fitness.m_index >= mod) {
-			fitness.m_index = 0;
+	
+		if (!fitness.m_index) {
 			cost = fitness.TotalCost();
 			fitness.m_prevCost = cost;
 		}
+		fitness.m_index = (fitness.m_index + 1) % mod;
 	}
 	return cost;
 #endif
@@ -1690,6 +1690,8 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
+	UpdateFitness();
+
 	dgContactList::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
@@ -1747,7 +1749,5 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	AttachNewContacts(lastNode);
 	RemoveOldContacts();
-
-	UpdateFitness();
 }
 
