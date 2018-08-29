@@ -1706,12 +1706,13 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_world->SynchronizationBarrier();
 	}
 
-	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
-		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
+//	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
+//	for (dgInt32 i = 0; i < threadsCount; i++) {
+//		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
+//		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
+//	}
+//	m_world->SynchronizationBarrier();
+	FindColliningPairs(&syncPoints, timestep);
 
 	dgContactList::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1751,3 +1752,83 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	RemoveOldContacts();
 }
 
+void dgBroadPhase::FindColliningPairs(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timestep)
+{
+	DG_TRACKTIME(__FUNCTION__);
+
+	const dgInt32 threadsCount = m_world->GetThreadCount();
+	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob(CollidingPairsKernel, descriptor, broadPhaseNode, "dgBroadPhase::CollidingPairs");
+		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
+	}
+	m_world->SynchronizationBarrier();
+
+/*
+	dgBroadPhaseNodePair pool[128];
+	pool[0].m_left = m_rootNode->GetLeft();
+	pool[0].m_right = m_rootNode->GetRight();
+	dgInt32 stack = 1;
+
+int xxx = 0;
+	while (stack) {
+		stack --;
+
+		dgBroadPhaseNode* const left = pool[stack].m_left;
+		dgBroadPhaseNode* const right = pool[stack].m_right;
+
+		if (left->IsLeafNode() && right->IsLeafNode()) {
+			dgBody* const body0 = left->GetBody();
+			dgBody* const body1 = right->GetBody();
+			dgAssert (body0);
+			dgAssert (body1);
+
+			//const dgVector body0P0(body0->m_minAABB);
+			//const dgVector body0P1(body0->m_maxAABB);
+			//const dgVector body1P0(body1->m_minAABB);
+			//const dgVector body1P1(body1->m_maxAABB);
+xxx ++;
+			//if (dgOverlapTest(body0P0, body0->m_maxAABB, body1P0, body1->m_maxAABB)) {
+			//	if (test0 || (body1->GetInvMass().m_w != dgFloat32(0.0f))) {
+			//	AddPair(body0, body1, timestep, threadID);
+			//	AddPair(body0, body1, timestep, 0);
+			//}
+		} else {
+			dgBroadPhaseNode* children[4];
+			dgInt32 count = 4;
+			if (left->IsLeafNode()) {
+				count = 3;
+				dgAssert (!right->IsLeafNode());
+				children[0] = left;
+				children[1] = right->GetLeft();
+				children[2] = right->GetRight();
+			} else if (right->IsLeafNode()) {
+				count = 3;
+				dgAssert(!left->IsLeafNode());
+				children[0] = right;
+				children[1] = left->GetLeft();
+				children[2] = left->GetRight();
+			} else {
+				children[0] = left->GetLeft();
+				children[1] = left->GetRight();
+				children[2] = right->GetLeft();
+				children[3] = right->GetRight();
+			}
+			for (dgInt32 i = 1; i < count; i ++) {
+				dgBroadPhaseNode* const nodeB = children[i];
+				for (dgInt32 j = 0; j < i; j ++) {
+					dgBroadPhaseNode* const nodeA = children[j];
+					if (dgOverlapTest(nodeA->m_minBox, nodeA->m_maxBox, nodeB->m_minBox, nodeB->m_maxBox)) {
+						pool[stack].m_left = nodeA;
+						pool[stack].m_right = nodeB;
+						stack ++;
+						dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
+					}
+				}
+			}
+		}
+	}
+
+xxx *=1;
+*/
+}

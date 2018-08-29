@@ -526,6 +526,8 @@ class dgBroadPhase
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
 	void AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodeConstactNode, dgInt32 threadID);
 		
+	void FindColliningPairs(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timestep);
+		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
@@ -541,6 +543,13 @@ class dgBroadPhase
 		public:
 		dgBody* m_body0;
 		dgBody* m_body1;
+	};
+
+	class dgBroadPhaseNodePair
+	{
+		public:
+		dgBroadPhaseNode* m_left;
+		dgBroadPhaseNode* m_right;
 	};
 
 	dgWorld* m_world;

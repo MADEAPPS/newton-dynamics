@@ -47,7 +47,7 @@
     <ClCompile Include="..\..\dgPhysics\dgBodyMasterList.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgBroadPhase.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgBroadPhaseAggregate.cpp" />
-    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseDefault.cpp" />
+    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseMixed.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgBroadPhaseSegregated.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgCollision.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgCollisionBox.cpp" />
@@ -110,7 +110,7 @@
     <ClInclude Include="..\..\dgPhysics\dgBodyMasterList.h" />
     <ClInclude Include="..\..\dgPhysics\dgBroadPhase.h" />
     <ClInclude Include="..\..\dgPhysics\dgBroadPhaseAggregate.h" />
-    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseDefault.h" />
+    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseMixed.h" />
     <ClInclude Include="..\..\dgPhysics\dgBroadPhaseSegregated.h" />
     <ClInclude Include="..\..\dgPhysics\dgCollision.h" />
     <ClInclude Include="..\..\dgPhysics\dgCollisionBox.h" />
