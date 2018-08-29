@@ -187,8 +187,8 @@ class dgWorld
 
 	enum dgBroadPhaseType
 	{
-		m_defaultBroadphase,
-		m_persistentBroadphase,
+		m_broadphaseMixed,
+		m_broadphaseSegregated,
 	};
 
 	class dgListener

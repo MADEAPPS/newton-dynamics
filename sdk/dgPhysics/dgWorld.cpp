@@ -32,12 +32,12 @@
 #include "dgCollisionSphere.h"
 #include "dgInverseDynamics.h"
 #include "dgCollisionCapsule.h"
-#include "dgBroadPhaseDefault.h"
+#include "dgBroadPhaseMixed.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionCompound.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgCollisionConvexHull.h"
-#include "dgBroadPhasePersistent.h"
+#include "dgBroadPhaseSegregated.h"
 #include "dgCollisionChamferCylinder.h"
 
 #include "dgUserConstraint.h"
@@ -313,8 +313,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	SetThreadsCount (0);
 
-	m_broadPhase = new (allocator) dgBroadPhaseDefault(this);
-	//m_broadPhase = new (allocator) dgBroadPhasePersistent(this);
+	m_broadPhase = new (allocator) dgBroadPhaseMixed(this);
+	//m_broadPhase = new (allocator) dgBroadPhaseSegregated (this);
 
 	//m_pointCollision = new (m_allocator) dgCollisionPoint(m_allocator);
 	dgCollision* const pointCollison = new (m_allocator) dgCollisionPoint(m_allocator);
@@ -1067,13 +1067,13 @@ void dgWorld::SetBroadPhaseType(dgInt32 type)
 		
 		switch (type)
 		{
-			case m_persistentBroadphase:
-				newBroadPhase = new (m_allocator) dgBroadPhasePersistent(this);
+			case m_broadphaseSegregated:
+				newBroadPhase = new (m_allocator) dgBroadPhaseSegregated (this);
 				break;
 
-			case m_defaultBroadphase:
+			case m_broadphaseMixed:
 			default:
-				newBroadPhase = new (m_allocator) dgBroadPhaseDefault(this);
+				newBroadPhase = new (m_allocator) dgBroadPhaseMixed(this);
 				break;
 		}
 
@@ -1089,13 +1089,13 @@ void dgWorld::ResetBroadPhase()
 
 	switch (GetBroadPhaseType())
 	{
-		case m_persistentBroadphase:
-			newBroadPhase = new (m_allocator) dgBroadPhasePersistent(this);
+		case m_broadphaseSegregated:
+			newBroadPhase = new (m_allocator) dgBroadPhaseSegregated (this);
 			break;
 
-		case m_defaultBroadphase:
+		case m_broadphaseMixed:
 		default:
-			newBroadPhase = new (m_allocator) dgBroadPhaseDefault(this);
+			newBroadPhase = new (m_allocator) dgBroadPhaseMixed(this);
 			break;
 	}
 

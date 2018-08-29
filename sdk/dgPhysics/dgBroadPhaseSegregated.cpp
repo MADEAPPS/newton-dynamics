@@ -24,13 +24,13 @@
 #include "dgWorld.h"
 #include "dgCollisionInstance.h"
 #include "dgBroadPhaseAggregate.h"
-#include "dgBroadPhasePersistent.h"
+#include "dgBroadPhaseSegregated.h"
 
 
-class dgBroadPhasePesistanceRootNode: public dgBroadPhaseTreeNode
+class dgBroadPhaseSegregatedRootNode: public dgBroadPhaseTreeNode
 {
 	public:
-	dgBroadPhasePesistanceRootNode()
+	dgBroadPhaseSegregatedRootNode()
 		:dgBroadPhaseTreeNode()
 	{
 	}
@@ -54,7 +54,7 @@ class dgBroadPhasePesistanceRootNode: public dgBroadPhaseTreeNode
 	}
 };
 
-dgBroadPhasePersistent::dgBroadPhasePersistent(dgWorld* const world)
+dgBroadPhaseSegregated::dgBroadPhaseSegregated (dgWorld* const world)
 	:dgBroadPhase(world)
 	,m_staticEntropy(dgFloat32 (0.0f))
 	,m_dynamicsEntropy(dgFloat32 (0.0f))
@@ -62,20 +62,20 @@ dgBroadPhasePersistent::dgBroadPhasePersistent(dgWorld* const world)
 	,m_dynamicsFitness(world->GetAllocator())
 	,m_staticNeedsUpdate(true)
 {
-	m_rootNode = new (world->GetAllocator()) dgBroadPhasePesistanceRootNode();
+	m_rootNode = new (world->GetAllocator()) dgBroadPhaseSegregatedRootNode();
 }
 
-dgBroadPhasePersistent::~dgBroadPhasePersistent()
+dgBroadPhaseSegregated::~dgBroadPhaseSegregated ()
 {
 	delete m_rootNode;
 }
 
-dgInt32 dgBroadPhasePersistent::GetType() const
+dgInt32 dgBroadPhaseSegregated::GetType() const
 {
-	return dgWorld::m_persistentBroadphase;
+	return dgWorld::m_broadphaseSegregated;
 }
 
-void dgBroadPhasePersistent::CheckStaticDynamic(dgBody* const body, dgFloat32 mass)
+void dgBroadPhaseSegregated::CheckStaticDynamic(dgBody* const body, dgFloat32 mass)
 {
 	dgBroadPhaseNode* const node = body->GetBroadPhase();
 	if (node) {
@@ -89,10 +89,10 @@ void dgBroadPhasePersistent::CheckStaticDynamic(dgBody* const body, dgFloat32 ma
 	}
 }
 
-void dgBroadPhasePersistent::Add(dgBody* const body)
+void dgBroadPhaseSegregated::Add(dgBody* const body)
 {
 	dgAssert (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
-	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	dgAssert (m_rootNode->IsPersistentRoot());
 
 	if (body->GetCollision()->IsType(dgCollision::dgCollisionMesh_RTTI) || (body->GetInvMass().m_w == dgFloat32(0.0f))) {
@@ -117,17 +117,17 @@ void dgBroadPhasePersistent::Add(dgBody* const body)
 	}
 }
 
-dgBroadPhaseAggregate* dgBroadPhasePersistent::CreateAggregate()
+dgBroadPhaseAggregate* dgBroadPhaseSegregated::CreateAggregate()
 {
 	dgBroadPhaseAggregate* const aggregate = new (m_world->GetAllocator()) dgBroadPhaseAggregate(m_world->GetBroadPhase());
 	LinkAggregate(aggregate);
 	return aggregate;
 }
 
-void dgBroadPhasePersistent::LinkAggregate(dgBroadPhaseAggregate* const aggregate)
+void dgBroadPhaseSegregated::LinkAggregate(dgBroadPhaseAggregate* const aggregate)
 {
 	dgAssert(m_rootNode->IsPersistentRoot());
-	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 
 	aggregate->m_broadPhase = this;
 	if (root->m_left) {
@@ -141,19 +141,19 @@ void dgBroadPhasePersistent::LinkAggregate(dgBroadPhaseAggregate* const aggregat
 	aggregate->m_myAggregateNode = m_aggregateList.Append(aggregate);
 }
 
-void dgBroadPhasePersistent::DestroyAggregate(dgBroadPhaseAggregate* const aggregate)
+void dgBroadPhaseSegregated::DestroyAggregate(dgBroadPhaseAggregate* const aggregate)
 {
 	m_updateList.Remove(aggregate->m_updateNode);
 	m_aggregateList.Remove(aggregate->m_myAggregateNode);
 	RemoveNode(aggregate);
 }
 
-void dgBroadPhasePersistent::RemoveNode(dgBroadPhaseNode* const node)
+void dgBroadPhaseSegregated::RemoveNode(dgBroadPhaseNode* const node)
 {
 	dgAssert (node->m_parent);
 
 	if (node->m_parent->IsPersistentRoot()) {
-		dgBroadPhasePesistanceRootNode* const parent = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+		dgBroadPhaseSegregatedRootNode* const parent = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 		dgAssert(parent == node->m_parent);
 
 		if (parent->m_right == node) {
@@ -204,7 +204,7 @@ void dgBroadPhasePersistent::RemoveNode(dgBroadPhaseNode* const node)
 			delete parent;
 
 		} else if (parent->m_parent->IsPersistentRoot()) {
-			dgBroadPhasePesistanceRootNode* const grandParent = (dgBroadPhasePesistanceRootNode*) parent->m_parent;
+			dgBroadPhaseSegregatedRootNode* const grandParent = (dgBroadPhaseSegregatedRootNode*) parent->m_parent;
 			if (grandParent->m_right == parent) {
 				m_staticNeedsUpdate = true;
 				if (parent->m_right == node) {
@@ -287,9 +287,9 @@ void dgBroadPhasePersistent::RemoveNode(dgBroadPhaseNode* const node)
 	}
 }
 
-void dgBroadPhasePersistent::UnlinkAggregate (dgBroadPhaseAggregate* const aggregate)
+void dgBroadPhaseSegregated::UnlinkAggregate (dgBroadPhaseAggregate* const aggregate)
 {
-	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	dgAssert (root && root->m_left);
 	if (aggregate->m_parent == root) {
 		root->m_left = NULL;
@@ -324,7 +324,7 @@ void dgBroadPhasePersistent::UnlinkAggregate (dgBroadPhaseAggregate* const aggre
 	aggregate->m_parent = NULL;
 }
 
-void dgBroadPhasePersistent::Remove(dgBody* const body)
+void dgBroadPhaseSegregated::Remove(dgBody* const body)
 {
 	if (body->GetBroadPhase()) {
 		dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
@@ -335,7 +335,7 @@ void dgBroadPhasePersistent::Remove(dgBody* const body)
 	}
 }
 
-void dgBroadPhasePersistent::ResetEntropy()
+void dgBroadPhaseSegregated::ResetEntropy()
 {
 	m_staticNeedsUpdate = true;
 	m_staticEntropy = dgFloat32(0.0f);
@@ -343,20 +343,20 @@ void dgBroadPhasePersistent::ResetEntropy()
 }
 
 
-void dgBroadPhasePersistent::InvalidateCache()
+void dgBroadPhaseSegregated::InvalidateCache()
 {
 	ResetEntropy();
 	m_staticNeedsUpdate = false;
 	dgAssert (m_rootNode->IsPersistentRoot());
-	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	ImproveFitness(m_staticFitness, m_staticEntropy, &root->m_right);
 	ImproveFitness(m_dynamicsFitness, m_dynamicsEntropy, &root->m_left);
 	root->SetBox ();
 }
 
-void dgBroadPhasePersistent::UpdateFitness()
+void dgBroadPhaseSegregated::UpdateFitness()
 {
-	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	if (m_staticNeedsUpdate) {
 		m_staticNeedsUpdate = false;
 		ImproveFitness(m_staticFitness, m_staticEntropy, &root->m_right);
@@ -365,9 +365,9 @@ void dgBroadPhasePersistent::UpdateFitness()
 	root->SetBox ();
 }
 
-void dgBroadPhasePersistent::ForEachBodyInAABB(const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const
+void dgBroadPhaseSegregated::ForEachBodyInAABB(const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const
 {
-	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	const dgBroadPhaseNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
 
 	dgInt32 stack = 0;
@@ -383,9 +383,9 @@ void dgBroadPhasePersistent::ForEachBodyInAABB(const dgVector& minBox, const dgV
 	dgBroadPhase::ForEachBodyInAABB(stackPool, stack, minBox, maxBox, callback, userData);
 }
 
-void dgBroadPhasePersistent::RayCast(const dgVector& l0, const dgVector& l1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
+void dgBroadPhaseSegregated::RayCast(const dgVector& l0, const dgVector& l1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
 {
-	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	if (filter && (root->m_left || root->m_right)) {
 		dgVector segment(l1 - l0);
 		dgFloat32 dist2 = segment.DotProduct3(segment);
@@ -419,7 +419,7 @@ void dgBroadPhasePersistent::RayCast(const dgVector& l0, const dgVector& l1, OnR
 	}
 }
 
-dgInt32 dgBroadPhasePersistent::ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+dgInt32 dgBroadPhaseSegregated::ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgInt32 totalCount = 0;
 	if (m_rootNode) {
@@ -436,7 +436,7 @@ dgInt32 dgBroadPhasePersistent::ConvexCast(dgCollisionInstance* const shape, con
 		dgFastRayTest ray(dgVector(dgFloat32(0.0f)), velocA);
 
 		dgInt32 stack = 0;
-		dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+		dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 		if (root->m_left) {
 			dgVector minBox(root->m_left->m_minBox - boxP1);
 			dgVector maxBox(root->m_left->m_maxBox - boxP0);
@@ -465,7 +465,7 @@ dgInt32 dgBroadPhasePersistent::ConvexCast(dgCollisionInstance* const shape, con
 	return totalCount;
 }
 
-dgInt32 dgBroadPhasePersistent::Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+dgInt32 dgBroadPhaseSegregated::Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgInt32 totalCount = 0;
 	if (m_rootNode) {
@@ -478,7 +478,7 @@ dgInt32 dgBroadPhasePersistent::Collide(dgCollisionInstance* const shape, const 
 		const dgBroadPhaseNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
 
 		dgInt32 stack = 0;
-		dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+		dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 		if (dgOverlapTest(m_rootNode->m_minBox, m_rootNode->m_maxBox, boxP0, boxP1)) {
 			if (root->m_left) {
 				stackPool[stack] = root->m_left;
@@ -497,7 +497,7 @@ dgInt32 dgBroadPhasePersistent::Collide(dgCollisionInstance* const shape, const 
 	return totalCount;
 }
 
-void dgBroadPhasePersistent::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
+void dgBroadPhaseSegregated::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	const dgFloat32 timestep = descriptor->m_timestep;

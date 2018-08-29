@@ -23,18 +23,18 @@
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgCollisionInstance.h"
-#include "dgBroadPhaseDefault.h"
+#include "dgBroadPhaseMixed.h"
 #include "dgBroadPhaseAggregate.h"
 
 
-dgBroadPhaseDefault::dgBroadPhaseDefault(dgWorld* const world)
+dgBroadPhaseMixed::dgBroadPhaseMixed(dgWorld* const world)
 	:dgBroadPhase(world)
 	,m_treeEntropy(dgFloat32(0.0f))
 	,m_fitness(world->GetAllocator())
 {
 }
 
-dgBroadPhaseDefault::~dgBroadPhaseDefault()
+dgBroadPhaseMixed::~dgBroadPhaseMixed()
 {
 	if (m_rootNode) {
 		delete m_rootNode;
@@ -42,28 +42,28 @@ dgBroadPhaseDefault::~dgBroadPhaseDefault()
 	m_rootNode = NULL;
 }
 
-dgInt32 dgBroadPhaseDefault::GetType() const
+dgInt32 dgBroadPhaseMixed::GetType() const
 {
-	return dgWorld::m_defaultBroadphase;
+	return dgWorld::m_broadphaseMixed;
 }
 
-void dgBroadPhaseDefault::ResetEntropy()
+void dgBroadPhaseMixed::ResetEntropy()
 {
 	m_treeEntropy = dgFloat32(0.0f);
 }
 
-void dgBroadPhaseDefault::UpdateFitness()
+void dgBroadPhaseMixed::UpdateFitness()
 {
 	ImproveFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
-void dgBroadPhaseDefault::InvalidateCache()
+void dgBroadPhaseMixed::InvalidateCache()
 {
 	ResetEntropy();
 	ImproveFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
-void dgBroadPhaseDefault::ForEachBodyInAABB(const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const
+void dgBroadPhaseMixed::ForEachBodyInAABB(const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const
 {
 	if (m_rootNode) {
 		const dgBroadPhaseNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
@@ -73,7 +73,7 @@ void dgBroadPhaseDefault::ForEachBodyInAABB(const dgVector& minBox, const dgVect
 }
 
 
-void dgBroadPhaseDefault::RayCast(const dgVector& l0, const dgVector& l1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
+void dgBroadPhaseMixed::RayCast(const dgVector& l0, const dgVector& l1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
 {
 	if (filter && m_rootNode) {
 		dgVector segment(l1 - l0);
@@ -93,7 +93,7 @@ void dgBroadPhaseDefault::RayCast(const dgVector& l0, const dgVector& l1, OnRayC
 }
 
 
-dgInt32 dgBroadPhaseDefault::ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+dgInt32 dgBroadPhaseMixed::ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgInt32 totalCount = 0;
 	if (m_rootNode) {
@@ -121,7 +121,7 @@ dgInt32 dgBroadPhaseDefault::ConvexCast(dgCollisionInstance* const shape, const 
 	return totalCount;
 }
 
-dgInt32 dgBroadPhaseDefault::Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+dgInt32 dgBroadPhaseMixed::Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgInt32 totalCount = 0;
 	if (m_rootNode) {
@@ -142,7 +142,7 @@ dgInt32 dgBroadPhaseDefault::Collide(dgCollisionInstance* const shape, const dgM
 	return totalCount;
 }
 
-void dgBroadPhaseDefault::AddNode(dgBroadPhaseNode* const newNode)
+void dgBroadPhaseMixed::AddNode(dgBroadPhaseNode* const newNode)
 {
 	if (!m_rootNode) {
 		m_rootNode = newNode;
@@ -155,7 +155,7 @@ void dgBroadPhaseDefault::AddNode(dgBroadPhaseNode* const newNode)
 	}
 }
 
-void dgBroadPhaseDefault::Add(dgBody* const body)
+void dgBroadPhaseMixed::Add(dgBody* const body)
 {
 	// create a new leaf node;
 	dgAssert (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
@@ -164,14 +164,14 @@ void dgBroadPhaseDefault::Add(dgBody* const body)
 	AddNode(newNode);
 }
 
-dgBroadPhaseAggregate* dgBroadPhaseDefault::CreateAggregate()
+dgBroadPhaseAggregate* dgBroadPhaseMixed::CreateAggregate()
 {
 	dgBroadPhaseAggregate* const aggregate = new (m_world->GetAllocator()) dgBroadPhaseAggregate(m_world->GetBroadPhase());
 	LinkAggregate (aggregate);
 	return aggregate;
 }
 
-void dgBroadPhaseDefault::LinkAggregate(dgBroadPhaseAggregate* const aggregate)
+void dgBroadPhaseMixed::LinkAggregate(dgBroadPhaseAggregate* const aggregate)
 {
 	AddNode(aggregate);
 	aggregate->m_broadPhase = this;
@@ -179,7 +179,7 @@ void dgBroadPhaseDefault::LinkAggregate(dgBroadPhaseAggregate* const aggregate)
 	aggregate->m_myAggregateNode = m_aggregateList.Append(aggregate);
 }
 
-void dgBroadPhaseDefault::RemoveNode(dgBroadPhaseNode* const node)
+void dgBroadPhaseMixed::RemoveNode(dgBroadPhaseNode* const node)
 {
 	if (node->m_parent) {
 		if (!node->m_parent->IsAggregate()) {
@@ -267,7 +267,7 @@ void dgBroadPhaseDefault::RemoveNode(dgBroadPhaseNode* const node)
 	}
 }
 
-void dgBroadPhaseDefault::UnlinkAggregate(dgBroadPhaseAggregate* const aggregate)
+void dgBroadPhaseMixed::UnlinkAggregate(dgBroadPhaseAggregate* const aggregate)
 {
 	dgAssert (m_rootNode);
 	if (m_rootNode == aggregate) {
@@ -318,7 +318,7 @@ void dgBroadPhaseDefault::UnlinkAggregate(dgBroadPhaseAggregate* const aggregate
 }
 
 
-void dgBroadPhaseDefault::Remove(dgBody* const body)
+void dgBroadPhaseMixed::Remove(dgBody* const body)
 {
 	if (body->GetBroadPhase()) {
 		dgBroadPhaseBodyNode* const node = (dgBroadPhaseBodyNode*)body->GetBroadPhase();
@@ -330,14 +330,14 @@ void dgBroadPhaseDefault::Remove(dgBody* const body)
 }
 
 
-void dgBroadPhaseDefault::DestroyAggregate(dgBroadPhaseAggregate* const aggregate)
+void dgBroadPhaseMixed::DestroyAggregate(dgBroadPhaseAggregate* const aggregate)
 {
 	m_updateList.Remove(aggregate->m_updateNode);
 	m_aggregateList.Remove(aggregate->m_myAggregateNode);
 	RemoveNode(aggregate);
 }
 
-void dgBroadPhaseDefault::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
+void dgBroadPhaseMixed::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
 {
 	DG_TRACKTIME(__FUNCTION__);
 	const dgFloat32 timestep = descriptor->m_timestep;
