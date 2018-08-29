@@ -34,7 +34,7 @@
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 //#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(256)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(128)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(128)
 //#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(1)
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
@@ -180,9 +180,9 @@ dgInt32 dgWorldDynamicUpdate::CompareKey(dgInt32 highA, dgInt32 lowA, dgInt32 hi
 		return -1;
 	}
 	if (lowA < lowB) {
-		return -1;
-	} else if (lowA > lowB) {
 		return 1;
+	} else if (lowA > lowB) {
+		return -1;
 	}
 	return 0;
 }
@@ -292,7 +292,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	dgInt32 augmentedJointCount = jointCount;
 
 	dgArray<dgBodyCluster>& clusterMemory = world->m_clusterMemory;
-
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node && (node->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32(0.0f)); node = node->GetPrev()) {
 		dgBody* const body = node->GetInfo().GetBody();
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
@@ -305,17 +304,18 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 			root->m_resting &= state;
 
 			if (!root->m_resting && !root->m_disjointInfo.m_jointCount) {
-				dgJointInfo& info = jointArray[augmentedJointCount];
+				dgJointInfo& jointInfo = jointArray[augmentedJointCount];
 
 				dgAssert (root == body);
 				dgAssert (root->m_index == -1);
 				dgAssert (root->m_disjointInfo.m_bodyCount == 1);
 
 				root->m_index = clustersCount;
-				info.m_body = body;
-				info.m_jointCount = 0;
-				info.m_setId = root->m_index;
-				info.m_bodyCount = root->m_disjointInfo.m_bodyCount;
+				jointInfo.m_body = body;
+				jointInfo.m_jointCount = 0;
+				jointInfo.m_setId = root->m_index;
+				jointInfo.m_bodyCount = root->m_disjointInfo.m_bodyCount;
+				jointInfo.m_pairCount = 0;
 
 				dgBodyCluster& cluster = clusterMemory[clustersCount];
 				cluster.m_bodyCount = 2;
@@ -335,9 +335,9 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	// remove all sleeping joints sets
 	dgJointInfo* const augmentedJointArray = &jointArray[0];
 	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
-		dgJointInfo* const info = &augmentedJointArray[i];
-		dgConstraint* const contact = info->m_joint;
-		dgBody* const root = FindRoot (contact->GetBody0());
+		dgJointInfo* const jointInfo = &augmentedJointArray[i];
+		dgConstraint* const constraint = jointInfo->m_joint;
+		dgBody* const root = FindRoot (constraint->GetBody0());
 		if (root->m_resting) {
 			augmentedJointCount --;
 			augmentedJointArray[i] = augmentedJointArray[augmentedJointCount];
@@ -356,9 +356,10 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 				clustersCount++;
 				bodyInfoCount += root->m_disjointInfo.m_bodyCount + 1;
 			}
-			info->m_setId = root->m_index;
-			info->m_bodyCount = root->m_disjointInfo.m_bodyCount;
-			info->m_jointCount = root->m_disjointInfo.m_jointCount;
+			jointInfo->m_setId = root->m_index;
+			jointInfo->m_pairCount = constraint->m_maxDOF;
+			jointInfo->m_bodyCount = root->m_disjointInfo.m_bodyCount;
+			jointInfo->m_jointCount = root->m_disjointInfo.m_jointCount;
 		}
 	}
 
@@ -381,9 +382,10 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		softBodiesCount += cluster.m_hasSoftBodies;
 		jointStart += cluster.m_jointCount ? cluster.m_jointCount : 1;
 	}
-
 	m_solverMemory.Init(world, rowStart, bodyStart);
 	world->m_bodiesMemory.ResizeIfNecessary(bodyStart);
+
+	rowStart = 0;
 	for (dgInt32 i = 0; i < clustersCount; i++) {
 		const dgBodyCluster& cluster = m_clusterData[i];
 		dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster.m_bodyStart];
@@ -419,8 +421,11 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 					}
 					m1 = body1->m_index;
 				}
+				
 				jointInfo->m_m0 = m0;
 				jointInfo->m_m1 = m1;
+				jointInfo->m_pairStart = rowStart;
+				rowStart += jointInfo->m_pairCount; 
 			}
 		} else {
 			dgAssert(cluster.m_bodyCount == 2);

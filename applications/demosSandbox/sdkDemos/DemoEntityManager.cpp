@@ -334,7 +334,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
-//	m_solveLargeIslandInParallel = true;
+	m_solveLargeIslandInParallel = true;
 //	m_synchronousPhysicsUpdateMode = false;
 
 	m_currentPlugin = 0;
