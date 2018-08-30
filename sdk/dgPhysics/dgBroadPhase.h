@@ -550,8 +550,8 @@ class dgBroadPhase
 	class dgBroadPhaseNodePair
 	{
 		public:
-		dgBroadPhaseNode* m_left;
-		dgBroadPhaseNode* m_right;
+		const dgBroadPhaseNode* m_left;
+		const dgBroadPhaseNode* m_right;
 	};
 
 	dgWorld* m_world;
