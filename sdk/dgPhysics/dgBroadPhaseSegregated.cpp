@@ -97,11 +97,14 @@ void dgBroadPhaseSegregated::Add(dgBody* const body)
 
 	if (body->GetCollision()->IsType(dgCollision::dgCollisionMesh_RTTI) || (body->GetInvMass().m_w == dgFloat32(0.0f))) {
 		m_staticNeedsUpdate = true;
+		dgBroadPhaseBodyNode* const bodyNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
+		bodyNode->m_isSegregated = true;
 		if (root->m_right) {
-			dgBroadPhaseTreeNode* const node = InsertNode(root->m_right, new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body));
+			dgBroadPhaseTreeNode* const node = InsertNode(root->m_right, bodyNode);
+			node->m_isSegregated = true;
 			node->m_fitnessNode = m_staticFitness.Append(node);
 		} else {
-			root->m_right = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
+			root->m_right = bodyNode;
 			root->m_right->m_parent = root;
 		}
 	} else {
