@@ -184,7 +184,9 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _CAPSULE_PRIMITIVE, defaultMaterialID);
-	DemoMesh* const geometry = new DemoMesh("sphere", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dMatrix uvMatrix (dPitchMatrix(dPi));
+	DemoMesh* const geometry = new DemoMesh("sphere", collision, "smilli.tga", "smilli.tga", "smilli.tga", 1.0f, uvMatrix);
 
 	dFloat vertialStep = blockBoxSize.m_x;
 	dFloat horizontalStep = blockBoxSize.m_y * 0.8f;
