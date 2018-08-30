@@ -33,10 +33,11 @@ class dgCollisionBVH: public dgCollisionMesh, public dgAABBPolygonSoup
 {
 	public:
 	DG_MSC_VECTOR_ALIGMENT 
-	struct dgBVHRay: public dgFastRayTest 
+	class dgBVHRay: public dgFastRayTest 
 	{
+		public:
 		dgBVHRay(const dgVector& l0, const dgVector& l1)
-			: dgFastRayTest (l0, l1)
+			:dgFastRayTest (l0, l1)
 		{
 		}
 

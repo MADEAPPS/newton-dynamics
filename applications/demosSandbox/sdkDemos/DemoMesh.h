@@ -70,7 +70,7 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	DemoMesh(const char* const name);
 	DemoMesh(NewtonMesh* const mesh);
 	DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode);
-	DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f);
+	DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 	DemoMesh(const char* const name, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
 
 	using dClassInfo::operator new;

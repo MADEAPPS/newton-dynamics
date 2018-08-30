@@ -329,7 +329,7 @@ DemoMesh::DemoMesh(const DemoMesh& mesh)
 	OptimizeForRender ();
 }
 
-DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity)
+DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity, const dMatrix& uvMatrix)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
@@ -344,8 +344,8 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	// apply the vertex normals
 	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);
 
-	dMatrix aligmentUV(dGetIdentityMatrix());
-	NewtonCollisionGetMatrix(collision, &aligmentUV[0][0]);
+	dMatrix aligmentUV(uvMatrix);
+//	NewtonCollisionGetMatrix(collision, &aligmentUV[0][0]);
 	aligmentUV = aligmentUV.Inverse();
 
 	// apply uv projections
