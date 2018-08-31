@@ -55,19 +55,21 @@ class dgBroadPhaseAggregate: public dgBroadPhaseNode
 	void RemoveBody (dgBody* const body);
 
 	void ImproveEntropy ();
-	void SubmitSeltPairs(dgFloat32 timestep, dgInt32 threadID) const;
+	void SubmitSelfPairs(dgFloat32 timestep, dgInt32 threadID) const;
 	void SummitPairs(dgBody* const body, dgFloat32 timestep, dgInt32 threadID) const;
 	void SummitPairs(dgBroadPhaseAggregate* const aggregate, dgFloat32 timestep, dgInt32 threadID) const;
-	void SubmitSeltPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const;
+	private:
+	void SubmitSelfPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const;
 
+	public:
 	dgBroadPhaseNode* m_root;
 	dgBroadPhase* m_broadPhase;
 	dgList<dgBroadPhaseNode*>::dgListNode* m_updateNode;
 	dgList<dgBroadPhaseAggregate*>::dgListNode* m_myAggregateNode;
 	dgList<dgBroadPhaseTreeNode*> m_fitnessList;
 	dgFloat64 m_treeEntropy;
-	dgInt32 m_isInEquilibrium	: 1;
-	dgInt32 m_isSelfCollidable	: 1;
+	bool m_isInEquilibrium;
+	bool m_isSelfCollidable;
 };
 
 #endif

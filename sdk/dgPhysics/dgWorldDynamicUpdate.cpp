@@ -107,8 +107,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_dynamicsLru = m_markLru;
 
-//	BuildClusters(timestep);
-	BuildClustersOld(timestep);
+	BuildClusters(timestep);
+//	BuildClustersOld(timestep);
 
 	const dgInt32 threadCount = world->GetThreadCount();	
 

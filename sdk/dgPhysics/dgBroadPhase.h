@@ -64,9 +64,6 @@ class dgBroadPhaseNode
 		,m_criticalSectionLock(0)
 		,m_isSegregated(false)
 	{
-static int xxxxxxx;
-xxxxx = xxxxxxx;
-xxxxxxx++;
 	}
 
 	virtual ~dgBroadPhaseNode()
@@ -122,7 +119,6 @@ xxxxxxx++;
 		return NULL;
 	}
 
-int xxxxx;
 	dgVector m_minBox;
 	dgVector m_maxBox;
 	dgBroadPhaseNode* m_parent;
@@ -549,13 +545,6 @@ class dgBroadPhase
 		public:
 		dgBody* m_body0;
 		dgBody* m_body1;
-	};
-
-	class dgBroadPhaseNodePair
-	{
-		public:
-		const dgBroadPhaseNode* m_left;
-		const dgBroadPhaseNode* m_right;
 	};
 
 	dgWorld* m_world;

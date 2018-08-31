@@ -167,15 +167,15 @@ void dgBroadPhaseAggregate::ImproveEntropy()
 void dgBroadPhaseAggregate::SummitPairs(dgBroadPhaseAggregate* const aggregate, dgFloat32 timestep, dgInt32 threadID) const
 {
 	if (m_root && aggregate->m_root && !(m_isInEquilibrium & aggregate->m_isInEquilibrium)) {
-		SubmitSeltPairs(m_root, aggregate->m_root, timestep, threadID);
+		SubmitSelfPairs(m_root, aggregate->m_root, timestep, threadID);
 	}
 }
 
-void dgBroadPhaseAggregate::SubmitSeltPairs(dgFloat32 timestep, dgInt32 threadID) const
+void dgBroadPhaseAggregate::SubmitSelfPairs(dgFloat32 timestep, dgInt32 threadID) const
 {
 	if (m_root && !m_root->IsLeafNode()) {
 		if (!m_isInEquilibrium & m_isSelfCollidable) {
-			SubmitSeltPairs(m_root->GetLeft(), m_root->GetRight(), timestep, threadID);
+			SubmitSelfPairs(m_root->GetLeft(), m_root->GetRight(), timestep, threadID);
 		}
 	}
 }
@@ -222,14 +222,14 @@ void dgBroadPhaseAggregate::SummitPairs(dgBody* const body, dgFloat32 timestep, 
 	}
 }
 
-void dgBroadPhaseAggregate::SubmitSeltPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const
+void dgBroadPhaseAggregate::SubmitSelfPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const
 {
+/*
 	dgInt32 stack = 1;
 	dgBroadPhaseNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH][2];
 
 	pool[0][0] = node0;
 	pool[0][1] = node1;
-
 	while (stack) {
 		stack--;
 		dgBroadPhaseNode* const root0 = pool[stack][0];
@@ -299,6 +299,77 @@ void dgBroadPhaseAggregate::SubmitSeltPairs(dgBroadPhaseNode* const node0, dgBro
 				pool[stack][1] = tmpNode1->m_right;
 				stack++;
 				dgAssert(stack < dgInt32(sizeof (pool) / sizeof (pool[0])));
+			}
+		}
+	}
+*/
+
+	const dgBroadPhaseNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH][2];
+	pool[0][0] = node0;
+	pool[0][1] = node1;
+	dgInt32 stack = 1;
+
+	while (stack) {
+		stack--;
+
+		const dgBroadPhaseNode* const left = pool[stack][0];
+		const dgBroadPhaseNode* const right = pool[stack][1];
+
+		if (left->IsLeafNode() && right->IsLeafNode()) {
+			dgBody* const body0 = left->GetBody();
+			dgBody* const body1 = right->GetBody();
+			if (dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) {
+				m_broadPhase->AddPair(body0, body1, timestep, threadID);
+			}
+		} else {
+			if (left->m_parent == right->m_parent) {
+				if (!left->IsLeafNode()) {
+					pool[stack][0] = left->GetLeft();
+					pool[stack][1] = left->GetRight();
+					stack++;
+					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
+				}
+				if (!right->IsLeafNode()) {
+					pool[stack][0] = right->GetLeft();
+					pool[stack][1] = right->GetRight();
+					stack++;
+					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
+				}
+			}
+
+			const dgBroadPhaseNode* leftPool[2];
+			const dgBroadPhaseNode* rightPool[2];
+			dgInt32 leftCount = 2;
+			dgInt32 rightCount = 2;
+			if (left->IsLeafNode()) {
+				leftCount = 1;
+				dgAssert(!right->IsLeafNode());
+				leftPool[0] = left;
+				rightPool[0] = right->GetLeft();
+				rightPool[1] = right->GetRight();
+			} else if (right->IsLeafNode()) {
+				rightCount = 1;
+				dgAssert(!left->IsLeafNode());
+				leftPool[0] = left->GetLeft();
+				leftPool[1] = left->GetRight();
+				rightPool[0] = right;
+			}
+			else {
+				leftPool[0] = left->GetLeft();
+				leftPool[1] = left->GetRight();
+				rightPool[0] = right->GetLeft();
+				rightPool[1] = right->GetRight();
+			}
+
+			for (dgInt32 i = 0; i < leftCount; i++) {
+				for (dgInt32 j = 0; j < rightCount; j++) {
+					if (dgOverlapTest(leftPool[i]->m_minBox, leftPool[i]->m_maxBox, rightPool[j]->m_minBox, rightPool[j]->m_maxBox)) {
+						pool[stack][0] = leftPool[i];
+						pool[stack][1] = rightPool[j];
+						stack++;
+						dgAssert(stack < sizeof (pool) / sizeof (pool[0]));
+					}
+				}
 			}
 		}
 	}
