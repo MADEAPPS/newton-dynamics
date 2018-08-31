@@ -692,13 +692,17 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
 		dgBody* const body1 = node->GetBody();
 		dgAssert(body1 == body);
-
+		dgAssert(!body1->m_equilibrium);
 		dgAssert(!node->GetLeft());
 		dgAssert(!node->GetRight());
 		dgAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
 
 		const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
 		
+		for (dgBroadPhaseNode* parent = node; parent && parent->m_isSleeping; parent = parent->m_parent) {
+			parent->m_isSleeping = 0;
+		}
+
 		if (body1->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
 			dgScopeSpinPause lock(&aggregate->m_criticalSectionLock);
@@ -1706,13 +1710,12 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_world->SynchronizationBarrier();
 	}
 
-//	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-//	for (dgInt32 i = 0; i < threadsCount; i++) {
-//		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
-//		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-//	}
-//	m_world->SynchronizationBarrier();
-	FindColliningPairs(&syncPoints, timestep);
+	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
+		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
+	}
+	m_world->SynchronizationBarrier();
 
 	dgContactList::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1750,92 +1753,4 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	AttachNewContacts(lastNode);
 	RemoveOldContacts();
-}
-
-void dgBroadPhase::FindColliningPairs(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timestep)
-{
-	DG_TRACKTIME(__FUNCTION__);
-
-#if 1
-	const dgInt32 threadsCount = m_world->GetThreadCount();
-	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(CollidingPairsKernel, descriptor, broadPhaseNode, "dgBroadPhase::CollidingPairs");
-		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-#else 
-
-dgInt32 threadID = 0;
-	const dgBroadPhaseNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH][2];
-	pool[0][0] = m_rootNode->GetLeft();
-	pool[0][1] = m_rootNode->GetRight();
-	dgInt32 stack = 1;
-
-	while (stack) {
-		stack --;
-
-		const dgBroadPhaseNode* const left = pool[stack][0];
-		const dgBroadPhaseNode* const right = pool[stack][1];
-
-		if (left->IsLeafNode() && right->IsLeafNode()) {
-			dgBody* const body0 = left->GetBody();
-			dgBody* const body1 = right->GetBody();
-			if (dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) {
-//				dgTrace(("%d %d\n", body0->m_uniqueID, body1->m_uniqueID));
-				AddPair(body0, body1, timestep, threadID);
-			}
-		} else {
-			if (left->m_parent == right->m_parent) {
-				if (!left->IsLeafNode() && !left->m_isSegregated) {
-					pool[stack][0] = left->GetLeft();
-					pool[stack][1] = left->GetRight();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-				}
-				if (!right->IsLeafNode() && !right->m_isSegregated) {
-					pool[stack][0] = right->GetLeft();
-					pool[stack][1] = right->GetRight();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-				}
-			}
-
-			const dgBroadPhaseNode* leftPool[2];
-			const dgBroadPhaseNode* rightPool[2];
-			dgInt32 leftCount = 2;
-			dgInt32 rightCount = 2;
-			if (left->IsLeafNode()) {
-				leftCount = 1;
-				dgAssert(!right->IsLeafNode());
-				leftPool[0] = left;
-				rightPool[0] = right->GetLeft();
-				rightPool[1] = right->GetRight();
-			} else if (right->IsLeafNode()) {
-				rightCount = 1;
-				dgAssert(!left->IsLeafNode());
-				leftPool[0] = left->GetLeft();
-				leftPool[1] = left->GetRight();
-				rightPool[0] = right;
-			} else {
-				leftPool[0] = left->GetLeft();
-				leftPool[1] = left->GetRight();
-				rightPool[0] = right->GetLeft();
-				rightPool[1] = right->GetRight();
-			}
-
-			for (dgInt32 i = 0; i < leftCount; i++) {
-				for (dgInt32 j = 0; j < rightCount; j++) {
-					if (dgOverlapTest(leftPool[i]->m_minBox, leftPool[i]->m_maxBox, rightPool[j]->m_minBox, rightPool[j]->m_maxBox)) {
-						pool[stack][0] = leftPool[i];
-						pool[stack][1] = rightPool[j];
-						stack++;
-						dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-					}
-				}
-			}
-		}
-	}
-#endif
 }

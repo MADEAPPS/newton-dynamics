@@ -98,10 +98,10 @@ void dgBroadPhaseSegregated::Add(dgBody* const body)
 	if (body->GetCollision()->IsType(dgCollision::dgCollisionMesh_RTTI) || (body->GetInvMass().m_w == dgFloat32(0.0f))) {
 		m_staticNeedsUpdate = true;
 		dgBroadPhaseBodyNode* const bodyNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
-		bodyNode->m_isSegregated = true;
+		bodyNode->m_isSleeping = 1;
 		if (root->m_right) {
 			dgBroadPhaseTreeNode* const node = InsertNode(root->m_right, bodyNode);
-			node->m_isSegregated = true;
+			node->m_isSleeping = 1;
 			node->m_fitnessNode = m_staticFitness.Append(node);
 		} else {
 			root->m_right = bodyNode;
@@ -357,12 +357,23 @@ void dgBroadPhaseSegregated::InvalidateCache()
 	root->SetBox ();
 }
 
+bool dgBroadPhaseSegregated::SanitySleeping(dgBroadPhaseNode* const root) const
+{
+	if (!root->m_isSleeping) {
+		return false;
+	} else if (root->IsLeafNode()) {
+		return true;
+	}
+	return SanitySleeping(root->GetLeft()) || SanitySleeping(root->GetRight());
+}
+
 void dgBroadPhaseSegregated::UpdateFitness()
 {
 	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	if (m_staticNeedsUpdate) {
 		m_staticNeedsUpdate = false;
 		ImproveFitness(m_staticFitness, m_staticEntropy, &root->m_right);
+		dgAssert (SanitySleeping(root->m_right));
 	}
 	ImproveFitness(m_dynamicsFitness, m_dynamicsEntropy, &root->m_left);
 	root->SetBox ();

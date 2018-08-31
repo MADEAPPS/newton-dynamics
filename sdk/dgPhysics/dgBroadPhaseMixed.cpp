@@ -159,9 +159,10 @@ void dgBroadPhaseMixed::Add(dgBody* const body)
 {
 	// create a new leaf node;
 	dgAssert (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
-	dgBroadPhaseBodyNode* const newNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
-	newNode->m_updateNode = m_updateList.Append(newNode);
-	AddNode(newNode);
+	dgBroadPhaseBodyNode* const bodyNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
+	bodyNode->m_isSleeping = (body->GetCollision()->IsType(dgCollision::dgCollisionMesh_RTTI) || (body->GetInvMass().m_w == dgFloat32(0.0f))) ? 1 : 0;
+	bodyNode->m_updateNode = m_updateList.Append(bodyNode);
+	AddNode(bodyNode);
 }
 
 dgBroadPhaseAggregate* dgBroadPhaseMixed::CreateAggregate()
