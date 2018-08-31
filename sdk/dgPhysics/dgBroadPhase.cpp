@@ -1809,50 +1809,37 @@ dgInt32 threadID = 0;
 				}
 			}
 
-			if (dgOverlapTest(left->m_minBox, left->m_maxBox, right->m_minBox, right->m_maxBox)) {
-				if (left->IsLeafNode()) {
-					dgAssert(!right->IsLeafNode());
-					pool[stack].m_left = left;
-					pool[stack].m_right = right->GetLeft();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
+			const dgBroadPhaseNode* leftPool[2];
+			const dgBroadPhaseNode* rightPool[2];
+			dgInt32 leftCount = 2;
+			dgInt32 rightCount = 2;
+			if (left->IsLeafNode()) {
+				leftCount = 1;
+				dgAssert(!right->IsLeafNode());
+				leftPool[0] = left;
+				rightPool[0] = right->GetLeft();
+				rightPool[1] = right->GetRight();
+			} else if (right->IsLeafNode()) {
+				rightCount = 1;
+				dgAssert(!left->IsLeafNode());
+				leftPool[0] = left->GetLeft();
+				leftPool[1] = left->GetRight();
+				rightPool[0] = right;
+			} else {
+				leftPool[0] = left->GetLeft();
+				leftPool[1] = left->GetRight();
+				rightPool[0] = right->GetLeft();
+				rightPool[1] = right->GetRight();
+			}
 
-					pool[stack].m_left = left;
-					pool[stack].m_right = right->GetRight();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-
-				} else if (right->IsLeafNode()) {
-					dgAssert(!left->IsLeafNode());
-					pool[stack].m_left = left->GetLeft();
-					pool[stack].m_right = right;
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-
-					pool[stack].m_left = left->GetRight();
-					pool[stack].m_right = right;
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-				} else {
-					pool[stack].m_left = left->GetLeft();
-					pool[stack].m_right = right->GetLeft();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-
-					pool[stack].m_left = left->GetRight();
-					pool[stack].m_right = right->GetLeft();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-
-					pool[stack].m_left = left->GetLeft();
-					pool[stack].m_right = right->GetRight();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-
-					pool[stack].m_left = left->GetRight();
-					pool[stack].m_right = right->GetRight();
-					stack++;
-					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
+			for (dgInt32 i = 0; i < leftCount; i++) {
+				for (dgInt32 j = 0; j < rightCount; j++) {
+					if (dgOverlapTest(leftPool[i]->m_minBox, leftPool[i]->m_maxBox, rightPool[j]->m_minBox, rightPool[j]->m_maxBox)) {
+						pool[stack].m_left = leftPool[i];
+						pool[stack].m_right = rightPool[j];
+						stack++;
+						dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
+					}
 				}
 			}
 		}
