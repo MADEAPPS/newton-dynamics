@@ -1755,7 +1755,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 void dgBroadPhase::FindColliningPairs(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timestep)
 {
 	DG_TRACKTIME(__FUNCTION__);
-
+#if 1
 	const dgInt32 threadsCount = m_world->GetThreadCount();
 	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1764,16 +1764,16 @@ void dgBroadPhase::FindColliningPairs(dgBroadphaseSyncDescriptor* const descript
 	}
 	m_world->SynchronizationBarrier();
 
-#if 0
-dgContactList* const contactList = m_world;
-for (dgContactList::dgListNode* ptr = contactList->GetFirst(); ptr; ptr = ptr->GetNext()) {
-	dgContact* const contact = ptr->GetInfo();
-	dgTrace (("%d %d\n", contact->GetBody0()->m_uniqueID, contact->GetBody1()->m_uniqueID))
-}
-dgTrace(("\n"));
+#else 
+//dgContactList* const contactList = m_world;
+//for (dgContactList::dgListNode* ptr = contactList->GetFirst(); ptr; ptr = ptr->GetNext()) {
+//	dgContact* const contact = ptr->GetInfo();
+//	dgTrace (("%d %d\n", contact->GetBody0()->m_uniqueID, contact->GetBody1()->m_uniqueID))
+//}
+//dgTrace(("\n"));
 
 int xxx = 0;
-
+dgInt32 threadID = 0;
 	dgBroadPhaseNodePair pool[128];
 	pool[0].m_left = m_rootNode->GetLeft();
 	pool[0].m_right = m_rootNode->GetRight();
@@ -1789,7 +1789,8 @@ int xxx = 0;
 			dgBody* const body0 = left->GetBody();
 			dgBody* const body1 = right->GetBody();
 			if (dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) {
-				dgTrace(("%d %d\n", body0->m_uniqueID, body1->m_uniqueID));
+//				dgTrace(("%d %d\n", body0->m_uniqueID, body1->m_uniqueID));
+				AddPair(body0, body1, timestep, threadID);
 				xxx++;
 			}
 		} else {
