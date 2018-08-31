@@ -64,6 +64,9 @@ class dgBroadPhaseNode
 		,m_criticalSectionLock(0)
 		,m_isSegregated(false)
 	{
+static int xxxxxxx;
+xxxxx = xxxxxxx;
+xxxxxxx++;
 	}
 
 	virtual ~dgBroadPhaseNode()
@@ -119,6 +122,7 @@ class dgBroadPhaseNode
 		return NULL;
 	}
 
+int xxxxx;
 	dgVector m_minBox;
 	dgVector m_maxBox;
 	dgBroadPhaseNode* m_parent;
