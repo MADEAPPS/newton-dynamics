@@ -1765,12 +1765,21 @@ void dgBroadPhase::FindColliningPairs(dgBroadphaseSyncDescriptor* const descript
 	m_world->SynchronizationBarrier();
 
 /*
+dgContactList* const contactList = m_world;
+for (dgContactList::dgListNode* ptr = contactList->GetFirst(); ptr; ptr = ptr->GetNext()) {
+	dgContact* const contact = ptr->GetInfo();
+	dgTrace (("%d %d\n", contact->GetBody0()->m_uniqueID, contact->GetBody1()->m_uniqueID))
+}
+dgTrace(("\n"));
+
+int xxx = 0;
+
 	dgBroadPhaseNodePair pool[128];
 	pool[0].m_left = m_rootNode->GetLeft();
 	pool[0].m_right = m_rootNode->GetRight();
 	dgInt32 stack = 1;
 
-int xxx = 0;
+
 	while (stack) {
 		stack --;
 
@@ -1778,6 +1787,9 @@ int xxx = 0;
 		const dgBroadPhaseNode* const right = pool[stack].m_right;
 		if (dgOverlapTest(left->m_minBox, left->m_maxBox, right->m_minBox, right->m_maxBox)) {
 			if (left->IsLeafNode() && right->IsLeafNode()) {
+				dgBody* const body0 = left->GetBody();
+				dgBody* const body1 = right->GetBody();
+				dgTrace(("%d %d\n", body0->m_uniqueID, body1->m_uniqueID))
 				xxx++;
 			} else {
 				if (left->m_parent == right->m_parent) {
