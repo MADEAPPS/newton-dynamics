@@ -1283,11 +1283,15 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 	const dgVector boxP0 (body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dgVector boxP1 (body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 
+	const dgInt32 isSleeping = leafNode->m_isSleeping;
+
 	const bool test0 = body0 ? (body0->GetInvMass().m_w != dgFloat32(0.0f)) : true;
 	while (stack) {
 		stack--;
 		dgBroadPhaseNode* const rootNode = pool[stack];
-		if (dgOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) {
+		const dgInt32 isActive = !(isSleeping & rootNode->m_isSleeping);
+		//const dgInt32 isActive = 1;
+		if (isActive && dgOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) {
 			if (rootNode->IsLeafNode()) {
 				dgAssert(!rootNode->GetRight());
 				dgAssert(!rootNode->GetLeft());
@@ -1316,6 +1320,7 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 				dgBroadPhaseTreeNode* const tmpNode = (dgBroadPhaseTreeNode*) rootNode;
 				dgAssert (tmpNode->m_left);
 				dgAssert (tmpNode->m_right);
+				tmpNode->m_isSleeping = tmpNode->m_left->m_isSleeping | tmpNode->m_right->m_isSleeping;
 
 				pool[stack] = tmpNode->m_left;
 				stack++;

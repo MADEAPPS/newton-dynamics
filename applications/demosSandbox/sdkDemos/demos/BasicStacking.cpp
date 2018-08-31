@@ -281,7 +281,6 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	int high = 20;
 //high = 40;
 high = 30;
-//high = 2;
 
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
