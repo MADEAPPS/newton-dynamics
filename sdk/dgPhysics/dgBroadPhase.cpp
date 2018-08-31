@@ -1770,7 +1770,7 @@ for (dgContactList::dgListNode* ptr = contactList->GetFirst(); ptr; ptr = ptr->G
 	dgContact* const contact = ptr->GetInfo();
 	dgTrace (("%d %d\n", contact->GetBody0()->m_uniqueID, contact->GetBody1()->m_uniqueID))
 }
-//dgTrace(("\n"));
+dgTrace(("\n"));
 
 int xxx = 0;
 
@@ -1779,36 +1779,36 @@ int xxx = 0;
 	pool[0].m_right = m_rootNode->GetRight();
 	dgInt32 stack = 1;
 
-
 	while (stack) {
 		stack --;
 
 		const dgBroadPhaseNode* const left = pool[stack].m_left;
 		const dgBroadPhaseNode* const right = pool[stack].m_right;
-		if (dgOverlapTest(left->m_minBox, left->m_maxBox, right->m_minBox, right->m_maxBox)) {
-			if (left->IsLeafNode() && right->IsLeafNode()) {
-				dgBody* const body0 = left->GetBody();
-				dgBody* const body1 = right->GetBody();
-				if (dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) {
-					dgTrace(("%d %d\n", body0->m_uniqueID, body1->m_uniqueID));
-					xxx++;
-				}
-			} else {
-				if (left->m_parent == right->m_parent) {
-					if (!left->IsLeafNode() && !left->m_isSegregated) {
-						pool[stack].m_left = left->GetLeft();
-						pool[stack].m_right = left->GetRight();
-						stack++;
-						dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-					} 
-					if (!right->IsLeafNode() && !right->m_isSegregated) {
-						pool[stack].m_left = right->GetLeft();
-						pool[stack].m_right = right->GetRight();
-						stack++;
-						dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
-					}
-				}
 
+		if (left->IsLeafNode() && right->IsLeafNode()) {
+			dgBody* const body0 = left->GetBody();
+			dgBody* const body1 = right->GetBody();
+			if (dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) {
+				dgTrace(("%d %d\n", body0->m_uniqueID, body1->m_uniqueID));
+				xxx++;
+			}
+		} else {
+			if (left->m_parent == right->m_parent) {
+				if (!left->IsLeafNode() && !left->m_isSegregated) {
+					pool[stack].m_left = left->GetLeft();
+					pool[stack].m_right = left->GetRight();
+					stack++;
+					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
+				}
+				if (!right->IsLeafNode() && !right->m_isSegregated) {
+					pool[stack].m_left = right->GetLeft();
+					pool[stack].m_right = right->GetRight();
+					stack++;
+					dgAssert(stack < sizeof(pool) / sizeof(pool[0]));
+				}
+			}
+
+			if (dgOverlapTest(left->m_minBox, left->m_maxBox, right->m_minBox, right->m_maxBox)) {
 				if (left->IsLeafNode()) {
 					dgAssert(!right->IsLeafNode());
 					pool[stack].m_left = left;
