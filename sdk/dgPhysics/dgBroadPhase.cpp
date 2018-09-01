@@ -1141,21 +1141,24 @@ bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const
 		const dgCollisionInstance* const instance1 = body1->GetCollision();
 
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
-			dgVector box0_p0;
-			dgVector box0_p1;
-			dgVector box1_p0;
-			dgVector box1_p1;
-
-			instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
-			instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
-
-			dgVector boxp0(box0_p0 - box1_p1);
-			dgVector boxp1(box0_p1 - box1_p0);
-
 			dgVector velRelative(body1->GetVelocity() - body0->GetVelocity());
-			dgFastRayTest ray(dgVector(dgFloat32(0.0f)), velRelative.Scale4(timestep * dgFloat32(4.0f)));
-			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
-			ret = (distance < dgFloat32(1.0f));
+			if (velRelative.DotProduct4(velRelative).GetScalar() > dgFloat32(0.25f)) {
+				dgVector box0_p0;
+				dgVector box0_p1;
+				dgVector box1_p0;
+				dgVector box1_p1;
+
+				instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
+				instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
+
+				dgVector boxp0(box0_p0 - box1_p1);
+				dgVector boxp1(box0_p1 - box1_p0);
+				dgFastRayTest ray(dgVector::m_zero, velRelative.Scale4(timestep * dgFloat32(4.0f)));
+				dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
+				ret = (distance < dgFloat32(1.0f));
+			} else {
+				ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
+			}
 		} else {
 			ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
 			//if (ret) {
