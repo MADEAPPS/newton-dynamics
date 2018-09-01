@@ -357,23 +357,12 @@ void dgBroadPhaseSegregated::InvalidateCache()
 	root->SetBox ();
 }
 
-bool dgBroadPhaseSegregated::SanitySleeping(dgBroadPhaseNode* const root) const
-{
-	if (!root->m_isSleeping) {
-		return false;
-	} else if (root->IsLeafNode()) {
-		return true;
-	}
-	return SanitySleeping(root->GetLeft()) || SanitySleeping(root->GetRight());
-}
-
 void dgBroadPhaseSegregated::UpdateFitness()
 {
 	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	if (m_staticNeedsUpdate) {
 		m_staticNeedsUpdate = false;
 		ImproveFitness(m_staticFitness, m_staticEntropy, &root->m_right);
-		dgAssert (SanitySleeping(root->m_right));
 	}
 	ImproveFitness(m_dynamicsFitness, m_dynamicsEntropy, &root->m_left);
 	root->SetBox ();

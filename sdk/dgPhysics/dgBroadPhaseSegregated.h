@@ -56,8 +56,6 @@ class dgBroadPhaseSegregated : public dgBroadPhase
 
 	void RemoveNode(dgBroadPhaseNode* const node);
 
-	bool SanitySleeping(dgBroadPhaseNode* const root) const;
-
 	dgFloat64 m_staticEntropy;
 	dgFloat64 m_dynamicsEntropy;
 	dgFitnessList m_staticFitness;
