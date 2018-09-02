@@ -1617,7 +1617,8 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 			m_world->AttachContact(contact);
 			m_contactCache.AddContactJoint(contact);
 
-			if (contact->m_contactActive || contact->m_maxDOF) {
+			//if (contact->m_contactActive || contact->m_maxDOF) {
+			if (contact->m_contactActive && contact->m_maxDOF) {
 				dgAssert(contact->m_maxDOF);
 				dgAssert(contact->m_contactActive);
 
