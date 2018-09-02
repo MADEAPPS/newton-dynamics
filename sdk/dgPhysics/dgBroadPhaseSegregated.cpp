@@ -355,6 +355,7 @@ void dgBroadPhaseSegregated::InvalidateCache()
 	ImproveFitness(m_staticFitness, m_staticEntropy, &root->m_right);
 	ImproveFitness(m_dynamicsFitness, m_dynamicsEntropy, &root->m_left);
 	root->SetBox ();
+	m_contactCache.Flush();
 }
 
 void dgBroadPhaseSegregated::UpdateFitness()

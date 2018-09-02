@@ -274,6 +274,18 @@ class dgBroadPhase
 			:dgArray<dgContactCacheLine>(allocator)
 			,m_count(1<<10)
 		{
+			Init();
+		}
+
+		void Flush()
+		{
+			Clear();
+			Init();
+		}
+
+		void Init()
+		{
+			m_count = 1 << 10;
 			ResizeIfNecessary(m_count);
 			dgContactCacheLine* const cache = &(*this)[0];
 			memset(cache, 0, m_count * sizeof(dgContactCacheLine));

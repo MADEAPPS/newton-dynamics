@@ -61,6 +61,7 @@ void dgBroadPhaseMixed::InvalidateCache()
 {
 	ResetEntropy();
 	ImproveFitness(m_fitness, m_treeEntropy, &m_rootNode);
+	m_contactCache.Flush();
 }
 
 void dgBroadPhaseMixed::ForEachBodyInAABB(const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const

@@ -299,9 +299,9 @@ dgCollisionInstance::~dgCollisionInstance()
 	if (m_world->m_onCollisionInstanceDestruction) {
 		m_world->m_onCollisionInstanceDestruction (m_world, this);
 	}
-	((dgWorld*) m_world)->ReleaseCollision(m_childShape);
+	dgWorld* const world = (dgWorld*)m_world;
+	world->ReleaseCollision(m_childShape);
 }
-
 
 void dgCollisionInstance::Serialize(dgSerialize serialize, void* const userData, bool saveShape) const
 {
