@@ -490,14 +490,14 @@ void dgPolygonSoupDatabaseBuilder::End(bool optimize)
 		dgBigVector v0 (&m_vertexPoints[ptr[0]].m_x);
 		dgBigVector v1 (&m_vertexPoints[ptr[1]].m_x);
 		dgBigVector e0 (v1 - v0);
-		dgBigVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgBigVector normal0 (dgBigVector::m_zero);
 		for (dgInt32 j = 2; j < faceIndexCount - 1; j ++) {
 			dgBigVector v2 (&m_vertexPoints[ptr[j]].m_x);
 			dgBigVector e1 (v2 - v0);
-			normal += e0.CrossProduct3(e1);
+			normal0 += e0.CrossProduct3(e1);
 			e0 = e1;
 		}
-		normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal.DotProduct3(normal)));
+		dgBigVector normal (normal0.Normalize());
 
 		m_normalPoints[i].m_x = normal.m_x;
 		m_normalPoints[i].m_y = normal.m_y;
@@ -507,7 +507,7 @@ void dgPolygonSoupDatabaseBuilder::End(bool optimize)
 	}
 	// compress normals array
 	m_normalIndex[m_faceCount] = 0;
-	m_normalCount = dgVertexListToIndexList(&m_normalPoints[0].m_x, sizeof (dgBigVector), 3, m_faceCount, &m_normalIndex[0], dgFloat32 (1.0e-4f));
+	m_normalCount = dgVertexListToIndexList(&m_normalPoints[0].m_x, sizeof (dgBigVector), 3, m_faceCount, &m_normalIndex[0], dgFloat32 (1.0e-6f));
 }
 
 

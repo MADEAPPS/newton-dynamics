@@ -118,6 +118,11 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	// for now we will simple make simple Box,  make a visual Mesh
 	DemoMesh* const visualMesh = new DemoMesh (newtonMesh);
 
+
+NewtonMesh* const testNewtonMesh = visualMesh->CreateNewtonMesh (scene->GetNewton(), dGetIdentityMatrix());
+NewtonMeshDestroy (testNewtonMesh);
+
+
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;

@@ -57,6 +57,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonAvx2", "..\..\..\..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dTimeTracker", "..\..\..\..\sdk\dProfiler\vs_2013\dTimeTracker.vcxproj", "{89509957-CE86-4ACE-946C-7A65E63F0F23}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dNewton", "..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dNewton.vcxproj", "{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_double|Win32 = debug_double|Win32
@@ -293,6 +295,22 @@ Global
 		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Release|Win32.Build.0 = Release|Win32
 		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Release|x64.ActiveCfg = Release|x64
 		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Release|x64.Build.0 = Release|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debug_double|Win32.ActiveCfg = debug_double|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debug_double|Win32.Build.0 = debug_double|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debug_double|x64.ActiveCfg = debug_double|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debug_double|x64.Build.0 = debug_double|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|Win32.Build.0 = Debug|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|x64.ActiveCfg = Debug|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|x64.Build.0 = Debug|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.release_double|Win32.ActiveCfg = release_double|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.release_double|Win32.Build.0 = release_double|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.release_double|x64.ActiveCfg = release_double|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.release_double|x64.Build.0 = release_double|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|Win32.ActiveCfg = Release|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|Win32.Build.0 = Release|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|x64.ActiveCfg = Release|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
