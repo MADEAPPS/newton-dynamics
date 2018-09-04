@@ -92,9 +92,14 @@ void dNewtonMesh::AddPoint (dFloat64 x, dFloat64 y, dFloat64 z)
 	NewtonMeshAddPoint(m_mesh, x, y, z);
 }
 
-void dNewtonMesh::AddNormal (dFloat32 x, dFloat32 y, dFloat32 z)
+void dNewtonMesh::AddNormal(dFloat32 nx, dFloat32 ny, dFloat32 nz)
 {
-	NewtonMeshAddNormal(m_mesh, x, y, z);
+	NewtonMeshAddNormal(m_mesh, nx, ny, nz);
+}
+
+void dNewtonMesh::AddBiNormal(dFloat32 nx, dFloat32 ny, dFloat32 nz)
+{
+	NewtonMeshAddBinormal(m_mesh, nx, ny, nz);
 }
 
 void dNewtonMesh::AddMaterial(int materialIndex)
@@ -102,6 +107,30 @@ void dNewtonMesh::AddMaterial(int materialIndex)
 	NewtonMeshAddMaterial(m_mesh, materialIndex);
 }
 
+void dNewtonMesh::AddLayer(int layer)
+{
+	NewtonMeshAddLayer(m_mesh, layer);
+}
+
+void dNewtonMesh::AddUV0(dFloat32 u, dFloat32 v)
+{
+	NewtonMeshAddUV0(m_mesh, u, v);
+}
+
+void dNewtonMesh::AddUV1(dFloat32 u, dFloat32 v)
+{
+	NewtonMeshAddUV1(m_mesh, u, v);
+}
+
+void dNewtonMesh::AddVertexColor(dFloat32 r, dFloat32 g, dFloat32 b, dFloat32 a)
+{
+	NewtonMeshAddVertexColor(m_mesh, r, g, b, a);
+}
+
+void dNewtonMesh::AddVertexWeight(int matrixIndex[4], dFloat weights[4])
+{
+	NewtonMeshAddVertexWeight(m_mesh, matrixIndex, weights);
+}
 
 void dNewtonMesh::EndPolygon()
 {

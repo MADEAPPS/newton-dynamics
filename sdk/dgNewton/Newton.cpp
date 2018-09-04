@@ -8029,6 +8029,27 @@ void NewtonMeshAddUV1(const NewtonMesh* const mesh, dFloat u, dFloat v)
 	meshEffect->AddUV1(u, v);
 }
 
+void NewtonMeshAddVertexColor(const NewtonMesh* const mesh, dFloat32 r, dFloat32 g, dFloat32 b, dFloat32 a)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddVertexColor(r, g, b, a);
+}
+
+void NewtonMeshAddVertexWeight(const NewtonMesh* const mesh, int matrixIndex[4], dFloat weights[4])
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+
+	dgMeshEffect::dgPointFormat::dgWeightSet weightSet;
+	for (int i = 0; i < 4; i ++) {
+		weightSet.m_weightPair[i].m_weight = weights[i];
+		weightSet.m_weightPair[i].m_controlIndex = matrixIndex[i];
+	}
+
+	meshEffect->AddWeights (weightSet);
+}
+
 void NewtonMeshEndBuild(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);

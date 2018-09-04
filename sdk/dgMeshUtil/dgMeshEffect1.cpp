@@ -1840,7 +1840,6 @@ void dgMeshEffect::AddWeights (const dgPointFormat::dgWeightSet& weight)
 	m_points.m_weights.PushBack(weight);
 }
 
-
 void dgMeshEffect::AddVertexColor(dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
 {
 	m_attrib.m_colorChannel.PushBack(dgVector (x, y, z, w));

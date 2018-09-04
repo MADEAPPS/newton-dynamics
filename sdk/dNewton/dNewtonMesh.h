@@ -60,10 +60,16 @@ class dNewtonMesh: public dNewtonAlloc
 
 	NEWTON_API void BeginBuild();
 		CNEWTON_API void BeginPolygon();
-//		CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
-		CNEWTON_API void AddPoint (dFloat64 x, dFloat64 y, dFloat64 z);
-		CNEWTON_API void AddNormal (dFloat32 x, dFloat32 y, dFloat32 z);
-		CNEWTON_API void AddMaterial (int materialIndex);
+	//		CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
+			CNEWTON_API void AddPoint (dFloat64 x, dFloat64 y, dFloat64 z);
+			CNEWTON_API void AddMaterial (int materialIndex);
+			CNEWTON_API void AddLayer (int layer);
+			CNEWTON_API void AddNormal (dFloat32 nx, dFloat32 ny, dFloat32 nz);
+			CNEWTON_API void AddBiNormal (dFloat32 nx, dFloat32 ny, dFloat32 nz);
+			CNEWTON_API void AddUV0 (dFloat32 u, dFloat32 v);
+			CNEWTON_API void AddUV1 (dFloat32 u, dFloat32 v);
+			CNEWTON_API void AddVertexColor (dFloat32 r, dFloat32 g, dFloat32 b, dFloat32 a);
+			CNEWTON_API void AddVertexWeight (int matrixIndex[4], dFloat32 weights[4]);
 		CNEWTON_API void EndPolygon();
 	NEWTON_API void EndBuild();
 
