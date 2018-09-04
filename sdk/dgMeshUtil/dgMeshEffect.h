@@ -152,9 +152,11 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 		void SetCount (dgInt32 count) 
 		{
-			dgAssert (count >= 0);
-			dgAssert (count <= m_count);
-			m_count = count;
+			if (m_count) {
+				dgAssert (count >= 0);
+				dgAssert (m_count >= count);
+				m_count = count;
+			}
 		}
 
 		dgInt32 m_count;
@@ -204,6 +206,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		~dgPointFormat();
 
 		void Clear();
+		void SetCount (dgInt32 count);
 		void CompressData(dgInt32* const indexList);
 
 		dgChannel<dgInt32, m_layer> m_layers;

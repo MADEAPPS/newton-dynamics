@@ -179,6 +179,10 @@ typedef long long unsigned64;
 #include <dCollisionConvexHullNodeInfo.h>
 #include <dGeometryNodeSkinModifierInfo.h>
 
+
+#include <dStdAfxNewton.h>
+#include <dNewtonMesh.h>
+
 /*
 #ifdef _NEWTON_USE_DOUBLE
 	#define glMultMatrix(x) glMultMatrixd(x)

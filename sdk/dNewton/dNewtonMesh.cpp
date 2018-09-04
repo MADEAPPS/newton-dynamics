@@ -24,6 +24,10 @@
 #include "dNewtonMesh.h"
 #include "dNewtonCollision.h"
 
+dNewtonMesh::dNewtonMesh(NewtonWorld* const world)
+:m_mesh(NewtonMeshCreate(world))
+{
+}
 
 dNewtonMesh::dNewtonMesh(dNewton* const world)
 	:m_mesh (NewtonMeshCreate (world->GetNewton()))
@@ -60,11 +64,17 @@ NewtonMesh* dNewtonMesh::GetMesh() const
 	return m_mesh;
 }
 
+void dNewtonMesh::BeginBuild()
+{
+	NewtonMeshBeginBuild(m_mesh);
+}
+
 void dNewtonMesh::BeginPolygon()
 {
 	NewtonMeshBeginFace(m_mesh);
 }
 
+/*
 void dNewtonMesh::AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex)
 {
 //	NewtonMeshAddFace (m_mesh, vertexCount, vertex, strideInBytes, materialIndex);
@@ -74,10 +84,33 @@ void dNewtonMesh::AddFace (int vertexCount, const dFloat* const vertex, int stri
 		NewtonMeshAddMaterial(m_mesh, materialIndex);
 	}
 }
+*/
+
+
+void dNewtonMesh::AddPoint (dFloat64 x, dFloat64 y, dFloat64 z)
+{
+	NewtonMeshAddPoint(m_mesh, x, y, z);
+}
+
+void dNewtonMesh::AddNormal (dFloat32 x, dFloat32 y, dFloat32 z)
+{
+	NewtonMeshAddNormal(m_mesh, x, y, z);
+}
+
+void dNewtonMesh::AddMaterial(int materialIndex)
+{
+	NewtonMeshAddMaterial(m_mesh, materialIndex);
+}
+
 
 void dNewtonMesh::EndPolygon()
 {
 	NewtonMeshEndFace(m_mesh);
+}
+
+void dNewtonMesh::EndBuild()
+{
+	NewtonMeshEndBuild(m_mesh);
 }
 
 

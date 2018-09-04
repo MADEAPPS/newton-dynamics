@@ -47,6 +47,7 @@ class dNewtonMesh: public dNewtonAlloc
 	};
 
 	CNEWTON_API dNewtonMesh(dNewton* const world);
+	CNEWTON_API dNewtonMesh(NewtonWorld* const world);
 	CNEWTON_API dNewtonMesh(const dNewtonMesh& clone);
 	CNEWTON_API dNewtonMesh(const dNewtonCollision& collision);
 	CNEWTON_API dNewtonMesh(dNewton* const world, int pointCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance);
@@ -57,9 +58,14 @@ class dNewtonMesh: public dNewtonAlloc
 	// special construction functions
 	CNEWTON_API void CreateApproximateConvexDecomposition (const dNewtonMesh& sourceMesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull);
 
-	CNEWTON_API void BeginPolygon();
-	CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
-	CNEWTON_API void EndPolygon();
+	NEWTON_API void BeginBuild();
+		CNEWTON_API void BeginPolygon();
+//		CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
+		CNEWTON_API void AddPoint (dFloat64 x, dFloat64 y, dFloat64 z);
+		CNEWTON_API void AddNormal (dFloat32 x, dFloat32 y, dFloat32 z);
+		CNEWTON_API void AddMaterial (int materialIndex);
+		CNEWTON_API void EndPolygon();
+	NEWTON_API void EndBuild();
 
 	CNEWTON_API void ApplyTransform (const dFloat* const matrix);
 
