@@ -257,8 +257,6 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 		dgAssert (m_world);
 		if (!m_equilibrium) {
 			m_world->GetBroadPhase()->UpdateBody (this, threadIndex);
-		} else {
-			m_broadPhaseNode->m_isSleeping = 1;
 		}
 	}
 }

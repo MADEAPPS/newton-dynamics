@@ -697,12 +697,6 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		dgAssert(!node->GetRight());
 		dgAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
 
-		const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
-		
-		for (dgBroadPhaseNode* parent = node; parent && parent->m_isSleeping; parent = parent->m_parent) {
-			parent->m_isSleeping = 0;
-		}
-
 		if (body1->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
 			dgScopeSpinPause lock(&aggregate->m_criticalSectionLock);
@@ -712,6 +706,8 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		if (!dgBoxInclusionTest(body1->m_minAABB, body1->m_maxAABB, node->m_minBox, node->m_maxBox)) {
 			dgAssert(!node->IsAggregate());
 			node->SetAABB(body1->m_minAABB, body1->m_maxAABB);
+
+			const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
 			for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
 				dgScopeSpinPause lock(&parent->m_criticalSectionLock);
 				if (!parent->IsAggregate()) {
@@ -1286,15 +1282,11 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 	const dgVector boxP0 (body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dgVector boxP1 (body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 
-	const dgInt32 isSleeping = leafNode->m_isSleeping;
-
 	const bool test0 = body0 ? (body0->GetInvMass().m_w != dgFloat32(0.0f)) : true;
 	while (stack) {
 		stack--;
 		dgBroadPhaseNode* const rootNode = pool[stack];
-		const dgInt32 isActive = !(isSleeping & rootNode->m_isSleeping);
-		//const dgInt32 isActive = 1;
-		if (isActive && dgOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) {
+		if (dgOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) {
 			if (rootNode->IsLeafNode()) {
 				dgAssert(!rootNode->GetRight());
 				dgAssert(!rootNode->GetLeft());
@@ -1323,7 +1315,6 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 				dgBroadPhaseTreeNode* const tmpNode = (dgBroadPhaseTreeNode*) rootNode;
 				dgAssert (tmpNode->m_left);
 				dgAssert (tmpNode->m_right);
-				tmpNode->m_isSleeping = tmpNode->m_left->m_isSleeping | tmpNode->m_right->m_isSleeping;
 
 				pool[stack] = tmpNode->m_left;
 				stack++;

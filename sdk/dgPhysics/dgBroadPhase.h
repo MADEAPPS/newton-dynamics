@@ -62,7 +62,6 @@ class dgBroadPhaseNode
 		,m_parent(parent)
 		,m_surfaceArea(dgFloat32(1.0e20f))
 		,m_criticalSectionLock(0)
-		,m_isSleeping(0)
 	{
 	}
 
@@ -70,7 +69,7 @@ class dgBroadPhaseNode
 	{
 	}
 
-	virtual bool IsPersistentRoot() const
+	virtual bool IsSegregatedRoot() const
 	{
 		return false;
 	}
@@ -124,7 +123,6 @@ class dgBroadPhaseNode
 	dgBroadPhaseNode* m_parent;
 	dgFloat32 m_surfaceArea;
 	dgInt32 m_criticalSectionLock;
-	dgInt32 m_isSleeping;
 
 	static dgVector m_broadPhaseScale;
 	static dgVector m_broadInvPhaseScale;
