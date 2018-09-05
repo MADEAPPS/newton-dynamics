@@ -454,8 +454,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void* GetFirstPoint () const;
 	void* GetNextPoint (const void* const point) const;
-	int GetPointIndex (const void* const point) const;
-	int GetVertexIndexFromPoint (const void* const point) const;
+	dgInt32 GetPointIndex (const void* const point) const;
+	dgInt32 GetVertexIndexFromPoint (const void* const point) const;
 
 	void* GetFirstEdge () const;
 	void* GetNextEdge (const void* const edge) const;
@@ -467,9 +467,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void* GetFirstFace () const;
 	void* GetNextFace (const void* const face) const;
-	int IsFaceOpen (const void* const face) const;
-	int GetFaceMaterial (const void* const face) const;
-	int GetFaceIndexCount (const void* const face) const;
+	dgInt32 IsFaceOpen (const void* const face) const;
+	dgInt32 GetFaceMaterial (const void* const face) const;
+	dgInt32 GetFaceIndexCount (const void* const face) const;
 	void GetFaceIndex (const void* const face, dgInt32* const indices) const;
 	void GetFaceAttributeIndex (const void* const face, dgInt32* const indices) const;
 	dgBigVector CalculateFaceNormal (const void* const face) const;

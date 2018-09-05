@@ -3126,9 +3126,6 @@ void dgMeshEffect::GetMaterialGetIndexStreamShort (dgIndexArray* const handle, d
 
 dgCollisionInstance* dgMeshEffect::CreateCollisionTree(dgWorld* const world, dgInt32 shapeID) const
 {
-dgAssert(0);
-return NULL;
-/*
 	dgCollisionBVH* const collision = new  (GetAllocator()) dgCollisionBVH (world);
 
 	collision->BeginBuild();
@@ -3136,19 +3133,22 @@ return NULL;
 	dgInt32 mark = IncLRU();
 	dgPolyhedra::Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++){
-		dgEdge* const face = &(*iter);
+		dgTreeNode* const faceNode = iter.GetNode();
+		//dgEdge* const face = &(*iter);
+		dgEdge* const face = &faceNode->GetInfo();
 		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
 			dgInt32 count = 0;
 			dgVector polygon[256]; 
 			dgEdge* ptr = face;
 			do {
-				polygon[count] = dgVector (m_points[ptr->m_incidentVertex]);
-				polygon[count].m_w = dgFloat32 (0.0f);
+				//polygon[count] = dgVector (m_points[ptr->m_incidentVertex]);
+				polygon[count] = GetVertex(ptr->m_incidentVertex);
 				count ++;
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != face);
-			collision->AddFace(count, &polygon[0].m_x, sizeof (dgVector), dgInt32 (m_attrib[face->m_userData].m_material));
+			//collision->AddFace(count, &polygon[0].m_x, sizeof (dgVector), dgInt32 (m_attrib[face->m_userData].m_material));
+			collision->AddFace(count, &polygon[0].m_x, sizeof (dgVector), GetFaceMaterial(faceNode));
 		}
 	}
 	collision->EndBuild(0);
@@ -3156,7 +3156,6 @@ return NULL;
 	dgCollisionInstance* const instance = world->CreateInstance(collision, shapeID, dgGetIdentityMatrix());
 	collision->Release();
 	return instance;
-*/
 }
 
 dgCollisionInstance* dgMeshEffect::CreateConvexCollision(dgWorld* const world, dgFloat64 tolerance, dgInt32 shapeID, const dgMatrix& srcMatrix) const

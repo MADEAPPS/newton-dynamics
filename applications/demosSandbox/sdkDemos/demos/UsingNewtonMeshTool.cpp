@@ -173,12 +173,14 @@ static void CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, const d
 		buildMesh.EndPolygon();
 		index += indexCount;
 	}
-
 	buildMesh.EndBuild();
-
 
 	// get the newtonMesh from the dNewtonMesh class and use it to build a render mesh, collision or anything
 	NewtonMesh* const newtonMesh = buildMesh.GetMesh();
+
+	// test collision tree
+	//NewtonCollision* const collisionTree = NewtonCreateTreeCollisionFromMesh (scene->GetNewton(), newtonMesh, 0);
+	//NewtonDestroyCollision(collisionTree);
 
 	// now we can use this mesh for lot of stuff, we can apply UV, we can decompose into convex, 
 	NewtonCollision* const collision = NewtonCreateConvexHullFromMesh(scene->GetNewton(), newtonMesh, 0.001f, 0);
