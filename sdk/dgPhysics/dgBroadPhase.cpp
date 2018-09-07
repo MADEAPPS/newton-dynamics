@@ -292,7 +292,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = node ? node->GetPrev() : NULL;
+			node = node ? node->GetNext() : NULL;
 		}
 	}
 }
@@ -341,7 +341,7 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = node ? node->GetPrev() : NULL;
+			node = node ? node->GetNext() : NULL;
 		}
 	}
 }
@@ -1179,7 +1179,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 	const bool test = TestOverlaping (body0, body1, timestep);
 	if (test) {
 		dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
-
 		if (!contact) {
 			const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
 			const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
@@ -1201,6 +1200,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
 						const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
 						const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+
 						if (isSofBody0 || isSofBody1) {
 							m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
 							m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
@@ -1668,12 +1668,14 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	const dgInt32 threadsCount = m_world->GetThreadCount();
 
 	const dgBodyMasterList* const masterList = m_world;
+
+	m_world->m_bodiesMemory.ResizeIfNecessary(masterList->GetCount());
 	dgBroadphaseSyncDescriptor syncPoints(timestep, m_world);
 
-	dgBodyMasterList::dgListNode* node = masterList->GetLast();
+	dgBodyMasterList::dgListNode* node = masterList->GetFirst()->GetNext();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(ForceAndToqueKernel, &syncPoints, node, "dgBroadPhase::ForceAndToque");
-		node = node ? node->GetPrev() : NULL;
+		node = node ? node->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
 
@@ -1687,17 +1689,18 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		}
 	}
 
+	// check for sleeping bodies states
+	node = masterList->GetFirst()->GetNext();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob(SleepingStateKernel, &syncPoints, node, "dgBroadPhase::SleepingState");
+		node = node ? node->GetNext() : NULL;
+	}
+	m_world->SynchronizationBarrier();
+
 	dgContactList* const contactList = m_world;
 	contactList->m_deadContactsCount = 0;
 	contactList->m_activeContactsCount = 0;
 	dgContactList::dgListNode* const lastNode = contactList->GetFirst();
-
-	node = masterList->GetLast();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(SleepingStateKernel, &syncPoints, node, "dgBroadPhase::SleepingState");
-		node = node ? node->GetPrev() : NULL;
-	}
-	m_world->SynchronizationBarrier();
 
 	UpdateFitness();
 
