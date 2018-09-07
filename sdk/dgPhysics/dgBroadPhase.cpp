@@ -1611,7 +1611,8 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 {
 	DG_TRACKTIME(__FUNCTION__);
 
-#ifdef DG_USE_OLD_SCANNER
+//#ifdef DG_USE_OLD_SCANNER
+#if 0
 	dgContactList* const contactList = m_world;
 	dgInt32 activeCount = contactList->m_activeContactsCount;
 	if (activeCount < m_world->m_jointsMemory.GetElementsCapacity()) {
@@ -1659,9 +1660,8 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 		m_contactCache.AddContactJoint(contact);
 	}
 	
-	dgInt32 activeCount = contactList->m_activeContactsCount;
-	if (activeCount < m_world->m_jointsMemory.GetElementsCapacity()) {
-		activeCount = 0;
+	if (contactList->m_activeContactsCount >= m_world->m_jointsMemory.GetElementsCapacity()) {
+		dgInt32 activeCount = 0;
 		for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 			dgContact* const contact = contactNode->GetInfo();
 			if (contact->m_contactActive || contact->m_maxDOF) {
