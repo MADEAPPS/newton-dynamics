@@ -390,11 +390,13 @@ class dgBroadPhase
 		dgBroadphaseSyncDescriptor(dgFloat32 timestep, dgWorld* const world)
 			:m_world(world)
 			,m_timestep(timestep)
+			,m_atomicPendingBodiesCount(0)
 		{
 		}
 
 		dgWorld* m_world;
 		dgFloat32 m_timestep;
+		dgInt32 m_atomicPendingBodiesCount;
 	};
 	
 	class dgFitnessList: public dgList <dgBroadPhaseTreeNode*>
