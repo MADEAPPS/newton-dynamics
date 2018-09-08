@@ -280,8 +280,8 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 
 	int high = 20;
 //high = 40;
-high = 30;
-high = 2;
+//high = 30;
+high = 10;
 
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
@@ -294,7 +294,7 @@ high = 2;
 	high = 20;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-//			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high);
+			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high);
 		}
 	}
 

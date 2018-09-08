@@ -535,6 +535,7 @@ class dgWorld
 	friend class dgJacobianMemory;
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
+	friend class dgBroadPhaseMixed;
 	friend class dgCollisionInstance;
 	friend class dgCollisionCompound;
 	friend class dgParallelBodySolver;
@@ -543,6 +544,7 @@ class dgWorld
 	friend class dgParallelSolverSolve;
 	friend class dgCollisionHeightField;
 	friend class dgSolverWorlkerThreads;
+	friend class dgBroadPhaseSegregated;
 	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
 	friend class dgCollisionDeformableMesh;

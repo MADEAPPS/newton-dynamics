@@ -390,13 +390,19 @@ class dgBroadPhase
 		dgBroadphaseSyncDescriptor(dgFloat32 timestep, dgWorld* const world)
 			:m_world(world)
 			,m_timestep(timestep)
+			,m_atomicIndex(0)
+			,m_atomicDynamicsCount(0)
 			,m_atomicPendingBodiesCount(0)
+			,m_fullScan(false)
 		{
 		}
 
 		dgWorld* m_world;
 		dgFloat32 m_timestep;
+		dgInt32 m_atomicIndex;
+		dgInt32 m_atomicDynamicsCount;
 		dgInt32 m_atomicPendingBodiesCount;
+		bool m_fullScan;
 	};
 	
 	class dgFitnessList: public dgList <dgBroadPhaseTreeNode*>
@@ -535,6 +541,7 @@ class dgBroadPhase
 	void UpdateRigidBodyContacts (dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
 	void AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodeConstactNode, dgInt32 threadID);
+	bool SanityCheck() const;
 		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
