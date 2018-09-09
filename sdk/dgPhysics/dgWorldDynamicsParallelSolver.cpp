@@ -41,8 +41,8 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[m_bodies];
 	dgJointInfo* const jointArray = &world->m_jointsMemory[m_joints];
 
-	if (world->m_currentPlugin) {
-		dgWorldPlugin* const plugin = world->m_currentPlugin->GetInfo().m_plugin;
+	if (world->GetCurrentPlugin()) {
+		dgWorldPlugin* const plugin = world->GetCurrentPlugin()->GetInfo().m_plugin;
 		plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 	} else {
 		m_parallelSolver.CalculateJointForces(cluster, bodyArray, jointArray, timestep);

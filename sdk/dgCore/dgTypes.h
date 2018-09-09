@@ -55,11 +55,9 @@
 	#pragma warning (disable: 4626) //assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
 	#pragma warning (disable: 4640) //construction of local static object is not thread-safe
 	#pragma warning (disable: 4820) //bytes padding added after data member
-	
-    #if _MSC_VER >= 1400
-	  #pragma warning (disable: 4005) //'__useHeader': macro redefinition
-// 	  #pragma warning (disable: 4577) // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
-    #endif
+	#pragma warning (disable: 4005) //'__useHeader': macro redefinition
+	//#pragma warning (disable: 4577) // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
+    
 	#include <io.h> 
 	#include <direct.h> 
 	#include <malloc.h>
@@ -89,7 +87,7 @@
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
-#include <atomic>
+//#include <atomic>
 
 #if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	#include <io.h> 
@@ -880,6 +878,7 @@ DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 #endif
 }
 
+/*
 class dgAtomic: protected std::atomic<dgInt32>
 {
 	public:
@@ -899,6 +898,7 @@ class dgAtomic: protected std::atomic<dgInt32>
 		return exchange(value);
 	}
 };
+*/
 
 DG_INLINE void dgThreadYield()
 {
@@ -931,6 +931,8 @@ DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 {
 	#ifndef DG_USE_THREAD_EMULATION 
 		dgInterlockedExchange(ptr, 0);
+	#else
+		*ptr = 0;
 	#endif
 }
 

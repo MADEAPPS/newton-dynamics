@@ -1664,6 +1664,7 @@ void dgBroadPhase::RemoveOldContacts()
 
 bool dgBroadPhase::SanityCheck() const
 {
+#ifdef _DEBUG
 	class dgKey
 	{
 		public:
@@ -1696,10 +1697,9 @@ bool dgBroadPhase::SanityCheck() const
 
 	dgContactList* const contactList = m_world;
 	for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
-		dgContact* const contact = contactNode->GetInfo();
-		dgAssert (filter.Insert(0, dgKey(contact)));
+		dgAssert (filter.Insert(0, dgKey(contactNode->GetInfo())));
 	}
-
+#endif
 	return true;
 }
 

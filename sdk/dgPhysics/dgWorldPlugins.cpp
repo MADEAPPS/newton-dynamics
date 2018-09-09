@@ -37,15 +37,14 @@ dgWorldPluginList::~dgWorldPluginList()
 {
 }
 
-void dgWorldPluginList::LoadPlugins()
+
+void dgWorldPluginList::LoadVisualStudioPlugins()
 {
-#ifndef _NEWTON_USE_DOUBLE
+#if _MSC_VER > 1700
 	char plugInPath[2048];
 	char rootPathInPath[2048];
 
-#ifdef _MSC_VER
 	GetModuleFileNameA(NULL, plugInPath, 256);
-#endif
 
 	for (dgInt32 i = dgInt32(strlen(plugInPath) - 1); i; i--) {
 		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
@@ -96,6 +95,17 @@ void dgWorldPluginList::LoadPlugins()
 
 		_findclose(handle);
 	}
+#endif	
+
+}
+
+
+void dgWorldPluginList::LoadPlugins()
+{
+#ifndef _NEWTON_USE_DOUBLE
+	#ifdef _MSC_VER
+		LoadVisualStudioPlugins();
+	#endif
 #endif
 }
 

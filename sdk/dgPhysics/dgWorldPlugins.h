@@ -80,6 +80,9 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 	const char* GetPluginId(dgListNode* const plugin);
 	void SelectPlugin(dgListNode* const plugin);
 
+	private:
+	void LoadVisualStudioPlugins();
+
 	dgListNode* m_currentPlugin;
 	dgListNode* m_preferedPlugin;
 };
