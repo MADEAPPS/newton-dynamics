@@ -20,24 +20,24 @@
 */
 
 
-#ifndef _D_NEWTON_H__
-#define _D_NEWTON_H__
+#ifndef __D_VEHICLE_H__
+#define __D_VEHICLE_H__
 
 
-#ifdef _CNEWTON_STATIC_LIB
-	#define CNEWTON_API
+#ifdef _DVEHICLE_STATIC_LIB
+	#define DVEHICLE_API
 #else 
-	#ifdef _CNEWTON_BUILD_DLL
+	#ifdef _DVEHICLE_BUILD_DLL
 		#ifdef _WIN32
-			#define CNEWTON_API __declspec (dllexport)
+			#define DVEHICLE_API __declspec (dllexport)
 		#else
-			#define CNEWTON_API __attribute__ ((visibility("default")))
+			#define DVEHICLE_API __attribute__ ((visibility("default")))
 		#endif
 	#else
 		#ifdef _WIN32
-			#define CNEWTON_API __declspec (dllimport)
+			#define DVEHICLE_API __declspec (dllimport)
 		#else
-			#define CNEWTON_API
+			#define DVEHICLE_API
 		#endif
 	#endif
 #endif
@@ -55,10 +55,16 @@
 	#include <crtdbg.h>
 #endif
 
+#include <stdio.h>
+#include <assert.h>
+#endif
+
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <Newton.h>
+
+/*
 #include <dCustomJoint.h>
 #include <dCustom6dof.h>
 #include <dCustomGear.h>
@@ -79,5 +85,7 @@
 #include <dCustomDoubleHingeActuator.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
+*/
 
-#endif
+
+

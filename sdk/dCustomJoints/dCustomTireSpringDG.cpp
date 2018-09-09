@@ -10,8 +10,8 @@
 */
 
 /*
-* Vehicle Multibody Joint write by Dave Gravel 2018.
-* I have write this vehicle multibody code for share with other newton users, and maybe it can help someone. 
+* Vehicle Multi body Joint write by Dave Gravel 2018.
+* I have write this vehicle multi body code for share with other newton users, and maybe it can help someone. 
 * Have fun!!!
 *
 * Informations, Problems:

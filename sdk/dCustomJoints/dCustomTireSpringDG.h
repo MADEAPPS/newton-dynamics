@@ -10,8 +10,8 @@
 */
 
 /*
-* Vehicle Multibody Joint write by Dave Gravel 2018.
-* I have write this vehicle multibody code for share with other newton users, and maybe it can help someone.
+* Vehicle Multi body Joint write by Dave Gravel 2018.
+* I have write this vehicle multi body code for share with other newton users, and maybe it can help someone.
 * Have fun!!!
 * 
 * Informations, Problems:
@@ -43,26 +43,26 @@ const dFloat VEHICLE_ATTACH_FORCE_SIDE = -1;
 
 class dCustomVehicleControllerDG : public dCustomControllerBase
 {
-public:
-	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-protected:
+	public:
+	CUSTOM_JOINTS_API void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	CUSTOM_JOINTS_API void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 
-  virtual void PreUpdate(dFloat timestep, int threadIndex);
-  virtual void PostUpdate(dFloat timestep, int threadIndex) {};
-  //
-  friend class dCustomVehicleControllerManager;
+	protected:
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
+	//
+	friend class dCustomVehicleControllerManager;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class dCustomVehicleControllerManagerDG : public dCustomControllerManager<dCustomVehicleControllerDG>
 {
-public:
-  dCustomVehicleControllerManagerDG(NewtonWorld* const world, int materialCount, int* const otherMaterials);
-  virtual ~dCustomVehicleControllerManagerDG();
-  //
-  friend class dCustomVehicleControllerDG;
+	public:
+	CUSTOM_JOINTS_API dCustomVehicleControllerManagerDG(NewtonWorld* const world, int materialCount, int* const otherMaterials);
+	CUSTOM_JOINTS_API virtual ~dCustomVehicleControllerManagerDG();
+	//
+	friend class dCustomVehicleControllerDG;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,37 +89,37 @@ public:
 	CUSTOM_JOINTS_API void SetTireOmegaCorrection(dFloat val);
 	CUSTOM_JOINTS_API void SetTireSuspenssion(dFloat tvSpringK, dFloat tvSpringD, dFloat tvSpringMassEffective, dFloat tvMinLimit, dFloat tvMaxLimit);
 	//
-	dFloat GetTireTorque();
-	dFloat GetTireIxx();
-	dFloat GetTireIyy();
-	dFloat GetTireIzz();
+	CUSTOM_JOINTS_API dFloat GetTireTorque();
+	CUSTOM_JOINTS_API dFloat GetTireIxx();
+	CUSTOM_JOINTS_API dFloat GetTireIyy();
+	CUSTOM_JOINTS_API dFloat GetTireIzz();
 
 	//
 	// Public because it is use inside the Listener
 	// I don't think they need to become implemented for the dll interface.
-	void SetDistance();
-	void SetAccel(dFloat val);
-	void SetSpringK(dFloat val);
-	void SetSpringD(dFloat val);
-	void SetSpringMassEffective(dFloat val);
+	CUSTOM_JOINTS_API void SetDistance();
+	CUSTOM_JOINTS_API void SetAccel(dFloat val);
+	CUSTOM_JOINTS_API void SetSpringK(dFloat val);
+	CUSTOM_JOINTS_API void SetSpringD(dFloat val);
+	CUSTOM_JOINTS_API void SetSpringMassEffective(dFloat val);
 	//
-	void SetCenterInTire(dVector val);
-	void SetCenterInChassis(dVector val);
-	void SetChassisPivotMatrix(dMatrix val);
-	void SetTirePivotMatrix(dMatrix val);
-	void TireMatrixProjection();
+	CUSTOM_JOINTS_API void SetCenterInTire(dVector val);
+	CUSTOM_JOINTS_API void SetCenterInChassis(dVector val);
+	CUSTOM_JOINTS_API void SetChassisPivotMatrix(dMatrix val);
+	CUSTOM_JOINTS_API void SetTirePivotMatrix(dMatrix val);
+	CUSTOM_JOINTS_API void TireMatrixProjection();
 	//
-	dFloat GetDistance();
-	dFloat GetRealTireOmega();
-	dFloat GetAccel();
-	dFloat GetSpringK();
-	dFloat GetSpringD();
-	dFloat GetSpringMassEffective();
+	CUSTOM_JOINTS_API dFloat GetDistance();
+	CUSTOM_JOINTS_API dFloat GetRealTireOmega();
+	CUSTOM_JOINTS_API dFloat GetAccel();
+	CUSTOM_JOINTS_API dFloat GetSpringK();
+	CUSTOM_JOINTS_API dFloat GetSpringD();
+	CUSTOM_JOINTS_API dFloat GetSpringMassEffective();
 	//
-	dVector GetCenterInTire();
-	dVector GetCenterInChassis();
-	dMatrix GetChassisPivotMatrix();
-	dMatrix GetTirePivotMatrix();
+	CUSTOM_JOINTS_API dVector GetCenterInTire();
+	CUSTOM_JOINTS_API dVector GetCenterInChassis();
+	CUSTOM_JOINTS_API dMatrix GetChassisPivotMatrix();
+	CUSTOM_JOINTS_API dMatrix GetTirePivotMatrix();
 	//
 protected:
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
