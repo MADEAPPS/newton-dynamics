@@ -159,20 +159,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	m_clusterData = NULL;
 }
 
-
-/*
-dgInt32 dgWorldDynamicUpdate::CompareBodyInfos(const dgBodyInfo* const infoA, const dgBodyInfo* const infoB, void*)
-{
-	if (infoA->m_clusterKey < infoB->m_clusterKey) {
-		return -1;
-	}
-	else if (infoA->m_clusterKey > infoB->m_clusterKey) {
-		return 1;
-	}
-	return 0;
-}
-*/
-
 dgInt32 dgWorldDynamicUpdate::CompareKey(dgInt32 highA, dgInt32 lowA, dgInt32 highB, dgInt32 lowB)
 {
 	if (highA < highB) {

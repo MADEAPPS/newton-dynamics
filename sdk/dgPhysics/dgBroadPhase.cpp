@@ -1564,12 +1564,10 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					const dgBroadPhaseNode* const bodyNode1 = contact->GetBody1()->m_broadPhaseNode;
 					if (dgOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) {
 						contact->m_broadphaseLru = m_lru;
-					} else {
-						if (contact->m_broadphaseLru < lru) {
-							dgInt32 index = dgAtomicExchangeAndAdd(&contactList->m_deadContactsCount, 1);
-							if (index < sizeof(contactList->m_deadContacts) / sizeof(contactList->m_deadContacts[0])) {
-								contactList->m_deadContacts[index] = node;
-							}
+					} else if (contact->m_broadphaseLru < lru) {
+						dgInt32 index = dgAtomicExchangeAndAdd(&contactList->m_deadContactsCount, 1);
+						if (index < sizeof(contactList->m_deadContacts) / sizeof(contactList->m_deadContacts[0])) {
+							contactList->m_deadContacts[index] = node;
 						}
 					}
 				}
@@ -1591,6 +1589,11 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 			dgInt32 activeCount = dgAtomicExchangeAndAdd(activeContactsCount, 1);
 			if (activeCount < maxActiveCount) {
 				constraintArray[activeCount].m_joint = contact;
+			}
+		} else if (body0->m_equilibrium & body1->m_equilibrium) {
+			dgInt32 index = dgAtomicExchangeAndAdd(&contactList->m_deadContactsCount, 1);
+			if (index < sizeof(contactList->m_deadContacts) / sizeof(contactList->m_deadContacts[0])) {
+				contactList->m_deadContacts[index] = node;
 			}
 		}
 

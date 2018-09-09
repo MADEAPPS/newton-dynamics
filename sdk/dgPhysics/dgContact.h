@@ -224,7 +224,6 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgFloat32 m_closestDistance;
 	dgFloat32 m_separationDistance;
 	dgFloat32 m_timeOfImpact;
-//	dgWorld* m_world;
 	const dgContactMaterial* m_material;
 	dgContactList::dgListNode* m_contactNode;
 	dgFloat32 m_contactPruningTolereance;
