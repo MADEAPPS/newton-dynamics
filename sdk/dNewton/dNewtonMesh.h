@@ -58,7 +58,7 @@ class dNewtonMesh: public dNewtonAlloc
 	// special construction functions
 	CNEWTON_API void CreateApproximateConvexDecomposition (const dNewtonMesh& sourceMesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull);
 
-	NEWTON_API void BeginBuild();
+	CNEWTON_API void BeginBuild();
 		CNEWTON_API void BeginPolygon();
 	//		CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
 			CNEWTON_API void AddPoint (dFloat64 x, dFloat64 y, dFloat64 z);
@@ -71,7 +71,7 @@ class dNewtonMesh: public dNewtonAlloc
 			CNEWTON_API void AddVertexColor (dFloat32 r, dFloat32 g, dFloat32 b, dFloat32 a);
 			CNEWTON_API void AddVertexWeight (int matrixIndex[4], dFloat32 weights[4]);
 		CNEWTON_API void EndPolygon();
-	NEWTON_API void EndBuild();
+	CNEWTON_API void EndBuild();
 
 	CNEWTON_API void ApplyTransform (const dFloat* const matrix);
 
