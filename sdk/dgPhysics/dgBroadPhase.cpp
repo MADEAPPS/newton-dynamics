@@ -41,7 +41,7 @@
 #define DG_NARROW_PHASE_DIST			dgFloat32 (0.2f)
 #define DG_CONTACT_DELAY_FRAMES			4
 
-#define DG_USE_OLD_SCANNER
+//#define DG_USE_OLD_SCANNER
 
 dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-16f)); 
 dgVector dgBroadPhase::m_angularContactError2(DG_CONTACT_ANGULAR_ERROR * DG_CONTACT_ANGULAR_ERROR);
