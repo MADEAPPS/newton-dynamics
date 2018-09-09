@@ -105,6 +105,7 @@ void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
 void BasicCar (DemoEntityManager* const scene);
+void BasicMultibodyVehicle(DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
@@ -161,6 +162,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
 	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
+	{"Basic Multibody Vehicle", "show how to set up a multibody vehicle by Dave Gravel", BasicMultibodyVehicle},
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
@@ -329,7 +331,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = true;
 	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-	m_workerThreads = 4;
+//	m_workerThreads = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
