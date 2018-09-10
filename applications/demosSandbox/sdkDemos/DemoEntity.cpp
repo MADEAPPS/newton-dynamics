@@ -34,8 +34,6 @@ DemoEntity::DemoEntity(const dMatrix& matrix, DemoEntity* const parent)
 	}
 }
 
-
-
 DemoEntity::DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent)
 	:dClassInfo()
 	,dHierarchy<DemoEntity>() 

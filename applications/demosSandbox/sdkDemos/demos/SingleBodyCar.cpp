@@ -466,6 +466,27 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 	}
 
+	void MakeVisualEntity(dVehicleChassis* const chassis)
+	{
+		NewtonBody* const chassiBody = chassis->GetBody();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+
+		NewtonCollision* const chassisCollision = NewtonBodyGetCollision(chassiBody);
+		DemoMesh* const chassisMesh = new DemoMesh("chassis", chassisCollision, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+
+		dMatrix chassisMatrix;
+		NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
+		DemoEntity* const entity = new DemoEntity(chassisMatrix, NULL);
+		scene->Append(entity);
+		entity->SetMesh(chassisMesh, dGetIdentityMatrix());
+		chassisMesh->Release();
+
+		// set the user data
+		NewtonBodySetUserData(chassiBody, entity);
+
+		// set the transform callback
+		NewtonBodySetTransformCallback(chassiBody, DemoEntity::TransformCallback);
+	}
 
 	dVehicleChassis* CreateVehicle(const dMatrix& location)
 	{
@@ -493,18 +514,15 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// get body from player
 		NewtonBody* const body = vehicle->GetBody();
 
-		// set the user data
-		//NewtonBodySetUserData(body, this);
-
-		// set the transform callback
-		//NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
 		// set the player matrix 
 		NewtonBodySetMatrix(body, &location[0][0]);
 
 //		for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
 //			m_gearMap[i] = i;
 //		}
+
+		// create the visual representation
+		MakeVisualEntity(vehicle);
 
 		// destroy chassis collision shape 
 		NewtonDestroyCollision(chassisCollision);

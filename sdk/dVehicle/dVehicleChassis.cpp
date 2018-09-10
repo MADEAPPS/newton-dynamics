@@ -33,6 +33,7 @@ void dVehicleChassis::Init(NewtonCollision* const chassisShape, dFloat mass, con
 void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 	m_body = body;
+	NewtonBodySetForceAndTorqueCallback(m_body, forceAndTorque);
 /*
 	m_speed = 0.0f;
 	m_sideSlip = 0.0f;
