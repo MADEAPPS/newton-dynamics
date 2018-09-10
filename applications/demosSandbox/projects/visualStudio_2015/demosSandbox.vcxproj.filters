@@ -183,6 +183,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\BasicMultibodyVehicle.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SingleBodyCar.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">

@@ -123,6 +123,15 @@ typedef long long unsigned64;
 #include <dMathDefines.h>
 #include <dBezierSpline.h>
 
+#include <dCRC.h>
+#include <dHeap.h>
+#include <dList.h>
+#include <dTree.h>
+#include <dRtti.h>
+#include <dClassInfo.h>
+#include <dRefCounter.h>
+#include <dBaseHierarchy.h>
+
 #include <dCustomJoint.h>
 #include <dCustom6dof.h>
 #include <dCustomGear.h>
@@ -154,15 +163,9 @@ typedef long long unsigned64;
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
 
-
-#include <dCRC.h>
-#include <dHeap.h>
-#include <dList.h>
-#include <dTree.h>
-#include <dRtti.h>
-#include <dClassInfo.h>
-#include <dRefCounter.h>
-#include <dBaseHierarchy.h>
+#include <dStdafxVehicle.h>
+#include <dVehicleChassis.h>
+#include <dVehicleManager.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>

@@ -198,11 +198,6 @@ static void CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, const d
 }
 
 
-//NewtonMesh* const testNewtonMesh = visualMesh->CreateNewtonMesh(scene->GetNewton(), dGetIdentityMatrix());
-//NewtonMeshDestroy(testNewtonMesh);
-
-
-
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox

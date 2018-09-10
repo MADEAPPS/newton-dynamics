@@ -87,5 +87,9 @@
 #include <dCustomVehicleControllerManager.h>
 */
 
+#include <dCustomJointLibraryStdAfx.h>
+#include <dCustomAlloc.h>
+#include <dCustomJoint.h>
+#include <dCustomControllerManager.h>
 
 

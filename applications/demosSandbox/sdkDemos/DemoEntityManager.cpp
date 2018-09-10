@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-#define DEFAULT_SCENE	8			// box stacks
+//#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -67,14 +67,16 @@
 //#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
-//#define DEFAULT_SCENE	36			// super Car
-//#define DEFAULT_SCENE	37			// heavy vehicles
-//#define DEFAULT_SCENE	38			// basic player controller
-//#define DEFAULT_SCENE	39			// advanced player controller
-//#define DEFAULT_SCENE	40			// cloth patch			
-//#define DEFAULT_SCENE	41			// soft bodies	
-//#define DEFAULT_SCENE	42          // joe's joint test
-//#define DEFAULT_SCENE	43          // Misho's Rocket Test
+#define DEFAULT_SCENE	36			// single body vehicle
+//#define DEFAULT_SCENE	37			// david Gravel multi body car
+//#define DEFAULT_SCENE	38			// super Car
+//#define DEFAULT_SCENE	39			// heavy vehicles
+//#define DEFAULT_SCENE	30			// basic player controller
+//#define DEFAULT_SCENE	31			// advanced player controller
+//#define DEFAULT_SCENE	42			// cloth patch			
+//#define DEFAULT_SCENE	43			// soft bodies	
+//#define DEFAULT_SCENE	44          // joe's joint test
+//#define DEFAULT_SCENE	45          // Misho's Rocket Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -105,6 +107,7 @@ void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
 void BasicCar (DemoEntityManager* const scene);
+void SingleBodyCar(DemoEntityManager* const scene);
 void BasicMultibodyVehicle(DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
@@ -162,7 +165,8 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
 	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
-	{"Basic Multibody Vehicle", "show how to set up a multibody vehicle by Dave Gravel", BasicMultibodyVehicle},
+	{"Single Body Car", "show a generalized coordinate system body", SingleBodyCar },
+	{"Basic Multi body Car", "show how to set up a multi body vehicle by Dave Gravel", BasicMultibodyVehicle},
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
