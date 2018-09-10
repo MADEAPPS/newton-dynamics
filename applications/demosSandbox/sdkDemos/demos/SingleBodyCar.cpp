@@ -24,7 +24,7 @@
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 
-static dFloat chassis[][3] = 
+static dFloat chassisShape[] = 
 {
 	-2.086454f, 0.152566f, -0.709441f,
 	-1.997459f, 0.059762f, -0.739932f,
@@ -469,14 +469,49 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	dVehicleChassis* CreateVehicle(const dMatrix& location)
 	{
+		NewtonWorld* const world = GetWorld();
 
+		// make chassis collision shape;
+		int chassisVertexCount = sizeof(chassisShape) / (3 * sizeof(chassisShape[0]));
+		NewtonCollision* const chassisCollision = NewtonCreateConvexHull(world, chassisVertexCount, &chassisShape[0], 3 * sizeof(dFloat), 0.001f, 0, NULL);
 
-		return NULL;
+		// create the vehicle controller
+		dMatrix chassisMatrix;
+#if 1
+		chassisMatrix.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
+#else
+		chassisMatrix.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
+#endif
+		chassisMatrix.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
+		chassisMatrix.m_right = chassisMatrix.m_front.CrossProduct(chassisMatrix.m_up);	// this is in the side vehicle direction (the plane of the wheels)
+		chassisMatrix.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+		// create a single body vehicle 
+		dFloat chassisMass = 1000.0f;
+		dVehicleChassis* const vehicle = CreateSingleBodyVehicle(chassisCollision, chassisMatrix, chassisMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
+
+		// get body from player
+		NewtonBody* const body = vehicle->GetBody();
+
+		// set the user data
+		//NewtonBodySetUserData(body, this);
+
+		// set the transform callback
+		//NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+		// set the player matrix 
+		NewtonBodySetMatrix(body, &location[0][0]);
+
+//		for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
+//			m_gearMap[i] = i;
+//		}
+
+		// destroy chassis collision shape 
+		NewtonDestroyCollision(chassisCollision);
+
+		return vehicle;
 	}
 };
-
-
-
 
 
 void SingleBodyCar(DemoEntityManager* const scene)

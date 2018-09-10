@@ -118,10 +118,14 @@ class dVehicleChassis: public dCustomControllerBase
 	friend class dVehicleChassisManager;
 */
 
+	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+
 	protected:
 	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
 
+	friend class dVehicleManager;
 };
 
 
