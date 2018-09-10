@@ -31,10 +31,13 @@ class dCustomCorkScrew: public dCustomSlider
 
 	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
-	protected:
+    CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
+
+    protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
 	CUSTOM_JOINTS_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	void SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);

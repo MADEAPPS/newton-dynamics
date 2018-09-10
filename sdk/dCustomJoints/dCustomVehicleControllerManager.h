@@ -201,11 +201,14 @@ class dWheelJoint: public dCustomJoint
 		return m_lateralDir.Scale(NewtonUserJointGetRowForce(m_joint, 0));
 	}
 
+
+    CUSTOM_JOINTS_API void Debug(dDebugDisplay* const debugDisplay) const;
+
 	protected:
 	CUSTOM_JOINTS_API void ResetTransform();
 	CUSTOM_JOINTS_API dFloat CalculateTireParametricPosition(const dMatrix& tireMatrix, const dMatrix& chassisMatrix) const;
 	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API void Debug(dDebugDisplay* const debugDisplay) const;
+	
 
 	dVector m_lateralDir;
 	dVector m_longitudinalDir;

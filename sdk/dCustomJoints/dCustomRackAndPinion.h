@@ -32,7 +32,6 @@ class dCustomRackAndPinion: public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomRackAndPinion();
 
 	protected:
-	//CUSTOM_JOINTS_API dCustomRackAndPinion (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
