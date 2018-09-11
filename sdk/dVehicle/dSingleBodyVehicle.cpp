@@ -10,22 +10,26 @@
 */
 
 
-#ifndef __D_SINGLE_BODY_VEHICLE_H__
-#define __D_SINGLE_BODY_VEHICLE_H__
 
 #include "dStdafxVehicle.h"
-#include "dVehicleInterface.h"
+#include "dVehicleTire.h"
+#include "dSingleBodyVehicle.h"
 
 
-class dSingleBodyVehicle: public dVehicleInterface
+dSingleBodyVehicle::dSingleBodyVehicle(dVehicleChassis* const chassis)
+	:dVehicleInterface(chassis)
 {
-	public:
-	DVEHICLE_API dSingleBodyVehicle(dVehicleChassis* const chassis);
-	DVEHICLE_API virtual ~dSingleBodyVehicle();
+}
 
-	DVEHICLE_API dVehicleTire* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
-};
+dSingleBodyVehicle::~dSingleBodyVehicle()
+{
+}
+
+dVehicleTire* dSingleBodyVehicle::AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
+{
+	return new dVehicleTire(this);
+}
 
 
-#endif 
+
 

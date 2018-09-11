@@ -19,19 +19,11 @@
 class dVehicleNode: public dContainersAlloc
 {
 	public:
-	dVehicleNode()
-		:dContainersAlloc()
-	{
-	}
+	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
+	DVEHICLE_API virtual ~dVehicleNode();
 
-	virtual ~dVehicleNode()
-	{
-		for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-			delete child->GetInfo();
-		}
-	}
-
-	dList<dVehicleNode*> m_children;
+	dVehicleNode* m_parent;
+//	dList<dVehicleNode*> m_children;
 };
 
 

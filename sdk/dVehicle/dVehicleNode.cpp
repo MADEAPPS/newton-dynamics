@@ -10,22 +10,19 @@
 */
 
 
-#ifndef __D_SINGLE_BODY_VEHICLE_H__
-#define __D_SINGLE_BODY_VEHICLE_H__
-
 #include "dStdafxVehicle.h"
-#include "dVehicleInterface.h"
+#include "dVehicleNode.h"
 
-
-class dSingleBodyVehicle: public dVehicleInterface
+dVehicleNode::dVehicleNode(dVehicleNode* const parent)
+	:dContainersAlloc()
+	,m_parent(parent)
 {
-	public:
-	DVEHICLE_API dSingleBodyVehicle(dVehicleChassis* const chassis);
-	DVEHICLE_API virtual ~dSingleBodyVehicle();
+}
 
-	DVEHICLE_API dVehicleTire* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
-};
-
-
-#endif 
+dVehicleNode::~dVehicleNode()
+{
+//	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+//		delete child->GetInfo();
+//	}
+}
 

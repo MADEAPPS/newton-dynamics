@@ -97,6 +97,10 @@ void dVehicleChassis::Cleanup()
 
 void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 {
+	dAssert (0);
 }
 
-
+dVehicleTire* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
+{
+	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo);
+}
