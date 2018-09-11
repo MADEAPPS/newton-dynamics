@@ -23,16 +23,20 @@ dVehicleManager::~dVehicleManager()
 
 dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
-	dVehicleChassis* const controller = CreateController();
-	controller->Init(body, vehicleFrame, forceAndTorque, gravityMag);
-	return controller;
+	dVehicleChassis* const vehicle = CreateController();
+	vehicle->Init(body, vehicleFrame, forceAndTorque, gravityMag);
+	return vehicle;
 }
 
 dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
-	dVehicleChassis* const controller = CreateController();
-	controller->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
-	return controller;
+	dVehicleChassis* const vehicle = CreateController();
+	vehicle->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
+	return vehicle;
 }
 
-
+void dVehicleManager::DestroyController(dVehicleChassis* const vehicle)
+{
+	vehicle->Cleanup();
+	dCustomControllerManager<dVehicleChassis>::DestroyController(vehicle);
+}

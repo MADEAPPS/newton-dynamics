@@ -12,7 +12,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleManager.h"
 #include "dVehicleChassis.h"
-
+#include "dSingleBodyVehicle.h"
 
 void dVehicleChassis::Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
@@ -34,6 +34,7 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 {
 	m_body = body;
 	NewtonBodySetForceAndTorqueCallback(m_body, forceAndTorque);
+	m_vehicle = new dSingleBodyVehicle(this);
 /*
 	m_speed = 0.0f;
 	m_sideSlip = 0.0f;
@@ -86,6 +87,12 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 */
 }
 
+void dVehicleChassis::Cleanup()
+{
+	if (m_vehicle) {
+		delete m_vehicle;
+	}
+}
 
 
 void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)

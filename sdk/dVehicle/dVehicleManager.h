@@ -29,7 +29,6 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 
 	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
 	DVEHICLE_API virtual int OnTireAabbOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const;
 	//	DVEHICLE_API virtual int OnTireAabbOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex) const;
 
@@ -39,6 +38,7 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 
+	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
 	protected:
 /*
 	void OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);

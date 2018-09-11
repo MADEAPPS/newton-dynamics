@@ -49,9 +49,11 @@
     <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dVehicle\dSingleBodyVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleChassis.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C6EB0F50-FB7D-4788-8B90-DC6450ED0499}</ProjectGuid>
