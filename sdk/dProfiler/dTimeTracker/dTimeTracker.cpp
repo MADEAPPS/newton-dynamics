@@ -105,17 +105,64 @@ class dTimeTrack
 
 class dTimeTrackerServer
 {
+	class dNetworkSupport
+	{
+		public:
+		dNetworkSupport ()
+		{
+			#ifdef _WIN32__
+				m_socket = NULL;
+				memset(&m_client, 0, sizeof(m_client));
+				memset(&m_server, 0, sizeof(m_server));
+				memset(&m_wsaData, 0, sizeof(m_wsaData));
+			#endif
+		}	
+
+		bool Start() 
+		{
+			bool ret = true;
+
+			#ifdef _WIN32__
+				WORD version = MAKEWORD(2, 2);
+				int state = WSAStartup(version, &m_wsaData);
+				if (!state) {
+					// bind socket to ip address
+					m_socket = socket(AF_INET, SOCK_DGRAM, 0);
+
+					m_server.sin_addr.S_un.S_addr = ADDR_ANY;
+					m_server.sin_family = AF_INET;
+					if (!bind(m_socket, (SOCKADDR*)&m_server, sizeof(m_server))) {
+						ret = true;
+					}
+				}
+			#endif
+			return ret;
+		}
+
+		void Close()
+		{
+			#ifdef _WIN32__
+				closesocket(m_socket);
+				WSACleanup();
+			#endif
+		}
+
+		SOCKET m_socket;
+		SOCKADDR_IN m_client;
+		SOCKADDR_IN m_server;
+		WSADATA m_wsaData;
+	};
+
 	public:
 	dTimeTrackerServer()
-		:m_initialized(false)
-		,m_socket(0)
-		,m_trackEnum(0)
+		:m_criticalSection()
 		,m_tracks()
 		,m_baseCount(__rdtsc())
 		,m_currentFile(NULL)
+		,m_trackEnum(0)
+		,m_initialized(false)
+		,m_networkSupport()
 	{
-		memset(&m_client, 0, sizeof(m_client));
-		memset(&m_server, 0, sizeof(m_server));
 	}
 
 	~dTimeTrackerServer()
@@ -127,8 +174,7 @@ class dTimeTrackerServer
 		}
 
 		if (m_initialized) {
-			closesocket(m_socket);
-			WSACleanup();
+			m_networkSupport.Close();
 		}
 	}
 
@@ -147,18 +193,7 @@ class dTimeTrackerServer
 	{
 		if (!m_initialized) {
 			// initialized win socket
-			WORD version = MAKEWORD(2, 2);
-			int state = WSAStartup(version, &m_wsaData);
-			if (!state) {
-				// bind socket to ip address
-				m_socket = socket(AF_INET, SOCK_DGRAM, 0);
-				
-				m_server.sin_addr.S_un.S_addr = ADDR_ANY;
-				m_server.sin_family = AF_INET;
-				if (!bind(m_socket, (SOCKADDR*) &m_server, sizeof(m_server))) {
-					m_initialized = true;
-				}
-			}
+			m_initialized = m_networkSupport.Start();
 		}
 		return m_initialized;
 	}
@@ -269,18 +304,13 @@ class dTimeTrackerServer
 		m_criticalSection.unlock();
 	}
 
-	bool m_initialized;
-	SOCKET m_socket;
-	SOCKADDR_IN m_client;
-	SOCKADDR_IN m_server;
-	WSADATA m_wsaData;
 	std::mutex m_criticalSection;
-
-	int m_trackEnum;
 	dMap<dTimeTrack*, DWORD> m_tracks;
-
 	DWORD64 m_baseCount;
 	FILE* m_currentFile;
+	int m_trackEnum;
+	bool m_initialized;
+	dNetworkSupport m_networkSupport;
 };
 
 bool StartServer()
