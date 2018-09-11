@@ -292,8 +292,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 
 		// add Tires
-		dTireInfo tireInfo;
 		dMatrix tireMatrix;
+		dVehicleTireInterface::dTireInfo tireInfo;
 		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireMatrix, tireInfo);
 
 		// add a visual tire geometry

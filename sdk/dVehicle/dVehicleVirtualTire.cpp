@@ -13,8 +13,8 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleVirtualTire.h"
 
-dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const chassis)
-	:dVehicleTireInterface(chassis)
+dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& location, const dTireInfo& info)
+	:dVehicleTireInterface(parent, location, info)
 {
 }
 

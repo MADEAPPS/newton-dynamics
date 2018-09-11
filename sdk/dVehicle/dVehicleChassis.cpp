@@ -100,7 +100,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 //	dAssert (0);
 }
 
-dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
+dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
 {
 	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo);
 }

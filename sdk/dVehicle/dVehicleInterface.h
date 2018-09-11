@@ -15,10 +15,9 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
+#include "dVehicleTireInterface.h"
 
-class dTireInfo;
 class dVehicleChassis;
-class dVehicleTireInterface;
 
 
 class dVehicleInterface: public dVehicleNode
@@ -27,7 +26,7 @@ class dVehicleInterface: public dVehicleNode
 	DVEHICLE_API dVehicleInterface(dVehicleChassis* const chassis);
 	DVEHICLE_API virtual ~dVehicleInterface();
 
-	DVEHICLE_API virtual dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo) = 0;
+	DVEHICLE_API virtual dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo) = 0;
 
 	protected:
 	dVehicleChassis* m_chassis;

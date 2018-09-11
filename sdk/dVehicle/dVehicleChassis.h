@@ -121,7 +121,7 @@ class dVehicleChassis: public dCustomControllerBase
 */
 
 	public:
-	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
+	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 
 	protected:
 	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadIndex);

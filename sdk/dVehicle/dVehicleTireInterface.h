@@ -50,8 +50,7 @@ class dVehicleTireInterface: public dVehicleNode
 		dSuspensionType m_suspentionType;
 	};
 
-
-	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const chassis);
+	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent, const dMatrix& location, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleTireInterface();
 
 	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const = 0;
