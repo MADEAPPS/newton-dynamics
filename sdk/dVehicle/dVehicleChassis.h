@@ -14,10 +14,9 @@
 #define __D_VEHICLE_CHASSIS_H__
 
 #include "dStdafxVehicle.h"
+#include "dVehicleInterface.h"
+#include "dVehicleTireInterface.h"
 
-class dTireInfo;
-class dVehicleTireInterface;
-class dVehicleInterface;
 
 class dVehicleChassis: public dCustomControllerBase
 {

@@ -21,3 +21,8 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const chassis)
 dVehicleVirtualTire::~dVehicleVirtualTire()
 {
 }
+
+NewtonCollision* dVehicleVirtualTire::GetCollisionShape() const
+{
+	return NULL;
+}

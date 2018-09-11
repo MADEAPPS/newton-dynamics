@@ -166,6 +166,8 @@ typedef long long unsigned64;
 #include <dStdafxVehicle.h>
 #include <dVehicleChassis.h>
 #include <dVehicleManager.h>
+#include <dVehicleInterface.h>
+#include <dVehicleTireInterface.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>

@@ -17,42 +17,44 @@
 #include "dVehicleNode.h"
 
 
-enum dSuspensionType
-{
-	m_offroad,
-	m_confort,
-	m_race,
-	m_roller,
-};
-
-class dTireInfo
-{
-	public:
-	dTireInfo()
-	{
-		memset(this, 0, sizeof(dTireInfo));
-	}
-
-	dFloat m_mass;
-	dFloat m_radio;
-	dFloat m_width;
-	dFloat m_pivotOffset;
-	dFloat m_maxSteeringAngle;
-	dFloat m_dampingRatio;
-	dFloat m_springStrength;
-	dFloat m_suspensionLength;
-	dFloat m_corneringStiffness;
-	dFloat m_aligningMomentTrail;
-	int m_hasFender;
-	dSuspensionType m_suspentionType;
-};
-
-
 class dVehicleTireInterface: public dVehicleNode
 {
 	public:
+	enum dSuspensionType
+	{
+		m_offroad,
+		m_confort,
+		m_race,
+		m_roller,
+	};
+
+	class dTireInfo
+	{
+		public:
+		dTireInfo()
+		{
+			memset(this, 0, sizeof(dTireInfo));
+		}
+
+		dFloat m_mass;
+		dFloat m_radio;
+		dFloat m_width;
+		dFloat m_pivotOffset;
+		dFloat m_maxSteeringAngle;
+		dFloat m_dampingRatio;
+		dFloat m_springStrength;
+		dFloat m_suspensionLength;
+		dFloat m_corneringStiffness;
+		dFloat m_aligningMomentTrail;
+		int m_hasFender;
+		dSuspensionType m_suspentionType;
+	};
+
+
 	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const chassis);
 	DVEHICLE_API virtual ~dVehicleTireInterface();
+
+	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const = 0;
 };
 
 

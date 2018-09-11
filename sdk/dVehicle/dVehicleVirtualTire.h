@@ -21,6 +21,8 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	public:
 	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const chassis);
 	DVEHICLE_API virtual ~dVehicleVirtualTire();
+
+	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
 };
 
 

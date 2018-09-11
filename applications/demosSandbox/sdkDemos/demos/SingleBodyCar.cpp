@@ -224,7 +224,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 	}
 
-	void MakeVisualEntity(dVehicleChassis* const chassis)
+	void AttachVisualChassis(dVehicleChassis* const chassis)
 	{
 		NewtonBody* const chassiBody = chassis->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -244,6 +244,11 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// set the transform callback
 		NewtonBodySetTransformCallback(chassiBody, DemoEntity::TransformCallback);
+	}
+
+	void AttachVisualTire(dVehicleChassis* const chassis, dVehicleTireInterface* const tire)
+	{
+		NewtonCollision* const shape = tire->GetCollisionShape();
 	}
 
 	dVehicleChassis* CreateVehicle(const dMatrix& location)
@@ -280,7 +285,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 //		}
 
 		// create the visual representation
-		MakeVisualEntity(vehicle);
+		AttachVisualChassis(vehicle);
 
 		// destroy chassis collision shape 
 		NewtonDestroyCollision(chassisCollision);
@@ -290,6 +295,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dTireInfo tireInfo;
 		dMatrix tireMatrix;
 		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireMatrix, tireInfo);
+
+		// add a visual tire geometry
+		AttachVisualTire(vehicle, frontLeft);
 
 		return vehicle;
 	}
