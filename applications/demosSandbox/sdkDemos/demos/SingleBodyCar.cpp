@@ -285,6 +285,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// destroy chassis collision shape 
 		NewtonDestroyCollision(chassisCollision);
 
+
+		// add Tires
+		dTireInfo tireInfo;
+		dMatrix tireMatrix;
+		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireMatrix, tireInfo);
+
 		return vehicle;
 	}
 };

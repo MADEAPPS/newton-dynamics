@@ -17,12 +17,15 @@ dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 	:dContainersAlloc()
 	,m_parent(parent)
 {
+	if (parent) {
+		parent->m_children.Append(this);
+	}
 }
 
 dVehicleNode::~dVehicleNode()
 {
-//	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-//		delete child->GetInfo();
-//	}
+	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		delete child->GetInfo();
+	}
 }
 

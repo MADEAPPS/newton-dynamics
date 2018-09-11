@@ -16,7 +16,7 @@
 #include "dStdafxVehicle.h"
 
 class dTireInfo;
-class dVehicleTire;
+class dVehicleTireInterface;
 class dVehicleInterface;
 
 class dVehicleChassis: public dCustomControllerBase
@@ -121,7 +121,8 @@ class dVehicleChassis: public dCustomControllerBase
 	friend class dVehicleChassisManager;
 */
 
-	DVEHICLE_API dVehicleTire* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
+	public:
+	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
 
 	protected:
 	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadIndex);

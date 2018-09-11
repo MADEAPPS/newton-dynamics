@@ -10,26 +10,14 @@
 */
 
 
-
 #include "dStdafxVehicle.h"
-#include "dVehicleTire.h"
-#include "dSingleBodyVehicle.h"
+#include "dVehicleTireInterface.h"
 
-
-dSingleBodyVehicle::dSingleBodyVehicle(dVehicleChassis* const chassis)
-	:dVehicleInterface(chassis)
+dVehicleTireInterface::dVehicleTireInterface(dVehicleNode* const chassis)
+	:dVehicleNode(chassis)
 {
 }
 
-dSingleBodyVehicle::~dSingleBodyVehicle()
+dVehicleTireInterface::~dVehicleTireInterface()
 {
 }
-
-dVehicleTire* dSingleBodyVehicle::AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
-{
-	return new dVehicleTire(this);
-}
-
-
-
-

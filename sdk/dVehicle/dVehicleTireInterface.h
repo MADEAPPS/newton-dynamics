@@ -48,11 +48,11 @@ class dTireInfo
 };
 
 
-class dVehicleTire: public dVehicleNode
+class dVehicleTireInterface: public dVehicleNode
 {
 	public:
-	DVEHICLE_API dVehicleTire(dVehicleNode* const chassis);
-	DVEHICLE_API virtual ~dVehicleTire();
+	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const chassis);
+	DVEHICLE_API virtual ~dVehicleTireInterface();
 };
 
 

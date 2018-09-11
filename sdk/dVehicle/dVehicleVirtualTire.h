@@ -10,20 +10,17 @@
 */
 
 
-#ifndef __D_VEHICLE_NODE_H__
-#define __D_VEHICLE_NODE_H__
+#ifndef __D_VEHICLE_VIRTUAL_TIRE_H__
+#define __D_VEHICLE_VIRTUAL__TIRE_H__
 
 #include "dStdafxVehicle.h"
+#include "dVehicleTireInterface.h"
 
-
-class dVehicleNode: public dContainersAlloc
+class dVehicleVirtualTire: public dVehicleTireInterface
 {
 	public:
-	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
-	DVEHICLE_API virtual ~dVehicleNode();
-
-	dVehicleNode* m_parent;
-	dList<dVehicleNode*> m_children;
+	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const chassis);
+	DVEHICLE_API virtual ~dVehicleVirtualTire();
 };
 
 
