@@ -38,6 +38,8 @@ class dgWorkGroupFloat
 {
 	public:
 	DG_INLINE dgWorkGroupFloat()
+		:m_low()
+		,m_high()
 	{
 	}
 
