@@ -124,7 +124,8 @@ void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
 void Hexapod(DemoEntityManager* const scene);
 void JoesJointTest (DemoEntityManager* const scene);
-void MishosRocketTest(DemoEntityManager* const scene);
+//void MishosRocketTest(DemoEntityManager* const scene);
+void MishosHingeTest(DemoEntityManager* const scene);
 
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
@@ -174,7 +175,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
 	{"Joes joint test", "", JoesJointTest},
-	{"Misho's Rocket Test", "", MishosRocketTest},
+	{"Misho's Hinge Test", "", MishosHingeTest },
 };
 
 
