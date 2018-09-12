@@ -164,9 +164,9 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
-	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
-	{"Single Body Car", "show a generalized coordinate system body", SingleBodyCar },
-	{"Basic Multi body Car", "show how to set up a multi body vehicle by Dave Gravel", BasicMultibodyVehicle},
+	{"Basic car", "show how to set up a vehicle controller", BasicCar},
+	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
+	{"Basic multi body car", "show how to set up a multi body vehicle by Dave Gravel", BasicMultibodyVehicle},
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
@@ -351,7 +351,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-m_currentPlugin = 0;
+//m_currentPlugin = 0;
 
 /*
 	dFloat A[2][2];
