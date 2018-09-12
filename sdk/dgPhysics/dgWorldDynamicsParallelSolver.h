@@ -81,7 +81,7 @@ class dgWorkGroupFloat
 	{
 		dgAssert(i >= 0);
 		dgAssert(i < DG_WORK_GROUP_SIZE);
-		dgFloat32* const ptr = &m_low.m_f[0];
+		dgFloat32* const ptr = &m_low[0];
 		return ptr[i];
 	}
 
@@ -89,8 +89,7 @@ class dgWorkGroupFloat
 	{
 		dgAssert(i >= 0);
 		dgAssert(i < DG_WORK_GROUP_SIZE);
-		const dgFloat32* const ptr = &m_low.m_f[0];
-		//return m_f[i];
+		const dgFloat32* const ptr = &m_low[0];
 		return ptr[i];
 	}
 
