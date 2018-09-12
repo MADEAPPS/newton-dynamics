@@ -84,7 +84,7 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 #endif
 }
 
-
+/*
 void MishosRocketTest(DemoEntityManager* const scene)
 {
 	// set DEMO_GRAVITY constant to turn on off gravity
@@ -145,8 +145,8 @@ void MishosRocketTest(DemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot*dqRotY, origin);
 
 	NewtonSerializeToFile(scene->GetNewton(), "RocketLaunchFar.bin", NULL, NULL);
-
 }
+*/
 
 void MishosHingeTest(DemoEntityManager* const scene)
 {
@@ -166,6 +166,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	dFloat CoreMass = 979452.0f;
 	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 	NewtonBody* const CoreBody = CreateSimpleSolid(scene, geometryCore, CoreMass, matrixCore, CoreCompound, 0);
+	NewtonBodySetForceAndTorqueCallback(CoreBody, ApplyGravityForce);
 	DemoEntity* const entityCore = (DemoEntity*)NewtonBodyGetUserData(CoreBody);
 	entityCore->SetNameID("Core");
 	NewtonBodySetLinearDamping(CoreBody, 0.0f);
@@ -184,6 +185,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	dFloat PayloadMass = 979452.0f;
 	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", PayloadCompound, "metalblu.tga", "metalblu.tga", "metalblu.tga");
 	NewtonBody* const PayloadBody = CreateSimpleSolid(scene, geometryPayload, PayloadMass, matrixPayload, PayloadCompound, 0);
+	NewtonBodySetForceAndTorqueCallback(PayloadBody, ApplyGravityForce);
 	DemoEntity* const entityPayload = (DemoEntity*)NewtonBodyGetUserData(PayloadBody);
 	entityPayload->SetNameID("Payload");
 	NewtonBodySetLinearDamping(PayloadBody, 0.0f);
@@ -212,5 +214,4 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot*dqRotY, origin);
 
 	NewtonSerializeToFile(scene->GetNewton(), "RocketLaunchFar.bin", NULL, NULL);
-
 }
