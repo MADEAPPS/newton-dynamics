@@ -111,11 +111,13 @@ void dgWorldPluginList::LoadPlugins()
 
 void dgWorldPluginList::UnloadPlugins()
 {
+#ifdef _MSC_VER
 	dgWorldPluginList& pluginsList = *this;
 	for (dgWorldPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
 		HMODULE module = (HMODULE)node->GetInfo().m_module;
 		FreeLibrary(module);
 	}
+#endif
 	m_currentPlugin = NULL;
 	m_preferedPlugin = NULL;
 }
