@@ -542,9 +542,11 @@ DG_INLINE dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo*
 
 		dgWorkGroupFloat frictionNormal;
 		for (dgInt32 j = 0; j < DG_WORK_GROUP_SIZE; j++) {
-			dgAssert(row->m_normalForceIndex.m_i[j] >= -1);
-			dgAssert(row->m_normalForceIndex.m_i[j] <= rowsCount);
-			const dgInt32 frictionIndex = dgInt32(row->m_normalForceIndex.m_i[j] + 1);
+			//dgAssert(row->m_normalForceIndex.m_i[j] >= -1);
+			//dgAssert(row->m_normalForceIndex.m_i[j] <= rowsCount);
+			dgAssert(row->m_normalForceIndex.GetInt(j) >= -1);
+			dgAssert(row->m_normalForceIndex.GetInt(j) <= rowsCount);
+			const dgInt32 frictionIndex = row->m_normalForceIndex.GetInt(j) + 1;
 			frictionNormal[j] = normalForce[frictionIndex][j];
 		}
 
@@ -606,9 +608,11 @@ DG_INLINE dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo*
 
 			dgWorkGroupFloat frictionNormal;
 			for (dgInt32 k = 0; k < DG_WORK_GROUP_SIZE; k++) {
-				dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
-				dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
-				const dgInt32 frictionIndex = dgInt32(row->m_normalForceIndex.m_i[k] + 1);
+				//dgAssert(row->m_normalForceIndex.m_i[k] >= -1);
+				//dgAssert(row->m_normalForceIndex.m_i[k] <= rowsCount);
+				dgAssert(row->m_normalForceIndex.GetInt(k) >= -1);
+				dgAssert(row->m_normalForceIndex.GetInt(k) <= rowsCount);
+				const dgInt32 frictionIndex = row->m_normalForceIndex.GetInt(k) + 1;
 				frictionNormal[k] = normalForce[frictionIndex][k];
 			}
 
@@ -1031,7 +1035,8 @@ DG_INLINE void dgParallelBodySolver::TransposeRow (dgSolverSoaElement* const row
 			row->m_diagDamp[i] = rhs->m_diagDamp;
 			row->m_invJinvMJt[i] = rhs->m_invJinvMJt;
 			row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
-			row->m_normalForceIndex.m_i[i] = rhs->m_normalForceIndex;
+			//row->m_normalForceIndex.m_i[i] = rhs->m_normalForceIndex;
+			row->m_normalForceIndex.SetInt(i, rhs->m_normalForceIndex);
 			row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 			row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
 		}
@@ -1073,11 +1078,13 @@ DG_INLINE void dgParallelBodySolver::TransposeRow (dgSolverSoaElement* const row
 				row->m_diagDamp[i] = rhs->m_diagDamp;
 				row->m_invJinvMJt[i] = rhs->m_invJinvMJt;
 				row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
-				row->m_normalForceIndex.m_i[i] = rhs->m_normalForceIndex;
+				//row->m_normalForceIndex.m_i[i] = rhs->m_normalForceIndex;
+				row->m_normalForceIndex.SetInt(i, rhs->m_normalForceIndex);
 				row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 				row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
 			} else {
-				row->m_normalForceIndex.m_i[i] = DG_INDEPENDENT_ROW;
+				//row->m_normalForceIndex.m_i[i] = DG_INDEPENDENT_ROW;
+				row->m_normalForceIndex.SetInt(i, DG_INDEPENDENT_ROW);
 			}
 		}
 	}

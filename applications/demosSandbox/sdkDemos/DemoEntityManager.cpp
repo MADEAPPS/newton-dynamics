@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// box stacks
+#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -67,7 +67,7 @@
 //#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
-#define DEFAULT_SCENE	36			// single body vehicle
+//#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// david Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles
@@ -351,7 +351,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-//m_currentPlugin = 0;
+m_currentPlugin = 0;
 
 /*
 	dFloat A[2][2];
