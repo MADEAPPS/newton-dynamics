@@ -8036,7 +8036,7 @@ void NewtonMeshAddVertexColor(const NewtonMesh* const mesh, dFloat32 r, dFloat32
 	meshEffect->AddVertexColor(r, g, b, a);
 }
 
-void NewtonMeshAddVertexWeight(const NewtonMesh* const mesh, int matrixIndex[4], dFloat weights[4])
+void NewtonMeshAddVertexWeight(const NewtonMesh* const mesh, int matrixIndex[4], dFloat32 weights[4])
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;

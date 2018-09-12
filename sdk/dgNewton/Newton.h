@@ -1245,7 +1245,7 @@ extern "C" {
 			NEWTON_API void NewtonMeshAddUV0(const NewtonMesh* const mesh, dFloat u, dFloat v);
 			NEWTON_API void NewtonMeshAddUV1(const NewtonMesh* const mesh, dFloat u, dFloat v);
 			NEWTON_API void NewtonMeshAddVertexColor(const NewtonMesh* const mesh, dFloat32 r, dFloat32 g, dFloat32 b, dFloat32 a);
-			NEWTON_API void NewtonMeshAddVertexWeight(const NewtonMesh* const mesh, int matrixIndex[4], dFloat weights[4]);
+			NEWTON_API void NewtonMeshAddVertexWeight(const NewtonMesh* const mesh, int matrixIndex[4], dFloat32 weights[4]);
 		NEWTON_API void NewtonMeshEndFace(const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshEndBuild(const NewtonMesh* const mesh);
 

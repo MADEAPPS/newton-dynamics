@@ -64,15 +64,24 @@ class dgWorkGroupFloat
 	{
 		dgAssert (i >= 0);
 		dgAssert(i < DG_WORK_GROUP_SIZE);
+		#ifdef _NEWTON_USE_DOUBLE
+		const dgInt64* const ptr = &m_low.m_i[0];
+		#else
 		const dgInt32* const ptr = &m_low.m_i[0];
-		return ptr[i];
+		#endif
+		return dgInt32 (ptr[i]);
 	}
 
 	DG_INLINE void SetInt(dgInt32 i, dgInt32 value)
 	{
 		dgAssert(i >= 0);
 		dgAssert(i < DG_WORK_GROUP_SIZE);
+
+		#ifdef _NEWTON_USE_DOUBLE
+		dgInt64* const ptr = &m_low.m_i[0];
+		#else
 		dgInt32* const ptr = &m_low.m_i[0];
+		#endif
 		ptr[i] = value;
 	}
 
