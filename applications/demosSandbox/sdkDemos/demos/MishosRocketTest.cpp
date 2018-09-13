@@ -43,7 +43,7 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	if (bThrust)
 	{
 		// ten million newtons, so the bodies will "rise" slowly...
-		torque = dVector(0.0f, 0.0f, 1.0f).Scale(10000000.0); 
+		torque = dVector(0.0f, 0.0f, 1.0f).Scale(1000000000.0); 
 	} else {
 		// ten million newtons, so the bodies will "rise" slowly...
 		torque = dVector(0.0f, 0.0f, 1.0f).Scale(0.0); 
@@ -51,21 +51,30 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 
 	// pressing P prints out distance between objects...
 	if (scene->GetKeyState('P')) {
-		int counter = 0;
-		dVector bodyVectors[2];
+		const NewtonBody* body1 = NULL;
 		for (NewtonBody* bodyZ = NewtonWorldGetFirstBody(world); bodyZ; bodyZ = NewtonWorldGetNextBody(world, bodyZ)) {
-			dVector positionVector;
-			NewtonBodyGetPosition(bodyZ, &positionVector[0]);
-			bodyVectors[counter] = positionVector;
-			counter++;
+			if (bodyZ != body) {
+				body1 = bodyZ;
+			}
 		}
-		//printf("position body 1: %f %f %f\n", bodyVectors[0].m_x, bodyVectors[0].m_y, bodyVectors[0].m_z);
-		//printf("position body 2: %f %f %f\n", bodyVectors[1].m_x, bodyVectors[1].m_y, bodyVectors[1].m_z);
+
+		dMatrix matrix;
+		dVector bodyVectors[2];
+		dVector positionVector(0.0f);
+
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
+		NewtonBodyGetPosition(body, &positionVector[0]);
+		bodyVectors[0] = matrix.UntransformVector(positionVector);
+
+		NewtonBodyGetPosition(body1, &positionVector[0]);
+		bodyVectors[1] = matrix.UntransformVector(positionVector);
+
 		dVector diff = bodyVectors[1] - bodyVectors[0];
 		dFloat distance = dSqrt(diff.DotProduct3(diff));
 
 		// Nominal object distance at the beginning is 35, so we will subtract that here to get to zero as a starting point.
-		printf("Object distance: %f\n", distance - 35.0f); 
+		printf("Object distance: %f  local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]);
+		dTrace(("Object distance: %f local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]));
 	}
 
 	// Apply torque only to the Core object
