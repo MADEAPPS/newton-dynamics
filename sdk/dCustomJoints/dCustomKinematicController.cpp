@@ -74,6 +74,7 @@ void dCustomKinematicController::Init (NewtonBody* const body, const dMatrix& ma
 	NewtonBodySetSleepState(body, 0);
 
 	SetPickMode(1);
+    SetLimitRotationVelocity(true);
 	SetTargetMatrix(matrix);
 	SetMaxLinearFriction(1.0f);
 	SetMaxAngularFriction(1.0f);
@@ -85,6 +86,11 @@ void dCustomKinematicController::Init (NewtonBody* const body, const dMatrix& ma
 void dCustomKinematicController::SetPickMode (int mode)
 {
 	m_isSixdof = mode ? true : false;
+}
+
+void dCustomKinematicController::SetLimitRotationVelocity(int limit)
+{
+
 }
 
 void dCustomKinematicController::SetMaxLinearFriction(dFloat frictionForce)
@@ -147,14 +153,17 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	dAssert (timestep > 0.0f);
 	const dFloat invTimestep = 1.0f / timestep;
 
-	// we not longer cap excessive angular velocities, it is left to the client application. 
+
 	NewtonBodyGetOmega(m_body0, &omega[0]);
 	dFloat mag2 = omega.DotProduct3(omega);
-	if (mag2 > dFloat32(10.0f * 10.0f)) {
-		omega = omega.Normalize().Scale(10.0f);
-		NewtonBodySetOmega(m_body0, &omega[0]);
-	}
 
+    //cap excessive angular velocities
+    if (m_limitRotVel) {
+        if (mag2 > dFloat32(10.0f * 10.0f)) {
+            omega = omega.Normalize().Scale(10.0f);
+            NewtonBodySetOmega(m_body0, &omega[0]);
+        }
+    }
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
 	NewtonBodyGetPointVelocity(m_body0, &m_targetMatrix.m_posit[0], &pointVeloc[0]);

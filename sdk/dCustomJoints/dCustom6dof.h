@@ -62,8 +62,10 @@ class dCustom6dof: public dCustomJoint
 	CUSTOM_JOINTS_API dFloat GetRoll() const { return m_roll.m_currentAngle.GetAngle();}
 	CUSTOM_JOINTS_API dFloat GetPitch() const { return m_pitch.m_currentAngle.GetAngle();}
 
-	protected:
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+    CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
+    protected:
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;

@@ -39,8 +39,11 @@ class dCustomHinge: public dCustomJoint
 	CUSTOM_JOINTS_API void EnableMotor(bool state, dFloat motorSpeed);
 	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
-	protected:
-	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
+    CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
+    protected:
+	
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
