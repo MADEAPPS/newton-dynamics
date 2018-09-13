@@ -7203,8 +7203,9 @@ void NewtonUserJointAddLinearRow(const NewtonJoint* const joint, const dFloat* c
 
 	TRACE_FUNCTION(__FUNCTION__);
 	dgVector direction (dir[0], dir[1], dir[2], dgFloat32 (0.0f)); 
-	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
-	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
+//	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
+	direction = direction.Normalize();
+	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 	dgVector pivotPoint0 (pivot0[0], pivot0[1], pivot0[2], dgFloat32 (0.0f)); 
 	dgVector pivotPoint1 (pivot1[0], pivot1[1], pivot1[2], dgFloat32 (0.0f)); 
 	

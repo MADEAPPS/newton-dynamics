@@ -499,6 +499,10 @@ void Hexapod(DemoEntityManager* const scene)
 	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	origin.m_y  += 2.5f;
 
+//	dVector size(3.0f, 0.125f, 3.0f, 0.0f);
+//	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
