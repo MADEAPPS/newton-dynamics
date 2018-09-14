@@ -128,15 +128,15 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonDestroyCollision(PayloadCompound);
 	NewtonDestroyCollision(PayloadShape);
 
-	dVector omega(20.0f, 0.0f, 0.0f, 0.0f);
+	dVector omega(10.0f, 0.0f, 0.0f, 0.0f);
 	NewtonBodySetOmega(CoreBody, &omega[0]);
 	NewtonBodySetOmega(PayloadBody, &omega[0]);
 
-//	dVector veloc0(0.0f, 0.0f, 35.0f * 10.0f, 0.0f);
-//	NewtonBodySetVelocity(PayloadBody, &veloc0[0]);
+	dVector veloc(0.0f, 0.0f, 35.0f * 10.0f / 2.0f, 0.0f);
+	NewtonBodySetVelocity(PayloadBody, &veloc[0]);
 
-//	dVector veloc1(0.0f, 0.0f, 35.0f * 10.0f / 2.0f, 0.0f);
-//	NewtonBodySetVelocity(CoreBody, &veloc1[0]);
+	veloc.m_z *= -1.0f;
+	NewtonBodySetVelocity(CoreBody, &veloc[0]);
 	
 
 	// Lock these two bodies with a hard hinge...
