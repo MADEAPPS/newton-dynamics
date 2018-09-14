@@ -87,6 +87,13 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	dMatrix offset(dGetIdentityMatrix());
 	dVector damp(0.0f, 0.0f, 0.0f);
 
+	dFloat CoreMass = 979452.0f;
+	dFloat PayloadMass = 979452.0f;
+
+	CoreMass = 1.0f;
+	PayloadMass = 1.0f;
+
+
 	// Make rocket core body...
 	NewtonCollision* const CoreShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 60.0f, 1, &offset[0][0]);
 	NewtonCollision* const CoreCompound = NewtonCreateCompoundCollision(world, 0);
@@ -95,7 +102,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonCompoundCollisionEndAddRemove(CoreCompound);
 //	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, -30.0f, 0.0f));
 	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, 0.0f, 0.0f));
-	dFloat CoreMass = 979452.0f;
+	
 	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 	NewtonBody* const CoreBody = CreateSimpleSolid(scene, geometryCore, CoreMass, matrixCore, CoreCompound, 0);
 	NewtonBodySetForceAndTorqueCallback(CoreBody, ApplyGravityForce);
@@ -115,7 +122,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonCompoundCollisionEndAddRemove(PayloadCompound);
 //	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 5.0f, 0.0f));
 	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 35.0f, 0.0f));
-	dFloat PayloadMass = 979452.0f;
+	
 	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", PayloadCompound, "metalblu.tga", "metalblu.tga", "metalblu.tga");
 	NewtonBody* const PayloadBody = CreateSimpleSolid(scene, geometryPayload, PayloadMass, matrixPayload, PayloadCompound, 0);
 	//NewtonBodySetForceAndTorqueCallback(PayloadBody, ApplyGravityForce);
@@ -128,11 +135,13 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonDestroyCollision(PayloadCompound);
 	NewtonDestroyCollision(PayloadShape);
 
-	dVector omega(10.0f, 0.0f, 0.0f, 0.0f);
+
+	dFloat w = 10.0f;
+	dVector omega(w, 0.0f, 0.0f, 0.0f);
 	NewtonBodySetOmega(CoreBody, &omega[0]);
 	NewtonBodySetOmega(PayloadBody, &omega[0]);
 
-	dVector veloc(0.0f, 0.0f, 35.0f * 10.0f / 2.0f, 0.0f);
+	dVector veloc(0.0f, 0.0f, 0.5f * 35.0f * w, 0.0f);
 	NewtonBodySetVelocity(PayloadBody, &veloc[0]);
 
 	veloc.m_z *= -1.0f;
@@ -142,13 +151,13 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	// Lock these two bodies with a hard hinge...
 	dMatrix  mSourceMatrix;
 	NewtonBodyGetMatrix(PayloadBody, &mSourceMatrix[0][0]);
-	dCustomHinge* pHinge = NULL;
-	pHinge = new dCustomHinge(mSourceMatrix, PayloadBody, CoreBody);
-	pHinge->EnableMotor(false, 0.0);
-	pHinge->SetAsSpringDamper(false, 0.0, 0.0, 0.0);
-	pHinge->EnableLimits(true);
-	pHinge->SetLimits(0.0, 0.0);
-//	pHinge->SetStiffness(1.00f); // Tried this but it doesn't change anything...
+//	dCustomHinge* pHinge = NULL;
+//	pHinge = new dCustomHinge(mSourceMatrix, PayloadBody, CoreBody);
+//	pHinge->EnableMotor(false, 0.0);
+//	pHinge->SetAsSpringDamper(false, 0.0, 0.0, 0.0);
+//	pHinge->EnableLimits(true);
+//	pHinge->SetLimits(0.0, 0.0);
+	new dCustomBallAndSocket(mSourceMatrix, PayloadBody, CoreBody);
 
 	// place camera into position and rotate towards objects
 //	dMatrix camMatrix(dGetIdentityMatrix());
