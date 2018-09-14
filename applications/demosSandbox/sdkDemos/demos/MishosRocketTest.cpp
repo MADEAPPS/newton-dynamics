@@ -43,7 +43,8 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	if (bThrust)
 	{
 		// ten million newtons, so the bodies will "rise" slowly...
-		torque.m_x = 1000000000.0; 
+		//torque.m_x = 1000000000.0; 
+		torque.m_x = mass * 500.0;
 	}
 
 	// pressing P prints out distance between objects...
@@ -115,7 +116,8 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonDestroyCollision(CoreShape);
 
 	// Make payload ...  
-	NewtonCollision* const PayloadShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 10.0f, 1, &offset[0][0]);
+	//NewtonCollision* const PayloadShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 10.0f, 1, &offset[0][0]);
+	NewtonCollision* const PayloadShape = NewtonCreateSphere(world, 5.0f, 1, &offset[0][0]);
 	NewtonCollision* const PayloadCompound = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(PayloadCompound);
 	NewtonCompoundCollisionAddSubCollision(PayloadCompound, PayloadShape);
@@ -135,7 +137,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonDestroyCollision(PayloadCompound);
 	NewtonDestroyCollision(PayloadShape);
 
-
+#if 0
 	dFloat w = 10.0f;
 	dVector omega(w, 0.0f, 0.0f, 0.0f);
 	NewtonBodySetOmega(CoreBody, &omega[0]);
@@ -146,7 +148,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 
 	veloc.m_z *= -1.0f;
 	NewtonBodySetVelocity(CoreBody, &veloc[0]);
-	
+#endif	
 
 	// Lock these two bodies with a hard hinge...
 	dMatrix  mSourceMatrix;
