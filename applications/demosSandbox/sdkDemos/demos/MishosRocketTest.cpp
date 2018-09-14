@@ -47,15 +47,16 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 		torque.m_x = mass * 500.0;
 	}
 
+
+	const NewtonBody* body1 = NULL;
+	for (NewtonBody* bodyZ = NewtonWorldGetFirstBody(world); bodyZ; bodyZ = NewtonWorldGetNextBody(world, bodyZ)) {
+		if (bodyZ != body) {
+			body1 = bodyZ;
+		}
+	}
+
 	// pressing P prints out distance between objects...
 	if (scene->GetKeyState('P')) {
-		const NewtonBody* body1 = NULL;
-		for (NewtonBody* bodyZ = NewtonWorldGetFirstBody(world); bodyZ; bodyZ = NewtonWorldGetNextBody(world, bodyZ)) {
-			if (bodyZ != body) {
-				body1 = bodyZ;
-			}
-		}
-
 		dMatrix matrix;
 		dVector bodyVectors[2];
 		dVector positionVector(0.0f);
@@ -71,9 +72,13 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 		dFloat distance = dSqrt(diff.DotProduct3(diff));
 
 		// Nominal object distance at the beginning is 35, so we will subtract that here to get to zero as a starting point.
-		printf("Object distance: %f  local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]);
+		//printf("Object distance: %f  local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]);
 		dTrace(("Object distance: %f local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]));
 	}
+
+	dVector veloc;
+	NewtonBodyGetVelocity(body1, &veloc[0]);
+	dTrace(("v(%f %f %f)\n", veloc[0], veloc[1], veloc[2]));
 
 	// Apply torque only to the Core object
 	NewtonBodyAddTorque(body, &torque.m_x);
@@ -137,7 +142,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonDestroyCollision(PayloadCompound);
 	NewtonDestroyCollision(PayloadShape);
 
-#if 0
+#if 1
 	dFloat w = 10.0f;
 	dVector omega(w, 0.0f, 0.0f, 0.0f);
 	NewtonBodySetOmega(CoreBody, &omega[0]);
