@@ -26,10 +26,6 @@
 #include "dgPhysicsStdafx.h"
 #include "dgWorldDynamicsParallelSolver.h"
 
-//#define DG_PSD_DAMP_TOL				dgFloat32 (1.0e-2f)
-#define DG_PSD_DAMP_TOL					dgFloat32 (1.0e-3f)
-//#define DG_PSD_DAMP_TOL				dgFloat32 (1.0e-4f)
-
 
 #define	DG_BODY_LRU_STEP				2	
 #define	DG_MAX_SKELETON_JOINT_COUNT		256
@@ -37,6 +33,7 @@
 #define	DG_SMALL_ISLAND_COUNT			2
 
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
+#define	DG_PSD_DAMP_TOL					dgFloat32 (1.0e-3f)
 #define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_MAG * dgFloat32 (0.5f))
 
 

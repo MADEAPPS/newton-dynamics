@@ -268,8 +268,6 @@ void NewtonUserJoint::SetRowStiffness (dgFloat32 stiffness)
 {
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-//		stiffness = dgFloat32 (1.0f) - dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
-//		stiffness = -dgFloat32 (1.0f) - stiffness / DG_PSD_DAMP_TOL; 
 		stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
 		m_param->m_jointStiffness[index] = stiffness;
 	}

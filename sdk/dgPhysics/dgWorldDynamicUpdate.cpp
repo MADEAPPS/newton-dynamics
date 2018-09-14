@@ -495,7 +495,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	world->m_clusterLRU ++;
 
 	queueBuffer[0] = body;
-//	world->m_bodiesMemory____.ResizeIfNecessary (m_bodies + 1);
 	dgBodyInfo* const bodyArray0 = &world->m_bodiesMemory[0];
 
 	bodyArray0[m_bodies].m_body = world->m_sentinelBody;
@@ -948,7 +947,8 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = dgFloat32(0.0f);
-		rhs->m_stiffness = dgMax(DG_PSD_DAMP_TOL * (dgFloat32(1.0f) - constraintParam.m_jointStiffness[i]), dgFloat32(1.0e-5f));
+		const dgFloat32 stiffCoef = dgFloat32(1.0f) - constraintParam.m_jointStiffness[i];
+		rhs->m_stiffness = dgMax(DG_PSD_DAMP_TOL * stiffCoef, dgFloat32(1.0e-5f));
 
 		dgAssert(rhs->m_stiffness >= dgFloat32(0.0f));
 		dgAssert(constraintParam.m_jointStiffness[i] <= dgFloat32(1.0f));
@@ -1091,8 +1091,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
 
-//	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-//	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
 
@@ -1180,9 +1178,6 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 {
 	dgWorld* const world = (dgWorld*) this;
 	dgFloat32 velocityDragCoeff = DG_FREEZZING_VELOCITY_DRAG;
-
-//	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-//	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart + 1];
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart + 1];
 
 	dgInt32 count = cluster->m_bodyCount - 1;
