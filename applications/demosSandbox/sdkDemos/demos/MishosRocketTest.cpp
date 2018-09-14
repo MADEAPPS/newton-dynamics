@@ -37,16 +37,13 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 
 	// no gravity for this example
-	dVector force(dVector(0.0f, 0.0f, 0.0f).Scale(0.0f)); 
+	dVector force(0.0f); 
+	dVector torque(0.0f);
 
-	dVector torque(dVector(0.0f, 0.0f, 1.0f).Scale(0.0));
 	if (bThrust)
 	{
 		// ten million newtons, so the bodies will "rise" slowly...
-		torque = dVector(0.0f, 0.0f, 1.0f).Scale(1000000000.0); 
-	} else {
-		// ten million newtons, so the bodies will "rise" slowly...
-		torque = dVector(0.0f, 0.0f, 1.0f).Scale(0.0); 
+		torque.m_x = 1000000000.0; 
 	}
 
 	// pressing P prints out distance between objects...
@@ -96,7 +93,8 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonCompoundCollisionBeginAddRemove(CoreCompound);
 	NewtonCompoundCollisionAddSubCollision(CoreCompound, CoreShape);
 	NewtonCompoundCollisionEndAddRemove(CoreCompound);
-	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, -30.0f, 0.0f));
+//	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, -30.0f, 0.0f));
+	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, 0.0f, 0.0f));
 	dFloat CoreMass = 979452.0f;
 	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 	NewtonBody* const CoreBody = CreateSimpleSolid(scene, geometryCore, CoreMass, matrixCore, CoreCompound, 0);
@@ -115,7 +113,8 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonCompoundCollisionBeginAddRemove(PayloadCompound);
 	NewtonCompoundCollisionAddSubCollision(PayloadCompound, PayloadShape);
 	NewtonCompoundCollisionEndAddRemove(PayloadCompound);
-	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 5.0f, 0.0f));
+//	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 5.0f, 0.0f));
+	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 35.0f, 0.0f));
 	dFloat PayloadMass = 979452.0f;
 	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", PayloadCompound, "metalblu.tga", "metalblu.tga", "metalblu.tga");
 	NewtonBody* const PayloadBody = CreateSimpleSolid(scene, geometryPayload, PayloadMass, matrixPayload, PayloadCompound, 0);
@@ -141,11 +140,15 @@ void MishosHingeTest(DemoEntityManager* const scene)
 //	pHinge->SetStiffness(1.00f); // Tried this but it doesn't change anything...
 
 	// place camera into position and rotate towards objects
-	dMatrix camMatrix(dGetIdentityMatrix());
-	dQuaternion dqRotY(dVector(0.0f, 1.0f, 0.0f), 90.0f * 3.141592f / 180.0f);
-	dQuaternion rot(camMatrix);
-	dVector origin(0.0, 0.0f, 120.0f, 0.0f);
-	scene->SetCameraMatrix(rot*dqRotY, origin);
+//	dMatrix camMatrix(dGetIdentityMatrix());
+//	dQuaternion dqRotY(dVector(0.0f, 1.0f, 0.0f), 90.0f * 3.141592f / 180.0f);
+//	dQuaternion rot(camMatrix);
+//	dVector origin(0.0, 0.0f, 120.0f, 0.0f);
+//	scene->SetCameraMatrix(rot*dqRotY, origin);
+	dVector origin(matrixCore.m_posit);
+	origin.m_x -= 120.0f;
+	dQuaternion rot;
+	scene->SetCameraMatrix(rot, origin);
 
 	NewtonSerializeToFile(scene->GetNewton(), "RocketLaunchFar.bin", NULL, NULL);
 }
