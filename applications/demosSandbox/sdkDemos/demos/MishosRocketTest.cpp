@@ -101,7 +101,8 @@ void MishosHingeTest(DemoEntityManager* const scene)
 
 
 	// Make rocket core body...
-	NewtonCollision* const CoreShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 60.0f, 1, &offset[0][0]);
+//	NewtonCollision* const CoreShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 60.0f, 1, &offset[0][0]);
+	NewtonCollision* const CoreShape = NewtonCreateSphere(world, 5.0f, 1, &offset[0][0]);
 	NewtonCollision* const CoreCompound = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(CoreCompound);
 	NewtonCompoundCollisionAddSubCollision(CoreCompound, CoreShape);
