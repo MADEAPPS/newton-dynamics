@@ -36,10 +36,9 @@ class dCustomSlider: public dCustomJoint
 	CUSTOM_JOINTS_API dFloat GetFriction () const;
 	CUSTOM_JOINTS_API void SetFriction (dFloat friction);
 
-    CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	protected:
-	
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
