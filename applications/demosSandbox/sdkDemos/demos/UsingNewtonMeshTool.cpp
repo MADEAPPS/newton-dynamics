@@ -136,10 +136,10 @@ static void CreateSimpleBox_NewtonMesh (DemoEntityManager* const scene, const dV
 // create a mesh using the dNewtonMesh wrapper
 static void CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
 {
-	dBigVector array[8];
-	dBigVector scale1(scale);
+	dVector array[8];
+	dVector scale1(scale);
 	for (int i = 0; i < 8; i++) {
-		dBigVector p(&BoxPoints[i * 4]);
+		dVector p(&BoxPoints[i * 4]);
 		array[i] = scale1 * p;
 	}
 
@@ -163,7 +163,7 @@ static void CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, const d
 
 			// add vertex normal
 			int n = faceNormalIndex[index + j];
-			buildMesh.AddNormal (normal[n * 3 + 0], normal[n * 3 + 1], normal[n * 3 + 2]);
+			buildMesh.AddNormal (dFloat32 (normal[n * 3 + 0]), dFloat32 (normal[n * 3 + 1]), dFloat32 (normal[n * 3 + 2]));
 
 			// add face material index
 			buildMesh.AddMaterial(faceMaterail);
