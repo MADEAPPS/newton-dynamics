@@ -31,7 +31,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// gyroscope precession
@@ -68,7 +68,7 @@
 //#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
 //#define DEFAULT_SCENE	36			// single body vehicle
-//#define DEFAULT_SCENE	37			// david Gravel multi body car
+//#define DEFAULT_SCENE	37			// David Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles
 //#define DEFAULT_SCENE	30			// basic player controller
@@ -76,7 +76,7 @@
 //#define DEFAULT_SCENE	42			// cloth patch			
 //#define DEFAULT_SCENE	43			// soft bodies	
 //#define DEFAULT_SCENE	44			// joe's joint test
-#define DEFAULT_SCENE	45			// Misho's Hinge Test
+//#define DEFAULT_SCENE	45			// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
