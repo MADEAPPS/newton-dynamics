@@ -30,9 +30,9 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API virtual ~dCustomKinematicController();
 
 	CUSTOM_JOINTS_API void SetPickMode (int mode);
-    CUSTOM_JOINTS_API void SetLimitRotationVelocity(int limit);
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
+	CUSTOM_JOINTS_API void SetLimitRotationVelocity(dFloat omegaCap);
 	
 	CUSTOM_JOINTS_API void SetTargetPosit (const dVector& posit); 
 	CUSTOM_JOINTS_API void SetTargetRotation (const dQuaternion& rotation); 
@@ -54,8 +54,8 @@ class dCustomKinematicController: public dCustomJoint
 	dMatrix m_targetMatrix;
 	dFloat m_maxLinearFriction;
 	dFloat m_maxAngularFriction;
+	dFloat m_omegaCap;
 	bool m_isSixdof;
-    bool m_limitRotVel;
 	bool m_autoSleepState;
 
 	DECLARE_CUSTOM_JOINT(dCustomKinematicController, dCustomJoint)

@@ -202,7 +202,7 @@ dScene::dScene(NewtonWorld* const newton)
 dScene::dScene(const dScene& me)
 	:dSceneGraph(me)
 	,dRefCounter()
-	,m_revision(m_revision)
+	,m_revision(me.m_revision)
 	,m_newton (me.m_newton)
 {
 	dBoneNodeInfo::GetRttiType();

@@ -381,18 +381,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgVector& bodyOmega1 = m_body1->m_omega;
 		dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(jacobian0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(jacobian0.m_angular) +
 					   bodyVeloc1 * bodyOmega1.CrossProduct3(jacobian1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(jacobian1.m_angular));
-
-		dgVector omegaCrossJ0(bodyOmega0.CrossProduct3(jacobian0.m_linear));
-		dgVector omegaCrossJ1(bodyOmega1.CrossProduct3(jacobian1.m_linear));
-
-		dgVector accel1(bodyVeloc0 * omegaCrossJ0 + bodyOmega0 * (param.m_r0.CompProduct3(omegaCrossJ0)) +
-					    bodyVeloc1 * omegaCrossJ1 + bodyOmega1 * (param.m_r1.CompProduct3(omegaCrossJ1)));
-		
 		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
 
-dgFloat32 relCentr1 = -accel1.AddHorizontal().GetScalar();
-//dgTrace(("%f %f\n", relCentr1, relCentr));
-		
 		//desc.m_zeroRowAcceleration[index] = (relPosit * desc.m_invTimestep + relVeloc) * desc.m_invTimestep;
 		desc.m_zeroRowAcceleration[index] = relVeloc * desc.m_invTimestep;
 
