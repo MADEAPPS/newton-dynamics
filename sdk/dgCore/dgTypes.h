@@ -831,6 +831,7 @@ class dgSetPrecisionDouble
 
 DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
+/*
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchangeAdd((long*) addend, long (amount));
 	#endif
@@ -839,9 +840,19 @@ DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 		return InterlockedExchangeAdd((long*) addend, long (amount));
 	#endif
 
-
 	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		return __sync_fetch_and_add ((int32_t*)addend, amount );
+	#endif
+*/
+
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+		return _InterlockedExchangeAdd((long*)addend, long(amount));
+	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+		return InterlockedExchangeAdd((long*)addend, long(amount));
+	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER)|| defined ANDROID)
+		return __sync_fetch_and_add((int32_t*)addend, amount);
+	#else
+		#error "dgAtomicExchangeAndAdd implementation required"
 	#endif
 }
 
@@ -849,33 +860,28 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchange((long*) ptr, value);
-	#endif
-
-	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 		return InterlockedExchange((long*) ptr, value);
-	#endif
-
-
-	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
+	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();
 		return __sync_lock_test_and_set((int32_t*)ptr, value);
+	#else
+		#error "dgInterlockedExchange implementation required"
 	#endif
 }
 
 DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 {
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	return _InterlockedCompareExchange((long*)ptr, value, value);
-#endif
-
-#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-	return InterlockedCompareExchange((long*)ptr, value, value);
-#endif
-
-#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
-	//__sync_synchronize();
-	return __sync_lock_test_and_set((int32_t*)ptr, value);
-#endif
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+		return _InterlockedCompareExchange((long*)ptr, value, value);
+	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+		return InterlockedCompareExchange((long*)ptr, value, value);
+	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
+		//__sync_synchronize();
+		return __sync_lock_test_and_set((int32_t*)ptr, value);
+	#else
+		#error "dgInterlockedTest implementation required"
+	#endif
 }
 
 /*
