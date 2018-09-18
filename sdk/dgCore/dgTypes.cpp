@@ -28,7 +28,6 @@
 
 dgUnsigned64 dgGetTimeInMicrosenconds()
 {
-
 #ifdef _MSC_VER
 	static LARGE_INTEGER frequency;
 	static LARGE_INTEGER baseCount;
@@ -37,15 +36,14 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 		QueryPerformanceCounter (&baseCount);
 	}
 
-
 	LARGE_INTEGER count;
 	QueryPerformanceCounter (&count);
 	count.QuadPart -= baseCount.QuadPart;
 	dgUnsigned64 ticks = dgUnsigned64 (count.QuadPart * LONGLONG (1000000) / frequency.QuadPart);
 	return ticks;
-#endif
 
-#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+
 	timespec ts;
 	static dgUnsigned64 baseCount = 0;
 	if (!baseCount) {
@@ -54,10 +52,8 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 	}
 	clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 	return dgUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
-#endif
 
-
-#ifdef _MACOSX_VER
+#elif defined (_MACOSX_VER)
 	timeval tp;
 	static dgUnsigned64 baseCount = 0;
 	if (!baseCount) {
@@ -68,6 +64,9 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 	gettimeofday(&tp, NULL);
 	dgUnsigned64 microsecunds = dgUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 	return microsecunds - baseCount;
+#else 
+	#error "dgGetTimeInMicrosenconds implementation required"
+	return 0;
 #endif
 }
 

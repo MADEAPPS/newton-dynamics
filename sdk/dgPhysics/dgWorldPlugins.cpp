@@ -96,9 +96,7 @@ void dgWorldPluginList::LoadVisualStudioPlugins()
 		_findclose(handle);
 	}
 #endif	
-
 }
-
 
 void dgWorldPluginList::LoadPlugins()
 {
