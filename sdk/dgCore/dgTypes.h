@@ -916,7 +916,7 @@ DG_INLINE void dgThreadYield()
 DG_INLINE void dgThreadPause()
 {
 #ifndef DG_USE_THREAD_EMULATION
-	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
+	#if defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (WIN32) || defined (i386_) || defined (x86_64_)
 		_mm_pause();
 	#endif
 #endif
@@ -968,7 +968,7 @@ class dgScopeSpinPause
 	{
 		while (dgInterlockedExchange(m_atomicLock, 1)) {
 			//DG_TRACKTIME_NAMED("pause");
-			_mm_pause();
+			dgThreadPause();
 		}
 	}
 
