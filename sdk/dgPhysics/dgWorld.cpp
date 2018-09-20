@@ -418,12 +418,12 @@ void dgWorld::SetContactMergeTolerance(dgFloat32 tolerenace)
 	m_contactTolerance = dgMax (tolerenace, dgFloat32 (1.e-3f));
 }
 
-void dgWorld::EnableThreadOnSingleIsland(dgInt32 mode)
+void dgWorld::EnableParallelSolverOnLargeIsland(dgInt32 mode)
 {
 	m_useParallelSolver = mode ? 1 : 0;
 }
 
-dgInt32 dgWorld::GetThreadOnSingleIsland() const
+dgInt32 dgWorld::GetParallelSolverOnLargeIsland() const
 {
 	return m_useParallelSolver ? 1 : 0;
 }

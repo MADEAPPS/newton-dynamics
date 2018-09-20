@@ -478,7 +478,7 @@ void NewtonSetThreadsCount(const NewtonWorld* const newtonWorld, int threads)
 
   @return Number threads
 
-  See also: ::NewtonSetThreadsCount, ::NewtonSetMultiThreadSolverOnSingleIsland
+  See also: ::NewtonSetThreadsCount, ::NewtonSetParallelSolverOnLargeIsland
 */
 int NewtonGetThreadsCount(const NewtonWorld* const newtonWorld)
 {
@@ -499,7 +499,7 @@ int NewtonGetThreadsCount(const NewtonWorld* const newtonWorld)
   This function will return 1 on single core version of the library.
   // fixme; what is a single core version?
 
-  See also: ::NewtonSetThreadsCount, ::NewtonSetMultiThreadSolverOnSingleIsland
+  See also: ::NewtonSetThreadsCount, ::NewtonSetParallelSolverOnLargeIsland
 */
 int NewtonGetMaxThreadsCount(const NewtonWorld* const newtonWorld)
 {
@@ -537,11 +537,11 @@ int NewtonGetMaxThreadsCount(const NewtonWorld* const newtonWorld)
 
   See also: ::NewtonGetThreadsCount, ::NewtonSetThreadsCount
 */
-void NewtonSetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorld, int mode)
+void NewtonSetParallelSolverOnLargeIsland(const NewtonWorld* const newtonWorld, int mode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	world->EnableThreadOnSingleIsland (mode);
+	world->EnableParallelSolverOnLargeIsland (mode);
 }
 
 
@@ -558,11 +558,11 @@ void NewtonSyncThreadJobs(const NewtonWorld* const newtonWorld)
 	world->SynchronizationBarrier();
 }
 
-int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorld)
+int NewtonGetParallelSolverOnLargeIsland(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->GetThreadOnSingleIsland();
+	return world->GetParallelSolverOnLargeIsland();
 }
 
 /*!

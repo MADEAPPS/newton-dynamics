@@ -248,8 +248,8 @@ class dgWorld
 
 	void SetPostUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback);
 
-	void EnableThreadOnSingleIsland(dgInt32 mode);
-	dgInt32 GetThreadOnSingleIsland() const;
+	void EnableParallelSolverOnLargeIsland(dgInt32 mode);
+	dgInt32 GetParallelSolverOnLargeIsland() const;
 
 	void FlushCache();
 

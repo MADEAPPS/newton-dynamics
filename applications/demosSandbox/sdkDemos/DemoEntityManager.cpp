@@ -626,7 +626,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	}
 
 	NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
-	NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
+	NewtonSetParallelSolverOnLargeIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
 
 	void* plugin = NULL;
 	if (m_currentPlugin) {
