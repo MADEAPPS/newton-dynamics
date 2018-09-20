@@ -316,6 +316,20 @@ NewtonBody* NewtonFindSerializedBody(const NewtonWorld* const newtonWorld, int b
 	return (NewtonBody*) world->FindBodyFromSerializedID(bodySerializedID);
 }
 
+void NewtonLoadPlugins(const NewtonWorld* const newtonWorld, const char* const plugInPath)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	world->LoadPlugins(plugInPath);
+}
+
+void NewtonUnloadPlugins(const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	world->UnloadPlugins();
+}
+
 void* NewtonCurrentPlugin(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);

@@ -38,12 +38,12 @@ dgWorldPluginList::~dgWorldPluginList()
 }
 
 
-void dgWorldPluginList::LoadVisualStudioPlugins()
+void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 {
 #if _MSC_VER > 1700
+/*
 	char plugInPath[2048];
 	char rootPathInPath[2048];
-
 	GetModuleFileNameA(NULL, plugInPath, 256);
 
 	for (dgInt32 i = dgInt32(strlen(plugInPath) - 1); i; i--) {
@@ -57,6 +57,8 @@ void dgWorldPluginList::LoadVisualStudioPlugins()
 #else
 	strcat(plugInPath, "/newtonPlugins/release");
 #endif
+*/
+	char rootPathInPath[2048];
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
 	dgInt32 score = 0;
@@ -98,11 +100,11 @@ void dgWorldPluginList::LoadVisualStudioPlugins()
 #endif	
 }
 
-void dgWorldPluginList::LoadPlugins()
+void dgWorldPluginList::LoadPlugins(const char* const path)
 {
 #ifndef _NEWTON_USE_DOUBLE
 	#ifdef _MSC_VER
-		LoadVisualStudioPlugins();
+		LoadVisualStudioPlugins(path);
 	#endif
 #endif
 }

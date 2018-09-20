@@ -322,8 +322,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	pointCollison->Release();
 
 	AddSentinelBody();
-
-	LoadPlugins();
+//	LoadPlugins();
 }
 
 dgWorld::~dgWorld()

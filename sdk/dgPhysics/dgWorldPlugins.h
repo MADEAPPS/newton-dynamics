@@ -70,7 +70,7 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 	dgWorldPluginList(dgMemoryAllocator* const allocator);
 	~dgWorldPluginList();
 
-	void LoadPlugins();
+	void LoadPlugins(const char* const path);
 	void UnloadPlugins();
 
 	dgListNode* GetFirstPlugin();
@@ -81,7 +81,7 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 	void SelectPlugin(dgListNode* const plugin);
 
 	private:
-	void LoadVisualStudioPlugins();
+	void LoadVisualStudioPlugins(const char* const path);
 
 	dgListNode* m_currentPlugin;
 	dgListNode* m_preferedPlugin;

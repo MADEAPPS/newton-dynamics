@@ -449,6 +449,8 @@ extern "C" {
 	NEWTON_API void* NewtonAlloc (int sizeInBytes);
 	NEWTON_API void NewtonFree (void* const ptr);
 
+	NEWTON_API void NewtonLoadPlugins(const NewtonWorld* const newtonWorld, const char* const plugInPath);
+	NEWTON_API void NewtonUnloadPlugins(const NewtonWorld* const newtonWorld);
 	NEWTON_API void* NewtonCurrentPlugin(const NewtonWorld* const newtonWorld);
 	NEWTON_API void* NewtonGetFirstPlugin(const NewtonWorld* const newtonWorld);
 	NEWTON_API void* NewtonGetPreferedPlugin(const NewtonWorld* const newtonWorld);

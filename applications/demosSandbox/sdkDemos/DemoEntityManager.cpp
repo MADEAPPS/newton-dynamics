@@ -561,6 +561,23 @@ void DemoEntityManager::Cleanup ()
 	// set the number of sub steps
 	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
+	// load all available plug ins
+	char plugInPath[2048];
+	GetModuleFileNameA(NULL, plugInPath, 256);
+
+	for (int i = int(strlen(plugInPath) - 1); i; i--) {
+		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
+			plugInPath[i] = 0;
+			break;
+		}
+	}
+#ifdef _DEBUG
+	strcat(plugInPath, "/newtonPlugins/debug");
+#else
+	strcat(plugInPath, "/newtonPlugins/release");
+#endif
+	NewtonLoadPlugins(m_world, plugInPath);
+
 	// we start without 2d render
 	m_renderDemoGUI = NULL;
 	m_renderHelpMenus = NULL;
