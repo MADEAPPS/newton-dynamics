@@ -27,14 +27,13 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
+#define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
+
 #ifdef DG_SCALAR_VECTOR_CLASS
 #include "dgVectorScalar.h"
 #else
 #include "dgVectorSimd.h"
 #endif
-
-
-#define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 
 template<class T>
 class dgTemplateVector

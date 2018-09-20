@@ -33,6 +33,8 @@ DG_MSC_AVX_ALIGMENT
 class dgSoaFloat
 {
 	public:
+	#define PERMUTE_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
+
 	DG_INLINE dgSoaFloat()
 	{
 	}
@@ -44,8 +46,8 @@ class dgSoaFloat
 	}
 
 	DG_INLINE dgSoaFloat(const dgVector& type)
-		:m_low(type)
-		,m_high(type)
+		:m_low(_mm_set_ps(dgFloat32(type[0]), dgFloat32(type[1]), dgFloat32(type[2]), dgFloat32(type[3])))
+		,m_high(m_low)
 	{
 	}
 
@@ -55,9 +57,15 @@ class dgSoaFloat
 	{
 	}
 
-	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
+	DG_INLINE dgSoaFloat(const __m128 low, const __m128 high)
 		:m_low(low)
 		,m_high(high)
+	{
+	}
+
+	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
+		:m_low(_mm_set_ps(dgFloat32(low[0]), dgFloat32(low[1]), dgFloat32(low[2]), dgFloat32(low[3])))
+		,m_high(_mm_set_ps(dgFloat32(high[0]), dgFloat32(high[1]), dgFloat32(high[2]), dgFloat32(high[3])))
 	{
 	}
 
@@ -77,79 +85,87 @@ class dgSoaFloat
 
 	DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low + A.m_low, m_high + A.m_high);
+		return dgSoaFloat(_mm_add_ps (m_low, A.m_low), _mm_add_ps (m_high, A.m_high)); 
 	}
 
 	DG_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low - A.m_low, m_high - A.m_high);
+		return dgSoaFloat(_mm_sub_ps (m_low, A.m_low), _mm_sub_ps (m_high, A.m_high)); 
 	}
 
 	DG_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low * A.m_low, m_high * A.m_high);
+		return dgSoaFloat(_mm_mul_ps (m_low, A.m_low), _mm_mul_ps (m_high, A.m_high)); 
 	}
 
 	DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
 	{
-		return dgSoaFloat(_mm_fmadd_ps (A.m_low.m_type, B.m_low.m_type, m_low.m_type), _mm_fmadd_ps(A.m_high.m_type, B.m_high.m_type, m_high.m_type));
+		return dgSoaFloat(_mm_fmadd_ps (A.m_low, B.m_low, m_low), _mm_fmadd_ps(A.m_high, B.m_high, m_high));
 	}
 
 	DG_INLINE dgSoaFloat NegMulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
 	{
-		return dgSoaFloat(_mm_fnmadd_ps(A.m_low.m_type, B.m_low.m_type, m_low.m_type), _mm_fnmadd_ps(A.m_high.m_type, B.m_high.m_type, m_high.m_type));
+		return dgSoaFloat(_mm_fnmadd_ps(A.m_low, B.m_low, m_low), _mm_fnmadd_ps(A.m_high, B.m_high, m_high));
 	}
 	
 	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low > A.m_low, m_high > A.m_high);
+		return dgSoaFloat(_mm_cmpgt_ps (m_low, A.m_low), _mm_cmpgt_ps (m_high, A.m_high));
 	}
 
 	DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low < A.m_low, m_high < A.m_high);
+		return dgSoaFloat(_mm_cmplt_ps (m_low, A.m_low), _mm_cmplt_ps (m_high, A.m_high));
 	}
 
 	DG_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low | A.m_low, m_high | A.m_high);
+		return dgSoaFloat(_mm_or_ps (m_low, A.m_low), _mm_or_ps (m_high, A.m_high));
 	}
 
 	DG_INLINE dgSoaFloat AndNot (const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low.AndNot(A.m_low), m_high.AndNot(A.m_high));
+		return dgSoaFloat(_mm_andnot_ps (m_low, A.m_low), _mm_andnot_ps (m_high, A.m_high));
 	}
 
 	DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low.GetMin(A.m_low), m_high.GetMin(A.m_high));
+		return dgSoaFloat(_mm_min_ps (m_low, A.m_low), _mm_min_ps (m_high, A.m_high));
 	}
 
 	DG_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
 	{
-		return dgSoaFloat(m_low.GetMax(A.m_low), m_high.GetMax(A.m_high));
+		return dgSoaFloat(_mm_max_ps (m_low, A.m_low), _mm_max_ps (m_high, A.m_high));
 	}
 
 	DG_INLINE float AddHorizontal() const
 	{
-		return (m_low + m_high).AddHorizontal().GetScalar();
+		__m128 tmp0 (_mm_add_ps (m_low, m_high));
+		__m128 tmp1 (_mm_hadd_ps (tmp0, tmp0));
+		__m128 tmp2 (_mm_hadd_ps (tmp1, tmp1));
+		return _mm_cvtss_f32 (tmp2);
 	}
 
 	DG_INLINE float GetMax() const
 	{
-		return (m_low.GetMax(m_high)).GetMax();
+		__m128 tmp0 (_mm_max_ps (m_low, m_high));
+		__m128 tmp1 (_mm_max_ps (tmp0, _mm_shuffle_ps (tmp0, tmp0, PERMUTE_MASK(1, 0, 3, 2))));
+		__m128 tmp2 (_mm_max_ps (tmp1, _mm_shuffle_ps (tmp1, tmp1, PERMUTE_MASK(2, 3, 0, 1))));
+		return _mm_cvtss_f32 (tmp2);
 	}
 
 	union
 	{
-		float m_f[DG_SOA_WORD_GROUP_SIZE];
-		int m_i[DG_SOA_WORD_GROUP_SIZE];
 		struct
 		{
-			dgVector m_low;
-			dgVector m_high;
+			__m128 m_low;
+			__m128 m_high;
 		};
+		int m_i[DG_SOA_WORD_GROUP_SIZE];
+		float m_f[DG_SOA_WORD_GROUP_SIZE];
 	};
+
+
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT

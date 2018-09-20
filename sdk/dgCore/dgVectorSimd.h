@@ -94,7 +94,8 @@ class dgVector
 
 	DG_INLINE dgFloat32 GetScalar () const
 	{
-		return m_x;
+		//return m_x;
+		return _mm_cvtss_f32 (m_type);
 	}
 
 	DG_INLINE void Store (dgFloat32* const dst) const
@@ -250,8 +251,8 @@ class dgVector
 
 	DG_INLINE dgVector AddHorizontal () const
 	{
-		dgVector tmp (_mm_hadd_ps (m_type, m_type));
-		return _mm_hadd_ps (tmp.m_type, tmp.m_type);
+		__m128 tmp (_mm_hadd_ps (m_type, m_type));
+		return _mm_hadd_ps (tmp, tmp);
 	}
 
 	DG_INLINE dgVector Abs () const

@@ -44,7 +44,7 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	{
 		// ten million newtons, so the bodies will "rise" slowly...
 		//torque.m_x = 1000000000.0; 
-		torque.m_x = mass * 500.0;
+		torque.m_x = mass * 500.0f;
 	}
 
 
