@@ -190,6 +190,13 @@ class dgVector
 		#endif
 	}
 
+	// component wise multiplication
+	DG_INLINE dgVector CompProduct3(const dgVector& A) const
+	{
+		dgVector tmp ((*this & m_triplexMask) | m_wOne);
+		return tmp * A;
+	}
+
 	// return cross product
 	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
 	{
