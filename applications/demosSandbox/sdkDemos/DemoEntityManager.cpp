@@ -239,6 +239,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_hideVisualMeshes(false)
 	,m_showNormalForces(false)
 	,m_showCenterOfMass(false)
+	,m_showBodyFrame(false)
 	,m_updateMenuOptions(true)
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
@@ -755,6 +756,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("Show contact points", &m_showContactPoints);
 			ImGui::Checkbox("Show normal forces", &m_showNormalForces);
 			ImGui::Checkbox("Show center of mass", &m_showCenterOfMass);
+			ImGui::Checkbox("Show body frame", &m_showBodyFrame);
 			ImGui::Checkbox("show Joint debug info", &m_showJointDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
 			ImGui::Separator();
@@ -1438,6 +1440,9 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showCenterOfMass) {
 		RenderCenterOfMass(m_world);
+	}
+	if (m_showBodyFrame) {
+		RenderBodyFrame(m_world);
 	}
 
 	if (m_showJointDebugInfo) {
