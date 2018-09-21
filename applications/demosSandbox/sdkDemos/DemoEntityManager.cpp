@@ -1437,13 +1437,13 @@ void DemoEntityManager::RenderScene()
 	if (m_showContactPoints) {
 		RenderContactPoints (m_world);
 	}
-
-	if (m_showCenterOfMass) {
-		RenderCenterOfMass(m_world);
-	}
 	if (m_showBodyFrame) {
 		RenderBodyFrame(m_world);
 	}
+	if (m_showCenterOfMass) {
+		RenderCenterOfMass(m_world);
+	}
+
 
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
