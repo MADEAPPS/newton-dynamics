@@ -99,15 +99,9 @@
 #endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-//	#define DG_SSE4_INSTRUCTIONS_SET
 	#include <intrin.h>
 	#include <emmintrin.h> 
 	#include <pmmintrin.h>
-#endif
-
-
-#ifdef __ppc__
-	#include <vecLib/veclib.h>
 #endif
 
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
@@ -127,11 +121,6 @@
 			#include <pmmintrin.h> 
 			#include <emmintrin.h> 
 			#include <mmintrin.h> 
-			#ifdef __SSE4_1__
-				// some linux systems still do not support dot product operations
-//				#define DG_SSE4_INSTRUCTIONS_SET
-				#include <smmintrin.h>
-			#endif
 		} 
 	#endif
 #endif
@@ -145,27 +134,10 @@
 		#include <pmmintrin.h> 
 		#include <emmintrin.h>  //sse3
         #include <mmintrin.h> 
-		
-		#ifdef __SSE4_1__
-			#define DG_SSE4_INSTRUCTIONS_SET
-			#include <smmintrin.h>
-		#endif
     #endif
 #endif
 
 //#define DG_SCALAR_VECTOR_CLASS
-
-#ifdef DG_SSE4_INSTRUCTIONS_SET
-	#undef DG_SCALAR_VECTOR_CLASS
-#endif
-
-#if defined (__ppc__) || defined (ANDROID) || defined (IOS)
-	#undef DG_SSE4_INSTRUCTIONS_SET
-	#ifndef DG_SCALAR_VECTOR_CLASS
-		#define DG_SCALAR_VECTOR_CLASS
-	#endif
-#endif
-
 
 
 // by default newton run on a separate thread and 

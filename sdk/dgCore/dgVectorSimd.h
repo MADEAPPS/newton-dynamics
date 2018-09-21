@@ -181,13 +181,9 @@ class dgVector
 	// return dot product
 	DG_INLINE dgFloat32 DotProduct3 (const dgVector& A) const
 	{
-		#ifdef DG_SSE4_INSTRUCTIONS_SET 
-			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).GetScalar(); 
-		#else
-			dgVector tmp (A & m_triplexMask);
-			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-			return (*this * tmp).AddHorizontal().GetScalar();
-		#endif
+		dgVector tmp (A & m_triplexMask);
+		dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
+		return (*this * tmp).AddHorizontal().GetScalar();
 	}
 
 	// component wise multiplication
@@ -206,11 +202,7 @@ class dgVector
 
 	DG_INLINE dgVector DotProduct4(const dgVector& A) const
 	{
-		#ifdef DG_SSE4_INSTRUCTIONS_SET 
-			return _mm_dp_ps(m_type, A.m_type, 0xff);
-		#else 
-			return (*this * A).AddHorizontal();
-		#endif
+		return (*this * A).AddHorizontal();
 	}
 
 	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
@@ -296,17 +288,13 @@ class dgVector
 
 	DG_INLINE dgVector Floor () const
 	{
-		#ifdef DG_SSE4_INSTRUCTIONS_SET
-			return _mm_floor_ps(m_type);
-		#else
-			dgVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
-			dgVector ret (truncated - (dgVector::m_one & (*this < truncated)));
-			dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
-			dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
-			dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
-			dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
-			return ret;
-		#endif
+		dgVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
+		dgVector ret (truncated - (dgVector::m_one & (*this < truncated)));
+		dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
+		dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
+		dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
+		dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
+		return ret;
 	}
 
 	DG_INLINE dgVector Sqrt () const
@@ -775,11 +763,7 @@ class dgBigVector
 
 	DG_INLINE dgBigVector Floor() const
 	{
-#ifdef DG_SSE4_INSTRUCTIONS_SET
-		return dgBigVector(_mm_floor_pd(m_typeLow), _mm_floor_pd(m_typeHigh));
-#else 
 		return dgBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
-#endif
 	}
 
 	DG_INLINE dgBigVector TestZero() const
