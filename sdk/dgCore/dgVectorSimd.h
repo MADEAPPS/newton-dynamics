@@ -186,13 +186,6 @@ class dgVector
 		return (*this * tmp).AddHorizontal().GetScalar();
 	}
 
-	// component wise multiplication
-	DG_INLINE dgVector CompProduct3(const dgVector& A) const
-	{
-		dgVector tmp ((*this & m_triplexMask) | m_wOne);
-		return tmp * A;
-	}
-
 	// return cross product
 	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
 	{
@@ -783,11 +776,6 @@ class dgBigVector
 		dst1 = dgBigVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
 		dst2 = dgBigVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
 		dst3 = dgBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
-	}
-
-	DG_INLINE dgBigVector CompProduct3(const dgBigVector& A) const
-	{
-		return dgBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
 
 	// return dot 4d dot product

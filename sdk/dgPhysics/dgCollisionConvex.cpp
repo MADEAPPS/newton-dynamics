@@ -277,7 +277,6 @@ dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& m_a
 		inertia[2][1] = m_crossInertia[0] * mag2;
 		inertia = matrix.Inverse() * inertia * matrix;
 		
-		//dgVector origin (matrix.TransformVector (m_centerOfMass.CompProduct3(localScale)));
 		dgAssert (localScale.m_w == dgFloat32 (0.0f));
 		dgVector origin (matrix.TransformVector (m_centerOfMass * localScale));
 		dgFloat32 mag = origin.DotProduct3(origin);

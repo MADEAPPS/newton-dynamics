@@ -298,13 +298,9 @@ dgConvexHull3dAABBTreeNode* dgConvexHull3d::BuildTree (dgConvexHull3dAABBTreeNod
 			clump->m_indices[i] = i + baseIndex;
 
 			const dgBigVector& p = points[i];
-			minP.m_x = dgMin (p.m_x, minP.m_x);
-			minP.m_y = dgMin (p.m_y, minP.m_y);
-			minP.m_z = dgMin (p.m_z, minP.m_z);
-
-			maxP.m_x = dgMax (p.m_x, maxP.m_x);
-			maxP.m_y = dgMax (p.m_y, maxP.m_y);
-			maxP.m_z = dgMax (p.m_z, maxP.m_z);
+			dgAssert(p.m_w == dgFloat32(0.0f));
+			minP = minP.GetMin(p);
+			maxP = maxP.GetMax(p);
 		}
 
 		clump->m_left = NULL;
@@ -317,19 +313,14 @@ dgConvexHull3dAABBTreeNode* dgConvexHull3d::BuildTree (dgConvexHull3dAABBTreeNod
 		for (dgInt32 i = 0; i < count; i ++) {
 
 			const dgBigVector& p = points[i];
-			minP.m_x = dgMin (p.m_x, minP.m_x);
-			minP.m_y = dgMin (p.m_y, minP.m_y);
-			minP.m_z = dgMin (p.m_z, minP.m_z);
-
-			maxP.m_x = dgMax (p.m_x, maxP.m_x);
-			maxP.m_y = dgMax (p.m_y, maxP.m_y);
-			maxP.m_z = dgMax (p.m_z, maxP.m_z);
-
+			dgAssert(p.m_w == dgFloat32(0.0f));
+			minP = minP.GetMin(p);
+			maxP = maxP.GetMax(p);
 			median += p;
-			varian += p.CompProduct3 (p);
+			varian += p * p;
 		}
 
-		varian = varian.Scale3 (dgFloat32 (count)) - median.CompProduct3(median);
+		varian = varian.Scale4(dgFloat32(count)) - median * median;
 		dgInt32 index = 0;
 		dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
 		for (dgInt32 i = 0; i < 3; i ++) {
@@ -338,7 +329,7 @@ dgConvexHull3dAABBTreeNode* dgConvexHull3d::BuildTree (dgConvexHull3dAABBTreeNod
 				maxVarian = varian[i];
 			}
 		}
-		dgBigVector center = median.Scale3 (dgFloat64 (1.0f) / dgFloat64 (count));
+		dgBigVector center (median.Scale4 (dgFloat64 (1.0f) / dgFloat64 (count)));
 
 		dgFloat64 test = center[index];
 

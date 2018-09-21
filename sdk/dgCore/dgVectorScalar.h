@@ -187,12 +187,6 @@ class dgVector
 		return dgVector (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
 
-	// component wise multiplication
-	DG_INLINE dgVector CompProduct3 (const dgVector& A) const
-	{
-		return dgVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
-	}
-
 	// return dot product
 	DG_INLINE dgFloat32 DotProduct3 (const dgVector& A) const
 	{
@@ -613,12 +607,6 @@ class dgBigVector
 	DG_INLINE dgBigVector Scale4 (dgFloat64 scale) const
 	{
 		return dgBigVector (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
-	}
-
-	// component wise multiplication
-	DG_INLINE dgBigVector CompProduct3 (const dgBigVector& A) const
-	{
-		return dgBigVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
 
 	// return dot product

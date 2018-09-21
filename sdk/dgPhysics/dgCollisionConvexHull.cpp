@@ -583,11 +583,9 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 					boxP0 = boxP0.GetMin(p);
 					boxP1 = boxP1.GetMax(p);
 					median += p;
-					//varian += p.CompProduct3 (p);
 					varian += p * p;
 				}
 
-				//varian = varian.Scale3 (dgFloat32 (box.m_vertexCount)) - median.CompProduct3(median);
 				varian = varian.Scale3 (dgFloat32 (box.m_vertexCount)) - median * median;
 				dgInt32 index = 0;
 				dgFloat64 maxVarian = dgFloat64 (-1.0e10f);

@@ -259,15 +259,15 @@ namespace InternalSphere
 		
 			 index = Face->m_wireFrame[0] * stride;
 			 dgVector p0 (&ptr[index]);
-			 p0 = p0.CompProduct3 (scaleVector);
+			 p0 = p0 * scaleVector;
 	
 			 index = Face->m_wireFrame[1] * stride;
 			 dgVector p1 (&ptr[index]);
-			 p1 = p1.CompProduct3 (scaleVector);
+			 p1 = p1 * scaleVector;
 		
 			 index = Face->m_wireFrame[2] * stride;
 			 dgVector p2 (&ptr[index]);
-			 p2 = p2.CompProduct3 (scaleVector);
+			 p2 = p2 * scaleVector;
 		
 			 dgVector normal ((p1 - p0) * (p2 - p0));
 		

@@ -584,19 +584,22 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 					for (dgInt32 j = 0; j < count1; j ++) {
 						dgInt32 index = indexArray[start1 + j];
 						const dgBigVector& p = points[index];
-						p0.m_x = dgMin (p0.m_x, p.m_x);
-						p0.m_y = dgMin (p0.m_y, p.m_y);
-						p0.m_z = dgMin (p0.m_z, p.m_z);
-						p1.m_x = dgMax (p1.m_x, p.m_x);
-						p1.m_y = dgMax (p1.m_y, p.m_y);
-						p1.m_z = dgMax (p1.m_z, p.m_z);
+						dgAssert(p.m_w == dgFloat32(0.0f));
+						//p0.m_x = dgMin (p0.m_x, p.m_x);
+						//p0.m_y = dgMin (p0.m_y, p.m_y);
+						//p0.m_z = dgMin (p0.m_z, p.m_z);
+						//p1.m_x = dgMax (p1.m_x, p.m_x);
+						//p1.m_y = dgMax (p1.m_y, p.m_y);
+						//p1.m_z = dgMax (p1.m_z, p.m_z);
+						p0 = p0.GetMin(p);
+						p1 = p1.GetMax(p);
 					}
-					dgBigVector p ((p0 + p1).Scale3 (0.5f));
+					dgBigVector p ((p0 + p1).Scale4 (0.5f));
 					median += p;
-					varian += p.CompProduct3 (p);
+					varian += p * p;
 				}
 
-				varian = varian.Scale3 (dgFloat32 (faceCount)) - median.CompProduct3(median);
+				varian = varian.Scale4 (dgFloat32 (faceCount)) - median * median;
 
 				dgInt32 axis = 0;
 				dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
@@ -606,7 +609,7 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 						maxVarian = dgFloat32 (varian[i]);
 					}
 				}
-				dgBigVector center = median.Scale3 (dgFloat32 (1.0f) / dgFloat32 (faceCount));
+				dgBigVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (faceCount));
 				dgFloat64 axisVal = center[axis];
 
 				dgInt32 leftCount = 0;

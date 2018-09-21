@@ -181,12 +181,6 @@ class dgTemplateVector
 		return normal;
 	}
 
-	// component wise multiplication
-	DG_INLINE dgTemplateVector<T> CompProduct3 (const dgTemplateVector<T>& A) const
-	{
-		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
-	}
-
 	T GetMax () const
 	{
 		return dgMax(dgMax(m_x, m_y), dgMax(m_z, m_w));

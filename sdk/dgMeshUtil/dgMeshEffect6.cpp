@@ -1785,7 +1785,8 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
             dgEdge* ptr = edge;
             do {
 				dgAttibutFormat::dgUV uv;
-                dgBigVector p (scale.CompProduct3(m_points.m_vertex[ptr->m_incidentVertex] - minVal));
+                //dgBigVector p (scale.Comp_Product3(m_points.m_vertex[ptr->m_incidentVertex] - minVal));
+				dgBigVector p(scale * (m_points.m_vertex[ptr->m_incidentVertex] - minVal));
 				uv.m_u = dgFloat32 (p[u]);
 				uv.m_v = dgFloat32 (p[v]);
 				m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
