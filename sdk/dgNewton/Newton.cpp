@@ -2127,10 +2127,9 @@ void NewtonMaterialSetContactNormalDirection(const NewtonMaterial* const materia
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 	dgVector normal (direction[0], direction[1], direction[2], dgFloat32 (0.0f));
 
-	//dgAssert (dgAbs (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
 	dgAssert (normal.DotProduct3(material->m_normal) > dgFloat32 (0.01f));
 	if (normal.DotProduct3(material->m_normal) < dgFloat32 (0.0f)) {
-		normal = normal.Scale3 (-dgFloat32(1.0f));
+		normal = normal * dgVector::m_negOne;
 	}
 	material->m_normal = normal;
 
@@ -2172,9 +2171,10 @@ void NewtonMaterialContactRotateTangentDirections(const NewtonMaterial* const ma
 	const dgVector dir0 (alignVector[0], alignVector[1], alignVector[2], dgFloat32 (0.0f));
     	
 	dgVector dir1 (material->m_normal.CrossProduct3(dir0));
-	dFloat mag2 = dir1.DotProduct3(dir1);
-	if (mag2 > 1.0e-6f) {
-		material->m_dir1 = dir1.Scale3 (dgRsqrt (mag2));
+	dgAssert(dir1.m_w == dgFloat32(0.0f));
+	dFloat mag2 = dir1.DotProduct4(dir1).GetScalar();
+	if (mag2 > dgFloat32(1.0e-6f)) {
+		material->m_dir1 = dir1.Normalize();
 		material->m_dir0 = material->m_dir1.CrossProduct3(material->m_normal);
 	}
 }
@@ -3793,8 +3793,7 @@ void NewtonCollisionSupportVertex(const NewtonCollision* const collisionPtr, con
 
 	const dgMatrix& matrix = collision->GetLocalMatrix ();
 	dgVector searchDir (matrix.UnrotateVector(dgVector (dir[0], dir[1], dir[2], dgFloat32 (0.0f)))); 
-	searchDir = searchDir.Scale3 (dgRsqrt (searchDir.DotProduct3(searchDir)));
-
+	searchDir = searchDir.Normalize();
 	dgVector vertexOut (matrix.TransformVector(collision->SupportVertex(searchDir)));
 
 	vertex[0] = vertexOut[0];
@@ -4317,13 +4316,6 @@ NewtonBody* NewtonCreateDynamicBody(const NewtonWorld* const newtonWorld, const 
 	#endif
 
 	dgMatrix matrix (matrixPtr);
-#ifdef _DEBUG
-	//	matrix.m_front = matrix.m_front.Scale3 (dgRsqrt (matrix.m_front % matrix.m_front));
-	//	matrix.m_right = matrix.m_front * matrix.m_up;
-	//	matrix.m_right = matrix.m_right.Scale3 (dgRsqrt (matrix.m_right % matrix.m_right));
-	//	matrix.m_up = matrix.m_right * matrix.m_front;
-#endif
-
 	matrix.m_front.m_w = dgFloat32 (0.0f);
 	matrix.m_up.m_w    = dgFloat32 (0.0f);
 	matrix.m_right.m_w = dgFloat32 (0.0f);
@@ -4350,13 +4342,6 @@ NewtonBody* NewtonCreateAsymetricDynamicBody(const NewtonWorld* const newtonWorl
 #endif
 
 	dgMatrix matrix(matrixPtr);
-#ifdef _DEBUG
-	//	matrix.m_front = matrix.m_front.Scale3 (dgRsqrt (matrix.m_front % matrix.m_front));
-	//	matrix.m_right = matrix.m_front * matrix.m_up;
-	//	matrix.m_right = matrix.m_right.Scale3 (dgRsqrt (matrix.m_right % matrix.m_right));
-	//	matrix.m_up = matrix.m_right * matrix.m_front;
-#endif
-
 	matrix.m_front.m_w = dgFloat32(0.0f);
 	matrix.m_up.m_w = dgFloat32(0.0f);
 	matrix.m_right.m_w = dgFloat32(0.0f);
@@ -4383,13 +4368,6 @@ NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, cons
 #endif
 
 	dgMatrix matrix (matrixPtr);
-#ifdef _DEBUG
-	//	matrix.m_front = matrix.m_front.Scale3 (dgRsqrt (matrix.m_front % matrix.m_front));
-	//	matrix.m_right = matrix.m_front * matrix.m_up;
-	//	matrix.m_right = matrix.m_right.Scale3 (dgRsqrt (matrix.m_right % matrix.m_right));
-	//	matrix.m_up = matrix.m_right * matrix.m_front;
-#endif
-
 	matrix.m_front.m_w = dgFloat32 (0.0f);
 	matrix.m_up.m_w    = dgFloat32 (0.0f);
 	matrix.m_right.m_w = dgFloat32 (0.0f);
@@ -6313,8 +6291,10 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 		}
 	}
 	dgVector lateral (tmp.CrossProduct3(coneAxis)); 
-	lateral = lateral.Scale3 (dgRsqrt (lateral.DotProduct3(lateral)));
-	coneAxis = coneAxis.Scale3 (dgRsqrt (coneAxis.DotProduct3(coneAxis)));
+	dgAssert(lateral.m_w = dgFloat32(0.0f));
+	dgAssert(coneAxis.m_w = dgFloat32(0.0f));
+	lateral = lateral.Normalize();
+	coneAxis = coneAxis.Normalize();
 
 	maxConeAngle = dgAbs (maxConeAngle);
 	maxTwistAngle = dgAbs (maxTwistAngle);
@@ -7217,7 +7197,6 @@ void NewtonUserJointAddLinearRow(const NewtonJoint* const joint, const dFloat* c
 
 	TRACE_FUNCTION(__FUNCTION__);
 	dgVector direction (dir[0], dir[1], dir[2], dgFloat32 (0.0f)); 
-//	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
 	direction = direction.Normalize();
 	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 	dgVector pivotPoint0 (pivot0[0], pivot0[1], pivot0[2], dgFloat32 (0.0f)); 
@@ -7253,7 +7232,7 @@ void NewtonUserJointAddAngularRow(const NewtonJoint* const joint, dFloat relativ
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
 	dgVector direction (pin[0], pin[1], pin[2], dgFloat32 (0.0f));
-	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
+	direction = direction.Normalize();
 	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	userJoint->AddAngularRowJacobian (direction, relativeAngleError);
