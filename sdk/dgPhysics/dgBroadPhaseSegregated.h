@@ -53,8 +53,11 @@ class dgBroadPhaseSegregated : public dgBroadPhase
 	virtual void RayCast(const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
 	virtual dgInt32 Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
 	virtual dgInt32 ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
-
 	void RemoveNode(dgBroadPhaseNode* const node);
+
+	private:
+	void AddStaticBody(dgBody* const body);
+	void AddDynamicBody(dgBody* const body);
 
 	dgFloat64 m_staticEntropy;
 	dgFloat64 m_dynamicsEntropy;

@@ -75,46 +75,66 @@ dgInt32 dgBroadPhaseSegregated::GetType() const
 	return dgWorld::m_broadphaseSegregated;
 }
 
-void dgBroadPhaseSegregated::CheckStaticDynamic(dgBody* const body, dgFloat32 mass)
+void dgBroadPhaseSegregated::CheckStaticDynamic(dgBody* const body, dgFloat32 mass1)
 {
 	dgBroadPhaseNode* const node = body->GetBroadPhase();
 	if (node) {
-		dgVector temp (body->GetInvMass());
-		if (((mass < (DG_INFINITE_MASS * dgFloat32 (0.9f))) && (temp.m_w == dgFloat32 (0.0f))) || ((mass > (DG_INFINITE_MASS * dgFloat32 (0.5f))) && (temp.m_w != dgFloat32 (0.0f)))) {
+		const dgFloat32 mass0 = body->GetMass().m_w;
+		const bool m0 = (mass0 >= DG_INFINITE_MASS);
+		const bool m1 = (mass1 >= DG_INFINITE_MASS);
+		if (m0 ^ m1) {
 			Remove(body);
-			body->SetInvMass (dgVector (dgFloat32 (1.0f)));			
-			Add(body);
-			body->SetInvMass (temp);
+			if (m1) {
+				AddStaticBody (body);
+			} else {
+				AddDynamicBody (body);
+			}
 		}
 	}
 }
 
+void dgBroadPhaseSegregated::AddStaticBody(dgBody* const body)
+{
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
+	dgAssert(m_rootNode->IsSegregatedRoot());
+
+	m_staticNeedsUpdate = true;
+	dgBroadPhaseBodyNode* const bodyNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
+	if (root->m_right) {
+		dgBroadPhaseTreeNode* const node = InsertNode(root->m_right, bodyNode);
+		node->m_fitnessNode = m_staticFitness.Append(node);
+	} else {
+		root->m_right = bodyNode;
+		root->m_right->m_parent = root;
+	}
+}
+
+void dgBroadPhaseSegregated::AddDynamicBody(dgBody* const body)
+{
+	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
+	dgAssert(m_rootNode->IsSegregatedRoot());
+
+	dgBroadPhaseBodyNode* const newNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
+	if (root->m_left) {
+		dgBroadPhaseTreeNode* const node = InsertNode(root->m_left, newNode);
+		node->m_fitnessNode = m_dynamicsFitness.Append(node);
+	} else {
+		root->m_left = newNode;
+		root->m_left->m_parent = root;
+	}
+	newNode->m_updateNode = m_updateList.Append(newNode);
+}
+
+
 void dgBroadPhaseSegregated::Add(dgBody* const body)
 {
 	dgAssert (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
-	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
-	dgAssert (m_rootNode->IsSegregatedRoot());
+	dgAssert (((dgBroadPhaseSegregatedRootNode*)m_rootNode)->IsSegregatedRoot());
 
 	if (body->GetCollision()->IsType(dgCollision::dgCollisionMesh_RTTI) || (body->GetInvMass().m_w == dgFloat32(0.0f))) {
-		m_staticNeedsUpdate = true;
-		dgBroadPhaseBodyNode* const bodyNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
-		if (root->m_right) {
-			dgBroadPhaseTreeNode* const node = InsertNode(root->m_right, bodyNode);
-			node->m_fitnessNode = m_staticFitness.Append(node);
-		} else {
-			root->m_right = bodyNode;
-			root->m_right->m_parent = root;
-		}
+		AddStaticBody(body);
 	} else {
-		dgBroadPhaseBodyNode* const newNode = new (m_world->GetAllocator()) dgBroadPhaseBodyNode(body);
-		if (root->m_left) {
-			dgBroadPhaseTreeNode* const node = InsertNode(root->m_left, newNode);
-			node->m_fitnessNode = m_dynamicsFitness.Append(node);
-		} else {
-			root->m_left = newNode;
-			root->m_left->m_parent = root;
-		}
-		newNode->m_updateNode = m_updateList.Append(newNode);
+		AddDynamicBody(body);
 	}
 }
 
