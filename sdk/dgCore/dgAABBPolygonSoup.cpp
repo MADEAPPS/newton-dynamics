@@ -102,20 +102,20 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 		m_p0 = p0;
 		m_p1 = p1;
 		m_size = m_p1 - m_p0;
-		m_origin = (m_p1 + m_p0).Scale4 (dgFloat32 (0.5f));
+		m_origin = (m_p1 + m_p0) * dgVector::m_half;
 		m_area = m_size.DotProduct4(m_size.ShiftTripleRight()).m_x;
 	}
 
-	static dgFloat32 CalculateSurfaceArea (dgNodeBuilder* const node0, dgNodeBuilder* const node1, dgVector& minBox, dgVector& maxBox)
+	DG_INLINE static dgFloat32 CalculateSurfaceArea (dgNodeBuilder* const node0, dgNodeBuilder* const node1, dgVector& minBox, dgVector& maxBox)
 	{
 		minBox = node0->m_p0.GetMin(node1->m_p0);
 		maxBox = node0->m_p1.GetMax(node1->m_p1);
 
-		dgVector side0 ((maxBox - minBox).Scale4 (dgFloat32 (0.5f)));
-		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		return side0.DotProduct4(side1).m_x;
+		dgVector side0 ((maxBox - minBox) * dgVector::m_half);
+		//dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
+		dgVector side1 (side0.ShiftTripleLeft());
+		return side0.DotProduct4(side1).GetScalar();
 	}
-
 
 	dgVector m_p0;
 	dgVector m_p1;
@@ -258,6 +258,9 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 	dgAssert (node->m_right);
 
 	if (node->m_parent)	{
+		dgAssert(node->m_parent->m_p0.m_w == dgFloat32(0.0f));
+		dgAssert(node->m_parent->m_p1.m_w == dgFloat32(0.0f));
+
 		if (node->m_parent->m_left == node) {
 			dgFloat32 cost0 = node->m_area;
 
@@ -293,8 +296,8 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				parent->m_p0 = cost1P0;
 				parent->m_p1 = cost1P1;		
 				parent->m_area = cost1;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dgVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dgVector::m_half;
 
 			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
 				dgNodeBuilder* const parent = node->m_parent;
@@ -321,8 +324,8 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				parent->m_p0 = cost2P0;
 				parent->m_p1 = cost2P1;		
 				parent->m_area = cost2;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dgVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dgVector::m_half;
 			}
 		} else {
 			dgFloat32 cost0 = node->m_area;
@@ -360,8 +363,8 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				parent->m_p0 = cost1P0;
 				parent->m_p1 = cost1P1;		
 				parent->m_area = cost1;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dgVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dgVector::m_half;
 
 			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
 				dgNodeBuilder* const parent = node->m_parent;
@@ -388,8 +391,8 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				parent->m_p0 = cost2P0;
 				parent->m_p1 = cost2P1;		
 				parent->m_area = cost2;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dgVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dgVector::m_half;
 			}
 		}
 	} else {
@@ -408,7 +411,9 @@ dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (const dgVector* const vertex,
 		dgVector p1 (vertex[index1]);
 
 		dgVector dir (p1 - p0);
-		dir = dir.Scale3 (dgRsqrt (dir.DotProduct3(dir)));
+		dgAssert (dir.m_w == dgFloat32 (0.0f));
+		//dir = dir.Scale4 (dgRsqrt (dir.DotProduct3(dir)));
+		dir = dir.Normalize();
 
 		dgFloat32 maxVal = dgFloat32 (-1.0e10f);
 		dgFloat32 minVal = dgFloat32 ( 1.0e10f);
@@ -650,9 +655,9 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 						dgAssert (x1 > x0);
 						dgAssert (y1 > y0);
 						if (!((y0 >= x1) || (y1 <= x0))) {
-							//dgFloat64 t = ((p0 - q0) % q1q0) / q1q0Mag2;
 							dgFloat64 t = q1q0.DotProduct3 (p0 - q0) / q1q0Mag2;
-							dgBigVector q (q0 + q1q0.Scale3(t));
+							dgAssert (q1q0.m_w == dgFloat32 (0.0f));
+							dgBigVector q (q0 + q1q0.Scale4(t));
 							dgBigVector dist (p0 - q);
 							dgFloat64 err2 = dist.DotProduct3 (dist);
 							if (err2 < DG_WELDING_TOL2) {

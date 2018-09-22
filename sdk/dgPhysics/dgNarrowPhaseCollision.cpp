@@ -906,8 +906,8 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct3(tangDir);
 				dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
-				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale4 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
-//				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
+				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale4 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
+				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
 				contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct3(contactMaterial->m_dir0);
 				dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			}
