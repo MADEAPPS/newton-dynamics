@@ -91,11 +91,15 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		m_castingVisualEntity->ResetMatrix(*scene, matrixB);
 
 		NewtonCollision* const collisionA = NewtonBodyGetCollision(m_body);
-		int res = NewtonCollisionClosestPoint(world, collisionA, &matrixA[0][0], m_castingVisualEntity->m_castingShape, &matrixB[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_contact1[0], &m_castingVisualEntity->m_normal[0], 0);
-	
+		
+		//int res = NewtonCollisionClosestPoint(world, collisionA, &matrixA[0][0], m_castingVisualEntity->m_castingShape, &matrixB[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_contact1[0], &m_castingVisualEntity->m_normal[0], 0);
+		
+		//just test the center of collisionB against collisionA to see if the point is inside or not:
+		int res = NewtonCollisionPointDistance(world, &matrixB.m_posit[0], collisionA, &matrixA[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_normal[0], 0);
+
 		if (res == 0)
 		{
-			printf("Bodies Are Intersecting!");
+			printf("Point Inside Body!");
 		}
 
 	}
@@ -143,6 +147,7 @@ class dClosestDistanceRecord: public dCustomControllerBase
 
 		DemoMesh* const geometry = new DemoMesh("convexShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		m_body = CreateSimpleSolid (scene, geometry, 1.0f, matrix, collision, materialID);
+
 
 		geometry->Release(); 
 		NewtonDestroyCollision (collision);
