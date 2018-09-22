@@ -206,6 +206,41 @@ void RenderCenterOfMass (NewtonWorld* const world)
 	glEnd();
 }
 
+void RenderBodyFrame(NewtonWorld* const world)
+{
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+
+	glBegin(GL_LINES);
+	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+		dMatrix matrix;
+
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+		dVector o(matrix.m_posit);
+
+		dVector x(o + matrix.RotateVector(dVector(1.1f, 0.0f, 0.0f, 0.0f)));
+		glColor3f(0.5f, 0.0f, 0.0f);
+		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+		glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
+
+		dVector y(o + matrix.RotateVector(dVector(0.0f, 1.1f, 0.0f, 0.0f)));
+		glColor3f(0.0f, 0.5f, 0.0f);
+		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+		glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
+
+		dVector z(o + matrix.RotateVector(dVector(0.0f, 0.0f, 1.1f, 0.0f)));
+		glColor3f(0.0f, 0.0f, 0.5f);
+		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+		glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
+	}
+	glEnd();
+}
+
+
+
 
 void RenderContactPoints (NewtonWorld* const world)
 {
