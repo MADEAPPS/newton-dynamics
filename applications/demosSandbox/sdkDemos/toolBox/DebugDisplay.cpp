@@ -239,9 +239,6 @@ void RenderBodyFrame(NewtonWorld* const world)
 	glEnd();
 }
 
-
-
-
 void RenderContactPoints (NewtonWorld* const world)
 {
 	glDisable (GL_LIGHTING);

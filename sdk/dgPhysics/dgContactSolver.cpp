@@ -873,7 +873,8 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 						den = 1.0e-10f;
 					}
 					output[count + 0] = ptr[0];
-					output[count + 1] = ptr[0] - dp.Scale3(test0 / den);
+					dgAssert (dp.m_w == dgFloat32 (0.0f));
+					output[count + 1] = ptr[0] - dp.Scale4(test0 / den);
 					count += 2;
 				}
 			} else if (test1 >= dgFloat32(0.0f)) {
@@ -882,7 +883,8 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 				if (dgAbs(den) < 1.0e-10f) {
 					den = 1.0e-10f;
 				}
-				output[count] = ptr[0] - dp.Scale3(test0 / den);
+				dgAssert (dp.m_w == dgFloat32 (0.0f));
+				output[count] = ptr[0] - dp.Scale4(test0 / den);
 				count++;
 				output[count] = ptr[1];
 				count++;
@@ -1094,11 +1096,11 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 						den = test0 / den;
 						if (den >= dgFloat32(0.0f)) {
 							den = dgFloat32(0.0f);
-						}
-						else if (den <= -1.0f) {
+						} else if (den <= -1.0f) {
 							den = dgFloat32(-1.0f);
 						}
-						output[0] = p0 - dp.Scale3(den);
+						dgAssert (dp.m_w == dgFloat32 (0.0f));
+						output[0] = p0 - dp.Scale4(den);
 						edgeClipped[0] = tmp;
 						count++;
 					}
@@ -1117,7 +1119,8 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 					} else if (den <= -1.0f) {
 						den = dgFloat32(-1.0f);
 					}
-					output[1] = p0 - dp.Scale3(den);
+					dgAssert (dp.m_w == dgFloat32 (0.0f));
+					output[1] = p0 - dp.Scale4(den);
 					edgeClipped[1] = tmp;
 					count++;
 				}
