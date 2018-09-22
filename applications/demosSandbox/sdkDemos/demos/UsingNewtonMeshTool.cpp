@@ -23,14 +23,14 @@
 // in most case w can be set to 0.0
 static dFloat64 BoxPoints[] = 
 {
-	-1.0, 0.0, -1.0, 0.0,
-	-1.0, 0.0, 1.0, 0.0,
-	-1.0, 2.0, 1.0, 0.0,
-	-1.0, 2.0, -1.0, 0.0,
-	1.0,  0.0, -1.0, 0.0,
-	1.0,  0.0, 1.0, 0.0,
-	1.0, 2.0, 1.0, 0.0,
-	1.0, 2.0, -1.0, 0.0,
+	-1.0, -1.0, -1.0, 0.0,
+	-1.0, -1.0, 1.0, 0.0,
+	-1.0, 1.0, 1.0, 0.0,
+	-1.0, 1.0, -1.0, 0.0,
+	1.0, -1.0, -1.0, 0.0,
+	1.0, -1.0, 1.0, 0.0,
+	1.0, 1.0, 1.0, 0.0,
+	1.0, 1.0, -1.0, 0.0,
 };
 
 // the vertex index list is an array of all the face, in any order, the can be convex or concave, 
@@ -84,7 +84,7 @@ static int faceNormalIndex[] =
 
 
 // create a mesh using the NewtonMesh low lever interface
-static void CreateSimpleBox_NewtonMesh (DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
+static NewtonBody* CreateSimpleBox_NewtonMesh (DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
 {
 	dBigVector array[8];
 	dBigVector scale1 (scale);
@@ -126,15 +126,19 @@ static void CreateSimpleBox_NewtonMesh (DemoEntityManager* const scene, const dV
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
-	CreateSimpleSolid (scene, visualMesh, mass, matrix, collision, 0);
+
+	NewtonBody* const body = CreateSimpleSolid(scene, visualMesh, mass, matrix, collision, 0);
+	dVector veloc(1, 0, 2, 0);
+	NewtonBodySetVelocity(body, &veloc[0]);
 
 	visualMesh->Release();
 	NewtonDestroyCollision(collision);
 	NewtonMeshDestroy (newtonMesh);
+	return body;
 }
 
 // create a mesh using the dNewtonMesh wrapper
-static void CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
+static NewtonBody* CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
 {
 	dVector array[8];
 	dVector scale1(scale);
@@ -191,10 +195,15 @@ static void CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, const d
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
-	CreateSimpleSolid(scene, visualMesh, mass, matrix, collision, 0);
+
+	NewtonBody* const body = CreateSimpleSolid(scene, visualMesh, mass, matrix, collision, 0);
+	dVector veloc (1, 0, 2, 0);
+	NewtonBodySetVelocity(body, &veloc[0]);
 
 	visualMesh->Release();
 	NewtonDestroyCollision(collision);
+
+	return body;
 }
 
 

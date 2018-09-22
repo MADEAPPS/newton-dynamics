@@ -585,12 +585,6 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 						dgInt32 index = indexArray[start1 + j];
 						const dgBigVector& p = points[index];
 						dgAssert(p.m_w == dgFloat32(0.0f));
-						//p0.m_x = dgMin (p0.m_x, p.m_x);
-						//p0.m_y = dgMin (p0.m_y, p.m_y);
-						//p0.m_z = dgMin (p0.m_z, p.m_z);
-						//p1.m_x = dgMax (p1.m_x, p.m_x);
-						//p1.m_y = dgMax (p1.m_y, p.m_y);
-						//p1.m_z = dgMax (p1.m_z, p.m_z);
 						p0 = p0.GetMin(p);
 						p1 = p1.GetMax(p);
 					}

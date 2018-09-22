@@ -41,23 +41,6 @@ dgWorldPluginList::~dgWorldPluginList()
 void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 {
 #if _MSC_VER > 1700
-/*
-	char plugInPath[2048];
-	char rootPathInPath[2048];
-	GetModuleFileNameA(NULL, plugInPath, 256);
-
-	for (dgInt32 i = dgInt32(strlen(plugInPath) - 1); i; i--) {
-		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
-			plugInPath[i] = 0;
-			break;
-		}
-	}
-#ifdef _DEBUG
-	strcat(plugInPath, "/newtonPlugins/debug");
-#else
-	strcat(plugInPath, "/newtonPlugins/release");
-#endif
-*/
 	char rootPathInPath[2048];
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
