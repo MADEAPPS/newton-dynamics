@@ -91,7 +91,13 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		m_castingVisualEntity->ResetMatrix(*scene, matrixB);
 
 		NewtonCollision* const collisionA = NewtonBodyGetCollision(m_body);
-		NewtonCollisionClosestPoint(world, collisionA, &matrixA[0][0], m_castingVisualEntity->m_castingShape, &matrixB[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_contact1[0], &m_castingVisualEntity->m_normal[0], 0);
+		int res = NewtonCollisionClosestPoint(world, collisionA, &matrixA[0][0], m_castingVisualEntity->m_castingShape, &matrixB[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_contact1[0], &m_castingVisualEntity->m_normal[0], 0);
+	
+		if (res == 0)
+		{
+			printf("Bodies Are Intersecting!");
+		}
+
 	}
 
 	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
