@@ -191,7 +191,7 @@ DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 
 DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 {
-	return (v.DotProduct4(m_front) & dgVector::m_xMask) + (v.DotProduct4(m_up) & dgVector::m_yMask) + (v.DotProduct4(m_right) & dgVector::m_zMask);
+	return (v.DotProduct(m_front) & dgVector::m_xMask) + (v.DotProduct(m_up) & dgVector::m_yMask) + (v.DotProduct(m_right) & dgVector::m_zMask);
 }
 
 

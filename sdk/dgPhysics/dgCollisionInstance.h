@@ -410,17 +410,17 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
-			dgVector dir1(m_scale.CompProduct4(dir));
-			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_childShape->SupportVertexSpecial(dir1, vertexIndex));
+			dgVector dir1(m_scale * dir);
+			dir1 = dir1 * (dir1.InvMagSqrt());
+			return m_scale * m_childShape->SupportVertexSpecial(dir1, vertexIndex);
 		}
 
 		case m_global:
 		default:
 		{
-			dgVector dir1(m_aligmentMatrix.UnrotateVector(m_scale.CompProduct4(dir)));
-			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecial(dir1, vertexIndex)));
+			dgVector dir1(m_aligmentMatrix.UnrotateVector(m_scale * dir));
+			dir1 = dir1 * (dir1.InvMagSqrt());
+			return m_scale * m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecial(dir1, vertexIndex));
 		}
 */
 	}
@@ -447,17 +447,17 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const 
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p/S, n * transp(S)) 
-			dgVector dir1(m_scale.CompProduct4(dir));
-			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_childShape->SupportVertexSpecialProjectPoint(point.CompProduct4(m_invScale), dir1));
+			dgVector dir1(m_scale * dir);
+			dir1 = dir1 * (dir1.InvMagSqrt());
+			return m_scale * m_childShape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
 		}
 
 		case m_global:
 		default:
 		{
-			dgVector dir1(m_aligmentMatrix.UnrotateVector(m_scale.CompProduct4(dir)));
-			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecialProjectPoint(m_aligmentMatrix.UntransformVector(point.CompProduct4(m_invScale)), dir1)));
+			dgVector dir1(m_aligmentMatrix.UnrotateVector(m_scale * dir));
+			dir1 = dir1 * (dir1.InvMagSqrt());
+			return m_scale * m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecialProjectPoint(m_aligmentMatrix.UntransformVector(point * m_invScale), dir1));
 		}
 */
 	}

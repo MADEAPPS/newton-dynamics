@@ -1278,7 +1278,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgBroadPhase::dgPair* c
 		dgVector relVeloc (otherBody->GetVelocity() - myBody->GetVelocity());
 		dgAssert (relVeloc.m_w == dgFloat32 (0.0f));
 		dgVector impulseStimate (relVeloc.Scale (dgFloat32 (1.0f) / (myBody->GetInvMass().m_w + otherBody->GetInvMass().m_w))); 
-		dgFloat32 impulseStimate2 = impulseStimate.DotProduct4(impulseStimate).m_w;
+		dgFloat32 impulseStimate2 = impulseStimate.DotProduct(impulseStimate).m_w;
 		dgFloat32 impulseStrength = m_impulseStrengthPerUnitMass * myBody->GetMass().m_w;
 
 		if (impulseStimate2 > (impulseStrength * impulseStrength)) {
@@ -1391,7 +1391,7 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 	dgVector error (dgFloat32 (1.0e-3f));
 	dgVector himespherePlane (directionsMap[0]);
 	for (dgInt32 i = 1; i < count; i ++) {
-		dgVector projection (himespherePlane.DotProduct4(directionsMap[i]));
+		dgVector projection (himespherePlane.DotProduct(directionsMap[i]));
 		dgInt32 sign = (projection < error).GetSignMask();
 		if (sign & 0x0f) {
 //			dgFloat32 val;
@@ -1405,7 +1405,7 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 			himespherePlane = dgMatrix (rot, dgVector::m_wOne).RotateVector(himespherePlane);
 
 			for (dgInt32 j = 0; j < i; j ++) {
-				dgVector projection1 (himespherePlane.DotProduct4(directionsMap[j]));
+				dgVector projection1 (himespherePlane.DotProduct(directionsMap[j]));
 				dgInt32 sign1 = (projection1 < error).GetSignMask();
 				if (sign1 & 0x0f) {
 					return false;
@@ -1429,7 +1429,7 @@ bool dgCollisionCompoundFractured::IsBelowPlane (dgConectivityGraph::dgListNode*
 	const dgMatrix& matrix = instance->GetLocalMatrix(); 
 	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir))));
 
-	dgFloat32 dist = (support.DotProduct4(plane)).GetScalar();
+	dgFloat32 dist = (support.DotProduct(plane)).GetScalar();
 	return dist < dgFloat32 (0.0f);
 }
 
@@ -1443,7 +1443,7 @@ bool dgCollisionCompoundFractured::IsAbovePlane (dgConectivityGraph::dgListNode*
 	const dgMatrix& matrix = instance->GetLocalMatrix(); 
 	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir))));
 
-	dgFloat32 dist = (support.DotProduct4(plane)).GetScalar();
+	dgFloat32 dist = (support.DotProduct(plane)).GetScalar();
 	return dist > dgFloat32 (0.0f);
 }
 
@@ -1457,7 +1457,7 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 	const dgMatrix& matrix = instance->GetLocalMatrix(); 
 	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir))));
 
-	dgFloat32 dist = (support.DotProduct4(plane)).GetScalar();
+	dgFloat32 dist = (support.DotProduct(plane)).GetScalar();
 	dgAssert (dist < dgFloat32 (0.0f));
 
 	dgConectivityGraph::dgListNode* startNode = nodeBelowPlane;
@@ -1470,7 +1470,7 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 
 			const dgMatrix& matrix1 = instance1->GetLocalMatrix(); 
 			dgVector support1 (matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir))));
-			dgFloat32 dist1 = (support1.DotProduct4(plane)).GetScalar();
+			dgFloat32 dist1 = (support1.DotProduct(plane)).GetScalar();
 			if (dist1 > dist) {
 				dist = dist1;
 				foundBetterNode = true;
@@ -1524,7 +1524,7 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 						const dgMatrix& matrix = instance->GetLocalMatrix(); 
 
 						dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(negDir))));
-						dgFloat32 dist = (support.DotProduct4(plane)).GetScalar();
+						dgFloat32 dist = (support.DotProduct(plane)).GetScalar();
 						if (dist > dgFloat32 (0.0f)) {
 							upperSide.Insert(node, node);
 							planeNode->GetInfo().DeleteEdge (edgeNode);
@@ -1544,7 +1544,7 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 
 						} else {
 							dgVector support1 (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(posgDir))));
-							dgFloat32 dist1 = (support1.DotProduct4(plane)).GetScalar();
+							dgFloat32 dist1 = (support1.DotProduct(plane)).GetScalar();
 							if (dist1 > dgFloat32 (0.0f)) {
 								pool[stack] = node;
 								stack ++;

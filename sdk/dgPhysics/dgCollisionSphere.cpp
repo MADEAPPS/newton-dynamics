@@ -215,7 +215,7 @@ dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, c
 {
 	dgAssert (normal.m_w == 0.0f);
 	dgAssert (normal.DotProduct3(normal) > dgFloat32 (0.999f));
-	contactsOut[0] = normal * normal.DotProduct4(point);
+	contactsOut[0] = normal * normal.DotProduct(point);
 	return 1;
 }
 

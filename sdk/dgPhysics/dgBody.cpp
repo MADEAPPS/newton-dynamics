@@ -302,7 +302,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	dgAssert (m_veloc.m_w == dgFloat32 (0.0f));
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
 	m_globalCentreOfMass += m_veloc.Scale (timestep); 
-	dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
+	dgFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar();
 #ifdef _DEBUG
 	const dgFloat32 err = dgFloat32(90.0f * dgDEG2RAD);
 	const dgFloat32 err2 = err * err;

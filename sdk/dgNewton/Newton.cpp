@@ -2172,7 +2172,7 @@ void NewtonMaterialContactRotateTangentDirections(const NewtonMaterial* const ma
     	
 	dgVector dir1 (material->m_normal.CrossProduct(dir0));
 	dgAssert(dir1.m_w == dgFloat32(0.0f));
-	dFloat mag2 = dir1.DotProduct4(dir1).GetScalar();
+	dFloat mag2 = dir1.DotProduct(dir1).GetScalar();
 	if (mag2 > dgFloat32(1.0e-6f)) {
 		material->m_dir1 = dir1.Normalize();
 		material->m_dir0 = material->m_dir1.CrossProduct(material->m_normal);

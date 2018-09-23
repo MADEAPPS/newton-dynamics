@@ -1041,17 +1041,17 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 
 		dgVector deltaTime(timestep);
 		dgVector positStep(deltaTime * (body0->m_veloc - body1->m_veloc));
-		positStep = ((positStep.DotProduct4(positStep)) > m_velocTol) & positStep;
+		positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
 		contact->m_positAcc += positStep;
 
-		dgVector positError2(contact->m_positAcc.DotProduct4(contact->m_positAcc));
+		dgVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
 		if ((positError2 < m_linearContactError2).GetSignMask()) {
 			dgVector rotationStep(deltaTime * (body0->m_omega - body1->m_omega));
-			rotationStep = ((rotationStep.DotProduct4(rotationStep)) > m_velocTol) & rotationStep;
+			rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
 			contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion(dgFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
 
 			dgVector angle(contact->m_rotationAcc.m_q1, contact->m_rotationAcc.m_q2, contact->m_rotationAcc.m_q3, dgFloat32(0.0f));
-			dgVector rotatError2(angle.DotProduct4(angle));
+			dgVector rotatError2(angle.DotProduct(angle));
 			if ((rotatError2 < m_angularContactError2).GetSignMask()) {
 				return true;
 			}
@@ -1154,7 +1154,7 @@ bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const
 
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 			dgVector velRelative(body1->GetVelocity() - body0->GetVelocity());
-			if (velRelative.DotProduct4(velRelative).GetScalar() > dgFloat32(0.25f)) {
+			if (velRelative.DotProduct(velRelative).GetScalar() > dgFloat32(0.25f)) {
 				dgVector box0_p0;
 				dgVector box0_p1;
 				dgVector box1_p0;
@@ -1420,7 +1420,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 				if (body1->m_equilibrium) {
 					dgVector relVeloc (body0->m_veloc - body1->m_veloc);
 					dgVector relOmega (body0->m_omega - body1->m_omega);
-					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
+					dgVector mask2 ((relVeloc.DotProduct(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct(relOmega) < dgDynamicBody::m_equilibriumError2));
 
 					dgScopeSpinPause lock(&body1->m_criticalSectionLock);
 					body1->m_sleeping = false;
@@ -1432,7 +1432,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 				if (body0->m_equilibrium) {
 					dgVector relVeloc (body0->m_veloc - body1->m_veloc);
 					dgVector relOmega (body0->m_omega - body1->m_omega);
-					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
+					dgVector mask2 ((relVeloc.DotProduct(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct(relOmega) < dgDynamicBody::m_equilibriumError2));
 
 					dgScopeSpinPause lock(&body1->m_criticalSectionLock);
 					body0->m_sleeping = false;
@@ -1546,9 +1546,9 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
 
 					const dgVector velocLinear (veloc1 - veloc0);
-					const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct4(omega0)).GetScalar()) * maxDiameter0;
-					const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct4(omega1)).GetScalar()) * maxDiameter1;
-					const dgFloat32 speed = dgSqrt ((velocLinear.DotProduct4(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32 (0.5f);
+					const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct(omega0)).GetScalar()) * maxDiameter0;
+					const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct(omega1)).GetScalar()) * maxDiameter1;
+					const dgFloat32 speed = dgSqrt ((velocLinear.DotProduct(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32 (0.5f);
 					distance -= speed * timestep;
 					contact->m_separationDistance = distance;
 				}

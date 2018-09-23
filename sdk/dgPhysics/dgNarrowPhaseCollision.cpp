@@ -89,7 +89,7 @@ class dgCollisionContactCloud: public dgCollisionConvex
 		dgInt32 index = 0;
 		dgFloat32 dist = dgFloat32 (-1.0e10f);
 		for (dgInt32 i = 0; i < m_count; i ++) {
-			dgFloat32 dist1 = dir.DotProduct4(m_contacts[i].m_point).GetScalar();
+			dgFloat32 dist1 = dir.DotProduct(m_contacts[i].m_point).GetScalar();
 			if (dist1 > dist) {
 				index = i;
 				dist = dist1;
@@ -818,7 +818,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		}
 		controlDir0 = controlNormal.CrossProduct(tangDir);
 		dgAssert (controlDir0.m_w == dgFloat32 (0.0f));
-		dgAssert (controlDir0.DotProduct4(controlDir0).GetScalar() > dgFloat32 (1.0e-8f));
+		dgAssert (controlDir0.DotProduct(controlDir0).GetScalar() > dgFloat32 (1.0e-8f));
 		//controlDir0 = controlDir0.Scale (dgRsqrt (controlDir0.DotProduct3(controlDir0)));
 		controlDir0 = controlDir0.Normalize();
 		controlDir1 = controlNormal.CrossProduct(controlDir0);
@@ -1415,7 +1415,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 		contactOut[1].m_normal = contactSolver.GetNormal();
 		contactOut[1].m_point = proxy.m_closestPointBody1;
 
-		contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4(proxy.m_normal).GetScalar();
+		contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct(proxy.m_normal).GetScalar();
 		contactJoint->m_separationDistance = dgFloat32(0.0f);
 
 		instance0.m_material.m_userData = NULL;
@@ -1490,7 +1490,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 				case m_sphereCollision:
 				{
 					dgVector diff(instance0.GetGlobalMatrix().m_posit - instance1.GetGlobalMatrix().m_posit);
-					dgFloat32 mag2 = diff.DotProduct4(diff).GetScalar();
+					dgFloat32 mag2 = diff.DotProduct(diff).GetScalar();
 					if (mag2 < dgFloat32(1.0e-6f)) {
 						dgMatrix tmp(instance0.GetGlobalMatrix());
 						tmp.m_posit.m_x += dgFloat32(1.0e-3f);
@@ -1525,7 +1525,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 		if (contactJoint->m_isNewContact) {
 			contactJoint->m_isNewContact = false;
 			dgVector v((proxy.m_instance0->m_globalMatrix.m_posit - proxy.m_instance1->m_globalMatrix.m_posit) & dgVector::m_triplexMask);
-			dgFloat32 mag2 = v.DotProduct4(v).m_x;
+			dgFloat32 mag2 = v.DotProduct(v).m_x;
 			if (mag2 > dgFloat32(0.0f)) {
 				contactJoint->m_separtingVector = v.Scale(dgRsqrt(mag2));
 			} else {
@@ -1779,11 +1779,11 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	for (dgInt32 i = 0; i < count; i ++) {
 		const dgVector& p0 = contactOut[i].m_point;
 		for (dgInt32 j = i + 1; j < count; j ++) {
-			const dgFloat32 project = (contactOut[i].m_normal.DotProduct4(contactOut[j].m_normal)).GetScalar();
+			const dgFloat32 project = (contactOut[i].m_normal.DotProduct(contactOut[j].m_normal)).GetScalar();
 			contactsValid = contactsValid && (project > dgFloat32 (-0.5f));
 			const dgVector& p1 = contactOut[j].m_point;
 			const dgVector step (p1 - p0);
-			const dgFloat32 step2 = step.DotProduct4(step).GetScalar(); 
+			const dgFloat32 step2 = step.DotProduct(step).GetScalar(); 
 			if (step2 < dist2) {
 				if (project > dgFloat32 (0.999f)) {
 					count --;

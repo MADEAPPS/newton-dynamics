@@ -137,7 +137,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 		dgVector p01 (p0 - p1);
 		dgVector p12 (p1 - p2);
 		dgVector p23 (p2 - p3);
-		dgFloat32 volume = (p01.DotProduct4(p12.CrossProduct(p23))).GetScalar();
+		dgFloat32 volume = (p01.DotProduct(p12.CrossProduct(p23))).GetScalar();
 		if (volume < dgFloat32 (0.0f)) {
 			volume = -volume;
 			dgSwap(fem.m_index[0], fem.m_index[1]);
@@ -238,7 +238,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 
 
 
-	dgVector unitAccel(m_body->m_externalForce.CompProduct4(m_body->m_invMass.m_w));
+	dgVector unitAccel(m_body->m_externalForce * m_body->m_invMass.m_w);
 	dgVector deltaOmega(m_body->m_invWorldInertiaMatrix.RotateVector (m_body->m_externalTorque.Scale4 (timestep)));
 
 	m_body->m_alpha = dgVector::m_zero;
@@ -289,11 +289,11 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			dgVector area0123(p23.CrossProduct(p01));
 			dgVector area012(p12.CrossProduct(p01));
 
-			dgFloat32 volume = (p01.DotProduct4(area123)).GetScalar();
+			dgFloat32 volume = (p01.DotProduct(area123)).GetScalar();
 			dgVector deltaVolume(volume - fem.m_restVolume);
-			dgVector a0(deltaVolume.CompProduct4(area123));
-			dgVector a1(deltaVolume.CompProduct4(area0123));
-			dgVector a3(deltaVolume.CompProduct4(area012));
+			dgVector a0(deltaVolume * area123);
+			dgVector a1(deltaVolume * area0123);
+			dgVector a3(deltaVolume * area012);
 			dgAssert (a0.m_w == dgFloat32 (0.0f));
 			dgAssert (a1.m_w == dgFloat32 (0.0f));
 			dgAssert (a3.m_w == dgFloat32 (0.0f));
@@ -312,7 +312,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 
 			const dgVector p0p1 (dx[i]);
 			const dgVector v0v1 (dv[i]);
-			const dgVector length2(p0p1.DotProduct4(p0p1));
+			const dgVector length2(p0p1.DotProduct(p0p1));
 			const dgVector mask(length2 > m_smallestLenght2);
 
 			const dgVector lenght2 ((length2 & mask) | length2.AndNot(mask));
@@ -321,13 +321,13 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			const dgFloat32 lenghtRatio = restLenght[i] * den;
 			const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
 			const dgVector fs(p0p1.Scale4(kSpring * compression));
-			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
+			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct(p0p1)).GetScalar()));
 
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(p0p1.m_w == dgFloat32(0.0f));
 
-			dpdv[i] = p0p1.CompProduct4(v0v1);
+			dpdv[i] = p0p1 * v0v1;
 			accel[j0] -= (fs + fd);
 			accel[j1] += (fs + fd);
 
@@ -339,7 +339,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			const dgVector dv0 (dv[i]);
 			const dgVector A01(spring_A01[i]);
 			const dgVector B01(spring_B01[i]);
-			const dgVector dfdx (A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv[i])));
+			const dgVector dfdx (A01 * dv0 + B01 * dx[i] * dpdv[i]);
 
 			const dgInt32 j0 = links[i].m_m0;
 			const dgInt32 j1 = links[i].m_m1;
@@ -350,22 +350,22 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] += volumetricStiffness.CompProduct4(volumeAccel[i]);
-			dgVector normalDirAccel (normalDir[i].CompProduct4(accel[i].DotProduct4(normalDir[i])));
+			accel[i] += volumetricStiffness * volumeAccel[i];
+			dgVector normalDirAccel (normalDir[i] * accel[i].DotProduct(normalDir[i]));
 
-			//dgVector dirAccel1 (collisionDir1[i].CompProduct4(accel[i].DotProduct4(collisionDir1[i])));
-			//dgVector dirAccel2 (collisionDir2[i].CompProduct4(accel[i].DotProduct4(collisionDir2[i])));
+			//dgVector dirAccel1 (collisionDir1[i] * accel[i].DotProduct(collisionDir1[i]));
+			//dgVector dirAccel2 (collisionDir2[i] * accel[i].DotProduct(collisionDir2[i]));
 			//tmp0[i] = accel[i] + collidingAccel[i] - dirAccel0 - dirAccel1 - dirAccel2;
 			
-			dgVector tangentDir (veloc[i] - normalDir[i].CompProduct4(normalDir[i].DotProduct4(veloc[i])));
-			dgVector mag (tangentDir.DotProduct4(tangentDir) + epsilon);
+			dgVector tangentDir (veloc[i] - normalDir[i] * normalDir[i].DotProduct(veloc[i]));
+			dgVector mag (tangentDir.DotProduct(tangentDir) + epsilon);
 
-			dgFloat32 tangentFrictionAccel = dgAbs (accel[i].DotProduct4(normalDir[i]).GetScalar());
+			dgFloat32 tangentFrictionAccel = dgAbs (accel[i].DotProduct(normalDir[i]).GetScalar());
 			dgVector friction (tangentDir.Scale4 (frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt (mag.GetScalar())));
 
 			accel[i] += (normalAccel[i] - normalDirAccel - friction);
-			veloc[i] += accel[i].CompProduct4(dtRK4);
-			posit[i] += veloc[i].CompProduct4(dtRK4);
+			veloc[i] += accel[i] * dtRK4;
+			posit[i] += veloc[i] * dtRK4;
 		}
 	}
 */

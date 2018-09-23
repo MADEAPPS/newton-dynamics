@@ -133,8 +133,8 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 			const dgVector& axis = m_crossAxis[index];
 			dgAssert (axis.m_w == dgFloat32 (0.0f));
 			dgVector tmp (m_matrix.UnrotateVector(axis));
-			dgVector d (m_size.DotProduct4(tmp.Abs()) + m_padding);
-			dgVector c (origin.DotProduct4(axis));
+			dgVector d (m_size.DotProduct(tmp.Abs()) + m_padding);
+			dgVector c (origin.DotProduct(axis));
 			dgVector diff (c - d);
 			dgVector sum (c + d);
 			extends[index] = dgVector (diff.m_x, sum.m_x, diff.m_y, sum.m_y);
@@ -234,7 +234,7 @@ void dgCollisionCompound::dgNodeBase::SetBox (const dgVector& p0, const dgVector
 	dgAssert (m_p1.m_w == dgFloat32 (0.0f));
 	m_size = dgVector::m_half * (m_p1 - m_p0);
 	m_origin = dgVector::m_half * (m_p1 + m_p0);
-	m_area = m_size.DotProduct4(m_size.ShiftTripleRight()).m_x;
+	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
 }
 
 void dgCollisionCompound::dgNodeBase::CalculateAABB()
@@ -1371,7 +1371,7 @@ DG_INLINE dgFloat32 dgCollisionCompound::CalculateSurfaceArea (dgNodeBase* const
 	minBox = node0->m_p0.GetMin(node1->m_p0);
 	maxBox = node0->m_p1.GetMax(node1->m_p1);
 	dgVector side0 (dgVector::m_half * (maxBox - minBox));
-	return side0.DotProduct4(side0.ShiftTripleRight()).GetScalar();
+	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 }
 
 void dgCollisionCompound::ImproveNodeFitness (dgNodeBase* const node) const
@@ -2275,7 +2275,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 		p1 = nodeProxi.m_p1 * dgVector::m_half;
 		nodeProxi.m_size = p1 - p0;
 		nodeProxi.m_origin = p1 + p0;
-		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct4(nodeProxi.m_size).GetScalar();
+		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct(nodeProxi.m_size).GetScalar();
 
 		if (me->BoxTest (data, &nodeProxi)) {
 			if ((me->m_type == m_leaf) && treeNodeIsLeaf) {
@@ -2862,7 +2862,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 		p1 = nodeProxi.m_p1 * dgVector::m_half;
 		nodeProxi.m_size = p1 - p0;
 		nodeProxi.m_origin = p1 + p0;
-		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct4(nodeProxi.m_size).GetScalar();
+		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct(nodeProxi.m_size).GetScalar();
 
 		dgFloat32 dist = me->RayBoxDistance (data, myCompoundRay, otherTreedRay, &nodeProxi);
 		if (dist <= upperBound) {

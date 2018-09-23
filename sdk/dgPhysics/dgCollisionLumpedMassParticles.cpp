@@ -159,12 +159,12 @@ void dgCollisionLumpedMassParticles::SetOwnerAndMassPraperties (dgDynamicBody* c
 	body->m_invMass = dgVector(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), invMass);
 
 //	dgVector yySum(xxSum.ShiftTripleRight());
-//	dgVector com(xxSum.CompProduct4(den) + origin);
+//	dgVector com(xxSum * den + origin);
 //	dgVector pxx0(origin - com);
 //	dgVector pxy0(pxx0.ShiftTripleRight());
-//	dgVector Ixx(unitMass.CompProduct4(xxSum2 + xxSum.CompProduct4(pxx0.CompProduct4(dgVector::m_two))) + pxx0.CompProduct4(pxx0.Scale(m_body->m_mass.m_w)));
-//	dgVector Ixy(unitMass.CompProduct4(xySum + xxSum.CompProduct4(pxy0) + yySum.CompProduct4(pxx0)) + pxx0.CompProduct4(pxy0.Scale(m_body->m_mass.m_w)));
-//	dgVector com2(body->m_localCentreOfMass.CompProduct4(body->m_localCentreOfMass));
+//	dgVector Ixx(unitMass * (xxSum2 + xxSum * pxx0 * dgVector::m_two) + pxx0 * pxx0.Scale(m_body->m_mass.m_w));
+//	dgVector Ixy(unitMass * (xySum + xxSum * pxy0 + yySum * pxx0) + pxx0 * pxy0.Scale(m_body->m_mass.m_w));
+//	dgVector com2(body->m_localCentreOfMass * body->m_localCentreOfMass);
 }
 
 int dgCollisionLumpedMassParticles::GetCount() const
@@ -266,7 +266,7 @@ dgFloat32 dgCollisionLumpedMassParticles::CalculaleContactPenetration(const dgVe
 {
 	dgVector otherPoint (point);
 	otherPoint.m_y = dgFloat32 (0.0f);
-	dgFloat32 penetration = normal.DotProduct4(point - otherPoint).GetScalar();
+	dgFloat32 penetration = normal.DotProduct(point - otherPoint).GetScalar();
 	return penetration;
 }
 */
@@ -277,7 +277,7 @@ dgVector dgCollisionLumpedMassParticles::CalculateContactNormalAndPenetration(co
 	dgVector otherPoint(worldPosition);
 	otherPoint.m_y = dgFloat32(0.0f);
 	dgVector point(worldPosition - contactNormal.Scale (m_particleRadius));
-	contactNormal.m_w = contactNormal.DotProduct4(otherPoint - point).GetScalar();
+	contactNormal.m_w = contactNormal.DotProduct(otherPoint - point).GetScalar();
 
 	return contactNormal;
 }
@@ -321,12 +321,12 @@ xxx ++;
 					dgFloat32 penetration = dgClamp(contactNormal.m_w - DG_MINIMIM_ZERO_SURFACE, dgFloat32(0.0f), dgFloat32(0.125f));
 					dgFloat32 s = dgFloat32 (2.0f) * invTimeStep * penetration;
 					dgFloat32 a = -s * invTimeStep;
-					veloc[i] += normal.Scale (s - veloc[i].DotProduct4(normal).GetScalar());
+					veloc[i] += normal.Scale (s - veloc[i].DotProduct(normal).GetScalar());
 					//dgVector penetrationSpeed(invTimeStep.Scale(coeficientOfPenetration * penetration));
-					//dgVector normalSpeed(normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
+					//dgVector normalSpeed(normal.DotProduct(veloc[i] * dgVector::m_negOne));
 					//dgVector restoringSpeed(normalSpeed.GetMax(penetrationSpeed));
-					//dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
-					//accel1 = invTimeStep.CompProduct4(normalVelocity);
+					//dgVector normalVelocity(normal * restoringSpeed);
+					//accel1 = invTimeStep * normalVelocity;
 					accel1 = normal.Scale(a);
 					frictionCoef = coeficientOfFriction;
 				}

@@ -381,14 +381,14 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	dgAssert(0);
 /*
 	dgVector velocError (param.m_veloc1 - param.m_veloc0);
-	dgFloat32 relVeloc = velocError.DotProduct4(dir).GetScalar();
+	dgFloat32 relVeloc = velocError.DotProduct(dir).GetScalar();
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
 
 		dgVector positError (param.m_posit1 - param.m_posit0);
-		dgFloat32 relPosit = positError.DotProduct4(dir).GetScalar();
+		dgFloat32 relPosit = positError.DotProduct(dir).GetScalar();
 
 		//dgVector centrError (param.m_centripetal1 - param.m_centripetal0);
-		//dgFloat32 relCentr = centrError.DotProduct4(dir).GetScalar(); 
+		//dgFloat32 relCentr = centrError.DotProduct(dir).GetScalar(); 
 		//relCentr = dgClamp (relCentr, dgFloat32(-100000.0f), dgFloat32(100000.0f));
 
 		const dgVector& bodyVeloc0 = m_body0->m_veloc;

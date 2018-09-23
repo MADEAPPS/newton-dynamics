@@ -123,7 +123,7 @@ DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVect
 	dgAssert(maxBox.m_z >= minBox.m_z);
 	dgVector mask ((minBox * maxBox) > dgVector::m_zero);
 	dgVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
-	return dist.DotProduct4(dist).GetScalar();
+	return dist.DotProduct(dist).GetScalar();
 }
 
 
@@ -142,7 +142,7 @@ class dgFastRayTest
 		dgAssert(m_p1.m_w == dgFloat32(0.0f));
 		dgAssert(m_diff.m_w == dgFloat32(0.0f));
 
-		dgAssert (m_diff.DotProduct4(m_diff).GetScalar() > dgFloat32 (0.0f));
+		dgAssert (m_diff.DotProduct(m_diff).GetScalar() > dgFloat32 (0.0f));
 		m_isParallel = (m_diff.Abs() < dgVector(1.0e-8f));
 		m_dpInv = (((dgVector(dgFloat32(1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc()) & dgVector::m_triplexMask;
 		m_unitDir = m_diff.Normalize();
@@ -314,13 +314,13 @@ class dgFastAABBInfo: public dgObb
 			dist0 = (dist1 > dgFloat32 (0.0f)) ? dgMax (dist0, dist1) : dgFloat32 (0.0f);
 			if (dist0 <= dgFloat32(0.0f)) {
 				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask2));
-				dist2 = p1p0.DotProduct4(p1p0);
+				dist2 = p1p0.DotProduct(p1p0);
 				dist2 = dist2.Sqrt() * dgVector::m_negOne;
 				dist0 = dist2.GetScalar();
 			}
 		} else {
 			dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
-			dist = p1p0.DotProduct4(p1p0);
+			dist = p1p0.DotProduct(p1p0);
 			dist = dist.Sqrt() * dgVector::m_negOne;
 			dist0 = dist.GetScalar();
 		}
@@ -371,7 +371,7 @@ class dgFastAABBInfo: public dgObb
 
 		faceMatrix[0] = faceNormal;
 		faceMatrix[1] = dgVector (&vertexArray[indexArray[1] * stride]) - origin;
-		//faceMatrix[1] = faceMatrix[1] * (faceMatrix[1].DotProduct4(faceMatrix[1]).InvSqrt());
+		//faceMatrix[1] = faceMatrix[1] * (faceMatrix[1].DotProduct(faceMatrix[1]).InvSqrt());
 		faceMatrix[1] = faceMatrix[1].Normalize();
 		faceMatrix[2] = faceMatrix[0].CrossProduct(faceMatrix[1]);
 		faceMatrix[3] = origin | dgVector::m_wOne; 

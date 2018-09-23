@@ -100,12 +100,12 @@ DG_INLINE dgPlane dgPlane::Scale (dgFloat32 s)	const
 
 DG_INLINE dgFloat32 dgPlane::Evalue (const dgFloat32* const point) const
 {
-	return DotProduct4 (dgVector (point) | m_wOne).GetScalar();
+	return DotProduct (dgVector (point) | m_wOne).GetScalar();
 }
 
 DG_INLINE dgFloat32 dgPlane::Evalue (const dgVector& point) const
 {
-	return DotProduct4 ((point & m_triplexMask) | m_wOne).GetScalar();
+	return DotProduct ((point & m_triplexMask) | m_wOne).GetScalar();
 }
 #endif
 

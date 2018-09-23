@@ -363,9 +363,9 @@ class dgTetraIsoSufaceStuffing
 
 			const dgBigVector e10(p1 - p0);
 			const dgBigVector e20(p2 - p0);
-			const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();
-			const dgFloat64 a11 = e20.DotProduct4(e20).GetScalar();
-			const dgFloat64 a01 = e10.DotProduct4(e20).GetScalar();
+			const dgFloat64 a00 = e10.DotProduct(e10).GetScalar();
+			const dgFloat64 a11 = e20.DotProduct(e20).GetScalar();
+			const dgFloat64 a01 = e10.DotProduct(e20).GetScalar();
 
 			const dgFloat64 det = a00 * a11 - a01 * a01;
 			dgAssert(det >= dgFloat32(0.0f));
@@ -376,8 +376,8 @@ class dgTetraIsoSufaceStuffing
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
 					dgBigVector point(point0 + (point1 - point0).Scale(t));
 					dgBigVector variPoint(point - p0);	
-					const dgFloat64 b0 = e10.DotProduct4(variPoint).GetScalar();
-					const dgFloat64 b1 = e20.DotProduct4(variPoint).GetScalar();
+					const dgFloat64 b0 = e10.DotProduct(variPoint).GetScalar();
+					const dgFloat64 b1 = e20.DotProduct(variPoint).GetScalar();
 
 					dgFloat64 beta = b1 * a00 - a01 * b0;
 					dgFloat64 alpha = b0 * a11 - a01 * b1;
@@ -405,9 +405,9 @@ class dgTetraIsoSufaceStuffing
 
 			const dgBigVector e10(p1 - p0);
 			const dgBigVector e20(p2 - p0);
-			const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();
-			const dgFloat64 a11 = e20.DotProduct4(e20).GetScalar();
-			const dgFloat64 a01 = e10.DotProduct4(e20).GetScalar();
+			const dgFloat64 a00 = e10.DotProduct(e10).GetScalar();
+			const dgFloat64 a11 = e20.DotProduct(e20).GetScalar();
+			const dgFloat64 a01 = e10.DotProduct(e20).GetScalar();
 
 			const dgFloat64 det = a00 * a11 - a01 * a01;
 			dgAssert(det >= dgFloat32(0.0f));
@@ -418,8 +418,8 @@ class dgTetraIsoSufaceStuffing
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
 					dgBigVector point(point0 + (point1 - point0).Scale(t));
 					dgBigVector variPoint(point - p0);
-					const dgFloat64 b0 = e10.DotProduct4(variPoint).GetScalar();
-					const dgFloat64 b1 = e20.DotProduct4(variPoint).GetScalar();
+					const dgFloat64 b0 = e10.DotProduct(variPoint).GetScalar();
+					const dgFloat64 b1 = e20.DotProduct(variPoint).GetScalar();
 
 					dgFloat64 beta = b1 * a00 - a01 * b0;
 					dgFloat64 alpha = b0 * a11 - a01 * b1;
@@ -1155,28 +1155,28 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 			const dgBigVector e20(q2 - q0);
 			const dgBigVector e30(q3 - q0);
 
-			dgAssert (e10.DotProduct4(e10).GetScalar() > dgFloat32 (0.0f));
-			const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
+			dgAssert (e10.DotProduct(e10).GetScalar() > dgFloat32 (0.0f));
+			const dgFloat64 d0 = sqrt(e10.DotProduct(e10).GetScalar());
 			const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
-			const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
-			const dgFloat64 l20 = e30.DotProduct4(e10).GetScalar() * invd0;
+			const dgFloat64 l10 = e20.DotProduct(e10).GetScalar() * invd0;
+			const dgFloat64 l20 = e30.DotProduct(e10).GetScalar() * invd0;
 
-			dgAssert ((e20.DotProduct4(e20).GetScalar() - l10 * l10) > dgFloat32 (0.0f));
-			const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
+			dgAssert ((e20.DotProduct(e20).GetScalar() - l10 * l10) > dgFloat32 (0.0f));
+			const dgFloat64 desc11 = e20.DotProduct(e20).GetScalar() - l10 * l10;
 
 			const dgFloat64 d1 = sqrt(desc11);
 			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
-			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
-			dgAssert (e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21 > dgFloat32 (0.0f));
-			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
+			const dgFloat64 l21 = (e30.DotProduct(e20).GetScalar() - l20 * l10) * invd1;
+			dgAssert (e30.DotProduct(e30).GetScalar() - l20 * l20 - l21 * l21 > dgFloat32 (0.0f));
+			const dgFloat64 desc22 = e30.DotProduct(e30).GetScalar() - l20 * l20 - l21 * l21;
 
 			dgBigVector p0Point(p - q0);
 			const dgFloat64 d2 = sqrt(desc22);
 			const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
 
-			const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
-			const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
-			const dgFloat64 b2 = e30.DotProduct4(p0Point).GetScalar();
+			const dgFloat64 b0 = e10.DotProduct(p0Point).GetScalar();
+			const dgFloat64 b1 = e20.DotProduct(p0Point).GetScalar();
+			const dgFloat64 b2 = e30.DotProduct(p0Point).GetScalar();
 
 			dgFloat64 u1 = b0 * invd0;
 			dgFloat64 u2 = (b1 - l10 * u1) * invd1;

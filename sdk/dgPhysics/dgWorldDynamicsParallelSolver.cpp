@@ -821,8 +821,8 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 				body->m_veloc += velocStep;
 				body->m_omega += omegaStep;
 			} else {
-				const dgVector velocStep2(velocStep.DotProduct4(velocStep));
-				const dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
+				const dgVector velocStep2(velocStep.DotProduct(velocStep));
+				const dgVector omegaStep2(omegaStep.DotProduct(omegaStep));
 				const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dgVector::m_negOne);
 				const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 				body->m_resting &= equilibrium;

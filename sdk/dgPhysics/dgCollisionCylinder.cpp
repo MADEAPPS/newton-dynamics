@@ -215,7 +215,7 @@ dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const
 	} else {
 		dgVector dir_yz (dir);
 		dir_yz.m_x = dgFloat32 (0.0f);
-		dgFloat32 mag2 = dir_yz.DotProduct4(dir_yz).GetScalar();
+		dgFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
 		dgAssert (mag2 > dgFloat32 (0.0f));
 		dir_yz = dir_yz.Scale (dgFloat32 (1.0f) / dgSqrt (mag2));
 		dgVector p0 (dir_yz.Scale (m_radio0));
@@ -224,8 +224,8 @@ dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const
 		p0.m_x = -m_height;
 		p1.m_x =  m_height;
 
-		dgFloat32 dist0 = dir.DotProduct4(p0).GetScalar();
-		dgFloat32 dist1 = dir.DotProduct4(p1).GetScalar();
+		dgFloat32 dist0 = dir.DotProduct(p0).GetScalar();
+		dgFloat32 dist1 = dir.DotProduct(p1).GetScalar();
 
 		if (dist1 >= dist0) {
 			p0 = p1;
@@ -247,7 +247,7 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgFloat
 	} else {
 		dgVector dir_yz(dir);
 		dir_yz.m_x = dgFloat32(0.0f);
-		dgFloat32 mag2 = dir_yz.DotProduct4(dir_yz).GetScalar();
+		dgFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
 		dgAssert (mag2 > dgFloat32 (0.0f));
 		dir_yz = dir_yz.Scale(dgFloat32(1.0f) / dgSqrt(mag2));
 		dgVector p0(dir_yz.Scale(m_radio0 - thickness));
@@ -256,8 +256,8 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgFloat
 		p0.m_x = - (m_height - thickness);
 		p1.m_x =   m_height - thickness;
 
-		dgFloat32 dist0 = dir.DotProduct4(p0).GetScalar();
-		dgFloat32 dist1 = dir.DotProduct4(p1).GetScalar();
+		dgFloat32 dist0 = dir.DotProduct(p0).GetScalar();
+		dgFloat32 dist1 = dir.DotProduct(p1).GetScalar();
 
 		if (dist1 >= dist0) {
 			p0 = p1;
@@ -379,13 +379,13 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 
 		count = 0;
 		int i0 = 3;
-		dgVector test0((m_profile[i0] - origin1).DotProduct4(normal1));
+		dgVector test0((m_profile[i0] - origin1).DotProduct(normal1));
 		for (int i = 0; (i < 4) && (count < 2); i++) {
-			dgVector test1((m_profile[i] - origin1).DotProduct4(normal1));
+			dgVector test1((m_profile[i] - origin1).DotProduct(normal1));
 			dgVector acrossPlane(test0 * test1);
 			if (acrossPlane.m_x < 0.0f) {
 				dgVector step(m_profile[i] - m_profile[i0]);
-				contactsOut[count] = m_profile[i0] - step.Scale(test0.m_x / (step.DotProduct4(normal1).m_x));
+				contactsOut[count] = m_profile[i0] - step.Scale(test0.m_x / (step.DotProduct(normal1).m_x));
 				count++;
 			}
 			i0 = i;

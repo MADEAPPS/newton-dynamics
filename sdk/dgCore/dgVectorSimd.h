@@ -187,7 +187,7 @@ class dgVector
 			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1))));
 	}
 
-	DG_INLINE dgVector DotProduct4(const dgVector& A) const
+	DG_INLINE dgVector DotProduct(const dgVector& A) const
 	{
 		return (*this * A).AddHorizontal();
 	}
@@ -292,20 +292,19 @@ class dgVector
 	DG_INLINE dgVector InvSqrt () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
-		//return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
 		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
 	}
 
 	DG_INLINE dgVector InvMagSqrt () const
 	{
-		return DotProduct4(*this).InvSqrt();
+		return DotProduct(*this).InvSqrt();
 	}
 
 	DG_INLINE dgVector Normalize () const
 	{
 		dgAssert (m_w == dgFloat32 (0.0f));
 		// somehow this function changes the behavior with 3.13
-		//return Scale(dgFloat32 (1.0f) / dgSqrt(DotProduct4(*this).GetScalar()));
+		//return Scale(dgFloat32 (1.0f) / dgSqrt(DotProduct(*this).GetScalar()));
 		return *this * InvMagSqrt ();
 	}
 
@@ -645,7 +644,7 @@ class dgBigVector
 	DG_INLINE dgBigVector Normalize() const
 	{
 		dgAssert (m_w == dgFloat32 (0.0f));
-		dgFloat64 mag2 = DotProduct4(*this).GetScalar();
+		dgFloat64 mag2 = DotProduct(*this).GetScalar();
 		return Scale(dgFloat64 (1.0f) / sqrt (mag2));
 	}
 
@@ -768,7 +767,7 @@ class dgBigVector
 	}
 
 	// return dot 4d dot product
-	DG_INLINE dgBigVector DotProduct4(const dgBigVector &A) const
+	DG_INLINE dgBigVector DotProduct(const dgBigVector &A) const
 	{
 		dgFloat64 val(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 		return dgBigVector(val, val, val, val);

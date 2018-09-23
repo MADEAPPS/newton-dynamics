@@ -103,7 +103,7 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 		m_p1 = p1;
 		m_size = m_p1 - m_p0;
 		m_origin = (m_p1 + m_p0) * dgVector::m_half;
-		m_area = m_size.DotProduct4(m_size.ShiftTripleRight()).m_x;
+		m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
 	}
 
 	DG_INLINE static dgFloat32 CalculateSurfaceArea (dgNodeBuilder* const node0, dgNodeBuilder* const node1, dgVector& minBox, dgVector& maxBox)
@@ -114,7 +114,7 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 		dgVector side0 ((maxBox - minBox) * dgVector::m_half);
 		//dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
 		dgVector side1 (side0.ShiftTripleLeft());
-		return side0.DotProduct4(side1).GetScalar();
+		return side0.DotProduct(side1).GetScalar();
 	}
 
 	dgVector m_p0;

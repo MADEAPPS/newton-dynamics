@@ -421,8 +421,6 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend2d(const dgVector& p0, 
 
 	//dgVector elevationPadding (dgVector(dgFloat32(1.0e10f)).AndNot(m_yMask));
 	dgVector invScale (m_horizontalScaleInv_x, dgFloat32 (0.0f), m_horizontalScaleInv_z, dgFloat32 (0.0f));
-	//boxP0 = ((q0.CompProduct4(invScale).Floor().CompProduct4(scale) & m_yMask) - elevationPadding) & dgVector::m_triplexMask;
-	//boxP1 = (((q1.CompProduct4(invScale).Floor().CompProduct4(scale) + scale) & m_yMask) + elevationPadding) & dgVector::m_triplexMask;
 	boxP0 = (((q0 * invScale).Floor() * scale)         & m_yMask) - m_elevationPadding;
 	boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + m_elevationPadding;
 	dgAssert (boxP0.m_w == dgFloat32 (0.0f));
@@ -447,8 +445,6 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend3d(const dgVector& p0, 
 	dgVector q1(p0.GetMax(p1) + scale + m_padding);
 
 	dgVector invScale(m_horizontalScaleInv_x, dgFloat32(0.0f), m_horizontalScaleInv_z, dgFloat32(0.0f));
-	//boxP0 = (q0.CompProduct4(invScale).Floor().CompProduct4(scale) & m_yMask) + q0.AndNot(m_yMask);
-	//boxP1 = ((q1.CompProduct4(invScale).Floor().CompProduct4(scale) + scale) & m_yMask) + q1.AndNot(m_yMask);
 	boxP0 = (((q0 * invScale).Floor() * scale        ) & m_yMask) + q0.AndNot(m_yMask);
 	boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + q1.AndNot(m_yMask);
 
@@ -737,7 +733,7 @@ dgVector dgCollisionHeightField::SupportVertex (const dgVector& dir, dgInt32* co
 			dgFloat32 zVal = m_horizontalScale_z * z;
 			for (dgInt32 x = 0; x < m_width; x ++) {
 				dgVector p (m_horizontalScale_x * x, m_verticalScale * elevation[base + x], zVal, dgFloat32 (0.0f));
-				dgFloat32 project = dir.DotProduct4(p).m_x;
+				dgFloat32 project = dir.DotProduct(p).m_x;
 				if (project > maxProject) {
 					maxProject = project;
 					support = p;
@@ -752,7 +748,7 @@ dgVector dgCollisionHeightField::SupportVertex (const dgVector& dir, dgInt32* co
 			dgFloat32 zVal = m_horizontalScale_z * z;
 			for (dgInt32 x = 0; x < m_width; x ++) {
 				dgVector p (m_horizontalScale_x * x, m_verticalScale * elevation[base + x], zVal, dgFloat32 (0.0f));
-				dgFloat32 project = dir.DotProduct4(p).m_x;
+				dgFloat32 project = dir.DotProduct(p).m_x;
 				if (project > maxProject) {
 					maxProject = project;
 					support = p;

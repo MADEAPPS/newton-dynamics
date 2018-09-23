@@ -227,7 +227,7 @@ dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point,
 {
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);
-	dgAssert(dgAbs((dir.DotProduct4(dir).GetScalar() - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbs((dir.DotProduct(dir).GetScalar() - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
 	return point + dir.Scale (DG_PENETRATION_TOL);
 }
 
@@ -338,14 +338,14 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 		dgInt32 edgeIndex;
 		support[0] = SupportVertex (normal, &edgeIndex);
 
-		dgFloat32 dist = normal.DotProduct4(support[0] - point).GetScalar();
+		dgFloat32 dist = normal.DotProduct(support[0] - point).GetScalar();
 		if (dist <= DG_PENETRATION_TOL) {
 			dgVector normalAlgin (normal.Abs());
 			if (!((normalAlgin.m_x > dgFloat32 (0.9999f)) || (normalAlgin.m_y > dgFloat32 (0.9999f)) || (normalAlgin.m_z > dgFloat32 (0.9999f)))) {
 				// 0.25 degrees
 				const dgFloat32 tiltAngle = dgFloat32 (0.005f);
 				const dgFloat32 tiltAngle2 = tiltAngle * tiltAngle ;
-				dgPlane testPlane (normal, - (normal.DotProduct4(support[0]).GetScalar()));
+				dgPlane testPlane (normal, - (normal.DotProduct(support[0]).GetScalar()));
 
 				featureCount = 1;
 				const dgConvexSimplexEdge* const edge = vertToEdgeMapping[edgeIndex];
@@ -354,7 +354,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 					const dgVector& p = m_vertex[ptr->m_twin->m_vertex];
 					dgFloat32 test1 = testPlane.Evalue(p);
 					dgVector dist1 (p - support[0]);
-					dgFloat32 angle2 = test1 * test1 / (dist1.DotProduct4(dist1).GetScalar());
+					dgFloat32 angle2 = test1 * test1 / (dist1.DotProduct(dist1).GetScalar());
 					if (angle2 < tiltAngle2) {
 						support[featureCount] = p;
 						featureCount ++;
@@ -370,15 +370,15 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	{
 		case 1:
 		{
-			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - point);
+			contactsOut[0] = support[0] - normal * normal.DotProduct(support[0] - point);
 			count = 1;
 			break;
 		}
 
 		case 2:
 		{
-			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - point);
-			contactsOut[1] = support[1] - normal * normal.DotProduct4(support[1] - point);
+			contactsOut[0] = support[0] - normal * normal.DotProduct(support[0] - point);
+			contactsOut[1] = support[1] - normal * normal.DotProduct(support[1] - point);
 			count = 2;
 			break;
 		}
@@ -387,10 +387,10 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 		{
 			dgFloat32 test[8];
 			dgAssert(normal.m_w == dgFloat32(0.0f));
-			dgPlane plane(normal, -(normal.DotProduct4(point).GetScalar()));
+			dgPlane plane(normal, -(normal.DotProduct(point).GetScalar()));
 			for (dgInt32 i = 0; i < 8; i++) {
 				dgAssert(m_vertex[i].m_w == dgFloat32(0.0f));
-				test[i] = plane.DotProduct4(m_vertex[i] | dgVector::m_wOne).m_x;
+				test[i] = plane.DotProduct(m_vertex[i] | dgVector::m_wOne).m_x;
 			}
 
 			dgConvexSimplexEdge* edge = NULL;
@@ -434,7 +434,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 					ptr = edge;
 					do {
 						dgVector dp (m_vertex[ptr->m_twin->m_vertex] - m_vertex[ptr->m_vertex]);
-						dgFloat32 t = plane.DotProduct4(dp).m_x;
+						dgFloat32 t = plane.DotProduct(dp).m_x;
 						if (t >= dgFloat32 (-1.e-24f)) {
 							t = dgFloat32 (0.0f);
 						} else {

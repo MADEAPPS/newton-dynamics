@@ -76,13 +76,13 @@ void dgCollisionCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 hei
 	for (int i = 0; i < 16; i ++) {
 		dgVector p1p0 (m_p1 - m_p0);
 		dgVector dir(side.CrossProduct(p1p0));
-		dir = dir.Scale(dgFloat32 (1.0f) / dgSqrt(dir.DotProduct4(dir).GetScalar()));
+		dir = dir.Scale(dgFloat32 (1.0f) / dgSqrt(dir.DotProduct(dir).GetScalar()));
 		dgVector support0(dir.Scale(m_radio0));
 		dgVector support1(dir.Scale(m_radio1));
 		support0.m_x -= m_height;
 		support1.m_x += m_height;
-		dgFloat32 distance0 = support0.DotProduct4(dir).GetScalar();
-		dgFloat32 distance1 = support1.DotProduct4(dir).GetScalar();
+		dgFloat32 distance0 = support0.DotProduct(dir).GetScalar();
+		dgFloat32 distance1 = support1.DotProduct(dir).GetScalar();
 
 		if (distance1 > distance0) {
 			m_p1 = support1;
@@ -349,8 +349,8 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 	dgVector p1(dir.Scale (m_radio1));
 	p0.m_x -= m_height;
 	p1.m_x += m_height;
-	dgFloat32 dir0 = p0.DotProduct4(dir).GetScalar();
-	dgFloat32 dir1 = p1.DotProduct4(dir).GetScalar();
+	dgFloat32 dir0 = p0.DotProduct(dir).GetScalar();
+	dgFloat32 dir1 = p1.DotProduct(dir).GetScalar();
 	if (dir1 > dir0) {
 		p0 = p1;
 	}
@@ -366,8 +366,8 @@ dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgF
 	dgVector p1(dir.Scale(m_radio1 - m_radio0));
 	p0.m_x -= m_height;
 	p1.m_x += m_height;
-	dgFloat32 dir0 = p0.DotProduct4(dir).GetScalar();
-	dgFloat32 dir1 = p1.DotProduct4(dir).GetScalar();
+	dgFloat32 dir0 = p0.DotProduct(dir).GetScalar();
+	dgFloat32 dir1 = p1.DotProduct(dir).GetScalar();
 	if (dir1 > dir0) {
 		p0 = p1;
 	}
@@ -418,7 +418,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgInt32 count = 0;
 	dgVector p0 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir0 (p0 - origin);
-	dgFloat32 dist0 = dir0.DotProduct4(normal).GetScalar();
+	dgFloat32 dist0 = dir0.DotProduct(normal).GetScalar();
 	if ((dist0 * dist0 - dgFloat32 (5.0e-5f)) < (m_radio0 * m_radio0)) {
 		contactsOut[count] = m_transform * (p0 - normal.Scale (dist0));
 		count ++;
@@ -426,7 +426,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 
 	dgVector p1 (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir1 (p1 - origin);
-	dgFloat32 dist1 = dir1.DotProduct4(normal).GetScalar();
+	dgFloat32 dist1 = dir1.DotProduct(normal).GetScalar();
 	if ((dist1 * dist1 - dgFloat32 (5.0e-5f)) < (m_radio1 * m_radio1)) {
 		contactsOut[count] = m_transform * (p1 - normal.Scale (dist1));
 		count ++;
@@ -448,14 +448,14 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 			dgVector q (q0 + (q1 - q0).Scale (t0));
 			dgVector n(q - origin0);
 			dgAssert(n.m_w == dgFloat32(0.0f));
-			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct(n).InvSqrt();
 			contactOut.m_normal = m_transform * n.Normalize();
 			return t0;
 		} else {
 			dgVector q (q0 + (q1 - q0).Scale (t1));
 			dgVector n(q - origin1);
 			dgAssert(n.m_w == dgFloat32(0.0f));
-			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct(n).InvSqrt();
 			contactOut.m_normal = m_transform * n.Normalize();
 			return t1;
 		}
@@ -464,7 +464,7 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 		if (q.m_x >= m_p1.m_x) {
 			dgVector n (q - origin1); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));
-			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct(n).InvSqrt();
 			contactOut.m_normal = m_transform * n.Normalize();
 			return t1;
 		}
@@ -473,7 +473,7 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 		if (q.m_x <= m_p0.m_x) {
 			dgVector n (q - origin0); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));
-			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
+			//contactOut.m_normal = m_transform * n * n.DotProduct(n).InvSqrt();
 			contactOut.m_normal = m_transform * n.Normalize();
 			return t0;
 		}

@@ -100,7 +100,7 @@ class dgBroadPhaseNode
 		dgAssert(m_maxBox.m_w == dgFloat32(0.0f));
 
 		dgVector side0(m_maxBox - m_minBox);
-		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
+		m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
 	}
 
 	virtual dgBody* GetBody() const
@@ -191,7 +191,7 @@ class dgBroadPhaseTreeNode: public dgBroadPhaseNode
 		m_minBox = left->m_minBox.GetMin(right->m_minBox);
 		m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
 		dgVector side0(m_maxBox - m_minBox);
-		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
+		m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
 	}
 
 	virtual ~dgBroadPhaseTreeNode()
@@ -470,7 +470,7 @@ class dgBroadPhase
 		minBox = node0->m_minBox.GetMin(node1->m_minBox);
 		maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
 		dgVector side0(maxBox - minBox);
-		return side0.DotProduct4(side0.ShiftTripleRight()).GetScalar();
+		return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 	}
 
 	dgWorld* GetWorld() const { return m_world;}

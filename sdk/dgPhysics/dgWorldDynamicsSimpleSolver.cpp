@@ -102,8 +102,8 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 				if (equilibrium) {
 					dgVector veloc (body->m_veloc * forceDampVect);
 					dgVector omega = body->m_omega * forceDampVect;
-					body->m_veloc = (veloc.DotProduct4(veloc) > m_velocTol) & veloc;
-					body->m_omega = (omega.DotProduct4(omega) > m_velocTol) & omega;
+					body->m_veloc = (veloc.DotProduct(veloc) > m_velocTol) & veloc;
+					body->m_omega = (omega.DotProduct(omega) > m_velocTol) & omega;
 
 				}
 				body->m_equilibrium = equilibrium ? 1 : 0;
@@ -268,7 +268,7 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 										dgVector vel1 (veloc1 + omega1.CrossProduct(contactMaterial->m_point - com1));
 										dgVector vRel (vel0 - vel1);
 										dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
-										dgFloat32 speed = vRel.DotProduct4(contactMaterial->m_normal).m_w;
+										dgFloat32 speed = vRel.DotProduct(contactMaterial->m_normal).m_w;
 										isColliding |= (speed < dgFloat32 (0.0f));
 									}
 								}
@@ -361,7 +361,7 @@ void dgWorldDynamicUpdate::CalculateNetAcceleration(dgBody* const body, const dg
 	// the initial velocity and angular velocity were stored in m_accel and body->m_alpha for memory saving
 	dgVector accel (invTimeStep * (body->m_veloc - body->m_accel));
 	dgVector alpha (invTimeStep * (body->m_omega - body->m_alpha));
-	dgVector accelTest((accel.DotProduct4(accel) > maxAccNorm2) | (alpha.DotProduct4(alpha) > maxAccNorm2));
+	dgVector accelTest((accel.DotProduct(accel) > maxAccNorm2) | (alpha.DotProduct(alpha) > maxAccNorm2));
 	accel = accel & accelTest;
 	alpha = alpha & accelTest;
 
@@ -640,7 +640,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	dgAssert(omega.m_w == dgFloat32(0.0f));
 
 	// integrate rotation here
-	dgFloat32 omegaMag2 = omega.DotProduct4(omega).GetScalar() + dgFloat32(1.0e-12f);
+	dgFloat32 omegaMag2 = omega.DotProduct(omega).GetScalar() + dgFloat32(1.0e-12f);
 	dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
 	dgVector omegaAxis(omega.Scale(invOmegaMag));
 	dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
@@ -776,8 +776,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 //}
 
 					} else {
-						const dgVector velocStep2(velocStep.m_linear.DotProduct4(velocStep.m_linear));
-						const dgVector omegaStep2(velocStep.m_angular.DotProduct4(velocStep.m_angular));
+						const dgVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+						const dgVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
 						const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dgVector::m_negOne);
 						const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 						body->m_resting &= equilibrium;

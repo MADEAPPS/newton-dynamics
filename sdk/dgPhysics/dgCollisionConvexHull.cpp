@@ -783,8 +783,8 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 		dgVector leftP (leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dgFloat32 (0.0f));
 		dgVector rightP (rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dgFloat32 (0.0f));
 
-		dgFloat32 leftDist = leftP.DotProduct4(dir).m_x;
-		dgFloat32 rightDist = rightP.DotProduct4(dir).m_x;
+		dgFloat32 leftDist = leftP.DotProduct(dir).m_x;
+		dgFloat32 rightDist = rightP.DotProduct(dir).m_x;
 		if (rightDist >= leftDist) {
 			distPool[0] = leftDist;
 			stackPool[0] = &leftBox; 
@@ -815,8 +815,8 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 					dgVector leftBoxP (leftBox1.m_box[ix][0], leftBox1.m_box[iy][1], leftBox1.m_box[iz][2], dgFloat32 (0.0f));
 					dgVector rightBoxP (rightBox1.m_box[ix][0], rightBox1.m_box[iy][1], rightBox1.m_box[iz][2], dgFloat32 (0.0f));
 
-					dgFloat32 leftBoxDist = leftBoxP.DotProduct4(dir).m_x;
-					dgFloat32 rightBoxDist = rightBoxP.DotProduct4(dir).m_x;
+					dgFloat32 leftBoxDist = leftBoxP.DotProduct(dir).m_x;
+					dgFloat32 rightBoxDist = rightBoxP.DotProduct(dir).m_x;
 					if (rightBoxDist >= leftBoxDist) {
 						distPool[stack] = leftBoxDist;
 						stackPool[stack] = &leftBox1; 
@@ -848,7 +848,7 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 						dgAssert (p.m_y <= box.m_box[1].m_y);
 						dgAssert (p.m_z >= box.m_box[0].m_z);
 						dgAssert (p.m_z <= box.m_box[1].m_z);
-						dgVector projectionDist (p.DotProduct4(dir));
+						dgVector projectionDist (p.DotProduct(dir));
 						dgVector mask (projectionDist > maxProj);
 						dgInt32 intMask = *((dgInt32*) &mask.m_x);
 						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
@@ -860,7 +860,7 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 	} else {
 		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
 			const dgVector& p = m_vertex[i];
-			dgVector dist (p.DotProduct4(dir));
+			dgVector dist (p.DotProduct(dir));
 			dgVector mask (dist > maxProj);
 			dgInt32 intMask = *((dgInt32*) &mask.m_x);
 			index = (i & intMask) | (index & ~intMask);

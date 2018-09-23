@@ -143,7 +143,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				dist = dist.GetMin(dist1);
 			} else {
 				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
-				dist = p1p0.DotProduct4(p1p0);
+				dist = p1p0.DotProduct(p1p0);
 				dist = dist.Sqrt() * dgVector::m_negOne;
 			}
 			return	dist.GetScalar();

@@ -231,13 +231,13 @@ bool dgDynamicBody::IsInEquilibrium() const
 	if (m_equilibrium) {
 		dgVector deltaAccel((m_externalForce - m_savedExternalForce).Scale(m_invMass.m_w));
 		dgAssert(deltaAccel.m_w == 0.0f);
-		dgFloat32 deltaAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
+		dgFloat32 deltaAccel2 = deltaAccel.DotProduct(deltaAccel).GetScalar();
 		if (deltaAccel2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
 		dgVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque) * m_invMass);
 		dgAssert(deltaAlpha.m_w == 0.0f);
-		dgFloat32 deltaAlpha2 = deltaAlpha.DotProduct4(deltaAlpha).GetScalar();
+		dgFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
 		if (deltaAlpha2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
@@ -459,7 +459,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 				// integrate rotation here
 				dgAssert(m_veloc.m_w == dgFloat32(0.0f));
 				dgAssert(m_omega.m_w == dgFloat32(0.0f));
-				dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar() + dgFloat32 (1.0e-12f);;
+				dgFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar() + dgFloat32 (1.0e-12f);;
 					dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
 					dgVector omegaAxis(m_omega.Scale(invOmegaMag));
 					dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt.GetScalar();
@@ -537,7 +537,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 				// integrate rotation here
 				dgAssert(m_veloc.m_w == dgFloat32(0.0f));
 				dgAssert(m_omega.m_w == dgFloat32(0.0f));
-				dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar() + dgFloat32 (1.0e-12f);
+				dgFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar() + dgFloat32 (1.0e-12f);
 				dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
 				dgVector omegaAxis(m_omega.Scale(invOmegaMag));
 				dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt.GetScalar();

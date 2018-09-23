@@ -171,7 +171,7 @@ class dgTemplateVector
 
 
 	// return dot 4d dot product
-	DG_INLINE dgTemplateVector<T> DotProduct4 (const dgTemplateVector &A) const
+	DG_INLINE dgTemplateVector<T> DotProduct (const dgTemplateVector &A) const
 	{
 		T val (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 		return dgTemplateVector<T> (val, val, val, val);

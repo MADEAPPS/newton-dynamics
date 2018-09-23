@@ -140,7 +140,7 @@ void dgCollisionConvex::SetVolumeAndCG ()
 	m_boxSize = (p1 - p0) * dgVector::m_half; 
 	m_boxOrigin = (p1 + p0) * dgVector::m_half; 
 	m_boxMinRadius = dgMin(m_boxSize.m_x, m_boxSize.m_y, m_boxSize.m_z);
-	m_boxMaxRadius = dgSqrt ((m_boxSize.DotProduct4(m_boxSize)).GetScalar());
+	m_boxMaxRadius = dgSqrt ((m_boxSize.DotProduct(m_boxSize)).GetScalar());
 
 	MassProperties ();
 }
@@ -781,13 +781,13 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 		// 5 degrees
 		const dgFloat32 tiltAngle = dgFloat32 (0.087f);
 		const dgFloat32 tiltAngle2 = tiltAngle * tiltAngle ;
-		dgPlane testPlane (normal, - (normal.DotProduct4(support[0]).GetScalar()));
+		dgPlane testPlane (normal, - (normal.DotProduct(support[0]).GetScalar()));
 		const dgConvexSimplexEdge* ptr = edge;
 		do {
 			const dgVector& p = m_vertex[ptr->m_twin->m_vertex];
 			dgFloat32 test = testPlane.Evalue(p);
 			dgVector dist (p - support[0]);
-			dgFloat32 angle2 = test * test / (dist.DotProduct4(dist).GetScalar());
+			dgFloat32 angle2 = test * test / (dist.DotProduct(dist).GetScalar());
 
 			if (angle2 < tiltAngle2) {
 				support[featureCount] = p;
@@ -802,13 +802,13 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	switch (featureCount)
 	{
 		case 1:
-			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - origin);
+			contactsOut[0] = support[0] - normal * normal.DotProduct(support[0] - origin);
 			count = 1;
 			break;
 
 		case 2:
-			contactsOut[0] = support[0] - normal * normal.DotProduct4(support[0] - origin);
-			contactsOut[1] = support[1] - normal * normal.DotProduct4(support[1] - origin);
+			contactsOut[0] = support[0] - normal * normal.DotProduct(support[0] - origin);
+			contactsOut[1] = support[1] - normal * normal.DotProduct(support[1] - origin);
 			count = 2;
 			break;
 
