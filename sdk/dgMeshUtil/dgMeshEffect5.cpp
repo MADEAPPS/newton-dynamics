@@ -566,7 +566,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 				//point on different size, clip the line
 				dgHugeVector p1p0 (p1 - p0);
 				dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / (plane % p1p0);
-				dgHugeVector p (p0 + p1p0.Scale4 (param));
+				dgHugeVector p (p0 + p1p0.Scale (param));
 				if (IsPointInFace (p, meshFace, face, plane)) {
 					return param;
 				}
@@ -895,7 +895,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			//point on different size, clip the line
 			dgHugeVector p1p0 (p1 - p0);
 			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / (plane % p1p0);
-			dgHugeVector p (p0 + p1p0.Scale4 (param));
+			dgHugeVector p (p0 + p1p0.Scale (param));
 			if (IsPointInFace (p, meshFace, face, plane)) {
 				return param;
 			}
@@ -975,7 +975,7 @@ do {
 			//point on different size, clip the line
 			dgHugeVector p1p0 (p1 - p0);
 			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / plane.DotProduct3(p1p0);
-			dgHugeVector p (p0 + p1p0.Scale4 (param));
+			dgHugeVector p (p0 + p1p0.Scale (param));
 			if (IsPointInFace (p, meshFace, face, plane)) {
 				point = dgBigVector(p.m_x, p.m_y, p.m_z, p.m_w);
 				return true;

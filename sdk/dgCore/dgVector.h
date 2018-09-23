@@ -76,7 +76,7 @@ class dgTemplateVector
 		return (&m_x)[i];
 	}
 
-	DG_INLINE dgTemplateVector<T> Scale4 (T scale) const
+	DG_INLINE dgTemplateVector<T> Scale (T scale) const
 	{
 		return dgTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}

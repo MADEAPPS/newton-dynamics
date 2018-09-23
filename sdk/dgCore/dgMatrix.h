@@ -137,7 +137,7 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	} else {
 	  	m_right = front.CrossProduct(dgVector (-front.m_y, front.m_x, dgFloat32(0.0f), dgFloat32(0.0f)));
 	}
-  	//m_right = m_right.Scale4 (dgRsqrt (m_right.DotProduct3(m_right)));
+  	//m_right = m_right.Scale (dgRsqrt (m_right.DotProduct3(m_right)));
 	m_right = m_right.Normalize();
   	m_up = m_right.CrossProduct(m_front);
 

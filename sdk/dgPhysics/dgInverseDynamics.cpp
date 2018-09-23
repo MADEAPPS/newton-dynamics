@@ -1295,7 +1295,7 @@ dgTrace(("inv dyn %d\n", xxx));
 		dgAssert(node->m_body);
 		dgDynamicBody* const body = node->m_body;
 
-		dgVector velocStep(externalForce[i].m_linear.Scale4(timestep * body->m_invMass.m_w));
+		dgVector velocStep(externalForce[i].m_linear.Scale(timestep * body->m_invMass.m_w));
 		dgVector omegaStep(body->m_invWorldInertiaMatrix.RotateVector(externalForce[i].m_angular) * timestep4);
 
 		velocity0[i].m_linear = body->m_veloc;

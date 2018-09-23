@@ -1473,10 +1473,10 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 	dgVector* const shape1 = &contactsOut[baseCount];
 
 	dgAssert(normal.m_w == dgFloat32(0.0f));
-	dgVector origin((point0 + point1).Scale4(dgFloat32(0.5f)));
-	dgVector relVeloc((m_proxy->m_body1->GetVelocity() - m_proxy->m_body0->GetVelocity()).Scale4(m_proxy->m_timestep));
+	dgVector origin((point0 + point1).Scale(dgFloat32(0.5f)));
+	dgVector relVeloc((m_proxy->m_body1->GetVelocity() - m_proxy->m_body0->GetVelocity()).Scale(m_proxy->m_timestep));
 	dgFloat32 relSpeed(relVeloc.DotProduct(normal).GetScalar());
-	dgVector penetrationStep(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
+	dgVector penetrationStep(normal.Scale(DG_PENETRATION_TOL * dgFloat32(2.0f)));
 	dgVector velocStep(normal.Scale ((relSpeed > (DG_PENETRATION_TOL * dgFloat32(2.0f))) ? relSpeed : DG_PENETRATION_TOL * dgFloat32(2.0f)));
 
 	dgVector instance1StepAcc(velocStep);
@@ -1531,8 +1531,8 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 				const dgVector& q1 = shape0[1];
 				dgVector p10(p1 - p0);
 				dgVector q10(q1 - q0);
-				p10 = p10.Scale4(dgRsqrt(p10.DotProduct3(p10) + dgFloat32(1.0e-8f)));
-				q10 = q10.Scale4(dgRsqrt(q10.DotProduct3(q10) + dgFloat32(1.0e-8f)));
+				p10 = p10.Scale(dgRsqrt(p10.DotProduct3(p10) + dgFloat32(1.0e-8f)));
+				q10 = q10.Scale(dgRsqrt(q10.DotProduct3(q10) + dgFloat32(1.0e-8f)));
 				dgFloat32 dot = q10.DotProduct3(p10);
 				if (dgAbs(dot) > dgFloat32(0.998f)) {
 					dgFloat32 pl0 = p0.DotProduct3(p10);
@@ -1542,7 +1542,7 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 					if (pl0 > pl1) {
 						dgSwap(pl0, pl1);
 						dgSwap(p0, p1);
-						p10 = p10.Scale4(dgFloat32(-1.0f));
+						p10 = p10.Scale(dgFloat32(-1.0f));
 					}
 					if (ql0 > ql1) {
 						dgSwap(ql0, ql1);
@@ -1552,15 +1552,15 @@ dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVecto
 						dgFloat32 clip1 = (ql1 < pl1) ? ql1 : pl1;
 
 						count = 2;
-						contactsOut[0] = p0 + p10.Scale4(clip0 - pl0);
-						contactsOut[1] = p0 + p10.Scale4(clip1 - pl0);
+						contactsOut[0] = p0 + p10.Scale(clip0 - pl0);
+						contactsOut[1] = p0 + p10.Scale(clip1 - pl0);
 					}
 				} else {
 					count = 1;
 					dgVector c0;
 					dgVector c1;
 					dgRayToRayDistance(p0, p1, q0, q1, c0, c1);
-					contactsOut[0] = (c0 + c1).Scale4(dgFloat32(0.5f));
+					contactsOut[0] = (c0 + c1).Scale(dgFloat32(0.5f));
 				}
 			} else {
 				dgAssert((count1 >= 2) && (count0 >= 2));

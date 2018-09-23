@@ -1008,7 +1008,6 @@ void dgSolver::UpdateForceFeedback(dgInt32 threadID)
 	m_hasJointFeeback[threadID] = hasJointFeeback;
 }
 
-
 void dgSolver::UpdateKinematicFeedback(dgInt32 threadID)
 {
 	const dgInt32 step = m_threadCounts;

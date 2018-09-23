@@ -164,8 +164,6 @@ class dgSoaFloat
 		int m_i[DG_SOA_WORD_GROUP_SIZE];
 		float m_f[DG_SOA_WORD_GROUP_SIZE];
 	};
-
-
 } DG_GCC_AVX_ALIGMENT;
 
 DG_MSC_AVX_ALIGMENT

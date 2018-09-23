@@ -239,7 +239,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 
 
 	dgVector unitAccel(m_body->m_externalForce * m_body->m_invMass.m_w);
-	dgVector deltaOmega(m_body->m_invWorldInertiaMatrix.RotateVector (m_body->m_externalTorque.Scale4 (timestep)));
+	dgVector deltaOmega(m_body->m_invWorldInertiaMatrix.RotateVector (m_body->m_externalTorque.Scale (timestep)));
 
 	m_body->m_alpha = dgVector::m_zero;
 	m_body->m_omega = dgVector::m_zero;
@@ -320,8 +320,8 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			const dgFloat32 den = dgFloat32 (1.0f) / length;
 			const dgFloat32 lenghtRatio = restLenght[i] * den;
 			const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
-			const dgVector fs(p0p1.Scale4(kSpring * compression));
-			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct(p0p1)).GetScalar()));
+			const dgVector fs(p0p1.Scale(kSpring * compression));
+			const dgVector fd(p0p1.Scale(kDamper * den * den * (v0v1.DotProduct(p0p1)).GetScalar()));
 
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
@@ -361,7 +361,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			dgVector mag (tangentDir.DotProduct(tangentDir) + epsilon);
 
 			dgFloat32 tangentFrictionAccel = dgAbs (accel[i].DotProduct(normalDir[i]).GetScalar());
-			dgVector friction (tangentDir.Scale4 (frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt (mag.GetScalar())));
+			dgVector friction (tangentDir.Scale (frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt (mag.GetScalar())));
 
 			accel[i] += (normalAccel[i] - normalDirAccel - friction);
 			veloc[i] += accel[i] * dtRK4;
