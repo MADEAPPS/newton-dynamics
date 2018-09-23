@@ -1232,7 +1232,8 @@ void dgPolyhedra::RefineTriangulation (const dgFloat64* const vertex, dgInt32 st
 	matrix.m_right = dgVector (normal.Scale (dgFloat64 (1.0f) / sqrt (normal.DotProduct3(normal))));
 	matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
 	matrix = matrix.Inverse();
-	matrix.m_posit.m_w = dgFloat32 (1.0f);
+	dgAssert (matrix.m_posit.m_w == dgFloat32 (1.0f));
+//	matrix.m_posit.m_w = dgFloat32 (1.0f);
 
 	dgInt32 maxCount = dignonals.GetCount() * dignonals.GetCount();
 	while (dignonals.GetCount() && maxCount) {

@@ -271,7 +271,7 @@ class dgFastAABBInfo: public dgObb
 		m_absDir[0] = m_absDir[0].Abs();
 		m_absDir[1] = m_absDir[1].Abs();
 		m_absDir[2] = m_absDir[2].Abs();
-		m_absDir[3] = dgVector::m_wOne;
+		//m_absDir[3] = dgVector::m_wOne;
 	}
 
 	DG_INLINE dgFloat32 PolygonBoxRayDistance (const dgVector& faceNormal, dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, const dgFastRayTest& ray) const

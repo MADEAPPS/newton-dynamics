@@ -160,7 +160,6 @@ void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVe
 
 	matrix1 = matrix0 * body1_Matrix.Inverse(); 
 	matrix0 = matrix0 * body0_Matrix.Inverse();
-
 }
 
 dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (const dgMatrix& localMatrix0, const dgMatrix& localMatrix1, dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const
@@ -236,8 +235,6 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 
 void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContraintDescritor& desc, dgFloat32 rowStiffness, dgFloat32 spring, dgFloat32 damper)
 {
-	dgAssert (0);
-/*
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
 
 		dgAssert (m_body1);
@@ -265,7 +262,6 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 		desc.m_jointStiffness[index] = dgFloat32(1.0f) - rowStiffness / DG_PSD_DAMP_TOL;
 		SetMotorAcceleration (index, accel, desc);
 	}
-*/
 }
 
 dgFloat32 dgBilateralConstraint::CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const
@@ -378,8 +374,6 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
-	dgAssert(0);
-/*
 	dgVector velocError (param.m_veloc1 - param.m_veloc0);
 	dgFloat32 relVeloc = velocError.DotProduct(dir).GetScalar();
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
@@ -426,13 +420,10 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		desc.m_zeroRowAcceleration[index]  = dgFloat32 (0.0f);
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	}
-*/
 }
 
 void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
-	dgAssert(0);
-	/*
 	const dgVector& bodyVeloc0 = m_body0->m_veloc;
 	const dgVector& bodyOmega0 = m_body0->m_omega;
 	const dgVector& bodyVeloc1 = m_body1->m_veloc;
@@ -503,6 +494,5 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 			}
 		}
 	}
-*/
 }
 
