@@ -82,7 +82,7 @@ DG_INLINE dgInt32 dgCompareBox (const dgVector& p0, const dgVector& p1, const dg
 
 DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, const dgVector& omega, dgFloat32 timestep, dgFloat32 maxRadius, dgFloat32 minRadius)
 {
-	dgVector linearStep (veloc.Scale3 (timestep));
+	dgVector linearStep (veloc.Scale4 (timestep));
 
 	// estimate the maximum effect of the angular velocity and enlarge that box by that value (use 45 degrees as max angle not 90)
 	dgFloat32 maxAngle = dgMin (dgSqrt (omega.DotProduct3(omega) * timestep * timestep), dgFloat32 (45.0f * dgDEG2RAD));

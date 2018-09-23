@@ -39,37 +39,6 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& faceNormal, dgFloat32
 	dgAssert (m_p0.m_w == dgFloat32 (0.0f));
 	dgAssert (m_p1.m_w == dgFloat32 (0.0f));
 
-
-/*
-	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
-	dgBigVector v0 (&polygon[indexArray[indexCount - 1] * stride]);
-	dgBigVector p0 (m_p0);
-	dgBigVector p0v0 (v0 - p0);
-
-	dgBigVector diff (m_diff);
-	dgBigVector normal (faceNormal);
-	dgFloat64 tOut = normal.DotProduct3 (p0v0);
-	dgFloat64 dist = normal.DotProduct3 (diff);
-	if (tOut >= dist * maxT) {
-		if ((tOut < dgFloat64 (0.0f)) && (tOut > dist)) {
-			for (dgInt32 i = 0; i < indexCount; i ++) {
-				dgInt32 i2 = indexArray[i] * stride;
-				dgBigVector v1 (&polygon[i2]);
-				dgBigVector p0v1 (v1 - p0);
-				dgFloat64 alpha = p0v0.DotProduct3 (diff.CrossProduct3(p0v1));
-				if (alpha < DG_RAY_TOL_ERROR) {
-					return 1.2f;
-				}
-				p0v0 = p0v1;
-			}
-
-			tOut = tOut / dist;
-			dgAssert (tOut >= dgFloat32 (0.0f));
-			dgAssert (tOut <= dgFloat32 (1.0f));
-			return dgFloat32 (tOut);
-		}
-	}
-*/
 	if (faceNormal.DotProduct4(m_unitDir).GetScalar() < dgFloat32 (0.0f)) {
 		dgInt32 stride = dgInt32(strideInBytes / sizeof (dgFloat32));
 		dgBigVector v0(&polygon[indexArray[indexCount - 1] * stride]);
@@ -80,7 +49,7 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& faceNormal, dgFloat32
 		dgBigVector normal(faceNormal);
 		dgFloat64 tOut = normal.DotProduct4(p0v0).GetScalar() / normal.DotProduct4(diff).GetScalar();
 		if ((tOut >= dgFloat64(0.0f)) && (tOut <= maxT)) {
-			dgBigVector p (p0 + diff.Scale3 (tOut));
+			dgBigVector p (p0 + diff.Scale4 (tOut));
 			dgBigVector unitDir(m_unitDir);
 			for (dgInt32 i = 0; i < indexCount; i++) {
 				dgInt32 i2 = indexArray[i] * stride;
@@ -148,10 +117,10 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 
 dgBigVector dgPointToRayDistance (const dgBigVector& point, const dgBigVector& ray_p0, const dgBigVector& ray_p1)
 {
-	dgFloat32 t;
-	dgVector dp (ray_p1 - ray_p0);
-	t = dgClamp (dp.DotProduct3 (point - ray_p0) / dp.DotProduct3 (dp), dgFloat32(dgFloat32 (0.0f)), dgFloat32 (1.0f));
-	return ray_p0 + dp.Scale3 (t);
+	dgBigVector dp (ray_p1 - ray_p0);
+	dgAssert (dp.m_w == dgFloat32 (0.0f));
+	dgFloat64 t = dgClamp (dp.DotProduct3 (point - ray_p0) / dp.DotProduct3 (dp), dgFloat64(0.0f), dgFloat64 (1.0f));
+	return ray_p0 + dp.Scale4 (t);
 }
 
 dgBigVector dgPointToTriangleDistance(const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2)
@@ -307,61 +276,11 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 	dgFloat32 sc = (dgAbs(sN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : sN / sD);
 	dgFloat32 tc = (dgAbs(tN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : tN / tD);
 
-	pOut = ray_p0 + u.Scale3 (sc);
-	qOut = ray_q0 + v.Scale3 (tc);
-
-/*
-	const dgVector p10(ray_p1 - ray_p0);
-	const dgVector q10(ray_q1 - ray_q0);
-	const dgFloat32 a00 = p10.DotProduct3(p10);
-	const dgFloat32 a11 = q10.DotProduct3(q10);
-	const dgFloat32 a01 = -(p10.DotProduct3(q10));
-
-	dgFloat32 den = a00 * a11 - a01 * a01;
-	dgAssert (den >= dgFloat32 (0.0f));
-	if (den > dgFloat32 (1.0e-16f)) {
-		const dgVector p0q0(ray_p0 - ray_q0);
-		const dgFloat32 b0 = -(p0q0.DotProduct3(p10));
-		const dgFloat32 b1 =  (p0q0.DotProduct3(q10));
-
-		dgFloat32 A[2][2];
-		dgFloat32 x[2];
-		dgFloat32 b[2];
-		dgFloat32 l[2];
-		dgFloat32 h[2];
-
-		A[0][0] = a00;
-		A[0][1] = a01;
-		A[1][0] = a01;
-		A[1][1] = a11;
-		b[0] = b0;
-		b[1] = b1;
-		x[0] = 0;
-		x[1] = 0;
-		l[0] = 0.0f;
-		l[1] = 0.0f;
-		h[0] = 1.0f;
-		h[1] = 1.0f;
-		dgSolveDantzigLCP(2, &A[0][0], x, b, l, h);
-		x[0] *= 1;
-
-		dgFloat32 u = b0 / a00;
-		if (u < dgFloat32 (0.0f)) {
-			dgAssert (0);
-		} else if (u > dgFloat32 (1.0f)) {
-			dgAssert (0);
-		} else {
-			dgAssert (0);
-			dgFloat32 du = b0 - a01;
-		}
-
-
-	}
-*/
-
+	dgAssert (u.m_w == dgFloat32 (0.0f));
+	dgAssert (v.m_w == dgFloat32 (0.0f));
+	pOut = ray_p0 + u.Scale4 (sc);
+	qOut = ray_q0 + v.Scale4 (tc);
 }
-
-
 
 
 dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVector& origin, dgFloat32 radius)
