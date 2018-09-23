@@ -478,6 +478,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 							const dgBigVector& p1 = *tmp->m_next->m_vertex;
 
 							dgBigVector dp (p1 - p0); 
+							dgAssert(dp.m_w == dgFloat32(0.0f));
 							dgFloat64 den = plane.DotProduct3(dp);
 							if (fabs(den) < dgFloat32 (1.0e-24f)) {
 								den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
@@ -489,7 +490,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 							} else if (den <= -1.0f) {
 								den = dgFloat32 (-1.0f);
 							}
-							output[0] = p0 - dp.Scale3 (den);
+							output[0] = p0 - dp.Scale4 (den);
 							edgeClipped[0] = tmp;
 							count ++;
 						}
@@ -498,6 +499,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 						const dgBigVector& p1 = *tmp->m_next->m_vertex;
 						isInside |= 1;
 						dgBigVector dp (p1 - p0); 
+						dgAssert(dp.m_w == dgFloat32(0.0f));
 						dgFloat64 den = plane.DotProduct3(dp);
 						if (fabs(den) < dgFloat32 (1.0e-24f)) {
 							den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
@@ -508,7 +510,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 						} else if (den <= -1.0f) {
 							den = dgFloat32 (-1.0f);
 						}
-						output[1] = p0 - dp.Scale3 (den);
+						output[1] = p0 - dp.Scale4 (den);
 						edgeClipped[1] = tmp;
 						count ++;
 					}

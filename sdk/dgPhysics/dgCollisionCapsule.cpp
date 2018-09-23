@@ -224,9 +224,9 @@ void dgCollisionCapsule::TesselateTriangle(dgInt32 level, const dgVector& p0, co
 		dgVector p12(p1 + p2);
 		dgVector p20(p2 + p0);
 
-		p01 = p01.Scale3(dgRsqrt(p01.DotProduct3(p01)));
-		p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
-		p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
+		p01 = p01.Scale4(dgRsqrt(p01.DotProduct3(p01)));
+		p12 = p12.Scale4(dgRsqrt(p12.DotProduct3(p12)));
+		p20 = p20.Scale4(dgRsqrt(p20.DotProduct3(p20)));
 
 		dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 		dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
@@ -238,9 +238,9 @@ void dgCollisionCapsule::TesselateTriangle(dgInt32 level, const dgVector& p0, co
 		TesselateTriangle(level - 1, p01, p12, p20, count, ouput);
 
 	} else {
-		ouput[count + 0] = p0.Scale3(m_radio0);
-		ouput[count + 1] = p1.Scale3(m_radio0);
-		ouput[count + 2] = p2.Scale3(m_radio0);
+		ouput[count + 0] = p0.Scale4(m_radio0);
+		ouput[count + 1] = p1.Scale4(m_radio0);
+		ouput[count + 2] = p2.Scale4(m_radio0);
 		count += 3;
 	}
 }

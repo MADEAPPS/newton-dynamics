@@ -207,7 +207,7 @@ class dgCollisionCompound: public dgCollision
 	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);
 
 	void ImproveNodeFitness (dgNodeBase* const node) const;
-	dgFloat32 CalculateSurfaceArea (dgNodeBase* const node0, dgNodeBase* const node1, dgVector& minBox, dgVector& maxBox) const;
+	DG_INLINE dgFloat32 CalculateSurfaceArea (dgNodeBase* const node0, dgNodeBase* const node1, dgVector& minBox, dgVector& maxBox) const;
 
 	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 
