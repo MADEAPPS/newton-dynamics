@@ -123,12 +123,6 @@ class dgVector
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
 	}
 
-	DG_INLINE dgVector Scale3 (dgFloat32 s) const
-	{
-		dgVector tmp (s, s, s, dgFloat32 (1.0f));
-		return _mm_mul_ps (m_type, tmp.m_type);
-	}
-
 	DG_INLINE dgVector Scale4 (dgFloat32 s) const
 	{
 		return _mm_mul_ps (m_type, _mm_set_ps1(s));
@@ -620,11 +614,6 @@ class dgBigVector
 	DG_INLINE dgBigVector BroadcastW() const
 	{
 		return dgBigVector(m_w);
-	}
-
-	DG_INLINE dgBigVector Scale3(dgFloat64 s) const
-	{
-		return dgBigVector(m_x * s, m_y * s, m_z * s, m_w);
 	}
 
 	DG_INLINE dgBigVector Scale4(dgFloat64 s) const

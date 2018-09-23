@@ -177,11 +177,6 @@ class dgVector
 		return dgVector (m_x + m_y + m_z + m_w);
 	}
 
-	DG_INLINE dgVector Scale3 (dgFloat32 scale) const
-	{
-		return dgVector (m_x * scale, m_y * scale, m_z * scale, m_w);
-	}
-
 	DG_INLINE dgVector Scale4 (dgFloat32 scale) const
 	{
 		return dgVector (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
@@ -597,11 +592,6 @@ class dgBigVector
 	DG_INLINE dgBigVector AddHorizontal () const
 	{
 		return dgBigVector (m_x + m_y + m_z + m_w);
-	}
-
-	DG_INLINE dgBigVector Scale3 (dgFloat64 scale) const
-	{
-		return dgBigVector (m_x * scale, m_y * scale, m_z * scale, m_w);
 	}
 
 	DG_INLINE dgBigVector Scale4 (dgFloat64 scale) const
