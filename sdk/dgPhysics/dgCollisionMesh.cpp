@@ -330,7 +330,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
 				dgAssert (0);
-				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
+				contactsOut[count] = p0 - dp.Scale4 (side0 / t);
 				count ++;
 
 			} 
@@ -342,7 +342,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 				t = dgSign(t) * dgFloat32 (1.0e-8f);	
 			}
 			dgAssert (0);
-			contactsOut[count] = p0 - dp.Scale3 (side0 / t);
+			contactsOut[count] = p0 - dp.Scale4 (side0 / t);
 			count ++;
 		}
 

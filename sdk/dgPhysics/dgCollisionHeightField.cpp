@@ -683,7 +683,8 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 			dgFloat32 t = RayCastCell (ray, xIndex0, zIndex0, normalOut, maxT);
 			if (t < maxT) {
 				// bail out at the first intersection and copy the data into the descriptor
-				contactOut.m_normal = normalOut.Scale3 (dgRsqrt (normalOut.DotProduct3(normalOut)));
+				//contactOut.m_normal = normalOut.Scale4 (dgRsqrt (normalOut.DotProduct3(normalOut)));
+				contactOut.m_normal = normalOut.Normalize();
 				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
 				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
 
