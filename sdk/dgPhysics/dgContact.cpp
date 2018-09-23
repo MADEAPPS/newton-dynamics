@@ -125,8 +125,6 @@ void dgContact::AppendToContactList()
 {
 	dgAssert (m_body0);
 	dgAssert (!m_contactNode);
-dgAssert (!((m_body0->m_uniqueID == 88) && (m_body1->m_uniqueID == 58)));
-dgAssert (!((m_body0->m_uniqueID == 58) && (m_body1->m_uniqueID == 88)));
 	dgContactList* const contactList = m_body0->m_world;
 	m_contactNode = contactList->Addtop(this);
 }

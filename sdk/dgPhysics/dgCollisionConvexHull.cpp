@@ -167,7 +167,7 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 	dgBigVector p1 (pool[edge->m_incidentVertex]);
 	dgBigVector e1 (p1 - p0);
 
-	dgBigVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgBigVector normal (dgFloat32 (0.0f));
 	for (edge = edge->m_next; edge != face; edge = edge->m_next) {
 		dgBigVector p2 (pool[edge->m_incidentVertex]);
 		dgBigVector e2 (p2 - p0);
@@ -180,7 +180,7 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 		e1 = e2;
 	} 
 	dgFloat64 den = sqrt (normal.DotProduct3(normal)) + dgFloat64 (1.0e-24f);
-	normal = normal.Scale3 (dgFloat64 (1.0f)/ den);
+	normal = normal.Scale4 (dgFloat64 (1.0f)/ den);
 
 #ifdef _DEBUG
 	edge = face;
@@ -232,11 +232,13 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 						dgBigVector e1 (hullVertexArray[edge0->m_twin->m_next->m_next->m_incidentVertex] - hullVertexArray[edge0->m_incidentVertex]);
 						dgBigVector e0 (hullVertexArray[edge0->m_incidentVertex] - hullVertexArray[edge0->m_prev->m_incidentVertex]);
 
+						dgAssert(e0.m_w == dgFloat64(0.0f));
+						dgAssert(e1.m_w == dgFloat64(0.0f));
 						dgAssert (e0.DotProduct3(e0) >= dgFloat64 (0.0f));
 						dgAssert (e1.DotProduct3(e1) >= dgFloat64 (0.0f));
 
-						e0 = e0.Scale3 (dgFloat64 (1.0f) / sqrt (e0.DotProduct3(e0)));
-						e1 = e1.Scale3 (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1)));
+						e0 = e0.Scale4 (dgFloat64 (1.0f) / sqrt (e0.DotProduct3(e0)));
+						e1 = e1.Scale4 (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1)));
 						dgBigVector n1 (e0.CrossProduct3(e1));
 
 						dgFloat64 projection = n1.DotProduct3(normal0);
@@ -244,10 +246,12 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 
 							dgBigVector e11 (hullVertexArray[edge0->m_next->m_next->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_incidentVertex]);
 							dgBigVector e00 (hullVertexArray[edge0->m_twin->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_prev->m_incidentVertex]);
+							dgAssert (e00.m_w == dgFloat64 (0.0f));
+							dgAssert (e11.m_w == dgFloat64 (0.0f));
 							dgAssert (e00.DotProduct3(e00) >= dgFloat64 (0.0f));
 							dgAssert (e11.DotProduct3(e11) >= dgFloat64 (0.0f));
-							e00 = e00.Scale3 (dgFloat64 (1.0f) / sqrt (e00.DotProduct3(e00)));
-							e11 = e11.Scale3 (dgFloat64 (1.0f) / sqrt (e11.DotProduct3(e11)));
+							e00 = e00.Scale4 (dgFloat64 (1.0f) / sqrt (e00.DotProduct3(e00)));
+							e11 = e11.Scale4 (dgFloat64 (1.0f) / sqrt (e11.DotProduct3(e11)));
 
 							dgBigVector n11 (e00.CrossProduct3(e11));
 							projection = n11.DotProduct3(normal0);
@@ -305,7 +309,7 @@ bool dgCollisionConvexHull::CheckConvex (dgPolyhedra& polyhedra1, const dgBigVec
 			} while (ptr != edge);
 		}
 	}
-	center = center.Scale3 (dgFloat64 (1.0f) / dgFloat64 (count));
+	center = center.Scale4 (dgFloat64 (1.0f) / dgFloat64 (count));
 
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &(*iter);
@@ -364,9 +368,9 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 				size = sphere.m_size[i];
 			}
 		}
-		dgVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector normal (dgFloat32 (0.0f));
 		normal[index] = dgFloat32 (1.0f);
-		dgVector step = sphere.RotateVector (normal.Scale3 (dgFloat32 (0.05f)));
+		dgVector step = sphere.RotateVector (normal.Scale4 (dgFloat32 (0.05f)));
 		for (dgInt32 i = 0; i < count; i ++) {
 			dgVector p1 (tmp[i] + step);
 			dgVector p2 (tmp[i] - step);
@@ -586,7 +590,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 					varian += p * p;
 				}
 
-				varian = varian.Scale3 (dgFloat32 (box.m_vertexCount)) - median * median;
+				varian = varian.Scale4 (dgFloat32 (box.m_vertexCount)) - median * median;
 				dgInt32 index = 0;
 				dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
 				for (dgInt32 i = 0; i < 3; i ++) {
@@ -595,7 +599,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 						maxVarian = varian[i];
 					}
 				}
-				dgVector center = median.Scale3 (dgFloat32 (1.0f) / dgFloat32 (box.m_vertexCount));
+				dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (box.m_vertexCount));
 				dgFloat32 test = center[index];
 
 				dgInt32 i0 = 0;

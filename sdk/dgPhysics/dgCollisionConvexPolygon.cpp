@@ -296,7 +296,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 	dgFloat32 projectFactor = m_normal.DotProduct3(normal);
 	if (projectFactor < dgFloat32 (0.0f)) {
 		projectFactor *= dgFloat32 (-1.0f);
-		normal = normal.Scale3 (dgFloat32 (-1.0f));
+		normal = normal * dgVector::m_negOne;
 	}
 
 	if (projectFactor > dgFloat32 (0.9999f)) {
@@ -326,7 +326,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 
 			if (side0 > dgFloat32 (0.0f)) {
 				maxDist = dgMax (maxDist, side0);
-				contactsOut[count] = p0 - plane.Scale3 (side0);
+				contactsOut[count] = p0 - plane.Scale4 (side0);
 				count ++;
 				if (count > 1) {
 					dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -343,7 +343,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 					if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 						t = dgSign(t) * dgFloat32 (1.0e-8f);	
 					}
-					contactsOut[count] = p0 - dp.Scale3 (side0 / t);
+					contactsOut[count] = p0 - dp.Scale4 (side0 / t);
 					count ++;
 					if (count > 1) {
 						dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -360,7 +360,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 				if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
-				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
+				contactsOut[count] = p0 - dp.Scale4 (side0 / t);
 				count ++;
 				if (count > 1) {
 					dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -391,7 +391,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 				if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
-				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
+				contactsOut[count] = p0 - dp.Scale4 (side0 / t);
 				count ++;
 				if (count > 1) {
 					dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -450,16 +450,17 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 			}
 
 			if (count >= 3) {
-				dgVector n (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+				dgVector n (dgFloat32 (0.0f));
 				dgVector e0 (contactsOut[1] - contactsOut[0]);
 				for (dgInt32 i = 2; i < count; i ++) {
 					dgVector e1 (contactsOut[i] - contactsOut[0]);
 					n += e0.CrossProduct3(e1);
 					e0 = e1;
 				} 
-				n = n.Scale3 (dgRsqrt(n.DotProduct3(n)));
-				dgFloat32 val = n.DotProduct3(normal);
-				dgAssert (val > dgFloat32 (0.9f));
+				dgAssert (n.m_w == dgFloat32 (0.0f));
+				//n = n.Scale4 (dgRsqrt(n.DotProduct3(n)));
+				n = n.Normalize();
+				dgAssert (n.DotProduct3(normal) > dgFloat32 (0.9f));
 			}
 		}
 	#endif
