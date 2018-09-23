@@ -120,7 +120,7 @@ dgUnsigned32 dgUpVectorConstraint::JacobianDerivative (dgContraintDescritor& par
 	dgFloat32 mag = lateralDir.DotProduct3(lateralDir);
 	if (mag > dgFloat32 (1.0e-6f)) {
 		mag = dgSqrt (mag);
-		lateralDir = lateralDir.Scale3 (dgFloat32 (1.0f) / mag);
+		lateralDir = lateralDir.Scale4 (dgFloat32 (1.0f) / mag);
 		dgFloat32 angle = dgAsin (mag);
 		CalculateAngularDerivative (0, params, lateralDir, m_stiffness, angle, &m_jointForce[0]);
 

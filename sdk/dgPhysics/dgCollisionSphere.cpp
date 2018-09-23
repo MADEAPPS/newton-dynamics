@@ -283,7 +283,6 @@ dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dg
 	return t;
 }
 
-
 void dgCollisionSphere::MassProperties () 
 {
 	m_centerOfMass = dgVector (dgFloat32 (0.0f));

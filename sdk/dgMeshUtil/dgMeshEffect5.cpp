@@ -38,7 +38,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		return true;
 	}  
 
-	normal = normal.Scale3(dgFloat64 (1.0f) / sqrt (mag2));
+	normal = normal.Normalize();
 	dgBigVector origin (convexMesh.m_points.m_vertex[convexFace->m_incidentVertex]);
 	dgBigPlane plane (normal, - origin.DotProduct3(normal));
 
@@ -77,7 +77,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		dgBigVector xDir (p1 - origin);
 		dgAssert (xDir.DotProduct3(xDir) > dgFloat32 (0.0f));
 		matrix[2] = dgVector (normal);
-		matrix[0] = dgVector(xDir.Scale3(dgFloat64 (1.0f) / sqrt (xDir.DotProduct3(xDir))));
+		matrix[0] = dgVector(xDir.Scale4(dgFloat64 (1.0f) / sqrt (xDir.DotProduct3(xDir))));
 		matrix[1] = matrix[2].CrossProduct3(matrix[0]);
 		matrix[3] = dgVector (origin);
 		matrix[3][3] = dgFloat32 (1.0f);
@@ -566,7 +566,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 				//point on different size, clip the line
 				dgHugeVector p1p0 (p1 - p0);
 				dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / (plane % p1p0);
-				dgHugeVector p (p0 + p1p0.Scale3 (param));
+				dgHugeVector p (p0 + p1p0.Scale4 (param));
 				if (IsPointInFace (p, meshFace, face, plane)) {
 					return param;
 				}
@@ -895,7 +895,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			//point on different size, clip the line
 			dgHugeVector p1p0 (p1 - p0);
 			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / (plane % p1p0);
-			dgHugeVector p (p0 + p1p0.Scale3 (param));
+			dgHugeVector p (p0 + p1p0.Scale4 (param));
 			if (IsPointInFace (p, meshFace, face, plane)) {
 				return param;
 			}
@@ -975,7 +975,7 @@ do {
 			//point on different size, clip the line
 			dgHugeVector p1p0 (p1 - p0);
 			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / plane.DotProduct3(p1p0);
-			dgHugeVector p (p0 + p1p0.Scale3 (param));
+			dgHugeVector p (p0 + p1p0.Scale4 (param));
 			if (IsPointInFace (p, meshFace, face, plane)) {
 				point = dgBigVector(p.m_x, p.m_y, p.m_z, p.m_w);
 				return true;

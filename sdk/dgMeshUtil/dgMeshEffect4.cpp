@@ -658,7 +658,7 @@ class dgHACDClusterGraph
 				dgHACDClusterFace& face = cluster.Append()->GetInfo();
 				face.m_edge = edge;
 				face.m_area = dgFloat64(0.5f) * mag;
-				face.m_normal = normal.Scale3(dgFloat64(1.0f) / mag);
+				face.m_normal = normal.Scale4(dgFloat64(1.0f) / mag);
 
 				//m_concavityTreeArray[color] = new (allocator) dgHACDConvacityLookAheadTree (allocator, edge, cluster.m_concavity);
 				m_concavityTreeArray[color] = new (allocator) dgHACDConvacityLookAheadTree (allocator, edge, dgFloat64 (0.0f));

@@ -130,11 +130,11 @@ dgVector dgHingeConstraint::GetJointForce () const
 	dgMatrix matrix1;
 
 	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-	return dgVector (matrix0.m_front.Scale3 (m_jointForce[0].m_force) + 
-		             matrix0.m_up.Scale3 (m_jointForce[1].m_force) + 
-					 matrix0.m_right.Scale3 (m_jointForce[2].m_force) +
-					 matrix0.m_up.Scale3 (m_jointForce[3].m_force) +
-					 matrix0.m_right.Scale3 (m_jointForce[4].m_force));
+	return dgVector (matrix0.m_front.Scale4 (m_jointForce[0].m_force) + 
+		             matrix0.m_up.Scale4 (m_jointForce[1].m_force) + 
+					 matrix0.m_right.Scale4 (m_jointForce[2].m_force) +
+					 matrix0.m_up.Scale4 (m_jointForce[3].m_force) +
+					 matrix0.m_right.Scale4 (m_jointForce[4].m_force));
 }
 
 
@@ -156,8 +156,8 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 
 	const dgVector& p0 = matrix0.m_posit;
 	const dgVector& p1 = matrix1.m_posit;
-	dgVector q0 (p0 + matrix0.m_front.Scale3(MIN_JOINT_PIN_LENGTH));
-	dgVector q1 (p1 + matrix1.m_front.Scale3(MIN_JOINT_PIN_LENGTH));
+	dgVector q0 (p0 + matrix0.m_front.Scale4(MIN_JOINT_PIN_LENGTH));
+	dgVector q1 (p1 + matrix1.m_front.Scale4(MIN_JOINT_PIN_LENGTH));
 
 //	dgAssert (((p1 - p0) % (p1 - p0)) < 1.0e-2f);
 
