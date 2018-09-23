@@ -114,7 +114,7 @@ dgUnsigned32 dgUpVectorConstraint::JacobianDerivative (dgContraintDescritor& par
 	dgMatrix matrix1;
 	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
 
-	dgVector lateralDir (matrix0.m_front.CrossProduct3(matrix1.m_front));
+	dgVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
 
 	dgInt32 ret = 0;
 	dgFloat32 mag = lateralDir.DotProduct3(lateralDir);
@@ -124,7 +124,7 @@ dgUnsigned32 dgUpVectorConstraint::JacobianDerivative (dgContraintDescritor& par
 		dgFloat32 angle = dgAsin (mag);
 		CalculateAngularDerivative (0, params, lateralDir, m_stiffness, angle, &m_jointForce[0]);
 
-		dgVector frontDir (lateralDir.CrossProduct3(matrix1.m_front));
+		dgVector frontDir (lateralDir.CrossProduct(matrix1.m_front));
 		CalculateAngularDerivative (1, params, frontDir, m_stiffness, dgFloat32 (0.0f), &m_jointForce[1]);
 		ret = 2;
 	} else {

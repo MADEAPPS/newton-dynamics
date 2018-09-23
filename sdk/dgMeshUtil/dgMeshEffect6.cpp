@@ -1702,7 +1702,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 			for (dgEdge* ptr = edge->m_next; ptr != edge; ptr = ptr->m_next) {
 				dgVector p2(uvAligment.RotateVector(m_points.m_vertex[ptr->m_next->m_incidentVertex] - origin));
 				dgBigVector e2(p2 - p0);
-				normal += e1.CrossProduct3(e2);
+				normal += e1.CrossProduct(e2);
 				e1 = e2;
 			}
 			normal = normal.Normalize();
@@ -1766,7 +1766,7 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
 
             dgBigVector e0 (p1 - p0);
             dgBigVector e1 (p2 - p0);
-            dgBigVector n (e0.CrossProduct3(e1));
+            dgBigVector n (e0.CrossProduct(e1));
 
             dgInt32 index = 0;
             dgFloat64 maxProjection = dgFloat32 (0.0f);

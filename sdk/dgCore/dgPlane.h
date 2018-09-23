@@ -87,7 +87,7 @@ DG_INLINE dgPlane::dgPlane (const dgVector &normal, dgFloat32 distance)
 }
 
 DG_INLINE dgPlane::dgPlane (const dgVector &P0, const dgVector &P1, const dgVector &P2)
-	:dgVector ((P1 - P0).CrossProduct3(P2 - P0)) 
+	:dgVector ((P1 - P0).CrossProduct(P2 - P0)) 
 {
 	m_w = - DotProduct3(P0);
 }
@@ -132,7 +132,7 @@ DG_INLINE dgBigPlane::dgBigPlane (const dgBigVector &normal, dgFloat64 distance)
 }
 
 DG_INLINE dgBigPlane::dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2)
-	:dgBigVector ((P1 - P0).CrossProduct3(P2 - P0)) 
+	:dgBigVector ((P1 - P0).CrossProduct(P2 - P0)) 
 {
 	m_w = - DotProduct3(P0);
 }

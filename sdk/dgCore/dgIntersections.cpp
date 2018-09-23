@@ -57,7 +57,7 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& faceNormal, dgFloat32
 
 				dgBigVector edge0(p - v0);
 				dgBigVector edge1(v1 - v0);
-				dgFloat64 area = unitDir.DotProduct4 (edge0.CrossProduct3(edge1)).GetScalar();
+				dgFloat64 area = unitDir.DotProduct4 (edge0.CrossProduct(edge1)).GetScalar();
 				if (area < dgFloat32 (0.0f)) {
 					return 1.2f;
 				}

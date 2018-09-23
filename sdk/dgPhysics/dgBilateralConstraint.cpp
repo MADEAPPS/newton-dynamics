@@ -146,9 +146,9 @@ void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVe
 
 	dgAssert ((pinDirection0.DotProduct3(pinDirection0)) > dgFloat32 (0.0f));
 	matrix0.m_front = pinDirection0.Scale (dgRsqrt (pinDirection0.DotProduct3(pinDirection0)));
-	matrix0.m_right = matrix0.m_front.CrossProduct3(pinDirection1);
+	matrix0.m_right = matrix0.m_front.CrossProduct(pinDirection1);
 	matrix0.m_right = matrix0.m_right.Scale (dgRsqrt (matrix0.m_right.DotProduct3(matrix0.m_right)));
-	matrix0.m_up = matrix0.m_right.CrossProduct3(matrix0.m_front); 
+	matrix0.m_up = matrix0.m_right.CrossProduct(matrix0.m_front); 
 	matrix0.m_posit = pivot;
 	
 	matrix0.m_front.m_w = dgFloat32 (0.0f);
@@ -313,7 +313,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
 #ifdef _DEBUG
-		dgVector accel(omega0 * omega0.CrossProduct3(jacobian0.m_angular) + omega1 * omega1.CrossProduct3(jacobian1.m_angular));
+		dgVector accel(omega0 * omega0.CrossProduct(jacobian0.m_angular) + omega1 * omega1.CrossProduct(jacobian1.m_angular));
 		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
 		dgAssert (dgAbs(relCentr) < dgFloat32 (1.0e-3f));
 #endif
@@ -354,7 +354,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 
 	dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
-	dgVector r0CrossDir (param.m_r0.CrossProduct3(dir));
+	dgVector r0CrossDir (param.m_r0.CrossProduct(dir));
 	jacobian0.m_linear[0] = dir.m_x;
 	jacobian0.m_linear[1] = dir.m_y;
 	jacobian0.m_linear[2] = dir.m_z;
@@ -365,7 +365,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	jacobian0.m_angular[3] = dgFloat32 (0.0f);
 
 	dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
-	dgVector r1CrossDir (dir.CrossProduct3(param.m_r1));
+	dgVector r1CrossDir (dir.CrossProduct(param.m_r1));
 	jacobian1.m_linear[0] = -dir.m_x;
 	jacobian1.m_linear[1] = -dir.m_y;
 	jacobian1.m_linear[2] = -dir.m_z;
@@ -395,8 +395,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgVector& bodyOmega0 = m_body0->m_omega;
 		const dgVector& bodyVeloc1 = m_body1->m_veloc;
 		const dgVector& bodyOmega1 = m_body1->m_omega;
-		dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(jacobian0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(jacobian0.m_angular) +
-					   bodyVeloc1 * bodyOmega1.CrossProduct3(jacobian1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(jacobian1.m_angular));
+		dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct(jacobian0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct(jacobian0.m_angular) +
+					   bodyVeloc1 * bodyOmega1.CrossProduct(jacobian1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct(jacobian1.m_angular));
 		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
 
 		//desc.m_zeroRowAcceleration[index] = (relPosit * desc.m_invTimestep + relVeloc) * desc.m_invTimestep;
@@ -458,8 +458,8 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				#if 1
 				dgFloat32 aRel = params->m_firstPassCoefFlag ? rhs[k].m_deltaAccel : rhs[k].m_coordenateAccel;
 				#else			
-				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct3(Jt.m_jacobianM0.m_angular) +
-							   bodyVeloc1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct3(Jt.m_jacobianM1.m_angular));
+				dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct(Jt.m_jacobianM0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct(Jt.m_jacobianM0.m_angular) +
+							   bodyVeloc1 * bodyOmega1.CrossProduct(Jt.m_jacobianM1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct(Jt.m_jacobianM1.m_angular));
 				dgFloat32 aRel = rhs[k].m_deltaAccel - accel.AddHorizontal().GetScalar(); 
 				#endif
 

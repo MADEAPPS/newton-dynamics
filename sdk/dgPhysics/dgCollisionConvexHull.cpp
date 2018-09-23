@@ -171,7 +171,7 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 	for (edge = edge->m_next; edge != face; edge = edge->m_next) {
 		dgBigVector p2 (pool[edge->m_incidentVertex]);
 		dgBigVector e2 (p2 - p0);
-		dgBigVector n1 (e1.CrossProduct3(e2));
+		dgBigVector n1 (e1.CrossProduct(e2));
 #ifdef _DEBUG
 		dgFloat64 mag = normal.DotProduct3(n1);
 		dgAssert ( mag >= -dgFloat32 (0.1f));
@@ -187,7 +187,7 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 	dgBigVector e0 (pool[edge->m_incidentVertex] - pool[edge->m_prev->m_incidentVertex]);	
 	do {
 		dgBigVector de1 (pool[edge->m_next->m_incidentVertex] - pool[edge->m_incidentVertex]);	
-		dgBigVector dn1 (e0.CrossProduct3(de1));
+		dgBigVector dn1 (e0.CrossProduct(de1));
 		dgFloat64 x = normal.DotProduct3(dn1);
 		dgAssert (x > -dgFloat64 (0.01f));
 		e0 = de1;
@@ -239,7 +239,7 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 
 						e0 = e0.Scale (dgFloat64 (1.0f) / sqrt (e0.DotProduct3(e0)));
 						e1 = e1.Scale (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1)));
-						dgBigVector n1 (e0.CrossProduct3(e1));
+						dgBigVector n1 (e0.CrossProduct(e1));
 
 						dgFloat64 projection = n1.DotProduct3(normal0);
 						if (projection >= DG_MAX_EDGE_ANGLE) {
@@ -253,7 +253,7 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 							e00 = e00.Scale (dgFloat64 (1.0f) / sqrt (e00.DotProduct3(e00)));
 							e11 = e11.Scale (dgFloat64 (1.0f) / sqrt (e11.DotProduct3(e11)));
 
-							dgBigVector n11 (e00.CrossProduct3(e11));
+							dgBigVector n11 (e00.CrossProduct(e11));
 							projection = n11.DotProduct3(normal0);
 							if (projection >= DG_MAX_EDGE_ANGLE) {
 								dgAssert (&(*iter) != edge0);
@@ -404,7 +404,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			const dgBigVector& p2 = hullVertexArray[face.m_index[2]];
 			dgBigVector p1p0 (p1 - p0);
 			dgBigVector p2p0 (p2 - p0);
-			dgBigVector normal (p2p0.CrossProduct3(p1p0));
+			dgBigVector normal (p2p0.CrossProduct(p1p0));
 			dgFloat64 mag2 = normal.DotProduct3(normal);
 			if (mag2 < dgFloat64 (1.0e-6f * 1.0e-6f)) {
 				success = false;

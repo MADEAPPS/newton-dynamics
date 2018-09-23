@@ -460,7 +460,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 			for (dgInt32 i1 = 0; i1 < indexCountA; i1 ++) {
                 const dgBigVector& q0 = pointsA[indexA[i0]];
                 const dgBigVector& q1 = pointsA[indexA[i1]];
-				dgBigVector n (planeA.CrossProduct3(q1 - q0));
+				dgBigVector n (planeA.CrossProduct(q1 - q0));
 				dgBigPlane plane (n, - n.DotProduct3(q0));
 				i0 = i1;
 //dgTrace (("%f %f %f\n", q0.m_x, q0.m_y, q0.m_z));
@@ -548,7 +548,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
             do {
                 dgBigVector r2 (*polyPtr->m_vertex);
                 dgBigVector r2r0 (r2 - r0);
-                area += r2r0.CrossProduct3(r1r0);
+                area += r2r0.CrossProduct(r1r0);
                 r1r0 = r2r0;
                 polyPtr = polyPtr->m_next;
             } while (polyPtr != poly);
@@ -1399,7 +1399,7 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 			dgFloat32 val = projection.GetScalar();
 			dgAssert (val > dgFloat32 (-1.0f));
 			dgFloat32 angle = dgAcos (val) - dgFloat32 (90.0f * dgDEG2RAD) + dgFloat32 (15.0f * dgDEG2RAD);
-			dgVector axis (himespherePlane.CrossProduct3(directionsMap[i]));
+			dgVector axis (himespherePlane.CrossProduct(directionsMap[i]));
 			axis = axis.Normalize();
 			dgQuaternion rot (axis, angle);
 			himespherePlane = dgMatrix (rot, dgVector::m_wOne).RotateVector(himespherePlane);
@@ -1688,7 +1688,7 @@ void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const
 
 	// calculate debris initial velocity
 	dgVector chunkOrigin (matrix.TransformVector(chunkCollision->GetLocalMatrix().m_posit));
-	dgVector chunkVeloc (veloc + omega.CrossProduct3(chunkOrigin - com));
+	dgVector chunkVeloc (veloc + omega.CrossProduct(chunkOrigin - com));
 
 	chunkBody->SetOmega(omega);
 	chunkBody->SetVelocity(chunkVeloc);
@@ -1747,7 +1747,7 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 
 	// calculate debris initial velocity
 	dgVector chunkOrigin (matrix.TransformVector(childStructureInstance->GetLocalMatrix().m_posit));
-	dgVector chunkVeloc (veloc + omega.CrossProduct3(chunkOrigin - com));
+	dgVector chunkVeloc (veloc + omega.CrossProduct(chunkOrigin - com));
 
 	chunkBody->SetOmega(omega);
 	chunkBody->SetVelocity(chunkVeloc);

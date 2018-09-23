@@ -184,7 +184,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 				if (((head + 1) & mask) != tail) {
 					dgBigVector edge10(p1 - p0);
 					dgBigVector edge20(p2 - p0);
-					dgBigVector n(edge10.CrossProduct3(edge20));
+					dgBigVector n(edge10.CrossProduct(edge20));
 					dgFloat64 area2 = n.DotProduct3(n);
 					if (area2 > minArea2) {
 						dgBigVector p01((p0 + p1).Scale(dgFloat64(0.5f)));
@@ -224,7 +224,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			dgInt32 i2 = face->m_index[2];
 
 			const dgBigVector& p0 = m_points[i0];
-			dgBigVector normal ((m_points[i1] - p0).CrossProduct3(m_points[i2] - p0));
+			dgBigVector normal ((m_points[i1] - p0).CrossProduct(m_points[i2] - p0));
 
 			//dgFloat64 N = (origin - p0) % normal;
 			dgFloat64 N = normal.DotProduct3(origin - p0);

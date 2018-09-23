@@ -189,14 +189,14 @@ class dgVector
 	}
 
 	// return cross product
-	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
+	DG_INLINE dgVector CrossProduct (const dgVector& B) const
 	{
 		return dgVector (m_y * B.m_z - m_z * B.m_y,
 			m_z * B.m_x - m_x * B.m_z,
 			m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
+	DG_INLINE dgVector CrossProduct (const dgVector& A, const dgVector& B) const
 	{
 		dgFloat32 cofactor[3][3];
 		dgFloat32 array[4][4];
@@ -606,12 +606,12 @@ class dgBigVector
 	}
 
 	// return cross product
-	DG_INLINE dgBigVector CrossProduct3 (const dgBigVector& B) const
+	DG_INLINE dgBigVector CrossProduct (const dgBigVector& B) const
 	{
 		return dgBigVector (m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	DG_INLINE dgBigVector CrossProduct4 (const dgBigVector& A, const dgBigVector& B) const
+	DG_INLINE dgBigVector CrossProduct (const dgBigVector& A, const dgBigVector& B) const
 	{
 		dgFloat64 cofactor[3][3];
 		dgFloat64 array[4][4];

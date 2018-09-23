@@ -264,8 +264,8 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 									
 									for (dgList<dgContactMaterial>::dgListNode* node = contact->GetFirst(); node; node = node->GetNext()) {
 										const dgContactMaterial* const contactMaterial = &node->GetInfo();
-										dgVector vel0 (veloc0 + omega0.CrossProduct3(contactMaterial->m_point - com0));
-										dgVector vel1 (veloc1 + omega1.CrossProduct3(contactMaterial->m_point - com1));
+										dgVector vel0 (veloc0 + omega0.CrossProduct(contactMaterial->m_point - com0));
+										dgVector vel1 (veloc1 + omega1.CrossProduct(contactMaterial->m_point - com1));
 										dgVector vRel (vel0 - vel1);
 										dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
 										dgFloat32 speed = vRel.DotProduct4(contactMaterial->m_normal).m_w;
@@ -652,7 +652,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	matrix = dgMatrix (body->m_gyroRotation, dgVector::m_wOne);
 	localOmega = matrix.UnrotateVector(omega);
 	dgVector angularMomentum(inertia * localOmega);
-	body->m_gyroTorque = matrix.RotateVector(localOmega.CrossProduct3(angularMomentum));
+	body->m_gyroTorque = matrix.RotateVector(localOmega.CrossProduct(angularMomentum));
 	
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 #else

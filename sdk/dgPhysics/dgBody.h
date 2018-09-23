@@ -432,7 +432,7 @@ DG_INLINE void dgBody::SetOmega (const dgVector& omega)
 
 DG_INLINE dgVector dgBody::GetVelocityAtPoint (const dgVector& point) const
 {
-	return m_veloc + m_omega.CrossProduct3(point - m_globalCentreOfMass);
+	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
 }
 
 DG_INLINE void dgBody::SetVelocityNoSleep(const dgVector& velocity)

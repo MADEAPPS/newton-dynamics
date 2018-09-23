@@ -255,7 +255,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 	}
 
 	m_gyroRotation = m_rotation;
-	m_gyroTorque = m_omega.CrossProduct3(CalculateAngularMomentum());
+	m_gyroTorque = m_omega.CrossProduct(CalculateAngularMomentum());
 
 	m_externalForce += m_impulseForce;
 	m_externalTorque += m_impulseTorque;
@@ -432,7 +432,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 			dgVector externTorque(m_matrix.UnrotateVector(m_externalTorque));
 			dgVector localOmega(m_matrix.UnrotateVector(m_omega));
 			for (dgInt32 i = 0; i < 4; i++) {
-				dgVector gyroTorque(localOmega.CrossProduct3(m_mass * localOmega));
+				dgVector gyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 				dgVector torque(externTorque - gyroTorque);
 				dgVector alpha(torque * m_invMass);
 				localOmega += alpha * dt;
@@ -450,7 +450,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 			for (dgInt32 i = 0; i < 4; i++) {
 				dgMatrix matrix(m_gyroRotation, dgVector::m_wOne);
 				dgVector localOmega(matrix.UnrotateVector(m_omega));
-				dgVector gyroTorque(localOmega.CrossProduct3(m_mass * localOmega));
+				dgVector gyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 				dgVector torque(externTorque - gyroTorque);
 				dgVector alpha(torque * m_invMass);
 				localOmega += alpha * dt;
@@ -482,7 +482,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 			for (dgInt32 i = 0; i < 4; i++) {
 				dgMatrix matrix(m_gyroRotation, dgVector::m_wOne);
 				dgVector localOmega(matrix.UnrotateVector(m_omega));
-				dgVector gyroTorque(localOmega.CrossProduct3(m_mass * localOmega));
+				dgVector gyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 				dgVector torque(externTorque - gyroTorque);
 
 				// and solving for alpha we get the angular acceleration at t + dt

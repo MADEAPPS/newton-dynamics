@@ -138,7 +138,7 @@ class dgConvexHull4dPointCluster: public dgConvexHull4dAABBTreeNode
 
 
 dgConvexHull4dTetraherum::dgTetrahedrumPlane::dgTetrahedrumPlane (const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3)
-	:dgBigVector ((p1 - p0).CrossProduct4 (p2 - p0, p3 - p0))
+	:dgBigVector ((p1 - p0).CrossProduct (p2 - p0, p3 - p0))
 {
 	dgBigVector& me = *this;
 	dgFloat64 invMag2 = dgFloat32 (0.0f);
@@ -207,7 +207,7 @@ void dgConvexHull4dTetraherum::Init (const dgConvexHull4dVector* const points, d
 	dgBigVector p1p0 (points[v1] - points[v0]);
 	dgBigVector p2p0 (points[v2] - points[v0]);
 	dgBigVector p3p0 (points[v3] - points[v0]);
-	dgBigVector normal (p1p0.CrossProduct4(p2p0, p3p0));
+	dgBigVector normal (p1p0.CrossProduct(p2p0, p3p0));
 	dgFloat64 volume = normal.DotProduct4(normal).m_x;
 	dgAssert (volume > dgFloat64 (0.0f));
 #endif
@@ -671,7 +671,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, cons
 							dgInt32 index3 = SupportVertex(&tree, points, normalMap.m_normal[l], false);
 							convexPoints[3] = points[index3];
 							dgBigVector p30(convexPoints[3] - convexPoints[0]);
-							dgBigVector plane(p10.CrossProduct4(p20, p30));
+							dgBigVector plane(p10.CrossProduct(p20, p30));
 							dgFloat64 volume = plane.DotProduct4(plane).GetScalar();
 							if (volume > testVol) {
 								validTetrahedrum = true;
@@ -741,7 +741,7 @@ bool dgConvexHull4d::Sanity() const
 		dgBigVector p1p0 (p1.Sub4(p0));
 		dgBigVector p2p0 (p2.Sub4(p0));
 		dgBigVector p3p0 (p3.Sub4(p0));
-		dgBigVector normal (p1p0.CrossProduct4 (p2p0, p3p0));
+		dgBigVector normal (p1p0.CrossProduct (p2p0, p3p0));
 
 		if (normal.m_w < dgFloat64 (0.0f)) {
 			tetraList.Append(node);

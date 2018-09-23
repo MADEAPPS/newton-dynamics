@@ -78,7 +78,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		dgAssert (xDir.DotProduct3(xDir) > dgFloat32 (0.0f));
 		matrix[2] = dgVector (normal);
 		matrix[0] = dgVector(xDir.Scale(dgFloat64 (1.0f) / sqrt (xDir.DotProduct3(xDir))));
-		matrix[1] = matrix[2].CrossProduct3(matrix[0]);
+		matrix[1] = matrix[2].CrossProduct(matrix[0]);
 		matrix[3] = dgVector (origin);
 		matrix[3][3] = dgFloat32 (1.0f);
 
@@ -89,7 +89,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		dgVector p10 (q1 - q0);
 		dgVector p20 (q2 - q0);
 		dgVector faceNormal (matrix.UnrotateVector (dgVector(normal)));
-		dgFloat32 areaInv = faceNormal.DotProduct3(p10.CrossProduct3(p20));
+		dgFloat32 areaInv = faceNormal.DotProduct3(p10.CrossProduct(p20));
 		if (e2->m_next != e0) {
 			const dgEdge* edge = e2;
 			dgVector r1 (q2);
@@ -97,7 +97,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 			do {
 				dgVector r2 (matrix.UntransformVector(dgVector(convexMesh.m_points.m_vertex[edge->m_next->m_incidentVertex])));
 				dgVector q20 (r2 - q0);
-				dgFloat32 areaInv1 = faceNormal.DotProduct3(q10.CrossProduct3(q20));
+				dgFloat32 areaInv1 = faceNormal.DotProduct3(q10.CrossProduct(q20));
 				if (areaInv1 > areaInv) {
 					e1 = edge;
 					e2 = edge->m_next;
@@ -266,9 +266,9 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 				dgVector p_p0 (p - q0);
 				dgVector p_p1 (p - q1);
 				dgVector p_p2 (p - q2);
-				dgFloat32 alpha0 = faceNormal.DotProduct3(p_p1.CrossProduct3(p_p2)) * areaInv;
-				dgFloat32 alpha1 = faceNormal.DotProduct3(p_p2.CrossProduct3(p_p0)) * areaInv;
-				dgFloat32 alpha2 = faceNormal.DotProduct3(p_p0.CrossProduct3(p_p1)) * areaInv;
+				dgFloat32 alpha0 = faceNormal.DotProduct3(p_p1.CrossProduct(p_p2)) * areaInv;
+				dgFloat32 alpha1 = faceNormal.DotProduct3(p_p2.CrossProduct(p_p0)) * areaInv;
+				dgFloat32 alpha2 = faceNormal.DotProduct3(p_p0.CrossProduct(p_p1)) * areaInv;
 
 				//alpha0 = 0.0f;
 				//alpha1 = 0.0f;
@@ -921,7 +921,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		do {
 			dgHugeVector p2(mesh->GetVertex(edge->m_incidentVertex));
 			dgHugeVector p2p0(p2 - p0);
-			plane += p1p0.CrossProduct3(p2p0);
+			plane += p1p0.CrossProduct(p2p0);
 			p1p0 = p2p0;
 			edge = edge->m_next;
 		} while (edge != face);
@@ -946,7 +946,7 @@ do {
 			dgHugeVector p1(mesh->GetVertex(edge->m_twin->m_incidentVertex));
 			dgHugeVector p1p0(p1 - p0);
 			dgHugeVector q1p0(point - p0);
-			dgGoogol side (q1p0.DotProduct3(p1p0.CrossProduct3(normal)));
+			dgGoogol side (q1p0.DotProduct3(p1p0.CrossProduct(normal)));
 			if (side >= dgGoogol::m_zero) {
 				return false;
 			}

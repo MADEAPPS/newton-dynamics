@@ -1690,8 +1690,8 @@ dFloat NewtonMaterialGetContactNormalSpeed(const NewtonMaterial* const materialH
 	dgVector p0 (material->m_point - body0->GetPosition());
 	dgVector p1 (material->m_point - body1->GetPosition());
 
-	dgVector v0 (body0->GetVelocity() + body0->GetOmega().CrossProduct3(p0));
-	dgVector v1 (body1->GetVelocity() + body1->GetOmega().CrossProduct3(p1));
+	dgVector v0 (body0->GetVelocity() + body0->GetOmega().CrossProduct(p0));
+	dgVector v1 (body1->GetVelocity() + body1->GetOmega().CrossProduct(p1));
 
 	dgVector dv (v1 - v0);
 
@@ -1722,8 +1722,8 @@ dFloat NewtonMaterialGetContactTangentSpeed(const NewtonMaterial* const material
 	dgVector p0 (material->m_point - body0->GetPosition());
 	dgVector p1 (material->m_point - body1->GetPosition());
 
-	dgVector v0 (body0->GetVelocity() + body0->GetOmega().CrossProduct3(p0));
-	dgVector v1 (body1->GetVelocity() + body1->GetOmega().CrossProduct3(p1));
+	dgVector v0 (body0->GetVelocity() + body0->GetOmega().CrossProduct(p0));
+	dgVector v1 (body1->GetVelocity() + body1->GetOmega().CrossProduct(p1));
 
 	dgVector dv (v1 - v0);
 	dgVector dir (index ? material->m_dir1 : material->m_dir0);
@@ -2170,12 +2170,12 @@ void NewtonMaterialContactRotateTangentDirections(const NewtonMaterial* const ma
 
 	const dgVector dir0 (alignVector[0], alignVector[1], alignVector[2], dgFloat32 (0.0f));
     	
-	dgVector dir1 (material->m_normal.CrossProduct3(dir0));
+	dgVector dir1 (material->m_normal.CrossProduct(dir0));
 	dgAssert(dir1.m_w == dgFloat32(0.0f));
 	dFloat mag2 = dir1.DotProduct4(dir1).GetScalar();
 	if (mag2 > dgFloat32(1.0e-6f)) {
 		material->m_dir1 = dir1.Normalize();
-		material->m_dir0 = material->m_dir1.CrossProduct3(material->m_normal);
+		material->m_dir0 = material->m_dir1.CrossProduct(material->m_normal);
 	}
 }
 
@@ -6290,7 +6290,7 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 			dgAssert (dgAbs (tmp.DotProduct3(coneAxis)) < dgFloat32 (0.999f));
 		}
 	}
-	dgVector lateral (tmp.CrossProduct3(coneAxis)); 
+	dgVector lateral (tmp.CrossProduct(coneAxis)); 
 	dgAssert(lateral.m_w = dgFloat32(0.0f));
 	dgAssert(coneAxis.m_w = dgFloat32(0.0f));
 	lateral = lateral.Normalize();

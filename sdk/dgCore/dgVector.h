@@ -124,43 +124,36 @@ class dgTemplateVector
 	}
 
 	// return cross product
-	DG_INLINE dgTemplateVector<T> CrossProduct3 (const dgTemplateVector<T>& B) const
+	DG_INLINE dgTemplateVector<T> CrossProduct (const dgTemplateVector<T>& B) const
 	{
 		return dgTemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
 									m_z * B.m_x - m_x * B.m_z,
 									m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	// return dot 4d dot product
-	DG_INLINE dgTemplateVector<T> DotProduct4 (const dgTemplateVector &A) const
-	{
-		T val (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
-		return dgTemplateVector<T> (val, val, val, val);
-	}
-
-	DG_INLINE dgTemplateVector<T> CrossProduct4 (const dgTemplateVector &A, const dgTemplateVector &B) const
+	DG_INLINE dgTemplateVector<T> CrossProduct(const dgTemplateVector &A, const dgTemplateVector &B) const
 	{
 		T cofactor[3][3];
 		T array[4][4];
 
 		const dgTemplateVector<T>& me = *this;
-		for (dgInt32 i = 0; i < 4; i ++) {
+		for (dgInt32 i = 0; i < 4; i++) {
 			array[0][i] = me[i];
 			array[1][i] = A[i];
 			array[2][i] = B[i];
-			array[3][i] = T (1.0f);
+			array[3][i] = T(1.0f);
 		}
 
 		dgTemplateVector<T> normal;
-		T sign = T (-1.0f);
-		for (dgInt32 i = 0; i < 4; i ++)  {
+		T sign = T(-1.0f);
+		for (dgInt32 i = 0; i < 4; i++) {
 
-			for (dgInt32 j = 0; j < 3; j ++) {
+			for (dgInt32 j = 0; j < 3; j++) {
 				dgInt32 k0 = 0;
-				for (dgInt32 k = 0; k < 4; k ++) {
+				for (dgInt32 k = 0; k < 4; k++) {
 					if (k != i) {
 						cofactor[j][k0] = array[j][k];
-						k0 ++;
+						k0++;
 					}
 				}
 			}
@@ -170,11 +163,20 @@ class dgTemplateVector
 			T det = x + y + z;
 
 			normal[i] = sign * det;
-			sign *= T (-1.0f);
+			sign *= T(-1.0f);
 		}
 
 		return normal;
 	}
+
+
+	// return dot 4d dot product
+	DG_INLINE dgTemplateVector<T> DotProduct4 (const dgTemplateVector &A) const
+	{
+		T val (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return dgTemplateVector<T> (val, val, val, val);
+	}
+
 
 	T GetMax () const
 	{

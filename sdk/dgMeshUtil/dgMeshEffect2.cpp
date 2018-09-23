@@ -371,7 +371,7 @@ class dgTetraIsoSufaceStuffing
 			dgAssert(det >= dgFloat32(0.0f));
 			if (dgAbs(det) > dgFloat32(1.0e-24f)) {
 				dgBigVector p0Point(point0 - p0);
-				dgBigVector normal(e10.CrossProduct3(e20));
+				dgBigVector normal(e10.CrossProduct(e20));
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
 					dgBigVector point(point0 + (point1 - point0).Scale(t));
@@ -413,7 +413,7 @@ class dgTetraIsoSufaceStuffing
 			dgAssert(det >= dgFloat32(0.0f));
 			if (dgAbs(det) > dgFloat32(1.0e-24f)) {
 				dgBigVector p0Point(point0 - p0);
-				dgBigVector normal(e10.CrossProduct3(e20));
+				dgBigVector normal(e10.CrossProduct(e20));
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
 					dgBigVector point(point0 + (point1 - point0).Scale(t));
@@ -764,7 +764,7 @@ class dgTetraIsoSufaceStuffing
 		dgBigVector p10(p1 - p0);
 		dgBigVector p20(p2 - p0);
 		dgBigVector p30(p3 - p0);
-		return p10.DotProduct3(p20.CrossProduct3(p30));
+		return p10.DotProduct3(p20.CrossProduct(p30));
 	}
 
 	dgArray<dgBigVector> m_points;

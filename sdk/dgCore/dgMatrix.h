@@ -133,13 +133,13 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 {
 	m_front = front; 
 	if (dgAbs (front.m_z) > dgFloat32 (0.577f)) {
-		m_right = front.CrossProduct3(dgVector (-front.m_y, front.m_z, dgFloat32(0.0f), dgFloat32(0.0f)));
+		m_right = front.CrossProduct(dgVector (-front.m_y, front.m_z, dgFloat32(0.0f), dgFloat32(0.0f)));
 	} else {
-	  	m_right = front.CrossProduct3(dgVector (-front.m_y, front.m_x, dgFloat32(0.0f), dgFloat32(0.0f)));
+	  	m_right = front.CrossProduct(dgVector (-front.m_y, front.m_x, dgFloat32(0.0f), dgFloat32(0.0f)));
 	}
   	//m_right = m_right.Scale4 (dgRsqrt (m_right.DotProduct3(m_right)));
 	m_right = m_right.Normalize();
-  	m_up = m_right.CrossProduct3(m_front);
+  	m_up = m_right.CrossProduct(m_front);
 
 	m_front.m_w = dgFloat32(0.0f);
 	m_up.m_w = dgFloat32(0.0f);
@@ -149,7 +149,7 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	dgAssert ((dgAbs (m_front.DotProduct3(m_front)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
 	dgAssert ((dgAbs (m_up.DotProduct3(m_up)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
 	dgAssert ((dgAbs (m_right.DotProduct3(m_right)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
-	dgAssert ((dgAbs (m_right.DotProduct3(m_front.CrossProduct3(m_up))) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbs (m_right.DotProduct3(m_front.CrossProduct(m_up))) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
 }
 
 DG_INLINE dgVector& dgMatrix::operator[] (dgInt32  i)
@@ -251,7 +251,7 @@ DG_INLINE bool dgMatrix::TestIdentity() const
 
 DG_INLINE bool dgMatrix::TestOrthogonal(dgFloat32 tol) const
 {
-	dgVector n (m_front.CrossProduct3(m_up));
+	dgVector n (m_front.CrossProduct(m_up));
 	dgFloat32 a = m_right.DotProduct3(m_right);
 	dgFloat32 b = m_up.DotProduct3(m_up);
 	dgFloat32 c = m_front.DotProduct3(m_front);

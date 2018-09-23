@@ -669,8 +669,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						for (dgInt32 j = 0; j < ccdContactCount; j++) {
 							dgVector point(&points[j].m_x);
 							dgVector normal(&normals[j].m_x);
-							dgVector vel0(veloc0 + omega0.CrossProduct3(point - com0));
-							dgVector vel1(veloc1 + omega1.CrossProduct3(point - com1));
+							dgVector vel0(veloc0 + omega0.CrossProduct(point - com0));
+							dgVector vel1(veloc1 + omega1.CrossProduct(point - com1));
 							dgVector vRel(vel1 - vel0);
 							dgFloat32 contactDistTravel = vRel.DotProduct4(normal).m_w * timestep;
 							ccdJoint |= (contactDistTravel > dist);

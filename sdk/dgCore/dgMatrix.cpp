@@ -292,8 +292,8 @@ dgMatrix dgMatrix::Symetric3by3Inverse () const
 void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
 	const dgMatrix& matrix = *this;
-	dgAssert (matrix[2].DotProduct3(matrix[0].CrossProduct3(matrix[1])) > 0.0f);
-	dgAssert (dgAbs (matrix[2].DotProduct3(matrix[0].CrossProduct3(matrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+	dgAssert (matrix[2].DotProduct3(matrix[0].CrossProduct(matrix[1])) > 0.0f);
+	dgAssert (dgAbs (matrix[2].DotProduct3(matrix[0].CrossProduct(matrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 /*
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > dgFloat32 (0.99995f)) {
@@ -485,7 +485,7 @@ dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
 */
 
 	const dgMatrix& me = *this;
-	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0].CrossProduct3(me[1])));
+	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0].CrossProduct(me[1])));
 	stretchAxis = me * Transpose();
 	stretchAxis.EigenVectors (scale);
 
@@ -589,7 +589,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 
 		if (sm < dgFloat32 (1.0e-12f)) {
 			// order the eigenvalue vectors	
-			dgVector tmp (eigenVectors.m_front.CrossProduct3(eigenVectors.m_up));
+			dgVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
 			if (tmp.DotProduct3(eigenVectors.m_right) < dgFloat32(0.0f)) {
 				dgAssert (0.0f);
 				//eigenVectors.m_right = eigenVectors.m_right.Scale (-dgFloat32(1.0f));

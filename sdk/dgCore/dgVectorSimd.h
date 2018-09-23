@@ -181,7 +181,7 @@ class dgVector
 	}
 
 	// return cross product
-	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
+	DG_INLINE dgVector CrossProduct (const dgVector& B) const
 	{
 		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2))),
 			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1))));
@@ -192,7 +192,7 @@ class dgVector
 		return (*this * A).AddHorizontal();
 	}
 
-	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
+	DG_INLINE dgVector CrossProduct (const dgVector& A, const dgVector& B) const
 	{
 		dgFloat32 cofactor[3][3];
 		dgFloat32 array[4][4];
@@ -579,7 +579,7 @@ class dgBigVector
 	}
 
 	// return cross product
-	DG_INLINE dgBigVector CrossProduct3(const dgBigVector& B) const
+	DG_INLINE dgBigVector CrossProduct(const dgBigVector& B) const
 	{
 		//dgBigVector tmp0(ShiftTripleLeft());
 		//dgBigVector tmp1(B.ShiftTripleRight());
@@ -774,7 +774,7 @@ class dgBigVector
 		return dgBigVector(val, val, val, val);
 	}
 
-	DG_INLINE dgBigVector CrossProduct4(const dgBigVector& A, const dgBigVector& B) const
+	DG_INLINE dgBigVector CrossProduct(const dgBigVector& A, const dgBigVector& B) const
 	{
 		dgFloat64 cofactor[3][3];
 		dgFloat64 array[4][4];

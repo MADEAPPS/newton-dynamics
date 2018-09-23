@@ -137,7 +137,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 		dgVector p01 (p0 - p1);
 		dgVector p12 (p1 - p2);
 		dgVector p23 (p2 - p3);
-		dgFloat32 volume = (p01.DotProduct4(p12.CrossProduct3(p23))).GetScalar();
+		dgFloat32 volume = (p01.DotProduct4(p12.CrossProduct(p23))).GetScalar();
 		if (volume < dgFloat32 (0.0f)) {
 			volume = -volume;
 			dgSwap(fem.m_index[0], fem.m_index[1]);
@@ -249,7 +249,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 	// here I need to add all other external acceleration like wind and pressure, friction and collision.
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		m_externalAccel[i] = unitAccel;
-		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
+		veloc[i] += deltaOmega.CrossProduct(m_posit[i]);
 	}
 
 	const dgSpringDamperLink* const links = &m_linkList[0];
@@ -285,9 +285,9 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			const dgVector p12(p1 - p2);
 			const dgVector p23(p2 - p3);
 
-			dgVector area123(p12.CrossProduct3(p23));
-			dgVector area0123(p23.CrossProduct3(p01));
-			dgVector area012(p12.CrossProduct3(p01));
+			dgVector area123(p12.CrossProduct(p23));
+			dgVector area0123(p23.CrossProduct(p01));
+			dgVector area012(p12.CrossProduct(p01));
 
 			dgFloat32 volume = (p01.DotProduct4(area123)).GetScalar();
 			dgVector deltaVolume(volume - fem.m_restVolume);

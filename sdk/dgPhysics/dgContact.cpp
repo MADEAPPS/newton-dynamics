@@ -153,8 +153,8 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 	jacobian0.m_linear = dir;
 	jacobian1.m_linear = dir * dgVector::m_negOne;
 
-	jacobian0.m_angular = param.m_r0.CrossProduct3(dir);
-	jacobian1.m_angular = dir.CrossProduct3(param.m_r1);
+	jacobian0.m_angular = param.m_r0.CrossProduct(dir);
+	jacobian1.m_angular = dir.CrossProduct(param.m_r1);
 
 	dgAssert(jacobian0.m_linear.m_w == dgFloat32(0.0f));
 	dgAssert(jacobian0.m_angular.m_w == dgFloat32(0.0f));

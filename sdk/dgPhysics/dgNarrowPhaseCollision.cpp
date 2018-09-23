@@ -320,7 +320,7 @@ dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dg
 	dgAssert (dgAbs (offsetMatrix[0].DotProduct3(offsetMatrix[0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
 	dgAssert (dgAbs (offsetMatrix[1].DotProduct3(offsetMatrix[1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
 	dgAssert (dgAbs (offsetMatrix[2].DotProduct3(offsetMatrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbs (offsetMatrix[2].DotProduct3(offsetMatrix[0].CrossProduct3(offsetMatrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[2].DotProduct3(offsetMatrix[0].CrossProduct(offsetMatrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
 
 	dgAssert (offsetMatrix[0][3] == dgFloat32 (0.0f));
 	dgAssert (offsetMatrix[1][3] == dgFloat32 (0.0f));
@@ -676,7 +676,7 @@ dgInt32 dgWorld::PruneContactsByRank(dgInt32 count, dgCollisionParamProxy& proxy
 	dgVector com(body->m_globalCentreOfMass);
 	for (dgInt32 i = 0; i < count; i++) {
 		jt[i].m_linear = proxy.m_contacts[i].m_normal;
-		jt[i].m_angular = (proxy.m_contacts[i].m_point - com).CrossProduct3(proxy.m_contacts[i].m_normal);
+		jt[i].m_angular = (proxy.m_contacts[i].m_point - com).CrossProduct(proxy.m_contacts[i].m_normal);
 	}
 
 
@@ -801,8 +801,8 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgVector controlDir0 (dgFloat32 (0.0f));
 	dgVector controlDir1 (dgFloat32 (0.0f));
 	dgVector controlNormal (contactArray[0].m_normal);
-	dgVector vel0 (v0 + w0.CrossProduct3(contactArray[0].m_point - com0));
-	dgVector vel1 (v1 + w1.CrossProduct3(contactArray[0].m_point - com1));
+	dgVector vel0 (v0 + w0.CrossProduct(contactArray[0].m_point - com0));
+	dgVector vel1 (v1 + w1.CrossProduct(contactArray[0].m_point - com1));
 	dgVector vRel (vel1 - vel0);
 	dgAssert (controlNormal.m_w == dgFloat32 (0.0f));
 	dgVector tangDir (vRel - controlNormal.Scale (vRel.DotProduct3(controlNormal)));
@@ -816,13 +816,13 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		} else {
 			tangDir = dgVector (-controlNormal.m_y, controlNormal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
 		}
-		controlDir0 = controlNormal.CrossProduct3(tangDir);
+		controlDir0 = controlNormal.CrossProduct(tangDir);
 		dgAssert (controlDir0.m_w == dgFloat32 (0.0f));
 		dgAssert (controlDir0.DotProduct4(controlDir0).GetScalar() > dgFloat32 (1.0e-8f));
 		//controlDir0 = controlDir0.Scale (dgRsqrt (controlDir0.DotProduct3(controlDir0)));
 		controlDir0 = controlDir0.Normalize();
-		controlDir1 = controlNormal.CrossProduct3(controlDir0);
-		dgAssert (dgAbs(controlNormal.DotProduct3(controlDir0.CrossProduct3(controlDir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+		controlDir1 = controlNormal.CrossProduct(controlDir0);
+		dgAssert (dgAbs(controlNormal.DotProduct3(controlDir0.CrossProduct(controlDir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	}
 
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
@@ -903,17 +903,17 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				} else {
 					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
-				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct3(tangDir);
+				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct(tangDir);
 				dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
 				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
-				contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct3(contactMaterial->m_dir0);
-				dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+				contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct(contactMaterial->m_dir0);
+				dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			}
 		} else {
-			dgVector veloc0 (v0 + w0.CrossProduct3(contactMaterial->m_point - com0));
-			dgVector veloc1 (v1 + w1.CrossProduct3(contactMaterial->m_point - com1));
+			dgVector veloc0 (v0 + w0.CrossProduct(contactMaterial->m_point - com0));
+			dgVector veloc1 (v1 + w1.CrossProduct(contactMaterial->m_point - com1));
 			dgVector relReloc (veloc1 - veloc0);
 
 			dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
@@ -936,14 +936,14 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				} else {
 					tangentDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
-				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct3(tangentDir);
+				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct(tangentDir);
 				dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
 				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
 			}
-			contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct3(contactMaterial->m_dir0);
-			dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+			contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct(contactMaterial->m_dir0);
+			dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 		}
 		dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 		dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));

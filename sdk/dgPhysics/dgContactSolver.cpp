@@ -394,7 +394,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		for (dgInt32 i = 0; i < 8; i++) {
 			SupportVertex(matrix[1], 3);
 			dgVector e1(m_hullDiff[3] - m_hullDiff[0]);
-			dgVector area(e0.CrossProduct3(e1));
+			dgVector area(e0.CrossProduct(e1));
 			dgFloat32 area2 = area.DotProduct3(area);
 			if (area2 > maxArea) {
 				m_hullSum[2] = m_hullSum[3];
@@ -414,7 +414,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 	if (count == 3) {
 		dgVector e10(m_hullDiff[1] - m_hullDiff[0]);
 		dgVector e20(m_hullDiff[2] - m_hullDiff[0]);
-		dgVector normal(e10.CrossProduct3(e20));
+		dgVector normal(e10.CrossProduct(e20));
 		dgFloat32 mag2 = normal.DotProduct3(normal);
 		dgAssert(mag2 > dgFloat32(0.0f));
 		normal = normal.Scale(dgRsqrt(mag2));
@@ -433,7 +433,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		dgVector e0(m_hullDiff[1] - m_hullDiff[0]);
 		dgVector e1(m_hullDiff[2] - m_hullDiff[0]);
 		dgVector e2(m_hullDiff[3] - m_hullDiff[0]);
-		dgVector n(e1.CrossProduct3(e2));
+		dgVector n(e1.CrossProduct(e2));
 		volume = e0.DotProduct3(n);
 	}
 
@@ -471,7 +471,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		for (i++; i < nCount; i++) {
 			SupportVertex(m_hullDirs[i], 2);
 			e2 = m_hullDiff[2] - m_hullDiff[0];
-			normal = e1.CrossProduct3(e2);
+			normal = e1.CrossProduct(e2);
 			error2 = normal.DotProduct3(normal);
 			if (error2 > DG_CALCULATE_SEPARATING_PLANE_ERROR) {
 				break;
@@ -503,7 +503,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 			dgVector f0(m_hullDiff[1] - m_hullDiff[0]);
 			dgVector f1(m_hullDiff[2] - m_hullDiff[0]);
 			dgVector f2(m_hullDiff[3] - m_hullDiff[0]);
-			dgVector n(f1.CrossProduct3(f2));
+			dgVector n(f1.CrossProduct(f2));
 			dgFloat32 volume1 = f0.DotProduct3(n);
 			dgAssert(volume1 < dgFloat32(0.0f));
 		}
@@ -721,14 +721,14 @@ DG_INLINE void dgContactSolver::CalculateContactFromFeacture(dgInt32 featureType
 		{
 			dgVector e10(m_hullDiff[1] - m_hullDiff[0]);
 			dgVector e20(m_hullDiff[2] - m_hullDiff[0]);
-			dgVector normal(e10.CrossProduct3(e20));
+			dgVector normal(e10.CrossProduct(e20));
 			dgAssert(normal.DotProduct3(normal) > dgFloat32(0.0f));
 
 			dgFloat32 alphas[3];
 			for (dgInt32 i0 = 2, i1 = 0; i1 < 3; i1++) {
 				const dgVector& p1p0 = m_hullDiff[i0];
 				const dgVector& p2p0 = m_hullDiff[i1];
-				alphas[i0] = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
+				alphas[i0] = normal.DotProduct3(p1p0.CrossProduct(p2p0));
 				i0 = i1;
 			}
 
@@ -855,7 +855,7 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 		ptr = (dgVector*)&shape2[0];
 		dgInt32 i0 = count1 - 1;
 		for (dgInt32 i1 = 0; i1 < count1; i1++) {
-			dgVector n(normal.CrossProduct3(shape1[i1] - shape1[i0]));
+			dgVector n(normal.CrossProduct(shape1[i1] - shape1[i0]));
 			dgAssert(n.DotProduct3(n) > dgFloat32(0.0f));
 			dgPlane plane(n, - n.DotProduct3(shape1[i0]));
 
@@ -904,7 +904,7 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 		const dgVector& p = shape2[0];
 		dgInt32 i0 = count1 - 1;
 		for (dgInt32 i1 = 0; i1 < count1; i1++) {
-			dgVector n(normal.CrossProduct3(shape1[i1] - shape1[i0]));
+			dgVector n(normal.CrossProduct(shape1[i1] - shape1[i0]));
 			dgAssert(n.DotProduct3(n) > dgFloat32(0.0f));
 			dgPlane plane(n, - n.DotProduct3(shape1[i0]));
 			dgFloat32 test0 = plane.Evalue(p);
@@ -1072,7 +1072,7 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 		dgInt32 edgeIndex = count1;
 		dgPerimenterEdge* poly = &subdivision[0];
 		for (dgInt32 j1 = count0 - 1; j1 >= 0; j1--) {
-			dgVector n(normal.CrossProduct3(shape0[j1] - shape0[j0]));
+			dgVector n(normal.CrossProduct(shape0[j1] - shape0[j0]));
 			dgPlane plane(n, - n.DotProduct3(shape0[j0]));
 			j0 = j1;
 			count = 0;

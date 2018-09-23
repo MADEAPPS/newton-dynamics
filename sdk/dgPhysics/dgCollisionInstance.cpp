@@ -640,7 +640,7 @@ void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix,
 		dgVector buoyanceCenter (volumeIntegral - origin);
 
 		dgVector force (gravity.Scale (-fluidDensity * volumeIntegral.m_w));
-		dgVector torque (buoyanceCenter.CrossProduct3(force));
+		dgVector torque (buoyanceCenter.CrossProduct(force));
 
 		unitForce += force;
 		unitTorque += torque;

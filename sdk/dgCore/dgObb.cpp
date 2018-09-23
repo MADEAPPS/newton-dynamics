@@ -128,7 +128,7 @@ namespace InternalSphere
 			dgVector p2 (&ptr[index]);
 			p2 = p2 * scaleVector;
 
-			dgVector normal ((p1 - p0).CrossProduct3(p2 - p0));
+			dgVector normal ((p1 - p0).CrossProduct(p2 - p0));
 
 			dgFloat64 area = dgFloat32 (0.5f) * sqrt (normal.DotProduct3(normal));
 
