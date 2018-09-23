@@ -215,12 +215,12 @@ DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 
 DG_INLINE dgVector dgDynamicBody::PredictLinearVelocity(dgFloat32 timestep) const
 {
-	return 	m_veloc + m_externalForce.Scale3 (timestep * m_invMass.m_w);
+	return 	m_veloc + m_externalForce.Scale4 (timestep * m_invMass.m_w);
 }
 
 DG_INLINE dgVector dgDynamicBody::PredictAngularVelocity(dgFloat32 timestep) const
 {
-	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_externalTorque).Scale3 (timestep);
+	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_externalTorque).Scale4 (timestep);
 }
 
 

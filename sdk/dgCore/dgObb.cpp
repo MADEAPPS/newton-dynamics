@@ -470,7 +470,7 @@ void dgObb::SetDimensions (
 	m_posit = TransformVector (massCenter);
 
 	dgVector dim (max - min);
-	dim = dim.Scale3 (dgFloat32(0.5f));
+	dim = dim.Scale4 (dgFloat32(0.5f));
 	SetDimensions (dim.m_x + InternalSphere::SPHERE_TOL, 
 				   dim.m_y + InternalSphere::SPHERE_TOL, 
 				   dim.m_z + InternalSphere::SPHERE_TOL);

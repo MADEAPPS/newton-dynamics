@@ -137,7 +137,8 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	} else {
 	  	m_right = front.CrossProduct3(dgVector (-front.m_y, front.m_x, dgFloat32(0.0f), dgFloat32(0.0f)));
 	}
-  	m_right = m_right.Scale3 (dgRsqrt (m_right.DotProduct3(m_right)));
+  	//m_right = m_right.Scale4 (dgRsqrt (m_right.DotProduct3(m_right)));
+	m_right = m_right.Normalize();
   	m_up = m_right.CrossProduct3(m_front);
 
 	m_front.m_w = dgFloat32(0.0f);
@@ -150,7 +151,6 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	dgAssert ((dgAbs (m_right.DotProduct3(m_right)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
 	dgAssert ((dgAbs (m_right.DotProduct3(m_front.CrossProduct3(m_up))) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
 }
-
 
 DG_INLINE dgVector& dgMatrix::operator[] (dgInt32  i)
 {

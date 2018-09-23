@@ -317,7 +317,7 @@ void dgCollisionBox::GetCollisionInfo(dgCollisionInfo* const info) const
 void dgCollisionBox::Serialize(dgSerialize callback, void* const userData) const
 {
 	SerializeLow(callback, userData);
-	dgVector size (m_size[0].Scale3 (dgFloat32 (2.0f)));
+	dgVector size (m_size[0].Scale4 (dgFloat32 (2.0f)));
 	callback (userData, &size, sizeof (dgVector));
 }
 
