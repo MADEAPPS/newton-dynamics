@@ -71,9 +71,9 @@ class dgConvexHull3d::dgNormalMap
 			dgVector p12(p1 + p2);
 			dgVector p20(p2 + p0);
 
-			p01 = p01.Scale3(dgRsqrt(p01.DotProduct3(p01)));
-			p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
-			p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
+			p01 = p01.Scale4(dgRsqrt(p01.DotProduct3(p01)));
+			p12 = p12.Scale4(dgRsqrt(p12.DotProduct3(p12)));
+			p20 = p20.Scale4(dgRsqrt(p20.DotProduct3(p20)));
 
 			dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 			dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
@@ -464,8 +464,8 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 	}
 
 	validTetrahedrum = false;
-	dgBigVector e2(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));;
-	dgBigVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgBigVector e2(dgFloat32 (0.0f));
+	dgBigVector normal (dgFloat32 (0.0f));
 	for (dgInt32 i = 2; i < normalMap.m_count; i ++) {
 		dgInt32 index = SupportVertex (&tree, points, normalMap.m_normal[i]);
 		dgAssert (index >= 0);
@@ -480,6 +480,7 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 		}
 	}
 
+	dgAssert(normal.m_w == dgFloat32(0.0f));
 	if (!validTetrahedrum) {
 		m_count = 0;
 		dgAssert (0);
@@ -488,7 +489,7 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 
 	// find the largest possible tetrahedron
 	validTetrahedrum = false;
-	dgBigVector e3(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgBigVector e3(dgFloat32 (0.0f));
 
 	index0 = SupportVertex (&tree, points, normal);
 	e3 = points[index0] - m_points[0];
@@ -500,7 +501,7 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 		validTetrahedrum = true;
 	}
 	if (!validTetrahedrum) {
-		dgVector n (normal.Scale3(dgFloat64 (-1.0f)));
+		dgVector n (normal.Scale4(dgFloat64 (-1.0f)));
 		dgInt32 index = SupportVertex (&tree, points, n);
 		e3 = points[index] - m_points[0];
 		dgFloat64 error2 = normal.DotProduct3(e3);
@@ -546,7 +547,7 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 	return count;
 #else
 	
-	dgBigVector origin((m_aabbP1 + m_aabbP0).Scale3 (0.5f));
+	dgBigVector origin((m_aabbP1 + m_aabbP0).Scale4 (0.5f));
 
 	dgBigVector dir(m_aabbP1 - m_aabbP0);
 	dgAssert(dir.DotProduct3(dir) > dgFloat32(1.0e-4f));
@@ -565,7 +566,7 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 	dgBigVector e0(m_points[1] - m_points[0]);
 	dgAssert(e0.DotProduct3(e0) > dgFloat32(1.0e-4f));
 	dgFloat64 t = -e0.DotProduct3(origin - m_points[0]) / e0.DotProduct3(e0);
-	dir = m_points[0] + e0.Scale3(t) - origin;
+	dir = m_points[0] + e0.Scale4(t) - origin;
 
 	dgAssert(dir.DotProduct3(dir) > dgFloat32(1.0e-4f));
 	dir = dir.Normalize();
@@ -750,7 +751,7 @@ bool dgConvexHull3d::CheckFlatSurface(dgConvexHull3dAABBTreeNode* tree, dgConvex
 	dgAssert(e0.DotProduct3(e0) > dgFloat32(1.0e-4f));
 	dgAssert(e1.DotProduct3(e1) > dgFloat32(1.0e-4f));
 	dgBigVector normal(e1.CrossProduct3(e0));
-	//dgFloat64 mag2 = normal.DotProduct3(normal);
+	dgAssert(normal.m_w == dgFloat32(0.0f));
 	dgAssert(normal.DotProduct3(normal) > dgFloat32(1.0e-6f));
 	normal = normal.Normalize();
 
@@ -759,7 +760,7 @@ bool dgConvexHull3d::CheckFlatSurface(dgConvexHull3dAABBTreeNode* tree, dgConvex
 
 	dgFloat64 volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
 	if (dgAbs(volume) < dgFloat32(1.0e-9f)) {
-		normal = normal.Scale3(dgFloat32(-1.0f));
+		normal = normal.Scale4(dgFloat32(-1.0f));
 		index = SupportVertex(&tree, points, normal);
 		m_points[3] = points[index];
 		volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);

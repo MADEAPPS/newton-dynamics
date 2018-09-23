@@ -83,9 +83,12 @@ void dgConvexHull4d::dgNormalMap::TessellateTriangle(dgInt32 level, const dgVect
 		dgVector p12(p1 + p2);
 		dgVector p20(p2 + p0);
 
-		p01 = p01.Scale3(dgRsqrt(p01.DotProduct3(p01)));
-		p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
-		p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
+		dgAssert (p01.m_w == dgFloat32 (0.0f));
+		dgAssert (p12.m_w == dgFloat32 (0.0f));
+		dgAssert (p20.m_w == dgFloat32 (0.0f));
+		p01 = p01.Scale4(dgRsqrt(p01.DotProduct3(p01)));
+		p12 = p12.Scale4(dgRsqrt(p12.DotProduct3(p12)));
+		p20 = p20.Scale4(dgRsqrt(p20.DotProduct3(p20)));
 
 		dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 		dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
