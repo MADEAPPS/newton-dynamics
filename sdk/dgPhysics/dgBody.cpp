@@ -280,7 +280,9 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 		if (p1p0.DotProduct3(p1p0) > dgFloat32 (1.0e-12f)) {
 			dgFloat32 t = m_collision->RayCast (localP0, localP1, dgFloat32 (1.0f), contactOut, preFilter, this, userData);
 			if (t < dgFloat32 (1.0f)) {
-				dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale3(t)));
+				dgAssert (localP0.m_w == dgFloat32 (0.0f));
+				dgAssert (localP1.m_w == dgFloat32 (0.0f));
+				dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale4(t)));
 				dgVector l1l0 (line.m_l1 - line.m_l0);
 				t = l1l0.DotProduct3(p - line.m_l0) / l1l0.DotProduct3(l1l0);
 				if (t < maxT) {
@@ -343,7 +345,7 @@ dgVector dgBody::CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgF
 			massAccel *= (dgFloat32 (2.0f) * dgFloat32 (LINEAR_SOLVER_SUB_STEPS) / dgFloat32 (LINEAR_SOLVER_SUB_STEPS + 1));
 		} 
 	}
-	return (desiredVeloc - m_veloc).Scale3 (massAccel);
+	return (desiredVeloc - m_veloc).Scale4 (massAccel);
 */
 }
 
@@ -691,12 +693,6 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 	// change of momentum
 	dgVector changeOfMomentum (contactMatrix.RotateVector (pointDeltaVeloc));
 
-
-//	dgVector dv (changeOfMomentum.Scale3 (m_invMass.m_w));
-//	dgVector dw (invInertia.RotateVector (globalContact.CrossProduct3(changeOfMomentum)));
-//	m_veloc += dv;
-//	m_omega += dw;
-
 	m_impulseForce += changeOfMomentum.Scale4(1.0f / timestep);
 	m_impulseTorque += globalContact.CrossProduct3(m_impulseForce);
 
@@ -707,13 +703,6 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 
 void dgBody::ApplyImpulsePair (const dgVector& linearImpulseIn, const dgVector& angularImpulseIn, dgFloat32 timestep)
 {
-//	dgMatrix inertia (CalculateInertiaMatrix());
-//	dgMatrix invInertia (CalculateInvInertiaMatrix());
-//	dgVector linearImpulse (m_veloc.Scale3 (m_mass.m_w) + linearImpulseIn);
-//	dgVector angularImpulse (inertia.RotateVector (m_omega) + angularImpulseIn);
-//	m_veloc = linearImpulse.Scale3(m_invMass.m_w);
-//	m_omega = invInertia.RotateVector(angularImpulse);
-
 	m_impulseForce += linearImpulseIn.Scale4(1.0f / timestep);
 	m_impulseTorque += angularImpulseIn.Scale4(1.0f / timestep);
 
@@ -728,7 +717,6 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 
 	dgMatrix inertia (CalculateInertiaMatrix());
 
-	//dgVector impulse (m_veloc.Scale3 (m_mass.m_w));
 	dgVector impulse (dgFloat32 (0.0f));
 	dgVector angularImpulse (dgFloat32 (0.0f));
 
@@ -742,10 +730,6 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 		impulse += L;
 		angularImpulse += Q;
 	}
-
-//	dgMatrix invInertia (CalculateInvInertiaMatrix());
-//	m_veloc = impulse.Scale3(m_invMass.m_w);
-//	m_omega = invInertia.RotateVector(angularImpulse);
 
 	m_impulseForce += impulse.Scale4(1.0f / timestep);
 	m_impulseTorque += angularImpulse.Scale4(1.0f / timestep);

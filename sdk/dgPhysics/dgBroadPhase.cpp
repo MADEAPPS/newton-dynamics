@@ -1625,10 +1625,15 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 	DG_TRACKTIME(__FUNCTION__);
 
 	dgContactList* const contactList = m_world;
-	for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = contactNode->GetNext()) {
+	dgContactList::dgListNode* nextContactNode;
+	for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = nextContactNode) {
+		nextContactNode = contactNode->GetNext();
 		dgContact* const contact = contactNode->GetInfo();
-		m_world->AttachContact(contact);
-		m_contactCache.AddContactJoint(contact);
+		if (m_contactCache.AddContactJoint(contact)) {
+			m_world->AttachContact(contact);
+		} else {
+			delete contact;
+		}
 	}
 	
 	if (contactList->m_activeContactsCount >= m_world->m_jointsMemory.GetElementsCapacity()) {
@@ -1644,11 +1649,9 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 		}
 		contactList->m_activeContactsCount = activeCount;
 	}
-
-	RemoveOldContacts();
 }
 
-void dgBroadPhase::RemoveOldContacts()
+void dgBroadPhase::DeleteDeadContacts()
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgContactList* const contactList = m_world;
@@ -1656,7 +1659,6 @@ void dgBroadPhase::RemoveOldContacts()
 	for (dgInt32 i = 0; i < count; i++) {
 		dgContact* const contact = contactList->m_deadContacts[i]->GetInfo();
 		m_contactCache.RemoveContactJoint(contact);
-//		m_world->DestroyConstraint(contact);
 		m_world->RemoveContact(contact);
 		delete contact;
 	}
@@ -1756,54 +1758,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	contactList->m_activeContactsCount = 0;
 	dgContactList::dgListNode* const lastNode = contactList->GetFirst();
 
-#ifdef DG_USE_OLD_SCANNER
-	syncPoints.m_fullScan = syncPoints.m_fullScan = true;
-	dgContactList::dgListNode* contactListNode = contactList->GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateRigidBodyContact");
-		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-	if (m_pendingSoftBodyPairsCount) {
-		for (dgInt32 i = 0; i < threadsCount; i++) {
-			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode, "dgBroadPhase::UpdateSoftBodyContact");
-		}
-		m_world->SynchronizationBarrier();
-	}
-
-	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(CollidingPairsKernel, &syncPoints, broadPhaseNode, "dgBroadPhase::CollidingPairs");
-		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-	dgContactList::dgListNode* newContact = lastNode ? lastNode->GetPrev() : contactList->GetLast();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(AddNewContactsKernel, &syncPoints, newContact, "dgBroadPhase::AddNewContacts");
-		newContact = newContact ? newContact->GetPrev() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-//	m_recursiveChunks = false;
-	if (m_generatedBodies.GetCount()) {
-		dgAssert (0);
-//		syncPoints.m_newBodiesNodes = m_generatedBodies.GetFirst();
-//		for (dgInt32 i = 0; i < threadsCount; i++) {
-//			m_world->QueueJob(AddGeneratedBodiesContactsKernel, &syncPoints, m_world);
-//		}
-//		m_world->SynchronizationBarrier();
-//
-//		for (dgInt32 i = 0; i < threadsCount; i++) {
-//			m_world->QueueJob(UpdateContactsKernel, &syncPoints, m_world);
-//		}
-//		m_world->SynchronizationBarrier();
-//
-//		m_generatedBodies.RemoveAll();
-	}
-#else
-
 	syncPoints.m_fullScan = syncPoints.m_fullScan || (syncPoints.m_atomicPendingBodiesCount >= (syncPoints.m_atomicDynamicsCount / 2));
 	dgList<dgBroadPhaseNode*>::dgListNode* broadPhaseNode = m_updateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1811,6 +1765,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		broadPhaseNode = broadPhaseNode ? broadPhaseNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
+
+	AttachNewContacts(lastNode);
+	dgAssert(SanityCheck());
 
 	dgContactList::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1842,8 +1799,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		//
 		//m_generatedBodies.RemoveAll();
 	}
-#endif
 
-	AttachNewContacts(lastNode);
-	dgAssert (SanityCheck());
+	DeleteDeadContacts();
 }

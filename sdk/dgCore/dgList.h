@@ -40,7 +40,6 @@ class dgList
 		dgListNode (dgListNode* const prev, dgListNode* const next) 
 			:m_info () 
 		{
-//			dgAssert ((dgUnsigned64 (&m_info) & 0x0f) == 0);
 			m_prev = prev;
 			m_next = next;
 			if (m_prev) {

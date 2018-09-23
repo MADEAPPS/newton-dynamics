@@ -275,7 +275,9 @@ dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dg
 	dgFloat32 t = dgRayCastSphere (p0, p1, dgVector (dgFloat32 (0.0f)), m_radius);
 	if (t < maxT) {
 		dgVector contact (p0 + (p1 - p0).Scale3 (t));
-		contactOut.m_normal = contact.Scale3 (dgRsqrt (contact.DotProduct3(contact)));
+		dgAssert (contact.m_w == dgFloat32 (0.0f));
+		//contactOut.m_normal = contact.Scale4 (dgRsqrt (contact.DotProduct3(contact)));
+		contactOut.m_normal = contact.Normalize();
 		//contactOut.m_userId = SetUserDataID();
 	}
 	return t;

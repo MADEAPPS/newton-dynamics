@@ -305,13 +305,21 @@ class dgBroadPhase
 			return NULL;
 		}
 
-		DG_INLINE void AddContactJoint(dgContact* const joint)
+		DG_INLINE bool AddContactJoint(dgContact* const joint)
 		{
+			// note this function is not thread safe
 			CacheEntryTag tag(joint->GetBody0()->m_uniqueID, joint->GetBody1()->m_uniqueID);
 			dgUnsigned32 hash = tag.GetHash();
 
 			dgInt32 entry = hash & (m_count - 1);
 			dgContactCacheLine* cacheLine = &(*this)[entry];
+
+			for (dgInt32 i = cacheLine->m_count - 1; i >= 0; i--) {
+				if (cacheLine->m_tags[i].m_tag == tag.m_tag) {
+					return false;
+				}
+			}
+
 			while (cacheLine->m_count == 4) {
 				Rehash();
 				entry = hash & (m_count - 1);
@@ -326,6 +334,7 @@ class dgBroadPhase
 			cacheLine->m_tags[index] = tag;
 			cacheLine->m_hashKey[index] = hash;
 			cacheLine->m_contact[index] = joint;
+			return true;
 		}
 
 		DG_INLINE void RemoveContactJoint(dgContact* const joint)
@@ -484,7 +493,7 @@ class dgBroadPhase
 	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 	virtual void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
 
-	void RemoveOldContacts();
+	void DeleteDeadContacts();
 	void AttachNewContacts(dgContactList::dgListNode* const lastNode);
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)

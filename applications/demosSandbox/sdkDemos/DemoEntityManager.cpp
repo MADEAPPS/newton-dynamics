@@ -31,7 +31,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// gyroscope precession
@@ -47,7 +47,7 @@
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
-//#define DEFAULT_SCENE	16			// uniform Scaled Collision
+#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// continuous collision
