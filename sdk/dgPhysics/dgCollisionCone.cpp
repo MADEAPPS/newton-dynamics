@@ -199,9 +199,9 @@ dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const ver
 		dir_yz.m_x = dgFloat32(0.0f);
 		dgFloat32 mag2 = dir_yz.DotProduct4(dir_yz).GetScalar();
 		dgAssert(mag2 > dgFloat32(0.0f));
-		dir_yz = dir_yz.Scale4(dgFloat32(1.0f) / dgSqrt(mag2));
+		dir_yz = dir_yz.Scale(dgFloat32(1.0f) / dgSqrt(mag2));
 
-		dgVector p0(dir_yz.Scale4(m_radius));
+		dgVector p0(dir_yz.Scale(m_radius));
 		dgVector p1(dgVector::m_zero);
 
 		p0.m_x = -m_height;
@@ -230,9 +230,9 @@ dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgFloat32 sk
 		dir_yz.m_x = dgFloat32(0.0f);
 		dgFloat32 mag2 = dir_yz.DotProduct4(dir_yz).GetScalar();
 		dgAssert(mag2 > dgFloat32(0.0f));
-		dir_yz = dir_yz.Scale4(dgFloat32(1.0f) / dgSqrt(mag2));
+		dir_yz = dir_yz.Scale(dgFloat32(1.0f) / dgSqrt(mag2));
 
-		dgVector p0(dir_yz.Scale4(m_radius - DG_PENETRATION_TOL));
+		dgVector p0(dir_yz.Scale(m_radius - DG_PENETRATION_TOL));
 		dgVector p1(dgVector::m_zero);
 
 		p0.m_x = -(m_height - DG_PENETRATION_TOL);
@@ -251,7 +251,7 @@ dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgFloat32 sk
 dgVector dgCollisionCone::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
 {
 	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
-	return point + dir.Scale4(DG_PENETRATION_TOL);
+	return point + dir.Scale(DG_PENETRATION_TOL);
 }
 
 
@@ -339,7 +339,7 @@ dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, con
 			dgVector acrossPlane(test0 * test1);
 			if (acrossPlane.m_x < 0.0f) {
 				dgVector step(m_profile[i] - m_profile[i0]);
-				contactsOut[count] = m_profile[i0] - step.Scale4(test0.m_x / (step.DotProduct4(normal1).m_x));
+				contactsOut[count] = m_profile[i0] - step.Scale(test0.m_x / (step.DotProduct4(normal1).m_x));
 				count++;
 			}
 			i0 = i;

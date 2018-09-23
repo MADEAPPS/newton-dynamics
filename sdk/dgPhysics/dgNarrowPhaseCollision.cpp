@@ -805,7 +805,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgVector vel1 (v1 + w1.CrossProduct3(contactArray[0].m_point - com1));
 	dgVector vRel (vel1 - vel0);
 	dgAssert (controlNormal.m_w == dgFloat32 (0.0f));
-	dgVector tangDir (vRel - controlNormal.Scale4 (vRel.DotProduct3(controlNormal)));
+	dgVector tangDir (vRel - controlNormal.Scale (vRel.DotProduct3(controlNormal)));
 	dgFloat32 diff = tangDir.DotProduct3(tangDir);
 
 	dgInt32 staticMotion = 0;
@@ -819,7 +819,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		controlDir0 = controlNormal.CrossProduct3(tangDir);
 		dgAssert (controlDir0.m_w == dgFloat32 (0.0f));
 		dgAssert (controlDir0.DotProduct4(controlDir0).GetScalar() > dgFloat32 (1.0e-8f));
-		//controlDir0 = controlDir0.Scale4 (dgRsqrt (controlDir0.DotProduct3(controlDir0)));
+		//controlDir0 = controlDir0.Scale (dgRsqrt (controlDir0.DotProduct3(controlDir0)));
 		controlDir0 = controlDir0.Normalize();
 		controlDir1 = controlNormal.CrossProduct3(controlDir0);
 		dgAssert (dgAbs(controlNormal.DotProduct3(controlDir0.CrossProduct3(controlDir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
@@ -906,7 +906,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct3(tangDir);
 				dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
-				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale4 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
+				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
 				contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct3(contactMaterial->m_dir0);
 				dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
@@ -924,11 +924,11 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 //				breakImpulse1 = contactMaterial->m_collision1->GetBreakImpulse();
 			}
 			
-			dgVector tangentDir (relReloc - contactMaterial->m_normal.Scale4 (impulse));
+			dgVector tangentDir (relReloc - contactMaterial->m_normal.Scale (impulse));
 			diff = tangentDir.DotProduct3(tangentDir);
 			if (diff > dgFloat32 (1.0e-2f)) {
 				dgAssert (tangentDir.m_w == dgFloat32 (0.0f));
-				//contactMaterial->m_dir0 = tangentDir.Scale4 (dgRsqrt (diff));
+				//contactMaterial->m_dir0 = tangentDir.Scale (dgRsqrt (diff));
 				contactMaterial->m_dir0 = tangentDir.Normalize();
 			} else {
 				if (dgAbs (contactMaterial->m_normal.m_z) > dgFloat32 (0.577f)) {
@@ -939,7 +939,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct3(tangentDir);
 				dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
-				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale4 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
+				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
 			}
 			contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct3(contactMaterial->m_dir0);
@@ -1190,7 +1190,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 	} else {
 		contact->m_body0 = body0;
 		contact->m_body1 = body1;
-		//normal = proxy.m_normal.Scale4(dgFloat32 (-1.0f));
+		//normal = proxy.m_normal.Scale(dgFloat32 (-1.0f));
 		normal = proxy.m_normal * dgVector::m_negOne;
 		p = proxy.m_closestPointBody1;
 		q = proxy.m_closestPointBody0;
@@ -1268,7 +1268,7 @@ dgInt32 dgWorld::CollideContinue (
 		//dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
 		if (pair.m_flipContacts) {
  			for (dgInt32 i = 0; i < count; i++) {
-				dgVector step ((collideBodyA.m_veloc - collideBodyB.m_veloc).Scale4 (pair.m_timestep));
+				dgVector step ((collideBodyA.m_veloc - collideBodyB.m_veloc).Scale (pair.m_timestep));
 				points[i].m_x = contacts[i].m_point.m_x + step.m_x;
 				points[i].m_y = contacts[i].m_point.m_y + step.m_y;
 				points[i].m_z = contacts[i].m_point.m_z + step.m_z;
@@ -1406,7 +1406,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	if (retVal) {
 		proxy.m_closestPointBody0 = contactSolver.GetPoint0() + origin;
 		proxy.m_closestPointBody1 = contactSolver.GetPoint1() + origin;
-		proxy.m_normal = contactSolver.GetNormal().Scale4(-1.0f);
+		proxy.m_normal = contactSolver.GetNormal().Scale(-1.0f);
 
 		dgContactPoint* const contactOut = proxy.m_contacts;
 		contactOut[0].m_normal = proxy.m_normal;
@@ -1527,7 +1527,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 			dgVector v((proxy.m_instance0->m_globalMatrix.m_posit - proxy.m_instance1->m_globalMatrix.m_posit) & dgVector::m_triplexMask);
 			dgFloat32 mag2 = v.DotProduct4(v).m_x;
 			if (mag2 > dgFloat32(0.0f)) {
-				contactJoint->m_separtingVector = v.Scale4(dgRsqrt(mag2));
+				contactJoint->m_separtingVector = v.Scale(dgRsqrt(mag2));
 			} else {
 				contactJoint->m_separtingVector = proxy.m_instance0->m_globalMatrix.m_up;
 			}
@@ -1626,7 +1626,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 				dgFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
 
 				dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
-				dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
+				dgVector upperBoundVeloc(hullVeloc.Scale(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
 				data.SetDistanceTravel(upperBoundVeloc);
 			}
 		}

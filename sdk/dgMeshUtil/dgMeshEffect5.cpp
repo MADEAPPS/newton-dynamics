@@ -77,7 +77,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		dgBigVector xDir (p1 - origin);
 		dgAssert (xDir.DotProduct3(xDir) > dgFloat32 (0.0f));
 		matrix[2] = dgVector (normal);
-		matrix[0] = dgVector(xDir.Scale4(dgFloat64 (1.0f) / sqrt (xDir.DotProduct3(xDir))));
+		matrix[0] = dgVector(xDir.Scale(dgFloat64 (1.0f) / sqrt (xDir.DotProduct3(xDir))));
 		matrix[1] = matrix[2].CrossProduct3(matrix[0]);
 		matrix[3] = dgVector (origin);
 		matrix[3][3] = dgFloat32 (1.0f);

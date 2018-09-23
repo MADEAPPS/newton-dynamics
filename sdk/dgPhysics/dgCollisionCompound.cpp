@@ -393,7 +393,7 @@ class dgCollisionCompound::dgSpliteInfo
 				varian += p * p;
 			}
 
-			varian = varian.Scale4 (dgFloat32 (boxCount)) - median * median;
+			varian = varian.Scale (dgFloat32 (boxCount)) - median * median;
 
 			dgInt32 index = 0;
 			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
@@ -404,7 +404,7 @@ class dgCollisionCompound::dgSpliteInfo
 				}
 			}
 
-			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+			dgVector center = median.Scale (dgFloat32 (1.0f) / dgFloat32 (boxCount));
 
 			dgFloat32 test = center[index];
 
@@ -621,7 +621,7 @@ void dgCollisionCompound::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 {
 	if (m_root) {
 		dgVector origin (matrix.TransformVector(m_root->m_origin));
-		dgVector size (matrix.m_front.Abs().Scale4(m_root->m_size.m_x) + matrix.m_up.Abs().Scale4(m_root->m_size.m_y) + matrix.m_right.Abs().Scale4(m_root->m_size.m_z));
+		dgVector size (matrix.m_front.Abs().Scale(m_root->m_size.m_x) + matrix.m_up.Abs().Scale(m_root->m_size.m_y) + matrix.m_right.Abs().Scale(m_root->m_size.m_z));
 
 		size -= dgCollisionInstance::m_padding;
 		p0 = (origin - size) & dgVector::m_triplexMask;
@@ -787,9 +787,9 @@ dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgMatrix& m
 	dgVector crossInertia;
 	dgVector centerOfMass;
 	dgMatrix scaledMatrix(matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale4(localScale.m_x);
-	scaledMatrix[1] = scaledMatrix[1].Scale4(localScale.m_y);
-	scaledMatrix[2] = scaledMatrix[2].Scale4(localScale.m_z);
+	scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
+	scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
+	scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
 	scaledMatrix = m_alignMatrix * scaledMatrix;
 
 	dgFloat32 volume = CalculateMassProperties (scaledMatrix, inertiaII, crossInertia, centerOfMass);
@@ -798,9 +798,9 @@ dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgMatrix& m
 	}
 
 	dgFloat32 invVolume = dgFloat32 (1.0f) / volume;
-	centerOfMass = centerOfMass.Scale4(invVolume);
-	inertiaII = inertiaII.Scale4 (invVolume);
-	crossInertia = crossInertia.Scale4 (invVolume);
+	centerOfMass = centerOfMass.Scale(invVolume);
+	inertiaII = inertiaII.Scale (invVolume);
+	crossInertia = crossInertia.Scale (invVolume);
 	dgMatrix inertia (dgGetIdentityMatrix());
 	inertia[0][0] = inertiaII[0];
 	inertia[1][1] = inertiaII[1];
@@ -834,10 +834,10 @@ void dgCollisionCompound::MassProperties ()
 //	dgFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
 //	dgAssert (volume_ > dgFloat32 (0.0f));
 //	dgFloat32 invVolume_ = dgFloat32 (1.0f)/volume_;
-//	m_centerOfMass = origin_.Scale4 (invVolume_);
+//	m_centerOfMass = origin_.Scale (invVolume_);
 //	m_centerOfMass.m_w = volume_;
-//	m_inertia = inertia_.Scale4 (invVolume_);
-//	m_crossInertia = crossInertia_.Scale4(invVolume_);
+//	m_inertia = inertia_.Scale (invVolume_);
+//	m_crossInertia = crossInertia_.Scale(invVolume_);
 #endif
 
 
@@ -852,15 +852,15 @@ void dgCollisionCompound::MassProperties ()
 		dgFloat32 shapeVolume = collision->GetVolume();
 
 		volume += shapeVolume;
-		origin += shapeInertia.m_posit.Scale4(shapeVolume);
-		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[1][1], shapeInertia[2][2], dgFloat32 (0.0f)).Scale4 (shapeVolume);
-		inertiaIJ += dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale4 (shapeVolume);
+		origin += shapeInertia.m_posit.Scale(shapeVolume);
+		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[1][1], shapeInertia[2][2], dgFloat32 (0.0f)).Scale (shapeVolume);
+		inertiaIJ += dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale (shapeVolume);
 	}
 	if (volume > dgFloat32 (0.0f)) { 
 		dgFloat32 invVolume = dgFloat32 (1.0f)/volume;
-		m_inertia = inertiaII.Scale4 (invVolume);
-		m_crossInertia = inertiaIJ.Scale4 (invVolume);
-		m_centerOfMass = origin.Scale4 (invVolume);
+		m_inertia = inertiaII.Scale (invVolume);
+		m_crossInertia = inertiaIJ.Scale (invVolume);
+		m_centerOfMass = origin.Scale (invVolume);
 		m_centerOfMass.m_w = volume;
 	}
 
@@ -1951,8 +1951,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 		dgVector p0 (origin - size);
 		dgVector p1 (origin + size);
 		terrainCollision->GetLocalAABB (p0, p1, nodeProxi.m_p0, nodeProxi.m_p1);
-		//nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale4 (dgFloat32 (0.5f));
-		//nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale4 (dgFloat32 (0.5f));
+		//nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale (dgFloat32 (0.5f));
+		//nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale (dgFloat32 (0.5f));
 		nodeProxi.m_size = dgVector::m_half * (nodeProxi.m_p1 - nodeProxi.m_p0);
 		nodeProxi.m_origin = dgVector::m_half * (nodeProxi.m_p1 + nodeProxi.m_p0);
 

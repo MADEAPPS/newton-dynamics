@@ -116,7 +116,7 @@ dgVector dgQuaternion::CalcAverageOmega (const dgQuaternion &q1, dgFloat32 invdt
 	dgFloat32 dirMag = dirMag2 * dirMagInv;
 
 	dgFloat32 omegaMag = dgFloat32(2.0f) * dgAtan2 (dirMag, dq.m_q0) * invdt;
-	return omegaDir.Scale4 (dirMagInv * omegaMag);
+	return omegaDir.Scale (dirMagInv * omegaMag);
 }
 
 

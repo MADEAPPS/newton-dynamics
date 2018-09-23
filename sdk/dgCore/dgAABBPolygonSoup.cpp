@@ -171,7 +171,7 @@ class dgAABBPolygonSoup::dgSpliteInfo
 				varian += p * p;
 			}
 
-			varian = varian.Scale4 (dgFloat32 (boxCount)) - median * median;
+			varian = varian.Scale (dgFloat32 (boxCount)) - median * median;
 
 			dgInt32 index = 0;
 			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
@@ -182,7 +182,7 @@ class dgAABBPolygonSoup::dgSpliteInfo
 				}
 			}
 
-			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+			dgVector center = median.Scale (dgFloat32 (1.0f) / dgFloat32 (boxCount));
 			dgFloat32 test = center[index];
 			dgInt32 i0 = 0;
 			dgInt32 i1 = boxCount - 1;
@@ -412,7 +412,7 @@ dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (const dgVector* const vertex,
 
 		dgVector dir (p1 - p0);
 		dgAssert (dir.m_w == dgFloat32 (0.0f));
-		//dir = dir.Scale4 (dgRsqrt (dir.DotProduct3(dir)));
+		//dir = dir.Scale (dgRsqrt (dir.DotProduct3(dir)));
 		dir = dir.Normalize();
 
 		dgFloat32 maxVal = dgFloat32 (-1.0e10f);
@@ -477,7 +477,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 					if (face[j0] == -1) {
 						dgVector e (q1 - q0);
 						dgVector n (e.CrossProduct3(normal));
-						n = n.Scale4(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
+						n = n.Scale(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
 						dgAssert (dgAbs (n.DotProduct3(n) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
@@ -507,7 +507,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 					if (face[j0] == -1) {
 						dgVector e (q1 - q0);
 						dgVector n (e.CrossProduct3(normal));
-						n = n.Scale4(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
+						n = n.Scale(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
 						dgAssert (dgAbs (n.DotProduct3(n) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
@@ -657,7 +657,7 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 						if (!((y0 >= x1) || (y1 <= x0))) {
 							dgFloat64 t = q1q0.DotProduct3 (p0 - q0) / q1q0Mag2;
 							dgAssert (q1q0.m_w == dgFloat32 (0.0f));
-							dgBigVector q (q0 + q1q0.Scale4(t));
+							dgBigVector q (q0 + q1q0.Scale(t));
 							dgBigVector dist (p0 - q);
 							dgFloat64 err2 = dist.DotProduct3 (dist);
 							if (err2 < DG_WELDING_TOL2) {

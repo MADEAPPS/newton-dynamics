@@ -49,7 +49,7 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& faceNormal, dgFloat32
 		dgBigVector normal(faceNormal);
 		dgFloat64 tOut = normal.DotProduct4(p0v0).GetScalar() / normal.DotProduct4(diff).GetScalar();
 		if ((tOut >= dgFloat64(0.0f)) && (tOut <= maxT)) {
-			dgBigVector p (p0 + diff.Scale4 (tOut));
+			dgBigVector p (p0 + diff.Scale (tOut));
 			dgBigVector unitDir(m_unitDir);
 			for (dgInt32 i = 0; i < indexCount; i++) {
 				dgInt32 i2 = indexArray[i] * stride;
@@ -82,13 +82,13 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 		if (tmp0 > dgFloat32 (0.0f)) {
 			dgFloat32 tmp1 = boxP1[i] - p1[i];
 			if (tmp1 < dgFloat32 (0.0f)) {
-				p1 = p0 + (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
+				p1 = p0 + (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP1[i];
 			}
 		} else {
 			dgFloat32 tmp1 = boxP1[i] - p1[i];
 			if (tmp1 > dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
+				p0 += (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP1[i];
 			} else {
 				return false;
@@ -99,13 +99,13 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 		if (tmp0 < dgFloat32 (0.0f)) {
 			dgFloat32 tmp1 = boxP0[i] - p1[i];
 			if (tmp1 > dgFloat32 (0.0f)) {
-				p1 = p0 + (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
+				p1 = p0 + (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP0[i];
 			}
 		} else {
 			dgFloat32 tmp1 = boxP0[i] - p1[i];
 			if (tmp1 < dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
+				p0 += (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP0[i];
 			} else {
 				return false;
@@ -120,7 +120,7 @@ dgBigVector dgPointToRayDistance (const dgBigVector& point, const dgBigVector& r
 	dgBigVector dp (ray_p1 - ray_p0);
 	dgAssert (dp.m_w == dgFloat32 (0.0f));
 	dgFloat64 t = dgClamp (dp.DotProduct3 (point - ray_p0) / dp.DotProduct3 (dp), dgFloat64(0.0f), dgFloat64 (1.0f));
-	return ray_p0 + dp.Scale4 (t);
+	return ray_p0 + dp.Scale (t);
 }
 
 dgBigVector dgPointToTriangleDistance(const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2)
@@ -147,7 +147,7 @@ dgBigVector dgPointToTriangleDistance(const dgBigVector& point, const dgBigVecto
 		} else if ((alpha + beta) > det) {
 			return dgPointToRayDistance (point, p1, p2);
 		}
-		return p0 + (e10.Scale4(alpha) + e20.Scale4(beta)).Scale4(dgFloat64(1.0f) / det);
+		return p0 + (e10.Scale(alpha) + e20.Scale(beta)).Scale(dgFloat64(1.0f) / det);
 	}
 	// this is a degenerated triangle. this should never happens
 	dgAssert(0);
@@ -195,7 +195,7 @@ dgBigVector dgPointToTetrahedrumDistance (const dgBigVector& point, const dgBigV
 				} else if (u1 + u2 + u3 > dgFloat64(1.0f)) {
 					return dgPointToTriangleDistance(point, p1, p2, p3);
 				}
-				return p0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3);
+				return p0 + e10.Scale(u1) + e20.Scale(u2) + e30.Scale(u3);
 			}
 		}
 	}
@@ -278,8 +278,8 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 
 	dgAssert (u.m_w == dgFloat32 (0.0f));
 	dgAssert (v.m_w == dgFloat32 (0.0f));
-	pOut = ray_p0 + u.Scale4 (sc);
-	qOut = ray_q0 + v.Scale4 (tc);
+	pOut = ray_p0 + u.Scale (sc);
+	qOut = ray_q0 + v.Scale (tc);
 }
 
 

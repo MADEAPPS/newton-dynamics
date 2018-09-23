@@ -56,7 +56,7 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 			origin += points[i];
 			maxW = dgMax (points[i].m_w, maxW);
 		}
-		origin = origin.Scale4 (dgFloat64 (1.0f) / count);
+		origin = origin.Scale (dgFloat64 (1.0f) / count);
 		points[count + 0] = origin;
 		points[count + 1] = origin;
 		points[count + 0].m_w += dgFloat64 (1.0f);

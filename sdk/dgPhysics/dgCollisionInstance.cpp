@@ -516,9 +516,9 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 		case m_nonUniform:
 		{
 			dgMatrix matrix1 (matrix);
-			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale4(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale4(m_scale.m_z);
+			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
 			m_childShape->CalcAABB (matrix1, p0, p1);
 			p0 -= m_padding;
 			p1 += m_padding;
@@ -529,9 +529,9 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 		default:
 		{
 			dgMatrix matrix1 (matrix);
-			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale4(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale4(m_scale.m_z);
+			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
 			m_childShape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
 			p0 -= m_padding;
 			p1 += m_padding;
@@ -639,7 +639,7 @@ void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix,
 	if (volumeIntegral.m_w > dgFloat32 (0.0f)) {
 		dgVector buoyanceCenter (volumeIntegral - origin);
 
-		dgVector force (gravity.Scale4 (-fluidDensity * volumeIntegral.m_w));
+		dgVector force (gravity.Scale (-fluidDensity * volumeIntegral.m_w));
 		dgVector torque (buoyanceCenter.CrossProduct3(force));
 
 		unitForce += force;

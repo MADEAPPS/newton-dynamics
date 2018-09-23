@@ -642,7 +642,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	// integrate rotation here
 	dgFloat32 omegaMag2 = omega.DotProduct4(omega).GetScalar() + dgFloat32(1.0e-12f);
 	dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
-	dgVector omegaAxis(omega.Scale4(invOmegaMag));
+	dgVector omegaAxis(omega.Scale(invOmegaMag));
 	dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
 	dgQuaternion deltaRotation(omegaAxis, omegaAngle);
 	body->m_gyroRotation = body->m_gyroRotation * deltaRotation;
@@ -660,7 +660,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	dgVector externTorque(torque);
 	velocStep.m_angular = body->m_invWorldInertiaMatrix.RotateVector(externTorque) * timestep;
 #endif
-	velocStep.m_linear = force.Scale4(body->m_invMass.m_w) * timestep;
+	velocStep.m_linear = force.Scale(body->m_invMass.m_w) * timestep;
 	return velocStep;
 }
 
@@ -793,7 +793,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				const dgVector& linearMomentum = internalForces[i].m_linear;
 				const dgVector& angularMomentum = internalForces[i].m_angular;
 
-				body->m_veloc += linearMomentum.Scale4(body->m_invMass.m_w);
+				body->m_veloc += linearMomentum.Scale(body->m_invMass.m_w);
 				body->m_omega += body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
 			}
 		}

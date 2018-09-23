@@ -133,7 +133,7 @@ namespace InternalSphere
 			dgFloat64 area = dgFloat32 (0.5f) * sqrt (normal.DotProduct3(normal));
 
 			centre = p0 + p1 + p2;
-			centre = centre.Scale4 (dgFloat32  (1.0f / 3.0f));
+			centre = centre.Scale (dgFloat32  (1.0f / 3.0f));
 
 			// Inertia of each point in the triangle
 			dgFloat64 Ixx = p0.m_x * p0.m_x + p1.m_x * p1.m_x + p2.m_x * p2.m_x;	
@@ -154,7 +154,7 @@ namespace InternalSphere
 				Ixy = K * (Ixy + 9.0 * centre.m_x * centre.m_y);
 				Ixz = K * (Ixz + 9.0 * centre.m_x * centre.m_z);
 				Iyz = K * (Iyz + 9.0 * centre.m_y * centre.m_z);
-				centre = centre.Scale4 ((dgFloat32)area);
+				centre = centre.Scale ((dgFloat32)area);
 			} 
 
 			totalArea += area;
@@ -165,9 +165,9 @@ namespace InternalSphere
 
 		if (totalArea > dgEPSILON * 10.0) {
 			dgFloat64 K = dgFloat64 (1.0) / totalArea; 
-			var = var.Scale4 ((dgFloat32)K);
-			cov = cov.Scale4 ((dgFloat32)K);
-			massCenter = massCenter.Scale4 ((dgFloat32)K);
+			var = var.Scale ((dgFloat32)K);
+			cov = cov.Scale ((dgFloat32)K);
+			massCenter = massCenter.Scale ((dgFloat32)K);
 		}
 
 		dgFloat64 Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
@@ -203,9 +203,9 @@ namespace InternalSphere
 		}
 	
 		dgFloat64 k = dgFloat64 (1.0) / vertexCount;
-		var = var.Scale4 (k);
-		cov = cov.Scale4 (k);
-		massCenter = massCenter.Scale4 (k);
+		var = var.Scale (k);
+		cov = cov.Scale (k);
+		massCenter = massCenter.Scale (k);
 	
 		dgFloat64 Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
 		dgFloat64 Iyy = var.m_y - massCenter.m_y * massCenter.m_y;
@@ -274,7 +274,7 @@ namespace InternalSphere
 			 area = 0.5 * sqrt (normal % normal);
 		
 			 centre = p0 + p1 + p2;
-			 centre = centre.Scale4 (1.0f / 3.0f);
+			 centre = centre.Scale (1.0f / 3.0f);
 		
 			 // Inercia of each point in the triangle
 			 Ixx = p0.m_x * p0.m_x + p1.m_x * p1.m_x + p2.m_x * p2.m_x;	
@@ -295,7 +295,7 @@ namespace InternalSphere
 			     Ixy = K * (Ixy + 9.0 * centre.m_x * centre.m_y);
 			     Ixz = K * (Ixz + 9.0 * centre.m_x * centre.m_z);
 			     Iyz = K * (Iyz + 9.0 * centre.m_y * centre.m_z);
-			     centre = centre.Scale4 ((dgFloat32)area);
+			     centre = centre.Scale ((dgFloat32)area);
 			 } 
 		
 			 totalArea += area;
@@ -306,9 +306,9 @@ namespace InternalSphere
 		
 		if (totalArea > dgEPSILON * 10.0) {
 			K = 1.0 / totalArea; 
-			var = var.Scale4 ((dgFloat32)K);
-			cov = cov.Scale4 ((dgFloat32)K);
-			massCenter = massCenter.Scale4 ((dgFloat32)K);
+			var = var.Scale ((dgFloat32)K);
+			cov = cov.Scale ((dgFloat32)K);
+			massCenter = massCenter.Scale ((dgFloat32)K);
 		}
 	
 		Ixx = var.m_x - massCenter.m_x * massCenter.m_x;
@@ -368,11 +368,11 @@ void dgObb::SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, cons
 	InternalSphere::BoundingBox (*this, vertex, stride, triangles, indexCount, min, max);
 
 	dgVector massCenter	((max + min) * dgVector::m_half);
-	//massCenter = massCenter.Scale4 (dgFloat32 (0.5f));
+	//massCenter = massCenter.Scale (dgFloat32 (0.5f));
 	m_posit = TransformVector (massCenter);
 
 	dgVector dim ((max - min) * dgVector::m_half);
-	//dim = dim.Scale4 (dgFloat32(0.5f));
+	//dim = dim.Scale (dgFloat32(0.5f));
 	SetDimensions (dim.m_x, dim.m_y, dim.m_z);
 }
 
@@ -411,11 +411,11 @@ void dgObb::SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, dgIn
    InternalSphere::BoundingBox (*this, vertex, count, stride, min, max);
 
 	dgVector massCenter ((max + min) * dgVector::m_half);
-	//massCenter = massCenter.Scale4 (0.5);
+	//massCenter = massCenter.Scale (0.5);
 	m_posit = TransformVector (massCenter);
 
 	dgVector dim ((max - min) * dgVector::m_half);
-	//dim = dim.Scale4 (dgFloat32(0.5f));
+	//dim = dim.Scale (dgFloat32(0.5f));
 	SetDimensions (dim.m_x + InternalSphere::SPHERE_TOL, 
 				   dim.m_y + InternalSphere::SPHERE_TOL, 
 				   dim.m_z + InternalSphere::SPHERE_TOL);
@@ -466,11 +466,11 @@ void dgObb::SetDimensions (
    InternalSphere::BoundingBox (*this, vertex, stride, index, indexCount, min, max);
 
 	dgVector massCenter (max + min);
-	massCenter = massCenter.Scale4 (dgFloat32(0.5f));
+	massCenter = massCenter.Scale (dgFloat32(0.5f));
 	m_posit = TransformVector (massCenter);
 
 	dgVector dim (max - min);
-	dim = dim.Scale4 (dgFloat32(0.5f));
+	dim = dim.Scale (dgFloat32(0.5f));
 	SetDimensions (dim.m_x + InternalSphere::SPHERE_TOL, 
 				   dim.m_y + InternalSphere::SPHERE_TOL, 
 				   dim.m_z + InternalSphere::SPHERE_TOL);
@@ -500,7 +500,7 @@ dgObb::dgObb (
 	}
 	right = up * front;
 
-	dgVector Step (Dir.Scale4(0.5));
+	dgVector Step (Dir.Scale(0.5));
 	size.m_x = (dgFloat32)(dgObb.size.m_x * dgAbs (right % dgObb.right) +
 						 dgObb.size.m_y * dgAbs (right % dgObb.up) +
 						 dgObb.size.m_z * dgAbs (right % dgObb.front));

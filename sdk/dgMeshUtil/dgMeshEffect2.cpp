@@ -175,9 +175,9 @@ class dgTetraIsoSufaceStuffing
 				dgVector p12(p1 + p2);
 				dgVector p20(p2 + p0);
 
-				p01 = p01.Scale4(dgRsqrt(p01.DotProduct3(p01)));
-				p12 = p12.Scale4(dgRsqrt(p12.DotProduct3(p12)));
-				p20 = p20.Scale4(dgRsqrt(p20.DotProduct3(p20)));
+				p01 = p01.Scale(dgRsqrt(p01.DotProduct3(p01)));
+				p12 = p12.Scale(dgRsqrt(p12.DotProduct3(p12)));
+				p20 = p20.Scale(dgRsqrt(p20.DotProduct3(p20)));
 
 				dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 				dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
@@ -344,7 +344,7 @@ class dgTetraIsoSufaceStuffing
 			dgFloat64 den = dp___.DotProduct3(dp___);
 			dgFloat64 num = dp___.DotProduct3(point - ray_p0);
 			if ((num >= dgFloat64 (0.0f)) && (num <= den)) { 
-				dgBigVector p (ray_p0 + dp___.Scale4 (num / den));
+				dgBigVector p (ray_p0 + dp___.Scale (num / den));
 				dgBigVector dist (point - p);
 				if (dist.DotProduct3(dist) < dgFloat64 (1.0e-12f)) {
 					rayType->m_rayIsDegenerate = true;
@@ -374,7 +374,7 @@ class dgTetraIsoSufaceStuffing
 				dgBigVector normal(e10.CrossProduct3(e20));
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
-					dgBigVector point(point0 + (point1 - point0).Scale4(t));
+					dgBigVector point(point0 + (point1 - point0).Scale(t));
 					dgBigVector variPoint(point - p0);	
 					const dgFloat64 b0 = e10.DotProduct4(variPoint).GetScalar();
 					const dgFloat64 b1 = e20.DotProduct4(variPoint).GetScalar();
@@ -416,7 +416,7 @@ class dgTetraIsoSufaceStuffing
 				dgBigVector normal(e10.CrossProduct3(e20));
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
-					dgBigVector point(point0 + (point1 - point0).Scale4(t));
+					dgBigVector point(point0 + (point1 - point0).Scale(t));
 					dgBigVector variPoint(point - p0);
 					const dgFloat64 b0 = e10.DotProduct4(variPoint).GetScalar();
 					const dgFloat64 b1 = e20.DotProduct4(variPoint).GetScalar();
@@ -462,7 +462,7 @@ class dgTetraIsoSufaceStuffing
 			for (dgInt32 i = 0; (i < m_normals.m_count) && hits.m_rayIsDegenerate; i ++) {
 				hits.m_hitCount = 0;
 				hits.m_rayIsDegenerate = false;
-				dgBigVector point1 (point0 + dgBigVector (m_normals.m_normal[i].Scale4 (m_diameter))); 
+				dgBigVector point1 (point0 + dgBigVector (m_normals.m_normal[i].Scale (m_diameter))); 
 				FaceRayCast (point0, point1, &hits);
 			}
 			dgAssert (!hits.m_rayIsDegenerate);
@@ -580,11 +580,11 @@ class dgTetraIsoSufaceStuffing
 		dgBigVector minBox;
 		dgBigVector maxBox;
 		mesh->CalculateAABB(minBox, maxBox);
-		minBox -= (maxBox - minBox).Scale4(dgFloat64(1.e-3f));
-		maxBox += (maxBox - minBox).Scale4(dgFloat64(1.e-3f));
+		minBox -= (maxBox - minBox).Scale(dgFloat64(1.e-3f));
+		maxBox += (maxBox - minBox).Scale(dgFloat64(1.e-3f));
 
-		dgBigVector mMinInt((minBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor());
-		dgBigVector mMaxInt((maxBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor() + dgBigVector::m_one);
+		dgBigVector mMinInt((minBox.Scale(dgFloat64(1.0f) / cellsize)).Floor());
+		dgBigVector mMaxInt((maxBox.Scale(dgFloat64(1.0f) / cellsize)).Floor() + dgBigVector::m_one);
 		dgBigVector gridSize(mMaxInt - mMinInt + dgBigVector::m_one);
 
 		dgBigVector size(maxBox - minBox);
@@ -1186,10 +1186,10 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 			u2 = (u2 - l21 * u3) * invd1;
 			u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
 			if ((u1 >= dgFloat64(0.0f)) && (u2 >= dgFloat64(0.0f)) && (u3 >= dgFloat64(0.0f)) && ((u1 + u2 + u3) <= dgFloat64(1.0f))) {
-				dgBigVector r0 (q0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3));
+				dgBigVector r0 (q0 + e10.Scale(u1) + e20.Scale(u2) + e30.Scale(u3));
 
 				dgFloat64 u0 = dgFloat64 (1.0f) - u1 - u2 - u3;
-				dgBigVector r1 (q0.Scale4 (u0) + q1.Scale4 (u1) + q2.Scale4 (u2) + q3.Scale4 (u3));
+				dgBigVector r1 (q0.Scale (u0) + q1.Scale (u1) + q2.Scale (u2) + q3.Scale (u3));
 				dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[i];
 
 				weighSet.m_weightPair[0].m_controlIndex = i0;

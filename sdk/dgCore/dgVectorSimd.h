@@ -123,7 +123,7 @@ class dgVector
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
 	}
 
-	DG_INLINE dgVector Scale4 (dgFloat32 s) const
+	DG_INLINE dgVector Scale (dgFloat32 s) const
 	{
 		return _mm_mul_ps (m_type, _mm_set_ps1(s));
 	}
@@ -305,7 +305,7 @@ class dgVector
 	{
 		dgAssert (m_w == dgFloat32 (0.0f));
 		// somehow this function changes the behavior with 3.13
-		//return Scale4(dgFloat32 (1.0f) / dgSqrt(DotProduct4(*this).GetScalar()));
+		//return Scale(dgFloat32 (1.0f) / dgSqrt(DotProduct4(*this).GetScalar()));
 		return *this * InvMagSqrt ();
 	}
 
@@ -616,7 +616,7 @@ class dgBigVector
 		return dgBigVector(m_w);
 	}
 
-	DG_INLINE dgBigVector Scale4(dgFloat64 s) const
+	DG_INLINE dgBigVector Scale(dgFloat64 s) const
 	{
 		__m128d tmp0(_mm_set1_pd(s));
 		return dgBigVector(_mm_mul_pd(m_typeLow, tmp0), _mm_mul_pd(m_typeHigh, tmp0));
@@ -646,7 +646,7 @@ class dgBigVector
 	{
 		dgAssert (m_w == dgFloat32 (0.0f));
 		dgFloat64 mag2 = DotProduct4(*this).GetScalar();
-		return Scale4(dgFloat64 (1.0f) / sqrt (mag2));
+		return Scale(dgFloat64 (1.0f) / sqrt (mag2));
 	}
 
 	dgFloat64 GetMax() const

@@ -215,8 +215,8 @@ void dgCollisionMesh::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
 	dgAssert (p0.m_y <= p1.m_y);
 	dgAssert (p0.m_z <= p1.m_z);
 
-	m_boxSize = (p1 - p0).Scale4 (dgFloat32 (0.5f)) & dgVector::m_triplexMask;
-	m_boxOrigin = (p1 + p0).Scale4 (dgFloat32 (0.5f)) & dgVector::m_triplexMask; 
+	m_boxSize = (p1 - p0).Scale (dgFloat32 (0.5f)) & dgVector::m_triplexMask;
+	m_boxOrigin = (p1 + p0).Scale (dgFloat32 (0.5f)) & dgVector::m_triplexMask; 
 }
 
 dgInt32 dgCollisionMesh::CalculateSignature () const
@@ -303,7 +303,7 @@ dgVector dgCollisionMesh::SupportVertex (const dgVector& dir, dgInt32* const ver
 void dgCollisionMesh::CalcAABB(const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {
 	dgVector origin (matrix.TransformVector(m_boxOrigin));
-	dgVector size (matrix.m_front.Abs().Scale4(m_boxSize.m_x) + matrix.m_up.Abs().Scale4(m_boxSize.m_y) + matrix.m_right.Abs().Scale4(m_boxSize.m_z));
+	dgVector size (matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));
 
 	p0 = (origin - size) & dgVector::m_triplexMask;
 	p1 = (origin + size) & dgVector::m_triplexMask;
@@ -330,7 +330,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
 				dgAssert (0);
-				contactsOut[count] = p0 - dp.Scale4 (side0 / t);
+				contactsOut[count] = p0 - dp.Scale (side0 / t);
 				count ++;
 
 			} 
@@ -342,7 +342,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 				t = dgSign(t) * dgFloat32 (1.0e-8f);	
 			}
 			dgAssert (0);
-			contactsOut[count] = p0 - dp.Scale4 (side0 / t);
+			contactsOut[count] = p0 - dp.Scale (side0 / t);
 			count ++;
 		}
 

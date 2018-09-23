@@ -490,7 +490,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 							} else if (den <= -1.0f) {
 								den = dgFloat32 (-1.0f);
 							}
-							output[0] = p0 - dp.Scale4 (den);
+							output[0] = p0 - dp.Scale (den);
 							edgeClipped[0] = tmp;
 							count ++;
 						}
@@ -510,7 +510,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 						} else if (den <= -1.0f) {
 							den = dgFloat32 (-1.0f);
 						}
-						output[1] = p0 - dp.Scale4 (den);
+						output[1] = p0 - dp.Scale (den);
 						edgeClipped[1] = tmp;
 						count ++;
 					}
@@ -1277,7 +1277,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgBroadPhase::dgPair* c
 		dgBody* const otherBody = constraint->GetBody1();
 		dgVector relVeloc (otherBody->GetVelocity() - myBody->GetVelocity());
 		dgAssert (relVeloc.m_w == dgFloat32 (0.0f));
-		dgVector impulseStimate (relVeloc.Scale4 (dgFloat32 (1.0f) / (myBody->GetInvMass().m_w + otherBody->GetInvMass().m_w))); 
+		dgVector impulseStimate (relVeloc.Scale (dgFloat32 (1.0f) / (myBody->GetInvMass().m_w + otherBody->GetInvMass().m_w))); 
 		dgFloat32 impulseStimate2 = impulseStimate.DotProduct4(impulseStimate).m_w;
 		dgFloat32 impulseStrength = m_impulseStrengthPerUnitMass * myBody->GetMass().m_w;
 

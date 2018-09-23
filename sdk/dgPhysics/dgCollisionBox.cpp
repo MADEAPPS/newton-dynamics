@@ -228,12 +228,12 @@ dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point,
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);
 	dgAssert(dgAbs((dir.DotProduct4(dir).GetScalar() - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
-	return point + dir.Scale4 (DG_PENETRATION_TOL);
+	return point + dir.Scale (DG_PENETRATION_TOL);
 }
 
 void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {
-	dgVector size (matrix[0].Abs().Scale4(m_size[0].m_x) + matrix[1].Abs().Scale4(m_size[0].m_y) + matrix[2].Abs().Scale4(m_size[0].m_z));
+	dgVector size (matrix[0].Abs().Scale(m_size[0].m_x) + matrix[1].Abs().Scale(m_size[0].m_y) + matrix[2].Abs().Scale(m_size[0].m_z));
 	p0 = (matrix[3] - size) & dgVector::m_triplexMask;
 	p1 = (matrix[3] + size) & dgVector::m_triplexMask;
 }
@@ -317,7 +317,7 @@ void dgCollisionBox::GetCollisionInfo(dgCollisionInfo* const info) const
 void dgCollisionBox::Serialize(dgSerialize callback, void* const userData) const
 {
 	SerializeLow(callback, userData);
-	dgVector size (m_size[0].Scale4 (dgFloat32 (2.0f)));
+	dgVector size (m_size[0].Scale (dgFloat32 (2.0f)));
 	callback (userData, &size, sizeof (dgVector));
 }
 
@@ -449,7 +449,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 
 						dgAssert (t <= dgFloat32 (0.01f));
 						dgAssert (t >= dgFloat32 (-1.05f));
-						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale4 (t);
+						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale (t);
 						count ++;
 
 						dgConvexSimplexEdge* ptr1 = ptr->m_next;

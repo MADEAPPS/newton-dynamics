@@ -319,9 +319,9 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 			dgBigVector e20 (p2 - p0);
 			dgBigVector e12 (p2 - p1);
 
-			e10 = e10.Scale4 (dgFloat64 (1.0) / sqrt (e10.DotProduct3(e10)));
-			e20 = e20.Scale4 (dgFloat64 (1.0) / sqrt (e20.DotProduct3(e20)));
-			e12 = e20.Scale4 (dgFloat64 (1.0) / sqrt (e12.DotProduct3(e12)));
+			e10 = e10.Scale (dgFloat64 (1.0) / sqrt (e10.DotProduct3(e10)));
+			e20 = e20.Scale (dgFloat64 (1.0) / sqrt (e20.DotProduct3(e20)));
+			e12 = e20.Scale (dgFloat64 (1.0) / sqrt (e12.DotProduct3(e12)));
 
 			m_triangleAngles[i * 3 + 0] = acos (dgClamp(e10.DotProduct3(e20), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
 			m_triangleAngles[i * 3 + 1] = acos (dgClamp(e10.DotProduct3(e20), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
@@ -1057,8 +1057,8 @@ dgAssert (0);
 			dgBigVector e10 (p1 - p0);
 			dgBigVector e20 (p2 - p0);
 
-			e10 = e10.Scale4 (dgFloat64 (1.0) / sqrt (e10.DotProduct3(e10)));
-			e20 = e20.Scale4 (dgFloat64 (1.0) / sqrt (e20.DotProduct3(e20)));
+			e10 = e10.Scale (dgFloat64 (1.0) / sqrt (e10.DotProduct3(e10)));
+			e20 = e20.Scale (dgFloat64 (1.0) / sqrt (e20.DotProduct3(e20)));
 
 			m_beta[i] = acos (dgClamp(e10.DotProduct3(e20), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
 			dgAssert (m_beta[i] > dgFloat64 (0.0f));
@@ -1456,7 +1456,7 @@ dgBigVector dgMeshEffect::GetOrigin ()const
     for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
         origin += m_points.m_vertex[i];
     }	
-    return origin.Scale4 (dgFloat64 (1.0f) / m_points.m_vertex.m_count);
+    return origin.Scale (dgFloat64 (1.0f) / m_points.m_vertex.m_count);
 }
 
 /*
@@ -1512,7 +1512,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
             do {
                 dgVector normal (FaceNormal (edgePtr, &m_points.m_vertex[0].m_x, sizeof (dgBigVector)));
 				dgAssert (normal.m_w == dgFloat32 (0.0f));
-                normal = normal.Scale4 (dgFloat32 (1.0f) / dgFloat32 (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+                normal = normal.Scale (dgFloat32 (1.0f) / dgFloat32 (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
                 faceNormal[edgeIndex] = normal;
                 normalsMap.Insert(edgeIndex, edgePtr);
                 edgeIndex ++;
@@ -1547,7 +1547,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
                 normal0 = normal1;
             } 
 
-            normal = normal.Scale4 (dgFloat32 (1.0f) / dgFloat32(sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+            normal = normal.Scale (dgFloat32 (1.0f) / dgFloat32(sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
 			dgTriplex n;
 			n.m_x = normal.m_x;
 			n.m_y = normal.m_y;

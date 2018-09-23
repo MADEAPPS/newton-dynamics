@@ -76,9 +76,9 @@ void dgCollisionCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 hei
 	for (int i = 0; i < 16; i ++) {
 		dgVector p1p0 (m_p1 - m_p0);
 		dgVector dir(side.CrossProduct3(p1p0));
-		dir = dir.Scale4(dgFloat32 (1.0f) / dgSqrt(dir.DotProduct4(dir).GetScalar()));
-		dgVector support0(dir.Scale4(m_radio0));
-		dgVector support1(dir.Scale4(m_radio1));
+		dir = dir.Scale(dgFloat32 (1.0f) / dgSqrt(dir.DotProduct4(dir).GetScalar()));
+		dgVector support0(dir.Scale(m_radio0));
+		dgVector support1(dir.Scale(m_radio1));
 		support0.m_x -= m_height;
 		support1.m_x += m_height;
 		dgFloat32 distance0 = support0.DotProduct4(dir).GetScalar();
@@ -224,9 +224,9 @@ void dgCollisionCapsule::TesselateTriangle(dgInt32 level, const dgVector& p0, co
 		dgVector p12(p1 + p2);
 		dgVector p20(p2 + p0);
 
-		p01 = p01.Scale4(dgRsqrt(p01.DotProduct3(p01)));
-		p12 = p12.Scale4(dgRsqrt(p12.DotProduct3(p12)));
-		p20 = p20.Scale4(dgRsqrt(p20.DotProduct3(p20)));
+		p01 = p01.Scale(dgRsqrt(p01.DotProduct3(p01)));
+		p12 = p12.Scale(dgRsqrt(p12.DotProduct3(p12)));
+		p20 = p20.Scale(dgRsqrt(p20.DotProduct3(p20)));
 
 		dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 		dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
@@ -238,9 +238,9 @@ void dgCollisionCapsule::TesselateTriangle(dgInt32 level, const dgVector& p0, co
 		TesselateTriangle(level - 1, p01, p12, p20, count, ouput);
 
 	} else {
-		ouput[count + 0] = p0.Scale4(m_radio0);
-		ouput[count + 1] = p1.Scale4(m_radio0);
-		ouput[count + 2] = p2.Scale4(m_radio0);
+		ouput[count + 0] = p0.Scale(m_radio0);
+		ouput[count + 1] = p1.Scale(m_radio0);
+		ouput[count + 2] = p2.Scale(m_radio0);
 		count += 3;
 	}
 }
@@ -326,9 +326,9 @@ void dgCollisionCapsule::DebugCollision (const dgMatrix& matrix, dgCollision::On
 		}
 	} else {
 		dgMatrix transform (matrix);
-		transform[0] = transform[0].Scale4(m_transform.m_x);
-		transform[1] = transform[1].Scale4(m_transform.m_y);
-		transform[2] = transform[2].Scale4(m_transform.m_z);
+		transform[0] = transform[0].Scale(m_transform.m_x);
+		transform[1] = transform[1].Scale(m_transform.m_y);
+		transform[2] = transform[2].Scale(m_transform.m_z);
 		dgCollisionConvex::DebugCollision (transform, callback, userData);
 	}
 }
@@ -345,8 +345,8 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 	dgVector dir (direction * m_transform);
 	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
-	dgVector p0(dir.Scale4 (m_radio0));
-	dgVector p1(dir.Scale4 (m_radio1));
+	dgVector p0(dir.Scale (m_radio0));
+	dgVector p1(dir.Scale (m_radio1));
 	p0.m_x -= m_height;
 	p1.m_x += m_height;
 	dgFloat32 dir0 = p0.DotProduct4(dir).GetScalar();
@@ -363,7 +363,7 @@ dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgF
 	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	dgVector p0(dgVector::m_zero);
-	dgVector p1(dir.Scale4(m_radio1 - m_radio0));
+	dgVector p1(dir.Scale(m_radio1 - m_radio0));
 	p0.m_x -= m_height;
 	p1.m_x += m_height;
 	dgFloat32 dir0 = p0.DotProduct4(dir).GetScalar();
@@ -379,7 +379,7 @@ dgVector dgCollisionCapsule::SupportVertexSpecialProjectPoint (const dgVector& t
 {
 	dgVector dir(direction * m_transform);
 	dgVector point(testPoint * m_transform);
-	point += dir.Scale4(m_radio0 - DG_PENETRATION_TOL);
+	point += dir.Scale(m_radio0 - DG_PENETRATION_TOL);
 	return m_transform * point;
 }
 
@@ -420,7 +420,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgVector dir0 (p0 - origin);
 	dgFloat32 dist0 = dir0.DotProduct4(normal).GetScalar();
 	if ((dist0 * dist0 - dgFloat32 (5.0e-5f)) < (m_radio0 * m_radio0)) {
-		contactsOut[count] = m_transform * (p0 - normal.Scale4 (dist0));
+		contactsOut[count] = m_transform * (p0 - normal.Scale (dist0));
 		count ++;
 	}
 
@@ -428,7 +428,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgVector dir1 (p1 - origin);
 	dgFloat32 dist1 = dir1.DotProduct4(normal).GetScalar();
 	if ((dist1 * dist1 - dgFloat32 (5.0e-5f)) < (m_radio1 * m_radio1)) {
-		contactsOut[count] = m_transform * (p1 - normal.Scale4 (dist1));
+		contactsOut[count] = m_transform * (p1 - normal.Scale (dist1));
 		count ++;
 	}
 	return count;
@@ -445,14 +445,14 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 	dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_radio1);
 	if ((t0 < maxT) && (t1 < maxT)) {
 		if (t0 < t1) {
-			dgVector q (q0 + (q1 - q0).Scale4 (t0));
+			dgVector q (q0 + (q1 - q0).Scale (t0));
 			dgVector n(q - origin0);
 			dgAssert(n.m_w == dgFloat32(0.0f));
 			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
 			contactOut.m_normal = m_transform * n.Normalize();
 			return t0;
 		} else {
-			dgVector q (q0 + (q1 - q0).Scale4 (t1));
+			dgVector q (q0 + (q1 - q0).Scale (t1));
 			dgVector n(q - origin1);
 			dgAssert(n.m_w == dgFloat32(0.0f));
 			//contactOut.m_normal = m_transform * n * n.DotProduct4(n).InvSqrt();
@@ -460,7 +460,7 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 			return t1;
 		}
 	} else if (t1 < maxT) {
-		dgVector q (q0 + (q1 - q0).Scale4 (t1));
+		dgVector q (q0 + (q1 - q0).Scale (t1));
 		if (q.m_x >= m_p1.m_x) {
 			dgVector n (q - origin1); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));
@@ -469,7 +469,7 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 			return t1;
 		}
 	} else if (t0 < maxT) {
-		dgVector q (q0 + (q1 - q0).Scale4 (t0));
+		dgVector q (q0 + (q1 - q0).Scale (t0));
 		if (q.m_x <= m_p0.m_x) {
 			dgVector n (q - origin0); 
 			dgAssert (n.m_w == dgFloat32 (0.0f));

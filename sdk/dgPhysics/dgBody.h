@@ -613,7 +613,7 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 
 DG_INLINE dgVector dgBody::CalculateLinearMomentum() const
 {
-	return dgVector (m_veloc.Scale4 (m_mass.m_w));
+	return dgVector (m_veloc.Scale (m_mass.m_w));
 }
 
 DG_INLINE dgVector dgBody::CalculateAngularMomentum() const

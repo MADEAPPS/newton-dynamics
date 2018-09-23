@@ -159,8 +159,8 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	dgVector* const veloc = &m_veloc[0];
 	const dgFloat32* const mass = &m_mass[0];
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		comVeloc += veloc[i].Scale4(mass[i]);
-		xMassSum += posit[i].Scale4(mass[i]);
+		comVeloc += veloc[i].Scale(mass[i]);
+		xMassSum += posit[i].Scale(mass[i]);
 	}
 
 	dgVector invMass(dgFloat32(1.0f / m_totalMass));

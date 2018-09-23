@@ -530,9 +530,9 @@ DG_INLINE dgCollisionInstance::dgScaleType dgCollisionInstance::GetCombinedScale
 DG_INLINE dgMatrix dgCollisionInstance::GetScaledTransform(const dgMatrix& matrix) const
 {
 	dgMatrix scaledMatrix(m_localMatrix * matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale4(m_scale[0]);
-	scaledMatrix[1] = scaledMatrix[1].Scale4(m_scale[1]);
-	scaledMatrix[2] = scaledMatrix[2].Scale4(m_scale[2]);
+	scaledMatrix[0] = scaledMatrix[0].Scale(m_scale[0]);
+	scaledMatrix[1] = scaledMatrix[1].Scale(m_scale[1]);
+	scaledMatrix[2] = scaledMatrix[2].Scale(m_scale[2]);
 	return m_aligmentMatrix * scaledMatrix;
 }
 
@@ -559,9 +559,9 @@ DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) c
 		case m_global:
 		{
 //			dgMatrix matrix1 (matrix);
-//			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);
-//			matrix1[1] = matrix1[1].Scale4(m_scale.m_y);
-//			matrix1[2] = matrix1[2].Scale4(m_scale.m_z);
+//			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+//			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+//			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
 //			m_childShape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
 //			p0 -= m_padding;
 //			p1 += m_padding;

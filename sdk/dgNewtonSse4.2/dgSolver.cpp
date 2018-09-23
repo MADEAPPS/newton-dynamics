@@ -952,7 +952,7 @@ void dgSolver::IntegrateBodiesVelocity(dgInt32 threadID)
 			const dgVector force(body->m_externalForce + forceAndTorque.m_linear * w);
 			const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular * w);
 
-			const dgVector velocStep((force.Scale4(body->m_invMass.m_w)) * timestep4);
+			const dgVector velocStep((force.Scale(body->m_invMass.m_w)) * timestep4);
 			const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
 
 			if (!body->m_resting) {

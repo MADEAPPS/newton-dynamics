@@ -180,7 +180,7 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 		e1 = e2;
 	} 
 	dgFloat64 den = sqrt (normal.DotProduct3(normal)) + dgFloat64 (1.0e-24f);
-	normal = normal.Scale4 (dgFloat64 (1.0f)/ den);
+	normal = normal.Scale (dgFloat64 (1.0f)/ den);
 
 #ifdef _DEBUG
 	edge = face;
@@ -237,8 +237,8 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 						dgAssert (e0.DotProduct3(e0) >= dgFloat64 (0.0f));
 						dgAssert (e1.DotProduct3(e1) >= dgFloat64 (0.0f));
 
-						e0 = e0.Scale4 (dgFloat64 (1.0f) / sqrt (e0.DotProduct3(e0)));
-						e1 = e1.Scale4 (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1)));
+						e0 = e0.Scale (dgFloat64 (1.0f) / sqrt (e0.DotProduct3(e0)));
+						e1 = e1.Scale (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1)));
 						dgBigVector n1 (e0.CrossProduct3(e1));
 
 						dgFloat64 projection = n1.DotProduct3(normal0);
@@ -250,8 +250,8 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 							dgAssert (e11.m_w == dgFloat64 (0.0f));
 							dgAssert (e00.DotProduct3(e00) >= dgFloat64 (0.0f));
 							dgAssert (e11.DotProduct3(e11) >= dgFloat64 (0.0f));
-							e00 = e00.Scale4 (dgFloat64 (1.0f) / sqrt (e00.DotProduct3(e00)));
-							e11 = e11.Scale4 (dgFloat64 (1.0f) / sqrt (e11.DotProduct3(e11)));
+							e00 = e00.Scale (dgFloat64 (1.0f) / sqrt (e00.DotProduct3(e00)));
+							e11 = e11.Scale (dgFloat64 (1.0f) / sqrt (e11.DotProduct3(e11)));
 
 							dgBigVector n11 (e00.CrossProduct3(e11));
 							projection = n11.DotProduct3(normal0);
@@ -309,7 +309,7 @@ bool dgCollisionConvexHull::CheckConvex (dgPolyhedra& polyhedra1, const dgBigVec
 			} while (ptr != edge);
 		}
 	}
-	center = center.Scale4 (dgFloat64 (1.0f) / dgFloat64 (count));
+	center = center.Scale (dgFloat64 (1.0f) / dgFloat64 (count));
 
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &(*iter);
@@ -370,7 +370,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 		}
 		dgVector normal (dgFloat32 (0.0f));
 		normal[index] = dgFloat32 (1.0f);
-		dgVector step = sphere.RotateVector (normal.Scale4 (dgFloat32 (0.05f)));
+		dgVector step = sphere.RotateVector (normal.Scale (dgFloat32 (0.05f)));
 		for (dgInt32 i = 0; i < count; i ++) {
 			dgVector p1 (tmp[i] + step);
 			dgVector p2 (tmp[i] - step);
@@ -590,7 +590,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 					varian += p * p;
 				}
 
-				varian = varian.Scale4 (dgFloat32 (box.m_vertexCount)) - median * median;
+				varian = varian.Scale (dgFloat32 (box.m_vertexCount)) - median * median;
 				dgInt32 index = 0;
 				dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
 				for (dgInt32 i = 0; i < 3; i ++) {
@@ -599,7 +599,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 						maxVarian = varian[i];
 					}
 				}
-				dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (box.m_vertexCount));
+				dgVector center = median.Scale (dgFloat32 (1.0f) / dgFloat32 (box.m_vertexCount));
 				dgFloat32 test = center[index];
 
 				dgInt32 i0 = 0;

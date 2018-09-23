@@ -299,8 +299,8 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 	dgFloat32 disc = b * b - dgFloat32 (4.0f) * a * c;
 	if (disc >= dgFloat32 (0.0f)) {
 		disc = dgSqrt (disc);
-		dgVector origin0(p0 + dp.Scale4 ((-b + disc) / (dgFloat32 (2.0f) * a)));
-		dgVector origin1(p0 + dp.Scale4 ((-b - disc) / (dgFloat32 (2.0f) * a)));
+		dgVector origin0(p0 + dp.Scale ((-b + disc) / (dgFloat32 (2.0f) * a)));
+		dgVector origin1(p0 + dp.Scale ((-b - disc) / (dgFloat32 (2.0f) * a)));
 		dgFloat32 t0 = dgRayCastSphere(q0, q1, origin0, m_height);
 		dgFloat32 t1 = dgRayCastSphere(q0, q1, origin1, m_height);
 		if(t1 < t0) {
@@ -309,7 +309,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 		}
 
 		if ((t0 >= 0.0f) && (t0 <= 1.0f)) {
-			contactOut.m_normal = q0 + dq.Scale4(t0) - origin0;
+			contactOut.m_normal = q0 + dq.Scale(t0) - origin0;
 			dgAssert(contactOut.m_normal.m_w == dgFloat32(0.0f));
 
 			//contactOut.m_normal = contactOut.m_normal * contactOut.m_normal.DotProduct4(contactOut.m_normal).InvSqrt();
@@ -318,10 +318,10 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 		}
 	} else {
 		dgVector origin0 (dgPointToRayDistance (dgVector::m_zero, p0, p1)); 
-		origin0 = origin0.Scale4(m_radius / dgSqrt(origin0.DotProduct4(origin0).GetScalar()));
+		origin0 = origin0.Scale(m_radius / dgSqrt(origin0.DotProduct4(origin0).GetScalar()));
 		dgFloat32 t0 = dgRayCastSphere(q0, q1, origin0, m_height);
 		if ((t0 >= 0.0f) && (t0 <= 1.0f)) {
-			contactOut.m_normal = q0 + dq.Scale4(t0) - origin0;
+			contactOut.m_normal = q0 + dq.Scale(t0) - origin0;
 			dgAssert(contactOut.m_normal.m_w == dgFloat32(0.0f));
 			
 			//contactOut.m_normal = contactOut.m_normal * contactOut.m_normal.DotProduct4(contactOut.m_normal).InvSqrt();
@@ -346,7 +346,7 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 	dgVector sideDir (m_yzMask & dir);
 	//sideDir = sideDir * sideDir.InvMagSqrt();
 	sideDir = sideDir.Normalize();
-	return sideDir.Scale4(m_radius) + dir.Scale4 (m_height);
+	return sideDir.Scale(m_radius) + dir.Scale (m_height);
 }
 
 
@@ -361,13 +361,13 @@ dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, 
 
 	dgVector sideDir (m_yzMask & dir);
 	dgAssert (sideDir.DotProduct3(sideDir) > dgFloat32 (0.0f));
-	return sideDir.Normalize().Scale4(m_radius);
+	return sideDir.Normalize().Scale(m_radius);
 }
 
 dgVector dgCollisionChamferCylinder::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	dgAssert (dir.m_w == 0.0f);
-	return point + dir.Scale4(m_height - DG_PENETRATION_TOL);
+	return point + dir.Scale(m_height - DG_PENETRATION_TOL);
 }
 
 

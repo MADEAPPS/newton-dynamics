@@ -229,7 +229,7 @@ void dgDynamicBody::SetAccel(const dgVector& accel)
 bool dgDynamicBody::IsInEquilibrium() const
 {
 	if (m_equilibrium) {
-		dgVector deltaAccel((m_externalForce - m_savedExternalForce).Scale4(m_invMass.m_w));
+		dgVector deltaAccel((m_externalForce - m_savedExternalForce).Scale(m_invMass.m_w));
 		dgAssert(deltaAccel.m_w == 0.0f);
 		dgFloat32 deltaAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
 		if (deltaAccel2 > DG_ERR_TOLERANCE2) {
@@ -277,7 +277,7 @@ void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 */
 	dgVector damp (GetDampCoeffcient (timestep));
 	if (m_linearDampOn) {
-		m_veloc = m_veloc.Scale4(damp.m_w);
+		m_veloc = m_veloc.Scale(damp.m_w);
 	}
 
 	if (m_angularDampOn) {
@@ -333,11 +333,11 @@ void dgDynamicBody::IntegrateImplicit(dgFloat32 timestep)
 
 	// and solving for alpha we get the angular acceleration at t + dt
 	// calculate gradient at a full time step
-	dgVector gradientStep(localTorque.Scale4(timestep));
+	dgVector gradientStep(localTorque.Scale(timestep));
 
 	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
-	dgVector dw(localOmega.Scale4(dgFloat32(0.5f) * timestep));
-	//dgVector dw(localOmega.Scale4(dgFloat32(1.0f) * timestep));
+	dgVector dw(localOmega.Scale(dgFloat32(0.5f) * timestep));
+	//dgVector dw(localOmega.Scale(dgFloat32(1.0f) * timestep));
 
 	dgFloat32 jacobianMatrix[3][3];
 	// calculates Jacobian matrix
@@ -389,10 +389,10 @@ void dgDynamicBody::IntegrateImplicit(dgFloat32 timestep)
 	gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
 	localOmega += gradientStep;
 
-	m_accel = m_externalForce.Scale4(m_invMass.m_w);
+	m_accel = m_externalForce.Scale(m_invMass.m_w);
 	m_alpha = m_matrix.RotateVector(localTorque * m_invMass);
 
-	m_veloc += m_accel.Scale4(timestep);
+	m_veloc += m_accel.Scale(timestep);
 	m_omega = m_matrix.RotateVector(localOmega);
 }
 
@@ -405,9 +405,9 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 	// f(t + dt) = f(t) + f'(t) * dt
 
 	dgVector externalTorque(m_externalTorque - m_gyroTorque);
-	m_accel = m_externalForce.Scale4(m_invMass.m_w);
+	m_accel = m_externalForce.Scale(m_invMass.m_w);
 	m_alpha = externalTorque * m_invMass;
-	m_veloc += m_accel.Scale4(timestep);
+	m_veloc += m_accel.Scale(timestep);
 
 	dgTrace (("forward Euler %d: ", method));
 	switch (method)
@@ -461,7 +461,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 				dgAssert(m_omega.m_w == dgFloat32(0.0f));
 				dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar() + dgFloat32 (1.0e-12f);;
 					dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
-					dgVector omegaAxis(m_omega.Scale4(invOmegaMag));
+					dgVector omegaAxis(m_omega.Scale(invOmegaMag));
 					dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt.GetScalar();
 					dgQuaternion deltaRotation(omegaAxis, omegaAngle);
 				m_gyroRotation = m_gyroRotation * deltaRotation;
@@ -539,7 +539,7 @@ void dgDynamicBody::IntegrateExplicit(dgFloat32 timestep, dgInt32 method)
 				dgAssert(m_omega.m_w == dgFloat32(0.0f));
 				dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar() + dgFloat32 (1.0e-12f);
 				dgFloat32 invOmegaMag = dgRsqrt(omegaMag2);
-				dgVector omegaAxis(m_omega.Scale4(invOmegaMag));
+				dgVector omegaAxis(m_omega.Scale(invOmegaMag));
 				dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * dt.GetScalar();
 				dgQuaternion deltaRotation(omegaAxis, omegaAngle);
 				m_gyroRotation = m_gyroRotation * deltaRotation;

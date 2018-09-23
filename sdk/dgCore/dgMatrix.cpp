@@ -119,9 +119,9 @@ dgMatrix::dgMatrix (const dgQuaternion &rotation, const dgVector &position)
 dgMatrix::dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, const dgMatrix& stretchAxis)
 {
 	dgMatrix scaledAxis;
-	scaledAxis[0] = stretchAxis[0].Scale4 (scale[0]);
-	scaledAxis[1] = stretchAxis[1].Scale4 (scale[1]);
-	scaledAxis[2] = stretchAxis[2].Scale4 (scale[2]);
+	scaledAxis[0] = stretchAxis[0].Scale (scale[0]);
+	scaledAxis[1] = stretchAxis[1].Scale (scale[1]);
+	scaledAxis[2] = stretchAxis[2].Scale (scale[2]);
 	scaledAxis[3] = stretchAxis[3];
 
 	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
@@ -207,8 +207,8 @@ void dgMatrix::TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes,
 void dgMatrix::TransformBBox (const dgVector& p0local, const dgVector& p1local, dgVector& p0, dgVector& p1) const
 {
 	const dgMatrix& matrix = *this;
-	//dgVector size ((p1local - p0local).Scale4 (dgFloat32 (0.5f)));
-	//dgVector center (TransformVector ((p1local + p0local).Scale4 (dgFloat32 (0.5f))));
+	//dgVector size ((p1local - p0local).Scale (dgFloat32 (0.5f)));
+	//dgVector center (TransformVector ((p1local + p0local).Scale (dgFloat32 (0.5f))));
 	dgVector size ((p1local - p0local) * dgVector::m_half);
 	dgVector center (TransformVector ((p1local + p0local) * dgVector::m_half));
 	dgVector extends (size.m_x * dgAbs(matrix[0][0]) + size.m_y * dgAbs(matrix[1][0]) + size.m_z * dgAbs(matrix[2][0]),  
@@ -426,9 +426,9 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	dgFloat32 invdet2 = 1.0f / det2;
 
 	dgMatrix pureRotation (LL);
-	pureRotation[0] = pureRotation[0].Scale4 (invdet2);
-	pureRotation[1] = pureRotation[1].Scale4 (invdet2);
-	pureRotation[2] = pureRotation[2].Scale4 (invdet2);
+	pureRotation[0] = pureRotation[0].Scale (invdet2);
+	pureRotation[1] = pureRotation[1].Scale (invdet2);
+	pureRotation[2] = pureRotation[2].Scale (invdet2);
 
 	dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
 	dgFloat32 det = (pureRotation[0] * pureRotation[1]) % pureRotation[2];
@@ -439,9 +439,9 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 		scale[1] = det;
 		scale[2] = det;
 		det = dgFloat32 (1.0f)/ det;
-		transformMatrix.m_front = m_front.Scale4 (det);
-		transformMatrix.m_up = m_up.Scale4 (det);
-		transformMatrix.m_right = m_right.Scale4 (det);
+		transformMatrix.m_front = m_front.Scale (det);
+		transformMatrix.m_up = m_up.Scale (det);
+		transformMatrix.m_right = m_right.Scale (det);
 		transformMatrix[0][3] = dgFloat32 (0.0f);
 		transformMatrix[1][3] = dgFloat32 (0.0f);
 		transformMatrix[2][3] = dgFloat32 (0.0f);
@@ -462,9 +462,9 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 		scale[3] = dgFloat32 (0.0f);
 
 		dgMatrix scaledAxis;
-		scaledAxis[0] = stretchAxis[0].Scale4 (dgFloat32 (1.0f) / scale[0]);
-		scaledAxis[1] = stretchAxis[1].Scale4 (dgFloat32 (1.0f) / scale[1]);
-		scaledAxis[2] = stretchAxis[2].Scale4 (dgFloat32 (1.0f) / scale[2]);
+		scaledAxis[0] = stretchAxis[0].Scale (dgFloat32 (1.0f) / scale[0]);
+		scaledAxis[1] = stretchAxis[1].Scale (dgFloat32 (1.0f) / scale[1]);
+		scaledAxis[2] = stretchAxis[2].Scale (dgFloat32 (1.0f) / scale[2]);
 		scaledAxis[3] = stretchAxis[3];
 		dgMatrix symetricInv (stretchAxis.Transpose() * scaledAxis);
 
@@ -499,9 +499,9 @@ dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
 	scale[3] = dgFloat32 (0.0f);
 
 	dgMatrix scaledAxis;
-	scaledAxis[0] = stretchAxis[0].Scale4 (dgFloat32 (1.0f) / scale[0]);
-	scaledAxis[1] = stretchAxis[1].Scale4 (dgFloat32 (1.0f) / scale[1]);
-	scaledAxis[2] = stretchAxis[2].Scale4 (dgFloat32 (1.0f) / scale[2]);
+	scaledAxis[0] = stretchAxis[0].Scale (dgFloat32 (1.0f) / scale[0]);
+	scaledAxis[1] = stretchAxis[1].Scale (dgFloat32 (1.0f) / scale[1]);
+	scaledAxis[2] = stretchAxis[2].Scale (dgFloat32 (1.0f) / scale[2]);
 	scaledAxis[3] = stretchAxis[3];
 	dgMatrix symetricInv (stretchAxis.Transpose() * scaledAxis);
 
@@ -592,7 +592,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 			dgVector tmp (eigenVectors.m_front.CrossProduct3(eigenVectors.m_up));
 			if (tmp.DotProduct3(eigenVectors.m_right) < dgFloat32(0.0f)) {
 				dgAssert (0.0f);
-				//eigenVectors.m_right = eigenVectors.m_right.Scale4 (-dgFloat32(1.0f));
+				//eigenVectors.m_right = eigenVectors.m_right.Scale (-dgFloat32(1.0f));
 				eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
 			}
 			break;

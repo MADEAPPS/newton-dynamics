@@ -86,9 +86,9 @@ void dgConvexHull4d::dgNormalMap::TessellateTriangle(dgInt32 level, const dgVect
 		dgAssert (p01.m_w == dgFloat32 (0.0f));
 		dgAssert (p12.m_w == dgFloat32 (0.0f));
 		dgAssert (p20.m_w == dgFloat32 (0.0f));
-		p01 = p01.Scale4(dgRsqrt(p01.DotProduct3(p01)));
-		p12 = p12.Scale4(dgRsqrt(p12.DotProduct3(p12)));
-		p20 = p20.Scale4(dgRsqrt(p20.DotProduct3(p20)));
+		p01 = p01.Scale(dgRsqrt(p01.DotProduct3(p01)));
+		p12 = p12.Scale(dgRsqrt(p12.DotProduct3(p12)));
+		p20 = p20.Scale(dgRsqrt(p20.DotProduct3(p20)));
 
 		dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 		dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
@@ -546,7 +546,7 @@ dgConvexHull4dAABBTreeNode* dgConvexHull4d::BuildTree (dgConvexHull4dAABBTreeNod
 			varian = varian + p * p;
 		}
 
-		varian = varian.Scale4 (dgFloat32 (count)) - median * median;
+		varian = varian.Scale (dgFloat32 (count)) - median * median;
 
 		dgInt32 index = 0;
 		dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
@@ -556,7 +556,7 @@ dgConvexHull4dAABBTreeNode* dgConvexHull4d::BuildTree (dgConvexHull4dAABBTreeNod
 				maxVarian = varian[i];
 			}
 		}
-		dgBigVector center = median.Scale4 (dgFloat64 (1.0f) / dgFloat64 (count));
+		dgBigVector center = median.Scale (dgFloat64 (1.0f) / dgFloat64 (count));
 
 		dgFloat64 test = center[index];
 

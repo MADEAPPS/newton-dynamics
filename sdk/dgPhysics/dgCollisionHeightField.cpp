@@ -683,7 +683,7 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 			dgFloat32 t = RayCastCell (ray, xIndex0, zIndex0, normalOut, maxT);
 			if (t < maxT) {
 				// bail out at the first intersection and copy the data into the descriptor
-				//contactOut.m_normal = normalOut.Scale4 (dgRsqrt (normalOut.DotProduct3(normalOut)));
+				//contactOut.m_normal = normalOut.Scale (dgRsqrt (normalOut.DotProduct3(normalOut)));
 				contactOut.m_normal = normalOut.Normalize();
 				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
 				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
@@ -917,8 +917,8 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 	// the user data is the pointer to the collision geometry
 	CalculateMinExtend3d (q0, q1, boxP0, boxP1);
 
-	dgVector p0 (boxP0.Scale4(m_horizontalScaleInv_x).GetInt());
-	dgVector p1 (boxP1.Scale4(m_horizontalScaleInv_x).GetInt());
+	dgVector p0 (boxP0.Scale(m_horizontalScaleInv_x).GetInt());
+	dgVector p1 (boxP1.Scale(m_horizontalScaleInv_x).GetInt());
 
 	dgAssert (p0.m_ix == dgFastInt (boxP0.m_x * m_horizontalScaleInv_x));
 	dgAssert (p0.m_iz == dgFastInt (boxP0.m_z * m_horizontalScaleInv_x));
@@ -984,8 +984,8 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 	boxP0 = (boxP0.GetMax(dgVector (dgFloat32 (0.0f))) & m_yMask) + boxP0.AndNot(m_yMask);
 	boxP1 = (boxP1.GetMax(dgVector (dgFloat32 (0.0f))) & m_yMask) + boxP1.AndNot(m_yMask);
 
-	dgVector p0 (boxP0.Scale4(m_horizontalScaleInv_x).GetInt());
-	dgVector p1 (boxP1.Scale4(m_horizontalScaleInv_x).GetInt());
+	dgVector p0 (boxP0.Scale(m_horizontalScaleInv_x).GetInt());
+	dgVector p1 (boxP1.Scale(m_horizontalScaleInv_x).GetInt());
 
 	dgAssert (p0.m_ix == dgFastInt (boxP0.m_x * m_horizontalScaleInv_x));
 	dgAssert (p0.m_iz == dgFastInt (boxP0.m_z * m_horizontalScaleInv_x));

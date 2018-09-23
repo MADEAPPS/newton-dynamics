@@ -266,7 +266,7 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 {
 	dgAssert (filter);
 	dgVector l0 (line.m_l0);
-	dgVector l1 (line.m_l0 + (line.m_l1 - line.m_l0).Scale4 (dgMin(maxT, dgFloat32 (1.0f))));
+	dgVector l1 (line.m_l0 + (line.m_l1 - line.m_l0).Scale (dgMin(maxT, dgFloat32 (1.0f))));
 	if (dgRayBoxClip (l0, l1, m_minAABB, m_maxAABB)) {
 //	if (1) {
 //l0 = dgVector (-20.3125000f, 3.54991579f, 34.3441200f, 0.0f);
@@ -282,7 +282,7 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 			if (t < dgFloat32 (1.0f)) {
 				dgAssert (localP0.m_w == dgFloat32 (0.0f));
 				dgAssert (localP1.m_w == dgFloat32 (0.0f));
-				dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale4(t)));
+				dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
 				dgVector l1l0 (line.m_l1 - line.m_l0);
 				t = l1l0.DotProduct3(p - line.m_l0) / l1l0.DotProduct3(l1l0);
 				if (t < maxT) {
@@ -301,7 +301,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	dgAssert (m_veloc.m_w == dgFloat32 (0.0f));
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
-	m_globalCentreOfMass += m_veloc.Scale4 (timestep); 
+	m_globalCentreOfMass += m_veloc.Scale (timestep); 
 	dgFloat32 omegaMag2 = m_omega.DotProduct4(m_omega).GetScalar();
 #ifdef _DEBUG
 	const dgFloat32 err = dgFloat32(90.0f * dgDEG2RAD);
@@ -315,7 +315,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	// this is correct
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
-		dgVector omegaAxis (m_omega.Scale4 (invOmegaMag));
+		dgVector omegaAxis (m_omega.Scale (invOmegaMag));
 		dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
 		dgQuaternion rotation (omegaAxis, omegaAngle);
 		m_rotation = m_rotation * rotation;
@@ -345,7 +345,7 @@ dgVector dgBody::CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgF
 			massAccel *= (dgFloat32 (2.0f) * dgFloat32 (LINEAR_SOLVER_SUB_STEPS) / dgFloat32 (LINEAR_SOLVER_SUB_STEPS + 1));
 		} 
 	}
-	return (desiredVeloc - m_veloc).Scale4 (massAccel);
+	return (desiredVeloc - m_veloc).Scale (massAccel);
 */
 }
 
@@ -597,17 +597,17 @@ dgMatrix dgBody::CalculateInertiaMatrix () const
 	const dgVector Ixx(m_mass[0]);
 	const dgVector Iyy(m_mass[1]);
 	const dgVector Izz(m_mass[2]);
-	return dgMatrix (m_matrix.m_front.Scale4(m_matrix.m_front[0]) * Ixx +
-					 m_matrix.m_up.Scale4(m_matrix.m_up[0])		  * Iyy +
-					 m_matrix.m_right.Scale4(m_matrix.m_right[0]) * Izz,
+	return dgMatrix (m_matrix.m_front.Scale(m_matrix.m_front[0]) * Ixx +
+					 m_matrix.m_up.Scale(m_matrix.m_up[0])		  * Iyy +
+					 m_matrix.m_right.Scale(m_matrix.m_right[0]) * Izz,
 
-					 m_matrix.m_front.Scale4(m_matrix.m_front[1]) * Ixx +
-					 m_matrix.m_up.Scale4(m_matrix.m_up[1])       * Iyy +
-					 m_matrix.m_right.Scale4(m_matrix.m_right[1]) * Izz,
+					 m_matrix.m_front.Scale(m_matrix.m_front[1]) * Ixx +
+					 m_matrix.m_up.Scale(m_matrix.m_up[1])       * Iyy +
+					 m_matrix.m_right.Scale(m_matrix.m_right[1]) * Izz,
 
-					 m_matrix.m_front.Scale4(m_matrix.m_front[2]) * Ixx +
-					 m_matrix.m_up.Scale4(m_matrix.m_up[2])       * Iyy +
-					 m_matrix.m_right.Scale4(m_matrix.m_right[2]) * Izz,
+					 m_matrix.m_front.Scale(m_matrix.m_front[2]) * Ixx +
+					 m_matrix.m_up.Scale(m_matrix.m_up[2])       * Iyy +
+					 m_matrix.m_right.Scale(m_matrix.m_right[2]) * Izz,
 					 dgVector::m_wOne);
 #endif
 }
@@ -624,17 +624,17 @@ dgMatrix dgBody::CalculateInvInertiaMatrix () const
 	const dgVector invIxx(m_invMass[0]);
 	const dgVector invIyy(m_invMass[1]);
 	const dgVector invIzz(m_invMass[2]);
-	return dgMatrix(m_matrix.m_front.Scale4(m_matrix.m_front[0]) * invIxx +
-					m_matrix.m_up.Scale4(m_matrix.m_up[0])		 * invIyy +
-					m_matrix.m_right.Scale4(m_matrix.m_right[0]) * invIzz,
+	return dgMatrix(m_matrix.m_front.Scale(m_matrix.m_front[0]) * invIxx +
+					m_matrix.m_up.Scale(m_matrix.m_up[0])		 * invIyy +
+					m_matrix.m_right.Scale(m_matrix.m_right[0]) * invIzz,
 
-					m_matrix.m_front.Scale4(m_matrix.m_front[1]) * invIxx +
-					m_matrix.m_up.Scale4(m_matrix.m_up[1])		 * invIyy +
-					m_matrix.m_right.Scale4(m_matrix.m_right[1]) * invIzz,
+					m_matrix.m_front.Scale(m_matrix.m_front[1]) * invIxx +
+					m_matrix.m_up.Scale(m_matrix.m_up[1])		 * invIyy +
+					m_matrix.m_right.Scale(m_matrix.m_right[1]) * invIzz,
 
-					m_matrix.m_front.Scale4(m_matrix.m_front[2]) * invIxx +
-					m_matrix.m_up.Scale4(m_matrix.m_up[2])		 * invIyy +
-					m_matrix.m_right.Scale4(m_matrix.m_right[2]) * invIzz,
+					m_matrix.m_front.Scale(m_matrix.m_front[2]) * invIxx +
+					m_matrix.m_up.Scale(m_matrix.m_up[2])		 * invIyy +
+					m_matrix.m_right.Scale(m_matrix.m_right[2]) * invIzz,
 					dgVector::m_wOne);
 #endif
 }
@@ -693,7 +693,7 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 	// change of momentum
 	dgVector changeOfMomentum (contactMatrix.RotateVector (pointDeltaVeloc));
 
-	m_impulseForce += changeOfMomentum.Scale4(1.0f / timestep);
+	m_impulseForce += changeOfMomentum.Scale(1.0f / timestep);
 	m_impulseTorque += globalContact.CrossProduct3(m_impulseForce);
 
 	m_sleeping	= false;
@@ -703,8 +703,8 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 
 void dgBody::ApplyImpulsePair (const dgVector& linearImpulseIn, const dgVector& angularImpulseIn, dgFloat32 timestep)
 {
-	m_impulseForce += linearImpulseIn.Scale4(1.0f / timestep);
-	m_impulseTorque += angularImpulseIn.Scale4(1.0f / timestep);
+	m_impulseForce += linearImpulseIn.Scale(1.0f / timestep);
+	m_impulseTorque += angularImpulseIn.Scale(1.0f / timestep);
 
 	m_sleeping	= false;
 	m_equilibrium = false;
@@ -731,8 +731,8 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 		angularImpulse += Q;
 	}
 
-	m_impulseForce += impulse.Scale4(1.0f / timestep);
-	m_impulseTorque += angularImpulse.Scale4(1.0f / timestep);
+	m_impulseForce += impulse.Scale(1.0f / timestep);
+	m_impulseTorque += angularImpulse.Scale(1.0f / timestep);
 
 	m_sleeping	= false;
 	m_equilibrium = false;

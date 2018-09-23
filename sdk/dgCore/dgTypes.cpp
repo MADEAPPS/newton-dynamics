@@ -150,7 +150,7 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 	dgFloat64 sweptWindow = dgFloat64 (2.0f) * tol;
 	sweptWindow += dgFloat64 (1.0e-4f);
 
-	x2c = x2c.Scale4 (dgFloat32 (vertexCount)) - xc * xc;
+	x2c = x2c.Scale (dgFloat32 (vertexCount)) - xc * xc;
 
 	dgInt32 firstSortAxis = 2;
 	if ((x2c.m_y >= x2c.m_x) && (x2c.m_y >= x2c.m_z)) {

@@ -119,7 +119,7 @@ void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const 
 	length = dir.DotProduct3(dir);
 	length = dgSqrt (length);
 	dgAssert (length > dgFloat32 (0.0f));
-	matrix0 = dgMatrix (body0_Matrix.UnrotateVector (dir.Scale4 (dgFloat32 (1.0f) / length)));
+	matrix0 = dgMatrix (body0_Matrix.UnrotateVector (dir.Scale (dgFloat32 (1.0f) / length)));
 	matrix0.m_posit = body0_Matrix.UntransformVector (pivot);
 
 	matrix0.m_front.m_w = dgFloat32 (0.0f);
@@ -145,9 +145,9 @@ void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVe
 	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
 
 	dgAssert ((pinDirection0.DotProduct3(pinDirection0)) > dgFloat32 (0.0f));
-	matrix0.m_front = pinDirection0.Scale4 (dgRsqrt (pinDirection0.DotProduct3(pinDirection0)));
+	matrix0.m_front = pinDirection0.Scale (dgRsqrt (pinDirection0.DotProduct3(pinDirection0)));
 	matrix0.m_right = matrix0.m_front.CrossProduct3(pinDirection1);
-	matrix0.m_right = matrix0.m_right.Scale4 (dgRsqrt (matrix0.m_right.DotProduct3(matrix0.m_right)));
+	matrix0.m_right = matrix0.m_right.Scale (dgRsqrt (matrix0.m_right.DotProduct3(matrix0.m_right)));
 	matrix0.m_up = matrix0.m_right.CrossProduct3(matrix0.m_front); 
 	matrix0.m_posit = pivot;
 	

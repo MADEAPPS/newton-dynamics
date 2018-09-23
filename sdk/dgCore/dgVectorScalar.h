@@ -177,7 +177,7 @@ class dgVector
 		return dgVector (m_x + m_y + m_z + m_w);
 	}
 
-	DG_INLINE dgVector Scale4 (dgFloat32 scale) const
+	DG_INLINE dgVector Scale (dgFloat32 scale) const
 	{
 		return dgVector (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
@@ -283,7 +283,7 @@ class dgVector
 	{
 		dgAssert (m_w == dgFloat32 (0.0f));
 		//return *this * dgVector (dgRsqrt (DotProduct4(*this).m_x));
-		//return Scale4 (dgRsqrt (DotProduct4(*this).GetScalar()));
+		//return Scale (dgRsqrt (DotProduct4(*this).GetScalar()));
 		const dgVector& me = *this; 
 		return me * InvMagSqrt();
 	}
@@ -594,7 +594,7 @@ class dgBigVector
 		return dgBigVector (m_x + m_y + m_z + m_w);
 	}
 
-	DG_INLINE dgBigVector Scale4 (dgFloat64 scale) const
+	DG_INLINE dgBigVector Scale (dgFloat64 scale) const
 	{
 		return dgBigVector (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}

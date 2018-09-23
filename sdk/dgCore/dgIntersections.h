@@ -82,7 +82,7 @@ DG_INLINE dgInt32 dgCompareBox (const dgVector& p0, const dgVector& p1, const dg
 
 DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, const dgVector& omega, dgFloat32 timestep, dgFloat32 maxRadius, dgFloat32 minRadius)
 {
-	dgVector linearStep (veloc.Scale4 (timestep));
+	dgVector linearStep (veloc.Scale (timestep));
 
 	// estimate the maximum effect of the angular velocity and enlarge that box by that value (use 45 degrees as max angle not 90)
 	dgFloat32 maxAngle = dgMin (dgSqrt (omega.DotProduct3(omega) * timestep * timestep), dgFloat32 (45.0f * dgDEG2RAD));
@@ -250,7 +250,7 @@ class dgFastAABBInfo: public dgObb
 		,m_separationDistance(dgFloat32(1.0e10f))
 	{
 		SetTransposeAbsMatrix (matrix);
-		dgVector size1 (matrix[0].Abs().Scale4(size.m_x) + matrix[1].Abs().Scale4(size.m_y) + matrix[2].Abs().Scale4(size.m_z));
+		dgVector size1 (matrix[0].Abs().Scale(size.m_x) + matrix[1].Abs().Scale(size.m_y) + matrix[2].Abs().Scale(size.m_z));
 		m_p0 = (matrix[3] - size1) & dgVector::m_triplexMask;
 		m_p1 = (matrix[3] + size1) & dgVector::m_triplexMask;
 	}
@@ -355,7 +355,7 @@ class dgFastAABBInfo: public dgObb
 		faceBoxP1 = faceBoxP1 & dgVector::m_triplexMask;
 
 		dgMatrix matrix = *this * faceMatrix;
-		dgVector size (matrix[0].Abs().Scale4(m_size.m_x) + matrix[1].Abs().Scale4(m_size.m_y) + matrix[2].Abs().Scale4(m_size.m_z));
+		dgVector size (matrix[0].Abs().Scale(m_size.m_x) + matrix[1].Abs().Scale(m_size.m_y) + matrix[2].Abs().Scale(m_size.m_z));
 		dgVector boxP0 ((matrix.m_posit - size) & dgVector::m_triplexMask);
 		dgVector boxP1 ((matrix.m_posit + size) & dgVector::m_triplexMask);
 

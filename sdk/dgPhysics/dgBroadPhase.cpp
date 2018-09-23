@@ -80,7 +80,7 @@ class dgBroadPhase::dgSpliteInfo
 				varian += p * p;
 			}
 
-			varian = varian.Scale4 (dgFloat32 (boxCount)) - median * median;
+			varian = varian.Scale (dgFloat32 (boxCount)) - median * median;
 
 			dgInt32 index = 0;
 			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
@@ -91,7 +91,7 @@ class dgBroadPhase::dgSpliteInfo
 				}
 			}
 
-			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+			dgVector center = median.Scale (dgFloat32 (1.0f) / dgFloat32 (boxCount));
 
 			dgFloat32 test = center[index];
 
@@ -1165,7 +1165,7 @@ bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const
 
 				dgVector boxp0(box0_p0 - box1_p1);
 				dgVector boxp1(box0_p1 - box1_p0);
-				dgFastRayTest ray(dgVector::m_zero, velRelative.Scale4(timestep * dgFloat32(4.0f)));
+				dgFastRayTest ray(dgVector::m_zero, velRelative.Scale(timestep * dgFloat32(4.0f)));
 				dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
 				ret = (distance < dgFloat32(1.0f));
 			} else {

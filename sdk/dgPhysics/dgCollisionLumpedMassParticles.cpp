@@ -138,9 +138,9 @@ void dgCollisionLumpedMassParticles::SetOwnerAndMassPraperties (dgDynamicBody* c
 		massSum += mass[i];
 		//inertiaSum += mass[i] * radius2;
 		posit[i] = scaledTranform.TransformVector(posit[i]) & dgVector::m_triplexMask;
-		xMassSum += posit[i].Scale4 (mass[i]);
-		//xxMassSum += posit[i] * posit[i].Scale4 (mass[i]);
-		//xyMassSum += posit[i] * (posit[i].ShiftTripleRight()).Scale4 (mass[i]);
+		xMassSum += posit[i].Scale (mass[i]);
+		//xxMassSum += posit[i] * posit[i].Scale (mass[i]);
+		//xyMassSum += posit[i] * (posit[i].ShiftTripleRight()).Scale (mass[i]);
 	}
 	m_totalMass = massSum;
 	dgFloat32 invMass = dgFloat32(1.0f) / massSum;
@@ -151,7 +151,7 @@ void dgCollisionLumpedMassParticles::SetOwnerAndMassPraperties (dgDynamicBody* c
 	body->m_matrix = matrix;
 	body->m_localCentreOfMass = xMassSum * invMass;
 
-	//dgVector inertia (xxMassSum.Scale4(invMass) - body->m_localCentreOfMass); 
+	//dgVector inertia (xxMassSum.Scale(invMass) - body->m_localCentreOfMass); 
 	//inertia += dgVector (inertiaSum);
 	//inertia.m_w = massSum;
 	//body->m_mass = inertia; 
@@ -162,8 +162,8 @@ void dgCollisionLumpedMassParticles::SetOwnerAndMassPraperties (dgDynamicBody* c
 //	dgVector com(xxSum.CompProduct4(den) + origin);
 //	dgVector pxx0(origin - com);
 //	dgVector pxy0(pxx0.ShiftTripleRight());
-//	dgVector Ixx(unitMass.CompProduct4(xxSum2 + xxSum.CompProduct4(pxx0.CompProduct4(dgVector::m_two))) + pxx0.CompProduct4(pxx0.Scale4(m_body->m_mass.m_w)));
-//	dgVector Ixy(unitMass.CompProduct4(xySum + xxSum.CompProduct4(pxy0) + yySum.CompProduct4(pxx0)) + pxx0.CompProduct4(pxy0.Scale4(m_body->m_mass.m_w)));
+//	dgVector Ixx(unitMass.CompProduct4(xxSum2 + xxSum.CompProduct4(pxx0.CompProduct4(dgVector::m_two))) + pxx0.CompProduct4(pxx0.Scale(m_body->m_mass.m_w)));
+//	dgVector Ixy(unitMass.CompProduct4(xySum + xxSum.CompProduct4(pxy0) + yySum.CompProduct4(pxx0)) + pxx0.CompProduct4(pxy0.Scale(m_body->m_mass.m_w)));
 //	dgVector com2(body->m_localCentreOfMass.CompProduct4(body->m_localCentreOfMass));
 }
 
@@ -216,7 +216,7 @@ void dgCollisionLumpedMassParticles::RegisterCollision(const dgBody* const other
 void dgCollisionLumpedMassParticles::CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
 	dgVector origin(matrix.TransformVector(m_boxOrigin));
-	dgVector size(matrix.m_front.Abs().Scale4(m_boxSize.m_x) + matrix.m_up.Abs().Scale4(m_boxSize.m_y) + matrix.m_right.Abs().Scale4(m_boxSize.m_z));
+	dgVector size(matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));
 	p0 = (origin - size) & dgVector::m_triplexMask;
 	p1 = (origin + size) & dgVector::m_triplexMask;
 }
@@ -276,7 +276,7 @@ dgVector dgCollisionLumpedMassParticles::CalculateContactNormalAndPenetration(co
 	dgVector contactNormal(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 	dgVector otherPoint(worldPosition);
 	otherPoint.m_y = dgFloat32(0.0f);
-	dgVector point(worldPosition - contactNormal.Scale4 (m_particleRadius));
+	dgVector point(worldPosition - contactNormal.Scale (m_particleRadius));
 	contactNormal.m_w = contactNormal.DotProduct4(otherPoint - point).GetScalar();
 
 	return contactNormal;
@@ -321,13 +321,13 @@ xxx ++;
 					dgFloat32 penetration = dgClamp(contactNormal.m_w - DG_MINIMIM_ZERO_SURFACE, dgFloat32(0.0f), dgFloat32(0.125f));
 					dgFloat32 s = dgFloat32 (2.0f) * invTimeStep * penetration;
 					dgFloat32 a = -s * invTimeStep;
-					veloc[i] += normal.Scale4 (s - veloc[i].DotProduct4(normal).GetScalar());
-					//dgVector penetrationSpeed(invTimeStep.Scale4(coeficientOfPenetration * penetration));
+					veloc[i] += normal.Scale (s - veloc[i].DotProduct4(normal).GetScalar());
+					//dgVector penetrationSpeed(invTimeStep.Scale(coeficientOfPenetration * penetration));
 					//dgVector normalSpeed(normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
 					//dgVector restoringSpeed(normalSpeed.GetMax(penetrationSpeed));
 					//dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
 					//accel1 = invTimeStep.CompProduct4(normalVelocity);
-					accel1 = normal.Scale4(a);
+					accel1 = normal.Scale(a);
 					frictionCoef = coeficientOfFriction;
 				}
 			}
