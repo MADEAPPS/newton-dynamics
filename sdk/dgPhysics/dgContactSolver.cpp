@@ -489,7 +489,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		}
 
 		if (i >= nCount) {
-			dgAssert(0);
+//			dgAssert(0);
 			return -1;
 		}
 

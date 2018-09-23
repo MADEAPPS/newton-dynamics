@@ -92,16 +92,14 @@ class dClosestDistanceRecord: public dCustomControllerBase
 
 		NewtonCollision* const collisionA = NewtonBodyGetCollision(m_body);
 
-		int res = NewtonCollisionClosestPoint(world, collisionA, &matrixA[0][0], m_castingVisualEntity->m_castingShape, &matrixB[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_contact1[0], &m_castingVisualEntity->m_normal[0], 0);
+		//int res = NewtonCollisionClosestPoint(world, collisionA, &matrixA[0][0], m_castingVisualEntity->m_castingShape, &matrixB[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_contact1[0], &m_castingVisualEntity->m_normal[0], 0);
 		
 		//just test the center of collisionB against collisionA to see if the point is inside or not:
-		//int res = NewtonCollisionPointDistance(world, &matrixB.m_posit[0], collisionA, &matrixA[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_normal[0], 0);
-
-		if (res == 0)
-		{
-			printf("Point Inside Body!");
+		int res = NewtonCollisionPointDistance(world, &matrixA.m_posit[0], collisionA, &matrixA[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_normal[0], 0);
+		if (res == 0){
+			printf("Point Inside Body!\n");
+			//dTrace(("Point Inside Body!\n"));
 		}
-
 	}
 
 	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)

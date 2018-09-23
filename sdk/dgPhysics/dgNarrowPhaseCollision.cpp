@@ -1402,27 +1402,28 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	contactJoint->m_separtingVector = collision0->GetGlobalMatrix().m_up;
 
 	dgContactSolver contactSolver(&proxy);
-	contactSolver.CalculateClosestPoints();
+	const bool retVal = contactSolver.CalculateClosestPoints();
+	if (retVal) {
+		proxy.m_closestPointBody0 = contactSolver.GetPoint0() + origin;
+		proxy.m_closestPointBody1 = contactSolver.GetPoint1() + origin;
+		proxy.m_normal = contactSolver.GetNormal().Scale4(-1.0f);
 
-	proxy.m_closestPointBody0 = contactSolver.GetPoint0() + origin;
-	proxy.m_closestPointBody1 = contactSolver.GetPoint1() + origin;
-	proxy.m_normal = contactSolver.GetNormal().Scale4(-1.0f);
+		dgContactPoint* const contactOut = proxy.m_contacts;
+		contactOut[0].m_normal = proxy.m_normal;
+		contactOut[0].m_point = proxy.m_closestPointBody0;
 
-	dgContactPoint* const contactOut = proxy.m_contacts;
-	contactOut[0].m_normal = proxy.m_normal;
-	contactOut[0].m_point = proxy.m_closestPointBody0;
+		contactOut[1].m_normal = contactSolver.GetNormal();
+		contactOut[1].m_point = proxy.m_closestPointBody1;
 
-	contactOut[1].m_normal = contactSolver.GetNormal();
-	contactOut[1].m_point = proxy.m_closestPointBody1;
+		contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4(proxy.m_normal).GetScalar();
+		contactJoint->m_separationDistance = dgFloat32(0.0f);
 
-	contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4(proxy.m_normal).GetScalar();
-	contactJoint->m_separationDistance = dgFloat32(0.0f);
-
-	instance0.m_material.m_userData = NULL;
-	instance1.m_material.m_userData = NULL;
-	proxy.m_instance0 = collision0;
-	proxy.m_instance1 = collision1;
-	return 1;
+		instance0.m_material.m_userData = NULL;
+		instance1.m_material.m_userData = NULL;
+		proxy.m_instance0 = collision0;
+		proxy.m_instance1 = collision1;
+	}
+	return retVal ? 1 : 0;
 }
 
 dgInt32 dgWorld::CalculateUserContacts(dgCollisionParamProxy& proxy) const
