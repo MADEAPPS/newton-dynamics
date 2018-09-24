@@ -53,7 +53,6 @@ class dgContactList: public dgList<dgContact*>
 	dgContactList::dgListNode* m_deadContacts[128];
 };
 
-
 DG_MSC_VECTOR_ALIGMENT
 class dgCollisionParamProxy
 {	

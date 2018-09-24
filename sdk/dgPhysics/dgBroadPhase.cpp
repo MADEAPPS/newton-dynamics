@@ -1636,18 +1636,19 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 		}
 	}
 	
-	if (contactList->m_activeContactsCount >= m_world->m_jointsMemory.GetElementsCapacity()) {
+	if (contactList->GetCount() >= m_world->m_jointsMemory.GetElementsCapacity()) {
 		dgInt32 activeCount = 0;
+		m_world->m_jointsMemory.ResizeIfNecessary(contactList->GetCount());
+		dgJointInfo* const constraintArray = &m_world->m_jointsMemory[0];
 		for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 			dgContact* const contact = contactNode->GetInfo();
 			if (contact->m_contactActive || contact->m_maxDOF) {
 				dgAssert(contact->m_maxDOF);
 				dgAssert(contact->m_contactActive);
-				m_world->m_jointsMemory[activeCount].m_joint = contact;
+				constraintArray[activeCount].m_joint = contact;
 				activeCount++;
 			}
 		}
-		contactList->m_activeContactsCount = activeCount;
 	}
 }
 
