@@ -187,7 +187,7 @@ DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
 	tmp = dgClamp (angularDamp.m_z, dgFloat32(0.0f), dgFloat32(1.0f));
 	m_dampCoef.m_z = DG_MAX_SPEED_ATT * tmp;
 
-	m_angularDampOn = m_dampCoef.DotProduct3(m_dampCoef) > dgFloat32 (1.0e-12f);
+	m_angularDampOn = m_dampCoef.DotProduct(m_dampCoef & dgVector::m_triplexMask).GetScalar() > dgFloat32 (1.0e-12f);
 	m_cachedTimeStep = dgFloat32(0.0f);
 }
 

@@ -217,20 +217,20 @@ dgInt32 dgCollisionCapsule::CalculateSignature () const
 void dgCollisionCapsule::TesselateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const
 {
 	if (level) {
-		dgAssert(dgAbs(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p0.DotProduct(p0).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p1.DotProduct(p1).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p2.DotProduct(p2).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 		dgVector p01(p0 + p1);
 		dgVector p12(p1 + p2);
 		dgVector p20(p2 + p0);
 
-		p01 = p01.Scale(dgRsqrt(p01.DotProduct3(p01)));
-		p12 = p12.Scale(dgRsqrt(p12.DotProduct3(p12)));
-		p20 = p20.Scale(dgRsqrt(p20.DotProduct3(p20)));
+		p01 = p01.Scale(dgRsqrt(p01.DotProduct(p01).GetScalar()));
+		p12 = p12.Scale(dgRsqrt(p12.DotProduct(p12).GetScalar()));
+		p20 = p20.Scale(dgRsqrt(p20.DotProduct(p20).GetScalar()));
 
-		dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p01.DotProduct(p01).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p12.DotProduct(p12).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(p20.DotProduct(p20).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 
 		TesselateTriangle(level - 1, p0, p01, p20, count, ouput);
 		TesselateTriangle(level - 1, p1, p12, p01, count, ouput);
@@ -343,7 +343,8 @@ void dgCollisionCapsule::SetCollisionBBox (const dgVector& p0__, const dgVector&
 dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* const vertexIndex) const
 {
 	dgVector dir (direction * m_transform);
-	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert (dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgVector p0(dir.Scale (m_radio0));
 	dgVector p1(dir.Scale (m_radio1));
@@ -360,7 +361,8 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgVector dir(direction * m_transform);
-	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert(dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	dgVector p0(dgVector::m_zero);
 	dgVector p1(dir.Scale(m_radio1 - m_radio0));

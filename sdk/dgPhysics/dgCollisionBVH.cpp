@@ -260,7 +260,7 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 			maxT = ray.m_t; 
 			dgAssert (ray.m_normal.m_w == dgFloat32 (0.0f));
 			dgAssert (ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dgFloat32(0.0f));
-			//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct3(ray.m_normal) + dgFloat32 (1.0e-8f)));
+			//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dgFloat32 (1.0e-8f)));
 			contactOut.m_normal = ray.m_normal.Normalize();
 			//contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;
@@ -277,7 +277,7 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 			maxT = ray.m_t; 
 			dgAssert(ray.m_normal.m_w == dgFloat32(0.0f));
 			dgAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dgFloat32(0.0f));
-			//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct3(ray.m_normal) + dgFloat32 (1.0e-8f)));
+			//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dgFloat32 (1.0e-8f)));
 			contactOut.m_normal = ray.m_normal.Normalize();
 			//contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;

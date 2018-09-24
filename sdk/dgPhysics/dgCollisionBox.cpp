@@ -191,7 +191,7 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir0, dgInt32* const ver
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);
 
-	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
 	if (vertexIndex) {
@@ -207,7 +207,7 @@ dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir0, dgFloat32 sk
 	dgVector mask0(dir0.Abs() > m_flushZero);
 	dgVector dir(dir0 & mask0);
 
-	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
 	dgVector mask(dir < dgVector(dgFloat32(0.0f)));
 	if (vertexIndex) {
