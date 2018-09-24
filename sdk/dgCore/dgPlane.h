@@ -89,7 +89,7 @@ DG_INLINE dgPlane::dgPlane (const dgVector &normal, dgFloat32 distance)
 DG_INLINE dgPlane::dgPlane (const dgVector &P0, const dgVector &P1, const dgVector &P2)
 	:dgVector ((P1 - P0).CrossProduct(P2 - P0)) 
 {
-	m_w = - DotProduct3(P0);
+	m_w = - DotProduct(P0 & dgVector::m_triplexMask).GetScalar();
 }
 
 DG_INLINE dgPlane dgPlane::Scale (dgFloat32 s)	const

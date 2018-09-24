@@ -188,7 +188,8 @@ void dgCollisionCone::SetCollisionBBox (const dgVector& p0__, const dgVector& p1
 
 dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert(dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	if (dir.m_x < dgFloat32(-0.9999f)) {
 		return dgVector(-m_height, dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
@@ -219,7 +220,8 @@ dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const ver
 
 dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
-	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert(dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	if (dir.m_x < dgFloat32(-0.9999f)) {
 		return dgVector(-(m_height - DG_PENETRATION_TOL), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
@@ -250,10 +252,10 @@ dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgFloat32 sk
 
 dgVector dgCollisionCone::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
 {
-	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert(dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	return point + dir.Scale(DG_PENETRATION_TOL);
 }
-
 
 void dgCollisionCone::MassProperties ()
 {

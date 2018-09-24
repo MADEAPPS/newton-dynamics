@@ -1053,8 +1053,9 @@ void dgCollisionCompound::EndAddRemove (bool flushCache)
 			m_treeEntropy = dgFloat32 (2.0f);
 		}
 
+		dgAssert (m_root->m_size.m_w == dgFloat32 (0.0f));
 		m_boxMinRadius = dgMin(m_root->m_size.m_x, m_root->m_size.m_y, m_root->m_size.m_z);
-		m_boxMaxRadius = dgSqrt (m_root->m_size.DotProduct3(m_root->m_size));
+		m_boxMaxRadius = dgSqrt (m_root->m_size.DotProduct(m_root->m_size).GetScalar());
 
 		m_boxSize = m_root->m_size;
 		m_boxOrigin = m_root->m_origin;
@@ -1282,6 +1283,7 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 	dgInt32 iz = (dir[2] > dgFloat32 (0.0f)) ? 1 : 0;
 	dgVector supportVertex (dgFloat32 (0.0f));   
 
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	while (stack) {
 
 		stack--;
@@ -1295,7 +1297,7 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 				const dgMatrix& matrix = subShape->GetLocalMatrix(); 
 				dgVector newDir (matrix.UnrotateVector(dir)); 
 				dgVector vertex (matrix.TransformVector (subShape->SupportVertex(newDir)));		
-				dgFloat32 dist = dir.DotProduct3(vertex);
+				dgFloat32 dist = dir.DotProduct(vertex).GetScalar();
 				if (dist > maxProj) {
 					maxProj = dist;
 					supportVertex = vertex;		
@@ -1311,8 +1313,8 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 				const dgVector* const box1 = &right->m_p0;
 				dgVector p1 (box1[ix].m_x, box1[iy].m_y, box1[iz].m_z, dgFloat32 (0.0f));
 
-				dgFloat32 dist0 = p0.DotProduct3(dir);
-				dgFloat32 dist1 = p1.DotProduct3(dir);
+				dgFloat32 dist0 = p0.DotProduct(dir).GetScalar();
+				dgFloat32 dist1 = p1.DotProduct(dir).GetScalar();
 				if (dist0 > dist1) {
 					stackPool[stack] = right;
 					aabbProjection[stack] = dist1;

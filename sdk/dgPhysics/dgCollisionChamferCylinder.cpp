@@ -335,7 +335,8 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 
 dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert (dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 x = dir.GetScalar();
 	if (dgAbs (x) > dgFloat32 (0.9999f)) {
@@ -352,7 +353,8 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 
 dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert (dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 x = dir.GetScalar();
 	if (dgAbs (x) > dgFloat32 (0.99995f)) {
@@ -360,7 +362,7 @@ dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, 
 	}
 
 	dgVector sideDir (m_yzMask & dir);
-	dgAssert (sideDir.DotProduct3(sideDir) > dgFloat32 (0.0f));
+	dgAssert (sideDir.DotProduct(sideDir).GetScalar() > dgFloat32 (0.0f));
 	return sideDir.Normalize().Scale(m_radius);
 }
 

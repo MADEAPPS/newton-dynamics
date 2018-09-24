@@ -340,11 +340,11 @@ class dgTetraIsoSufaceStuffing
 
 		dgFloat64 dgPointToRayDistance (const dgBigVector& point, const dgBigVector& ray_p0, const dgBigVector& ray_p1, dgRayTracePointSide* const rayType) const
 		{
-			dgBigVector dp___(ray_p1 - ray_p0);
-			dgFloat64 den = dp___.DotProduct3(dp___);
-			dgFloat64 num = dp___.DotProduct3(point - ray_p0);
+			dgBigVector dp(ray_p1 - ray_p0);
+			dgFloat64 den = dp.DotProduct3(dp);
+			dgFloat64 num = dp.DotProduct3(point - ray_p0);
 			if ((num >= dgFloat64 (0.0f)) && (num <= den)) { 
-				dgBigVector p (ray_p0 + dp___.Scale (num / den));
+				dgBigVector p (ray_p0 + dp.Scale (num / den));
 				dgBigVector dist (point - p);
 				if (dist.DotProduct3(dist) < dgFloat64 (1.0e-12f)) {
 					rayType->m_rayIsDegenerate = true;
