@@ -76,7 +76,7 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		NewtonBodyGetMatrix(m_body, &matrixA[0][0]);
 
 		dFloat speed = m_step * timestep * 60.0f; 
-speed = 0;
+//speed = 0;
 		m_pith = dMod (m_pith + speed, dPi * 2.0f);
 		m_yaw = dMod (m_yaw + speed, dPi * 2.0f);
 		m_roll = dMod (m_roll + speed, dPi * 2.0f);
@@ -115,7 +115,7 @@ speed = 0;
 		m_yaw = dGaussianRandom (dPi * 2.0f);
 		m_roll = dGaussianRandom (dPi * 2.0f);
 		m_step = 15.0f * (dAbs (dGaussianRandom (0.25f)) + 0.0001f) * dDegreeToRad;
-m_pith -= 0.5f;
+//m_pith -= 0.5f;
 
 		CreatCasterBody(location_x, location_z, shapeType, materialID);
 

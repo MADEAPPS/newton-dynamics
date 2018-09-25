@@ -1637,7 +1637,6 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 					contact1 = proxy.m_contacts[1];
 				}
 			} else {
-				dgAssert (0);
 				break;
 			}
 

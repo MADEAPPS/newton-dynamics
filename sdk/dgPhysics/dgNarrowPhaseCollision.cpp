@@ -1403,7 +1403,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	contactJoint->m_separtingVector = collision0->GetGlobalMatrix().m_up;
 
 	dgContactSolver contactSolver(&proxy);
-	const bool retVal = contactSolver.CalculateClosestPoints();
+	bool retVal = contactSolver.CalculateClosestPoints();
 	if (retVal) {
 		proxy.m_closestPointBody0 = contactSolver.GetPoint0() + origin;
 		proxy.m_closestPointBody1 = contactSolver.GetPoint1() + origin;
@@ -1423,6 +1423,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 		instance1.m_material.m_userData = NULL;
 		proxy.m_instance0 = collision0;
 		proxy.m_instance1 = collision1;
+		retVal = contactJoint->m_closestDistance >= dgFloat32(0.0f);
 	}
 	return retVal ? 1 : 0;
 }
