@@ -317,10 +317,10 @@ dgCollisionInstance* dgWorld::CreateHeightField(
 
 dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgAssert (dgAbs (offsetMatrix[0].DotProduct3(offsetMatrix[0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbs (offsetMatrix[1].DotProduct3(offsetMatrix[1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbs (offsetMatrix[2].DotProduct3(offsetMatrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbs (offsetMatrix[2].DotProduct3(offsetMatrix[0].CrossProduct(offsetMatrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[0].DotProduct(offsetMatrix[0]).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[1].DotProduct(offsetMatrix[1]).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[2].DotProduct(offsetMatrix[2]).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbs (offsetMatrix[2].DotProduct(offsetMatrix[0].CrossProduct(offsetMatrix[1])).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
 
 	dgAssert (offsetMatrix[0][3] == dgFloat32 (0.0f));
 	dgAssert (offsetMatrix[1][3] == dgFloat32 (0.0f));
@@ -584,7 +584,8 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 					for (dgInt32 j = i + 1; (j < count) && countOver && (contact[j].m_point[index] < val) ; j ++) {
 						if (!mask[j]) {
 							dgVector dp (contact[j].m_point - contact[i].m_point);
-							dgFloat32 dist2 = dp.DotProduct3(dp);
+							dgAssert (dp.m_w == dgFloat32 (0.0f));
+							dgFloat32 dist2 = dp.DotProduct(dp).GetScalar();
 							if (dist2 < window2) {
 								mask[j] = 1;
 								countOver --;
@@ -632,7 +633,8 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 				for (dgInt32 j = i + 1; (j < count) && (contactPointArray[j].m_point[index] < val) ; j ++) {
 					if (!mask[j]) {
 						dgVector dp (contactPointArray[j].m_point - contactPointArray[i].m_point);
-						dgFloat32 dist2 = dp.DotProduct3(dp);
+						dgAssert (dp.m_w == dgFloat32 (0.0f));
+						dgFloat32 dist2 = dp.DotProduct(dp).GetScalar();
 						if (dist2 < window2) {
 							if (contactPointArray[i].m_penetration < contactPointArray[j].m_penetration ) {
 								contactPointArray[i].m_point = contactPointArray[j].m_point;
@@ -759,7 +761,6 @@ void dgWorld::ProcessCachedContacts (dgContact* const contact, dgFloat32 timeste
 	}
 }
 
-
 void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex)
 {
 	dgContact* const contact = pair->m_contact;
@@ -805,8 +806,9 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgVector vel1 (v1 + w1.CrossProduct(contactArray[0].m_point - com1));
 	dgVector vRel (vel1 - vel0);
 	dgAssert (controlNormal.m_w == dgFloat32 (0.0f));
-	dgVector tangDir (vRel - controlNormal.Scale (vRel.DotProduct3(controlNormal)));
-	dgFloat32 diff = tangDir.DotProduct3(tangDir);
+	dgVector tangDir (vRel - controlNormal * vRel.DotProduct(controlNormal));
+	dgAssert (tangDir.m_w == dgFloat32 (0.0f));
+	dgFloat32 diff = tangDir.DotProduct(tangDir).GetScalar();
 
 	dgInt32 staticMotion = 0;
 	if (diff <= dgFloat32 (1.0e-2f)) {
@@ -819,10 +821,9 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		controlDir0 = controlNormal.CrossProduct(tangDir);
 		dgAssert (controlDir0.m_w == dgFloat32 (0.0f));
 		dgAssert (controlDir0.DotProduct(controlDir0).GetScalar() > dgFloat32 (1.0e-8f));
-		//controlDir0 = controlDir0.Scale (dgRsqrt (controlDir0.DotProduct3(controlDir0)));
 		controlDir0 = controlDir0.Normalize();
 		controlDir1 = controlNormal.CrossProduct(controlDir0);
-		dgAssert (dgAbs(controlNormal.DotProduct3(controlDir0.CrossProduct(controlDir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbs(controlNormal.DotProduct(controlDir0.CrossProduct(controlDir1)).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	}
 
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
@@ -835,7 +836,8 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		dgInt32 index = -1;
 		for (dgInt32 j = 0; j < count; j ++) {
 			dgVector v (cachePosition[j] - contactArray[i].m_point);
-			diff = v.DotProduct3(v);
+			dgAssert (v.m_w == dgFloat32 (0.0f));
+			diff = v.DotProduct(v).GetScalar();
 			if (diff < min) {
 				min = diff;
 				index = j;
@@ -882,7 +884,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		contactMaterial->m_dynamicFriction0 = material->m_dynamicFriction0;
 		contactMaterial->m_dynamicFriction1 = material->m_dynamicFriction1;
 
-		dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_normal).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 		//contactMaterial.m_collisionEnable = true;
 		//contactMaterial.m_friction0Enable = material->m_friction0Enable;
@@ -894,7 +896,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		contactMaterial->m_userData = material->m_userData;
 
 		if (staticMotion) {
-			if (contactMaterial->m_normal.DotProduct3(controlNormal) > dgFloat32 (0.9995f)) {
+			if (contactMaterial->m_normal.DotProduct(controlNormal).GetScalar() > dgFloat32 (0.9995f)) {
 				contactMaterial->m_dir0 = controlDir0;
 				contactMaterial->m_dir1 = controlDir1;
 			} else {
@@ -905,11 +907,10 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				}
 				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct(tangDir);
 				dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
-				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
-				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
+				dgAssert (contactMaterial->m_dir0.DotProduct(contactMaterial->m_dir0).GetScalar() > dgFloat32 (1.0e-8f));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
 				contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct(contactMaterial->m_dir0);
-				dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+				dgAssert (dgAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			}
 		} else {
 			dgVector veloc0 (v0 + w0.CrossProduct(contactMaterial->m_point - com0));
@@ -917,7 +918,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			dgVector relReloc (veloc1 - veloc0);
 
 			dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
-			dgFloat32 impulse = relReloc.DotProduct3(contactMaterial->m_normal);
+			dgFloat32 impulse = relReloc.DotProduct(contactMaterial->m_normal).GetScalar();
 			if (dgAbs (impulse) > maxImpulse) {
 				maxImpulse = dgAbs (impulse); 
 //				breakImpulse0 = contactMaterial->m_collision0->GetBreakImpulse();
@@ -925,7 +926,8 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			}
 			
 			dgVector tangentDir (relReloc - contactMaterial->m_normal.Scale (impulse));
-			diff = tangentDir.DotProduct3(tangentDir);
+			dgAssert (tangentDir.m_w == dgFloat32 (0.0f));
+			diff = tangentDir.DotProduct(tangentDir).GetScalar();
 			if (diff > dgFloat32 (1.0e-2f)) {
 				dgAssert (tangentDir.m_w == dgFloat32 (0.0f));
 				//contactMaterial->m_dir0 = tangentDir.Scale (dgRsqrt (diff));
@@ -938,12 +940,11 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				}
 				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct(tangentDir);
 				dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
-				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
-				//contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
+				dgAssert (contactMaterial->m_dir0.DotProduct(contactMaterial->m_dir0).GetScalar() > dgFloat32 (1.0e-8f));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
 			}
 			contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct(contactMaterial->m_dir0);
-			dgAssert (dgAbs(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+			dgAssert (dgAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 		}
 		dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 		dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
@@ -1435,7 +1436,8 @@ dgInt32 dgWorld::CalculateUserContacts(dgCollisionParamProxy& proxy) const
 		proxy.m_contactJoint->m_contactActive = 1;
 		dgContactPoint* const contactOut = proxy.m_contacts;
 		for (dgInt32 i = 0; i < count; i++) {
-			dgAssert(dgAbs(buffer[i].m_normal.DotProduct3(buffer[i].m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgAssert (buffer[i].m_normal.m_w == dgFloat32 (0.0f));
+			dgAssert(dgAbs(buffer[i].m_normal.DotProduct(buffer[i].m_normal).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 			contactOut[i].m_point = buffer[i].m_point;
 			contactOut[i].m_normal = buffer[i].m_normal;
 			contactOut[i].m_penetration = buffer[i].m_penetration;
@@ -1618,11 +1620,11 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 			const dgVector& hullVeloc = data.m_objBody->m_veloc;
 			const dgVector& hullOmega = data.m_objBody->m_omega;
 
-			dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct3(hullVeloc));
+			dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct(hullVeloc).GetScalar());
 			if (baseLinearSpeed > dgFloat32(1.0e-6f)) {
 				const dgFloat32 minRadius = instance0.GetBoxMinRadius();
 				const dgFloat32 maxRadius = instance0.GetBoxMaxRadius();
-				dgFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct3(hullOmega));
+				dgFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct(hullOmega).GetScalar());
 				dgFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
 
 				dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
