@@ -337,7 +337,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = true;
 	m_broadPhaseType = 1;
 	m_solverPasses = 12;
-	m_workerThreads = 8;
+	m_workerThreads = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
@@ -740,10 +740,12 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("persistence broad phase", &m_broadPhaseType, 1);
 			ImGui::Separator();
 
-			ImGui::RadioButton("Iterative solver one passes", &m_solverPasses, 1);
-			ImGui::RadioButton("Iterative solver tow passes", &m_solverPasses, 2);
-			ImGui::RadioButton("Iterative solver four passes", &m_solverPasses, 4);
-			ImGui::RadioButton("Iterative solver eight passes", &m_solverPasses, 8);
+			ImGui::Text("Iterative solver passes %d", m_solverPasses);
+			ImGui::SliderInt("", &m_solverPasses, 4, 20);
+			//ImGui::RadioButton("Iterative solver four passes", &m_solverPasses, 4);
+			//ImGui::RadioButton("Iterative solver eight passes", &m_solverPasses, 8);
+			//ImGui::RadioButton("Iterative solver eight passes", &m_solverPasses, 12);
+			//ImGui::RadioButton("Iterative solver eight passes", &m_solverPasses, 16);
 			ImGui::Separator();
 
 			ImGui::RadioButton("Hide collision Mesh", &m_collisionDisplayMode, 0);
