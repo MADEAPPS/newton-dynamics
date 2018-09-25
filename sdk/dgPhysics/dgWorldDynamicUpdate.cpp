@@ -1095,10 +1095,10 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
 
 	dgAssert(((dgDynamicBody*)bodyArray[0].m_body)->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_accel.DotProduct3(((dgDynamicBody*)bodyArray[0].m_body)->m_accel)) == dgFloat32(0.0f));
-	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_alpha.DotProduct3(((dgDynamicBody*)bodyArray[0].m_body)->m_alpha)) == dgFloat32(0.0f));
-	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_externalForce.DotProduct3(((dgDynamicBody*)bodyArray[0].m_body)->m_externalForce)) == dgFloat32(0.0f));
-	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_externalTorque.DotProduct3(((dgDynamicBody*)bodyArray[0].m_body)->m_externalTorque)) == dgFloat32(0.0f));
+	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_accel.DotProduct(((dgDynamicBody*)bodyArray[0].m_body)->m_accel)).GetScalar() == dgFloat32(0.0f));
+	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_alpha.DotProduct(((dgDynamicBody*)bodyArray[0].m_body)->m_alpha)).GetScalar() == dgFloat32(0.0f));
+	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_externalForce.DotProduct(((dgDynamicBody*)bodyArray[0].m_body)->m_externalForce)).GetScalar() == dgFloat32(0.0f));
+	dgAssert((((dgDynamicBody*)bodyArray[0].m_body)->m_externalTorque.DotProduct(((dgDynamicBody*)bodyArray[0].m_body)->m_externalTorque)).GetScalar() == dgFloat32(0.0f));
 
 	internalForces[0].m_linear = dgVector::m_zero;
 	internalForces[0].m_angular = dgVector::m_zero;

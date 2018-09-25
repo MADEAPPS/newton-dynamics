@@ -410,7 +410,8 @@ void dgBroadPhaseSegregated::RayCast(const dgVector& l0, const dgVector& l1, OnR
 	dgBroadPhaseSegregatedRootNode* const root = (dgBroadPhaseSegregatedRootNode*)m_rootNode;
 	if (filter && (root->m_left || root->m_right)) {
 		dgVector segment(l1 - l0);
-		dgFloat32 dist2 = segment.DotProduct3(segment);
+		dgAssert (segment.m_w == dgFloat32 (0.0f));
+		dgFloat32 dist2 = segment.DotProduct(segment).GetScalar();
 		if (dist2 > dgFloat32(1.0e-8f)) {
 
 			dgFloat32 distance[DG_BROADPHASE_MAX_STACK_DEPTH];

@@ -117,7 +117,7 @@ dgUnsigned32 dgUpVectorConstraint::JacobianDerivative (dgContraintDescritor& par
 	dgVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
 
 	dgInt32 ret = 0;
-	dgFloat32 mag = lateralDir.DotProduct3(lateralDir);
+	dgFloat32 mag = lateralDir.DotProduct(lateralDir).GetScalar();
 	if (mag > dgFloat32 (1.0e-6f)) {
 		mag = dgSqrt (mag);
 		lateralDir = lateralDir.Scale (dgFloat32 (1.0f) / mag);
