@@ -94,11 +94,7 @@ class dClosestDistanceRecord: public dCustomControllerBase
 
 		int res = NewtonCollisionClosestPoint(world, collisionA, &matrixA[0][0], m_castingVisualEntity->m_castingShape, &matrixB[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_contact1[0], &m_castingVisualEntity->m_normal[0], 0);
 		
-		m_castingVisualEntity->m_contact1 = matrixB.m_posit;
-
-
-		//just test the center of collisionB against collisionA to see if the point is inside or not:
-		//int res = NewtonCollisionPointDistance(world, &matrixB.m_posit[0], collisionA, &matrixA[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_normal[0], 0);
+		
 		if (res == 0){
 			printf("Point Inside Body!\n");
 			//dTrace(("Point Inside Body!\n"));
