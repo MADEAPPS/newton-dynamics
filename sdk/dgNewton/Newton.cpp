@@ -3617,7 +3617,7 @@ int NewtonCollisionPointDistance(const NewtonWorld* const newtonWorld, const dFl
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->ClosestPoint (*((dgTriplex*) point), (dgCollisionInstance*)collision, dgMatrix (matrix), *((dgTriplex*) contact), *((dgTriplex*) normal), threadIndex);
+	return 1-world->ClosestPoint (*((dgTriplex*) point), (dgCollisionInstance*)collision, dgMatrix (matrix), *((dgTriplex*) contact), *((dgTriplex*) normal), threadIndex);
 }
 
 
@@ -3656,7 +3656,7 @@ int NewtonCollisionClosestPoint(const NewtonWorld* const newtonWorld,
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->ClosestPoint ((dgCollisionInstance*)collisionA, dgMatrix (matrixA), 
+	return 1-world->ClosestPoint ((dgCollisionInstance*)collisionA, dgMatrix (matrixA), 
 								(dgCollisionInstance*)collisionB, dgMatrix (matrixB), 
 								*((dgTriplex*) contactA), *((dgTriplex*) contactB), *((dgTriplex*) normalAB), threadIndex);
 }
