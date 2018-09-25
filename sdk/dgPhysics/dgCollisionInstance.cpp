@@ -374,10 +374,9 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 
 	// extract the original local matrix
 	dgMatrix transpose (matrix.Transpose());
-	dgVector globalScale (dgSqrt (transpose[0].DotProduct3(transpose[0])), dgSqrt (transpose[1].DotProduct3(transpose[1])), dgSqrt (transpose[2].DotProduct3(transpose[2])), dgFloat32 (1.0f));
+	dgVector globalScale (dgSqrt (transpose[0].DotProduct(transpose[0]).GetScalar()), dgSqrt (transpose[1].DotProduct(transpose[1]).GetScalar()), dgSqrt (transpose[2].DotProduct(transpose[2]).GetScalar()), dgFloat32 (1.0f));
 	dgVector invGlobalScale (dgFloat32 (1.0f) / globalScale.m_x, dgFloat32 (1.0f) / globalScale.m_y, dgFloat32 (1.0f) / globalScale.m_z, dgFloat32 (1.0f));
 	dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
-//	localMatrix.m_posit = matrix.m_posit * invGlobalScale | dgVector::m_wOne;
 	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
 	dgAssert (localMatrix.m_posit.m_w == dgFloat32 (1.0f));
 

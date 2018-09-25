@@ -93,10 +93,8 @@ dgFloat32 dgSlidingConstraint::GetJointVeloc () const
 	dgVector dir (m_body0->GetMatrix().RotateVector (m_localMatrix0[0]));
 	const dgVector& veloc0 = m_body0->GetVelocity();
 	const dgVector& veloc1 = m_body1->GetVelocity();
-	return dir.DotProduct3(veloc0 - veloc1);
+	return dir.DotProduct(veloc0 - veloc1).GetScalar();
 }
-
-
 
 dgFloat32 dgSlidingConstraint::CalculateStopAccel (dgFloat32 distance, const dgJointCallbackParam* param) const
 {
@@ -146,18 +144,18 @@ dgUnsigned32 dgSlidingConstraint::JacobianDerivative (dgContraintDescritor& para
 
 	//dgVector angle (CalculateGlobalMatrixAndAngle (matrix0, matrix1));
 	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-	m_posit = matrix0.m_front.DotProduct3(matrix0.m_posit - matrix1.m_posit);
+	m_posit = matrix0.m_front.DotProduct(matrix0.m_posit - matrix1.m_posit).GetScalar();
 	matrix1.m_posit += matrix1.m_front.Scale (m_posit);
 
-	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_front.DotProduct(matrix0.m_front).GetScalar()) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_up.DotProduct(matrix0.m_up).GetScalar()) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - matrix0.m_right.DotProduct(matrix0.m_right).GetScalar()) < dgFloat32 (1.0e-5f)); 
 
 	const dgVector& dir1 = matrix0.m_up;
 	const dgVector& dir2 = matrix0.m_right;
 
 	dgVector p0 (matrix0.m_posit);
-	dgVector p1 (matrix1.m_posit + matrix1.m_front.Scale (matrix1.m_front.DotProduct3(p0 - matrix1.m_posit))); 
+	dgVector p1 (matrix1.m_posit + matrix1.m_front.Scale (matrix1.m_front.DotProduct(p0 - matrix1.m_posit).GetScalar())); 
 
 	dgVector q0 (p0 + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
 	dgVector q1 (p1 + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));

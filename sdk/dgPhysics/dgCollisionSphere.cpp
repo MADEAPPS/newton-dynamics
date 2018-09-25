@@ -153,9 +153,9 @@ dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const v
 void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* const ouput) const
 {
 	if (level) {
-		dgAssert (dgAbs (p0.DotProduct3(p0) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbs (p1.DotProduct3(p1) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbs (p2.DotProduct3(p2) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p0.DotProduct(p0).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p1.DotProduct(p1).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p2.DotProduct(p2).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgVector p01 (p0 + p1);
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
@@ -168,9 +168,9 @@ void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, co
 		p12 = p12.Normalize();
 		p20 = p20.Normalize();
 
-		dgAssert (dgAbs (p01.DotProduct3(p01) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbs (p12.DotProduct3(p12) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbs (p20.DotProduct3(p20) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p01.DotProduct(p01).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p12.DotProduct(p12).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbs (p20.DotProduct(p20).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 		TesselateTriangle (level - 1, p0,  p01, p20, count, ouput);
 		TesselateTriangle (level - 1, p1,  p12, p01, count, ouput);
@@ -214,7 +214,7 @@ void dgCollisionSphere::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector
 dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgAssert (normal.m_w == 0.0f);
-	dgAssert (normal.DotProduct3(normal) > dgFloat32 (0.999f));
+	dgAssert (normal.DotProduct(normal).GetScalar() > dgFloat32 (0.999f));
 	contactsOut[0] = normal * normal.DotProduct(point);
 	return 1;
 }
@@ -276,7 +276,7 @@ dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dg
 	if (t < maxT) {
 		dgVector contact (p0 + (p1 - p0).Scale (t));
 		dgAssert (contact.m_w == dgFloat32 (0.0f));
-		//contactOut.m_normal = contact.Scale (dgRsqrt (contact.DotProduct3(contact)));
+		//contactOut.m_normal = contact.Scale (dgRsqrt (contact.DotProduct(contact).GetScalar()));
 		contactOut.m_normal = contact.Normalize();
 		//contactOut.m_userId = SetUserDataID();
 	}

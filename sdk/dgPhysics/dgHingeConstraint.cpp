@@ -93,9 +93,8 @@ dgFloat32 dgHingeConstraint::GetJointOmega () const
 	dgVector dir (m_body0->GetMatrix().RotateVector (m_localMatrix0[0]));
 	const dgVector& omega0 = m_body0->GetOmega();
 	const dgVector& omega1 = m_body1->GetOmega();
-	return dir.DotProduct3(omega0 - omega1);
+	return dir.DotProduct(omega0 - omega1).GetScalar();
 }
-
 
 dgFloat32 dgHingeConstraint::CalculateStopAlpha (dgFloat32 angle, const dgJointCallbackParam* param) const
 {
@@ -146,9 +145,9 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 
 	m_angle = -angle.m_x;
 
-	dgAssert (dgAbs (1.0f - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbs (1.0f - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbs (1.0f - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (1.0f - matrix0.m_front.DotProduct(matrix0.m_front).GetScalar()) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (1.0f - matrix0.m_up.DotProduct(matrix0.m_up).GetScalar()) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbs (1.0f - matrix0.m_right.DotProduct(matrix0.m_right).GetScalar()) < dgFloat32 (1.0e-5f)); 
 
 	const dgVector& dir0 = matrix0.m_front;
 	const dgVector& dir1 = matrix0.m_up;

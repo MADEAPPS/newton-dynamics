@@ -111,8 +111,7 @@ dgFloat32 dgUniversalConstraint::GetJointOmega0 () const
 //	if (m_body1) {
 //		omega1 = m_body1->GetOmega();
 //	}
-	return dir.DotProduct3(omega0 - omega1);
-
+	return dir.DotProduct(omega0 - omega1).GetScalar();
 }
 
 dgFloat32 dgUniversalConstraint::GetJointOmega1 () const
@@ -131,9 +130,8 @@ dgFloat32 dgUniversalConstraint::GetJointOmega1 () const
 //	}
 //	dgVector dir (matrix.RotateVector (m_localMatrix1[1]));
 	
-	return dir.DotProduct3(omega0 - omega1);
+	return dir.DotProduct(omega0 - omega1).GetScalar();
 }
-
 
 dgFloat32 dgUniversalConstraint::CalculateStopAlpha0 (dgFloat32 angle, const dgJointCallbackParam* param) const
 {
@@ -220,7 +218,7 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 	dgVector dir2 (dir0.CrossProduct(dir1));
 
 	dgVector dir3 (dir2.CrossProduct(dir0));
-	dir3 = dir3.Scale (dgRsqrt (dir3.DotProduct3(dir3)));
+	dir3 = dir3.Normalize();
 
 	const dgVector& p0 = matrix0.m_posit;
 	const dgVector& p1 = matrix1.m_posit;
@@ -246,8 +244,8 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 //		m_angle0 = (m_angle0 >= dgFloat32 (0.0f)) ? dgPI - m_angle0 : dgPI + m_angle0;
 //	}
 
-	sinAngle = matrix0.m_front.DotProduct3(matrix1.m_up.CrossProduct(matrix0.m_up));
-	cosAngle = matrix0.m_up.DotProduct3(matrix1.m_up);
+	sinAngle = matrix0.m_front.DotProduct(matrix1.m_up.CrossProduct(matrix0.m_up)).GetScalar();
+	cosAngle = matrix0.m_up.DotProduct(matrix1.m_up).GetScalar();
 //	dgAssert (dgAbs (m_angle0 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
 	m_angle0 = dgAtan2 (sinAngle, cosAngle);
 
@@ -257,8 +255,8 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 //		m_angle1 = (m_angle1 >= dgFloat32 (0.0f)) ? dgPI - m_angle1 : dgPI + m_angle1;
 //	}
 
-	sinAngle = matrix1.m_up.DotProduct3(matrix0.m_front.CrossProduct(matrix1.m_front));
-	cosAngle = matrix0.m_front.DotProduct3(matrix1.m_front);
+	sinAngle = matrix1.m_up.DotProduct(matrix0.m_front.CrossProduct(matrix1.m_front)).GetScalar();
+	cosAngle = matrix0.m_front.DotProduct(matrix1.m_front).GetScalar();
 //	dgAssert (dgAbs (m_angle1 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
 	m_angle1 = dgAtan2 (sinAngle, cosAngle);
 

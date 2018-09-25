@@ -88,10 +88,10 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 			if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 				dgAssert (body->m_invMass.m_w);
 
-				const dgFloat32 accel2 = body->m_accel.DotProduct3(body->m_accel);
-				const dgFloat32 alpha2 = body->m_alpha.DotProduct3(body->m_alpha);
-				const dgFloat32 speed2 = body->m_veloc.DotProduct3(body->m_veloc);
-				const dgFloat32 omega2 = body->m_omega.DotProduct3(body->m_omega);
+				const dgFloat32 accel2 = body->m_accel.DotProduct(body->m_accel).GetScalar();
+				const dgFloat32 alpha2 = body->m_alpha.DotProduct(body->m_alpha).GetScalar();
+				const dgFloat32 speed2 = body->m_veloc.DotProduct(body->m_veloc).GetScalar();
+				const dgFloat32 omega2 = body->m_omega.DotProduct(body->m_omega).GetScalar();
 
 				maxAccel = dgMax (maxAccel, accel2);
 				maxAlpha = dgMax (maxAlpha, alpha2);
@@ -467,7 +467,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 
 	return accNorm.GetScalar() * accNorm.GetScalar();
 }
-
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const
 {
