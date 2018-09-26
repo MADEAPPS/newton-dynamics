@@ -1416,7 +1416,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 		contactOut[1].m_normal = contactSolver.GetNormal();
 		contactOut[1].m_point = proxy.m_closestPointBody1;
 
-		contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct(proxy.m_normal).GetScalar();
+		contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct(contactSolver.GetNormal()).GetScalar();
 		contactJoint->m_separationDistance = dgFloat32(0.0f);
 
 		instance0.m_material.m_userData = NULL;

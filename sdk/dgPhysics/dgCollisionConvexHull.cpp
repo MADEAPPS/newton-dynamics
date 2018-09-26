@@ -173,13 +173,15 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 		dgBigVector e2 (p2 - p0);
 		dgBigVector n1 (e1.CrossProduct(e2));
 #ifdef _DEBUG
-		dgFloat64 mag = normal.DotProduct3(n1);
+		dgAssert(n1.m_w == dgFloat32(0.0f));
+		dgFloat64 mag = normal.DotProduct(n1).GetScalar();
 		dgAssert ( mag >= -dgFloat32 (0.1f));
 #endif
 		normal += n1;
 		e1 = e2;
 	} 
-	dgFloat64 den = sqrt (normal.DotProduct3(normal)) + dgFloat64 (1.0e-24f);
+
+	dgFloat64 den = sqrt (normal.DotProduct(normal).GetScalar()) + dgFloat64 (1.0e-24f);
 	normal = normal.Scale (dgFloat64 (1.0f)/ den);
 
 #ifdef _DEBUG
@@ -188,16 +190,14 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 	do {
 		dgBigVector de1 (pool[edge->m_next->m_incidentVertex] - pool[edge->m_incidentVertex]);	
 		dgBigVector dn1 (e0.CrossProduct(de1));
-		dgFloat64 x = normal.DotProduct3(dn1);
+		dgFloat64 x = normal.DotProduct(dn1).GetScalar();
 		dgAssert (x > -dgFloat64 (0.01f));
 		e0 = de1;
 		edge = edge->m_next;
 	} while (edge != face);
 #endif
-
 	return normal;
 }
-
 
 bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dgBigVector* const hullVertexArray) const
 {
@@ -217,7 +217,7 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 				dgBigVector normal0 (FaceNormal (edge0, &hullVertexArray[0]));
 				dgBigVector normal1 (FaceNormal (edge0->m_twin, &hullVertexArray[0]));
 
-				dgFloat64 test = normal0.DotProduct3(normal1);
+				dgFloat64 test = normal0.DotProduct(normal1).GetScalar();
 				if (test > dgFloat64 (0.99995f)) {
 
 					if ((edge0->m_twin->m_next->m_twin->m_next != edge0) && (edge0->m_next->m_twin->m_next != edge0->m_twin)) {
@@ -234,27 +234,27 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 
 						dgAssert(e0.m_w == dgFloat64(0.0f));
 						dgAssert(e1.m_w == dgFloat64(0.0f));
-						dgAssert (e0.DotProduct3(e0) >= dgFloat64 (0.0f));
-						dgAssert (e1.DotProduct3(e1) >= dgFloat64 (0.0f));
+						dgAssert (e0.DotProduct(e0).GetScalar() >= dgFloat64 (0.0f));
+						dgAssert (e1.DotProduct(e1).GetScalar() >= dgFloat64 (0.0f));
 
-						e0 = e0.Scale (dgFloat64 (1.0f) / sqrt (e0.DotProduct3(e0)));
-						e1 = e1.Scale (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1)));
+						e0 = e0.Scale (dgFloat64 (1.0f) / sqrt (e0.DotProduct(e0).GetScalar()));
+						e1 = e1.Scale (dgFloat64 (1.0f) / sqrt (e1.DotProduct(e1).GetScalar()));
 						dgBigVector n1 (e0.CrossProduct(e1));
 
-						dgFloat64 projection = n1.DotProduct3(normal0);
+						dgFloat64 projection = n1.DotProduct(normal0).GetScalar();
 						if (projection >= DG_MAX_EDGE_ANGLE) {
 
 							dgBigVector e11 (hullVertexArray[edge0->m_next->m_next->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_incidentVertex]);
 							dgBigVector e00 (hullVertexArray[edge0->m_twin->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_prev->m_incidentVertex]);
 							dgAssert (e00.m_w == dgFloat64 (0.0f));
 							dgAssert (e11.m_w == dgFloat64 (0.0f));
-							dgAssert (e00.DotProduct3(e00) >= dgFloat64 (0.0f));
-							dgAssert (e11.DotProduct3(e11) >= dgFloat64 (0.0f));
-							e00 = e00.Scale (dgFloat64 (1.0f) / sqrt (e00.DotProduct3(e00)));
-							e11 = e11.Scale (dgFloat64 (1.0f) / sqrt (e11.DotProduct3(e11)));
+							dgAssert (e00.DotProduct(e00).GetScalar() >= dgFloat64 (0.0f));
+							dgAssert (e11.DotProduct(e11).GetScalar() >= dgFloat64 (0.0f));
+							e00 = e00.Scale(dgFloat64(1.0f) / sqrt(e00.DotProduct(e00).GetScalar()));
+							e11 = e11.Scale(dgFloat64(1.0f) / sqrt(e11.DotProduct(e11).GetScalar()));
 
 							dgBigVector n11 (e00.CrossProduct(e11));
-							projection = n11.DotProduct3(normal0);
+							projection = n11.DotProduct(normal0).GetScalar();
 							if (projection >= DG_MAX_EDGE_ANGLE) {
 								dgAssert (&(*iter) != edge0);
 								dgAssert (&(*iter) != edge0->m_twin);
@@ -316,8 +316,8 @@ bool dgCollisionConvexHull::CheckConvex (dgPolyhedra& polyhedra1, const dgBigVec
 		dgBigVector normal0 (FaceNormal (edge, hullVertexArray));
 		dgBigVector normal1 (FaceNormal (edge->m_twin, hullVertexArray));
 
-		dgBigPlane plane0 (normal0, - normal0.DotProduct3(hullVertexArray[edge->m_incidentVertex]));
-		dgBigPlane plane1 (normal1, - normal1.DotProduct3(hullVertexArray[edge->m_twin->m_incidentVertex]));
+		dgBigPlane plane0 (normal0, - normal0.DotProduct(hullVertexArray[edge->m_incidentVertex]).GetScalar());
+		dgBigPlane plane1 (normal1, - normal1.DotProduct(hullVertexArray[edge->m_twin->m_incidentVertex]).GetScalar());
 		dgFloat64 test0 = plane0.Evalue(center);
 		if (test0 > dgFloat64 (1.0e-3f)) {
 			return false;
@@ -328,11 +328,8 @@ bool dgCollisionConvexHull::CheckConvex (dgPolyhedra& polyhedra1, const dgBigVec
 			return false;
 		}
 	}
-
 	return true;
 }
-
-
 
 bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const vertexArray, dgFloat32 tolerance)
 {
@@ -402,17 +399,19 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			const dgBigVector& p0 = hullVertexArray[face.m_index[0]];
 			const dgBigVector& p1 = hullVertexArray[face.m_index[1]];
 			const dgBigVector& p2 = hullVertexArray[face.m_index[2]];
+			dgAssert(p0.m_w == p1.m_w);
+			dgAssert(p0.m_w == p2.m_w);
 			dgBigVector p1p0 (p1 - p0);
 			dgBigVector p2p0 (p2 - p0);
 			dgBigVector normal (p2p0.CrossProduct(p1p0));
-			dgFloat64 mag2 = normal.DotProduct3(normal);
+			dgFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 			if (mag2 < dgFloat64 (1.0e-6f * 1.0e-6f)) {
 				success = false;
 				dgInt32 index = -1;
 				dgBigVector p2p1 (p2 - p1);
-				dgFloat64 dist10 = p1p0.DotProduct3(p1p0);
-				dgFloat64 dist20 = p2p0.DotProduct3(p2p0);
-				dgFloat64 dist21 = p2p1.DotProduct3(p2p1);
+				dgFloat64 dist10 = p1p0.DotProduct(p1p0).GetScalar();
+				dgFloat64 dist20 = p2p0.DotProduct(p2p0).GetScalar();
+				dgFloat64 dist21 = p2p1.DotProduct(p2p1).GetScalar();
 				if ((dist10 >= dist20) && (dist10 >= dist21)) {
 					index = 2;
 				} else if ((dist20 >= dist10) && (dist20 >= dist21)) {

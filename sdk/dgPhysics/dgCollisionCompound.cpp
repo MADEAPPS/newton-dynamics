@@ -1724,7 +1724,6 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 					contact1 = proxy.m_contacts[1];
 				}
 			} else {
-				dgAssert (0);
 				break;
 			}
 

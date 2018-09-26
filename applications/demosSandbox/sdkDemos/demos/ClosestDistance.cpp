@@ -76,7 +76,6 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		NewtonBodyGetMatrix(m_body, &matrixA[0][0]);
 
 		dFloat speed = m_step * timestep * 60.0f; 
-//speed = 0;
 		m_pith = dMod (m_pith + speed, dPi * 2.0f);
 		m_yaw = dMod (m_yaw + speed, dPi * 2.0f);
 		m_roll = dMod (m_roll + speed, dPi * 2.0f);
@@ -84,8 +83,8 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		dMatrix matrixB(dPitchMatrix(m_pith) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
 		matrixB.m_posit = matrixA.m_posit;
 
-		//matrixB.m_posit.m_y = 5.0f;
-		matrixB.m_posit.m_y = 1.5f;
+		matrixB.m_posit.m_y = 5.0f;
+		//matrixB.m_posit.m_y = 1.5f;
 
 		NewtonWorld* const world = NewtonBodyGetWorld(m_body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData (world);
@@ -98,14 +97,13 @@ class dClosestDistanceRecord: public dCustomControllerBase
 
 		//just test the center of collisionB against collisionA to see if the point is inside or not:
 		//int res = NewtonCollisionPointDistance(world, &matrixA.m_posit[0], collisionA, &matrixA[0][0], &m_castingVisualEntity->m_contact0[0], &m_castingVisualEntity->m_normal[0], 0);
-		
-		if (res == 0){
+		if (res == 0) {
 			printf("Point Inside Body!\n");
 			//dTrace(("Point Inside Body!\n"));
 		}
 		else
 		{
-			printf("Point point oustide Body!\n");
+			//printf("Point point outside Body!\n");
 		}
 	}
 
@@ -115,7 +113,6 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		m_yaw = dGaussianRandom (dPi * 2.0f);
 		m_roll = dGaussianRandom (dPi * 2.0f);
 		m_step = 15.0f * (dAbs (dGaussianRandom (0.25f)) + 0.0001f) * dDegreeToRad;
-//m_pith -= 0.5f;
 
 		CreatCasterBody(location_x, location_z, shapeType, materialID);
 
@@ -225,15 +222,15 @@ void ClosestDistance (DemoEntityManager* const scene)
 	//PrimitiveType castinShapeType = _REGULAR_CONVEX_HULL_PRIMITIVE;
 	PrimitiveType castinShapeType = _COMPOUND_CONVEX_CRUZ_PRIMITIVE;
 
-	int count = 1;
+	int count = 4;
 	castManager->AddPrimitives (count, dVector (  0, 0, 0), _SPHERE_PRIMITIVE, materialID, castinShapeType);
-	//castManager->AddPrimitives (count, dVector (  2, 0, 2), _BOX_PRIMITIVE, materialID, castinShapeType);
-	//castManager->AddPrimitives (count, dVector (  4, 0, 4), _CAPSULE_PRIMITIVE, materialID, castinShapeType);
-	//castManager->AddPrimitives (count, dVector (  8, 0, 8), _CYLINDER_PRIMITIVE, materialID, castinShapeType);
-	//castManager->AddPrimitives (count, dVector ( 10, 0, 10), _CHAMFER_CYLINDER_PRIMITIVE, materialID, castinShapeType);
-	//castManager->AddPrimitives (count, dVector (- 4, 0, -4), _CONE_PRIMITIVE, materialID, castinShapeType);
-	//castManager->AddPrimitives (count, dVector (-10, 0, -10), _REGULAR_CONVEX_HULL_PRIMITIVE, materialID, castinShapeType);
-	//castManager->AddPrimitives (count, dVector (-12, 0, -12), _COMPOUND_CONVEX_CRUZ_PRIMITIVE, materialID, castinShapeType);
+	castManager->AddPrimitives (count, dVector (  2, 0, 2), _BOX_PRIMITIVE, materialID, castinShapeType);
+	castManager->AddPrimitives (count, dVector (  4, 0, 4), _CAPSULE_PRIMITIVE, materialID, castinShapeType);
+	castManager->AddPrimitives (count, dVector (  8, 0, 8), _CYLINDER_PRIMITIVE, materialID, castinShapeType);
+	castManager->AddPrimitives (count, dVector ( 10, 0, 10), _CHAMFER_CYLINDER_PRIMITIVE, materialID, castinShapeType);
+	castManager->AddPrimitives (count, dVector (- 4, 0, -4), _CONE_PRIMITIVE, materialID, castinShapeType);
+	castManager->AddPrimitives (count, dVector (-10, 0, -10), _REGULAR_CONVEX_HULL_PRIMITIVE, materialID, castinShapeType);
+	castManager->AddPrimitives (count, dVector (-12, 0, -12), _COMPOUND_CONVEX_CRUZ_PRIMITIVE, materialID, castinShapeType);
 
 
 	// place camera into position
