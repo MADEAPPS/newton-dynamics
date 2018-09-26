@@ -64,7 +64,8 @@ dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* c
 		const dgVector& p0 = m_posit[v0];
 		const dgVector& p1 = m_posit[v1];
 		dgVector dp(p0 - p1);
-		m_linkList[i].m_restlength = dgSqrt(dp.DotProduct3(dp));
+		dgAssert (dp.m_w == dgFloat32 (0.0f));
+		m_linkList[i].m_restlength = dgSqrt(dp.DotProduct(dp).GetScalar());
 		dgAssert(m_linkList[i].m_restlength > dgFloat32(1.0e-2f));
 	}
 

@@ -229,8 +229,8 @@ dgFloat32 dgCollisionLumpedMassParticles::RayCast(const dgVector& localP0, const
 	for (dgInt32 i = 0; i < m_particlesCount; i ++) {
 		dgVector posit (dgPointToRayDistance (m_posit[i], localP0, localP1)); 
 		dgVector step (posit - m_posit[i]);
-		
-		dgFloat32 dist2 = step.DotProduct3(step);
+		dgAssert (step.m_w == dgFloat32 (0.0f));
+		dgFloat32 dist2 = step.DotProduct(step).GetScalar();
 		if (dist2 < distance2) {
 			distance2 = dist2;
 			p = m_posit[i];
@@ -243,7 +243,8 @@ dgFloat32 dgCollisionLumpedMassParticles::RayCast(const dgVector& localP0, const
 		contactOut.m_normal = dgVector(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 		dgVector num(p - localP0);
 		dgVector den(localP1 - localP0);
-		dist = num.DotProduct3(den) / den.DotProduct3(den);
+		dgAssert (den.m_w == dgFloat32 (0.0f));
+		dist = num.DotProduct(den).GetScalar() / den.DotProduct(den).GetScalar();
 	}
 	return dist;
 }
@@ -314,7 +315,8 @@ xxx ++;
 		dgFloat32 frictionCoef = dgFloat32(0.0f);
 		if (contactNormal.m_w > dgFloat32 (0.0f)) {
 			dgVector projectedVelocity(veloc[i] + timestepV * (accel[i] + extAccel[i]));
-			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct3(projectedVelocity);
+			dgAssert (projectedVelocity.m_w == dgFloat32 (0.0f));
+			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct(projectedVelocity).GetScalar();
 			if (projectedNormalSpeed < DG_MINIMIM_ZERO_SPEED) {
 				if (contactNormal.m_w > DG_MINIMIM_ZERO_SURFACE) {
 					normal = contactNormal & dgVector::m_triplexMask;

@@ -93,7 +93,8 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 	dgMatrix matrix (otherMatrix * myMatrix.Inverse());
 
 	const dgVector& hullVeloc = otherBody->m_veloc;
-	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
+	dgAssert (hullVeloc.m_w == dgFloat32 (0.0f));
+	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct(hullVeloc).GetScalar());
 
 	dgFloat32 timestep = pair->m_timestep;
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
@@ -104,9 +105,10 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 		otherInstance->CalcAABB (matrix, p0, p1);
 
 		const dgVector& hullOmega = otherBody->m_omega;
+		dgAssert (hullOmega.m_w == dgFloat32 (0.0f));
 
 		dgFloat32 minRadius = otherInstance->GetBoxMinRadius();
-		dgFloat32 maxAngularSpeed = dgSqrt (hullOmega.DotProduct3(hullOmega));
+		dgFloat32 maxAngularSpeed = dgSqrt (hullOmega.DotProduct(hullOmega).GetScalar());
 		dgFloat32 angularSpeedBound = maxAngularSpeed * (otherInstance->GetBoxMaxRadius() - minRadius);
 
 		dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt (angularSpeedBound);
@@ -269,7 +271,8 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 	stackPool[0][1] = otherCompound->m_root;
 
 	const dgVector& hullVeloc = otherBody->m_veloc;
-	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
+	dgAssert (hullVeloc.m_w == dgFloat32 (0.0f));
+	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct(hullVeloc).GetScalar());
 
 	dgFloat32 timestep = pair->m_timestep;
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);

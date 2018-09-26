@@ -145,7 +145,8 @@ void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 
 dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbs(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dgAssert (dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == 0.0f);
 	return dir.Scale (m_radius);
 }

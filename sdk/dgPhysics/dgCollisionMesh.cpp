@@ -324,7 +324,8 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 		if (side0 < dgFloat32 (0.0f)) {
 			if (side1 >= dgFloat32 (0.0f)) {
 				dgVector dp (p1 - p0);
-				dgFloat32 t = localPlane.DotProduct3(dp);
+				dgAssert (dp.m_w == dgFloat32 (0.0f));
+				dgFloat32 t = localPlane.DotProduct(dp).GetScalar();
 				dgAssert (dgAbs (t) >= dgFloat32 (0.0f));
 				if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
@@ -336,7 +337,8 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 			} 
 		} else if (side1 <= dgFloat32 (0.0f)) {
 			dgVector dp (p1 - p0);
-			dgFloat32 t = localPlane.DotProduct3(dp);
+			dgAssert (dp.m_w == dgFloat32 (0.0f));
+			dgFloat32 t = localPlane.DotProduct(dp).GetScalar();
 			dgAssert (dgAbs (t) >= dgFloat32 (0.0f));
 			if (dgAbs (t) < dgFloat32 (1.0e-8f)) {
 				t = dgSign(t) * dgFloat32 (1.0e-8f);	

@@ -430,8 +430,8 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 
 DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
-	dgAssert(dgAbs(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-2f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
+	dgAssert(dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-2f));
 	switch (m_scaleType) 
 	{
 		case m_unit:
