@@ -137,7 +137,7 @@
     #endif
 #endif
 
-#define DG_SCALAR_VECTOR_CLASS
+//#define DG_SCALAR_VECTOR_CLASS
 
 
 // by default newton run on a separate thread and 

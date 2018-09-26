@@ -497,14 +497,13 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 #if 1
 			dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
 					   row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
-			a = dgVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 #else
-			dgVector a(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp);
-			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear, linearM0);
+			dgVector a (row->m_JMinv.m_jacobianM0.m_linear * linearM0);
 			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular, angularM0);
 			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear, linearM1);
 			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular, angularM1);
 #endif
+			a = dgVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 
 			dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
 			dgAssert(rhs->m_normalForceIndex >= -1);
@@ -526,10 +525,18 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 
 			dgVector deltaforce0(preconditioner0 * deltaForce);
 			dgVector deltaforce1(preconditioner1 * deltaForce);
+
+#if 1
 			linearM0 += row->m_Jt.m_jacobianM0.m_linear * deltaforce0;
 			angularM0 += row->m_Jt.m_jacobianM0.m_angular * deltaforce0;
 			linearM1 += row->m_Jt.m_jacobianM1.m_linear * deltaforce1;
 			angularM1 += row->m_Jt.m_jacobianM1.m_angular * deltaforce1;
+#else
+			linearM0 = linearM0.MulAdd(row->m_Jt.m_jacobianM0.m_linear, deltaforce0);
+			angularM0 = angularM0.MulAdd(row->m_Jt.m_jacobianM0.m_angular, deltaforce0);
+			linearM1 = linearM1.MulAdd(row->m_Jt.m_jacobianM1.m_linear, deltaforce1);
+			angularM1 = angularM1.MulAdd(row->m_Jt.m_jacobianM1.m_angular, deltaforce1);
+#endif
 		}
 
 		dgVector maxAccel(accNorm);

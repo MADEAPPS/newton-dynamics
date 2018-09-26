@@ -235,6 +235,16 @@ class dgVector
 		return _mm_div_ps (m_one.m_type, m_type);
 	}
 
+	DG_INLINE dgVector MulAdd(const dgVector& A, const dgVector& B) const
+	{
+		return _mm_add_ps(m_type, _mm_add_ps(A.m_type, B.m_type));
+	}
+
+	DG_INLINE dgVector NegMulAdd(const dgVector& A, const dgVector& B) const
+	{
+		return _mm_sub_ps(m_type, _mm_add_ps(A.m_type, B.m_type));
+	}
+
 	DG_INLINE dgVector AddHorizontal () const
 	{
 		__m128 tmp (_mm_hadd_ps (m_type, m_type));
