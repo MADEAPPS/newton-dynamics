@@ -499,9 +499,9 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 					   row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
 #else
 			dgVector a (row->m_JMinv.m_jacobianM0.m_linear * linearM0);
-			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular, angularM0);
-			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear, linearM1);
-			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular, angularM1);
+			a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_angular, angularM0);
+			a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_linear, linearM1);
+			a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular, angularM1);
 #endif
 			a = dgVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 
