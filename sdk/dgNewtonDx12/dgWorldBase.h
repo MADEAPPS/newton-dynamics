@@ -42,7 +42,13 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	virtual dgInt32 GetScore() const;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
+	void GetHardwareAdapter(IDXGIAdapter1** ppAdapter);
+
 	int m_score;
+
+	// Direct3D objects.
+	Microsoft::WRL::ComPtr<ID3D12Device> m_d3dDevice;
+	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
 };
 
 #endif
