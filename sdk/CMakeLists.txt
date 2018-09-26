@@ -50,3 +50,6 @@ if (WITH_AVX2_PLUGIN)
 	add_subdirectory(dgNewtonAvx2)
 endif()
 
+if (WITH_DX12_PLUGIN)
+	add_subdirectory(dgNewtonDx12)
+endif()

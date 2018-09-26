@@ -17,6 +17,7 @@ option("STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
 option("WITH_AVX_PLUGIN" "adding avx parallel solver" ON)
 option("WITH_AVX2_PLUGIN" "adding avx parallel solver" OFF)
 option("WITH_SSE4_PLUGIN" "adding avx parallel solver" OFF)
+option("WITH_DX12_PLUGIN" "adding direct compute 12 parallel solver" OFF)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
