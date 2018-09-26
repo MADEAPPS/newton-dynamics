@@ -113,10 +113,10 @@ void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const 
 	dgFloat32 length; 
 	dgAssert (m_body0);
 	dgAssert (m_body1);
-
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
 
-	length = dir.DotProduct3(dir);
+	length = dir.DotProduct(dir).GetScalar();
 	length = dgSqrt (length);
 	dgAssert (length > dgFloat32 (0.0f));
 	matrix0 = dgMatrix (body0_Matrix.UnrotateVector (dir.Scale (dgFloat32 (1.0f) / length)));
@@ -143,11 +143,12 @@ void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVe
 	dgAssert (m_body1);
 
 	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
+	dgAssert (pinDirection0.m_w == dgFloat32 (0.0f));
+	dgAssert ((pinDirection0.DotProduct(pinDirection0).GetScalar()) > dgFloat32 (0.0f));
 
-	dgAssert ((pinDirection0.DotProduct3(pinDirection0)) > dgFloat32 (0.0f));
-	matrix0.m_front = pinDirection0.Scale (dgRsqrt (pinDirection0.DotProduct3(pinDirection0)));
+	matrix0.m_front = pinDirection0.Scale (dgRsqrt (pinDirection0.DotProduct(pinDirection0).GetScalar()));
 	matrix0.m_right = matrix0.m_front.CrossProduct(pinDirection1);
-	matrix0.m_right = matrix0.m_right.Scale (dgRsqrt (matrix0.m_right.DotProduct3(matrix0.m_right)));
+	matrix0.m_right = matrix0.m_right.Scale (dgRsqrt (matrix0.m_right.DotProduct(matrix0.m_right).GetScalar()));
 	matrix0.m_up = matrix0.m_right.CrossProduct(matrix0.m_front); 
 	matrix0.m_posit = pivot;
 	
@@ -174,9 +175,9 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (const dgMatrix& l
 
 	dgMatrix relMatrix (globalMatrix1 * globalMatrix0.Inverse());
 
-	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_front.DotProduct3(relMatrix.m_front))) < 1.0e-5f); 
-	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_up.DotProduct3(relMatrix.m_up))) < 1.0e-5f); 
-	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_right.DotProduct3(relMatrix.m_right))) < 1.0e-5f); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_front.DotProduct(relMatrix.m_front).GetScalar())) < 1.0e-5f); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_up.DotProduct(relMatrix.m_up).GetScalar())) < 1.0e-5f); 
+	dgAssert (dgAbs (dgFloat32 (1.0f) - (relMatrix.m_right.DotProduct(relMatrix.m_right).GetScalar())) < 1.0e-5f); 
 
 	dgVector euler0;
 	dgVector euler1;
@@ -248,7 +249,7 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 
 		//dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
 		dgFloat32 relPosit = desc.m_penetration[index];
-		dgFloat32 relVeloc = - (veloc0.DotProduct3(jacobian0.m_linear) + veloc1.DotProduct3(jacobian1.m_linear) + omega0.DotProduct3(jacobian0.m_angular) + omega1.DotProduct3(jacobian1.m_angular));
+		dgFloat32 relVeloc = - (veloc0.DotProduct(jacobian0.m_linear) + veloc1.DotProduct(jacobian1.m_linear) + omega0.DotProduct(jacobian0.m_angular) + omega1.DotProduct(jacobian1.m_angular)).GetScalar();
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;
@@ -280,6 +281,8 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 {
 	dgAssert (jointForce);
 	dgAssert (m_body0);
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+
 	dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
 	jacobian0.m_linear[0] = dgFloat32 (0.0f);
 	jacobian0.m_linear[1] = dgFloat32 (0.0f);
@@ -303,7 +306,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 
 	const dgVector& omega0 = m_body0->GetOmega();
 	const dgVector& omega1 = m_body1->GetOmega();
-	dgFloat32 omegaError = dir.DotProduct3(omega1 - omega0);
+	dgFloat32 omegaError = dir.DotProduct(omega1 - omega0).GetScalar();
 
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
