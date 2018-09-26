@@ -117,6 +117,16 @@ class dgTemplateVector
 		return dgTemplateVector<T>(val, val, val, val);
 	}
 
+	DG_INLINE dgTemplateVector<T> MulAdd(const dgTemplateVector<T>& A, const dgTemplateVector<T>& B) const
+	{
+		return *this + A * B;
+	}
+
+	DG_INLINE dgTemplateVector<T> NegMulAdd(const dgTemplateVector<T>& A, const dgTemplateVector<T>& B) const
+	{
+		return *this - A * B;
+	}
+
 	// return dot product
 	DG_INLINE T DotProduct3 (const dgTemplateVector<T>& A) const
 	{

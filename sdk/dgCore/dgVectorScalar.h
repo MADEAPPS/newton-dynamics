@@ -170,7 +170,15 @@ class dgVector
 		return (*this = dgVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
 	}
 
+	DG_INLINE dgVector MulAdd(const dgVector& A, const dgVector& B) const
+	{
+		return *this + A * B;
+	}
 
+	DG_INLINE dgVector NegMulAdd(const dgVector& A, const dgVector& B) const
+	{
+		return *this - A * B;
+	}
 
 	DG_INLINE dgVector AddHorizontal () const
 	{

@@ -494,9 +494,17 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 		for (dgInt32 j = 0; j < rowsCount; j++) {
 			dgRightHandSide* const rhs = &rightHandSide[rowStart + j];
 			const dgLeftHandSide* const row = &matrixRow[rowStart + j];
+#if 1
 			dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0 + row->m_JMinv.m_jacobianM0.m_angular * angularM0 +
 					   row->m_JMinv.m_jacobianM1.m_linear * linearM1 + row->m_JMinv.m_jacobianM1.m_angular * angularM1);
 			a = dgVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
+#else
+			dgVector a(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_linear, linearM0);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM0.m_angular, angularM0);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_linear, linearM1);
+			a = a.NegMulAdd(row->m_JMinv.m_jacobianM1.m_angular, angularM1);
+#endif
 
 			dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
 			dgAssert(rhs->m_normalForceIndex >= -1);
