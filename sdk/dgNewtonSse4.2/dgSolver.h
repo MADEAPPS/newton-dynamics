@@ -103,7 +103,7 @@ class dgSoaFloat
 		return dgSoaFloat(_mm_fmadd_ps (A.m_low, B.m_low, m_low), _mm_fmadd_ps(A.m_high, B.m_high, m_high));
 	}
 
-	DG_INLINE dgSoaFloat NegMulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
+	DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
 	{
 		return dgSoaFloat(_mm_fnmadd_ps(A.m_low, B.m_low, m_low), _mm_fnmadd_ps(A.m_high, B.m_high, m_high));
 	}

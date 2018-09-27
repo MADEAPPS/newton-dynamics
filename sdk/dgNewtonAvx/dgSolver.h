@@ -91,7 +91,7 @@ class dgSoaFloat
 		return *this + A * B;
 	}
 
-	DG_INLINE dgSoaFloat NegMulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
+	DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
 	{
 		return *this - A * B;
 	}

@@ -122,7 +122,7 @@ class dgTemplateVector
 		return *this + A * B;
 	}
 
-	DG_INLINE dgTemplateVector<T> NegMulAdd(const dgTemplateVector<T>& A, const dgTemplateVector<T>& B) const
+	DG_INLINE dgTemplateVector<T> MulSub(const dgTemplateVector<T>& A, const dgTemplateVector<T>& B) const
 	{
 		return *this - A * B;
 	}

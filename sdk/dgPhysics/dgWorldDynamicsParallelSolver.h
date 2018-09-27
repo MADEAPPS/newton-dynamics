@@ -119,12 +119,12 @@ class dgWorkGroupFloat
 
 	DG_INLINE dgWorkGroupFloat MulAdd(const dgWorkGroupFloat& A, const dgWorkGroupFloat& B) const
 	{
-		return dgWorkGroupFloat(*this + A * B);
+		return dgWorkGroupFloat(m_low.MulAdd(A.m_low, B.m_low), m_high.MulAdd(A.m_high, B.m_high));
 	}
 
-	DG_INLINE dgWorkGroupFloat NegMulAdd(const dgWorkGroupFloat& A, const dgWorkGroupFloat& B) const
+	DG_INLINE dgWorkGroupFloat MulSub(const dgWorkGroupFloat& A, const dgWorkGroupFloat& B) const
 	{
-		return dgWorkGroupFloat(*this - A * B);
+		return dgWorkGroupFloat(m_low.MulSub(A.m_low, B.m_low), m_high.MulSub(A.m_high, B.m_high));
 	}
 
 	DG_INLINE dgWorkGroupFloat operator> (const dgWorkGroupFloat& A) const

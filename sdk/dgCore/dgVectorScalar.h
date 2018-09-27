@@ -175,7 +175,7 @@ class dgVector
 		return *this + A * B;
 	}
 
-	DG_INLINE dgVector NegMulAdd(const dgVector& A, const dgVector& B) const
+	DG_INLINE dgVector MulSub(const dgVector& A, const dgVector& B) const
 	{
 		return *this - A * B;
 	}
@@ -596,6 +596,17 @@ class dgBigVector
 	{
 		return (*this = dgBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
 	}
+
+	DG_INLINE dgBigVector MulAdd(const dgBigVector& A, const dgBigVector& B) const
+	{
+		return *this + A * B;
+	}
+
+	DG_INLINE dgBigVector MulSub(const dgVector& A, const dgBigVector& B) const
+	{
+		return *this - A * B;
+	}
+
 
 	DG_INLINE dgBigVector AddHorizontal () const
 	{

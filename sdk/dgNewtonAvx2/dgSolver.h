@@ -91,7 +91,7 @@ class dgSoaFloat
 		return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
 	}
 
-	DG_INLINE dgSoaFloat NegMulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
+	DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
 	{
 		return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
 	}
