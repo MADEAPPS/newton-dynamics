@@ -76,6 +76,11 @@ class dgTemplateVector
 		return (&m_x)[i];
 	}
 
+	DG_INLINE T GetScalar() const
+	{
+		return m_x;
+	}
+
 	DG_INLINE dgTemplateVector<T> Scale (T scale) const
 	{
 		return dgTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
