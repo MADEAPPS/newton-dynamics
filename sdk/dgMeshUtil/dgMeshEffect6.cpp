@@ -318,13 +318,16 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 			dgBigVector e10 (p1 - p0);
 			dgBigVector e20 (p2 - p0);
 			dgBigVector e12 (p2 - p1);
+			dgAssert(e10.m_w == dgFloat32(0.0f));
+			dgAssert(e20.m_w == dgFloat32(0.0f));
+			dgAssert(e12.m_w == dgFloat32(0.0f));
 
-			e10 = e10.Scale (dgFloat64 (1.0) / sqrt (e10.DotProduct3(e10)));
-			e20 = e20.Scale (dgFloat64 (1.0) / sqrt (e20.DotProduct3(e20)));
-			e12 = e20.Scale (dgFloat64 (1.0) / sqrt (e12.DotProduct3(e12)));
+			e10 = e10.Scale (dgFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
+			e20 = e20.Scale (dgFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
+			e12 = e20.Scale (dgFloat64 (1.0) / sqrt (e12.DotProduct(e12).GetScalar()));
 
-			m_triangleAngles[i * 3 + 0] = acos (dgClamp(e10.DotProduct3(e20), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
-			m_triangleAngles[i * 3 + 1] = acos (dgClamp(e10.DotProduct3(e20), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 0] = acos (dgClamp(e10.DotProduct(e20).GetScalar(), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 1] = acos (dgClamp(e10.DotProduct(e20).GetScalar(), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
 			m_triangleAngles[i * 3 + 2] = dgABF_PI - m_triangleAngles[i * 3 + 0] - m_triangleAngles[i * 3 + 1];
 		}
 	}
@@ -871,7 +874,8 @@ dgAssert (0);
 		const dgBigVector& p0 = m_mesh->GetVertex(face->m_incidentVertex);
 		const dgBigVector& p1 = m_mesh->GetVertex(twinFace->m_incidentVertex);
 		dgBigVector p10 (p1 - p0);
-		dgFloat64 e0length = sqrt (p10.DotProduct3(p10));
+		dgAssert(p10.m_w == dgFloat32(0.0f));
+		dgFloat64 e0length = sqrt (p10.DotProduct(p10).GetScalar());
 
 		ptr = twinFace;
 		do {
@@ -1057,10 +1061,12 @@ dgAssert (0);
 			dgBigVector e10 (p1 - p0);
 			dgBigVector e20 (p2 - p0);
 
-			e10 = e10.Scale (dgFloat64 (1.0) / sqrt (e10.DotProduct3(e10)));
-			e20 = e20.Scale (dgFloat64 (1.0) / sqrt (e20.DotProduct3(e20)));
+			e10 = e10.Scale (dgFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
+			e20 = e20.Scale (dgFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
+			dgAssert(e10.m_w == dgFloat32(0.0f));
+			dgAssert(e20.m_w == dgFloat32(0.0f));
 
-			m_beta[i] = acos (dgClamp(e10.DotProduct3(e20), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
+			m_beta[i] = acos (dgClamp(e10.DotProduct(e20).GetScalar(), dgFloat64 (-1.0f), dgFloat64 (1.0f)));
 			dgAssert (m_beta[i] > dgFloat64 (0.0f));
 		}
 
@@ -1489,7 +1495,6 @@ void dgMeshEffect::ClearAttributeArray ()
 }
 */
 
-
 void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
 {
     dgEdge* edgeBuffer[256];
@@ -1512,7 +1517,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
             do {
                 dgVector normal (FaceNormal (edgePtr, &m_points.m_vertex[0].m_x, sizeof (dgBigVector)));
 				dgAssert (normal.m_w == dgFloat32 (0.0f));
-                normal = normal.Scale (dgFloat32 (1.0f) / dgFloat32 (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+                normal = normal.Scale (dgFloat32 (1.0f) / dgFloat32 (sqrt(normal.DotProduct(normal).GetScalar()) + dgFloat32(1.0e-16f)));
                 faceNormal[edgeIndex] = normal;
                 normalsMap.Insert(edgeIndex, edgePtr);
                 edgeIndex ++;
@@ -1523,7 +1528,8 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
             dgVector normal0 (faceNormal[normalsMap.Find(startEdge)->GetInfo()]);
             for (dgEdge* ptr = edge->m_prev->m_twin ; (ptr->m_mark != mark) && (ptr != edge) && (ptr->m_incidentFace > 0); ptr = ptr->m_prev->m_twin) {
                 const dgVector& normal1 (faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-                dgFloat32 dot = normal0.DotProduct3(normal1);
+				dgAssert(normal0.m_w == dgFloat32(0.0f));
+                dgFloat32 dot = normal0.DotProduct(normal1).GetScalar();
                 if (dot < smoothValue) {
                     break;
                 }
@@ -1537,7 +1543,8 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
             dgVector normal (normal0);
             for (dgEdge* ptr = startEdge->m_twin->m_next; (ptr->m_mark != mark) && (ptr != startEdge) && (ptr->m_incidentFace > 0); ptr = ptr->m_twin->m_next) { 
                 const dgVector& normal1 (faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-                dgFloat32 dot = normal0.DotProduct3(normal1);
+				dgAssert(normal0.m_w == dgFloat32(0.0f));
+                dgFloat32 dot = normal0.DotProduct(normal1).GetScalar();
                 if (dot < smoothValue)  {
                     break;
                 }
@@ -1547,7 +1554,8 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
                 normal0 = normal1;
             } 
 
-            normal = normal.Scale (dgFloat32 (1.0f) / dgFloat32(sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+			dgAssert(normal.m_w == dgFloat32(0.0f));
+            normal = normal.Scale (dgFloat32 (1.0f) / dgFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + dgFloat32(1.0e-16f)));
 			dgTriplex n;
 			n.m_x = normal.m_x;
 			n.m_y = normal.m_y;
@@ -1569,7 +1577,7 @@ void dgMeshEffect::SphericalMapping (dgInt32 material, const dgMatrix& matrix)
     for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
 		dgBigVector point(matrix.RotateVector(m_points.m_vertex[i] - origin));
 		dgAssert(point.m_w == dgFloat32(0.0f));
-		dgAssert(point.DotProduct3(point) > dgFloat32(0.0f));
+		dgAssert(point.DotProduct(point).GetScalar() > dgFloat32(0.0f));
 		point = point.Normalize();
 
 		dgFloat64 u = dgAsin(dgClamp(point.m_x, dgFloat64(-1.0f + 1.0e-6f), dgFloat64(1.0f - 1.0e-6f)));
@@ -1646,7 +1654,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
         dgFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
 		dgAssert(point.m_w == dgFloat32(0.0f));
-        dgAssert(point.DotProduct3(point) > dgFloat32 (0.0f));
+        dgAssert(point.DotProduct(point).GetScalar() > dgFloat32 (0.0f));
         point = point.Normalize();
         dgFloat64 v = dgAtan2 (point.m_y, point.m_z);
 
