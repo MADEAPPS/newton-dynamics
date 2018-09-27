@@ -26,42 +26,8 @@
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
-	union cpuInfo
-	{
-		int m_data[4];
-		struct
-		{
-			int m_eax;
-			int m_ebx;
-			int m_ecx;
-			int m_edx;
-		};
-	} info;
-
-	__cpuid(info.m_data, 0);
-	if (info.m_eax < 7) {
-		return NULL;
-	}
-
-	// check for instruction set support (avx2 is bit 5 in reg ebx)
-	__cpuid(info.m_data, 7);
-	if (!(info.m_ebx & (1 << 5))) {
-		return NULL;
-	}
-
 	static dgWorldBase module(world, allocator);
-
-	union {
-		char m_vendor[256];
-		int m_reg[3];
-	};
-	memset(m_vendor, 0, sizeof(m_vendor));
-	__cpuid(info.m_data, 0);
-
-	m_reg[0] = info.m_ebx;
-	m_reg[1] = info.m_edx;
-	m_reg[2] = info.m_ecx;
-	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 3 : 4;
+	module.m_score = 1;
 	return &module;
 }
 
@@ -78,9 +44,9 @@ dgWorldBase::~dgWorldBase()
 const char* dgWorldBase::GetId() const
 {
 #ifdef _DEBUG
-	return "newtonAVX2_d";
+	return "newtonSSE4.2_d";
 #else
-	return "newtonAVX2";
+	return "newtonSSE4.2";
 #endif
 }
 
@@ -88,6 +54,7 @@ dgInt32 dgWorldBase::GetScore() const
 {
 	return m_score;
 }
+
 
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {

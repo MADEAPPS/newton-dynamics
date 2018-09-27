@@ -32,41 +32,12 @@ using namespace Microsoft::WRL;
 //using namespace Platform;
 
 
-
-
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
-	union cpuInfo
-	{
-		int m_data[4];
-		struct
-		{
-			int m_eax;
-			int m_ebx;
-			int m_ecx;
-			int m_edx;
-		};
-	} info;
-
-	// check for instruction set support (avx is bit 28 in reg ecx)
-	__cpuid(info.m_data, 1);
-	if (!(info.m_ecx & (1 << 28))) {
-		return NULL;
-	}
 	
 	static dgWorldBase module(world, allocator);
-	union {
-		char m_vendor[256];
-		int m_reg[3];
-	};
-	memset(m_vendor, 0, sizeof(m_vendor));
-	__cpuid(info.m_data, 0);
-
-	m_reg[0] = info.m_ebx;
-	m_reg[1] = info.m_edx;
-	m_reg[2] = info.m_ecx;
-	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 1 : 2;
+	module.m_score = 5;
 
 	return &module;
 }
@@ -75,10 +46,8 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 	:dgWorldPlugin(world, allocator)
 	,dgSolver(world, allocator)
 {
-	ComPtr<IDXGIAdapter1> adapter;
-
 	CreateDXGIFactory1(IID_PPV_ARGS(&m_dxgiFactory));
-	GetHardwareAdapter(&adapter);
+	GetHardwareAdapter();
 
 	//ComPtr<IDXGIAdapter1> adapter;
 	//ComPtr<DX::ID3D11Device> device;
@@ -91,11 +60,7 @@ dgWorldBase::~dgWorldBase()
 
 const char* dgWorldBase::GetId() const
 {
-#ifdef _DEBUG
-	return "newtonDx12_d";
-#else
-	return "newtonDx12";
-#endif
+	return m_deviceName;
 }
 
 dgInt32 dgWorldBase::GetScore() const
@@ -104,11 +69,9 @@ dgInt32 dgWorldBase::GetScore() const
 }
 
 
-void dgWorldBase::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
+void dgWorldBase::GetHardwareAdapter()
 {
-	ComPtr<IDXGIAdapter1> adapter;
-	*ppAdapter = nullptr;
-
+	IDXGIAdapter1* adapter = nullptr;
 	for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != m_dxgiFactory->EnumAdapters1(adapterIndex, &adapter); adapterIndex++)
 	{
 		DXGI_ADAPTER_DESC1 desc;
@@ -122,13 +85,20 @@ void dgWorldBase::GetHardwareAdapter(IDXGIAdapter1** ppAdapter)
 
 		// Check to see if the adapter supports Direct3D 12, but don't create the
 		// actual device yet.
-		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+		if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
 		{
+			for (int i = 0; desc.Description[i]; i++) {
+				wctomb(&m_deviceName[i], desc.Description[i]);
+				m_deviceName[i + 1] = 0;
+			}
+			#ifdef _DEBUG
+			strcat(m_deviceName, "_d");
+			#endif
+			m_adapter = adapter;
 			break;
 		}
+		adapter->Release();
 	}
-
-	*ppAdapter = adapter.Detach();
 }
 
 

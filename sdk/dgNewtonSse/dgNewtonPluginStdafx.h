@@ -19,38 +19,22 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_WORLD_BASE_H_
-#define _DG_WORLD_BASE_H_
-#include "dgNewtonPluginStdafx.h"
-#include "dgSolver.h"
+#ifndef _DG_NEWTON_PLUGIN_STDADX_
+#define _DG_NEWTON_PLUGIN_STDADX_
 
-#ifdef __cplusplus 
-extern "C"
-{
-	NEWTONCPU_API dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
-}
+// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN             
+#include <windows.h>
+
+#include <dg.h>
+#include <dgPhysics.h>
+
+#ifdef NEWTONCPU_EXPORTS
+	#define NEWTONCPU_API __declspec(dllexport)
+#else
+	#define NEWTONCPU_API __declspec(dllimport)
 #endif
 
-
-class dgWorldBase: public dgWorldPlugin, public dgSolver
-{
-	public:
-	dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator);
-	virtual ~dgWorldBase();
-
-	virtual const char* GetId() const;
-	virtual dgInt32 GetScore() const;
-	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
-
-	void GetHardwareAdapter();
-
-	int m_score;
-	char m_deviceName[64];
-
-	// Direct3D objects.
-	//Microsoft::WRL::ComPtr<ID3D12Device> m_d3dDevice;
-	Microsoft::WRL::ComPtr<IDXGIAdapter1> m_adapter;
-	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
-};
+#pragma warning (disable: 4100) //unreferenced formal parameter
 
 #endif

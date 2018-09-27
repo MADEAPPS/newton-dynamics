@@ -19,38 +19,37 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_WORLD_BASE_H_
-#define _DG_WORLD_BASE_H_
 #include "dgNewtonPluginStdafx.h"
-#include "dgSolver.h"
 
-#ifdef __cplusplus 
-extern "C"
+
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+					 )
 {
-	NEWTONCPU_API dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
+	switch (ul_reason_for_call)
+	{
+		case DLL_PROCESS_ATTACH:
+		case DLL_THREAD_ATTACH:
+		case DLL_THREAD_DETACH:
+		case DLL_PROCESS_DETACH:
+			break;
+	}
+
+	union cpuInfo
+	{
+		int m_data[4];
+		struct
+		{
+			int m_eax;
+			int m_ebx;
+			int m_ecx;
+			int m_edx;
+		};
+	} info;
+
+	// check for instruction set support (sse4.2 and fmad3)
+	__cpuid(info.m_data, 1);
+	return ((info.m_ecx & (1 << 12)) && (info.m_ecx & (1 << 20))) ? TRUE : FALSE;
 }
-#endif
 
-
-class dgWorldBase: public dgWorldPlugin, public dgSolver
-{
-	public:
-	dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator);
-	virtual ~dgWorldBase();
-
-	virtual const char* GetId() const;
-	virtual dgInt32 GetScore() const;
-	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
-
-	void GetHardwareAdapter();
-
-	int m_score;
-	char m_deviceName[64];
-
-	// Direct3D objects.
-	//Microsoft::WRL::ComPtr<ID3D12Device> m_d3dDevice;
-	Microsoft::WRL::ComPtr<IDXGIAdapter1> m_adapter;
-	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
-};
-
-#endif

@@ -107,7 +107,7 @@ class dgSoaFloat
 	{
 		return *this - A * B;
 	}
-
+	
 	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
 	{
 		return dgSoaFloat(_mm_cmpgt_ps (m_low, A.m_low), _mm_cmpgt_ps (m_high, A.m_high));

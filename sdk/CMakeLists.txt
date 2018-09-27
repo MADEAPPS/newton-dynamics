@@ -38,6 +38,10 @@ add_subdirectory(dCustomJoints)
 
 add_subdirectory(thirdParty)
 
+if (WITH_SSE_PLUGIN)
+	add_subdirectory(dgNewtonSse)
+endif()
+
 if (WITH_SSE4_PLUGIN)
 	add_subdirectory(dgNewtonSse4.2)
 endif()

@@ -55,7 +55,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	m_reg[0] = info.m_ebx;
 	m_reg[1] = info.m_edx;
 	m_reg[2] = info.m_ecx;
-	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 1 : 2;
+	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 2 : 3;
 	return &module;
 }
 
