@@ -35,21 +35,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		case DLL_PROCESS_DETACH:
 			break;
 	}
-
-	union cpuInfo
-	{
-		int m_data[4];
-		struct
-		{
-			int m_eax;
-			int m_ebx;
-			int m_ecx;
-			int m_edx;
-		};
-	} info;
-
-	// check for instruction set support (sse4.2 and fmad3)
-	__cpuid(info.m_data, 1);
-	return ((info.m_ecx & (1 << 12)) && (info.m_ecx & (1 << 20))) ? TRUE : FALSE;
+	return TRUE;
 }
 

@@ -35,24 +35,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		case DLL_PROCESS_DETACH:
 			break;
 	}
-
-	union cpuInfo
-	{
-		int m_data[4];
-		struct
-		{
-			int m_eax;
-			int m_ebx;
-			int m_ecx;
-			int m_edx;
-		};
-	} info;
-
-	// check for instruction set support (avx is bit 28 in reg ecx)
-	__cpuid(info.m_data, 1);
-	if (!(info.m_ecx & (1 << 28))) {
-		return FALSE;
-	}
 	return TRUE;
 }
 
