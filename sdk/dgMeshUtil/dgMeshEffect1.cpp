@@ -1737,13 +1737,15 @@ void dgMeshEffect::ApplyTransform (const dgMatrix& matrix)
 {
 	matrix.TransformTriplex(&m_points.m_vertex[0].m_x, sizeof (dgBigVector), &m_points.m_vertex[0].m_x, sizeof (dgBigVector), m_points.m_vertex.m_count);
 
-	dgMatrix rotation ((matrix.Inverse4x4()).Transpose4X4());
+	dgMatrix invMatix(matrix.Inverse4x4());
+	invMatix.m_posit = dgVector::m_wOne;
+	dgMatrix rotation (invMatix.Transpose4X4());
 	for (dgInt32 i = 0; i < m_attrib.m_normalChannel.m_count; i ++) {
 		dgVector n (dgFloat32 (m_attrib.m_normalChannel[i].m_x), dgFloat32 (m_attrib.m_normalChannel[i].m_y), dgFloat32 (m_attrib.m_normalChannel[i].m_z), dgFloat32 (0.0f));
 		n = rotation.RotateVector(n);
-		dgAssert (n.DotProduct3(n) > dgFloat32 (0.0f));
-		//n = n.Scale (dgRsqrt (n.DotProduct3(n)));
-		n = n.Normalize();
+		dgAssert(n.m_w == dgFloat32(0.0f));
+		dgAssert (n.DotProduct(n).GetScalar() > dgFloat32 (0.0f));
+		n = n.Normalize(); 
 		m_attrib.m_normalChannel[i].m_x = n.m_x;
 		m_attrib.m_normalChannel[i].m_y = n.m_y;
 		m_attrib.m_normalChannel[i].m_z = n.m_z;
@@ -1752,8 +1754,8 @@ void dgMeshEffect::ApplyTransform (const dgMatrix& matrix)
 	for (dgInt32 i = 0; i < m_attrib.m_binormalChannel.m_count; i++) {
 		dgVector n(dgFloat32(m_attrib.m_binormalChannel[i].m_x), dgFloat32(m_attrib.m_binormalChannel[i].m_y), dgFloat32(m_attrib.m_binormalChannel[i].m_z), dgFloat32(0.0f));
 		n = rotation.RotateVector(n);
-		dgAssert(n.DotProduct3(n) > dgFloat32(0.0f));
-		//n = n.Scale(dgRsqrt(n.DotProduct3(n)));
+		dgAssert(n.m_w == dgFloat32(0.0f));
+		dgAssert(n.DotProduct(n).GetScalar() > dgFloat32(0.0f));
 		n = n.Normalize();
 		m_attrib.m_binormalChannel[i].m_x = n.m_x;
 		m_attrib.m_binormalChannel[i].m_y = n.m_y;
