@@ -556,7 +556,7 @@ DG_INLINE dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo*
 		a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
 		f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
-		accNorm = accNorm + a * a;
+		accNorm = accNorm.MulAdd(a, a);
 		dgWorkGroupFloat deltaForce(f - row->m_force);
 
 		row->m_force = f;
@@ -621,8 +621,8 @@ DG_INLINE dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo*
 
 			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-			maxAccel = maxAccel + a * a;
 
+			maxAccel = maxAccel.MulAdd(a, a);
 			dgWorkGroupFloat deltaForce(f - row->m_force);
 
 			row->m_force = f;
