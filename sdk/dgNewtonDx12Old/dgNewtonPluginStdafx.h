@@ -19,36 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_WORLD_BASE_H_
-#define _DG_WORLD_BASE_H_
-#include "dgNewtonPluginStdafx.h"
-#include "dgSolver.h"
+#ifndef _DG_NEWTON_PLUGIN_STDADX_
+#define _DG_NEWTON_PLUGIN_STDADX_
 
-#ifdef __cplusplus 
-extern "C"
-{
-	NEWTONCPU_API dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
-}
+// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN             
+#include <windows.h>
+
+#include <wrl.h>
+#include <wrl/client.h>
+#include <dxgi1_4.h>
+#include <d3d12.h>
+//#include "Common\d3dx12.h"
+#include <pix.h>
+//#include <DirectXColors.h>
+//#include <DirectXMath.h>
+//#include <memory>
+//#include <vector>
+//#include <agile.h>
+//#include <concrt.h>
+
+#if defined(_DEBUG)
+#include <dxgidebug.h>
 #endif
 
 
-class dgWorldBase: public dgWorldPlugin, public dgSolver
-{
-	public:
-	dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator);
-	virtual ~dgWorldBase();
 
-	virtual const char* GetId() const;
-	virtual dgInt32 GetScore() const;
-	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
+#include <dg.h>
+#include <dgPhysics.h>
 
-	accelerator m_accelerator;
-	int m_score;
-	char m_deviceName[64];
+#ifdef NEWTONCPU_EXPORTS
+	#define NEWTONCPU_API __declspec(dllexport)
+#else
+	#define NEWTONCPU_API __declspec(dllimport)
+#endif
 
-
-	void TestAmp();
-	
-};
+#pragma warning (disable: 4100) //unreferenced formal parameter
 
 #endif

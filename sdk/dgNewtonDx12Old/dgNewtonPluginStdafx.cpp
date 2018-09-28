@@ -19,36 +19,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_WORLD_BASE_H_
-#define _DG_WORLD_BASE_H_
 #include "dgNewtonPluginStdafx.h"
-#include "dgSolver.h"
 
-#ifdef __cplusplus 
-extern "C"
-{
-	NEWTONCPU_API dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
-}
-#endif
+// TODO: reference any additional headers you need in STDAFX.H
+// and not in this file
 
 
-class dgWorldBase: public dgWorldPlugin, public dgSolver
-{
-	public:
-	dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator);
-	virtual ~dgWorldBase();
-
-	virtual const char* GetId() const;
-	virtual dgInt32 GetScore() const;
-	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
-
-	accelerator m_accelerator;
-	int m_score;
-	char m_deviceName[64];
-
-
-	void TestAmp();
-	
-};
-
-#endif
