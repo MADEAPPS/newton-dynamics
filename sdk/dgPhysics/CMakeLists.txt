@@ -13,6 +13,8 @@ cmake_minimum_required(VERSION 3.12.0)
 set (projectName "dgPhysics")
 message (${projectName})
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /fp:fast")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
 
  # low level core
 file(GLOB source *.cpp *.h ../dgMeshUtil/*.cpp ../dgMeshUtil/*.h)
