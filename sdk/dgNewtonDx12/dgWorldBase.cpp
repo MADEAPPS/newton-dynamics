@@ -60,7 +60,8 @@ dgWorldBase::~dgWorldBase()
 
 const char* dgWorldBase::GetId() const
 {
-	return m_deviceName;
+//	return m_deviceName;
+	return "gpu experimental";
 }
 
 dgInt32 dgWorldBase::GetScore() const
