@@ -206,7 +206,8 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 
 	dFloat invTimeStep = 1.0f / timestep;
 
-	const dFloat tol0 = m_motorSpeed * timestep;
+	//const dFloat tol0 = m_motorSpeed * timestep;
+	const dFloat tol0 = 0.0f;
 	dFloat angle0 = m_curJointAngle.GetAngle();
 	dFloat targetAngle0 = m_targetAngle0.GetAngle();
 	dFloat currentSpeed0 = 0.0f;
@@ -230,8 +231,8 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
-
-	const dFloat tol1 = m_angularRate1 * timestep;
+	//const dFloat tol1 = m_angularRate1 * timestep;
+	const dFloat tol1 = 0.0f;
 	dFloat angle1 = m_curJointAngle1.GetAngle();
 	dFloat targetAngle1 = m_targetAngle1.GetAngle();
 	dFloat currentSpeed1 = 0.0f;

@@ -126,17 +126,16 @@ void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	dCustomSlider::SubmitAngularRow(matrix0, matrix1, timestep);
 
 	dFloat invTimeStep = 1.0f / timestep;
-	const dFloat tol = m_linearRate * timestep;
 	dFloat posit = GetJointPosit();
 	dFloat targetPosit = m_targetPosit;
 	dFloat currentSpeed = 0.0f;
-	if (posit > (targetPosit + tol)) {
+	if (posit > targetPosit) {
 		currentSpeed = -m_linearRate;
 		dFloat predictPosit = posit + currentSpeed * timestep;
 		if (predictPosit < targetPosit) {
 			currentSpeed = 0.5f * (predictPosit - posit) * invTimeStep;
 		}
-	} else if (posit < (targetPosit - tol)) {
+	} else if (posit < targetPosit) {
 		currentSpeed = m_linearRate;
 		dFloat predictPosit = posit + currentSpeed * timestep;
 		if (predictPosit > targetPosit) {
