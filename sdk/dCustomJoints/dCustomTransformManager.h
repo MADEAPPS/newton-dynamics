@@ -44,6 +44,8 @@ class dCustomTransformController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dSkeletonBone* AddRoot (NewtonBody* const bone, const dMatrix& bindMatrix);
 	CUSTOM_JOINTS_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone);
 
+	CUSTOM_JOINTS_API void SetSelfCollision(bool selfCollsion);
+
 	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}
 	

@@ -163,7 +163,6 @@ void dgBroadPhaseAggregate::ImproveEntropy()
 	}
 }
 
-
 void dgBroadPhaseAggregate::SummitPairs(dgBroadPhaseAggregate* const aggregate, dgFloat32 timestep, dgInt32 threadID) const
 {
 	if (m_root && aggregate->m_root && !(m_isInEquilibrium & aggregate->m_isInEquilibrium)) {
@@ -179,7 +178,6 @@ void dgBroadPhaseAggregate::SubmitSelfPairs(dgFloat32 timestep, dgInt32 threadID
 		}
 	}
 }
-
 
 void dgBroadPhaseAggregate::SummitPairs(dgBody* const body, dgFloat32 timestep, dgInt32 threadID) const
 {

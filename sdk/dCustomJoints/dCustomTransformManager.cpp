@@ -31,7 +31,6 @@ dCustomTransformController* dCustomTransformManager::CreateTransformController (
 	return controller;
 }
 
-
 dCustomTransformController::dCustomTransformController()
 	:m_collisionAggregate(NULL)
 {
@@ -44,7 +43,6 @@ dCustomTransformController::~dCustomTransformController()
 	}
 }
 
-
 void dCustomTransformController::Init ()
 {
 	dCustomTransformManager* const manager = (dCustomTransformManager*) GetManager();
@@ -52,6 +50,11 @@ void dCustomTransformController::Init ()
 
 	m_calculateLocalTransform = false;
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
+}
+
+void dCustomTransformController::SetSelfCollision(bool selfCollision)
+{
+	NewtonCollisionAggregateSetSelfCollision(m_collisionAggregate, selfCollision ? 1 : 0);
 }
 
 void dCustomTransformController::PreUpdate(dFloat timestep, int threadIndex)

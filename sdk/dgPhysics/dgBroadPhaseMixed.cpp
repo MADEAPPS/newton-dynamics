@@ -381,18 +381,16 @@ void dgBroadPhaseMixed::FindCollidingPairs(dgBroadphaseSyncDescriptor* const des
 			dgAssert(broadPhaseNode->IsLeafNode());
 			dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
 
-			if (broadPhaseNode->IsAggregate()) {
-				((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSelfPairs(timestep, threadID);
-			}
-
 			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
 				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
-				dgAssert(!parent->IsLeafNode());
-				dgBroadPhaseNode* const rightSibling = parent->m_right;
-				if (rightSibling != ptr) {
-					SubmitPairs(broadPhaseNode, rightSibling, timestep, threadCount, threadID);
-				} else {
-					SubmitPairs(broadPhaseNode, parent->m_left, timestep, threadCount, threadID);
+				if (!parent->IsAggregate()) {
+					dgAssert(!parent->IsLeafNode());
+					dgBroadPhaseNode* const rightSibling = parent->m_right;
+					if (rightSibling != ptr) {
+						SubmitPairs(broadPhaseNode, rightSibling, timestep, threadCount, threadID);
+					} else {
+						SubmitPairs(broadPhaseNode, parent->m_left, timestep, threadCount, threadID);
+					}
 				}
 			}
 		}

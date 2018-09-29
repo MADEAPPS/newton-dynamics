@@ -527,6 +527,7 @@ void dgBroadPhaseSegregated::FindCollidingPairs (dgBroadphaseSyncDescriptor* con
 
 	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
+
 	if (descriptor->m_fullScan) {
 		while (node) {
 			dgBroadPhaseNode* const broadPhaseNode = node->GetInfo();
@@ -559,25 +560,23 @@ void dgBroadPhaseSegregated::FindCollidingPairs (dgBroadphaseSyncDescriptor* con
 
 		for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 			dgBroadPhaseNode* const broadPhaseNode = bodyArray[i].m_body->GetBroadPhase();
+
 			dgAssert(broadPhaseNode->IsLeafNode());
 			dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
 
-			if (broadPhaseNode->IsAggregate()) {
-				((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSelfPairs(timestep, threadID);
-			}
-
 			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
 				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
-				dgAssert(!parent->IsLeafNode());
+				if (!parent->IsAggregate()) {
+					dgAssert(!parent->IsLeafNode());
+					dgBroadPhaseNode* const rightSibling = parent->m_right;
+					if (rightSibling && (rightSibling != ptr)) {
+						SubmitPairs(broadPhaseNode, rightSibling, timestep, 0, threadID);
+					}
 
-				dgBroadPhaseNode* const rightSibling = parent->m_right;
-				if (rightSibling && (rightSibling != ptr)) {
-					SubmitPairs(broadPhaseNode, rightSibling, timestep, 0, threadID);
-				}
-
-				dgBroadPhaseNode* const leftSibling = parent->m_left;
-				if (leftSibling && (leftSibling != ptr)) {
-					SubmitPairs(broadPhaseNode, leftSibling, timestep, threadCount, threadID);
+					dgBroadPhaseNode* const leftSibling = parent->m_left;
+					if (leftSibling && (leftSibling != ptr)) {
+						SubmitPairs(broadPhaseNode, leftSibling, timestep, threadCount, threadID);
+					}
 				}
 			}
 		}

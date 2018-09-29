@@ -34,13 +34,15 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 	:dgWorldPlugin(world, allocator)
 	,dgSolver(world, allocator)
 	,m_score(5)
-	,m_accelerator(accelerator::default_accelerator)
+//	,m_accelerator(accelerator::default_accelerator)
 //	,m_accelerator(accelerator::cpu_accelerator)
-//	,m_accelerator(accelerator::direct3d_warp)
+	,m_accelerator(accelerator::direct3d_warp)
 //	,m_accelerator(accelerator::direct3d_ref)
 {
+	accelerator_view acc_v = m_accelerator.default_view;
+
 	std::wstring desc (m_accelerator.get_description());
-	for (int i = 0; i < desc.size(); i++) {
+	for (int i = 0; i < dgInt32 (desc.size()); i++) {
 		wctomb(&m_deviceName[i], desc[i]);
 		m_deviceName[i + 1] = 0;
 	}
