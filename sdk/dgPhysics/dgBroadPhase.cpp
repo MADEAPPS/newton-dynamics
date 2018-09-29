@@ -1144,7 +1144,7 @@ bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const
 
 	bool tier1 = true;
 	bool tier2 = !(body0->m_sleeping & body1->m_sleeping);
-	bool tier3 = (agreggate0 != agreggate1) || (agreggate0 && agreggate0->GetSelfCollision());
+	bool tier3 = (agreggate0 != agreggate1) || !agreggate0 || (agreggate0 && agreggate0->GetSelfCollision());
 	bool tier4 = isDynamic0 & mass0;
 	bool tier5 = isDynamic1 & mass1;
 	bool tier6 = isKinematic0 & mass1;
