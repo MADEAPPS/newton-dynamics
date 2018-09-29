@@ -215,7 +215,7 @@ DG_INLINE void dgWorldDynamicUpdate::UnionSet(const dgConstraint* const joint) c
 		root1->m_disjointInfo.m_parent = root0;
 		if (root0->m_disjointInfo.m_rank == root1->m_disjointInfo.m_rank) {
 			root0->m_disjointInfo.m_rank += 1;
-			dgAssert (root0->m_disjointInfo.m_rank <= 5);
+			dgAssert (root0->m_disjointInfo.m_rank <= 6);
 		}
 		root0->m_disjointInfo.m_rowCount += root1->m_disjointInfo.m_rowCount;
 		root0->m_disjointInfo.m_bodyCount += root1->m_disjointInfo.m_bodyCount;
