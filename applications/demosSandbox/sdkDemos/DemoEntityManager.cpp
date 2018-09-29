@@ -336,7 +336,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_hideVisualMeshes = true;
 //	m_autoSleepMode = true;
 	m_broadPhaseType = 1;
-	m_solverPasses = 12;
+	m_solverPasses = 16;
 	m_workerThreads = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;

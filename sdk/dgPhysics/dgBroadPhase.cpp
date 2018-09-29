@@ -1642,7 +1642,7 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 		dgJointInfo* const constraintArray = &m_world->m_jointsMemory[0];
 		for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 			dgContact* const contact = contactNode->GetInfo();
-			if (contact->m_contactActive || contact->m_maxDOF) {
+			if (contact->m_contactActive && contact->m_maxDOF) {
 				dgAssert(contact->m_maxDOF);
 				dgAssert(contact->m_contactActive);
 				constraintArray[activeCount].m_joint = contact;
