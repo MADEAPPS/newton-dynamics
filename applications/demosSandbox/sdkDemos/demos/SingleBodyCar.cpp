@@ -299,9 +299,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_radio = 0.33;
 		tireInfo.m_width = 0.30f;
 		tireInfo.m_pivotOffset = 0.0f;
-		
+	
+		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireLocation + dVector (1.2f, 0.0f, -0.8f, 0.0f), tireInfo);
+		dVehicleTireInterface* const frontRight = vehicle->AddTire(tireLocation + dVector (1.2f, 0.0f,  0.8f, 0.0f), tireInfo);
 
-		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireLocation + dVector (1.0f, 0.0f, 1.0f, 0.0f), tireInfo);
+		dVehicleTireInterface* const rearLeft = vehicle->AddTire(tireLocation + dVector(-1.2f, 0.0f, -0.8f, 0.0f), tireInfo);
+		dVehicleTireInterface* const rearRight = vehicle->AddTire(tireLocation + dVector(-1.2f, 0.0f, 0.8f, 0.0f), tireInfo);
+
 
 		// add a visual tire geometry
 		AttachVisualTire(vehicle, frontLeft);

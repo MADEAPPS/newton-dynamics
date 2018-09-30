@@ -132,9 +132,10 @@ class dVehicleChassis: public dCustomControllerBase
 	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Cleanup();
 	
-
+	dMatrix m_localFrame;
 	dVehicleInterface* m_vehicle;
 	friend class dVehicleManager;
+	friend class dVehicleVirtualTire;
 };
 
 

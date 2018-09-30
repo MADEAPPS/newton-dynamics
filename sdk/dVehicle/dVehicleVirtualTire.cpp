@@ -15,8 +15,8 @@
 #include "dVehicleVirtualTire.h"
 
 
-dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dVector& location, const dTireInfo& info)
-	:dVehicleTireInterface(parent, location, info)
+dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dVector& locationInGlobalSpace, const dTireInfo& info)
+	:dVehicleTireInterface(parent, locationInGlobalSpace, info)
 	,m_info(info)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
@@ -26,6 +26,17 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dVect
 
 	m_tireShape = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
+
+	dMatrix chassisMatrix;
+	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+
+	dMatrix alignMatrix(dGetIdentityMatrix());
+	alignMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);
+	alignMatrix.m_up = dVector (0.0f, 1.0f, 0.0f, 0.0f);
+	alignMatrix.m_right = alignMatrix.m_front.CrossProduct(alignMatrix.m_up);
+
+	m_matrix = alignMatrix * chassis->m_localFrame;
+	m_matrix.m_posit = chassis->m_localFrame.UntransformVector(chassisMatrix.UntransformVector(locationInGlobalSpace));
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -52,20 +63,28 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 	}
 }
 
-void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+dMatrix dVehicleVirtualTire::GetTireMatrix () const
 {
-	dVehicleTireInterface::Debug(debugContext);
-
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
 	NewtonBody* const chassisBody = chassis->GetBody();
 
 	dMatrix chassisMatrix;
-	NewtonBodyGetMatrix (chassisBody, &chassisMatrix[0][0]);
+	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	return m_matrix * chassisMatrix;
+}
 
-	chassisMatrix.m_posit.m_y += 1.0f;
+void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dVehicleTireInterface::Debug(debugContext);
 
-	NewtonCollisionForEachPolygonDo(m_tireShape, &chassisMatrix[0][0], RenderDebugTire, debugContext);
+	dMatrix trieMatrix (GetTireMatrix ());
+//	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
+//	dVehicleChassis* const chassis = chassisNode->GetChassis();
+//	NewtonBody* const chassisBody = chassis->GetBody();
+//	dMatrix chassisMatrix;
+//	NewtonBodyGetMatrix (chassisBody, &chassisMatrix[0][0]);
+//	chassisMatrix.m_posit.m_y += 1.0f;
 
-
+	NewtonCollisionForEachPolygonDo(m_tireShape, &trieMatrix[0][0], RenderDebugTire, debugContext);
 }

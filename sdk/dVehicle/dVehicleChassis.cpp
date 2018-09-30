@@ -35,6 +35,11 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	m_body = body;
 	NewtonBodySetForceAndTorqueCallback(m_body, forceAndTorque);
 	m_vehicle = new dVehicleSingleBody(this);
+
+	m_localFrame = localFrame;
+	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+	dAssert(m_localFrame.TestOrthogonal());
+
 /*
 	m_speed = 0.0f;
 	m_sideSlip = 0.0f;
@@ -47,9 +52,6 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	m_aerodynamicsDownSpeedCutOff = 0.0f;
 	m_aerodynamicsDownForceCoefficient = 0.0f;
 
-	m_localFrame = localFrame;
-	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
-	dAssert(m_localFrame.TestOrthogonal());
 
 	m_forceAndTorqueCallback = forceAndTorque;
 
