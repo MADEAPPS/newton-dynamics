@@ -592,23 +592,23 @@ int NewtonGetParallelSolverOnLargeIsland(const NewtonWorld* const newtonWorld)
   If it happen that the joints residual acceleration fall below the minimum tolerance 1.0e-5
   then the solve will terminate before the number of iteration reach N.
 */
-void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
+void NewtonSetSolverIterations(const NewtonWorld* const newtonWorld, int model)
 {
 	Newton* const world = (Newton *)newtonWorld;
 
 	TRACE_FUNCTION(__FUNCTION__);
-	world->SetSolverMode (model);
+	world->SetSolverIterations (model);
 }
 
 /*!
 Get the solver precision mode.
 */
-int NewtonGetSolverModel(const NewtonWorld* const newtonWorld)
+int NewtonGetSolverIterations(const NewtonWorld* const newtonWorld)
 {
 	Newton* const world = (Newton *)newtonWorld;
 
 	TRACE_FUNCTION(__FUNCTION__);
-	return world->GetSolverMode();
+	return world->GetSolverIterations();
 }
 
 

@@ -60,14 +60,14 @@
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
-#define DEFAULT_SCENE	29			// servo joints
+//#define DEFAULT_SCENE	29			// servo joints
 //#define DEFAULT_SCENE	30			// articulated joints
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
-//#define DEFAULT_SCENE	36			// single body vehicle
+#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// David Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles
@@ -336,7 +336,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_hideVisualMeshes = true;
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 1;
-	m_solverPasses = 16;
+	m_solverPasses = 4;
 //	m_workerThreads = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
@@ -635,7 +635,7 @@ void DemoEntityManager::ApplyMenuOptions()
 
 	// clean up all caches the engine have saved
 	//NewtonInvalidateCache(m_world);
-	NewtonSetSolverModel(m_world, m_solverPasses);
+	NewtonSetSolverIterations(m_world, m_solverPasses);
 	NewtonSetThreadsCount(m_world, m_workerThreads);
 
 	int state = m_autoSleepMode ? 1 : 0;
@@ -928,6 +928,9 @@ void DemoEntityManager::RenderStats()
 			ImGui::Text(text);
 
 			sprintf (text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
+			ImGui::Text(text);
+
+			sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
 			ImGui::Text(text);
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  

@@ -463,8 +463,8 @@ extern "C" {
 
 	NEWTON_API void NewtonInvalidateCache (const NewtonWorld* const newtonWorld);
 
-	NEWTON_API void NewtonSetSolverModel (const NewtonWorld* const newtonWorld, int model);
-	NEWTON_API int NewtonGetSolverModel(const NewtonWorld* const newtonWorld);
+	NEWTON_API void NewtonSetSolverIterations (const NewtonWorld* const newtonWorld, int model);
+	NEWTON_API int NewtonGetSolverIterations(const NewtonWorld* const newtonWorld);
 
 	NEWTON_API void NewtonSetParallelSolverOnLargeIsland (const NewtonWorld* const newtonWorld, int mode);
 	NEWTON_API int NewtonGetParallelSolverOnLargeIsland (const NewtonWorld* const newtonWorld);

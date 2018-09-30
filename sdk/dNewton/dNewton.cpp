@@ -86,7 +86,7 @@ dNewton::dNewton()
 	NewtonWorldSetUserData(m_world, this);
 
 	// set the simplified solver mode (faster but less accurate)
-	NewtonSetSolverModel (m_world, 1);
+	NewtonSetSolverIterations (m_world, 1);
 
 	// by default runs on four micro threads
 	NewtonSetThreadsCount(m_world, 4);

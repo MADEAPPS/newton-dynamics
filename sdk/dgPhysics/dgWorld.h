@@ -243,8 +243,8 @@ class dgWorld
 	dgFloat32 GetUpdateTime() const;
 	dgBroadPhase* GetBroadPhase() const;
 
-	dgInt32 GetSolverMode() const;
-	void SetSolverMode (dgInt32 mode);
+	dgInt32 GetSolverIterations() const;
+	void SetSolverIterations (dgInt32 mode);
 
 	void SetPostUpdateCallback (const dgWorld* const newtonWorld, dgPostUpdateCallback callback);
 
@@ -475,7 +475,7 @@ class dgWorld
 	dgUnsigned32 m_numberOfSubsteps;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_inUpdate;
-	dgUnsigned32 m_solverMode;
+	dgUnsigned32 m_solverIterations;
 	dgUnsigned32 m_bodyGroupID;
 	dgUnsigned32 m_defualtBodyGroupID;
 	dgUnsigned32 m_bodiesUniqueID;
@@ -601,14 +601,14 @@ inline dgUnsigned64 dgWorld::GetTimeInMicrosenconds() const
 	return dgGetTimeInMicrosenconds();
 }
 
-inline void dgWorld::SetSolverMode(dgInt32 mode)
+inline void dgWorld::SetSolverIterations(dgInt32 mode)
 {
-	m_solverMode = dgUnsigned32(dgMax(1, mode));
+	m_solverIterations = dgUnsigned32(dgMax(1, mode));
 }
 
-inline dgInt32 dgWorld::GetSolverMode() const
+inline dgInt32 dgWorld::GetSolverIterations() const
 {
-	return m_solverMode;
+	return m_solverIterations;
 }
 
 #endif

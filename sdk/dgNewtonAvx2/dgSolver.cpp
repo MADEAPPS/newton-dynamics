@@ -57,7 +57,7 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 	m_invTimestepRK = m_invTimestep * dgFloat32 (4.0f);
 
 	m_threadCounts = m_world->GetThreadCount();
-	m_solverPasses = m_world->GetSolverMode();
+	m_solverPasses = m_world->GetSolverIterations();
 
 	dgInt32 mask = -dgInt32(DG_SOA_WORD_GROUP_SIZE - 1);
 	m_jointCount = ((m_cluster->m_jointCount + DG_SOA_WORD_GROUP_SIZE - 1) & mask) / DG_SOA_WORD_GROUP_SIZE;

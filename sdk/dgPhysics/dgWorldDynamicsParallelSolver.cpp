@@ -155,7 +155,7 @@ void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dg
 	m_timestepRK = m_timestep * m_invStepRK;
 	m_invTimestepRK = m_invTimestep * dgFloat32 (4.0f);
 
-	m_solverPasses = m_world->GetSolverMode();
+	m_solverPasses = m_world->GetSolverIterations();
 	m_threadCounts = m_world->GetThreadCount();
 	m_jointCount = ((m_cluster->m_jointCount + DG_WORK_GROUP_SIZE - 1) & -dgInt32(DG_WORK_GROUP_SIZE - 1)) / DG_WORK_GROUP_SIZE;
 
