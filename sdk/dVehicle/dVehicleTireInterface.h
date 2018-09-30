@@ -54,7 +54,10 @@ class dVehicleTireInterface: public dVehicleNode
 	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent, const dVector& location, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleTireInterface();
 
-	virtual dMatrix GetTireMatrix () const = 0;
+	virtual dVehicleTireInterface* GetAsTire() const {return (dVehicleTireInterface*) this;} 
+
+	virtual dMatrix GetLocalMatrix () const = 0;
+	virtual dMatrix GetGlobalMatrix () const = 0;
 	virtual NewtonCollision* GetCollisionShape() const = 0;
 };
 

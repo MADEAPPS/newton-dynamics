@@ -26,9 +26,11 @@ class dVehicleInterface: public dVehicleNode
 	DVEHICLE_API dVehicleInterface(dVehicleChassis* const chassis);
 	DVEHICLE_API virtual ~dVehicleInterface();
 
-	DVEHICLE_API virtual dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo) = 0;
+	virtual dMatrix GetMatrix () const = 0;
+	virtual dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo) = 0;
 
 	DVEHICLE_API dVehicleChassis* GetChassis() const;
+	DVEHICLE_API virtual dVehicleInterface* GetAsVehicle() const {return (dVehicleInterface*)this;} 
 
 	protected:
 	dVehicleChassis* m_chassis;

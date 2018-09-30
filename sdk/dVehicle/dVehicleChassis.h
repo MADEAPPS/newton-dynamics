@@ -121,6 +121,7 @@ class dVehicleChassis: public dCustomControllerBase
 */
 
 	public:
+	dVehicleInterface* GetVehicle() {return m_vehicle;}
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 
 	protected:

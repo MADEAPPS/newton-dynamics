@@ -22,7 +22,8 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const parent, const dVector& location, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleVirtualTire();
 
-	DVEHICLE_API virtual dMatrix GetTireMatrix () const;
+	DVEHICLE_API dMatrix GetLocalMatrix () const;
+	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
 	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
 
 	DVEHICLE_API void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;

@@ -246,9 +246,26 @@ class SingleBodyVehicleManager: public dVehicleManager
 		NewtonBodySetTransformCallback(chassiBody, DemoEntity::TransformCallback);
 	}
 
-	void AttachVisualTire(dVehicleChassis* const chassis, dVehicleTireInterface* const tire)
+	void MakeVisualEntity(dVehicleChassis* const chassis)
 	{
-		NewtonCollision* const shape = tire->GetCollisionShape();
+		AttachVisualChassis(chassis);
+
+		dVehicleInterface* const vehicle = chassis->GetVehicle();
+		dMatrix chassisMatrixInv (vehicle->GetMatrix().Inverse());
+		DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(chassis->GetBody());
+
+		for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
+			dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
+			if (tire) {
+				dMatrix tireMatrix (tire->GetGlobalMatrix() * chassisMatrixInv);
+
+				NewtonCollision* const chassisCollision = tire->GetCollisionShape();
+				DemoMesh* const tireMesh = new DemoMesh("chassis", chassisCollision, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+				DemoEntity* const tireEntity = new DemoEntity(tireMatrix, chassisEntity);
+				tireEntity->SetMesh(tireMesh, dGetIdentityMatrix());
+				tireMesh->Release();
+			}
+		}
 	}
 
 	dVehicleChassis* CreateVehicle(const dMatrix& location)
@@ -284,19 +301,15 @@ class SingleBodyVehicleManager: public dVehicleManager
 //			m_gearMap[i] = i;
 //		}
 
-		// create the visual representation
-		AttachVisualChassis(vehicle);
-
 		// destroy chassis collision shape 
 		NewtonDestroyCollision(chassisCollision);
-
 
 		// add Tires
 		dVector tireLocation(location.m_posit);
 		dVehicleTireInterface::dTireInfo tireInfo;
 	
 		tireInfo.m_mass = 40.0f;
-		tireInfo.m_radio = 0.33;
+		tireInfo.m_radio = 0.33f;
 		tireInfo.m_width = 0.30f;
 		tireInfo.m_pivotOffset = 0.0f;
 	
@@ -306,9 +319,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dVehicleTireInterface* const rearLeft = vehicle->AddTire(tireLocation + dVector(-1.2f, 0.0f, -0.8f, 0.0f), tireInfo);
 		dVehicleTireInterface* const rearRight = vehicle->AddTire(tireLocation + dVector(-1.2f, 0.0f, 0.8f, 0.0f), tireInfo);
 
-
-		// add a visual tire geometry
-		AttachVisualTire(vehicle, frontLeft);
+		// create the visual representation from the collision shapes
+		MakeVisualEntity(vehicle);
 
 		return vehicle;
 	}

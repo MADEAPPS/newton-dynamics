@@ -23,6 +23,7 @@ class dVehicleSingleBody: public dVehicleInterface
 	DVEHICLE_API dVehicleSingleBody(dVehicleChassis* const chassis);
 	DVEHICLE_API virtual ~dVehicleSingleBody();
 
+	DVEHICLE_API dMatrix GetMatrix () const;
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 };
 

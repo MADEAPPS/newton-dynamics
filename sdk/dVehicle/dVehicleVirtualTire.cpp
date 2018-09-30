@@ -63,9 +63,15 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 	}
 }
 
-dMatrix dVehicleVirtualTire::GetTireMatrix () const
+dMatrix dVehicleVirtualTire::GetLocalMatrix () const
 {
-	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
+	return m_matrix;
+}
+
+dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
+{
+	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent->GetAsVehicle();
+	dAssert (chassisNode);
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
 	NewtonBody* const chassisBody = chassis->GetBody();
 
@@ -78,13 +84,6 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 {
 	dVehicleTireInterface::Debug(debugContext);
 
-	dMatrix trieMatrix (GetTireMatrix ());
-//	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
-//	dVehicleChassis* const chassis = chassisNode->GetChassis();
-//	NewtonBody* const chassisBody = chassis->GetBody();
-//	dMatrix chassisMatrix;
-//	NewtonBodyGetMatrix (chassisBody, &chassisMatrix[0][0]);
-//	chassisMatrix.m_posit.m_y += 1.0f;
-
+	dMatrix trieMatrix (GetGlobalMatrix ());
 	NewtonCollisionForEachPolygonDo(m_tireShape, &trieMatrix[0][0], RenderDebugTire, debugContext);
 }
