@@ -292,9 +292,16 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 
 		// add Tires
-		dMatrix tireMatrix;
+		dVector tireLocation(location.m_posit);
 		dVehicleTireInterface::dTireInfo tireInfo;
-		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireMatrix, tireInfo);
+	
+		tireInfo.m_mass = 40.0f;
+		tireInfo.m_radio = 0.33;
+		tireInfo.m_width = 0.30f;
+		tireInfo.m_pivotOffset = 0.0f;
+		
+
+		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireLocation + dVector (1.0f, 0.0f, 1.0f, 0.0f), tireInfo);
 
 		// add a visual tire geometry
 		AttachVisualTire(vehicle, frontLeft);

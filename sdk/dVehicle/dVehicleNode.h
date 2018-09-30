@@ -22,6 +22,8 @@ class dVehicleNode: public dContainersAlloc
 	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
 	DVEHICLE_API virtual ~dVehicleNode();
 
+	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+
 	dVehicleNode* m_parent;
 	dList<dVehicleNode*> m_children;
 };

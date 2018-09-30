@@ -22,4 +22,7 @@ dVehicleInterface::~dVehicleInterface()
 {
 }
 
-
+dVehicleChassis* dVehicleInterface::GetChassis() const
+{
+	return m_chassis;
+}

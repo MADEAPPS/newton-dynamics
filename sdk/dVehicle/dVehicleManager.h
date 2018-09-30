@@ -24,7 +24,7 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 	DVEHICLE_API dVehicleManager(NewtonWorld* const world);
 	DVEHICLE_API virtual ~dVehicleManager();
 /*
-	DVEHICLE_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+	
 	DVEHICLE_API virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
 
 	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
@@ -40,6 +40,8 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 
 	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
 	protected:
+
+	DVEHICLE_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 /*
 	void OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);
 	int OnContactGeneration(const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;

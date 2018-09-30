@@ -40,3 +40,11 @@ void dVehicleManager::DestroyController(dVehicleChassis* const vehicle)
 	vehicle->Cleanup();
 	dCustomControllerManager<dVehicleChassis>::DestroyController(vehicle);
 }
+
+void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+{
+	for (dCustomControllerManager<dVehicleChassis>::dListNode* vehicleNode = GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
+		dVehicleChassis* const vehicle = &vehicleNode->GetInfo();
+		vehicle->Debug(debugContext);
+	}
+}

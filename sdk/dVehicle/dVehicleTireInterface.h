@@ -36,21 +36,22 @@ class dVehicleTireInterface: public dVehicleNode
 			memset(this, 0, sizeof(dTireInfo));
 		}
 
+		dVector m_location;
 		dFloat m_mass;
 		dFloat m_radio;
 		dFloat m_width;
 		dFloat m_pivotOffset;
-		dFloat m_maxSteeringAngle;
-		dFloat m_dampingRatio;
-		dFloat m_springStrength;
-		dFloat m_suspensionLength;
-		dFloat m_corneringStiffness;
-		dFloat m_aligningMomentTrail;
-		int m_hasFender;
-		dSuspensionType m_suspentionType;
+		//dFloat m_maxSteeringAngle;
+		//dFloat m_dampingRatio;
+		//dFloat m_springStrength;
+		//dFloat m_suspensionLength;
+		//dFloat m_corneringStiffness;
+		//dFloat m_aligningMomentTrail;
+		//int m_hasFender;
+		//dSuspensionType m_suspentionType;
 	};
 
-	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent, const dMatrix& location, const dTireInfo& info);
+	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent, const dVector& location, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleTireInterface();
 
 	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const = 0;

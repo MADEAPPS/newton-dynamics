@@ -73,7 +73,7 @@ class dVehicleChassis: public dCustomControllerBase
 	DVEHICLE_API dFloat GetWeightDistribution() const;
 	DVEHICLE_API void SetWeightDistribution(dFloat weightDistribution);
 
-	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	
 	DVEHICLE_API void DrawSchematic (dCustomJoint::dDebugDisplay* const debugContext, dFloat x, dFloat y, dFloat scale) const;	
 
 
@@ -121,15 +121,17 @@ class dVehicleChassis: public dCustomControllerBase
 */
 
 	public:
-	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
+	DVEHICLE_API dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 
 	protected:
 	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
+	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
+	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
 	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Cleanup();
+	
 
 	dVehicleInterface* m_vehicle;
 	friend class dVehicleManager;

@@ -29,3 +29,9 @@ dVehicleNode::~dVehicleNode()
 	}
 }
 
+void dVehicleNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->Debug(debugContext);
+	}
+}
