@@ -176,7 +176,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 					param = dgFloat64(1.0f);
 				}
 				dgBigVector dq(step.Scale(dgFloat32(1.0f) - param));
-				dgFloat64 lenght2 = sqrt (dq.DotProduct3(dq));
+				dgAssert(dq.m_w == dgFloat32(0.0f));
+				dgFloat64 lenght2 = sqrt (dq.DotProduct(dq).GetScalar());
 				if (lenght2 > concavity) {
 					concavity = lenght2;
 				}
@@ -185,7 +186,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 					dgBigVector edge10(p1 - p0);
 					dgBigVector edge20(p2 - p0);
 					dgBigVector n(edge10.CrossProduct(edge20));
-					dgFloat64 area2 = n.DotProduct3(n);
+					dgAssert(n.m_w == dgFloat32(0.0f));
+					dgFloat64 area2 = n.DotProduct(n).GetScalar();
 					if (area2 > minArea2) {
 						dgBigVector p01((p0 + p1).Scale(dgFloat64(0.5f)));
 						dgBigVector p12((p1 + p2).Scale(dgFloat64(0.5f)));
@@ -227,8 +229,9 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			dgBigVector normal ((m_points[i1] - p0).CrossProduct(m_points[i2] - p0));
 
 			//dgFloat64 N = (origin - p0) % normal;
-			dgFloat64 N = normal.DotProduct3(origin - p0);
-			dgFloat64 D = normal.DotProduct3(dist);
+			dgAssert(normal.m_w == dgFloat32(0.0f));
+			dgFloat64 N = normal.DotProduct(origin - p0).GetScalar();
+			dgFloat64 D = normal.DotProduct(dist).GetScalar();
 
 			if (fabs(D) < dgFloat64 (1.0e-16f)) { // 
 				normalProjection = dgFloat32 (0.0);
@@ -253,7 +256,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 			for (dgInt32 i = 0; i < 3; i ++) {
 				dgBigVector dist (m_points[closestFace->m_index[i]] - point);
-				heap.Push(closestFace, dist.DotProduct3(dist));
+				dgAssert(dist.m_w == dgFloat32(0.0f));
+				heap.Push(closestFace, dist.DotProduct(dist).GetScalar());
 			}
 
 			m_mark ++;	
@@ -272,7 +276,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 					if (twin->GetMark() != m_mark) {
 						dgBigVector dist (m_points[twin->m_index[i]] - point);
 						// use hysteresis to prevent stops at a local minimal, but at the same time fast descend
-						dgFloat64 dist2 = dist.DotProduct3(dist);
+						dgAssert(dist.m_w == dgFloat32(0.0f));
+						dgFloat64 dist2 = dist.DotProduct(dist).GetScalar();
 						if (dist2 < (minDist * dgFloat64 (1.001f))) {
 							heap.Push(twin, dist2);
 						}
@@ -695,15 +700,16 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 				dgEdge* ptr = edge;
 				do {
 					dgBigVector p1p0(points[ptr->m_incidentVertex] - points[ptr->m_prev->m_incidentVertex]);
-					perimeter += sqrt(p1p0.DotProduct3(p1p0));
+					dgAssert(p1p0.m_w == dgFloat32(0.0f));
+					perimeter += sqrt(p1p0.DotProduct(p1p0).GetScalar());
 					ptr->m_incidentFace = color;
 					ptr->m_userData = dgUnsigned64 (clusterNode);
 					ptr->m_mark = meshMask;
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 
-				dgBigVector normal = mesh.FaceNormal(edge, &points[0][0], sizeof(dgBigVector));
-				dgFloat64 mag = sqrt(normal.DotProduct3(normal));
+				dgBigVector normal (mesh.FaceNormal(edge, &points[0][0], sizeof(dgBigVector)));
+				dgFloat64 mag = sqrt(normal.DotProduct(normal).GetScalar());
 
 				cluster.m_color = color;
 				cluster.m_hierachicalClusterIndex = color;
@@ -757,7 +763,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		dgBigVector maxAABB;
 		mesh.CalculateAABB (minAABB, maxAABB);
 		maxAABB -= minAABB;
-		dgFloat32 rayDiagonalLength = dgFloat32 (sqrt (maxAABB.DotProduct3(maxAABB)));
+		dgAssert(maxAABB.m_w == dgFloat32(0.0f));
+		dgFloat32 rayDiagonalLength = dgFloat32 (sqrt (maxAABB.DotProduct(maxAABB).GetScalar()));
 		m_diagonal = rayDiagonalLength;
 
 		dgBackFaceFinder backFaces(&mesh, this);
@@ -976,7 +983,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			do {
 				if (!((edge->m_twin->m_incidentFace == colorA) || (edge->m_twin->m_incidentFace == colorB))) {
 					dgBigVector p1p0(points[edge->m_twin->m_incidentVertex] - points[edge->m_incidentVertex]);
-					perimeter += sqrt(p1p0.DotProduct3(p1p0));
+					dgAssert(p1p0.m_w == dgFloat32(0.0f));
+					perimeter += sqrt(p1p0.DotProduct(p1p0).GetScalar());
 				}
 				edge = edge->m_next;
 			} while (edge != clusterFace.m_edge);
@@ -1037,7 +1045,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		bool flatStrip = true;
 		dgFloat64 tol = dgFloat64 (1.0e-5f) * m_diagonal;
 		dgHACDClusterFace& clusterFaceA = clusterA.GetFirst()->GetInfo();
-		dgBigPlane plane(clusterFaceA.m_normal, - points[clusterFaceA.m_edge->m_incidentVertex].DotProduct3(clusterFaceA.m_normal));
+		dgAssert(clusterFaceA.m_normal.m_w == dgFloat32(0.0f));
+		dgBigPlane plane(clusterFaceA.m_normal, - points[clusterFaceA.m_edge->m_incidentVertex].DotProduct(clusterFaceA.m_normal).GetScalar());
 
 		if (clusterA.GetCount() > 1) {
 			flatStrip = clusterA.IsCoplanar(plane, mesh, tol);
