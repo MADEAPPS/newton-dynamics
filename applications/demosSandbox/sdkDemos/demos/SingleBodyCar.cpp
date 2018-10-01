@@ -63,12 +63,28 @@ class SingleBodyVehicleManager: public dVehicleManager
 			}
 		}
 	}
-	
+
+	NewtonCollision* CreateChassisCollision(const DemoEntity* const carEntity, NewtonWorld* const world) const
+	{
+		DemoEntity* const chassis = carEntity->Find("car_body");
+		dAssert(chassis);
+
+		DemoMesh* const mesh = (DemoMesh*)chassis->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
+
+		dFloat* const temp = new dFloat[mesh->m_vertexCount * 3];
+		meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+		NewtonCollision* const shape = NewtonCreateConvexHull(world, mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
+		delete[] temp;
+		return shape;
+	}
+
 	DemoEntity* const LoadVisualModel (const char* const modelName)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-
+/*
 		char pathName[2048];
 		char chassisName [256];
 		sprintf (chassisName, "%s_chassis.obj", modelName);
@@ -94,29 +110,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 		scene->Append(chassisEntity);
 
 		chassisEntity->SetNameID("car_body");
+*/
 
+		DemoEntity* const entity = DemoEntity::LoadNGD_mesh (modelName, scene->GetNewton());
+		dAssert (entity);
+		scene->Append(entity);
 
-
-		return chassisEntity;
+		return entity;
 	}
-
-	NewtonCollision* CreateChassisCollision(const DemoEntity* const carEntity, NewtonWorld* const world) const
-	{
-		DemoEntity* const chassis = carEntity->Find("car_body");
-		dAssert(chassis);
-
-		DemoMesh* const mesh = (DemoMesh*)chassis->GetMesh();
-		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
-		//dAssert (chassis->GetMeshMatrix().TestIdentity());
-		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
-
-		dFloat* const temp = new dFloat[mesh->m_vertexCount * 3];
-		meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
-		NewtonCollision* const shape = NewtonCreateConvexHull(world, mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
-		delete[] temp;
-		return shape;
-	}
-
 
 	dVehicleChassis* CreateVehicle(const char* const carModelName, const dMatrix& location)
 	{
@@ -203,8 +204,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	SingleBodyVehicleManager* const manager = new SingleBodyVehicleManager(world);
 	
 	// load 
-//	dCustomVehicleController* const player = manager->LoadVehicle("simpleVehicle.txt");
-	dVehicleChassis* const player = manager->CreateVehicle("porche918", location);
+	//dVehicleChassis* const player = manager->CreateVehicle("porche918", location);
+	dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
 
 /*
 	// set this vehicle as the player
