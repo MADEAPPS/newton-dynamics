@@ -86,12 +86,12 @@ void dCustomCorkScrew::EnableAngularLimits(bool state)
 	m_options.m_option2 = state;
 }
 
-void dCustomCorkScrew::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+void dCustomCorkScrew::SetAngularSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
-	m_spring = spring;
-	m_damper = damper;
+	m_angularSpring = spring;
+	m_angularDamper = damper;
 	m_options.m_option3 = state;
-	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
+    m_angularSpringDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
 }
 
 void dCustomCorkScrew::SetAngularLimits(dFloat minDist, dFloat maxDist)
