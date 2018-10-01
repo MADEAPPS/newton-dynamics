@@ -31,6 +31,8 @@ class dVehicleNode: public dContainersAlloc
 
 	dVehicleNode* m_parent;
 	dList<dVehicleNode*> m_children;
+	dComplentaritySolver::dBodyState m_body;
+	dComplentaritySolver::dBilateralJoint* m_articulation;
 };
 
 

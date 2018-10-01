@@ -16,6 +16,8 @@
 dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 	:dContainersAlloc()
 	,m_parent(parent)
+	,m_body()
+	,m_articulation(NULL)
 {
 	if (parent) {
 		parent->m_children.Append(this);
@@ -24,6 +26,9 @@ dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 
 dVehicleNode::~dVehicleNode()
 {
+	if (m_articulation) {
+		delete m_articulation;
+	}
 	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
 		delete child->GetInfo();
 	}
