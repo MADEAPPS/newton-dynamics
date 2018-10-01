@@ -85,7 +85,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		scale[2][2] = 1.0f/40.0f;
 		scale = scale * dPitchMatrix(-dPi * 0.5f) * dYawMatrix(-dPi * 0.5f);
 		newtonMesh.ApplyTransform (&scale[0][0]);
-		newtonMesh.CalculateVertexNormals(45.0f * dDegreeToRad);
+		newtonMesh.CalculateVertexNormals(20.0f * dDegreeToRad);
 
 		DemoMesh* const chassinMesh = new DemoMesh(newtonMesh.GetMesh());
 		DemoEntity* const chassisEntity = new DemoEntity(dGetIdentityMatrix(), NULL);
