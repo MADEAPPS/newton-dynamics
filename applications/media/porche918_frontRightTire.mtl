@@ -1,0 +1,17 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 01.10.2018 07:05:11
+
+newmtl 02___Default
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.5882 0.5882 0.5882
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\julio\Downloads\61528mat0vsw-NFSHP2PorscheCarreraGT\NFSHP2 - Porsche Carrera GT\maps\0001.BMP
+	map_Kd C:\Users\julio\Downloads\61528mat0vsw-NFSHP2PorscheCarreraGT\NFSHP2 - Porsche Carrera GT\maps\0001.BMP
+	map_refl C:\Users\julio\Downloads\61528mat0vsw-NFSHP2PorscheCarreraGT\NFSHP2 - Porsche Carrera GT\maps\Map__7_Raytrace.tga

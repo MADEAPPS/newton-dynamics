@@ -2012,8 +2012,7 @@ void dgMeshEffect::EndBuildFace ()
 		dgFloat64 mag3 = n.DotProduct3(n);
 		if (mag3 < dgFloat64(DG_MESH_EFFECT_PRECISION_SCALE_INV * DG_MESH_EFFECT_PRECISION_SCALE_INV)) {
 			m_attrib.SetCount (m_constructionIndex);
-			dgAssert (0);
-//			m_points.SetCount (m_constructionIndex);
+			m_points.SetCount (m_constructionIndex);
 		}
 	}
 }
