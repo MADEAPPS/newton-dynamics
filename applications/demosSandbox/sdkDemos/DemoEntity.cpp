@@ -303,7 +303,6 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 	
 }
 
-
 DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world)
 {
 	dScene scene(world);
@@ -434,3 +433,8 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 	return entity;
 }
 
+DemoEntity* DemoEntity::LoadOBJ_mesh (const char* const fileName, NewtonWorld* const world)
+{
+	dAssert (0);
+	return NULL;
+}
