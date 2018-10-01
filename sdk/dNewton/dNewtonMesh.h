@@ -72,8 +72,6 @@ class dNewtonMesh: public dNewtonAlloc
 		CNEWTON_API void EndPolygon();
 	CNEWTON_API void EndBuild();
 
-	CNEWTON_API void LoadObjFile(const char* const fileName, char* const materialLibraryOut);
-
 	CNEWTON_API void ApplyTransform (const dFloat* const matrix);
 
 	CNEWTON_API void CreateVoronoiConvexDecomposition (const dNewtonMesh& convexMesh);

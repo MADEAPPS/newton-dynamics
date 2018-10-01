@@ -51,7 +51,7 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 
 	dBaseHierarchy* CreateClone () const;
 	static DemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world);
-	static DemoEntity* LoadOBJ_mesh (const char* const fileName, NewtonWorld* const world);
+	static DemoEntity* LoadOBJ_mesh (const char* const fileName, NewtonWorld* const world, const dMatrix& convertMatrix = dGetIdentityMatrix());
 
 	const dMatrix& GetRenderMatrix () const;
 	dMatrix CalculateGlobalMatrix (const DemoEntity* const root = NULL) const;
