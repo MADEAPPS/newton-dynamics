@@ -133,10 +133,11 @@ class dVehicleChassis: public dCustomControllerBase
 	DVEHICLE_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
-	
 	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Cleanup();
+
+	void InitRigiBody(dFloat timestep);
 	
 	dMatrix m_localFrame;
 	dVehicleSolver m_solver;
