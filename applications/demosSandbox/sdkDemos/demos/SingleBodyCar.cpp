@@ -59,17 +59,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 			for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
 				dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
 				if (tire) {
-					//dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
-					//NewtonCollision* const chassisCollision = tire->GetCollisionShape();
-					//DemoMesh* const tireMesh = new DemoMesh("chassis", chassisCollision, "metal_30.tga", "metal_30.tga", "metal_30.tga");
-					//DemoEntity* const tireEntity = new DemoEntity(tireMatrix, chassisEntity);
-					//tireEntity->SetMesh(tireMesh, dGetIdentityMatrix());
-					//tireMesh->Release();
-
-					//ent->SetMatrixUsafe(rot, transform.m_posit);
+					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
+					dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
+					dQuaternion rotation(tireMatrix);
+					tireMesh->SetMatrixUsafe(rotation, tireMatrix.m_posit);
 				}
 			}
-			//DemoEntity::TransformCallback(body, matrix, threadIndex);
 		}
 
 		dVehicleChassis* m_vehicleChassis;
