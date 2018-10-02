@@ -36,4 +36,10 @@ dMatrix dVehicleSingleBody::GetMatrix () const
 	return matrix;
 }
 
+void dVehicleSingleBody::InitRigiBody(dFloat timestep)
+{
 
+
+
+	dVehicleInterface::InitRigiBody(timestep);
+}

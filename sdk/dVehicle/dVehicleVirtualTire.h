@@ -30,6 +30,9 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
+	protected:
+	void InitRigiBody(dFloat timestep);
+
 	dTireInfo m_info;
 	dMatrix m_matrix;
 	NewtonCollision *m_tireShape;

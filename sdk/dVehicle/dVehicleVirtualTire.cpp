@@ -87,3 +87,11 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 	dMatrix trieMatrix (GetGlobalMatrix ());
 	NewtonCollisionForEachPolygonDo(m_tireShape, &trieMatrix[0][0], RenderDebugTire, debugContext);
 }
+
+void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
+{
+
+
+
+	dVehicleTireInterface::InitRigiBody(timestep);
+}

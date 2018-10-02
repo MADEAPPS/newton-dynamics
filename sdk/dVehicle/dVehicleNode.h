@@ -27,6 +27,8 @@ class dVehicleNode: public dContainersAlloc
 	DVEHICLE_API void* GetUserData();
 	DVEHICLE_API void SetUserData(void* const userData);
 	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	
+	DVEHICLE_API virtual void InitRigiBody(dFloat timestep);
 
 	virtual dVehicleInterface* GetAsVehicle() const {return NULL;} 
 	virtual dVehicleTireInterface* GetAsTire() const {return NULL;} 

@@ -25,6 +25,7 @@ class dVehicleSolver: public dContainersAlloc
 	DVEHICLE_API virtual ~dVehicleSolver();
 	DVEHICLE_API void Finalize(dVehicleChassis* const vehicle);
 
+	void Update(dFloat timestep);
 	private:
 	int CalculateNodeCount () const;
 	void SortGraph(dVehicleNode* const root, int& index);

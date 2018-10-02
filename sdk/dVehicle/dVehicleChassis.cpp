@@ -110,6 +110,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 
 void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
 {
+	m_solver.Update(timestep);
 	//	dAssert (0);
 }
 

@@ -53,3 +53,10 @@ void dVehicleNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 		child->GetInfo()->Debug(debugContext);
 	}
 }
+
+void dVehicleNode::InitRigiBody(dFloat timestep)
+{
+	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->InitRigiBody(timestep);
+	}
+}

@@ -1246,4 +1246,11 @@ void dVehicleSolver::Finalize(dVehicleChassis* const vehicle)
 		//}
 */
 	}
+
+	
+}
+
+void dVehicleSolver::Update(dFloat timestep)
+{
+	m_vehicle->GetVehicle()->InitRigiBody(timestep);
 }
