@@ -32,7 +32,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		public:
 		VehicleUserData(dVehicleChassis* const vehicle)
 			:DemoEntity::UserData()
-			,m_vehicle(vehicle)
+			,m_vehicleChassis(vehicle)
 		{
 		}
 
@@ -50,15 +50,11 @@ class SingleBodyVehicleManager: public dVehicleManager
 		{
 //			dAssert(0);
 
-			//ent->SetMatrixUsafe(rot, transform.m_posit);
-/*
-			// do the base class post update
-			dVehicleManager::UpdateTireMatrices(vehicleModel);
-
+			
 			// calculate tire Matrices
-			dVehicleInterface* const vehicle = vehicleModel->GetVehicle();
+			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
 			dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
-			DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(vehicleModel->GetBody());
+			//DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(vehicleModel->GetBody());
 
 			for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
 				dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
@@ -69,13 +65,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 					//DemoEntity* const tireEntity = new DemoEntity(tireMatrix, chassisEntity);
 					//tireEntity->SetMesh(tireMesh, dGetIdentityMatrix());
 					//tireMesh->Release();
+
+					//ent->SetMatrixUsafe(rot, transform.m_posit);
 				}
 			}
 			//DemoEntity::TransformCallback(body, matrix, threadIndex);
-*/
 		}
 
-		dVehicleChassis* m_vehicle;
+		dVehicleChassis* m_vehicleChassis;
 	};
 
 	SingleBodyVehicleManager(NewtonWorld* const world)
@@ -124,36 +121,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// destroy the auxiliary collision
 		NewtonDestroyCollision(collision);
 	}
-
-/*
-	void BindVehicleAndVisualEntity (dVehicleChassis* const chassis, DemoEntity* const chassisEntity)
-	{
-		NewtonBody* const chassiBody = chassis->GetBody();
-
-		// set the user data
-		NewtonBodySetUserData(chassiBody, chassisEntity);
-
-		// set the transform callback
-		NewtonBodySetTransformCallback(chassiBody, DemoEntity::TransformCallback);
-
-		dVehicleInterface* const vehicle = chassis->GetVehicle();
-		dMatrix chassisMatrixInv (vehicle->GetMatrix().Inverse());
-		//DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(chassis->GetBody());
-
-		for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
-			dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
-			if (tire) {
-				dMatrix tireMatrix (tire->GetGlobalMatrix() * chassisMatrixInv);
-
-				NewtonCollision* const chassisCollision = tire->GetCollisionShape();
-				DemoMesh* const tireMesh = new DemoMesh("chassis", chassisCollision, "metal_30.tga", "metal_30.tga", "metal_30.tga");
-				DemoEntity* const tireEntity = new DemoEntity(tireMatrix, chassisEntity);
-				tireEntity->SetMesh(tireMesh, dGetIdentityMatrix());
-				tireMesh->Release();
-			}
-		}
-	}
-*/
 
 	NewtonCollision* CreateChassisCollision(const DemoEntity* const carEntity, NewtonWorld* const world) const
 	{
@@ -311,63 +278,11 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio);
 
-		// create the visual representation from the collision shapes
-		//BindVehicleAndVisualEntity (vehicle, carEntity);
-
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
 		
 		return vehicle;
 	}
-/*
-	// overload the transform call back so the we can calculate the tire matrices
-	static void TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex)
-	{
-		// calculate tire Matrices
-		dVehicleInterface* const vehicle = chassis->GetVehicle();
-		dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
-		//DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(chassis->GetBody());
-
-		for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
-			dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
-			if (tire) {
-				dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
-
-				NewtonCollision* const chassisCollision = tire->GetCollisionShape();
-				DemoMesh* const tireMesh = new DemoMesh("chassis", chassisCollision, "metal_30.tga", "metal_30.tga", "metal_30.tga");
-				DemoEntity* const tireEntity = new DemoEntity(tireMatrix, chassisEntity);
-				tireEntity->SetMesh(tireMesh, dGetIdentityMatrix());
-				tireMesh->Release();
-			}
-		}
-		DemoEntity::TransformCallback (body, matrix, threadIndex);
-	}
-*/
-/*
-	void UpdateTireMatrices (dVehicleChassis* const vehicleModel) const
-	{
-		// do the base class post update
-		dVehicleManager::UpdateTireMatrices(vehicleModel);
-
-		// calculate tire Matrices
-		dVehicleInterface* const vehicle = vehicleModel->GetVehicle();
-		dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
-		DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(vehicleModel->GetBody());
-
-		for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
-			dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
-			if (tire) {
-				//dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
-				//NewtonCollision* const chassisCollision = tire->GetCollisionShape();
-				//DemoMesh* const tireMesh = new DemoMesh("chassis", chassisCollision, "metal_30.tga", "metal_30.tga", "metal_30.tga");
-				//DemoEntity* const tireEntity = new DemoEntity(tireMatrix, chassisEntity);
-				//tireEntity->SetMesh(tireMesh, dGetIdentityMatrix());
-				//tireMesh->Release();
-			}
-		}
-		//DemoEntity::TransformCallback(body, matrix, threadIndex);
-	}
-*/
 };
 
 
