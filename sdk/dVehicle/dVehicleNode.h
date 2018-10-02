@@ -24,15 +24,20 @@ class dVehicleNode: public dContainersAlloc
 	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
 	DVEHICLE_API virtual ~dVehicleNode();
 
+	DVEHICLE_API void* GetUserData();
+	DVEHICLE_API void SetUserData(void* const userData);
 	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	virtual dVehicleInterface* GetAsVehicle() const {return NULL;} 
 	virtual dVehicleTireInterface* GetAsTire() const {return NULL;} 
 
+	void* m_userData;
 	dVehicleNode* m_parent;
 	dList<dVehicleNode*> m_children;
 	dComplentaritySolver::dBodyState m_body;
 	dComplentaritySolver::dBilateralJoint* m_articulation;
+
+	int m_solverIndex;
 };
 
 

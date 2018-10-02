@@ -15,9 +15,11 @@
 
 dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 	:dContainersAlloc()
+	,m_userData(NULL)
 	,m_parent(parent)
 	,m_body()
 	,m_articulation(NULL)
+	,m_solverIndex(-1)
 {
 	if (parent) {
 		parent->m_children.Append(this);
@@ -33,6 +35,17 @@ dVehicleNode::~dVehicleNode()
 		delete child->GetInfo();
 	}
 }
+
+void* dVehicleNode::GetUserData()
+{
+	return m_userData;
+}
+
+void dVehicleNode::SetUserData(void* const userData)
+{
+	m_userData = userData;
+}
+
 
 void dVehicleNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {

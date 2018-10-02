@@ -35,6 +35,7 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 	DVEHICLE_API int GetTireMaterial() const;
 */
 
+	virtual void UpdateTireMatrices (dVehicleChassis* const vehicle) const {};
 	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 

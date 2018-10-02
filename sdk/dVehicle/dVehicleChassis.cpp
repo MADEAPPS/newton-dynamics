@@ -14,6 +14,13 @@
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
 
+dVehicleChassis::dVehicleChassis ()
+	:m_localFrame(dGetIdentityMatrix())
+	,m_solver()
+	,m_vehicle(NULL)
+{
+}
+
 void dVehicleChassis::Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 	dVehicleManager* const manager = (dVehicleManager*)GetManager();
@@ -96,10 +103,15 @@ void dVehicleChassis::Cleanup()
 	}
 }
 
-
 void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 {
 //	dAssert (0);
+}
+
+void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
+{
+	dVehicleManager* const manager = (dVehicleManager*)GetManager();
+	manager->UpdateTireMatrices(this);
 }
 
 dVehicleTireInterface* dVehicleChassis::AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
@@ -107,8 +119,12 @@ dVehicleTireInterface* dVehicleChassis::AddTire (const dVector& locationInGlobal
 	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo);
 }
 
-
 void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 	m_vehicle->Debug(debugContext);
+}
+
+void dVehicleChassis::Finalize()
+{
+	m_solver.Finalize(this);
 }
