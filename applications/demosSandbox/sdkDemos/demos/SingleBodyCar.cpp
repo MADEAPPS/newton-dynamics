@@ -27,6 +27,57 @@
 class SingleBodyVehicleManager: public dVehicleManager
 {
 	public:
+	class VehicleUserData: public DemoEntity::UserData
+	{
+		public:
+		VehicleUserData(dVehicleChassis* const vehicle)
+			:DemoEntity::UserData()
+			,m_vehicle(vehicle)
+		{
+		}
+
+		void OnRender(dFloat timestep) const
+		{
+
+		}
+
+		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
+		{
+
+		}
+
+		void OnTransformCallback(DemoEntityManager& world) const
+		{
+//			dAssert(0);
+
+			//ent->SetMatrixUsafe(rot, transform.m_posit);
+/*
+			// do the base class post update
+			dVehicleManager::UpdateTireMatrices(vehicleModel);
+
+			// calculate tire Matrices
+			dVehicleInterface* const vehicle = vehicleModel->GetVehicle();
+			dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
+			DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(vehicleModel->GetBody());
+
+			for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
+				dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
+				if (tire) {
+					//dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
+					//NewtonCollision* const chassisCollision = tire->GetCollisionShape();
+					//DemoMesh* const tireMesh = new DemoMesh("chassis", chassisCollision, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+					//DemoEntity* const tireEntity = new DemoEntity(tireMatrix, chassisEntity);
+					//tireEntity->SetMesh(tireMesh, dGetIdentityMatrix());
+					//tireMesh->Release();
+				}
+			}
+			//DemoEntity::TransformCallback(body, matrix, threadIndex);
+*/
+		}
+
+		dVehicleChassis* m_vehicle;
+	};
+
 	SingleBodyVehicleManager(NewtonWorld* const world)
 		:dVehicleManager(world)
 	{
@@ -224,6 +275,10 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat chassisMass = 1000.0f;
 		dVehicleChassis* const vehicle = CreateSingleBodyVehicle(chassisCollision, chassisMatrix, chassisMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
 
+		// save the vehicle chassis with the vehicle visual for update children matrices 
+		VehicleUserData* const renderCallback = new VehicleUserData(vehicle);
+		vehicleEntity->SetUserData(renderCallback);
+
 		// get the inteface and assig a user data;
 		dVehicleInterface* const vehicleRoot = vehicle->GetVehicle();
 		vehicleRoot->SetUserData(vehicleEntity);
@@ -237,7 +292,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// set the transform callback
 		NewtonBodySetUserData(chassisBody, vehicleEntity);
 		NewtonBodySetTransformCallback(chassisBody, DemoEntity::TransformCallback);
-
 
 //		for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
 //			m_gearMap[i] = i;
@@ -289,6 +343,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		DemoEntity::TransformCallback (body, matrix, threadIndex);
 	}
 */
+/*
 	void UpdateTireMatrices (dVehicleChassis* const vehicleModel) const
 	{
 		// do the base class post update
@@ -312,6 +367,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		}
 		//DemoEntity::TransformCallback(body, matrix, threadIndex);
 	}
+*/
 };
 
 

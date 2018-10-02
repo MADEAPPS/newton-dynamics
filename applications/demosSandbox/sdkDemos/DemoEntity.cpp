@@ -137,10 +137,15 @@ void DemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix,
 		//dQuaternion rot1(transform);
 		dQuaternion rot;
 		NewtonBodyGetRotation(body, &rot.m_q0);
-		ent->SetMatrix(*scene, rot, transform.m_posit);
+
+		scene->Lock(ent->m_lock);
+		ent->SetMatrixUsafe(rot, transform.m_posit);
+		if (ent->m_userData) {
+			ent->m_userData->OnTransformCallback(*scene);
+		}
+		scene->Unlock(ent->m_lock);
 	}
 }
-
 
 DemoMeshInterface* DemoEntity::GetMesh() const
 {
@@ -197,11 +202,8 @@ dMatrix DemoEntity::CalculateInterpolatedGlobalMatrix (const DemoEntity* const r
 	return matrix;
 }
 
-void DemoEntity::SetMatrix(DemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
+void DemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& position)
 {
-	// read the data in a critical section to prevent race condition from other thread  
-	world.Lock(m_lock);
-
 	m_curPosition = m_nextPosition;
 	m_curRotation = m_nextRotation;
 
@@ -212,6 +214,14 @@ void DemoEntity::SetMatrix(DemoEntityManager& world, const dQuaternion& rotation
 	if (angle < 0.0f) {
 		m_curRotation.Scale(-1.0f);
 	}
+}
+
+void DemoEntity::SetMatrix(DemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
+{
+	// read the data in a critical section to prevent race condition from other thread  
+	world.Lock(m_lock);
+
+	SetMatrixUsafe(rotation, position);
 
 	// release the critical section
 	world.Unlock(m_lock);

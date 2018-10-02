@@ -30,8 +30,9 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 		virtual ~UserData()
 		{
 		}
-
+		
 		virtual void OnRender (dFloat timestep) const = 0;
+		virtual void OnTransformCallback(DemoEntityManager& world) const = 0;
 		virtual void OnInterpolateMatrix (DemoEntityManager& world, dFloat param) const = 0;
 	};
 
@@ -60,6 +61,8 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	dMatrix GetCurrentMatrix () const;
 	virtual void SetMatrix(DemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 	virtual void SetNextMatrix (DemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
+
+	void SetMatrixUsafe(const dQuaternion& rotation, const dVector& position);
 
 	virtual void ResetMatrix(DemoEntityManager& world, const dMatrix& matrix);
 	virtual void InterpolateMatrix (DemoEntityManager& world, dFloat param);

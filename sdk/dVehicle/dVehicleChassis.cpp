@@ -110,8 +110,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 
 void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
 {
-	dVehicleManager* const manager = (dVehicleManager*)GetManager();
-	manager->UpdateTireMatrices(this);
+	//	dAssert (0);
 }
 
 dVehicleTireInterface* dVehicleChassis::AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
