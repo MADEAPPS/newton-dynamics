@@ -38,24 +38,25 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		void OnRender(dFloat timestep) const
 		{
-
 		}
 
 		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
 		{
-
+			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
+			for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
+				dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
+				if (tire) {
+					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
+					tireMesh->InterpolateMatrixUsafe(param);
+				}
+			}
 		}
 
 		void OnTransformCallback(DemoEntityManager& world) const
 		{
-//			dAssert(0);
-
-			
 			// calculate tire Matrices
 			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
 			dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
-			//DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(vehicleModel->GetBody());
-
 			for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
 				dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
 				if (tire) {
@@ -78,7 +79,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 	~SingleBodyVehicleManager()
 	{
 	}
-
 
 	void CalculateTireDimensions(const char* const tireName, dFloat& width, dFloat& radius, NewtonWorld* const world, DemoEntity* const vehEntity) const
 	{

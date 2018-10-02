@@ -253,27 +253,32 @@ void DemoEntity::ResetMatrix(DemoEntityManager& world, const dMatrix& matrix)
 	InterpolateMatrix (world, 0.0f);
 }
 
+void DemoEntity::InterpolateMatrixUsafe(dFloat param)
+{
+	dVector p0(m_curPosition);
+	dVector p1(m_nextPosition);
+	dQuaternion r0(m_curRotation);
+	dQuaternion r1(m_nextRotation);
+
+	dVector posit(p0 + (p1 - p0).Scale(param));
+	dQuaternion rotation(r0.Slerp(r1, param));
+
+	m_matrix = dMatrix(rotation, posit);
+}
+
+
 void DemoEntity::InterpolateMatrix (DemoEntityManager& world, dFloat param)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	world.Lock(m_lock);
 
-	dVector p0(m_curPosition);
-	dVector p1(m_nextPosition);
-	dQuaternion r0 (m_curRotation);
-	dQuaternion r1 (m_nextRotation);
-
-	// release the critical section
-	world.Unlock(m_lock);
-
-	dVector posit (p0 + (p1 - p0).Scale (param));
-	dQuaternion rotation (r0.Slerp(r1, param));
-
-	m_matrix = dMatrix (rotation, posit);
-
+	InterpolateMatrixUsafe(param);
 	if (m_userData) {
 		m_userData->OnInterpolateMatrix(world, param);
 	}
+
+	// release the critical section
+	world.Unlock(m_lock);
 }
 
 

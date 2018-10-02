@@ -62,6 +62,7 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	virtual void SetMatrix(DemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 	virtual void SetNextMatrix (DemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 
+	void InterpolateMatrixUsafe(dFloat param);
 	void SetMatrixUsafe(const dQuaternion& rotation, const dVector& position);
 
 	virtual void ResetMatrix(DemoEntityManager& world, const dMatrix& matrix);
