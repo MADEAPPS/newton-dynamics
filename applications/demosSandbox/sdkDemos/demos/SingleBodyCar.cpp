@@ -36,6 +36,45 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 	}
 
+
+	void CalculateTireDimensions(const char* const tireName, dFloat& width, dFloat& radius, NewtonWorld* const world, DemoEntity* const vehEntity) const
+	{
+		// find the the tire visual mesh 
+		DemoEntity* const tirePart = vehEntity->Find(tireName);
+		dAssert(tirePart);
+
+		// make a convex hull collision shape to assist in calculation of the tire shape size
+		DemoMesh* const tireMesh = (DemoMesh*)tirePart->GetMesh();
+		dAssert(tireMesh->IsType(DemoMesh::GetRttiType()));
+		//dAssert (tirePart->GetMeshMatrix().TestIdentity());
+		const dMatrix& meshMatrix = tirePart->GetMeshMatrix();
+		dVector* const temp = new dVector[tireMesh->m_vertexCount];
+		meshMatrix.TransformTriplex(&temp[0].m_x, sizeof (dVector), tireMesh->m_vertex, 3 * sizeof (dFloat), tireMesh->m_vertexCount);
+		NewtonCollision* const collision = NewtonCreateConvexHull(world, tireMesh->m_vertexCount, &temp[0].m_x, sizeof (dVector), 0, 0, NULL);
+		delete[] temp;
+
+		// get the location of this tire relative to the car chassis
+		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix(vehEntity));
+
+		// find the support points that can be used to define the with and high of the tire collision mesh
+		dVector extremePoint(0.0f);
+		dVector upDir(tireMatrix.UnrotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
+		NewtonCollisionSupportVertex(collision, &upDir[0], &extremePoint[0]);
+		radius = dAbs(upDir.DotProduct3(extremePoint));
+
+		dVector widthDir(tireMatrix.UnrotateVector(dVector(0.0f, 0.0f, 1.0f, 0.0f)));
+		NewtonCollisionSupportVertex(collision, &widthDir[0], &extremePoint[0]);
+		width = widthDir.DotProduct3(extremePoint);
+
+		widthDir = widthDir.Scale(-1.0f);
+		NewtonCollisionSupportVertex(collision, &widthDir[0], &extremePoint[0]);
+		width += widthDir.DotProduct3(extremePoint);
+
+		// destroy the auxiliary collision
+		NewtonDestroyCollision(collision);
+	}
+
+
 	void BindVehicleAndVisualEntity (dVehicleChassis* const chassis, DemoEntity* const chassisEntity)
 	{
 		NewtonBody* const chassiBody = chassis->GetBody();
@@ -113,14 +152,57 @@ class SingleBodyVehicleManager: public dVehicleManager
 		return entity;
 	}
 
+	//dVehicleTireInterface* AddTire(dFloat width, dFloat radius, dFloat pivotOffset, dFloat maxSteerAngle, const CarDefinition& definition)
+	dVehicleTireInterface* AddTire(dVehicleChassis* const vehicle, DemoEntity* const entity, const char* const tireName, dFloat width, dFloat radius)
+	{
+		DemoEntity* const tirePart = entity->Find(tireName);
+
+		// save the controller with the tire so that we can use it a callback 
+//		TireVehControllerSaved* const savedVehController = new TireVehControllerSaved(m_controller);
+//		tirePart->SetUserData(savedVehController);
+
+		// for simplicity, tires are position in global space
+		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix());
+
+		// add the offset to the tire position to account for suspension span
+		//tireMatrix.m_posit += m_controller->GetUpAxis().Scale (definition.m_tirePivotOffset);
+		//tireMatrix.m_posit -= vehicle->GetUpAxis().Scale(0.0f);
+
+		// add the tire to the vehicle
+		dVehicleTireInterface::dTireInfo tireInfo;
+		tireInfo.m_mass = 40.0f;
+		tireInfo.m_radio = radius;
+		tireInfo.m_width = width;
+
+		//tireInfo.m_pivotOffset = pivotOffset;
+		//tireInfo.m_maxSteeringAngle = maxSteerAngle * dDegreeToRad;
+		//tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
+		//tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
+		//tireInfo.m_suspensionLength = definition.m_tireSuspensionLength;
+		//tireInfo.m_corneringStiffness = definition.m_corneringStiffness;
+		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
+		//tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
+		//tireInfo.m_suspentionType = definition.m_tireSuspensionType;
+
+		dVehicleTireInterface* const tire = vehicle->AddTire(tireMatrix.m_posit, tireInfo);
+		// add the user data and a tire transform callback that calculate the tire local space matrix
+		//NewtonBodySetUserData(tireBody, tirePart);
+		//NewtonBodySetTransformCallback(tireBody, TireTransformCallback);
+		return tire;
+	}
+	
 	dVehicleChassis* CreateVehicle(const char* const carModelName, const dMatrix& location)
 	{
 		NewtonWorld* const world = GetWorld();
-		
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		// load vehicle visual mesh
 		DemoEntity* const carEntity = LoadVisualModel (carModelName);
 
+		// set entity world location
+		carEntity->ResetMatrix(*scene, location);
+
 		// make chassis collision shape;
-		//int chassisVertexCount = sizeof(chassisShape) / (3 * sizeof(chassisShape[0]));
 		NewtonCollision* const chassisCollision = CreateChassisCollision(carEntity, world);
 
 		// create the vehicle controller
@@ -152,19 +234,15 @@ class SingleBodyVehicleManager: public dVehicleManager
 		NewtonDestroyCollision(chassisCollision);
 
 		// add Tires
-		dVector tireLocation(location.m_posit);
-		dVehicleTireInterface::dTireInfo tireInfo;
-	
-		tireInfo.m_mass = 25.0f;
-		tireInfo.m_radio = 0.33f;
-		tireInfo.m_width = 0.36f;
-		tireInfo.m_pivotOffset = 0.0f;
-	
-		dVehicleTireInterface* const frontLeft = vehicle->AddTire(tireLocation + dVector (1.2f, 0.0f, -0.8f, 0.0f), tireInfo);
-		dVehicleTireInterface* const frontRight = vehicle->AddTire(tireLocation + dVector (1.2f, 0.0f,  0.8f, 0.0f), tireInfo);
+		dFloat width;
+		dFloat radio;
+		CalculateTireDimensions ("fl_tire", width, radio, world, carEntity);
+		dVehicleTireInterface* const frontLeft = AddTire(vehicle, carEntity, "fl_tire", width, radio);
+		dVehicleTireInterface* const frontRight = AddTire(vehicle, carEntity, "fr_tire", width, radio);
 
-		dVehicleTireInterface* const rearLeft = vehicle->AddTire(tireLocation + dVector(-1.2f, 0.0f, -0.8f, 0.0f), tireInfo);
-		dVehicleTireInterface* const rearRight = vehicle->AddTire(tireLocation + dVector(-1.2f, 0.0f, 0.8f, 0.0f), tireInfo);
+		CalculateTireDimensions ("rl_tire", width, radio, world, carEntity);
+		dVehicleTireInterface* const rearLeft = AddTire(vehicle, carEntity, "rl_tire", width, radio);
+		dVehicleTireInterface* const rearRight = AddTire(vehicle, carEntity, "rr_tire", width, radio);
 
 		// create the visual representation from the collision shapes
 		BindVehicleAndVisualEntity (vehicle, carEntity);
@@ -182,7 +260,6 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
-
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
