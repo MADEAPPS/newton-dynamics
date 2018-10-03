@@ -15,8 +15,8 @@
 #include "dVehicleVirtualTire.h"
 
 
-dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dVector& locationInGlobalSpace, const dTireInfo& info)
-	:dVehicleTireInterface(parent, locationInGlobalSpace, info)
+dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
+	:dVehicleTireInterface(parent)
 	,m_info(info)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
@@ -36,7 +36,10 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dVect
 	alignMatrix.m_right = alignMatrix.m_front.CrossProduct(alignMatrix.m_up);
 
 	m_matrix = alignMatrix * chassis->m_localFrame;
-	m_matrix.m_posit = chassis->m_localFrame.UntransformVector(chassisMatrix.UntransformVector(locationInGlobalSpace));
+	m_matrix.m_posit = chassis->m_localFrame.UntransformVector(chassisMatrix.UntransformVector(locationInGlobalSpace.m_posit));
+
+	m_bindingRotation = locationInGlobalSpace * (m_matrix * chassisMatrix).Inverse();
+	m_bindingRotation.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -77,7 +80,7 @@ dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
 
 	dMatrix chassisMatrix;
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-	return m_matrix * chassisMatrix;
+	return m_bindingRotation * m_matrix * chassisMatrix;
 }
 
 void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const

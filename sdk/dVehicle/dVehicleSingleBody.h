@@ -24,7 +24,7 @@ class dVehicleSingleBody: public dVehicleInterface
 	DVEHICLE_API virtual ~dVehicleSingleBody();
 
 	DVEHICLE_API dMatrix GetMatrix () const;
-	DVEHICLE_API dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
+	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 
 	protected:
 	void InitRigiBody(dFloat timestep);

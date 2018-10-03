@@ -105,7 +105,7 @@ void dVehicleChassis::Cleanup()
 
 
 
-dVehicleTireInterface* dVehicleChassis::AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
+dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
 {
 	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo);
 }

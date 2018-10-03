@@ -51,7 +51,7 @@ class dVehicleTireInterface: public dVehicleNode
 		//dSuspensionType m_suspentionType;
 	};
 
-	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent, const dVector& location, const dTireInfo& info);
+	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent);
 	DVEHICLE_API virtual ~dVehicleTireInterface();
 
 	virtual dVehicleTireInterface* GetAsTire() const {return (dVehicleTireInterface*) this;} 

@@ -124,7 +124,7 @@ class dVehicleChassis: public dCustomControllerBase
 	public:
 	DVEHICLE_API dVehicleChassis ();
 	dVehicleInterface* GetVehicle() {return m_vehicle;}
-	DVEHICLE_API dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
+	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 
 	DVEHICLE_API void Finalize();
 

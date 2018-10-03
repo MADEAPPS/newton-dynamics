@@ -27,7 +27,7 @@ class dVehicleInterface: public dVehicleNode
 	DVEHICLE_API virtual ~dVehicleInterface();
 
 	virtual dMatrix GetMatrix () const = 0;
-	virtual dVehicleTireInterface* AddTire (const dVector& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo) = 0;
+	virtual dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo) = 0;
 
 	DVEHICLE_API dVehicleChassis* GetChassis() const;
 	DVEHICLE_API virtual dVehicleInterface* GetAsVehicle() const {return (dVehicleInterface*)this;} 
