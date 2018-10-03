@@ -256,7 +256,7 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 	ray.m_userData = userData;
 	if (!m_userRayCastCallback) {
 		ForAllSectorsRayHit (ray, maxT, RayHit, &ray);
-		if (ray.m_t <= maxT) {
+		if (ray.m_t < maxT) {
 			maxT = ray.m_t; 
 			dgAssert (ray.m_normal.m_w == dgFloat32 (0.0f));
 			dgAssert (ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dgFloat32(0.0f));
@@ -273,7 +273,7 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 		}
 		
 		ForAllSectorsRayHit (ray, maxT, RayHitUser, &ray);
-		if (ray.m_t <= dgFloat32 (1.0f)) {
+		if (ray.m_t < dgFloat32 (1.0f)) {
 			maxT = ray.m_t; 
 			dgAssert(ray.m_normal.m_w == dgFloat32(0.0f));
 			dgAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dgFloat32(0.0f));
