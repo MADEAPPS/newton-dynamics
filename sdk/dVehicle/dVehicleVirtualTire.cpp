@@ -45,7 +45,6 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	m_bindingRotation.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 	m_tireOmega = -10.0f;
-	m_steeringAngle = 30.0f * dDegreeToRad;
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -95,6 +94,11 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 
 	dMatrix trieMatrix (GetGlobalMatrix ());
 	NewtonCollisionForEachPolygonDo(m_tireShape, &trieMatrix[0][0], RenderDebugTire, debugContext);
+}
+
+void dVehicleVirtualTire::SetSteeringAngle(dFloat steeringAngle)
+{
+	m_steeringAngle = steeringAngle;
 }
 
 void dVehicleVirtualTire::InitRigiBody(dFloat timestep)

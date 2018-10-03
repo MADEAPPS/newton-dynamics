@@ -268,6 +268,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio);
 		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio);
+frontLeft->SetSteeringAngle(25.5f * dDegreeToRad);
+frontRight->SetSteeringAngle(25.5f * dDegreeToRad);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);

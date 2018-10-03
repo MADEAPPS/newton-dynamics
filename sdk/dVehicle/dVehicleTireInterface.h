@@ -55,10 +55,11 @@ class dVehicleTireInterface: public dVehicleNode
 	DVEHICLE_API virtual ~dVehicleTireInterface();
 
 	virtual dVehicleTireInterface* GetAsTire() const {return (dVehicleTireInterface*) this;} 
-
+	
 	virtual dMatrix GetLocalMatrix () const = 0;
 	virtual dMatrix GetGlobalMatrix () const = 0;
 	virtual NewtonCollision* GetCollisionShape() const = 0;
+	virtual void SetSteeringAngle(dFloat steeringAngle) = 0;
 };
 
 
