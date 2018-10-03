@@ -199,7 +199,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		//tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 		//tireInfo.m_suspentionType = definition.m_tireSuspensionType;
 
-		dVehicleTireInterface* const tire = vehicle->AddTire(tireMatrix.m_posit, tireInfo);
+		dVehicleTireInterface* const tire = vehicle->AddTire(tireMatrix, tireInfo);
 		// add the user data and a tire transform callback that calculate the tire local space matrix
 		//NewtonBodySetUserData(tireBody, tirePart);
 		//NewtonBodySetTransformCallback(tireBody, TireTransformCallback);
