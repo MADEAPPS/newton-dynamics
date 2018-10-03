@@ -36,7 +36,10 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	dTireInfo m_info;
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-	NewtonCollision *m_tireShape;
+	NewtonCollision* m_tireShape;
+	dFloat m_tireOmega;
+	dFloat m_tireAngle;
+	dFloat m_steeringAngle;
 };
 
 

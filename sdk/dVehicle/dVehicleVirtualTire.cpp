@@ -18,6 +18,9 @@
 dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleTireInterface(parent)
 	,m_info(info)
+	,m_tireOmega(0.0f)
+	,m_tireAngle(0.0f)
+	,m_steeringAngle(0.0f)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
@@ -40,6 +43,9 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 
 	m_bindingRotation = locationInGlobalSpace * (m_matrix * chassisMatrix).Inverse();
 	m_bindingRotation.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_tireOmega = -10.0f;
+	m_steeringAngle = 30.0f * dDegreeToRad;
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -68,7 +74,7 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 
 dMatrix dVehicleVirtualTire::GetLocalMatrix () const
 {
-	return m_matrix;
+	return m_bindingRotation * dPitchMatrix(m_tireAngle) * dYawMatrix(m_steeringAngle) * m_matrix;
 }
 
 dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
@@ -80,7 +86,7 @@ dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
 
 	dMatrix chassisMatrix;
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-	return m_bindingRotation * m_matrix * chassisMatrix;
+	return GetLocalMatrix () * chassisMatrix;
 }
 
 void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -93,7 +99,7 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 
 void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 {
-
+m_tireAngle = dMod (m_tireAngle + m_tireOmega * timestep, 2.0f * dPi);
 
 
 	dVehicleTireInterface::InitRigiBody(timestep);
