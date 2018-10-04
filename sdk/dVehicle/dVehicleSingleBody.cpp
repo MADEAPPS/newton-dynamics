@@ -17,6 +17,19 @@
 dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	:dVehicleInterface(chassis)
 {
+	dVector tmp;
+	NewtonBody* const newtonBody = m_chassis->GetBody();
+	dComplentaritySolver::dBodyState* const chassisBody = GetBody();
+	
+	// set the inertia matrix;
+	NewtonBodyGetMass(newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
+	chassisBody->SetMass(tmp.m_w);
+	chassisBody->SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
+
+	dMatrix matrix (dGetIdentityMatrix());
+	NewtonBodyGetCentreOfMass(newtonBody, &matrix.m_posit[0]);
+	matrix.m_posit.m_w = 1.0f;
+	chassisBody->SetLocalMatrix(matrix);
 }
 
 dVehicleSingleBody::~dVehicleSingleBody()
@@ -38,8 +51,30 @@ dMatrix dVehicleSingleBody::GetMatrix () const
 
 void dVehicleSingleBody::InitRigiBody(dFloat timestep)
 {
+	dVector vector;
+	dMatrix matrix;
 
+	NewtonBody* const newtonBody = m_chassis->GetBody();
+	dComplentaritySolver::dBodyState* const chassisBody = GetBody();
 
+	// get data from engine rigid body and copied to the vehicle chassis body
+	NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
+	chassisBody->SetMatrix(matrix);
+
+	NewtonBodyGetVelocity(newtonBody, &vector[0]);
+	chassisBody->SetVeloc(vector);
+
+	NewtonBodyGetOmega(newtonBody, &vector[0]);
+	chassisBody->SetOmega(vector);
+
+	NewtonBodyGetForce(newtonBody, &vector[0]);
+	chassisBody->SetVeloc(vector);
+
+	NewtonBodyGetForce(newtonBody, &vector[0]);
+	chassisBody->SetForce(vector);
+
+	NewtonBodyGetTorque(newtonBody, &vector[0]);
+	chassisBody->SetTorque(vector);
 
 	dVehicleInterface::InitRigiBody(timestep);
 }

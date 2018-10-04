@@ -1222,7 +1222,7 @@ int dVehicleSolver::Factorize(dVehicleNode* const node)
 {
 //	const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray
 
-//	CalculateInertiaMatrix(node);
+	//CalculateInertiaMatrix(node);
 
 /*
 	m_ordinals = m_ordinalInit;
