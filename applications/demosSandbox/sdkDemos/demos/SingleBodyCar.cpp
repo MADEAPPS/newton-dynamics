@@ -43,7 +43,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
 		{
 			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
-			for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
+
+			const dList<dVehicleNode*>& children = vehicle->GetChildren();
+			for (dList<dVehicleNode*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
 				dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
 				if (tire) {
 					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
@@ -57,7 +59,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 			// calculate tire Matrices
 			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
 			dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
-			for (dList<dVehicleNode*>::dListNode* node = vehicle->m_children.GetFirst(); node; node = node->GetNext()) {
+
+			const dList<dVehicleNode*>& children = vehicle->GetChildren();
+			for (dList<dVehicleNode*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
 				dVehicleTireInterface* const tire = node->GetInfo()->GetAsTire();
 				if (tire) {
 					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
@@ -266,13 +270,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio);
-		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio);
-frontLeft->SetSteeringAngle(25.5f * dDegreeToRad);
-frontRight->SetSteeringAngle(25.5f * dDegreeToRad);
+//		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio);
+//		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio);
+//frontLeft->SetSteeringAngle(25.5f * dDegreeToRad);
+//frontRight->SetSteeringAngle(25.5f * dDegreeToRad);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);
+//		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle

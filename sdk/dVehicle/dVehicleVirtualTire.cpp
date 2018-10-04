@@ -18,6 +18,7 @@
 dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleTireInterface(parent)
 	,m_info(info)
+	,m_joint()
 	,m_tireOmega(0.0f)
 	,m_tireAngle(0.0f)
 	,m_steeringAngle(0.0f)
@@ -44,6 +45,8 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	m_bindingRotation = locationInGlobalSpace * (m_matrix * chassisMatrix).Inverse();
 	m_bindingRotation.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
+	m_joint.Init (&m_body, m_parent->GetBody());
+
 	m_tireOmega = -10.0f;
 }
 
@@ -57,6 +60,10 @@ NewtonCollision* dVehicleVirtualTire::GetCollisionShape() const
 	return m_tireShape;
 }
 
+dComplentaritySolver::dBilateralJoint* dVehicleVirtualTire::GetJoint()
+{
+	return &m_joint;
+}
 
 void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id)
 {

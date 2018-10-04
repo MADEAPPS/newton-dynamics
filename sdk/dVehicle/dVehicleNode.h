@@ -30,16 +30,23 @@ class dVehicleNode: public dContainersAlloc
 	
 	DVEHICLE_API virtual void InitRigiBody(dFloat timestep);
 
-	virtual dVehicleInterface* GetAsVehicle() const {return NULL;} 
-	virtual dVehicleTireInterface* GetAsTire() const {return NULL;} 
+	dVehicleNode* GetParent() const {return m_parent;}
+	const dList<dVehicleNode*>& GetChildren() const {return m_children;}
 
+	virtual dComplentaritySolver::dBodyState* GetBody() {return &m_body;}
+	virtual dComplentaritySolver::dBilateralJoint* GetJoint() {return NULL;}
+
+	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
+	virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
+
+	protected:	
 	void* m_userData;
 	dVehicleNode* m_parent;
 	dList<dVehicleNode*> m_children;
 	dComplentaritySolver::dBodyState m_body;
-	dComplentaritySolver::dBilateralJoint* m_articulation;
-
 	int m_solverIndex;
+
+	friend class dVehicleSolver;
 };
 
 

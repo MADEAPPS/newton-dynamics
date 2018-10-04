@@ -26,13 +26,20 @@ class dVehicleSolver: public dContainersAlloc
 	DVEHICLE_API void Finalize(dVehicleChassis* const vehicle);
 
 	void Update(dFloat timestep);
+
 	private:
 	int CalculateNodeCount () const;
 	void SortGraph(dVehicleNode* const root, int& index);
 
-//	dVehicleNode* m_root;
+	void InitMassMatrix();
+	int Factorize(dVehicleNode* const node);
+	void CalculateInertiaMatrix(dVehicleNode* const node) const;
+
 	dVehicleChassis* m_vehicle;
 	dVehicleNode** m_nodesOrder;
+
+	// cache temporary variables
+	dSpatialMatrix* m_bodyMassArray;
 	int m_nodeCount;
 };
 

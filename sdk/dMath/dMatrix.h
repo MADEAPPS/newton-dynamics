@@ -15,10 +15,8 @@
 
 #include "dVector.h"
 
-class dMatrix ;
+class dMatrix;
 class dQuaternion;
-
-// small but fully operational 4x4 matrix class
 class dQuaternion;
 
 dMatrix dGetZeroMatrix ();

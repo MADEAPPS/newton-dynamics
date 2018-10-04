@@ -18,7 +18,6 @@ dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 	,m_userData(NULL)
 	,m_parent(parent)
 	,m_body()
-	,m_articulation(NULL)
 	,m_solverIndex(-1)
 {
 	if (parent) {
@@ -28,9 +27,6 @@ dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 
 dVehicleNode::~dVehicleNode()
 {
-	if (m_articulation) {
-		delete m_articulation;
-	}
 	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
 		delete child->GetInfo();
 	}

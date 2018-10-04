@@ -166,14 +166,16 @@ void dComplentaritySolver::dBodyState::GetInertia (dFloat& Ixx, dFloat& Iyy, dFl
 	Izz = m_localInertia[2];
 }
 
-
+const dMatrix& dComplentaritySolver::dBodyState::GetInertia() const
+{
+	return m_inertia;
+}
 
 void dComplentaritySolver::dBodyState::SetMatrix (const dMatrix& matrix)
 {
 	m_matrix = matrix;
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 }
-
 
 const dMatrix& dComplentaritySolver::dBodyState::GetMatrix () const
 {
@@ -291,7 +293,6 @@ void dComplentaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
 #endif
 }
 
-
 void dComplentaritySolver::dBodyState::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
 	dVector accel = (m_veloc - veloc).Scale(invTimestep);
@@ -301,8 +302,6 @@ void dComplentaritySolver::dBodyState::ApplyNetForceAndTorque (dFloat invTimeste
 	alpha = m_matrix.UnrotateVector(alpha);
 	m_externalTorque = m_matrix.RotateVector(alpha * m_localInertia);
 }
-
-
 
 void dComplentaritySolver::dBilateralJoint::Init(dBodyState* const state0, dBodyState* const state1)
 {
@@ -315,7 +314,6 @@ void dComplentaritySolver::dBilateralJoint::Init(dBodyState* const state0, dBody
 	m_state0 = state0;
 	m_state1 = state1;
 }
-
 
 void dComplentaritySolver::dBilateralJoint::InitPointParam (dPointDerivativeParam& param, const dVector& pivot) const
 {

@@ -18,6 +18,14 @@
 
 class dVehicleVirtualTire: public dVehicleTireInterface
 {
+	class dTireJoint: public dComplentaritySolver::dBilateralJoint
+	{
+		public:
+		void JacobianDerivative(dComplentaritySolver::dParamInfo* const constraintParams){};
+		void UpdateSolverForces(const dComplentaritySolver::dJacobianPair* const jacobians) const{};
+	};
+
+
 	public:
 	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleVirtualTire();
@@ -29,14 +37,17 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 
 	DVEHICLE_API void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
+	
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
 	protected:
 	void InitRigiBody(dFloat timestep);
+	dComplentaritySolver::dBilateralJoint* GetJoint();
 
 	dTireInfo m_info;
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
+	dTireJoint m_joint;
 	NewtonCollision* m_tireShape;
 	dFloat m_tireOmega;
 	dFloat m_tireAngle;

@@ -223,6 +223,8 @@ class dComplentaritySolver
 		void SetInertia (dFloat Ixx, dFloat Iyy, dFloat Izz);
 		void GetInertia (dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
+		const dMatrix& GetInertia() const; 
+
 		void SetVeloc (const dVector& veloc);
 		void SetOmega (const dVector& omega);
 		const dVector& GetOmega() const; 

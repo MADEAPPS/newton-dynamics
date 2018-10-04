@@ -104,7 +104,7 @@ enum dEulerAngleOrder
 	RPY = (2 << 8) + (0 << 4) + (1 << 0),
 };
 
-#define dAlloca(type, size) (type*) alloca ((size) * sizeof (type))
+#define dAlloca(type,size) (type*) alloca ((size) * sizeof (type))
 
 template <class T>
 T dAbs(T A)

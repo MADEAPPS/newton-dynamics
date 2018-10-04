@@ -64,28 +64,11 @@
 #include <stdlib.h>
 #include <Newton.h>
 
-/*
-#include <dCustomJoint.h>
-#include <dCustom6dof.h>
-#include <dCustomGear.h>
-#include <dCustomHinge.h>
-#include <dCustomWheel.h>
-#include <dCustomSlider.h>
-#include <dCustomPulley.h>
-#include <dCustomCorkScrew.h>
-#include <dCustomDoubleHinge.h>
-#include <dCustomInputManager.h>
-#include <dCustomBallAndSocket.h>
-#include <dCustomHingeActuator.h>
-#include <dCustomRackAndPinion.h>
-#include <dCustomSliderActuator.h>
-#include <dCustomTriggerManager.h>
-#include <dCustomTransformManager.h>
-#include <dCustomControllerManager.h>
-#include <dCustomDoubleHingeActuator.h>
-#include <dCustomPlayerControllerManager.h>
-#include <dCustomVehicleControllerManager.h>
-*/
+#include <dStdAfxMath.h>
+#include <dMathDefines.h>
+#include <dVector.h>
+#include <dMatrix.h>
+#include <dLinearAlgebra.h>
 
 #include <dCustomJointLibraryStdAfx.h>
 #include <dCustomAlloc.h>

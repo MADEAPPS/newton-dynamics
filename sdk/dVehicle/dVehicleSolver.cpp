@@ -110,22 +110,6 @@ public:
 		}
 	}
 
-	DG_INLINE void CalculateInertiaMatrix(dgSpatialMatrix* const bodyMassArray) const
-	{
-		dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
-
-		bodyMass = dgSpatialMatrix(dgFloat32(0.0f));
-		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
-			const dgFloat32 mass = m_body->GetMass().m_w;
-			dgMatrix inertia(m_body->CalculateInertiaMatrix());
-			for (dgInt32 i = 0; i < 3; i++) {
-				bodyMass[i][i] = mass;
-				for (dgInt32 j = 0; j < 3; j++) {
-					bodyMass[i + 3][j + 3] = inertia[i][j];
-				}
-			}
-		}
-	}
 
 	DG_INLINE void GetJacobians(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const jointMassArray)
 	{
@@ -162,62 +146,6 @@ public:
 		}
 	}
 
-	//DG_INLINE dgInt32 Factorize(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
-	dgInt32 Factorize(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
-	{
-		CalculateInertiaMatrix(bodyMassArray);
-
-		m_ordinals = m_ordinalInit;
-		dgInt32 boundedDof = 0;
-		if (m_joint) {
-			dgAssert(m_parent);
-			const dgJointInfo* const jointInfo = &jointInfoArray[m_joint->m_index];
-			dgAssert(jointInfo->m_joint == m_joint);
-
-			m_dof = 0;
-			dgInt32 count = jointInfo->m_pairCount;
-			const dgInt32 first = jointInfo->m_pairStart;
-			for (dgInt32 i = 0; i < count; i++) {
-				dgInt32 k = m_sourceJacobianIndex[i];
-				const dgRightHandSide* const rhs = &rightHandSide[k + first];
-				if ((rhs->m_lowerBoundFrictionCoefficent <= dgFloat32(-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32(DG_LCP_MAX_VALUE))) {
-					m_dof++;
-				}
-				else {
-					dgSwap(m_sourceJacobianIndex[i], m_sourceJacobianIndex[count - 1]);
-					i--;
-					count--;
-				}
-			}
-			dgAssert(m_dof > 0);
-			dgAssert(m_dof <= 6);
-			boundedDof += jointInfo->m_pairCount - count;
-			GetJacobians(jointInfo, leftHandSide, rightHandSide, jointMassArray);
-		}
-
-		dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
-		const dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
-		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
-			for (dgNode* child = m_child; child; child = child->m_sibling) {
-				CalculateBodyDiagonal(child, bodyMassArray, jointMassArray);
-			}
-			bodyInvMass = bodyMass.Inverse(6);
-		}
-		else {
-			bodyInvMass = dgSpatialMatrix(dgFloat32(0.0f));
-		}
-
-		if (m_joint) {
-			dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
-			dgAssert(m_parent);
-			for (dgInt32 i = 0; i < m_dof; i++) {
-				bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
-			}
-			CalculateJointDiagonal(bodyMassArray, jointMassArray);
-			CalculateJacobianBlock();
-		}
-		return boundedDof;
-	}
 
 	DG_INLINE void CalculateBodyDiagonal(dgNode* const child, dgSpatialMatrix* const bodyMassArray, const dgSpatialMatrix* const jointMassArray)
 	{
@@ -1252,5 +1180,150 @@ void dVehicleSolver::Finalize(dVehicleChassis* const vehicle)
 
 void dVehicleSolver::Update(dFloat timestep)
 {
+	dVehicleNode* const root = m_vehicle->GetVehicle();
+	if (!root->m_children.GetCount()) {
+		return;
+	}
+
 	m_vehicle->InitRigiBody(timestep);
+
+	m_bodyMassArray = dAlloca (dSpatialMatrix, m_nodeCount);
+	
+	InitMassMatrix();
+}
+
+
+void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
+{
+//	dSpatialMatrix* const bodyMassArray) const
+
+	dSpatialMatrix& bodyMass = m_bodyMassArray[node->m_solverIndex];
+
+	bodyMass = dSpatialMatrix(dFloat32(0.0f));
+	dComplentaritySolver::dBodyState* const body = node->GetBody();
+
+	dAssert (body->GetInvMass() != dFloat32(0.0f));
+
+	const dFloat32 mass = body->GetMass();
+	const dMatrix& inertia = body->GetInertia();
+/*
+	for (dgInt32 i = 0; i < 3; i++) {
+		bodyMass[i][i] = mass;
+		for (dgInt32 j = 0; j < 3; j++) {
+			bodyMass[i + 3][j + 3] = inertia[i][j];
+		}
+	}
+*/
+
+}
+
+
+int dVehicleSolver::Factorize(dVehicleNode* const node)
+{
+//	const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray
+
+//	CalculateInertiaMatrix(node);
+
+/*
+	m_ordinals = m_ordinalInit;
+	dgInt32 boundedDof = 0;
+
+	dComplentaritySolver::dBilateralJoint* const joint = node->GetJoint();
+	//dComplentaritySolver::dBilateralJoint* const joint = node->GetJoint();
+	//dAssert (joint);
+
+	if (m_joint) {
+		dgAssert(m_parent);
+		const dgJointInfo* const jointInfo = &jointInfoArray[m_joint->m_index];
+		dgAssert(jointInfo->m_joint == m_joint);
+
+		m_dof = 0;
+		dgInt32 count = jointInfo->m_pairCount;
+		const dgInt32 first = jointInfo->m_pairStart;
+		for (dgInt32 i = 0; i < count; i++) {
+			dgInt32 k = m_sourceJacobianIndex[i];
+			const dgRightHandSide* const rhs = &rightHandSide[k + first];
+			if ((rhs->m_lowerBoundFrictionCoefficent <= dgFloat32(-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32(DG_LCP_MAX_VALUE))) {
+				m_dof++;
+			}
+			else {
+				dgSwap(m_sourceJacobianIndex[i], m_sourceJacobianIndex[count - 1]);
+				i--;
+				count--;
+			}
+		}
+		dgAssert(m_dof > 0);
+		dgAssert(m_dof <= 6);
+		boundedDof += jointInfo->m_pairCount - count;
+		GetJacobians(jointInfo, leftHandSide, rightHandSide, jointMassArray);
+	}
+
+	dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
+	const dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
+	if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
+		for (dgNode* child = m_child; child; child = child->m_sibling) {
+			CalculateBodyDiagonal(child, bodyMassArray, jointMassArray);
+		}
+		bodyInvMass = bodyMass.Inverse(6);
+	}
+	else {
+		bodyInvMass = dgSpatialMatrix(dgFloat32(0.0f));
+	}
+
+	if (m_joint) {
+		dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
+		dgAssert(m_parent);
+		for (dgInt32 i = 0; i < m_dof; i++) {
+			bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
+		}
+		CalculateJointDiagonal(bodyMassArray, jointMassArray);
+		CalculateJacobianBlock();
+	}
+	return boundedDof;
+*/
+return 0;
+}
+
+
+void dVehicleSolver::InitMassMatrix()
+{
+//	const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide
+/*
+	dgInt32 rowCount = 0;
+	
+	m_leftHandSide = leftHandSide;
+	m_rightHandSide = rightHandSide;
+	dgSpatialMatrix* const bodyMassArray = dgAlloca(dgSpatialMatrix, m_nodeCount);
+	dgSpatialMatrix* const jointMassArray = dgAlloca(dgSpatialMatrix, m_nodeCount);
+*/
+	int auxiliaryCount = 0;
+
+	dAssert (m_nodesOrder);
+	for (int i = 0; i < m_nodeCount - 1; i++) {
+		dVehicleNode* const node = m_nodesOrder[i];
+		//const dgJointInfo& info = jointInfoArray[node->m_joint->m_index];
+//		rowCount += info.m_pairCount;
+//		auxiliaryCount += node->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+		auxiliaryCount += Factorize(node);
+	}
+//	m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+	
+/*
+	m_rowCount = dgInt16(rowCount);
+	m_auxiliaryRowCount = dgInt16(auxiliaryCount);
+
+	dgInt32 loopRowCount = 0;
+	const dgInt32 loopCount = m_loopCount + m_selfContactCount;
+	for (dgInt32 j = 0; j < loopCount; j++) {
+		const dgConstraint* const joint = m_loopingJoints[j];
+		loopRowCount += jointInfoArray[joint->m_index].m_pairCount;
+	}
+	m_loopRowCount = dgInt16(loopRowCount);
+	m_rowCount += m_loopRowCount;
+	m_auxiliaryRowCount += m_loopRowCount;
+
+	if (m_auxiliaryRowCount) {
+		InitLoopMassMatrix(jointInfoArray);
+	}
+*/
 }
