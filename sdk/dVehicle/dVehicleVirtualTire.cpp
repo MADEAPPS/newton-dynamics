@@ -25,14 +25,14 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
-	NewtonBody* const chassisBody = chassis->GetBody();
-	NewtonWorld* const world = NewtonBodyGetWorld(chassisBody);
+	NewtonBody* const newtonBody = chassis->GetBody();
+	NewtonWorld* const world = NewtonBodyGetWorld(newtonBody);
 
 	m_tireShape = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
 
 	dMatrix chassisMatrix;
-	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+	NewtonBodyGetMatrix(newtonBody, &chassisMatrix[0][0]);
 
 	dMatrix alignMatrix(dGetIdentityMatrix());
 	alignMatrix.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);
@@ -44,6 +44,17 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 
 	m_bindingRotation = locationInGlobalSpace * (m_matrix * chassisMatrix).Inverse();
 	m_bindingRotation.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	dVector com;
+	dVector inertia(0.0f);
+	NewtonConvexCollisionCalculateInertialMatrix(m_tireShape, &inertia[0], &com[0]);
+	// simplify calculation by making wheel inertia spherical
+	inertia = dVector(m_info.m_mass * dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z));
+
+	dComplentaritySolver::dBodyState* const chassisBody = GetBody();
+	chassisBody->SetMass(m_info.m_mass);
+	chassisBody->SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
+	chassisBody->UpdateInertia();
 
 	m_joint.Init (&m_body, m_parent->GetBody());
 
@@ -110,8 +121,12 @@ void dVehicleVirtualTire::SetSteeringAngle(dFloat steeringAngle)
 
 void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 {
-m_tireAngle = dMod (m_tireAngle + m_tireOmega * timestep, 2.0f * dPi);
+	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
+	dVehicleChassis* const chassis = chassisNode->GetChassis();
+	NewtonBody* const newtonBody = chassis->GetBody();
 
 
 	dVehicleTireInterface::InitRigiBody(timestep);
+
+m_tireAngle = dMod(m_tireAngle + m_tireOmega * timestep, 2.0f * dPi);
 }
