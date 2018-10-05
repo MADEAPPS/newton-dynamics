@@ -338,27 +338,14 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 {
 	int index = constraintParams->m_count;
 
+	dAssert(dir.m_w == 0.0f);
 	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
-	dVector r0CrossDir (param.m_r0.CrossProduct(dir));
-	jacobian0.m_linear[0] = dir.m_x;
-	jacobian0.m_linear[1] = dir.m_y;
-	jacobian0.m_linear[2] = dir.m_z;
-	jacobian0.m_linear[3] = dFloat (0.0f);
-	jacobian0.m_angular[0] = r0CrossDir.m_x;
-	jacobian0.m_angular[1] = r0CrossDir.m_y;
-	jacobian0.m_angular[2] = r0CrossDir.m_z;
-	jacobian0.m_angular[3] = 0.0f;
+	jacobian0.m_linear = dir;
+	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
 
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_IM1; 
-	dVector r1CrossDir (dir.CrossProduct(param.m_r1));
-	jacobian1.m_linear[0] = -dir.m_x;
-	jacobian1.m_linear[1] = -dir.m_y;
-	jacobian1.m_linear[2] = -dir.m_z;
-	jacobian1.m_linear[3] = dFloat (0.0f);
-	jacobian1.m_angular[0] = r1CrossDir.m_x;
-	jacobian1.m_angular[1] = r1CrossDir.m_y;
-	jacobian1.m_angular[2] = r1CrossDir.m_z;
-	jacobian1.m_angular[3] = 0.0f;
+	jacobian1.m_linear = dir.Scale (-1.0f);
+	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
 
 //	dVector velocError (param.m_veloc1 - param.m_veloc0);
 //	dVector positError (param.m_posit1 - param.m_posit0);
@@ -393,7 +380,7 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 	constraintParams->m_jointAccel[index] = accelError + relCentr;
 */
 	constraintParams->m_jointAccel[index] = - (accel.m_x + accel.m_y + accel.m_z);
-dTrace(("%f\n", constraintParams->m_jointAccel[index]));
+//dTrace(("l->%f\n", constraintParams->m_jointAccel[index]));
 	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
@@ -402,31 +389,24 @@ dTrace(("%f\n", constraintParams->m_jointAccel[index]));
 void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, const dVector& dirOmega, dFloat jointAngle)
 {
 	int index = constraintParams->m_count;
-	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
+	dAssert(dir.m_w == 0.0f);
 
-	jacobian0.m_linear[0] = 0.0f;
-	jacobian0.m_linear[1] = 0.0f;
-	jacobian0.m_linear[2] = 0.0f;
-	jacobian0.m_linear[3] = 0.0f;
-	jacobian0.m_angular[0] = dir.m_x;
-	jacobian0.m_angular[1] = dir.m_y;
-	jacobian0.m_angular[2] = dir.m_z;
-	jacobian0.m_angular[3] = 0.0f;
+	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
+	jacobian0.m_linear = dVector(0.0f);
+	jacobian0.m_angular = dir;
 
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_IM1; 
-	jacobian1.m_linear[0] = 0.0f;
-	jacobian1.m_linear[1] = 0.0f;
-	jacobian1.m_linear[2] = 0.0f;
-	jacobian1.m_linear[3] = 0.0f;
-	jacobian1.m_angular[0] = -dir.m_x;
-	jacobian1.m_angular[1] = -dir.m_y;
-	jacobian1.m_angular[2] = -dir.m_z;
-	jacobian1.m_angular[3] = 0.0f;
+	jacobian1.m_linear = dVector(0.0f);
+	jacobian1.m_angular = dir.Scale (1.0f);
 
 	const dVector& omega0 = m_state0->m_omega;
 	const dVector& omega1 = m_state1->m_omega;
-	dFloat omegaError = (omega1 - omega0).DotProduct3(dir);
 
+	dVector j01_angular(dirOmega.CrossProduct(jacobian0.m_angular));
+	dVector j10_angular(dirOmega.CrossProduct(jacobian1.m_angular));
+	const dVector accel(j01_angular * omega0 + j10_angular * omega1);
+/*
+	dFloat omegaError = (omega1 - omega0).DotProduct3(dir);
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 	dFloat dt = constraintParams->m_timestep;
 	dFloat ks = COMPLEMENTARITY_POS_DAMP;
@@ -439,6 +419,9 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	m_rowIsMotor[index] = false;
 	m_motorAcceleration[index] = 0.0f;
 	constraintParams->m_jointAccel[index] = alphaError;
+*/
+	constraintParams->m_jointAccel[index] = -(accel.m_x + accel.m_y + accel.m_z);
+dTrace(("a->%f\n", constraintParams->m_jointAccel[index]));
 	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
