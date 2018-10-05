@@ -33,7 +33,10 @@ class dVehicleSolver: public dContainersAlloc
 
 	void InitMassMatrix();
 	int Factorize(dVehicleNode* const node);
+	int BuildJacobianMatrix(dFloat timestep);
+
 	void CalculateInertiaMatrix(dVehicleNode* const node) const;
+	
 
 	dVehicleChassis* m_vehicle;
 	dVehicleNode** m_nodesOrder;

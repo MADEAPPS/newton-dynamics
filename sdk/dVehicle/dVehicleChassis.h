@@ -142,7 +142,9 @@ class dVehicleChassis: public dCustomControllerBase
 	dMatrix m_localFrame;
 	dVehicleSolver m_solver;
 	dVehicleInterface* m_vehicle;
-	dList<dComplentaritySolver::dBilateralJoint*> m_loopJoints;
+	dList<dComplementaritySolver::dBilateralJoint*> m_loopJoints;
+
+	dVector m_gravity;
 
 	friend class dVehicleSolver;
 	friend class dVehicleManager;

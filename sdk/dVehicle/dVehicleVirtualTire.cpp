@@ -14,12 +14,13 @@
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualTire.h"
 
-
 dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleTireInterface(parent)
 	,m_info(info)
 	,m_joint()
-	,m_tireOmega(0.0f)
+	,m_omega(0.0f)
+	,m_speed(0.0f)
+	,m_position(0.0f)
 	,m_tireAngle(0.0f)
 	,m_steeringAngle(0.0f)
 {
@@ -51,14 +52,16 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	// simplify calculation by making wheel inertia spherical
 	inertia = dVector(m_info.m_mass * dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z));
 
-	dComplentaritySolver::dBodyState* const chassisBody = GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
 	chassisBody->SetMass(m_info.m_mass);
 	chassisBody->SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
 	chassisBody->UpdateInertia();
 
+	// set the tire joint
 	m_joint.Init (&m_body, m_parent->GetBody());
+	m_joint.m_tire = this;
 
-	m_tireOmega = -10.0f;
+m_omega = -10.0f;
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -71,7 +74,7 @@ NewtonCollision* dVehicleVirtualTire::GetCollisionShape() const
 	return m_tireShape;
 }
 
-dComplentaritySolver::dBilateralJoint* dVehicleVirtualTire::GetJoint()
+dComplementaritySolver::dBilateralJoint* dVehicleVirtualTire::GetJoint()
 {
 	return &m_joint;
 }
@@ -89,9 +92,16 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 	}
 }
 
+dMatrix dVehicleVirtualTire::GetHardpointMatrix () const
+{
+	dMatrix matrix(dYawMatrix(m_steeringAngle) * m_matrix);
+	matrix.m_posit += m_matrix.m_up.Scale(m_position);
+	return matrix;
+}
+
 dMatrix dVehicleVirtualTire::GetLocalMatrix () const
 {
-	return m_bindingRotation * dPitchMatrix(m_tireAngle) * dYawMatrix(m_steeringAngle) * m_matrix;
+	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix();
 }
 
 dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
@@ -101,9 +111,9 @@ dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
 	NewtonBody* const chassisBody = chassis->GetBody();
 
-	dMatrix chassisMatrix;
-	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-	return GetLocalMatrix () * chassisMatrix;
+	dMatrix newtonBody;
+	NewtonBodyGetMatrix(chassisBody, &newtonBody[0][0]);
+	return GetLocalMatrix () * newtonBody;
 }
 
 void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -124,9 +134,67 @@ void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
 	NewtonBody* const newtonBody = chassis->GetBody();
+	dComplementaritySolver::dBodyState* const tireBody = GetBody();
 
+	dMatrix tireMatrix;
+	NewtonBodyGetMatrix(newtonBody, &tireMatrix[0][0]);
+
+	tireMatrix = GetHardpointMatrix () * tireMatrix;
+	tireBody->SetMatrix(tireMatrix);
+
+	dVector veloc(0.0f);
+	NewtonBodyGetPointVelocity (newtonBody, &tireMatrix.m_posit.m_x, &veloc[0]);
+	tireBody->SetVeloc(veloc + tireMatrix.m_up.Scale(m_speed));
+
+	NewtonBodyGetOmega(newtonBody, &veloc[0]);
+	tireBody->SetOmega(veloc + tireMatrix.m_front.Scale(m_omega));
+
+	tireBody->SetForce(chassis->m_gravity.Scale (tireBody->GetMass()));
+	tireBody->SetTorque(dVector (0.0f));
 
 	dVehicleTireInterface::InitRigiBody(timestep);
 
-m_tireAngle = dMod(m_tireAngle + m_tireOmega * timestep, 2.0f * dPi);
+m_tireAngle = dMod(m_tireAngle + m_omega * timestep, 2.0f * dPi);
+}
+
+
+void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	// Restrict the movement on the pivot point along all two orthonormal direction
+	dComplementaritySolver::dBodyState* const tire = m_state0;
+	//dComplementaritySolver::dBodyState* const chassis = m_state1;
+
+	//dMatrix tireMatrix (tire->GetMatrix());
+	//tireMatrix.m_up = chassis->GetMatrix().m_up;
+	//tireMatrix.m_right = tireMatrix.m_front.CrossProduct(tireMatrix.m_up);
+
+	const dMatrix& tireMatrix = tire->GetMatrix();
+
+	// lateral force
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front);
+
+	// longitudinal force
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+
+	// angular constraints	
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, 0.0f);
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, 0.0f);
+
+/*
+	// dry rolling friction (for now contact, bu it should be a function of the tire angular velocity)
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian(constraintParams, tire->m_matrix[0], 0.0f);
+	constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
+	constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
+
+	// check if the brakes are applied
+	if (tire->m_brakeTorque > 1.0e-3f) {
+		// brake is on override rolling friction value
+		constraintParams->m_jointLowFriction[index] = -tire->m_brakeTorque;
+		constraintParams->m_jointHighFriction[index] = tire->m_brakeTorque;
+	}
+
+	// clear the input variable after there are res
+	tire->m_brakeTorque = 0.0f;
+*/
 }

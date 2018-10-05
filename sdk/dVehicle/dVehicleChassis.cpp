@@ -47,6 +47,8 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 	dAssert(m_localFrame.TestOrthogonal());
 
+	m_gravity = dVector (0.0f, -dAbs(gravityMag), 0.0f, 0.0f);
+
 /*
 	m_speed = 0.0f;
 	m_sideSlip = 0.0f;

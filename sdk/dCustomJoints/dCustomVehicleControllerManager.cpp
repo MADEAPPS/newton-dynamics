@@ -1992,8 +1992,8 @@ void dCustomVehicleController::CalculateSuspensionForces(dFloat timestep)
 	dVector chassisTorque(0.0f);
 
 	const int maxSize = 64;
-	dComplentaritySolver::dJacobianPair m_jt[maxSize];
-	dComplentaritySolver::dJacobianPair m_jInvMass[maxSize];
+	dComplementaritySolver::dJacobianPair m_jt[maxSize];
+	dComplementaritySolver::dJacobianPair m_jInvMass[maxSize];
 	dWheelJoint* tires[maxSize];
 	dFloat accel[maxSize];
 	dFloat massMatrix[maxSize * maxSize];

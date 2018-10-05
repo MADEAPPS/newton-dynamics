@@ -276,8 +276,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 //frontRight->SetSteeringAngle(25.5f * dDegreeToRad);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
-//		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);
-		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio);
+		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);
+//		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();

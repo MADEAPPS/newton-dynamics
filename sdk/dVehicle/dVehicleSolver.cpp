@@ -1130,7 +1130,7 @@ void dVehicleSolver::Finalize(dVehicleChassis* const vehicle)
 	SortGraph(root, index);
 	dAssert(index == m_nodeCount);
 
-	const dList<dComplentaritySolver::dBilateralJoint*>& loopJoints = m_vehicle->m_loopJoints;
+	const dList<dComplementaritySolver::dBilateralJoint*>& loopJoints = m_vehicle->m_loopJoints;
 	if (loopJoints.GetCount()) {
 		dAssert (0);
 /*
@@ -1174,23 +1174,8 @@ void dVehicleSolver::Finalize(dVehicleChassis* const vehicle)
 		//}
 */
 	}
-
-	
 }
 
-void dVehicleSolver::Update(dFloat timestep)
-{
-	dVehicleNode* const root = m_vehicle->GetVehicle();
-	if (!root->m_children.GetCount()) {
-		return;
-	}
-
-	m_vehicle->InitRigiBody(timestep);
-
-	m_bodyMassArray = dAlloca (dSpatialMatrix, m_nodeCount);
-	
-	InitMassMatrix();
-}
 
 
 void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
@@ -1200,21 +1185,19 @@ void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
 	dSpatialMatrix& bodyMass = m_bodyMassArray[node->m_solverIndex];
 
 	bodyMass = dSpatialMatrix(dFloat32(0.0f));
-	dComplentaritySolver::dBodyState* const body = node->GetBody();
+	dComplementaritySolver::dBodyState* const body = node->GetBody();
 
 	dAssert (body->GetInvMass() != dFloat32(0.0f));
 
 	const dFloat32 mass = body->GetMass();
 	const dMatrix& inertia = body->GetInertia();
-/*
-	for (dgInt32 i = 0; i < 3; i++) {
+
+	for (int i = 0; i < 3; i++) {
 		bodyMass[i][i] = mass;
-		for (dgInt32 j = 0; j < 3; j++) {
+		for (int j = 0; j < 3; j++) {
 			bodyMass[i + 3][j + 3] = inertia[i][j];
 		}
 	}
-*/
-
 }
 
 
@@ -1222,14 +1205,14 @@ int dVehicleSolver::Factorize(dVehicleNode* const node)
 {
 //	const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray
 
-	//CalculateInertiaMatrix(node);
+	CalculateInertiaMatrix(node);
 
 /*
 	m_ordinals = m_ordinalInit;
 	dgInt32 boundedDof = 0;
 
-	dComplentaritySolver::dBilateralJoint* const joint = node->GetJoint();
-	//dComplentaritySolver::dBilateralJoint* const joint = node->GetJoint();
+	dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
+	//dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 	//dAssert (joint);
 
 	if (m_joint) {
@@ -1306,7 +1289,8 @@ void dVehicleSolver::InitMassMatrix()
 //		auxiliaryCount += node->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
 		auxiliaryCount += Factorize(node);
 	}
-//	m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+	//m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+	Factorize(m_nodesOrder[m_nodeCount - 1]);
 	
 /*
 	m_rowCount = dgInt16(rowCount);
@@ -1326,4 +1310,97 @@ void dVehicleSolver::InitMassMatrix()
 		InitLoopMassMatrix(jointInfoArray);
 	}
 */
+}
+
+
+int dVehicleSolver::BuildJacobianMatrix(dFloat timestep)
+{
+//	int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray, int maxRowCount
+
+	int rowCount = 0;
+
+	dComplementaritySolver::dParamInfo constraintParams;
+	constraintParams.m_timestep = timestep;
+	constraintParams.m_timestepInv = 1.0f / timestep;
+
+	// calculate Jacobian derivative for each active joint	
+	//for (int j = 0; j < jointCount; j++) {
+	for (int j = 0; j < m_nodeCount - 1; j++) {
+		dVehicleNode* const node = m_nodesOrder[j];
+		dAssert (node && node->GetJoint());
+		dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
+
+		constraintParams.m_count = 0;
+		joint->JacobianDerivative(&constraintParams);
+/*
+		int dofCount = constraintParams.m_count;
+		joint->m_count = dofCount;
+		joint->m_start = rowCount;
+
+		// complete the derivative matrix for this joint
+		int index = joint->m_start;
+		dBodyState* const state0 = joint->m_state0;
+		dBodyState* const state1 = joint->m_state1;
+
+		const dMatrix& invInertia0 = state0->m_invInertia;
+		const dMatrix& invInertia1 = state1->m_invInertia;
+
+		dFloat invMass0 = state0->m_invMass;
+		dFloat invMass1 = state1->m_invMass;
+		dFloat weight = 0.9f;
+
+		for (int i = 0; i < dofCount; i++) {
+			dJacobianPair* const row = &jacobianArray[index];
+			dJacobianColum* const col = &jacobianColumnArray[index];
+			jacobianArray[rowCount] = constraintParams.m_jacobians[i];
+
+			dVector JMinvIM0linear(row->m_jacobian_IM0.m_linear.Scale(invMass0));
+			dVector JMinvIM1linear(row->m_jacobian_IM1.m_linear.Scale(invMass1));
+			dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
+			dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
+
+			dVector tmpDiag(JMinvIM0linear.CompProduct(row->m_jacobian_IM0.m_linear) + JMinvIM0angular.CompProduct(row->m_jacobian_IM0.m_angular) + JMinvIM1linear.CompProduct(row->m_jacobian_IM1.m_linear) + JMinvIM1angular.CompProduct(row->m_jacobian_IM1.m_angular));
+			dVector tmpAccel(JMinvIM0linear.CompProduct(state0->m_externalForce) + JMinvIM0angular.CompProduct(state0->m_externalTorque) + JMinvIM1linear.CompProduct(state1->m_externalForce) + JMinvIM1angular.CompProduct(state1->m_externalTorque));
+			dFloat extenalAcceleration = -(tmpAccel[0] + tmpAccel[1] + tmpAccel[2]);
+
+			col->m_diagDamp = 1.0f;
+			col->m_coordenateAccel = constraintParams.m_jointAccel[i];
+			col->m_jointLowFriction = constraintParams.m_jointLowFriction[i];
+			col->m_jointHighFriction = constraintParams.m_jointHighFriction[i];
+
+			col->m_deltaAccel = extenalAcceleration;
+			col->m_coordenateAccel += extenalAcceleration;
+
+			col->m_force = joint->m_jointFeebackForce[i] * weight;
+
+			dFloat stiffness = COMPLEMENTARITY_PSD_DAMP_TOL * col->m_diagDamp;
+			dFloat diag = (tmpDiag[0] + tmpDiag[1] + tmpDiag[2]);
+			dAssert(diag > dFloat(0.0f));
+			col->m_diagDamp = diag * stiffness;
+
+			diag *= (dFloat(1.0f) + stiffness);
+			col->m_invDJMinvJt = dFloat(1.0f) / diag;
+			index++;
+			rowCount++;
+			dAssert(rowCount < maxRowCount);
+		}
+*/
+	}
+	return rowCount;
+}
+
+
+void dVehicleSolver::Update(dFloat timestep)
+{
+	dVehicleNode* const root = m_vehicle->GetVehicle();
+	if (!root->m_children.GetCount()) {
+		return;
+	}
+
+	m_bodyMassArray = dAlloca(dSpatialMatrix, m_nodeCount);
+
+	m_vehicle->InitRigiBody(timestep);
+
+	BuildJacobianMatrix(timestep);
+	InitMassMatrix();
 }
