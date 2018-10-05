@@ -163,22 +163,24 @@ void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver:
 	// Restrict the movement on the pivot point along all two orthonormal direction
 	dComplementaritySolver::dBodyState* const tire = m_state0;
 	//dComplementaritySolver::dBodyState* const chassis = m_state1;
+	NewtonBody* const newtonBody = m_tire->m_parent->GetAsVehicle()->GetChassis()->GetBody();
 
 	//dMatrix tireMatrix (tire->GetMatrix());
 	//tireMatrix.m_up = chassis->GetMatrix().m_up;
 	//tireMatrix.m_right = tireMatrix.m_front.CrossProduct(tireMatrix.m_up);
-
+	dVector omega(0.0f);
+	NewtonBodyGetOmega(newtonBody, &omega[0]);
 	const dMatrix& tireMatrix = tire->GetMatrix();
 
 	// lateral force
-	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front);
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front, omega);
 
 	// longitudinal force
-	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right, omega);
 
 	// angular constraints	
-	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, 0.0f);
-	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, 0.0f);
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, omega, 0.0f);
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, omega, 0.0f);
 
 /*
 	// dry rolling friction (for now contact, bu it should be a function of the tire angular velocity)
