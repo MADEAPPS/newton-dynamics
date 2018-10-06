@@ -1176,8 +1176,6 @@ void dVehicleSolver::Finalize(dVehicleChassis* const vehicle)
 	}
 }
 
-
-
 void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
 {
 //	dSpatialMatrix* const bodyMassArray) const

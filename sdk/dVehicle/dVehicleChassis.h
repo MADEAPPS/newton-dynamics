@@ -138,6 +138,7 @@ class dVehicleChassis: public dCustomControllerBase
 	void Cleanup();
 
 	void InitRigiBody(dFloat timestep);
+	void CalculateSuspensionForces(dFloat timestep);
 	
 	dMatrix m_localFrame;
 	dVehicleSolver m_solver;
