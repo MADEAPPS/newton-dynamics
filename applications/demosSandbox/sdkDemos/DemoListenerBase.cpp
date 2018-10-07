@@ -38,7 +38,6 @@ void DemoListenerBase::PreUpdate (const NewtonWorld* const world, void* const li
 	me->PreUpdate(world, timestep);
 }
 
-
 void DemoListenerBase::PostUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep)
 {
 	DemoListenerBase* const me = (DemoListenerBase*) listenerUserData;

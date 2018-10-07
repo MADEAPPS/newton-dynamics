@@ -42,6 +42,7 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 	protected:
 
 	DVEHICLE_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+
 /*
 	void OnTireContactsProcess(const NewtonJoint* const contactJoint, dWheelJoint* const tire, const NewtonBody* const otherBody, dFloat timestep);
 	int OnContactGeneration(const dWheelJoint* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;

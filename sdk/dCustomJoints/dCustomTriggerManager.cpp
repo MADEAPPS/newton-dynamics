@@ -38,7 +38,7 @@ dCustomTriggerController* dCustomTriggerManager::CreateTrigger (const dMatrix& m
 void dCustomTriggerManager::PreUpdate(dFloat timestep)
 {
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		NewtonDispachThreadJob (m_world, UpdateTrigger, &node->GetInfo());
+		NewtonDispachThreadJob (m_world, UpdateTrigger, &node->GetInfo(), "UpdateTrigger");
 	}
 	NewtonSyncThreadJobs(m_world);
 
@@ -99,15 +99,12 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 	}
 }
 
-
 void dCustomTriggerManager::UpdateTrigger (NewtonWorld* const world, void* const context, int threadIndex)
 {
 	dCustomTriggerController* const controller = (dCustomTriggerController*)context;
 	dCustomTriggerManager* const me = (dCustomTriggerManager*)controller->GetManager();
 	me->UpdateTrigger(controller);
 }
-
-
 
 dCustomTriggerController::dCustomTriggerController()
 	:dCustomControllerBase()

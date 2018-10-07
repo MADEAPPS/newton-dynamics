@@ -563,9 +563,9 @@ void dgWorld::DestroyConstraint(dgConstraint* const constraint)
 	delete constraint;
 }
 
-void dgWorld::ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext)
+void dgWorld::ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext, const char* const functionName)
 {
-	QueueJob (userJobKernel, this, userJobKernelContext, __FUNCTION__);
+	QueueJob (userJobKernel, this, userJobKernelContext, functionName);
 }
 
 

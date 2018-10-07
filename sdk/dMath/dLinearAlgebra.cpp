@@ -128,6 +128,10 @@ const dVector& dComplementaritySolver::dBodyState::GetVelocity() const
 	return m_veloc;
 }
 
+dVector dComplementaritySolver::dBodyState::CalculatePointVelocity (const dVector& point) const
+{
+	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
+}
 
 dFloat dComplementaritySolver::dBodyState::GetMass () const
 {
@@ -398,7 +402,7 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_IM1; 
 	jacobian1.m_linear = dVector(0.0f);
-	jacobian1.m_angular = dir.Scale (1.0f);
+	jacobian1.m_angular = dir.Scale (-1.0f);
 
 	const dVector& omega0 = m_state0->m_omega;
 	const dVector& omega1 = m_state1->m_omega;
@@ -422,7 +426,7 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	constraintParams->m_jointAccel[index] = alphaError;
 */
 	constraintParams->m_jointAccel[index] = -(accel.m_x + accel.m_y + accel.m_z);
-dTrace(("a->%f\n", constraintParams->m_jointAccel[index]));
+//dTrace(("a->%f\n", constraintParams->m_jointAccel[index]));
 	constraintParams->m_jointLowFriction[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFriction[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
@@ -506,10 +510,6 @@ void dComplementaritySolver::dBilateralJoint::JointAccelerations (dJointAccelera
 	}
 }
 
-
-
-
-
 int dComplementaritySolver::dFrictionLessContactJoint::CompareContact (const dContact* const contactA, const dContact* const contactB, void* dommy)
 {
 	if (contactA->m_point[0] < contactB->m_point[0]) {
@@ -520,7 +520,6 @@ int dComplementaritySolver::dFrictionLessContactJoint::CompareContact (const dCo
 		return 0;
 	}
 }
-
 
 int dComplementaritySolver::dFrictionLessContactJoint::ReduceContacts (int count, dContact* const contacts, dFloat tol)
 {

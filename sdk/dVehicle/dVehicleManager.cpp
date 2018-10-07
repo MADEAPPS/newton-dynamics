@@ -48,3 +48,4 @@ void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 		vehicle->Debug(debugContext);
 	}
 }
+

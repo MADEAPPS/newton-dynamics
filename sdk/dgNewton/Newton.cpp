@@ -559,11 +559,11 @@ void NewtonSetParallelSolverOnLargeIsland(const NewtonWorld* const newtonWorld, 
 }
 
 
-void NewtonDispachThreadJob(const NewtonWorld* const newtonWorld, NewtonJobTask task, void* const usedData)
+void NewtonDispachThreadJob(const NewtonWorld* const newtonWorld, NewtonJobTask task, void* const usedData, const char* const functionName)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	world->ExecuteUserJob (dgWorkerThreadTaskCallback (task), usedData);
+	world->ExecuteUserJob (dgWorkerThreadTaskCallback (task), usedData, functionName);
 }
 
 void NewtonSyncThreadJobs(const NewtonWorld* const newtonWorld)

@@ -234,6 +234,7 @@ class dComplementaritySolver
 		void SetOmega (const dVector& omega);
 		const dVector& GetOmega() const; 
 		const dVector& GetVelocity() const; 
+		dVector CalculatePointVelocity (const dVector& point) const;
 
 		void UpdateInertia();
 

@@ -65,6 +65,7 @@ void dVehicleSingleBody::InitRigiBody(dFloat timestep)
 	chassisBody->SetVeloc(vector);
 
 	NewtonBodyGetOmega(newtonBody, &vector[0]);
+vector.m_y = 10.0f;
 	chassisBody->SetOmega(vector);
 
 	NewtonBodyGetForce(newtonBody, &vector[0]);

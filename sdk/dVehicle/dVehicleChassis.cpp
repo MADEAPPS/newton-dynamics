@@ -181,7 +181,7 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 					break;
 			}
 */
-//x = 0.1f;
+x = 0.1f;
 //v = 10.0f;
 			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, info.m_springStrength * weight, x, info.m_dampingRatio, v);
 

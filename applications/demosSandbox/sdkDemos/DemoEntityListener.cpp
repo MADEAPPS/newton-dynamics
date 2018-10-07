@@ -69,7 +69,7 @@ void DemoEntityListener::PreUpdate (const NewtonWorld* const world, dFloat times
 	scene->m_currentListenerTimestep = timestep;
 	DemoEntityManager::dListNode* node = scene->dList<DemoEntity*>::GetFirst();
 	for (int i = 0; i < threadCount; i ++) {
-		NewtonDispachThreadJob(world, PreUpdateKernel, node);
+		NewtonDispachThreadJob(world, PreUpdateKernel, node, "DemoEntityListener");
 		node = node ? node->GetNext() : NULL;
 	}
 	NewtonSyncThreadJobs(world);
@@ -82,7 +82,7 @@ void DemoEntityListener::PostUpdate (const NewtonWorld* const world, dFloat time
 	scene->m_currentListenerTimestep = timestep;
 	DemoEntityManager::dListNode* node = scene->dList<DemoEntity*>::GetFirst();
 	for (int i = 0; i < threadCount; i++) {
-		NewtonDispachThreadJob(world, PostUpdateKernel, node);
+		NewtonDispachThreadJob(world, PostUpdateKernel, node, "PostUpdateKernel");
 		node = node ? node->GetNext() : NULL;
 	}
 	NewtonSyncThreadJobs(world);

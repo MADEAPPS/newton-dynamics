@@ -15,11 +15,13 @@
 
 #include "dStdafxVehicle.h"
 
+
 class dVehicleNode;
 class dVehicleChassis;
 
 class dVehicleSolver: public dContainersAlloc
 {
+	class dVectorPair;
 	class dBodyJointMatrixDataPair;
 
 	public:
@@ -43,17 +45,21 @@ class dVehicleSolver: public dContainersAlloc
 	void CalculateBodyDiagonal(dVehicleNode* const child);
 	void CalculateInertiaMatrix(dVehicleNode* const node) const;
 
+	void CalculateJointForce();
+	void CalculateJointAccel(dVectorPair* const accel) const;
+	void CalculateForce(dVectorPair* const force, const dVectorPair* const accel) const;
+	void SolveForward(dVectorPair* const force, const dVectorPair* const accel, int startNode) const;
+
+	void JointJacobianTimeMassForward(dVehicleNode* const node, dVectorPair& force) const;
+	void BodyJacobianTimeMassForward(dVehicleNode* const node, const dVectorPair& force, dVectorPair& parentForce) const;
+	
+
 	dVehicleChassis* m_vehicle;
 	dVehicleNode** m_nodesOrder;
 
-	// cache temporary variables
-	//dSpatialMatrix* m_bodyJt;
-	//dSpatialMatrix* m_jointJ;
-	//dSpatialMatrix* m_bodyInvMass;
-	//dSpatialMatrix* m_jointInvMass;
-	//dSpatialMatrix* m_bodyMassArray;
-	//dSpatialMatrix* m_jointMassArray;
 
+
+	// cache temporary variables
 	dBodyJointMatrixDataPair* m_data;
 	
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;

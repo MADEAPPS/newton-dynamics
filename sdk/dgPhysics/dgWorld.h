@@ -399,7 +399,7 @@ class dgWorld
 	void SetThreadsCount (dgInt32 count);
 	
 	//Parallel Job dispatcher for user related stuff
-	void ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext);
+	void ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext, const char* const functionName);
 
 	void BodyEnableSimulation (dgBody* const body);
 	void BodyDisableSimulation (dgBody* const body);

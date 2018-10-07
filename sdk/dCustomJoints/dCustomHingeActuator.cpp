@@ -128,7 +128,7 @@ void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 	dCustomHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
 
 	const dFloat invTimeStep = 1.0f / timestep;
-	const dFloat tol = m_motorSpeed * timestep;
+//	const dFloat tol = m_motorSpeed * timestep;
 	const dFloat angle = m_curJointAngle.GetAngle();
 	const dFloat targetAngle = m_targetAngle.GetAngle();
 

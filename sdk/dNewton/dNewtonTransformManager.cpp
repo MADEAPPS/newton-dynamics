@@ -16,11 +16,9 @@
 #include "dNewtonTransformManager.h"
 
 
-
 dNewtonTransformManager::dNewtonTransformManager (dNewton* const world)
 	:dCustomControllerManager<dNewtonTransformController>(world->GetNewton(), "__dNewton_transformManager__")
 {
-
 }
 
 dNewtonTransformManager::~dNewtonTransformManager()
@@ -32,7 +30,7 @@ void dNewtonTransformManager::PostUpdate (dFloat timestep)
 {
 	NewtonWorld* const world = GetWorld();
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		NewtonDispachThreadJob (world, UpdateTransformKernel, body);
+		NewtonDispachThreadJob (world, UpdateTransformKernel, body, "UpdateTransformKernel");
 	}
 	NewtonSyncThreadJobs(world);
 }

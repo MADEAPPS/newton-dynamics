@@ -134,24 +134,17 @@ void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
-	NewtonBody* const newtonBody = chassis->GetBody();
 	dComplementaritySolver::dBodyState* const tireBody = GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
-	dMatrix tireMatrix;
-	NewtonBodyGetMatrix(newtonBody, &tireMatrix[0][0]);
-
-	tireMatrix = GetHardpointMatrix () * tireMatrix;
+	dMatrix tireMatrix (GetHardpointMatrix () * chassisBody->GetMatrix());
 	tireBody->SetMatrix(tireMatrix);
 
-	dVector veloc(0.0f);
-	NewtonBodyGetPointVelocity (newtonBody, &tireMatrix.m_posit.m_x, &veloc[0]);
-	tireBody->SetVeloc(veloc + tireMatrix.m_up.Scale(m_speed));
+	tireBody->SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
+	tireBody->SetVeloc(chassisBody->CalculatePointVelocity (tireMatrix.m_posit) + tireMatrix.m_up.Scale(m_speed));
 
-	NewtonBodyGetOmega(newtonBody, &veloc[0]);
-	tireBody->SetOmega(veloc + tireMatrix.m_front.Scale(m_omega));
-
-	tireBody->SetForce(chassis->m_gravity.Scale (tireBody->GetMass()));
 	tireBody->SetTorque(dVector (0.0f));
+	tireBody->SetForce(chassis->m_gravity.Scale (tireBody->GetMass()));
 
 	dVehicleTireInterface::InitRigiBody(timestep);
 
@@ -163,14 +156,13 @@ void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver:
 {
 	// Restrict the movement on the pivot point along all two orthonormal direction
 	dComplementaritySolver::dBodyState* const tire = m_state0;
-	//dComplementaritySolver::dBodyState* const chassis = m_state1;
-	NewtonBody* const newtonBody = m_tire->m_parent->GetAsVehicle()->GetChassis()->GetBody();
+	dComplementaritySolver::dBodyState* const chassis = m_state1;
+	//NewtonBody* const newtonBody = m_tire->m_parent->GetAsVehicle()->GetChassis()->GetBody();
 
 	//dMatrix tireMatrix (tire->GetMatrix());
 	//tireMatrix.m_up = chassis->GetMatrix().m_up;
 	//tireMatrix.m_right = tireMatrix.m_front.CrossProduct(tireMatrix.m_up);
-	dVector omega(0.0f);
-	NewtonBodyGetOmega(newtonBody, &omega[0]);
+	const dVector& omega = chassis->GetOmega();
 	const dMatrix& tireMatrix = tire->GetMatrix();
 
 	// lateral force

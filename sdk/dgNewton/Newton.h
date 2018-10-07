@@ -499,7 +499,7 @@ extern "C" {
 	NEWTON_API void NewtonSetThreadsCount (const NewtonWorld* const newtonWorld, int threads);
 	NEWTON_API int NewtonGetThreadsCount(const NewtonWorld* const newtonWorld);
 	NEWTON_API int NewtonGetMaxThreadsCount(const NewtonWorld* const newtonWorld);
-	NEWTON_API void NewtonDispachThreadJob(const NewtonWorld* const newtonWorld, NewtonJobTask task, void* const usedData);
+	NEWTON_API void NewtonDispachThreadJob(const NewtonWorld* const newtonWorld, NewtonJobTask task, void* const usedData, const char* const functionName);
 	NEWTON_API void NewtonSyncThreadJobs(const NewtonWorld* const newtonWorld);
 
 	// atomic operations
