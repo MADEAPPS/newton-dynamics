@@ -46,13 +46,19 @@ class dVehicleSolver: public dContainersAlloc
 	void CalculateInertiaMatrix(dVehicleNode* const node) const;
 
 	void CalculateJointForce();
+	void UpdateForces(const dVectorPair* const force) const;
 	void CalculateJointAccel(dVectorPair* const accel) const;
 	void CalculateForce(dVectorPair* const force, const dVectorPair* const accel) const;
+
+	void SolveBackward(dVectorPair* const force, const dVectorPair* const accel) const;
 	void SolveForward(dVectorPair* const force, const dVectorPair* const accel, int startNode) const;
 
+	void BodyDiagInvTimeSolution(dVehicleNode* const node, dVectorPair& force) const;
+	void JointDiagInvTimeSolution(dVehicleNode* const node, dVectorPair& force) const;
 	void JointJacobianTimeMassForward(dVehicleNode* const node, dVectorPair& force) const;
+	void BodyJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force) const;
 	void BodyJacobianTimeMassForward(dVehicleNode* const node, const dVectorPair& force, dVectorPair& parentForce) const;
-	
+	void JointJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force, const dVectorPair& parentForce) const;
 
 	dVehicleChassis* m_vehicle;
 	dVehicleNode** m_nodesOrder;
@@ -67,6 +73,7 @@ class dVehicleSolver: public dContainersAlloc
 	
 	int m_nodeCount;
 	int m_rowsCount;
+	int m_auxiliaryRowCount;
 };
 
 
