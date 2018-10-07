@@ -18,10 +18,6 @@
 #define COMPLEMENTARITY_POS_DAMP			dFloat(1500.0f)
 #define COMPLEMENTARITY_PSD_DAMP_TOL		dFloat(1.0e-4f)
 #define COMPLEMENTARITY_STACK_ENTRIES		64
-#define COMPLEMENTARITY_MAX_FRICTION_BOUND	dFloat(1.0e15f)
-#define COMPLEMENTARITY_MIN_FRICTION_BOUND	-COMPLEMENTARITY_MAX_FRICTION_BOUND
-
-
 
 
 void dSymmetricBiconjugateGradientSolve::ScaleAdd (int size, dFloat64* const a, const dFloat64* const b, dFloat64 scale, const dFloat64* const c) const
@@ -171,6 +167,11 @@ const dMatrix& dComplementaritySolver::dBodyState::GetInertia() const
 	return m_inertia;
 }
 
+const dMatrix& dComplementaritySolver::dBodyState::GetInvInertia() const
+{
+	return m_invInertia;
+}
+
 void dComplementaritySolver::dBodyState::SetMatrix (const dMatrix& matrix)
 {
 	m_matrix = matrix;
@@ -193,9 +194,9 @@ const dMatrix& dComplementaritySolver::dBodyState::GetLocalMatrix () const
 	return m_localFrame;
 }
 
-const dVector& dComplementaritySolver::dBodyState::GetCenterOfMass () const
+const dVector& dComplementaritySolver::dBodyState::GetCOM () const
 {
-	return m_globalCentreOfMass;
+	return m_localFrame.m_posit;
 }
 
 void dComplementaritySolver::dBodyState::SetVeloc (const dVector& veloc)
@@ -381,8 +382,8 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 */
 	constraintParams->m_jointAccel[index] = - (accel.m_x + accel.m_y + accel.m_z);
 //dTrace(("l->%f\n", constraintParams->m_jointAccel[index]));
-	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
-	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
+	constraintParams->m_jointLowFriction[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
+	constraintParams->m_jointHighFriction[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
 }
 
@@ -422,8 +423,8 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 */
 	constraintParams->m_jointAccel[index] = -(accel.m_x + accel.m_y + accel.m_z);
 dTrace(("a->%f\n", constraintParams->m_jointAccel[index]));
-	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
-	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
+	constraintParams->m_jointLowFriction[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
+	constraintParams->m_jointHighFriction[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
 }
 
@@ -456,8 +457,8 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	m_rowIsMotor[index] = true;
 	m_motorAcceleration[index] = accelerationRatio;
 	constraintParams->m_jointAccel[index] = 0.0f;
-	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
-	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
+	constraintParams->m_jointLowFriction[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
+	constraintParams->m_jointHighFriction[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
 }
 */

@@ -56,6 +56,9 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	dFloat m_position;
 	dFloat m_tireAngle;
 	dFloat m_steeringAngle;
+	dFloat m_tireLoad;
+
+	friend class dVehicleChassis;
 };
 
 

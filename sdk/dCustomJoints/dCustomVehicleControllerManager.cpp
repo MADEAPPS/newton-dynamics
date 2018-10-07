@@ -1997,7 +1997,7 @@ void dCustomVehicleController::CalculateSuspensionForces(dFloat timestep)
 	dWheelJoint* tires[maxSize];
 	dFloat accel[maxSize];
 	dFloat massMatrix[maxSize * maxSize];
-	dFloat chassisMass;
+	dFloat chassisInvMass;
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
@@ -2005,7 +2005,7 @@ void dCustomVehicleController::CalculateSuspensionForces(dFloat timestep)
 	NewtonBody* const chassisBody = GetBody();
 	NewtonBodyGetCentreOfMass(chassisBody, &chassisOrigin[0]);
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-	NewtonBodyGetInvMass(chassisBody, &chassisMass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetInvMass(chassisBody, &chassisInvMass, &Ixx, &Iyy, &Izz);
 	NewtonBodyGetInvInertiaMatrix(chassisBody, &chassisInvInertia[0][0]);
 
 	chassisOrigin = chassisMatrix.TransformVector(chassisOrigin);
@@ -2051,9 +2051,9 @@ void dCustomVehicleController::CalculateSuspensionForces(dFloat timestep)
 			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, tire->m_springStrength * weight, x, tire->m_dampingRatio, v);
 
 			dMatrix tireInvInertia;
-			dFloat tireMass;
+			dFloat tireInvMass;
 
-			NewtonBodyGetInvMass(tireBody, &tireMass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetInvMass(tireBody, &tireInvMass, &Ixx, &Iyy, &Izz);
 			NewtonBodyGetInvInertiaMatrix(tireBody, &tireInvInertia[0][0]);
 
 			m_jt[tireCount].m_jacobian_IM0.m_linear = chassisMatrix.m_up.Scale(-1.0f);
@@ -2061,9 +2061,9 @@ void dCustomVehicleController::CalculateSuspensionForces(dFloat timestep)
 			m_jt[tireCount].m_jacobian_IM1.m_linear = chassisMatrix.m_up;
 			m_jt[tireCount].m_jacobian_IM1.m_angular = (tireMatrix.m_posit - chassisOrigin).CrossProduct(chassisMatrix.m_up);
 
-			m_jInvMass[tireCount].m_jacobian_IM0.m_linear = m_jt[tireCount].m_jacobian_IM0.m_linear.Scale(tireMass);
+			m_jInvMass[tireCount].m_jacobian_IM0.m_linear = m_jt[tireCount].m_jacobian_IM0.m_linear.Scale(tireInvMass);
 			m_jInvMass[tireCount].m_jacobian_IM0.m_angular = tireInvInertia.RotateVector(m_jt[tireCount].m_jacobian_IM0.m_angular);
-			m_jInvMass[tireCount].m_jacobian_IM1.m_linear = m_jt[tireCount].m_jacobian_IM1.m_linear.Scale(chassisMass);
+			m_jInvMass[tireCount].m_jacobian_IM1.m_linear = m_jt[tireCount].m_jacobian_IM1.m_linear.Scale(chassisInvMass);
 			m_jInvMass[tireCount].m_jacobian_IM1.m_angular = chassisInvInertia.RotateVector(m_jt[tireCount].m_jacobian_IM1.m_angular);
 
 			tireCount++;

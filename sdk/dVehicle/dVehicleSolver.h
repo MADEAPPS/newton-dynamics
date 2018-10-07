@@ -20,6 +20,8 @@ class dVehicleChassis;
 
 class dVehicleSolver: public dContainersAlloc
 {
+	class dBodyJointMatrixDataPair;
+
 	public:
 	DVEHICLE_API dVehicleSolver();
 	DVEHICLE_API virtual ~dVehicleSolver();
@@ -33,17 +35,32 @@ class dVehicleSolver: public dContainersAlloc
 
 	void InitMassMatrix();
 	int Factorize(dVehicleNode* const node);
+	void GetJacobians(dVehicleNode* const node);
 	int BuildJacobianMatrix(dFloat timestep);
 
+	void CalculateJointDiagonal(dVehicleNode* const node);
+	void CalculateJacobianBlock(dVehicleNode* const node);
+	void CalculateBodyDiagonal(dVehicleNode* const child);
 	void CalculateInertiaMatrix(dVehicleNode* const node) const;
-	
 
 	dVehicleChassis* m_vehicle;
 	dVehicleNode** m_nodesOrder;
 
 	// cache temporary variables
-	dSpatialMatrix* m_bodyMassArray;
+	//dSpatialMatrix* m_bodyJt;
+	//dSpatialMatrix* m_jointJ;
+	//dSpatialMatrix* m_bodyInvMass;
+	//dSpatialMatrix* m_jointInvMass;
+	//dSpatialMatrix* m_bodyMassArray;
+	//dSpatialMatrix* m_jointMassArray;
+
+	dBodyJointMatrixDataPair* m_data;
+	
+	dComplementaritySolver::dJacobianPair* m_leftHandSide;
+	dComplementaritySolver::dJacobianColum* m_rightHandSide;
+	
 	int m_nodeCount;
+	int m_rowsCount;
 };
 
 

@@ -26,6 +26,9 @@
 
 #define D_MAX_PRAM_INFO_SIZE		16 
 #define D_MAX_PLACEMENT_CONTACTS	128
+#define D_COMPLEMENTARITY_MAX_FRICTION_BOUND	dFloat(1.0e15f)
+#define D_COMPLEMENTARITY_MIN_FRICTION_BOUND	(-D_COMPLEMENTARITY_MAX_FRICTION_BOUND)
+
 
 class dSymmetricBiconjugateGradientSolve
 {
@@ -171,8 +174,14 @@ class dComplementaritySolver
 		int m_rowIsMotor[D_MAX_PRAM_INFO_SIZE];
 		dBodyState* m_state0;
 		dBodyState* m_state1;
+		union
+		{
+			long long m_ordinals;
+			char m_sourceJacobianIndex[8];
+		};
 		int m_start;
 		int m_count;
+		int m_dof;
 
 		friend class dBodyState;
 		friend class dComplementaritySolver;
@@ -219,6 +228,7 @@ class dComplementaritySolver
 		void GetInertia (dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
 		const dMatrix& GetInertia() const; 
+		const dMatrix& GetInvInertia() const; 
 
 		void SetVeloc (const dVector& veloc);
 		void SetOmega (const dVector& omega);
@@ -238,7 +248,7 @@ class dComplementaritySolver
 		const dVector& GetForce () const;
 		const dVector& GetTorque () const;
 
-		const dVector& GetCenterOfMass () const;
+		const dVector& GetCOM () const;
 
 		void IntegrateVelocity (dFloat timestep);
 

@@ -781,9 +781,6 @@ dMatrix dMatrix::JacobiDiagonalization (dVector &eigenValues, const dMatrix& ini
 	return dGetIdentityMatrix();
 } 	
 
-
-
-
 //void dMatrix::PolarDecomposition (dMatrix& orthogonal, dMatrix& symetric) const
 void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMatrix& stretchAxis, const dMatrix& initialStretchAxis) const
 {

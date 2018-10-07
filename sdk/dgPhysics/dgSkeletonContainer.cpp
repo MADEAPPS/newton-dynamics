@@ -218,7 +218,7 @@ class dgSkeletonContainer::dgNode
 	{
 		dgAssert(child->m_joint);
 		
-		dgSpatialMatrix copy (dgSpatialMatrix(dgFloat32(0.0f)));
+		dgSpatialMatrix copy (dgFloat32(0.0f));
 		const dgInt32 dof = child->m_dof;
 		const dgSpatialMatrix& jacobianMatrix = child->m_data.m_joint.m_jt;
 		const dgSpatialMatrix& childDiagonal = jointMassArray[child->m_index];

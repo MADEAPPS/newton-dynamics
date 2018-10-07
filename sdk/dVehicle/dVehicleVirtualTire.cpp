@@ -23,6 +23,7 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	,m_position(0.0f)
 	,m_tireAngle(0.0f)
 	,m_steeringAngle(0.0f)
+	,m_tireLoad(0.0f)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();

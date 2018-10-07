@@ -13,6 +13,7 @@
 #include "dVehicleManager.h"
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
+#include "dVehicleVirtualTire.h"
 
 dVehicleChassis::dVehicleChassis ()
 	:m_localFrame(dGetIdentityMatrix())
@@ -142,83 +143,53 @@ void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 
 void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 {
-//	dMatrix chassisMatrix;
-//	dMatrix chassisInvInertia;
-//	dVector chassisOrigin(0.0f);
-//	dVector chassisForce(0.0f);
-//	dVector chassisTorque(0.0f);
-
 	const int maxSize = 64;
-	dVehicleTireInterface* tires[maxSize];
 	dComplementaritySolver::dJacobianPair m_jt[maxSize];
 	dComplementaritySolver::dJacobianPair m_jInvMass[maxSize];
-	
-/*
-	dWheelJoint* tires[maxSize];
-	dFloat accel[maxSize];
+	dVehicleVirtualTire* tires[maxSize];
 	dFloat massMatrix[maxSize * maxSize];
-	dFloat chassisMass;
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-
-	NewtonBody* const chassisBody = GetBody();
-	NewtonBodyGetCentreOfMass(chassisBody, &chassisOrigin[0]);
-	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-	NewtonBodyGetInvMass(chassisBody, &chassisMass, &Ixx, &Iyy, &Izz);
-	NewtonBodyGetInvInertiaMatrix(chassisBody, &chassisInvInertia[0][0]);
-
-	chassisOrigin = chassisMatrix.TransformVector(chassisOrigin);
-*/
+	dFloat accel[maxSize];
+	
 	dComplementaritySolver::dBodyState* const chassisBody = m_vehicle->GetBody();
+
+	const dMatrix& chassisMatrix = chassisBody->GetMatrix(); 
+	const dMatrix& chassisInvInertia = chassisBody->GetInvInertia();
+	dVector chassisOrigin (chassisMatrix.TransformVector (chassisBody->GetCOM()));
+	dFloat chassisInvMass = chassisBody->GetInvMass();
 
 	int tireCount = 0;
 	const dList<dVehicleNode*>& children = m_vehicle->GetChildren();
 	for (dList<dVehicleNode*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-		dVehicleTireInterface* const tire = tireNode->GetInfo()->GetAsTire();
-//		if (tire->m_suspentionType != int(m_roller)) {
+		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*) tireNode->GetInfo()->GetAsTire();
 		if (tire) {
+			const dVehicleVirtualTire::dTireInfo& info = tire->m_info;
 			tires[tireCount] = tire;
-			dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
-		/*
-			dAssert(tireBody == tire->GetBody0());
-			dAssert(chassisBody == tire->GetBody1());
-
-			dMatrix tireMatrix;
-			//dMatrix chassisMatrix;
-			dVector tireVeloc(0.0f);
-			dVector chassisPivotVeloc(0.0f);
-
-			tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-			NewtonBodyGetVelocity(tireBody, &tireVeloc[0]);
-			NewtonBodyGetPointVelocity(chassisBody, &tireMatrix.m_posit[0], &chassisPivotVeloc[0]);
-
-			dFloat param = tire->CalculateTireParametricPosition(tireMatrix, chassisMatrix);
-			param = dClamp(param, dFloat(-0.25f), dFloat(1.0f));
-
-			dFloat x = tire->m_suspensionLength * param;
-			dFloat v = ((tireVeloc - chassisPivotVeloc).DotProduct3(chassisMatrix.m_up));
-
+			dFloat x = tire->m_position;
+			dFloat v = tire->m_speed;
 			dFloat weight = 1.0f;
+/*
 			switch (tire->m_suspentionType)
 			{
-			case m_offroad:
-				weight = 0.9f;
-				break;
-			case m_confort:
-				weight = 1.0f;
-				break;
-			case m_race:
-				weight = 1.1f;
-				break;
+				case m_offroad:
+					weight = 0.9f;
+					break;
+				case m_confort:
+					weight = 1.0f;
+					break;
+				case m_race:
+					weight = 1.1f;
+					break;
 			}
-			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, tire->m_springStrength * weight, x, tire->m_dampingRatio, v);
+*/
+//x = 0.1f;
+//v = 10.0f;
+			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, info.m_springStrength * weight, x, info.m_dampingRatio, v);
 
-			dMatrix tireInvInertia;
-			dFloat tireMass;
+			dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
 
-			NewtonBodyGetInvMass(tireBody, &tireMass, &Ixx, &Iyy, &Izz);
-			NewtonBodyGetInvInertiaMatrix(tireBody, &tireInvInertia[0][0]);
+			const dMatrix& tireMatrix = tireBody->GetMatrix(); 
+			const dMatrix& tireInvInertia = tireBody->GetInvInertia();
+			dFloat tireMass = tireBody->GetInvMass();
 
 			m_jt[tireCount].m_jacobian_IM0.m_linear = chassisMatrix.m_up.Scale(-1.0f);
 			m_jt[tireCount].m_jacobian_IM0.m_angular = dVector(0.0f);
@@ -227,18 +198,18 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 
 			m_jInvMass[tireCount].m_jacobian_IM0.m_linear = m_jt[tireCount].m_jacobian_IM0.m_linear.Scale(tireMass);
 			m_jInvMass[tireCount].m_jacobian_IM0.m_angular = tireInvInertia.RotateVector(m_jt[tireCount].m_jacobian_IM0.m_angular);
-			m_jInvMass[tireCount].m_jacobian_IM1.m_linear = m_jt[tireCount].m_jacobian_IM1.m_linear.Scale(chassisMass);
+			m_jInvMass[tireCount].m_jacobian_IM1.m_linear = m_jt[tireCount].m_jacobian_IM1.m_linear.Scale(chassisInvMass);
 			m_jInvMass[tireCount].m_jacobian_IM1.m_angular = chassisInvInertia.RotateVector(m_jt[tireCount].m_jacobian_IM1.m_angular);
 
 			tireCount++;
-		*/
 		}
 	}
-/*
+
 	for (int i = 0; i < tireCount; i++) {
 		dFloat* const row = &massMatrix[i * tireCount];
+
 		dFloat aii = m_jInvMass[i].m_jacobian_IM0.m_linear.DotProduct3(m_jt[i].m_jacobian_IM0.m_linear) + m_jInvMass[i].m_jacobian_IM0.m_angular.DotProduct3(m_jt[i].m_jacobian_IM0.m_angular) +
-			m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[i].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[i].m_jacobian_IM1.m_angular);
+					 m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[i].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[i].m_jacobian_IM1.m_angular);
 
 		row[i] = aii * 1.0001f;
 		for (int j = i + 1; j < tireCount; j++) {
@@ -250,17 +221,20 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 
 	dCholeskyFactorization(tireCount, massMatrix);
 	dCholeskySolve(tireCount, tireCount, massMatrix, accel);
+
+	dVector chassisForce(0.0f);
+	dVector chassisTorque(0.0f);
 	for (int i = 0; i < tireCount; i++) {
-		NewtonBody* const tirebody = tires[i]->GetTireBody();
+		dVehicleVirtualTire* const tire = tires[i];
+		dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
+
 		tires[i]->m_tireLoad = dMax(dFloat(1.0f), accel[i]);
 		dVector tireForce(m_jt[i].m_jacobian_IM0.m_linear.Scale(accel[i]));
-		dVector tireTorque(m_jt[i].m_jacobian_IM0.m_angular.Scale(accel[i]));
-		NewtonBodyAddForce(tirebody, &tireForce[0]);
-		NewtonBodyAddTorque(tirebody, &tireTorque[0]);
+
+		tireBody->SetForce(tireBody->GetForce() + tireForce);
 		chassisForce += m_jt[i].m_jacobian_IM1.m_linear.Scale(accel[i]);
 		chassisTorque += m_jt[i].m_jacobian_IM1.m_angular.Scale(accel[i]);
 	}
-	NewtonBodyAddForce(chassisBody, &chassisForce[0]);
-	NewtonBodyAddTorque(chassisBody, &chassisTorque[0]);
-*/
+	chassisBody->SetForce(chassisBody->GetForce() + chassisForce);
+	chassisBody->SetTorque(chassisBody->GetTorque() + chassisTorque);
 }
