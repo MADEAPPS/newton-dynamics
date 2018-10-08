@@ -828,51 +828,6 @@ void dVehicleSolver::Finalize(dVehicleChassis* const vehicle)
 	int index = 0;
 	SortGraph(root, index);
 	dAssert(index == m_nodeCount);
-
-	const dList<dComplementaritySolver::dBilateralJoint*>& loopJoints = m_vehicle->m_loopJoints;
-	if (loopJoints.GetCount()) {
-		dAssert (0);
-/*
-		//dgTree<int, dgDynamicBody*> filter (allocator);
-		for (int i = 0; i < loopJointsCount; i++) {
-			dgBilateralConstraint* const joint = loopJointArray[i];
-			dgAssert(joint->GetBody0()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			dgAssert(joint->GetBody1()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			dgAssert((FindNode((dgDynamicBody*)joint->GetBody0()) || FindNode((dgDynamicBody*)joint->GetBody1())));
-			joint->m_isInSkeleton = true;
-
-			//dgDynamicBody* const body0 = (dgDynamicBody*)joint->GetBody0();
-			//dgDynamicBody* const body1 = (dgDynamicBody*)joint->GetBody1();
-			//dgNode* const node0 = FindNode(body0);
-			//dgNode* const node1 = FindNode(body1);
-			//if (node0) {
-			//	filter.Insert(node0->m_index, node0->m_body);
-			//}
-			//if (node1) {
-			//	filter.Insert(node1->m_index, node1->m_body);
-			//}
-			//dgTree<int, dgDynamicBody*>::dgTreeNode* index0 = filter.Find(body0);
-			//if (!index0) {
-			//	index0 = filter.Insert(-1, body0);
-			//}
-			//dgTree<int, dgDynamicBody*>::dgTreeNode* index1 = filter.Find(body1);
-			//if (!index1) {
-			//	index1 = filter.Insert(-1, body1);
-			//}
-			m_loopingJoints[m_loopCount] = joint;
-			m_loopCount++;
-		}
-
-		//for (int i = 0; i < m_nodeCount; i++) {
-		//	filter.Remove(m_nodesOrder[i]->m_body);
-		//}
-		//dgTree<dgDynamicBody*, int> bodyOrder (allocator);
-		//dgTree<int, dgDynamicBody*>::Iterator iter(filter);
-		//for (iter.Begin(); iter; iter ++) {
-		//	bodyOrder.Insert (iter.GetKey(), iter.GetNode()->GetInfo());
-		//}
-*/
-	}
 }
 
 void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
@@ -1213,33 +1168,6 @@ int dVehicleSolver::BuildJacobianMatrix(dFloat timestep)
 	return rowCount;
 }
 
-
-void dVehicleSolver::Update(dFloat timestep)
-{
-	dVehicleNode* const root = m_vehicle->GetVehicle();
-	if (!root->m_children.GetCount()) {
-		return;
-	}
-
-//	m_bodyJt = dAlloca(dSpatialMatrix, m_nodeCount);
-//	m_jointJ = dAlloca(dSpatialMatrix, m_nodeCount);
-//	m_bodyInvMass = dAlloca(dSpatialMatrix, m_nodeCount);
-//	m_jointInvMass = dAlloca(dSpatialMatrix, m_nodeCount);
-//	m_bodyMassArray = dAlloca(dSpatialMatrix, m_nodeCount);
-//	m_jointMassArray = dAlloca(dSpatialMatrix, m_nodeCount);
-//int xxx = sizeof (dBodyJointMatrixDataPair);
-	m_data = dAlloca(dBodyJointMatrixDataPair, m_nodeCount);
-	m_leftHandSide = dAlloca(dComplementaritySolver::dJacobianPair, m_nodeCount * 6);
-	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, m_nodeCount * 6);
-
-	m_vehicle->InitRigiBody(timestep);
-	m_rowsCount = BuildJacobianMatrix(timestep);
-	InitMassMatrix();
-
-	CalculateJointForce();
-}
-
-
 void dVehicleSolver::CalculateJointAccel(dVectorPair* const accel) const
 {
 //dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dVectorPair* const accel
@@ -1495,3 +1423,54 @@ void dVehicleSolver::CalculateJointForce()
 	}
 }
 
+
+void dVehicleSolver::Update(dFloat timestep)
+{
+	dVehicleNode* const root = m_vehicle->GetVehicle();
+	if (!root->m_children.GetCount()) {
+		return;
+	}
+
+	//	m_bodyJt = dAlloca(dSpatialMatrix, m_nodeCount);
+	//	m_jointJ = dAlloca(dSpatialMatrix, m_nodeCount);
+	//	m_bodyInvMass = dAlloca(dSpatialMatrix, m_nodeCount);
+	//	m_jointInvMass = dAlloca(dSpatialMatrix, m_nodeCount);
+	//	m_bodyMassArray = dAlloca(dSpatialMatrix, m_nodeCount);
+	//	m_jointMassArray = dAlloca(dSpatialMatrix, m_nodeCount);
+	//int xxx = sizeof (dBodyJointMatrixDataPair);
+
+	dKinematicLoopJoint* kinematicLoop[128];
+	m_kinematicLoop = kinematicLoop;
+
+	m_vehicle->CalculateTireContacts(timestep);
+	m_kinematicLoopCount = m_vehicle->GetKinematicLoops(m_kinematicLoop);
+
+	int loopNodeCount = 0;
+	for (int i = 0; i < m_kinematicLoopCount; i ++) {
+		dKinematicLoopJoint* const loop = m_kinematicLoop[i];
+		dAssert (loop->IsActive());
+
+		dVehicleNode* const node0 = loop->GetOwner0();
+		if (node0->IsLoopNode() && (node0->m_solverIndex == -1)) {
+			node0->SetIndex(loopNodeCount + m_nodeCount);
+			loopNodeCount ++;
+		}
+
+		dVehicleNode* const node1 = loop->GetOwner1();
+		if (node1->IsLoopNode() && (node1->m_solverIndex == -1)) {
+			node1->SetIndex(loopNodeCount + m_nodeCount);
+			loopNodeCount++;
+		}
+	}
+
+	int totalJoint = m_nodeCount + loopNodeCount;
+	m_data = dAlloca(dBodyJointMatrixDataPair, m_nodeCount);
+	m_leftHandSide = dAlloca(dComplementaritySolver::dJacobianPair, totalJoint * 6);
+	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, totalJoint * 6);
+
+	m_vehicle->InitRigiBody(timestep);
+	m_rowsCount = BuildJacobianMatrix(timestep);
+	InitMassMatrix();
+
+	CalculateJointForce();
+}

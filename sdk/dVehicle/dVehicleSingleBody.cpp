@@ -49,6 +49,12 @@ dMatrix dVehicleSingleBody::GetMatrix () const
 	return matrix;
 }
 
+void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
+{
+	NewtonCollision* const collision = NewtonBodyGetCollision(m_chassis->GetBody());
+	CalculateAABB(collision, matrix, minP, maxP);
+}
+
 void dVehicleSingleBody::InitRigiBody(dFloat timestep)
 {
 	dVector vector;

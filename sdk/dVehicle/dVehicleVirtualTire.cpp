@@ -18,6 +18,7 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	:dVehicleTireInterface(parent)
 	,m_info(info)
 	,m_joint()
+	,m_dynamicContactBodyNode(NULL, true)
 	,m_omega(0.0f)
 	,m_speed(0.0f)
 	,m_position(0.0f)
@@ -62,6 +63,11 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	m_joint.Init (&m_body, m_parent->GetBody());
 	m_joint.m_tire = this;
 
+	for (int i = 0 ; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i ++) {
+		m_contactsJoints[i].SetOwners (this, &chassis->m_groundNode);
+	}
+	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
+
 m_omega = -10.0f;
 }
 
@@ -73,6 +79,11 @@ dVehicleVirtualTire::~dVehicleVirtualTire()
 NewtonCollision* dVehicleVirtualTire::GetCollisionShape() const
 {
 	return m_tireShape;
+}
+
+void dVehicleVirtualTire::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
+{
+	CalculateAABB(GetCollisionShape(), matrix, minP, maxP);
 }
 
 dComplementaritySolver::dBilateralJoint* dVehicleVirtualTire::GetJoint()
@@ -93,16 +104,16 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 	}
 }
 
-dMatrix dVehicleVirtualTire::GetHardpointMatrix () const
+dMatrix dVehicleVirtualTire::GetHardpointMatrix (dFloat position) const
 {
 	dMatrix matrix(dYawMatrix(m_steeringAngle) * m_matrix);
-	matrix.m_posit += m_matrix.m_up.Scale(m_position);
+	matrix.m_posit += m_matrix.m_up.Scale(position);
 	return matrix;
 }
 
 dMatrix dVehicleVirtualTire::GetLocalMatrix () const
 {
-	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix();
+	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix(m_position);
 }
 
 dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
@@ -137,7 +148,7 @@ void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 	dComplementaritySolver::dBodyState* const tireBody = GetBody();
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
-	dMatrix tireMatrix (GetHardpointMatrix () * chassisBody->GetMatrix());
+	dMatrix tireMatrix (GetHardpointMatrix (m_position) * chassisBody->GetMatrix());
 	tireBody->SetMatrix(tireMatrix);
 
 	tireBody->SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
@@ -151,6 +162,22 @@ void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 m_tireAngle = dMod(m_tireAngle + m_omega * timestep, 2.0f * dPi);
 }
 
+int dVehicleVirtualTire::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+{
+	int count = 0;
+	for (int i = 0; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]); i ++) {
+		dKinematicLoopJoint* const loop = &m_contactsJoints[i];
+		if (loop->IsActive ()) {
+			jointArray[count] = loop;
+			dAssert (!loop->GetOwner0()->IsLoopNode());
+			if (loop->GetOwner1()->IsLoopNode()) {
+				loop->GetOwner1()->SetIndex(-1);
+			}
+			count ++;
+		}
+	}
+	return dVehicleTireInterface::GetKinematicLoops(&jointArray[count]) + count;
+}
 
 void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
@@ -193,3 +220,16 @@ void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver:
 	tire->m_brakeTorque = 0.0f;
 */
 }
+
+
+void dVehicleVirtualTire::CalculateContacts(dFloat timestep)
+{
+
+}
+
+void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+
+}
+
+

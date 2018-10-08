@@ -16,12 +16,14 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleInterface;
+class dKinematicLoopJoint;
 class dVehicleTireInterface;
+
 
 class dVehicleNode: public dContainersAlloc
 {
 	public:
-	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
+	DVEHICLE_API dVehicleNode(dVehicleNode* const parent, bool isLoop = false);
 	DVEHICLE_API virtual ~dVehicleNode();
 
 	DVEHICLE_API void* GetUserData();
@@ -29,26 +31,77 @@ class dVehicleNode: public dContainersAlloc
 	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	
 	DVEHICLE_API virtual void InitRigiBody(dFloat timestep);
+	DVEHICLE_API virtual int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
 
 	dVehicleNode* GetParent() const {return m_parent;}
 	const dList<dVehicleNode*>& GetChildren() const {return m_children;}
 
+	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+
 	virtual dComplementaritySolver::dBodyState* GetBody() {return &m_body;}
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() {return NULL;}
+
+	bool IsLoopNode() const
+	{
+		return m_isLoop;
+	}
+
+	void SetIndex(int index)
+	{
+		m_solverIndex = index;
+	}
 
 	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
 	virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
 
 	protected:	
+	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+
 	void* m_userData;
 	dVehicleNode* m_parent;
 	dList<dVehicleNode*> m_children;
 	dComplementaritySolver::dBodyState m_body;
 	int m_solverIndex;
+	bool m_isLoop;
 
 	friend class dVehicleSolver;
 };
 
+class dKinematicLoopJoint: public dComplementaritySolver::dBilateralJoint
+{
+	public:
+	dKinematicLoopJoint()
+		:dComplementaritySolver::dBilateralJoint()
+		,m_owner0(NULL)
+		,m_owner1(NULL)
+	{
+	}
+
+	dVehicleNode* GetOwner0() const
+	{
+		return m_owner0;
+	}
+
+	dVehicleNode* GetOwner1() const
+	{
+		return m_owner1;
+	}
+	
+	void SetOwners (dVehicleNode* const owner0, dVehicleNode* const owner1)
+	{
+		m_owner0 = owner0;
+		m_owner1 = owner1;
+		Init (m_owner0->GetBody(), m_owner1->GetBody());
+	}
+
+	bool IsActive () const
+	{
+		return true;
+	}	
+
+	dVehicleNode* m_owner0;
+	dVehicleNode* m_owner1;
+};
 
 #endif 
 

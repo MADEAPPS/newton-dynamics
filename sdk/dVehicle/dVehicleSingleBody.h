@@ -28,6 +28,7 @@ class dVehicleSingleBody: public dVehicleInterface
 
 	protected:
 	void InitRigiBody(dFloat timestep);
+	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 };
 
 

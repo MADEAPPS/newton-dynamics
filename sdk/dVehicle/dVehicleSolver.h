@@ -18,6 +18,7 @@
 
 class dVehicleNode;
 class dVehicleChassis;
+class dKinematicLoopJoint;
 
 class dVehicleSolver: public dContainersAlloc
 {
@@ -67,12 +68,13 @@ class dVehicleSolver: public dContainersAlloc
 
 	// cache temporary variables
 	dBodyJointMatrixDataPair* m_data;
-	
+	dKinematicLoopJoint** m_kinematicLoop;	
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;
 	dComplementaritySolver::dJacobianColum* m_rightHandSide;
 	
 	int m_nodeCount;
 	int m_rowsCount;
+	int m_kinematicLoopCount;
 	int m_auxiliaryRowCount;
 };
 

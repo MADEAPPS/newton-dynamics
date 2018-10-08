@@ -38,10 +38,12 @@ class TemplateVector
 	TemplateVector& operator-= (const TemplateVector &A); 
 	TemplateVector& operator*= (const TemplateVector &A); 
 
+	TemplateVector Min(const TemplateVector &A) const;
+	TemplateVector Max(const TemplateVector &A) const;
+
 	T DotProduct3 (const TemplateVector &A) const; 
 	TemplateVector Normalize () const; 
 	TemplateVector CrossProduct (const TemplateVector &A) const; 
-	
 
 	T m_x;
 	T m_y;
@@ -203,6 +205,18 @@ TemplateVector<T>& TemplateVector<T>::operator*= (const TemplateVector<T>& A)
 	m_z *= A.m_z;
 	//m_w *= A.m_w;
 	return *this;
+}
+
+template<class T>
+TemplateVector<T> TemplateVector<T>::Min(const TemplateVector &A) const
+{
+	return dVector (dMin (m_x, A.m_x), dMin (m_y, A.m_y), dMin (m_z, A.m_z), dMin (m_w, A.m_w));
+}
+
+template<class T>
+TemplateVector<T> TemplateVector<T>::Max(const TemplateVector &A) const
+{
+	return dVector (dMax (m_x, A.m_x), dMax (m_y, A.m_y), dMax (m_z, A.m_z), dMax (m_w, A.m_w));
 }
 
 

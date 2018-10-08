@@ -138,14 +138,18 @@ class dVehicleChassis: public dCustomControllerBase
 	void Cleanup();
 
 	void InitRigiBody(dFloat timestep);
+	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
+	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
 	
 	dMatrix m_localFrame;
 	dVehicleSolver m_solver;
 	dVehicleInterface* m_vehicle;
-	dList<dComplementaritySolver::dBilateralJoint*> m_loopJoints;
+	dVehicleNode m_groundNode;
 
 	dVector m_gravity;
+	dVector m_obbSize;
+	dVector m_obbOrigin;
 
 	friend class dVehicleSolver;
 	friend class dVehicleManager;

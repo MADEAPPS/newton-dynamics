@@ -27,6 +27,40 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 		dVehicleVirtualTire* m_tire;
 	};
 
+	class dContact: public dKinematicLoopJoint
+	{
+		public:
+		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+	};
+
+/*
+	class dTireContact: public dVehicleNode
+	{
+		public:
+		dTireContact ()
+			:dVehicleNode(NULL)
+			,m_tire(NULL)
+		{
+		}
+
+		void Init (dVehicleVirtualTire* const tire)
+		{
+			m_tire = tire;
+			m_contact.m_tire = this;
+			m_contact.SetOwners(this, tire);
+		}
+
+		dComplementaritySolver::dBilateralJoint* GetJoint() 
+		{
+			return &m_contact;
+		}
+
+		dContact m_contact;
+		dVehicleVirtualTire* m_tire;
+	};
+*/
+
 	public:
 	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleVirtualTire();
@@ -42,14 +76,20 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
 	protected:
-	dMatrix GetHardpointMatrix () const;
+	dMatrix GetHardpointMatrix (dFloat posit) const;
 	void InitRigiBody(dFloat timestep);
+	void CalculateContacts(dFloat timestep);
+	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
 	dComplementaritySolver::dBilateralJoint* GetJoint();
+
+	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
 	dTireInfo m_info;
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
 	dTireJoint m_joint;
+	dVehicleNode m_dynamicContactBodyNode;
+	dContact m_contactsJoints[3];
 	NewtonCollision* m_tireShape;
 	dFloat m_omega;
 	dFloat m_speed;

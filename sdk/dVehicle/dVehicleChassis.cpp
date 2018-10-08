@@ -19,6 +19,7 @@ dVehicleChassis::dVehicleChassis ()
 	:m_localFrame(dGetIdentityMatrix())
 	,m_solver()
 	,m_vehicle(NULL)
+	,m_groundNode(NULL, true)
 {
 }
 
@@ -120,6 +121,28 @@ void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) con
 
 void dVehicleChassis::Finalize()
 {
+	dVector minP;
+	dVector maxP;
+	m_vehicle->CalculateNodeAABB(dGetIdentityMatrix(), minP, maxP);
+
+	const dList<dVehicleNode*>& children = m_vehicle->GetChildren();
+	for (dList<dVehicleNode*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)tireNode->GetInfo()->GetAsTire();
+		if (tire) {
+			dVector tireMinP;
+			dVector tireMaxP;
+
+			dMatrix tireMatrix(tire->GetHardpointMatrix(0.0f));
+			tire->CalculateNodeAABB(tireMatrix, tireMinP, tireMaxP);
+
+			minP = minP.Min (tireMinP);
+			maxP = maxP.Max (tireMaxP);
+		}
+	}
+
+	m_obbOrigin = (maxP + minP).Scale (0.5f);
+	m_obbSize = (maxP - minP).Scale (0.5f) + dVector (0.1f, 0.1f, 0.1f, 0.0f);
+
 	m_solver.Finalize(this);
 }
 
@@ -127,6 +150,23 @@ void dVehicleChassis::InitRigiBody(dFloat timestep)
 {
 	m_vehicle->InitRigiBody(timestep);
 	CalculateSuspensionForces(timestep);
+}
+
+void dVehicleChassis::CalculateTireContacts(dFloat timestep)
+{
+	const dList<dVehicleNode*>& children = m_vehicle->GetChildren();
+	for (dList<dVehicleNode*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)tireNode->GetInfo()->GetAsTire();
+		if (tire) {
+			tire->CalculateContacts(timestep);
+		}
+	}
+}
+
+int dVehicleChassis::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+{
+	m_groundNode.SetIndex(-1);
+	return m_vehicle->GetKinematicLoops(jointArray);
 }
 
 void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
