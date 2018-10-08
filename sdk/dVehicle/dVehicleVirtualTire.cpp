@@ -222,9 +222,14 @@ void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver:
 }
 
 
-void dVehicleVirtualTire::CalculateContacts(dFloat timestep)
+void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep)
 {
-
+	for (int i = 0; i < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]); i++) {
+		m_contactsJoints[i].m_isActive = false;
+	}
+	if (bodyArray.m_count) {
+		dTrace (("xxxxxxxx\n"))
+	}
 }
 
 void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

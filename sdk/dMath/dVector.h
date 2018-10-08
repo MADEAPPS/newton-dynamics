@@ -38,6 +38,7 @@ class TemplateVector
 	TemplateVector& operator-= (const TemplateVector &A); 
 	TemplateVector& operator*= (const TemplateVector &A); 
 
+	TemplateVector Abs() const;
 	TemplateVector Min(const TemplateVector &A) const;
 	TemplateVector Max(const TemplateVector &A) const;
 
@@ -205,6 +206,12 @@ TemplateVector<T>& TemplateVector<T>::operator*= (const TemplateVector<T>& A)
 	m_z *= A.m_z;
 	//m_w *= A.m_w;
 	return *this;
+}
+
+template<class T>
+TemplateVector<T> TemplateVector<T>::Abs() const
+{
+	return dVector(dAbs(m_x), dAbs(m_y), dAbs(m_z), dAbs(m_w));
 }
 
 template<class T>

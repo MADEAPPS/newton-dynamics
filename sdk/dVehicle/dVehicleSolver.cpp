@@ -1442,7 +1442,8 @@ void dVehicleSolver::Update(dFloat timestep)
 	dKinematicLoopJoint* kinematicLoop[128];
 	m_kinematicLoop = kinematicLoop;
 
-	m_vehicle->CalculateTireContacts(timestep);
+	m_vehicle->InitRigiBody(timestep);
+	
 	m_kinematicLoopCount = m_vehicle->GetKinematicLoops(m_kinematicLoop);
 
 	int loopNodeCount = 0;
@@ -1468,7 +1469,7 @@ void dVehicleSolver::Update(dFloat timestep)
 	m_leftHandSide = dAlloca(dComplementaritySolver::dJacobianPair, totalJoint * 6);
 	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, totalJoint * 6);
 
-	m_vehicle->InitRigiBody(timestep);
+	
 	m_rowsCount = BuildJacobianMatrix(timestep);
 	InitMassMatrix();
 

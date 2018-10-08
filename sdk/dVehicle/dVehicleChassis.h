@@ -21,6 +21,19 @@
 
 class dVehicleChassis: public dCustomControllerBase
 {
+	class dCollectCollidingBodies
+	{
+		public:
+		dCollectCollidingBodies(NewtonBody* const me)
+			:m_exclude(me)
+			,m_count(0)
+		{
+		}
+
+		NewtonBody* m_exclude;
+		int m_count;
+		NewtonBody* m_array[16];
+	};
 /*
 	class dTireFilter;
 	public:
@@ -141,6 +154,9 @@ class dVehicleChassis: public dCustomControllerBase
 	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
 	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
+
+//	void OnAABBOverlap(const NewtonBody * const body);
+	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 	
 	dMatrix m_localFrame;
 	dVehicleSolver m_solver;

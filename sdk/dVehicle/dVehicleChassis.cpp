@@ -150,15 +150,39 @@ void dVehicleChassis::InitRigiBody(dFloat timestep)
 {
 	m_vehicle->InitRigiBody(timestep);
 	CalculateSuspensionForces(timestep);
+	CalculateTireContacts(timestep);
+}
+
+int dVehicleChassis::OnAABBOverlap(const NewtonBody * const body, void* const context)
+{
+	dCollectCollidingBodies* const bodyList = (dCollectCollidingBodies*)context;
+	if (body != bodyList->m_exclude) {
+		bodyList->m_array[bodyList->m_count] = (NewtonBody*)body;
+		bodyList->m_count++;
+		dAssert(bodyList->m_count < sizeof(bodyList->m_array) / sizeof(bodyList->m_array[1]));
+	}
+	return 1;
 }
 
 void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 {
+	dComplementaritySolver::dBodyState* const chassisBody = m_vehicle->GetBody();
+	const dMatrix& matrix = chassisBody->GetMatrix();
+	dVector origin(matrix.TransformVector(m_obbOrigin));
+	dVector size(matrix.m_front.Abs().Scale(m_obbSize.m_x) + matrix.m_up.Abs().Scale(m_obbSize.m_y) + matrix.m_right.Abs().Scale(m_obbSize.m_z));
+
+	dVector p0 (origin - size);
+	dVector p1 (origin + size);
+
+	dCollectCollidingBodies bodyList(GetBody());
+	NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+	NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, OnAABBOverlap, &bodyList);
+
 	const dList<dVehicleNode*>& children = m_vehicle->GetChildren();
 	for (dList<dVehicleNode*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)tireNode->GetInfo()->GetAsTire();
 		if (tire) {
-			tire->CalculateContacts(timestep);
+			tire->CalculateContacts(bodyList, timestep);
 		}
 	}
 }

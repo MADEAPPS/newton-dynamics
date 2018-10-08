@@ -74,6 +74,7 @@ class dKinematicLoopJoint: public dComplementaritySolver::dBilateralJoint
 		:dComplementaritySolver::dBilateralJoint()
 		,m_owner0(NULL)
 		,m_owner1(NULL)
+		,m_isActive(false)
 	{
 	}
 
@@ -96,11 +97,12 @@ class dKinematicLoopJoint: public dComplementaritySolver::dBilateralJoint
 
 	bool IsActive () const
 	{
-		return true;
+		return m_isActive;
 	}	
 
 	dVehicleNode* m_owner0;
 	dVehicleNode* m_owner1;
+	bool m_isActive;
 };
 
 #endif 

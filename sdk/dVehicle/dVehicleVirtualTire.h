@@ -76,13 +76,12 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
 	protected:
+	dComplementaritySolver::dBilateralJoint* GetJoint();
 	dMatrix GetHardpointMatrix (dFloat posit) const;
 	void InitRigiBody(dFloat timestep);
-	void CalculateContacts(dFloat timestep);
 	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
-	dComplementaritySolver::dBilateralJoint* GetJoint();
-
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	void CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep);
 
 	dTireInfo m_info;
 	dMatrix m_matrix;
