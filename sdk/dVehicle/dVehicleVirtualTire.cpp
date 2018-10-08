@@ -107,7 +107,7 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 dMatrix dVehicleVirtualTire::GetHardpointMatrix (dFloat param) const
 {
 	dMatrix matrix(dYawMatrix(m_steeringAngle) * m_matrix);
-	matrix.m_posit += m_matrix.m_up.Scale(param * m_info.m_suspensionLength);
+	matrix.m_posit += m_matrix.m_up.Scale(param * m_info.m_suspensionLength - m_info.m_pivotOffset);
 	return matrix;
 }
 
