@@ -104,16 +104,17 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 	}
 }
 
-dMatrix dVehicleVirtualTire::GetHardpointMatrix (dFloat position) const
+dMatrix dVehicleVirtualTire::GetHardpointMatrix (dFloat param) const
 {
 	dMatrix matrix(dYawMatrix(m_steeringAngle) * m_matrix);
-	matrix.m_posit += m_matrix.m_up.Scale(position);
+	matrix.m_posit += m_matrix.m_up.Scale(param * m_info.m_suspensionLength);
 	return matrix;
 }
 
 dMatrix dVehicleVirtualTire::GetLocalMatrix () const
 {
-	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix(m_position);
+//	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix(m_position * m_info.m_suspensionLength);
+	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix(1.0f);
 }
 
 dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
@@ -148,7 +149,7 @@ void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 	dComplementaritySolver::dBodyState* const tireBody = GetBody();
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
-	dMatrix tireMatrix (GetHardpointMatrix (m_position) * chassisBody->GetMatrix());
+	dMatrix tireMatrix (GetHardpointMatrix (m_position * m_info.m_suspensionLength) * chassisBody->GetMatrix());
 	tireBody->SetMatrix(tireMatrix);
 
 	tireBody->SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
