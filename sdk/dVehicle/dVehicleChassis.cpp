@@ -19,7 +19,6 @@ dVehicleChassis::dVehicleChassis ()
 	:m_localFrame(dGetIdentityMatrix())
 	,m_solver()
 	,m_vehicle(NULL)
-	,m_groundNode(NULL, true)
 {
 }
 
@@ -107,8 +106,6 @@ void dVehicleChassis::Cleanup()
 	}
 }
 
-
-
 dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
 {
 	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo);
@@ -189,7 +186,8 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 
 int dVehicleChassis::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
 {
-	m_groundNode.SetIndex(-1);
+	dAssert(0);
+//	m_groundNode.SetIndex(-1);
 	return m_vehicle->GetKinematicLoops(jointArray);
 }
 

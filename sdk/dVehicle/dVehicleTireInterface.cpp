@@ -16,6 +16,7 @@
 dVehicleTireInterface::dVehicleTireInterface(dVehicleNode* const parent)
 	:dVehicleNode(parent)
 {
+	SetWorld(parent->GetWorld());
 }
 
 dVehicleTireInterface::~dVehicleTireInterface()

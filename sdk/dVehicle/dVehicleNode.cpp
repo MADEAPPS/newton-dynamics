@@ -16,6 +16,7 @@
 dVehicleNode::dVehicleNode(dVehicleNode* const parent, bool isLoop)
 	:dContainersAlloc()
 	,m_userData(NULL)
+	,m_world(NULL)
 	,m_parent(parent)
 	,m_body()
 	,m_solverIndex(-1)

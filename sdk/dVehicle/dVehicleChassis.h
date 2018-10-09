@@ -161,8 +161,7 @@ class dVehicleChassis: public dCustomControllerBase
 	dMatrix m_localFrame;
 	dVehicleSolver m_solver;
 	dVehicleInterface* m_vehicle;
-	dVehicleNode m_groundNode;
-
+	
 	dVector m_gravity;
 	dVector m_obbSize;
 	dVector m_obbOrigin;

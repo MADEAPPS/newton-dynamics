@@ -27,14 +27,18 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	,m_steeringAngle(0.0f)
 	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f/m_info.m_suspensionLength : 0.0f)
 {
-	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
-	dVehicleChassis* const chassis = chassisNode->GetChassis();
-	NewtonBody* const newtonBody = chassis->GetBody();
-	NewtonWorld* const world = NewtonBodyGetWorld(newtonBody);
+	SetWorld(parent->GetWorld());
+	m_dynamicContactBodyNode.SetWorld(m_world);
 
-	m_tireShape = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
+	//dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
+	//dVehicleChassis* const chassis = chassisNode->GetChassis();
+	//NewtonBody* const newtonBody = chassis->GetBody();
+	//NewtonWorld* const world = NewtonBodyGetWorld(newtonBody);
+
+	m_tireShape = NewtonCreateChamferCylinder(m_world, 0.5f, 1.0f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
-
+dAssert(0);
+/*
 	dMatrix chassisMatrix;
 	NewtonBodyGetMatrix(newtonBody, &chassisMatrix[0][0]);
 
@@ -70,6 +74,7 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
 
 m_omega = -10.0f;
+*/
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -120,12 +125,15 @@ dMatrix dVehicleVirtualTire::GetLocalMatrix () const
 dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
 {
 	dMatrix newtonBodyMatrix;
-
+dAssert(0);
+return newtonBodyMatrix;
+/*
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent->GetAsVehicle();
 	dAssert (chassisNode);
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
 	NewtonBodyGetMatrix(chassis->GetBody(), &newtonBodyMatrix[0][0]);
 	return GetLocalMatrix() * newtonBodyMatrix;
+*/
 }
 
 void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -143,6 +151,8 @@ void dVehicleVirtualTire::SetSteeringAngle(dFloat steeringAngle)
 
 void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 {
+	dAssert(0);
+/*
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
 	dComplementaritySolver::dBodyState* const tireBody = GetBody();
@@ -160,6 +170,7 @@ void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 	dVehicleTireInterface::InitRigiBody(timestep);
 
 m_tireAngle = dMod(m_tireAngle + m_omega * timestep, 2.0f * dPi);
+*/
 }
 
 int dVehicleVirtualTire::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
@@ -220,6 +231,8 @@ void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver:
 
 void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep)
 {
+	dAssert(0);
+/*
 	for (int i = 0; i < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]); i++) {
 		m_contactsJoints[i].m_isActive = false;
 	}
@@ -252,6 +265,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 				&attributeA, &attributeB, 0);
 		}
 	}
+*/
 }
 
 void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

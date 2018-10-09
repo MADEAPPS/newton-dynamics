@@ -57,6 +57,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		void OnTransformCallback(DemoEntityManager& world) const
 		{
 			// calculate tire Matrices
+			dAssert(0);
+/*
 			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
 			dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
 
@@ -70,6 +72,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 					tireMesh->SetMatrixUsafe(rotation, tireMatrix.m_posit);
 				}
 			}
+*/
 		}
 
 		dVehicleChassis* m_vehicleChassis;

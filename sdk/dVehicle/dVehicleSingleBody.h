@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #ifndef __D_SINGLE_BODY_VEHICLE_H__
 #define __D_SINGLE_BODY_VEHICLE_H__
 
@@ -29,6 +28,11 @@ class dVehicleSingleBody: public dVehicleInterface
 	protected:
 	void InitRigiBody(dFloat timestep);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+
+	dVehicleNode m_groundNode;
+	NewtonBody* m_newtonBody;
+
+	friend class dVehicleChassis;
 };
 
 

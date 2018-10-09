@@ -16,18 +16,20 @@
 
 dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	:dVehicleInterface(chassis)
+	,m_groundNode(NULL)
+	,m_newtonBody(chassis->GetBody())
 {
 	dVector tmp;
-	NewtonBody* const newtonBody = m_chassis->GetBody();
 	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
+	m_groundNode.SetWorld(m_world);
 	
 	// set the inertia matrix;
-	NewtonBodyGetMass(newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
+	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
 	chassisBody->SetMass(tmp.m_w);
 	chassisBody->SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
 
 	dMatrix matrix (dGetIdentityMatrix());
-	NewtonBodyGetCentreOfMass(newtonBody, &matrix.m_posit[0]);
+	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
 	matrix.m_posit.m_w = 1.0f;
 	chassisBody->SetLocalMatrix(matrix);
 }
@@ -44,19 +46,23 @@ dVehicleTireInterface* dVehicleSingleBody::AddTire (const dMatrix& locationInGlo
 dMatrix dVehicleSingleBody::GetMatrix () const
 {
 	dMatrix matrix;
-	NewtonBody* const chassisBody = m_chassis->GetBody();
-	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+	dAssert(0);
+//	NewtonBody* const chassisBody = m_chassis->GetBody();
+//	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 	return matrix;
 }
 
 void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
-	NewtonCollision* const collision = NewtonBodyGetCollision(m_chassis->GetBody());
-	CalculateAABB(collision, matrix, minP, maxP);
+	dAssert(0);
+//	NewtonCollision* const collision = NewtonBodyGetCollision(m_chassis->GetBody());
+//	CalculateAABB(collision, matrix, minP, maxP);
 }
 
 void dVehicleSingleBody::InitRigiBody(dFloat timestep)
 {
+	dAssert(0);
+/*
 	dVector vector;
 	dMatrix matrix;
 
@@ -83,4 +89,5 @@ void dVehicleSingleBody::InitRigiBody(dFloat timestep)
 	chassisBody->UpdateInertia();
 
 	dVehicleInterface::InitRigiBody(timestep);
+*/
 }

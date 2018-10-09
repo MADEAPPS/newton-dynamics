@@ -38,6 +38,8 @@ class dVehicleNode: public dContainersAlloc
 
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
+	void SetWorld(NewtonWorld* const world) {m_world = world;}
+	NewtonWorld* GetWorld() const {return m_world;}
 	virtual dComplementaritySolver::dBodyState* GetBody() {return &m_body;}
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() {return NULL;}
 
@@ -58,8 +60,10 @@ class dVehicleNode: public dContainersAlloc
 	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
 	void* m_userData;
+	NewtonWorld* m_world;
 	dVehicleNode* m_parent;
 	dList<dVehicleNode*> m_children;
+	
 	dComplementaritySolver::dBodyState m_body;
 	int m_solverIndex;
 	bool m_isLoop;

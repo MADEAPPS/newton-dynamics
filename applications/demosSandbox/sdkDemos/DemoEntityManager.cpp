@@ -31,7 +31,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// gyroscope precession
@@ -67,7 +67,7 @@
 //#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
-#define DEFAULT_SCENE	36			// single body vehicle
+//#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// David Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles

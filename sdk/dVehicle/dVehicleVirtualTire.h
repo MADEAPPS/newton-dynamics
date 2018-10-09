@@ -97,8 +97,6 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	dFloat m_tireAngle;
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
-	
-	
 
 	friend class dVehicleChassis;
 };

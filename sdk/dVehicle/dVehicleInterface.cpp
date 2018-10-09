@@ -10,19 +10,16 @@
 */
 
 #include "dStdafxVehicle.h"
+#include "dVehicleChassis.h"
 #include "dVehicleInterface.h"
 
 dVehicleInterface::dVehicleInterface(dVehicleChassis* const chassis)
 	:dVehicleNode(NULL)
-	,m_chassis(chassis)
 {
+	SetWorld(NewtonBodyGetWorld(chassis->GetBody()));
 }
 
 dVehicleInterface::~dVehicleInterface()
 {
 }
 
-dVehicleChassis* dVehicleInterface::GetChassis() const
-{
-	return m_chassis;
-}
