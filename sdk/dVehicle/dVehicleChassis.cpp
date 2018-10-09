@@ -108,7 +108,7 @@ void dVehicleChassis::Cleanup()
 
 dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
 {
-	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo);
+	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo, m_localFrame);
 }
 
 void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const

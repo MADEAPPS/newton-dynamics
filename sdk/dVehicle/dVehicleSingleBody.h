@@ -23,7 +23,7 @@ class dVehicleSingleBody: public dVehicleInterface
 	DVEHICLE_API virtual ~dVehicleSingleBody();
 
 	DVEHICLE_API dMatrix GetMatrix () const;
-	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
+	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame);
 
 	protected:
 	void InitRigiBody(dFloat timestep);
@@ -33,6 +33,7 @@ class dVehicleSingleBody: public dVehicleInterface
 	NewtonBody* m_newtonBody;
 
 	friend class dVehicleChassis;
+	friend class dVehicleVirtualTire;
 };
 
 

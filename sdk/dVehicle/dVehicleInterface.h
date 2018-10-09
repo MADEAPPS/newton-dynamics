@@ -28,7 +28,7 @@ class dVehicleInterface: public dVehicleNode
 
 	protected:
 	virtual dMatrix GetMatrix() const = 0;
-	virtual dVehicleTireInterface* AddTire(const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo) = 0;
+	virtual dVehicleTireInterface* AddTire(const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame) = 0;
 
 	friend class dVehicleChassis;
 };

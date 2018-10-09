@@ -14,7 +14,7 @@
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualTire.h"
 
-dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
+dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame)
 	:dVehicleTireInterface(parent)
 	,m_info(info)
 	,m_joint()
@@ -30,15 +30,14 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	SetWorld(parent->GetWorld());
 	m_dynamicContactBodyNode.SetWorld(m_world);
 
-	//dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
+	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
 	//dVehicleChassis* const chassis = chassisNode->GetChassis();
-	//NewtonBody* const newtonBody = chassis->GetBody();
+	NewtonBody* const newtonBody = chassisNode->m_newtonBody;
 	//NewtonWorld* const world = NewtonBodyGetWorld(newtonBody);
 
 	m_tireShape = NewtonCreateChamferCylinder(m_world, 0.5f, 1.0f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
-dAssert(0);
-/*
+
 	dMatrix chassisMatrix;
 	NewtonBodyGetMatrix(newtonBody, &chassisMatrix[0][0]);
 
@@ -47,8 +46,8 @@ dAssert(0);
 	alignMatrix.m_up = dVector (0.0f, 1.0f, 0.0f, 0.0f);
 	alignMatrix.m_right = alignMatrix.m_front.CrossProduct(alignMatrix.m_up);
 
-	m_matrix = alignMatrix * chassis->m_localFrame;
-	m_matrix.m_posit = chassis->m_localFrame.UntransformVector(chassisMatrix.UntransformVector(locationInGlobalSpace.m_posit));
+	m_matrix = alignMatrix * localFrame;
+	m_matrix.m_posit = localFrame.UntransformVector(chassisMatrix.UntransformVector(locationInGlobalSpace.m_posit));
 
 	m_bindingRotation = locationInGlobalSpace * (m_matrix * chassisMatrix).Inverse();
 	m_bindingRotation.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
@@ -69,12 +68,11 @@ dAssert(0);
 	m_joint.m_tire = this;
 
 	for (int i = 0 ; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i ++) {
-		m_contactsJoints[i].SetOwners (this, &chassis->m_groundNode);
+		m_contactsJoints[i].SetOwners (this, &chassisNode->m_groundNode);
 	}
 	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
 
 m_omega = -10.0f;
-*/
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()

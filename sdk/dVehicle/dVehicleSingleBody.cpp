@@ -38,9 +38,9 @@ dVehicleSingleBody::~dVehicleSingleBody()
 {
 }
 
-dVehicleTireInterface* dVehicleSingleBody::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
+dVehicleTireInterface* dVehicleSingleBody::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame)
 {
-	return new dVehicleVirtualTire(this, locationInGlobalSpace, tireInfo);
+	return new dVehicleVirtualTire(this, locationInGlobalSpace, tireInfo, localFrame);
 }
 
 dMatrix dVehicleSingleBody::GetMatrix () const

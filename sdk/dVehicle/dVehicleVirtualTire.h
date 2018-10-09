@@ -62,7 +62,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 */
 
 	public:
-	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
+	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame);
 	DVEHICLE_API virtual ~dVehicleVirtualTire();
 
 	DVEHICLE_API dMatrix GetLocalMatrix () const;
