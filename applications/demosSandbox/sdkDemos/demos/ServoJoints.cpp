@@ -162,6 +162,8 @@ class ServoInputManager: public dCustomInputManager
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
+		dTrace(("fix me !!!!\n"));
+/*
 		ServoEntityModel::InputRecord inputs;
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
@@ -181,7 +183,6 @@ class ServoInputManager: public dCustomInputManager
 			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
 			NewtonBodySetSleepState(body, false);
 		}
-
 #if 0
 #if 0
 		static FILE* file = fopen("log.bin", "wb");
@@ -197,6 +198,7 @@ class ServoInputManager: public dCustomInputManager
 #endif
 #endif
 		vehicleModel->SetInput(inputs);
+*/
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
@@ -207,6 +209,8 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
+		dTrace(("fix me !!!!\n"));
+/*
 		DemoCamera* const camera = m_scene->GetCamera();
 		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
@@ -233,6 +237,7 @@ class ServoInputManager: public dCustomInputManager
 		}
 
 		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
+*/
 	}
 
 	void OnEndUpdate(dFloat timestepInSecunds)
@@ -778,18 +783,23 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		return new dCustomMotor(engineMatrix.m_up, engine, chassis);
 	}
 
-	dCustomTransformController* CreateForklift(const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
+	dCustomTransformController* CreateForklift(const dMatrix& location, const char* const filename, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
+		// load the model
+		//const DemoEntity* const model = DemoEntity::LoadNGD_mesh(filename, scene->GetNewton());
+
 		// make a clone of the mesh 
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*)model->CreateClone();
+		//ServoEntityModel* const vehicleModel = (ServoEntityModel*)model->CreateClone();
+		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(filename, scene->GetNewton());
 		scene->Append(vehicleModel);
 
 		// plane the model at its location
 		vehicleModel->ResetMatrix(*scene, location);
-
+return NULL;
+/*
 		dCustomTransformController* const controller = CreateTransformController();
 
 		controller->SetSelfCollision(0);
@@ -861,6 +871,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		}
 
 		return controller;
+*/
 	}
 };
 
@@ -888,8 +899,8 @@ void ServoJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	// load a the mesh of the articulate vehicle
-	ServoEntityModel forkliftModel(scene, "forklift.ngd");
-	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+//	ServoEntityModel forkliftModel(scene, "forklift.ngd");
+	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
 
 	// add some object to play with
