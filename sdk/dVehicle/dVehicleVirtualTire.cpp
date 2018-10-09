@@ -22,9 +22,10 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	,m_omega(0.0f)
 	,m_speed(0.0f)
 	,m_position(0.0f)
+	,m_tireLoad(0.0f)
 	,m_tireAngle(0.0f)
 	,m_steeringAngle(0.0f)
-	,m_tireLoad(0.0f)
+	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f/m_info.m_suspensionLength : 0.0f)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
@@ -113,20 +114,18 @@ dMatrix dVehicleVirtualTire::GetHardpointMatrix (dFloat param) const
 
 dMatrix dVehicleVirtualTire::GetLocalMatrix () const
 {
-//	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix(m_position * m_info.m_suspensionLength);
-	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix(1.0f);
+	return m_bindingRotation * dPitchMatrix(m_tireAngle) * GetHardpointMatrix(m_position * m_invSuspensionLength);
 }
 
 dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
 {
+	dMatrix newtonBodyMatrix;
+
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent->GetAsVehicle();
 	dAssert (chassisNode);
 	dVehicleChassis* const chassis = chassisNode->GetChassis();
-	NewtonBody* const chassisBody = chassis->GetBody();
-
-	dMatrix newtonBody;
-	NewtonBodyGetMatrix(chassisBody, &newtonBody[0][0]);
-	return GetLocalMatrix () * newtonBody;
+	NewtonBodyGetMatrix(chassis->GetBody(), &newtonBodyMatrix[0][0]);
+	return GetLocalMatrix() * newtonBodyMatrix;
 }
 
 void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -149,7 +148,7 @@ void dVehicleVirtualTire::InitRigiBody(dFloat timestep)
 	dComplementaritySolver::dBodyState* const tireBody = GetBody();
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
-	dMatrix tireMatrix (GetHardpointMatrix (m_position * m_info.m_suspensionLength) * chassisBody->GetMatrix());
+	dMatrix tireMatrix (GetHardpointMatrix (m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
 	tireBody->SetMatrix(tireMatrix);
 
 	tireBody->SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
@@ -185,11 +184,7 @@ void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver:
 	// Restrict the movement on the pivot point along all two orthonormal direction
 	dComplementaritySolver::dBodyState* const tire = m_state0;
 	dComplementaritySolver::dBodyState* const chassis = m_state1;
-	//NewtonBody* const newtonBody = m_tire->m_parent->GetAsVehicle()->GetChassis()->GetBody();
 
-	//dMatrix tireMatrix (tire->GetMatrix());
-	//tireMatrix.m_up = chassis->GetMatrix().m_up;
-	//tireMatrix.m_right = tireMatrix.m_front.CrossProduct(tireMatrix.m_up);
 	const dVector& omega = chassis->GetOmega();
 	const dMatrix& tireMatrix = tire->GetMatrix();
 
@@ -229,7 +224,33 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 		m_contactsJoints[i].m_isActive = false;
 	}
 	if (bodyArray.m_count) {
-		dTrace (("xxxxxxxx\n"))
+		dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
+		dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
+
+		dMatrix tireMatrix (GetHardpointMatrix (1.0f) * chassisBody->GetMatrix());
+		dVector veloc0 (tireMatrix.m_up.Scale (-m_info.m_suspensionLength));
+		dVector tmp (0.0f);
+
+		dVector contact(0.0f);
+		dVector normal(0.0f);
+		dFloat penetration(0.0f);
+
+		NewtonWorld* const world = NewtonBodyGetWorld(chassisNode->GetChassis()->GetBody());
+		for (int i = 0; i < bodyArray.m_count; i ++) {
+			dMatrix matrixB;
+			dLong attributeA;
+			dLong attributeB;
+			dFloat impactParam;
+
+			NewtonBodyGetMatrix(bodyArray.m_array[i], &matrixB[0][0]);
+			NewtonCollision* const otherShape = NewtonBodyGetCollision (bodyArray.m_array[i]);
+
+			int count = NewtonCollisionCollideContinue(world, 1, 1.0f,
+				m_tireShape, &tireMatrix[0][0], &veloc0[0], &tmp[0],
+				otherShape, &matrixB[0][0], &tmp[0], &tmp[0], 
+				&impactParam, &contact[0], &normal[0], &penetration,
+				&attributeA, &attributeB, 0);
+		}
 	}
 }
 
