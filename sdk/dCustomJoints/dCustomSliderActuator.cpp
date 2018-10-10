@@ -125,30 +125,81 @@ void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 {
 	dCustomSlider::SubmitAngularRow(matrix0, matrix1, timestep);
 
-	dFloat invTimeStep = 1.0f / timestep;
+	dAssert(m_linearRate >= 0.0f);
 	dFloat posit = GetJointPosit();
 	dFloat targetPosit = m_targetPosit;
-	dFloat currentSpeed = 0.0f;
-	if (posit > targetPosit) {
-		currentSpeed = -m_linearRate;
-		dFloat predictPosit = posit + currentSpeed * timestep;
-		if (predictPosit < targetPosit) {
-			currentSpeed = 0.5f * (predictPosit - posit) * invTimeStep;
-		}
+//	dFloat currentSpeed = 0.0f;
+
+	dFloat invTimeStep = 1.0f / timestep;
+	dFloat step = m_linearRate * timestep;
+	if (posit < (targetPosit - step)) {
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + m_linearRate * invTimeStep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	} else if (posit < targetPosit) {
+		dFloat currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	} else if (posit > (targetPosit + step)) {
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) - m_linearRate * invTimeStep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	} else if (posit > targetPosit) {
+		dFloat currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	} else {
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
+
+/*
+	dAssert(m_linearRate >= 0.0f);
+	dFloat posit = GetJointPosit();
+	//	dFloat targetPosit = m_targetPosit;
+	dFloat invTimeStep = 1.0f / timestep;
+	dFloat step = m_linearRate * timestep;
+	dFloat deadZone = 0.1f * step;
+
+	dFloat currentSpeed = 0.0f;
+	if (posit < (m_targetPosit - step)) {
 		currentSpeed = m_linearRate;
-		dFloat predictPosit = posit + currentSpeed * timestep;
-		if (predictPosit > targetPosit) {
-			currentSpeed = 0.5f * (predictPosit - posit) * invTimeStep;
-		}
+	} else if (posit < (m_targetPosit - deadZone)) {
+		currentSpeed = 0.3f * (m_targetPosit - posit) * invTimeStep;
+	} else if (posit > (m_targetPosit + step)) {
+		currentSpeed = -m_linearRate;
+	} else if (posit > (m_targetPosit + deadZone)) {
+		currentSpeed = 0.3f * (m_targetPosit - posit) * invTimeStep;
 	}
 
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
-	NewtonUserJointSetRowAcceleration(m_joint, accel);
+	if (currentSpeed != 0.0f) {
+		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+	}
+
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+*/
+
 }
 
 

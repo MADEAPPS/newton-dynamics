@@ -209,7 +209,7 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
-		dTrace(("fix me !!!!\n"));
+//		dTrace(("fix me !!!!\n"));
 /*
 		DemoCamera* const camera = m_scene->GetCamera();
 		ServoEntityModel* const lifterData = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
