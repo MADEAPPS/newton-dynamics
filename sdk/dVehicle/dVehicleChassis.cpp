@@ -140,12 +140,13 @@ void dVehicleChassis::Finalize()
 	m_obbOrigin = (maxP + minP).Scale (0.5f);
 	m_obbSize = (maxP - minP).Scale (0.5f) + dVector (0.1f, 0.1f, 0.1f, 0.0f);
 
+	m_vehicle->RigidBodyToStates();
 	m_solver.Finalize(this);
 }
 
-void dVehicleChassis::InitRigiBody(dFloat timestep)
+void dVehicleChassis::ApplyExternalForces(dFloat timestep)
 {
-	m_vehicle->InitRigiBody(timestep);
+	m_vehicle->ApplyExternalForce();
 	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 }
@@ -186,22 +187,20 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 
 int dVehicleChassis::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
 {
-	dAssert(0);
-//	m_groundNode.SetIndex(-1);
 	return m_vehicle->GetKinematicLoops(jointArray);
 }
 
 void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
 {
-	//	dAssert (0);
+	m_vehicle->RigidBodyToStates();
 }
 
 void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 {
 	//	dAssert (0);
+	m_vehicle->RigidBodyToStates();
 	m_solver.Update(timestep);
 }
-
 
 void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 {

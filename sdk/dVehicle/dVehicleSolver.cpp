@@ -1442,7 +1442,7 @@ void dVehicleSolver::Update(dFloat timestep)
 	dKinematicLoopJoint* kinematicLoop[128];
 	m_kinematicLoop = kinematicLoop;
 
-	m_vehicle->InitRigiBody(timestep);
+	m_vehicle->ApplyExternalForces(timestep);
 	
 	m_kinematicLoopCount = m_vehicle->GetKinematicLoops(m_kinematicLoop);
 

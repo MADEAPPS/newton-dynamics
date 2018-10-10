@@ -16,6 +16,7 @@
 
 dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	:dVehicleInterface(chassis)
+	,m_gravity(0.0f)
 	,m_groundNode(NULL)
 	,m_newtonBody(chassis->GetBody())
 {
@@ -45,49 +46,64 @@ dVehicleTireInterface* dVehicleSingleBody::AddTire (const dMatrix& locationInGlo
 
 dMatrix dVehicleSingleBody::GetMatrix () const
 {
-	dMatrix matrix;
-	dAssert(0);
+//	dMatrix matrix;
 //	NewtonBody* const chassisBody = m_chassis->GetBody();
 //	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-	return matrix;
+	return m_body.GetMatrix();
 }
 
 void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
-	dAssert(0);
-//	NewtonCollision* const collision = NewtonBodyGetCollision(m_chassis->GetBody());
-//	CalculateAABB(collision, matrix, minP, maxP);
+	NewtonCollision* const collision = NewtonBodyGetCollision(m_newtonBody);
+	CalculateAABB(collision, matrix, minP, maxP);
 }
 
-void dVehicleSingleBody::InitRigiBody(dFloat timestep)
+void dVehicleSingleBody::RigidBodyToStates()
 {
-	dAssert(0);
-/*
 	dVector vector;
 	dMatrix matrix;
-
-	NewtonBody* const newtonBody = m_chassis->GetBody();
 	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
 
 	// get data from engine rigid body and copied to the vehicle chassis body
-	NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
+	NewtonBodyGetMatrix(m_newtonBody, &matrix[0][0]);
 	chassisBody->SetMatrix(matrix);
 
-	NewtonBodyGetVelocity(newtonBody, &vector[0]);
+	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
 	chassisBody->SetVeloc(vector);
 
-	NewtonBodyGetOmega(newtonBody, &vector[0]);
-//vector.m_y = 10.0f;
+	NewtonBodyGetOmega(m_newtonBody, &vector[0]);
+	//vector.m_y = 10.0f;
 	chassisBody->SetOmega(vector);
 
-	NewtonBodyGetForce(newtonBody, &vector[0]);
+	NewtonBodyGetForce(m_newtonBody, &vector[0]);
 	chassisBody->SetForce(vector);
 
-	NewtonBodyGetTorque(newtonBody, &vector[0]);
+	NewtonBodyGetTorque(m_newtonBody, &vector[0]);
 	chassisBody->SetTorque(vector);
 
 	chassisBody->UpdateInertia();
+	
+	dVehicleInterface::RigidBodyToStates();
+}
 
-	dVehicleInterface::InitRigiBody(timestep);
-*/
+int dVehicleSingleBody::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+{
+	m_groundNode.SetIndex(-1);
+	return dVehicleInterface::GetKinematicLoops(jointArray);
+}
+
+void dVehicleSingleBody::ApplyExternalForce()
+{
+	dVector force;
+	dVector torque;
+	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
+
+	NewtonBodyGetForce(m_newtonBody, &force[0]);
+	chassisBody->SetForce(force);
+
+	NewtonBodyGetTorque(m_newtonBody, &torque[0]);
+	chassisBody->SetTorque(torque);
+
+	m_gravity = force.Scale (chassisBody->GetInvMass());
+	dVehicleInterface::ApplyExternalForce();
 }

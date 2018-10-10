@@ -77,10 +77,17 @@ void dVehicleNode::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVect
 	maxP = matrix.m_posit;
 }
 
-void dVehicleNode::InitRigiBody(dFloat timestep)
+void dVehicleNode::ApplyExternalForce()
 {
 	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-		child->GetInfo()->InitRigiBody(timestep);
+		child->GetInfo()->ApplyExternalForce();
+	}
+}
+
+void dVehicleNode::RigidBodyToStates()
+{
+	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->RigidBodyToStates();
 	}
 }
 

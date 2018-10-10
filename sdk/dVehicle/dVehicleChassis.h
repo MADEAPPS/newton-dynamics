@@ -150,7 +150,7 @@ class dVehicleChassis: public dCustomControllerBase
 	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Cleanup();
 
-	void InitRigiBody(dFloat timestep);
+	void ApplyExternalForces(dFloat timestep);
 	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
 	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);

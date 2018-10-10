@@ -26,9 +26,12 @@ class dVehicleSingleBody: public dVehicleInterface
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame);
 
 	protected:
-	void InitRigiBody(dFloat timestep);
+	void RigidBodyToStates();
+	void ApplyExternalForce();
+	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
+	dVector m_gravity;
 	dVehicleNode m_groundNode;
 	NewtonBody* m_newtonBody;
 
