@@ -59,8 +59,7 @@ static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
-
-class ServoEntityModel: public DemoEntity
+class dLifterUserData: public DemoEntity::UserData
 {
 	public:
 	class InputRecord
@@ -78,29 +77,10 @@ class ServoEntityModel: public DemoEntity
 		int m_throttleValue;
 	};
 
-	ServoEntityModel(DemoEntityManager* const scene, const char* const name)
-		:DemoEntity(dGetIdentityMatrix(), NULL)
-		,m_inputs()
-		,m_engineMotor(NULL)
-		,m_engineJoint(NULL)
-		,m_forkBase(NULL)
-		,m_maxEngineSpeed(20.0f)
-	{
-		m_liftJoints[0] = NULL;
-		m_liftJoints[1] = NULL;
-		m_liftJoints[2] = NULL;
-		m_paletteJoints[0] = NULL;
-		m_paletteJoints[1] = NULL;
-		m_rearTireJoints[0] = NULL;
-		m_rearTireJoints[1] = NULL;
-		m_frontTiresJoints[0] = NULL;
-		m_frontTiresJoints[1] = NULL;
-		// load the vehicle model
-		LoadNGD_mesh(name, scene->GetNewton());
-	}
 
-	ServoEntityModel(const ServoEntityModel& copy)
-		:DemoEntity(copy)
+	dLifterUserData(DemoEntity* const vehicle)
+		:DemoEntity::UserData()
+//		,m_vehicleChassis(vehicle)
 		,m_inputs()
 		,m_engineMotor(NULL)
 		,m_engineJoint(NULL)
@@ -118,9 +98,16 @@ class ServoEntityModel: public DemoEntity
 		m_frontTiresJoints[1] = NULL;
 	}
 
-	DemoEntity* CreateClone() const
+	void OnRender(dFloat timestep) const
 	{
-		return new ServoEntityModel(*this);
+	}
+
+	void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
+	{
+	}
+
+	void OnTransformCallback(DemoEntityManager& world) const
+	{
 	}
 
 	void SetInput(const InputRecord& inputs)
@@ -143,6 +130,21 @@ class ServoEntityModel: public DemoEntity
 class ServoInputManager: public dCustomInputManager
 {
 	public:
+	class InputRecord
+	{
+		public:
+		InputRecord()
+		{
+			memset(this, 0, sizeof(InputRecord));
+		}
+
+		dFloat m_liftValue;
+		dFloat m_forkValue;
+		dFloat m_paletteValue;
+		int m_steerValue;
+		int m_throttleValue;
+	};
+
 	ServoInputManager(DemoEntityManager* const scene)
 		:dCustomInputManager(scene->GetNewton())
 		,m_scene(scene)
@@ -162,10 +164,9 @@ class ServoInputManager: public dCustomInputManager
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
-		dTrace(("fix me !!!!\n"));
-/*
-		ServoEntityModel::InputRecord inputs;
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
+		dLifterUserData::InputRecord inputs;
+		DemoEntity* const entity = (DemoEntity*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
+		dLifterUserData* const lifterData = (dLifterUserData*)(entity->GetUserData());
 
 		inputs.m_steerValue = int(m_scene->GetKeyState('D')) - int(m_scene->GetKeyState('A'));
 		inputs.m_throttleValue = int(m_scene->GetKeyState('W')) - int(m_scene->GetKeyState('S'));
@@ -197,8 +198,7 @@ class ServoInputManager: public dCustomInputManager
 		}
 #endif
 #endif
-		vehicleModel->SetInput(inputs);
-*/
+		lifterData->SetInput(inputs);
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
@@ -212,7 +212,7 @@ class ServoInputManager: public dCustomInputManager
 		dTrace(("fix me !!!!\n"));
 /*
 		DemoCamera* const camera = m_scene->GetCamera();
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
+		ServoEntityModel* const lifterData = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
 		//if (!m_currentPlayer) {
 		//	return;
@@ -223,7 +223,7 @@ class ServoInputManager: public dCustomInputManager
 		}
 
 		dMatrix camMatrix(camera->GetNextMatrix());
-		dMatrix playerMatrix(vehicleModel->GetNextMatrix());
+		dMatrix playerMatrix(lifterData->GetNextMatrix());
 
 		dVector frontDir(camMatrix[0]);
 		dVector camOrigin(0.0f);
@@ -456,48 +456,48 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		}
 	}
 
-
 	virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*)controller->GetUserData();
+		//ServoEntityModel* const lifterData = (ServoEntityModel*)controller->GetUserData();
+		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 
-		if (vehicleModel->m_engineJoint) {
+		if (lifterData->m_engineJoint) {
 			dFloat engineRPM = 0.0f;
 			dFloat brakeTorque = 2000.0f;
 
-			if (vehicleModel->m_inputs.m_throttleValue > 0) {
+			if (lifterData->m_inputs.m_throttleValue > 0) {
 				brakeTorque = 0.0f;
-				engineRPM = -vehicleModel->m_maxEngineSpeed;
-			} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
+				engineRPM = -lifterData->m_maxEngineSpeed;
+			} else if (lifterData->m_inputs.m_throttleValue < 0) {
 				brakeTorque = 0.0f;
-				engineRPM = vehicleModel->m_maxEngineSpeed;
+				engineRPM = lifterData->m_maxEngineSpeed;
 			}
 
 			// apply DC engine torque
-			vehicleModel->m_engineMotor->SetSpeed(engineRPM);
+			lifterData->m_engineMotor->SetSpeed(engineRPM);
 
 			// apply breaks
-			//for (int i = 0; i < vehicleModel->m_tractionTiresCount; i++) {
-			//	vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
+			//for (int i = 0; i < lifterData->m_tractionTiresCount; i++) {
+			//	lifterData->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
 			//}
 		}
 
 		// update steering wheels
-		dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetSteerAngle();
-		if (vehicleModel->m_inputs.m_steerValue > 0) {
+		dFloat steeringAngle = lifterData->m_rearTireJoints[0]->GetSteerAngle();
+		if (lifterData->m_inputs.m_steerValue > 0) {
 			steeringAngle = 30.0f * dDegreeToRad;
-		} else if (vehicleModel->m_inputs.m_steerValue < 0) {
+		} else if (lifterData->m_inputs.m_steerValue < 0) {
 			steeringAngle = -30.0f * dDegreeToRad;
 		}
-		vehicleModel->m_rearTireJoints[0]->SetTargetSteerAngle(steeringAngle);
-		vehicleModel->m_rearTireJoints[1]->SetTargetSteerAngle(steeringAngle);
+		lifterData->m_rearTireJoints[0]->SetTargetSteerAngle(steeringAngle);
+		lifterData->m_rearTireJoints[1]->SetTargetSteerAngle(steeringAngle);
 
-		vehicleModel->m_forkBase->SetTargetAngle(vehicleModel->m_inputs.m_forkValue);
-		vehicleModel->m_liftJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_liftValue);
-		vehicleModel->m_liftJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_liftValue);
-		vehicleModel->m_liftJoints[2]->SetTargetPosit(vehicleModel->m_inputs.m_liftValue);
-		vehicleModel->m_paletteJoints[0]->SetTargetPosit(vehicleModel->m_inputs.m_paletteValue);
-		vehicleModel->m_paletteJoints[1]->SetTargetPosit(vehicleModel->m_inputs.m_paletteValue);
+		lifterData->m_forkBase->SetTargetAngle(lifterData->m_inputs.m_forkValue);
+		lifterData->m_liftJoints[0]->SetTargetPosit(lifterData->m_inputs.m_liftValue);
+		lifterData->m_liftJoints[1]->SetTargetPosit(lifterData->m_inputs.m_liftValue);
+		lifterData->m_liftJoints[2]->SetTargetPosit(lifterData->m_inputs.m_liftValue);
+		lifterData->m_paletteJoints[0]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
+		lifterData->m_paletteJoints[1]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -600,7 +600,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(body, definition.m_mass, collision);
 
-		// save the user data with the bone body (usually the visual geometry)
+		// save the user lifterData with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(body, bodyPart);
 
 		// assign a body part id
@@ -667,11 +667,12 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		dMatrix tireHingeMatrix(dRollMatrix(0.0f * dDegreeToRad) * matrix);
 		tireHingeMatrix = wheel->GetMatrix0() * tireHingeMatrix;
 
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*)controller->GetUserData();
+		//ServoEntityModel* const lifterData = (ServoEntityModel*)controller->GetUserData();
+		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 
-		dAssert (chassis == vehicleModel->m_engineJoint->GetBody1());
-		NewtonBody* const engine = vehicleModel->m_engineJoint->GetBody0();
-		vehicleModel->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+		dAssert (chassis == lifterData->m_engineJoint->GetBody1());
+		NewtonBody* const engine = lifterData->m_engineJoint->GetBody0();
+		lifterData->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
 		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
 		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up.Scale(-1.0f), engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
@@ -681,47 +682,47 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	void ConnectBodyPart(dCustomTransformController* const controller, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
 	{
-		ServoEntityModel* const vehicleModel = (ServoEntityModel*) controller->GetUserData();
+		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 
 		if (jointArticulation == "") {
 			// this is the root body do nothing
 		} else if (jointArticulation == "frontTire") {
 			dCustomWheel* const tire = LinkFrontTireJoint(controller, parent, child);
-			if (!vehicleModel->m_frontTiresJoints[0]) {
-				vehicleModel->m_frontTiresJoints[0] = tire;
+			if (!lifterData->m_frontTiresJoints[0]) {
+				lifterData->m_frontTiresJoints[0] = tire;
 			} else {
-				dAssert(!vehicleModel->m_frontTiresJoints[1]);
-				vehicleModel->m_frontTiresJoints[1] = tire;
+				dAssert(!lifterData->m_frontTiresJoints[1]);
+				lifterData->m_frontTiresJoints[1] = tire;
 			}
 		} else if (jointArticulation == "rearTire") {
 			dCustomWheel* const tire = LinkTireJoint(parent, child);
-			if (!vehicleModel->m_rearTireJoints[0]) {
-				vehicleModel->m_rearTireJoints[0] = tire;
+			if (!lifterData->m_rearTireJoints[0]) {
+				lifterData->m_rearTireJoints[0] = tire;
 			} else {
-				dAssert(!vehicleModel->m_rearTireJoints[1]);
-				vehicleModel->m_rearTireJoints[1] = tire;
+				dAssert(!lifterData->m_rearTireJoints[1]);
+				lifterData->m_rearTireJoints[1] = tire;
 			}
 		} else if (jointArticulation == "hingeActuator") {
-			vehicleModel->m_forkBase = LinkHingeActuator(parent, child);
+			lifterData->m_forkBase = LinkHingeActuator(parent, child);
 		} else if (jointArticulation == "liftActuator") {
 			dCustomSliderActuator* const lift = LinkLiftActuator(parent, child);;
-			if (!vehicleModel->m_liftJoints[0]) {
-				vehicleModel->m_liftJoints[0] = lift;
-			} else if (!vehicleModel->m_liftJoints[1]) {
-				dAssert(!vehicleModel->m_liftJoints[1]);
-				vehicleModel->m_liftJoints[1] = lift;
+			if (!lifterData->m_liftJoints[0]) {
+				lifterData->m_liftJoints[0] = lift;
+			} else if (!lifterData->m_liftJoints[1]) {
+				dAssert(!lifterData->m_liftJoints[1]);
+				lifterData->m_liftJoints[1] = lift;
 			} else {
-				dAssert(!vehicleModel->m_liftJoints[2]);
-				vehicleModel->m_liftJoints[2] = lift;
+				dAssert(!lifterData->m_liftJoints[2]);
+				lifterData->m_liftJoints[2] = lift;
 			}
 
 		} else if (jointArticulation == "paletteActuator") {
 			dCustomSliderActuator* const lift = LinkLiftActuator(parent, child);;
-			if (!vehicleModel->m_paletteJoints[0]) {
-				vehicleModel->m_paletteJoints[0] = lift;
+			if (!lifterData->m_paletteJoints[0]) {
+				lifterData->m_paletteJoints[0] = lift;
 			} else {
-				dAssert(!vehicleModel->m_paletteJoints[1]);
-				vehicleModel->m_paletteJoints[1] = lift;
+				dAssert(!lifterData->m_paletteJoints[1]);
+				lifterData->m_paletteJoints[1] = lift;
 			}
 		} else {
 			dAssert(0);
@@ -788,9 +789,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		// load the model
-		//const DemoEntity* const model = DemoEntity::LoadNGD_mesh(filename, scene->GetNewton());
-
 		// make a clone of the mesh 
 		//ServoEntityModel* const vehicleModel = (ServoEntityModel*)model->CreateClone();
 		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(filename, scene->GetNewton());
@@ -798,8 +796,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 		// plane the model at its location
 		vehicleModel->ResetMatrix(*scene, location);
-return NULL;
-/*
 		dCustomTransformController* const controller = CreateTransformController();
 
 		controller->SetSelfCollision(0);
@@ -807,7 +803,6 @@ return NULL;
 		controller->SetCalculateLocalTransforms(true);
 
 		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
-
 		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
 
 		// move the center of mass a lithe to the back, and lower
@@ -820,18 +815,22 @@ return NULL;
 //new dCustom6dof (location, rootBody);
 //NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
+		// attach a user lifterData for controlling the vehicle
+		dLifterUserData* const lifterData = new dLifterUserData(vehicleModel);
+		vehicleModel->SetUserData(lifterData);
+
 		// add the root bone to the articulation manager
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
 
 		// add engine
 		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		vehicleModel->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
-		vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
+		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
+		lifterData->m_engineMotor = CreateEngineMotor(controller, lifterData->m_engineJoint);
 
 		// set power parameter for a simple DC engine
-		vehicleModel->m_maxEngineSpeed = 20.0f;
-		vehicleModel->m_engineMotor->SetTorque(1000.0f);
-		//vehicleModel->m_engineMotor->SetTorque1(1500.0f);
+		lifterData->m_maxEngineSpeed = 20.0f;
+		lifterData->m_engineMotor->SetTorque(1000.0f);
+		//lifterData->m_engineMotor->SetTorque1(1500.0f);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
@@ -869,9 +868,7 @@ return NULL;
 				stackIndex++;
 			}
 		}
-
 		return controller;
-*/
 	}
 };
 
