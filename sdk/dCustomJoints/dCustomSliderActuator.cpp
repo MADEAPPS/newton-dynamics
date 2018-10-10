@@ -128,31 +128,27 @@ void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	dAssert(m_linearRate >= 0.0f);
 	dFloat posit = GetJointPosit();
 	dFloat targetPosit = m_targetPosit;
-//	dFloat currentSpeed = 0.0f;
 
 	dFloat invTimeStep = 1.0f / timestep;
 	dFloat step = m_linearRate * timestep;
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-
+	dFloat currentSpeed = 0.0f;
+	
 	if (posit < (targetPosit - step)) {
-		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + m_linearRate * invTimeStep;
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		currentSpeed = m_linearRate;
 	} else if (posit < targetPosit) {
-		dFloat currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
-		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
 	} else if (posit > (targetPosit + step)) {
-		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) - m_linearRate * invTimeStep;
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		currentSpeed = -m_linearRate;
 	} else if (posit > targetPosit) {
-		dFloat currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
-		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
 	}
+
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxForce);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
 }
 
 
