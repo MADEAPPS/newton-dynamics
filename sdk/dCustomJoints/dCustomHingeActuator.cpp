@@ -156,8 +156,6 @@ void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 */
 
 	dAssert(m_motorSpeed >= 0.0f);
-//	dFloat posit = GetJointPosit();
-//	dFloat targetPosit = m_targetPosit;
 	const dFloat angle = m_curJointAngle.GetAngle();
 	const dFloat targetAngle = m_targetAngle.GetAngle();
 
