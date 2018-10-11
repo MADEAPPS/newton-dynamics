@@ -841,7 +841,7 @@ void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
 
 	dAssert (body->GetInvMass() != dFloat32(0.0f));
 
-	const dFloat32 mass = body->GetMass();
+	const dFloat mass = body->GetMass();
 	const dMatrix& inertia = body->GetInertia();
 
 	for (int i = 0; i < 3; i++) {
@@ -1440,11 +1440,12 @@ void dVehicleSolver::Update(dFloat timestep)
 	
 	m_kinematicLoopCount = m_vehicle->GetKinematicLoops(m_kinematicLoop);
 
+	int loopDof = 0;
 	int loopNodeCount = 0;
 	for (int i = 0; i < m_kinematicLoopCount; i ++) {
 		dKinematicLoopJoint* const loop = m_kinematicLoop[i];
 		dAssert (loop->IsActive());
-
+		loopDof += loop->GetMaxDOF();
 		dVehicleNode* const node0 = loop->GetOwner0();
 		if (node0->IsLoopNode() && (node0->m_solverIndex == -1)) {
 			node0->SetIndex(loopNodeCount + m_nodeCount);

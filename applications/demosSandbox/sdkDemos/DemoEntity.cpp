@@ -557,8 +557,8 @@ DemoEntity* DemoEntity::LoadOBJ_mesh (const char* const fileName, NewtonWorld* c
 								t--;
 								n--;
 								mesh.AddPoint(vertex[v].m_x, vertex[v].m_y, vertex[v].m_z);
-								mesh.AddNormal(normal[n].m_x, normal[n].m_y, normal[n].m_z);
-								mesh.AddUV0(uv[t].m_x, uv[t].m_y);
+								mesh.AddNormal(dFloat32(normal[n].m_x), dFloat32(normal[n].m_y), dFloat32(normal[n].m_z));
+								mesh.AddUV0(dFloat32(uv[t].m_x), dFloat32(uv[t].m_y));
 								mesh.AddMaterial(materialId);
 							} else {
 								dAssert(0);

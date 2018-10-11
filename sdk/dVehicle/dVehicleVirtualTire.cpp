@@ -14,6 +14,9 @@
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualTire.h"
 
+#define D_TIRE_MAX_ELASTIC_DEFORMATION		(0.05f)
+#define D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS (10.0f / D_TIRE_MAX_ELASTIC_DEFORMATION)
+
 dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame)
 	:dVehicleTireInterface(parent)
 	,m_info(info)
@@ -240,7 +243,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 		dVector normal(0.0f);
 		dFloat penetration(0.0f);
 
-		dFloat param0 = 1.0f - m_position * m_invSuspensionLength;
+		dFloat param = 1.0f - m_position * m_invSuspensionLength;
 
 		int contactCount = 0;
 		for (int i = 0; i < bodyArray.m_count; i ++) {
@@ -259,21 +262,23 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 				&attributeA, &attributeB, 0);
 			if (count) {
 				// calculate tire penetration
-				dFloat dist = (param0 - impactParam) * m_info.m_suspensionLength;
+				dFloat dist = (param - impactParam) * m_info.m_suspensionLength;
+				if (dist < D_TIRE_MAX_ELASTIC_DEFORMATION) {
 
-				normal.m_w = 0.0f;
-				penetration = normal.DotProduct3(tireMatrix.m_up.Scale(dist));
+					normal.m_w = 0.0f;
+					penetration = normal.DotProduct3(tireMatrix.m_up.Scale(dist));
 
-				// calculate contact matrix
-				dMatrix contactMatrix;
-				contactMatrix[0] = normal;
-				contactMatrix[1] = normal.CrossProduct(tireMatrix.m_front);
-				dAssert (contactMatrix[1].DotProduct3(contactMatrix[1]) > 0.0f);
-				contactMatrix[1] = contactMatrix[1].Normalize();
-				contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
-				contactMatrix[3] = contact;
-				contactMatrix[3].m_w = 1.0f;
-				m_contactsJoints[contactCount].SetContact (contactMatrix, penetration);
+					// calculate contact matrix
+					dMatrix contactMatrix;
+					contactMatrix[0] = normal;
+					contactMatrix[1] = normal.CrossProduct(tireMatrix.m_front);
+					dAssert(contactMatrix[1].DotProduct3(contactMatrix[1]) > 0.0f);
+					contactMatrix[1] = contactMatrix[1].Normalize();
+					contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
+					contactMatrix[3] = contact - tireMatrix.m_up.Scale (dist);
+					contactMatrix[3].m_w = 1.0f;
+					m_contactsJoints[contactCount].SetContact(contactMatrix, penetration);
+				}
 			}
 		}
 	}
@@ -283,7 +288,7 @@ void dVehicleVirtualTire::dContact::SetContact(const dMatrix& contact, dFloat pe
 {
 	m_isActive = true;
 	m_contact = contact;
-	m_penetartion = penetration;
+	m_penetartion = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
 void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

@@ -103,6 +103,8 @@ class dKinematicLoopJoint: public dComplementaritySolver::dBilateralJoint
 		return m_isActive;
 	}	
 
+	virtual int GetMaxDOF() const = 0;
+
 	dVehicleNode* m_owner0;
 	dVehicleNode* m_owner1;
 	bool m_isActive;
