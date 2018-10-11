@@ -37,9 +37,10 @@ class dVehicleSolver: public dContainersAlloc
 	void SortGraph(dVehicleNode* const root, int& index);
 
 	void InitMassMatrix();
-	int Factorize(dVehicleNode* const node);
+	void Factorize(dVehicleNode* const node);
 	void GetJacobians(dVehicleNode* const node);
 	int BuildJacobianMatrix(dFloat timestep);
+	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
 
 	void CalculateJointDiagonal(dVehicleNode* const node);
 	void CalculateJacobianBlock(dVehicleNode* const node);
@@ -72,8 +73,9 @@ class dVehicleSolver: public dContainersAlloc
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;
 	dComplementaritySolver::dJacobianColum* m_rightHandSide;
 	
+	int m_rowCount;
 	int m_nodeCount;
-	int m_rowsCount;
+	
 	int m_kinematicLoopCount;
 	int m_auxiliaryRowCount;
 };
