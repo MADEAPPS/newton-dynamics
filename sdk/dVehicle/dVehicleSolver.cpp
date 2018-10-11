@@ -1431,12 +1431,6 @@ void dVehicleSolver::Update(dFloat timestep)
 		return;
 	}
 
-	//	m_bodyJt = dAlloca(dSpatialMatrix, m_nodeCount);
-	//	m_jointJ = dAlloca(dSpatialMatrix, m_nodeCount);
-	//	m_bodyInvMass = dAlloca(dSpatialMatrix, m_nodeCount);
-	//	m_jointInvMass = dAlloca(dSpatialMatrix, m_nodeCount);
-	//	m_bodyMassArray = dAlloca(dSpatialMatrix, m_nodeCount);
-	//	m_jointMassArray = dAlloca(dSpatialMatrix, m_nodeCount);
 	//int xxx = sizeof (dBodyJointMatrixDataPair);
 
 	dKinematicLoopJoint* kinematicLoop[128];
@@ -1468,7 +1462,6 @@ void dVehicleSolver::Update(dFloat timestep)
 	m_data = dAlloca(dBodyJointMatrixDataPair, m_nodeCount);
 	m_leftHandSide = dAlloca(dComplementaritySolver::dJacobianPair, totalJoint * 6);
 	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, totalJoint * 6);
-
 	
 	m_rowsCount = BuildJacobianMatrix(timestep);
 	InitMassMatrix();

@@ -231,15 +231,18 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 		dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 		dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
-		dMatrix tireMatrix (GetHardpointMatrix (1.0f) * chassisBody->GetMatrix());
+		const dMatrix& chassisMatrix = chassisBody->GetMatrix();
+		dMatrix tireMatrix (GetHardpointMatrix (1.0f) * chassisMatrix);
 		dVector veloc0 (tireMatrix.m_up.Scale (-m_info.m_suspensionLength));
 		dVector tmp (0.0f);
-
+		
 		dVector contact(0.0f);
 		dVector normal(0.0f);
 		dFloat penetration(0.0f);
 
-//		NewtonWorld* const world = NewtonBodyGetWorld(chassisNode->GetChassis()->GetBody());
+		dFloat param0 = 1.0f - m_position * m_invSuspensionLength;
+
+		int contactCount = 0;
 		for (int i = 0; i < bodyArray.m_count; i ++) {
 			dMatrix matrixB;
 			dLong attributeA;
@@ -254,13 +257,36 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 				otherShape, &matrixB[0][0], &tmp[0], &tmp[0], 
 				&impactParam, &contact[0], &normal[0], &penetration,
 				&attributeA, &attributeB, 0);
+			if (count) {
+				// calculate tire penetration
+				dFloat dist = (param0 - impactParam) * m_info.m_suspensionLength;
+
+				normal.m_w = 0.0f;
+				penetration = normal.DotProduct3(tireMatrix.m_up.Scale(dist));
+
+				// calculate contact matrix
+				dMatrix contactMatrix;
+				contactMatrix[0] = normal;
+				contactMatrix[1] = normal.CrossProduct(tireMatrix.m_front);
+				dAssert (contactMatrix[1].DotProduct3(contactMatrix[1]) > 0.0f);
+				contactMatrix[1] = contactMatrix[1].Normalize();
+				contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
+				contactMatrix[3] = contact;
+				contactMatrix[3].m_w = 1.0f;
+				m_contactsJoints[contactCount].SetContact (contactMatrix, penetration);
+			}
 		}
 	}
+}
+
+void dVehicleVirtualTire::dContact::SetContact(const dMatrix& contact, dFloat penetration)
+{
+	m_isActive = true;
+	m_contact = contact;
+	m_penetartion = penetration;
 }
 
 void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 
 }
-
-

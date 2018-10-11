@@ -32,34 +32,11 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 		public:
 		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+		void SetContact (const dMatrix& contact, dFloat penetration);
+
+		dMatrix m_contact;
+		dFloat m_penetartion;
 	};
-
-/*
-	class dTireContact: public dVehicleNode
-	{
-		public:
-		dTireContact ()
-			:dVehicleNode(NULL)
-			,m_tire(NULL)
-		{
-		}
-
-		void Init (dVehicleVirtualTire* const tire)
-		{
-			m_tire = tire;
-			m_contact.m_tire = this;
-			m_contact.SetOwners(this, tire);
-		}
-
-		dComplementaritySolver::dBilateralJoint* GetJoint() 
-		{
-			return &m_contact;
-		}
-
-		dContact m_contact;
-		dVehicleVirtualTire* m_tire;
-	};
-*/
 
 	public:
 	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame);
