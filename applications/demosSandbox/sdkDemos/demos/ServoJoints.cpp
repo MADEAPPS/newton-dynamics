@@ -80,7 +80,6 @@ class dLifterUserData: public DemoEntity::UserData
 
 	dLifterUserData(DemoEntity* const vehicle)
 		:DemoEntity::UserData()
-//		,m_vehicleChassis(vehicle)
 		,m_inputs()
 		,m_engineMotor(NULL)
 		,m_engineJoint(NULL)
@@ -209,21 +208,15 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
-//		dTrace(("fix me !!!!\n"));
-/*
 		DemoCamera* const camera = m_scene->GetCamera();
-		ServoEntityModel* const lifterData = (ServoEntityModel*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
-
-		//if (!m_currentPlayer) {
-		//	return;
-		//}
+		DemoEntity* const entity = (DemoEntity*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
 		if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState('P'))) {
 			m_currentPlayer++;
 		}
 
 		dMatrix camMatrix(camera->GetNextMatrix());
-		dMatrix playerMatrix(lifterData->GetNextMatrix());
+		dMatrix playerMatrix(entity->GetNextMatrix());
 
 		dVector frontDir(camMatrix[0]);
 		dVector camOrigin(0.0f);
@@ -237,7 +230,6 @@ class ServoInputManager: public dCustomInputManager
 		}
 
 		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
-*/
 	}
 
 	void OnEndUpdate(dFloat timestepInSecunds)
@@ -872,7 +864,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 	}
 };
 
-
 void ServoJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
@@ -896,7 +887,6 @@ void ServoJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	// load a the mesh of the articulate vehicle
-//	ServoEntityModel forkliftModel(scene, "forklift.ngd");
 	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
 
