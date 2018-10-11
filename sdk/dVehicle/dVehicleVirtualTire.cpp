@@ -293,5 +293,5 @@ void dVehicleVirtualTire::dContact::SetContact(const dMatrix& contact, dFloat pe
 
 void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-
+	constraintParams->m_count = 0;
 }
