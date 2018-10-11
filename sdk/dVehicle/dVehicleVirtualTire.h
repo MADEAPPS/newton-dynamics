@@ -37,7 +37,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 		int GetMaxDOF() const { return 3;}
 
 		dMatrix m_contact;
-		dFloat m_penetartion;
+		dFloat m_penetration;
 	};
 
 	public:

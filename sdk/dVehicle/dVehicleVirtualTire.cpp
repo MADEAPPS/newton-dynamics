@@ -129,9 +129,6 @@ dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
 
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent->GetAsVehicle();
 	dAssert (chassisNode);
-//	dVehicleChassis* const chassis = chassisNode->GetChassis();
-//	NewtonBodyGetMatrix(chassis->GetBody(), &newtonBodyMatrix[0][0]);
-//	return GetLocalMatrix() * newtonBodyMatrix;
 	return GetLocalMatrix() * chassisNode->GetBody()->GetMatrix();
 }
 
@@ -188,7 +185,6 @@ int dVehicleVirtualTire::GetKinematicLoops(dKinematicLoopJoint** const jointArra
 
 void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	// Restrict the movement on the pivot point along all two orthonormal direction
 	dComplementaritySolver::dBodyState* const tire = m_state0;
 	dComplementaritySolver::dBodyState* const chassis = m_state1;
 
@@ -288,10 +284,35 @@ void dVehicleVirtualTire::dContact::SetContact(const dMatrix& contact, dFloat pe
 {
 	m_isActive = true;
 	m_contact = contact;
-	m_penetartion = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
+	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
 void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	constraintParams->m_count = 0;
+//	dComplementaritySolver::dBodyState* const tire = m_state0;
+//	dComplementaritySolver::dBodyState* const other = m_state1;
+
+//	const dVector& omega = chassis->GetOmega();
+//	const dMatrix& tireMatrix = tire->GetMatrix();
+	dVector omega(0.0f);
+
+	// normal constraint
+	AddLinearRowJacobian(constraintParams, m_contact.m_posit, m_contact[0], omega);
+
+	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_IM0;
+	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_IM1;
+
+	const dVector& veloc0 = m_state0->GetVelocity();
+	const dVector& omega0 = m_state0->GetOmega();
+	const dVector& veloc1 = m_state1->GetVelocity();
+	const dVector& omega1 = m_state1->GetOmega();
+	const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
+	dFloat relSpeed = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
+
+	relSpeed += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration;
+	constraintParams->m_jointLowFriction[0] = 0.0f;
+	constraintParams->m_jointAccel[0] = relSpeed / constraintParams->m_timestepInv;
+
+	constraintParams->m_count = 1;
+constraintParams->m_count = 1;
 }
