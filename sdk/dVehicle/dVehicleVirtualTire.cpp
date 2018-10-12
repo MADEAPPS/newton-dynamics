@@ -313,6 +313,8 @@ void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::d
 	constraintParams->m_jointLowFriction[0] = 0.0f;
 	constraintParams->m_jointAccel[0] = relSpeed / constraintParams->m_timestepInv;
 
+	
+	m_dof = 1;
+	m_count = 1;
 	constraintParams->m_count = 1;
-constraintParams->m_count = 1;
 }

@@ -33,8 +33,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 		void SetContact (const dMatrix& contact, dFloat penetration);
-
-		int GetMaxDOF() const { return 3;}
+		int GetMaxDof() const { return 3;}
 
 		dMatrix m_contact;
 		dFloat m_penetration;

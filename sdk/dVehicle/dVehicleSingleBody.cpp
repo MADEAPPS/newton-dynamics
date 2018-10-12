@@ -23,6 +23,7 @@ dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	dVector tmp;
 	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
 	m_groundNode.SetWorld(m_world);
+	m_groundNode.SetLoopNode(true);
 	
 	// set the inertia matrix;
 	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);

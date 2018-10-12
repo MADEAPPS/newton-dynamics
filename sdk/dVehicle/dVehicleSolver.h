@@ -22,7 +22,9 @@ class dKinematicLoopJoint;
 
 class dVehicleSolver: public dContainersAlloc
 {
+	class dNodePair;
 	class dVectorPair;
+	class dMatrixData;
 	class dBodyJointMatrixDataPair;
 
 	public:
@@ -37,6 +39,7 @@ class dVehicleSolver: public dContainersAlloc
 	void SortGraph(dVehicleNode* const root, int& index);
 
 	void InitMassMatrix();
+	void InitLoopMassMatrix();
 	void Factorize(dVehicleNode* const node);
 	void GetJacobians(dVehicleNode* const node);
 	int BuildJacobianMatrix(dFloat timestep);
@@ -65,18 +68,22 @@ class dVehicleSolver: public dContainersAlloc
 	dVehicleChassis* m_vehicle;
 	dVehicleNode** m_nodesOrder;
 
-
-
 	// cache temporary variables
+	int* m_matrixRowsIndex;
+	dNodePair* m_pairs;
+	dFloat* m_massMatrix10;
+	dFloat* m_massMatrix11;
 	dBodyJointMatrixDataPair* m_data;
-	dKinematicLoopJoint** m_kinematicLoop;	
+	dKinematicLoopJoint** m_loopJoints;	
+	
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;
 	dComplementaritySolver::dJacobianColum* m_rightHandSide;
 	
 	int m_rowCount;
 	int m_nodeCount;
-	
-	int m_kinematicLoopCount;
+	int m_loopRowCount;
+	int m_loopNodeCount;
+	int m_loopJointCount;
 	int m_auxiliaryRowCount;
 };
 

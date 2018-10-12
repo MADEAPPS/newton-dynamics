@@ -41,15 +41,10 @@ class dVehicleNode: public dContainersAlloc
 	virtual dComplementaritySolver::dBodyState* GetBody() {return &m_body;}
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() {return NULL;}
 
-	bool IsLoopNode() const
-	{
-		return m_isLoop;
-	}
+	bool IsLoopNode() const{return m_isLoop;}
+	void SetIndex(int index){m_solverIndex = index;}
+	void SetLoopNode(bool staste){m_isLoop = staste;}
 
-	void SetIndex(int index)
-	{
-		m_solverIndex = index;
-	}
 
 	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
 	virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
@@ -103,7 +98,7 @@ class dKinematicLoopJoint: public dComplementaritySolver::dBilateralJoint
 		return m_isActive;
 	}	
 
-	virtual int GetMaxDOF() const = 0;
+	virtual int GetMaxDof() const = 0;
 
 	dVehicleNode* m_owner0;
 	dVehicleNode* m_owner1;
