@@ -41,8 +41,9 @@ class dVehicleSolver: public dContainersAlloc
 	void InitMassMatrix();
 	void InitLoopMassMatrix();
 	void Factorize(dVehicleNode* const node);
-	void GetJacobians(dVehicleNode* const node);
 	int BuildJacobianMatrix(dFloat timestep);
+	void GetJacobians(dVehicleNode* const node);
+	void CalculateLoopMassMatrixCoefficients(dFloat* const diagDamp);
 	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
 
 	void CalculateJointDiagonal(dVehicleNode* const node);

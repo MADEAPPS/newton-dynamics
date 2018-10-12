@@ -319,99 +319,6 @@ void dgSkeletonContainer::RemoveLoopJoint(dgBilateralConstraint* const joint)
 }
 
 
-DG_INLINE void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat32* const diagDamp)
-{
-	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
-	for (int i = 0; i < m_auxiliaryRowCount; i++) {
-		const int ii = m_matrixRowsIndex[primaryCount + i];
-		const dgLeftHandSide* const row_i = &m_leftHandSide[ii];
-		const dgRightHandSide* const rhs_i = &m_rightHandSide[ii];
-		dgFloat32* const matrixRow11 = &m_massMatrix11[m_auxiliaryRowCount * i];
-
-		dgJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
-		dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
-
-		dgVector element(JMinvM0.m_linear * row_i->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_i->m_Jt.m_jacobianM0.m_angular +
-			JMinvM1.m_linear * row_i->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_i->m_Jt.m_jacobianM1.m_angular);
-		element = element.AddHorizontal();
-
-		// I know I am doubling the matrix regularizer, but this makes the solution more robust.
-		dgFloat32 diagonal = element.GetScalar() + rhs_i->m_diagDamp;
-		matrixRow11[i] = diagonal + rhs_i->m_diagDamp;
-		diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dgFloat32(4.0f));
-
-		const int m0_i = m_pairs[primaryCount + i].m_m0;
-		const int m1_i = m_pairs[primaryCount + i].m_m1;
-		for (int j = i + 1; j < m_auxiliaryRowCount; j++) {
-			const int jj = m_matrixRowsIndex[primaryCount + j];
-			const dgLeftHandSide* const row_j = &m_leftHandSide[jj];
-
-			const int k = primaryCount + j;
-			dgVector acc(dgVector::m_zero);
-			const int m0_j = m_pairs[k].m_m0;
-			const int m1_j = m_pairs[k].m_m1;
-			bool hasEffect = false;
-			if (m0_i == m0_j) {
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-			else if (m0_i == m1_j) {
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-
-			if (m1_i == m1_j) {
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-			else if (m1_i == m0_j) {
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-
-			if (hasEffect) {
-				acc = acc.AddHorizontal();
-				dgFloat32 offDiagValue = acc.GetScalar();
-				matrixRow11[j] = offDiagValue;
-				m_massMatrix11[j * m_auxiliaryRowCount + i] = offDiagValue;
-			}
-		}
-
-		dgFloat32* const matrixRow10 = &m_massMatrix10[primaryCount * i];
-		for (int j = 0; j < primaryCount; j++) {
-			const int jj = m_matrixRowsIndex[j];
-			const dgLeftHandSide* const row_j = &m_leftHandSide[jj];
-
-			const int m0_j = m_pairs[j].m_m0;
-			const int m1_j = m_pairs[j].m_m1;
-			dgVector acc(dgVector::m_zero);
-			bool hasEffect = false;
-			if (m0_i == m0_j) {
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-			else if (m0_i == m1_j) {
-				hasEffect = true;
-				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-
-			if (m1_i == m1_j) {
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
-			}
-			else if (m1_i == m0_j) {
-				hasEffect = true;
-				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
-			}
-
-			if (hasEffect) {
-				acc = acc.AddHorizontal();
-				dgFloat32 val = acc.GetScalar();
-				matrixRow10[j] = val;
-			}
-		}
-	}
-}
 
 
 
@@ -420,14 +327,14 @@ bool dgSkeletonContainer::SanityCheck(const dVectorPair* const force, const dVec
 	return true;
 }
 
-void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dVectorPair* const accel, dVectorPair* const force) const
+void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dJacobian* const internalForces, const dVectorPair* const accel, dVectorPair* const force) const
 {
-	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
-	dgFloat32* const u = dgAlloca(dgFloat32, m_auxiliaryRowCount);
-	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);
-	dgFloat32* const low = dgAlloca(dgFloat32, m_auxiliaryRowCount);
-	dgFloat32* const high = dgAlloca(dgFloat32, m_auxiliaryRowCount);
-	dgFloat32* const massMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
+	dgFloat32* const f = dAlloca(dgFloat32, m_rowCount);
+	dgFloat32* const u = dAlloca(dgFloat32, m_auxiliaryRowCount);
+	dgFloat32* const b = dAlloca(dgFloat32, m_auxiliaryRowCount);
+	dgFloat32* const low = dAlloca(dgFloat32, m_auxiliaryRowCount);
+	dgFloat32* const high = dAlloca(dgFloat32, m_auxiliaryRowCount);
+	dgFloat32* const massMatrix11 = dAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
 
 	int primaryIndex = 0;
 	int auxiliaryIndex = 0;
@@ -469,8 +376,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		const int m1 = jointInfo->m_m1;
 		const int first = jointInfo->m_pairStart;
 		const int auxiliaryDof = jointInfo->m_pairCount;
-		const dgJacobian& y0 = internalForces[m0];
-		const dgJacobian& y1 = internalForces[m1];
+		const dJacobian& y0 = internalForces[m0];
+		const dJacobian& y1 = internalForces[m1];
 
 		for (int i = 0; i < auxiliaryDof; i++) {
 			const dgRightHandSide* const rhs = &m_rightHandSide[first + i];
@@ -496,8 +403,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		const int m1 = jointInfo->m_m1;
 		const int first = jointInfo->m_pairStart;
 		const int auxiliaryDof = jointInfo->m_pairCount;
-		const dgJacobian& y0 = internalForces[m0];
-		const dgJacobian& y1 = internalForces[m1];
+		const dJacobian& y0 = internalForces[m0];
+		const dJacobian& y1 = internalForces[m1];
 
 		dgFloat32 normalForce[DG_CONSTRAINT_MAX_ROWS + 1];
 		normalForce[0] = dgFloat32(1.0f);
@@ -575,8 +482,8 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	m_leftHandSide = leftHandSide;
 	m_rightHandSide = rightHandSide;
 
-	dgSpatialMatrix* const bodyMassArray = dgAlloca(dgSpatialMatrix, m_nodeCount);
-	dgSpatialMatrix* const jointMassArray = dgAlloca(dgSpatialMatrix, m_nodeCount);
+	dgSpatialMatrix* const bodyMassArray = dAlloca(dgSpatialMatrix, m_nodeCount);
+	dgSpatialMatrix* const jointMassArray = dAlloca(dgSpatialMatrix, m_nodeCount);
 
 	if (m_nodesOrder) {
 		for (int i = 0; i < m_nodeCount - 1; i++) {
@@ -869,6 +776,103 @@ void dVehicleSolver::Factorize(dVehicleNode* const node)
 }
 
 
+void dVehicleSolver::CalculateLoopMassMatrixCoefficients(dFloat* const diagDamp)
+{
+//	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
+	const int auxiliaryRowCount = m_auxiliaryRowCount + m_loopRowCount;
+	const int primaryCount = m_rowCount;
+	for (int i = 0; i < auxiliaryRowCount; i++) {
+		const int ii = m_matrixRowsIndex[primaryCount + i];
+
+		//const dgLeftHandSide* const row_i = &m_leftHandSide[ii];
+		//const dgRightHandSide* const rhs_i = &m_rightHandSide[ii];
+		const dComplementaritySolver::dJacobianPair* const row_i = &m_leftHandSide[ii];
+		const dComplementaritySolver::dJacobianColum* const rhs_i = &m_rightHandSide[ii];
+		dFloat* const matrixRow11 = &m_massMatrix11[auxiliaryRowCount * i];
+
+//		dComplementaritySolver::dJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
+//		dComplementaritySolver::dJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
+/*
+		dgVector element(JMinvM0.m_linear * row_i->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_i->m_Jt.m_jacobianM0.m_angular +
+			JMinvM1.m_linear * row_i->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_i->m_Jt.m_jacobianM1.m_angular);
+		element = element.AddHorizontal();
+
+		// I know I am doubling the matrix regularizer, but this makes the solution more robust.
+		dgFloat32 diagonal = element.GetScalar() + rhs_i->m_diagDamp;
+		matrixRow11[i] = diagonal + rhs_i->m_diagDamp;
+		diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dgFloat32(4.0f));
+
+		const int m0_i = m_pairs[primaryCount + i].m_m0;
+		const int m1_i = m_pairs[primaryCount + i].m_m1;
+		for (int j = i + 1; j < m_auxiliaryRowCount; j++) {
+			const int jj = m_matrixRowsIndex[primaryCount + j];
+			const dgLeftHandSide* const row_j = &m_leftHandSide[jj];
+
+			const int k = primaryCount + j;
+			dgVector acc(dgVector::m_zero);
+			const int m0_j = m_pairs[k].m_m0;
+			const int m1_j = m_pairs[k].m_m1;
+			bool hasEffect = false;
+			if (m0_i == m0_j) {
+				hasEffect = true;
+				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
+			} else if (m0_i == m1_j) {
+				hasEffect = true;
+				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
+			}
+
+			if (m1_i == m1_j) {
+				hasEffect = true;
+				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
+			} else if (m1_i == m0_j) {
+				hasEffect = true;
+				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
+			}
+
+			if (hasEffect) {
+				acc = acc.AddHorizontal();
+				dgFloat32 offDiagValue = acc.GetScalar();
+				matrixRow11[j] = offDiagValue;
+				m_massMatrix11[j * m_auxiliaryRowCount + i] = offDiagValue;
+			}
+		}
+
+		dgFloat32* const matrixRow10 = &m_massMatrix10[primaryCount * i];
+		for (int j = 0; j < primaryCount; j++) {
+			const int jj = m_matrixRowsIndex[j];
+			const dgLeftHandSide* const row_j = &m_leftHandSide[jj];
+
+			const int m0_j = m_pairs[j].m_m0;
+			const int m1_j = m_pairs[j].m_m1;
+			dgVector acc(dgVector::m_zero);
+			bool hasEffect = false;
+			if (m0_i == m0_j) {
+				hasEffect = true;
+				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
+			} else if (m0_i == m1_j) {
+				hasEffect = true;
+				acc += JMinvM0.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM0.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
+			}
+
+			if (m1_i == m1_j) {
+				hasEffect = true;
+				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM1.m_angular;
+			} else if (m1_i == m0_j) {
+				hasEffect = true;
+				acc += JMinvM1.m_linear * row_j->m_Jt.m_jacobianM0.m_linear + JMinvM1.m_angular * row_j->m_Jt.m_jacobianM0.m_angular;
+			}
+
+			if (hasEffect) {
+				acc = acc.AddHorizontal();
+				dgFloat32 val = acc.GetScalar();
+				matrixRow10[j] = val;
+			}
+		}
+*/
+	}
+}
+
+
 void dVehicleSolver::InitLoopMassMatrix()
 {
 //	const dgJointInfo* const jointInfoArray
@@ -880,9 +884,8 @@ void dVehicleSolver::InitLoopMassMatrix()
 ////	m_massMatrix10 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 //	m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
-//	dVectorPair* const forcePair = dgAlloca(dVectorPair, m_nodeCount);
-//	dVectorPair* const accelPair = dgAlloca(dVectorPair, m_nodeCount);
-//	dgFloat32* const diagDamp = dgAlloca(dgFloat32, m_auxiliaryRowCount);
+//	dVectorPair* const forcePair = dAlloca(dVectorPair, m_nodeCount);
+//	dVectorPair* const accelPair = dAlloca(dVectorPair, m_nodeCount);
 
 	int primaryIndex = 0;
 	int auxiliaryIndex = 0;
@@ -942,10 +945,9 @@ void dVehicleSolver::InitLoopMassMatrix()
 	memset(m_massMatrix10, 0, row * col * sizeof(dFloat));
 	memset(m_massMatrix11, 0, row * row * sizeof(dFloat));
 
-
-/*
+	dFloat* const diagDamp = dAlloca(dFloat, row);
 	CalculateLoopMassMatrixCoefficients(diagDamp);
-
+/*
 	const dgSpatialVector zero(dgSpatialVector::m_zero);
 	accelPair[m_nodeCount - 1].m_body = zero;
 	accelPair[m_nodeCount - 1].m_joint = zero;
@@ -988,7 +990,7 @@ void dVehicleSolver::InitLoopMassMatrix()
 		}
 	}
 
-	dgInt16* const indexList = dgAlloca(dgInt16, primaryCount);
+	dgInt16* const indexList = dAlloca(dgInt16, primaryCount);
 	for (int i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		const dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
@@ -1029,8 +1031,8 @@ void dVehicleSolver::InitMassMatrix()
 //	const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide
 //	m_leftHandSide = leftHandSide;
 //	m_rightHandSide = rightHandSide;
-//	dgSpatialMatrix* const bodyMassArray = dgAlloca(dgSpatialMatrix, m_nodeCount);
-//	dgSpatialMatrix* const jointMassArray = dgAlloca(dgSpatialMatrix, m_nodeCount);
+//	dgSpatialMatrix* const bodyMassArray = dAlloca(dgSpatialMatrix, m_nodeCount);
+//	dgSpatialMatrix* const jointMassArray = dAlloca(dgSpatialMatrix, m_nodeCount);
 
 	int rowCount = 0;
 	int auxiliaryRowCount = 0;
@@ -1212,7 +1214,7 @@ int dVehicleSolver::BuildJacobianMatrix(dFloat timestep)
 
 void dVehicleSolver::CalculateJointAccel(dVectorPair* const accel) const
 {
-//dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dVectorPair* const accel
+//dgJointInfo* const jointInfoArray, const dJacobian* const internalForces, dVectorPair* const accel
 
 	const dSpatialVector zero(0.0f);
 	for (int i = 0; i < m_nodeCount - 1; i++) {
@@ -1235,8 +1237,8 @@ void dVehicleSolver::CalculateJointAccel(dVectorPair* const accel) const
 		//const int m1 = jointInfo->m_m1;
 //		const int m0 = node->m_solverIndex;
 //		const int m1 = node->m_parent->m_solverIndex;
-//		const dgJacobian& y0 = internalForces[m0];
-//		const dgJacobian& y1 = internalForces[m1];
+//		const dJacobian& y0 = internalForces[m0];
+//		const dJacobian& y1 = internalForces[m1];
 		for (int j = 0; j < dof; j++) {
 			const int k = joint->m_sourceJacobianIndex[j];
 			dComplementaritySolver::dJacobianColum& col = m_rightHandSide[first + k];
@@ -1400,7 +1402,7 @@ void dVehicleSolver::CalculateForce(dVectorPair* const force, const dVectorPair*
 
 void dVehicleSolver::UpdateForces(const dVectorPair* const force) const
 {
-//	dgJacobian* const internalForces,
+//	dJacobian* const internalForces,
 
 	dVector zero(0.0f);
 	for (int i = 0; i < m_nodeCount - 1; i++) {
@@ -1448,7 +1450,7 @@ void dVehicleSolver::UpdateForces(const dVectorPair* const force) const
 
 void dVehicleSolver::CalculateJointForce()
 {
-//	dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces
+//	dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dJacobian* const internalForces
 
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const accel = dAlloca(dVectorPair, m_nodeCount);
