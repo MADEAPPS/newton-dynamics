@@ -95,16 +95,21 @@ int dVehicleSingleBody::GetKinematicLoops(dKinematicLoopJoint** const jointArray
 
 void dVehicleSingleBody::ApplyExternalForce()
 {
-	dVector force;
+	dVector force(0.0f);
 	dVector torque;
+	
 	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
+	dComplementaritySolver::dBodyState* const groundBody = m_groundNode.GetBody();
+
+	groundBody->SetForce(force);
+	groundBody->SetTorque(force);
 
 	NewtonBodyGetForce(m_newtonBody, &force[0]);
 	chassisBody->SetForce(force);
 
 	NewtonBodyGetTorque(m_newtonBody, &torque[0]);
 	chassisBody->SetTorque(torque);
-
+	
 	m_gravity = force.Scale (chassisBody->GetInvMass());
 	dVehicleInterface::ApplyExternalForce();
 }

@@ -1014,8 +1014,8 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		const dFloat invMass1 = state1->GetInvMass();
 
 		for (int i = 0; i < auxiliaryDof; i++) {
-			const dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[first + i];
 			const dComplementaritySolver::dJacobianPair* const row = &m_leftHandSide[first + i];
+			const dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[first + i];
 
 			f[auxiliaryIndex + primaryCount] = dFloat(0.0f);
 			dVector acc (row->m_jacobian_J01.m_linear.Scale(invMass0) * force0 +
@@ -1048,8 +1048,9 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 
 //	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
 	dGaussSeidelLcpSor(n, m_massMatrix11, u, b, low, high, dFloat(0.01), 30, dFloat(1.15f));
-/*
-	for (int i = 0; i < m_auxiliaryRowCount; i++) {
+
+//	for (int i = 0; i < m_auxiliaryRowCount; i++) {
+	for (int i = 0; i < n; i++) {
 		const dFloat s = u[i];
 		f[primaryCount + i] = s;
 		const dFloat* const deltaForce = &m_deltaForce[i * primaryCount];
@@ -1058,21 +1059,31 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		}
 	}
 
-	for (int i = 0; i < m_rowCount; i++) {
+//	for (int i = 0; i < m_rowCount; i++) {
+	for (int i = 0; i < m_rowCount + n ; i++) {
 		int index = m_matrixRowsIndex[i];
-		dgRightHandSide* const rhs = &m_rightHandSide[index];
-		const dgLeftHandSide* const row = &m_leftHandSide[index];
+		//dgRightHandSide* const rhs = &m_rightHandSide[index];
+		//const dgLeftHandSide* const row = &m_leftHandSide[index];
+		dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[index];
+		const dComplementaritySolver::dJacobianPair* const row = &m_leftHandSide[index];
 		const int m0 = m_pairs[i].m_m0;
 		const int m1 = m_pairs[i].m_m1;
 
+		dComplementaritySolver::dBodyState* const state0 = m_nodesOrder[m0]->GetBody();
+		dComplementaritySolver::dBodyState* const state1 = m_nodesOrder[m1]->GetBody();
+
 		rhs->m_force += f[i];
-		dgVector jointForce(f[i]);
-		internalForces[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
-		internalForces[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
-		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
-		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
+		dVector jointForce(f[i]);
+		//internalForces[m0].m_linear += row->m_jacobian_J01.m_linear * jointForce;
+		//internalForces[m0].m_angular += row->m_jacobian_J01.m_angular * jointForce;
+		//internalForces[m1].m_linear += row->m_jacobian_J10.m_linear * jointForce;
+		//internalForces[m1].m_angular += row->m_jacobian_J10.m_angular * jointForce;
+
+		state0->SetForce(state0->GetForce() + row->m_jacobian_J01.m_linear * jointForce);
+		state0->SetTorque(state0->GetTorque() + row->m_jacobian_J01.m_angular * jointForce);
+		state1->SetForce(state1->GetForce() + row->m_jacobian_J10.m_linear * jointForce);
+		state1->SetTorque(state1->GetTorque() + row->m_jacobian_J10.m_angular * jointForce);
 	}
-*/
 }
 
 void dVehicleSolver::Update(dFloat timestep)
