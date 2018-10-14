@@ -51,9 +51,9 @@ class dVehicleSolver: public dContainersAlloc
 	void CalculateBodyDiagonal(dVehicleNode* const child);
 	void CalculateInertiaMatrix(dVehicleNode* const node) const;
 
-	void CalculateJointForce();
 	void UpdateForces(const dVectorPair* const force) const;
 	void CalculateJointAccel(dVectorPair* const accel) const;
+	void SolveAuxiliary(dVectorPair* const force, const dVectorPair* const accel) const;
 	void CalculateForce(dVectorPair* const force, const dVectorPair* const accel) const;
 
 	void SolveBackward(dVectorPair* const force, const dVectorPair* const accel) const;
@@ -72,6 +72,7 @@ class dVehicleSolver: public dContainersAlloc
 	// cache temporary variables
 	int* m_matrixRowsIndex;
 	dNodePair* m_pairs;
+	dFloat* m_deltaForce;
 	dFloat* m_massMatrix10;
 	dFloat* m_massMatrix11;
 	dBodyJointMatrixDataPair* m_data;
@@ -82,6 +83,7 @@ class dVehicleSolver: public dContainersAlloc
 	
 	int m_rowCount;
 	int m_nodeCount;
+	int m_maxNodeCount;
 	int m_loopRowCount;
 	int m_loopNodeCount;
 	int m_loopJointCount;

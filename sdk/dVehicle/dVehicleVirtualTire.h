@@ -30,6 +30,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	class dContact: public dKinematicLoopJoint
 	{
 		public:
+		dContact();
 		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 		void SetContact (const dMatrix& contact, dFloat penetration);

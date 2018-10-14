@@ -197,7 +197,6 @@ void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
 
 void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 {
-	//	dAssert (0);
 	m_vehicle->RigidBodyToStates();
 	m_solver.Update(timestep);
 }
@@ -242,7 +241,7 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 					break;
 			}
 */
-x = 0.1f;
+//x = 0.1f;
 //v = 10.0f;
 			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, info.m_springStrength * weight, x, info.m_dampingRatio, v);
 
@@ -252,15 +251,15 @@ x = 0.1f;
 			const dMatrix& tireInvInertia = tireBody->GetInvInertia();
 			dFloat tireMass = tireBody->GetInvMass();
 
-			m_jt[tireCount].m_jacobian_IM0.m_linear = chassisMatrix.m_up.Scale(-1.0f);
-			m_jt[tireCount].m_jacobian_IM0.m_angular = dVector(0.0f);
-			m_jt[tireCount].m_jacobian_IM1.m_linear = chassisMatrix.m_up;
-			m_jt[tireCount].m_jacobian_IM1.m_angular = (tireMatrix.m_posit - chassisOrigin).CrossProduct(chassisMatrix.m_up);
+			m_jt[tireCount].m_jacobian_J01.m_linear = chassisMatrix.m_up.Scale(-1.0f);
+			m_jt[tireCount].m_jacobian_J01.m_angular = dVector(0.0f);
+			m_jt[tireCount].m_jacobian_J10.m_linear = chassisMatrix.m_up;
+			m_jt[tireCount].m_jacobian_J10.m_angular = (tireMatrix.m_posit - chassisOrigin).CrossProduct(chassisMatrix.m_up);
 
-			m_jInvMass[tireCount].m_jacobian_IM0.m_linear = m_jt[tireCount].m_jacobian_IM0.m_linear.Scale(tireMass);
-			m_jInvMass[tireCount].m_jacobian_IM0.m_angular = tireInvInertia.RotateVector(m_jt[tireCount].m_jacobian_IM0.m_angular);
-			m_jInvMass[tireCount].m_jacobian_IM1.m_linear = m_jt[tireCount].m_jacobian_IM1.m_linear.Scale(chassisInvMass);
-			m_jInvMass[tireCount].m_jacobian_IM1.m_angular = chassisInvInertia.RotateVector(m_jt[tireCount].m_jacobian_IM1.m_angular);
+			m_jInvMass[tireCount].m_jacobian_J01.m_linear = m_jt[tireCount].m_jacobian_J01.m_linear.Scale(tireMass);
+			m_jInvMass[tireCount].m_jacobian_J01.m_angular = tireInvInertia.RotateVector(m_jt[tireCount].m_jacobian_J01.m_angular);
+			m_jInvMass[tireCount].m_jacobian_J10.m_linear = m_jt[tireCount].m_jacobian_J10.m_linear.Scale(chassisInvMass);
+			m_jInvMass[tireCount].m_jacobian_J10.m_angular = chassisInvInertia.RotateVector(m_jt[tireCount].m_jacobian_J10.m_angular);
 
 			tireCount++;
 		}
@@ -269,12 +268,12 @@ x = 0.1f;
 	for (int i = 0; i < tireCount; i++) {
 		dFloat* const row = &massMatrix[i * tireCount];
 
-		dFloat aii = m_jInvMass[i].m_jacobian_IM0.m_linear.DotProduct3(m_jt[i].m_jacobian_IM0.m_linear) + m_jInvMass[i].m_jacobian_IM0.m_angular.DotProduct3(m_jt[i].m_jacobian_IM0.m_angular) +
-					 m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[i].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[i].m_jacobian_IM1.m_angular);
+		dFloat aii = m_jInvMass[i].m_jacobian_J01.m_linear.DotProduct3(m_jt[i].m_jacobian_J01.m_linear) + m_jInvMass[i].m_jacobian_J01.m_angular.DotProduct3(m_jt[i].m_jacobian_J01.m_angular) +
+					 m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[i].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[i].m_jacobian_J10.m_angular);
 
 		row[i] = aii * 1.0001f;
 		for (int j = i + 1; j < tireCount; j++) {
-			dFloat aij = m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[j].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[j].m_jacobian_IM1.m_angular);
+			dFloat aij = m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[j].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[j].m_jacobian_J10.m_angular);
 			row[j] = aij;
 			massMatrix[j * tireCount + i] = aij;
 		}
@@ -290,11 +289,11 @@ x = 0.1f;
 		dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
 
 		tires[i]->m_tireLoad = dMax(dFloat(1.0f), accel[i]);
-		dVector tireForce(m_jt[i].m_jacobian_IM0.m_linear.Scale(accel[i]));
+		dVector tireForce(m_jt[i].m_jacobian_J01.m_linear.Scale(accel[i]));
 
 		tireBody->SetForce(tireBody->GetForce() + tireForce);
-		chassisForce += m_jt[i].m_jacobian_IM1.m_linear.Scale(accel[i]);
-		chassisTorque += m_jt[i].m_jacobian_IM1.m_angular.Scale(accel[i]);
+		chassisForce += m_jt[i].m_jacobian_J10.m_linear.Scale(accel[i]);
+		chassisTorque += m_jt[i].m_jacobian_J10.m_angular.Scale(accel[i]);
 	}
 	chassisBody->SetForce(chassisBody->GetForce() + chassisForce);
 	chassisBody->SetTorque(chassisBody->GetTorque() + chassisTorque);

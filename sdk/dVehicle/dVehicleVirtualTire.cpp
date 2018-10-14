@@ -224,8 +224,15 @@ void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver:
 void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep)
 {
 	for (int i = 0; i < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]); i++) {
-		m_contactsJoints[i].m_isActive = false;
+		dContact* const contact = &m_contactsJoints[i];
+		if (contact->m_isActive == false) {
+			contact->m_jointFeebackForce[0] = 0.0f;
+			contact->m_jointFeebackForce[1] = 0.0f;
+			contact->m_jointFeebackForce[2] = 0.0f;
+		}
+		contact->m_isActive = false;
 	}
+
 	if (bodyArray.m_count) {
 		dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 		dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
@@ -259,7 +266,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 			if (count) {
 				// calculate tire penetration
 				dFloat dist = (param - impactParam) * m_info.m_suspensionLength;
-				if (dist < D_TIRE_MAX_ELASTIC_DEFORMATION) {
+				if (dist > -D_TIRE_MAX_ELASTIC_DEFORMATION) {
 
 					normal.m_w = 0.0f;
 					penetration = normal.DotProduct3(tireMatrix.m_up.Scale(dist));
@@ -274,10 +281,21 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 					contactMatrix[3] = contact - tireMatrix.m_up.Scale (dist);
 					contactMatrix[3].m_w = 1.0f;
 					m_contactsJoints[contactCount].SetContact(contactMatrix, penetration);
+					contactCount ++;
 				}
 			}
 		}
 	}
+}
+
+dVehicleVirtualTire::dContact::dContact()
+	:dKinematicLoopJoint()
+	,m_contact(dGetIdentityMatrix())
+	,m_penetration(0.0f)
+{
+	m_jointFeebackForce[0] = 0.0f;
+	m_jointFeebackForce[1] = 0.0f;
+	m_jointFeebackForce[2] = 0.0f;
 }
 
 void dVehicleVirtualTire::dContact::SetContact(const dMatrix& contact, dFloat penetration)
@@ -299,8 +317,8 @@ void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::d
 	// normal constraint
 	AddLinearRowJacobian(constraintParams, m_contact.m_posit, m_contact[0], omega);
 
-	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_IM0;
-	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_IM1;
+	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
+	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
 	const dVector& veloc0 = m_state0->GetVelocity();
 	const dVector& omega0 = m_state0->GetOmega();
@@ -312,7 +330,6 @@ void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::d
 	relSpeed += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration;
 	constraintParams->m_jointLowFriction[0] = 0.0f;
 	constraintParams->m_jointAccel[0] = relSpeed / constraintParams->m_timestepInv;
-
 	
 	m_dof = 1;
 	m_count = 1;

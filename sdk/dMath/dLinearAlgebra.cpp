@@ -344,11 +344,11 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 	int index = constraintParams->m_count;
 
 	dAssert(dir.m_w == 0.0f);
-	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
+	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01; 
 	jacobian0.m_linear = dir;
 	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
 
-	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_IM1; 
+	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10; 
 	jacobian1.m_linear = dir.Scale (-1.0f);
 	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
 
@@ -396,11 +396,11 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	int index = constraintParams->m_count;
 	dAssert(dir.m_w == 0.0f);
 
-	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
+	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01; 
 	jacobian0.m_linear = dVector(0.0f);
 	jacobian0.m_angular = dir;
 
-	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_IM1; 
+	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10; 
 	jacobian1.m_linear = dVector(0.0f);
 	jacobian1.m_angular = dir.Scale (-1.0f);
 
@@ -492,10 +492,10 @@ void dComplementaritySolver::dBilateralJoint::JointAccelerations (dJointAccelera
 			jacobianColElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianColElements[k].m_deltaAccel;
 		} else {
 			const dJacobianPair& Jt = jacobianRowElements[k];
-			dVector relVeloc (Jt.m_jacobian_IM0.m_linear * bodyVeloc0 +
-							  Jt.m_jacobian_IM0.m_angular * bodyOmega0 + 
-							  Jt.m_jacobian_IM1.m_linear * bodyVeloc1 +
-							  Jt.m_jacobian_IM1.m_angular * bodyOmega1);
+			dVector relVeloc (Jt.m_jacobian_J01.m_linear * bodyVeloc0 +
+							  Jt.m_jacobian_J01.m_angular * bodyOmega0 + 
+							  Jt.m_jacobian_J10.m_linear * bodyVeloc1 +
+							  Jt.m_jacobian_J10.m_angular * bodyOmega1);
 
 			dFloat vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 			dFloat aRel = jacobianColElements[k].m_deltaAccel;
@@ -620,7 +620,7 @@ void dComplementaritySolver::dFrictionLessContactJoint::JointAccelerations (dJoi
 		const dJacobianPair& Jt = rowMatrix[k];
 		dJacobianColum& element = jacobianColElements[k];
 
-		dVector relVeloc (Jt.m_jacobian_IM0.m_linear * bodyVeloc0 + Jt.m_jacobian_IM0.m_angular * bodyOmega0 + Jt.m_jacobian_IM1.m_linear * bodyVeloc1 + Jt.m_jacobian_IM1.m_angular * bodyOmega1);
+		dVector relVeloc (Jt.m_jacobian_J01.m_linear * bodyVeloc0 + Jt.m_jacobian_J01.m_angular * bodyOmega0 + Jt.m_jacobian_J10.m_linear * bodyVeloc1 + Jt.m_jacobian_J10.m_angular * bodyOmega1);
 
 		dFloat vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dFloat aRel = element.m_deltaAccel;
@@ -668,12 +668,12 @@ int dComplementaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint
 			dJacobianColum* const col = &jacobianColumnArray[index];
 			jacobianArray[rowCount] = constraintParams.m_jacobians[i]; 
 
-			dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
-			dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
-			dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
-			dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
+			dVector JMinvIM0linear (row->m_jacobian_J01.m_linear.Scale (invMass0));
+			dVector JMinvIM1linear (row->m_jacobian_J10.m_linear.Scale (invMass1));
+			dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_J01.m_angular);
+			dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_J10.m_angular);
 
-			dVector tmpDiag (JMinvIM0linear * row->m_jacobian_IM0.m_linear + JMinvIM0angular * row->m_jacobian_IM0.m_angular + JMinvIM1linear * row->m_jacobian_IM1.m_linear + JMinvIM1angular * row->m_jacobian_IM1.m_angular);
+			dVector tmpDiag (JMinvIM0linear * row->m_jacobian_J01.m_linear + JMinvIM0angular * row->m_jacobian_J01.m_angular + JMinvIM1linear * row->m_jacobian_J10.m_linear + JMinvIM1angular * row->m_jacobian_J10.m_angular);
 			dVector tmpAccel (JMinvIM0linear * state0->m_externalForce + JMinvIM0angular * state0->m_externalTorque + JMinvIM1linear * state1->m_externalForce + JMinvIM1angular * state1->m_externalTorque);
 			dFloat extenalAcceleration = -(tmpAccel[0] + tmpAccel[1] + tmpAccel[2]);
 
@@ -736,10 +736,10 @@ void dComplementaritySolver::CalculateReactionsForces (int bodyCount, dBodyState
 			dJacobianPair* const row = &jacobianArray[j + first];
 			const dJacobianColum* const col = &jacobianColumnArray[j + first];
 			dFloat val = col->m_force; 
-			y0.m_linear += row->m_jacobian_IM0.m_linear.Scale(val);
-			y0.m_angular += row->m_jacobian_IM0.m_angular.Scale(val);
-			y1.m_linear += row->m_jacobian_IM1.m_linear.Scale(val);
-			y1.m_angular += row->m_jacobian_IM1.m_angular.Scale(val);
+			y0.m_linear += row->m_jacobian_J01.m_linear.Scale(val);
+			y0.m_angular += row->m_jacobian_J01.m_angular.Scale(val);
+			y1.m_linear += row->m_jacobian_J10.m_linear.Scale(val);
+			y1.m_angular += row->m_jacobian_J10.m_angular.Scale(val);
 		}
 		int m0 = constraint->m_state0->m_myIndex;
 		int m1 = constraint->m_state1->m_myIndex;
@@ -801,10 +801,10 @@ void dComplementaritySolver::CalculateReactionsForces (int bodyCount, dBodyState
 					dJacobianPair* const row = &jacobianArray[index];
 					dJacobianColum* const col = &jacobianColumnArray[index];
 
-					dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
-					dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
-					dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
-					dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
+					dVector JMinvIM0linear (row->m_jacobian_J01.m_linear.Scale (invMass0));
+					dVector JMinvIM1linear (row->m_jacobian_J10.m_linear.Scale (invMass1));
+					dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_J01.m_angular);
+					dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_J10.m_angular);
 					dVector acc (JMinvIM0linear * linearM0 + JMinvIM0angular * angularM0 + JMinvIM1linear * linearM1 + JMinvIM1angular * angularM1);
 
 					dFloat a = col->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - col->m_force * col->m_diagDamp;
@@ -825,10 +825,10 @@ void dComplementaritySolver::CalculateReactionsForces (int bodyCount, dBodyState
 					dFloat prevValue = f - col->m_force;
 					col->m_force = f;
 
-					linearM0 += row->m_jacobian_IM0.m_linear.Scale (prevValue);
-					angularM0 += row->m_jacobian_IM0.m_angular.Scale (prevValue);
-					linearM1 += row->m_jacobian_IM1.m_linear.Scale (prevValue);
-					angularM1 += row->m_jacobian_IM1.m_angular.Scale (prevValue);
+					linearM0 += row->m_jacobian_J01.m_linear.Scale (prevValue);
+					angularM0 += row->m_jacobian_J01.m_angular.Scale (prevValue);
+					linearM1 += row->m_jacobian_J10.m_linear.Scale (prevValue);
+					angularM1 += row->m_jacobian_J10.m_angular.Scale (prevValue);
 					index ++;
 				}
 				internalForces[m0].m_linear = linearM0;

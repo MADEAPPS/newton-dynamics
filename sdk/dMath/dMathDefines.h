@@ -106,6 +106,22 @@ enum dEulerAngleOrder
 
 #define dAlloca(type,size) (type*) alloca ((size) * sizeof (type))
 
+template <class T> T dAbs(T A);
+template <class T> T dSign(T A);
+template <class T> void dSwap(T& A, T& B);
+template <class T> T dMin(T A, T B);
+template <class T> T dMax(T A, T B);
+template <class T> T dClamp(T val, T min, T max);
+template<class T> T dDotProduct(int size, const T* const A, const T* const B);
+template<class T> bool dCholeskyFactorization(int size, T* const matrix);
+template<class T> void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x);
+template<class T> void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out);
+template <class T> bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const low, T* const high);
+template <class T> void dSort(T* const array, int elements, int(*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL);
+template <class T> void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, int maxIterCount, T sor);
+
+
+
 template <class T>
 T dAbs(T A)
 {
@@ -146,7 +162,7 @@ T dClamp(T val, T min, T max)
 }
 
 template <class T> 
-void dSort (T* const array, int elements, int (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
+void dSort (T* const array, int elements, int (*compare) (const T* const  A, const T* const B, void* const context), void* const context)
 {
 	int stride = 8;
 	int stack[1024][2];
@@ -259,7 +275,6 @@ void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x)
 		x[i] = (x[i] - acc) / choleskyMatrix[size * i + i];
 	}
 }
-
 
 template<class T>
 bool dCholeskyFactorization(int size, T* const matrix)
@@ -402,7 +417,6 @@ void dCalculateDelta_r(int size, int n, const T* const matrix, const T* const de
 		stride += size;
 	}
 }
-
 
 
 // solve a general Linear complementary program (LCP)
@@ -628,6 +642,69 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 		b[j] = r0[i];
 	}
 	return true;
+}
+
+
+// solve a general Linear complementary program (LCP)
+// A * x = b + r
+// subjected to constraints
+// x(i) = low(i),  if r(i) >= 0  
+// x(i) = high(i), if r(i) <= 0  
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
+//
+// return true is the system has a solution.
+// in return 
+// x is the solution,
+// r is return in vector b
+// note: although the system is called LCP, the solver is far more general than a strict LCP
+// to solve a strict LCP, set the following
+// low(i) = 0
+// high(i) = infinity.
+// this the same as enforcing the constraint: x(i) * r(i) = 0
+template <class T>
+void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, int maxIterCount, T sor)
+{
+	const T* const me = matrix;
+	T* const invDiag1 = dAlloca(T, size);
+//	dgInt16* const clipped
+//	dgCheckAligment(invDiag1);
+
+	int stride = 0;
+	for (int i = 0; i < size; i++) {
+		x[i] = dClamp(T(0.0f), low[i], high[i]);
+		invDiag1[i] = T(1.0f) / me[stride + i];
+		stride += size;
+	}
+
+	T tolerance(tol2 * 2.0f);
+	const T* const invDiag = invDiag1;
+#ifdef _DEBUG 
+	int passes = 0;
+#endif
+	for (int i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+		int base = 0;
+		tolerance = T(0.0f);
+#ifdef _DEBUG 
+		passes++;
+#endif
+		for (int j = 0; j < size; j++) {
+			const T* const row = &me[base];
+			T r(b[j] - dDotProduct(size, row, x));
+			T f((r + row[j] * x[j]) * invDiag[j]);
+			if (f > high[j]) {
+				x[j] = high[j];
+				//clipped[j] = 1;
+			} else if (f < low[j]) {
+				x[j] = low[j];
+				//clipped[j] = 1;
+			} else {
+				//clipped[j] = 0;
+				tolerance += r * r;
+				x[j] = x[j] + (f - x[j]) * sor;
+			}
+			base += size;
+		}
+	}
 }
 
 #endif

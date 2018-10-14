@@ -76,6 +76,12 @@ class dComplementaritySolver
 		{
 		}
 
+		dJacobian (const dVector& linear, const dVector& angular)
+			:m_linear(linear)
+			,m_angular(angular)
+		{
+		}
+
 		dVector m_linear;
 		dVector m_angular;
 	};
@@ -83,8 +89,8 @@ class dComplementaritySolver
 	class dJacobianPair
 	{
 		public:
-		dJacobian m_jacobian_IM0;
-		dJacobian m_jacobian_IM1;
+		dJacobian m_jacobian_J01;
+		dJacobian m_jacobian_J10;
 	};
 
 	class dJacobianColum
