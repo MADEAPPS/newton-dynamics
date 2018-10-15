@@ -195,9 +195,7 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 
 //	const dMatrix& chassisMatrix = chassis->GetBody()->GetMatrix();
 	const dMatrix& tireMatrix = m_body.GetMatrix();
-
-	m_position = matrix0.m_up.DotProduct3(tireMatrix.m_posit - matrix0.m_posit);
-
+	m_position = dClamp (matrix0.m_up.DotProduct3(tireMatrix.m_posit - matrix0.m_posit), dFloat (0.0f), m_info.m_suspensionLength);
 
 //	dVector chassisOmega(chassisBody->GetOmega());
 //	dVector chassisVeloc(chassisBody->GetVelocity());
