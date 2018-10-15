@@ -666,12 +666,10 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dAlloca(T, size);
-//	dgInt16* const clipped
-//	dgCheckAligment(invDiag1);
 
 	int stride = 0;
 	for (int i = 0; i < size; i++) {
-		x[i] = dClamp(T(0.0f), low[i], high[i]);
+		x[i] = dClamp(x[i], low[i], high[i]);
 		invDiag1[i] = T(1.0f) / me[stride + i];
 		stride += size;
 	}
@@ -693,12 +691,9 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 			T f((r + row[j] * x[j]) * invDiag[j]);
 			if (f > high[j]) {
 				x[j] = high[j];
-				//clipped[j] = 1;
 			} else if (f < low[j]) {
 				x[j] = low[j];
-				//clipped[j] = 1;
 			} else {
-				//clipped[j] = 0;
 				tolerance += r * r;
 				x[j] = x[j] + (f - x[j]) * sor;
 			}
