@@ -45,12 +45,12 @@ class dVehicleNode: public dContainersAlloc
 	void SetIndex(int index){m_solverIndex = index;}
 	void SetLoopNode(bool staste){m_isLoop = staste;}
 
-
 	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
 	virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
 
 	protected:	
 	virtual void RigidBodyToStates();
+	virtual void Integrate(dFloat timestep);
 	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
 	void* m_userData;

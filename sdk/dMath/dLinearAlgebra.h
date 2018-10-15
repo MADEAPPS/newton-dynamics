@@ -218,7 +218,6 @@ class dComplementaritySolver
 		int m_count;
 	};
 
-
 	class dBodyState
 	{
 		public:
@@ -258,9 +257,9 @@ class dComplementaritySolver
 		const dVector& GetCOM () const;
 
 		void IntegrateVelocity (dFloat timestep);
+		void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 
 		protected:
-		virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 		virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
 		dMatrix m_matrix;

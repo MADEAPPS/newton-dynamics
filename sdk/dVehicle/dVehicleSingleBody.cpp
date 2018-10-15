@@ -113,3 +113,9 @@ void dVehicleSingleBody::ApplyExternalForce()
 	m_gravity = force.Scale (chassisBody->GetInvMass());
 	dVehicleInterface::ApplyExternalForce();
 }
+
+void dVehicleSingleBody::Integrate(dFloat timestep)
+{
+
+	dVehicleInterface::Integrate(timestep);
+}

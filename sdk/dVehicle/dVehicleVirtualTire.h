@@ -48,19 +48,18 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
 	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
 	DVEHICLE_API virtual void SetSteeringAngle(dFloat steeringAngle);
-
 	DVEHICLE_API void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
-	
-	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
-
 	protected:
+	void ApplyExternalForce();
+	void Integrate(dFloat timestep);
 	dComplementaritySolver::dBilateralJoint* GetJoint();
 	dMatrix GetHardpointMatrix (dFloat param) const;
-	void ApplyExternalForce();
 	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	void CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep);
+
+	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
 	dTireInfo m_info;
 	dMatrix m_matrix;

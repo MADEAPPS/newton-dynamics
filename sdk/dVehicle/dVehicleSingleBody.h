@@ -28,6 +28,7 @@ class dVehicleSingleBody: public dVehicleInterface
 	protected:
 	void RigidBodyToStates();
 	void ApplyExternalForce();
+	void Integrate(dFloat timestep);
 	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 

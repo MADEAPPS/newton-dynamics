@@ -91,6 +91,16 @@ void dVehicleNode::RigidBodyToStates()
 	}
 }
 
+void dVehicleNode::Integrate(dFloat timestep)
+{
+	m_body.IntegrateForce(timestep, m_body.GetForce(), m_body.GetTorque());
+	m_body.IntegrateVelocity(timestep);
+
+	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->Integrate(timestep);
+	}
+}
+
 int dVehicleNode::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
 {
 	int count = 0;

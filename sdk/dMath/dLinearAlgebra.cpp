@@ -233,7 +233,6 @@ const dVector& dComplementaritySolver::dBodyState::GetTorque () const
 	return m_externalTorque;
 }
 
-
 void dComplementaritySolver::dBodyState::UpdateInertia()
 {
 	dMatrix tmpMatrix (dGetZeroMatrix());

@@ -183,6 +183,26 @@ int dVehicleVirtualTire::GetKinematicLoops(dKinematicLoopJoint** const jointArra
 	return dVehicleTireInterface::GetKinematicLoops(&jointArray[count]) + count;
 }
 
+
+void dVehicleVirtualTire::Integrate(dFloat timestep)
+{
+	dVehicleTireInterface::Integrate(timestep);
+
+	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
+	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetBody();
+	const dMatrix& tireMatrix = m_body.GetMatrix();
+	const dMatrix& chassisMatri = chassis->GetBody()->GetMatrix();
+
+	dVector chassisOmega(chassisBody->GetOmega());
+	dVector chassisVeloc(chassisBody->GetVelocity());
+	
+	dVector tireOmega(m_body.GetOmega());
+	dVector tireVeloc(m_body.GetVelocity());
+
+//	dVector chassinPointVeloc (chassisVeloc + )
+}
+
+
 void dVehicleVirtualTire::dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dComplementaritySolver::dBodyState* const tire = m_state0;
@@ -335,3 +355,4 @@ void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::d
 	m_count = 1;
 	constraintParams->m_count = 1;
 }
+
