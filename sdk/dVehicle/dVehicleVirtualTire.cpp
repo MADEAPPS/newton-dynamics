@@ -186,19 +186,23 @@ int dVehicleVirtualTire::GetKinematicLoops(dKinematicLoopJoint** const jointArra
 
 void dVehicleVirtualTire::Integrate(dFloat timestep)
 {
-	dVehicleTireInterface::Integrate(timestep);
-
+	// get the 
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
 	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetBody();
+	dMatrix matrix0(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
+
+	dVehicleTireInterface::Integrate(timestep);
+
+//	const dMatrix& chassisMatrix = chassis->GetBody()->GetMatrix();
 	const dMatrix& tireMatrix = m_body.GetMatrix();
-	const dMatrix& chassisMatri = chassis->GetBody()->GetMatrix();
 
-	dVector chassisOmega(chassisBody->GetOmega());
-	dVector chassisVeloc(chassisBody->GetVelocity());
-	
-	dVector tireOmega(m_body.GetOmega());
-	dVector tireVeloc(m_body.GetVelocity());
+	m_position = matrix0.m_up.DotProduct3(tireMatrix.m_posit - matrix0.m_posit);
 
+
+//	dVector chassisOmega(chassisBody->GetOmega());
+//	dVector chassisVeloc(chassisBody->GetVelocity());
+//	dVector tireOmega(m_body.GetOmega());
+//	dVector tireVeloc(m_body.GetVelocity());
 //	dVector chassinPointVeloc (chassisVeloc + )
 }
 
