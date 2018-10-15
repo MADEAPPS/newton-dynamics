@@ -302,6 +302,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 					dAssert(contactMatrix[1].DotProduct3(contactMatrix[1]) > 0.0f);
 					contactMatrix[1] = contactMatrix[1].Normalize();
 					contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
+dTrace(("xxxxx\n"));
 					contactMatrix[3] = contact - tireMatrix.m_up.Scale (dist);
 					contactMatrix[3].m_w = 1.0f;
 					m_contactsJoints[contactCount].SetContact(contactMatrix, penetration);
