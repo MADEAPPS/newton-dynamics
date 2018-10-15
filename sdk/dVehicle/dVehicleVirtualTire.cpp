@@ -302,7 +302,6 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 					dAssert(contactMatrix[1].DotProduct3(contactMatrix[1]) > 0.0f);
 					contactMatrix[1] = contactMatrix[1].Normalize();
 					contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
-dTrace(("xxxxx\n"));
 					contactMatrix[3] = contact - tireMatrix.m_up.Scale (dist);
 					contactMatrix[3].m_w = 1.0f;
 					m_contactsJoints[contactCount].SetContact(contactMatrix, penetration);
@@ -354,7 +353,7 @@ void dVehicleVirtualTire::dContact::JacobianDerivative(dComplementaritySolver::d
 
 	relSpeed += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration;
 	constraintParams->m_jointLowFriction[0] = 0.0f;
-	constraintParams->m_jointAccel[0] = relSpeed / constraintParams->m_timestepInv;
+	constraintParams->m_jointAccel[0] = relSpeed * constraintParams->m_timestepInv;
 	
 	m_dof = 1;
 	m_count = 1;
