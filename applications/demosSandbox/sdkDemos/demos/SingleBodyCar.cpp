@@ -193,8 +193,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 
-		tireInfo.m_dampingRatio = 200.0f;
-		tireInfo.m_springStrength = 10000.0f;
+		tireInfo.m_dampingRatio = 0.0f;
+		tireInfo.m_springStrength = 100.0f;
 		tireInfo.m_suspensionLength = 0.22f;
 		tireInfo.m_pivotOffset = 0.025f;
 		//tireInfo.m_maxSteeringAngle = maxSteerAngle * dDegreeToRad;
