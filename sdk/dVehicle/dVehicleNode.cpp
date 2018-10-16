@@ -91,6 +91,13 @@ void dVehicleNode::RigidBodyToStates()
 	}
 }
 
+void dVehicleNode::StatestoRigidBody(dFloat timestep)
+{
+	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->StatestoRigidBody(timestep);
+	}
+}
+
 void dVehicleNode::Integrate(dFloat timestep)
 {
 	m_body.IntegrateForce(timestep, m_body.GetForce(), m_body.GetTorque());

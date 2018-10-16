@@ -51,6 +51,7 @@ class dVehicleNode: public dContainersAlloc
 	protected:	
 	virtual void RigidBodyToStates();
 	virtual void Integrate(dFloat timestep);
+	virtual void StatestoRigidBody(dFloat timestep);
 	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
 	void* m_userData;
