@@ -141,7 +141,7 @@ class dgBroadPhaseBodyNode: public dgBroadPhaseNode
 		m_body->SetBroadPhase(this);
 	}
 
-	~dgBroadPhaseBodyNode()
+	virtual ~dgBroadPhaseBodyNode()
 	{
 		m_body->SetBroadPhase(NULL);
 	}
