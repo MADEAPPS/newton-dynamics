@@ -194,7 +194,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_width = width;
 
 		tireInfo.m_dampingRatio = 0.0f;
-		tireInfo.m_springStrength = 100.0f;
+		tireInfo.m_springStrength = 5000.0f;
 		tireInfo.m_suspensionLength = 0.22f;
 		tireInfo.m_pivotOffset = 0.025f;
 		//tireInfo.m_maxSteeringAngle = maxSteerAngle * dDegreeToRad;
@@ -273,14 +273,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio);
-		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio);
+//		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio);
+//		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio);
 //frontLeft->SetSteeringAngle(25.5f * dDegreeToRad);
 //frontRight->SetSteeringAngle(25.5f * dDegreeToRad);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);
-		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio);
+//		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();

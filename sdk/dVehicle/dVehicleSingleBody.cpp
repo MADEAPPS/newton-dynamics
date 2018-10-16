@@ -126,8 +126,9 @@ void dVehicleSingleBody::ApplyExternalForce()
 	dVehicleInterface::ApplyExternalForce();
 }
 
+/*
 void dVehicleSingleBody::Integrate(dFloat timestep)
 {
-
 	dVehicleInterface::Integrate(timestep);
 }
+*/
