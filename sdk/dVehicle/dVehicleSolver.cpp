@@ -14,6 +14,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
 #include "dVehicleChassis.h"
+#include "dVehicleVirtualJoints.h"
 
 #define D_DIAG_DAMP			 (1.0e-4f)
 #define D_MAX_FRICTION_BOUND (D_COMPLEMENTARITY_MAX_FRICTION_BOUND * 0.5f)

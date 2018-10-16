@@ -66,45 +66,5 @@ class dVehicleNode: public dContainersAlloc
 	friend class dVehicleSolver;
 };
 
-class dKinematicLoopJoint: public dComplementaritySolver::dBilateralJoint
-{
-	public:
-	dKinematicLoopJoint()
-		:dComplementaritySolver::dBilateralJoint()
-		,m_owner0(NULL)
-		,m_owner1(NULL)
-		,m_isActive(false)
-	{
-	}
-
-	dVehicleNode* GetOwner0() const
-	{
-		return m_owner0;
-	}
-
-	dVehicleNode* GetOwner1() const
-	{
-		return m_owner1;
-	}
-	
-	void SetOwners (dVehicleNode* const owner0, dVehicleNode* const owner1)
-	{
-		m_owner0 = owner0;
-		m_owner1 = owner1;
-		Init (m_owner0->GetBody(), m_owner1->GetBody());
-	}
-
-	bool IsActive () const
-	{
-		return m_isActive;
-	}	
-
-	virtual int GetMaxDof() const = 0;
-
-	dVehicleNode* m_owner0;
-	dVehicleNode* m_owner1;
-	bool m_isActive;
-};
-
 #endif 
 

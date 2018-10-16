@@ -52,6 +52,7 @@
     <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleTireInterface.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleVirtualJoints.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleVirtualTire.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +64,7 @@
     <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleTireInterface.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleVirtualJoints.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleVirtualTire.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

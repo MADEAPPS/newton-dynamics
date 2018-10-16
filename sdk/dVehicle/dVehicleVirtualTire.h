@@ -11,35 +11,14 @@
 
 
 #ifndef __D_VEHICLE_VIRTUAL_TIRE_H__
-#define __D_VEHICLE_VIRTUAL__TIRE_H__
+#define __D_VEHICLE_VIRTUAL_TIRE_H__
 
 #include "dStdafxVehicle.h"
+#include "dVehicleVirtualJoints.h"
 #include "dVehicleTireInterface.h"
 
 class dVehicleVirtualTire: public dVehicleTireInterface
 {
-	class dTireJoint: public dComplementaritySolver::dBilateralJoint
-	{
-		public:
-		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
-		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const{dAssert (0);}
-
-		dVehicleVirtualTire* m_tire;
-	};
-
-	class dContact: public dKinematicLoopJoint
-	{
-		public:
-		dContact();
-		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
-		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
-		void SetContact (const dMatrix& contact, dFloat penetration);
-		int GetMaxDof() const { return 3;}
-
-		dMatrix m_contact;
-		dFloat m_penetration;
-	};
-
 	public:
 	DVEHICLE_API dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame);
 	DVEHICLE_API virtual ~dVehicleVirtualTire();
