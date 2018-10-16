@@ -94,7 +94,7 @@ void dVehicleSingleBody::StatestoRigidBody(dFloat timestep)
 	dVector force(chassisBody->GetForce());
 	dVector torque(chassisBody->GetTorque());
 	NewtonBodySetForce(m_newtonBody, &force[0]);
-	NewtonBodyGetTorque(m_newtonBody, &torque[0]);
+	NewtonBodySetTorque(m_newtonBody, &torque[0]);
 
 	dVehicleInterface::StatestoRigidBody(timestep);
 }
