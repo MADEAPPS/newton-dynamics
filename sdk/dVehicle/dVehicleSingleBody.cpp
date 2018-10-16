@@ -87,6 +87,18 @@ void dVehicleSingleBody::RigidBodyToStates()
 	dVehicleInterface::RigidBodyToStates();
 }
 
+void dVehicleSingleBody::StatestoRigidBody(dFloat timestep)
+{
+	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
+
+	dVector force(chassisBody->GetForce());
+	dVector torque(chassisBody->GetTorque());
+	NewtonBodySetForce(m_newtonBody, &force[0]);
+	NewtonBodyGetTorque(m_newtonBody, &torque[0]);
+
+	dVehicleInterface::StatestoRigidBody(timestep);
+}
+
 int dVehicleSingleBody::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
 {
 	m_groundNode.SetIndex(-1);
