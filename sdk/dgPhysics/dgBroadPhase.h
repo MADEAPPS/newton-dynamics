@@ -141,6 +141,11 @@ class dgBroadPhaseBodyNode: public dgBroadPhaseNode
 		m_body->SetBroadPhase(this);
 	}
 
+	~dgBroadPhaseBodyNode()
+	{
+		m_body->SetBroadPhase(NULL);
+	}
+
 	virtual bool IsLeafNode() const
 	{
 		return true;

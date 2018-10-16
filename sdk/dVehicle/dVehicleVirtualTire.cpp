@@ -161,9 +161,6 @@ void dVehicleVirtualTire::ApplyExternalForce()
 	tireBody->SetForce(chassisNode->m_gravity.Scale (tireBody->GetMass()));
 
 	dVehicleTireInterface::ApplyExternalForce();
-
-m_tireAngle = dMod(m_tireAngle + m_omega * 0.001f, 2.0f * dPi);
-
 }
 
 int dVehicleVirtualTire::GetKinematicLoops(dKinematicLoopJoint** const jointArray)

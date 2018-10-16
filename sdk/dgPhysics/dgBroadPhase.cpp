@@ -326,9 +326,11 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 				if (!dynamicBody->IsInEquilibrium()) {
 					dynamicBody->m_sleeping = false;
 					dynamicBody->m_equilibrium = false;
-					dynamicBody->UpdateCollisionMatrix(timestep, threadID);
-					dgInt32 pendingBodyIndex = dgAtomicExchangeAndAdd(atomicPendingBodiesCount, 1);
-					pendingBodies[pendingBodyIndex].m_body = dynamicBody;
+					if (dynamicBody->GetBroadPhase()) {
+						dynamicBody->UpdateCollisionMatrix(timestep, threadID);
+						dgInt32 pendingBodyIndex = dgAtomicExchangeAndAdd(atomicPendingBodiesCount, 1);
+						pendingBodies[pendingBodyIndex].m_body = dynamicBody;
+					}
 				}
 				if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
 					dynamicBody->m_sleeping = true;
@@ -352,7 +354,9 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 				body->m_equilibrium = true;
 
 				// update collision matrix by calling the transform callback for all kinematic bodies
-				body->UpdateCollisionMatrix(timestep, threadID);
+				if (body->GetBroadPhase()) {
+					body->UpdateCollisionMatrix(timestep, threadID);
+				}
 			}
 		}
 
