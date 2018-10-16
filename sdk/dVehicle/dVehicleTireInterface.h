@@ -42,7 +42,7 @@ class dVehicleTireInterface: public dVehicleNode
 		dFloat m_width;
 		dFloat m_pivotOffset;
 		dFloat m_dampingRatio;
-		dFloat m_springStrength;
+		dFloat m_springStiffness;
 		dFloat m_suspensionLength;
 		//dFloat m_maxSteeringAngle;
 		//dFloat m_corneringStiffness;

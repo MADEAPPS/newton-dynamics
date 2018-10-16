@@ -171,7 +171,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	}
 
 	//dVehicleTireInterface* AddTire(dFloat width, dFloat radius, dFloat pivotOffset, dFloat maxSteerAngle, const CarDefinition& definition)
-	dVehicleTireInterface* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius)
+	dVehicleTireInterface* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetVehicle()->GetUserData();
 		DemoEntity* const tirePart = entity->Find(tireName);
@@ -193,13 +193,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 
-		tireInfo.m_dampingRatio = 400.0f;
-		tireInfo.m_springStrength = 10000.0f;
 		tireInfo.m_suspensionLength = 0.22f;
-		tireInfo.m_pivotOffset = 0.025f;
+		tireInfo.m_dampingRatio = 15.0f * vehicleMass;
+		tireInfo.m_springStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 8.0f / tireInfo.m_suspensionLength);
+		tireInfo.m_pivotOffset = 0.01f;
 		//tireInfo.m_maxSteeringAngle = maxSteerAngle * dDegreeToRad;
 		//tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
-		//tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
+		//tireInfo.m_springStiffness = definition.m_tireSuspensionSpringConstant;
 		//tireInfo.m_suspensionLength = definition.m_tireSuspensionLength;
 		//tireInfo.m_corneringStiffness = definition.m_corneringStiffness;
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
@@ -273,14 +273,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio);
-		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio);
+		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
+		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 //frontLeft->SetSteeringAngle(25.5f * dDegreeToRad);
 //frontRight->SetSteeringAngle(25.5f * dDegreeToRad);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio);
-		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio);
+		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
+		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();

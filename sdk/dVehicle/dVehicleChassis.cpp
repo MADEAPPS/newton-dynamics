@@ -245,9 +245,12 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 */
 //x = 0.1f;
 //v = 10.0f;
-			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, info.m_springStrength * weight, x, info.m_dampingRatio, v);
-
 			dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
+
+			const dFloat invMass = tireBody->GetInvMass();
+			const dFloat kv = info.m_dampingRatio * invMass;
+			const dFloat ks = info.m_springStiffness * invMass;
+			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, ks * weight, x, kv, v);
 
 			const dMatrix& tireMatrix = tireBody->GetMatrix(); 
 			const dMatrix& tireInvInertia = tireBody->GetInvInertia();
