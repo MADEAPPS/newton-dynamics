@@ -27,12 +27,6 @@
     <ClCompile Include="..\..\dgPhysics\dgBroadPhaseAggregate.cpp">
       <Filter>systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseDefault.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dgPhysics\dgBroadPhasePersistent.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dgPhysics\dgContactSolver.cpp">
       <Filter>systems</Filter>
     </ClCompile>
@@ -189,6 +183,8 @@
     <ClCompile Include="..\..\dgPhysics\dgWorldPlugins.cpp">
       <Filter>systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseMixed.cpp" />
+    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseSegregated.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgPhysics\dgBodyMasterList.h">
@@ -198,12 +194,6 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgPhysics\dgBroadPhaseAggregate.h">
-      <Filter>systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseDefault.h">
-      <Filter>systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgBroadPhasePersistent.h">
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgPhysics\dgContactSolver.h">
@@ -344,5 +334,7 @@
     <ClInclude Include="..\..\dgPhysics\dgWorldPlugins.h">
       <Filter>systems</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseMixed.h" />
+    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseSegregated.h" />
   </ItemGroup>
 </Project>

@@ -45,7 +45,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	dMatrix m_bindingRotation;
 	dTireJoint m_joint;
 	dVehicleNode m_dynamicContactBodyNode;
-	dContact m_contactsJoints[3];
+	dTireContact m_contactsJoints[3];
 	NewtonCollision* m_tireShape;
 	dFloat m_omega;
 	dFloat m_speed;

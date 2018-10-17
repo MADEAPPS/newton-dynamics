@@ -206,7 +206,7 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep)
 {
 	for (int i = 0; i < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]); i++) {
-		dContact* const contact = &m_contactsJoints[i];
+		dTireContact* const contact = &m_contactsJoints[i];
 		if (contact->m_isActive == false) {
 			contact->m_jointFeebackForce[0] = 0.0f;
 			contact->m_jointFeebackForce[1] = 0.0f;

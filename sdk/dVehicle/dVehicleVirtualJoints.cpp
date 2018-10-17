@@ -72,7 +72,7 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 }
 
 
-dContact::dContact()
+dTireContact::dTireContact()
 	:dKinematicLoopJoint()
 	,m_contact(dGetIdentityMatrix())
 	,m_penetration(0.0f)
@@ -82,14 +82,14 @@ dContact::dContact()
 	m_jointFeebackForce[2] = 0.0f;
 }
 
-void dContact::SetContact(const dMatrix& contact, dFloat penetration)
+void dTireContact::SetContact(const dMatrix& contact, dFloat penetration)
 {
 	m_isActive = true;
 	m_contact = contact;
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
-void dContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 //	dComplementaritySolver::dBodyState* const tire = m_state0;
 //	dComplementaritySolver::dBodyState* const other = m_state1;
