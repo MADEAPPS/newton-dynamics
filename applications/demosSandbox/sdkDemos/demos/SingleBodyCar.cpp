@@ -273,14 +273,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
-		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
+//		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
+//		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 //frontLeft->SetSteeringAngle(25.5f * dDegreeToRad);
 //frontRight->SetSteeringAngle(25.5f * dDegreeToRad);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
-		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
+//		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();

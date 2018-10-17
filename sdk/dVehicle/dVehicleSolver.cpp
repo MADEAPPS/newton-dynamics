@@ -659,12 +659,11 @@ int dVehicleSolver::BuildJacobianMatrix(dFloat timestep, dComplementaritySolver:
 		//dAssert(diag > dFloat(0.0f));
 		//diag *= (dFloat(1.0f) + stiffness);
 		//col->m_invDJMinvJt = dFloat(1.0f) / diag;
-
-		col.m_force = joint->m_jointFeebackForce[i] * weight;
 		col.m_diagDamp = (tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z) * D_DIAG_DAMP;
 		col.m_coordenateAccel = constraintParams.m_jointAccel[i];
 		col.m_jointLowFriction = constraintParams.m_jointLowFriction[i];
 		col.m_jointHighFriction = constraintParams.m_jointHighFriction[i];
+		col.m_force = dClamp(joint->m_jointFeebackForce[i] * weight, col.m_jointLowFriction, col.m_jointHighFriction);
 	}
 //	rowCount += dofCount;
 	return dofCount;
