@@ -182,6 +182,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// for simplicity, tires are position in global space
 		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix());
+tireMatrix.m_posit.m_x = 0.0f;
+tireMatrix.m_posit.m_z = 0.0f;
 
 		// add the offset to the tire position to account for suspension span
 		//tireMatrix.m_posit += m_controller->GetUpAxis().Scale (definition.m_tirePivotOffset);

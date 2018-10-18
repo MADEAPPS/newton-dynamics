@@ -59,7 +59,10 @@ class dTireContact: public dKinematicLoopJoint
 	void SetContact (const dMatrix& contact, dFloat penetration);
 	int GetMaxDof() const { return 3;}
 
-	dMatrix m_contact;
+	dVector m_point;
+	dVector m_normal;
+	dVector m_lateralDir;
+	dVector m_longitudinalDir;
 	dFloat m_penetration;
 };
 

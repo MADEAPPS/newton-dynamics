@@ -103,6 +103,7 @@ class dComplementaritySolver
 		dFloat m_coordenateAccel;
 		dFloat m_jointLowFriction;
 		dFloat m_jointHighFriction;
+		int m_normalIndex;
 	};
 
 	class dParamInfo
@@ -110,8 +111,9 @@ class dComplementaritySolver
 		public:
 		dJacobianPair m_jacobians[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_jointAccel[D_MAX_PRAM_INFO_SIZE];
-		dFloat m_jointLowFriction[D_MAX_PRAM_INFO_SIZE];
-		dFloat m_jointHighFriction[D_MAX_PRAM_INFO_SIZE];
+		dFloat m_jointLowFrictionCoef[D_MAX_PRAM_INFO_SIZE];
+		dFloat m_jointHighFrictionCoef[D_MAX_PRAM_INFO_SIZE];
+		int m_normalIndex[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_timestep;
 		dFloat m_timestepInv;
 		int m_count;

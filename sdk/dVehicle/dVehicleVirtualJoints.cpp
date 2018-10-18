@@ -74,7 +74,10 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 
 dTireContact::dTireContact()
 	:dKinematicLoopJoint()
-	,m_contact(dGetIdentityMatrix())
+	,m_point(0.0f)
+	,m_normal(0.0f)
+	,m_lateralDir(0.0f)
+	,m_longitudinalDir(0.0f)
 	,m_penetration(0.0f)
 {
 	m_jointFeebackForce[0] = 0.0f;
@@ -85,19 +88,20 @@ dTireContact::dTireContact()
 void dTireContact::SetContact(const dMatrix& contact, dFloat penetration)
 {
 	m_isActive = true;
-	m_contact = contact;
+	m_point = contact.m_posit;
+	m_normal = contact.m_front;
+	m_lateralDir = contact.m_right;
+	m_longitudinalDir = contact.m_up;
+
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
 void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-//	dComplementaritySolver::dBodyState* const tire = m_state0;
-//	dComplementaritySolver::dBodyState* const other = m_state1;
-
-//	const dVector& omega = chassis->GetOmega();
-//	const dMatrix& tireMatrix = tire->GetMatrix();
 	dVector omega(0.0f);
 
+static int xxx;
+xxx ++;
 	// normal constraint
 	const dVector& veloc0 = m_state0->GetVelocity();
 	const dVector& omega0 = m_state0->GetOmega();
@@ -105,26 +109,28 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	const dVector& omega1 = m_state1->GetOmega();
 
 	{
-		AddLinearRowJacobian(constraintParams, m_contact.m_posit, m_contact[0], omega);
+		// normal force row
+		AddLinearRowJacobian(constraintParams, m_point, m_normal, omega);
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat relSpeed = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
 		relSpeed += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration;
-		constraintParams->m_jointLowFriction[0] = 0.0f;
+		constraintParams->m_jointLowFrictionCoef[0] = 0.0f;
 		constraintParams->m_jointAccel[0] = relSpeed * constraintParams->m_timestepInv;
 	}
 
 	{
-		// add lateral row
-		AddLinearRowJacobian(constraintParams, m_contact.m_posit, m_contact[2], omega);
+		// lateral force row
+		AddLinearRowJacobian(constraintParams, m_point, m_lateralDir, omega);
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[1].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[1].m_jacobian_J10;
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat relSpeed = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
 		constraintParams->m_jointAccel[1] = relSpeed * constraintParams->m_timestepInv;
-		constraintParams->m_jointLowFriction[1] = -m_jointFeebackForce[0] * 0.7f - 1.0f;
-		constraintParams->m_jointHighFriction[1] = m_jointFeebackForce[0] * 0.7f + 1.0f;
+		constraintParams->m_normalIndex[1] = -1;
+		constraintParams->m_jointLowFrictionCoef[1] = -0.7f;
+		constraintParams->m_jointHighFrictionCoef[1] = 0.7f;
 	}
 	
 	const int dofs = 2;

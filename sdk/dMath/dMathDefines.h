@@ -118,7 +118,7 @@ template<class T> void dCholeskySolve(int size, int n, const T* const choleskyMa
 template<class T> void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out);
 template <class T> bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const low, T* const high);
 template <class T> void dSort(T* const array, int elements, int(*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL);
-template <class T> void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, int maxIterCount, T sor);
+template <class T> void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor);
 
 
 
@@ -662,15 +662,19 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, int maxIterCount, T sor)
+void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor)
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dAlloca(T, size);
 
 	int stride = 0;
-	for (int i = 0; i < size; i++) {
-		x[i] = dClamp(x[i], low[i], high[i]);
-		invDiag1[i] = T(1.0f) / me[stride + i];
+	for (int j = 0; j < size; j++) {
+		const int index = normalIndex[j];
+		const T val = index ? x[j + index] : 1.0f;
+		const T l = low[j] * val;
+		const T h = high[j] * val;
+		x[j] = dClamp(x[j], l, h);
+		invDiag1[j] = T(1.0f) / me[stride + j];
 		stride += size;
 	}
 
@@ -689,10 +693,15 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 			const T* const row = &me[base];
 			T r(b[j] - dDotProduct(size, row, x));
 			T f((r + row[j] * x[j]) * invDiag[j]);
-			if (f > high[j]) {
-				x[j] = high[j];
-			} else if (f < low[j]) {
-				x[j] = low[j];
+
+			const int index = normalIndex[j];
+			const T val = index ? x[j + index] : 1.0f;
+			const T l = low[j] * val;
+			const T h = high[j] * val;
+			if (f > h) {
+				x[j] = h;
+			} else if (f < l) {
+				x[j] = l;
 			} else {
 				tolerance += r * r;
 				x[j] = x[j] + (f - x[j]) * sor;

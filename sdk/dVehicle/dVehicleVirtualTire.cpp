@@ -256,7 +256,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 					// calculate contact matrix
 					dMatrix contactMatrix;
 					contactMatrix[0] = normal;
-					contactMatrix[1] = normal.CrossProduct(tireMatrix.m_front);
+					contactMatrix[1] = tireMatrix.m_front.CrossProduct( normal);
 					dAssert(contactMatrix[1].DotProduct3(contactMatrix[1]) > 0.0f);
 					contactMatrix[1] = contactMatrix[1].Normalize();
 					contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
