@@ -192,7 +192,12 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector localOmega(tireOmega - chassisOmega);
 	m_omega = tireMatrix.m_front.DotProduct3(localOmega);
-	m_tireAngle = dClamp(m_tireAngle + m_omega * timestep, dFloat(0.0f), dFloat(2.0f * dPi));
+	m_tireAngle += m_omega * timestep;
+	while (m_tireAngle <= 0.0f)
+	{
+		m_tireAngle += 2.0f * dPi;
+	}
+	m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
 
 	dVector tireVeloc(m_body.GetVelocity());
 	dVector chassisVeloc(chassisBody->GetVelocity());

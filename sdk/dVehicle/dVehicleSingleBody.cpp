@@ -73,9 +73,9 @@ static int xxx;
 xxx++;
 if (xxx == 500)
 {
-	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
-	vector.m_x += 5.0f;
-	NewtonBodySetVelocity(m_newtonBody, &vector[0]);
+//	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
+//	vector.m_x += 5.0f;
+//	NewtonBodySetVelocity(m_newtonBody, &vector[0]);
 }
 
 
@@ -83,7 +83,6 @@ if (xxx == 500)
 	chassisBody->SetVeloc(vector);
 
 	NewtonBodyGetOmega(m_newtonBody, &vector[0]);
-	//vector.m_y = 10.0f;
 	chassisBody->SetOmega(vector);
 
 	NewtonBodyGetForce(m_newtonBody, &vector[0]);
