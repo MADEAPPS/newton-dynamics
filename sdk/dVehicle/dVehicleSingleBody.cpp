@@ -70,14 +70,14 @@ void dVehicleSingleBody::RigidBodyToStates()
 	chassisBody->SetMatrix(matrix);
 
 static int xxx;
-xxx ++;
-if (xxx == 1000)
+xxx++;
+if (xxx == 500)
 {
-	vector.m_x = 0.0f;
-	vector.m_y = 0.0f;
-	vector.m_z = 1.0f;
+	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
+	vector.m_x += 5.0f;
 	NewtonBodySetVelocity(m_newtonBody, &vector[0]);
 }
+
 
 	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
 	chassisBody->SetVeloc(vector);
@@ -97,7 +97,7 @@ if (xxx == 1000)
 	dVehicleInterface::RigidBodyToStates();
 }
 
-void dVehicleSingleBody::StatestoRigidBody(dFloat timestep)
+void dVehicleSingleBody::StatesToRigidBody(dFloat timestep)
 {
 	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
 
@@ -106,7 +106,7 @@ void dVehicleSingleBody::StatestoRigidBody(dFloat timestep)
 	NewtonBodySetForce(m_newtonBody, &force[0]);
 	NewtonBodySetTorque(m_newtonBody, &torque[0]);
 
-	dVehicleInterface::StatestoRigidBody(timestep);
+	dVehicleInterface::StatesToRigidBody(timestep);
 }
 
 int dVehicleSingleBody::GetKinematicLoops(dKinematicLoopJoint** const jointArray)

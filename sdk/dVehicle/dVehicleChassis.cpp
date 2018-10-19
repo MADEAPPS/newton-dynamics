@@ -200,7 +200,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 	m_vehicle->RigidBodyToStates();
 	m_solver.Update(timestep);
 	m_vehicle->Integrate(timestep);
-	m_vehicle->StatestoRigidBody(timestep);
+	m_vehicle->StatesToRigidBody(timestep);
 }
 
 void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)

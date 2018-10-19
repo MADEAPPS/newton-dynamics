@@ -66,7 +66,7 @@ class dVehicleSolver: public dContainersAlloc
 	void BodyJacobianTimeMassForward(dVehicleNode* const node, const dVectorPair& force, dVectorPair& parentForce) const;
 	void JointJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force, const dVectorPair& parentForce) const;
 
-void xxxxx();
+	void DebugMassMatrix();
 
 	dVehicleChassis* m_vehicle;
 	dVehicleNode** m_nodesOrder;

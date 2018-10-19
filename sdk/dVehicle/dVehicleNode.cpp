@@ -91,10 +91,10 @@ void dVehicleNode::RigidBodyToStates()
 	}
 }
 
-void dVehicleNode::StatestoRigidBody(dFloat timestep)
+void dVehicleNode::StatesToRigidBody(dFloat timestep)
 {
 	for (dList<dVehicleNode*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-		child->GetInfo()->StatestoRigidBody(timestep);
+		child->GetInfo()->StatesToRigidBody(timestep);
 	}
 }
 
