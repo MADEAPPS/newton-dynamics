@@ -323,7 +323,16 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 					dgAtomicExchangeAndAdd(atomicBodiesCount, 1);
 				}
 
-				if (!dynamicBody->IsInEquilibrium()) {
+				if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
+					dynamicBody->m_sleeping = true;
+					dynamicBody->m_autoSleep = true;
+					dynamicBody->m_equilibrium = true;
+				}
+
+				if (dynamicBody->IsInEquilibrium()) {
+					dynamicBody->m_equilibrium = true;
+					dynamicBody->m_sleeping = dynamicBody->m_autoSleep;
+				} else {
 					dynamicBody->m_sleeping = false;
 					dynamicBody->m_equilibrium = false;
 					if (dynamicBody->GetBroadPhase()) {
@@ -331,11 +340,6 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 						dgInt32 pendingBodyIndex = dgAtomicExchangeAndAdd(atomicPendingBodiesCount, 1);
 						pendingBodies[pendingBodyIndex].m_body = dynamicBody;
 					}
-				}
-				if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
-					dynamicBody->m_sleeping = true;
-					dynamicBody->m_autoSleep = true;
-					dynamicBody->m_equilibrium = true;
 				}
 
 				dynamicBody->m_savedExternalForce = dynamicBody->m_externalForce;

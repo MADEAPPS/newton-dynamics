@@ -662,6 +662,7 @@ void DemoEntityManager::ApplyMenuOptions()
 void DemoEntityManager::ShowMainMenuBar()
 {
 	int mainMenu = 0;
+dAssert (m_autoSleepMode);
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) {

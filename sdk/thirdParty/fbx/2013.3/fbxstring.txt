@@ -1,0 +1,43 @@
+To be able to see the content of FbxString class when debugging on the Microsoft Windows platform, please copy and paste the
+following lines below the [Visualizer] section of the file autoexp.dat found in your Microsoft Visual Studio installation:
+
+
+
+fbxsdk_2013_3::FbxString{
+	preview
+	( 
+		#if(((*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Myres) < ((*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._BUF_SIZE))
+		(
+			[(*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Bx._Buf,s]
+		)
+		#else
+		(
+			[(*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Bx._Ptr,s]
+		)
+	)
+	
+	stringview
+	(
+		#if(((*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Myres) < ((*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._BUF_SIZE))
+		(
+			[(*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Bx._Buf,sb]
+		)
+		#else
+		(
+			[(*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Bx._Ptr,sb]
+		)
+	)
+	
+	children
+	(
+		#if(((*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Myres) < ((*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._BUF_SIZE))
+		(
+			#([actual members]: [(*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk)),!] , #array( expr: (*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Bx._Buf[$i], size: (*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Mysize))
+		)
+		#else
+		(
+			#([actual members]: [(*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk)),!],  #array( expr: (*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Bx._Ptr[$i], size: (*(std::basic_string<char,std::char_traits<char>,std::allocator<char> >*)&($e.mOpaqueChunk))._Mysize))
+		)	
+	)	
+
+}

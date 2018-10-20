@@ -70,7 +70,7 @@ void dCustomKinematicController::Init (NewtonBody* const body, const dMatrix& ma
 {
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 
-	m_autoSleepState = NewtonBodyGetSleepState(body) ? true : false;
+	m_autoSleepState = NewtonBodyGetAutoSleep(body) ? true : false;
 	NewtonBodySetSleepState(body, 0);
 
 	SetPickMode(1);
