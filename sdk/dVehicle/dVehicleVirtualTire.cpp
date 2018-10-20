@@ -192,8 +192,16 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector localOmega(tireOmega - chassisOmega);
 	m_omega = tireMatrix.m_front.DotProduct3(localOmega);
+	// check if the tire is going to rest
+	if (dAbs(m_omega) < 0.1f) {
+		dFloat alpha = tireMatrix.m_front.DotProduct3(m_body.GetTorque()) * m_body.GetInvInertia()[0][0];
+		if (alpha < 0.2f) {
+			m_omega = 0.0f;
+		}
+	}
+
 	m_tireAngle += m_omega * timestep;
-	while (m_tireAngle <= 0.0f)
+	while (m_tireAngle < 0.0f)
 	{
 		m_tireAngle += 2.0f * dPi;
 	}
