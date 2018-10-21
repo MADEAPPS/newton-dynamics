@@ -267,15 +267,23 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 					penetration = normal.DotProduct3(tireMatrix.m_up.Scale(dist));
 
 					// calculate contact matrix
-					dMatrix contactMatrix;
-					contactMatrix[0] = normal;
-					contactMatrix[1] = tireMatrix.m_front.CrossProduct( normal);
-					dAssert(contactMatrix[1].DotProduct3(contactMatrix[1]) > 0.0f);
-					contactMatrix[1] = contactMatrix[1].Normalize();
-					contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
-					contactMatrix[3] = contact - tireMatrix.m_up.Scale (dist);
-					contactMatrix[3].m_w = 1.0f;
-					m_contactsJoints[contactCount].SetContact(contactMatrix, penetration);
+					//contactMatrix[0] = tireMatrix.m_front.CrossProduct(normal);
+					//dAssert(contactMatrix[0].DotProduct3(contactMatrix[0]) > 0.0f);
+					//contactMatrix[1] = contactMatrix[1].Normalize();
+					//contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
+					//contactMatrix[3] = contact - tireMatrix.m_up.Scale (dist);
+					//contactMatrix[3].m_w = 1.0f;
+
+					dVector lateralDir (normal.CrossProduct(tireMatrix.m_right));
+					if (lateralDir.DotProduct3(lateralDir) < 0.1f) {
+						lateralDir = normal.CrossProduct(tireMatrix.m_front.CrossProduct(normal)); 
+					}
+					lateralDir = lateralDir.Normalize();
+					dAssert (lateralDir.DotProduct3(lateralDir) > 0.0f);
+
+					contact -= tireMatrix.m_up.Scale (dist);
+					contact.m_w = 1.0f;
+					m_contactsJoints[contactCount].SetContact(contact, normal, lateralDir, penetration, 0.7f);
 					contactCount ++;
 				}
 			}

@@ -80,20 +80,22 @@ dTireContact::dTireContact()
 	,m_lateralDir(0.0f)
 	,m_longitudinalDir(0.0f)
 	,m_penetration(0.0f)
+	,m_friction(0.7f)
 {
 	m_jointFeebackForce[0] = 0.0f;
 	m_jointFeebackForce[1] = 0.0f;
 	m_jointFeebackForce[2] = 0.0f;
 }
 
-void dTireContact::SetContact(const dMatrix& contact, dFloat penetration)
+void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat friction)
 {
-	m_isActive = true;
-	m_point = contact.m_posit;
-	m_normal = contact.m_front;
-	m_lateralDir = contact.m_right;
-	m_longitudinalDir = contact.m_up;
+	m_point = posit;
+	m_normal = normal;
+	m_lateralDir = lateralDir;
+	m_longitudinalDir = m_normal.CrossProduct(m_lateralDir);
 
+	m_isActive = true;
+	m_friction = friction;
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
@@ -121,11 +123,15 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		n++;
 	}
 
+	dFloat longitudialSlip = 0.0f;
 	{
 		// longitudinal force row
 		AddLinearRowJacobian(constraintParams, m_point, m_longitudinalDir, omega);
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[n].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[n].m_jacobian_J10;
+
+//		dFloat tireSpeed = 
+
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat relSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 
@@ -154,13 +160,9 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		lateralSlip = lateralSpeed / longitudinalSpeed;
 		dFloat maxLateralSpeed = D_TIRE_MAX_LATERAL_SLIP * longitudinalSpeed;
 		dFloat slideSpeed = lateralSpeed - dClamp (lateralSpeed, - maxLateralSpeed, maxLateralSpeed);
-
 		constraintParams->m_jointAccel[n] = -slideSpeed * constraintParams->m_timestepInv;
-
 		n++;
 	}
-
-
 
 	m_dof = n;
 	m_count = n;

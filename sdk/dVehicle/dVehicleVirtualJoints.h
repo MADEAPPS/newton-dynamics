@@ -56,16 +56,19 @@ class dTireContact: public dKinematicLoopJoint
 {
 	public:
 	dTireContact();
+
+	void SetContact (const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat friction);
+
+	int GetMaxDof() const { return 3;}
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
-	void SetContact (const dMatrix& contact, dFloat penetration);
-	int GetMaxDof() const { return 3;}
 
 	dVector m_point;
 	dVector m_normal;
 	dVector m_lateralDir;
 	dVector m_longitudinalDir;
 	dFloat m_penetration;
+	dFloat m_friction;
 };
 
 
