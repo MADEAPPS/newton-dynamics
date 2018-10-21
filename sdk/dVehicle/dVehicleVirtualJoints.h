@@ -18,6 +18,8 @@
 class dVehicleNode;
 class dVehicleVirtualTire;
 
+// tang of 10 degrees
+#define D_TIRE_MAX_LATERAL_SLIP				(0.175f)
 #define D_TIRE_MAX_ELASTIC_DEFORMATION		(0.05f)
 #define D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS (10.0f / D_TIRE_MAX_ELASTIC_DEFORMATION)
 

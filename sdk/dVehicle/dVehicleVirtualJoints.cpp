@@ -13,6 +13,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleVirtualJoints.h"
 
+
 dKinematicLoopJoint::dKinematicLoopJoint()
 	:dComplementaritySolver::dBilateralJoint()
 	,m_owner0(NULL)
@@ -121,32 +122,44 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	}
 
 	{
-		// lateral force row
-		AddLinearRowJacobian(constraintParams, m_point, m_lateralDir, omega);
+		// longitudinal force row
+		AddLinearRowJacobian(constraintParams, m_point, m_longitudinalDir, omega);
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[n].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[n].m_jacobian_J10;
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
-		dFloat relSpeed = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
-		constraintParams->m_jointAccel[n] = relSpeed * constraintParams->m_timestepInv;
+		dFloat relSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+
+
+		constraintParams->m_jointAccel[n] = -relSpeed * constraintParams->m_timestepInv;
 		constraintParams->m_normalIndex[n] = -n;
 		constraintParams->m_jointLowFrictionCoef[n] = -0.7f;
 		constraintParams->m_jointHighFrictionCoef[n] = 0.7f;
 		n++;
 	}
 
+	dFloat lateralSlip = 0.0f;
 	{
-		// longitudinal force row
-		AddLinearRowJacobian(constraintParams, m_point, m_longitudinalDir, omega);
+		// lateral force row
+		AddLinearRowJacobian(constraintParams, m_point, m_lateralDir, omega);
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[n].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[n].m_jacobian_J10;
-		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
-		dFloat relSpeed = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
-		constraintParams->m_jointAccel[n] = relSpeed * constraintParams->m_timestepInv;
 		constraintParams->m_normalIndex[n] = -n;
 		constraintParams->m_jointLowFrictionCoef[n] = -0.7f;
 		constraintParams->m_jointHighFrictionCoef[n] = 0.7f;
+
+		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
+		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+		dFloat longitudinalSpeed = dAbs (m_longitudinalDir.DotProduct3(relVeloc)) + 0.01f;
+
+		lateralSlip = lateralSpeed / longitudinalSpeed;
+		dFloat maxLateralSpeed = D_TIRE_MAX_LATERAL_SLIP * longitudinalSpeed;
+		dFloat slideSpeed = lateralSpeed - dClamp (lateralSpeed, - maxLateralSpeed, maxLateralSpeed);
+
+		constraintParams->m_jointAccel[n] = -slideSpeed * constraintParams->m_timestepInv;
+
 		n++;
 	}
+
 
 
 	m_dof = n;

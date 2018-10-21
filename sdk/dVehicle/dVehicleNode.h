@@ -42,6 +42,7 @@ class dVehicleNode: public dContainersAlloc
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() {return NULL;}
 
 	bool IsLoopNode() const{return m_isLoop;}
+	int GetIndex() const {return m_solverIndex;}
 	void SetIndex(int index){m_solverIndex = index;}
 	void SetLoopNode(bool staste){m_isLoop = staste;}
 
