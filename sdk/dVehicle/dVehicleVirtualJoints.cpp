@@ -125,7 +125,7 @@ dTireContact::dTireModel dTireContact::TireForces(dFloat longitudinalSlip, dFloa
 
 	dTireModel model;
 
-	model.m_lateralForce = -dSign(lateralSlip) * v * f / mag;
+	model.m_lateralForce = -dSign(lateralSlip) * y * f / mag;
 	model.m_longitunalForce = -dSign(longitudinalSlip) * x * f / mag;
 	return model;
 }
@@ -233,7 +233,6 @@ xxx *=1;
 
 	dTireModel tireforces (TireForces(longitudialSlip, lateralSlip));
 
-tireforces.m_lateralForce = 0.0f;
 	dComplementaritySolver::dJacobian &longForce = constraintParams->m_jacobians[1].m_jacobian_J01;
 	dComplementaritySolver::dJacobian &lateralForce = constraintParams->m_jacobians[2].m_jacobian_J01;
 
@@ -244,7 +243,8 @@ tireforces.m_lateralForce = 0.0f;
 	m_state0->SetTorque (m_state0->GetTorque() + torque);
 
 //dTrace (("(%d = %f) ", GetOwner0()->GetIndex(), longitudialSlip));
-dTrace (("(%d = %f %f) ", GetOwner0()->GetIndex(), longitudialSlip, tireforces.m_longitunalForce));
+dTrace(("(%d = %f %f) ", GetOwner0()->GetIndex(), lateralSlip, tireforces.m_lateralForce));
+//dTrace (("(%d = %f %f) ", GetOwner0()->GetIndex(), longitudialSlip, tireforces.m_longitunalForce));
 
 if (GetOwner0()->GetIndex() == 3)
 dTrace (("\n"));
