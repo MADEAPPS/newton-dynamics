@@ -13,8 +13,9 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleTireInterface.h"
 
-dVehicleTireInterface::dVehicleTireInterface(dVehicleNode* const parent)
+dVehicleTireInterface::dVehicleTireInterface(dVehicleNode* const parent, const dTireInfo& info)
 	:dVehicleNode(parent)
+	,m_info(info)
 {
 	SetWorld(parent->GetWorld());
 }

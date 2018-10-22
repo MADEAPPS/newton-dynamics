@@ -52,15 +52,21 @@ class dVehicleTireInterface: public dVehicleNode
 		//dSuspensionType m_suspentionType;
 	};
 
-	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent);
+	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleTireInterface();
 
 	virtual dVehicleTireInterface* GetAsTire() const {return (dVehicleTireInterface*) this;} 
+	
+	const dTireInfo& GetInfo() const {return m_info;}
+	void SetInfo(const dTireInfo& info) {m_info = info;}
 	
 	virtual dMatrix GetLocalMatrix () const = 0;
 	virtual dMatrix GetGlobalMatrix () const = 0;
 	virtual NewtonCollision* GetCollisionShape() const = 0;
 	virtual void SetSteeringAngle(dFloat steeringAngle) = 0;
+
+	protected:
+	dTireInfo m_info;
 };
 
 

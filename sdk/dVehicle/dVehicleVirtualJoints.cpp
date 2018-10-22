@@ -11,8 +11,8 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
+#include "dVehicleTireInterface.h"
 #include "dVehicleVirtualJoints.h"
-
 
 dKinematicLoopJoint::dKinematicLoopJoint()
 	:dComplementaritySolver::dBilateralJoint()
@@ -97,6 +97,37 @@ void dTireContact::SetContact(const dVector& posit, const dVector& normal, const
 	m_isActive = true;
 	m_friction = friction;
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
+}
+
+dTireContact::dTireModel dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip)
+{
+	dVehicleTireInterface* const tire = GetOwner0()->GetAsTire();
+	dAssert (tire);
+
+	const dVehicleTireInterface::dTireInfo& tireInfo = tire->GetInfo();
+
+	dFloat f = m_friction * m_jointFeebackForce[0];
+
+	dFloat v = dAbs (lateralSlip);
+	dFloat u = dAbs (longitudinalSlip);
+
+	dFloat invden = 1.0f / (1.0f + u);
+
+	dFloat y = tireInfo.m_corneringStiffness * v * invden;
+	dFloat x = tireInfo.m_longitudinalStiffness * u * invden;
+	dFloat mag = dSqrt (x * x + y * y);
+
+	if (mag < (3.0f * f)) {
+		dFloat den = dMax (f, 1.0f);
+		f = mag * (1.0f - mag / (3.0f * den) + mag * mag / (27 * den * den));
+	} 
+	mag = dMax (mag, 1.0f);
+
+	dTireModel model;
+
+	model.m_lateralForce = -dSign(lateralSlip) * v * f / mag;
+	model.m_longitunalForce = -dSign(longitudinalSlip) * x * f / mag;
+	return model;
 }
 
 void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
@@ -200,7 +231,18 @@ xxx *=1;
 		n++;
 	}
 
-dTrace (("(%d =%f) ", GetOwner0()->GetIndex(), longitudialSlip));
+	dTireModel tireforces (TireForces(longitudialSlip, lateralSlip));
+
+	dComplementaritySolver::dJacobian &longForce = constraintParams->m_jacobians[1].m_jacobian_J01;
+	dComplementaritySolver::dJacobian &lateralForce = constraintParams->m_jacobians[2].m_jacobian_J01;
+
+	dVector force (longForce.m_linear.Scale(tireforces.m_longitunalForce) + lateralForce.m_linear.Scale(tireforces.m_lateralForce));
+	dVector torque(longForce.m_angular.Scale(tireforces.m_longitunalForce) + lateralForce.m_angular.Scale(tireforces.m_lateralForce));
+
+
+//dTrace (("(%d = %f) ", GetOwner0()->GetIndex(), longitudialSlip));
+dTrace (("(%d = %f %f) ", GetOwner0()->GetIndex(), longitudialSlip, tireforces.m_longitunalForce));
+
 if (GetOwner0()->GetIndex() == 3)
 dTrace (("\n"));
 

@@ -15,8 +15,7 @@
 #include "dVehicleVirtualTire.h"
 
 dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame)
-	:dVehicleTireInterface(parent)
-	,m_info(info)
+	:dVehicleTireInterface(parent, info)
 	,m_joint()
 	,m_dynamicContactBodyNode(NULL, true)
 	,m_omega(0.0f)
@@ -204,7 +203,7 @@ static int xxx;
 xxx++;
 if (xxx > 5000) {
 if ((m_solverIndex == 2) || (m_solverIndex == 3))
-m_omega = -50.0f;
+m_omega = -20.0f;
 }
 
 

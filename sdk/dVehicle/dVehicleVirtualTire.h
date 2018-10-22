@@ -40,7 +40,6 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
-	dTireInfo m_info;
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
 	dTireJoint m_joint;

@@ -55,13 +55,29 @@ class dTireJoint: public dComplementaritySolver::dBilateralJoint
 class dTireContact: public dKinematicLoopJoint
 {
 	public:
-	dTireContact();
+	class dTireModel
+	{
+		public:
+		dTireModel ()
+			:m_alingMoment(0.0f)
+			,m_lateralForce(0.0f)
+			,m_longitunalForce(0.0f)
+		{
+		}
+		dFloat m_alingMoment;
+		dFloat m_lateralForce;
+		dFloat m_longitunalForce;
+	};
 
+	dTireContact();
 	void SetContact (const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat friction);
 
+	private:
 	int GetMaxDof() const { return 3;}
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
+	dTireModel TireForces(dFloat longitudinalSlip, dFloat lateralSlip);
 
 	dVector m_point;
 	dVector m_normal;
