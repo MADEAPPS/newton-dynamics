@@ -200,6 +200,14 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 		}
 	}
 
+static int xxx;
+xxx++;
+if (xxx > 5000) {
+if ((m_solverIndex == 2) || (m_solverIndex == 3))
+m_omega = -50.0f;
+}
+
+
 	m_tireAngle += m_omega * timestep;
 	while (m_tireAngle < 0.0f)
 	{
@@ -258,6 +266,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 				otherShape, &matrixB[0][0], &tmp[0], &tmp[0], 
 				&impactParam, &contact[0], &normal[0], &penetration,
 				&attributeA, &attributeB, 0);
+
 			if (count) {
 				// calculate tire penetration
 				dFloat dist = (param - impactParam) * m_info.m_suspensionLength;
@@ -265,14 +274,6 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 
 					normal.m_w = 0.0f;
 					penetration = normal.DotProduct3(tireMatrix.m_up.Scale(dist));
-
-					// calculate contact matrix
-					//contactMatrix[0] = tireMatrix.m_front.CrossProduct(normal);
-					//dAssert(contactMatrix[0].DotProduct3(contactMatrix[0]) > 0.0f);
-					//contactMatrix[1] = contactMatrix[1].Normalize();
-					//contactMatrix[2] = contactMatrix[0].CrossProduct(contactMatrix[1]);
-					//contactMatrix[3] = contact - tireMatrix.m_up.Scale (dist);
-					//contactMatrix[3].m_w = 1.0f;
 
 					dVector lateralDir (normal.CrossProduct(tireMatrix.m_right));
 					if (lateralDir.DotProduct3(lateralDir) < 0.1f) {

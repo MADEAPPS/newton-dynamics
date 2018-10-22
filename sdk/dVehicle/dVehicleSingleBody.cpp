@@ -71,10 +71,10 @@ void dVehicleSingleBody::RigidBodyToStates()
 
 static int xxx;
 xxx++;
-if (xxx == 500)
+if (xxx == 1500)
 {
 //	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
-//	vector.m_x += 5.0f;
+//	vector.m_x += 2.0f;
 //	NewtonBodySetVelocity(m_newtonBody, &vector[0]);
 }
 
