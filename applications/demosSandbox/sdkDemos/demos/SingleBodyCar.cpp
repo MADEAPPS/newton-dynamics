@@ -170,20 +170,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		return entity;
 	}
 
-	//dVehicleTireInterface* AddTire(dFloat width, dFloat radius, dFloat pivotOffset, dFloat maxSteerAngle, const CarDefinition& definition)
 	dVehicleTireInterface* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetVehicle()->GetUserData();
 		DemoEntity* const tirePart = entity->Find(tireName);
 
-		// save the controller with the tire so that we can use it a callback 
-//		TireVehControllerSaved* const savedVehController = new TireVehControllerSaved(m_controller);
-//		tirePart->SetUserData(savedVehController);
-
 		// for simplicity, tires are position in global space
 		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix());
-//tireMatrix.m_posit.m_x = 0.0f;
-//tireMatrix.m_posit.m_z = 0.0f;
 
 		// add the offset to the tire position to account for suspension span
 		//tireMatrix.m_posit += m_controller->GetUpAxis().Scale (definition.m_tirePivotOffset);

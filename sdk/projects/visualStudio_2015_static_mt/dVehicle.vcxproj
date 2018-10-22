@@ -35,6 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dVehicle\dVehicleDashControl.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleSingleBody.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -56,6 +57,7 @@
     <ClCompile Include="..\..\dVehicle\dVehicleVirtualTire.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dVehicle\dVehicleDashControl.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSingleBody.h" />
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleChassis.h" />
