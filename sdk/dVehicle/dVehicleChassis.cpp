@@ -50,6 +50,11 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 
 	m_gravity = dVector (0.0f, -dAbs(gravityMag), 0.0f, 0.0f);
 
+	// set linear and angular drag to zero
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(m_body, 0.0f);
+	NewtonBodySetAngularDamping(m_body, &drag[0]);
+
 /*
 	m_speed = 0.0f;
 	m_sideSlip = 0.0f;
@@ -68,10 +73,6 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
-	// set linear and angular drag to zero
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_body, 0.0f);
-	NewtonBodySetAngularDamping(m_body, &drag[0]);
 
 	// set the standard force and torque call back
 	NewtonBodySetForceAndTorqueCallback(body, m_forceAndTorqueCallback);

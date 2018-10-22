@@ -201,7 +201,7 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 
 static int xxx;
 xxx++;
-if (xxx > 5000) {
+if (xxx > 2000) {
 if ((m_solverIndex == 2) || (m_solverIndex == 3))
 m_omega = -20.0f;
 }
