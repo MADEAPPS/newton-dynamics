@@ -45,7 +45,8 @@ class dVehicleTireInterface: public dVehicleNode
 		dFloat m_springStiffness;
 		dFloat m_suspensionLength;
 		//dFloat m_maxSteeringAngle;
-		//dFloat m_corneringStiffness;
+		dFloat m_corneringStiffness;
+		dFloat m_longitudinalStiffness;
 		//dFloat m_aligningMomentTrail;
 		//int m_hasFender;
 		//dSuspensionType m_suspentionType;
