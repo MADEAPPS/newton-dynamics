@@ -77,11 +77,58 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	SingleBodyVehicleManager(NewtonWorld* const world)
 		:dVehicleManager(world)
+		,m_player(NULL)
+		,m_externalView(true)
 	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
 	~SingleBodyVehicleManager()
 	{
+	}
+
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
+	{
+		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
+		me->UpdateCamera(timestep);
+	}
+
+	void UpdateCamera(dFloat timestep)
+	{
+//		SuperCarEntity* player = m_player;
+//		if (!player) {
+//			dCustomVehicleController* const controller = &GetLast()->GetInfo();
+//			player = (SuperCarEntity*)NewtonBodyGetUserData(controller->GetBody());
+//		}
+
+		DemoEntity* const player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		DemoCamera* const camera = scene->GetCamera();
+		dMatrix camMatrix(camera->GetNextMatrix());
+		dMatrix playerMatrix(player->GetNextMatrix());
+
+		dVector frontDir(camMatrix[0]);
+		dVector camOrigin(0.0f);
+		if (m_externalView) {
+			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
+			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
+			//camOrigin = dVector (-7.0f, 3.0f, 0.0f, 0.0f);
+		} else {
+			dAssert(0);
+			//           camMatrix = camMatrix * playerMatrix;
+			//           camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+		}
+		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
+	}
+
+	void SetAsPlayer(dVehicleChassis* const player)
+	{
+		//dEngineController* const engine = player->m_controller->GetEngine();
+		//if (engine) {
+		//	engine->SetIgnition(false);
+		//}
+		m_player = player;
 	}
 
 	void CalculateTireDimensions(const char* const tireName, dFloat& width, dFloat& radius, NewtonWorld* const world, DemoEntity* const vehEntity) const
@@ -369,6 +416,9 @@ axisCount = 0;
 //		m_steeringControl->Update(timestep);
 
 	}
+
+	dVehicleChassis* m_player;
+	bool m_externalView;
 };
 
 
@@ -390,18 +440,15 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 
 	// create a vehicle controller manager
-//	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
-//	int materialList[] = {defaulMaterial };
 	SingleBodyVehicleManager* const manager = new SingleBodyVehicleManager(world);
 	
 	// load 
 	//dVehicleChassis* const player = manager->CreateVehicle("porche918", location);
 	dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
 
-/*
 	// set this vehicle as the player
 	manager->SetAsPlayer(player);
-
+/*
 	DemoEntity* const vehicleEntity = (DemoEntity*)NewtonBodyGetUserData(player->GetBody());
 	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
 	//	scene->SetCameraMouseLock (true);
