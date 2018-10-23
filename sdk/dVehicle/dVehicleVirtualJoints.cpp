@@ -130,10 +130,10 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip)
 	dFloat mag = dSqrt (x * x + y * y);
 
 	if (mag < (3.0f * f)) {
-		dFloat den = dMax (f, 1.0f);
+		dFloat den = dMax (f, dFloat(1.0f));
 		f = mag * (1.0f - mag / (3.0f * den) + mag * mag / (27 * den * den));
 	} 
-	mag = dMax (mag, 1.0f);
+	mag = dMax (mag, dFloat(1.0f));
 
 	m_tireModel.m_alingMoment = 0.0f;
 	m_tireModel.m_lateralForce = -dSign(lateralSlip) * y * f / mag;
@@ -194,18 +194,18 @@ xxx *=1;
 		linearSpeed = dAbs (linearSpeed);
 		if (!((omegaSpeed < 0.1f) && (linearSpeed < 0.1f))) {
 			if (relSpeed < 0.0f) {
-				dFloat speedDen = dMax (linearSpeed, 0.01f);
+				dFloat speedDen = dMax (linearSpeed, dFloat(0.01f));
 				longitudialSlip = relSpeed / speedDen;
-				dFloat slipLimit = 2.0f * dMax (linearSpeed, 0.0f);
+				dFloat slipLimit = 2.0f * dMax (linearSpeed, dFloat(0.0f));
 
 				relSpeed = 0.0f;
 				if ((omegaSpeed - slipLimit) > 0.0f) {
 					relSpeed = -(omegaSpeed - slipLimit);
 				}
 			} else {
-				dFloat speedDen = dMax(omegaSpeed, 0.01f);
+				dFloat speedDen = dMax(omegaSpeed, dFloat(0.01f));
 				longitudialSlip = relSpeed / speedDen;
-				dFloat slipLimit = 2.0f * dMax(omegaSpeed, 0.0f);
+				dFloat slipLimit = 2.0f * dMax(omegaSpeed, dFloat(0.0f));
 
 				relSpeed = 0.0f;
 				if ((linearSpeed - slipLimit) > 0.0f) {
