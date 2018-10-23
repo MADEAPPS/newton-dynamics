@@ -299,7 +299,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat axis[32];
 		int axisCount = scene->GetJoystickAxis(axis);
 		if (axisCount) {
-			dAssert (0);
+			//dAssert (0);
 /*
 			dFloat joyPosX;
 			dFloat joyPosY;

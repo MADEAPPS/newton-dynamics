@@ -80,27 +80,35 @@ dTireContact::dTireContact()
 	,m_lateralDir(0.0f)
 	,m_longitudinalDir(0.0f)
 	,m_penetration(0.0f)
-	,m_friction(0.7f)
+	,m_frictionCoefficient(0.7f)
+	,m_load(0.0f)
 	,m_tireModel()
-	,m_isActive0(false)
 {
 	m_jointFeebackForce[0] = 0.0f;
 	m_jointFeebackForce[1] = 0.0f;
 	m_jointFeebackForce[2] = 0.0f;
+	memset(m_normalFilter, 0, sizeof(m_normalFilter));
+	memset(m_isActiveFilter, 0, sizeof(m_isActiveFilter));
 }
 
 void dTireContact::ResetContact ()
 {
-	m_isActive0 = m_isActive;
 	if (m_isActive == false) {
 		m_jointFeebackForce[0] = 0.0f;
 		m_jointFeebackForce[1] = 0.0f;
 		m_jointFeebackForce[2] = 0.0f;
+		memset(m_normalFilter, 0, sizeof(m_normalFilter));
+		memset(m_isActiveFilter, 0, sizeof(m_isActiveFilter));
 	}
+	m_load = 0.0f;
 	m_isActive = false;
+	for (int i = sizeof(m_isActiveFilter) / sizeof(m_isActiveFilter[0]); i > 0; i--) {
+		m_normalFilter[i] = m_normalFilter[i - 1];
+		m_isActiveFilter[i] = m_isActiveFilter[i - 1];
+	}
 }
 
-void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat friction)
+void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat frictionCoefficient)
 {
 	m_point = posit;
 	m_normal = normal;
@@ -108,7 +116,16 @@ void dTireContact::SetContact(const dVector& posit, const dVector& normal, const
 	m_longitudinalDir = m_normal.CrossProduct(m_lateralDir);
 
 	m_isActive = true;
-	m_friction = friction;
+	m_isActiveFilter[0] = true;
+	m_normalFilter[0] = m_jointFeebackForce[0];
+
+	dFloat load = 0.0f;
+	for (int i = 0; i < sizeof(m_isActiveFilter) / sizeof(m_isActiveFilter[0]); i++) {
+		load += m_normalFilter[i];
+	}
+	m_load = load * (1.0f / (sizeof(m_isActiveFilter) / sizeof(m_isActiveFilter[0])));
+
+	m_frictionCoefficient = frictionCoefficient;
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
@@ -119,9 +136,9 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip)
 
 	const dVehicleTireInterface::dTireInfo& tireInfo = tire->GetInfo();
 
-	dFloat f = m_friction * (m_isActive0 ? m_jointFeebackForce[0] : 0.0f);
 	dFloat v = dAbs (lateralSlip);
 	dFloat u = dAbs (longitudinalSlip);
+	dFloat f = m_frictionCoefficient * m_load;
 
 	dFloat invden = 1.0f / (1.0f + u);
 
@@ -181,8 +198,8 @@ xxx *=1;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[n].m_jacobian_J10;
 
 		constraintParams->m_normalIndex[n] = -n;
-		constraintParams->m_jointLowFrictionCoef[n] = -m_friction;
-		constraintParams->m_jointHighFrictionCoef[n] = m_friction;
+		constraintParams->m_jointLowFrictionCoef[n] = -m_frictionCoefficient;
+		constraintParams->m_jointHighFrictionCoef[n] = m_frictionCoefficient;
 		
 		dVector linearVeloc(veloc0 * jacobian0.m_linear + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 
@@ -225,8 +242,8 @@ xxx *=1;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[n].m_jacobian_J10;
 
 		constraintParams->m_normalIndex[n] = -n;
-		constraintParams->m_jointLowFrictionCoef[n] = -m_friction;
-		constraintParams->m_jointHighFrictionCoef[n] = m_friction;
+		constraintParams->m_jointLowFrictionCoef[n] = -m_frictionCoefficient;
+		constraintParams->m_jointHighFrictionCoef[n] = m_frictionCoefficient;
 
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;

@@ -85,9 +85,11 @@ class dTireContact: public dKinematicLoopJoint
 	dVector m_lateralDir;
 	dVector m_longitudinalDir;
 	dFloat m_penetration;
-	dFloat m_friction;
+	dFloat m_frictionCoefficient;
+	dFloat m_load;
 	dTireModel m_tireModel;
-	bool m_isActive0;
+	dFloat m_normalFilter[4];
+	bool m_isActiveFilter[4];
 };
 
 
