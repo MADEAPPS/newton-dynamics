@@ -16,6 +16,7 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleChassis;
+class dVehicleTireInterface;
 
 class dVehicleDashControl: public dCustomAlloc
 {
@@ -34,6 +35,22 @@ class dVehicleDashControl: public dCustomAlloc
 	dFloat m_param;
 	dFloat m_paramMemory;
 	mutable dFloat m_timer;
+};
+
+
+class dVehicleSteeringControl: public dVehicleDashControl 
+{
+	public:
+	dVehicleSteeringControl(dVehicleChassis* const vehicle);
+
+	DVEHICLE_API void AddTire(dVehicleTireInterface* const tire);
+
+	protected:
+	virtual void Update(dFloat timestep);
+
+	dList<dVehicleTireInterface*> m_tires;
+	bool m_isSleeping;
+	friend class dVehicleChassis;
 };
 
 #endif 

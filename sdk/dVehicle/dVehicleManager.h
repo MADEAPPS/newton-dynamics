@@ -23,10 +23,9 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 	public:
 	DVEHICLE_API dVehicleManager(NewtonWorld* const world);
 	DVEHICLE_API virtual ~dVehicleManager();
-/*
 	
 	DVEHICLE_API virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
-
+/*
 	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	DVEHICLE_API virtual int OnTireAabbOverlap(const NewtonMaterial* const material, const dWheelJoint* const tire, const NewtonBody* const otherBody) const;

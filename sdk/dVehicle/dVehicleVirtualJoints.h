@@ -70,14 +70,15 @@ class dTireContact: public dKinematicLoopJoint
 	};
 
 	dTireContact();
+
+	void ResetContact ();
 	void SetContact (const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat friction);
 
 	private:
 	int GetMaxDof() const { return 3;}
+	void TireForces(dFloat longitudinalSlip, dFloat lateralSlip);
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
-
-	dTireModel TireForces(dFloat longitudinalSlip, dFloat lateralSlip);
 
 	dVector m_point;
 	dVector m_normal;
@@ -85,6 +86,8 @@ class dTireContact: public dKinematicLoopJoint
 	dVector m_longitudinalDir;
 	dFloat m_penetration;
 	dFloat m_friction;
+	dTireModel m_tireModel;
+	bool m_isActive0;
 };
 
 

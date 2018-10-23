@@ -16,11 +16,41 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleSolver.h"
 #include "dVehicleInterface.h"
+#include "dVehicleDashControl.h"
 #include "dVehicleTireInterface.h"
 
 
 class dVehicleChassis: public dCustomControllerBase
 {
+	public:
+	class dDriverInput
+	{
+		public:
+		dDriverInput()
+			:m_throttle(0.0f)
+			,m_brakePedal(0.0f)
+			,m_clutchPedal(0.0f)
+			,m_steeringValue(0.0f)
+			,m_handBrakeValue(0.0f)
+			,m_gear(0)
+			,m_ignitionKey(0)
+			,m_lockDifferential(0)
+			,m_manualTransmission(0)
+		{
+		}
+
+		dFloat m_throttle;
+		dFloat m_brakePedal;
+		dFloat m_clutchPedal;
+		dFloat m_steeringValue;
+		dFloat m_handBrakeValue;
+		int m_gear;
+		int m_ignitionKey;
+		int m_lockDifferential;
+		int m_manualTransmission;
+	};
+
+	private:
 	class dCollectCollidingBodies
 	{
 		public:
@@ -35,11 +65,7 @@ class dVehicleChassis: public dCustomControllerBase
 		NewtonBody* m_array[16];
 	};
 /*
-	class dTireFilter;
 	public:
-	DVEHICLE_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs, dFloat timestep);
-
-	DVEHICLE_API void Finalize();
 	DVEHICLE_API dEngineJoint* AddEngineJoint(dFloat mass, dFloat armatureRadius);
 	DVEHICLE_API dWheelJoint* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
 	DVEHICLE_API dDifferentialJoint* AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire);
@@ -139,6 +165,10 @@ class dVehicleChassis: public dCustomControllerBase
 	dVehicleInterface* GetVehicle() {return m_vehicle;}
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 
+	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl ();
+
+	DVEHICLE_API void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
+
 	DVEHICLE_API void Finalize();
 
 	protected:
@@ -155,12 +185,12 @@ class dVehicleChassis: public dCustomControllerBase
 	void CalculateSuspensionForces(dFloat timestep);
 	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
 
-//	void OnAABBOverlap(const NewtonBody * const body);
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 	
 	dMatrix m_localFrame;
 	dVehicleSolver m_solver;
 	dVehicleInterface* m_vehicle;
+	dVehicleSteeringControl* m_steeringControl;
 	
 	dVector m_gravity;
 	dVector m_obbSize;

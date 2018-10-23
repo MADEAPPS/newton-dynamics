@@ -79,11 +79,6 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 
 	m_contactFilter = new dTireFrictionModel(this);
 
-	m_engine = NULL;
-	m_brakesControl = NULL;
-	m_engineControl = NULL;
-	m_steeringControl = NULL;
-	m_handBrakesControl = NULL;
 
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 	NewtonCollisionAggregateSetSelfCollision(m_collisionAggregate, 0);
@@ -98,13 +93,31 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	fprintf(file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
 #endif
 */
+
+//	m_engine = NULL;
+//	m_brakesControl = NULL;
+//	m_engineControl = NULL;
+	m_steeringControl = NULL;
+//	m_handBrakesControl = NULL;
 }
 
 void dVehicleChassis::Cleanup()
 {
+	if (m_steeringControl) {
+		delete m_steeringControl;
+	}
+
 	if (m_vehicle) {
 		delete m_vehicle;
 	}
+}
+
+dVehicleSteeringControl* dVehicleChassis::GetSteeringControl ()
+{
+	if (!m_steeringControl) {
+		m_steeringControl = new dVehicleSteeringControl(this);
+	}
+	return m_steeringControl;
 }
 
 dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
@@ -198,10 +211,199 @@ void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
 
 void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 {
+	dVehicleManager* const manager = (dVehicleManager*)GetManager();
+	manager->UpdateDriverInput(this, timestep);
+
+	if (m_steeringControl) {
+		m_steeringControl->Update(timestep);
+	}
+	
 	m_vehicle->RigidBodyToStates();
 	m_solver.Update(timestep);
 	m_vehicle->Integrate(timestep);
 	m_vehicle->StatesToRigidBody(timestep);
+}
+
+void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
+{
+	if (m_steeringControl) {
+		m_steeringControl->SetParam(driveInputs.m_steeringValue);
+	}
+/*
+	if (m_brakesControl) {
+		m_brakesControl->SetParam(driveInputs.m_brakePedal);
+	}
+
+	if (m_engineControl) {
+		m_engineControl->SetDifferentialLock(driveInputs.m_lockDifferential ? true : false);
+
+		switch (m_engineControl->m_drivingState) {
+		case dEngineController::m_engineOff:
+		{
+											   if (driveInputs.m_ignitionKey) {
+												   m_engineControl->SetIgnition(true);
+												   m_engineControl->SetGear(m_engineControl->GetNeutralGear());
+												   m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+												   if (m_handBrakesControl) {
+													   m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+												   }
+											   }
+											   else {
+												   m_engineControl->SetIgnition(false);
+												   m_engineControl->SetGear(m_engineControl->GetFirstGear());
+												   if (m_handBrakesControl) {
+													   m_handBrakesControl->SetParam(1.0f - driveInputs.m_handBrakeValue);
+												   }
+											   }
+											   break;
+		}
+
+		case dEngineController::m_engineStop:
+		{
+												m_engineControl->SetParam(0.0f);
+												m_engineControl->SetClutchParam(1.0f);
+												if (dAbs(m_engineControl->GetSpeed()) < 4.0f) {
+													m_engineControl->m_stopDelay = int(2.0f / timestep);
+													m_engineControl->m_drivingState = dEngineController::m_engineStopDelay;
+												}
+												if (m_brakesControl) {
+													m_engineControl->SetGear(m_engineControl->GetNeutralGear());
+													m_brakesControl->SetParam(1.0f);
+													m_brakesControl->SetParam(1.0f);
+												}
+												break;
+		}
+
+		case dEngineController::m_engineStopDelay:
+		{
+													 m_engineControl->m_stopDelay--;
+													 if ((m_engineControl->m_stopDelay < 0) || driveInputs.m_ignitionKey) {
+														 m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+													 }
+													 m_engineControl->SetGear(m_engineControl->GetNeutralGear());
+													 m_brakesControl->SetParam(1.0f);
+													 m_brakesControl->SetParam(1.0f);
+													 break;
+		}
+
+		case dEngineController::m_engineIdle:
+		{
+												if (!driveInputs.m_ignitionKey) {
+													m_engineControl->m_drivingState = dEngineController::m_engineOff;
+												}
+												else {
+													m_engineControl->SetGear(driveInputs.m_gear);
+													m_engineControl->SetParam(driveInputs.m_throttle);
+
+													if (m_engineControl->m_automaticTransmissionMode) {
+														m_engineControl->SetClutchParam(0.0f);
+													}
+													else {
+														m_engineControl->SetClutchParam(1.0f - driveInputs.m_clutchPedal);
+													}
+													if (m_handBrakesControl) {
+														m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+													}
+
+													if (m_engineControl->GetGear() == m_engineControl->GetReverseGear()) {
+														m_engineControl->m_drivingState = dEngineController::m_driveReverse;
+													}
+													else if (m_engineControl->GetGear() != m_engineControl->GetNeutralGear()) {
+														m_engineControl->m_drivingState = dEngineController::m_driveForward;
+													}
+												}
+												break;
+		}
+
+		case dEngineController::m_driveForward:
+		{
+												  m_engineControl->SetParam(driveInputs.m_throttle);
+
+												  if ((driveInputs.m_brakePedal > 0.1f) && (m_engineControl->GetRPM() < 1.1f * m_engineControl->GetIdleRPM())) {
+													  m_engineControl->SetClutchParam(0.0f);
+												  }
+												  else {
+													  m_engineControl->SetClutchParam(driveInputs.m_clutchPedal);
+												  }
+												  if (m_handBrakesControl) {
+													  m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+												  }
+
+												  if (!m_engineControl->GetTransmissionMode()) {
+													  dAssert(0);
+													  //m_engineControl->SetGear(driveInputs.m_gear);
+												  }
+												  else {
+													  if (m_engineControl->GetSpeed() < 5.0f) {
+														  if (driveInputs.m_gear == m_engineControl->GetReverseGear()) {
+															  m_engineControl->SetGear(driveInputs.m_gear);
+															  if (m_brakesControl) {
+																  m_brakesControl->SetParam(1.0f);
+																  m_brakesControl->SetParam(1.0f);
+															  }
+															  m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+														  }
+														  else if (driveInputs.m_gear == m_engineControl->GetNeutralGear()) {
+															  m_engineControl->SetGear(driveInputs.m_gear);
+															  m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+														  }
+													  }
+												  }
+												  if (!driveInputs.m_ignitionKey) {
+													  m_engineControl->m_drivingState = dEngineController::m_engineStop;
+												  }
+												  break;
+		}
+
+		case dEngineController::m_driveReverse:
+		{
+												  m_engineControl->SetParam(driveInputs.m_throttle);
+
+												  if ((driveInputs.m_brakePedal > 0.1f) && (m_engineControl->GetRPM() < 1.1f * m_engineControl->GetIdleRPM())) {
+													  m_engineControl->SetClutchParam(0.0f);
+												  }
+												  else {
+													  m_engineControl->SetClutchParam(driveInputs.m_clutchPedal);
+												  }
+												  if (m_handBrakesControl) {
+													  m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+												  }
+
+												  if (!m_engineControl->GetTransmissionMode()) {
+													  dAssert(0);
+													  //m_engineControl->SetGear(driveInputs.m_gear);
+												  }
+												  else {
+													  if (m_engineControl->GetSpeed() < 5.0f) {
+														  if (driveInputs.m_gear == m_engineControl->GetNeutralGear()) {
+															  m_engineControl->SetGear(driveInputs.m_gear);
+															  m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+														  }
+														  else if (driveInputs.m_gear != m_engineControl->GetReverseGear()) {
+															  m_engineControl->SetGear(driveInputs.m_gear);
+															  if (m_brakesControl) {
+																  m_brakesControl->SetParam(1.0f);
+																  m_brakesControl->SetParam(1.0f);
+															  }
+															  m_engineControl->m_drivingState = dEngineController::m_engineIdle;
+														  }
+													  }
+												  }
+												  if (!driveInputs.m_ignitionKey) {
+													  m_engineControl->m_drivingState = dEngineController::m_engineStop;
+												  }
+												  break;
+		}
+
+		default:
+			dAssert(0);
+		}
+
+	}
+	else if (m_handBrakesControl) {
+		m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
+	}
+*/
 }
 
 void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)

@@ -81,10 +81,23 @@ dTireContact::dTireContact()
 	,m_longitudinalDir(0.0f)
 	,m_penetration(0.0f)
 	,m_friction(0.7f)
+	,m_tireModel()
+	,m_isActive0(false)
 {
 	m_jointFeebackForce[0] = 0.0f;
 	m_jointFeebackForce[1] = 0.0f;
 	m_jointFeebackForce[2] = 0.0f;
+}
+
+void dTireContact::ResetContact ()
+{
+	m_isActive0 = m_isActive;
+	if (m_isActive == false) {
+		m_jointFeebackForce[0] = 0.0f;
+		m_jointFeebackForce[1] = 0.0f;
+		m_jointFeebackForce[2] = 0.0f;
+	}
+	m_isActive = false;
 }
 
 void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat friction)
@@ -99,15 +112,14 @@ void dTireContact::SetContact(const dVector& posit, const dVector& normal, const
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
-dTireContact::dTireModel dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip)
+void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip)
 {
 	dVehicleTireInterface* const tire = GetOwner0()->GetAsTire();
 	dAssert (tire);
 
 	const dVehicleTireInterface::dTireInfo& tireInfo = tire->GetInfo();
 
-	dFloat f = m_friction * m_jointFeebackForce[0];
-
+	dFloat f = m_friction * (m_isActive0 ? m_jointFeebackForce[0] : 0.0f);
 	dFloat v = dAbs (lateralSlip);
 	dFloat u = dAbs (longitudinalSlip);
 
@@ -123,11 +135,9 @@ dTireContact::dTireModel dTireContact::TireForces(dFloat longitudinalSlip, dFloa
 	} 
 	mag = dMax (mag, 1.0f);
 
-	dTireModel model;
-
-	model.m_lateralForce = -dSign(lateralSlip) * y * f / mag;
-	model.m_longitunalForce = -dSign(longitudinalSlip) * x * f / mag;
-	return model;
+	m_tireModel.m_alingMoment = 0.0f;
+	m_tireModel.m_lateralForce = -dSign(lateralSlip) * y * f / mag;
+	m_tireModel.m_longitunalForce = -dSign(longitudinalSlip) * x * f / mag;
 }
 
 void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
@@ -204,8 +214,6 @@ xxx *=1;
 			}
 		}
 
-		//const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
-		//dFloat relSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		constraintParams->m_jointAccel[n] = -relSpeed * constraintParams->m_timestepInv;
 		n++;
 	}
@@ -226,28 +234,34 @@ xxx *=1;
 
 		lateralSlip = lateralSpeed / longitudinalSpeed;
 		dFloat maxLateralSpeed = D_TIRE_MAX_LATERAL_SLIP * longitudinalSpeed;
-		dFloat slideSpeed = lateralSpeed - dClamp (lateralSpeed, - maxLateralSpeed, maxLateralSpeed);
+		//dFloat slideSpeed = lateralSpeed - dClamp (lateralSpeed, - maxLateralSpeed, maxLateralSpeed);
+		dFloat slideSpeed = 0.0f;
+		if (lateralSpeed > maxLateralSpeed) {
+			slideSpeed = lateralSpeed - maxLateralSpeed;
+		} else if (lateralSpeed < -maxLateralSpeed) {
+			slideSpeed = lateralSpeed + maxLateralSpeed;
+		}
+
 		constraintParams->m_jointAccel[n] = -slideSpeed * constraintParams->m_timestepInv;
-		n++;
+		n ++;
 	}
 
-	dTireModel tireforces (TireForces(longitudialSlip, lateralSlip));
+	TireForces(longitudialSlip, lateralSlip);
 
 	dComplementaritySolver::dJacobian &longForce = constraintParams->m_jacobians[1].m_jacobian_J01;
 	dComplementaritySolver::dJacobian &lateralForce = constraintParams->m_jacobians[2].m_jacobian_J01;
 
-	dVector force(longForce.m_linear.Scale(tireforces.m_longitunalForce) + lateralForce.m_linear.Scale(tireforces.m_lateralForce));
-	dVector torque(longForce.m_angular.Scale(tireforces.m_longitunalForce) + lateralForce.m_angular.Scale(tireforces.m_lateralForce));
+	dVector force(longForce.m_linear.Scale(m_tireModel.m_longitunalForce) + lateralForce.m_linear.Scale(m_tireModel.m_lateralForce));
+	dVector torque(longForce.m_angular.Scale(m_tireModel.m_longitunalForce) + lateralForce.m_angular.Scale(m_tireModel.m_lateralForce));
 
 	m_state0->SetForce (m_state0->GetForce() + force);
 	m_state0->SetTorque (m_state0->GetTorque() + torque);
 
 //dTrace (("(%d = %f) ", GetOwner0()->GetIndex(), longitudialSlip));
-dTrace(("(%d = %f %f) ", GetOwner0()->GetIndex(), lateralSlip, tireforces.m_lateralForce));
-//dTrace (("(%d = %f %f) ", GetOwner0()->GetIndex(), longitudialSlip, tireforces.m_longitunalForce));
-
-if (GetOwner0()->GetIndex() == 3)
-dTrace (("\n"));
+//dTrace (("(%d = %f %f) ", GetOwner0()->GetIndex(), lateralSlip, m_tireModel.m_lateralForce, m_jointFeebackForce[0]));
+//dTrace (("(%d = %f %f) ", GetOwner0()->GetIndex(), longitudialSlip, m_tireModel.m_longitunalForce));
+//if (GetOwner0()->GetIndex() == 3)
+//dTrace (("\n"));
 
 	m_dof = n;
 	m_count = n;

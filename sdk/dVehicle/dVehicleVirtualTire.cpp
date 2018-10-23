@@ -70,8 +70,6 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 		m_contactsJoints[i].SetOwners (this, &chassisNode->m_groundNode);
 	}
 	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
-
-//m_omega = -10.0f;
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -139,6 +137,11 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 void dVehicleVirtualTire::SetSteeringAngle(dFloat steeringAngle)
 {
 	m_steeringAngle = steeringAngle;
+}
+
+dFloat dVehicleVirtualTire::GetSteeringAngle() const
+{
+	return m_steeringAngle;
 }
 
 void dVehicleVirtualTire::ApplyExternalForce()
@@ -226,13 +229,7 @@ m_omega = -20.0f;
 void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep)
 {
 	for (int i = 0; i < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]); i++) {
-		dTireContact* const contact = &m_contactsJoints[i];
-		if (contact->m_isActive == false) {
-			contact->m_jointFeebackForce[0] = 0.0f;
-			contact->m_jointFeebackForce[1] = 0.0f;
-			contact->m_jointFeebackForce[2] = 0.0f;
-		}
-		contact->m_isActive = false;
+		m_contactsJoints[i].ResetContact();
 	}
 
 	if (bodyArray.m_count) {

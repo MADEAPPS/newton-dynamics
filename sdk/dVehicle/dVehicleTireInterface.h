@@ -40,11 +40,12 @@ class dVehicleTireInterface: public dVehicleNode
 		dFloat m_mass;
 		dFloat m_radio;
 		dFloat m_width;
+		dFloat m_steerRate;
 		dFloat m_pivotOffset;
 		dFloat m_dampingRatio;
 		dFloat m_springStiffness;
 		dFloat m_suspensionLength;
-		//dFloat m_maxSteeringAngle;
+		dFloat m_maxSteeringAngle;
 		dFloat m_corneringStiffness;
 		dFloat m_longitudinalStiffness;
 		//dFloat m_aligningMomentTrail;
@@ -63,6 +64,8 @@ class dVehicleTireInterface: public dVehicleNode
 	virtual dMatrix GetLocalMatrix () const = 0;
 	virtual dMatrix GetGlobalMatrix () const = 0;
 	virtual NewtonCollision* GetCollisionShape() const = 0;
+
+	virtual dFloat GetSteeringAngle() const = 0;
 	virtual void SetSteeringAngle(dFloat steeringAngle) = 0;
 
 	protected:

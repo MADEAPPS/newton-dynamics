@@ -26,6 +26,8 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	DVEHICLE_API dMatrix GetLocalMatrix () const;
 	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
 	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
+
+	DVEHICLE_API virtual dFloat GetSteeringAngle() const;
 	DVEHICLE_API virtual void SetSteeringAngle(dFloat steeringAngle);
 	DVEHICLE_API void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
