@@ -38,20 +38,45 @@ class dVehicleDashControl: public dCustomAlloc
 };
 
 
-class dVehicleSteeringControl: public dVehicleDashControl 
+class dVehicleTireControl: public dVehicleDashControl 
+{
+	public:
+	DVEHICLE_API dVehicleTireControl(dVehicleChassis* const vehicle);
+	DVEHICLE_API virtual ~dVehicleTireControl();
+	
+	DVEHICLE_API void AddTire(dVehicleTireInterface* const tire);
+
+	protected:
+	dList<dVehicleTireInterface*> m_tires;
+	bool m_isSleeping;
+};
+
+class dVehicleSteeringControl: public dVehicleTireControl 
 {
 	public:
 	dVehicleSteeringControl(dVehicleChassis* const vehicle);
 
-	DVEHICLE_API void AddTire(dVehicleTireInterface* const tire);
+	protected:
+	virtual void Update(dFloat timestep);
+	friend class dVehicleChassis;
+};
+
+
+class dVehicleBrakeControl: public dVehicleTireControl
+{
+	public:
+	dVehicleBrakeControl(dVehicleChassis* const vehicle);
+
+	DVEHICLE_API dFloat GetBrakeTorque () const;
+	DVEHICLE_API void SetBrakeTorque (dFloat torque);
 
 	protected:
 	virtual void Update(dFloat timestep);
 
-	dList<dVehicleTireInterface*> m_tires;
-	bool m_isSleeping;
+	dFloat m_maxTorque;
 	friend class dVehicleChassis;
 };
+
 
 #endif 
 

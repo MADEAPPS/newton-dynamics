@@ -319,10 +319,17 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
 
-		// add vehicle control 
+		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
 		steeringControl->AddTire(frontRight);
+
+		// add vehicle brake control 
+		dVehicleBrakeControl* const breakControl = vehicle->GetBrakeControl();
+		breakControl->AddTire(frontLeft);
+		breakControl->AddTire(frontRight);
+		breakControl->AddTire(rearLeft);
+		breakControl->AddTire(rearLeft);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();

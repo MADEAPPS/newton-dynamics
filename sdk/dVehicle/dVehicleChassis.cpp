@@ -18,7 +18,12 @@
 dVehicleChassis::dVehicleChassis ()
 	:m_localFrame(dGetIdentityMatrix())
 	,m_solver()
+	,m_gravity(0.0f)
+	,m_obbSize(0.0f)
+	,m_obbOrigin(0.0f)
 	,m_vehicle(NULL)
+	,m_brakeControl(NULL)
+	,m_steeringControl(NULL)
 {
 }
 
@@ -103,6 +108,10 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 
 void dVehicleChassis::Cleanup()
 {
+	if (m_brakeControl) {
+		delete m_brakeControl;
+	}
+
 	if (m_steeringControl) {
 		delete m_steeringControl;
 	}
@@ -111,6 +120,15 @@ void dVehicleChassis::Cleanup()
 		delete m_vehicle;
 	}
 }
+
+dVehicleBrakeControl* dVehicleChassis::GetBrakeControl()
+{
+	if (!m_brakeControl) {
+		m_brakeControl = new dVehicleBrakeControl(this);
+	}
+	return m_brakeControl;
+}
+
 
 dVehicleSteeringControl* dVehicleChassis::GetSteeringControl ()
 {

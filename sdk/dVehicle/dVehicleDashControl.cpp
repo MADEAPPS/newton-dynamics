@@ -43,18 +43,34 @@ bool dVehicleDashControl::ParamChanged() const
 	return m_timer > 0;
 }
 
-
-dVehicleSteeringControl::dVehicleSteeringControl(dVehicleChassis* const vehicle)
+// ****************************************************************************
+//
+// ****************************************************************************
+dVehicleTireControl::dVehicleTireControl(dVehicleChassis* const vehicle)
 	:dVehicleDashControl(vehicle)
+	,m_tires()
 	,m_isSleeping(false)
 {
 }
+	
+dVehicleTireControl::~dVehicleTireControl()
+{
+	m_tires.RemoveAll();
+}
 
-void dVehicleSteeringControl::AddTire(dVehicleTireInterface* const tire)
+void dVehicleTireControl::AddTire(dVehicleTireInterface* const tire)
 {
 	m_tires.Append(tire);
 }
 
+
+// ****************************************************************************
+//
+// ****************************************************************************
+dVehicleSteeringControl::dVehicleSteeringControl(dVehicleChassis* const vehicle)
+	:dVehicleTireControl(vehicle)
+{
+}
 
 void dVehicleSteeringControl::Update(dFloat timestep)
 {
@@ -81,3 +97,28 @@ void dVehicleSteeringControl::Update(dFloat timestep)
 	}
 }
 
+
+
+// ****************************************************************************
+//
+// ****************************************************************************
+dVehicleBrakeControl::dVehicleBrakeControl(dVehicleChassis* const vehicle)
+	:dVehicleTireControl(vehicle)
+	,m_maxTorque(0.0f)
+
+{
+}
+
+
+void dVehicleBrakeControl::Update(dFloat timestep)
+{
+	m_isSleeping = true;
+	for (dList<dVehicleTireInterface*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		dVehicleTireInterface* const tire = node->GetInfo();
+		if (m_maxTorque > 0.1f) {
+			tire->SetBrakeTorque(0.0f);
+		} else {
+			tire->SetBrakeTorque(m_maxTorque * m_param);
+		}
+	}
+}
