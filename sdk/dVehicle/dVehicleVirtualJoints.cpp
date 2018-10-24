@@ -80,7 +80,8 @@ dTireContact::dTireContact()
 	,m_lateralDir(0.0f)
 	,m_longitudinalDir(0.0f)
 	,m_penetration(0.0f)
-	,m_frictionCoefficient(0.7f)
+	,m_staticFriction(1.0f)
+	,m_kineticFriction(1.0f)
 	,m_load(0.0f)
 	,m_tireModel()
 {
@@ -102,13 +103,13 @@ void dTireContact::ResetContact ()
 	}
 	m_load = 0.0f;
 	m_isActive = false;
-	for (int i = sizeof(m_isActiveFilter) / sizeof(m_isActiveFilter[0]); i > 0; i--) {
+	for (int i = sizeof(m_isActiveFilter) / sizeof(m_isActiveFilter[0]) - 1; i > 0; i--) {
 		m_normalFilter[i] = m_normalFilter[i - 1];
 		m_isActiveFilter[i] = m_isActiveFilter[i - 1];
 	}
 }
 
-void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat frictionCoefficient)
+void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction)
 {
 	m_point = posit;
 	m_normal = normal;
@@ -125,11 +126,12 @@ void dTireContact::SetContact(const dVector& posit, const dVector& normal, const
 	}
 	m_load = load * (1.0f / (sizeof(m_isActiveFilter) / sizeof(m_isActiveFilter[0])));
 
-	m_frictionCoefficient = frictionCoefficient;
+	m_staticFriction = staticFriction;
+	m_kineticFriction = kineticFriction;
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }
 
-void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip)
+void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloat frictionCoef)
 {
 	dVehicleTireInterface* const tire = GetOwner0()->GetAsTire();
 	dAssert (tire);
@@ -138,7 +140,7 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip)
 
 	dFloat v = dAbs (lateralSlip);
 	dFloat u = dAbs (longitudinalSlip);
-	dFloat f = m_frictionCoefficient * m_load;
+	dFloat f = frictionCoef * m_load;
 
 	dFloat invden = 1.0f / (1.0f + u);
 
@@ -189,6 +191,7 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	int longitudinaIndex = 0;
 	dFloat lateralSlip = 0.0f;
 	dFloat longitudialSlip = 0.0f;
+	dFloat frictionCoef = m_staticFriction;
 	{
 		// longitudinal force row
 		AddLinearRowJacobian(constraintParams, m_point, m_longitudinalDir, omega);
@@ -206,28 +209,22 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 			if (relSpeed < 0.0f) {
 				dFloat speedDen = dMax (linearSpeed, dFloat(0.01f));
 				longitudialSlip = relSpeed / speedDen;
-/*
 				dFloat slipLimit = 2.0f * dMax (linearSpeed, dFloat(0.0f));
-				relSpeed = 0.0f;
 				if ((omegaSpeed - slipLimit) > 0.0f) {
-					relSpeed = -(omegaSpeed - slipLimit);
+					frictionCoef = m_kineticFriction;
 				}
-*/
+
 			} else {
 				dFloat speedDen = dMax(omegaSpeed, dFloat(0.01f));
 				longitudialSlip = relSpeed / speedDen;
-/*
 				dFloat slipLimit = 2.0f * dMax(omegaSpeed, dFloat(0.0f));
-				relSpeed = 0.0f;
 				if ((linearSpeed - slipLimit) > 0.0f) {
-					relSpeed = linearSpeed - slipLimit;
+					frictionCoef = m_kineticFriction;
 				} 
-*/
 			}
 		}
 
 		constraintParams->m_jointAccel[n] = -relSpeed * constraintParams->m_timestepInv;
-
 		longitudinaIndex = n;
 		n++;
 	}
@@ -242,15 +239,13 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dFloat longitudinalSpeed = dAbs (m_longitudinalDir.DotProduct3(relVeloc)) + 0.01f;
 		lateralSlip = lateralSpeed / longitudinalSpeed;
-/*
+
 		dFloat maxLateralSpeed = D_TIRE_MAX_LATERAL_SLIP * longitudinalSpeed;
-		dFloat slideSpeed = 0.0f;
 		if (lateralSpeed > maxLateralSpeed) {
-			slideSpeed = lateralSpeed - maxLateralSpeed;
+			frictionCoef = m_kineticFriction;
 		} else if (lateralSpeed < -maxLateralSpeed) {
-			slideSpeed = lateralSpeed + maxLateralSpeed;
+			frictionCoef = m_kineticFriction;
 		}
-*/
 		
 		//constraintParams->m_jointAccel[n] = -slideSpeed * constraintParams->m_timestepInv;
 		constraintParams->m_jointAccel[n] = -lateralSpeed * constraintParams->m_timestepInv;
@@ -258,7 +253,7 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		n ++;
 	}
 
-	TireForces(longitudialSlip, lateralSlip);
+	TireForces(longitudialSlip, lateralSlip, frictionCoef);
 
 	constraintParams->m_jointLowFrictionCoef[lateralIndex] = -m_tireModel.m_lateralForce;
 	constraintParams->m_jointHighFrictionCoef[lateralIndex] = m_tireModel.m_lateralForce;

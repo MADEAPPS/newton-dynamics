@@ -812,9 +812,8 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 	}
 
 	for (int i = startNode; i < m_nodeCount - 1; i++) {
-		//dgNode* const node = m_nodesOrder[i];
 		dVehicleNode* const node = m_nodesOrder[i];
-		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
+		//const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 		dAssert(joint);
 		dAssert(i == node->m_solverIndex);
 
@@ -824,7 +823,6 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 		f.m_joint = a.m_joint;
 
 		const dList<dVehicleNode*>& children = node->GetChildren();
-		//for (dgNode* child = node->m_child; child; child = child->m_sibling) {
 		for (dList<dVehicleNode*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 			//dAssert(child->m_joint);
 			dVehicleNode* const child = childNode->GetInfo();
@@ -836,27 +834,21 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 
 	const int n = m_nodeCount - 1;
 	dAssert(n == m_nodesOrder[n]->m_solverIndex);
-	//dVehicleNode* const node = m_nodesOrder[n];
 	dVehicleNode* const rootNode = m_nodesOrder[n];
 	force[n] = accel[n];
 	const dList<dVehicleNode*>& children = rootNode->GetChildren();
-	//for (dgNode* child = m_nodesOrder[m_nodeCount - 1]->m_child; child; child = child->m_sibling) {
 	for (dList<dVehicleNode*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 		dVehicleNode* const child = childNode->GetInfo();
 		dAssert(child->m_parent->m_solverIndex == n);
-		//child->BodyJacobianTimeMassForward(force[child->m_index], force[child->m_parent->m_index]);
 		BodyJacobianTimeMassForward(child, force[child->m_solverIndex], force[n]);
 	}
 
 	for (int i = startNode; i < m_nodeCount - 1; i++) {
 		dVehicleNode* const node = m_nodesOrder[i];
 		dVectorPair& f = force[i];
-		//node->BodyDiagInvTimeSolution(f);
 		BodyDiagInvTimeSolution(node, f);
-		//node->JointDiagInvTimeSolution(f);
 		JointDiagInvTimeSolution(node, f);
 	}
-	//m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
 	BodyDiagInvTimeSolution(rootNode, force[n]);
 }
 
@@ -968,19 +960,12 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 
 	//for (int j = 0; j < m_loopCount; j++) {
 	for (int j = 0; j < m_loopJointCount; j++) {
-		//const dgConstraint* const joint = m_loopingJoints[j];
-		//const dgJointInfo* const jointInfo = &jointInfoArray[joint->m_index];
 		dKinematicLoopJoint* const joint = m_loopJoints[j];
-
-		//const int m0 = jointInfo->m_m0;
-		//const int m1 = jointInfo->m_m1;
-		//const int first = jointInfo->m_pairStart;
-		//const int auxiliaryDof = jointInfo->m_pairCount;
 
 		dVehicleNode* const node0 = joint->GetOwner0();
 		dVehicleNode* const node1 = joint->GetOwner1();
-		const int m0 = node0->m_solverIndex;
-		const int m1 = node1->m_solverIndex;
+		//const int m0 = node0->m_solverIndex;
+		//const int m1 = node1->m_solverIndex;
 		const int first = joint->m_start;
 		const int auxiliaryDof = joint->m_count;
 

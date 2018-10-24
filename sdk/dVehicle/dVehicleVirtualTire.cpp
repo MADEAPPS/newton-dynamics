@@ -280,7 +280,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 
 					contact -= tireMatrix.m_up.Scale (dist);
 					contact.m_w = 1.0f;
-					m_contactsJoints[contactCount].SetContact(contact, normal, lateralDir, penetration, 0.7f);
+					m_contactsJoints[contactCount].SetContact(contact, normal, lateralDir, penetration, 1.0f, 0.8f);
 					contactCount ++;
 				}
 			}
