@@ -11,6 +11,9 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
+#include "dVehicleChassis.h"
+#include "dVehicleSingleBody.h"
+#include "dVehicleVirtualTire.h"
 #include "dVehicleTireInterface.h"
 #include "dVehicleVirtualJoints.h"
 
@@ -54,7 +57,7 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, omega, 0.0f);
 
 	/*
-	// dry rolling friction (for now contact, bu it should be a function of the tire angular velocity)
+	// dry rolling friction (for now contact, but it should be a function of the tire angular velocity)
 	int index = constraintParams->m_count;
 	AddAngularRowJacobian(constraintParams, tire->m_matrix[0], 0.0f);
 	constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
@@ -70,6 +73,10 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	// clear the input variable after there are res
 	tire->m_brakeTorque = 0.0f;
 	*/
+
+	if (m_tire->GetBrakeTorque() > 1.0e-3f) {
+		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
+	}
 }
 
 

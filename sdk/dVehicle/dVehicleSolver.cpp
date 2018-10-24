@@ -814,7 +814,7 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 	for (int i = startNode; i < m_nodeCount - 1; i++) {
 		dVehicleNode* const node = m_nodesOrder[i];
 		//const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
-		dAssert(joint);
+		dAssert(node->GetJoint());
 		dAssert(i == node->m_solverIndex);
 
 		dVectorPair& f = force[i];
@@ -969,13 +969,13 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		const int first = joint->m_start;
 		const int auxiliaryDof = joint->m_count;
 
-		dAssert (node0 == m_nodesOrder[m0]);
-		dAssert (node1 == m_nodesOrder[m1]);
+		dAssert (node0 == m_nodesOrder[node0->m_solverIndex]);
+		dAssert (node1 == m_nodesOrder[node1->m_solverIndex]);
 
 		dComplementaritySolver::dBodyState* const state0 = node0->GetBody();
 		dComplementaritySolver::dBodyState* const state1 = node1->GetBody();
-		dAssert (state0 == m_nodesOrder[m0]->GetBody());
-		dAssert (state1 == m_nodesOrder[m1]->GetBody());
+		dAssert (state0 == m_nodesOrder[node0->m_solverIndex]->GetBody());
+		dAssert (state1 == m_nodesOrder[node1->m_solverIndex]->GetBody());
 
 		const dVector& force0 = state0->GetForce();
 		const dVector& torque0 = state0->GetTorque();

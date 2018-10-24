@@ -23,6 +23,7 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	,m_position(0.0f)
 	,m_tireLoad(0.0f)
 	,m_tireAngle(0.0f)
+	,m_brakeTorque(0.0f)
 	,m_steeringAngle(0.0f)
 	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f/m_info.m_suspensionLength : 0.0f)
 {
@@ -70,6 +71,8 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 		m_contactsJoints[i].SetOwners (this, &chassisNode->m_groundNode);
 	}
 	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
+
+m_brakeTorque = 100.0f;
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -142,6 +145,16 @@ void dVehicleVirtualTire::SetSteeringAngle(dFloat steeringAngle)
 dFloat dVehicleVirtualTire::GetSteeringAngle() const
 {
 	return m_steeringAngle;
+}
+
+dFloat dVehicleVirtualTire::GetBrakeTorque() const
+{
+	return m_brakeTorque;
+}
+
+void dVehicleVirtualTire::SetBrakeTorque(dFloat brakeTorque)
+{
+	m_brakeTorque = dAbs (brakeTorque);
 }
 
 void dVehicleVirtualTire::ApplyExternalForce()

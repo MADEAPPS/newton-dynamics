@@ -68,6 +68,9 @@ class dVehicleTireInterface: public dVehicleNode
 	virtual dFloat GetSteeringAngle() const = 0;
 	virtual void SetSteeringAngle(dFloat steeringAngle) = 0;
 
+	virtual dFloat GetBrakeTorque() const = 0;
+	virtual void SetBrakeTorque(dFloat brakeTorque) = 0;
+
 	protected:
 	dTireInfo m_info;
 };

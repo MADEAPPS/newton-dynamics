@@ -29,6 +29,10 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 
 	DVEHICLE_API virtual dFloat GetSteeringAngle() const;
 	DVEHICLE_API virtual void SetSteeringAngle(dFloat steeringAngle);
+
+	DVEHICLE_API virtual dFloat GetBrakeTorque() const;
+	DVEHICLE_API virtual void SetBrakeTorque(dFloat brakeTorque);
+
 	DVEHICLE_API void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	protected:
@@ -53,6 +57,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	dFloat m_position;
 	dFloat m_tireLoad;
 	dFloat m_tireAngle;
+	dFloat m_brakeTorque;
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
 
