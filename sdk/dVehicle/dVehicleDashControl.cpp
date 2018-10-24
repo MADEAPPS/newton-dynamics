@@ -105,20 +105,25 @@ void dVehicleSteeringControl::Update(dFloat timestep)
 dVehicleBrakeControl::dVehicleBrakeControl(dVehicleChassis* const vehicle)
 	:dVehicleTireControl(vehicle)
 	,m_maxTorque(0.0f)
-
 {
 }
 
+dFloat dVehicleBrakeControl::GetBrakeTorque() const
+{
+	return m_maxTorque;
+}
+
+void dVehicleBrakeControl::SetBrakeTorque(dFloat torque)
+{
+	m_maxTorque = dAbs(torque);
+}
 
 void dVehicleBrakeControl::Update(dFloat timestep)
 {
 	m_isSleeping = true;
 	for (dList<dVehicleTireInterface*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
 		dVehicleTireInterface* const tire = node->GetInfo();
-		if (m_maxTorque > 0.1f) {
-			tire->SetBrakeTorque(0.0f);
-		} else {
-			tire->SetBrakeTorque(m_maxTorque * m_param);
-		}
+		dFloat torque = dMax(m_maxTorque * m_param, tire->GetBrakeTorque());
+		tire->SetBrakeTorque(torque);
 	}
 }

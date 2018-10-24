@@ -23,6 +23,7 @@ dVehicleChassis::dVehicleChassis ()
 	,m_obbOrigin(0.0f)
 	,m_vehicle(NULL)
 	,m_brakeControl(NULL)
+	,m_handBrakeControl(NULL)
 	,m_steeringControl(NULL)
 {
 }
@@ -112,6 +113,10 @@ void dVehicleChassis::Cleanup()
 		delete m_brakeControl;
 	}
 
+	if (m_handBrakeControl) {
+		delete m_handBrakeControl;
+	}
+
 	if (m_steeringControl) {
 		delete m_steeringControl;
 	}
@@ -129,6 +134,13 @@ dVehicleBrakeControl* dVehicleChassis::GetBrakeControl()
 	return m_brakeControl;
 }
 
+dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
+{
+	if (!m_handBrakeControl) {
+		m_handBrakeControl = new dVehicleBrakeControl(this);
+	}
+	return m_handBrakeControl;
+}
 
 dVehicleSteeringControl* dVehicleChassis::GetSteeringControl ()
 {
@@ -235,6 +247,15 @@ void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
 	if (m_steeringControl) {
 		m_steeringControl->Update(timestep);
 	}
+
+	if (m_brakeControl) {
+		m_brakeControl->Update(timestep);
+	}
+
+	if (m_handBrakeControl) {
+		m_handBrakeControl->Update(timestep);
+	}
+
 	
 	m_vehicle->RigidBodyToStates();
 	m_solver.Update(timestep);
@@ -247,11 +268,16 @@ void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat 
 	if (m_steeringControl) {
 		m_steeringControl->SetParam(driveInputs.m_steeringValue);
 	}
-/*
-	if (m_brakesControl) {
-		m_brakesControl->SetParam(driveInputs.m_brakePedal);
+
+	if (m_brakeControl) {
+		m_brakeControl->SetParam(driveInputs.m_brakePedal);
 	}
 
+	if (m_handBrakeControl) {
+		m_handBrakeControl->SetParam(driveInputs.m_handBrakeValue);
+	}
+
+/*
 	if (m_engineControl) {
 		m_engineControl->SetDifferentialLock(driveInputs.m_lockDifferential ? true : false);
 

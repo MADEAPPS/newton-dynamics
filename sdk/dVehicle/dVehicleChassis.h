@@ -166,6 +166,7 @@ class dVehicleChassis: public dCustomControllerBase
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl ();
+	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl ();
 
 	DVEHICLE_API void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
@@ -196,6 +197,7 @@ class dVehicleChassis: public dCustomControllerBase
 
 	dVehicleInterface* m_vehicle;
 	dVehicleBrakeControl* m_brakeControl;
+	dVehicleBrakeControl* m_handBrakeControl;
 	dVehicleSteeringControl* m_steeringControl;
 
 	friend class dVehicleSolver;

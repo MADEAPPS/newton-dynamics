@@ -325,11 +325,18 @@ class SingleBodyVehicleManager: public dVehicleManager
 		steeringControl->AddTire(frontRight);
 
 		// add vehicle brake control 
-		dVehicleBrakeControl* const breakControl = vehicle->GetBrakeControl();
-		breakControl->AddTire(frontLeft);
-		breakControl->AddTire(frontRight);
-		breakControl->AddTire(rearLeft);
-		breakControl->AddTire(rearLeft);
+		dVehicleBrakeControl* const brakeControl = vehicle->GetBrakeControl();
+		brakeControl->SetBrakeTorque(1000.0f);
+		brakeControl->AddTire(frontLeft);
+		brakeControl->AddTire(frontRight);
+		//brakeControl->AddTire(rearLeft);
+		//brakeControl->AddTire(rearRight);
+
+		// add vehicle hand brake control 
+		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
+		handBrakeControl->SetBrakeTorque(1000.0f);
+		handBrakeControl->AddTire(rearLeft);
+		handBrakeControl->AddTire(rearRight);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
@@ -393,9 +400,10 @@ axisCount = 0;
 			//driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
 			//driverInput.m_clutchPedal = 1.0f - scene->GetKeyState('K') ? 1.0f : 0.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
-			//driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
+			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
+			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+
 			//driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('I'));
-			//driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
 			////driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
 			//gear += m_gearUpKey.UpdateTrigger(scene->GetKeyState('M')) - m_gearUpKey.UpdateTrigger(scene->GetKeyState('N'));
 			//driverInput.m_gear = gear;

@@ -56,27 +56,27 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, omega, 0.0f);
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, omega, 0.0f);
 
-	/*
 	// dry rolling friction (for now contact, but it should be a function of the tire angular velocity)
-	int index = constraintParams->m_count;
-	AddAngularRowJacobian(constraintParams, tire->m_matrix[0], 0.0f);
-	constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
-	constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
-
-	// check if the brakes are applied
-	if (tire->m_brakeTorque > 1.0e-3f) {
-	// brake is on override rolling friction value
-	constraintParams->m_jointLowFriction[index] = -tire->m_brakeTorque;
-	constraintParams->m_jointHighFriction[index] = tire->m_brakeTorque;
-	}
-
-	// clear the input variable after there are res
-	tire->m_brakeTorque = 0.0f;
-	*/
+	//int index = constraintParams->m_count;
+	//AddAngularRowJacobian(constraintParams, tire->m_matrix[0], 0.0f);
+	//constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
+	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
 	if (m_tire->GetBrakeTorque() > 1.0e-3f) {
+		const dVector& omega0 = m_state0->GetOmega();
+		const dVector& omega1 = m_state1->GetOmega();
+
+		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
+		
+		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		dFloat relOmega = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
+		//constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
+		//constraintParams->m_jointLowFrictionCoef[n] = 0.0f;
 	}
+//	m_tire->SetBrakeTorque(0.0f);
 }
 
 
@@ -162,8 +162,6 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloa
 	mag = dMax (mag, dFloat(1.0f));
 
 	m_tireModel.m_alingMoment = 0.0f;
-	//m_tireModel.m_lateralForce = -dSign(lateralSlip) * y * f / mag;
-	//m_tireModel.m_longitunalForce = -dSign(longitudinalSlip) * x * f / mag;
 	m_tireModel.m_lateralForce = y * f / mag;
 	m_tireModel.m_longitunalForce = x * f / mag;
 	dAssert(m_tireModel.m_lateralForce >= 0.0f);
