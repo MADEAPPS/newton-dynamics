@@ -31,12 +31,14 @@ add_subdirectory(dNewton)
 add_subdirectory(dVehicle)
 add_subdirectory(dgNewton)
 add_subdirectory(dgPhysics)
-add_subdirectory(dProfiler)
 add_subdirectory(dAnimation)
 add_subdirectory(dContainers)
 add_subdirectory(dCustomJoints)
-
 add_subdirectory(thirdParty)
+
+if (BUILD_PROFILER)
+	add_subdirectory(dProfiler)
+endif (BUILD_PROFILER)
 
 if (WITH_SSE_PLUGIN)
 	add_subdirectory(dgNewtonSse)
