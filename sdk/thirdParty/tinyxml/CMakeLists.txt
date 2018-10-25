@@ -14,11 +14,11 @@ set (projectName "tinyxml")
 message (${projectName})
 
 
- # low level core
-file(GLOB source *.cpp *.h)
+# low level core
+file(GLOB CPP_SOURCE *.cpp)
+file(GLOB HEADERS *.h)
 
-add_library(${projectName} STATIC ${source})
+add_library(${projectName} STATIC ${CPP_SOURCE})
 
-file(GLOB includes *.h)
-install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
+install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
 install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

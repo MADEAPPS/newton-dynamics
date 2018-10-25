@@ -162,8 +162,10 @@
 	#include <condition_variable>
 #endif
 
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	#include <dTimeTracker.h>
+#endif
 
-#include <dTimeTracker.h>
 
 //************************************************************
 #ifdef DG_DISABLE_ASSERT

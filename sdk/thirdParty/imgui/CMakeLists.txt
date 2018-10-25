@@ -14,9 +14,10 @@ set (projectName "imgui")
 message (${projectName})
 
 
- # low level core
-file(GLOB source *.cpp *.h)
+# low level core
+file(GLOB CPP_SOURCE *.cpp)
+file(GLOB HEADERS *.h)
 
-add_library(${projectName} STATIC ${source})
+add_library(${projectName} STATIC ${CPP_SOURCE})
 
 #install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

@@ -14,17 +14,35 @@ set (projectName "dMath")
 message (${projectName})
 
 
- # low level core
-file(GLOB source *.cpp *.h)
-
-add_library(${projectName} STATIC ${source})
+# low level core
+file(GLOB CPP_SOURCE *.cpp)
+file(GLOB HEADERS *.h)
 
 if (MSVC)
+        add_library(${projectName} STATIC ${CPP_SOURCE})
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudStdAfxMath.h")
 	set_source_files_properties(dStdAfxMath.cpp PROPERTIES COMPILE_FLAGS "/YcdStdAfxMath.h")
 endif(MSVC)
 
-file(GLOB includes *.h)
-install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
+if (UNIX)
+    if(NEWTON_BUILD_SHARED_LIBS)
+        add_library(${projectName} SHARED ${CPP_SOURCE})
+    else(NEWTON_BUILD_SHARED_LIBS)
+        add_library(${projectName} STATIC ${CPP_SOURCE})
+    endif(NEWTON_BUILD_SHARED_LIBS)
 
-install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+    install(TARGETS ${projectName} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+    target_include_directories(
+            ${projectName} PUBLIC
+            # Headers used from source/build location:
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+        )
+endif (UNIX)
+
+if (MSVC)
+       install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+endif(MSVC)
+
+install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")

@@ -13,14 +13,15 @@ cmake_minimum_required(VERSION 3.12.0)
 set (projectName "dScene")
 message (${projectName})
 
- # low level core
-file(GLOB source *.cpp *.h)
+# low level core
+file(GLOB CPP_SOURCE *.cpp)
+file(GLOB HEADERS *.h)
 
 if (GENERATE_DLL)
 	add_definitions(-D_DSCENE_DLL)
 	add_definitions(-D_DSCENE_EXPORTS)
 	add_definitions(-D_DCONTAINERS_DLL)
-	add_library(${projectName} SHARED ${source})
+        add_library(${projectName} SHARED ${CPP_SOURCE})
 	target_link_libraries (${projectName} newton dContainers dMath dCustomJoints dTimeTracker tinyxml)
 	install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
 	if (BUILD_SANDBOX_DEMOS)
@@ -30,10 +31,31 @@ if (GENERATE_DLL)
 			ARGS -E copy $(TargetPath) ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/$(TargetFileName))
 	endif ()
 else()
-	add_definitions(-D_NEWTON_STATIC_LIB)
-	add_definitions(-D_CNEWTON_STATIC_LIB)
-	add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
-	add_library(${projectName} STATIC ${source})
+        if (UNIX)
+            if(NEWTON_BUILD_SHARED_LIBS)
+                add_library(${projectName} SHARED ${CPP_SOURCE})
+            else(NEWTON_BUILD_SHARED_LIBS)
+                add_library(${projectName} STATIC ${CPP_SOURCE})
+            endif(NEWTON_BUILD_SHARED_LIBS)
+
+            install(TARGETS ${projectName} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+            install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+            target_link_libraries (${projectName} newton dContainers dMath dCustomJoints tinyxml)
+
+            target_include_directories(
+                    ${projectName} PUBLIC
+                    # Headers used from source/build location:
+                    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+                )
+        endif (UNIX)
+        
+        if (MSVC)
+            add_definitions(-D_NEWTON_STATIC_LIB)
+            add_definitions(-D_CNEWTON_STATIC_LIB)
+            add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
+            add_library(${projectName} STATIC ${CPP_SOURCE})
+        endif(MSVC)
 endif()
 
 if (MSVC)
@@ -41,7 +63,5 @@ if (MSVC)
 	set_source_files_properties(dSceneStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcdSceneStdafx.h")
 endif(MSVC)
 
-file(GLOB includes *.h)
-install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
+install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
 
-install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

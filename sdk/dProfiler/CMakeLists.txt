@@ -10,12 +10,15 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
-include_directories(dTimeTracker/)
-include_directories(../dMath/)
-include_directories(../dContainers/)
+if (MSVC)
 
-#include_directories(dTimeTrackerViewer)
+    include_directories(dTimeTracker/)
+    include_directories(../dMath/)
+    include_directories(../dContainers/)
 
-add_subdirectory(dTimeTracker)
-#add_subdirectory(dTimeTrackerViewer)
+    #include_directories(dTimeTrackerViewer)
 
+    add_subdirectory(dTimeTracker)
+    #add_subdirectory(dTimeTrackerViewer)
+
+endif (MSVC)
