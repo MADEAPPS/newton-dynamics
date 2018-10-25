@@ -20,9 +20,10 @@ file(GLOB HEADERS *.h)
 if (GENERATE_DLL)
 	add_definitions(-D_DCONTAINERS_DLL)
 	add_definitions(-D_DCONTAINERS_EXPORT)
-        add_library(${projectName} SHARED ${CPP_SOURCE})
+    add_library(${projectName} SHARED ${CPP_SOURCE})
 	target_link_libraries (${projectName} newton dTimeTracker)
 	install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
+	install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
 	if (BUILD_SANDBOX_DEMOS)
 		add_custom_command(
 			TARGET ${projectName} POST_BUILD
@@ -50,6 +51,7 @@ else()
         if (MSVC)
             add_definitions(-D_NEWTON_STATIC_LIB)
             add_library(${projectName} STATIC ${CPP_SOURCE})
+			install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
         endif(MSVC)
 endif()
 
@@ -60,4 +62,4 @@ endif(MSVC)
 
 install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
 
-install(TARGETS ${projectName} DESTINATION ${libraryPath})
+
