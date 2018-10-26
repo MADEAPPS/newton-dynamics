@@ -564,7 +564,11 @@ void DemoEntityManager::Cleanup ()
 
 	// load all available plug ins
 	char plugInPath[2048];
-	GetModuleFileNameA(NULL, plugInPath, 256);
+//	GetModuleFileNameA(NULL, plugInPath, 256);
+	plugInPath[0] = 0;
+	#if defined (_MSC_VER)
+		GetModuleFileNameA(NULL, plugInPath, 256);
+	#endif
 
 	for (int i = int(strlen(plugInPath) - 1); i; i--) {
 		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {

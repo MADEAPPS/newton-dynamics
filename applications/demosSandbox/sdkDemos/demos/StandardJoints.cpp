@@ -1092,10 +1092,10 @@ struct JoesNewRagdollJoint: public dCustomJoint
 	{
 		dFloat const maxAng = 2.8f; // to prevent flipping on the pole on the backside
 
-		m_coneAngle = min(maxAng, coneAngle);
-		dFloat angle = max(0.0f, min(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
-		m_arcAngleCos = dFloat(cos(angle));
-		m_arcAngleSin = dFloat(sin(angle));
+		m_coneAngle = dMin(maxAng, coneAngle);
+		dFloat angle = dMax(0.0f, dMin(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
+		m_arcAngleCos = dFloat(dCos(angle));
+		m_arcAngleSin = dFloat(dSin(angle));
 
 		m_minTwistAngle = minTwistAngle;
 		m_maxTwistAngle = maxTwistAngle;
