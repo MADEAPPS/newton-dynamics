@@ -925,7 +925,7 @@ class MyPathFollow: public dCustomPathFollow
 		dBigVector point;
 		dFloat64 knot = spline.FindClosestKnot (point, p, 4);
 		dBigVector tangent (spline.CurveDerivative (knot));
-		tangent = tangent.Scale (1.0 / sqrt (tangent.DotProduct3(tangent)));
+		tangent = tangent.Scale (1.0 / dSqrt (tangent.DotProduct3(tangent)));
 
 //		positOut = matrix.TransformVector (dVector (point.m_x, point.m_y, point.m_z));
 		positOut = matrix.TransformVector (point);
@@ -974,7 +974,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	for (int i = 0; i < count; i ++) {
 		dBigVector point1;
 		dBigVector tangent(spline.CurveDerivative(knot));
-		tangent = tangent.Scale (1.0 / sqrt (tangent.DotProduct3(tangent)));
+		tangent = tangent.Scale (1.0 / dSqrt (tangent.DotProduct3(tangent)));
 		knot = spline.FindClosestKnot(point1, dBigVector (point0 + tangent.Scale (2.0f)), 4);
 		point0 = point1;
 		positions[i + 1] = point1;
@@ -1168,13 +1168,13 @@ struct JoesNewRagdollJoint: public dCustomJoint
 				dFloat *q1 = (dFloat*)&quat1;
 
 				// factor rotation about x axis between quat0 and quat1. Code is an optimization of this: qt = q0.Inversed() * q1; halfTwistAngle = atan (qt.x / qt.w);
-				dFloat twistAngle = 2.0f * dFloat(atan(
+				dFloat twistAngle = 2.0f * dFloat(dAtan(
 					((((q0[0] * q1[1]) + (-q0[1] * q1[0])) + (-q0[2] * q1[3])) - (-q0[3] * q1[2])) /
 					((((q0[0] * q1[0]) - (-q0[1] * q1[1])) - (-q0[2] * q1[2])) - (-q0[3] * q1[3]))));
 
 				// select an axis for the twist - any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
 				dVector twistAxis = coneDir0 + coneDir1;
-				twistAxis = twistAxis.Scale(1.0f / dFloat(sqrt(twistAxis.DotProduct3(twistAxis))));
+				twistAxis = twistAxis.Scale(1.0f / dFloat(dSqrt(twistAxis.DotProduct3(twistAxis))));
 
 				if (m_maxTwistAngle == m_minTwistAngle) // no freedom for any twist
 				{
@@ -1194,10 +1194,10 @@ struct JoesNewRagdollJoint: public dCustomJoint
 #if 0
 			// simple cone limit:
 
-			dFloat angle = acos(dot) - m_coneAngle;
+			dFloat angle = dAcos(dot) - m_coneAngle;
 			if (angle > 0) {
 				dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
-				swingAxis = swingAxis.Scale(1.0 / sqrt(swingAxis.DotProduct3(swingAxis)));
+				swingAxis = swingAxis.Scale(1.0 / dSqrt(swingAxis.DotProduct3(swingAxis)));
 				NewtonUserJointAddAngularRow(m_joint, angle, (dFloat*)&swingAxis);
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0);
 			}
@@ -1207,17 +1207,17 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			if (m_coneAngle > 0.0f && dot < 0.999f) {
 				// project current axis to the arc plane (y)
 				dVector d = matrix1.UnrotateVector(matrix0.m_front);
-				dVector cone = d; cone.m_y = 0; cone = cone.Scale(1.0f / dFloat(sqrt(cone.DotProduct3(cone))));
+				dVector cone = d; cone.m_y = 0; cone = cone.Scale(1.0f / dFloat(dSqrt(cone.DotProduct3(cone))));
 
 				// clamp the result to be within the arc angle
 				if (cone.m_x < m_arcAngleCos)
 					cone = dVector(m_arcAngleCos, 0.0f, ((cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
 
 				// do a regular cone constraint from that
-				dFloat angle = dFloat(acos(max(-1.0f, min(1.0f, d.DotProduct3(cone))))) - m_coneAngle;
+				dFloat angle = dFloat(dAcos(dMax(-1.0f, dMin(1.0f, d.DotProduct3(cone))))) - m_coneAngle;
 				if (angle > 0.0f) {
 					dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
-					swingAxis = swingAxis.Scale(1.0f / dFloat(sqrt(swingAxis.DotProduct3(swingAxis))));
+					swingAxis = swingAxis.Scale(1.0f / dFloat(dSqrt(swingAxis.DotProduct3(swingAxis))));
 					NewtonUserJointAddAngularRow(m_joint, angle, (dFloat*)&swingAxis);
 					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 				}
@@ -1243,7 +1243,7 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f) ? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
 			qErr.Normalize();
 
-			dFloat errorAngle = 2.0f * dFloat(acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0))));
+			dFloat errorAngle = 2.0f * dFloat(dAcos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0))));
 			dVector errorAngVel(0, 0, 0);
 
 			dMatrix basis;
