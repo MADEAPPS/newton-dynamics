@@ -329,8 +329,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->SetBrakeTorque(1000.0f);
 		brakeControl->AddTire(frontLeft);
 		brakeControl->AddTire(frontRight);
-		brakeControl->AddTire(rearLeft);
-		brakeControl->AddTire(rearRight);
+		//brakeControl->AddTire(rearLeft);
+		//brakeControl->AddTire(rearRight);
 
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();

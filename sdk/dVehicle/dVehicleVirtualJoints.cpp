@@ -62,20 +62,22 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	//constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
 	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
-	if (m_tire->GetBrakeTorque() > 1.0e-3f) {
-		//int index = constraintParams->m_count;
+	dFloat brakeTorque = m_tire->GetBrakeTorque();
+	if (brakeTorque > 1.0e-3f) {
+		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
 
-		//const dVector& omega0 = m_state0->GetOmega();
-		//const dVector& omega1 = m_state1->GetOmega();
-		//const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
-		//const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
-		//const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-		//dFloat relOmega = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
-		//constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
-		//constraintParams->m_jointLowFrictionCoef[n] = 0.0f;
+		const dVector& omega0 = m_state0->GetOmega();
+		const dVector& omega1 = m_state1->GetOmega();
+		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		dFloat relOmega = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+		constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
+		constraintParams->m_jointLowFrictionCoef[index] = -brakeTorque;
+		constraintParams->m_jointHighFrictionCoef[index] = brakeTorque;
 	}
-//	m_tire->SetBrakeTorque(0.0f);
+	m_tire->SetBrakeTorque(0.0f);
 }
 
 
@@ -217,7 +219,6 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 				if ((omegaSpeed - slipLimit) > 0.0f) {
 					frictionCoef = m_kineticFriction;
 				}
-
 			} else {
 				dFloat speedDen = dMax(omegaSpeed, dFloat(0.01f));
 				longitudialSlip = relSpeed / speedDen;
@@ -251,7 +252,6 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 			frictionCoef = m_kineticFriction;
 		}
 		
-		//constraintParams->m_jointAccel[n] = -slideSpeed * constraintParams->m_timestepInv;
 		constraintParams->m_jointAccel[n] = -lateralSpeed * constraintParams->m_timestepInv;
 		lateralIndex = n;
 		n ++;
