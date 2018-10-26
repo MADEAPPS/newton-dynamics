@@ -13,13 +13,12 @@ cmake_minimum_required(VERSION 3.12.0)
 set (projectName "dAnimation")
 message (${projectName})
 
-
  # low level core
 file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
 
 if (MSVC)
-        add_library(${projectName} STATIC ${CPP_SOURCE})
+    add_library(${projectName} STATIC ${CPP_SOURCE})
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudAnimationStdAfx.h")
 	set_source_files_properties(dAnimationStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdAnimationStdAfx.h")
 endif(MSVC)

@@ -65,8 +65,8 @@ if (MSVC)
 endif(MSVC)
 
 # Install library
-#install(TARGETS ${projectName} DESTINATION lib/${projectName})
-# Install library headers
-
+if (MSVC)
+      install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+endif(MSVC)
+# Install headers
 install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
-#install(FILES ${HEADERS} DESTINATION include/${projectName})

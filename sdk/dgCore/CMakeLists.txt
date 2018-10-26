@@ -43,3 +43,9 @@ if (MSVC)
                 install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
         endif ()
 endif(MSVC)
+
+if (MSVC)
+      install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+endif(MSVC)
+
+install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")

@@ -51,3 +51,4 @@ if (MSVC)
     endif()
 endif(MSVC)
 
+install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
