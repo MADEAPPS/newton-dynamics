@@ -162,7 +162,7 @@
 	#include <condition_variable>
 #endif
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+#if defined (_DG_USE_PROFILER) && (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#include <dTimeTracker.h>
 #endif
 

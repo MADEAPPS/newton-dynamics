@@ -33,7 +33,10 @@ include_directories(../../sdk/dgMeshUtil/)
 include_directories(../../sdk/dContainers/)
 include_directories(../../sdk/dCustomJoints/)
 include_directories(../../sdk/thirdParty/tinyxml/)
-include_directories(../../sdk/dProfiler/dTimeTracker/)
+
+if (BUILD_PROFILER)
+	include_directories(../../sdk/dProfiler/dTimeTracker/)
+endif ()
 
 include_directories(../../sdk/thirdParty/glfw/)
 include_directories(../../sdk/thirdParty/imgui/)
@@ -43,29 +46,35 @@ add_executable(${projectName} ${CPP_SOURCE})
 if (GENERATE_DLL)
 	add_definitions(-D_DSCENE_DLL)
 	add_definitions(-D_DCONTAINERS_DLL)
-	target_link_libraries (${projectName} newton dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints dTimeTracker tinyxml glfw imgui glu32 opengl32)
+	target_link_libraries (${projectName} newton dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml glfw imgui glu32 opengl32)
+	if (BUILD_PROFILER)
+		target_link_libraries (${projectName} dTimeTracker)
+	endif ()
+
 else ()
 	add_definitions(-D_NEWTON_STATIC_LIB)
 	add_definitions(-D_DVEHICLE_STATIC_LIB)
 	add_definitions(-D_CNEWTON_STATIC_LIB)
 	add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
 
-        if (MSVC)
-               target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints dTimeTracker tinyxml glfw imgui glu32 opengl32)
-        endif(MSVC)
+    if (MSVC)
+		target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml glfw imgui glu32 opengl32)
+		if (BUILD_PROFILER)
+			target_link_libraries (${projectName} dTimeTracker)
+		endif ()
+    endif(MSVC)
 
-        if (UNIX)
-               target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw3 GL GLU X11 Xrandr Xi Xxf86vm pthread dl)
+    if (UNIX)
+        target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw3 GL GLU X11 Xrandr Xi Xxf86vm pthread dl)
 
-               set (source "${CMAKE_SOURCE_DIR}/applications/media")
-               set (destination "${CMAKE_BINARY_DIR}/applications/media")
-               add_custom_command(
-                TARGET ${projectName} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
-                DEPENDS ${destination}
-                COMMENT "symbolic link resources folder from ${source} => ${destination}"
-               )
-        endif(UNIX)
+        set (source "${CMAKE_SOURCE_DIR}/applications/media")
+        set (destination "${CMAKE_BINARY_DIR}/applications/media")
+        add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
+			DEPENDS ${destination}
+			COMMENT "symbolic link resources folder from ${source} => ${destination}")
+    endif(UNIX)
 
 endif()
 

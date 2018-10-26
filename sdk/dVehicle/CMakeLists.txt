@@ -22,7 +22,10 @@ if (GENERATE_DLL)
 	add_definitions(-D_DCONTAINERS_DLL)
 	add_definitions(-D_DVEHICLE_BUILD_DLL)
     add_library(${projectName} SHARED ${CPP_SOURCE})
-	target_link_libraries (${projectName} newton dContainers dMath dCustomJoints dTimeTracker)
+	target_link_libraries (${projectName} newton dContainers dMath dCustomJoints)
+	if (BUILD_PROFILER)
+		target_link_libraries (${projectName} dTimeTracker)
+	endif ()
 	install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
 	install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
 	if (BUILD_SANDBOX_DEMOS)
@@ -32,33 +35,33 @@ if (GENERATE_DLL)
 			ARGS -E copy $(TargetPath) ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/$(TargetFileName))
 	endif ()
 else()
-        if (UNIX)
-            if(NEWTON_BUILD_SHARED_LIBS)
-                add_library(${projectName} SHARED ${CPP_SOURCE})
-            else(NEWTON_BUILD_SHARED_LIBS)
-                add_library(${projectName} STATIC ${CPP_SOURCE})
-            endif(NEWTON_BUILD_SHARED_LIBS)
-
-            target_link_libraries (${projectName} newton dContainers dMath dCustomJoints)
-
-            install(TARGETS ${projectName} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-            install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-            target_include_directories(
-                    ${projectName} PUBLIC
-                    # Headers used from source/build location:
-                    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-                )
-        endif (UNIX)
-
-        if (MSVC)
-            add_definitions(-D_NEWTON_STATIC_LIB)
-            add_definitions(-D_CNEWTON_STATIC_LIB)
-            add_definitions(-D_DVEHICLE_STATIC_LIB)
-            add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
+    if (UNIX)
+        if(NEWTON_BUILD_SHARED_LIBS)
+            add_library(${projectName} SHARED ${CPP_SOURCE})
+        else(NEWTON_BUILD_SHARED_LIBS)
             add_library(${projectName} STATIC ${CPP_SOURCE})
-			install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
-        endif(MSVC)
+        endif(NEWTON_BUILD_SHARED_LIBS)
+
+        target_link_libraries (${projectName} newton dContainers dMath dCustomJoints)
+
+        install(TARGETS ${projectName} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+        target_include_directories(
+                ${projectName} PUBLIC
+                # Headers used from source/build location:
+                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+            )
+    endif (UNIX)
+
+    if (MSVC)
+        add_definitions(-D_NEWTON_STATIC_LIB)
+        add_definitions(-D_CNEWTON_STATIC_LIB)
+        add_definitions(-D_DVEHICLE_STATIC_LIB)
+        add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
+        add_library(${projectName} STATIC ${CPP_SOURCE})
+		install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+    endif(MSVC)
 endif()
 
 if (MSVC)
