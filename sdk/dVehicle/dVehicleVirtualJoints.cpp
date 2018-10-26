@@ -63,6 +63,7 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
 	dFloat brakeTorque = m_tire->GetBrakeTorque();
+brakeTorque = 1000;
 	if (brakeTorque > 1.0e-3f) {
 		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
