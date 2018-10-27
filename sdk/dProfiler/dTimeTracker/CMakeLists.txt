@@ -18,7 +18,7 @@ file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
 
 add_definitions(-DDTIMETRACKER_EXPORTS)
-add_library(${projectName} SHARED ${source})
+add_library(${projectName} SHARED ${CPP_SOURCE})
 
 if (MSVC)
 	target_link_libraries (${projectName} ws2_32.lib)
