@@ -39,10 +39,16 @@ if (BUILD_PROFILER)
     target_link_libraries (${projectName} dTimeTracker)
 endif()
 
-
 if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudStdafxVehicle.h")
 	set_source_files_properties(dStdafxVehicle.cpp PROPERTIES COMPILE_FLAGS "/YcdStdafxVehicle.h")
+
+	if (BUILD_SANDBOX_DEMOS)
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy $(TargetPath) ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/$(TargetFileName))
+	endif ()
 endif(MSVC)
 
 install(TARGETS ${projectName}

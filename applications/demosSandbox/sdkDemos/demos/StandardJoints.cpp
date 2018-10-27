@@ -1093,7 +1093,7 @@ struct JoesNewRagdollJoint: public dCustomJoint
 		dFloat const maxAng = 2.8f; // to prevent flipping on the pole on the backside
 
 		m_coneAngle = dMin(maxAng, coneAngle);
-		dFloat angle = dMax(0.0f, dMin(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
+		dFloat angle = dMax(dFloat(0.0f), dMin(maxAng, arcAngle + m_coneAngle) - m_coneAngle);
 		m_arcAngleCos = dFloat(dCos(angle));
 		m_arcAngleSin = dFloat(dSin(angle));
 
@@ -1214,7 +1214,7 @@ struct JoesNewRagdollJoint: public dCustomJoint
 					cone = dVector(m_arcAngleCos, 0.0f, ((cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
 
 				// do a regular cone constraint from that
-				dFloat angle = dFloat(dAcos(dMax(-1.0f, dMin(1.0f, d.DotProduct3(cone))))) - m_coneAngle;
+				dFloat angle = dFloat(dAcos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), d.DotProduct3(cone))))) - m_coneAngle;
 				if (angle > 0.0f) {
 					dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
 					swingAxis = swingAxis.Scale(1.0f / dFloat(dSqrt(swingAxis.DotProduct3(swingAxis))));
