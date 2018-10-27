@@ -284,8 +284,9 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 
 					dVector longitudinalDir (normal.CrossProduct(tireMatrix.m_front));
 					if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
-						dAssert(0);
 						//lateralDir = normal.CrossProduct(tireMatrix.m_front.CrossProduct(normal)); 
+						longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
+						dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
 					}
 					longitudinalDir = longitudinalDir.Normalize();
 					
