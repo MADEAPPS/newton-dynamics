@@ -14,7 +14,8 @@ set (projectName "dTimeTracker")
 message (${projectName})
 
 # low level core
-file(GLOB source *.cpp *.h)
+file(GLOB CPP_SOURCE *.cpp)
+file(GLOB HEADERS *.h)
 
 add_definitions(-DDTIMETRACKER_EXPORTS)
 add_library(${projectName} SHARED ${source})
@@ -25,11 +26,12 @@ if (MSVC)
 	set_source_files_properties(stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
 endif(MSVC)
 
-file(GLOB includes *.h)
-install(FILES ${includes} DESTINATION "${includePath}/${projectName}")
+install(TARGETS ${projectName}
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
-install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${projectName})
 
 if (BUILD_SANDBOX_DEMOS)
 	add_custom_command(

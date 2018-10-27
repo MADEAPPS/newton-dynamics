@@ -19,6 +19,3 @@ file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
-
-install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
-install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

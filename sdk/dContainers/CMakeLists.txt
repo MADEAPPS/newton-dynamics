@@ -17,54 +17,37 @@ message (${projectName})
 file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
 
-if (GENERATE_DLL)
-	add_definitions(-D_DCONTAINERS_DLL)
-	add_definitions(-D_DCONTAINERS_EXPORT)
+if(NEWTON_BUILD_SHARED_LIBS)
+    if(MSVC)
+        add_definitions(-D_DCONTAINERS_DLL)
+        add_definitions(-D_DCONTAINERS_EXPORT)
+    endif(MSVC)
     add_library(${projectName} SHARED ${CPP_SOURCE})
-	target_link_libraries (${projectName} newton)
-	if (BUILD_PROFILER)
-		target_link_libraries (${projectName} dTimeTracker)
-	endif()
-	install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
-	install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
-	if (BUILD_SANDBOX_DEMOS)
-		add_custom_command(
-			TARGET ${projectName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND}
-			ARGS -E copy $(TargetPath) ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/$(TargetFileName))
-	endif ()
 
-else()
+    target_link_libraries (${projectName} newton)
 
-    if (UNIX)
-        if(NEWTON_BUILD_SHARED_LIBS)
-            add_library(${projectName} SHARED ${CPP_SOURCE})
-        else(NEWTON_BUILD_SHARED_LIBS)
-            add_library(${projectName} STATIC ${CPP_SOURCE})
-        endif(NEWTON_BUILD_SHARED_LIBS)
-
-        install(TARGETS ${projectName} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-        install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-        target_include_directories(
-                ${projectName} PUBLIC
-                # Headers used from source/build location:
-                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-            )
-    endif (UNIX)
-
+    if (BUILD_PROFILER)
+        target_link_libraries (${projectName} dTimeTracker)
+    endif()
+else(NEWTON_BUILD_SHARED_LIBS)
     if (MSVC)
         add_definitions(-D_NEWTON_STATIC_LIB)
-        add_library(${projectName} STATIC ${CPP_SOURCE})
-		install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
     endif(MSVC)
-endif()
+
+    add_library(${projectName} STATIC ${CPP_SOURCE})
+endif(NEWTON_BUILD_SHARED_LIBS)
+
+target_link_libraries (${projectName} newton)
 
 if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudContainersStdAfx.h")
 	set_source_files_properties(dContainersStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdContainersStdAfx.h")
 endif(MSVC)
 
-install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
+install(TARGETS ${projectName}
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${projectName})
 

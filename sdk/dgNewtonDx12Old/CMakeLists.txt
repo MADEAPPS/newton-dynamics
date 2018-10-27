@@ -40,7 +40,7 @@ endif(MSVC)
 add_custom_command(
 	TARGET ${projectName} POST_BUILD
 	COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $(TargetPath) ${dllPath}/newtonPlugins/${CMAKE_CFG_INTDIR}/$(TargetFileName))
+	ARGS -E copy $(TargetPath) ${CMAKE_INSTALL_BINDIR}/newtonPlugins/${CMAKE_CFG_INTDIR}/$(TargetFileName))
 
 
 if (BUILD_SANDBOX_DEMOS)

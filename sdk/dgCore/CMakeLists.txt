@@ -17,29 +17,20 @@ message (${projectName})
 file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
 
-if (UNIX)
-    if(NEWTON_BUILD_SHARED_LIBS)
-        add_library(${projectName} SHARED ${CPP_SOURCE})
-    else(NEWTON_BUILD_SHARED_LIBS)
-        add_library(${projectName} STATIC ${CPP_SOURCE})
-    endif(NEWTON_BUILD_SHARED_LIBS)
-
-    install(TARGETS ${projectName} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-    target_include_directories(
-            ${projectName} PUBLIC
-            # Headers used from source/build location:
-            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-        )
-endif (UNIX)
+if(NEWTON_BUILD_SHARED_LIBS)
+   add_library(${projectName} SHARED ${CPP_SOURCE})
+else(NEWTON_BUILD_SHARED_LIBS)
+   add_library(${projectName} STATIC ${CPP_SOURCE})
+endif(NEWTON_BUILD_SHARED_LIBS)
 
 if (MSVC)
-        add_library(${projectName} STATIC ${CPP_SOURCE})
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-	set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
-
-        if (NOT GENERATE_DLL)
-                install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
-        endif ()
+       set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
+       set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
 endif(MSVC)
+
+install(TARGETS ${projectName}
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${projectName})

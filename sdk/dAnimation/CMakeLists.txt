@@ -13,36 +13,24 @@ cmake_minimum_required(VERSION 3.12.0)
 set (projectName "dAnimation")
 message (${projectName})
 
-
 # low level core
 file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
 
-if (MSVC)
-    add_library(${projectName} STATIC ${CPP_SOURCE})
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudAnimationStdAfx.h")
-	set_source_files_properties(dAnimationStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdAnimationStdAfx.h")
-endif(MSVC)
-
-if (UNIX)
-    if(NEWTON_BUILD_SHARED_LIBS)
-        add_library(${projectName} SHARED ${CPP_SOURCE})
-    else(NEWTON_BUILD_SHARED_LIBS)
-        add_library(${projectName} STATIC ${CPP_SOURCE})
-    endif(NEWTON_BUILD_SHARED_LIBS)
-
-    install(TARGETS ${projectName} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-    target_include_directories(
-        ${projectName} PUBLIC
-        # Headers used from source/build location:
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-    )
-endif (UNIX)
+if(NEWTON_BUILD_SHARED_LIBS)
+   add_library(${projectName} SHARED ${CPP_SOURCE})
+else(NEWTON_BUILD_SHARED_LIBS)
+   add_library(${projectName} STATIC ${CPP_SOURCE})
+endif(NEWTON_BUILD_SHARED_LIBS)
 
 if (MSVC)
-      install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+       set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudAnimationStdAfx.h")
+       set_source_files_properties(dAnimationStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdAnimationStdAfx.h")
 endif(MSVC)
 
-install(FILES ${HEADERS} DESTINATION "${includePath}/${projectName}")
+install(TARGETS ${projectName}
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${projectName})
