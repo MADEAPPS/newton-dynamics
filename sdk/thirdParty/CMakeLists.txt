@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.12.0)
 
 add_subdirectory(tinyxml)
 
-if (BUILD_SANDBOX_DEMOS)
+if (NEWTON_BUILD_SANDBOX_DEMOS)
     if (MSVC)
         add_subdirectory(glfw)
         add_subdirectory(imgui)

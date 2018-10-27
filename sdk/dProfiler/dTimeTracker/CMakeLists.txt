@@ -33,7 +33,7 @@ install(TARGETS ${projectName}
 
 install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${projectName})
 
-if (BUILD_SANDBOX_DEMOS)
+if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_custom_command(
 		TARGET ${projectName} POST_BUILD
 		COMMAND ${CMAKE_COMMAND}

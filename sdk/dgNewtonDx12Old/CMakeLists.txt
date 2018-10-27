@@ -26,8 +26,9 @@ endif ()
 
 add_definitions(-DNEWTONCPU_EXPORTS)
 add_library(${projectName} SHARED ${source})
-target_link_libraries (${projectName} dTimeTracker mincore.lib d3d12.lib dxgi.lib dxguid.lib)
-
+if (NEWTON_BUILD_PROFILER)
+		target_link_libraries (${projectName} dTimeTracker mincore.lib d3d12.lib dxgi.lib dxguid.lib)
+endif ()
 if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgNewtonPluginStdafx.h")
 	set_source_files_properties(dgNewtonPluginStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcdgNewtonPluginStdafx.h")
@@ -43,7 +44,7 @@ add_custom_command(
 	ARGS -E copy $(TargetPath) ${CMAKE_INSTALL_BINDIR}/newtonPlugins/${CMAKE_CFG_INTDIR}/$(TargetFileName))
 
 
-if (BUILD_SANDBOX_DEMOS)
+if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_custom_command(
 		TARGET ${projectName} POST_BUILD
 		COMMAND ${CMAKE_COMMAND}

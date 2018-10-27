@@ -26,7 +26,7 @@ if(NEWTON_BUILD_SHARED_LIBS)
 
     target_link_libraries (${projectName} newton)
 
-    if (BUILD_PROFILER)
+    if (NEWTON_BUILD_PROFILER)
         target_link_libraries (${projectName} dTimeTracker)
     endif()
 else(NEWTON_BUILD_SHARED_LIBS)
@@ -42,7 +42,7 @@ target_link_libraries (${projectName} newton)
 if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudContainersStdAfx.h")
 	set_source_files_properties(dContainersStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdContainersStdAfx.h")
-	if (BUILD_SANDBOX_DEMOS)
+	if (NEWTON_BUILD_SANDBOX_DEMOS)
 		add_custom_command(
 			TARGET ${projectName} POST_BUILD
 			COMMAND ${CMAKE_COMMAND}
