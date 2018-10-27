@@ -22,4 +22,3 @@ file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c
 
 add_library(${projectName} STATIC ${source})
 
-#install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})

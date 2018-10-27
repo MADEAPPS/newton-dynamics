@@ -20,4 +20,3 @@ file(GLOB HEADERS *.h)
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
 
-#install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
