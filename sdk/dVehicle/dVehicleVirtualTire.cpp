@@ -72,7 +72,8 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	}
 	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
 
-m_brakeTorque = 100.0f;
+//m_brakeTorque = 100.0f;
+//m_omega = -20.0f;
 }
 
 dVehicleVirtualTire::~dVehicleVirtualTire()
@@ -221,7 +222,6 @@ if (xxx > 2000) {
 if ((m_solverIndex == 2) || (m_solverIndex == 3))
 m_omega = -20.0f;
 }
-
 
 	m_tireAngle += m_omega * timestep;
 	while (m_tireAngle < 0.0f)

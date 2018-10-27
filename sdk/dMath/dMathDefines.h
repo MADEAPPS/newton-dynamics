@@ -693,6 +693,7 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 			const T* const row = &me[base];
 			T r(b[j] - dDotProduct(size, row, x));
 			T f((r + row[j] * x[j]) * invDiag[j]);
+			f = x[j] + (f - x[j]) * sor;
 
 			const int index = normalIndex[j];
 			const T val = index ? x[j + index] : 1.0f;
@@ -704,7 +705,8 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 				x[j] = l;
 			} else {
 				tolerance += r * r;
-				x[j] = x[j] + (f - x[j]) * sor;
+				//x[j] = x[j] + (f - x[j]) * sor;
+				x[j] = f;
 			}
 			base += size;
 		}

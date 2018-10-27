@@ -63,7 +63,7 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
 	dFloat brakeTorque = m_tire->GetBrakeTorque();
-brakeTorque = 1000;
+//brakeTorque = 1000;
 	if (brakeTorque > 1.0e-3f) {
 		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
@@ -73,7 +73,7 @@ brakeTorque = 1000;
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-		dFloat relOmega = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+		dFloat relOmega = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
 		constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
 		constraintParams->m_jointLowFrictionCoef[index] = -brakeTorque;
 		constraintParams->m_jointHighFrictionCoef[index] = brakeTorque;
