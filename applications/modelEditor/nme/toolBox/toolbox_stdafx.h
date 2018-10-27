@@ -157,7 +157,7 @@ typedef long long unsigned64;
 
 
 
-#ifdef __USE_DOUBLE_PRECISION__
+#ifdef __USE_NEWTON_DOUBLE_PRECISION__
 	#define glMultMatrix(x) glMultMatrixd(x)
 	#define glLoadMatrix(x) glMultMatrixd(x)
 //	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 

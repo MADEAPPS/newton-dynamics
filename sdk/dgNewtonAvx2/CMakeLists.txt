@@ -24,7 +24,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /arch:AVX2")
 
 add_definitions(-DNEWTONCPU_EXPORTS)
 add_library(${projectName} SHARED ${source})
-if (BUILD_PROFILER)
+if (NEWTON_BUILD_PROFILER)
 		target_link_libraries (${projectName} dTimeTracker)
 endif ()
 if (MSVC)
@@ -42,7 +42,7 @@ add_custom_command(
 	ARGS -E copy $(TargetPath) ${CMAKE_INSTALL_BINDIR}/newtonPlugins/${CMAKE_CFG_INTDIR}/$(TargetFileName))
 
 
-if (BUILD_SANDBOX_DEMOS)
+if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_custom_command(
 		TARGET ${projectName} POST_BUILD
 		COMMAND ${CMAKE_COMMAND}
