@@ -337,13 +337,13 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = true;
 //	m_broadPhaseType = 1;
 	m_solverPasses = 4;
-//	m_workerThreads = 4;
+	m_workerThreads = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
-	m_showJointDebugInfo = true;
+//	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
-	m_solveLargeIslandInParallel = true;
-//	m_synchronousPhysicsUpdateMode = false;
+	m_asynchronousPhysicsUpdate = true;
+//	m_solveLargeIslandInParallel = true;
 
 	m_currentPlugin = 0;
 	void* preferedPlugin = NewtonGetPreferedPlugin(m_world);

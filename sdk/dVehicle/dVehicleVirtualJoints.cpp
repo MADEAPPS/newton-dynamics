@@ -50,7 +50,7 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front, omega);
 
 	// longitudinal force
-	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right, omega);
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_up, omega);
 
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, omega, 0.0f);
@@ -65,6 +65,7 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	dFloat brakeTorque = m_tire->GetBrakeTorque();
 //brakeTorque = 1000;
 	if (brakeTorque > 1.0e-3f) {
+
 		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
 
@@ -118,12 +119,12 @@ void dTireContact::ResetContact ()
 	}
 }
 
-void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction)
+void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction)
 {
 	m_point = posit;
 	m_normal = normal;
-	m_lateralDir = lateralDir;
-	m_longitudinalDir = m_normal.CrossProduct(m_lateralDir);
+	m_longitudinalDir = longitudinalDir;
+	m_lateralDir = m_longitudinalDir.CrossProduct(m_normal);
 
 	m_isActive = true;
 	m_isActiveFilter[0] = true;
