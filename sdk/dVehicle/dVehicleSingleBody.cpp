@@ -66,16 +66,6 @@ void dVehicleSingleBody::RigidBodyToStates()
 	NewtonBodyGetMatrix(m_newtonBody, &matrix[0][0]);
 	chassisBody->SetMatrix(matrix);
 
-static int xxx;
-xxx++;
-if (xxx == 1500)
-{
-//	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
-//	vector.m_x += 2.0f;
-//	NewtonBodySetVelocity(m_newtonBody, &vector[0]);
-}
-
-
 	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
 	chassisBody->SetVeloc(vector);
 

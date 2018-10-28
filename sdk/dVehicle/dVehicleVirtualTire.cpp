@@ -243,7 +243,8 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 		m_contactsJoints[i].ResetContact();
 	}
 
-	if (bodyArray.m_count) {
+	int contactCount = 0;
+	if (bodyArray.m_staticCount) {
 		dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 		dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
@@ -257,9 +258,7 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 		dFloat penetration(0.0f);
 
 		dFloat param = 1.0f - m_position * m_invSuspensionLength;
-
-		int contactCount = 0;
-		for (int i = 0; i < bodyArray.m_count; i ++) {
+		for (int i = 0; i < bodyArray.m_staticCount; i ++) {
 			dMatrix matrixB;
 			dLong attributeA;
 			dLong attributeB;
@@ -294,6 +293,26 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 					contact.m_w = 1.0f;
 					m_contactsJoints[contactCount].SetContact(contact, normal, longitudinalDir, penetration, 1.0f, 0.8f);
 					contactCount ++;
+				}
+			}
+		}
+	}
+
+	if (bodyArray.m_count > bodyArray.m_staticCount) {
+		// for now ignore tire collision with dynamics bodies,
+		// later tire collision with dynamic bodies will no be CCD
+		//dAssert (0);
+	}
+
+
+	if (contactCount > 1) {
+		for (int i = 0; i < contactCount - 1; i ++) {
+			const dVector& n = m_contactsJoints[i].m_normal;
+			for (int j = contactCount - 1; j > i; j --) {
+				dFloat val = dAbs (n.DotProduct3(m_contactsJoints[j].m_normal));
+				if (val > 0.99f) {
+					m_contactsJoints[j] = m_contactsJoints[contactCount - 1];
+					contactCount --;
 				}
 			}
 		}

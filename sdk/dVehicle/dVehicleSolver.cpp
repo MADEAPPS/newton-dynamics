@@ -1054,7 +1054,6 @@ void dVehicleSolver::DebugMassMatrix()
 		}
 	}
 
-	const int primaryCount = rows;
 	for (int i = 0; i < m_nodeCount - 1; i++) {
 		dVehicleNode* const node = m_nodesOrder[i];
 		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
