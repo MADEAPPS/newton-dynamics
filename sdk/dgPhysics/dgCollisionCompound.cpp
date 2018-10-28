@@ -1902,9 +1902,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 	return contactCount;
 }
 
-
-
-
 dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContactPoint* const contacts = proxy.m_contacts;
@@ -1942,19 +1939,22 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 
 	dgFloat32 timestep = pair->m_timestep;
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
+
+	const dgVector heighFieldInvScale(terrainInstance->GetScale());
+	const dgVector heighFieldScale(terrainInstance->GetScale() * dgVector::m_half);
 	while (stack) {
 		stack --;
 		const dgNodeBase* const me = stackPool[stack];
 
-		dgVector origin (data.m_matrix.UntransformVector(me->m_origin));
-		dgVector size (data.m_absMatrix.UnrotateVector(me->m_size));
+		dgVector origin (heighFieldInvScale * data.m_matrix.UntransformVector(me->m_origin));
+		dgVector size (heighFieldInvScale * data.m_absMatrix.UnrotateVector(me->m_size));
 		dgVector p0 (origin - size);
 		dgVector p1 (origin + size);
 		terrainCollision->GetLocalAABB (p0, p1, nodeProxi.m_p0, nodeProxi.m_p1);
-		//nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale (dgFloat32 (0.5f));
-		//nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale (dgFloat32 (0.5f));
-		nodeProxi.m_size = dgVector::m_half * (nodeProxi.m_p1 - nodeProxi.m_p0);
-		nodeProxi.m_origin = dgVector::m_half * (nodeProxi.m_p1 + nodeProxi.m_p0);
+		//nodeProxi.m_size = dgVector::m_half * (nodeProxi.m_p1 - nodeProxi.m_p0);
+		//nodeProxi.m_origin = dgVector::m_half * (nodeProxi.m_p1 + nodeProxi.m_p0);
+		nodeProxi.m_size = heighFieldScale * (nodeProxi.m_p1 - nodeProxi.m_p0);
+		nodeProxi.m_origin = heighFieldScale * (nodeProxi.m_p1 + nodeProxi.m_p0);
 
 		if (me->BoxTest (data, &nodeProxi)) {
 			if (me->m_type == m_leaf) {
