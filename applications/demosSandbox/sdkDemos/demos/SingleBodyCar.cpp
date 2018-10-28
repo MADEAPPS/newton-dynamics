@@ -466,7 +466,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	manager->SetAsPlayer(player);
 
 
-	int count = 6;
+	int count = 5;
 	for (int i = 0; i < count; i++) {
 		for (int j = 0; j < count; j++) {
 			//dVector offset(j * 4.0f, 0.0f, i * 4.0f + 4.0f, 0.0f);

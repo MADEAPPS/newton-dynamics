@@ -379,9 +379,6 @@ void dgWorld::DestroyAllBodies()
 	dgAssert(dgBodyCollisionList::GetCount() == 0);
 }
 
-
-
-
 void dgWorld::SetThreadsCount (dgInt32 count)
 {
 	dgThreadHive::SetThreadsCount(count);
@@ -1113,7 +1110,7 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 {
 	dgAssert (rootBone);
 	dgSkeletonList* const list = this;
-	if (dgSkeletonContainer::m_uniqueID > 1014 * 16) {
+	if (dgSkeletonContainer::m_uniqueID > 1024 * 16) {
 		dgList<dgSkeletonContainer*> saveList (GetAllocator());
 		dgSkeletonList::Iterator iter (*list);
 		for (iter.Begin(); iter; iter ++) {
