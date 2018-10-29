@@ -14,7 +14,6 @@ set (projectName "demosSandbox")
 message (${projectName})
 
  # low level core
-#file(GLOB CPP_SOURCE sdkDemos/*.cpp sdkDemos/*.h sdkDemos/toolBox/*.cpp sdkDemos/toolBox/*.h sdkDemos/demos/*.cpp sdkDemos/demos/*.h)
 file(GLOB CPP_SOURCE sdkDemos/*.cpp sdkDemos/toolBox/*.cpp sdkDemos/demos/*.cpp)
 file(GLOB HEADERS sdkDemos/*.h sdkDemos/toolBox/*.h sdkDemos/demos/*.h)
 
@@ -70,7 +69,7 @@ if(MSVC)
 endif(MSVC)
 
 if (UNIX)
-    target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw GL GLU X11 Xrandr Xi Xxf86vm pthread dl)
+    target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw GL GLU pthread)
 
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")

@@ -39,6 +39,14 @@ endif(NEWTON_BUILD_SHARED_LIBS)
 
 target_link_libraries (${projectName} newton)
 
+if(UNIX)
+    target_include_directories(
+                        ${projectName} PUBLIC
+                        # Headers used from source/build location:
+                        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    )
+endif(UNIX)
+
 if (MSVC)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudContainersStdAfx.h")
 	set_source_files_properties(dContainersStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdContainersStdAfx.h")

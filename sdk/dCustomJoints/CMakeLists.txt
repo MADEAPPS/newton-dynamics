@@ -33,6 +33,15 @@ else(NEWTON_BUILD_SHARED_LIBS)
 endif(NEWTON_BUILD_SHARED_LIBS)
 
 target_link_libraries (${projectName} newton dContainers dMath)
+
+if(UNIX)
+    target_include_directories(
+                        ${projectName} PUBLIC
+                        # Headers used from source/build location:
+                        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    )
+endif(UNIX)
+
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dTimeTracker)
 endif()
