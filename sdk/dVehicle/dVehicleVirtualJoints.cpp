@@ -216,7 +216,8 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		if (!((omegaSpeed < 0.1f) && (linearSpeed < 0.1f))) {
 			if (relSpeed < 0.0f) {
 				dFloat speedDen = dMax (linearSpeed, dFloat(0.01f));
-				longitudialSlip = relSpeed / speedDen;
+				//longitudialSlip = relSpeed / speedDen;
+				longitudialSlip = dClamp(relSpeed / speedDen, dFloat(0.0f), dFloat(20.0f));
 				dFloat slipLimit = 2.0f * dMax (linearSpeed, dFloat(0.0f));
 				if ((omegaSpeed - slipLimit) > 0.0f) {
 					frictionCoef = m_kineticFriction;
@@ -224,7 +225,7 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 			} else {
 				dFloat speedDen = dMax(omegaSpeed, dFloat(0.01f));
 				//longitudialSlip = relSpeed / speedDen;
-				longitudialSlip = dClamp (relSpeed / speedDen, dFloat(0.0f), dFloat(3.0f));
+				longitudialSlip = dClamp (relSpeed / speedDen, dFloat(0.0f), dFloat(4.0f));
 				dFloat slipLimit = 2.0f * dMax(omegaSpeed, dFloat(0.0f));
 				if ((linearSpeed - slipLimit) > 0.0f) {
 					frictionCoef = m_kineticFriction;

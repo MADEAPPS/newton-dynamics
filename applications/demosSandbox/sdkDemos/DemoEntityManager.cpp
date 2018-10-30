@@ -340,7 +340,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_workerThreads = 4;
 //	m_showNormalForces = false;
 //	m_showCenterOfMass = false;
-//	m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 //	m_solveLargeIslandInParallel = true;

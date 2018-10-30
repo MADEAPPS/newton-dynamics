@@ -50,6 +50,7 @@ dMatrix dVehicleSingleBody::GetMatrix () const
 	return m_body.GetMatrix();
 }
 
+
 void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
 	NewtonCollision* const collision = NewtonBodyGetCollision(m_newtonBody);
@@ -117,8 +118,13 @@ void dVehicleSingleBody::ApplyExternalForce()
 
 	NewtonBodyGetTorque(m_newtonBody, &torque[0]);
 	chassisBody->SetTorque(torque);
-	
-	m_gravity = force.Scale (chassisBody->GetInvMass());
+
+	const dVector& updir = chassisBody->GetMatrix().m_up;
+	m_gravity = updir.Scale (chassisBody->GetInvMass() * updir.DotProduct3(force));
 	dVehicleInterface::ApplyExternalForce();
 }
 
+void dVehicleSingleBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dVehicleInterface::Debug(debugContext);
+}
