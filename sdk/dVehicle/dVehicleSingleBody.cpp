@@ -127,4 +127,28 @@ void dVehicleSingleBody::ApplyExternalForce()
 void dVehicleSingleBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 	dVehicleInterface::Debug(debugContext);
+
+	const dMatrix& matrix = m_body.GetMatrix();
+
+	// draw velocity
+	dVector veloc (m_body.GetVelocity());
+	veloc = veloc - matrix.m_up.Scale (veloc.DotProduct3(matrix.m_up));
+	dFloat mag = dSqrt (veloc.DotProduct3(veloc));
+	veloc = veloc.Scale (dLog (mag) / (mag + 0.1f));
+
+	debugContext->SetColor(dVector(1.0f, 1.0f, 0.0f, 1.0f));
+	dVector p0 (matrix.m_posit + matrix.m_up.Scale (1.0f));
+	dVector p1 (p0 + veloc);
+	debugContext->DrawLine(p0, p1);
+	
+	debugContext->SetColor(dVector(0.5f, 0.5f, 0.5f, 1.0f));
+	dVector p2(p0 + matrix.m_front.Scale(2.0f));
+	debugContext->DrawLine(p0, p2);
+
+
+	//draw vehicle weight
+	debugContext->SetColor(dVector(0.0f, 0.0f, 0.0f, 1.0f));
+	// for now weight is normalize to 1.0
+	dVector p3(p0 + matrix.m_up.Scale(2.0f));
+	debugContext->DrawLine(p0, p3);
 }

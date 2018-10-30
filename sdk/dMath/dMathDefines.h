@@ -76,8 +76,9 @@
 
 // transcendental functions
 #define	dSqrt(x)	dFloat (sqrt (dFloat(x))) 
-#define	dFloor(x)	dFloat (floor (dFloat(x))) 
 #define	dCiel(x)	dFloat (ceil (dFloat(x))) 
+#define	dFloor(x)	dFloat (floor (dFloat(x))) 
+#define	dLog(x)		dFloat (log (dFloat(x))) 
 #define	dMod(x,y)	dFloat (fmod (dFloat(x), dFloat(y))) 
 #define	dPow(x,y)	dFloat (pow (dFloat(x), dFloat(y))) 
 
