@@ -14,22 +14,89 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleTireInterface.h"
 
 class dVehicleChassis;
+
+
+class dVehicleDifferentialInterface: public dVehicleNode
+{
+	public:
+	DVEHICLE_API dVehicleDifferentialInterface(dVehicleNode* const parent);
+	virtual ~dVehicleDifferentialInterface() {}
+};
+
+class dVehicleTireInterface: public dVehicleNode
+{
+	public:
+	enum dSuspensionType
+	{
+		m_offroad,
+		m_confort,
+		m_race,
+		m_roller,
+	};
+
+	class dTireInfo
+	{
+		public:
+		dTireInfo()
+		{
+			memset(this, 0, sizeof(dTireInfo));
+		}
+
+		dVector m_location;
+		dFloat m_mass;
+		dFloat m_radio;
+		dFloat m_width;
+		dFloat m_steerRate;
+		dFloat m_pivotOffset;
+		dFloat m_dampingRatio;
+		dFloat m_springStiffness;
+		dFloat m_suspensionLength;
+		dFloat m_maxSteeringAngle;
+		dFloat m_corneringStiffness;
+		dFloat m_longitudinalStiffness;
+		dFloat m_frictionCoefficient;
+		//dFloat m_aligningMomentTrail;
+		//int m_hasFender;
+		//dSuspensionType m_suspentionType;
+	};
+
+	DVEHICLE_API dVehicleTireInterface(dVehicleNode* const parent, const dTireInfo& info);
+	virtual ~dVehicleTireInterface() {}
+
+	virtual dVehicleTireInterface* GetAsTire() const { return (dVehicleTireInterface*) this; }
+
+	const dTireInfo& GetInfo() const { return m_info; }
+	void SetInfo(const dTireInfo& info) { m_info = info; }
+
+	virtual dMatrix GetLocalMatrix() const = 0;
+	virtual dMatrix GetGlobalMatrix() const = 0;
+	virtual NewtonCollision* GetCollisionShape() const = 0;
+
+	virtual dFloat GetSteeringAngle() const = 0;
+	virtual void SetSteeringAngle(dFloat steeringAngle) = 0;
+
+	virtual dFloat GetBrakeTorque() const = 0;
+	virtual void SetBrakeTorque(dFloat brakeTorque) = 0;
+
+	protected:
+	dTireInfo m_info;
+};
 
 
 class dVehicleInterface: public dVehicleNode
 {
 	public:
 	DVEHICLE_API dVehicleInterface(dVehicleChassis* const chassis);
-	DVEHICLE_API virtual ~dVehicleInterface();
-	DVEHICLE_API virtual dVehicleInterface* GetAsVehicle() const {return (dVehicleInterface*)this;} 
+	virtual ~dVehicleInterface() {};
 
 	virtual dMatrix GetMatrix() const = 0;
+	virtual dVehicleInterface* GetAsVehicle() const {return (dVehicleInterface*)this;} 
 
 	protected:
 	virtual dVehicleTireInterface* AddTire(const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame) = 0;
+	virtual dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire, const dMatrix& localFrame) = 0;
 
 	friend class dVehicleChassis;
 };

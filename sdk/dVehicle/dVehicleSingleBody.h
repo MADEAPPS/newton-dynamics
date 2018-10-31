@@ -14,7 +14,6 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleInterface.h"
-#include "dVehicleTireInterface.h"
 
 class dVehicleSingleBody: public dVehicleInterface
 {
@@ -24,6 +23,7 @@ class dVehicleSingleBody: public dVehicleInterface
 
 	DVEHICLE_API dMatrix GetMatrix () const;
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame);
+	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire, const dMatrix& localFrame);
 
 	protected:
 	void RigidBodyToStates();

@@ -444,8 +444,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+//	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
 
 	dMatrix location (dGetIdentityMatrix());

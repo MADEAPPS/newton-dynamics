@@ -11,8 +11,8 @@
 
 
 #include "dStdafxVehicle.h"
+#include "dVehicleInterface.h"
 #include "dVehicleDashControl.h"
-#include "dVehicleTireInterface.h"
 
 
 dVehicleDashControl::dVehicleDashControl(dVehicleChassis* const vehicle)

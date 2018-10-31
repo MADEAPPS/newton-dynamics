@@ -45,6 +45,11 @@ dVehicleTireInterface* dVehicleSingleBody::AddTire (const dMatrix& locationInGlo
 	return new dVehicleVirtualTire(this, locationInGlobalSpace, tireInfo, localFrame);
 }
 
+dVehicleDifferentialInterface* dVehicleSingleBody::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire, const dMatrix& localFrame)
+{
+	return NULL;
+}
+
 dMatrix dVehicleSingleBody::GetMatrix () const
 {
 	return m_body.GetMatrix();

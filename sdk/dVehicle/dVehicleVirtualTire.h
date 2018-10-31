@@ -15,7 +15,6 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleVirtualJoints.h"
-#include "dVehicleTireInterface.h"
 
 class dVehicleVirtualTire: public dVehicleTireInterface
 {

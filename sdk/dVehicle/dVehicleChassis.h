@@ -17,7 +17,6 @@
 #include "dVehicleSolver.h"
 #include "dVehicleInterface.h"
 #include "dVehicleDashControl.h"
-#include "dVehicleTireInterface.h"
 
 
 class dVehicleChassis: public dCustomControllerBase
@@ -70,7 +69,7 @@ class dVehicleChassis: public dCustomControllerBase
 	public:
 	DVEHICLE_API dEngineJoint* AddEngineJoint(dFloat mass, dFloat armatureRadius);
 	DVEHICLE_API dWheelJoint* AddTire (const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
-	DVEHICLE_API dDifferentialJoint* AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire);
+	
 	DVEHICLE_API dDifferentialJoint* AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential);
 
 	DVEHICLE_API void LinkTiresKinematically(dWheelJoint* const tire0, dWheelJoint* const tire1);
@@ -166,6 +165,8 @@ class dVehicleChassis: public dCustomControllerBase
 	DVEHICLE_API dVehicleChassis ();
 	dVehicleInterface* GetVehicle() {return m_vehicle;}
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
+
+	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl ();
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();

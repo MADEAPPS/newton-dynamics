@@ -13,13 +13,22 @@
 #include "dVehicleChassis.h"
 #include "dVehicleInterface.h"
 
+
+dVehicleDifferentialInterface::dVehicleDifferentialInterface(dVehicleNode* const parent)
+	:dVehicleNode(parent)
+{
+}
+
+dVehicleTireInterface::dVehicleTireInterface(dVehicleNode* const parent, const dTireInfo& info)
+	:dVehicleNode(parent)
+	,m_info(info)
+{
+	SetWorld(parent->GetWorld());
+}
+
 dVehicleInterface::dVehicleInterface(dVehicleChassis* const chassis)
 	:dVehicleNode(NULL)
 {
 	SetWorld(NewtonBodyGetWorld(chassis->GetBody()));
-}
-
-dVehicleInterface::~dVehicleInterface()
-{
 }
 

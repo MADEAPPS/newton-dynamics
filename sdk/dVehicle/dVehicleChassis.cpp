@@ -103,7 +103,7 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 //	m_engine = NULL;
 //	m_brakesControl = NULL;
 //	m_engineControl = NULL;
-	m_steeringControl = NULL;
+//	m_steeringControl = NULL;
 //	m_handBrakesControl = NULL;
 }
 
@@ -154,6 +154,12 @@ dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobal
 {
 	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo, m_localFrame);
 }
+
+dVehicleDifferentialInterface* dVehicleChassis::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
+{
+	return m_vehicle->AddDifferential(leftTire, rightTire, m_localFrame);
+}
+
 
 void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {

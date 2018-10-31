@@ -14,7 +14,6 @@
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualTire.h"
-#include "dVehicleTireInterface.h"
 #include "dVehicleVirtualJoints.h"
 
 dKinematicLoopJoint::dKinematicLoopJoint()
