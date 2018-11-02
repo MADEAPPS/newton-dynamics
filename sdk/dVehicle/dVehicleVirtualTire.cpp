@@ -56,10 +56,10 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	// simplify calculation by making wheel inertia spherical
 	inertia = dVector(m_info.m_mass * dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z));
 
-	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
-	chassisBody->SetMass(m_info.m_mass);
-	chassisBody->SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
-	chassisBody->UpdateInertia();
+
+	m_body.SetMass(m_info.m_mass);
+	m_body.SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
+	m_body.UpdateInertia();
 
 	// set the tire joint
 	m_joint.Init (&m_body, m_parent->GetBody());
@@ -140,17 +140,16 @@ void dVehicleVirtualTire::SetBrakeTorque(dFloat brakeTorque)
 void dVehicleVirtualTire::ApplyExternalForce()
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
-	dComplementaritySolver::dBodyState* const tireBody = GetBody();
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
 	dMatrix tireMatrix (GetHardpointMatrix (m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
-	tireBody->SetMatrix(tireMatrix);
-
-	tireBody->SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
-	tireBody->SetVeloc(chassisBody->CalculatePointVelocity (tireMatrix.m_posit) + tireMatrix.m_right.Scale(m_speed));
-
-	tireBody->SetTorque(dVector (0.0f));
-	tireBody->SetForce(chassisNode->m_gravity.Scale (tireBody->GetMass()));
+	m_body.SetMatrix(tireMatrix);
+		  
+	m_body.SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
+	m_body.SetVeloc(chassisBody->CalculatePointVelocity (tireMatrix.m_posit) + tireMatrix.m_right.Scale(m_speed));
+		  
+	m_body.SetTorque(dVector (0.0f));
+	m_body.SetForce(chassisNode->m_gravity.Scale (m_body.GetMass()));
 
 	dVehicleTireInterface::ApplyExternalForce();
 }

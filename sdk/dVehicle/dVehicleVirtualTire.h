@@ -14,6 +14,7 @@
 #define __D_VEHICLE_VIRTUAL_TIRE_H__
 
 #include "dStdafxVehicle.h"
+#include "dVehicleInterface.h"
 #include "dVehicleVirtualJoints.h"
 
 class dVehicleVirtualTire: public dVehicleTireInterface
@@ -32,8 +33,6 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	DVEHICLE_API virtual dFloat GetBrakeTorque() const;
 	DVEHICLE_API virtual void SetBrakeTorque(dFloat brakeTorque);
 
-	DVEHICLE_API void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-
 	protected:
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
@@ -43,6 +42,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	void CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep);
 
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
 	dMatrix m_matrix;

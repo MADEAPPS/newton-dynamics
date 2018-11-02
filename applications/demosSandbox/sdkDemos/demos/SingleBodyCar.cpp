@@ -320,6 +320,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
 
+		// add a differential 
+		dVehicleDifferentialInterface* const differential = vehicle->AddDifferential(rearLeft, rearRight);
+
+		// add and internal combustion engine
+		dVehicleEngineInterface::dEngineInfo engineInfo;
+		dVehicleEngineInterface* const engine = vehicle->AddEngine(engineInfo, differential);
+		engine;
+
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();

@@ -165,8 +165,8 @@ class dVehicleChassis: public dCustomControllerBase
 	DVEHICLE_API dVehicleChassis ();
 	dVehicleInterface* GetVehicle() {return m_vehicle;}
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
-
 	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
+	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl ();
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
@@ -206,6 +206,7 @@ class dVehicleChassis: public dCustomControllerBase
 	friend class dVehicleSolver;
 	friend class dVehicleManager;
 	friend class dVehicleVirtualTire;
+	friend class dVehicleVirtualDifferential;
 };
 
 

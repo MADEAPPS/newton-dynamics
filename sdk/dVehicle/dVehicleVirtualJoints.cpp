@@ -16,22 +16,9 @@
 #include "dVehicleVirtualTire.h"
 #include "dVehicleVirtualJoints.h"
 
-dKinematicLoopJoint::dKinematicLoopJoint()
-	:dComplementaritySolver::dBilateralJoint()
-	,m_owner0(NULL)
-	,m_owner1(NULL)
-	,m_isActive(false)
-{
-}
-
-void dKinematicLoopJoint::SetOwners(dVehicleNode* const owner0, dVehicleNode* const owner1)
-{
-	m_owner0 = owner0;
-	m_owner1 = owner1;
-	Init(m_owner0->GetBody(), m_owner1->GetBody());
-}
-
-
+// *******************************************************************
+// tire
+// *******************************************************************
 dTireJoint::dTireJoint()
 	:dComplementaritySolver::dBilateralJoint()
 {
@@ -81,7 +68,58 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 	m_tire->SetBrakeTorque(0.0f);
 }
 
+// *******************************************************************
+// differential attachment to chassis
+// *******************************************************************
+dDifferentialMount::dDifferentialMount()
+	:dComplementaritySolver::dBilateralJoint()
+	,m_slipeOn(false)
+{
+}
 
+void dDifferentialMount::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dComplementaritySolver::dBodyState* const chassis = m_state1;
+	dComplementaritySolver::dBodyState* const differential = m_state0;
+
+	const dVector& omega = chassis->GetOmega();
+	const dMatrix& matrix = differential->GetMatrix();
+
+	// three rigid attachment to chassis
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_front, omega);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_up, omega);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_right, omega);
+
+	// angular constraints	
+	AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
+	if (m_slipeOn) {
+		dAssert (0);
+	}
+}
+
+
+// *******************************************************************
+// loop base 
+// *******************************************************************
+dKinematicLoopJoint::dKinematicLoopJoint()
+	:dComplementaritySolver::dBilateralJoint()
+	,m_owner0(NULL)
+	,m_owner1(NULL)
+	,m_isActive(false)
+{
+}
+
+void dKinematicLoopJoint::SetOwners(dVehicleNode* const owner0, dVehicleNode* const owner1)
+{
+	m_owner0 = owner0;
+	m_owner1 = owner1;
+	Init(m_owner0->GetBody(), m_owner1->GetBody());
+}
+
+
+// *******************************************************************
+// tire contacts
+// *******************************************************************
 dTireContact::dTireContact()
 	:dKinematicLoopJoint()
 	,m_point(0.0f)
@@ -315,4 +353,19 @@ void dTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat
 	dVector p3(origin + m_lateralDir.Scale(scale * m_jointFeebackForce[2]));
 
 	debugContext->DrawLine(origin, p3);
+}
+
+
+
+// *******************************************************************
+// differential axle to tire
+// *******************************************************************
+dDifferentialJoint::dDifferentialJoint()	
+	:dKinematicLoopJoint()
+{
+}
+
+void dDifferentialJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dAssert (0);
 }

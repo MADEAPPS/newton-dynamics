@@ -157,9 +157,13 @@ dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobal
 
 dVehicleDifferentialInterface* dVehicleChassis::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
 {
-	return m_vehicle->AddDifferential(leftTire, rightTire, m_localFrame);
+	return m_vehicle->AddDifferential(leftTire, rightTire);
 }
 
+dVehicleEngineInterface* dVehicleChassis::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential)
+{
+	return m_vehicle->AddEngine(engineInfo, differential);
+}
 
 void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {

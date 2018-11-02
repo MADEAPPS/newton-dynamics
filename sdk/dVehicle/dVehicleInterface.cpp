@@ -19,12 +19,20 @@ dVehicleDifferentialInterface::dVehicleDifferentialInterface(dVehicleNode* const
 {
 }
 
+dVehicleEngineInterface::dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info,  dVehicleTireInterface* const differential)
+	:dVehicleNode(parent)
+	,m_info(info)
+	,m_differential(differential)
+{
+}
+
 dVehicleTireInterface::dVehicleTireInterface(dVehicleNode* const parent, const dTireInfo& info)
 	:dVehicleNode(parent)
 	,m_info(info)
 {
 	SetWorld(parent->GetWorld());
 }
+
 
 dVehicleInterface::dVehicleInterface(dVehicleChassis* const chassis)
 	:dVehicleNode(NULL)

@@ -13,6 +13,7 @@
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualTire.h"
+#include "dVehicleVirtualDifferential.h"
 
 dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	:dVehicleInterface(chassis)
@@ -45,10 +46,17 @@ dVehicleTireInterface* dVehicleSingleBody::AddTire (const dMatrix& locationInGlo
 	return new dVehicleVirtualTire(this, locationInGlobalSpace, tireInfo, localFrame);
 }
 
-dVehicleDifferentialInterface* dVehicleSingleBody::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire, const dMatrix& localFrame)
+dVehicleDifferentialInterface* dVehicleSingleBody::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
 {
+	return new dVehicleVirtualDifferential(this, leftTire, rightTire);
+}
+
+dVehicleEngineInterface* dVehicleSingleBody::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const diffrential)
+{
+//	return new dVehicleVirtualDifferential(this, leftTire, rightTire);
 	return NULL;
 }
+
 
 dMatrix dVehicleSingleBody::GetMatrix () const
 {

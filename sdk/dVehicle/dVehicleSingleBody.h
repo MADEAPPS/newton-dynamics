@@ -22,8 +22,9 @@ class dVehicleSingleBody: public dVehicleInterface
 	DVEHICLE_API virtual ~dVehicleSingleBody();
 
 	DVEHICLE_API dMatrix GetMatrix () const;
+	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
+	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const diffrential);
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame);
-	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire, const dMatrix& localFrame);
 
 	protected:
 	void RigidBodyToStates();
@@ -40,6 +41,7 @@ class dVehicleSingleBody: public dVehicleInterface
 
 	friend class dVehicleChassis;
 	friend class dVehicleVirtualTire;
+	friend class dVehicleVirtualDifferential;
 };
 
 

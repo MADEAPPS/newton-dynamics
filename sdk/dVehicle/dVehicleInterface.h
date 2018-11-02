@@ -25,6 +25,30 @@ class dVehicleDifferentialInterface: public dVehicleNode
 	virtual ~dVehicleDifferentialInterface() {}
 };
 
+
+class dVehicleEngineInterface: public dVehicleNode
+{
+	public:
+	class dEngineInfo
+	{
+		public:
+		dEngineInfo ()
+		{
+			memset (this, 0, sizeof (dEngineInfo));
+		}
+
+		dFloat m_mass;
+		dFloat m_armatureRadius;
+	};
+
+	DVEHICLE_API dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info,  dVehicleTireInterface* const differential);
+	virtual ~dVehicleEngineInterface() {}
+
+	dEngineInfo m_info;
+	dVehicleTireInterface* m_differential;
+};
+
+
 class dVehicleTireInterface: public dVehicleNode
 {
 	public:
@@ -42,6 +66,24 @@ class dVehicleTireInterface: public dVehicleNode
 		dTireInfo()
 		{
 			memset(this, 0, sizeof(dTireInfo));
+
+			dFloat gravity = 9.8f;
+			dFloat vehicleMass = 1000.0f;
+
+			m_mass = 25.0f;
+			m_radio = 0.5f;
+			m_width = 0.15f;
+			m_pivotOffset = 0.01f;
+			m_steerRate = 0.5f * dPi;
+			m_frictionCoefficient = 0.8f;
+			m_maxSteeringAngle = 25.0f * dDegreeToRad;
+
+			m_suspensionLength = 0.3f;
+			m_dampingRatio = 15.0f * vehicleMass;
+			m_springStiffness = dAbs(vehicleMass * 9.8f * 8.0f / m_suspensionLength);
+
+			m_corneringStiffness = dAbs(vehicleMass * gravity * 1.0f);
+			m_longitudinalStiffness = dAbs(vehicleMass * gravity * 1.0f);
 		}
 
 		dVector m_location;
@@ -84,7 +126,6 @@ class dVehicleTireInterface: public dVehicleNode
 	dTireInfo m_info;
 };
 
-
 class dVehicleInterface: public dVehicleNode
 {
 	public:
@@ -95,8 +136,9 @@ class dVehicleInterface: public dVehicleNode
 	virtual dVehicleInterface* GetAsVehicle() const {return (dVehicleInterface*)this;} 
 
 	protected:
+	virtual dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire) = 0;
+	virtual dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential) = 0;
 	virtual dVehicleTireInterface* AddTire(const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo, const dMatrix& localFrame) = 0;
-	virtual dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire, const dMatrix& localFrame) = 0;
 
 	friend class dVehicleChassis;
 };
