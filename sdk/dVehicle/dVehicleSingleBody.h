@@ -41,6 +41,7 @@ class dVehicleSingleBody: public dVehicleInterface
 
 	friend class dVehicleChassis;
 	friend class dVehicleVirtualTire;
+	friend class dVehicleVirtualEngine;
 	friend class dVehicleVirtualDifferential;
 };
 

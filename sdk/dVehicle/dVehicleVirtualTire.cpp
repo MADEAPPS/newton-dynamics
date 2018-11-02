@@ -179,7 +179,8 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
 	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetBody();
 	
-	const dMatrix chassisMatrix (chassis->GetBody()->GetMatrix());
+//	const dMatrix chassisMatrix (chassis->GetBody()->GetMatrix());
+	const dMatrix chassisMatrix(chassisBody->GetMatrix());
 	const dMatrix tireMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
 
 	dVector tireOmega(m_body.GetOmega());
@@ -300,7 +301,6 @@ void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectColli
 	}
 }
 
-
 void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id)
 {
 	dCustomJoint::dDebugDisplay* const debugContext = (dCustomJoint::dDebugDisplay*) userData;
@@ -313,7 +313,6 @@ void dVehicleVirtualTire::RenderDebugTire(void* userData, int vertexCount, const
 		p0 = p1;
 	}
 }
-
 
 void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {

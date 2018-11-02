@@ -19,7 +19,7 @@ dVehicleDifferentialInterface::dVehicleDifferentialInterface(dVehicleNode* const
 {
 }
 
-dVehicleEngineInterface::dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info,  dVehicleTireInterface* const differential)
+dVehicleEngineInterface::dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info, dVehicleDifferentialInterface* const differential)
 	:dVehicleNode(parent)
 	,m_info(info)
 	,m_differential(differential)

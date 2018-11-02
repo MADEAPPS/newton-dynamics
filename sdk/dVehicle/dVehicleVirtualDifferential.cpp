@@ -27,7 +27,6 @@ dVehicleVirtualDifferential::dVehicleVirtualDifferential(dVehicleNode* const par
 {
 	SetWorld(parent->GetWorld());
 
-	dVector com;
 	dVector inertia(0.0f);
 	dFloat mass = (m_leftTire->GetInfo().m_mass + m_rightTire->GetInfo().m_mass) * 0.8f;
 	dFloat radius = m_leftTire->GetInfo().m_radio * 0.75f;
@@ -79,4 +78,15 @@ void dVehicleVirtualDifferential::ApplyExternalForce()
 void dVehicleVirtualDifferential::Integrate(dFloat timestep)
 {
 	dVehicleDifferentialInterface::Integrate(timestep);
+
+	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
+	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetBody();
+
+	const dMatrix chassisMatrix(chassisBody->GetMatrix());
+
+	dVector omega(m_body.GetOmega());
+	dVector chassisOmega(chassisBody->GetOmega());
+	dVector localOmega(omega - chassisOmega);
+	m_diffOmega = chassisMatrix.m_up.DotProduct3(localOmega);
+	m_shaftOmega = chassisMatrix.m_right.DotProduct3(localOmega);
 }

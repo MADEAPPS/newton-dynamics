@@ -91,10 +91,36 @@ void dDifferentialMount::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_right, omega);
 
 	// angular constraints	
-	AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
+	AddAngularRowJacobian(constraintParams, matrix.m_front, omega, 0.0f);
 	if (m_slipeOn) {
 		dAssert (0);
 	}
+}
+
+// *******************************************************************
+// differential attachment to chassis
+// *******************************************************************
+dEngineJoint::dEngineJoint()
+	:dComplementaritySolver::dBilateralJoint()
+{
+}
+
+void dEngineJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dComplementaritySolver::dBodyState* const engine = m_state0;
+	dComplementaritySolver::dBodyState* const chassis = m_state1;
+
+	const dVector& omega = chassis->GetOmega();
+	const dMatrix& matrix = engine->GetMatrix();
+
+	// three rigid attachment to chassis
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_front, omega);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_up, omega);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_right, omega);
+
+	// angular constraints	
+	AddAngularRowJacobian(constraintParams, matrix.m_front, omega, 0.0f);
+	AddAngularRowJacobian(constraintParams, matrix.m_up, omega, 0.0f);
 }
 
 

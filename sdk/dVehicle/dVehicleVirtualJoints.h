@@ -23,7 +23,6 @@ class dVehicleVirtualTire;
 #define D_TIRE_MAX_ELASTIC_DEFORMATION		(0.05f)
 #define D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS (10.0f / D_TIRE_MAX_ELASTIC_DEFORMATION)
 
-
 class dTireJoint: public dComplementaritySolver::dBilateralJoint
 {
 	public:
@@ -44,6 +43,14 @@ class dDifferentialMount: public dComplementaritySolver::dBilateralJoint
 	bool m_slipeOn;
 };
 
+class dEngineJoint: public dComplementaritySolver::dBilateralJoint
+{
+	public:
+	dEngineJoint();
+
+	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+};
 
 class dKinematicLoopJoint : public dComplementaritySolver::dBilateralJoint
 {

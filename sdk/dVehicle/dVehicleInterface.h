@@ -17,14 +17,12 @@
 
 class dVehicleChassis;
 
-
 class dVehicleDifferentialInterface: public dVehicleNode
 {
 	public:
 	DVEHICLE_API dVehicleDifferentialInterface(dVehicleNode* const parent);
 	virtual ~dVehicleDifferentialInterface() {}
 };
-
 
 class dVehicleEngineInterface: public dVehicleNode
 {
@@ -41,11 +39,11 @@ class dVehicleEngineInterface: public dVehicleNode
 		dFloat m_armatureRadius;
 	};
 
-	DVEHICLE_API dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info,  dVehicleTireInterface* const differential);
+	DVEHICLE_API dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info, dVehicleDifferentialInterface* const differential);
 	virtual ~dVehicleEngineInterface() {}
 
 	dEngineInfo m_info;
-	dVehicleTireInterface* m_differential;
+	dVehicleDifferentialInterface* m_differential;
 };
 
 
