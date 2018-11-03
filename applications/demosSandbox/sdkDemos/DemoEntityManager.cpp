@@ -330,7 +330,7 @@ DemoEntityManager::DemoEntityManager ()
 	Cleanup ();
 	ResetTimer();
 
-//	m_showUI = true;
+	m_showUI = false;
 //	m_showAABB = false;
 //	m_showContactPoints = false;
 //	m_hideVisualMeshes = true;
