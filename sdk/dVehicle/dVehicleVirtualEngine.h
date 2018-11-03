@@ -38,7 +38,7 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 		public:
 		dEngineMetricInfo(const dEngineInfo& info);
 		dFloat m_peakPowerTorque;
-		dFloat m_crownGearRatio;
+		//dFloat m_crownGearRatio;
 
 		dEngineTorqueNode m_torqueCurve[6];
 	};

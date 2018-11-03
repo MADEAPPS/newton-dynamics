@@ -99,18 +99,14 @@ void dVehicleVirtualEngine::InitEngineTorqueCurve()
 //	dFloat tireRadio = tire->m_radio;
 //	m_metricInfo.m_crownGearRatio = tireRadio * m_metricInfo.m_rpmAtPeakHorsePower / (m_metricInfo.m_vehicleTopSpeed * topGearRatio);
 
-m_metricInfo.m_crownGearRatio = 1.0f;
-
 	// bake crown gear with the engine power curve
-	//m_metricInfo.m_idleFriction *= m_metricInfo.m_crownGearRatio;
-	m_metricInfo.m_idleTorque *= m_metricInfo.m_crownGearRatio;
-	m_metricInfo.m_peakTorque *= m_metricInfo.m_crownGearRatio;
-	m_metricInfo.m_peakPowerTorque *= m_metricInfo.m_crownGearRatio;
-
-	m_metricInfo.m_rpmAtIdleTorque /= m_metricInfo.m_crownGearRatio;
-	m_metricInfo.m_rpmAtPeakTorque /= m_metricInfo.m_crownGearRatio;
-	m_metricInfo.m_rpmAtPeakHorsePower /= m_metricInfo.m_crownGearRatio;
-	m_metricInfo.m_rpmAtRedLine /= m_metricInfo.m_crownGearRatio;
+	//m_metricInfo.m_idleTorque *= m_metricInfo.m_crownGearRatio;
+	//m_metricInfo.m_peakTorque *= m_metricInfo.m_crownGearRatio;
+	//m_metricInfo.m_peakPowerTorque *= m_metricInfo.m_crownGearRatio;
+	//m_metricInfo.m_rpmAtIdleTorque /= m_metricInfo.m_crownGearRatio;
+	//m_metricInfo.m_rpmAtPeakTorque /= m_metricInfo.m_crownGearRatio;
+	//m_metricInfo.m_rpmAtPeakHorsePower /= m_metricInfo.m_crownGearRatio;
+	//m_metricInfo.m_rpmAtRedLine /= m_metricInfo.m_crownGearRatio;
 
 	m_metricInfo.m_torqueCurve[0] = dEngineTorqueNode(0.0f, m_metricInfo.m_idleTorque);
 	m_metricInfo.m_torqueCurve[1] = dEngineTorqueNode(m_metricInfo.m_rpmAtIdleTorque, m_metricInfo.m_idleTorque);
