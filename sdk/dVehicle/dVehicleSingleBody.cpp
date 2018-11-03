@@ -13,6 +13,7 @@
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualTire.h"
+#include "dVehicleVirtualEngine.h"
 #include "dVehicleVirtualDifferential.h"
 
 dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
@@ -51,18 +52,15 @@ dVehicleDifferentialInterface* dVehicleSingleBody::AddDifferential(dVehicleTireI
 	return new dVehicleVirtualDifferential(this, leftTire, rightTire);
 }
 
-dVehicleEngineInterface* dVehicleSingleBody::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const diffrential)
+dVehicleEngineInterface* dVehicleSingleBody::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential)
 {
-//	return new dVehicleVirtualDifferential(this, leftTire, rightTire);
-	return NULL;
+	return new dVehicleVirtualEngine(this, engineInfo, differential);
 }
-
 
 dMatrix dVehicleSingleBody::GetMatrix () const
 {
 	return m_body.GetMatrix();
 }
-
 
 void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {

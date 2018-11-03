@@ -33,19 +33,39 @@ class dVehicleEngineInterface: public dVehicleNode
 		dEngineInfo ()
 		{
 			memset (this, 0, sizeof (dEngineInfo));
+
+			m_mass = 50.0f;
+			m_armatureRadius = 0.2f;
+			m_idleTorque = 100.0f;				// IDLE_TORQUE
+			m_rpmAtIdleTorque = 450.0f;			// IDLE_TORQUE_RPM
+			m_peakTorque = 500.0f;				// PEAK_TORQUE
+			m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM
+			m_peakHorsePower = 400.0f;			// PEAK_HP
+			m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
+			m_rpmAtRedLine = 6000.0f;			// REDLINE_TORQUE_RPM
 		}
 
 		dFloat m_mass;
 		dFloat m_armatureRadius;
+
+		dFloat m_idleTorque;
+		dFloat m_rpmAtIdleTorque;
+		dFloat m_peakTorque;
+		dFloat m_rpmAtPeakTorque;
+		dFloat m_peakHorsePower;
+		dFloat m_rpmAtPeakHorsePower;
+		dFloat m_rpmAtRedLine;
 	};
 
 	DVEHICLE_API dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info, dVehicleDifferentialInterface* const differential);
 	virtual ~dVehicleEngineInterface() {}
 
+	const dEngineInfo& GetInfo() const { return m_info; }
+	DVEHICLE_API void SetInfo(const dEngineInfo& info) { m_info = info; }
+	
 	dEngineInfo m_info;
 	dVehicleDifferentialInterface* m_differential;
 };
-
 
 class dVehicleTireInterface: public dVehicleNode
 {
@@ -140,7 +160,5 @@ class dVehicleInterface: public dVehicleNode
 
 	friend class dVehicleChassis;
 };
-
-
 #endif 
 

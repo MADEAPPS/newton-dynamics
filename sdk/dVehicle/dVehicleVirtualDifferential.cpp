@@ -27,13 +27,12 @@ dVehicleVirtualDifferential::dVehicleVirtualDifferential(dVehicleNode* const par
 {
 	SetWorld(parent->GetWorld());
 
-	dVector inertia(0.0f);
 	dFloat mass = (m_leftTire->GetInfo().m_mass + m_rightTire->GetInfo().m_mass) * 0.8f;
 	dFloat radius = m_leftTire->GetInfo().m_radio * 0.75f;
-	inertia = dVector(0.7f * mass * radius * radius);
+	dFloat inertia = 0.7f * mass * radius * radius;
 
 	m_body.SetMass(mass);
-	m_body.SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
+	m_body.SetInertia(inertia, inertia, inertia);
 	m_body.UpdateInertia();
 
 	// set the tire joint
