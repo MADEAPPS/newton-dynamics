@@ -698,7 +698,7 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, in
 
 
 
-NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMatrix, const dVector& originalSize, PrimitiveType type, int materialID__)
+NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix& srcMatrix, const dVector& originalSize, PrimitiveType type, int materialID__)
 {
 	dVector size (originalSize);
 
@@ -1031,7 +1031,7 @@ class CollsionTreeFaceMap
 };
 
 
-NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const entity, int materialID, bool optimize)
+NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* const entity, int materialID, bool optimize)
 {
 	// measure the time to build a collision tree
 	unsigned64 timer0 = dGetTimeInMicrosenconds();

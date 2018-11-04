@@ -321,6 +321,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_bodyPart:
 			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_tirePart:
 			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_landPart:
+			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_landPart:
 			//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_linkPart:
 			//case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
 			//case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_linkPart:
@@ -328,6 +329,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			//case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
 			//case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_linkPart:
 			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_landPart:
+			case SERVO_VEHICLE_DEFINITION::m_landPart | SERVO_VEHICLE_DEFINITION::m_bodyPart:
 			{
 				return 1;
 				break;
@@ -343,9 +345,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	static int CompoundSubCollisionAABBOverlap (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 	{
-		dAssert(0);
-		return 0;
-/*
 		dAssert(collisionNode0);
 		NewtonCollision* const collision0 = NewtonCompoundCollisionGetCollisionFromNode (NewtonBodyGetCollision(body0), collisionNode0);
 		NewtonCollision* const collision1 = collisionNode1 ? NewtonCompoundCollisionGetCollisionFromNode(NewtonBodyGetCollision(body1), collisionNode1) : NewtonBodyGetCollision(body1);
@@ -360,8 +359,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_linkPart:			
 			//case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_tireInnerRing:
 			//case SERVO_VEHICLE_DEFINITION::m_linkPart | SERVO_VEHICLE_DEFINITION::m_tireInnerRing:
+			case SERVO_VEHICLE_DEFINITION::m_terrain | SERVO_VEHICLE_DEFINITION::m_landPart:
 			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_terrain:
 			case SERVO_VEHICLE_DEFINITION::m_tirePart | SERVO_VEHICLE_DEFINITION::m_landPart:
+			case SERVO_VEHICLE_DEFINITION::m_bodyPart | SERVO_VEHICLE_DEFINITION::m_landPart:
 			case SERVO_VEHICLE_DEFINITION::m_tireInnerRing | SERVO_VEHICLE_DEFINITION::m_linkPart:
 			{
 				return 1;
@@ -381,7 +382,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 				return 0;
 			}
 		}
-*/
 	}
 	
 	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
@@ -864,6 +864,43 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 	}
 };
 
+static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& location)
+{
+	dMatrix matrix (location);
+	matrix.m_posit.m_x += 4.0f;
+
+	NewtonWorld* const world = scene->GetNewton();
+	NewtonCollision* const bar = NewtonCreateBox (world, 0.25f, 0.25f, 2.4f, SERVO_VEHICLE_DEFINITION::m_landPart, NULL); 
+	NewtonCollision* const bell = NewtonCreateBox (world, 1.0f, 1.0f, 0.25f, SERVO_VEHICLE_DEFINITION::m_landPart, NULL); 
+
+	NewtonCollision* const collision = NewtonCreateCompoundCollision(scene->GetNewton(), SERVO_VEHICLE_DEFINITION::m_landPart);
+	NewtonCompoundCollisionBeginAddRemove(collision);
+
+	NewtonCompoundCollisionAddSubCollision(collision, bar);
+
+	dMatrix offset (dGetIdentityMatrix());
+	void* const leftWing = NewtonCompoundCollisionAddSubCollision (collision, bell);
+	offset.m_posit.m_z = -1.0f;
+	NewtonCompoundCollisionSetSubCollisionMatrix (collision, leftWing, &offset[0][0]);	
+
+	void* const rightWing = NewtonCompoundCollisionAddSubCollision (collision, bell);
+	offset.m_posit.m_z = 1.0f;
+	NewtonCompoundCollisionSetSubCollisionMatrix(collision, rightWing, &offset[0][0]);
+
+	NewtonCompoundCollisionEndAddRemove(collision);
+
+	NewtonDestroyCollision(bar);
+	NewtonDestroyCollision(bell);
+
+	DemoMesh* const mesh = new DemoMesh ("weight", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+
+	dFloat mass = 500.0f;
+	CreateSimpleSolid (scene, mesh, mass, matrix, collision, 0, false);
+
+	mesh->Release();
+	NewtonDestroyCollision(collision);
+}
+
 void ServoJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
@@ -889,6 +926,10 @@ void ServoJoints (DemoEntityManager* const scene)
 	// load a the mesh of the articulate vehicle
 	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
+
+	// place heavy load to show reproduce black bird dream problems
+	MakeHeavyLoad (scene, matrix);
+
 
 	// add some object to play with
 //	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);

@@ -73,8 +73,8 @@ void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matri
 
 void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex);
 
-NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const entity, int materialID, bool optimize);
-NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& offsetMatrix, const dVector& size, PrimitiveType type, int materialID);
+NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* const entity, int materialID, bool optimize);
+NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix& offsetMatrix, const dVector& size, PrimitiveType type, int materialID);
 
 NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize);
 NewtonBody* CreateSimpleBody(NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
