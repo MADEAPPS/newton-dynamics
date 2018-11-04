@@ -198,7 +198,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 			DemoEntity* const playerEnt = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
 			
-//			dEngineController* const engine = m_player->m_controller->GetEngine();
+			dVehicleEngineInterface* const engine = m_player->GetEngineControl()->GetEngine();
 //			if (engine) {
 			if (1) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -207,15 +207,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 				// draw the tachometer
 				dFloat x = gageSize / 2 + 20.0f;
-				//dFloat rpm = engine->GetRPM() / engine->GetRedLineRPM();
-				dFloat rpm = 0.5f;
+				dFloat rpm = engine->GetRpm() / engine->GetRedLineRpm();
 				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
 
 				// draw the odometer
 				x += gageSize;
 				//dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
 				//dFloat speed = dAbs(engine->GetSpeed()) / engine->GetTopSpeed();
-				dFloat speed = 0.3f;
+				dFloat speed = 0.0f;
 				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
 
 				// draw the current gear
@@ -370,7 +369,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_pivotOffset = 0.01f;
 		tireInfo.m_steerRate = 0.5f * dPi;
 		tireInfo.m_frictionCoefficient = 0.8f;
-		tireInfo.m_maxSteeringAngle = 20.0f * dDegreeToRad;
+		tireInfo.m_maxSteeringAngle = 25.0f * dDegreeToRad;
 		
 		tireInfo.m_suspensionLength = 0.22f;
 		tireInfo.m_dampingRatio = 15.0f * vehicleMass;
@@ -469,8 +468,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_rpmAtRedLine = 6000.0f;		// REDLINE_TORQUE_RPM
 
 		dVehicleEngineInterface* const engine = vehicle->AddEngine(engineInfo, differential);
-		engine;
-
+		// Set Engine Control
+		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
+		engineControl->SetEngine(engine);
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -550,7 +550,7 @@ axisCount = 0;
 			//dTrace (("%d %d %d\n", gear, ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 */
 		} else {
-			//driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
+			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
 			//driverInput.m_clutchPedal = 1.0f - scene->GetKeyState('K') ? 1.0f : 0.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;

@@ -48,8 +48,12 @@ class dEngineJoint: public dComplementaritySolver::dBilateralJoint
 	public:
 	dEngineJoint();
 
+	void SetTorqueAndRpm (dFloat torque, dFloat rpm);
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
+	dFloat m_targetRpm;
+	dFloat m_targetTorque;
 };
 
 class dKinematicLoopJoint : public dComplementaritySolver::dBilateralJoint
@@ -77,11 +81,16 @@ class dTireContact: public dKinematicLoopJoint
 	{
 		public:
 		dTireModel ()
-			:m_alingMoment(0.0f)
+			:m_lateralSlip(0.0f)
+			,m_longitodinalSlip(0.0f)
+			,m_alingMoment(0.0f)
 			,m_lateralForce(0.0f)
 			,m_longitunalForce(0.0f)
 		{
 		}
+
+		dFloat m_lateralSlip;
+		dFloat m_longitodinalSlip;
 		dFloat m_alingMoment;
 		dFloat m_lateralForce;
 		dFloat m_longitunalForce;

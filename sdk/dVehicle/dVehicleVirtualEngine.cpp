@@ -149,6 +149,23 @@ void dVehicleVirtualEngine::Debug(dCustomJoint::dDebugDisplay* const debugContex
 	dVehicleEngineInterface::Debug(debugContext);
 }
 
+dFloat dVehicleVirtualEngine::GetRpm() const
+{
+	return -m_omega * 9.549f;
+}
+
+dFloat dVehicleVirtualEngine::GetRedLineRpm() const
+{
+	return m_metricInfo.m_rpmAtRedLine * 9.549f;
+}
+
+void dVehicleVirtualEngine::SetThrottle (dFloat throttle)
+{
+	dFloat rmp = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
+	dFloat torque = 500.0f;
+	m_joint.SetTorqueAndRpm(torque, rmp);
+}
+
 void dVehicleVirtualEngine::ApplyExternalForce()
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;

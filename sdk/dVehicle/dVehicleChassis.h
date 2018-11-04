@@ -168,7 +168,8 @@ class dVehicleChassis: public dCustomControllerBase
 	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
 	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
 
-	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl ();
+	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
+	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl ();
 
@@ -200,6 +201,7 @@ class dVehicleChassis: public dCustomControllerBase
 
 	dVehicleInterface* m_vehicle;
 	dVehicleBrakeControl* m_brakeControl;
+	dVehicleEngineControl* m_engineControl;
 	dVehicleBrakeControl* m_handBrakeControl;
 	dVehicleSteeringControl* m_steeringControl;
 

@@ -195,12 +195,12 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 		}
 	}
 
-static int xxx;
-xxx++;
-if (xxx > 2000) {
-if ((m_solverIndex == 2) || (m_solverIndex == 3))
-m_omega = -20.0f;
-}
+//static int xxx;
+//xxx++;
+//if (xxx > 2000) {
+//if ((m_solverIndex == 2) || (m_solverIndex == 3))
+//m_omega = -20.0f;
+//}
 
 	m_tireAngle += m_omega * timestep;
 	while (m_tireAngle < 0.0f)

@@ -14,7 +14,6 @@
 #include "dVehicleInterface.h"
 #include "dVehicleDashControl.h"
 
-
 dVehicleDashControl::dVehicleDashControl(dVehicleChassis* const vehicle)
 	:dCustomAlloc()
 	,m_vehicle(vehicle)
@@ -41,6 +40,27 @@ bool dVehicleDashControl::ParamChanged() const
 		m_timer = 30;
 	}
 	return m_timer > 0;
+}
+
+// ****************************************************************************
+//
+// ****************************************************************************
+dVehicleEngineControl::dVehicleEngineControl(dVehicleChassis* const vehicle)
+	:dVehicleDashControl(vehicle)
+	,m_engine(NULL)
+{
+}
+
+void dVehicleEngineControl::SetEngine (dVehicleEngineInterface* const engine)
+{
+	m_engine = engine; 
+}
+
+void dVehicleEngineControl::Update(dFloat timestep)
+{
+	if (m_engine) {
+		m_engine->SetThrottle (m_param);
+	}
 }
 
 // ****************************************************************************
@@ -96,8 +116,6 @@ void dVehicleSteeringControl::Update(dFloat timestep)
 		m_isSleeping &= dAbs(targetAngle - angle) < 1.0e-4f;
 	}
 }
-
-
 
 // ****************************************************************************
 //

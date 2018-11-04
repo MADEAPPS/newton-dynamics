@@ -16,6 +16,8 @@
 #include "dVehicleVirtualTire.h"
 #include "dVehicleVirtualJoints.h"
 
+#define D_VEHICLE_STOP_TORQUE	10000.0f
+
 // *******************************************************************
 // tire
 // *******************************************************************
@@ -102,7 +104,15 @@ void dDifferentialMount::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 // *******************************************************************
 dEngineJoint::dEngineJoint()
 	:dComplementaritySolver::dBilateralJoint()
+	,m_targetRpm(0.0f)
+	,m_targetTorque(D_VEHICLE_STOP_TORQUE)
 {
+}
+
+void dEngineJoint::SetTorqueAndRpm (dFloat torque, dFloat rpm)
+{
+	m_targetRpm = -dAbs (rpm);
+	m_targetTorque = dAbs (torque);
 }
 
 void dEngineJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
@@ -121,6 +131,23 @@ void dEngineJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, matrix.m_front, omega, 0.0f);
 	AddAngularRowJacobian(constraintParams, matrix.m_up, omega, 0.0f);
+
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
+
+	const dVector& omega0 = m_state0->GetOmega();
+	const dVector& omega1 = m_state1->GetOmega();
+	const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+	const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+	const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+	dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+	dFloat relOmega = m_targetRpm - w;
+	constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
+
+	bool test = (m_targetRpm > -0.1f) && (w > -1.0f);
+	dFloat targetTorque = test ? D_VEHICLE_STOP_TORQUE : m_targetTorque;
+	constraintParams->m_jointLowFrictionCoef[index] = -targetTorque;
+	constraintParams->m_jointHighFrictionCoef[index] = targetTorque;
 }
 
 
@@ -227,6 +254,8 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloa
 	} 
 	mag = dMax (mag, dFloat(1.0f));
 
+	m_tireModel.m_longitodinalSlip = u * invden;
+	m_tireModel.m_lateralSlip = v * invden * (1.0f / D_TIRE_MAX_LATERAL_SLIP);
 	m_tireModel.m_alingMoment = 0.0f;
 	m_tireModel.m_lateralForce = y * f / mag;
 	m_tireModel.m_longitunalForce = x * f / mag;
@@ -260,8 +289,8 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 
 	int lateralIndex = 0;
 	int longitudinaIndex = 0;
-	dFloat lateralSlip = 0.0f;
-	dFloat longitudialSlip = 0.0f;
+	dFloat lateralSlip = 0.4f;
+	dFloat longitudialSlip = 0.4f;
 	dFloat frictionCoef = m_staticFriction;
 	{
 		// longitudinal force row
@@ -279,7 +308,6 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		if (!((omegaSpeed < 0.1f) && (linearSpeed < 0.1f))) {
 			if (relSpeed < 0.0f) {
 				dFloat speedDen = dMax (linearSpeed, dFloat(0.01f));
-				//longitudialSlip = dAbs (relSpeed / speedDen);
 				longitudialSlip = dClamp(dAbs (relSpeed / speedDen), dFloat(0.0f), dFloat(20.0f));
 				dFloat slipLimit = 2.0f * dMax (linearSpeed, dFloat(0.0f));
 				if ((omegaSpeed - slipLimit) > 0.0f) {
@@ -287,7 +315,6 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 				}
 			} else {
 				dFloat speedDen = dMax(omegaSpeed, dFloat(0.01f));
-				//longitudialSlip = dAbs (relSpeed / speedDen);
 				longitudialSlip = dClamp (dAbs (relSpeed / speedDen), dFloat(0.0f), dFloat(4.0f));
 				dFloat slipLimit = 2.0f * dMax(omegaSpeed, dFloat(0.0f));
 				if ((linearSpeed - slipLimit) > 0.0f) {

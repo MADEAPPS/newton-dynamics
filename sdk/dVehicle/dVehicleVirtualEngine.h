@@ -48,12 +48,15 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	DVEHICLE_API virtual ~dVehicleVirtualEngine();
 
 	protected:
+	virtual dFloat GetRpm() const;
+	virtual dFloat GetRedLineRpm() const;
+
 	void ApplyExternalForce();
-	void Integrate(dFloat timestep);
-
 	void InitEngineTorqueCurve();
+	void Integrate(dFloat timestep);
+	void SetThrottle (dFloat throttle);
 	void SetInfo(const dEngineInfo& info);
-
+	
 	dComplementaritySolver::dBilateralJoint* GetJoint();
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 

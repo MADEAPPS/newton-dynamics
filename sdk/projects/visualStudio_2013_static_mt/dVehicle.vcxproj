@@ -53,6 +53,7 @@
     <ClCompile Include="..\..\dVehicle\dVehicleSingleBody.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleVirtualDifferential.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleVirtualEngine.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleVirtualJoints.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleVirtualTire.cpp" />
   </ItemGroup>
@@ -66,6 +67,7 @@
     <ClInclude Include="..\..\dVehicle\dVehicleSingleBody.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleVirtualDifferential.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleVirtualEngine.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleVirtualJoints.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleVirtualTire.h" />
   </ItemGroup>

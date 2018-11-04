@@ -60,6 +60,10 @@ class dVehicleEngineInterface: public dVehicleNode
 	DVEHICLE_API dVehicleEngineInterface(dVehicleNode* const parent, const dEngineInfo& info, dVehicleDifferentialInterface* const differential);
 	virtual ~dVehicleEngineInterface() {}
 
+	virtual dFloat GetRpm () const {return 0.0f;}
+	virtual dFloat GetRedLineRpm () const {return 1.0f;}
+	virtual void SetThrottle (dFloat throttle) {}
+
 	const dEngineInfo& GetInfo() const { return m_info; }
 	DVEHICLE_API void SetInfo(const dEngineInfo& info) { m_info = info; }
 	

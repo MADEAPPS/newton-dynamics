@@ -37,15 +37,28 @@ class dVehicleDashControl: public dCustomAlloc
 	mutable dFloat m_timer;
 };
 
+class dVehicleEngineControl: public dVehicleDashControl 
+{
+	public:
+	DVEHICLE_API dVehicleEngineControl(dVehicleChassis* const vehicle);
+	DVEHICLE_API void SetEngine (dVehicleEngineInterface* const engine);
+
+	dVehicleEngineInterface* GetEngine() const {return m_engine;}
+
+	virtual void Update(dFloat timestep);
+
+	private:
+	dVehicleEngineInterface* m_engine;
+};
 
 class dVehicleTireControl: public dVehicleDashControl 
 {
 	public:
 	DVEHICLE_API dVehicleTireControl(dVehicleChassis* const vehicle);
 	DVEHICLE_API virtual ~dVehicleTireControl();
-	
-	DVEHICLE_API void AddTire(dVehicleTireInterface* const tire);
 
+	DVEHICLE_API void AddTire(dVehicleTireInterface* const tire);
+	
 	protected:
 	dList<dVehicleTireInterface*> m_tires;
 	bool m_isSleeping;
