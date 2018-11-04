@@ -130,8 +130,9 @@ void dVehicleSingleBody::ApplyExternalForce()
 	NewtonBodyGetTorque(m_newtonBody, &torque[0]);
 	chassisBody->SetTorque(torque);
 
-	const dVector& updir = chassisBody->GetMatrix().m_up;
-	m_gravity = updir.Scale (chassisBody->GetInvMass() * updir.DotProduct3(force));
+	//const dVector& updir = chassisBody->GetMatrix().m_up;
+	//m_gravity = updir.Scale (chassisBody->GetInvMass() * updir.DotProduct3(force));
+	m_gravity = force.Scale(chassisBody->GetInvMass());
 	dVehicleInterface::ApplyExternalForce();
 }
 
@@ -156,10 +157,12 @@ void dVehicleSingleBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	dVector p2(p0 + matrix.m_front.Scale(2.0f));
 	debugContext->DrawLine(p0, p2);
 
-
 	//draw vehicle weight
-	debugContext->SetColor(dVector(0.0f, 0.0f, 0.0f, 1.0f));
-	// for now weight is normalize to 1.0
-	dVector p3(p0 + matrix.m_up.Scale(2.0f));
-	debugContext->DrawLine(p0, p3);
+	if (m_gravity.DotProduct3(m_gravity) > 0.1) {
+		// for now weight is normalize to 2.0
+		debugContext->SetColor(dVector(0.0f, 0.0f, 1.0f, 1.0f));
+		dVector gravity (m_gravity.Normalize());
+		dVector p3(p0 - gravity.Scale (2.0f));
+		debugContext->DrawLine(p0, p3);
+	}
 }

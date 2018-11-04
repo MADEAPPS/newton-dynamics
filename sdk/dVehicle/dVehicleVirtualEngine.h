@@ -40,6 +40,8 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 		dFloat m_peakPowerTorque;
 		//dFloat m_crownGearRatio;
 
+		dFloat GetTorque (dFloat rpm) const;
+
 		dEngineTorqueNode m_torqueCurve[6];
 	};
 	public:

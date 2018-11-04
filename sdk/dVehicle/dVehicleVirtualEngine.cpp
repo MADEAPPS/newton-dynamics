@@ -44,6 +44,28 @@ dVehicleVirtualEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& i
 	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
 }
 
+dFloat dVehicleVirtualEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
+{
+	dAssert(rpm >= -0.1f);
+	const int maxIndex = sizeof (m_torqueCurve) / sizeof (m_torqueCurve[0]) - 1;
+	rpm = dClamp(rpm, dFloat(0.0f), m_torqueCurve[maxIndex - 1].m_rpm);
+
+	for (int i = 1; i < maxIndex; i++) {
+		if (m_torqueCurve[i].m_rpm >= rpm) {
+			dFloat rpm0 = m_torqueCurve[i - 1].m_rpm;
+			dFloat rpm1 = m_torqueCurve[i].m_rpm;
+
+			dFloat torque0 = m_torqueCurve[i - 1].m_torque;
+			dFloat torque1 = m_torqueCurve[i].m_torque;
+			dFloat torque = torque0 + (rpm - rpm0) * (torque1 - torque0) / (rpm1 - rpm0);
+			return torque;
+		}
+	}
+
+	return m_torqueCurve[maxIndex - 1].m_rpm;
+}
+
+
 dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const dEngineInfo& info, dVehicleDifferentialInterface* const differential)
 	:dVehicleEngineInterface(parent, info, differential)
 	,m_joint()
@@ -161,9 +183,9 @@ dFloat dVehicleVirtualEngine::GetRedLineRpm() const
 
 void dVehicleVirtualEngine::SetThrottle (dFloat throttle)
 {
-	dFloat rmp = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
-	dFloat torque = 500.0f;
-	m_joint.SetTorqueAndRpm(torque, rmp);
+	dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
+	dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
+	m_joint.SetTorqueAndRpm(torque, omega);
 }
 
 void dVehicleVirtualEngine::ApplyExternalForce()
