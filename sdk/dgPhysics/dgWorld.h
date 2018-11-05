@@ -462,6 +462,10 @@ class dgWorld
 	
 	void AddSentinelBody();
 	void InitConvexCollision ();
+
+	DG_INLINE dgBody* FindRoot(dgBody* const body) const;
+	DG_INLINE dgBody* FindRootAndSplit(dgBody* const body) const;
+	DG_INLINE void UnionSet(const dgConstraint* const joint) const;
 	
 	virtual void Execute (dgInt32 threadID);
 	virtual void TickCallback (dgInt32 threadID);
@@ -610,5 +614,47 @@ inline dgInt32 dgWorld::GetSolverIterations() const
 {
 	return m_solverIterations;
 }
+
+DG_INLINE dgBody* dgWorld::FindRoot(dgBody* const body) const
+{
+	dgBody* node = body;
+	for (; node->m_disjointInfo.m_parent != node; node = node->m_disjointInfo.m_parent);
+	return node;
+}
+
+DG_INLINE dgBody* dgWorld::FindRootAndSplit(dgBody* const body) const
+{
+	dgBody* node = body;
+	while (node->m_disjointInfo.m_parent != node) {
+		dgBody* const prev = node;
+		node = node->m_disjointInfo.m_parent;
+		prev->m_disjointInfo.m_parent = node->m_disjointInfo.m_parent;
+	}
+	return node;
+}
+
+DG_INLINE void dgWorld::UnionSet(const dgConstraint* const joint) const
+{
+	dgBody* const body0 = joint->GetBody0();
+	dgBody* const body1 = joint->GetBody1();
+	dgBody* root0 = FindRootAndSplit(body0);
+	dgBody* root1 = FindRootAndSplit(body1);
+	if (root0 != root1) {
+		if (root0->m_disjointInfo.m_rank < root1->m_disjointInfo.m_rank) {
+			dgSwap(root0, root1);
+		}
+		root1->m_disjointInfo.m_parent = root0;
+		if (root0->m_disjointInfo.m_rank == root1->m_disjointInfo.m_rank) {
+			root0->m_disjointInfo.m_rank += 1;
+			dgAssert(root0->m_disjointInfo.m_rank <= 6);
+		}
+		root0->m_disjointInfo.m_rowCount += root1->m_disjointInfo.m_rowCount;
+		root0->m_disjointInfo.m_bodyCount += root1->m_disjointInfo.m_bodyCount;
+		root0->m_disjointInfo.m_jointCount += root1->m_disjointInfo.m_jointCount;
+	}
+	root0->m_disjointInfo.m_jointCount++;
+	root0->m_disjointInfo.m_rowCount += joint->m_maxDOF;
+}
+
 
 #endif

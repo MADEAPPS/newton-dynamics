@@ -109,8 +109,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_dynamicsLru = m_markLru;
 
 	BuildClusters(timestep);
-//	BuildClustersOld(timestep);
-
 	const dgInt32 threadCount = world->GetThreadCount();	
 
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
@@ -177,53 +175,13 @@ dgInt32 dgWorldDynamicUpdate::CompareKey(dgInt32 highA, dgInt32 lowA, dgInt32 hi
 dgInt32 dgWorldDynamicUpdate::CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void*)
 {
 	return CompareKey(infoA->m_jointCount, infoA->m_setId, infoB->m_jointCount, infoB->m_setId);
-	}
+}
 
 dgInt32 dgWorldDynamicUpdate::CompareClusterInfos(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed)
 {
 	return CompareKey(clusterA->m_jointCount, clusterA->m_bodyStart, clusterB->m_jointCount, clusterB->m_bodyStart);
 }
 
-DG_INLINE dgBody* dgWorldDynamicUpdate::FindRoot(dgBody* const body) const
-{
-	dgBody* node = body;
-	for (; node->m_disjointInfo.m_parent != node; node = node->m_disjointInfo.m_parent);
-	return node;
-}
-
-DG_INLINE dgBody* dgWorldDynamicUpdate::FindRootAndSplit(dgBody* const body) const
-{
-	dgBody* node = body;
-	while (node->m_disjointInfo.m_parent != node) {
-		dgBody* const prev = node;
-		node = node->m_disjointInfo.m_parent;
-		prev->m_disjointInfo.m_parent = node->m_disjointInfo.m_parent;
-	}
-	return node;
-}
-
-DG_INLINE void dgWorldDynamicUpdate::UnionSet(const dgConstraint* const joint) const
-{
-	dgBody* const body0 = joint->GetBody0();
-	dgBody* const body1 = joint->GetBody1();
-	dgBody* root0 = FindRootAndSplit(body0);
-	dgBody* root1 = FindRootAndSplit(body1);
-	if (root0 != root1) {
-		if (root0->m_disjointInfo.m_rank < root1->m_disjointInfo.m_rank) {
-			dgSwap(root0, root1);
-		}
-		root1->m_disjointInfo.m_parent = root0;
-		if (root0->m_disjointInfo.m_rank == root1->m_disjointInfo.m_rank) {
-			root0->m_disjointInfo.m_rank += 1;
-			dgAssert (root0->m_disjointInfo.m_rank <= 6);
-		}
-		root0->m_disjointInfo.m_rowCount += root1->m_disjointInfo.m_rowCount;
-		root0->m_disjointInfo.m_bodyCount += root1->m_disjointInfo.m_bodyCount;
-		root0->m_disjointInfo.m_jointCount += root1->m_disjointInfo.m_jointCount;
-	}
-	root0->m_disjointInfo.m_jointCount ++;
-	root0->m_disjointInfo.m_rowCount += joint->m_maxDOF;
-}
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
@@ -244,7 +202,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		dgBody* const body = graphNode.GetBody();
 		if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
 			for (; node; node = node->GetPrev()) {
-				//dgAssert ((body->GetType() == dgBody::m_kinamticBody) ||(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f)));
 				dgAssert(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f));
 			}
 			break;
@@ -264,9 +221,9 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		dgConstraint* const contact = baseJointArray[i].m_joint;
 		dgAssert(contact->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
 		if (contact->GetBody1()->m_invMass.m_w > dgFloat32 (0.0f)) {
-			UnionSet(contact);
+			world->UnionSet(contact);
 		} else {
-			dgBody* const root = FindRootAndSplit(contact->GetBody0());
+			dgBody* const root = world->FindRootAndSplit(contact->GetBody0());
 			root->m_disjointInfo.m_jointCount += 1;
 			root->m_disjointInfo.m_rowCount += contact->m_maxDOF;
 		}
@@ -324,7 +281,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	for (dgInt32 i = jointCount - 1; i >= 0; i --) {
 		dgJointInfo* const jointInfo = &augmentedJointArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
-		dgBody* const root = FindRoot (constraint->GetBody0());
+		dgBody* const root = world->FindRoot (constraint->GetBody0());
 		if (root->m_resting) {
 			augmentedJointCount --;
 			augmentedJointArray[i] = augmentedJointArray[augmentedJointCount];
@@ -424,276 +381,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	m_joints = jointStart;
 	m_clusters = clustersCount;
 	m_softBodiesCount = softBodiesCount;
-}
-
-void dgWorldDynamicUpdate::BuildClustersOld(dgFloat32 timestep)
-{
-	DG_TRACKTIME(__FUNCTION__);
-	dgWorld* const world = (dgWorld*) this;
-	dgUnsigned32 lru = m_markLru - 1;
-
-	dgBodyMasterList& masterList = *world;
-
-	m_bodies = 0;
-	m_joints = 0;
-	m_clusters = 0;
-	dgAssert (masterList.GetFirst()->GetInfo().GetBody() == world->m_sentinelBody);
-	world->m_solverJacobiansMemory.ResizeIfNecessary ((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgDynamicBody*));
-	dgDynamicBody** const stackPoolBuffer = (dgDynamicBody**)&world->m_solverJacobiansMemory[0];
-
-	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
-		const dgBodyMasterListRow& graphNode = node->GetInfo();
-		dgBody* const body = graphNode.GetBody();
-		
-		if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
-#ifdef _DEBUG
-			for (; node; node = node->GetPrev()) {
-				//dgAssert ((body->GetType() == dgBody::m_kinamticBody) ||(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f)));
-				dgAssert(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f));
-			}
-#endif
-			break;
-		}
-
-		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
-			if (dynamicBody->m_dynamicsLru < lru) {
-				if (!(dynamicBody->m_freeze | dynamicBody->m_spawnnedFromCallback | dynamicBody->m_sleeping)) {
-					SpanningTree(dynamicBody, stackPoolBuffer, timestep);
-				}
-			}
-			dynamicBody->m_spawnnedFromCallback = false;
-		}
-	}
-
-	dgSort(m_clusterData, m_clusters, CompareClusters);
-
-	dgInt32 maxRowCount = 0;
-	dgInt32 softBodiesCount = 0;
-	for (dgInt32 i = 0; i < m_clusters; i++) {
-		dgBodyCluster& cluster = m_clusterData[i];
-		cluster.m_rowStart = maxRowCount;
-		maxRowCount += cluster.m_rowCount;
-		softBodiesCount += cluster.m_hasSoftBodies;
-	}
-	m_solverMemory.Init(world, maxRowCount, m_bodies);
-	m_softBodiesCount = softBodiesCount; 
-}
-
-void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep)
-{
-	dgInt32 stack = 1;
-	dgInt32 bodyCount = 1;
-	dgInt32 jointCount = 0;
-	dgInt32 hasSoftBodies = 0;
-	dgInt32 isInEquilibrium = 1;
-
-	dgWorld* const world = (dgWorld*) this;
-	const dgInt32 clusterLRU = world->m_clusterLRU;
-	const dgUnsigned32 lruMark = m_markLru - 1;
-
-	world->m_clusterLRU ++;
-
-	queueBuffer[0] = body;
-	dgBodyInfo* const bodyArray0 = &world->m_bodiesMemory[0];
-
-	bodyArray0[m_bodies].m_body = world->m_sentinelBody;
-	dgAssert(world->m_sentinelBody->m_index == 0);
-	dgAssert(dgInt32(world->m_sentinelBody->m_dynamicsLru) == m_markLru);
-
-	bool globalAutoSleep = true;
-	while (stack) {
-		stack --;
-		dgDynamicBody* const srcBody = queueBuffer[stack];
-
-		if (srcBody->m_dynamicsLru < lruMark) {
-//hack
-//srcBody->m_equilibrium = false;
-
-			dgAssert(srcBody->GetInvMass().m_w > dgFloat32(0.0f));
-			dgAssert(srcBody->m_masterNode);
-
-			dgInt32 bodyIndex = m_bodies + bodyCount;
-			world->m_bodiesMemory.ResizeIfNecessary (bodyIndex + 1);
-			dgBodyInfo* const bodyArray1 = &world->m_bodiesMemory[0];
-			bodyArray1[bodyIndex].m_body = srcBody;
-			isInEquilibrium &= srcBody->m_equilibrium;
-			globalAutoSleep &= (srcBody->m_autoSleep & srcBody->m_equilibrium); 
-			
-			srcBody->m_index = bodyCount;
-			srcBody->m_dynamicsLru = lruMark;
-			srcBody->m_resting = srcBody->m_equilibrium;
-
-			hasSoftBodies |= (srcBody->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI) ? 1 : 0);
-
-			srcBody->m_sleeping = false;
-
-			bodyCount++;
-			for (dgBodyMasterListRow::dgListNode* jointNode = srcBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-
-				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-				dgConstraint* const constraint = cell->m_joint;
-				dgAssert(constraint);
-				if (constraint->m_clusterLRU != clusterLRU) {
-					dgBody* const linkBody = cell->m_bodyNode;
-					dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
-					dgAssert((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
-					const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
-
-					bool check0 = linkBody->IsCollidable();
-					check0 = check0 && (!contact || (contact->m_contactActive && contact->m_maxDOF) || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode));
-					if (check0) {
-						bool check1 = constraint->m_dynamicsLru != lruMark;
-						if (check1) {
-							const dgInt32 jointIndex = m_joints + jointCount;
-							dgJointInfo* const jointInfo = &world->m_jointsMemory[jointIndex];
-
-							constraint->m_index = jointCount;
-							constraint->m_clusterLRU = clusterLRU;
-							constraint->m_dynamicsLru = lruMark;
-
-							jointInfo->m_joint = constraint;
-							const dgInt32 rows = constraint->m_maxDOF;
-							jointInfo->m_pairStart = 0;
-							jointInfo->m_pairCount = rows;
-							jointCount++;
-
-							dgAssert(constraint->m_body0);
-							dgAssert(constraint->m_body1);
-						}
-
-						dgDynamicBody* const adjacentBody = (dgDynamicBody*)linkBody;
-						if ((adjacentBody->m_dynamicsLru != lruMark) && (adjacentBody->GetInvMass().m_w > dgFloat32(0.0f))) {
-							queueBuffer[stack] = adjacentBody;
-							stack++;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[0]; 
-	if (globalAutoSleep) {
-		for (dgInt32 i = 1; i < bodyCount; i++) {
-			dgBody* const body1 = bodyArray[m_bodies + i].m_body;
-			body1->m_dynamicsLru = m_markLru;
-			body1->m_sleeping = globalAutoSleep;
-		}
-	} else {
-		if (world->m_clusterUpdate) {
-			dgClusterCallbackStruct record;
-			record.m_world = world;
-			record.m_count = bodyCount;
-			record.m_strideInByte = sizeof (dgBodyInfo);
-			record.m_bodyArray = &bodyArray[m_bodies].m_body;
-			if (!world->m_clusterUpdate(world, &record, bodyCount)) {
-				for (dgInt32 i = 0; i < bodyCount; i++) {
-					dgBody* const body1 = bodyArray[m_bodies + i].m_body;
-					body1->m_dynamicsLru = m_markLru;
-				}
-				return;
-			}
-		}
-
-		//world->m_clusterMemory.ResizeIfNecessary  (m_clusters + 1);
-		//m_clusterData = &world->m_clusterMemory[0];
-		//dgBodyCluster& cluster = m_clusterData[m_clusters];
-		dgBodyCluster& cluster = world->m_clusterMemory[m_clusters];
-		m_clusterData = &world->m_clusterMemory[0];
-
-		cluster.m_bodyStart = m_bodies;
-		cluster.m_jointStart = m_joints;
-		cluster.m_bodyCount = bodyCount;
-		cluster.m_jointCount = jointCount;
-		
-		cluster.m_rowStart = 0;
-		cluster.m_isContinueCollision = 0;
-		cluster.m_hasSoftBodies = dgInt16 (hasSoftBodies);
-
-		dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
-		dgJointInfo* const constraintArray = &constraintArrayPtr[m_joints];
-
-		dgInt32 rowCount = 0;
-		dgInt32 isContinueCollisionCluster = 0;
-		for (dgInt32 i = 0; i < jointCount; i++) {
-			dgJointInfo* const jointInfo = &constraintArray[i];
-			dgConstraint* const joint = jointInfo->m_joint;
-
-			dgBody* const body0 = joint->m_body0;
-			dgBody* const body1 = joint->m_body1;
-
-			dgInt32 m0 = (body0->GetInvMass().m_w != dgFloat32(0.0f)) ? body0->m_index : 0;
-			dgInt32 m1 = (body1->GetInvMass().m_w != dgFloat32(0.0f)) ? body1->m_index : 0;
-
-			jointInfo->m_m0 = m0;
-			jointInfo->m_m1 = m1;
-
-			body0->m_dynamicsLru = m_markLru;
-			body1->m_dynamicsLru = m_markLru;
-
-			dgAssert (constraintArray[i].m_pairCount >= 0);
-			dgAssert (constraintArray[i].m_pairCount < 64);
-			rowCount += constraintArray[i].m_pairCount;
-			if (joint->GetId() == dgConstraint::m_contactConstraint) {
-				if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
-					dgInt32 ccdJoint = false;
-					const dgVector& veloc0 = body0->m_veloc;
-					const dgVector& veloc1 = body1->m_veloc;
-
-					const dgVector& omega0 = body0->m_omega;
-					const dgVector& omega1 = body1->m_omega;
-
-					const dgVector& com0 = body0->m_globalCentreOfMass;
-					const dgVector& com1 = body1->m_globalCentreOfMass;
-
-					const dgCollisionInstance* const collision0 = body0->m_collision;
-					const dgCollisionInstance* const collision1 = body1->m_collision;
-					dgFloat32 dist = dgMax(body0->m_collision->GetBoxMinRadius(), body1->m_collision->GetBoxMinRadius()) * dgFloat32(0.25f);
-
-					dgVector relVeloc(veloc1 - veloc0);
-					dgVector relOmega(omega1 - omega0);
-					dgVector relVelocMag2(relVeloc.DotProduct(relVeloc));
-					dgVector relOmegaMag2(relOmega.DotProduct(relOmega));
-
-					if ((relOmegaMag2.m_w > dgFloat32(1.0f)) || ((relVelocMag2.m_w * timestep * timestep) > (dist * dist))) {
-						dgTriplex normals[16];
-						dgTriplex points[16];
-						dgInt64 attrib0[16];
-						dgInt64 attrib1[16];
-						dgFloat32 penetrations[16];
-						dgFloat32 timeToImpact = timestep;
-						const dgInt32 ccdContactCount = world->CollideContinue(collision0, body0->m_matrix, veloc0, omega0, collision1, body1->m_matrix, veloc1, omega1,
-																			   timeToImpact, points, normals, penetrations, attrib0, attrib1, 6, 0);
-
-						for (dgInt32 j = 0; j < ccdContactCount; j++) {
-							dgVector point(&points[j].m_x);
-							dgVector normal(&normals[j].m_x);
-							dgVector vel0(veloc0 + omega0.CrossProduct(point - com0));
-							dgVector vel1(veloc1 + omega1.CrossProduct(point - com1));
-							dgVector vRel(vel1 - vel0);
-							dgFloat32 contactDistTravel = vRel.DotProduct(normal).m_w * timestep;
-							ccdJoint |= (contactDistTravel > dist);
-						}
-					}
-					//ccdJoint = body0->m_continueCollisionMode | body1->m_continueCollisionMode;
-					isContinueCollisionCluster |= ccdJoint;
-					rowCount += DG_CCD_EXTRA_CONTACT_COUNT;
-				}
-			}
-		}
-
-		if (isContinueCollisionCluster) {
-			rowCount = dgMax(rowCount, 64);
-		}
-
-		cluster.m_rowCount = rowCount;
-		cluster.m_isContinueCollision = dgInt16 (isContinueCollisionCluster);
-
-		m_clusters++;
-		m_bodies += bodyCount;
-		m_joints += jointCount;
-	}
 }
 
 dgInt32 dgWorldDynamicUpdate::CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed)
@@ -862,23 +549,6 @@ dgBody* dgWorldDynamicUpdate::GetClusterBody(const void* const clusterPtr, dgInt
 	dgBody** const bodyPtr = (dgBody**)ptr;
 	return (index < cluster->m_count) ? ((index >= 0) ? *bodyPtr : NULL) : NULL;
 }
-
-
-// sort from high to low
-dgInt32 dgWorldDynamicUpdate::CompareClusters(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed)
-{
-	dgInt32 countA = clusterA->m_jointCount + (clusterA->m_hasSoftBodies << 30);
-	dgInt32 countB = clusterB->m_jointCount + (clusterB->m_hasSoftBodies << 30);
-
-	if (countA < countB) {
-		return 1;
-	}
-	if (countA > countB) {
-		return -1;
-	}
-	return 0;
-}
-
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {

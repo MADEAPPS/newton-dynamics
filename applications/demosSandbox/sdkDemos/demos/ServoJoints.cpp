@@ -894,7 +894,7 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 
 	DemoMesh* const mesh = new DemoMesh ("weight", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
 
-	dFloat mass = 500.0f;
+	dFloat mass = 300.0f;
 	CreateSimpleSolid (scene, mesh, mass, matrix, collision, 0, false);
 
 	mesh->Release();

@@ -82,11 +82,11 @@ class dgBody
 	class dgSetInfo
 	{
 		public:
-		dgSetInfo()
+		DG_INLINE dgSetInfo()
 		{
 		}
 
-		void Init(dgBody* const self)
+		DG_INLINE void Init(dgBody* const self)
 		{
 			m_parent = self;
 			m_rank = 0;
@@ -203,9 +203,9 @@ class dgBody
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
 	virtual void InvalidateCache();
-	
-    virtual void SetMatrix(const dgMatrix& matrix);
-    virtual void SetMatrixResetSleep(const dgMatrix& matrix);
+
+	virtual void SetMatrix(const dgMatrix& matrix);
+	virtual void SetMatrixResetSleep(const dgMatrix& matrix);
 	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
 	virtual void IntegrateVelocity (dgFloat32 timestep);
 	virtual void AttachCollision (dgCollisionInstance* const collision);
@@ -224,7 +224,7 @@ class dgBody
 	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
 	virtual dgSkeletonContainer* GetSkeleton() const;
 
-    void SetMatrixOriginAndRotation(const dgMatrix& matrix);
+	void SetMatrixOriginAndRotation(const dgMatrix& matrix);
 
 	dgBroadPhaseBodyNode* GetBroadPhase () const;
 	void SetBroadPhase(dgBroadPhaseBodyNode* const node);

@@ -1335,7 +1335,10 @@ void StandardJoints (DemoEntityManager* const scene)
 
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 30.0f));
 
-#if 1
+	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+
+#if 0
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1359,8 +1362,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 	//dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-	//dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
-	dVector origin(-30.0f, 5.0f, 32.0f, 0.0f);
+	dVector origin (-30.0f, 5.0f, -10.0f, 0.0f);
+	//dVector origin(-30.0f, 5.0f, 32.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 

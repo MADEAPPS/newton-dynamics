@@ -1237,6 +1237,7 @@ void dgWorld::UpdateBroadphase(dgFloat32 timestep)
 	m_broadPhase->UpdateContacts (timestep);
 }
 
+#if 1
 dgInt32 dgWorld::CompareJointByInvMass(const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed)
 {
 	dgInt32 modeA = jointA->m_solverModel;
@@ -1257,7 +1258,6 @@ dgInt32 dgWorld::CompareJointByInvMass(const dgBilateralConstraint* const jointA
 	}
 	return 0;
 }
-
 
 void dgWorld::UpdateSkeletons()
 {
@@ -1387,6 +1387,167 @@ void dgWorld::UpdateSkeletons()
 	}
 }
 
+#else
+
+dgInt32 dgWorld::CompareJointByInvMass(const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed)
+{
+	dgAssert (jointA->m_solverModel < 2);
+	dgAssert (jointB->m_solverModel < 2);
+
+	dgWorld* const world = jointA->GetBody0()->GetWorld();
+	dgBody* const rootA = world->FindRoot (jointA->GetBody0());
+	dgBody* const rootB = world->FindRoot (jointB->GetBody0());
+
+	if (rootA->m_uniqueID < rootB->m_uniqueID) {
+		return -1;
+	} else if (rootA->m_uniqueID > rootB->m_uniqueID) {
+		return 1;
+	}
+
+	dgFloat32 invMassA[2];
+	dgFloat32 invMassB[2];
+	invMassA[0] = jointA->GetBody0()->m_invMass.m_w;
+	invMassA[1] = jointA->GetBody1()->m_invMass.m_w;
+
+	invMassB[0] = jointB->GetBody0()->m_invMass.m_w;
+	invMassB[1] = jointB->GetBody1()->m_invMass.m_w;
+
+	if (invMassA[0] < invMassA[1]) {
+		dgSwap(invMassA[0], invMassA[1]);
+	}
+	if (invMassB[0] < invMassB[1]) {
+		dgSwap(invMassA[0], invMassA[1]);
+	}
+
+	if (invMassA[1] < invMassB[1]) {
+		return -1;
+	} else if (invMassA[1] > invMassB[1]) {
+		return 1;
+	}
+
+	if (invMassA[0] < invMassB[0]) {
+		return -1;
+	} else if (invMassA[0] > invMassB[0]) {
+		return 1;
+	}
+
+	return 0;
+}
+
+void dgWorld::UpdateSkeletons()
+{
+	DG_TRACKTIME(__FUNCTION__);
+	dgSkeletonList& skelManager = *this;
+skelManager.m_skelListIsDirty = true;
+
+	if (skelManager.m_skelListIsDirty) {
+		skelManager.m_skelListIsDirty = false;
+		dgSkeletonList::Iterator iter(skelManager);
+		for (iter.Begin(); iter; iter++) {
+			dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
+			delete skeleton;
+		}
+		skelManager.RemoveAll();
+
+		const dgBilateralConstraintList& jointList = *this;
+		m_solverJacobiansMemory.ResizeIfNecessary((jointList.GetCount() + 1024) * sizeof (dgBilateralConstraint*));
+		dgBilateralConstraint** const jointArray = (dgBilateralConstraint**)&m_solverJacobiansMemory[0];
+		
+		dgInt32 jointCount = 0;
+		for (dgBilateralConstraintList::dgListNode* node = jointList.GetFirst(); node; node = node->GetNext()) {
+			dgBilateralConstraint* const joint = node->GetInfo();
+			if (joint->m_solverModel < 2) {
+				joint->m_body0->InitJointSet();
+				joint->m_body1->InitJointSet();
+				jointArray[jointCount] = joint;
+				jointCount++;
+			}
+		}
+
+		for (dgInt32 i = 0; i < jointCount; i++) {
+			dgBilateralConstraint* const joint = jointArray[i];
+			dgAssert(joint->GetBody0()->m_invMass.m_w > dgFloat32(0.0f));
+			if (joint->GetBody1()->m_invMass.m_w > dgFloat32(0.0f)) {
+				UnionSet(joint);
+			} else {
+				dgBody* const root = FindRootAndSplit(joint->GetBody0());
+				root->m_disjointInfo.m_jointCount += 1;
+			}
+		}
+
+		dgSortIndirect(jointArray, jointCount, CompareJointByInvMass);
+		
+		for (dgInt32 i = 0; i < jointCount; i++) {
+			dgBilateralConstraint* const joint = jointArray[i];
+			dgBody* const root = FindRoot (joint->GetBody0());
+			root->m_disjointInfo.m_rank = -1;
+		}
+
+		int skelCount = 0;
+		for (dgInt32 i = 0; i < jointCount; i++) {
+			dgBilateralConstraint* const joint = jointArray[i];
+			dgBody* const root = FindRoot(joint->GetBody0());
+			if (root->m_disjointInfo.m_rank == -1) {
+				root->m_disjointInfo.m_rank = skelCount;
+				skelCount ++;
+			}
+		}
+
+		dgInt32* batchStart = dgAlloca (dgInt32, skelCount + 1);
+		memset (batchStart, 0, sizeof (dgInt32) *(skelCount + 1));
+		for (dgInt32 i = 0; i < jointCount; i++) {
+			dgBilateralConstraint* const joint = jointArray[i];
+			dgBody* const root = FindRoot(joint->GetBody0());
+			batchStart[root->m_disjointInfo.m_rank] += 1;
+		}
+
+		dgInt32 acc = 0;
+		for (dgInt32 i = 0; i <= skelCount ; i++) {
+			dgInt32 count = batchStart[i];
+			batchStart[i] = acc;
+			acc += count;
+		}
+
+		for (dgInt32 i = 0; i < skelCount ; i++) {
+			dgInt32 index = batchStart[i];
+			dgInt32 count = batchStart[i + 1] - i;
+			dgBilateralConstraint** const constraint = &jointArray[index];
+
+			for (dgInt32 j = 0; j < count; j ++) {
+				dgBilateralConstraint* const joint = constraint[j];
+				joint->m_body0->InitJointSet();
+				joint->m_body1->InitJointSet();
+			}
+
+			dgInt32 loopCount = 0;
+			dgInt32 spanningCount = 0;
+			dgBilateralConstraint** const loopJoints = dgAlloca (dgBilateralConstraint*, count);
+			dgBilateralConstraint** const spanningTree = dgAlloca (dgBilateralConstraint*, count);
+			for (dgInt32 j = 0; j < count; j ++) {
+				dgBilateralConstraint* const joint = constraint[j];
+				dgBody* const root0 = FindRoot(joint->GetBody0());
+				dgBody* const root1 = FindRoot(joint->GetBody1());
+				if (root0 != root1) {
+					UnionSet(joint);
+					spanningTree[spanningCount] = joint;
+					spanningCount ++;
+				} else {
+					loopJoints[loopCount] = joint;
+					loopCount ++;
+				}
+			}
+			//skeleton->Finalize(loopCount, loopJoints);
+
+		}
+	}
+
+	dgSkeletonList::Iterator iter(skelManager);
+	for (iter.Begin(); iter; iter++) {
+		dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
+		skeleton->ClearSelfCollision();
+	}
+}
+#endif
 
 void dgWorld::OnSerializeToFile(void* const fileHandle, const void* const buffer, dgInt32 size)
 {
