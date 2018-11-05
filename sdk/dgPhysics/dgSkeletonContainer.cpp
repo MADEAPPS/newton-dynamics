@@ -60,7 +60,6 @@ class dgSkeletonContainer::dgBodyJointMatrixDataPair
 } DG_GCC_VECTOR_ALIGMENT;
 
 dgInt32 dgSkeletonContainer::m_lruMarker = 1;
-dgInt32 dgSkeletonContainer::m_uniqueID = DG_SKELETON_BASE_UNIQUE_ID;
 
 class dgSkeletonContainer::dgNode
 {
@@ -383,9 +382,10 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_rightHandSide(NULL)
 	,m_leftHandSide(NULL)
 	,m_matrixRowsIndex(NULL)
+	,m_listNode(NULL)
 	,m_loopingJoints(world->GetAllocator())
 	,m_auxiliaryMemoryBuffer(world->GetAllocator())
-	,m_id(m_uniqueID)
+//	,m_id(m_uniqueID)
 	,m_lru(0)
 	,m_nodeCount(1)
 	,m_loopCount(0)
@@ -397,7 +397,7 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	if (rootBody->GetInvMass().m_w != dgFloat32 (0.0f)) {
 		rootBody->SetSkeleton(this);
 	}
-	m_uniqueID++;
+//	m_uniqueID++;
 }
 
 dgSkeletonContainer::~dgSkeletonContainer()
@@ -452,11 +452,6 @@ dgSkeletonContainer::dgNode* dgSkeletonContainer::GetNextSiblingChild(dgSkeleton
 dgWorld* dgSkeletonContainer::GetWorld() const
 {
 	return m_world;
-}
-
-void dgSkeletonContainer::ResetUniqueId(dgInt32 id)
-{
-	m_uniqueID = id;
 }
 
 void dgSkeletonContainer::ClearSelfCollision()

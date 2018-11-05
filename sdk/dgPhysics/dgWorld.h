@@ -76,11 +76,13 @@ class dgBodyMaterialList: public dgTree<dgContactMaterial, dgUnsigned32>
 	}
 };
 
-class dgSkeletonList: public dgTree<dgSkeletonContainer*, dgInt32>
+//class dgSkeletonList: public dgTree<dgSkeletonContainer*, dgInt32>
+class dgSkeletonList : public dgList<dgSkeletonContainer*>
 {
 	public:
 	dgSkeletonList(dgMemoryAllocator* const allocator)
-		:dgTree<dgSkeletonContainer*, dgInt32>(allocator)
+//		:dgTree<dgSkeletonContainer*, dgInt32>(allocator)
+		:dgList<dgSkeletonContainer*>(allocator)
 		,m_skelListIsDirty(true)
 	{
 	}

@@ -22,8 +22,6 @@
 #ifndef _DG_SKELETON_CONTAINER_H__
 #define _DG_SKELETON_CONTAINER_H__
 
-#define DG_SKELETON_BASE_UNIQUE_ID	10
-
 #include "dgConstraint.h"
 #include "dgContact.h"
 #include "dgBilateralConstraint.h"
@@ -44,7 +42,7 @@ class dgSkeletonContainer
 	~dgSkeletonContainer();
 
 	dgWorld* GetWorld() const; 
-	dgInt32 GetId () const {return m_id;}
+//	dgInt32 GetId () const {return m_id;}
 	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
 	dgNode* AddChild (dgBilateralConstraint* const joint, dgNode* const parent);
 	void RemoveLoopJoint(dgBilateralConstraint* const joint);  
@@ -69,7 +67,6 @@ class dgSkeletonContainer
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgForcePair* const accel) const;
 
 	DG_INLINE void CalculateLoopMassMatrixCoefficients(dgFloat32* const diagDamp);
-	static void ResetUniqueId(dgInt32 id);
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
@@ -90,9 +87,10 @@ class dgSkeletonContainer
 	dgRightHandSide* m_rightHandSide;
 	const dgLeftHandSide* m_leftHandSide;
 	dgInt32* m_matrixRowsIndex;
+	dgSkeletonList::dgListNode* m_listNode;
 	dgArray<dgConstraint*> m_loopingJoints;
 	dgArray<dgInt8> m_auxiliaryMemoryBuffer;
-	dgInt32 m_id;
+//	dgInt32 m_id;
 	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
 	dgInt16 m_loopCount;
@@ -100,7 +98,7 @@ class dgSkeletonContainer
 	dgInt16 m_rowCount;
 	dgInt16 m_loopRowCount;
 	dgInt16 m_auxiliaryRowCount;
-	static dgInt32 m_uniqueID;
+//	static dgInt32 m_uniqueID;
 	static dgInt32 m_lruMarker;
 
 	friend class dgWorld;

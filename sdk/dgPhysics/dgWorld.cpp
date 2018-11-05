@@ -1110,38 +1110,22 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 {
 	dgAssert (rootBone);
 	dgSkeletonList* const list = this;
-	if (dgSkeletonContainer::m_uniqueID > 1024 * 16) {
-		dgList<dgSkeletonContainer*> saveList (GetAllocator());
-		dgSkeletonList::Iterator iter (*list);
-		for (iter.Begin(); iter; iter ++) {
-			saveList.Append(iter.GetNode()->GetInfo());
-		}
-		list->RemoveAll();
-
-		dgInt32 index = DG_SKELETON_BASE_UNIQUE_ID;
-		for (dgList<dgSkeletonContainer*>::dgListNode* ptr = saveList.GetFirst(); ptr; ptr ++) {
-			dgSkeletonContainer* const skeleton = ptr->GetInfo();
-			skeleton->m_id = index;
-			list->Insert (skeleton, skeleton->GetId());
-			index ++;
-		}
-		dgSkeletonContainer::ResetUniqueId(index);
-	}
-
 	dgAssert (rootBone->GetType() == dgBody::m_dynamicBody);
 	dgSkeletonContainer* const container = new (m_allocator) dgSkeletonContainer(this, (dgDynamicBody*)rootBone);
-	
-	list->Insert (container, container->GetId());
+
+//	list->Insert (container, container->GetId());
+	container->m_listNode = list->Append(container);
 	return container;
 }
 
 void dgWorld::DestroySkeletonContainer (dgSkeletonContainer* const container)
 {
 	dgSkeletonList* const list = this;
-	list->Remove (container->GetId());
+//	list->Remove (container->GetId());
+	dgAssert(container->m_listNode);
+	list->Remove(container->m_listNode);
 	delete container;
 }
-
 
 dgBroadPhaseAggregate* dgWorld::CreateAggreGate() const
 {
@@ -1263,6 +1247,7 @@ void dgWorld::UpdateSkeletons()
 {
 	DG_TRACKTIME(__FUNCTION__);
 	dgSkeletonList& skelManager = *this;
+
 	if (skelManager.m_skelListIsDirty) {
 		skelManager.m_skelListIsDirty = false;
 		dgSkeletonList::Iterator iter(skelManager);
