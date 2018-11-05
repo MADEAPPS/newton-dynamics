@@ -76,6 +76,7 @@ class dgSkeletonContainer
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide);
 	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces);
+	void SolveLcp(const dgInt32 size, const dgFloat32* const matrix, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high) const;
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;

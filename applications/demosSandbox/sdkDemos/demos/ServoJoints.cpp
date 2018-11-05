@@ -55,8 +55,8 @@ static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_4",		"convexHull",			 20.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 class dLifterUserData: public DemoEntity::UserData
@@ -490,8 +490,12 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		lifterData->m_liftJoints[0]->SetTargetPosit(lifterData->m_inputs.m_liftValue);
 		lifterData->m_liftJoints[1]->SetTargetPosit(lifterData->m_inputs.m_liftValue);
 		lifterData->m_liftJoints[2]->SetTargetPosit(lifterData->m_inputs.m_liftValue);
-		lifterData->m_paletteJoints[0]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
-		lifterData->m_paletteJoints[1]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
+		if (lifterData->m_paletteJoints[0]) {
+			lifterData->m_paletteJoints[0]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
+		}
+		if (lifterData->m_paletteJoints[1]) {
+			lifterData->m_paletteJoints[1]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
+		}
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -930,8 +934,7 @@ void ServoJoints (DemoEntityManager* const scene)
 	inputManager->AddPlayer(forklift);
 
 	// place heavy load to show reproduce black bird dream problems
-	MakeHeavyLoad (scene, matrix);
-
+//	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
 //	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);

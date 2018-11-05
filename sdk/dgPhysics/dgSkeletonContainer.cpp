@@ -962,6 +962,54 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 	accel[m_nodeCount - 1].m_joint = zero;
 }
 
+void dgSkeletonContainer::SolveLcp(const dgInt32 size, const dgFloat32* const matrix, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high) const
+{
+	dgFloat32 sor = 1.2f;
+	dgFloat32 tol2 = 0.1f;
+	dgInt32 maxIterCount = 100;
+//	dgInt16* const clipped;
+//	const dgFloat32* const me = matrix;
+	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
+	dgCheckAligment(invDiag1);
+
+	dgInt32 stride = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = dgClamp(dgFloat32(0.0f), low[i], high[i]);
+		invDiag1[i] = dgFloat32(1.0f) / matrix[stride + i];
+		stride += size;
+	}
+
+	dgFloat32 tolerance(tol2 * 2.0f);
+	const dgFloat32* const invDiag = invDiag1;
+#ifdef _DEBUG 
+	dgInt32 passes = 0;
+#endif
+
+	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+		dgInt32 base = 0;
+		tolerance = dgFloat32(0.0f);
+#ifdef _DEBUG 
+		passes++;
+#endif
+		for (dgInt32 j = 0; j < size; j++) {
+
+			const dgFloat32* const row = &matrix[base];
+			dgFloat32 r(b[j] - dgDotProduct(size, row, x));
+			dgFloat32 f = (r + row[j] * x[j]) * invDiag[j];
+			f = x[j] + (f - x[j]) * sor;
+
+			if (f > high[j]) {
+				x[j] = high[j];
+			} else if (f < low[j]) {
+				x[j] = low[j];
+			} else {
+				x[j] = f;
+				tolerance += r * r;
+			}
+			base += size;
+		}
+	}
+}
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const
 {
@@ -1083,7 +1131,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		b[i] -= r;
 	}
 	
-	//dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, lowerTriangularMassMatrix11, u, b, low, high);
+	//SolveLcp(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
 	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
