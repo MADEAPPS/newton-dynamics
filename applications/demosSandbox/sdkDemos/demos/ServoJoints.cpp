@@ -47,10 +47,10 @@ struct SERVO_VEHICLE_DEFINITION
 static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 {
 	{"body",		"convexHull",			900.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
-	{"fr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
-	{"fl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
-	{"rr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
-	{"rl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+//	{"fr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
+//	{"fl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
+//	{"rr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+//	{"rl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
 	{"lift_1",		"convexHull",			 50.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
 	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
@@ -475,14 +475,16 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		}
 
 		// update steering wheels
-		dFloat steeringAngle = lifterData->m_rearTireJoints[0]->GetSteerAngle();
-		if (lifterData->m_inputs.m_steerValue > 0) {
-			steeringAngle = 30.0f * dDegreeToRad;
-		} else if (lifterData->m_inputs.m_steerValue < 0) {
-			steeringAngle = -30.0f * dDegreeToRad;
+		if (lifterData->m_rearTireJoints[0] && lifterData->m_rearTireJoints[1]) {
+			dFloat steeringAngle = lifterData->m_rearTireJoints[0]->GetSteerAngle();
+			if (lifterData->m_inputs.m_steerValue > 0) {
+				steeringAngle = 30.0f * dDegreeToRad;
+			} else if (lifterData->m_inputs.m_steerValue < 0) {
+				steeringAngle = -30.0f * dDegreeToRad;
+			}
+			lifterData->m_rearTireJoints[0]->SetTargetSteerAngle(steeringAngle);
+			lifterData->m_rearTireJoints[1]->SetTargetSteerAngle(steeringAngle);
 		}
-		lifterData->m_rearTireJoints[0]->SetTargetSteerAngle(steeringAngle);
-		lifterData->m_rearTireJoints[1]->SetTargetSteerAngle(steeringAngle);
 
 		lifterData->m_forkBase->SetTargetAngle(lifterData->m_inputs.m_forkValue);
 		lifterData->m_liftJoints[0]->SetTargetPosit(lifterData->m_inputs.m_liftValue);
@@ -867,7 +869,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& location)
 {
 	dMatrix matrix (location);
-	matrix.m_posit.m_x += 4.0f;
+	matrix.m_posit.m_x += 1.5f;
 
 	NewtonWorld* const world = scene->GetNewton();
 	NewtonCollision* const bar = NewtonCreateBox (world, 0.25f, 0.25f, 2.4f, SERVO_VEHICLE_DEFINITION::m_landPart, NULL); 
@@ -894,7 +896,7 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 
 	DemoMesh* const mesh = new DemoMesh ("weight", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
 
-	dFloat mass = 300.0f;
+	dFloat mass = 1500.0f;
 	CreateSimpleSolid (scene, mesh, mass, matrix, collision, 0, false);
 
 	mesh->Release();

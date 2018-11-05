@@ -1191,6 +1191,7 @@ void dgSolveDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD, T* const x, T*
 	dgInt16* const clipped = dgAlloca(dgInt16, size);
 
 	// find an approximation to the solution
+passes = 1000.0f;
 	dgGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, passes, clipped, T(1.3f));
 
 	T err2(0.0f);
