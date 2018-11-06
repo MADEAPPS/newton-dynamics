@@ -242,7 +242,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 			dgBody* root = body;
 			bool state = true;
 			do {
-				state &= root->m_equilibrium;
+				state &= (root->m_equilibrium & root->m_autoSleep);
 				root = root->m_disjointInfo.m_parent;
 			} while (root->m_disjointInfo.m_parent != root);
 			root->m_resting &= state;

@@ -46,11 +46,11 @@ struct SERVO_VEHICLE_DEFINITION
 
 static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 {
-	{"body",		"convexHull",		   2500.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
-	{"fr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
-	{"fl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
-	{"rr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
-	{"rl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+	{"body",		"convexHull",		   0.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
+//	{"fr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
+//	{"fl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
+//	{"rr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+//	{"rl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
 	{"lift_1",		"convexHull",			 50.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
 	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
@@ -872,8 +872,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& location)
 {
+	dFloat mass = 4000.0f;
+
 	dMatrix matrix (location);
-	matrix.m_posit.m_x += 4.5f;
+	matrix.m_posit.m_x += 1.5f;
 
 	NewtonWorld* const world = scene->GetNewton();
 	NewtonCollision* const bar = NewtonCreateBox (world, 0.25f, 0.25f, 2.4f, SERVO_VEHICLE_DEFINITION::m_landPart, NULL); 
@@ -899,8 +901,6 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 	NewtonDestroyCollision(bell);
 
 	DemoMesh* const mesh = new DemoMesh ("weight", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
-
-	dFloat mass = 1500.0f;
 	CreateSimpleSolid (scene, mesh, mass, matrix, collision, 0, false);
 
 	mesh->Release();

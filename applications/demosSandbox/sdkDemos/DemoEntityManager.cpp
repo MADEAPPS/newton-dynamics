@@ -334,7 +334,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showAABB = false;
 //	m_showContactPoints = false;
 //	m_hideVisualMeshes = true;
-//	m_autoSleepMode = true;
+	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 	m_solverPasses = 4;
 //	m_workerThreads = 4;
@@ -666,7 +666,7 @@ void DemoEntityManager::ApplyMenuOptions()
 void DemoEntityManager::ShowMainMenuBar()
 {
 	int mainMenu = 0;
-	dAssert (m_autoSleepMode);
+	//dAssert (m_autoSleepMode);
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) {

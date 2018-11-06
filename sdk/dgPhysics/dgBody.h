@@ -535,10 +535,8 @@ DG_INLINE bool dgBody::GetFreeze () const
 
 DG_INLINE void dgBody::SetAutoSleep (bool state)
 {
+	SetSleepState(false);
 	m_autoSleep = dgUnsigned32 (state);
-	if (m_autoSleep == 0) {
-		m_sleeping = false;
-	}
 }
 
 DG_INLINE bool dgBody::GetAutoSleep () const
