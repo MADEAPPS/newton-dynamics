@@ -164,6 +164,7 @@ class dgConstraint
 	bool IsCollidable () const;
 	bool IsBilateral () const;
 	bool IsSkeleton () const;
+	bool IsSkeletonLoop () const;
 
 	virtual void ResetMaxDOF();
 	dgInt32 GetMaxDOF() const;
@@ -182,7 +183,6 @@ class dgConstraint
 
 	ConstraintsForceFeeback GetUpdateFeedbackFunction ();
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params) = 0; 
-
 
 	class dgPointParam
 	{
@@ -226,6 +226,7 @@ class dgConstraint
 	dgUnsigned32 m_isBilateral			: 1;
 	dgUnsigned32 m_isInSkeleton			: 1;
 	dgUnsigned32 m_graphTagged			: 1;
+	dgUnsigned32 m_isInSkeletonLoop		: 1;
 	
 	friend class dgWorld;
 	friend class dgJacobianMemory;
@@ -258,6 +259,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_isBilateral(false)
 	,m_isInSkeleton(false)
 	,m_graphTagged(false)
+	,m_isInSkeletonLoop(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }
@@ -284,6 +286,11 @@ DG_INLINE bool dgConstraint::IsBilateral() const
 DG_INLINE bool dgConstraint::IsSkeleton () const
 {
 	return m_isInSkeleton ? true : false;
+}
+
+DG_INLINE bool dgConstraint::IsSkeletonLoop () const
+{
+	return m_isInSkeletonLoop ? true : false;
 }
 
 DG_INLINE bool dgConstraint::IsCollidable () const

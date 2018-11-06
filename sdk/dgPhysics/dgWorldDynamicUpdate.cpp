@@ -593,15 +593,19 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 
 	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
 		dgContact* const contactJoint = (dgContact*)constraint;
+		contactJoint->m_isInSkeletonLoop = false;
 		dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
 		dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
 		if (skeleton0 && (skeleton0 == skeleton1)) {
+			contactJoint->m_isInSkeletonLoop = true;
 			skeleton0->AddSelfCollisionJoint(contactJoint);
 		} else if (contactJoint->IsSkeleton()) {
 			if (skeleton0 && !skeleton1) {
-				skeleton0->AddSelfCollisionJoint((dgContact*)constraint);
+				contactJoint->m_isInSkeletonLoop = true;
+				skeleton0->AddSelfCollisionJoint(contactJoint);
 			} else if (skeleton1 && !skeleton0) {
-				skeleton1->AddSelfCollisionJoint((dgContact*)constraint);
+				contactJoint->m_isInSkeletonLoop = true;
+				skeleton1->AddSelfCollisionJoint(contactJoint);
 			}
 		}
 	}
@@ -631,15 +635,11 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
 
-//		dgInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex < 0 ? dof : constraintParam.m_forceBounds[i].m_normalIndex;
-//		rhs->m_normalForceIndex = frictionIndex;
 		dgAssert (constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		rowCount++;
 	}
 //  we separate left and right hand side not to align row to near multiple of 4
-//	rowCount = (rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) ? ((rowCount & (-dgInt32(sizeof(dgVector) / sizeof(dgFloat32)))) + dgInt32(sizeof(dgVector) / sizeof(dgFloat32))) : rowCount;
-//	dgAssert((rowCount & (dgInt32(sizeof(dgVector) / sizeof(dgFloat32)) - 1)) == 0);
 	constraint->ResetInverseDynamics();
 	return rowCount;
 }
@@ -652,9 +652,10 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 	const dgInt32 m0 = jointInfo->m_m0;
 	const dgInt32 m1 = jointInfo->m_m1;
 
+	const dgConstraint* const joint = jointInfo->m_joint;
 	const dgBody* const body0 = bodyInfoArray[m0].m_body;
 	const dgBody* const body1 = bodyInfoArray[m1].m_body;
-	const bool isBilateral = jointInfo->m_joint->IsBilateral();
+	const bool isBilateral = joint->IsBilateral();
 
 	const dgVector invMass0(body0->m_invMass[3]);
 	const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
@@ -677,8 +678,9 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 
 	jointInfo->m_preconditioner0 = dgFloat32(1.0f);
 	jointInfo->m_preconditioner1 = dgFloat32(1.0f);
-//	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
-	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())) {
+
+	 //&& !(body0->GetSkeleton() && body1->GetSkeleton())
+	if (!joint->IsSkeletonLoop() && (invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
 		if (mass0 > (DG_DIAGONAL_PRECONDITIONER * mass1)) {

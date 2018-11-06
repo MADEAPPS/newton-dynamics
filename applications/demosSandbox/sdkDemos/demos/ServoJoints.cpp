@@ -46,17 +46,17 @@ struct SERVO_VEHICLE_DEFINITION
 
 static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 {
-	{"body",		"convexHull",			900.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
-//	{"fr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
-//	{"fl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
-//	{"rr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
-//	{"rl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+	{"body",		"convexHull",		   2500.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
+	{"fr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
+	{"fl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
+	{"rr_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+	{"rl_tire",		"tireShape",			 50.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
 	{"lift_1",		"convexHull",			 50.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
 	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_4",		"convexHull",			 20.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-//	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 class dLifterUserData: public DemoEntity::UserData
@@ -873,7 +873,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& location)
 {
 	dMatrix matrix (location);
-	matrix.m_posit.m_x += 1.5f;
+	matrix.m_posit.m_x += 4.5f;
 
 	NewtonWorld* const world = scene->GetNewton();
 	NewtonCollision* const bar = NewtonCreateBox (world, 0.25f, 0.25f, 2.4f, SERVO_VEHICLE_DEFINITION::m_landPart, NULL); 
@@ -934,7 +934,7 @@ void ServoJoints (DemoEntityManager* const scene)
 	inputManager->AddPlayer(forklift);
 
 	// place heavy load to show reproduce black bird dream problems
-//	MakeHeavyLoad (scene, matrix);
+	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
 //	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
