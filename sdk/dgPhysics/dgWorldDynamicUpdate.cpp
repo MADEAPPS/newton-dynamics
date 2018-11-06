@@ -608,6 +608,8 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 				skeleton1->AddSelfCollisionJoint(contactJoint);
 			}
 		}
+
+contactJoint->m_isInSkeletonLoop = false;
 	}
 
 	jointInfo->m_pairCount = dof;

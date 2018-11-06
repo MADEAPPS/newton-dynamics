@@ -872,7 +872,8 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& location)
 {
-	dFloat mass = 4000.0f;
+//	dFloat mass = 4000.0f;
+	dFloat mass = 400.0f;
 
 	dMatrix matrix (location);
 	matrix.m_posit.m_x += 1.5f;
