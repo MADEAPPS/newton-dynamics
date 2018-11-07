@@ -980,7 +980,7 @@ void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0
 		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]): 1.0f;
 		const dgFloat32 l = low[i] * coefficient;
 		const dgFloat32 h = high[i] * coefficient;
-		x[i] = dgClamp(x[i] + x0[i], l, h) - x0[i];
+		x[i] = dgClamp(x0[i], l, h) - x0[i];
 		invDiag1[i] = dgFloat32(1.0f) / matrix[stride + i];
 		stride += size;
 	}
@@ -1130,7 +1130,6 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			r += matrixRow10[j] * f[j];
 		}
 		b[i] -= r;
-		u[i] = dgFloat32 (0.0f);
 	}
 	SolveLcp(u, u0, b, low, high, normalIndex);
 
