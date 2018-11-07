@@ -608,8 +608,6 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 				skeleton1->AddSelfCollisionJoint(contactJoint);
 			}
 		}
-
-contactJoint->m_isInSkeletonLoop = false;
 	}
 
 	jointInfo->m_pairCount = dof;
@@ -681,8 +679,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 	jointInfo->m_preconditioner0 = dgFloat32(1.0f);
 	jointInfo->m_preconditioner1 = dgFloat32(1.0f);
 
-	 //&& !(body0->GetSkeleton() && body1->GetSkeleton())
-	if (!joint->IsSkeletonLoop() && (invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
+	if ((invMass0.GetScalar() > dgFloat32(0.0f)) && (invMass1.GetScalar() > dgFloat32(0.0f))) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
 		if (mass0 > (DG_DIAGONAL_PRECONDITIONER * mass1)) {
@@ -690,6 +687,11 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		} else if (mass1 > (DG_DIAGONAL_PRECONDITIONER * mass0)) {
 			jointInfo->m_preconditioner1 = mass1 / (mass0 * DG_DIAGONAL_PRECONDITIONER);
 		}
+	}
+
+	if (joint->IsSkeletonLoop() || joint->IsSkeleton() || (body0->GetSkeleton() && body1->GetSkeleton())) {
+		jointInfo->m_preconditioner0 = dgFloat32(1.0f);
+		jointInfo->m_preconditioner1 = dgFloat32(1.0f);
 	}
 
 	dgJacobian forceAcc0;

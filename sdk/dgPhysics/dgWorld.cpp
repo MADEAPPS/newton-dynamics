@@ -1113,7 +1113,6 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 	dgAssert (rootBone->GetType() == dgBody::m_dynamicBody);
 	dgSkeletonContainer* const container = new (m_allocator) dgSkeletonContainer(this, (dgDynamicBody*)rootBone);
 
-//	list->Insert (container, container->GetId());
 	container->m_listNode = list->Append(container);
 	return container;
 }
@@ -1121,7 +1120,6 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 void dgWorld::DestroySkeletonContainer (dgSkeletonContainer* const container)
 {
 	dgSkeletonList* const list = this;
-//	list->Remove (container->GetId());
 	dgAssert(container->m_listNode);
 	list->Remove(container->m_listNode);
 	delete container;

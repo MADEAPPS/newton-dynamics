@@ -706,7 +706,6 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 				x[j] = l;
 			} else {
 				tolerance += r * r;
-				//x[j] = x[j] + (f - x[j]) * sor;
 				x[j] = f;
 			}
 			base += size;

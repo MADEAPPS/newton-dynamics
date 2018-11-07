@@ -62,9 +62,31 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dVehicleChassis.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleDashControl.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleInterface.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleSingleBody.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleVirtualDifferential.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleVirtualEngine.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleVirtualJoints.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleVirtualTire.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleChassis.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleDashControl.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleInterface.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleSingleBody.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleVirtualDifferential.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleVirtualEngine.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleVirtualJoints.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleVirtualTire.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A78EB61C-CCC7-491E-B32D-7A31B76A73D3}</ProjectGuid>
