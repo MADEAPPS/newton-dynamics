@@ -966,9 +966,9 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 
 void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
-	const dgFloat32 sor = 1.2f;
-	const dgFloat32 tol2 = 0.1f;
-	const dgInt32 maxIterCount = 100;
+	const dgFloat32 sor = 1.125f;
+	const dgFloat32 tol2 = 0.25f;
+	const dgInt32 maxIterCount = 64;
 	const dgInt32 size = m_auxiliaryRowCount;
 	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
 	dgCheckAligment(invDiag1);
@@ -1020,6 +1020,9 @@ void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0
 			base += size;
 		}
 	}
+
+//if (passes > 20)
+//dgTrace(("%d %d\n", size, passes));
 }
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const
