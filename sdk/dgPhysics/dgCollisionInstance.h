@@ -145,6 +145,7 @@ class dgCollisionInstance
 	dgInt32 m_collisionMode;
 	dgInt32 m_refCount;
 	dgScaleType m_scaleType;
+	bool m_isExternal;
 
 	static dgVector m_padding;
 };
@@ -165,6 +166,7 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_collisionMode(meshInstance.m_collisionMode)
 	,m_refCount(1)
 	,m_scaleType(meshInstance.m_scaleType)
+	,m_isExternal(false)
 {
 	if (m_childShape) {
 		m_childShape->AddRef();
