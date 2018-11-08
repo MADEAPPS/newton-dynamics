@@ -822,7 +822,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 //		//m_massMatrix11[stride] *= dgFloat32 (1.0001f);
 //		stride += (m_auxiliaryRowCount + 1);
 //	}
-//	dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_massMatrix11, diagDamp);
+	dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 }
 
 bool dgSkeletonContainer::SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const
