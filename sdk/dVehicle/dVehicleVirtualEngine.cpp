@@ -70,6 +70,7 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 	,m_metricInfo(info)
 	,m_blockJoint()
 	,m_crankJoint()
+	,m_gearBox()
 	,m_omega(0.0f)
 {
 	SetWorld(parent->GetWorld());
@@ -82,6 +83,10 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*) m_parent->GetAsVehicle();
 	// set the tire joint
 	m_blockJoint.Init(&m_body, chassis->GetBody());
+
+	m_gearBox.Init(&m_body, differential->GetBody());
+	m_gearBox.SetOwners(this, differential);
+
 	m_crankJoint.Init(&m_body, chassis->m_groundNode.GetBody());
 	m_crankJoint.SetOwners(this, &chassis->m_groundNode);
 /*
@@ -141,7 +146,6 @@ void dVehicleVirtualEngine::InitEngineTorqueCurve()
 	m_metricInfo.m_torqueCurve[5] = dEngineTorqueNode(m_metricInfo.m_rpmAtRedLine, m_metricInfo.m_idleTorque);
 }
 
-
 void dVehicleVirtualEngine::SetInfo(const dEngineInfo& info)
 {
 	dVehicleEngineInterface::SetInfo(info);
@@ -193,8 +197,9 @@ void dVehicleVirtualEngine::SetThrottle (dFloat throttle)
 
 int dVehicleVirtualEngine::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
 {
-	jointArray[0] = &m_crankJoint;
-	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[1]) + 1;
+	jointArray[0] = &m_gearBox;
+	jointArray[1] = &m_crankJoint;
+	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[2]) + 2;
 }
 
 void dVehicleVirtualEngine::ApplyExternalForce()

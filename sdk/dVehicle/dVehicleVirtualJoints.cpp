@@ -99,78 +99,6 @@ void dDifferentialMount::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 	}
 }
 
-// *******************************************************************
-// engine block 
-// *******************************************************************
-dEngineBlockJoint::dEngineBlockJoint()
-	:dComplementaritySolver::dBilateralJoint()
-{
-}
-
-void dEngineBlockJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
-{
-	dComplementaritySolver::dBodyState* const engine = m_state0;
-	dComplementaritySolver::dBodyState* const chassis = m_state1;
-
-	const dVector& omega = chassis->GetOmega();
-	const dMatrix& matrix = engine->GetMatrix();
-
-	// three rigid attachment to chassis
-	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_front, omega);
-	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_up, omega);
-	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_right, omega);
-
-	// angular constraints	
-	AddAngularRowJacobian(constraintParams, matrix.m_front, omega, 0.0f);
-	AddAngularRowJacobian(constraintParams, matrix.m_up, omega, 0.0f);
-}
-
-// *******************************************************************
-// engine crank
-// *******************************************************************
-dEngineCrankJoint::dEngineCrankJoint()
-	:dKinematicLoopJoint()
-	,m_targetRpm(0.0f)
-	,m_targetTorque(D_VEHICLE_STOP_TORQUE)
-{
-	m_isActive = true;
-}
-
-void dEngineCrankJoint::SetTorqueAndRpm(dFloat torque, dFloat rpm)
-{
-	m_targetRpm = -dAbs(rpm);
-	m_targetTorque = dAbs(torque);
-}
-
-void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
-{
-	dComplementaritySolver::dBodyState* const engine = m_state0;
-	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
-
-	const dVector& omega = chassis->GetOmega();
-	const dMatrix& matrix = engine->GetMatrix();
-
-	int index = constraintParams->m_count;
-	AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
-
-	const dVector& omega0 = m_state0->GetOmega();
-	const dVector& omega1 = m_state1->GetOmega();
-	const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
-	const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
-	const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-	dFloat relOmega = m_targetRpm - w;
-	constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
-
-	bool test = (m_targetRpm > -0.1f) && (w > -1.0f);
-	dFloat targetTorque = test ? D_VEHICLE_STOP_TORQUE : m_targetTorque;
-	constraintParams->m_jointLowFrictionCoef[index] = -targetTorque;
-	constraintParams->m_jointHighFrictionCoef[index] = targetTorque;
-
-	m_dof = 1;
-	m_count = 1;
-	constraintParams->m_count = 1;
-}
 
 // *******************************************************************
 // loop base 
@@ -441,4 +369,103 @@ dDifferentialJoint::dDifferentialJoint()
 void dDifferentialJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dAssert (0);
+}
+
+// *******************************************************************
+// engine block 
+// *******************************************************************
+dEngineBlockJoint::dEngineBlockJoint()
+	:dComplementaritySolver::dBilateralJoint()
+{
+}
+
+void dEngineBlockJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dComplementaritySolver::dBodyState* const engine = m_state0;
+	dComplementaritySolver::dBodyState* const chassis = m_state1;
+
+	const dVector& omega = chassis->GetOmega();
+	const dMatrix& matrix = engine->GetMatrix();
+
+	// three rigid attachment to chassis
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_front, omega);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_up, omega);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_right, omega);
+
+	// angular constraints	
+	AddAngularRowJacobian(constraintParams, matrix.m_front, omega, 0.0f);
+	AddAngularRowJacobian(constraintParams, matrix.m_up, omega, 0.0f);
+}
+
+// *******************************************************************
+// engine crank
+// *******************************************************************
+dEngineCrankJoint::dEngineCrankJoint()
+	:dKinematicLoopJoint()
+	, m_targetRpm(0.0f)
+	, m_targetTorque(D_VEHICLE_STOP_TORQUE)
+{
+	m_isActive = true;
+}
+
+void dEngineCrankJoint::SetTorqueAndRpm(dFloat torque, dFloat rpm)
+{
+	m_targetRpm = -dAbs(rpm);
+	m_targetTorque = dAbs(torque);
+}
+
+void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dComplementaritySolver::dBodyState* const engine = m_state0;
+	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
+
+	const dVector& omega = chassis->GetOmega();
+	const dMatrix& matrix = engine->GetMatrix();
+
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
+
+	const dVector& omega0 = m_state0->GetOmega();
+	const dVector& omega1 = m_state1->GetOmega();
+	const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+	const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+	const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+	dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+	dFloat relOmega = m_targetRpm - w;
+	constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
+
+	bool test = (m_targetRpm > -0.1f) && (w > -1.0f);
+	dFloat targetTorque = test ? D_VEHICLE_STOP_TORQUE : m_targetTorque;
+	constraintParams->m_jointLowFrictionCoef[index] = -targetTorque;
+	constraintParams->m_jointHighFrictionCoef[index] = targetTorque;
+
+	m_dof = 1;
+	m_count = 1;
+	constraintParams->m_count = 1;
+}
+
+
+// *******************************************************************
+// engine crank
+// *******************************************************************
+dGearBoxJoint::dGearBoxJoint()
+	:dKinematicLoopJoint()
+	,m_gearRatio (0.0f)
+{
+	m_isActive = true;
+}
+
+void dGearBoxJoint::SetGearRatio(dFloat ratio)
+{
+	m_gearRatio = ratio;
+}
+
+void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+//	dComplementaritySolver::dBodyState* const engine = m_state0;
+//	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
+
+	m_dof = 0;
+	m_count = 0;
+	constraintParams->m_count = 0;
 }

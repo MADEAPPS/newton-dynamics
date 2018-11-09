@@ -67,6 +67,7 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	dEngineMetricInfo m_metricInfo;
 	dEngineBlockJoint m_blockJoint;
 	dEngineCrankJoint m_crankJoint;
+	dGearBoxJoint m_gearBox;
 	dFloat m_omega;
 	friend class dVehicleChassis;
 };

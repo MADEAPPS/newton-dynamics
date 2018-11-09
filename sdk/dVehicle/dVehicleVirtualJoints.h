@@ -43,7 +43,6 @@ class dDifferentialMount: public dComplementaritySolver::dBilateralJoint
 	bool m_slipeOn;
 };
 
-
 class dKinematicLoopJoint : public dComplementaritySolver::dBilateralJoint
 {
 	public:
@@ -144,6 +143,21 @@ class dEngineCrankJoint: public dKinematicLoopJoint
 
 	dFloat m_targetRpm;
 	dFloat m_targetTorque;
+};
+
+class dGearBoxJoint: public dKinematicLoopJoint
+{
+	public:
+	dGearBoxJoint();
+
+	void SetGearRatio(dFloat ratio);
+
+	private:
+	int GetMaxDof() const { return 1; }
+	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
+	dFloat m_gearRatio;
 };
 
 
