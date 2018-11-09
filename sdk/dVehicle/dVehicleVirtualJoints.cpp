@@ -421,29 +421,26 @@ void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* c
 
 	const dVector& omega = chassis->GetOmega();
 	const dMatrix& matrix = engine->GetMatrix();
-
-	int index = constraintParams->m_count;
 	AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
 
 	const dVector& omega0 = m_state0->GetOmega();
 	const dVector& omega1 = m_state1->GetOmega();
-	const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
-	const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+	const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians->m_jacobian_J01;
+	const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians->m_jacobian_J10;
 	const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 	dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 	dFloat relOmega = m_targetRpm - w;
-	constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
+	constraintParams->m_jointAccel[0] = relOmega * constraintParams->m_timestepInv;
 
 	bool test = (m_targetRpm > -0.1f) && (w > -1.0f);
 	dFloat targetTorque = test ? D_VEHICLE_STOP_TORQUE : m_targetTorque;
-	constraintParams->m_jointLowFrictionCoef[index] = -targetTorque;
-	constraintParams->m_jointHighFrictionCoef[index] = targetTorque;
+	constraintParams->m_jointLowFrictionCoef[0] = -targetTorque;
+	constraintParams->m_jointHighFrictionCoef[0] = targetTorque;
 
 	m_dof = 1;
 	m_count = 1;
 	constraintParams->m_count = 1;
 }
-
 
 // *******************************************************************
 // engine crank
@@ -462,10 +459,27 @@ void dGearBoxJoint::SetGearRatio(dFloat ratio)
 
 void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-//	dComplementaritySolver::dBodyState* const engine = m_state0;
-//	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
-
 	m_dof = 0;
 	m_count = 0;
 	constraintParams->m_count = 0;
+	if (dAbs(m_gearRatio) > 1.0e-3f) {
+
+/*
+		dComplementaritySolver::dBodyState* const engine = m_state0;
+		dComplementaritySolver::dBodyState* const differential = m_state1;
+		dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
+
+		const dVector& omega = chassis->GetOmega();
+		const dMatrix& matrix = engine->GetMatrix();
+		AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
+
+		const dVector& omega0 = m_state0->GetOmega();
+		const dVector& omega1 = m_state1->GetOmega();
+		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
+		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
+		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+*/
+
+	}
 }
