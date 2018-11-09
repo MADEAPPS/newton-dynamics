@@ -1670,8 +1670,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		instance1.m_material.m_userData = NULL;
 		proxy.m_instance0 = collision0;
 		proxy.m_instance1 = collision1;
-
-		
 	} else {
 		count = CalculateUserContacts(proxy);
 

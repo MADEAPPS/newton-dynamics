@@ -189,7 +189,6 @@ DG_INLINE dgInt32 dgCollisionInstance::Release ()
 	return 0;
 }
 
-
 DG_INLINE dgInt32 dgCollisionInstance::IsType (dgCollision::dgRTTI type) const 
 {
 	return m_childShape->IsType (type);

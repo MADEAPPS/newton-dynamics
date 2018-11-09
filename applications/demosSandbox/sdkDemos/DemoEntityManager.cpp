@@ -60,14 +60,14 @@
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
-#define DEFAULT_SCENE	29			// servo joints
+//#define DEFAULT_SCENE	29			// servo joints
 //#define DEFAULT_SCENE	30			// articulated joints
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
-//#define DEFAULT_SCENE	36			// single body vehicle
+#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// David Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles
@@ -334,7 +334,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showAABB = false;
 //	m_showContactPoints = false;
 //	m_hideVisualMeshes = true;
-	m_autoSleepMode = false;
+//	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 	m_solverPasses = 4;
 //	m_workerThreads = 4;
