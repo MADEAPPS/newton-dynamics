@@ -65,12 +65,12 @@ dFloat dVehicleVirtualEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 	return m_torqueCurve[maxIndex - 1].m_rpm;
 }
 
-
 dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const dEngineInfo& info, dVehicleDifferentialInterface* const differential)
 	:dVehicleEngineInterface(parent, info, differential)
-	,m_joint()
-	,m_omega(0.0f)
 	,m_metricInfo(info)
+	,m_blockJoint()
+	,m_crankJoint()
+	,m_omega(0.0f)
 {
 	SetWorld(parent->GetWorld());
 
@@ -79,8 +79,11 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 	m_body.SetInertia(inertia, inertia, inertia);
 	m_body.UpdateInertia();
 
+	dVehicleSingleBody* const chassis = (dVehicleSingleBody*) m_parent->GetAsVehicle();
 	// set the tire joint
-	m_joint.Init(&m_body, m_parent->GetBody());
+	m_blockJoint.Init(&m_body, chassis->GetBody());
+	m_crankJoint.Init(&m_body, chassis->m_groundNode.GetBody());
+	m_crankJoint.SetOwners(this, &chassis->m_groundNode);
 /*
 	m_leftDifferential.Init(&m_body, m_leftTire->GetBody());
 	m_rightDifferential.Init(&m_body, m_rightTire->GetBody());
@@ -163,7 +166,7 @@ void dVehicleVirtualEngine::SetInfo(const dEngineInfo& info)
 
 dComplementaritySolver::dBilateralJoint* dVehicleVirtualEngine::GetJoint()
 {
-	return &m_joint;
+	return &m_blockJoint;
 }
 
 void dVehicleVirtualEngine::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -185,7 +188,13 @@ void dVehicleVirtualEngine::SetThrottle (dFloat throttle)
 {
 	dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
 	dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
-	m_joint.SetTorqueAndRpm(torque, omega);
+	m_crankJoint.SetTorqueAndRpm(torque, omega);
+}
+
+int dVehicleVirtualEngine::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+{
+	jointArray[0] = &m_crankJoint;
+	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[1]) + 1;
 }
 
 void dVehicleVirtualEngine::ApplyExternalForce()

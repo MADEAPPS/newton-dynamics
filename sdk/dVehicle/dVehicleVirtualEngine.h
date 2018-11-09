@@ -32,7 +32,6 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 		dFloat m_torque;
 	};
 
-
 	class dEngineMetricInfo: public dEngineInfo
 	{
 		public:
@@ -60,10 +59,14 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	void SetInfo(const dEngineInfo& info);
 	
 	dComplementaritySolver::dBilateralJoint* GetJoint();
+	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
+
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	
 
 	dEngineMetricInfo m_metricInfo;
-	dEngineJoint m_joint;
+	dEngineBlockJoint m_blockJoint;
+	dEngineCrankJoint m_crankJoint;
 	dFloat m_omega;
 	friend class dVehicleChassis;
 };

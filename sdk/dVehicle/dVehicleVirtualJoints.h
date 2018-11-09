@@ -43,18 +43,6 @@ class dDifferentialMount: public dComplementaritySolver::dBilateralJoint
 	bool m_slipeOn;
 };
 
-class dEngineJoint: public dComplementaritySolver::dBilateralJoint
-{
-	public:
-	dEngineJoint();
-
-	void SetTorqueAndRpm (dFloat torque, dFloat rpm);
-	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
-	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
-
-	dFloat m_targetRpm;
-	dFloat m_targetTorque;
-};
 
 class dKinematicLoopJoint : public dComplementaritySolver::dBilateralJoint
 {
@@ -72,7 +60,6 @@ class dKinematicLoopJoint : public dComplementaritySolver::dBilateralJoint
 	dVehicleNode* m_owner1;
 	bool m_isActive;
 };
-
 
 class dTireContact: public dKinematicLoopJoint
 {
@@ -123,7 +110,6 @@ class dTireContact: public dKinematicLoopJoint
 	friend class dVehicleVirtualTire;
 };
 
-
 class dDifferentialJoint: public dKinematicLoopJoint
 {
 	public:
@@ -133,6 +119,31 @@ class dDifferentialJoint: public dKinematicLoopJoint
 	int GetMaxDof() const { return 1;}
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+};
+
+class dEngineBlockJoint : public dComplementaritySolver::dBilateralJoint
+{
+	public:
+	dEngineBlockJoint();
+
+	private:
+	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+};
+
+class dEngineCrankJoint: public dKinematicLoopJoint
+{
+	public:
+	dEngineCrankJoint();
+
+	void SetTorqueAndRpm(dFloat torque, dFloat rpm);
+	private:
+	int GetMaxDof() const { return 1; }
+	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
+	dFloat m_targetRpm;
+	dFloat m_targetTorque;
 };
 
 

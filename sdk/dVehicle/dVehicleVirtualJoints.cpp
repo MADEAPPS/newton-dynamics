@@ -100,22 +100,14 @@ void dDifferentialMount::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 }
 
 // *******************************************************************
-// differential attachment to chassis
+// engine block 
 // *******************************************************************
-dEngineJoint::dEngineJoint()
+dEngineBlockJoint::dEngineBlockJoint()
 	:dComplementaritySolver::dBilateralJoint()
-	,m_targetRpm(0.0f)
-	,m_targetTorque(D_VEHICLE_STOP_TORQUE)
 {
 }
 
-void dEngineJoint::SetTorqueAndRpm (dFloat torque, dFloat rpm)
-{
-	m_targetRpm = -dAbs (rpm);
-	m_targetTorque = dAbs (torque);
-}
-
-void dEngineJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dEngineBlockJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dComplementaritySolver::dBodyState* const engine = m_state0;
 	dComplementaritySolver::dBodyState* const chassis = m_state1;
@@ -131,6 +123,32 @@ void dEngineJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, matrix.m_front, omega, 0.0f);
 	AddAngularRowJacobian(constraintParams, matrix.m_up, omega, 0.0f);
+}
+
+// *******************************************************************
+// engine crank
+// *******************************************************************
+dEngineCrankJoint::dEngineCrankJoint()
+	:dKinematicLoopJoint()
+	,m_targetRpm(0.0f)
+	,m_targetTorque(D_VEHICLE_STOP_TORQUE)
+{
+	m_isActive = true;
+}
+
+void dEngineCrankJoint::SetTorqueAndRpm(dFloat torque, dFloat rpm)
+{
+	m_targetRpm = -dAbs(rpm);
+	m_targetTorque = dAbs(torque);
+}
+
+void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dComplementaritySolver::dBodyState* const engine = m_state0;
+	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
+
+	const dVector& omega = chassis->GetOmega();
+	const dMatrix& matrix = engine->GetMatrix();
 
 	int index = constraintParams->m_count;
 	AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
@@ -148,8 +166,11 @@ void dEngineJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	dFloat targetTorque = test ? D_VEHICLE_STOP_TORQUE : m_targetTorque;
 	constraintParams->m_jointLowFrictionCoef[index] = -targetTorque;
 	constraintParams->m_jointHighFrictionCoef[index] = targetTorque;
-}
 
+	m_dof = 1;
+	m_count = 1;
+	constraintParams->m_count = 1;
+}
 
 // *******************************************************************
 // loop base 
@@ -168,7 +189,6 @@ void dKinematicLoopJoint::SetOwners(dVehicleNode* const owner0, dVehicleNode* co
 	m_owner1 = owner1;
 	Init(m_owner0->GetBody(), m_owner1->GetBody());
 }
-
 
 // *******************************************************************
 // tire contacts

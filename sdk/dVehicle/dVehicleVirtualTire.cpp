@@ -171,7 +171,6 @@ int dVehicleVirtualTire::GetKinematicLoops(dKinematicLoopJoint** const jointArra
 	return dVehicleTireInterface::GetKinematicLoops(&jointArray[count]) + count;
 }
 
-
 void dVehicleVirtualTire::Integrate(dFloat timestep)
 {
 	dVehicleTireInterface::Integrate(timestep);
