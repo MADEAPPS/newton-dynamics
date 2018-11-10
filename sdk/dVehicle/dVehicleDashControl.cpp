@@ -63,6 +63,13 @@ void dVehicleEngineControl::Update(dFloat timestep)
 	}
 }
 
+void dVehicleEngineControl::SetGear (int gear)
+{
+	if (m_engine) {
+		m_engine->SetGear(gear);
+	}
+}
+
 // ****************************************************************************
 //
 // ****************************************************************************

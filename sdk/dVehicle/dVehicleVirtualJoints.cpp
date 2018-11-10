@@ -447,7 +447,8 @@ void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* c
 // *******************************************************************
 dGearBoxJoint::dGearBoxJoint()
 	:dKinematicLoopJoint()
-	,m_gearRatio (0.0f)
+	,m_gearRatio(0.0f)
+	,m_crowndGear(1.0f)
 {
 	m_isActive = true;
 }

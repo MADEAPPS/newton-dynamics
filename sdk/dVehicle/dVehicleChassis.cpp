@@ -318,6 +318,8 @@ void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat 
 
 if (m_engineControl) {
 m_engineControl->SetParam(driveInputs.m_throttle);
+m_engineControl->SetGear(dVehicleEngineInterface::m_firstGear);
+
 }
 
 

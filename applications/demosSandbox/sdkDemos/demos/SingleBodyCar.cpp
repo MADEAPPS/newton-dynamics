@@ -458,14 +458,24 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// add and internal combustion engine
 		dVehicleEngineInterface::dEngineInfo engineInfo;
 		engineInfo.m_mass = 50.0f;
-		engineInfo.m_armatureRadius = 0.2f;
-		engineInfo.m_idleTorque = 100.0f;			// IDLE_TORQUE
+		engineInfo.m_armatureRadius = 0.125f;
+		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
 		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
 		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
 		engineInfo.m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM
 		engineInfo.m_peakHorsePower = 400.0f;		// PEAK_HP
 		engineInfo.m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
 		engineInfo.m_rpmAtRedLine = 6000.0f;		// REDLINE_TORQUE_RPM
+
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_reverseGear] = -2.90f;	// reverse
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_neutralGear] = 0.0f;     // neutral
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 0] = 2.66f;  // GEAR_1
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 1] = 1.78f;	// GEAR_2
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 2] = 1.30f;	// GEAR_3
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 3] = 1.00f;	// GEAR_4
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 4] = 0.74f;	// GEAR_5
+		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 5] = 0.50f;	// GEAR_6
+		engineInfo.m_gearsCount = 8;
 
 		dVehicleEngineInterface* const engine = vehicle->AddEngine(engineInfo, differential);
 		// Set Engine Control

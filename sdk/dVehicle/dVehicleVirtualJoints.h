@@ -158,6 +158,7 @@ class dGearBoxJoint: public dKinematicLoopJoint
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
 	dFloat m_gearRatio;
+	dFloat m_crowndGear;
 };
 
 

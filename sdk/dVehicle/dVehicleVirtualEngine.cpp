@@ -18,7 +18,7 @@ dVehicleVirtualEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& i
 	:dEngineInfo(info)
 {
 	const dFloat horsePowerToWatts = 735.5f;
-	const dFloat kmhToMetersPerSecunds = 0.278f;
+//	const dFloat kmhToMetersPerSecunds = 0.278f;
 	const dFloat rpmToRadiansPerSecunds = 0.105f;
 	const dFloat poundFootToNewtonMeters = 1.356f;
 
@@ -154,18 +154,8 @@ void dVehicleVirtualEngine::SetInfo(const dEngineInfo& info)
 //	m_metricInfo.m_clutchFrictionTorque = dMax(dFloat(10.0f), dAbs(m_metricInfo.m_clutchFrictionTorque));
 //	m_metricInfoCopy.m_clutchFrictionTorque = m_metricInfo.m_clutchFrictionTorque;
 	InitEngineTorqueCurve();
-/*
-	dAssert(info.m_gearsCount < (int(sizeof(m_metricInfo.m_gearRatios) / sizeof(m_metricInfo.m_gearRatios[0])) - D_VEHICLE_FIRST_GEAR));
-	m_metricInfo.m_gearsCount = info.m_gearsCount + D_VEHICLE_FIRST_GEAR;
 
-	m_metricInfo.m_gearRatios[D_VEHICLE_NEUTRAL_GEAR] = 0.0f;
-	m_metricInfo.m_gearRatios[D_VEHICLE_REVERSE_GEAR] = -dAbs(info.m_reverseGearRatio);
-	for (int i = 0; i < (m_metricInfo.m_gearsCount - D_VEHICLE_FIRST_GEAR); i++) {
-		m_metricInfo.m_gearRatios[i + D_VEHICLE_FIRST_GEAR] = dAbs(info.m_gearRatios[i]);
-	}
-
-	m_controller->SetAerodynamicsDownforceCoefficient(info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
-*/
+//	m_controller->SetAerodynamicsDownforceCoefficient(info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
 }
 
 dComplementaritySolver::dBilateralJoint* dVehicleVirtualEngine::GetJoint()
@@ -193,6 +183,13 @@ void dVehicleVirtualEngine::SetThrottle (dFloat throttle)
 	dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
 	dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
 	m_crankJoint.SetTorqueAndRpm(torque, omega);
+}
+
+void dVehicleVirtualEngine::SetGear (int gear)
+{
+	gear = dClamp (gear, int (m_reverseGear), m_metricInfo.m_gearsCount);
+	dFloat ratio = m_metricInfo.m_gearRatios[gear];
+	m_gearBox.SetGearRatio(ratio);
 }
 
 int dVehicleVirtualEngine::GetKinematicLoops(dKinematicLoopJoint** const jointArray)

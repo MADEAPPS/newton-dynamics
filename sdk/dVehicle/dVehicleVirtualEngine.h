@@ -25,9 +25,10 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 		dEngineTorqueNode() {}
 		dEngineTorqueNode(dFloat rpm, dFloat torque)
 			:m_rpm(rpm)
-			, m_torque(torque)
+			,m_torque(torque)
 		{
 		}
+
 		dFloat m_rpm;
 		dFloat m_torque;
 	};
@@ -55,7 +56,11 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	void ApplyExternalForce();
 	void InitEngineTorqueCurve();
 	void Integrate(dFloat timestep);
+
+	void SetGear (int gear);
 	void SetThrottle (dFloat throttle);
+
+
 	void SetInfo(const dEngineInfo& info);
 	
 	dComplementaritySolver::dBilateralJoint* GetJoint();
