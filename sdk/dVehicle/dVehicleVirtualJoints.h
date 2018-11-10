@@ -109,17 +109,6 @@ class dTireContact: public dKinematicLoopJoint
 	friend class dVehicleVirtualTire;
 };
 
-class dDifferentialJoint: public dKinematicLoopJoint
-{
-	public:
-	dDifferentialJoint ();
-
-	private:
-	int GetMaxDof() const { return 1;}
-	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
-	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
-};
-
 class dEngineBlockJoint : public dComplementaritySolver::dBilateralJoint
 {
 	public:
@@ -161,6 +150,17 @@ class dGearBoxJoint: public dKinematicLoopJoint
 	dFloat m_gearRatio;
 	dFloat m_crowndGear;
 	dFloat m_clutchTorque;
+};
+
+class dTireAxleJoint: public dKinematicLoopJoint
+{
+	public:
+	dTireAxleJoint();
+
+	private:
+	int GetMaxDof() const { return 1; }
+	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 };
 
 

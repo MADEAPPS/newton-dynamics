@@ -358,20 +358,6 @@ void dTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat
 }
 
 
-
-// *******************************************************************
-// differential axle to tire
-// *******************************************************************
-dDifferentialJoint::dDifferentialJoint()	
-	:dKinematicLoopJoint()
-{
-}
-
-void dDifferentialJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
-{
-	dAssert (0);
-}
-
 // *******************************************************************
 // engine block 
 // *******************************************************************
@@ -500,4 +486,21 @@ void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const
 		m_count = 1;
 		constraintParams->m_count = 1;
 	}
+}
+
+// *******************************************************************
+// tire axle
+// *******************************************************************
+dTireAxleJoint::dTireAxleJoint()
+	:dKinematicLoopJoint()
+{
+	m_isActive = true;
+}
+
+void dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+
+	m_dof = 0;
+	m_count = 0;
+	constraintParams->m_count = 0;
 }

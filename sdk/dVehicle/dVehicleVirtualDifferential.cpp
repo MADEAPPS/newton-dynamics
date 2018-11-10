@@ -18,8 +18,8 @@
 dVehicleVirtualDifferential::dVehicleVirtualDifferential(dVehicleNode* const parent, dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
 	:dVehicleDifferentialInterface(parent)
 	,m_differential()
-	,m_leftDifferential()
-	,m_rightDifferential()
+	,m_leftAxle()
+	,m_rightAxle()
 	,m_leftTire(leftTire)
 	,m_rightTire(rightTire)
 	,m_diffOmega(0.0f)
@@ -37,11 +37,11 @@ dVehicleVirtualDifferential::dVehicleVirtualDifferential(dVehicleNode* const par
 
 	// set the tire joint
 	m_differential.Init(&m_body, m_parent->GetBody());
-	m_leftDifferential.Init(&m_body, m_leftTire->GetBody());
-	m_rightDifferential.Init(&m_body, m_rightTire->GetBody());
+	m_leftAxle.Init(&m_body, m_leftTire->GetBody());
+	m_rightAxle.Init(&m_body, m_rightTire->GetBody());
 
-	m_leftDifferential.SetOwners(this, m_leftTire);
-	m_rightDifferential.SetOwners(this, m_rightTire);
+	m_leftAxle.SetOwners(this, m_leftTire);
+	m_rightAxle.SetOwners(this, m_rightTire);
 }
 
 dVehicleVirtualDifferential::~dVehicleVirtualDifferential()
@@ -56,6 +56,13 @@ dComplementaritySolver::dBilateralJoint* dVehicleVirtualDifferential::GetJoint()
 void dVehicleVirtualDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 	dVehicleDifferentialInterface::Debug(debugContext);
+}
+
+int dVehicleVirtualDifferential::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+{
+	jointArray[0] = &m_leftAxle;
+	jointArray[1] = &m_rightAxle;
+	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[2]) + 2;
 }
 
 void dVehicleVirtualDifferential::ApplyExternalForce()
