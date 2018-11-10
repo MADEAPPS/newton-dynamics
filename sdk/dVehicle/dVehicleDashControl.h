@@ -44,6 +44,7 @@ class dVehicleEngineControl: public dVehicleDashControl
 	DVEHICLE_API void SetEngine (dVehicleEngineInterface* const engine);
 
 	void SetGear (int gear);
+	void SetClutch (dFloat clutch);
 	dVehicleEngineInterface* GetEngine() const {return m_engine;}
 
 	virtual void Update(dFloat timestep);

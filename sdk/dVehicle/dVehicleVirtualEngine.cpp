@@ -22,6 +22,7 @@ dVehicleVirtualEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& i
 	const dFloat rpmToRadiansPerSecunds = 0.105f;
 	const dFloat poundFootToNewtonMeters = 1.356f;
 
+	m_clutchTorque *= poundFootToNewtonMeters;
 	m_idleTorque *= poundFootToNewtonMeters;
 	m_peakTorque *= poundFootToNewtonMeters;
 
@@ -192,6 +193,12 @@ void dVehicleVirtualEngine::SetGear (int gear)
 	m_gearBox.SetGearRatio(ratio);
 }
 
+void dVehicleVirtualEngine::SetClutch (dFloat clutch) 
+{
+	clutch = dClamp (clutch, dFloat (0.0f), dFloat (1.0f));
+	m_gearBox.SetClutchTorque(clutch * m_metricInfo.m_clutchTorque);
+}
+
 int dVehicleVirtualEngine::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
 {
 	jointArray[0] = &m_gearBox;
@@ -228,4 +235,6 @@ void dVehicleVirtualEngine::Integrate(dFloat timestep)
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector localOmega(omega - chassisOmega);
 	m_omega = chassisMatrix.m_right.DotProduct3(localOmega);
+
+dTrace (("eng(%f)\n", m_omega));
 }

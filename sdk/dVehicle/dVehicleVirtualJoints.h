@@ -151,6 +151,7 @@ class dGearBoxJoint: public dKinematicLoopJoint
 	dGearBoxJoint();
 
 	void SetGearRatio(dFloat ratio);
+	void SetClutchTorque(dFloat toqrue);
 
 	private:
 	int GetMaxDof() const { return 1; }
@@ -159,6 +160,7 @@ class dGearBoxJoint: public dKinematicLoopJoint
 
 	dFloat m_gearRatio;
 	dFloat m_crowndGear;
+	dFloat m_clutchTorque;
 };
 
 

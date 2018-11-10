@@ -14,6 +14,7 @@
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualTire.h"
+#include "dVehicleVirtualEngine.h"
 #include "dVehicleVirtualJoints.h"
 
 #define D_VEHICLE_STOP_TORQUE	10000.0f
@@ -449,6 +450,7 @@ dGearBoxJoint::dGearBoxJoint()
 	:dKinematicLoopJoint()
 	,m_gearRatio(0.0f)
 	,m_crowndGear(1.0f)
+	,m_clutchTorque(1000.0f)
 {
 	m_isActive = true;
 }
@@ -458,6 +460,11 @@ void dGearBoxJoint::SetGearRatio(dFloat ratio)
 	m_gearRatio = ratio;
 }
 
+void dGearBoxJoint::SetClutchTorque(dFloat clutchTorque)
+{
+	m_clutchTorque = clutchTorque;
+}
+
 void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	m_dof = 0;
@@ -465,22 +472,32 @@ void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const
 	constraintParams->m_count = 0;
 	if (dAbs(m_gearRatio) > 1.0e-3f) {
 
-/*
-		dComplementaritySolver::dBodyState* const engine = m_state0;
-		dComplementaritySolver::dBodyState* const differential = m_state1;
-		dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
-
-		const dVector& omega = chassis->GetOmega();
-		const dMatrix& matrix = engine->GetMatrix();
+		dVehicleVirtualEngine* const engineNode = (dVehicleVirtualEngine*)GetOwner0();
+		dComplementaritySolver::dBodyState* const chassis = engineNode->GetBody();
+		const dVehicleEngineInterface::dEngineInfo& info = engineNode->GetInfo();
+	
+		const dVector& omega = chassis->GetOmega(); 
+		const dMatrix& matrix = m_state0->GetMatrix();
 		AddAngularRowJacobian(constraintParams, matrix.m_right, omega, 0.0f);
+
+		dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
+		dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
+
+		dFloat gain = info.m_crownGear * m_gearRatio;
+		jacobian1.m_angular = jacobian1.m_angular.Scale(gain);
 
 		const dVector& omega0 = m_state0->GetOmega();
 		const dVector& omega1 = m_state1->GetOmega();
-		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
-		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
+
 		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 		dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-*/
 
+		constraintParams->m_jointAccel[0] = -w * constraintParams->m_timestepInv;
+		constraintParams->m_jointLowFrictionCoef[0] = -m_clutchTorque;
+		constraintParams->m_jointHighFrictionCoef[0] = m_clutchTorque;
+
+		m_dof = 1;
+		m_count = 1;
+		constraintParams->m_count = 1;
 	}
 }

@@ -27,8 +27,8 @@ dVehicleVirtualDifferential::dVehicleVirtualDifferential(dVehicleNode* const par
 {
 	SetWorld(parent->GetWorld());
 
-	dFloat mass = (m_leftTire->GetInfo().m_mass + m_rightTire->GetInfo().m_mass) * 0.8f;
-	dFloat radius = m_leftTire->GetInfo().m_radio * 0.75f;
+	dFloat mass = 0.75f * 0.5f * (m_leftTire->GetInfo().m_mass + m_rightTire->GetInfo().m_mass);
+	dFloat radius = m_leftTire->GetInfo().m_radio * 0.5f;
 	dFloat inertia = 0.7f * mass * radius * radius;
 
 	m_body.SetMass(mass);
@@ -88,4 +88,6 @@ void dVehicleVirtualDifferential::Integrate(dFloat timestep)
 	dVector localOmega(omega - chassisOmega);
 	m_diffOmega = chassisMatrix.m_up.DotProduct3(localOmega);
 	m_shaftOmega = chassisMatrix.m_right.DotProduct3(localOmega);
+
+dTrace (("diff(%f %f)\n", m_shaftOmega, m_diffOmega));
 }

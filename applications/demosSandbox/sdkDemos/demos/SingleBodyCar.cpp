@@ -467,6 +467,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
 		engineInfo.m_rpmAtRedLine = 6000.0f;		// REDLINE_TORQUE_RPM
 
+		engineInfo.m_crownGear = 4.0f;
+		engineInfo.m_clutchTorque = 600.0f;
+
 		engineInfo.m_gearRatios[dVehicleEngineInterface::m_reverseGear] = -2.90f;	// reverse
 		engineInfo.m_gearRatios[dVehicleEngineInterface::m_neutralGear] = 0.0f;     // neutral
 		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 0] = 2.66f;  // GEAR_1
@@ -561,7 +564,7 @@ axisCount = 0;
 */
 		} else {
 			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
-			//driverInput.m_clutchPedal = 1.0f - scene->GetKeyState('K') ? 1.0f : 0.0f;
+			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
 			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;

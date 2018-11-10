@@ -53,6 +53,8 @@ class dVehicleEngineInterface: public dVehicleNode
 			m_rpmAtRedLine = 6000.0f;			// REDLINE_TORQUE_RPM
 
 			m_gearsCount = 8;
+			m_crownGear = 4.0f;
+			m_clutchTorque = 1000.0f;
 			m_gearRatios[dVehicleEngineInterface::m_reverseGear] = -2.90f;	// reverse
 			m_gearRatios[dVehicleEngineInterface::m_neutralGear] = 0.0f;    // neutral
 			m_gearRatios[dVehicleEngineInterface::m_firstGear + 0] = 2.66f; // GEAR_1
@@ -74,6 +76,8 @@ class dVehicleEngineInterface: public dVehicleNode
 		dFloat m_rpmAtPeakHorsePower;
 		dFloat m_rpmAtRedLine;
 
+		dFloat m_crownGear;
+		dFloat m_clutchTorque;
 		dFloat m_gearRatios[m_gears_count];
 		int m_gearsCount;
 
@@ -87,6 +91,8 @@ class dVehicleEngineInterface: public dVehicleNode
 	virtual void SetThrottle (dFloat throttle) {}
 
 	virtual void SetGear (int gear) {}
+	virtual void SetClutch (dFloat clutch) {}
+
 	const dEngineInfo& GetInfo() const { return m_info; }
 	DVEHICLE_API void SetInfo(const dEngineInfo& info) { m_info = info; }
 	

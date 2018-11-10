@@ -58,6 +58,7 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	void Integrate(dFloat timestep);
 
 	void SetGear (int gear);
+	void SetClutch (dFloat clutch);
 	void SetThrottle (dFloat throttle);
 
 

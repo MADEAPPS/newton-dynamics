@@ -70,6 +70,13 @@ void dVehicleEngineControl::SetGear (int gear)
 	}
 }
 
+void dVehicleEngineControl::SetClutch (dFloat clutch)
+{
+	if (m_engine) {
+		m_engine->SetClutch(clutch);
+	}
+}
+
 // ****************************************************************************
 //
 // ****************************************************************************
