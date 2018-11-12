@@ -368,7 +368,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_pivotOffset = 0.01f;
 		tireInfo.m_steerRate = 0.5f * dPi;
 		tireInfo.m_frictionCoefficient = 0.8f;
-		tireInfo.m_maxSteeringAngle = 25.0f * dDegreeToRad;
+		tireInfo.m_maxSteeringAngle = 40.0f * dDegreeToRad;
 		
 		tireInfo.m_suspensionLength = 0.22f;
 		tireInfo.m_dampingRatio = 15.0f * vehicleMass;
@@ -563,7 +563,7 @@ axisCount = 0;
 */
 		} else {
 			//driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
-			driverInput.m_throttle = scene->GetKeyState('W') ? 0.2f : 0.0f;
+			driverInput.m_throttle = scene->GetKeyState('W') ? 0.4f : 0.0f;
 			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;

@@ -127,7 +127,7 @@ class dVehicleTireInterface: public dVehicleNode
 			m_pivotOffset = 0.01f;
 			m_steerRate = 0.5f * dPi;
 			m_frictionCoefficient = 0.8f;
-			m_maxSteeringAngle = 25.0f * dDegreeToRad;
+			m_maxSteeringAngle = 40.0f * dDegreeToRad;
 
 			m_suspensionLength = 0.3f;
 			m_dampingRatio = 15.0f * vehicleMass;
