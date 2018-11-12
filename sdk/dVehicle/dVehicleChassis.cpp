@@ -63,36 +63,10 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 
 /*
-	m_speed = 0.0f;
-	m_sideSlip = 0.0f;
-	m_prevSideSlip = 0.0f;
-	m_finalized = false;
-	m_gravityMag = dAbs(gravityMag);
-	m_weightDistribution = 0.5f;
 	m_aerodynamicsDownForce0 = 0.0f;
 	m_aerodynamicsDownForce1 = 0.0f;
 	m_aerodynamicsDownSpeedCutOff = 0.0f;
 	m_aerodynamicsDownForceCoefficient = 0.0f;
-
-
-	m_forceAndTorqueCallback = forceAndTorque;
-
-	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
-	NewtonWorld* const world = manager->GetWorld();
-
-
-	// set the standard force and torque call back
-	NewtonBodySetForceAndTorqueCallback(body, m_forceAndTorqueCallback);
-
-	m_contactFilter = new dTireFrictionModel(this);
-
-
-	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
-	NewtonCollisionAggregateSetSelfCollision(m_collisionAggregate, 0);
-	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_body);
-
-	m_bodyList.Append(m_body);
-
 	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
 
 #ifdef D_PLOT_ENGINE_CURVE 
@@ -100,12 +74,6 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	fprintf(file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
 #endif
 */
-
-//	m_engine = NULL;
-//	m_brakesControl = NULL;
-//	m_engineControl = NULL;
-//	m_steeringControl = NULL;
-//	m_handBrakesControl = NULL;
 }
 
 void dVehicleChassis::Cleanup()
@@ -584,9 +552,7 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 		dVehicleVirtualTire* const tire = tires[i];
 		dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
 
-		tires[i]->m_tireLoad = dMax(dFloat(1.0f), accel[i]);
 		dVector tireForce(m_jt[i].m_jacobian_J01.m_linear.Scale(accel[i]));
-
 		tireBody->SetForce(tireBody->GetForce() + tireForce);
 		chassisForce += m_jt[i].m_jacobian_J10.m_linear.Scale(accel[i]);
 		chassisTorque += m_jt[i].m_jacobian_J10.m_angular.Scale(accel[i]);

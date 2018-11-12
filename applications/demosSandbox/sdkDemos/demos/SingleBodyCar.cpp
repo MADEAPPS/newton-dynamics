@@ -199,8 +199,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 			DemoEntity* const playerEnt = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
 			
 			dVehicleEngineInterface* const engine = m_player->GetEngineControl()->GetEngine();
-//			if (engine) {
-			if (1) {
+			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
 				dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
@@ -495,8 +494,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->SetBrakeTorque(1000.0f);
 		brakeControl->AddTire(frontLeft);
 		brakeControl->AddTire(frontRight);
-		//brakeControl->AddTire(rearLeft);
-		//brakeControl->AddTire(rearRight);
+		brakeControl->AddTire(rearLeft);
+		brakeControl->AddTire(rearRight);
 
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
@@ -563,7 +562,8 @@ axisCount = 0;
 			//dTrace (("%d %d %d\n", gear, ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 */
 		} else {
-			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
+			//driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
+			driverInput.m_throttle = scene->GetKeyState('W') ? 0.2f : 0.0f;
 			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
@@ -578,7 +578,7 @@ axisCount = 0;
 
 		//xxxxxx
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
@@ -593,9 +593,6 @@ axisCount = 0;
 #endif
 
 		vehicle->ApplyDriverInputs(driverInput, timestep);
-
-//		m_steeringControl->Update(timestep);
-
 	}
 
 	dVehicleChassis* m_player;
@@ -622,7 +619,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 2.0f;
+	location.m_posit.m_y += 2.5f;
 
 	NewtonWorld* const world = scene->GetNewton();
 

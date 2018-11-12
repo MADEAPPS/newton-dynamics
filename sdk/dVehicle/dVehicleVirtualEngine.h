@@ -61,7 +61,6 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	void SetClutch (dFloat clutch);
 	void SetThrottle (dFloat throttle);
 
-
 	void SetInfo(const dEngineInfo& info);
 	
 	dComplementaritySolver::dBilateralJoint* GetJoint();

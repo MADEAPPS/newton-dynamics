@@ -21,7 +21,6 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	,m_omega(0.0f)
 	,m_speed(0.0f)
 	,m_position(0.0f)
-	,m_tireLoad(0.0f)
 	,m_tireAngle(0.0f)
 	,m_brakeTorque(0.0f)
 	,m_steeringAngle(0.0f)
@@ -178,7 +177,6 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
 	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetBody();
 	
-//	const dMatrix chassisMatrix (chassis->GetBody()->GetMatrix());
 	const dMatrix chassisMatrix(chassisBody->GetMatrix());
 	const dMatrix tireMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
 
@@ -194,13 +192,6 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 		}
 	}
 
-//static int xxx;
-//xxx++;
-//if (xxx > 2000) {
-//if ((m_solverIndex == 2) || (m_solverIndex == 3))
-//m_omega = -20.0f;
-//}
-
 	m_tireAngle += m_omega * timestep;
 	while (m_tireAngle < 0.0f)
 	{
@@ -209,12 +200,18 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 	m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
 
 	dVector tireVeloc(m_body.GetVelocity());
-	dVector chassisVeloc(chassisBody->GetVelocity());
-	dVector chassinPointVeloc (chassisVeloc + chassisOmega.CrossProduct(tireMatrix.m_posit - chassisMatrix.m_posit));
-	dVector localVeloc (tireVeloc - chassinPointVeloc);
+	dVector chassisPointVeloc (chassisBody->CalculatePointVelocity(tireMatrix.m_posit));
+	dVector localVeloc (tireVeloc - chassisPointVeloc);
 
 	m_speed = tireMatrix.m_right.DotProduct3(localVeloc);
-	m_position = dClamp (m_position + m_speed * timestep, dFloat (0.0f), m_info.m_suspensionLength);
+	m_position += m_speed * timestep;
+	if (m_position <= 0.0f) {
+		m_speed = 0.0f;
+		m_position = 0.0f;
+	} else if (m_position >= m_info.m_suspensionLength) {
+		m_speed = 0.0f;
+		m_position = m_info.m_suspensionLength;
+	}
 }
 
 void dVehicleVirtualTire::CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep)

@@ -54,7 +54,6 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	dFloat m_omega;
 	dFloat m_speed;
 	dFloat m_position;
-	dFloat m_tireLoad;
 	dFloat m_tireAngle;
 	dFloat m_brakeTorque;
 	dFloat m_steeringAngle;

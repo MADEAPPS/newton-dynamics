@@ -42,6 +42,9 @@ dVehicleVirtualDifferential::dVehicleVirtualDifferential(dVehicleNode* const par
 
 	m_leftAxle.SetOwners(this, m_leftTire);
 	m_rightAxle.SetOwners(this, m_rightTire);
+
+	m_leftAxle.m_diffSign = -1.0f;
+	m_rightAxle.m_diffSign = 1.0f;
 }
 
 dVehicleVirtualDifferential::~dVehicleVirtualDifferential()
@@ -63,6 +66,7 @@ int dVehicleVirtualDifferential::GetKinematicLoops(dKinematicLoopJoint** const j
 	jointArray[0] = &m_leftAxle;
 	jointArray[1] = &m_rightAxle;
 	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[2]) + 2;
+//	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[0]);
 }
 
 void dVehicleVirtualDifferential::ApplyExternalForce()
@@ -70,11 +74,12 @@ void dVehicleVirtualDifferential::ApplyExternalForce()
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
-	const dMatrix& tireMatrix(chassisBody->GetMatrix());
-	m_body.SetMatrix(tireMatrix);
+	dMatrix matrix(chassisBody->GetMatrix());
+	matrix.m_posit = matrix.TransformVector(chassisBody->GetCOM());
+	m_body.SetMatrix(matrix);
 
 	m_body.SetVeloc(chassisBody->GetVelocity());
-	m_body.SetOmega(chassisBody->GetOmega() + tireMatrix.m_right.Scale (m_shaftOmega) + tireMatrix.m_up.Scale (m_diffOmega));
+	m_body.SetOmega(chassisBody->GetOmega() + matrix.m_right.Scale (m_shaftOmega) + matrix.m_up.Scale (m_diffOmega));
 	m_body.SetTorque(dVector(0.0f));
 	m_body.SetForce(chassisNode->m_gravity.Scale(m_body.GetMass()));
 
@@ -95,6 +100,4 @@ void dVehicleVirtualDifferential::Integrate(dFloat timestep)
 	dVector localOmega(omega - chassisOmega);
 	m_diffOmega = chassisMatrix.m_up.DotProduct3(localOmega);
 	m_shaftOmega = chassisMatrix.m_right.DotProduct3(localOmega);
-
-dTrace (("diff(%f %f)\n", m_shaftOmega, m_diffOmega));
 }

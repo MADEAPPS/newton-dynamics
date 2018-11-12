@@ -18,7 +18,6 @@ dVehicleVirtualEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& i
 	:dEngineInfo(info)
 {
 	const dFloat horsePowerToWatts = 735.5f;
-//	const dFloat kmhToMetersPerSecunds = 0.278f;
 	const dFloat rpmToRadiansPerSecunds = 0.105f;
 	const dFloat poundFootToNewtonMeters = 1.356f;
 
@@ -32,7 +31,6 @@ dVehicleVirtualEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& i
 	m_rpmAtIdleTorque *= rpmToRadiansPerSecunds;
 
 	m_peakHorsePower *= horsePowerToWatts;
-//	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
 	m_peakPowerTorque = m_peakHorsePower / m_rpmAtPeakHorsePower;
 
 	dAssert(m_rpmAtIdleTorque > 0.0f);
@@ -108,37 +106,6 @@ void dVehicleVirtualEngine::InitEngineTorqueCurve()
 {
 	m_metricInfo = dEngineMetricInfo(m_info);
 
-//	dAssert(m_metricInfo.m_vehicleTopSpeed >= 0.0f);
-//	dAssert(m_metricInfo.m_vehicleTopSpeed < 100.0f);
-//	m_metricInfo.m_crownGearRatio = 1.0f;
-//	dWheelJoint* const tire = m_crownGearCalculator;
-//	dAssert(tire);
-
-	// drive train geometrical relations
-	// G0 = m_differentialGearRatio
-	// G1 = m_transmissionGearRatio
-	// s = topSpeedMPS
-	// r = tireRadio
-	// wt = rpsAtTire
-	// we = rpsAtPickPower
-	// we = G1 * G0 * wt;
-	// wt = e / r
-	// we = G0 * G1 * s / r
-	// G0 = r * we / (G1 * s)
-	// using the top gear and the optimal engine torque for the calculations
-//	dFloat topGearRatio = GetTopGear();
-//	dFloat tireRadio = tire->m_radio;
-//	m_metricInfo.m_crownGearRatio = tireRadio * m_metricInfo.m_rpmAtPeakHorsePower / (m_metricInfo.m_vehicleTopSpeed * topGearRatio);
-
-	// bake crown gear with the engine power curve
-	//m_metricInfo.m_idleTorque *= m_metricInfo.m_crownGearRatio;
-	//m_metricInfo.m_peakTorque *= m_metricInfo.m_crownGearRatio;
-	//m_metricInfo.m_peakPowerTorque *= m_metricInfo.m_crownGearRatio;
-	//m_metricInfo.m_rpmAtIdleTorque /= m_metricInfo.m_crownGearRatio;
-	//m_metricInfo.m_rpmAtPeakTorque /= m_metricInfo.m_crownGearRatio;
-	//m_metricInfo.m_rpmAtPeakHorsePower /= m_metricInfo.m_crownGearRatio;
-	//m_metricInfo.m_rpmAtRedLine /= m_metricInfo.m_crownGearRatio;
-
 	m_metricInfo.m_torqueCurve[0] = dEngineTorqueNode(0.0f, m_metricInfo.m_idleTorque);
 	m_metricInfo.m_torqueCurve[1] = dEngineTorqueNode(m_metricInfo.m_rpmAtIdleTorque, m_metricInfo.m_idleTorque);
 	m_metricInfo.m_torqueCurve[2] = dEngineTorqueNode(m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_peakTorque);
@@ -150,10 +117,6 @@ void dVehicleVirtualEngine::InitEngineTorqueCurve()
 void dVehicleVirtualEngine::SetInfo(const dEngineInfo& info)
 {
 	dVehicleEngineInterface::SetInfo(info);
-
-//	m_metricInfoCopy = info;
-//	m_metricInfo.m_clutchFrictionTorque = dMax(dFloat(10.0f), dAbs(m_metricInfo.m_clutchFrictionTorque));
-//	m_metricInfoCopy.m_clutchFrictionTorque = m_metricInfo.m_clutchFrictionTorque;
 	InitEngineTorqueCurve();
 
 //	m_controller->SetAerodynamicsDownforceCoefficient(info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
@@ -201,8 +164,8 @@ void dVehicleVirtualEngine::SetClutch (dFloat clutch)
 
 int dVehicleVirtualEngine::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
 {
-	jointArray[0] = &m_gearBox;
-	jointArray[1] = &m_crankJoint;
+	jointArray[0] = &m_crankJoint;
+	jointArray[1] = &m_gearBox;
 	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[2]) + 2;
 }
 
@@ -211,7 +174,8 @@ void dVehicleVirtualEngine::ApplyExternalForce()
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
 
-	const dMatrix& matrix(chassisBody->GetMatrix());
+	dMatrix matrix(chassisBody->GetMatrix());
+	matrix.m_posit = matrix.TransformVector(chassisBody->GetCOM());
 	m_body.SetMatrix(matrix);
 
 	m_body.SetVeloc(chassisBody->GetVelocity());
@@ -236,5 +200,5 @@ void dVehicleVirtualEngine::Integrate(dFloat timestep)
 	dVector localOmega(omega - chassisOmega);
 	m_omega = chassisMatrix.m_right.DotProduct3(localOmega);
 
-dTrace (("eng(%f)\n", m_omega));
+//dTrace (("eng(%f)\n", m_omega));
 }

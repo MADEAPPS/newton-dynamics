@@ -161,6 +161,10 @@ class dTireAxleJoint: public dKinematicLoopJoint
 	int GetMaxDof() const { return 1; }
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
+	dFloat m_diffSign;
+
+	friend class dVehicleVirtualDifferential;
 };
 
 

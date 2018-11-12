@@ -482,6 +482,9 @@ void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const
 		constraintParams->m_jointLowFrictionCoef[0] = -m_clutchTorque;
 		constraintParams->m_jointHighFrictionCoef[0] = m_clutchTorque;
 
+//constraintParams->m_jointLowFrictionCoef[0] = -50;
+//constraintParams->m_jointHighFrictionCoef[0] = 50;
+
 		m_dof = 1;
 		m_count = 1;
 		constraintParams->m_count = 1;
@@ -493,14 +496,35 @@ void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const
 // *******************************************************************
 dTireAxleJoint::dTireAxleJoint()
 	:dKinematicLoopJoint()
+	,m_diffSign(1.0f)
 {
 	m_isActive = true;
 }
 
 void dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
+	dVehicleVirtualEngine* const engineNode = (dVehicleVirtualEngine*)GetOwner0();
+	dComplementaritySolver::dBodyState* const chassis = engineNode->GetBody();
 
-	m_dof = 0;
-	m_count = 0;
-	constraintParams->m_count = 0;
+	const dVector& omega = chassis->GetOmega();
+	const dMatrix& diffMatrix = m_state0->GetMatrix();
+	const dMatrix& tireMatrix = m_state1->GetMatrix();
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
+
+	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
+	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
+
+	jacobian0.m_angular = diffMatrix.m_right + diffMatrix.m_up.Scale (m_diffSign);
+
+	const dVector& omega0 = m_state0->GetOmega();
+	const dVector& omega1 = m_state1->GetOmega();
+
+	const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+	dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+
+	constraintParams->m_jointAccel[0] = -w * constraintParams->m_timestepInv;
+
+	m_dof = 1;
+	m_count = 1;
+	constraintParams->m_count = 1;
 }
