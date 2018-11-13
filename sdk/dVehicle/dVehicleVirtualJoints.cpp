@@ -189,25 +189,24 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloa
 
 	dFloat v = dAbs (lateralSlip);
 	dFloat u = dAbs (longitudinalSlip);
-	dFloat f = frictionCoef * m_load;
+	dFloat f = dMax (frictionCoef * m_load, dFloat (1.0f));
 
 	dFloat invden = 1.0f / (1.0f + u);
 
 	dFloat y = tireInfo.m_corneringStiffness * v * invden;
 	dFloat x = tireInfo.m_longitudinalStiffness * u * invden;
-	dFloat mag = dSqrt (x * x + y * y);
+	dFloat g = dSqrt (x * x + y * y);
 
-	if (mag < (3.0f * f)) {
-		dFloat den = dMax (f, dFloat(1.0f));
-		f = mag * (1.0f - mag / (3.0f * den) + mag * mag / (27 * den * den));
-	} 
-	mag = dMax (mag, dFloat(1.0f));
+	dFloat r = g / f;
+	if (g < (3.0f * f)) {
+		f = g * (1.0f - (1.0f / 3.0f) * r  + (1.0f / 27.0f) * r * r);
+	}
 
 	m_tireModel.m_longitodinalSlip = u * invden;
 	m_tireModel.m_lateralSlip = v * invden * (1.0f / D_TIRE_MAX_LATERAL_SLIP);
 	m_tireModel.m_alingMoment = 0.0f;
-	m_tireModel.m_lateralForce = y * f / mag;
-	m_tireModel.m_longitunalForce = x * f / mag;
+	m_tireModel.m_lateralForce = y * r;
+	m_tireModel.m_longitunalForce = x * r;
 	dAssert(m_tireModel.m_lateralForce >= 0.0f);
 	dAssert(m_tireModel.m_longitunalForce >= 0.0f);
 }

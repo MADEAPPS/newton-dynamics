@@ -380,11 +380,8 @@ class dgFastAABBInfo: public dgObb
 
 	protected:
 	dgMatrix m_absDir;
-	union {
-		;
-		mutable dgFloat32 m_separationDistance;
-		dgVector m_padding;
-	};
+	mutable dgFloat32 m_separationDistance;
+//	dgFloat32 m_padding[3];
 	dgVector m_p0;
 	dgVector m_p1;
 
