@@ -374,8 +374,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_dampingRatio = 15.0f * vehicleMass;
 		tireInfo.m_springStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 8.0f / tireInfo.m_suspensionLength);
 
-		tireInfo.m_corneringStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 1.0f);
-		tireInfo.m_longitudinalStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 1.0f);
+		tireInfo.m_corneringStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 0.5f);
+		tireInfo.m_longitudinalStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 0.25f);
 
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		//tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
@@ -563,7 +563,7 @@ axisCount = 0;
 */
 		} else {
 			//driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
-			driverInput.m_throttle = scene->GetKeyState('W') ? 0.4f : 0.0f;
+			driverInput.m_throttle = scene->GetKeyState('W') ? 0.5f : 0.0f;
 			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;

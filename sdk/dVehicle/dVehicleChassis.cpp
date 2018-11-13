@@ -68,11 +68,6 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 	m_aerodynamicsDownSpeedCutOff = 0.0f;
 	m_aerodynamicsDownForceCoefficient = 0.0f;
 	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
-
-#ifdef D_PLOT_ENGINE_CURVE 
-	file_xxx = fopen("vehiceLog.csv", "wb");
-	fprintf(file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
-#endif
 */
 }
 

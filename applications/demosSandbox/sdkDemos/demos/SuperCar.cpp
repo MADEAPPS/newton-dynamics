@@ -529,12 +529,8 @@ class SuperCarEntity: public DemoEntity
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState() ? true : false);
 		engineControl->SetIgnition(true);
 
-		// trace the engine curve
-		//engineControl->PlotEngineCurve ();
-
 		// set the gear look up table
 		SetGearMap(engineControl);
-
 
 		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (definition.m_vehicleWeightDistribution);

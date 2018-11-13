@@ -201,7 +201,7 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloa
 	if (g < (3.0f * f)) {
 		f = g * (1.0f - (1.0f / 3.0f) * r  + (1.0f / 27.0f) * r * r);
 	}
-
+	r = f / (g + 1.0e-3f);
 	m_tireModel.m_longitodinalSlip = u * invden;
 	m_tireModel.m_lateralSlip = v * invden * (1.0f / D_TIRE_MAX_LATERAL_SLIP);
 	m_tireModel.m_alingMoment = 0.0f;
@@ -213,6 +213,19 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloa
 
 void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
+/*
+FILE* file_xxx = fopen("xxxxx.csv", "wb");
+fprintf(file_xxx, "tireforce\n");
+m_load = 1000.0f;
+for (int i = 0; i < 100; i++) {
+	float u = 0.01f * i;
+	TireForces(0.0f, u, 1.0f);
+	//fprintf(file_xxx, "%f,\n", m_tireModel.m_longitunalForce);
+	fprintf(file_xxx, "%f,\n", m_tireModel.m_lateralForce);
+}
+fclose(file_xxx);
+*/
+
 	dVector omega(0.0f);
 
 	// normal constraint
@@ -253,7 +266,7 @@ void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 
 		omegaSpeed = dAbs (omegaSpeed);
 		linearSpeed = dAbs (linearSpeed);
-		if (!((omegaSpeed < 0.1f) && (linearSpeed < 0.1f))) {
+		if (!((omegaSpeed < 0.2f) && (linearSpeed < 0.2f))) {
 			if (relSpeed < 0.0f) {
 				dFloat speedDen = dMax (linearSpeed, dFloat(0.01f));
 				longitudialSlip = dClamp(dAbs (relSpeed / speedDen), dFloat(0.0f), dFloat(20.0f));
