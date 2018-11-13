@@ -125,6 +125,7 @@ void dgContact::AppendToContactList()
 {
 	dgAssert (m_body0);
 	dgAssert (!m_contactNode);
+	dgAssert(m_body0->m_invMass.m_w > dgFloat32 (0.0f));
 	dgContactList* const contactList = m_body0->m_world;
 	m_contactNode = contactList->Addtop(this);
 }
@@ -133,6 +134,7 @@ void dgContact::SwapBodies()
 {
 	dgSwap (m_body0, m_body1);
 	dgSwap (m_link0, m_link1);
+	dgAssert(m_body0->m_invMass.m_w > dgFloat32(0.0f));
 }
 
 void dgContact::GetInfo (dgConstraintInfo* const info) const
