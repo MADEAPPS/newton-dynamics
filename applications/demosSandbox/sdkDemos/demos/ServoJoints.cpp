@@ -636,7 +636,9 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		dFloat minLimit = -2.0f;
 		dFloat maxLimit = 2.5f;
 		dFloat linearRate = 0.20f;
-		return new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+		dCustomSliderActuator* const joint = new dCustomSliderActuator(&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+		joint->SetMinForce(-100.0f);
+		return joint;
 	}
 
 	dCustomWheel* LinkTireJoint(NewtonBody* const chassis, NewtonBody* const tire)
