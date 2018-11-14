@@ -361,13 +361,11 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		NewtonCollision* const collision = NewtonBodyGetCollision (m_phantomEntity->m_phantom);
 		NewtonBodyGetMatrix (m_phantomEntity->m_phantom, &matrix[0][0]);
 
-//dMatrix xxxxx (matrix);
 		bool isUnstable = true;
-//int xxx = 0;
 		for (int i = 0; (i < 16) && isUnstable; i ++) {
             dVector minP(0.0f);
             dVector maxP(0.0f);
-//xxx ++;
+
 			isUnstable = false;
 			if (CalculateTranslationMatrix (matrix)) {
                 NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);

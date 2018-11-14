@@ -574,12 +574,12 @@ void dComplementaritySolver::dFrictionLessContactJoint::SetContacts (int count, 
 
 void dComplementaritySolver::dFrictionLessContactJoint::JacobianDerivative (dParamInfo* const constraintParams)
 {
+	dVector pinOmega(0.0f);
 	for (int i = 0; i < m_count; i ++) {
-		dAssert(0);
-/*
+
 		dPointDerivativeParam pointData;
 		InitPointParam (pointData, m_contacts[i].m_point);
-		CalculatePointDerivative (constraintParams, m_contacts[i].m_normal, pointData);
+		CalculatePointDerivative (constraintParams, m_contacts[i].m_normal, pinOmega, pointData);
 
 		dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 
@@ -593,9 +593,9 @@ void dComplementaritySolver::dFrictionLessContactJoint::JacobianDerivative (dPar
 			relVelocErr *= (m_restitution + dFloat (1.0f));
 		}
 
-		constraintParams->m_jointLowFriction[i] = dFloat (0.0f);
+		constraintParams->m_normalIndex[i] = 0;
+		constraintParams->m_jointLowFrictionCoef[i] = dFloat (0.0f);
 		constraintParams->m_jointAccel[i] = dMax (dFloat (-4.0f), relVelocErr + penetrationVeloc) * constraintParams->m_timestepInv;
-*/
 	}
 }
 
@@ -676,9 +676,9 @@ int dComplementaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint
 
 			col->m_diagDamp = 1.0f;
 			col->m_coordenateAccel = constraintParams.m_jointAccel[i];
-dAssert (0);
-//			col->m_jointLowFriction = constraintParams.m_jointLowFriction[i];
-//			col->m_jointHighFriction = constraintParams.m_jointHighFriction[i];
+			col->m_normalIndex = constraintParams.m_normalIndex[i];
+			col->m_jointLowFriction = constraintParams.m_jointLowFrictionCoef[i];
+			col->m_jointHighFriction = constraintParams.m_jointHighFrictionCoef[i];
 
 			col->m_deltaAccel = extenalAcceleration;
 			col->m_coordenateAccel += extenalAcceleration;
@@ -706,7 +706,7 @@ void dComplementaritySolver::CalculateReactionsForces (int bodyCount, dBodyState
 	dJacobian internalForces [COMPLEMENTARITY_STACK_ENTRIES];
 
 	int stateIndex = 0;
-	dVector zero(dFloat (0.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f));
+	dVector zero(dFloat (0.0f));
 	for (int i = 0; i < bodyCount; i ++) {
 		dBodyState* const state = bodyArray[i];
 		stateVeloc[stateIndex].m_linear = state->m_veloc;
