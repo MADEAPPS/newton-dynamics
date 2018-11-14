@@ -135,7 +135,7 @@ void dgContact::SwapBodies()
 	dgSwap (m_body0, m_body1);
 	dgSwap (m_link0, m_link1);
 
-dgTrace(("this is a fucking big problen that need to be fix\n));
+dgTrace(("this is a fucking big problen that need to be fix\n"));
 //	dgAssert(m_body0->m_invMass.m_w > dgFloat32(0.0f));
 }
 
