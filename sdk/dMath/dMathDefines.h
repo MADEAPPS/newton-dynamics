@@ -107,20 +107,19 @@ enum dEulerAngleOrder
 
 #define dAlloca(type,size) (type*) alloca ((size) * sizeof (type))
 
-template <class T> T dAbs(T A);
-template <class T> T dSign(T A);
-template <class T> void dSwap(T& A, T& B);
-template <class T> T dMin(T A, T B);
-template <class T> T dMax(T A, T B);
-template <class T> T dClamp(T val, T min, T max);
-template<class T> T dDotProduct(int size, const T* const A, const T* const B);
-template<class T> bool dCholeskyFactorization(int size, T* const matrix);
-template<class T> void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x);
-template<class T> void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out);
-template <class T> bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const low, T* const high);
-template <class T> void dSort(T* const array, int elements, int(*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL);
-template <class T> void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor);
-
+//template <class T> T dAbs(T A);
+//template <class T> T dSign(T A);
+//template <class T> void dSwap(T& A, T& B);
+//template <class T> T dMin(T A, T B);
+//template <class T> T dMax(T A, T B);
+//template <class T> T dClamp(T val, T min, T max);
+//template<class T> T dDotProduct(int size, const T* const A, const T* const B);
+//template<class T> bool dCholeskyFactorization(int size, T* const matrix);
+//template<class T> void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x);
+//template<class T> void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out);
+//template <class T> bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const low, T* const high);
+//template <class T> void dSort(T* const array, int elements, int(*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL);
+//template <class T> void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor);
 
 
 template <class T>
@@ -163,7 +162,7 @@ T dClamp(T val, T min, T max)
 }
 
 template <class T> 
-void dSort (T* const array, int elements, int (*compare) (const T* const  A, const T* const B, void* const context), void* const context)
+void dSort (T* const array, int elements, int (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
 	int stride = 8;
 	int stack[1024][2];
