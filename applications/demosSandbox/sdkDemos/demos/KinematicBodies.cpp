@@ -295,13 +295,32 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 //			m_stupidLevel->ChangeCastingShape();
 //		}
 
-		bool buttonState = scene->GetMouseKeyState(1);
-		if (buttonState) {
-			int mouseX;
-			int mouseY;
+		int mouseX;
+		int mouseY;
+		int buttonState;
+		scene->GetMousePosition(mouseX, mouseY);
+		buttonState = scene->GetMouseKeyState(1) ? 1 : 0;
+#if 0
+#if 1
+		static FILE* file = fopen("log.bin", "wb");
+		if (file) {
+			fwrite(&mouseX, sizeof(int), 1, file);
+			fwrite(&mouseY, sizeof(int), 1, file);
+			fwrite(&buttonState, sizeof(int), 1, file);
+			fflush(file);
+		}
+#else 
+		static FILE* file = fopen("log.bin", "rb");
+		if (file) {
+			fread(&mouseX, sizeof(int), 1, file);
+			fread(&mouseY, sizeof(int), 1, file);
+			fread(&buttonState, sizeof(int), 1, file);
+		}
+#endif
+#endif
 
-			//buttonState = false;
-			scene->GetMousePosition (mouseX, mouseY);
+
+		if (buttonState) {
 
 			dFloat x = dFloat (mouseX);
 			dFloat y = dFloat (mouseY);
