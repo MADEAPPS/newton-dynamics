@@ -28,6 +28,7 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, N
 	,m_linearRate(0.0f)
 	,m_maxForce(D_CUSTOM_LARGE_VALUE)
 	,m_minForce(-D_CUSTOM_LARGE_VALUE)
+	,m_force(0.0f)
 {
 	m_friction = 0.0f;
 	dAssert(m_options.m_value == 0);
@@ -39,6 +40,7 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, d
 	,m_linearRate(speed)
 	,m_maxForce(D_CUSTOM_LARGE_VALUE)
 	,m_minForce(-D_CUSTOM_LARGE_VALUE)
+	,m_force(0.0f)
 {
 	m_friction = 0.0f;
 	dAssert(m_options.m_value == 0);
@@ -114,6 +116,11 @@ dFloat dCustomSliderActuator::GetActuatorPosit() const
 	return GetJointPosit();
 }
 
+dFloat dCustomSliderActuator::GetForce() const
+{
+	return m_force;
+}
+
 dFloat dCustomSliderActuator::GetMaxForce() const
 {
     return m_maxForce;
@@ -155,6 +162,9 @@ void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 	} else if (posit > targetPosit) {
 		currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
 	}
+
+	m_force = NewtonUserJointGetRowForce(m_joint, 5);
+dTrace(("%f\n", m_force));
 
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
 	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;

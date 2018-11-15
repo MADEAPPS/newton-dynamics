@@ -40,6 +40,7 @@ class dCustomSliderActuator: public dCustomSlider
 	CUSTOM_JOINTS_API dFloat GetMaxPositLimit() const;
 	CUSTOM_JOINTS_API void SetMaxPositLimit(dFloat limit);
 
+	CUSTOM_JOINTS_API dFloat GetForce() const;
 	CUSTOM_JOINTS_API dFloat GetMaxForce() const;
 	CUSTOM_JOINTS_API dFloat GetMinForce() const;
 	CUSTOM_JOINTS_API void SetMaxForce(dFloat force);
@@ -54,6 +55,7 @@ class dCustomSliderActuator: public dCustomSlider
 	dFloat m_linearRate;
 	dFloat m_maxForce;
 	dFloat m_minForce;
+	dFloat m_force;
 	DECLARE_CUSTOM_JOINT(dCustomSliderActuator, dCustomSlider)
 
 };
