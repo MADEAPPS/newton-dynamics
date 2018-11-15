@@ -37,7 +37,7 @@ dCustomSliderActuator::dCustomSliderActuator (const dMatrix& pinAndPivotFrame, d
 	:dCustomSlider(pinAndPivotFrame, child, parent)
 	,m_targetPosit(0.0f)
 	,m_linearRate(speed)
-    ,m_maxForce(D_CUSTOM_LARGE_VALUE)
+	,m_maxForce(D_CUSTOM_LARGE_VALUE)
 	,m_minForce(-D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
