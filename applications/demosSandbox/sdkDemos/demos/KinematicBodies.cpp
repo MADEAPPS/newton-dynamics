@@ -86,15 +86,11 @@ class dKinematicPlacement: public dCustomControllerBase
 	{
 		dAssert(0);
 	}
-
 };
-
-
 
 class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlacement>, public dComplementaritySolver 
 {
 	public:
-
 	dKinematicPlacementManager(DemoEntityManager* const scene)
 		:dCustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
 		,m_castDir (0.0f, -1.0f, 0.0f, 0.0f)
@@ -195,13 +191,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
         dLong attrbB[maxSize];
 
         if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) ) {
-/*
-			poseA = dMatrix (dVector(0.951201f, 0.308571f, 0.000000f, 0.000000f), 
-							dVector(-0.308571f, 0.951201f, -0.000000f, 0.000000f),
-							dVector(-0.000000f, 0.000000f, 1.000000f, 0.000000f),
-							dVector(-0.620709f, 1.965793f, 0.240484f, 1.000000f));
-			poseA.Trace();
-*/
             int contactCount = NewtonCollisionCollide(world, maxSize, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &points[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
             if (contactCount && ((me->m_contactCount + contactCount) <= int (sizeof (me->m_contacts) / sizeof (me->m_contacts[0])))) {
                 for(int i = 0; i < contactCount; i ++) {
@@ -214,7 +203,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
         }
         return me->m_isInPenetration ? 0 : 1;
     }
-
 
     static int TranslationCollisionCallback (const NewtonBody * const otherBody, void * const userData)
     {   
@@ -475,26 +463,20 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
-	AddStaticMesh (scene);
+//	AddStaticMesh (scene);
 
 	// create a system for object placement
 	new dKinematicPlacementManager (scene);
 
 	// add some bodies 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0,0,0,0);
 	location.m_x += 0.0f;
 	location.m_z += 0.0f;
-	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 /*
-dMatrix matrix (dGetIdentityMatrix());
-dFloat pts[] = { 0,0,0, 0,0,0.01, 0.01,0,0.01,  0.01,0,0, 0,0.03,0, 0,0.03,0.01, 0.01, 0.03,0, 0.01,0.03,0.01 };
-NewtonCollision* col = NewtonCreateConvexHull(scene->GetNewton(), 8, pts, 12, 0.0, 0, NULL);
-NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
-NewtonBodySetMassProperties(body, 1.0, col);
-*/
 	int count = 3;
+	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -504,13 +486,11 @@ NewtonBodySetMassProperties(body, 1.0, col);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
+*/
 	// place camera into position
 	dQuaternion rot;
 	dVector origin (-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-
-
 
 //	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
 
