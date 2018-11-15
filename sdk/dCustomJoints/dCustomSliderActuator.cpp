@@ -58,6 +58,7 @@ void dCustomSliderActuator::Serialize(NewtonSerializeCallback callback, void* co
 	callback(userData, &m_targetPosit, sizeof(dFloat));
 	callback(userData, &m_linearRate, sizeof(dFloat));
 	callback(userData, &m_maxForce, sizeof(dFloat));
+	callback(userData, &m_minForce, sizeof(dFloat));
 }
 
 void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, void* const userData)
@@ -65,6 +66,7 @@ void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, voi
 	callback(userData, &m_targetPosit, sizeof(dFloat));
 	callback(userData, &m_linearRate, sizeof(dFloat));
 	callback(userData, &m_maxForce, sizeof(dFloat));
+	callback(userData, &m_minForce, sizeof(dFloat));
 }
 
 dFloat dCustomSliderActuator::GetTargetPosit() const
