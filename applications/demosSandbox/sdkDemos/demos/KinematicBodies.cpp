@@ -27,10 +27,16 @@ class PhantomPlacement: public DemoEntity
 		NewtonWorld* const world = scene->GetNewton();
 
 		dMatrix matrix (dGetIdentityMatrix());
-		NewtonCollision* const shape = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
+		DemoEntity* const cowEntity = DemoEntity::LoadNGD_mesh("cow.ngd", world);
+		NewtonMesh* const cowMesh = cowEntity->GetMesh()->CreateNewtonMesh(world, dGetIdentityMatrix());
+		
+		//NewtonCollision* const shape = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
+		NewtonCollision* const shape = NewtonCreateConvexHullFromMesh(world, cowMesh, 0, 0);
 		m_phantom = NewtonCreateKinematicBody(world, shape, &matrix[0][0]);
 
-		m_solideMesh = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga");
+		//m_solideMesh = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga");
+		m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
+		m_solideMesh->AddRef();
 		m_redMesh = CreatePhantomMesh (shape, dVector (1.0f, 0.0f, 0.0f, 0.5f)); 
         m_blueMesh = CreatePhantomMesh (shape, dVector (0.0f, 0.5f, 0.0f, 0.5f)); 
 		SetMesh (m_redMesh, dGetIdentityMatrix());
@@ -39,6 +45,8 @@ class PhantomPlacement: public DemoEntity
 		NewtonBodySetMassProperties (m_phantom, 10.0f, shape);
 		NewtonBodySetTransformCallback (m_phantom, DemoEntity::TransformCallback);
 
+		delete cowEntity;
+		NewtonMeshDestroy(cowMesh);
 		NewtonDestroyCollision(shape);
 	}
 
