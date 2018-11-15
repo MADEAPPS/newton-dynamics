@@ -297,16 +297,19 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 
 		int mouseX;
 		int mouseY;
-		int buttonState;
+		int buttonState0;
+		int buttonState1;
 		scene->GetMousePosition(mouseX, mouseY);
-		buttonState = scene->GetMouseKeyState(1) ? 1 : 0;
+		buttonState0 = scene->GetMouseKeyState(0) ? 1 : 0;
+		buttonState1 = scene->GetMouseKeyState(1) ? 1 : 0;
 #if 0
-#if 1
+#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&mouseX, sizeof(int), 1, file);
 			fwrite(&mouseY, sizeof(int), 1, file);
-			fwrite(&buttonState, sizeof(int), 1, file);
+			fwrite(&buttonState0, sizeof(int), 1, file);
+			fwrite(&buttonState1, sizeof(int), 1, file);
 			fflush(file);
 		}
 #else 
@@ -314,14 +317,13 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 		if (file) {
 			fread(&mouseX, sizeof(int), 1, file);
 			fread(&mouseY, sizeof(int), 1, file);
-			fread(&buttonState, sizeof(int), 1, file);
+			fread(&buttonState0, sizeof(int), 1, file);
+			fread(&buttonState1, sizeof(int), 1, file);
 		}
 #endif
 #endif
 
-
-		if (buttonState) {
-
+		if (buttonState1) {
 			dFloat x = dFloat (mouseX);
 			dFloat y = dFloat (mouseY);
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
@@ -340,7 +342,7 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
                         m_phantomEntity->SetPhantomMesh (false);
 //dTrace (("%d %d\n", mouseX, mouseY));
 
-						if (m_placeInstance.UpdateTrigger (scene->GetMouseKeyState(0))) {
+						if (m_placeInstance.UpdateTrigger (buttonState0 ? true : false)) {
 							dMatrix matrix;
 							NewtonBodyGetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 							NewtonCollision* const collision = NewtonBodyGetCollision(m_phantomEntity->m_phantom);
