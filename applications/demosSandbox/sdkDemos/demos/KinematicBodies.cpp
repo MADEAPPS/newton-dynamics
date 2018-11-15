@@ -30,11 +30,9 @@ class PhantomPlacement: public DemoEntity
 		DemoEntity* const cowEntity = DemoEntity::LoadNGD_mesh("cow.ngd", world);
 		NewtonMesh* const cowMesh = cowEntity->GetMesh()->CreateNewtonMesh(world, dGetIdentityMatrix());
 		
-		//NewtonCollision* const shape = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
 		NewtonCollision* const shape = NewtonCreateConvexHullFromMesh(world, cowMesh, 0, 0);
 		m_phantom = NewtonCreateKinematicBody(world, shape, &matrix[0][0]);
 
-		//m_solideMesh = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga");
 		m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
 		m_solideMesh->AddRef();
 		m_redMesh = CreatePhantomMesh (shape, dVector (1.0f, 0.0f, 0.0f, 0.5f)); 
@@ -492,7 +490,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
-//	AddStaticMesh (scene);
+	AddStaticMesh (scene);
 
 	// create a system for object placement
 	new dKinematicPlacementManager (scene);
@@ -501,7 +499,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	dVector location (0,0,0,0);
 	location.m_x += 0.0f;
 	location.m_z += 0.0f;
-/*
+
 	int count = 3;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
@@ -515,7 +513,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-*/
+
 	// place camera into position
 	dQuaternion rot;
 	dVector origin (-20.0f, 5.0f, 0.0f, 0.0f);

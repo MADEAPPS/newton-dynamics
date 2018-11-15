@@ -98,7 +98,7 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-	bool mouseState = scene->GetMouseKeyState(0);
+	bool mouseState = scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1);
 
 	// do camera rotation, only if we do not have anything picked
 	bool buttonState = m_mouseLockState || mouseState;
