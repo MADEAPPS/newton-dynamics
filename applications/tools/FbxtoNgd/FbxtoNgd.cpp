@@ -8,6 +8,35 @@
 #define IOS_REF (*(pManager->GetIOSettings()))
 #endif
 
+#define DEFUALT_MATERIAL_ID -1
+
+class ImportStackData
+{
+	public:
+	ImportStackData(const dMatrix& parentMatrix, FbxNode* const fbxNode, dScene::dTreeNode* parentNode)
+		:m_parentMatrix(parentMatrix)
+		, m_fbxNode(fbxNode)
+		, m_parentNode(parentNode)
+	{
+	}
+	dMatrix m_parentMatrix;
+	FbxNode* m_fbxNode;
+	dScene::dTreeNode* m_parentNode;
+};
+
+
+class GlobalNodeMap: public dTree<dScene::dTreeNode*, FbxNode*>
+{
+};
+
+class UsedMaterials : public dTree<int, dScene::dTreeNode*>
+{
+};
+
+
+static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene);
+static void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene);
+static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap);
 
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
 {
@@ -150,7 +179,6 @@ static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFi
 	return lStatus;
 }
 
-static bool ConvertToNgd(dScene* const scene);
 
 int main(int argc, char** argv)
 {
@@ -176,13 +204,13 @@ int main(int argc, char** argv)
 	}
 
 	NewtonWorld* newton = NewtonCreate();
-	dScene* scene = new dScene(newton);
+	dScene* ngdScene = new dScene(newton);
 
-	if (ConvertToNgd(scene)) {
+	if (ConvertToNgd(ngdScene, fbxScene)) {
 
 	}
 
-	delete scene;
+	delete ngdScene;
 	NewtonDestroy(newton);
 
 	fbxManager->Destroy();
@@ -191,8 +219,209 @@ int main(int argc, char** argv)
 }
 
 
-static bool ConvertToNgd(dScene* const scene)
+static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 {
+	FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
+
+	const FbxSystemUnit& systemUnit = settings.GetSystemUnit();
+	dFloat scaleFactor = dFloat(systemUnit.GetScaleFactor());
+
+	dMatrix convertMatrix(dGetIdentityMatrix());
+	convertMatrix[0][0] = dFloat(scaleFactor / 100.0f);
+	convertMatrix[1][1] = dFloat(scaleFactor / 100.0f);
+	convertMatrix[2][2] = dFloat(scaleFactor / 100.0f);
+
+
+	int sign;
+	dVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+	dVector frontVector(1.0f, 0.0f, 0.0f, 0.0f);
+	FbxAxisSystem axisSystem = settings.GetAxisSystem();
+	if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eXAxis) {
+		dAssert(0);
+	} else if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eYAxis) {
+		upVector = dVector(0.0f, 1.0f * sign, 0.0f, 0.0f);
+		if (axisSystem.GetFrontVector(sign) == FbxAxisSystem::eParityEven) {
+			frontVector = dVector(1.0f * sign, 0.0f, 0.0f, 0.0f);
+		} else {
+			frontVector = dVector(0.0f, 0.0f, 1.0f * sign, 0.0f);
+		}
+	} else {
+		upVector = dVector(1.0f * sign, 0.0f, 0.0f, 0.0f);
+		if (axisSystem.GetFrontVector(sign) == FbxAxisSystem::eParityEven) {
+			dAssert(0);
+			frontVector = dVector(1.0f * sign, 0.0f, 0.0f, 0.0f);
+		} else {
+			frontVector = dVector(0.0f, 0.0f, -1.0f * sign, 0.0f);
+		}
+	}
+
+	dMatrix axisMatrix(dGetIdentityMatrix());
+	axisMatrix.m_front = frontVector;
+	axisMatrix.m_up = upVector;
+	axisMatrix.m_right = frontVector.CrossProduct(upVector);
+	convertMatrix = axisMatrix * convertMatrix;
+
+	PopulateScene(ngdScene, fbxScene);
 
 	return true;
+}
+
+
+void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
+{
+	GlobalNodeMap nodeMap;
+//	GlobalMeshMap meshCache;
+//	GlobalTextureMap textureCache;
+//	GlobalMaterialMap materialCache;
+	UsedMaterials usedMaterials;
+
+	dScene::dTreeNode* const defaulMaterialNode = ngdScene->CreateMaterialNode(DEFUALT_MATERIAL_ID);
+	dMaterialNodeInfo* const defaulMaterial = (dMaterialNodeInfo*)ngdScene->GetInfoFromNode(defaulMaterialNode);
+	defaulMaterial->SetName("default_material");
+	usedMaterials.Insert(0, defaulMaterialNode);
+
+	int m_materialId = 0;
+	LoadHierarchy(fbxScene, ngdScene, nodeMap);
+
+	GlobalNodeMap::Iterator iter(nodeMap);
+	for (iter.Begin(); iter; iter++) {
+		FbxNode* const fbxNode = iter.GetKey();
+		dScene::dTreeNode* const node = iter.GetNode()->GetInfo();
+		FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
+
+		if (attribute) {
+			FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
+
+			switch (attributeType)
+			{
+				case FbxNodeAttribute::eMesh:
+				{
+					dAssert(0);
+//					ImportMeshNode(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials, nodeMap);
+					break;
+				}
+
+				case FbxNodeAttribute::eSkeleton:
+				{
+					dAssert(0);
+					//ImportSkeleton(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+					break;
+				}
+
+				case FbxNodeAttribute::eLine:
+				{
+					dAssert(0);
+					//ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+					break;
+				}
+
+				case FbxNodeAttribute::eNurbsCurve:
+				{
+					dAssert(0);
+					//ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+					break;
+				}
+
+				case FbxNodeAttribute::eNull:
+				{
+					break;
+				}
+
+
+
+				case FbxNodeAttribute::eMarker:
+				case FbxNodeAttribute::eNurbs:
+				case FbxNodeAttribute::ePatch:
+				case FbxNodeAttribute::eCamera:
+				case FbxNodeAttribute::eCameraStereo:
+				case FbxNodeAttribute::eCameraSwitcher:
+				case FbxNodeAttribute::eLight:
+				case FbxNodeAttribute::eOpticalReference:
+				case FbxNodeAttribute::eOpticalMarker:
+
+				case FbxNodeAttribute::eTrimNurbsSurface:
+				case FbxNodeAttribute::eBoundary:
+				case FbxNodeAttribute::eNurbsSurface:
+				case FbxNodeAttribute::eShape:
+				case FbxNodeAttribute::eLODGroup:
+				case FbxNodeAttribute::eSubDiv:
+				case FbxNodeAttribute::eCachedEffect:
+				case FbxNodeAttribute::eUnknown:
+				default:
+					dAssert(0);
+					break;
+			}
+		}
+	}
+
+/*
+	UsedMaterials::Iterator iter1(usedMaterials);
+	for (iter1.Begin(); iter1; iter1++) {
+		int count = iter1.GetNode()->GetInfo();
+		if (!count) {
+			dScene::dTreeNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
+			dScene::dTreeNode* const materialNode = iter1.GetKey();
+			void* nextLink;
+			for (void* link = ngdScene->GetFirstParentLink(materialNode); link; link = nextLink) {
+				nextLink = ngdScene->GetNextParentLink(materialNode, link);
+				dScene::dTreeNode* const parentNode = ngdScene->GetNodeFromLink(link);
+				if (parentNode != materiaCacheNode) {
+					ngdScene->RemoveReference(parentNode, materialNode);
+				}
+			}
+		}
+	}
+*/
+}
+
+
+static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap)
+{
+	dList <ImportStackData> nodeStack;
+
+	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
+
+	// Print the nodes of the scene and their attributes recursively.
+	FbxNode* const rootNode = fbxScene->GetRootNode();
+	if (rootNode) {
+		int count = rootNode->GetChildCount();
+		for (int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRootNode()));
+		}
+	}
+
+	while (nodeStack.GetCount()) {
+
+		ImportStackData data(nodeStack.GetLast()->GetInfo());
+		nodeStack.Remove(nodeStack.GetLast());
+
+		dScene::dTreeNode* const node = ngdScene->CreateSceneNode(data.m_parentNode);
+		dSceneNodeInfo* const info = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(node);
+
+		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
+
+		info->SetName(data.m_fbxNode->GetName());
+		info->SetTransform(localMatrix);
+
+		FbxVector4 fbxPivotScaling(data.m_fbxNode->GetGeometricScaling(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotRotation(data.m_fbxNode->GetGeometricRotation(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotTranslation(data.m_fbxNode->GetGeometricTranslation(FbxNode::eSourcePivot));
+
+		dVector pivotTranslation(dFloat(fbxPivotTranslation[0]), dFloat(fbxPivotTranslation[1]), dFloat(fbxPivotTranslation[2]), 1.0f);
+		dVector pivotRotation(dFloat(fbxPivotRotation[0] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[1] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[2] * 3.14159265359 / 180.0), 0.0f);
+
+		dMatrix pivotScale(dGetIdentityMatrix());
+		pivotScale[0][0] = dFloat(fbxPivotScaling[0]);
+		pivotScale[1][1] = dFloat(fbxPivotScaling[1]);
+		pivotScale[2][2] = dFloat(fbxPivotScaling[2]);
+		dMatrix pivotMatrix(pivotScale * dMatrix(pivotRotation[0], pivotRotation[1], pivotRotation[2], pivotTranslation));
+		info->SetGeometryTransform(pivotMatrix);
+
+		nodeMap.Insert(node, data.m_fbxNode);
+
+		int count = data.m_fbxNode->GetChildCount();
+		for (int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), node));
+		}
+	}
 }

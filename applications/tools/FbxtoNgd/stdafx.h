@@ -17,6 +17,7 @@
 #include <dMathDefines.h>
 
 #include <dContainersStdAfx.h>
+#include <dList.h>
 #include <dTree.h>
 
 #include <dAnimationStdAfx.h>
@@ -24,8 +25,10 @@
 #include <dSceneStdafx.h>
 #include <dScene.h>
 #include <dNodeInfo.h>
-#include <dSceneNodeInfo.h>
 #include <dSceneGraph.h>
+#include <dSceneNodeInfo.h>
+#include <dMaterialNodeInfo.h>
+
 
 
 
