@@ -86,9 +86,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(FBX_SDK)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)\include;../../../sdk/dMath;../../../sdk/dScene;../../../sdk/dgNewton;../../../sdk/dAnimation;../../../sdk/dContainers</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -103,9 +103,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(FBX_SDK)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)\include;../../../sdk/dMath;../../../sdk/dScene;../../../sdk/dgNewton;../../../sdk/dAnimation;../../../sdk/dContainers</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -122,9 +122,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(FBX_SDK)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)\include;../../../sdk/dMath;../../../sdk/dScene;../../../sdk/dgNewton;../../../sdk/dAnimation;../../../sdk/dContainers</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -143,9 +143,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(FBX_SDK)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)\include;../../../sdk/dMath;../../../sdk/dScene;../../../sdk/dgNewton;../../../sdk/dAnimation;../../../sdk/dContainers</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -172,6 +172,29 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\sdk\projects\visualStudio_2015_static_mt\dAnimation.vcxproj">
+      <Project>{ea56552e-746b-4b3a-bf92-004e6a2068ef}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\sdk\projects\visualStudio_2015_static_mt\dContainers.vcxproj">
+      <Project>{e6a31c39-173f-4000-97e0-f086db68dd42}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\sdk\projects\visualStudio_2015_static_mt\dgCore.vcxproj">
+      <Project>{75a4a856-914e-4d41-a28d-23eaf8f8f9c9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\sdk\projects\visualStudio_2015_static_mt\dgPhysics.vcxproj">
+      <Project>{34ad435b-7662-49d5-af13-5974fec5f578}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\sdk\projects\visualStudio_2015_static_mt\dMath.vcxproj">
+      <Project>{2928f15f-0650-4261-b759-36c7792267dc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\sdk\projects\visualStudio_2015_static_mt\dScene.vcxproj">
+      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\sdk\projects\visualStudio_2015_static_mt\newton.vcxproj">
+      <Project>{f8604c1c-867d-4efd-afac-15404f17084e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

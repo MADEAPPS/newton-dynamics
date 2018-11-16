@@ -37,7 +37,8 @@ static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
 	return 1;
 }
 
-bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
+
+static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 {
 	int lFileMajor, lFileMinor, lFileRevision;
 	int lSDKMajor, lSDKMinor, lSDKRevision;
@@ -149,6 +150,7 @@ bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 	return lStatus;
 }
 
+static bool ConvertToNgd(dScene* const scene);
 
 int main(int argc, char** argv)
 {
@@ -157,19 +159,40 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	FbxManager* lSdkManager = NULL;
-	FbxScene* lScene = NULL;
+	FbxManager* fbxManager = NULL;
+	FbxScene* fbxScene = NULL;
 
-	if (!InitializeSdkObjects(lSdkManager, lScene)) {
+	if (!InitializeSdkObjects(fbxManager, fbxScene)) {
 		return 0;
 	}
 
-	FbxString lFilePath(argv[1]);
-	bool lResult = LoadScene(lSdkManager, lScene, lFilePath.Buffer());
+	if (!fbxManager || !fbxScene) {
+		FBXSDK_printf("failed to load file: %s\n", argv[1]);
+	}
+	FbxString filePath(argv[1]);
+	bool lResult = LoadScene(fbxManager, fbxScene, filePath.Buffer());
 	if (!lResult) {
 		FBXSDK_printf("failed to load file: %s\n", argv[1]);
 	}
 
+	NewtonWorld* newton = NewtonCreate();
+	dScene* scene = new dScene(newton);
+
+	if (ConvertToNgd(scene)) {
+
+	}
+
+	delete scene;
+	NewtonDestroy(newton);
+
+	fbxManager->Destroy();
+	FBXSDK_printf("Conversion successful!\n");
     return 0;
 }
 
+
+static bool ConvertToNgd(dScene* const scene)
+{
+
+	return true;
+}

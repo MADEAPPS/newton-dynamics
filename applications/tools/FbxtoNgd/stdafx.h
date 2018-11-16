@@ -9,7 +9,23 @@
 
 #include <stdio.h>
 #include <tchar.h>
+
+#include <Newton.h>
 #include <fbxsdk.h>
 
+#include <dStdAfxMath.h>
+#include <dMathDefines.h>
 
-// TODO: reference additional headers your program requires here
+#include <dContainersStdAfx.h>
+#include <dTree.h>
+
+#include <dAnimationStdAfx.h>
+
+#include <dSceneStdafx.h>
+#include <dScene.h>
+#include <dNodeInfo.h>
+#include <dSceneNodeInfo.h>
+#include <dSceneGraph.h>
+
+
+
