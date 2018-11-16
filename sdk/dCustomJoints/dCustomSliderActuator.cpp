@@ -61,6 +61,7 @@ void dCustomSliderActuator::Serialize(NewtonSerializeCallback callback, void* co
 	callback(userData, &m_linearRate, sizeof(dFloat));
 	callback(userData, &m_maxForce, sizeof(dFloat));
 	callback(userData, &m_minForce, sizeof(dFloat));
+	callback(userData, &m_force, sizeof(dFloat));
 }
 
 void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, void* const userData)
@@ -69,6 +70,7 @@ void dCustomSliderActuator::Deserialize (NewtonDeserializeCallback callback, voi
 	callback(userData, &m_linearRate, sizeof(dFloat));
 	callback(userData, &m_maxForce, sizeof(dFloat));
 	callback(userData, &m_minForce, sizeof(dFloat));
+	callback(userData, &m_force, sizeof(dFloat));
 }
 
 dFloat dCustomSliderActuator::GetTargetPosit() const
@@ -163,8 +165,9 @@ void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 		currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
 	}
 
+	//update on the active dof.
 	m_force = NewtonUserJointGetRowForce(m_joint, 5);
-dTrace(("%f\n", m_force));
+//dTrace(("%f\n", m_force));
 
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
 	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
