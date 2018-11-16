@@ -440,8 +440,6 @@ void dRayToRayCast (const dVector& ray_p0, const dVector& ray_p1, const dVector&
 
 void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 {
-	dAssert (0);
-/*
 	TiXmlElement* pointElement = new TiXmlElement ("points");
 	rootNode->LinkEndChild(pointElement);
 
@@ -483,6 +481,8 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 	int count = dPackVertexArray (packVertex, 3, 3 * sizeof (dFloat), pointCount, normalIndexList);
 	dFloatArrayToString (packVertex, count * 3, buffer, bufferSizeInBytes);
 
+dAssert(0);
+/*
 	TiXmlElement* const normal = new TiXmlElement ("normal");
 	pointElement->LinkEndChild(normal);
 	normal->SetAttribute("float3", count);

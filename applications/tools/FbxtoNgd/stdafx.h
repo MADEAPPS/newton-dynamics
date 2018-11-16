@@ -26,8 +26,13 @@
 #include <dScene.h>
 #include <dNodeInfo.h>
 #include <dSceneGraph.h>
+#include <dMeshNodeInfo.h>
 #include <dSceneNodeInfo.h>
+#include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
+#include <dGeometryNodeModifierInfo.h>
+#include <dGeometryNodeSkinModifierInfo.h>
+
 
 
 
