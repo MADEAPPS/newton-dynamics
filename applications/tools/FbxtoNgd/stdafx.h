@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
-
+#include <fbxsdk.h>
 
 
 // TODO: reference additional headers your program requires here
