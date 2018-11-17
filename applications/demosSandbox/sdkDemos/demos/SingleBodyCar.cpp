@@ -341,10 +341,11 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
 		DemoEntity* const entity = LoadModel_ndg(modelName);
-		//DemoEntity* const entity = LoadModel_obj(modelName);
 		dAssert (entity);
 		scene->Append(entity);
+
 		return entity;
 	}
 
