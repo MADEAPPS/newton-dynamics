@@ -315,8 +315,8 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 	dVehicleTireInterface::Debug(debugContext);
 
 	debugContext->SetColor(dVector(0.0f, 0.4f, 0.7f, 1.0f));
-	dMatrix trieMatrix(GetGlobalMatrix());
-	NewtonCollisionForEachPolygonDo(m_tireShape, &trieMatrix[0][0], RenderDebugTire, debugContext);
+	dMatrix tireMatrix(m_bindingRotation.Transpose() * GetGlobalMatrix());
+	NewtonCollisionForEachPolygonDo(m_tireShape, &tireMatrix[0][0], RenderDebugTire, debugContext);
 
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent->GetAsVehicle();
 	dAssert (chassis);
