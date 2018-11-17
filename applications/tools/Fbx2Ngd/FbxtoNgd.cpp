@@ -49,6 +49,8 @@ class LocalMaterialMap: public dTree<dScene::dTreeNode*, int>
 };
 
 static int m_materialId = 0;
+static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene);
+static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
 static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene);
 static void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene);
 static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap);
@@ -56,6 +58,51 @@ static void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, Fbx
 static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 
+
+int main(int argc, char** argv)
+{
+	if (argc != 2) {
+		printf("fbxToNgd [fbx_file_name]\n");
+		return 0;
+	}
+
+	FbxManager* fbxManager = NULL;
+	FbxScene* fbxScene = NULL;
+
+	if (!InitializeSdkObjects(fbxManager, fbxScene)) {
+		return 0;
+	}
+
+	if (!fbxManager || !fbxScene) {
+		FBXSDK_printf("failed to load file: %s\n", argv[1]);
+	}
+	FbxString filePath(argv[1]);
+	bool lResult = LoadScene(fbxManager, fbxScene, filePath.Buffer());
+	if (!lResult) {
+		FBXSDK_printf("failed to load file: %s\n", argv[1]);
+		return 0;
+	}
+
+	NewtonWorld* newton = NewtonCreate();
+	dScene* ngdScene = new dScene(newton);
+
+	if (ConvertToNgd(ngdScene, fbxScene)) {
+		char name[1024];
+		strcpy(name, argv[1]);
+		_strlwr(name);
+		char* ptr = strstr(name, ".fbx");
+		ptr[0] = 0;
+		strcat(name, ".ngd");
+		ngdScene->Serialize(name);
+	}
+
+	delete ngdScene;
+	NewtonDestroy(newton);
+
+	fbxManager->Destroy();
+	FBXSDK_printf("Conversion successful!\n");
+	return 0;
+}
 
 
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
@@ -85,7 +132,6 @@ static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
 	}
 	return 1;
 }
-
 
 static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 {
@@ -200,51 +246,6 @@ static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFi
 }
 
 
-int main(int argc, char** argv)
-{
-	if (argc != 2) {
-		printf("fbxToNgd [fbx_file_name]\n");
-		return 0;
-	}
-
-	FbxManager* fbxManager = NULL;
-	FbxScene* fbxScene = NULL;
-
-	if (!InitializeSdkObjects(fbxManager, fbxScene)) {
-		return 0;
-	}
-
-	if (!fbxManager || !fbxScene) {
-		FBXSDK_printf("failed to load file: %s\n", argv[1]);
-	}
-	FbxString filePath(argv[1]);
-	bool lResult = LoadScene(fbxManager, fbxScene, filePath.Buffer());
-	if (!lResult) {
-		FBXSDK_printf("failed to load file: %s\n", argv[1]);
-	}
-
-	NewtonWorld* newton = NewtonCreate();
-	dScene* ngdScene = new dScene(newton);
-
-	if (ConvertToNgd(ngdScene, fbxScene)) {
-		char name[1024];
-		strcpy(name, argv[1]);
-		_strlwr(name);
-		char* ptr = strstr(name, ".fbx");
-		ptr[0] = 0;
-		strcat(name, ".ngd");
-		ngdScene->Serialize(name);
-	}
-
-	delete ngdScene;
-	NewtonDestroy(newton);
-
-	fbxManager->Destroy();
-	FBXSDK_printf("Conversion successful!\n");
-    return 0;
-}
-
-
 static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 {
 	FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
@@ -288,6 +289,9 @@ static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 	convertMatrix = axisMatrix * convertMatrix;
 
 	PopulateScene(ngdScene, fbxScene);
+
+	ngdScene->RemoveUnusedMaterials();
+	ngdScene->BakeTransform(convertMatrix);
 
 	return true;
 }
@@ -684,8 +688,8 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 		//material->SetName("default material");
 		//materialID ++;
 
-		int faceCount = fbxMesh->GetPolygonCount();
 		int indexCount = 0;
+		int faceCount = fbxMesh->GetPolygonCount();
 		for (int i = 0; i < faceCount; i++) {
 			indexCount += fbxMesh->GetPolygonSize(i);
 		}
@@ -702,10 +706,11 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 		dVector* const uv0Array = new dVector[indexCount];
 		dVector* const uv1Array = new dVector[indexCount];
 
+		int controlCount = fbxMesh->GetControlPointsCount();
 		const FbxVector4* const controlPoints = fbxMesh->GetControlPoints();
-		for (int i = 0; i < fbxMesh->GetControlPointsCount(); i++) {
+		for (int i = 0; i < controlCount; i++) {
 			const FbxVector4& p = controlPoints[i];
-			vertexArray[i] = dVector(dFloat(p[0]), dFloat(p[1]), dFloat(p[2]), 0.0f);
+			vertexArray[i] = dBigVector(p[0], p[1], p[2], 0.0);
 		}
 
 		FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV();
@@ -752,14 +757,10 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 				uv0Index[index] = index;
 				uv0Array[index] = dVector(dFloat(uv[0]), dFloat(uv[1]), 0.0f, 0.0f);
 
-				//uv1Index[index] = 0;
-				//uv1Array[index] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-
 				index++;
 				dAssert(index <= indexCount);
 			}
 		}
-
 
 		NewtonMeshVertexFormat format;
 		NewtonMeshClearVertexFormat(&format);
@@ -778,17 +779,13 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 		format.m_uv0.m_data = &uv0Array[0].m_x;
 		format.m_uv0.m_indexList = uv0Index;
 		format.m_uv0.m_strideInBytes = sizeof(dVector);
-		/*
-		instance->BuildFromVertexListIndexList(faceCount, faceIndexList, materialIndex,
-		&vertexArray[0].m_x, sizeof (dVector), vertexIndex,
-		&normalArray[0].m_x, sizeof (dVector), normalIndex,
-		&uv0Array[0].m_x, sizeof (dVector), uv0Index,
-		&uv1Array[0].m_x, sizeof (dVector), uv1Index);
-		*/
+
 		instance->BuildFromVertexListIndexList(&format);
 
 		// some meshes has degenerated faces we must repair them to be legal manifold
 		instance->RepairTJoints();
+
+		instance->SmoothNormals(45.0f * dDegreeToRad);
 
 		// import skin if there is any
 		int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);

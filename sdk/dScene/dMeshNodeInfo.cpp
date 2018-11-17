@@ -134,11 +134,6 @@ void dMeshNodeInfo::BuildFromVertexListIndexList(int faceCount, const int* const
 */
 void dMeshNodeInfo::BuildFromVertexListIndexList(const NewtonMeshVertexFormat* const format)
 {
-/*
-	NewtonMeshBuildFromPointListIndexList(m_mesh, faceCount, faceIndexCount, faceMaterialIndex, 
-		vertex, vertexStrideInBytes, vertexIndex,normal, normalStrideInBytes, normalIndex,
-		uv0, uv0StrideInBytes, uv0Index, uv1, uv1StrideInBytes, uv1Index);
-*/
 	NewtonMeshBuildFromVertexListIndexList (m_mesh, format);
 }
 
