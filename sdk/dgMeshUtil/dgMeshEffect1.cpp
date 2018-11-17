@@ -2511,8 +2511,6 @@ dgInt32 dgMeshEffect::GetTotalIndexCount() const
 
 void dgMeshEffect::GetFaces (dgInt32* const facesIndex, dgInt32* const materials, void** const faceNodeList) const
 {
-dgAssert(0);
-/*
 	Iterator iter (*this);
 
 	dgInt32 faces = 0;
@@ -2540,10 +2538,10 @@ dgAssert(0);
 		} while (ptr != edge);
 
 		facesIndex[faces] = faceCount;
-		materials[faces] = dgFastInt(m_attrib[dgInt32 (edge->m_userData)].m_material);
+		//materials[faces] = dgFastInt(m_attrib[dgInt32 (edge->m_userData)].m_material);
+		materials[faces] = m_attrib.m_materialChannel.m_count ? m_attrib.m_materialChannel[dgInt32(edge->m_userData)] : 0;
 		faces ++;
 	}
-*/
 }
 
 void* dgMeshEffect::GetFirstVertex () const

@@ -149,7 +149,9 @@ void dMeshNodeInfo::RemoveUnusedVertices(dScene* const world, dScene::dTreeNode*
 	int vertexCount = NewtonMeshGetVertexCount(m_mesh);
 	int* vertexRemapArray = new int [vertexCount];
 
-	NewtonRemoveUnusedVertices(m_mesh, vertexRemapArray);
+	dTrace(("fix this shit here\n"));
+//	NewtonRemoveUnusedVertices(m_mesh, vertexRemapArray);
+	NewtonRemoveUnusedVertices(m_mesh, NULL);
 
 	for (void* ptr0 = world->GetFirstChildLink (myNode); ptr0; ptr0 = world->GetNextChildLink(myNode, ptr0)) {
 		dScene::dTreeNode* node = world->GetNodeFromLink(ptr0);
