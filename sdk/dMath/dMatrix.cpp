@@ -532,7 +532,7 @@ bool dMatrix::SanityCheck() const
 
 dMatrix dMatrix::Inverse4x4 () const
 {
-	const dFloat tol = 1.0e-4f;
+	const dFloat tol = dFloat (1.0e-6f);
 	dMatrix tmp (*this);
 	dMatrix inv (dGetIdentityMatrix());
 	for (int i = 0; i < 4; i ++) {
