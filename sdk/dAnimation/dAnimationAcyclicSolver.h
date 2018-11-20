@@ -10,14 +10,17 @@
 */
 
 
-#ifndef __D_VEHICLE_SOLVER_H__
-#define __D_VEHICLE_SOLVER_H__
+#ifndef __D_ANIMATION_ACYCLIC_SOLVER_H__
+#define __D_ANIMATION_ACYCLIC_SOLVER_H__
 
-#include "dStdafxVehicle.h"
+//#include "dStdafxVehicle.h"
 
-class dVehicleChassis;
 
-class dVehicleSolver: public dContainersAlloc
+//class dVehicleChassis;
+class dAnimationAcyclicJoint;
+class dAnimationKinematicLoopJoint;
+
+class dAnimationAcyclicSolver: public dContainersAlloc
 {
 	class dNodePair;
 	class dVectorPair;
@@ -25,9 +28,10 @@ class dVehicleSolver: public dContainersAlloc
 	class dBodyJointMatrixDataPair;
 
 	public:
-	DVEHICLE_API dVehicleSolver();
-	DVEHICLE_API virtual ~dVehicleSolver();
-	DVEHICLE_API void Finalize(dVehicleChassis* const vehicle);
+	dAnimationAcyclicSolver();
+	virtual ~dAnimationAcyclicSolver();
+	//void Finalize(dVehicleChassis* const vehicle);
+	void Finalize(dAnimationAcyclicJoint* const rootNode);
 
 	void Update(dFloat timestep);
 
@@ -65,7 +69,7 @@ class dVehicleSolver: public dContainersAlloc
 
 	void DebugMassMatrix();
 
-	dVehicleChassis* m_vehicle;
+	dAnimationAcyclicJoint* m_rootNode;
 	dAnimationAcyclicJoint** m_nodesOrder;
 
 	// cache temporary variables

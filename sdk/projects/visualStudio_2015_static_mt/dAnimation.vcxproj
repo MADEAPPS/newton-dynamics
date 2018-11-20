@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dAnimation\dAnimationAcyclicJoint.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationAcyclicSolver.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationClip.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationNode.cpp" />
@@ -53,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dAnimation\dAnimationAcyclicJoint.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationAcyclicSolver.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationClip.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationNode.h" />
