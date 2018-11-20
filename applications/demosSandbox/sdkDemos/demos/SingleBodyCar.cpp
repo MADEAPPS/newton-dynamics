@@ -614,9 +614,18 @@ void SingleBodyCar(DemoEntityManager* const scene)
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
 
-DemoEntity* const xxxx = DemoEntity::LoadNGD_mesh("tred.ngd", scene->GetNewton());
-scene->Append(xxxx);
+DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("tred_1.ngd", scene->GetNewton());
+DemoEntity* const xxxx1 = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
+scene->Append(xxxx0);
+scene->Append(xxxx1);
 
+dMatrix matrix0(xxxx0->GetCurrentMatrix());
+matrix0.m_posit.m_z += 2.0f;
+xxxx0->ResetMatrix(*scene, matrix0);
+
+dMatrix matrix1(xxxx1->GetCurrentMatrix());
+matrix1.m_posit.m_z -= 2.0f;
+xxxx1->ResetMatrix(*scene, matrix1);
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
