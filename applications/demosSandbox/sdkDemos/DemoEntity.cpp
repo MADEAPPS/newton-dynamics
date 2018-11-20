@@ -245,12 +245,12 @@ void DemoEntity::SetNextMatrix (DemoEntityManager& world, const dQuaternion& rot
 }
 
 
-void DemoEntity::ResetMatrix(DemoEntityManager& world, const dMatrix& matrix)
+void DemoEntity::ResetMatrix(DemoEntityManager& scene, const dMatrix& matrix)
 {
 	dQuaternion rot (matrix);
-	SetMatrix(world, rot, matrix.m_posit);
-	SetMatrix(world, rot, matrix.m_posit);
-	InterpolateMatrix (world, 0.0f);
+	SetMatrix(scene, rot, matrix.m_posit);
+	SetMatrix(scene, rot, matrix.m_posit);
+	InterpolateMatrix (scene, 0.0f);
 }
 
 void DemoEntity::InterpolateMatrixUsafe(dFloat param)
