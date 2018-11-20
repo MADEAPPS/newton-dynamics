@@ -197,6 +197,7 @@ dScene::dScene(NewtonWorld* const newton)
 	,m_revision(D_SCENE_REVISION_NUMBER)
 	,m_newton (newton)
 {
+	RegisterClasses();
 }
 
 dScene::dScene(const dScene& me)
@@ -205,33 +206,42 @@ dScene::dScene(const dScene& me)
 	,m_revision(me.m_revision)
 	,m_newton (me.m_newton)
 {
-	dBoneNodeInfo::GetRttiType();
-	dMeshNodeInfo::GetRttiType();
-	dLineNodeInfo::GetRttiType();
-	dRootNodeInfo::GetRttiType();
-	dSceneNodeInfo::GetRttiType();
-	dSceneCacheInfo::GetRttiType();
-	dSceneModelInfo::GetRttiType();
-	dTextureNodeInfo::GetRttiType();
-	dMaterialNodeInfo::GetRttiType();
-	dGeometryNodeInfo::GetRttiType();
-	dCollisionNodeInfo::GetRttiType();
-	dRigidbodyNodeInfo::GetRttiType();
-	dCollisionBoxNodeInfo::GetRttiType();
-	dCollisionConeNodeInfo::GetRttiType();
-	dCollisionTreeNodeInfo::GetRttiType();
-	dCollisionSphereNodeInfo::GetRttiType();
-	dGeometryNodeModifierInfo::GetRttiType();
-	dCollisionCapsuleNodeInfo::GetRttiType();
-	dCollisionCompoundNodeInfo::GetRttiType();
-	dCollisionCylinderNodeInfo::GetRttiType();
-	dCollisionConvexHullNodeInfo::GetRttiType();
-	dGeometryNodeSkinModifierInfo::GetRttiType();
-	dCollisionChamferCylinderNodeInfo::GetRttiType();
+	RegisterClasses();
 }
 
 dScene::~dScene(void)
 {
+}
+
+void dScene::RegisterClasses()
+{
+	static bool firstTime = true;
+	if (firstTime) {
+		firstTime = false;
+		dBoneNodeInfo::GetSingleton();
+		dMeshNodeInfo::GetSingleton();
+		dLineNodeInfo::GetSingleton();
+		dRootNodeInfo::GetSingleton();
+		dSceneNodeInfo::GetSingleton();
+		dSceneCacheInfo::GetSingleton();
+		dSceneModelInfo::GetSingleton();
+		dTextureNodeInfo::GetSingleton();
+		dMaterialNodeInfo::GetSingleton();
+		dGeometryNodeInfo::GetSingleton();
+		dCollisionNodeInfo::GetSingleton();
+		dRigidbodyNodeInfo::GetSingleton();
+		dCollisionBoxNodeInfo::GetSingleton();
+		dCollisionConeNodeInfo::GetSingleton();
+		dCollisionTreeNodeInfo::GetSingleton();
+		dCollisionSphereNodeInfo::GetSingleton();
+		dGeometryNodeModifierInfo::GetSingleton();
+		dCollisionCapsuleNodeInfo::GetSingleton();
+		dCollisionCompoundNodeInfo::GetSingleton();
+		dCollisionCylinderNodeInfo::GetSingleton();
+		dCollisionConvexHullNodeInfo::GetSingleton();
+		dGeometryNodeSkinModifierInfo::GetSingleton();
+		dCollisionChamferCylinderNodeInfo::GetSingleton();
+	}
 }
 
 int dScene::GetRevision() const

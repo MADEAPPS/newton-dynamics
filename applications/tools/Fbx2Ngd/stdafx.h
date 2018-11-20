@@ -38,6 +38,7 @@
 #include <dNodeInfo.h>
 #include <dSceneGraph.h>
 #include <dMeshNodeInfo.h>
+#include <dBoneNodeInfo.h>
 #include <dSceneNodeInfo.h>
 #include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
