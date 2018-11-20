@@ -61,12 +61,11 @@ void dVehicleVirtualDifferential::Debug(dCustomJoint::dDebugDisplay* const debug
 	dVehicleDifferentialInterface::Debug(debugContext);
 }
 
-int dVehicleVirtualDifferential::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+int dVehicleVirtualDifferential::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
 {
 	jointArray[0] = &m_leftAxle;
 	jointArray[1] = &m_rightAxle;
 	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[2]) + 2;
-//	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[0]);
 }
 
 void dVehicleVirtualDifferential::ApplyExternalForce()

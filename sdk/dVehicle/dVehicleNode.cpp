@@ -80,7 +80,7 @@ void dVehicleNode::Integrate(dFloat timestep)
 	}
 }
 
-int dVehicleNode::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+int dVehicleNode::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
 {
 	int count = 0;
 	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {

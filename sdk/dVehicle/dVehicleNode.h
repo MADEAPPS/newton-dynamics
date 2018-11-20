@@ -19,25 +19,6 @@ class dVehicleInterface;
 class dKinematicLoopJoint;
 class dVehicleTireInterface;
 
-/*
-class dVehicleNode: public dContainersAlloc
-{
-	public:
-	DVEHICLE_API dVehicleNode(dVehicleNode* const parent, bool isLoop = false);
-	DVEHICLE_API virtual ~dVehicleNode();
-
-	DVEHICLE_API void* GetUserData();
-	DVEHICLE_API void SetUserData(void* const userData);
-	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-
-	dVehicleNode* GetParent() const {return m_parent;}
-	const dList<dVehicleNode*>& GetChildren() const {return m_children;}
-	NewtonWorld* GetWorld() const {return m_world;}
-	void SetWorld(NewtonWorld* const world) {m_world = world;}
-	virtual dComplementaritySolver::dBodyState* GetBody() {return &m_body;}
-	virtual dComplementaritySolver::dBilateralJoint* GetJoint() {return NULL;}
-};
-*/
 
 class dVehicleNode: public dAnimationAcyclicJoint
 {
@@ -46,7 +27,7 @@ class dVehicleNode: public dAnimationAcyclicJoint
 	DVEHICLE_API virtual ~dVehicleNode();
 
 	DVEHICLE_API virtual void ApplyExternalForce();
-	DVEHICLE_API virtual int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
+	DVEHICLE_API virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
 	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }

@@ -39,29 +39,6 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	virtual dComplementaritySolver::dBodyState* GetBody() { return &m_body; }
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return m_joint; }
 
-/*
-	virtual void ApplyExternalForce();
-	virtual int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
-	virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-
-	
-	int GetIndex() const { return m_solverIndex; }
-	void SetIndex(int index) { m_solverIndex = index; }
-	
-
-	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
-	virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
-
-	protected:
-	virtual void RigidBodyToStates();
-	virtual void Integrate(dFloat timestep);
-	virtual void StatesToRigidBody(dFloat timestep);
-	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-	int m_solverIndex;
-	bool m_isLoop;
-
-	friend class dVehicleSolver;
-*/
 	dComplementaritySolver::dBodyState m_body;
 	dComplementaritySolver::dBilateralJoint* m_joint;
 	dAnimationAcyclicJoint* m_parent;
@@ -70,6 +47,24 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	int m_solverIndex;
 	bool m_isLoop;
 	dList<dAnimationAcyclicJoint*> m_children;
+};
+
+
+class dAnimationKinematicLoopJoint: public dContainersAlloc, public dComplementaritySolver::dBilateralJoint
+{
+	public:
+	dAnimationKinematicLoopJoint();
+	~dAnimationKinematicLoopJoint() {}
+	bool IsActive() const { return m_isActive; }
+	dAnimationAcyclicJoint* GetOwner0() const { return m_owner0; }
+	dAnimationAcyclicJoint* GetOwner1() const { return m_owner1; }
+	void SetOwners(dAnimationAcyclicJoint* const owner0, dAnimationAcyclicJoint* const owner1);
+
+	virtual int GetMaxDof() const = 0;
+
+	dAnimationAcyclicJoint* m_owner0;
+	dAnimationAcyclicJoint* m_owner1;
+	bool m_isActive;
 };
 
 

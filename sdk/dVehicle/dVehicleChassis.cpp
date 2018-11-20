@@ -230,7 +230,7 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 	}
 }
 
-int dVehicleChassis::GetKinematicLoops(dKinematicLoopJoint** const jointArray)
+int dVehicleChassis::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
 {
 	return m_vehicle->GetKinematicLoops(jointArray);
 }

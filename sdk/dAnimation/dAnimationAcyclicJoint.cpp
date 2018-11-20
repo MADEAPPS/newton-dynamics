@@ -50,3 +50,18 @@ void dAnimationAcyclicJoint::Debug(dCustomJoint::dDebugDisplay* const debugConte
 	}
 }
 
+
+dAnimationKinematicLoopJoint::dAnimationKinematicLoopJoint()
+	:dComplementaritySolver::dBilateralJoint()
+	,m_owner0(NULL)
+	,m_owner1(NULL)
+	,m_isActive(false)
+{
+}
+
+void dAnimationKinematicLoopJoint::SetOwners(dAnimationAcyclicJoint* const owner0, dAnimationAcyclicJoint* const owner1)
+{
+	m_owner0 = owner0;
+	m_owner1 = owner1;
+	Init(m_owner0->GetBody(), m_owner1->GetBody());
+}

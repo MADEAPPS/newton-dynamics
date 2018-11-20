@@ -189,7 +189,7 @@ class dVehicleChassis: public dCustomControllerBase
 	void ApplyExternalForces(dFloat timestep);
 	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
-	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
+	int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 	

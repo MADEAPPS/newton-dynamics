@@ -460,7 +460,7 @@ void dVehicleSolver::InitLoopMassMatrix()
 
 	const int loopJointCount = m_loopJointCount;
 	for (int j = 0; j < loopJointCount; j++) {
-		const dKinematicLoopJoint* const joint = m_loopJoints[j];
+		const dAnimationKinematicLoopJoint* const joint = m_loopJoints[j];
 		const dAnimationAcyclicJoint* const node0 = joint->GetOwner0();
 		const dAnimationAcyclicJoint* const node1 = joint->GetOwner1();
 		const int m0 = node0->GetIndex();
@@ -595,7 +595,7 @@ void dVehicleSolver::InitMassMatrix()
 
 	int loopRowCount = 0;
 	for (int j = 0; j < m_loopJointCount; j++) {
-		const dKinematicLoopJoint* const joint = m_loopJoints[j];
+		const dAnimationKinematicLoopJoint* const joint = m_loopJoints[j];
 		loopRowCount += joint->m_count;
 	}
 
@@ -668,7 +668,7 @@ int dVehicleSolver::BuildJacobianMatrix(dFloat timestep)
 	}
 
 	for (int i = 0; i < m_loopJointCount; i++) {
-		dKinematicLoopJoint* const joint = m_loopJoints[i];
+		dAnimationKinematicLoopJoint* const joint = m_loopJoints[i];
 		joint->m_start = rowCount;
 		joint->m_count = BuildJacobianMatrix(timestep, joint);
 		rowCount += joint->m_count;
@@ -922,7 +922,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 	}
 
 	for (int j = 0; j < m_loopJointCount; j++) {
-		dKinematicLoopJoint* const joint = m_loopJoints[j];
+		dAnimationKinematicLoopJoint* const joint = m_loopJoints[j];
 
 		dAnimationAcyclicJoint* const node0 = joint->GetOwner0();
 		dAnimationAcyclicJoint* const node1 = joint->GetOwner1();
@@ -1075,7 +1075,7 @@ void dVehicleSolver::DebugMassMatrix()
 	}
 
 	for (int j = 0; j < m_loopJointCount; j ++) {
-		dKinematicLoopJoint* const joint = m_loopJoints[j];	
+		dAnimationKinematicLoopJoint* const joint = m_loopJoints[j];	
 		const dAnimationAcyclicJoint* const node0 = joint->GetOwner0();
 		const dAnimationAcyclicJoint* const node1 = joint->GetOwner1();
 		const int m0 = node0->GetIndex();
@@ -1198,7 +1198,7 @@ void dVehicleSolver::Update(dFloat timestep)
 	}
 //int xxx = sizeof (dBodyJointMatrixDataPair);
 
-	dKinematicLoopJoint* kinematicLoop[128];
+	dAnimationKinematicLoopJoint* kinematicLoop[128];
 	m_loopJoints = kinematicLoop;
 
 	m_vehicle->ApplyExternalForces(timestep);
@@ -1208,7 +1208,7 @@ void dVehicleSolver::Update(dFloat timestep)
 	int loopDof = 0;
 	m_loopNodeCount = 0;
 	for (int i = 0; i < m_loopJointCount; i ++) {
-		dKinematicLoopJoint* const loop = m_loopJoints[i];
+		dAnimationKinematicLoopJoint* const loop = m_loopJoints[i];
 		dAssert (loop->IsActive());
 		loopDof += loop->GetMaxDof();
 		dAnimationAcyclicJoint* const node0 = loop->GetOwner0();

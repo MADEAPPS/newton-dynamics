@@ -43,24 +43,8 @@ class dDifferentialMount: public dComplementaritySolver::dBilateralJoint
 	bool m_slipeOn;
 };
 
-class dKinematicLoopJoint : public dComplementaritySolver::dBilateralJoint
-{
-	public:
-	dKinematicLoopJoint();
-	~dKinematicLoopJoint(){}
-	bool IsActive() const { return m_isActive; }
-	dVehicleNode* GetOwner0() const{return m_owner0;}
-	dVehicleNode* GetOwner1() const{return m_owner1;}
-	void SetOwners(dVehicleNode* const owner0, dVehicleNode* const owner1);
 
-	virtual int GetMaxDof() const = 0;
-
-	dVehicleNode* m_owner0;
-	dVehicleNode* m_owner1;
-	bool m_isActive;
-};
-
-class dTireContact: public dKinematicLoopJoint
+class dTireContact: public dAnimationKinematicLoopJoint
 {
 	public:
 	class dTireModel
@@ -119,7 +103,7 @@ class dEngineBlockJoint : public dComplementaritySolver::dBilateralJoint
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 };
 
-class dEngineCrankJoint: public dKinematicLoopJoint
+class dEngineCrankJoint: public dAnimationKinematicLoopJoint
 {
 	public:
 	dEngineCrankJoint();
@@ -134,7 +118,7 @@ class dEngineCrankJoint: public dKinematicLoopJoint
 	dFloat m_targetTorque;
 };
 
-class dGearBoxJoint: public dKinematicLoopJoint
+class dGearBoxJoint: public dAnimationKinematicLoopJoint
 {
 	public:
 	dGearBoxJoint();
@@ -152,7 +136,7 @@ class dGearBoxJoint: public dKinematicLoopJoint
 	dFloat m_clutchTorque;
 };
 
-class dTireAxleJoint: public dKinematicLoopJoint
+class dTireAxleJoint: public dAnimationKinematicLoopJoint
 {
 	public:
 	dTireAxleJoint();

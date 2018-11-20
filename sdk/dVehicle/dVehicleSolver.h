@@ -16,7 +16,6 @@
 #include "dStdafxVehicle.h"
 
 
-//class dVehicleNode;
 class dVehicleChassis;
 class dKinematicLoopJoint;
 
@@ -78,7 +77,7 @@ class dVehicleSolver: public dContainersAlloc
 	dFloat* m_massMatrix10;
 	dFloat* m_massMatrix11;
 	dBodyJointMatrixDataPair* m_data;
-	dKinematicLoopJoint** m_loopJoints;	
+	dAnimationKinematicLoopJoint** m_loopJoints;
 	
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;
 	dComplementaritySolver::dJacobianColum* m_rightHandSide;

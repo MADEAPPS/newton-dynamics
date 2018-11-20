@@ -38,7 +38,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	void Integrate(dFloat timestep);
 	dComplementaritySolver::dBilateralJoint* GetJoint();
 	dMatrix GetHardpointMatrix (dFloat param) const;
-	int GetKinematicLoops(dKinematicLoopJoint** const jointArray);
+	int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	void CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep);
 
