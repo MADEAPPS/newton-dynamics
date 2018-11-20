@@ -152,9 +152,10 @@ void dVehicleChassis::Finalize()
 	dVector maxP;
 	m_vehicle->CalculateNodeAABB(dGetIdentityMatrix(), minP, maxP);
 
-	const dList<dVehicleNode*>& children = m_vehicle->GetChildren();
-	for (dList<dVehicleNode*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)tireNode->GetInfo()->GetAsTire();
+	const dList<dAnimationAcyclicJoint*>& children = m_vehicle->GetChildren();
+	for (dList<dAnimationAcyclicJoint*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+		dVehicleNode* const node = (dVehicleNode*)tireNode->GetInfo();
+		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)node->GetAsTire();
 		if (tire) {
 			dVector tireMinP;
 			dVector tireMaxP;
@@ -219,9 +220,10 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 	NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 	NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, OnAABBOverlap, &bodyList);
 
-	const dList<dVehicleNode*>& children = m_vehicle->GetChildren();
-	for (dList<dVehicleNode*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)tireNode->GetInfo()->GetAsTire();
+	const dList<dAnimationAcyclicJoint*>& children = m_vehicle->GetChildren();
+	for (dList<dAnimationAcyclicJoint*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+		dVehicleNode* const node = (dVehicleNode*)tireNode->GetInfo();
+		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)node->GetAsTire();
 		if (tire) {
 			tire->CalculateContacts(bodyList, timestep);
 		}
@@ -476,9 +478,10 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 	dFloat chassisInvMass = chassisBody->GetInvMass();
 
 	int tireCount = 0;
-	const dList<dVehicleNode*>& children = m_vehicle->GetChildren();
-	for (dList<dVehicleNode*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*) tireNode->GetInfo()->GetAsTire();
+	const dList<dAnimationAcyclicJoint*>& children = m_vehicle->GetChildren();
+	for (dList<dAnimationAcyclicJoint*>::dListNode* tireNode = children.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+		dVehicleNode* const node = (dVehicleNode*)tireNode->GetInfo();
+		dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)node->GetAsTire();
 		if (tire) {
 			const dVehicleVirtualTire::dTireInfo& info = tire->m_info;
 			tires[tireCount] = tire;

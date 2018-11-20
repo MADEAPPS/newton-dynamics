@@ -16,7 +16,7 @@
 #include "dStdafxVehicle.h"
 
 
-class dVehicleNode;
+//class dVehicleNode;
 class dVehicleChassis;
 class dKinematicLoopJoint;
 
@@ -36,20 +36,20 @@ class dVehicleSolver: public dContainersAlloc
 
 	private:
 	int CalculateNodeCount () const;
-	void SortGraph(dVehicleNode* const root, int& index);
+	void SortGraph(dAnimationAcyclicJoint* const root, int& index);
 
 	void InitMassMatrix();
 	void InitLoopMassMatrix();
-	void Factorize(dVehicleNode* const node);
+	void Factorize(dAnimationAcyclicJoint* const node);
 	int BuildJacobianMatrix(dFloat timestep);
-	void GetJacobians(dVehicleNode* const node);
+	void GetJacobians(dAnimationAcyclicJoint* const node);
 	void CalculateLoopMassMatrixCoefficients(dFloat* const diagDamp);
 	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
 
-	void CalculateJointDiagonal(dVehicleNode* const node);
-	void CalculateJacobianBlock(dVehicleNode* const node);
-	void CalculateBodyDiagonal(dVehicleNode* const child);
-	void CalculateInertiaMatrix(dVehicleNode* const node) const;
+	void CalculateJointDiagonal(dAnimationAcyclicJoint* const node);
+	void CalculateJacobianBlock(dAnimationAcyclicJoint* const node);
+	void CalculateBodyDiagonal(dAnimationAcyclicJoint* const child);
+	void CalculateInertiaMatrix(dAnimationAcyclicJoint* const node) const;
 
 	void UpdateForces(const dVectorPair* const force) const;
 	void CalculateJointAccel(dVectorPair* const accel) const;
@@ -59,17 +59,17 @@ class dVehicleSolver: public dContainersAlloc
 	void SolveBackward(dVectorPair* const force, const dVectorPair* const accel) const;
 	void SolveForward(dVectorPair* const force, const dVectorPair* const accel, int startNode) const;
 
-	void BodyDiagInvTimeSolution(dVehicleNode* const node, dVectorPair& force) const;
-	void JointDiagInvTimeSolution(dVehicleNode* const node, dVectorPair& force) const;
-	void JointJacobianTimeMassForward(dVehicleNode* const node, dVectorPair& force) const;
-	void BodyJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force) const;
-	void BodyJacobianTimeMassForward(dVehicleNode* const node, const dVectorPair& force, dVectorPair& parentForce) const;
-	void JointJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force, const dVectorPair& parentForce) const;
+	void BodyDiagInvTimeSolution(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
+	void JointDiagInvTimeSolution(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
+	void JointJacobianTimeMassForward(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
+	void BodyJacobianTimeSolutionBackward(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
+	void BodyJacobianTimeMassForward(dAnimationAcyclicJoint* const node, const dVectorPair& force, dVectorPair& parentForce) const;
+	void JointJacobianTimeSolutionBackward(dAnimationAcyclicJoint* const node, dVectorPair& force, const dVectorPair& parentForce) const;
 
 	void DebugMassMatrix();
 
 	dVehicleChassis* m_vehicle;
-	dVehicleNode** m_nodesOrder;
+	dAnimationAcyclicJoint** m_nodesOrder;
 
 	// cache temporary variables
 	int* m_matrixRowsIndex;

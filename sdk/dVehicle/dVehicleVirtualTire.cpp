@@ -17,7 +17,7 @@
 dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame)
 	:dVehicleTireInterface(parent, info)
 	,m_joint()
-	,m_dynamicContactBodyNode(NULL, true)
+	,m_dynamicContactBodyNode(NULL)
 	,m_omega(0.0f)
 	,m_speed(0.0f)
 	,m_position(0.0f)
@@ -27,6 +27,7 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f/m_info.m_suspensionLength : 0.0f)
 {
 	SetWorld(parent->GetWorld());
+	m_dynamicContactBodyNode.SetLoopNode(true);
 	m_dynamicContactBodyNode.SetWorld(m_world);
 
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
@@ -110,7 +111,7 @@ dMatrix dVehicleVirtualTire::GetGlobalMatrix () const
 {
 	dMatrix newtonBodyMatrix;
 
-	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent->GetAsVehicle();
+	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)((dVehicleNode*)m_parent)->GetAsVehicle();
 	dAssert (chassisNode);
 	return GetLocalMatrix() * chassisNode->GetBody()->GetMatrix();
 }
@@ -318,7 +319,7 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 	dMatrix tireMatrix(m_bindingRotation.Transpose() * GetGlobalMatrix());
 	NewtonCollisionForEachPolygonDo(m_tireShape, &tireMatrix[0][0], RenderDebugTire, debugContext);
 
-	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent->GetAsVehicle();
+	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)((dVehicleNode*)m_parent)->GetAsVehicle();
 	dAssert (chassis);
 	dVector weight (chassis->m_gravity.Scale(chassis->GetBody()->GetMass()));
 	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));

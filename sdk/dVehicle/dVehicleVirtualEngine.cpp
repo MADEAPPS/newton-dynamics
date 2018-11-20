@@ -79,7 +79,7 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 	m_body.SetInertia(inertia, inertia, inertia);
 	m_body.UpdateInertia();
 
-	dVehicleSingleBody* const chassis = (dVehicleSingleBody*) m_parent->GetAsVehicle();
+	dVehicleSingleBody* const chassis = (dVehicleSingleBody*) ((dVehicleNode*)m_parent)->GetAsVehicle();
 	// set the tire joint
 	m_blockJoint.Init(&m_body, chassis->GetBody());
 

@@ -117,7 +117,6 @@ dComplementaritySolver::dBodyState::dBodyState()
 {
 }
 
-
 const dVector& dComplementaritySolver::dBodyState::GetOmega() const
 {
 	return m_omega;

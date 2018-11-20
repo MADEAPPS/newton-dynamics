@@ -286,8 +286,6 @@ class dComplementaritySolver
 		friend class dComplementaritySolver;
 	};
 
-
-
 	public:
 	dComplementaritySolver() {};
 	virtual ~dComplementaritySolver() {};

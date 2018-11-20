@@ -332,8 +332,8 @@ fclose(file_xxx);
 
 void dTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
 {
-	dVehicleVirtualTire* const tire = (dVehicleVirtualTire*)GetOwner0()->GetAsTire();
-	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)GetOwner0()->GetParent()->GetAsVehicle();
+	dVehicleVirtualTire* const tire = (dVehicleVirtualTire*) GetOwner0()->GetAsTire();
+	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)((dVehicleNode*)GetOwner0()->GetParent())->GetAsVehicle();
 
 	dAssert (tire);
 	dAssert (chassis);

@@ -75,4 +75,5 @@
 #include <dCustomJoint.h>
 #include <dCustomControllerManager.h>
 
-
+#include <dAnimationStdAfx.h>
+#include <dAnimationAcyclicJoint.h>

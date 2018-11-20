@@ -42,11 +42,14 @@
 
 #include <dStdAfxMath.h>
 #include <dContainersStdAfx.h>
+#include <dCustomJointLibraryStdAfx.h>
 
+#include <Newton.h>
 #include <dMathDefines.h>
 #include <dVector.h>
 #include <dMatrix.h>
 #include <dQuaternion.h>
+#include <dLinearAlgebra.h>
  
 #include <dCRC.h>
 #include <dRefCounter.h>
@@ -57,7 +60,7 @@
 #include <dRtti.h>
 #include <dClassInfo.h>
 
-//#include <tinyxml.h>
+#include <dCustomJoint.h>
 
 
 #define D_DEFINE_ANIMATION_NODE_DEFINE(className,baseClass)	\
