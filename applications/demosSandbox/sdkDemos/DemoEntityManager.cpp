@@ -1366,7 +1366,7 @@ void DemoEntityManager::RenderScene()
 	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	// one light form the Camera eye point
+	// one light from the Camera eye point
 	GLfloat lightDiffuse0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
 	GLfloat lightAmbient0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
 	dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
@@ -1381,12 +1381,13 @@ void DemoEntityManager::RenderScene()
 	// set just one directional light
 	GLfloat lightDiffuse1[] = { 0.7f, 0.7f, 0.7f, 0.0 };
 	GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0 };
+	GLfloat lightSpecular1[] = { 0.1f, 0.1f, 0.1f, 0.0 };
 	GLfloat lightPosition1[] = { -500.0f, 200.0f, 500.0f, 0.0 };
 
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, lightDiffuse1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
 	glEnable(GL_LIGHT1);
 
 	//glEnable(GL_BLEND);

@@ -19,7 +19,7 @@
 #include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
 
-#if 1
+#if 0
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -419,8 +419,18 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
 	}
 
-	dSixAxisController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->Debug(debugContext);
+		}
+	}
+*/
+
+	dAnimationCharacterRig* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	{
+/*
 		dSixAxisController* const controller = (dSixAxisController*)CreateController();
 		controller->MakeKukaRobot(scene, origin);
 		m_currentController = controller;
@@ -434,16 +444,16 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		xxxx0->ResetMatrix(*scene, matrix0);
 
 		return controller;
+*/
+
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
+		scene->Append(model);
+		model->ResetMatrix(*scene, origin);
+
+		return NULL;
 	}
 
-	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
-	{
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			dSixAxisController* const controller = &node->GetInfo();
-			controller->Debug(debugContext);
-		}
-	}
-
+/*
 	dSixAxisController* m_currentController;
 	dFloat32 m_azimuth;
 	dFloat32 m_posit_x;
@@ -471,7 +481,7 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	for (int i = 0; i < count; i++) {
 		origin.m_posit.m_x += 1.0f;
 		origin1.m_posit.m_x += 1.0f;
-		//robotManager->MakeKukaRobot(scene, origin);
+		robotManager->MakeKukaRobot(scene, origin);
 		//robotManager->MakeKukaRobot (scene, origin1);
 	}
 
