@@ -49,10 +49,9 @@ void dAnimationCharacterRigManager::DestroyController(dAnimationCharacterRig* co
 
 void dAnimationCharacterRigManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
-	dAssert(0);
-	for (dCustomControllerManager<dAnimationCharacterRig>::dListNode* vehicleNode = GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
-//		dAnimationCharacterRig* const vehicle = &vehicleNode->GetInfo();
-//		vehicle->Debug(debugContext);
+	for (dCustomControllerManager<dAnimationCharacterRig>::dListNode* rigNode = GetFirst(); rigNode; rigNode = rigNode->GetNext()) {
+		dAnimationCharacterRig* const rig = &rigNode->GetInfo();
+		rig->Debug(debugContext);
 	}
 }
 

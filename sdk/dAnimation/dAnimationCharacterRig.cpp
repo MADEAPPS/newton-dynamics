@@ -348,3 +348,21 @@ void dAnimationCharacterRig::CalculateSuspensionForces(dFloat timestep)
 	chassisBody->SetTorque(chassisBody->GetTorque() + chassisTorque);
 }
 */
+
+
+void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dAssert(0);
+//	m_vehicle->Debug(debugContext);
+}
+
+void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
+{
+	dAssert(0);
+//	dVehicleManager* const manager = (dVehicleManager*)GetManager();
+}
+
+void dAnimationCharacterRig::PostUpdate(dFloat timestep, int threadIndex)
+{
+//	m_vehicle->RigidBodyToStates();
+}

@@ -40,6 +40,7 @@ class dAnimationCharacterRig: public dCustomControllerBase
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 */	
 
+	friend class dAnimationCharacterRigManager;
 };
 
 

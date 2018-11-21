@@ -19,6 +19,7 @@
 #include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
 
+#if 1
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -369,4 +370,114 @@ count = 1;
 	origin.m_posit = dVector(-1.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
+#else
 
+
+
+class dSixAxisManager: public dAnimationCharacterRigManager
+{
+	public:
+	dSixAxisManager(DemoEntityManager* const scene)
+		:dAnimationCharacterRigManager(scene->GetNewton())
+//		,m_currentController(NULL)
+//		,m_azimuth(0.0f)
+//		,m_posit_x(0.0f)
+//		,m_posit_y(0.0f)
+//		,m_gripper_roll(0.0f)
+//		,m_gripper_pitch(0.0f)
+	{
+//		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~dSixAxisManager()
+	{
+	}
+/*
+	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
+	{
+		dSixAxisManager* const me = (dSixAxisManager*)context;
+
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Use sliders to manipulate robot");
+		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+
+		//		ImGui::Separator();
+		//		ImGui::Separator();
+		//		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
+		//		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
+
+		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->SetTarget(me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
+		}
+	}
+
+	virtual dSixAxisController* CreateController()
+	{
+		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
+	}
+
+	dSixAxisController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	{
+		dSixAxisController* const controller = (dSixAxisController*)CreateController();
+		controller->MakeKukaRobot(scene, origin);
+		m_currentController = controller;
+
+		DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
+		scene->Append(xxxx0);
+		dMatrix matrix0(xxxx0->GetCurrentMatrix());
+		matrix0 = dYawMatrix(-90.0f * dDegreeToRad) * matrix0;
+		matrix0.m_posit = origin.m_posit;
+		matrix0.m_posit.m_z += 1.0f;
+		xxxx0->ResetMatrix(*scene, matrix0);
+
+		return controller;
+	}
+
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->Debug(debugContext);
+		}
+	}
+
+	dSixAxisController* m_currentController;
+	dFloat32 m_azimuth;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_gripper_roll;
+	dFloat32 m_gripper_pitch;
+*/
+};
+
+
+void SixAxisManipulators(DemoEntityManager* const scene)
+{
+	// load the sky box
+	scene->CreateSkyBox();
+	CreateLevelMesh(scene, "flatPlane.ngd", true);
+	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
+
+	dMatrix origin(dYawMatrix(0.0f * dDegreeToRad));
+	dMatrix origin1(dYawMatrix(180.0f * dDegreeToRad));
+	origin.m_posit.m_z = -1.0f;
+	origin1.m_posit.m_z = 1.0f;
+
+	int count = 10;
+	count = 1;
+	for (int i = 0; i < count; i++) {
+		origin.m_posit.m_x += 1.0f;
+		origin1.m_posit.m_x += 1.0f;
+		//robotManager->MakeKukaRobot(scene, origin);
+		//robotManager->MakeKukaRobot (scene, origin1);
+	}
+
+	//	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
+	origin.m_posit = dVector(-1.0f, 0.5f, 0.0f, 1.0f);
+	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
+}
+
+#endif
