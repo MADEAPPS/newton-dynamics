@@ -798,7 +798,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		// make a clone of the mesh 
-		//ServoEntityModel* const vehicleModel = (ServoEntityModel*)model->CreateClone();
 		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(filename, scene->GetNewton());
 		scene->Append(vehicleModel);
 

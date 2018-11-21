@@ -372,7 +372,18 @@ count = 1;
 }
 #else
 
+struct dArmnRobotConfig
+{
+	char m_partName[32];
+	char m_shapeTypeName[32];
+	dFloat m_mass;
+};
 
+static dArmnRobotConfig armnRobotConfig[] =
+{
+	{ "bone_base",		"convexHull",	200.0f},
+//	{ "bone_base",		"cylinder", 200.0f },
+};
 
 class dSixAxisManager: public dAnimationCharacterRigManager
 {
@@ -428,6 +439,90 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 	}
 */
 
+	DemoEntity* FindMesh(DemoEntity* const bodyPart) const
+	{
+		for (DemoEntity* child = bodyPart->GetChild(); child; child = child->GetSibling()) {
+			if (child->GetMesh()) {
+				return child;
+			}
+		}
+		dAssert(0);
+		return NULL;
+	}
+
+	NewtonCollision* MakeConvexHull(const DemoEntity* const bodyPart) const
+	{
+		dVector points[1024 * 16];
+
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		dAssert(mesh->m_vertexCount && (mesh->m_vertexCount < int(sizeof(points) / sizeof(points[0]))));
+
+		// go over the vertex array and find and collect all vertices's weighted by this bone.
+		const dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			points[i][0] = array[i * 3 + 0];
+			points[i][1] = array[i * 3 + 1];
+			points[i][2] = array[i * 3 + 2];
+			points[i][3] = 0.0f;
+		}
+		dMatrix matrix(bodyPart->GetMeshMatrix());
+		matrix = matrix * bodyPart->GetCurrentMatrix();
+		//matrix = matrix * bodyPart->GetParent()->GetCurrentMatrix();
+		matrix.TransformTriplex(&points[0][0], sizeof(dVector), &points[0][0], sizeof(dVector), mesh->m_vertexCount);
+//		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, SERVO_VEHICLE_DEFINITION::m_bodyPart, NULL);
+		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
+	}
+
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dArmnRobotConfig& definition)
+	{
+		const DemoEntity* const mesh = FindMesh(bodyPart);
+		dAssert(mesh);
+
+		NewtonCollision* shape = NULL;
+		if (!strcmp(definition.m_shapeTypeName, "box")) {
+			dAssert(0);
+		} else if (!strcmp(definition.m_shapeTypeName, "cylinder")) {
+			dAssert(0);
+			//shape = MakeForkLiftTireShape(bodyPart);
+		} else if (!strcmp(definition.m_shapeTypeName, "convexHull")) {
+			shape = MakeConvexHull(mesh);
+		} else if (!strcmp(definition.m_shapeTypeName, "convexHullAggregate")) {
+			dAssert(0);
+			//shape = MakePalleteShape(bodyPart);
+		} else {
+			dAssert(0);
+		}
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		NewtonWorld* const world = GetWorld();
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, definition.m_mass, collision);
+
+		// save the user lifterData with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// assign a body part id
+		//NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+
+
 	dAnimationCharacterRig* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 /*
@@ -449,6 +544,43 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
+
+		NewtonBody* const rootBody = CreateBodyPart(model, armnRobotConfig[0]);
+
+/*
+		int stackIndex = 0;
+		DemoEntity* childEntities[32];
+//		dCustomTransformController::dSkeletonBone* parentBones[32];
+		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		const int partCount = sizeof(armnRobotConfig) / sizeof(armnRobotConfig[0]);
+		while (stackIndex) {
+			stackIndex--;
+			DemoEntity* const entity = childEntities[stackIndex];
+
+			const char* const name = entity->GetName().GetStr();
+			for (int i = 0; i < partCount; i++) {
+				if (!strcmp(armnRobotConfig[i].m_partName, name)) {
+					//NewtonBody* const bone = CreateBodyPart(entity, definition[i]);
+
+					// connect this body part to its parent with a vehicle joint
+					//ConnectBodyPart(controller, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
+
+					//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
+					//parentBone = controller->AddBone(bone, bindMatrix, parentBone);
+					break;
+				}
+			}
+
+			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+				childEntities[stackIndex] = child;
+				stackIndex++;
+			}
+		}
+*/
 
 		return NULL;
 	}
@@ -475,6 +607,8 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	dMatrix origin1(dYawMatrix(180.0f * dDegreeToRad));
 	origin.m_posit.m_z = -1.0f;
 	origin1.m_posit.m_z = 1.0f;
+
+origin = dGetIdentityMatrix();
 
 	int count = 10;
 	count = 1;
