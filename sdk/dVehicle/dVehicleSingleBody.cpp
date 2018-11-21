@@ -20,7 +20,7 @@ dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	:dVehicleInterface(chassis)
 	,m_gravity(0.0f)
 	,m_groundNode(NULL)
-	,m_newtonBody(chassis->GetBody())
+	,m_chassis(chassis)
 {
 	dVector tmp;
 	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
@@ -28,12 +28,13 @@ dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	m_groundNode.SetLoopNode(true);
 	
 	// set the inertia matrix;
-	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
+	NewtonBody* const newtonBody = chassis->GetBody();
+	NewtonBodyGetMass(newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
 	chassisBody->SetMass(tmp.m_w);
 	chassisBody->SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
 
 	dMatrix matrix (dGetIdentityMatrix());
-	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
+	NewtonBodyGetCentreOfMass(newtonBody, &matrix.m_posit[0]);
 	matrix.m_posit.m_w = 1.0f;
 	chassisBody->SetLocalMatrix(matrix);
 }
@@ -64,7 +65,8 @@ dMatrix dVehicleSingleBody::GetMatrix () const
 
 void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
-	NewtonCollision* const collision = NewtonBodyGetCollision(m_newtonBody);
+	NewtonBody* const newtonBody = m_chassis->GetBody();
+	NewtonCollision* const collision = NewtonBodyGetCollision(newtonBody);
 	CalculateAABB(collision, matrix, minP, maxP);
 }
 
@@ -75,19 +77,20 @@ void dVehicleSingleBody::RigidBodyToStates()
 	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
 
 	// get data from engine rigid body and copied to the vehicle chassis body
-	NewtonBodyGetMatrix(m_newtonBody, &matrix[0][0]);
+	NewtonBody* const newtonBody = m_chassis->GetBody();
+	NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
 	chassisBody->SetMatrix(matrix);
 
-	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
+	NewtonBodyGetVelocity(newtonBody, &vector[0]);
 	chassisBody->SetVeloc(vector);
 
-	NewtonBodyGetOmega(m_newtonBody, &vector[0]);
+	NewtonBodyGetOmega(newtonBody, &vector[0]);
 	chassisBody->SetOmega(vector);
 
-	NewtonBodyGetForce(m_newtonBody, &vector[0]);
+	NewtonBodyGetForce(newtonBody, &vector[0]);
 	chassisBody->SetForce(vector);
 
-	NewtonBodyGetTorque(m_newtonBody, &vector[0]);
+	NewtonBodyGetTorque(newtonBody, &vector[0]);
 	chassisBody->SetTorque(vector);
 
 	chassisBody->UpdateInertia();
@@ -101,8 +104,9 @@ void dVehicleSingleBody::StatesToRigidBody(dFloat timestep)
 
 	dVector force(chassisBody->GetForce());
 	dVector torque(chassisBody->GetTorque());
-	NewtonBodySetForce(m_newtonBody, &force[0]);
-	NewtonBodySetTorque(m_newtonBody, &torque[0]);
+	NewtonBody* const newtonBody = m_chassis->GetBody();
+	NewtonBodySetForce(newtonBody, &force[0]);
+	NewtonBodySetTorque(newtonBody, &torque[0]);
 
 	dVehicleInterface::StatesToRigidBody(timestep);
 }
@@ -113,7 +117,7 @@ int dVehicleSingleBody::GetKinematicLoops(dAnimationKinematicLoopJoint** const j
 	return dVehicleInterface::GetKinematicLoops(jointArray);
 }
 
-void dVehicleSingleBody::ApplyExternalForce()
+void dVehicleSingleBody::ApplyExternalForce(dFloat timestep)
 {
 	dVector force(0.0f);
 	dVector torque(0.0f);
@@ -124,14 +128,17 @@ void dVehicleSingleBody::ApplyExternalForce()
 	groundBody->SetForce(force);
 	groundBody->SetTorque(force);
 
-	NewtonBodyGetForce(m_newtonBody, &force[0]);
+	NewtonBody* const newtonBody = m_chassis->GetBody();
+	NewtonBodyGetForce(newtonBody, &force[0]);
 	chassisBody->SetForce(force);
 
-	NewtonBodyGetTorque(m_newtonBody, &torque[0]);
+	NewtonBodyGetTorque(newtonBody, &torque[0]);
 	chassisBody->SetTorque(torque);
 
 	m_gravity = force.Scale(chassisBody->GetInvMass());
-	dVehicleInterface::ApplyExternalForce();
+	dVehicleInterface::ApplyExternalForce(timestep);
+
+	m_chassis->ApplyExternalForces(timestep);
 }
 
 void dVehicleSingleBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) const

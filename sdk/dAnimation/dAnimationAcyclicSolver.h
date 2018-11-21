@@ -13,10 +13,6 @@
 #ifndef __D_ANIMATION_ACYCLIC_SOLVER_H__
 #define __D_ANIMATION_ACYCLIC_SOLVER_H__
 
-//#include "dStdafxVehicle.h"
-
-
-//class dVehicleChassis;
 class dAnimationAcyclicJoint;
 class dAnimationKinematicLoopJoint;
 

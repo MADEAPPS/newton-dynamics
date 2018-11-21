@@ -14,6 +14,8 @@
 
 #include "dAnimationStdAfx.h"
 
+class dAnimationKinematicLoopJoint;
+
 class dAnimationAcyclicJoint: public dContainersAlloc
 {
 	public:
@@ -38,6 +40,9 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 
 	virtual dComplementaritySolver::dBodyState* GetBody() { return &m_body; }
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return m_joint; }
+
+	virtual void ApplyExternalForce(dFloat timestep);
+	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 
 	dComplementaritySolver::dBodyState m_body;
 	dComplementaritySolver::dBilateralJoint* m_joint;

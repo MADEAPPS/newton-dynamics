@@ -177,7 +177,6 @@ void dVehicleChassis::Finalize()
 
 void dVehicleChassis::ApplyExternalForces(dFloat timestep)
 {
-	m_vehicle->ApplyExternalForce();
 	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 }
@@ -228,11 +227,6 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 			tire->CalculateContacts(bodyList, timestep);
 		}
 	}
-}
-
-int dVehicleChassis::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
-{
-	return m_vehicle->GetKinematicLoops(jointArray);
 }
 
 void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)

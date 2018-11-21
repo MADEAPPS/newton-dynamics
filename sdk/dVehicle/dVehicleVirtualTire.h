@@ -34,7 +34,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	DVEHICLE_API virtual void SetBrakeTorque(dFloat brakeTorque);
 
 	protected:
-	void ApplyExternalForce();
+	void ApplyExternalForce(dFloat timestep);
 	void Integrate(dFloat timestep);
 	dComplementaritySolver::dBilateralJoint* GetJoint();
 	dMatrix GetHardpointMatrix (dFloat param) const;

@@ -28,7 +28,7 @@ class dVehicleSingleBody: public dVehicleInterface
 
 	protected:
 	void RigidBodyToStates();
-	void ApplyExternalForce();
+	void ApplyExternalForce(dFloat timestep);
 	void StatesToRigidBody(dFloat timestep);
 	int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
@@ -37,7 +37,8 @@ class dVehicleSingleBody: public dVehicleInterface
 
 	dVector m_gravity;
 	dVehicleNode m_groundNode;
-	NewtonBody* m_newtonBody;
+//	NewtonBody* m_newtonBody;
+	dVehicleChassis* m_chassis;
 
 	friend class dVehicleChassis;
 	friend class dVehicleVirtualTire;

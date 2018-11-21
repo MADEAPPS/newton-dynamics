@@ -31,7 +31,7 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 	m_dynamicContactBodyNode.SetWorld(m_world);
 
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
-	NewtonBody* const newtonBody = chassisNode->m_newtonBody;
+	NewtonBody* const newtonBody = chassisNode->m_chassis->GetBody();
 
 	m_tireShape = NewtonCreateChamferCylinder(m_world, 0.5f, 1.0f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
@@ -137,7 +137,7 @@ void dVehicleVirtualTire::SetBrakeTorque(dFloat brakeTorque)
 	m_brakeTorque = dAbs (brakeTorque);
 }
 
-void dVehicleVirtualTire::ApplyExternalForce()
+void dVehicleVirtualTire::ApplyExternalForce(dFloat timestep)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
@@ -151,7 +151,7 @@ void dVehicleVirtualTire::ApplyExternalForce()
 	m_body.SetTorque(dVector (0.0f));
 	m_body.SetForce(chassisNode->m_gravity.Scale (m_body.GetMass()));
 
-	dVehicleTireInterface::ApplyExternalForce();
+	dVehicleTireInterface::ApplyExternalForce(timestep);
 }
 
 int dVehicleVirtualTire::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)

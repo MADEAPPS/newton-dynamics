@@ -53,7 +53,7 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	virtual dFloat GetRpm() const;
 	virtual dFloat GetRedLineRpm() const;
 
-	void ApplyExternalForce();
+	void ApplyExternalForce(dFloat timestep);
 	void InitEngineTorqueCurve();
 	void Integrate(dFloat timestep);
 

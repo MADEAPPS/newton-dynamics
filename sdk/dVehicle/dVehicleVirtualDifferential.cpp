@@ -68,7 +68,7 @@ int dVehicleVirtualDifferential::GetKinematicLoops(dAnimationKinematicLoopJoint*
 	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[2]) + 2;
 }
 
-void dVehicleVirtualDifferential::ApplyExternalForce()
+void dVehicleVirtualDifferential::ApplyExternalForce(dFloat timestep)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
 	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
@@ -82,7 +82,7 @@ void dVehicleVirtualDifferential::ApplyExternalForce()
 	m_body.SetTorque(dVector(0.0f));
 	m_body.SetForce(chassisNode->m_gravity.Scale(m_body.GetMass()));
 
-	dVehicleDifferentialInterface::ApplyExternalForce();
+	dVehicleDifferentialInterface::ApplyExternalForce(timestep);
 }
 
 void dVehicleVirtualDifferential::Integrate(dFloat timestep)

@@ -25,9 +25,7 @@ class dVehicleNode: public dAnimationAcyclicJoint
 	public:
 	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
 	DVEHICLE_API virtual ~dVehicleNode();
-
-	DVEHICLE_API virtual void ApplyExternalForce();
-	DVEHICLE_API virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
+	
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
 	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }

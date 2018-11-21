@@ -47,13 +47,6 @@ void dVehicleNode::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVect
 	maxP = matrix.m_posit;
 }
 
-void dVehicleNode::ApplyExternalForce()
-{
-	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-		dVehicleNode* const node = (dVehicleNode*)child->GetInfo();
-		node->ApplyExternalForce();
-	}
-}
 
 void dVehicleNode::RigidBodyToStates()
 {
@@ -78,14 +71,4 @@ void dVehicleNode::Integrate(dFloat timestep)
 		dVehicleNode* const node = (dVehicleNode*)child->GetInfo();
 		node->Integrate(timestep);
 	}
-}
-
-int dVehicleNode::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
-{
-	int count = 0;
-	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-		dVehicleNode* const node = (dVehicleNode*)child->GetInfo();
-		count += node->GetKinematicLoops(&jointArray[count]);
-	}
-	return count;
 }

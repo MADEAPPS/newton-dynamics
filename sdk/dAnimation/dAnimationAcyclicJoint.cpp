@@ -30,6 +30,9 @@ dAnimationAcyclicJoint::dAnimationAcyclicJoint(dAnimationAcyclicJoint* const par
 
 dAnimationAcyclicJoint::~dAnimationAcyclicJoint()
 {
+	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		delete child->GetInfo();
+	}
 }
 
 void* dAnimationAcyclicJoint::GetUserData()
@@ -50,6 +53,21 @@ void dAnimationAcyclicJoint::Debug(dCustomJoint::dDebugDisplay* const debugConte
 	}
 }
 
+void dAnimationAcyclicJoint::ApplyExternalForce(dFloat timestep)
+{
+	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->ApplyExternalForce(timestep);
+	}
+}
+
+int dAnimationAcyclicJoint::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
+{
+	int count = 0;
+	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		count += child->GetInfo()->GetKinematicLoops(&jointArray[count]);
+	}
+	return count;
+}
 
 dAnimationKinematicLoopJoint::dAnimationKinematicLoopJoint()
 	:dComplementaritySolver::dBilateralJoint()

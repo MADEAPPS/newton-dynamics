@@ -13,14 +13,9 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationAcyclicJoint.h"
 #include "dAnimationAcyclicSolver.h"
-//#include "dVehicleNode.h"
-//#include "dAnimationAcyclicSolver.h"
-//#include "dVehicleChassis.h"
-//#include "dVehicleVirtualJoints.h"
 
 #define D_DIAG_DAMP			 (1.0e-4f)
 #define D_MAX_FRICTION_BOUND (D_COMPLEMENTARITY_MAX_FRICTION_BOUND * 0.5f)
-
 
 class dAnimationAcyclicSolver::dMatrixData
 {
@@ -1200,13 +1195,11 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		return;
 	}
 
-dAssert(0);
-/*
 	dAnimationKinematicLoopJoint* kinematicLoop[128];
 	m_loopJoints = kinematicLoop;
 
-	m_rootNode->ApplyExternalForces(timestep);
-	
+	m_rootNode->ApplyExternalForce(timestep);
+
 	m_loopJointCount = m_rootNode->GetKinematicLoops(m_loopJoints);
 
 	int loopDof = 0;
@@ -1266,5 +1259,4 @@ dAssert(0);
 	} else {
 		UpdateForces(force);
 	}
-*/
 }
