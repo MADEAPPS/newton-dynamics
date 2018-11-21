@@ -820,8 +820,8 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 				FbxCluster* const cluster = skin->GetCluster(i);
 				FbxNode* const fbxBone = cluster->GetLink(); // Get a reference to the bone's node
 
-															 //char xxx[256];
-															 //sprintf (xxx, "%s", fbxBone->GetName());
+				//char xxx[256];
+				//sprintf (xxx, "%s", fbxBone->GetName());
 				GlobalNodeMap::dTreeNode* const boneNode = nodeMap.Find(fbxBone);
 				if (boneNode) {
 					dScene::dTreeNode* const bone = boneNode->GetInfo();
