@@ -14,18 +14,17 @@
 #define __D_ANIMATION_CHARACTER_RIG_MANAGER_H__
 
 #include "dAnimationStdAfx.h"
-
+#include "dAnimationAcyclicJoint.h"
+#include "dAnimationCharacterRig.h"
+#include "dAnimationAcyclicSolver.h"
 
 #define D_ANINAMTION_CHARACTER_RIG_NAME	"__dAnimationCharacterRigManager__"
-
 
 class dAnimationCharacterRigManager: public dCustomControllerManager<dAnimationCharacterRig>
 {
 	public:
 	dAnimationCharacterRigManager(NewtonWorld* const world);
 	virtual ~dAnimationCharacterRigManager();
-	
-//	virtual void UpdateDriverInput(dAnimationCharacterRig* const vehicle, dFloat timestep) {}
 
 	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
@@ -36,8 +35,5 @@ class dAnimationCharacterRigManager: public dCustomControllerManager<dAnimationC
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 	friend class dAnimationCharacterRig;
 };
-
-
-
 #endif 
 
