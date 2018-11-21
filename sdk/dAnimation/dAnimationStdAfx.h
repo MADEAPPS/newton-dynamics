@@ -39,12 +39,11 @@
 	#include <sys/sysctl.h>
 #endif
 
-
+#include <Newton.h>
 #include <dStdAfxMath.h>
 #include <dContainersStdAfx.h>
 #include <dCustomJointLibraryStdAfx.h>
 
-#include <Newton.h>
 #include <dMathDefines.h>
 #include <dVector.h>
 #include <dMatrix.h>
@@ -52,16 +51,17 @@
 #include <dLinearAlgebra.h>
  
 #include <dCRC.h>
-#include <dRefCounter.h>
 #include <dHeap.h>
 #include <dList.h>
 #include <dTree.h>
-#include <dBaseHierarchy.h>
 #include <dRtti.h>
+
 #include <dClassInfo.h>
+#include <dRefCounter.h>
+#include <dBaseHierarchy.h>
 
 #include <dCustomJoint.h>
-
+#include <dCustomControllerManager.h>
 
 #define D_DEFINE_ANIMATION_NODE_DEFINE(className,baseClass)	\
 	dAddRtti(baseClass);									

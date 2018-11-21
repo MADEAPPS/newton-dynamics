@@ -315,6 +315,14 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		dSixAxisController* const controller = (dSixAxisController*)CreateController();
 		controller->MakeKukaRobot(scene, origin);
 		m_currentController = controller;
+
+DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
+scene->Append(xxxx0);
+dMatrix matrix0(xxxx0->GetCurrentMatrix());
+matrix0 = dYawMatrix (-90.0f * dDegreeToRad) * matrix0;
+matrix0.m_posit.m_z += 0.0f;
+xxxx0->ResetMatrix(*scene, matrix0);
+
 		return controller;
 	}
 
@@ -348,11 +356,12 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	origin1.m_posit.m_z =  1.0f;
 
 	int count = 10;
+count = 1;
 	for (int i = 0; i < count; i ++) {
 		origin.m_posit.m_x += 1.0f;
 		origin1.m_posit.m_x += 1.0f;
 		robotManager->MakeKukaRobot (scene, origin);
-		robotManager->MakeKukaRobot (scene, origin1);
+//		robotManager->MakeKukaRobot (scene, origin1);
 	}
 	
 	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);

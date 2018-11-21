@@ -125,6 +125,9 @@
     <ProjectReference Include="..\..\..\..\sdk\dProfiler\vs_2013\dTimeTracker.vcxproj">
       <Project>{89509957-ce86-4ace-946c-7a65e63f0f23}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dAnimation.vcxproj">
+      <Project>{ea56552e-746b-4b3a-bf92-004e6a2068ef}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dContainers.vcxproj">
       <Project>{e6a31c39-173f-4000-97e0-f086db68dd42}</Project>
     </ProjectReference>
