@@ -59,26 +59,5 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	friend class dAnimationAcyclicSolver;
 };
 
-
-class dAnimationKinematicLoopJoint: public dContainersAlloc, public dComplementaritySolver::dBilateralJoint
-{
-	public:
-	dAnimationKinematicLoopJoint();
-	~dAnimationKinematicLoopJoint() {}
-	bool IsActive() const { return m_isActive; }
-	dAnimationAcyclicJoint* GetOwner0() const { return m_owner0; }
-	dAnimationAcyclicJoint* GetOwner1() const { return m_owner1; }
-	void SetOwners(dAnimationAcyclicJoint* const owner0, dAnimationAcyclicJoint* const owner1);
-
-	virtual int GetMaxDof() const = 0;
-
-	dAnimationAcyclicJoint* m_owner0;
-	dAnimationAcyclicJoint* m_owner1;
-	bool m_isActive;
-};
-
-
-
-
 #endif
 

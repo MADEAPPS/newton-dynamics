@@ -78,3 +78,4 @@
 #include <dAnimationStdAfx.h>
 #include <dAnimationAcyclicJoint.h>
 #include <dAnimationAcyclicSolver.h>
+#include <dAnimationKinematicLoopJoint.h>
