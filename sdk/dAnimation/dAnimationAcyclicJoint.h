@@ -44,6 +44,9 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	virtual void ApplyExternalForce(dFloat timestep);
 	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 
+	virtual NewtonBody* GetNewtonBody() const {return NULL;}
+
+	protected:
 	dComplementaritySolver::dBodyState m_body;
 	dComplementaritySolver::dBilateralJoint* m_joint;
 	dAnimationAcyclicJoint* m_parent;
@@ -52,6 +55,8 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	int m_solverIndex;
 	bool m_isLoop;
 	dList<dAnimationAcyclicJoint*> m_children;
+
+	friend class dAnimationAcyclicSolver;
 };
 
 

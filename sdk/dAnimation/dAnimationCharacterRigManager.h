@@ -26,13 +26,13 @@ class dAnimationCharacterRigManager: public dCustomControllerManager<dAnimationC
 	dAnimationCharacterRigManager(NewtonWorld* const world);
 	virtual ~dAnimationCharacterRigManager();
 
-	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonBody* const body);
 	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 
 	virtual void DestroyController(dAnimationCharacterRig* const controller);
 	protected:
-
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+	virtual void OnUpdateTransform (dAnimationAcyclicJoint* const bone, const dMatrix& localMatrix) const{}	
 	friend class dAnimationCharacterRig;
 };
 #endif 

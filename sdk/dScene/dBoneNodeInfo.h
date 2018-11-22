@@ -23,10 +23,10 @@
 #include "dSceneNodeInfo.h"
 
 
-class dBoneNodeInfo: public dSceneNodeInfo
+class dBoneNodeInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dBoneNodeInfo, dSceneNodeInfo, DSCENE_API)
+	D_DEFINE_CLASS_NODE(dBoneNodeInfo, dNodeInfo, DSCENE_API)
 
 	enum dBoneType	
 	{

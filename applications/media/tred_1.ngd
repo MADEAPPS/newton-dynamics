@@ -97,7 +97,7 @@
             <transform position="0.000004 0.000000 21.066256 1.000000" eulerAngles="-1.268743 0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="11" />
-            <childrenNodes count="2" indices="13 45" />
+            <childrenNodes count="2" indices="13 42" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="right_nut" editorFlags="0" />
@@ -105,7 +105,7 @@
             <transform position="0.000000 0.000000 12.423275 1.000000" eulerAngles="-0.000000 0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="12" />
-            <childrenNodes count="1" indices="40" />
+            <childrenNodes count="1" indices="46" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="left_leg" editorFlags="0" />
@@ -113,7 +113,7 @@
             <transform position="16.811026 -5.213391 0.760147 1.000000" eulerAngles="2.808908 -0.000000 -0.000001 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="3" />
-            <childrenNodes count="2" indices="15 37" />
+            <childrenNodes count="2" indices="15 43" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="left_thigh" editorFlags="0" />
@@ -121,7 +121,7 @@
             <transform position="0.000000 0.000008 -29.449883 1.000000" eulerAngles="0.936651 -0.000000 0.000001 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="14" />
-            <childrenNodes count="2" indices="16 46" />
+            <childrenNodes count="2" indices="16 47" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="left_ancle" editorFlags="0" />
@@ -129,7 +129,7 @@
             <transform position="0.000036 -0.000021 -29.063894 1.000000" eulerAngles="-0.735342 0.000001 0.000001 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="15" />
-            <childrenNodes count="2" indices="17 44" />
+            <childrenNodes count="2" indices="17 48" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="left_foot" editorFlags="0" />
@@ -137,7 +137,7 @@
             <transform position="-0.000002 0.000009 -21.066223 1.000000" eulerAngles="-1.263049 0.000000 -0.000004 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="16" />
-            <childrenNodes count="2" indices="18 38" />
+            <childrenNodes count="2" indices="18 49" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="left_nut" editorFlags="0" />
@@ -145,7 +145,7 @@
             <transform position="-0.000000 -0.000002 -12.423273 1.000000" eulerAngles="-0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="17" />
-            <childrenNodes count="1" indices="48" />
+            <childrenNodes count="1" indices="44" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="tail_01" editorFlags="0" />
@@ -153,7 +153,7 @@
             <transform position="-0.000000 -0.000002 -0.000015 1.000000" eulerAngles="1.610480 -0.000000 -0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="3" />
-            <childrenNodes count="2" indices="20 42" />
+            <childrenNodes count="2" indices="20 39" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="tail_02" editorFlags="0" />
@@ -161,7 +161,7 @@
             <transform position="-0.000008 -0.000008 37.782406 1.000000" eulerAngles="-0.011003 0.000000 -0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="19" />
-            <childrenNodes count="2" indices="21 43" />
+            <childrenNodes count="2" indices="21 45" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="tail_03" editorFlags="0" />
@@ -169,7 +169,7 @@
             <transform position="-0.000009 0.000008 29.287090 1.000000" eulerAngles="0.055170 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="20" />
-            <childrenNodes count="2" indices="22 39" />
+            <childrenNodes count="2" indices="22 37" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="tail_04" editorFlags="0" />
@@ -177,7 +177,7 @@
             <transform position="0.000007 -0.000076 38.348621 1.000000" eulerAngles="-0.091920 0.000000 -0.000002 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="21" />
-            <childrenNodes count="2" indices="23 47" />
+            <childrenNodes count="2" indices="23 38" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="tail_nut" editorFlags="0" />
@@ -185,7 +185,7 @@
             <transform position="0.000000 0.000008 25.707069 1.000000" eulerAngles="-0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="22" />
-            <childrenNodes count="1" indices="49" />
+            <childrenNodes count="1" indices="40" />
         </dSceneNodeInfo>
         <dSceneCacheInfo cacheId="-7649022316178375635">
             <dNodeInfo name="dGeometryCache" editorFlags="0" />
@@ -232,214 +232,109 @@
             <parentNodes count="2" indices="27 26" />
         </dTextureNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="pelvis" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="pelvis" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="3" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="pelvis_nut" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="pelvis_nut" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="4" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="spine_1" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="spine_1" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="5" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="spine_2" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="spine_2" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="6" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="neck" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="neck" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="7" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="head_nut" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="head_nut" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="8" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="right_leg" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="right_leg" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="9" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="right_ancle" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="right_ancle" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="11" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="left_leg" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="14" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="left_foot" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="17" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="tail_03" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="tail_03" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="21" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="right_nut" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="13" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="right_thigh" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="10" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="tail_01" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="19" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="tail_02" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="20" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="left_ancle" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="16" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="right_foot" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="12" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="left_thigh" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
-            <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="15" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="tail_04" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="tail_04" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="22" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="left_nut" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="tail_01" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="19" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="tail_nut" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="23" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="right_thigh" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="10" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="right_foot" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="12" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="left_leg" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="14" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="left_nut" editorFlags="0" />
             <boneData length="1.000000" type="1" />
             <parentNodes count="1" indices="18" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dSceneNodeInfo>
-                <dNodeInfo name="tail_nut" editorFlags="0" />
-                <color float4="0.750000 0.750000 0.000000 0.000000" />
-                <transform position="0.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-                <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
-            </dSceneNodeInfo>
+            <dNodeInfo name="tail_02" editorFlags="0" />
             <boneData length="1.000000" type="1" />
-            <parentNodes count="1" indices="23" />
+            <parentNodes count="1" indices="20" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="right_nut" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="13" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="left_thigh" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="15" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="left_ancle" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="16" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="left_foot" editorFlags="0" />
+            <boneData length="1.000000" type="1" />
+            <parentNodes count="1" indices="17" />
         </dBoneNodeInfo>
     </nodes>
 </NewtonGameDynamnics>

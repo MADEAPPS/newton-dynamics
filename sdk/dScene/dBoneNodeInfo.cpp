@@ -24,7 +24,7 @@
 D_IMPLEMENT_CLASS_NODE(dBoneNodeInfo);
 
 dBoneNodeInfo::dBoneNodeInfo()
-	:dSceneNodeInfo ()
+	:dNodeInfo ()
 	,m_lengh (0.0f) 
 	,m_type(m_effector)
 {
@@ -57,7 +57,7 @@ dBoneNodeInfo::dBoneType dBoneNodeInfo::GetType() const
 
 void dBoneNodeInfo::Serialize (TiXmlElement* const rootNode) const
 {
-	SerialiseBase(dSceneNodeInfo, rootNode);
+	SerialiseBase(dNodeInfo, rootNode);
 
 	TiXmlElement* boneData = new TiXmlElement ("boneData");
 	rootNode->LinkEndChild(boneData);
@@ -68,7 +68,7 @@ void dBoneNodeInfo::Serialize (TiXmlElement* const rootNode) const
 
 bool dBoneNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
 {
-	DeserialiseBase(scene, dSceneNodeInfo, rootNode);
+	DeserialiseBase(scene, dNodeInfo, rootNode);
 
 	TiXmlElement* const boneData = (TiXmlElement*) rootNode->FirstChild ("boneData");
 	dStringToFloatArray (boneData->Attribute("length"), &m_lengh, 1);

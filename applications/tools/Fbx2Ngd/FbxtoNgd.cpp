@@ -71,52 +71,6 @@ static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene:
 static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 
 
-int main(int argc, char** argv)
-{
-	if (argc != 2) {
-		printf("fbxToNgd [fbx_file_name]\n");
-		return 0;
-	}
-
-	FbxManager* fbxManager = NULL;
-	FbxScene* fbxScene = NULL;
-
-	if (!InitializeSdkObjects(fbxManager, fbxScene)) {
-		return 0;
-	}
-
-	if (!fbxManager || !fbxScene) {
-		FBXSDK_printf("failed to load file: %s\n", argv[1]);
-	}
-	FbxString filePath(argv[1]);
-	bool lResult = LoadScene(fbxManager, fbxScene, filePath.Buffer());
-	if (!lResult) {
-		FBXSDK_printf("failed to load file: %s\n", argv[1]);
-		return 0;
-	}
-
-	NewtonWorld* newton = NewtonCreate();
-	dScene* ngdScene = new dScene(newton);
-
-	if (ConvertToNgd(ngdScene, fbxScene)) {
-		char name[1024];
-		strcpy(name, argv[1]);
-		_strlwr(name);
-		char* ptr = strstr(name, ".fbx");
-		ptr[0] = 0;
-		strcat(name, ".ngd");
-		ngdScene->Serialize(name);
-	}
-
-	delete ngdScene;
-	NewtonDestroy(newton);
-
-	fbxManager->Destroy();
-	FBXSDK_printf("Conversion successful!\n");
-	return 0;
-}
-
-
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
 {
 	//The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
@@ -150,7 +104,6 @@ static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFi
 	int lFileMajor, lFileMinor, lFileRevision;
 	int lSDKMajor, lSDKMinor, lSDKRevision;
 	//int lFileFormat = -1;
-	int i, lAnimStackCount;
 	bool lStatus;
 	char lPassword[1024];
 
@@ -188,31 +141,31 @@ static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFi
 		// From this point, it is possible to access animation stack information without
 		// the expense of loading the entire file.
 
-		FBXSDK_printf("Animation Stack Information\n");
+		//FBXSDK_printf("Animation Stack Information\n");
 
-		lAnimStackCount = lImporter->GetAnimStackCount();
+		//int lAnimStackCount = lImporter->GetAnimStackCount();
 
-		FBXSDK_printf("    Number of Animation Stacks: %d\n", lAnimStackCount);
-		FBXSDK_printf("    Current Animation Stack: \"%s\"\n", lImporter->GetActiveAnimStackName().Buffer());
-		FBXSDK_printf("\n");
+		//FBXSDK_printf("    Number of Animation Stacks: %d\n", lAnimStackCount);
+		//FBXSDK_printf("    Current Animation Stack: \"%s\"\n", lImporter->GetActiveAnimStackName().Buffer());
+		//FBXSDK_printf("\n");
 
-		for (i = 0; i < lAnimStackCount; i++)
-		{
-			FbxTakeInfo* lTakeInfo = lImporter->GetTakeInfo(i);
+		//for (int i = 0; i < lAnimStackCount; i++)
+		//{
+			//FbxTakeInfo* lTakeInfo = lImporter->GetTakeInfo(i);
 
-			FBXSDK_printf("    Animation Stack %d\n", i);
-			FBXSDK_printf("         Name: \"%s\"\n", lTakeInfo->mName.Buffer());
-			FBXSDK_printf("         Description: \"%s\"\n", lTakeInfo->mDescription.Buffer());
+			//FBXSDK_printf("    Animation Stack %d\n", i);
+			//FBXSDK_printf("         Name: \"%s\"\n", lTakeInfo->mName.Buffer());
+			//FBXSDK_printf("         Description: \"%s\"\n", lTakeInfo->mDescription.Buffer());
 
 			// Change the value of the import name if the animation stack should be imported 
 			// under a different name.
-			FBXSDK_printf("         Import Name: \"%s\"\n", lTakeInfo->mImportName.Buffer());
+			//FBXSDK_printf("         Import Name: \"%s\"\n", lTakeInfo->mImportName.Buffer());
 
 			// Set the value of the import state to false if the animation stack should be not
 			// be imported. 
-			FBXSDK_printf("         Import State: %s\n", lTakeInfo->mSelect ? "true" : "false");
-			FBXSDK_printf("\n");
-		}
+			//FBXSDK_printf("         Import State: %s\n", lTakeInfo->mSelect ? "true" : "false");
+			//FBXSDK_printf("\n");
+		//}
 
 		// Set the import states. By default, the import states are always set to 
 		// true. The code below shows how to change these states.
@@ -582,7 +535,6 @@ static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene:
 	}
 }
 
-
 static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
 {
 	dScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(DEFUALT_MATERIAL_ID);
@@ -820,8 +772,6 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 				FbxCluster* const cluster = skin->GetCluster(i);
 				FbxNode* const fbxBone = cluster->GetLink(); // Get a reference to the bone's node
 
-				//char xxx[256];
-				//sprintf (xxx, "%s", fbxBone->GetName());
 				GlobalNodeMap::dTreeNode* const boneNode = nodeMap.Find(fbxBone);
 				if (boneNode) {
 					dScene::dTreeNode* const bone = boneNode->GetInfo();
@@ -873,24 +823,9 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 
 static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
 {
-//	GlobalMeshMap::dTreeNode* instanceNode = meshCache.Find(fbxNode->GetLine());
-/*
-	if (instanceNode) {
-		dScene::dTreeNode* const meshInstance = instanceNode->GetInfo();
-		ngdScene->AddReference (node, meshInstance);
-	} else {
-		FbxSkeleton* const fbxSkeleton = fbxNode->GetSkeleton();
-		dAssert (fbxSkeleton);
-
-		char name[256];
-		sprintf (name, "%s", fbxNode->GetName());
-		sprintf (name, "%s", fbxNode->GetName());
-	}
-*/
-
 	FbxSkeleton* fbxBone = (FbxSkeleton*)fbxNode->GetNodeAttribute();
 
-	printf("%s\n", (char *)fbxNode->GetName());
+	//printf("%s\n", (char *)fbxNode->GetName());
 
 	dScene::dTreeNode* const boneNode = ngdScene->CreateBoneNode(node);
 	dBoneNodeInfo* const bone = (dBoneNodeInfo*)ngdScene->GetInfoFromNode(boneNode);
@@ -906,4 +841,50 @@ static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, Fbx
 	} else {
 		bone->SetType(dBoneNodeInfo::m_effector);
 	}
+}
+
+
+int main(int argc, char** argv)
+{
+	if (argc != 2) {
+		printf("fbxToNgd [fbx_file_name]\n");
+		return 0;
+	}
+
+	FbxManager* fbxManager = NULL;
+	FbxScene* fbxScene = NULL;
+
+	if (!InitializeSdkObjects(fbxManager, fbxScene)) {
+		return 0;
+	}
+
+	if (!fbxManager || !fbxScene) {
+		FBXSDK_printf("failed to load file: %s\n", argv[1]);
+	}
+	FbxString filePath(argv[1]);
+	bool lResult = LoadScene(fbxManager, fbxScene, filePath.Buffer());
+	if (!lResult) {
+		FBXSDK_printf("failed to load file: %s\n", argv[1]);
+		return 0;
+	}
+
+	NewtonWorld* newton = NewtonCreate();
+	dScene* ngdScene = new dScene(newton);
+
+	if (ConvertToNgd(ngdScene, fbxScene)) {
+		char name[1024];
+		strcpy(name, argv[1]);
+		_strlwr(name);
+		char* ptr = strstr(name, ".fbx");
+		ptr[0] = 0;
+		strcat(name, ".ngd");
+		ngdScene->Serialize(name);
+	}
+
+	delete ngdScene;
+	NewtonDestroy(newton);
+
+	fbxManager->Destroy();
+	FBXSDK_printf("Conversion successful!\n");
+	return 0;
 }

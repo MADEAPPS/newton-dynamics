@@ -375,14 +375,15 @@ count = 1;
 struct dArmnRobotConfig
 {
 	char m_partName[32];
-	char m_shapeTypeName[32];
 	dFloat m_mass;
 };
 
 static dArmnRobotConfig armnRobotConfig[] =
 {
-	{ "bone_base",		"convexHull",	200.0f},
-//	{ "bone_base",		"cylinder", 200.0f },
+	{ "bone_base",	200.0f},
+//	{ "bone_base1",	200.0f},
+//	{ "bone_arm0",	180.0f},
+//	{ "bone_arm1",	160.0f},
 };
 
 class dSixAxisManager: public dAnimationCharacterRigManager
@@ -439,7 +440,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 	}
 */
 
-	DemoEntity* FindMesh(DemoEntity* const bodyPart) const
+	DemoEntity* FindMesh(const DemoEntity* const bodyPart) const
 	{
 		for (DemoEntity* child = bodyPart->GetChild(); child; child = child->GetSibling()) {
 			if (child->GetMesh()) {
@@ -454,7 +455,9 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 	{
 		dVector points[1024 * 16];
 
-		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		const DemoEntity* const meshEntity = FindMesh(bodyPart);
+
+		DemoMesh* const mesh = (DemoMesh*)meshEntity->GetMesh();
 		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 		dAssert(mesh->m_vertexCount && (mesh->m_vertexCount < int(sizeof(points) / sizeof(points[0]))));
 
@@ -466,8 +469,8 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 			points[i][2] = array[i * 3 + 2];
 			points[i][3] = 0.0f;
 		}
-		dMatrix matrix(bodyPart->GetMeshMatrix());
-		matrix = matrix * bodyPart->GetCurrentMatrix();
+		dMatrix matrix(meshEntity->GetMeshMatrix());
+		matrix = matrix * meshEntity->GetCurrentMatrix();
 		//matrix = matrix * bodyPart->GetParent()->GetCurrentMatrix();
 		matrix.TransformTriplex(&points[0][0], sizeof(dVector), &points[0][0], sizeof(dVector), mesh->m_vertexCount);
 //		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, SERVO_VEHICLE_DEFINITION::m_bodyPart, NULL);
@@ -476,23 +479,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dArmnRobotConfig& definition)
 	{
-		const DemoEntity* const mesh = FindMesh(bodyPart);
-		dAssert(mesh);
-
-		NewtonCollision* shape = NULL;
-		if (!strcmp(definition.m_shapeTypeName, "box")) {
-			dAssert(0);
-		} else if (!strcmp(definition.m_shapeTypeName, "cylinder")) {
-			dAssert(0);
-			//shape = MakeForkLiftTireShape(bodyPart);
-		} else if (!strcmp(definition.m_shapeTypeName, "convexHull")) {
-			shape = MakeConvexHull(mesh);
-		} else if (!strcmp(definition.m_shapeTypeName, "convexHullAggregate")) {
-			dAssert(0);
-			//shape = MakePalleteShape(bodyPart);
-		} else {
-			dAssert(0);
-		}
+		NewtonCollision* const shape = MakeConvexHull(bodyPart);
 
 		// calculate the bone matrix
 		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
@@ -510,6 +497,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(body, definition.m_mass, collision);
+//NewtonBodySetMassProperties(body, 0.0f, collision);
 
 		// save the user lifterData with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(body, bodyPart);
@@ -546,12 +534,13 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		model->ResetMatrix(*scene, origin);
 
 		NewtonBody* const rootBody = CreateBodyPart(model, armnRobotConfig[0]);
+		dAnimationCharacterRig* const parentBone = CreateCharacterRig (rootBody);
 
-/*
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-//		dCustomTransformController::dSkeletonBone* parentBones[32];
+		dAnimationCharacterRig* parentBones[32];
 		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = parentBone;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
@@ -559,30 +548,44 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		const int partCount = sizeof(armnRobotConfig) / sizeof(armnRobotConfig[0]);
 		while (stackIndex) {
 			stackIndex--;
+			//NewtonBody* const parentBody = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < partCount; i++) {
 				if (!strcmp(armnRobotConfig[i].m_partName, name)) {
 					//NewtonBody* const bone = CreateBodyPart(entity, definition[i]);
+					dAssert (0);
+					NewtonBody* const limbBody = CreateBodyPart(entity, armnRobotConfig[i]);
 
 					// connect this body part to its parent with a vehicle joint
 					//ConnectBodyPart(controller, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
 
 					//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
 					//parentBone = controller->AddBone(bone, bindMatrix, parentBone);
+
+					for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+						dAssert (0);
+						//parentBones[stackIndex] = limbBody;
+						childEntities[stackIndex] = child;
+						stackIndex++;
+					}
 					break;
 				}
 			}
-
-			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-				childEntities[stackIndex] = child;
-				stackIndex++;
-			}
 		}
-*/
 
 		return NULL;
+	}
+
+	void OnUpdateTransform (dAnimationAcyclicJoint* const bone, const dMatrix& localMatrix) const
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+		NewtonBody* const newtonBody = bone->GetNewtonBody();
+		DemoEntity* const meshEntity = (DemoEntity*)NewtonBodyGetUserData(newtonBody);
+		
+		dQuaternion rot(localMatrix);
+		meshEntity->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
 /*

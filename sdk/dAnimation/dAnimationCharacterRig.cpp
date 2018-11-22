@@ -11,9 +11,21 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationCharacterRig.h"
+#include "dAnimationCharacterRigManager.h"
 
 dAnimationCharacterRig::dAnimationCharacterRig ()
+	:dCustomControllerBase()
+	,dAnimationAcyclicJoint(NULL)
 {
+}
+
+dAnimationCharacterRig::~dAnimationCharacterRig ()
+{
+}
+
+void dAnimationCharacterRig::Init(NewtonBody* const body)
+{
+	dCustomControllerBase::m_body = body;
 }
 
 /*
@@ -352,17 +364,55 @@ void dAnimationCharacterRig::CalculateSuspensionForces(dFloat timestep)
 
 void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	dAssert(0);
-//	m_vehicle->Debug(debugContext);
+
+	dAnimationAcyclicJoint::Debug(debugContext);
 }
 
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 {
-	dAssert(0);
+//	dAssert(0);
 //	dVehicleManager* const manager = (dVehicleManager*)GetManager();
+}
+
+NewtonBody* dAnimationCharacterRig::GetNewtonBody() const 
+{
+	return dCustomControllerBase::GetBody();
 }
 
 void dAnimationCharacterRig::PostUpdate(dFloat timestep, int threadIndex)
 {
 //	m_vehicle->RigidBodyToStates();
+
+//	dAssert(m_bones.GetCount() == 1);
+
+	dAnimationCharacterRigManager* const manager = (dAnimationCharacterRigManager*)GetManager();
+
+	dMatrix parentMatrixPool[128];
+	dAnimationAcyclicJoint* stackPool[128];
+
+	int stack = 1;
+	stackPool[0] = this;
+	parentMatrixPool[0] = dGetIdentityMatrix();
+
+	while (stack) {
+		dMatrix matrix;
+		stack--;
+
+		dMatrix parentMatrix(parentMatrixPool[stack]);
+		dAnimationAcyclicJoint* const node = stackPool[stack];
+
+//		const dSkeletonBone& bone = node->GetInfo();
+		NewtonBody* const newtonBody = node->GetNewtonBody();
+
+		NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
+//		manager->OnUpdateTransform(node, matrix * parentMatrix * bone.m_bindMatrix);
+		manager->OnUpdateTransform(node, matrix * parentMatrix);
+
+		parentMatrix = matrix.Inverse();
+		for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+			stackPool[stack] = child->GetInfo();
+			parentMatrixPool[stack] = parentMatrix;
+			stack++;
+		}
+	}
 }

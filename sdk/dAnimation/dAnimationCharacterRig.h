@@ -14,12 +14,13 @@
 #define __D_ANIMATION_CHARACTER_RIG_H__
 
 #include "dAnimationStdAfx.h"
+#include "dAnimationAcyclicJoint.h"
 
-
-class dAnimationCharacterRig: public dCustomControllerBase
+class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationAcyclicJoint
 {
 	public:
 	dAnimationCharacterRig ();
+	~dAnimationCharacterRig ();
 //	dVehicleInterface* GetVehicle() {return m_vehicle;}
 	
 	void Finalize();
@@ -29,8 +30,11 @@ class dAnimationCharacterRig: public dCustomControllerBase
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+
+	void Init(NewtonBody* const body);
+	virtual NewtonBody* GetNewtonBody() const;
 /*
-	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	
 	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Cleanup();
 	

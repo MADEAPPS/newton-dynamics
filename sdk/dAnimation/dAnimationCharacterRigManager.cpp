@@ -22,29 +22,26 @@ dAnimationCharacterRigManager::~dAnimationCharacterRigManager()
 {
 }
 
-dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonBody* const body)
 {
-//	dAnimationCharacterRig* const vehicle = CreateController();
-//	vehicle->Init(body, vehicleFrame, forceAndTorque, gravityMag);
-//	return vehicle;
+	dAnimationCharacterRig* const rig = CreateController();
+	rig->Init(body);
+	return rig;
+}
+
+dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& rigFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+{
+//	dAnimationCharacterRig* const rig = CreateController();
+//	rig->Init(chassisShape, mass, rigFrame, forceAndTorque, gravityMag);
+//	return rig;
 	dAssert(0);
 	return NULL;
 }
 
-dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+void dAnimationCharacterRigManager::DestroyController(dAnimationCharacterRig* const rig)
 {
-//	dAnimationCharacterRig* const vehicle = CreateController();
-//	vehicle->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
-//	return vehicle;
-	dAssert(0);
-	return NULL;
-}
-
-void dAnimationCharacterRigManager::DestroyController(dAnimationCharacterRig* const vehicle)
-{
-	dAssert(0);
-//	vehicle->Cleanup();
-	dCustomControllerManager<dAnimationCharacterRig>::DestroyController(vehicle);
+//	rig->Cleanup();
+	dCustomControllerManager<dAnimationCharacterRig>::DestroyController(rig);
 }
 
 void dAnimationCharacterRigManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
