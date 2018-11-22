@@ -44,6 +44,7 @@
     <ClCompile Include="..\..\dAnimation\dAnimationKinematicLoopJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationPlayer.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRigJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -65,6 +66,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimationKinematicLoopJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationPlayer.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

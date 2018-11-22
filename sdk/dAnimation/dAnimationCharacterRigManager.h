@@ -14,7 +14,7 @@
 #define __D_ANIMATION_CHARACTER_RIG_MANAGER_H__
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationAcyclicJoint.h"
+#include "dAnimationRigJoint.h"
 #include "dAnimationCharacterRig.h"
 #include "dAnimationAcyclicSolver.h"
 
@@ -32,7 +32,9 @@ class dAnimationCharacterRigManager: public dCustomControllerManager<dAnimationC
 	virtual void DestroyController(dAnimationCharacterRig* const controller);
 	protected:
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
-	virtual void OnUpdateTransform (dAnimationAcyclicJoint* const bone, const dMatrix& localMatrix) const{}	
+	virtual void OnUpdateTransform (const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const{}	
+
+	friend class dAnimationRigJoint;
 	friend class dAnimationCharacterRig;
 };
 #endif 

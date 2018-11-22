@@ -10,7 +10,7 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationAcyclicJoint.h"
+#include "dAnimationRigJoint.h"
 #include "dAnimationCharacterRigManager.h"
 
 dAnimationCharacterRigManager::dAnimationCharacterRigManager(NewtonWorld* const world)

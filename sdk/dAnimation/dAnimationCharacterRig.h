@@ -14,17 +14,15 @@
 #define __D_ANIMATION_CHARACTER_RIG_H__
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationAcyclicJoint.h"
+#include "dAnimationRigJoint.h"
 
-class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationAcyclicJoint
+class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRigJoint
 {
 	public:
 	dAnimationCharacterRig ();
 	~dAnimationCharacterRig ();
-//	dVehicleInterface* GetVehicle() {return m_vehicle;}
 	
 	void Finalize();
-//	void ApplyExternalForces(dFloat timestep);
 
 	protected:
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
@@ -33,16 +31,6 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationAcy
 
 	void Init(NewtonBody* const body);
 	virtual NewtonBody* GetNewtonBody() const;
-/*
-	
-	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Cleanup();
-	
-	void CalculateTireContacts(dFloat timestep);
-	void CalculateSuspensionForces(dFloat timestep);
-
-	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
-*/	
 
 	friend class dAnimationCharacterRigManager;
 };

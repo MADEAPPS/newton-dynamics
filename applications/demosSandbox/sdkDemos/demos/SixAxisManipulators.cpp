@@ -578,7 +578,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		return NULL;
 	}
 
-	void OnUpdateTransform (dAnimationAcyclicJoint* const bone, const dMatrix& localMatrix) const
+	void OnUpdateTransform (const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		NewtonBody* const newtonBody = bone->GetNewtonBody();
