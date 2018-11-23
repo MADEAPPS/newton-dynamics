@@ -39,7 +39,7 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	void SetLoopNode(bool staste) { m_isLoop = staste; }
 
 	dComplementaritySolver::dBodyState* GetBody() { return &m_body; }
-	dComplementaritySolver::dBilateralJoint* GetJoint() { return m_joint; }
+	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return m_joint; }
 
 	virtual void ApplyExternalForce(dFloat timestep);
 	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
