@@ -15,7 +15,7 @@
 
 
 dAnimationRigHinge::dAnimationRigHinge(dAnimationRigJoint* const parent, NewtonBody* const body)
-	:dAnimationRigJoint(parent, body)
+	:dAnimationRigLimb(parent, body)
 	,dCustomHinge (dGetIdentityMatrix(), body, parent->GetNewtonBody())
 {
 	dMatrix matrix;

@@ -20,15 +20,15 @@ class dAnimationCharacterRigManager;
 class dAnimationRigJoint: public dAnimationAcyclicJoint
 {
 	public:
-	dAnimationRigJoint(dAnimationRigJoint* const parent, NewtonBody* const body);
+	dAnimationRigJoint(dAnimationRigJoint* const parent);
 	virtual ~dAnimationRigJoint();
 
-	NewtonBody* GetNewtonBody() const {return m_body;}
-
+	dAnimationRigJoint* GetRoot() {return m_root;}
+	virtual NewtonBody* GetNewtonBody() const {return NULL;}
 	void UpdateLocalTransforms (dAnimationCharacterRigManager* const manager) const;
 
 	protected:
-	NewtonBody* m_body;
+	dAnimationRigJoint* m_root;
 	static dMatrix m_boneConvertionMatrix;
 };
 

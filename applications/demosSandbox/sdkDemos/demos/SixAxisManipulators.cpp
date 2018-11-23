@@ -380,10 +380,11 @@ struct dArmnRobotConfig
 
 static dArmnRobotConfig armnRobotConfig[] =
 {
-	{ "bone_base",	200.0f},
-	{ "bone_base1",	200.0f},
-	{ "bone_arm0",	180.0f},
-	{ "bone_arm1",	160.0f},
+	{ "bone_base",		200.0f},
+	{ "bone_base1",		200.0f},
+	{ "bone_arm0",		180.0f},
+	{ "bone_arm1",		160.0f},
+	{ "effector_arm",	0.0f}
 };
 
 class dSixAxisManager: public dAnimationCharacterRigManager
@@ -513,34 +514,18 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 
 	dAnimationCharacterRig* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
-/*
-		dSixAxisController* const controller = (dSixAxisController*)CreateController();
-		controller->MakeKukaRobot(scene, origin);
-		m_currentController = controller;
-
-		DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
-		scene->Append(xxxx0);
-		dMatrix matrix0(xxxx0->GetCurrentMatrix());
-		matrix0 = dYawMatrix(-90.0f * dDegreeToRad) * matrix0;
-		matrix0.m_posit = origin.m_posit;
-		matrix0.m_posit.m_z += 1.0f;
-		xxxx0->ResetMatrix(*scene, matrix0);
-
-		return controller;
-*/
-
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
 
 		NewtonBody* const rootBody = CreateBodyPart(model, armnRobotConfig[0]);
-		dAnimationCharacterRig* const parentBone = CreateCharacterRig (rootBody);
+		dAnimationCharacterRig* const rig = CreateCharacterRig (rootBody);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		dAnimationRigJoint* parentBones[32];
 		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = parentBone;
+			parentBones[stackIndex] = rig;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
@@ -554,26 +539,28 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < partCount; i++) {
 				if (!strcmp(armnRobotConfig[i].m_partName, name)) {
-					NewtonBody* const limbBody = CreateBodyPart(entity, armnRobotConfig[i]);
-					dAnimationRigJoint* const limbJoint = new dAnimationRigHinge(parentJoint, limbBody);
 
-					// connect this body part to its parent with a vehicle joint
-					//ConnectBodyPart(controller, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
-
-					//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
-					//parentBone = controller->AddBone(bone, bindMatrix, parentBone);
-
-					for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-						parentBones[stackIndex] = limbJoint;
-						childEntities[stackIndex] = child;
-						stackIndex++;
+					if (strstr (name, "bone")) {
+						// add a bone and all it children
+						NewtonBody* const limbBody = CreateBodyPart(entity, armnRobotConfig[i]);
+						dAnimationRigJoint* const limbJoint = new dAnimationRigHinge(parentJoint, limbBody);
+						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+							parentBones[stackIndex] = limbJoint;
+							childEntities[stackIndex] = child;
+							stackIndex++;
+						}
+					} else if (strstr(name, "effector")) {
+						// add an end effector (end effector can't have children)
+						new dAnimationRigEffector(parentJoint);
 					}
 					break;
 				}
 			}
 		}
 
-		return NULL;
+		rig->Finalize();
+
+		return rig;
 	}
 
 	void OnUpdateTransform (const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const

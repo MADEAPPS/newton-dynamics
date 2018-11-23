@@ -80,11 +80,10 @@ dAnimationAcyclicSolver::~dAnimationAcyclicSolver()
 
 int dAnimationAcyclicSolver::CalculateNodeCount () const
 {
-	dAnimationAcyclicJoint* pool[256];
 	int count = 0;
 	int stack = 1;
+	dAnimationAcyclicJoint* pool[256];
 
-	//pool[0] = m_rootNode->GetVehicle();
 	pool[0] = m_rootNode;
 	while (stack) {
 		stack --;
@@ -115,7 +114,6 @@ void dAnimationAcyclicSolver::SortGraph(dAnimationAcyclicJoint* const root, int&
 void dAnimationAcyclicSolver::Finalize(dAnimationAcyclicJoint* const rootNode)
 {
 	m_rootNode = rootNode;
-//	dAnimationAcyclicJoint* const root = m_rootNode->GetVehicle();
 	if (!rootNode->m_children.GetCount()) {
 		return ;
 	}
@@ -1191,7 +1189,6 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 
 void dAnimationAcyclicSolver::Update(dFloat timestep)
 {
-	//dAnimationAcyclicJoint* const root = m_rootNode->GetVehicle();
 	if (!m_rootNode->m_children.GetCount()) {
 		return;
 	}

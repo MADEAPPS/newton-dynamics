@@ -19,16 +19,15 @@ dMatrix dAnimationRigJoint::m_boneConvertionMatrix (
 	dVector (0.0f, 0.0f,-1.0f, 0.0f), 
 	dVector (0.0f, 0.0f, 0.0f, 1.0f));
 
-dAnimationRigJoint::dAnimationRigJoint(dAnimationRigJoint* const parent, NewtonBody* const body)
+dAnimationRigJoint::dAnimationRigJoint(dAnimationRigJoint* const parent)
 	:dAnimationAcyclicJoint(parent)
-	,m_body(body)
+	,m_root(parent ? parent->GetRoot() : NULL)
 {
 }
 
 dAnimationRigJoint::~dAnimationRigJoint()
 {
 }
-
 
 void dAnimationRigJoint::UpdateLocalTransforms (dAnimationCharacterRigManager* const manager) const
 {

@@ -15,6 +15,7 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigJoint.h"
+#include "dAnimationAcyclicSolver.h"
 
 class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRigJoint
 {
@@ -30,8 +31,12 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	void Init(NewtonBody* const body);
-	virtual NewtonBody* GetNewtonBody() const;
+	
+	NewtonBody* GetNewtonBody() const;
+	dComplementaritySolver::dBodyState* GetStaticWorld() {return &m_staticWorld;}
 
+	dComplementaritySolver::dBodyState m_staticWorld;
+	dAnimationAcyclicSolver m_solver;
 	friend class dAnimationCharacterRigManager;
 };
 

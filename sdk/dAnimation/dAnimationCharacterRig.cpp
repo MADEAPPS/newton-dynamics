@@ -16,8 +16,10 @@
 
 dAnimationCharacterRig::dAnimationCharacterRig ()
 	:dCustomControllerBase()
-	,dAnimationRigJoint(NULL, NULL)
+	,dAnimationRigJoint(NULL)
+	,m_solver()
 {
+	m_root = this;
 }
 
 dAnimationCharacterRig::~dAnimationCharacterRig ()
@@ -26,14 +28,22 @@ dAnimationCharacterRig::~dAnimationCharacterRig ()
 
 void dAnimationCharacterRig::Init(NewtonBody* const body)
 {
-	dAnimationRigJoint::m_body = body;
 	dCustomControllerBase::m_body = body;
 }
 
 void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-
 	dAnimationRigJoint::Debug(debugContext);
+}
+
+void dAnimationCharacterRig::Finalize()
+{
+	m_solver.Finalize(this);
+}
+
+NewtonBody* dAnimationCharacterRig::GetNewtonBody() const 
+{
+	return dCustomControllerBase::GetBody();
 }
 
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
@@ -46,10 +56,6 @@ void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 //	dVehicleManager* const manager = (dVehicleManager*)GetManager();
 }
 
-NewtonBody* dAnimationCharacterRig::GetNewtonBody() const 
-{
-	return dCustomControllerBase::GetBody();
-}
 
 void dAnimationCharacterRig::PostUpdate(dFloat timestep, int threadIndex)
 {

@@ -12,10 +12,10 @@
 #ifndef __D_ANIMATION_RIG_HINGE_H__
 #define __D_ANIMATION_RIG_HINGE_H__
 
-#include "dAnimationRigJoint.h"
+#include "dAnimationRigLimb.h"
 
 
-class dAnimationRigHinge: public dAnimationRigJoint, public dCustomHinge
+class dAnimationRigHinge: public dAnimationRigLimb, public dCustomHinge
 {
 	public:
 	dAnimationRigHinge(dAnimationRigJoint* const parent, NewtonBody* const body);
