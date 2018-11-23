@@ -61,6 +61,7 @@
 #include <dBaseHierarchy.h>
 
 #include <dCustomJoint.h>
+#include <dCustomHinge.h>
 #include <dCustomControllerManager.h>
 
 #define D_DEFINE_ANIMATION_NODE_DEFINE(className,baseClass)	\

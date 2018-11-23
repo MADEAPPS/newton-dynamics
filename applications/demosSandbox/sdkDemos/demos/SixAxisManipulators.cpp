@@ -381,9 +381,9 @@ struct dArmnRobotConfig
 static dArmnRobotConfig armnRobotConfig[] =
 {
 	{ "bone_base",	200.0f},
-//	{ "bone_base1",	200.0f},
-//	{ "bone_arm0",	180.0f},
-//	{ "bone_arm1",	160.0f},
+	{ "bone_base1",	200.0f},
+	{ "bone_arm0",	180.0f},
+	{ "bone_arm1",	160.0f},
 };
 
 class dSixAxisManager: public dAnimationCharacterRigManager
@@ -538,7 +538,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		dAnimationCharacterRig* parentBones[32];
+		dAnimationRigJoint* parentBones[32];
 		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = parentBone;
 			childEntities[stackIndex] = child;
@@ -548,15 +548,14 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		const int partCount = sizeof(armnRobotConfig) / sizeof(armnRobotConfig[0]);
 		while (stackIndex) {
 			stackIndex--;
-			//NewtonBody* const parentBody = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
+			dAnimationRigJoint* const parentJoint = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < partCount; i++) {
 				if (!strcmp(armnRobotConfig[i].m_partName, name)) {
-					//NewtonBody* const bone = CreateBodyPart(entity, definition[i]);
-					dAssert (0);
 					NewtonBody* const limbBody = CreateBodyPart(entity, armnRobotConfig[i]);
+					dAnimationRigJoint* const limbJoint = new dAnimationRigHinge(parentJoint, limbBody);
 
 					// connect this body part to its parent with a vehicle joint
 					//ConnectBodyPart(controller, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
@@ -565,8 +564,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 					//parentBone = controller->AddBone(bone, bindMatrix, parentBone);
 
 					for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-						dAssert (0);
-						//parentBones[stackIndex] = limbBody;
+						parentBones[stackIndex] = limbJoint;
 						childEntities[stackIndex] = child;
 						stackIndex++;
 					}

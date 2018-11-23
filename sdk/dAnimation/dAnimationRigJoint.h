@@ -29,6 +29,7 @@ class dAnimationRigJoint: public dAnimationAcyclicJoint
 
 	protected:
 	NewtonBody* m_body;
+	static dMatrix m_boneConvertionMatrix;
 };
 
 #endif

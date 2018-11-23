@@ -13,6 +13,11 @@
 #include "dAnimationRigJoint.h"
 #include "dAnimationCharacterRigManager.h"
 
+dMatrix dAnimationRigJoint::m_boneConvertionMatrix (
+	dVector (0.0f, 1.0f, 0.0f, 0.0f), 
+	dVector (1.0f, 0.0f, 0.0f, 0.0f), 
+	dVector (0.0f, 0.0f,-1.0f, 0.0f), 
+	dVector (0.0f, 0.0f, 0.0f, 1.0f));
 
 dAnimationRigJoint::dAnimationRigJoint(dAnimationRigJoint* const parent, NewtonBody* const body)
 	:dAnimationAcyclicJoint(parent)
@@ -48,7 +53,7 @@ void dAnimationRigJoint::UpdateLocalTransforms (dAnimationCharacterRigManager* c
 			manager->OnUpdateTransform(node, matrix * parentMatrix);
 
 			parentMatrix = matrix.Inverse();
-			for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+			for (dList<dAnimationAcyclicJoint*>::dListNode* child = node->m_children.GetFirst(); child; child = child->GetNext()) {
 				stackPool[stack] = (dAnimationRigJoint*) child->GetInfo();
 				parentMatrixPool[stack] = parentMatrix;
 				stack++;
