@@ -29,4 +29,20 @@ dAnimationRigHinge::~dAnimationRigHinge()
 {
 }
 
+/*
+void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
+{
+	dCustomHinge::SubmitConstraints (timestep, threadIndex);
+}
+*/
 
+void dAnimationRigHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+{
+	dCustomHinge::SubmitAngularRow (matrix0, matrix1, eulers, timestep);
+
+	NewtonJoint* const joint = dCustomHinge::GetJoint();
+	NewtonUserJointAddAngularRow(joint, 0.0f, &matrix1.m_front[0]);
+	NewtonUserJointSetRowStiffness(joint, m_stiffness);
+	NewtonUserJointSetRowAcceleration(joint, 0.0f);
+
+}

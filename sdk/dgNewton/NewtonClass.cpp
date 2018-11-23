@@ -289,6 +289,18 @@ void NewtonUserJoint::SetUpdateFeedbackFunction (NewtonUserBilateralCallback get
 	dgUserConstraint::SetUpdateFeedbackFunction ((ConstraintsForceFeeback) getFeedback);
 }
 
+dgInt32 NewtonUserJoint::SubmitImmediateModeConstraint(NewtonImmediateModeConstraint* const descriptor, dFloat timestep)
+{
+	m_rows = 0;
+	dgContraintDescritor constraintParams;
+	m_param = &constraintParams;
+	m_jacobianFnt ((NewtonJoint*)this, timestep, 0);
+
+
+	return m_rows;
+}
+
+
 
 NewtonUserJointInverseDynamicsEffector::NewtonUserJointInverseDynamicsEffector(dgInverseDynamics* const invDynSolver, dgInverseDynamics::dgNode* const invDynNode, NewtonUserBilateralCallback callback)
 	:NewtonUserJoint(callback, invDynSolver->GetBody(invDynNode))

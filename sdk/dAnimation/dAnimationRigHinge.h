@@ -21,6 +21,9 @@ class dAnimationRigHinge: public dAnimationRigJoint, public dCustomHinge
 	dAnimationRigHinge(dAnimationRigJoint* const parent, NewtonBody* const body);
 	virtual ~dAnimationRigHinge();
 
+	//virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
+
 	void *operator new (size_t size) {return dAnimationRigJoint::Alloc(size);}
 	void operator delete (void* ptr) {dAnimationRigJoint::Free(ptr);}
 };

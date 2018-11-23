@@ -7443,6 +7443,14 @@ void NewtonUserJointSetFeedbackCollectorCallback(const NewtonJoint* const joint,
 	return userJoint->SetUpdateFeedbackFunction (getFeedback);
 }
 
+int NewtonUserJointSubmitImmediateModeConstraint(const NewtonJoint* const joint, NewtonImmediateModeConstraint* const descriptor, dFloat timestep)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	return userJoint->SubmitImmediateModeConstraint(descriptor, timestep);
+}
+
+
 
 /*! @} */ // end of JointUser
 

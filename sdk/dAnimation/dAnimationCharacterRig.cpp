@@ -10,6 +10,7 @@
 */
 
 #include "dAnimationStdAfx.h"
+#include "dAnimationRigHinge.h"
 #include "dAnimationCharacterRig.h"
 #include "dAnimationCharacterRigManager.h"
 
@@ -37,6 +38,10 @@ void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugConte
 
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 {
+	NewtonImmediateModeConstraint descriptor;
+	dAnimationRigHinge* joint = (dAnimationRigHinge*) m_children.GetFirst()->GetInfo();
+	int xxx = NewtonUserJointSubmitImmediateModeConstraint(joint->dCustomHinge::GetJoint(), &descriptor, timestep);
+
 //	dAssert(0);
 //	dVehicleManager* const manager = (dVehicleManager*)GetManager();
 }

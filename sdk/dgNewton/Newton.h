@@ -316,6 +316,21 @@ extern "C" {
 		int m_unused[3];
 	} NewtonUserContactPoint;
 
+
+	typedef struct NewtonImmediateModeConstraint
+	{
+		dFloat m_jacobian01[8][3];
+		dFloat m_jacobian10[8][3];
+		//dFloat m_forceBounds[8][2];
+		//dFloat m_jointAccel[8];
+		//dFloat m_jointStiffness[8];
+		//dFloat m_restitution[8];
+		//dFloat m_penetration[8];
+		//dFloat m_penetrationStiffness[8];
+		//dFloat m_zeroRowAcceleration[8];
+	} NewtonConstraintDescriptor;
+
+
 	// data structure for interfacing with NewtonMesh
 	typedef struct NewtonMeshDoubleData
 	{
@@ -1186,6 +1201,8 @@ extern "C" {
 	NEWTON_API int NewtonUserJoinRowsCount (const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointGetGeneralRow (const NewtonJoint* const joint, int index, dFloat* const jacobian0, dFloat* const jacobian1);
 	NEWTON_API dFloat NewtonUserJointGetRowForce (const NewtonJoint* const joint, int row);
+
+	NEWTON_API int NewtonUserJointSubmitImmediateModeConstraint (const NewtonJoint* const joint, NewtonImmediateModeConstraint* const descriptor, dFloat timestep);
 
 	// **********************************************************************************************
 	//
