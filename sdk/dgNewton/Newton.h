@@ -321,13 +321,10 @@ extern "C" {
 	{
 		dFloat m_jacobian01[8][3];
 		dFloat m_jacobian10[8][3];
-		//dFloat m_forceBounds[8][2];
-		//dFloat m_jointAccel[8];
-		//dFloat m_jointStiffness[8];
-		//dFloat m_restitution[8];
-		//dFloat m_penetration[8];
-		//dFloat m_penetrationStiffness[8];
-		//dFloat m_zeroRowAcceleration[8];
+		dFloat m_minFriction[8];
+		dFloat m_maxFriction[8];
+		dFloat m_jointAccel[8];
+		dFloat m_jointStiffness[8];
 	} NewtonConstraintDescriptor;
 
 
