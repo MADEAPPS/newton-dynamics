@@ -15,6 +15,8 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigJoint.h"
 
+class dAnimationRigEffector;
+
 class dAnimationRigLimb: public dAnimationRigJoint
 {
 	public:
@@ -22,9 +24,13 @@ class dAnimationRigLimb: public dAnimationRigJoint
 	virtual ~dAnimationRigLimb();
 
 	virtual NewtonBody* GetNewtonBody() const;
+	dAnimationRigLimb* GetAsLimb() {return this;}
 
 	protected:
 	NewtonBody* m_newtonBody;
+	dAnimationRigEffector* m_effector;
+
+	friend class dAnimationRigEffector;
 };
 
 #endif

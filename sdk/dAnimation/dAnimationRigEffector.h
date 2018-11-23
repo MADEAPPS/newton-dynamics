@@ -13,13 +13,20 @@
 #define __D_ANIMATION_RIG_EFFECTOR_H__
 
 #include "dAnimationRigJoint.h"
+#include "dAnimationKinematicLoopJoint.h"
 
+class dAnimationRigLimb;
 
-class dAnimationRigEffector: public dAnimationRigJoint
+class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 {
 	public:
-	dAnimationRigEffector(dAnimationRigJoint* const parent);
+	dAnimationRigEffector(dAnimationRigLimb* const parent);
 	virtual ~dAnimationRigEffector();
+
+	virtual int GetMaxDof() const {return 3;}
+	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams) { dAssert(0); }
+	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
 };
 
 #endif

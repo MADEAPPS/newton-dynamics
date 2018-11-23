@@ -15,6 +15,8 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationAcyclicJoint.h"
 
+class dAnimationRigLimb;
+class dAnimationCharacterRig;
 class dAnimationCharacterRigManager;
 
 class dAnimationRigJoint: public dAnimationAcyclicJoint
@@ -23,12 +25,14 @@ class dAnimationRigJoint: public dAnimationAcyclicJoint
 	dAnimationRigJoint(dAnimationRigJoint* const parent);
 	virtual ~dAnimationRigJoint();
 
-	dAnimationRigJoint* GetRoot() {return m_root;}
+	dAnimationCharacterRig* GetRoot() {return m_root;}
 	virtual NewtonBody* GetNewtonBody() const {return NULL;}
 	void UpdateLocalTransforms (dAnimationCharacterRigManager* const manager) const;
 
+	virtual dAnimationRigLimb* GetAsLimb() {return NULL;}
+
 	protected:
-	dAnimationRigJoint* m_root;
+	dAnimationCharacterRig* m_root;
 	static dMatrix m_boneConvertionMatrix;
 };
 

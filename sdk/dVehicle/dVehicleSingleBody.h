@@ -37,7 +37,6 @@ class dVehicleSingleBody: public dVehicleInterface
 
 	dVector m_gravity;
 	dVehicleNode m_groundNode;
-//	NewtonBody* m_newtonBody;
 	dVehicleChassis* m_chassis;
 
 	friend class dVehicleChassis;

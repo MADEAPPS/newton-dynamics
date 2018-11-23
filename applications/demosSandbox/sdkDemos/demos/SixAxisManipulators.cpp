@@ -551,7 +551,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 						}
 					} else if (strstr(name, "effector")) {
 						// add an end effector (end effector can't have children)
-						new dAnimationRigEffector(parentJoint);
+						new dAnimationRigEffector(parentJoint->GetAsLimb());
 					}
 					break;
 				}

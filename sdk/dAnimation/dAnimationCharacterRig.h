@@ -37,6 +37,8 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 
 	dComplementaritySolver::dBodyState m_staticWorld;
 	dAnimationAcyclicSolver m_solver;
+
+	friend class dAnimationRigEffector;
 	friend class dAnimationCharacterRigManager;
 };
 

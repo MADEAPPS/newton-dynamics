@@ -11,17 +11,22 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigLimb.h"
+#include "dAnimationRigEffector.h"
 #include "dAnimationCharacterRigManager.h"
 
 
 dAnimationRigLimb::dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBody* const body)
 	:dAnimationRigJoint(parent)
 	,m_newtonBody(body)
+	,m_effector(NULL)
 {
 }
 
 dAnimationRigLimb::~dAnimationRigLimb()
 {
+	if (m_effector) {
+		delete m_effector;
+	}
 }
 
 NewtonBody* dAnimationRigLimb::GetNewtonBody() const 

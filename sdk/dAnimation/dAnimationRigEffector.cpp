@@ -10,13 +10,19 @@
 */
 
 #include "dAnimationStdAfx.h"
+#include "dAnimationRigLimb.h"
 #include "dAnimationRigEffector.h"
 #include "dAnimationCharacterRigManager.h"
 
 
-dAnimationRigEffector::dAnimationRigEffector(dAnimationRigJoint* const parent)
-	:dAnimationRigJoint(parent)
+dAnimationRigEffector::dAnimationRigEffector(dAnimationRigLimb* const parent)
+	:dAnimationKinematicLoopJoint()
 {
+	dAssert (!parent->m_effector);
+	parent->m_effector = this;
+	dAnimationCharacterRig* const root = parent->GetRoot();
+	Init(parent->GetBody(), root->GetStaticWorld());
+	SetOwners(parent, root);
 }
 
 dAnimationRigEffector::~dAnimationRigEffector()
