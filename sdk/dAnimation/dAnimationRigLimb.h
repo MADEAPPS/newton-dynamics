@@ -23,10 +23,11 @@ class dAnimationRigLimb: public dAnimationRigJoint
 	dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBody* const body);
 	virtual ~dAnimationRigLimb();
 
-	virtual NewtonBody* GetNewtonBody() const;
-	dAnimationRigLimb* GetAsLimb() {return this;}
-
 	protected:
+	virtual NewtonBody* GetNewtonBody() const;
+	virtual dAnimationRigLimb* GetAsRigLimb() {return this;}
+	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
+
 	NewtonBody* m_newtonBody;
 	dAnimationRigEffector* m_effector;
 

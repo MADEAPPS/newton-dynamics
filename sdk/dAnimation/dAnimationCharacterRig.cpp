@@ -29,6 +29,7 @@ dAnimationCharacterRig::~dAnimationCharacterRig ()
 void dAnimationCharacterRig::Init(NewtonBody* const body)
 {
 	dCustomControllerBase::m_body = body;
+	dAnimationRigJoint::Init(body);
 }
 
 void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -46,14 +47,15 @@ NewtonBody* dAnimationCharacterRig::GetNewtonBody() const
 	return dCustomControllerBase::GetBody();
 }
 
+
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 {
-	NewtonImmediateModeConstraint descriptor;
-	dAnimationRigHinge* joint = (dAnimationRigHinge*) m_children.GetFirst()->GetInfo();
-	int xxx = NewtonUserJointSubmitImmediateModeConstraint(joint->dCustomHinge::GetJoint(), &descriptor, timestep);
+//	NewtonImmediateModeConstraint descriptor;
+//	dAnimationRigHinge* joint = (dAnimationRigHinge*) m_children.GetFirst()->GetInfo();
+//	int xxx = NewtonUserJointSubmitImmediateModeConstraint(joint->dCustomHinge::GetJoint(), &descriptor, timestep);
 
-//	dAssert(0);
-//	dVehicleManager* const manager = (dVehicleManager*)GetManager();
+	RigidBodyToStates();
+	m_solver.Update(timestep);
 }
 
 

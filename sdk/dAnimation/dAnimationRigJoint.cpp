@@ -29,6 +29,7 @@ dAnimationRigJoint::~dAnimationRigJoint()
 {
 }
 
+
 void dAnimationRigJoint::UpdateLocalTransforms (dAnimationCharacterRigManager* const manager) const
 {
 	dMatrix parentMatrixPool[128];
@@ -60,3 +61,66 @@ void dAnimationRigJoint::UpdateLocalTransforms (dAnimationCharacterRigManager* c
 		}
 	}
 }
+
+void dAnimationRigJoint::Init(NewtonBody* const newtonBody)
+{
+	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetBody();
+
+	dAssert(body);
+	dAssert(newtonBody == GetNewtonBody());
+
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonBodyGetCentreOfMass(newtonBody, &matrix.m_posit[0]);
+	matrix.m_posit.m_w = 1.0f;
+	body->SetLocalMatrix(matrix);
+
+	// get data from engine rigid body and copied to the vehicle chassis body
+	NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
+	body->SetMatrix(matrix);
+
+	dFloat mass;
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	NewtonBodyGetMass(newtonBody, &mass, &Ixx, &Iyy, &Izz);
+	body->SetMass(mass);
+	body->SetInertia(Ixx, Iyy, Izz);
+	body->UpdateInertia();
+}
+
+void dAnimationRigJoint::RigidBodyToStates()
+{
+	NewtonBody* const newtonBody = GetNewtonBody();
+	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetBody();
+
+	dAssert (body);
+	dAssert (newtonBody);
+
+	dVector vector;
+	dMatrix matrix;
+
+	// get data from engine rigid body and copied to the vehicle chassis body
+	NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
+	body->SetMatrix(matrix);
+
+	NewtonBodyGetVelocity(newtonBody, &vector[0]);
+	body->SetVeloc(vector);
+
+	NewtonBodyGetOmega(newtonBody, &vector[0]);
+	body->SetOmega(vector);
+
+	NewtonBodyGetForce(newtonBody, &vector[0]);
+	body->SetForce(vector);
+
+	NewtonBodyGetTorque(newtonBody, &vector[0]);
+	body->SetTorque(vector);
+
+	body->UpdateInertia();
+
+	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		dAnimationRigJoint* const rigJoint = child->GetInfo()->GetAsRigJoint();
+		dAssert (rigJoint);
+		rigJoint->RigidBodyToStates();
+	}
+}
+

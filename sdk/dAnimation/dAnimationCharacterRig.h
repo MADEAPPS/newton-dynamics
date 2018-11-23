@@ -30,7 +30,7 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
-	void Init(NewtonBody* const body);
+	virtual void Init(NewtonBody* const body);
 	
 	NewtonBody* GetNewtonBody() const;
 	dComplementaritySolver::dBodyState* GetStaticWorld() {return &m_staticWorld;}

@@ -14,6 +14,8 @@
 
 #include "dAnimationStdAfx.h"
 
+class dAnimationRigLimb;
+class dAnimationRigJoint;
 class dAnimationKinematicLoopJoint;
 
 class dAnimationAcyclicJoint: public dContainersAlloc
@@ -43,6 +45,9 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 
 	virtual void ApplyExternalForce(dFloat timestep);
 	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
+
+	virtual dAnimationRigLimb* GetAsRigLimb() {return NULL;}
+	virtual dAnimationRigJoint* GetAsRigJoint() {return NULL;}
 
 	protected:
 	dComplementaritySolver::dBodyState m_body;

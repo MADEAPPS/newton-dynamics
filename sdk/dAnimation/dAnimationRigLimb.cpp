@@ -20,6 +20,7 @@ dAnimationRigLimb::dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBod
 	,m_newtonBody(body)
 	,m_effector(NULL)
 {
+	Init (body);
 }
 
 dAnimationRigLimb::~dAnimationRigLimb()
@@ -32,4 +33,15 @@ dAnimationRigLimb::~dAnimationRigLimb()
 NewtonBody* dAnimationRigLimb::GetNewtonBody() const 
 { 
 	return m_newtonBody; 
+}
+
+
+int dAnimationRigLimb::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
+{
+	int count = 0;
+	if (m_effector) {
+		jointArray[count] = m_effector;
+		count ++;
+	}
+	return dAnimationRigJoint::GetKinematicLoops(&jointArray[count]) + count;
 }
