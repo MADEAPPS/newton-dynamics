@@ -155,11 +155,6 @@ void dAnimationAcyclicSolver::GetJacobians(dAnimationAcyclicJoint* const node)
 {
 	dAssert(node->m_parent);
 	dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
-	//dgAssert(jointInfo->m_joint == m_joint);
-
-	//dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
-	//dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
-	//dgSpatialMatrix& jointMass = jointMassArray[m_index];
 
 	const int index = node->GetIndex();
 	dSpatialMatrix& bodyJt = m_data[index].m_body.m_jt;

@@ -17,10 +17,13 @@
 
 dAnimationRigLimb::dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBody* const body)
 	:dAnimationRigJoint(parent)
+	,dComplementaritySolver::dBilateralJoint()
 	,m_newtonBody(body)
 	,m_effector(NULL)
 {
-	Init (body);
+	m_joint = this;
+	dAnimationRigJoint::Init (body);
+	dComplementaritySolver::dBilateralJoint::Init (dAnimationRigJoint::GetBody(), parent->GetBody());
 }
 
 dAnimationRigLimb::~dAnimationRigLimb()
@@ -39,8 +42,9 @@ NewtonBody* dAnimationRigLimb::GetNewtonBody() const
 int dAnimationRigLimb::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
 {
 	int count = 0;
-	if (m_effector) {
+	if (m_effector && m_effector->IsActive()) {
 		jointArray[count] = m_effector;
+		m_effector->GetOwner1()->SetIndex(-1);
 		count ++;
 	}
 	return dAnimationRigJoint::GetKinematicLoops(&jointArray[count]) + count;

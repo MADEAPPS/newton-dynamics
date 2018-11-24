@@ -17,9 +17,11 @@
 dAnimationCharacterRig::dAnimationCharacterRig ()
 	:dCustomControllerBase()
 	,dAnimationRigJoint(NULL)
+	,m_staticWorld(NULL)
 	,m_solver()
 {
 	m_root = this;
+	m_staticWorld.SetLoopNode(true);
 }
 
 dAnimationCharacterRig::~dAnimationCharacterRig ()
@@ -50,22 +52,13 @@ NewtonBody* dAnimationCharacterRig::GetNewtonBody() const
 
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 {
-//	NewtonImmediateModeConstraint descriptor;
-//	dAnimationRigHinge* joint = (dAnimationRigHinge*) m_children.GetFirst()->GetInfo();
-//	int xxx = NewtonUserJointSubmitImmediateModeConstraint(joint->dCustomHinge::GetJoint(), &descriptor, timestep);
-
 	RigidBodyToStates();
 	m_solver.Update(timestep);
+	UpdateJointAcceleration();
 }
-
 
 void dAnimationCharacterRig::PostUpdate(dFloat timestep, int threadIndex)
 {
-//	m_vehicle->RigidBodyToStates();
-
-//	dAssert(m_bones.GetCount() == 1);
-
 	dAnimationCharacterRigManager* const manager = (dAnimationCharacterRigManager*)GetManager();
-
 	UpdateLocalTransforms (manager);
 }

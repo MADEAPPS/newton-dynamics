@@ -17,7 +17,7 @@
 
 class dAnimationRigEffector;
 
-class dAnimationRigLimb: public dAnimationRigJoint
+class dAnimationRigLimb: public dAnimationRigJoint, public dComplementaritySolver::dBilateralJoint
 {
 	public:
 	dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBody* const body);
@@ -27,6 +27,7 @@ class dAnimationRigLimb: public dAnimationRigJoint
 	virtual NewtonBody* GetNewtonBody() const;
 	virtual dAnimationRigLimb* GetAsRigLimb() {return this;}
 	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
 	NewtonBody* m_newtonBody;
 	dAnimationRigEffector* m_effector;

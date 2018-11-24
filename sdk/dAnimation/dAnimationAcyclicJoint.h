@@ -50,6 +50,8 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	virtual dAnimationRigJoint* GetAsRigJoint() {return NULL;}
 
 	protected:
+	virtual void UpdateJointAcceleration();
+
 	dComplementaritySolver::dBodyState m_body;
 	dComplementaritySolver::dBilateralJoint* m_joint;
 	dAnimationAcyclicJoint* m_parent;

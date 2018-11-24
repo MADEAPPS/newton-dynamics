@@ -319,8 +319,8 @@ extern "C" {
 
 	typedef struct NewtonImmediateModeConstraint
 	{
-		dFloat m_jacobian01[8][3];
-		dFloat m_jacobian10[8][3];
+		dFloat m_jacobian01[8][6];
+		dFloat m_jacobian10[8][6];
 		dFloat m_minFriction[8];
 		dFloat m_maxFriction[8];
 		dFloat m_jointAccel[8];

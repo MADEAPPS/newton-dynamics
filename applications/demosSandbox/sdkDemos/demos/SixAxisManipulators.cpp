@@ -19,7 +19,7 @@
 #include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
 
-#if 0
+#if 1
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -349,16 +349,20 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	origin1.m_posit.m_z =  1.0f;
 
 	int count = 10;
+count = 1;
+origin = dGetIdentityMatrix();
 	for (int i = 0; i < count; i ++) {
 		origin.m_posit.m_x += 1.0f;
 		origin1.m_posit.m_x += 1.0f;
 		robotManager->MakeKukaRobot (scene, origin);
-		robotManager->MakeKukaRobot (scene, origin1);
+//		robotManager->MakeKukaRobot (scene, origin1);
 	}
 	
 	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
+origin.m_posit = dVector(-1.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
+
 #else
 
 struct dArmnRobotConfig
@@ -540,7 +544,8 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 						}
 					} else if (strstr(name, "effector")) {
 						// add an end effector (end effector can't have children)
-						new dAnimationRigEffector(parentJoint->GetAsRigLimb());
+						dMatrix pivot (entity->CalculateGlobalMatrix());
+						new dAnimationRigEffector(parentJoint->GetAsRigLimb(), pivot);
 					}
 					break;
 				}

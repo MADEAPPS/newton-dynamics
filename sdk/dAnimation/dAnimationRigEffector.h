@@ -20,13 +20,17 @@ class dAnimationRigLimb;
 class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 {
 	public:
-	dAnimationRigEffector(dAnimationRigLimb* const parent);
+	dAnimationRigEffector(dAnimationRigLimb* const parent, const dMatrix& pivot);
 	virtual ~dAnimationRigEffector();
 
 	virtual int GetMaxDof() const {return 3;}
-	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams) { dAssert(0); }
+	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
+	dMatrix m_targetMatrix;
+	dMatrix m_pivotLocalMatrix;
+	dFloat m_linearSpeed;
+	dFloat m_linearFriction;
 };
 
 #endif

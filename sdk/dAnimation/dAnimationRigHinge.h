@@ -24,8 +24,15 @@ class dAnimationRigHinge: public dAnimationRigLimb, public dCustomHinge
 	//virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
 
+	virtual void UpdateJointAcceleration();
+	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+
 	void *operator new (size_t size) {return dAnimationRigJoint::Alloc(size);}
 	void operator delete (void* ptr) {dAnimationRigJoint::Free(ptr);}
+
+	dComplementaritySolver::dJacobian m_jacobial01;
+	dComplementaritySolver::dJacobian m_jacobial10;
+	dFloat m_rowAccel;
 };
 
 #endif

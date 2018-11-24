@@ -33,10 +33,12 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	virtual void Init(NewtonBody* const body);
 	
 	NewtonBody* GetNewtonBody() const;
-	dComplementaritySolver::dBodyState* GetStaticWorld() {return &m_staticWorld;}
+	dAnimationAcyclicJoint* GetStaticWorld() {return &m_staticWorld;}
 
-	dComplementaritySolver::dBodyState m_staticWorld;
+//	dComplementaritySolver::dBodyState m_staticWorld;
+	dAnimationAcyclicJoint m_staticWorld;
 	dAnimationAcyclicSolver m_solver;
+	
 
 	friend class dAnimationRigEffector;
 	friend class dAnimationCharacterRigManager;

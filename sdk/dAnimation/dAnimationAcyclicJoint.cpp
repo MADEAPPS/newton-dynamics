@@ -69,3 +69,9 @@ int dAnimationAcyclicJoint::GetKinematicLoops(dAnimationKinematicLoopJoint** con
 	return count;
 }
 
+void dAnimationAcyclicJoint::UpdateJointAcceleration()
+{
+	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->UpdateJointAcceleration();
+	}
+}
