@@ -5372,6 +5372,19 @@ void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDyna
 	return ik->AddChild((dgBilateralConstraint*)joint, (dgInverseDynamics::dgNode*) parentNode);
 }
 
+void* NewtonInverseDynamicsGetFirstChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	return ik->GetFirstChild ((dgInverseDynamics::dgNode*) parentNode);
+}
+
+void* NewtonInverseDynamicsGetNextChildNode(NewtonInverseDynamics* const inverseDynamics, void* const node)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	return ik->GetNextSiblingChild((dgInverseDynamics::dgNode*) node);
+}
 
 bool NewtonInverseDynamicsAddLoopJoint(NewtonInverseDynamics* const inverseDynamics, NewtonJoint* const joint)
 {

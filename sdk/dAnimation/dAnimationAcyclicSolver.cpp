@@ -968,7 +968,12 @@ void dAnimationAcyclicSolver::SolveAuxiliary(dVectorPair* const force, const dVe
 		b[i] -= r;
 	}
 
+static int xxx;
+
 	dGaussSeidelLcpSor(n, m_massMatrix11, u, b, normalIndex, low, high, dFloat(0.01), 30, dFloat(1.15f));
+
+dTrace (("%d\n", xxx));
+xxx ++;
 
 	for (int i = 0; i < n; i++) {
 		const dFloat s = u[i];

@@ -1040,6 +1040,9 @@ extern "C" {
 	NEWTON_API void NewtonInverseDynamicsDestroy (NewtonInverseDynamics* const inverseDynamics);
 	
 	NEWTON_API void* NewtonInverseDynamicsGetRoot(NewtonInverseDynamics* const inverseDynamics);
+	NEWTON_API void* NewtonInverseDynamicsGetNextChildNode(NewtonInverseDynamics* const inverseDynamics, void* const node);
+	NEWTON_API void* NewtonInverseDynamicsGetFirstChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode);
+
 	NEWTON_API NewtonBody* NewtonInverseDynamicsGetBody(NewtonInverseDynamics* const inverseDynamics, void* const node);
 	NEWTON_API NewtonJoint* NewtonInverseDynamicsGetJoint(NewtonInverseDynamics* const inverseDynamics, void* const node);
 

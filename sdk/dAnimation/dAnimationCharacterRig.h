@@ -23,16 +23,15 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	dAnimationCharacterRig ();
 	~dAnimationCharacterRig ();
 	
+	NewtonBody* GetNewtonBody() const;
 	void Finalize();
 
 	protected:
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-
 	virtual void Init(NewtonBody* const body);
 	
-	NewtonBody* GetNewtonBody() const;
 	dAnimationAcyclicJoint* GetStaticWorld() {return &m_staticWorld;}
 
 //	dComplementaritySolver::dBodyState m_staticWorld;

@@ -592,7 +592,6 @@ void dgInverseDynamics::Finalize()
 
 	if (m_skeleton) {
 		const dgDynamicBody* const rootBody = m_skeleton->m_body;
-		//dgAssert (m_skeleton->m_body->GetInvMass().m_w != dgFloat32 (0.0f));
 
 		dgMemoryAllocator* const allocator = rootBody->GetWorld()->GetAllocator();
 		m_nodesOrder = (dgNode**)allocator->Malloc(m_nodeCount * sizeof (dgNode*));
@@ -1103,7 +1102,6 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 		b[i] -= r;
 	}
 
-	//dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, lowerTriangularMassMatrix11, u, b, low, high);
 	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {

@@ -19,6 +19,23 @@
 #include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
 
+struct dArmnRobotConfig
+{
+	char m_partName[32];
+	dFloat m_mass;
+	dFloat m_minLimit;
+	dFloat m_maxLimit;
+};
+
+static dArmnRobotConfig armnRobotConfig[] =
+{
+	{ "bone_base", 200.0f, -1000.0f, 1000.0f},
+	{ "bone_base1", 200.0f, -1000.0f, 1000.0f},
+	{ "bone_arm0", 180.0f, -45.0f, 135.0f},
+	{ "bone_arm1", 160.0f, -90.0f, 35.0f},
+	{ "effector_arm", 0.0f, 0.0f, 0.0f}
+};
+
 #if 1
 class dSixAxisController: public dCustomControllerBase
 {
@@ -98,17 +115,20 @@ class dSixAxisController: public dCustomControllerBase
 
 	void SetTarget (dFloat x, dFloat y, dFloat azimuth, dFloat pitch, dFloat roll)
 	{
-		m_inputModifier->SetTarget(x, y, azimuth, pitch, roll);
+		if (m_inputModifier) {
+			m_inputModifier->SetTarget(x, y, azimuth, pitch, roll);
+		}
 	}
 
-	void ScaleIntertia(NewtonBody* const body, dFloat factor) const
+	DemoEntity* FindMesh(const DemoEntity* const bodyPart) const
 	{
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		dFloat mass;
-		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
+		for (DemoEntity* child = bodyPart->GetChild(); child; child = child->GetSibling()) {
+			if (child->GetMesh()) {
+				return child;
+			}
+		}
+		dAssert(0);
+		return NULL;
 	}
 
 	NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size) const
@@ -120,7 +140,6 @@ class dSixAxisController: public dCustomControllerBase
 
 		dFloat mass = 1.0f;
 		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-		ScaleIntertia(body, 10.0f);
 
 		geometry->Release();
 		NewtonDestroyCollision(collision);
@@ -136,23 +155,85 @@ class dSixAxisController: public dCustomControllerBase
 		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
-		ScaleIntertia(body, 10.0f);
 
 		geometry->Release();
 		NewtonDestroyCollision(collision);
 		return body;
 	}
 
-	void MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& location)
+	NewtonCollision* MakeConvexHull(const DemoEntity* const bodyPart) const
 	{
+		dVector points[1024 * 16];
+
+		const DemoEntity* const meshEntity = FindMesh(bodyPart);
+
+		DemoMesh* const mesh = (DemoMesh*)meshEntity->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		dAssert(mesh->m_vertexCount && (mesh->m_vertexCount < int(sizeof(points) / sizeof(points[0]))));
+
+		// go over the vertex array and find and collect all vertices's weighted by this bone.
+		const dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			points[i][0] = array[i * 3 + 0];
+			points[i][1] = array[i * 3 + 1];
+			points[i][2] = array[i * 3 + 2];
+			points[i][3] = 0.0f;
+		}
+		dMatrix matrix(meshEntity->GetMeshMatrix());
+		matrix = matrix * meshEntity->GetCurrentMatrix();
+		//matrix = matrix * bodyPart->GetParent()->GetCurrentMatrix();
+		matrix.TransformTriplex(&points[0][0], sizeof(dVector), &points[0][0], sizeof(dVector), mesh->m_vertexCount);
+
+		NewtonWorld* const world = GetManager()->GetWorld();
+		return NewtonCreateConvexHull(world, mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
+	}
+
+
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dArmnRobotConfig& definition)
+	{
+		NewtonCollision* const shape = MakeConvexHull(bodyPart);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		NewtonWorld* const world = GetManager()->GetWorld();
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, definition.m_mass, collision);
+
+		// save the user lifterData with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// assign a body part id
+		//NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+
+	void MakeKukaRobot(DemoEntityManager* const scene, DemoEntity* const model)
+	{
+		m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
+
+#if 0
+		dMatrix location (model->GetCurrentMatrix());
+
 		dFloat size = 1.0f;
 		dFloat r = size / 4.0f;
 		dFloat h = size / 8.0f;
 
 		dFloat lowLimit = -88.0f * dDegreeToRad;
 		dFloat highLimit = 60.0f * dDegreeToRad;
-
-		m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
 		// add Robot Base Frame locked the root body to the world
 		dMatrix baseFrameMatrix(dRollMatrix(90.0f * dDegreeToRad));
@@ -199,7 +280,6 @@ class dSixAxisController: public dCustomControllerBase
 		dMatrix gripperMatrix(armMatrix);
 		gripperMatrix.m_posit.m_z += l1;
 		dKukaEffector* const effector = new dKukaEffector(m_kinematicSolver, armNode, baseFrameBody, gripperMatrix * location);
-		//m_effector = new dSixAxisEffector(this, effector);
 		effector->SetAsThreedof();
 		effector->SetMaxLinearFriction(1000.0f);
 
@@ -239,25 +319,143 @@ class dSixAxisController: public dCustomControllerBase
 		fixPose->GetPose().Append(frame);
 		m_animTreeNode->GetPose().Append(frame);
 
-		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
-	}
+#else
+		NewtonBody* const baseFrameBody = CreateBodyPart(model, armnRobotConfig[0]);
+		void* const baseFrameNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, baseFrameBody);
+		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);	
 
-	void PostUpdate(dFloat timestep, int threadIndex) 
-	{
+		int stackIndex = 0;
+		DemoEntity* childEntities[32];
+		void* parentBones[32];
+		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = baseFrameNode;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		dKukaEffector* effector = NULL;
+		const int partCount = sizeof(armnRobotConfig) / sizeof(armnRobotConfig[0]);
+		while (stackIndex) {
+			stackIndex--;
+			DemoEntity* const entity = childEntities[stackIndex];
+			void* const parentJoint = parentBones[stackIndex];
+
+			const char* const name = entity->GetName().GetStr();
+			for (int i = 0; i < partCount; i++) {
+				if (!strcmp(armnRobotConfig[i].m_partName, name)) {
+
+					if (strstr(name, "bone")) {
+						// add a bone and all it children
+						NewtonBody* const rotatingColumnBody = CreateBodyPart(entity, armnRobotConfig[i]);
+
+						dMatrix matrix;
+						dMatrix m_boneConvertionMatrix(dVector(0.0f, 1.0f, 0.0f, 0.0f),
+													   dVector(1.0f, 0.0f, 0.0f, 0.0f),
+													   dVector(0.0f, 0.0f, -1.0f, 0.0f),
+													   dVector(0.0f, 0.0f, 0.0f, 1.0f));
+						NewtonBodyGetMatrix(rotatingColumnBody, &matrix[0][0]);
+
+						matrix = m_boneConvertionMatrix * matrix;
+
+						NewtonBody* const parentBody = NewtonInverseDynamicsGetBody(m_kinematicSolver, parentJoint);
+						dCustomInverseDynamics* const rotatingColumnHinge = new dCustomInverseDynamics(matrix, rotatingColumnBody, parentBody);
+						rotatingColumnHinge->SetJointTorque(armnRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+						rotatingColumnHinge->SetTwistAngle(armnRobotConfig[i].m_minLimit * dDegreeToRad, armnRobotConfig[i].m_maxLimit * dDegreeToRad);
+						void* const limbJoint = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, parentJoint, rotatingColumnHinge->GetJoint());
+
+						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+							parentBones[stackIndex] = limbJoint;
+							childEntities[stackIndex] = child;
+							stackIndex++;
+						}
+					} else if (strstr(name, "effector")) {
+						// add effector
+						dMatrix gripperMatrix(entity->CalculateGlobalMatrix());
+						effector = new dKukaEffector(m_kinematicSolver, parentJoint, baseFrameBody, gripperMatrix);
+						effector->SetAsThreedof();
+						effector->SetMaxLinearFriction(armnRobotConfig[0].m_mass * DEMO_GRAVITY * 50.0f);
+					}
+					break;
+				}
+			}
+		}
+
+		// create the Animation tree for manipulation 
+		DemoEntity* const effectoBone = model->Find("effector_arm");
+		dMatrix baseFrameMatrix(model->GetCurrentMatrix());
+		dMatrix effectorLocalMatrix(effectoBone->CalculateGlobalMatrix(model));
+
+		dVector upAxis(baseFrameMatrix.UnrotateVector(dVector(0.0f, 1.0f, 0.0f, 1.0f)));
+		dVector planeAxis(baseFrameMatrix.UnrotateVector(dVector(0.0f, 0.0f, 1.0f, 1.0f)));
+
+		dEffectorTreeFixPose* const fixPose = new dEffectorTreeFixPose(baseFrameBody);
+		m_inputModifier = new dEffectorTreeInputModifier(fixPose, upAxis, planeAxis);
+		m_animTreeNode = new dEffectorTreeRoot(baseFrameBody, m_inputModifier);
+
+		// set base pose
+		dEffectorTreeInterface::dEffectorTransform frame;
+		frame.m_effector = effector;
+		frame.m_posit = effectorLocalMatrix.m_posit;
+		frame.m_rotation = dQuaternion(effectorLocalMatrix);
+
+		fixPose->GetPose().Append(frame);
+		m_animTreeNode->GetPose().Append(frame);
+
+#endif
+		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 	}
 
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		m_animTreeNode->Update(timestep);
+		if (m_inputModifier) {
+			m_animTreeNode->Update(timestep);
+		}
 		NewtonInverseDynamicsUpdate(m_kinematicSolver, timestep, threadIndex);
+	}
+
+	void PostUpdate(dFloat timestep, int threadIndex)
+	{
+		int count = 1;
+		void* nodes[32];
+		dMatrix parentMatrix[32];
+		nodes[0] = NewtonInverseDynamicsGetRoot(m_kinematicSolver);
+
+		parentMatrix[0] = dGetIdentityMatrix();
+
+		NewtonWorld* const world = GetManager()->GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		while (count) {
+			dMatrix matrix;
+
+			count --;
+			void* const rootNode = nodes[count];
+			NewtonBody* const body = NewtonInverseDynamicsGetBody(m_kinematicSolver, rootNode);
+			NewtonBodyGetMatrix (body, &matrix[0][0]);
+			dMatrix localMatrix (matrix * parentMatrix[count]);
+
+			DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
+
+			dQuaternion rot(localMatrix);
+			ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+
+			matrix = matrix.Inverse();
+			for (void* node = NewtonInverseDynamicsGetFirstChildNode(m_kinematicSolver, rootNode); node; node = NewtonInverseDynamicsGetNextChildNode(m_kinematicSolver, node)) {
+				nodes[count] = node;
+				parentMatrix[count] = matrix;
+				count ++;
+			}
+		}
 	}
 
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
-		const dEffectorTreeInterface::dEffectorPose& pose = m_animTreeNode->GetPose();
-		for (dEffectorTreeInterface::dEffectorPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
-			dCustomInverseDynamicsEffector* const effector = node->GetInfo().m_effector;
-			effector->Debug(debugContext);
+		if (m_animTreeNode) {
+			const dEffectorTreeInterface::dEffectorPose& pose = m_animTreeNode->GetPose();
+			for (dEffectorTreeInterface::dEffectorPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
+				dCustomInverseDynamicsEffector* const effector = node->GetInfo().m_effector;
+				effector->Debug(debugContext);
+			}
 		}
 	}
 
@@ -313,8 +511,12 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 
 	dSixAxisController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
+		scene->Append(model);
+		model->ResetMatrix(*scene, origin);
+
 		dSixAxisController* const controller = (dSixAxisController*)CreateController();
-		controller->MakeKukaRobot(scene, origin);
+		controller->MakeKukaRobot(scene, model);
 		m_currentController = controller;
 		return controller;
 	}
@@ -351,34 +553,21 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	int count = 10;
 count = 1;
 origin = dGetIdentityMatrix();
+origin.m_posit.m_x = 2.0f;
 	for (int i = 0; i < count; i ++) {
-		origin.m_posit.m_x += 1.0f;
-		origin1.m_posit.m_x += 1.0f;
 		robotManager->MakeKukaRobot (scene, origin);
 //		robotManager->MakeKukaRobot (scene, origin1);
+		origin.m_posit.m_x += 1.0f;
+		origin1.m_posit.m_x += 1.0f;
 	}
 	
 	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
-origin.m_posit = dVector(-1.0f, 0.5f, 0.0f, 1.0f);
+origin.m_posit = dVector(-2.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 
 #else
 
-struct dArmnRobotConfig
-{
-	char m_partName[32];
-	dFloat m_mass;
-};
-
-static dArmnRobotConfig armnRobotConfig[] =
-{
-	{ "bone_base",		200.0f},
-	{ "bone_base1",		200.0f},
-	{ "bone_arm0",		180.0f},
-	{ "bone_arm1",		160.0f},
-	{ "effector_arm",	0.0f}
-};
 
 class dSixAxisManager: public dAnimationCharacterRigManager
 {
@@ -552,7 +741,11 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 			}
 		}
 
+NewtonBody* xxx = rig->GetNewtonBody();
+NewtonBodySetMassMatrix(xxx, 0.0f, 0.0f, 0.0f, 0.0f);
+
 		rig->Finalize();
+
 
 		return rig;
 	}
@@ -590,19 +783,18 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	origin.m_posit.m_z = -1.0f;
 	origin1.m_posit.m_z = 1.0f;
 
-origin = dGetIdentityMatrix();
-
 	int count = 10;
-	count = 1;
+count = 1;
+origin = dGetIdentityMatrix();
 	for (int i = 0; i < count; i++) {
-		origin.m_posit.m_x += 1.0f;
-		origin1.m_posit.m_x += 1.0f;
 		robotManager->MakeKukaRobot(scene, origin);
 		//robotManager->MakeKukaRobot (scene, origin1);
+		origin.m_posit.m_x += 1.0f;
+		origin1.m_posit.m_x += 1.0f;
 	}
 
 	//	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
-	origin.m_posit = dVector(-1.0f, 0.5f, 0.0f, 1.0f);
+	origin.m_posit = dVector(-2.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 
