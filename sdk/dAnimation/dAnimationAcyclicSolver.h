@@ -51,7 +51,7 @@ class dAnimationAcyclicSolver: public dContainersAlloc
 	void UpdateForces(const dVectorPair* const force) const;
 	void CalculateJointAccel(dVectorPair* const accel) const;
 	void SolveAuxiliary(dVectorPair* const force, const dVectorPair* const accel) const;
-	void CalculateForce(dVectorPair* const force, const dVectorPair* const accel) const;
+	void CalculateOpenLoopForce(dVectorPair* const force, const dVectorPair* const accel) const;
 
 	void SolveBackward(dVectorPair* const force, const dVectorPair* const accel) const;
 	void SolveForward(dVectorPair* const force, const dVectorPair* const accel, int startNode) const;

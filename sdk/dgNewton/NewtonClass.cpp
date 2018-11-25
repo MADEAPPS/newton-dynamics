@@ -195,6 +195,7 @@ void NewtonUserJoint::SetAsInverseDynamicsRow()
 		dgFloat32 accel;
 		if (m_rowIsIk & (1 << index)) {
 			accel = GetInverseDynamicAcceleration(index);
+//dgTrace (("%f\n", accel));
 		} else {
 			accel = GetAcceleration();
 		}
@@ -300,6 +301,8 @@ dgInt32 NewtonUserJoint::SubmitImmediateModeConstraint(NewtonImmediateModeConstr
 	for (dgInt32 i = 0; i < sizeof (descriptor->m_minFriction)/ sizeof (descriptor->m_minFriction[0]); i++) {
 		constraintParams.m_forceBounds[i].m_low = DG_MIN_BOUND;
 		constraintParams.m_forceBounds[i].m_upper = DG_MAX_BOUND;
+		constraintParams.m_forceBounds[i].m_jointForce = NULL;
+		constraintParams.m_forceBounds[i].m_normalIndex = DG_INDEPENDENT_ROW;
 	}
 
 	m_param = &constraintParams;

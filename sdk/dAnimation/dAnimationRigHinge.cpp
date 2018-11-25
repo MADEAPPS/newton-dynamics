@@ -23,22 +23,21 @@ dAnimationRigHinge::dAnimationRigHinge(dAnimationRigJoint* const parent, NewtonB
 	
 	matrix = m_boneConvertionMatrix * matrix;
 	CalculateLocalMatrix (matrix, m_localMatrix0, m_localMatrix1);
+
+	EnableMotor(true, 0.0f);
 }
 
 dAnimationRigHinge::~dAnimationRigHinge()
 {
 }
 
-void dAnimationRigHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dCustomHinge::SubmitAngularRow (matrix0, matrix1, eulers, timestep);
+	dCustomHinge::SubmitConstraints (timestep, threadIndex);
 
 	NewtonJoint* const joint = dCustomHinge::GetJoint();
-	NewtonUserJointAddAngularRow(joint, 0.0f, &matrix1.m_front[0]);
-	NewtonUserJointSetRowStiffness(joint, m_stiffness);
 	NewtonUserJointSetRowAcceleration(joint, -m_rowAccel);
 }
-
 
 void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
@@ -80,6 +79,9 @@ void dAnimationRigHinge::UpdateJointAcceleration()
 
 	dVector accel (accel0 * m_jacobial01.m_linear + alpha0 * m_jacobial01.m_angular + accel1 * m_jacobial10.m_linear + alpha1 * m_jacobial10.m_angular); 
 	m_rowAccel = accel.m_x + accel.m_y + accel.m_z;
+
+//dTrace (("%f\n", m_rowAccel))
+//m_rowAccel = 0;
 
 	dAnimationRigLimb::UpdateJointAcceleration();
 }

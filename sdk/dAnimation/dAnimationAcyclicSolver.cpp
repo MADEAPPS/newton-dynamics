@@ -15,7 +15,7 @@
 #include "dAnimationAcyclicSolver.h"
 #include "dAnimationKinematicLoopJoint.h"
 
-#define D_DIAG_DAMP			 (1.0e-4f)
+#define D_DIAG_DAMP			 (1.0e-6f)
 #define D_MAX_FRICTION_BOUND (D_COMPLEMENTARITY_MAX_FRICTION_BOUND * 0.5f)
 
 class dAnimationAcyclicSolver::dMatrixData
@@ -36,8 +36,8 @@ class dAnimationAcyclicSolver::dNodePair
 class dAnimationAcyclicSolver::dVectorPair
 {
 	public:
-	dSpatialVector m_body;
 	dSpatialVector m_joint;
+	dSpatialVector m_body;
 };
 
 class dAnimationAcyclicSolver::dBodyJointMatrixDataPair
@@ -133,20 +133,19 @@ void dAnimationAcyclicSolver::Finalize(dAnimationAcyclicJoint* const rootNode)
 
 void dAnimationAcyclicSolver::CalculateInertiaMatrix(dAnimationAcyclicJoint* const node) const
 {
-	dSpatialMatrix& bodyMass = m_data[node->GetIndex()].m_body.m_mass;
-
-	bodyMass = dSpatialMatrix(dFloat32(0.0f));
 	dComplementaritySolver::dBodyState* const body = node->GetBody();
+	dSpatialMatrix& bodyMass = m_data[node->GetIndex()].m_body.m_mass;
+	bodyMass = dSpatialMatrix(dFloat32(0.0f));
 
-	dAssert (body->GetInvMass() != dFloat32(0.0f));
+	if (body->GetInvMass() != dFloat32(0.0f)) {
+		const dFloat mass = body->GetMass();
+		const dMatrix& inertia = body->GetInertia();
 
-	const dFloat mass = body->GetMass();
-	const dMatrix& inertia = body->GetInertia();
-
-	for (int i = 0; i < 3; i++) {
-		bodyMass[i][i] = mass;
-		for (int j = 0; j < 3; j++) {
-			bodyMass[i + 3][j + 3] = inertia[i][j];
+		for (int i = 0; i < 3; i++) {
+			bodyMass[i][i] = mass;
+			for (int j = 0; j < 3; j++) {
+				bodyMass[i + 3][j + 3] = inertia[i][j];
+			}
 		}
 	}
 }
@@ -192,8 +191,9 @@ void dAnimationAcyclicSolver::CalculateBodyDiagonal(dAnimationAcyclicJoint* cons
 			copy[j] = copy[j] + jacobian.Scale(val);
 		}
 	}
-
-	dSpatialMatrix& bodyMass = m_data[index].m_body.m_mass;
+	
+	const int parentIndes = child->GetParent()->GetIndex();
+	dSpatialMatrix& bodyMass = m_data[parentIndes].m_body.m_mass;
 	for (int i = 0; i < dof; i++) {
 		const dSpatialVector& Jacobian = copy[i];
 		const dSpatialVector& JacobianTranspose = jacobianMatrix[i];
@@ -282,7 +282,6 @@ void dAnimationAcyclicSolver::Factorize(dAnimationAcyclicJoint* const node)
 
 		dAssert(joint->m_dof > 0);
 		dAssert(joint->m_dof <= 6);
-		//boundedDof += joint->m_count - count;
 		GetJacobians(node);
 	}
 
@@ -627,13 +626,8 @@ int dAnimationAcyclicSolver::BuildJacobianMatrix(dFloat timestep, dComplementari
 		dVector J10MinvJ10angular(invInertia1.RotateVector(row->m_jacobian_J10.m_angular) * row->m_jacobian_J10.m_angular);
 		dVector tmpDiag(J01MinvJ01linear + J10MinvJ10linear + J01MinvJ01angular + J10MinvJ10angular);
 
-		//col->m_deltaAccel = extenalAcceleration;
-		//dFloat stiffness = COMPLEMENTARITY_PSD_DAMP_TOL * col->m_diagDamp;
-		//dFloat diag = (tmpDiag[0] + tmpDiag[1] + tmpDiag[2]);
-		//dAssert(diag > dFloat(0.0f));
-		//diag *= (dFloat(1.0f) + stiffness);
-		//col->m_invDJMinvJt = dFloat(1.0f) / diag;
-		col->m_diagDamp = (tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z) * D_DIAG_DAMP;
+		dFloat diag = tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z;
+		col->m_diagDamp = diag * D_DIAG_DAMP;
 		col->m_coordenateAccel = constraintParams.m_jointAccel[i];
 		col->m_normalIndex = constraintParams.m_normalIndex[i];
 		col->m_jointLowFriction = constraintParams.m_jointLowFrictionCoef[i];
@@ -643,7 +637,7 @@ int dAnimationAcyclicSolver::BuildJacobianMatrix(dFloat timestep, dComplementari
 		dFloat highFriction = normal * col->m_jointHighFriction;
 		col->m_force = dClamp(joint->m_jointFeebackForce[i] * weight, lowFriction, highFriction);
 	}
-//	rowCount += dofCount;
+
 	return dofCount;
 }
 
@@ -672,7 +666,9 @@ int dAnimationAcyclicSolver::BuildJacobianMatrix(dFloat timestep)
 void dAnimationAcyclicSolver::CalculateJointAccel(dVectorPair* const accel) const
 {
 	const dSpatialVector zero(0.0f);
-	for (int i = 0; i < m_nodeCount - 1; i++) {
+	const int n = m_nodeCount - 1;
+	dAssert(n == m_nodesOrder[n]->GetIndex());
+	for (int i = 0; i < n; i++) {
 		dAnimationAcyclicJoint* const node = m_nodesOrder[i];
 		dAssert(i == node->GetIndex());
 
@@ -680,7 +676,7 @@ void dAnimationAcyclicSolver::CalculateJointAccel(dVectorPair* const accel) cons
 		dAssert(node->GetBody());
 		dAssert(node->GetJoint());
 
-		a.m_body = zero;
+		//a.m_body = zero;
 		a.m_joint = zero;
 
 		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
@@ -689,7 +685,8 @@ void dAnimationAcyclicSolver::CalculateJointAccel(dVectorPair* const accel) cons
 		for (int j = 0; j < dof; j++) {
 			const int k = joint->m_sourceJacobianIndex[j];
 			dComplementaritySolver::dJacobianColum& col = m_rightHandSide[first + k];
-			a.m_joint[j] = col.m_coordenateAccel;
+			//a.m_joint[j] = col.m_coordenateAccel;
+			a.m_joint[j] = -col.m_coordenateAccel;
 		}
 		
 		dComplementaritySolver::dBodyState* const body = node->GetBody();
@@ -700,9 +697,7 @@ void dAnimationAcyclicSolver::CalculateJointAccel(dVectorPair* const accel) cons
 			a.m_body[j + 3] = torque[j];
 		}
 	}
-
-	const int n = m_nodeCount - 1;
-	dAssert(n == m_nodesOrder[n]->GetIndex());
+	
 	dAnimationAcyclicJoint* const rooNode = m_nodesOrder[n];
 	dComplementaritySolver::dBodyState* const body = rooNode->GetBody();	
 	const dVector& force = body->GetForce();
@@ -773,7 +768,8 @@ void dAnimationAcyclicSolver::SolveForward(dVectorPair* const force, const dVect
 		force[i].m_joint = zero;
 	}
 
-	for (int i = startNode; i < m_nodeCount - 1; i++) {
+	const int nodeCount = m_nodeCount - 1;
+	for (int i = startNode; i < nodeCount; i++) {
 		dAnimationAcyclicJoint* const node = m_nodesOrder[i];
 		dAssert(node->GetJoint());
 		dAssert(i == node->GetIndex());
@@ -803,7 +799,7 @@ void dAnimationAcyclicSolver::SolveForward(dVectorPair* const force, const dVect
 		BodyJacobianTimeMassForward(child, force[child->GetIndex()], force[n]);
 	}
 
-	for (int i = startNode; i < m_nodeCount - 1; i++) {
+	for (int i = startNode; i < nodeCount; i++) {
 		dAnimationAcyclicJoint* const node = m_nodesOrder[i];
 		dVectorPair& f = force[i];
 		BodyDiagInvTimeSolution(node, f);
@@ -823,7 +819,7 @@ void dAnimationAcyclicSolver::SolveBackward(dVectorPair* const force, const dVec
 	}
 }
 
-void dAnimationAcyclicSolver::CalculateForce(dVectorPair* const force, const dVectorPair* const accel) const
+void dAnimationAcyclicSolver::CalculateOpenLoopForce(dVectorPair* const force, const dVectorPair* const accel) const
 {
 	SolveForward(force, accel, 0);
 	SolveBackward(force, accel);
@@ -900,7 +896,8 @@ void dAnimationAcyclicSolver::SolveAuxiliary(dVectorPair* const force, const dVe
 			dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[first + index];
 
 			f[auxiliaryIndex + primaryCount] = rhs->m_force;
-			b[auxiliaryIndex] = dFloat(accelSpatial[primaryDof + j]);
+			//b[auxiliaryIndex] = dFloat(accelSpatial[primaryDof + j]);
+			b[auxiliaryIndex] = -dFloat(accelSpatial[primaryDof + j]);
 
 			dAssert(rhs->m_force >= rhs->m_jointLowFriction * dFloat(2.0f));
 			dAssert(rhs->m_force <= rhs->m_jointHighFriction * dFloat(2.0f));
@@ -968,12 +965,7 @@ void dAnimationAcyclicSolver::SolveAuxiliary(dVectorPair* const force, const dVe
 		b[i] -= r;
 	}
 
-static int xxx;
-
 	dGaussSeidelLcpSor(n, m_massMatrix11, u, b, normalIndex, low, high, dFloat(0.01), 30, dFloat(1.15f));
-
-dTrace (("%d\n", xxx));
-xxx ++;
 
 	for (int i = 0; i < n; i++) {
 		const dFloat s = u[i];
@@ -1245,12 +1237,25 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		InitLoopMassMatrix();
 	}
 
-//	DebugMassMatrix();
+	//DebugMassMatrix();
 
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const accel = dAlloca(dVectorPair, m_nodeCount);
 	CalculateJointAccel(accel);
-	CalculateForce(force, accel);
+	CalculateOpenLoopForce(force, accel);
+
+/*
+for (int i = 0; i < m_nodeCount - 1; i++) {
+	dAnimationAcyclicJoint* const node = m_nodesOrder[i];
+	const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
+
+	const dSpatialVector& f = force[i].m_joint;
+	for (int j = 0; j < joint->m_dof; j++) {
+		dTrace(("%f ", f[j]));
+	}
+}
+dTrace(("\n"));
+*/
 
 	if (m_auxiliaryRowCount || m_loopRowCount) {
 		SolveAuxiliary(force, accel);

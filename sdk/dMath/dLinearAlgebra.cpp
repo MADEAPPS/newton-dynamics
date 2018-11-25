@@ -145,7 +145,7 @@ dFloat dComplementaritySolver::dBodyState::GetInvMass () const
 void dComplementaritySolver::dBodyState::SetMass (dFloat mass)
 {
 	m_mass = mass;
-	m_invMass = 1.0f / mass;
+	m_invMass = mass > (1.0e-3f) ?  1.0f / mass : 0.0f;
 }
 
 void dComplementaritySolver::dBodyState::SetInertia (dFloat Ixx, dFloat Iyy, dFloat Izz)
@@ -153,9 +153,9 @@ void dComplementaritySolver::dBodyState::SetInertia (dFloat Ixx, dFloat Iyy, dFl
 	m_localInertia[0] = Ixx;
 	m_localInertia[1] =	Iyy;
 	m_localInertia[2] =	Izz;
-	m_localInvInertia[0] = 1.0f / Ixx;
-	m_localInvInertia[1] = 1.0f / Iyy;
-	m_localInvInertia[2] = 1.0f / Izz;
+	m_localInvInertia[0] = Ixx ? 1.0f / Ixx : 0.0f;
+	m_localInvInertia[1] = Iyy ? 1.0f / Iyy : 0.0f;
+	m_localInvInertia[2] = Izz ? 1.0f / Izz : 0.0f;
 }
 
 void dComplementaritySolver::dBodyState::GetInertia (dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const

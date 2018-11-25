@@ -131,7 +131,7 @@ dFloat dCustomHinge::GetJointOmega () const
 
 void dCustomHinge::SetFriction (dFloat frictionTorque)
 {
-	m_friction = frictionTorque;
+	m_friction = dAbs (frictionTorque);
 }
 
 dFloat dCustomHinge::GetFriction () const
@@ -321,6 +321,5 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-//		dTrace(("%f %f\n", m_jointOmega, accel));
 	}
 }

@@ -21,8 +21,7 @@ class dAnimationRigHinge: public dAnimationRigLimb, public dCustomHinge
 	dAnimationRigHinge(dAnimationRigJoint* const parent, NewtonBody* const body);
 	virtual ~dAnimationRigHinge();
 
-	//virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep);
+	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	virtual void UpdateJointAcceleration();
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);

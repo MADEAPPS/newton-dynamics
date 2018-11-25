@@ -34,7 +34,6 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	
 	dAnimationAcyclicJoint* GetStaticWorld() {return &m_staticWorld;}
 
-//	dComplementaritySolver::dBodyState m_staticWorld;
 	dAnimationAcyclicJoint m_staticWorld;
 	dAnimationAcyclicSolver m_solver;
 	
