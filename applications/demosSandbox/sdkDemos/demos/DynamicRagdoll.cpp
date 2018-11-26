@@ -720,9 +720,13 @@ struct dRagDollConfig
 static dRagDollConfig ragDollConfig[] =
 {
 	{ "bone_spine0", 210.0f, -1000.0f, 1000.0f },
-//	{ "bone_base1", 200.0f, -1000.0f, 1000.0f },
-//	{ "bone_arm0", 180.0f, -45.0f, 135.0f },
-//	{ "bone_arm1", 160.0f, -90.0f, 35.0f },
+
+	{ "bone_rightLeg", 200.0f, -45.0f, 60.0f },
+	{ "bone_rightKnee", 190.0f, -30.0f, 80.0f },
+
+	{ "bone_leftLeg", 200.0f, -45.0f, 60.0f },
+	{ "bone_leftknee", 190.0f, -30.0f, 80.0f },
+
 //	{ "effector_arm", 1000.0f, 0.0f, 0.0f }
 };
 
@@ -864,7 +868,7 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 		model->ResetMatrix(*scene, modelMatrix * origin);
 
 		NewtonBody* const rootBody = CreateBodyPart(model, ragDollConfig[0]);
-		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		dAnimationCharacterRig* const rig = CreateCharacterRig(rootBody);
 
 		int stackIndex = 0;
@@ -888,11 +892,14 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 					if (strstr(name, "bone")) {
 						// add a bone and all it children
-						dAssert(0);
 						NewtonBody* const limbBody = CreateBodyPart(entity, ragDollConfig[i]);
-						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(parentJoint, limbBody);
+
+						dMatrix matrix;
+						NewtonBodyGetMatrix(limbBody, &matrix[0][0]);
+						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(matrix, parentJoint, limbBody);
 
 						limbJoint->SetFriction(ragDollConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+						//limbJoint->SetFriction(ragDollConfig[i].m_mass * DEMO_GRAVITY * 2.0f);
 						limbJoint->SetLimits(ragDollConfig[i].m_minLimit * dDegreeToRad, ragDollConfig[i].m_maxLimit * dDegreeToRad);
 
 						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
@@ -919,14 +926,12 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 	void OnUpdateTransform(const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const
 	{
-/*
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 		NewtonBody* const newtonBody = bone->GetNewtonBody();
 		DemoEntity* const meshEntity = (DemoEntity*)NewtonBodyGetUserData(newtonBody);
 
 		dQuaternion rot(localMatrix);
 		meshEntity->SetMatrix(*scene, rot, localMatrix.m_posit);
-*/
 	}
 
 //	dSixAxisController* m_currentController;
@@ -948,6 +953,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
+	//origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 	origin.m_posit.m_y = 2.1f;
 	for (int i = 0; i < count; i++) {

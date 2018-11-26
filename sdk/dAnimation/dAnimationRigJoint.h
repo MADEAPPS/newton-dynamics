@@ -37,7 +37,7 @@ class dAnimationRigJoint: public dAnimationAcyclicJoint
 	virtual dAnimationRigJoint* GetAsRigJoint() {return this;}
 	
 	dAnimationCharacterRig* m_root;
-	static dMatrix m_boneConvertionMatrix;
+	//static dMatrix m_boneConvertionMatrix;
 };
 
 #endif

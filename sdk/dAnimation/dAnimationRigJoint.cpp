@@ -13,12 +13,6 @@
 #include "dAnimationRigJoint.h"
 #include "dAnimationCharacterRigManager.h"
 
-dMatrix dAnimationRigJoint::m_boneConvertionMatrix (
-	dVector (0.0f, 1.0f, 0.0f, 0.0f), 
-	dVector (1.0f, 0.0f, 0.0f, 0.0f), 
-	dVector (0.0f, 0.0f,-1.0f, 0.0f), 
-	dVector (0.0f, 0.0f, 0.0f, 1.0f));
-
 dAnimationRigJoint::dAnimationRigJoint(dAnimationRigJoint* const parent)
 	:dAnimationAcyclicJoint(parent)
 	,m_root(parent ? parent->GetRoot() : NULL)

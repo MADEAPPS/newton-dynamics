@@ -13,18 +13,13 @@
 #include "dAnimationRigHinge.h"
 #include "dAnimationCharacterRigManager.h"
 
-dAnimationRigHinge::dAnimationRigHinge(dAnimationRigJoint* const parent, NewtonBody* const body)
+dAnimationRigHinge::dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body)
 	:dAnimationRigLimb(parent, body)
-	,dCustomHinge (dGetIdentityMatrix(), body, parent->GetNewtonBody())
+	,dCustomHinge (basicMatrix, body, parent->GetNewtonBody())
 	,m_rowAccel(0.0f)
 {
-	dMatrix matrix;
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	
-	matrix = m_boneConvertionMatrix * matrix;
-	CalculateLocalMatrix (matrix, m_localMatrix0, m_localMatrix1);
-
-	EnableMotor(true, 0.0f);
+//	EnableMotor(true, 0.0f);
+	EnableLimits(true);
 }
 
 dAnimationRigHinge::~dAnimationRigHinge()
@@ -35,8 +30,12 @@ void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dCustomHinge::SubmitConstraints (timestep, threadIndex);
 
-	NewtonJoint* const joint = dCustomHinge::GetJoint();
-	NewtonUserJointSetRowAcceleration(joint, m_rowAccel);
+//	dFloat angle = GetJointAngle();
+//	dFloat speed = GetJointOmega();
+	if (!m_limitReached) {
+		NewtonJoint* const joint = dCustomHinge::GetJoint();
+		NewtonUserJointSetRowAcceleration(joint, m_rowAccel);
+	}
 }
 
 void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
@@ -66,7 +65,6 @@ void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 
 	constraintParams->m_count = 5;
 }
-
 
 void dAnimationRigHinge::UpdateJointAcceleration()
 {

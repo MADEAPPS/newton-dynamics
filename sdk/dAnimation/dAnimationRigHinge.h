@@ -18,7 +18,7 @@
 class dAnimationRigHinge: public dAnimationRigLimb, public dCustomHinge
 {
 	public:
-	dAnimationRigHinge(dAnimationRigJoint* const parent, NewtonBody* const body);
+	dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body);
 	virtual ~dAnimationRigHinge();
 
 	virtual void SubmitConstraints (dFloat timestep, int threadIndex);

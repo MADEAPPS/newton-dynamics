@@ -199,6 +199,12 @@ class dSixAxisController: public dCustomControllerBase
 		void* const baseFrameNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, baseFrameBody);
 		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);	
 
+		dMatrix boneAligmentMatrix(
+			dVector(0.0f, 1.0f, 0.0f, 0.0f),
+			dVector(1.0f, 0.0f, 0.0f, 0.0f),
+			dVector(0.0f, 0.0f, -1.0f, 0.0f),
+			dVector(0.0f, 0.0f, 0.0f, 1.0f));
+
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		void* parentBones[32];
@@ -220,19 +226,13 @@ class dSixAxisController: public dCustomControllerBase
 				if (!strcmp(armRobotConfig[i].m_partName, name)) {
 
 					if (strstr(name, "bone")) {
-						dMatrix matrix;
 						// add a bone and all it children
-						dMatrix m_boneConvertionMatrix(dVector(0.0f, 1.0f, 0.0f, 0.0f),
-													   dVector(1.0f, 0.0f, 0.0f, 0.0f),
-													   dVector(0.0f, 0.0f, -1.0f, 0.0f),
-													   dVector(0.0f, 0.0f, 0.0f, 1.0f));
+						dMatrix matrix;
 						NewtonBody* const limbBody = CreateBodyPart(entity, armRobotConfig[i]);
 						NewtonBodyGetMatrix(limbBody, &matrix[0][0]);
 
-						matrix = m_boneConvertionMatrix * matrix;
-
 						NewtonBody* const parentBody = NewtonInverseDynamicsGetBody(m_kinematicSolver, parentJoint);
-						dCustomInverseDynamics* const rotatingColumnHinge = new dCustomInverseDynamics(matrix, limbBody, parentBody);
+						dCustomInverseDynamics* const rotatingColumnHinge = new dCustomInverseDynamics(boneAligmentMatrix * matrix, limbBody, parentBody);
 						rotatingColumnHinge->SetJointTorque(armRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
 						rotatingColumnHinge->SetTwistAngle(armRobotConfig[i].m_minLimit * dDegreeToRad, armRobotConfig[i].m_maxLimit * dDegreeToRad);
 						void* const limbJoint = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, parentJoint, rotatingColumnHinge->GetJoint());
@@ -587,6 +587,12 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 			stackIndex++;
 		}
 
+		dMatrix boneAligmentMatrix(
+			dVector(0.0f, 1.0f, 0.0f, 0.0f),
+			dVector(1.0f, 0.0f, 0.0f, 0.0f),
+			dVector(0.0f, 0.0f, -1.0f, 0.0f),
+			dVector(0.0f, 0.0f, 0.0f, 1.0f));
+
 		const int partCount = sizeof(armRobotConfig) / sizeof(armRobotConfig[0]);
 		while (stackIndex) {
 			stackIndex--;
@@ -600,12 +606,10 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 					if (strstr (name, "bone")) {
 						// add a bone and all it children
 						NewtonBody* const limbBody = CreateBodyPart(entity, armRobotConfig[i]);
-						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(parentJoint, limbBody);
 
-//if (!strcmp (name, "bone_base1")){
-//dVector xxx (0, 10.0, 0, 0);
-//NewtonBodySetOmega(limbBody, &xxx[0]);
-//}
+						dMatrix matrix;
+						NewtonBodyGetMatrix(limbBody, &matrix[0][0]);
+						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(boneAligmentMatrix * matrix, parentJoint, limbBody);
 
 						limbJoint->SetFriction(armRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
 						limbJoint->SetLimits(armRobotConfig[i].m_minLimit * dDegreeToRad, armRobotConfig[i].m_maxLimit * dDegreeToRad);
