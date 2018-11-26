@@ -635,7 +635,7 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 	int m_material;
 };
 
-#endif
+
 
 void DynamicRagDoll (DemoEntityManager* const scene)
 {
@@ -643,7 +643,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	dAssert (0);
-/*
+
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
@@ -705,7 +705,259 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	origin.m_y += 1.0f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
+}
+#endif
+
+
+struct dRagDollConfig
+{
+	char m_partName[32];
+	dFloat m_mass;
+	dFloat m_minLimit;
+	dFloat m_maxLimit;
+};
+
+static dRagDollConfig ragDollConfig[] =
+{
+	{ "bone_spine0", 210.0f, -1000.0f, 1000.0f },
+//	{ "bone_base1", 200.0f, -1000.0f, 1000.0f },
+//	{ "bone_arm0", 180.0f, -45.0f, 135.0f },
+//	{ "bone_arm1", 160.0f, -90.0f, 35.0f },
+//	{ "effector_arm", 1000.0f, 0.0f, 0.0f }
+};
+
+
+class BalancingDummyManager : public dAnimationCharacterRigManager
+{
+	public:
+	BalancingDummyManager(DemoEntityManager* const scene)
+		:dAnimationCharacterRigManager(scene->GetNewton())
+		//,m_currentController(NULL)
+		//,m_azimuth(0.0f)
+		//,m_posit_x(0.0f)
+		//,m_posit_y(0.0f)
+		//,m_gripper_roll(0.0f)
+		//,m_gripper_pitch(0.0f)
+	{
+		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~BalancingDummyManager()
+	{
+	}
+
+/*
+	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
+	{
+		BalancingDummyManager* const me = (BalancingDummyManager*)context;
+
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Use sliders to manipulate robot");
+		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+
+		//		ImGui::Separator();
+		//		ImGui::Separator();
+		//		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
+		//		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
+
+		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->SetTarget(me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
+		}
+	}
+
+	virtual dSixAxisController* CreateController()
+	{
+		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
+	}
+
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->Debug(debugContext);
+		}
+	}
 */
+
+	DemoEntity* FindMesh(const DemoEntity* const bodyPart) const
+	{
+		for (DemoEntity* child = bodyPart->GetChild(); child; child = child->GetSibling()) {
+			if (child->GetMesh()) {
+				return child;
+			}
+		}
+		dAssert(0);
+		return NULL;
+	}
+
+	NewtonCollision* MakeConvexHull(const DemoEntity* const bodyPart) const
+	{
+		dVector points[1024 * 16];
+
+		const DemoEntity* const meshEntity = FindMesh(bodyPart);
+
+		DemoMesh* const mesh = (DemoMesh*)meshEntity->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		dAssert(mesh->m_vertexCount && (mesh->m_vertexCount < int(sizeof(points) / sizeof(points[0]))));
+
+		// go over the vertex array and find and collect all vertices's weighted by this bone.
+		const dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			points[i][0] = array[i * 3 + 0];
+			points[i][1] = array[i * 3 + 1];
+			points[i][2] = array[i * 3 + 2];
+			points[i][3] = 0.0f;
+		}
+		dMatrix matrix(meshEntity->GetMeshMatrix());
+		matrix = matrix * meshEntity->GetCurrentMatrix();
+		//matrix = matrix * bodyPart->GetParent()->GetCurrentMatrix();
+		matrix.TransformTriplex(&points[0][0], sizeof(dVector), &points[0][0], sizeof(dVector), mesh->m_vertexCount);
+		//return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, SERVO_VEHICLE_DEFINITION::m_bodyPart, NULL);
+		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
+	}
+
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dRagDollConfig& definition)
+	{
+		NewtonCollision* const shape = MakeConvexHull(bodyPart);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		NewtonWorld* const world = GetWorld();
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, definition.m_mass, collision);
+		//NewtonBodySetMassProperties(body, 0.0f, collision);
+
+		// save the user lifterData with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// assign a body part id
+		//NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+
+	dAnimationCharacterRig* CreateRagDoll(DemoEntityManager* const scene, const dMatrix& origin)
+	{
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
+		scene->Append(model);
+
+		dMatrix modelMatrix(model->GetCurrentMatrix());
+		modelMatrix.m_posit = dVector(0.0f);
+		modelMatrix.m_posit.m_w = 1.0f;
+
+		model->ResetMatrix(*scene, modelMatrix * origin);
+
+		NewtonBody* const rootBody = CreateBodyPart(model, ragDollConfig[0]);
+		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+		dAnimationCharacterRig* const rig = CreateCharacterRig(rootBody);
+
+		int stackIndex = 0;
+		DemoEntity* childEntities[32];
+		dAnimationRigJoint* parentBones[32];
+		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = rig;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		const int partCount = sizeof(ragDollConfig) / sizeof(ragDollConfig[0]);
+		while (stackIndex) {
+			stackIndex--;
+			DemoEntity* const entity = childEntities[stackIndex];
+			dAnimationRigJoint* const parentJoint = parentBones[stackIndex];
+
+			const char* const name = entity->GetName().GetStr();
+			for (int i = 0; i < partCount; i++) {
+				if (!strcmp(ragDollConfig[i].m_partName, name)) {
+
+					if (strstr(name, "bone")) {
+						// add a bone and all it children
+						dAssert(0);
+						NewtonBody* const limbBody = CreateBodyPart(entity, ragDollConfig[i]);
+						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(parentJoint, limbBody);
+
+						limbJoint->SetFriction(ragDollConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+						limbJoint->SetLimits(ragDollConfig[i].m_minLimit * dDegreeToRad, ragDollConfig[i].m_maxLimit * dDegreeToRad);
+
+						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+							parentBones[stackIndex] = limbJoint;
+							childEntities[stackIndex] = child;
+							stackIndex++;
+						}
+					} else if (strstr(name, "effector")) {
+						dAssert(0);
+						// add an end effector (end effector can't have children)
+						dMatrix pivot(entity->CalculateGlobalMatrix());
+						dAnimationRigEffector* const effector = new dAnimationRigEffector(parentJoint->GetAsRigLimb(), pivot);
+						effector->SetLinearSpeed(2.0f);
+						effector->SetMaxLinearFriction(ragDollConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+					}
+					break;
+				}
+			}
+		}
+
+		rig->Finalize();
+		return rig;
+	}
+
+	void OnUpdateTransform(const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const
+	{
+/*
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		NewtonBody* const newtonBody = bone->GetNewtonBody();
+		DemoEntity* const meshEntity = (DemoEntity*)NewtonBodyGetUserData(newtonBody);
+
+		dQuaternion rot(localMatrix);
+		meshEntity->SetMatrix(*scene, rot, localMatrix.m_posit);
+*/
+	}
+
+//	dSixAxisController* m_currentController;
+//	dFloat32 m_azimuth;
+//	dFloat32 m_posit_x;
+//	dFloat32 m_posit_y;
+//	dFloat32 m_gripper_roll;
+//	dFloat32 m_gripper_pitch;
+};
+
+void DynamicRagDoll(DemoEntityManager* const scene)
+{
+	// load the sky box
+	scene->CreateSkyBox();
+	CreateLevelMesh(scene, "flatPlane.ngd", true);
+	BalancingDummyManager* const robotManager = new BalancingDummyManager(scene);
+
+	int count = 10;
+	count = 1;
+
+	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
+	origin.m_posit.m_x = 2.0f;
+	origin.m_posit.m_y = 2.1f;
+	for (int i = 0; i < count; i++) {
+		robotManager->CreateRagDoll(scene, origin);
+		//robotManager->CreateRagDoll (scene, origin1);
+		origin.m_posit.m_x += 1.0f;
+	}
+
+	origin.m_posit = dVector(-4.0f, 1.0f, 0.0f, 1.0f);
+	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 
 

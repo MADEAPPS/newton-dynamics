@@ -36,7 +36,7 @@ static dArmRobotConfig armRobotConfig[] =
 	{ "effector_arm", 1000.0f, 0.0f, 0.0f}
 };
 
-#if 1
+#if 0
 class dSixAxisController: public dCustomControllerBase
 {
 	public:

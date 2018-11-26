@@ -357,11 +357,8 @@ class CrashDummyManager: public dCustomTransformManager
 		return controller;
 	}
 
-
 	int m_material;
 };
-
-
 
 void PassiveRagdoll (DemoEntityManager* const scene)
 {
