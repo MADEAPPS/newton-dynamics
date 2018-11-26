@@ -58,8 +58,8 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	dVector veloc0 (m_state0->CalculatePointVelocity(matrix0.m_posit));
 	dVector veloc1 (m_state1->CalculatePointVelocity(matrix1.m_posit));
 
-m_targetMatrix.m_posit.m_z = 0.45;
-m_targetMatrix.m_posit.m_y = 0.7;
+//m_targetMatrix.m_posit.m_z = 0.45;
+//m_targetMatrix.m_posit.m_y = 0.7;
 
 	dVector relVeloc(veloc1 - veloc0);
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
@@ -84,7 +84,7 @@ m_targetMatrix.m_posit.m_y = 0.7;
 	m_count = 3;
 	constraintParams->m_count = 3;
 
-m_dof = 1;
-m_count = 1;
-constraintParams->m_count = 1;
+//m_dof = 1;
+//m_count = 1;
+//constraintParams->m_count = 1;
 }

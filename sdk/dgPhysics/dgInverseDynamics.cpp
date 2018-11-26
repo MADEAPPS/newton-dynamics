@@ -1298,8 +1298,10 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 						   force1.m_angular * row->m_JMinv.m_jacobianM1.m_angular);
 			dgFloat32 a = accel.AddHorizontal().GetScalar();
 			joint->m_inverseDynamicsAcceleration[k] = a;
+//dgTrace (("%f ", a));
 		}
 	}
+//dgTrace (("\n"));
 }
 
 void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
@@ -1327,7 +1329,7 @@ void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 		CalculateJointAccel(jointInfoArray, righHandSide, accel);
 		CalculateOpenLoopForce(force, accel);
 
-
+/*
 for (int i = 0; i < m_nodeCount - 1; i++) {
 	dgNode* const node = m_nodesOrder[i];
 	dgBilateralConstraint* const joint = node->m_joint;
@@ -1338,11 +1340,26 @@ for (int i = 0; i < m_nodeCount - 1; i++) {
 	}
 }
 dgTrace(("\n"));
+*/
 
 		CalculateInternalForces(internalForce, jointInfoArray, matrixRow, righHandSide, force);
 		if (m_auxiliaryRowCount) {
 			CalculateCloseLoopsForces(internalForce, jointInfoArray, righHandSide, accel, force);
 		}
+
+/*
+for (int i = 0; i < m_nodeCount - 1; i++) {
+	dgNode* const node = m_nodesOrder[i];
+	dgBilateralConstraint* const joint = node->m_joint;
+
+	const dgSpatialVector& f = force[i].m_joint;
+	for (int j = 0; j < node->m_dof; j++) {
+		dgTrace(("%f ", f[j]));
+	}
+}
+dgTrace(("\n"));
+*/
+
 		CalculateMotorsAccelerations (internalForce, jointInfoArray, matrixRow, timestep);
 	}
 }

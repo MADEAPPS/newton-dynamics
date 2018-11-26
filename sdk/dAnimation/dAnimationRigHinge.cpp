@@ -36,7 +36,7 @@ void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	dCustomHinge::SubmitConstraints (timestep, threadIndex);
 
 	NewtonJoint* const joint = dCustomHinge::GetJoint();
-	NewtonUserJointSetRowAcceleration(joint, -m_rowAccel);
+	NewtonUserJointSetRowAcceleration(joint, m_rowAccel);
 }
 
 void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
@@ -81,7 +81,5 @@ void dAnimationRigHinge::UpdateJointAcceleration()
 	m_rowAccel = accel.m_x + accel.m_y + accel.m_z;
 
 //dTrace (("%f\n", m_rowAccel))
-//m_rowAccel = 0;
-
 	dAnimationRigLimb::UpdateJointAcceleration();
 }

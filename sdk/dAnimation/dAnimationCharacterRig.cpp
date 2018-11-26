@@ -55,6 +55,7 @@ void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 	RigidBodyToStates();
 	m_solver.Update(timestep);
 	UpdateJointAcceleration();
+//dTrace(("\n"));
 }
 
 void dAnimationCharacterRig::PostUpdate(dFloat timestep, int threadIndex)

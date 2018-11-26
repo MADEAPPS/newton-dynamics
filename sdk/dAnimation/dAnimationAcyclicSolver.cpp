@@ -528,10 +528,10 @@ void dAnimationAcyclicSolver::InitLoopMassMatrix()
 	}
 
 	short* const indexList = dAlloca(short, primaryCount);
-	for (int i = 0; i < m_auxiliaryRowCount; i++) {
+	for (int i = 0; i < auxiliaryIndex; i++) {
 		const dFloat* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		const dFloat* const deltaForcePtr = &m_deltaForce[i * primaryCount];
-		dFloat* const matrixRow11 = &m_massMatrix11[i * m_auxiliaryRowCount];
+		dFloat* const matrixRow11 = &m_massMatrix11[i * auxiliaryIndex];
 
 		int indexCount = 0;
 		for (int k = 0; k < primaryCount; k++) {
@@ -546,7 +546,7 @@ void dAnimationAcyclicSolver::InitLoopMassMatrix()
 		}
 		matrixRow11[i] = dMax(diagonal, diagDamp[i]);
 
-		for (int j = i + 1; j < m_auxiliaryRowCount; j++) {
+		for (int j = i + 1; j < auxiliaryIndex; j++) {
 			dFloat offDiagonal = matrixRow11[j];
 			const dFloat* const row10 = &m_deltaForce[j * primaryCount];
 			for (int k = 0; k < indexCount; k++) {
@@ -554,7 +554,7 @@ void dAnimationAcyclicSolver::InitLoopMassMatrix()
 				offDiagonal += matrixRow10[index] * row10[index];
 			}
 			matrixRow11[j] = offDiagonal;
-			m_massMatrix11[j * m_auxiliaryRowCount + i] = offDiagonal;
+			m_massMatrix11[j * auxiliaryIndex + i] = offDiagonal;
 		}
 	}
 
@@ -1237,14 +1237,14 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		InitLoopMassMatrix();
 	}
 
-DebugMassMatrix();
+//DebugMassMatrix();
 
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const accel = dAlloca(dVectorPair, m_nodeCount);
 	CalculateJointAccel(accel);
 	CalculateOpenLoopForce(force, accel);
 
-
+/*
 for (int i = 0; i < m_nodeCount - 1; i++) {
 	dAnimationAcyclicJoint* const node = m_nodesOrder[i];
 	const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
@@ -1255,11 +1255,24 @@ for (int i = 0; i < m_nodeCount - 1; i++) {
 	}
 }
 dTrace(("\n"));
-
+*/
 
 	if (m_auxiliaryRowCount || m_loopRowCount) {
 		SolveAuxiliary(force, accel);
 	} else {
 		UpdateForces(force);
 	}
+
+/*
+for (int i = 0; i < m_nodeCount - 1; i++) {
+	dAnimationAcyclicJoint* const node = m_nodesOrder[i];
+	const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
+
+	const dSpatialVector& f = force[i].m_joint;
+	for (int j = 0; j < joint->m_dof; j++) {
+		dTrace(("%f ", f[j]));
+	}
+}
+dTrace(("\n"));
+*/
 }

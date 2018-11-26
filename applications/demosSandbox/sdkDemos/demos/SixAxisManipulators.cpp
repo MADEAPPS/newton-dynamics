@@ -226,7 +226,6 @@ class dSixAxisController: public dCustomControllerBase
 													   dVector(1.0f, 0.0f, 0.0f, 0.0f),
 													   dVector(0.0f, 0.0f, -1.0f, 0.0f),
 													   dVector(0.0f, 0.0f, 0.0f, 1.0f));
-
 						NewtonBody* const limbBody = CreateBodyPart(entity, armRobotConfig[i]);
 						NewtonBodyGetMatrix(limbBody, &matrix[0][0]);
 
