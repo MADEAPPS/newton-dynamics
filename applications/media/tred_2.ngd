@@ -427,9 +427,9 @@
             <dNodeInfo name="Default" editorFlags="0" />
             <ambient textureId="-1" color="0.700000 0.700000 0.700000 1.000000" />
             <diffuse textureId="-1" color="0.700000 0.700000 0.700000 1.000000" />
-            <specular textureId="-1" color="1.000000 1.000000 1.000000 1.000000" />
+            <specular textureId="-1" color="0.000000 0.000000 0.000000 0.000000" />
             <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
-            <shininess float="3200.000000" />
+            <shininess float="0.000000" />
             <opacity float="1.000000" />
             <parentNodes count="23" indices="1 53 56 57 59 61 62 63 64 65 66 74 76 77 79 80 83 85 88 89 93 94 95" />
         </dMaterialNodeInfo>
