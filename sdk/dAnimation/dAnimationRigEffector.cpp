@@ -18,7 +18,7 @@
 dAnimationRigEffector::dAnimationRigEffector(dAnimationRigLimb* const parent, const dMatrix& matrix)
 	:dAnimationKinematicLoopJoint()
 	,m_targetMatrix(matrix)
-	,m_linearSpeed(0.0f)
+	,m_linearSpeed(1.0f)
 	,m_linearFriction(10000.0f)
 {
 	m_isActive = true;
@@ -40,6 +40,16 @@ dAnimationRigEffector::~dAnimationRigEffector()
 {
 }
 
+void dAnimationRigEffector::SetLinearSpeed(dFloat speed)
+{
+	m_linearSpeed = dAbs (speed);
+}
+
+void dAnimationRigEffector::SetMaxLinearFriction(dFloat friction)
+{
+	m_linearFriction = dAbs(friction);
+}
+
 void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	const dMatrix& matrix1 = m_targetMatrix;
@@ -47,6 +57,9 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	
 	dVector veloc0 (m_state0->CalculatePointVelocity(matrix0.m_posit));
 	dVector veloc1 (m_state1->CalculatePointVelocity(matrix1.m_posit));
+
+m_targetMatrix.m_posit.m_z = 0.45;
+m_targetMatrix.m_posit.m_y = 0.7;
 
 	dVector relVeloc(veloc1 - veloc0);
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
@@ -70,4 +83,8 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	m_dof = 3;
 	m_count = 3;
 	constraintParams->m_count = 3;
+
+m_dof = 1;
+m_count = 1;
+constraintParams->m_count = 1;
 }

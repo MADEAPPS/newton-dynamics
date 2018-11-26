@@ -19,7 +19,7 @@
 #include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
 
-struct dArmnRobotConfig
+struct dArmRobotConfig
 {
 	char m_partName[32];
 	dFloat m_mass;
@@ -27,13 +27,13 @@ struct dArmnRobotConfig
 	dFloat m_maxLimit;
 };
 
-static dArmnRobotConfig armnRobotConfig[] =
+static dArmRobotConfig armRobotConfig[] =
 {
 	{ "bone_base", 210.0f, -1000.0f, 1000.0f},
 	{ "bone_base1", 200.0f, -1000.0f, 1000.0f},
 	{ "bone_arm0", 180.0f, -45.0f, 135.0f},
 	{ "bone_arm1", 160.0f, -90.0f, 35.0f},
-	{ "effector_arm", 0.0f, 0.0f, 0.0f}
+	{ "effector_arm", 1000.0f, 0.0f, 0.0f}
 };
 
 #if 1
@@ -96,7 +96,7 @@ class dSixAxisController: public dCustomControllerBase
 			:dCustomInverseDynamicsEffector(invDynSolver, invDynNode, referenceBody, attachmentMatrixInGlobalSpace)
 		{
 			SetLinearSpeed(2.0f);
-			SetMaxLinearFriction (5000.0f);
+			SetMaxLinearFriction (armRobotConfig[4].m_mass * DEMO_GRAVITY * 50.0f);
 		}
 	};
 
@@ -159,7 +159,7 @@ class dSixAxisController: public dCustomControllerBase
 	}
 
 
-	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dArmnRobotConfig& definition)
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dArmRobotConfig& definition)
 	{
 		NewtonCollision* const shape = MakeConvexHull(bodyPart);
 
@@ -195,7 +195,7 @@ class dSixAxisController: public dCustomControllerBase
 	{
 		m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
-		NewtonBody* const baseFrameBody = CreateBodyPart(model, armnRobotConfig[0]);
+		NewtonBody* const baseFrameBody = CreateBodyPart(model, armRobotConfig[0]);
 		void* const baseFrameNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, baseFrameBody);
 		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);	
 
@@ -209,7 +209,7 @@ class dSixAxisController: public dCustomControllerBase
 		}
 
 		dKukaEffector* effector = NULL;
-		const int partCount = sizeof(armnRobotConfig) / sizeof(armnRobotConfig[0]);
+		const int partCount = sizeof(armRobotConfig) / sizeof(armRobotConfig[0]);
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
@@ -217,30 +217,25 @@ class dSixAxisController: public dCustomControllerBase
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < partCount; i++) {
-				if (!strcmp(armnRobotConfig[i].m_partName, name)) {
+				if (!strcmp(armRobotConfig[i].m_partName, name)) {
 
 					if (strstr(name, "bone")) {
-						// add a bone and all it children
-						NewtonBody* const limbBody = CreateBodyPart(entity, armnRobotConfig[i]);
-
-//if (!strcmp(name, "bone_base1")) {
-//dVector xxx(0, 10.0, 0, 0);
-//NewtonBodySetOmega(limbBody, &xxx[0]);
-//}
-
 						dMatrix matrix;
+						// add a bone and all it children
 						dMatrix m_boneConvertionMatrix(dVector(0.0f, 1.0f, 0.0f, 0.0f),
 													   dVector(1.0f, 0.0f, 0.0f, 0.0f),
 													   dVector(0.0f, 0.0f, -1.0f, 0.0f),
 													   dVector(0.0f, 0.0f, 0.0f, 1.0f));
+
+						NewtonBody* const limbBody = CreateBodyPart(entity, armRobotConfig[i]);
 						NewtonBodyGetMatrix(limbBody, &matrix[0][0]);
 
 						matrix = m_boneConvertionMatrix * matrix;
 
 						NewtonBody* const parentBody = NewtonInverseDynamicsGetBody(m_kinematicSolver, parentJoint);
 						dCustomInverseDynamics* const rotatingColumnHinge = new dCustomInverseDynamics(matrix, limbBody, parentBody);
-						rotatingColumnHinge->SetJointTorque(armnRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
-						rotatingColumnHinge->SetTwistAngle(armnRobotConfig[i].m_minLimit * dDegreeToRad, armnRobotConfig[i].m_maxLimit * dDegreeToRad);
+						rotatingColumnHinge->SetJointTorque(armRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+						rotatingColumnHinge->SetTwistAngle(armRobotConfig[i].m_minLimit * dDegreeToRad, armRobotConfig[i].m_maxLimit * dDegreeToRad);
 						void* const limbJoint = NewtonInverseDynamicsAddChildNode(m_kinematicSolver, parentJoint, rotatingColumnHinge->GetJoint());
 
 						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
@@ -253,13 +248,14 @@ class dSixAxisController: public dCustomControllerBase
 						dMatrix gripperMatrix(entity->CalculateGlobalMatrix());
 						effector = new dKukaEffector(m_kinematicSolver, parentJoint, baseFrameBody, gripperMatrix);
 						effector->SetAsThreedof();
-						effector->SetMaxLinearFriction(armnRobotConfig[0].m_mass * DEMO_GRAVITY * 50.0f);
+						effector->SetLinearSpeed(2.0f);
+						effector->SetMaxLinearFriction(armRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
 					}
 					break;
 				}
 			}
 		}
-/*
+
 		// create the Animation tree for manipulation 
 		DemoEntity* const effectoBone = model->Find("effector_arm");
 		dMatrix baseFrameMatrix(model->GetCurrentMatrix());
@@ -280,7 +276,7 @@ class dSixAxisController: public dCustomControllerBase
 
 		fixPose->GetPose().Append(frame);
 		m_animTreeNode->GetPose().Append(frame);
-*/
+
 		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 	}
 
@@ -539,7 +535,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
 	}
 
-	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dArmnRobotConfig& definition)
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dArmRobotConfig& definition)
 	{
 		NewtonCollision* const shape = MakeConvexHull(bodyPart);
 
@@ -579,7 +575,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
 
-		NewtonBody* const rootBody = CreateBodyPart(model, armnRobotConfig[0]);
+		NewtonBody* const rootBody = CreateBodyPart(model, armRobotConfig[0]);
 NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		dAnimationCharacterRig* const rig = CreateCharacterRig (rootBody);
 
@@ -592,7 +588,7 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 			stackIndex++;
 		}
 
-		const int partCount = sizeof(armnRobotConfig) / sizeof(armnRobotConfig[0]);
+		const int partCount = sizeof(armRobotConfig) / sizeof(armRobotConfig[0]);
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
@@ -600,11 +596,11 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < partCount; i++) {
-				if (!strcmp(armnRobotConfig[i].m_partName, name)) {
+				if (!strcmp(armRobotConfig[i].m_partName, name)) {
 
 					if (strstr (name, "bone")) {
 						// add a bone and all it children
-						NewtonBody* const limbBody = CreateBodyPart(entity, armnRobotConfig[i]);
+						NewtonBody* const limbBody = CreateBodyPart(entity, armRobotConfig[i]);
 						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(parentJoint, limbBody);
 
 //if (!strcmp (name, "bone_base1")){
@@ -612,8 +608,8 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 //NewtonBodySetOmega(limbBody, &xxx[0]);
 //}
 
-						limbJoint->SetFriction(armnRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
-						limbJoint->SetLimits(armnRobotConfig[i].m_minLimit * dDegreeToRad, armnRobotConfig[i].m_maxLimit * dDegreeToRad);
+						limbJoint->SetFriction(armRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+						limbJoint->SetLimits(armRobotConfig[i].m_minLimit * dDegreeToRad, armRobotConfig[i].m_maxLimit * dDegreeToRad);
 
 						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
 							parentBones[stackIndex] = limbJoint;
@@ -623,7 +619,9 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 					} else if (strstr(name, "effector")) {
 						// add an end effector (end effector can't have children)
 						dMatrix pivot (entity->CalculateGlobalMatrix());
-						new dAnimationRigEffector(parentJoint->GetAsRigLimb(), pivot);
+						dAnimationRigEffector* const effector = new dAnimationRigEffector(parentJoint->GetAsRigLimb(), pivot);
+						effector->SetLinearSpeed(2.0f);
+						effector->SetMaxLinearFriction(armRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
 					}
 					break;
 				}

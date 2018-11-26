@@ -662,7 +662,6 @@ void dCustomInverseDynamicsEffector::SubmitConstraints(dFloat timestep, int thre
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
 	}
 
-
 	if (m_isSixdof) {
 		dQuaternion rotation(matrix0.Inverse() * m_targetMatrix);
 		if (dAbs(rotation.m_q0) < 0.99998f) {

@@ -27,6 +27,9 @@ class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
+	void SetLinearSpeed(dFloat speed);
+	void SetMaxLinearFriction(dFloat friction);
+
 	dMatrix m_targetMatrix;
 	dMatrix m_pivotLocalMatrix;
 	dFloat m_linearSpeed;

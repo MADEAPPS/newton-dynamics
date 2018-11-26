@@ -692,8 +692,6 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 		m_rowArray = (dgLeftHandSide**) memoryBuffer;
 		m_pairs = (dgNodePair*) &m_rowArray[m_rowCount];
 		m_massMatrix11 = (dgFloat32*)&m_pairs[m_rowCount];
-		//m_lowerTriangularMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
-		//m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 		m_massMatrix10 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 		m_deltaForce = (dgFloat32*)&m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 		m_righHandSize = (dgRightHandSide**)&m_deltaForce[m_auxiliaryRowCount * primaryCount];
@@ -1329,7 +1327,7 @@ void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 		CalculateJointAccel(jointInfoArray, righHandSide, accel);
 		CalculateOpenLoopForce(force, accel);
 
-/*
+
 for (int i = 0; i < m_nodeCount - 1; i++) {
 	dgNode* const node = m_nodesOrder[i];
 	dgBilateralConstraint* const joint = node->m_joint;
@@ -1340,7 +1338,6 @@ for (int i = 0; i < m_nodeCount - 1; i++) {
 	}
 }
 dgTrace(("\n"));
-*/
 
 		CalculateInternalForces(internalForce, jointInfoArray, matrixRow, righHandSide, force);
 		if (m_auxiliaryRowCount) {
