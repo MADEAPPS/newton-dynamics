@@ -715,17 +715,26 @@ struct dRagDollConfig
 	dFloat m_mass;
 	dFloat m_minLimit;
 	dFloat m_maxLimit;
+	dFloat m_frictionScale;
 };
 
 static dRagDollConfig ragDollConfig[] =
 {
-	{ "bone_spine0", 210.0f, -1000.0f, 1000.0f },
+	{ "bone_spine0", 210.0f, -1000.0f, 1000.0f, 50.0f },
 
-	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f },
-	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f },
+	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 50.0f },
+	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
+	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 100.0f },
 
-	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f }, 
-	{ "bone_leftknee", 190.0f, -70.0f, 20.0f },
+//	{ "bone_rightAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
+
+//	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 50.0f },
+//	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
+//	{ "bone_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "effector_leftLeg", 0.0f, -90.0f, 45.0f, 100.0f },
+
 
 //	{ "effector_arm", 1000.0f, 0.0f, 0.0f }
 };
@@ -898,8 +907,7 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 						NewtonBodyGetMatrix(limbBody, &matrix[0][0]);
 						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(matrix, parentJoint, limbBody);
 
-						limbJoint->SetFriction(ragDollConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
-						//limbJoint->SetFriction(ragDollConfig[i].m_mass * DEMO_GRAVITY * 2.0f);
+						limbJoint->SetFriction(ragDollConfig[i].m_frictionScale * ragDollConfig[i].m_mass * DEMO_GRAVITY);
 						limbJoint->SetLimits(ragDollConfig[i].m_minLimit * dDegreeToRad, ragDollConfig[i].m_maxLimit * dDegreeToRad);
 
 						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
@@ -908,12 +916,11 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 							stackIndex++;
 						}
 					} else if (strstr(name, "effector")) {
-						dAssert(0);
 						// add an end effector (end effector can't have children)
 						dMatrix pivot(entity->CalculateGlobalMatrix());
 						dAnimationRigEffector* const effector = new dAnimationRigEffector(parentJoint->GetAsRigLimb(), pivot);
 						effector->SetLinearSpeed(2.0f);
-						effector->SetMaxLinearFriction(ragDollConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+						effector->SetMaxLinearFriction(ragDollConfig[i].m_frictionScale * ragDollConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
 					}
 					break;
 				}
@@ -955,14 +962,15 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
 	//origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
-	origin.m_posit.m_y = 2.1f;
+//	origin.m_posit.m_y = 2.1f;
+	origin.m_posit.m_y = 3.0f;
 	for (int i = 0; i < count; i++) {
 		robotManager->CreateRagDoll(scene, origin);
 		//robotManager->CreateRagDoll (scene, origin1);
 		origin.m_posit.m_x += 1.0f;
 	}
 
-	origin.m_posit = dVector(-4.0f, 2.0f, 0.0f, 1.0f);
+	origin.m_posit = dVector(-4.0f, 3.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 
