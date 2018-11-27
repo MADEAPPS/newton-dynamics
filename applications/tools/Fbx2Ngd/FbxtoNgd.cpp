@@ -392,12 +392,13 @@ static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, Glob
 
 		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
 
+dMatrix localMatrix1(evaluator->GetNodeGlobalTransform(data.m_fbxNode));
 dVector euler1;
 dVector euler2;
 dVector scale;
 dMatrix stretchAxis;
-localMatrix.PolarDecomposition(localMatrix, scale, stretchAxis);
-localMatrix.GetEulerAngles(euler1, euler2);
+localMatrix1.PolarDecomposition(localMatrix1, scale, stretchAxis);
+localMatrix1.GetEulerAngles(euler1, euler2);
 euler1 = euler1.Scale(dRadToDegree);
 euler2 = euler2.Scale(dRadToDegree);
 
@@ -590,7 +591,7 @@ static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, Fb
 					specular[3] = 1.0f;
 
 					// Display the Shininess
-					shininess = dFloat(phongMaterial->Shininess.Get() * 100.0f);
+					shininess = dFloat(phongMaterial->Shininess.Get());
 
 					// Display the Emissive Color
 					//lKFbxDouble3 =((FbxSurfacePhong *) lMaterial)->Emissive;

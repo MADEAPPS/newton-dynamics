@@ -34,6 +34,17 @@ dAnimationRigHinge::~dAnimationRigHinge()
 {
 }
 
+void dAnimationRigHinge::Debug(dDebugDisplay* const debugContext) const
+{
+	dFloat scale = debugContext->GetScale();
+	debugContext->SetScale(scale * 2.5f);
+
+	dCustomHinge::Debug(debugContext);
+	debugContext->SetScale(scale);
+
+	dAnimationRigLimb::Debug(debugContext);
+}
+
 void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dCustomHinge::SubmitConstraints (timestep, threadIndex);

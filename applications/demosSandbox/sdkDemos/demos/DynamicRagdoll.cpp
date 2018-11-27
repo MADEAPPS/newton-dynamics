@@ -721,11 +721,11 @@ static dRagDollConfig ragDollConfig[] =
 {
 	{ "bone_spine0", 210.0f, -1000.0f, 1000.0f },
 
-	{ "bone_rightLeg", 200.0f, -45.0f, 60.0f },
-	{ "bone_rightKnee", 190.0f, -30.0f, 80.0f },
+	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f },
+	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f },
 
-	{ "bone_leftLeg", 200.0f, -45.0f, 60.0f },
-	{ "bone_leftknee", 190.0f, -30.0f, 80.0f },
+	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f }, 
+	{ "bone_leftknee", 190.0f, -70.0f, 20.0f },
 
 //	{ "effector_arm", 1000.0f, 0.0f, 0.0f }
 };
@@ -776,15 +776,15 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 	{
 		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
 	}
-
+*/
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			dSixAxisController* const controller = &node->GetInfo();
-			controller->Debug(debugContext);
-		}
+		dAnimationCharacterRigManager::OnDebug(debugContext);
+//		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+//			dSixAxisController* const controller = &node->GetInfo();
+//			controller->Debug(debugContext);
+//		}
 	}
-*/
 
 	DemoEntity* FindMesh(const DemoEntity* const bodyPart) const
 	{
@@ -953,7 +953,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-	origin = dGetIdentityMatrix();
+	//origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 	origin.m_posit.m_y = 2.1f;
 	for (int i = 0; i < count; i++) {
@@ -962,7 +962,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 		origin.m_posit.m_x += 1.0f;
 	}
 
-	origin.m_posit = dVector(-4.0f, 1.0f, 0.0f, 1.0f);
+	origin.m_posit = dVector(-4.0f, 2.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 

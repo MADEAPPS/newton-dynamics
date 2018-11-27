@@ -449,6 +449,27 @@ class SingleBodyVehicleManager: public dVehicleManager
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
+
+		// add vehicle steering control 
+		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
+		steeringControl->AddTire(frontLeft);
+		steeringControl->AddTire(frontRight);
+
+		// add vehicle hand brake control 
+		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
+		handBrakeControl->SetBrakeTorque(1000.0f);
+		handBrakeControl->AddTire(rearLeft);
+		handBrakeControl->AddTire(rearRight);
+
+
+		// add vehicle brake control 
+		dVehicleBrakeControl* const brakeControl = vehicle->GetBrakeControl();
+		brakeControl->SetBrakeTorque(1000.0f);
+		brakeControl->AddTire(frontLeft);
+		brakeControl->AddTire(frontRight);
+		brakeControl->AddTire(rearLeft);
+		brakeControl->AddTire(rearRight);
+
 /*
 		// add a differential 
 		dVehicleDifferentialInterface* const differential = vehicle->AddDifferential(rearLeft, rearRight);
@@ -482,25 +503,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// Set Engine Control
 		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
 		engineControl->SetEngine(engine);
-
-		// add vehicle steering control 
-		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
-		steeringControl->AddTire(frontLeft);
-		steeringControl->AddTire(frontRight);
-
-		// add vehicle brake control 
-		dVehicleBrakeControl* const brakeControl = vehicle->GetBrakeControl();
-		brakeControl->SetBrakeTorque(1000.0f);
-		brakeControl->AddTire(frontLeft);
-		brakeControl->AddTire(frontRight);
-		brakeControl->AddTire(rearLeft);
-		brakeControl->AddTire(rearRight);
-
-		// add vehicle hand brake control 
-		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
-		handBrakeControl->SetBrakeTorque(1000.0f);
-		handBrakeControl->AddTire(rearLeft);
-		handBrakeControl->AddTire(rearRight);
 */
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();

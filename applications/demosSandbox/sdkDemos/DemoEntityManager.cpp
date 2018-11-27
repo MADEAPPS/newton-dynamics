@@ -1447,7 +1447,7 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		jointDebugRender.SetScale(0.25f);
+		jointDebugRender.SetScale(0.5f);
 
 		RenderJointsDebugInfo(m_world, &jointDebugRender);
 	}

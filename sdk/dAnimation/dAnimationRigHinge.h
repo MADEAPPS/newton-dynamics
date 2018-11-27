@@ -21,13 +21,14 @@ class dAnimationRigHinge: public dAnimationRigLimb, public dCustomHinge
 	dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body);
 	virtual ~dAnimationRigHinge();
 
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-
-	virtual void UpdateJointAcceleration();
-	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
-
 	void *operator new (size_t size) {return dAnimationRigJoint::Alloc(size);}
 	void operator delete (void* ptr) {dAnimationRigJoint::Free(ptr);}
+
+	protected:
+	void Debug(dDebugDisplay* const debugDisplay) const;
+	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	virtual void UpdateJointAcceleration();
+	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 
 	dComplementaritySolver::dJacobian m_jacobial01;
 	dComplementaritySolver::dJacobian m_jacobial10;
