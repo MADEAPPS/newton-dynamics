@@ -848,66 +848,66 @@ void dScene::FreezeGeometryPivot ()
 {
 	dScene::dTreeNode* const geometryCache = FindGetGeometryCacheNode ();
 
-	dList<dScene::dTreeNode*> nodeList;
-	for (void* link = GetFirstChildLink(geometryCache); link; link = GetNextChildLink(geometryCache, link)) {
-		dScene::dTreeNode* const meshNode = GetNodeFromLink(link);
-		nodeList.Addtop(meshNode);
-	}
+	if (geometryCache) {
+		dList<dScene::dTreeNode*> nodeList;
+		for (void* link = GetFirstChildLink(geometryCache); link; link = GetNextChildLink(geometryCache, link)) {
+			dScene::dTreeNode* const meshNode = GetNodeFromLink(link);
+			nodeList.Addtop(meshNode);
+		}
 
-	dList<dScene::dTreeNode*>::dListNode* nextLink; 
-	for (dList<dScene::dTreeNode*>::dListNode* link = nodeList.GetFirst(); link; link = nextLink) {
-		nextLink = link->GetNext();
+		dList<dScene::dTreeNode*>::dListNode* nextLink; 
+		for (dList<dScene::dTreeNode*>::dListNode* link = nodeList.GetFirst(); link; link = nextLink) {
+			nextLink = link->GetNext();
 
-		dScene::dTreeNode* const meshNode = GetNodeFromLink(link);
-		dMeshNodeInfo* meshInfo = (dMeshNodeInfo*)GetInfoFromNode(meshNode);
-		if (meshInfo->IsType(dMeshNodeInfo::GetRttiType())) {
-			int parentCount = 0;
-			dScene::dTreeNode* sceneNodeParent = NULL;
-			for (void* meshParentlink = GetFirstParentLink(meshNode); meshParentlink; meshParentlink = GetNextParentLink(meshNode, meshParentlink)) {
-				dScene::dTreeNode* const parentNode = GetNodeFromLink(meshParentlink);
-				dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(parentNode);
-				if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
-					parentCount ++;
-					if (!sceneNodeParent) {
-						sceneNodeParent = parentNode;
+			dScene::dTreeNode* const meshNode = GetNodeFromLink(link);
+			dMeshNodeInfo* meshInfo = (dMeshNodeInfo*)GetInfoFromNode(meshNode);
+			if (meshInfo->IsType(dMeshNodeInfo::GetRttiType())) {
+				int parentCount = 0;
+				dScene::dTreeNode* sceneNodeParent = NULL;
+				for (void* meshParentlink = GetFirstParentLink(meshNode); meshParentlink; meshParentlink = GetNextParentLink(meshNode, meshParentlink)) {
+					dScene::dTreeNode* const parentNode = GetNodeFromLink(meshParentlink);
+					dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(parentNode);
+					if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+						parentCount++;
+						if (!sceneNodeParent) {
+							sceneNodeParent = parentNode;
+						}
 					}
 				}
-			}
 
-			if (parentCount > 1) {
+				if (parentCount > 1) {
 
-				dScene::dTreeNode* const meshNodeCopy = CreateMeshNode (sceneNodeParent);
-				for (void* matLinks = GetFirstChildLink(meshNode); matLinks; matLinks = GetNextChildLink(meshNode, matLinks)) {
-					dScene::dTreeNode* const matNode = GetNodeFromLink(matLinks);
-					AddReference(meshNodeCopy, matNode);
+					dScene::dTreeNode* const meshNodeCopy = CreateMeshNode(sceneNodeParent);
+					for (void* matLinks = GetFirstChildLink(meshNode); matLinks; matLinks = GetNextChildLink(meshNode, matLinks)) {
+						dScene::dTreeNode* const matNode = GetNodeFromLink(matLinks);
+						AddReference(meshNodeCopy, matNode);
+					}
+
+					dMeshNodeInfo* const meshInfoCopy = (dMeshNodeInfo*)CloneNodeInfo(meshNode);
+					dString name(dString(meshInfo->GetName()) + dString("_clone"));
+					meshInfoCopy->SetName(name.GetStr());
+					SetNodeInfo(meshInfoCopy, meshNodeCopy);
+					meshInfoCopy->Release();
+					RemoveReference(meshNode, sceneNodeParent);
+
+					meshInfo = meshInfoCopy;
+					nextLink = link;
 				}
 
-				dMeshNodeInfo* const meshInfoCopy = (dMeshNodeInfo*) CloneNodeInfo (meshNode);
-				dString name (dString (meshInfo->GetName()) + dString ("_clone"));
-				meshInfoCopy->SetName(name.GetStr());
-				SetNodeInfo (meshInfoCopy, meshNodeCopy);
-				meshInfoCopy->Release();
-				RemoveReference (meshNode, sceneNodeParent);
+				dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNodeParent);
 
-				meshInfo = meshInfoCopy;
-				nextLink = link;
+				dMatrix geoScaleMatrix(sceneInfo->GetGeometryTransform());
+				sceneInfo->SetGeometryTransform(dGetIdentityMatrix());
+
+				dMatrix meshPivotMatrix(meshInfo->GetPivotMatrix());
+				meshInfo->SetPivotMatrix(dGetIdentityMatrix());
+
+				dMatrix marix(meshPivotMatrix * geoScaleMatrix);
+				meshInfo->BakeTransform(marix);
 			}
-
-			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNodeParent);
-
-			dMatrix geoScaleMatrix (sceneInfo->GetGeometryTransform());
-			sceneInfo->SetGeometryTransform(dGetIdentityMatrix());
-
-			dMatrix meshPivotMatrix (meshInfo->GetPivotMatrix());
-			meshInfo->SetPivotMatrix (dGetIdentityMatrix());
-
-			dMatrix marix (meshPivotMatrix * geoScaleMatrix);
-			meshInfo->BakeTransform (marix);
 		}
 	}
 }
-
-
 
 void dScene::BakeTransform (const dMatrix& matrix)
 {

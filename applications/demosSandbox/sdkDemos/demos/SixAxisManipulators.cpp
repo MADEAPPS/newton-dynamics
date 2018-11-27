@@ -36,7 +36,7 @@ static dArmRobotConfig armRobotConfig[] =
 	{ "effector_arm", 1000.0f, 0.0f, 0.0f}
 };
 
-#if 0
+#if 1
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -200,10 +200,10 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);	
 
 		dMatrix boneAligmentMatrix(
-			dVector(0.0f, 1.0f, 0.0f, 0.0f),
-			dVector(1.0f, 0.0f, 0.0f, 0.0f),
-			dVector(0.0f, 0.0f, -1.0f, 0.0f),
-			dVector(0.0f, 0.0f, 0.0f, 1.0f));
+			dVector( 0.0f, 1.0f, 0.0f, 0.0f),
+			dVector(-1.0f, 0.0f, 0.0f, 0.0f),
+			dVector( 0.0f, 0.0f, 1.0f, 0.0f),
+			dVector( 0.0f, 0.0f, 0.0f, 1.0f));
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
@@ -567,7 +567,6 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		return body;
 	}
 
-
 	dAnimationCharacterRig* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
@@ -575,7 +574,8 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 		model->ResetMatrix(*scene, origin);
 
 		NewtonBody* const rootBody = CreateBodyPart(model, armRobotConfig[0]);
-NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+
 		dAnimationCharacterRig* const rig = CreateCharacterRig (rootBody);
 
 		int stackIndex = 0;
@@ -588,10 +588,10 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		}
 
 		dMatrix boneAligmentMatrix(
-			dVector(0.0f, 1.0f, 0.0f, 0.0f),
-			dVector(1.0f, 0.0f, 0.0f, 0.0f),
-			dVector(0.0f, 0.0f, -1.0f, 0.0f),
-			dVector(0.0f, 0.0f, 0.0f, 1.0f));
+			dVector( 0.0f, 1.0f, 0.0f, 0.0f),
+			dVector(-1.0f, 0.0f, 0.0f, 0.0f),
+			dVector( 0.0f, 0.0f, 1.0f, 0.0f),
+			dVector( 0.0f, 0.0f, 0.0f, 1.0f));
 
 		const int partCount = sizeof(armRobotConfig) / sizeof(armRobotConfig[0]);
 		while (stackIndex) {

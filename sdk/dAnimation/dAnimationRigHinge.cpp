@@ -18,7 +18,15 @@ dAnimationRigHinge::dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRig
 	,dCustomHinge (basicMatrix, body, parent->GetNewtonBody())
 	,m_rowAccel(0.0f)
 {
-//	EnableMotor(true, 0.0f);
+/*
+	dMatrix boneAligmentMatrix(
+		dVector(0.0f, 0.0f, 1.0f, 0.0f),
+		dVector(1.0f, 0.0f, 0.0f, 0.0f),
+		dVector(0.0f, 1.0f, 0.0f, 0.0f),
+		dVector(0.0f, 0.0f, 0.0f, 1.0f));
+	dMatrix matrix (boneAligmentMatrix * basicMatrix);
+	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
+*/
 	EnableLimits(true);
 }
 
