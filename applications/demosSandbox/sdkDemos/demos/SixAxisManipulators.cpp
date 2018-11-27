@@ -36,7 +36,7 @@ static dArmRobotConfig armRobotConfig[] =
 	{ "effector_arm", 1000.0f, 0.0f, 0.0f}
 };
 
-#if 1
+#if 0
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -200,10 +200,10 @@ class dSixAxisController: public dCustomControllerBase
 		NewtonBodySetMassMatrix(baseFrameBody, 0.0f, 0.0f, 0.0f, 0.0f);	
 
 		dMatrix boneAligmentMatrix(
-			dVector( 0.0f, 1.0f, 0.0f, 0.0f),
-			dVector(-1.0f, 0.0f, 0.0f, 0.0f),
-			dVector( 0.0f, 0.0f, 1.0f, 0.0f),
-			dVector( 0.0f, 0.0f, 0.0f, 1.0f));
+			dVector(0.0f, 1.0f, 0.0f, 0.0f),
+			dVector(0.0f, 0.0f, 1.0f, 0.0f),
+			dVector(1.0f, 0.0f, 0.0f, 0.0f),
+			dVector(0.0f, 0.0f, 0.0f, 1.0f));
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
@@ -587,12 +587,6 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 			stackIndex++;
 		}
 
-		dMatrix boneAligmentMatrix(
-			dVector( 0.0f, 1.0f, 0.0f, 0.0f),
-			dVector(-1.0f, 0.0f, 0.0f, 0.0f),
-			dVector( 0.0f, 0.0f, 1.0f, 0.0f),
-			dVector( 0.0f, 0.0f, 0.0f, 1.0f));
-
 		const int partCount = sizeof(armRobotConfig) / sizeof(armRobotConfig[0]);
 		while (stackIndex) {
 			stackIndex--;
@@ -609,7 +603,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 
 						dMatrix matrix;
 						NewtonBodyGetMatrix(limbBody, &matrix[0][0]);
-						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(boneAligmentMatrix * matrix, parentJoint, limbBody);
+						dAnimationRigHinge* const limbJoint = new dAnimationRigHinge(matrix, parentJoint, limbBody);
 
 						limbJoint->SetFriction(armRobotConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
 						limbJoint->SetLimits(armRobotConfig[i].m_minLimit * dDegreeToRad, armRobotConfig[i].m_maxLimit * dDegreeToRad);

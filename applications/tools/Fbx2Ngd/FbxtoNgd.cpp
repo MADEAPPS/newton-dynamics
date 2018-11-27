@@ -392,6 +392,15 @@ static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, Glob
 
 		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
 
+dVector euler1;
+dVector euler2;
+dVector scale;
+dMatrix stretchAxis;
+localMatrix.PolarDecomposition(localMatrix, scale, stretchAxis);
+localMatrix.GetEulerAngles(euler1, euler2);
+euler1 = euler1.Scale(dRadToDegree);
+euler2 = euler2.Scale(dRadToDegree);
+
 		info->SetName(data.m_fbxNode->GetName());
 		info->SetTransform(localMatrix);
 

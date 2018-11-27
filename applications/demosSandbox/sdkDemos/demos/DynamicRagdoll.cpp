@@ -858,10 +858,6 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 	dAnimationCharacterRig* CreateRagDoll(DemoEntityManager* const scene, const dMatrix& origin)
 	{
-//DemoEntity* const model1 = DemoEntity::LoadNGD_mesh("xxxx.ngd", scene->GetNewton());
-//dMatrix modelMatrix1(model1->GetCurrentMatrix());
-
-
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
 		scene->Append(model);
 
@@ -957,7 +953,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-	//origin = dGetIdentityMatrix();
+	origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 	origin.m_posit.m_y = 2.1f;
 	for (int i = 0; i < count; i++) {

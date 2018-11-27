@@ -62,10 +62,10 @@
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// servo joints
 //#define DEFAULT_SCENE	30			// articulated joints
-#define DEFAULT_SCENE	31			// six axis manipulator
+//#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
-//#define DEFAULT_SCENE	34			// dynamic rag doll
+#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
 //#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// David Gravel multi body car
@@ -1447,7 +1447,7 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		jointDebugRender.SetScale(0.5f);
+		jointDebugRender.SetScale(0.25f);
 
 		RenderJointsDebugInfo(m_world, &jointDebugRender);
 	}
