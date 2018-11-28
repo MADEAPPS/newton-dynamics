@@ -471,7 +471,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add a differential 
 		dVehicleDifferentialInterface* const differential = vehicle->AddDifferential(rearLeft, rearRight);
-/*
+
 		// add and internal combustion engine
 		dVehicleEngineInterface::dEngineInfo engineInfo;
 		engineInfo.m_mass = 50.0f;
@@ -501,7 +501,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// Set Engine Control
 		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
 		engineControl->SetEngine(engine);
-*/
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
 		
