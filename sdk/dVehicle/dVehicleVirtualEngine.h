@@ -42,7 +42,7 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 
 		dFloat GetTorque (dFloat rpm) const;
 
-		dEngineTorqueNode m_torqueCurve[6];
+		dEngineTorqueNode m_torqueCurve[5];
 	};
 	public:
 

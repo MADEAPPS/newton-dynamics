@@ -895,7 +895,6 @@ void dAnimationAcyclicSolver::SolveAuxiliary(dVectorPair* const force, const dVe
 			dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[first + index];
 
 			f[auxiliaryIndex + primaryCount] = rhs->m_force;
-			//b[auxiliaryIndex] = dFloat(accelSpatial[primaryDof + j]);
 			b[auxiliaryIndex] = -dFloat(accelSpatial[primaryDof + j]);
 
 			dAssert(rhs->m_force >= rhs->m_jointLowFriction * dFloat(2.0f));
@@ -1163,7 +1162,7 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 		dTrace (("%f ", u[i]));
 	}
 	dTrace (("\n"));
-/*
+
 	for (int i = 0; i < rows; i++) {
 		dTrace(("%f ", b[i]));
 	}
@@ -1176,7 +1175,6 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 		}
 		dTrace (("\n"));
 	}
-*/
 }
 
 void dAnimationAcyclicSolver::Update(dFloat timestep)
@@ -1199,14 +1197,14 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		dAssert (loop->IsActive());
 		loopDof += loop->GetMaxDof();
 		dAnimationAcyclicJoint* const node0 = loop->GetOwner0();
+		dAnimationAcyclicJoint* const node1 = loop->GetOwner1();
+
 		if (node0->IsLoopNode() && (node0->GetIndex() == -1)) {
 			node0->SetIndex(m_loopNodeCount + m_nodeCount);
 			m_nodesOrder[m_nodeCount + m_loopNodeCount] = node0;
 			dAssert ((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
 			m_loopNodeCount ++;
 		}
-
-		dAnimationAcyclicJoint* const node1 = loop->GetOwner1();
 		if (node1->IsLoopNode() && (node1->GetIndex() == -1)) {
 			node1->SetIndex(m_loopNodeCount + m_nodeCount);
 			m_nodesOrder[m_nodeCount + m_loopNodeCount] = node1;
@@ -1237,7 +1235,7 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		InitLoopMassMatrix();
 	}
 
-//DebugMassMatrix();
+DebugMassMatrix();
 
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const accel = dAlloca(dVectorPair, m_nodeCount);

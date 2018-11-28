@@ -868,6 +868,22 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 	dAnimationCharacterRig* CreateRagDoll(DemoEntityManager* const scene, const dMatrix& origin)
 	{
+
+DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("tred_1.ngd", scene->GetNewton());
+DemoEntity* const xxxx1 = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
+scene->Append(xxxx0);
+scene->Append(xxxx1);
+
+dMatrix matrix0(xxxx0->GetCurrentMatrix());
+matrix0.m_posit.m_z += 2.0f;
+xxxx0->ResetMatrix(*scene, matrix0);
+
+dMatrix matrix1(xxxx1->GetCurrentMatrix());
+matrix1.m_posit.m_z -= 2.0f;
+xxxx1->ResetMatrix(*scene, matrix1);
+
+
+
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
 		scene->Append(model);
 

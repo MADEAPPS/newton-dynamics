@@ -443,13 +443,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
-		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
+//		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
+//		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
-
+/*
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
@@ -461,7 +461,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		handBrakeControl->AddTire(rearLeft);
 		handBrakeControl->AddTire(rearRight);
 
-
 		// add vehicle brake control 
 		dVehicleBrakeControl* const brakeControl = vehicle->GetBrakeControl();
 		brakeControl->SetBrakeTorque(1000.0f);
@@ -469,11 +468,10 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(frontRight);
 		brakeControl->AddTire(rearLeft);
 		brakeControl->AddTire(rearRight);
-
-/*
+*/
 		// add a differential 
 		dVehicleDifferentialInterface* const differential = vehicle->AddDifferential(rearLeft, rearRight);
-
+/*
 		// add and internal combustion engine
 		dVehicleEngineInterface::dEngineInfo engineInfo;
 		engineInfo.m_mass = 50.0f;
@@ -563,8 +561,8 @@ axisCount = 0;
 			//dTrace (("%d %d %d\n", gear, ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 */
 		} else {
-			//driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
-			driverInput.m_throttle = scene->GetKeyState('W') ? 0.5f : 0.0f;
+			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
+			//driverInput.m_throttle = scene->GetKeyState('W') ? 0.5f : 0.0f;
 			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
@@ -579,7 +577,7 @@ axisCount = 0;
 
 		//xxxxxx
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
@@ -616,18 +614,6 @@ void SingleBodyCar(DemoEntityManager* const scene)
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
 
-DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("tred_1.ngd", scene->GetNewton());
-DemoEntity* const xxxx1 = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
-scene->Append(xxxx0);
-scene->Append(xxxx1);
-
-dMatrix matrix0(xxxx0->GetCurrentMatrix());
-matrix0.m_posit.m_z += 2.0f;
-xxxx0->ResetMatrix(*scene, matrix0);
-
-dMatrix matrix1(xxxx1->GetCurrentMatrix());
-matrix1.m_posit.m_z -= 2.0f;
-xxxx1->ResetMatrix(*scene, matrix1);
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);

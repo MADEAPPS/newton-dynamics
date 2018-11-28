@@ -508,6 +508,7 @@ void dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
 	jacobian0.m_angular = diffMatrix.m_right + diffMatrix.m_up.Scale (m_diffSign);
+jacobian0.m_angular = diffMatrix.m_right;
 
 	const dVector& omega0 = m_state0->GetOmega();
 	const dVector& omega1 = m_state1->GetOmega();

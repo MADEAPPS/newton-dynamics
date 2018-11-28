@@ -46,22 +46,23 @@ dVehicleVirtualEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& i
 dFloat dVehicleVirtualEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 {
 	dAssert(rpm >= -0.1f);
-	const int maxIndex = sizeof (m_torqueCurve) / sizeof (m_torqueCurve[0]) - 1;
+	const int maxIndex = sizeof (m_torqueCurve) / sizeof (m_torqueCurve[0]);
 	rpm = dClamp(rpm, dFloat(0.0f), m_torqueCurve[maxIndex - 1].m_rpm);
 
 	for (int i = 1; i < maxIndex; i++) {
-		if (m_torqueCurve[i].m_rpm >= rpm) {
-			dFloat rpm0 = m_torqueCurve[i - 1].m_rpm;
+		if (rpm <= m_torqueCurve[i].m_rpm) {
 			dFloat rpm1 = m_torqueCurve[i].m_rpm;
+			dFloat rpm0 = m_torqueCurve[i - 1].m_rpm;
 
-			dFloat torque0 = m_torqueCurve[i - 1].m_torque;
 			dFloat torque1 = m_torqueCurve[i].m_torque;
+			dFloat torque0 = m_torqueCurve[i - 1].m_torque;
+
 			dFloat torque = torque0 + (rpm - rpm0) * (torque1 - torque0) / (rpm1 - rpm0);
 			return torque;
 		}
 	}
 
-	return m_torqueCurve[maxIndex - 1].m_rpm;
+	return m_torqueCurve[maxIndex - 1].m_torque;
 }
 
 dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const dEngineInfo& info, dVehicleDifferentialInterface* const differential)
@@ -88,13 +89,7 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 
 	m_crankJoint.Init(&m_body, chassis->m_groundNode.GetBody());
 	m_crankJoint.SetOwners(this, &chassis->m_groundNode);
-/*
-	m_leftDifferential.Init(&m_body, m_leftTire->GetBody());
-	m_rightDifferential.Init(&m_body, m_rightTire->GetBody());
 
-	m_leftDifferential.SetOwners(this, m_leftTire);
-	m_rightDifferential.SetOwners(this, m_rightTire);
-*/
 	SetInfo(info);
 }
 
@@ -111,7 +106,6 @@ void dVehicleVirtualEngine::InitEngineTorqueCurve()
 	m_metricInfo.m_torqueCurve[2] = dEngineTorqueNode(m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_peakTorque);
 	m_metricInfo.m_torqueCurve[3] = dEngineTorqueNode(m_metricInfo.m_rpmAtPeakHorsePower, m_metricInfo.m_peakPowerTorque);
 	m_metricInfo.m_torqueCurve[4] = dEngineTorqueNode(m_metricInfo.m_rpmAtRedLine, m_metricInfo.m_idleTorque);
-	m_metricInfo.m_torqueCurve[5] = dEngineTorqueNode(m_metricInfo.m_rpmAtRedLine, m_metricInfo.m_idleTorque);
 }
 
 void dVehicleVirtualEngine::SetInfo(const dEngineInfo& info)
@@ -166,7 +160,9 @@ int dVehicleVirtualEngine::GetKinematicLoops(dAnimationKinematicLoopJoint** cons
 {
 	jointArray[0] = &m_crankJoint;
 	jointArray[1] = &m_gearBox;
-	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[2]) + 2;
+
+	int count = 2;
+	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[count]) + count;
 }
 
 void dVehicleVirtualEngine::ApplyExternalForce(dFloat timestep)

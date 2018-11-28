@@ -66,6 +66,7 @@ int dVehicleVirtualDifferential::GetKinematicLoops(dAnimationKinematicLoopJoint*
 	jointArray[0] = &m_leftAxle;
 	jointArray[1] = &m_rightAxle;
 	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[2]) + 2;
+//return dVehicleDifferentialInterface::GetKinematicLoops(jointArray);
 }
 
 void dVehicleVirtualDifferential::ApplyExternalForce(dFloat timestep)
