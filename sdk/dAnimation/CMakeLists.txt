@@ -36,8 +36,8 @@ if (MSVC)
     add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
 
     add_library(${projectName} STATIC ${CPP_SOURCE})
-	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudAnimationStdAfx.h")
-	set_source_files_properties(dAnimationStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdAnimationStdAfx.h")
+    set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudAnimationStdAfx.h")
+    set_source_files_properties(dAnimationStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdAnimationStdAfx.h")
 endif(MSVC)
 
 install(TARGETS ${projectName}
