@@ -443,13 +443,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-//		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
-//		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
+		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
+		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
-/*
+
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
@@ -468,7 +468,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(frontRight);
 		brakeControl->AddTire(rearLeft);
 		brakeControl->AddTire(rearRight);
-*/
+
 		// add a differential 
 		dVehicleDifferentialInterface* const differential = vehicle->AddDifferential(rearLeft, rearRight);
 /*

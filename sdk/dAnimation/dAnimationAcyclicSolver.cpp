@@ -405,7 +405,7 @@ void dAnimationAcyclicSolver::CalculateLoopMassMatrixCoefficients(dFloat* const 
 				acc += J10invM1.m_linear * row_j->m_jacobian_J01.m_linear + J10invM1.m_angular * row_j->m_jacobian_J01.m_angular;
 			} else if (m1_i == m0_j) {
 				hasEffect = true;
-				acc += J10invM1.m_linear * row_j->m_jacobian_J10.m_linear + J10invM1.m_angular * row_j->m_jacobian_J10.m_angular;
+				acc += J10invM1.m_linear * row_j->m_jacobian_J01.m_linear + J10invM1.m_angular * row_j->m_jacobian_J01.m_angular;
 			}
 
 			if (hasEffect) {
@@ -1235,7 +1235,7 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		InitLoopMassMatrix();
 	}
 
-DebugMassMatrix();
+//DebugMassMatrix();
 
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const accel = dAlloca(dVectorPair, m_nodeCount);
