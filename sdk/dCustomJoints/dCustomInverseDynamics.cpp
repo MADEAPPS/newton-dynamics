@@ -647,9 +647,6 @@ void dCustomInverseDynamicsEffector::SubmitConstraints(dFloat timestep, int thre
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
 	NewtonBodyGetPointVelocity(m_referenceBody, &m_targetMatrix.m_posit[0], &veloc1[0]);
 
-//m_targetMatrix.m_posit.m_z = 0.45;
-//m_targetMatrix.m_posit.m_y = 0.7;
-
 	dVector relVeloc(veloc1 - veloc0);
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
 

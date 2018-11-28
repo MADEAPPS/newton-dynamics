@@ -24,7 +24,7 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	~dAnimationCharacterRig ();
 	
 	NewtonBody* GetNewtonBody() const;
-	void Finalize();
+	virtual void Finalize();
 
 	protected:
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
@@ -36,7 +36,6 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 
 	dAnimationAcyclicJoint m_staticWorld;
 	dAnimationAcyclicSolver m_solver;
-	
 
 	friend class dAnimationRigEffector;
 	friend class dAnimationCharacterRigManager;

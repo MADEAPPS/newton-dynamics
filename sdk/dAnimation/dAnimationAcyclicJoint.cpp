@@ -75,3 +75,10 @@ void dAnimationAcyclicJoint::UpdateJointAcceleration()
 		child->GetInfo()->UpdateJointAcceleration();
 	}
 }
+
+void dAnimationAcyclicJoint::Finalize()
+{
+	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		child->GetInfo()->Finalize();
+	}
+}

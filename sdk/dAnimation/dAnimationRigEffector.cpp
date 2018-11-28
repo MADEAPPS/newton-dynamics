@@ -18,6 +18,8 @@
 dAnimationRigEffector::dAnimationRigEffector(dAnimationRigLimb* const parent, const dMatrix& matrix)
 	:dAnimationKinematicLoopJoint()
 	,m_targetMatrix(matrix)
+	,m_parent(parent)
+	,m_referenceBody(NULL)
 	,m_linearSpeed(1.0f)
 	,m_linearFriction(10000.0f)
 {
@@ -58,11 +60,23 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	dVector veloc0 (m_state0->CalculatePointVelocity(matrix0.m_posit));
 	dVector veloc1 (m_state1->CalculatePointVelocity(matrix1.m_posit));
 
-//m_targetMatrix.m_posit.m_z = 0.45;
-//m_targetMatrix.m_posit.m_y = 0.7;
+int xxxxxxxxxxxx = 3;
+if (xxxxx == xxxxxxxxxxxx) {
+	m_targetMatrix.m_posit.m_y = 1.7f;
+	m_targetMatrix.m_posit.m_z = 0.7f;
+}
 
 	dVector relVeloc(veloc1 - veloc0);
 	dVector relPosit(m_targetMatrix.m_posit - matrix0.m_posit);
+
+if (xxxxx == xxxxxxxxxxxx) {
+dTrace(("%d ", xxxxx));
+dTrace(("p10(%f %f %f) ", relPosit.m_x, relPosit.m_y, relPosit.m_z));
+dTrace(("p0(%f %f %f) ", matrix0.m_posit.m_x, matrix0.m_posit.m_y, matrix0.m_posit.m_z));
+dTrace(("p1(%f %f %f) ", m_targetMatrix.m_posit.m_x, m_targetMatrix.m_posit.m_y, m_targetMatrix.m_posit.m_z));
+//dTrace(("p(%f %f %f) ", relPosit.m_x, relPosit.m_y, relPosit.m_z));
+dTrace(("\n"));
+}
 
 	const dFloat damp = 0.3f;
 	const dFloat invTimestep = constraintParams->m_timestepInv;
@@ -83,8 +97,4 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	m_dof = 3;
 	m_count = 3;
 	constraintParams->m_count = 3;
-
-//m_dof = 1;
-//m_count = 1;
-//constraintParams->m_count = 1;
 }

@@ -191,6 +191,8 @@ class dComplementaritySolver
 		int m_count;
 		int m_dof;
 
+		int xxxxx;
+
 		friend class dBodyState;
 		friend class dComplementaritySolver;
 	};

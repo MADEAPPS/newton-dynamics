@@ -29,9 +29,12 @@ class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 
 	void SetLinearSpeed(dFloat speed);
 	void SetMaxLinearFriction(dFloat friction);
+	dAnimationRigLimb* GetParent() const { return m_parent;}
 
 	dMatrix m_targetMatrix;
 	dMatrix m_pivotLocalMatrix;
+	dAnimationRigLimb* m_parent;
+	NewtonBody* m_referenceBody;
 	dFloat m_linearSpeed;
 	dFloat m_linearFriction;
 };

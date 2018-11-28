@@ -41,6 +41,7 @@ void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugConte
 
 void dAnimationCharacterRig::Finalize()
 {
+	dAnimationRigJoint::Finalize();
 	m_solver.Finalize(this);
 }
 
@@ -48,7 +49,6 @@ NewtonBody* dAnimationCharacterRig::GetNewtonBody() const
 {
 	return dCustomControllerBase::GetBody();
 }
-
 
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 {

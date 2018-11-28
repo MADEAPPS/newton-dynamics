@@ -725,18 +725,19 @@ static dRagDollConfig ragDollConfig[] =
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 50.0f },
 	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
 	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 100.0f },
-
 //	{ "bone_rightAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "effector_rightAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
 
 //	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 50.0f },
 //	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-//	{ "bone_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
-//	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftLeg", 0.0f, -90.0f, 45.0f, 100.0f },
+//	{ "bone_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
+//	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
 
-
-//	{ "effector_arm", 1000.0f, 0.0f, 0.0f }
 };
 
 

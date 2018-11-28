@@ -27,6 +27,7 @@ class dAnimationRigJoint: public dAnimationAcyclicJoint
 
 	dAnimationCharacterRig* GetRoot() {return m_root;}
 	virtual NewtonBody* GetNewtonBody() const {return NULL;}
+	virtual dAnimationRigJoint* GetAsRigJoint() { return this; }
 
 	virtual void Init(NewtonBody* const body);
 
@@ -34,7 +35,7 @@ class dAnimationRigJoint: public dAnimationAcyclicJoint
 	void RigidBodyToStates();
 	void ApplyExternalForce(dFloat timestep) {}
 	void UpdateLocalTransforms (dAnimationCharacterRigManager* const manager) const;
-	virtual dAnimationRigJoint* GetAsRigJoint() {return this;}
+	
 	
 	dAnimationCharacterRig* m_root;
 	//static dMatrix m_boneConvertionMatrix;

@@ -38,6 +38,23 @@ NewtonBody* dAnimationRigLimb::GetNewtonBody() const
 	return m_newtonBody; 
 }
 
+void dAnimationRigLimb::Finalize()
+{
+	if (m_effector) {
+		m_effector->m_referenceBody = NULL;
+		for (dAnimationRigLimb* parentLimb = GetParent()->GetAsRigLimb(); parentLimb; parentLimb = parentLimb->GetParent()->GetAsRigLimb()) {
+			if (parentLimb->m_effector) {
+				m_effector->m_referenceBody = parentLimb->GetNewtonBody();
+				break;
+			}
+		}
+		if (!m_effector->m_referenceBody) {
+			m_effector->m_referenceBody = GetRoot()->GetNewtonBody();
+		}
+	}
+
+	dAnimationRigJoint::Finalize();
+}
 
 int dAnimationRigLimb::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
 {
@@ -49,3 +66,4 @@ int dAnimationRigLimb::GetKinematicLoops(dAnimationKinematicLoopJoint** const jo
 	}
 	return dAnimationRigJoint::GetKinematicLoops(&jointArray[count]) + count;
 }
+
