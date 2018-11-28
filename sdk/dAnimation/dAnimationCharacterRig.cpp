@@ -17,6 +17,7 @@
 dAnimationCharacterRig::dAnimationCharacterRig ()
 	:dCustomControllerBase()
 	,dAnimationRigJoint(NULL)
+	,m_localFrame(dGetIdentityMatrix())
 	,m_staticWorld(NULL)
 	,m_solver()
 {
@@ -28,10 +29,14 @@ dAnimationCharacterRig::~dAnimationCharacterRig ()
 {
 }
 
-void dAnimationCharacterRig::Init(NewtonBody* const body)
+void dAnimationCharacterRig::Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace)
 {
 	dCustomControllerBase::m_body = body;
 	dAnimationRigJoint::Init(body);
+
+	dMatrix matrix;
+	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	m_localFrame = localFrameInGlobalSpace * matrix.Inverse();
 }
 
 void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const

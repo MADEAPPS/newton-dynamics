@@ -26,7 +26,7 @@ class dAnimationCharacterRigManager: public dCustomControllerManager<dAnimationC
 	dAnimationCharacterRigManager(NewtonWorld* const world);
 	virtual ~dAnimationCharacterRigManager();
 
-	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonBody* const body);
+	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame);
 	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 
 	virtual void DestroyController(dAnimationCharacterRig* const controller);

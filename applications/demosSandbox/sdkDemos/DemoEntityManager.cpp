@@ -65,9 +65,9 @@
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
-//#define DEFAULT_SCENE	34			// dynamic rag doll
+#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
-#define DEFAULT_SCENE	36			// single body vehicle
+//#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// David Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles

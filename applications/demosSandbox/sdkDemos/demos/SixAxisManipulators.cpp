@@ -575,7 +575,9 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 
 		NewtonBody* const rootBody = CreateBodyPart(model, armRobotConfig[0]);
 		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
-
+dAssert(0);
+return NULL;
+/*
 		dAnimationCharacterRig* const rig = CreateCharacterRig (rootBody);
 
 		int stackIndex = 0;
@@ -627,6 +629,7 @@ class dSixAxisManager: public dAnimationCharacterRigManager
 
 		rig->Finalize();
 		return rig;
+*/
 	}
 
 	void OnUpdateTransform (const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const

@@ -293,11 +293,11 @@ bool dCholeskyFactorization(int size, T* const matrix)
 			if (i == j) {
 				T diag = rowN[i] - s;
 				if (diag < T(dFloat(0.0f))) {
-					// hack to prevent explosions when round error make the diagonal a small negative value
-					if (diag < T(dFloat(1.0e-5f))) {
-						dAssert(0);
+					if (diag < T(dFloat(1.0e-3f))) {
+						// the system is ill formed
 						return false;
 					}
+					// allow for some minor rounding error 
 					diag = dFloat(1.0e-12f);
 				}
 

@@ -22,10 +22,10 @@ dAnimationCharacterRigManager::~dAnimationCharacterRigManager()
 {
 }
 
-dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonBody* const body)
+dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame)
 {
 	dAnimationCharacterRig* const rig = CreateController();
-	rig->Init(body);
+	rig->Init(body, localFrame);
 	return rig;
 }
 

@@ -103,8 +103,6 @@ void dAnimationRigJoint::RigidBodyToStates()
 	NewtonBodyGetOmega(newtonBody, &vector[0]);
 	body->SetOmega(vector);
 
-	//NewtonBodyGetForce(newtonBody, &vector[0]);
-	//NewtonBodyGetTorque(newtonBody, &vector[0]);
 	body->SetForce(dVector (0.0f));
 	body->SetTorque(dVector (0.0f));
 

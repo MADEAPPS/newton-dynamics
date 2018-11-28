@@ -875,14 +875,14 @@ scene->Append(xxxx0);
 scene->Append(xxxx1);
 
 dMatrix matrix0(xxxx0->GetCurrentMatrix());
+matrix0.m_posit.m_x += 5.0f;
 matrix0.m_posit.m_z += 2.0f;
 xxxx0->ResetMatrix(*scene, matrix0);
 
 dMatrix matrix1(xxxx1->GetCurrentMatrix());
+matrix1.m_posit.m_x += 5.0f;
 matrix1.m_posit.m_z -= 2.0f;
 xxxx1->ResetMatrix(*scene, matrix1);
-
-
 
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
 		scene->Append(model);
@@ -895,7 +895,10 @@ xxxx1->ResetMatrix(*scene, matrix1);
 
 		NewtonBody* const rootBody = CreateBodyPart(model, ragDollConfig[0]);
 NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
-		dAnimationCharacterRig* const rig = CreateCharacterRig(rootBody);
+		DemoEntity* const localFrame = model->Find("rootLocalFrame");
+		dAssert(localFrame);
+		dMatrix localFrameMatrix(localFrame->CalculateGlobalMatrix());
+		dAnimationCharacterRig* const rig = CreateCharacterRig(rootBody, localFrameMatrix);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
@@ -977,7 +980,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-	//origin = dGetIdentityMatrix();
+//origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;

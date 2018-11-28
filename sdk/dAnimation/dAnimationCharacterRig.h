@@ -27,13 +27,14 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	virtual void Finalize();
 
 	protected:
+	virtual void Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace);
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-	virtual void Init(NewtonBody* const body);
 	
 	dAnimationAcyclicJoint* GetStaticWorld() {return &m_staticWorld;}
 
+	dMatrix m_localFrame;
 	dAnimationAcyclicJoint m_staticWorld;
 	dAnimationAcyclicSolver m_solver;
 
