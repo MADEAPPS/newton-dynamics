@@ -857,7 +857,7 @@ void dCustomInverseDynamics::Debug(dDebugDisplay* const debugDisplay) const
 
 	// vis limits
 	const int subdiv = 16;
-	const float radius = debugDisplay->m_debugScale;
+	const dFloat radius = debugDisplay->m_debugScale;
 	dVector arch[subdiv + 1];
 
 	dFloat angleStep = (m_maxTwistAngle - m_minTwistAngle) / subdiv;
