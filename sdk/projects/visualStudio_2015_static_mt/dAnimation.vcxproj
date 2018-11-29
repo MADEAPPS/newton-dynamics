@@ -37,13 +37,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\dAnimation\dAnimationAcyclicJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationAcyclicSolver.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationCharacterRig.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationCharacterRigManager.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationClip.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendPose.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationKinematicLoopJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationNode.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationPlayer.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigEffector.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigHinge.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigJoint.cpp" />
@@ -62,13 +61,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\dAnimation\dAnimationAcyclicJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationAcyclicSolver.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationCharacterRig.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationCharacterRigManager.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationClip.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendPose.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationKinematicLoopJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationNode.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationPlayer.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigEffector.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigHinge.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigJoint.h" />

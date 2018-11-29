@@ -10,16 +10,18 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationNode.h"
+#include "dAnimationEffectorBlendPose.h"
 
-/*
-D_DEFINE_ANIMATION_NODE_DECLARE(dAnimationNode)	
-
-dAnimationNode::dAnimationNode(void)
+dAnimationEffectorBlendPose::dAnimationEffectorBlendPose(dAnimationCharacterRig* const character)
+	:dAnimationEffectorBlendNode(character)
 {
 }
 
-dAnimationNode::~dAnimationNode(void)
+dAnimationEffectorBlendPose::~dAnimationEffectorBlendPose()
 {
 }
-*/
+
+void dAnimationEffectorBlendPose::Evaluate(dAnimationPose& output, dFloat timestep)
+{
+	dAssert(0);
+}

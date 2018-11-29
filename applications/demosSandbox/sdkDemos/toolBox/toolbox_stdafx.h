@@ -193,6 +193,9 @@ typedef long long unsigned64;
 #include <dAnimationRigJoint.h>
 #include <dAnimationRigHinge.h>
 #include <dAnimationRigEffector.h>
+#include <dAnimationEffectorBlendNode.h>
+#include <dAnimationEffectorBlendPose.h>
+#include <dAnimationEffectorBlendRoot.h>
 #include <dAnimationCharacterRigManager.h>
 
 /*

@@ -9,29 +9,23 @@
 * freely
 */
 
-#ifndef __dAnimationBlendNode_h__
-#define __dAnimationBlendNode_h__
+#ifndef __D_ANIMATION_EFFECTOR_BLEND_POSE_h__
+#define __D_ANIMATION_EFFECTOR_BLEND_POSE_h__
 
 #include "dAnimationEffectorBlendNode.h"
 
-/*
-class dAnimationBlendNode: public dAnimationNode
+class dAnimationEffectorBlendPose: public dAnimationEffectorBlendNode
 {
 	public:
-	D_DEFINE_ANIMATION_NODE_DEFINE(dAnimationBlendNode, dAnimationNode);
+	dAnimationEffectorBlendPose(dAnimationCharacterRig* const character);
+	virtual ~dAnimationEffectorBlendPose();
 
-	dAnimationBlendNode(void);
-	virtual ~dAnimationBlendNode(void);
-
-	void AddChild(dAnimationNode* const child);
-	void RemoveChild(dAnimationNode* const child);
-
-	virtual void Update (dAnimationTransform* const palette, int transformCount);
+	dAnimationPose& GetPose() { return m_pose; }
+	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
 
 	protected:
-	dList<dAnimationNode*> m_children;
-
+	dAnimationPose m_pose;
 };
-*/
+
 
 #endif
