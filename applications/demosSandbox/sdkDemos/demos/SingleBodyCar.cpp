@@ -575,6 +575,7 @@ axisCount = 0;
 			//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
 		}
 
+		driverInput.m_clutchPedal = 0.0f;
 		//xxxxxx
 #if 0
 	#if 0

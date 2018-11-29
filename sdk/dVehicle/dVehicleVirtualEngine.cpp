@@ -72,6 +72,7 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 	,m_crankJoint()
 	,m_gearBox()
 	,m_omega(0.0f)
+	,m_torque(0.0f)
 {
 	SetWorld(parent->GetWorld());
 
@@ -128,7 +129,7 @@ void dVehicleVirtualEngine::Debug(dCustomJoint::dDebugDisplay* const debugContex
 
 dFloat dVehicleVirtualEngine::GetRpm() const
 {
-	return -m_omega * 9.549f;
+	return m_omega * 9.549f;
 }
 
 dFloat dVehicleVirtualEngine::GetRedLineRpm() const
@@ -138,9 +139,8 @@ dFloat dVehicleVirtualEngine::GetRedLineRpm() const
 
 void dVehicleVirtualEngine::SetThrottle (dFloat throttle)
 {
-	dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
-	dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
-	m_crankJoint.SetTorqueAndRpm(torque, omega);
+	throttle = dClamp(throttle, dFloat(0.1f), dFloat(1.0f));
+	m_torque = m_metricInfo.GetTorque(dAbs(m_omega)) * throttle;
 }
 
 void dVehicleVirtualEngine::SetGear (int gear)
@@ -161,7 +161,7 @@ int dVehicleVirtualEngine::GetKinematicLoops(dAnimationKinematicLoopJoint** cons
 	jointArray[0] = &m_crankJoint;
 	jointArray[1] = &m_gearBox;
 
-	int count = 2;
+int count = 0;
 	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[count]) + count;
 }
 
@@ -176,8 +176,11 @@ void dVehicleVirtualEngine::ApplyExternalForce(dFloat timestep)
 
 	m_body.SetVeloc(chassisBody->GetVelocity());
 	m_body.SetOmega(chassisBody->GetOmega() + matrix.m_right.Scale (m_omega));
-	m_body.SetTorque(dVector(0.0f));
 	m_body.SetForce(chassisNode->m_gravity.Scale(m_body.GetMass()));
+
+	// calculate engine torque
+	dVector torque(matrix.m_right.Scale(m_torque));
+	m_body.SetTorque(torque);
 
 	dVehicleEngineInterface::ApplyExternalForce(timestep);
 }
@@ -196,5 +199,5 @@ void dVehicleVirtualEngine::Integrate(dFloat timestep)
 	dVector localOmega(omega - chassisOmega);
 	m_omega = chassisMatrix.m_right.DotProduct3(localOmega);
 
-//dTrace (("eng(%f)\n", m_omega));
+dTrace (("eng(%f)\n", m_omega));
 }

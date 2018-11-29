@@ -67,13 +67,13 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-	
 
 	dEngineMetricInfo m_metricInfo;
 	dEngineBlockJoint m_blockJoint;
 	dEngineCrankJoint m_crankJoint;
 	dGearBoxJoint m_gearBox;
 	dFloat m_omega;
+	dFloat m_torque;
 	friend class dVehicleChassis;
 };
 

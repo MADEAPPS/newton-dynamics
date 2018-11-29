@@ -396,6 +396,7 @@ void dEngineCrankJoint::SetTorqueAndRpm(dFloat torque, dFloat rpm)
 
 void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
+/*
 	dComplementaritySolver::dBodyState* const engine = m_state0;
 	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
 
@@ -420,6 +421,10 @@ void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* c
 	m_dof = 1;
 	m_count = 1;
 	constraintParams->m_count = 1;
+*/
+	m_dof = 0;
+	m_count = 0;
+	constraintParams->m_count = 0;
 }
 
 // *******************************************************************
