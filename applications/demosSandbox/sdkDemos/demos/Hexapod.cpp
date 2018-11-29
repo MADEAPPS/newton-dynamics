@@ -29,7 +29,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		,m_amplitud_x(0.35f)
 		,m_amplitud_y(0.1f)
 		,m_period (1.0f)
-		,cycle()
+		,m_cycle()
 	{
 		m_sequence[0] = 0;
 		m_sequence[3] = 0;
@@ -66,7 +66,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
 
 //		cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
-		cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
+		m_cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
 	}
 
 	virtual void Evaluate(dEffectorPose& output, dFloat timestep)
@@ -74,8 +74,8 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 		dEffectorTreeFixPose::Evaluate(output, timestep);
 
 		dFloat param = m_acc / m_period;
-		dBigVector left (cycle.CurvePoint(param));
-		dBigVector right (cycle.CurvePoint(dMod (param + 0.5f, 1.0f)));
+		dBigVector left (m_cycle.CurvePoint(param));
+		dBigVector right (m_cycle.CurvePoint(dMod (param + 0.5f, 1.0f)));
 
 		dFloat high[2];
 		dFloat stride[2];
@@ -98,7 +98,7 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	dFloat m_period;
 	dFloat m_amplitud_x;
 	dFloat m_amplitud_y;
-	dBezierSpline cycle;
+	dBezierSpline m_cycle;
 	int m_sequence[6]; 
 };
 

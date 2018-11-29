@@ -12,6 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigHinge.h"
 #include "dAnimationCharacterRig.h"
+#include "dAnimationEffectorBlendRoot.h"
 #include "dAnimationCharacterRigManager.h"
 
 dAnimationCharacterRig::dAnimationCharacterRig ()
@@ -20,6 +21,7 @@ dAnimationCharacterRig::dAnimationCharacterRig ()
 	,m_localFrame(dGetIdentityMatrix())
 	,m_staticWorld(NULL)
 	,m_solver()
+	,m_animationTree(NULL)
 {
 	m_root = this;
 	m_staticWorld.SetLoopNode(true);
@@ -27,6 +29,22 @@ dAnimationCharacterRig::dAnimationCharacterRig ()
 
 dAnimationCharacterRig::~dAnimationCharacterRig ()
 {
+	if (m_animationTree) {
+		delete m_animationTree;
+	}
+}
+
+dAnimationEffectorBlendRoot* dAnimationCharacterRig::GetAnimationTree() const
+{
+	return m_animationTree;
+}
+
+void dAnimationCharacterRig::SetAnimationTree(dAnimationEffectorBlendRoot* const animTree)
+{
+	if (m_animationTree) {
+		delete m_animationTree;
+	}
+	m_animationTree = animTree;
 }
 
 void dAnimationCharacterRig::Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace)
@@ -37,6 +55,11 @@ void dAnimationCharacterRig::Init(NewtonBody* const body, const dMatrix& localFr
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 	m_localFrame = localFrameInGlobalSpace * matrix.Inverse();
+}
+
+dMatrix dAnimationCharacterRig::GetBasePoseMatrix() const
+{
+	return m_localFrame * dAnimationRigJoint::GetBody()->GetMatrix();
 }
 
 void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const

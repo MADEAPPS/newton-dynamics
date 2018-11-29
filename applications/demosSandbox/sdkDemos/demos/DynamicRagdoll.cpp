@@ -952,7 +952,7 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		dAnimationEffectorBlendPose* const fixPose = new dAnimationEffectorBlendPose(rig);
 		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, fixPose);
 
-		delete animTree;
+		rig->SetAnimationTree (animTree);
 		return rig;
 	}
 

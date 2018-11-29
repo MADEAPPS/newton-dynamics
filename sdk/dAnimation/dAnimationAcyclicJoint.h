@@ -32,6 +32,7 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	void SetWorld(NewtonWorld* const world) { m_world = world; }
 
 	dAnimationAcyclicJoint* GetParent() const { return m_parent; }
+	dList<dAnimationAcyclicJoint*>& GetChildren() { return m_children;} 
 	const dList<dAnimationAcyclicJoint*>& GetChildren() const { return m_children; }
 
 	int GetIndex() const { return m_solverIndex; }
@@ -41,6 +42,7 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	void SetLoopNode(bool staste) { m_isLoop = staste; }
 
 	dComplementaritySolver::dBodyState* GetBody() { return &m_body; }
+	const dComplementaritySolver::dBodyState* GetBody() const { return &m_body; }
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return m_joint; }
 
 	virtual void ApplyExternalForce(dFloat timestep);

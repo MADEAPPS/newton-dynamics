@@ -14,6 +14,7 @@
 
 dAnimationEffectorBlendPose::dAnimationEffectorBlendPose(dAnimationCharacterRig* const character)
 	:dAnimationEffectorBlendNode(character)
+	,m_pose(character)
 {
 }
 

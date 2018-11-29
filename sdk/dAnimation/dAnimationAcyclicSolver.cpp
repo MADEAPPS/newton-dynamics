@@ -366,12 +366,12 @@ void dAnimationAcyclicSolver::CalculateLoopMassMatrixCoefficients(dFloat* const 
 				acc += J01invM0.m_linear * row_j->m_jacobian_J10.m_linear + J01invM0.m_angular * row_j->m_jacobian_J10.m_angular;
 			}
 
-			if (m1_i == m1_j) {
-				hasEffect = true;
-				acc += J10invM1.m_linear * row_j->m_jacobian_J10.m_linear + J10invM1.m_angular * row_j->m_jacobian_J10.m_angular;
-			} else if (m1_i == m0_j) {
+			if (m1_i == m0_j) {
 				hasEffect = true;
 				acc += J10invM1.m_linear * row_j->m_jacobian_J01.m_linear + J10invM1.m_angular * row_j->m_jacobian_J01.m_angular;
+			} else if (m1_i == m1_j) {
+				hasEffect = true;
+				acc += J10invM1.m_linear * row_j->m_jacobian_J10.m_linear + J10invM1.m_angular * row_j->m_jacobian_J10.m_angular;
 			}
 
 			if (hasEffect) {
@@ -400,12 +400,12 @@ void dAnimationAcyclicSolver::CalculateLoopMassMatrixCoefficients(dFloat* const 
 				acc += J01invM0.m_linear * row_j->m_jacobian_J10.m_linear + J01invM0.m_angular * row_j->m_jacobian_J10.m_angular;
 			}
 
-			if (m1_i == m1_j) {
+			if (m1_i == m0_j) {
 				hasEffect = true;
 				acc += J10invM1.m_linear * row_j->m_jacobian_J01.m_linear + J10invM1.m_angular * row_j->m_jacobian_J01.m_angular;
-			} else if (m1_i == m0_j) {
+			} else if (m1_i == m1_j) {
 				hasEffect = true;
-				acc += J10invM1.m_linear * row_j->m_jacobian_J01.m_linear + J10invM1.m_angular * row_j->m_jacobian_J01.m_angular;
+				acc += J10invM1.m_linear * row_j->m_jacobian_J10.m_linear + J10invM1.m_angular * row_j->m_jacobian_J10.m_angular;				
 			}
 
 			if (hasEffect) {

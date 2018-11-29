@@ -27,12 +27,7 @@ class dAnimationTransform
 class dAnimationPose: public dList<dAnimationTransform>
 {
 	public:
-	dAnimationPose()
-		:dList<dAnimationTransform>()
-//		,m_childNode(NULL)
-	{
-	}
-//	dAnimationEffectorBlendNode* m_childNode;
+	dAnimationPose(dAnimationCharacterRig* const character);
 };
 
 class dAnimationEffectorBlendNode : public dCustomAlloc

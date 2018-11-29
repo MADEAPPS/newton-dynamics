@@ -14,6 +14,7 @@
 
 dAnimationEffectorBlendRoot::dAnimationEffectorBlendRoot(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const childNode)
 	:dAnimationEffectorBlendNode(character)
+	,m_pose(character)
 	,m_childNode (childNode)
 {
 }
