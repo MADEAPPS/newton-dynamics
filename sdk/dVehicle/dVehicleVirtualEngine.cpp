@@ -14,6 +14,8 @@
 #include "dVehicleSingleBody.h"
 #include "dVehicleVirtualEngine.h"
 
+#define D_ENGINE_IDLE_GAS_VALUE dFloat (0.25f)
+
 dVehicleVirtualEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
 	:dEngineInfo(info)
 {
@@ -73,6 +75,8 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 	,m_gearBox()
 	,m_omega(0.0f)
 	,m_torque(0.0f)
+	,m_viscousDragMaxForce(0.0f)
+	,m_viscousDragCoefficient(0.0f)
 {
 	SetWorld(parent->GetWorld());
 
@@ -114,6 +118,11 @@ void dVehicleVirtualEngine::SetInfo(const dEngineInfo& info)
 	dVehicleEngineInterface::SetInfo(info);
 	InitEngineTorqueCurve();
 
+	//calculate viscous drag Coefficient
+	dFloat omega = m_metricInfo.m_rpmAtIdleTorque;
+	m_viscousDragMaxForce = D_ENGINE_IDLE_GAS_VALUE * m_metricInfo.GetTorque(0.0f);
+	m_viscousDragCoefficient = dSqrt(m_viscousDragMaxForce / omega);
+
 //	m_controller->SetAerodynamicsDownforceCoefficient(info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
 }
 
@@ -139,7 +148,7 @@ dFloat dVehicleVirtualEngine::GetRedLineRpm() const
 
 void dVehicleVirtualEngine::SetThrottle (dFloat throttle)
 {
-	throttle = dClamp(throttle, dFloat(0.1f), dFloat(1.0f));
+	throttle = dClamp(throttle, D_ENGINE_IDLE_GAS_VALUE, dFloat(1.0f));
 	m_torque = m_metricInfo.GetTorque(dAbs(m_omega)) * throttle;
 }
 
@@ -179,7 +188,8 @@ void dVehicleVirtualEngine::ApplyExternalForce(dFloat timestep)
 	m_body.SetForce(chassisNode->m_gravity.Scale(m_body.GetMass()));
 
 	// calculate engine torque
-	dVector torque(matrix.m_right.Scale(m_torque));
+	dFloat drag = dMin(m_viscousDragCoefficient * m_omega * m_omega, m_viscousDragMaxForce);
+	dVector torque(matrix.m_right.Scale(m_torque - drag));
 	m_body.SetTorque(torque);
 
 	dVehicleEngineInterface::ApplyExternalForce(timestep);

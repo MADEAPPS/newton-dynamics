@@ -122,7 +122,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		me->RenderUI(scene);
 	}
 
-	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size) const
+	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size, dFloat minAngle, dFloat maxAngle) const
 	{
 		size *= 0.5f;
 		dMatrix origin(dGetIdentityMatrix());
@@ -141,8 +141,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		glEnd();
 
 		// render needle
-		const dFloat minAngle = 180.0f * dDegreeToRad;
-		const dFloat maxAngle = -90.0f * dDegreeToRad;
+		minAngle *= -dDegreeToRad;
+		maxAngle *= -dDegreeToRad;
+		//param = 1.0f;
 		dFloat angle = minAngle + (maxAngle - minAngle) * param;
 		dMatrix needleMatrix(dRollMatrix(angle));
 
@@ -190,7 +191,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		glPopMatrix();
 	}
 
-
 	void RenderUI(DemoEntityManager* const scene)
 	{
 		// set to transparent color
@@ -207,14 +207,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 				// draw the tachometer
 				dFloat x = gageSize / 2 + 20.0f;
 				dFloat rpm = engine->GetRpm() / engine->GetRedLineRpm();
-				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
+				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 0.0f);
 
 				// draw the odometer
 				x += gageSize;
 				//dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
 				//dFloat speed = dAbs(engine->GetSpeed()) / engine->GetTopSpeed();
 				dFloat speed = 0.0f;
-				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
+				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
 
 				// draw the current gear
 				//int gear = engine->GetGear();
@@ -477,9 +477,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_mass = 50.0f;
 		engineInfo.m_armatureRadius = 0.125f;
 		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
-		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
+		engineInfo.m_rpmAtIdleTorque = 1000.0f;		// IDLE_TORQUE_RPM
 		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
-		engineInfo.m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM
+		engineInfo.m_rpmAtPeakTorque = 4000.0f;		// PEAK_TORQUE_RPM
 		engineInfo.m_peakHorsePower = 400.0f;		// PEAK_HP
 		engineInfo.m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
 		engineInfo.m_rpmAtRedLine = 6000.0f;		// REDLINE_TORQUE_RPM

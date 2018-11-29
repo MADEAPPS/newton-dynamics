@@ -74,6 +74,9 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 	dGearBoxJoint m_gearBox;
 	dFloat m_omega;
 	dFloat m_torque;
+	dFloat m_viscousDragMaxForce;
+	dFloat m_viscousDragCoefficient;
+	
 	friend class dVehicleChassis;
 };
 
