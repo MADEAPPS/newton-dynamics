@@ -485,7 +485,8 @@ void Hexapod(DemoEntityManager* const scene)
 	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	location.m_posit.m_y += 1.0f;
 
-	const int count = 5;
+	int count = 5;
+count = 1;
 	dMatrix location1(location);
 	dFloat x0 = location.m_posit.m_x;
 	for (int j = 0; j < 1; j++) {
