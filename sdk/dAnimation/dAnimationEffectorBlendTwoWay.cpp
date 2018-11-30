@@ -21,7 +21,7 @@ dAnimationEffectorBlendTwoWay::dAnimationEffectorBlendTwoWay(dAnimationCharacter
 	,m_pose(character)
 	,m_param(0.0f)
 {
-	m_param = 0.5f;
+	m_param = 0.6f;
 }
 
 dAnimationEffectorBlendTwoWay::~dAnimationEffectorBlendTwoWay()
