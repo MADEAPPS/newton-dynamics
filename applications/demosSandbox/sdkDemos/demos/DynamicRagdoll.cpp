@@ -737,56 +737,194 @@ static dRagDollConfig ragDollConfig[] =
 //	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
-
 };
 
+class dWalkGenerator: public dAnimationEffectorBlendPose
+{
+	public:
+	dWalkGenerator(dAnimationCharacterRig* const character, dAnimationRigEffector* const leftFeet, dAnimationRigEffector* const rightFeet)
+		:dAnimationEffectorBlendPose(character)
+		,m_acc(0.0f)
+		,m_amplitud_x(2.0f)
+		,m_amplitud_y(1.3f)
+		,m_period(1.0f)
+		,m_cycle()
+		,m_leftFeet(leftFeet)
+		,m_rightFeet(rightFeet)
+	{
+		m_sequence[0] = 0;
+		m_sequence[3] = 0;
+		m_sequence[4] = 0;
+		m_sequence[1] = 1;
+		m_sequence[2] = 1;
+		m_sequence[5] = 1;
+
+		// make left walk cycle
+		const int size = 11;
+		const int splite = (size - 1) / 2 - 1;
+		dFloat64 knots[size];
+		dBigVector leftControlPoints[size + 2];
+		for (int i = 0; i < size; i++) {
+			knots[i] = dFloat(i) / (size - 1);
+		}
+		memset(leftControlPoints, 0, sizeof(leftControlPoints));
+
+		dFloat x = -m_amplitud_x / 2.0f;
+		dFloat step_x = m_amplitud_x / splite;
+		for (int i = 0; i <= splite; i++) {
+			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin(dPi * dFloat(i) / splite);
+			leftControlPoints[i + 1].m_x = x;
+			x += step_x;
+		}
+
+		x = m_amplitud_x / 2.0f;
+		step_x = -m_amplitud_x / (size - splite - 1);
+		for (int i = splite; i < size; i++) {
+			leftControlPoints[i + 1].m_x = x;
+			x += step_x;
+		}
+		leftControlPoints[0].m_x = leftControlPoints[1].m_x;
+		leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
+
+		//cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
+		m_cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
+	}
+
+	void Evaluate(dAnimationPose& output, dFloat timestep)
+	{
+		dAnimationEffectorBlendPose::Evaluate(output, timestep);
+
+		dFloat param = m_acc / m_period;
+		dBigVector left(m_cycle.CurvePoint(param));
+		dBigVector right(m_cycle.CurvePoint(dMod(param + 0.5f, 1.0f)));
+
+		dFloat high[2];
+		dFloat stride[2];
+		high[0] = dFloat(left.m_y);
+		high[1] = dFloat(right.m_y);
+		stride[0] = dFloat(left.m_x);
+		stride[1] = dFloat(right.m_x);
+
+		int index = 0;
+		for (dAnimationPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dAnimationTransform& transform = node->GetInfo();
+			if ((transform.m_effector == m_leftFeet) || (transform.m_effector == m_rightFeet)) {
+				transform.m_posit.m_y += high[m_sequence[index]];
+				transform.m_posit.m_x += stride[m_sequence[index]];
+			}
+			index++;
+		}
+		m_acc = dMod(m_acc + timestep, m_period);
+	}
+
+	dFloat m_acc;
+	dFloat m_period;
+	dFloat m_amplitud_x;
+	dFloat m_amplitud_y;
+	dBezierSpline m_cycle;
+	int m_sequence[6];
+	dAnimationRigEffector* m_leftFeet;
+	dAnimationRigEffector* m_rightFeet;
+};
+
+class dEffectorTreePostureGenerator: public dAnimationEffectorBlendNode
+{
+	public:
+	dEffectorTreePostureGenerator(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
+		:dAnimationEffectorBlendNode(character)
+		,m_euler(0.0f)
+		,m_position(0.0f)
+		,m_child(child)
+	{
+	}
+
+	~dEffectorTreePostureGenerator()
+	{
+		delete m_child;
+	}
+
+	void Evaluate(dAnimationPose& output, dFloat timestep)
+	{
+		m_child->Evaluate(output, timestep);
+
+		dQuaternion rotation(dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
+		for (dAnimationPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dAnimationTransform& transform = node->GetInfo();
+			transform.m_rotation = transform.m_rotation * rotation;
+			transform.m_posit = m_position + rotation.RotateVector(transform.m_posit);
+		}
+	}
+
+	dVector m_euler;
+	dVector m_position;
+	dAnimationEffectorBlendNode* m_child;
+};
 
 class BalancingDummyManager : public dAnimationCharacterRigManager
 {
 	public:
+
+	class dAnimationCharacterUserData: public DemoEntity::UserData
+	{
+		public:
+		dAnimationCharacterUserData(dAnimationCharacterRig* const rig, dAnimationEffectorBlendTwoWay* const walk, dEffectorTreePostureGenerator* const posture)
+			:DemoEntity::UserData()
+			,m_rig(rig)
+			,m_walk(walk)
+			,m_posture(posture)
+			,m_hypeHigh(0.0f)
+			,m_walkSpeed(0.0f)
+		{
+		}
+
+		void OnRender(dFloat timestep) const
+		{
+		}
+
+		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
+		{
+		}
+
+		void OnTransformCallback(DemoEntityManager& world) const
+		{
+		}
+
+		dAnimationCharacterRig* m_rig;
+		dAnimationEffectorBlendTwoWay* m_walk;
+		dEffectorTreePostureGenerator* m_posture;
+
+		dFloat m_hypeHigh;
+		dFloat m_walkSpeed;
+	};
+
+
 	BalancingDummyManager(DemoEntityManager* const scene)
 		:dAnimationCharacterRigManager(scene->GetNewton())
-		//,m_currentController(NULL)
-		//,m_azimuth(0.0f)
-		//,m_posit_x(0.0f)
-		//,m_posit_y(0.0f)
-		//,m_gripper_roll(0.0f)
-		//,m_gripper_pitch(0.0f)
+		,m_currentRig(NULL)
 	{
-		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
 	~BalancingDummyManager()
 	{
 	}
 
-/*
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
 		BalancingDummyManager* const me = (BalancingDummyManager*)context;
+		if (me->m_currentRig) {
+			DemoEntity* const entiry = (DemoEntity*) NewtonBodyGetUserData(me->m_currentRig->GetNewtonBody());
+			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*) entiry->GetUserData();
 
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Use sliders to manipulate robot");
-		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
-		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
-
-		//		ImGui::Separator();
-		//		ImGui::Separator();
-		//		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
-		//		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
-
-		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-			dSixAxisController* const controller = &node->GetInfo();
-			controller->SetTarget(me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
+			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "Use sliders to manipulate robot");
+			//ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
+			//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
+			ImGui::SliderFloat("walkSpeed", &controlData->m_walkSpeed, 0.0f, 1.0f);
+			//ImGui::SliderFloat("posit_y", &controlData->m_hypeHigh, -1.0f, 1.0f);
 		}
 	}
 
-	virtual dSixAxisController* CreateController()
-	{
-		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
-	}
-*/
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		dAnimationCharacterRigManager::OnDebug(debugContext);
@@ -866,88 +1004,6 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 		return body;
 	}
 
-	class dWalkGenerator: public dAnimationEffectorBlendPose
-	{
-		public:
-		dWalkGenerator(dAnimationCharacterRig* const character)
-			:dAnimationEffectorBlendPose(character)
-			,m_acc(0.0f)
-			,m_amplitud_x(2.0f)
-			,m_amplitud_y(1.3f)
-			,m_period(1.0f)
-			,m_cycle()
-		{
-			m_sequence[0] = 0;
-			m_sequence[3] = 0;
-			m_sequence[4] = 0;
-			m_sequence[1] = 1;
-			m_sequence[2] = 1;
-			m_sequence[5] = 1;
-
-			// make left walk cycle
-			const int size = 11;
-			const int splite = (size - 1) / 2 - 1;
-			dFloat64 knots[size];
-			dBigVector leftControlPoints[size + 2];
-			for (int i = 0; i < size; i++) {
-				knots[i] = dFloat(i) / (size - 1);
-			}
-			memset(leftControlPoints, 0, sizeof(leftControlPoints));
-
-			dFloat x = -m_amplitud_x / 2.0f;
-			dFloat step_x = m_amplitud_x / splite;
-			for (int i = 0; i <= splite; i++) {
-				leftControlPoints[i + 1].m_y = m_amplitud_y * dSin(dPi * dFloat(i) / splite);
-				leftControlPoints[i + 1].m_x = x;
-				x += step_x;
-			}
-
-			x = m_amplitud_x / 2.0f;
-			step_x = -m_amplitud_x / (size - splite - 1);
-			for (int i = splite; i < size; i++) {
-				leftControlPoints[i + 1].m_x = x;
-				x += step_x;
-			}
-			leftControlPoints[0].m_x = leftControlPoints[1].m_x;
-			leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
-
-			//cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
-			m_cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
-		}
-
-		void Evaluate(dAnimationPose& output, dFloat timestep)
-		{
-			dAnimationEffectorBlendPose::Evaluate(output, timestep);
-
-			dFloat param = m_acc / m_period;
-			dBigVector left(m_cycle.CurvePoint(param));
-			dBigVector right(m_cycle.CurvePoint(dMod(param + 0.5f, 1.0f)));
-
-			dFloat high[2];
-			dFloat stride[2];
-			high[0] = dFloat(left.m_y);
-			high[1] = dFloat(right.m_y);
-			stride[0] = dFloat(left.m_x);
-			stride[1] = dFloat(right.m_x);
-
-			int index = 0;
-			for (dAnimationPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-				dAnimationTransform& transform = node->GetInfo();
-				transform.m_posit.m_y += high[m_sequence[index]];
-				transform.m_posit.m_x += stride[m_sequence[index]];
-				index++;
-			}
-			m_acc = dMod(m_acc + timestep, m_period);
-		}
-
-		dFloat m_acc;
-		dFloat m_period;
-		dFloat m_amplitud_x;
-		dFloat m_amplitud_y;
-		dBezierSpline m_cycle;
-		int m_sequence[6];
-	};
-
 	dAnimationCharacterRig* CreateRagDoll(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 
@@ -991,6 +1047,9 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 			stackIndex++;
 		}
 
+		dAnimationRigEffector* leftFeet = NULL;
+		dAnimationRigEffector* rightFeet = NULL;
+
 		const int partCount = sizeof(ragDollConfig) / sizeof(ragDollConfig[0]);
 		while (stackIndex) {
 			stackIndex--;
@@ -1023,6 +1082,13 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 						dAnimationRigEffector* const effector = new dAnimationRigEffector(parentJoint->GetAsRigLimb(), pivot);
 						effector->SetLinearSpeed(2.0f);
 						effector->SetMaxLinearFriction(ragDollConfig[i].m_frictionScale * ragDollConfig[i].m_mass * DEMO_GRAVITY * 50.0f);
+
+						if (!strcmp (name, "effector_leftLeg")) {
+							leftFeet = effector;
+						}
+						if (!strcmp(name, "effector_rightLeg")) {
+							rightFeet = effector;
+						}
 					}
 					break;
 				}
@@ -1032,11 +1098,17 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		rig->Finalize();
 
 		dAnimationEffectorBlendPose* const fixPose = new dAnimationEffectorBlendPose(rig);
-		dAnimationEffectorBlendPose* const walkPose = new dWalkGenerator(rig);
+		dAnimationEffectorBlendPose* const walkPose = new dWalkGenerator(rig, leftFeet, rightFeet);
 		dAnimationEffectorBlendTwoWay* const walkBlend = new dAnimationEffectorBlendTwoWay(rig, fixPose, walkPose);
-		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, walkBlend);
+		dEffectorTreePostureGenerator* const posture = new dEffectorTreePostureGenerator (rig, walkBlend);
+		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, posture);
 
+		dAnimationCharacterUserData* const renderCallback = new dAnimationCharacterUserData(rig, walkBlend, posture);
+		model->SetUserData(renderCallback);
+		
 		rig->SetAnimationTree (animTree);
+
+		m_currentRig = rig;
 		return rig;
 	}
 
@@ -1050,12 +1122,22 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		meshEntity->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
-//	dSixAxisController* m_currentController;
-//	dFloat32 m_azimuth;
-//	dFloat32 m_posit_x;
-//	dFloat32 m_posit_y;
-//	dFloat32 m_gripper_roll;
-//	dFloat32 m_gripper_pitch;
+	void PreUpdate(dFloat timestep)
+	{
+		if (m_currentRig) {
+			DemoEntity* const entiry = (DemoEntity*)NewtonBodyGetUserData(m_currentRig->GetNewtonBody());
+			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*)entiry->GetUserData();
+
+			dAnimationEffectorBlendTwoWay* const walkBlend = controlData->m_walk;
+			walkBlend->SetParam (controlData->m_walkSpeed);
+			//dEffectorTreePostureGenerator* const posture = controlData->m_posture;
+			//posture->m_position.m_y = 0.25f * controlData->m_hypeHigh;
+		}
+
+		dAnimationCharacterRigManager::PreUpdate(timestep);
+	}
+
+	dAnimationCharacterRig* m_currentRig;
 };
 
 void DynamicRagDoll(DemoEntityManager* const scene)

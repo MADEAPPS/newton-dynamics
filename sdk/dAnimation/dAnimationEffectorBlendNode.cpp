@@ -18,22 +18,6 @@
 dAnimationPose::dAnimationPose(dAnimationCharacterRig* const character)
 	:dList<dAnimationTransform>()
 {
-//	NewtonBodyGetMatrix(character->Get hexaBody, &rootMatrix[0][0]);
-//	rootMatrix = rootMatrix.Inverse();
-//	for (int i = 0; i < legEffectorCount; i++) {
-//		dEffectorTreeInterface::dEffectorTransform frame;
-//		dCustomInverseDynamicsEffector* const effector = legEffectors[i];
-//		dMatrix effectorMatrix(effector->GetBodyMatrix());
-//		dMatrix poseMatrix(effectorMatrix * rootMatrix);
-//		frame.m_effector = effector;
-//		frame.m_posit = poseMatrix.m_posit;
-//		frame.m_rotation = dQuaternion(poseMatrix);
-//		idlePose->GetPose().Append(frame);
-//		walkPoseGenerator->GetPose().Append(frame);
-//		m_animTreeNode->GetPose().Append(frame);
-//	}
-
-//	dMatrix rootMatrix (character->GetBasePoseMatrix().Inverse());
 	dList<dAnimationRigEffector*>& effectorsList = character->GetEffectors();
 	for (dList<dAnimationRigEffector*>::dListNode* node = effectorsList.GetFirst(); node; node = node->GetNext()) {
 		dAnimationRigEffector* const effector = node->GetInfo();

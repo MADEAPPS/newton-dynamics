@@ -477,9 +477,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_mass = 50.0f;
 		engineInfo.m_armatureRadius = 0.125f;
 		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
-		engineInfo.m_rpmAtIdleTorque = 1000.0f;		// IDLE_TORQUE_RPM
+		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
 		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
-		engineInfo.m_rpmAtPeakTorque = 4000.0f;		// PEAK_TORQUE_RPM
+		engineInfo.m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM
 		engineInfo.m_peakHorsePower = 400.0f;		// PEAK_HP
 		engineInfo.m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
 		engineInfo.m_rpmAtRedLine = 6000.0f;		// REDLINE_TORQUE_RPM

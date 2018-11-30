@@ -22,6 +22,9 @@ class dAnimationEffectorBlendTwoWay: public dAnimationEffectorBlendNode
 								  dAnimationEffectorBlendNode* const node1);
 	virtual ~dAnimationEffectorBlendTwoWay();
 
+	dFloat GetParam () const {return m_param;}
+	void SetParam (dFloat param) {m_param = param;}
+
 	dAnimationPose& GetPose() { return m_pose; }
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
 
