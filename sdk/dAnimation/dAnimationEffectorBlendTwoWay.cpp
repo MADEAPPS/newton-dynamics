@@ -32,16 +32,21 @@ dAnimationEffectorBlendTwoWay::~dAnimationEffectorBlendTwoWay()
 
 void dAnimationEffectorBlendTwoWay::Evaluate(dAnimationPose& output, dFloat timestep)
 {
-	m_node0->Evaluate(output, timestep);
-	m_node1->Evaluate(m_pose, timestep);
-
-	dAnimationPose::dListNode* destNode = output.GetFirst();
-	for (dAnimationPose::dListNode* sourceNode = m_pose.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
-		const dAnimationTransform& srcFrame = sourceNode->GetInfo();
-		dAnimationTransform& dstFrame = destNode->GetInfo();
-		dAssert(srcFrame.m_effector == dstFrame.m_effector);
-		dstFrame.m_rotation = dstFrame.m_rotation.Slerp(srcFrame.m_rotation, m_param);
-		dstFrame.m_posit = dstFrame.m_posit + (srcFrame.m_posit - dstFrame.m_posit).Scale(m_param);
-		destNode = destNode->GetNext();
+	if (m_param < 0.001f) {
+		m_node0->Evaluate(output, timestep);
+	} else if (m_param > 0.999f) {
+		m_node1->Evaluate(output, timestep);
+	} else {
+		m_node0->Evaluate(output, timestep);
+		m_node1->Evaluate(m_pose, timestep);
+		dAnimationPose::dListNode* destNode = output.GetFirst();
+		for (dAnimationPose::dListNode* sourceNode = m_pose.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
+			const dAnimationTransform& srcFrame = sourceNode->GetInfo();
+			dAnimationTransform& dstFrame = destNode->GetInfo();
+			dAssert(srcFrame.m_effector == dstFrame.m_effector);
+			dstFrame.m_rotation = dstFrame.m_rotation.Slerp(srcFrame.m_rotation, m_param);
+			dstFrame.m_posit = dstFrame.m_posit + (srcFrame.m_posit - dstFrame.m_posit).Scale(m_param);
+			destNode = destNode->GetNext();
+		}
 	}
 }

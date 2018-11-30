@@ -84,10 +84,10 @@ NewtonBody* dAnimationCharacterRig::GetNewtonBody() const
 
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 {
+	RigidBodyToStates();
 	if (m_animationTree) {
 		m_animationTree->Update(timestep);
 	}
-	RigidBodyToStates();
 	m_solver.Update(timestep);
 	UpdateJointAcceleration();
 }

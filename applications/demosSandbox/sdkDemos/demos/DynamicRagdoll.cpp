@@ -730,9 +730,9 @@ static dRagDollConfig ragDollConfig[] =
 //	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
 
-//	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 50.0f },
-//	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-//	{ "effector_leftLeg", 0.0f, -90.0f, 45.0f, 100.0f },
+	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 50.0f },
+	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
+	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
@@ -866,6 +866,88 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 		return body;
 	}
 
+	class dWalkGenerator: public dAnimationEffectorBlendPose
+	{
+		public:
+		dWalkGenerator(dAnimationCharacterRig* const character)
+			:dAnimationEffectorBlendPose(character)
+			,m_acc(0.0f)
+			,m_amplitud_x(2.0f)
+			,m_amplitud_y(1.3f)
+			,m_period(1.0f)
+			,m_cycle()
+		{
+			m_sequence[0] = 0;
+			m_sequence[3] = 0;
+			m_sequence[4] = 0;
+			m_sequence[1] = 1;
+			m_sequence[2] = 1;
+			m_sequence[5] = 1;
+
+			// make left walk cycle
+			const int size = 11;
+			const int splite = (size - 1) / 2 - 1;
+			dFloat64 knots[size];
+			dBigVector leftControlPoints[size + 2];
+			for (int i = 0; i < size; i++) {
+				knots[i] = dFloat(i) / (size - 1);
+			}
+			memset(leftControlPoints, 0, sizeof(leftControlPoints));
+
+			dFloat x = -m_amplitud_x / 2.0f;
+			dFloat step_x = m_amplitud_x / splite;
+			for (int i = 0; i <= splite; i++) {
+				leftControlPoints[i + 1].m_y = m_amplitud_y * dSin(dPi * dFloat(i) / splite);
+				leftControlPoints[i + 1].m_x = x;
+				x += step_x;
+			}
+
+			x = m_amplitud_x / 2.0f;
+			step_x = -m_amplitud_x / (size - splite - 1);
+			for (int i = splite; i < size; i++) {
+				leftControlPoints[i + 1].m_x = x;
+				x += step_x;
+			}
+			leftControlPoints[0].m_x = leftControlPoints[1].m_x;
+			leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
+
+			//cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
+			m_cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
+		}
+
+		void Evaluate(dAnimationPose& output, dFloat timestep)
+		{
+			dAnimationEffectorBlendPose::Evaluate(output, timestep);
+
+			dFloat param = m_acc / m_period;
+			dBigVector left(m_cycle.CurvePoint(param));
+			dBigVector right(m_cycle.CurvePoint(dMod(param + 0.5f, 1.0f)));
+
+			dFloat high[2];
+			dFloat stride[2];
+			high[0] = dFloat(left.m_y);
+			high[1] = dFloat(right.m_y);
+			stride[0] = dFloat(left.m_x);
+			stride[1] = dFloat(right.m_x);
+
+			int index = 0;
+			for (dAnimationPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+				dAnimationTransform& transform = node->GetInfo();
+				transform.m_posit.m_y += high[m_sequence[index]];
+				transform.m_posit.m_x += stride[m_sequence[index]];
+				index++;
+			}
+			m_acc = dMod(m_acc + timestep, m_period);
+		}
+
+		dFloat m_acc;
+		dFloat m_period;
+		dFloat m_amplitud_x;
+		dFloat m_amplitud_y;
+		dBezierSpline m_cycle;
+		int m_sequence[6];
+	};
+
 	dAnimationCharacterRig* CreateRagDoll(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 
@@ -950,7 +1032,7 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		rig->Finalize();
 
 		dAnimationEffectorBlendPose* const fixPose = new dAnimationEffectorBlendPose(rig);
-		dAnimationEffectorBlendPose* const walkPose = new dAnimationEffectorBlendPose(rig);
+		dAnimationEffectorBlendPose* const walkPose = new dWalkGenerator(rig);
 		dAnimationEffectorBlendTwoWay* const walkBlend = new dAnimationEffectorBlendTwoWay(rig, fixPose, walkPose);
 		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, walkBlend);
 
