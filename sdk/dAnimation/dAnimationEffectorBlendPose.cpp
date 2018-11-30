@@ -24,5 +24,5 @@ dAnimationEffectorBlendPose::~dAnimationEffectorBlendPose()
 
 void dAnimationEffectorBlendPose::Evaluate(dAnimationPose& output, dFloat timestep)
 {
-	dAssert(0);
+	output.CopySource(m_pose);
 }

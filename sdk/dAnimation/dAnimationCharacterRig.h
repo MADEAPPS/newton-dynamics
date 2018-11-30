@@ -17,6 +17,7 @@
 #include "dAnimationRigJoint.h"
 #include "dAnimationAcyclicSolver.h"
 
+class dAnimationRigEffector;
 class dAnimationEffectorBlendRoot;
 
 class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRigJoint
@@ -34,6 +35,8 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	dMatrix GetBasePoseMatrix() const;
 	const dMatrix& GetLocalFrame() const {return m_localFrame;}
 
+	dList<dAnimationRigEffector*>& GetEffectors() {return m_effectors;}
+
 	protected:
 	virtual void Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace);
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
@@ -45,6 +48,7 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	dMatrix m_localFrame;
 	dAnimationAcyclicJoint m_staticWorld;
 	dAnimationAcyclicSolver m_solver;
+	dList<dAnimationRigEffector*> m_effectors;
 	dAnimationEffectorBlendRoot* m_animationTree;
 
 	friend class dAnimationRigEffector;

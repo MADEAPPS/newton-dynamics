@@ -28,6 +28,9 @@ class dAnimationPose: public dList<dAnimationTransform>
 {
 	public:
 	dAnimationPose(dAnimationCharacterRig* const character);
+
+	void SetTargetPose(dAnimationCharacterRig* const character) const;
+	void CopySource(const dAnimationPose& source);
 };
 
 class dAnimationEffectorBlendNode : public dCustomAlloc
@@ -39,12 +42,6 @@ class dAnimationEffectorBlendNode : public dCustomAlloc
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep)
 	{
 	}
-
-//	NewtonBody* GetRootBody() const
-//	{
-//		return m_rootBody;
-//	}
-
 	dAnimationCharacterRig* m_character;
 };
 

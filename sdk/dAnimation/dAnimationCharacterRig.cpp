@@ -11,16 +11,18 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigHinge.h"
+#include "dAnimationRigEffector.h"
 #include "dAnimationCharacterRig.h"
 #include "dAnimationEffectorBlendRoot.h"
 #include "dAnimationCharacterRigManager.h"
 
-dAnimationCharacterRig::dAnimationCharacterRig ()
+dAnimationCharacterRig::dAnimationCharacterRig()
 	:dCustomControllerBase()
 	,dAnimationRigJoint(NULL)
 	,m_localFrame(dGetIdentityMatrix())
 	,m_staticWorld(NULL)
 	,m_solver()
+	,m_effectors()
 	,m_animationTree(NULL)
 {
 	m_root = this;
@@ -59,7 +61,9 @@ void dAnimationCharacterRig::Init(NewtonBody* const body, const dMatrix& localFr
 
 dMatrix dAnimationCharacterRig::GetBasePoseMatrix() const
 {
-	return m_localFrame * dAnimationRigJoint::GetBody()->GetMatrix();
+	dMatrix matrix;
+	NewtonBodyGetMatrix(GetNewtonBody(), &matrix[0][0]);
+	return m_localFrame * matrix;
 }
 
 void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -80,10 +84,12 @@ NewtonBody* dAnimationCharacterRig::GetNewtonBody() const
 
 void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 {
+	if (m_animationTree) {
+		m_animationTree->Update(timestep);
+	}
 	RigidBodyToStates();
 	m_solver.Update(timestep);
 	UpdateJointAcceleration();
-//dTrace(("\n"));
 }
 
 void dAnimationCharacterRig::PostUpdate(dFloat timestep, int threadIndex)

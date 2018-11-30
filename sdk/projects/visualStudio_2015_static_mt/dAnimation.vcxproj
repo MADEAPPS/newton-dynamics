@@ -41,6 +41,7 @@
     <ClCompile Include="..\..\dAnimation\dAnimationCharacterRigManager.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendPose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendRoot.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendTwoWay.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationKinematicLoopJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigEffector.cpp" />
@@ -65,6 +66,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimationCharacterRigManager.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendPose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendRoot.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendTwoWay.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationKinematicLoopJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigEffector.h" />

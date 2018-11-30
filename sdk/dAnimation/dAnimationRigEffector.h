@@ -31,8 +31,14 @@ class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 	void SetMaxLinearFriction(dFloat friction);
 	dAnimationRigLimb* GetParent() const { return m_parent;}
 
+	dMatrix GetBasePoseMatrix() const;
+	const dMatrix& GetLocalMatrix() const { return m_effectorMatrix;}
+
+	void SetTargetPose(const dMatrix& blobalSpaceMatrix);
+
+	dMatrix m_localMatrix;
 	dMatrix m_targetMatrix;
-	dMatrix m_pivotLocalMatrix;
+	dMatrix m_effectorMatrix;
 	dAnimationRigLimb* m_parent;
 	NewtonBody* m_referenceBody;
 	dFloat m_linearSpeed;

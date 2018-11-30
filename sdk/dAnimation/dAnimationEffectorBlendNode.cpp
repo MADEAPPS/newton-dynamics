@@ -10,6 +10,8 @@
 */
 
 #include "dAnimationStdAfx.h"
+#include "dAnimationRigLimb.h"
+#include "dAnimationRigEffector.h"
 #include "dAnimationCharacterRig.h"
 #include "dAnimationEffectorBlendNode.h"
 
@@ -31,30 +33,41 @@ dAnimationPose::dAnimationPose(dAnimationCharacterRig* const character)
 //		m_animTreeNode->GetPose().Append(frame);
 //	}
 
+//	dMatrix rootMatrix (character->GetBasePoseMatrix().Inverse());
+	dList<dAnimationRigEffector*>& effectorsList = character->GetEffectors();
+	for (dList<dAnimationRigEffector*>::dListNode* node = effectorsList.GetFirst(); node; node = node->GetNext()) {
+		dAnimationRigEffector* const effector = node->GetInfo();
 
-	dMatrix rootMatrix (character->GetBasePoseMatrix());
+		const dMatrix& localMatrix = effector->GetLocalMatrix();
 
-	const dAnimationRigJoint* stackPool[128];
+		dAnimationTransform frame;
+		frame.m_effector = effector;
+		frame.m_posit = localMatrix.m_posit;
+		frame.m_rotation = dQuaternion(localMatrix);
+		Append(frame);
+	}
+}
 
-	int stack = 1;
-	stackPool[0] = character;
+void dAnimationPose::CopySource(const dAnimationPose& source)
+{
+	dListNode* destNode = GetFirst();
+	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
+		const dAnimationTransform& srcFrame = sourceNode->GetInfo();
+		dAnimationTransform& dstFrame = destNode->GetInfo();
+		dAssert(srcFrame.m_effector == dstFrame.m_effector);
+		dstFrame.m_rotation = srcFrame.m_rotation;
+		dstFrame.m_posit = srcFrame.m_posit;
+		destNode = destNode->GetNext();
+	}
+}
 
-	while (stack) {
-
-		dMatrix matrix;
-		stack--;
-		const dAnimationRigJoint* const node = stackPool[stack];
-
-		//NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
-		//manager->OnUpdateTransform(node, matrix * parentMatrix);
-		//parentMatrix = matrix.Inverse();
-
-
-		const dList<dAnimationAcyclicJoint*>& children = node->GetChildren();
-		for (dList<dAnimationAcyclicJoint*>::dListNode* child = children.GetFirst(); child; child = child->GetNext()) {
-			stackPool[stack] = (dAnimationRigJoint*)child->GetInfo();
-			stack++;
-		}
+void dAnimationPose::SetTargetPose(dAnimationCharacterRig* const character) const
+{
+	dMatrix rootMatrix(character->GetBasePoseMatrix());
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		const dAnimationTransform& frame = node->GetInfo();
+		dMatrix matrix(dMatrix(frame.m_rotation, frame.m_posit) * rootMatrix);
+		frame.m_effector->SetTargetPose(matrix);
 	}
 }
 

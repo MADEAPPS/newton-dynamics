@@ -950,7 +950,9 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 		rig->Finalize();
 
 		dAnimationEffectorBlendPose* const fixPose = new dAnimationEffectorBlendPose(rig);
-		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, fixPose);
+		dAnimationEffectorBlendPose* const walkPose = new dAnimationEffectorBlendPose(rig);
+		dAnimationEffectorBlendTwoWay* const walkBlend = new dAnimationEffectorBlendTwoWay(rig, fixPose, walkPose);
+		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, walkBlend);
 
 		rig->SetAnimationTree (animTree);
 		return rig;
@@ -985,7 +987,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-//origin = dGetIdentityMatrix();
+origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;

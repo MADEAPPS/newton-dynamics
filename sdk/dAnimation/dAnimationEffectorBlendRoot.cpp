@@ -15,6 +15,7 @@
 dAnimationEffectorBlendRoot::dAnimationEffectorBlendRoot(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const childNode)
 	:dAnimationEffectorBlendNode(character)
 	,m_pose(character)
+	,m_rig(character)
 	,m_childNode (childNode)
 {
 }
@@ -28,10 +29,12 @@ dAnimationEffectorBlendRoot::~dAnimationEffectorBlendRoot()
 
 void dAnimationEffectorBlendRoot::Update(dFloat timestep)
 {
-	dAssert(0);
+	Evaluate(m_pose, timestep);
+	m_pose.SetTargetPose(m_rig);
 }
 
 void dAnimationEffectorBlendRoot::Evaluate(dAnimationPose& output, dFloat timestep)
 {
-	dAssert(0);
+	dAssert(m_childNode);
+	m_childNode->Evaluate(output, timestep);
 }

@@ -23,11 +23,11 @@ class dAnimationRigLimb: public dAnimationRigJoint, public dComplementaritySolve
 	dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBody* const body);
 	virtual ~dAnimationRigLimb();
 
+	virtual NewtonBody* GetNewtonBody() const;
 	virtual dAnimationRigLimb* GetAsRigLimb() { return this; }
 
 	protected:
 	virtual void Finalize();
-	virtual NewtonBody* GetNewtonBody() const;
 	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
