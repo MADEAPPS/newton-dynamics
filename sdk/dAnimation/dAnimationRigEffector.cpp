@@ -71,11 +71,8 @@ void dAnimationRigEffector::SetTargetPose(const dMatrix& globalSpaceMatrix)
 
 void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dAnimationCharacterRig* const root = m_parent->GetRoot();
-
 	const dMatrix& matrix1 = m_targetMatrix;
 	dMatrix matrix0 (m_localMatrix * m_state0->GetMatrix());
-	//dMatrix matrix0(m_effectorMatrix * root->GetBasePoseMatrix());
 	
 	dVector veloc0 (m_state0->CalculatePointVelocity(matrix0.m_posit));
 	dVector veloc1 (m_state1->CalculatePointVelocity(matrix1.m_posit));
