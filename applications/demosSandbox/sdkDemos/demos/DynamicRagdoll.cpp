@@ -720,7 +720,8 @@ struct dRagDollConfig
 
 static dRagDollConfig ragDollConfig[] =
 {
-	{ "bone_spine0", 210.0f, -1000.0f, 1000.0f, 50.0f },
+//	{ "bone_spine0", 250.0f, -1000.0f, 1000.0f, 50.0f },
+	{ "bone_spine0", 100.0f, -1000.0f, 1000.0f, 50.0f },
 
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 50.0f },
 	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
@@ -920,7 +921,9 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 			scene->Print(color, "Use sliders to manipulate robot");
 			//ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
 			//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-			ImGui::SliderFloat("walkSpeed", &controlData->m_walkSpeed, 0.0f, 1.0f);
+			dFloat32 val = dFloat32(controlData->m_walkSpeed);
+			ImGui::SliderFloat("walkSpeed", &val, 0.0f, 1.0f);
+			controlData->m_walkSpeed = val;
 			//ImGui::SliderFloat("posit_y", &controlData->m_hypeHigh, -1.0f, 1.0f);
 		}
 	}
@@ -991,7 +994,6 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(body, definition.m_mass, collision);
-		//NewtonBodySetMassProperties(body, 0.0f, collision);
 
 		// save the user lifterData with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(body, bodyPart);
@@ -1029,10 +1031,14 @@ xxxx1->ResetMatrix(*scene, matrix1);
 		modelMatrix.m_posit = dVector(0.0f);
 		modelMatrix.m_posit.m_w = 1.0f;
 
-		model->ResetMatrix(*scene, modelMatrix * origin);
+		dMatrix rootMatrix(modelMatrix * origin);
+		model->ResetMatrix(*scene, rootMatrix);
 
 		NewtonBody* const rootBody = CreateBodyPart(model, ragDollConfig[0]);
-NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+
+new dCustom6dof(rootMatrix, rootBody);
+//NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+
 		DemoEntity* const localFrame = model->Find("rootLocalFrame");
 		dAssert(localFrame);
 		dMatrix localFrameMatrix(localFrame->CalculateGlobalMatrix());

@@ -115,6 +115,7 @@ enum dEulerAngleOrder
 //template <class T> T dClamp(T val, T min, T max);
 //template<class T> T dDotProduct(int size, const T* const A, const T* const B);
 //template<class T> bool dCholeskyFactorization(int size, T* const matrix);
+//template<class T> bool dCholeskyFactorization(int size, int block, T* const matrix);
 //template<class T> void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x);
 //template<class T> void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out);
 //template <class T> bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const low, T* const high);
@@ -277,9 +278,9 @@ void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x)
 }
 
 template<class T>
-bool dCholeskyFactorization(int size, T* const matrix)
+bool dCholeskyFactorization(int size, int block, T* const matrix)
 {
-	for (int i = 0; i < size; i++) {
+	for (int i = 0; i < block; i++) {
 		T* const rowN = &matrix[size * i];
 
 		int stride = 0;
@@ -292,13 +293,13 @@ bool dCholeskyFactorization(int size, T* const matrix)
 
 			if (i == j) {
 				T diag = rowN[i] - s;
-				if (diag < T(dFloat(0.0f))) {
-					if (diag < T(dFloat(1.0e-3f))) {
+				if (diag < T(0.0f)) {
+					if (diag < T(1.0e-3f)) {
 						// the system is ill formed
 						return false;
 					}
 					// allow for some minor rounding error 
-					diag = dFloat(1.0e-12f);
+					diag = T(1.0e-12f);
 				}
 
 				rowN[i] = T(sqrt(diag));
@@ -312,6 +313,11 @@ bool dCholeskyFactorization(int size, T* const matrix)
 	return true;
 }
 
+template<class T>
+bool dCholeskyFactorization(int size, T* const matrix)
+{
+	return dCholeskyFactorization(size, size, matrix);
+}
 
 template<class T>
 void dPermuteRows(int size, int i, int j, T* const matrix, T* const choleskyMatrix, T* const x, T* const r, T* const low, T* const high, int* const permute)
@@ -642,6 +648,102 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 		b[j] = r0[i];
 	}
 	return true;
+}
+
+
+// solve a general Linear complementary program (LCP)
+// A * x = b + r
+// subjected to constraints
+// x(i) = low(i),  if r(i) >= 0  
+// x(i) = high(i), if r(i) <= 0  
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
+//
+// return true is the system has a solution.
+// in return 
+// x is the solution,
+// b is zero
+// note: although the system is called LCP, the solver is far more general than a strict LCP
+// to solve a strict LCP, set the following
+// low(i) = 0
+// high(i) = infinity.
+// this is the same as enforcing the constraint: x(i) * r(i) = 0
+template <class T>
+bool dSolvePartitionDantzigLCP(int size, T* const symmetricMatrixPSD, T* const x, T* const b, T* const low, T* const high, int unboundedSize)
+{
+	short* const permute = dAlloca(short, size);
+
+	for (int i = 0; i < size; i++) {
+		x[i] = b[i];
+		permute[i] = short(i);
+	}
+
+	bool ret = dCholeskyFactorization(size, unboundedSize, symmetricMatrixPSD);
+	if (unboundedSize > 0) {
+		dCholeskySolve(size, unboundedSize, symmetricMatrixPSD, x);
+		int base = unboundedSize * size;
+		for (int i = unboundedSize; i < size; i++) {
+			b[i] = dDotProduct(unboundedSize, &symmetricMatrixPSD[base], x) - b[i];
+			base += size;
+		}
+
+		const int boundedSize = size - unboundedSize;
+		T* const l = dAlloca(T, boundedSize);
+		T* const h = dAlloca(T, boundedSize);
+		T* const c = dAlloca(T, boundedSize);
+		T* const u = dAlloca(T, boundedSize);
+		T* const a11 = dAlloca(T, boundedSize * boundedSize);
+		T* const a10 = dAlloca(T, boundedSize * unboundedSize);
+
+		for (int i = 0; i < boundedSize; i++) {
+			T* const g = &a10[i * unboundedSize];
+			const T* const row = &symmetricMatrixPSD[(unboundedSize + i) * size];
+			for (int j = 0; j < unboundedSize; j++) {
+				g[j] = -row[j];
+			}
+			dCholeskySolve(size, unboundedSize, symmetricMatrixPSD, g);
+
+			T* const arow = &a11[i * boundedSize];
+			const T* const row2 = &symmetricMatrixPSD[(unboundedSize + i) * size];
+			arow[i] = row2[unboundedSize + i] + dDotProduct(unboundedSize, g, row2);
+			for (int j = i + 1; j < boundedSize; j++) {
+				const T* const row1 = &symmetricMatrixPSD[(unboundedSize + j) * size];
+				T elem = row1[unboundedSize + i] + dDotProduct(unboundedSize, g, row1);
+				arow[j] = elem;
+				a11[j * boundedSize + i] = elem;
+			}
+			u[i] = T(0.0f);
+			c[i] = -b[i + unboundedSize];
+			l[i] = low[i + unboundedSize];
+			h[i] = high[i + unboundedSize];
+		}
+
+		if (dSolveDantzigLCP(boundedSize, a11, u, c, l, h)) {
+			for (int i = 0; i < boundedSize; i++) {
+				const T s = u[i];
+				x[unboundedSize + i] = s;
+				const T* const g = &a10[i * unboundedSize];
+				for (int j = 0; j < unboundedSize; j++) {
+					x[j] += g[j] * s;
+				}
+			}
+			ret = true;
+		}
+	} else {
+		for (int i = 0; i < size; i++) {
+			x[i] = T(0.0f);
+		}
+		ret = dSolveDantzigLCP(size, symmetricMatrixPSD, x, b, low, high);
+	}
+
+	for (int i = 0; i < size; i++) {
+		b[i] = x[i];
+	}
+	for (int i = 0; i < size; i++) {
+		int j = permute[i];
+		x[j] = b[i];
+		b[i] = T(0.0f);
+	}
+	return ret;
 }
 
 

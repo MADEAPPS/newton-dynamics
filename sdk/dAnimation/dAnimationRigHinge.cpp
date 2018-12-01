@@ -63,9 +63,8 @@ void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 	NewtonImmediateModeConstraint descriptor;
 	NewtonJoint* const newtonJoint = dCustomHinge::GetJoint();
 	int rows = NewtonUserJointSubmitImmediateModeConstraint(newtonJoint, &descriptor, constraintParams->m_timestep);
-	dAssert (rows == 6);
-
-	for (int i = 0; i < 5; i ++) {
+	rows -= 1;
+	for (int i = 0; i < rows; i ++) {
 		constraintParams->m_jacobians[i].m_jacobian_J01.m_linear = dVector (descriptor.m_jacobian01[i][0], descriptor.m_jacobian01[i][1], descriptor.m_jacobian01[i][2], dFloat (0.0f));
 		constraintParams->m_jacobians[i].m_jacobian_J01.m_angular = dVector (descriptor.m_jacobian01[i][3], descriptor.m_jacobian01[i][4], descriptor.m_jacobian01[i][5], dFloat (0.0f));
 		constraintParams->m_jacobians[i].m_jacobian_J10.m_linear = dVector(descriptor.m_jacobian10[i][0], descriptor.m_jacobian10[i][1], descriptor.m_jacobian10[i][2], dFloat(0.0f));
@@ -76,13 +75,13 @@ void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 		constraintParams->m_normalIndex[i] = 0;
 	}
 
-	m_jacobial01.m_linear = dVector (descriptor.m_jacobian01[5][0], descriptor.m_jacobian01[5][1], descriptor.m_jacobian01[5][2], dFloat (0.0f));
-	m_jacobial01.m_angular = dVector (descriptor.m_jacobian01[5][3], descriptor.m_jacobian01[5][4], descriptor.m_jacobian01[5][5], dFloat (0.0f));
+	m_jacobial01.m_linear = dVector (descriptor.m_jacobian01[rows][0], descriptor.m_jacobian01[5][1], descriptor.m_jacobian01[rows][2], dFloat (0.0f));
+	m_jacobial01.m_angular = dVector (descriptor.m_jacobian01[rows][3], descriptor.m_jacobian01[5][4], descriptor.m_jacobian01[rows][5], dFloat (0.0f));
 
-	m_jacobial10.m_linear = dVector(descriptor.m_jacobian10[5][0], descriptor.m_jacobian10[5][1], descriptor.m_jacobian10[5][2], dFloat(0.0f));
-	m_jacobial10.m_angular = dVector(descriptor.m_jacobian10[5][3], descriptor.m_jacobian10[5][4], descriptor.m_jacobian10[5][5], dFloat(0.0f));
+	m_jacobial10.m_linear = dVector(descriptor.m_jacobian10[rows][0], descriptor.m_jacobian10[rows][1], descriptor.m_jacobian10[rows][2], dFloat(0.0f));
+	m_jacobial10.m_angular = dVector(descriptor.m_jacobian10[rows][3], descriptor.m_jacobian10[rows][4], descriptor.m_jacobian10[rows][5], dFloat(0.0f));
 
-	constraintParams->m_count = 5;
+	constraintParams->m_count = rows;
 }
 
 void dAnimationRigHinge::UpdateJointAcceleration()
