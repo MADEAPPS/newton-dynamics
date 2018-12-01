@@ -75,6 +75,7 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	const dMatrix& matrix1 = m_targetMatrix;
 	dMatrix matrix0 (m_localMatrix * m_state0->GetMatrix());
 	
+	dVector omega(0.0f);
 	dVector veloc0 (m_state0->CalculatePointVelocity(matrix0.m_posit));
 	dVector veloc1 (m_state1->CalculatePointVelocity(matrix1.m_posit));
 
@@ -82,9 +83,11 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	dVector relPosit(matrix1.m_posit - matrix0.m_posit);
 
 	const dFloat damp = 0.3f;
+
+	const dFloat timestep = constraintParams->m_timestep;
 	const dFloat invTimestep = constraintParams->m_timestepInv;
 
-	dVector omega (0.0f);
+	const dFloat step = m_linearSpeed * timestep;
 	for (int i = 0; i < 3; i++) {
 		dFloat speed = relVeloc.DotProduct3(matrix1[i]);
 		dFloat dist = relPosit.DotProduct3(matrix1[i]) * damp;
@@ -93,8 +96,26 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 		AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i], omega);
 		constraintParams->m_jointLowFrictionCoef[i] = -m_linearFriction;
 		constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
-		constraintParams->m_jointAccel[i] = relSpeed * invTimestep;
+		//constraintParams->m_jointAccel[i] = relSpeed * invTimestep;
 		constraintParams->m_normalIndex[i] = 0;
+
+		dFloat currentSpeed = 0.0f;
+		dFloat dist1 = relPosit.DotProduct3(matrix1[i]);
+		if (dist1 > step) {
+			currentSpeed = m_linearSpeed;
+		} else if (dist1 < -step) {
+			currentSpeed = -m_linearSpeed;
+		} else {
+			currentSpeed = 0.3f * dist1 * invTimestep;
+		}
+		
+		dFloat xxxx0 = currentSpeed + constraintParams->m_jointAccel[i] * timestep;
+		dFloat xxxx1 = relSpeed;
+		dTrace(("%f %f\n", xxxx0, xxxx1));
+
+		//constraintParams->m_jointAccel[i] = relSpeed * invTimestep;
+		constraintParams->m_jointAccel[i] = xxxx0 * invTimestep;
+
 	}
 
 #else
