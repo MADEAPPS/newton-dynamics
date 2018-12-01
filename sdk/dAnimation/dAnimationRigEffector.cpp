@@ -71,6 +71,7 @@ void dAnimationRigEffector::SetTargetPose(const dMatrix& globalSpaceMatrix)
 
 void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
+#if 1
 	const dMatrix& matrix1 = m_targetMatrix;
 	dMatrix matrix0 (m_localMatrix * m_state0->GetMatrix());
 	
@@ -85,24 +86,49 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 
 	dVector omega (0.0f);
 	for (int i = 0; i < 3; i++) {
-//	for (int i = 0; i < 2; i++) {
 		dFloat speed = relVeloc.DotProduct3(matrix1[i]);
 		dFloat dist = relPosit.DotProduct3(matrix1[i]) * damp;
 		dFloat relSpeed = dClamp(dist * invTimestep + speed, -m_linearSpeed, m_linearSpeed);
-		dFloat relAccel = relSpeed * invTimestep;
-//relAccel = 10.0f;
 
 		AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i], omega);
 		constraintParams->m_jointLowFrictionCoef[i] = -m_linearFriction;
 		constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
-		constraintParams->m_jointAccel[i] = relAccel;
+		constraintParams->m_jointAccel[i] = relSpeed * invTimestep;
 		constraintParams->m_normalIndex[i] = 0;
 	}
+
+#else
+	const dMatrix& matrix1 = m_targetMatrix;
+	dMatrix matrix0(m_localMatrix * m_state0->GetMatrix());
+
+	dVector omega(0.0f);
+	dVector relPosit(matrix1.m_posit - matrix0.m_posit);
+
+	dAssert(m_linearSpeed >= 0.0f);
+	const dFloat timestep = constraintParams->m_timestep;
+	const dFloat invTimestep = constraintParams->m_timestepInv;
+	const dFloat step = m_linearSpeed * timestep;
+	for (int i = 0; i < 3; i++) {
+
+		dFloat currentSpeed = 0.0f;
+		dFloat dist = relPosit.DotProduct3(matrix1[i]);
+		if (dist > step) {
+			currentSpeed = m_linearSpeed;
+		} else if (dist < -step) {
+			currentSpeed = -m_linearSpeed;
+		} else {
+			currentSpeed = 0.3f * dist * invTimestep;
+		}
+
+		AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i], omega);
+		constraintParams->m_jointLowFrictionCoef[i] = -m_linearFriction;
+		constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
+		constraintParams->m_jointAccel[i] -= currentSpeed * invTimestep;
+		constraintParams->m_normalIndex[i] = 0;
+	}
+#endif
+
 	m_dof = 3;
 	m_count = 3;
 	constraintParams->m_count = 3;
-
-//m_dof = 2;
-//m_count = 2;
-//constraintParams->m_count = 2;
 }
