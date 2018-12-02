@@ -35,10 +35,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dAnimation\dAnimationBlendNode.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationClip.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationNode.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationPlayer.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationAcyclicJoint.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationAcyclicSolver.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationCharacterRig.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationCharacterRigManager.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendNode.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendPose.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendRoot.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendTwoWay.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationKinematicLoopJoint.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRigEffector.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRigForwardDynamicLimb.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRigHinge.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRigJoint.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRigLimb.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -51,10 +61,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dAnimation\dAnimationBlendNode.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationClip.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationNode.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationPlayer.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationAcyclicJoint.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationAcyclicSolver.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationCharacterRig.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationCharacterRigManager.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendNode.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendNodePose.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendPose.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendRoot.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendTwoWay.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationKinematicLoopJoint.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRigEffector.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRigForwardDynamicLimb.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRigHinge.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRigJoint.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRigLimb.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -192,7 +213,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>
@@ -212,7 +233,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>
@@ -232,7 +253,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>
@@ -252,7 +273,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>
@@ -274,7 +295,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>
@@ -298,7 +319,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>
@@ -322,7 +343,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>
@@ -346,7 +367,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_LIB;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dAnimationStdAfx.h</PrecompiledHeaderFile>

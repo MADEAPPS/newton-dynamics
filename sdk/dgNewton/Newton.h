@@ -31,17 +31,9 @@
 	#define NEWTON_API
 #else 
 	#ifdef _NEWTON_BUILD_DLL
-		#ifdef _WIN32
-			#define NEWTON_API __declspec (dllexport)
-		#else
-			#define NEWTON_API __attribute__ ((visibility("default")))
-		#endif
+		#define NEWTON_API __declspec (dllexport)
 	#else
-		#ifdef _WIN32
-			#define NEWTON_API __declspec (dllimport)
-		#else
-			#define NEWTON_API
-		#endif
+		#define NEWTON_API __declspec (dllimport)
 	#endif
 #endif
 

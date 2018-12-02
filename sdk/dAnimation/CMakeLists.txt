@@ -31,9 +31,12 @@ if (UNIX)
         )
 endif (UNIX)
 
+
 if (MSVC)
-    add_definitions(-D_NEWTON_STATIC_LIB)
-    add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
+	if(NOT NEWTON_BUILD_SHARED_LIBS)
+	    add_definitions(-D_NEWTON_STATIC_LIB)
+	    add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
+	endif(NOT NEWTON_BUILD_SHARED_LIBS)
 
     add_library(${projectName} STATIC ${CPP_SOURCE})
     set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudAnimationStdAfx.h")

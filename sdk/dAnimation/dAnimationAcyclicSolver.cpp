@@ -15,9 +15,9 @@
 #include "dAnimationAcyclicSolver.h"
 #include "dAnimationKinematicLoopJoint.h"
 
-#define D_DIAG_DAMP			 (1.0e-6f)
-#define D_DIAG_REGULARIZER		 (1.0e-4f)
-#define D_MAX_FRICTION_BOUND (D_COMPLEMENTARITY_MAX_FRICTION_BOUND * 0.5f)
+#define D_DIAG_DAMP			 dFloat(1.0e-6f)
+#define D_DIAG_REGULARIZER	 dFloat(1.0e-4f)
+#define D_MAX_FRICTION_BOUND (D_COMPLEMENTARITY_MAX_FRICTION_BOUND * dFloat(0.5f))
 
 class dAnimationAcyclicSolver::dMatrixData
 {
