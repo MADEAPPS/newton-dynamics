@@ -1110,7 +1110,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 		dgSolveCholesky(size, unboundedSize, symmetricMatrixPSD , x);
 		dgInt32 base = unboundedSize * size;
 		for (dgInt32 i = unboundedSize; i < size; i++) {
-			b[i] = dgDotProduct(unboundedSize, &symmetricMatrixPSD[base], x) - b[i];
+			b[i] -= dgDotProduct(unboundedSize, &symmetricMatrixPSD[base], x);
 			base += size;
 		}
 
@@ -1147,7 +1147,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 				a11[j * boundedSize + i] = elem;
 			}
 			u[i] = T(0.0f);
-			c[i] = -b[i + unboundedSize];
+			c[i] = b[i + unboundedSize];
 			l[i] = low[i + unboundedSize];
 			h[i] = high[i + unboundedSize];
 		}

@@ -461,7 +461,7 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 	for (int i = 0; i < size; i++) {
 		T* const row = &choleskyMatrix[i * size];
 		for (int j = i + 1; j < size; j++) {
-			row[j] = T(dFloat(0.0));
+			row[j] = T(0.0f);
 		}
 	}
 
@@ -699,10 +699,11 @@ bool dSolvePartitionDantzigLCP(int size, T* const symmetricMatrixPSD, T* const x
 
 		ret = dCholeskyWithRegularizer(size, unboundedSize, symmetricMatrixPSD, regularizer);
 		if (ret) {
+			memcpy (x, b, unboundedSize * sizeof (T));
 			dCholeskySolve(size, unboundedSize, symmetricMatrixPSD, x);
 			int base = unboundedSize * size;
 			for (int i = unboundedSize; i < size; i++) {
-				b[i] = dDotProduct(unboundedSize, &symmetricMatrixPSD[base], x) - b[i];
+				b[i] -= dDotProduct(unboundedSize, &symmetricMatrixPSD[base], x);
 				base += size;
 			}
 
@@ -732,7 +733,7 @@ bool dSolvePartitionDantzigLCP(int size, T* const symmetricMatrixPSD, T* const x
 					a11[j * boundedSize + i] = elem;
 				}
 				u[i] = T(0.0f);
-				c[i] = -b[i + unboundedSize];
+				c[i] = b[i + unboundedSize];
 				l[i] = low[i + unboundedSize];
 				h[i] = high[i + unboundedSize];
 			}

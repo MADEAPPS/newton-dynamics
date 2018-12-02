@@ -31,7 +31,6 @@ if (UNIX)
         )
 endif (UNIX)
 
-
 if (MSVC)
 	if(NOT NEWTON_BUILD_SHARED_LIBS)
 	    add_definitions(-D_NEWTON_STATIC_LIB)
