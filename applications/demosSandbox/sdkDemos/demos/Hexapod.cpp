@@ -466,7 +466,6 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 	dFloat32 m_speed;
 };
 
-
 void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box

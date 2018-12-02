@@ -40,7 +40,7 @@ class dAnimationAcyclicSolver: public dContainersAlloc
 	void Factorize(dAnimationAcyclicJoint* const node);
 	int BuildJacobianMatrix(dFloat timestep);
 	void GetJacobians(dAnimationAcyclicJoint* const node);
-	void CalculateLoopMassMatrixCoefficients(dFloat* const diagDamp);
+	void CalculateLoopMassMatrixCoefficients();
 	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
 
 	void CalculateJointDiagonal(dAnimationAcyclicJoint* const node);

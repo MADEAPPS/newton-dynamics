@@ -26,6 +26,7 @@ class dAnimationKinematicLoopJoint: public dContainersAlloc, public dComplementa
 	dAnimationAcyclicJoint* GetOwner1() const { return m_owner1; }
 	void SetOwners(dAnimationAcyclicJoint* const owner0, dAnimationAcyclicJoint* const owner1);
 
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const {}
 	virtual int GetMaxDof() const = 0;
 
 	dAnimationAcyclicJoint* m_owner0;

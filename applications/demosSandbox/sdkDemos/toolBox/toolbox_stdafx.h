@@ -198,6 +198,7 @@ typedef long long unsigned64;
 #include <dAnimationEffectorBlendRoot.h>
 #include <dAnimationEffectorBlendTwoWay.h>
 #include <dAnimationCharacterRigManager.h>
+#include <dAnimationRigForwardDynamicLimb.h>
 
 /*
 #ifdef _NEWTON_USE_DOUBLE

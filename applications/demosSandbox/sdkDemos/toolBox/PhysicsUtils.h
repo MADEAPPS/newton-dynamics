@@ -13,7 +13,7 @@
 #define __PHYSICS_UTIL__
 
 
-#define DEMO_GRAVITY  -10.0f
+#define DEMO_GRAVITY  -10.0f 
 //#define DEMO_GRAVITY  -0.0f
 
 enum PrimitiveType
@@ -29,8 +29,6 @@ enum PrimitiveType
 	_REGULAR_CONVEX_HULL_PRIMITIVE,
 	_COMPOUND_CONVEX_CRUZ_PRIMITIVE,
 };
-
-
 
 
 void ExportScene (NewtonWorld* const world, const char* const fileName);

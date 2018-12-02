@@ -10,31 +10,29 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigHinge.h"
 #include "dAnimationCharacterRigManager.h"
+#include "dAnimationRigForwardDynamicLimb.h"
 
-dAnimationRigHinge::dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body)
+dAnimationRigForwardDynamicLimb::dAnimationRigForwardDynamicLimb(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body)
 	:dAnimationRigLimb(parent, body)
-	,dCustomHinge (basicMatrix, body, parent->GetNewtonBody())
-	,m_rowAccel(0.0f)
+	,dCustomHinge(basicMatrix, body, parent->GetNewtonBody())
 {
-
 	dMatrix boneAligmentMatrix(
-		dVector( 0.0f, 1.0f, 0.0f, 0.0f),
-		dVector( 0.0f, 0.0f, 1.0f, 0.0f),
-		dVector( 1.0f, 0.0f, 0.0f, 0.0f),
-		dVector( 0.0f, 0.0f, 0.0f, 1.0f));
-	dMatrix matrix (boneAligmentMatrix * basicMatrix);
+		dVector(0.0f, 1.0f, 0.0f, 0.0f),
+		dVector(0.0f, 0.0f, 1.0f, 0.0f),
+		dVector(1.0f, 0.0f, 0.0f, 0.0f),
+		dVector(0.0f, 0.0f, 0.0f, 1.0f));
+	dMatrix matrix(boneAligmentMatrix * basicMatrix);
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 
 	EnableLimits(true);
 }
 
-dAnimationRigHinge::~dAnimationRigHinge()
+dAnimationRigForwardDynamicLimb::~dAnimationRigForwardDynamicLimb()
 {
 }
 
-void dAnimationRigHinge::Debug(dDebugDisplay* const debugContext) const
+void dAnimationRigForwardDynamicLimb::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 	dFloat scale = debugContext->GetScale();
 	debugContext->SetScale(scale * 2.5f);
@@ -45,28 +43,30 @@ void dAnimationRigHinge::Debug(dDebugDisplay* const debugContext) const
 	dAnimationRigLimb::Debug(debugContext);
 }
 
-void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
-{
-	dCustomHinge::SubmitConstraints (timestep, threadIndex);
 
-//	dFloat angle = GetJointAngle();
-//	dFloat speed = GetJointOmega();
+void dAnimationRigForwardDynamicLimb::SubmitConstraints (dFloat timestep, int threadIndex)
+{
+	dCustomHinge::SubmitConstraints(timestep, threadIndex);
+
+	//	dFloat angle = GetJointAngle();
+	//	dFloat speed = GetJointOmega();
 	if (!m_limitReached) {
 		NewtonJoint* const joint = dCustomHinge::GetJoint();
 		NewtonUserJointSetRowAcceleration(joint, m_rowAccel);
 	}
 }
 
-void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+
+void dAnimationRigForwardDynamicLimb::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	m_rowAccel = 0.0f;
 	NewtonImmediateModeConstraint descriptor;
 	NewtonJoint* const newtonJoint = dCustomHinge::GetJoint();
 	const int rows = NewtonUserJointSubmitImmediateModeConstraint(newtonJoint, &descriptor, constraintParams->m_timestep) - 1;
 
-	for (int i = 0; i < rows; i ++) {
-		constraintParams->m_jacobians[i].m_jacobian_J01.m_linear = dVector (descriptor.m_jacobian01[i][0], descriptor.m_jacobian01[i][1], descriptor.m_jacobian01[i][2], dFloat (0.0f));
-		constraintParams->m_jacobians[i].m_jacobian_J01.m_angular = dVector (descriptor.m_jacobian01[i][3], descriptor.m_jacobian01[i][4], descriptor.m_jacobian01[i][5], dFloat (0.0f));
+	for (int i = 0; i < rows; i++) {
+		constraintParams->m_jacobians[i].m_jacobian_J01.m_linear = dVector(descriptor.m_jacobian01[i][0], descriptor.m_jacobian01[i][1], descriptor.m_jacobian01[i][2], dFloat(0.0f));
+		constraintParams->m_jacobians[i].m_jacobian_J01.m_angular = dVector(descriptor.m_jacobian01[i][3], descriptor.m_jacobian01[i][4], descriptor.m_jacobian01[i][5], dFloat(0.0f));
 		constraintParams->m_jacobians[i].m_jacobian_J10.m_linear = dVector(descriptor.m_jacobian10[i][0], descriptor.m_jacobian10[i][1], descriptor.m_jacobian10[i][2], dFloat(0.0f));
 		constraintParams->m_jacobians[i].m_jacobian_J10.m_angular = dVector(descriptor.m_jacobian10[i][3], descriptor.m_jacobian10[i][4], descriptor.m_jacobian10[i][5], dFloat(0.0f));
 		constraintParams->m_jointAccel[i] = descriptor.m_jointAccel[i];
@@ -75,8 +75,8 @@ void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 		constraintParams->m_normalIndex[i] = 0;
 	}
 
-	m_jacobial01.m_linear = dVector (descriptor.m_jacobian01[rows][0], descriptor.m_jacobian01[5][1], descriptor.m_jacobian01[rows][2], dFloat (0.0f));
-	m_jacobial01.m_angular = dVector (descriptor.m_jacobian01[rows][3], descriptor.m_jacobian01[5][4], descriptor.m_jacobian01[rows][5], dFloat (0.0f));
+	m_jacobial01.m_linear = dVector(descriptor.m_jacobian01[rows][0], descriptor.m_jacobian01[5][1], descriptor.m_jacobian01[rows][2], dFloat(0.0f));
+	m_jacobial01.m_angular = dVector(descriptor.m_jacobian01[rows][3], descriptor.m_jacobian01[5][4], descriptor.m_jacobian01[rows][5], dFloat(0.0f));
 
 	m_jacobial10.m_linear = dVector(descriptor.m_jacobian10[rows][0], descriptor.m_jacobian10[rows][1], descriptor.m_jacobian10[rows][2], dFloat(0.0f));
 	m_jacobial10.m_angular = dVector(descriptor.m_jacobian10[rows][3], descriptor.m_jacobian10[rows][4], descriptor.m_jacobian10[rows][5], dFloat(0.0f));
@@ -86,7 +86,7 @@ void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 	constraintParams->m_count = rows;
 }
 
-void dAnimationRigHinge::UpdateJointAcceleration()
+void dAnimationRigForwardDynamicLimb::UpdateJointAcceleration()
 {
 	dComplementaritySolver::dBodyState* const body0 = GetBody();
 	dComplementaritySolver::dBodyState* const body1 = m_parent->GetBody();
@@ -96,8 +96,10 @@ void dAnimationRigHinge::UpdateJointAcceleration()
 	const dVector& alpha1 = body1->GetInvInertia().RotateVector(body1->GetTorque());
 
 	dVector accel (accel0 * m_jacobial01.m_linear + alpha0 * m_jacobial01.m_angular + accel1 * m_jacobial10.m_linear + alpha1 * m_jacobial10.m_angular); 
-	m_rowAccel = accel.m_x + accel.m_y + accel.m_z;
+//	m_rowAccel = accel.m_x + accel.m_y + accel.m_z;
 
-//dTrace (("%f\n", m_rowAccel))
+	m_rowAccel = 0.0f;
+
 	dAnimationRigLimb::UpdateJointAcceleration();
+
 }

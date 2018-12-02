@@ -28,6 +28,7 @@ class dAnimationRigLimb: public dAnimationRigJoint, public dComplementaritySolve
 
 	protected:
 	virtual void Finalize();
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const;
 	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 

@@ -45,6 +45,7 @@
     <ClCompile Include="..\..\dAnimation\dAnimationKinematicLoopJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigEffector.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRigForwardDynamicLimb.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigHinge.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationRigLimb.cpp" />
@@ -70,6 +71,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimationKinematicLoopJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigEffector.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRigForwardDynamicLimb.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigHinge.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationRigLimb.h" />

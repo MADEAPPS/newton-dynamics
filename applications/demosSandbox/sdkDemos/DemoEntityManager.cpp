@@ -334,7 +334,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showAABB = false;
 //	m_showContactPoints = false;
 //	m_hideVisualMeshes = true;
-//	m_autoSleepMode = false;
+	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 	m_solverPasses = 4;
 //	m_workerThreads = 4;

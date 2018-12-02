@@ -36,6 +36,8 @@ class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 
 	void SetTargetPose(const dMatrix& blobalSpaceMatrix);
 
+	void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const;
+
 	dMatrix m_localMatrix;
 	dMatrix m_targetMatrix;
 	dMatrix m_effectorMatrix;

@@ -38,6 +38,15 @@ NewtonBody* dAnimationRigLimb::GetNewtonBody() const
 	return m_newtonBody; 
 }
 
+void dAnimationRigLimb::Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const
+{
+	if (m_effector) {
+		m_effector->Debug(debugDisplay);
+	}
+
+	dAnimationRigJoint::Debug(debugDisplay);
+}
+
 void dAnimationRigLimb::Finalize()
 {
 	if (m_effector) {

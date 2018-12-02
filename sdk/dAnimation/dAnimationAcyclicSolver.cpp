@@ -16,6 +16,7 @@
 #include "dAnimationKinematicLoopJoint.h"
 
 #define D_DIAG_DAMP			 (1.0e-6f)
+#define D_DIAG_REGULARIZER		 (1.0e-4f)
 #define D_MAX_FRICTION_BOUND (D_COMPLEMENTARITY_MAX_FRICTION_BOUND * 0.5f)
 
 class dAnimationAcyclicSolver::dMatrixData
@@ -311,7 +312,7 @@ void dAnimationAcyclicSolver::Factorize(dAnimationAcyclicJoint* const node)
 	}
 }
 
-void dAnimationAcyclicSolver::CalculateLoopMassMatrixCoefficients(dFloat* const diagDamp)
+void dAnimationAcyclicSolver::CalculateLoopMassMatrixCoefficients()
 {
 	const int auxiliaryRowCount = m_auxiliaryRowCount + m_loopRowCount;
 	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -476,8 +477,7 @@ void dAnimationAcyclicSolver::InitLoopMassMatrix()
 	memset(m_massMatrix10, 0, row * col * sizeof(dFloat));
 	memset(m_massMatrix11, 0, col * col * sizeof(dFloat));
 
-	dFloat* const diagDamp = dAlloca(dFloat, col);
-	CalculateLoopMassMatrixCoefficients(diagDamp);
+	CalculateLoopMassMatrixCoefficients();
 
 	const dSpatialVector zero(0.0f);
 	dVectorPair* const accelPair = dAlloca(dVectorPair, m_nodeCount);
@@ -544,7 +544,9 @@ void dAnimationAcyclicSolver::InitLoopMassMatrix()
 			int index = indexList[k];
 			diagonal += matrixRow10[index] * deltaForcePtr[index];
 		}
-		matrixRow11[i] = dMax(diagonal, diagDamp[i]);
+		diagonal += diagonal * D_DIAG_REGULARIZER;
+		dAssert (diagonal > 0.0f);
+		matrixRow11[i] = dMax(diagonal, D_DIAG_DAMP);
 
 		for (int j = i + 1; j < auxiliaryIndex; j++) {
 			dFloat offDiagonal = matrixRow11[j];
@@ -1022,6 +1024,7 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 	int matrixRowsIndex[30];
 
 	int rows = 0;
+	int auxiliaryCount = 0;
 	for (int i = 0; i < m_nodeCount - 1; i++) {
 		dAnimationAcyclicJoint* const node = m_nodesOrder[i];
 		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
@@ -1058,6 +1061,7 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 			pairs[rows].m_m1 = m1;
 			matrixRowsIndex[rows] = first + index;
 			rows++;
+			auxiliaryCount ++;
 		}
 	}
 
@@ -1074,6 +1078,7 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 			pairs[rows].m_m1 = m1;
 			matrixRowsIndex[rows] = first + i;
 			rows++;
+			auxiliaryCount++;
 		}
 	}
 	
@@ -1155,9 +1160,6 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 			}
 		}
 	}
-
-//	dGaussSeidelLcpSor(rows, matrix, u, b, normalIndex, low, high, dFloat(1.0e-3f), 1000, dFloat(1.15f));
-	dSolvePartitionDantzigLCP(rows, matrix, u, b, low, high, rows - m_loopJointCount);
 /*
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < rows; j++) {
@@ -1172,10 +1174,14 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 	}
 	dTrace(("\n"));
 */
+//	dGaussSeidelLcpSor(rows, matrix, u, b, normalIndex, low, high, dFloat(1.0e-3f), 1000, dFloat(1.15f));
+	dSolvePartitionDantzigLCP(rows, matrix, u, b, low, high, rows - auxiliaryCount);
+/*
 	for (int i = 0; i < rows; i++) {
 		dTrace(("%f ", u[i]));
 	}
 //	dTrace(("\n"));
+*/
 }
 
 void dAnimationAcyclicSolver::Update(dFloat timestep)
@@ -1236,7 +1242,7 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		InitLoopMassMatrix();
 	}
 
-DebugMassMatrix();
+//DebugMassMatrix();
 
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const accel = dAlloca(dVectorPair, m_nodeCount);
@@ -1249,7 +1255,7 @@ DebugMassMatrix();
 		UpdateForces(force);
 	}
 
-
+/*
 dTrace(("\n"));
 for (int i = 0; i < m_nodeCount - 1; i++) {
 	dAnimationAcyclicJoint* const node = m_nodesOrder[i];
@@ -1265,5 +1271,5 @@ for (int i = 0; i < m_loopJointCount; i++) {
 	}
 }
 dTrace(("\n"));
-
+*/
 }
