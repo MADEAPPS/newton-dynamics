@@ -6595,6 +6595,75 @@ bool ImGui::SliderFloat(const char* label, float* v, float v_min, float v_max, c
     return value_changed;
 }
 
+bool ImGui::SliderFloat_DoubleSpace(const char* label, float* v, float v_min, float v_max, const char* display_format, float power)
+{
+	ImGuiWindow* window = GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+
+	char text[256];
+	sprintf(text, "%s %s", label, display_format);
+	ImGui::Text(text, *v);
+
+	ImGuiContext& g = *GImGui;
+	const ImGuiStyle& style = g.Style;
+	const ImGuiID id = window->GetID(label);
+//	const float w = CalcItemWidth();
+	const float w = 160.0f;
+
+	const char* emptyLabel = "";
+	const ImVec2 label_size = CalcTextSize(emptyLabel, NULL, true);
+	const ImRect frame_bb(window->DC.CursorPos, window->DC.CursorPos + ImVec2(w, label_size.y + style.FramePadding.y*2.0f));
+	const ImRect total_bb(frame_bb.Min, frame_bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, 0.0f));
+
+	// NB- we don't call ItemSize() yet because we may turn into a text edit box below
+	if (!ItemAdd(total_bb, &id))
+	{
+		ItemSize(total_bb, style.FramePadding.y);
+		return false;
+	}
+
+	const bool hovered = IsHovered(frame_bb, id);
+	if (hovered)
+		SetHoveredID(id);
+
+	if (!display_format)
+		display_format = "%.3f";
+	int decimal_precision = ParseFormatPrecision(display_format, 3);
+
+	// Tabbing or CTRL-clicking on Slider turns it into an input box
+	bool start_text_input = false;
+	const bool tab_focus_requested = FocusableItemRegister(window, g.ActiveId == id);
+	if (tab_focus_requested || (hovered && g.IO.MouseClicked[0]))
+	{
+		SetActiveID(id, window);
+		FocusWindow(window);
+
+		if (tab_focus_requested || g.IO.KeyCtrl)
+		{
+			start_text_input = true;
+			g.ScalarAsInputTextId = 0;
+		}
+	}
+	if (start_text_input || (g.ActiveId == id && g.ScalarAsInputTextId == id))
+		return InputScalarAsWidgetReplacement(frame_bb, emptyLabel, ImGuiDataType_Float, v, id, decimal_precision);
+
+	ItemSize(total_bb, style.FramePadding.y);
+
+	// Actual slider behavior + render grab
+	const bool value_changed = SliderBehavior(frame_bb, id, v, v_min, v_max, power, decimal_precision);
+
+	// Display value using user-provided display format so user can add prefix/suffix/decorations to the value.
+	char value_buf[64];
+	const char* value_buf_end = value_buf + ImFormatString(value_buf, IM_ARRAYSIZE(value_buf), display_format, *v);
+	RenderTextClipped(frame_bb.Min, frame_bb.Max, value_buf, value_buf_end, NULL, ImVec2(0.5f, 0.5f));
+
+	if (label_size.x > 0.0f)
+		RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), emptyLabel);
+
+	return value_changed;
+}
+
 bool ImGui::VSliderFloat(const char* label, const ImVec2& size, float* v, float v_min, float v_max, const char* display_format, float power)
 {
     ImGuiWindow* window = GetCurrentWindow();
@@ -6658,6 +6727,17 @@ bool ImGui::SliderInt(const char* label, int* v, int v_min, int v_max, const cha
     *v = (int)v_f;
     return value_changed;
 }
+
+bool ImGui::SliderInt_DoubleSpace(const char* label, int* v, int v_min, int v_max, const char* display_format)
+{
+	if (!display_format)
+		display_format = "%.0f";
+	float v_f = (float)*v;
+	bool value_changed = SliderFloat_DoubleSpace(label, &v_f, (float)v_min, (float)v_max, display_format, 1.0f);
+	*v = (int)v_f;
+	return value_changed;
+}
+
 
 bool ImGui::VSliderInt(const char* label, const ImVec2& size, int* v, int v_min, int v_max, const char* display_format)
 {

@@ -741,11 +741,11 @@ void DemoEntityManager::ShowMainMenuBar()
 			}
 			ImGui::Separator();
 
-			ImGui::Text("iterative solver passes %d", m_solverPasses);
-			ImGui::SliderInt("", &m_solverPasses, 4, 20);
+			//ImGui::Text("iterative solver passes %d", m_solverPasses);
+			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 20);
 
-			ImGui::Text("worker threads %d", m_workerThreads);
-			ImGui::SliderInt(" ", &m_workerThreads, 1, 20);
+			//ImGui::Text("worker threads %d", m_workerThreads);
+			ImGui::SliderInt_DoubleSpace("worker threads", &m_workerThreads, 1, 20);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);

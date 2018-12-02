@@ -230,15 +230,14 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*) entiry->GetUserData();
 
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Use sliders to manipulate robot");
-			//ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
-			//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
+			scene->Print(color, "Sliders control");
+			
 			dFloat32 val0 = dFloat32(controlData->m_walkSpeed);
-			ImGui::SliderFloat("walkSpeed", &val0, 0.0f, 1.0f);
+			ImGui::SliderFloat_DoubleSpace("walkSpeed", &val0, 0.0f, 1.0f);
 			controlData->m_walkSpeed = val0;
 
 			dFloat32 val1 = dFloat32(controlData->m_hipHigh);
-			ImGui::SliderFloat("hip high", &val1, -0.5f, 1.5f);
+			ImGui::SliderFloat_DoubleSpace("hip high", &val1, -0.5f, 1.5f);
 			controlData->m_hipHigh = val1;
 		}
 	}
