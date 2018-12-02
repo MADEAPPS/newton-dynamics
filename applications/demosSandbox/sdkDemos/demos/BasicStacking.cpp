@@ -189,6 +189,7 @@ static void CapsuleStack2(DemoEntityManager* const scene, dFloat mass, const dVe
 	DemoMesh* const geometry = new DemoMesh("sphere", collision, "smilli.tga", "smilli.tga", "smilli.tga", 1.0f, uvMatrix);
 
 	dFloat vertialStep = blockBoxSize.m_x*10.0f;
+vertialStep = 4.0f;
 	dFloat horizontalStep = blockBoxSize.m_y * 0.8f;
 	dMatrix matrix0(dGetIdentityMatrix());
 	matrix0.m_posit = origin;
