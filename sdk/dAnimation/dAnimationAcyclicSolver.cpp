@@ -1176,12 +1176,12 @@ void dAnimationAcyclicSolver::DebugMassMatrix()
 */
 //	dGaussSeidelLcpSor(rows, matrix, u, b, normalIndex, low, high, dFloat(1.0e-3f), 1000, dFloat(1.15f));
 	dSolvePartitionDantzigLCP(rows, matrix, u, b, low, high, rows - auxiliaryCount);
-/*
+
 	for (int i = 0; i < rows; i++) {
 		dTrace(("%f ", u[i]));
 	}
 //	dTrace(("\n"));
-*/
+
 }
 
 void dAnimationAcyclicSolver::Update(dFloat timestep)
