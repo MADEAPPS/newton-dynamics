@@ -42,10 +42,10 @@ static dRagDollConfig ragDollConfig[] =
 //	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
 
-//	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 50.0f },
-//	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-//	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 100.0f },
-//	{ "bone_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 50.0f },
+	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
+	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 100.0f },
+	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
@@ -170,6 +170,22 @@ class dEffectorTreePostureGenerator: public dAnimationEffectorBlendNode
 	dVector m_euler;
 	dVector m_position;
 	dAnimationEffectorBlendNode* m_child;
+};
+
+class dAnimationKeeController: public dAnimationRigForwardDynamicLimb
+{
+	public:
+	dAnimationKeeController(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body, const dRagDollConfig& config)
+		:dAnimationRigForwardDynamicLimb(basicMatrix, parent, body)
+	{
+		SetFriction(config.m_frictionScale * config.m_mass * DEMO_MUSCLE_STRENGTH);
+		SetLimits(config.m_minLimit * dDegreeToRad, config.m_maxLimit * dDegreeToRad);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dAnimationRigForwardDynamicLimb::SubmitConstraints(timestep, threadIndex);
+	}
 };
 
 class BalancingDummyManager : public dAnimationCharacterRigManager
@@ -388,9 +404,7 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 						dAnimationRigLimb* limbJoint = NULL;
 						if (strstr(name, "boneFD")) {
-							dAnimationRigForwardDynamicLimb* const hinge = new dAnimationRigForwardDynamicLimb(matrix, parentJoint, limbBody);
-							hinge->SetFriction(ragDollConfig[i].m_frictionScale * ragDollConfig[i].m_mass * DEMO_MUSCLE_STRENGTH);
-							hinge->SetLimits(ragDollConfig[i].m_minLimit * dDegreeToRad, ragDollConfig[i].m_maxLimit * dDegreeToRad);
+							dAnimationRigForwardDynamicLimb* const hinge = new dAnimationKeeController(matrix, parentJoint, limbBody, ragDollConfig[i]);
 							limbJoint = hinge;
 						} else {
 							dAnimationRigHinge* const hinge = new dAnimationRigHinge(matrix, parentJoint, limbBody);

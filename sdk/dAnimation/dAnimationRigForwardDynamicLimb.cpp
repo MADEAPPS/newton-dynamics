@@ -43,19 +43,15 @@ void dAnimationRigForwardDynamicLimb::Debug(dCustomJoint::dDebugDisplay* const d
 	dAnimationRigLimb::Debug(debugContext);
 }
 
-
 void dAnimationRigForwardDynamicLimb::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dCustomHinge::SubmitConstraints(timestep, threadIndex);
 
-	//	dFloat angle = GetJointAngle();
-	//	dFloat speed = GetJointOmega();
 	if (!m_limitReached) {
 		NewtonJoint* const joint = dCustomHinge::GetJoint();
 		NewtonUserJointSetRowAcceleration(joint, m_rowAccel);
 	}
 }
-
 
 void dAnimationRigForwardDynamicLimb::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
