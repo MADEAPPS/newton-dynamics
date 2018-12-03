@@ -319,8 +319,8 @@ void dTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat
 	dAssert (tire);
 	dAssert (chassis);
 
-	const dMatrix& tireMatrix = tire->GetBody()->GetMatrix();
-	const dMatrix& chassisMatrix = chassis->GetBody()->GetMatrix();
+	const dMatrix& tireMatrix = tire->GetProxyBody()->GetMatrix();
+	const dMatrix& chassisMatrix = chassis->GetProxyBody()->GetMatrix();
 
 	dVector localPosit (chassisMatrix.UntransformVector(tireMatrix.m_posit));
 	dVector origin (m_point + m_normal.Scale (1.0f/32.0f)); 
@@ -397,7 +397,7 @@ void dEngineCrankJoint::SetTorqueAndRpm(dFloat torque, dFloat rpm)
 void dEngineCrankJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dComplementaritySolver::dBodyState* const engine = m_state0;
-	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetBody();
+	dComplementaritySolver::dBodyState* const chassis = GetOwner0()->GetProxyBody();
 
 	const dVector& omega = chassis->GetOmega();
 	const dMatrix& matrix = engine->GetMatrix();
@@ -452,7 +452,7 @@ void dGearBoxJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const
 	if (dAbs(m_gearRatio) > 1.0e-3f) {
 
 		dVehicleVirtualEngine* const engineNode = (dVehicleVirtualEngine*)GetOwner0();
-		dComplementaritySolver::dBodyState* const chassis = engineNode->GetBody();
+		dComplementaritySolver::dBodyState* const chassis = engineNode->GetProxyBody();
 		const dVehicleEngineInterface::dEngineInfo& info = engineNode->GetInfo();
 	
 		const dVector& omega = chassis->GetOmega(); 
@@ -497,7 +497,7 @@ dTireAxleJoint::dTireAxleJoint()
 void dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dVehicleVirtualEngine* const engineNode = (dVehicleVirtualEngine*)GetOwner0();
-	dComplementaritySolver::dBodyState* const chassis = engineNode->GetBody();
+	dComplementaritySolver::dBodyState* const chassis = engineNode->GetProxyBody();
 
 	const dVector& omega = chassis->GetOmega();
 	const dMatrix& diffMatrix = m_state0->GetMatrix();

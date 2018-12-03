@@ -31,8 +31,12 @@ dAnimationRigEffector::dAnimationRigEffector(dAnimationRigLimb* const parent, co
 	dAnimationCharacterRig* const root = parent->GetRoot();
 	root->m_effectors.Append(this);
 
-	Init(parent->GetBody(), root->GetStaticWorld()->GetBody());
-	SetOwners(parent, root->GetStaticWorld());
+	dFloat invMass = root->GetProxyBody()->GetInvMass();
+	dAnimationAcyclicJoint* const otherBody = invMass ? root->GetStaticWorld() : root;
+
+	dAssert(parent != otherBody);
+	Init(parent->GetProxyBody(), otherBody->GetProxyBody());
+	SetOwners(parent, otherBody);
 
 	NewtonBody* const newtonBody = parent->GetNewtonBody();
 	dAssert (parent->GetNewtonBody());

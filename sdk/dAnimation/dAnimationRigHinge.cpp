@@ -88,8 +88,8 @@ void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 
 void dAnimationRigHinge::UpdateJointAcceleration()
 {
-	dComplementaritySolver::dBodyState* const body0 = GetBody();
-	dComplementaritySolver::dBodyState* const body1 = m_parent->GetBody();
+	dComplementaritySolver::dBodyState* const body0 = GetProxyBody();
+	dComplementaritySolver::dBodyState* const body1 = m_parent->GetProxyBody();
 	const dVector& accel0 = body0->GetForce().Scale (body0->GetInvMass());
 	const dVector& alpha0 = body0->GetInvInertia().RotateVector(body0->GetTorque());
 	const dVector& accel1 = body1->GetForce().Scale (body1->GetInvMass());;

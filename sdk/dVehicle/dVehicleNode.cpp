@@ -66,7 +66,7 @@ void dVehicleNode::StatesToRigidBody(dFloat timestep)
 
 void dVehicleNode::Integrate(dFloat timestep)
 {
-	m_body.IntegrateForce(timestep, m_body.GetForce(), m_body.GetTorque());
+	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
 		dVehicleNode* const node = (dVehicleNode*)child->GetInfo();
 		node->Integrate(timestep);

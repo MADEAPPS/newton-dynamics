@@ -76,18 +76,18 @@ dVehicleVirtualEngine::dVehicleVirtualEngine(dVehicleNode* const parent, const d
 	SetWorld(parent->GetWorld());
 
 	dFloat inertia = 0.7f * m_info.m_mass * m_info.m_armatureRadius * m_info.m_armatureRadius;
-	m_body.SetMass(m_info.m_mass);
-	m_body.SetInertia(inertia, inertia, inertia);
-	m_body.UpdateInertia();
+	m_proxyBody.SetMass(m_info.m_mass);
+	m_proxyBody.SetInertia(inertia, inertia, inertia);
+	m_proxyBody.UpdateInertia();
 
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*) ((dVehicleNode*)m_parent)->GetAsVehicle();
 	// set the tire joint
-	m_blockJoint.Init(&m_body, chassis->GetBody());
+	m_blockJoint.Init(&m_proxyBody, chassis->GetProxyBody());
 
-	m_gearBox.Init(&m_body, differential->GetBody());
+	m_gearBox.Init(&m_proxyBody, differential->GetProxyBody());
 	m_gearBox.SetOwners(this, differential);
 
-	m_crankJoint.Init(&m_body, chassis->m_groundNode.GetBody());
+	m_crankJoint.Init(&m_proxyBody, chassis->m_groundNode.GetProxyBody());
 	m_crankJoint.SetOwners(this, &chassis->m_groundNode);
 
 	SetInfo(info);
@@ -116,7 +116,7 @@ void dVehicleVirtualEngine::SetInfo(const dEngineInfo& info)
 //	m_controller->SetAerodynamicsDownforceCoefficient(info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
 }
 
-dComplementaritySolver::dBilateralJoint* dVehicleVirtualEngine::GetJoint()
+dComplementaritySolver::dBilateralJoint* dVehicleVirtualEngine::GetProxyJoint()
 {
 	return &m_blockJoint;
 }
@@ -168,16 +168,16 @@ int dVehicleVirtualEngine::GetKinematicLoops(dAnimationKinematicLoopJoint** cons
 void dVehicleVirtualEngine::ApplyExternalForce(dFloat timestep)
 {
 	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
-	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetProxyBody();
 
 	dMatrix matrix(chassisBody->GetMatrix());
 	matrix.m_posit = matrix.TransformVector(chassisBody->GetCOM());
-	m_body.SetMatrix(matrix);
+	m_proxyBody.SetMatrix(matrix);
 
-	m_body.SetVeloc(chassisBody->GetVelocity());
-	m_body.SetOmega(chassisBody->GetOmega() + matrix.m_right.Scale (m_omega));
-	m_body.SetTorque(dVector(0.0f));
-	m_body.SetForce(chassisNode->m_gravity.Scale(m_body.GetMass()));
+	m_proxyBody.SetVeloc(chassisBody->GetVelocity());
+	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_right.Scale (m_omega));
+	m_proxyBody.SetTorque(dVector(0.0f));
+	m_proxyBody.SetForce(chassisNode->m_gravity.Scale(m_proxyBody.GetMass()));
 
 	dVehicleEngineInterface::ApplyExternalForce(timestep);
 }
@@ -187,11 +187,11 @@ void dVehicleVirtualEngine::Integrate(dFloat timestep)
 	dVehicleEngineInterface::Integrate(timestep);
 
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
-	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetProxyBody();
 
 	const dMatrix chassisMatrix(chassisBody->GetMatrix());
 
-	dVector omega(m_body.GetOmega());
+	dVector omega(m_proxyBody.GetOmega());
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector localOmega(omega - chassisOmega);
 	m_omega = chassisMatrix.m_right.DotProduct3(localOmega);

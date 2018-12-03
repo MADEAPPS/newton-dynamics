@@ -207,7 +207,7 @@ int dVehicleChassis::OnAABBOverlap(const NewtonBody * const body, void* const co
 
 void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 {
-	dComplementaritySolver::dBodyState* const chassisBody = m_vehicle->GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = m_vehicle->GetProxyBody();
 	const dMatrix& matrix = chassisBody->GetMatrix();
 	dVector origin(matrix.TransformVector(m_obbOrigin));
 	dVector size(matrix.m_front.Abs().Scale(m_obbSize.m_x) + matrix.m_up.Abs().Scale(m_obbSize.m_y) + matrix.m_right.Abs().Scale(m_obbSize.m_z));
@@ -464,7 +464,7 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 	dFloat massMatrix[maxSize * maxSize];
 	dFloat accel[maxSize];
 	
-	dComplementaritySolver::dBodyState* const chassisBody = m_vehicle->GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = m_vehicle->GetProxyBody();
 
 	const dMatrix& chassisMatrix = chassisBody->GetMatrix(); 
 	const dMatrix& chassisInvInertia = chassisBody->GetInvInertia();
@@ -496,7 +496,7 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 					break;
 			}
 */
-			dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
+			dComplementaritySolver::dBodyState* const tireBody = tire->GetProxyBody();
 
 			const dFloat invMass = tireBody->GetInvMass();
 			const dFloat kv = info.m_dampingRatio * invMass;
@@ -542,7 +542,7 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 	dVector chassisTorque(0.0f);
 	for (int i = 0; i < tireCount; i++) {
 		dVehicleVirtualTire* const tire = tires[i];
-		dComplementaritySolver::dBodyState* const tireBody = tire->GetBody();
+		dComplementaritySolver::dBodyState* const tireBody = tire->GetProxyBody();
 
 		dVector tireForce(m_jt[i].m_jacobian_J01.m_linear.Scale(accel[i]));
 		tireBody->SetForce(tireBody->GetForce() + tireForce);

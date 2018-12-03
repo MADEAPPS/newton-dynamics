@@ -25,5 +25,5 @@ void dAnimationKinematicLoopJoint::SetOwners(dAnimationAcyclicJoint* const owner
 {
 	m_owner0 = owner0;
 	m_owner1 = owner1;
-	Init(m_owner0->GetBody(), m_owner1->GetBody());
+	Init(m_owner0->GetProxyBody(), m_owner1->GetProxyBody());
 }

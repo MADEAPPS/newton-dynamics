@@ -37,7 +37,7 @@
 //#define DEFAULT_SCENE	3			// gyroscope precession
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
-#define DEFAULT_SCENE	6 			// kinematic bodies
+//#define DEFAULT_SCENE	6 			// kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
 //#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
@@ -65,7 +65,7 @@
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
-//#define DEFAULT_SCENE	34			// dynamic rag doll
+#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
 //#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// David Gravel multi body car

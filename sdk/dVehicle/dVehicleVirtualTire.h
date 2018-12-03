@@ -36,7 +36,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 	protected:
 	void ApplyExternalForce(dFloat timestep);
 	void Integrate(dFloat timestep);
-	dComplementaritySolver::dBilateralJoint* GetJoint();
+	dComplementaritySolver::dBilateralJoint* GetProxyJoint();
 	dMatrix GetHardpointMatrix (dFloat param) const;
 	int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
@@ -47,7 +47,7 @@ class dVehicleVirtualTire: public dVehicleTireInterface
 
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-	dTireJoint m_joint;
+	dTireJoint m_proxyJoint;
 	dVehicleNode m_dynamicContactBodyNode;
 	dTireContact m_contactsJoints[3];
 	NewtonCollision* m_tireShape;

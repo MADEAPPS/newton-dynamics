@@ -14,8 +14,8 @@
 
 dAnimationAcyclicJoint::dAnimationAcyclicJoint(dAnimationAcyclicJoint* const parent)
 	:dContainersAlloc()
-	,m_body()
-	,m_joint()
+	,m_proxyBody()
+	,m_proxyJoint()
 	,m_parent(parent)
 	,m_userData(NULL)
 	,m_world(NULL)

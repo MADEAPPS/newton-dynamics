@@ -63,7 +63,7 @@ class dVehicleVirtualEngine: public dVehicleEngineInterface
 
 	void SetInfo(const dEngineInfo& info);
 	
-	dComplementaritySolver::dBilateralJoint* GetJoint();
+	dComplementaritySolver::dBilateralJoint* GetProxyJoint();
 	int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
 
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;

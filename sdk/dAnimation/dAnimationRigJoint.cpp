@@ -58,7 +58,7 @@ void dAnimationRigJoint::UpdateLocalTransforms (dAnimationCharacterRigManager* c
 
 void dAnimationRigJoint::Init(NewtonBody* const newtonBody)
 {
-	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetBody();
+	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetProxyBody();
 
 	dAssert(body);
 	dAssert(newtonBody == GetNewtonBody());
@@ -85,7 +85,7 @@ void dAnimationRigJoint::Init(NewtonBody* const newtonBody)
 void dAnimationRigJoint::RigidBodyToStates()
 {
 	NewtonBody* const newtonBody = GetNewtonBody();
-	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetBody();
+	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetProxyBody();
 
 	dAssert (body);
 	dAssert (newtonBody);

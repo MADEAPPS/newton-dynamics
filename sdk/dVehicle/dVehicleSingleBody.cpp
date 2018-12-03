@@ -23,7 +23,7 @@ dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	,m_chassis(chassis)
 {
 	dVector tmp;
-	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
 	m_groundNode.SetWorld(m_world);
 	m_groundNode.SetLoopNode(true);
 	
@@ -60,7 +60,7 @@ dVehicleEngineInterface* dVehicleSingleBody::AddEngine(const dVehicleEngineInter
 
 dMatrix dVehicleSingleBody::GetMatrix () const
 {
-	return m_body.GetMatrix();
+	return m_proxyBody.GetMatrix();
 }
 
 void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
@@ -74,7 +74,7 @@ void dVehicleSingleBody::RigidBodyToStates()
 {
 	dVector vector;
 	dMatrix matrix;
-	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
 
 	// get data from engine rigid body and copied to the vehicle chassis body
 	NewtonBody* const newtonBody = m_chassis->GetBody();
@@ -100,7 +100,7 @@ void dVehicleSingleBody::RigidBodyToStates()
 
 void dVehicleSingleBody::StatesToRigidBody(dFloat timestep)
 {
-	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
 
 	dVector force(chassisBody->GetForce());
 	dVector torque(chassisBody->GetTorque());
@@ -122,8 +122,8 @@ void dVehicleSingleBody::ApplyExternalForce(dFloat timestep)
 	dVector force(0.0f);
 	dVector torque(0.0f);
 	
-	dComplementaritySolver::dBodyState* const chassisBody = GetBody();
-	dComplementaritySolver::dBodyState* const groundBody = m_groundNode.GetBody();
+	dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
+	dComplementaritySolver::dBodyState* const groundBody = m_groundNode.GetProxyBody();
 
 	groundBody->SetForce(force);
 	groundBody->SetTorque(force);
@@ -145,10 +145,10 @@ void dVehicleSingleBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 {
 	dVehicleInterface::Debug(debugContext);
 
-	const dMatrix& matrix = m_body.GetMatrix();
+	const dMatrix& matrix = m_proxyBody.GetMatrix();
 
 	// draw velocity
-	dVector veloc (m_body.GetVelocity());
+	dVector veloc (m_proxyBody.GetVelocity());
 	veloc = veloc - matrix.m_up.Scale (veloc.DotProduct3(matrix.m_up));
 	dFloat mag = dSqrt (veloc.DotProduct3(veloc));
 	veloc = veloc.Scale (dLog (mag) / (mag + 0.1f));

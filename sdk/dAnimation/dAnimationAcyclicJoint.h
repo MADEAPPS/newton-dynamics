@@ -41,9 +41,9 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	bool IsLoopNode() const { return m_isLoop; }
 	void SetLoopNode(bool staste) { m_isLoop = staste; }
 
-	dComplementaritySolver::dBodyState* GetBody() { return &m_body; }
-	const dComplementaritySolver::dBodyState* GetBody() const { return &m_body; }
-	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return m_joint; }
+	dComplementaritySolver::dBodyState* GetProxyBody() { return &m_proxyBody; }
+	const dComplementaritySolver::dBodyState* GetProxyBody() const { return &m_proxyBody; }
+	virtual dComplementaritySolver::dBilateralJoint* GetProxyJoint() { return m_proxyJoint; }
 
 	virtual void ApplyExternalForce(dFloat timestep);
 	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
@@ -56,8 +56,8 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	virtual void Finalize();
 	virtual void UpdateJointAcceleration();
 
-	dComplementaritySolver::dBodyState m_body;
-	dComplementaritySolver::dBilateralJoint* m_joint;
+	dComplementaritySolver::dBodyState m_proxyBody;
+	dComplementaritySolver::dBilateralJoint* m_proxyJoint;
 	dAnimationAcyclicJoint* m_parent;
 	void* m_userData;
 	NewtonWorld* m_world;

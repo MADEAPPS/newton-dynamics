@@ -32,7 +32,6 @@ struct dRagDollConfig
 
 static dRagDollConfig ragDollConfig[] =
 {
-//	{ "bone_spine0", 250.0f, -1000.0f, 1000.0f, 50.0f },
 	{ "bone_spine0", 400.0f, -1000.0f, 1000.0f, 50.0f },
 
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 50.0f },
