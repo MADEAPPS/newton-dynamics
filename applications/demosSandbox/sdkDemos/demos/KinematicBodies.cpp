@@ -434,10 +434,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 			    }
             }
 		}
-
-//if (xxx == 1){
-//NewtonBodySetMatrix (m_phantomEntity->m_phantom, &xxxxx[0][0]);
-//}
 	}
 
 	dVector m_castDir;

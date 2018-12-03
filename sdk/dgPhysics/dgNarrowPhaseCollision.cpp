@@ -1506,7 +1506,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 					dgMatrix diff(instance0.GetGlobalMatrix() * instance1.GetGlobalMatrix().Inverse());
 					if (dgAbs(diff[0][0]) > dgFloat32(0.9999f)) {
 						if (dgAbs(diff.m_posit.m_x) < dgFloat32(1.0e-3f)) {
-							diff.m_posit.m_y = dgFloat32(1.0e-3f);
+							diff.m_posit.m_y += dgFloat32(1.0e-3f);
 							instance0.SetGlobalMatrix(diff * instance1.GetGlobalMatrix());
 						}
 					}
@@ -1517,7 +1517,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 					dgMatrix diff(instance0.GetGlobalMatrix() * instance1.GetGlobalMatrix().Inverse());
 					if (dgAbs(diff[0][0]) > dgFloat32(0.9999f)) {
 						if (dgAbs(diff.m_posit.m_x) < dgFloat32(1.0e-3f)) {
-							diff.m_posit.m_x = dgFloat32(1.0e-3f);
+							diff.m_posit.m_x += dgFloat32(1.0e-3f);
 							instance0.SetGlobalMatrix(diff * instance1.GetGlobalMatrix());
 						}
 					}

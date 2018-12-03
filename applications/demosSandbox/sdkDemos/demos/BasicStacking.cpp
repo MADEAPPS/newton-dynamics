@@ -189,7 +189,6 @@ static void CapsuleStack2(DemoEntityManager* const scene, dFloat mass, const dVe
 	DemoMesh* const geometry = new DemoMesh("sphere", collision, "smilli.tga", "smilli.tga", "smilli.tga", 1.0f, uvMatrix);
 
 	dFloat vertialStep = blockBoxSize.m_x*10.0f;
-vertialStep = 2.0f;
 	dFloat horizontalStep = blockBoxSize.m_y * 0.8f;
 	dMatrix matrix0(dGetIdentityMatrix());
 	matrix0.m_posit = origin;
@@ -212,8 +211,8 @@ vertialStep = 2.0f;
 	for (int i = 0; i < count / 2; i++) {
 		CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
 		CreateSimpleSolid(scene, geometry, mass, matrix1, collision, defaultMaterialID);
-//		CreateSimpleSolid(scene, geometry, mass, matrix2, collision, defaultMaterialID);
-//		CreateSimpleSolid(scene, geometry, mass, matrix3, collision, defaultMaterialID);
+		CreateSimpleSolid(scene, geometry, mass, matrix2, collision, defaultMaterialID);
+		CreateSimpleSolid(scene, geometry, mass, matrix3, collision, defaultMaterialID);
 
 		matrix0.m_posit.m_y += vertialStep * 2.0f;
 		matrix1.m_posit.m_y += vertialStep * 2.0f;
