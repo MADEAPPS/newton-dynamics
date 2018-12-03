@@ -90,7 +90,7 @@ class dgCollisionInstance
 	dgFloat32 GetVolume () const;
 	void GetCollisionInfo(dgCollisionInfo* const info) const;
 
-	dgInt32 IsType (dgCollision::dgRTTI type) const ;
+	dgInt32 IsType (dgCollision::dgRTTI type) const;
 	dgMemoryAllocator* GetAllocator() const;
 
 	bool GetCollisionMode() const;
