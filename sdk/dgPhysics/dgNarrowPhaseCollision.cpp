@@ -1492,33 +1492,33 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 			{
 				case m_sphereCollision:
 				{
-					dgVector diff(instance0.GetGlobalMatrix().m_posit - instance1.GetGlobalMatrix().m_posit);
+					dgVector diff(instance1.GetGlobalMatrix().m_posit - instance0.GetGlobalMatrix().m_posit);
 					dgFloat32 mag2 = diff.DotProduct(diff).GetScalar();
 					if (mag2 < dgFloat32(1.0e-6f)) {
-						dgMatrix tmp(instance0.GetGlobalMatrix());
+						dgMatrix tmp(instance1.GetGlobalMatrix());
 						tmp.m_posit.m_x += dgFloat32(1.0e-3f);
-						instance0.SetGlobalMatrix(tmp);
+						instance1.SetGlobalMatrix(tmp);
 					}
 					break;
 				}
 				case m_capsuleCollision:
 				{
-					dgMatrix diff(instance0.GetGlobalMatrix() * instance1.GetGlobalMatrix().Inverse());
+					dgMatrix diff(instance1.GetGlobalMatrix() * instance0.GetGlobalMatrix().Inverse());
 					if (dgAbs(diff[0][0]) > dgFloat32(0.9999f)) {
 						if (dgAbs(diff.m_posit.m_x) < dgFloat32(1.0e-3f)) {
 							diff.m_posit.m_y += dgFloat32(1.0e-3f);
-							instance0.SetGlobalMatrix(diff * instance1.GetGlobalMatrix());
+							instance1.SetGlobalMatrix(diff * instance0.GetGlobalMatrix());
 						}
 					}
 					break;
 				}
 				case m_chamferCylinderCollision:
 				{
-					dgMatrix diff(instance0.GetGlobalMatrix() * instance1.GetGlobalMatrix().Inverse());
+					dgMatrix diff(instance1.GetGlobalMatrix() * instance0.GetGlobalMatrix().Inverse());
 					if (dgAbs(diff[0][0]) > dgFloat32(0.9999f)) {
 						if (dgAbs(diff.m_posit.m_x) < dgFloat32(1.0e-3f)) {
 							diff.m_posit.m_x += dgFloat32(1.0e-3f);
-							instance0.SetGlobalMatrix(diff * instance1.GetGlobalMatrix());
+							instance1.SetGlobalMatrix(diff * instance0.GetGlobalMatrix());
 						}
 					}
 					break;
