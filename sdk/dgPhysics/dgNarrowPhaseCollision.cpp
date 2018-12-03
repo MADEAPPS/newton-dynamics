@@ -1118,6 +1118,8 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 	proxy.m_maxContacts = DG_MAX_CONTATCS;
 	proxy.m_skinThickness = material->m_skinThickness;
 
+	dgFloat32 invMass = body1->GetInvMass().m_w;
+
 	if (body1->m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
 		SceneContacts(pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
@@ -1130,6 +1132,9 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 		contact->SwapBodies();
 		//pair->m_flipContacts = -1;
 		CompoundContacts (pair, proxy);
+		if (!invMass) {
+//			dgAssert (0);
+		}
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		ConvexContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
@@ -1294,7 +1299,6 @@ dgInt32 dgWorld::CollideContinue (
 	} 
 	return count;
 }
-
 
 dgInt32 dgWorld::Collide (
 	const dgCollisionInstance* const collisionSrcA, const dgMatrix& matrixA, 
