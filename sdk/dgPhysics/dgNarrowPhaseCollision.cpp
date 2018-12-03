@@ -1122,19 +1122,19 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 		SceneContacts(pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		contact->SwapBodies();
-		pair->m_flipContacts = -1;
+		//pair->m_flipContacts = -1;
 		SceneContacts (pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		CompoundContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		contact->SwapBodies();
-		pair->m_flipContacts = -1;
+		//pair->m_flipContacts = -1;
 		CompoundContacts (pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		ConvexContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		contact->SwapBodies();
-		pair->m_flipContacts = -1;
+		//pair->m_flipContacts = -1;
 		ConvexContacts (pair, proxy);
 	}
 
@@ -1265,6 +1265,7 @@ dgInt32 dgWorld::CollideContinue (
 			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
 		}
 		if (pair.m_flipContacts) {
+			dgAssert (0);
  			for (dgInt32 i = 0; i < count; i++) {
 				dgVector step ((collideBodyA.m_veloc - collideBodyB.m_veloc).Scale (pair.m_timestep));
 				points[i].m_x = contacts[i].m_point.m_x + step.m_x;
@@ -1282,9 +1283,9 @@ dgInt32 dgWorld::CollideContinue (
 				points[i].m_x = contacts[i].m_point.m_x; 
 				points[i].m_y = contacts[i].m_point.m_y; 
 				points[i].m_z = contacts[i].m_point.m_z; 
-					normals[i].m_x = contacts[i].m_normal.m_x;  
-					normals[i].m_y = contacts[i].m_normal.m_y;  
-					normals[i].m_z = contacts[i].m_normal.m_z;  
+				normals[i].m_x = contacts[i].m_normal.m_x;  
+				normals[i].m_y = contacts[i].m_normal.m_y;  
+				normals[i].m_z = contacts[i].m_normal.m_z;  
 				penetration[i] = contacts[i].m_penetration; 
 				attibuteA[i] = contacts[i].m_shapeId0;
 				attibuteB[i] = contacts[i].m_shapeId1;
