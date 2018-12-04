@@ -15,7 +15,7 @@
 #include "dAnimationCharacterRigManager.h"
 
 
-dAnimationRigEffector::dAnimationRigEffector(dAnimationRigLimb* const parent, const dMatrix& matrix)
+dAnimationRigEffector::dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, dAnimationRigLimb* const parent, dAnimationRigJoint* const targetBody)
 	:dAnimationKinematicLoopJoint()
 	,m_localMatrix(dGetIdentityMatrix())
 	,m_targetMatrix(dGetIdentityMatrix())
@@ -31,21 +31,18 @@ dAnimationRigEffector::dAnimationRigEffector(dAnimationRigLimb* const parent, co
 	dAnimationCharacterRig* const root = parent->GetRoot();
 	root->m_effectors.Append(this);
 
-	dFloat invMass = root->GetProxyBody()->GetInvMass();
-	dAnimationAcyclicJoint* const otherBody = invMass ? root->GetStaticWorld() : root;
-
-	dAssert(parent != otherBody);
-	Init(parent->GetProxyBody(), otherBody->GetProxyBody());
-	SetOwners(parent, otherBody);
+	dAssert(parent != targetBody);
+	Init(parent->GetProxyBody(), targetBody->GetProxyBody());
+	SetOwners(parent, targetBody);
 
 	NewtonBody* const newtonBody = parent->GetNewtonBody();
 	dAssert (parent->GetNewtonBody());
 	NewtonBodyGetMatrix(newtonBody, &m_localMatrix[0][0]);
-	m_localMatrix = matrix * m_localMatrix.Inverse();
+	m_localMatrix = pivotInGlocalSpace * m_localMatrix.Inverse();
 	m_targetMatrix = root->GetBasePoseMatrix();
-	m_effectorMatrix.m_posit = m_targetMatrix.UntransformVector(matrix.m_posit);
+	m_effectorMatrix.m_posit = m_targetMatrix.UntransformVector(pivotInGlocalSpace.m_posit);
 
-	m_targetMatrix.m_posit = matrix.m_posit;
+	m_targetMatrix.m_posit = pivotInGlocalSpace.m_posit;
 }
 
 dAnimationRigEffector::~dAnimationRigEffector()
@@ -99,6 +96,8 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	const dFloat timestep = constraintParams->m_timestep;
 	const dFloat invTimestep = constraintParams->m_timestepInv;
 	const dFloat step = m_linearSpeed * timestep;
+
+dTrace (("effect accel: "));
 	for (int i = 0; i < 3; i++) {
 
 		dFloat currentSpeed = 0.0f;
@@ -123,7 +122,10 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 		constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
 		constraintParams->m_jointAccel[i] = currentSpeed * invTimestep;
 		constraintParams->m_normalIndex[i] = 0;
+
+dTrace (("%f ", constraintParams->m_jointAccel[i]));
 	}
+dTrace (("\n"));
 
 	m_dof = 3;
 	m_count = 3;

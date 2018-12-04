@@ -32,19 +32,19 @@ struct dRagDollConfig
 
 static dRagDollConfig ragDollConfig[] =
 {
-	{ "bone_spine0", 400.0f, -1000.0f, 1000.0f, 50.0f },
+	{ "bone_spine0", 1.0f, -1000.0f, 1000.0f, 50.0f },
 
-	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
-	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
+	{ "bone_rightLeg", 1.0f, -70.0f, 50.0f, 200.0f },
+	{ "bone_rightKnee", 1.0f, -70.0f, 20.0f, 50.0f },
+	{ "effector_rightLeg", 1.0f, 0.0f, 0.0f, 50.0f },
 //	{ "boneFD_rightAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_rightAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
 
-	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
-	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
+//	{ "bone_leftLeg", 1.0f, -70.0f, 50.0f, 200.0f },
+//	{ "bone_leftknee", 1.0f, -70.0f, 20.0f, 50.0f },
+//	{ "effector_leftLeg", 1.0f, 0.0f, 0.0f, 50.0f },
 //	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
@@ -431,7 +431,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 					} else if (strstr(name, "effector")) {
 						// add an end effector (end effector can't have children)
 						dMatrix pivot(entity->CalculateGlobalMatrix());
-						dAnimationRigEffector* const effector = new dAnimationRigEffector(parentJoint->GetAsRigLimb(), pivot);
+						dAnimationRigEffector* const effector = new dAnimationRigEffector(pivot, parentJoint->GetAsRigLimb(), rig);
 						effector->SetLinearSpeed(2.0f);
 						effector->SetMaxLinearFriction(ragDollConfig[i].m_frictionScale * ragDollConfig[i].m_mass * DEMO_MUSCLE_STRENGTH * 50.0f);
 
@@ -504,7 +504,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-origin = dGetIdentityMatrix();
+//origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;

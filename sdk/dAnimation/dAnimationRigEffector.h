@@ -20,7 +20,7 @@ class dAnimationRigLimb;
 class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 {
 	public:
-	dAnimationRigEffector(dAnimationRigLimb* const parent, const dMatrix& pivot);
+	dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, dAnimationRigLimb* const parent, dAnimationRigJoint* const targetBody);
 	virtual ~dAnimationRigEffector();
 
 	virtual int GetMaxDof() const {return 3;}

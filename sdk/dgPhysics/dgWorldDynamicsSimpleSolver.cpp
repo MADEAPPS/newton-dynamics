@@ -810,7 +810,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 
 			for (dgInt32 j = 0; j < count; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[j + first];
-				//const dgLeftHandSide* const row = &leftHandSide[j + first];
 				dgAssert(dgCheckFloat(rhs->m_force));
 				rhs->m_jointFeebackForce->m_force = rhs->m_force;
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
