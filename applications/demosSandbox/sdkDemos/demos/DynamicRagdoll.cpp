@@ -43,10 +43,10 @@ static dRagDollConfig ragDollConfig[] =
 //	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
 
-//	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
-//	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-//	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
-	//	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
+	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
+	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
+	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
 	//	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 	//	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
 	//	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
@@ -208,12 +208,46 @@ class dAnimationKeeController: public dAnimationRigForwardDynamicLimb
 		dMatrix matrix1;
 		dMatrix rootMatrix(GetRoot()->GetBasePoseMatrix());
 		CalculateGlobalMatrix(matrix0, matrix1);
-		m_offsetAngle = CalculateAngle(rootMatrix.m_up, matrix0.m_up, rootMatrix.m_right);
+		m_offsetAngle = dPi + CalculateAngle(rootMatrix.m_up, matrix0.m_up, rootMatrix.m_right);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dAnimationRigForwardDynamicLimb::SubmitConstraints(timestep, threadIndex);
+
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		//dMatrix localMatrix(matrix0 * matrix1.Inverse());
+
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
+
+		dVector normal;
+		dVector floor (FindFloor(world, matrix1.m_posit, 10.0f, &normal));
+
+		dMatrix floorMatrix(dGetIdentityMatrix());
+		floorMatrix.m_front = matrix0.m_front;
+		floorMatrix.m_right = normal.CrossProduct(floorMatrix.m_front);
+		floorMatrix.m_right = floorMatrix.m_right.Normalize();
+		floorMatrix.m_up = floorMatrix.m_right.CrossProduct(floorMatrix.m_front);
+
+		dFloat deltaAngle = CalculateAngle(floorMatrix.m_up, matrix0.m_up, matrix0.m_front) - m_offsetAngle;
+
+		float speed = 3.0f;
+		dFloat currentSpeed = 0.0f;
+		dFloat step = speed * timestep;
+		if (deltaAngle > step) {
+			currentSpeed = -speed;
+		} else if (deltaAngle < -step) {
+			currentSpeed = speed;
+		} else {
+			currentSpeed = -0.3f * deltaAngle / timestep;
+		}
+
+		NewtonJoint* const joint = dCustomHinge::GetJoint();
+		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(joint) + currentSpeed / timestep;
+		NewtonUserJointSetRowAcceleration(joint, accel);
 	}
 
 	dFloat m_offsetAngle;
@@ -526,7 +560,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-origin = dGetIdentityMatrix();
+//origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;

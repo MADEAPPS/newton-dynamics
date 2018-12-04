@@ -114,8 +114,16 @@ void GetConnectedBodiesByJoints (NewtonBody* const body)
 	}
 }
 	
-
-
+class RayCastPlacementData
+{
+	public:
+	RayCastPlacementData()
+		:m_param(1.2f)
+	{
+	}
+	dVector m_normal;
+	dFloat m_param;
+};
 
 static dFloat RayCastPlacement (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
 {
@@ -126,14 +134,13 @@ static dFloat RayCastPlacement (const NewtonBody* const body, const NewtonCollis
 		dAssert (NewtonCollisionGetSubCollisionHandle (collisionHit));
 	}
 
-
-	dFloat* const paramPtr = (dFloat*)userData;
-	if (intersetParam < paramPtr[0]) {
-		paramPtr[0] = intersetParam;
+	RayCastPlacementData* const paramPtr = (RayCastPlacementData*)userData;
+	if (intersetParam < paramPtr->m_param) {
+		paramPtr->m_param = intersetParam;
+		paramPtr->m_normal = dVector(normal[0], normal[1], normal[2], 0.0f); 
 	}
-	return paramPtr[0];
+	return paramPtr->m_param;
 }
-
 
 static unsigned RayPrefilter (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 {
@@ -147,16 +154,19 @@ static unsigned RayPrefilter (const NewtonBody* const body, const NewtonCollisio
 	return 1;
 }
 
-dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist)
+dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist, dVector* const normal)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
 	dVector p0 (origin); 
 	dVector p1 (origin - dVector (0.0f, dAbs (dist), 0.0f, 0.0f)); 
 
-	dFloat parameter = 1.2f;
+	RayCastPlacementData parameter;
 	NewtonWorldRayCast (world, &p0[0], &p1[0], RayCastPlacement, &parameter, RayPrefilter, 0);
-	if (parameter < 1.0f) {
-		p0 -= dVector (0.0f, dAbs (dist) * parameter, 0.0f, 0.0f);
+	if (parameter.m_param < 1.0f) {
+		p0 -= dVector (0.0f, dAbs (dist) * parameter.m_param, 0.0f, 0.0f);
+		if (normal) {
+			*normal = parameter.m_normal;
+		}
 	}
 	return p0;
 }
@@ -1255,7 +1265,6 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 
 	NewtonBodyApplyImpulsePair(body, &linearMomentum[0], &angularMomentum[0], timestep);
 }
-
 
 NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramterOut, dVector& positionOut, dVector& normalOut)
 {
