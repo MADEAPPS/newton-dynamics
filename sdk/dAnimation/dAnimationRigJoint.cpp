@@ -93,20 +93,15 @@ void dAnimationRigJoint::RigidBodyToStates()
 	dVector vector;
 	dMatrix matrix;
 
-dTrace (("%d ", NewtonBodyGetID (newtonBody)));
 	// get data from engine rigid body and copied to the vehicle chassis body
 	NewtonBodyGetMatrix(newtonBody, &matrix[0][0]);
 	body->SetMatrix(matrix);
-dTrace (("p(%f %f %f) ", matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z));
 
 	NewtonBodyGetVelocity(newtonBody, &vector[0]);
 	body->SetVeloc(vector);
-dTrace (("v(%f %f %f) ", vector.m_x, vector.m_y, vector.m_z));
 
 	NewtonBodyGetOmega(newtonBody, &vector[0]);
 	body->SetOmega(vector);
-dTrace (("w(%f %f %f) ", vector.m_x, vector.m_y, vector.m_z));
-dTrace (("\n", vector.m_x, vector.m_y, vector.m_z));
 
 	body->SetForce(dVector (0.0f));
 	body->SetTorque(dVector (0.0f));

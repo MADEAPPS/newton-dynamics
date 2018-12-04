@@ -1253,7 +1253,7 @@ void dAnimationAcyclicSolver::Update(dFloat timestep)
 		UpdateForces(force);
 	}
 
-
+/*
 //DebugMassMatrix();
 for (int i = 0; i < m_nodeCount - 1; i++) {
 	dAnimationAcyclicJoint* const node = m_nodesOrder[i];
@@ -1269,5 +1269,5 @@ for (int i = 0; i < m_loopJointCount; i++) {
 	}
 }
 dTrace(("\n"));
-
+*/
 }

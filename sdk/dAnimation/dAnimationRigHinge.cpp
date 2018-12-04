@@ -97,8 +97,5 @@ void dAnimationRigHinge::UpdateJointAcceleration()
 
 	dVector accel (accel0 * m_jacobial01.m_linear + alpha0 * m_jacobial01.m_angular + accel1 * m_jacobial10.m_linear + alpha1 * m_jacobial10.m_angular); 
 	m_rowAccel = accel.m_x + accel.m_y + accel.m_z;
-dTrace (("joint accel %f\n", m_rowAccel))
-m_rowAccel = 0.0f;
-//dTrace (("%f\n", m_rowAccel))
 	dAnimationRigLimb::UpdateJointAcceleration();
 }

@@ -30,6 +30,29 @@ struct dRagDollConfig
 	dFloat m_frictionScale;
 };
 
+#if 1
+static dRagDollConfig ragDollConfig[] =
+{
+	{ "bone_spine0", 400.0f, -1000.0f, 1000.0f, 50.0f },
+
+	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
+	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
+	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
+	{ "boneFD_rightAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "effector_rightAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
+//	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
+//	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
+
+//	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
+//	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
+//	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
+	//	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
+	//	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
+	//	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
+	//	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
+};
+
+#else
 static dRagDollConfig ragDollConfig[] =
 {
 	{ "bone_spine0", 1.0f, -1000.0f, 1000.0f, 50.0f },
@@ -50,7 +73,7 @@ static dRagDollConfig ragDollConfig[] =
 //	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
 };
-
+#endif
 class dWalkGenerator: public dAnimationEffectorBlendPose
 {
 	public:
@@ -180,7 +203,6 @@ class dAnimationKeeController: public dAnimationRigForwardDynamicLimb
 	{
 		SetFriction(config.m_frictionScale * config.m_mass * DEMO_MUSCLE_STRENGTH);
 		SetLimits(config.m_minLimit * dDegreeToRad, config.m_maxLimit * dDegreeToRad);
-
 
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -376,7 +398,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 		NewtonBody* const rootBody = CreateBodyPart(model, ragDollConfig[0]);
 
 //new dCustom6dof(rootMatrix, rootBody);
-//NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		DemoEntity* const localFrame = model->Find("rootLocalFrame");
 		dAssert(localFrame);
@@ -504,7 +526,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-//origin = dGetIdentityMatrix();
+origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;

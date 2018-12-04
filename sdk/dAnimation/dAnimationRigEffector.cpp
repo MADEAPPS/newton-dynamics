@@ -97,7 +97,6 @@ void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 	const dFloat invTimestep = constraintParams->m_timestepInv;
 	const dFloat step = m_linearSpeed * timestep;
 
-dTrace (("effect accel: "));
 	for (int i = 0; i < 3; i++) {
 
 		dFloat currentSpeed = 0.0f;
@@ -122,10 +121,7 @@ dTrace (("effect accel: "));
 		constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
 		constraintParams->m_jointAccel[i] = currentSpeed * invTimestep;
 		constraintParams->m_normalIndex[i] = 0;
-
-dTrace (("%f ", constraintParams->m_jointAccel[i]));
 	}
-dTrace (("\n"));
 
 	m_dof = 2;
 	m_count = 2;
