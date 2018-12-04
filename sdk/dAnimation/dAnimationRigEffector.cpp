@@ -127,7 +127,7 @@ dTrace (("%f ", constraintParams->m_jointAccel[i]));
 	}
 dTrace (("\n"));
 
-	m_dof = 3;
-	m_count = 3;
-	constraintParams->m_count = 3;
+	m_dof = 2;
+	m_count = 2;
+	constraintParams->m_count = 2;
 }

@@ -42,9 +42,9 @@ static dRagDollConfig ragDollConfig[] =
 //	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
 
-//	{ "bone_leftLeg", 1.0f, -70.0f, 50.0f, 200.0f },
-//	{ "bone_leftknee", 1.0f, -70.0f, 20.0f, 50.0f },
-//	{ "effector_leftLeg", 1.0f, 0.0f, 0.0f, 50.0f },
+	{ "bone_leftLeg", 1.0f, -70.0f, 50.0f, 200.0f },
+	{ "bone_leftknee", 1.0f, -70.0f, 20.0f, 50.0f },
+	{ "effector_leftLeg", 1.0f, 0.0f, 0.0f, 50.0f },
 //	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
 //	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
 //	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
