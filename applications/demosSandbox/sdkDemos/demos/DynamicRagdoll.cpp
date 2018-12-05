@@ -141,28 +141,47 @@ timestep *= 0.01f;
 class dAnimationBalanceController: public dAnimationEffectorBlendNode
 {
 	public:
+	class dConvexHullPoint 
+	{
+		public:
+		dConvexHullPoint ()
+		{
+		}
+
+		dVector m_point;
+		dConvexHullPoint *m_next;
+		dConvexHullPoint *m_prev;
+	};
+
 	dAnimationBalanceController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
 		:dAnimationEffectorBlendNode(character, child)
 	{
 	}
 
-	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	int SupportPoint (int count, const dVector* const array, const dVector& dir) const
 	{
-		dAssert (0);
+		int index = 0;
+		dFloat dist = array[0].DotProduct3(dir);
+		for (int i = 1; i < count; i ++) {
+			dFloat dist1 = array[i].DotProduct3(dir);
+			if (dist1 > dist) {
+				index = i;
+				dist = dist1;
+			}
+		}
+		return index;
 	}
 
-	void Evaluate(dAnimationPose& output, dFloat timestep)
+
+	int BuildSupportPolygon (dVector* const polygon, int maxCount) const
 	{
-		m_child->Evaluate(output, timestep);
-
-
-		const dAnimationRigJoint* stackPool[128];
-
+		dAnimationRigJoint* stackPool[32];
 		int stack = 1;
+
 		stackPool[0] = m_character;
 
 		int pointCount = 0;
-		dVector contacPoints[32];
+		dVector contactPoints[128];
 
 		dVector point(0.0f);
 		dVector normal(0.0f);
@@ -179,10 +198,10 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 						NewtonMaterial* const material = NewtonContactGetMaterial(contact);
 
 						NewtonMaterialGetContactPositionAndNormal(material, newtonBody, &point.m_x, &normal.m_x);
-						contacPoints[pointCount] = point;
-						pointCount ++;
-						if (pointCount >= sizeof (contacPoints) / sizeof (contacPoints[0])) {
-							pointCount --;
+						contactPoints[pointCount] = point;
+						pointCount++;
+						if (pointCount >= sizeof (contactPoints) / sizeof (contactPoints[0])) {
+							pointCount--;
 						}
 					}
 				}
@@ -194,6 +213,120 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 				}
 			}
 		}
+				
+		if (pointCount > 3) {
+			dVector median(0.0f);
+			dVector variance(0.0f);
+			dVector coVariance(0.0f);
+			dVector origin(m_character->GetProxyBody()->GetMatrix().m_posit);
+
+			for (int i = 0; i < pointCount; i ++) {
+				dVector x (contactPoints[i] - origin);
+				median += x;
+				variance += x * x;
+				coVariance += x * dVector (x.m_y, x.m_z, x.m_x, 0.0f);
+				contactPoints[i] = x;
+			}
+			dFloat den = 1.0f / pointCount;
+
+			median = median.Scale (den);
+			variance = variance.Scale (den) - median * median;
+			coVariance = coVariance.Scale (den) - median * dVector (median.m_y, median.m_z, median.m_x, 0.0f);
+
+			dMatrix basisMatrix (dGetIdentityMatrix());
+			basisMatrix[0][0] = variance.m_x;
+			basisMatrix[1][1] = variance.m_y;
+			basisMatrix[2][2] = variance.m_z;
+
+			basisMatrix[0][1] = coVariance.m_x;
+			basisMatrix[1][0] = coVariance.m_x;
+			
+			basisMatrix[0][2] = coVariance.m_z;
+			basisMatrix[2][0] = coVariance.m_z;
+
+			basisMatrix[1][2] = coVariance.m_x;
+			basisMatrix[2][1] = coVariance.m_x;
+
+			dVector eigenValues; 
+			dMatrix axis (basisMatrix.JacobiDiagonalization (eigenValues));
+
+			for (int i = 0; i < pointCount; i ++) {
+				contactPoints[i] = contactPoints[i] - axis[1].Scale(axis[1].DotProduct3(contactPoints[i] - median));
+			}
+
+		
+			int hullPoints = 0;
+			dConvexHullPoint convexHull[32];
+
+			int index0 = SupportPoint (pointCount, contactPoints, axis[0]);
+			convexHull[hullPoints].m_point = contactPoints[index0];
+			hullPoints ++;
+			pointCount --;
+			dSwap (contactPoints[index0], contactPoints[pointCount]);
+
+			index0 = SupportPoint(pointCount, contactPoints, axis[0].Scale (-1.0f));
+			convexHull[hullPoints].m_point = contactPoints[index0];
+			hullPoints++;
+			pointCount--;
+			dSwap(contactPoints[index0], contactPoints[pointCount]);
+
+			index0 = SupportPoint(pointCount, contactPoints, axis[2]);
+			convexHull[hullPoints].m_point = contactPoints[index0];
+			hullPoints++;
+			pointCount--;
+			dSwap(contactPoints[index0], contactPoints[pointCount]);
+
+			convexHull[0].m_next = &convexHull[1];
+			convexHull[0].m_prev = &convexHull[2];
+			convexHull[1].m_next = &convexHull[2];
+			convexHull[1].m_prev = &convexHull[0];
+			convexHull[2].m_next = &convexHull[0];
+			convexHull[2].m_prev = &convexHull[1];
+
+			dVector hullNormal ((convexHull[1].m_point - convexHull[0].m_point).CrossProduct (convexHull[2].m_point - convexHull[0].m_point));
+
+
+			int hullStack = 3;
+			dConvexHullPoint* hullPool[64];
+			hullPool[0] = &convexHull[0];
+			hullPool[1] = &convexHull[1];
+			hullPool[2] = &convexHull[2];
+
+			while (hullStack) {
+				hullStack--;
+				dConvexHullPoint* const edge = hullPool[hullStack];
+				
+				dVector dir (hullNormal.CrossProduct(edge->m_next->m_point - edge->m_point));
+				index0 = SupportPoint(pointCount, contactPoints, axis[0].Scale (-1.0f));
+
+				dVector newPoint (contactPoints[index0]);
+				dFloat dist (dir.DotProduct3 (newPoint - edge->m_point));
+				if (dist > 1.0e3f) {
+					dAssert (0);
+				}
+			}
+
+
+		
+		}
+
+		return 0;
+	}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dVector polygon[16];
+		int count = BuildSupportPolygon (polygon, sizeof (polygon) / sizeof (polygon[0]));
+		if (count) {
+			dAssert (0);
+		}
+	}
+
+	void Evaluate(dAnimationPose& output, dFloat timestep)
+	{
+		m_child->Evaluate(output, timestep);
+
+
 
 /*
 		dQuaternion rotation(dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
@@ -666,7 +799,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-//origin = dGetIdentityMatrix();
+origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;
