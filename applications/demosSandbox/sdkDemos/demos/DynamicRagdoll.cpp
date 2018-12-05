@@ -37,14 +37,14 @@ static dRagDollConfig ragDollConfig[] =
 
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_rightAnkle", 50.0f, -90.0f, 45.0f, 1000.0f },
-	{ "boneFD_rightToe", 50.0f, -30.0f, 30.0f, 1000.0f },
+	{ "boneFD_rightAnkle", 50.0f, -75.0f, 60.0f, 100.0f },
+	{ "boneFD_rightToe", 50.0f, -30.0f, 30.0f, 100.0f },
 	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 	
 	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
-	{ "boneFD_leftToe", 50.0f, -30.0f, 30.0f, 1000.0f },
+	{ "boneFD_leftAnkle", 50.0f, -75.0f, 60.0f, 100.0f },
+	{ "boneFD_leftToe", 50.0f, -30.0f, 30.0f, 100.0f },
 	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 };
 
@@ -124,6 +124,7 @@ class dWalkGenerator: public dAnimationEffectorBlendPose
 			}
 			index++;
 		}
+timestep *= 0.01f;
 		m_acc = dMod(m_acc + timestep, m_period);
 	}
 
@@ -592,6 +593,12 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 	BalancingDummyManager* const robotManager = new BalancingDummyManager(scene);
+
+	NewtonWorld* const world = scene->GetNewton();
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
+	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
+
 
 	int count = 10;
 	count = 1;
