@@ -471,8 +471,8 @@ void Hexapod(DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.3f, 200.0f, -50.0f);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	//CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.3f, 200.0f, -50.0f);
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
@@ -485,7 +485,7 @@ void Hexapod(DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.0f;
 
 	int count = 5;
-count = 1;
+//count = 1;
 	dMatrix location1(location);
 	dFloat x0 = location.m_posit.m_x;
 	for (int j = 0; j < 1; j++) {
