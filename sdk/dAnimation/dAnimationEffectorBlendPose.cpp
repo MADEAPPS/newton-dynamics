@@ -13,7 +13,7 @@
 #include "dAnimationEffectorBlendPose.h"
 
 dAnimationEffectorBlendPose::dAnimationEffectorBlendPose(dAnimationCharacterRig* const character)
-	:dAnimationEffectorBlendNode(character)
+	:dAnimationEffectorBlendNode(character, NULL)
 	,m_pose(character)
 {
 }

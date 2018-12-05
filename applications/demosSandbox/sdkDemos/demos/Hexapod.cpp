@@ -102,10 +102,10 @@ class dEffectorWalkPoseGenerator: public dEffectorTreeFixPose
 	int m_sequence[6]; 
 };
 
-class dEffectorTreePostureGenerator: public dEffectorTreeInterface
+class dAnimationHipController: public dEffectorTreeInterface
 {
 	public:
-	dEffectorTreePostureGenerator(dEffectorTreeInterface* const poseGenerator)
+	dAnimationHipController(dEffectorTreeInterface* const poseGenerator)
 		:dEffectorTreeInterface(poseGenerator->GetRootBody())
 		,m_euler(0.0f)
 		,m_position(0.0f)
@@ -114,7 +114,7 @@ class dEffectorTreePostureGenerator: public dEffectorTreeInterface
 		m_position.m_w = 1.0f;
 	}
 
-	~dEffectorTreePostureGenerator()
+	~dAnimationHipController()
 	{
 		delete m_poseGenerator;
 	}
@@ -340,7 +340,7 @@ class dHexapodController: public dCustomControllerBase
 		dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorWalkPoseGenerator(hexaBody);
 		m_walkIdleBlender = new dEffectorBlendIdleWalk (hexaBody, idlePose, walkPoseGenerator);
 
-		m_postureModifier = new dEffectorTreePostureGenerator(m_walkIdleBlender);
+		m_postureModifier = new dAnimationHipController(m_walkIdleBlender);
 		m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
 
 		dMatrix rootMatrix;
@@ -385,7 +385,7 @@ class dHexapodController: public dCustomControllerBase
 	dEffectorTreeRoot* m_animTreeNode;
 	NewtonInverseDynamics* m_kinematicSolver;
 	dEffectorBlendIdleWalk* m_walkIdleBlender; // do not delete 
-	dEffectorTreePostureGenerator* m_postureModifier; // do not delete 
+	dAnimationHipController* m_postureModifier; // do not delete 
 };
 
 class dHexapodManager: public dCustomControllerManager<dHexapodController>

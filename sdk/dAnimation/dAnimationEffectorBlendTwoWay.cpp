@@ -15,7 +15,7 @@
 dAnimationEffectorBlendTwoWay::dAnimationEffectorBlendTwoWay(dAnimationCharacterRig* const character,
 	dAnimationEffectorBlendNode* const node0,
 	dAnimationEffectorBlendNode* const node1)
-	:dAnimationEffectorBlendNode(character)
+	:dAnimationEffectorBlendNode(character, NULL)
 	,m_node0(node0)
 	,m_node1(node1)
 	,m_pose(character)
@@ -28,6 +28,12 @@ dAnimationEffectorBlendTwoWay::~dAnimationEffectorBlendTwoWay()
 {
 	delete m_node0;
 	delete m_node1;
+}
+
+void dAnimationEffectorBlendTwoWay::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	m_node0->Debug(debugContext);
+	m_node1->Debug(debugContext);
 }
 
 void dAnimationEffectorBlendTwoWay::Evaluate(dAnimationPose& output, dFloat timestep)

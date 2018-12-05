@@ -27,6 +27,7 @@ class dAnimationEffectorBlendTwoWay: public dAnimationEffectorBlendNode
 
 	dAnimationPose& GetPose() { return m_pose; }
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	protected:
 	dAnimationEffectorBlendNode* m_node0;

@@ -33,17 +33,28 @@ class dAnimationPose: public dList<dAnimationTransform>
 	void CopySource(const dAnimationPose& source);
 };
 
-class dAnimationEffectorBlendNode : public dCustomAlloc
+class dAnimationEffectorBlendNode: public dCustomAlloc
 {
 	public:
-	dAnimationEffectorBlendNode(dAnimationCharacterRig* const character);
+	dAnimationEffectorBlendNode(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child);
 	virtual ~dAnimationEffectorBlendNode();
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		if (m_child) {
+			m_child->Debug(debugContext);
+		}
+	}
 
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep)
 	{
+		if (m_child) {
+			m_child->Evaluate(output, timestep);
+		}
 	}
-	dAnimationCharacterRig* m_character;
-};
 
+	dAnimationCharacterRig* m_character;
+	dAnimationEffectorBlendNode* m_child;
+};
 
 #endif

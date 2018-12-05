@@ -55,13 +55,17 @@ void dAnimationPose::SetTargetPose(dAnimationCharacterRig* const character) cons
 	}
 }
 
-dAnimationEffectorBlendNode::dAnimationEffectorBlendNode(dAnimationCharacterRig* const character)
+dAnimationEffectorBlendNode::dAnimationEffectorBlendNode(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
 	:dCustomAlloc()
 	,m_character(character)
+	,m_child(child)
 {
 }
 
 dAnimationEffectorBlendNode::~dAnimationEffectorBlendNode()
 {
+	if (m_child) {
+		delete m_child;
+	}
 }
 

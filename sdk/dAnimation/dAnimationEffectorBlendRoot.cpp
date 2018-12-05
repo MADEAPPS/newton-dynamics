@@ -13,18 +13,14 @@
 #include "dAnimationEffectorBlendRoot.h"
 
 dAnimationEffectorBlendRoot::dAnimationEffectorBlendRoot(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const childNode)
-	:dAnimationEffectorBlendNode(character)
+	:dAnimationEffectorBlendNode(character, childNode)
 	,m_pose(character)
 	,m_rig(character)
-	,m_childNode (childNode)
 {
 }
 
 dAnimationEffectorBlendRoot::~dAnimationEffectorBlendRoot()
 {
-	if (m_childNode) {
-		delete m_childNode;
-	}
 }
 
 void dAnimationEffectorBlendRoot::Update(dFloat timestep)
@@ -33,8 +29,8 @@ void dAnimationEffectorBlendRoot::Update(dFloat timestep)
 	m_pose.SetTargetPose(m_rig);
 }
 
+
 void dAnimationEffectorBlendRoot::Evaluate(dAnimationPose& output, dFloat timestep)
 {
-	dAssert(m_childNode);
-	m_childNode->Evaluate(output, timestep);
+	dAnimationEffectorBlendNode::Evaluate(output, timestep);
 }

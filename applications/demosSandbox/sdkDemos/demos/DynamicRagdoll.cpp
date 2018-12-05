@@ -37,14 +37,14 @@ static dRagDollConfig ragDollConfig[] =
 
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_rightAnkle", 50.0f, -75.0f, 60.0f, 100.0f },
-	{ "boneFD_rightToe", 50.0f, -30.0f, 30.0f, 100.0f },
+	{ "boneFD_rightAnkle", 25.0f, -75.0f, 60.0f, 10.0f },
+	{ "boneFD_rightToe", 25.0f, -30.0f, 30.0f, 10.0f },
 	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 	
 	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_leftAnkle", 50.0f, -75.0f, 60.0f, 100.0f },
-	{ "boneFD_leftToe", 50.0f, -30.0f, 30.0f, 100.0f },
+	{ "boneFD_leftAnkle", 25.0f, -75.0f, 60.0f, 10.0f },
+	{ "boneFD_leftToe", 25.0f, -30.0f, 30.0f, 10.0f },
 	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 };
 
@@ -138,20 +138,82 @@ timestep *= 0.01f;
 	dAnimationRigEffector* m_rightFeet;
 };
 
-class dEffectorTreePostureGenerator: public dAnimationEffectorBlendNode
+class dAnimationBalanceController: public dAnimationEffectorBlendNode
 {
 	public:
-	dEffectorTreePostureGenerator(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
-		:dAnimationEffectorBlendNode(character)
-		,m_euler(0.0f)
-		,m_position(0.0f)
-		,m_child(child)
+	dAnimationBalanceController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
+		:dAnimationEffectorBlendNode(character, child)
 	{
 	}
 
-	~dEffectorTreePostureGenerator()
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
-		delete m_child;
+		dAssert (0);
+	}
+
+	void Evaluate(dAnimationPose& output, dFloat timestep)
+	{
+		m_child->Evaluate(output, timestep);
+
+
+		const dAnimationRigJoint* stackPool[128];
+
+		int stack = 1;
+		stackPool[0] = m_character;
+
+		int pointCount = 0;
+		dVector contacPoints[32];
+
+		dVector point(0.0f);
+		dVector normal(0.0f);
+
+		while (stack) {
+			stack--;
+
+			const dAnimationRigJoint* const node = stackPool[stack];
+			NewtonBody* const newtonBody = node->GetNewtonBody();
+
+			if (newtonBody) {
+				for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(newtonBody); joint; joint = NewtonBodyGetNextContactJoint(newtonBody, joint)) {
+					for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
+						NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+
+						NewtonMaterialGetContactPositionAndNormal(material, newtonBody, &point.m_x, &normal.m_x);
+						contacPoints[pointCount] = point;
+						pointCount ++;
+						if (pointCount >= sizeof (contacPoints) / sizeof (contacPoints[0])) {
+							pointCount --;
+						}
+					}
+				}
+
+				const dList<dAnimationAcyclicJoint*>& children = node->GetChildren();
+				for (dList<dAnimationAcyclicJoint*>::dListNode* child = children.GetFirst(); child; child = child->GetNext()) {
+					stackPool[stack] = (dAnimationRigJoint*)child->GetInfo();
+					stack++;
+				}
+			}
+		}
+
+/*
+		dQuaternion rotation(dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
+		for (dAnimationPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dAnimationTransform& transform = node->GetInfo();
+			transform.m_rotation = transform.m_rotation * rotation;
+			transform.m_posit = m_position + rotation.RotateVector(transform.m_posit);
+		}
+*/
+	}
+};
+
+class dAnimationHipController: public dAnimationEffectorBlendNode
+{
+	public:
+	dAnimationHipController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
+		:dAnimationEffectorBlendNode(character, child)
+		,m_euler(0.0f)
+		,m_position(0.0f)
+	{
 	}
 
 	void Evaluate(dAnimationPose& output, dFloat timestep)
@@ -168,7 +230,6 @@ class dEffectorTreePostureGenerator: public dAnimationEffectorBlendNode
 
 	dVector m_euler;
 	dVector m_position;
-	dAnimationEffectorBlendNode* m_child;
 };
 
 class dAnimationAnkleJoint: public dAnimationRigForwardDynamicLimb
@@ -294,7 +355,7 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 	class dAnimationCharacterUserData: public DemoEntity::UserData
 	{
 		public:
-		dAnimationCharacterUserData(dAnimationCharacterRig* const rig, dAnimationEffectorBlendTwoWay* const walk, dEffectorTreePostureGenerator* const posture)
+		dAnimationCharacterUserData(dAnimationCharacterRig* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationHipController* const posture)
 			:DemoEntity::UserData()
 			,m_rig(rig)
 			,m_walk(walk)
@@ -318,7 +379,7 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 		dAnimationCharacterRig* m_rig;
 		dAnimationEffectorBlendTwoWay* m_walk;
-		dEffectorTreePostureGenerator* m_posture;
+		dAnimationHipController* m_posture;
 
 		dFloat m_hipHigh;
 		dFloat m_walkSpeed;
@@ -546,8 +607,9 @@ xxxx1->ResetMatrix(*scene, matrix1);
 		dAnimationEffectorBlendPose* const fixPose = new dAnimationEffectorBlendPose(rig);
 		dAnimationEffectorBlendPose* const walkPose = new dWalkGenerator(rig, leftFeet, rightFeet);
 		dAnimationEffectorBlendTwoWay* const walkBlend = new dAnimationEffectorBlendTwoWay(rig, fixPose, walkPose);
-		dEffectorTreePostureGenerator* const posture = new dEffectorTreePostureGenerator (rig, walkBlend);
-		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, posture);
+		dAnimationHipController* const posture = new dAnimationHipController (rig, walkBlend);
+		dAnimationBalanceController* const balance = new dAnimationBalanceController (rig, posture);
+		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, balance);
 
 		dAnimationCharacterUserData* const renderCallback = new dAnimationCharacterUserData(rig, walkBlend, posture);
 		model->SetUserData(renderCallback);
@@ -577,7 +639,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 			dAnimationEffectorBlendTwoWay* const walkBlend = controlData->m_walk;
 			walkBlend->SetParam (controlData->m_walkSpeed);
 
-			dEffectorTreePostureGenerator* const posture = controlData->m_posture;
+			dAnimationHipController* const posture = controlData->m_posture;
 			posture->m_position.m_y = 0.25f * controlData->m_hipHigh;
 		}
 

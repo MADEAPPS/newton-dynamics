@@ -28,7 +28,6 @@ class dAnimationEffectorBlendRoot: public dAnimationEffectorBlendNode
 	protected:
 	dAnimationPose m_pose;
 	dAnimationCharacterRig* m_rig;
-	dAnimationEffectorBlendNode* m_childNode;
 };
 
 

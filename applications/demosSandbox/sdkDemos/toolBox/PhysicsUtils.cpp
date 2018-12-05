@@ -578,7 +578,7 @@ void GetContactOnBody (NewtonBody* const body)
 		NewtonBody* const body0 = NewtonJointGetBody0(joint);
 		NewtonBody* const body1 = NewtonJointGetBody1(joint);
 		for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-			NewtonMaterial* material = NewtonContactGetMaterial (contact);
+			NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 
 			//dFloat forceMag;
 			dVector point(0.0f);
