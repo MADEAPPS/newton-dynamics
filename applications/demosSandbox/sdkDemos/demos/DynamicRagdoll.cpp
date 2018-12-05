@@ -30,50 +30,25 @@ struct dRagDollConfig
 	dFloat m_frictionScale;
 };
 
-#if 1
+
 static dRagDollConfig ragDollConfig[] =
 {
 	{ "bone_spine0", 400.0f, -1000.0f, 1000.0f, 50.0f },
 
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
+	{ "boneFD_rightAnkle", 50.0f, -90.0f, 45.0f, 1000.0f },
+	{ "boneFD_rightToe", 50.0f, -30.0f, 30.0f, 1000.0f },
 	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
-	{ "boneFD_rightAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
-//	{ "effector_rightAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
-//	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
-//	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
-
+	
 	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
-	//	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
-	//	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
-	//	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
+	{ "boneFD_leftToe", 50.0f, -30.0f, 30.0f, 1000.0f },
+	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 };
 
-#else
-static dRagDollConfig ragDollConfig[] =
-{
-	{ "bone_spine0", 1.0f, -1000.0f, 1000.0f, 50.0f },
 
-	{ "bone_rightLeg", 1.0f, -70.0f, 50.0f, 200.0f },
-	{ "bone_rightKnee", 1.0f, -70.0f, 20.0f, 50.0f },
-	{ "effector_rightLeg", 1.0f, 0.0f, 0.0f, 50.0f },
-//	{ "boneFD_rightAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
-//	{ "effector_rightAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
-//	{ "bone_rightToe", 50.0f, -90.0f, 45.0f, 100.0f },
-//	{ "effector_rightToe", 100.0f, 0.0f, 0.0f, 100.0f },
-
-	{ "bone_leftLeg", 1.0f, -70.0f, 50.0f, 200.0f },
-	{ "bone_leftknee", 1.0f, -70.0f, 20.0f, 50.0f },
-	{ "effector_leftLeg", 1.0f, 0.0f, 0.0f, 50.0f },
-//	{ "boneFD_leftAnkle", 50.0f, -90.0f, 45.0f, 100.0f },
-//	{ "effector_leftAnkle", 100.0f, 0.0f, 0.0f, 100.0f },
-//	{ "bone_leftToe", 50.0f, -90.0f, 45.0f, 100.0f },
-//	{ "effector_leftToe", 100.0f, 0.0f, 0.0f, 100.0f },
-};
-#endif
 class dWalkGenerator: public dAnimationEffectorBlendPose
 {
 	public:
@@ -195,10 +170,10 @@ class dEffectorTreePostureGenerator: public dAnimationEffectorBlendNode
 	dAnimationEffectorBlendNode* m_child;
 };
 
-class dAnimationKeeController: public dAnimationRigForwardDynamicLimb
+class dAnimationAnkleJoint: public dAnimationRigForwardDynamicLimb
 {
 	public:
-	dAnimationKeeController(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body, const dRagDollConfig& config)
+	dAnimationAnkleJoint(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body, const dRagDollConfig& config)
 		:dAnimationRigForwardDynamicLimb(basicMatrix, parent, body)
 	{
 		SetFriction(config.m_frictionScale * config.m_mass * DEMO_MUSCLE_STRENGTH);
@@ -217,20 +192,19 @@ class dAnimationKeeController: public dAnimationRigForwardDynamicLimb
 
 		dMatrix matrix0;
 		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-
-		//dMatrix localMatrix(matrix0 * matrix1.Inverse());
-
-		NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
-
 		dVector normal;
-		dVector floor (FindFloor(world, matrix1.m_posit, 10.0f, &normal));
-
-		dMatrix floorMatrix(dGetIdentityMatrix());
-		floorMatrix.m_front = matrix0.m_front;
-		floorMatrix.m_right = normal.CrossProduct(floorMatrix.m_front);
-		floorMatrix.m_right = floorMatrix.m_right.Normalize();
-		floorMatrix.m_up = floorMatrix.m_right.CrossProduct(floorMatrix.m_front);
+		
+		CalculateGlobalMatrix(matrix0, matrix1);
+	
+//		NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
+//		dVector floor (FindFloor(world, matrix1.m_posit, 10.0f, &normal));
+//		dMatrix floorMatrix(dGetIdentityMatrix());
+//		floorMatrix.m_front = matrix0.m_front;
+//		floorMatrix.m_right = normal.CrossProduct(floorMatrix.m_front);
+//		floorMatrix.m_right = floorMatrix.m_right.Normalize();
+//		floorMatrix.m_up = floorMatrix.m_right.CrossProduct(floorMatrix.m_front);
+		dAnimationCharacterRig* const root = GetRoot();
+		dMatrix floorMatrix (dRollMatrix(dPi) * root->GetBasePoseMatrix());
 
 		dFloat deltaAngle = CalculateAngle(floorMatrix.m_up, matrix0.m_up, matrix0.m_front) - m_offsetAngle;
 
@@ -252,6 +226,65 @@ class dAnimationKeeController: public dAnimationRigForwardDynamicLimb
 
 	dFloat m_offsetAngle;
 };
+
+
+class dAnimationToeJoint : public dAnimationRigForwardDynamicLimb
+{
+	public:
+	dAnimationToeJoint(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body, const dRagDollConfig& config)
+		:dAnimationRigForwardDynamicLimb(basicMatrix, parent, body)
+	{
+		SetFriction(config.m_frictionScale * config.m_mass * DEMO_MUSCLE_STRENGTH);
+		SetLimits(config.m_minLimit * dDegreeToRad, config.m_maxLimit * dDegreeToRad);
+
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+		dMatrix rootMatrix(dYawMatrix(dPi) * dPitchMatrix(dPi * 0.5f) * GetRoot()->GetBasePoseMatrix());
+		m_offsetAngle = CalculateAngle(matrix0.m_right, rootMatrix.m_right, rootMatrix.m_front);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dAnimationRigForwardDynamicLimb::SubmitConstraints(timestep, threadIndex);
+
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dVector normal;
+
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		//NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
+		//dVector floor (FindFloor(world, matrix1.m_posit, 10.0f, &normal));
+		//dMatrix floorMatrix(dGetIdentityMatrix());
+		//floorMatrix.m_front = matrix0.m_front;
+		//floorMatrix.m_right = normal.CrossProduct(floorMatrix.m_front);
+		//floorMatrix.m_right = floorMatrix.m_right.Normalize();
+		//floorMatrix.m_up = floorMatrix.m_right.CrossProduct(floorMatrix.m_front);
+
+		dMatrix rootMatrix(dYawMatrix(dPi) * dPitchMatrix(dPi * 0.5f) * GetRoot()->GetBasePoseMatrix());
+		dFloat deltaAngle = -CalculateAngle(matrix0.m_right, rootMatrix.m_right, rootMatrix.m_front) + m_offsetAngle;;
+
+		float speed = 3.0f;
+		dFloat currentSpeed = 0.0f;
+		dFloat step = speed * timestep;
+		if (deltaAngle > step) {
+			currentSpeed = -speed;
+		} else if (deltaAngle < -step) {
+			currentSpeed = speed;
+		} else {
+			currentSpeed = -0.3f * deltaAngle / timestep;
+		}
+
+		NewtonJoint* const joint = dCustomHinge::GetJoint();
+		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(joint) + currentSpeed / timestep;
+		NewtonUserJointSetRowAcceleration(joint, accel);
+	}
+
+	dFloat m_offsetAngle;
+};
+
+
 
 class BalancingDummyManager : public dAnimationCharacterRigManager
 {
@@ -431,8 +464,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 
 		NewtonBody* const rootBody = CreateBodyPart(model, ragDollConfig[0]);
 
-//new dCustom6dof(rootMatrix, rootBody);
-NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		DemoEntity* const localFrame = model->Find("rootLocalFrame");
 		dAssert(localFrame);
@@ -470,8 +502,13 @@ NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 
 						dAnimationRigLimb* limbJoint = NULL;
 						if (strstr(name, "boneFD")) {
-							dAnimationRigForwardDynamicLimb* const hinge = new dAnimationKeeController(matrix, parentJoint, limbBody, ragDollConfig[i]);
-							limbJoint = hinge;
+							dAnimationRigForwardDynamicLimb* footJoint = NULL;
+							if (strstr(name, "Ankle")) {
+								footJoint = new dAnimationAnkleJoint(matrix, parentJoint, limbBody, ragDollConfig[i]);
+							} else {
+								footJoint = new dAnimationToeJoint(matrix, parentJoint, limbBody, ragDollConfig[i]);
+							}
+							limbJoint = footJoint;
 						} else {
 							dAnimationRigHinge* const hinge = new dAnimationRigHinge(matrix, parentJoint, limbBody);
 							hinge->SetFriction(ragDollConfig[i].m_frictionScale * ragDollConfig[i].m_mass * DEMO_MUSCLE_STRENGTH);
