@@ -37,14 +37,14 @@ static dRagDollConfig ragDollConfig[] =
 
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_rightAnkle", 25.0f, -75.0f, 60.0f, 10.0f },
-	{ "boneFD_rightToe", 25.0f, -30.0f, 30.0f, 10.0f },
+	{ "boneFD_rightAnkle", 25.0f, -75.0f, 60.0f, 100.0f },
+	{ "boneFD_rightToe", 25.0f, -30.0f, 30.0f, 100.0f },
 	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 	
 	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_leftAnkle", 25.0f, -75.0f, 60.0f, 10.0f },
-	{ "boneFD_leftToe", 25.0f, -30.0f, 30.0f, 10.0f },
+	{ "boneFD_leftAnkle", 25.0f, -75.0f, 60.0f, 100.0f },
+	{ "boneFD_leftToe", 25.0f, -30.0f, 30.0f, 100.0f },
 	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 };
 
@@ -138,6 +138,40 @@ timestep *= 0.01f;
 	dAnimationRigEffector* m_rightFeet;
 };
 
+class dAnimationBipeHipController: public dAnimationEffectorBlendNode
+{
+	public:
+	dAnimationBipeHipController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
+		:dAnimationEffectorBlendNode(character, child)
+		, m_euler(0.0f)
+		, m_position(0.0f)
+	{
+	}
+
+	~dAnimationBipeHipController()
+	{
+	}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+	}
+
+	virtual void Evaluate(dAnimationPose& output, dFloat timestep)
+	{
+		m_child->Evaluate(output, timestep);
+
+		dQuaternion rotation(dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
+		for (dAnimationPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dAnimationTransform& transform = node->GetInfo();
+			transform.m_rotation = transform.m_rotation * rotation;
+			transform.m_posit = m_position + rotation.RotateVector(transform.m_posit);
+		}
+	}
+
+	dVector m_euler;
+	dVector m_position;
+};
+
 class dAnimationBalanceController: public dAnimationEffectorBlendNode
 {
 	public:
@@ -171,7 +205,6 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 		}
 		return index;
 	}
-
 
 	int BuildSupportPolygon (dVector* const polygon, int maxCount) const
 	{
@@ -213,7 +246,8 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 				}
 			}
 		}
-				
+
+		int hullPoints = 0;
 		if (pointCount > 3) {
 			dVector median(0.0f);
 			dVector variance(0.0f);
@@ -253,26 +287,23 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 			for (int i = 0; i < pointCount; i ++) {
 				contactPoints[i] = contactPoints[i] - axis[1].Scale(axis[1].DotProduct3(contactPoints[i] - median));
 			}
+	
 
-		
-			int hullPoints = 0;
 			dConvexHullPoint convexHull[32];
+			dConvexHullPoint* hullStackBuffer[64];
 
 			int index0 = SupportPoint (pointCount, contactPoints, axis[0]);
-			convexHull[hullPoints].m_point = contactPoints[index0];
-			hullPoints ++;
+			convexHull[0].m_point = contactPoints[index0];
 			pointCount --;
 			dSwap (contactPoints[index0], contactPoints[pointCount]);
 
 			index0 = SupportPoint(pointCount, contactPoints, axis[0].Scale (-1.0f));
-			convexHull[hullPoints].m_point = contactPoints[index0];
-			hullPoints++;
+			convexHull[1].m_point = contactPoints[index0];
 			pointCount--;
 			dSwap(contactPoints[index0], contactPoints[pointCount]);
 
 			index0 = SupportPoint(pointCount, contactPoints, axis[2]);
-			convexHull[hullPoints].m_point = contactPoints[index0];
-			hullPoints++;
+			convexHull[2].m_point = contactPoints[index0];
 			pointCount--;
 			dSwap(contactPoints[index0], contactPoints[pointCount]);
 
@@ -282,51 +313,76 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 			convexHull[1].m_prev = &convexHull[0];
 			convexHull[2].m_next = &convexHull[0];
 			convexHull[2].m_prev = &convexHull[1];
+			dVector hullNormal ((convexHull[2].m_point - convexHull[0].m_point).CrossProduct (convexHull[1].m_point - convexHull[0].m_point));
 
-			dVector hullNormal ((convexHull[1].m_point - convexHull[0].m_point).CrossProduct (convexHull[2].m_point - convexHull[0].m_point));
-
-
+			int edgeAlloc = 3;
 			int hullStack = 3;
-			dConvexHullPoint* hullPool[64];
-			hullPool[0] = &convexHull[0];
-			hullPool[1] = &convexHull[1];
-			hullPool[2] = &convexHull[2];
 
-			while (hullStack) {
+			hullStackBuffer[0] = &convexHull[0];
+			hullStackBuffer[1] = &convexHull[1];
+			hullStackBuffer[2] = &convexHull[2];
+
+			while (hullStack && pointCount) {
 				hullStack--;
-				dConvexHullPoint* const edge = hullPool[hullStack];
+				dConvexHullPoint* const edge = hullStackBuffer[hullStack];
 				
 				dVector dir (hullNormal.CrossProduct(edge->m_next->m_point - edge->m_point));
 				index0 = SupportPoint(pointCount, contactPoints, axis[0].Scale (-1.0f));
 
 				dVector newPoint (contactPoints[index0]);
 				dFloat dist (dir.DotProduct3 (newPoint - edge->m_point));
-				if (dist > 1.0e3f) {
-					dAssert (0);
+				if (dist > 1.0e-3f) {
+					dConvexHullPoint* newEdge = &convexHull[edgeAlloc];
+					edgeAlloc++;
+					dAssert(edgeAlloc < sizeof(convexHull) / sizeof(convexHull[0]));
+					newEdge->m_point = newPoint;
+					newEdge->m_next = edge->m_next;
+					newEdge->m_prev = edge;
+					edge->m_next->m_prev = newEdge;
+					edge->m_next = newEdge;
+
+					hullStackBuffer[hullStack] = newEdge;
+					hullStack++;
+					hullStackBuffer[hullStack] = edge;
+					hullStack++;
+
+					pointCount--;
+					dSwap(contactPoints[index0], contactPoints[pointCount]);
 				}
 			}
 
-
-		
+			dConvexHullPoint* edge = convexHull;
+			do {
+				polygon[hullPoints] = edge->m_point + origin;
+				hullPoints++;
+				edge = edge->m_next;
+			} while (edge != convexHull);
 		}
-
-		return 0;
+		return hullPoints;
 	}
 
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
-		dVector polygon[16];
+		dVector polygon[32];
 		int count = BuildSupportPolygon (polygon, sizeof (polygon) / sizeof (polygon[0]));
 		if (count) {
-			dAssert (0);
+			int i0 = count - 1;
+			for (int i = 0; i < count; i++) {
+				polygon[i].m_x += 2.0f;
+				polygon[i].m_y += 1.2f;
+			}
+
+			debugContext->SetColor(dVector(1.0f, 1.0f, 0.0f, 1.0f));
+			for (int i = 0; i < count; i++) {
+				debugContext->DrawLine(polygon[i0], polygon[i]);
+				i0 = i;
+			}
 		}
 	}
 
 	void Evaluate(dAnimationPose& output, dFloat timestep)
 	{
 		m_child->Evaluate(output, timestep);
-
-
 
 /*
 		dQuaternion rotation(dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
@@ -339,31 +395,7 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 	}
 };
 
-class dAnimationHipController: public dAnimationEffectorBlendNode
-{
-	public:
-	dAnimationHipController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
-		:dAnimationEffectorBlendNode(character, child)
-		,m_euler(0.0f)
-		,m_position(0.0f)
-	{
-	}
 
-	void Evaluate(dAnimationPose& output, dFloat timestep)
-	{
-		m_child->Evaluate(output, timestep);
-
-		dQuaternion rotation(dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
-		for (dAnimationPose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-			dAnimationTransform& transform = node->GetInfo();
-			transform.m_rotation = transform.m_rotation * rotation;
-			transform.m_posit = m_position + rotation.RotateVector(transform.m_posit);
-		}
-	}
-
-	dVector m_euler;
-	dVector m_position;
-};
 
 class dAnimationAnkleJoint: public dAnimationRigForwardDynamicLimb
 {
@@ -488,7 +520,7 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 	class dAnimationCharacterUserData: public DemoEntity::UserData
 	{
 		public:
-		dAnimationCharacterUserData(dAnimationCharacterRig* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationHipController* const posture)
+		dAnimationCharacterUserData(dAnimationCharacterRig* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationBipeHipController* const posture)
 			:DemoEntity::UserData()
 			,m_rig(rig)
 			,m_walk(walk)
@@ -512,7 +544,7 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 		dAnimationCharacterRig* m_rig;
 		dAnimationEffectorBlendTwoWay* m_walk;
-		dAnimationHipController* m_posture;
+		dAnimationBipeHipController* m_posture;
 
 		dFloat m_hipHigh;
 		dFloat m_walkSpeed;
@@ -740,7 +772,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 		dAnimationEffectorBlendPose* const fixPose = new dAnimationEffectorBlendPose(rig);
 		dAnimationEffectorBlendPose* const walkPose = new dWalkGenerator(rig, leftFeet, rightFeet);
 		dAnimationEffectorBlendTwoWay* const walkBlend = new dAnimationEffectorBlendTwoWay(rig, fixPose, walkPose);
-		dAnimationHipController* const posture = new dAnimationHipController (rig, walkBlend);
+		dAnimationBipeHipController* const posture = new dAnimationBipeHipController (rig, walkBlend);
 		dAnimationBalanceController* const balance = new dAnimationBalanceController (rig, posture);
 		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, balance);
 
@@ -772,7 +804,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 			dAnimationEffectorBlendTwoWay* const walkBlend = controlData->m_walk;
 			walkBlend->SetParam (controlData->m_walkSpeed);
 
-			dAnimationHipController* const posture = controlData->m_posture;
+			dAnimationBipeHipController* const posture = controlData->m_posture;
 			posture->m_position.m_y = 0.25f * controlData->m_hipHigh;
 		}
 

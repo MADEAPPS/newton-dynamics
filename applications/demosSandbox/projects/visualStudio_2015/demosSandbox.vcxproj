@@ -382,6 +382,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -405,6 +406,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -428,6 +430,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -451,6 +454,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

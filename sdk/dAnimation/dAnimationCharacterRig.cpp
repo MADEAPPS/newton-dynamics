@@ -68,7 +68,7 @@ dMatrix dAnimationCharacterRig::GetBasePoseMatrix() const
 
 void dAnimationCharacterRig::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	dAnimationRigJoint::Debug(debugContext);
+//	dAnimationRigJoint::Debug(debugContext);
 	if (m_animationTree) {
 		m_animationTree->Debug(debugContext);
 	}
