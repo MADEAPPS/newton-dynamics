@@ -26,6 +26,23 @@
 //#define USE_PICK_BODY_BY_FORCE
 
 
+class DemoCameraPickBodyJoint: public dCustomKinematicController
+{
+	public:
+	DemoCameraPickBodyJoint(NewtonBody* const body, const dVector& attachmentPointInGlobalSpace, DemoCameraManager* const camera)
+		:dCustomKinematicController(body, attachmentPointInGlobalSpace)
+		,m_manager (camera)
+	{
+	}
+	
+	~DemoCameraPickBodyJoint()
+	{
+		m_manager->ResetPickBody();
+	}
+		
+	DemoCameraManager* m_manager;
+};
+
 DemoCameraManager::DemoCameraManager(DemoEntityManager* const scene)
 	:m_camera (new DemoCamera())
 	,m_mousePosX(0)
@@ -211,22 +228,6 @@ void DemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 	m_bodyDestructor = NULL;
 }
 
-class DemoCameraPickBodyJoint: public dCustomKinematicController
-{
-	public:
-	DemoCameraPickBodyJoint(NewtonBody* const body, const dVector& attachmentPointInGlobalSpace, DemoCameraManager* const camera)
-		:dCustomKinematicController(body, attachmentPointInGlobalSpace)
-		,m_manager (camera)
-	{
-	}
-	
-	~DemoCameraPickBodyJoint()
-	{
-		m_manager->ResetPickBody();
-	}
-		
-	DemoCameraManager* m_manager;
-};
 
 void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat timestep) 
 {
