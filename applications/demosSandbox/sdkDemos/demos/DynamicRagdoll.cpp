@@ -37,14 +37,14 @@ static dRagDollConfig ragDollConfig[] =
 
 	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_rightAnkle", 25.0f, -75.0f, 60.0f, 100.0f },
-	{ "boneFD_rightToe", 25.0f, -30.0f, 30.0f, 100.0f },
+	{ "boneFD_rightAnkle", 25.0f, -75.0f, 60.0f, 5.0f },
+	{ "boneFD_rightToe", 25.0f, -30.0f, 30.0f, 5.0f },
 	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 	
 	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
 	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_leftAnkle", 25.0f, -75.0f, 60.0f, 100.0f },
-	{ "boneFD_leftToe", 25.0f, -30.0f, 30.0f, 100.0f },
+	{ "boneFD_leftAnkle", 25.0f, -75.0f, 60.0f, 5.0f },
+	{ "boneFD_leftToe", 25.0f, -30.0f, 30.0f, 5.0f },
 	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 };
 
@@ -314,7 +314,7 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 			convexHull[1].m_next = &convexHull[2];
 			convexHull[2].m_next = &convexHull[0];
 			dVector hullNormal ((convexHull[2].m_point - convexHull[0].m_point).CrossProduct (convexHull[1].m_point - convexHull[0].m_point));
-			dAssert(hullNormal.DotProduct3(hullNormal) > 1.0e-6f);
+			dAssert(hullNormal.DotProduct3(hullNormal) > 1.0e-9f);
 
 			int edgeAlloc = 3;
 			int hullStack = 3;
@@ -367,8 +367,7 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 		if (count) {
 			int i0 = count - 1;
 			for (int i = 0; i < count; i++) {
-				polygon[i].m_x += 2.0f;
-				polygon[i].m_y += 1.2f;
+				polygon[i].m_y += 0.2f;
 			}
 
 			debugContext->SetColor(dVector(1.0f, 1.0f, 0.0f, 1.0f));
@@ -830,7 +829,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	count = 1;
 
 	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
-origin = dGetIdentityMatrix();
+//origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;
