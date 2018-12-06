@@ -56,7 +56,7 @@
 //#define DEFAULT_SCENE	22			// simple convex decomposition
 //#define DEFAULT_SCENE	23			// scene Collision
 //#define DEFAULT_SCENE	24          // simple boolean operators 
-//#define DEFAULT_SCENE	25			// simple convex fracturing 
+#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
@@ -65,7 +65,7 @@
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
 //#define DEFAULT_SCENE	33			// basic rag doll
-#define DEFAULT_SCENE	34			// dynamic rag doll
+//#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
 //#define DEFAULT_SCENE	36			// single body vehicle
 //#define DEFAULT_SCENE	37			// David Gravel multi body car

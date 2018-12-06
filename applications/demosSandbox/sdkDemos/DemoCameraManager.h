@@ -42,6 +42,8 @@ class DemoCameraManager
 
 	virtual void FixUpdate(const NewtonWorld* const world, dFloat timestep);
 
+	void ResetPickBody();
+
 	private:
 	virtual void OnBodyDestroy (NewtonBody* const body);
 	void UpdatePickBody (DemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat timestep); 

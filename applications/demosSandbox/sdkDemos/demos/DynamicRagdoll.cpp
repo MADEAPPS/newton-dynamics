@@ -33,18 +33,18 @@ struct dRagDollConfig
 
 static dRagDollConfig ragDollConfig[] =
 {
-	{ "bone_spine0", 400.0f, -1000.0f, 1000.0f, 50.0f },
+	{ "bone_spine0", 200.0f, -1000.0f, 1000.0f, 50.0f },
 
-	{ "bone_rightLeg", 200.0f, -70.0f, 50.0f, 200.0f },
-	{ "bone_rightKnee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_rightAnkle", 25.0f, -75.0f, 60.0f, 5.0f },
-	{ "boneFD_rightToe", 25.0f, -30.0f, 30.0f, 5.0f },
+	{ "bone_rightLeg", 25.0f, -70.0f, 50.0f, 100.0f },
+	{ "bone_rightKnee", 20.0f, -70.0f, 20.0f, 100.0f },
+	{ "boneFD_rightAnkle", 5.0f, -75.0f, 60.0f, 10.0f },
+	{ "boneFD_rightToe",  5.0f, -30.0f, 30.0f, 10.0f },
 	{ "effector_rightLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 	
-	{ "bone_leftLeg", 200.0f, -70.0f, 50.0f, 200.0f },
-	{ "bone_leftknee", 190.0f, -70.0f, 20.0f, 50.0f },
-	{ "boneFD_leftAnkle", 25.0f, -75.0f, 60.0f, 5.0f },
-	{ "boneFD_leftToe", 25.0f, -30.0f, 30.0f, 5.0f },
+	{ "bone_leftLeg", 25.0f, -70.0f, 50.0f, 100.0f },
+	{ "bone_leftknee", 20.0f, -70.0f, 20.0f, 100.0f },
+	{ "boneFD_leftAnkle", 5.0f, -75.0f, 60.0f, 10.0f },
+	{ "boneFD_leftToe", 5.0f, -30.0f, 30.0f, 10.0f },
 	{ "effector_leftLeg", 100.0f, 0.0f, 0.0f, 50.0f },
 };
 
@@ -314,7 +314,9 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 			convexHull[1].m_next = &convexHull[2];
 			convexHull[2].m_next = &convexHull[0];
 			dVector hullNormal ((convexHull[2].m_point - convexHull[0].m_point).CrossProduct (convexHull[1].m_point - convexHull[0].m_point));
-			dAssert(hullNormal.DotProduct3(hullNormal) > 1.0e-9f);
+			if (hullNormal.DotProduct3(hullNormal) < 1.0e-9f) {
+				return 0;
+			}
 
 			int edgeAlloc = 3;
 			int hullStack = 3;

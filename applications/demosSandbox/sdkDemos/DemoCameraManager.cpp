@@ -211,6 +211,22 @@ void DemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 	m_bodyDestructor = NULL;
 }
 
+class DemoCameraPickBodyJoint: public dCustomKinematicController
+{
+	public:
+	DemoCameraPickBodyJoint(NewtonBody* const body, const dVector& attachmentPointInGlobalSpace, DemoCameraManager* const camera)
+		:dCustomKinematicController(body, attachmentPointInGlobalSpace)
+		,m_manager (camera)
+	{
+	}
+	
+	~DemoCameraPickBodyJoint()
+	{
+		m_manager->ResetPickBody();
+	}
+		
+	DemoCameraManager* m_manager;
+};
 
 void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat timestep) 
 {
@@ -254,7 +270,8 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 					const dFloat linearFrictionAccel = 100.0f * dAbs (dMax (DEMO_GRAVITY, 10.0f));
 					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
 
-					m_pickJoint = new dCustomKinematicController (body, posit);
+					//m_pickJoint = new dCustomKinematicController (body, posit);
+					m_pickJoint = new DemoCameraPickBodyJoint (body, posit, this);
 					m_pickJoint->SetPickMode (0);
 					m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
 					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
@@ -281,19 +298,22 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 				}
 			#endif
 		} else {
-			if (m_targetPicked) {
-				NewtonBodySetSleepState (m_targetPicked, 0);
-			}
 			if (m_pickJoint) {
 				delete m_pickJoint;
 			}
-			m_pickJoint = NULL;
-			m_targetPicked = NULL; 
-			m_bodyDestructor = NULL;
+			ResetPickBody();
 		}
 	}
 
 	m_prevMouseState = mousePickState;
 }
 
-
+void DemoCameraManager::ResetPickBody()
+{
+	if (m_targetPicked) {
+		NewtonBodySetSleepState(m_targetPicked, 0);
+	}
+	m_pickJoint = NULL;
+	m_targetPicked = NULL;
+	m_bodyDestructor = NULL;
+}
