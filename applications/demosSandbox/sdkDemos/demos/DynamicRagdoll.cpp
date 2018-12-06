@@ -184,7 +184,6 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 
 		dVector m_point;
 		dConvexHullPoint *m_next;
-		dConvexHullPoint *m_prev;
 	};
 
 	dAnimationBalanceController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
@@ -265,6 +264,10 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 
 			median = median.Scale (den);
 			variance = variance.Scale (den) - median * median;
+			dFloat maxVariance = dMax(dMax(variance.m_x, variance.m_y), variance.m_z);
+			if (maxVariance < 1.0e-3f) {
+				return 0;
+			}
 			coVariance = coVariance.Scale (den) - median * dVector (median.m_y, median.m_z, median.m_x, 0.0f);
 
 			dMatrix basisMatrix (dGetIdentityMatrix());
@@ -278,8 +281,8 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 			basisMatrix[0][2] = coVariance.m_z;
 			basisMatrix[2][0] = coVariance.m_z;
 
-			basisMatrix[1][2] = coVariance.m_x;
-			basisMatrix[2][1] = coVariance.m_x;
+			basisMatrix[1][2] = coVariance.m_y;
+			basisMatrix[2][1] = coVariance.m_y;
 
 			dVector eigenValues; 
 			dMatrix axis (basisMatrix.JacobiDiagonalization (eigenValues));
@@ -308,12 +311,10 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 			dSwap(contactPoints[index0], contactPoints[pointCount]);
 
 			convexHull[0].m_next = &convexHull[1];
-			convexHull[0].m_prev = &convexHull[2];
 			convexHull[1].m_next = &convexHull[2];
-			convexHull[1].m_prev = &convexHull[0];
 			convexHull[2].m_next = &convexHull[0];
-			convexHull[2].m_prev = &convexHull[1];
 			dVector hullNormal ((convexHull[2].m_point - convexHull[0].m_point).CrossProduct (convexHull[1].m_point - convexHull[0].m_point));
+			dAssert(hullNormal.DotProduct3(hullNormal) > 1.0e-6f);
 
 			int edgeAlloc = 3;
 			int hullStack = 3;
@@ -337,8 +338,6 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 					dAssert(edgeAlloc < sizeof(convexHull) / sizeof(convexHull[0]));
 					newEdge->m_point = newPoint;
 					newEdge->m_next = edge->m_next;
-					newEdge->m_prev = edge;
-					edge->m_next->m_prev = newEdge;
 					edge->m_next = newEdge;
 
 					hullStackBuffer[hullStack] = newEdge;
