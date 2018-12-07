@@ -342,8 +342,6 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 void dgWorldDynamicUpdate::IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
 	dgWorld* const world = (dgWorld*) this;
-	//dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	//dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 
 	dgAssert (timestep > dgFloat32 (0.0f));

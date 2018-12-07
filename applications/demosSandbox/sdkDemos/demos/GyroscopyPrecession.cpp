@@ -271,11 +271,9 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 
 	geometry->Release();
 	NewtonDestroyCollision(cone);
-
 }
 
 
-//static NewtonBody* TippeTop(DemoEntityManager* const scene, const dVector& posit, dVector omega, dFloat radius, dFloat lenght)
 static void TippeTop(DemoEntityManager* const scene, const dVector& posit, dVector omega, dFloat radius, dFloat lenght)
 {
 	NewtonBody* const top = CreateFlyWheel(scene, posit, 100.0f, 0.5f, 0.3f);
@@ -324,9 +322,11 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	// this is also known as the Frisbee theorem
 	FrisbeePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
 */
+
 	// intermediate Axis Theorem
 	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  0.0f, 1.0f), dVector (0.01f, 0.01f, 20.0f), 0.25f, 2.0f);
-/*	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  2.0f, 1.0f), dVector (0.01f, 20.0f, 0.01f), 0.25f, 2.0f);
+/*
+	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  2.0f, 1.0f), dVector (0.01f, 20.0f, 0.01f), 0.25f, 2.0f);
 	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  4.0f, 1.0f), dVector (20.0f, 0.01f, 0.01f), 0.25f, 2.0f);
 
 	//the effect only happens is there a residual angular velocity on the other two axis
@@ -340,17 +340,17 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	RattleBack(scene, dVector(-2.0f, 0.5f, - 3.0, 1.0f), 0.0f, 1.0f);
 	RattleBack(scene, dVector(-2.0f, 0.5f, - 6.0, 1.0f), 2.0f, 1.0f);
 	RattleBack(scene, dVector(-2.0f, 0.5f, - 9.0, 1.0f), -2.0f, 1.0f);
-
+*/
 	// place a toy tops
 	const int topsCount = 4;
 //const int topsCount = 1;
 	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i ++) {
 		PrecessingTop(scene, dVector(0.0f, 0.5f, -spacing * i - spacing, 1.0f));
-		PhiTop(scene, dVector(8.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 10.0f, 1.0f);
+//		PhiTop(scene, dVector(8.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 10.0f, 1.0f);
 //		TippeTop(scene, dVector(-6.0f, 0.3f, -spacing * i - spacing, 1.0f), 0.0f, 0.0f, 0.0f);
 	}
-*/
+
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());
 	dQuaternion rot(camMatrix);
