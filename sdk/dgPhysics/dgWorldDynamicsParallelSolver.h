@@ -252,6 +252,7 @@ class dgParallelBodySolver
 	void CalculateBodiesAcceleration();
 	
 	void InitBodyArray(dgInt32 threadID);
+	void InitSkeletons(dgInt32 threadID);
 	void InitJacobianMatrix(dgInt32 threadID);
 	void InitInternalForces(dgInt32 threadID);
 	void CalculateBodyForce(dgInt32 threadID);
@@ -263,7 +264,8 @@ class dgParallelBodySolver
 	void UpdateKinematicFeedback(dgInt32 threadID);
 	void CalculateJointsAcceleration(dgInt32 threadID);
 	void CalculateBodiesAcceleration(dgInt32 threadID);
-
+	
+	static void InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodyForceKernel(void* const context, void* const, dgInt32 threadID);
@@ -304,10 +306,12 @@ class dgParallelBodySolver
 	dgInt32 m_jointCount;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
 	dgInt32 m_solverPasses;
+	dgInt32 m_skeletonCount;
 	dgInt32 m_threadCounts;
 	dgInt32 m_soaRowsCount;
 	dgInt32* m_soaRowStart;
 	dgInt32* m_bodyRowStart;
+	
 
 	private:
 	dgArray<dgSolverSoaElement> m_massMatrix;
@@ -329,6 +333,7 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_jointCount(0)
 	,m_jacobianMatrixRowAtomicIndex(0)
 	,m_solverPasses(0)
+	,m_skeletonCount(0)
 	,m_threadCounts(0)
 	,m_soaRowsCount(0)
 	,m_soaRowStart(NULL)

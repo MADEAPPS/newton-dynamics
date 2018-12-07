@@ -100,6 +100,7 @@ class dgSkeletonContainer
 	static dgInt32 m_lruMarker;
 
 	friend class dgWorld;
+	friend class dgParallelBodySolver;
 	friend class dgWorldDynamicUpdate;
 };
 
