@@ -22,7 +22,6 @@
 #ifndef _DG_PARALLEL_SOLVER_H_
 #define _DG_PARALLEL_SOLVER_H_
 
-
 #include "dgPhysicsStdafx.h"
 
 class dgBodyInfo;
@@ -52,7 +51,6 @@ class dgWorkGroupFloat
 		,m_high(v)
 	{
 	}
-
 
 	DG_INLINE dgWorkGroupFloat(const dgVector& low, const dgVector& high)
 		:m_low(low)
@@ -84,7 +82,6 @@ class dgWorkGroupFloat
 		#endif
 		ptr[i] = value;
 	}
-
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
@@ -199,7 +196,6 @@ class dgSolverSoaJacobianPair
 	dgWorkGroupVector6 m_jacobianM1;
 } DG_GCC_VECTOR_ALIGMENT;
 
-
 DG_MSC_VECTOR_ALIGMENT
 class dgSolverSoaElement
 {
@@ -215,7 +211,6 @@ class dgSolverSoaElement
 	dgWorkGroupFloat m_lowerBoundFrictionCoefficent;
 	dgWorkGroupFloat m_upperBoundFrictionCoefficent;
 } DG_GCC_VECTOR_ALIGMENT;
-
 
 class dgParallelBodySolver
 {
@@ -341,7 +336,6 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_massMatrix(allocator)
 {
 }
-
 
 #endif
 

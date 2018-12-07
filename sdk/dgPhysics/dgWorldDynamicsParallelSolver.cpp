@@ -25,9 +25,9 @@
 #include "dgWorld.h"
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
+#include "dgSkeletonContainer.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgWorldDynamicsParallelSolver.h"
-
 
 dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one);
 dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero);
@@ -1114,7 +1114,22 @@ void dgParallelBodySolver::CalculateForces()
 	const dgInt32 passes = m_solverPasses;
 	m_firstPassCoef = dgFloat32(0.0f);
 	const dgInt32 threadCounts = m_world->GetThreadCount();
-
+/*
+	dgInt32 skeletonCount = 0;
+	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
+	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
+	for (dgInt32 i = 1; i < bodyCount; i++) {
+		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+		dgSkeletonContainer* const container = body->GetSkeleton();
+		if (container && (container->m_lru != lru)) {
+			container->m_lru = lru;
+			skeletonArray[skeletonCount] = container;
+			container->InitMassMatrix(constraintArray, leftHandSide, rightHandSide);
+			skeletonCount++;
+			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
+		}
+	}
+*/
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAcceleration();
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
