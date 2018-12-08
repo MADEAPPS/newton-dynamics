@@ -127,8 +127,23 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 			count++;
 		}
 		if (count) {
-			CalculateReactionForcesParallel(&m_clusterData[index], count, timestep);
-			index += count;
+			dgBodyInfo* const bodyArrayPtr = &world->m_bodiesMemory[0];
+			for (dgInt32 i = count - 1; i >= 0; i --) {
+				const dgBodyCluster* const cluster = &m_clusterData[i];
+				for (dgInt32 j = 1; j < cluster->m_bodyCount; j ++) {
+					const dgBodyInfo* const bodyInfo = &bodyArrayPtr[cluster->m_bodyStart + j];
+					dgSkeletonContainer* const skeleton = bodyInfo->m_body->GetSkeleton();
+					if (skeleton) {
+						dgSwap(m_clusterData[count - 1], m_clusterData[i]);
+						count --;
+						break;
+					}
+				}
+			} 
+			if (count) {
+				CalculateReactionForcesParallel(&m_clusterData[index], count, timestep);
+				index += count;
+			}
 		}
 	}
 
@@ -181,7 +196,6 @@ dgInt32 dgWorldDynamicUpdate::CompareClusterInfos(const dgBodyCluster* const clu
 {
 	return CompareKey(clusterA->m_jointCount, clusterA->m_bodyStart, clusterB->m_jointCount, clusterB->m_bodyStart);
 }
-
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
@@ -497,7 +511,6 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 			dgJointInfo* const jointInfo = queue.m_pool[index];
 			dgConstraint* const constraint = jointInfo->m_joint;
 			if (!constraint->m_graphTagged) {
-				//dgAssert (dgInt32 (constraint->m_index) < cluster->m_jointCount);
 				constraint->m_index = infoIndex;
 				constraintArray[infoIndex] = *jointInfo;
 				constraint->m_graphTagged = 1;
