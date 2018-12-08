@@ -27,10 +27,9 @@
 class dgBodyInfo;
 class dgJointInfo;
 class dgBodyCluster;
-
+class dgSkeletonContainer;
 
 #define DG_WORK_GROUP_SIZE		8 
-
 
 DG_MSC_VECTOR_ALIGMENT
 class dgWorkGroupFloat
@@ -302,6 +301,7 @@ class dgParallelBodySolver
 	dgFloat32 m_firstPassCoef;
 	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
+	dgSkeletonContainer* m_skeletonArray[256];
 
 	dgInt32 m_jointCount;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
@@ -311,7 +311,6 @@ class dgParallelBodySolver
 	dgInt32 m_soaRowsCount;
 	dgInt32* m_soaRowStart;
 	dgInt32* m_bodyRowStart;
-	
 
 	private:
 	dgArray<dgSolverSoaElement> m_massMatrix;

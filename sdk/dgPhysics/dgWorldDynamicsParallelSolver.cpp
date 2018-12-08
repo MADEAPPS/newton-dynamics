@@ -894,22 +894,23 @@ void dgParallelBodySolver::InitSkeletons(dgInt32 threadID)
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	const dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
 
-	dgWorld* const world = (dgWorld*) this;
+//	dgWorld* const world = (dgWorld*) this;
+//	dgJointInfo* const jointInfo = &m_jointArray[i];
+	const dgJointInfo* const jointArray = m_jointArray;
+	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
+	const dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
 	
-	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[bodyCount];
+	dgBodyInfo* const bodyArray = &m_world->m_bodiesMemory[bodyCount];
 	for (dgInt32 i = threadID + 1; i < bodyCount; i += step) {
 		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 		dgSkeletonContainer* const container = body->GetSkeleton();
 
 		if (container && (dgInterlockedExchange (&container->m_lru, lru) < lru)) {
-/*
-			skeletonArray[skeletonCount] = container;
-			container->InitMassMatrix(constraintArray, leftHandSide, rightHandSide);
-			skeletonCount++;
-			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
-*/
+			dgInt32 index = dgAtomicExchangeAndAdd(&m_skeletonCount, 1);
+			m_skeletonArray[index] = container;
+			container->InitMassMatrix(jointArray, leftHandSide, rightHandSide);
+			dgAssert(index < dgInt32(sizeof(m_skeletonArray) / sizeof(m_skeletonArray[0])));
 		}
-
 	}
 }
 
@@ -1146,27 +1147,11 @@ void dgParallelBodySolver::CalculateForces()
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 
 	m_skeletonCount = 0;
-	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
-
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(InitSkeletonsKernel, this, skeletonArray, "dgParallelBodySolver::InitSkeletons");
+		m_world->QueueJob(InitSkeletonsKernel, this, NULL, "dgParallelBodySolver::InitSkeletons");
 	}
 	m_world->SynchronizationBarrier();
 
-/*
-	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
-	for (dgInt32 i = 1; i < bodyCount; i++) {
-		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
-		dgSkeletonContainer* const container = body->GetSkeleton();
-		if (container && (container->m_lru != lru)) {
-			container->m_lru = lru;
-			skeletonArray[skeletonCount] = container;
-			container->InitMassMatrix(constraintArray, leftHandSide, rightHandSide);
-			skeletonCount++;
-			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
-		}
-	}
-*/
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAcceleration();
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
