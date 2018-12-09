@@ -320,7 +320,6 @@ DG_INLINE void dgContact::SetPruningTolerance(dgFloat32 tolerance)
 	m_contactPruningTolereance = dgAbs (tolerance);
 }
 
-
 DG_INLINE void dgContact::ResetSkeleton()
 {
 	m_skeletonSelfCollision = 0;
