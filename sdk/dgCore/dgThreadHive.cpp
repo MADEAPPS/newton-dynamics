@@ -194,4 +194,141 @@ void dgThreadHive::SynchronizationBarrier ()
 
 #else
 
+dgThreadHive::dgWorkerThread::dgWorkerThread()
+	:dgThread()
+	,m_workerSemaphore()
+	,m_hive(NULL)
+	,m_allocator(NULL)
+{
+}
+
+dgThreadHive::dgWorkerThread::~dgWorkerThread()
+{
+	dgInterlockedExchange(&m_terminate, 1);
+	m_workerSemaphore.Release();
+	Close();
+}
+
+void dgThreadHive::dgWorkerThread::SetUp(dgMemoryAllocator* const allocator, const char* const name, dgInt32 id, dgThreadHive* const hive)
+{
+	m_hive = hive;
+	m_allocator = allocator;
+	Init(name, id);
+}
+
+void dgThreadHive::dgWorkerThread::Execute(dgInt32 threadId)
+{
+	m_hive->OnBeginWorkerThread(threadId);
+
+	while (!m_terminate) {
+//		dgInterlockedExchange(&m_isBusy, 0);
+		SuspendExecution(m_workerSemaphore);
+//		dgInterlockedExchange(&m_isBusy, 1);
+		if (!m_terminate) {
+			dgAssert(0);
+//			RunNextJobInQueue(threadId);
+//			m_hive->m_semaphore[threadId].Release();
+		}
+	}
+
+//	dgInterlockedExchange(&m_isBusy, 0);
+	m_hive->OnEndWorkerThread(threadId);
+}
+
+dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
+	:m_parentThread(NULL)
+	,m_workerThreads(NULL)
+	,m_allocator(allocator)
+	,m_workerThreadsCount(0)
+{
+}
+
+dgThreadHive::~dgThreadHive()
+{
+	DestroyThreads();
+}
+
+void dgThreadHive::SetParentThread(dgThread* const mastertThread)
+{
+	m_parentThread = mastertThread;
+}
+
+void dgThreadHive::OnBeginWorkerThread(dgInt32 threadId)
+{
+}
+
+void dgThreadHive::OnEndWorkerThread(dgInt32 threadId)
+{
+}
+
+void dgThreadHive::BeginSection()
+{
+	dgAssert(0);
+}
+
+void dgThreadHive::EndSection()
+{
+	dgAssert(0);
+}
+
+
+void dgThreadHive::GlobalLock() const
+{
+	dgAssert(0);
+}
+
+void dgThreadHive::GlobalUnlock() const
+{
+	dgAssert(0);
+}
+
+void dgThreadHive::GetIndirectLock(dgInt32* const criticalSectionLock) const
+{
+	dgAssert(0);
+}
+
+void dgThreadHive::ReleaseIndirectLock(dgInt32* const criticalSectionLock) const
+{
+	dgAssert(0);
+}
+
+void dgThreadHive::QueueJob(dgWorkerThreadTaskCallback callback, void* const context0, void* const context1, const char* const functionName)
+{
+	dgAssert(0);
+}
+
+void dgThreadHive::SetThreadsCount(dgInt32 threads)
+{
+	DestroyThreads();
+
+	m_workerThreadsCount = dgMin(threads, DG_MAX_THREADS_HIVE_COUNT);
+	if (m_workerThreadsCount == 1) {
+		m_workerThreadsCount = 0;
+	}
+
+	if (m_workerThreadsCount) {
+		m_workerThreads = new (m_allocator) dgWorkerThread[dgUnsigned32(m_workerThreadsCount)];
+
+		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
+			char name[256];
+			sprintf(name, "dgWorkerThread%d", i);
+			m_workerThreads[i].SetUp(m_allocator, name, i, this);
+		}
+	}
+}
+
+void dgThreadHive::SynchronizationBarrier()
+{
+	dgAssert(0);
+}
+
+void dgThreadHive::DestroyThreads()
+{
+	if (m_workerThreadsCount) {
+		delete[] m_workerThreads;
+		m_workerThreads = NULL;
+		m_workerThreadsCount = 0;
+	}
+}
+
 #endif

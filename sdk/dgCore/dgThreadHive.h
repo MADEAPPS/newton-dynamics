@@ -152,8 +152,38 @@ DG_INLINE void dgThreadHive::ReleaseIndirectLock (dgInt32* const criticalSection
 }
 
 #else
+
 class dgThreadHive
 {
+
+	class dgWorkerThread: public dgThread
+	{
+		public:
+		DG_CLASS_ALLOCATOR(allocator)
+
+		dgWorkerThread();
+		~dgWorkerThread();
+
+		void SetUp(dgMemoryAllocator* const allocator, const char* const name, dgInt32 id, dgThreadHive* const hive);
+		virtual void Execute(dgInt32 threadId);
+
+/*
+		bool IsBusy() const;
+		dgInt32 PushJob(const dgThreadJob& job);
+		void RunNextJobInQueue(dgInt32 threadId);
+
+		dgInt32 m_isBusy;
+		dgInt32 m_jobsCount;
+		
+		dgThreadJob m_jobPool[DG_THREAD_POOL_JOB_SIZE];
+*/
+
+		dgSemaphore m_workerSemaphore;
+		dgThreadHive* m_hive;
+		dgMemoryAllocator* m_allocator;
+	};
+
+
 	public:
 	dgThreadHive(dgMemoryAllocator* const allocator);
 	virtual ~dgThreadHive();
@@ -161,8 +191,8 @@ class dgThreadHive
 	virtual void OnBeginWorkerThread(dgInt32 threadId);
 	virtual void OnEndWorkerThread(dgInt32 threadId);
 
-	void BeginSection() {}
-	void EndSection() {}
+	void BeginSection();
+	void EndSection();
 
 	void SetParentThread(dgThread* const mastertThread);
 
@@ -181,7 +211,23 @@ class dgThreadHive
 
 	private:
 	void DestroyThreads();
+
+	dgThread* m_parentThread;
+	dgWorkerThread* m_workerThreads;
+	dgMemoryAllocator* m_allocator;
+	dgInt32 m_workerThreadsCount;
 };
+
+DG_INLINE dgInt32 dgThreadHive::GetThreadCount() const
+{
+	return m_workerThreadsCount ? m_workerThreadsCount : 1;
+}
+
+DG_INLINE dgInt32 dgThreadHive::GetMaxThreadCount() const
+{
+	return DG_MAX_THREADS_HIVE_COUNT;
+}
+
 #endif
 
 #endif
