@@ -87,4 +87,6 @@ void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location,
 
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
 
+void SetKinematicPose(NewtonBody* const body, const dMatrix& matrix1, dFloat timestep);
+
 #endif
