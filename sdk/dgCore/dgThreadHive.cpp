@@ -74,7 +74,7 @@ void dgThreadHive::dgWorkerThread::Execute (dgInt32 threadId)
 		dgInterlockedExchange(&m_isBusy, 1);
 		if (!m_terminate) {
 			RunNextJobInQueue(threadId);
-			m_hive->m_semaphore[threadId].Release();
+			m_hive->m_beginSectionSemaphores[threadId].Release();
 		}
 	}
 
@@ -187,7 +187,7 @@ void dgThreadHive::SynchronizationBarrier ()
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i ++) {
 			m_workerThreads[i].m_workerSemaphore.Release();
 		}
-		m_parentThread->SuspendExecution(m_workerThreadsCount, m_semaphore);
+		m_parentThread->SuspendExecution(m_workerThreadsCount, m_beginSectionSemaphores);
 	}
 	m_jobsCount = 0;
 }
@@ -199,6 +199,7 @@ dgThreadHive::dgWorkerThread::dgWorkerThread()
 	,m_workerSemaphore()
 	,m_hive(NULL)
 	,m_allocator(NULL)
+	,m_concurrentWork(0)
 {
 }
 
@@ -216,6 +217,13 @@ void dgThreadHive::dgWorkerThread::SetUp(dgMemoryAllocator* const allocator, con
 	Init(name, id);
 }
 
+void dgThreadHive::dgWorkerThread::ConcurrentWork(dgInt32 threadId)
+{
+	while (dgInterlockedTest(&m_concurrentWork, 1)) {
+		dgThreadYield();
+	}
+}
+
 void dgThreadHive::dgWorkerThread::Execute(dgInt32 threadId)
 {
 	m_hive->OnBeginWorkerThread(threadId);
@@ -225,9 +233,11 @@ void dgThreadHive::dgWorkerThread::Execute(dgInt32 threadId)
 		SuspendExecution(m_workerSemaphore);
 //		dgInterlockedExchange(&m_isBusy, 1);
 		if (!m_terminate) {
-			dgAssert(0);
 //			RunNextJobInQueue(threadId);
-//			m_hive->m_semaphore[threadId].Release();
+			m_concurrentWork = 1;
+			m_hive->m_beginSectionSemaphores[threadId].Release();
+			ConcurrentWork(threadId);
+			m_hive->m_endSectionSemaphores[threadId].Release();
 		}
 	}
 
@@ -240,6 +250,7 @@ dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
 	,m_workerThreads(NULL)
 	,m_allocator(allocator)
 	,m_workerThreadsCount(0)
+	,m_globalCriticalSection(0)
 {
 }
 
@@ -263,33 +274,24 @@ void dgThreadHive::OnEndWorkerThread(dgInt32 threadId)
 
 void dgThreadHive::BeginSection()
 {
-	dgAssert(0);
+	if (m_workerThreadsCount) {
+		//DG_TRACKTIME(__FUNCTION__);
+		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
+			m_workerThreads[i].m_workerSemaphore.Release();
+		}
+		m_parentThread->SuspendExecution(m_workerThreadsCount, m_beginSectionSemaphores);
+	}
 }
 
 void dgThreadHive::EndSection()
 {
-	dgAssert(0);
-}
-
-
-void dgThreadHive::GlobalLock() const
-{
-	dgAssert(0);
-}
-
-void dgThreadHive::GlobalUnlock() const
-{
-	dgAssert(0);
-}
-
-void dgThreadHive::GetIndirectLock(dgInt32* const criticalSectionLock) const
-{
-	dgAssert(0);
-}
-
-void dgThreadHive::ReleaseIndirectLock(dgInt32* const criticalSectionLock) const
-{
-	dgAssert(0);
+	if (m_workerThreadsCount) {
+		//DG_TRACKTIME(__FUNCTION__);
+		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
+			dgInterlockedExchange(&m_workerThreads[i].m_concurrentWork, 0);
+		}
+		m_parentThread->SuspendExecution(m_workerThreadsCount, m_endSectionSemaphores);
+	}
 }
 
 void dgThreadHive::QueueJob(dgWorkerThreadTaskCallback callback, void* const context0, void* const context1, const char* const functionName)

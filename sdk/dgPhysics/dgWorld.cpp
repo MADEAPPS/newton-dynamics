@@ -1007,11 +1007,10 @@ void dgWorld::RunStep ()
 	}
 
 	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
-
+#endif
 	if (!m_concurrentUpdate) {
 		m_mutex.Release();
 	}
-#endif
 
 	EndSection();
 }
