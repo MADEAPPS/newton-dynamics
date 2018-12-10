@@ -947,8 +947,8 @@ void ServoJoints (DemoEntityManager* const scene)
 	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 
 //	origin.m_x -= 5.0f;
 	origin.m_y += 2.0f;

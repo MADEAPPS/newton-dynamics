@@ -217,7 +217,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 		int mask = material0.m_userId | material1.m_userId;
 		if (mask == (ARTICULATED_VEHICLE_DEFINITION::m___terrain + ARTICULATED_VEHICLE_DEFINITION::m___tirePart)) {
-			NewtonContactJointResetSelfJointsCollision(contactJoint);
+			NewtonContactJointResetIntraJointCollision(contactJoint);
 		}
 
 		int filter0 = material0.m_userId & material1.m_userFlags;

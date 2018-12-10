@@ -239,11 +239,10 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		const dgFloat32 invMass1 = body1->m_invMass.m_w;
 
 		if ((invMass0 > dgFloat32 (0.0f)) && (invMass1 > dgFloat32 (0.0f))) {
-			dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI | dgBody::m_dynamicBodyAsymatric));
-			dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI | dgBody::m_dynamicBodyAsymatric));
+			//dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI | dgBody::m_dynamicBodyAsymatric));
+			//dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI | dgBody::m_dynamicBodyAsymatric));
 			world->UnionSet(joint);
 		} else if (invMass1 == dgFloat32 (0.0f)) {
-			//dgBody* const root = world->FindRootAndSplit(joint->GetBody0());
 			dgBody* const root = world->FindRootAndSplit(body0);
 			root->m_disjointInfo.m_jointCount += 1;
 			root->m_disjointInfo.m_rowCount += joint->m_maxDOF;
@@ -625,9 +624,11 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
 		dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
 		if (skeleton0 && (skeleton0 == skeleton1)) {
-			contactJoint->m_isInSkeletonLoop = true;
-			skeleton0->AddSelfCollisionJoint(contactJoint);
-		} else if (contactJoint->IsSkeleton()) {
+			if (contactJoint->IsSkeletonSelftCollision()) {
+				contactJoint->m_isInSkeletonLoop = true;
+				skeleton0->AddSelfCollisionJoint(contactJoint);
+			}
+		} else if (contactJoint->IsSkeletonIntraCollision()) {
 			if (skeleton0 && !skeleton1) {
 				contactJoint->m_isInSkeletonLoop = true;
 				skeleton0->AddSelfCollisionJoint(contactJoint);
