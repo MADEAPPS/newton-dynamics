@@ -26,6 +26,7 @@
 #include "dgThreadHive.h"
 
 
+#ifdef USE_OLD_THREAD_POOL 
 dgThreadHive::dgWorkerThread::dgWorkerThread()
 	:dgThread()
 	,m_hive(NULL)
@@ -191,3 +192,6 @@ void dgThreadHive::SynchronizationBarrier ()
 	m_jobsCount = 0;
 }
 
+#else
+
+#endif

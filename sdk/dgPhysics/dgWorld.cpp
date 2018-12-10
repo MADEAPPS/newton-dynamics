@@ -565,7 +565,6 @@ void dgWorld::ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* co
 	QueueJob (userJobKernel, this, userJobKernelContext, functionName);
 }
 
-
 void dgWorld::SetUserData (void* const userData)
 {
 	m_userData = userData;

@@ -151,6 +151,37 @@ DG_INLINE void dgThreadHive::ReleaseIndirectLock (dgInt32* const criticalSection
 	}
 }
 
+#else
+class dgThreadHive
+{
+	public:
+	dgThreadHive(dgMemoryAllocator* const allocator);
+	virtual ~dgThreadHive();
+
+	virtual void OnBeginWorkerThread(dgInt32 threadId);
+	virtual void OnEndWorkerThread(dgInt32 threadId);
+
+	void BeginSection() {}
+	void EndSection() {}
+
+	void SetParentThread(dgThread* const mastertThread);
+
+	void GlobalLock() const;
+	void GlobalUnlock() const;
+
+	void GetIndirectLock(dgInt32* const criticalSectionLock) const;
+	void ReleaseIndirectLock(dgInt32* const criticalSectionLock) const;
+
+	dgInt32 GetThreadCount() const;
+	dgInt32 GetMaxThreadCount() const;
+	void SetThreadsCount(dgInt32 count);
+
+	virtual void QueueJob(dgWorkerThreadTaskCallback callback, void* const context0, void* const context1, const char* const functionName);
+	virtual void SynchronizationBarrier();
+
+	private:
+	void DestroyThreads();
+};
 #endif
 
 #endif
