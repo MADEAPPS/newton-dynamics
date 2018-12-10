@@ -30,6 +30,9 @@
 #define DG_THREAD_POOL_JOB_SIZE (256)
 typedef void (*dgWorkerThreadTaskCallback) (void* const context0, void* const context1, dgInt32 threadID);
 
+#define USE_OLD_THREAD_POOL 
+
+#ifdef USE_OLD_THREAD_POOL 
 class dgThreadHive  
 {
 	public:
@@ -82,6 +85,9 @@ class dgThreadHive
 
 	virtual void OnBeginWorkerThread (dgInt32 threadId);
 	virtual void OnEndWorkerThread (dgInt32 threadId);
+
+	void BeginSection() {}
+	void EndSection() {}
 
 	void SetParentThread (dgThread* const mastertThread);
 
@@ -144,5 +150,7 @@ DG_INLINE void dgThreadHive::ReleaseIndirectLock (dgInt32* const criticalSection
 		dgSpinUnlock(criticalSectionLock);
 	}
 }
+
+#endif
 
 #endif
