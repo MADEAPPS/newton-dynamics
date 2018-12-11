@@ -226,14 +226,25 @@ void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
 		DG_TRACKTIME_NAMED(job.m_jobName);
 		job.m_callback(job.m_context0, job.m_context1, m_id);
 	}
-	m_jobsCount = 0;
 }
+
+dgInt32 dgThreadHive::dgWorkerThread::PushJob(const dgThreadJob& job)
+{
+	dgAssert(m_jobsCount < sizeof (m_jobPool) / sizeof (m_jobPool[0]));
+	m_jobPool[m_jobsCount] = job;
+	m_jobsCount++;
+	return m_jobsCount;
+}
+
 
 void dgThreadHive::dgWorkerThread::ConcurrentWork(dgInt32 threadId)
 {
 	while (dgInterlockedTest(&m_concurrentWork, 1)) {
 		if (dgInterlockedExchange(&m_pendingWork, 0)) {
+			DG_TRACKTIME(__FUNCTION__);
 			RunNextJobInQueue(threadId);
+			m_jobsCount = 0;
+			dgAtomicExchangeAndAdd(&m_hive->m_syncLock, -1);
 		}
 		dgThreadYield();
 	}
@@ -263,6 +274,8 @@ dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
 	:m_parentThread(NULL)
 	,m_workerThreads(NULL)
 	,m_allocator(allocator)
+	,m_syncLock(0)
+	,m_jobsCount(0)
 	,m_workerThreadsCount(0)
 	,m_globalCriticalSection(0)
 {
@@ -289,7 +302,7 @@ void dgThreadHive::OnEndWorkerThread(dgInt32 threadId)
 void dgThreadHive::BeginSection()
 {
 	if (m_workerThreadsCount) {
-		//DG_TRACKTIME(__FUNCTION__);
+		DG_TRACKTIME(__FUNCTION__);
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
 			m_workerThreads[i].m_workerSemaphore.Release();
 		}
@@ -300,7 +313,7 @@ void dgThreadHive::BeginSection()
 void dgThreadHive::EndSection()
 {
 	if (m_workerThreadsCount) {
-		//DG_TRACKTIME(__FUNCTION__);
+		DG_TRACKTIME(__FUNCTION__);
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
 			dgInterlockedExchange(&m_workerThreads[i].m_concurrentWork, 0);
 		}
@@ -310,7 +323,23 @@ void dgThreadHive::EndSection()
 
 void dgThreadHive::QueueJob(dgWorkerThreadTaskCallback callback, void* const context0, void* const context1, const char* const functionName)
 {
-	dgAssert(0);
+	if (!m_workerThreadsCount) {
+		DG_TRACKTIME(functionName);
+		callback(context0, context1, 0);
+	} else {
+		dgInt32 workerTreadEntry = m_jobsCount % m_workerThreadsCount;
+#ifdef DG_USE_THREAD_EMULATION
+		DG_TRACKTIME(functionName);
+		callback(context0, context1, workerTreadEntry);
+#else 
+		dgInt32 index = m_workerThreads[workerTreadEntry].PushJob(dgThreadJob(context0, context1, callback, functionName));
+		if (index >= DG_THREAD_POOL_JOB_SIZE) {
+			dgAssert(0);
+			SynchronizationBarrier();
+		}
+#endif
+	}
+	m_jobsCount++;
 }
 
 void dgThreadHive::SetThreadsCount(dgInt32 threads)
@@ -335,7 +364,17 @@ void dgThreadHive::SetThreadsCount(dgInt32 threads)
 
 void dgThreadHive::SynchronizationBarrier()
 {
-	dgAssert(0);
+	if (m_workerThreadsCount) {
+		DG_TRACKTIME(__FUNCTION__);
+		m_syncLock = m_workerThreadsCount;
+		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
+			dgInterlockedExchange(&m_workerThreads[i].m_pendingWork, 1);
+		}
+		while (dgInterlockedTest(&m_syncLock, 0)) {
+			dgThreadYield();
+		}
+	}
+	m_jobsCount = 0;
 }
 
 void dgThreadHive::DestroyThreads()

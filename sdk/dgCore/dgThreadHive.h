@@ -189,11 +189,11 @@ class dgThreadHive
 		void SetUp(dgMemoryAllocator* const allocator, const char* const name, dgInt32 id, dgThreadHive* const hive);
 		virtual void Execute(dgInt32 threadId);
 
+		dgInt32 PushJob(const dgThreadJob& job);
 		void RunNextJobInQueue(dgInt32 threadId);
 		void ConcurrentWork(dgInt32 threadId);
 
 //		bool IsBusy() const;
-//		dgInt32 PushJob(const dgThreadJob& job);
 //		dgInt32 m_isBusy;
 
 		dgSemaphore m_workerSemaphore;
@@ -236,6 +236,8 @@ class dgThreadHive
 	dgThread* m_parentThread;
 	dgWorkerThread* m_workerThreads;
 	dgMemoryAllocator* m_allocator;
+	dgInt32 m_syncLock;
+	dgInt32 m_jobsCount;
 	dgInt32 m_workerThreadsCount;
 	mutable dgInt32 m_globalCriticalSection;
 	dgThread::dgSemaphore m_endSectionSemaphores[DG_MAX_THREADS_HIVE_COUNT];

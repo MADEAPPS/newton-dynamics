@@ -965,10 +965,10 @@ void dgWorld::RunStep ()
 {
 /*
 	static int zzzz;
-	if (zzzz == 50) {
+	if (zzzz == 100) {
 		DG_START_RECORDING("../../../../sdk/dProfiler/xxxx.tt");
 	}
-	if (zzzz == 500) {
+	if (zzzz == 400) {
 		DG_STOP_RECORDING();
 	}
 	zzzz++;
@@ -978,7 +978,6 @@ void dgWorld::RunStep ()
 	
 	BeginSection();
 	dgUnsigned64 timeAcc = dgGetTimeInMicrosenconds();
-#ifdef USE_OLD_THREAD_POOL 
 
 	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
 	for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
@@ -1005,11 +1004,11 @@ void dgWorld::RunStep ()
 	if (m_postUpdateCallback) {
 		m_postUpdateCallback (this, m_savetimestep);
 	}
-#endif
-	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
+
 	if (!m_concurrentUpdate) {
 		m_mutex.Release();
 	}
+	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
 	EndSection();
 }
 

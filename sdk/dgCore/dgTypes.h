@@ -805,20 +805,6 @@ class dgSetPrecisionDouble
 
 DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
-/*
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-		return _InterlockedExchangeAdd((long*) addend, long (amount));
-	#endif
-
-	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		return InterlockedExchangeAdd((long*) addend, long (amount));
-	#endif
-
-	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
-		return __sync_fetch_and_add ((int32_t*)addend, amount );
-	#endif
-*/
-
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchangeAdd((long*)addend, long(amount));
 	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
