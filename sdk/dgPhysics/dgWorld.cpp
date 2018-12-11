@@ -975,11 +975,11 @@ void dgWorld::RunStep ()
 */
 
 	DG_TRACKTIME(__FUNCTION__);
-
+	
 	BeginSection();
-
-#ifdef USE_OLD_THREAD_POOL 
 	dgUnsigned64 timeAcc = dgGetTimeInMicrosenconds();
+#ifdef USE_OLD_THREAD_POOL 
+
 	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
 	for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
 		dgInterlockedExchange(&m_delayDelateLock, 1);
@@ -1005,13 +1005,11 @@ void dgWorld::RunStep ()
 	if (m_postUpdateCallback) {
 		m_postUpdateCallback (this, m_savetimestep);
 	}
-
-	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
 #endif
+	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
 	if (!m_concurrentUpdate) {
 		m_mutex.Release();
 	}
-
 	EndSection();
 }
 

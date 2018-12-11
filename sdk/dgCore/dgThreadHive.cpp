@@ -200,6 +200,8 @@ dgThreadHive::dgWorkerThread::dgWorkerThread()
 	,m_hive(NULL)
 	,m_allocator(NULL)
 	,m_concurrentWork(0)
+	,m_pendingWork(0)
+	,m_jobsCount(0)
 {
 }
 
@@ -217,9 +219,22 @@ void dgThreadHive::dgWorkerThread::SetUp(dgMemoryAllocator* const allocator, con
 	Init(name, id);
 }
 
+void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
+{
+	for (dgInt32 i = 0; i < m_jobsCount; i++) {
+		const dgThreadJob& job = m_jobPool[i];
+		DG_TRACKTIME_NAMED(job.m_jobName);
+		job.m_callback(job.m_context0, job.m_context1, m_id);
+	}
+	m_jobsCount = 0;
+}
+
 void dgThreadHive::dgWorkerThread::ConcurrentWork(dgInt32 threadId)
 {
 	while (dgInterlockedTest(&m_concurrentWork, 1)) {
+		if (dgInterlockedExchange(&m_pendingWork, 0)) {
+			RunNextJobInQueue(threadId);
+		}
 		dgThreadYield();
 	}
 }
@@ -233,7 +248,6 @@ void dgThreadHive::dgWorkerThread::Execute(dgInt32 threadId)
 		SuspendExecution(m_workerSemaphore);
 //		dgInterlockedExchange(&m_isBusy, 1);
 		if (!m_terminate) {
-//			RunNextJobInQueue(threadId);
 			m_concurrentWork = 1;
 			m_hive->m_beginSectionSemaphores[threadId].Release();
 			ConcurrentWork(threadId);

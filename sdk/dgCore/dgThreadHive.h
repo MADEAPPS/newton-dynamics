@@ -156,6 +156,28 @@ DG_INLINE void dgThreadHive::ReleaseIndirectLock (dgInt32* const criticalSection
 class dgThreadHive
 {
 
+	class dgThreadJob
+	{
+		public:
+		dgThreadJob()
+		{
+		}
+
+		dgThreadJob(void* const context0, void* const context1, dgWorkerThreadTaskCallback callback, const char* const jobName)
+			:m_context0(context0)
+			,m_context1(context1)
+			,m_callback(callback)
+			,m_jobName(jobName)
+		{
+		}
+
+		void* m_context0;
+		void* m_context1;
+		const char* m_jobName;
+		dgWorkerThreadTaskCallback m_callback;
+	};
+
+
 	class dgWorkerThread: public dgThread
 	{
 		public:
@@ -167,24 +189,21 @@ class dgThreadHive
 		void SetUp(dgMemoryAllocator* const allocator, const char* const name, dgInt32 id, dgThreadHive* const hive);
 		virtual void Execute(dgInt32 threadId);
 
-		void ConcurrentWork(dgInt32 threadId);
-/*
-		bool IsBusy() const;
-		dgInt32 PushJob(const dgThreadJob& job);
 		void RunNextJobInQueue(dgInt32 threadId);
+		void ConcurrentWork(dgInt32 threadId);
 
-		dgInt32 m_isBusy;
-		dgInt32 m_jobsCount;
-		
-		dgThreadJob m_jobPool[DG_THREAD_POOL_JOB_SIZE];
-*/
+//		bool IsBusy() const;
+//		dgInt32 PushJob(const dgThreadJob& job);
+//		dgInt32 m_isBusy;
 
 		dgSemaphore m_workerSemaphore;
 		dgThreadHive* m_hive;
 		dgMemoryAllocator* m_allocator;
 		dgInt32 m_concurrentWork;
+		dgInt32 m_pendingWork;
+		dgInt32 m_jobsCount;
+		dgThreadJob m_jobPool[DG_THREAD_POOL_JOB_SIZE];
 	};
-
 
 	public:
 	dgThreadHive(dgMemoryAllocator* const allocator);
