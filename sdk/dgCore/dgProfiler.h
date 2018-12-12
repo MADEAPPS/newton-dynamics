@@ -80,8 +80,8 @@ class dgProfile
 
 #define DG_DELETE_TRACK() dProfilerDeleteTrack()
 #define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
-#define DG_TRACKTIME(name) dgProfile _profile##name(name);
 
+#define DG_TRACKTIME(name) dgProfile _profile##name(name);
 #define DG_TRACKTIME_NAMED(name) dgProfile _profile(name);
 
 #else
