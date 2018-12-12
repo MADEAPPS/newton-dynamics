@@ -220,15 +220,17 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 		matrix3.m_posit.m_y += vertialStep * 2.0f;
 	}
 
+	// hack the inertia (yes I know it is a cheat, but this can be fix with more iterations as well)
+	dFloat inertiaScale = 3.0f;
 	for (int i = 0; i < bodyCount; i++) {
 		dFloat m;
 		dFloat Ixx;
 		dFloat Iyy;
 		dFloat Izz;
 		NewtonBodyGetMass(bodyArray[i], &m, &Ixx, &Iyy, &Izz);
-		Ixx *= 2.0f;
-		Iyy *= 2.0f;
-		Izz *= 2.0f;
+		Ixx *= inertiaScale;
+		Iyy *= inertiaScale;
+		Izz *= inertiaScale;
 		NewtonBodySetMassMatrix(bodyArray[i], m, Ixx, Iyy, Izz);
 	}
 
