@@ -416,7 +416,7 @@ public:
 		// add an input Manage to manage the inputs and user interaction 
 		minputManager = new VehicleInputManager(mscene);
 
-
+		// settig up a use contact handle to calcual tire collsion with terrain
 		int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
 		m_tireMaterial = NewtonMaterialCreateGroupID(world);
 
