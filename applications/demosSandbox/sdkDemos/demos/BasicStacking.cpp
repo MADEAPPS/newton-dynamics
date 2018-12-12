@@ -205,17 +205,31 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 
 	dMatrix matrix3(matrix2);
 	matrix3.m_posit.m_x -= horizontalStep;
-	
+
+	int bodyCount = 0;
+	NewtonBody* bodyArray[256];
 	for (int i = 0; i < count/2; i++) {
-		CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
-		CreateSimpleSolid(scene, geometry, mass, matrix1, collision, defaultMaterialID);
-		CreateSimpleSolid(scene, geometry, mass, matrix2, collision, defaultMaterialID);
-		CreateSimpleSolid(scene, geometry, mass, matrix3, collision, defaultMaterialID);
+		bodyArray[bodyCount ++] = CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
+		bodyArray[bodyCount ++] = CreateSimpleSolid(scene, geometry, mass, matrix1, collision, defaultMaterialID);
+		bodyArray[bodyCount ++] = CreateSimpleSolid(scene, geometry, mass, matrix2, collision, defaultMaterialID);
+		bodyArray[bodyCount ++] = CreateSimpleSolid(scene, geometry, mass, matrix3, collision, defaultMaterialID);
 
 		matrix0.m_posit.m_y += vertialStep * 2.0f;
 		matrix1.m_posit.m_y += vertialStep * 2.0f;
 		matrix2.m_posit.m_y += vertialStep * 2.0f;
 		matrix3.m_posit.m_y += vertialStep * 2.0f;
+	}
+
+	for (int i = 0; i < bodyCount; i++) {
+		dFloat m;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		NewtonBodyGetMass(bodyArray[i], &m, &Ixx, &Iyy, &Izz);
+		Ixx *= 2.0f;
+		Iyy *= 2.0f;
+		Izz *= 2.0f;
+		NewtonBodySetMassMatrix(bodyArray[i], m, Ixx, Iyy, Izz);
 	}
 
 //matrix0.m_posit.m_y += 10.0f;
