@@ -415,11 +415,26 @@ public:
 		//
 		// add an input Manage to manage the inputs and user interaction 
 		minputManager = new VehicleInputManager(mscene);
+
+
+		int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
+		m_tireMaterial = NewtonMaterialCreateGroupID(world);
+
+		NewtonMaterialSetCallbackUserData(world, m_tireMaterial, defualtMaterial, this);
+		NewtonMaterialSetContactGenerationCallback(world, m_tireMaterial, defualtMaterial, OnContactGeneration);
+		//NewtonMaterialSetCollisionCallback(world, m_tireMaterial, materialsList[i], OnTireAabbOverlap, OnTireContactsProcess);
 	}
 
 	~VehicleControllerManagerDG()
 	{
 	}
+
+	static int OnContactGeneration(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
+	{
+		dAssert(0);
+		return 0;
+	}
+
 
 	virtual void PreUpdate(dFloat timestep)
 	{
@@ -466,6 +481,8 @@ private:
 	// add an input Manage to manage the inputs and user interaction 
 	VehicleInputManager* minputManager;
 	DemoEntityManager* mscene;
+
+	int m_tireMaterial;
 };
 
 static void BuildPyramid(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count, PrimitiveType type, const dMatrix& shapeMatrix = dGetIdentityMatrix())
@@ -670,8 +687,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	startlocation.m_posit.m_x += 50.0f;
 	startlocation.m_posit.m_y += 8.5f;
 	NewtonCollision* collision = NewtonCreateBox(world, 50.0f, 0.25f, 100.0f, 0, NULL);
-	DemoMesh* const StartBox = new DemoMesh("StartBox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-	CreateSimpleSolid(scene, StartBox, 0.0f, startlocation, collision, defaultMaterial);
+//	DemoMesh* const StartBox = new DemoMesh("StartBox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+//	CreateSimpleSolid(scene, StartBox, 0.0f, startlocation, collision, defaultMaterial);
 	NewtonDestroyCollision(collision);
 	collision = NULL;
 	//
@@ -679,8 +696,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	startlocation2.m_posit.m_x += 38.0f;
 	startlocation2.m_posit.m_y += 4.0f;
 	collision = NewtonCreateBox(world, 20.0f, 0.25f, 40.0f, 0, NULL);
-	DemoMesh* const StartBox3 = new DemoMesh("StartBox", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-	CreateSimpleSolid(scene, StartBox3, 0.0f, startlocation2, collision, defaultMaterial);
+//	DemoMesh* const StartBox3 = new DemoMesh("StartBox", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+//	CreateSimpleSolid(scene, StartBox3, 0.0f, startlocation2, collision, defaultMaterial);
 	NewtonDestroyCollision(collision);
 	collision = NULL;
 	//	
@@ -688,13 +705,13 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	startlocation3.m_posit.m_x -= 31.5f;
 	startlocation3.m_posit.m_y += 0.575f;
 	collision = NewtonCreateBox(world, 2.0f, 2.0f, 100.0f, 0, NULL);
-	DemoMesh* const StartBox2 = new DemoMesh("StartBox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-	CreateSimpleSolid(scene, StartBox2, 0.0f, startlocation3, collision, defaultMaterial);
+//	DemoMesh* const StartBox2 = new DemoMesh("StartBox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+//	CreateSimpleSolid(scene, StartBox2, 0.0f, startlocation3, collision, defaultMaterial);
 	NewtonDestroyCollision(collision);
 	collision = NULL;
 	//
-	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, 10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0), 10, _BOX_PRIMITIVE);
-	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, -10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0), 10, _BOX_PRIMITIVE);
+//	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, 10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0), 10, _BOX_PRIMITIVE);
+//	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, -10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0), 10, _BOX_PRIMITIVE);
 	//
 	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
@@ -781,7 +798,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	// VEHICLE END
 	//
 	// MULTIPLE VEHICLES BEGIN
-	for (int u = 0; u < 20; u++) {
+	int count = 0;
+	for (int u = 0; u < count; u++) {
 		VehicleFrameRotation = dVector(-180.0f, 30.0f, 0.0f);
 		dMatrix location4(dGetIdentityMatrix());
 
