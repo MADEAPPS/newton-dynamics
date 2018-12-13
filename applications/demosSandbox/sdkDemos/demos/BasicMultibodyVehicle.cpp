@@ -790,7 +790,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	// Scene 3D
 	// load the sky box
 	scene->CreateSkyBox();
-	CreateLevelMesh(scene, "flatPlane.ngd", true);
+	//CreateLevelMesh(scene, "flatPlane.ngd", true);
+	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 	//
 	NewtonWorld* const world = scene->GetNewton();
 	//
