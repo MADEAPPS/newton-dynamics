@@ -68,9 +68,99 @@ static void UserContactFriction(const NewtonJoint* contactJoint, dFloat timestep
 	}
 }
 
+static int OnTireContactGeneration(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
+{
+	int id0 = NewtonCollisionGetUserID(collision0);
+
+	//const NewtonBody* const tire = (id0 == D_MULTIBODY_TIRE_ID) ? body0 : body1;
+	const NewtonCollision* const tireCollision = (id0 == D_MULTIBODY_TIRE_ID) ? collision0 : collision1;
+
+	const NewtonBody* const terrain = (id0 == D_MULTIBODY_TIRE_ID) ? body1 : body0;
+	const NewtonCollision* const terrainCollision = (id0 == D_MULTIBODY_TIRE_ID) ? collision1 : collision0;
+
+	// get the joint information form the collision user data
+	NewtonCollisionMaterial collisionMaterial;
+	NewtonCollisionGetMaterial(tireCollision, &collisionMaterial);
+	dAssert(collisionMaterial.m_userId == D_MULTIBODY_TIRE_ID);
+
+	dCustomTireSpringDG* const tireJoint = (dCustomTireSpringDG*)collisionMaterial.m_userData;
+	dAssert(tireJoint->GetBody1() == ((id0 == D_MULTIBODY_TIRE_ID) ? body0 : body1));
+
+	dMatrix tireMatrix;
+	dMatrix tireHarpointMatrix;
+	tireJoint->CalculateGlobalMatrix(tireHarpointMatrix, tireMatrix);
+
+	// here I need the suspension length, for now assume 1 meter
+	dFloat suspensionSpan = 1.0f;
+	tireHarpointMatrix.m_posit += tireHarpointMatrix.m_up.Scale(suspensionSpan);
+
+	//dVector veloc0(tireHarpointMatrix.m_up.Scale(-m_info.m_suspensionLength));
+	dVector veloc0(tireHarpointMatrix.m_up.Scale(-suspensionSpan));
+	dVector tmp(0.0f);
+	dVector contact(0.0f);
+	dVector normal(0.0f);
+	dFloat penetration(0.0f);
+
+	dFloat position = tireHarpointMatrix.m_up.DotProduct3(tireHarpointMatrix.m_posit - tireMatrix.m_posit);
+	dFloat param = position / suspensionSpan;
+
+	dMatrix matrixB;
+	dLong attributeA;
+	dLong attributeB;
+	dFloat impactParam;
+
+	NewtonWorld* const world = NewtonBodyGetWorld(terrain);
+	NewtonBodyGetMatrix(terrain, &matrixB[0][0]);
+
+	int count = NewtonCollisionCollideContinue(world, 1, 1.0f,
+		tireCollision, &tireHarpointMatrix[0][0], &veloc0[0], &tmp[0],
+		terrainCollision, &matrixB[0][0], &tmp[0], &tmp[0],
+		&impactParam, &contact[0], &normal[0], &penetration,
+		&attributeA, &attributeB, 0);
+
+	int contactCount = 0;
+	if (count) {
+		// calculate tire penetration
+		dFloat dist = (param - impactParam) * suspensionSpan;
+
+		if (dist > -D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION) {
+
+			normal.m_w = 0.0f;
+			penetration = normal.DotProduct3(tireHarpointMatrix.m_up.Scale(dist));
+
+			dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
+
+			if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
+				dAssert(0);
+				//lateralDir = normal.CrossProduct(tireMatrix.m_front.CrossProduct(normal)); 
+				longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
+				dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
+			}
+			longitudinalDir = longitudinalDir.Normalize();
+			contact -= tireMatrix.m_up.Scale(dist);
+
+			contactBuffer[contactCount].m_point[0] = contact.m_x;
+			contactBuffer[contactCount].m_point[1] = contact.m_y;
+			contactBuffer[contactCount].m_point[2] = contact.m_z;
+			contactBuffer[contactCount].m_point[3] = 1.0f;
+			contactBuffer[contactCount].m_normal[0] = normal.m_x;
+			contactBuffer[contactCount].m_normal[1] = normal.m_y;
+			contactBuffer[contactCount].m_normal[2] = normal.m_z;
+			contactBuffer[contactCount].m_normal[3] = 0.0f;
+			contactBuffer[contactCount].m_shapeId0 = collisionMaterial.m_userId;
+			contactBuffer[contactCount].m_shapeId1 = NewtonCollisionGetUserID(terrainCollision);
+			contactBuffer[contactCount].m_penetration = dClamp(penetration, dFloat(-D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION));
+			contactCount++;
+		}
+	}
+
+	return contactCount;
+}
+
+
 class VehicleControllerManagerDG : public dCustomVehicleControllerManagerDG
 {
-public:
+	public:
 	class VehicleFrameEntity : public DemoEntity
 	{
 	private:
@@ -456,105 +546,6 @@ public:
 	{
 	}
 
-	static int OnTireContactGeneration(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
-	{
-		VehicleControllerManagerDG* const manager = (VehicleControllerManagerDG*)NewtonMaterialGetMaterialPairUserData(material);
-		int id0 = NewtonCollisionGetUserID(collision0);
-		if (id0 == D_MULTIBODY_TIRE_ID) {
-			return manager->OnTireContactGeneration(material, body0, collision0, body1, collision1, contactBuffer);
-		} else {
-			dAssert (NewtonCollisionGetUserID(collision1) == D_MULTIBODY_TIRE_ID);
-			return manager->OnTireContactGeneration(material, body1, collision1, body0, collision0, contactBuffer);
-		}
-	}
-
-	int OnTireContactGeneration(const NewtonMaterial* const material, const NewtonBody* const tire, const NewtonCollision* const tireCollision, const NewtonBody* const terrain, const NewtonCollision* const terrainCollision, NewtonUserContactPoint* const contactBuffer)
-	{
-		// get the joint information form the collision user data
-		NewtonCollisionMaterial collisionMaterial;
-		NewtonCollisionGetMaterial(tireCollision, &collisionMaterial);
-		dAssert (collisionMaterial.m_userId == D_MULTIBODY_TIRE_ID);
-
-		dCustomTireSpringDG* const tireJoint = (dCustomTireSpringDG*) collisionMaterial.m_userData;
-		dAssert (tireJoint->GetBody1() == tire);
-
-		dMatrix tireMatrix;
-		dMatrix tireHarpointMatrix;
-		tireJoint->CalculateGlobalMatrix (tireHarpointMatrix, tireMatrix);
-
-static int xxx;
-xxx ++;
-if (xxx > 2770)
-xxx *=1;
-
-		// here I need the suspension length, for now assume 1 meter
-		dFloat suspensionSpan = 1.0f;
-		tireHarpointMatrix.m_posit += tireHarpointMatrix.m_up.Scale (suspensionSpan);
-
-		//dVector veloc0(tireHarpointMatrix.m_up.Scale(-m_info.m_suspensionLength));
-		dVector veloc0(tireHarpointMatrix.m_up.Scale(-suspensionSpan));
-		dVector tmp(0.0f);
-		dVector contact(0.0f);
-		dVector normal(0.0f);
-		dFloat penetration(0.0f);
-
-		dFloat position = tireHarpointMatrix.m_up.DotProduct3(tireHarpointMatrix.m_posit - tireMatrix.m_posit);
-		dFloat param = position / suspensionSpan;
-
-		dMatrix matrixB;
-		dLong attributeA;
-		dLong attributeB;
-		dFloat impactParam;
-
-		NewtonBodyGetMatrix(terrain, &matrixB[0][0]);
-
-		int count = NewtonCollisionCollideContinue(m_world, 1, 1.0f,
-			tireCollision, &tireHarpointMatrix[0][0], &veloc0[0], &tmp[0],
-			terrainCollision, &matrixB[0][0], &tmp[0], &tmp[0],
-			&impactParam, &contact[0], &normal[0], &penetration,
-			&attributeA, &attributeB, 0);
-
-		int contactCount = 0;
-		if (count) {
-			// calculate tire penetration
-			dFloat dist = (param - impactParam) * suspensionSpan;
-
-			if (dist > -D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION) {
-
-				normal.m_w = 0.0f;
-				penetration = normal.DotProduct3(tireHarpointMatrix.m_up.Scale(dist));
-
-				dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
-
-				if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
-					dAssert (0);
-					//lateralDir = normal.CrossProduct(tireMatrix.m_front.CrossProduct(normal)); 
-					longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
-					dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
-				}
-				longitudinalDir = longitudinalDir.Normalize();
-
-				contact -= tireMatrix.m_up.Scale(dist);
-				//m_contactsJoints[contactCount].SetContact(contact, normal, longitudinalDir, penetration, friction, friction * 0.8f);
-				//contactCount++;
-
-				contactBuffer[contactCount].m_point[0] = contact.m_x;
-				contactBuffer[contactCount].m_point[1] = contact.m_y;
-				contactBuffer[contactCount].m_point[2] = contact.m_z;
-				contactBuffer[contactCount].m_point[3] = 1.0f;
-				contactBuffer[contactCount].m_normal[0] = normal.m_x;
-				contactBuffer[contactCount].m_normal[1] = normal.m_y;
-				contactBuffer[contactCount].m_normal[2] = normal.m_z;
-				contactBuffer[contactCount].m_normal[3] = 0.0f;
-				contactBuffer[contactCount].m_shapeId0 = collisionMaterial.m_userId;
-				contactBuffer[contactCount].m_shapeId1 = NewtonCollisionGetUserID(terrainCollision);
-				contactBuffer[contactCount].m_penetration = dClamp (penetration, dFloat(-D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION));
-				contactCount ++;
-			}
-		}
-
-		return contactCount;
-	}
 
 	virtual void PreUpdate(dFloat timestep)
 	{
