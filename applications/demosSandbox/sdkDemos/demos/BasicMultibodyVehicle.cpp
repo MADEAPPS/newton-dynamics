@@ -435,7 +435,6 @@ public:
 		return 0;
 	}
 
-
 	virtual void PreUpdate(dFloat timestep)
 	{
 		// Julio i'm not sure here if I do it correctly.
@@ -473,6 +472,11 @@ public:
 	VehicleInputManager* GetInputManager()
 	{
 		return minputManager;
+	}
+
+	int GetTireMaterial() const
+	{
+		return m_tireMaterial;
 	}
 
 private:
@@ -540,7 +544,7 @@ dFloat dRandRangeFloat(dFloat amin, dFloat amax)
 	return (amin + r * (amax - amin));
 }
 
-NewtonBody* VehicleTireCreate(DemoEntityManager* scene, VehicleControllerManagerDG::VehicleFrameEntity* const vVehicle, dFloat const tireMass, dFloat tireRad, dFloat tireHeight, dVector tirePos)
+NewtonBody* VehicleTireCreate(DemoEntityManager* scene, VehicleControllerManagerDG::VehicleFrameEntity* const vVehicle, dFloat const tireMass, dFloat tireRad, dFloat tireHeight, dVector tirePos, int tireMaterial)
 {
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrixVehicle = vVehicle->GetInitialMatrix();
@@ -576,6 +580,10 @@ NewtonBody* VehicleTireCreate(DemoEntityManager* scene, VehicleControllerManager
 	NewtonCollision* collision = NewtonCreateChamferCylinder(world, tireRad, tireHeight, 0, NULL);
 	DemoMesh* const VehicleTireMesh = new DemoMesh(&buff[0], collision, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, defaultMaterialID);
+
+	// set the tire material
+	NewtonBodySetMaterialGroupID(vBody, tireMaterial);
+
 	// Make the tire 100% free rolling(spinning).
 	NewtonBodySetLinearDamping(vBody, 0.0);
 	NewtonBodySetAngularDamping(vBody, &angdamp[0]);
@@ -766,14 +774,14 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	//
 	// Front tires
 	/*NewtonBody* const Tire1 = */ 
-	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
+	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f), manager->GetTireMaterial());
 	/*NewtonBody* const Tire2 = */ 
-	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
+	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f), manager->GetTireMaterial());
 	// Rear Tires
 	/*NewtonBody* const Tire3 = */ 
-	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
+	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f), manager->GetTireMaterial());
 	/*NewtonBody* const Tire4 = */ 
-	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
+	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f), manager->GetTireMaterial());
 	// Suspenssion spring force, spring damp, mass effect scaled, spring limite 
 	multibodyvehicle->GetTireJoint(0)->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0);
 	multibodyvehicle->GetTireJoint(1)->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0);
@@ -833,14 +841,14 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 		//
 		// Front tires
 		/*NewtonBody* const Tire1 = */
-		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
+		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f), manager->GetTireMaterial());
 		/*NewtonBody* const Tire2 = */
-		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
+		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f), manager->GetTireMaterial());
 		// Rear Tires
 		/*NewtonBody* const Tire3 = */
-		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
+		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f), manager->GetTireMaterial());
 		/*NewtonBody* const Tire4 = */
-		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
+		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f), manager->GetTireMaterial());
 		// Suspenssion spring force, spring damp, mass effect scaled, spring limite 
 		multibodyvehicle->GetTireJoint(0)->SetTireSuspenssion(150.0f, 5.0f, 0.5f, -0.25f, 0.0);
 		multibodyvehicle->GetTireJoint(1)->SetTireSuspenssion(150.0f, 5.0f, 0.5f, -0.25f, 0.0);
