@@ -287,6 +287,23 @@ public:
 			int Accelerator = int(m_scene->GetKeyState(264)) - int(m_scene->GetKeyState(265));
 			int SteerAction = int(m_scene->GetKeyState(263)) - int(m_scene->GetKeyState(262));
 			int BreakAction = int(m_scene->GetKeyState('B')) - int(m_scene->GetKeyState(32));
+
+#if 0
+	#if 0
+			static FILE* file = fopen("log.bin", "wb");
+			if (file) {
+				fwrite(&Accelerator, sizeof(int), 1, file);
+				fflush(file);
+			}
+	#else 
+			static FILE* file = fopen("log.bin", "rb");
+			if (file) {
+				fread(&Accelerator, sizeof(int), 1, file);
+			}
+	#endif
+#endif
+
+
 			//int HardBreakAction = ;
 			//
 			if (m_vehicle) {
@@ -463,9 +480,14 @@ public:
 
 		dMatrix tireMatrix;
 		dMatrix tireHarpointMatrix;
-		tireJoint->CalculateGlobalMatrix (tireMatrix, tireHarpointMatrix);
+		tireJoint->CalculateGlobalMatrix (tireHarpointMatrix, tireMatrix);
 
-		// here I need the suspension lenght, for now asume 1 meter
+static int xxx;
+xxx ++;
+if (xxx > 2770)
+xxx *=1;
+
+		// here I need the suspension length, for now assume 1 meter
 		dFloat suspensionSpan = 1.0f;
 		tireHarpointMatrix.m_posit += tireHarpointMatrix.m_up.Scale (suspensionSpan);
 
@@ -526,8 +548,7 @@ public:
 				contactBuffer[contactCount].m_normal[3] = 0.0f;
 				contactBuffer[contactCount].m_shapeId0 = collisionMaterial.m_userId;
 				contactBuffer[contactCount].m_shapeId1 = NewtonCollisionGetUserID(terrainCollision);
-				contactBuffer[contactCount].m_penetration = penetration;
-
+				contactBuffer[contactCount].m_penetration = dClamp (penetration, dFloat(-D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION));
 				contactCount ++;
 			}
 		}
