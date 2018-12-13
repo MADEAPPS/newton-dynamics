@@ -20,6 +20,9 @@
 #include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
 
+#define D_MULTIBODY_TIRE_ID							0x26ab752c
+#define D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION	(0.05f)
+
 static int UserOnAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
 #ifdef _DEBUG
@@ -168,13 +171,14 @@ public:
 			//
 		}
 		//
-		void AddTireSuspenssion(NewtonBody* const vTire, dMatrix vTireMatrix)
+		dCustomTireSpringDG* AddTireSuspenssion(NewtonBody* const vTire, dMatrix vTireMatrix)
 		{
 			mTireJoint[mTireCount] = new dCustomTireSpringDG(vTireMatrix, mFrameBody, vTire);
 			mTireJoint[mTireCount]->SetSolverModel(2);
 			mTireJoint[mTireCount]->SetEngineFpsRequest(GetEngineFpsRequest());
 			//
 			mTireCount++;
+			return mTireJoint[mTireCount-1];
 		}
 		//
 		void VehicleSimulationPreListener(dFloat timestep)
@@ -421,18 +425,108 @@ public:
 		m_tireMaterial = NewtonMaterialCreateGroupID(world);
 
 		NewtonMaterialSetCallbackUserData(world, m_tireMaterial, defualtMaterial, this);
-		NewtonMaterialSetContactGenerationCallback(world, m_tireMaterial, defualtMaterial, OnContactGeneration);
-		//NewtonMaterialSetCollisionCallback(world, m_tireMaterial, materialsList[i], OnTireAabbOverlap, OnTireContactsProcess);
+		NewtonMaterialSetContactGenerationCallback(world, m_tireMaterial, defualtMaterial, OnTireContactGeneration);
+		NewtonMaterialSetCollisionCallback(world, m_tireMaterial, defualtMaterial, UserOnAABBOverlap, UserContactFriction);
 	}
 
 	~VehicleControllerManagerDG()
 	{
 	}
 
-	static int OnContactGeneration(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
+	static int OnTireContactGeneration(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
 	{
-		dAssert(0);
-		return 0;
+		VehicleControllerManagerDG* const manager = (VehicleControllerManagerDG*)NewtonMaterialGetMaterialPairUserData(material);
+		int id0 = NewtonCollisionGetUserID(collision0);
+		if (id0 == D_MULTIBODY_TIRE_ID) {
+			return manager->OnTireContactGeneration(material, body0, collision0, body1, collision1, contactBuffer);
+		} else {
+			dAssert (NewtonCollisionGetUserID(collision1) == D_MULTIBODY_TIRE_ID);
+			return manager->OnTireContactGeneration(material, body1, collision1, body0, collision0, contactBuffer);
+		}
+	}
+
+	int OnTireContactGeneration(const NewtonMaterial* const material, const NewtonBody* const tire, const NewtonCollision* const tireCollision, const NewtonBody* const terrain, const NewtonCollision* const terrainCollision, NewtonUserContactPoint* const contactBuffer)
+	{
+		// get the joint information form the collision user data
+		NewtonCollisionMaterial collisionMaterial;
+		NewtonCollisionGetMaterial(tireCollision, &collisionMaterial);
+		dAssert (collisionMaterial.m_userId == D_MULTIBODY_TIRE_ID);
+
+		dCustomTireSpringDG* const tireJoint = (dCustomTireSpringDG*) collisionMaterial.m_userData;
+		dAssert (tireJoint->GetBody1() == tire);
+
+		dMatrix tireMatrix;
+		dMatrix tireHarpointMatrix;
+		tireJoint->CalculateGlobalMatrix (tireMatrix, tireHarpointMatrix);
+
+		// here I need the suspension lenght, for now asume 1 meter
+		dFloat suspensionSpan = 1.0f;
+		tireHarpointMatrix.m_posit += tireHarpointMatrix.m_up.Scale (suspensionSpan);
+
+		//dVector veloc0(tireHarpointMatrix.m_up.Scale(-m_info.m_suspensionLength));
+		dVector veloc0(tireHarpointMatrix.m_up.Scale(-suspensionSpan));
+		dVector tmp(0.0f);
+		dVector contact(0.0f);
+		dVector normal(0.0f);
+		dFloat penetration(0.0f);
+
+		dFloat position = tireHarpointMatrix.m_up.DotProduct3(tireHarpointMatrix.m_posit - tireMatrix.m_posit);
+		dFloat param = position / suspensionSpan;
+
+		dMatrix matrixB;
+		dLong attributeA;
+		dLong attributeB;
+		dFloat impactParam;
+
+		NewtonBodyGetMatrix(terrain, &matrixB[0][0]);
+
+		int count = NewtonCollisionCollideContinue(m_world, 1, 1.0f,
+			tireCollision, &tireHarpointMatrix[0][0], &veloc0[0], &tmp[0],
+			terrainCollision, &matrixB[0][0], &tmp[0], &tmp[0],
+			&impactParam, &contact[0], &normal[0], &penetration,
+			&attributeA, &attributeB, 0);
+
+		int contactCount = 0;
+		if (count) {
+			// calculate tire penetration
+			dFloat dist = (param - impactParam) * suspensionSpan;
+
+			if (dist > -D_MULTIBODY_TIRE_MAX_ELASTIC_DEFORMATION) {
+
+				normal.m_w = 0.0f;
+				penetration = normal.DotProduct3(tireHarpointMatrix.m_up.Scale(dist));
+
+				dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
+
+				if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
+					dAssert (0);
+					//lateralDir = normal.CrossProduct(tireMatrix.m_front.CrossProduct(normal)); 
+					longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
+					dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
+				}
+				longitudinalDir = longitudinalDir.Normalize();
+
+				contact -= tireMatrix.m_up.Scale(dist);
+				//m_contactsJoints[contactCount].SetContact(contact, normal, longitudinalDir, penetration, friction, friction * 0.8f);
+				//contactCount++;
+
+				contactBuffer[contactCount].m_point[0] = contact.m_x;
+				contactBuffer[contactCount].m_point[1] = contact.m_y;
+				contactBuffer[contactCount].m_point[2] = contact.m_z;
+				contactBuffer[contactCount].m_point[3] = 1.0f;
+				contactBuffer[contactCount].m_normal[0] = normal.m_x;
+				contactBuffer[contactCount].m_normal[1] = normal.m_y;
+				contactBuffer[contactCount].m_normal[2] = normal.m_z;
+				contactBuffer[contactCount].m_normal[3] = 0.0f;
+				contactBuffer[contactCount].m_shapeId0 = collisionMaterial.m_userId;
+				contactBuffer[contactCount].m_shapeId1 = NewtonCollisionGetUserID(terrainCollision);
+				contactBuffer[contactCount].m_penetration = penetration;
+
+				contactCount ++;
+			}
+		}
+
+		return contactCount;
 	}
 
 	virtual void PreUpdate(dFloat timestep)
@@ -571,18 +665,12 @@ NewtonBody* VehicleTireCreate(DemoEntityManager* scene, VehicleControllerManager
 	//
 	matrix.m_posit = matrixVehicle.TransformVector(tirePos);
 	//
-	int defaultMaterialID;
-	defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
-	NewtonMaterialSetCollisionCallback(world, defaultMaterialID, defaultMaterialID, UserOnAABBOverlap, UserContactFriction);
 	// some extra char in case the count go higher.
 	char buff[24] = "";
 	sprintf(buff, "VehicleTireMesh%d", vVehicle->GetTireCount());
 	NewtonCollision* collision = NewtonCreateChamferCylinder(world, tireRad, tireHeight, 0, NULL);
 	DemoMesh* const VehicleTireMesh = new DemoMesh(&buff[0], collision, "smilli.tga", "smilli.tga", "smilli.tga");
-	NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, defaultMaterialID);
-
-	// set the tire material
-	NewtonBodySetMaterialGroupID(vBody, tireMaterial);
+	NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, tireMaterial);
 
 	// Make the tire 100% free rolling(spinning).
 	NewtonBodySetLinearDamping(vBody, 0.0);
@@ -594,7 +682,16 @@ NewtonBody* VehicleTireCreate(DemoEntityManager* scene, VehicleControllerManager
 	//
 	NewtonDestroyCollision(collision); 
 	//
-	vVehicle->AddTireSuspenssion(vBody, matrix);
+	dCustomTireSpringDG* const tireJoint = vVehicle->AddTireSuspenssion(vBody, matrix);
+
+	// set the tire material, you can set other stuff her that you can use in the call back
+	NewtonCollisionMaterial collisionMaterial;
+	NewtonCollisionGetMaterial(NewtonBodyGetCollision(vBody), &collisionMaterial);
+	collisionMaterial.m_userId = D_MULTIBODY_TIRE_ID;
+	collisionMaterial.m_userData = tireJoint;
+	NewtonCollisionSetMaterial(NewtonBodyGetCollision(vBody), &collisionMaterial);
+	NewtonBodySetMaterialGroupID(vBody, tireMaterial);
+
 	//
 	return vBody;
 }
@@ -748,6 +845,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	if (VehicleFrameRotation.m_z != 0.0f)
 	  location3 = location3 * dPitchMatrix(VehicleFrameRotation.m_z * dDegreeToRad) * location;
     //
+location3 = dGetIdentityMatrix();
+
 	location3.m_posit.m_y += 2.5f;
 	location3.m_posit.m_x += 2.0f;
 	//
