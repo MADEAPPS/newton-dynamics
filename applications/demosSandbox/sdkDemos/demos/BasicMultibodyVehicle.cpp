@@ -98,6 +98,12 @@ public:
 			mFrameTorqueAffective(0.25f)
 		{
 			mTireJoint = new dCustomTireSpringDG*[maxTire];		
+			scene->Append(this);
+		}
+
+		~VehicleFrameEntity()
+		{
+			delete[] mTireJoint;
 		}
 		//
 		void SetEngineFpsRequest(dFloat val)
@@ -671,6 +677,7 @@ NewtonBody* VehicleTireCreate(DemoEntityManager* scene, VehicleControllerManager
 	NewtonCollision* collision = NewtonCreateChamferCylinder(world, tireRad, tireHeight, 0, NULL);
 	DemoMesh* const VehicleTireMesh = new DemoMesh(&buff[0], collision, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, tireMaterial);
+	VehicleTireMesh->Release();
 
 	// Make the tire 100% free rolling(spinning).
 	NewtonBodySetLinearDamping(vBody, 0.0);
@@ -683,7 +690,7 @@ NewtonBody* VehicleTireCreate(DemoEntityManager* scene, VehicleControllerManager
 	NewtonDestroyCollision(collision); 
 	//
 	dCustomTireSpringDG* const tireJoint = vVehicle->AddTireSuspenssion(vBody, matrix);
-
+		
 	// set the tire material, you can set other stuff her that you can use in the call back
 	NewtonCollisionMaterial collisionMaterial;
 	NewtonCollisionGetMaterial(NewtonBodyGetCollision(vBody), &collisionMaterial);
@@ -721,6 +728,7 @@ NewtonBody* VehicleFrameCreate(DemoEntityManager* scene, VehicleControllerManage
 	//
 	DemoMesh* const VehicleFrameMesh1 = new DemoMesh("VehicleFrameMesh1", collision, "wood_0.tga", "smilli.tga", "wood_0.tga");
 	NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleFrameMesh1, vMass, matrix, collision, defaultMaterialID);
+	VehicleFrameMesh1->Release();
 	// Make the tire 100% free rolling(spinning).
 	NewtonBodySetLinearDamping(vBody, 0.0);
 	NewtonBodySetAngularDamping(vBody, &angdamp[0]);
