@@ -1,6 +1,6 @@
 /*
-* Vehicle Multibody Joint + Demo write by Dave Gravel 2018.
-* I have write this vehicle multibody code for share with other newton users, and maybe it can help someone.
+* Vehicle Multi body Joint + Demo write by Dave Gravel 2018.
+* I have write this vehicle multi body code for share with other newton users, and maybe it can help someone.
 * 
 * Have fun!!!
 *
@@ -158,6 +158,7 @@ static int OnTireContactGeneration(const NewtonMaterial* const material, const N
 }
 
 
+#if 1
 class VehicleControllerManagerDG : public dCustomVehicleControllerManagerDG
 {
 	public:
@@ -993,3 +994,71 @@ location3 = dGetIdentityMatrix();
 	// MULTIPLE VEHICLES END
 
 }
+
+#else
+
+class MultibodyVehicleControllerDG: public dCustomControllerBase
+{
+	public:
+	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+
+	protected:
+	virtual void PreUpdate(dFloat timestep, int threadIndex)
+	{
+	}
+	virtual void PostUpdate(dFloat timestep, int threadIndex) 
+	{
+	}
+	//
+	friend class MultibodyVehicleControllerManagerDG;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<MultibodyVehicleControllerDG>
+{
+	public:
+	MultibodyVehicleControllerManagerDG(NewtonWorld* const world)
+		:dCustomControllerManager<MultibodyVehicleControllerDG>(world, "Multi body Vehicle Manage DG")
+	{
+	}
+		
+	virtual ~MultibodyVehicleControllerManagerDG()
+	{
+	}
+
+	MultibodyVehicleControllerDG* CreateBasicVehicle(const dMatrix& location)
+	{
+		return NULL;
+	}
+	
+	friend class dCustomVehicleControllerDG;
+};
+
+
+void BasicMultibodyVehicle(DemoEntityManager* const scene)
+{
+	//////////////////////////////////////////////////////
+	// Scene 3D load the sky box
+	scene->CreateSkyBox();
+
+	//CreateLevelMesh(scene, "flatPlane.ngd", true);
+	CreateHeightFieldTerrain(scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+
+	NewtonWorld* const world = scene->GetNewton();
+
+	// encapsulate vehicle controller so that we can apply customizations in the pre and post update function 
+	MultibodyVehicleControllerManagerDG* const manager = new MultibodyVehicleControllerManagerDG(world);
+
+	// VEHICLE BEGIN
+	// create a basic vehicle matrix
+	dMatrix location(dGetIdentityMatrix());
+	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	MultibodyVehicleControllerDG* const multibodyvehicle = manager->CreateBasicVehicle (location);
+
+
+}
+
+
+#endif
