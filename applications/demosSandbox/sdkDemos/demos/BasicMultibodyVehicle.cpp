@@ -1287,7 +1287,7 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		VehicleTireMesh->Release();
 		NewtonDestroyCollision(collision);
 
-		// lesson tree make tire inertia spherical to avoid bad gyro torques
+		// lesson three: make tire inertia spherical to avoid bad gyro torques
 		dFloat mass;
 		dFloat Ixx;
 		dFloat Iyy;
