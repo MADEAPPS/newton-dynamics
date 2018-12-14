@@ -1090,19 +1090,8 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 	// new style suspension force calculate the sprung mass for any tire arrangement 
 	void ApplyTireSuspensionForces (dFloat timestep)
 	{
-		const int maxSize = 64;
-		dComplementaritySolver::dJacobianPair m_jt[maxSize];
-		dComplementaritySolver::dJacobianPair m_jInvMass[maxSize];
-
-		dFloat massMatrix[maxSize * maxSize];
-		dFloat accel[maxSize];
-
 		dMatrix chassisMatrix;
 		dMatrix chassisInvInertia;
-
-		NewtonBody* const chassisBody = GetBody();
-		NewtonBodyGetInvInertiaMatrix(chassisBody, &chassisInvInertia[0][0]);
-
 		dVector chassisCom;
 		dVector chassisOmega;
 		dVector chassisVeloc;
@@ -1111,14 +1100,23 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 		dFloat chassisInvIyy;
 		dFloat chassisInvIzz;
 
+		const int maxSize = 64;
+		dComplementaritySolver::dJacobianPair m_jt[maxSize];
+		dComplementaritySolver::dJacobianPair m_jInvMass[maxSize];
+		dFloat massMatrix[maxSize * maxSize];
+		dFloat accel[maxSize];
+
+		NewtonBody* const chassisBody = GetBody();
+		NewtonBodyGetInvInertiaMatrix(chassisBody, &chassisInvInertia[0][0]);
+
 		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
 		NewtonBodyGetVelocity(chassisBody, &chassisVeloc[0]);
 		NewtonBodyGetInvMass(chassisBody, &chassisInvMass, &chassisInvIxx, &chassisInvIyy, &chassisInvIzz);
 
 		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 		NewtonBodyGetCentreOfMass(chassisBody, &chassisCom[0]);
-		dVector chassisOrigin(chassisMatrix.TransformVector(chassisCom));
 
+		dVector chassisOrigin(chassisMatrix.TransformVector(chassisCom));
 		for (int i = 0; i < m_tireCount; i++) {
 			dMatrix tireMatrix;
 			dMatrix chassisMatrix;
