@@ -158,7 +158,7 @@ static int OnTireContactGeneration(const NewtonMaterial* const material, const N
 }
 
 
-#if 1
+#if 0
 class VehicleControllerManagerDG : public dCustomVehicleControllerManagerDG
 {
 	public:
@@ -791,8 +791,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	// Scene 3D
 	// load the sky box
 	scene->CreateSkyBox();
-	//CreateLevelMesh(scene, "flatPlane.ngd", true);
-	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+	CreateLevelMesh(scene, "flatPlane.ngd", true);
+	//CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 	//
 	NewtonWorld* const world = scene->GetNewton();
 	//
@@ -1000,22 +1000,95 @@ location3 = dGetIdentityMatrix();
 class MultibodyVehicleControllerDG: public dCustomControllerBase
 {
 	public:
-	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+	void Init(NewtonBody* const body)
 	{
-	}
-
-	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-	{
+		m_body = body;
+		m_tireCount = 0;
 	}
 
 	protected:
 	virtual void PreUpdate(dFloat timestep, int threadIndex)
 	{
+		dVector FrameTorque;
+		dVector FrameForce;
+		dVector AttVeloc;
+		dVector frmVeloc;
+		dVector frmOmega;
+		dVector frmCom;
+		dVector AttachForce;
+		dMatrix frmMatrix;
+		dFloat speed;
+		dFloat frameMass;
+		dFloat vIxx;
+		dFloat vIyy;
+		dFloat vIzz;
+		dVector tireTorque;
+		dVector chassisReationTorque;
+		//
+
+		NewtonBody* const chassis = GetBody();
+		NewtonBodySetSleepState(chassis, 0);
+		NewtonBodyGetMass(chassis, &frameMass, &vIxx, &vIyy, &vIzz);
+
+		for (int i = 0; i < m_tireCount; i++) {
+			dCustomTireSpringDG* cTireSpring = m_tireJoint[i];
+			//
+			frmCom = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+			frmVeloc = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+			FrameTorque = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+			FrameForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+			//
+			cTireSpring->TireMatrixProjection();
+			//
+			NewtonBodySetSleepState(cTireSpring->GetBody1(), 0);
+			NewtonBodyGetVelocity(cTireSpring->GetBody1(), &AttVeloc[0]);
+			NewtonBodyGetVelocity(chassis, &frmVeloc[0]);
+			NewtonBodyGetOmega(chassis, &frmOmega[0]);
+			NewtonBodyGetMatrix(chassis, &frmMatrix[0][0]);
+			NewtonBodyGetCentreOfMass(chassis, &frmCom[0]);
+			//
+			dFloat mVehicleSpeed = dAbs(frmVeloc.DotProduct3(cTireSpring->GetChassisPivotMatrix().m_right));
+			//
+			frmCom = frmMatrix.TransformVector(frmCom); //OXTransformVector(frmCom, frmMatrix); 
+			frmVeloc = frmVeloc + frmOmega.CrossProduct(cTireSpring->GetCenterInChassis() - frmCom);
+			//
+			speed = (frmVeloc - AttVeloc).DotProduct3(cTireSpring->GetChassisPivotMatrix().m_up);
+			//
+			cTireSpring->SetDistance();
+			//
+			cTireSpring->SetAccel(NewtonCalculateSpringDamperAcceleration(timestep, cTireSpring->GetSpringK(), cTireSpring->GetDistance(),
+				cTireSpring->GetSpringD(), speed) * frameMass * cTireSpring->GetSpringMassEffective());
+			//
+			FrameForce = (cTireSpring->GetChassisPivotMatrix().m_up * cTireSpring->GetAccel());
+			FrameTorque = (cTireSpring->GetChassisPivotMatrix().m_posit - frmCom).CrossProduct(FrameForce);
+			//
+			NewtonBodyAddForce(chassis, &FrameForce[0]);
+			NewtonBodyAddTorque(chassis, &FrameTorque[0]);
+			//
+			AttachForce = (FrameForce * VEHICLE_ATTACH_FORCE_SIDE);
+			NewtonBodyAddForce(cTireSpring->GetBody1(), &AttachForce[0]);
+			//
+			// When only normal break is use it apply the torque anyway, Because with the 4x4 model the rear tire can break and the front tire can accelerate in same time.
+			// The result is a bit strange the vehicle can slide a bit more when you break with 4x4 model and if you accelerate in same time.
+			if (cTireSpring->GetUseTorque() && (!cTireSpring->GetUseHardBreak()))
+			{
+				// apply engine torque plus some tire angular drag
+				tireTorque = (cTireSpring->GetChassisPivotMatrix().m_front * (cTireSpring->GetTireTorque() - cTireSpring->GetRealTireOmega() * cTireSpring->GetTireIzz()));
+				NewtonBodyAddTorque(cTireSpring->GetBody1(), &tireTorque[0]);
+			}
+			//
+			dFloat frameTorqueAffective = 0.25f;
+			chassisReationTorque = (cTireSpring->GetChassisPivotMatrix().m_front * -(cTireSpring->GetTireTorque() * frameTorqueAffective));
+			NewtonBodyAddTorque(chassis, &chassisReationTorque[0]);
+		}
 	}
+
 	virtual void PostUpdate(dFloat timestep, int threadIndex) 
 	{
 	}
-	//
+	
+	int m_tireCount;
+	dCustomTireSpringDG* m_tireJoint[4];
 	friend class MultibodyVehicleControllerManagerDG;
 };
 
@@ -1028,8 +1101,8 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		:dCustomControllerManager<MultibodyVehicleControllerDG>(world, "Multi body Vehicle Manage DG")
 	{
 		// setting up a user contact handle to calculate tire collision with terrain
-		int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
 		m_tireMaterial = NewtonMaterialCreateGroupID(world);
+		//int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
 
 		//NewtonMaterialSetCallbackUserData(world, m_tireMaterial, defualtMaterial, this);
 		//NewtonMaterialSetContactGenerationCallback(world, m_tireMaterial, defualtMaterial, OnTireContactGeneration);
@@ -1070,82 +1143,75 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		return vBody;
 	}
 
-	NewtonBody* VehicleTire(NewtonBody* const chassis, dFloat const tireMass, dFloat tireRad, dFloat tireHeight, dVector tirePos)
+	NewtonBody* VehicleTire(MultibodyVehicleControllerDG* const controller, dFloat const tireMass, dFloat tireRad, dFloat tireHeight, dVector tirePos)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		dMatrix matrixVehicle;
-		NewtonBodyGetMatrix(chassis, &matrixVehicle[0][0]);
+		NewtonBody* const chassisBody = controller->GetBody();
 
-		dMatrix matrix(dGetIdentityMatrix());
-/*		
-		dVector tireRot(0.0f);
-		dVector angdamp(0.0f);
-		//
-		// rotate the model for when you use 3d mesh, to make if facing on the good side.
-		//
-		if ((vVehicle->GetTireCount() % 2) == 0)
-		{
-			tireRot = dVector(90.0f, 0.0f, 0.0f);
-		} else {
-			tireRot = dVector(-90.0f, 0.0f, 0.0f);
-		}
-*/
+		dMatrix matrixVehicle;
+		NewtonBodyGetMatrix(chassisBody, &matrixVehicle[0][0]);
+
+		dMatrix matrix(dYawMatrix(dPi * 0.5f));
+
+		//dVector tireRot(0.0f);
 		matrix.m_posit = tirePos;
 		matrix.m_posit.m_w = 1.0f;
-
-		//matrix
-		//if (tireRot.m_x != 0.0f) matrix = dYawMatrix(tireRot.m_x * dDegreeToRad);
-		//if (tireRot.m_y != 0.0f) matrix = dRollMatrix(tireRot.m_y * dDegreeToRad);
-		//if (tireRot.m_z != 0.0f) matrix = dPitchMatrix(tireRot.m_z * dDegreeToRad);
-		//
 		matrix = matrix * matrixVehicle;
 
 		NewtonCollision* const collision = NewtonCreateChamferCylinder(world, tireRad, tireHeight, 0, NULL);
 		DemoMesh* const VehicleTireMesh = new DemoMesh("tireShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-		NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, m_tireMaterial);
+		NewtonBody* const tireBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, m_tireMaterial);
 		VehicleTireMesh->Release();
 		NewtonDestroyCollision(collision);
 
 		// Make the tire 100% free rolling(spinning).
 		dVector angdamp(0.0f);
-		NewtonBodySetLinearDamping(vBody, 0.0f);
-		NewtonBodySetAngularDamping(vBody, &angdamp[0]);
+		NewtonBodySetLinearDamping(tireBody, 0.0f);
+		NewtonBodySetAngularDamping(tireBody, &angdamp[0]);
 		//
-		//NewtonBodySetAutoSleep(vBody, 0);
-		//NewtonBodySetFreezeState(vBody, 0);
-		//NewtonBodySetMatrix(vBody, &matrix[0][0]);
+		//NewtonBodySetAutoSleep(tireBody, 0);
+		//NewtonBodySetFreezeState(tireBody, 0);
+		//NewtonBodySetMatrix(tireBody, &matrix[0][0]);
 		//
-/*		
-		//
-		dCustomTireSpringDG* const tireJoint = vVehicle->AddTireSuspenssion(vBody, matrix);
+		dCustomTireSpringDG* const tireJoint = new dCustomTireSpringDG(matrix, chassisBody, tireBody);
+		tireJoint->SetSolverModel(2);
+		tireJoint->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0f);
+		controller->m_tireJoint[controller->m_tireCount] = tireJoint;
+		controller->m_tireCount++;
+
+		//mTireJoint[mTireCount]->SetEngineFpsRequest(GetEngineFpsRequest());
 
 		// set the tire material, you can set other stuff her that you can use in the call back
-		NewtonCollisionMaterial collisionMaterial;
-		NewtonCollisionGetMaterial(NewtonBodyGetCollision(vBody), &collisionMaterial);
-		collisionMaterial.m_userId = D_MULTIBODY_TIRE_ID;
-		collisionMaterial.m_userData = tireJoint;
-		NewtonCollisionSetMaterial(NewtonBodyGetCollision(vBody), &collisionMaterial);
-		NewtonBodySetMaterialGroupID(vBody, tireMaterial);
-*/
+		//NewtonCollisionMaterial collisionMaterial;
+		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(tireBody), &collisionMaterial);
+		//collisionMaterial.m_userId = D_MULTIBODY_TIRE_ID;
+		//collisionMaterial.m_userData = tireJoint;
+		//NewtonCollisionSetMaterial(NewtonBodyGetCollision(tireBody), &collisionMaterial);
+		//NewtonBodySetMaterialGroupID(tireBody, tireMaterial);
+
 		//
-		return vBody;
+		return tireBody;
 	}
 
 	MultibodyVehicleControllerDG* CreateBasicVehicle(const dMatrix& location)
 	{
 		NewtonBody* const chassis = VehicleChassis(location, 1200.0f, dVector(-0.15f, -0.65f, 0.0f), dVector(4.0f, 1.125f, 2.55f));
 
+		MultibodyVehicleControllerDG* const controller = CreateController();
+		//cVcontroller = controller;
+		controller->Init(chassis);
+
 		// front tires
-		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
-		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
+		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
+		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
 
 		// Rear Tires
-		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
-		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
+		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
+		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
 
-		return NULL;
+		return controller;
 	}
 	
 	int m_tireMaterial;

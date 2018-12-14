@@ -37,7 +37,6 @@ void dCustomVehicleControllerDG::Init(NewtonBody* const body, const dMatrix& loc
   //dCustomVehicleControllerManagerDG* const manager = (dCustomVehicleControllerManagerDG*)GetManager();
   //NewtonWorld* const world = manager->GetWorld();
   //
-
 }
 
 void dCustomVehicleControllerDG::Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
