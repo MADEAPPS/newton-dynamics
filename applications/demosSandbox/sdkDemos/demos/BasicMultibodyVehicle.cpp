@@ -1219,11 +1219,11 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 	{
 		// setting up a user contact handle to calculate tire collision with terrain
 		m_tireMaterial = NewtonMaterialCreateGroupID(world);
-		//int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
+		int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
 
-		//NewtonMaterialSetCallbackUserData(world, m_tireMaterial, defualtMaterial, this);
-		//NewtonMaterialSetContactGenerationCallback(world, m_tireMaterial, defualtMaterial, OnTireContactGeneration);
-		//NewtonMaterialSetCollisionCallback(world, m_tireMaterial, defualtMaterial, UserOnAABBOverlap, UserContactFriction);
+		NewtonMaterialSetCallbackUserData(world, m_tireMaterial, defualtMaterial, this);
+		NewtonMaterialSetContactGenerationCallback(world, m_tireMaterial, defualtMaterial, OnTireContactGeneration);
+		NewtonMaterialSetCollisionCallback(world, m_tireMaterial, defualtMaterial, UserOnAABBOverlap, UserContactFriction);
 	}
 		
 	virtual ~MultibodyVehicleControllerManagerDG()
@@ -1313,14 +1313,13 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		controller->m_tireCount++;
 
 		// set the tire material, you can set other stuff her that you can use in the call back
-		//NewtonCollisionMaterial collisionMaterial;
-		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(tireBody), &collisionMaterial);
-		//collisionMaterial.m_userId = D_MULTIBODY_TIRE_ID;
-		//collisionMaterial.m_userData = tireJoint;
-		//NewtonCollisionSetMaterial(NewtonBodyGetCollision(tireBody), &collisionMaterial);
-		//NewtonBodySetMaterialGroupID(tireBody, tireMaterial);
+		NewtonCollisionMaterial collisionMaterial;
+		NewtonCollisionGetMaterial(NewtonBodyGetCollision(tireBody), &collisionMaterial);
+		collisionMaterial.m_userId = D_MULTIBODY_TIRE_ID;
+		collisionMaterial.m_userData = tireJoint;
+		NewtonCollisionSetMaterial(NewtonBodyGetCollision(tireBody), &collisionMaterial);
+		NewtonBodySetMaterialGroupID(tireBody, m_tireMaterial);
 
-		//
 		return tireBody;
 	}
 
@@ -1333,12 +1332,12 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		controller->Init(chassis);
 
 		// front tires
-		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
-		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.25f, dVector(1.0f, -0.75f, 1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.25f, dVector(1.0f, -0.75f, -1.125f));
 
 		// Rear Tires
-		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
-		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.25f, dVector(-1.25f, -0.75f, 1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.25f, dVector(-1.25f, -0.75f, -1.125f));
 
 		return controller;
 	}
