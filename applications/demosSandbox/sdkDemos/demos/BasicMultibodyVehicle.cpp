@@ -1027,6 +1027,13 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 	MultibodyVehicleControllerManagerDG(NewtonWorld* const world)
 		:dCustomControllerManager<MultibodyVehicleControllerDG>(world, "Multi body Vehicle Manage DG")
 	{
+		// setting up a user contact handle to calculate tire collision with terrain
+		int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
+		m_tireMaterial = NewtonMaterialCreateGroupID(world);
+
+		//NewtonMaterialSetCallbackUserData(world, m_tireMaterial, defualtMaterial, this);
+		//NewtonMaterialSetContactGenerationCallback(world, m_tireMaterial, defualtMaterial, OnTireContactGeneration);
+		//NewtonMaterialSetCollisionCallback(world, m_tireMaterial, defualtMaterial, UserOnAABBOverlap, UserContactFriction);
 	}
 		
 	virtual ~MultibodyVehicleControllerManagerDG()
@@ -1063,14 +1070,85 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		return vBody;
 	}
 
+	NewtonBody* VehicleTire(NewtonBody* const chassis, dFloat const tireMass, dFloat tireRad, dFloat tireHeight, dVector tirePos)
+	{
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		dMatrix matrixVehicle;
+		NewtonBodyGetMatrix(chassis, &matrixVehicle[0][0]);
+
+		dMatrix matrix(dGetIdentityMatrix());
+/*		
+		dVector tireRot(0.0f);
+		dVector angdamp(0.0f);
+		//
+		// rotate the model for when you use 3d mesh, to make if facing on the good side.
+		//
+		if ((vVehicle->GetTireCount() % 2) == 0)
+		{
+			tireRot = dVector(90.0f, 0.0f, 0.0f);
+		} else {
+			tireRot = dVector(-90.0f, 0.0f, 0.0f);
+		}
+*/
+		matrix.m_posit = tirePos;
+		matrix.m_posit.m_w = 1.0f;
+
+		//matrix
+		//if (tireRot.m_x != 0.0f) matrix = dYawMatrix(tireRot.m_x * dDegreeToRad);
+		//if (tireRot.m_y != 0.0f) matrix = dRollMatrix(tireRot.m_y * dDegreeToRad);
+		//if (tireRot.m_z != 0.0f) matrix = dPitchMatrix(tireRot.m_z * dDegreeToRad);
+		//
+		matrix = matrix * matrixVehicle;
+
+		NewtonCollision* const collision = NewtonCreateChamferCylinder(world, tireRad, tireHeight, 0, NULL);
+		DemoMesh* const VehicleTireMesh = new DemoMesh("tireShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, m_tireMaterial);
+		VehicleTireMesh->Release();
+		NewtonDestroyCollision(collision);
+
+		// Make the tire 100% free rolling(spinning).
+		dVector angdamp(0.0f);
+		NewtonBodySetLinearDamping(vBody, 0.0f);
+		NewtonBodySetAngularDamping(vBody, &angdamp[0]);
+		//
+		//NewtonBodySetAutoSleep(vBody, 0);
+		//NewtonBodySetFreezeState(vBody, 0);
+		//NewtonBodySetMatrix(vBody, &matrix[0][0]);
+		//
+/*		
+		//
+		dCustomTireSpringDG* const tireJoint = vVehicle->AddTireSuspenssion(vBody, matrix);
+
+		// set the tire material, you can set other stuff her that you can use in the call back
+		NewtonCollisionMaterial collisionMaterial;
+		NewtonCollisionGetMaterial(NewtonBodyGetCollision(vBody), &collisionMaterial);
+		collisionMaterial.m_userId = D_MULTIBODY_TIRE_ID;
+		collisionMaterial.m_userData = tireJoint;
+		NewtonCollisionSetMaterial(NewtonBodyGetCollision(vBody), &collisionMaterial);
+		NewtonBodySetMaterialGroupID(vBody, tireMaterial);
+*/
+		//
+		return vBody;
+	}
 
 	MultibodyVehicleControllerDG* CreateBasicVehicle(const dMatrix& location)
 	{
 		NewtonBody* const chassis = VehicleChassis(location, 1200.0f, dVector(-0.15f, -0.65f, 0.0f), dVector(4.0f, 1.125f, 2.55f));
-//		CreateVehicleChassis(VehicleControllerManagerDG::VehicleFrameEntity* const vVehicle, dFloat const vMass, dVector const vCenterMass, dVector const vScal)
+
+		// front tires
+		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
+		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
+
+		// Rear Tires
+		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
+		VehicleTire(chassis, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
+
 		return NULL;
 	}
 	
+	int m_tireMaterial;
 	friend class dCustomVehicleControllerDG;
 };
 
