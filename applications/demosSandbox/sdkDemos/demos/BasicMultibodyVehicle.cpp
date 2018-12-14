@@ -325,8 +325,9 @@ class VehicleControllerManagerDG : public dCustomVehicleControllerManagerDG
 				//
 				cTireSpring->SetDistance();
 				//
+				dFloat effectiveMassHack = 0.5f;
 				cTireSpring->SetAccel(NewtonCalculateSpringDamperAcceleration(timestep, cTireSpring->GetSpringK(), cTireSpring->GetDistance(), 
-				cTireSpring->GetSpringD(), speed) * frameMass * cTireSpring->GetSpringMassEffective());
+									  cTireSpring->GetSpringD(), speed) * frameMass * effectiveMassHack);
 				//
 			    FrameForce = (cTireSpring->GetChassisPivotMatrix().m_up * cTireSpring->GetAccel());
 			    FrameTorque = (cTireSpring->GetChassisPivotMatrix().m_posit - frmCom).CrossProduct(FrameForce);
@@ -903,11 +904,11 @@ location3 = dGetIdentityMatrix();
 	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f), manager->GetTireMaterial());
 	/*NewtonBody* const Tire4 = */ 
 	VehicleTireCreate(scene, multibodyvehicle, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f), manager->GetTireMaterial());
-	// Suspenssion spring force, spring damp, mass effect scaled, spring limite 
-	multibodyvehicle->GetTireJoint(0)->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0);
-	multibodyvehicle->GetTireJoint(1)->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0);
-	multibodyvehicle->GetTireJoint(2)->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0);
-	multibodyvehicle->GetTireJoint(3)->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0);
+	// Suspension spring force, spring damp, mass effect scaled, spring limit 
+	multibodyvehicle->GetTireJoint(0)->SetTireSuspenssion(100.0f, 6.0f, -0.275f, 0.0f);
+	multibodyvehicle->GetTireJoint(1)->SetTireSuspenssion(100.0f, 6.0f, -0.275f, 0.0f);
+	multibodyvehicle->GetTireJoint(2)->SetTireSuspenssion(100.0f, 6.0f, -0.275f, 0.0f);
+	multibodyvehicle->GetTireJoint(3)->SetTireSuspenssion(100.0f, 6.0f, -0.275f, 0.0f);
 	// Setup for 4x4
 	// Setup the tire id that can use the Torque
 	multibodyvehicle->GetTireJoint(0)->SetUseTorque(true);
@@ -970,11 +971,11 @@ location3 = dGetIdentityMatrix();
 		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f), manager->GetTireMaterial());
 		/*NewtonBody* const Tire4 = */
 		VehicleTireCreate(scene, multibodyvehicles, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f), manager->GetTireMaterial());
-		// Suspenssion spring force, spring damp, mass effect scaled, spring limite 
-		multibodyvehicle->GetTireJoint(0)->SetTireSuspenssion(150.0f, 5.0f, 0.5f, -0.25f, 0.0);
-		multibodyvehicle->GetTireJoint(1)->SetTireSuspenssion(150.0f, 5.0f, 0.5f, -0.25f, 0.0);
-		multibodyvehicle->GetTireJoint(2)->SetTireSuspenssion(150.0f, 5.0f, 0.5f, -0.25f, 0.0);
-		multibodyvehicle->GetTireJoint(3)->SetTireSuspenssion(150.0f, 5.0f, 0.5f, -0.25f, 0.0);
+		// Suspension spring force, spring damp, mass effect scaled, spring limit 
+		multibodyvehicle->GetTireJoint(0)->SetTireSuspenssion(150.0f, 5.0f, -0.25f, 0.0f);
+		multibodyvehicle->GetTireJoint(1)->SetTireSuspenssion(150.0f, 5.0f, -0.25f, 0.0f);
+		multibodyvehicle->GetTireJoint(2)->SetTireSuspenssion(150.0f, 5.0f, -0.25f, 0.0f);
+		multibodyvehicle->GetTireJoint(3)->SetTireSuspenssion(150.0f, 5.0f, -0.25f, 0.0f);
 		// Setup the tire id that can use the Torque
 		multibodyvehicles->GetTireJoint(0)->SetUseTorque(false);
 		multibodyvehicles->GetTireJoint(1)->SetUseTorque(false);
@@ -1007,7 +1008,10 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 	}
 
 	protected:
-	virtual void PreUpdate(dFloat timestep, int threadIndex)
+
+	// old style suspension force use as effective to model sprung mass
+	// this is a hack that we are getting away off.
+	void ApplyTireSuspensionForcesOld (dFloat timestep)
 	{
 		dVector FrameTorque;
 		dVector FrameForce;
@@ -1047,7 +1051,7 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 			NewtonBodyGetMatrix(chassis, &frmMatrix[0][0]);
 			NewtonBodyGetCentreOfMass(chassis, &frmCom[0]);
 			//
-			dFloat mVehicleSpeed = dAbs(frmVeloc.DotProduct3(cTireSpring->GetChassisPivotMatrix().m_right));
+			//dFloat mVehicleSpeed = dAbs(frmVeloc.DotProduct3(cTireSpring->GetChassisPivotMatrix().m_right));
 			//
 			frmCom = frmMatrix.TransformVector(frmCom); //OXTransformVector(frmCom, frmMatrix); 
 			frmVeloc = frmVeloc + frmOmega.CrossProduct(cTireSpring->GetCenterInChassis() - frmCom);
@@ -1056,8 +1060,9 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 			//
 			cTireSpring->SetDistance();
 			//
+			dFloat sprungMass = 0.5f;
 			cTireSpring->SetAccel(NewtonCalculateSpringDamperAcceleration(timestep, cTireSpring->GetSpringK(), cTireSpring->GetDistance(),
-				cTireSpring->GetSpringD(), speed) * frameMass * cTireSpring->GetSpringMassEffective());
+								  cTireSpring->GetSpringD(), speed) * frameMass * sprungMass);
 			//
 			FrameForce = (cTireSpring->GetChassisPivotMatrix().m_up * cTireSpring->GetAccel());
 			FrameTorque = (cTireSpring->GetChassisPivotMatrix().m_posit - frmCom).CrossProduct(FrameForce);
@@ -1070,8 +1075,7 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 			//
 			// When only normal break is use it apply the torque anyway, Because with the 4x4 model the rear tire can break and the front tire can accelerate in same time.
 			// The result is a bit strange the vehicle can slide a bit more when you break with 4x4 model and if you accelerate in same time.
-			if (cTireSpring->GetUseTorque() && (!cTireSpring->GetUseHardBreak()))
-			{
+			if (cTireSpring->GetUseTorque() && (!cTireSpring->GetUseHardBreak())) {
 				// apply engine torque plus some tire angular drag
 				tireTorque = (cTireSpring->GetChassisPivotMatrix().m_front * (cTireSpring->GetTireTorque() - cTireSpring->GetRealTireOmega() * cTireSpring->GetTireIzz()));
 				NewtonBodyAddTorque(cTireSpring->GetBody1(), &tireTorque[0]);
@@ -1081,6 +1085,121 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 			chassisReationTorque = (cTireSpring->GetChassisPivotMatrix().m_front * -(cTireSpring->GetTireTorque() * frameTorqueAffective));
 			NewtonBodyAddTorque(chassis, &chassisReationTorque[0]);
 		}
+	}
+
+	// new style suspension force calculate the sprung mass for any tire arrangement 
+	void ApplyTireSuspensionForces (dFloat timestep)
+	{
+		const int maxSize = 64;
+		dComplementaritySolver::dJacobianPair m_jt[maxSize];
+		dComplementaritySolver::dJacobianPair m_jInvMass[maxSize];
+
+		dFloat massMatrix[maxSize * maxSize];
+		dFloat accel[maxSize];
+
+		dMatrix chassisMatrix;
+		dMatrix chassisInvInertia;
+
+		NewtonBody* const chassisBody = GetBody();
+		NewtonBodyGetInvInertiaMatrix(chassisBody, &chassisInvInertia[0][0]);
+
+		dVector chassisCom;
+		dVector chassisOmega;
+		dVector chassisVeloc;
+		dFloat chassisInvMass;
+		dFloat chassisInvIxx;
+		dFloat chassisInvIyy;
+		dFloat chassisInvIzz;
+
+		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+		NewtonBodyGetVelocity(chassisBody, &chassisVeloc[0]);
+		NewtonBodyGetInvMass(chassisBody, &chassisInvMass, &chassisInvIxx, &chassisInvIyy, &chassisInvIzz);
+
+		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+		NewtonBodyGetCentreOfMass(chassisBody, &chassisCom[0]);
+		dVector chassisOrigin(chassisMatrix.TransformVector(chassisCom));
+
+		for (int i = 0; i < m_tireCount; i++) {
+			dMatrix tireMatrix;
+			dMatrix chassisMatrix;
+			dMatrix tireInvInertia;
+			dVector tireOmega;
+			dVector tireVeloc;
+
+			dFloat tireInvMass;
+			dFloat tireInvIxx;
+			dFloat tireInvIyy;
+			dFloat tireInvIzz;
+
+			dCustomTireSpringDG* const tire = m_tireJoint[i];
+			NewtonBody* const tireBody = tire->GetBody1();
+			tire->CalculateGlobalMatrix(chassisMatrix, tireMatrix);
+
+			NewtonBodyGetInvInertiaMatrix(tireBody, &tireInvInertia[0][0]);
+			NewtonBodyGetInvMass(tireBody, &tireInvMass, &tireInvIxx, &tireInvIyy, &tireInvIzz);
+
+			m_jt[i].m_jacobian_J01.m_linear = chassisMatrix.m_up.Scale(-1.0f);
+			m_jt[i].m_jacobian_J01.m_angular = dVector(0.0f);
+			m_jt[i].m_jacobian_J10.m_linear = chassisMatrix.m_up;
+			m_jt[i].m_jacobian_J10.m_angular = (tireMatrix.m_posit - chassisOrigin).CrossProduct(chassisMatrix.m_up);
+
+			m_jInvMass[i].m_jacobian_J01.m_linear = m_jt[i].m_jacobian_J01.m_linear.Scale(tireInvMass);
+			m_jInvMass[i].m_jacobian_J01.m_angular = tireInvInertia.RotateVector(m_jt[i].m_jacobian_J01.m_angular);
+			m_jInvMass[i].m_jacobian_J10.m_linear = m_jt[i].m_jacobian_J10.m_linear.Scale(chassisInvMass);
+			m_jInvMass[i].m_jacobian_J10.m_angular = chassisInvInertia.RotateVector(m_jt[i].m_jacobian_J10.m_angular);
+
+			NewtonBodyGetOmega(tireBody, &tireOmega[0]);
+			NewtonBodyGetVelocity(tireBody, &tireVeloc[0]);
+
+			const dVector v(m_jt[i].m_jacobian_J01.m_linear * tireVeloc + m_jt[i].m_jacobian_J01.m_angular * tireOmega +
+							m_jt[i].m_jacobian_J10.m_linear * chassisVeloc + m_jt[i].m_jacobian_J10.m_angular * chassisOmega);
+			const dVector s(m_jt[i].m_jacobian_J01.m_linear * tireMatrix.m_posit + m_jt[i].m_jacobian_J10.m_linear * chassisMatrix.m_posit);
+			const dFloat dist = -(s.m_x + s.m_y + s.m_z);
+			const dFloat speed = -(v.m_x + v.m_y + v.m_z);
+
+			const dFloat kv = tire->GetSpringD();
+			const dFloat ks = tire->GetSpringK();
+			accel[i] = -NewtonCalculateSpringDamperAcceleration(timestep, ks, dist, kv, speed);
+		}
+
+		for (int i = 0; i < m_tireCount; i++) {
+			dFloat* const row = &massMatrix[i * m_tireCount];
+
+			dFloat aii = m_jInvMass[i].m_jacobian_J01.m_linear.DotProduct3(m_jt[i].m_jacobian_J01.m_linear) + m_jInvMass[i].m_jacobian_J01.m_angular.DotProduct3(m_jt[i].m_jacobian_J01.m_angular) +
+				m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[i].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[i].m_jacobian_J10.m_angular);
+
+			row[i] = aii * 1.0001f;
+			for (int j = i + 1; j < m_tireCount; j++) {
+				dFloat aij = m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[j].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[j].m_jacobian_J10.m_angular);
+				row[j] = aij;
+				massMatrix[j * m_tireCount + i] = aij;
+			}
+		}
+
+		dCholeskyFactorization(m_tireCount, massMatrix);
+		dCholeskySolve(m_tireCount, m_tireCount, massMatrix, accel);
+
+		dVector chassisForce(0.0f);
+		dVector chassisTorque(0.0f);
+		for (int i = 0; i < m_tireCount; i++) {
+			dCustomTireSpringDG* const tire = m_tireJoint[i];
+			NewtonBody* const tireBody = tire->GetBody1();
+
+			dVector force(m_jt[i].m_jacobian_J01.m_linear.Scale(accel[i]));
+			NewtonBodyAddForce(tireBody, &force[0]);
+
+			chassisForce += m_jt[i].m_jacobian_J10.m_linear.Scale(accel[i]);
+			chassisTorque += m_jt[i].m_jacobian_J10.m_angular.Scale(accel[i]);
+		}
+		NewtonBodyAddForce(chassisBody, &chassisForce[0]);
+		NewtonBodyAddTorque(chassisBody, &chassisTorque[0]);
+	}
+
+
+	virtual void PreUpdate(dFloat timestep, int threadIndex)
+	{
+		//ApplyTireSuspensionForcesOld (timestep);
+		ApplyTireSuspensionForces (timestep);
 	}
 
 	virtual void PostUpdate(dFloat timestep, int threadIndex) 
@@ -1177,7 +1296,8 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		//
 		dCustomTireSpringDG* const tireJoint = new dCustomTireSpringDG(matrix, chassisBody, tireBody);
 		tireJoint->SetSolverModel(2);
-		tireJoint->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0f);
+		//tireJoint->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0f);
+		tireJoint->SetTireSuspenssion(1200.0f, 30.0f, -0.275f, 0.0f);
 		controller->m_tireJoint[controller->m_tireCount] = tireJoint;
 		controller->m_tireCount++;
 
