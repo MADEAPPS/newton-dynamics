@@ -1000,8 +1000,13 @@ location3 = dGetIdentityMatrix();
 class MultibodyVehicleControllerDG: public dCustomControllerBase
 {
 	public:
-	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+	{
+	}
+
+	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+	{
+	}
 
 	protected:
 	virtual void PreUpdate(dFloat timestep, int threadIndex)
@@ -1028,8 +1033,41 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 	{
 	}
 
+	NewtonBody* VehicleChassis(const dMatrix&matrix, dFloat const vMass, dVector const vCenterMass, dVector const vScal)
+	{
+		// get the physical world and visual scene
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		
+		// create a simple box to serve as chassis
+		int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+		NewtonCollision* const collision = NewtonCreateBox(world, vScal.m_x, vScal.m_y, vScal.m_z, 0, NULL);
+		DemoMesh* const VehicleFrameMesh1 = new DemoMesh("VehicleFrameMesh1", collision, "wood_0.tga", "smilli.tga", "wood_0.tga");
+		NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleFrameMesh1, vMass, matrix, collision, defaultMaterialID);
+		VehicleFrameMesh1->Release();
+		NewtonDestroyCollision(collision);
+
+		// set some vehicle properties, for better physics vehavior 
+		dVector angdamp(0.0f);
+
+		// Make the tire 100% free rolling(spinning).
+		NewtonBodySetLinearDamping(vBody, 0.0f);
+		NewtonBodySetAngularDamping(vBody, &angdamp[0]);
+		//
+		NewtonBodySetAutoSleep(vBody, 0);
+		NewtonBodySetFreezeState(vBody, 0);
+		NewtonBodySetMatrix(vBody, &matrix[0][0]);
+
+		//vVehicle->SetVehicleFrameMesh(VehicleFrameMesh1);
+		//vVehicle->AddVehicleFrameBody(vBody, vCenterMass);
+		return vBody;
+	}
+
+
 	MultibodyVehicleControllerDG* CreateBasicVehicle(const dMatrix& location)
 	{
+		NewtonBody* const chassis = VehicleChassis(location, 1200.0f, dVector(-0.15f, -0.65f, 0.0f), dVector(4.0f, 1.125f, 2.55f));
+//		CreateVehicleChassis(VehicleControllerManagerDG::VehicleFrameEntity* const vVehicle, dFloat const vMass, dVector const vCenterMass, dVector const vScal)
 		return NULL;
 	}
 	
@@ -1043,8 +1081,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	// Scene 3D load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh(scene, "flatPlane.ngd", true);
-	CreateHeightFieldTerrain(scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+	CreateLevelMesh(scene, "flatPlane.ngd", true);
+	//CreateHeightFieldTerrain(scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -1055,8 +1093,17 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	// create a basic vehicle matrix
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	location.m_posit.m_y += 2.0f;
 	MultibodyVehicleControllerDG* const multibodyvehicle = manager->CreateBasicVehicle (location);
 
+	// set the camera 
+	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	origin.m_y += 10.0f;
+	origin.m_x += -45.0f;
+	//
+	dQuaternion rot;
+	scene->SetCameraMatrix(rot, origin);
 
 }
 
