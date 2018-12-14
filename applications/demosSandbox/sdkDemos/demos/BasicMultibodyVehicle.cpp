@@ -1230,7 +1230,7 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 	{
 	}
 
-	NewtonBody* VehicleChassis(const dMatrix&matrix, dFloat const vMass, dVector const vCenterMass, dVector const vScal)
+	NewtonBody* CreateChassis(const dMatrix&matrix, dFloat const vMass, dVector const vCenterMass, dVector const vScal)
 	{
 		// get the physical world and visual scene
 		NewtonWorld* const world = GetWorld();
@@ -1260,7 +1260,7 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		return vBody;
 	}
 
-	NewtonBody* VehicleTire(MultibodyVehicleControllerDG* const controller, dFloat const tireMass, dFloat tireRad, dFloat tireHeight, dVector tirePos)
+	NewtonBody* CreateTire(MultibodyVehicleControllerDG* const controller, dFloat const tireMass, dFloat tireRad, dFloat tireHeight, dVector tirePos)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -1299,8 +1299,6 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		controller->m_tireJoint[controller->m_tireCount] = tireJoint;
 		controller->m_tireCount++;
 
-		//mTireJoint[mTireCount]->SetEngineFpsRequest(GetEngineFpsRequest());
-
 		// set the tire material, you can set other stuff her that you can use in the call back
 		//NewtonCollisionMaterial collisionMaterial;
 		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(tireBody), &collisionMaterial);
@@ -1315,19 +1313,19 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 
 	MultibodyVehicleControllerDG* CreateBasicVehicle(const dMatrix& location)
 	{
-		NewtonBody* const chassis = VehicleChassis(location, 1200.0f, dVector(-0.15f, -0.65f, 0.0f), dVector(4.0f, 1.125f, 2.55f));
+		NewtonBody* const chassis = CreateChassis(location, 1200.0f, dVector(-0.15f, -0.65f, 0.0f), dVector(4.0f, 1.125f, 2.55f));
 
 		MultibodyVehicleControllerDG* const controller = CreateController();
 		//cVcontroller = controller;
 		controller->Init(chassis);
 
 		// front tires
-		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
-		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, 1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(1.0f, -0.75f, -1.125f));
 
 		// Rear Tires
-		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
-		VehicleTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, 1.125f));
+		CreateTire(controller, 75.0f, 0.35f, 0.4f, dVector(-1.25f, -0.75f, -1.125f));
 
 		return controller;
 	}
