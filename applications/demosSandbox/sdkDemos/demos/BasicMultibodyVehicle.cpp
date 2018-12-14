@@ -1277,7 +1277,11 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		matrix.m_posit.m_w = 1.0f;
 		matrix = matrix * matrixVehicle;
 
-		NewtonCollision* const collision = NewtonCreateChamferCylinder(world, tireRad, tireHeight, 0, NULL);
+		// lesson two use a unit CreateChamferCylinder and scale it instead of a variable size one.
+		//NewtonCollision* const collision = NewtonCreateChamferCylinder(world, tireRad, tireHeight, 0, NULL);
+		NewtonCollision* const collision = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
+		NewtonCollisionSetScale(collision, 2.0f * tireHeight, 2.0f * tireRad, 2.0f * tireRad);
+
 		DemoMesh* const VehicleTireMesh = new DemoMesh("tireShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		NewtonBody* const tireBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, m_tireMaterial);
 		VehicleTireMesh->Release();
