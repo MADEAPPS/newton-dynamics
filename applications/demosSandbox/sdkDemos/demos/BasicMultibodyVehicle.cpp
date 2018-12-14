@@ -1287,6 +1287,15 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		VehicleTireMesh->Release();
 		NewtonDestroyCollision(collision);
 
+		// lesson tree make tire inertia spherical to avoid bad gyro torques
+		dFloat mass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		NewtonBodyGetMass(tireBody, &mass, &Ixx, &Iyy, &Izz);
+		Ixx = dMax(dMax(Ixx, Iyy), Izz);
+		NewtonBodySetMassMatrix(tireBody, mass, Ixx, Ixx, Ixx);
+
 		// Make the tire 100% free rolling(spinning).
 		dVector angdamp(0.0f);
 		NewtonBodySetLinearDamping(tireBody, 0.0f);
@@ -1368,7 +1377,6 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	//
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
-
 }
 
 
