@@ -75,8 +75,8 @@ static void UserContactFriction(const NewtonJoint* contactJoint, dFloat timestep
 	// D.G: With this setup it can give strange collision result from body frame vs body frame collisions.
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-		NewtonMaterialSetContactFrictionCoef(material, 1.4f, 1.4f, 0);
-		NewtonMaterialSetContactFrictionCoef(material, 1.4f, 1.4f, 1);
+		NewtonMaterialSetContactFrictionCoef(material, 1.1f, 1.1f, 0);
+		NewtonMaterialSetContactFrictionCoef(material, 1.1f, 1.1f, 1);
 	}
 }
 
@@ -310,7 +310,10 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 
 			dCustomTireSpringDG* const tire = m_tireJoint[i];
 			NewtonBody* const tireBody = tire->GetBody1();
+
 			tire->CalculateGlobalMatrix(chassisMatrix, tireMatrix);
+
+			tire->TireMatrixProjection();
 
 			NewtonBodyGetInvInertiaMatrix(tireBody, &tireInvInertia[0][0]);
 			NewtonBodyGetInvMass(tireBody, &tireInvMass, &tireInvIxx, &tireInvIyy, &tireInvIzz);
@@ -404,18 +407,18 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 		// The best is to create a engine value with graduation for the torque.
 		// On this way with gears you can get the perfect torque to give without make the tire spin to much.
 		if (Accelerator < 0) {
-			m_tireJoint[0]->SetTireTorque(-1600.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[1]->SetTireTorque(1600.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[2]->SetTireTorque(-1600.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[3]->SetTireTorque(1600.0f * timestepInSecunds * GetEngineFpsRequest());
+			//m_tireJoint[0]->SetTireTorque(-1600.0f * timestepInSecunds * GetEngineFpsRequest());
+			//m_tireJoint[1]->SetTireTorque(1600.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[2]->SetTireTorque(-1200.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[3]->SetTireTorque(1200.0f * timestepInSecunds * GetEngineFpsRequest());
 		} else if (Accelerator > 0) {
-			m_tireJoint[0]->SetTireTorque(900.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[1]->SetTireTorque(-900.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[2]->SetTireTorque(900.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[3]->SetTireTorque(-900.0f * timestepInSecunds * GetEngineFpsRequest());
+			//m_tireJoint[0]->SetTireTorque(900.0f * timestepInSecunds * GetEngineFpsRequest());
+			//m_tireJoint[1]->SetTireTorque(-900.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[2]->SetTireTorque(1750.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[3]->SetTireTorque(-1750.0f * timestepInSecunds * GetEngineFpsRequest());
 		} else {
-			m_tireJoint[0]->SetTireTorque(0.0f);
-			m_tireJoint[1]->SetTireTorque(0.0f);
+			//m_tireJoint[0]->SetTireTorque(0.0f);
+			//m_tireJoint[1]->SetTireTorque(0.0f);
 			m_tireJoint[2]->SetTireTorque(0.0f);
 			m_tireJoint[3]->SetTireTorque(0.0f);
 		}
@@ -441,29 +444,26 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 				// m_vehicle->GetTireJoint(3)->SetTireSteer(0.0f);
 			}
 		//
-		if (BreakAction > 1) {
+		if (BreakAction >= 1) {
 			m_tireJoint[2]->SetTireBreak(5000.0f * 2.0f);
 			m_tireJoint[3]->SetTireBreak(5000.0f * 2.0f);
 		}
-		if (BreakAction < 0) {
+		else
+		if (BreakAction <= -1) {
 			//m_tireJoint[0]->SetUseHardBreak(true);
-			m_tireJoint[0]->SetTireBreak(5000.0f * 0.5f);
+			m_tireJoint[0]->SetTireBreak(5000.0f * 0.75f);
 			//m_tireJoint[1]->SetUseHardBreak(true);
-			m_tireJoint[1]->SetTireBreak(5000.0f * 0.5f);
+			m_tireJoint[1]->SetTireBreak(5000.0f * 0.75f);
 			//m_tireJoint[2]->SetUseHardBreak(true);
-			m_tireJoint[2]->SetTireBreak(5000.0f * 0.5f);
+			m_tireJoint[2]->SetTireBreak(5000.0f * 0.75f);
 			//m_tireJoint[3]->SetUseHardBreak(true);
-			m_tireJoint[3]->SetTireBreak(5000.0f * 0.5f);
-		}
+			m_tireJoint[3]->SetTireBreak(5000.0f * 0.75f);
+		} else
 		if (BreakAction == 0) {
 		  m_tireJoint[0]->SetTireBreak(0.0f);
 		  m_tireJoint[1]->SetTireBreak(0.0f);
 		  m_tireJoint[2]->SetTireBreak(0.0f);
 		  m_tireJoint[3]->SetTireBreak(0.0f);
-		  //m_tireJoint[0]->SetUseHardBreak(false);
-		  //m_tireJoint[1]->SetUseHardBreak(false);
-		  //m_tireJoint[2]->SetUseHardBreak(false);
-		  //m_tireJoint[3]->SetUseHardBreak(false);
 		}
 
 #if 0
@@ -545,8 +545,10 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 
 		for (int i = 0; i < 4; i++) {
 			dCustomTireSpringDG* const cTireSpring = m_tireJoint[i];
-			dVector tireTorque (cTireSpring->GetChassisPivotMatrix().m_front.Scale (cTireSpring->GetTireTorque() - cTireSpring->GetRealTireOmega() * cTireSpring->GetTireIzz()));
-			NewtonBodyAddTorque(cTireSpring->GetBody1(), &tireTorque[0]);
+			if (cTireSpring->GetUseTorque()) {
+				dVector tireTorque(cTireSpring->GetChassisPivotMatrix().m_front.Scale(cTireSpring->GetTireTorque() - cTireSpring->GetRealTireOmega() * cTireSpring->GetTireIzz()));
+				NewtonBodyAddTorque(cTireSpring->GetBody1(), &tireTorque[0]);
+			}
 		}
 	}
 
