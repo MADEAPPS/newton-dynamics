@@ -157,6 +157,8 @@ static int OnTireContactGeneration(const NewtonMaterial* const material, const N
 	return contactCount;
 }
 
+class MultibodyVehicleControllerDG;
+static bool IsPlayer(const MultibodyVehicleControllerDG* const controller);
 
 #if 0
 class VehicleControllerManagerDG : public dCustomVehicleControllerManagerDG
@@ -1005,6 +1007,7 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 	{
 		m_body = body;
 		m_tireCount = 0;
+		mEngineFpsRequest = 120.0f;
 	}
 
 	protected:
@@ -1193,11 +1196,136 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 		NewtonBodyAddTorque(chassisBody, &chassisTorque[0]);
 	}
 
+	dFloat GetEngineFpsRequest()
+	{
+		return mEngineFpsRequest;
+	}
+
+	void OnBeginUpdate(dFloat timestepInSecunds)
+	{
+		NewtonWorld* const world = GetManager()->GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		int Accelerator = int(scene->GetKeyState(265)) - int(scene->GetKeyState(264));
+		//int SteerAction = int(scene->GetKeyState(263)) - int(scene->GetKeyState(262));
+		//int BreakAction = int(scene->GetKeyState('B')) - int(scene->GetKeyState(32));
+
+#if 0
+	#if 0
+			static FILE* file = fopen("log.bin", "wb");
+			if (file) {
+				fwrite(&Accelerator, sizeof(int), 1, file);
+				fflush(file);
+			}
+	#else 
+			static FILE* file = fopen("log.bin", "rb");
+			if (file) {
+				fread(&Accelerator, sizeof(int), 1, file);
+			}
+	#endif
+#endif
+		//int HardBreakAction = ;
+		//
+		// The best is to create a engine value with graduation for the torque.
+		// On this way with gears you can get the perfect torque to give without make the tire spin to much.
+		if (Accelerator < 0) {
+			m_tireJoint[0]->SetTireTorque(1600.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[1]->SetTireTorque(-1600.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[2]->SetTireTorque(1600.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[3]->SetTireTorque(-1600.0f * timestepInSecunds * GetEngineFpsRequest());
+		} else if (Accelerator > 0) {
+			m_tireJoint[0]->SetTireTorque(-900.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[1]->SetTireTorque(900.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[2]->SetTireTorque(-900.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[3]->SetTireTorque(900.0f * timestepInSecunds * GetEngineFpsRequest());
+		} else {
+			m_tireJoint[0]->SetTireTorque(0.0f);
+			m_tireJoint[1]->SetTireTorque(0.0f);
+			m_tireJoint[2]->SetTireTorque(0.0f);
+			m_tireJoint[3]->SetTireTorque(0.0f);
+		}
+#if 0
+			// It is pretty same here you can general a value from zero to the desired angle with graduation.
+			// On this way you can have more control on the steer and it can acting better and smoother.
+			if (SteerAction < 0) {
+				m_vehicle->GetTireJoint(0)->SetTireSteer(-35.0f);
+				m_vehicle->GetTireJoint(1)->SetTireSteer(-35.0f);
+				// m_vehicle->GetTireJoint(2)->SetTireSteer(-35.0f);
+				// m_vehicle->GetTireJoint(3)->SetTireSteer(-35.0f);
+			} else
+				if (SteerAction > 0) {
+					m_vehicle->GetTireJoint(0)->SetTireSteer(35.0f);
+					m_vehicle->GetTireJoint(1)->SetTireSteer(35.0f);
+					// m_vehicle->GetTireJoint(2)->SetTireSteer(35.0f);
+					// m_vehicle->GetTireJoint(3)->SetTireSteer(35.0f);
+				} else {
+					m_vehicle->GetTireJoint(0)->SetTireSteer(0.0f);
+					m_vehicle->GetTireJoint(1)->SetTireSteer(0.0f);
+					// m_vehicle->GetTireJoint(2)->SetTireSteer(0.0f);
+					// m_vehicle->GetTireJoint(3)->SetTireSteer(0.0f);
+				}
+			//
+			if (BreakAction > 0) {
+				m_vehicle->GetTireJoint(2)->SetTireBreak(5000.0f * 2.0f);
+				m_vehicle->GetTireJoint(3)->SetTireBreak(5000.0f * 2.0f);
+			} else
+				if (BreakAction < 0) {
+					m_vehicle->GetTireJoint(0)->SetUseHardBreak(true);
+					m_vehicle->GetTireJoint(0)->SetTireBreak(5000.0f * 0.5f);
+					m_vehicle->GetTireJoint(1)->SetUseHardBreak(true);
+					m_vehicle->GetTireJoint(1)->SetTireBreak(5000.0f * 0.5f);
+					m_vehicle->GetTireJoint(2)->SetUseHardBreak(true);
+					m_vehicle->GetTireJoint(2)->SetTireBreak(5000.0f * 0.5f);
+					m_vehicle->GetTireJoint(3)->SetUseHardBreak(true);
+					m_vehicle->GetTireJoint(3)->SetTireBreak(5000.0f * 0.5f);
+				} else {
+					m_vehicle->GetTireJoint(0)->SetTireBreak(0.0f);
+					m_vehicle->GetTireJoint(1)->SetTireBreak(0.0f);
+					m_vehicle->GetTireJoint(2)->SetTireBreak(0.0f);
+					m_vehicle->GetTireJoint(3)->SetTireBreak(0.0f);
+					m_vehicle->GetTireJoint(0)->SetUseHardBreak(false);
+					m_vehicle->GetTireJoint(1)->SetUseHardBreak(false);
+					m_vehicle->GetTireJoint(2)->SetUseHardBreak(false);
+					m_vehicle->GetTireJoint(3)->SetUseHardBreak(false);
+				}
+			//
+			/*if (HardBreakAction > 0) {
+			//m_backupbreak[0] = m_vehicle->GetTireJoint(0)->GetUseBreak();
+			//m_backupbreak[1] = m_vehicle->GetTireJoint(0)->GetUseBreak();
+			//m_backupbreak[2] = m_vehicle->GetTireJoint(0)->GetUseBreak();
+			//m_backupbreak[3] = m_vehicle->GetTireJoint(0)->GetUseBreak();
+			printf();
+			m_vehicle->GetTireJoint(0)->SetUseHardBreak(true);
+			m_vehicle->GetTireJoint(0)->SetTireBreak(50000.0f * 0.5f);
+			m_vehicle->GetTireJoint(1)->SetUseHardBreak(true);
+			m_vehicle->GetTireJoint(1)->SetTireBreak(50000.0f * 0.5f);
+			m_vehicle->GetTireJoint(2)->SetUseHardBreak(true);
+			m_vehicle->GetTireJoint(2)->SetTireBreak(50000.0f * 0.5f);
+			m_vehicle->GetTireJoint(3)->SetUseHardBreak(true);
+			m_vehicle->GetTireJoint(3)->SetTireBreak(50000.0f * 0.5f);
+			}
+			else {
+
+			}*/
+			//
+		
+#endif
+	}
 
 	virtual void PreUpdate(dFloat timestep, int threadIndex)
 	{
+		if (IsPlayer(this)) {
+			OnBeginUpdate(timestep);
+		}
+
 		//ApplyTireSuspensionForcesOld (timestep);
 		ApplyTireSuspensionForces (timestep);
+
+		for (int i = 0; i < 4; i++) {
+			dCustomTireSpringDG* const cTireSpring = m_tireJoint[i];
+			dVector tireTorque (cTireSpring->GetChassisPivotMatrix().m_front * (cTireSpring->GetTireTorque() - cTireSpring->GetRealTireOmega() * cTireSpring->GetTireIzz()));
+dTrace(("%f %f %f\n", tireTorque.m_x, tireTorque.m_y, tireTorque.m_z));
+			NewtonBodyAddTorque(cTireSpring->GetBody1(), &tireTorque[0]);
+		}
 	}
 
 	virtual void PostUpdate(dFloat timestep, int threadIndex) 
@@ -1205,6 +1333,7 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 	}
 	
 	int m_tireCount;
+	dFloat mEngineFpsRequest;
 	dCustomTireSpringDG* m_tireJoint[4];
 	friend class MultibodyVehicleControllerManagerDG;
 };
@@ -1216,7 +1345,15 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 	public:
 	MultibodyVehicleControllerManagerDG(NewtonWorld* const world)
 		:dCustomControllerManager<MultibodyVehicleControllerDG>(world, "Multi body Vehicle Manage DG")
+		,m_currentController(NULL)
+		,m_tireMaterial(0)
 	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		// plug a callback for 2d help display
+		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
+		//scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+
 		// setting up a user contact handle to calculate tire collision with terrain
 		m_tireMaterial = NewtonMaterialCreateGroupID(world);
 		int defualtMaterial = NewtonMaterialGetDefaultGroupID(world);
@@ -1228,6 +1365,25 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		
 	virtual ~MultibodyVehicleControllerManagerDG()
 	{
+	}
+
+	void RenderPlayerHelp(DemoEntityManager* const scene)
+	{
+		dVector color(0.5f, 0.5f, 0.0f, 0.0f);
+		scene->Print(color, "Vehicle Multibody by Dave Gravel");
+		scene->Print(color, "Navigation Keys:");
+		scene->Print(color, "drive forward:  Arrow Up");
+		scene->Print(color, "drive backward: Arrow Down");
+		scene->Print(color, "turn Left:      Arrow Left");
+		scene->Print(color, "turn Right:     Arrow Right");
+		scene->Print(color, "break:          B");
+		scene->Print(color, "hardbreak:      Space");
+	}
+
+	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
+	{
+		MultibodyVehicleControllerManagerDG* const me = (MultibodyVehicleControllerManagerDG*)context;
+		me->RenderPlayerHelp(scene);
 	}
 
 	NewtonBody* CreateChassis(const dMatrix&matrix, dFloat const vMass, dVector const vCenterMass, dVector const vScal)
@@ -1342,10 +1498,15 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		return controller;
 	}
 	
+	MultibodyVehicleControllerDG* m_currentController;
 	int m_tireMaterial;
 	friend class dCustomVehicleControllerDG;
 };
 
+static bool IsPlayer(const MultibodyVehicleControllerDG* const controller)
+{
+	return ((MultibodyVehicleControllerManagerDG*)controller->GetManager())->m_currentController ? true : false;
+}
 
 void BasicMultibodyVehicle(DemoEntityManager* const scene)
 {
@@ -1366,7 +1527,8 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit = dVector(FindFloor(world, dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	location.m_posit.m_y += 2.0f;
-	MultibodyVehicleControllerDG* const multibodyvehicle = manager->CreateBasicVehicle (location);
+	MultibodyVehicleControllerDG* const multiBodyVehicle = manager->CreateBasicVehicle (location);
+	manager->m_currentController = multiBodyVehicle;
 
 	// set the camera 
 	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
