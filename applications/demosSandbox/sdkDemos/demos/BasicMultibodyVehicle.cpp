@@ -926,14 +926,39 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene)
 	location.m_posit.m_y += 2.0f;
 	MultibodyVehicleControllerDG* const multiBodyVehicle = manager->CreateBasicVehicle (location);
 	manager->m_currentController = multiBodyVehicle;
-	//multiBodyVehicl
-	// set the camera 
+
+
+	int count = 10;
+	count = 0;
+	for (int u = 0; u < count; u++) {
+
+		dVector VehicleFrameRotation(-180.0f, 30.0f, 0.0f);
+		dMatrix location4(dGetIdentityMatrix());
+
+		if (VehicleFrameRotation.m_x != 0.0f)
+			location4 = location4 * dYawMatrix(VehicleFrameRotation.m_x * dDegreeToRad) * location;
+		//
+		if (VehicleFrameRotation.m_y != 0.0f)
+			location4 = location4 * dRollMatrix(VehicleFrameRotation.m_y * dDegreeToRad) * location;
+		//
+		if (VehicleFrameRotation.m_z != 0.0f)
+			location4 = location4 * dPitchMatrix(VehicleFrameRotation.m_z * dDegreeToRad) * location;
+		//
+		location4.m_posit.m_x += 65.0f;
+		location4.m_posit.m_y = 30.0f;
+		//location4.m_posit.m_x = dSin(20.0f)*80-60;
+	    location4.m_posit.m_z = -38.0f + u * 4.0f;
+		//location4.m_posit.m_x += 2.0f;
+		manager->CreateBasicVehicle (location4);
+	}
+
 
 	// add some more stuff to drive over
-	AddRamps (scene);
-	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, 10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0f), 10, _BOX_PRIMITIVE);
-	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, -10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0f), 10, _BOX_PRIMITIVE);
+//	AddRamps (scene);
+//	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, 10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0f), 10, _BOX_PRIMITIVE);
+//	BuildPyramid(scene, 10.0f, dVector(-20.0f, 0.0f, -10.0f, 1.0f), dVector(0.5f, 0.25f, 0.8f, 0.0f), 10, _BOX_PRIMITIVE);
 
+	// set the camera 
 	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	origin.m_y += 10.0f;
