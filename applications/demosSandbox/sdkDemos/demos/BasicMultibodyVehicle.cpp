@@ -407,15 +407,15 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 		// The best is to create a engine value with graduation for the torque.
 		// On this way with gears you can get the perfect torque to give without make the tire spin to much.
 		if (Accelerator < 0) {
-			//m_tireJoint[0]->SetTireTorque(-1600.0f * timestepInSecunds * GetEngineFpsRequest());
-			//m_tireJoint[1]->SetTireTorque(1600.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[0]->SetTireTorque(-1200.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[1]->SetTireTorque(1200.0f * timestepInSecunds * GetEngineFpsRequest());
 			m_tireJoint[2]->SetTireTorque(-1200.0f * timestepInSecunds * GetEngineFpsRequest());
 			m_tireJoint[3]->SetTireTorque(1200.0f * timestepInSecunds * GetEngineFpsRequest());
 		} else if (Accelerator > 0) {
-			//m_tireJoint[0]->SetTireTorque(900.0f * timestepInSecunds * GetEngineFpsRequest());
-			//m_tireJoint[1]->SetTireTorque(-900.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[2]->SetTireTorque(1750.0f * timestepInSecunds * GetEngineFpsRequest());
-			m_tireJoint[3]->SetTireTorque(-1750.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[0]->SetTireTorque(1500.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[1]->SetTireTorque(-1500.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[2]->SetTireTorque(1500.0f * timestepInSecunds * GetEngineFpsRequest());
+			m_tireJoint[3]->SetTireTorque(-1500.0f * timestepInSecunds * GetEngineFpsRequest());
 		} else {
 			//m_tireJoint[0]->SetTireTorque(0.0f);
 			//m_tireJoint[1]->SetTireTorque(0.0f);
@@ -709,7 +709,7 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		dCustomTireSpringDG* const tireJoint = new dCustomTireSpringDG(matrix, chassisBody, tireBody);
 		tireJoint->SetSolverModel(2);
 		//tireJoint->SetTireSuspenssion(100.0f, 6.0f, 0.5f, -0.275f, 0.0f);
-		tireJoint->SetTireSuspenssion(1200.0f, 30.0f, -0.275f, 0.0f);
+		tireJoint->SetTireSuspenssion(1300.0f, 40.0f, -0.275f, 0.0f);
 		controller->m_tireJoint[controller->m_tireCount] = tireJoint;
 	
 		tireJoint->SetUseTorque(false);
@@ -795,8 +795,8 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		controller->Init(chassis);
 
 		// front tires
-		CreateTire(controller, TMODE_STEER_BREAK_HARDBREAK, 50.0f, 0.35f, 0.25f, dVector(1.2f, -0.75f, 1.125f));
-		CreateTire(controller, TMODE_STEER_BREAK_HARDBREAK, 50.0f, 0.35f, 0.25f, dVector(1.2f, -0.75f, -1.125f));
+		CreateTire(controller, /*TMODE_STEER_BREAK_HARDBREAK*/TMODE_TORQUE_STEER_BREAK_HARDBREAK, 50.0f, 0.35f, 0.25f, dVector(1.2f, -0.75f, 1.125f));
+		CreateTire(controller, /*TMODE_STEER_BREAK_HARDBREAK*/TMODE_TORQUE_STEER_BREAK_HARDBREAK, 50.0f, 0.35f, 0.25f, dVector(1.2f, -0.75f, -1.125f));
 
 		// rear Tires
 		CreateTire(controller, TMODE_TORQUE_BREAK_HARDBREAK, 50.0f, 0.35f, 0.25f, dVector(-1.4f, -0.75f, 1.125f));
