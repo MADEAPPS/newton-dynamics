@@ -44,13 +44,11 @@ static CheckMemoryLeaks checkLeaks;
 
 int main(int, char**)
 {
-//	atexit(CheckMemoryLeaks);
-
 	#if defined(_DEBUG) && defined(_MSC_VER)
 		// Track all memory leaks at the operating system level.
 		// make sure no Newton tool or utility leaves leaks behind.
 		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
-		_CrtSetBreakAlloc (727);
+		//_CrtSetBreakAlloc (727);
 	#endif
 
 	// Set the memory allocation function before creation the newton world
