@@ -288,6 +288,8 @@ class dgParallelBodySolver
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
 	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
 
+	void DEBUG____();
+
 	protected:
 	dgWorld* m_world;
 	const dgBodyCluster* m_cluster;
