@@ -48,7 +48,9 @@ class CheckMemoryLeaks
 
 	static void CheckMemoryLeaksCallback()
 	{
+#if defined(_DEBUG) && defined(_MSC_VER)
 		_CrtDumpMemoryLeaks();
+#endif
 	}
 };
 static CheckMemoryLeaks checkLeaks;
