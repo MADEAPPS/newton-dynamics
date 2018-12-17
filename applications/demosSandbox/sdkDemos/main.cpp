@@ -26,7 +26,10 @@ static void PhysicsFree (void* ptr, int sizeInBytes)
 	delete[] (char*)ptr;
 }
 
-
+static void CheckMemoryLeaks()
+{
+	_CrtDumpMemoryLeaks();
+}
 
 int main(int, char**)
 {
@@ -36,6 +39,8 @@ int main(int, char**)
 		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
 		//_CrtSetBreakAlloc (3600);
 	#endif
+
+	atexit(CheckMemoryLeaks);
 
 	// Set the memory allocation function before creation the newton world
 	// this is the only function that can be called before the creation of the newton world.
