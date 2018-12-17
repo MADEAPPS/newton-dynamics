@@ -33,6 +33,10 @@ class CheckMemoryLeaks
 	CheckMemoryLeaks() 
 	{
 		atexit(CheckMemoryLeaksCallback);
+		// Set the memory allocation function before creation the newton world
+		// this is the only function that can be called before the creation of the newton world.
+		// it should be called once, and the the call is optional 
+		NewtonSetMemorySystem(PhysicsAlloc, PhysicsFree);
 	}
 
 	static void CheckMemoryLeaksCallback()
@@ -50,11 +54,6 @@ int main(int, char**)
 		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
 		//_CrtSetBreakAlloc (727);
 	#endif
-
-	// Set the memory allocation function before creation the newton world
-	// this is the only function that can be called before the creation of the newton world.
-	// it should be called once, and the the call is optional 
-	NewtonSetMemorySystem (PhysicsAlloc, PhysicsFree);
 
 //	DemoEntityManager demos;
 //	demos.Run();
