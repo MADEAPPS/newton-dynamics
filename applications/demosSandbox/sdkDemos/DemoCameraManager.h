@@ -22,6 +22,7 @@
 #include "DemoListenerBase.h"
 
 class DemoCamera;
+class DemoCameraPickBodyJoint;
 class DemoCameraManager
 {
 	public:
@@ -65,7 +66,7 @@ class DemoCameraManager
 	dVector m_pickedBodyLocalAtachmentPoint;
 	dVector m_pickedBodyLocalAtachmentNormal;
 	NewtonBody* m_targetPicked;
-	dCustomKinematicController* m_pickJoint;
+	DemoCameraPickBodyJoint* m_pickJoint;
 	NewtonBodyDestructor m_bodyDestructor;
 	friend class DemoCamera;
 };

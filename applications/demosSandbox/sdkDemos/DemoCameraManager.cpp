@@ -37,7 +37,9 @@ class DemoCameraPickBodyJoint: public dCustomKinematicController
 	
 	~DemoCameraPickBodyJoint()
 	{
-		m_manager->ResetPickBody();
+		if (m_manager) {
+			m_manager->ResetPickBody();
+		}
 	}
 		
 	DemoCameraManager* m_manager;
@@ -67,6 +69,9 @@ DemoCameraManager::DemoCameraManager(DemoEntityManager* const scene)
 
 DemoCameraManager::~DemoCameraManager()
 {
+	if (m_targetPicked) {
+		ResetPickBody();
+	}
 	m_camera->Release();
 }
 
@@ -313,6 +318,9 @@ void DemoCameraManager::ResetPickBody()
 {
 	if (m_targetPicked) {
 		NewtonBodySetSleepState(m_targetPicked, 0);
+	}
+	if (m_pickJoint) {
+		m_pickJoint->m_manager = NULL;
 	}
 	m_pickJoint = NULL;
 	m_targetPicked = NULL;
