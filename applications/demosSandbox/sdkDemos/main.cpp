@@ -26,30 +26,40 @@ static void PhysicsFree (void* ptr, int sizeInBytes)
 	delete[] (char*)ptr;
 }
 
-static void CheckMemoryLeaks()
+
+class CheckMemoryLeaks
 {
-	_CrtDumpMemoryLeaks();
-}
+	public:
+	CheckMemoryLeaks() 
+	{
+		atexit(CheckMemoryLeaksCallback);
+	}
+
+	static void CheckMemoryLeaksCallback()
+	{
+		_CrtDumpMemoryLeaks();
+	}
+};
+static CheckMemoryLeaks checkLeaks;
 
 int main(int, char**)
 {
+//	atexit(CheckMemoryLeaks);
+
 	#if defined(_DEBUG) && defined(_MSC_VER)
 		// Track all memory leaks at the operating system level.
 		// make sure no Newton tool or utility leaves leaks behind.
 		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
-		//_CrtSetBreakAlloc (3600);
+		_CrtSetBreakAlloc (727);
 	#endif
-
-	atexit(CheckMemoryLeaks);
 
 	// Set the memory allocation function before creation the newton world
 	// this is the only function that can be called before the creation of the newton world.
 	// it should be called once, and the the call is optional 
 	NewtonSetMemorySystem (PhysicsAlloc, PhysicsFree);
 
-	DemoEntityManager demos;
-
-	demos.Run();
+//	DemoEntityManager demos;
+//	demos.Run();
 
     return 0;
 }
