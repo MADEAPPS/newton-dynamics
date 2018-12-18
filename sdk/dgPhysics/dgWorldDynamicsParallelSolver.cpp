@@ -1127,9 +1127,9 @@ void dgParallelBodySolver::CalculateForces()
 				accNorm = dgMax(accNorm, m_accelNorm[i]);
 			}
 		}
+DEBUG____();
 		IntegrateBodiesVelocity();
 	}
-DEBUG____();
 
 	UpdateForceFeedback();
 
@@ -1876,6 +1876,7 @@ void dgParallelBodySolver::CalculateForces()
 			}
 			memcpy(internalForces, tempInternalForces, bodyCount * sizeof (dgJacobian));
 		}
+		DEBUG____();
 		IntegrateBodiesVelocity();
 	}
 
@@ -1897,11 +1898,11 @@ void dgParallelBodySolver::CalculateForces()
 
 void dgParallelBodySolver::DEBUG____()
 {
-	dgTrace(("\n"));
 	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
 	for (dgInt32 i = 1; i < m_cluster->m_bodyCount; i++) {
 		dgInt32 index = m_bodyArray[i].m_body->m_index;
 		dgVector f(internalForces[index].m_linear);
 		dgTrace(("%d, %f %f %f\n", index, f[0], f[1], f[2]));
 	}
+	dgTrace(("\n"));
 }

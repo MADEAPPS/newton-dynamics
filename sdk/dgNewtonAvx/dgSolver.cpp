@@ -44,6 +44,7 @@ dgSolver::~dgSolver()
 {
 }
 
+#ifdef D_USE_AOS_SOLVER
 void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	m_cluster = &cluster;
@@ -1053,5 +1054,11 @@ void dgSolver::CalculateForces()
 	}
 }
 
+#else
+void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
+{
+	dgAssert(0);
+}
 
+#endif
 

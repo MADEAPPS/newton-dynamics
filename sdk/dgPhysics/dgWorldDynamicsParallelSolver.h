@@ -393,6 +393,8 @@ class dgParallelBodySolver
 	protected:
 	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
+	void DEBUG____();
+
 	dgWorld* m_world;
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
