@@ -1127,7 +1127,7 @@ void dgParallelBodySolver::CalculateForces()
 				accNorm = dgMax(accNorm, m_accelNorm[i]);
 			}
 		}
-DEBUG____();
+//DEBUG____();
 		IntegrateBodiesVelocity();
 	}
 
@@ -1571,7 +1571,7 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 		const dgInt32 m1 = jointInfo->m_m1;
 		const dgBody* const body0 = bodyArray[m0].m_body;
 		const dgBody* const body1 = bodyArray[m1].m_body;
-		bool isSleeping = body0->m_resting & body1->m_resting;
+		dgInt32 isSleeping = body0->m_resting & body1->m_resting;
 		if (!isSleeping) {
 
 			dgVector preconditioner0 (jointInfo->m_preconditioner0 * bodyProxyArray[m0].m_weight);
@@ -1876,7 +1876,7 @@ void dgParallelBodySolver::CalculateForces()
 			}
 			memcpy(internalForces, tempInternalForces, bodyCount * sizeof (dgJacobian));
 		}
-		DEBUG____();
+//DEBUG____();
 		IntegrateBodiesVelocity();
 	}
 
@@ -1902,7 +1902,7 @@ void dgParallelBodySolver::DEBUG____()
 	for (dgInt32 i = 1; i < m_cluster->m_bodyCount; i++) {
 		dgInt32 index = m_bodyArray[i].m_body->m_index;
 		dgVector f(internalForces[index].m_linear);
-		dgTrace(("%d, %f %f %f\n", index, f[0], f[1], f[2]));
+		dgTrace(("%d, %f %f %f\n", m_bodyArray[i].m_body->m_uniqueID, f[0], f[1], f[2]));
 	}
 	dgTrace(("\n"));
 }
