@@ -29,7 +29,7 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgWorldDynamicsParallelSolver.h"
 
-#ifdef D_USE_AOS_SOLVER
+#ifdef D_USE_SOA_SOLVER
 
 dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one);
 dgWorkGroupFloat dgWorkGroupFloat::m_zero(dgVector::m_zero);

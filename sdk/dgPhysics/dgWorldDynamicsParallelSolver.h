@@ -29,9 +29,9 @@ class dgJointInfo;
 class dgBodyCluster;
 class dgSkeletonContainer;
 
-#define D_USE_AOS_SOLVER
+#define D_USE_SOA_SOLVER
 
-#ifdef D_USE_AOS_SOLVER
+#ifdef D_USE_SOA_SOLVER
 #define DG_WORK_GROUP_SIZE		8 
 
 DG_MSC_VECTOR_ALIGMENT
