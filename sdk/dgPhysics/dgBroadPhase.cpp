@@ -1788,7 +1788,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	m_world->SynchronizationBarrier();
 
 	AttachNewContacts(lastNode);
-	dgAssert(SanityCheck());
+//	dgAssert(SanityCheck());
 
 	dgContactList::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
