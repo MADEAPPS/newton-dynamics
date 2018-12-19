@@ -233,6 +233,7 @@ class dgParallelBodySolver
 		dgFloat32 m_weight;
 		dgFloat32 m_invWeight;
 		dgInt32 m_jointStart;
+		dgInt32 m_lock;
 	};
 
 	~dgParallelBodySolver() {}
@@ -285,10 +286,8 @@ class dgParallelBodySolver
 
 	DG_INLINE void SortWorkGroup (dgInt32 base) const; 
 	DG_INLINE void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
-	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
 	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSolverSoaElement* const massMatrix, const dgJacobian* const internalForces) const;
-
-	void DEBUG____();
+	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 
 	protected:
 	dgWorld* m_world;
@@ -388,12 +387,10 @@ class dgParallelBodySolver
 	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);	
 
-	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide);
+	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 
 	protected:
 	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
-
-	void DEBUG____();
 
 	dgWorld* m_world;
 	dgBodyInfo* m_bodyArray;

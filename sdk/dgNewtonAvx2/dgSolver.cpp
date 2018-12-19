@@ -158,7 +158,7 @@ void dgSolver::InitInternalForces(dgInt32 threadID)
 		const dgBodyJacobianPair* const jointsStart = &bodyJacobiansPairs[startJoints->m_jointStart];
 
 		for (dgInt32 j = 0; j < jointsCount; j++) {
-			const dgInt32 rowsCount = jointsStart[j].m_rowCount - 2;
+			const dgInt32 rowsCount = (jointsStart[j].m_rowCount >> 1) * 2;	
 			const dgFloat32 preconditioner = jointsStart[j].m_preconditioner;
 			const dgSoaFloat* const lhs = &leftHandSide[jointsStart[j].m_rowStart];
 			const dgRightHandSide* const rhs = &rightHandSide[jointsStart[j].m_righHandStart];
@@ -916,7 +916,7 @@ void dgSolver::CalculateBodyForce(dgInt32 threadID)
 		const dgBodyJacobianPair* const jointsStart = &bodyJacobiansPairs[startJoints->m_jointStart];
 
 		for (dgInt32 j = 0; j < jointsCount; j++) {
-			const dgInt32 rowsCount = jointsStart[j].m_rowCount - 2;
+			const dgInt32 rowsCount = (jointsStart[j].m_rowCount >> 1) * 2;	
 			const dgSoaFloat* const lhs = &leftHandSide[jointsStart[j].m_rowStart];
 			const dgRightHandSide* const rhs = &rightHandSide[jointsStart[j].m_righHandStart];
 			for (dgInt32 k = 0; k < rowsCount; k += 2) {
