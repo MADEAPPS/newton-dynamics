@@ -382,7 +382,6 @@ void dgParallelBodySolver::CalculateBodiesAcceleration()
 	m_world->SynchronizationBarrier();
 }
 
-
 void dgParallelBodySolver::CalculateJointsForce()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
@@ -1062,7 +1061,6 @@ DG_INLINE void dgParallelBodySolver::TransposeRow (dgSolverSoaElement* const row
 			row->m_diagDamp[i] = rhs->m_diagDamp;
 			row->m_invJinvMJt[i] = rhs->m_invJinvMJt;
 			row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
-			//row->m_normalForceIndex.m_i[i] = rhs->m_normalForceIndex;
 			row->m_normalForceIndex.SetInt(i, rhs->m_normalForceIndex);
 			row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 			row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
@@ -1105,12 +1103,10 @@ DG_INLINE void dgParallelBodySolver::TransposeRow (dgSolverSoaElement* const row
 				row->m_diagDamp[i] = rhs->m_diagDamp;
 				row->m_invJinvMJt[i] = rhs->m_invJinvMJt;
 				row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
-				//row->m_normalForceIndex.m_i[i] = rhs->m_normalForceIndex;
 				row->m_normalForceIndex.SetInt(i, rhs->m_normalForceIndex);
 				row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 				row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
 			} else {
-				//row->m_normalForceIndex.m_i[i] = DG_INDEPENDENT_ROW;
 				row->m_normalForceIndex.SetInt(i, DG_INDEPENDENT_ROW);
 			}
 		}
@@ -1556,10 +1552,16 @@ void dgParallelBodySolver::CalculateJointsForceKernel(void* const context, void*
 
 void dgParallelBodySolver::CalculateJointsForce()
 {
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+	dgJacobian* const tempInternalForces = &m_world->m_solverMemory.m_internalForcesBuffer[bodyCount];
+
+	memset(tempInternalForces, 0, bodyCount * sizeof(dgJacobian));
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(CalculateJointsForceKernel, this, NULL, "dgParallelBodySolver::CalculateJointsForce");
 	}
 	m_world->SynchronizationBarrier();
+	memcpy(internalForces, tempInternalForces, bodyCount * sizeof(dgJacobian));
 }
 
 void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
@@ -1874,21 +1876,16 @@ void dgParallelBodySolver::CalculateForces()
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-	dgJacobian* const tempInternalForces = &m_world->m_solverMemory.m_internalForcesBuffer[bodyCount];
-
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAcceleration();
 
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
 		for (dgInt32 i = 0; (i < passes) && (accNorm > DG_SOLVER_MAX_ERROR); i++) {
-			memset(tempInternalForces, 0, bodyCount * sizeof (dgJacobian));
 			CalculateJointsForce();
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < threadCounts; j++) {
 				accNorm += m_accelNorm[j];
 			}
-			memcpy(internalForces, tempInternalForces, bodyCount * sizeof (dgJacobian));
 		}
 		IntegrateBodiesVelocity();
 	}
