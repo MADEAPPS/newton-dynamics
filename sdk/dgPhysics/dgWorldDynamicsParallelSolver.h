@@ -256,7 +256,6 @@ class dgParallelBodySolver
 	
 	void InitBodyArray(dgInt32 threadID);
 	void InitJacobianMatrix(dgInt32 threadID);
-	void InitInternalForces(dgInt32 threadID);
 	void CalculateBodyForce(dgInt32 threadID);
 	void UpdateForceFeedback(dgInt32 threadID);
 	void TransposeMassMatrix(dgInt32 threadID);
@@ -267,11 +266,10 @@ class dgParallelBodySolver
 	void CalculateJointsAcceleration(dgInt32 threadID);
 	void CalculateBodiesAcceleration(dgInt32 threadID);
 	
-	static void InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID);
+//	static void InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateBodyForceKernel(void* const context, void* const, dgInt32 threadID);
-	static void InitInternalForcesKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void TransposeMassMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);

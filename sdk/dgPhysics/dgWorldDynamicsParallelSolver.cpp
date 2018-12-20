@@ -63,12 +63,15 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 bodyCount = 0;
 	dgInt32 jointsCount = 0;
+	dgInt32 rowCount = 0;
 	for (dgInt32 i = 0; i < clustersCount; i++) {
 		const dgBodyCluster* const srcCluster = &clusterArray[i];
 		bodyCount += srcCluster->m_bodyCount - 1;
 		jointsCount += srcCluster->m_jointCount;
+		rowCount += srcCluster->m_rowCount;
 	}
 
+	world->m_solverMemory.Init(world, rowCount, 2 * bodyCount);
 	world->m_bodiesMemory.ResizeIfNecessary((m_bodies + bodyCount + 1) * sizeof(dgBodyInfo));
 	world->m_jointsMemory.ResizeIfNecessary(m_joints + jointsCount + 32);
 
@@ -181,12 +184,6 @@ void dgParallelBodySolver::InitJacobianMatrixKernel(void* const context, void* c
 {
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->InitJacobianMatrix(threadID);
-}
-
-void dgParallelBodySolver::InitInternalForcesKernel(void* const context, void* const, dgInt32 threadID)
-{
-	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
-	me->InitInternalForces(threadID);
 }
 
 void dgParallelBodySolver::CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID)
@@ -320,13 +317,6 @@ void dgParallelBodySolver::InitJacobianMatrix()
 		dgInt32 index = bodyJacobiansPairs[i].m_bodyIndex;
 		bodyProxyArray[index].m_jointStart = i;
 	}
-
-//	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-//		m_world->QueueJob(InitInternalForcesKernel, this, NULL, "dgParallelBodySolver::InitInternalForces");
-//	}
-//	m_world->SynchronizationBarrier();
-//	internalForces[0].m_linear = dgVector::m_zero;
-//	internalForces[0].m_angular = dgVector::m_zero;
 
 	dgJointInfo* const jointArray = m_jointArray;
 	dgSort(jointArray, m_cluster->m_jointCount, CompareJointInfos);
@@ -757,42 +747,6 @@ void dgParallelBodySolver::CalculateBodyForce(dgInt32 threadID)
 			}
 		}
 		internalForces[i] = forceAcc * dgWorkGroupFloat (startJoints->m_invWeight);
-	}
-}
-
-void dgParallelBodySolver::InitInternalForces(dgInt32 threadID)
-{
-	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
-	const dgBodyJacobianPair* const bodyJacobiansPairs = m_bodyJacobiansPairs;
-	dgWorkGroupFloat* const internalForces = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_internalForcesBuffer[0];
-	const dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
-	const dgWorkGroupFloat* const leftHandSide = (dgWorkGroupFloat*)&m_world->m_solverMemory.m_leftHandSizeBuffer[0].m_Jt.m_jacobianM0;
-
-	const dgInt32 step = m_threadCounts;
-	const dgInt32 bodyCount = m_cluster->m_bodyCount - 1;
-	for (dgInt32 k = threadID; k < bodyCount; k += step) {
-		const dgInt32 i = k + 1;
-		dgWorkGroupFloat forceAcc(dgVector::m_zero);
-		
-		const dgBodyProxy* const startJoints = &bodyProxyArray[i];
-		const dgInt32 jointsCount = dgInt32 (startJoints->m_weight);
-		const dgBodyJacobianPair* const jointsStart = &bodyJacobiansPairs[startJoints->m_jointStart];
-
-		for (dgInt32 j = 0; j < jointsCount; j ++) {
-			const dgInt32 rowsCount = (jointsStart[j].m_rowCount >> 1) * 2;	
-			const dgFloat32 preconditioner = jointsStart[j].m_preconditioner;
-			const dgWorkGroupFloat* const lhs = &leftHandSide[jointsStart[j].m_rowStart];
-			const dgRightHandSide* const rhs = &rightHandSide[jointsStart[j].m_righHandStart];
-			for (dgInt32 k = 0; k < rowsCount; k += 2) {
-				forceAcc = forceAcc.MulAdd (lhs[(k + 0) * 4], dgWorkGroupFloat (rhs[k + 0].m_force * preconditioner));
-				forceAcc = forceAcc.MulAdd (lhs[(k + 1) * 4], dgWorkGroupFloat (rhs[k + 1].m_force * preconditioner));
-			}
-			if (jointsStart[j].m_rowCount & 1) {
-				const dgInt32 k = jointsStart[j].m_rowCount - 1;
-				forceAcc = forceAcc.MulAdd (lhs[k * 4], dgWorkGroupFloat (rhs[k].m_force * preconditioner));
-			}
-		}
-		internalForces[i] = forceAcc;
 	}
 }
 
