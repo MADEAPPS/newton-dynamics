@@ -39,9 +39,9 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// box stacks
+#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
-#define DEFAULT_SCENE	10			// optimized level mesh collision
+//#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
@@ -341,7 +341,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 
@@ -353,7 +353,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-m_currentPlugin = 0;
+//m_currentPlugin = 3;
 
 /*
 	dFloat A[2][2];

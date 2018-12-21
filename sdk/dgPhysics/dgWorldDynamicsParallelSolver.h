@@ -217,25 +217,12 @@ class dgSolverSoaElement
 class dgParallelBodySolver
 {
 	public:
-
-	class dgBodyJacobianPair
-	{
-		public:
-		dgInt32 m_bodyIndex;
-		dgInt32 m_rowCount;
-		dgInt32 m_rowStart;
-		dgInt32 m_righHandStart;
-		dgFloat32 m_preconditioner;
-	};
-
-
 	class dgBodyProxy
 	{
 		public:
 		dgFloat32 m_weight;
 		dgFloat32 m_invWeight;
 		dgInt32 m_lock;
-dgInt32 m_jointStart;
 	};
 
 	~dgParallelBodySolver() {}
@@ -248,7 +235,6 @@ dgInt32 m_jointStart;
 	void InitBodyArray();
 	void CalculateForces();
 	void InitJacobianMatrix();
-//	void CalculateBodyForce();
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
@@ -258,7 +244,6 @@ dgInt32 m_jointStart;
 	
 	void InitBodyArray(dgInt32 threadID);
 	void InitJacobianMatrix(dgInt32 threadID);
-//	void CalculateBodyForce(dgInt32 threadID);
 	void UpdateForceFeedback(dgInt32 threadID);
 	void TransposeMassMatrix(dgInt32 threadID);
 	void CalculateJointsForce(dgInt32 threadID);
@@ -271,7 +256,6 @@ dgInt32 m_jointStart;
 //	static void InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
-//	static void CalculateBodyForceKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);
 	static void TransposeMassMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);
@@ -282,7 +266,6 @@ dgInt32 m_jointStart;
 	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);
 
 	static dgInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
-//	static dgInt32 CompareBodyJointsPairs(const dgBodyJacobianPair* const pairA, const dgBodyJacobianPair* const pairB, void* notUsed);
 
 	DG_INLINE void SortWorkGroup (dgInt32 base) const; 
 	DG_INLINE void TransposeRow (dgSolverSoaElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
@@ -295,7 +278,6 @@ dgInt32 m_jointStart;
 	dgBodyInfo* m_bodyArray;
 	dgJointInfo* m_jointArray;
 	dgBodyProxy* m_bodyProxyArray;
-	dgBodyJacobianPair* m_bodyJacobiansPairs;
 	dgFloat32 m_timestep;
 	dgFloat32 m_invTimestep;
 	dgFloat32 m_invStepRK;

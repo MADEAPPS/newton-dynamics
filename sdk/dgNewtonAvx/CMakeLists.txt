@@ -34,6 +34,10 @@ if (MSVC)
 	set_source_files_properties(dgNewtonPluginStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcdgNewtonPluginStdafx.h")
 endif(MSVC)
 
+
+#install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
+#install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+
 add_custom_command(
 	TARGET ${projectName} POST_BUILD
 	COMMAND ${CMAKE_COMMAND}
