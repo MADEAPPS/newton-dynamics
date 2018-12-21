@@ -29,6 +29,8 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgWorldDynamicsParallelSolver.h"
 
+#define D_USE_SOA_SOLVER
+
 #ifdef D_USE_SOA_SOLVER
 
 dgWorkGroupFloat dgWorkGroupFloat::m_one(dgVector::m_one);
@@ -66,11 +68,6 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	} else {
 		m_parallelSolver.CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 	}
-
-//	dgInt32 atomicIndex = 0;
-//	for (dgInt32 i = dgAtomicExchangeAndAdd(&atomicIndex, 1); i < clustersCount; i = dgAtomicExchangeAndAdd(&atomicIndex, 1)) {
-//		world->IntegrateVelocity(&clusterArray[i], DG_SOLVER_MAX_ERROR, timestep, 0);
-//	}
 
 	dgParallelClusterArray integrateCluster(clusterArray, clustersCount, timestep);
 	const dgInt32 threadCounts = world->GetThreadCount();

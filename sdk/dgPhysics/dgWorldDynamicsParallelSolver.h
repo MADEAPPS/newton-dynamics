@@ -29,9 +29,6 @@ class dgJointInfo;
 class dgBodyCluster;
 class dgSkeletonContainer;
 
-#define D_USE_SOA_SOLVER
-
-#ifdef D_USE_SOA_SOLVER
 #define DG_WORK_GROUP_SIZE		8 
 
 DG_MSC_VECTOR_ALIGMENT
@@ -322,101 +319,6 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_massMatrix(allocator)
 {
 }
-
-#else
-
-class dgParallelBodySolver
-{
-	public: 
-	class dgBodyProxy
-	{
-		public:
-		dgFloat32 m_weight;
-		dgFloat32 m_invWeight;
-		dgInt32 m_lock;
-	};
-
-	~dgParallelBodySolver() {}
-	dgParallelBodySolver(dgMemoryAllocator* const allocator);
-
-	private:
-	void InitWeights();
-	void InitBodyArray();
-	void CalculateForces();
-	void InitJacobianMatrix();
-	void UpdateForceFeedback();
-	void CalculateJointsForce();
-	void UpdateKinematicFeedback();
-	void IntegrateBodiesVelocity();
-	void CalculateBodiesAcceleration();
-	void CalculateJointsAcceleration();
-
-	void InitBodyArray(dgInt32 threadID);
-	void InitJacobianMatrix(dgInt32 threadID);
-	void UpdateForceFeedback(dgInt32 threadID);
-	void CalculateJointsForce(dgInt32 threadID);
-	void UpdateKinematicFeedback(dgInt32 threadID);
-	void IntegrateBodiesVelocity(dgInt32 threadID);
-	void CalculateBodiesAcceleration(dgInt32 threadID);
-	void CalculateJointsAcceleration(dgInt32 threadID);
-
-	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
-	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
-	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);
-	static void CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID);
-	static void UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID);
-	static void IntegrateBodiesVelocityKernel(void* const context, void* const, dgInt32 threadID);
-	static void CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID);
-	static void CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID);	
-
-	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
-
-	protected:
-	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
-
-	dgWorld* m_world;
-	dgBodyInfo* m_bodyArray;
-	dgJointInfo* m_jointArray;
-	const dgBodyCluster* m_cluster;
-	
-	dgBodyProxy* m_bodyProxyArray;
-
-	dgFloat32 m_timestep;
-	dgFloat32 m_invTimestep;
-	dgFloat32 m_invStepRK;
-	dgFloat32 m_timestepRK;
-	dgFloat32 m_invTimestepRK;
-	dgFloat32 m_firstPassCoef;
-	dgFloat32 m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
-	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
-
-	dgInt32 m_solverPasses;
-	dgInt32 m_threadCounts;
-	dgInt32 m_jacobianMatrixRowAtomicIndex;
-
-	friend class dgWorldDynamicUpdate;
-};
-
-DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const allocator)
-	:m_world(NULL)
-	,m_bodyArray(NULL)
-	,m_jointArray(NULL)
-	,m_cluster(NULL)
-	,m_bodyProxyArray(NULL)
-	,m_timestep(dgFloat32(0.0f))
-	,m_invTimestep(dgFloat32(0.0f))
-	,m_invStepRK(dgFloat32(0.0f))
-	,m_timestepRK(dgFloat32(0.0f))
-	,m_invTimestepRK(dgFloat32(0.0f))
-	,m_firstPassCoef(dgFloat32(0.0f))
-	,m_solverPasses(0)
-	,m_threadCounts(0)
-	,m_jacobianMatrixRowAtomicIndex(0)
-{
-}
-
-
-#endif
 
 #endif
 
