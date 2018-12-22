@@ -353,7 +353,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-//m_currentPlugin = 3;
+//m_currentPlugin = 0;
 
 /*
 	dFloat A[2][2];
