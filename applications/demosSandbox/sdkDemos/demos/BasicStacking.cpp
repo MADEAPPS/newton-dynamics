@@ -17,6 +17,71 @@
 #include "DemoMesh.h"
 #include "PhysicsUtils.h"
 
+// Dave: my old code in lua script
+static void BuildTower(DemoEntityManager* const scene, dFloat spacing, dFloat separspace, dFloat mass, const dVector& origin, dFloat dpt, dFloat hgt, dFloat wdt, dFloat towercount, dFloat towerHigh, dFloat towerboxcount)
+{
+	dMatrix mplacement1(dGetIdentityMatrix());
+	dMatrix mplacement2(dGetIdentityMatrix());
+	dFloat spacingbetween = 0.0f;
+	dFloat rayon = 0.0f;
+	dFloat inpx = 0.0f;
+	dFloat inpy = 0.0f;
+	dFloat inpz = 0.0f;
+	dFloat RollAngle = 0.0f;
+	int numBox = -1;
+	dVector blockBoxSize(dpt, hgt, wdt);
+	//
+	// create the shape and visual mesh as a common data to be re used
+	NewtonWorld* const world = scene->GetNewton();
+	// create a material to control collision with this objects
+	int defaultMaterialID;
+	defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+	//
+	if (separspace == 0.0f) {
+		spacingbetween = 1.0f;
+	}
+	else {
+		spacingbetween = separspace;
+	}
+	rayon = spacing * towerboxcount;
+	// create the shape and visual mesh as a common data to be re used
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
+	DemoMesh* const geometry = new DemoMesh("towerbox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	//
+	int n = 0;
+	int ct1 = 0;
+	int ct2 = 0;
+	//
+	for (n = 0; (n < (towercount)); n++) {
+		for (ct1 = 0; (ct1 < (towerHigh)); ct1++) {
+			for (ct2 = 0; (ct2 < (towerboxcount)); ct2++) {
+				numBox++;
+				if (ct1 % 2) {
+					inpx = ((-((n+1) - 1)*spacingbetween) + (-((n+1) - 1) * ((towerboxcount)* wdt))) + (dCos(((360 / towerboxcount) * ct2) * dDegreeToRad) * rayon);
+					inpz = dSin(((360 / towerboxcount) * ct2) * dDegreeToRad) * rayon;
+					RollAngle = (ct2 * (360 / towerboxcount));
+				}
+				else {
+					inpx = ((-((n+1) - 1)*spacingbetween) + (-((n+1) - 1) * ((towerboxcount)* wdt))) + (dCos((((360.0f / towerboxcount) * ct2) + (360.0f / towerboxcount / 2)) * dDegreeToRad) * rayon);
+					inpz = dSin((((360.0f / towerboxcount) * ct2) + (360.0f / towerboxcount / 2)) * dDegreeToRad) * rayon;
+					RollAngle = ((ct2 * (360.0f / towerboxcount)) + (360.0f / towerboxcount / 2));
+				}
+
+				inpy = -hgt + ((dpt*(ct1 - 1)) + (dpt - 0.01f));
+				mplacement1 = dRollMatrix(-90 * dDegreeToRad);
+				mplacement1.m_posit = dVector(origin.m_x + inpx, origin.m_y + inpy, origin.m_z + inpz);
+				//
+				mplacement2 = dPitchMatrix(RollAngle * dDegreeToRad);
+				mplacement1 = mplacement2 * mplacement1;
+				CreateSimpleSolid(scene, geometry, mass, mplacement1, collision, defaultMaterialID);	
+			}
+		}
+	}
+	// do not forget to release the assets
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
+
 static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
 {
 	// build a standard block stack of 20 * 3 boxes for a total of 60
@@ -291,8 +356,14 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
+	// need more iteration for the tower demo
+//	scene->SetIterations (16);
+
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-//	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
+
+	//0.25, 0.0, -10, 0.45, 0, 0.35, 0.5, 1.0, 1, 80, 12
+	BuildTower(scene, 0.25f, 0.0f, 1.0f, dVector(-2.0f, 0.65f, 25.0f), 0.35f, 0.5f, 1.0f, 1, 80, 12);
+
 
 	int high = 20;
 high = 30;

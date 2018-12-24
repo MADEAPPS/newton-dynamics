@@ -28,7 +28,7 @@
 #endif
 
 #define MAX_PHYSICS_FPS				60.0f
-#define MAX_PHYSICS_SUB_STEPS		2
+#define MAX_PHYSICS_SUB_STEPS		4
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
