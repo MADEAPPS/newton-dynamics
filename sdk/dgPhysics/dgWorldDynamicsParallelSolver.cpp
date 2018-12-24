@@ -143,6 +143,7 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 			dgJointInfo* const jointInfo = &jointArray[jointIndex];
 
 			dgConstraint* const constraint = jointInfo->m_joint;
+			constraint->m_index = jointIndex;
 			const dgBody* const body0 = constraint->GetBody0();
 			const dgBody* const body1 = constraint->GetBody1();
 
@@ -185,8 +186,21 @@ void dgParallelBodySolver::InitWeights()
 
 	dgFloat32 extraPasses = dgFloat32(0.0f);
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+
+	const dgInt32 lru = dgSkeletonContainer::m_lruMarker;
+	dgSkeletonContainer::m_lruMarker += 1;
+
+	m_skeletonCount = 0;
 	for (dgInt32 i = 1; i < bodyCount; i++) {
 		extraPasses = dgMax(weight[i].m_weight, extraPasses);
+
+		dgDynamicBody* const body = (dgDynamicBody*)m_bodyArray[i].m_body;
+		dgSkeletonContainer* const container = body->GetSkeleton();
+		if (container && (container->m_lru != lru)) {
+			container->m_lru = lru;
+			m_skeletonArray[m_skeletonCount] = container;
+			m_skeletonCount ++;
+		}
 	}
 	const dgInt32 conectivity = 7;
 	m_solverPasses += 2 * dgInt32(extraPasses) / conectivity + 1;
@@ -460,12 +474,12 @@ DG_INLINE void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const join
 	if (m0) {
 		dgWorkGroupFloat& out = (dgWorkGroupFloat&)internalForces[m0];
 		dgScopeSpinPause lock(&m_bodyProxyArray[m0].m_lock);
-		out = out + forceAcc0;
+		out = out.MulAdd(forceAcc0, dgWorkGroupFloat(m_bodyProxyArray[m0].m_invWeight));
 	}
 	if (m1) {
 		dgWorkGroupFloat& out = (dgWorkGroupFloat&)internalForces[m1];
 		dgScopeSpinPause lock(&m_bodyProxyArray[m1].m_lock);
-		out = out + forceAcc1;
+		out = out.MulAdd(forceAcc1, dgWorkGroupFloat(m_bodyProxyArray[m1].m_invWeight));
 	}
 }
 
@@ -794,37 +808,64 @@ void dgParallelBodySolver::CalculateJointsAcceleration()
 #endif
 }
 
-void dgParallelBodySolver::CalculateForces()
+void dgParallelBodySolver::InitSkeletons(dgInt32 threadID)
 {
-	const dgInt32 passes = m_solverPasses;
-	m_firstPassCoef = dgFloat32(0.0f);
+	dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
+	const dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
+
+	const dgInt32 count = m_skeletonCount;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
+	dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
 
-	for (dgInt32 step = 0; step < 4; step++) {
-		CalculateJointsAcceleration();
-		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
-		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
-			CalculateJointsForce();
-			accNorm = dgFloat32(0.0f);
-			for (dgInt32 i = 0; i < threadCounts; i++) {
-				accNorm = dgMax(accNorm, m_accelNorm[i]);
-			}
-		}
-		IntegrateBodiesVelocity();
-	}
-
-	UpdateForceFeedback();
-
-	dgInt32 hasJointFeeback = 0;
-	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
-		hasJointFeeback |= m_hasJointFeeback[i];
-	}
-	CalculateBodiesAcceleration();
-
-	if (hasJointFeeback) {
-		UpdateKinematicFeedback();
+	for (dgInt32 i = threadID; i < count; i += threadCounts) {
+		dgSkeletonContainer* const skeleton = skeletonArray[i];
+		skeleton->InitMassMatrix(m_jointArray, leftHandSide, rightHandSide);
 	}
 }
+
+void dgParallelBodySolver::UpdateSkeletons(dgInt32 threadID)
+{
+	const dgInt32 count = m_skeletonCount;
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
+	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
+
+	for (dgInt32 i = threadID; i < count; i += threadCounts) {
+		dgSkeletonContainer* const skeleton = skeletonArray[i];
+		skeleton->CalculateJointForce(m_jointArray, m_bodyArray, internalForces);
+	}
+}
+
+void dgParallelBodySolver::InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->InitSkeletons(threadID);
+}
+
+void dgParallelBodySolver::UpdateSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
+{
+	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
+	me->UpdateSkeletons(threadID);
+}
+
+void dgParallelBodySolver::InitSkeletons()
+{
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	for (dgInt32 i = 0; i < threadCounts; i++) {
+		m_world->QueueJob(InitSkeletonsKernel, this, NULL, "dgParallelBodySolver::InitSkeletonsKernel");
+	}
+	m_world->SynchronizationBarrier();
+}
+
+void dgParallelBodySolver::UpdateSkeletons()
+{
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	for (dgInt32 i = 0; i < threadCounts; i++) {
+		m_world->QueueJob(UpdateSkeletonsKernel, this, NULL, "dgParallelBodySolver::UpdateSkeletons");
+	}
+	m_world->SynchronizationBarrier();
+}
+
 
 #ifdef D_USE_SOA_SOLVER
 
@@ -1285,6 +1326,41 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 	m_accelNorm[threadID] = accNorm.GetScalar();
 }
 #endif
+
+
+void dgParallelBodySolver::CalculateForces()
+{
+	const dgInt32 passes = m_solverPasses;
+	m_firstPassCoef = dgFloat32(0.0f);
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+
+	InitSkeletons();
+	for (dgInt32 step = 0; step < 4; step++) {
+		CalculateJointsAcceleration();
+		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
+		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
+			CalculateJointsForce();
+			accNorm = dgFloat32(0.0f);
+			for (dgInt32 i = 0; i < threadCounts; i++) {
+				accNorm = dgMax(accNorm, m_accelNorm[i]);
+			}
+		}
+		UpdateSkeletons();
+		IntegrateBodiesVelocity();
+	}
+
+	UpdateForceFeedback();
+
+	dgInt32 hasJointFeeback = 0;
+	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
+		hasJointFeeback |= m_hasJointFeeback[i];
+	}
+	CalculateBodiesAcceleration();
+
+	if (hasJointFeeback) {
+		UpdateKinematicFeedback();
+	}
+}
 
 void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {

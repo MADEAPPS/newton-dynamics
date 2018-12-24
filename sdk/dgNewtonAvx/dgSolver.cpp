@@ -453,12 +453,12 @@ DG_INLINE void dgSolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLef
 	if (m0) {
 		dgSoaFloat& out = (dgSoaFloat&)internalForces[m0];
 		dgScopeSpinPause lock(&m_bodyProxyArray[m0].m_lock);
-		out = out + forceAcc0;
+		out = out.MulAdd(forceAcc0, dgSoaFloat(m_bodyProxyArray[m0].m_invWeight));
 	}
 	if (m1) {
 		dgSoaFloat& out = (dgSoaFloat&)internalForces[m1];
 		dgScopeSpinPause lock(&m_bodyProxyArray[m1].m_lock);
-		out = out + forceAcc1;
+		out = out.MulAdd(forceAcc1, dgSoaFloat(m_bodyProxyArray[m1].m_invWeight));
 	}
 }
 
