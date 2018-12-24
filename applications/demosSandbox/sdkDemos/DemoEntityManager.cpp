@@ -28,7 +28,7 @@
 #endif
 
 #define MAX_PHYSICS_FPS				60.0f
-#define MAX_PHYSICS_SUB_STEPS		4
+#define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
@@ -229,6 +229,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_broadPhaseType(0)
 	,m_workerThreads(1)
 	,m_solverPasses(4)
+	,m_solverSubSteps(2)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
 	,m_showUI(true)
@@ -338,6 +339,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_broadPhaseType = 1;
 	m_solverPasses = 4;
 	m_workerThreads = 4;
+//	m_solverSubSteps = 2;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
@@ -639,6 +641,7 @@ void DemoEntityManager::ApplyMenuOptions()
 
 	// clean up all caches the engine have saved
 	//NewtonInvalidateCache(m_world);
+	NewtonSetNumberOfSubsteps (m_world, m_solverSubSteps);
 	NewtonSetSolverIterations(m_world, m_solverPasses);
 	NewtonSetThreadsCount(m_world, m_workerThreads);
 
@@ -742,6 +745,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			//ImGui::Text("iterative solver passes %d", m_solverPasses);
+			ImGui::SliderInt_DoubleSpace("solver sub steps", &m_solverSubSteps, 2, 8);
 			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 20);
 
 			//ImGui::Text("worker threads %d", m_workerThreads);
@@ -936,6 +940,9 @@ void DemoEntityManager::RenderStats()
 			ImGui::Text(text);
 
 			sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
+			ImGui::Text(text);
+
+			sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
 			ImGui::Text(text);
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  

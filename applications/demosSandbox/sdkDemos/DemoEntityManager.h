@@ -125,8 +125,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	int GetDebugDisplay() const;
 	void SetDebugDisplay(int mode) const;
 
-	void SetIterations (int count) {m_solverPasses = dMax (m_solverPasses, count);}
-
 	private:
 	void BeginFrame();
 	void RenderStats();
@@ -183,6 +181,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat m_mainThreadPhysicsTimeAcc;
 
 	int m_solverPasses;
+	int m_solverSubSteps;
 	int m_broadPhaseType;
 	int m_workerThreads;
 	int m_debugDisplayMode;

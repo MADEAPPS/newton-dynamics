@@ -356,14 +356,11 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
-	// need more iteration for the tower demo
-//	scene->SetIterations (16);
-
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
-	//0.25, 0.0, -10, 0.45, 0, 0.35, 0.5, 1.0, 1, 80, 12
-	BuildTower(scene, 0.25f, 0.0f, 1.0f, dVector(-2.0f, 0.65f, 25.0f), 0.35f, 0.5f, 1.0f, 1, 80, 12);
-
+	// tower is very hard to stabilize, needs more iteration 
+	//BuildTower(scene, 0.25f, 0.0f, 1.0f, dVector(-2.0f, 0.65f, 25.0f), 0.35f, 0.5f, 1.0f, 1, 80, 12);
+	//BuildTower(scene, 0.25f, 0.0f, 1.0f, dVector(-2.0f, 0.65f, 25.0f), 0.35f, 0.5f, 1.0f, 1, 30, 12);
 
 	int high = 20;
 high = 30;
@@ -387,6 +384,7 @@ high = 30;
 	}
 
 	high = 20;
+
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);

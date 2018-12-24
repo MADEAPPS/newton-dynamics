@@ -47,16 +47,16 @@ struct SERVO_VEHICLE_DEFINITION
 static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
 {
 	{"body",		"convexHull",		   4096.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
-//	{"fr_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
+	{"fr_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
 	{"fl_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
-//	{"rr_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
-//	{"rl_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
-//	{"lift_1",		"convexHull",			 50.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
-//	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"lift_4",		"convexHull",			 20.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-//	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"rr_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+	{"rl_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
+	{"lift_1",		"convexHull",			 50.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
+	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"lift_4",		"convexHull",			 20.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 class dLifterUserData: public DemoEntity::UserData
@@ -665,7 +665,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 	dCustomWheel* LinkFrontTireJoint(dCustomTransformController* const controller, NewtonBody* const chassis, NewtonBody* const tire)
 	{
 		dCustomWheel* const wheel = LinkTireJoint(chassis, tire);
-/*
+
 		// link traction tire to the engine using a differential gear
 		dMatrix matrix;
 		dMatrix engineMatrix;
@@ -683,7 +683,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
 		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up.Scale(-1.0f), engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
-*/
+
 		return wheel;
 	}
 
@@ -827,7 +827,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 		// add the root bone to the articulation manager
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
-/*
+
 		// add engine
 		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
 		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
@@ -835,9 +835,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 		// set power parameter for a simple DC engine
 		lifterData->m_maxEngineSpeed = 20.0f;
-		lifterData->m_engineMotor->SetTorque(1000.0f);
-		//lifterData->m_engineMotor->SetTorque1(1500.0f);
-*/
+		lifterData->m_engineMotor->SetTorque(3000.0f);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
@@ -938,17 +936,19 @@ void ServoJoints (DemoEntityManager* const scene)
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
-
+	
 	// load a the mesh of the articulate vehicle
 	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
 
 	// place heavy load to show reproduce black bird dream problems
-//	MakeHeavyLoad (scene, matrix);
+	matrix.m_posit.m_x += 2.0f;	
+	matrix.m_posit.m_z -= 2.0f;	
+	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 
 //	origin.m_x -= 5.0f;
 	origin.m_y += 2.0f;
