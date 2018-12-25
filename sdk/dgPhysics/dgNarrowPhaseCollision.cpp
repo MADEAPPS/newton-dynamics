@@ -1119,6 +1119,7 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 	proxy.m_skinThickness = material->m_skinThickness;
 
 	if (body1->m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
+		dgAssert(contact->m_body1->GetInvMass().m_w == dgFloat32(0.0f));
 		SceneContacts(pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		contact->SwapBodies();
@@ -1127,25 +1128,16 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		CompoundContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
-		dgFloat32 invMass = body1->GetInvMass().m_w;
 		contact->SwapBodies();
 		CompoundContacts (pair, proxy);
-		if (!invMass) {
-			contact->SwapBodies();
-		}
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		ConvexContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
-		dgFloat32 invMass = body1->GetInvMass().m_w;
 		contact->SwapBodies();
 		ConvexContacts (pair, proxy);
-		if (!invMass) {
-			contact->SwapBodies();
-		}
 	}
 	pair->m_timestep = proxy.m_timestep;
 }
-
 
 dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex, dgVector& p, dgVector& q, dgVector& normal, dgFloat32 dist) const
 {
