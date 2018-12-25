@@ -177,6 +177,9 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	
 	NewtonMesh* const mesh = meshInfo->GetMesh();
 
+	// recalculate mesh normals
+	//NewtonMeshCalculateVertexNormals(mesh, 45.0f * dDegreeToRad);
+
 	// extract vertex data  from the newton mesh		
 	AllocVertexData(NewtonMeshGetPointCount (mesh));
 	NewtonMeshGetVertexChannel (mesh, 3 * sizeof (dFloat), (dFloat*) m_vertex);

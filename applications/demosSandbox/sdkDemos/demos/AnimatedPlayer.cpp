@@ -825,9 +825,15 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	dMatrix origin (dGetIdentityMatrix());
 
-	DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skintest.ngd", scene->GetNewton());
-	xxxx0->ResetMatrix(*scene, origin);
+	DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("whiteMan.ngd", scene->GetNewton());
+	xxxx0->ResetMatrix(*scene, xxxx0->GetCurrentMatrix() * origin);
 	scene->Append(xxxx0);
+
+	DemoEntity* const xxxx1 = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton());
+	dMatrix origin1 (origin);
+	origin1.m_posit.m_z = 2.0f;
+	xxxx1->ResetMatrix(*scene, xxxx1->GetCurrentMatrix() * origin1);
+	scene->Append(xxxx1);
 	
 /*
 	BalancingDummyManager* const robotManager = new BalancingDummyManager(scene);

@@ -405,8 +405,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 						}
 					}
 
-				}
-				else if (nodeInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
+				} else if (nodeInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
 					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(node);
 					if (!cacheNode) {
 						DemoMeshInterface* const mesh = new DemoBezierCurve(&scene, node);
