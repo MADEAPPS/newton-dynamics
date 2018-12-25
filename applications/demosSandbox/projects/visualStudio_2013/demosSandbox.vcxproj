@@ -43,6 +43,7 @@
     <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\AnimatedPlayer.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />

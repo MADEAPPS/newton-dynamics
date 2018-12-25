@@ -160,7 +160,8 @@ void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* const skinNode, 
 			if (m_vertexWeights[vertexIndex][j] == 0.0f) {
 				dAssert (node && node->GetInfo() >= 0);
 				m_vertexWeights[vertexIndex][j] = skinData[i].m_weight;
-				m_boneWeightIndex[vertexIndex].m_index[j] = node->GetInfo();
+				int boneIndex = node->GetInfo();
+				m_boneWeightIndex[vertexIndex].m_index[j] = boneIndex;
 				break;
 			}
 		}

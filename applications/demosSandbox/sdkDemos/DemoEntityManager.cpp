@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-#define DEFAULT_SCENE	8			// box stacks
+//#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -71,12 +71,13 @@
 //#define DEFAULT_SCENE	37			// David Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles
-//#define DEFAULT_SCENE	30			// basic player controller
-//#define DEFAULT_SCENE	31			// advanced player controller
-//#define DEFAULT_SCENE	42			// cloth patch			
-//#define DEFAULT_SCENE	43			// soft bodies	
-//#define DEFAULT_SCENE	44			// joe's joint test
-//#define DEFAULT_SCENE	45			// Misho's Hinge Test
+//#define DEFAULT_SCENE	40			// basic player controller
+#define DEFAULT_SCENE	41			// animated player controller
+//#define DEFAULT_SCENE	42			// advanced player controller
+//#define DEFAULT_SCENE	43			// cloth patch			
+//#define DEFAULT_SCENE	44			// soft bodies	
+//#define DEFAULT_SCENE	45			// joe's joint test
+//#define DEFAULT_SCENE	46			// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -112,6 +113,7 @@ void BasicMultibodyVehicle(DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
+void AnimatedPlayerController (DemoEntityManager* const scene);
 void AdvancedPlayerController (DemoEntityManager* const scene);
 void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
@@ -171,6 +173,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
+	{"Animated player controller", "demonstrate inverse kinematic player controller", AnimatedPlayerController},
 	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
@@ -507,7 +510,6 @@ void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 		}
 	}
 }
-
 
 void DemoEntityManager::Cleanup ()
 {

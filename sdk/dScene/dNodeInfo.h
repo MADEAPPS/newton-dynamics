@@ -44,6 +44,7 @@ class dSceneRender;
 	}																		\
 	exportType static const className& GetSingleton()						\
 	{																		\
+		className dommyRegister;														\
 		return m_singletonClass;											\
 	}																		\
 	static className m_singletonClass;
