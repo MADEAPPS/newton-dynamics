@@ -68,7 +68,7 @@ static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, Glob
 static void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, GlobalNodeMap& nodeMap);
 static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
-static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
+static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId);
 
 
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
@@ -278,10 +278,27 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 	m_materialId = 0;
 	LoadHierarchy(fbxScene, ngdScene, nodeMap);
 
+	int boneId = 0;
 	GlobalNodeMap::Iterator iter(nodeMap);
 	for (iter.Begin(); iter; iter++) {
 		FbxNode* const fbxNode = iter.GetKey();
-		dScene::dTreeNode* const node = iter.GetNode()->GetInfo();
+		dScene::dTreeNode* const ngdNode = iter.GetNode()->GetInfo();
+		FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
+
+		if (attribute) {
+			FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
+			if (attributeType == FbxNodeAttribute::eSkeleton)
+			{
+				ImportSkeleton(ngdScene, fbxScene, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials, boneId);
+				boneId++;
+			}
+		}
+	}
+
+	
+	for (iter.Begin(); iter; iter++) {
+		FbxNode* const fbxNode = iter.GetKey();
+		dScene::dTreeNode* const ngdNode = iter.GetNode()->GetInfo();
 		FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
 
 		if (attribute) {
@@ -291,13 +308,14 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 			{
 				case FbxNodeAttribute::eMesh:
 				{
-					ImportMeshNode(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials, nodeMap);
+					ImportMeshNode(fbxScene, ngdScene, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials, nodeMap);
 					break;
 				}
 
 				case FbxNodeAttribute::eSkeleton:
 				{
-					ImportSkeleton(ngdScene, fbxScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+					//ImportSkeleton(ngdScene, fbxScene, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials, boneId);
+					//boneId++;
 					break;
 				}
 
@@ -319,8 +337,6 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 				{
 					break;
 				}
-
-
 
 				case FbxNodeAttribute::eMarker:
 				case FbxNodeAttribute::eNurbs:
@@ -785,7 +801,9 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 
 				GlobalNodeMap::dTreeNode* const boneNode = nodeMap.Find(fbxBone);
 				if (boneNode) {
-					dScene::dTreeNode* const bone = boneNode->GetInfo();
+					dScene::dTreeNode* const parentbone = boneNode->GetInfo();
+					dScene::dTreeNode* const bone = ngdScene->FindChildByType(parentbone, dBoneNodeInfo::GetRttiType());
+					dAssert(bone);
 
 					// Get the bind pose
 					//FbxAMatrix bindPoseMatrix;
@@ -831,14 +849,11 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 	}
 }
 
-
-static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
+static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const ngdNode, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId)
 {
 	FbxSkeleton* fbxBone = (FbxSkeleton*)fbxNode->GetNodeAttribute();
 
-	//printf("%s\n", (char *)fbxNode->GetName());
-
-	dScene::dTreeNode* const boneNode = ngdScene->CreateBoneNode(node);
+	dScene::dTreeNode* const boneNode = ngdScene->CreateBoneNode(ngdNode);
 	dBoneNodeInfo* const bone = (dBoneNodeInfo*)ngdScene->GetInfoFromNode(boneNode);
 	bone->SetName(fbxNode->GetName());
 
@@ -852,6 +867,7 @@ static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, Fbx
 	} else {
 		bone->SetType(dBoneNodeInfo::m_effector);
 	}
+	bone->SetId(boneId);
 }
 
 

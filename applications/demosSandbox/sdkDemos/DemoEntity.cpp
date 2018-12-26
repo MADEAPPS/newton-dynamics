@@ -332,29 +332,42 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 	// this will apply all local scale and transform to the mesh
 	scene.FreezeGeometryPivot();
 
-	dScene::dTreeNode* meshRootNode = NULL;
+	int rootCount = 0;
+	dScene::dTreeNode* meshRootNodeArray[256];
 	dScene::dTreeNode* const root = scene.GetRootNode();
 	for (void* child = scene.GetFirstChildLink(root); child; child = scene.GetNextChildLink(root, child)) {
 		dScene::dTreeNode* const sceneNode = scene.GetNodeFromLink(child);
-		dNodeInfo* const scaneInfo = scene.GetInfoFromNode(sceneNode);
-		if (scaneInfo->GetTypeId() == dSceneNodeInfo::GetRttiType()) {
-			meshRootNode = sceneNode;
-			break;
+		dNodeInfo* const nodeInfo = scene.GetInfoFromNode(sceneNode);
+		if (nodeInfo->GetTypeId() == dSceneNodeInfo::GetRttiType()) {
+			meshRootNodeArray[rootCount] = sceneNode;
+			rootCount ++;
 		}
 	}
 
-	DemoEntity* const entity = new DemoEntity(dGetIdentityMatrix(), NULL);
-	if (meshRootNode) {
-		int stack;
+	DemoEntity* returnEntity = NULL;
+	DemoEntity* entity[256];
+	entity[0] = NULL;
+	if (rootCount) {
+		int stack = 0;
+		int bonesCount = 0;
 		int modifiersCount = 0;
 		DemoEntity* entityStack[256];
 		dScene::dTreeNode* nodeStack[256];
+		DemoEntity* entityModifiers[256];
 		dScene::dTreeNode* nodeModifiers[256];
+		dBoneNodeInfo* bones[256];
+		//int bonesIndex[256];
 
-		entityStack[0] = entity;
-		nodeStack[0] = meshRootNode;
-
-		stack = 1;
+		DemoEntity* parent = NULL;
+		if (rootCount > 1) {
+			parent = new DemoEntity(dGetIdentityMatrix(), NULL);
+		}
+		for (int i = 0; i < rootCount; i ++) {
+			entity[stack] = new DemoEntity(dGetIdentityMatrix(), parent);
+			entityStack[stack] = entity[stack];
+			nodeStack[stack] = meshRootNodeArray[stack];
+			stack ++;
+		}
 
 		dTree<DemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
 		while (stack) {
@@ -363,16 +376,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			DemoEntity* const entity = entityStack[stack];
 			dScene::dTreeNode* sceneNode = nodeStack[stack];
 
-			//dMatrix parentMatrix (GetIdentityMatrix());
-			//dScene::dTreeNode* const parentNode = scene.FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType());
-			//if (parentNode) {
-			//	dSceneNodeInfo* const parentInfo = (dSceneNodeInfo*)scene.GetInfoFromNode (parentNode);
-			//	dAssert (parentInfo->IsType(dSceneNodeInfo::GetRttiType()));
-			//	parentMatrix = parentInfo->GetTransform();
-			//}
-
 			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)scene.GetInfoFromNode(sceneNode);
-			//dMatrix matrix (sceneInfo->GetTransform() * parentMatrix.Inverse4x4());
 			dMatrix matrix(sceneInfo->GetTransform());
 			dQuaternion rot(matrix);
 			entity->m_curPosition = matrix.m_posit;
@@ -400,6 +404,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 						dScene::dTreeNode* const modifierNode = scene.GetNodeFromLink(ptr);
 						dNodeInfo* const modifierInfo = scene.GetInfoFromNode(modifierNode);
 						if (modifierInfo->IsType(dGeometryNodeModifierInfo::GetRttiType())) {
+							entityModifiers[modifiersCount] = entity;
 							nodeModifiers[modifiersCount] = modifierNode;
 							modifiersCount++;
 						}
@@ -413,13 +418,17 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 					}
 					DemoMeshInterface* const mesh = cacheNode->GetInfo();
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
+				} else if (nodeInfo->GetTypeId() == dBoneNodeInfo::GetRttiType()) {
+					dBoneNodeInfo* const bone = (dBoneNodeInfo*)nodeInfo;
+					bones[bonesCount] = bone;
+					bonesCount++;
 				}
 			}
 
 			for (void* child = scene.GetFirstChildLink(sceneNode); child; child = scene.GetNextChildLink(sceneNode, child)) {
 				dScene::dTreeNode* const node = scene.GetNodeFromLink(child);
-				dNodeInfo* const info = scene.GetInfoFromNode(node);
-				if (info->IsType(dSceneNodeInfo::GetRttiType())) {
+				dNodeInfo* const nodeInfo = scene.GetInfoFromNode(node);
+				if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
 					nodeStack[stack] = node;
 					entityStack[stack] = new DemoEntity(dGetIdentityMatrix(), entity);
 					stack++;
@@ -434,17 +443,29 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			meshDictionary.Remove(node);
 		}
 
-		for (int i = 0; i < modifiersCount; i++) {
-			dScene::dTreeNode* const node = nodeModifiers[i];
-			dNodeInfo* const nodeInfo = scene.GetInfoFromNode(node);
-			if (nodeInfo->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
-				//				dAssert (0);
-				//skinMesh = (dGeometryNodeSkinModifierInfo*)info;
+		returnEntity = entity[0] ? (entity[0]->GetParent() ? entity[0]->GetParent() : entity[0]) : NULL;
+		if (modifiersCount) {
+			DemoEntity* entityBones[256];
+			for (int i = 0; i < bonesCount; i ++) {
+				dBoneNodeInfo* const bone = bones[i];
+//				entityBones[bone->m_]
+			}
+
+
+			for (int i = 0; i < modifiersCount; i++) {
+				dScene::dTreeNode* const node = nodeModifiers[i];
+				dNodeInfo* const nodeInfo = scene.GetInfoFromNode(node);
+				if (nodeInfo->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
+					DemoMesh* const mesh = (DemoMesh*)entityModifiers[i]->GetMesh();
+					dGeometryNodeSkinModifierInfo* const skiMesh = (dGeometryNodeSkinModifierInfo*)nodeInfo;
+					dGeometryNodeSkinModifierInfo* const skiMesh1 = (dGeometryNodeSkinModifierInfo*)nodeInfo;
+					//skinMesh = (dGeometryNodeSkinModifierInfo*)info;
+				}
 			}
 		}
 	}
 
-	return entity;
+	return returnEntity;
 }
 
 DemoEntity* DemoEntity::LoadOBJ_mesh (const char* const fileName, NewtonWorld* const world, const dMatrix& convertMatrix)
