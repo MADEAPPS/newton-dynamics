@@ -136,7 +136,11 @@ class DemoSkinMesh: public DemoMeshInterface
 	NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected: 
+	void BuildSkin ();
+
 	DemoMesh* m_mesh;
+	dFloat* m_vertex;
+	dFloat* m_normal;
 };
 
 #endif 

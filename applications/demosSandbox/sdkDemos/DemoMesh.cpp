@@ -149,8 +149,6 @@ void DemoSubMesh::AllocIndexData (int indexCount)
 	m_indexes = new unsigned [m_indexCount]; 
 }
 
-
-
 DemoMesh::DemoMesh(const char* const name)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
@@ -193,7 +191,7 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	matrix = (matrix.Inverse4x4()).Transpose();
 	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat), m_normal, 3 * sizeof (dFloat), m_vertexCount);
 
-	bool hasModifiers = false;
+//	bool hasModifiers = false;
 	dTree<dScene::dTreeNode*, dCRCTYPE> materialMap;
 	for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink (meshNode, ptr)) {
 		dScene::dTreeNode* const node = scene->GetNodeFromLink(ptr);
@@ -202,8 +200,8 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 			dMaterialNodeInfo* const material = (dMaterialNodeInfo*)info;
 			dCRCTYPE id = material->GetId();
 			materialMap.Insert(node, id);
-		} else if (info->IsType(dGeometryNodeModifierInfo::GetRttiType())) {
-			hasModifiers = true;
+//		} else if (info->IsType(dGeometryNodeModifierInfo::GetRttiType())) {
+//			hasModifiers = true;
 		}
 	}
 
@@ -244,10 +242,10 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	}
 	NewtonMeshEndHandle (mesh, meshCookie); 
 
-	if (!hasModifiers) {
+//	if (!hasModifiers) {
 		// see if this mesh can be optimized
 		OptimizeForRender ();
-	}
+//	}
 }
 
 DemoMesh::DemoMesh(NewtonMesh* const mesh)
@@ -412,7 +410,6 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	OptimizeForRender ();
 }
 
-
 DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
@@ -525,8 +522,6 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 	OptimizeForRender();
 }
 
-
-
 DemoMesh::~DemoMesh()
 {
 	if (m_vertex) {
@@ -536,7 +531,6 @@ DemoMesh::~DemoMesh()
 		ResetOptimization();
 	}
 }
-
 
 NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
@@ -912,11 +906,18 @@ DemoSkinMesh::DemoSkinMesh(DemoMesh* const mesh)
 	,m_mesh(mesh)
 {
 	m_mesh->AddRef();
+	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
+	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
+
+
+
 }
 
 DemoSkinMesh::~DemoSkinMesh()
 {
 	m_mesh->Release();
+	delete[] m_vertex;
+	delete[] m_normal; 
 }
 
 void DemoSkinMesh::RenderTransparency () const
@@ -936,5 +937,28 @@ NewtonMesh* DemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatr
 
 void DemoSkinMesh::Render (DemoEntityManager* const scene)
 {
-	m_mesh->Render(scene);
+	BuildSkin ();
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, 0, m_vertex);
+	glNormalPointer(GL_FLOAT, 0, m_normal);
+	glTexCoordPointer(2, GL_FLOAT, 0, m_mesh->m_uv);
+
+	for (DemoMesh::dListNode* nodes = m_mesh->GetFirst(); nodes; nodes = nodes->GetNext()) {
+		DemoSubMesh& segment = nodes->GetInfo();
+		segment.Render();
+	}
+	glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
+	glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
+}
+
+
+void DemoSkinMesh::BuildSkin ()
+{
+	memcpy (m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+	memcpy (m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 }
