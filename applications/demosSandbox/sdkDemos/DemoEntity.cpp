@@ -356,6 +356,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 		DemoEntity* entityModifiers[256];
 		dScene::dTreeNode* nodeModifiers[256];
 		dBoneNodeInfo* bones[256];
+		DemoEntity* bonesEntities[256];
 		//int bonesIndex[256];
 
 		DemoEntity* parent = NULL;
@@ -421,6 +422,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 				} else if (nodeInfo->GetTypeId() == dBoneNodeInfo::GetRttiType()) {
 					dBoneNodeInfo* const bone = (dBoneNodeInfo*)nodeInfo;
 					bones[bonesCount] = bone;
+					bonesEntities[bonesCount] = entity;
 					bonesCount++;
 				}
 			}
@@ -445,12 +447,11 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 
 		returnEntity = entity[0] ? (entity[0]->GetParent() ? entity[0]->GetParent() : entity[0]) : NULL;
 		if (modifiersCount) {
-			DemoEntity* entityBones[256];
+			DemoEntity* sortedBonesEntities[256];
 			for (int i = 0; i < bonesCount; i ++) {
 				dBoneNodeInfo* const bone = bones[i];
-//				entityBones[bone->m_]
+				sortedBonesEntities[bone->GetId()] = bonesEntities[i];
 			}
-
 
 			for (int i = 0; i < modifiersCount; i++) {
 				dScene::dTreeNode* const node = nodeModifiers[i];

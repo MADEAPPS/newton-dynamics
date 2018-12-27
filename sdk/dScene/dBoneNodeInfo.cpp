@@ -25,7 +25,7 @@ D_IMPLEMENT_CLASS_NODE(dBoneNodeInfo);
 
 dBoneNodeInfo::dBoneNodeInfo()
 	:dNodeInfo ()
-	,m_id(0)
+	,m_boneIndex(0)
 	,m_lengh (0.0f) 
 	,m_type(m_effector)
 {
@@ -48,12 +48,12 @@ void dBoneNodeInfo::SetLength(dFloat length)
 
 int dBoneNodeInfo::GetId() const
 {
-	return m_id;
+	return m_boneIndex;
 }
 
 void dBoneNodeInfo::SetId(int id)
 {
-	m_id = id;
+	m_boneIndex = id;
 }
 
 void dBoneNodeInfo::SetType(dBoneType type)
@@ -73,7 +73,7 @@ void dBoneNodeInfo::Serialize (TiXmlElement* const rootNode) const
 	TiXmlElement* boneData = new TiXmlElement ("boneData");
 	rootNode->LinkEndChild(boneData);
 
-	boneData->SetAttribute("id", m_id);
+	boneData->SetAttribute("boneIndex", m_boneIndex);
 	boneData->SetDoubleAttribute("length", m_lengh);
 	boneData->SetAttribute("type", int (m_type));
 }
@@ -84,7 +84,7 @@ bool dBoneNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const 
 
 	TiXmlElement* const boneData = (TiXmlElement*) rootNode->FirstChild ("boneData");
 
-	boneData->Attribute("index", (int*)&m_id);
+	boneData->Attribute("boneIndex", (int*)&m_boneIndex);
 	dStringToFloatArray (boneData->Attribute("length"), &m_lengh, 1);
 	int type;
 	dStringToIntArray(boneData->Attribute("type"), &type, 1);
