@@ -16,7 +16,6 @@
 class DemoMesh;
 class DemoEntityManager;
 
-
 class DemoMeshInterface: public dClassInfo  
 {
 	public:
@@ -30,7 +29,7 @@ class DemoMeshInterface: public dClassInfo
 	virtual void RenderTransparency () const = 0;
 	virtual void Render (DemoEntityManager* const scene) = 0;
 	virtual void RenderNormals () = 0;
-	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix) = 0;
+	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
 
 	dAddRtti(dClassInfo,DOMMY_API);
 
@@ -62,7 +61,6 @@ class DemoSubMesh
 	dString  m_textureName;
 };
 
-
 class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 {
 	public:
@@ -86,7 +84,7 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	virtual void RenderNormals ();
 
 	void OptimizeForRender();
-	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);
+	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected:
 	virtual ~DemoMesh();
@@ -96,7 +94,6 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	void  ResetOptimization();
 	void  SpliteSegment(dListNode* const node, int maxIndexCount);
 
-
 	public:
 	int m_vertexCount;
 	dFloat* m_uv;
@@ -105,8 +102,6 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
 };
-
-
 
 class DemoBezierCurve: public DemoMeshInterface
 {
@@ -121,7 +116,7 @@ class DemoBezierCurve: public DemoMeshInterface
 	virtual void Render (DemoEntityManager* const scene);
 	virtual void RenderNormals ();
 
-	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);
+	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	dBezierSpline m_curve;
 	int m_renderResolution;
@@ -129,6 +124,20 @@ class DemoBezierCurve: public DemoMeshInterface
 	dAddRtti (DemoMeshInterface, DOMMY_API);
 };
 
+class DemoSkinMesh: public DemoMeshInterface
+{
+	public:
+	DemoSkinMesh(DemoMesh* const mesh);
+	~DemoSkinMesh();
+
+	void Render (DemoEntityManager* const scene);
+	void RenderNormals ();
+	void RenderTransparency () const;
+	NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
+
+	protected: 
+	DemoMesh* m_mesh;
+};
 
 #endif 
 

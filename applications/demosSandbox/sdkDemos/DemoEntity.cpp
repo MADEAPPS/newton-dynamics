@@ -454,13 +454,20 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			}
 
 			for (int i = 0; i < modifiersCount; i++) {
-				dScene::dTreeNode* const node = nodeModifiers[i];
-				dNodeInfo* const nodeInfo = scene.GetInfoFromNode(node);
-				if (nodeInfo->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
-					DemoMesh* const mesh = (DemoMesh*)entityModifiers[i]->GetMesh();
-					dGeometryNodeSkinModifierInfo* const skiMesh = (dGeometryNodeSkinModifierInfo*)nodeInfo;
-					dGeometryNodeSkinModifierInfo* const skiMesh1 = (dGeometryNodeSkinModifierInfo*)nodeInfo;
-					//skinMesh = (dGeometryNodeSkinModifierInfo*)info;
+				dScene::dTreeNode* const skinNode = nodeModifiers[i];
+				dNodeInfo* const skinNodeInfo = scene.GetInfoFromNode(skinNode);
+				if (skinNodeInfo->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
+					dScene::dTreeNode* const meshNode = scene.FindParentByType(skinNode, dMeshNodeInfo::GetRttiType());
+					dAssert (meshNode);
+					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(meshNode);
+					const int* const indexMap = meshInfo->GetIndexToVertexMap();
+					DemoEntity* const skinEntity = entityModifiers[i];
+					DemoMesh* const mesh = (DemoMesh*)skinEntity->GetMesh();
+					dGeometryNodeSkinModifierInfo* const skinModifier = (dGeometryNodeSkinModifierInfo*)skinNodeInfo;
+
+					DemoSkinMesh* const skinMesh = new DemoSkinMesh(mesh);
+					skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());
+					skinMesh->Release();
 				}
 			}
 		}
