@@ -127,7 +127,11 @@ class DemoBezierCurve: public DemoMeshInterface
 class DemoSkinMesh: public DemoMeshInterface
 {
 	public:
-	DemoSkinMesh(DemoMesh* const mesh);
+	struct dWeightBoneIndex
+	{
+		int m_boneIndex[4];
+	};
+	DemoSkinMesh(DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap);
 	~DemoSkinMesh();
 
 	void Render (DemoEntityManager* const scene);
@@ -141,6 +145,10 @@ class DemoSkinMesh: public DemoMeshInterface
 	DemoMesh* m_mesh;
 	dFloat* m_vertex;
 	dFloat* m_normal;
+	dVector* m_weights;
+	dWeightBoneIndex* m_weighIndex;
+	int* m_skinIndexMap; 
+	int m_weightcount;
 };
 
 #endif 

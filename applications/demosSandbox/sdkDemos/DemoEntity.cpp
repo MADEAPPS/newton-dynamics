@@ -465,7 +465,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 					DemoMesh* const mesh = (DemoMesh*)skinEntity->GetMesh();
 					dGeometryNodeSkinModifierInfo* const skinModifier = (dGeometryNodeSkinModifierInfo*)skinNodeInfo;
 
-					DemoSkinMesh* const skinMesh = new DemoSkinMesh(mesh);
+					DemoSkinMesh* const skinMesh = new DemoSkinMesh(mesh, skinModifier, indexMap);
 					skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());
 					skinMesh->Release();
 				}

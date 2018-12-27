@@ -901,16 +901,28 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	}
 }
 
-DemoSkinMesh::DemoSkinMesh(DemoMesh* const mesh)
+DemoSkinMesh::DemoSkinMesh(DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap)
 	:DemoMeshInterface()
 	,m_mesh(mesh)
 {
 	m_mesh->AddRef();
 	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
 	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
+	m_weights = new dVector [skinModifier->m_vertexCount];
+	m_weighIndex = new dWeightBoneIndex [skinModifier->m_vertexCount];
+	m_skinIndexMap = new int[m_mesh->m_vertexCount];
 
+	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
+		m_skinIndexMap[i] = indexMap[i];
+	}
 
-
+	m_weightcount = skinModifier->m_boneCount;
+	for (int i = 0; i < skinModifier->m_vertexCount; i ++) {
+		m_weights[i] = skinModifier->m_vertexWeights[i];
+		for (int j = 0; j < sizeof (dWeightBoneIndex)/sizeof (int); j ++) {
+			m_weighIndex[i].m_boneIndex[j] = skinModifier->m_boneWeightIndex[i].m_index[j];
+		}
+	}
 }
 
 DemoSkinMesh::~DemoSkinMesh()
@@ -918,6 +930,9 @@ DemoSkinMesh::~DemoSkinMesh()
 	m_mesh->Release();
 	delete[] m_vertex;
 	delete[] m_normal; 
+	delete[] m_weights;
+	delete[] m_weighIndex;
+	delete[] m_skinIndexMap;
 }
 
 void DemoSkinMesh::RenderTransparency () const
