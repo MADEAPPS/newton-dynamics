@@ -312,7 +312,7 @@ DemoEntityManager::DemoEntityManager ()
 #ifdef _MSC_VER 
 	io.ImeWindowHandle = glfwGetWin32Window(m_mainFrame);
 #else 
-	dTrace (("no sure if this what to set this to for non wiondes systems\n"))
+	dTrace (("no sure what to set this to for non windews systems\n"))
 //	dAssert (0);
 #endif
 
