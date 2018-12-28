@@ -825,8 +825,8 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	dMatrix origin (dGetIdentityMatrix());
 
-	//DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("whiteMan.ngd", scene->GetNewton());
-	DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skinTest.ngd", scene->GetNewton());
+	//DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("whiteman.ngd", scene->GetNewton());
+	DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skintest.ngd", scene->GetNewton());
 	xxxx0->ResetMatrix(*scene, xxxx0->GetCurrentMatrix() * origin);
 	scene->Append(xxxx0);
 
