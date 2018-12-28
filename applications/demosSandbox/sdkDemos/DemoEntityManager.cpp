@@ -936,10 +936,10 @@ void DemoEntityManager::RenderStats()
 				}
 			}
 
-			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
+			sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
 			ImGui::Text(text);
 
-			sprintf (text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
+			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
 			ImGui::Text(text);
 
 			sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));

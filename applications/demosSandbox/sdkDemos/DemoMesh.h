@@ -145,7 +145,8 @@ class DemoSkinMesh: public DemoMeshInterface
 	void BuildSkin ();
 
 	DemoMesh* m_mesh;
-	DemoEntity* m_owner; 
+	DemoEntity* m_root; 
+	DemoEntity* m_entity; 
 	dFloat* m_vertex;
 	dFloat* m_normal;
 	dVector* m_weights;

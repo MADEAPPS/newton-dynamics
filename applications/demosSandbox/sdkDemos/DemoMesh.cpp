@@ -905,10 +905,11 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount)
 	:DemoMeshInterface()
 	,m_mesh(mesh)
-	,m_owner(owner)
+	,m_root(owner)
+	,m_entity(owner)
 {
-	while (m_owner->GetParent()) {
-		m_owner = m_owner->GetParent();
+	while (m_root->GetParent()) {
+		m_root = m_root->GetParent();
 	}
 	
 	m_mesh->AddRef();
@@ -944,9 +945,9 @@ DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeome
 		nodeMap.Insert(i, bones[i]);
 	}
 
-	pool[0] = m_owner;
+	pool[0] = m_root;
 	parentMatrix[0] = dGetIdentityMatrix();
-	dMatrix shapeBindMatrix(owner->GetMeshMatrix() * owner->CalculateGlobalMatrix());
+	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
 	while (stack) {
 		stack --;
 		DemoEntity* const entity = pool[stack];
@@ -1032,16 +1033,19 @@ void DemoSkinMesh::BuildSkin ()
 	int stack = 1;
 	DemoEntity* pool[32];
 	dMatrix parentMatrix[32];
-	pool[0] = m_owner;
-	parentMatrix[0] = dGetIdentityMatrix();
-
+	pool[0] = m_root;
+	
 	int count = 0;
+	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
+	shapeBindMatrix = shapeBindMatrix.Inverse();
+
+	parentMatrix[0] = dGetIdentityMatrix();
 	dMatrix* const bindMatrix = dAlloca (dMatrix, m_nodeCount);
 	while (stack) {
 		stack--;
 		DemoEntity* const entity = pool[stack];
 		dMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
-		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix;
+		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix * shapeBindMatrix;
 		count ++;
 		dAssert (count <= m_nodeCount);
 		for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
