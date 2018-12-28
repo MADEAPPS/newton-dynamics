@@ -57,11 +57,11 @@ class dGeometryNodeSkinModifierInfo: public dGeometryNodeModifierInfo
 	DSCENE_API virtual void Serialize (TiXmlElement* const rootNode) const;
 	DSCENE_API virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 
-	int m_boneCount;
 	int m_vertexCount;
-	dMatrix m_shapeBindMatrix;
+	int m_weightsPerVertex;
+//	dMatrix m_shapeBindMatrix;
 	dVector* m_vertexWeights;
-	dMatrix* m_boneBindingMatrix;
+//	dMatrix* m_boneBindingMatrix;
 	dBoneWeightIndex* m_boneWeightIndex;
 };
 

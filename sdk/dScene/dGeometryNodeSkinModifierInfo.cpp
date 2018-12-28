@@ -31,11 +31,12 @@ D_IMPLEMENT_CLASS_NODE(dGeometryNodeSkinModifierInfo);
 
 dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo()
 	:dGeometryNodeModifierInfo () 
-	,m_boneCount(0)
+//	,m_boneCount(0)
 	,m_vertexCount(0)
-	,m_shapeBindMatrix(dGetIdentityMatrix()) 
+	,m_weightsPerVertex(0)
+//	,m_shapeBindMatrix(dGetIdentityMatrix()) 
 	,m_vertexWeights(NULL)
-	,m_boneBindingMatrix(NULL)
+//	,m_boneBindingMatrix(NULL)
 	,m_boneWeightIndex(NULL)
 {
 	SetName ("Skin Modifier");
@@ -43,24 +44,25 @@ dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo()
 
 dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo(dScene* const world)
 	:dGeometryNodeModifierInfo ()
-	,m_boneCount(0)
+//	,m_boneCount(0)
 	,m_vertexCount(0)
-	,m_shapeBindMatrix(dGetIdentityMatrix()) 
+	,m_weightsPerVertex(0)
+//	,m_shapeBindMatrix(dGetIdentityMatrix()) 
 	,m_vertexWeights(NULL)
-	,m_boneBindingMatrix(NULL)
+//	,m_boneBindingMatrix(NULL)
 	,m_boneWeightIndex(NULL)
 {
 	SetName ("Skin Modifier");
 }
 
-
 dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo(const dGeometryNodeSkinModifierInfo& me)
 	:dGeometryNodeModifierInfo (me)
-	,m_boneCount(0)
+//	,m_boneCount(0)
 	,m_vertexCount(0)
-	,m_shapeBindMatrix(dGetIdentityMatrix()) 
+	,m_weightsPerVertex(0)
+//	,m_shapeBindMatrix(dGetIdentityMatrix()) 
 	,m_vertexWeights(NULL)
-	,m_boneBindingMatrix(NULL)
+//	,m_boneBindingMatrix(NULL)
 	,m_boneWeightIndex(NULL)
 {
 	dAssert (0);
@@ -72,9 +74,9 @@ dGeometryNodeSkinModifierInfo::~dGeometryNodeSkinModifierInfo(void)
 	if (m_vertexWeights) {
 		delete[] m_vertexWeights;
 	}
-	if (m_boneBindingMatrix) {
-		delete[] m_boneBindingMatrix;
-	}
+//	if (m_boneBindingMatrix) {
+//		delete[] m_boneBindingMatrix;
+//	}
 	if (m_boneWeightIndex) {
 		delete[] m_boneWeightIndex;
 	}
@@ -101,13 +103,10 @@ void dGeometryNodeSkinModifierInfo::RemoveUnusedVertices(const int* const vertex
 	delete[] vertexWeights;
 }
 
-
 //void dGeometryNodeSkinModifierInfo::BakeTransform (const dMatrix& transform)
 //{
 //	dAssert (0);
 //}
-
-
 
 void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* const skinNode, dScene* const scene, dBoneVertexWeightData* const skinData, int skinDataCount)  
 {
@@ -120,9 +119,9 @@ void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* const skinNode, 
 		delete[] m_boneWeightIndex;
 	}
 
-	if (m_boneBindingMatrix) {
-		delete[] m_boneBindingMatrix;
-	}
+//	if (m_boneBindingMatrix) {
+//		delete[] m_boneBindingMatrix;
+//	}
 
 	while (scene->GetFirstChildLink(skinNode)) {
 		dScene::dTreeNode* const bone = scene->GetNodeFromLink(scene->GetFirstChildLink(skinNode));
@@ -166,23 +165,23 @@ void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* const skinNode, 
 			}
 		}
 	}
+	m_weightsPerVertex = skinBoneCount;
 
-	m_boneCount = skinBoneCount;
-	m_boneBindingMatrix = new dMatrix [skinBoneCount];
-
-	dScene::dTreeNode* const parentBone = scene->FindParentByType(meshNode, dSceneNodeInfo::GetRttiType());
-	dAssert (parentBone);
-	dSceneNodeInfo* const sceneNode = (dSceneNodeInfo*) scene->GetInfoFromNode(parentBone);
-	m_shapeBindMatrix = meshInfo->m_matrix * sceneNode->GetTransform();
-	for (void* boneLink = scene->GetFirstChildLink(skinNode); boneLink; boneLink = scene->GetNextChildLink(skinNode, boneLink)) {
-		dScene::dTreeNode* const boneNode = scene->GetNodeFromLink(boneLink);
-		dScene::dTreeNode* const transformNode = scene->FindParentByType(boneNode, dSceneNodeInfo::GetRttiType());
-		dAssert(transformNode);
-		dBoneNodeInfo* const boneInfo = (dBoneNodeInfo*)scene->GetInfoFromNode(boneNode);
-		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) scene->GetInfoFromNode(transformNode);
-		dMatrix matrix (sceneInfo->GetTransform());
-		m_boneBindingMatrix[boneInfo->GetId()] = matrix.Inverse4x4();
-	}
+//	m_boneCount = skinBoneCount;
+//	m_boneBindingMatrix = new dMatrix [skinBoneCount];
+//	dScene::dTreeNode* const parentBone = scene->FindParentByType(meshNode, dSceneNodeInfo::GetRttiType());
+//	dAssert (parentBone);
+//	dSceneNodeInfo* const sceneNode = (dSceneNodeInfo*) scene->GetInfoFromNode(parentBone);
+//	m_shapeBindMatrix = meshInfo->m_matrix * sceneNode->GetTransform();
+//	for (void* boneLink = scene->GetFirstChildLink(skinNode); boneLink; boneLink = scene->GetNextChildLink(skinNode, boneLink)) {
+		//dScene::dTreeNode* const boneNode = scene->GetNodeFromLink(boneLink);
+		//dScene::dTreeNode* const transformNode = scene->FindParentByType(boneNode, dSceneNodeInfo::GetRttiType());
+		//dAssert(transformNode);
+		//dBoneNodeInfo* const boneInfo = (dBoneNodeInfo*)scene->GetInfoFromNode(boneNode);
+		//dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) scene->GetInfoFromNode(transformNode);
+		//dMatrix matrix (sceneInfo->GetTransform());
+		//m_boneBindingMatrix[boneInfo->GetId()] = matrix.Inverse4x4();
+//	}
 }
 
 void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) const
@@ -192,23 +191,25 @@ void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) con
 	TiXmlElement* vertexCount = new TiXmlElement ("vertexCount");
 	rootNode->LinkEndChild(vertexCount);
 	vertexCount->SetAttribute("count", m_vertexCount);
+	vertexCount->SetAttribute("weightsPerVertex", m_weightsPerVertex);
 
-	int size0 = sizeof (dMatrix) * m_boneCount / sizeof (dFloat);
-	int size1 = sizeof (dVector) * m_vertexCount / sizeof (dFloat);
-	int bufferSizeInBytes = dMax (size0, size1) * 10;
+//	int size0 = sizeof (dMatrix) * m_boneCount / sizeof (dFloat);
+//	int size1 = sizeof (dVector) * m_vertexCount / sizeof (dFloat);
+//	int bufferSizeInBytes = dMax (size0, size1) * 10;
+	int size = sizeof(dVector) * m_vertexCount / sizeof(dFloat);
+	int bufferSizeInBytes = size * 10;
 	char* const buffer = new char[bufferSizeInBytes];
 
-	TiXmlElement* const matrix = new TiXmlElement ("bindingMatrix");
-	rootNode->LinkEndChild(matrix);
-	dFloatArrayToString (&m_shapeBindMatrix[0][0], 16, buffer, bufferSizeInBytes);
-	matrix->SetAttribute("float16", buffer);
+	//TiXmlElement* const matrix = new TiXmlElement ("bindingMatrix");
+	//rootNode->LinkEndChild(matrix);
+	//dFloatArrayToString (&m_shapeBindMatrix[0][0], 16, buffer, bufferSizeInBytes);
+	//matrix->SetAttribute("float16", buffer);
 
-	TiXmlElement* const bindMatrices = new TiXmlElement ("bonesBindMatrices");
-	rootNode->LinkEndChild(bindMatrices);
-
-	dFloatArrayToString (&m_boneBindingMatrix[0][0][0], size0, buffer, bufferSizeInBytes);
-	bindMatrices->SetAttribute("count", m_boneCount);
-	bindMatrices->SetAttribute("float16", buffer);
+	//TiXmlElement* const bindMatrices = new TiXmlElement ("bonesBindMatrices");
+	//rootNode->LinkEndChild(bindMatrices);
+	//dFloatArrayToString (&m_boneBindingMatrix[0][0][0], size0, buffer, bufferSizeInBytes);
+	//bindMatrices->SetAttribute("count", m_boneCount);
+	//bindMatrices->SetAttribute("float16", buffer);
 
 	int weightCount = 0;
 	for (int i = 0; i < m_vertexCount; i ++) {
@@ -266,15 +267,15 @@ bool dGeometryNodeSkinModifierInfo::Deserialize (const dScene* const scene, TiXm
 
 	TiXmlElement* const vertexCount = (TiXmlElement*) rootNode->FirstChild ("vertexCount");
 	vertexCount->Attribute("count", &m_vertexCount);
+	vertexCount->Attribute("weightsPerVertex", &m_weightsPerVertex);
 
-	TiXmlElement* const matrixNode = (TiXmlElement*) rootNode->FirstChild ("bindingMatrix");
-	dStringToFloatArray (matrixNode->Attribute("float16"), &m_shapeBindMatrix[0][0], 16);
+	//TiXmlElement* const matrixNode = (TiXmlElement*) rootNode->FirstChild ("bindingMatrix");
+	//dStringToFloatArray (matrixNode->Attribute("float16"), &m_shapeBindMatrix[0][0], 16);
 
-	TiXmlElement* const bindMatrices = (TiXmlElement*) rootNode->FirstChild ("bonesBindMatrices");
-	bindMatrices->Attribute("count", &m_boneCount);
-
-	m_boneBindingMatrix = new dMatrix[m_boneCount];
-	dStringToFloatArray (bindMatrices->Attribute("float16"), &m_boneBindingMatrix[0][0][0], 16 * m_boneCount);
+	//TiXmlElement* const bindMatrices = (TiXmlElement*) rootNode->FirstChild ("bonesBindMatrices");
+	//bindMatrices->Attribute("count", &m_boneCount);
+	//m_boneBindingMatrix = new dMatrix[m_boneCount];
+	//dStringToFloatArray (bindMatrices->Attribute("float16"), &m_boneBindingMatrix[0][0][0], 16 * m_boneCount);
 
 	int weightCount = 0; 
 	TiXmlElement* const vertexWeight = (TiXmlElement*) rootNode->FirstChild ("vertexWeights");
@@ -315,13 +316,11 @@ bool dGeometryNodeSkinModifierInfo::Deserialize (const dScene* const scene, TiXm
 	return true;
 }
 
-
 void dGeometryNodeSkinModifierInfo::BakeTransform (const dMatrix& transform)
 {
-	dMatrix inverse (transform.Inverse4x4());
-	m_shapeBindMatrix = inverse * m_shapeBindMatrix * transform;
-
-	for (int i = 0; i < m_boneCount; i ++) {
-		m_boneBindingMatrix[i] = inverse * m_boneBindingMatrix[i] * transform;
-	}
+//	dMatrix inverse (transform.Inverse4x4());
+//	m_shapeBindMatrix = inverse * m_shapeBindMatrix * transform;
+//	for (int i = 0; i < m_boneCount; i ++) {
+//		m_boneBindingMatrix[i] = inverse * m_boneBindingMatrix[i] * transform;
+//	}
 }

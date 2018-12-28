@@ -14,6 +14,7 @@
 #define _D_MESH_H_
 
 class DemoMesh;
+class DemoEntity;
 class DemoEntityManager;
 
 class DemoMeshInterface: public dClassInfo  
@@ -131,7 +132,8 @@ class DemoSkinMesh: public DemoMeshInterface
 	{
 		int m_boneIndex[4];
 	};
-	DemoSkinMesh(DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap);
+	
+	DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount);
 	~DemoSkinMesh();
 
 	void Render (DemoEntityManager* const scene);
@@ -143,12 +145,16 @@ class DemoSkinMesh: public DemoMeshInterface
 	void BuildSkin ();
 
 	DemoMesh* m_mesh;
+	DemoEntity* m_owner; 
 	dFloat* m_vertex;
 	dFloat* m_normal;
 	dVector* m_weights;
+	dMatrix* m_bindingMatrixArray;
 	dWeightBoneIndex* m_weighIndex;
 	int* m_skinIndexMap; 
+	int* m_boneRemapIndex; 
 	int m_weightcount;
+	int m_nodeCount; 
 };
 
 #endif 

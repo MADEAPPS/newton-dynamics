@@ -12,6 +12,7 @@
 
 #include "toolbox_stdafx.h"
 #include "DemoMesh.h"
+#include "DemoEntity.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
 
@@ -901,10 +902,15 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	}
 }
 
-DemoSkinMesh::DemoSkinMesh(DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap)
+DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount)
 	:DemoMeshInterface()
 	,m_mesh(mesh)
+	,m_owner(owner)
 {
+	while (m_owner->GetParent()) {
+		m_owner = m_owner->GetParent();
+	}
+	
 	m_mesh->AddRef();
 	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
 	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
@@ -916,13 +922,60 @@ DemoSkinMesh::DemoSkinMesh(DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* 
 		m_skinIndexMap[i] = indexMap[i];
 	}
 
-	m_weightcount = skinModifier->m_boneCount;
+	m_weightcount = skinModifier->m_weightsPerVertex;
 	for (int i = 0; i < skinModifier->m_vertexCount; i ++) {
 		m_weights[i] = skinModifier->m_vertexWeights[i];
 		for (int j = 0; j < sizeof (dWeightBoneIndex)/sizeof (int); j ++) {
 			m_weighIndex[i].m_boneIndex[j] = skinModifier->m_boneWeightIndex[i].m_index[j];
 		}
 	}
+
+	int stack = 1;
+	int entityCount = 0;
+	DemoEntity* pool[32];
+	dMatrix parentMatrix[32]; 
+	
+	dMatrix* const bindMatrix = dAlloca (dMatrix, 2048);
+	DemoEntity** const entityArray = dAlloca (DemoEntity*, 2048);
+	m_boneRemapIndex = new int [bonesCount];
+	memset (m_boneRemapIndex, -1, bonesCount * sizeof(int));
+	dTree<int, DemoEntity*> nodeMap;
+	for (int i = 0; i < bonesCount; i ++) {
+		nodeMap.Insert(i, bones[i]);
+	}
+
+	pool[0] = m_owner;
+	parentMatrix[0] = dGetIdentityMatrix();
+	dMatrix shapeBindMatrix(owner->GetMeshMatrix() * owner->CalculateGlobalMatrix());
+	while (stack) {
+		stack --;
+		DemoEntity* const entity = pool[stack];
+		dMatrix boneMatrix (entity->GetCurrentMatrix() * parentMatrix[stack]);
+	
+		entityArray[entityCount] = entity;
+		bindMatrix[entityCount] = shapeBindMatrix * boneMatrix.Inverse();
+		
+		dTree<int, DemoEntity*>::dTreeNode* const mapNode = nodeMap.Find(entity);
+		if (mapNode) {
+			int index = mapNode->GetInfo();
+			dAssert (index < bonesCount);
+			if (m_boneRemapIndex[index] < 0) {
+				m_boneRemapIndex[index] = entityCount;
+			}
+			dAssert (m_boneRemapIndex[index] == entityCount);
+		}
+		
+		entityCount++;
+		for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
+			pool[stack] = node;
+			parentMatrix[stack] = boneMatrix;
+			stack ++;
+		}
+	}
+
+	m_nodeCount = entityCount;
+	m_bindingMatrixArray = new dMatrix [entityCount];
+	memcpy (m_bindingMatrixArray, bindMatrix, entityCount * sizeof (dMatrix));
 }
 
 DemoSkinMesh::~DemoSkinMesh()
@@ -933,6 +986,8 @@ DemoSkinMesh::~DemoSkinMesh()
 	delete[] m_weights;
 	delete[] m_weighIndex;
 	delete[] m_skinIndexMap;
+	delete[] m_boneRemapIndex;
+	delete[] m_bindingMatrixArray; 
 }
 
 void DemoSkinMesh::RenderTransparency () const
@@ -974,6 +1029,29 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 
 void DemoSkinMesh::BuildSkin ()
 {
+	int stack = 1;
+	DemoEntity* pool[32];
+	dMatrix parentMatrix[32];
+	pool[0] = m_owner;
+	parentMatrix[0] = dGetIdentityMatrix();
+
+	int count = 0;
+	dMatrix* const bindMatrix = dAlloca (dMatrix, m_nodeCount);
+	while (stack) {
+		stack--;
+		DemoEntity* const entity = pool[stack];
+		dMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix.Inverse();
+		count ++;
+		dAssert (count <= m_nodeCount);
+		for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
+			pool[stack] = node;
+			parentMatrix[stack] = boneMatrix;
+			stack++;
+		}
+	}
+
+
 	memcpy (m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 	memcpy (m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 }
