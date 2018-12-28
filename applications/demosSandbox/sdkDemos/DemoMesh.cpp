@@ -1041,7 +1041,7 @@ void DemoSkinMesh::BuildSkin ()
 		stack--;
 		DemoEntity* const entity = pool[stack];
 		dMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
-		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix.Inverse();
+		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix;
 		count ++;
 		dAssert (count <= m_nodeCount);
 		for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
@@ -1051,7 +1051,24 @@ void DemoSkinMesh::BuildSkin ()
 		}
 	}
 
+	const dFloat* const src = m_mesh->m_vertex;
+	for (int i = 0 ; i < m_mesh->m_vertexCount; i ++) {
+		dVector p (src[i * 3 + 0], src[i * 3 + 1], src[i * 3 + 2], dFloat (1.0f));
+		dVector q (0.0f);
+		int k = m_skinIndexMap[i];
+		const dVector& weight = m_weights[k];
+		const dWeightBoneIndex& boneIndex = m_weighIndex[k];
+		for(int j = 0; j < m_weightcount; j ++) {
+			int index = m_boneRemapIndex[boneIndex.m_boneIndex[j]];
+			dFloat blend = weight[j];
+			const dMatrix& matrix = bindMatrix[index];
+			q += matrix.TransformVector(p).Scale (blend);
+		}
+ 		m_vertex[i * 3 + 0] = q.m_x;
+		m_vertex[i * 3 + 1] = q.m_y;
+		m_vertex[i * 3 + 2] = q.m_z;
+	}
 
-	memcpy (m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+//	memcpy (m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 	memcpy (m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 }
