@@ -824,14 +824,12 @@ void DemoEntityManager::ShowMainMenuBar()
 	}
 }
 
-
 void DemoEntityManager::ErrorCallback(int error, const char* description)
 {
-	dAssert (0);
 	dTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
+	dAssert (0);
 }
-
 
 void DemoEntityManager::MouseButtonCallback(GLFWwindow*, int button, int action, int)
 {
