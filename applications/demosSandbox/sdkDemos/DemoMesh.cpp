@@ -902,12 +902,14 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	}
 }
 
-DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount)
+//DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount)
+DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, const int* const indexMap, DemoEntity** const bones, int bonesCount)
 	:DemoMeshInterface()
 	,m_mesh(mesh)
 	,m_root(owner)
 	,m_entity(owner)
 {
+/*
 	while (m_root->GetParent()) {
 		m_root = m_root->GetParent();
 	}
@@ -915,9 +917,10 @@ DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeome
 	m_mesh->AddRef();
 	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
 	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
+	m_skinIndexMap = new int[m_mesh->m_vertexCount];
+
 	m_weights = new dVector [skinModifier->m_vertexCount];
 	m_weighIndex = new dWeightBoneIndex [skinModifier->m_vertexCount];
-	m_skinIndexMap = new int[m_mesh->m_vertexCount];
 
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
 		m_skinIndexMap[i] = indexMap[i];
@@ -977,6 +980,7 @@ DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeome
 	m_nodeCount = entityCount;
 	m_bindingMatrixArray = new dMatrix [entityCount];
 	memcpy (m_bindingMatrixArray, bindMatrix, entityCount * sizeof (dMatrix));
+*/
 }
 
 DemoSkinMesh::~DemoSkinMesh()
@@ -1030,6 +1034,11 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 
 void DemoSkinMesh::BuildSkin ()
 {
+/*
+memcpy(m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+
+
 	int stack = 1;
 	DemoEntity* pool[32];
 	dMatrix parentMatrix[32];
@@ -1057,9 +1066,13 @@ void DemoSkinMesh::BuildSkin ()
 
 	const dFloat* const src = m_mesh->m_vertex;
 	for (int i = 0 ; i < m_mesh->m_vertexCount; i ++) {
+//	for (int i = 0 ; i < 10; i ++) {
 		dVector p (src[i * 3 + 0], src[i * 3 + 1], src[i * 3 + 2], dFloat (1.0f));
 		dVector q (0.0f);
 		int k = m_skinIndexMap[i];
+//if (p.m_x > -2.0) continue;
+dTrace (("%d %d %f %f %f\n", i, k, p.m_x, p.m_y, p.m_z));
+
 		const dVector& weight = m_weights[k];
 		const dWeightBoneIndex& boneIndex = m_weighIndex[k];
 		for(int j = 0; j < m_weightcount; j ++) {
@@ -1073,6 +1086,5 @@ void DemoSkinMesh::BuildSkin ()
 		m_vertex[i * 3 + 2] = q.m_z;
 	}
 
-//	memcpy (m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
-	memcpy (m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+*/
 }

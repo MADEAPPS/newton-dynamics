@@ -183,7 +183,6 @@ typedef long long unsigned64;
 #include <dCollisionBoxNodeInfo.h>
 #include <dCollisionSphereNodeInfo.h>
 #include <dCollisionConvexHullNodeInfo.h>
-#include <dGeometryNodeSkinModifierInfo.h>
 
 #include <dStdAfxNewton.h>
 #include <dNewtonMesh.h>

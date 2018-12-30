@@ -43,7 +43,6 @@
 #include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
 #include <dGeometryNodeModifierInfo.h>
-#include <dGeometryNodeSkinModifierInfo.h>
 
 
 

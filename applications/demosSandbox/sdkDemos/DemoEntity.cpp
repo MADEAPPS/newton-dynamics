@@ -401,6 +401,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
 
 					// save the modifiers
+/*
 					for (void* ptr = scene.GetFirstChildLink(node); ptr; ptr = scene.GetNextChildLink(node, ptr)) {
 						dScene::dTreeNode* const modifierNode = scene.GetNodeFromLink(ptr);
 						dNodeInfo* const modifierInfo = scene.GetInfoFromNode(modifierNode);
@@ -410,7 +411,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 							modifiersCount++;
 						}
 					}
-
+*/
 				} else if (nodeInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
 					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(node);
 					if (!cacheNode) {
@@ -452,7 +453,8 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 				dBoneNodeInfo* const bone = bones[i];
 				sortedBonesEntities[bone->GetId()] = bonesEntities[i];
 			}
-
+			dAssert (0);
+/*
 			for (int i = 0; i < modifiersCount; i++) {
 				dScene::dTreeNode* const skinNode = nodeModifiers[i];
 				dNodeInfo* const skinNodeInfo = scene.GetInfoFromNode(skinNode);
@@ -470,6 +472,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 					skinMesh->Release();
 				}
 			}
+*/
 		}
 	}
 

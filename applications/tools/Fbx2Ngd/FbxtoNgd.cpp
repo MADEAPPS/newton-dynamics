@@ -21,6 +21,26 @@
 
 #define DEFUALT_MATERIAL_ID -1
 
+class CheckMemoryLeaks
+{
+	public:
+	CheckMemoryLeaks()
+	{
+		atexit(CheckMemoryLeaksCallback);
+		// Track all memory leaks at the operating system level.
+		// make sure no Newton tool or utility leaves leaks behind.
+		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
+		//_CrtSetBreakAlloc (34092);
+	}
+
+	static void CheckMemoryLeaksCallback()
+	{
+		_CrtDumpMemoryLeaks();
+	}
+};
+static CheckMemoryLeaks checkLeaks;
+
+
 class ImportStackData
 {
 	public:
@@ -260,7 +280,6 @@ static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 
 	return true;
 }
-
 
 void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 {
@@ -646,6 +665,7 @@ static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, Fb
 	}
 }
 
+
 void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, GlobalNodeMap& nodeMap)
 {
 	GlobalMeshMap::dTreeNode* instanceNode = meshCache.Find(fbxMeshNode->GetMesh());
@@ -752,6 +772,59 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 			}
 		}
 
+
+		// import skin if there is any
+		NewtonMeshVertexWeightData::dgWeights* weightArray = NULL;
+		int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
+		if (deformerCount) {
+			dAssert(deformerCount == 1);
+			FbxSkin* const skin = (FbxSkin*)fbxMesh->GetDeformer(0, FbxDeformer::eSkin);
+			dAssert(skin);
+
+			// count the number of weights
+			int skinVertexDataCount = 0;
+			int clusterCount = skin->GetClusterCount();
+			for (int i = 0; i < clusterCount; i++) {
+				FbxCluster* cluster = skin->GetCluster(i);
+				skinVertexDataCount += cluster->GetControlPointIndicesCount();
+			}
+
+			weightArray = new NewtonMeshVertexWeightData::dgWeights[fbxMesh->GetControlPointsCount()];
+			memset(weightArray, 0, fbxMesh->GetControlPointsCount() * sizeof(NewtonMeshVertexWeightData::dgWeights));
+
+			for (int i = 0; i < clusterCount; i++)
+			{
+				FbxCluster* const cluster = skin->GetCluster(i);
+				FbxNode* const fbxBone = cluster->GetLink();
+
+				GlobalNodeMap::dTreeNode* const boneNode = nodeMap.Find(fbxBone);
+				if (boneNode) {
+					dScene::dTreeNode* const parentbone = boneNode->GetInfo();
+					dScene::dTreeNode* const bone = ngdScene->FindChildByType(parentbone, dBoneNodeInfo::GetRttiType());
+					dAssert(bone);
+
+					dBoneNodeInfo* const boneInfo = (dBoneNodeInfo*)ngdScene->GetInfoFromNode(bone);
+
+					int *boneVertexIndices = cluster->GetControlPointIndices();
+					double *boneVertexWeights = cluster->GetControlPointWeights();
+					// Iterate through all the vertices, which are affected by the bone
+					int numBoneVertexIndices = cluster->GetControlPointIndicesCount();
+					for (int j = 0; j < numBoneVertexIndices; j++) {
+						int boneVertexIndex = boneVertexIndices[j];
+						float boneWeight = (float)boneVertexWeights[j];
+
+						for (int k = 0; k < 4; k++) {
+							if (weightArray[boneVertexIndex].m_weightBlends[k] == 0.0f) {
+								weightArray[boneVertexIndex].m_weightBlends[k] = boneWeight;
+								weightArray[boneVertexIndex].m_controlIndex[k] = boneInfo->GetId();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
 		NewtonMeshVertexFormat format;
 		NewtonMeshClearVertexFormat(&format);
 		format.m_faceCount = faceCount;
@@ -762,8 +835,12 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 		format.m_vertex.m_indexList = vertexIndex;
 		format.m_vertex.m_strideInBytes = sizeof(dBigVector);
 
+		format.m_weight.m_data = weightArray;
+		format.m_weight.m_indexList = vertexIndex;
+		format.m_weight.m_strideInBytes = sizeof(NewtonMeshVertexWeightData::dgWeights);
+
 		format.m_normal.m_data = &normalArray[0].m_x;
-		format.m_normal.m_indexList = vertexIndex;
+		format.m_normal.m_indexList = normalIndex;
 		format.m_normal.m_strideInBytes = sizeof(dVector);
 
 		format.m_uv0.m_data = &uv0Array[0].m_x;
@@ -777,65 +854,9 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 
 		instance->SmoothNormals(45.0f * dDegreeToRad);
 
-		// import skin if there is any
-		int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
-		for (int i = 0; i < deformerCount; i++) {
-
-			FbxSkin* const skin = (FbxSkin*)fbxMesh->GetDeformer(i, FbxDeformer::eSkin);
-			dAssert(skin);
-
-			// count the number of weights
-			int skinVertexDataCount = 0;
-			int clusterCount = skin->GetClusterCount();
-			for (int i = 0; i < clusterCount; i++) {
-				FbxCluster* cluster = skin->GetCluster(i);
-				skinVertexDataCount += cluster->GetControlPointIndicesCount();
-			}
-			dGeometryNodeSkinModifierInfo::dBoneVertexWeightData* const skinVertexData = new dGeometryNodeSkinModifierInfo::dBoneVertexWeightData[skinVertexDataCount];
-
-			int actualSkinVertexCount = 0;
-			for (int i = 0; i < clusterCount; i++)
-			{
-				FbxCluster* const cluster = skin->GetCluster(i);
-				FbxNode* const fbxBone = cluster->GetLink(); // Get a reference to the bone's node
-
-				GlobalNodeMap::dTreeNode* const boneNode = nodeMap.Find(fbxBone);
-				if (boneNode) {
-					dScene::dTreeNode* const parentbone = boneNode->GetInfo();
-					dScene::dTreeNode* const bone = ngdScene->FindChildByType(parentbone, dBoneNodeInfo::GetRttiType());
-					dAssert(bone);
-
-					// Get the bind pose
-					//FbxAMatrix bindPoseMatrix;
-					//cluster->GetTransformLinkMatrix(bindPoseMatrix);
-
-					int *boneVertexIndices = cluster->GetControlPointIndices();
-					double *boneVertexWeights = cluster->GetControlPointWeights();
-					// Iterate through all the vertices, which are affected by the bone
-					int numBoneVertexIndices = cluster->GetControlPointIndicesCount();
-					for (int j = 0; j < numBoneVertexIndices; j++) {
-						int boneVertexIndex = boneVertexIndices[j];
-						float boneWeight = (float)boneVertexWeights[j];
-						skinVertexData[actualSkinVertexCount].m_vertexIndex = boneVertexIndex;
-						skinVertexData[actualSkinVertexCount].m_weight = boneWeight;
-						skinVertexData[actualSkinVertexCount].m_boneNode = bone;
-						actualSkinVertexCount++;
-						dAssert(actualSkinVertexCount <= skinVertexDataCount);
-					}
-				}
-			}
-
-			char skinName[256];
-			sprintf(skinName, "%s_skin", fbxMeshNode->GetName());
-			dScene::dTreeNode* const skinNode = ngdScene->CreateSkinModifierNode(meshNode);
-			dGeometryNodeSkinModifierInfo* const info = (dGeometryNodeSkinModifierInfo*)ngdScene->GetInfoFromNode(skinNode);
-			info->SetName(skinName);
-			info->SkinMesh(skinNode, ngdScene, skinVertexData, actualSkinVertexCount);
-
-			delete[] skinVertexData;
+		if (weightArray) {
+			delete[] weightArray;
 		}
-
-
 		delete[] uv1Array;
 		delete[] uv0Array;
 		delete[] normalArray;

@@ -133,7 +133,8 @@ class DemoSkinMesh: public DemoMeshInterface
 		int m_boneIndex[4];
 	};
 	
-	DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount);
+//	DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount);
+	DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, const int* const indexMap, DemoEntity** const bones, int bonesCount);
 	~DemoSkinMesh();
 
 	void Render (DemoEntityManager* const scene);

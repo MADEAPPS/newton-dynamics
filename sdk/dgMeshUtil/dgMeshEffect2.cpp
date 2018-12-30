@@ -1190,19 +1190,19 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 
 				dgFloat64 u0 = dgFloat64 (1.0f) - u1 - u2 - u3;
 				dgBigVector r1 (q0.Scale (u0) + q1.Scale (u1) + q2.Scale (u2) + q3.Scale (u3));
-				dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[i];
+				dgWeights& weighSet = m_points.m_weights[i];
 
-				weighSet.m_weightPair[0].m_controlIndex = i0;
-				weighSet.m_weightPair[0].m_weight = dgFloat32 (u0);
+				weighSet.m_controlIndex[0] = i0;
+				weighSet.m_weightBlends[0] = dgFloat32(u0);
 
-				weighSet.m_weightPair[1].m_controlIndex = i1;
-				weighSet.m_weightPair[1].m_weight = dgFloat32(u1);
+				weighSet.m_controlIndex[1] = i1;
+				weighSet.m_weightBlends[1] = dgFloat32(u1);
 
-				weighSet.m_weightPair[2].m_controlIndex = i2;
-				weighSet.m_weightPair[2].m_weight = dgFloat32(u2);
+				weighSet.m_controlIndex[2] = i2;
+				weighSet.m_weightBlends[2] = dgFloat32(u2);
 
-				weighSet.m_weightPair[3].m_controlIndex = i3;
-				weighSet.m_weightPair[3].m_weight = dgFloat32(u3);
+				weighSet.m_controlIndex[3] = i3;
+				weighSet.m_weightBlends[3] = dgFloat32(u3);
 
 				weightFound = true;
 				break;

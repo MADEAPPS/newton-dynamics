@@ -32,11 +32,11 @@
 #include "dCollisionConeNodeInfo.h"
 #include "dCollisionTreeNodeInfo.h"
 #include "dCollisionSphereNodeInfo.h"
+#include "dGeometryNodeModifierInfo.h"
 #include "dCollisionCapsuleNodeInfo.h"
 #include "dCollisionCylinderNodeInfo.h"
 #include "dCollisionCompoundNodeInfo.h"
 #include "dCollisionConvexHullNodeInfo.h"
-#include "dGeometryNodeSkinModifierInfo.h"
 #include "dCollisionChamferCylinderNodeInfo.h"
 #include <tinyxml.h>
 
@@ -239,7 +239,6 @@ void dScene::RegisterClasses()
 		dCollisionCompoundNodeInfo::GetSingleton();
 		dCollisionCylinderNodeInfo::GetSingleton();
 		dCollisionConvexHullNodeInfo::GetSingleton();
-		dGeometryNodeSkinModifierInfo::GetSingleton();
 		dCollisionChamferCylinderNodeInfo::GetSingleton();
 	}
 }
@@ -843,7 +842,6 @@ void dScene::FreezeRootRotation ()
 	}
 }
 
-
 void dScene::FreezeGeometryPivot ()
 {
 	dScene::dTreeNode* const geometryCache = FindGetGeometryCacheNode ();
@@ -918,7 +916,6 @@ void dScene::BakeTransform (const dMatrix& matrix)
 		nodeInfo->BakeTransform (matrix);
 	}
 }
-
 
 void dScene::Serialize (const char* const fileName)
 {
