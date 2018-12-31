@@ -898,23 +898,24 @@ void dgMeshEffect::LoadTetraMesh (const char* const filename)
 	FILE* const file = fopen(filename, "rb");
 	if (file) {
 		dgInt32 vertexCount;
-		fscanf(file, "%d", &vertexCount);
+		size_t ret = fscanf(file, "%d", &vertexCount);
 		dgArray<dgBigVector> points(GetAllocator());
 		for (dgInt32 i = 0; i < vertexCount; i ++) {
 			float x;
 			float y;
 			float z;
-			fscanf(file, "%f %f %f", &x, &y, &z);
+			ret = fscanf(file, "%f %f %f", &x, &y, &z);
 			points[i] = dgBigVector (x, y, z, dgFloat32 (0.0f));
 		}
 		
 		BeginBuild();
 		dgInt32 tetras;
-		fscanf(file, "%d", &tetras);
+		ret = fscanf(file, "%d", &tetras);
 		dgMemoryAllocator* const allocator = GetAllocator();
 		for (dgInt32 layers = 0; layers < tetras; layers ++) {
 			dgInt32 tetra[4];
-			fscanf(file, "%d %d %d %d", &tetra[0], &tetra[1], &tetra[2], &tetra[3]);
+			ret = fscanf(file, "%d %d %d %d", &tetra[0], &tetra[1], &tetra[2], &tetra[3]);
+			ret = 0; 
 			dgBigVector pointArray[4];
 			for (dgInt32 i = 0; i < 4; i++) {
 				dgInt32 index = tetra[i];

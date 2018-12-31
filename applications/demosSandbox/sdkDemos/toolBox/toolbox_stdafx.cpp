@@ -94,7 +94,8 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 
 		sprintf(id, "/proc/%d/exe", getpid());
 		memset (appPath, 0, sizeof (appPath));
-		readlink(id, appPath, sizeof (appPath));
+		size_t ret = readlink(id, appPath, sizeof (appPath));
+		ret = 0;
 		char* const end = strstr (appPath, "applications");
 		*end = 0;
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);

@@ -1091,7 +1091,8 @@ void DemoEntityManager::DeserializeFile (void* const serializeHandle, void* cons
 {
 	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
 	dAssert ((size & 0x03) == 0);
-	fread (buffer, size, 1, (FILE*) serializeHandle);
+	size_t ret = fread (buffer, size, 1, (FILE*) serializeHandle);
+	ret = 0;
 }
 
 

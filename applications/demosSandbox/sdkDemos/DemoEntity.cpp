@@ -510,7 +510,8 @@ DemoEntity* DemoEntity::LoadOBJ_mesh (const char* const fileName, NewtonWorld* c
 		mesh.BeginBuild();
 
 		while (!feof(file)) {
-			fgets(line, sizeof(line) - 1, file);
+			char* ret = fgets(line, sizeof(line) - 1, file);
+			ret = 0;
 
 			int index = 0;
 			while (line[index] && (line[index] != '\r') && (line[index] != '\n')) {

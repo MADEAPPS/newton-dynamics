@@ -133,7 +133,8 @@ GLuint LoadTexture(const char* const filename)
 		//dAssert (sizeof (TGAHEADER) == 18);
 		// Read in header (binary) sizeof(TGAHEADER) = 18
 		TGAHEADER tgaHeader;		// TGA file header
-		fread(&tgaHeader, 18, 1, pFile);
+		size_t ret = fread(&tgaHeader, 18, 1, pFile);
+		ret = 0;
 
 		// Do byte swap for big vs little Indian
 		tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
