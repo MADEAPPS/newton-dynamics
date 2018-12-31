@@ -1536,13 +1536,15 @@ skelManager.m_skelListIsDirty = true;
 void dgWorld::OnSerializeToFile(void* const fileHandle, const void* const buffer, dgInt32 size)
 {
 	dgAssert((size & 0x03) == 0);
-	fwrite(buffer, size, 1, (FILE*)fileHandle);
+	size_t bytes = fwrite(buffer, size, 1, (FILE*)fileHandle);
+	bytes=0;
 }
 
 void dgWorld::OnDeserializeFromFile(void* const fileHandle, void* const buffer, dgInt32 size)
 {
 	dgAssert((size & 0x03) == 0);
-	fread(buffer, size, 1, (FILE*)fileHandle);
+	size_t bytes = fread(buffer, size, 1, (FILE*)fileHandle);
+	bytes=0;
 }
 
 void dgWorld::OnBodySerializeToFile(dgBody& body, void* const userData, dgSerialize serializeCallback, void* const serializeHandle)

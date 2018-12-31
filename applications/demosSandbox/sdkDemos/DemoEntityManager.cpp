@@ -606,7 +606,7 @@ void DemoEntityManager::LoadFont()
 
 	float pixedSize = 18;
 	char pathName[2048];
-	char* const name = "Cousine-Regular.ttf";
+	const char* const name = "Cousine-Regular.ttf";
 	//char* const name = "calibri.ttf";
 	//char* const name = "courbd.ttf";
 
@@ -915,36 +915,36 @@ void DemoEntityManager::RenderStats()
 		
 		if (ImGui::Begin("statistics", &m_showStats)) {
 			sprintf (text, "fps:           %6.3f", m_fps);
-			ImGui::Text(text);
+			ImGui::Text(text, "");
 
 			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
-			ImGui::Text(text);
+			ImGui::Text(text, "");
 
 			sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
-			ImGui::Text(text);
+			ImGui::Text(text, "");
 
 			if (m_currentPlugin) {
 				int index = 1;
 				for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
 					if (index == m_currentPlugin) {
 						sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
-						ImGui::Text(text);
+						ImGui::Text(text, "");
 					}
 					index++;
 				}
 			}
 
 			sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
-			ImGui::Text(text);
+			ImGui::Text(text, "");
 
 			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
-			ImGui::Text(text);
+			ImGui::Text(text, "");
 
 			sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
-			ImGui::Text(text);
+			ImGui::Text(text, "");
 
 			sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
-			ImGui::Text(text);
+			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
@@ -1162,7 +1162,7 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 	va_start (argptr, fmt);
 	vsprintf (string, fmt, argptr);
 	va_end( argptr );
-	ImGui::Text(string);
+	ImGui::Text(string, "");
 	return 0;
 }
 
