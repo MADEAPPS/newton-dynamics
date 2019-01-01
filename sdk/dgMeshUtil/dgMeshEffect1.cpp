@@ -2320,6 +2320,7 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 
 	// calculate vertex Count
 	dgInt32 vertexCount = 0;
+	dgInt32 weightsCount = 0;
 	dgInt32 maxAttribCount = 0;
 	for (dgInt32 j = 0; j < format->m_faceCount; j++) {
 		dgInt32 count = format->m_faceIndexCount[j];
@@ -2339,9 +2340,19 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 	}
 
 	if (format->m_vertexWeight.m_data) {
+		
+		dgInt32 faceVertexCount = 0;
+		for (dgInt32 j = 0; j < format->m_faceCount; j++) {
+			dgInt32 count = format->m_faceIndexCount[j];
+			for (dgInt32 i = 0; i < count; i++) {
+				weightsCount = dgMax(weightsCount, format->m_vertexWeight.m_indexList[faceVertexCount + i] + 1);
+			}
+			faceVertexCount += count;
+		}
+
 		dgInt8* const data = (dgInt8*)format->m_vertexWeight.m_data;
 		dgInt32 index = 0;
-		for (dgInt32 i = 0; i < vertexCount; i++) {
+		for (dgInt32 i = 0; i < weightsCount; i++) {
 			dgFloat32* const weightBlends = (dgFloat32*)&data[index];
 			dgInt32* const controlIndex = (dgInt32*)&weightBlends[4];
 			dgWeights weight;
@@ -2488,13 +2499,7 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 				m_points.m_vertex.PushBack(vertex[i * vertexStride]);
 			}
 			if (m_points.m_weights.m_count) {
-				for (dgInt32 i = 0; i < vertexCount; i++) {
-					//dgPointFormat::dgWeightSet weight;
-					//for (int j = 0; j < 4; j++) {
-					//	weight.m_weightPair[j].m_weight = format->m_vertexWeight.m_data[i].m_weightSet[j].m_weight;
-					//	weight.m_weightPair[j].m_controlIndex = format->m_vertexWeight.m_data[i].m_weightSet[j].m_index;
-					//}
-					//m_points.m_weights.PushBack(weight);
+				for (dgInt32 i = 0; i < weightsCount; i++) {
 					m_points.m_weights.PushBack(format->m_vertexWeight.m_data[i]);
 				}
 			}
