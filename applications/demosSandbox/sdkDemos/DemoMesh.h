@@ -104,27 +104,6 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	unsigned m_optimizedTransparentDiplayList;		
 };
 
-class DemoBezierCurve: public DemoMeshInterface
-{
-	public:
-	DemoBezierCurve (const dBezierSpline& curve);
-	DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
-
-	int GetRenderResolution () const;
-	void SetRenderResolution (int breaks);
-
-	virtual void RenderTransparency () const;
-	virtual void Render (DemoEntityManager* const scene);
-	virtual void RenderNormals ();
-
-	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
-
-	dBezierSpline m_curve;
-	int m_renderResolution;
-
-	dAddRtti (DemoMeshInterface, DOMMY_API);
-};
-
 class DemoSkinMesh: public DemoMeshInterface
 {
 	public:
@@ -132,9 +111,8 @@ class DemoSkinMesh: public DemoMeshInterface
 	{
 		int m_boneIndex[4];
 	};
-	
-//	DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount);
-	DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, const int* const indexMap, DemoEntity** const bones, int bonesCount);
+
+	DemoSkinMesh(DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount);
 	~DemoSkinMesh();
 
 	void Render (DemoEntityManager* const scene);
@@ -158,6 +136,28 @@ class DemoSkinMesh: public DemoMeshInterface
 	int m_weightcount;
 	int m_nodeCount; 
 };
+
+class DemoBezierCurve: public DemoMeshInterface
+{
+	public:
+	DemoBezierCurve(const dBezierSpline& curve);
+	DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
+
+	int GetRenderResolution() const;
+	void SetRenderResolution(int breaks);
+
+	virtual void RenderTransparency() const;
+	virtual void Render(DemoEntityManager* const scene);
+	virtual void RenderNormals();
+
+	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
+
+	dBezierSpline m_curve;
+	int m_renderResolution;
+
+	dAddRtti(DemoMeshInterface, DOMMY_API);
+};
+
 
 #endif 
 

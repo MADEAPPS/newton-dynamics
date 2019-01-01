@@ -400,18 +400,14 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 					DemoMeshInterface* const mesh = cacheNode->GetInfo();
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
 
-					// save the modifiers
-/*
-					for (void* ptr = scene.GetFirstChildLink(node); ptr; ptr = scene.GetNextChildLink(node, ptr)) {
-						dScene::dTreeNode* const modifierNode = scene.GetNodeFromLink(ptr);
-						dNodeInfo* const modifierInfo = scene.GetInfoFromNode(modifierNode);
-						if (modifierInfo->IsType(dGeometryNodeModifierInfo::GetRttiType())) {
-							entityModifiers[modifiersCount] = entity;
-							nodeModifiers[modifiersCount] = modifierNode;
-							modifiersCount++;
-						}
+					// save mesh with skins for further proccesing.
+					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(node);
+					if (meshInfo->hasSkinWeights()) {
+						entityModifiers[modifiersCount] = entity;
+						nodeModifiers[modifiersCount] = node;
+						modifiersCount++;
 					}
-*/
+
 				} else if (nodeInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
 					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(node);
 					if (!cacheNode) {
@@ -453,26 +449,16 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 				dBoneNodeInfo* const bone = bones[i];
 				sortedBonesEntities[bone->GetId()] = bonesEntities[i];
 			}
-			dAssert (0);
-/*
-			for (int i = 0; i < modifiersCount; i++) {
-				dScene::dTreeNode* const skinNode = nodeModifiers[i];
-				dNodeInfo* const skinNodeInfo = scene.GetInfoFromNode(skinNode);
-				if (skinNodeInfo->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
-					dScene::dTreeNode* const meshNode = scene.FindParentByType(skinNode, dMeshNodeInfo::GetRttiType());
-					dAssert (meshNode);
-					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(meshNode);
-					const int* const indexMap = meshInfo->GetIndexToVertexMap();
-					DemoEntity* const skinEntity = entityModifiers[i];
-					DemoMesh* const mesh = (DemoMesh*)skinEntity->GetMesh();
-					dGeometryNodeSkinModifierInfo* const skinModifier = (dGeometryNodeSkinModifierInfo*)skinNodeInfo;
 
-					DemoSkinMesh* const skinMesh = new DemoSkinMesh(skinEntity, mesh, skinModifier, indexMap, sortedBonesEntities, bonesCount);
-					skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());
-					skinMesh->Release();
-				}
+			for (int i = 0; i < modifiersCount; i++) {
+				dScene::dTreeNode* const skinMeshNode = nodeModifiers[i];
+				dMeshNodeInfo* const skinNodeInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(skinMeshNode);
+				dAssert (skinNodeInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
+				DemoEntity* const skinEntity = entityModifiers[i];
+				DemoSkinMesh* const skinMesh = new DemoSkinMesh(skinEntity, skinMeshNode, sortedBonesEntities, bonesCount);
+				skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());
+				skinMesh->Release();
 			}
-*/
 		}
 	}
 

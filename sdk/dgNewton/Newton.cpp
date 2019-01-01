@@ -8164,7 +8164,7 @@ int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, in
 	return meshEffect->GetVertexWeights (vertexIndex, weightIndices, weightFactors);
 }
 
-int NewtonMeshHasVertxWeightChannel(const NewtonMesh* const mesh)
+int NewtonMeshHasVertexWeightChannel(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;

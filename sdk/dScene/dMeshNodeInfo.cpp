@@ -73,14 +73,11 @@ void dMeshNodeInfo::ReplaceMesh (NewtonMesh* const mesh)
 	SetMesh (mesh);
 }
 
-
-
-
+/*
 void dMeshNodeInfo::BeginBuild ()
 {
 	NewtonMeshBeginBuild(m_mesh);
 }
-
 
 void dMeshNodeInfo::AddPolygon (int pointsCount, const neMeshInfoFlatPoint* const points, int materialID)
 {
@@ -92,6 +89,7 @@ void dMeshNodeInfo::EndBuild ()
 {
 	NewtonMeshEndBuild(m_mesh);
 }
+*/
 
 void dMeshNodeInfo::ConvertToTriangles()
 {
@@ -107,6 +105,10 @@ void dMeshNodeInfo::RepairTJoints ()
 	NewtonMeshFixTJoints (m_mesh);
 }
 
+bool dMeshNodeInfo::hasSkinWeights() const
+{
+	return NewtonMeshHasVertexWeightChannel(m_mesh) ? true : false;
+}
 
 void dMeshNodeInfo::SmoothNormals (dFloat angleInRadiants)
 {

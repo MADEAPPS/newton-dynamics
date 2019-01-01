@@ -1301,7 +1301,7 @@ extern "C" {
 	NEWTON_API void NewtonMeshGetVertexColorChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
 
 	NEWTON_API int NewtonMeshHasNormalChannel(const NewtonMesh* const mesh);
-	NEWTON_API int NewtonMeshHasVertxWeightChannel(const NewtonMesh* const mesh);
+	NEWTON_API int NewtonMeshHasVertexWeightChannel(const NewtonMesh* const mesh);
 	NEWTON_API int NewtonMeshHasBinormalChannel(const NewtonMesh* const mesh);
 	NEWTON_API int NewtonMeshHasUV0Channel(const NewtonMesh* const mesh);
 	NEWTON_API int NewtonMeshHasUV1Channel(const NewtonMesh* const mesh);

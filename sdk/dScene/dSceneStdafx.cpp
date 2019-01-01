@@ -469,7 +469,7 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 		position->SetAttribute("floats", buffer);
 	}
 
-	if (NewtonMeshHasVertxWeightChannel(mesh)) {
+	if (NewtonMeshHasVertexWeightChannel(mesh)) {
 		dFloat* const weights = new dFloat[8 * bufferCount];
 		int* const weightsBoneIndex = new int[4 * bufferCount];
 		NewtonMeshGetWeightBendsChannel(mesh, 8 * sizeof (dFloat), &weights[0]);
@@ -590,7 +590,7 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 	polygons->LinkEndChild(positionIndex);
 	positionIndex->SetAttribute("index", buffer);
 
-	if (NewtonMeshHasVertxWeightChannel(mesh)) {
+	if (NewtonMeshHasVertexWeightChannel(mesh)) {
 		for (int i = 0; i < indexCount; i++) {
 			int index = NewtonMeshGetPointIndex(mesh, indexArray[i]);
 			remapedIndexArray[i] = weightIndexList[index];
