@@ -480,7 +480,7 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 		FlatWeightedVertex* const flatPoint = new FlatWeightedVertex[8 * bufferCount];
 
 		NewtonMeshGetVertexChannel(mesh, sizeof(FlatWeightedVertex), &flatPoint->m_point[0]);
-		NewtonMeshGetWeightBendsChannel(mesh, sizeof (FlatWeightedVertex), &flatPoint->m_weights[0]);
+		NewtonMeshGetWeightBlendsChannel(mesh, sizeof (FlatWeightedVertex), &flatPoint->m_weights[0]);
 		NewtonMeshGetWeightBoneIndexChannel(mesh, 4 * sizeof (int), &weightsBoneIndex[0]);
 		for (int i = 0; i < pointCount; i++) {
 			const int* const src = &weightsBoneIndex[i * 4];
@@ -695,6 +695,37 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 	dFloat64* const positions = new dFloat64[4 * positionCount];
 	dStringToFloatArray (positionsElement->Attribute("floats"), positions, 4 * positionCount);
 
+	TiXmlElement* const weightBlendElement = (TiXmlElement*)pointElement->FirstChild("weightBlend");
+	if (weightBlendElement) {
+		int blendCount;
+		int boneBlendCount;
+		TiXmlElement* const weightBonesElement = (TiXmlElement*)pointElement->FirstChild("weightBones");
+
+		weightBlendElement->Attribute("float4", &blendCount);
+		weightBonesElement->Attribute("int4", &boneBlendCount);
+		dAssert (positionCount == blendCount);
+		dAssert (positionCount == boneBlendCount);
+		
+		int* const weightBones = new int [4 * positionCount];
+		dVector* const weightsFloat = new dVector[positionCount];
+		dStringToIntArray(weightBonesElement->Attribute("bones"), &weightBones[0], 4 * positionCount);
+		dStringToFloatArray(weightBlendElement->Attribute("floats"), &weightsFloat[0][0], 4 * positionCount);
+
+		NewtonMeshVertexWeightData::dgWeights* const meshWeight = new NewtonMeshVertexWeightData::dgWeights[positionCount];
+		for (int i = 0; i < positionCount; i ++) {
+			for (int j = 0; j < 4; j ++) {
+				meshWeight[i].m_weightBlends[j] = weightsFloat[i][j];
+				meshWeight[i].m_controlIndex[j] = weightBones[i * 4 + j];
+			}
+		}
+			
+		vertexFormat.m_weight.m_data = meshWeight;
+		vertexFormat.m_weight.m_strideInBytes = sizeof (NewtonMeshVertexWeightData::dgWeights);
+
+		delete[] weightBones;
+		delete[] weightsFloat;
+	}
+
 	TiXmlElement* const normalsElement = (TiXmlElement*) pointElement->FirstChild ("normal");
 	if (normalsElement) {
 		int normalCount;
@@ -741,43 +772,6 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 		vertexFormat.m_uv1.m_data = uv1;
 		vertexFormat.m_uv1.m_indexList = uv1VertexIndex;
 		vertexFormat.m_uv1.m_strideInBytes = 2 * sizeof (dFloat);
-	}
-
-	TiXmlElement* const weightIndexElement = (TiXmlElement*)polygonsElement->FirstChild("weight");
-	if (weightIndexElement) {
-		dAssert(0);
-/*
-		int* const weightVertexIndex = new int[indexCount];
-		TiXmlElement* const normalVertexIndexElement = (TiXmlElement*)polygonsElement->FirstChild("weight");
-		dStringToIntArray(normalVertexIndexElement->Attribute("index"), weightVertexIndex, indexCount);
-
-		int weightCount; 
-		TiXmlElement* const weightBlendElement = (TiXmlElement*) pointElement->FirstChild ("weightBlend");
-		weightBlendElement->Attribute("float4", &weightCount);
-		dVector* const weightsFloat = new dVector[weightCount];
-		dStringToFloatArray(weightBlendElement->Attribute("floats"), &weightsFloat[0][0], 4 * weightCount);
-
-		int weightBoneCount;
-		TiXmlElement* const weightBonesElement = (TiXmlElement*)pointElement->FirstChild("weightBones");
-		weightBonesElement->Attribute("int4", &weightBoneCount);
-		dAssert (weightCount == weightBoneCount);
-		int* const weightBones = new int [4 * weightBoneCount];
-		dStringToIntArray(weightBonesElement->Attribute("bones"), &weightBones[0], 4 * weightBoneCount);
-
-		NewtonMeshVertexWeightData::dgWeights* const meshWeight = new NewtonMeshVertexWeightData::dgWeights[weightCount];
-		for (int i = 0; i < weightCount; i ++) {
-			for (int j = 0; j < 4; j ++) {
-				meshWeight[i].m_weightBlends[j] = weightsFloat[i][j];
-				meshWeight[i].m_controlIndex[j] = weightBones[i * 4 + j];
-			}
-		}
-			
-		vertexFormat.m_weight.m_data = meshWeight;
-		vertexFormat.m_weight.m_indexList = weightVertexIndex;
-		vertexFormat.m_weight.m_strideInBytes = sizeof (NewtonMeshVertexWeightData::dgWeights);
-		delete[] weightBones;
-		delete[] weightsFloat;
-*/
 	}
 
 	vertexFormat.m_faceCount = faceCount;

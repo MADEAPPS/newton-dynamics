@@ -8221,7 +8221,7 @@ void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideI
 	meshEffect->GetVertexChannel(vertexStrideInByte, (dgFloat32*)outBuffer);
 }
 
-void NewtonMeshGetWeightBendsChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
+void NewtonMeshGetWeightBlendsChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;

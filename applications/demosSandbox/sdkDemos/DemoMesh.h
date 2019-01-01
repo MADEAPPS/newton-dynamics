@@ -131,7 +131,6 @@ class DemoSkinMesh: public DemoMeshInterface
 	dVector* m_weights;
 	dMatrix* m_bindingMatrixArray;
 	dWeightBoneIndex* m_weighIndex;
-	int* m_skinIndexMap; 
 	int* m_boneRemapIndex; 
 	int m_weightcount;
 	int m_nodeCount; 

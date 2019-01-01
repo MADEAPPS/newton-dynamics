@@ -927,26 +927,20 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
 	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
 
-	m_skinIndexMap = new int[m_mesh->m_vertexCount];
-
 	m_weights = new dVector [m_mesh->m_vertexCount];
 	m_weighIndex = new dWeightBoneIndex [m_mesh->m_vertexCount];
 
 	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(skinMeshNode);
 	dAssert (meshInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
-	NewtonMeshGetWeightBendsChannel(meshInfo->GetMesh(), sizeof (dVector), &m_weights[0].m_x);
+	NewtonMeshGetWeightBlendsChannel(meshInfo->GetMesh(), sizeof (dVector), &m_weights[0].m_x);
 	NewtonMeshGetWeightBoneIndexChannel(meshInfo->GetMesh(), sizeof (dWeightBoneIndex), &m_weighIndex->m_boneIndex[0]);
 
-/*
+	m_weightcount = 0;
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
-		m_skinIndexMap[i] = indexMap[i];
-	}
-
-	m_weightcount = skinModifier->m_weightsPerVertex;
-	for (int i = 0; i < skinModifier->m_vertexCount; i ++) {
-		m_weights[i] = skinModifier->m_vertexWeights[i];
-		for (int j = 0; j < sizeof (dWeightBoneIndex)/sizeof (int); j ++) {
-			m_weighIndex[i].m_boneIndex[j] = skinModifier->m_boneWeightIndex[i].m_index[j];
+		for (int j = 0; j < 4; j ++) {
+			if (m_weights[i][j] > 0.0f) {
+				m_weightcount = dMax (m_weightcount, j + 1);
+			}
 		}
 	}
 
@@ -968,6 +962,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	parentMatrix[0] = dGetIdentityMatrix();
 	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
 	while (stack) {
+
 		stack --;
 		DemoEntity* const entity = pool[stack];
 		dMatrix boneMatrix (entity->GetCurrentMatrix() * parentMatrix[stack]);
@@ -996,7 +991,6 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	m_nodeCount = entityCount;
 	m_bindingMatrixArray = new dMatrix [entityCount];
 	memcpy (m_bindingMatrixArray, bindMatrix, entityCount * sizeof (dMatrix));
-*/
 }
 
 DemoSkinMesh::~DemoSkinMesh()
@@ -1004,11 +998,10 @@ DemoSkinMesh::~DemoSkinMesh()
 	m_mesh->Release();
 	delete[] m_vertex;
 	delete[] m_normal; 
-//	delete[] m_weights;
-//	delete[] m_weighIndex;
-//	delete[] m_skinIndexMap;
-//	delete[] m_boneRemapIndex;
-//	delete[] m_bindingMatrixArray; 
+	delete[] m_weights;
+	delete[] m_weighIndex;
+	delete[] m_boneRemapIndex;
+	delete[] m_bindingMatrixArray; 
 }
 
 void DemoSkinMesh::RenderTransparency () const
@@ -1050,9 +1043,6 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 
 void DemoSkinMesh::BuildSkin ()
 {
-memcpy(m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
-memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
-/*
 	int stack = 1;
 	DemoEntity* pool[32];
 	dMatrix parentMatrix[32];
@@ -1078,26 +1068,35 @@ memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 		}
 	}
 
-	const dFloat* const src = m_mesh->m_vertex;
+	const dFloat* const pointSource = m_mesh->m_vertex;
+	const dFloat* const normalSource = m_mesh->m_normal;
 	for (int i = 0 ; i < m_mesh->m_vertexCount; i ++) {
-//	for (int i = 0 ; i < 10; i ++) {
-		dVector p (src[i * 3 + 0], src[i * 3 + 1], src[i * 3 + 2], dFloat (1.0f));
-		dVector q (0.0f);
-		int k = m_skinIndexMap[i];
-//if (p.m_x > -2.0) continue;
-dTrace (("%d %d %f %f %f\n", i, k, p.m_x, p.m_y, p.m_z));
+		dVector point (pointSource[i * 3 + 0], pointSource[i * 3 + 1], pointSource[i * 3 + 2], dFloat (1.0f));
+		dVector normal (normalSource[i * 3 + 0], normalSource[i * 3 + 1], normalSource[i * 3 + 2], dFloat (0.0f));
+		dVector weightedPoint (0.0f);
+		dVector weightedNormal (0.0f);
 
-		const dVector& weight = m_weights[k];
-		const dWeightBoneIndex& boneIndex = m_weighIndex[k];
+//if (p.m_x > -2.0) continue;
+//dTrace (("%d %d %f %f %f\n", i, k, p.m_x, p.m_y, p.m_z));
+
+		const dVector& weight = m_weights[i];
+		const dWeightBoneIndex& boneIndex = m_weighIndex[i];
 		for(int j = 0; j < m_weightcount; j ++) {
 			int index = m_boneRemapIndex[boneIndex.m_boneIndex[j]];
 			dFloat blend = weight[j];
 			const dMatrix& matrix = bindMatrix[index];
-			q += matrix.TransformVector(p).Scale (blend);
+			weightedPoint += matrix.TransformVector(point).Scale (blend);
+			weightedNormal += matrix.RotateVector(normal).Scale (blend);
 		}
- 		m_vertex[i * 3 + 0] = q.m_x;
-		m_vertex[i * 3 + 1] = q.m_y;
-		m_vertex[i * 3 + 2] = q.m_z;
+ 		m_vertex[i * 3 + 0] = weightedPoint.m_x;
+		m_vertex[i * 3 + 1] = weightedPoint.m_y;
+		m_vertex[i * 3 + 2] = weightedPoint.m_z;
+
+		m_normal[i * 3 + 0] = weightedNormal.m_x;
+		m_normal[i * 3 + 1] = weightedNormal.m_y;
+		m_normal[i * 3 + 2] = weightedNormal.m_z;
 	}
-*/
+
+//	memcpy(m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+//	memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 }

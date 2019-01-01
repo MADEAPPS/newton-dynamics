@@ -1291,7 +1291,7 @@ extern "C" {
 
 	NEWTON_API void NewtonMeshGetVertexDoubleChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat64* const outBuffer);
 	NEWTON_API void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
-	NEWTON_API void NewtonMeshGetWeightBendsChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
+	NEWTON_API void NewtonMeshGetWeightBlendsChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
 	NEWTON_API void NewtonMeshGetWeightBoneIndexChannel(const NewtonMesh* const mesh, int vertexStrideInByte, int* const outBuffer);
 	NEWTON_API void NewtonMeshGetNormalChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
 	NEWTON_API void NewtonMeshGetBinormalChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
