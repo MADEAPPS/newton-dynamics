@@ -347,12 +347,11 @@ extern "C" {
 	{
 		struct dgWeights
 		{
-			dFloat32 m_weightBlends[4];
+			dFloat m_weightBlends[4];
 			int m_controlIndex[4];
 		};
 
 		dgWeights* m_data;
-		int* m_indexList;
 		int m_strideInBytes;
 	} NewtonMeshVertexWeightData;
 

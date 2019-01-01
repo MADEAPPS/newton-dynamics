@@ -836,7 +836,6 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 		format.m_vertex.m_strideInBytes = sizeof(dBigVector);
 
 		format.m_weight.m_data = weightArray;
-		format.m_weight.m_indexList = vertexIndex;
 		format.m_weight.m_strideInBytes = sizeof(NewtonMeshVertexWeightData::dgWeights);
 
 		format.m_normal.m_data = &normalArray[0].m_x;

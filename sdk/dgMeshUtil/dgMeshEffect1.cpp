@@ -37,8 +37,8 @@ dgMeshEffect::dgPointFormat::dgPointFormat(dgMemoryAllocator* const allocator)
 
 dgMeshEffect::dgPointFormat::dgPointFormat(const dgPointFormat& source)
 	:m_layers(source.m_layers)
-	,m_vertex(source.m_vertex)
 	,m_weights(source.m_weights)
+	,m_vertex(source.m_vertex)
 {
 }
 
@@ -2320,7 +2320,6 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 
 	// calculate vertex Count
 	dgInt32 vertexCount = 0;
-	dgInt32 weightsCount = 0;
 	dgInt32 maxAttribCount = 0;
 	for (dgInt32 j = 0; j < format->m_faceCount; j++) {
 		dgInt32 count = format->m_faceIndexCount[j];
@@ -2339,35 +2338,21 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 		m_points.m_vertex.PushBack(dgBigVector (vertex[index + 0], vertex[index + 1], vertex[index + 2], dgFloat64(0.0f)));
 	}
 
-	if (format->m_vertexWeight.m_data) {
-		
-		dgInt32 faceVertexCount = 0;
-		for (dgInt32 j = 0; j < format->m_faceCount; j++) {
-			dgInt32 count = format->m_faceIndexCount[j];
-			for (dgInt32 i = 0; i < count; i++) {
-				weightsCount = dgMax(weightsCount, format->m_vertexWeight.m_indexList[faceVertexCount + i] + 1);
-			}
-			faceVertexCount += count;
-		}
-
-		dgInt8* const data = (dgInt8*)format->m_vertexWeight.m_data;
-		dgInt32 index = 0;
-		for (dgInt32 i = 0; i < weightsCount; i++) {
-			dgFloat32* const weightBlends = (dgFloat32*)&data[index];
-			dgInt32* const controlIndex = (dgInt32*)&weightBlends[4];
+	if (format->m_vertexWeights.m_data) {
+		dgInt8* const data = (dgInt8*)format->m_vertexWeights.m_data;
+		for (dgInt32 i = 0; i < vertexCount; i++) {
+			const dgWeights* const vertexWeight = (dgWeights*)&data[i * format->m_vertexWeights.m_strideInBytes];
 			dgWeights weight;
 			for (int j = 0; j < 4; j++) {
-				weight.m_weightBlends[j] = weightBlends[j];
-				weight.m_controlIndex[j] = controlIndex[j];
+				weight.m_weightBlends[j] = vertexWeight->m_weightBlends[j];
+				weight.m_controlIndex[j] = vertexWeight->m_controlIndex[j];
 			}
 			m_points.m_weights.PushBack(weight);
-			index += format->m_vertexWeight.m_strideInBytes;
 		}
 	}
 
 	bool pendingFaces = true;
 	dgInt32 layerBase = 0;
-//	dgInt32 layerCount = 0;
 	dgInt32 attributeCount = 0;
 
 	dgInt32 normalStride = dgInt32(format->m_normal.m_strideInBytes / sizeof (dgFloat32));
@@ -2499,14 +2484,24 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 				m_points.m_vertex.PushBack(vertex[i * vertexStride]);
 			}
 			if (m_points.m_weights.m_count) {
-				for (dgInt32 i = 0; i < weightsCount; i++) {
-					m_points.m_weights.PushBack(format->m_vertexWeight.m_data[i]);
+				dgInt8* const data = (dgInt8*)format->m_vertexWeights.m_data;
+				for (dgInt32 i = 0; i < vertexCount; i++) {
+					const dgWeights* const vertexWeight = (dgWeights*)&data[i * format->m_vertexWeights.m_strideInBytes];
+					dgWeights weight;
+					for (int j = 0; j < 4; j++) {
+						weight.m_weightBlends[j] = vertexWeight->m_weightBlends[j];
+						weight.m_controlIndex[j] = vertexWeight->m_controlIndex[j];
+					}
+					m_points.m_weights.PushBack(weight);
 				}
 			}
 		}
 	}
+
 	dgAssert (m_points.m_vertex.m_count == vertexCount * (layerIndex + 1));
+	dgAssert(!m_points.m_weights.m_count || (m_points.m_weights.m_count == vertexCount * (layerIndex + 1)));
 	dgAssert (m_attrib.m_pointChannel.m_count == attributeCount);
+	
 	EndFace();
 	PackAttibuteData();
 }
@@ -4057,11 +4052,11 @@ void dgMeshEffect::RepairTJoints ()
 	dgAssert (Sanity ());
 }
 
-dgInt32 dgMeshEffect::GetVertexWeights(dgInt32 vertexIndex, dgInt32* const weightIndices, dgFloat32* const weightFactors) const
+void dgMeshEffect::GetVertexWeights(dgInt32 vertexIndex, dgInt32* const weightIndices, dgFloat32* const weightFactors) const
 {
-	dgInt32 count = 0;
 	dgAssert(0);
 /*
+	dgInt32 count = 0;
 	if (m_points.m_weights.m_count) {
 		count = DG_MESH_WEIGHT_COUNT;
 		dgInt32 index = m_attrib.m_pointChannel[vertexIndex];
@@ -4071,6 +4066,6 @@ dgInt32 dgMeshEffect::GetVertexWeights(dgInt32 vertexIndex, dgInt32* const weigh
 			weightIndices[i] = weighSet.m_weightPair[i].m_controlIndex;
 		}
 	}
-*/
 	return count;
+*/
 }

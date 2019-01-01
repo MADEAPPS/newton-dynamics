@@ -8156,13 +8156,14 @@ const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh)
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
 	return meshEffect->GetIndexToVertexMap();
 }
-
+/*
 int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, int* const weightIndices, dFloat* const weightFactors)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
 	return meshEffect->GetVertexWeights (vertexIndex, weightIndices, weightFactors);
 }
+*/
 
 int NewtonMeshHasVertexWeightChannel(const NewtonMesh* const mesh)
 {

@@ -904,7 +904,7 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 
 //DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount)
 //DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, const int* const indexMap, DemoEntity** const bones, int bonesCount)
-DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount)
+DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount)
 	:DemoMeshInterface()
 	,m_mesh((DemoMesh*)owner->GetMesh())
 	,m_root(owner)
@@ -913,7 +913,7 @@ DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, dScene::dTreeNode* const ski
 	//if (skinNodeInfo->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
 	//dScene::dTreeNode* const meshNode = scene.FindParentByType(skinNode, dMeshNodeInfo::GetRttiType());
 	//dAssert (meshNode);
-	//dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(meshNode);
+	
 	//const int* const indexMap = skinNodeInfo->GetIndexToVertexMap();
 	//DemoEntity* const skinEntity = entityModifiers[i];
 	//DemoMesh* const mesh = (DemoMesh*)skinEntity->GetMesh();
@@ -926,12 +926,18 @@ DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, dScene::dTreeNode* const ski
 	m_mesh->AddRef();
 	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
 	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
-/*
+
 	m_skinIndexMap = new int[m_mesh->m_vertexCount];
 
-	m_weights = new dVector [skinModifier->m_vertexCount];
-	m_weighIndex = new dWeightBoneIndex [skinModifier->m_vertexCount];
+	m_weights = new dVector [m_mesh->m_vertexCount];
+	m_weighIndex = new dWeightBoneIndex [m_mesh->m_vertexCount];
 
+	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(skinMeshNode);
+	dAssert (meshInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
+	NewtonMeshGetWeightBendsChannel(meshInfo->GetMesh(), sizeof (dVector), &m_weights[0].m_x);
+	NewtonMeshGetWeightBoneIndexChannel(meshInfo->GetMesh(), sizeof (dWeightBoneIndex), &m_weighIndex->m_boneIndex[0]);
+
+/*
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
 		m_skinIndexMap[i] = indexMap[i];
 	}

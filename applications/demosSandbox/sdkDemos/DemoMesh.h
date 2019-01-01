@@ -112,7 +112,7 @@ class DemoSkinMesh: public DemoMeshInterface
 		int m_boneIndex[4];
 	};
 
-	DemoSkinMesh(DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount);
+	DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount);
 	~DemoSkinMesh();
 
 	void Render (DemoEntityManager* const scene);
