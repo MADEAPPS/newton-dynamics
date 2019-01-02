@@ -443,11 +443,11 @@ origin.m_posit = dVector(-2.0f, 0.5f, 0.0f, 1.0f);
 #else
 
 
-class dSixAxisManager: public dAnimationCharacterRigManager
+class dSixAxisManager: public dAnimationInverseDynamicsManager
 {
 	public:
 	dSixAxisManager(DemoEntityManager* const scene)
-		:dAnimationCharacterRigManager(scene->GetNewton())
+		:dAnimationInverseDynamicsManager(scene->GetNewton())
 //		,m_currentController(NULL)
 //		,m_azimuth(0.0f)
 //		,m_posit_x(0.0f)

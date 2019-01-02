@@ -513,7 +513,7 @@ class dAnimationToeJoint : public dAnimationRigForwardDynamicLimb
 
 
 
-class BalancingDummyManager : public dAnimationCharacterRigManager
+class BalancingDummyManager : public dAnimationInverseDynamicsManager
 {
 	public:
 
@@ -552,7 +552,7 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 
 	BalancingDummyManager(DemoEntityManager* const scene)
-		:dAnimationCharacterRigManager(scene->GetNewton())
+		:dAnimationInverseDynamicsManager(scene->GetNewton())
 		,m_currentRig(NULL)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
@@ -584,7 +584,7 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
-		dAnimationCharacterRigManager::OnDebug(debugContext);
+		dAnimationInverseDynamicsManager::OnDebug(debugContext);
 //		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 //			dSixAxisController* const controller = &node->GetInfo();
 //			controller->Debug(debugContext);
@@ -808,7 +808,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 			posture->m_position.m_y = 0.25f * controlData->m_hipHigh;
 		}
 
-		dAnimationCharacterRigManager::PreUpdate(timestep);
+		dAnimationInverseDynamicsManager::PreUpdate(timestep);
 	}
 
 	dAnimationCharacterRig* m_currentRig;

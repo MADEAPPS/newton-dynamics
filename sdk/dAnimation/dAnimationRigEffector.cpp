@@ -12,7 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigLimb.h"
 #include "dAnimationRigEffector.h"
-#include "dAnimationCharacterRigManager.h"
+#include "dAnimationInverseDynamicsManager.h"
 
 
 dAnimationRigEffector::dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, dAnimationRigLimb* const parent, dAnimationRigJoint* const targetBody)

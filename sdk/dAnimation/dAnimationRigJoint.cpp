@@ -11,7 +11,7 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigJoint.h"
-#include "dAnimationCharacterRigManager.h"
+#include "dAnimationInverseDynamicsManager.h"
 
 dAnimationRigJoint::dAnimationRigJoint(dAnimationRigJoint* const parent)
 	:dAnimationAcyclicJoint(parent)
@@ -24,7 +24,7 @@ dAnimationRigJoint::~dAnimationRigJoint()
 }
 
 
-void dAnimationRigJoint::UpdateLocalTransforms (dAnimationCharacterRigManager* const manager) const
+void dAnimationRigJoint::UpdateLocalTransforms (dAnimationInverseDynamicsManager* const manager) const
 {
 	dMatrix parentMatrixPool[128];
 	const dAnimationRigJoint* stackPool[128];

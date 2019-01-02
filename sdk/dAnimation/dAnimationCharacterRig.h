@@ -52,7 +52,7 @@ class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRig
 	dAnimationEffectorBlendRoot* m_animationTree;
 
 	friend class dAnimationRigEffector;
-	friend class dAnimationCharacterRigManager;
+	friend class dAnimationInverseDynamicsManager;
 };
 
 

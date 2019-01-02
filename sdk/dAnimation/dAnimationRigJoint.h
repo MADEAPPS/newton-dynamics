@@ -17,7 +17,7 @@
 
 class dAnimationRigLimb;
 class dAnimationCharacterRig;
-class dAnimationCharacterRigManager;
+class dAnimationInverseDynamicsManager;
 
 class dAnimationRigJoint: public dAnimationAcyclicJoint
 {
@@ -34,7 +34,7 @@ class dAnimationRigJoint: public dAnimationAcyclicJoint
 	protected:
 	void RigidBodyToStates();
 	void ApplyExternalForce(dFloat timestep) {}
-	void UpdateLocalTransforms (dAnimationCharacterRigManager* const manager) const;
+	void UpdateLocalTransforms (dAnimationInverseDynamicsManager* const manager) const;
 	
 	
 	dAnimationCharacterRig* m_root;

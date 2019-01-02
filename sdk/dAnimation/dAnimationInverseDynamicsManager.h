@@ -18,13 +18,13 @@
 #include "dAnimationCharacterRig.h"
 #include "dAnimationAcyclicSolver.h"
 
-#define D_ANINAMTION_CHARACTER_RIG_NAME	"__dAnimationCharacterRigManager__"
+#define D_ANINAMTION_INVERSE_DYNAMICS_MANAGER	"__dAnimationInverseDynamicsManager__"
 
-class dAnimationCharacterRigManager: public dCustomControllerManager<dAnimationCharacterRig>
+class dAnimationInverseDynamicsManager: public dCustomControllerManager<dAnimationCharacterRig>
 {
 	public:
-	dAnimationCharacterRigManager(NewtonWorld* const world);
-	virtual ~dAnimationCharacterRigManager();
+	dAnimationInverseDynamicsManager(NewtonWorld* const world);
+	virtual ~dAnimationInverseDynamicsManager();
 
 	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame);
 	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);

@@ -10,7 +10,7 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationCharacterRigManager.h"
+#include "dAnimationInverseDynamicsManager.h"
 #include "dAnimationRigForwardDynamicLimb.h"
 
 dAnimationRigForwardDynamicLimb::dAnimationRigForwardDynamicLimb(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body)

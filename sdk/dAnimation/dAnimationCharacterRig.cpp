@@ -14,7 +14,7 @@
 #include "dAnimationRigEffector.h"
 #include "dAnimationCharacterRig.h"
 #include "dAnimationEffectorBlendRoot.h"
-#include "dAnimationCharacterRigManager.h"
+#include "dAnimationInverseDynamicsManager.h"
 
 dAnimationCharacterRig::dAnimationCharacterRig()
 	:dCustomControllerBase()
@@ -97,6 +97,6 @@ void dAnimationCharacterRig::PreUpdate(dFloat timestep, int threadIndex)
 
 void dAnimationCharacterRig::PostUpdate(dFloat timestep, int threadIndex)
 {
-	dAnimationCharacterRigManager* const manager = (dAnimationCharacterRigManager*)GetManager();
+	dAnimationInverseDynamicsManager* const manager = (dAnimationInverseDynamicsManager*)GetManager();
 	UpdateLocalTransforms (manager);
 }

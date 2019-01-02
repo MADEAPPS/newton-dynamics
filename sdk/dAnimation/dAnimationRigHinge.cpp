@@ -11,7 +11,7 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigHinge.h"
-#include "dAnimationCharacterRigManager.h"
+#include "dAnimationInverseDynamicsManager.h"
 
 dAnimationRigHinge::dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body)
 	:dAnimationRigLimb(parent, body)

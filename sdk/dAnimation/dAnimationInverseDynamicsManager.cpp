@@ -11,25 +11,25 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigJoint.h"
-#include "dAnimationCharacterRigManager.h"
+#include "dAnimationInverseDynamicsManager.h"
 
-dAnimationCharacterRigManager::dAnimationCharacterRigManager(NewtonWorld* const world)
-	:dCustomControllerManager<dAnimationCharacterRig>(world, D_ANINAMTION_CHARACTER_RIG_NAME)
+dAnimationInverseDynamicsManager::dAnimationInverseDynamicsManager(NewtonWorld* const world)
+	:dCustomControllerManager<dAnimationCharacterRig>(world, D_ANINAMTION_INVERSE_DYNAMICS_MANAGER)
 {
 }
 
-dAnimationCharacterRigManager::~dAnimationCharacterRigManager()
+dAnimationInverseDynamicsManager::~dAnimationInverseDynamicsManager()
 {
 }
 
-dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame)
+dAnimationCharacterRig* dAnimationInverseDynamicsManager::CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame)
 {
 	dAnimationCharacterRig* const rig = CreateController();
 	rig->Init(body, localFrame);
 	return rig;
 }
 
-dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& rigFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+dAnimationCharacterRig* dAnimationInverseDynamicsManager::CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& rigFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 //	dAnimationCharacterRig* const rig = CreateController();
 //	rig->Init(chassisShape, mass, rigFrame, forceAndTorque, gravityMag);
@@ -38,13 +38,13 @@ dAnimationCharacterRig* dAnimationCharacterRigManager::CreateCharacterRig(Newton
 	return NULL;
 }
 
-void dAnimationCharacterRigManager::DestroyController(dAnimationCharacterRig* const rig)
+void dAnimationInverseDynamicsManager::DestroyController(dAnimationCharacterRig* const rig)
 {
 //	rig->Cleanup();
 	dCustomControllerManager<dAnimationCharacterRig>::DestroyController(rig);
 }
 
-void dAnimationCharacterRigManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+void dAnimationInverseDynamicsManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
 	for (dCustomControllerManager<dAnimationCharacterRig>::dListNode* rigNode = GetFirst(); rigNode; rigNode = rigNode->GetNext()) {
 		dAnimationCharacterRig* const rig = &rigNode->GetInfo();
