@@ -756,7 +756,6 @@ void SoftBodies(DemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 }
 
-
 void ClothPatch(DemoEntityManager* const scene)
 {
 	// load the skybox
