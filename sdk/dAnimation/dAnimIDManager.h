@@ -10,15 +10,15 @@
 */
 
 
-#ifndef __D_ANIMATION_CHARACTER_RIG_MANAGER_H__
-#define __D_ANIMATION_CHARACTER_RIG_MANAGER_H__
+#ifndef __D_ANIM_ID_MANAGER_H__
+#define __D_ANIM_ID_MANAGER_H__
 
 #include "dAnimationStdAfx.h"
 #include "dAnimIDRigJoint.h"
 #include "dAnimAcyclicSolver.h"
 #include "dAnimIDController.h"
 
-#define D_ANIMAMTION_INVERSE_DYNAMICS_MANAGER	"__dAnimIDManager__"
+#define D_ANIM_ID_MANAGER	"__dAnimIDManager__"
 
 class dAnimIDManager: public dCustomControllerManager<dAnimIDController>
 {

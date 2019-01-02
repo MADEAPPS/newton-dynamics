@@ -514,7 +514,7 @@ class dAnimationToeJoint : public dAnimationRigForwardDynamicLimb
 
 
 
-class BalancingDummyManager : public dAnimationCharacterRigManager
+class InverseKinematicAnimationManager : public dAnimationCharacterRigManager
 {
 	public:
 
@@ -552,20 +552,20 @@ class BalancingDummyManager : public dAnimationCharacterRigManager
 	};
 
 
-	BalancingDummyManager(DemoEntityManager* const scene)
+	InverseKinematicAnimationManager(DemoEntityManager* const scene)
 		:dAnimationCharacterRigManager(scene->GetNewton())
 		,m_currentRig(NULL)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~BalancingDummyManager()
+	~InverseKinematicAnimationManager()
 	{
 	}
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		BalancingDummyManager* const me = (BalancingDummyManager*)context;
+		InverseKinematicAnimationManager* const me = (InverseKinematicAnimationManager*)context;
 		if (me->m_currentRig) {
 			DemoEntity* const entiry = (DemoEntity*) NewtonBodyGetUserData(me->m_currentRig->GetNewtonBody());
 			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*) entiry->GetUserData();
@@ -814,8 +814,208 @@ xxxx1->ResetMatrix(*scene, matrix1);
 
 	dAnimationCharacterRig* m_currentRig;
 };
-
 #endif
+
+
+class InverseKinematicAnimationManager: public dAnimIKManager
+{
+	public:
+/*
+	class dAnimationCharacterUserData : public DemoEntity::UserData
+	{
+	public:
+		dAnimationCharacterUserData(dAnimIKController* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationBipeHipController* const posture)
+			:DemoEntity::UserData()
+			, m_rig(rig)
+			, m_walk(walk)
+			, m_posture(posture)
+			, m_hipHigh(0.0f)
+			, m_walkSpeed(0.0f)
+		{
+		}
+
+		void OnRender(dFloat timestep) const
+		{
+		}
+
+		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
+		{
+		}
+
+		void OnTransformCallback(DemoEntityManager& world) const
+		{
+		}
+
+		dAnimIKController* m_rig;
+		dAnimationEffectorBlendTwoWay* m_walk;
+		dAnimationBipeHipController* m_posture;
+
+		dFloat m_hipHigh;
+		dFloat m_walkSpeed;
+	};
+*/
+
+	InverseKinematicAnimationManager(DemoEntityManager* const scene)
+		:dAnimIKManager(scene->GetNewton())
+		,m_currentRig(NULL)
+	{
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~InverseKinematicAnimationManager()
+	{
+	}
+
+	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
+	{
+/*
+		InverseKinematicAnimationManager* const me = (InverseKinematicAnimationManager*)context;
+		if (me->m_currentRig) {
+			DemoEntity* const entiry = (DemoEntity*)NewtonBodyGetUserData(me->m_currentRig->GetNewtonBody());
+			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*)entiry->GetUserData();
+
+			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "Sliders control");
+
+			dFloat32 val0 = dFloat32(controlData->m_walkSpeed);
+			ImGui::SliderFloat_DoubleSpace("walkSpeed", &val0, 0.0f, 1.0f);
+			controlData->m_walkSpeed = val0;
+
+			dFloat32 val1 = dFloat32(controlData->m_hipHigh);
+			ImGui::SliderFloat_DoubleSpace("hip high", &val1, -0.5f, 1.5f);
+			controlData->m_hipHigh = val1;
+		}
+*/
+	}
+
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		dAnimIKManager::OnDebug(debugContext);
+		//for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		//	dSixAxisController* const controller = &node->GetInfo();
+		//	controller->Debug(debugContext);
+		//}
+	}
+/*
+	DemoEntity* FindMesh(const DemoEntity* const bodyPart) const
+	{
+		for (DemoEntity* child = bodyPart->GetChild(); child; child = child->GetSibling()) {
+			if (child->GetMesh()) {
+				return child;
+			}
+		}
+		dAssert(0);
+		return NULL;
+	}
+
+	NewtonCollision* MakeConvexHull(const DemoEntity* const bodyPart) const
+	{
+		dVector points[1024 * 16];
+
+		const DemoEntity* const meshEntity = FindMesh(bodyPart);
+
+		DemoMesh* const mesh = (DemoMesh*)meshEntity->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		dAssert(mesh->m_vertexCount && (mesh->m_vertexCount < int(sizeof(points) / sizeof(points[0]))));
+
+		// go over the vertex array and find and collect all vertices's weighted by this bone.
+		const dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			points[i][0] = array[i * 3 + 0];
+			points[i][1] = array[i * 3 + 1];
+			points[i][2] = array[i * 3 + 2];
+			points[i][3] = 0.0f;
+		}
+		dMatrix matrix(meshEntity->GetMeshMatrix());
+		matrix = matrix * meshEntity->GetCurrentMatrix();
+		//matrix = matrix * bodyPart->GetParent()->GetCurrentMatrix();
+		matrix.TransformTriplex(&points[0][0], sizeof(dVector), &points[0][0], sizeof(dVector), mesh->m_vertexCount);
+		//return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, SERVO_VEHICLE_DEFINITION::m_bodyPart, NULL);
+		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
+	}
+
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dRagDollConfig& definition)
+	{
+		NewtonCollision* const shape = MakeConvexHull(bodyPart);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		NewtonWorld* const world = GetWorld();
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, definition.m_mass, collision);
+
+		// save the user lifterData with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// assign a body part id
+		//NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+
+	void OnUpdateTransform(const dAnimIDRigJoint* const bone, const dMatrix& localMatrix) const
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		NewtonBody* const newtonBody = bone->GetNewtonBody();
+		DemoEntity* const meshEntity = (DemoEntity*)NewtonBodyGetUserData(newtonBody);
+
+		dQuaternion rot(localMatrix);
+		meshEntity->SetMatrix(*scene, rot, localMatrix.m_posit);
+	}
+*/
+	void PreUpdate(dFloat timestep)
+	{
+
+/*
+		if (m_currentRig) {
+			DemoEntity* const entiry = (DemoEntity*)NewtonBodyGetUserData(m_currentRig->GetNewtonBody());
+			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*)entiry->GetUserData();
+
+			dAnimationEffectorBlendTwoWay* const walkBlend = controlData->m_walk;
+			walkBlend->SetParam(controlData->m_walkSpeed);
+
+			dAnimationBipeHipController* const posture = controlData->m_posture;
+			posture->m_position.m_y = 0.25f * controlData->m_hipHigh;
+		}
+*/
+		dAnimIKManager::PreUpdate(timestep);
+	}
+
+	dAnimIKController* CreateHuman(const char* const fileName, const dMatrix& origin)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+
+		//DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skintest.ngd", scene->GetNewton());
+		DemoEntity* const character = DemoEntity::LoadNGD_mesh(fileName, GetWorld());
+		character->ResetMatrix(*scene, character->GetCurrentMatrix() * origin);
+		scene->Append(character);
+
+		//DemoEntity* xxx = xxxx0->Find("Bone002");
+		//dMatrix aaaa (dYawMatrix (30.0f * dDegreeToRad) * xxx->GetCurrentMatrix());
+		//xxx->ResetMatrix(*scene, aaaa);
+
+		dAnimIKController* const controller = CreateIKController();
+		controller->SetUserData(character);
+
+		return controller;
+	}
+
+	dAnimIKController* m_currentRig;
+
+};
 
 void AnimatedPlayerController(DemoEntityManager* const scene)
 {
@@ -824,46 +1024,17 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 	dMatrix origin (dGetIdentityMatrix());
+	origin.m_posit.m_y += 2.0f;
 
-origin.m_posit.m_y += 2.0f;
-
-	DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("whiteman.ngd", scene->GetNewton());
-//	DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skintest.ngd", scene->GetNewton());
-	xxxx0->ResetMatrix(*scene, xxxx0->GetCurrentMatrix() * origin);
-	scene->Append(xxxx0);
-
-//DemoEntity* xxx = xxxx0->Find("Bone002");
-//dMatrix aaaa (dYawMatrix (30.0f * dDegreeToRad) * xxx->GetCurrentMatrix());
-//xxx->ResetMatrix(*scene, aaaa);
-
-
-	DemoEntity* const xxxx1 = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton());
 	dMatrix origin1 (origin);
-	origin1.m_posit.m_z = 2.0f;
-	xxxx1->ResetMatrix(*scene, xxxx1->GetCurrentMatrix() * origin1);
-	scene->Append(xxxx1);
-	
-/*
-	BalancingDummyManager* const robotManager = new BalancingDummyManager(scene);
+	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
+	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
 
-	NewtonWorld* const world = scene->GetNewton();
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
-//	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
-//	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
-	int count = 10;
-	count = 1;
+DemoEntity* const referenceModel = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton());
+origin1.m_posit.m_z = 2.0f;
+referenceModel->ResetMatrix(*scene, referenceModel->GetCurrentMatrix() * origin1);
+scene->Append(referenceModel);
 	
-
-//origin = dGetIdentityMatrix();
-	origin.m_posit.m_x = 2.0f;
-//	origin.m_posit.m_y = 2.1f;
-	origin.m_posit.m_y = 3.0f;
-	for (int i = 0; i < count; i++) {
-		robotManager->CreateRagDoll(scene, origin);
-		//robotManager->CreateRagDoll (scene, origin1);
-		origin.m_posit.m_x += 1.0f;
-	}
-*/
 	origin.m_posit = dVector(-8.0f, 3.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }

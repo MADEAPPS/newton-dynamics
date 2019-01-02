@@ -14,7 +14,7 @@
 
 dAnimIKController::dAnimIKController()
 	:dCustomControllerBase()
-	,dAnimIDRigJoint(NULL)
+//	,dAnimIDRigJoint(NULL)
 //	,m_localFrame(dGetIdentityMatrix())
 //	,m_staticWorld(NULL)
 //	,m_solver()
@@ -46,29 +46,12 @@ void dAnimIKController::SetAnimationTree(dAnimationEffectorBlendRoot* const anim
 	m_animationTree = animTree;
 }
 
-void dAnimIKController::Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace)
-{
-	dCustomControllerBase::m_body = body;
-	dAnimIDRigJoint::Init(body);
-
-	dMatrix matrix;
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	m_localFrame = localFrameInGlobalSpace * matrix.Inverse();
-}
 
 dMatrix dAnimIKController::GetBasePoseMatrix() const
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(GetNewtonBody(), &matrix[0][0]);
 	return m_localFrame * matrix;
-}
-
-void dAnimIKController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-//	dAnimIDRigJoint::Debug(debugContext);
-	if (m_animationTree) {
-		m_animationTree->Debug(debugContext);
-	}
 }
 
 void dAnimIKController::Finalize()
@@ -82,19 +65,43 @@ NewtonBody* dAnimIKController::GetNewtonBody() const
 	return dCustomControllerBase::GetBody();
 }
 
+*/
+
+
+void dAnimIKController::Init(const dMatrix& localFrameInGlobalSpace)
+{
+	dAssert(0);
+//	dCustomControllerBase::m_body = body;
+//	dAnimIDRigJoint::Init(body);
+//	dMatrix matrix;
+//	NewtonBodyGetMatrix(body, &matrix[0][0]);
+//	m_localFrame = localFrameInGlobalSpace * matrix.Inverse();
+}
+
+void dAnimIKController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dAssert(0);
+	//	dAnimIDRigJoint::Debug(debugContext);
+//	if (m_animationTree) {
+//		m_animationTree->Debug(debugContext);
+//	}
+}
+
+
 void dAnimIKController::PreUpdate(dFloat timestep, int threadIndex)
 {
-	RigidBodyToStates();
-	if (m_animationTree) {
-		m_animationTree->Update(timestep);
-	}
-	m_solver.Update(timestep);
-	UpdateJointAcceleration();
+//	dAssert(0);
+//	RigidBodyToStates();
+//	if (m_animationTree) {
+//		m_animationTree->Update(timestep);
+//	}
+//	m_solver.Update(timestep);
+//	UpdateJointAcceleration();
 }
 
 void dAnimIKController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	dAnimationInverseDynamicsManager* const manager = (dAnimationInverseDynamicsManager*)GetManager();
-	UpdateLocalTransforms (manager);
+//	dAssert(0);
+//	dAnimationInverseDynamicsManager* const manager = (dAnimationInverseDynamicsManager*)GetManager();
+//	UpdateLocalTransforms(manager);
 }
-*/

@@ -10,29 +10,29 @@
 */
 
 
-#ifndef __D_ANIMATION_INVERSE_KINEMATIC_CONTROLLER_H__
-#define __D_ANIMATION_INVERSE_KINEMATIC_CONTROLLER_H__
+#ifndef __D_ANIM_IK_CONTROLLER_H__
+#define __D_ANIM_IK_CONTROLLER_H__
 
 #include "dAnimationStdAfx.h"
 #include "dAnimIDRigJoint.h"
 
-class dAnimIKController: public dCustomControllerBase, public dAnimIDRigJoint
+class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 {
 	public:
 	dAnimIKController ();
 	~dAnimIKController ();
 	
-	NewtonBody* GetNewtonBody() const;
-	virtual void Finalize();
-
+//	NewtonBody* GetNewtonBody() const;
+//	virtual void Finalize();
 //	dAnimationEffectorBlendRoot* GetAnimationTree () const;
 //	void SetAnimationTree (dAnimationEffectorBlendRoot* const animTree);
 //	dMatrix GetBasePoseMatrix() const;
 //	const dMatrix& GetLocalFrame() const {return m_localFrame;}
 //	dList<dAnimIDRigEffector*>& GetEffectors() {return m_effectors;}
+	
 
 	protected:
-	virtual void Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace);
+	virtual void Init(const dMatrix& localFrameInGlobalSpace);
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
@@ -44,9 +44,8 @@ class dAnimIKController: public dCustomControllerBase, public dAnimIDRigJoint
 //	dAnimationAcyclicSolver m_solver;
 //	dList<dAnimIDRigEffector*> m_effectors;
 //	dAnimationEffectorBlendRoot* m_animationTree;
-
-	friend class dAnimIDRigEffector;
-	friend class dAnimIDManager;
+//	friend class dAnimIDRigEffector;
+	friend class dAnimIKManager;
 };
 
 

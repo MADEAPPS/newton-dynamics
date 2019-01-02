@@ -14,7 +14,7 @@
 #include "dAnimIDManager.h"
 
 dAnimIDManager::dAnimIDManager(NewtonWorld* const world)
-	:dCustomControllerManager<dAnimIDController>(world, D_ANIMAMTION_INVERSE_DYNAMICS_MANAGER)
+	:dCustomControllerManager<dAnimIDController>(world, D_ANIM_ID_MANAGER)
 {
 }
 
