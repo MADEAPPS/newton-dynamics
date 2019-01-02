@@ -37,7 +37,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\dAnimation\dAnimationAcyclicJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationAcyclicSolver.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationCharacterRig.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationInverseDynamicsController.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationInverseDynamicsManager.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendPose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationEffectorBlendRoot.cpp" />
@@ -63,7 +63,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\dAnimation\dAnimationAcyclicJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationAcyclicSolver.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationCharacterRig.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationInverseDynamicsController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationInverseDynamicsManager.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendPose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationEffectorBlendRoot.h" />

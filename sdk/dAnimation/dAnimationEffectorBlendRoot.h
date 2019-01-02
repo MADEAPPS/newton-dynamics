@@ -17,7 +17,7 @@
 class dAnimationEffectorBlendRoot: public dAnimationEffectorBlendNode
 {
 	public:
-	dAnimationEffectorBlendRoot(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const childNode);
+	dAnimationEffectorBlendRoot(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const childNode);
 	virtual ~dAnimationEffectorBlendRoot();
 
 	dAnimationPose& GetPose() { return m_pose; }
@@ -27,7 +27,7 @@ class dAnimationEffectorBlendRoot: public dAnimationEffectorBlendNode
 
 	protected:
 	dAnimationPose m_pose;
-	dAnimationCharacterRig* m_rig;
+	dAnimationInverseDynamicsController* m_rig;
 };
 
 

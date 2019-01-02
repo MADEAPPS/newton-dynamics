@@ -12,7 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationEffectorBlendPose.h"
 
-dAnimationEffectorBlendPose::dAnimationEffectorBlendPose(dAnimationCharacterRig* const character)
+dAnimationEffectorBlendPose::dAnimationEffectorBlendPose(dAnimationInverseDynamicsController* const character)
 	:dAnimationEffectorBlendNode(character, NULL)
 	,m_pose(character)
 {

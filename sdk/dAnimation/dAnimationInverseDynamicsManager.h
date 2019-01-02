@@ -15,27 +15,27 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigJoint.h"
-#include "dAnimationCharacterRig.h"
 #include "dAnimationAcyclicSolver.h"
+#include "dAnimationInverseDynamicsController.h"
 
 #define D_ANINAMTION_INVERSE_DYNAMICS_MANAGER	"__dAnimationInverseDynamicsManager__"
 
-class dAnimationInverseDynamicsManager: public dCustomControllerManager<dAnimationCharacterRig>
+class dAnimationInverseDynamicsManager: public dCustomControllerManager<dAnimationInverseDynamicsController>
 {
 	public:
 	dAnimationInverseDynamicsManager(NewtonWorld* const world);
 	virtual ~dAnimationInverseDynamicsManager();
 
-	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame);
-	virtual dAnimationCharacterRig* CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	virtual dAnimationInverseDynamicsController* CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame);
+	virtual dAnimationInverseDynamicsController* CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 
-	virtual void DestroyController(dAnimationCharacterRig* const controller);
+	virtual void DestroyController(dAnimationInverseDynamicsController* const controller);
 	protected:
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 	virtual void OnUpdateTransform (const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const{}	
 
 	friend class dAnimationRigJoint;
-	friend class dAnimationCharacterRig;
+	friend class dAnimationInverseDynamicsController;
 };
 #endif 
 

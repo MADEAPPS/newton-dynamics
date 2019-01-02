@@ -12,10 +12,10 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationRigLimb.h"
 #include "dAnimationRigEffector.h"
-#include "dAnimationCharacterRig.h"
 #include "dAnimationEffectorBlendNode.h"
+#include "dAnimationInverseDynamicsController.h"
 
-dAnimationPose::dAnimationPose(dAnimationCharacterRig* const character)
+dAnimationPose::dAnimationPose(dAnimationInverseDynamicsController* const character)
 	:dList<dAnimationTransform>()
 {
 	dList<dAnimationRigEffector*>& effectorsList = character->GetEffectors();
@@ -45,7 +45,7 @@ void dAnimationPose::CopySource(const dAnimationPose& source)
 	}
 }
 
-void dAnimationPose::SetTargetPose(dAnimationCharacterRig* const character) const
+void dAnimationPose::SetTargetPose(dAnimationInverseDynamicsController* const character) const
 {
 	dMatrix rootMatrix(character->GetBasePoseMatrix());
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
@@ -55,7 +55,7 @@ void dAnimationPose::SetTargetPose(dAnimationCharacterRig* const character) cons
 	}
 }
 
-dAnimationEffectorBlendNode::dAnimationEffectorBlendNode(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
+dAnimationEffectorBlendNode::dAnimationEffectorBlendNode(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const child)
 	:dCustomAlloc()
 	,m_character(character)
 	,m_child(child)

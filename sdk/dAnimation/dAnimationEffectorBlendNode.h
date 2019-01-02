@@ -14,7 +14,7 @@
 
 class dAnimationEffectorBlendNode;
 class dAnimationRigEffector;
-class dAnimationCharacterRig;
+class dAnimationInverseDynamicsController;
 
 class dAnimationTransform
 {
@@ -27,16 +27,16 @@ class dAnimationTransform
 class dAnimationPose: public dList<dAnimationTransform>
 {
 	public:
-	dAnimationPose(dAnimationCharacterRig* const character);
+	dAnimationPose(dAnimationInverseDynamicsController* const character);
 
-	void SetTargetPose(dAnimationCharacterRig* const character) const;
+	void SetTargetPose(dAnimationInverseDynamicsController* const character) const;
 	void CopySource(const dAnimationPose& source);
 };
 
 class dAnimationEffectorBlendNode: public dCustomAlloc
 {
 	public:
-	dAnimationEffectorBlendNode(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child);
+	dAnimationEffectorBlendNode(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const child);
 	virtual ~dAnimationEffectorBlendNode();
 
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -53,7 +53,7 @@ class dAnimationEffectorBlendNode: public dCustomAlloc
 		}
 	}
 
-	dAnimationCharacterRig* m_character;
+	dAnimationInverseDynamicsController* m_character;
 	dAnimationEffectorBlendNode* m_child;
 };
 

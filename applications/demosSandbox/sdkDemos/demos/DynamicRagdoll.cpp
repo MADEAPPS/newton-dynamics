@@ -52,7 +52,7 @@ static dRagDollConfig ragDollConfig[] =
 class dWalkGenerator: public dAnimationEffectorBlendPose
 {
 	public:
-	dWalkGenerator(dAnimationCharacterRig* const character, dAnimationRigEffector* const leftFeet, dAnimationRigEffector* const rightFeet)
+	dWalkGenerator(dAnimationInverseDynamicsController* const character, dAnimationRigEffector* const leftFeet, dAnimationRigEffector* const rightFeet)
 		:dAnimationEffectorBlendPose(character)
 		,m_acc(0.0f)
 		,m_amplitud_x(2.0f)
@@ -141,7 +141,7 @@ timestep *= 0.01f;
 class dAnimationBipeHipController: public dAnimationEffectorBlendNode
 {
 	public:
-	dAnimationBipeHipController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
+	dAnimationBipeHipController(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const child)
 		:dAnimationEffectorBlendNode(character, child)
 		, m_euler(0.0f)
 		, m_position(0.0f)
@@ -186,7 +186,7 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 		dConvexHullPoint *m_next;
 	};
 
-	dAnimationBalanceController(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const child)
+	dAnimationBalanceController(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const child)
 		:dAnimationEffectorBlendNode(character, child)
 	{
 	}
@@ -430,7 +430,7 @@ class dAnimationAnkleJoint: public dAnimationRigForwardDynamicLimb
 //		floorMatrix.m_right = normal.CrossProduct(floorMatrix.m_front);
 //		floorMatrix.m_right = floorMatrix.m_right.Normalize();
 //		floorMatrix.m_up = floorMatrix.m_right.CrossProduct(floorMatrix.m_front);
-		dAnimationCharacterRig* const root = GetRoot();
+		dAnimationInverseDynamicsController* const root = GetRoot();
 		dMatrix floorMatrix (dRollMatrix(dPi) * root->GetBasePoseMatrix());
 
 		dFloat deltaAngle = CalculateAngle(floorMatrix.m_up, matrix0.m_up, matrix0.m_front) - m_offsetAngle;
@@ -520,7 +520,7 @@ class BalancingDummyManager : public dAnimationInverseDynamicsManager
 	class dAnimationCharacterUserData: public DemoEntity::UserData
 	{
 		public:
-		dAnimationCharacterUserData(dAnimationCharacterRig* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationBipeHipController* const posture)
+		dAnimationCharacterUserData(dAnimationInverseDynamicsController* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationBipeHipController* const posture)
 			:DemoEntity::UserData()
 			,m_rig(rig)
 			,m_walk(walk)
@@ -542,7 +542,7 @@ class BalancingDummyManager : public dAnimationInverseDynamicsManager
 		{
 		}
 
-		dAnimationCharacterRig* m_rig;
+		dAnimationInverseDynamicsController* m_rig;
 		dAnimationEffectorBlendTwoWay* m_walk;
 		dAnimationBipeHipController* m_posture;
 
@@ -660,7 +660,7 @@ class BalancingDummyManager : public dAnimationInverseDynamicsManager
 		return body;
 	}
 
-	dAnimationCharacterRig* CreateRagDoll(DemoEntityManager* const scene, const dMatrix& origin)
+	dAnimationInverseDynamicsController* CreateRagDoll(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 /*
 DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("tred_1.ngd", scene->GetNewton());
@@ -696,7 +696,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 		DemoEntity* const localFrame = model->Find("rootLocalFrame");
 		dAssert(localFrame);
 		dMatrix localFrameMatrix(localFrame->CalculateGlobalMatrix());
-		dAnimationCharacterRig* const rig = CreateCharacterRig(rootBody, localFrameMatrix);
+		dAnimationInverseDynamicsController* const rig = CreateCharacterRig(rootBody, localFrameMatrix);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
@@ -811,7 +811,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 		dAnimationInverseDynamicsManager::PreUpdate(timestep);
 	}
 
-	dAnimationCharacterRig* m_currentRig;
+	dAnimationInverseDynamicsController* m_currentRig;
 };
 
 void DynamicRagDoll(DemoEntityManager* const scene)

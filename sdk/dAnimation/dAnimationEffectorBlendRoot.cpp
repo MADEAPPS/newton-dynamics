@@ -12,7 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationEffectorBlendRoot.h"
 
-dAnimationEffectorBlendRoot::dAnimationEffectorBlendRoot(dAnimationCharacterRig* const character, dAnimationEffectorBlendNode* const childNode)
+dAnimationEffectorBlendRoot::dAnimationEffectorBlendRoot(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const childNode)
 	:dAnimationEffectorBlendNode(character, childNode)
 	,m_pose(character)
 	,m_rig(character)

@@ -20,11 +20,11 @@
 class dAnimationRigEffector;
 class dAnimationEffectorBlendRoot;
 
-class dAnimationCharacterRig: public dCustomControllerBase, public dAnimationRigJoint
+class dAnimationInverseDynamicsController: public dCustomControllerBase, public dAnimationRigJoint
 {
 	public:
-	dAnimationCharacterRig ();
-	~dAnimationCharacterRig ();
+	dAnimationInverseDynamicsController ();
+	~dAnimationInverseDynamicsController ();
 	
 	NewtonBody* GetNewtonBody() const;
 	virtual void Finalize();

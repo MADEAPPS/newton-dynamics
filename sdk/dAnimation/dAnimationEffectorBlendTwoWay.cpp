@@ -12,7 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationEffectorBlendTwoWay.h"
 
-dAnimationEffectorBlendTwoWay::dAnimationEffectorBlendTwoWay(dAnimationCharacterRig* const character,
+dAnimationEffectorBlendTwoWay::dAnimationEffectorBlendTwoWay(dAnimationInverseDynamicsController* const character,
 	dAnimationEffectorBlendNode* const node0,
 	dAnimationEffectorBlendNode* const node1)
 	:dAnimationEffectorBlendNode(character, NULL)

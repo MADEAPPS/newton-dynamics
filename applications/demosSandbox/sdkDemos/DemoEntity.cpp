@@ -452,8 +452,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 
 			for (int i = 0; i < modifiersCount; i++) {
 				dScene::dTreeNode* const skinMeshNode = nodeModifiers[i];
-				dMeshNodeInfo* const skinNodeInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(skinMeshNode);
-				dAssert (skinNodeInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
+				dAssert (((dMeshNodeInfo*)scene.GetInfoFromNode(skinMeshNode))->GetTypeId() == dMeshNodeInfo::GetRttiType());
 				DemoEntity* const skinEntity = entityModifiers[i];
 				DemoSkinMesh* const skinMesh = new DemoSkinMesh(&scene, skinEntity, skinMeshNode, sortedBonesEntities, bonesCount);
 				skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());

@@ -567,7 +567,7 @@ class dSixAxisManager: public dAnimationInverseDynamicsManager
 		return body;
 	}
 
-	dAnimationCharacterRig* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	dAnimationInverseDynamicsController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
 		scene->Append(model);
@@ -578,7 +578,7 @@ class dSixAxisManager: public dAnimationInverseDynamicsManager
 dAssert(0);
 return NULL;
 /*
-		dAnimationCharacterRig* const rig = CreateCharacterRig (rootBody);
+		dAnimationInverseDynamicsController* const rig = CreateCharacterRig (rootBody);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];

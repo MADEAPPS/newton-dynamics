@@ -28,7 +28,7 @@ dAnimationRigEffector::dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, 
 	m_isActive = true;
 	dAssert (!parent->m_effector);
 	parent->m_effector = this;
-	dAnimationCharacterRig* const root = parent->GetRoot();
+	dAnimationInverseDynamicsController* const root = parent->GetRoot();
 	root->m_effectors.Append(this);
 
 	dAssert(parent != targetBody);
@@ -51,7 +51,7 @@ dAnimationRigEffector::~dAnimationRigEffector()
 
 dMatrix dAnimationRigEffector::GetBasePoseMatrix() const
 {
-	dAnimationCharacterRig* const root = m_parent->GetRoot();
+	dAnimationInverseDynamicsController* const root = m_parent->GetRoot();
 	return m_effectorMatrix * root->GetBasePoseMatrix();
 }
 
