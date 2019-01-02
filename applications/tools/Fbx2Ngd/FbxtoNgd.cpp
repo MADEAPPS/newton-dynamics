@@ -789,11 +789,14 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 				skinVertexDataCount += cluster->GetControlPointIndicesCount();
 			}
 
-			weightArray = new NewtonMeshVertexWeightData::dgWeights[fbxMesh->GetControlPointsCount()];
-			memset(weightArray, 0, fbxMesh->GetControlPointsCount() * sizeof(NewtonMeshVertexWeightData::dgWeights));
+			const int vertexCount = fbxMesh->GetControlPointsCount();
+			dFloat* const tempWeight = new dFloat [16 * vertexCount];
+			int* const tempBones = new int[16 * vertexCount];
+			memset(tempWeight, 0, 16 * vertexCount * sizeof(dFloat));
+			memset(tempBones, 0, 16 * vertexCount * sizeof(int));
 
-			for (int i = 0; i < clusterCount; i++)
-			{
+			int maxBoneWeightCount = 0;
+			for (int i = 0; i < clusterCount; i++) {
 				FbxCluster* const cluster = skin->GetCluster(i);
 				FbxNode* const fbxBone = cluster->GetLink();
 
@@ -804,25 +807,71 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 					dAssert(bone);
 
 					dBoneNodeInfo* const boneInfo = (dBoneNodeInfo*)ngdScene->GetInfoFromNode(bone);
-
-					int *boneVertexIndices = cluster->GetControlPointIndices();
-					double *boneVertexWeights = cluster->GetControlPointWeights();
+					
+					const int* const boneVertexIndices = cluster->GetControlPointIndices();
+					const double* const boneVertexWeights = cluster->GetControlPointWeights();
 					// Iterate through all the vertices, which are affected by the bone
 					int numBoneVertexIndices = cluster->GetControlPointIndicesCount();
 					for (int j = 0; j < numBoneVertexIndices; j++) {
 						int boneVertexIndex = boneVertexIndices[j];
 						float boneWeight = (float)boneVertexWeights[j];
 
-						for (int k = 0; k < 4; k++) {
-							if (weightArray[boneVertexIndex].m_weightBlends[k] == 0.0f) {
-								weightArray[boneVertexIndex].m_weightBlends[k] = boneWeight;
-								weightArray[boneVertexIndex].m_controlIndex[k] = boneInfo->GetId();
+						for (int k = 0; k < 16; k++) {
+							if (tempWeight[16 * boneVertexIndex + k] == 0.0f) {
+								tempWeight[16 * boneVertexIndex + k] = boneWeight;
+								tempBones[16 * boneVertexIndex + k] = boneInfo->GetId();
+								maxBoneWeightCount = dMax(maxBoneWeightCount, k + 1);
+								dAssert(maxBoneWeightCount <= 16);
 								break;
 							}
 						}
 					}
 				}
 			}
+
+			for (int i = 0; i < vertexCount; i++) {
+				dFloat* const weighPtr = &tempWeight[i * 16];
+				int n = 0;
+				for (int j = 0; j < 16; j++) {
+					n += (weighPtr[j] > 0.0f) ? 1 : 0;
+				}
+				if (n > 4) {
+					int* const bonePtr = &tempBones[i * 16];
+					for (int j = 0; j < n - 1; j++) {
+						for (int k = j + 1; k < n; k++) {
+							if (weighPtr[k] > weighPtr[j]) {
+								dSwap(bonePtr[k], bonePtr[j]);
+								dSwap(weighPtr[k], weighPtr[j]);
+							}
+						}
+					}
+				}
+
+				dFloat normalize = 0.0f;
+				for (int j = 0; j < 4; j++) {
+					normalize += weighPtr[j];
+				}
+				normalize = 1.0f / normalize;
+				for (int j = 0; j < 4; j++) {
+					weighPtr[j] *= normalize;
+				}
+			}
+
+			weightArray = new NewtonMeshVertexWeightData::dgWeights[fbxMesh->GetControlPointsCount()];
+			memset(weightArray, 0, vertexCount * sizeof(NewtonMeshVertexWeightData::dgWeights));
+
+			for (int i = 0; i < vertexCount; i++) {
+				const dFloat* const weighPtr = &tempWeight[i * 16];
+				const int* const bonePtr = &tempBones[i * 16];
+				for (int j = 0; j < 4; j++) {
+					weightArray[i].m_weightBlends[j] = weighPtr[j];
+					weightArray[i].m_controlIndex[j] = bonePtr[j];
+				}
+				dAssert((weightArray[i].m_weightBlends[3] > 0.0f) || (weightArray[i].m_controlIndex[3] == 0));
+			}
+
+			delete[] tempWeight;
+			delete[] tempBones;
 		}
 
 		NewtonMeshVertexFormat format;

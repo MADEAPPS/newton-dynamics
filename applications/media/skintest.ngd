@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <NewtonGameDynamnics>
     <header description="Newton Dynamnics 3.00, universal file format" revision="104" />
-    <nodes count="14">
+    <nodes count="12">
         <dRootNodeInfo>
             <dNodeInfo name="rootNode" fileIndex="0" editorFlags="0" />
-            <childrenNodes count="3" indices="1 3 11" />
+            <childrenNodes count="3" indices="1 3 10" />
         </dRootNodeInfo>
         <dSceneCacheInfo cacheId="-3320094658024126097">
             <dNodeInfo name="dMaterialCache" fileIndex="1" editorFlags="0" />
@@ -19,106 +19,79 @@
             <emissive textureId="-1" color="0 0 0 1" />
             <shininess float="0.000000" />
             <opacity float="1.000000" />
-            <parentNodes count="3" indices="1 12 13" />
+            <parentNodes count="2" indices="1 11" />
         </dMaterialNodeInfo>
         <dSceneNodeInfo>
-            <dNodeInfo name="mesh" fileIndex="3" editorFlags="0" />
+            <dNodeInfo name="Box001" fileIndex="3" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="8.27637e-08 -2.22054e-08 -0.00941624 1" eulerAngles="8.9407e-08 7.53644e-15 -8.42937e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <geometryTransform matrix="8.74228e-08 1 -7.54979e-08 0 7.54979e-08 -7.54979e-08 -1 0 -1 8.74228e-08 -7.54979e-08 0 -9.79033e-08 9.68933e-08 0.508 1" />
+            <transform position="-0.298069 -9.68933e-08 0.0264273 1" eulerAngles="2.27374e-13 -4.76837e-07 -4.76837e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="0" />
-            <childrenNodes count="2" indices="4 12" />
+            <childrenNodes count="2" indices="4 11" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="Bone001" fileIndex="4" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="1.99475 0.121235 -0.0206585 1" eulerAngles="-1.5708 4.44487e-07 1.83884 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <transform position="2.00156 0.636009 -0.0264281 1" eulerAngles="-1.5708 7.97827e-08 1.83884 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="3" />
-            <childrenNodes count="2" indices="5 8" />
+            <childrenNodes count="2" indices="5 7" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="Bone002" fileIndex="5" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="-9.68933e-08 -2.30122e-07 1.99486 1" eulerAngles="1.93773e-07 0.4947 1.20302e-22 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <transform position="-1.4534e-07 -2.29314e-07 1.99486 1" eulerAngles="1.93773e-07 0.4947 -3.00755e-23 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="4" />
-            <childrenNodes count="2" indices="6 9" />
+            <childrenNodes count="2" indices="6 8" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="Bone003" fileIndex="6" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="-4.84467e-08 0 2.14903 1" eulerAngles="1.42109e-14 -5.55112e-17 -5.29396e-23 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <transform position="-4.84467e-08 -2.88765e-15 2.14903 1" eulerAngles="1.09188e-22 -1.49012e-08 -7.10543e-15 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="5" />
-            <childrenNodes count="2" indices="7 10" />
-        </dSceneNodeInfo>
-        <dSceneNodeInfo>
-            <dNodeInfo name="Box001" fileIndex="7" editorFlags="0" />
-            <color float4="0.75 0.75 0 0" />
-            <transform position="-0.119897 -0.1729 0.693493 1" eulerAngles="1.48275e-15 -0.226661 2.91678e-14 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <parentNodes count="1" indices="6" />
-            <childrenNodes count="1" indices="13" />
+            <childrenNodes count="1" indices="9" />
         </dSceneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="Bone001" fileIndex="8" editorFlags="0" />
+            <dNodeInfo name="Bone001" fileIndex="7" editorFlags="0" />
             <boneData boneIndex="0" length="1.000000" type="1" />
             <parentNodes count="1" indices="4" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="Bone002" fileIndex="9" editorFlags="0" />
+            <dNodeInfo name="Bone002" fileIndex="8" editorFlags="0" />
             <boneData boneIndex="1" length="1.000000" type="1" />
             <parentNodes count="1" indices="5" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="Bone003" fileIndex="10" editorFlags="0" />
+            <dNodeInfo name="Bone003" fileIndex="9" editorFlags="0" />
             <boneData boneIndex="2" length="1.000000" type="1" />
             <parentNodes count="1" indices="6" />
         </dBoneNodeInfo>
         <dSceneCacheInfo cacheId="-7649022316178375635">
-            <dNodeInfo name="dGeometryCache" fileIndex="11" editorFlags="0" />
+            <dNodeInfo name="dGeometryCache" fileIndex="10" editorFlags="0" />
             <parentNodes count="1" indices="0" />
-            <childrenNodes count="2" indices="12 13" />
+            <childrenNodes count="1" indices="11" />
         </dSceneCacheInfo>
         <dMeshNodeInfo>
             <dGeometryNodeInfo>
-                <dNodeInfo name="mesh_mesh" fileIndex="12" editorFlags="0" />
+                <dNodeInfo name="Box001_mesh" fileIndex="11" editorFlags="0" />
                 <pivotMatrix float16="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             </dGeometryNodeInfo>
             <points>
-                <position float4="16" floats="-0.48768 0 -2.032 0 -0.48768 0 -0.677333 0 -0.48768 0 0.677333 0 -0.48768 0 2.032 0 -0.48768 1.016 2.032 0 -0.48768 1.016 0.677333 0 -0.48768 1.016 -0.677333 0 -0.48768 1.016 -2.032 0 0.48768 0 2.032 0 0.48768 0 0.677333 0 0.48768 0 -0.677333 0 0.48768 0 -2.032 0 0.48768 1.016 -2.032 0 0.48768 1.016 -0.677333 0 0.48768 1.016 0.677333 0 0.48768 1.016 2.032 0" />
-                <weightBlend float4="16" floats="1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0" />
-                <weightBones int4="16" bones="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0" />
+                <position float4="40" floats="-2 0 -0.5 0 -2 0 0.5 0 -2 1 0.5 0 -2 1 -0.5 0 -1.55556 1 -0.5 0 -1.55556 0 0.5 0 -1.55556 0 -0.5 0 -1.55556 1 0.5 0 -1.11111 0 0.5 0 -1.11111 1 0.5 0 -1.11111 1 -0.5 0 -1.11111 0 -0.5 0 -0.666667 1 -0.5 0 -0.666667 0 -0.5 0 -0.666667 0 0.5 0 -0.666667 1 0.5 0 -0.222222 0 -0.5 0 -0.222222 0 0.5 0 -0.222222 1 0.5 0 -0.222222 1 -0.5 0 0.222222 1 0.5 0 0.222222 0 0.5 0 0.222222 0 -0.5 0 0.222222 1 -0.5 0 0.666666 1 -0.5 0 0.666666 1 0.5 0 0.666666 0 0.5 0 0.666666 0 -0.5 0 1.11111 1 -0.5 0 1.11111 1 0.5 0 1.11111 0 -0.5 0 1.11111 0 0.5 0 1.55556 0 -0.5 0 1.55556 0 0.5 0 1.55556 1 0.5 0 1.55556 1 -0.5 0 2 0 0.5 0 2 0 -0.5 0 2 1 -0.5 0 2 1 0.5 0" />
+                <weightBlend float4="40" floats="1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 0.5 0.5 0 0 1 0 0 0 0.999686 0.000313989 0 0 0.5 0.5 0 0 0.5 0.5 0 0 0.999821 0.000178832 0 0 0.5 0.5 0 0 0.5 0.5 0 0 1 0 0 0 1 0 0 0 0.999874 0.000126056 0 0 0.864526 0.135474 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0" />
+                <weightBones int4="40" bones="1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
                 <normal float3="6" floats="-1 0 0 0 0 1 0 -1 0 0 0 -1 0 1 0 1 0 0" />
-                <uv0 float2="8" floats="0 0 0 1 0.333333 0 0.333333 1 0.666667 0 0.666667 1 1 1 1 0" />
+                <uv0 float2="36" floats="0 0 0 1 0 0.888889 0 0.777778 0 0.111111 0 0.666667 0 0.555556 0 0.444444 0 0.222222 0 0.333333 0.111111 0 0.111111 1 0.222222 1 0.222222 0 0.333333 0 0.333333 1 0.444444 0 0.444444 1 0.555556 0 0.555556 1 0.666667 1 0.666667 0 0.777778 0 0.777778 1 0.888889 1 0.888889 0 1 0.333333 1 0 1 0.222222 1 1 1 0.444444 1 0.666667 1 0.555556 1 0.111111 1 0.888889 1 0.777778" />
             </points>
-            <polygons count="14" faceIndexCount="4 4 4 4 4 4 4 4 4 4 4 4 4 4">
-                <faceMaterial index="-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1" />
-                <position index="0 1 6 7 0 11 10 1 0 7 12 11 1 2 5 6 1 10 9 2 2 3 4 5 2 9 8 3 3 8 15 4 11 12 13 10 10 13 14 9 9 14 15 8 7 6 13 12 6 5 14 13 5 4 15 14" />
-                <normal index="0 0 0 0 2 2 2 2 3 3 3 3 0 0 0 0 2 2 2 2 0 0 0 0 2 2 2 2 1 1 1 1 5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 4 4 4" />
-                <uv0 index="0 2 3 1 7 6 5 4 7 6 1 0 2 4 5 3 4 5 3 2 4 7 6 5 2 3 1 0 0 7 6 1 7 6 5 4 4 5 3 2 2 3 1 0 0 2 3 1 2 4 5 3 4 7 6 5" />
+            <polygons count="38" faceIndexCount="4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4">
+                <faceMaterial index="-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1" />
+                <position index="0 1 2 3 0 6 5 1 0 3 4 6 1 5 7 2 6 11 8 5 6 4 10 11 5 8 9 7 11 13 14 8 11 10 12 13 8 14 15 9 13 16 17 14 13 12 19 16 14 17 18 15 16 22 21 17 16 19 23 22 17 21 20 18 22 27 26 21 22 23 24 27 21 26 25 20 27 30 31 26 27 24 28 30 26 31 29 25 30 32 33 31 30 28 35 32 31 33 34 29 32 37 36 33 32 35 38 37 33 36 39 34 37 38 39 36 3 2 7 4 4 7 9 10 10 9 15 12 12 15 18 19 19 18 20 23 23 20 25 24 24 25 29 28 28 29 34 35 35 34 39 38" />
+                <normal index="0 0 0 0 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 5 5 5 5 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4" />
+                <uv0 index="0 27 29 1 27 33 4 0 27 29 24 25 0 10 11 1 33 28 8 4 25 24 23 22 10 13 12 11 28 26 9 8 22 23 20 21 13 14 15 12 26 30 7 9 21 20 19 18 14 16 17 15 30 32 6 7 18 19 17 16 16 18 19 17 32 31 5 6 16 17 15 14 18 21 20 19 31 35 3 5 14 15 12 13 21 22 23 20 35 34 2 3 13 12 11 10 22 25 24 23 34 29 1 2 10 11 1 0 25 27 29 24 27 29 1 0 0 27 33 4 4 33 28 8 8 28 26 9 9 26 30 7 7 30 32 6 6 32 31 5 5 31 35 3 3 35 34 2 2 34 29 1" />
             </polygons>
-            <parentNodes count="2" indices="3 11" />
-            <childrenNodes count="1" indices="2" />
-        </dMeshNodeInfo>
-        <dMeshNodeInfo>
-            <dGeometryNodeInfo>
-                <dNodeInfo name="Box001_mesh" fileIndex="13" editorFlags="0" />
-                <pivotMatrix float16="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            </dGeometryNodeInfo>
-            <points>
-                <position float4="8" floats="-0.237067 0 -0.277707 0 -0.237067 0 0.277707 0 -0.237067 0.311573 0.277707 0 -0.237067 0.311573 -0.277707 0 0.237067 0 0.277707 0 0.237067 0 -0.277707 0 0.237067 0.311573 -0.277707 0 0.237067 0.311573 0.277707 0" />
-                <normal float3="6" floats="-1 0 0 0 0 1 0 -1 0 0 0 -1 0 1 0 1 0 0" />
-                <uv0 float2="4" floats="0 0 0 1 1 0 1 1" />
-            </points>
-            <polygons count="6" faceIndexCount="4 4 4 4 4 4">
-                <faceMaterial index="-1 -1 -1 -1 -1 -1" />
-                <position index="0 1 2 3 0 5 4 1 0 3 6 5 1 4 7 2 5 6 7 4 3 2 7 6" />
-                <normal index="0 0 0 0 2 2 2 2 3 3 3 3 1 1 1 1 5 5 5 5 4 4 4 4" />
-                <uv0 index="0 2 3 1 2 3 1 0 2 3 1 0 0 2 3 1 2 3 1 0 0 2 3 1" />
-            </polygons>
-            <parentNodes count="2" indices="7 11" />
+            <parentNodes count="2" indices="3 10" />
             <childrenNodes count="1" indices="2" />
         </dMeshNodeInfo>
     </nodes>

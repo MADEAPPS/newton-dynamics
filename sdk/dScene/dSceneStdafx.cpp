@@ -466,7 +466,6 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 		pointElement->LinkEndChild(position);
 		position->SetAttribute("float4", count);
 		position->SetAttribute("floats", buffer);
-
 	} else {
 		struct FlatWeightedVertex
 		{

@@ -902,23 +902,12 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	}
 }
 
-//DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, dGeometryNodeSkinModifierInfo* const skinModifier, const int* const indexMap, DemoEntity** const bones, int bonesCount)
-//DemoSkinMesh::DemoSkinMesh(DemoEntity* const owner, DemoMesh* const mesh, const int* const indexMap, DemoEntity** const bones, int bonesCount)
 DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount)
 	:DemoMeshInterface()
 	,m_mesh((DemoMesh*)owner->GetMesh())
 	,m_root(owner)
 	,m_entity(owner)
 {
-	//if (skinNodeInfo->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
-	//dScene::dTreeNode* const meshNode = scene.FindParentByType(skinNode, dMeshNodeInfo::GetRttiType());
-	//dAssert (meshNode);
-	
-	//const int* const indexMap = skinNodeInfo->GetIndexToVertexMap();
-	//DemoEntity* const skinEntity = entityModifiers[i];
-	//DemoMesh* const mesh = (DemoMesh*)skinEntity->GetMesh();
-	//dGeometryNodeSkinModifierInfo* const skinModifier = (dGeometryNodeSkinModifierInfo*)skinNodeInfo;
-
 	while (m_root->GetParent()) {
 		m_root = m_root->GetParent();
 	}
@@ -937,11 +926,15 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 
 	m_weightcount = 0;
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
+		dFloat w = 0.0f;
 		for (int j = 0; j < 4; j ++) {
+			w += m_weights[i][j];
 			if (m_weights[i][j] > 0.0f) {
 				m_weightcount = dMax (m_weightcount, j + 1);
 			}
 		}
+		dAssert (w > 0.999f);
+		dAssert (w <= 1.001f);
 	}
 
 	int stack = 1;
@@ -1075,9 +1068,6 @@ void DemoSkinMesh::BuildSkin ()
 		dVector normal (normalSource[i * 3 + 0], normalSource[i * 3 + 1], normalSource[i * 3 + 2], dFloat (0.0f));
 		dVector weightedPoint (0.0f);
 		dVector weightedNormal (0.0f);
-
-//if (p.m_x > -2.0) continue;
-//dTrace (("%d %d %f %f %f\n", i, k, p.m_x, p.m_y, p.m_z));
 
 		const dVector& weight = m_weights[i];
 		const dWeightBoneIndex& boneIndex = m_weighIndex[i];

@@ -2341,12 +2341,16 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 	if (format->m_vertexWeights.m_data) {
 		dgInt8* const data = (dgInt8*)format->m_vertexWeights.m_data;
 		for (dgInt32 i = 0; i < vertexCount; i++) {
+			dgFloat32 w = dgFloat32(0.0f);
 			const dgWeights* const vertexWeight = (dgWeights*)&data[i * format->m_vertexWeights.m_strideInBytes];
 			dgWeights weight;
 			for (int j = 0; j < 4; j++) {
+				w += vertexWeight->m_weightBlends[j];
 				weight.m_weightBlends[j] = vertexWeight->m_weightBlends[j];
 				weight.m_controlIndex[j] = vertexWeight->m_controlIndex[j];
 			}
+			dgAssert(w > 0.999f);
+			dgAssert(w <= 1.001f);
 			m_points.m_weights.PushBack(weight);
 		}
 	}
@@ -2995,11 +2999,11 @@ void dgMeshEffect::GetWeightBlendChannel(dgInt32 strideInByte, dgFloat32* const 
 		dgFloat32* const ptr = (dgFloat32*)&buffer[j];
 
 		const dgInt32 index = m_attrib.m_pointChannel[i];
-		const dgVector& p = m_points.m_weights[index].m_weightBlends;
-		ptr[0] = dgFloat32(p.m_x);
-		ptr[1] = dgFloat32(p.m_y);
-		ptr[2] = dgFloat32(p.m_z);
-		ptr[3] = dgFloat32(p.m_w);
+		const dgFloat32* const p = &m_points.m_weights[index].m_weightBlends[0];
+		ptr[0] = dgFloat32(p[0]);
+		ptr[1] = dgFloat32(p[1]);
+		ptr[2] = dgFloat32(p[2]);
+		ptr[3] = dgFloat32(p[3]);
 	}
 }
 
