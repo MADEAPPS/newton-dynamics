@@ -10,15 +10,15 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigHinge.h"
-#include "dAnimationRigEffector.h"
+#include "dAnimIDRigHinge.h"
+#include "dAnimIDRigEffector.h"
 #include "dAnimationEffectorBlendRoot.h"
-#include "dAnimationInverseDynamicsManager.h"
-#include "dAnimationInverseDynamicsController.h"
+#include "dAnimIDManager.h"
+#include "dAnimIDController.h"
 
-dAnimationInverseDynamicsController::dAnimationInverseDynamicsController()
+dAnimIDController::dAnimIDController()
 	:dCustomControllerBase()
-	,dAnimationRigJoint(NULL)
+	,dAnimIDRigJoint(NULL)
 	,m_localFrame(dGetIdentityMatrix())
 	,m_staticWorld(NULL)
 	,m_solver()
@@ -29,19 +29,19 @@ dAnimationInverseDynamicsController::dAnimationInverseDynamicsController()
 	m_staticWorld.SetLoopNode(true);
 }
 
-dAnimationInverseDynamicsController::~dAnimationInverseDynamicsController ()
+dAnimIDController::~dAnimIDController ()
 {
 	if (m_animationTree) {
 		delete m_animationTree;
 	}
 }
 
-dAnimationEffectorBlendRoot* dAnimationInverseDynamicsController::GetAnimationTree() const
+dAnimationEffectorBlendRoot* dAnimIDController::GetAnimationTree() const
 {
 	return m_animationTree;
 }
 
-void dAnimationInverseDynamicsController::SetAnimationTree(dAnimationEffectorBlendRoot* const animTree)
+void dAnimIDController::SetAnimationTree(dAnimationEffectorBlendRoot* const animTree)
 {
 	if (m_animationTree) {
 		delete m_animationTree;
@@ -49,43 +49,43 @@ void dAnimationInverseDynamicsController::SetAnimationTree(dAnimationEffectorBle
 	m_animationTree = animTree;
 }
 
-void dAnimationInverseDynamicsController::Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace)
+void dAnimIDController::Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace)
 {
 	dCustomControllerBase::m_body = body;
-	dAnimationRigJoint::Init(body);
+	dAnimIDRigJoint::Init(body);
 
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 	m_localFrame = localFrameInGlobalSpace * matrix.Inverse();
 }
 
-dMatrix dAnimationInverseDynamicsController::GetBasePoseMatrix() const
+dMatrix dAnimIDController::GetBasePoseMatrix() const
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(GetNewtonBody(), &matrix[0][0]);
 	return m_localFrame * matrix;
 }
 
-void dAnimationInverseDynamicsController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+void dAnimIDController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-//	dAnimationRigJoint::Debug(debugContext);
+//	dAnimIDRigJoint::Debug(debugContext);
 	if (m_animationTree) {
 		m_animationTree->Debug(debugContext);
 	}
 }
 
-void dAnimationInverseDynamicsController::Finalize()
+void dAnimIDController::Finalize()
 {
-	dAnimationRigJoint::Finalize();
+	dAnimIDRigJoint::Finalize();
 	m_solver.Finalize(this);
 }
 
-NewtonBody* dAnimationInverseDynamicsController::GetNewtonBody() const 
+NewtonBody* dAnimIDController::GetNewtonBody() const 
 {
 	return dCustomControllerBase::GetBody();
 }
 
-void dAnimationInverseDynamicsController::PreUpdate(dFloat timestep, int threadIndex)
+void dAnimIDController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	RigidBodyToStates();
 	if (m_animationTree) {
@@ -95,8 +95,8 @@ void dAnimationInverseDynamicsController::PreUpdate(dFloat timestep, int threadI
 	UpdateJointAcceleration();
 }
 
-void dAnimationInverseDynamicsController::PostUpdate(dFloat timestep, int threadIndex)
+void dAnimIDController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	dAnimationInverseDynamicsManager* const manager = (dAnimationInverseDynamicsManager*)GetManager();
+	dAnimIDManager* const manager = (dAnimIDManager*)GetManager();
 	UpdateLocalTransforms (manager);
 }

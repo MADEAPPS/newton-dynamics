@@ -9,23 +9,23 @@
 * freely
 */
 
-#ifndef __D_ANIMATION_RIG_FORWRAD_DYNAMIC_LIMB_H__
-#define __D_ANIMATION_RIG_FORWRAD_DYNAMIC_LIMB_H__
+#ifndef __D_ANIMATION_RIG_HINGE_H__
+#define __D_ANIMATION_RIG_HINGE_H__
 
-#include "dAnimationRigLimb.h"
+#include "dAnimIDRigLimb.h"
 
 
-class dAnimationRigForwardDynamicLimb: public dAnimationRigLimb, public dCustomHinge
+class dAnimIDRigHinge: public dAnimIDRigLimb, public dCustomHinge
 {
 	public:
-	dAnimationRigForwardDynamicLimb(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body);
-	virtual ~dAnimationRigForwardDynamicLimb();
+	dAnimIDRigHinge(const dMatrix& basicMatrix, dAnimIDRigJoint* const parent, NewtonBody* const body);
+	virtual ~dAnimIDRigHinge();
 
-	void *operator new (size_t size){ return dAnimationRigJoint::Alloc(size); }
-	void operator delete (void* ptr) { dAnimationRigJoint::Free(ptr); }
+	void *operator new (size_t size) {return dAnimIDRigJoint::Alloc(size);}
+	void operator delete (void* ptr) {dAnimIDRigJoint::Free(ptr);}
 
 	protected:
-	void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const;
+	void Debug(dDebugDisplay* const debugDisplay) const;
 	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	virtual void UpdateJointAcceleration();
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);

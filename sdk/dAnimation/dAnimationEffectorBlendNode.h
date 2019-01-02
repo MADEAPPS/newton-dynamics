@@ -13,30 +13,30 @@
 #define __D_ANIMATION_EFFECTOR_BLEND_NODE_h__
 
 class dAnimationEffectorBlendNode;
-class dAnimationRigEffector;
-class dAnimationInverseDynamicsController;
+class dAnimIDRigEffector;
+class dAnimIDController;
 
 class dAnimationTransform
 {
 	public:
 	dVector m_posit;
 	dQuaternion m_rotation;
-	dAnimationRigEffector* m_effector;
+	dAnimIDRigEffector* m_effector;
 };
 
 class dAnimationPose: public dList<dAnimationTransform>
 {
 	public:
-	dAnimationPose(dAnimationInverseDynamicsController* const character);
+	dAnimationPose(dAnimIDController* const character);
 
-	void SetTargetPose(dAnimationInverseDynamicsController* const character) const;
+	void SetTargetPose(dAnimIDController* const character) const;
 	void CopySource(const dAnimationPose& source);
 };
 
 class dAnimationEffectorBlendNode: public dCustomAlloc
 {
 	public:
-	dAnimationEffectorBlendNode(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const child);
+	dAnimationEffectorBlendNode(dAnimIDController* const character, dAnimationEffectorBlendNode* const child);
 	virtual ~dAnimationEffectorBlendNode();
 
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -53,7 +53,7 @@ class dAnimationEffectorBlendNode: public dCustomAlloc
 		}
 	}
 
-	dAnimationInverseDynamicsController* m_character;
+	dAnimIDController* m_character;
 	dAnimationEffectorBlendNode* m_child;
 };
 

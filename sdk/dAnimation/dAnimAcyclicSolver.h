@@ -13,10 +13,10 @@
 #ifndef __D_ANIMATION_ACYCLIC_SOLVER_H__
 #define __D_ANIMATION_ACYCLIC_SOLVER_H__
 
-class dAnimationAcyclicJoint;
-class dAnimationKinematicLoopJoint;
+class dAnimAcyclicJoint;
+class dAnimIDRigKinematicLoopJoint;
 
-class dAnimationAcyclicSolver: public dContainersAlloc
+class dAnimAcyclicSolver: public dContainersAlloc
 {
 	class dNodePair;
 	class dVectorPair;
@@ -24,29 +24,28 @@ class dAnimationAcyclicSolver: public dContainersAlloc
 	class dBodyJointMatrixDataPair;
 
 	public:
-	dAnimationAcyclicSolver();
-	virtual ~dAnimationAcyclicSolver();
-	//void Finalize(dVehicleChassis* const vehicle);
-	void Finalize(dAnimationAcyclicJoint* const rootNode);
+	dAnimAcyclicSolver();
+	virtual ~dAnimAcyclicSolver();
+	void Finalize(dAnimAcyclicJoint* const rootNode);
 
 	void Update(dFloat timestep);
 
 	private:
 	int CalculateNodeCount () const;
-	void SortGraph(dAnimationAcyclicJoint* const root, int& index);
+	void SortGraph(dAnimAcyclicJoint* const root, int& index);
 
 	void InitMassMatrix();
 	void InitLoopMassMatrix();
-	void Factorize(dAnimationAcyclicJoint* const node);
+	void Factorize(dAnimAcyclicJoint* const node);
 	int BuildJacobianMatrix(dFloat timestep);
-	void GetJacobians(dAnimationAcyclicJoint* const node);
+	void GetJacobians(dAnimAcyclicJoint* const node);
 	void CalculateLoopMassMatrixCoefficients();
 	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
 
-	void CalculateJointDiagonal(dAnimationAcyclicJoint* const node);
-	void CalculateJacobianBlock(dAnimationAcyclicJoint* const node);
-	void CalculateBodyDiagonal(dAnimationAcyclicJoint* const child);
-	void CalculateInertiaMatrix(dAnimationAcyclicJoint* const node) const;
+	void CalculateJointDiagonal(dAnimAcyclicJoint* const node);
+	void CalculateJacobianBlock(dAnimAcyclicJoint* const node);
+	void CalculateBodyDiagonal(dAnimAcyclicJoint* const child);
+	void CalculateInertiaMatrix(dAnimAcyclicJoint* const node) const;
 
 	void UpdateForces(const dVectorPair* const force) const;
 	void CalculateJointAccel(dVectorPair* const accel) const;
@@ -56,17 +55,17 @@ class dAnimationAcyclicSolver: public dContainersAlloc
 	void SolveBackward(dVectorPair* const force, const dVectorPair* const accel) const;
 	void SolveForward(dVectorPair* const force, const dVectorPair* const accel, int startNode) const;
 
-	void BodyDiagInvTimeSolution(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
-	void JointDiagInvTimeSolution(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
-	void JointJacobianTimeMassForward(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
-	void BodyJacobianTimeSolutionBackward(dAnimationAcyclicJoint* const node, dVectorPair& force) const;
-	void BodyJacobianTimeMassForward(dAnimationAcyclicJoint* const node, const dVectorPair& force, dVectorPair& parentForce) const;
-	void JointJacobianTimeSolutionBackward(dAnimationAcyclicJoint* const node, dVectorPair& force, const dVectorPair& parentForce) const;
+	void BodyDiagInvTimeSolution(dAnimAcyclicJoint* const node, dVectorPair& force) const;
+	void JointDiagInvTimeSolution(dAnimAcyclicJoint* const node, dVectorPair& force) const;
+	void JointJacobianTimeMassForward(dAnimAcyclicJoint* const node, dVectorPair& force) const;
+	void BodyJacobianTimeSolutionBackward(dAnimAcyclicJoint* const node, dVectorPair& force) const;
+	void BodyJacobianTimeMassForward(dAnimAcyclicJoint* const node, const dVectorPair& force, dVectorPair& parentForce) const;
+	void JointJacobianTimeSolutionBackward(dAnimAcyclicJoint* const node, dVectorPair& force, const dVectorPair& parentForce) const;
 
 	void DebugMassMatrix();
 
-	dAnimationAcyclicJoint* m_rootNode;
-	dAnimationAcyclicJoint** m_nodesOrder;
+	dAnimAcyclicJoint* m_rootNode;
+	dAnimAcyclicJoint** m_nodesOrder;
 
 	// cache temporary variables
 	int* m_matrixRowsIndex;
@@ -75,7 +74,7 @@ class dAnimationAcyclicSolver: public dContainersAlloc
 	dFloat* m_massMatrix10;
 	dFloat* m_massMatrix11;
 	dBodyJointMatrixDataPair* m_data;
-	dAnimationKinematicLoopJoint** m_loopJoints;
+	dAnimIDRigKinematicLoopJoint** m_loopJoints;
 	
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;
 	dComplementaritySolver::dJacobianColum* m_rightHandSide;

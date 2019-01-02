@@ -12,16 +12,16 @@
 #ifndef __D_ANIMATION_RIG_EFFECTOR_H__
 #define __D_ANIMATION_RIG_EFFECTOR_H__
 
-#include "dAnimationRigJoint.h"
-#include "dAnimationKinematicLoopJoint.h"
+#include "dAnimIDRigJoint.h"
+#include "dAnimIDRigKinematicLoopJoint.h"
 
-class dAnimationRigLimb;
+class dAnimIDRigLimb;
 
-class dAnimationRigEffector: public dAnimationKinematicLoopJoint
+class dAnimIDRigEffector: public dAnimIDRigKinematicLoopJoint
 {
 	public:
-	dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, dAnimationRigLimb* const parent, dAnimationRigJoint* const targetBody);
-	virtual ~dAnimationRigEffector();
+	dAnimIDRigEffector(const dMatrix& pivotInGlocalSpace, dAnimIDRigLimb* const parent, dAnimIDRigJoint* const targetBody);
+	virtual ~dAnimIDRigEffector();
 
 	virtual int GetMaxDof() const {return 3;}
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
@@ -29,7 +29,7 @@ class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 
 	void SetLinearSpeed(dFloat speed);
 	void SetMaxLinearFriction(dFloat friction);
-	dAnimationRigLimb* GetParent() const { return m_parent;}
+	dAnimIDRigLimb* GetParent() const { return m_parent;}
 
 	dMatrix GetBasePoseMatrix() const;
 	const dMatrix& GetLocalMatrix() const { return m_effectorMatrix;}
@@ -41,7 +41,7 @@ class dAnimationRigEffector: public dAnimationKinematicLoopJoint
 	dMatrix m_localMatrix;
 	dMatrix m_targetMatrix;
 	dMatrix m_effectorMatrix;
-	dAnimationRigLimb* m_parent;
+	dAnimIDRigLimb* m_parent;
 	NewtonBody* m_referenceBody;
 	dFloat m_linearSpeed;
 	dFloat m_linearFriction;

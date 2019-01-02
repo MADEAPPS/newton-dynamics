@@ -10,11 +10,11 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigHinge.h"
-#include "dAnimationInverseDynamicsManager.h"
+#include "dAnimIDRigHinge.h"
+#include "dAnimIDManager.h"
 
-dAnimationRigHinge::dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body)
-	:dAnimationRigLimb(parent, body)
+dAnimIDRigHinge::dAnimIDRigHinge(const dMatrix& basicMatrix, dAnimIDRigJoint* const parent, NewtonBody* const body)
+	:dAnimIDRigLimb(parent, body)
 	,dCustomHinge (basicMatrix, body, parent->GetNewtonBody())
 	,m_rowAccel(0.0f)
 {
@@ -30,11 +30,11 @@ dAnimationRigHinge::dAnimationRigHinge(const dMatrix& basicMatrix, dAnimationRig
 	EnableLimits(true);
 }
 
-dAnimationRigHinge::~dAnimationRigHinge()
+dAnimIDRigHinge::~dAnimIDRigHinge()
 {
 }
 
-void dAnimationRigHinge::Debug(dDebugDisplay* const debugContext) const
+void dAnimIDRigHinge::Debug(dDebugDisplay* const debugContext) const
 {
 	dFloat scale = debugContext->GetScale();
 	debugContext->SetScale(scale * 2.5f);
@@ -42,10 +42,10 @@ void dAnimationRigHinge::Debug(dDebugDisplay* const debugContext) const
 	dCustomHinge::Debug(debugContext);
 	debugContext->SetScale(scale);
 
-	dAnimationRigLimb::Debug(debugContext);
+	dAnimIDRigLimb::Debug(debugContext);
 }
 
-void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
+void dAnimIDRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dCustomHinge::SubmitConstraints (timestep, threadIndex);
 
@@ -57,7 +57,7 @@ void dAnimationRigHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 }
 
-void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dAnimIDRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	m_rowAccel = 0.0f;
 	NewtonImmediateModeConstraint descriptor;
@@ -86,7 +86,7 @@ void dAnimationRigHinge::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 	constraintParams->m_count = rows;
 }
 
-void dAnimationRigHinge::UpdateJointAcceleration()
+void dAnimIDRigHinge::UpdateJointAcceleration()
 {
 	dComplementaritySolver::dBodyState* const body0 = GetProxyBody();
 	dComplementaritySolver::dBodyState* const body1 = m_parent->GetProxyBody();
@@ -97,5 +97,5 @@ void dAnimationRigHinge::UpdateJointAcceleration()
 
 	dVector accel (accel0 * m_jacobial01.m_linear + alpha0 * m_jacobial01.m_angular + accel1 * m_jacobial10.m_linear + alpha1 * m_jacobial10.m_angular); 
 	m_rowAccel = accel.m_x + accel.m_y + accel.m_z;
-	dAnimationRigLimb::UpdateJointAcceleration();
+	dAnimIDRigLimb::UpdateJointAcceleration();
 }

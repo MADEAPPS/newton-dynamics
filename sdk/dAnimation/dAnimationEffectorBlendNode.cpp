@@ -10,17 +10,17 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigLimb.h"
-#include "dAnimationRigEffector.h"
+#include "dAnimIDRigLimb.h"
+#include "dAnimIDRigEffector.h"
 #include "dAnimationEffectorBlendNode.h"
-#include "dAnimationInverseDynamicsController.h"
+#include "dAnimIDController.h"
 
-dAnimationPose::dAnimationPose(dAnimationInverseDynamicsController* const character)
+dAnimationPose::dAnimationPose(dAnimIDController* const character)
 	:dList<dAnimationTransform>()
 {
-	dList<dAnimationRigEffector*>& effectorsList = character->GetEffectors();
-	for (dList<dAnimationRigEffector*>::dListNode* node = effectorsList.GetFirst(); node; node = node->GetNext()) {
-		dAnimationRigEffector* const effector = node->GetInfo();
+	dList<dAnimIDRigEffector*>& effectorsList = character->GetEffectors();
+	for (dList<dAnimIDRigEffector*>::dListNode* node = effectorsList.GetFirst(); node; node = node->GetNext()) {
+		dAnimIDRigEffector* const effector = node->GetInfo();
 
 		const dMatrix& localMatrix = effector->GetLocalMatrix();
 
@@ -45,7 +45,7 @@ void dAnimationPose::CopySource(const dAnimationPose& source)
 	}
 }
 
-void dAnimationPose::SetTargetPose(dAnimationInverseDynamicsController* const character) const
+void dAnimationPose::SetTargetPose(dAnimIDController* const character) const
 {
 	dMatrix rootMatrix(character->GetBasePoseMatrix());
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
@@ -55,7 +55,7 @@ void dAnimationPose::SetTargetPose(dAnimationInverseDynamicsController* const ch
 	}
 }
 
-dAnimationEffectorBlendNode::dAnimationEffectorBlendNode(dAnimationInverseDynamicsController* const character, dAnimationEffectorBlendNode* const child)
+dAnimationEffectorBlendNode::dAnimationEffectorBlendNode(dAnimIDController* const character, dAnimationEffectorBlendNode* const child)
 	:dCustomAlloc()
 	,m_character(character)
 	,m_child(child)

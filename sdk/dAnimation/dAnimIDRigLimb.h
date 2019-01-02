@@ -13,29 +13,29 @@
 #define __D_ANIMATION_RIG_LIMB_H__
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigJoint.h"
+#include "dAnimIDRigJoint.h"
 
-class dAnimationRigEffector;
+class dAnimIDRigEffector;
 
-class dAnimationRigLimb: public dAnimationRigJoint, public dComplementaritySolver::dBilateralJoint
+class dAnimIDRigLimb: public dAnimIDRigJoint, public dComplementaritySolver::dBilateralJoint
 {
 	public:
-	dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBody* const body);
-	virtual ~dAnimationRigLimb();
+	dAnimIDRigLimb(dAnimIDRigJoint* const parent, NewtonBody* const body);
+	virtual ~dAnimIDRigLimb();
 
 	virtual NewtonBody* GetNewtonBody() const;
-	virtual dAnimationRigLimb* GetAsRigLimb() { return this; }
+	virtual dAnimIDRigLimb* GetAsRigLimb() { return this; }
 
 	protected:
 	virtual void Finalize();
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const;
-	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
+	virtual int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
 	NewtonBody* m_newtonBody;
-	dAnimationRigEffector* m_effector;
+	dAnimIDRigEffector* m_effector;
 
-	friend class dAnimationRigEffector;
+	friend class dAnimIDRigEffector;
 };
 
 #endif

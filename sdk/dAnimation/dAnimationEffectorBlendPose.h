@@ -17,7 +17,7 @@
 class dAnimationEffectorBlendPose: public dAnimationEffectorBlendNode
 {
 	public:
-	dAnimationEffectorBlendPose(dAnimationInverseDynamicsController* const character);
+	dAnimationEffectorBlendPose(dAnimIDController* const character);
 	virtual ~dAnimationEffectorBlendPose();
 
 	dAnimationPose& GetPose() { return m_pose; }

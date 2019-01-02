@@ -17,7 +17,7 @@
 class dAnimationEffectorBlendTwoWay: public dAnimationEffectorBlendNode
 {
 	public:
-	dAnimationEffectorBlendTwoWay(dAnimationInverseDynamicsController* const character,
+	dAnimationEffectorBlendTwoWay(dAnimIDController* const character,
 								  dAnimationEffectorBlendNode* const node0,
 								  dAnimationEffectorBlendNode* const node1);
 	virtual ~dAnimationEffectorBlendTwoWay();

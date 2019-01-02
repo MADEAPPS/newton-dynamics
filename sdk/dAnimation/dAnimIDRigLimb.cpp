@@ -10,48 +10,48 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigLimb.h"
-#include "dAnimationRigEffector.h"
-#include "dAnimationInverseDynamicsManager.h"
+#include "dAnimIDRigLimb.h"
+#include "dAnimIDRigEffector.h"
+#include "dAnimIDManager.h"
 
 
-dAnimationRigLimb::dAnimationRigLimb(dAnimationRigJoint* const parent, NewtonBody* const body)
-	:dAnimationRigJoint(parent)
+dAnimIDRigLimb::dAnimIDRigLimb(dAnimIDRigJoint* const parent, NewtonBody* const body)
+	:dAnimIDRigJoint(parent)
 	,dComplementaritySolver::dBilateralJoint()
 	,m_newtonBody(body)
 	,m_effector(NULL)
 {
 	m_proxyJoint = this;
-	dAnimationRigJoint::Init (body);
-	dComplementaritySolver::dBilateralJoint::Init (dAnimationRigJoint::GetProxyBody(), parent->GetProxyBody());
+	dAnimIDRigJoint::Init (body);
+	dComplementaritySolver::dBilateralJoint::Init (dAnimIDRigJoint::GetProxyBody(), parent->GetProxyBody());
 }
 
-dAnimationRigLimb::~dAnimationRigLimb()
+dAnimIDRigLimb::~dAnimIDRigLimb()
 {
 	if (m_effector) {
 		delete m_effector;
 	}
 }
 
-NewtonBody* dAnimationRigLimb::GetNewtonBody() const 
+NewtonBody* dAnimIDRigLimb::GetNewtonBody() const 
 { 
 	return m_newtonBody; 
 }
 
-void dAnimationRigLimb::Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const
+void dAnimIDRigLimb::Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const
 {
 	if (m_effector) {
 		m_effector->Debug(debugDisplay);
 	}
 
-	dAnimationRigJoint::Debug(debugDisplay);
+	dAnimIDRigJoint::Debug(debugDisplay);
 }
 
-void dAnimationRigLimb::Finalize()
+void dAnimIDRigLimb::Finalize()
 {
 	if (m_effector) {
 		m_effector->m_referenceBody = NULL;
-		for (dAnimationRigLimb* parentLimb = GetParent()->GetAsRigLimb(); parentLimb; parentLimb = parentLimb->GetParent()->GetAsRigLimb()) {
+		for (dAnimIDRigLimb* parentLimb = GetParent()->GetAsRigLimb(); parentLimb; parentLimb = parentLimb->GetParent()->GetAsRigLimb()) {
 			if (parentLimb->m_effector) {
 				m_effector->m_referenceBody = parentLimb->GetNewtonBody();
 				break;
@@ -62,20 +62,20 @@ void dAnimationRigLimb::Finalize()
 		}
 	}
 
-	dAnimationRigJoint::Finalize();
+	dAnimIDRigJoint::Finalize();
 }
 
-int dAnimationRigLimb::GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray)
+int dAnimIDRigLimb::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray)
 {
 	int count = 0;
 	if (m_effector && m_effector->IsActive()) {
 		jointArray[count] = m_effector;
-		dAnimationAcyclicJoint* const owner1 = m_effector->GetOwner1();
+		dAnimAcyclicJoint* const owner1 = m_effector->GetOwner1();
 		if (owner1->IsLoopNode()) {
 			m_effector->GetOwner1()->SetIndex(-1);
 		}
 		count ++;
 	}
-	return dAnimationRigJoint::GetKinematicLoops(&jointArray[count]) + count;
+	return dAnimIDRigJoint::GetKinematicLoops(&jointArray[count]) + count;
 }
 

@@ -10,11 +10,11 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationInverseDynamicsManager.h"
-#include "dAnimationRigForwardDynamicLimb.h"
+#include "dAnimIDManager.h"
+#include "dAnimIDRigForwardDynamicLimb.h"
 
-dAnimationRigForwardDynamicLimb::dAnimationRigForwardDynamicLimb(const dMatrix& basicMatrix, dAnimationRigJoint* const parent, NewtonBody* const body)
-	:dAnimationRigLimb(parent, body)
+dAnimIDRigForwardDynamicLimb::dAnimIDRigForwardDynamicLimb(const dMatrix& basicMatrix, dAnimIDRigJoint* const parent, NewtonBody* const body)
+	:dAnimIDRigLimb(parent, body)
 	,dCustomHinge(basicMatrix, body, parent->GetNewtonBody())
 {
 	dMatrix boneAligmentMatrix(
@@ -28,11 +28,11 @@ dAnimationRigForwardDynamicLimb::dAnimationRigForwardDynamicLimb(const dMatrix& 
 	EnableLimits(true);
 }
 
-dAnimationRigForwardDynamicLimb::~dAnimationRigForwardDynamicLimb()
+dAnimIDRigForwardDynamicLimb::~dAnimIDRigForwardDynamicLimb()
 {
 }
 
-void dAnimationRigForwardDynamicLimb::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+void dAnimIDRigForwardDynamicLimb::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 	dFloat scale = debugContext->GetScale();
 	debugContext->SetScale(scale * 2.5f);
@@ -40,10 +40,10 @@ void dAnimationRigForwardDynamicLimb::Debug(dCustomJoint::dDebugDisplay* const d
 	dCustomHinge::Debug(debugContext);
 	debugContext->SetScale(scale);
 
-	dAnimationRigLimb::Debug(debugContext);
+	dAnimIDRigLimb::Debug(debugContext);
 }
 
-void dAnimationRigForwardDynamicLimb::SubmitConstraints (dFloat timestep, int threadIndex)
+void dAnimIDRigForwardDynamicLimb::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dCustomHinge::SubmitConstraints(timestep, threadIndex);
 
@@ -53,7 +53,7 @@ void dAnimationRigForwardDynamicLimb::SubmitConstraints (dFloat timestep, int th
 	}
 }
 
-void dAnimationRigForwardDynamicLimb::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dAnimIDRigForwardDynamicLimb::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	m_rowAccel = 0.0f;
 	NewtonImmediateModeConstraint descriptor;
@@ -82,7 +82,7 @@ void dAnimationRigForwardDynamicLimb::JacobianDerivative(dComplementaritySolver:
 	constraintParams->m_count = rows;
 }
 
-void dAnimationRigForwardDynamicLimb::UpdateJointAcceleration()
+void dAnimIDRigForwardDynamicLimb::UpdateJointAcceleration()
 {
 	dComplementaritySolver::dBodyState* const body0 = GetProxyBody();
 	dComplementaritySolver::dBodyState* const body1 = m_parent->GetProxyBody();
@@ -96,6 +96,6 @@ void dAnimationRigForwardDynamicLimb::UpdateJointAcceleration()
 
 	m_rowAccel = 0.0f;
 
-	dAnimationRigLimb::UpdateJointAcceleration();
+	dAnimIDRigLimb::UpdateJointAcceleration();
 
 }

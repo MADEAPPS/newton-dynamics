@@ -45,8 +45,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		{
 			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
 
-			const dList<dAnimationAcyclicJoint*>& children = vehicle->GetChildren();
-			for (dList<dAnimationAcyclicJoint*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
+			const dList<dAnimAcyclicJoint*>& children = vehicle->GetChildren();
+			for (dList<dAnimAcyclicJoint*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
 				dVehicleTireInterface* const tire = ((dVehicleNode*)node->GetInfo())->GetAsTire();
 				if (tire) {
 					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
@@ -61,8 +61,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
 			dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
 
-			const dList<dAnimationAcyclicJoint*>& children = vehicle->GetChildren();
-			for (dList<dAnimationAcyclicJoint*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
+			const dList<dAnimAcyclicJoint*>& children = vehicle->GetChildren();
+			for (dList<dAnimAcyclicJoint*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
 				dVehicleTireInterface* const tire = ((dVehicleNode*)node->GetInfo())->GetAsTire();
 				if (tire) {
 					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();

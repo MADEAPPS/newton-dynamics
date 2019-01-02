@@ -14,23 +14,23 @@
 
 #include "dAnimationStdAfx.h"
 
-class dAnimationAcyclicJoint;
+class dAnimAcyclicJoint;
 
-class dAnimationKinematicLoopJoint: public dContainersAlloc, public dComplementaritySolver::dBilateralJoint
+class dAnimIDRigKinematicLoopJoint: public dContainersAlloc, public dComplementaritySolver::dBilateralJoint
 {
 	public:
-	dAnimationKinematicLoopJoint();
-	~dAnimationKinematicLoopJoint() {}
+	dAnimIDRigKinematicLoopJoint();
+	~dAnimIDRigKinematicLoopJoint() {}
 	bool IsActive() const { return m_isActive; }
-	dAnimationAcyclicJoint* GetOwner0() const { return m_owner0; }
-	dAnimationAcyclicJoint* GetOwner1() const { return m_owner1; }
-	void SetOwners(dAnimationAcyclicJoint* const owner0, dAnimationAcyclicJoint* const owner1);
+	dAnimAcyclicJoint* GetOwner0() const { return m_owner0; }
+	dAnimAcyclicJoint* GetOwner1() const { return m_owner1; }
+	void SetOwners(dAnimAcyclicJoint* const owner0, dAnimAcyclicJoint* const owner1);
 
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const {}
 	virtual int GetMaxDof() const = 0;
 
-	dAnimationAcyclicJoint* m_owner0;
-	dAnimationAcyclicJoint* m_owner1;
+	dAnimAcyclicJoint* m_owner0;
+	dAnimAcyclicJoint* m_owner1;
 	bool m_isActive;
 };
 

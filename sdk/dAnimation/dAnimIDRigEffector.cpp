@@ -10,13 +10,13 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigLimb.h"
-#include "dAnimationRigEffector.h"
-#include "dAnimationInverseDynamicsManager.h"
+#include "dAnimIDRigLimb.h"
+#include "dAnimIDRigEffector.h"
+#include "dAnimIDManager.h"
 
 
-dAnimationRigEffector::dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, dAnimationRigLimb* const parent, dAnimationRigJoint* const targetBody)
-	:dAnimationKinematicLoopJoint()
+dAnimIDRigEffector::dAnimIDRigEffector(const dMatrix& pivotInGlocalSpace, dAnimIDRigLimb* const parent, dAnimIDRigJoint* const targetBody)
+	:dAnimIDRigKinematicLoopJoint()
 	,m_localMatrix(dGetIdentityMatrix())
 	,m_targetMatrix(dGetIdentityMatrix())
 	,m_effectorMatrix(dGetIdentityMatrix())
@@ -28,7 +28,7 @@ dAnimationRigEffector::dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, 
 	m_isActive = true;
 	dAssert (!parent->m_effector);
 	parent->m_effector = this;
-	dAnimationInverseDynamicsController* const root = parent->GetRoot();
+	dAnimIDController* const root = parent->GetRoot();
 	root->m_effectors.Append(this);
 
 	dAssert(parent != targetBody);
@@ -45,32 +45,32 @@ dAnimationRigEffector::dAnimationRigEffector(const dMatrix& pivotInGlocalSpace, 
 	m_targetMatrix.m_posit = pivotInGlocalSpace.m_posit;
 }
 
-dAnimationRigEffector::~dAnimationRigEffector()
+dAnimIDRigEffector::~dAnimIDRigEffector()
 {
 }
 
-dMatrix dAnimationRigEffector::GetBasePoseMatrix() const
+dMatrix dAnimIDRigEffector::GetBasePoseMatrix() const
 {
-	dAnimationInverseDynamicsController* const root = m_parent->GetRoot();
+	dAnimIDController* const root = m_parent->GetRoot();
 	return m_effectorMatrix * root->GetBasePoseMatrix();
 }
 
-void dAnimationRigEffector::SetLinearSpeed(dFloat speed)
+void dAnimIDRigEffector::SetLinearSpeed(dFloat speed)
 {
 	m_linearSpeed = dAbs (speed);
 }
 
-void dAnimationRigEffector::SetMaxLinearFriction(dFloat friction)
+void dAnimIDRigEffector::SetMaxLinearFriction(dFloat friction)
 {
 	m_linearFriction = dAbs(friction);
 }
 
-void dAnimationRigEffector::SetTargetPose(const dMatrix& globalSpaceMatrix)
+void dAnimIDRigEffector::SetTargetPose(const dMatrix& globalSpaceMatrix)
 {
 	m_targetMatrix = globalSpaceMatrix;
 }
 
-void dAnimationRigEffector::Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const
+void dAnimIDRigEffector::Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const
 {
 	const dMatrix& matrix1 = m_targetMatrix;
 	dMatrix matrix0(m_localMatrix * m_state0->GetMatrix());
@@ -79,7 +79,7 @@ void dAnimationRigEffector::Debug(dCustomJoint::dDebugDisplay* const debugDispla
 	debugDisplay->DrawFrame(matrix1);
 }
 
-void dAnimationRigEffector::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dAnimIDRigEffector::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	const dMatrix& matrix1 = m_targetMatrix;
 	dMatrix matrix0(m_localMatrix * m_state0->GetMatrix());

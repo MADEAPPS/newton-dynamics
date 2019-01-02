@@ -443,11 +443,11 @@ origin.m_posit = dVector(-2.0f, 0.5f, 0.0f, 1.0f);
 #else
 
 
-class dSixAxisManager: public dAnimationInverseDynamicsManager
+class dSixAxisManager: public dAnimIDManager
 {
 	public:
 	dSixAxisManager(DemoEntityManager* const scene)
-		:dAnimationInverseDynamicsManager(scene->GetNewton())
+		:dAnimIDManager(scene->GetNewton())
 //		,m_currentController(NULL)
 //		,m_azimuth(0.0f)
 //		,m_posit_x(0.0f)
@@ -567,7 +567,7 @@ class dSixAxisManager: public dAnimationInverseDynamicsManager
 		return body;
 	}
 
-	dAnimationInverseDynamicsController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	dAnimIDController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
 		scene->Append(model);
@@ -578,11 +578,11 @@ class dSixAxisManager: public dAnimationInverseDynamicsManager
 dAssert(0);
 return NULL;
 /*
-		dAnimationInverseDynamicsController* const rig = CreateCharacterRig (rootBody);
+		dAnimIDController* const rig = CreateCharacterRig (rootBody);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		dAnimationRigJoint* parentBones[32];
+		dAnimIDRigJoint* parentBones[32];
 		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = rig;
 			childEntities[stackIndex] = child;
@@ -593,7 +593,7 @@ return NULL;
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
-			dAnimationRigJoint* const parentJoint = parentBones[stackIndex];
+			dAnimIDRigJoint* const parentJoint = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < partCount; i++) {
@@ -632,7 +632,7 @@ return NULL;
 */
 	}
 
-	void OnUpdateTransform (const dAnimationRigJoint* const bone, const dMatrix& localMatrix) const
+	void OnUpdateTransform (const dAnimIDRigJoint* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		NewtonBody* const newtonBody = bone->GetNewtonBody();

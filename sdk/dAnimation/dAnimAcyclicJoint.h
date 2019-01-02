@@ -14,15 +14,15 @@
 
 #include "dAnimationStdAfx.h"
 
-class dAnimationRigLimb;
-class dAnimationRigJoint;
-class dAnimationKinematicLoopJoint;
+class dAnimIDRigLimb;
+class dAnimIDRigJoint;
+class dAnimIDRigKinematicLoopJoint;
 
-class dAnimationAcyclicJoint: public dContainersAlloc
+class dAnimAcyclicJoint: public dContainersAlloc
 {
 	public:
-	dAnimationAcyclicJoint(dAnimationAcyclicJoint* const parent);
-	virtual ~dAnimationAcyclicJoint();
+	dAnimAcyclicJoint(dAnimAcyclicJoint* const parent);
+	virtual ~dAnimAcyclicJoint();
 
 	void* GetUserData();
 	void SetUserData(void* const userData);
@@ -31,9 +31,9 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	NewtonWorld* GetWorld() const { return m_world; }
 	void SetWorld(NewtonWorld* const world) { m_world = world; }
 
-	dAnimationAcyclicJoint* GetParent() const { return m_parent; }
-	dList<dAnimationAcyclicJoint*>& GetChildren() { return m_children;} 
-	const dList<dAnimationAcyclicJoint*>& GetChildren() const { return m_children; }
+	dAnimAcyclicJoint* GetParent() const { return m_parent; }
+	dList<dAnimAcyclicJoint*>& GetChildren() { return m_children;} 
+	const dList<dAnimAcyclicJoint*>& GetChildren() const { return m_children; }
 
 	int GetIndex() const { return m_solverIndex; }
 	void SetIndex(int index) { m_solverIndex = index; }
@@ -46,11 +46,11 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 	virtual dComplementaritySolver::dBilateralJoint* GetProxyJoint() { return m_proxyJoint; }
 
 	virtual void ApplyExternalForce(dFloat timestep);
-	virtual int GetKinematicLoops(dAnimationKinematicLoopJoint** const jointArray);
+	virtual int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
 
-	virtual dAnimationRigLimb* GetAsRigLimb() {return NULL;}
-	virtual dAnimationRigJoint* GetAsRigJoint() {return NULL;}
-	virtual dAnimationAcyclicJoint* GetAsAcyclicJoint() { return this; }
+	virtual dAnimIDRigLimb* GetAsRigLimb() {return NULL;}
+	virtual dAnimIDRigJoint* GetAsRigJoint() {return NULL;}
+	virtual dAnimAcyclicJoint* GetAsAcyclicJoint() { return this; }
 
 	protected:
 	virtual void Finalize();
@@ -58,14 +58,14 @@ class dAnimationAcyclicJoint: public dContainersAlloc
 
 	dComplementaritySolver::dBodyState m_proxyBody;
 	dComplementaritySolver::dBilateralJoint* m_proxyJoint;
-	dAnimationAcyclicJoint* m_parent;
+	dAnimAcyclicJoint* m_parent;
 	void* m_userData;
 	NewtonWorld* m_world;
 	int m_solverIndex;
 	bool m_isLoop;
-	dList<dAnimationAcyclicJoint*> m_children;
+	dList<dAnimAcyclicJoint*> m_children;
 
-	friend class dAnimationAcyclicSolver;
+	friend class dAnimAcyclicSolver;
 };
 
 #endif

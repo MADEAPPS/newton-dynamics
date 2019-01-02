@@ -17,7 +17,7 @@
 
 class dAnimationEffectorBlendPose: public dAnimationEffectorBlendNode
 {
-	dAnimationEffectorBlendPose(dAnimationInverseDynamicsController* const character);
+	dAnimationEffectorBlendPose(dAnimIDController* const character);
 	virtual ~dAnimationEffectorBlendPose();
 
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep);

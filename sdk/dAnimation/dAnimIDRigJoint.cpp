@@ -10,24 +10,23 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigJoint.h"
-#include "dAnimationInverseDynamicsManager.h"
+#include "dAnimIDRigJoint.h"
+#include "dAnimIDManager.h"
 
-dAnimationRigJoint::dAnimationRigJoint(dAnimationRigJoint* const parent)
-	:dAnimationAcyclicJoint(parent)
+dAnimIDRigJoint::dAnimIDRigJoint(dAnimIDRigJoint* const parent)
+	:dAnimAcyclicJoint(parent)
 	,m_root(parent ? parent->GetRoot() : NULL)
 {
 }
 
-dAnimationRigJoint::~dAnimationRigJoint()
+dAnimIDRigJoint::~dAnimIDRigJoint()
 {
 }
 
-
-void dAnimationRigJoint::UpdateLocalTransforms (dAnimationInverseDynamicsManager* const manager) const
+void dAnimIDRigJoint::UpdateLocalTransforms (dAnimIDManager* const manager) const
 {
 	dMatrix parentMatrixPool[128];
-	const dAnimationRigJoint* stackPool[128];
+	const dAnimIDRigJoint* stackPool[128];
 	
 	int stack = 1;
 	stackPool[0] = this;
@@ -38,7 +37,7 @@ void dAnimationRigJoint::UpdateLocalTransforms (dAnimationInverseDynamicsManager
 		stack--;
 
 		dMatrix parentMatrix(parentMatrixPool[stack]);
-		const dAnimationRigJoint* const node = stackPool[stack];
+		const dAnimIDRigJoint* const node = stackPool[stack];
 		NewtonBody* const newtonBody = node->GetNewtonBody();
 
 		if (newtonBody) {
@@ -47,8 +46,8 @@ void dAnimationRigJoint::UpdateLocalTransforms (dAnimationInverseDynamicsManager
 			manager->OnUpdateTransform(node, matrix * parentMatrix);
 
 			parentMatrix = matrix.Inverse();
-			for (dList<dAnimationAcyclicJoint*>::dListNode* child = node->m_children.GetFirst(); child; child = child->GetNext()) {
-				stackPool[stack] = (dAnimationRigJoint*) child->GetInfo();
+			for (dList<dAnimAcyclicJoint*>::dListNode* child = node->m_children.GetFirst(); child; child = child->GetNext()) {
+				stackPool[stack] = (dAnimIDRigJoint*) child->GetInfo();
 				parentMatrixPool[stack] = parentMatrix;
 				stack++;
 			}
@@ -56,9 +55,9 @@ void dAnimationRigJoint::UpdateLocalTransforms (dAnimationInverseDynamicsManager
 	}
 }
 
-void dAnimationRigJoint::Init(NewtonBody* const newtonBody)
+void dAnimIDRigJoint::Init(NewtonBody* const newtonBody)
 {
-	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetProxyBody();
+	dComplementaritySolver::dBodyState* const body = dAnimAcyclicJoint::GetProxyBody();
 
 	dAssert(body);
 	dAssert(newtonBody == GetNewtonBody());
@@ -82,10 +81,10 @@ void dAnimationRigJoint::Init(NewtonBody* const newtonBody)
 	body->UpdateInertia();
 }
 
-void dAnimationRigJoint::RigidBodyToStates()
+void dAnimIDRigJoint::RigidBodyToStates()
 {
 	NewtonBody* const newtonBody = GetNewtonBody();
-	dComplementaritySolver::dBodyState* const body = dAnimationAcyclicJoint::GetProxyBody();
+	dComplementaritySolver::dBodyState* const body = dAnimAcyclicJoint::GetProxyBody();
 
 	dAssert (body);
 	dAssert (newtonBody);
@@ -108,8 +107,8 @@ void dAnimationRigJoint::RigidBodyToStates()
 
 	body->UpdateInertia();
 
-	for (dList<dAnimationAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-		dAnimationRigJoint* const rigJoint = child->GetInfo()->GetAsRigJoint();
+	for (dList<dAnimAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		dAnimIDRigJoint* const rigJoint = child->GetInfo()->GetAsRigJoint();
 		dAssert (rigJoint);
 		rigJoint->RigidBodyToStates();
 	}

@@ -10,21 +10,21 @@
 */
 
 
-#ifndef __D_ANIMATION_CHARACTER_RIG_H__
-#define __D_ANIMATION_CHARACTER_RIG_H__
+#ifndef __D_ANIM_ID_CONTROLLER_H__
+#define __D_ANIM_ID_CONTROLLER_H__
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationRigJoint.h"
-#include "dAnimationAcyclicSolver.h"
+#include "dAnimIDRigJoint.h"
+#include "dAnimAcyclicSolver.h"
 
-class dAnimationRigEffector;
+class dAnimIDRigEffector;
 class dAnimationEffectorBlendRoot;
 
-class dAnimationInverseDynamicsController: public dCustomControllerBase, public dAnimationRigJoint
+class dAnimIDController: public dCustomControllerBase, public dAnimIDRigJoint
 {
 	public:
-	dAnimationInverseDynamicsController ();
-	~dAnimationInverseDynamicsController ();
+	dAnimIDController ();
+	~dAnimIDController ();
 	
 	NewtonBody* GetNewtonBody() const;
 	virtual void Finalize();
@@ -35,7 +35,7 @@ class dAnimationInverseDynamicsController: public dCustomControllerBase, public 
 	dMatrix GetBasePoseMatrix() const;
 	const dMatrix& GetLocalFrame() const {return m_localFrame;}
 
-	dList<dAnimationRigEffector*>& GetEffectors() {return m_effectors;}
+	dList<dAnimIDRigEffector*>& GetEffectors() {return m_effectors;}
 
 	protected:
 	virtual void Init(NewtonBody* const body, const dMatrix& localFrameInGlobalSpace);
@@ -43,16 +43,16 @@ class dAnimationInverseDynamicsController: public dCustomControllerBase, public 
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	
-	dAnimationAcyclicJoint* GetStaticWorld() {return &m_staticWorld;}
+	dAnimAcyclicJoint* GetStaticWorld() {return &m_staticWorld;}
 
 	dMatrix m_localFrame;
-	dAnimationAcyclicJoint m_staticWorld;
-	dAnimationAcyclicSolver m_solver;
-	dList<dAnimationRigEffector*> m_effectors;
+	dAnimAcyclicJoint m_staticWorld;
+	dAnimAcyclicSolver m_solver;
+	dList<dAnimIDRigEffector*> m_effectors;
 	dAnimationEffectorBlendRoot* m_animationTree;
 
-	friend class dAnimationRigEffector;
-	friend class dAnimationInverseDynamicsManager;
+	friend class dAnimIDRigEffector;
+	friend class dAnimIDManager;
 };
 
 

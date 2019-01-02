@@ -10,10 +10,10 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationAcyclicJoint.h"
-#include "dAnimationKinematicLoopJoint.h"
+#include "dAnimAcyclicJoint.h"
+#include "dAnimIDRigKinematicLoopJoint.h"
 
-dAnimationKinematicLoopJoint::dAnimationKinematicLoopJoint()
+dAnimIDRigKinematicLoopJoint::dAnimIDRigKinematicLoopJoint()
 	:dComplementaritySolver::dBilateralJoint()
 	,m_owner0(NULL)
 	,m_owner1(NULL)
@@ -21,7 +21,7 @@ dAnimationKinematicLoopJoint::dAnimationKinematicLoopJoint()
 {
 }
 
-void dAnimationKinematicLoopJoint::SetOwners(dAnimationAcyclicJoint* const owner0, dAnimationAcyclicJoint* const owner1)
+void dAnimIDRigKinematicLoopJoint::SetOwners(dAnimAcyclicJoint* const owner0, dAnimAcyclicJoint* const owner1)
 {
 	m_owner0 = owner0;
 	m_owner1 = owner1;
