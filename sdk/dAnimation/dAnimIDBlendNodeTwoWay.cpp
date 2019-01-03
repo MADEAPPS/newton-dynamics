@@ -10,12 +10,12 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationEffectorBlendTwoWay.h"
+#include "dAnimIDBlendNodeTwoWay.h"
 
-dAnimationEffectorBlendTwoWay::dAnimationEffectorBlendTwoWay(dAnimIDController* const character,
-	dAnimationEffectorBlendNode* const node0,
-	dAnimationEffectorBlendNode* const node1)
-	:dAnimationEffectorBlendNode(character, NULL)
+dAnimIDBlendNodeTwoWay::dAnimIDBlendNodeTwoWay(dAnimIDController* const character,
+	dAnimIDBlendNode* const node0,
+	dAnimIDBlendNode* const node1)
+	:dAnimIDBlendNode(character, NULL)
 	,m_node0(node0)
 	,m_node1(node1)
 	,m_pose(character)
@@ -24,19 +24,19 @@ dAnimationEffectorBlendTwoWay::dAnimationEffectorBlendTwoWay(dAnimIDController* 
 	m_param = 0.6f;
 }
 
-dAnimationEffectorBlendTwoWay::~dAnimationEffectorBlendTwoWay()
+dAnimIDBlendNodeTwoWay::~dAnimIDBlendNodeTwoWay()
 {
 	delete m_node0;
 	delete m_node1;
 }
 
-void dAnimationEffectorBlendTwoWay::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+void dAnimIDBlendNodeTwoWay::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 	m_node0->Debug(debugContext);
 	m_node1->Debug(debugContext);
 }
 
-void dAnimationEffectorBlendTwoWay::Evaluate(dAnimationPose& output, dFloat timestep)
+void dAnimIDBlendNodeTwoWay::Evaluate(dAnimationPose& output, dFloat timestep)
 {
 	if (m_param < 0.001f) {
 		m_node0->Evaluate(output, timestep);

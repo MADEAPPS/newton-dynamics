@@ -12,13 +12,13 @@
 #ifndef __D_ANIMATION_EFFECTOR_BLEND_POSE_h__
 #define __D_ANIMATION_EFFECTOR_BLEND_POSE_h__
 
-#include "dAnimationEffectorBlendNode.h"
+#include "dAnimIDBlendNode.h"
 
-class dAnimationEffectorBlendPose: public dAnimationEffectorBlendNode
+class dAnimIDBlendNodePose: public dAnimIDBlendNode
 {
 	public:
-	dAnimationEffectorBlendPose(dAnimIDController* const character);
-	virtual ~dAnimationEffectorBlendPose();
+	dAnimIDBlendNodePose(dAnimIDController* const character);
+	virtual ~dAnimIDBlendNodePose();
 
 	dAnimationPose& GetPose() { return m_pose; }
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep);

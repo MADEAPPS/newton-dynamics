@@ -10,14 +10,16 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimIDRigLimb.h"
-#include "dAnimIDRigEffector.h"
-#include "dAnimationEffectorBlendNode.h"
-#include "dAnimIDController.h"
+//#include "dAnimIDRigLimb.h"
+//#include "dAnimIDRigEffector.h"
+#include "dAnimIKBlendNode.h"
+#include "dAnimIKController.h"
 
-dAnimationPose::dAnimationPose(dAnimIDController* const character)
+dAnimIKBlendNode::dAnimationPose::dAnimationPose(dAnimIKController* const character)
 	:dList<dAnimationTransform>()
 {
+//	dAssert(0);
+/*
 	dList<dAnimIDRigEffector*>& effectorsList = character->GetEffectors();
 	for (dList<dAnimIDRigEffector*>::dListNode* node = effectorsList.GetFirst(); node; node = node->GetNext()) {
 		dAnimIDRigEffector* const effector = node->GetInfo();
@@ -30,10 +32,13 @@ dAnimationPose::dAnimationPose(dAnimIDController* const character)
 		frame.m_rotation = dQuaternion(localMatrix);
 		Append(frame);
 	}
+*/
 }
 
-void dAnimationPose::CopySource(const dAnimationPose& source)
+void dAnimIKBlendNode::dAnimationPose::CopySource(const dAnimationPose& source)
 {
+	dAssert(0);
+/*
 	dListNode* destNode = GetFirst();
 	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
 		const dAnimationTransform& srcFrame = sourceNode->GetInfo();
@@ -43,26 +48,30 @@ void dAnimationPose::CopySource(const dAnimationPose& source)
 		dstFrame.m_posit = srcFrame.m_posit;
 		destNode = destNode->GetNext();
 	}
+*/
 }
 
-void dAnimationPose::SetTargetPose(dAnimIDController* const character) const
+void dAnimIKBlendNode::dAnimationPose::SetTargetPose(dAnimIKController* const character) const
 {
+	dAssert(0);
+/*
 	dMatrix rootMatrix(character->GetBasePoseMatrix());
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		const dAnimationTransform& frame = node->GetInfo();
 		dMatrix matrix(dMatrix(frame.m_rotation, frame.m_posit) * rootMatrix);
 		frame.m_effector->SetTargetPose(matrix);
 	}
+*/
 }
 
-dAnimationEffectorBlendNode::dAnimationEffectorBlendNode(dAnimIDController* const character, dAnimationEffectorBlendNode* const child)
+dAnimIKBlendNode::dAnimIKBlendNode(dAnimIKController* const character, dAnimIKBlendNode* const child)
 	:dCustomAlloc()
 	,m_character(character)
 	,m_child(child)
 {
 }
 
-dAnimationEffectorBlendNode::~dAnimationEffectorBlendNode()
+dAnimIKBlendNode::~dAnimIKBlendNode()
 {
 	if (m_child) {
 		delete m_child;

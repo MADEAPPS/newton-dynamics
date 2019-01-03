@@ -49,11 +49,11 @@ static dRagDollConfig ragDollConfig[] =
 };
 
 
-class dWalkGenerator: public dAnimationEffectorBlendPose
+class dWalkGenerator: public dAnimIDBlendNodePose
 {
 	public:
 	dWalkGenerator(dAnimIDController* const character, dAnimIDRigEffector* const leftFeet, dAnimIDRigEffector* const rightFeet)
-		:dAnimationEffectorBlendPose(character)
+		:dAnimIDBlendNodePose(character)
 		,m_acc(0.0f)
 		,m_amplitud_x(2.0f)
 		,m_amplitud_y(1.3f)
@@ -102,7 +102,7 @@ class dWalkGenerator: public dAnimationEffectorBlendPose
 
 	void Evaluate(dAnimationPose& output, dFloat timestep)
 	{
-		dAnimationEffectorBlendPose::Evaluate(output, timestep);
+		dAnimIDBlendNodePose::Evaluate(output, timestep);
 
 		dFloat param = m_acc / m_period;
 		dBigVector left(m_cycle.CurvePoint(param));
@@ -138,11 +138,11 @@ timestep *= 0.01f;
 	dAnimIDRigEffector* m_rightFeet;
 };
 
-class dAnimationBipeHipController: public dAnimationEffectorBlendNode
+class dAnimationBipeHipController: public dAnimIDBlendNode
 {
 	public:
-	dAnimationBipeHipController(dAnimIDController* const character, dAnimationEffectorBlendNode* const child)
-		:dAnimationEffectorBlendNode(character, child)
+	dAnimationBipeHipController(dAnimIDController* const character, dAnimIDBlendNode* const child)
+		:dAnimIDBlendNode(character, child)
 		, m_euler(0.0f)
 		, m_position(0.0f)
 	{
@@ -172,7 +172,7 @@ class dAnimationBipeHipController: public dAnimationEffectorBlendNode
 	dVector m_position;
 };
 
-class dAnimationBalanceController: public dAnimationEffectorBlendNode
+class dAnimationBalanceController: public dAnimIDBlendNode
 {
 	public:
 	class dConvexHullPoint 
@@ -186,8 +186,8 @@ class dAnimationBalanceController: public dAnimationEffectorBlendNode
 		dConvexHullPoint *m_next;
 	};
 
-	dAnimationBalanceController(dAnimIDController* const character, dAnimationEffectorBlendNode* const child)
-		:dAnimationEffectorBlendNode(character, child)
+	dAnimationBalanceController(dAnimIDController* const character, dAnimIDBlendNode* const child)
+		:dAnimIDBlendNode(character, child)
 	{
 	}
 
@@ -520,7 +520,7 @@ class BalancingDummyManager : public dAnimIDManager
 	class dAnimationCharacterUserData: public DemoEntity::UserData
 	{
 		public:
-		dAnimationCharacterUserData(dAnimIDController* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationBipeHipController* const posture)
+		dAnimationCharacterUserData(dAnimIDController* const rig, dAnimIDBlendNodeTwoWay* const walk, dAnimationBipeHipController* const posture)
 			:DemoEntity::UserData()
 			,m_rig(rig)
 			,m_walk(walk)
@@ -543,7 +543,7 @@ class BalancingDummyManager : public dAnimIDManager
 		}
 
 		dAnimIDController* m_rig;
-		dAnimationEffectorBlendTwoWay* m_walk;
+		dAnimIDBlendNodeTwoWay* m_walk;
 		dAnimationBipeHipController* m_posture;
 
 		dFloat m_hipHigh;
@@ -769,12 +769,12 @@ xxxx1->ResetMatrix(*scene, matrix1);
 
 		rig->Finalize();
 
-		dAnimationEffectorBlendPose* const fixPose = new dAnimationEffectorBlendPose(rig);
-		dAnimationEffectorBlendPose* const walkPose = new dWalkGenerator(rig, leftFeet, rightFeet);
-		dAnimationEffectorBlendTwoWay* const walkBlend = new dAnimationEffectorBlendTwoWay(rig, fixPose, walkPose);
+		dAnimIDBlendNodePose* const fixPose = new dAnimIDBlendNodePose(rig);
+		dAnimIDBlendNodePose* const walkPose = new dWalkGenerator(rig, leftFeet, rightFeet);
+		dAnimIDBlendNodeTwoWay* const walkBlend = new dAnimIDBlendNodeTwoWay(rig, fixPose, walkPose);
 		dAnimationBipeHipController* const posture = new dAnimationBipeHipController (rig, walkBlend);
 		dAnimationBalanceController* const balance = new dAnimationBalanceController (rig, posture);
-		dAnimationEffectorBlendRoot* const animTree = new dAnimationEffectorBlendRoot(rig, balance);
+		dAnimIDBlendNodeRoot* const animTree = new dAnimIDBlendNodeRoot(rig, balance);
 
 		dAnimationCharacterUserData* const renderCallback = new dAnimationCharacterUserData(rig, walkBlend, posture);
 		model->SetUserData(renderCallback);
@@ -801,7 +801,7 @@ xxxx1->ResetMatrix(*scene, matrix1);
 			DemoEntity* const entiry = (DemoEntity*)NewtonBodyGetUserData(m_currentRig->GetNewtonBody());
 			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*)entiry->GetUserData();
 
-			dAnimationEffectorBlendTwoWay* const walkBlend = controlData->m_walk;
+			dAnimIDBlendNodeTwoWay* const walkBlend = controlData->m_walk;
 			walkBlend->SetParam (controlData->m_walkSpeed);
 
 			dAnimationBipeHipController* const posture = controlData->m_posture;

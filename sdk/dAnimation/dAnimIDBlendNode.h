@@ -9,35 +9,35 @@
 * freely
 */
 
-#ifndef __D_ANIMATION_EFFECTOR_BLEND_NODE_h__
-#define __D_ANIMATION_EFFECTOR_BLEND_NODE_h__
+#ifndef __D_ANIM_ID_BLEND_NODE_h__
+#define __D_ANIM_ID_BLEND_NODE_h__
 
-class dAnimationEffectorBlendNode;
-class dAnimIDRigEffector;
+class dAnimIDBlendNode;
 class dAnimIDController;
+class dAnimIDRigEffector;
 
-class dAnimationTransform
+class dAnimIDBlendNode: public dCustomAlloc
 {
 	public:
-	dVector m_posit;
-	dQuaternion m_rotation;
-	dAnimIDRigEffector* m_effector;
-};
+	class dAnimationTransform
+	{
+		public:
+		dVector m_posit;
+		dQuaternion m_rotation;
+		dAnimIDRigEffector* m_effector;
+	};
 
-class dAnimationPose: public dList<dAnimationTransform>
-{
-	public:
-	dAnimationPose(dAnimIDController* const character);
+	class dAnimationPose : public dList<dAnimationTransform>
+	{
+		public:
+		dAnimationPose(dAnimIDController* const character);
 
-	void SetTargetPose(dAnimIDController* const character) const;
-	void CopySource(const dAnimationPose& source);
-};
+		void SetTargetPose(dAnimIDController* const character) const;
+		void CopySource(const dAnimationPose& source);
+	};
 
-class dAnimationEffectorBlendNode: public dCustomAlloc
-{
-	public:
-	dAnimationEffectorBlendNode(dAnimIDController* const character, dAnimationEffectorBlendNode* const child);
-	virtual ~dAnimationEffectorBlendNode();
+	dAnimIDBlendNode(dAnimIDController* const character, dAnimIDBlendNode* const child);
+	virtual ~dAnimIDBlendNode();
 
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
@@ -54,7 +54,7 @@ class dAnimationEffectorBlendNode: public dCustomAlloc
 	}
 
 	dAnimIDController* m_character;
-	dAnimationEffectorBlendNode* m_child;
+	dAnimIDBlendNode* m_child;
 };
 
 #endif

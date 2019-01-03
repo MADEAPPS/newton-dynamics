@@ -12,7 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimIDRigHinge.h"
 #include "dAnimIDRigEffector.h"
-#include "dAnimationEffectorBlendRoot.h"
+#include "dAnimIDBlendNodeRoot.h"
 #include "dAnimIDManager.h"
 #include "dAnimIDController.h"
 
@@ -36,12 +36,12 @@ dAnimIDController::~dAnimIDController ()
 	}
 }
 
-dAnimationEffectorBlendRoot* dAnimIDController::GetAnimationTree() const
+dAnimIDBlendNodeRoot* dAnimIDController::GetAnimationTree() const
 {
 	return m_animationTree;
 }
 
-void dAnimIDController::SetAnimationTree(dAnimationEffectorBlendRoot* const animTree)
+void dAnimIDController::SetAnimationTree(dAnimIDBlendNodeRoot* const animTree)
 {
 	if (m_animationTree) {
 		delete m_animationTree;

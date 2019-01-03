@@ -12,15 +12,15 @@
 #ifndef __D_ANIMATION_EFFECTOR_BLEND_TWO_WAY_h__
 #define __D_ANIMATION_EFFECTOR_BLEND_TWO_WAY_h__
 
-#include "dAnimationEffectorBlendNode.h"
+#include "dAnimIDBlendNode.h"
 
-class dAnimationEffectorBlendTwoWay: public dAnimationEffectorBlendNode
+class dAnimIDBlendNodeTwoWay: public dAnimIDBlendNode
 {
 	public:
-	dAnimationEffectorBlendTwoWay(dAnimIDController* const character,
-								  dAnimationEffectorBlendNode* const node0,
-								  dAnimationEffectorBlendNode* const node1);
-	virtual ~dAnimationEffectorBlendTwoWay();
+	dAnimIDBlendNodeTwoWay(dAnimIDController* const character,
+								  dAnimIDBlendNode* const node0,
+								  dAnimIDBlendNode* const node1);
+	virtual ~dAnimIDBlendNodeTwoWay();
 
 	dFloat GetParam () const {return m_param;}
 	void SetParam (dFloat param) {m_param = param;}
@@ -30,8 +30,8 @@ class dAnimationEffectorBlendTwoWay: public dAnimationEffectorBlendNode
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	protected:
-	dAnimationEffectorBlendNode* m_node0;
-	dAnimationEffectorBlendNode* m_node1;
+	dAnimIDBlendNode* m_node0;
+	dAnimIDBlendNode* m_node1;
 	dAnimationPose m_pose;
 	dFloat m_param;
 };

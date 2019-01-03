@@ -188,16 +188,20 @@ typedef long long unsigned64;
 #include <dNewtonMesh.h>
 
 #include <dAnimationStdAfx.h>
+
 #include <dAnimIKManager.h>
+#include <dAnimIKBlendNodePose.h>
+#include <dAnimIKBlendNodeRoot.h>
+
 #include <dAnimIDManager.h>
 #include <dAnimIDRigLimb.h>
 #include <dAnimIDRigJoint.h>
 #include <dAnimIDRigHinge.h>
 #include <dAnimIDRigEffector.h>
-#include <dAnimationEffectorBlendNode.h>
-#include <dAnimationEffectorBlendPose.h>
-#include <dAnimationEffectorBlendRoot.h>
-#include <dAnimationEffectorBlendTwoWay.h>
+#include <dAnimIDBlendNode.h>
+#include <dAnimIDBlendNodePose.h>
+#include <dAnimIDBlendNodeRoot.h>
+#include <dAnimIDBlendNodeTwoWay.h>
 #include <dAnimIDRigForwardDynamicLimb.h>
 
 /*

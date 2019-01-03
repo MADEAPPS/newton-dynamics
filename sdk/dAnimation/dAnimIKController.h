@@ -16,6 +16,8 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimIDRigJoint.h"
 
+class dAnimIKBlendNodeRoot;
+
 class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 {
 	public:
@@ -25,11 +27,11 @@ class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 //	NewtonBody* GetNewtonBody() const;
 //	virtual void Finalize();
 //	dAnimationEffectorBlendRoot* GetAnimationTree () const;
-//	void SetAnimationTree (dAnimationEffectorBlendRoot* const animTree);
 //	dMatrix GetBasePoseMatrix() const;
 //	const dMatrix& GetLocalFrame() const {return m_localFrame;}
 //	dList<dAnimIDRigEffector*>& GetEffectors() {return m_effectors;}
-	
+
+	void SetAnimationTree(dAnimIKBlendNodeRoot* const animTree);
 
 	protected:
 	virtual void Init(const dMatrix& localFrameInGlobalSpace);
@@ -43,7 +45,7 @@ class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 //	dAnimationAcyclicJoint m_staticWorld;
 //	dAnimationAcyclicSolver m_solver;
 //	dList<dAnimIDRigEffector*> m_effectors;
-//	dAnimationEffectorBlendRoot* m_animationTree;
+	dAnimIKBlendNodeRoot* m_animationTree;
 //	friend class dAnimIDRigEffector;
 	friend class dAnimIKManager;
 };

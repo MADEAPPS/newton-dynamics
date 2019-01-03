@@ -11,6 +11,7 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimIKController.h"
+#include "dAnimIKBlendNodeRoot.h"
 
 dAnimIKController::dAnimIKController()
 	:dCustomControllerBase()
@@ -19,7 +20,7 @@ dAnimIKController::dAnimIKController()
 //	,m_staticWorld(NULL)
 //	,m_solver()
 //	,m_effectors()
-//	,m_animationTree(NULL)
+	,m_animationTree(NULL)
 {
 //	m_root = this;
 //	m_staticWorld.SetLoopNode(true);
@@ -27,18 +28,12 @@ dAnimIKController::dAnimIKController()
 
 dAnimIKController::~dAnimIKController ()
 {
-//	if (m_animationTree) {
-//		delete m_animationTree;
-//	}
+	if (m_animationTree) {
+		delete m_animationTree;
+	}
 }
 
-/*
-dAnimationEffectorBlendRoot* dAnimIKController::GetAnimationTree() const
-{
-	return m_animationTree;
-}
-
-void dAnimIKController::SetAnimationTree(dAnimationEffectorBlendRoot* const animTree)
+void dAnimIKController::SetAnimationTree(dAnimIKBlendNodeRoot* const animTree)
 {
 	if (m_animationTree) {
 		delete m_animationTree;
@@ -46,6 +41,12 @@ void dAnimIKController::SetAnimationTree(dAnimationEffectorBlendRoot* const anim
 	m_animationTree = animTree;
 }
 
+
+/*
+dAnimationEffectorBlendRoot* dAnimIKController::GetAnimationTree() const
+{
+	return m_animationTree;
+}
 
 dMatrix dAnimIKController::GetBasePoseMatrix() const
 {

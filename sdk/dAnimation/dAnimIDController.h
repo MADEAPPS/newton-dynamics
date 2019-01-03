@@ -18,7 +18,7 @@
 #include "dAnimAcyclicSolver.h"
 
 class dAnimIDRigEffector;
-class dAnimationEffectorBlendRoot;
+class dAnimIDBlendNodeRoot;
 
 class dAnimIDController: public dCustomControllerBase, public dAnimIDRigJoint
 {
@@ -29,8 +29,8 @@ class dAnimIDController: public dCustomControllerBase, public dAnimIDRigJoint
 	NewtonBody* GetNewtonBody() const;
 	virtual void Finalize();
 
-	dAnimationEffectorBlendRoot* GetAnimationTree () const;
-	void SetAnimationTree (dAnimationEffectorBlendRoot* const animTree);
+	dAnimIDBlendNodeRoot* GetAnimationTree () const;
+	void SetAnimationTree (dAnimIDBlendNodeRoot* const animTree);
 
 	dMatrix GetBasePoseMatrix() const;
 	const dMatrix& GetLocalFrame() const {return m_localFrame;}
@@ -49,7 +49,7 @@ class dAnimIDController: public dCustomControllerBase, public dAnimIDRigJoint
 	dAnimAcyclicJoint m_staticWorld;
 	dAnimAcyclicSolver m_solver;
 	dList<dAnimIDRigEffector*> m_effectors;
-	dAnimationEffectorBlendRoot* m_animationTree;
+	dAnimIDBlendNodeRoot* m_animationTree;
 
 	friend class dAnimIDRigEffector;
 	friend class dAnimIDManager;

@@ -9,16 +9,16 @@
 * freely
 */
 
-#ifndef __D_ANIMATION_EFFECTOR_BLEND_ROOT_h__
-#define __D_ANIMATION_EFFECTOR_BLEND_ROOT_h__
+#ifndef __D_ANIM_IK_BLEND_CLIP_h__
+#define __D_ANIM_IK_BLEND_CLIP_h__
 
-#include "dAnimationEffectorBlendNode.h"
+#include "dAnimIKBlendNode.h"
 
-class dAnimationEffectorBlendRoot: public dAnimationEffectorBlendNode
+class dAnimIKBlendNodePose: public dAnimIKBlendNode
 {
 	public:
-	dAnimationEffectorBlendRoot(dAnimIDController* const character, dAnimationEffectorBlendNode* const childNode);
-	virtual ~dAnimationEffectorBlendRoot();
+	dAnimIKBlendNodePose(dAnimIKController* const character);
+	virtual ~dAnimIKBlendNodePose();
 
 	dAnimationPose& GetPose() { return m_pose; }
 
@@ -27,7 +27,6 @@ class dAnimationEffectorBlendRoot: public dAnimationEffectorBlendNode
 
 	protected:
 	dAnimationPose m_pose;
-	dAnimIDController* m_rig;
 };
 
 

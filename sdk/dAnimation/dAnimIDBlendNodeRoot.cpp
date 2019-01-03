@@ -10,27 +10,27 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationEffectorBlendRoot.h"
+#include "dAnimIDBlendNodeRoot.h"
 
-dAnimationEffectorBlendRoot::dAnimationEffectorBlendRoot(dAnimIDController* const character, dAnimationEffectorBlendNode* const childNode)
-	:dAnimationEffectorBlendNode(character, childNode)
+dAnimIDBlendNodeRoot::dAnimIDBlendNodeRoot(dAnimIDController* const character, dAnimIDBlendNode* const childNode)
+	:dAnimIDBlendNode(character, childNode)
 	,m_pose(character)
 	,m_rig(character)
 {
 }
 
-dAnimationEffectorBlendRoot::~dAnimationEffectorBlendRoot()
+dAnimIDBlendNodeRoot::~dAnimIDBlendNodeRoot()
 {
 }
 
-void dAnimationEffectorBlendRoot::Update(dFloat timestep)
+void dAnimIDBlendNodeRoot::Update(dFloat timestep)
 {
 	Evaluate(m_pose, timestep);
 	m_pose.SetTargetPose(m_rig);
 }
 
 
-void dAnimationEffectorBlendRoot::Evaluate(dAnimationPose& output, dFloat timestep)
+void dAnimIDBlendNodeRoot::Evaluate(dAnimationPose& output, dFloat timestep)
 {
-	dAnimationEffectorBlendNode::Evaluate(output, timestep);
+	dAnimIDBlendNode::Evaluate(output, timestep);
 }

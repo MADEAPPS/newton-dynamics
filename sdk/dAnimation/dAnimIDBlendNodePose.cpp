@@ -10,19 +10,19 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationEffectorBlendPose.h"
+#include "dAnimIDBlendNodePose.h"
 
-dAnimationEffectorBlendPose::dAnimationEffectorBlendPose(dAnimIDController* const character)
-	:dAnimationEffectorBlendNode(character, NULL)
+dAnimIDBlendNodePose::dAnimIDBlendNodePose(dAnimIDController* const character)
+	:dAnimIDBlendNode(character, NULL)
 	,m_pose(character)
 {
 }
 
-dAnimationEffectorBlendPose::~dAnimationEffectorBlendPose()
+dAnimIDBlendNodePose::~dAnimIDBlendNodePose()
 {
 }
 
-void dAnimationEffectorBlendPose::Evaluate(dAnimationPose& output, dFloat timestep)
+void dAnimIDBlendNodePose::Evaluate(dAnimationPose& output, dFloat timestep)
 {
 	output.CopySource(m_pose);
 }

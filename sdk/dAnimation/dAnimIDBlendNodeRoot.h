@@ -9,21 +9,25 @@
 * freely
 */
 
-#ifndef __D_ANIMATION_EFFECTOR_BLEND_POSE_h__
-#define __D_ANIMATION_EFFECTOR_BLEND_POSE_h__
+#ifndef __D_ANIM_ID_BLEND_ROOT_h__
+#define __D_ANIM_ID_BLEND_ROOT_h__
 
-#include "dAnimationEffectorBlendPose.h"
+#include "dAnimIDBlendNode.h"
 
-
-class dAnimationEffectorBlendPose: public dAnimationEffectorBlendNode
+class dAnimIDBlendNodeRoot: public dAnimIDBlendNode
 {
-	dAnimationEffectorBlendPose(dAnimIDController* const character);
-	virtual ~dAnimationEffectorBlendPose();
-
-	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
+	public:
+	dAnimIDBlendNodeRoot(dAnimIDController* const character, dAnimIDBlendNode* const childNode);
+	virtual ~dAnimIDBlendNodeRoot();
 
 	dAnimationPose& GetPose() { return m_pose; }
-	dEffectorPose m_pose;
+
+	void Update(dFloat timestep);
+	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
+
+	protected:
+	dAnimationPose m_pose;
+	dAnimIDController* m_rig;
 };
 
 

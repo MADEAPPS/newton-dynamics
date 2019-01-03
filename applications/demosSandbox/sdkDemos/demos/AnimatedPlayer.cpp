@@ -1003,12 +1003,13 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		character->ResetMatrix(*scene, character->GetCurrentMatrix() * origin);
 		scene->Append(character);
 
-		//DemoEntity* xxx = xxxx0->Find("Bone002");
-		//dMatrix aaaa (dYawMatrix (30.0f * dDegreeToRad) * xxx->GetCurrentMatrix());
-		//xxx->ResetMatrix(*scene, aaaa);
-
 		dAnimIKController* const controller = CreateIKController();
 		controller->SetUserData(character);
+
+		dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
+		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, pose);
+
+		controller->SetAnimationTree(animTree);
 
 		return controller;
 	}
