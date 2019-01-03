@@ -11,7 +11,6 @@
 cmake_minimum_required(VERSION 3.10.0)
 
 option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
-option("NEWTON_BUILD_DEBUG_CONFIGURATION" "generates debug build" OFF)
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 option("NEWTON_BUILD_MULTI_THREADED" "multi threaded" ON)
 option("NEWTON_DOUBLE_PRECISION" "Generate double precision" OFF)
@@ -37,12 +36,12 @@ if (NOT NEWTON_BUILD_MULTI_THREADED)
 	add_definitions(-DDG_USE_THREAD_EMULATION)
 endif ()
 
-if(NEWTON_BUILD_DEBUG_CONFIGURATION)
-	set(default_build_type "Debug")
-else ()
-	set(default_build_type "Release")
-endif()
-set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "" FORCE)
+#If no build type set, Release as default
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+          "Choose the type of build, options are: Debug Release"
+          FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
 
 # determine if we are compiling for a 32bit or 64bit system
 include(CheckTypeSize)
