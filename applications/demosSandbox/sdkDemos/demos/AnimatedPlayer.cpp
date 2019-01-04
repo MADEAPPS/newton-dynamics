@@ -976,6 +976,20 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		meshEntity->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 */
+
+	void UpdatePlayer(dAnimIKController* const controller, dFloat timestep) 
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		dAnimIKManager::UpdatePlayer(controller, timestep);
+
+		const dAnimPose& pose = controller->GetBasePose();
+		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
+			const dAnimKeyframe& frame = node->GetInfo();
+			DemoEntity* const entity = (DemoEntity*) frame.m_userData;
+			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
+		}
+	}
+
 	void PreUpdate(dFloat timestep)
 	{
 
@@ -1055,7 +1069,6 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 	}
 
 	dAnimIKController* m_currentRig;
-
 };
 
 void AnimatedPlayerController(DemoEntityManager* const scene)

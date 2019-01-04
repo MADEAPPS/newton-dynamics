@@ -26,9 +26,7 @@ dAnimIKBlendNodeRoot::~dAnimIKBlendNodeRoot()
 
 void dAnimIKBlendNodeRoot::Update(dFloat timestep)
 {
-	dAssert(0);
-//	Evaluate(m_pose, timestep);
-//	m_pose.SetTargetPose(m_rig);
+	Evaluate(m_pose, timestep);
 }
 
 void dAnimIKBlendNodeRoot::Evaluate(dAnimPose& output, dFloat timestep)

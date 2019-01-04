@@ -32,17 +32,14 @@ void dAnimPose::Clear()
 
 void dAnimPose::CopySource(const dAnimPose& source)
 {
-	dAssert(0);
-/*
 	dListNode* destNode = GetFirst();
 	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
 		const dAnimKeyframe& srcFrame = sourceNode->GetInfo();
 		dAnimKeyframe& dstFrame = destNode->GetInfo();
-		dAssert(srcFrame.m_effector == dstFrame.m_effector);
+		dAssert(srcFrame.m_userData == dstFrame.m_userData);
 		dstFrame.m_rotation = srcFrame.m_rotation;
 		dstFrame.m_posit = srcFrame.m_posit;
 		destNode = destNode->GetNext();
 	}
-*/
 }
 

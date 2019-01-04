@@ -32,6 +32,5 @@ void dAnimIKBlendNodePose::Update(dFloat timestep)
 
 void dAnimIKBlendNodePose::Evaluate(dAnimPose& output, dFloat timestep)
 {
-	dAssert(0);
-	dAnimIKBlendNode::Evaluate(output, timestep);
+	output.CopySource(m_pose);
 }

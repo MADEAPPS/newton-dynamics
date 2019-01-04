@@ -10,6 +10,7 @@
 */
 
 #include "dAnimationStdAfx.h"
+#include "dAnimIKManager.h"
 #include "dAnimIKController.h"
 #include "dAnimIKBlendNodeRoot.h"
 
@@ -94,11 +95,13 @@ void dAnimIKController::PreUpdate(dFloat timestep, int threadIndex)
 {
 //	dAssert(0);
 //	RigidBodyToStates();
-//	if (m_animationTree) {
-//		m_animationTree->Update(timestep);
-//	}
+	if (m_animationTree) {
+		m_animationTree->Update(timestep);
+	}
 //	m_solver.Update(timestep);
 //	UpdateJointAcceleration();
+	dAnimIKManager* const manager = (dAnimIKManager*)GetManager();
+	manager->UpdatePlayer(this, timestep);
 }
 
 void dAnimIKController::PostUpdate(dFloat timestep, int threadIndex)

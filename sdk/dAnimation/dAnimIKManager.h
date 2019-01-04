@@ -28,15 +28,13 @@ class dAnimIKManager: public dCustomControllerManager<dAnimIKController>
 	virtual ~dAnimIKManager();
 
 	virtual dAnimIKController* CreateIKController();
-//	virtual dAnimIKController* CreateCharacterRig(NewtonBody* const body, const dMatrix& localFrame);
-//	virtual dAnimIKController* CreateCharacterRig(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	virtual void UpdatePlayer(dAnimIKController* const controller, dFloat timestep) {}
 
 	virtual void DestroyController(dAnimIKController* const controller);
 	protected:
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 	virtual void OnUpdateTransform (const dAnimIDRigJoint* const bone, const dMatrix& localMatrix) const{}	
 
-//	friend class dAnimIDRigJoint;
 	friend class dAnimIKController;
 };
 #endif 
