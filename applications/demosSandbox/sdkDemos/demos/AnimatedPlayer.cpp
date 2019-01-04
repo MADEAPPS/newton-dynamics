@@ -994,6 +994,15 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		dAnimIKManager::PreUpdate(timestep);
 	}
 
+	void LoadAnimation(const char* const animName)
+	{
+		dScene scene(GetWorld());
+
+		char pathName[2048];
+		dGetWorkingFileName(animName, pathName);
+		scene.Deserialize(pathName);
+	}
+
 	dAnimIKController* CreateHuman(const char* const fileName, const dMatrix& origin)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
@@ -1008,6 +1017,8 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 
 		dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, pose);
+
+		LoadAnimation("whiteman_walk.ngd");
 
 		controller->SetAnimationTree(animTree);
 

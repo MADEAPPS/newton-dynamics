@@ -147,5 +147,47 @@ void dAnimationTrack::Serialize (TiXmlElement* const rootNode) const
 bool dAnimationTrack::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
 {
 	DeserialiseBase(scene, dNodeInfo, rootNode);
+
+	// load all the vertexData
+	TiXmlElement* const positionKeyframes = (TiXmlElement*)rootNode->FirstChild("positionKeyframes");
+	if (positionKeyframes) {
+
+		TiXmlElement* const timeLineElement = (TiXmlElement*)positionKeyframes->FirstChild("timeLine");
+		TiXmlElement* const positionElement = (TiXmlElement*)positionKeyframes->FirstChild("positions");
+
+		int keyFramesCount;
+		timeLineElement->Attribute("float", &keyFramesCount);
+
+		dFloat* const timeline = dAlloca(dFloat, keyFramesCount);
+		dFloat* const points = dAlloca(dFloat, 3 * keyFramesCount);
+
+		dStringToFloatArray(timeLineElement->Attribute("floats"), timeline, keyFramesCount);
+		dStringToFloatArray(positionElement->Attribute("floats"), points, 3 * keyFramesCount);
+
+		for (int i = 0; i < keyFramesCount; i ++) {
+			AddPosition(timeline[i], points[i * 3 + 0], points[i * 3 + 1], points[i * 3 + 2]);
+		}
+	}
+
+	TiXmlElement* const rotationKeyframes = (TiXmlElement*)rootNode->FirstChild("rotationKeyframes");
+	if (rotationKeyframes) {
+
+		TiXmlElement* const timeLineElement = (TiXmlElement*)rotationKeyframes->FirstChild("timeLine");
+		TiXmlElement* const positionElement = (TiXmlElement*)rotationKeyframes->FirstChild("angles");
+
+		int keyFramesCount;
+		timeLineElement->Attribute("float", &keyFramesCount);
+
+		dFloat* const timeline = dAlloca(dFloat, keyFramesCount);
+		dFloat* const points = dAlloca(dFloat, 3 * keyFramesCount);
+
+		dStringToFloatArray(timeLineElement->Attribute("floats"), timeline, keyFramesCount);
+		dStringToFloatArray(positionElement->Attribute("floats"), points, 3 * keyFramesCount);
+
+		for (int i = 0; i < keyFramesCount; i++) {
+			AddRotation(timeline[i], points[i * 3 + 0], points[i * 3 + 1], points[i * 3 + 2]);
+		}
+	}
+
 	return true;
 }
