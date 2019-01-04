@@ -11,7 +11,7 @@
 
 #ifndef __D_ANIM_IK_BLEND_ROOT_h__
 #define __D_ANIM_IK_BLEND_ROOT_h__
-
+#include "dAnimPose.h"
 #include "dAnimIKBlendNode.h"
 
 class dAnimIKBlendNodeRoot: public dAnimIKBlendNode
@@ -20,13 +20,13 @@ class dAnimIKBlendNodeRoot: public dAnimIKBlendNode
 	dAnimIKBlendNodeRoot(dAnimIKController* const character, dAnimIKBlendNode* const childNode);
 	virtual ~dAnimIKBlendNodeRoot();
 
-	dAnimationPose& GetPose() { return m_pose; }
+	dAnimPose& GetPose() {return m_pose; }
 
 	void Update(dFloat timestep);
-	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
+	virtual void Evaluate(dAnimPose& output, dFloat timestep);
 
 	protected:
-	dAnimationPose m_pose;
+	dAnimPose m_pose;
 	dAnimIKController* m_rig;
 };
 

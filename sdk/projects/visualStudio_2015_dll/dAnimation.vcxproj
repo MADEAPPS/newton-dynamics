@@ -64,6 +64,7 @@
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKController.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKManager.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimPose.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dAnimation\dAnimAcyclicJoint.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimPose.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EA56552E-746B-4B3A-BF92-004E6A2068EF}</ProjectGuid>

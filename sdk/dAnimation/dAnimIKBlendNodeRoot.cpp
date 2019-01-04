@@ -10,11 +10,12 @@
 */
 
 #include "dAnimationStdAfx.h"
+#include "dAnimIKController.h"
 #include "dAnimIKBlendNodeRoot.h"
 
 dAnimIKBlendNodeRoot::dAnimIKBlendNodeRoot(dAnimIKController* const character, dAnimIKBlendNode* const childNode)
 	:dAnimIKBlendNode(character, childNode)
-	,m_pose(character)
+	,m_pose(character->GetBasePose())
 	,m_rig(character)
 {
 }
@@ -25,12 +26,12 @@ dAnimIKBlendNodeRoot::~dAnimIKBlendNodeRoot()
 
 void dAnimIKBlendNodeRoot::Update(dFloat timestep)
 {
-	Evaluate(m_pose, timestep);
-	m_pose.SetTargetPose(m_rig);
+	dAssert(0);
+//	Evaluate(m_pose, timestep);
+//	m_pose.SetTargetPose(m_rig);
 }
 
-
-void dAnimIKBlendNodeRoot::Evaluate(dAnimationPose& output, dFloat timestep)
+void dAnimIKBlendNodeRoot::Evaluate(dAnimPose& output, dFloat timestep)
 {
 	dAnimIKBlendNode::Evaluate(output, timestep);
 }

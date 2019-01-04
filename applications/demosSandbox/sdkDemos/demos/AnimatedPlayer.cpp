@@ -1003,6 +1003,31 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		scene.Deserialize(pathName);
 	}
 
+	void PopulateBasePose(dAnimPose& basePose, DemoEntity* const character)
+	{
+		basePose.Clear();
+
+		int stack = 1;
+		DemoEntity* pool[32];
+		pool[0] = character;
+
+		while (stack) {
+			stack--;
+			DemoEntity* const entity = pool[stack];
+
+			dAnimKeyframe& transform = basePose.Append()->GetInfo();
+			dMatrix matrix(entity->GetCurrentMatrix());
+			transform.m_posit = matrix.m_posit;
+			transform.m_rotation = dQuaternion(matrix);
+			transform.m_userData = entity;
+
+			for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
+				pool[stack] = node;
+				stack++;
+			}
+		}
+	}
+
 	dAnimIKController* CreateHuman(const char* const fileName, const dMatrix& origin)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
@@ -1014,11 +1039,15 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 
 		dAnimIKController* const controller = CreateIKController();
 		controller->SetUserData(character);
+		
+		// populate base pose
+		PopulateBasePose(controller->GetBasePose(), character);
 
 		dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, pose);
 
-		LoadAnimation("whiteman_walk.ngd");
+
+//		LoadAnimation("whiteman_walk.ngd");
 
 		controller->SetAnimationTree(animTree);
 

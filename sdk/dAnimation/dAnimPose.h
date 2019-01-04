@@ -9,21 +9,27 @@
 * freely
 */
 
+#ifndef __D_ANIM_POSE_h__
+#define __D_ANIM_POSE_h__
+
 #include "dAnimationStdAfx.h"
-#include "dAnimIKBlendNode.h"
-#include "dAnimIKController.h"
 
-dAnimIKBlendNode::dAnimIKBlendNode(dAnimIKController* const character, dAnimIKBlendNode* const child)
-	:dCustomAlloc()
-	,m_character(character)
-	,m_child(child)
+class dAnimKeyframe
 {
-}
+	public:
+	dVector m_posit;
+	dQuaternion m_rotation;
+	void* m_userData;
+};
 
-dAnimIKBlendNode::~dAnimIKBlendNode()
+class dAnimPose: public dList<dAnimKeyframe>
 {
-	if (m_child) {
-		delete m_child;
-	}
-}
+	public:
+	dAnimPose();
+	dAnimPose(const dAnimPose& source);
 
+	void Clear();
+	void CopySource(const dAnimPose& source);
+};
+
+#endif

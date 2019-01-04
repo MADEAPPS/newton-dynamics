@@ -15,6 +15,7 @@
 
 dAnimIKController::dAnimIKController()
 	:dCustomControllerBase()
+	,m_basePose()
 //	,dAnimIDRigJoint(NULL)
 //	,m_localFrame(dGetIdentityMatrix())
 //	,m_staticWorld(NULL)

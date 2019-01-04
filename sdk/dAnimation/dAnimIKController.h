@@ -14,6 +14,7 @@
 #define __D_ANIM_IK_CONTROLLER_H__
 
 #include "dAnimationStdAfx.h"
+#include "dAnimPose.h"
 #include "dAnimIDRigJoint.h"
 
 class dAnimIKBlendNodeRoot;
@@ -31,6 +32,7 @@ class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 //	const dMatrix& GetLocalFrame() const {return m_localFrame;}
 //	dList<dAnimIDRigEffector*>& GetEffectors() {return m_effectors;}
 
+	dAnimPose& GetBasePose() {return m_basePose;}
 	void SetAnimationTree(dAnimIKBlendNodeRoot* const animTree);
 
 	protected:
@@ -45,6 +47,7 @@ class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 //	dAnimationAcyclicJoint m_staticWorld;
 //	dAnimationAcyclicSolver m_solver;
 //	dList<dAnimIDRigEffector*> m_effectors;
+	dAnimPose m_basePose;
 	dAnimIKBlendNodeRoot* m_animationTree;
 //	friend class dAnimIDRigEffector;
 	friend class dAnimIKManager;

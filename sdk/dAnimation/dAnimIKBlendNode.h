@@ -12,32 +12,16 @@
 #ifndef __D_ANIM_IK_BLEND_NODE_h__
 #define __D_ANIM_IK_BLEND_NODE_h__
 
+#include "dAnimPose.h"
+#include "dAnimationStdAfx.h"
+
 //class dAnimIKBlendNode;
 //class dAnimIDRigEffector;
 class dAnimIKController;
-#include "dAnimationStdAfx.h"
 
 class dAnimIKBlendNode: public dCustomAlloc
 {
 	public:
-	class dAnimationTransform
-	{
-		public:
-		dVector m_posit;
-		dQuaternion m_rotation;
-//		dAnimIDRigEffector* m_effector;
-	};
-
-	class dAnimationPose : public dList<dAnimationTransform>
-	{
-		public:
-		dAnimationPose(dAnimIKController* const character);
-
-		void SetTargetPose(dAnimIKController* const character) const;
-		void CopySource(const dAnimationPose& source);
-	};
-
-
 	dAnimIKBlendNode(dAnimIKController* const character, dAnimIKBlendNode* const child);
 	virtual ~dAnimIKBlendNode();
 
@@ -48,7 +32,7 @@ class dAnimIKBlendNode: public dCustomAlloc
 		}
 	}
 
-	virtual void Evaluate(dAnimationPose& output, dFloat timestep)
+	virtual void Evaluate(dAnimPose& output, dFloat timestep)
 	{
 		if (m_child) {
 			m_child->Evaluate(output, timestep);
