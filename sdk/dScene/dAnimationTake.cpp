@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dSceneCacheInfo.h
+// Name:        dAnimationTake.h
 // Purpose:     
 // Author:      Julio Jerez
 // Modified by: 
@@ -16,33 +16,38 @@
 // freely
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _D_SCENE_CACHE_INFO_H_
-#define _D_SCENE_CACHE_INFO_H_
 
-#include "dNodeInfo.h"
+#include "dSceneStdafx.h"
+#include "dScene.h"
+#include "dAnimationTake.h"
+#include <tinyxml.h>
 
-class dSceneCacheInfo: public dNodeInfo
+
+D_IMPLEMENT_CLASS_NODE(dAnimationTake);
+
+dAnimationTake::dAnimationTake(dScene* const world) 
+	:dNodeInfo () 
 {
-	public:
-	D_DEFINE_CLASS_NODE(dSceneCacheInfo,dNodeInfo,DSCENE_API)
+	SetName ("animationLayers");
+}
 
-	dSceneCacheInfo();
-	dSceneCacheInfo(dScene* const world);
-	virtual ~dSceneCacheInfo(void);
+dAnimationTake::dAnimationTake()
+	:dNodeInfo () 
+{
+	SetName ("animationLayers");
+}
 
-	virtual void SetID(dCRCTYPE id);
-	virtual dCRCTYPE GetID() const;
+dAnimationTake::~dAnimationTake(void)
+{
+}
 
-	protected:
-	virtual void Serialize (TiXmlElement* const rootNode) const; 
-	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
+void dAnimationTake::Serialize (TiXmlElement* const rootNode) const
+{
+	SerialiseBase(dNodeInfo, rootNode);
+}
 
-
-	dCRCTYPE m_internalCacheID;
-};
-
-
-
-
-
-#endif
+bool dAnimationTake::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
+{
+	DeserialiseBase(scene, dNodeInfo, rootNode);
+	return true;
+}

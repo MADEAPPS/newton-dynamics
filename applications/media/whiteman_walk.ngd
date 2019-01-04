@@ -1,0 +1,868 @@
+<?xml version="1.0" ?>
+<NewtonGameDynamnics>
+    <header description="Newton Dynamnics 3.00, universal file format" revision="104" />
+    <nodes count="134">
+        <dRootNodeInfo>
+            <dNodeInfo name="rootNode" fileIndex="0" editorFlags="0" />
+            <childrenNodes count="3" indices="1 2 132" />
+        </dRootNodeInfo>
+        <dSceneCacheInfo cacheId="-3320094658024126097">
+            <dNodeInfo name="dMaterialCache" fileIndex="1" editorFlags="0" />
+            <parentNodes count="1" indices="0" />
+        </dSceneCacheInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:Hips" fileIndex="2" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.920833 0 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="4" indices="3 57 62 67" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:Spine" fileIndex="3" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.003326 0.103405 0 1" eulerAngles="0 -0 -0.0321507 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="2" />
+            <childrenNodes count="2" indices="4 68" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:Spine1" fileIndex="4" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="4.44089e-18 0.120702 0 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="3" />
+            <childrenNodes count="2" indices="5 69" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:Spine2" fileIndex="5" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.137945 0 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="4" />
+            <childrenNodes count="4" indices="6 9 33 70" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:Neck" fileIndex="6" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.155188 0 1" eulerAngles="0 -0 0.0321507 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="5" />
+            <childrenNodes count="2" indices="7 71" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:Head" fileIndex="7" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.00744 0.087193 0 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="6" />
+            <childrenNodes count="2" indices="8 72" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:HeadTop_End" fileIndex="8" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.017325 0.203054 0 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="7" />
+            <childrenNodes count="1" indices="73" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftShoulder" fileIndex="9" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="7e-05 0.135244 0.054574 1" eulerAngles="1.5708 -0.20492 1.5708 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="5" />
+            <childrenNodes count="2" indices="10 74" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftArm" fileIndex="10" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-2.84217e-16 0.114908 8.88178e-18 1" eulerAngles="0.0035207 0.0546348 -0.204727 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="9" />
+            <childrenNodes count="2" indices="11 75" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftForeArm" fileIndex="11" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.234381 0 1" eulerAngles="5.30743e-17 -0.00631077 -8.12232e-16 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="10" />
+            <childrenNodes count="2" indices="12 80" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHand" fileIndex="12" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.255864 0 1" eulerAngles="0.0869923 -0.00483008 0.0250907 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="11" />
+            <childrenNodes count="6" indices="13 17 21 25 29 76" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb1" fileIndex="13" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.016702 0.039473 -0.018157 1" eulerAngles="-0.52414 0.174914 0.409426 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="12" />
+            <childrenNodes count="2" indices="14 77" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb2" fileIndex="14" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.037221 -0.001152 1" eulerAngles="-0.0262476 -0.00187308 5.79724e-05 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="13" />
+            <childrenNodes count="2" indices="15 78" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb3" fileIndex="15" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.033881 -0.000159 1" eulerAngles="-0.0503994 -0.00225729 1.05933e-05 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="14" />
+            <childrenNodes count="2" indices="16 81" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb4" fileIndex="16" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.028663 0.001311 1" eulerAngles="-1.11022e-16 9.24446e-33 8.32667e-17 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="15" />
+            <childrenNodes count="1" indices="79" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex1" fileIndex="17" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.000467 0.103986 -0.029225 1" eulerAngles="-0.0886313 0.000532744 -0.0252323 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="12" />
+            <childrenNodes count="2" indices="18 88" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex2" fileIndex="18" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-2.84217e-16 0.029122 4.5e-05 1" eulerAngles="0.00212244 5.61434e-05 8.67541e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="17" />
+            <childrenNodes count="2" indices="19 95" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex3" fileIndex="19" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.027719 -1.6e-05 1" eulerAngles="0.000649149 -3.08662e-05 1.78166e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="18" />
+            <childrenNodes count="2" indices="20 82" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex4" fileIndex="20" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.023647 -2.9e-05 1" eulerAngles="-2.35099e-38 3.46945e-18 -6.77626e-21 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="19" />
+            <childrenNodes count="1" indices="89" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle1" fileIndex="21" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.002596 0.103052 -0.009 1" eulerAngles="-0.0862003 -0.00261584 -0.0249575 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="12" />
+            <childrenNodes count="2" indices="22 97" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle2" fileIndex="22" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.036115 -3.2e-05 1" eulerAngles="-0.000947574 -7.06802e-05 6.26268e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="21" />
+            <childrenNodes count="2" indices="23 83" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle3" fileIndex="23" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.032512 2e-06 1" eulerAngles="-0.000932417 8.43604e-05 5.18949e-09 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="22" />
+            <childrenNodes count="2" indices="24 84" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle4" fileIndex="24" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-2.84217e-16 0.029177 2.9e-05 1" eulerAngles="2.1684e-19 -5.20417e-18 -1.69407e-21 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="23" />
+            <childrenNodes count="1" indices="90" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing1" fileIndex="25" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.000556 0.104571 0.008704 1" eulerAngles="-0.0812441 0.00766246 -0.0258548 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="12" />
+            <childrenNodes count="2" indices="26 98" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing2" fileIndex="26" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.030969 -0.000181 1" eulerAngles="-0.00786912 -0.00064655 3.77879e-06 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="25" />
+            <childrenNodes count="2" indices="27 100" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing3" fileIndex="27" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="2.84217e-16 0.029141 5.9e-05 1" eulerAngles="-0.00268412 0.000384418 7.78307e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="26" />
+            <childrenNodes count="2" indices="28 93" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing4" fileIndex="28" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.025909 0.000122 1" eulerAngles="1.41059e-37 -3.46945e-18 -4.06576e-20 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="27" />
+            <childrenNodes count="1" indices="91" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky1" fileIndex="29" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.000348 0.099478 0.029522 1" eulerAngles="-0.0829324 -0.00774268 -0.0245098 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="12" />
+            <childrenNodes count="2" indices="30 92" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky2" fileIndex="30" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="2.84217e-16 0.027669 -0.000115 1" eulerAngles="-0.00594228 -0.000211152 8.77606e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="29" />
+            <childrenNodes count="2" indices="31 99" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky3" fileIndex="31" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.022396 4e-05 1" eulerAngles="-0.00206693 0.000206008 3.67937e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="30" />
+            <childrenNodes count="2" indices="32 85" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky4" fileIndex="32" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.019725 7.6e-05 1" eulerAngles="8.67362e-19 -8.67362e-19 3.38813e-21 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="31" />
+            <childrenNodes count="1" indices="96" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightShoulder" fileIndex="33" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.001212 0.135281 -0.054574 1" eulerAngles="-1.58859 0.204189 1.56427 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="5" />
+            <childrenNodes count="2" indices="34 101" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightArm" fileIndex="34" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="2.84217e-16 0.114908 1.77636e-17 1" eulerAngles="0.0174448 -0.050986 -0.20511 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="33" />
+            <childrenNodes count="2" indices="35 86" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightForeArm" fileIndex="35" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="2.84217e-16 0.234419 -8.88178e-18 1" eulerAngles="-1.34415e-16 0.00566116 6.87119e-17 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="34" />
+            <childrenNodes count="2" indices="36 102" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHand" fileIndex="36" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.252916 0 1" eulerAngles="-0.0837517 0.0277641 0.0142109 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="35" />
+            <childrenNodes count="6" indices="37 41 45 49 53 94" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb1" fileIndex="37" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.011587 0.041559 0.018727 1" eulerAngles="0.461432 -0.18355 0.431206 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="36" />
+            <childrenNodes count="2" indices="38 87" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb2" fileIndex="38" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.037518 0.00286 1" eulerAngles="0.0926727 0.0080409 0.000612972 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="37" />
+            <childrenNodes count="2" indices="39 109" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb3" fileIndex="39" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-2.84217e-16 0.034059 -0.000565 1" eulerAngles="0.0567605 0.00653847 -0.000108467 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="38" />
+            <childrenNodes count="2" indices="40 103" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb4" fileIndex="40" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.031233 -0.002295 1" eulerAngles="1.92593e-34 1.38778e-17 1.38778e-17 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="39" />
+            <childrenNodes count="1" indices="105" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex1" fileIndex="41" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-0.000482 0.113921 0.030137 1" eulerAngles="0.0865042 0.00712612 -0.0136549 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="36" />
+            <childrenNodes count="2" indices="42 112" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex2" fileIndex="42" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="2.84217e-16 0.029606 -7e-05 1" eulerAngles="-0.00309781 -0.000146661 3.46764e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="41" />
+            <childrenNodes count="2" indices="43 111" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex3" fileIndex="43" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.027269 2e-05 1" eulerAngles="-0.00126656 0.000183905 1.34882e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="42" />
+            <childrenNodes count="2" indices="44 110" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex4" fileIndex="44" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="2.84217e-16 0.0245 4.9e-05 1" eulerAngles="4.33681e-19 3.46945e-18 1.35525e-20 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="43" />
+            <childrenNodes count="1" indices="104" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle1" fileIndex="45" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.001586 0.111245 0.009383 1" eulerAngles="0.0862816 -0.000278815 -0.0142794 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="36" />
+            <childrenNodes count="2" indices="46 106" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle2" fileIndex="46" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.034982 -7.5e-05 1" eulerAngles="-0.00245346 -0.000195366 4.18857e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="45" />
+            <childrenNodes count="2" indices="47 107" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle3" fileIndex="47" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.03231 1e-05 1" eulerAngles="-0.00193509 0.000214572 6.64103e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="46" />
+            <childrenNodes count="2" indices="48 108" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle4" fileIndex="48" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.029404 6.6e-05 1" eulerAngles="4.70198e-38 3.46945e-18 1.35525e-20 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="47" />
+            <childrenNodes count="1" indices="124" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing1" fileIndex="49" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.001462 0.111704 -0.009842 1" eulerAngles="0.0837412 0.00464992 -0.0138637 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="36" />
+            <childrenNodes count="2" indices="50 115" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing2" fileIndex="50" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.030197 1.2e-05 1" eulerAngles="0.000672711 1.43178e-05 5.68977e-09 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="49" />
+            <childrenNodes count="2" indices="51 120" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing3" fileIndex="51" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.029057 -8e-06 1" eulerAngles="-0.000121315 2.31129e-06 -6.36347e-10 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="50" />
+            <childrenNodes count="2" indices="52 119" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing4" fileIndex="52" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-2.84217e-16 0.025973 -4e-06 1" eulerAngles="2.71051e-20 3.46945e-18 9.40395e-38 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="51" />
+            <childrenNodes count="1" indices="122" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky1" fileIndex="53" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.000506 0.103385 -0.029678 1" eulerAngles="0.083139 0.0243947 -0.0121981 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="36" />
+            <childrenNodes count="2" indices="54 126" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky2" fileIndex="54" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.027349 2.8e-05 1" eulerAngles="0.00214199 -5.6129e-06 -5.74651e-09 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="53" />
+            <childrenNodes count="2" indices="55 113" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky3" fileIndex="55" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.023252 -2.6e-05 1" eulerAngles="-0.0010646 2.87284e-05 -3.21236e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="54" />
+            <childrenNodes count="2" indices="56 127" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky4" fileIndex="56" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.018662 -1e-06 1" eulerAngles="6.77626e-21 -6.93889e-18 8.47033e-22 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="55" />
+            <childrenNodes count="1" indices="121" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftUpLeg" fileIndex="57" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.003022 -0.056927 0.075625 1" eulerAngles="3.11607 -0.00066513 0.0569087 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="2" />
+            <childrenNodes count="2" indices="58 123" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftLeg" fileIndex="58" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.400897 1.77636e-17 1" eulerAngles="0.0531665 -0.00176818 0.0332137 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="57" />
+            <childrenNodes count="2" indices="59 125" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftFoot" fileIndex="59" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.36965 1.77636e-17 1" eulerAngles="-0.046243 -0.0159245 0.997905 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="58" />
+            <childrenNodes count="2" indices="60 114" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftToeBase" fileIndex="60" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.155954 0 1" eulerAngles="0.00543734 0.00784094 0.60633 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="59" />
+            <childrenNodes count="2" indices="61 128" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftToe_End" fileIndex="61" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.065172 -8.88178e-18 1" eulerAngles="1.38778e-17 -2.27682e-18 1.73472e-18 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="60" />
+            <childrenNodes count="1" indices="129" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightUpLeg" fileIndex="62" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0.004886 -0.056927 -0.075625 1" eulerAngles="-3.11607 0.000653071 0.0558678 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="2" />
+            <childrenNodes count="2" indices="63 118" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightLeg" fileIndex="63" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="-8.88178e-18 0.400874 0 1" eulerAngles="-0.0531769 0.0011324 0.0212716 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="62" />
+            <childrenNodes count="2" indices="64 116" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightFoot" fileIndex="64" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="8.88178e-18 0.369768 0 1" eulerAngles="0.0467717 0.0160751 1.00132 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="63" />
+            <childrenNodes count="2" indices="65 130" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightToeBase" fileIndex="65" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.154259 -8.88178e-18 1" eulerAngles="-0.00504373 -0.00715568 0.613986 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="64" />
+            <childrenNodes count="2" indices="66 117" />
+        </dSceneNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="mixamorig:RightToe_End" fileIndex="66" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0.063981 0 1" eulerAngles="6.93889e-18 -3.03577e-18 -1.73472e-18 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="65" />
+            <childrenNodes count="1" indices="131" />
+        </dSceneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:Hips" fileIndex="67" editorFlags="0" />
+            <boneData boneIndex="0" length="1.000000" type="1" />
+            <parentNodes count="1" indices="2" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:Spine" fileIndex="68" editorFlags="0" />
+            <boneData boneIndex="1" length="1.000000" type="1" />
+            <parentNodes count="1" indices="3" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:Spine1" fileIndex="69" editorFlags="0" />
+            <boneData boneIndex="2" length="1.000000" type="1" />
+            <parentNodes count="1" indices="4" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:Spine2" fileIndex="70" editorFlags="0" />
+            <boneData boneIndex="3" length="1.000000" type="1" />
+            <parentNodes count="1" indices="5" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:Neck" fileIndex="71" editorFlags="0" />
+            <boneData boneIndex="4" length="1.000000" type="1" />
+            <parentNodes count="1" indices="6" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:Head" fileIndex="72" editorFlags="0" />
+            <boneData boneIndex="5" length="1.000000" type="1" />
+            <parentNodes count="1" indices="7" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:HeadTop_End" fileIndex="73" editorFlags="0" />
+            <boneData boneIndex="6" length="1.000000" type="1" />
+            <parentNodes count="1" indices="8" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftShoulder" fileIndex="74" editorFlags="0" />
+            <boneData boneIndex="7" length="1.000000" type="1" />
+            <parentNodes count="1" indices="9" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftArm" fileIndex="75" editorFlags="0" />
+            <boneData boneIndex="8" length="1.000000" type="1" />
+            <parentNodes count="1" indices="10" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHand" fileIndex="76" editorFlags="0" />
+            <boneData boneIndex="9" length="1.000000" type="1" />
+            <parentNodes count="1" indices="12" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb1" fileIndex="77" editorFlags="0" />
+            <boneData boneIndex="10" length="1.000000" type="1" />
+            <parentNodes count="1" indices="13" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb2" fileIndex="78" editorFlags="0" />
+            <boneData boneIndex="11" length="1.000000" type="1" />
+            <parentNodes count="1" indices="14" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb4" fileIndex="79" editorFlags="0" />
+            <boneData boneIndex="12" length="1.000000" type="1" />
+            <parentNodes count="1" indices="16" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftForeArm" fileIndex="80" editorFlags="0" />
+            <boneData boneIndex="13" length="1.000000" type="1" />
+            <parentNodes count="1" indices="11" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandThumb3" fileIndex="81" editorFlags="0" />
+            <boneData boneIndex="14" length="1.000000" type="1" />
+            <parentNodes count="1" indices="15" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex3" fileIndex="82" editorFlags="0" />
+            <boneData boneIndex="15" length="1.000000" type="1" />
+            <parentNodes count="1" indices="19" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle2" fileIndex="83" editorFlags="0" />
+            <boneData boneIndex="16" length="1.000000" type="1" />
+            <parentNodes count="1" indices="22" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle3" fileIndex="84" editorFlags="0" />
+            <boneData boneIndex="17" length="1.000000" type="1" />
+            <parentNodes count="1" indices="23" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky3" fileIndex="85" editorFlags="0" />
+            <boneData boneIndex="18" length="1.000000" type="1" />
+            <parentNodes count="1" indices="31" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightArm" fileIndex="86" editorFlags="0" />
+            <boneData boneIndex="19" length="1.000000" type="1" />
+            <parentNodes count="1" indices="34" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb1" fileIndex="87" editorFlags="0" />
+            <boneData boneIndex="20" length="1.000000" type="1" />
+            <parentNodes count="1" indices="37" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex1" fileIndex="88" editorFlags="0" />
+            <boneData boneIndex="21" length="1.000000" type="1" />
+            <parentNodes count="1" indices="17" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex4" fileIndex="89" editorFlags="0" />
+            <boneData boneIndex="22" length="1.000000" type="1" />
+            <parentNodes count="1" indices="20" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle4" fileIndex="90" editorFlags="0" />
+            <boneData boneIndex="23" length="1.000000" type="1" />
+            <parentNodes count="1" indices="24" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing4" fileIndex="91" editorFlags="0" />
+            <boneData boneIndex="24" length="1.000000" type="1" />
+            <parentNodes count="1" indices="28" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky1" fileIndex="92" editorFlags="0" />
+            <boneData boneIndex="25" length="1.000000" type="1" />
+            <parentNodes count="1" indices="29" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing3" fileIndex="93" editorFlags="0" />
+            <boneData boneIndex="26" length="1.000000" type="1" />
+            <parentNodes count="1" indices="27" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHand" fileIndex="94" editorFlags="0" />
+            <boneData boneIndex="27" length="1.000000" type="1" />
+            <parentNodes count="1" indices="36" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex2" fileIndex="95" editorFlags="0" />
+            <boneData boneIndex="28" length="1.000000" type="1" />
+            <parentNodes count="1" indices="18" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky4" fileIndex="96" editorFlags="0" />
+            <boneData boneIndex="29" length="1.000000" type="1" />
+            <parentNodes count="1" indices="32" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle1" fileIndex="97" editorFlags="0" />
+            <boneData boneIndex="30" length="1.000000" type="1" />
+            <parentNodes count="1" indices="21" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing1" fileIndex="98" editorFlags="0" />
+            <boneData boneIndex="31" length="1.000000" type="1" />
+            <parentNodes count="1" indices="25" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky2" fileIndex="99" editorFlags="0" />
+            <boneData boneIndex="32" length="1.000000" type="1" />
+            <parentNodes count="1" indices="30" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing2" fileIndex="100" editorFlags="0" />
+            <boneData boneIndex="33" length="1.000000" type="1" />
+            <parentNodes count="1" indices="26" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightShoulder" fileIndex="101" editorFlags="0" />
+            <boneData boneIndex="34" length="1.000000" type="1" />
+            <parentNodes count="1" indices="33" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightForeArm" fileIndex="102" editorFlags="0" />
+            <boneData boneIndex="35" length="1.000000" type="1" />
+            <parentNodes count="1" indices="35" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb3" fileIndex="103" editorFlags="0" />
+            <boneData boneIndex="36" length="1.000000" type="1" />
+            <parentNodes count="1" indices="39" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex4" fileIndex="104" editorFlags="0" />
+            <boneData boneIndex="37" length="1.000000" type="1" />
+            <parentNodes count="1" indices="44" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb4" fileIndex="105" editorFlags="0" />
+            <boneData boneIndex="38" length="1.000000" type="1" />
+            <parentNodes count="1" indices="40" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle1" fileIndex="106" editorFlags="0" />
+            <boneData boneIndex="39" length="1.000000" type="1" />
+            <parentNodes count="1" indices="45" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle2" fileIndex="107" editorFlags="0" />
+            <boneData boneIndex="40" length="1.000000" type="1" />
+            <parentNodes count="1" indices="46" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle3" fileIndex="108" editorFlags="0" />
+            <boneData boneIndex="41" length="1.000000" type="1" />
+            <parentNodes count="1" indices="47" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb2" fileIndex="109" editorFlags="0" />
+            <boneData boneIndex="42" length="1.000000" type="1" />
+            <parentNodes count="1" indices="38" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex3" fileIndex="110" editorFlags="0" />
+            <boneData boneIndex="43" length="1.000000" type="1" />
+            <parentNodes count="1" indices="43" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex2" fileIndex="111" editorFlags="0" />
+            <boneData boneIndex="44" length="1.000000" type="1" />
+            <parentNodes count="1" indices="42" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex1" fileIndex="112" editorFlags="0" />
+            <boneData boneIndex="45" length="1.000000" type="1" />
+            <parentNodes count="1" indices="41" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky2" fileIndex="113" editorFlags="0" />
+            <boneData boneIndex="46" length="1.000000" type="1" />
+            <parentNodes count="1" indices="54" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftFoot" fileIndex="114" editorFlags="0" />
+            <boneData boneIndex="47" length="1.000000" type="1" />
+            <parentNodes count="1" indices="59" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing1" fileIndex="115" editorFlags="0" />
+            <boneData boneIndex="48" length="1.000000" type="1" />
+            <parentNodes count="1" indices="49" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightLeg" fileIndex="116" editorFlags="0" />
+            <boneData boneIndex="49" length="1.000000" type="1" />
+            <parentNodes count="1" indices="63" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightToeBase" fileIndex="117" editorFlags="0" />
+            <boneData boneIndex="50" length="1.000000" type="1" />
+            <parentNodes count="1" indices="65" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightUpLeg" fileIndex="118" editorFlags="0" />
+            <boneData boneIndex="51" length="1.000000" type="1" />
+            <parentNodes count="1" indices="62" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing3" fileIndex="119" editorFlags="0" />
+            <boneData boneIndex="52" length="1.000000" type="1" />
+            <parentNodes count="1" indices="51" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing2" fileIndex="120" editorFlags="0" />
+            <boneData boneIndex="53" length="1.000000" type="1" />
+            <parentNodes count="1" indices="50" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky4" fileIndex="121" editorFlags="0" />
+            <boneData boneIndex="54" length="1.000000" type="1" />
+            <parentNodes count="1" indices="56" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing4" fileIndex="122" editorFlags="0" />
+            <boneData boneIndex="55" length="1.000000" type="1" />
+            <parentNodes count="1" indices="52" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftUpLeg" fileIndex="123" editorFlags="0" />
+            <boneData boneIndex="56" length="1.000000" type="1" />
+            <parentNodes count="1" indices="57" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle4" fileIndex="124" editorFlags="0" />
+            <boneData boneIndex="57" length="1.000000" type="1" />
+            <parentNodes count="1" indices="48" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftLeg" fileIndex="125" editorFlags="0" />
+            <boneData boneIndex="58" length="1.000000" type="1" />
+            <parentNodes count="1" indices="58" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky1" fileIndex="126" editorFlags="0" />
+            <boneData boneIndex="59" length="1.000000" type="1" />
+            <parentNodes count="1" indices="53" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky3" fileIndex="127" editorFlags="0" />
+            <boneData boneIndex="60" length="1.000000" type="1" />
+            <parentNodes count="1" indices="55" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftToeBase" fileIndex="128" editorFlags="0" />
+            <boneData boneIndex="61" length="1.000000" type="1" />
+            <parentNodes count="1" indices="60" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftToe_End" fileIndex="129" editorFlags="0" />
+            <boneData boneIndex="62" length="1.000000" type="1" />
+            <parentNodes count="1" indices="61" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightFoot" fileIndex="130" editorFlags="0" />
+            <boneData boneIndex="63" length="1.000000" type="1" />
+            <parentNodes count="1" indices="64" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightToe_End" fileIndex="131" editorFlags="0" />
+            <boneData boneIndex="64" length="1.000000" type="1" />
+            <parentNodes count="1" indices="66" />
+        </dBoneNodeInfo>
+        <dAnimationLayers>
+            <dNodeInfo name="animationLayers" fileIndex="132" editorFlags="0" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="1" indices="133" />
+        </dAnimationLayers>
+        <dAnimationTake>
+            <dNodeInfo name="Layer0" fileIndex="133" editorFlags="0" />
+            <parentNodes count="1" indices="132" />
+        </dAnimationTake>
+    </nodes>
+</NewtonGameDynamnics>

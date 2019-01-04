@@ -15,7 +15,6 @@
     <ClCompile Include="..\..\dScene\dDrawUtils.cpp" />
     <ClCompile Include="..\..\dScene\dGeometryNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dGeometryNodeModifierInfo.cpp" />
-    <ClCompile Include="..\..\dScene\dGeometryNodeSkinModifierInfo.cpp" />
     <ClCompile Include="..\..\dScene\dLineNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dMaterialNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dMeshNodeInfo.cpp" />
@@ -44,6 +43,8 @@
     <ClCompile Include="..\..\thirdParty\tinyxml\tinyxmlparser.cpp">
       <Filter>tinyxml</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dScene\dAnimationLayers.cpp" />
+    <ClCompile Include="..\..\dScene\dAnimationTake.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dScene\dBoneNodeInfo.h" />
@@ -60,7 +61,6 @@
     <ClInclude Include="..\..\dScene\dDrawUtils.h" />
     <ClInclude Include="..\..\dScene\dGeometryNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dGeometryNodeModifierInfo.h" />
-    <ClInclude Include="..\..\dScene\dGeometryNodeSkinModifierInfo.h" />
     <ClInclude Include="..\..\dScene\dLineNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dMaterialNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dMeshNodeInfo.h" />
@@ -83,6 +83,8 @@
     <ClInclude Include="..\..\thirdParty\tinyxml\tinyxml.h">
       <Filter>tinyxml</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dScene\dAnimationLayers.h" />
+    <ClInclude Include="..\..\dScene\dAnimationTake.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tinyxml">

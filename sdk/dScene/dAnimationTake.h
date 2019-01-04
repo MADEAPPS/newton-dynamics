@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dSceneCacheInfo.h
+// Name:        dAnimationTake.h
 // Purpose:     
 // Author:      Julio Jerez
 // Modified by: 
@@ -16,33 +16,23 @@
 // freely
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _D_SCENE_CACHE_INFO_H_
-#define _D_SCENE_CACHE_INFO_H_
+#ifndef _D_ANIMATION_TAKE_H_
+#define _D_ANIMATION_TAKE_H_
 
 #include "dNodeInfo.h"
 
-class dSceneCacheInfo: public dNodeInfo
+class dAnimationTake: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dSceneCacheInfo,dNodeInfo,DSCENE_API)
+	D_DEFINE_CLASS_NODE(dAnimationTake,dNodeInfo,DSCENE_API)
 
-	dSceneCacheInfo();
-	dSceneCacheInfo(dScene* const world);
-	virtual ~dSceneCacheInfo(void);
-
-	virtual void SetID(dCRCTYPE id);
-	virtual dCRCTYPE GetID() const;
+	dAnimationTake();
+	dAnimationTake(dScene* const world);
+	virtual ~dAnimationTake(void);
 
 	protected:
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
-
-
-	dCRCTYPE m_internalCacheID;
 };
-
-
-
-
 
 #endif

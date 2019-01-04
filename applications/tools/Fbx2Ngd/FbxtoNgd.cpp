@@ -46,8 +46,8 @@ class ImportStackData
 	public:
 	ImportStackData(const dMatrix& parentMatrix, FbxNode* const fbxNode, dScene::dTreeNode* parentNode)
 		:m_parentMatrix(parentMatrix)
-		, m_fbxNode(fbxNode)
-		, m_parentNode(parentNode)
+		,m_fbxNode(fbxNode)
+		,m_parentNode(parentNode)
 	{
 	}
 	dMatrix m_parentMatrix;
@@ -79,7 +79,7 @@ class LocalMaterialMap: public dTree<dScene::dTreeNode*, int>
 {
 };
 
-static int m_materialId = 0;
+static int g_materialId = 0;
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene);
 static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
 static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene);
@@ -89,9 +89,11 @@ static void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, Fbx
 static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId);
+static void ImportAnimations(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap);
+static void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene, GlobalNodeMap& nodeMap, FbxNode* const pNode, dScene::dTreeNode* const animationLayers);
 
 
-static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
+int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
 {
 	//The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
 	pManager = FbxManager::Create();
@@ -119,7 +121,7 @@ static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
 	return 1;
 }
 
-static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
+bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 {
 	int lFileMajor, lFileMinor, lFileRevision;
 	int lSDKMajor, lSDKMinor, lSDKRevision;
@@ -231,7 +233,7 @@ static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFi
 }
 
 
-static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
+bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 {
 	FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
 
@@ -294,7 +296,7 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 	defaulMaterial->SetName("default_material");
 	usedMaterials.Insert(0, defaulMaterialNode);
 
-	m_materialId = 0;
+	g_materialId = 0;
 	LoadHierarchy(fbxScene, ngdScene, nodeMap);
 
 	int boneId = 0;
@@ -314,7 +316,6 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 		}
 	}
 
-	
 	for (iter.Begin(); iter; iter++) {
 		FbxNode* const fbxNode = iter.GetKey();
 		dScene::dTreeNode* const ngdNode = iter.GetNode()->GetInfo();
@@ -382,7 +383,6 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 		}
 	}
 
-
 	UsedMaterials::Iterator iter1(usedMaterials);
 	for (iter1.Begin(); iter1; iter1++) {
 		int count = iter1.GetNode()->GetInfo();
@@ -399,10 +399,205 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 			}
 		}
 	}
+
+	ImportAnimations(fbxScene, ngdScene, nodeMap);
 }
 
 
-static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap)
+static int InterpolationFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eInterpolationConstant) == FbxAnimCurveDef::eInterpolationConstant) return 1;
+	if ((flags & FbxAnimCurveDef::eInterpolationLinear) == FbxAnimCurveDef::eInterpolationLinear) return 2;
+	if ((flags & FbxAnimCurveDef::eInterpolationCubic) == FbxAnimCurveDef::eInterpolationCubic) return 3;
+	return 0;
+}
+
+static int ConstantmodeFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eConstantStandard) == FbxAnimCurveDef::eConstantStandard) return 1;
+	if ((flags & FbxAnimCurveDef::eConstantNext) == FbxAnimCurveDef::eConstantNext) return 2;
+	return 0;
+}
+
+static int TangentmodeFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eTangentAuto) == FbxAnimCurveDef::eTangentAuto) return 1;
+	if ((flags & FbxAnimCurveDef::eTangentAutoBreak) == FbxAnimCurveDef::eTangentAutoBreak) return 2;
+	if ((flags & FbxAnimCurveDef::eTangentTCB) == FbxAnimCurveDef::eTangentTCB) return 3;
+	if ((flags & FbxAnimCurveDef::eTangentUser) == FbxAnimCurveDef::eTangentUser) return 4;
+	if ((flags & FbxAnimCurveDef::eTangentGenericBreak) == FbxAnimCurveDef::eTangentGenericBreak) return 5;
+	if ((flags & FbxAnimCurveDef::eTangentBreak) == FbxAnimCurveDef::eTangentBreak) return 6;
+	return 0;
+}
+
+static int TangentweightFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eWeightedNone) == FbxAnimCurveDef::eWeightedNone) return 1;
+	if ((flags & FbxAnimCurveDef::eWeightedRight) == FbxAnimCurveDef::eWeightedRight) return 2;
+	if ((flags & FbxAnimCurveDef::eWeightedNextLeft) == FbxAnimCurveDef::eWeightedNextLeft) return 3;
+	return 0;
+}
+
+static int TangentVelocityFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eVelocityNone) == FbxAnimCurveDef::eVelocityNone) return 1;
+	if ((flags & FbxAnimCurveDef::eVelocityRight) == FbxAnimCurveDef::eVelocityRight) return 2;
+	if ((flags & FbxAnimCurveDef::eVelocityNextLeft) == FbxAnimCurveDef::eVelocityNextLeft) return 3;
+	return 0;
+}
+
+static void DisplayCurveKeys(FbxAnimCurve* pCurve)
+{
+	static const char* interpolation[] = { "?", "constant", "linear", "cubic" };
+	static const char* constantMode[] = { "?", "Standard", "Next" };
+	static const char* cubicMode[] = { "?", "Auto", "Auto break", "Tcb", "User", "Break", "User break" };
+	static const char* tangentWVMode[] = { "?", "None", "Right", "Next left" };
+
+	FbxTime   lKeyTime;
+	float   lKeyValue;
+	char    lTimeString[256];
+	FbxString lOutputString;
+	int     lCount;
+
+	int lKeyCount = pCurve->KeyGetCount();
+
+	for (lCount = 0; lCount < lKeyCount; lCount++)
+	{
+		lKeyValue = static_cast<float>(pCurve->KeyGetValue(lCount));
+		lKeyTime = pCurve->KeyGetTime(lCount);
+
+		lOutputString = "            Key Time: ";
+		lOutputString += lKeyTime.GetTimeString(lTimeString, FbxUShort(256));
+		lOutputString += ".... Key Value: ";
+		lOutputString += lKeyValue;
+		lOutputString += " [ ";
+		lOutputString += interpolation[InterpolationFlagToIndex(pCurve->KeyGetInterpolation(lCount))];
+		if ((pCurve->KeyGetInterpolation(lCount)&FbxAnimCurveDef::eInterpolationConstant) == FbxAnimCurveDef::eInterpolationConstant)
+		{
+			lOutputString += " | ";
+			lOutputString += constantMode[ConstantmodeFlagToIndex(pCurve->KeyGetConstantMode(lCount))];
+		}
+		else if ((pCurve->KeyGetInterpolation(lCount)&FbxAnimCurveDef::eInterpolationCubic) == FbxAnimCurveDef::eInterpolationCubic)
+		{
+			lOutputString += " | ";
+			lOutputString += cubicMode[TangentmodeFlagToIndex(pCurve->KeyGetTangentMode(lCount))];
+			lOutputString += " | ";
+			lOutputString += tangentWVMode[TangentweightFlagToIndex(pCurve->KeyGet(lCount).GetTangentWeightMode())];
+			lOutputString += " | ";
+			lOutputString += tangentWVMode[TangentVelocityFlagToIndex(pCurve->KeyGet(lCount).GetTangentVelocityMode())];
+		}
+		lOutputString += " ]";
+		lOutputString += "\n";
+		FBXSDK_printf(lOutputString);
+	}
+}
+
+void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene, GlobalNodeMap& nodeMap, FbxNode* const rootNode, dScene::dTreeNode* const animationTakeNode)
+{
+	int stack = 1;
+	FbxNode* fbxNodes[32];
+	fbxNodes[0] = rootNode;
+
+	while (stack) {
+		stack--;
+		FbxNode* const fbxNode = fbxNodes[stack];
+
+		FbxString lOutputString;
+		lOutputString = "     Node Name: ";
+		lOutputString += fbxNode->GetName();
+		lOutputString += "\n";
+		FBXSDK_printf(lOutputString);
+
+		FbxAnimCurve* const animCurveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		FbxAnimCurve* const animCurveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		FbxAnimCurve* const animCurveZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+
+		FbxAnimCurve* const animCurveRotX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		FbxAnimCurve* const animCurveRotY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		FbxAnimCurve* const animCurveRotZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+
+		if (animCurveX || animCurveRotX) {
+/*
+			dScene::dTreeNode* const animationTakeNode = ngdScene->CreateAnimationTake();
+			dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
+			dScene::dTreeNode* const ngdNode = nodeMap.Find(fbxNode)->GetInfo();
+			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
+			animationTake->SetName(ngdInfo->GetName());
+*/
+
+			if (animCurveX) {
+				dAssert(animCurveY);
+				dAssert(animCurveZ);
+				DisplayCurveKeys(animCurveX);
+				DisplayCurveKeys(animCurveY);
+				DisplayCurveKeys(animCurveZ);
+			}
+			if (animCurveRotX) {
+				dAssert(animCurveRotY);
+				dAssert(animCurveRotZ);
+				DisplayCurveKeys(animCurveRotX);
+				DisplayCurveKeys(animCurveRotY);
+				DisplayCurveKeys(animCurveRotZ);
+			}
+		}
+
+
+/*
+		lAnimCurve = fbxNode->LclScaling.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		if (lAnimCurve)
+		{
+			FBXSDK_printf("        SX\n");
+			DisplayCurveKeys(lAnimCurve);
+		}
+		lAnimCurve = fbxNode->LclScaling.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		if (lAnimCurve)
+		{
+			FBXSDK_printf("        SY\n");
+			DisplayCurveKeys(lAnimCurve);
+		}
+		lAnimCurve = fbxNode->LclScaling.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+		if (lAnimCurve)
+		{
+			FBXSDK_printf("        SZ\n");
+			DisplayCurveKeys(lAnimCurve);
+		}
+*/
+
+		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
+			fbxNodes[stack] = fbxNode->GetChild(i);
+			stack++;
+		}
+	}
+}
+
+void ImportAnimations(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap)
+{
+	const int numStacks = fbxScene->GetSrcObjectCount<FbxAnimStack>();
+	if (numStacks) {
+		FbxAnimStack* const animStack = fbxScene->GetSrcObject<FbxAnimStack>(0);
+
+		FbxString lOutputString = "Animation Stack Name: ";
+		lOutputString += animStack->GetName();
+		lOutputString += "\n";
+		FBXSDK_printf(lOutputString);
+		int nbAnimLayers = animStack->GetMemberCount<FbxAnimLayer>();
+
+		dScene::dTreeNode* const animationLayers = ngdScene->CreateAnimationLayers();
+
+		for (int j = 0; j < nbAnimLayers; j++) {
+			FbxAnimLayer* const animLayer = animStack->GetMember<FbxAnimLayer>(j);
+
+			FbxString takeName(animLayer->GetName());
+
+			dScene::dTreeNode* const animationTakeNode = ngdScene->CreateAnimationTake();
+			dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
+			animationTake->SetName(animLayer->GetName());
+			ImportAnimationLayer(animLayer, ngdScene, nodeMap, fbxScene->GetRootNode(), animationTakeNode);
+		}
+	}
+}
+
+void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap)
 {
 	dList <ImportStackData> nodeStack;
 
@@ -465,7 +660,7 @@ euler2 = euler2.Scale(dRadToDegree);
 }
 
 
-static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache)
+void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache)
 {
 	int lTextureCount = pProperty.GetSrcObjectCount<FbxTexture>();
 	for (int j = 0; j < lTextureCount; ++j) {
@@ -581,7 +776,7 @@ static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene:
 	}
 }
 
-static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
+void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
 {
 	dScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(DEFUALT_MATERIAL_ID);
 	localMaterilIndex.Insert(materialNode, DEFUALT_MATERIAL_ID);
@@ -593,7 +788,7 @@ static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, Fb
 			FbxSurfaceMaterial* const fbxMaterial = fbxMeshNode->GetMaterial(i);
 			GlobalMaterialMap::dTreeNode* globalMaterialCacheNode = materialCache.Find(fbxMaterial);
 			if (!globalMaterialCacheNode) {
-				dScene::dTreeNode* const materialNode = ngdScene->CreateMaterialNode(m_materialId);
+				dScene::dTreeNode* const materialNode = ngdScene->CreateMaterialNode(g_materialId);
 				globalMaterialCacheNode = materialCache.Insert(materialNode, fbxMaterial);
 				usedMaterials.Insert(0, materialNode);
 
@@ -650,7 +845,7 @@ static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, Fb
 				materialInfo->SetShininess(shininess);
 				materialInfo->SetOpacity(opacity);
 
-				m_materialId++;
+				g_materialId++;
 			}
 			dScene::dTreeNode* const materialNode = globalMaterialCacheNode->GetInfo();
 			localMaterilIndex.Insert(materialNode, i);
@@ -918,7 +1113,7 @@ void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* c
 	}
 }
 
-static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const ngdNode, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId)
+void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const ngdNode, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId)
 {
 	FbxSkeleton* fbxBone = (FbxSkeleton*)fbxNode->GetNodeAttribute();
 
@@ -938,7 +1133,6 @@ static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, Fbx
 	}
 	bone->SetId(boneId);
 }
-
 
 int main(int argc, char** argv)
 {

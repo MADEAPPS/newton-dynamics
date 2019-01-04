@@ -72,6 +72,8 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual void CleanUp();
 	DSCENE_API virtual dTreeNode* GetRootNode() const;
 
+	DSCENE_API virtual dTreeNode* CreateAnimationTake();
+	DSCENE_API virtual dTreeNode* CreateAnimationLayers();
 	DSCENE_API virtual dTreeNode* CreateModelNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateSceneNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateGeometryTransformNode(dTreeNode* const parent);
@@ -90,12 +92,14 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual dTreeNode* CreateLineNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateSkinModifierNode(dTreeNode* const parent);
 
+
 	DSCENE_API virtual dTreeNode* CreateMaterialNode (int id);
 	DSCENE_API virtual dTreeNode* CreateTextureNode (const char* const pathName);
 
 	DSCENE_API virtual dTreeNode* GetTextureCacheNode ();
 	DSCENE_API virtual dTreeNode* GetMaterialCacheNode ();
 	DSCENE_API virtual dTreeNode* GetGeometryCacheNode ();
+	
 
 	DSCENE_API virtual dTreeNode* FindTextureCacheNode () const;
 	DSCENE_API virtual dTreeNode* FindGetMaterialCacheNode () const;

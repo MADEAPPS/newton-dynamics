@@ -59,6 +59,9 @@
     <ClCompile Include="..\..\dAnimation\dAnimIDRigJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDRigLimb.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNode.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodePose.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKController.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKManager.cpp" />
   </ItemGroup>
@@ -79,6 +82,9 @@
     <ClInclude Include="..\..\dAnimation\dAnimIDRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDRigLimb.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNode.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodePose.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
   </ItemGroup>

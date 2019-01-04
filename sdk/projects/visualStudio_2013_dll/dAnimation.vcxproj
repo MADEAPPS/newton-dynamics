@@ -59,6 +59,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNode.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodePose.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKController.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKManager.cpp" />
   </ItemGroup>
@@ -79,6 +82,9 @@
     <ClInclude Include="..\..\dAnimation\dAnimIDRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDRigLimb.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNode.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodePose.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
   </ItemGroup>
