@@ -43,6 +43,9 @@
     <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodePose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodeRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodeTwoWay.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNode.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodePose.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKController.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDRigEffector.cpp" />
@@ -71,6 +74,9 @@
     <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodePose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodeRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodeTwoWay.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNode.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodePose.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDRigEffector.h" />

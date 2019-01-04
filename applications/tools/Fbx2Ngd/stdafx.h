@@ -41,6 +41,7 @@
 #include <dBoneNodeInfo.h>
 #include <dAnimationTake.h>
 #include <dSceneNodeInfo.h>
+#include <dAnimationTrack.h>
 #include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
 #include <dGeometryNodeModifierInfo.h>

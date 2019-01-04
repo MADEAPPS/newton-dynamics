@@ -160,35 +160,6 @@ bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 	{
 		FBXSDK_printf("FBX file format version for file '%s' is %d.%d.%d\n\n", pFilename, lFileMajor, lFileMinor, lFileRevision);
 
-		// From this point, it is possible to access animation stack information without
-		// the expense of loading the entire file.
-
-		//FBXSDK_printf("Animation Stack Information\n");
-
-		//int lAnimStackCount = lImporter->GetAnimStackCount();
-
-		//FBXSDK_printf("    Number of Animation Stacks: %d\n", lAnimStackCount);
-		//FBXSDK_printf("    Current Animation Stack: \"%s\"\n", lImporter->GetActiveAnimStackName().Buffer());
-		//FBXSDK_printf("\n");
-
-		//for (int i = 0; i < lAnimStackCount; i++)
-		//{
-			//FbxTakeInfo* lTakeInfo = lImporter->GetTakeInfo(i);
-
-			//FBXSDK_printf("    Animation Stack %d\n", i);
-			//FBXSDK_printf("         Name: \"%s\"\n", lTakeInfo->mName.Buffer());
-			//FBXSDK_printf("         Description: \"%s\"\n", lTakeInfo->mDescription.Buffer());
-
-			// Change the value of the import name if the animation stack should be imported 
-			// under a different name.
-			//FBXSDK_printf("         Import Name: \"%s\"\n", lTakeInfo->mImportName.Buffer());
-
-			// Set the value of the import state to false if the animation stack should be not
-			// be imported. 
-			//FBXSDK_printf("         Import State: %s\n", lTakeInfo->mSelect ? "true" : "false");
-			//FBXSDK_printf("\n");
-		//}
-
 		// Set the import states. By default, the import states are always set to 
 		// true. The code below shows how to change these states.
 		IOS_REF.SetBoolProp(IMP_FBX_MATERIAL, true);
@@ -403,95 +374,6 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 	ImportAnimations(fbxScene, ngdScene, nodeMap);
 }
 
-
-static int InterpolationFlagToIndex(int flags)
-{
-	if ((flags & FbxAnimCurveDef::eInterpolationConstant) == FbxAnimCurveDef::eInterpolationConstant) return 1;
-	if ((flags & FbxAnimCurveDef::eInterpolationLinear) == FbxAnimCurveDef::eInterpolationLinear) return 2;
-	if ((flags & FbxAnimCurveDef::eInterpolationCubic) == FbxAnimCurveDef::eInterpolationCubic) return 3;
-	return 0;
-}
-
-static int ConstantmodeFlagToIndex(int flags)
-{
-	if ((flags & FbxAnimCurveDef::eConstantStandard) == FbxAnimCurveDef::eConstantStandard) return 1;
-	if ((flags & FbxAnimCurveDef::eConstantNext) == FbxAnimCurveDef::eConstantNext) return 2;
-	return 0;
-}
-
-static int TangentmodeFlagToIndex(int flags)
-{
-	if ((flags & FbxAnimCurveDef::eTangentAuto) == FbxAnimCurveDef::eTangentAuto) return 1;
-	if ((flags & FbxAnimCurveDef::eTangentAutoBreak) == FbxAnimCurveDef::eTangentAutoBreak) return 2;
-	if ((flags & FbxAnimCurveDef::eTangentTCB) == FbxAnimCurveDef::eTangentTCB) return 3;
-	if ((flags & FbxAnimCurveDef::eTangentUser) == FbxAnimCurveDef::eTangentUser) return 4;
-	if ((flags & FbxAnimCurveDef::eTangentGenericBreak) == FbxAnimCurveDef::eTangentGenericBreak) return 5;
-	if ((flags & FbxAnimCurveDef::eTangentBreak) == FbxAnimCurveDef::eTangentBreak) return 6;
-	return 0;
-}
-
-static int TangentweightFlagToIndex(int flags)
-{
-	if ((flags & FbxAnimCurveDef::eWeightedNone) == FbxAnimCurveDef::eWeightedNone) return 1;
-	if ((flags & FbxAnimCurveDef::eWeightedRight) == FbxAnimCurveDef::eWeightedRight) return 2;
-	if ((flags & FbxAnimCurveDef::eWeightedNextLeft) == FbxAnimCurveDef::eWeightedNextLeft) return 3;
-	return 0;
-}
-
-static int TangentVelocityFlagToIndex(int flags)
-{
-	if ((flags & FbxAnimCurveDef::eVelocityNone) == FbxAnimCurveDef::eVelocityNone) return 1;
-	if ((flags & FbxAnimCurveDef::eVelocityRight) == FbxAnimCurveDef::eVelocityRight) return 2;
-	if ((flags & FbxAnimCurveDef::eVelocityNextLeft) == FbxAnimCurveDef::eVelocityNextLeft) return 3;
-	return 0;
-}
-
-static void DisplayCurveKeys(FbxAnimCurve* pCurve)
-{
-	static const char* interpolation[] = { "?", "constant", "linear", "cubic" };
-	static const char* constantMode[] = { "?", "Standard", "Next" };
-	static const char* cubicMode[] = { "?", "Auto", "Auto break", "Tcb", "User", "Break", "User break" };
-	static const char* tangentWVMode[] = { "?", "None", "Right", "Next left" };
-
-	FbxTime   lKeyTime;
-	float   lKeyValue;
-	char    lTimeString[256];
-	FbxString lOutputString;
-	int     lCount;
-
-	int lKeyCount = pCurve->KeyGetCount();
-
-	for (lCount = 0; lCount < lKeyCount; lCount++)
-	{
-		lKeyValue = static_cast<float>(pCurve->KeyGetValue(lCount));
-		lKeyTime = pCurve->KeyGetTime(lCount);
-
-		lOutputString = "            Key Time: ";
-		lOutputString += lKeyTime.GetTimeString(lTimeString, FbxUShort(256));
-		lOutputString += ".... Key Value: ";
-		lOutputString += lKeyValue;
-		lOutputString += " [ ";
-		lOutputString += interpolation[InterpolationFlagToIndex(pCurve->KeyGetInterpolation(lCount))];
-		if ((pCurve->KeyGetInterpolation(lCount)&FbxAnimCurveDef::eInterpolationConstant) == FbxAnimCurveDef::eInterpolationConstant)
-		{
-			lOutputString += " | ";
-			lOutputString += constantMode[ConstantmodeFlagToIndex(pCurve->KeyGetConstantMode(lCount))];
-		}
-		else if ((pCurve->KeyGetInterpolation(lCount)&FbxAnimCurveDef::eInterpolationCubic) == FbxAnimCurveDef::eInterpolationCubic)
-		{
-			lOutputString += " | ";
-			lOutputString += cubicMode[TangentmodeFlagToIndex(pCurve->KeyGetTangentMode(lCount))];
-			lOutputString += " | ";
-			lOutputString += tangentWVMode[TangentweightFlagToIndex(pCurve->KeyGet(lCount).GetTangentWeightMode())];
-			lOutputString += " | ";
-			lOutputString += tangentWVMode[TangentVelocityFlagToIndex(pCurve->KeyGet(lCount).GetTangentVelocityMode())];
-		}
-		lOutputString += " ]";
-		lOutputString += "\n";
-		FBXSDK_printf(lOutputString);
-	}
-}
-
 void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene, GlobalNodeMap& nodeMap, FbxNode* const rootNode, dScene::dTreeNode* const animationTakeNode)
 {
 	int stack = 1;
@@ -502,12 +384,6 @@ void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene,
 		stack--;
 		FbxNode* const fbxNode = fbxNodes[stack];
 
-		FbxString lOutputString;
-		lOutputString = "     Node Name: ";
-		lOutputString += fbxNode->GetName();
-		lOutputString += "\n";
-		FBXSDK_printf(lOutputString);
-
 		FbxAnimCurve* const animCurveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
 		FbxAnimCurve* const animCurveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
 		FbxAnimCurve* const animCurveZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
@@ -517,51 +393,52 @@ void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene,
 		FbxAnimCurve* const animCurveRotZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
 
 		if (animCurveX || animCurveRotX) {
-/*
-			dScene::dTreeNode* const animationTakeNode = ngdScene->CreateAnimationTake();
-			dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
+			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
+			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
 			dScene::dTreeNode* const ngdNode = nodeMap.Find(fbxNode)->GetInfo();
 			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
-			animationTake->SetName(ngdInfo->GetName());
-*/
+			animationTrack->SetName(ngdInfo->GetName());
+			ngdScene->AddReference(ngdNode, trackNode);
 
 			if (animCurveX) {
 				dAssert(animCurveY);
 				dAssert(animCurveZ);
-				DisplayCurveKeys(animCurveX);
-				DisplayCurveKeys(animCurveY);
-				DisplayCurveKeys(animCurveZ);
+
+				int keyCount = animCurveX->KeyGetCount();
+				dAssert(keyCount == animCurveY->KeyGetCount());
+				dAssert(keyCount == animCurveZ->KeyGetCount());
+				for (int i = 0; i < keyCount; i++) {
+					FbxTime keyTime = animCurveX->KeyGetTime(i);
+					dAssert(keyTime == animCurveY->KeyGetTime(i));
+					dAssert(keyTime == animCurveZ->KeyGetTime(i));
+
+					dFloat x = animCurveX->KeyGetValue(i);
+					dFloat y = animCurveY->KeyGetValue(i);
+					dFloat z = animCurveZ->KeyGetValue(i);
+					animationTrack->AddPosition(dFloat (keyTime.GetSecondDouble()), x, y, z);
+				}
 			}
 			if (animCurveRotX) {
 				dAssert(animCurveRotY);
 				dAssert(animCurveRotZ);
-				DisplayCurveKeys(animCurveRotX);
-				DisplayCurveKeys(animCurveRotY);
-				DisplayCurveKeys(animCurveRotZ);
+
+				int keyCount = animCurveRotX->KeyGetCount();
+				dAssert(keyCount == animCurveRotY->KeyGetCount());
+				dAssert(keyCount == animCurveRotZ->KeyGetCount());
+				for (int i = 0; i < keyCount; i++) {
+					FbxTime keyTime = animCurveRotX->KeyGetTime(i);
+					dAssert(keyTime == animCurveRotY->KeyGetTime(i));
+					dAssert(keyTime == animCurveRotZ->KeyGetTime(i));
+
+					dFloat x = animCurveRotX->KeyGetValue(i);
+					dFloat y = animCurveRotY->KeyGetValue(i);
+					dFloat z = animCurveRotZ->KeyGetValue(i);
+					animationTrack->AddRotation(dFloat(keyTime.GetSecondDouble()), x, y, z);
+				}
 			}
-		}
 
-
-/*
-		lAnimCurve = fbxNode->LclScaling.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
-		if (lAnimCurve)
-		{
-			FBXSDK_printf("        SX\n");
-			DisplayCurveKeys(lAnimCurve);
+			animationTrack->OptimizeCurves();
 		}
-		lAnimCurve = fbxNode->LclScaling.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
-		if (lAnimCurve)
-		{
-			FBXSDK_printf("        SY\n");
-			DisplayCurveKeys(lAnimCurve);
-		}
-		lAnimCurve = fbxNode->LclScaling.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
-		if (lAnimCurve)
-		{
-			FBXSDK_printf("        SZ\n");
-			DisplayCurveKeys(lAnimCurve);
-		}
-*/
 
 		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
 			fbxNodes[stack] = fbxNode->GetChild(i);
@@ -658,7 +535,6 @@ euler2 = euler2.Scale(dRadToDegree);
 		}
 	}
 }
-
 
 void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache)
 {

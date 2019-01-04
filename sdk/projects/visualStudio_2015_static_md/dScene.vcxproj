@@ -37,6 +37,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\dScene\dAnimationLayers.cpp" />
     <ClCompile Include="..\..\dScene\dAnimationTake.cpp" />
+    <ClCompile Include="..\..\dScene\dAnimationTrack.cpp" />
     <ClCompile Include="..\..\dScene\dBoneNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dCollisionBoxNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dCollisionCapsuleNodeInfo.cpp" />
@@ -120,6 +121,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\dScene\dAnimationLayers.h" />
     <ClInclude Include="..\..\dScene\dAnimationTake.h" />
+    <ClInclude Include="..\..\dScene\dAnimationTrack.h" />
     <ClInclude Include="..\..\dScene\dBoneNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dCollisionBoxNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dCollisionCapsuleNodeInfo.h" />

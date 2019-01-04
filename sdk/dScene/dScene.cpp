@@ -26,6 +26,7 @@
 #include "dSceneCacheInfo.h"
 #include "dSceneModelInfo.h"
 #include "dAnimationTake.h"
+#include "dAnimationTrack.h"
 #include "dTextureNodeInfo.h"
 #include "dAnimationLayers.h"
 #include "dMaterialNodeInfo.h"
@@ -228,6 +229,7 @@ void dScene::RegisterClasses()
 		dSceneNodeInfo::GetSingleton();
 		dSceneCacheInfo::GetSingleton();
 		dSceneModelInfo::GetSingleton();
+		dAnimationTrack::GetSingleton();
 		dAnimationLayers::GetSingleton();
 		dTextureNodeInfo::GetSingleton();
 		dMaterialNodeInfo::GetSingleton();
@@ -506,6 +508,11 @@ dScene::dTreeNode* dScene::CreateMaterialNode (int id)
 	dMaterialNodeInfo* const info = (dMaterialNodeInfo*) GetInfoFromNode(node);
 	info->m_id = id;
 	return node;
+}
+
+dScene::dTreeNode* dScene::CreateAnimationTrack(dTreeNode* const take)
+{
+	return CreateNode("dAnimationTrack", take);
 }
 
 dScene::dTreeNode* dScene::CreateAnimationTake()
