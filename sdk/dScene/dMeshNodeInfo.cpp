@@ -120,7 +120,6 @@ void dMeshNodeInfo::BakeTransform (const dMatrix& transform)
 	dVector scale; 
 	dMatrix stretchMatrix;
 
-	//dMatrix tmp (m_matrix);
 	dMatrix matrix (transform.Inverse4x4() * m_matrix * transform);
 	matrix.PolarDecomposition (m_matrix, scale, stretchMatrix);
 	matrix = transform * dMatrix (dGetIdentityMatrix(), scale, stretchMatrix);

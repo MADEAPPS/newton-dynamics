@@ -59,6 +59,61 @@ void dAnimationTrack::AddRotation(dFloat time, dFloat x, dFloat y, dFloat z)
 	value.m_time = time;
 }
 
+void dAnimationTrack::BakeTransform(const dMatrix& transform)
+{
+	dMatrix invert(transform.Inverse4x4());
+//	SetTransform(invert * GetTransform() * transform);
+
+	if (m_position.GetCount() && m_rotation.GetCount()) {
+		dList<dCurveValue>::dListNode* positNode = m_position.GetFirst();
+		for (dList<dCurveValue>::dListNode* rotNode = m_rotation.GetFirst(); rotNode; rotNode = rotNode->GetNext()) {
+			dVector euler;
+			dVector tmp;
+			dCurveValue& rotValue = rotNode->GetInfo();
+			dCurveValue& positValue = positNode->GetInfo();
+			dMatrix m(dPitchMatrix(rotValue.m_x * dDegreeToRad) * dYawMatrix(rotValue.m_y * dDegreeToRad) * dRollMatrix(rotValue.m_z * dDegreeToRad));
+			m.m_posit = dVector(positValue.m_x, positValue.m_y, positValue.m_z, 0.0f);
+			dMatrix matrix(invert * m * transform);
+
+			dVector scale;
+			dMatrix output;
+			dMatrix eigenScaleAxis;
+			matrix.PolarDecomposition(output, scale, eigenScaleAxis);
+			output.GetEulerAngles(euler, tmp);
+			euler = euler.Scale(dRadToDegree);
+			rotValue.m_x = euler.m_x;
+			rotValue.m_y = euler.m_y;
+			rotValue.m_z = euler.m_z;
+
+			positValue.m_x = output.m_posit.m_x;
+			positValue.m_y = output.m_posit.m_y;
+			positValue.m_z = output.m_posit.m_z;
+
+			positNode = positNode->GetNext();
+		}
+
+	} else if (m_position.GetCount()) {
+		dAssert(0);
+	} else {
+		for (dList<dCurveValue>::dListNode* node = m_rotation.GetFirst(); node; node = node->GetNext()) {
+			dVector euler;
+			dVector tmp;
+			dCurveValue& value = node->GetInfo();
+			dMatrix matrix(invert * dPitchMatrix(value.m_x * dDegreeToRad) * dYawMatrix(value.m_y * dDegreeToRad) * dRollMatrix(value.m_z * dDegreeToRad) * transform);
+
+			dVector scale;
+			dMatrix output;
+			dMatrix eigenScaleAxis;
+			matrix.PolarDecomposition(output, scale, eigenScaleAxis);
+			output.GetEulerAngles(euler, tmp);
+			euler = euler.Scale(dRadToDegree);
+			value.m_x = euler.m_x;
+			value.m_y = euler.m_y;
+			value.m_z = euler.m_z;
+		}
+	}
+}
+
 void dAnimationTrack::OptimizeCurves()
 {
 	if (m_position.GetCount() > 2) {

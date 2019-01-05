@@ -9,22 +9,17 @@
 * freely
 */
 
-#ifndef __D_ANIM_IK_BLEND_NODE_POSE_h__
-#define __D_ANIM_IK_BLEND_NODE_POSE_h__
-#include "dAnimPose.h"
+#ifndef __D_ANIM_IK_BLEND_NODE_TAKE_h__
+#define __D_ANIM_IK_BLEND_NODE_TAKE_h__
 #include "dAnimIKBlendNode.h"
 
-class dAnimIKBlendNodePose: public dAnimIKBlendNode
+class dAnimIKBlendNodeTake: public dAnimIKBlendNode
 {
 	public:
-	dAnimIKBlendNodePose(dAnimIKController* const character);
-	virtual ~dAnimIKBlendNodePose();
+	dAnimIKBlendNodeTake(dAnimIKController* const character);
+	virtual ~dAnimIKBlendNodeTake();
 
-	dAnimPose& GetPose() { return m_pose; }
 	virtual void Evaluate(dAnimPose& output, dFloat timestep);
-
-	protected:
-	dAnimPose m_pose;
 };
 
 

@@ -25,14 +25,6 @@
 class dMeshNodeInfo: public dGeometryNodeInfo
 {
 	public:
-//	struct neMeshInfoFlatPoint
-//	{
-//		dFloat m_x, m_y, m_z;
-//		dFloat m_nx, m_ny, m_nz;
-//		dFloat m_u0, m_v0;
-//		dFloat m_u1, m_v1;
-//	};
-
 	D_DEFINE_CLASS_NODE(dMeshNodeInfo,dGeometryNodeInfo,DSCENE_API)
 
 	dMeshNodeInfo();

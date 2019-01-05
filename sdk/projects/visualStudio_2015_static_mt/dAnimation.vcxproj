@@ -52,6 +52,7 @@
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodePose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeTake.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKController.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -85,6 +86,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodePose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeTake.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
     <ClInclude Include="..\..\dAnimation\dAnimPose.h" />

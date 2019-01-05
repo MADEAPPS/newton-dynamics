@@ -10,20 +10,21 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimIKController.h"
-#include "dAnimIKBlendNodePose.h"
+#include "dAnimIKBlendNodeTake.h"
 
-dAnimIKBlendNodePose::dAnimIKBlendNodePose(dAnimIKController* const character)
+dAnimIKBlendNodeTake::dAnimIKBlendNodeTake(dAnimIKController* const character)
 	:dAnimIKBlendNode(character, NULL)
-	,m_pose(character->GetBasePose())
+{
+	dAssert(0);
+}
+
+dAnimIKBlendNodeTake::~dAnimIKBlendNodeTake()
 {
 }
 
-dAnimIKBlendNodePose::~dAnimIKBlendNodePose()
-{
-}
 
-void dAnimIKBlendNodePose::Evaluate(dAnimPose& output, dFloat timestep)
+void dAnimIKBlendNodeTake::Evaluate(dAnimPose& output, dFloat timestep)
 {
-	output.CopySource(m_pose);
+	dAssert(0);
+//	output.CopySource(m_pose);
 }

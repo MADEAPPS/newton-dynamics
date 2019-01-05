@@ -80,7 +80,7 @@
             <transform position="-2.84217e-16 0.114908 8.88178e-18 1" eulerAngles="0.0035207 0.0546348 -0.204727 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="9" />
-            <childrenNodes count="3" indices="11 73 166" />
+            <childrenNodes count="3" indices="11 70 166" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftForeArm" fileIndex="11" editorFlags="0" />
@@ -96,7 +96,7 @@
             <transform position="0 0.255864 0 1" eulerAngles="0.0869923 -0.00483008 0.0250907 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="11" />
-            <childrenNodes count="7" indices="13 17 21 25 29 70 168" />
+            <childrenNodes count="7" indices="13 17 21 25 29 74 168" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandThumb1" fileIndex="13" editorFlags="0" />
@@ -128,7 +128,7 @@
             <transform position="0 0.028663 0.001311 1" eulerAngles="-1.11022e-16 9.24446e-33 8.32667e-17 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="15" />
-            <childrenNodes count="1" indices="74" />
+            <childrenNodes count="1" indices="73" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandIndex1" fileIndex="17" editorFlags="0" />
@@ -136,7 +136,7 @@
             <transform position="-0.000467 0.103986 -0.029225 1" eulerAngles="-0.0886313 0.000532744 -0.0252323 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="12" />
-            <childrenNodes count="3" indices="18 95 178" />
+            <childrenNodes count="3" indices="18 97 178" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandIndex2" fileIndex="18" editorFlags="0" />
@@ -144,7 +144,7 @@
             <transform position="-2.84217e-16 0.029122 4.5e-05 1" eulerAngles="0.00212244 5.61434e-05 8.67541e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="17" />
-            <childrenNodes count="3" indices="19 92 179" />
+            <childrenNodes count="3" indices="19 90 179" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandIndex3" fileIndex="19" editorFlags="0" />
@@ -152,7 +152,7 @@
             <transform position="0 0.027719 -1.6e-05 1" eulerAngles="0.000649149 -3.08662e-05 1.78166e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="18" />
-            <childrenNodes count="3" indices="20 96 180" />
+            <childrenNodes count="3" indices="20 86 180" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandIndex4" fileIndex="20" editorFlags="0" />
@@ -160,7 +160,7 @@
             <transform position="0 0.023647 -2.9e-05 1" eulerAngles="-2.35099e-38 3.46945e-18 -6.77626e-21 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="19" />
-            <childrenNodes count="1" indices="93" />
+            <childrenNodes count="1" indices="94" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandMiddle1" fileIndex="21" editorFlags="0" />
@@ -168,7 +168,7 @@
             <transform position="0.002596 0.103052 -0.009 1" eulerAngles="-0.0862003 -0.00261584 -0.0249575 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="12" />
-            <childrenNodes count="3" indices="22 90 175" />
+            <childrenNodes count="3" indices="22 96 175" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandMiddle2" fileIndex="22" editorFlags="0" />
@@ -184,7 +184,7 @@
             <transform position="0 0.032512 2e-06 1" eulerAngles="-0.000932417 8.43604e-05 5.18949e-09 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="22" />
-            <childrenNodes count="3" indices="24 84 177" />
+            <childrenNodes count="3" indices="24 85 177" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandMiddle4" fileIndex="24" editorFlags="0" />
@@ -192,7 +192,7 @@
             <transform position="-2.84217e-16 0.029177 2.9e-05 1" eulerAngles="2.1684e-19 -5.20417e-18 -1.69407e-21 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="23" />
-            <childrenNodes count="1" indices="97" />
+            <childrenNodes count="1" indices="83" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandRing1" fileIndex="25" editorFlags="0" />
@@ -200,7 +200,7 @@
             <transform position="-0.000556 0.104571 0.008704 1" eulerAngles="-0.0812441 0.00766246 -0.0258548 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="12" />
-            <childrenNodes count="3" indices="26 88 172" />
+            <childrenNodes count="3" indices="26 89 172" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandRing2" fileIndex="26" editorFlags="0" />
@@ -208,7 +208,7 @@
             <transform position="0 0.030969 -0.000181 1" eulerAngles="-0.00786912 -0.00064655 3.77879e-06 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="25" />
-            <childrenNodes count="3" indices="27 82 173" />
+            <childrenNodes count="3" indices="27 84 173" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandRing3" fileIndex="27" editorFlags="0" />
@@ -216,7 +216,7 @@
             <transform position="2.84217e-16 0.029141 5.9e-05 1" eulerAngles="-0.00268412 0.000384418 7.78307e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="26" />
-            <childrenNodes count="3" indices="28 98 174" />
+            <childrenNodes count="3" indices="28 91 174" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandRing4" fileIndex="28" editorFlags="0" />
@@ -224,7 +224,7 @@
             <transform position="0 0.025909 0.000122 1" eulerAngles="1.41059e-37 -3.46945e-18 -4.06576e-20 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="27" />
-            <childrenNodes count="1" indices="83" />
+            <childrenNodes count="1" indices="88" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky1" fileIndex="29" editorFlags="0" />
@@ -232,7 +232,7 @@
             <transform position="-0.000348 0.099478 0.029522 1" eulerAngles="-0.0829324 -0.00774268 -0.0245098 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="12" />
-            <childrenNodes count="3" indices="30 99 169" />
+            <childrenNodes count="3" indices="30 95 169" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky2" fileIndex="30" editorFlags="0" />
@@ -240,7 +240,7 @@
             <transform position="2.84217e-16 0.027669 -0.000115 1" eulerAngles="-0.00594228 -0.000211152 8.77606e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="29" />
-            <childrenNodes count="3" indices="31 100 170" />
+            <childrenNodes count="3" indices="31 92 170" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky3" fileIndex="31" editorFlags="0" />
@@ -248,7 +248,7 @@
             <transform position="0 0.022396 4e-05 1" eulerAngles="-0.00206693 0.000206008 3.67937e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="30" />
-            <childrenNodes count="3" indices="32 85 171" />
+            <childrenNodes count="3" indices="32 82 171" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky4" fileIndex="32" editorFlags="0" />
@@ -256,7 +256,7 @@
             <transform position="0 0.019725 7.6e-05 1" eulerAngles="8.67362e-19 -8.67362e-19 3.38813e-21 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="31" />
-            <childrenNodes count="1" indices="91" />
+            <childrenNodes count="1" indices="98" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightShoulder" fileIndex="33" editorFlags="0" />
@@ -264,7 +264,7 @@
             <transform position="0.001212 0.135281 -0.054574 1" eulerAngles="-1.58859 0.204189 1.56427 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="5" />
-            <childrenNodes count="3" indices="34 89 146" />
+            <childrenNodes count="3" indices="34 99 146" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightArm" fileIndex="34" editorFlags="0" />
@@ -272,7 +272,7 @@
             <transform position="2.84217e-16 0.114908 1.77636e-17 1" eulerAngles="0.0174448 -0.050986 -0.20511 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="33" />
-            <childrenNodes count="3" indices="35 94 147" />
+            <childrenNodes count="3" indices="35 93 147" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightForeArm" fileIndex="35" editorFlags="0" />
@@ -280,7 +280,7 @@
             <transform position="2.84217e-16 0.234419 -8.88178e-18 1" eulerAngles="-1.34415e-16 0.00566116 6.87119e-17 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="34" />
-            <childrenNodes count="3" indices="36 101 148" />
+            <childrenNodes count="3" indices="36 100 148" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHand" fileIndex="36" editorFlags="0" />
@@ -288,7 +288,7 @@
             <transform position="0 0.252916 0 1" eulerAngles="-0.0837517 0.0277641 0.0142109 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="35" />
-            <childrenNodes count="7" indices="37 41 45 49 53 86 149" />
+            <childrenNodes count="7" indices="37 41 45 49 53 112 149" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandThumb1" fileIndex="37" editorFlags="0" />
@@ -296,7 +296,7 @@
             <transform position="-0.011587 0.041559 0.018727 1" eulerAngles="0.461432 -0.18355 0.431206 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="36" />
-            <childrenNodes count="3" indices="38 105 162" />
+            <childrenNodes count="3" indices="38 102 162" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandThumb2" fileIndex="38" editorFlags="0" />
@@ -304,7 +304,7 @@
             <transform position="0 0.037518 0.00286 1" eulerAngles="0.0926727 0.0080409 0.000612972 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="37" />
-            <childrenNodes count="3" indices="39 106 163" />
+            <childrenNodes count="3" indices="39 110 163" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandThumb3" fileIndex="39" editorFlags="0" />
@@ -312,7 +312,7 @@
             <transform position="-2.84217e-16 0.034059 -0.000565 1" eulerAngles="0.0567605 0.00653847 -0.000108467 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="38" />
-            <childrenNodes count="3" indices="40 102 164" />
+            <childrenNodes count="3" indices="40 108 164" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandThumb4" fileIndex="40" editorFlags="0" />
@@ -320,7 +320,7 @@
             <transform position="0 0.031233 -0.002295 1" eulerAngles="1.92593e-34 1.38778e-17 1.38778e-17 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="39" />
-            <childrenNodes count="1" indices="107" />
+            <childrenNodes count="1" indices="111" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandIndex1" fileIndex="41" editorFlags="0" />
@@ -328,7 +328,7 @@
             <transform position="-0.000482 0.113921 0.030137 1" eulerAngles="0.0865042 0.00712612 -0.0136549 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="36" />
-            <childrenNodes count="3" indices="42 103 159" />
+            <childrenNodes count="3" indices="42 101 159" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandIndex2" fileIndex="42" editorFlags="0" />
@@ -336,7 +336,7 @@
             <transform position="2.84217e-16 0.029606 -7e-05 1" eulerAngles="-0.00309781 -0.000146661 3.46764e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="41" />
-            <childrenNodes count="3" indices="43 108 160" />
+            <childrenNodes count="3" indices="43 104 160" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandIndex3" fileIndex="43" editorFlags="0" />
@@ -344,7 +344,7 @@
             <transform position="0 0.027269 2e-05 1" eulerAngles="-0.00126656 0.000183905 1.34882e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="42" />
-            <childrenNodes count="3" indices="44 109 161" />
+            <childrenNodes count="3" indices="44 103 161" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandIndex4" fileIndex="44" editorFlags="0" />
@@ -352,7 +352,7 @@
             <transform position="2.84217e-16 0.0245 4.9e-05 1" eulerAngles="4.33681e-19 3.46945e-18 1.35525e-20 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="43" />
-            <childrenNodes count="1" indices="110" />
+            <childrenNodes count="1" indices="105" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandMiddle1" fileIndex="45" editorFlags="0" />
@@ -360,7 +360,7 @@
             <transform position="0.001586 0.111245 0.009383 1" eulerAngles="0.0862816 -0.000278815 -0.0142794 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="36" />
-            <childrenNodes count="3" indices="46 111 156" />
+            <childrenNodes count="3" indices="46 106 156" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandMiddle2" fileIndex="46" editorFlags="0" />
@@ -368,7 +368,7 @@
             <transform position="0 0.034982 -7.5e-05 1" eulerAngles="-0.00245346 -0.000195366 4.18857e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="45" />
-            <childrenNodes count="3" indices="47 112 157" />
+            <childrenNodes count="3" indices="47 107 157" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandMiddle3" fileIndex="47" editorFlags="0" />
@@ -376,7 +376,7 @@
             <transform position="0 0.03231 1e-05 1" eulerAngles="-0.00193509 0.000214572 6.64103e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="46" />
-            <childrenNodes count="3" indices="48 104 158" />
+            <childrenNodes count="3" indices="48 109 158" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandMiddle4" fileIndex="48" editorFlags="0" />
@@ -384,7 +384,7 @@
             <transform position="0 0.029404 6.6e-05 1" eulerAngles="4.70198e-38 3.46945e-18 1.35525e-20 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="47" />
-            <childrenNodes count="1" indices="128" />
+            <childrenNodes count="1" indices="114" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandRing1" fileIndex="49" editorFlags="0" />
@@ -392,7 +392,7 @@
             <transform position="0.001462 0.111704 -0.009842 1" eulerAngles="0.0837412 0.00464992 -0.0138637 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="36" />
-            <childrenNodes count="3" indices="50 123 153" />
+            <childrenNodes count="3" indices="50 127 153" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandRing2" fileIndex="50" editorFlags="0" />
@@ -408,7 +408,7 @@
             <transform position="0 0.029057 -8e-06 1" eulerAngles="-0.000121315 2.31129e-06 -6.36347e-10 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="50" />
-            <childrenNodes count="3" indices="52 116 155" />
+            <childrenNodes count="3" indices="52 115 155" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandRing4" fileIndex="52" editorFlags="0" />
@@ -416,7 +416,7 @@
             <transform position="-2.84217e-16 0.025973 -4e-06 1" eulerAngles="2.71051e-20 3.46945e-18 9.40395e-38 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="51" />
-            <childrenNodes count="1" indices="124" />
+            <childrenNodes count="1" indices="116" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky1" fileIndex="53" editorFlags="0" />
@@ -432,7 +432,7 @@
             <transform position="0 0.027349 2.8e-05 1" eulerAngles="0.00214199 -5.6129e-06 -5.74651e-09 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="53" />
-            <childrenNodes count="3" indices="55 121 151" />
+            <childrenNodes count="3" indices="55 125 151" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky3" fileIndex="55" editorFlags="0" />
@@ -440,7 +440,7 @@
             <transform position="0 0.023252 -2.6e-05 1" eulerAngles="-0.0010646 2.87284e-05 -3.21236e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="54" />
-            <childrenNodes count="3" indices="56 115 152" />
+            <childrenNodes count="3" indices="56 119 152" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky4" fileIndex="56" editorFlags="0" />
@@ -448,7 +448,7 @@
             <transform position="0 0.018662 -1e-06 1" eulerAngles="6.77626e-21 -6.93889e-18 8.47033e-22 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="55" />
-            <childrenNodes count="1" indices="122" />
+            <childrenNodes count="1" indices="124" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftUpLeg" fileIndex="57" editorFlags="0" />
@@ -456,7 +456,7 @@
             <transform position="0.003022 -0.056927 0.075625 1" eulerAngles="3.11607 -0.00066513 0.0569087 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="2" />
-            <childrenNodes count="3" indices="58 126 139" />
+            <childrenNodes count="3" indices="58 120 139" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftLeg" fileIndex="58" editorFlags="0" />
@@ -464,7 +464,7 @@
             <transform position="0 0.400897 1.77636e-17 1" eulerAngles="0.0531665 -0.00176818 0.0332137 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="57" />
-            <childrenNodes count="3" indices="59 113 140" />
+            <childrenNodes count="3" indices="59 126 140" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftFoot" fileIndex="59" editorFlags="0" />
@@ -472,7 +472,7 @@
             <transform position="0 0.36965 1.77636e-17 1" eulerAngles="-0.046243 -0.0159245 0.997905 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="58" />
-            <childrenNodes count="3" indices="60 125 141" />
+            <childrenNodes count="3" indices="60 121 141" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftToeBase" fileIndex="60" editorFlags="0" />
@@ -480,7 +480,7 @@
             <transform position="0 0.155954 0 1" eulerAngles="0.00543734 0.00784094 0.60633 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="59" />
-            <childrenNodes count="3" indices="61 127 142" />
+            <childrenNodes count="3" indices="61 122 142" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftToe_End" fileIndex="61" editorFlags="0" />
@@ -488,7 +488,7 @@
             <transform position="0 0.065172 -8.88178e-18 1" eulerAngles="1.38778e-17 -2.27682e-18 1.73472e-18 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="60" />
-            <childrenNodes count="1" indices="119" />
+            <childrenNodes count="1" indices="123" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightUpLeg" fileIndex="62" editorFlags="0" />
@@ -496,7 +496,7 @@
             <transform position="0.004886 -0.056927 -0.075625 1" eulerAngles="-3.11607 0.000653071 0.0558678 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="2" />
-            <childrenNodes count="3" indices="63 120 135" />
+            <childrenNodes count="3" indices="63 113 135" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightLeg" fileIndex="63" editorFlags="0" />
@@ -504,7 +504,7 @@
             <transform position="-8.88178e-18 0.400874 0 1" eulerAngles="-0.0531769 0.0011324 0.0212716 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="62" />
-            <childrenNodes count="3" indices="64 129 136" />
+            <childrenNodes count="3" indices="64 130 136" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightFoot" fileIndex="64" editorFlags="0" />
@@ -512,7 +512,7 @@
             <transform position="8.88178e-18 0.369768 0 1" eulerAngles="0.0467717 0.0160751 1.00132 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="63" />
-            <childrenNodes count="3" indices="65 114 137" />
+            <childrenNodes count="3" indices="65 128 137" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightToeBase" fileIndex="65" editorFlags="0" />
@@ -520,7 +520,7 @@
             <transform position="0 0.154259 -8.88178e-18 1" eulerAngles="-0.00504373 -0.00715568 0.613986 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="64" />
-            <childrenNodes count="3" indices="66 130 138" />
+            <childrenNodes count="3" indices="66 129 138" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightToe_End" fileIndex="66" editorFlags="0" />
@@ -546,9 +546,9 @@
             <parentNodes count="1" indices="11" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHand" fileIndex="70" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftArm" fileIndex="70" editorFlags="0" />
             <boneData boneIndex="3" length="1.000000" type="1" />
-            <parentNodes count="1" indices="12" />
+            <parentNodes count="1" indices="10" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandThumb1" fileIndex="71" editorFlags="0" />
@@ -561,14 +561,14 @@
             <parentNodes count="1" indices="15" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftArm" fileIndex="73" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftHandThumb4" fileIndex="73" editorFlags="0" />
             <boneData boneIndex="6" length="1.000000" type="1" />
-            <parentNodes count="1" indices="10" />
+            <parentNodes count="1" indices="16" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandThumb4" fileIndex="74" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftHand" fileIndex="74" editorFlags="0" />
             <boneData boneIndex="7" length="1.000000" type="1" />
-            <parentNodes count="1" indices="16" />
+            <parentNodes count="1" indices="12" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
             <dNodeInfo name="mixamorig:Spine" fileIndex="75" editorFlags="0" />
@@ -606,29 +606,29 @@
             <parentNodes count="1" indices="9" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandRing2" fileIndex="82" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftHandPinky3" fileIndex="82" editorFlags="0" />
             <boneData boneIndex="15" length="1.000000" type="1" />
-            <parentNodes count="1" indices="26" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandRing4" fileIndex="83" editorFlags="0" />
-            <boneData boneIndex="16" length="1.000000" type="1" />
-            <parentNodes count="1" indices="28" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandMiddle3" fileIndex="84" editorFlags="0" />
-            <boneData boneIndex="17" length="1.000000" type="1" />
-            <parentNodes count="1" indices="23" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandPinky3" fileIndex="85" editorFlags="0" />
-            <boneData boneIndex="18" length="1.000000" type="1" />
             <parentNodes count="1" indices="31" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHand" fileIndex="86" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftHandMiddle4" fileIndex="83" editorFlags="0" />
+            <boneData boneIndex="16" length="1.000000" type="1" />
+            <parentNodes count="1" indices="24" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing2" fileIndex="84" editorFlags="0" />
+            <boneData boneIndex="17" length="1.000000" type="1" />
+            <parentNodes count="1" indices="26" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle3" fileIndex="85" editorFlags="0" />
+            <boneData boneIndex="18" length="1.000000" type="1" />
+            <parentNodes count="1" indices="23" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex3" fileIndex="86" editorFlags="0" />
             <boneData boneIndex="19" length="1.000000" type="1" />
-            <parentNodes count="1" indices="36" />
+            <parentNodes count="1" indices="19" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandMiddle2" fileIndex="87" editorFlags="0" />
@@ -636,149 +636,149 @@
             <parentNodes count="1" indices="22" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandRing1" fileIndex="88" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftHandRing4" fileIndex="88" editorFlags="0" />
             <boneData boneIndex="21" length="1.000000" type="1" />
+            <parentNodes count="1" indices="28" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing1" fileIndex="89" editorFlags="0" />
+            <boneData boneIndex="22" length="1.000000" type="1" />
             <parentNodes count="1" indices="25" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightShoulder" fileIndex="89" editorFlags="0" />
-            <boneData boneIndex="22" length="1.000000" type="1" />
-            <parentNodes count="1" indices="33" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandMiddle1" fileIndex="90" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftHandIndex2" fileIndex="90" editorFlags="0" />
             <boneData boneIndex="23" length="1.000000" type="1" />
-            <parentNodes count="1" indices="21" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandPinky4" fileIndex="91" editorFlags="0" />
-            <boneData boneIndex="24" length="1.000000" type="1" />
-            <parentNodes count="1" indices="32" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandIndex2" fileIndex="92" editorFlags="0" />
-            <boneData boneIndex="25" length="1.000000" type="1" />
             <parentNodes count="1" indices="18" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandIndex4" fileIndex="93" editorFlags="0" />
-            <boneData boneIndex="26" length="1.000000" type="1" />
-            <parentNodes count="1" indices="20" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightArm" fileIndex="94" editorFlags="0" />
-            <boneData boneIndex="27" length="1.000000" type="1" />
-            <parentNodes count="1" indices="34" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandIndex1" fileIndex="95" editorFlags="0" />
-            <boneData boneIndex="28" length="1.000000" type="1" />
-            <parentNodes count="1" indices="17" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandIndex3" fileIndex="96" editorFlags="0" />
-            <boneData boneIndex="29" length="1.000000" type="1" />
-            <parentNodes count="1" indices="19" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandMiddle4" fileIndex="97" editorFlags="0" />
-            <boneData boneIndex="30" length="1.000000" type="1" />
-            <parentNodes count="1" indices="24" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandRing3" fileIndex="98" editorFlags="0" />
-            <boneData boneIndex="31" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftHandRing3" fileIndex="91" editorFlags="0" />
+            <boneData boneIndex="24" length="1.000000" type="1" />
             <parentNodes count="1" indices="27" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandPinky1" fileIndex="99" editorFlags="0" />
-            <boneData boneIndex="32" length="1.000000" type="1" />
-            <parentNodes count="1" indices="29" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandPinky2" fileIndex="100" editorFlags="0" />
-            <boneData boneIndex="33" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftHandPinky2" fileIndex="92" editorFlags="0" />
+            <boneData boneIndex="25" length="1.000000" type="1" />
             <parentNodes count="1" indices="30" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightForeArm" fileIndex="101" editorFlags="0" />
-            <boneData boneIndex="34" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightArm" fileIndex="93" editorFlags="0" />
+            <boneData boneIndex="26" length="1.000000" type="1" />
+            <parentNodes count="1" indices="34" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex4" fileIndex="94" editorFlags="0" />
+            <boneData boneIndex="27" length="1.000000" type="1" />
+            <parentNodes count="1" indices="20" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky1" fileIndex="95" editorFlags="0" />
+            <boneData boneIndex="28" length="1.000000" type="1" />
+            <parentNodes count="1" indices="29" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandMiddle1" fileIndex="96" editorFlags="0" />
+            <boneData boneIndex="29" length="1.000000" type="1" />
+            <parentNodes count="1" indices="21" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandIndex1" fileIndex="97" editorFlags="0" />
+            <boneData boneIndex="30" length="1.000000" type="1" />
+            <parentNodes count="1" indices="17" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky4" fileIndex="98" editorFlags="0" />
+            <boneData boneIndex="31" length="1.000000" type="1" />
+            <parentNodes count="1" indices="32" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightShoulder" fileIndex="99" editorFlags="0" />
+            <boneData boneIndex="32" length="1.000000" type="1" />
+            <parentNodes count="1" indices="33" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightForeArm" fileIndex="100" editorFlags="0" />
+            <boneData boneIndex="33" length="1.000000" type="1" />
             <parentNodes count="1" indices="35" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandThumb3" fileIndex="102" editorFlags="0" />
-            <boneData boneIndex="35" length="1.000000" type="1" />
-            <parentNodes count="1" indices="39" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandIndex1" fileIndex="103" editorFlags="0" />
-            <boneData boneIndex="36" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandIndex1" fileIndex="101" editorFlags="0" />
+            <boneData boneIndex="34" length="1.000000" type="1" />
             <parentNodes count="1" indices="41" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandMiddle3" fileIndex="104" editorFlags="0" />
-            <boneData boneIndex="37" length="1.000000" type="1" />
-            <parentNodes count="1" indices="47" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandThumb1" fileIndex="105" editorFlags="0" />
-            <boneData boneIndex="38" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandThumb1" fileIndex="102" editorFlags="0" />
+            <boneData boneIndex="35" length="1.000000" type="1" />
             <parentNodes count="1" indices="37" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandThumb2" fileIndex="106" editorFlags="0" />
-            <boneData boneIndex="39" length="1.000000" type="1" />
-            <parentNodes count="1" indices="38" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandThumb4" fileIndex="107" editorFlags="0" />
-            <boneData boneIndex="40" length="1.000000" type="1" />
-            <parentNodes count="1" indices="40" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandIndex2" fileIndex="108" editorFlags="0" />
-            <boneData boneIndex="41" length="1.000000" type="1" />
-            <parentNodes count="1" indices="42" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandIndex3" fileIndex="109" editorFlags="0" />
-            <boneData boneIndex="42" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandIndex3" fileIndex="103" editorFlags="0" />
+            <boneData boneIndex="36" length="1.000000" type="1" />
             <parentNodes count="1" indices="43" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandIndex4" fileIndex="110" editorFlags="0" />
-            <boneData boneIndex="43" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandIndex2" fileIndex="104" editorFlags="0" />
+            <boneData boneIndex="37" length="1.000000" type="1" />
+            <parentNodes count="1" indices="42" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex4" fileIndex="105" editorFlags="0" />
+            <boneData boneIndex="38" length="1.000000" type="1" />
             <parentNodes count="1" indices="44" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandMiddle1" fileIndex="111" editorFlags="0" />
-            <boneData boneIndex="44" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandMiddle1" fileIndex="106" editorFlags="0" />
+            <boneData boneIndex="39" length="1.000000" type="1" />
             <parentNodes count="1" indices="45" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandMiddle2" fileIndex="112" editorFlags="0" />
-            <boneData boneIndex="45" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandMiddle2" fileIndex="107" editorFlags="0" />
+            <boneData boneIndex="40" length="1.000000" type="1" />
             <parentNodes count="1" indices="46" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftLeg" fileIndex="113" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightHandThumb3" fileIndex="108" editorFlags="0" />
+            <boneData boneIndex="41" length="1.000000" type="1" />
+            <parentNodes count="1" indices="39" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandMiddle3" fileIndex="109" editorFlags="0" />
+            <boneData boneIndex="42" length="1.000000" type="1" />
+            <parentNodes count="1" indices="47" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb2" fileIndex="110" editorFlags="0" />
+            <boneData boneIndex="43" length="1.000000" type="1" />
+            <parentNodes count="1" indices="38" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb4" fileIndex="111" editorFlags="0" />
+            <boneData boneIndex="44" length="1.000000" type="1" />
+            <parentNodes count="1" indices="40" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHand" fileIndex="112" editorFlags="0" />
+            <boneData boneIndex="45" length="1.000000" type="1" />
+            <parentNodes count="1" indices="36" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightUpLeg" fileIndex="113" editorFlags="0" />
             <boneData boneIndex="46" length="1.000000" type="1" />
-            <parentNodes count="1" indices="58" />
+            <parentNodes count="1" indices="62" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightFoot" fileIndex="114" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightHandMiddle4" fileIndex="114" editorFlags="0" />
             <boneData boneIndex="47" length="1.000000" type="1" />
-            <parentNodes count="1" indices="64" />
+            <parentNodes count="1" indices="48" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandPinky3" fileIndex="115" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightHandRing3" fileIndex="115" editorFlags="0" />
             <boneData boneIndex="48" length="1.000000" type="1" />
-            <parentNodes count="1" indices="55" />
+            <parentNodes count="1" indices="51" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandRing3" fileIndex="116" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightHandRing4" fileIndex="116" editorFlags="0" />
             <boneData boneIndex="49" length="1.000000" type="1" />
-            <parentNodes count="1" indices="51" />
+            <parentNodes count="1" indices="52" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky1" fileIndex="117" editorFlags="0" />
@@ -791,64 +791,64 @@
             <parentNodes count="1" indices="50" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftToe_End" fileIndex="119" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightHandPinky3" fileIndex="119" editorFlags="0" />
             <boneData boneIndex="52" length="1.000000" type="1" />
-            <parentNodes count="1" indices="61" />
+            <parentNodes count="1" indices="55" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightUpLeg" fileIndex="120" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftUpLeg" fileIndex="120" editorFlags="0" />
             <boneData boneIndex="53" length="1.000000" type="1" />
-            <parentNodes count="1" indices="62" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandPinky2" fileIndex="121" editorFlags="0" />
-            <boneData boneIndex="54" length="1.000000" type="1" />
-            <parentNodes count="1" indices="54" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandPinky4" fileIndex="122" editorFlags="0" />
-            <boneData boneIndex="55" length="1.000000" type="1" />
-            <parentNodes count="1" indices="56" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandRing1" fileIndex="123" editorFlags="0" />
-            <boneData boneIndex="56" length="1.000000" type="1" />
-            <parentNodes count="1" indices="49" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandRing4" fileIndex="124" editorFlags="0" />
-            <boneData boneIndex="57" length="1.000000" type="1" />
-            <parentNodes count="1" indices="52" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftFoot" fileIndex="125" editorFlags="0" />
-            <boneData boneIndex="58" length="1.000000" type="1" />
-            <parentNodes count="1" indices="59" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftUpLeg" fileIndex="126" editorFlags="0" />
-            <boneData boneIndex="59" length="1.000000" type="1" />
             <parentNodes count="1" indices="57" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftToeBase" fileIndex="127" editorFlags="0" />
-            <boneData boneIndex="60" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftFoot" fileIndex="121" editorFlags="0" />
+            <boneData boneIndex="54" length="1.000000" type="1" />
+            <parentNodes count="1" indices="59" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftToeBase" fileIndex="122" editorFlags="0" />
+            <boneData boneIndex="55" length="1.000000" type="1" />
             <parentNodes count="1" indices="60" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandMiddle4" fileIndex="128" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftToe_End" fileIndex="123" editorFlags="0" />
+            <boneData boneIndex="56" length="1.000000" type="1" />
+            <parentNodes count="1" indices="61" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky4" fileIndex="124" editorFlags="0" />
+            <boneData boneIndex="57" length="1.000000" type="1" />
+            <parentNodes count="1" indices="56" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky2" fileIndex="125" editorFlags="0" />
+            <boneData boneIndex="58" length="1.000000" type="1" />
+            <parentNodes count="1" indices="54" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftLeg" fileIndex="126" editorFlags="0" />
+            <boneData boneIndex="59" length="1.000000" type="1" />
+            <parentNodes count="1" indices="58" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandRing1" fileIndex="127" editorFlags="0" />
+            <boneData boneIndex="60" length="1.000000" type="1" />
+            <parentNodes count="1" indices="49" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightFoot" fileIndex="128" editorFlags="0" />
             <boneData boneIndex="61" length="1.000000" type="1" />
-            <parentNodes count="1" indices="48" />
+            <parentNodes count="1" indices="64" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightLeg" fileIndex="129" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightToeBase" fileIndex="129" editorFlags="0" />
             <boneData boneIndex="62" length="1.000000" type="1" />
-            <parentNodes count="1" indices="63" />
+            <parentNodes count="1" indices="65" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightToeBase" fileIndex="130" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightLeg" fileIndex="130" editorFlags="0" />
             <boneData boneIndex="63" length="1.000000" type="1" />
-            <parentNodes count="1" indices="65" />
+            <parentNodes count="1" indices="63" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
             <dNodeInfo name="mixamorig:RightToe_End" fileIndex="131" editorFlags="0" />
@@ -869,11 +869,11 @@
             <dNodeInfo name="mixamorig:Hips" fileIndex="134" editorFlags="0" />
             <positionKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <positions float3="32" floats="-0.0252857 91.6808 0.511784 0.114413 92.0604 -0.0259836 0.327862 91.7212 -0.491533 0.610443 90.7304 -0.760627 0.859011 89.2928 -0.754119 1.10825 87.7861 -0.683472 1.41821 86.5881 -0.623228 1.81122 85.7037 -0.0167034 2.39509 85.2698 1.15457 3.05416 85.2174 2.17488 3.6849 85.3685 2.84716 4.27456 85.7359 3.14133 4.69339 86.4143 3.06363 4.82473 87.5504 2.71081 4.70941 88.8358 2.21992 4.40292 89.8862 1.85669 4.10948 90.6471 1.62045 3.85091 90.9208 1.36659 3.572 90.6547 1.13106 3.19082 89.9771 1.11996 2.796 88.8116 1.3687 2.40778 87.4954 1.51542 1.92651 86.3072 1.81221 1.36644 85.5101 2.54894 0.76767 85.2264 3.38305 0.144209 85.2769 4.05755 -0.521017 85.7944 4.32739 -1.00928 86.624 3.90565 -1.09508 87.8142 3.15316 -0.82849 89.2497 2.38837 -0.408906 90.6344 1.50003 -0.0252857 91.6808 0.511784" />
+                <positions float3="32" floats="-0.00511784 0.916808 -0.000252857 0.000259836 0.920604 0.00114413 0.00491533 0.917212 0.00327862 0.00760627 0.907304 0.00610443 0.00754119 0.892928 0.00859011 0.00683472 0.877861 0.0110825 0.00623228 0.865881 0.0141821 0.000167034 0.857037 0.0181122 -0.0115457 0.852698 0.0239509 -0.0217488 0.852174 0.0305416 -0.0284716 0.853685 0.036849 -0.0314133 0.857359 0.0427456 -0.0306363 0.864143 0.0469339 -0.0271081 0.875504 0.0482473 -0.0221992 0.888358 0.0470941 -0.0185669 0.898862 0.0440292 -0.0162045 0.906471 0.0410948 -0.0136659 0.909208 0.0385091 -0.0113106 0.906547 0.03572 -0.0111996 0.899771 0.0319082 -0.013687 0.888116 0.02796 -0.0151542 0.874954 0.0240778 -0.0181221 0.863072 0.0192651 -0.0254894 0.855101 0.0136644 -0.0338305 0.852264 0.0076767 -0.0405755 0.852769 0.00144209 -0.0432739 0.857944 -0.00521017 -0.0390565 0.86624 -0.0100928 -0.0315316 0.878142 -0.0109508 -0.0238837 0.892497 -0.0082849 -0.0150003 0.906344 -0.00408906 -0.00511784 0.916808 -0.000252857" />
             </positionKeyframes>
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="1.96343 1.89453 0.747486 2.55631 1.39671 0.841547 3.18675 0.795332 0.300275 3.63962 -0.296292 -1.37558 3.8838 -1.73027 -2.99357 4.13587 -2.77268 -3.61953 4.1834 -3.36592 -3.54938 3.17963 -3.19975 -2.67277 2.38711 -2.63802 -2.03949 1.68205 -2.00412 -1.54263 1.0671 -1.3224 -1.27618 0.533769 -0.586302 -1.11754 0.0783786 0.127174 -0.915476 -0.296157 0.84487 -0.685919 -0.588289 1.58171 -0.438138 -0.796746 2.33881 -0.151086 -0.783777 3.10561 0.173332 -0.510976 3.82822 0.488568 0.0851804 4.49023 0.845827 0.934183 5.46846 2.00052 1.88556 6.52312 3.12215 2.90624 7.12264 3.80923 3.02769 7.16034 3.54143 2.0117 6.59559 2.15605 1.64186 5.89978 1.27023 1.53219 5.20958 0.924271 1.60225 4.5098 0.876022 1.76611 3.881 0.901709 1.95141 3.33949 0.897864 2.09287 2.83017 0.900902 2.11997 2.35002 0.858012 1.96343 1.89453 0.747486" />
+                <angles float3="32" floats="-0.682533 1.91888 1.93964 -0.778665 1.43271 2.53632 -0.255624 0.810785 3.18286 1.35402 -0.382925 3.63154 2.87114 -1.92671 3.7903 3.41497 -3.02114 3.95816 3.3011 -3.60973 3.97503 2.49552 -3.33978 3.0322 1.93006 -2.71908 2.29434 1.4841 -2.04784 1.62854 1.25168 -1.34562 1.03767 1.11209 -0.596575 0.522261 0.915652 0.125905 0.0804006 0.681618 0.848344 -0.286053 0.422039 1.58608 -0.576399 0.118657 2.34068 -0.791238 -0.216094 3.10294 -0.794329 -0.523829 3.82356 -0.544789 -0.841742 4.491 0.0190129 -1.92007 5.49715 0.746445 -2.92579 6.61321 1.53852 -3.47231 7.29216 2.44775 -3.18537 7.325 2.60209 -1.9368 6.66299 1.7747 -1.1069 5.93248 1.51905 -0.788121 5.23185 1.45413 -0.752065 4.53207 1.53799 -0.783584 3.90652 1.70884 -0.785049 3.36777 1.90216 -0.797983 2.86088 2.05069 -0.771184 2.37991 2.08635 -0.682533 1.91888 1.93964" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 2" />
         </dAnimationTrack>
@@ -881,7 +881,7 @@
             <dNodeInfo name="mixamorig:RightUpLeg" fileIndex="135" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="12.2011 7.0189 3.3024 6.6279 7.77836 3.29368 3.65138 9.40331 3.38023 2.69374 11.2182 3.85513 0.622071 12.4403 3.93715 -2.34958 13.0817 3.04592 -5.96061 13.4612 1.6698 -11.066 14.098 -0.402671 -16.5927 15.1183 -2.2896 -17.0267 15.35 -3.81019 -11.3841 14.5242 -4.60367 -2.79591 13.3396 -4.68707 5.71036 12.2626 -3.92324 13.5133 11.9751 -3.07492 20.673 12.5436 -2.33217 27.2294 12.6203 -1.28275 33.3066 12.4975 -0.473071 38.7476 12.3973 0.114353 42.6708 11.3585 0.606534 43.3218 9.54443 0.111062 40.8056 9.08835 -0.363341 35.1246 9.69269 -0.448579 35.8379 9.44394 0.0909476 39.0428 8.01632 1.32385 40.0747 7.94752 1.94555 39.4948 8.32443 2.12213 37.6708 8.90237 2.41658 34.833 8.92228 2.55638 30.8043 8.30002 2.6458 25.575 7.3016 2.8657 19.3296 6.75793 3.14108 12.2013 7.0189 3.3024" />
+                <angles float3="32" floats="-1.76437 7.55124 11.882 -2.40094 8.09682 6.23397 -2.81672 9.5857 3.13708 -3.39378 11.3645 1.9772 -3.89469 12.4535 -0.232306 -3.66819 12.9236 -3.1145 -3.12923 13.2031 -6.51992 -2.35314 13.9099 -11.3033 -2.14519 15.139 -16.5739 -0.821883 15.7839 -16.627 1.74172 15.1238 -10.5659 4.15207 13.5128 -1.7554 5.22573 11.773 6.67112 5.87823 10.8896 14.3967 6.70622 10.8748 21.5684 7.00366 10.602 28.0219 7.33813 10.155 34.0113 7.74394 9.7115 39.3941 7.30631 8.74135 43.1696 6.49969 7.00524 43.7108 6.2432 6.62764 41.1963 5.98097 7.65433 35.5631 5.4884 7.69774 36.1999 4.03746 7.05578 39.199 3.6409 7.33077 40.1729 3.67115 7.77002 39.5898 3.54285 8.51973 37.7466 3.00968 8.78078 34.8647 1.98147 8.48199 30.7593 0.560974 7.82102 25.4305 -0.740393 7.41249 19.0961 -1.76433 7.55125 11.8823" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 62" />
         </dAnimationTrack>
@@ -889,7 +889,7 @@
             <dNodeInfo name="mixamorig:RightLeg" fileIndex="136" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-16.6748 -3.32071 -2.71864 -10.458 -4.70525 -3.66088 -9.54439 -6.61618 -3.22027 -13.7025 -6.18551 -1.99583 -16.6433 -3.43307 -1.89723 -18.1538 -1.65168 -2.37672 -18.2449 -0.908035 -3.33692 -17.7116 -1.71474 -4.68613 -15.6306 -3.48959 -5.91962 -21.5252 -7.10743 -5.23611 -36.2464 -9.8638 -1.88108 -53.859 -5.52598 -2.65304 -66.4895 -1.33569 -7.38014 -72.9171 0.235101 -8.27164 -74.8209 0.644257 -4.56585 -73.7736 1.05978 -1.43861 -69.959 1.80545 -0.76225 -63.3598 2.62165 -1.24192 -53.0877 2.64998 -2.29717 -38.1224 2.58755 -4.86523 -22.5349 2.75764 -6.12699 -4.64978 1.80586 -4.94933 -7.18838 0.692181 -4.31617 -18.6819 1.19592 -4.07755 -27.5145 0.16565 -1.64032 -33.428 0.227977 0.740914 -37.4823 0.201542 2.23242 -38.5296 -0.147552 2.93865 -36.5617 -0.715857 2.35529 -32.0326 -1.40683 0.494621 -25.2379 -2.23329 -1.40213 -16.6754 -3.32071 -2.71862" />
+                <angles float3="32" floats="3.55998 -2.39662 -16.8281 4.4641 -3.95154 -10.7625 4.29424 -5.97698 -9.95486 3.41805 -5.53006 -13.9754 2.80389 -2.74323 -16.7673 2.77324 -0.827625 -18.2081 3.45328 0.183246 -18.2659 4.9852 -0.203709 -17.7906 6.64315 -1.74872 -15.9126 7.50046 -4.65387 -22.1558 7.38949 -6.81553 -36.8493 6.02729 -1.10886 -54.0455 4.17886 6.23272 -66.3481 2.22104 7.97332 -72.7453 0.576294 4.5749 -74.7722 -0.615503 1.67743 -73.7693 -1.43502 1.33475 -69.9637 -1.78686 2.28542 -63.367 -0.738402 3.42798 -53.0566 2.24095 5.03397 -37.9139 4.61972 4.88113 -22.1903 4.79018 2.19416 -4.47994 4.19654 1.22445 -7.11744 3.48267 2.43568 -18.5652 1.3784 0.90457 -27.5012 -0.74394 -0.217902 -33.4281 -1.89438 -1.1984 -37.4664 -2.20788 -1.94539 -38.4883 -1.46625 -1.9775 -36.5217 0.32688 -1.45497 -32.0307 2.2211 -1.42136 -25.2928 3.55998 -2.39659 -16.8287" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 63" />
         </dAnimationTrack>
@@ -897,7 +897,7 @@
             <dNodeInfo name="mixamorig:RightFoot" fileIndex="137" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="7.60473 -0.00919803 0.223182 8.36933 0.571922 0.68018 10.7924 -0.0573021 0.27936 15.0162 -2.29616 2.36399 18.3992 -5.63856 6.38298 22.2234 -7.51923 9.41489 23.6922 -7.89111 11.8137 22.4209 -6.36012 12.7462 16.2781 -2.71441 12.4723 6.26487 2.93273 8.75807 -9.14229 9.78461 4.87493 -16.3666 10.7561 4.32674 -13.143 8.04446 3.48955 -8.11732 5.96898 2.97954 -4.37308 5.55399 3.09322 0.950129 4.99778 3.22244 6.90375 5.42078 4.04275 11.4684 5.69563 4.69222 10.8138 5.27649 4.2656 8.27203 5.36531 4.108 8.16395 5.5228 4.23893 2.91749 6.28073 4.2522 0.385885 3.70477 2.38822 -2.66182 0.304261 0.138007 -4.02993 -0.821584 -0.505367 -2.27359 -2.21627 -1.48499 2.46322 -3.17406 -2.28214 6.59239 -3.51021 -2.6828 8.85642 -3.0562 -2.37369 9.70742 -1.94572 -1.41401 9.19817 -0.823886 -0.434537 7.60495 -0.00920068 0.223181" />
+                <angles float3="32" floats="-0.222436 0.0204183 7.6047 -0.589733 0.664797 8.36251 -0.285149 -0.00397762 10.7925 -2.87921 -1.60317 15.1039 -7.84749 -3.29988 18.9402 -11.5715 -3.30417 23.1783 -13.9854 -2.33781 24.7967 -14.1934 -0.901222 23.2442 -12.7266 0.92532 16.4716 -8.4046 3.83484 5.75837 -6.43857 8.84006 -10.058 -7.26155 9.05002 -17.3495 -5.26259 7.01811 -13.7114 -3.80871 5.47834 -8.45499 -3.52215 5.29287 -4.68601 -3.15145 5.04278 0.670651 -3.38071 5.85582 6.53933 -3.49119 6.49988 11.0366 -3.2193 5.97151 10.4492 -3.31228 5.889 7.90905 -3.43243 6.05611 7.77777 -3.95295 6.47279 2.46048 -2.36822 3.71757 0.231768 -0.15199 0.297523 -2.66258 0.561908 -0.784002 -4.03739 1.57284 -2.15484 -2.3319 2.14719 -3.26681 2.33875 2.26735 -3.79165 6.43511 1.87843 -3.38305 8.73761 1.06652 -2.15582 9.66334 0.297292 -0.882735 9.19276 -0.222435 0.0204164 7.60493" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 64" />
         </dAnimationTrack>
@@ -905,7 +905,7 @@
             <dNodeInfo name="mixamorig:RightToeBase" fileIndex="138" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="4.96703 0.214952 0.0426871 4.66717 0.202087 0.0395796 4.48264 0.194164 0.0377025 4.54022 0.196636 0.038285 5.02597 0.217479 0.0432989 5.99097 0.258756 0.0537954 7.56951 0.325877 0.0724364 10.8015 0.461562 0.116351 17.0965 0.717706 0.223491 32.7983 1.28567 0.603576 44.055 1.09704 0.743849 12.2614 0.521995 0.138685 13.1474 0.558382 0.152981 12.8232 0.54509 0.147681 9.86911 0.422677 0.102902 8.87303 0.380899 0.0892277 7.63952 0.32884 0.0733082 6.9116 0.297967 0.0644471 6.48629 0.279873 0.0594491 6.48693 0.279903 0.0594513 7.07776 0.305022 0.0664321 6.26439 0.270424 0.0568857 8.37914 0.360098 0.082721 11.7228 0.499764 0.130266 11.4517 0.488546 0.126107 7.56295 0.325599 0.0723582 6.1309 0.264726 0.0553691 6.31832 0.272719 0.0575049 6.01059 0.259593 0.0540134 5.63606 0.243596 0.0498514 5.29539 0.229022 0.0461584 4.96703 0.214953 0.0426856" />
+                <angles float3="32" floats="-0.0239159 0.217841 4.9669 -0.0230052 0.204638 4.66706 -0.0224121 0.196516 4.48253 -0.0225995 0.19905 4.54011 -0.02408 0.220436 5.02584 -0.0264951 0.262957 5.99079 -0.0288784 0.332579 7.56922 -0.0277908 0.475189 10.801 -0.00262883 0.751692 17.0951 0.189042 1.40765 32.7939 0.228205 1.30563 44.0505 -0.0246664 0.53954 12.2607 -0.0219665 0.578541 13.1466 -0.0230218 0.564271 12.8224 -0.0289345 0.434059 9.86863 -0.0294091 0.390103 8.87264 -0.0289423 0.335667 7.63923 -0.0281226 0.303557 6.91136 -0.0274531 0.284797 6.48608 -0.0274487 0.284827 6.48672 -0.0283428 0.310883 7.07751 -0.0270387 0.275017 6.2642 -0.0293645 0.368308 8.37878 -0.0260103 0.515807 11.7222 -0.0266024 0.503857 11.4511 -0.0288756 0.33229 7.56266 -0.02678 0.269126 6.13071 -0.0271427 0.277391 6.31812 -0.0265342 0.263822 6.01041 -0.0256874 0.247314 5.6359 -0.0248252 0.232304 5.29525 -0.0239143 0.217842 4.96691" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 65" />
         </dAnimationTrack>
@@ -913,7 +913,7 @@
             <dNodeInfo name="mixamorig:LeftUpLeg" fileIndex="139" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="28.7571 -10.956 -2.19161 31.0158 -10.3217 -3.3262 30.2005 -9.26123 -3.52494 32.155 -8.21092 -2.30506 35.9078 -6.96439 -0.791066 40.9591 -6.33875 -0.128011 41.706 -7.34846 -0.601653 38.9409 -7.36821 -1.63683 36.8626 -6.33562 -2.5676 36.7503 -6.03453 -3.05436 38.1929 -6.36469 -3.02468 36.5072 -6.39306 -3.0393 33.2068 -6.19109 -3.3065 28.4089 -5.70227 -3.63446 22.751 -5.10003 -3.97783 16.8168 -5.30215 -4.28567 10.6346 -6.08146 -4.56732 4.85238 -6.64814 -4.75786 0.206477 -7.64644 -4.53907 -4.30971 -9.5227 -4.28885 -7.3116 -11.0231 -3.71945 -11.9565 -11.8786 -2.94536 -16.5303 -12.9223 -1.44567 -19.7171 -14.2524 1.16225 -19.4706 -15.7926 3.64288 -14.3398 -17.1005 4.97961 -5.22266 -16.0521 4.52643 4.28948 -13.757 2.68262 12.7146 -12.4008 1.11259 19.7646 -12.2759 -0.153605 25.2578 -12.0028 -1.40654 28.7571 -10.956 -2.19161" />
+                <angles float3="32" floats="-3.37425 -10.6548 28.8617 -2.47447 -10.5559 30.944 -1.60858 -9.77368 30.0524 -2.42588 -8.17625 32.1629 -3.455 -6.10194 36.0438 -4.06809 -4.86687 41.125 -4.45407 -5.8814 41.8963 -3.3688 -6.75713 39.0344 -1.74747 -6.608 36.8214 -1.16061 -6.66102 36.6569 -1.55707 -6.87077 38.1181 -1.35846 -6.94506 36.4199 -0.617982 -6.98856 33.0656 0.495076 -6.74074 28.1986 1.71078 -6.2351 22.4806 2.58759 -6.30546 16.4757 3.39335 -6.80482 10.1901 4.21141 -7.00613 4.31796 4.55205 -7.63875 -0.401066 5.05372 -9.1424 -5.07142 5.17019 -10.4277 -8.14272 5.42757 -10.9798 -12.785 5.14863 -11.9548 -17.2334 3.77562 -13.8012 -20.0289 1.8268 -16.0963 -19.2235 -0.694622 -17.7768 -13.482 -3.19635 -16.3609 -4.12449 -3.79975 -13.496 5.06291 -3.87821 -11.8394 13.2377 -4.06114 -11.5954 20.1606 -3.89098 -11.4489 25.5001 -3.37425 -10.6548 28.8617" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 57" />
         </dAnimationTrack>
@@ -921,7 +921,7 @@
             <dNodeInfo name="mixamorig:LeftLeg" fileIndex="140" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-58.7829 0.759364 -3.54457 -44.857 -0.788351 -2.73195 -24.8006 -2.42997 -1.95291 -11.7817 -3.54804 -0.511894 -5.72022 -3.6716 2.57582 -7.57695 -2.98129 4.48623 -8.57078 -1.60154 3.40457 -9.50619 1.51841 1.74861 -12.4119 3.61682 0.869654 -19.6439 3.35035 -0.594552 -32.2661 2.12775 -2.84281 -38.0715 1.63101 -3.97934 -40.0514 1.91897 -4.21818 -38.4249 2.75995 -3.59005 -34.4719 3.90995 -2.35837 -29.7685 5.66135 -1.25554 -24.0794 7.87865 0.0031894 -18.4763 9.74788 1.69587 -14.4853 8.63525 3.41624 -10.8778 6.42796 4.23816 -10.9091 3.40965 4.72142 -7.17514 1.54405 5.60033 -5.0861 1.307 7.13098 -8.02518 3.29867 8.93747 -16.0824 8.40806 7.98521 -30.3223 12.6364 3.93501 -49.6917 12.3765 -0.58485 -64.1393 8.40374 -0.55926 -71.7728 5.18743 -0.29382 -72.8874 3.24445 -2.18143 -68.3761 1.90725 -3.70882 -58.7829 0.759365 -3.54456" />
+                <angles float3="32" floats="1.18997 3.42425 -58.7238 2.49276 1.36816 -44.846 2.79276 -1.38504 -24.8758 1.22728 -3.36836 -11.8337 -2.20246 -3.9068 -5.56252 -4.06193 -3.53806 -7.33464 -3.12998 -2.08821 -8.46612 -1.97579 1.20803 -9.55019 -1.62907 3.34452 -12.4869 -0.566638 3.35518 -19.6431 1.27082 3.31542 -32.1765 2.13201 3.73524 -37.9453 2.00046 4.1802 -39.9077 1.10275 4.39114 -38.2961 -0.266599 4.55742 -34.402 -1.72413 5.53703 -29.7898 -3.23443 7.18795 -24.2829 -4.74103 8.6928 -18.9815 -5.50895 7.48157 -15.1038 -5.39813 5.49133 -11.3749 -5.28586 2.44291 -11.1625 -5.74979 0.826106 -7.29216 -7.21911 0.661139 -5.20925 -9.31531 1.98263 -8.44459 -10.0484 5.77686 -17.1786 -9.87277 8.84401 -31.5236 -9.12234 8.42008 -50.3012 -7.33001 4.15917 -64.3648 -4.83685 1.89975 -71.8397 -2.45939 3.03925 -72.8909 -0.404252 4.15027 -68.329 1.18997 3.42425 -58.7238" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 58" />
         </dAnimationTrack>
@@ -929,7 +929,7 @@
             <dNodeInfo name="mixamorig:LeftFoot" fileIndex="141" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="0.62224 -0.819179 -0.473532 0.78178 -2.25103 -1.35109 -2.30244 -3.08438 -1.66999 -2.95614 -4.5835 -2.51169 1.19434 -5.23906 -3.32058 9.10544 -4.34453 -3.11709 8.03873 -4.10431 -3.09816 -1.65188 -2.5227 -1.38104 -11.4848 1.16159 1.04088 -15.3693 2.53302 1.77886 -4.77555 3.80385 2.60465 2.19238 4.49894 3.16188 6.97603 4.64324 3.3559 9.69487 4.22449 3.09827 11.0255 3.42347 2.50868 11.9436 2.59949 1.88473 12.3819 1.77664 1.23645 12.8838 0.937009 0.434661 14.1528 2.2104 -2.65448 15.0657 4.98179 -7.20941 17.3832 8.3924 -11.9817 17.8095 9.70046 -15.6651 17.3183 9.63785 -17.7552 15.7612 7.95177 -17.2355 10.7193 5.22306 -11.7753 -4.33055 3.24308 -6.48537 -13.8448 -2.30563 -3.24583 -13.3698 -4.41245 -1.85633 -7.32052 -2.64282 -1.34587 -4.14603 -1.89422 -1.0579 -1.55253 -1.06271 -0.617636 0.622215 -0.819185 -0.473539" />
+                <angles float3="32" floats="0.464657 -0.824246 0.615513 1.3213 -2.26864 0.729072 1.79498 -3.0134 -2.39462 2.75278 -4.44309 -3.16348 3.22461 -5.29857 0.893134 2.39947 -4.77791 8.88706 2.50207 -4.49221 7.82954 1.45453 -2.48107 -1.71379 -1.25148 0.930875 -11.5055 -2.38788 1.96946 -15.4497 -2.91775 3.56949 -4.95299 -2.99735 4.61006 1.94747 -2.7785 5.00967 6.71837 -2.35131 4.68101 9.48446 -1.81224 3.83755 10.8898 -1.30794 2.93222 11.8674 -0.827323 2.00015 12.3483 -0.214834 1.01032 12.8784 3.11533 1.49184 14.2446 8.26548 2.89877 15.5893 13.9714 4.25692 18.7873 17.9081 4.12196 19.7968 19.83 3.52244 19.4431 18.7476 2.67533 17.4099 12.5538 2.84335 11.5711 6.23515 3.70265 -3.94502 3.70431 -1.45833 -13.9573 2.83205 -3.86012 -13.5368 1.67308 -2.44889 -7.38733 1.19265 -1.81242 -4.18239 0.646307 -1.04552 -1.56416 0.464663 -0.824251 0.615488" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 59" />
         </dAnimationTrack>
@@ -937,7 +937,7 @@
             <dNodeInfo name="mixamorig:LeftToeBase" fileIndex="142" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="8.19667 -0.345956 -0.0787863 6.38857 -0.270673 -0.0571658 5.37139 -0.228028 -0.046051 5.85573 -0.248355 -0.051253 7.67533 -0.324319 -0.0723033 8.09043 -0.341553 -0.0774549 8.15866 -0.344384 -0.0783129 9.49478 -0.399569 -0.0957728 10.4348 -0.438143 -0.108828 8.86771 -0.37372 -0.087418 7.17432 -0.303472 -0.0662739 7.06666 -0.298988 -0.064999 7.37247 -0.311724 -0.068641 7.40071 -0.312901 -0.0689797 7.25265 -0.306737 -0.0672066 7.04199 -0.297959 -0.0647082 6.81669 -0.28856 -0.0620751 6.61808 -0.280266 -0.0597781 6.47531 -0.274299 -0.0581537 6.6034 -0.279652 -0.0596103 7.1302 -0.301634 -0.0657501 8.0347 -0.339244 -0.0767572 9.56308 -0.402381 -0.0967005 14.4118 -0.598786 -0.170995 26.8706 -1.06811 -0.435182 45.8767 -2.75891 -1.61261 18.6091 -1.19642 -0.370954 9.18723 -0.386902 -0.0916416 9.79237 -0.411803 -0.0998401 9.29335 -0.391274 -0.0930605 8.86083 -0.373438 -0.0873284 8.19668 -0.345956 -0.0787875" />
+                <angles float3="32" floats="0.0286589 -0.353654 8.19635 0.0266933 -0.275353 6.38837 0.024503 -0.231338 5.37125 0.0256477 -0.252289 5.85556 0.0283404 -0.33107 7.67504 0.0286161 -0.349055 8.09011 0.028648 -0.352012 8.15834 0.02855 -0.409894 9.49435 0.0276753 -0.450607 10.4343 0.0287638 -0.382729 8.86733 0.0278555 -0.309373 7.17407 0.0277232 -0.304713 7.06641 0.0280741 -0.317955 7.3722 0.0281016 -0.31918 7.40044 0.0279455 -0.312767 7.25239 0.0276919 -0.303644 7.04175 0.0273868 -0.293888 6.81647 0.0270794 -0.285288 6.61786 0.0268491 -0.279107 6.4751 0.0270564 -0.284652 6.60318 0.0278021 -0.307462 7.12995 0.0285875 -0.346642 8.03439 0.0285091 -0.412854 9.56264 0.0165872 -0.622501 14.4108 -0.094548 -1.14947 26.8675 -0.857622 -3.07819 45.8609 -0.0302014 -1.25223 18.6055 0.028694 -0.396571 9.18682 0.0283482 -0.422783 9.7919 0.0286538 -0.401167 9.29293 0.0287648 -0.382432 8.86045 0.0286599 -0.353655 8.19635" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 60" />
         </dAnimationTrack>
@@ -945,7 +945,7 @@
             <dNodeInfo name="mixamorig:Spine" fileIndex="143" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="6.17565 -1.22854 -0.974912 5.77908 -0.319102 -0.998973 5.33761 0.593832 -0.0407141 4.87065 1.94691 2.5452 4.3402 3.12481 4.56933 3.83989 3.46319 4.7902 3.79591 3.79319 4.02764 4.16342 4.09237 2.42808 3.63362 4.09188 1.09814 3.42098 3.83543 -0.274412 3.63673 3.78567 -0.711536 3.96216 3.011 -0.611631 4.36868 1.10982 -0.380793 4.79166 -0.806284 -0.203473 5.07746 -2.10221 -0.247492 5.05901 -3.14159 -0.747941 4.9596 -4.19161 -1.2385 5.10865 -5.09645 -1.63821 5.18576 -5.74154 -2.20673 4.94351 -6.53495 -4.00677 4.34424 -7.05782 -5.42746 3.75461 -6.91106 -5.4629 3.8571 -6.40044 -4.58108 4.45788 -5.86371 -2.74868 4.2776 -6.15097 -1.22877 4.00582 -6.81632 -0.957051 3.88894 -6.34426 -1.2988 4.32233 -4.67337 -1.74575 4.78511 -3.13692 -1.87402 4.99149 -2.20877 -1.68866 5.3806 -1.63895 -1.34806 6.17565 -1.22854 -0.974912" />
+                <angles float3="32" floats="0.837329 -1.32613 6.15551 0.96179 -0.418018 5.77279 0.0957823 0.58747 5.33831 -2.37242 2.15414 4.78279 -4.32774 3.45193 4.08504 -4.55754 3.76438 3.54514 -3.7773 4.04254 3.52912 -2.13072 4.25458 3.9975 -0.839042 4.15266 3.56397 0.503737 3.81213 3.44694 0.952081 3.73251 3.69127 0.819225 2.96131 3.99941 0.464303 1.07756 4.37674 0.135427 -0.820459 4.78926 0.0605543 -2.11586 5.0718 0.468873 -3.19512 5.02542 0.874274 -4.28227 4.88159 1.18344 -5.22052 4.98179 1.68869 -5.91415 4.98785 3.45475 -6.8419 4.50809 4.92009 -7.41951 3.69008 5.03997 -7.22459 3.10611 4.16947 -6.67523 3.35756 2.2983 -6.05387 4.19553 0.772019 -6.22453 4.1696 0.483154 -6.86597 3.91984 0.871899 -6.41658 3.76808 1.39386 -4.78988 4.19279 1.6086 -3.28085 4.68772 1.49139 -2.34646 4.92839 1.18902 -1.75773 5.34307 0.837329 -1.32613 6.15551" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 3" />
         </dAnimationTrack>
@@ -953,7 +953,7 @@
             <dNodeInfo name="mixamorig:Spine1" fileIndex="144" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="2.44925 -2.50531 1.04677 2.2144 -1.88413 0.544289 2.01524 -1.23883 -0.117457 1.96217 -0.582019 -1.07826 2.00263 0.148263 -1.76416 1.97671 1.0003 -1.83311 1.97976 1.82213 -1.64263 2.05818 2.4157 -1.50157 1.87106 2.68032 -1.26837 1.45962 2.48477 -0.639741 1.25276 1.98092 -0.601893 1.27472 1.57125 -0.637987 1.50255 1.04391 -0.498257 1.77545 0.0793543 -0.38031 1.91352 -1.08321 -0.32466 1.96842 -2.13423 -0.0267951 2.02314 -3.14123 0.345232 2.03479 -4.20265 0.767583 2.05221 -5.20407 1.3679 2.22773 -6.09825 2.22304 2.3641 -6.99306 2.77341 2.25157 -7.74658 2.72011 2.21523 -8.14862 2.56676 2.30038 -8.24617 2.49231 2.12413 -8.0203 2.15333 2.07626 -7.55366 2.33607 2.02837 -7.16598 2.33934 2.10526 -6.60479 2.18336 2.34033 -5.5725 1.96973 2.5352 -4.28724 1.67124 2.55581 -3.19288 1.36723 2.44926 -2.50531 1.04677" />
+                <angles float3="32" floats="-1.15391 -2.45783 2.4969 -0.616996 -1.86159 2.23337 0.0738417 -1.24219 2.01317 1.05776 -0.618494 1.95098 1.76827 0.0864621 2.00625 1.86677 0.935962 2.00796 1.70539 1.76352 2.03213 1.58868 2.35934 2.12256 1.35662 2.63678 1.93195 0.70346 2.4675 1.48864 0.64543 1.96717 1.27425 0.673027 1.55656 1.29261 0.525542 1.03044 1.51182 0.382586 0.0675316 1.77594 0.288364 -1.09343 1.9077 -0.0465439 -2.13389 1.96879 -0.456537 -3.12701 2.04507 -0.918623 -4.1723 2.09642 -1.55943 -5.15005 2.18451 -2.47154 -6.00214 2.47575 -3.08093 -6.86366 2.71839 -3.04843 -7.62399 2.63893 -2.90735 -8.03409 2.6023 -2.84885 -8.1306 2.68258 -2.47182 -7.92848 2.44643 -2.6297 -7.45702 2.40189 -2.61075 -7.07205 2.33623 -2.43976 -6.51479 2.37014 -2.20539 -5.48374 2.54184 -1.8641 -4.20709 2.66623 -1.51043 -3.12774 2.63516 -1.15391 -2.45783 2.4969" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 4" />
         </dAnimationTrack>
@@ -961,7 +961,7 @@
             <dNodeInfo name="mixamorig:Spine2" fileIndex="145" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="2.41865 -2.4689 1.16073 2.19479 -1.84725 0.641136 1.99703 -1.21213 -0.0366124 1.92351 -0.579742 -1.01483 1.92955 0.128469 -1.72526 1.89767 0.973615 -1.81753 1.92068 1.79381 -1.65266 2.00574 2.38853 -1.54286 1.82252 2.67351 -1.30068 1.4459 2.51359 -0.622089 1.22167 2.02325 -0.556207 1.22778 1.61996 -0.597363 1.46241 1.09425 -0.47492 1.7531 0.125964 -0.35508 1.90933 -1.04219 -0.276895 1.96669 -2.09601 0.0488475 2.00723 -3.10504 0.452199 1.99602 -4.16657 0.902232 1.9671 -5.15988 1.52715 2.04762 -6.02934 2.42821 2.12528 -6.90139 3.02366 2.04777 -7.65841 2.969 2.04432 -8.06551 2.82207 2.11928 -8.16906 2.77417 1.98212 -7.97578 2.40079 1.88075 -7.52324 2.55814 1.84351 -7.1464 2.53482 1.96042 -6.58941 2.36913 2.23586 -5.55437 2.15655 2.47457 -4.26255 1.83943 2.52322 -3.16038 1.50157 2.41865 -2.4689 1.16073" />
+                <angles float3="32" floats="-1.26498 -2.41717 2.47036 -0.711757 -1.82122 2.21644 -0.00564781 -1.21267 1.9967 0.994855 -0.613387 1.91305 1.72861 0.0702561 1.93254 1.84901 0.912407 1.92783 1.71263 1.73664 1.97252 1.62684 2.33216 2.07102 1.38648 2.63006 1.88471 0.685948 2.49693 1.4745 0.599577 2.01083 1.24201 0.632181 1.60669 1.24509 0.502779 1.08174 1.47169 0.358768 0.11504 1.75385 0.24206 -1.05083 1.9046 -0.120815 -2.0931 1.96979 -0.56144 -3.08717 2.03461 -1.04941 -4.13201 2.06669 -1.70991 -5.10237 2.11211 -2.65595 -5.93283 2.31318 -3.29999 -6.77409 2.50301 -3.26824 -7.53617 2.46184 -3.13725 -7.94888 2.46134 -3.104 -8.05022 2.5359 -2.69987 -7.88013 2.3355 -2.82672 -7.42698 2.23246 -2.78392 -7.05351 2.17343 -2.60946 -6.49833 2.24498 -2.3821 -5.46168 2.45412 -2.02698 -4.17675 2.61696 -1.64157 -3.09003 2.60893 -1.26498 -2.41717 2.47036" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 5" />
         </dAnimationTrack>
@@ -969,7 +969,7 @@
             <dNodeInfo name="mixamorig:RightShoulder" fileIndex="146" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="7.12558 -2.04583 -3.42305 6.88991 -2.13777 -3.73223 6.16303 -2.23651 -4.07957 5.35696 -2.37378 -4.53256 5.2316 -2.67631 -5.45804 5.43271 -3.0607 -6.63671 5.1414 -3.26299 -7.24192 4.69754 -3.23948 -7.14863 4.59506 -3.05386 -6.58817 4.67793 -2.91797 -6.1832 5.0185 -2.83787 -5.94756 5.26274 -2.77647 -5.76365 5.17104 -2.78497 -5.78869 5.24047 -2.77855 -5.76977 5.57257 -2.68778 -5.49316 5.93246 -2.56879 -5.12305 6.20074 -2.46759 -4.80303 6.23342 -2.35478 -4.45084 6.02416 -2.1998 -3.98021 5.69985 -2.04196 -3.51881 5.33881 -1.82725 -2.90234 5.01411 -1.53995 -2.08392 5.04285 -1.36436 -1.57158 5.44922 -1.36568 -1.53426 6.0699 -1.46064 -1.74394 6.70228 -1.60199 -2.09442 7.44812 -1.68318 -2.23856 8.09958 -1.7044 -2.19882 8.14645 -1.74441 -2.31446 7.88193 -1.82718 -2.61975 7.54377 -1.95065 -3.06392 7.12558 -2.04582 -3.42305" />
+                <angles float3="32" floats="3.14578 -2.45108 6.99713 3.45235 -2.5656 6.74292 3.82006 -2.65594 5.99478 4.29627 -2.77915 5.15874 5.19923 -3.15062 4.96092 6.33015 -3.65451 5.05305 6.9364 -3.87239 4.70008 6.87452 -3.78848 4.2675 6.33464 -3.55142 4.22266 5.93517 -3.39536 4.34423 5.68624 -3.33184 4.70553 5.49379 -3.27927 4.96557 5.52329 -3.28104 4.8719 5.50099 -3.27973 4.94281 5.21442 -3.19607 5.29803 4.83718 -3.07424 5.68765 4.51453 -2.96328 5.98041 4.17397 -2.81706 6.03923 3.73127 -2.60011 5.86301 3.3015 -2.37754 5.56859 2.72157 -2.08707 5.24293 1.94225 -1.71521 4.95702 1.44607 -1.49674 5.00524 1.39813 -1.50474 5.41258 1.58037 -1.63622 6.0251 1.89414 -1.83447 6.64267 2.00269 -1.95795 7.38101 1.93797 -1.99604 8.0331 2.04528 -2.05345 8.07455 2.34617 -2.16736 7.79576 2.78368 -2.33333 7.43489 3.14578 -2.45108 6.99713" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 33" />
         </dAnimationTrack>
@@ -977,7 +977,7 @@
             <dNodeInfo name="mixamorig:RightArm" fileIndex="147" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="17.4557 -18.2162 -23.6031 15.9777 -19.1656 -25.5496 14.066 -19.974 -27.0686 11.5575 -20.4184 -28.4347 8.27996 -21.2978 -29.6172 4.94084 -22.294 -30.2178 3.16741 -22.0141 -30.4145 3.52546 -21.0346 -29.7141 5.68794 -20.9737 -28.348 8.85853 -21.3631 -26.4161 12.0783 -21.4808 -23.6376 15.0438 -21.7458 -21.5106 17.5166 -22.0994 -21.0912 19.2958 -21.1328 -20.4492 20.6824 -19.2502 -18.0787 21.7891 -18.2894 -14.9409 22.4503 -18.1316 -11.7891 22.8807 -18.6774 -8.72377 23.3615 -19.2574 -5.94532 23.8622 -19.4923 -3.59995 24.3149 -19.5426 -1.62712 24.7752 -19.3749 -0.275423 24.9291 -18.9847 0.2681 24.3168 -19.0038 -0.352725 22.8827 -19.8529 -2.2751 21.1624 -20.9948 -5.07009 19.6968 -21.2955 -8.09144 18.7847 -19.666 -10.8586 18.4427 -17.4765 -13.8206 18.2678 -16.6344 -17.2383 17.9874 -17.0431 -20.6237 17.4557 -18.2162 -23.6031" />
+                <angles float3="32" floats="18.7835 -23.1642 9.73572 21.3489 -23.7954 7.04496 23.7065 -23.9321 4.11773 26.1734 -23.326 0.838031 28.7071 -22.5593 -3.25505 30.6184 -21.7119 -7.15969 31.3788 -20.532 -8.71043 30.3984 -19.9759 -7.59202 28.2345 -21.1324 -5.03715 25.0234 -23.008 -1.38279 20.6858 -24.3267 3.02706 17.027 -25.3436 7.00933 15.3634 -26.2983 9.74306 14.0134 -25.7397 12.2247 11.3181 -23.7546 15.2037 7.87283 -22.1632 17.8264 4.45555 -21.0738 19.7335 1.01954 -20.5241 21.2588 -2.13407 -20.0122 22.7285 -4.69681 -19.2661 24.0413 -6.76849 -18.4456 25.135 -8.12356 -17.6513 25.9916 -8.50241 -17.0394 26.2499 -7.73824 -17.4139 25.4446 -5.79471 -19.1517 23.4629 -2.85787 -21.3902 20.7622 0.703675 -22.7036 18.0319 4.44695 -21.9359 16.035 8.25369 -20.6229 14.8042 12.0717 -20.6415 13.5228 15.6279 -21.6954 11.8515 18.7835 -23.1642 9.73573" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 34" />
         </dAnimationTrack>
@@ -985,7 +985,7 @@
             <dNodeInfo name="mixamorig:RightForeArm" fileIndex="148" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="1.55843 0.386116 -4.03645 1.50899 0.461096 -6.83558 1.42575 0.571648 -11.1503 1.3654 0.642144 -14.0433 1.33839 0.67148 -15.2862 1.33362 0.67655 -15.5031 1.35941 0.648753 -14.3213 1.39892 0.60387 -12.4574 1.45153 0.53921 -9.85889 1.50999 0.459613 -6.78028 1.55082 0.398178 -4.48079 1.58495 0.342324 -2.44085 1.63589 0.249493 0.859784 1.68627 0.142875 4.53633 1.71685 0.0679179 7.05867 1.73409 0.0207869 8.62305 1.74502 -0.0112758 9.67847 1.7442 -0.00876339 9.59692 1.73711 0.0121459 8.90787 1.73104 0.0293943 8.33868 1.72847 0.0365316 8.10202 1.7301 0.0320194 8.25127 1.73527 0.0174128 8.73471 1.74445 -0.00954929 9.62219 1.75003 -0.0266663 10.1832 1.74512 -0.0115583 9.68811 1.7297 0.0331425 8.21456 1.70644 0.0944431 6.17065 1.67873 0.160045 3.95134 1.64813 0.225182 1.70802 1.60909 0.299948 -0.920478 1.55842 0.386105 -4.03644" />
+                <angles float3="32" floats="4.0455 0.275328 1.58176 6.84542 0.278076 1.55316 11.1612 0.284988 1.5094 14.0547 0.291474 1.48043 15.2978 0.294711 1.46808 15.5148 0.295312 1.46594 14.3328 0.292171 1.47765 12.4685 0.287731 1.49626 9.86947 0.282563 1.52243 6.7901 0.277984 1.55371 4.48997 0.275671 1.57721 2.44941 0.27439 1.59811 -0.852321 0.273907 1.63198 -4.53021 0.275716 1.6697 -7.05353 0.278318 1.69551 -8.61855 0.280501 1.71138 -9.6744 0.282217 1.72209 -9.59281 0.282106 1.72127 -8.90348 0.280939 1.7143 -8.33406 0.280076 1.7085 -8.09731 0.279719 1.70609 -8.24662 0.279931 1.70761 -8.73025 0.280681 1.71252 -9.6181 0.282131 1.72151 -10.1794 0.283118 1.72719 -9.68404 0.282245 1.72219 -8.20989 0.279891 1.70723 -6.16517 0.277253 1.68642 -3.945 0.275261 1.66373 -1.70086 0.274108 1.6407 0.928548 0.273945 1.61372 4.04549 0.275318 1.58175" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 35" />
         </dAnimationTrack>
@@ -993,7 +993,7 @@
             <dNodeInfo name="mixamorig:RightHand" fileIndex="149" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="0.339355 -8.73733 14.6405 2.0247 -8.85691 17.526 3.65549 -9.70958 20.576 5.13131 -10.6218 20.64 4.81916 -10.5355 19.0243 3.43053 -10.3235 17.9992 1.49525 -10.7625 16.2017 -0.798337 -11.5376 13.8778 -2.42555 -12.33 10.9372 -3.04545 -13.5412 7.32776 -3.39283 -15.0327 4.92369 -3.24637 -16.4111 3.57063 -2.44508 -17.9294 2.38627 -1.82922 -19.9059 2.29301 -1.24985 -20.8958 3.42804 0.583108 -19.5899 4.34991 3.89808 -17.7777 4.70027 7.0806 -17.0983 5.74876 9.00689 -17.1734 8.12309 10.3352 -16.9484 11.0202 11.5386 -16.5085 13.6587 12.2157 -16.2743 16.5912 12.8921 -16.5268 19.9668 13.6363 -16.9184 22.8854 13.9958 -17.7041 25.4581 14.2445 -19.1236 27.3199 13.0888 -18.9239 27.6225 10.3098 -15.7442 26.773 7.1314 -10.3023 24.6067 4.3887 -6.12677 21.3598 2.20476 -6.30407 17.898 0.33936 -8.73732 14.6405" />
+                <angles float3="32" floats="-14.8534 -8.36467 2.55617 -17.9998 -7.82161 4.63331 -21.3548 -7.76826 6.88883 -21.7261 -8.0638 8.62073 -20.0571 -8.32931 8.06484 -18.8068 -8.72193 6.51701 -16.7319 -9.90302 4.49148 -13.9979 -11.3905 2.01342 -10.6682 -12.5626 -0.062961 -6.80268 -13.8087 -1.34961 -4.18369 -15.2506 -2.18244 -2.76335 -16.562 -2.32905 -1.71584 -18.0035 -1.79675 -1.77594 -19.9566 -1.11431 -3.19245 -20.9315 -0.0276781 -4.82191 -19.4832 2.16272 -6.16068 -17.3389 5.57383 -8.1068 -16.1382 9.0967 -11.0857 -15.4606 11.7449 -14.3033 -14.3118 13.787 -17.0989 -12.9034 15.4772 -20.0585 -11.658 16.673 -23.539 -10.6283 18.0415 -26.5873 -9.72161 19.387 -29.341 -9.34986 20.4783 -31.6024 -9.74047 21.6958 -31.652 -10.072 20.6428 -29.5187 -9.07486 16.4745 -25.8477 -6.29514 10.83 -21.8208 -4.08493 6.33292 -18.2074 -5.31266 4.05035 -14.8534 -8.36466 2.55617" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 36" />
         </dAnimationTrack>
@@ -1001,7 +1001,7 @@
             <dNodeInfo name="mixamorig:RightHandPinky1" fileIndex="150" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="20.4671 -0.879312 -15.4864 20.7127 -0.789863 -15.6187 21.572 -0.386573 -16.2103 22.3805 0.088622 -16.8844 22.5823 0.357949 -17.289 22.4589 0.44513 -17.4508 22.4297 0.479112 -17.511 21.813 0.133086 -17.0434 20.6526 -0.457755 -16.1992 19.9586 -0.758172 -15.7475 19.7088 -0.806542 -15.6854 19.3903 -0.845789 -15.6446 18.9968 -1.01185 -15.3748 18.8262 -1.30772 -14.8398 18.4493 -1.56572 -14.3316 17.9647 -1.69177 -13.9381 17.7895 -1.71208 -13.8678 17.8457 -1.68137 -13.9582 18.1319 -1.59613 -14.2154 18.2899 -1.52521 -14.4163 18.4254 -1.45708 -14.5789 18.6499 -1.34721 -14.7729 18.4332 -1.36182 -14.7557 18.2249 -1.3021 -14.8795 19.0317 -0.85093 -15.6707 20.4708 -0.17325 -16.7351 21.9721 0.401585 -17.4938 22.9866 0.63474 -17.7014 22.3571 0.185341 -17.0752 21.4904 -0.32411 -16.3423 20.8324 -0.690205 -15.7846 20.4671 -0.87932 -15.4865" />
+                <angles float3="32" floats="14.2648 -6.15515 19.5766 14.3936 -6.17936 19.8233 14.9965 -6.23837 20.6951 15.7087 -6.27028 21.5278 16.1613 -6.23557 21.7505 16.3564 -6.18353 21.6377 16.4277 -6.16736 21.6124 15.9326 -6.13352 20.9738 15.058 -6.06028 19.7857 14.6038 -6.0047 19.0837 14.5549 -5.96567 18.8352 14.536 -5.90845 18.52 14.2673 -5.87767 18.124 13.6841 -5.94245 17.9423 13.159 -5.93779 17.567 12.7935 -5.8284 17.1039 12.7375 -5.78797 16.9347 12.8275 -5.79823 16.9875 13.0707 -5.8591 17.261 13.2682 -5.88937 17.4114 13.4304 -5.90659 17.5429 13.6261 -5.91665 17.7678 13.627 -5.87383 17.5544 13.7839 -5.80654 17.3524 14.5949 -5.83114 18.1672 15.6762 -5.93596 19.6274 16.4317 -6.10049 21.1522 16.6029 -6.259 22.1713 15.9239 -6.24784 21.5103 15.1506 -6.20758 20.6175 14.5708 -6.17554 19.9465 14.2648 -6.15515 19.5766" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 53" />
         </dAnimationTrack>
@@ -1009,7 +1009,7 @@
             <dNodeInfo name="mixamorig:RightHandPinky2" fileIndex="151" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="21.6669 -0.430882 3.31093 21.721 -0.433256 3.31712 21.7378 -0.434021 3.31905 21.7591 -0.434963 3.32148 21.7719 -0.435535 3.32294 21.7763 -0.43572 3.32346 21.7709 -0.435469 3.32282 21.8906 -0.440815 3.33652 22.0912 -0.449831 3.35944 21.8213 -0.437732 3.32859 21.7037 -0.432509 3.31515 21.7179 -0.433138 3.31677 21.7031 -0.432484 3.31507 21.7551 -0.434776 3.32103 21.8357 -0.43837 3.33025 21.6741 -0.431191 3.31174 21.6837 -0.431597 3.31285 21.6905 -0.431907 3.31363 21.6494 -0.430089 3.30892 21.4084 -0.419486 3.28129 21.3276 -0.415949 3.27202 21.4469 -0.421176 3.28571 21.2913 -0.414363 3.26785 21.1037 -0.406249 3.2463 20.9623 -0.400165 3.23004 21.4469 -0.42117 3.28572 21.765 -0.435216 3.32216 21.7929 -0.436457 3.32534 21.8584 -0.439385 3.33285 21.681 -0.431494 3.31254 21.6747 -0.431208 3.31181 21.6669 -0.430865 3.31092" />
+                <angles float3="32" floats="-3.23616 0.822011 21.6561 -3.24202 0.825156 21.7102 -3.24385 0.82611 21.727 -3.24615 0.827337 21.7482 -3.24753 0.828074 21.761 -3.24801 0.828344 21.7655 -3.24741 0.828035 21.7601 -3.26038 0.834966 21.8797 -3.28207 0.846647 22.0802 -3.25287 0.830936 21.8104 -3.24015 0.824139 21.6929 -3.24168 0.824956 21.7071 -3.24008 0.8241 21.6923 -3.24571 0.82712 21.7443 -3.25445 0.831779 21.8248 -3.23692 0.822428 21.6633 -3.23796 0.823 21.6729 -3.2387 0.823385 21.6797 -3.23425 0.821018 21.6387 -3.20808 0.807188 21.3978 -3.19929 0.802585 21.3171 -3.21227 0.809385 21.4362 -3.19534 0.800521 21.2808 -3.17492 0.789861 21.0933 -3.15949 0.781885 20.952 -3.21227 0.809392 21.4362 -3.24678 0.827688 21.7541 -3.24979 0.829296 21.782 -3.2569 0.833094 21.8475 -3.23768 0.822829 21.6702 -3.23698 0.82247 21.6639 -3.23615 0.822023 21.6561" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 54" />
         </dAnimationTrack>
@@ -1017,7 +1017,7 @@
             <dNodeInfo name="mixamorig:RightHandPinky3" fileIndex="152" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="18.6157 -0.360026 1.9614 18.6663 -0.362015 1.96731 18.6664 -0.362019 1.96731 18.6666 -0.362012 1.96732 18.6667 -0.362024 1.96735 18.6667 -0.362018 1.96734 18.6596 -0.361737 1.96652 18.7959 -0.36712 1.98238 19.0232 -0.376151 2.00878 18.7659 -0.365931 1.97887 18.6503 -0.361381 1.96542 18.6663 -0.362016 1.9673 18.6581 -0.361693 1.96634 18.7206 -0.364149 1.97361 18.8104 -0.367688 1.98406 18.6551 -0.361565 1.96599 18.6659 -0.361993 1.96724 18.6713 -0.36221 1.96787 18.6261 -0.360438 1.96262 18.3818 -0.350923 1.93416 18.2981 -0.3477 1.92441 18.4135 -0.352144 1.93785 18.2585 -0.346175 1.91979 18.0691 -0.338925 1.89768 17.9111 -0.332943 1.87922 18.3674 -0.350367 1.93249 18.6593 -0.361737 1.96647 18.6766 -0.362416 1.9685 18.7634 -0.365824 1.97859 18.6081 -0.359725 1.96053 18.6164 -0.360051 1.96148 18.6158 -0.360022 1.96141" />
+                <angles float3="32" floats="-1.97369 0.28501 18.617 -1.97967 0.286758 18.6676 -1.97967 0.286757 18.6677 -1.97968 0.286775 18.6679 -1.97971 0.286777 18.668 -1.9797 0.28678 18.668 -1.97887 0.286537 18.6609 -1.99493 0.291261 18.7972 -2.02166 0.299243 19.0245 -1.99138 0.290211 18.7671 -1.97776 0.286203 18.6516 -1.97966 0.286752 18.6675 -1.9787 0.286469 18.6593 -1.98605 0.288638 18.7219 -1.99663 0.29177 18.8117 -1.97834 0.286376 18.6563 -1.9796 0.28674 18.6671 -1.98025 0.286927 18.6726 -1.97492 0.285365 18.6274 -1.94612 0.276991 18.383 -1.93626 0.274146 18.2993 -1.94985 0.278075 18.4147 -1.93158 0.27281 18.2597 -1.9092 0.266453 18.0703 -1.89053 0.2612 17.9122 -1.94443 0.276503 18.3686 -1.97883 0.28651 18.6605 -1.98088 0.287116 18.6779 -1.99109 0.290139 18.7647 -1.97281 0.284755 18.6094 -1.97377 0.285034 18.6177 -1.9737 0.285017 18.617" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 55" />
         </dAnimationTrack>
@@ -1025,7 +1025,7 @@
             <dNodeInfo name="mixamorig:RightHandRing1" fileIndex="153" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="21.3146 -0.095481 -12.6488 21.5688 -0.0489056 -12.7465 22.5071 0.0694616 -12.9522 23.3477 0.19546 -13.1635 23.7867 0.2466 -13.2319 23.9119 0.226412 -13.1713 24.032 0.231355 -13.1689 23.4054 0.136916 -13.0202 21.8164 -0.0654629 -12.6826 20.5824 -0.175555 -12.4962 20.1279 -0.20864 -12.4395 20.2499 -0.229949 -12.3726 20.35 -0.263791 -12.2739 19.9599 -0.293649 -12.2157 19.1374 -0.331841 -12.153 18.5323 -0.363189 -12.0906 18.5553 -0.352786 -12.1208 18.7343 -0.337122 -12.1585 19.0625 -0.30032 -12.2487 19.4801 -0.278522 -12.2867 19.7472 -0.277675 -12.2728 19.8741 -0.27283 -12.2786 19.7427 -0.304634 -12.1975 19.4422 -0.336534 -12.1236 20.0905 -0.276182 -12.2561 22.0694 -0.0824133 -12.6184 24.0901 0.173582 -13.0316 25.383 0.357831 -13.2895 24.8275 0.225741 -13.0678 23.388 0.0730585 -12.8727 22.0683 -0.0422235 -12.7186 21.3146 -0.0954918 -12.6488" />
+                <angles float3="32" floats="11.7755 -4.65236 20.824 11.863 -4.6969 21.0751 12.0208 -4.85923 22.0031 12.193 -5.00268 22.8356 12.2379 -5.07655 23.2707 12.1633 -5.09703 23.3947 12.1525 -5.11697 23.5137 12.0332 -5.01162 22.8924 11.7773 -4.73957 21.32 11.6622 -4.52351 20.101 11.6326 -4.44282 19.6523 11.5531 -4.46438 19.7731 11.441 -4.48198 19.8725 11.4059 -4.41256 19.4876 11.3955 -4.26479 18.6764 11.3701 -4.15478 18.0801 11.4003 -4.15901 18.1025 11.4282 -4.19165 18.2788 11.5018 -4.25131 18.6019 11.514 -4.32671 19.0137 11.4812 -4.3746 19.2774 11.4787 -4.3973 19.4026 11.4015 -4.37372 19.2734 11.3436 -4.31972 18.9773 11.4399 -4.43587 19.6163 11.6907 -4.78294 21.5703 11.9984 -5.12584 23.5709 12.1928 -5.33891 24.854 11.9869 -5.24732 24.3021 11.874 -5.008 22.8751 11.7988 -4.7831 21.569 11.7755 -4.65237 20.824" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 49" />
         </dAnimationTrack>
@@ -1033,7 +1033,7 @@
             <dNodeInfo name="mixamorig:RightHandRing2" fileIndex="154" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="33.8474 -0.833182 4.60095 33.887 -0.835449 4.60434 33.9392 -0.838399 4.60879 33.9666 -0.839976 4.61112 33.9458 -0.838772 4.60935 33.9481 -0.838919 4.60956 34.0051 -0.842176 4.61442 34.0008 -0.841928 4.61405 34.0024 -0.842027 4.61419 33.9497 -0.83903 4.60968 33.8486 -0.833242 4.60105 33.8336 -0.83239 4.59977 33.8959 -0.835956 4.60509 33.9692 -0.840113 4.61135 34.0124 -0.842601 4.61504 34.0568 -0.84514 4.61882 34.0694 -0.845849 4.61989 34.0229 -0.8432 4.61595 33.9749 -0.840434 4.61183 33.9157 -0.837061 4.60679 33.8865 -0.835404 4.60429 33.8985 -0.836086 4.60532 33.853 -0.833486 4.60142 33.7712 -0.82884 4.59444 33.6086 -0.819605 4.5805 33.5338 -0.81537 4.57409 33.6053 -0.819411 4.58022 33.7608 -0.828242 4.59354 33.792 -0.830021 4.59621 33.8032 -0.830652 4.59717 33.8101 -0.831043 4.59776 33.8474 -0.833174 4.60094" />
+                <angles float3="32" floats="-4.28593 1.8705 33.8108 -4.28871 1.87348 33.8505 -4.29235 1.87742 33.9025 -4.29426 1.87947 33.9299 -4.2928 1.87792 33.9092 -4.29298 1.87808 33.9114 -4.29696 1.88237 33.9684 -4.29667 1.88205 33.9641 -4.29678 1.88217 33.9657 -4.29309 1.87818 33.9131 -4.28601 1.8706 33.812 -4.28495 1.86947 33.7971 -4.28932 1.87414 33.8593 -4.29444 1.87968 33.9326 -4.29748 1.88292 33.9757 -4.30057 1.88626 34.02 -4.30144 1.88722 34.0326 -4.29822 1.88372 33.9862 -4.29483 1.88011 33.9383 -4.29071 1.87566 33.8792 -4.28866 1.87345 33.85 -4.28951 1.87435 33.8619 -4.28631 1.87093 33.8165 -4.28058 1.86479 33.7348 -4.26913 1.85261 33.5723 -4.26386 1.84702 33.4976 -4.2689 1.85237 33.569 -4.27984 1.86401 33.7244 -4.28204 1.86635 33.7556 -4.28282 1.86719 33.7667 -4.2833 1.86772 33.7736 -4.28592 1.8705 33.8108" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 50" />
         </dAnimationTrack>
@@ -1041,7 +1041,7 @@
             <dNodeInfo name="mixamorig:RightHandRing3" fileIndex="155" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="23.6553 -0.490435 2.30437 23.6945 -0.492044 2.30805 23.7454 -0.494148 2.31286 23.7714 -0.49521 2.31531 23.7499 -0.494335 2.3133 23.7524 -0.494436 2.31353 23.8094 -0.496787 2.31888 23.8063 -0.496654 2.31857 23.8101 -0.496811 2.31893 23.7585 -0.494677 2.3141 23.6576 -0.490536 2.3046 23.6428 -0.489923 2.30321 23.7054 -0.492481 2.30908 23.779 -0.495534 2.31603 23.8225 -0.497326 2.32011 23.8671 -0.499175 2.3243 23.8797 -0.499691 2.32549 23.8331 -0.497768 2.32111 23.7848 -0.495769 2.31656 23.7254 -0.493325 2.31097 23.6961 -0.492114 2.30822 23.708 -0.492603 2.30934 23.6627 -0.490744 2.30508 23.5811 -0.487388 2.29739 23.418 -0.480728 2.28201 23.3415 -0.477623 2.27479 23.4101 -0.480419 2.28127 23.5633 -0.486666 2.29571 23.5963 -0.488014 2.29882 23.6093 -0.488538 2.30004 23.6176 -0.488894 2.30083 23.6553 -0.490436 2.30437" />
+                <angles float3="32" floats="-2.3075 0.475486 23.6556 -2.31119 0.477077 23.6948 -2.31601 0.479138 23.7457 -2.31847 0.480203 23.7717 -2.31645 0.479327 23.7502 -2.31668 0.479428 23.7527 -2.32205 0.481742 23.8097 -2.32174 0.481611 23.8065 -2.3221 0.481767 23.8104 -2.31725 0.479681 23.7588 -2.30773 0.47558 23.6579 -2.30634 0.474989 23.6431 -2.31222 0.477527 23.7057 -2.31919 0.480505 23.7793 -2.32329 0.482276 23.8228 -2.32749 0.48409 23.8674 -2.32868 0.484611 23.88 -2.32428 0.482705 23.8334 -2.31973 0.48074 23.7851 -2.31412 0.478324 23.7257 -2.31136 0.477144 23.6964 -2.31248 0.477624 23.7083 -2.30821 0.475788 23.663 -2.30049 0.472498 23.5814 -2.28507 0.465942 23.4183 -2.27784 0.46288 23.3417 -2.28433 0.465618 23.4104 -2.29881 0.471772 23.5636 -2.30193 0.473107 23.5966 -2.30315 0.473637 23.6096 -2.30395 0.473961 23.6179 -2.3075 0.475489 23.6556" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 51" />
         </dAnimationTrack>
@@ -1049,7 +1049,7 @@
             <dNodeInfo name="mixamorig:RightHandMiddle1" fileIndex="156" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="21.4357 1.02177 -10.768 21.8909 1.086 -10.8413 22.7862 1.167 -10.8617 23.3867 1.21332 -10.8524 23.5225 1.19442 -10.7815 23.4661 1.14124 -10.668 23.3689 1.117 -10.6294 22.7365 1.04385 -10.573 21.0415 0.911385 -10.556 19.6656 0.824749 -10.5825 18.8679 0.746236 -10.5088 18.7803 0.687947 -10.3516 18.9105 0.672575 -10.2821 18.8339 0.713308 -10.4173 18.3981 0.74115 -10.5857 18.1316 0.757535 -10.6903 18.1393 0.770482 -10.729 18.2234 0.77871 -10.737 18.5187 0.786499 -10.6996 18.6988 0.776674 -10.6332 18.8256 0.738958 -10.4953 18.8076 0.706372 -10.4015 18.5076 0.661173 -10.3211 18.1109 0.60513 -10.2208 18.5694 0.600773 -10.1271 20.2971 0.650053 -9.9827 22.3709 0.791481 -10.0193 24.0025 0.990252 -10.2238 23.8403 1.02147 -10.3227 22.7794 1.01752 -10.5014 21.8846 1.01185 -10.6548 21.4357 1.02175 -10.768" />
+                <angles float3="32" floats="10.4021 -2.97917 21.2608 10.47 -3.02975 21.7163 10.4717 -3.12649 22.6106 10.4483 -3.18999 23.2102 10.3682 -3.20353 23.3445 10.2462 -3.19652 23.286 10.2066 -3.18593 23.1882 10.1609 -3.11845 22.5557 10.185 -2.93375 20.8642 10.248 -2.77879 19.4928 10.1905 -2.68611 18.697 10.0271 -2.67476 18.608 9.95032 -2.68942 18.7369 10.0949 -2.68147 18.662 10.2835 -2.63171 18.2299 10.3999 -2.60105 17.9657 10.4404 -2.60228 17.9738 10.4467 -2.61231 18.0578 10.4002 -2.64677 18.3514 10.3259 -2.66734 18.5301 10.1774 -2.68108 18.6547 10.079 -2.67828 18.6356 10.0022 -2.64264 18.336 9.90757 -2.59527 17.94 9.7964 -2.64858 18.3956 9.59417 -2.84611 20.115 9.57294 -3.07471 22.1828 9.74916 -3.24828 23.814 9.86131 -3.23235 23.6536 10.0824 -3.12238 22.5974 10.2699 -3.02732 21.7068 10.4021 -2.97919 21.2608" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 45" />
         </dAnimationTrack>
@@ -1057,7 +1057,7 @@
             <dNodeInfo name="mixamorig:RightHandMiddle2" fileIndex="157" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="23.0764 -0.313545 3.50194 23.1182 -0.315144 3.50569 23.1534 -0.316505 3.50884 23.1709 -0.317194 3.5104 23.2458 -0.320097 3.5171 23.3858 -0.325523 3.52961 23.432 -0.327324 3.53375 23.4109 -0.326499 3.53185 23.3507 -0.324159 3.52646 23.1211 -0.315267 3.50593 22.9245 -0.307717 3.48832 22.8972 -0.306668 3.48588 22.9773 -0.309733 3.49305 23.0233 -0.31151 3.49717 22.9583 -0.309009 3.49135 22.9082 -0.307109 3.48687 22.9105 -0.307176 3.48708 22.9214 -0.307595 3.48805 22.9529 -0.308791 3.49088 22.9599 -0.309058 3.49149 22.9991 -0.310566 3.49501 23.0364 -0.31201 3.49836 23.0201 -0.311369 3.4969 22.938 -0.308234 3.48954 22.8655 -0.305461 3.48304 22.9734 -0.309598 3.49271 23.1641 -0.316906 3.50978 23.2935 -0.321929 3.52135 23.2435 -0.319988 3.51689 23.147 -0.316266 3.50826 23.0905 -0.314087 3.5032 23.0765 -0.313547 3.50194" />
+                <angles float3="32" floats="-3.34489 1.08391 23.0544 -3.34817 1.08635 23.0961 -3.35093 1.08839 23.1313 -3.35231 1.0894 23.1488 -3.35819 1.09376 23.2236 -3.36914 1.10194 23.3634 -3.37276 1.10465 23.4096 -3.3711 1.10341 23.3885 -3.36638 1.09988 23.3284 -3.34839 1.0865 23.099 -3.33293 1.0751 22.9026 -3.33078 1.07353 22.8753 -3.33708 1.07816 22.9554 -3.34071 1.08081 23.0012 -3.33559 1.07706 22.9364 -3.33166 1.07415 22.8863 -3.33184 1.0743 22.8886 -3.33269 1.07493 22.8995 -3.33517 1.07676 22.931 -3.3357 1.07716 22.938 -3.3388 1.07943 22.9771 -3.34174 1.08159 23.0144 -3.34045 1.08065 22.9981 -3.334 1.07589 22.9161 -3.32829 1.07169 22.8436 -3.33679 1.07793 22.9515 -3.35175 1.08902 23.142 -3.3619 1.09655 23.2712 -3.35799 1.09364 23.2213 -3.35043 1.08801 23.1249 -3.34599 1.08473 23.0684 -3.34489 1.08391 23.0544" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 46" />
         </dAnimationTrack>
@@ -1065,7 +1065,7 @@
             <dNodeInfo name="mixamorig:RightHandMiddle3" fileIndex="158" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="10.8824 -0.0373092 2.09606 10.9238 -0.0381537 2.10001 10.9587 -0.038887 2.10334 10.976 -0.0392418 2.10499 11.051 -0.040812 2.11214 11.1915 -0.0437602 2.12554 11.2378 -0.0447458 2.12996 11.2171 -0.0443107 2.12798 11.1575 -0.0430539 2.1223 10.9281 -0.0382419 2.10041 10.7318 -0.0342133 2.08168 10.7049 -0.0336719 2.07911 10.7852 -0.0353074 2.08678 10.8308 -0.0362436 2.09113 10.7656 -0.0349018 2.0849 10.7152 -0.03387 2.08009 10.7175 -0.0339237 2.0803 10.7283 -0.0341361 2.08133 10.7599 -0.0347837 2.08434 10.767 -0.0349389 2.08506 10.8066 -0.0357426 2.08882 10.8442 -0.0365142 2.09239 10.8282 -0.0361883 2.09088 10.7464 -0.0345104 2.08306 10.6741 -0.0330311 2.07616 10.782 -0.0352331 2.08647 10.9721 -0.0391668 2.10464 11.1004 -0.0418473 2.11685 11.0501 -0.0407914 2.11205 10.9534 -0.0387689 2.10282 10.8967 -0.0375996 2.09742 10.8824 -0.0373045 2.09605" />
+                <angles float3="32" floats="-2.06544 0.359024 10.8766 -2.06921 0.360434 10.918 -2.0724 0.361606 10.9528 -2.07398 0.362198 10.9701 -2.08082 0.364745 11.0452 -2.09364 0.369551 11.1855 -2.09787 0.371141 11.2319 -2.09598 0.370422 11.2111 -2.09054 0.368375 11.1515 -2.0696 0.360581 10.9223 -2.05166 0.353958 10.7261 -2.04921 0.35305 10.6992 -2.05655 0.355748 10.7794 -2.06071 0.357285 10.8251 -2.05475 0.355093 10.7599 -2.05014 0.353407 10.7095 -2.05035 0.353474 10.7118 -2.05133 0.353844 10.7226 -2.05421 0.354898 10.7541 -2.0549 0.355138 10.7613 -2.0585 0.356472 10.8008 -2.06192 0.357736 10.8384 -2.06047 0.357196 10.8224 -2.05299 0.354448 10.7407 -2.04638 0.35203 10.6684 -2.05625 0.355649 10.7763 -2.07364 0.362066 10.9663 -2.08533 0.366428 11.0945 -2.08073 0.364711 11.0442 -2.0719 0.361432 10.9475 -2.06673 0.35951 10.8909 -2.06543 0.359027 10.8766" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 47" />
         </dAnimationTrack>
@@ -1073,7 +1073,7 @@
             <dNodeInfo name="mixamorig:RightHandIndex1" fileIndex="159" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="14.6699 1.68647 -12.7042 15.0444 1.74495 -12.7058 16.3931 1.95269 -12.6869 17.6631 2.16071 -12.6933 18.2524 2.26343 -12.7091 18.4943 2.28527 -12.651 18.5974 2.30371 -12.6547 17.5948 2.15654 -12.7164 15.192 1.76867 -12.7086 13.2706 1.41154 -12.7248 12.6524 1.24193 -12.6477 13.1179 1.22682 -12.4701 13.6054 1.24078 -12.3375 12.8946 1.17195 -12.451 11.3744 0.967368 -12.5995 10.3998 0.787707 -12.6042 10.3508 0.750662 -12.5523 10.6025 0.760792 -12.4852 11.1781 0.843036 -12.4412 12.0097 0.94704 -12.3508 12.7428 1.02379 -12.2455 13.0692 1.06972 -12.2173 13.0364 1.04241 -12.1786 12.9538 0.95292 -12.0487 14.0594 1.11155 -11.9699 16.8208 1.56663 -11.8524 19.3432 2.17948 -11.9799 20.6943 2.56075 -12.3737 19.9063 2.43944 -12.4069 17.8522 2.12847 -12.4889 15.942 1.862 -12.6179 14.6699 1.68646 -12.7042" />
+                <angles float3="32" floats="12.7152 -1.59994 14.6794 12.7212 -1.62767 15.0573 12.7194 -1.72443 16.418 12.7469 -1.81222 17.701 12.7744 -1.85196 18.2972 12.7184 -1.86677 18.5396 12.7244 -1.8736 18.644 12.7698 -1.80804 17.6328 12.7258 -1.63855 15.2062 12.708 -1.55725 13.2546 12.6122 -1.56577 12.617 12.4231 -1.64157 13.0733 12.2832 -1.70205 13.5564 12.3987 -1.6415 12.8441 12.5433 -1.53957 11.312 12.5403 -1.50106 10.3219 12.484 -1.51672 10.2674 12.4132 -1.54916 10.5173 12.3696 -1.58553 11.0981 12.2784 -1.64546 11.9352 12.1705 -1.70499 12.6709 12.1434 -1.72368 13.0003 12.1006 -1.73411 12.9638 11.9569 -1.77317 12.8687 11.8822 -1.83228 13.9852 11.7981 -1.93836 16.7831 12.0222 -1.92838 19.3689 12.475 -2.00002 20.7533 12.4915 -1.95233 19.9578 12.5366 -1.82109 17.8851 12.6416 -1.69115 15.9605 12.7152 -1.59995 14.6794" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 41" />
         </dAnimationTrack>
@@ -1081,7 +1081,7 @@
             <dNodeInfo name="mixamorig:RightHandIndex2" fileIndex="160" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="13.4085 -0.0613091 2.64318 13.4138 -0.0614362 2.64371 13.3343 -0.0594508 2.63561 13.3539 -0.0599499 2.63761 13.3129 -0.0589206 2.63342 13.2709 -0.0578937 2.62914 13.3488 -0.0598138 2.6371 13.35 -0.059853 2.63721 13.3157 -0.0590007 2.63371 13.2414 -0.0571441 2.62612 13.2456 -0.0572501 2.62657 13.2649 -0.057723 2.62852 13.3543 -0.0599518 2.63764 13.3406 -0.0596067 2.63626 13.4176 -0.0615463 2.6441 13.508 -0.0638194 2.65332 13.473 -0.062918 2.64976 13.5208 -0.0641334 2.65462 13.4643 -0.0627223 2.64887 13.5637 -0.0652223 2.659 13.5654 -0.0652585 2.65917 13.5431 -0.0646847 2.65689 13.4918 -0.0633915 2.65167 13.4838 -0.0631937 2.65085 13.3365 -0.0594977 2.63584 13.2172 -0.0565414 2.62366 13.3195 -0.0590784 2.63409 13.4654 -0.0627513 2.64899 13.4659 -0.06274 2.64902 13.4752 -0.0629609 2.64996 13.4377 -0.0620386 2.64616 13.4085 -0.0613105 2.64318" />
+                <angles float3="32" floats="-2.58542 0.553147 13.3974 -2.58591 0.553387 13.4027 -2.57834 0.549865 13.3233 -2.58021 0.550724 13.3429 -2.57629 0.548912 13.3019 -2.57229 0.54704 13.2599 -2.57973 0.550507 13.3378 -2.57983 0.550545 13.3389 -2.57656 0.549025 13.3047 -2.56946 0.545758 13.2305 -2.56988 0.545945 13.2347 -2.5717 0.546793 13.2539 -2.58024 0.550743 13.3432 -2.57894 0.550145 13.3296 -2.58628 0.553543 13.4065 -2.5949 0.557567 13.4969 -2.59157 0.556029 13.4619 -2.59612 0.558143 13.5096 -2.59075 0.555619 13.4532 -2.60021 0.560057 13.5525 -2.60036 0.560134 13.5542 -2.59823 0.559148 13.5319 -2.59335 0.556863 13.4807 -2.59258 0.556503 13.4727 -2.57855 0.549972 13.3255 -2.56716 0.544694 13.2063 -2.57691 0.549211 13.3085 -2.59085 0.555667 13.4543 -2.59088 0.555706 13.4547 -2.59175 0.556132 13.4641 -2.5882 0.554449 13.4266 -2.58542 0.553146 13.3974" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 42" />
         </dAnimationTrack>
@@ -1089,7 +1089,7 @@
             <dNodeInfo name="mixamorig:RightHandIndex3" fileIndex="161" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="2.75917 0.0466112 1.16846 2.76452 0.0465661 1.16904 2.68503 0.0471282 1.16069 2.70463 0.0470024 1.16275 2.66356 0.04728 1.15843 2.62158 0.0475612 1.15402 2.69955 0.047038 1.1622 2.70066 0.0470394 1.16232 2.66634 0.0472503 1.15871 2.59214 0.0477634 1.15093 2.59633 0.047738 1.15137 2.61555 0.0476145 1.1534 2.70495 0.04699 1.16277 2.69132 0.0470855 1.16134 2.76835 0.0465637 1.16942 2.85877 0.0459019 1.17891 2.82379 0.0461439 1.17525 2.87154 0.0458068 1.18025 2.81503 0.0462162 1.17431 2.9145 0.0454935 1.18476 2.91611 0.0454797 1.18493 2.89384 0.0456365 1.18261 2.84257 0.0459994 1.17723 2.8346 0.0460766 1.17638 2.68723 0.0471107 1.16091 2.56791 0.0479278 1.14839 2.67023 0.0472302 1.15914 2.8217 0.0461756 1.17502 2.82284 0.0461528 1.17514 2.83309 0.0460852 1.17622 2.79284 0.0463716 1.172 2.75918 0.0466105 1.16847" />
+                <angles float3="32" floats="-1.16487 0.102791 2.75765 -1.16544 0.102883 2.763 -1.15721 0.101436 2.68353 -1.15924 0.101804 2.70312 -1.15498 0.101049 2.66206 -1.15064 0.100283 2.6201 -1.1587 0.10171 2.69805 -1.15881 0.10174 2.69916 -1.15526 0.101089 2.66485 -1.1476 0.0997535 2.59067 -1.14803 0.0998318 2.59485 -1.15002 0.100186 2.61406 -1.15926 0.101799 2.70344 -1.15785 0.101551 2.68982 -1.16581 0.102976 2.76682 -1.17516 0.104628 2.85723 -1.17155 0.103972 2.82226 -1.17647 0.104862 2.86999 -1.17063 0.103819 2.8135 -1.18092 0.105661 2.91295 -1.18108 0.105688 2.91455 -1.1788 0.105269 2.89228 -1.1735 0.10431 2.84103 -1.17266 0.104182 2.83306 -1.15743 0.101474 2.68573 -1.1451 0.0993187 2.56643 -1.15568 0.101167 2.66873 -1.17132 0.10395 2.82016 -1.17145 0.103957 2.82131 -1.17251 0.104152 2.83155 -1.16835 0.103408 2.79131 -1.16487 0.102791 2.75766" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 43" />
         </dAnimationTrack>
@@ -1097,7 +1097,7 @@
             <dNodeInfo name="mixamorig:RightHandThumb1" fileIndex="162" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="1" floats="0" />
-                <angles float3="1" floats="12.9469 -12.226 -2.80194" />
+                <angles float3="1" floats="0.0147358 -12.5382 12.6452" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 37" />
         </dAnimationTrack>
@@ -1105,7 +1105,7 @@
             <dNodeInfo name="mixamorig:RightHandThumb2" fileIndex="163" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-21.5966 5.02066 14.2903 -21.6809 4.93499 14.0288 -21.3814 4.05635 13.4278 -21.1004 2.77804 12.2671 -20.9646 2.26516 11.5927 -20.6861 2.57372 12.2636 -20.5014 2.79888 12.7285 -20.7443 3.52968 13.1793 -21.2627 4.80811 14.0241 -21.7467 4.58043 13.5006 -21.6029 3.4776 12.9385 -21.0673 3.34582 13.7432 -20.6469 4.35807 15.5598 -20.9699 5.86008 16.6753 -21.8086 6.75393 16.4555 -22.2453 6.85135 16.2039 -22.2102 6.76319 16.3062 -22.111 6.73297 16.4332 -21.9242 6.4939 16.4003 -21.5355 5.79214 16.2747 -21.1742 5.19759 16.2201 -20.9891 4.86338 16.0894 -20.883 4.66769 16.0341 -20.6912 3.92518 15.7607 -20.0674 2.69406 15.3587 -19.1204 2.57669 16.0372 -18.6639 3.48738 16.8426 -18.9214 4.41808 16.6587 -19.4967 4.13146 15.5349 -20.2541 4.19466 14.8839 -20.9703 4.64374 14.6323 -21.5966 5.02065 14.2902" />
+                <angles float3="32" floats="-15.114 -0.687489 -22.1352 -14.8395 -0.687543 -22.1989 -13.9675 -1.17998 -21.7146 -12.4382 -1.85126 -21.1972 -11.6324 -2.04844 -20.9859 -12.3768 -1.94741 -20.7515 -12.8956 -1.86548 -20.6028 -13.5635 -1.41529 -20.9839 -14.7939 -0.693007 -21.7645 -14.2194 -0.8234 -22.1864 -13.2988 -1.5741 -21.8138 -14.0163 -1.86222 -21.2417 -16.0765 -1.49456 -21.0316 -17.6357 -0.651101 -21.7284 -17.7521 -0.0298414 -22.7816 -17.557 0.0220681 -23.2252 -17.6177 -0.0853796 -23.167 -17.7233 -0.131809 -23.0638 -17.6042 -0.27347 -22.8186 -17.2334 -0.73099 -22.2536 -16.9745 -1.13353 -21.7462 -16.7385 -1.33016 -21.4812 -16.6208 -1.45461 -21.3283 -16.1135 -1.96797 -20.9561 -15.3457 -2.76892 -20.0576 -15.9926 -2.8469 -19.0835 -17.0583 -2.15281 -18.8575 -17.1689 -1.32628 -19.3683 -16.0045 -1.37261 -19.8676 -15.3978 -1.29508 -20.6272 -15.305 -0.989052 -21.434 -15.1139 -0.687494 -22.1352" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 38" />
         </dAnimationTrack>
@@ -1113,7 +1113,7 @@
             <dNodeInfo name="mixamorig:RightHandThumb3" fileIndex="164" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-10.5418 7.90568 -6.06563 -10.5432 7.90379 -6.07157 -10.5599 7.88154 -6.1411 -10.5811 7.85298 -6.23019 -10.5939 7.83564 -6.28421 -10.6004 7.82684 -6.31158 -10.6023 7.82422 -6.31979 -10.5936 7.83609 -6.28278 -10.5681 7.87048 -6.17559 -10.5548 7.8883 -6.11996 -10.554 7.88933 -6.11674 -10.554 7.88938 -6.11656 -10.551 7.89342 -6.104 -10.5327 7.91779 -6.02781 -10.5092 7.94886 -5.93054 -10.4958 7.96653 -5.8752 -10.4951 7.96739 -5.87244 -10.4955 7.96696 -5.87384 -10.502 7.95843 -5.90053 -10.5098 7.94811 -5.9329 -10.513 7.94382 -5.94629 -10.5129 7.94394 -5.94592 -10.5144 7.94202 -5.95199 -10.5161 7.93972 -5.95921 -10.5374 7.91148 -6.04752 -10.5771 7.8584 -6.21319 -10.6028 7.82363 -6.32152 -10.6137 7.80866 -6.36809 -10.6088 7.81539 -6.34717 -10.5816 7.85237 -6.23202 -10.5595 7.882 -6.13954 -10.5418 7.90568 -6.06563" />
+                <angles float3="32" floats="4.57769 8.84699 -9.76796 4.58371 8.84626 -9.76863 4.65428 8.83761 -9.77654 4.74472 8.8265 -9.78664 4.79957 8.81977 -9.79275 4.82737 8.81635 -9.79583 4.83571 8.81534 -9.79675 4.79812 8.81994 -9.79258 4.68928 8.83329 -9.78047 4.63282 8.84023 -9.77413 4.62955 8.84063 -9.77378 4.62937 8.84065 -9.77375 4.61663 8.84223 -9.77233 4.53931 8.85173 -9.76362 4.44064 8.86386 -9.75247 4.38451 8.87078 -9.7461 4.38171 8.8711 -9.74577 4.38313 8.87095 -9.74594 4.4102 8.8676 -9.74902 4.44303 8.86356 -9.75274 4.45661 8.86188 -9.75427 4.45624 8.86193 -9.75423 4.46239 8.86119 -9.75494 4.46971 8.86029 -9.75575 4.55931 8.84926 -9.76588 4.72746 8.82859 -9.78475 4.83747 8.81509 -9.79697 4.88477 8.80929 -9.80219 4.86351 8.8119 -9.79988 4.74657 8.82625 -9.78688 4.6527 8.83777 -9.77639 4.57769 8.847 -9.76796" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 39" />
         </dAnimationTrack>
@@ -1121,7 +1121,7 @@
             <dNodeInfo name="mixamorig:LeftShoulder" fileIndex="165" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="6.1695 3.45929 8.3051 5.9007 3.17249 7.37774 5.71741 2.90098 6.52006 5.52812 2.7559 6.05779 5.01165 2.58195 5.49075 4.52457 2.30328 4.63071 4.62291 2.15907 4.20508 5.12889 2.28825 4.61049 5.41312 2.37895 4.8988 5.62053 2.39473 4.9576 6.00439 2.58838 5.57862 6.47502 2.78232 6.22271 7.17761 2.82914 6.43852 7.79384 2.90808 6.75945 7.74623 3.07283 7.2931 7.31185 3.23011 7.74591 6.94593 3.3415 8.0504 6.59789 3.4335 8.28897 6.19072 3.53608 8.54674 5.87516 3.66933 8.9099 5.9428 3.8808 9.5788 6.05598 4.04098 10.1017 5.70562 4.06755 10.1201 5.45784 4.00937 9.89941 5.4328 3.86186 9.4458 5.24388 3.68524 8.87731 5.05435 3.60813 8.61893 5.07714 3.62556 8.68004 5.4549 3.64447 8.79313 5.76118 3.64308 8.833 5.90013 3.57947 8.65242 6.16946 3.4593 8.30511" />
+                <angles float3="32" floats="-7.90768 4.29457 5.6213 -7.02885 3.88731 5.45728 -6.21045 3.517 5.36128 -5.77387 3.31104 5.21525 -5.25168 3.03977 4.74837 -4.43939 2.65385 4.32855 -4.02121 2.48514 4.45638 -4.39234 2.6838 4.93382 -4.65825 2.82172 5.19655 -4.70516 2.85973 5.39934 -5.28531 3.14532 5.73305 -5.88003 3.44965 6.14653 -6.0466 3.59326 6.82861 -6.31651 3.77722 7.41357 -6.8292 4.00232 7.31145 -7.29123 4.1594 6.82799 -7.60843 4.2567 6.42755 -7.86221 4.32631 6.05158 -8.1398 4.39678 5.61342 -8.51425 4.51658 5.2528 -9.15798 4.79595 5.2332 -9.6565 5.01949 5.27442 -9.70284 4.98827 4.92166 -9.50798 4.87132 4.70512 -9.06841 4.685 4.74188 -8.5292 4.43589 4.62678 -8.29128 4.31171 4.4697 -8.34932 4.33696 4.48519 -8.43223 4.41991 4.84861 -8.44865 4.46697 5.1496 -8.26336 4.4081 5.31067 -7.9077 4.29457 5.62126" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 9" />
         </dAnimationTrack>
@@ -1129,7 +1129,7 @@
             <dNodeInfo name="mixamorig:LeftArm" fileIndex="166" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="26.2749 20.9232 16.0422 27.5324 20.958 11.5659 28.6829 20.8215 7.20449 29.9063 20.4706 3.14272 31.165 20.0618 -0.507545 32.0749 19.5322 -2.80875 32.0445 18.4595 -3.47951 31.0769 17.8646 -3.33525 29.8555 18.3555 -2.53424 28.4451 18.902 -1.33981 26.5928 19.3323 0.301928 24.6397 19.1899 2.79943 22.8979 17.1333 5.708 21.5238 14.3677 8.79401 20.6227 12.9167 11.9914 19.8891 12.7193 15.0508 18.8212 13.3964 18.1928 17.3022 14.7988 20.9511 15.3271 16.307 23.0292 12.744 17.5595 24.7621 9.40766 18.9579 25.71 6.09536 20.4999 26.2234 4.27172 21.2833 26.7298 4.49565 20.505 26.3286 6.83979 18.7349 24.674 10.6787 16.952 22.3478 14.3849 16.5742 20.8445 17.134 17.7213 21.1973 19.4608 19.2211 22.1488 21.9893 20.2415 21.9047 24.4328 20.6034 19.8314 26.2749 20.9232 16.0422" />
+                <angles float3="32" floats="-6.09533 25.4727 21.915 -0.989834 23.7918 25.1776 3.6551 21.6891 28.0579 7.70635 19.2709 30.649 11.1478 16.794 32.9055 13.0883 14.8885 34.2759 13.0315 13.6325 34.1744 12.3426 13.4304 33.06 11.619 14.5272 31.7509 10.4721 15.8801 30.1327 8.64581 17.3604 27.8638 5.59942 18.5889 25.0835 1.35156 17.983 22.2512 -3.12405 16.512 19.9599 -7.02201 16.1302 18.2641 -10.339 16.7551 16.6753 -13.6546 18.0027 14.4937 -16.6744 19.5172 11.6636 -19.2804 20.6478 8.43886 -21.9042 21.0759 4.73711 -24.0417 21.0808 0.505761 -25.7897 21.0575 -3.60119 -27.019 20.9034 -5.91572 -26.4452 20.3498 -5.17877 -23.8098 19.8466 -1.5174 -20.0953 19.6004 3.80044 -17.2686 20.2813 8.20415 -16.4323 22.1926 10.548 -16.1879 24.4002 12.1421 -14.5372 25.934 14.6681 -11.0498 26.2129 18.2127 -6.09533 25.4727 21.915" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 10" />
         </dAnimationTrack>
@@ -1137,7 +1137,7 @@
             <dNodeInfo name="mixamorig:LeftForeArm" fileIndex="167" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="1.77759 -0.0189102 -8.93204 1.77791 -0.0183268 -8.95157 1.77967 -0.0150304 -9.05712 1.7877 7.32604e-05 -9.54241 1.80077 0.0253713 -10.3502 1.82608 0.0771284 -11.9842 1.85998 0.152961 -14.341 1.87957 0.201028 -15.8131 1.87798 0.196932 -15.6883 1.86463 0.164044 -14.6818 1.8426 0.11303 -13.1057 1.80895 0.0416547 -10.8668 1.76621 -0.0397644 -8.25823 1.71556 -0.126093 -5.41855 1.6459 -0.230864 -1.8494 1.5554 -0.348775 2.36845 1.43607 -0.480634 7.41524 1.25371 -0.643986 14.366 1.04262 -0.790382 21.66 0.851586 -0.892015 27.8032 0.673509 -0.964748 33.2638 0.541323 -1.00647 37.1985 0.493863 -1.01905 38.5918 0.510621 -1.01472 38.1005 0.584483 -0.993943 35.9232 0.721586 -0.94705 31.81 0.937319 -0.849651 25.0896 1.21558 -0.673482 15.7341 1.47631 -0.438734 5.76683 1.63385 -0.247612 -1.26392 1.73016 -0.102148 -6.2144 1.7776 -0.0189162 -8.93204" />
+                <angles float3="32" floats="8.92724 -0.294622 1.75311 8.94677 -0.294694 1.75342 9.05237 -0.294946 1.75513 9.53785 -0.296241 1.76299 10.3459 -0.298535 1.77604 11.9807 -0.3037 1.80231 14.3385 -0.312509 1.83992 15.8112 -0.318778 1.86323 15.6863 -0.318229 1.86128 14.6794 -0.313906 1.84533 13.1027 -0.307709 1.82025 10.8628 -0.300093 1.78438 8.25316 -0.292983 1.7422 5.41241 -0.287452 1.696 1.84203 -0.283759 1.63761 -2.37708 -0.284078 1.5685 -7.42504 -0.291141 1.48611 -14.3768 -0.312647 1.37431 -21.671 -0.349623 1.26074 -27.8138 -0.391724 1.16936 -33.2737 -0.43718 1.09234 -37.2075 -0.474365 1.03971 -38.6005 -0.488383 1.02169 -38.1094 -0.483375 1.02798 -35.9325 -0.461913 1.05649 -31.8201 -0.424366 1.11242 -25.1004 -0.371917 1.20918 -15.745 -0.31848 1.35268 -5.77628 -0.288042 1.51294 1.25636 -0.283486 1.62801 6.20855 -0.288762 1.70895 8.92724 -0.29463 1.75312" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 11" />
         </dAnimationTrack>
@@ -1145,7 +1145,7 @@
             <dNodeInfo name="mixamorig:LeftHand" fileIndex="168" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="3.33419 11.4107 -11.065 6.70756 11.5348 -9.71804 8.56185 11.6812 -7.94081 9.21577 11.0516 -6.24421 10.0158 10.4155 -5.32994 10.9995 10.9654 -4.91533 11.4653 13.0804 -5.4381 9.4086 15.8522 -8.19373 6.83879 18.3308 -12.1524 7.1223 19.0503 -13.149 7.59571 17.2577 -11.363 7.0995 14.4055 -10.7277 6.70476 12.6994 -11.5658 5.63196 12.3505 -12.3346 3.93096 12.5945 -12.6244 2.93426 13.4994 -12.7376 3.66305 13.8003 -12.2902 3.07171 12.6014 -11.8749 -0.173302 11.8209 -11.7398 -4.46186 11.5901 -11.3279 -10.783 9.97911 -11.5329 -17.5964 7.70943 -10.5539 -21.5772 7.01306 -7.92905 -22.393 7.44808 -6.54138 -23.3474 7.52062 -6.12344 -25.0247 7.1076 -5.65494 -25.9465 5.19411 -4.9907 -22.6818 3.21018 -4.35279 -14.6222 3.9729 -5.16016 -6.7542 6.57488 -7.32562 -0.726983 9.50595 -9.61279 3.33422 11.4107 -11.065" />
+                <angles float3="32" floats="11.9093 10.5254 5.54399 11.1682 10.1385 8.68525 9.7388 10.2371 10.2499 8.04401 9.82719 10.5131 7.14648 9.27105 11.0821 7.0098 9.76962 12.0714 8.08023 11.6519 12.9151 10.9839 14.0893 11.9127 14.8255 16.2722 10.9379 16.0691 16.6893 11.7103 14.0176 15.2041 11.2057 12.7267 12.6829 9.87928 13.2059 10.9814 9.27115 13.7261 10.7766 8.27249 13.727 11.3788 6.70377 13.7369 12.4803 5.95713 13.4722 12.65 6.65613 12.7968 11.6635 5.69993 11.9521 11.6061 2.26535 10.6429 12.2207 -2.16589 9.68192 11.7825 -8.77132 7.87346 10.4327 -16.1633 4.87295 9.39178 -20.6901 3.26917 9.35038 -21.6994 2.69283 9.30877 -22.7253 2.15749 8.81556 -24.5068 2.23762 6.84357 -25.5862 2.78883 4.63375 -22.4469 4.00754 5.13333 -14.2633 6.55764 7.34105 -5.91172 9.62502 9.49356 0.875252 11.9093 10.5254 5.54402" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 12" />
         </dAnimationTrack>
@@ -1153,7 +1153,7 @@
             <dNodeInfo name="mixamorig:LeftHandPinky1" fileIndex="169" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="27.8654 2.51436 2.71198 27.3067 2.54864 2.52434 27.3008 2.49827 2.64281 27.3216 2.47099 2.71159 27.7383 2.59104 2.51004 28.937 2.64291 2.61676 29.3329 2.53294 2.92399 29.3429 2.35327 3.31498 29.4389 2.13366 3.80413 29.5164 1.73676 4.67387 29.5337 1.27566 5.68006 29.3301 0.885021 6.39975 29.1108 0.880916 6.41026 29.5023 1.16336 5.90448 29.8209 1.39277 5.43778 29.5618 1.49828 5.19583 29.137 1.50331 5.15901 28.8108 1.47527 5.19984 28.5799 1.31819 5.53987 28.2351 1.10804 5.99395 27.7382 0.9719 6.24638 27.1933 1.03063 6.13104 27.4444 0.929348 6.32245 27.9795 0.73267 6.68287 28.3976 0.700918 6.72728 28.9268 0.699478 6.71172 29.1515 0.910798 6.32781 29.2757 1.36397 5.41775 29.5224 1.79651 4.50293 29.6167 2.01822 4.04107 29.0237 2.2873 3.39542 27.8654 2.51437 2.71198" />
+                <angles float3="32" floats="-1.22548 3.48887 27.7685 -1.07662 3.42139 27.2184 -1.20557 3.4307 27.2071 -1.27808 3.43838 27.2248 -1.0184 3.46029 27.6508 -1.01432 3.57771 28.8449 -1.31193 3.63883 29.2266 -1.74098 3.67341 29.219 -2.26976 3.72461 29.2942 -3.21889 3.80904 29.3384 -4.32236 3.90271 29.3231 -5.15585 3.89808 29.1051 -5.18189 3.87985 28.8859 -4.57547 3.91269 29.286 -4.03392 3.90591 29.6171 -3.78854 3.86058 29.3661 -3.78232 3.81896 28.9432 -3.85331 3.79242 28.6162 -4.24287 3.80091 28.3753 -4.7658 3.80411 28.0188 -5.08558 3.75927 27.5182 -4.99147 3.71052 26.9763 -5.19191 3.73037 27.2239 -5.5678 3.77355 27.7531 -5.59436 3.80717 28.1703 -5.54608 3.84988 28.6993 -5.09242 3.86963 28.929 -4.06729 3.83259 29.075 -3.0399 3.77751 29.3515 -2.5217 3.74791 29.4629 -1.86388 3.64487 28.8966 -1.22548 3.48887 27.7685" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 29" />
         </dAnimationTrack>
@@ -1161,7 +1161,7 @@
             <dNodeInfo name="mixamorig:LeftHandPinky2" fileIndex="170" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="7.52587 -0.0227251 -1.36627 7.54955 -0.0224693 -1.36855 7.53811 -0.0225922 -1.36745 7.50032 -0.0229963 -1.36384 7.50539 -0.0229503 -1.3643 7.45828 -0.0234519 -1.35979 7.37407 -0.0243635 -1.3517 7.32126 -0.0249145 -1.34664 7.32778 -0.0248405 -1.34725 7.20894 -0.0260859 -1.33583 7.05955 -0.0276226 -1.32148 6.99802 -0.0282417 -1.31555 7.02117 -0.0280132 -1.31778 7.16861 -0.0265031 -1.33195 7.30522 -0.0250884 -1.34507 7.42048 -0.0238777 -1.35615 7.47822 -0.0232381 -1.36172 7.50114 -0.0230051 -1.36388 7.47024 -0.0233307 -1.36093 7.46193 -0.0234098 -1.36013 7.41418 -0.0239215 -1.35555 7.39334 -0.0241506 -1.35355 7.41776 -0.0238938 -1.35589 7.3981 -0.0240879 -1.354 7.31568 -0.0249625 -1.34608 7.15431 -0.0266471 -1.33058 7.04094 -0.02779 -1.31968 7.0742 -0.0274712 -1.32288 7.1837 -0.0263508 -1.3334 7.24726 -0.0256799 -1.33951 7.37752 -0.0243223 -1.35201 7.52587 -0.0227224 -1.36627" />
+                <angles float3="32" floats="1.35153 -0.201452 7.52322 1.35374 -0.202057 7.5469 1.35268 -0.201764 7.53546 1.34917 -0.200801 7.49768 1.34962 -0.200935 7.50275 1.34525 -0.199737 7.45565 1.3374 -0.197626 7.37148 1.33249 -0.196294 7.31868 1.33308 -0.196451 7.3252 1.322 -0.193488 7.2064 1.30807 -0.189803 7.05707 1.30232 -0.188291 6.99556 1.30448 -0.188862 7.0187 1.31824 -0.192488 7.16609 1.33097 -0.195895 7.30265 1.34172 -0.198802 7.41787 1.34711 -0.200244 7.47559 1.34921 -0.200835 7.4985 1.34636 -0.200047 7.46762 1.34558 -0.199826 7.45931 1.34114 -0.19862 7.41157 1.3392 -0.198103 7.39074 1.34147 -0.198721 7.41515 1.33963 -0.198209 7.39549 1.33195 -0.196141 7.31311 1.31691 -0.192131 7.15179 1.30632 -0.189323 7.03847 1.30943 -0.190159 7.07171 1.31964 -0.192865 7.18118 1.32558 -0.194434 7.24471 1.3377 -0.197705 7.37492 1.35153 -0.20145 7.52322" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 30" />
         </dAnimationTrack>
@@ -1169,7 +1169,7 @@
             <dNodeInfo name="mixamorig:LeftHandPinky3" fileIndex="171" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="13.5218 0.0911537 -1.58372 13.5455 0.0915982 -1.58596 13.534 0.0913887 -1.5849 13.4963 0.0906699 -1.5813 13.5013 0.0907734 -1.58179 13.4542 0.089887 -1.57732 13.3701 0.0883162 -1.56935 13.3173 0.0873332 -1.56434 13.3238 0.0874541 -1.56496 13.2049 0.0852739 -1.55369 13.0556 0.0825616 -1.53953 12.9934 0.0814481 -1.53364 13.0166 0.0818626 -1.53583 13.1646 0.0845372 -1.54987 13.3012 0.0870355 -1.56282 13.4165 0.0891827 -1.57374 13.4742 0.0902525 -1.57921 13.4971 0.0906861 -1.5814 13.4662 0.0900951 -1.57845 13.4579 0.0899394 -1.57767 13.4101 0.0890501 -1.57314 13.3893 0.0886688 -1.57116 13.4136 0.0891205 -1.57348 13.3933 0.0887435 -1.57154 13.3107 0.0872055 -1.56371 13.1493 0.0842579 -1.54843 13.0367 0.0822182 -1.53775 13.0702 0.082826 -1.54092 13.1797 0.0848113 -1.55131 13.2432 0.0859624 -1.55732 13.3735 0.0883862 -1.56968 13.5218 0.0911514 -1.58372" />
+                <angles float3="32" floats="1.56114 -0.281659 13.5192 1.56331 -0.282398 13.5429 1.56228 -0.282039 13.5315 1.5588 -0.280869 13.4937 1.55928 -0.281021 13.4988 1.55496 -0.279561 13.4517 1.54724 -0.276961 13.3675 1.54239 -0.275337 13.3147 1.543 -0.275537 13.3212 1.5321 -0.271885 13.2025 1.51839 -0.267335 13.0532 1.51269 -0.265449 12.991 1.51481 -0.26615 13.0142 1.5284 -0.270655 13.1621 1.54093 -0.274844 13.2987 1.5515 -0.278391 13.4139 1.55678 -0.280186 13.4716 1.5589 -0.280898 13.4945 1.55605 -0.279947 13.4637 1.55529 -0.279691 13.4554 1.55091 -0.278206 13.4075 1.549 -0.277558 13.3868 1.55124 -0.278312 13.4111 1.54936 -0.27768 13.3907 1.54179 -0.275141 13.3082 1.52701 -0.270192 13.1469 1.51667 -0.266768 13.0343 1.51974 -0.26778 13.0678 1.52979 -0.271117 13.1772 1.53561 -0.273072 13.2407 1.54757 -0.277062 13.3709 1.56114 -0.281662 13.5192" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 31" />
         </dAnimationTrack>
@@ -1177,7 +1177,7 @@
             <dNodeInfo name="mixamorig:LeftHandRing1" fileIndex="172" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="31.6889 1.81479 2.38037 30.6497 1.75366 2.40045 30.5931 1.75512 2.3935 30.5738 1.77318 2.36163 31.5082 1.9125 2.20861 34.3365 2.21764 1.97274 35.4902 2.30188 1.94466 35.5406 2.25611 2.01206 35.686 2.19684 2.10477 35.8791 2.13471 2.20372 35.6244 2.14143 2.17709 34.7052 2.19443 2.03529 33.944 2.13086 2.06827 34.354 2.14999 2.07227 35.6373 2.21819 2.07179 36.247 2.15412 2.20178 35.6425 2.01939 2.34729 35.0246 1.93856 2.42198 34.866 1.89181 2.47873 34.5161 1.83078 2.54544 33.7176 1.74325 2.6267 32.7856 1.70017 2.6359 33.5587 1.73722 2.62633 34.7375 1.82573 2.56559 34.6558 1.96525 2.36037 34.4963 2.0276 2.25979 34.4001 2.0277 2.25291 34.9311 2.12617 2.14952 35.7805 2.2794 1.99789 36.1204 2.29473 2.00223 34.5743 2.08521 2.18229 31.6889 1.81479 2.38036" />
+                <angles float3="32" floats="-1.0739 2.79381 31.625 -1.17285 2.73151 30.585 -1.16881 2.72808 30.5286 -1.13307 2.72705 30.5103 -0.885014 2.78409 31.4499 -0.379334 2.94345 34.2886 -0.248151 3.0028 35.4447 -0.327053 3.00491 35.4924 -0.429426 3.01161 35.6344 -0.536002 3.02061 35.8239 -0.523835 3.00817 35.5699 -0.425102 2.96232 34.6553 -0.527341 2.92207 33.8921 -0.498918 2.94381 34.3023 -0.392699 3.00939 35.5869 -0.503537 3.0385 36.1922 -0.732544 3.0082 35.5819 -0.872611 2.97675 34.9609 -0.954209 2.96835 34.8003 -1.06195 2.94993 34.448 -1.21923 2.90708 33.6467 -1.29742 2.85563 32.7142 -1.23031 2.89846 33.4878 -1.07 2.96133 34.6689 -0.825815 2.95804 34.594 -0.715717 2.95024 34.4379 -0.714928 2.94523 34.3418 -0.546308 2.97334 34.877 -0.289329 3.01687 35.7331 -0.265892 3.03347 36.0732 -0.615096 2.95472 34.5187 -1.0739 2.79381 31.6251" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 25" />
         </dAnimationTrack>
@@ -1185,7 +1185,7 @@
             <dNodeInfo name="mixamorig:LeftHandRing2" fileIndex="173" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="0.145101 -0.185184 -1.10421 0.14529 -0.185176 -1.10423 0.138936 -0.185171 -1.10371 0.121282 -0.185133 -1.10229 0.156188 -0.185198 -1.10511 0.160613 -0.185219 -1.10546 0.0893543 -0.185077 -1.09967 0.0412665 -0.184985 -1.09575 0.0411114 -0.184994 -1.09573 0.00170425 -0.184905 -1.09251 -0.0439296 -0.184821 -1.0888 -0.0455467 -0.18481 -1.08867 -0.00878748 -0.184891 -1.09167 -0.0122473 -0.184877 -1.09138 0.0332971 -0.184975 -1.09509 0.1207 -0.185144 -1.10222 0.169338 -0.185227 -1.10619 0.225097 -0.185338 -1.11072 0.267358 -0.185406 -1.11417 0.307721 -0.185477 -1.11746 0.313869 -0.185449 -1.11797 0.283467 -0.185419 -1.1155 0.309963 -0.185469 -1.11763 0.338021 -0.1855 -1.11992 0.347178 -0.185527 -1.12067 0.238317 -0.185351 -1.1118 0.0910216 -0.185079 -1.09981 0.0319493 -0.184973 -1.095 0.0653024 -0.185044 -1.09771 0.0933616 -0.185089 -1.09999 0.119606 -0.185144 -1.10213 0.145092 -0.18519 -1.10421" />
+                <angles float3="32" floats="1.10374 -0.187945 0.141506 1.10376 -0.187941 0.141695 1.10326 -0.187813 0.135345 1.1019 -0.187431 0.117698 1.10461 -0.188175 0.152588 1.10494 -0.188283 0.157011 1.09939 -0.186758 0.0857864 1.09563 -0.185741 0.0377216 1.0956 -0.185747 0.0375665 1.09251 -0.184904 -0.00182161 1.08894 -0.183953 -0.0474339 1.08883 -0.183911 -0.0490501 1.0917 -0.18469 -0.0123085 1.09143 -0.18461 -0.0157665 1.09498 -0.185577 0.029756 1.10184 -0.187431 0.117117 1.10565 -0.188461 0.165732 1.10999 -0.189665 0.221463 1.1133 -0.190568 0.263704 1.11645 -0.19144 0.304047 1.11694 -0.191535 0.310193 1.11458 -0.190901 0.279805 1.11662 -0.191477 0.306288 1.11882 -0.192068 0.334333 1.11953 -0.192278 0.343485 1.11103 -0.189939 0.234677 1.09952 -0.186791 0.0874529 1.09491 -0.18555 0.0284087 1.09751 -0.186261 0.0617458 1.0997 -0.186847 0.0897917 1.10175 -0.18741 0.116023 1.10375 -0.187951 0.141497" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 26" />
         </dAnimationTrack>
@@ -1193,7 +1193,7 @@
             <dNodeInfo name="mixamorig:LeftHandRing3" fileIndex="174" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="14.8118 0.0639583 -1.57422 14.8118 0.0639584 -1.57422 14.8054 0.0638699 -1.57372 14.7876 0.0635747 -1.5723 14.822 0.0641311 -1.57504 14.8259 0.0641937 -1.57537 14.7548 0.0630421 -1.56969 14.7071 0.0622778 -1.56588 14.7074 0.0622891 -1.56592 14.6685 0.0616614 -1.56281 14.6227 0.060925 -1.55916 14.6203 0.0608975 -1.55897 14.657 0.0614716 -1.56189 14.6536 0.0614161 -1.56163 14.6994 0.0621612 -1.56529 14.7875 0.0635628 -1.57229 14.8366 0.0643737 -1.57621 14.8925 0.0652771 -1.58065 14.935 0.0659751 -1.58403 14.9755 0.0666377 -1.58726 14.9818 0.0667328 -1.58777 14.9513 0.0662401 -1.58533 14.9778 0.0666789 -1.58746 15.0059 0.0671449 -1.58968 15.0142 0.0672837 -1.59035 14.905 0.0654955 -1.58165 14.7577 0.0630902 -1.56992 14.6983 0.0621397 -1.56518 14.7311 0.0626712 -1.5678 14.7592 0.063122 -1.57006 14.786 0.0635515 -1.57217 14.8118 0.063973 -1.57423" />
+                <angles float3="32" floats="1.53828 -0.340583 14.8081 1.53828 -0.340584 14.8081 1.53781 -0.340371 14.8017 1.53647 -0.339815 14.7839 1.53905 -0.340901 14.8183 1.53936 -0.341028 14.8222 1.534 -0.338785 14.7511 1.5304 -0.33728 14.7034 1.53044 -0.337287 14.7037 1.5275 -0.336066 14.6648 1.52406 -0.334639 14.6191 1.52388 -0.334552 14.6166 1.52663 -0.335711 14.6533 1.52639 -0.335611 14.65 1.52985 -0.337038 14.6958 1.53645 -0.339819 14.7838 1.54016 -0.341357 14.8329 1.54435 -0.343128 14.8888 1.54754 -0.344468 14.9312 1.55059 -0.345757 14.9717 1.55106 -0.345967 14.978 1.54876 -0.344988 14.9475 1.55077 -0.345832 14.9741 1.55287 -0.346716 15.0021 1.5535 -0.346981 15.0105 1.5453 -0.34351 14.9012 1.53421 -0.338874 14.754 1.52974 -0.337001 14.6946 1.53221 -0.338029 14.7275 1.53435 -0.338919 14.7556 1.53635 -0.339761 14.7823 1.53829 -0.34057 14.8081" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 27" />
         </dAnimationTrack>
@@ -1201,7 +1201,7 @@
             <dNodeInfo name="mixamorig:LeftHandMiddle1" fileIndex="175" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="23.0112 0.225578 -0.870233 22.2448 0.146581 -0.659698 22.182 0.140325 -0.642415 22.0658 0.147409 -0.656286 22.7714 0.234673 -0.886517 25.3542 0.555588 -1.62651 26.4923 0.700233 -1.91455 26.4267 0.623999 -1.76209 26.5666 0.536727 -1.58681 26.858 0.5121 -1.53886 26.9207 0.496047 -1.50756 26.6524 0.486294 -1.48641 25.9906 0.492488 -1.49528 25.6968 0.46487 -1.43675 25.9908 0.421319 -1.34917 26.0141 0.3829 -1.27053 25.6951 0.299765 -1.09305 25.399 0.191485 -0.85823 25.3149 0.122816 -0.70994 24.857 0.0650583 -0.567903 23.9769 -0.00274059 -0.37774 23.0337 -0.0267222 -0.274945 23.8167 0.0103068 -0.399652 25.2223 0.0906394 -0.637941 25.7922 0.176686 -0.839625 25.7843 0.255852 -1.00381 25.3135 0.350321 -1.19232 25.5637 0.512698 -1.53606 26.5269 0.67959 -1.87284 26.8209 0.733475 -1.97644 25.5001 0.539738 -1.5927 23.0112 0.225595 -0.870234" />
+                <angles float3="32" floats="0.889165 -0.132566 23.0119 0.666089 -0.11407 22.245 0.647848 -0.112608 22.1822 0.663592 -0.10994 22.066 0.908246 -0.126762 22.7722 1.70772 -0.194538 25.3592 2.0258 -0.227538 26.5 1.85563 -0.225583 26.4327 1.65928 -0.229728 26.5707 1.60419 -0.238455 26.8615 1.56875 -0.240345 26.9239 1.54658 -0.232221 26.6555 1.55985 -0.212669 25.9941 1.49621 -0.204163 25.7 1.39733 -0.212587 25.9932 1.30973 -0.213178 26.0159 1.11493 -0.203828 25.696 0.857407 -0.195141 25.399 0.694281 -0.192544 25.3145 0.542641 -0.179688 24.8564 0.344031 -0.156005 23.9765 0.24257 -0.132169 23.0333 0.369782 -0.151954 23.8162 0.615746 -0.189849 25.2218 0.832857 -0.206249 25.792 1.01516 -0.206279 25.7847 1.22761 -0.193149 25.3151 1.6069 -0.200416 25.5677 1.97914 -0.228589 26.534 2.09469 -0.237437 26.8292 1.66988 -0.198627 25.5047 0.889173 -0.132551 23.0119" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 21" />
         </dAnimationTrack>
@@ -1209,7 +1209,7 @@
             <dNodeInfo name="mixamorig:LeftHandMiddle2" fileIndex="176" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="2.11358 -0.068249 -1.02921 2.11737 -0.0682352 -1.02956 2.13472 -0.068174 -1.03113 2.11875 -0.0682342 -1.02968 2.10517 -0.0682719 -1.02845 2.14046 -0.0681714 -1.03165 2.13145 -0.0681981 -1.03084 2.1126 -0.068255 -1.02911 2.07851 -0.0683589 -1.02601 2.08899 -0.0683307 -1.02697 2.07074 -0.0684046 -1.02529 2.05011 -0.0684711 -1.02342 2.02665 -0.0685394 -1.02127 2.05918 -0.0684353 -1.02424 2.05501 -0.0684313 -1.02387 2.07063 -0.0684031 -1.02528 2.09945 -0.0683095 -1.02791 2.08435 -0.0683523 -1.02655 2.05223 -0.0684613 -1.02362 2.03859 -0.0684806 -1.02237 2.01526 -0.0685572 -1.02024 2.04646 -0.0684722 -1.02308 2.03745 -0.0684895 -1.02225 2.02562 -0.0685385 -1.02119 1.99862 -0.068628 -1.01871 1.9876 -0.0686588 -1.01771 2.01981 -0.0685511 -1.02066 2.07945 -0.0683679 -1.0261 2.11198 -0.0682613 -1.02907 2.11705 -0.0682438 -1.02953 2.11421 -0.0682572 -1.02927 2.11358 -0.06825 -1.02921" />
+                <angles float3="32" floats="1.02599 -0.106147 2.11202 1.02634 -0.106214 2.11581 1.02788 -0.106523 2.13315 1.02645 -0.106243 2.11719 1.02525 -0.105992 2.1036 1.02839 -0.106642 2.13889 1.02759 -0.106477 2.12988 1.0259 -0.106132 2.11104 1.02286 -0.105513 2.07695 1.0238 -0.105707 2.08744 1.02215 -0.105394 2.06919 1.02032 -0.105026 2.04856 1.01821 -0.1046 2.02511 1.02113 -0.105181 2.05764 1.02076 -0.10509 2.05347 1.02214 -0.10539 2.06908 1.02472 -0.105907 2.09789 1.02339 -0.10563 2.08279 1.02051 -0.105061 2.05069 1.01928 -0.104793 2.03705 1.0172 -0.104379 2.01373 1.01998 -0.10495 2.04492 1.01917 -0.104777 2.03591 1.01813 -0.104578 2.02408 1.0157 -0.104102 1.99708 1.01472 -0.103902 1.98607 1.01761 -0.104469 2.01827 1.02294 -0.105542 2.0779 1.02586 -0.106126 2.11042 1.02631 -0.106216 2.11548 1.02605 -0.106169 2.11265 1.02599 -0.106148 2.11201" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 22" />
         </dAnimationTrack>
@@ -1217,7 +1217,7 @@
             <dNodeInfo name="mixamorig:LeftHandMiddle3" fileIndex="177" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="4.7645 -0.0488262 -1.21203 4.76825 -0.0488113 -1.21236 4.78556 -0.048697 -1.21394 4.76965 -0.0488054 -1.21249 4.75609 -0.0488847 -1.21126 4.79153 -0.0486397 -1.2145 4.78247 -0.0487094 -1.21366 4.76362 -0.0488408 -1.21194 4.72953 -0.0490639 -1.20885 4.74001 -0.0489959 -1.20979 4.72177 -0.0491145 -1.20814 4.70113 -0.0492399 -1.20626 4.67768 -0.0493907 -1.20413 4.71022 -0.0491815 -1.2071 4.706 -0.0492135 -1.20669 4.7216 -0.0491062 -1.20813 4.75038 -0.0489099 -1.21075 4.73518 -0.0490242 -1.20936 4.70296 -0.0492242 -1.20642 4.68931 -0.0493266 -1.20518 4.66592 -0.0494839 -1.20306 4.69712 -0.049264 -1.2059 4.68816 -0.0493376 -1.2051 4.67641 -0.0494059 -1.20402 4.64949 -0.0495805 -1.20156 4.63851 -0.0496283 -1.20057 4.67077 -0.049438 -1.2035 4.73039 -0.0490512 -1.20893 4.76289 -0.0488369 -1.21188 4.7679 -0.0488054 -1.21233 4.76516 -0.048821 -1.21208 4.7645 -0.0488316 -1.21203" />
+                <angles float3="32" floats="1.20379 -0.149311 4.76241 1.20411 -0.149402 4.76616 1.20565 -0.149784 4.78347 1.20424 -0.149437 4.76756 1.20304 -0.149129 4.75401 1.2062 -0.149899 4.78943 1.20538 -0.149708 4.78038 1.2037 -0.149299 4.76154 1.20069 -0.148551 4.72746 1.20161 -0.148781 4.73793 1.2 -0.148381 4.7197 1.19817 -0.147919 4.69907 1.19609 -0.147405 4.67562 1.19898 -0.14812 4.70815 1.19859 -0.14803 4.70393 1.19999 -0.148368 4.71953 1.20254 -0.148991 4.7483 1.20118 -0.148672 4.73311 1.19832 -0.147955 4.7009 1.19712 -0.14767 4.68725 1.19505 -0.147166 4.66386 1.19782 -0.14783 4.69506 1.19704 -0.14765 4.6861 1.19598 -0.147385 4.67435 1.19359 -0.146798 4.64744 1.19263 -0.146537 4.63647 1.19548 -0.147257 4.66872 1.20077 -0.148563 4.72832 1.20364 -0.149275 4.7608 1.20408 -0.149386 4.76581 1.20384 -0.149324 4.76307 1.20379 -0.149316 4.76241" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 23" />
         </dAnimationTrack>
@@ -1225,7 +1225,7 @@
             <dNodeInfo name="mixamorig:LeftHandIndex1" fileIndex="178" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="9.77046 -1.90097 1.20546 8.7524 -1.84705 1.91329 8.60574 -1.81192 1.8363 8.43863 -1.7724 1.74838 9.57209 -1.88275 1.28355 13.4254 -1.83981 -0.616399 15.0671 -1.616 -1.72416 15.2136 -1.54284 -1.93976 15.3381 -1.50353 -2.06762 15.767 -1.38542 -2.45787 15.6491 -1.14401 -2.97836 14.7698 -0.95905 -3.19982 13.7312 -0.920777 -3.04119 13.3034 -1.05314 -2.59243 13.761 -1.27534 -2.15876 13.9504 -1.51911 -1.608 13.3943 -1.6913 -0.984461 12.9181 -1.77986 -0.576857 13.0843 -1.80058 -0.584486 12.6916 -1.73846 -0.592912 11.5996 -1.66699 -0.347281 10.1823 -1.61584 0.126005 11.4757 -1.62334 -0.406269 13.658 -1.61615 -1.2246 13.8294 -1.56127 -1.40471 13.7031 -1.3903 -1.76753 13.4201 -1.25549 -1.99744 13.8825 -1.27188 -2.07989 14.8515 -1.42599 -1.9886 15.1611 -1.54421 -1.80407 13.2114 -1.77962 -0.612038 9.77046 -1.90097 1.20545" />
+                <angles float3="32" floats="-1.51117 -1.66832 9.81247 -2.17281 -1.53331 8.81232 -2.08744 -1.51575 8.66239 -1.9902 -1.49575 8.49166 -1.57937 -1.64254 9.61583 0.172572 -1.93261 13.4126 1.24567 -2.00807 15.0209 1.46789 -1.99707 15.1619 1.59732 -1.99606 15.2831 1.9902 -2 15.7026 2.56078 -1.90342 15.5768 2.85087 -1.74147 14.6997 2.73677 -1.61492 13.6682 2.28144 -1.62033 13.2473 1.7943 -1.75142 13.7095 1.19504 -1.86148 13.9096 0.56627 -1.87319 13.3705 0.164519 -1.86373 12.9064 0.161856 -1.88611 13.0724 0.196649 -1.8262 12.6795 0.00505879 -1.70277 11.5944 -0.409787 -1.56809 10.1897 0.0752587 -1.6717 11.4689 0.808854 -1.85935 13.6276 0.991381 -1.85143 13.7942 1.38858 -1.76888 13.6602 1.65226 -1.6841 13.3739 1.7148 -1.733 13.8335 1.55758 -1.88733 14.8011 1.33828 -1.96168 15.1139 0.189295 -1.87236 13.1988 -1.51116 -1.66832 9.81247" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 17" />
         </dAnimationTrack>
@@ -1233,7 +1233,7 @@
             <dNodeInfo name="mixamorig:LeftHandIndex2" fileIndex="179" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="8.47822 0.0191185 -1.44746 8.49092 0.0193074 -1.44856 8.50417 0.0194888 -1.44971 8.50395 0.0194897 -1.4497 8.53266 0.019859 -1.45218 8.58566 0.0205853 -1.45679 8.59 0.0206517 -1.45717 8.56878 0.0203679 -1.45533 8.54705 0.0200617 -1.45344 8.48646 0.0192417 -1.44818 8.40099 0.0181 -1.44074 8.33926 0.0172716 -1.43536 8.34326 0.0173085 -1.4357 8.34195 0.0172882 -1.4356 8.361 0.0175533 -1.43725 8.40609 0.0181466 -1.44117 8.41694 0.0183054 -1.44211 8.4084 0.0181901 -1.44139 8.39626 0.0180366 -1.44033 8.4011 0.0180898 -1.44074 8.36369 0.0175848 -1.43747 8.34303 0.0173175 -1.43569 8.34747 0.0173734 -1.43608 8.35849 0.0175186 -1.43703 8.34263 0.0173069 -1.43565 8.3166 0.0169599 -1.4334 8.30282 0.0167776 -1.43219 8.3044 0.0168008 -1.43234 8.34146 0.0172938 -1.43555 8.40322 0.0181323 -1.44093 8.45379 0.0188031 -1.44532 8.47823 0.0191336 -1.44746" />
+                <angles float3="32" floats="1.43447 -0.194478 8.47603 1.43553 -0.194771 8.48873 1.43666 -0.195095 8.50197 1.43665 -0.195086 8.50175 1.43906 -0.19581 8.53045 1.44354 -0.19711 8.58344 1.44392 -0.197211 8.58777 1.44212 -0.196682 8.56657 1.44028 -0.196156 8.54484 1.43516 -0.194668 8.48427 1.42793 -0.19257 8.39882 1.4227 -0.191072 8.33711 1.42302 -0.191184 8.34111 1.42292 -0.191156 8.33979 1.42453 -0.191607 8.35884 1.42835 -0.192715 8.40391 1.42927 -0.192966 8.41476 1.42856 -0.19276 8.40623 1.42753 -0.192455 8.39409 1.42793 -0.192584 8.39893 1.42474 -0.191674 8.36153 1.42302 -0.191168 8.34087 1.42339 -0.191278 8.34531 1.42432 -0.191548 8.35633 1.42297 -0.191162 8.34047 1.42078 -0.190533 8.31444 1.41961 -0.190198 8.30068 1.41975 -0.190235 8.30225 1.42288 -0.191132 8.3393 1.42812 -0.192622 8.40105 1.43239 -0.193864 8.4516 1.43447 -0.194464 8.47604" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 18" />
         </dAnimationTrack>
@@ -1241,7 +1241,7 @@
             <dNodeInfo name="mixamorig:LeftHandIndex3" fileIndex="180" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="13.1546 0.144785 -1.35605 13.1672 0.14506 -1.35713 13.1805 0.145341 -1.35826 13.1803 0.145327 -1.35824 13.209 0.145937 -1.36069 13.262 0.147081 -1.36522 13.2663 0.147161 -1.36558 13.2451 0.146714 -1.36377 13.2233 0.146268 -1.36193 13.1627 0.144955 -1.35675 13.0773 0.143147 -1.34944 13.0156 0.141856 -1.34416 13.0196 0.141945 -1.34452 13.0183 0.14191 -1.3444 13.0373 0.142307 -1.34601 13.0824 0.143257 -1.34988 13.0933 0.143496 -1.35081 13.0847 0.143309 -1.35007 13.0726 0.143046 -1.34903 13.0774 0.143149 -1.34944 13.04 0.142368 -1.34626 13.0194 0.141931 -1.34449 13.0238 0.142015 -1.34486 13.0348 0.142255 -1.34582 13.019 0.141918 -1.34446 12.9929 0.141376 -1.34223 12.9792 0.141087 -1.34104 12.9807 0.141121 -1.34119 13.0178 0.141883 -1.34435 13.0795 0.143185 -1.34963 13.1301 0.144262 -1.35396 13.1546 0.144786 -1.35603" />
+                <angles float3="32" floats="1.35341 -0.167633 13.1543 1.3545 -0.167912 13.167 1.35562 -0.168208 13.1802 1.35559 -0.168212 13.18 1.35804 -0.168857 13.2087 1.36255 -0.170039 13.2617 1.36291 -0.170147 13.266 1.36111 -0.169663 13.2448 1.35928 -0.169159 13.2231 1.35411 -0.16782 13.1625 1.34683 -0.165909 13.077 1.34158 -0.164526 13.0153 1.34193 -0.164613 13.0193 1.34182 -0.164591 13.018 1.34342 -0.165013 13.037 1.34727 -0.166019 13.0821 1.3482 -0.166254 13.093 1.34746 -0.166068 13.0845 1.34643 -0.165803 13.0723 1.34684 -0.165909 13.0771 1.34366 -0.165071 13.0398 1.3419 -0.164614 13.0191 1.34227 -0.16472 13.0235 1.34322 -0.164961 13.0346 1.34187 -0.164611 13.0187 1.33965 -0.164027 12.9927 1.33847 -0.163722 12.9789 1.33861 -0.163758 12.9805 1.34176 -0.164593 13.0175 1.34702 -0.165966 13.0793 1.35133 -0.16709 13.1298 1.3534 -0.167629 13.1543" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 19" />
         </dAnimationTrack>
@@ -1249,7 +1249,7 @@
             <dNodeInfo name="mixamorig:LeftHandThumb1" fileIndex="181" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="1" floats="0" />
-                <angles float3="1" floats="-3.64383 7.47423 2.48896" />
+                <angles float3="1" floats="-2.98182 7.29251 -3.99649" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 13" />
         </dAnimationTrack>
@@ -1257,7 +1257,7 @@
             <dNodeInfo name="mixamorig:LeftHandThumb2" fileIndex="182" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-9.8169 3.30991 -10.1531 -10.3553 3.1246 -9.50874 -10.283 3.23041 -9.3783 -10.0369 3.61743 -9.11248 -8.96106 5.18854 -9.48497 -7.87311 6.22177 -8.93701 -7.69792 5.90379 -9.12953 -7.65616 5.35647 -9.6552 -7.72144 4.66123 -10.42 -7.68679 3.95173 -11.1484 -8.09631 2.67135 -12.8065 -9.12078 0.786138 -15.5193 -9.68081 -0.268467 -17.0197 -9.59688 -0.257397 -16.9655 -9.2969 -0.0563754 -15.4656 -9.36999 -0.372703 -12.7723 -9.95045 -0.801027 -11.3548 -10.5822 -1.2691 -10.5105 -10.7824 -1.61591 -9.7959 -10.9264 -1.93327 -8.8459 -11.3554 -2.35763 -7.40845 -11.773 -2.34941 -5.74593 -11.0428 -2.0249 -6.77817 -10.1427 -1.81146 -9.41862 -10.3506 -1.89194 -12.2626 -10.2264 -1.50706 -14.2754 -9.71684 -0.505074 -14.6088 -9.40643 0.0970805 -13.8289 -9.30912 0.511159 -13.0975 -9.13033 1.1552 -12.1182 -9.2584 2.29757 -10.8704 -9.81691 3.30992 -10.153" />
+                <angles float3="32" floats="9.47503 4.93674 -9.11341 8.82216 4.73674 -9.72974 8.68146 4.80667 -9.65289 8.37604 5.10298 -9.37463 8.61864 6.53306 -8.0375 8.06877 7.31543 -6.86976 8.32065 7.0014 -6.71624 8.91476 6.52023 -6.69462 9.75261 5.94072 -6.78891 10.5656 5.32874 -6.80789 12.3375 4.37089 -7.32382 15.2178 3.1796 -8.5888 16.8326 2.56792 -9.34098 16.781 2.54535 -9.25978 15.2805 2.41535 -8.9805 12.6654 1.7039 -9.22259 11.3226 1.17583 -9.91352 10.5635 0.692926 -10.6348 9.92364 0.259663 -10.8983 9.05074 -0.205229 -11.0922 7.72763 -0.836947 -11.5646 6.10516 -1.11745 -11.9505 7.04042 -0.677842 -11.2045 9.58909 -0.107655 -10.301 12.4001 0.368092 -10.5138 14.3139 1.07119 -10.2806 14.4885 1.95768 -9.53271 13.635 2.33191 -9.11583 12.8528 2.59245 -8.95839 11.7959 3.02509 -8.69513 10.3831 3.96795 -8.6791 9.47503 4.93675 -9.11341" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 14" />
         </dAnimationTrack>
@@ -1265,7 +1265,7 @@
             <dNodeInfo name="mixamorig:LeftHandThumb3" fileIndex="183" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-10.6613 13.7918 5.73477 -10.6666 13.6713 5.42908 -10.6565 13.6668 5.43376 -10.6243 13.6732 5.50078 -10.5583 13.9192 6.21028 -9.93406 14.4995 8.61617 -9.73184 14.7537 9.54497 -9.79451 14.7297 9.38378 -10.0196 14.5904 8.6842 -10.2591 14.4259 7.90463 -10.5467 14.5941 7.82662 -10.9959 15.1222 8.29702 -11.2557 15.3003 8.27698 -11.1953 14.8573 7.39508 -11.0048 14.255 6.30859 -10.7846 13.7371 5.40584 -10.7268 13.4571 4.79874 -10.7294 13.2776 4.33942 -10.7157 13.1348 3.99463 -10.681 12.9547 3.58149 -10.6533 12.7013 2.95651 -10.6367 12.4815 2.39362 -10.6098 12.6255 2.83082 -10.6627 12.9822 3.69749 -10.9042 13.4192 4.44276 -11.1005 13.825 5.13767 -11.1211 14.0147 5.55846 -10.9684 14.317 6.51129 -10.7804 14.6334 7.54176 -10.5474 14.6107 7.86353 -10.434 14.1931 7.06957 -10.6613 13.7918 5.73477" />
+                <angles float3="32" floats="-8.36457 12.3932 -12.2652 -8.03389 12.3401 -12.1878 -8.03541 12.3361 -12.178 -8.09687 12.3327 -12.1605 -8.84551 12.4315 -12.2823 -11.2425 12.591 -12.2764 -12.1829 12.6793 -12.329 -12.0301 12.6776 -12.3513 -11.3491 12.6475 -12.3952 -10.5857 12.6105 -12.4341 -10.6084 12.7372 -12.7378 -11.3007 13.0549 -13.3963 -11.3825 13.1798 -13.6886 -10.3831 12.9706 -13.3443 -9.11626 12.6662 -12.8083 -8.05047 12.3924 -12.3117 -7.37026 12.2559 -12.0857 -6.87302 12.1764 -11.9686 -6.49493 12.1097 -11.8655 -6.03643 12.022 -11.724 -5.35272 11.9031 -11.5408 -4.74099 11.8012 -11.3888 -5.20232 11.8579 -11.4636 -6.15439 12.0273 -11.7325 -7.04422 12.2716 -12.1853 -7.87065 12.492 -12.5865 -8.33819 12.5812 -12.7256 -9.32479 12.6872 -12.826 -10.3846 12.7959 -12.9178 -10.6492 12.745 -12.7498 -9.73767 12.5337 -12.3872 -8.36456 12.3932 -12.2652" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 15" />
         </dAnimationTrack>
@@ -1273,7 +1273,7 @@
             <dNodeInfo name="mixamorig:Neck" fileIndex="184" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-0.485934 2.1271 -0.255365 -0.445138 1.88325 -0.379307 -0.53173 1.55042 -0.262881 -0.622152 1.1126 0.326276 -0.580827 0.652706 0.954008 -0.57561 0.248944 1.16112 -0.741457 -0.101339 1.05339 -0.822323 -0.387507 0.772999 -0.454769 -0.480352 -0.0859826 -0.175378 -0.286548 -1.57274 -0.18276 -0.0479796 -2.28063 -0.0771568 0.259611 -2.79316 -0.0459074 0.701838 -3.10332 -0.144553 1.20646 -2.82785 -0.0533508 1.70466 -2.20302 0.281566 2.19902 -1.71657 0.593453 2.70126 -1.29593 0.639893 3.22359 -1.00676 0.479523 3.75257 -1.12652 0.265632 4.28969 -1.6904 0.0959874 4.7799 -2.23381 -0.144219 5.13133 -2.43873 -0.46179 5.30858 -2.31858 -0.63479 5.35654 -1.90542 -0.23923 5.22918 -0.545644 -0.0125815 5.0331 0.15731 0.101849 4.65167 0.816396 -0.0406384 4.05598 1.3366 -0.222446 3.38829 1.31339 -0.234419 2.77669 0.842647 -0.257439 2.33066 0.226622 -0.485935 2.1271 -0.255366" />
+                <angles float3="32" floats="0.237484 2.12917 -0.47678 0.364865 1.8861 -0.432898 0.248575 1.55278 -0.524804 -0.3384 1.10898 -0.628595 -0.960636 0.642911 -0.591651 -1.16357 0.237216 -0.580542 -1.05199 -0.114944 -0.73947 -0.767377 -0.398526 -0.817041 0.0897956 -0.479654 -0.455505 1.57363 -0.281625 -0.183178 2.28077 -0.0406686 -0.184525 2.79284 0.263062 -0.0644149 3.10299 0.703294 -0.00784651 2.82543 1.21212 -0.0848795 2.20241 1.70545 0.0122125 1.72862 2.18956 0.347549 1.32529 2.68699 0.655092 1.04432 3.21163 0.697499 1.16034 3.74226 0.554337 1.71504 4.27992 0.393036 2.24961 4.7725 0.282989 2.4356 5.13281 0.0742602 2.28564 5.32281 -0.248029 1.8542 5.37444 -0.458613 0.526027 5.23119 -0.190282 -0.159027 5.03305 -0.0264845 -0.810807 4.65265 0.0357509 -1.34284 4.05392 -0.135497 -1.32885 3.38226 -0.300529 -0.854997 2.77291 -0.275536 -0.237285 2.3296 -0.266874 0.237485 2.12917 -0.476781" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 6" />
         </dAnimationTrack>
@@ -1281,7 +1281,7 @@
             <dNodeInfo name="mixamorig:Head" fileIndex="185" editorFlags="0" />
             <rotationKeyframes>
                 <timeLine float="32" floats="0 0.0333333 0.0666667 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667 1 1.03333" />
-                <angles float3="32" floats="-3.3496 4.4167 -2.13227 -2.94646 3.21823 -2.04043 -2.90639 2.2029 -1.98629 -3.26239 1.3807 -2.27652 -3.97228 1.02587 -2.48079 -4.68648 0.922577 -2.50005 -5.42469 0.468015 -2.45607 -5.93582 -0.445662 -1.93609 -5.32553 -1.33664 -0.77578 -3.95205 -1.84369 0.715078 -3.09342 -1.97439 2.07802 -3.28642 -1.46889 2.48791 -4.01847 0.0727316 1.56908 -4.31422 2.09512 0.0117524 -3.74957 3.94234 -1.15014 -2.75702 5.40905 -1.66643 -1.90752 6.79762 -1.97691 -1.56104 8.18756 -2.30716 -1.89329 9.2162 -2.50223 -2.84195 9.93421 -2.52265 -3.82933 10.4143 -2.57261 -4.32026 10.5926 -2.66804 -4.75479 10.6043 -2.79285 -5.60417 10.774 -3.45056 -6.03271 11.656 -4.96406 -5.58106 12.6465 -6.02223 -4.83252 12.6836 -5.70473 -4.73002 11.2432 -4.77304 -4.86927 9.08027 -3.79533 -4.62045 6.94142 -2.83008 -4.01504 5.31032 -2.21243 -3.3496 4.4167 -2.13227" />
+                <angles float3="32" floats="1.87671 4.53102 -3.19311 1.87555 3.31696 -2.83482 1.87358 2.29952 -2.83059 2.19502 1.50693 -3.20609 2.40429 1.19428 -3.925 2.41678 1.12285 -4.64267 2.401 0.697622 -5.40004 1.97181 -0.242834 -5.94753 0.896697 -1.25873 -5.34443 -0.58665 -1.88847 -3.93088 -1.96977 -2.08239 -3.0218 -2.40057 -1.60772 -3.22083 -1.57031 -0.0374185 -4.01896 -0.169405 2.0883 -4.31753 0.892261 4.00849 -3.67876 1.41118 5.48099 -2.61074 1.7627 6.85603 -1.6845 2.10579 8.2413 -1.24417 2.22692 9.286 -1.5107 2.06112 10.0391 -2.44161 1.90763 10.5549 -3.41862 1.90067 10.755 -3.89396 1.94392 10.7901 -4.31195 2.43374 11.0451 -5.04335 3.80537 12.0788 -5.12295 4.90313 13.1146 -4.34917 4.74875 13.0662 -3.65384 3.91579 11.5661 -3.8632 3.05507 9.35332 -4.31781 2.2809 7.13988 -4.30645 1.84409 5.44884 -3.82467 1.87671 4.53102 -3.19311" />
             </rotationKeyframes>
             <parentNodes count="2" indices="133 7" />
         </dAnimationTrack>

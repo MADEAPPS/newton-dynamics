@@ -1060,8 +1060,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, pose);
 
-
-//		LoadAnimation("whiteman_walk.ngd");
+		LoadAnimation("whiteman_walk.ngd");
 
 		controller->SetAnimationTree(animTree);
 
