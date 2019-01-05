@@ -12,16 +12,41 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimIKBlendNodeTake.h"
 
-dAnimIKBlendNodeTake::dAnimIKBlendNodeTake(dAnimIKController* const character)
+dAnimTakeData::dAnimTakeData(int tracksCount)
+	:dRefCounter()
+	,m_tracks()
+{
+	for (int i = 0; i < tracksCount; i ++) {
+		m_tracks.Append();
+	}
+}
+
+dAnimTakeData::~dAnimTakeData()
+{
+}
+
+dAnimTakeData::dAnimTakeTrack::dAnimTakeTrack()
+	:m_position()
+	,m_rotation()
+{
+}
+
+dAnimTakeData::dAnimTakeTrack::~dAnimTakeTrack()
+{
+}
+
+dAnimIKBlendNodeTake::dAnimIKBlendNodeTake(dAnimIKController* const character, dAnimTakeData* const takeData)
 	:dAnimIKBlendNode(character, NULL)
+	,m_takeData(takeData)
 {
 	dAssert(0);
+	m_takeData->AddRef();
 }
 
 dAnimIKBlendNodeTake::~dAnimIKBlendNodeTake()
 {
+	m_takeData->Release();
 }
-
 
 void dAnimIKBlendNodeTake::Evaluate(dAnimPose& output, dFloat timestep)
 {

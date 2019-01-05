@@ -100,10 +100,10 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual dTreeNode* GetMaterialCacheNode ();
 	DSCENE_API virtual dTreeNode* GetGeometryCacheNode ();
 	
+	DSCENE_API virtual dTreeNode* FindAnimationLayers() const;
 	DSCENE_API virtual dTreeNode* FindTextureCacheNode () const;
 	DSCENE_API virtual dTreeNode* FindGetMaterialCacheNode () const;
 	DSCENE_API virtual dTreeNode* FindGetGeometryCacheNode () const;
-
 
 	DSCENE_API virtual dTreeNode* AddNode(dNodeInfo* const sceneInfo, dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateNode (const char* const className, dTreeNode* const parent);

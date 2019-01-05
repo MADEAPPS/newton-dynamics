@@ -577,6 +577,11 @@ dScene::dTreeNode* dScene::GetGeometryCacheNode ()
 	return GetCacheNode (D_GEOMETRY_CACHE_NODE_MAME);
 }
 
+dScene::dTreeNode* dScene::FindAnimationLayers() const
+{
+	return FindChildByType(GetRootNode(), dAnimationLayers::GetRttiType());
+}
+
 dScene::dTreeNode* dScene::FindTextureCacheNode () const
 {
 	return FindChildByName(GetRootNode(), D_TEXTURE_CACHE_NODE_MAME);

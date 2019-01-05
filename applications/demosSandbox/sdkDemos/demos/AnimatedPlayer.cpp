@@ -1008,13 +1008,43 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		dAnimIKManager::PreUpdate(timestep);
 	}
 
-	void LoadAnimation(const char* const animName)
+	void LoadAnimation(dAnimIKController* const controller, const char* const animName)
 	{
 		dScene scene(GetWorld());
 
 		char pathName[2048];
 		dGetWorkingFileName(animName, pathName);
 		scene.Deserialize(pathName);
+
+		dScene::dTreeNode* const animLayer = scene.FindAnimationLayers();
+		if (animLayer) {
+			dScene::dTreeNode* const animTake = scene.FindChildByType(animLayer, dAnimationTake::GetRttiType());
+			if (animTake) {
+				dTree<dAnimTakeData::dAnimTakeTrack*, dString> map;
+				const dAnimPose& basePose = controller->GetBasePose();
+				dAnimTakeData* const animdata = new dAnimTakeData(basePose.GetCount());
+			
+				dList<dAnimTakeData::dAnimTakeTrack>& tracks = animdata->GetTracks();
+				dList<dAnimTakeData::dAnimTakeTrack>::dListNode* ptr = tracks.GetFirst();
+				for (dAnimPose::dListNode* ptrNode = basePose.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+					DemoEntity* const entity = (DemoEntity*)ptrNode->GetInfo().m_userData;
+					map.Insert(&ptr->GetInfo(), entity->GetName());
+					ptr = ptr->GetNext();
+				}
+
+				for (void* link = scene.GetFirstChildLink(animTake); link; link = scene.GetNextChildLink(animTake, link)) {
+					dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
+					dAnimationTrack* const track = (dAnimationTrack*)scene.GetInfoFromNode(node);
+					if (track->IsType(dAnimationTrack::GetRttiType())) {
+						dTree<dAnimTakeData::dAnimTakeTrack*, dString>::dTreeNode* const ptrNode = map.Find(track->GetName());
+						dAssert(ptrNode);
+						dAnimTakeData::dAnimTakeTrack* const destTrack = ptrNode->GetInfo();
+					}
+				}
+
+				animdata->Release();
+			}
+		}
 	}
 
 	void PopulateBasePose(dAnimPose& basePose, DemoEntity* const character)
@@ -1048,6 +1078,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 
 		//DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skintest.ngd", scene->GetNewton());
 		DemoEntity* const character = DemoEntity::LoadNGD_mesh(fileName, GetWorld());
+		character->SetNameID("dommyRoot");
 		character->ResetMatrix(*scene, character->GetCurrentMatrix() * origin);
 		scene->Append(character);
 
@@ -1060,7 +1091,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, pose);
 
-		LoadAnimation("whiteman_walk.ngd");
+		LoadAnimation(controller, "whiteman_walk.ngd");
 
 		controller->SetAnimationTree(animTree);
 
