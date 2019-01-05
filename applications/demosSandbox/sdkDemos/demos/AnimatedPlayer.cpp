@@ -864,6 +864,11 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 
 	~InverseKinematicAnimationManager()
 	{
+		while (m_animCache) {
+			dAnimTakeData* const data = m_animCache.GetRoot()->GetInfo();
+			data->Release();
+			m_animCache.Remove(m_animCache.GetRoot());
+		}
 	}
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
@@ -1008,43 +1013,95 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		dAnimIKManager::PreUpdate(timestep);
 	}
 
-	void LoadAnimation(dAnimIKController* const controller, const char* const animName)
+	dAnimTakeData* LoadAnimation(dAnimIKController* const controller, const char* const animName)
 	{
-		dScene scene(GetWorld());
+		dTree<dAnimTakeData*, dString>::dTreeNode* cachedAnimNode = m_animCache.Find(animName);
+		if (!cachedAnimNode) {
+			dScene scene(GetWorld());
+			char pathName[2048];
+			dGetWorkingFileName(animName, pathName);
+			scene.Deserialize(pathName);
 
-		char pathName[2048];
-		dGetWorkingFileName(animName, pathName);
-		scene.Deserialize(pathName);
+			dScene::dTreeNode* const animLayer = scene.FindAnimationLayers();
+			if (animLayer) {
+				dScene::dTreeNode* const animTake = scene.FindChildByType(animLayer, dAnimationTake::GetRttiType());
+				if (animTake) {
+					dTree<dAnimTakeData::dAnimTakeTrack*, dString> map;
+					const dAnimPose& basePose = controller->GetBasePose();
 
-		dScene::dTreeNode* const animLayer = scene.FindAnimationLayers();
-		if (animLayer) {
-			dScene::dTreeNode* const animTake = scene.FindChildByType(animLayer, dAnimationTake::GetRttiType());
-			if (animTake) {
-				dTree<dAnimTakeData::dAnimTakeTrack*, dString> map;
-				const dAnimPose& basePose = controller->GetBasePose();
-				dAnimTakeData* const animdata = new dAnimTakeData(basePose.GetCount());
-			
-				dList<dAnimTakeData::dAnimTakeTrack>& tracks = animdata->GetTracks();
-				dList<dAnimTakeData::dAnimTakeTrack>::dListNode* ptr = tracks.GetFirst();
-				for (dAnimPose::dListNode* ptrNode = basePose.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
-					DemoEntity* const entity = (DemoEntity*)ptrNode->GetInfo().m_userData;
-					map.Insert(&ptr->GetInfo(), entity->GetName());
-					ptr = ptr->GetNext();
-				}
+					dAnimTakeData* const animdata = new dAnimTakeData(basePose.GetCount());
+					cachedAnimNode = m_animCache.Insert(animdata, animName);
 
-				for (void* link = scene.GetFirstChildLink(animTake); link; link = scene.GetNextChildLink(animTake, link)) {
-					dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
-					dAnimationTrack* const track = (dAnimationTrack*)scene.GetInfoFromNode(node);
-					if (track->IsType(dAnimationTrack::GetRttiType())) {
-						dTree<dAnimTakeData::dAnimTakeTrack*, dString>::dTreeNode* const ptrNode = map.Find(track->GetName());
-						dAssert(ptrNode);
-						dAnimTakeData::dAnimTakeTrack* const destTrack = ptrNode->GetInfo();
+					dList<dAnimTakeData::dAnimTakeTrack>& tracks = animdata->GetTracks();
+					dList<dAnimTakeData::dAnimTakeTrack>::dListNode* ptr = tracks.GetFirst();
+					for (dAnimPose::dListNode* ptrNode = basePose.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+						DemoEntity* const entity = (DemoEntity*)ptrNode->GetInfo().m_userData;
+						map.Insert(&ptr->GetInfo(), entity->GetName());
+						ptr = ptr->GetNext();
+					}
+
+					for (void* link = scene.GetFirstChildLink(animTake); link; link = scene.GetNextChildLink(animTake, link)) {
+						dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
+						dAnimationTrack* const srcTrack = (dAnimationTrack*)scene.GetInfoFromNode(node);
+						if (srcTrack->IsType(dAnimationTrack::GetRttiType())) {
+							dTree<dAnimTakeData::dAnimTakeTrack*, dString>::dTreeNode* const ptrNode = map.Find(srcTrack->GetName());
+							dAssert(ptrNode);
+							dAnimTakeData::dAnimTakeTrack* const dstTrack = ptrNode->GetInfo();
+
+							const dList<dAnimationTrack::dCurveValue>& positions = srcTrack->GetPositions();
+							const dList<dAnimationTrack::dCurveValue>& rotations = srcTrack->GetRotations();
+
+							if (rotations.GetCount() && !positions.GetCount()) {
+								dstTrack->m_time.Resize(rotations.GetCount());
+								dstTrack->m_rotation.Resize(rotations.GetCount());
+								int index = 0;
+								for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
+									const dAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
+									dMatrix matrix(dPitchMatrix(keyFrame.m_x * dDegreeToRad) * dYawMatrix(keyFrame.m_y * dDegreeToRad) * dRollMatrix(keyFrame.m_z * dDegreeToRad));
+									dQuaternion rot(matrix);
+									dstTrack->m_rotation[index] = rot;
+									dstTrack->m_time[index] = keyFrame.m_time;
+									index++;
+								}
+							} else if (!rotations.GetCount() && positions.GetCount()) {
+								dstTrack->m_time.Resize(positions.GetCount());
+								dstTrack->m_position.Resize(positions.GetCount());
+								int index = 0;
+								for (dList<dAnimationTrack::dCurveValue>::dListNode* node = positions.GetFirst(); node; node = node->GetNext()) {
+									const dAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
+									dstTrack->m_time[index] = keyFrame.m_time;
+									dstTrack->m_position[index] = dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat(1.0f));
+									index++;
+								}
+							} else {
+								dAssert(rotations.GetCount() && positions.GetCount() && (rotations.GetCount() == positions.GetCount()));
+
+								dstTrack->m_time.Resize(rotations.GetCount());
+								dstTrack->m_rotation.Resize(rotations.GetCount());
+								dstTrack->m_position.Resize(positions.GetCount());
+								int index = 0;
+								dList<dAnimationTrack::dCurveValue>::dListNode* positNode = positions.GetFirst();
+								for (dList<dAnimationTrack::dCurveValue>::dListNode* rotaNode = rotations.GetFirst(); rotaNode; rotaNode = rotaNode->GetNext()) {
+									const dAnimationTrack::dCurveValue& rotaKeyframe = rotaNode->GetInfo();
+									const dAnimationTrack::dCurveValue& positKeyframe = positNode->GetInfo();
+									dAssert(rotaKeyframe.m_time == positKeyframe.m_time);
+									dMatrix matrix(dPitchMatrix(rotaKeyframe.m_x * dDegreeToRad) * dYawMatrix(rotaKeyframe.m_y * dDegreeToRad) * dRollMatrix(rotaKeyframe.m_z * dDegreeToRad));
+									dQuaternion rot(matrix);
+									dstTrack->m_rotation[index] = rot;
+									dstTrack->m_position[index] = dVector(positKeyframe.m_x, positKeyframe.m_y, positKeyframe.m_z, dFloat(1.0f));
+									dstTrack->m_time[index] = rotaKeyframe.m_time;
+									index++;
+									positNode = positNode->GetNext();
+								}
+							}
+						}
 					}
 				}
-
-				animdata->Release();
 			}
 		}
+
+		dAssert(cachedAnimNode);
+		return cachedAnimNode->GetInfo();
 	}
 
 	void PopulateBasePose(dAnimPose& basePose, DemoEntity* const character)
@@ -1087,11 +1144,12 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		
 		// populate base pose
 		PopulateBasePose(controller->GetBasePose(), character);
+		dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_walk.ngd");
 
 		dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, pose);
 
-		LoadAnimation(controller, "whiteman_walk.ngd");
+
 
 		controller->SetAnimationTree(animTree);
 
@@ -1099,6 +1157,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 	}
 
 	dAnimIKController* m_currentRig;
+	dTree<dAnimTakeData*, dString> m_animCache;
 };
 
 void AnimatedPlayerController(DemoEntityManager* const scene)

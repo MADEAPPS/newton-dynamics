@@ -38,15 +38,15 @@ class dAnimationTrack: public dNodeInfo
 	dAnimationTrack(dScene* const world);
 	virtual ~dAnimationTrack(void);
 
+	const dList<dCurveValue>& GetPositions() const;
+	const dList<dCurveValue>& GetRotations() const;
+
 	void AddPosition(dFloat time, dFloat x, dFloat y, dFloat z);
 	void AddRotation(dFloat time, dFloat x, dFloat y, dFloat z);
 	void OptimizeCurves();
 
 	protected:
 	virtual void BakeTransform(const dMatrix& matrix);
-
-	void OptimizeCurve(dList<dCurveValue>& curve);
-
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 

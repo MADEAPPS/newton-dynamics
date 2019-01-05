@@ -22,7 +22,7 @@ class dAnimTakeData: public dRefCounter
 	{
 		public:
 		dAnimTakeArray()
-			:m_count(0)
+			:m_capacity(0)
 			,m_data(NULL)
 		{
 		}
@@ -34,8 +34,58 @@ class dAnimTakeData: public dRefCounter
 			}
 		}
 
-		int m_count;
-		OBJECT* m_data;
+		OBJECT& operator[] (int i)
+		{
+			dAssert(i >= 0);
+			while (i >= m_capacity) {
+				Resize(i * 2);
+			}
+			return m_data[i];
+		}
+
+		const OBJECT& operator[] (int i) const
+		{
+			dAssert(i >= 0);
+			while (i >= m_capacity) {
+				Resize(i * 2);
+			}
+			return m_data[i];
+		}
+
+		int GetSize() const
+		{
+			return m_capacity;
+		}
+
+		void Resize(int size) const
+		{
+			if (size >= m_capacity) {
+				size = dMax(size, 16);
+				OBJECT* const newArray = new OBJECT[size];
+				if (m_data) {
+					for (int i = 0; i < m_capacity; i++) {
+						newArray[i] = m_data[i];
+					}
+					delete[] m_data;
+				}
+				m_data = newArray;
+				m_capacity = size;
+			} else if (size < m_capacity) {
+				size = dMax(size, 16);
+				OBJECT* const newArray = new OBJECT[size];
+				if (m_data) {
+					for (int i = 0; i < size; i++) {
+						newArray[i] = m_data[i];
+					}
+					delete[] m_data;
+				}
+				m_data = newArray;
+				m_capacity = size;
+			}
+		}
+
+		mutable int m_capacity;
+		mutable OBJECT* m_data;
 	};
 
 	class dAnimTakeTrack
@@ -44,8 +94,9 @@ class dAnimTakeData: public dRefCounter
 		dAnimTakeTrack();
 		~dAnimTakeTrack();
 
+		dAnimTakeArray<dFloat> m_time;
 		dAnimTakeArray<dVector> m_position;
-		dAnimTakeArray<dVector> m_rotation;
+		dAnimTakeArray<dQuaternion> m_rotation;
 	};
 
 	dAnimTakeData(int tracksCount);

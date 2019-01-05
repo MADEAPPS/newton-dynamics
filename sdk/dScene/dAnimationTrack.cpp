@@ -114,19 +114,18 @@ void dAnimationTrack::BakeTransform(const dMatrix& transform)
 	}
 }
 
-void dAnimationTrack::OptimizeCurves()
+const dList<dAnimationTrack::dCurveValue>& dAnimationTrack::GetPositions() const
 {
-	if (m_position.GetCount() > 2) {
-		OptimizeCurve(m_position);
-	}
-	if (m_rotation.GetCount() > 2) {
-		OptimizeCurve(m_rotation);
-	}
+	return m_position;
 }
 
-void dAnimationTrack::OptimizeCurve(dList<dCurveValue>& curve)
+const dList<dAnimationTrack::dCurveValue>& dAnimationTrack::GetRotations() const
 {
+	return m_rotation;
+}
 
+void dAnimationTrack::OptimizeCurves()
+{
 }
 
 void dAnimationTrack::Serialize (TiXmlElement* const rootNode) const
