@@ -124,6 +124,7 @@ typedef long long unsigned64;
 #include <dBezierSpline.h>
 
 #include <dCRC.h>
+#include <dMap.h>
 #include <dHeap.h>
 #include <dList.h>
 #include <dTree.h>

@@ -189,9 +189,15 @@ void NewtonSetPostUpdateCallback(const NewtonWorld* const newtonWorld, NewtonPos
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SetPostUpdateCallback(world, (dgPostUpdateCallback) callback);
+	world->SetPostUpdateCallback((dgPostUpdateCallback) callback);
 }
 
+NewtonPostUpdateCallback NewtonGetPostUpdateCallback(const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return (NewtonPostUpdateCallback)world->GetPostUpdateCallback();
+}
 
 int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld)
 {

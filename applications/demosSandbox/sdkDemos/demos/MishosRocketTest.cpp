@@ -290,6 +290,21 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	NewtonBodyAddTorque(body, &torque.m_x);
 }
 
+dMap<dCustomJoint*, dCustomJoint*> garbageCollectedJoints;
+NewtonPostUpdateCallback gParentCallback;
+
+static void GarbageCollectJoints(const NewtonWorld* const world, dFloat timestep)
+{
+	if (gParentCallback) {
+		gParentCallback(world, timestep);
+	}
+
+	while (garbageCollectedJoints.GetCount()) {
+		delete garbageCollectedJoints.GetRoot()->GetInfo();
+		garbageCollectedJoints.Remove(garbageCollectedJoints.GetRoot());
+	}
+}
+
 static void BreakHinge(const NewtonBody* body, dFloat timestep, int threadIndex)
 {
 	NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -298,20 +313,26 @@ static void BreakHinge(const NewtonBody* body, dFloat timestep, int threadIndex)
 	static unsigned atomicLock = 0;
 	if (scene->GetKeyState('1')) {
 		dCustomScopeLock lock(&atomicLock);
-		if (pHinge1) {
-			delete pHinge1;
+		if (!garbageCollectedJoints.Find(pHinge1)) {
+			garbageCollectedJoints.Insert(pHinge1, pHinge1);
 			pHinge1 = NULL;
 		}
 	}
 	if (scene->GetKeyState('2')) {
 		dCustomScopeLock lock(&atomicLock);
 		if (pHinge[0]) {
-			delete pHinge[0];
-			pHinge[0] = NULL;
-			delete pHinge[1];
-			pHinge[1] = NULL;
-			delete pHinge[2];
-			pHinge[2] = NULL;
+			if (!garbageCollectedJoints.Find(pHinge[0])) {
+				garbageCollectedJoints.Insert(pHinge[0], pHinge[0]);
+				pHinge[0] = NULL;
+			}
+			if (!garbageCollectedJoints.Find(pHinge[1])) {
+				garbageCollectedJoints.Insert(pHinge[1], pHinge[1]);
+				pHinge[1] = NULL;
+			}
+			if (!garbageCollectedJoints.Find(pHinge[2])) {
+				garbageCollectedJoints.Insert(pHinge[2], pHinge[2]);
+				pHinge[2] = NULL;
+			}
 		}
 	}
 }
@@ -445,6 +466,11 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 
 	NewtonSerializeToFile(scene->GetNewton(), "RocketLaunchFar.bin", NULL, NULL);
+
+
+	// chain the call back so that we cal delete object after the newton update
+	gParentCallback = NewtonGetPostUpdateCallback(world);
+	NewtonSetPostUpdateCallback(world, GarbageCollectJoints);
 }
 
 
@@ -462,6 +488,9 @@ void MishosHingeTestOLD(DemoEntityManager* const scene)
 	CoreMass = 1.0f;
 	PayloadMass = 1.0f;
 
+	// chain the call back so that we cal delete object after the newton update
+	gParentCallback = NewtonGetPostUpdateCallback(world);
+	NewtonSetPostUpdateCallback(world, GarbageCollectJoints);
 
 	// Make rocket core body...
 	//  NewtonCollision* const CoreShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 60.0f, 1, &offset[0][0]);
