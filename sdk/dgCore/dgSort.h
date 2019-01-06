@@ -23,6 +23,7 @@
 #ifndef __DG_SORT_H__
 #define __DG_SORT_H__
 #include "dgStdafx.h"
+#include "dgHeap.h"
 #include "dgThreadHive.h"
 
 #define DG_PARALLET_SORT_BATCH_SIZE	1024
