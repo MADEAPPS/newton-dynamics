@@ -46,6 +46,7 @@ class dAnimationTrack: public dNodeInfo
 	void OptimizeCurves();
 
 	protected:
+	void OptimizeCurve(dList<dCurveValue>& curve);
 	virtual void BakeTransform(const dMatrix& matrix);
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);

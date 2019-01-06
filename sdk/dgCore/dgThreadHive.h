@@ -279,7 +279,130 @@ DG_INLINE void dgThreadHive::ReleaseIndirectLock(dgInt32* const criticalSectionL
 		dgSpinUnlock(criticalSectionLock);
 	}
 }
-
 #endif
+
+
+#define DG_PARALLET_SORT_BATCH_SIZE	512 
+template <class T>
+class dgParallelSourtDesc
+{
+	public:
+	class dgRange
+	{
+		public:
+		dgRange() {}
+		dgRange(dgInt32 i0, dgInt32 i1)
+			:m_i0(i0)
+			,m_i1(i1)
+		{
+		}
+		dgInt32 m_i0;
+		dgInt32 m_i1;
+	};
+
+	typedef dgInt32(*CompareFunction) (const T* const A, const T* const B, void* const context);
+
+	dgParallelSourtDesc(dgThreadHive& threadPool, T* const array, dgInt32 elements, CompareFunction compareFunct, void* const context)
+		:m_data(array)
+		,m_callback(compareFunct)
+		,m_context(context)
+		,m_threadCount(threadPool.GetThreadCount())
+	{
+		dgDownHeap<dgRange, dgInt32> rangeMerge(m_buffer, sizeof(m_buffer));
+
+		dgRange range(0, elements - 1);
+		rangeMerge.Push(range, elements);
+
+		const dgInt32 batchSize = DG_PARALLET_SORT_BATCH_SIZE;
+		const dgInt32 rangesCount = m_threadCount;
+
+		while ((rangeMerge.GetCount() < rangesCount) && (rangeMerge.Value() > batchSize)) {
+			dgRange splitRange(rangeMerge[0]);
+			rangeMerge.Pop();
+
+			const dgInt32 lo = splitRange.m_i0;
+			const dgInt32 hi = splitRange.m_i1;
+			const dgInt32 mid = (lo + hi) >> 1;
+			if (m_callback(&array[lo], &array[mid], context) > 0) {
+				dgSwap(array[lo], array[mid]);
+			}
+			if (m_callback(&array[mid], &array[hi], context) > 0) {
+				dgSwap(array[mid], array[hi]);
+			}
+			if (m_callback(&array[lo], &array[mid], context) > 0) {
+				dgSwap(array[lo], array[mid]);
+			}
+			dgInt32 i = lo;
+			dgInt32 j = hi;
+			T pivot(array[mid]);
+			for (;;) {
+				do {
+					i++;
+				} while (m_callback(&array[i], &pivot, context) < 0);
+				do {
+					j--;
+				} while (m_callback(&array[j], &pivot, context) > 0);
+
+				if (i >= j) {
+					break;
+				}
+				dgSwap(array[i], array[j]);
+			}
+
+			dgRange newRange0(lo, j);
+			dgRange newRange1(j + 1, hi);
+			rangeMerge.Push(newRange0, j - lo + 1);
+			rangeMerge.Push(newRange1, hi - j);
+		}
+
+		m_rangeMerge = &rangeMerge;
+		for (dgInt32 i = 0; i < m_threadCount; i++) {
+			threadPool.QueueJob(dgParallelKernel, this, NULL, __FUNCTION__);
+		}
+		threadPool.SynchronizationBarrier();
+
+		#ifdef _DEBUG
+		for (dgInt32 i = 0; i < (elements - 1); i++) {
+			dgAssert(m_callback(&m_data[i], &m_data[i + 1], context) <= 0);
+		}
+		#endif
+	}
+
+	static void dgParallelKernel(void* const context, void* const worldContext, dgInt32 threadID)
+	{
+		dgParallelSourtDesc<T>* const me = (dgParallelSourtDesc<T>*) context;
+		me->dgParallelKernel(threadID);
+	}
+
+	void dgParallelKernel(dgInt32 threadID) 
+	{
+		dgDownHeap<dgRange, dgInt32>& rangeMerge = *((dgDownHeap<dgRange, dgInt32>*)m_rangeMerge);
+		const dgInt32 count = rangeMerge.GetCount();
+		for (dgInt32 i = threadID; i < count; i += m_threadCount) {
+			dgRange range(rangeMerge[i]);
+			T* const data = &m_data[range.m_i0];
+			dgSort(data, range.m_i1 - range.m_i0 + 1, m_callback, m_context);
+		}
+	}
+
+	T* m_data;
+	void* m_rangeMerge;
+	CompareFunction m_callback;
+	void* m_context;
+	int m_threadCount;
+	dgInt8 m_buffer[256 * sizeof (dgRange)];
+};
+
+template <class T>
+void dgParallelSort(dgThreadHive& threadPool, T* const array, dgInt32 elements, dgInt32(*compare) (const T* const A, const T* const B, void* const context), void* const context = NULL)
+{
+	DG_TRACKTIME(__FUNCTION__);
+	if ((threadPool.GetThreadCount() <= 1) || (elements < DG_PARALLET_SORT_BATCH_SIZE)) {
+//	if (1) {
+		dgSort(array, elements, compare, context);
+	} else {
+		dgParallelSourtDesc<T> sort(threadPool, array, elements, compare, context);
+	}
+}
 
 #endif

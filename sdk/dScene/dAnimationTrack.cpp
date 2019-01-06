@@ -124,8 +124,42 @@ const dList<dAnimationTrack::dCurveValue>& dAnimationTrack::GetRotations() const
 	return m_rotation;
 }
 
+void dAnimationTrack::OptimizeCurve(dList<dCurveValue>& curve)
+{
+	for (dList<dCurveValue>::dListNode* node0 = curve.GetFirst(); node0; node0 = node0->GetNext()) {
+
+		if (node0->GetNext()) {
+			const dCurveValue& value0 = node0->GetInfo();
+			dVector p0(value0.m_x, value0.m_y, value0.m_z, dFloat(0.0f));
+			for (dList<dCurveValue>::dListNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext()) {
+				const dCurveValue& value1 = node1->GetPrev()->GetInfo();
+				const dCurveValue& value2 = node1->GetInfo();
+				dVector p1(value1.m_x, value1.m_y, value1.m_z, dFloat(0.0f));
+				dVector p2(value2.m_x, value2.m_y, value2.m_z, dFloat(0.0f));
+
+				dVector p20(p2 - p0);
+				dVector p10(p1 - p0);
+				p20 = p20.Normalize();
+				dVector dist(p10 - p20.Scale(p10.DotProduct3(p20)));
+				dFloat mag2 = dist.DotProduct3(dist);
+				if (mag2 > dFloat (1.0e-4f)) {
+					break;
+				}
+				curve.Remove(node1->GetPrev());
+			}
+		}
+	}
+}
+
 void dAnimationTrack::OptimizeCurves()
 {
+	if (m_position.GetCount() && !m_rotation.GetCount()) {
+		OptimizeCurve(m_position);
+	} else if (!m_position.GetCount() && m_rotation.GetCount()) {
+		OptimizeCurve(m_rotation);
+	} else {
+
+	}
 }
 
 void dAnimationTrack::Serialize (TiXmlElement* const rootNode) const

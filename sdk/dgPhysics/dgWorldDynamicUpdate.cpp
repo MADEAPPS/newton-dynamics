@@ -339,8 +339,10 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	}
 
 	m_clusterData = &world->m_clusterMemory[0];
-	dgSort(augmentedJointArray, augmentedJointCount, CompareJointInfos);
-	dgSort(m_clusterData, clustersCount, CompareClusterInfos);
+//	dgSort(augmentedJointArray, augmentedJointCount, CompareJointInfos);
+//	dgSort(m_clusterData, clustersCount, CompareClusterInfos);
+	dgParallelSort(*world, augmentedJointArray, augmentedJointCount, CompareJointInfos);
+	dgParallelSort(*world, m_clusterData, clustersCount, CompareClusterInfos);
 
 	dgInt32 rowStart = 0;
 	dgInt32 bodyStart = 0;

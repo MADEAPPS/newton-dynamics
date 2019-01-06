@@ -39,7 +39,6 @@ dAnimIKBlendNodeTake::dAnimIKBlendNodeTake(dAnimIKController* const character, d
 	:dAnimIKBlendNode(character, NULL)
 	,m_takeData(takeData)
 {
-	dAssert(0);
 	m_takeData->AddRef();
 }
 

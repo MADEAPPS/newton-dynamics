@@ -547,7 +547,6 @@ void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 r
 template <class T> 
 void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
-//	DG_TRACKTIME_NAMED("dgSort");
 	DG_TRACKTIME(__FUNCTION__);
 	const dgInt32 batchSize = 8;
 	dgInt32 stack[1024][2];
@@ -572,10 +571,10 @@ void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* cons
 			}
 			dgInt32 i = lo + 1;
 			dgInt32 j = hi - 1;
-			T val (array[mid]);
+			T pivot (array[mid]);
 			do {    
-				while (compare (&array[i], &val, context) < 0) i ++;
-				while (compare (&array[j], &val, context) > 0) j --;
+				while (compare (&array[i], &pivot, context) < 0) i ++;
+				while (compare (&array[j], &pivot, context) > 0) j --;
 
 				if (i <= j)	{
 					dgSwap(array[i], array[j]);
