@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-#define DEFAULT_SCENE	8			// box stacks
+//#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -77,7 +77,7 @@
 //#define DEFAULT_SCENE	43			// cloth patch			
 //#define DEFAULT_SCENE	44			// soft bodies	
 //#define DEFAULT_SCENE	45			// joe's joint test
-//#define DEFAULT_SCENE	46			// Misho's Hinge Test
+#define DEFAULT_SCENE	46			// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -342,7 +342,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 	m_solverPasses = 4;
-	m_workerThreads = 4;
+	m_workerThreads = 1;
 //	m_solverSubSteps = 3;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;

@@ -909,8 +909,8 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	m_inUpdate ++;
 
 	DG_TRACKTIME(__FUNCTION__);
-	UpdateSkeletons();
 	UpdateBroadphase(timestep);
+	UpdateSkeletons();
 	UpdateDynamics (timestep);
 
 	if (m_listeners.GetCount()) {
