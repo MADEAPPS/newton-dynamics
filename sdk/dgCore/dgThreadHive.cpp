@@ -25,7 +25,6 @@
 #include "dgProfiler.h"
 #include "dgThreadHive.h"
 
-
 #ifdef USE_OLD_THREAD_POOL 
 dgThreadHive::dgWorkerThread::dgWorkerThread()
 	:dgThread()

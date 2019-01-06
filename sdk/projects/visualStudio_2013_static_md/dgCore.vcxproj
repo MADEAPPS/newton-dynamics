@@ -107,6 +107,7 @@
     <ClInclude Include="..\..\dgCore\dgRefCounter.h" />
     <ClInclude Include="..\..\dgCore\dgRtti.h" />
     <ClInclude Include="..\..\dgCore\dgSmallDeterminant.h" />
+    <ClInclude Include="..\..\dgCore\dgSort.h" />
     <ClInclude Include="..\..\dgCore\dgStack.h" />
     <ClInclude Include="..\..\dgCore\dgStdafx.h" />
     <ClInclude Include="..\..\dgCore\dgThread.h" />

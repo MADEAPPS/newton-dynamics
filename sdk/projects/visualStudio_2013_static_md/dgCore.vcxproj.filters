@@ -227,5 +227,8 @@
     <ClInclude Include="..\..\dgCore\dgThreadHive.h">
       <Filter>threading</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dgCore\dgSort.h">
+      <Filter>containers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

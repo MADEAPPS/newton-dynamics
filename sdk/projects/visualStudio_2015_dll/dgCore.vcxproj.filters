@@ -233,5 +233,8 @@
     <ClInclude Include="..\..\dgCore\dgProfiler.h">
       <Filter>util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dgCore\dgSort.h">
+      <Filter>containers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

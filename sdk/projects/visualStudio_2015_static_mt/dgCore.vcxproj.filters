@@ -239,5 +239,8 @@
     <ClInclude Include="..\..\dgCore\dgVectorScalar.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dgCore\dgSort.h">
+      <Filter>containers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

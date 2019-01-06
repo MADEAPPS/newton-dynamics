@@ -171,8 +171,6 @@ void dgSolver::InitJacobianMatrix()
 	}
 	m_world->SynchronizationBarrier();
 
-static int xxx;
-xxx++;
 	dgJointInfo* const jointArray = m_jointArray;
 //	dgSort(jointArray, m_cluster->m_jointCount, CompareJointInfos);
 	dgParallelSort(*m_world, jointArray, m_cluster->m_jointCount, CompareJointInfos);
