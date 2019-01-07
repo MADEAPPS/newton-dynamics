@@ -1024,14 +1024,17 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 			dGetWorkingFileName(animName, pathName);
 			scene.Deserialize(pathName);
 
-			dScene::dTreeNode* const animLayer = scene.FindAnimationLayers();
-			if (animLayer) {
-				dScene::dTreeNode* const animTake = scene.FindChildByType(animLayer, dAnimationTake::GetRttiType());
-				if (animTake) {
+			dScene::dTreeNode* const animLayerNode = scene.FindAnimationLayers();
+			if (animLayerNode) {
+				dScene::dTreeNode* const animTakeNode = scene.FindChildByType(animLayerNode, dAnimationTake::GetRttiType());
+				if (animTakeNode) {
 					dTree<dAnimTakeData::dAnimTakeTrack*, dString> map;
 					const dAnimPose& basePose = controller->GetBasePose();
 
 					dAnimTakeData* const animdata = new dAnimTakeData(basePose.GetCount());
+					dAnimationTake* const animTake = (dAnimationTake*)scene.GetInfoFromNode(animTakeNode);
+					animdata->SetPeriod(animTake->GetPeriod());
+
 					cachedAnimNode = m_animCache.Insert(animdata, animName);
 
 					dList<dAnimTakeData::dAnimTakeTrack>& tracks = animdata->GetTracks();
@@ -1042,7 +1045,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 						ptr = ptr->GetNext();
 					}
 
-					for (void* link = scene.GetFirstChildLink(animTake); link; link = scene.GetNextChildLink(animTake, link)) {
+					for (void* link = scene.GetFirstChildLink(animTakeNode); link; link = scene.GetNextChildLink(animTakeNode, link)) {
 						dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
 						dAnimationTrack* const srcTrack = (dAnimationTrack*)scene.GetInfoFromNode(node);
 						if (srcTrack->IsType(dAnimationTrack::GetRttiType())) {

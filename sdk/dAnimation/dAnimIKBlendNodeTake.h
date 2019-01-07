@@ -105,15 +105,16 @@ class dAnimTakeData: public dRefCounter
 	dAnimTakeData(int tracksCount);
 	~dAnimTakeData();
 
-	dList<dAnimTakeTrack>& GetTracks() { return m_tracks; }
+	dFloat GetPeriod() const { return m_period; }
+	void SetPeriod(dFloat period) { m_period = period;}
 
+	dList<dAnimTakeTrack>& GetTracks() { return m_tracks; }
 	
 	void CalculatePose(dAnimPose& output, dFloat t) const;
 	
 	dList<dAnimTakeTrack> m_tracks;
 	dFloat m_period;
 };
-
 
 class dAnimIKBlendNodeTake: public dAnimIKBlendNode
 {
