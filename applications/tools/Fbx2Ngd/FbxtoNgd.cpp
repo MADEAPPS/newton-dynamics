@@ -21,6 +21,8 @@
 
 #define DEFUALT_MATERIAL_ID -1
 
+#define ANIMATION_RESAMPLING	(1.0f/60.0f)
+
 class CheckMemoryLeaks
 {
 	public:
@@ -203,7 +205,6 @@ bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 	return lStatus;
 }
 
-
 bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 {
 	FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
@@ -244,6 +245,7 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 	axisMatrix.m_front = frontVector;
 	axisMatrix.m_up = upVector;
 	axisMatrix.m_right = frontVector.CrossProduct(upVector);
+	axisMatrix = axisMatrix * dYawMatrix(180.0f * dDegreeToRad);
 	convertMatrix = axisMatrix * convertMatrix;
 
 	PopulateScene(ngdScene, fbxScene);
@@ -413,6 +415,7 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 			animationTrack->SetName(ngdInfo->GetName());
 			ngdScene->AddReference(ngdNode, trackNode);
 
+#if 1
 			if (animCurveX) {
 				dAssert(animCurveY);
 				dAssert(animCurveZ);
@@ -452,9 +455,60 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 					dFloat x = animCurveRotX->EvaluateIndex(i);
 					dFloat y = animCurveRotY->EvaluateIndex(i);
 					dFloat z = animCurveRotZ->EvaluateIndex(i);
+dAssert(i || !keyTime.GetSecondDouble());
 					animationTrack->AddRotation(dFloat(keyTime.GetSecondDouble()), x, y, z);
 				}
 			}
+#else
+			FbxAnimCurve* curvexArray[6];
+
+			curvexArray[0] = animCurveX;
+			curvexArray[1] = animCurveY;
+			curvexArray[2] = animCurveZ;
+			curvexArray[3] = animCurveRotX;
+			curvexArray[4] = animCurveRotX;
+			curvexArray[5] = animCurveRotX;
+
+			dFloat t0 = 1.0e10f;
+			dFloat t1 = -1.0e10f;
+			for (int i = 0; i < 6; i++) {
+				FbxTimeSpan interval;
+				if (curvexArray[i]) {
+					curvexArray[i]->GetTimeInterval(interval);
+					t0 = dFloat(dMin(t0, dFloat(interval.GetStart().GetSecondDouble())));
+					t1 = dFloat(dMax(t1, dFloat(interval.GetStop().GetSecondDouble())));
+				}
+			}
+
+			dFloat period = t1 - t0;
+			dFloat timeAcc = 0.0f;
+			if (animCurveX) {
+				do {
+					FbxTime maxTime;
+					maxTime.SetSecondDouble(timeAcc);
+					dFloat x = dFloat(animCurveX->Evaluate(maxTime));
+					dFloat y = dFloat(animCurveY->Evaluate(maxTime));
+					dFloat z = dFloat(animCurveZ->Evaluate(maxTime));
+					animationTrack->AddPosition(timeAcc, x, y, z);
+
+					timeAcc += ANIMATION_RESAMPLING;
+				} while (timeAcc < period);
+			}
+			if (animCurveRotX) {
+				dAssert(animCurveRotY);
+				dAssert(animCurveRotZ);
+				do {
+					FbxTime maxTime;
+					maxTime.SetSecondDouble(timeAcc);
+					dFloat x = dFloat(animCurveRotX->Evaluate(maxTime));
+					dFloat y = dFloat(animCurveRotY->Evaluate(maxTime));
+					dFloat z = dFloat(animCurveRotZ->Evaluate(maxTime));
+					animationTrack->AddRotation(timeAcc, x, y, z);
+
+					timeAcc += ANIMATION_RESAMPLING;
+				} while (timeAcc < period);
+			}
+#endif
 			animationTrack->OptimizeCurves();
 		}
 
@@ -1051,8 +1105,8 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	NewtonWorld* newton = NewtonCreate();
-	dScene* ngdScene = new dScene(newton);
+	NewtonWorld* const newton = NewtonCreate();
+	dScene* const ngdScene = new dScene(newton);
 
 	if (ConvertToNgd(ngdScene, fbxScene)) {
 		char name[1024];

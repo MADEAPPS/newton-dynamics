@@ -1063,7 +1063,6 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 									dQuaternion rot(matrix);
 									dstTrack->m_rotation[index] = rot;
 									dstTrack->m_time[index] = keyFrame.m_time;
-dAssert(index || keyFrame.m_time == 0.0f);
 									index++;
 								}
 							} else if (!rotations.GetCount() && positions.GetCount()) {
