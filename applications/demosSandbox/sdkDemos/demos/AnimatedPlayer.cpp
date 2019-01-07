@@ -992,7 +992,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
 			const dAnimKeyframe& frame = node->GetInfo();
 			DemoEntity* const entity = (DemoEntity*) frame.m_userData;
-if (entity->GetName() == "mixamorig:RightUpLeg")
+//if (entity->GetName() == "mixamorig:RightUpLeg")
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
 		}
 	}
@@ -1176,14 +1176,16 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
-	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+	//dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+	dAnimIKController* const human = animationManager->CreateHuman("whiteman_walk.ngd", origin1);
 	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
 	
-
+/*
 DemoEntity* const referenceModel = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton());
 origin1.m_posit.m_z = 2.0f;
 referenceModel->ResetMatrix(*scene, referenceModel->GetCurrentMatrix() * origin1);
 scene->Append(referenceModel);
+*/
 	
 	origin.m_posit = dVector(-8.0f, 3.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);

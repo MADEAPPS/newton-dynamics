@@ -373,11 +373,6 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 	ImportAnimations(ngdScene, fbxScene, nodeMap);
 }
 
-
-void SetupTransformForNode(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const Node)
-{
-}
-
 void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode)
 {
 	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
@@ -444,12 +439,12 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 				dAssert(animCurveRotZ);
 
 				int keyCount = animCurveRotX->KeyGetCount();
-				dAssert(keyCount == animCurveRotY->KeyGetCount());
-				dAssert(keyCount == animCurveRotZ->KeyGetCount());
+				//dAssert(keyCount == animCurveRotY->KeyGetCount());
+				//dAssert(keyCount == animCurveRotZ->KeyGetCount());
 				for (int i = 0; i < keyCount; i++) {
 					FbxTime keyTime = animCurveRotX->KeyGetTime(i);
-					dAssert(keyTime == animCurveRotY->KeyGetTime(i));
-					dAssert(keyTime == animCurveRotZ->KeyGetTime(i));
+					//dAssert(keyTime == animCurveRotY->KeyGetTime(i));
+					//dAssert(keyTime == animCurveRotZ->KeyGetTime(i));
 
 					//dFloat x = animCurveRotX->KeyGetValue(i);
 					//dFloat y = animCurveRotY->KeyGetValue(i);
