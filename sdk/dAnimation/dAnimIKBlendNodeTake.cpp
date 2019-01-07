@@ -55,6 +55,7 @@ dAnimTakeData::dAnimTakeData(int tracksCount)
 	,m_tracks()
 	,m_period(1.0f)
 {
+//m_period = 2.63f;
 	for (int i = 0; i < tracksCount; i ++) {
 		m_tracks.Append();
 	}

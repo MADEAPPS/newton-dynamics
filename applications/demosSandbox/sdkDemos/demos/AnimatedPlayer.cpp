@@ -992,7 +992,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
 			const dAnimKeyframe& frame = node->GetInfo();
 			DemoEntity* const entity = (DemoEntity*) frame.m_userData;
-if (entity->GetName() == "mixamorig:LeftUpLeg")
+if (entity->GetName() == "mixamorig:RightUpLeg")
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
 		}
 	}
@@ -1063,6 +1063,7 @@ if (entity->GetName() == "mixamorig:LeftUpLeg")
 									dQuaternion rot(matrix);
 									dstTrack->m_rotation[index] = rot;
 									dstTrack->m_time[index] = keyFrame.m_time;
+dAssert(index || keyFrame.m_time == 0.0f);
 									index++;
 								}
 							} else if (!rotations.GetCount() && positions.GetCount()) {
@@ -1147,6 +1148,7 @@ if (entity->GetName() == "mixamorig:LeftUpLeg")
 		// populate base pose
 		PopulateBasePose(controller->GetBasePose(), character);
 		dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_walk.ngd");
+		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "skintest.ngd");
 
 		dAnimIKBlendNodeTake* const walk = new dAnimIKBlendNodeTake(controller, walkCycle);
 		//dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
@@ -1175,6 +1177,8 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
 	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
+	
 
 DemoEntity* const referenceModel = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton());
 origin1.m_posit.m_z = 2.0f;

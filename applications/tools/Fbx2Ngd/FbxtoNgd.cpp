@@ -84,13 +84,13 @@ static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene);
 static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
 static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene);
 static void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene);
-static void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap);
-static void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, GlobalNodeMap& nodeMap);
+static void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
+static void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
-static void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
+static void ImportTexture(FbxScene* const fbxScene, dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId);
-static void ImportAnimations(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap);
-static void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene, GlobalNodeMap& nodeMap, FbxNode* const pNode, dScene::dTreeNode* const animationLayers);
+static void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
+static void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode);
 
 
 int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
@@ -268,7 +268,7 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 	usedMaterials.Insert(0, defaulMaterialNode);
 
 	g_materialId = 0;
-	LoadHierarchy(fbxScene, ngdScene, nodeMap);
+	LoadHierarchy(ngdScene, fbxScene, nodeMap);
 
 	int boneId = 0;
 	GlobalNodeMap::Iterator iter(nodeMap);
@@ -299,7 +299,7 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 			{
 				case FbxNodeAttribute::eMesh:
 				{
-					ImportMeshNode(fbxScene, ngdScene, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials, nodeMap);
+					ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
 					break;
 				}
 
@@ -370,19 +370,37 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 			}
 		}
 	}
-
-	ImportAnimations(fbxScene, ngdScene, nodeMap);
+	ImportAnimations(ngdScene, fbxScene, nodeMap);
 }
 
-void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene, GlobalNodeMap& nodeMap, FbxNode* const rootNode, dScene::dTreeNode* const animationTakeNode)
+
+void SetupTransformForNode(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const Node)
 {
+}
+
+void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode)
+{
+	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
+
 	int stack = 1;
 	FbxNode* fbxNodes[32];
-	fbxNodes[0] = rootNode;
+	fbxNodes[0] = fbxRootnode;
 
 	while (stack) {
 		stack--;
 		FbxNode* const fbxNode = fbxNodes[stack];
+
+		fbxNode->SetPivotState(FbxNode::eSourcePivot, FbxNode::ePivotActive);
+		fbxNode->SetPivotState(FbxNode::eDestinationPivot, FbxNode::ePivotActive);
+
+		EFbxRotationOrder RotationOrder;
+		fbxNode->GetRotationOrder(FbxNode::eSourcePivot, RotationOrder);
+		fbxNode->SetRotationOrder(FbxNode::eDestinationPivot, RotationOrder);
+
+		dAssert(RotationOrder == FbxEuler::eEulerXYZ);
+
+		// Recursively convert the animation data according to pivot settings.
+		fbxNode->ConvertPivotAnimationRecursive(NULL, FbxNode::eDestinationPivot, FbxTime::GetFrameRate(fbxScene->GetGlobalSettings().GetTimeMode()), false);
 
 		FbxAnimCurve* const animCurveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
 		FbxAnimCurve* const animCurveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
@@ -412,9 +430,12 @@ void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene,
 					dAssert(keyTime == animCurveY->KeyGetTime(i));
 					dAssert(keyTime == animCurveZ->KeyGetTime(i));
 
-					dFloat x = animCurveX->KeyGetValue(i);
-					dFloat y = animCurveY->KeyGetValue(i);
-					dFloat z = animCurveZ->KeyGetValue(i);
+					//dFloat x = animCurveX->KeyGetValue(i);
+					//dFloat y = animCurveY->KeyGetValue(i);
+					//dFloat z = animCurveZ->KeyGetValue(i);
+					dFloat x = animCurveX->EvaluateIndex(i);
+					dFloat y = animCurveY->EvaluateIndex(i);
+					dFloat z = animCurveZ->EvaluateIndex(i);
 					animationTrack->AddPosition(dFloat (keyTime.GetSecondDouble()), x, y, z);
 				}
 			}
@@ -430,13 +451,15 @@ void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene,
 					dAssert(keyTime == animCurveRotY->KeyGetTime(i));
 					dAssert(keyTime == animCurveRotZ->KeyGetTime(i));
 
-					dFloat x = animCurveRotX->KeyGetValue(i);
-					dFloat y = animCurveRotY->KeyGetValue(i);
-					dFloat z = animCurveRotZ->KeyGetValue(i);
+					//dFloat x = animCurveRotX->KeyGetValue(i);
+					//dFloat y = animCurveRotY->KeyGetValue(i);
+					//dFloat z = animCurveRotZ->KeyGetValue(i);
+					dFloat x = animCurveRotX->EvaluateIndex(i);
+					dFloat y = animCurveRotY->EvaluateIndex(i);
+					dFloat z = animCurveRotZ->EvaluateIndex(i);
 					animationTrack->AddRotation(dFloat(keyTime.GetSecondDouble()), x, y, z);
 				}
 			}
-
 			animationTrack->OptimizeCurves();
 		}
 
@@ -447,7 +470,7 @@ void ImportAnimationLayer(FbxAnimLayer* const animLayer, dScene* const ngdScene,
 	}
 }
 
-void ImportAnimations(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap)
+void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
 {
 	const int numStacks = fbxScene->GetSrcObjectCount<FbxAnimStack>();
 	if (numStacks) {
@@ -469,12 +492,12 @@ void ImportAnimations(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNo
 			dScene::dTreeNode* const animationTakeNode = ngdScene->CreateAnimationTake();
 			dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
 			animationTake->SetName(animLayer->GetName());
-			ImportAnimationLayer(animLayer, ngdScene, nodeMap, fbxScene->GetRootNode(), animationTakeNode);
+			ImportAnimationLayer(ngdScene, fbxScene, nodeMap, animLayer, animationTakeNode);
 		}
 	}
 }
 
-void LoadHierarchy(FbxScene* const fbxScene, dScene* const ngdScene, GlobalNodeMap& nodeMap)
+void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
 {
 	dList <ImportStackData> nodeStack;
 
@@ -536,7 +559,7 @@ euler2 = euler2.Scale(dRadToDegree);
 	}
 }
 
-void ImportTexture(dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache)
+void ImportTexture(FbxScene* const fbxScene, dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache)
 {
 	int lTextureCount = pProperty.GetSrcObjectCount<FbxTexture>();
 	for (int j = 0; j < lTextureCount; ++j) {
@@ -730,14 +753,13 @@ void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* 
 			// assume layer 0 for now
 			FbxProperty textureProperty(fbxMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[0]));
 			if (textureProperty.IsValid()) {
-				ImportTexture(ngdScene, textureProperty, materialNode, textureCache);
+				ImportTexture(fbxScene, ngdScene, textureProperty, materialNode, textureCache);
 			}
 		}
 	}
 }
 
-
-void ImportMeshNode(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, GlobalNodeMap& nodeMap)
+void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
 {
 	GlobalMeshMap::dTreeNode* instanceNode = meshCache.Find(fbxMeshNode->GetMesh());
 	if (instanceNode) {

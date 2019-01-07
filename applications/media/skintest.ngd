@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <NewtonGameDynamnics>
     <header description="Newton Dynamnics 3.00, universal file format" revision="104" />
-    <nodes count="12">
+    <nodes count="15">
         <dRootNodeInfo>
             <dNodeInfo name="rootNode" fileIndex="0" editorFlags="0" />
-            <childrenNodes count="3" indices="1 3 10" />
+            <childrenNodes count="4" indices="1 3 10 12" />
         </dRootNodeInfo>
         <dSceneCacheInfo cacheId="-3320094658024126097">
             <dNodeInfo name="dMaterialCache" fileIndex="1" editorFlags="0" />
@@ -40,15 +40,15 @@
         <dSceneNodeInfo>
             <dNodeInfo name="Bone002" fileIndex="5" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="-1.4534e-07 -2.29314e-07 1.99486 1" eulerAngles="1.93773e-07 0.4947 -3.00755e-23 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <transform position="-1.4534e-07 -2.29314e-07 1.99486 1" eulerAngles="-0.750633 0.504946 -1.61428e-14 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="4" />
-            <childrenNodes count="2" indices="6 8" />
+            <childrenNodes count="3" indices="6 8 14" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="Bone003" fileIndex="6" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="-4.84467e-08 -2.88765e-15 2.14903 1" eulerAngles="1.09188e-22 -1.49012e-08 -7.10543e-15 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <transform position="-4.23908e-08 -6.05583e-08 2.14903 1" eulerAngles="7.07805e-08 -1.49012e-08 -2.77556e-17 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <parentNodes count="1" indices="5" />
             <childrenNodes count="1" indices="9" />
@@ -94,5 +94,23 @@
             <parentNodes count="2" indices="3 10" />
             <childrenNodes count="1" indices="2" />
         </dMeshNodeInfo>
+        <dAnimationLayers>
+            <dNodeInfo name="animationLayers" fileIndex="12" editorFlags="0" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="1" indices="13" />
+        </dAnimationLayers>
+        <dAnimationTake>
+            <dNodeInfo name="BaseLayer" fileIndex="13" editorFlags="0" />
+            <parentNodes count="1" indices="12" />
+            <childrenNodes count="1" indices="14" />
+        </dAnimationTake>
+        <dAnimationTrack>
+            <dNodeInfo name="Bone002" fileIndex="14" editorFlags="0" />
+            <rotationKeyframes>
+                <timeLine float="5" floats="0.0 1.66667 1.83333 2.5 3.33333" />
+                <angles float3="5" floats="-43.0081 28.9312 0 -1.00528 28.9312 0 1.11024e-05 28.9312 0 41.4338 28.9312 0 -0.0651395 28.9312 0" />
+            </rotationKeyframes>
+            <parentNodes count="2" indices="13 5" />
+        </dAnimationTrack>
     </nodes>
 </NewtonGameDynamnics>
