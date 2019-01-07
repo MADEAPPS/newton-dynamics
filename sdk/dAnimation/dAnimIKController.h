@@ -33,6 +33,7 @@ class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 //	dList<dAnimIDRigEffector*>& GetEffectors() {return m_effectors;}
 
 	dAnimPose& GetBasePose() {return m_basePose;}
+	dAnimIKBlendNodeRoot* GetAnimationTree() const;
 	void SetAnimationTree(dAnimIKBlendNodeRoot* const animTree);
 
 	protected:

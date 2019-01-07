@@ -154,11 +154,10 @@ void dAnimationTrack::OptimizeCurve(dList<dCurveValue>& curve)
 void dAnimationTrack::OptimizeCurves()
 {
 	if (m_position.GetCount() && !m_rotation.GetCount()) {
-		OptimizeCurve(m_position);
+//		OptimizeCurve(m_position);
 	} else if (!m_position.GetCount() && m_rotation.GetCount()) {
-		OptimizeCurve(m_rotation);
+//		OptimizeCurve(m_rotation);
 	} else {
-
 	}
 }
 

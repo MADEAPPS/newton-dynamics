@@ -932,7 +932,6 @@ void dMap<OBJECT, KEY>::Unlink (typename dMap<OBJECT, KEY>::dTreeNode* const nod
 	node->Unlink((dTreeNode** )&m_head);
 }
 
-
 template<class OBJECT, class KEY>
 void dMap<OBJECT, KEY>::Remove (typename dMap<OBJECT, KEY>::dTreeNode* const node)
 {

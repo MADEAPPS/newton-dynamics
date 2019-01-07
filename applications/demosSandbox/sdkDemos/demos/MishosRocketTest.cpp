@@ -349,7 +349,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	dFloat PayloadMass = 979452.0f;
 	dFloat CVXMass = 979452.0f;
 
-	double dVeryFar = 6371000.0f;
+	dFloat dVeryFar = 6371000.0f;
 	//  double dVeryFar = 0.0f;
 
 	//CoreMass = 1.0f;
@@ -362,8 +362,8 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonCompoundCollisionBeginAddRemove(CoreCompound);
 	NewtonCompoundCollisionAddSubCollision(CoreCompound, CoreShape);
 	NewtonCompoundCollisionEndAddRemove(CoreCompound);
-	//  dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, -30.0f, 0.0f));
-	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(dVeryFar, 0.0f, 0.0f));
+	dMatrix matrixCore(dGetIdentityMatrix());
+	matrixCore.m_posit = dVector(dFloat(dVeryFar), dFloat(0.0f), dFloat(0.0f), dFloat(1.0f));
 
 	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 	NewtonBody* const CoreBody = CreateSimpleSolid(scene, geometryCore, CoreMass, matrixCore, CoreCompound, 0);

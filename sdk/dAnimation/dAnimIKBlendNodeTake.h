@@ -60,7 +60,7 @@ class dAnimTakeData: public dRefCounter
 		void Resize(int size) const
 		{
 			if (size >= m_capacity) {
-				size = dMax(size, 16);
+				//size = dMax(size, 16);
 				OBJECT* const newArray = new OBJECT[size];
 				if (m_data) {
 					for (int i = 0; i < m_capacity; i++) {
@@ -71,7 +71,7 @@ class dAnimTakeData: public dRefCounter
 				m_data = newArray;
 				m_capacity = size;
 			} else if (size < m_capacity) {
-				size = dMax(size, 16);
+				//size = dMax(size, 16);
 				OBJECT* const newArray = new OBJECT[size];
 				if (m_data) {
 					for (int i = 0; i < size; i++) {
@@ -94,6 +94,9 @@ class dAnimTakeData: public dRefCounter
 		dAnimTakeTrack();
 		~dAnimTakeTrack();
 
+		int GetIndex(dFloat t) const;
+		dQuaternion InterpolateRotation(int base, dFloat t) const;
+
 		dAnimTakeArray<dFloat> m_time;
 		dAnimTakeArray<dVector> m_position;
 		dAnimTakeArray<dQuaternion> m_rotation;
@@ -104,7 +107,11 @@ class dAnimTakeData: public dRefCounter
 
 	dList<dAnimTakeTrack>& GetTracks() { return m_tracks; }
 
+	
+	void CalculatePose(dAnimPose& output, dFloat t) const;
+	
 	dList<dAnimTakeTrack> m_tracks;
+	dFloat m_period;
 };
 
 
@@ -116,6 +123,9 @@ class dAnimIKBlendNodeTake: public dAnimIKBlendNode
 
 	virtual void Evaluate(dAnimPose& output, dFloat timestep);
 
+	void SetFrame(dFloat t);
+
+	dFloat m_time;
 	dAnimTakeData* m_takeData;
 };
 

@@ -987,7 +987,8 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 		dAnimIKManager::UpdatePlayer(controller, timestep);
 
-		const dAnimPose& pose = controller->GetBasePose();
+//		const dAnimPose& pose = controller->GetBasePose();
+		const dAnimPose& pose = controller->GetAnimationTree()->GetPose();
 		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
 			const dAnimKeyframe& frame = node->GetInfo();
 			DemoEntity* const entity = (DemoEntity*) frame.m_userData;

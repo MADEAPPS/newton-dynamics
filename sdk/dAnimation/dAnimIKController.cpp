@@ -35,6 +35,11 @@ dAnimIKController::~dAnimIKController ()
 	}
 }
 
+dAnimIKBlendNodeRoot* dAnimIKController::GetAnimationTree() const
+{
+	return m_animationTree;
+}
+
 void dAnimIKController::SetAnimationTree(dAnimIKBlendNodeRoot* const animTree)
 {
 	if (m_animationTree) {
@@ -42,7 +47,6 @@ void dAnimIKController::SetAnimationTree(dAnimIKBlendNodeRoot* const animTree)
 	}
 	m_animationTree = animTree;
 }
-
 
 /*
 dAnimationEffectorBlendRoot* dAnimIKController::GetAnimationTree() const
