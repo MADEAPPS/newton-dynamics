@@ -14,7 +14,7 @@
 
 int dAnimTakeData::dAnimTakeTrack::GetIndex(dFloat t) const
 {
-	dAssert(t >= 0.0);
+	dAssert(t >= 0.0f);
 	if (t > m_time[m_time.GetSize() - 1]) {
 		t = m_time[m_time.GetSize() - 1];
 	}
@@ -40,6 +40,16 @@ int dAnimTakeData::dAnimTakeTrack::GetIndex(dFloat t) const
 	return i0;
 }
 
+dVector dAnimTakeData::dAnimTakeTrack::InterpolatePosition(int base, dFloat t) const
+{
+	const dFloat t0 = m_time[base];
+	const dFloat t1 = m_time[base + 1];
+	const dFloat param = (t - t0) / (t1 - t0 + dFloat(1.0e-6f));
+	const dVector& p0 = m_position[base];
+	const dVector& p1 = m_position[base + 1];
+	return p0 + (p1 - p0).Scale(param);
+}
+
 dQuaternion dAnimTakeData::dAnimTakeTrack::InterpolateRotation(int base, dFloat t) const
 {
 	const dFloat t0 = m_time[base];
@@ -55,7 +65,6 @@ dAnimTakeData::dAnimTakeData(int tracksCount)
 	,m_tracks()
 	,m_period(1.0f)
 {
-//m_period = 2.63f;
 	for (int i = 0; i < tracksCount; i ++) {
 		m_tracks.Append();
 	}
@@ -81,15 +90,16 @@ void dAnimTakeData::CalculatePose(dAnimPose& output, dFloat t) const
 	for (dList<dAnimTakeTrack>::dListNode* srcNode = m_tracks.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
 		const dAnimTakeTrack& track = srcNode->GetInfo();
 		if (track.m_rotation.GetSize() && track.m_position.GetSize()) {
-			//dAssert(0);
+			dAssert(track.m_time.GetSize() > 1);
+			dAnimKeyframe& keyFrameOut = destNode->GetInfo();
+			int index = track.GetIndex(t);
+			keyFrameOut.m_posit = track.InterpolatePosition(index, t);
+			keyFrameOut.m_rotation = track.InterpolateRotation(index, t);
 		} else if (track.m_rotation.GetSize()) {
 			dAnimKeyframe& keyFrameOut = destNode->GetInfo();
-			if (track.m_time.GetSize() > 1) {
-				int index = track.GetIndex(t);
-				keyFrameOut.m_rotation = track.InterpolateRotation(index, t);
-			} else {
-				keyFrameOut.m_rotation = track.m_rotation[0];
-			}
+			dAssert(track.m_time.GetSize() > 1);
+			int index = track.GetIndex(t);
+			keyFrameOut.m_rotation = track.InterpolateRotation(index, t);
 		} else if (track.m_position.GetSize()){
 			dAssert(0);
 		}

@@ -95,6 +95,7 @@ class dAnimTakeData: public dRefCounter
 		~dAnimTakeTrack();
 
 		int GetIndex(dFloat t) const;
+		dVector InterpolatePosition(int base, dFloat t) const;
 		dQuaternion InterpolateRotation(int base, dFloat t) const;
 
 		dAnimTakeArray<dFloat> m_time;
