@@ -15,18 +15,16 @@
 #include "dMatrix.h"
 #include "dQuaternion.h"
 
-
+enum QUAT_INDEX
+{
+	X_INDEX = 0,
+	Y_INDEX = 1,
+	Z_INDEX = 2
+};
+static QUAT_INDEX QIndex[] = { Y_INDEX, Z_INDEX, X_INDEX };
 
 dQuaternion::dQuaternion (const dMatrix &matrix)
 {
-	enum QUAT_INDEX
-	{
-		X_INDEX=0,
-		Y_INDEX=1,
-		Z_INDEX=2
-	};
-	static QUAT_INDEX QIndex [] = {Y_INDEX, Z_INDEX, X_INDEX};
-
 	dFloat trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
 	dAssert (matrix[2].DotProduct3(matrix[0].CrossProduct(matrix[1])) > 0.0f);
 
@@ -39,6 +37,7 @@ dQuaternion::dQuaternion (const dMatrix &matrix)
 		m_q3 = (matrix[0][1] - matrix[1][0]) * trace;
 
 	} else {
+
 		QUAT_INDEX i = X_INDEX;
 		if (matrix[Y_INDEX][Y_INDEX] > matrix[X_INDEX][X_INDEX]) {
 			i = Y_INDEX;
@@ -75,7 +74,6 @@ dQuaternion::dQuaternion (const dMatrix &matrix)
 
 }
 
-
 dQuaternion::dQuaternion (const dVector &unitAxis, dFloat angle)
 {
 	angle *= dFloat (0.5f);
@@ -91,7 +89,6 @@ dQuaternion::dQuaternion (const dVector &unitAxis, dFloat angle)
 	m_q2 = unitAxis.m_y * sinAng;
 	m_q3 = unitAxis.m_z * sinAng;
 }
-
 
 dVector dQuaternion::CalcAverageOmega (const dQuaternion &q1, dFloat invdt) const
 {
@@ -114,12 +111,11 @@ dVector dQuaternion::CalcAverageOmega (const dQuaternion &q1, dFloat invdt) cons
 	return omegaDir.Scale (dirMagInv * omegaMag);
 }
 
-
-dQuaternion dQuaternion::Slerp (const dQuaternion &QB, dFloat t) const 
+dQuaternion dQuaternion::Slerp (const dQuaternion &q1, dFloat t) const 
 {
-	dQuaternion Q;
+	dQuaternion q;
 
-	dFloat dot = DotProduct (QB);
+	dFloat dot = DotProduct (q1);
 	dAssert (dot >= 0.0f);
 
 	if ((dot + dFloat(1.0f)) > dFloat(1.0e-5f)) {
@@ -140,36 +136,36 @@ dQuaternion dQuaternion::Slerp (const dQuaternion &QB, dFloat t) const
 			Sclq = t;
 		}
 
-		Q.m_q0 = m_q0 * Sclp + QB.m_q0 * Sclq;
-		Q.m_q1 = m_q1 * Sclp + QB.m_q1 * Sclq;
-		Q.m_q2 = m_q2 * Sclp + QB.m_q2 * Sclq;
-		Q.m_q3 = m_q3 * Sclp + QB.m_q3 * Sclq;
+		q.m_q0 = m_q0 * Sclp + q1.m_q0 * Sclq;
+		q.m_q1 = m_q1 * Sclp + q1.m_q1 * Sclq;
+		q.m_q2 = m_q2 * Sclp + q1.m_q2 * Sclq;
+		q.m_q3 = m_q3 * Sclp + q1.m_q3 * Sclq;
 
 	} else {
-		Q.m_q0 =  m_q3;
-		Q.m_q1 = -m_q2;
-		Q.m_q2 =  m_q1;
-		Q.m_q3 =  m_q0;
+		q.m_q0 =  m_q3;
+		q.m_q1 = -m_q2;
+		q.m_q2 =  m_q1;
+		q.m_q3 =  m_q0;
 
 		dFloat Sclp = dSin ((dFloat(1.0f) - t) * dFloat (dPi *0.5f));
 		dFloat Sclq = dSin (t * dFloat (dPi * 0.5f));
 
-		Q.m_q0 = m_q0 * Sclp + Q.m_q0 * Sclq;
-		Q.m_q1 = m_q1 * Sclp + Q.m_q1 * Sclq;
-		Q.m_q2 = m_q2 * Sclp + Q.m_q2 * Sclq;
-		Q.m_q3 = m_q3 * Sclp + Q.m_q3 * Sclq;
+		q.m_q0 = m_q0 * Sclp + q.m_q0 * Sclq;
+		q.m_q1 = m_q1 * Sclp + q.m_q1 * Sclq;
+		q.m_q2 = m_q2 * Sclp + q.m_q2 * Sclq;
+		q.m_q3 = m_q3 * Sclp + q.m_q3 * Sclq;
 	}
 
-	dot = Q.DotProduct (Q);
+	dot = q.DotProduct (q);
 	if ((dot) < (1.0f - 1.0e-4f) ) {
 		dot = dFloat(1.0f) / dSqrt (dot);
 		//dot = dgRsqrt (dot);
-		Q.m_q0 *= dot;
-		Q.m_q1 *= dot;
-		Q.m_q2 *= dot;
-		Q.m_q3 *= dot;
+		q.m_q0 *= dot;
+		q.m_q1 *= dot;
+		q.m_q2 *= dot;
+		q.m_q3 *= dot;
 	}
-	return Q;
+	return q;
 }
 
 dVector dQuaternion::RotateVector (const dVector& point) const
@@ -184,14 +180,12 @@ dVector dQuaternion::UnrotateVector (const dVector& point) const
 	return matrix.UnrotateVector(point);
 }
 
-//dVector dQuaternion::GetEulerAngles (dEulerAngleOrder order) const
 void dQuaternion::GetEulerAngles(dVector& euler1, dVector& euler2, dEulerAngleOrder order) const 
 {
 	dMatrix matrix (*this, dVector (0.0f,0.0f,0.0f,1.0f));
 	//return matrix.GetEulerAngles (order);
     matrix.GetEulerAngles (euler1, euler2, order);
 }
-
 
 dQuaternion dQuaternion::IntegrateOmega (const dVector& omega, dFloat timestep) const
 {

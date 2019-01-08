@@ -18,7 +18,6 @@
 // calculate an orthonormal matrix with the front vector pointing on the 
 // dir direction, and the up and right are determined by using the GramSchidth procedure
 
-
 dMatrix dGetIdentityMatrix()
 {
 	return dMatrix (dVector (1.0f, 0.0f, 0.0f, 0.0f),
@@ -34,8 +33,6 @@ dMatrix dGetZeroMatrix ()
 					dVector (0.0f, 0.0f, 0.0f, 0.0f),
 					dVector (0.0f, 0.0f, 0.0f, 0.0f));
 }
-
-
 
 dMatrix dGrammSchmidt(const dVector& dir)
 {
@@ -57,7 +54,6 @@ dMatrix dGrammSchmidt(const dVector& dir)
 	right.m_w = 0.0f;
 	return dMatrix (front, up, right, dVector (0.0f, 0.0f, 0.0f, 1.0f));
 }
-
 
 dMatrix dPitchMatrix(dFloat ang)
 {
@@ -95,8 +91,6 @@ dMatrix dRollMatrix(dFloat ang)
 					dVector (   0.0f,   0.0f, 1.0f, 0.0f), 
 					dVector (   0.0f,   0.0f, 0.0f, 1.0f)); 
 }																		 
-
-
 
 dMatrix::dMatrix (const dQuaternion &rotation, const dVector &position)
 	:m_front(0.0f)
@@ -137,7 +131,6 @@ dMatrix::dMatrix (dFloat pitch, dFloat yaw, dFloat roll, const dVector& location
 	me.m_posit.m_w = 1.0f;
 }
 
-
 bool dMatrix::TestIdentity() const 
 {
 	const dMatrix& matrix = *this;
@@ -152,7 +145,6 @@ bool dMatrix::TestIdentity() const
 	}
 	return isIdentity;
 }
-
 
 bool dMatrix::TestOrthogonal() const
 {
@@ -171,7 +163,6 @@ bool dMatrix::TestOrthogonal() const
 		(dAbs(c - dFloat (1.0f)) < dFloat (1.0e-4f)) &
 		(dAbs(d - dFloat (1.0f)) < dFloat (1.0e-4f)); 
 }
-
 
 void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder order) const
 {

@@ -24,17 +24,16 @@
 #include "dgMatrix.h"
 #include "dgQuaternion.h"
 
+enum QUAT_INDEX
+{
+	X_INDEX = 0,
+	Y_INDEX = 1,
+	Z_INDEX = 2
+};
+static QUAT_INDEX QIndex[] = { Y_INDEX, Z_INDEX, X_INDEX };
 
 dgQuaternion::dgQuaternion (const dgMatrix& matrix)
 {
-	enum QUAT_INDEX
-	{
-		X_INDEX=0,
-		Y_INDEX=1,
-		Z_INDEX=2
-	};
-	static QUAT_INDEX QIndex [] = {Y_INDEX, Z_INDEX, X_INDEX};
-
 	dgFloat32 trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
 	if (trace > dgFloat32(0.0f)) {
 		trace = dgSqrt (trace + dgFloat32(1.0f));
@@ -79,7 +78,6 @@ dgQuaternion::dgQuaternion (const dgMatrix& matrix)
 #endif
 }
 
-
 dgQuaternion::dgQuaternion (const dgVector &unitAxis, dgFloat32 angle)
 {
 	angle *= dgFloat32 (0.5f);
@@ -96,7 +94,6 @@ dgQuaternion::dgQuaternion (const dgVector &unitAxis, dgFloat32 angle)
 	m_q3 = unitAxis.m_z * sinAng;
 
 }
-
 
 dgVector dgQuaternion::CalcAverageOmega (const dgQuaternion &q1, dgFloat32 invdt) const
 {
@@ -119,64 +116,57 @@ dgVector dgQuaternion::CalcAverageOmega (const dgQuaternion &q1, dgFloat32 invdt
 	return omegaDir.Scale (dirMagInv * omegaMag);
 }
 
-
-dgQuaternion dgQuaternion::Slerp (const dgQuaternion &QB, dgFloat32 t) const 
+dgQuaternion dgQuaternion::Slerp (const dgQuaternion &q1, dgFloat32 t) const 
 {
-	dgFloat32 dot;
-	dgFloat32 ang;
-	dgFloat32 Sclp;
-	dgFloat32 Sclq;
-	dgFloat32 den;
-	dgFloat32 sinAng;
-	dgQuaternion Q;
+	dgQuaternion q0;
 
-	dot = DotProduct (QB);
-
+	dgFloat32 dot = DotProduct (q1);
 	if ((dot + dgFloat32(1.0f)) > dgEPSILON) {
+		dgFloat32 Sclp;
+		dgFloat32 Sclq;
 		if (dot < (dgFloat32(1.0f) - dgEPSILON) ) {
-			ang = dgAcos (dot);
+			dgFloat32 ang = dgAcos (dot);
 
-			sinAng = dgSin (ang);
-			den = dgFloat32(1.0f) / sinAng;
+			dgFloat32 sinAng = dgSin (ang);
+			dgFloat32 den = dgFloat32(1.0f) / sinAng;
 
 			Sclp = dgSin ((dgFloat32(1.0f) - t ) * ang) * den;
 			Sclq = dgSin (t * ang) * den;
-
 		} else  {
 			Sclp = dgFloat32(1.0f) - t;
 			Sclq = t;
 		}
 
-		Q.m_q0 = m_q0 * Sclp + QB.m_q0 * Sclq;
-		Q.m_q1 = m_q1 * Sclp + QB.m_q1 * Sclq;
-		Q.m_q2 = m_q2 * Sclp + QB.m_q2 * Sclq;
-		Q.m_q3 = m_q3 * Sclp + QB.m_q3 * Sclq;
+		q0.m_q0 = m_q0 * Sclp + q1.m_q0 * Sclq;
+		q0.m_q1 = m_q1 * Sclp + q1.m_q1 * Sclq;
+		q0.m_q2 = m_q2 * Sclp + q1.m_q2 * Sclq;
+		q0.m_q3 = m_q3 * Sclp + q1.m_q3 * Sclq;
 
 	} else {
-		Q.m_q0 =  m_q3;
-		Q.m_q1 = -m_q2;
-		Q.m_q2 =  m_q1;
-		Q.m_q3 =  m_q0;
+		q0.m_q0 =  m_q3;
+		q0.m_q1 = -m_q2;
+		q0.m_q2 =  m_q1;
+		q0.m_q3 =  m_q0;
 
-		Sclp = dgSin ((dgFloat32(1.0f) - t) * dgPI * dgFloat32 (0.5f));
-		Sclq = dgSin (t * dgPI * dgFloat32 (0.5f));
+		dgFloat32 Sclp = dgSin ((dgFloat32(1.0f) - t) * dgPI * dgFloat32 (0.5f));
+		dgFloat32 Sclq = dgSin (t * dgPI * dgFloat32 (0.5f));
 
-		Q.m_q0 = m_q0 * Sclp + Q.m_q0 * Sclq;
-		Q.m_q1 = m_q1 * Sclp + Q.m_q1 * Sclq;
-		Q.m_q2 = m_q2 * Sclp + Q.m_q2 * Sclq;
-		Q.m_q3 = m_q3 * Sclp + Q.m_q3 * Sclq;
+		q0.m_q0 = m_q0 * Sclp + q0.m_q0 * Sclq;
+		q0.m_q1 = m_q1 * Sclp + q0.m_q1 * Sclq;
+		q0.m_q2 = m_q2 * Sclp + q0.m_q2 * Sclq;
+		q0.m_q3 = m_q3 * Sclp + q0.m_q3 * Sclq;
 	}
 
-	dot = Q.DotProduct (Q);
+	dot = q0.DotProduct (q0);
 	if ((dot) < dgFloat32(1.0f - dgEPSILON * 10.0f) ) {
 		//dot = dgFloat32(1.0f) / dgSqrt (dot);
 		dot = dgRsqrt (dot);
-		Q.m_q0 *= dot;
-		Q.m_q1 *= dot;
-		Q.m_q2 *= dot;
-		Q.m_q3 *= dot;
+		q0.m_q0 *= dot;
+		q0.m_q1 *= dot;
+		q0.m_q2 *= dot;
+		q0.m_q3 *= dot;
 	}
-	return Q;
+	return q0;
 }
 
 

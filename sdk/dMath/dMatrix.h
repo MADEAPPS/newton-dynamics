@@ -119,7 +119,6 @@ inline const dVector& dMatrix::operator[] (int  i) const
 	return (&m_front)[i];
 }
 
-
 dMatrix dRollMatrix(dFloat ang);
 dMatrix dYawMatrix(dFloat ang);
 dMatrix dPitchMatrix(dFloat ang);

@@ -136,7 +136,7 @@ void DemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix,
 		dMatrix transform(matrix);
 		//dQuaternion rot1(transform);
 		dQuaternion rot;
-		NewtonBodyGetRotation(body, &rot.m_q0);
+		NewtonBodyGetRotation(body, &rot.m_q1);
 
 		scene->Lock(ent->m_lock);
 		ent->SetMatrixUsafe(rot, transform.m_posit);
