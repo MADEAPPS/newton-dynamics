@@ -4954,10 +4954,10 @@ void NewtonBodyGetRotation(const NewtonBody* const bodyPtr, dFloat* const rotPtr
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgQuaternion rot = body->GetRotation();
-	rotPtr[0] = rot.m_q1;
-	rotPtr[1] = rot.m_q2;
-	rotPtr[2] = rot.m_q3;
-	rotPtr[3] = rot.m_q0;
+	rotPtr[0] = rot.m_x;
+	rotPtr[1] = rot.m_y;
+	rotPtr[2] = rot.m_z;
+	rotPtr[3] = rot.m_w;
 }
 
 
