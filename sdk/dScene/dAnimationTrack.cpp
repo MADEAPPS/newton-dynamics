@@ -72,7 +72,7 @@ void dAnimationTrack::BakeTransform(const dMatrix& transform)
 			dCurveValue& rotValue = rotNode->GetInfo();
 			dCurveValue& positValue = positNode->GetInfo();
 			dMatrix m(dPitchMatrix(rotValue.m_x * dDegreeToRad) * dYawMatrix(rotValue.m_y * dDegreeToRad) * dRollMatrix(rotValue.m_z * dDegreeToRad));
-			m.m_posit = dVector(positValue.m_x, positValue.m_y, positValue.m_z, 0.0f);
+			m.m_posit = dVector(positValue.m_x, positValue.m_y, positValue.m_z, 1.0f);
 			dMatrix matrix(invert * m * transform);
 
 			dVector scale;
@@ -81,10 +81,10 @@ void dAnimationTrack::BakeTransform(const dMatrix& transform)
 			matrix.PolarDecomposition(output, scale, eigenScaleAxis);
 			output.GetEulerAngles(euler, tmp);
 			euler = euler.Scale(dRadToDegree);
+
 			rotValue.m_x = euler.m_x;
 			rotValue.m_y = euler.m_y;
 			rotValue.m_z = euler.m_z;
-
 			positValue.m_x = output.m_posit.m_x;
 			positValue.m_y = output.m_posit.m_y;
 			positValue.m_z = output.m_posit.m_z;
@@ -107,6 +107,7 @@ void dAnimationTrack::BakeTransform(const dMatrix& transform)
 			matrix.PolarDecomposition(output, scale, eigenScaleAxis);
 			output.GetEulerAngles(euler, tmp);
 			euler = euler.Scale(dRadToDegree);
+
 			value.m_x = euler.m_x;
 			value.m_y = euler.m_y;
 			value.m_z = euler.m_z;

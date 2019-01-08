@@ -100,7 +100,7 @@ void dAnimTakeData::CalculatePose(dAnimPose& output, dFloat t) const
 			dAssert(track.m_time.GetSize() > 1);
 			int index = track.GetIndex(t);
 			keyFrameOut.m_rotation = track.InterpolateRotation(index, t);
-		} else if (track.m_position.GetSize()){
+		} else if (track.m_position.GetSize()) {
 			dAssert(0);
 		}
 

@@ -991,8 +991,13 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		const dAnimPose& pose = controller->GetAnimationTree()->GetPose();
 		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
 			const dAnimKeyframe& frame = node->GetInfo();
-			DemoEntity* const entity = (DemoEntity*) frame.m_userData;
-//if (entity->GetName() == "mixamorig:RightUpLeg")
+			DemoEntity* const entity = (DemoEntity*)frame.m_userData;
+if (//(entity->GetName() == "mixamorig:Hips") ||
+(entity->GetName() == "mixamorig:LeftUpLeg") ||
+(entity->GetName() == "mixamorig:RightUpLeg") ||
+//(entity->GetName() == "mixamorig:RightLeg") ||
+//(entity->GetName() == "mixamorig:LeftLeg") ||
+(entity->GetName() == "xxxxxxxx"))
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
 		}
 	}
@@ -1061,11 +1066,19 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 								dstTrack->m_rotation.Resize(rotations.GetCount());
 								int index = 0;
 								for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
-									const dAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
+									//const dAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
+ dAnimationTrack::dCurveValue keyFrame (node->GetInfo());
+if ((ptrNode->GetKey() == "mixamorig:RightLeg") || (ptrNode->GetKey() == "mixamorig:LeftLeg")) {
+keyFrame.m_x = 0.0f;
+keyFrame.m_y = 0.0f;
+dTrace(("%d %f %f %f\n", index, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
+}
+
 									dMatrix matrix(dPitchMatrix(keyFrame.m_x * dDegreeToRad) * dYawMatrix(keyFrame.m_y * dDegreeToRad) * dRollMatrix(keyFrame.m_z * dDegreeToRad));
 									dQuaternion rot(matrix);
 									dstTrack->m_rotation[index] = rot;
 									dstTrack->m_time[index] = keyFrame.m_time;
+
 									index++;
 								}
 							} else if (!rotations.GetCount() && positions.GetCount()) {
@@ -1155,8 +1168,6 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		dAnimIKBlendNodeTake* const walk = new dAnimIKBlendNodeTake(controller, walkCycle);
 		//dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, walk);
-
-//delete walk;
 
 		controller->SetAnimationTree(animTree);
 

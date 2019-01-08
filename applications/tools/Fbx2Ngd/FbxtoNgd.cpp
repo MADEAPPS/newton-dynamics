@@ -84,14 +84,14 @@ class LocalMaterialMap: public dTree<dScene::dTreeNode*, int>
 static int g_materialId = 0;
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene);
 static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
-static bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene);
-static void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene);
 static void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
+static bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importMesh, bool importAnimations);
+static void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool importMesh, bool importAnimations);
 static void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* const fbxMeshNode, dScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 static void ImportTexture(FbxScene* const fbxScene, dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId);
-static void PrepareSkeletonForAnimation(FbxScene* const fbxScene);
+static void PrepareSkeleton(FbxScene* const fbxScene);
 static dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const animLayer);
 static void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
 static void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode);
@@ -207,7 +207,7 @@ bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 	return lStatus;
 }
 
-bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
+bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importMesh, bool importAnimations)
 {
 	FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
 
@@ -248,9 +248,10 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 	axisMatrix.m_up = upVector;
 	axisMatrix.m_right = frontVector.CrossProduct(upVector);
 	axisMatrix = axisMatrix * dYawMatrix(180.0f * dDegreeToRad);
+//axisMatrix = dGetIdentityMatrix();
 	convertMatrix = axisMatrix * convertMatrix;
 
-	PopulateScene(ngdScene, fbxScene);
+	PopulateScene(ngdScene, fbxScene, importMesh, importAnimations);
 
 	ngdScene->RemoveUnusedMaterials();
 	ngdScene->BakeTransform(convertMatrix);
@@ -258,7 +259,7 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* fbxScene)
 	return true;
 }
 
-void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
+void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool importMesh, bool importAnimations)
 {
 	GlobalNodeMap nodeMap;
 	GlobalMeshMap meshCache;
@@ -272,35 +273,37 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 	usedMaterials.Insert(0, defaulMaterialNode);
 
 	g_materialId = 0;
+	PrepareSkeleton(fbxScene);
 	LoadHierarchy(ngdScene, fbxScene, nodeMap);
 
-	int boneId = 0;
-	GlobalNodeMap::Iterator iter(nodeMap);
-	for (iter.Begin(); iter; iter++) {
-		FbxNode* const fbxNode = iter.GetKey();
-		dScene::dTreeNode* const ngdNode = iter.GetNode()->GetInfo();
-		FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
+	if (importMesh) {
+		int boneId = 0;
+		GlobalNodeMap::Iterator iter(nodeMap);
+		for (iter.Begin(); iter; iter++) {
+			FbxNode* const fbxNode = iter.GetKey();
+			dScene::dTreeNode* const ngdNode = iter.GetNode()->GetInfo();
+			FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
 
-		if (attribute) {
-			FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
-			if (attributeType == FbxNodeAttribute::eSkeleton)
-			{
-				ImportSkeleton(ngdScene, fbxScene, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials, boneId);
-				boneId++;
+			if (attribute) {
+				FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
+				if (attributeType == FbxNodeAttribute::eSkeleton)
+				{
+					ImportSkeleton(ngdScene, fbxScene, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials, boneId);
+					boneId++;
+				}
 			}
 		}
-	}
 
-	for (iter.Begin(); iter; iter++) {
-		FbxNode* const fbxNode = iter.GetKey();
-		dScene::dTreeNode* const ngdNode = iter.GetNode()->GetInfo();
-		FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
+		for (iter.Begin(); iter; iter++) {
+			FbxNode* const fbxNode = iter.GetKey();
+			dScene::dTreeNode* const ngdNode = iter.GetNode()->GetInfo();
+			FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
 
-		if (attribute) {
-			FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
+			if (attribute) {
+				FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
 
-			switch (attributeType)
-			{
+				switch (attributeType)
+				{
 				case FbxNodeAttribute::eMesh:
 				{
 					ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
@@ -354,30 +357,34 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene)
 				default:
 					dAssert(0);
 					break;
+				}
 			}
 		}
-	}
 
-	UsedMaterials::Iterator iter1(usedMaterials);
-	for (iter1.Begin(); iter1; iter1++) {
-		int count = iter1.GetNode()->GetInfo();
-		if (!count) {
-			dScene::dTreeNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
-			dScene::dTreeNode* const materialNode = iter1.GetKey();
-			void* nextLink;
-			for (void* link = ngdScene->GetFirstParentLink(materialNode); link; link = nextLink) {
-				nextLink = ngdScene->GetNextParentLink(materialNode, link);
-				dScene::dTreeNode* const parentNode = ngdScene->GetNodeFromLink(link);
-				if (parentNode != materiaCacheNode) {
-					ngdScene->RemoveReference(parentNode, materialNode);
+		UsedMaterials::Iterator iter1(usedMaterials);
+		for (iter1.Begin(); iter1; iter1++) {
+			int count = iter1.GetNode()->GetInfo();
+			if (!count) {
+				dScene::dTreeNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
+				dScene::dTreeNode* const materialNode = iter1.GetKey();
+				void* nextLink;
+				for (void* link = ngdScene->GetFirstParentLink(materialNode); link; link = nextLink) {
+					nextLink = ngdScene->GetNextParentLink(materialNode, link);
+					dScene::dTreeNode* const parentNode = ngdScene->GetNodeFromLink(link);
+					if (parentNode != materiaCacheNode) {
+						ngdScene->RemoveReference(parentNode, materialNode);
+					}
 				}
 			}
 		}
 	}
-	ImportAnimations(ngdScene, fbxScene, nodeMap);
+
+	if (importAnimations) {
+		ImportAnimations(ngdScene, fbxScene, nodeMap);
+	}
 }
 
-void PrepareSkeletonForAnimation(FbxScene* const fbxScene)
+void PrepareSkeleton(FbxScene* const fbxScene)
 {
 	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
 
@@ -445,9 +452,9 @@ dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const an
 	return t1 - t0;
 }
 
+#if 1
 void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode)
 {
-	PrepareSkeletonForAnimation(fbxScene);
 	dFloat period = CalculateAnimationPeriod(fbxScene, animLayer);
 
 	dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
@@ -484,11 +491,11 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 				dAssert(animCurveZ);
 				dFloat timeAcc = 0.0f;
 				do {
-					FbxTime maxTime;
-					maxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveX->Evaluate(maxTime));
-					dFloat y = dFloat(animCurveY->Evaluate(maxTime));
-					dFloat z = dFloat(animCurveZ->Evaluate(maxTime));
+					FbxTime fbxTime;
+					fbxTime.SetSecondDouble(timeAcc);
+					dFloat x = dFloat(animCurveX->Evaluate(fbxTime));
+					dFloat y = dFloat(animCurveY->Evaluate(fbxTime));
+					dFloat z = dFloat(animCurveZ->Evaluate(fbxTime));
 					animationTrack->AddPosition(timeAcc, x, y, z);
 
 					timeAcc += ANIMATION_RESAMPLING;
@@ -498,12 +505,18 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 				dAssert(animCurveRotY);
 				dAssert(animCurveRotZ);
 				dFloat timeAcc = 0.0f;
+//int xxxxx = 0;
 				do {
-					FbxTime maxTime;
-					maxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveRotX->Evaluate(maxTime));
-					dFloat y = dFloat(animCurveRotY->Evaluate(maxTime));
-					dFloat z = dFloat(animCurveRotZ->Evaluate(maxTime));
+					FbxTime fbxTime;
+					fbxTime.SetSecondDouble(timeAcc);
+					dFloat x = dFloat(animCurveRotX->Evaluate(fbxTime));
+					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime));
+					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime));
+
+//if ((xxxx == "mixamorig:LeftUpLeg") ||
+//	(xxxx == "mixamorig:LeftLeg"))
+//	dTrace(("%d %f %f %f\n", xxxxx++, x, y, z));
+
 					animationTrack->AddRotation(timeAcc, x, y, z);
 
 					timeAcc += ANIMATION_RESAMPLING;
@@ -519,11 +532,13 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 	}
 }
 
-/*
+#else
 void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode)
 {
-	PrepareSkeletonForAnimation(fbxScene);
 	dFloat period = CalculateAnimationPeriod(fbxScene, animLayer);
+
+	dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
+	animationTake->SetPeriod(period);
 
 	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
 
@@ -549,9 +564,9 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 			dScene::dTreeNode* const ngdNode = nodeMap.Find(fbxNode)->GetInfo();
 			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
 			animationTrack->SetName(ngdInfo->GetName());
-			ngdScene->AddReference(ngdNode, trackNode);
+//dString xxxx(ngdInfo->GetName());
 
-#if 0
+			ngdScene->AddReference(ngdNode, trackNode);
 			if (animCurveX) {
 				dAssert(animCurveY);
 				dAssert(animCurveZ);
@@ -570,6 +585,7 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 					dFloat x = animCurveX->EvaluateIndex(i);
 					dFloat y = animCurveY->EvaluateIndex(i);
 					dFloat z = animCurveZ->EvaluateIndex(i);
+
 					animationTrack->AddPosition(dFloat (keyTime.GetSecondDouble()), x, y, z);
 				}
 			}
@@ -591,60 +607,18 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 					dFloat x = animCurveRotX->EvaluateIndex(i);
 					dFloat y = animCurveRotY->EvaluateIndex(i);
 					dFloat z = animCurveRotZ->EvaluateIndex(i);
-dAssert(i || !keyTime.GetSecondDouble());
+
+//if ((xxxx == "mixamorig:LeftUpLeg") ||
+//(xxxx == "mixamorig:LeftLeg"))
+//dTrace(("%d %f %f %f\n", i, x, y, z));
+
 					animationTrack->AddRotation(dFloat(keyTime.GetSecondDouble()), x, y, z);
 				}
+
+//if ((xxxx == "mixamorig:LeftUpLeg") ||
+//(xxxx == "mixamorig:LeftLeg"))
+//dTrace(("\n"));
 			}
-#else
-			FbxAnimCurve* curvexArray[6];
-
-			curvexArray[0] = animCurveX;
-			curvexArray[1] = animCurveY;
-			curvexArray[2] = animCurveZ;
-			curvexArray[3] = animCurveRotX;
-			curvexArray[4] = animCurveRotX;
-			curvexArray[5] = animCurveRotX;
-
-			dFloat t0 = 1.0e10f;
-			dFloat t1 = -1.0e10f;
-			for (int i = 0; i < 6; i++) {
-				FbxTimeSpan interval;
-				if (curvexArray[i]) {
-					curvexArray[i]->GetTimeInterval(interval);
-					t0 = dFloat(dMin(t0, dFloat(interval.GetStart().GetSecondDouble())));
-					t1 = dFloat(dMax(t1, dFloat(interval.GetStop().GetSecondDouble())));
-				}
-			}
-
-			dFloat period = t1 - t0;
-			dFloat timeAcc = 0.0f;
-			if (animCurveX) {
-				do {
-					FbxTime maxTime;
-					maxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveX->Evaluate(maxTime));
-					dFloat y = dFloat(animCurveY->Evaluate(maxTime));
-					dFloat z = dFloat(animCurveZ->Evaluate(maxTime));
-					animationTrack->AddPosition(timeAcc, x, y, z);
-
-					timeAcc += ANIMATION_RESAMPLING;
-				} while (timeAcc < period);
-			}
-			if (animCurveRotX) {
-				dAssert(animCurveRotY);
-				dAssert(animCurveRotZ);
-				do {
-					FbxTime maxTime;
-					maxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveRotX->Evaluate(maxTime));
-					dFloat y = dFloat(animCurveRotY->Evaluate(maxTime));
-					dFloat z = dFloat(animCurveRotZ->Evaluate(maxTime));
-					animationTrack->AddRotation(timeAcc, x, y, z);
-
-					timeAcc += ANIMATION_RESAMPLING;
-				} while (timeAcc < period);
-			}
-#endif
 			animationTrack->OptimizeCurves();
 		}
 
@@ -654,7 +628,7 @@ dAssert(i || !keyTime.GetSecondDouble());
 		}
 	}
 }
-*/
+#endif
 
 void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
 {
@@ -682,6 +656,7 @@ void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNo
 		}
 	}
 }
+
 
 void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
 {
@@ -1245,7 +1220,9 @@ int main(int argc, char** argv)
 	NewtonWorld* const newton = NewtonCreate();
 	dScene* const ngdScene = new dScene(newton);
 
-	if (ConvertToNgd(ngdScene, fbxScene)) {
+	bool importMesh = true;
+	bool importAnimations = true;
+	if (ConvertToNgd(ngdScene, fbxScene, importMesh, importAnimations)) {
 		char name[1024];
 		strcpy(name, argv[1]);
 		_strlwr(name);
