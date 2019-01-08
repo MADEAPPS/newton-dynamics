@@ -252,10 +252,10 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 			dFloat t (0.5f);
 			dFloat s (1.0f - 0.5f);
 			if (q0.DotProduct(q1) < 0) s *= -1;
-			qAV.m_q0 = t*q1.m_q0 + s*q0.m_q0;
-			qAV.m_q1 = t*q1.m_q1 + s*q0.m_q1;
-			qAV.m_q2 = t*q1.m_q2 + s*q0.m_q2;
-			qAV.m_q3 = t*q1.m_q3 + s*q0.m_q3;
+			qAV.m_w = t*q1.m_w + s*q0.m_w;
+			qAV.m_x = t*q1.m_x + s*q0.m_x;
+			qAV.m_y = t*q1.m_y + s*q0.m_y;
+			qAV.m_z = t*q1.m_z + s*q0.m_z;
 			qAV.Normalize();
 
 			//dFloat unTwistAngle = XAngle (q0, qAV);
@@ -327,15 +327,15 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 			// measure error
 			dQuaternion qt0 = m_target * q1;
 			dQuaternion qErr = ((q0.DotProduct(qt0) < 0)	
-				? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) 
-				: dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
+				? dQuaternion(-q0.m_w, q0.m_x, q0.m_y, q0.m_z) 
+				: dQuaternion(q0.m_w, -q0.m_x, -q0.m_y, -q0.m_z)) * qt0;
 			qErr.Normalize();
 
-			dFloat errorAngle = 2 * dAcos(dClamp (qErr.m_q0, dFloat(-1), dFloat(1)));
+			dFloat errorAngle = 2 * dAcos(dClamp (qErr.m_w, dFloat(-1), dFloat(1)));
 
 			if (errorAngle > E_angle) 
 			{
-				errorAxis = dVector (qErr.m_q1, qErr.m_q2, qErr.m_q3, 0);
+				errorAxis = dVector (qErr.m_x, qErr.m_y, qErr.m_z, 0);
 				errorAxis = errorAxis.Scale(1 / dSqrt(errorAxis.DotProduct3(errorAxis)));
 			} 
 
@@ -425,8 +425,8 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, twistAxis, 0,1,1);
 					// try to account for orthogonal fix (rotationAxis may not be exactly (1,0,0)), but just worse - i still don't understand what causes unorthogonality - ignore this
 
 					dQuaternion qt = q1 * q0.Inverse();
-					dVector rotationAxis (qt.m_q1, qt.m_q2, qt.m_q3);
-					dFloat rotationAngle = 2 * dAcos(dClamp(qt.m_q0, dFloat(-1), dFloat(1)));
+					dVector rotationAxis (qt.m_x, qt.m_y, qt.m_z);
+					dFloat rotationAngle = 2 * dAcos(dClamp(qt.m_w, dFloat(-1), dFloat(1)));
 					dFloat sql = rotationAxis.DotProduct3(rotationAxis);
 					if (sql > E)
 					{
@@ -611,10 +611,10 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 					dFloat t (0.5f);
 					dFloat s (1.0f - 0.5f);
 					if (q0.DotProduct(q1) < 0) s *= -1;
-					qAV.m_q0 = t*q1.m_q0 + s*q0.m_q0;
-					qAV.m_q1 = t*q1.m_q1 + s*q0.m_q1;
-					qAV.m_q2 = t*q1.m_q2 + s*q0.m_q2;
-					qAV.m_q3 = t*q1.m_q3 + s*q0.m_q3;
+					qAV.m_w = t*q1.m_w + s*q0.m_w;
+					qAV.m_x = t*q1.m_x + s*q0.m_x;
+					qAV.m_y = t*q1.m_y + s*q0.m_y;
+					qAV.m_z = t*q1.m_z + s*q0.m_z;
 					qAV.Normalize();
 
 					dFloat unTwistAngle = XAngle (q0, qAV);

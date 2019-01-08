@@ -396,15 +396,15 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		dQuaternion q0(matrix0);
 		dQuaternion q1(matrix1);
 		dQuaternion qt0 = m_target * q1;
-		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
+		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_w, q0.m_x, q0.m_y, q0.m_z) : dQuaternion(q0.m_w, -q0.m_x, -q0.m_y, -q0.m_z)) * qt0;
 		qErr.Normalize();
 
-		dFloat errorAngle = 2.0f * dAcos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
+		dFloat errorAngle = 2.0f * dAcos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_w)));
 		dVector errorAngVel(0, 0, 0);
 
 		dMatrix basis;
 		if (errorAngle > 1.0e-10f) {
-			dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
+			dVector errorAxis(qErr.m_x, qErr.m_y, qErr.m_z, 0.0f);
 			errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis.DotProduct3(errorAxis)));
 			errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
 
@@ -1240,15 +1240,15 @@ struct JoesNewRagdollJoint: public dCustomJoint
 			dQuaternion q0(matrix0);
 			dQuaternion q1(matrix1);
 			dQuaternion qt0 = m_target * q1;
-			dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f) ? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
+			dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f) ? dQuaternion(-q0.m_w, q0.m_x, q0.m_y, q0.m_z) : dQuaternion(q0.m_w, -q0.m_x, -q0.m_y, -q0.m_z)) * qt0;
 			qErr.Normalize();
 
-			dFloat errorAngle = 2.0f * dFloat(dAcos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0))));
+			dFloat errorAngle = 2.0f * dFloat(dAcos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_w))));
 			dVector errorAngVel(0, 0, 0);
 
 			dMatrix basis;
 			if (errorAngle > 1.0e-10f) {
-				dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
+				dVector errorAxis(qErr.m_x, qErr.m_y, qErr.m_z, 0.0f);
 				errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis.DotProduct3(errorAxis)));
 				errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
 

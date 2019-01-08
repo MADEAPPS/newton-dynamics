@@ -98,20 +98,20 @@ dMatrix::dMatrix (const dQuaternion &rotation, const dVector &position)
 	,m_right(0.0f)
 	,m_posit(0.0f)
 {
-	dFloat x2 = dFloat (2.0f) * rotation.m_q1 * rotation.m_q1;
-	dFloat y2 = dFloat (2.0f) * rotation.m_q2 * rotation.m_q2;
-	dFloat z2 = dFloat (2.0f) * rotation.m_q3 * rotation.m_q3;
+	dFloat x2 = dFloat (2.0f) * rotation.m_x * rotation.m_x;
+	dFloat y2 = dFloat (2.0f) * rotation.m_y * rotation.m_y;
+	dFloat z2 = dFloat (2.0f) * rotation.m_z * rotation.m_z;
 #ifdef _DEBUG
-	dFloat w2 = dFloat (2.0f) * rotation.m_q0 * rotation.m_q0;
+	dFloat w2 = dFloat (2.0f) * rotation.m_w * rotation.m_w;
 	dAssert (dAbs (w2 + x2 + y2 + z2 - dFloat(2.0f)) < dFloat (1.e-2f));
 #endif
 
-	dFloat xy = dFloat (2.0f) * rotation.m_q1 * rotation.m_q2;
-	dFloat xz = dFloat (2.0f) * rotation.m_q1 * rotation.m_q3;
-	dFloat xw = dFloat (2.0f) * rotation.m_q1 * rotation.m_q0;
-	dFloat yz = dFloat (2.0f) * rotation.m_q2 * rotation.m_q3;
-	dFloat yw = dFloat (2.0f) * rotation.m_q2 * rotation.m_q0;
-	dFloat zw = dFloat (2.0f) * rotation.m_q3 * rotation.m_q0;
+	dFloat xy = dFloat (2.0f) * rotation.m_x * rotation.m_y;
+	dFloat xz = dFloat (2.0f) * rotation.m_x * rotation.m_z;
+	dFloat xw = dFloat (2.0f) * rotation.m_x * rotation.m_w;
+	dFloat yz = dFloat (2.0f) * rotation.m_y * rotation.m_z;
+	dFloat yw = dFloat (2.0f) * rotation.m_y * rotation.m_w;
+	dFloat zw = dFloat (2.0f) * rotation.m_z * rotation.m_w;
 
 	m_front = dVector (dFloat(1.0f) - y2 - z2, xy + zw				 , xz - yw				  , dFloat(0.0f));
 	m_up    = dVector (xy - zw				 , dFloat(1.0f) - x2 - z2, yz + xw				  , dFloat(0.0f));
