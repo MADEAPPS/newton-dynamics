@@ -255,6 +255,7 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importM
 
 	ngdScene->RemoveUnusedMaterials();
 	ngdScene->BakeTransform(convertMatrix);
+	ngdScene->FreezeGeometryPivot();
 
 	return true;
 }

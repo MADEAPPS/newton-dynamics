@@ -195,15 +195,15 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
 			const dAnimKeyframe& frame = node->GetInfo();
 			DemoEntity* const entity = (DemoEntity*)frame.m_userData;
-/*
+
 if (
 (entity->GetName() == "mixamorig:Hips") ||
-//(entity->GetName() == "mixamorig:LeftUpLeg") ||
-//(entity->GetName() == "mixamorig:RightUpLeg") ||
-//(entity->GetName() == "mixamorig:RightLeg") ||
-//(entity->GetName() == "mixamorig:LeftLeg") ||
+(entity->GetName() == "mixamorig:LeftUpLeg") ||
+(entity->GetName() == "mixamorig:RightUpLeg") ||
+(entity->GetName() == "mixamorig:RightLeg") ||
+(entity->GetName() == "mixamorig:LeftLeg") ||
 (entity->GetName() == "xxxxxxxx")) 
-*/
+
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
 		
 		}
