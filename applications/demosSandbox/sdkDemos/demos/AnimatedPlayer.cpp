@@ -195,15 +195,17 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
 			const dAnimKeyframe& frame = node->GetInfo();
 			DemoEntity* const entity = (DemoEntity*)frame.m_userData;
+/*
 if (
 (entity->GetName() == "mixamorig:LeftUpLeg") ||
 (entity->GetName() == "mixamorig:RightUpLeg") ||
 //(entity->GetName() == "mixamorig:RightLeg") ||
 //(entity->GetName() == "mixamorig:LeftLeg") ||
-	(entity->GetName() == "xxxxxxxx")) {
+(entity->GetName() == "xxxxxxxx")) 
+*/
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
+		
 		}
-	}
 	}
 
 	void PreUpdate(dFloat timestep)
@@ -271,7 +273,8 @@ if (
 								int index = 0;
 								for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
 									//const dAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
- dAnimationTrack::dCurveValue keyFrame (node->GetInfo());
+									dAnimationTrack::dCurveValue keyFrame (node->GetInfo());
+/*
 if (
 (ptrNode->GetKey() == "mixamorig:RightUpLeg") ||
 (ptrNode->GetKey() == "mixamorig:LeftUpLeg") ||
@@ -283,6 +286,7 @@ keyFrame.m_y = 0.0f;
 keyFrame.m_z = dPi;
 dTrace(("%d %f %f %f\n", index, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
 }
+*/
 
 									dMatrix matrix(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
 									dQuaternion rot(matrix);
@@ -399,8 +403,8 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
-	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
-	//dAnimIKController* const human = animationManager->CreateHuman("whiteman_walk.ngd", origin1);
+	//dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+	dAnimIKController* const human = animationManager->CreateHuman("whiteman_walk.ngd", origin1);
 	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
 	
 /*

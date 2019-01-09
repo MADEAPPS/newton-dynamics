@@ -247,8 +247,8 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importM
 	axisMatrix.m_front = frontVector;
 	axisMatrix.m_up = upVector;
 	axisMatrix.m_right = frontVector.CrossProduct(upVector);
-	axisMatrix = axisMatrix * dYawMatrix(180.0f * dDegreeToRad);
-//axisMatrix = dGetIdentityMatrix();
+	axisMatrix = axisMatrix * dYawMatrix(dPi);
+axisMatrix = dGetIdentityMatrix();
 	convertMatrix = axisMatrix * convertMatrix;
 
 	PopulateScene(ngdScene, fbxScene, importMesh, importAnimations);
@@ -386,11 +386,12 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool import
 
 void PrepareSkeleton(FbxScene* const fbxScene)
 {
-	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
-
 	int stack = 1;
 	FbxNode* fbxNodes[32];
-	fbxNodes[0] = fbxRootnode;
+	fbxNodes[0] = fbxScene->GetRootNode();
+
+	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
+	evaluator->Reset();
 
 	while (stack) {
 		stack--;
@@ -461,6 +462,8 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 	animationTake->SetPeriod(period);
 
 	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
+	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
+	evaluator->Reset();
 
 	int stack = 1;
 	FbxNode* fbxNodes[32];
@@ -513,9 +516,19 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime)) * dDegreeToRad;
 					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime)) * dDegreeToRad;
 
+/*
+FbxAMatrix globalMatrix = fbxNode->EvaluateGlobalTransform(fbxTime);
+dMatrix localMatrix(evaluator->GetNodeLocalTransform(fbxNode));
 //if ((xxxx == "mixamorig:LeftUpLeg") ||
 //	(xxxx == "mixamorig:LeftLeg"))
 //	dTrace(("%d %f %f %f\n", xxxxx++, x, y, z));
+dVector euler0;
+dVector euler1;
+localMatrix.GetEulerAngles(euler0, euler1);
+x = euler0.m_x;
+y = euler0.m_y;
+z = euler0.m_z;
+*/
 
 					animationTrack->AddRotation(timeAcc, x, y, z);
 
@@ -632,6 +645,7 @@ void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNo
 	const int numStacks = fbxScene->GetSrcObjectCount<FbxAnimStack>();
 	if (numStacks) {
 		FbxAnimStack* const animStack = fbxScene->GetSrcObject<FbxAnimStack>(0);
+		fbxScene->SetCurrentAnimationStack(animStack);
 
 		FbxString lOutputString = "Animation Stack Name: ";
 		lOutputString += animStack->GetName();
