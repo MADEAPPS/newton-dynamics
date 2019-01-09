@@ -248,7 +248,7 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importM
 	axisMatrix.m_up = upVector;
 	axisMatrix.m_right = frontVector.CrossProduct(upVector);
 	axisMatrix = axisMatrix * dYawMatrix(dPi);
-axisMatrix = dGetIdentityMatrix();
+//axisMatrix = dGetIdentityMatrix();
 	convertMatrix = axisMatrix * convertMatrix;
 
 	PopulateScene(ngdScene, fbxScene, importMesh, importAnimations);
@@ -1135,12 +1135,12 @@ z = euler0.m_z;
 		do {
 			FbxTime fbxTime;
 			fbxTime.SetSecondDouble(timeAcc);
-			//data.m_fbxNode->EvaluateLocalTransform(fbxTime);
-			dMatrix parentMatrix(data.m_fbxNode->GetParent()->EvaluateGlobalTransform(fbxTime));
-			dMatrix nodeMatrix (data.m_fbxNode->EvaluateGlobalTransform(fbxTime));
+			// not fact to back this but function does not seems to work 
 			//dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
-//			dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
+			dMatrix parentMatrix(data.m_fbxNode->GetParent()->EvaluateGlobalTransform(fbxTime));
+			dMatrix nodeMatrix(data.m_fbxNode->EvaluateGlobalTransform(fbxTime));
 			dMatrix localMatrix(nodeMatrix * parentMatrix.Inverse4x4());
+
 			animationTrack->AddKeyframe(timeAcc, localMatrix);
 			timeAcc += ANIMATION_RESAMPLING;
 		} while (timeAcc < period);
