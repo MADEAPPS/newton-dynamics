@@ -399,8 +399,8 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
-	//dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
-	dAnimIKController* const human = animationManager->CreateHuman("whiteman_walk.ngd", origin1);
+	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+	//dAnimIKController* const human = animationManager->CreateHuman("whiteman_walk.ngd", origin1);
 	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
 	
 /*
