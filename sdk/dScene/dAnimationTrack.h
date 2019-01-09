@@ -47,9 +47,11 @@ class dAnimationTrack: public dNodeInfo
 	void AddKeyframe(dFloat time, const dMatrix& matrix);
 
 	void OptimizeCurves();
+	virtual void FreezeScale(const dMatrix& matrix);
 
 	protected:
 	void OptimizeCurve(dList<dCurveValue>& curve);
+	
 	virtual void BakeTransform(const dMatrix& matrix);
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);

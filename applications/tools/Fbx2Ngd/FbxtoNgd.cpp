@@ -255,7 +255,15 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importM
 
 	ngdScene->RemoveUnusedMaterials();
 	ngdScene->BakeTransform(convertMatrix);
-	ngdScene->FreezeGeometryPivot();
+//	ngdScene->FreezeGeometryPivot();
+	ngdScene->FreezeScale();
+/*
+dMatrix xxxx(dGetIdentityMatrix());
+xxxx[0][0] = 1.0f / 0.366717f;
+xxxx[1][1] = 1.0f / 0.366717f;
+xxxx[2][2] = 1.0f / 0.366717f;
+ngdScene->BakeTransform(xxxx);
+*/	
 
 	return true;
 }
@@ -305,59 +313,53 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool import
 
 				switch (attributeType)
 				{
-				case FbxNodeAttribute::eMesh:
-				{
-					ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
-					break;
-				}
+					case FbxNodeAttribute::eMesh:
+					{
+						ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
+						break;
+					}
 
-				case FbxNodeAttribute::eSkeleton:
-				{
-					//ImportSkeleton(ngdScene, fbxScene, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials, boneId);
-					//boneId++;
-					break;
-				}
+					case FbxNodeAttribute::eLine:
+					{
+						dAssert(0);
+						//ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+						break;
+					}
 
-				case FbxNodeAttribute::eLine:
-				{
-					dAssert(0);
-					//ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-					break;
-				}
+					case FbxNodeAttribute::eNurbsCurve:
+					{
+						dAssert(0);
+						//ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+						break;
+					}
 
-				case FbxNodeAttribute::eNurbsCurve:
-				{
-					dAssert(0);
-					//ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-					break;
-				}
+					case FbxNodeAttribute::eSkeleton:
+					case FbxNodeAttribute::eNull:
+					{
+						break;
+					}
 
-				case FbxNodeAttribute::eNull:
-				{
-					break;
-				}
+					case FbxNodeAttribute::eMarker:
+					case FbxNodeAttribute::eNurbs:
+					case FbxNodeAttribute::ePatch:
+					case FbxNodeAttribute::eCamera:
+					case FbxNodeAttribute::eCameraStereo:
+					case FbxNodeAttribute::eCameraSwitcher:
+					case FbxNodeAttribute::eLight:
+					case FbxNodeAttribute::eOpticalReference:
+					case FbxNodeAttribute::eOpticalMarker:
 
-				case FbxNodeAttribute::eMarker:
-				case FbxNodeAttribute::eNurbs:
-				case FbxNodeAttribute::ePatch:
-				case FbxNodeAttribute::eCamera:
-				case FbxNodeAttribute::eCameraStereo:
-				case FbxNodeAttribute::eCameraSwitcher:
-				case FbxNodeAttribute::eLight:
-				case FbxNodeAttribute::eOpticalReference:
-				case FbxNodeAttribute::eOpticalMarker:
-
-				case FbxNodeAttribute::eTrimNurbsSurface:
-				case FbxNodeAttribute::eBoundary:
-				case FbxNodeAttribute::eNurbsSurface:
-				case FbxNodeAttribute::eShape:
-				case FbxNodeAttribute::eLODGroup:
-				case FbxNodeAttribute::eSubDiv:
-				case FbxNodeAttribute::eCachedEffect:
-				case FbxNodeAttribute::eUnknown:
-				default:
-					dAssert(0);
-					break;
+					case FbxNodeAttribute::eTrimNurbsSurface:
+					case FbxNodeAttribute::eBoundary:
+					case FbxNodeAttribute::eNurbsSurface:
+					case FbxNodeAttribute::eShape:
+					case FbxNodeAttribute::eLODGroup:
+					case FbxNodeAttribute::eSubDiv:
+					case FbxNodeAttribute::eCachedEffect:
+					case FbxNodeAttribute::eUnknown:
+					default:
+						dAssert(0);
+						break;
 				}
 			}
 		}
@@ -1105,12 +1107,6 @@ z = euler0.m_z;
 		}
 	}
 #else
-
-	// Print the nodes of the scene and their attributes recursively.
-//	FbxNode* const rootNode = fbxScene->GetRootNode();
-//	int stack = 1;
-//	FbxNode* fbxNodes[32];
-//	fbxNodes[0] = fbxScene->GetRootNode();;
 
 	dList <ImportStackData> nodeStack;
 	FbxNode* const rootNode = fbxScene->GetRootNode();

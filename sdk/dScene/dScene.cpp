@@ -797,6 +797,14 @@ void dScene::FreezeScale ()
 		transform.PolarDecomposition (matrix, scale, stretchAxis);
 		sceneNodeInfo->SetTransform (matrix);
 
+		for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
+			dTreeNode* const node = GetNodeFromLink(link);
+			dNodeInfo* const nodeInfo = GetInfoFromNode(node);
+			if (nodeInfo->IsType(dAnimationTrack::GetRttiType())) {
+				((dAnimationTrack*)nodeInfo)->FreezeScale(parentMatrix);
+			}
+		}
+
 		dMatrix scaleMatrix (dGetIdentityMatrix(), scale, stretchAxis);
 		sceneNodeInfo->SetGeometryTransform (sceneNodeInfo->GetGeometryTransform() * scaleMatrix);
 
@@ -931,8 +939,8 @@ void dScene::FreezeGeometryPivot ()
 				dMatrix meshPivotMatrix(meshInfo->GetPivotMatrix());
 				meshInfo->SetPivotMatrix(dGetIdentityMatrix());
 
-				dMatrix marix(meshPivotMatrix * geoScaleMatrix);
-				meshInfo->BakeTransform(marix);
+				dMatrix matrix(meshPivotMatrix * geoScaleMatrix);
+				meshInfo->BakeTransform(matrix);
 			}
 		}
 	}
