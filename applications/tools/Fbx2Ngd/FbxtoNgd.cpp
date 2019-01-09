@@ -453,192 +453,6 @@ dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const an
 	return t1 - t0;
 }
 
-#if 1
-void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode)
-{
-	dFloat period = CalculateAnimationPeriod(fbxScene, animLayer);
-
-	dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
-	animationTake->SetPeriod(period);
-
-	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
-	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
-	evaluator->Reset();
-
-	int stack = 1;
-	FbxNode* fbxNodes[32];
-	fbxNodes[0] = fbxRootnode;
-
-	while (stack) {
-		stack--;
-		FbxNode* const fbxNode = fbxNodes[stack];
-
-		FbxAnimCurve* const animCurveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
-		FbxAnimCurve* const animCurveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
-		FbxAnimCurve* const animCurveZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
-
-		FbxAnimCurve* const animCurveRotX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
-		FbxAnimCurve* const animCurveRotY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
-		FbxAnimCurve* const animCurveRotZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
-
-		if (animCurveX || animCurveRotX) {
-			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
-			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
-			dScene::dTreeNode* const ngdNode = nodeMap.Find(fbxNode)->GetInfo();
-			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
-			animationTrack->SetName(ngdInfo->GetName());
-			ngdScene->AddReference(ngdNode, trackNode);
-
-			if (animCurveX) {
-				dAssert(animCurveY);
-				dAssert(animCurveZ);
-				dFloat timeAcc = 0.0f;
-				do {
-					FbxTime fbxTime;
-					fbxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveX->Evaluate(fbxTime));
-					dFloat y = dFloat(animCurveY->Evaluate(fbxTime));
-					dFloat z = dFloat(animCurveZ->Evaluate(fbxTime));
-					animationTrack->AddPosition(timeAcc, x, y, z);
-
-					timeAcc += ANIMATION_RESAMPLING;
-				} while (timeAcc < period);
-			}
-			if (animCurveRotX) {
-				dAssert(animCurveRotY);
-				dAssert(animCurveRotZ);
-				dFloat timeAcc = 0.0f;
-//int xxxxx = 0;
-				do {
-					FbxTime fbxTime;
-					fbxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveRotX->Evaluate(fbxTime)) * dDegreeToRad;
-					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime)) * dDegreeToRad;
-					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime)) * dDegreeToRad;
-
-/*
-FbxAMatrix globalMatrix = fbxNode->EvaluateGlobalTransform(fbxTime);
-dMatrix localMatrix(evaluator->GetNodeLocalTransform(fbxNode));
-//if ((xxxx == "mixamorig:LeftUpLeg") ||
-//	(xxxx == "mixamorig:LeftLeg"))
-//	dTrace(("%d %f %f %f\n", xxxxx++, x, y, z));
-dVector euler0;
-dVector euler1;
-localMatrix.GetEulerAngles(euler0, euler1);
-x = euler0.m_x;
-y = euler0.m_y;
-z = euler0.m_z;
-*/
-
-					animationTrack->AddRotation(timeAcc, x, y, z);
-
-					timeAcc += ANIMATION_RESAMPLING;
-				} while (timeAcc < period);
-			}
-			animationTrack->OptimizeCurves();
-		}
-
-		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
-			fbxNodes[stack] = fbxNode->GetChild(i);
-			stack++;
-		}
-	}
-}
-
-#else
-void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode)
-{
-	dFloat period = CalculateAnimationPeriod(fbxScene, animLayer);
-
-	dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
-	animationTake->SetPeriod(period);
-
-	FbxNode* const fbxRootnode = fbxScene->GetRootNode();
-
-	int stack = 1;
-	FbxNode* fbxNodes[32];
-	fbxNodes[0] = fbxRootnode;
-
-	while (stack) {
-		stack--;
-		FbxNode* const fbxNode = fbxNodes[stack];
-
-		FbxAnimCurve* const animCurveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
-		FbxAnimCurve* const animCurveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
-		FbxAnimCurve* const animCurveZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
-
-		FbxAnimCurve* const animCurveRotX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
-		FbxAnimCurve* const animCurveRotY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
-		FbxAnimCurve* const animCurveRotZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
-
-		if (animCurveX || animCurveRotX) {
-			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
-			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
-			dScene::dTreeNode* const ngdNode = nodeMap.Find(fbxNode)->GetInfo();
-			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
-			animationTrack->SetName(ngdInfo->GetName());
-//dString xxxx(ngdInfo->GetName());
-
-			ngdScene->AddReference(ngdNode, trackNode);
-			if (animCurveX) {
-				dAssert(animCurveY);
-				dAssert(animCurveZ);
-
-				int keyCount = animCurveX->KeyGetCount();
-				dAssert(keyCount == animCurveY->KeyGetCount());
-				dAssert(keyCount == animCurveZ->KeyGetCount());
-				for (int i = 0; i < keyCount; i++) {
-					FbxTime keyTime = animCurveX->KeyGetTime(i);
-					dAssert(keyTime == animCurveY->KeyGetTime(i));
-					dAssert(keyTime == animCurveZ->KeyGetTime(i));
-
-					//dFloat x = animCurveX->KeyGetValue(i);
-					//dFloat y = animCurveY->KeyGetValue(i);
-					//dFloat z = animCurveZ->KeyGetValue(i);
-					dFloat x = animCurveX->EvaluateIndex(i);
-					dFloat y = animCurveY->EvaluateIndex(i);
-					dFloat z = animCurveZ->EvaluateIndex(i);
-
-					animationTrack->AddPosition(dFloat (keyTime.GetSecondDouble()), x, y, z);
-				}
-			}
-			if (animCurveRotX) {
-				dAssert(animCurveRotY);
-				dAssert(animCurveRotZ);
-
-				int keyCount = animCurveRotX->KeyGetCount();
-				//dAssert(keyCount == animCurveRotY->KeyGetCount());
-				//dAssert(keyCount == animCurveRotZ->KeyGetCount());
-				for (int i = 0; i < keyCount; i++) {
-					FbxTime keyTime = animCurveRotX->KeyGetTime(i);
-					//dAssert(keyTime == animCurveRotY->KeyGetTime(i));
-					//dAssert(keyTime == animCurveRotZ->KeyGetTime(i));
-
-					dFloat x = animCurveRotX->EvaluateIndex(i) * dDegreeToRad;
-					dFloat y = animCurveRotY->EvaluateIndex(i) * dDegreeToRad;
-					dFloat z = animCurveRotZ->EvaluateIndex(i) * dDegreeToRad;
-
-//if ((xxxx == "mixamorig:LeftUpLeg") ||
-//(xxxx == "mixamorig:LeftLeg"))
-//dTrace(("%d %f %f %f\n", i, x, y, z));
-
-					animationTrack->AddRotation(dFloat(keyTime.GetSecondDouble()), x, y, z);
-				}
-
-//if ((xxxx == "mixamorig:LeftUpLeg") ||
-//(xxxx == "mixamorig:LeftLeg"))
-//dTrace(("\n"));
-			}
-			animationTrack->OptimizeCurves();
-		}
-
-		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
-			fbxNodes[stack] = fbxNode->GetChild(i);
-			stack++;
-		}
-	}
-}
-#endif
 
 void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
 {
@@ -664,69 +478,6 @@ void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNo
 			dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
 			animationTake->SetName(animLayer->GetName());
 			ImportAnimationLayer(ngdScene, fbxScene, nodeMap, animLayer, animationTakeNode);
-		}
-	}
-}
-
-
-void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
-{
-	dList <ImportStackData> nodeStack;
-
-	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
-
-	// Print the nodes of the scene and their attributes recursively.
-	FbxNode* const rootNode = fbxScene->GetRootNode();
-	if (rootNode) {
-		int count = rootNode->GetChildCount();
-		for (int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRootNode()));
-		}
-	}
-
-	while (nodeStack.GetCount()) {
-
-		ImportStackData data(nodeStack.GetLast()->GetInfo());
-		nodeStack.Remove(nodeStack.GetLast());
-
-		dScene::dTreeNode* const node = ngdScene->CreateSceneNode(data.m_parentNode);
-		dSceneNodeInfo* const info = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(node);
-
-		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
-/*
-dMatrix globalMatrix(evaluator->GetNodeGlobalTransform(data.m_fbxNode));
-dVector euler1;
-dVector euler2;
-dVector scale;
-dMatrix stretchAxis;
-globalMatrix.PolarDecomposition(globalMatrix, scale, stretchAxis);
-globalMatrix.GetEulerAngles(euler1, euler2);
-euler1 = euler1.Scale(dRadToDegree);
-euler2 = euler2.Scale(dRadToDegree);
-*/
-
-		info->SetName(data.m_fbxNode->GetName());
-		info->SetTransform(localMatrix);
-
-		FbxVector4 fbxPivotScaling(data.m_fbxNode->GetGeometricScaling(FbxNode::eSourcePivot));
-		FbxVector4 fbxPivotRotation(data.m_fbxNode->GetGeometricRotation(FbxNode::eSourcePivot));
-		FbxVector4 fbxPivotTranslation(data.m_fbxNode->GetGeometricTranslation(FbxNode::eSourcePivot));
-
-		dVector pivotTranslation(dFloat(fbxPivotTranslation[0]), dFloat(fbxPivotTranslation[1]), dFloat(fbxPivotTranslation[2]), 1.0f);
-		dVector pivotRotation(dFloat(fbxPivotRotation[0] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[1] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[2] * 3.14159265359 / 180.0), 0.0f);
-
-		dMatrix pivotScale(dGetIdentityMatrix());
-		pivotScale[0][0] = dFloat(fbxPivotScaling[0]);
-		pivotScale[1][1] = dFloat(fbxPivotScaling[1]);
-		pivotScale[2][2] = dFloat(fbxPivotScaling[2]);
-		dMatrix pivotMatrix(pivotScale * dMatrix(pivotRotation[0], pivotRotation[1], pivotRotation[2], pivotTranslation));
-		info->SetGeometryTransform(pivotMatrix);
-
-		nodeMap.Insert(node, data.m_fbxNode);
-
-		int count = data.m_fbxNode->GetChildCount();
-		for (int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), node));
 		}
 	}
 }
@@ -1203,6 +954,206 @@ void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* c
 	}
 	bone->SetId(boneId);
 }
+
+void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
+{
+	dList <ImportStackData> nodeStack;
+	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
+
+	// Print the nodes of the scene and their attributes recursively.
+	FbxNode* const rootNode = fbxScene->GetRootNode();
+	if (rootNode) {
+		int count = rootNode->GetChildCount();
+		for (int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRootNode()));
+		}
+	}
+
+	while (nodeStack.GetCount()) {
+
+		ImportStackData data(nodeStack.GetLast()->GetInfo());
+		nodeStack.Remove(nodeStack.GetLast());
+
+		dScene::dTreeNode* const node = ngdScene->CreateSceneNode(data.m_parentNode);
+		dSceneNodeInfo* const info = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(node);
+
+		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
+/*
+dMatrix globalMatrix(evaluator->GetNodeGlobalTransform(data.m_fbxNode));
+dVector euler1;
+dVector euler2;
+dVector scale;
+dMatrix stretchAxis;
+globalMatrix.PolarDecomposition(globalMatrix, scale, stretchAxis);
+globalMatrix.GetEulerAngles(euler1, euler2);
+euler1 = euler1.Scale(dRadToDegree);
+euler2 = euler2.Scale(dRadToDegree);
+*/
+
+		info->SetName(data.m_fbxNode->GetName());
+		info->SetTransform(localMatrix);
+
+		FbxVector4 fbxPivotScaling(data.m_fbxNode->GetGeometricScaling(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotRotation(data.m_fbxNode->GetGeometricRotation(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotTranslation(data.m_fbxNode->GetGeometricTranslation(FbxNode::eSourcePivot));
+
+		dVector pivotTranslation(dFloat(fbxPivotTranslation[0]), dFloat(fbxPivotTranslation[1]), dFloat(fbxPivotTranslation[2]), 1.0f);
+		dVector pivotRotation(dFloat(fbxPivotRotation[0] * dDegreeToRad), dFloat(fbxPivotRotation[1] * dDegreeToRad), dFloat(fbxPivotRotation[2] * dDegreeToRad), 0.0f);
+
+		dMatrix pivotScale(dGetIdentityMatrix());
+		pivotScale[0][0] = dFloat(fbxPivotScaling[0]);
+		pivotScale[1][1] = dFloat(fbxPivotScaling[1]);
+		pivotScale[2][2] = dFloat(fbxPivotScaling[2]);
+		dMatrix pivotMatrix(pivotScale * dMatrix(pivotRotation[0], pivotRotation[1], pivotRotation[2], pivotTranslation));
+		info->SetGeometryTransform(pivotMatrix);
+
+		nodeMap.Insert(node, data.m_fbxNode);
+
+		int count = data.m_fbxNode->GetChildCount();
+		for (int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), node));
+		}
+	}
+}
+
+void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode)
+{
+	dFloat period = CalculateAnimationPeriod(fbxScene, animLayer);
+
+	dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
+	animationTake->SetPeriod(period);
+
+	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
+	evaluator->Reset();
+
+#if 0
+	int stack = 1;
+	FbxNode* fbxNodes[32];
+	fbxNodes[0] = fbxScene->GetRootNode();;
+
+	while (stack) {
+		stack--;
+		FbxNode* const fbxNode = fbxNodes[stack];
+
+		FbxAnimCurve* const animCurveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		FbxAnimCurve* const animCurveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		FbxAnimCurve* const animCurveZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+
+		FbxAnimCurve* const animCurveRotX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		FbxAnimCurve* const animCurveRotY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		FbxAnimCurve* const animCurveRotZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+
+		if (animCurveX || animCurveRotX) {
+			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
+			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
+			dScene::dTreeNode* const ngdNode = nodeMap.Find(fbxNode)->GetInfo();
+			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
+			animationTrack->SetName(ngdInfo->GetName());
+			ngdScene->AddReference(ngdNode, trackNode);
+
+			if (animCurveX) {
+				dAssert(animCurveY);
+				dAssert(animCurveZ);
+				dFloat timeAcc = 0.0f;
+				do {
+					FbxTime fbxTime;
+					fbxTime.SetSecondDouble(timeAcc);
+					dFloat x = dFloat(animCurveX->Evaluate(fbxTime));
+					dFloat y = dFloat(animCurveY->Evaluate(fbxTime));
+					dFloat z = dFloat(animCurveZ->Evaluate(fbxTime));
+					animationTrack->AddPosition(timeAcc, x, y, z);
+
+					timeAcc += ANIMATION_RESAMPLING;
+				} while (timeAcc < period);
+			}
+			if (animCurveRotX) {
+				dAssert(animCurveRotY);
+				dAssert(animCurveRotZ);
+				dFloat timeAcc = 0.0f;
+				//int xxxxx = 0;
+				do {
+					FbxTime fbxTime;
+					fbxTime.SetSecondDouble(timeAcc);
+					dFloat x = dFloat(animCurveRotX->Evaluate(fbxTime)) * dDegreeToRad;
+					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime)) * dDegreeToRad;
+					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime)) * dDegreeToRad;
+
+/*
+FbxAMatrix globalMatrix = fbxNode->EvaluateGlobalTransform(fbxTime);
+dMatrix localMatrix(evaluator->GetNodeLocalTransform(fbxNode));
+//if ((xxxx == "mixamorig:LeftUpLeg") ||
+//	(xxxx == "mixamorig:LeftLeg"))
+//	dTrace(("%d %f %f %f\n", xxxxx++, x, y, z));
+dVector euler0;
+dVector euler1;
+localMatrix.GetEulerAngles(euler0, euler1);
+x = euler0.m_x;
+y = euler0.m_y;
+z = euler0.m_z;
+*/
+					animationTrack->AddRotation(timeAcc, x, y, z);
+					timeAcc += ANIMATION_RESAMPLING;
+				} while (timeAcc < period);
+			}
+			animationTrack->OptimizeCurves();
+		}
+
+		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
+			fbxNodes[stack] = fbxNode->GetChild(i);
+			stack++;
+		}
+	}
+#else
+
+	// Print the nodes of the scene and their attributes recursively.
+//	FbxNode* const rootNode = fbxScene->GetRootNode();
+//	int stack = 1;
+//	FbxNode* fbxNodes[32];
+//	fbxNodes[0] = fbxScene->GetRootNode();;
+
+	dList <ImportStackData> nodeStack;
+	FbxNode* const rootNode = fbxScene->GetRootNode();
+	if (rootNode) {
+		int count = rootNode->GetChildCount();
+		for (int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), rootNode->GetChild(count - i - 1), NULL));
+		}
+	}
+
+	while (nodeStack.GetCount()) {
+		ImportStackData data(nodeStack.GetLast()->GetInfo());
+		nodeStack.Remove(nodeStack.GetLast());
+
+		dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
+		dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
+		dScene::dTreeNode* const ngdNode = nodeMap.Find(data.m_fbxNode)->GetInfo();
+		dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
+		animationTrack->SetName(ngdInfo->GetName());
+		ngdScene->AddReference(ngdNode, trackNode);
+
+		dFloat timeAcc = 0.0f;
+		do {
+			FbxTime fbxTime;
+			fbxTime.SetSecondDouble(timeAcc);
+			//data.m_fbxNode->EvaluateLocalTransform(fbxTime);
+			dMatrix parentMatrix(data.m_fbxNode->GetParent()->EvaluateGlobalTransform(fbxTime));
+			dMatrix nodeMatrix (data.m_fbxNode->EvaluateGlobalTransform(fbxTime));
+			//dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
+//			dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
+			dMatrix localMatrix(nodeMatrix * parentMatrix.Inverse4x4());
+			animationTrack->AddKeyframe(timeAcc, localMatrix);
+			timeAcc += ANIMATION_RESAMPLING;
+		} while (timeAcc < period);
+
+		int count = data.m_fbxNode->GetChildCount();
+		for (int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), NULL));
+		}
+	}
+
+#endif
+}
+
 
 int main(int argc, char** argv)
 {

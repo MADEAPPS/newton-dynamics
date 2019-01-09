@@ -41,6 +41,15 @@ dAnimationTrack::~dAnimationTrack(void)
 {
 }
 
+void dAnimationTrack::AddScale(dFloat time, dFloat x, dFloat y, dFloat z)
+{
+	dCurveValue& value = m_scale.Append()->GetInfo();
+	value.m_x = x;
+	value.m_y = y;
+	value.m_z = z;
+	value.m_time = time;
+}
+
 void dAnimationTrack::AddPosition(dFloat time, dFloat x, dFloat y, dFloat z)
 {
 	dCurveValue& value = m_position.Append()->GetInfo();
@@ -57,6 +66,21 @@ void dAnimationTrack::AddRotation(dFloat time, dFloat x, dFloat y, dFloat z)
 	value.m_y = y;
 	value.m_z = z;
 	value.m_time = time;
+}
+
+void dAnimationTrack::AddKeyframe(dFloat time, const dMatrix& matrix)
+{
+	dVector scale;
+	dVector euler0;
+	dVector euler1;
+	dMatrix transform;
+	dMatrix eigenScaleAxis;
+ 	matrix.PolarDecomposition(transform, scale, eigenScaleAxis);
+	transform.GetEulerAngles(euler0, euler1);
+
+	AddScale(time, scale.m_x, scale.m_y, scale.m_z);
+	AddPosition(time, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z);
+	AddRotation(time, euler0.m_x, euler0.m_y, euler0.m_z);
 }
 
 void dAnimationTrack::BakeTransform(const dMatrix& transform)
@@ -154,9 +178,9 @@ void dAnimationTrack::OptimizeCurves()
 {
 	if (m_position.GetCount() && m_rotation.GetCount()) {
 	} else if (m_position.GetCount() && !m_rotation.GetCount()) {
-		OptimizeCurve(m_position);
+//		OptimizeCurve(m_position);
 	} else if (!m_position.GetCount() && m_rotation.GetCount()) {
-		OptimizeCurve(m_rotation);
+//		OptimizeCurve(m_rotation);
 	}
 }
 

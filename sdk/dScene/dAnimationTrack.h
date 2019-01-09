@@ -41,8 +41,11 @@ class dAnimationTrack: public dNodeInfo
 	const dList<dCurveValue>& GetPositions() const;
 	const dList<dCurveValue>& GetRotations() const;
 
+	void AddScale(dFloat time, dFloat x, dFloat y, dFloat z);
 	void AddPosition(dFloat time, dFloat x, dFloat y, dFloat z);
 	void AddRotation(dFloat time, dFloat x, dFloat y, dFloat z);
+	void AddKeyframe(dFloat time, const dMatrix& matrix);
+
 	void OptimizeCurves();
 
 	protected:
@@ -51,6 +54,7 @@ class dAnimationTrack: public dNodeInfo
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 
+	dList<dCurveValue> m_scale;
 	dList<dCurveValue> m_position;
 	dList<dCurveValue> m_rotation;
 };

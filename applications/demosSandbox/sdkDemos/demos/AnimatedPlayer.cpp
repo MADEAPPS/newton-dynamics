@@ -197,8 +197,9 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 			DemoEntity* const entity = (DemoEntity*)frame.m_userData;
 /*
 if (
-(entity->GetName() == "mixamorig:LeftUpLeg") ||
-(entity->GetName() == "mixamorig:RightUpLeg") ||
+(entity->GetName() == "mixamorig:Hips") ||
+//(entity->GetName() == "mixamorig:LeftUpLeg") ||
+//(entity->GetName() == "mixamorig:RightUpLeg") ||
 //(entity->GetName() == "mixamorig:RightLeg") ||
 //(entity->GetName() == "mixamorig:LeftLeg") ||
 (entity->GetName() == "xxxxxxxx")) 
@@ -317,7 +318,7 @@ dTrace(("%d %f %f %f\n", index, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
 									const dAnimationTrack::dCurveValue& rotaKeyframe = rotaNode->GetInfo();
 									const dAnimationTrack::dCurveValue& positKeyframe = positNode->GetInfo();
 									dAssert(rotaKeyframe.m_time == positKeyframe.m_time);
-									dMatrix matrix(dPitchMatrix(rotaKeyframe.m_x * dDegreeToRad) * dYawMatrix(rotaKeyframe.m_y * dDegreeToRad) * dRollMatrix(rotaKeyframe.m_z * dDegreeToRad));
+									dMatrix matrix(dPitchMatrix(rotaKeyframe.m_x) * dYawMatrix(rotaKeyframe.m_y) * dRollMatrix(rotaKeyframe.m_z));
 									dQuaternion rot(matrix);
 									dstTrack->m_rotation[index] = rot;
 									dstTrack->m_position[index] = dVector(positKeyframe.m_x, positKeyframe.m_y, positKeyframe.m_z, dFloat(1.0f));
