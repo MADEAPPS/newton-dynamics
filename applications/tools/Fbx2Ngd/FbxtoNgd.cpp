@@ -509,9 +509,9 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 				do {
 					FbxTime fbxTime;
 					fbxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveRotX->Evaluate(fbxTime));
-					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime));
-					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime));
+					dFloat x = dFloat(animCurveRotX->Evaluate(fbxTime)) * dDegreeToRad;
+					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime)) * dDegreeToRad;
+					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime)) * dDegreeToRad;
 
 //if ((xxxx == "mixamorig:LeftUpLeg") ||
 //	(xxxx == "mixamorig:LeftLeg"))
@@ -601,12 +601,9 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 					//dAssert(keyTime == animCurveRotY->KeyGetTime(i));
 					//dAssert(keyTime == animCurveRotZ->KeyGetTime(i));
 
-					//dFloat x = animCurveRotX->KeyGetValue(i);
-					//dFloat y = animCurveRotY->KeyGetValue(i);
-					//dFloat z = animCurveRotZ->KeyGetValue(i);
-					dFloat x = animCurveRotX->EvaluateIndex(i);
-					dFloat y = animCurveRotY->EvaluateIndex(i);
-					dFloat z = animCurveRotZ->EvaluateIndex(i);
+					dFloat x = animCurveRotX->EvaluateIndex(i) * dDegreeToRad;
+					dFloat y = animCurveRotY->EvaluateIndex(i) * dDegreeToRad;
+					dFloat z = animCurveRotZ->EvaluateIndex(i) * dDegreeToRad;
 
 //if ((xxxx == "mixamorig:LeftUpLeg") ||
 //(xxxx == "mixamorig:LeftLeg"))
