@@ -197,9 +197,9 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 			DemoEntity* const entity = (DemoEntity*)frame.m_userData;
 /*
 if (
-(entity->GetName() == "mixamorig:Hips") ||
-(entity->GetName() == "mixamorig:LeftUpLeg") ||
-(entity->GetName() == "mixamorig:RightUpLeg") ||
+//(entity->GetName() == "mixamorig:Hips") ||
+//(entity->GetName() == "mixamorig:LeftUpLeg") ||
+//(entity->GetName() == "mixamorig:RightUpLeg") ||
 (entity->GetName() == "mixamorig:RightLeg") ||
 (entity->GetName() == "mixamorig:LeftLeg") ||
 (entity->GetName() == "xxxxxxxx")) 
@@ -273,14 +273,13 @@ if (
 								dstTrack->m_rotation.Resize(rotations.GetCount());
 								int index = 0;
 								for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
-									//const dAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
 									dAnimationTrack::dCurveValue keyFrame (node->GetInfo());
 /*
 if (
-(ptrNode->GetKey() == "mixamorig:RightUpLeg") ||
-(ptrNode->GetKey() == "mixamorig:LeftUpLeg") ||
-//(ptrNode->GetKey() == "mixamorig:RightLeg") || 
-//(ptrNode->GetKey() == "mixamorig:LeftLeg") ||
+//(ptrNode->GetKey() == "mixamorig:RightUpLeg") ||
+//(ptrNode->GetKey() == "mixamorig:LeftUpLeg") ||
+(ptrNode->GetKey() == "mixamorig:RightLeg") || 
+(ptrNode->GetKey() == "mixamorig:LeftLeg") ||
 (ptrNode->GetKey() == "xxx")) {
 keyFrame.m_x = dPi;
 keyFrame.m_y = 0.0f;
@@ -315,11 +314,25 @@ dTrace(("%d %f %f %f\n", index, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
 								int index = 0;
 								dList<dAnimationTrack::dCurveValue>::dListNode* positNode = positions.GetFirst();
 								for (dList<dAnimationTrack::dCurveValue>::dListNode* rotaNode = rotations.GetFirst(); rotaNode; rotaNode = rotaNode->GetNext()) {
-									const dAnimationTrack::dCurveValue& rotaKeyframe = rotaNode->GetInfo();
-									const dAnimationTrack::dCurveValue& positKeyframe = positNode->GetInfo();
+									dAnimationTrack::dCurveValue rotaKeyframe (rotaNode->GetInfo());
+									dAnimationTrack::dCurveValue positKeyframe (positNode->GetInfo());
+/*
+if (
+//(ptrNode->GetKey() == "mixamorig:RightUpLeg") ||
+(ptrNode->GetKey() == "mixamorig:LeftUpLeg") ||
+//(ptrNode->GetKey() == "mixamorig:RightLeg") ||
+(ptrNode->GetKey() == "mixamorig:LeftLeg") ||
+(ptrNode->GetKey() == "xxx")) {
+rotaKeyframe.m_x = 0.0f;
+rotaKeyframe.m_y = 0.0f;
+rotaKeyframe.m_z = 60.0f * dDegreeToRad;
+//dTrace(("%d %f %f %f\n", index, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
+}
+*/
 									dAssert(rotaKeyframe.m_time == positKeyframe.m_time);
 									dMatrix matrix(dPitchMatrix(rotaKeyframe.m_x) * dYawMatrix(rotaKeyframe.m_y) * dRollMatrix(rotaKeyframe.m_z));
 									dQuaternion rot(matrix);
+
 									dstTrack->m_rotation[index] = rot;
 									dstTrack->m_position[index] = dVector(positKeyframe.m_x, positKeyframe.m_y, positKeyframe.m_z, dFloat(1.0f));
 									dstTrack->m_time[index] = rotaKeyframe.m_time;
