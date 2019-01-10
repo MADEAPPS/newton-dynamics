@@ -26,14 +26,6 @@ class ShowCollisionCollide: public DemoEntity::UserData
 	{
 	}
 
-	virtual void OnInterpolateMatrix (DemoEntityManager& world, dFloat param) const
-	{
-	}
-
-	void OnTransformCallback(DemoEntityManager& scene) const
-	{
-	}
-
 	virtual void OnRender (dFloat timestep) const
 	{
 		dVector p0(0.0f);

@@ -101,14 +101,6 @@ class dLifterUserData: public DemoEntity::UserData
 	{
 	}
 
-	void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
-	{
-	}
-
-	void OnTransformCallback(DemoEntityManager& world) const
-	{
-	}
-
 	void SetInput(const InputRecord& inputs)
 	{
 		m_inputs = inputs;

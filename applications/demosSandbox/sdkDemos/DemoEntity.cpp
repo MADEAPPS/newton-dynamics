@@ -140,9 +140,9 @@ void DemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix,
 
 		scene->Lock(ent->m_lock);
 		ent->SetMatrixUsafe(rot, transform.m_posit);
-		if (ent->m_userData) {
-			ent->m_userData->OnTransformCallback(*scene);
-		}
+//		if (ent->m_userData) {
+//			ent->m_userData->OnTransformCallback(*scene);
+//		}
 		scene->Unlock(ent->m_lock);
 	}
 }
@@ -244,7 +244,6 @@ void DemoEntity::SetNextMatrix (DemoEntityManager& world, const dQuaternion& rot
 	world.Unlock(m_lock);
 }
 
-
 void DemoEntity::ResetMatrix(DemoEntityManager& scene, const dMatrix& matrix)
 {
 	dQuaternion rot (matrix);
@@ -253,7 +252,7 @@ void DemoEntity::ResetMatrix(DemoEntityManager& scene, const dMatrix& matrix)
 	InterpolateMatrix (scene, 0.0f);
 }
 
-void DemoEntity::InterpolateMatrixUsafe(dFloat param)
+void DemoEntity::InterpolateMatrixUnsafe(dFloat param)
 {
 	dVector p0(m_curPosition);
 	dVector p1(m_nextPosition);
@@ -266,21 +265,28 @@ void DemoEntity::InterpolateMatrixUsafe(dFloat param)
 	m_matrix = dMatrix(rotation, posit);
 }
 
-
 void DemoEntity::InterpolateMatrix (DemoEntityManager& world, dFloat param)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	world.Lock(m_lock);
 
-	InterpolateMatrixUsafe(param);
-	if (m_userData) {
-		m_userData->OnInterpolateMatrix(world, param);
+	int stack = 1;
+	DemoEntity* pool[32];
+	pool[0] = this;
+	while (stack) {
+		stack--;
+		DemoEntity* const entity = pool[stack];
+		entity->InterpolateMatrixUnsafe(param);
+
+		for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+			pool[stack] = child;
+			stack++;
+		}
 	}
 
 	// release the critical section
 	world.Unlock(m_lock);
 }
-
 
 const dMatrix& DemoEntity::GetRenderMatrix () const
 {

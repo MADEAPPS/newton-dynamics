@@ -41,6 +41,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		{
 		}
 
+/*
 		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
 		{
 			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
@@ -72,6 +73,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 				}
 			}
 		}
+*/
 
 		dVehicleChassis* m_vehicleChassis;
 		int m_gearMap[10];

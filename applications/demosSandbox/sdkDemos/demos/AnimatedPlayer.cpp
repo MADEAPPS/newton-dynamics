@@ -20,20 +20,57 @@
 #include "HeightFieldPrimitive.h"
 
 
+struct InverseKinematicNodes
+{
+	char* m_name;
+};
+
+
+static InverseKinematicNodes forkliftDefinition[] =
+{
+	{ "mixamorig:Hips" },
+//	{ "mixamorig:RightUpLeg" },
+//	{ "mixamorig:RightLeg" },
+//	{ "mixamorig:RightFoot" },
+//	{ "mixamorig:RightToeBase" },
+//	{ "mixamorig:RightToe_End" },
+//	{ "mixamorig:LeftUpLeg" },
+//	{ "mixamorig:LeftLeg" },
+//	{ "mixamorig:LeftFoot" },
+//	{ "mixamorig:LeftToeBase" },
+//	{ "mixamorig:LeftToe_End" },
+//	{ "mixamorig:Spine" },
+//	{ "mixamorig:Spine1" },
+//	{ "mixamorig:Spine2" },
+//	{ "mixamorig:RightShoulder" },
+//	{ "mixamorig:RightArm" },
+//	{ "mixamorig:RightForeArm" },
+//	{ "mixamorig:RightHand" },
+//	{ "mixamorig:LeftShoulder" },
+//	{ "mixamorig:LeftArm" },
+//	{ "mixamorig:LeftForeArm" },
+//	{ "mixamorig:LeftHand" },
+//	{ "mixamorig:Neck" },
+//	{ "mixamorig:Head" },
+//	{ "mixamorig:HeadTop_End" },
+};
+
+
+
 class InverseKinematicAnimationManager: public dAnimIKManager
 {
 	public:
 /*
-	class dAnimationCharacterUserData : public DemoEntity::UserData
+	class dAnimCharacterUserData: public DemoEntity::UserData
 	{
-	public:
-		dAnimationCharacterUserData(dAnimIKController* const rig, dAnimationEffectorBlendTwoWay* const walk, dAnimationBipeHipController* const posture)
+		public:
+		dAnimCharacterUserData(dAnimIKController* const controller)
 			:DemoEntity::UserData()
-			, m_rig(rig)
-			, m_walk(walk)
-			, m_posture(posture)
-			, m_hipHigh(0.0f)
-			, m_walkSpeed(0.0f)
+			,m_controller(controller)
+//			,m_walk(walk)
+//			,m_posture(posture)
+//			,m_hipHigh(0.0f)
+//			,m_walkSpeed(0.0f)
 		{
 		}
 
@@ -41,20 +78,12 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		{
 		}
 
-		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
-		{
-		}
-
-		void OnTransformCallback(DemoEntityManager& world) const
-		{
-		}
-
-		dAnimIKController* m_rig;
-		dAnimationEffectorBlendTwoWay* m_walk;
-		dAnimationBipeHipController* m_posture;
-
-		dFloat m_hipHigh;
-		dFloat m_walkSpeed;
+		dAnimIKController* m_controller;
+		//dAnimIKController* m_rig;
+		//dAnimationEffectorBlendTwoWay* m_walk;
+		//dAnimationBipeHipController* m_posture;
+		//dFloat m_hipHigh;
+		//dFloat m_walkSpeed;
 	};
 */
 
@@ -342,6 +371,31 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 		}
 	}
 
+	void CreateIKSolver(dAnimIKController* const controller, DemoEntity* const character)
+	{
+		int stack = 1;
+		DemoEntity* pool[32];
+		pool[0] = character;
+
+		const int nodesCount = sizeof(forkliftDefinition) / sizeof(forkliftDefinition[0]);
+
+		while (stack) {
+			stack--;
+			DemoEntity* const entity = pool[stack];
+
+			for (int i = 0; i < nodesCount; i++) {
+				if (entity->GetName() == forkliftDefinition[i].m_name) {
+					break;
+				}
+			}
+
+			for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
+				pool[stack] = node;
+				stack++;
+			}
+		}
+	}
+
 	dAnimIKController* CreateHuman(const char* const fileName, const dMatrix& origin)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
@@ -354,6 +408,9 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 
 		dAnimIKController* const controller = CreateIKController();
 		controller->SetUserData(character);
+
+//		dAnimCharacterUserData* const userData = new dAnimCharacterUserData(controller);
+//		character->SetUserData(userData);
 		
 		// populate base pose
 		PopulateBasePose(controller->GetBasePose(), character);
@@ -366,6 +423,7 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, walk);
 
 		controller->SetAnimationTree(animTree);
+		CreateIKSolver(controller, character);
 
 		return controller;
 	}

@@ -581,7 +581,6 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 
 		virtual void OnRender (dFloat timestep) const{};
-		virtual void OnInterpolateMatrix (DemoEntityManager& world, dFloat param) const{};
 
 		dMatrix m_matrix;
 	};

@@ -212,18 +212,17 @@ void DemoCameraManager::RenderPickedTarget () const
 
 void DemoCameraManager::InterpolateMatrices (DemoEntityManager* const scene, dFloat param)
 {
-	NewtonWorld* const world = scene->GetNewton();
+	// interpolate the location of all entities in the world
+//	DemoEntity* const entity
+//	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+//	DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+	for (DemoEntityManager::dListNode* node = scene->GetFirst(); node; node = node->GetNext()) {
+		DemoEntity* const entity = node->GetInfo();
+		entity->InterpolateMatrix(*scene, param);
+	}
 
 	// interpolate the Camera matrix;
 	m_camera->InterpolateMatrix (*scene, param);
-
-	// interpolate the location of all entities in the world
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-		if (entity) {
-			entity->InterpolateMatrix (*scene, param);
-		}
-	}
 }
 
 void DemoCameraManager::OnBodyDestroy (NewtonBody* const body)

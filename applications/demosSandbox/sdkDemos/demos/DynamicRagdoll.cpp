@@ -534,14 +534,6 @@ class BalancingDummyManager : public dAnimIDManager
 		{
 		}
 
-		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
-		{
-		}
-
-		void OnTransformCallback(DemoEntityManager& world) const
-		{
-		}
-
 		dAnimIDController* m_rig;
 		dAnimIDBlendNodeTwoWay* m_walk;
 		dAnimationBipeHipController* m_posture;
