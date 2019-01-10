@@ -107,13 +107,11 @@ return;
 			dMatrix stretchAxis;
 			dVector scale(0.0f);
 			transform.PolarDecomposition(matrix, scale, stretchAxis);
-			//sceneNodeInfo->SetTransform(matrix);
-
 			matrix.GetEulerAngles(euler0, euler1);
 
-			scaleValue.m_x = 1.0f;
-			scaleValue.m_y = 1.0f;
-			scaleValue.m_z = 1.0f;
+			scaleValue.m_x = dFloat(1.0f);
+			scaleValue.m_y = dFloat(1.0f);
+			scaleValue.m_z = dFloat(1.0f);
 
 			rotationValue.m_x = euler0.m_x;
 			rotationValue.m_y = euler0.m_y;

@@ -723,7 +723,7 @@ void dEffectorTreeRoot::Evaluate(dEffectorPose& output, dFloat timestep)
 
 	dVector rootPosition;
 	dQuaternion rootRotation;
-	NewtonBodyGetRotation(m_rootBody, &rootRotation.m_w);
+	NewtonBodyGetRotation(m_rootBody, &rootRotation.m_x);
 	NewtonBodyGetPosition(m_rootBody, &rootPosition.m_x);
 	rootPosition.m_w = 1.0f;
 

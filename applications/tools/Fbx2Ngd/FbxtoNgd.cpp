@@ -257,13 +257,6 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importM
 	ngdScene->BakeTransform(convertMatrix);
 //	ngdScene->FreezeGeometryPivot();
 	ngdScene->FreezeScale();
-/*
-dMatrix xxxx(dGetIdentityMatrix());
-xxxx[0][0] = 1.0f / 0.366717f;
-xxxx[1][1] = 1.0f / 0.366717f;
-xxxx[2][2] = 1.0f / 0.366717f;
-ngdScene->BakeTransform(xxxx);
-*/	
 
 	return true;
 }
@@ -1077,19 +1070,6 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime)) * dDegreeToRad;
 					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime)) * dDegreeToRad;
 
-/*
-FbxAMatrix globalMatrix = fbxNode->EvaluateGlobalTransform(fbxTime);
-dMatrix localMatrix(evaluator->GetNodeLocalTransform(fbxNode));
-//if ((xxxx == "mixamorig:LeftUpLeg") ||
-//	(xxxx == "mixamorig:LeftLeg"))
-//	dTrace(("%d %f %f %f\n", xxxxx++, x, y, z));
-dVector euler0;
-dVector euler1;
-localMatrix.GetEulerAngles(euler0, euler1);
-x = euler0.m_x;
-y = euler0.m_y;
-z = euler0.m_z;
-*/
 					animationTrack->AddRotation(timeAcc, x, y, z);
 					timeAcc += ANIMATION_RESAMPLING;
 				} while (timeAcc < period);
@@ -1150,9 +1130,29 @@ z = euler0.m_z;
 
 int main(int argc, char** argv)
 {
-	if (argc != 2) {
-		printf("fbxToNgd [fbx_file_name]\n");
-		return 0;
+
+	bool importMesh = true;
+	bool importAnimations = true;
+	const char* name = NULL;
+	for (int i = 1; i < argc; i ++) {
+		if (argv[i][0] == '-') {
+			if (argv[i][1] == 'm') {
+				importMesh = true;
+				importAnimations = false;
+			} else if (argv[i][1] == 'a') {
+				importMesh = false;
+				importAnimations = true;
+			}
+		} else {
+			name = argv[i];
+		}
+	}
+
+	if (!name) {
+		printf("fbxToNgd [fbx_file_name] -m -a\n");
+		printf("[fbx_file_name] = fbx file name\n");
+		printf("-m = export mesh only\n");
+		printf("-a = export animation only\n");
 	}
 
 	FbxManager* fbxManager = NULL;
@@ -1175,8 +1175,6 @@ int main(int argc, char** argv)
 	NewtonWorld* const newton = NewtonCreate();
 	dScene* const ngdScene = new dScene(newton);
 
-	bool importMesh = false;
-	bool importAnimations = true;
 	if (ConvertToNgd(ngdScene, fbxScene, importMesh, importAnimations)) {
 		char name[1024];
 		strcpy(name, argv[1]);
