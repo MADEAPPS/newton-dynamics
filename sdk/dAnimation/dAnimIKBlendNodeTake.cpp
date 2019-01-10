@@ -12,51 +12,26 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimIKBlendNodeTake.h"
 
-int dAnimTakeData::dAnimTakeTrack::GetIndex(dFloat t) const
+
+dVector dAnimTakeData::dAnimTakeTrack::InterpolatePosition(dFloat t) const
 {
-	dAssert(t >= 0.0f);
-	if (t > m_time[m_time.GetSize() - 1]) {
-		t = m_time[m_time.GetSize() - 1];
-	}
-
-	int i0 = 0; 
-	int i1 = m_time.GetSize() - 1;
-
-	const dFloat* const data = &m_time[0];
-	while ((i1 - i0) > 8) {
-		const int mid = (i1 + i0) / 2;
-		if (t < data[mid]) {
-			i1 = mid;
-		} else {
-			i0 = mid;
-		}
-	}
-	dAssert(data[i0] <= t);
-	for (int i = i0 + 1; i < m_time.GetSize(); i++) {
-		if (data[i] >= t) {
-			return i - 1;
-		}
-	}
-	return i0;
-}
-
-dVector dAnimTakeData::dAnimTakeTrack::InterpolatePosition(int base, dFloat t) const
-{
-	const dFloat t0 = m_time[base];
-	const dFloat t1 = m_time[base + 1];
+	int base = m_position.GetIndex(t);
+	const dFloat t0 = m_position[base].m_time;
+	const dFloat t1 = m_position[base + 1].m_time;
 	const dFloat param = (t - t0) / (t1 - t0 + dFloat(1.0e-6f));
-	const dVector& p0 = m_position[base];
-	const dVector& p1 = m_position[base + 1];
+	const dVector& p0 = m_position[base].m_posit;
+	const dVector& p1 = m_position[base + 1].m_posit;
 	return p0 + (p1 - p0).Scale(param);
 }
 
-dQuaternion dAnimTakeData::dAnimTakeTrack::InterpolateRotation(int base, dFloat t) const
+dQuaternion dAnimTakeData::dAnimTakeTrack::InterpolateRotation(dFloat t) const
 {
-	const dFloat t0 = m_time[base];
-	const dFloat t1 = m_time[base + 1];
+	int base = m_rotation.GetIndex(t);
+	const dFloat t0 = m_rotation[base].m_time;
+	const dFloat t1 = m_rotation[base + 1].m_time;
 	const dFloat param = (t - t0) / (t1 - t0 + dFloat (1.0e-6f));
-	const dQuaternion& rot0 = m_rotation[base];
-	const dQuaternion& rot1 = m_rotation[base + 1];
+	const dQuaternion& rot0 = m_rotation[base].m_rotation;
+	const dQuaternion& rot1 = m_rotation[base + 1].m_rotation;
 	return dQuaternion(rot0.Slerp(rot1, param));
 }
 
@@ -86,24 +61,15 @@ dAnimTakeData::dAnimTakeTrack::~dAnimTakeTrack()
 
 void dAnimTakeData::CalculatePose(dAnimPose& output, dFloat t) const
 {
-	dAnimPose::dListNode* destNode = output.GetFirst();
-	for (dList<dAnimTakeTrack>::dListNode* srcNode = m_tracks.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
+	dAnimPose::dListNode* destNode = output.GetFirst()->GetNext();
+	for (dList<dAnimTakeTrack>::dListNode* srcNode = m_tracks.GetFirst()->GetNext(); srcNode; srcNode = srcNode->GetNext()) {
 		const dAnimTakeTrack& track = srcNode->GetInfo();
-		if (track.m_rotation.GetSize() && track.m_position.GetSize()) {
-			dAssert(track.m_time.GetSize() > 1);
-			dAnimKeyframe& keyFrameOut = destNode->GetInfo();
-			int index = track.GetIndex(t);
-			keyFrameOut.m_posit = track.InterpolatePosition(index, t);
-			keyFrameOut.m_rotation = track.InterpolateRotation(index, t);
-		} else if (track.m_rotation.GetSize()) {
-			dAnimKeyframe& keyFrameOut = destNode->GetInfo();
-			dAssert(track.m_time.GetSize() > 1);
-			int index = track.GetIndex(t);
-			keyFrameOut.m_rotation = track.InterpolateRotation(index, t);
-		} else if (track.m_position.GetSize()) {
-			dAssert(0);
-		}
-
+		dAnimKeyframe& keyPositionOut = destNode->GetInfo();
+		dAnimKeyframe& keyRotationOut = destNode->GetInfo();
+		keyPositionOut.m_posit = track.InterpolatePosition(t);
+		keyRotationOut.m_rotation = track.InterpolateRotation(t);
+		dAssert(keyRotationOut.m_rotation.DotProduct(keyRotationOut.m_rotation) > 0.999f);
+		dAssert(keyRotationOut.m_rotation.DotProduct(keyRotationOut.m_rotation) < 1.001f);
 		destNode = destNode->GetNext();
 	}
 }

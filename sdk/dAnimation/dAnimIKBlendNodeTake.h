@@ -14,93 +14,75 @@
 #include "dAnimPose.h"
 #include "dAnimIKBlendNode.h"
 
+
 class dAnimTakeData: public dRefCounter
 {
 	public:
-	template<class OBJECT>
-	class dAnimTakeArray
-	{
-		public:
-		dAnimTakeArray()
-			:m_capacity(0)
-			,m_data(NULL)
-		{
-		}
-
-		~dAnimTakeArray()
-		{
-			if (m_data) {
-				delete[] m_data;
-			}
-		}
-
-		OBJECT& operator[] (int i)
-		{
-			dAssert(i >= 0);
-			while (i >= m_capacity) {
-				Resize(i * 2);
-			}
-			return m_data[i];
-		}
-
-		const OBJECT& operator[] (int i) const
-		{
-			dAssert(i >= 0);
-			while (i >= m_capacity) {
-				Resize(i * 2);
-			}
-			return m_data[i];
-		}
-
-		int GetSize() const
-		{
-			return m_capacity;
-		}
-
-		void Resize(int size) const
-		{
-			if (size >= m_capacity) {
-				//size = dMax(size, 16);
-				OBJECT* const newArray = new OBJECT[size];
-				if (m_data) {
-					for (int i = 0; i < m_capacity; i++) {
-						newArray[i] = m_data[i];
-					}
-					delete[] m_data;
-				}
-				m_data = newArray;
-				m_capacity = size;
-			} else if (size < m_capacity) {
-				//size = dMax(size, 16);
-				OBJECT* const newArray = new OBJECT[size];
-				if (m_data) {
-					for (int i = 0; i < size; i++) {
-						newArray[i] = m_data[i];
-					}
-					delete[] m_data;
-				}
-				m_data = newArray;
-				m_capacity = size;
-			}
-		}
-
-		mutable int m_capacity;
-		mutable OBJECT* m_data;
-	};
-
 	class dAnimTakeTrack
 	{
 		public:
+		class dPositionKey
+		{
+			public:
+			dVector m_posit;
+			dFloat m_time;
+		};
+
+		class dRotationKey
+		{
+			public:
+			dQuaternion m_rotation;
+			dFloat m_time;
+		};
+
+		template<class OBJECT>
+		class dAnimTakeArray : public dArray<OBJECT>
+		{
+			public:
+			dAnimTakeArray()
+				:dArray<OBJECT>()
+			{
+			}
+
+			int GetIndex(dFloat t) const
+			{
+				dAssert(t >= 0.0f);
+				const int size = GetSize();
+				if (t > m_data[size - 1].m_time) {
+					t = m_data[size - 1].m_time;
+				}
+
+				int i0 = 0;
+				int i1 = size - 1;
+
+				//const dFloat* const data = &m_time[0];
+				while ((i1 - i0) > 8) {
+					const int mid = (i1 + i0) / 2;
+					if (t < m_data[mid].m_time) {
+						i1 = mid;
+					} else {
+						i0 = mid;
+					}
+				}
+				dAssert(m_data[i0].m_time <= t);
+				for (int i = i0 + 1; i < size; i++) {
+					if (m_data[i].m_time >= t) {
+						return i - 1;
+					}
+				}
+				return i0;
+			}
+		};
+
 		dAnimTakeTrack();
 		~dAnimTakeTrack();
 
-		int GetIndex(dFloat t) const;
-		dVector InterpolatePosition(int base, dFloat t) const;
-		dQuaternion InterpolateRotation(int base, dFloat t) const;
+		dVector InterpolatePosition(dFloat t) const;
+		dQuaternion InterpolateRotation(dFloat t) const;
 
-		dAnimTakeArray<dFloat> m_time;
-		dAnimTakeArray<dVector> m_position;
-		dAnimTakeArray<dQuaternion> m_rotation;
+		//dAnimTakeArray<dFloat> m_time;
+		dAnimTakeArray<dPositionKey> m_position;
+		dAnimTakeArray<dRotationKey> m_rotation;
 	};
 
 	dAnimTakeData(int tracksCount);

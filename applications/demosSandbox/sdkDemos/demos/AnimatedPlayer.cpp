@@ -197,19 +197,21 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 			DemoEntity* const entity = (DemoEntity*)frame.m_userData;
 /*
 if (
-//(entity->GetName() == "mixamorig:Hips") ||
+(entity->GetName() == "mixamorig:Hips") ||
 //(entity->GetName() == "mixamorig:LeftUpLeg") ||
 //(entity->GetName() == "mixamorig:RightUpLeg") ||
-(entity->GetName() == "mixamorig:RightLeg") ||
-(entity->GetName() == "mixamorig:LeftLeg") ||
+//(entity->GetName() == "mixamorig:RightLeg") ||
+//(entity->GetName() == "mixamorig:LeftLeg") ||
 (entity->GetName() == "xxxxxxxx")) 
 */
+/*
 dVector euler0;
 dVector euler1;
 dMatrix xxxx(frame.m_rotation, frame.m_posit);
 xxxx.GetEulerAngles(euler0, euler1);
 euler0 = euler0.Scale(dRadToDegree);
 dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, euler0.m_z));
+*/
 
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
 		
@@ -268,84 +270,42 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 						dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
 						dAnimationTrack* const srcTrack = (dAnimationTrack*)scene.GetInfoFromNode(node);
 						if (srcTrack->IsType(dAnimationTrack::GetRttiType())) {
+
 							dTree<dAnimTakeData::dAnimTakeTrack*, dString>::dTreeNode* const ptrNode = map.Find(srcTrack->GetName());
 							dAssert(ptrNode);
 							dAnimTakeData::dAnimTakeTrack* const dstTrack = ptrNode->GetInfo();
 
-							const dList<dAnimationTrack::dCurveValue>& positions = srcTrack->GetPositions();
 							const dList<dAnimationTrack::dCurveValue>& rotations = srcTrack->GetRotations();
+							dstTrack->m_rotation.Resize(rotations.GetCount());
+							int index = 0;
+							for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
+								dAnimationTrack::dCurveValue keyFrame (node->GetInfo());
 
-							if (rotations.GetCount() && !positions.GetCount()) {
-								dstTrack->m_time.Resize(rotations.GetCount());
-								dstTrack->m_rotation.Resize(rotations.GetCount());
-								int index = 0;
-								for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
-									dAnimationTrack::dCurveValue keyFrame (node->GetInfo());
-/*
-if (
-//(ptrNode->GetKey() == "mixamorig:RightUpLeg") ||
-//(ptrNode->GetKey() == "mixamorig:LeftUpLeg") ||
-(ptrNode->GetKey() == "mixamorig:RightLeg") || 
-(ptrNode->GetKey() == "mixamorig:LeftLeg") ||
-(ptrNode->GetKey() == "xxx")) {
-keyFrame.m_x = dPi;
-keyFrame.m_y = 0.0f;
-keyFrame.m_z = dPi;
-dTrace(("%d %f %f %f\n", index, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
-}
-*/
+								dMatrix matrix(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
+								dQuaternion rot(matrix);
+								dstTrack->m_rotation[index].m_rotation = rot;
+								dstTrack->m_rotation[index].m_time = keyFrame.m_time;
+								index++;
+							}
 
-									dMatrix matrix(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
-									dQuaternion rot(matrix);
-									dstTrack->m_rotation[index] = rot;
-									dstTrack->m_time[index] = keyFrame.m_time;
-
-									index++;
+							for (int i = 0; i < rotations.GetCount() - 1; i++) {
+								dFloat dot = dstTrack->m_rotation[i].m_rotation.DotProduct(dstTrack->m_rotation[i + 1].m_rotation);
+								if (dot < 0.0f) {
+									dstTrack->m_rotation[i + 1].m_rotation.m_x *= -1.0f;
+									dstTrack->m_rotation[i + 1].m_rotation.m_y *= -1.0f;
+									dstTrack->m_rotation[i + 1].m_rotation.m_z *= -1.0f;
+									dstTrack->m_rotation[i + 1].m_rotation.m_w *= -1.0f;
 								}
-							} else if (!rotations.GetCount() && positions.GetCount()) {
-								dstTrack->m_time.Resize(positions.GetCount());
-								dstTrack->m_position.Resize(positions.GetCount());
-								int index = 0;
-								for (dList<dAnimationTrack::dCurveValue>::dListNode* node = positions.GetFirst(); node; node = node->GetNext()) {
-									const dAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
-									dstTrack->m_time[index] = keyFrame.m_time;
-									dstTrack->m_position[index] = dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat(1.0f));
-									index++;
-								}
-							} else {
-								dAssert(rotations.GetCount() && positions.GetCount() && (rotations.GetCount() == positions.GetCount()));
+							}
 
-								dstTrack->m_time.Resize(rotations.GetCount());
-								dstTrack->m_rotation.Resize(rotations.GetCount());
-								dstTrack->m_position.Resize(positions.GetCount());
-								int index = 0;
-								dList<dAnimationTrack::dCurveValue>::dListNode* positNode = positions.GetFirst();
-								for (dList<dAnimationTrack::dCurveValue>::dListNode* rotaNode = rotations.GetFirst(); rotaNode; rotaNode = rotaNode->GetNext()) {
-									dAnimationTrack::dCurveValue rotaKeyframe (rotaNode->GetInfo());
-									dAnimationTrack::dCurveValue positKeyframe (positNode->GetInfo());
-/*
-if (
-//(ptrNode->GetKey() == "mixamorig:RightUpLeg") ||
-(ptrNode->GetKey() == "mixamorig:LeftUpLeg") ||
-//(ptrNode->GetKey() == "mixamorig:RightLeg") ||
-(ptrNode->GetKey() == "mixamorig:LeftLeg") ||
-(ptrNode->GetKey() == "xxx")) {
-rotaKeyframe.m_x = 0.0f;
-rotaKeyframe.m_y = 0.0f;
-rotaKeyframe.m_z = 60.0f * dDegreeToRad;
-//dTrace(("%d %f %f %f\n", index, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
-}
-*/
-									dAssert(rotaKeyframe.m_time == positKeyframe.m_time);
-									dMatrix matrix(dPitchMatrix(rotaKeyframe.m_x) * dYawMatrix(rotaKeyframe.m_y) * dRollMatrix(rotaKeyframe.m_z));
-									dQuaternion rot(matrix);
-
-									dstTrack->m_rotation[index] = rot;
-									dstTrack->m_position[index] = dVector(positKeyframe.m_x, positKeyframe.m_y, positKeyframe.m_z, dFloat(1.0f));
-									dstTrack->m_time[index] = rotaKeyframe.m_time;
-									index++;
-									positNode = positNode->GetNext();
-								}
+							const dList<dAnimationTrack::dCurveValue>& positions = srcTrack->GetPositions();
+							dstTrack->m_position.Resize(positions.GetCount());
+							index = 0;
+							for (dList<dAnimationTrack::dCurveValue>::dListNode* node = positions.GetFirst(); node; node = node->GetNext()) {
+								dAnimationTrack::dCurveValue keyFrame(node->GetInfo());
+								dstTrack->m_position[index].m_posit = dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat(1.0f));
+								dstTrack->m_position[index].m_time = keyFrame.m_time;
+								index++;
 							}
 						}
 					}
@@ -397,7 +357,8 @@ rotaKeyframe.m_z = 60.0f * dDegreeToRad;
 		
 		// populate base pose
 		PopulateBasePose(controller->GetBasePose(), character);
-		dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_walk.ngd");
+		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_walk.ngd");
+		dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_idle.ngd");
 		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "skintest.ngd");
 
 		dAnimIKBlendNodeTake* const walk = new dAnimIKBlendNodeTake(controller, walkCycle);
@@ -420,7 +381,7 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 	dMatrix origin (dGetIdentityMatrix());
-	origin.m_posit.m_y += 2.0f;
+	origin.m_posit.m_y = 0.0f;
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
@@ -435,7 +396,7 @@ referenceModel->ResetMatrix(*scene, referenceModel->GetCurrentMatrix() * origin1
 scene->Append(referenceModel);
 */
 	
-	origin.m_posit = dVector(-8.0f, 3.0f, 0.0f, 1.0f);
+	origin.m_posit = dVector(-4.0f, 1.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 

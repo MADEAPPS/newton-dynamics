@@ -48,8 +48,8 @@ class ImportStackData
 	public:
 	ImportStackData(const dMatrix& parentMatrix, FbxNode* const fbxNode, dScene::dTreeNode* parentNode)
 		:m_parentMatrix(parentMatrix)
-		,m_fbxNode(fbxNode)
-		,m_parentNode(parentNode)
+		, m_fbxNode(fbxNode)
+		, m_parentNode(parentNode)
 	{
 	}
 	dMatrix m_parentMatrix;
@@ -306,53 +306,53 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool import
 
 				switch (attributeType)
 				{
-					case FbxNodeAttribute::eMesh:
-					{
-						ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
-						break;
-					}
+				case FbxNodeAttribute::eMesh:
+				{
+					ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
+					break;
+				}
 
-					case FbxNodeAttribute::eLine:
-					{
-						dAssert(0);
-						//ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-						break;
-					}
+				case FbxNodeAttribute::eLine:
+				{
+					dAssert(0);
+					//ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+					break;
+				}
 
-					case FbxNodeAttribute::eNurbsCurve:
-					{
-						dAssert(0);
-						//ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-						break;
-					}
+				case FbxNodeAttribute::eNurbsCurve:
+				{
+					dAssert(0);
+					//ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+					break;
+				}
 
-					case FbxNodeAttribute::eSkeleton:
-					case FbxNodeAttribute::eNull:
-					{
-						break;
-					}
+				case FbxNodeAttribute::eSkeleton:
+				case FbxNodeAttribute::eNull:
+				{
+					break;
+				}
 
-					case FbxNodeAttribute::eMarker:
-					case FbxNodeAttribute::eNurbs:
-					case FbxNodeAttribute::ePatch:
-					case FbxNodeAttribute::eCamera:
-					case FbxNodeAttribute::eCameraStereo:
-					case FbxNodeAttribute::eCameraSwitcher:
-					case FbxNodeAttribute::eLight:
-					case FbxNodeAttribute::eOpticalReference:
-					case FbxNodeAttribute::eOpticalMarker:
+				case FbxNodeAttribute::eMarker:
+				case FbxNodeAttribute::eNurbs:
+				case FbxNodeAttribute::ePatch:
+				case FbxNodeAttribute::eCamera:
+				case FbxNodeAttribute::eCameraStereo:
+				case FbxNodeAttribute::eCameraSwitcher:
+				case FbxNodeAttribute::eLight:
+				case FbxNodeAttribute::eOpticalReference:
+				case FbxNodeAttribute::eOpticalMarker:
 
-					case FbxNodeAttribute::eTrimNurbsSurface:
-					case FbxNodeAttribute::eBoundary:
-					case FbxNodeAttribute::eNurbsSurface:
-					case FbxNodeAttribute::eShape:
-					case FbxNodeAttribute::eLODGroup:
-					case FbxNodeAttribute::eSubDiv:
-					case FbxNodeAttribute::eCachedEffect:
-					case FbxNodeAttribute::eUnknown:
-					default:
-						dAssert(0);
-						break;
+				case FbxNodeAttribute::eTrimNurbsSurface:
+				case FbxNodeAttribute::eBoundary:
+				case FbxNodeAttribute::eNurbsSurface:
+				case FbxNodeAttribute::eShape:
+				case FbxNodeAttribute::eLODGroup:
+				case FbxNodeAttribute::eSubDiv:
+				case FbxNodeAttribute::eCachedEffect:
+				case FbxNodeAttribute::eUnknown:
+				default:
+					dAssert(0);
+					break;
 				}
 			}
 		}
@@ -438,8 +438,8 @@ dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const an
 				curvexArray[i]->GetTimeInterval(interval);
 				t0 = dFloat(dMin(t0, dFloat(interval.GetStart().GetSecondDouble())));
 				t1 = dFloat(dMax(t1, dFloat(interval.GetStop().GetSecondDouble())));
+				}
 			}
-		}
 
 		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
 			fbxNodes[stack] = fbxNode->GetChild(i);
@@ -812,7 +812,7 @@ void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNode
 					dAssert(bone);
 
 					dBoneNodeInfo* const boneInfo = (dBoneNodeInfo*)ngdScene->GetInfoFromNode(bone);
-					
+
 					const int* const boneVertexIndices = cluster->GetControlPointIndices();
 					const double* const boneVertexWeights = cluster->GetControlPointWeights();
 					// Iterate through all the vertices, which are affected by the bone
@@ -1118,6 +1118,8 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 			timeAcc += ANIMATION_RESAMPLING;
 		} while (timeAcc < period);
 
+		animationTrack->OptimizeCurves();
+
 		int count = data.m_fbxNode->GetChildCount();
 		for (int i = 0; i < count; i++) {
 			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), NULL));
@@ -1130,7 +1132,6 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 
 int main(int argc, char** argv)
 {
-
 	bool importMesh = true;
 	bool importAnimations = true;
 	const char* name = NULL;
