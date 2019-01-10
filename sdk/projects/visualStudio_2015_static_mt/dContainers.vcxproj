@@ -55,6 +55,7 @@
     <ClCompile Include="..\..\dContainers\dTree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dContainers\dArray.h" />
     <ClInclude Include="..\..\dContainers\dBaseHierarchy.h" />
     <ClInclude Include="..\..\dContainers\dBezierSpline.h" />
     <ClInclude Include="..\..\dContainers\dClassInfo.h" />
