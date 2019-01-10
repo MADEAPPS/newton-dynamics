@@ -85,44 +85,77 @@ void dAnimationTrack::AddKeyframe(dFloat time, const dMatrix& matrix)
 
 void dAnimationTrack::FreezeScale(const dMatrix& parentMatrix)
 {
-return;
-	dList<dCurveValue>::dListNode* scaleNode = m_scale.GetFirst();
-	dList<dCurveValue>::dListNode* positNode = m_position.GetFirst();
-	for (dList<dCurveValue>::dListNode* rotationNode = m_rotation.GetFirst(); rotationNode; rotationNode = rotationNode->GetNext()) {
-		if (m_position.GetCount() && m_rotation.GetCount()) {
-			dVector euler0;
-			dVector euler1;
-			dCurveValue& scaleValue = scaleNode->GetInfo();
-			dCurveValue& positValue = positNode->GetInfo();
-			dCurveValue& rotationValue = rotationNode->GetInfo();
+	if (m_scale.GetCount()) {
+		dList<dCurveValue>::dListNode* scaleNode = m_scale.GetFirst();
+		dList<dCurveValue>::dListNode* positNode = m_position.GetFirst();
+		for (dList<dCurveValue>::dListNode* rotationNode = m_rotation.GetFirst(); rotationNode; rotationNode = rotationNode->GetNext()) {
+			if (m_position.GetCount() && m_rotation.GetCount()) {
+				dVector euler0;
+				dVector euler1;
+				dCurveValue& scaleValue = scaleNode->GetInfo();
+				dCurveValue& positValue = positNode->GetInfo();
+				dCurveValue& rotationValue = rotationNode->GetInfo();
 
-			dMatrix scaleMatrix(dGetIdentityMatrix());
-			scaleMatrix[0][0] = scaleValue.m_x;
-			scaleMatrix[1][1] = scaleValue.m_y;
-			scaleMatrix[2][2] = scaleValue.m_z;
-			dMatrix matrix(scaleMatrix * dPitchMatrix(rotationValue.m_x) * dYawMatrix(rotationValue.m_y) * dRollMatrix(rotationValue.m_z));
-			matrix.m_posit = dVector(positValue.m_x, positValue.m_y, positValue.m_z, 1.0f);
-			dMatrix transform(matrix * parentMatrix);
-			
-			dMatrix stretchAxis;
-			dVector scale(0.0f);
-			transform.PolarDecomposition(matrix, scale, stretchAxis);
-			matrix.GetEulerAngles(euler0, euler1);
+				dMatrix scaleMatrix(dGetIdentityMatrix());
+				scaleMatrix[0][0] = scaleValue.m_x;
+				scaleMatrix[1][1] = scaleValue.m_y;
+				scaleMatrix[2][2] = scaleValue.m_z;
+				dMatrix matrix(scaleMatrix * dPitchMatrix(rotationValue.m_x) * dYawMatrix(rotationValue.m_y) * dRollMatrix(rotationValue.m_z));
+				matrix.m_posit = dVector(positValue.m_x, positValue.m_y, positValue.m_z, 1.0f);
+				dMatrix transform(matrix * parentMatrix);
 
-			scaleValue.m_x = dFloat(1.0f);
-			scaleValue.m_y = dFloat(1.0f);
-			scaleValue.m_z = dFloat(1.0f);
+				dMatrix stretchAxis;
+				dVector scale(0.0f);
+				transform.PolarDecomposition(matrix, scale, stretchAxis);
+				matrix.GetEulerAngles(euler0, euler1);
 
-			rotationValue.m_x = euler0.m_x;
-			rotationValue.m_y = euler0.m_y;
-			rotationValue.m_z = euler0.m_z;
+				scaleValue.m_x = dFloat(1.0f);
+				scaleValue.m_y = dFloat(1.0f);
+				scaleValue.m_z = dFloat(1.0f);
 
-			positValue.m_x = matrix.m_posit.m_x;
-			positValue.m_y = matrix.m_posit.m_y;
-			positValue.m_z = matrix.m_posit.m_z;
+				rotationValue.m_x = euler0.m_x;
+				rotationValue.m_y = euler0.m_y;
+				rotationValue.m_z = euler0.m_z;
 
-			positNode = positNode->GetNext();
-			scaleNode = scaleNode->GetNext();
+				positValue.m_x = matrix.m_posit.m_x;
+				positValue.m_y = matrix.m_posit.m_y;
+				positValue.m_z = matrix.m_posit.m_z;
+
+				positNode = positNode->GetNext();
+				scaleNode = scaleNode->GetNext();
+			}
+		}
+		m_scale.RemoveAll();
+
+	} else {
+
+		dList<dCurveValue>::dListNode* positNode = m_position.GetFirst();
+		for (dList<dCurveValue>::dListNode* rotationNode = m_rotation.GetFirst(); rotationNode; rotationNode = rotationNode->GetNext()) {
+			if (m_position.GetCount() && m_rotation.GetCount()) {
+				dVector euler0;
+				dVector euler1;
+				dCurveValue& positValue = positNode->GetInfo();
+				dCurveValue& rotationValue = rotationNode->GetInfo();
+
+				dMatrix matrix(dPitchMatrix(rotationValue.m_x) * dYawMatrix(rotationValue.m_y) * dRollMatrix(rotationValue.m_z));
+				matrix.m_posit = dVector(positValue.m_x, positValue.m_y, positValue.m_z, 1.0f);
+				dMatrix transform(matrix * parentMatrix);
+
+				dMatrix stretchAxis;
+				dVector scale(0.0f);
+				transform.PolarDecomposition(matrix, scale, stretchAxis);
+				matrix.GetEulerAngles(euler0, euler1);
+
+				rotationValue.m_x = euler0.m_x;
+				rotationValue.m_y = euler0.m_y;
+				rotationValue.m_z = euler0.m_z;
+
+				positValue.m_x = matrix.m_posit.m_x;
+				positValue.m_y = matrix.m_posit.m_y;
+				positValue.m_z = matrix.m_posit.m_z;
+
+				positNode = positNode->GetNext();
+			}
 		}
 	}
 }
