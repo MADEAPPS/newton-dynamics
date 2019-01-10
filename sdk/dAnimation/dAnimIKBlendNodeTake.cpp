@@ -124,7 +124,7 @@ dAnimIKBlendNodeTake::~dAnimIKBlendNodeTake()
 void dAnimIKBlendNodeTake::SetFrame(dFloat t)
 {
 	m_time = dMod(m_time + t, m_takeData->m_period);
-m_time = m_takeData->m_period * 0.0f;
+//m_time = m_takeData->m_period * 0.0f;
 }
 
 void dAnimIKBlendNodeTake::Evaluate(dAnimPose& output, dFloat timestep)

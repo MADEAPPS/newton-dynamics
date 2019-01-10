@@ -711,12 +711,6 @@ void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNode
 		LocalMaterialMap localMaterialIndex;
 		ImportMaterials(fbxScene, ngdScene, fbxMeshNode, meshNode, materialCache, localMaterialIndex, textureCache, usedMaterials);
 
-		//int materialID = 0;		
-		//dScene::dTreeNode* const matNode = ngdScene->CreateMaterialNode(materialID);
-		//dMaterialNodeInfo* const material = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(matNode);
-		//material->SetName("default material");
-		//materialID ++;
-
 		int indexCount = 0;
 		int faceCount = fbxMesh->GetPolygonCount();
 		for (int i = 0; i < faceCount; i++) {
@@ -790,7 +784,6 @@ void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNode
 				dAssert(index <= indexCount);
 			}
 		}
-
 
 		// import skin if there is any
 		NewtonMeshVertexWeightData::dgWeights* weightArray = NULL;
@@ -980,7 +973,10 @@ void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeM
 		dScene::dTreeNode* const node = ngdScene->CreateSceneNode(data.m_parentNode);
 		dSceneNodeInfo* const info = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(node);
 
-		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
+		dMatrix parentMatrix(data.m_fbxNode->GetParent()->EvaluateGlobalTransform());
+		dMatrix nodeMatrix(data.m_fbxNode->EvaluateGlobalTransform());
+		dMatrix localMatrix(nodeMatrix * parentMatrix.Inverse4x4());
+//		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
 /*
 dMatrix globalMatrix(evaluator->GetNodeGlobalTransform(data.m_fbxNode));
 dVector euler1;
@@ -1179,7 +1175,7 @@ int main(int argc, char** argv)
 	NewtonWorld* const newton = NewtonCreate();
 	dScene* const ngdScene = new dScene(newton);
 
-	bool importMesh = true;
+	bool importMesh = false;
 	bool importAnimations = true;
 	if (ConvertToNgd(ngdScene, fbxScene, importMesh, importAnimations)) {
 		char name[1024];

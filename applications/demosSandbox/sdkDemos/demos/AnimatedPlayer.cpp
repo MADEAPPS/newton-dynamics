@@ -204,6 +204,13 @@ if (
 (entity->GetName() == "mixamorig:LeftLeg") ||
 (entity->GetName() == "xxxxxxxx")) 
 */
+dVector euler0;
+dVector euler1;
+dMatrix xxxx(frame.m_rotation, frame.m_posit);
+xxxx.GetEulerAngles(euler0, euler1);
+euler0 = euler0.Scale(dRadToDegree);
+dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, euler0.m_z));
+
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
 		
 		}
@@ -417,8 +424,8 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
-	//dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
-	dAnimIKController* const human = animationManager->CreateHuman("whiteman_walk.ngd", origin1);
+	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+	//dAnimIKController* const human = animationManager->CreateHuman("whiteman_walk.ngd", origin1);
 	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
 	
 /*
