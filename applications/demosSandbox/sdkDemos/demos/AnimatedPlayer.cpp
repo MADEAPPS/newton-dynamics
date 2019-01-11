@@ -439,7 +439,7 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 	dMatrix origin (dGetIdentityMatrix());
-	origin.m_posit.m_y = 0.0f;
+	origin.m_posit.m_y = -0.2f;
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
