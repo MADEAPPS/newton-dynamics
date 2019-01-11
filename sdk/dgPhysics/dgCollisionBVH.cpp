@@ -336,8 +336,6 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 	return t_ContinueSearh;
 }
 
-
-
 void dgCollisionBVH::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
 	data->m_me = this;
