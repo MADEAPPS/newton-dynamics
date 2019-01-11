@@ -261,30 +261,18 @@ void DemoEntity::InterpolateMatrixUnsafe(dFloat param)
 
 	dVector posit(p0 + (p1 - p0).Scale(param));
 	dQuaternion rotation(r0.Slerp(r1, param));
-
 	m_matrix = dMatrix(rotation, posit);
+
+	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+		child->InterpolateMatrixUnsafe(param);
+	}
 }
 
 void DemoEntity::InterpolateMatrix (DemoEntityManager& world, dFloat param)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	world.Lock(m_lock);
-
-	int stack = 1;
-	DemoEntity* pool[32];
-	pool[0] = this;
-	while (stack) {
-		stack--;
-		DemoEntity* const entity = pool[stack];
-		entity->InterpolateMatrixUnsafe(param);
-
-		for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-			pool[stack] = child;
-			stack++;
-		}
-	}
-
-	// release the critical section
+	InterpolateMatrixUnsafe(param);
 	world.Unlock(m_lock);
 }
 
