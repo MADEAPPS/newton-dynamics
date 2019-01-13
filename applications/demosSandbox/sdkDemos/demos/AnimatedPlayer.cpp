@@ -20,15 +20,21 @@
 #include "HeightFieldPrimitive.h"
 
 
-struct InverseKinematicNodes
+enum dRigType
+{
+	m_root,
+};
+
+struct dSkeletonRigDefinition
 {
 	char* m_name;
+	dRigType m_type;
 };
 
 
-static InverseKinematicNodes forkliftDefinition[] =
+static dSkeletonRigDefinition inverseKinematicsRidParts[] =
 {
-	{ "mixamorig:Hips" },
+	{ "mixamorig:Hips", m_root},
 //	{ "mixamorig:RightUpLeg" },
 //	{ "mixamorig:RightLeg" },
 //	{ "mixamorig:RightFoot" },
@@ -371,20 +377,23 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 		}
 	}
 
-	void CreateIKSolver(dAnimIKController* const controller, DemoEntity* const character)
+	DemoEntity* FindRigRoot(DemoEntity* const character)
 	{
 		int stack = 1;
 		DemoEntity* pool[32];
 		pool[0] = character;
 
-		const int nodesCount = sizeof(forkliftDefinition) / sizeof(forkliftDefinition[0]);
+		const int nodesCount = sizeof(inverseKinematicsRidParts) / sizeof(inverseKinematicsRidParts[0]);
 
 		while (stack) {
 			stack--;
 			DemoEntity* const entity = pool[stack];
-
 			for (int i = 0; i < nodesCount; i++) {
-				if (entity->GetName() == forkliftDefinition[i].m_name) {
+				if (entity->GetName() == inverseKinematicsRidParts[i].m_name) {
+					if (inverseKinematicsRidParts[i].m_type == dRigType::m_root)
+					{
+						return entity;
+					}
 					break;
 				}
 			}
@@ -394,6 +403,50 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 				stack++;
 			}
 		}
+		dAssert(0);
+		return NULL;
+	}
+
+	dAnimIKController* CreateSkeletonRig(DemoEntity* const character)
+	{
+		DemoEntity* const rootEntity = FindRigRoot(character);
+		dAnimIKController* const controller = CreateIKController();
+		controller->SetUserData(character);
+/*
+		int stack = 1;
+		DemoEntity* pool[32];
+
+
+		pool[0] = character;
+		const int nodesCount = sizeof(inverseKinematicsRidParts) / sizeof(inverseKinematicsRidParts[0]);
+
+		while (stack) {
+			stack--;
+			DemoEntity* const entity = pool[stack];
+
+			for (int i = 0; i < nodesCount; i++) {
+				if (entity->GetName() == inverseKinematicsRidParts[i].m_name) {
+					switch (inverseKinematicsRidParts[i].m_type)
+					{
+						case dRigType::m_root
+						{
+							break;
+						}
+
+						default:
+							dAssert(0);
+					}
+					break;
+				}
+			}
+
+			for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
+				pool[stack] = node;
+				stack++;
+			}
+		}
+*/
+		return controller;
 	}
 
 	dAnimIKController* CreateHuman(const char* const fileName, const dMatrix& origin)
@@ -406,8 +459,7 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 		character->ResetMatrix(*scene, character->GetCurrentMatrix() * origin);
 		scene->Append(character);
 
-		dAnimIKController* const controller = CreateIKController();
-		controller->SetUserData(character);
+		dAnimIKController* const controller = CreateSkeletonRig(character);
 
 //		dAnimCharacterUserData* const userData = new dAnimCharacterUserData(controller);
 //		character->SetUserData(userData);
@@ -423,8 +475,6 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, walk);
 
 		controller->SetAnimationTree(animTree);
-		CreateIKSolver(controller, character);
-
 		return controller;
 	}
 

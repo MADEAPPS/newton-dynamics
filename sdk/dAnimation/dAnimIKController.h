@@ -15,11 +15,11 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimPose.h"
-#include "dAnimIDRigJoint.h"
+#include "dAnimIKRigJoint.h"
 
 class dAnimIKBlendNodeRoot;
 
-class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
+class dAnimIKController: public dCustomControllerBase, public dAnimIKRigJoint
 {
 	public:
 	dAnimIKController ();
@@ -31,6 +31,9 @@ class dAnimIKController: public dCustomControllerBase//, public dAnimIDRigJoint
 //	dMatrix GetBasePoseMatrix() const;
 //	const dMatrix& GetLocalFrame() const {return m_localFrame;}
 //	dList<dAnimIDRigEffector*>& GetEffectors() {return m_effectors;}
+
+	void* GetUserData() const;
+	void SetUserData(void* const userData);
 
 	dAnimPose& GetBasePose() {return m_basePose;}
 	dAnimIKBlendNodeRoot* GetAnimationTree() const;

@@ -65,6 +65,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dAnimation\dAnimIKManager.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKRigJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimPose.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +90,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeTake.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIkRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimPose.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

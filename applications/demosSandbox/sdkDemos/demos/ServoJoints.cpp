@@ -44,7 +44,7 @@ struct SERVO_VEHICLE_DEFINITION
 };
 
 
-static SERVO_VEHICLE_DEFINITION forkliftDefinition[] =
+static SERVO_VEHICLE_DEFINITION inverseKinematicsRidParts[] =
 {
 	{"body",		"convexHull",		   4096.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
 	{"fr_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
@@ -930,7 +930,7 @@ void ServoJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 	
 	// load a the mesh of the articulate vehicle
-	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
 	inputManager->AddPlayer(forklift);
 
 	// place heavy load to show reproduce black bird dream problems

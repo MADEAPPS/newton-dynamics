@@ -70,7 +70,6 @@ class dRayCastRecord: public dCustomControllerBase
 };
 
 
-
 class LineOfSightRayCastEntity: public DemoEntity
 {
 	public:

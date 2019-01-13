@@ -16,6 +16,7 @@
 
 dAnimIKController::dAnimIKController()
 	:dCustomControllerBase()
+	,dAnimIKRigJoint(NULL)
 	,m_basePose()
 //	,dAnimIDRigJoint(NULL)
 //	,m_localFrame(dGetIdentityMatrix())
@@ -24,7 +25,7 @@ dAnimIKController::dAnimIKController()
 //	,m_effectors()
 	,m_animationTree(NULL)
 {
-//	m_root = this;
+	m_root = this;
 //	m_staticWorld.SetLoopNode(true);
 }
 
@@ -33,6 +34,17 @@ dAnimIKController::~dAnimIKController ()
 	if (m_animationTree) {
 		delete m_animationTree;
 	}
+}
+
+void* dAnimIKController::GetUserData() const
+{
+	return dCustomControllerBase::GetUserData();
+}
+
+void dAnimIKController::SetUserData(void* const userData)
+{
+	dCustomControllerBase::SetUserData(userData);
+	dAnimIKRigJoint::SetUserData(userData);
 }
 
 dAnimIKBlendNodeRoot* dAnimIKController::GetAnimationTree() const
