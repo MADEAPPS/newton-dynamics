@@ -46,7 +46,7 @@ class dAnimTakeData: public dRefCounter
 			int GetIndex(dFloat t) const
 			{
 				dAssert(t >= 0.0f);
-				const int size = GetSize();
+				const int size = this->GetSize();
 				if (t > m_data[size - 1].m_time) {
 					t = m_data[size - 1].m_time;
 				}
