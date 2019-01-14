@@ -12,76 +12,94 @@
 #ifndef __D_ARRAY__
 #define __D_ARRAY__
 
-
-template<class OBJECT>
+template<class T>
 class dArray
 {
 	public:
-	dArray()
-		:m_capacity(0)
-		,m_data(NULL)
-	{
-	}
+	dArray();
+	~dArray();
 
-	~dArray()
-	{
+	T& operator[] (int i);
+	const T& operator[] (int i) const;
+
+	int GetSize() const;
+	void Resize(int size) const;
+
+	protected:
+	mutable int m_capacity;
+	mutable T* m_data;
+};
+
+
+template<class T>
+dArray<T>::dArray()
+	:m_capacity(0)
+	,m_data(NULL)
+{
+}
+
+template<class T>
+dArray<T>::~dArray()
+{
+	if (m_data) {
+		delete[] m_data;
+	}
+}
+
+
+template<class T>
+T& dArray<T>::operator[] (int i)
+{
+	dAssert(i >= 0);
+	while (i >= m_capacity) {
+		Resize(i * 2);
+	}
+	return m_data[i];
+}
+
+template<class T>
+const T& dArray<T>::operator[] (int i) const
+{
+	dAssert(i >= 0);
+	while (i >= m_capacity) {
+		Resize(i * 2);
+	}
+	return m_data[i];
+}
+
+template<class T>
+int dArray <T>::GetSize() const
+{
+	return m_capacity;
+}
+
+template<class T>
+void dArray <T>::Resize(int size) const
+{
+	if (size >= m_capacity) {
+		//size = dMax(size, 16);
+		T* const newArray = new T[size];
 		if (m_data) {
+			for (int i = 0; i < m_capacity; i++) {
+				newArray[i] = m_data[i];
+			}
 			delete[] m_data;
 		}
+		m_data = newArray;
+		m_capacity = size;
 	}
-
-	OBJECT& operator[] (int i)
-	{
-		dAssert(i >= 0);
-		while (i >= m_capacity) {
-			Resize(i * 2);
-		}
-		return m_data[i];
-	}
-
-	const OBJECT& operator[] (int i) const
-	{
-		dAssert(i >= 0);
-		while (i >= m_capacity) {
-			Resize(i * 2);
-		}
-		return m_data[i];
-	}
-
-	int GetSize() const
-	{
-		return m_capacity;
-	}
-
-	void Resize(int size) const
-	{
-		if (size >= m_capacity) {
-			//size = dMax(size, 16);
-			OBJECT* const newArray = new OBJECT[size];
-			if (m_data) {
-				for (int i = 0; i < m_capacity; i++) {
-					newArray[i] = m_data[i];
-				}
-				delete[] m_data;
+	else if (size < m_capacity) {
+		//size = dMax(size, 16);
+		T* const newArray = new T[size];
+		if (m_data) {
+			for (int i = 0; i < size; i++) {
+				newArray[i] = m_data[i];
 			}
-			m_data = newArray;
-			m_capacity = size;
-		} else if (size < m_capacity) {
-			//size = dMax(size, 16);
-			OBJECT* const newArray = new OBJECT[size];
-			if (m_data) {
-				for (int i = 0; i < size; i++) {
-					newArray[i] = m_data[i];
-				}
-				delete[] m_data;
-			}
-			m_data = newArray;
-			m_capacity = size;
+			delete[] m_data;
 		}
+		m_data = newArray;
+		m_capacity = size;
 	}
-
-	mutable int m_capacity;
-	mutable OBJECT* m_data;
-};
+}
 
 #endif

@@ -14,7 +14,6 @@
 #include "dAnimPose.h"
 #include "dAnimIKBlendNode.h"
 
-
 class dAnimTakeData: public dRefCounter
 {
 	public:
@@ -55,7 +54,6 @@ class dAnimTakeData: public dRefCounter
 				int i0 = 0;
 				int i1 = size - 1;
 
-				//const dFloat* const data = &m_time[0];
 				while ((i1 - i0) > 8) {
 					const int mid = (i1 + i0) / 2;
 					if (t < m_data[mid].m_time) {
