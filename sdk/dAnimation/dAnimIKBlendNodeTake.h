@@ -47,8 +47,8 @@ class dAnimTakeData: public dRefCounter
 			{
 				dAssert(t >= 0.0f);
 				const int size = this->GetSize();
-				if (t > m_data[size - 1].m_time) {
-					t = m_data[size - 1].m_time;
+				if (t > this->m_data[size - 1].m_time) {
+					t = this->m_data[size - 1].m_time;
 				}
 
 				int i0 = 0;
@@ -56,15 +56,15 @@ class dAnimTakeData: public dRefCounter
 
 				while ((i1 - i0) > 8) {
 					const int mid = (i1 + i0) / 2;
-					if (t < m_data[mid].m_time) {
+					if (t < this->m_data[mid].m_time) {
 						i1 = mid;
 					} else {
 						i0 = mid;
 					}
 				}
-				dAssert(m_data[i0].m_time <= t);
+				dAssert(this->m_data[i0].m_time <= t);
 				for (int i = i0 + 1; i < size; i++) {
-					if (m_data[i].m_time >= t) {
+					if (this->m_data[i].m_time >= t) {
 						return i - 1;
 					}
 				}
