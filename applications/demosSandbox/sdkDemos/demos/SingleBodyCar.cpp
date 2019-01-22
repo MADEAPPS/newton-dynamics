@@ -381,10 +381,10 @@ return;
 
 		// load vehicle visual mesh
 		DemoEntity* const vehicleEntity = LoadVisualModel (carModelName);
-return NULL;
 
 		// set entity world location
 		vehicleEntity->ResetMatrix(*scene, location);
+return NULL;
 
 		// make chassis collision shape;
 		NewtonCollision* const chassisCollision = CreateChassisCollision(vehicleEntity, world);
@@ -619,10 +619,11 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	
 	// load 
 	//dVehicleChassis* const player = manager->CreateVehicle("porche918", location);
-	//dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
+	dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
 	//dVehicleChassis* const player = manager->CreateVehicle("enzo.ngd", location);
-	dVehicleChassis* const player = manager->CreateVehicle("whiteman.ngd", location);
-	
+
+	location.m_posit.m_z += 2.0f;
+	manager->CreateVehicle("whiteman.ngd", location);
 
 	// set this vehicle as the player
 	manager->SetAsPlayer(player);
