@@ -516,52 +516,54 @@ bool dMatrix::SanityCheck() const
 	return true;
 }
 
-
 dMatrix dMatrix::Inverse4x4 () const
 {
-	const dFloat tol = dFloat (1.0e-6f);
 	dMatrix tmp (*this);
 	dMatrix inv (dGetIdentityMatrix());
 	for (int i = 0; i < 4; i ++) {
-		dFloat diag = tmp[i][i];
-		if (dAbs (diag) < tol) {
-			int j = 0;
-			for (j = i + 1; j < 4; j ++) {
-				dFloat val = tmp[j][i];
-				if (dAbs (val) > tol) {
-					break;
-				}
+		int permute = i;
+		dFloat pivot = dAbs(tmp[i][i]);
+		for (int j = i + 1; j < 4; j++) {
+			dFloat pivot1 = dAbs(tmp[j][i]);
+			if (pivot1 > pivot) {
+				permute = j;
+				pivot = pivot1;
 			}
-			dAssert (j < 4);
-			for (int k = 0; k < 4; k ++) {
-				tmp[i][k] += tmp[j][k];
-				inv[i][k] += inv[j][k];
+		}
+		dAssert(pivot > 1.0e-6f);
+		if (permute != i) {
+			for (int j = 0; j < 4; j++) {
+				dSwap(inv[i][j], inv[permute][j]);
+				dSwap(tmp[i][j], tmp[permute][j]);
 			}
-			diag = tmp[i][i];
 		}
-		dFloat invDiag = 1.0f / diag;
-		for (int j = 0; j < 4; j ++) {
-			tmp[i][j] *= invDiag;
-			inv[i][j] *= invDiag;
-		}
-		tmp[i][i] = 1.0f;
-
 		
-		for (int j = 0; j < 4; j ++) {
-			if (j != i) {
-				dFloat pivot = tmp[j][i];
-				for (int k = 0; k < 4; k ++) {
-					tmp[j][k] -= pivot * tmp[i][k];
-					inv[j][k] -= pivot * inv[i][k];
-				}
-				tmp[j][i] = 0.0f;
+		for (int j = i + 1; j < 4; j++) {
+			dFloat scale = tmp[j][i] / tmp[i][i];
+			for (int k = 0; k < 4; k++) {
+				tmp[j][k] -= scale * tmp[i][k];
+				inv[j][k] -= scale * inv[i][k];
 			}
+			tmp[j][i] = 0.0f;
+		}
+	}
+
+	dVector zero(0.0f);
+	for (int i = 3; i >= 0; i--) {
+		dVector acc (zero);
+		for (int j = i + 1; j < 4; j++) {
+			dFloat pivot = tmp[i][j];
+			for (int k = 0; k < 4; k++) {
+				acc[k] += pivot * inv[j][k];
+			}
+		}
+		dFloat den = 1.0f / tmp[i][i];
+		for (int k = 0; k < 4; k++) {
+			inv[i][k] = den * (inv[i][k] - acc[k]);
 		}
 	}
 	return inv;
 }
-
-
 
 
 #if 0

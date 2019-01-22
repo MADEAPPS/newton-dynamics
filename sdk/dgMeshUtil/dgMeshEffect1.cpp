@@ -2368,13 +2368,14 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 	dgStack<dgInt8> faceMark(format->m_faceCount);
 	memset(&faceMark[0], 0, faceMark.GetSizeInBytes());
 	const dgInt32* const vertexIndex = format->m_vertex.m_indexList;
+
 	while (pendingFaces) {
 		dgInt32 acc = 0;
 		pendingFaces = false;
-		//dgInt32 vertexBank = layerCount * vertexCount;
 		dgInt32 vertexBank = layerIndex * vertexCount;
 		for (dgInt32 j = 0; j < format->m_faceCount; j++) {
 			dgInt32 indexCount = format->m_faceIndexCount[j];
+
 			if (indexCount > 0) {
 				dgInt32 index[256];
 				dgInt64 userdata[256];
@@ -2387,6 +2388,7 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 						userdata[i] = k;
 						index[i] = vertexIndex[acc + i] + vertexBank;
 					}
+
 
 					dgEdge* const edge = AddFace(indexCount, index, userdata);
 					if (edge) {
@@ -2485,7 +2487,9 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 			layerBase += vertexCount;
 			for (dgInt32 i = 0; i < vertexCount; i++) {
 				m_points.m_layers.PushBack(layerIndex);
-				m_points.m_vertex.PushBack(vertex[i * vertexStride]);
+				dgInt32 index = i * vertexStride;
+				dgBigVector p (vertex[index + 0], vertex[index + 1], vertex[index + 2], vertex[index + 3]);
+				m_points.m_vertex.PushBack(p);
 			}
 			if (m_points.m_weights.m_count) {
 				dgInt8* const data = (dgInt8*)format->m_vertexWeights.m_data;

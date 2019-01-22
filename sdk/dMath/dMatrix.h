@@ -51,7 +51,7 @@ class dMatrix
 
 	bool TestIdentity() const; 
 	bool TestOrthogonal() const; 
-	dMatrix Inverse4x4 () const;
+	dMatrix Inverse4x4() const;
 	dVector RotateVector4x4 (const dVector &v) const;
 	dMatrix JacobiDiagonalization (dVector& eigenValues, const dMatrix& initialMatrix = dGetIdentityMatrix()) const;
 

@@ -43,13 +43,8 @@ class dMeshNodeInfo: public dGeometryNodeInfo
 	virtual void ConvertToTriangles();
 
 	virtual void RepairTJoints ();
+	virtual void SmoothNormals(dFloat angleInRadiants);
 	virtual void RemoveUnusedVertices(dScene* const world, dScene::dTreeNode* const myNode);
-
-	virtual void SmoothNormals (dFloat angleInRadiants);
-
-//	virtual void BeginBuild ();
-//	virtual void AddPolygon (int pointsCount, const neMeshInfoFlatPoint* const points, int materialID);
-//	virtual void EndBuild ();
 
 	bool hasSkinWeights() const;
 	const int* GetIndexToVertexMap() const;

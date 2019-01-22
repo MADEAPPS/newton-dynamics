@@ -43,6 +43,7 @@
     <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodePose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodeRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodeTwoWay.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIK3dofJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodePose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
@@ -65,6 +66,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dAnimation\dAnimIKManager.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKRigJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimPose.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +78,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodePose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodeRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodeTwoWay.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIK3dofJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodePose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
@@ -89,6 +92,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimIDRigLimb.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimPose.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

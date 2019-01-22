@@ -23,6 +23,7 @@
 enum dRigType
 {
 	m_root,
+	m_bone,
 };
 
 struct dSkeletonRigDefinition
@@ -35,12 +36,13 @@ struct dSkeletonRigDefinition
 static dSkeletonRigDefinition inverseKinematicsRidParts[] =
 {
 	{ "mixamorig:Hips", m_root},
-//	{ "mixamorig:RightUpLeg" },
+	{ "mixamorig:RightUpLeg", m_bone},
+	{ "mixamorig:LeftUpLeg", m_bone},
 //	{ "mixamorig:RightLeg" },
 //	{ "mixamorig:RightFoot" },
 //	{ "mixamorig:RightToeBase" },
 //	{ "mixamorig:RightToe_End" },
-//	{ "mixamorig:LeftUpLeg" },
+
 //	{ "mixamorig:LeftLeg" },
 //	{ "mixamorig:LeftFoot" },
 //	{ "mixamorig:LeftToeBase" },
@@ -407,45 +409,60 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 		return NULL;
 	}
 
+	dSkeletonRigDefinition* FindDefinition(DemoEntity* const entity) const
+	{
+		const int nodesCount = sizeof(inverseKinematicsRidParts) / sizeof(inverseKinematicsRidParts[0]);
+		for (int i = 0; i < nodesCount; i++) {
+			if (entity->GetName() == inverseKinematicsRidParts[i].m_name) {
+				switch (inverseKinematicsRidParts[i].m_type) 
+				{
+					case dRigType::m_root:
+					case dRigType::m_bone:
+					{
+						return &inverseKinematicsRidParts[i];
+					}
+
+					default:;
+				}
+			}
+		}
+		return NULL;
+
+	}
+
 	dAnimIKController* CreateSkeletonRig(DemoEntity* const character)
 	{
 		DemoEntity* const rootEntity = FindRigRoot(character);
 		dAnimIKController* const controller = CreateIKController();
-		controller->SetUserData(character);
-/*
-		int stack = 1;
-		DemoEntity* pool[32];
+		controller->SetUserData(rootEntity);
 
+		int stack = 0;
+		DemoEntity* entityStack[32];
+		dAnimIKRigJoint* parentJointStack[32];
 
-		pool[0] = character;
-		const int nodesCount = sizeof(inverseKinematicsRidParts) / sizeof(inverseKinematicsRidParts[0]);
+		for (DemoEntity* node = rootEntity->GetChild(); node; node = node->GetSibling()) {
+			entityStack[stack] = node;
+			parentJointStack[stack] = controller->GetAsIKRigJoint();
+			stack ++;
+		}
 
 		while (stack) {
 			stack--;
-			DemoEntity* const entity = pool[stack];
+			DemoEntity* const entity = entityStack[stack];
+			dAnimIKRigJoint* const parentJoint = parentJointStack[stack];
+			dSkeletonRigDefinition* const definitions = FindDefinition(entity);
+			if (definitions) {
+				dAnimIK3dofJoint* const joint = new dAnimIK3dofJoint(parentJoint);
+				joint->SetUserData(entity);
 
-			for (int i = 0; i < nodesCount; i++) {
-				if (entity->GetName() == inverseKinematicsRidParts[i].m_name) {
-					switch (inverseKinematicsRidParts[i].m_type)
-					{
-						case dRigType::m_root
-						{
-							break;
-						}
-
-						default:
-							dAssert(0);
-					}
-					break;
+				for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
+					entityStack[stack] = node;
+					parentJointStack[stack] = joint;
+					stack++;
 				}
 			}
-
-			for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
-				pool[stack] = node;
-				stack++;
-			}
 		}
-*/
+
 		return controller;
 	}
 

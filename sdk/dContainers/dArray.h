@@ -87,8 +87,7 @@ void dArray <T>::Resize(int size) const
 		}
 		m_data = newArray;
 		m_capacity = size;
-	}
-	else if (size < m_capacity) {
+	} else if (size < m_capacity) {
 		//size = dMax(size, 16);
 		T* const newArray = new T[size];
 		if (m_data) {

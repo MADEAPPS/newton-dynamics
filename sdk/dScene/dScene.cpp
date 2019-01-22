@@ -173,6 +173,7 @@ static void AddTextureCacheMaterianCacheMeshCache (dScene* const scene)
 	scene->DeleteDuplicateGeometries();
 }
 
+/*
 static void RemoveLocalTransformFromGeometries (dScene* const scene)
 {
 	dScene::dTreeNode* const cacheNode = scene->FindGetGeometryCacheNode();
@@ -191,7 +192,7 @@ static void RemoveLocalTransformFromGeometries (dScene* const scene)
 	}
 	scene->FreezeScale();
 }
-
+*/
 
 // this constructor is for the editor only
 dScene::dScene(NewtonWorld* const newton)
@@ -936,11 +937,11 @@ void dScene::FreezeGeometryPivot ()
 				dMatrix geoScaleMatrix(sceneInfo->GetGeometryTransform());
 				sceneInfo->SetGeometryTransform(dGetIdentityMatrix());
 
-				dMatrix meshPivotMatrix(meshInfo->GetPivotMatrix());
-				meshInfo->SetPivotMatrix(dGetIdentityMatrix());
-
-				dMatrix matrix(meshPivotMatrix * geoScaleMatrix);
-				meshInfo->BakeTransform(matrix);
+				//dMatrix meshPivotMatrix(meshInfo->GetPivotMatrix());
+				//meshInfo->SetPivotMatrix(dGetIdentityMatrix());
+				//dMatrix matrix(meshPivotMatrix * geoScaleMatrix);
+				//meshInfo->BakeTransform(matrix);
+				meshInfo->BakeTransform(geoScaleMatrix);
 			}
 		}
 	}
@@ -1515,9 +1516,10 @@ void dScene::NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCal
 			NewtonCollisionGetInfo(collision, &collsionRecord);
 
 			// extract the offset matrix form the collision
-			dMatrix& offsetMatrix = *((dMatrix*)&collsionRecord.m_offsetMatrix[0][0]);
-			info->BakeTransform (offsetMatrix.Inverse());
-			info->SetPivotMatrix(offsetMatrix * info->GetPivotMatrix());
+			dAssert(0);
+			//dMatrix& offsetMatrix = *((dMatrix*)&collsionRecord.m_offsetMatrix[0][0]);
+			//info->BakeTransform (offsetMatrix.Inverse());
+			//info->SetPivotMatrix(offsetMatrix * info->GetPivotMatrix());
 
 			dScene::dTreeNode* const collisionNode = CreateCollisionFromNewtonCollision(GetRootNode(), collision);
 
@@ -1623,7 +1625,6 @@ bool dScene::Deserialize (const char* const fileName)
 		// update the revision to latest 
 		if (GetRevision() < 104) {
 			m_revision = 104;
-			RemoveLocalTransformFromGeometries (this);
 		}
 	}
 

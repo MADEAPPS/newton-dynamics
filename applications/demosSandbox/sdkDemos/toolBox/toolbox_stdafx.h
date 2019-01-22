@@ -193,6 +193,7 @@ typedef long long unsigned64;
 #include <dAnimationStdAfx.h>
 
 #include <dAnimIKManager.h>
+#include <dAnimIK3dofJoint.h>
 #include <dAnimIKBlendNodePose.h>
 #include <dAnimIKBlendNodeRoot.h>
 #include <dAnimIKBlendNodeTake.h>

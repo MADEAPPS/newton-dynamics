@@ -25,7 +25,7 @@ class dAnimIKRigJoint: public dAnimAcyclicJoint
 
 	dAnimIKController* GetRoot() {return m_root;}
 //	virtual NewtonBody* GetNewtonBody() const {return NULL;}
-//	virtual dAnimIKRigJoint* GetAsRigJoint() { return this; }
+	virtual dAnimIKRigJoint* GetAsIKRigJoint() { return this; }
 //	virtual void Init(NewtonBody* const body);
 
 	protected:

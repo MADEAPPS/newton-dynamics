@@ -219,7 +219,6 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importM
 	convertMatrix[1][1] = dFloat(scaleFactor / 100.0f);
 	convertMatrix[2][2] = dFloat(scaleFactor / 100.0f);
 
-
 	int sign;
 	dVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
 	dVector frontVector(1.0f, 0.0f, 0.0f, 0.0f);
@@ -275,7 +274,6 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool import
 	usedMaterials.Insert(0, defaulMaterialNode);
 
 	g_materialId = 0;
-	PrepareSkeleton(fbxScene);
 	LoadHierarchy(ngdScene, fbxScene, nodeMap);
 
 	if (importMesh) {
@@ -306,53 +304,53 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool import
 
 				switch (attributeType)
 				{
-				case FbxNodeAttribute::eMesh:
-				{
-					ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
-					break;
-				}
+					case FbxNodeAttribute::eMesh:
+					{
+						ImportMeshNode(ngdScene, fbxScene, nodeMap, fbxNode, ngdNode, meshCache, materialCache, textureCache, usedMaterials);
+						break;
+					}
 
-				case FbxNodeAttribute::eLine:
-				{
-					dAssert(0);
-					//ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-					break;
-				}
+					case FbxNodeAttribute::eLine:
+					{
+						dAssert(0);
+						//ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+						break;
+					}
 
-				case FbxNodeAttribute::eNurbsCurve:
-				{
-					dAssert(0);
-					//ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-					break;
-				}
+					case FbxNodeAttribute::eNurbsCurve:
+					{
+						dAssert(0);
+						//ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
+						break;
+					}
 
-				case FbxNodeAttribute::eSkeleton:
-				case FbxNodeAttribute::eNull:
-				{
-					break;
-				}
+					case FbxNodeAttribute::eSkeleton:
+					case FbxNodeAttribute::eNull:
+					{
+						break;
+					}
 
-				case FbxNodeAttribute::eMarker:
-				case FbxNodeAttribute::eNurbs:
-				case FbxNodeAttribute::ePatch:
-				case FbxNodeAttribute::eCamera:
-				case FbxNodeAttribute::eCameraStereo:
-				case FbxNodeAttribute::eCameraSwitcher:
-				case FbxNodeAttribute::eLight:
-				case FbxNodeAttribute::eOpticalReference:
-				case FbxNodeAttribute::eOpticalMarker:
+					case FbxNodeAttribute::eMarker:
+					case FbxNodeAttribute::eNurbs:
+					case FbxNodeAttribute::ePatch:
+					case FbxNodeAttribute::eCamera:
+					case FbxNodeAttribute::eCameraStereo:
+					case FbxNodeAttribute::eCameraSwitcher:
+					case FbxNodeAttribute::eLight:
+					case FbxNodeAttribute::eOpticalReference:
+					case FbxNodeAttribute::eOpticalMarker:
 
-				case FbxNodeAttribute::eTrimNurbsSurface:
-				case FbxNodeAttribute::eBoundary:
-				case FbxNodeAttribute::eNurbsSurface:
-				case FbxNodeAttribute::eShape:
-				case FbxNodeAttribute::eLODGroup:
-				case FbxNodeAttribute::eSubDiv:
-				case FbxNodeAttribute::eCachedEffect:
-				case FbxNodeAttribute::eUnknown:
-				default:
-					dAssert(0);
-					break;
+					case FbxNodeAttribute::eTrimNurbsSurface:
+					case FbxNodeAttribute::eBoundary:
+					case FbxNodeAttribute::eNurbsSurface:
+					case FbxNodeAttribute::eShape:
+					case FbxNodeAttribute::eLODGroup:
+					case FbxNodeAttribute::eSubDiv:
+					case FbxNodeAttribute::eCachedEffect:
+					case FbxNodeAttribute::eUnknown:
+					default:
+						dAssert(0);
+						break;
 				}
 			}
 		}
@@ -678,28 +676,36 @@ void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, FbxNode* 
 	}
 }
 
-void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
+
+void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxNode* const fbxMeshNode, dScene::dTreeNode* const ngdNode, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
 {
 	GlobalMeshMap::dTreeNode* instanceNode = meshCache.Find(fbxMeshNode->GetMesh());
 	if (instanceNode) {
 		dScene::dTreeNode* const meshInstance = instanceNode->GetInfo();
-		ngdScene->AddReference(node, meshInstance);
+		ngdScene->AddReference(ngdNode, meshInstance);
 	} else {
 		FbxMesh* const fbxMesh = fbxMeshNode->GetMesh();
-		dScene::dTreeNode* const meshNode = ngdScene->CreateMeshNode(node);
+		dScene::dTreeNode* const meshNode = ngdScene->CreateMeshNode(ngdNode);
 		meshCache.Insert(meshNode, fbxMesh);
 
-		dMeshNodeInfo* const instance = (dMeshNodeInfo*)ngdScene->GetInfoFromNode(meshNode);
+		dMeshNodeInfo* const ngdMeshInfo = (dMeshNodeInfo*)ngdScene->GetInfoFromNode(meshNode);
+		dSceneNodeInfo* const ngdNodeInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
+
 		char name[256];
 		sprintf(name, "%s_mesh", fbxMeshNode->GetName());
-		instance->SetName(name);
+		ngdMeshInfo->SetName(name);
 
-		FbxAMatrix pivotMatrix;
-		fbxMesh->GetPivot(pivotMatrix);
-
-		dMatrix matrix(pivotMatrix);
-		instance->SetPivotMatrix(matrix);
-		dAssert(matrix[1][1] == 1.0f);
+		FbxVector4 fbxPivotScaling(fbxMeshNode->GetGeometricScaling(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotRotation(fbxMeshNode->GetGeometricRotation(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotTranslation(fbxMeshNode->GetGeometricTranslation(FbxNode::eSourcePivot));
+		dVector pivotTranslation(dFloat(fbxPivotTranslation[0]), dFloat(fbxPivotTranslation[1]), dFloat(fbxPivotTranslation[2]), 1.0f);
+		dVector pivotRotation(dFloat(fbxPivotRotation[0] * dDegreeToRad), dFloat(fbxPivotRotation[1] * dDegreeToRad), dFloat(fbxPivotRotation[2] * dDegreeToRad), 0.0f);
+		dMatrix pivotScale(dGetIdentityMatrix());
+		pivotScale[0][0] = dFloat(fbxPivotScaling[0]);
+		pivotScale[1][1] = dFloat(fbxPivotScaling[1]);
+		pivotScale[2][2] = dFloat(fbxPivotScaling[2]);
+		dMatrix pivotMatrix(pivotScale * dMatrix(pivotRotation[0], pivotRotation[1], pivotRotation[2], pivotTranslation));
+		ngdNodeInfo->SetGeometryTransform(pivotMatrix);
 
 		LocalMaterialMap localMaterialIndex;
 		ImportMaterials(fbxScene, ngdScene, fbxMeshNode, meshNode, materialCache, localMaterialIndex, textureCache, usedMaterials);
@@ -730,8 +736,7 @@ void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNode
 		}
 
 		FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV();
-		FbxLayerElement::EMappingMode uvMapingMode = uvArray ? uvArray->GetMappingMode() : FbxGeometryElement::eNone;
-		FbxLayerElement::EReferenceMode uvRefMode = uvArray ? uvArray->GetReferenceMode() : FbxGeometryElement::eIndex;
+		const char* const uvLayerName = uvArray ? uvArray->GetName() : NULL;
 
 		FbxGeometryElementMaterial* const materialArray = fbxMesh->GetElementMaterial();
 		FbxLayerElement::EMappingMode materialMapingMode = materialArray ? materialArray->GetMappingMode() : FbxGeometryElement::eNone;
@@ -759,19 +764,19 @@ void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNode
 
 			faceIndexList[i] = polygonIndexCount;
 			for (int j = 0; j < polygonIndexCount; j++) {
-				vertexIndex[index] = fbxMesh->GetPolygonVertex(i, j);
-				FbxVector4 n(0, 1, 0, 0);
+				bool pUnmapped = false;
+				FbxVector4 n(0.0, 1.0, 0.0, 0.0);
+				FbxVector2 uv(0.0, 0.0);
+				
 				fbxMesh->GetPolygonVertexNormal(i, j, n);
-				normalArray[index] = dVector(dFloat(n[0]), dFloat(n[1]), dFloat(n[2]), 0.0f);
-				normalIndex[index] = index;
+				fbxMesh->GetPolygonVertexUV(i, j, uvLayerName, uv, pUnmapped);
 
-				FbxVector2 uv(0, 0);
-				if (uvMapingMode == FbxGeometryElement::eByPolygonVertex) {
-					int textIndex = (uvRefMode == FbxGeometryElement::eDirect) ? index : uvArray->GetIndexArray().GetAt(index);
-					uv = uvArray->GetDirectArray().GetAt(textIndex);
-				}
-				uv0Index[index] = index;
+				vertexIndex[index] = fbxMesh->GetPolygonVertex(i, j);
 				uv0Array[index] = dVector(dFloat(uv[0]), dFloat(uv[1]), 0.0f, 0.0f);
+				normalArray[index] = dVector(dFloat(n[0]), dFloat(n[1]), dFloat(n[2]), dFloat(0.0f));
+
+				uv0Index[index] = index;
+				normalIndex[index] = index;
 
 				index++;
 				dAssert(index <= indexCount);
@@ -900,12 +905,11 @@ void ImportMeshNode(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNode
 		format.m_uv0.m_indexList = uv0Index;
 		format.m_uv0.m_strideInBytes = sizeof(dVector);
 
-		instance->BuildFromVertexListIndexList(&format);
+		ngdMeshInfo->BuildFromVertexListIndexList(&format);
 
 		// some meshes has degenerated faces we must repair them to be legal manifold
-		instance->RepairTJoints();
-
-		instance->SmoothNormals(45.0f * dDegreeToRad);
+		ngdMeshInfo->RepairTJoints();
+//		ngdMeshInfo->SmoothNormals(45.0f * dDegreeToRad);
 
 		if (weightArray) {
 			delete[] weightArray;
@@ -966,44 +970,16 @@ void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeM
 		dScene::dTreeNode* const node = ngdScene->CreateSceneNode(data.m_parentNode);
 		dSceneNodeInfo* const info = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(node);
 
-		dMatrix parentMatrix(data.m_fbxNode->GetParent()->EvaluateGlobalTransform());
-		dMatrix nodeMatrix(data.m_fbxNode->EvaluateGlobalTransform());
-		dMatrix localMatrix(nodeMatrix * parentMatrix.Inverse4x4());
-//		dMatrix localMatrix(evaluator->GetNodeLocalTransform(data.m_fbxNode));
-/*
-dMatrix globalMatrix(evaluator->GetNodeGlobalTransform(data.m_fbxNode));
-dVector euler1;
-dVector euler2;
-dVector scale;
-dMatrix stretchAxis;
-globalMatrix.PolarDecomposition(globalMatrix, scale, stretchAxis);
-globalMatrix.GetEulerAngles(euler1, euler2);
-euler1 = euler1.Scale(dRadToDegree);
-euler2 = euler2.Scale(dRadToDegree);
-*/
+		FbxNode* const fbxNode = data.m_fbxNode;
+		dMatrix localMatrix(fbxNode->EvaluateLocalTransform());
 
-		info->SetName(data.m_fbxNode->GetName());
+		info->SetName(fbxNode->GetName());
 		info->SetTransform(localMatrix);
+		nodeMap.Insert(node, fbxNode);
 
-		FbxVector4 fbxPivotScaling(data.m_fbxNode->GetGeometricScaling(FbxNode::eSourcePivot));
-		FbxVector4 fbxPivotRotation(data.m_fbxNode->GetGeometricRotation(FbxNode::eSourcePivot));
-		FbxVector4 fbxPivotTranslation(data.m_fbxNode->GetGeometricTranslation(FbxNode::eSourcePivot));
-
-		dVector pivotTranslation(dFloat(fbxPivotTranslation[0]), dFloat(fbxPivotTranslation[1]), dFloat(fbxPivotTranslation[2]), 1.0f);
-		dVector pivotRotation(dFloat(fbxPivotRotation[0] * dDegreeToRad), dFloat(fbxPivotRotation[1] * dDegreeToRad), dFloat(fbxPivotRotation[2] * dDegreeToRad), 0.0f);
-
-		dMatrix pivotScale(dGetIdentityMatrix());
-		pivotScale[0][0] = dFloat(fbxPivotScaling[0]);
-		pivotScale[1][1] = dFloat(fbxPivotScaling[1]);
-		pivotScale[2][2] = dFloat(fbxPivotScaling[2]);
-		dMatrix pivotMatrix(pivotScale * dMatrix(pivotRotation[0], pivotRotation[1], pivotRotation[2], pivotTranslation));
-		info->SetGeometryTransform(pivotMatrix);
-
-		nodeMap.Insert(node, data.m_fbxNode);
-
-		int count = data.m_fbxNode->GetChildCount();
+		int count = fbxNode->GetChildCount();
 		for (int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), node));
+			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), fbxNode->GetChild(i), node));
 		}
 	}
 }
@@ -1125,7 +1101,6 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), NULL));
 		}
 	}
-
 #endif
 }
 
@@ -1156,9 +1131,8 @@ int main(int argc, char** argv)
 		printf("-a = export animation only\n");
 	}
 
-	FbxManager* fbxManager = NULL;
 	FbxScene* fbxScene = NULL;
-
+	FbxManager* fbxManager = NULL;
 	if (!InitializeSdkObjects(fbxManager, fbxScene)) {
 		return 0;
 	}

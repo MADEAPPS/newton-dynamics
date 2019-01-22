@@ -295,7 +295,7 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 		glPushMatrix();
 		glMultMatrix(&m_meshMatrix[0][0]);
 		m_mesh->Render (scene);
-//		m_mesh->RenderNormals ();
+		//m_mesh->RenderNormals ();
 
 		if (m_userData) {
 			m_userData->OnRender(timestep);
@@ -394,7 +394,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 					DemoMeshInterface* const mesh = cacheNode->GetInfo();
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
 
-					// save mesh with skins for further proccesing.
+					// save mesh with skins for further processing.
 					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(node);
 					if (meshInfo->hasSkinWeights()) {
 						entityModifiers[modifiersCount] = entity;

@@ -42,20 +42,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		}
 
 /*
-		void OnInterpolateMatrix(DemoEntityManager& world, dFloat param) const
-		{
-			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
-
-			const dList<dAnimAcyclicJoint*>& children = vehicle->GetChildren();
-			for (dList<dAnimAcyclicJoint*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				dVehicleTireInterface* const tire = ((dVehicleNode*)node->GetInfo())->GetAsTire();
-				if (tire) {
-					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
-					tireMesh->InterpolateMatrixUsafe(param);
-				}
-			}
-		}
-
 		void OnTransformCallback(DemoEntityManager& world) const
 		{
 			// calculate tire Matrices
@@ -235,6 +221,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 //			player = (SuperCarEntity*)NewtonBodyGetUserData(controller->GetBody());
 //		}
 
+return;
 		DemoEntity* const player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
@@ -394,6 +381,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// load vehicle visual mesh
 		DemoEntity* const vehicleEntity = LoadVisualModel (carModelName);
+return NULL;
 
 		// set entity world location
 		vehicleEntity->ResetMatrix(*scene, location);
@@ -631,7 +619,10 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	
 	// load 
 	//dVehicleChassis* const player = manager->CreateVehicle("porche918", location);
-	dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
+	//dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
+	//dVehicleChassis* const player = manager->CreateVehicle("enzo.ngd", location);
+	dVehicleChassis* const player = manager->CreateVehicle("whiteman.ngd", location);
+	
 
 	// set this vehicle as the player
 	manager->SetAsPlayer(player);

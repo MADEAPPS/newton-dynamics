@@ -177,7 +177,7 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	NewtonMesh* const mesh = meshInfo->GetMesh();
 
 	// recalculate mesh normals
-	//NewtonMeshCalculateVertexNormals(mesh, 45.0f * dDegreeToRad);
+//	NewtonMeshCalculateVertexNormals(mesh, 45.0f * dDegreeToRad);
 
 	// extract vertex data  from the newton mesh		
 	AllocVertexData(NewtonMeshGetPointCount (mesh));
@@ -186,11 +186,11 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	NewtonMeshGetUV0Channel (mesh, 2 * sizeof (dFloat), (dFloat*) m_uv);
 
 	// bake the matrix into the vertex array
-	dMatrix matrix (meshInfo->GetPivotMatrix());
-	matrix.TransformTriplex(m_vertex, 3 * sizeof (dFloat), m_vertex, 3 * sizeof (dFloat), m_vertexCount);
-	matrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-	matrix = (matrix.Inverse4x4()).Transpose();
-	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat), m_normal, 3 * sizeof (dFloat), m_vertexCount);
+//	dMatrix matrix (meshInfo->GetPivotMatrix());
+//	matrix.TransformTriplex(m_vertex, 3 * sizeof (dFloat), m_vertex, 3 * sizeof (dFloat), m_vertexCount);
+//	matrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+//	matrix = (matrix.Inverse4x4()).Transpose();
+//	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat), m_normal, 3 * sizeof (dFloat), m_vertexCount);
 
 //	bool hasModifiers = false;
 	dTree<dScene::dTreeNode*, dCRCTYPE> materialMap;
@@ -344,7 +344,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
 
 	// apply the vertex normals
-	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);
+//	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);
 
 	dMatrix aligmentUV(uvMatrix);
 //	NewtonCollisionGetMatrix(collision, &aligmentUV[0][0]);
