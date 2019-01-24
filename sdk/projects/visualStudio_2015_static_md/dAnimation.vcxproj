@@ -59,12 +59,14 @@
     <ClCompile Include="..\..\dAnimation\dAnimIDRigJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIDRigLimb.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIK3dofJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodePose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeTake.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKController.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimIKManager.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimIKRigJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimPose.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -83,12 +85,15 @@
     <ClInclude Include="..\..\dAnimation\dAnimIDRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIDRigLimb.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIK3d0fJoint.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIK3dofJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodePose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeTake.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
     <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimIKRigJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimPose.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
