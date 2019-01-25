@@ -281,6 +281,22 @@ const dMatrix& DemoEntity::GetRenderMatrix () const
 	return m_matrix;
 }
 
+void DemoEntity::RenderBone() const
+{
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glBegin(GL_LINES);
+	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+		const dVector& posit = child->m_matrix.m_posit;
+		glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
+		glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
+	}
+
+	glEnd();
+	glEnable(GL_LIGHTING);
+}
 
 void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 {
@@ -296,12 +312,13 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 		glMultMatrix(&m_meshMatrix[0][0]);
 		m_mesh->Render (scene);
 		//m_mesh->RenderNormals ();
-
 		if (m_userData) {
 			m_userData->OnRender(timestep);
 		}
 		glPopMatrix();
 	}
+
+	RenderBone();
 
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
 		child->Render(timestep, scene);
@@ -338,20 +355,17 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 		}
 	}
 
+	dTree<DemoEntity*, dScene::dTreeNode*> boneMap;
 	DemoEntity* returnEntity = NULL;
 	DemoEntity* entity[256];
 	entity[0] = NULL;
 	if (rootCount) {
 		int stack = 0;
-		int bonesCount = 0;
 		int modifiersCount = 0;
 		DemoEntity* entityStack[256];
 		dScene::dTreeNode* nodeStack[256];
 		DemoEntity* entityModifiers[256];
 		dScene::dTreeNode* nodeModifiers[256];
-		dBoneNodeInfo* bones[256];
-		DemoEntity* bonesEntities[256];
-		//int bonesIndex[256];
 
 		DemoEntity* parent = NULL;
 		if (rootCount > 1) {
@@ -371,6 +385,8 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			DemoEntity* const entity = entityStack[stack];
 			dScene::dTreeNode* sceneNode = nodeStack[stack];
 
+			boneMap.Insert(entity, sceneNode);
+
 			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)scene.GetInfoFromNode(sceneNode);
 			dMatrix matrix(sceneInfo->GetTransform());
 			dQuaternion rot(matrix);
@@ -382,39 +398,37 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			entity->SetNameID(sceneInfo->GetName());
 
 			for (void* child = scene.GetFirstChildLink(sceneNode); child; child = scene.GetNextChildLink(sceneNode, child)) {
-				dScene::dTreeNode* const node = scene.GetNodeFromLink(child);
-				dNodeInfo* const nodeInfo = scene.GetInfoFromNode(node);
+				dScene::dTreeNode* const meshNode = scene.GetNodeFromLink(child);
+				dNodeInfo* const nodeInfo = scene.GetInfoFromNode(meshNode);
 
 				if (nodeInfo->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(node);
+					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
 					if (!cacheNode) {
-						DemoMeshInterface* const mesh = new DemoMesh(&scene, node);
-						cacheNode = meshDictionary.Insert(mesh, node);
+						DemoMeshInterface* const mesh = new DemoMesh(&scene, meshNode);
+						cacheNode = meshDictionary.Insert(mesh, meshNode);
 					}
 					DemoMeshInterface* const mesh = cacheNode->GetInfo();
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
 
-					// save mesh with skins for further processing.
-					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene.GetInfoFromNode(node);
-					if (meshInfo->hasSkinWeights()) {
-						entityModifiers[modifiersCount] = entity;
-						nodeModifiers[modifiersCount] = node;
-						modifiersCount++;
+					for (void* modifierChild = scene.GetFirstChildLink(meshNode); modifierChild; modifierChild = scene.GetNextChildLink(sceneNode, modifierChild)) {
+						dScene::dTreeNode* const modifierNode = scene.GetNodeFromLink(modifierChild);
+						dGeometryNodeSkinClusterInfo* const modifierInfo = (dGeometryNodeSkinClusterInfo*)scene.GetInfoFromNode(modifierNode);
+						if (modifierInfo->GetTypeId() == dGeometryNodeSkinClusterInfo::GetRttiType()) {
+							entityModifiers[modifiersCount] = entity;
+							nodeModifiers[modifiersCount] = meshNode;
+							modifiersCount++;
+							break;
+						}
 					}
 
 				} else if (nodeInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
-					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(node);
+					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
 					if (!cacheNode) {
-						DemoMeshInterface* const mesh = new DemoBezierCurve(&scene, node);
-						cacheNode = meshDictionary.Insert(mesh, node);
+						DemoMeshInterface* const mesh = new DemoBezierCurve(&scene, meshNode);
+						cacheNode = meshDictionary.Insert(mesh, meshNode);
 					}
 					DemoMeshInterface* const mesh = cacheNode->GetInfo();
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
-				} else if (nodeInfo->GetTypeId() == dBoneNodeInfo::GetRttiType()) {
-					dBoneNodeInfo* const bone = (dBoneNodeInfo*)nodeInfo;
-					bones[bonesCount] = bone;
-					bonesEntities[bonesCount] = entity;
-					bonesCount++;
 				}
 			}
 
@@ -438,19 +452,13 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 
 		returnEntity = entity[0] ? (entity[0]->GetParent() ? entity[0]->GetParent() : entity[0]) : NULL;
 		if (modifiersCount) {
-			DemoEntity* sortedBonesEntities[256];
-			for (int i = 0; i < bonesCount; i ++) {
-				dBoneNodeInfo* const bone = bones[i];
-				sortedBonesEntities[bone->GetId()] = bonesEntities[i];
-			}
-
 			for (int i = 0; i < modifiersCount; i++) {
 				dScene::dTreeNode* const skinMeshNode = nodeModifiers[i];
 				dAssert (((dMeshNodeInfo*)scene.GetInfoFromNode(skinMeshNode))->GetTypeId() == dMeshNodeInfo::GetRttiType());
 				DemoEntity* const skinEntity = entityModifiers[i];
-				DemoSkinMesh* const skinMesh = new DemoSkinMesh(&scene, skinEntity, skinMeshNode, sortedBonesEntities, bonesCount);
-				skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());
-				skinMesh->Release();
+				DemoSkinMesh* const skinMesh = new DemoSkinMesh(&scene, skinEntity, skinMeshNode, boneMap);
+//				skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());
+//				skinMesh->Release();
 			}
 		}
 	}

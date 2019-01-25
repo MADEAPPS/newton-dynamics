@@ -902,7 +902,7 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	}
 }
 
-DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount)
+DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<DemoEntity*, dScene::dTreeNode*>& boneMap)
 	:DemoMeshInterface()
 	,m_mesh((DemoMesh*)owner->GetMesh())
 	,m_root(owner)
@@ -919,8 +919,24 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	m_weights = new dVector [m_mesh->m_vertexCount];
 	m_weighIndex = new dWeightBoneIndex [m_mesh->m_vertexCount];
 
-	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(skinMeshNode);
+	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
 	dAssert (meshInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
+
+//	dGeometryNodeSkinClusterInfo* const modifierInfo = FindSkinModifier(scene, meshNode);
+//	dAssert (modifierInfo);
+
+	dTree<DemoEntity*, dScene::dTreeNode*>::Iterator iter (boneMap);
+	for (iter.Begin(); iter; iter++) {
+		dScene::dTreeNode* const boneNode = iter.GetKey();
+		const dGeometryNodeSkinClusterInfo* const cluster = FindSkinModifier(scene, boneNode);
+		if (cluster) {
+			DemoEntity* const boneEntity = iter.GetNode()->GetInfo();
+			boneEntity->SetMatrixUsafe (cluster->m_basePoseMatrix, cluster->m_basePoseMatrix.m_posit);
+			boneEntity->SetMatrixUsafe (cluster->m_basePoseMatrix, cluster->m_basePoseMatrix.m_posit);
+		}
+	}
+
+/*
 	NewtonMeshGetWeightBlendsChannel(meshInfo->GetMesh(), sizeof (dVector), &m_weights[0].m_x);
 	NewtonMeshGetWeightBoneIndexChannel(meshInfo->GetMesh(), sizeof (dWeightBoneIndex), &m_weighIndex->m_boneIndex[0]);
 
@@ -984,6 +1000,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	m_nodeCount = entityCount;
 	m_bindingMatrixArray = new dMatrix [entityCount];
 	memcpy (m_bindingMatrixArray, bindMatrix, entityCount * sizeof (dMatrix));
+*/
 }
 
 DemoSkinMesh::~DemoSkinMesh()
@@ -996,6 +1013,19 @@ DemoSkinMesh::~DemoSkinMesh()
 	delete[] m_boneRemapIndex;
 	delete[] m_bindingMatrixArray; 
 }
+
+dGeometryNodeSkinClusterInfo* DemoSkinMesh::FindSkinModifier(dScene* const scene, dScene::dTreeNode* const node) const
+{
+	for (void* modifierChild = scene->GetFirstChildLink(node); modifierChild; modifierChild = scene->GetNextChildLink(node, modifierChild)) {
+		dScene::dTreeNode* const modifierNode = scene->GetNodeFromLink(modifierChild);
+		dGeometryNodeSkinClusterInfo* const modifierInfo = (dGeometryNodeSkinClusterInfo*)scene->GetInfoFromNode(modifierNode);
+		if (modifierInfo->GetTypeId() == dGeometryNodeSkinClusterInfo::GetRttiType()) {
+			return modifierInfo;
+		}
+	}
+	return NULL;
+}
+
 
 void DemoSkinMesh::RenderTransparency () const
 {

@@ -68,7 +68,7 @@
 #include <dSceneNodeInfo.h>
 #include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
-#include <dGeometryNodeSkinModifierInfo.h>
+#include <dGeometryNodeSkinClusterInfo.h>
 
 #include <tinyxml.h>
 

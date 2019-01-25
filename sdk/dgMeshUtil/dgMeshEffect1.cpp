@@ -31,13 +31,11 @@
 dgMeshEffect::dgPointFormat::dgPointFormat(dgMemoryAllocator* const allocator)
 	:m_layers(allocator)
 	,m_vertex(allocator)
-	,m_weights(allocator)
 {
 }
 
 dgMeshEffect::dgPointFormat::dgPointFormat(const dgPointFormat& source)
 	:m_layers(source.m_layers)
-	,m_weights(source.m_weights)
 	,m_vertex(source.m_vertex)
 {
 }
@@ -50,14 +48,12 @@ void dgMeshEffect::dgPointFormat::Clear()
 {
 	m_layers.Clear();
 	m_vertex.Clear();
-	m_weights.Clear();
 }
 
 void dgMeshEffect::dgPointFormat::SetCount(dgInt32 count)
 {
 	m_layers.SetCount(count);
 	m_vertex.SetCount(count);
-	m_weights.SetCount(count);
 }
 
 dgInt32 dgMeshEffect::dgFormat::GetSortIndex (const dgChannel<dgBigVector, m_point>& points, dgFloat64& dist) const
@@ -189,12 +185,6 @@ void dgMeshEffect::dgPointFormat::CompressData(dgInt32* const indexList)
 	if (tmpFormat.m_layers.m_count) {
 		for (dgInt32 i = 0; i < newCount; i++) {
 			m_layers.PushBack(tmpFormat.m_layers[indirectList[i].m_vertexIndex]);
-		}
-	}
-
-	if (tmpFormat.m_weights.m_count) {
-		for (dgInt32 i = 0; i < newCount; i++) {
-			m_weights.PushBack(tmpFormat.m_weights[indirectList[i].m_vertexIndex]);
 		}
 	}
 
@@ -1505,9 +1495,6 @@ bool dgMeshEffect::EndFace ()
 			if (m_points.m_layers.m_count) {
 				m_points.m_layers.PushBack (m_points.m_layers[edge->m_incidentVertex]);
 			}
-			if (m_points.m_weights.m_count) {
-				m_points.m_weights.PushBack(m_points.m_weights[edge->m_incidentVertex]);
-			}
 
 			dgEdge* ptr = edge;
 			do {
@@ -1835,16 +1822,10 @@ void dgMeshEffect::AddLayer(dgInt32 layer)
 	m_points.m_layers.PushBack(layer);
 }
 
-void dgMeshEffect::AddWeights (const dgWeights& weight)
-{
-	m_points.m_weights.PushBack(weight);
-}
-
 void dgMeshEffect::AddVertexColor(dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
 {
 	m_attrib.m_colorChannel.PushBack(dgVector (x, y, z, w));
 }
-
 
 void dgMeshEffect::AddNormal(dgFloat32 x, dgFloat32 y, dgFloat32 z)
 {
@@ -1903,9 +1884,6 @@ void dgMeshEffect::EndBuildFace ()
 			points.m_vertex.PushBack(m_points.m_vertex[m_constructionIndex + i]);
 			if (m_points.m_layers.m_count) {
 				points.m_layers.PushBack(m_points.m_layers[m_constructionIndex + i]);
-			}
-			if (m_points.m_weights.m_count) {
-				points.m_weights.PushBack(m_points.m_weights[m_constructionIndex + i]);
 			}
 
 			if (m_attrib.m_materialChannel.m_count) {
@@ -1967,10 +1945,6 @@ void dgMeshEffect::EndBuildFace ()
 						AddPoint(points.m_vertex[j].m_x, points.m_vertex[j].m_y, points.m_vertex[j].m_z);
 						if (points.m_layers.m_count) {
 							AddLayer(points.m_layers[j]);
-						}
-
-						if (points.m_weights.m_count) {
-							AddWeights(points.m_weights[j]);
 						}
 
 						if (attibutes.m_materialChannel.m_count) {
@@ -2171,9 +2145,7 @@ void dgMeshEffect::UnpackPoints()
 			if (points.m_layers.m_count) {
 				m_points.m_layers.PushBack(points.m_layers[index]);
 			}
-			if (points.m_weights.m_count) {
-				m_points.m_weights.PushBack(points.m_weights[index]);
-			}
+
 			m_attrib.m_pointChannel[i] = i;
 		}
 
@@ -2310,7 +2282,6 @@ void dgMeshEffect::OptimizeAttibutes()
 	PackAttibuteData();
 }
 
-
 void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 {
 	BeginBuild();
@@ -2336,23 +2307,6 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 		dgInt32 index = i * vertexStride;
 		m_points.m_layers.PushBack(layerIndex);
 		m_points.m_vertex.PushBack(dgBigVector (vertex[index + 0], vertex[index + 1], vertex[index + 2], dgFloat64(0.0f)));
-	}
-
-	if (format->m_vertexWeights.m_data) {
-		dgInt8* const data = (dgInt8*)format->m_vertexWeights.m_data;
-		for (dgInt32 i = 0; i < vertexCount; i++) {
-			dgFloat32 w = dgFloat32(0.0f);
-			const dgWeights* const vertexWeight = (dgWeights*)&data[i * format->m_vertexWeights.m_strideInBytes];
-			dgWeights weight;
-			for (int j = 0; j < 4; j++) {
-				w += vertexWeight->m_weightBlends[j];
-				weight.m_weightBlends[j] = vertexWeight->m_weightBlends[j];
-				weight.m_controlIndex[j] = vertexWeight->m_controlIndex[j];
-			}
-			dgAssert(w > 0.999f);
-			dgAssert(w <= 1.001f);
-			m_points.m_weights.PushBack(weight);
-		}
 	}
 
 	bool pendingFaces = true;
@@ -2491,29 +2445,15 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 				dgBigVector p (vertex[index + 0], vertex[index + 1], vertex[index + 2], vertex[index + 3]);
 				m_points.m_vertex.PushBack(p);
 			}
-			if (m_points.m_weights.m_count) {
-				dgInt8* const data = (dgInt8*)format->m_vertexWeights.m_data;
-				for (dgInt32 i = 0; i < vertexCount; i++) {
-					const dgWeights* const vertexWeight = (dgWeights*)&data[i * format->m_vertexWeights.m_strideInBytes];
-					dgWeights weight;
-					for (int j = 0; j < 4; j++) {
-						weight.m_weightBlends[j] = vertexWeight->m_weightBlends[j];
-						weight.m_controlIndex[j] = vertexWeight->m_controlIndex[j];
-					}
-					m_points.m_weights.PushBack(weight);
-				}
-			}
 		}
 	}
 
 	dgAssert (m_points.m_vertex.m_count == vertexCount * (layerIndex + 1));
-	dgAssert(!m_points.m_weights.m_count || (m_points.m_weights.m_count == vertexCount * (layerIndex + 1)));
 	dgAssert (m_attrib.m_pointChannel.m_count == attributeCount);
 	
 	EndFace();
 	PackAttibuteData();
 }
-
 
 dgInt32 dgMeshEffect::GetTotalFaceCount() const
 {
@@ -2938,12 +2878,8 @@ dgInt32 GetTotalFaceCount() const;
 			} while (ptr != edge);
 		}
 	}
-*/
-
-bool dgMeshEffect::HasWeightChannel() const
-{
-	return m_points.m_weights.m_count != 0;
 }
+*/
 
 bool dgMeshEffect::HasNormalChannel() const
 {
@@ -2995,6 +2931,7 @@ void dgMeshEffect::GetVertexChannel(dgInt32 strideInByte, dgFloat32* const buffe
 	}
 }
 
+/*
 void dgMeshEffect::GetWeightBlendChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
 	dgInt8* const buffer = (dgInt8*)bufferOut;
@@ -3025,6 +2962,7 @@ void dgMeshEffect::GetWeightIndexChannel(dgInt32 strideInByte, dgInt32* const bu
 		ptr[3] = p[3];
 	}
 }
+*/
 
 void dgMeshEffect::GetNormalChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
@@ -3347,9 +3285,6 @@ void dgMeshEffect::AddInterpolatedEdgeAttribute (dgEdge* const edge, dgFloat64 p
 	m_points.m_vertex.PushBack(m_points.m_vertex[edge->m_incidentVertex].Scale(t0) + m_points.m_vertex[edge->m_next->m_incidentVertex].Scale(t1));
 	if (m_points.m_layers.m_count) {
 		m_points.m_layers.PushBack(m_points.m_layers[edge->m_incidentVertex]);
-	}
-	if (m_points.m_weights.m_count) {
-		dgAssert(0);
 	}
 
 	m_attrib.m_pointChannel.PushBack(vertexIndex);
@@ -3687,9 +3622,6 @@ void dgMeshEffect::MergeFaces (const dgMeshEffect* const source)
 				AddPoint (source->m_points.m_vertex[vIndex].m_x, source->m_points.m_vertex[vIndex].m_y, source->m_points.m_vertex[vIndex].m_z);
 				if (source->m_points.m_layers.m_count) {
 					AddLayer (source->m_points.m_layers[vIndex]);
-				}
-				if (source->m_points.m_weights.m_count) {
-					AddWeights(source->m_points.m_weights[vIndex]);
 				}
 
 				if (source->m_attrib.m_materialChannel.m_count) {
@@ -4060,20 +3992,3 @@ void dgMeshEffect::RepairTJoints ()
 	dgAssert (Sanity ());
 }
 
-void dgMeshEffect::GetVertexWeights(dgInt32 vertexIndex, dgInt32* const weightIndices, dgFloat32* const weightFactors) const
-{
-	dgAssert(0);
-/*
-	dgInt32 count = 0;
-	if (m_points.m_weights.m_count) {
-		count = DG_MESH_WEIGHT_COUNT;
-		dgInt32 index = m_attrib.m_pointChannel[vertexIndex];
-		const dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[index];
-		for (dgInt32 i = 0; i < DG_MESH_WEIGHT_COUNT; i ++) {
-			weightFactors[i] = weighSet.m_weightPair[i].m_weight;
-			weightIndices[i] = weighSet.m_weightPair[i].m_controlIndex;
-		}
-	}
-	return count;
-*/
-}

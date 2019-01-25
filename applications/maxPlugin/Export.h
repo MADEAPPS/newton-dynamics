@@ -46,7 +46,7 @@ class MaterialFilter;
 #include <dSceneNodeInfo.h>
 #include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
-#include <dGeometryNodeSkinModifierInfo.h>
+#include <dGeometryNodeSkinClusterInfo.h>
 
 #include "Max.h"
 #include "tab.h"

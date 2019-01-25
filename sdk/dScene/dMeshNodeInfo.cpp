@@ -87,10 +87,12 @@ void dMeshNodeInfo::RepairTJoints ()
 	NewtonMeshFixTJoints (m_mesh);
 }
 
+/*
 bool dMeshNodeInfo::hasSkinWeights() const
 {
 	return NewtonMeshHasVertexWeightChannel(m_mesh) ? true : false;
 }
+*/
 
 void dMeshNodeInfo::SmoothNormals (dFloat angleInRadiants)
 {
@@ -291,9 +293,8 @@ dCRCTYPE dMeshNodeInfo::CalculateSignature() const
 
 void dMeshNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
 {
-	dAssert (myNode == scene->Find(GetUniqueID()));
+	dAssert (myNode == scene->Find(GetNodeID()));
 	dAssert (scene->GetInfoFromNode(myNode) == this);
-
 
 	int displayList = render->GetCachedWireframeDisplayList(m_mesh);
 	dAssert (displayList > 0);
@@ -312,7 +313,7 @@ void dMeshNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scen
 
 void dMeshNodeInfo::DrawFlatShaded(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
 {
-	dAssert (myNode == scene->Find(GetUniqueID()));
+	dAssert (myNode == scene->Find(GetNodeID()));
 	dAssert (scene->GetInfoFromNode(myNode) == this);
 
 	int displayList = render->GetCachedFlatShadedDisplayList(m_mesh);

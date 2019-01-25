@@ -343,25 +343,12 @@ extern "C" {
 		int m_strideInBytes;
 	} NewtonMeshFloatData;
 
-	typedef struct NewtonMeshVertexWeightData
-	{
-		struct dgWeights
-		{
-			dFloat m_weightBlends[4];
-			int m_controlIndex[4];
-		};
-
-		dgWeights* m_data;
-		int m_strideInBytes;
-	} NewtonMeshVertexWeightData;
-
 	typedef struct NewtonMeshVertexFormat
 	{
 		int m_faceCount;
 		int* m_faceIndexCount;
 		int* m_faceMaterial;
 		NewtonMeshDoubleData m_vertex;
-		NewtonMeshVertexWeightData m_weight;
 		NewtonMeshFloatData m_normal;
 		NewtonMeshFloatData m_binormal;
 		NewtonMeshFloatData m_uv0;
@@ -1279,7 +1266,6 @@ extern "C" {
 			NEWTON_API void NewtonMeshAddUV0(const NewtonMesh* const mesh, dFloat u, dFloat v);
 			NEWTON_API void NewtonMeshAddUV1(const NewtonMesh* const mesh, dFloat u, dFloat v);
 			NEWTON_API void NewtonMeshAddVertexColor(const NewtonMesh* const mesh, dFloat32 r, dFloat32 g, dFloat32 b, dFloat32 a);
-			NEWTON_API void NewtonMeshAddVertexWeight(const NewtonMesh* const mesh, int matrixIndex[4], dFloat32 weights[4]);
 		NEWTON_API void NewtonMeshEndFace(const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshEndBuild(const NewtonMesh* const mesh);
 
@@ -1288,12 +1274,9 @@ extern "C" {
 
 	NEWTON_API int NewtonMeshGetPointCount (const NewtonMesh* const mesh); 
 	NEWTON_API const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh);
-	//NEWTON_API int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, int* const weightIndex, dFloat* const weightFactor);
 
 	NEWTON_API void NewtonMeshGetVertexDoubleChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat64* const outBuffer);
 	NEWTON_API void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
-	NEWTON_API void NewtonMeshGetWeightBlendsChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
-	NEWTON_API void NewtonMeshGetWeightBoneIndexChannel(const NewtonMesh* const mesh, int vertexStrideInByte, int* const outBuffer);
 	NEWTON_API void NewtonMeshGetNormalChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
 	NEWTON_API void NewtonMeshGetBinormalChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
 	NEWTON_API void NewtonMeshGetUV0Channel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
@@ -1301,7 +1284,6 @@ extern "C" {
 	NEWTON_API void NewtonMeshGetVertexColorChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
 
 	NEWTON_API int NewtonMeshHasNormalChannel(const NewtonMesh* const mesh);
-	NEWTON_API int NewtonMeshHasVertexWeightChannel(const NewtonMesh* const mesh);
 	NEWTON_API int NewtonMeshHasBinormalChannel(const NewtonMesh* const mesh);
 	NEWTON_API int NewtonMeshHasUV0Channel(const NewtonMesh* const mesh);
 	NEWTON_API int NewtonMeshHasUV1Channel(const NewtonMesh* const mesh);

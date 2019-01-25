@@ -112,7 +112,7 @@ class DemoSkinMesh: public DemoMeshInterface
 		int m_boneIndex[4];
 	};
 
-	DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const skinMeshNode, DemoEntity** const bones, int bonesCount);
+	DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<DemoEntity*, dScene::dTreeNode*>& boneMap);
 	~DemoSkinMesh();
 
 	void Render (DemoEntityManager* const scene);
@@ -122,6 +122,8 @@ class DemoSkinMesh: public DemoMeshInterface
 
 	protected: 
 	void BuildSkin ();
+	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
+
 
 	DemoMesh* m_mesh;
 	DemoEntity* m_root; 

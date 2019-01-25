@@ -78,7 +78,7 @@ void dLineNodeInfo::BakeTransform (const dMatrix& transform)
 
 void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
 {
-	dAssert (myNode == scene->Find(GetUniqueID()));
+	dAssert (myNode == scene->Find(GetNodeID()));
 	dAssert (scene->GetInfoFromNode(myNode) == this);
 
 	//	int displayList = render->GetCachedFlatShadedDisplayList(m_mesh);

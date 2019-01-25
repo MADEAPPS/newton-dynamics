@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\dScene\dAnimationLayers.cpp" />
     <ClCompile Include="..\..\dScene\dAnimationTake.cpp" />
     <ClCompile Include="..\..\dScene\dAnimationTrack.cpp" />
+    <ClCompile Include="..\..\dScene\dGeometryNodeSkinClusterInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dScene\dBoneNodeInfo.h" />
@@ -87,6 +88,7 @@
     <ClInclude Include="..\..\dScene\dAnimationLayers.h" />
     <ClInclude Include="..\..\dScene\dAnimationTake.h" />
     <ClInclude Include="..\..\dScene\dAnimationTrack.h" />
+    <ClInclude Include="..\..\dScene\dGeometryNodeSkinClusterInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tinyxml">

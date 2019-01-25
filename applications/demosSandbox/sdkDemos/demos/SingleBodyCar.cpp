@@ -618,15 +618,14 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	SingleBodyVehicleManager* const manager = new SingleBodyVehicleManager(world);
 	
 	// load 
-	//dVehicleChassis* const player = manager->CreateVehicle("porche918", location);
 	dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
-	//dVehicleChassis* const player = manager->CreateVehicle("enzo.ngd", location);
 
 	location.m_posit.m_z += 2.0f;
 	manager->CreateVehicle("whiteman.ngd", location);
+	
 
 	// set this vehicle as the player
-	manager->SetAsPlayer(player);
+//	manager->SetAsPlayer(player);
 
 	int count = 5;
 	count = 0;

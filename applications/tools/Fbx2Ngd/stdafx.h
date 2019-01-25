@@ -45,7 +45,7 @@
 #include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
 #include <dGeometryNodeModifierInfo.h>
-
+#include <dGeometryNodeSkinClusterInfo.h>
 
 
 

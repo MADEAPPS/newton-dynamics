@@ -43,7 +43,10 @@ class dTextureNodeInfo;
 //#define D_SCENE_REVISION_NUMBER 103
 
 // adding the geometry transform node info 
-#define D_SCENE_REVISION_NUMBER 104
+//#define D_SCENE_REVISION_NUMBER 104
+
+// adding node ID as part of the file
+#define D_SCENE_REVISION_NUMBER 105
 
 
 #define D_TEXTURE_CACHE_NODE_MAME	"dTextureCache"

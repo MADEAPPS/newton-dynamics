@@ -46,7 +46,7 @@ class dMeshNodeInfo: public dGeometryNodeInfo
 	virtual void SmoothNormals(dFloat angleInRadiants);
 	virtual void RemoveUnusedVertices(dScene* const world, dScene::dTreeNode* const myNode);
 
-	bool hasSkinWeights() const;
+//	bool hasSkinWeights() const;
 	const int* GetIndexToVertexMap() const;
 	virtual void BuildFromVertexListIndexList(const NewtonMeshVertexFormat* const format);
 	

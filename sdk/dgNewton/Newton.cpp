@@ -7780,6 +7780,7 @@ NewtonMesh* NewtonMeshCreateTetrahedraIsoSurface(const NewtonMesh* const closeMa
 
 void NewtonCreateTetrahedraLinearBlendSkinWeightsChannel(const NewtonMesh* const tetrahedraMesh, NewtonMesh* const skinMesh)
 {
+	dgAssert(0);
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)skinMesh;
 	meshEffect->CreateTetrahedraLinearBlendSkinWeightsChannel((const dgMeshEffect*)tetrahedraMesh);
@@ -8064,21 +8065,6 @@ void NewtonMeshAddVertexColor(const NewtonMesh* const mesh, dFloat32 r, dFloat32
 	meshEffect->AddVertexColor(r, g, b, a);
 }
 
-void NewtonMeshAddVertexWeight(const NewtonMesh* const mesh, int matrixIndex[4], dFloat32 weights[4])
-{
-	TRACE_FUNCTION(__FUNCTION__);
-
-	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
-
-	dgMeshEffect::dgWeights weightSet;
-	for (int i = 0; i < 4; i ++) {
-		weightSet.m_weightBlends[i] = weights[i];
-		weightSet.m_controlIndex[i] = matrixIndex[i];
-	}
-
-	meshEffect->AddWeights (weightSet);
-}
-
 void NewtonMeshEndBuild(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8162,21 +8148,6 @@ const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh)
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
 	return meshEffect->GetIndexToVertexMap();
 }
-/*
-int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, int* const weightIndices, dFloat* const weightFactors)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
-	return meshEffect->GetVertexWeights (vertexIndex, weightIndices, weightFactors);
-}
-*/
-
-int NewtonMeshHasVertexWeightChannel(const NewtonMesh* const mesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
-	return meshEffect->HasWeightChannel() ? 1 : 0;
-}
 
 int NewtonMeshHasNormalChannel(const NewtonMesh* const mesh)
 {
@@ -8225,20 +8196,6 @@ void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideI
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
 	meshEffect->GetVertexChannel(vertexStrideInByte, (dgFloat32*)outBuffer);
-}
-
-void NewtonMeshGetWeightBlendsChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
-	meshEffect->GetWeightBlendChannel(vertexStrideInByte, (dgFloat32*)outBuffer);
-}
-
-void NewtonMeshGetWeightBoneIndexChannel(const NewtonMesh* const mesh, int vertexStrideInByte, int* const outBuffer)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
-	meshEffect->GetWeightIndexChannel(vertexStrideInByte, (dgInt32*)outBuffer);
 }
 
 void NewtonMeshGetNormalChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
