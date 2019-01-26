@@ -140,19 +140,6 @@ void dMeshNodeInfo::RemoveUnusedVertices(dScene* const world, dScene::dTreeNode*
 */
 }
 
-void dMeshNodeInfo::Serialize (TiXmlElement* const rootNode) const
-{
- 	SerialiseBase(dGeometryNodeInfo, rootNode);
-	SerializeMesh (m_mesh, rootNode);
-}
-
-bool dMeshNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
-{
-	DeserialiseBase(scene, dGeometryNodeInfo, rootNode);
-	DeserializeMesh (m_mesh, rootNode); 
-	return true;
-}
-
 void dMeshNodeInfo::CalcutateAABB (dVector& p0, dVector& p1) const
 {
 //	int strideInBytes = NewtonMeshGetVertexStrideInByte(m_mesh);
@@ -322,4 +309,17 @@ void dMeshNodeInfo::DrawFlatShaded(dSceneRender* const render, dScene* const sce
 	//render->PushMatrix(&m_matrix[0][0]);
 	render->DrawDisplayList(displayList);
 	//render->PopMatrix();
+}
+
+void dMeshNodeInfo::Serialize(TiXmlElement* const rootNode) const
+{
+	SerialiseBase(dGeometryNodeInfo, rootNode);
+	SerializeMesh(m_mesh, rootNode);
+}
+
+bool dMeshNodeInfo::Deserialize(const dScene* const scene, TiXmlElement* const rootNode)
+{
+	DeserialiseBase(scene, dGeometryNodeInfo, rootNode);
+	DeserializeMesh(m_mesh, rootNode);
+	return true;
 }

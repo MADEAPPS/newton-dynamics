@@ -2306,7 +2306,8 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 	for (dgInt32 i = 0; i < vertexCount; i++) {
 		dgInt32 index = i * vertexStride;
 		m_points.m_layers.PushBack(layerIndex);
-		m_points.m_vertex.PushBack(dgBigVector (vertex[index + 0], vertex[index + 1], vertex[index + 2], dgFloat64(0.0f)));
+		dgBigVector p(vertex[index + 0], vertex[index + 1], vertex[index + 2], dgFloat64(0.0f));
+		m_points.m_vertex.PushBack(p);
 	}
 
 	bool pendingFaces = true;

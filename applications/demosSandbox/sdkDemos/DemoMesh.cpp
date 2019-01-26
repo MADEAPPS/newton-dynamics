@@ -999,7 +999,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 			int boneIndex = nodeEnumrator.Find(boneEntity)->GetInfo();
 			for (int i = 0; i < cluster->m_vertexIndex.GetSize(); i ++) {
 				int vertexIndex = cluster->m_vertexIndex[i];
-				vCount = dMax (vertexIndex, vCount);
+				vCount = dMax (vertexIndex + 1, vCount);
 				dFloat vertexWeight = cluster->m_vertexWeight[i];
 				if (vertexWeight >= weight[vertexIndex][3]) {
 					weight[vertexIndex][3] = vertexWeight;
@@ -1018,12 +1018,14 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	m_weightcount = 0;
 	for (int i = 0; i < vCount; i ++) {
 		dVector w (weight[i]);
-		dFloat mag2 = w.m_x * w.m_x + w.m_y * w.m_y + w.m_z * w.m_z + w.m_w * w.m_w;
-		mag2 = 1.0f / dSqrt (mag2);
-		weight[i].m_x = w.m_x * mag2;
-		weight[i].m_y = w.m_y * mag2;
-		weight[i].m_z = w.m_z * mag2;
-		weight[i].m_w = w.m_w * mag2;
+		dFloat invMag = w.m_x + w.m_y + w.m_z + w.m_w;
+		dAssert (invMag > 0.0f);
+		dAssert (invMag <= 1.01f);
+		invMag = 1.0f/invMag;
+		weight[i].m_x = w.m_x * invMag;
+		weight[i].m_y = w.m_y * invMag;
+		weight[i].m_z = w.m_z * invMag;
+		weight[i].m_w = w.m_w * invMag;
 
 		dAssert (skinBone[i].m_boneIndex[0] != -1);
 		for (int j = 0; j < 4; j++) {
@@ -1044,13 +1046,12 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 
 	const int* const indexToPoitMap = meshInfo->GetIndexToVertexMap();
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
-//dAssert (i != 6303);
 		int index = indexToPoitMap[i];
 		dAssert (index >= 0);
 		//dAssert (index < vCount);
 		if (index < vCount) {
-		m_weights[i] = weight[index];
-		m_weighIndex[i] = skinBone[index];
+			m_weights[i] = weight[index];
+			m_weighIndex[i] = skinBone[index];
 		}
 	}
 

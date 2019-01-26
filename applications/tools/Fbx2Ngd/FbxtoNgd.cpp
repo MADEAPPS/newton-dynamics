@@ -700,8 +700,6 @@ void ImportSkinModifier(dScene* const ngdScene, FbxScene* const fbxScene, Global
 	}
 	
 	dMeshNodeInfo* const ngdMeshInfo = (dMeshNodeInfo*)ngdScene->GetInfoFromNode(meshNode);
-
-//	dList<dGeometryNodeSkinClusterInfo::dCluster>& ngdClusters = info->GetClusters();
 	for (int i = 0; i < clusterCount; i++) {
 		FbxCluster* const cluster = skin->GetCluster(i);
 		FbxNode* const fbxBone = cluster->GetLink();
