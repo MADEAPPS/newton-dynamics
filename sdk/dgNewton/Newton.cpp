@@ -8113,9 +8113,21 @@ int NewtonMeshGetVertexCount(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-//	return meshEffect->GetPropertiesCount();
 	return meshEffect->GetVertexCount();
+}
+
+int NewtonMeshGetVertexBaseCount(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->GetVertexBaseCount();
+}
+
+void NewtonMeshSetVertexBaseCount(const NewtonMesh* const mesh, int baseCount)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->SetVertexBaseCount(baseCount);
 }
 
 int NewtonMeshGetVertexStrideInByte(const NewtonMesh* const mesh)

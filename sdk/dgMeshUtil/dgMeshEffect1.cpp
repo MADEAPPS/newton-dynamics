@@ -1195,6 +1195,8 @@ dgMeshEffect::dgMeshEffect ()
 	:dgPolyhedra(NULL)
 	,m_points(NULL)
 	,m_attrib(NULL)
+	,m_vertexBaseCount(-1)
+	,m_constructionIndex(0)
 {
 	Init();
 }
@@ -1203,6 +1205,7 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator)
 	:dgPolyhedra(allocator)
 	,m_points(allocator)
 	,m_attrib(allocator)
+	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	Init();
@@ -1212,6 +1215,7 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgMatrix& 
 	:dgPolyhedra(allocator)
 	,m_points(allocator)
 	,m_attrib(allocator)
+	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	dgAssert (0);
@@ -1268,6 +1272,7 @@ dgMeshEffect::dgMeshEffect(dgPolyhedra& mesh, const dgMeshEffect& source)
 	:dgPolyhedra (mesh) 
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
+	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	Init();
@@ -1277,6 +1282,7 @@ dgMeshEffect::dgMeshEffect(const dgMeshEffect& source)
 	:dgPolyhedra (source) 
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
+	, m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	Init();
@@ -1286,6 +1292,7 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 	:dgPolyhedra (collision->GetAllocator()) 
 	,m_points(collision->GetAllocator())
 	,m_attrib(collision->GetAllocator())
+	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	class dgMeshEffectBuilder
@@ -1405,6 +1412,7 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize de
 	:dgPolyhedra (allocator) 
 	,m_points(allocator)
 	,m_attrib(allocator)
+	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	Init();
@@ -1802,6 +1810,7 @@ void dgMeshEffect::BeginBuild ()
 	m_attrib.Clear();
 	RemoveAll();
 	BeginFace();
+	m_vertexBaseCount = -1;
 	m_constructionIndex = 0;
 }
 
@@ -2299,6 +2308,7 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 		}
 		maxAttribCount += count;
 	}
+	m_vertexBaseCount = vertexCount;
 
 	dgInt32 layerIndex = 0;
 	dgInt32 vertexStride = dgInt32(format->m_vertex.m_strideInBytes / sizeof (dgFloat64));

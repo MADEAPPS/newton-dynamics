@@ -1312,6 +1312,9 @@ extern "C" {
 	NEWTON_API int NewtonMeshGetVertexStrideInByte (const NewtonMesh* const mesh); 
 	NEWTON_API const dFloat64* NewtonMeshGetVertexArray (const NewtonMesh* const mesh); 
 
+	NEWTON_API int NewtonMeshGetVertexBaseCount(const NewtonMesh* const mesh);
+	NEWTON_API void NewtonMeshSetVertexBaseCount(const NewtonMesh* const mesh, int baseCount);
+
 	NEWTON_API void* NewtonMeshGetFirstVertex (const NewtonMesh* const mesh);
 	NEWTON_API void* NewtonMeshGetNextVertex (const NewtonMesh* const mesh, const void* const vertex);
 	NEWTON_API int NewtonMeshGetVertexIndex (const NewtonMesh* const mesh, const void* const vertex);

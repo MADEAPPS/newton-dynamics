@@ -87,13 +87,6 @@ void dMeshNodeInfo::RepairTJoints ()
 	NewtonMeshFixTJoints (m_mesh);
 }
 
-/*
-bool dMeshNodeInfo::hasSkinWeights() const
-{
-	return NewtonMeshHasVertexWeightChannel(m_mesh) ? true : false;
-}
-*/
-
 void dMeshNodeInfo::SmoothNormals (dFloat angleInRadiants)
 {
 	NewtonMeshCalculateVertexNormals(m_mesh, angleInRadiants);
@@ -175,7 +168,6 @@ void dMeshNodeInfo::CalcutateAABB (dVector& p0, dVector& p1) const
 		p1[2] = dMax(v[2], p1[2]);
 	}
 }
-
 
 dFloat dMeshNodeInfo::RayCast (const dVector& q0, const dVector& q1) const
 {

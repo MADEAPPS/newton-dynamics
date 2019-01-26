@@ -1015,8 +1015,10 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		}
 	}
 
+
 	m_weightcount = 0;
-	for (int i = 0; i < vCount; i ++) {
+	const int vertexBaseCount = NewtonMeshGetVertexBaseCount(meshInfo->GetMesh());
+	for (int i = 0; i < vertexBaseCount; i ++) {
 		dVector w (weight[i]);
 		dFloat invMag = w.m_x + w.m_y + w.m_z + w.m_w;
 		dAssert (invMag > 0.0f);
@@ -1045,6 +1047,8 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	memset (m_weighIndex, 0, m_mesh->m_vertexCount * sizeof (dWeightBoneIndex));
 
 	const int* const indexToPoitMap = meshInfo->GetIndexToVertexMap();
+
+	dList<int> pendingVertices;
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
 		int index = indexToPoitMap[i];
 		dAssert (index >= 0);
@@ -1052,6 +1056,24 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		if (index < vCount) {
 			m_weights[i] = weight[index];
 			m_weighIndex[i] = skinBone[index];
+		} else {
+			pendingVertices.Append(i);
+		}
+	}
+
+	for (dList<int>::dListNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		int i = ptr->GetInfo();
+		dVector p (m_mesh->m_vertex[i * 3 + 0], m_mesh->m_vertex[i * 3 + 1], m_mesh->m_vertex[i * 3 + 2], 0.0f);
+		for (int j = 0; j < m_mesh->m_vertexCount; j ++) {
+			if (i != j) {
+				dVector q (m_mesh->m_vertex[j * 3 + 0], m_mesh->m_vertex[j * 3 + 1], m_mesh->m_vertex[j * 3 + 2], 0.0f);
+				dVector diff (q - p);
+				if (diff.DotProduct3(diff) < 1.0e-6f) {
+					m_weights[i] = weight[j];
+					m_weighIndex[i] = skinBone[j];
+					break;
+				}
+			}
 		}
 	}
 

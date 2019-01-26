@@ -442,6 +442,9 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 	int pointCount = NewtonMeshGetPointCount(mesh);
 	int vertexCount = NewtonMeshGetVertexCount(mesh);
 
+	int pointBaseCount = NewtonMeshGetVertexBaseCount(mesh);
+	pointElement->SetAttribute("controlPointBaseCount", pointBaseCount);
+
 	int bufferCount = dMax (vertexCount, pointCount);
 	int bufferSizeInBytes = bufferCount * sizeof (dFloat) * 4 * 12;
 	char* const buffer = new char[bufferSizeInBytes];
@@ -604,6 +607,9 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 	NewtonMeshVertexFormat vertexFormat;
 	NewtonMeshClearVertexFormat(&vertexFormat);
 
+	int pointBaseCount;
+	pointElement->Attribute("controlPointBaseCount", &pointBaseCount);
+
 	int faceCount;
 	polygonsElement->Attribute("count", &faceCount);
 	int* const faceIndexCount = new int[faceCount];
@@ -685,6 +691,7 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 	vertexFormat.m_vertex.m_strideInBytes = 4 * sizeof (dFloat64);
 
 	NewtonMeshBuildFromVertexListIndexList (mesh, &vertexFormat);
+	NewtonMeshSetVertexBaseCount(mesh, pointBaseCount);
 
 	if (vertexFormat.m_normal.m_data) {
 		delete[] vertexFormat.m_normal.m_data;

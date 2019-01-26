@@ -363,6 +363,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgInt32 GetVertexCount() const;
 	dgInt32 GetVertexStrideInByte() const;
 	const dgFloat64* GetVertexPool () const;
+
+	dgInt32 GetVertexBaseCount() const;
+	void SetVertexBaseCount(dgInt32 count);
 	
 	dgEdge* SpliteFace (dgInt32 v0, dgInt32 v1);
 
@@ -426,7 +429,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void LoadTetraMesh (const char* const filename);
 	void Serialize (dgSerialize callback, void* const userData) const;
 
-
 	dgBigVector GetVertex (dgInt32 index) const;
 	dgInt32 GetVertexLayer (dgInt32 index) const;
 
@@ -489,6 +491,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgPointFormat m_points;
 	dgAttibutFormat m_attrib;
+	dgInt32 m_vertexBaseCount;
 	dgInt32 m_constructionIndex;
 	
 	friend class dgConvexHull3d;
@@ -504,6 +507,17 @@ DG_INLINE dgInt32 dgMeshEffect::GetVertexCount() const
 {
 	return m_points.m_vertex.m_count;
 }
+
+DG_INLINE dgInt32 dgMeshEffect::GetVertexBaseCount() const
+{
+	return m_vertexBaseCount;
+}
+
+DG_INLINE void dgMeshEffect::SetVertexBaseCount(dgInt32 count)
+{
+	m_vertexBaseCount = count;
+}
+
 
 DG_INLINE dgInt32 dgMeshEffect::GetPropertiesCount() const
 {
