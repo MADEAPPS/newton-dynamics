@@ -1124,6 +1124,7 @@ NewtonMesh* DemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatr
 
 void DemoSkinMesh::Render (DemoEntityManager* const scene)
 {
+return;
 	BuildSkin ();
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1146,7 +1147,6 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 
 void DemoSkinMesh::BuildSkin ()
 {
-
 	int stack = 1;
 	DemoEntity* pool[32];
 	dMatrix parentMatrix[32];
@@ -1198,6 +1198,6 @@ void DemoSkinMesh::BuildSkin ()
 		m_normal[i * 3 + 2] = weightedNormal.m_z;
 	}
 
-//	memcpy(m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
-//	memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+	memcpy(m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+	memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 }

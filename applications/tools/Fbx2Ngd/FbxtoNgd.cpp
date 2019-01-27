@@ -95,7 +95,6 @@ static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, Fbx
 static void PrepareSkeleton(FbxScene* const fbxScene);
 static dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const animLayer);
 static void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
-static void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxAnimLayer* const animLayer, dScene::dTreeNode* const animationTakeNode);
 
 
 int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
@@ -451,28 +450,69 @@ dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const an
 
 void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap)
 {
-	const int numStacks = fbxScene->GetSrcObjectCount<FbxAnimStack>();
-	if (numStacks) {
-		FbxAnimStack* const animStack = fbxScene->GetSrcObject<FbxAnimStack>(0);
+	const int animationCount = fbxScene->GetSrcObjectCount<FbxAnimStack>();
+
+	const int nodeCount = fbxScene->GetNodeCount();
+	for (int i = 0; i < animationCount; i++) {
+		FbxAnimStack* const animStack = fbxScene->GetSrcObject<FbxAnimStack>(i);
+		const char* const animStackName = animStack->GetName();
+
 		fbxScene->SetCurrentAnimationStack(animStack);
+		FbxTakeInfo* const takeInfo = fbxScene->GetTakeInfo(animStackName);
 
-		FbxString lOutputString = "Animation Stack Name: ";
-		lOutputString += animStack->GetName();
-		lOutputString += "\n";
-		FBXSDK_printf(lOutputString);
-		int nbAnimLayers = animStack->GetMemberCount<FbxAnimLayer>();
+		dScene::dTreeNode* const animationTakeNode = ngdScene->CreateAnimationTake();
+		dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
+		animationTake->SetName(animStackName);
 
-		dScene::dTreeNode* const animationLayers = ngdScene->CreateAnimationLayers();
+		FbxTime start (takeInfo->mLocalTimeSpan.GetStart());
+		FbxTime end (takeInfo->mLocalTimeSpan.GetStop());
 
-		for (int j = 0; j < nbAnimLayers; j++) {
-			FbxAnimLayer* const animLayer = animStack->GetMember<FbxAnimLayer>(j);
+		dFloat t0 = dFloat(start.GetSecondDouble());
+		dFloat t1 = dFloat(end.GetSecondDouble());
+		dFloat period = t1 - t0;
+		animationTake->SetPeriod(period);
 
-			FbxString takeName(animLayer->GetName());
+		const FbxLongLong firstFrameIndex = start.GetFrameCount(FbxTime::eDefaultMode);
+		const FbxLongLong lastFrameIndex = end.GetFrameCount(FbxTime::eDefaultMode);
 
-			dScene::dTreeNode* const animationTakeNode = ngdScene->CreateAnimationTake();
-			dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
-			animationTake->SetName(animLayer->GetName());
-			ImportAnimationLayer(ngdScene, fbxScene, nodeMap, animLayer, animationTakeNode);
+		dList <ImportStackData> nodeStack;
+		FbxNode* const rootNode = fbxScene->GetRootNode();
+		if (rootNode) {
+			int count = rootNode->GetChildCount();
+			for (int i = 0; i < count; i++) {
+				nodeStack.Append(ImportStackData(dGetIdentityMatrix(), rootNode->GetChild(count - i - 1), NULL));
+			}
+		}
+
+		while (nodeStack.GetCount()) {
+			ImportStackData data(nodeStack.GetLast()->GetInfo());
+			nodeStack.Remove(nodeStack.GetLast());
+
+			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
+			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
+			dScene::dTreeNode* const ngdNode = nodeMap.Find(data.m_fbxNode)->GetInfo();
+			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
+			animationTrack->SetName(ngdInfo->GetName());
+			ngdScene->AddReference(ngdNode, trackNode);
+
+			FbxLongLong j = firstFrameIndex;
+			do {
+				FbxTime fbxTime;
+				fbxTime.SetFrame(j, FbxTime::eDefaultMode);
+				dMatrix localMatrix(data.m_fbxNode->EvaluateLocalTransform(fbxTime));
+
+				dFloat t = dFloat (fbxTime.GetSecondDouble());
+				animationTrack->AddKeyframe(t, localMatrix);
+
+				j++;
+			} while (j <= lastFrameIndex);
+
+			animationTrack->OptimizeCurves();
+
+			int count = data.m_fbxNode->GetChildCount();
+			for (int i = 0; i < count; i++) {
+				nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), NULL));
+			}
 		}
 	}
 }
@@ -965,72 +1005,6 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
 	evaluator->Reset();
 
-#if 0
-	int stack = 1;
-	FbxNode* fbxNodes[32];
-	fbxNodes[0] = fbxScene->GetRootNode();;
-
-	while (stack) {
-		stack--;
-		FbxNode* const fbxNode = fbxNodes[stack];
-
-		FbxAnimCurve* const animCurveX = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
-		FbxAnimCurve* const animCurveY = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
-		FbxAnimCurve* const animCurveZ = fbxNode->LclTranslation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
-
-		FbxAnimCurve* const animCurveRotX = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_X);
-		FbxAnimCurve* const animCurveRotY = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Y);
-		FbxAnimCurve* const animCurveRotZ = fbxNode->LclRotation.GetCurve(animLayer, FBXSDK_CURVENODE_COMPONENT_Z);
-
-		if (animCurveX || animCurveRotX) {
-			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
-			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
-			dScene::dTreeNode* const ngdNode = nodeMap.Find(fbxNode)->GetInfo();
-			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
-			animationTrack->SetName(ngdInfo->GetName());
-			ngdScene->AddReference(ngdNode, trackNode);
-
-			if (animCurveX) {
-				dAssert(animCurveY);
-				dAssert(animCurveZ);
-				dFloat timeAcc = 0.0f;
-				do {
-					FbxTime fbxTime;
-					fbxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveX->Evaluate(fbxTime));
-					dFloat y = dFloat(animCurveY->Evaluate(fbxTime));
-					dFloat z = dFloat(animCurveZ->Evaluate(fbxTime));
-					animationTrack->AddPosition(timeAcc, x, y, z);
-
-					timeAcc += ANIMATION_RESAMPLING;
-				} while (timeAcc < period);
-			}
-			if (animCurveRotX) {
-				dAssert(animCurveRotY);
-				dAssert(animCurveRotZ);
-				dFloat timeAcc = 0.0f;
-				//int xxxxx = 0;
-				do {
-					FbxTime fbxTime;
-					fbxTime.SetSecondDouble(timeAcc);
-					dFloat x = dFloat(animCurveRotX->Evaluate(fbxTime)) * dDegreeToRad;
-					dFloat y = dFloat(animCurveRotY->Evaluate(fbxTime)) * dDegreeToRad;
-					dFloat z = dFloat(animCurveRotZ->Evaluate(fbxTime)) * dDegreeToRad;
-
-					animationTrack->AddRotation(timeAcc, x, y, z);
-					timeAcc += ANIMATION_RESAMPLING;
-				} while (timeAcc < period);
-			}
-			animationTrack->OptimizeCurves();
-		}
-
-		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
-			fbxNodes[stack] = fbxNode->GetChild(i);
-			stack++;
-		}
-	}
-#else
-
 	dList <ImportStackData> nodeStack;
 	FbxNode* const rootNode = fbxScene->GetRootNode();
 	if (rootNode) {
@@ -1072,7 +1046,6 @@ void ImportAnimationLayer(dScene* const ngdScene, FbxScene* const fbxScene, Glob
 			nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), NULL));
 		}
 	}
-#endif
 }
 
 int main(int argc, char** argv)

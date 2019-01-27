@@ -275,6 +275,41 @@ void dAnimationTrack::OptimizeCurves()
 void dAnimationTrack::Serialize (TiXmlElement* const rootNode) const
 {
 	SerialiseBase(dNodeInfo, rootNode);
+	dAssert(m_scale.GetCount() >= 2);
+	dAssert(m_rotation.GetCount() >= 2);
+	dAssert(m_position.GetCount() >= 2);
+
+	if (m_scale.GetCount()) {
+		TiXmlElement* const scaleKeys = new TiXmlElement("scaleKeyframes");
+		rootNode->LinkEndChild(scaleKeys);
+
+		int bufferSizeInBytes = 3 * 12 * m_scale.GetCount() * sizeof(dFloat);
+		char* const buffer = dAlloca(char, bufferSizeInBytes);
+		dFloat* const time = dAlloca(dFloat, m_scale.GetCount());
+		dFloat* const points = dAlloca(dFloat, 3 * m_scale.GetCount());
+
+		int count = 0;
+		for (dCurve::dListNode* node = m_scale.GetFirst(); node; node = node->GetNext()) {
+			const dCurveValue& value = node->GetInfo();
+			time[count] = value.m_time;
+			points[count * 3 + 0] = value.m_x;
+			points[count * 3 + 1] = value.m_y;
+			points[count * 3 + 2] = value.m_z;
+			count++;
+		}
+
+		TiXmlElement* const timeLine = new TiXmlElement("timeLine");
+		scaleKeys->LinkEndChild(timeLine);
+		dFloatArrayToString(time, count, buffer, bufferSizeInBytes);
+		timeLine->SetAttribute("float", count);
+		timeLine->SetAttribute("floats", buffer);
+
+		TiXmlElement* const positions = new TiXmlElement("scale");
+		scaleKeys->LinkEndChild(positions);
+		dFloatArrayToString(points, 3 * count, buffer, bufferSizeInBytes);
+		positions->SetAttribute("float3", count);
+		positions->SetAttribute("floats", buffer);
+	}
 
 	if (m_position.GetCount()) {
 
@@ -302,7 +337,7 @@ void dAnimationTrack::Serialize (TiXmlElement* const rootNode) const
 		timeLine->SetAttribute("float", count);
 		timeLine->SetAttribute("floats", buffer);
 
-		TiXmlElement* const positions = new TiXmlElement("positions");
+		TiXmlElement* const positions = new TiXmlElement("position");
 		positionKeys->LinkEndChild(positions);
 		dFloatArrayToString(points, 3 * count, buffer, bufferSizeInBytes);
 		positions->SetAttribute("float3", count);
@@ -346,12 +381,32 @@ bool dAnimationTrack::Deserialize (const dScene* const scene, TiXmlElement* cons
 {
 	DeserialiseBase(scene, dNodeInfo, rootNode);
 
-	// load all the vertexData
+	TiXmlElement* const scaleKeyframes = (TiXmlElement*)rootNode->FirstChild("scaleKeyframes");
+	if (scaleKeyframes) {
+
+		TiXmlElement* const timeLineElement = (TiXmlElement*)scaleKeyframes->FirstChild("timeLine");
+		TiXmlElement* const positionElement = (TiXmlElement*)scaleKeyframes->FirstChild("scale");
+
+		int keyFramesCount;
+		timeLineElement->Attribute("float", &keyFramesCount);
+
+		dFloat* const timeline = dAlloca(dFloat, keyFramesCount);
+		dFloat* const points = dAlloca(dFloat, 3 * keyFramesCount);
+
+		dStringToFloatArray(timeLineElement->Attribute("floats"), timeline, keyFramesCount);
+		dStringToFloatArray(positionElement->Attribute("floats"), points, 3 * keyFramesCount);
+
+		for (int i = 0; i < keyFramesCount; i++) {
+			AddScale(timeline[i], points[i * 3 + 0], points[i * 3 + 1], points[i * 3 + 2]);
+		}
+	}
+
+
 	TiXmlElement* const positionKeyframes = (TiXmlElement*)rootNode->FirstChild("positionKeyframes");
 	if (positionKeyframes) {
 
 		TiXmlElement* const timeLineElement = (TiXmlElement*)positionKeyframes->FirstChild("timeLine");
-		TiXmlElement* const positionElement = (TiXmlElement*)positionKeyframes->FirstChild("positions");
+		TiXmlElement* const positionElement = (TiXmlElement*)positionKeyframes->FirstChild("position");
 
 		int keyFramesCount;
 		timeLineElement->Attribute("float", &keyFramesCount);
