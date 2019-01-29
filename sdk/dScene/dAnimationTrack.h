@@ -81,7 +81,6 @@ class dAnimationTrack: public dNodeInfo
 	protected:
 	void ResampleAnimation();
 	void OptimizeCurve(dList<dCurveValue>& curve);
-
 	dFloat FixAngleAlias(dFloat angle0, dFloat angle1) const;
 	dFloat Interpolate(dFloat x0, dFloat t0, dFloat x1, dFloat t1, dFloat t) const;
 	
