@@ -237,23 +237,30 @@ const dList<dAnimationTrack::dCurveValue>& dAnimationTrack::GetRotations() const
 	return m_rotation;
 }
 
+dFloat dAnimationTrack::Interpolate(dFloat x0, dFloat t0, dFloat x1, dFloat t1, dFloat t) const
+{
+	return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
+}
+
 void dAnimationTrack::OptimizeCurve(dList<dCurveValue>& curve)
 {
+	const dFloat tol = 5.0e-5f;
+	const dFloat tol2 = tol * tol;
 	for (dCurve::dListNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext()) {
 		const dCurveValue& value0 = node0->GetInfo();
-		dVector p0(value0.m_x, value0.m_y, value0.m_z, dFloat(0.0f));
 		for (dCurve::dListNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext()) {
 			const dCurveValue& value1 = node1->GetPrev()->GetInfo();
 			const dCurveValue& value2 = node1->GetInfo();
 			dVector p1(value1.m_x, value1.m_y, value1.m_z, dFloat(0.0f));
 			dVector p2(value2.m_x, value2.m_y, value2.m_z, dFloat(0.0f));
 
-			dVector p20(p2 - p0);
-			dVector p10(p1 - p0);
-			p20 = p20.Normalize();
-			dVector dist(p10 - p20.Scale(p10.DotProduct3(p20)));
-			dFloat mag2 = dist.DotProduct3(dist);
-			if (mag2 > dFloat (1.0e-12f)) {
+			dFloat dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
+			dFloat dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
+			dFloat dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
+
+			dVector err(dist_x, dist_y, dist_z, 0.0f);
+			dFloat mag2 = err.DotProduct3(err);
+			if (mag2 > tol2) {
 				break;
 			}
 			curve.Remove(node1->GetPrev());

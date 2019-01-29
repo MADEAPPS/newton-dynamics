@@ -485,9 +485,8 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		
 		// populate base pose
 		PopulateBasePose(controller->GetBasePose(), character);
-		dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_walk.ngd");
-		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_idle.ngd");
-		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "skintest.ngd");
+		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_walk.ngd");
+		dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_idle.ngd");
 
 		dAnimIKBlendNodeTake* const walk = new dAnimIKBlendNodeTake(controller, walkCycle);
 		//dAnimIKBlendNodePose* const walk = new dAnimIKBlendNodePose(controller);

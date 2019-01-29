@@ -1024,7 +1024,6 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		dVector w (weight[i]);
 		dFloat invMag = w.m_x + w.m_y + w.m_z + w.m_w;
 		dAssert (invMag > 0.0f);
-		//dAssert (invMag <= 1.01f);
 		invMag = 1.0f/invMag;
 		weight[i].m_x = w.m_x * invMag;
 		weight[i].m_y = w.m_y * invMag;
@@ -1058,13 +1057,14 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	for (dList<int>::dListNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		int i = ptr->GetInfo();
 		dVector p (m_mesh->m_vertex[i * 3 + 0], m_mesh->m_vertex[i * 3 + 1], m_mesh->m_vertex[i * 3 + 2], 0.0f);
+
 		for (int j = 0; j < m_mesh->m_vertexCount; j ++) {
 			if (i != j) {
 				dVector q (m_mesh->m_vertex[j * 3 + 0], m_mesh->m_vertex[j * 3 + 1], m_mesh->m_vertex[j * 3 + 2], 0.0f);
 				dVector diff (q - p);
 				if (diff.DotProduct3(diff) < 1.0e-6f) {
-					m_weights[i] = weight[j];
-					m_weighIndex[i] = skinBone[j];
+					m_weights[i] = m_weights[j];
+					m_weighIndex[i] = m_weighIndex[j];
 					break;
 				}
 			}
@@ -1166,6 +1166,7 @@ void DemoSkinMesh::BuildSkin ()
 	const dFloat* const pointSource = m_mesh->m_vertex;
 	const dFloat* const normalSource = m_mesh->m_normal;
 	for (int i = 0 ; i < m_mesh->m_vertexCount; i ++) {
+
 		dVector point (pointSource[i * 3 + 0], pointSource[i * 3 + 1], pointSource[i * 3 + 2], dFloat (1.0f));
 		dVector normal (normalSource[i * 3 + 0], normalSource[i * 3 + 1], normalSource[i * 3 + 2], dFloat (0.0f));
 		dVector weightedPoint (0.0f);
