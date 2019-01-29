@@ -54,7 +54,7 @@ class dRayCastRecord: public dCustomControllerBase
 		NewtonWorld* const world = NewtonBodyGetWorld (m_target);
 		NewtonWorldRayCast(world, &m_p0[0], &matrix.m_posit[0], RayCast, &parameter, NULL, threadIndex);
 		//dAssert (parameter <= 1.0f);
-		parameter = dMin (parameter, 1.0f);
+		parameter = dMin (parameter, dFloat(1.0f));
 		m_p1 = m_p0 + (matrix.m_posit - m_p0).Scale (parameter);
 	}
 
