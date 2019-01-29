@@ -610,7 +610,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 2.5f;
+	location.m_posit.m_y += 0.5f;
 
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -670,7 +670,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 //	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
