@@ -232,27 +232,30 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		for (dAnimPose::dListNode* node = pose.GetFirst(); node; node = node->GetNext()) {
 			const dAnimKeyframe& frame = node->GetInfo();
 			DemoEntity* const entity = (DemoEntity*)frame.m_userData;
-/*
-if (
+
+//if (
 //(entity->GetName() == "mixamorig:Hips") ||
-//(entity->GetName() == "mixamorig:LeftUpLeg") ||
 //(entity->GetName() == "mixamorig:RightUpLeg") ||
 //(entity->GetName() == "mixamorig:RightLeg") ||
+//(entity->GetName() == "mixamorig:RightFoot") ||
+//(entity->GetName() == "mixamorig:RightToeBase") ||
 //(entity->GetName() == "mixamorig:LeftLeg") ||
+//(entity->GetName() == "mixamorig:LeftUpLeg") ||
 //(entity->GetName() == "mixamorig:LeftShoulder") ||
-(entity->GetName() == "mixamorig:Spine1") ||
-(entity->GetName() == "xxxxxxxx")) 
-*/
-/*
-dVector euler0;
-dVector euler1;
-dMatrix xxxx(frame.m_rotation, frame.m_posit);
-xxxx.GetEulerAngles(euler0, euler1);
-euler0 = euler0.Scale(dRadToDegree);
-dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, euler0.m_z));
-*/
+//(entity->GetName() == "mixamorig:Spine1") ||
+//(entity->GetName() == "Bone002") ||
+//(entity->GetName() == "xxxxxxxx")) 
+//{
+//dVector euler0;
+//dVector euler1;
+//dMatrix xxxx(frame.m_rotation, frame.m_posit);
+//xxxx.GetEulerAngles(euler0, euler1);
+//euler0 = euler0.Scale(dRadToDegree);
+//dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, euler0.m_z));
+//frame.m_rotation = dQuaternion (dYawMatrix(15.0f * dDegreeToRad)) * frame.m_rotation; 
 
 			entity->SetMatrix(*scene, frame.m_rotation, frame.m_posit);
+//}
 		
 		}
 	}
@@ -487,6 +490,7 @@ dTrace(("%s %f %f  %f\n", entity->GetName().GetStr(), euler0.m_x, euler0.m_y, eu
 		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "skintest.ngd");
 
 		dAnimIKBlendNodeTake* const walk = new dAnimIKBlendNodeTake(controller, walkCycle);
+		//dAnimIKBlendNodePose* const walk = new dAnimIKBlendNodePose(controller);
 		//dAnimIKBlendNodePose* const pose = new dAnimIKBlendNodePose(controller);
 		dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, walk);
 		//dAnimIKBlendNodeRoot* const animTree = new dAnimIKBlendNodeRoot(controller, pose);
@@ -506,20 +510,19 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 	dMatrix origin (dGetIdentityMatrix());
-	origin.m_posit.m_y = -0.2f;
-	origin.m_posit.m_y = 1.0f;
+	origin.m_posit.m_y = -0.0f;
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
 	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
 	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
 	
-/*
+
 DemoEntity* const referenceModel = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton());
 origin1.m_posit.m_z = 2.0f;
 referenceModel->ResetMatrix(*scene, referenceModel->GetCurrentMatrix() * origin1);
 scene->Append(referenceModel);
-*/
+
 	
 	origin.m_posit = dVector(-4.0f, 1.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);

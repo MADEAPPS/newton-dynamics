@@ -81,6 +81,7 @@ void dAnimationTrack::AddKeyframe(dFloat time, const dMatrix& matrix)
 	AddScale(time, scale.m_x, scale.m_y, scale.m_z);
 	AddPosition(time, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z);
 	AddRotation(time, euler0.m_x, euler0.m_y, euler0.m_z);
+//dTrace(("%d %f %f %f\n", m_rotation.GetCount(), euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree));
 }
 
 void dAnimationTrack::ResampleAnimation()
@@ -205,6 +206,7 @@ void dAnimationTrack::BakeTransform(const dMatrix& transform)
 		dMatrix eigenScaleAxis;
 		matrix.PolarDecomposition(output, scale, eigenScaleAxis);
 		output.GetEulerAngles(euler0, euler1);
+//dTrace(("%d %f %f %f\n", m_rotation.GetCount(), euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree));
 
 		scaleValue.m_x = scale.m_x;
 		scaleValue.m_y = scale.m_y;
@@ -259,6 +261,19 @@ void dAnimationTrack::OptimizeCurve(dList<dCurveValue>& curve)
 	}
 }
 
+dFloat dAnimationTrack::FixAngleAlias(dFloat angleA, dFloat angleB) const
+{
+	dFloat sinA = dSin(angleA);
+	dFloat cosA = dCos(angleA);
+	dFloat sinB = dSin(angleB);
+	dFloat cosB = dCos(angleB);
+
+	dFloat num = sinB * cosA - cosB * sinA;
+	dFloat den = cosA * cosB + sinA * sinB;
+	angleB = angleA + dAtan2(num, den);
+	return angleB;
+}
+
 void dAnimationTrack::OptimizeCurves()
 {
 	if (m_scale.GetCount()) {
@@ -268,6 +283,15 @@ void dAnimationTrack::OptimizeCurves()
 		OptimizeCurve(m_position);
 	}
 	if (m_rotation.GetCount()) {
+		for (dCurve::dListNode* node = m_rotation.GetFirst(); node->GetNext(); node = node->GetNext()) {
+			const dCurveValue& value0 = node->GetInfo();
+			dCurveValue& value1 = node->GetNext()->GetInfo();
+			value1.m_x = FixAngleAlias(value0.m_x, value1.m_x);
+			value1.m_y = FixAngleAlias(value0.m_y, value1.m_y);
+			value1.m_z = FixAngleAlias(value0.m_z, value1.m_z);
+//dTrace(("%d %f %f %f\n", m_rotation.GetCount(), value0.m_x * dRadToDegree, value0.m_y * dRadToDegree, value0.m_z * dRadToDegree));
+		}
+
 		OptimizeCurve(m_rotation);
 	}
 }

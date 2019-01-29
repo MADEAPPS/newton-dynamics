@@ -488,10 +488,12 @@ void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNo
 			ImportStackData data(nodeStack.GetLast()->GetInfo());
 			nodeStack.Remove(nodeStack.GetLast());
 
-			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
-			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
 			dScene::dTreeNode* const ngdNode = nodeMap.Find(data.m_fbxNode)->GetInfo();
 			dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
+
+			dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
+			dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
+
 			animationTrack->SetName(ngdInfo->GetName());
 			ngdScene->AddReference(ngdNode, trackNode);
 
@@ -501,7 +503,7 @@ void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNo
 				fbxTime.SetFrame(j, FbxTime::eDefaultMode);
 				dMatrix localMatrix(data.m_fbxNode->EvaluateLocalTransform(fbxTime));
 
-				dFloat t = dFloat (fbxTime.GetSecondDouble());
+				dFloat t = dFloat(fbxTime.GetSecondDouble());
 				animationTrack->AddKeyframe(t, localMatrix);
 
 				j++;
@@ -751,7 +753,7 @@ void ImportSkinModifier(dScene* const ngdScene, FbxScene* const fbxScene, Global
 			sprintf(skinName, "%s_skinCluster", fbxBone->GetName());
 			dScene::dTreeNode* const skinNode = ngdScene->CreateSkinModifierNode(ngdNode);
 			ngdScene->AddReference(meshNode, skinNode);
-			
+
 			dGeometryNodeSkinClusterInfo* const info = (dGeometryNodeSkinClusterInfo*)ngdScene->GetInfoFromNode(skinNode);
 			info->SetName(skinName);
 			
@@ -785,7 +787,6 @@ void ImportSkinModifier(dScene* const ngdScene, FbxScene* const fbxScene, Global
 				int boneVertexIndex = boneVertexIndices[j];
 				dFloat boneWeight = (dFloat)boneVertexWeights[j];
 				info->m_vertexWeight[j] = boneWeight;
-				//ngdCluster.m_vertexIndex[j] = indexMap[boneVertexIndex];
 				info->m_vertexIndex[j] = boneVertexIndex;
 			}
 		}

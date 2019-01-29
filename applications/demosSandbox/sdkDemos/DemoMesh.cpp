@@ -912,7 +912,6 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	,m_weights(NULL)
 	,m_bindingMatrixArray(NULL)
 	,m_weighIndex(NULL)
-	,m_boneRemapIndex(NULL)
 	,m_weightcount(0)
 	,m_nodeCount(0)
 {
@@ -924,8 +923,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
 	dAssert (meshInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
 
-	int boneCount = 0;
-	dTree<int, DemoEntity*> nodeEnumrator;
+	dTree<const dGeometryNodeSkinClusterInfo*, DemoEntity*> nodeClusterEnumerator;
 	dTree<DemoEntity*, dScene::dTreeNode*>::Iterator iter (boneMap);
 	for (iter.Begin(); iter; iter++) {
 		dScene::dTreeNode* const boneNode = iter.GetKey();
@@ -934,9 +932,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 			DemoEntity* const boneEntity = iter.GetNode()->GetInfo();
 			boneEntity->SetMatrixUsafe (cluster->m_basePoseMatrix, cluster->m_basePoseMatrix.m_posit);
 			boneEntity->SetMatrixUsafe (cluster->m_basePoseMatrix, cluster->m_basePoseMatrix.m_posit);
-
-			nodeEnumrator.Insert(boneCount, boneEntity);
-			boneCount ++;
+			nodeClusterEnumerator.Insert(cluster, boneEntity);
 		}
 	}
 
@@ -948,12 +944,13 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	dMatrix* const bindMatrix = dAlloca (dMatrix, 2048);
 	DemoEntity** const entityArray = dAlloca (DemoEntity*, 2048);
 
-	m_boneRemapIndex = new int[boneCount];
-	memset(m_boneRemapIndex, -1, boneCount * sizeof(int));
-
 	pool[0] = m_root;
 	parentMatrix[0] = dGetIdentityMatrix();
 	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
+
+	const int boneCount = boneMap.GetCount() + 1024;
+	int* const boneClusterRemapIndex = dAlloca (int, boneCount);
+	memset (boneClusterRemapIndex, -1, boneCount * sizeof (int));
 	while (stack) {
 		stack--;
 		DemoEntity* const entity = pool[stack];
@@ -962,17 +959,14 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		entityArray[entityCount] = entity;
 		bindMatrix[entityCount] = shapeBindMatrix * boneMatrix.Inverse();
 
-		dTree<int, DemoEntity*>::dTreeNode* const mapNode = nodeEnumrator.Find(entity);
-		if (mapNode) {
-			int index = mapNode->GetInfo();
-			dAssert(index < boneCount);
-			if (m_boneRemapIndex[index] < 0) {
-				m_boneRemapIndex[index] = entityCount;
-			}
-			dAssert(m_boneRemapIndex[index] == entityCount);
+		dTree<const dGeometryNodeSkinClusterInfo*, DemoEntity*>::dTreeNode* const clusterNode = nodeClusterEnumerator.Find(entity);
+		if (clusterNode) {
+			const dGeometryNodeSkinClusterInfo* const cluster = nodeClusterEnumerator.Find(entity)->GetInfo();
+			dAssert (boneClusterRemapIndex[cluster->GetNodeID()] == -1);
+			boneClusterRemapIndex[cluster->GetNodeID()] = entityCount;
 		}
-
 		entityCount++;
+		
 		for (DemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) {
 			pool[stack] = node;
 			parentMatrix[stack] = boneMatrix;
@@ -994,11 +988,11 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		dScene::dTreeNode* const boneNode = iter.GetKey();
 		const dGeometryNodeSkinClusterInfo* const cluster = FindSkinModifier(scene, boneNode);
 		if (cluster) {
-			DemoEntity* const boneEntity = iter.GetNode()->GetInfo();
-			dAssert (nodeEnumrator.Find(boneEntity));
-			int boneIndex = nodeEnumrator.Find(boneEntity)->GetInfo();
+			int boneIndex = boneClusterRemapIndex[cluster->GetNodeID()];
+			dAssert (boneIndex != -1);
 			for (int i = 0; i < cluster->m_vertexIndex.GetSize(); i ++) {
 				int vertexIndex = cluster->m_vertexIndex[i];
+
 				vCount = dMax (vertexIndex + 1, vCount);
 				dFloat vertexWeight = cluster->m_vertexWeight[i];
 				if (vertexWeight >= weight[vertexIndex][3]) {
@@ -1015,6 +1009,14 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		}
 	}
 
+	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
+	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
+
+	m_weights = new dVector[m_mesh->m_vertexCount];
+	m_weighIndex = new dWeightBoneIndex[m_mesh->m_vertexCount];
+	memset(m_weighIndex, 0, m_mesh->m_vertexCount * sizeof (dWeightBoneIndex));
+
+	const int* const indexToPointMap = meshInfo->GetIndexToVertexMap();
 
 	m_weightcount = 0;
 	const int vertexBaseCount = NewtonMeshGetVertexBaseCount(meshInfo->GetMesh());
@@ -1022,7 +1024,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		dVector w (weight[i]);
 		dFloat invMag = w.m_x + w.m_y + w.m_z + w.m_w;
 		dAssert (invMag > 0.0f);
-		dAssert (invMag <= 1.01f);
+		//dAssert (invMag <= 1.01f);
 		invMag = 1.0f/invMag;
 		weight[i].m_x = w.m_x * invMag;
 		weight[i].m_y = w.m_y * invMag;
@@ -1039,18 +1041,10 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		}
 	}
 
-	m_vertex = new dFloat[3 * m_mesh->m_vertexCount];
-	m_normal = new dFloat[3 * m_mesh->m_vertexCount];
-
-	m_weights = new dVector[m_mesh->m_vertexCount];
-	m_weighIndex = new dWeightBoneIndex[m_mesh->m_vertexCount];
-	memset (m_weighIndex, 0, m_mesh->m_vertexCount * sizeof (dWeightBoneIndex));
-
-	const int* const indexToPoitMap = meshInfo->GetIndexToVertexMap();
-
 	dList<int> pendingVertices;
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
-		int index = indexToPoitMap[i];
+		int index = indexToPointMap[i];
+
 		dAssert (index >= 0);
 		//dAssert (index < vCount);
 		if (index < vCount) {
@@ -1089,7 +1083,6 @@ DemoSkinMesh::~DemoSkinMesh()
 		delete[] m_normal; 
 		delete[] m_weights;
 		delete[] m_weighIndex;
-		delete[] m_boneRemapIndex;
 		delete[] m_bindingMatrixArray; 
 	}
 }
@@ -1124,7 +1117,6 @@ NewtonMesh* DemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatr
 
 void DemoSkinMesh::Render (DemoEntityManager* const scene)
 {
-return;
 	BuildSkin ();
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1143,7 +1135,6 @@ return;
 	glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
 }
-
 
 void DemoSkinMesh::BuildSkin ()
 {
@@ -1183,7 +1174,7 @@ void DemoSkinMesh::BuildSkin ()
 		const dVector& weight = m_weights[i];
 		const dWeightBoneIndex& boneIndex = m_weighIndex[i];
 		for(int j = 0; j < m_weightcount; j ++) {
-			int index = m_boneRemapIndex[boneIndex.m_boneIndex[j]];
+			int index = boneIndex.m_boneIndex[j];
 			dFloat blend = weight[j];
 			const dMatrix& matrix = bindMatrix[index];
 			weightedPoint += matrix.TransformVector(point).Scale (blend);
@@ -1198,6 +1189,6 @@ void DemoSkinMesh::BuildSkin ()
 		m_normal[i * 3 + 2] = weightedNormal.m_z;
 	}
 
-	memcpy(m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
-	memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+//	memcpy(m_vertex, m_mesh->m_vertex, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
+//	memcpy(m_normal, m_mesh->m_normal, 3 * m_mesh->m_vertexCount * sizeof (dFloat));
 }

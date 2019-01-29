@@ -455,12 +455,22 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 	int* const uv1IndexList = new int[bufferCount];
 	
 	// pack the vertex Array
-	NewtonMeshGetVertexChannel(mesh, 4 * sizeof(dFloat), points);
-	for (int i = 0; i < pointCount; i++) {
+//	NewtonMeshGetVertexChannel(mesh, 4 * sizeof(dFloat), points);
+//	for (int i = 0; i < pointCount; i++) {
+//		points[4 * i + 3] = 0.0f;
+//		dTrace(("%d %f %f %f\n", i, points[4 * i + 1], points[4 * i + 2], points[4 * i + 3]));
+//	}
+//	int controlPointCount = dPackVertexArray(points, 4, 4 * sizeof(dFloat), pointCount, vertexIndexList);
+	int controlPointCount = NewtonMeshGetVertexCount(mesh);
+	int controlPointCountStride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof(dFloat64);
+	const dFloat64* const controlPoints = NewtonMeshGetVertexArray(mesh);
+	for (int i = 0; i < controlPointCount; i++) {
+		points[4 * i + 0] = dFloat(controlPoints[controlPointCountStride * i + 0]);
+		points[4 * i + 1] = dFloat(controlPoints[controlPointCountStride * i + 1]);
+		points[4 * i + 2] = dFloat(controlPoints[controlPointCountStride * i + 2]);
 		points[4 * i + 3] = 0.0f;
+		//dTrace(("%d %f %f %f\n", i, points[4 * i + 0], points[4 * i + 1], points[4 * i + 2]));
 	}
-	int controlPointCount = dPackVertexArray(points, 4, 4 * sizeof(dFloat), pointCount, vertexIndexList);
-
 	dFloatArrayToString(points, controlPointCount * 4, buffer, bufferSizeInBytes);
 	TiXmlElement* const position = new TiXmlElement("position");
 	pointElement->LinkEndChild(position);
@@ -543,8 +553,10 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 	faceMaterial->SetAttribute("index", buffer);
 
 	for (int i = 0; i < indexCount; i ++) {
-		int index = NewtonMeshGetPointIndex(mesh, indexArray[i]);
-		remapedIndexArray[i] = vertexIndexList[index];
+		//int index = NewtonMeshGetPointIndex(mesh, indexArray[i]);
+		//remapedIndexArray[i] = vertexIndexList[index];
+		int index = NewtonMeshGetVertexIndexFromPoint(mesh, indexArray[i]);
+		remapedIndexArray[i] = index;
 	}
 	dIntArrayToString (remapedIndexArray, indexCount, buffer, bufferSizeInBytes);
 	TiXmlElement* const positionIndex = new TiXmlElement ("position");
@@ -693,6 +705,10 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 	NewtonMeshBuildFromVertexListIndexList (mesh, &vertexFormat);
 	NewtonMeshSetVertexBaseCount(mesh, pointBaseCount);
 
+//const dFloat64* xxx = NewtonMeshGetVertexArray(mesh);
+//for (int i = 0; i < pointBaseCount; i++) {
+//	dTrace(("%d %f %f %f\n", i, xxx[4 * i + 0], xxx[4 * i + 1], xxx[4 * i + 2]));
+//}
 	if (vertexFormat.m_normal.m_data) {
 		delete[] vertexFormat.m_normal.m_data;
 		delete[] vertexFormat.m_normal.m_indexList;
@@ -707,10 +723,6 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 		delete[] vertexFormat.m_uv1.m_data;
 		delete[] vertexFormat.m_uv1.m_indexList;
 	}
-
-//	if (vertexFormat.m_weight.m_data) {
-//		delete[] vertexFormat.m_weight.m_data;
-//	}
 
 	delete[] positions;	
 	delete[] positionVertexIndex;

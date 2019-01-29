@@ -81,6 +81,7 @@ class dAnimationTrack: public dNodeInfo
 	protected:
 	void ResampleAnimation();
 	void OptimizeCurve(dList<dCurveValue>& curve);
+	dFloat FixAngleAlias(dFloat angle0, dFloat angle1) const;
 	
 	virtual void BakeTransform(const dMatrix& matrix);
 	virtual void Serialize (TiXmlElement* const rootNode) const; 

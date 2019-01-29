@@ -255,8 +255,6 @@ void dgMeshEffect::dgAttibutFormat::CopyFrom (const dgAttibutFormat& source)
 	m_uv1Channel.CopyFrom(source.m_uv1Channel);
 }
 
-
-//void dgMeshEffect::dgAttibutFormat::CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList)
 void dgMeshEffect::dgAttibutFormat::CompressData (const dgPointFormat& points, dgInt32* const indexList)
 {
 	dgFloat64 minDist;
@@ -278,8 +276,6 @@ void dgMeshEffect::dgAttibutFormat::CompressData (const dgPointFormat& points, d
 	dgAttibutFormat tmpFormat (*this);
 	Clear();
 
-//	const dgFloat64 tolerance = DG_VERTEXLIST_INDEXLIST_TOL * minDist + dgFloat64(1.0e-12f);
-//	const dgFloat64 sweptWindow = dgFloat64(2.0f) * tolerance + dgFloat64(1.0e-4f);
 	const dgFloat64 tolerance = dgMin(minDist, dgFloat64(1.0e-12f));
 	const dgFloat64 sweptWindow = dgFloat64(2.0f) * tolerance + dgFloat64(1.0e-10f);
 
@@ -2580,7 +2576,6 @@ dgInt32 dgMeshEffect::GetVertexIndex (const void* const vertex) const
 	return edge->m_incidentVertex;
 }
 
-
 void* dgMeshEffect::GetFirstPoint () const
 {
 	Iterator iter (*this);
@@ -2615,11 +2610,11 @@ dgInt32 dgMeshEffect::GetPointIndex (const void* const point) const
 	return int (edge->m_userData);
 }
 
+
 dgInt32 dgMeshEffect::GetVertexIndexFromPoint (const void* const point) const
 {
 	return GetVertexIndex (point);
 }
-
 
 dgEdge* dgMeshEffect::SpliteFace (dgInt32 v0, dgInt32 v1)
 {

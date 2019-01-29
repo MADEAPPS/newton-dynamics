@@ -8108,7 +8108,6 @@ void NewtonMeshOptimize(const NewtonMesh* const mesh)
 	NewtonMeshOptimizeVertex(mesh);
 }
 
-
 int NewtonMeshGetVertexCount(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
@@ -8145,7 +8144,6 @@ const dFloat64* NewtonMeshGetVertexArray (const NewtonMesh* const mesh)
 
 	return meshEffect->GetVertexPool (); 
 }
-
 
 int NewtonMeshGetPointCount (const NewtonMesh* const mesh)
 {
