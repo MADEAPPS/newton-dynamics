@@ -11,6 +11,7 @@
 #ifndef __DEMO_MAIN_FRAME_H__
 #define __DEMO_MAIN_FRAME_H__
 
+#include "ShaderPrograms.h"
 
 struct GLFWwindow;
 struct ImDrawData;
@@ -161,6 +162,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	DemoEntity* m_sky;
 	NewtonWorld* m_world;
 	DemoCameraManager* m_cameraManager;
+	ShaderPrograms m_shadeCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
 	RenderGuiHelpCallback m_renderDemoGUI;

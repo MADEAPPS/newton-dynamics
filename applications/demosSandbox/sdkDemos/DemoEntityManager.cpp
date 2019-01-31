@@ -17,10 +17,12 @@
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
+#include "ShaderPrograms.h"
 #include "DemoEntityManager.h"
 #include "DemoCameraManager.h"
 #include "DemoEntityListener.h"
 #include "DemoCameraManager.h"
+
 #include "dHighResolutionTimer.h"
 
 #ifdef _MACOSX_VER
@@ -361,6 +363,8 @@ DemoEntityManager::DemoEntityManager ()
 	}
 //m_currentPlugin = 0;
 
+	m_shadeCache.CreateAllEffects();
+
 /*
 	dFloat A[2][2];
 	dFloat x[2];
@@ -614,8 +618,10 @@ void DemoEntityManager::LoadFont()
     io.Fonts->AddFontFromFileTTF(pathName, pixedSize);
     //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 
-	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. 
-	// If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
+	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) 
+	// because it is more likely to be compatible with user's existing shaders. 
+	// If your ImTextureId represent a higher-level concept than just a GL texture id, 
+	// consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
 	unsigned char* pixels;
 	int width, height;
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   

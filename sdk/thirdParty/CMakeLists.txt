@@ -15,12 +15,10 @@ add_subdirectory(tinyxml)
 if (NEWTON_BUILD_SANDBOX_DEMOS)
     if (MSVC)
         add_subdirectory(glfw)
-        add_subdirectory(imgui)
     endif(MSVC)
 
-    if (UNIX)
-        add_subdirectory(imgui)
-    endif(UNIX)
+    add_subdirectory(imgui)
+	add_subdirectory(glatter)
 endif()
 
 

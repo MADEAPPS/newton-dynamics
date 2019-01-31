@@ -65,6 +65,7 @@ typedef long long unsigned64;
 	#include <tchar.h>
 	#include <crtdbg.h>
 
+	#include <glatter.h>
 	#include <GL/glu.h>
 	#include <GL/gl.h>
 	#include <imgui.h>

@@ -77,6 +77,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dVehicle", "..\..\..\..\sdk
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dAnimation", "..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dAnimation.vcxproj", "{EA56552E-746B-4B3A-BF92-004E6A2068EF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glatter", "..\..\..\..\sdk\thirdParty\glatter\vs2013\glatter.vcxproj", "{29D84729-A048-4F2B-8B4A-FB95509FA0D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_double|Win32 = debug_double|Win32
@@ -361,6 +363,22 @@ Global
 		{EA56552E-746B-4B3A-BF92-004E6A2068EF}.Release|Win32.Build.0 = Release|Win32
 		{EA56552E-746B-4B3A-BF92-004E6A2068EF}.Release|x64.ActiveCfg = Release|x64
 		{EA56552E-746B-4B3A-BF92-004E6A2068EF}.Release|x64.Build.0 = Release|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.debug_double|Win32.ActiveCfg = debug|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.debug_double|Win32.Build.0 = debug|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.debug_double|x64.ActiveCfg = debug|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.debug_double|x64.Build.0 = debug|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Debug|Win32.ActiveCfg = debug|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Debug|Win32.Build.0 = debug|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Debug|x64.ActiveCfg = debug|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Debug|x64.Build.0 = debug|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.release_double|Win32.ActiveCfg = release|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.release_double|Win32.Build.0 = release|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.release_double|x64.ActiveCfg = release|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.release_double|x64.Build.0 = release|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Release|Win32.ActiveCfg = release|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Release|Win32.Build.0 = release|Win32
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Release|x64.ActiveCfg = release|x64
+		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -95,7 +95,6 @@ else (UNIX)
     set(CMAKE_INSTALL_LIBDIR "${PROJECT_BINARY_DIR}/build/lib")
     set(CMAKE_INSTALL_BINDIR "${PROJECT_BINARY_DIR}/build/bin")
     set(CMAKE_INSTALL_INCLUDEDIR "${PROJECT_BINARY_DIR}/build/include")
-
 endif (UNIX)
 
 if (MSVC)
@@ -183,7 +182,7 @@ if (NEWTON_BUILD_PROFILER)
 endif ()
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
-	add_dependencies (demosSandbox newton dMath dScene dNewton dContainers dVehicle dCustomJoints tinyxml imgui)
+	add_dependencies (demosSandbox newton dMath dScene dNewton dContainers dVehicle dCustomJoints tinyxml imgui glatter)
     if (MSVC)
 		add_dependencies (demosSandbox glfw)
 		if (NEWTON_BUILD_PROFILER)

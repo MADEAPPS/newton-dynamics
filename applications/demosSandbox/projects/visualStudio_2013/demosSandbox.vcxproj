@@ -90,6 +90,7 @@
     <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\OpenGlUtil.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\PhysicsUtils.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\ShaderPrograms.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\SkyBox.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\TargaToOpenGl.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\toolbox_stdafx.cpp">
@@ -117,6 +118,7 @@
     <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\PhysicsUtils.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\ShaderPrograms.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\SkyBox.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\TargaToOpenGl.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx.h" />
@@ -155,6 +157,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\sdk\projects\visualStudio_2013_static_mt\newton.vcxproj">
       <Project>{f8604c1c-867d-4efd-afac-15404f17084e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\sdk\thirdParty\glatter\vs2013\glatter.vcxproj">
+      <Project>{29d84729-a048-4f2b-8b4a-fb95509fa0d6}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\sdk\thirdParty\glfw\vs2013\glfw.vcxproj">
       <Project>{71de04d1-e371-4a45-9694-2aa647d65451}</Project>
@@ -300,7 +305,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CNEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -319,7 +324,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -338,7 +343,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CNEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -357,7 +362,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -378,7 +383,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -401,7 +406,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -424,7 +429,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -447,7 +452,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_NEWTON_STATIC_LIB;_DVEHICLE_STATIC_LIB;_CNEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dScene;../../../../sdk/dVehicle;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dgTimeTracker;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include/glfw;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

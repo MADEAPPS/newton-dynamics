@@ -40,6 +40,7 @@ endif ()
 include_directories(../../sdk/thirdParty/glfw/)
 include_directories(../../sdk/thirdParty/imgui/)
 include_directories(../../sdk/thirdParty/glfw/include/glfw/)
+include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 add_executable(${projectName} ${CPP_SOURCE})
 
 if(MSVC)
@@ -56,7 +57,7 @@ if(MSVC)
         add_definitions(-D_CNEWTON_STATIC_LIB)
         add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
 
-        target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml glfw imgui glu32 opengl32)
+        target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml glfw imgui glatter glu32 opengl32)
 
         if (NEWTON_BUILD_PROFILER)
             target_link_libraries (${projectName} dTimeTracker)
@@ -69,7 +70,7 @@ if(MSVC)
 endif(MSVC)
 
 if (UNIX)
-    target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw GL GLU pthread)
+    target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw glatter GL GLU pthread)
 
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
@@ -84,5 +85,7 @@ message (${CMAKE_CONFIGURATION_TYPES})
 
 if (MSVC)
     file(GLOB media ../media/*.*)
+    file(GLOB shaders ../media/shaders/*.*)
     install(FILES ${media} DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
+    install(FILES ${shaders} DESTINATION "${PROJECT_BINARY_DIR}/applications/media/shaders")
 endif(MSVC)

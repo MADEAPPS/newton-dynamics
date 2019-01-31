@@ -189,6 +189,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\AnimatedPlayer.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\ShaderPrograms.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
@@ -238,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoCameraManager.h">
       <Filter>mainLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\ShaderPrograms.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
