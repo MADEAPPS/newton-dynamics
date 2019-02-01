@@ -529,8 +529,8 @@ DemoMesh::~DemoMesh()
 		delete[] m_vertex;
 		delete[] m_normal;
 		delete[] m_uv;
-		ResetOptimization();
 	}
+	ResetOptimization();
 }
 
 NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)

@@ -31,7 +31,9 @@ class SkyBox: public DemoEntity
 	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
 
 	private:
-	dVector m_size;
+	void DrawMesh () const;
+
+	GLuint m_displayList;
 	GLuint m_shader;
 	GLuint m_textures[6];
 };
