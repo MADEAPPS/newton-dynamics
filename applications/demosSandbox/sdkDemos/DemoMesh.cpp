@@ -150,7 +150,7 @@ void DemoSubMesh::AllocIndexData (int indexCount)
 	m_indexes = new unsigned [m_indexCount]; 
 }
 
-DemoMesh::DemoMesh(const char* const name)
+DemoMesh::DemoMesh(const char* const name, const ShaderPrograms& shaderCache)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_vertexCount(0)
@@ -162,7 +162,7 @@ DemoMesh::DemoMesh(const char* const name)
 {
 }
 
-DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
+DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ShaderPrograms& shaderCache)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
@@ -249,7 +249,7 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 //	}
 }
 
-DemoMesh::DemoMesh(NewtonMesh* const mesh)
+DemoMesh::DemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache)
 	:DemoMeshInterface()
 	,m_uv(NULL)
 	,m_vertex(NULL)
@@ -295,7 +295,7 @@ DemoMesh::DemoMesh(NewtonMesh* const mesh)
 	OptimizeForRender ();
 }
 
-DemoMesh::DemoMesh(const DemoMesh& mesh)
+DemoMesh::DemoMesh(const DemoMesh& mesh, const ShaderPrograms& shaderCache)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
@@ -331,7 +331,7 @@ DemoMesh::DemoMesh(const DemoMesh& mesh)
 	OptimizeForRender ();
 }
 
-DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity, const dMatrix& uvMatrix)
+DemoMesh::DemoMesh(const char* const name, const ShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity, const dMatrix& uvMatrix)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
@@ -411,7 +411,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 	OptimizeForRender ();
 }
 
-DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize)
+DemoMesh::DemoMesh(const char* const name, const ShaderPrograms& shaderCache, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize)
 	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)

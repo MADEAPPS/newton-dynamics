@@ -46,18 +46,12 @@
 //#define ENABLE_ERROR_ALIGNED_P2P		// align point to point constraint space to displacement error, but no difference. ignore it.
 
 
-
-
-
-
-
 static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size, const dFloat mass = 1)
 {
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-   	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
+   	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
     
     dMatrix matrix (dGetIdentityMatrix());
     matrix.m_posit = location;

@@ -619,7 +619,7 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		// create a simple box to serve as chassis
 		int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 		NewtonCollision* const collision = NewtonCreateBox(world, vScal.m_x, vScal.m_y, vScal.m_z, 0, NULL);
-		DemoMesh* const VehicleFrameMesh1 = new DemoMesh("VehicleFrameMesh1", collision, "wood_0.tga", "smilli.tga", "wood_0.tga");
+		DemoMesh* const VehicleFrameMesh1 = new DemoMesh("VehicleFrameMesh1", scene->GetShaderCache(), collision, "wood_0.tga", "smilli.tga", "wood_0.tga");
 		NewtonBody* const vBody = CreateSimpleSolid(scene, VehicleFrameMesh1, vMass, matrix, collision, defaultMaterialID);
 		VehicleFrameMesh1->Release();
 		NewtonDestroyCollision(collision);
@@ -686,7 +686,7 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 		NewtonCollision* const collision = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
 		NewtonCollisionSetScale(collision, 2.0f * tireHeight, 2.0f * tireRad, 2.0f * tireRad);
 
-		DemoMesh* const VehicleTireMesh = new DemoMesh("tireShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const VehicleTireMesh = new DemoMesh("tireShape", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		NewtonBody* const tireBody = CreateSimpleSolid(scene, VehicleTireMesh, tireMass, matrix, collision, m_tireMaterial);
 		VehicleTireMesh->Release();
 		NewtonDestroyCollision(collision);
@@ -828,7 +828,7 @@ static void BuildPyramid(DemoEntityManager* const scene, dFloat mass, const dVec
 	defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 
 	NewtonCollision* const collision = CreateConvexCollision(world, shapeMatrix, size, type, defaultMaterialID);
-	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
+	DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
 
 	//	matrix = dRollMatrix(dPi/2.0f);
 	dFloat startElevation = 100.0f;
@@ -881,7 +881,7 @@ static void AddRamps (DemoEntityManager* const scene)
 	startlocation.m_posit.m_x += 50.0f;
 	startlocation.m_posit.m_y += 8.5f;
 	NewtonCollision* collision = NewtonCreateBox(world, 50.0f, 0.25f, 100.0f, 0, NULL);
-	DemoMesh* const StartBox = new DemoMesh("StartBox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	DemoMesh* const StartBox = new DemoMesh("StartBox", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 	CreateSimpleSolid(scene, StartBox, 0.0f, startlocation, collision, defaultMaterial);
 	NewtonDestroyCollision(collision);
 	StartBox->Release();
@@ -891,7 +891,7 @@ static void AddRamps (DemoEntityManager* const scene)
 	startlocation2.m_posit.m_x += 38.0f;
 	startlocation2.m_posit.m_y += 4.0f;
 	collision = NewtonCreateBox(world, 20.0f, 0.25f, 40.0f, 0, NULL);
-	DemoMesh* const StartBox3 = new DemoMesh("StartBox", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const StartBox3 = new DemoMesh("StartBox", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 	CreateSimpleSolid(scene, StartBox3, 0.0f, startlocation2, collision, defaultMaterial);
 	NewtonDestroyCollision(collision);
 	StartBox3->Release();
@@ -901,7 +901,7 @@ static void AddRamps (DemoEntityManager* const scene)
 	startlocation3.m_posit.m_x -= 31.5f;
 	startlocation3.m_posit.m_y += 0.575f;
 	collision = NewtonCreateBox(world, 2.0f, 2.0f, 100.0f, 0, NULL);
-	DemoMesh* const StartBox2 = new DemoMesh("StartBox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	DemoMesh* const StartBox2 = new DemoMesh("StartBox", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 	CreateSimpleSolid(scene, StartBox2, 0.0f, startlocation3, collision, defaultMaterial);
 	NewtonDestroyCollision(collision);
 	StartBox2->Release();

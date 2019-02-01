@@ -671,7 +671,7 @@ matrix1.m_posit.m_z -= 2.0f;
 xxxx1->ResetMatrix(*scene, matrix1);
 */
 
-		DemoEntity* const model = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton());
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("tred_2.ngd", scene->GetNewton(), scene->GetShaderCache());
 		scene->Append(model);
 
 		dMatrix modelMatrix(model->GetCurrentMatrix());

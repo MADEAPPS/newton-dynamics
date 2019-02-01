@@ -92,7 +92,7 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 	dMatrix aligmentUV(dGetIdentityMatrix());
 
 	NewtonMeshApplyBoxMapping(mesh, tex, tex, tex, &aligmentUV[0][0]);
-	DemoMesh* const visualMesh = new DemoMesh (mesh);
+	DemoMesh* const visualMesh = new DemoMesh (mesh, scene->GetShaderCache());
 
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;

@@ -46,7 +46,7 @@ static void BuildTower(DemoEntityManager* const scene, dFloat spacing, dFloat se
 	rayon = spacing * towerboxcount;
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
-	DemoMesh* const geometry = new DemoMesh("towerbox", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	DemoMesh* const geometry = new DemoMesh("towerbox", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 	//
 	int n = 0;
 	int ct1 = 0;
@@ -113,7 +113,7 @@ static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVect
 
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
-	DemoMesh* const geometry = new DemoMesh("box", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	for (int i = 0; i < count; i ++) { 
 		dMatrix matrix(baseMatrix);
@@ -147,7 +147,7 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeMatrix, size, type, defaultMaterialID);
-	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
+	DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
 
 	//	matrix = dRollMatrix(dPi/2.0f);
 	dFloat startElevation = 100.0f;
@@ -208,7 +208,7 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _SPHERE_PRIMITIVE, defaultMaterialID);
-	DemoMesh* const geometry = new DemoMesh("sphere", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	DemoMesh* const geometry = new DemoMesh("sphere", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	for (int i = 0; i < count; i++) {
 		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
@@ -216,7 +216,7 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 	}
 
 	//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);
-	DemoMesh* const geometry1 = new DemoMesh("sphere", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+	DemoMesh* const geometry1 = new DemoMesh("sphere", scene->GetShaderCache(), collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
 //	CreateSimpleSolid(scene, geometry1, mass * 1000.0f, baseMatrix, collision, defaultMaterialID);
 
 	// do not forget to release the assets	
@@ -251,7 +251,7 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _CAPSULE_PRIMITIVE, defaultMaterialID);
 
 	dMatrix uvMatrix (dPitchMatrix(dPi));
-	DemoMesh* const geometry = new DemoMesh("sphere", collision, "smilli.tga", "smilli.tga", "smilli.tga", 1.0f, uvMatrix);
+	DemoMesh* const geometry = new DemoMesh("sphere", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga", 1.0f, uvMatrix);
 
 	dFloat vertialStep = blockBoxSize.m_x;
 	dFloat horizontalStep = blockBoxSize.m_y * 0.8f;
@@ -335,7 +335,7 @@ baseMatrix.m_posit.m_y -= 0.1f;
 
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
-	DemoMesh* const geometry = new DemoMesh("sphere", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	DemoMesh* const geometry = new DemoMesh("sphere", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 //baseMatrix = dRollMatrix(30.0f * dDegreeToRad) * dPitchMatrix(30.0f * dDegreeToRad) * baseMatrix;
 //baseMatrix.m_posit.m_y += 10.0f;

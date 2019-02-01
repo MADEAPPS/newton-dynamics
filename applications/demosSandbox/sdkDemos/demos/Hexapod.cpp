@@ -207,7 +207,7 @@ class dHexapodController: public dCustomControllerBase
 		NewtonWorld* const world = scene->GetNewton();
 		int materialID = NewtonMaterialGetDefaultGroupID(world);
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
 		ScaleIntertia(body, inertiaScale);
 
@@ -222,7 +222,7 @@ class dHexapodController: public dCustomControllerBase
 		int materialID = NewtonMaterialGetDefaultGroupID(world);
 		dVector size(radius, height, radius, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
 		ScaleIntertia(body, inertiaScale);
@@ -239,7 +239,7 @@ class dHexapodController: public dCustomControllerBase
 		dVector size(radius, height, radius, 0.0f);
 		dMatrix align(dYawMatrix(dPi * 0.5f));
 		NewtonCollision* const collision = CreateConvexCollision(world, align, size, _CAPSULE_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, location, collision, materialID);
 		ScaleIntertia(body, inertiaScale);

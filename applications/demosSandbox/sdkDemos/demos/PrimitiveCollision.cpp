@@ -105,7 +105,7 @@ static void AddSinglePrimitive (DemoEntityManager* const scene, dFloat x, Primit
 	NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, materialID);
 
 	//	DemoMesh____* const geometry = new DemoMesh____("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
-	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 
 	matrix = dRollMatrix(dPi/2.0f);

@@ -77,12 +77,12 @@ void Restitution (DemoEntityManager* const scene)
 	// create some spheres 
 	dVector sphSize (2.0f, 2.0f, 2.0f, 0.0f);
 	NewtonCollision* const sphereCollision = CreateConvexCollision (world, offsetMatrix, sphSize, _SPHERE_PRIMITIVE, 0);
-	DemoMesh* const sphereMesh = new DemoMesh("sphere", sphereCollision, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const sphereMesh = new DemoMesh("sphere", scene->GetShaderCache(), sphereCollision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	// create some boxes too
 	dVector boxSize (2.0f, 2.0f, 2.0f, 0.0f);
 	NewtonCollision* const boxCollision = CreateConvexCollision (world, offsetMatrix, boxSize, _BOX_PRIMITIVE, 0);
-	DemoMesh* const boxMesh = new DemoMesh("box", boxCollision, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const boxMesh = new DemoMesh("box", scene->GetShaderCache(), boxCollision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	int zCount = 10;
 	dFloat spacing = 4.0f;

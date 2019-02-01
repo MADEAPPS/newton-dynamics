@@ -369,7 +369,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 
 	// load a skeleton mesh 
 	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
-	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
+	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton(), scene->GetShaderCache());
 
 	//  create a skeletal transform controller for controlling rag doll
 	CrashDummyManager* const manager = new CrashDummyManager (scene);

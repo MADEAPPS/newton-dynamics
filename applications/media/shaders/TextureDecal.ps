@@ -1,15 +1,13 @@
 #version 120
 
-varying vec2 texCoord;
 uniform sampler2D texture;
 
 void main()
 {
-	//vec4 color = texture2D(texture, gl_TexCoord[0].st);
-
 	// check if the shader is been called
 	//vec4 color = vec4 (1.0, 0.0, 0.0, 1.0);
-	vec4 color = texture2D (texture, texCoord);
+
+	vec4 color = texture2D(texture, gl_TexCoord[0].st);
 	gl_FragColor = color;
 }
 

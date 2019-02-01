@@ -569,7 +569,7 @@ class dSixAxisManager: public dAnimIDManager
 
 	dAnimIDController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
-		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton());
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton(), scene->GetShaderCache());
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
 

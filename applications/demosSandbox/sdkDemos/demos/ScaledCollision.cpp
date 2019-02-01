@@ -36,7 +36,7 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 			// test skin thinckness
 			NewtonCollisionSetSkinThickness(collision, 0.01f);
 			NewtonCollisionSetScale (collision, scale, scale, scale);
-			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 			dFloat z = origin.m_z + (j - zCount / 2) * spacing;
 			matrix.m_posit.m_x = x;
@@ -86,7 +86,7 @@ static void AddNonUniformScaledPrimitives(DemoEntityManager* const scene, dFloat
 
 			DemoEntity* entity = (DemoEntity*)NewtonBodyGetUserData(body);
 			NewtonCollisionSetScale(collision, scalex, scaley, scalez);
-			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 			entity->SetMesh(geometry, dGetIdentityMatrix());
 			NewtonBodySetCollisionScale(body, scalex, scaley, scalez);
 
@@ -253,7 +253,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	matrix.m_posit.m_z = 0.0f;
 	matrix.m_posit.m_w = 1.0f;
 
-	DemoEntity* const teaPot = DemoEntity::LoadNGD_mesh("teapot.ngd", world);
+	DemoEntity* const teaPot = DemoEntity::LoadNGD_mesh("teapot.ngd", world, scene->GetShaderCache());
 	//DemoEntity* const teaPot = DemoEntity::LoadNGD_mesh("box.ngd", world);
 
 	NewtonCollision* const staticCollision = CreateCollisionTree (world, teaPot, 0, true);

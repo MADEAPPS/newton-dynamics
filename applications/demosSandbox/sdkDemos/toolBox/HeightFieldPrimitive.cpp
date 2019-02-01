@@ -305,7 +305,7 @@ freq *= 0.5f;
 		//		MakeCalderas (elevation, size, maxElevation * 0.7f, maxElevation * 0.1f);
 
 		//	// create the visual mesh
-		DemoMesh* const mesh = new DemoMesh ("terrain", elevation, size, cellSize, 1.0f/4.0f, TILE_SIZE);
+		DemoMesh* const mesh = new DemoMesh ("terrain", scene->GetShaderCache(), elevation, size, cellSize, 1.0f/4.0f, TILE_SIZE);
 
 		DemoEntity* const entity = new DemoEntity(dGetIdentityMatrix(), NULL);
 		scene->Append (entity);

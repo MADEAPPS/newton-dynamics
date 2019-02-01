@@ -79,7 +79,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_gripperRotator(NULL)
 	{
 		// load the vehicle model
-		LoadNGD_mesh (name, scene->GetNewton());
+		LoadNGD_mesh (name, scene->GetNewton(), scene->GetShaderCache());
 	}
 
 	ArticulatedEntityModel (const ArticulatedEntityModel& copy)

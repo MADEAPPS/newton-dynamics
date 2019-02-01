@@ -30,7 +30,7 @@ static NewtonBody* CreatePlaneCollision (DemoEntityManager* const scene, const d
 	NewtonBody* const body = NewtonCreateDynamicBody(scene->GetNewton(), planeCollision, &matrix[0][0]);
 
 	// create a visual mesh
-	DemoMesh* const mesh = CreateVisualPlaneMesh (planeEquation);
+	DemoMesh* const mesh = CreateVisualPlaneMesh (planeEquation, scene->GetShaderCache().m_diffuseEffect);
 	DemoEntity* const entity = new DemoEntity(matrix, NULL);
 
 	NewtonCollisionGetMatrix(planeCollision, &matrix[0][0]);
@@ -62,7 +62,7 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 			dFloat scale = 0.5f + 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX);
 
 			NewtonCollisionSetScale (collision, scale, scale, scale);
-			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 			dFloat z = origin.m_z + (j - zCount / 2) * spacing;
 			matrix.m_posit.m_x = x;

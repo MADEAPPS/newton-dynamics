@@ -37,7 +37,7 @@ class dClosestDistanceRecord: public dCustomControllerBase
 			dVector size(1.0f, 1.0f, 1.0f, 0.0f);
 			m_castingShape = CreateConvexCollision (world, dGetIdentityMatrix(), size, castingShapeType, 0);
 
-			DemoMesh* const geometry = new DemoMesh("convexShape", m_castingShape, "smilli.tga", "smilli.tga", "smilli.tga");
+			DemoMesh* const geometry = new DemoMesh("convexShape", scene->GetShaderCache(), m_castingShape, "smilli.tga", "smilli.tga", "smilli.tga");
 			SetMesh(geometry, dGetIdentityMatrix());
 			geometry->Release();
 
@@ -148,7 +148,7 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		dVector size(0.5f, 0.5f, 0.75f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, shapeType, materialID);
 
-		DemoMesh* const geometry = new DemoMesh("convexShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("convexShape", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		m_body = CreateSimpleSolid (scene, geometry, 1.0f, matrix, collision, materialID);
 
 

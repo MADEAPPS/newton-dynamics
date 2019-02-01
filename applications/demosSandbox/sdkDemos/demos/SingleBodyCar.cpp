@@ -304,25 +304,11 @@ return;
 		return shape;
 	}
 
-	DemoEntity* const LoadModel_obj(const char* const modelName)
-	{
-		dMatrix scale(dGetIdentityMatrix());
-		scale[0][0] = 1.0f / 40.0f;
-		scale[1][1] = 1.0f / 40.0f;
-		scale[2][2] = 1.0f / 40.0f;
-		scale = scale * dPitchMatrix(-dPi * 0.5f) * dYawMatrix(-dPi * 0.5f);
-
-		char name[1024];
-		sprintf(name, "%s_chassis.obj", modelName);
-		DemoEntity* const chassisEntity = DemoEntity::LoadOBJ_mesh(name, GetWorld(), scale);
-		chassisEntity->SetNameID("car_body");
-
-		return chassisEntity;
-	}
 
 	DemoEntity* const LoadModel_ndg(const char* const modelName)
 	{
-		DemoEntity* const entity = DemoEntity::LoadNGD_mesh(modelName, GetWorld());
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		DemoEntity* const entity = DemoEntity::LoadNGD_mesh(modelName, GetWorld(), scene->GetShaderCache());
 		return entity;
 	}
 

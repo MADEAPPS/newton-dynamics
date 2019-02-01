@@ -126,6 +126,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	int GetDebugDisplay() const;
 	void SetDebugDisplay(int mode) const;
 
+	const ShaderPrograms& GetShaderCache() const;  
+	
+
 	private:
 	void BeginFrame();
 	void RenderStats();
@@ -154,7 +157,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat timestep);
 
 	void ApplyMenuOptions();
-
+	
 	GLFWwindow* m_mainFrame;
 	int	m_defaultFont;
 	bool m_mousePressed[3];
@@ -255,6 +258,9 @@ inline void DemoEntityManager::SetDebugDisplay(int mode) const
 	dAssert (0);
 }
 
-
+inline const ShaderPrograms& DemoEntityManager::GetShaderCache() const
+{
+	return m_shadeCache;
+}
 
 #endif

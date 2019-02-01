@@ -40,9 +40,10 @@ bool ShaderPrograms::CreateAllEffects()
 {
 //	m_solidColor = CreateShaderEffect ("SolidColor");
 //	m_decalEffect = CreateShaderEffect ("TextureDecal");
-//	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse");
 //	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse");
+
 	m_solidColor = CreateShaderEffect ("TextureDecal");
+	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse");
 
 //	if (m_solidColor && m_decalEffect && m_diffuseEffect && m_skinningDiffuseEffect) {
 //		return true;

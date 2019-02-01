@@ -72,7 +72,7 @@ static void CreateBooleanPhysics (DemoEntityManager* const scene, NewtonMesh* co
 	NewtonWorld* const world = scene->GetNewton();
 
 	// make a visual geometry from the mesh
-	DemoMesh* const visualMesh = new DemoMesh (mesh);
+	DemoMesh* const visualMesh = new DemoMesh (mesh, scene->GetShaderCache());
 
 	// create a convex approximation form the original mesh, 32 convex max and no more than 100 vertex convex hulls
 	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, NULL, NULL);

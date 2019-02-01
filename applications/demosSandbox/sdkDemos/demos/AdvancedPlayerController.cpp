@@ -136,7 +136,7 @@ class AdvancePlayerEntity: public DemoEntity
 
 		// create the visual mesh from the player collision shape
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		DemoMesh* const geometry = new DemoMesh("player", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		SetMesh(geometry, dGetIdentityMatrix());
 		geometry->Release(); 
@@ -283,7 +283,7 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 		//dVector size (0.35f, 0.25f, 0.25f, 0.0f);
 		dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, 0);
-		DemoMesh* const geometry = new DemoMesh("prop", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("prop", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		dMatrix matrix (location);
 		matrix.m_posit.m_y += 0.5f;

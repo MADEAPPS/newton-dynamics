@@ -1013,7 +1013,7 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 	for (dScene::dTreeNode* node = scene->GetFirstNode (); node; node = scene->GetNextNode (node)) {
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-			DemoMeshInterface* const mesh = new DemoMesh(scene, node);
+			DemoMeshInterface* const mesh = new DemoMesh(scene, node, m_shadeCache);
 			meshDictionary.Insert(mesh, node);
 		}
 	}
@@ -1038,7 +1038,6 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 		mesh->Release();
 	}
 }
-
 
 void DemoEntityManager::LoadScene (const char* const fileName)
 {
@@ -1150,7 +1149,7 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	dTree <DemoMeshInterface*, const void*>* const cache = (dTree <DemoMeshInterface*, const void*>*)bodyUserData;
 	dTree <DemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
 	if (!node) {
-		DemoMeshInterface* mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
+		DemoMeshInterface* mesh = new DemoMesh(bodyIndentification, scene->m_shadeCache, collision, NULL, NULL, NULL);
 		node = cache->Insert(mesh, NewtonCollisionDataPointer (collision));
 	} else {
 		node->GetInfo()->AddRef();

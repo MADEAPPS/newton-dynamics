@@ -23,7 +23,7 @@ static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& loc
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-   	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+   	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
     dFloat mass = 1.0f;
     dMatrix matrix (dGetIdentityMatrix());
@@ -42,7 +42,7 @@ static NewtonBody* CreateSphere(DemoEntityManager* const scene, const dVector& l
 	int materialID = NewtonMaterialGetDefaultGroupID(world);
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonCollision* const collision = CreateConvexCollision(world, &matrix[0][0], size, _SPHERE_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	dFloat mass = 1.0f;
 	matrix.m_posit = location;
@@ -61,7 +61,7 @@ static NewtonBody* CreateCapule (DemoEntityManager* const scene, const dVector& 
 	int materialID =  NewtonMaterialGetDefaultGroupID (world);
 	dMatrix uprightAligment (dRollMatrix(90.0f * dDegreeToRad));
 	NewtonCollision* const collision = CreateConvexCollision (world, &uprightAligment[0][0], size, _CAPSULE_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	dFloat mass = 1.0f;
 	dMatrix matrix (dGetIdentityMatrix());
@@ -80,7 +80,7 @@ static NewtonBody* CreateWheel (DemoEntityManager* const scene, const dVector& l
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     dVector size (radius, height, radius, 0.0f);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CHAMFER_CYLINDER_PRIMITIVE, 0);
-    DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+    DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
     dFloat mass = 1.0f;
     dMatrix matrix (dGetIdentityMatrix());
@@ -99,7 +99,7 @@ static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     dVector size (radius, height, radius, 0.0f);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
-    DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+    DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
     dFloat mass = 1.0f;
     dMatrix matrix (dGetIdentityMatrix());

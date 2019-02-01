@@ -789,7 +789,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		// make a clone of the mesh 
-		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(filename, scene->GetNewton());
+		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(filename, scene->GetNewton(), scene->GetShaderCache());
 		scene->Append(vehicleModel);
 
 		// plane the model at its location
@@ -900,7 +900,7 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 	NewtonDestroyCollision(bar);
 	NewtonDestroyCollision(bell);
 
-	DemoMesh* const mesh = new DemoMesh ("weight", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+	DemoMesh* const mesh = new DemoMesh ("weight", scene->GetShaderCache(), collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
 	CreateSimpleSolid (scene, mesh, mass, matrix, collision, 0, false);
 
 	mesh->Release();

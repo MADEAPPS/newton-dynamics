@@ -15,6 +15,7 @@
 
 class DemoMesh;
 class DemoEntity;
+class ShaderPrograms;
 class DemoEntityManager;
 
 class DemoMeshInterface: public dClassInfo  
@@ -65,12 +66,12 @@ class DemoSubMesh
 class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 {
 	public:
-	DemoMesh(const DemoMesh& mesh);
-	DemoMesh(const char* const name);
-	DemoMesh(NewtonMesh* const mesh);
-	DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode);
-	DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
-	DemoMesh(const char* const name, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
+	DemoMesh(const DemoMesh& mesh, const ShaderPrograms& shaderCache);
+	DemoMesh(const char* const name, const ShaderPrograms& shaderCache);
+	DemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache);
+	DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ShaderPrograms& shaderCache);
+	DemoMesh(const char* const name, const ShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+	DemoMesh(const char* const name, const ShaderPrograms& shaderCache, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
 
 	using dClassInfo::operator new;
 	using dClassInfo::operator delete;
@@ -102,6 +103,7 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	dFloat* m_normal;
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
+	unsigned m_shader;
 };
 
 class DemoSkinMesh: public DemoMeshInterface

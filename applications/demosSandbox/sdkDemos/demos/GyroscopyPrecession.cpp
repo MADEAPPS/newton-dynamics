@@ -47,7 +47,7 @@ static NewtonBody* DzhanibekovEffect(DemoEntityManager* const scene, const dVect
 	matrix.m_posit.m_x += lenght * 0.5f;
 	matrix.m_posit.m_w = 1.0f;
 
-	DemoMesh* const geometry = new DemoMesh("primitive", dzhanibekovShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), dzhanibekovShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const dzhanibekovBody = CreateSimpleSolid(scene, geometry, 10.0f, matrix, dzhanibekovShape, 0);
 
 	NewtonBodySetMassProperties(dzhanibekovBody, 10.0f, dzhanibekovShape);
@@ -84,7 +84,7 @@ static NewtonBody* FrisbeePreccesion(DemoEntityManager* const scene, const dVect
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
 
-	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
 
 	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
@@ -120,7 +120,7 @@ static NewtonBody* PhiTop(DemoEntityManager* const scene, const dVector& posit, 
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
 
-	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
 
 	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
@@ -153,7 +153,7 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
-	DemoMesh* const geometry = new DemoMesh("primitive", ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0, true);
 	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
 	
@@ -198,7 +198,7 @@ static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector
 	matrix.m_posit.m_x += lenght * 0.5f;
 	matrix.m_posit.m_w = 1.0f;
 
-	DemoMesh* const geometry = new DemoMesh("primitive", flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const wheelBody = CreateSimpleSolid(scene, geometry, 10.0f, matrix, flyWheelShape, 0);
 	NewtonBodySetMassProperties(wheelBody, 10.0f, flyWheelShape);
 
@@ -255,7 +255,7 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 	dMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
-	DemoMesh* const geometry = new DemoMesh("primitive", cone, "smilli.tga", "smilli.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), cone, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const gyroTop = CreateSimpleSolid(scene, geometry, 10.0f, matrix, cone, 0, true);
 	NewtonBodySetMassProperties(gyroTop, 10.0f, cone);
 

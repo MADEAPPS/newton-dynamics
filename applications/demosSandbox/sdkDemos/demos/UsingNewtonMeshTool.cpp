@@ -121,7 +121,7 @@ static NewtonBody* CreateSimpleBox_NewtonMesh (DemoEntityManager* const scene, c
 	NewtonCollision* const collision = NewtonCreateConvexHullFromMesh(scene->GetNewton(), newtonMesh, 0.001f, 0);
 
 	// for now we will simple make simple Box,  make a visual Mesh
-	DemoMesh* const visualMesh = new DemoMesh (newtonMesh);
+	DemoMesh* const visualMesh = new DemoMesh (newtonMesh, scene->GetShaderCache());
 
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -190,7 +190,7 @@ static NewtonBody* CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, 
 	NewtonCollision* const collision = NewtonCreateConvexHullFromMesh(scene->GetNewton(), newtonMesh, 0.001f, 0);
 
 	// for now we will simple make simple Box,  make a visual Mesh
-	DemoMesh* const visualMesh = new DemoMesh(newtonMesh);
+	DemoMesh* const visualMesh = new DemoMesh(newtonMesh, scene->GetShaderCache());
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;

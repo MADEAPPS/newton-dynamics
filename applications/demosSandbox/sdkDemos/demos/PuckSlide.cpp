@@ -67,7 +67,7 @@ class PuckEntity: public DemoEntity
 		dMatrix collisionAligmentMatrix (dRollMatrix(dPi/2.0f));
 		NewtonCollisionSetMatrix(collision, &collisionAligmentMatrix[0][0]);
 
-		DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		//dMatrix matrix = dRollMatrix(dPi/2.0f);
 		dMatrix matrix (dGetIdentityMatrix());
@@ -226,7 +226,7 @@ void PuckSlide (DemoEntityManager* const scene)
 		// create the shape and visual mesh as a common data to be re used
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), tableSize, _BOX_PRIMITIVE, materialGroupIDs[SBMaterial_SURFACE]);
 
-		DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_3.tga", "wood_3.tga", "wood_3.tga");
+		DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "wood_3.tga", "wood_3.tga", "wood_3.tga");
 
 		dMatrix matrix = dGetIdentityMatrix();
 		matrix.m_posit.m_x = 0.0f;

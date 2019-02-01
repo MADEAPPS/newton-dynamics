@@ -13,6 +13,8 @@
 #define __DEMO_ENTITY_H__
 
 #include "DemoEntityManager.h"
+
+class ShaderPrograms;
 class DemoMeshInterface;
 
 
@@ -49,8 +51,7 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	void SetUserData (UserData* const data);
 
 	dBaseHierarchy* CreateClone () const;
-	static DemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world);
-	static DemoEntity* LoadOBJ_mesh (const char* const fileName, NewtonWorld* const world, const dMatrix& convertMatrix = dGetIdentityMatrix());
+	static DemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world, const ShaderPrograms& shaderCache);
 
 	const dMatrix& GetRenderMatrix () const;
 	dMatrix CalculateGlobalMatrix (const DemoEntity* const root = NULL) const;

@@ -293,7 +293,7 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 #endif
 
 	// for now we will simple make simple Box,  make a visual Mesh
-	DemoMesh* const visualMesh = new DemoMesh ("big ball", compound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+	DemoMesh* const visualMesh = new DemoMesh ("big ball", scene->GetShaderCache(), compound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 
 	int instaceCount = 2;
 	dMatrix matrix (dGetIdentityMatrix());
@@ -311,7 +311,7 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 				NewtonCollision* const shape = NewtonBodyGetCollision(body);
 				NewtonCollisionSetScale(shape, 1.5f, 0.75f, 1.0f);
 				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-				DemoMesh* const mesh = new DemoMesh ("big ball", shape, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+				DemoMesh* const mesh = new DemoMesh ("big ball", scene->GetShaderCache(), shape, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 				entity->SetMesh(mesh, entity->GetMeshMatrix());
 				mesh->Release();
 			}

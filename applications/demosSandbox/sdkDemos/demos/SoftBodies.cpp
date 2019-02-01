@@ -26,8 +26,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 	class ClothPatchMesh: public DemoMesh
 	{
 		public:
-		ClothPatchMesh(NewtonMesh* const clothPatchMesh, NewtonBody* const body)
-			:DemoMesh(clothPatchMesh)
+		ClothPatchMesh(DemoEntityManager* const scene, NewtonMesh* const clothPatchMesh, NewtonBody* const body)
+			:DemoMesh(clothPatchMesh, scene->GetShaderCache())
 			,m_body(body)
 		{
 			ResetOptimization();
@@ -122,8 +122,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 	class TetrahedraSoftMesh: public DemoMesh
 	{
 		public:
-		TetrahedraSoftMesh (NewtonMesh* const tetrahedraMesh, NewtonBody* const body)
-			:DemoMesh(tetrahedraMesh)
+		TetrahedraSoftMesh (DemoEntityManager* const scene, NewtonMesh* const tetrahedraMesh, NewtonBody* const body)
+			:DemoMesh(tetrahedraMesh, scene->GetShaderCache())
 			,m_body (body)
 		{
 			ResetOptimization();
@@ -183,8 +183,9 @@ dAssert (0);
 			dFloat m_weight[4];
 		};
 
-		LinearBlendMeshTetra (NewtonMesh* const skinMesh, NewtonBody* const body)
-			:DemoMesh(skinMesh)
+
+		LinearBlendMeshTetra (DemoEntityManager* const scene, NewtonMesh* const skinMesh, NewtonBody* const body)
+			:DemoMesh(skinMesh, scene->GetShaderCache())
 			,m_body (body)
 			,m_weightSet(NULL)
 		{
@@ -521,7 +522,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody (scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		DemoMesh* const mesh = new TetrahedraSoftMesh(tetrahedra, m_body);
+		DemoMesh* const mesh = new TetrahedraSoftMesh(scene, tetrahedra, m_body);
 		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
@@ -552,7 +553,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		DemoMesh* const mesh = new TetrahedraSoftMesh(tetraCube, m_body);
+		DemoMesh* const mesh = new TetrahedraSoftMesh(scene, tetraCube, m_body);
 		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
@@ -583,7 +584,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		// create the soft body mesh
 		//m_mesh = new TetrahedraSoftMesh(tetraCube, m_body);
-		DemoMesh* const mesh = new TetrahedraSoftMesh(tetraCube, m_body);
+		DemoMesh* const mesh = new TetrahedraSoftMesh(scene, tetraCube, m_body);
 		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
@@ -621,7 +622,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		// create the soft body mesh
 		//DemoMesh* const mesh = new TetrahedraSoftMesh(tetraIsoSurface, m_body);
-		DemoMesh* const mesh = new LinearBlendMeshTetra(skinMesh, m_body);
+		DemoMesh* const mesh = new LinearBlendMeshTetra(scene, skinMesh, m_body);
 		SetMesh(mesh, dGetIdentityMatrix());
 		
 		// do not forget to destroy this objects, else you get bad memory leaks.
@@ -716,7 +717,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
-		DemoMesh* const mesh = new ClothPatchMesh (clothPatch, m_body);
+		DemoMesh* const mesh = new ClothPatchMesh (scene, clothPatch, m_body);
 		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.

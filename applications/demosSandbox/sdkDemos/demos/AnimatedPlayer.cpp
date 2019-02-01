@@ -473,7 +473,7 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 
 		//DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skintest.ngd", scene->GetNewton());
-		DemoEntity* const character = DemoEntity::LoadNGD_mesh(fileName, GetWorld());
+		DemoEntity* const character = DemoEntity::LoadNGD_mesh(fileName, GetWorld(), scene->GetShaderCache());
 		character->SetNameID("dommyRoot");
 		character->ResetMatrix(*scene, character->GetCurrentMatrix() * origin);
 		scene->Append(character);
@@ -517,7 +517,7 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
 	
 
-DemoEntity* const referenceModel = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton());
+DemoEntity* const referenceModel = DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache());
 origin1.m_posit.m_z = 2.0f;
 referenceModel->ResetMatrix(*scene, referenceModel->GetCurrentMatrix() * origin1);
 scene->Append(referenceModel);

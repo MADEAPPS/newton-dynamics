@@ -328,10 +328,13 @@ class dInfinitePlane
 	}
 
 	public:
-	static DemoMesh* CreateVisualMesh (const dVector& plane)
+	static DemoMesh* CreateVisualMesh (const dVector& plane, int shader)
 	{
+		dAssert (0);
+		return NULL;
+/*
 		// make a visual entity
-		DemoMesh* const mesh = new DemoMesh ("userInfinitePlane");
+		DemoMesh* const mesh = new DemoMesh ("userInfinitePlane", shader);
 
 		// build a unit grid in local space (this will be the shadow at projection of the collision aabb)
 		dFloat size = 1000.0f;
@@ -366,6 +369,7 @@ class dInfinitePlane
 
 		mesh->OptimizeForRender();
 		return mesh;
+*/
 	}
 
 /*
@@ -474,7 +478,7 @@ NewtonCollision* CreateInfinitePlane (NewtonWorld* const world, const dVector& p
 	return planeCollision->m_collision;
 }
 
-DemoMesh* CreateVisualPlaneMesh (const dVector& plane)
+DemoMesh* CreateVisualPlaneMesh (const dVector& plane, int shader)
 {
-	return dInfinitePlane::CreateVisualMesh (plane);
+	return dInfinitePlane::CreateVisualMesh (plane, shader);
 }

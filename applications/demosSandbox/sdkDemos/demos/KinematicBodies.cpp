@@ -27,7 +27,7 @@ class PhantomPlacement: public DemoEntity
 		NewtonWorld* const world = scene->GetNewton();
 
 		dMatrix matrix (dGetIdentityMatrix());
-		DemoEntity* const cowEntity = DemoEntity::LoadNGD_mesh("cow.ngd", world);
+		DemoEntity* const cowEntity = DemoEntity::LoadNGD_mesh("cow.ngd", world, scene->GetShaderCache());
 		NewtonMesh* const cowMesh = cowEntity->GetMesh()->CreateNewtonMesh(world, dGetIdentityMatrix());
 		
 		NewtonCollision* const shape = NewtonCreateConvexHullFromMesh(world, cowMesh, 0, 0);
@@ -35,8 +35,8 @@ class PhantomPlacement: public DemoEntity
 
 		m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
 		m_solideMesh->AddRef();
-		m_redMesh = CreatePhantomMesh (shape, dVector (1.0f, 0.0f, 0.0f, 0.5f)); 
-        m_blueMesh = CreatePhantomMesh (shape, dVector (0.0f, 0.5f, 0.0f, 0.5f)); 
+		m_redMesh = CreatePhantomMesh (scene, shape, dVector (1.0f, 0.0f, 0.0f, 0.5f)); 
+        m_blueMesh = CreatePhantomMesh (scene, shape, dVector (0.0f, 0.5f, 0.0f, 0.5f)); 
 		SetMesh (m_redMesh, dGetIdentityMatrix());
 		
 		NewtonBodySetUserData (m_phantom, this);
@@ -55,9 +55,9 @@ class PhantomPlacement: public DemoEntity
 		m_solideMesh->Release();
 	}
 	
-    DemoMesh* CreatePhantomMesh (NewtonCollision* const shape, const dVector& color) 
+    DemoMesh* CreatePhantomMesh (DemoEntityManager* const scene, NewtonCollision* const shape, const dVector& color) 
     {
-        DemoMesh* const mesh = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
+        DemoMesh* const mesh = new DemoMesh("primitive", scene->GetShaderCache(), shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
         DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
         subMesh.m_specular = color;
         subMesh.m_diffuse = color;
@@ -464,7 +464,7 @@ static NewtonBody* AddStaticMesh(DemoEntityManager* const scene)
 	NewtonMesh* const ntMesh = NewtonMeshLoadOFF(world, fileName);
 
 	dMatrix matrix (dGetIdentityMatrix());
-	DemoMesh* mesh = new DemoMesh(ntMesh);
+	DemoMesh* mesh = new DemoMesh(ntMesh, scene->GetShaderCache());
 	DemoEntity* const entity = new DemoEntity(matrix, NULL);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();

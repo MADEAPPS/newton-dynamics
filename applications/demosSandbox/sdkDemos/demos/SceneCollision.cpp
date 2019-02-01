@@ -195,7 +195,7 @@ class ComplexScene: public DemoEntity
 			}
 		}
 		dFloat cellsize = 0.25f;
-		DemoMesh* const mesh = new DemoMesh ("terrain", elevation, size, cellsize, 1.0f/16.0f, size - 1);
+		DemoMesh* const mesh = new DemoMesh ("terrain", scene->GetShaderCache(), elevation, size, cellsize, 1.0f/16.0f, size - 1);
 		
 		int width = size;
 		int height = size;
@@ -225,7 +225,7 @@ class ComplexScene: public DemoEntity
 	{
 		dMatrix offsetMatrix (dGetIdentityMatrix());
 		NewtonCollision* const box = NewtonCreateBox (scene->GetNewton(), 4.0f, 0.1f, 4.0f, 0, &offsetMatrix[0][0]) ;
-		DemoMesh* const mesh = new DemoMesh (" box",  box, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+		DemoMesh* const mesh = new DemoMesh (" box", scene->GetShaderCache(),  box, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 
 		// add compound to the scene collision
 		dMatrix matrix;

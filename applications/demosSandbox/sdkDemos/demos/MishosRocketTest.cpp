@@ -365,7 +365,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	//  dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, -30.0f, 0.0f));
 	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(dVeryFar, dFloat (0.0f), dFloat (0.0f), dFloat (1.0f)));
 
-	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", scene->GetShaderCache(), CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 	NewtonBody* const CoreBody = CreateSimpleSolid(scene, geometryCore, CoreMass, matrixCore, CoreCompound, 0);
 	NewtonBodySetForceAndTorqueCallback(CoreBody, BreakHinge);
 	DemoEntity* const entityCore = (DemoEntity*)NewtonBodyGetUserData(CoreBody);
@@ -385,7 +385,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	//  dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 5.0f, 0.0f));
 	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(dVeryFar, 7.5f, 0.0f));
 
-	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", PayloadCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", scene->GetShaderCache(), PayloadCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 	NewtonBody* const PayloadBody = CreateSimpleSolid(scene, geometryPayload, PayloadMass, matrixPayload, PayloadCompound, 0);
 	NewtonBodySetForceAndTorqueCallback(PayloadBody, BreakHinge);
 	DemoEntity* const entityPayload = (DemoEntity*)NewtonBodyGetUserData(PayloadBody);
@@ -429,7 +429,7 @@ void MishosHingeTest(DemoEntityManager* const scene)
 		NewtonCompoundCollisionEndAddRemove(CVXCompound);
 		matrixCVX = dMatrix(0.0f, i*2.09439f, 0.0f, positions[i]);
 
-		geometryCVX = new DemoMesh("CVX Stage", CVXCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+		geometryCVX = new DemoMesh("CVX Stage", scene->GetShaderCache(), CVXCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 		CVXBody[i] = CreateSimpleSolid(scene, geometryCVX, CVXMass, matrixCVX, CVXCompound, 0);
 		NewtonDestroyCollision(CVXCompound);
 		geometryCVX->Release();
@@ -502,7 +502,7 @@ void MishosHingeTestOLD(DemoEntityManager* const scene)
 	//  dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, -30.0f, 0.0f));
 	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, 0.0f, 0.0f));
 
-	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", scene->GetShaderCache(), CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 	NewtonBody* const CoreBody = CreateSimpleSolid(scene, geometryCore, CoreMass, matrixCore, CoreCompound, 0);
 	NewtonBodySetForceAndTorqueCallback(CoreBody, ApplyGravityForce);
 	DemoEntity* const entityCore = (DemoEntity*)NewtonBodyGetUserData(CoreBody);
@@ -523,7 +523,7 @@ void MishosHingeTestOLD(DemoEntityManager* const scene)
 	//  dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 5.0f, 0.0f));
 	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 35.0f, 0.0f));
 
-	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", PayloadCompound, "metalblu.tga", "metalblu.tga", "metalblu.tga");
+	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", scene->GetShaderCache(), PayloadCompound, "metalblu.tga", "metalblu.tga", "metalblu.tga");
 	NewtonBody* const PayloadBody = CreateSimpleSolid(scene, geometryPayload, PayloadMass, matrixPayload, PayloadCompound, 0);
 	//NewtonBodySetForceAndTorqueCallback(PayloadBody, ApplyGravityForce);
 	NewtonBodySetForceAndTorqueCallback(PayloadBody, NULL);

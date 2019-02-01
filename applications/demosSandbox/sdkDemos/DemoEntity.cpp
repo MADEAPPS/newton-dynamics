@@ -329,7 +329,7 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 	
 }
 
-DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world)
+DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world, const ShaderPrograms& shaderCache)
 {
 	dScene scene(world);
 
@@ -404,7 +404,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 				if (nodeInfo->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
 					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
 					if (!cacheNode) {
-						DemoMeshInterface* const mesh = new DemoMesh(&scene, meshNode);
+						DemoMeshInterface* const mesh = new DemoMesh(&scene, meshNode, shaderCache);
 						cacheNode = meshDictionary.Insert(mesh, meshNode);
 					}
 					DemoMeshInterface* const mesh = cacheNode->GetInfo();
@@ -464,150 +464,4 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 	}
 
 	return returnEntity;
-}
-
-DemoEntity* DemoEntity::LoadOBJ_mesh (const char* const fileName, NewtonWorld* const world, const dMatrix& convertMatrix)
-{
-	char pathName[2048];
-	dGetWorkingFileName(fileName, pathName);
-
-	FILE* const file = fopen(pathName, "rb");
-//	materialLibraryOut[0] = 0;
-
-	if (file) {
-		int uvCount = 0;
-
-		int vertexCount = 0;
-		int normalCount = 0;
-		int uvMaxCount = 4096;
-		int vertexMaxCount = 4096;
-		int normalMaxCount = 4096;
-		dVector* vertex = new dVector[4096];
-		dVector* normal = new dVector[4096];
-		dVector* uv = new dVector[4096];
-		dTree<int, dString> materialMap;
-
-		int materialId = 0;
-		int materialIndex = 0;
-		bool hasUV = false;
-		bool hasNormal = false;
-		char line[1024];
-
-		dNewtonMesh mesh(world);
-		mesh.BeginBuild();
-
-		while (!feof(file)) {
-			char* ret = fgets(line, sizeof(line) - 1, file);
-			ret = 0;
-
-			int index = 0;
-			while (line[index] && (line[index] != '\r') && (line[index] != '\n')) {
-				dFloat32 x;
-				dFloat32 y;
-				dFloat32 z;
-				char token[256];
-				sscanf(&line[index], "%s", token);
-				if (strcmp(token, "#") == 0) {
-					index = int (strlen(line));
-				} else if (strcmp(token, "mtllib") == 0) {
-					char* ptr = strstr(line, token);
-					ptr += int (strlen(token));
-					//dAssert(0);
-					//sscanf(ptr, "%s", materialLibraryOut);
-
-					index = int (strlen(line));
-				} else if (strcmp(token, "v") == 0) {
-					sscanf(&line[index + 1], "%f %f %f", &x, &y, &z);
-					vertex[vertexCount] = dVector(x, y, z, 0.0f);
-					vertexCount++;
-					if (vertexCount >= vertexMaxCount) {
-						dAssert(0);
-					}
-					index = int (strlen(line));
-				} else if (strcmp(token, "vn") == 0) {
-					hasNormal = true;
-					sscanf(&line[index + 1], "%f %f %f", &x, &y, &z);
-					normal[vertexCount] = dVector(x, y, z, 0.0f);
-					normalCount++;
-					if (normalCount >= normalMaxCount) {
-						dAssert(0);
-					}
-					index = int (strlen(line));
-				} else if (strcmp(token, "vt") == 0) {
-					hasUV = true;
-					sscanf(&line[index + 1], "%f %f %f", &x, &y, &z);
-					uv[vertexCount] = dVector(x, y, 0.0f, 0.0f);
-					uvCount++;
-					if (uvCount >= uvMaxCount) {
-						dAssert(0);
-					}
-					index = int (strlen(line));
-				} else if (strcmp(token, "g") == 0) {
-					sscanf(&line[index + 1], "%s", token);
-					index = int (strlen(line));
-				} else if (strcmp(token, "usemtl") == 0) {
-					char* ptr = strstr(line, token);
-					ptr += strlen(token);
-					sscanf(ptr, "%s", token);
-					dTree<int, dString>::dTreeNode* node = materialMap.Find(token);
-					if (!node) {
-						node = materialMap.Insert(materialIndex, token);
-						materialIndex++;
-					}
-					materialId = node->GetInfo();
-
-					index = int (strlen(line));
-				} else if (strcmp(token, "s") == 0) {
-					//fscanf(file, "%d", &material);
-					index = int (strlen(line));
-				} else if (strcmp(token, "f") == 0) {
-					mesh.BeginPolygon();
-					char* ptr = &line[index + 1];
-					do {
-						token[0] = 0;
-						sscanf(ptr, "%s", token);
-						if (*token) {
-							if (hasUV && hasNormal) {
-								int v;
-								int n;
-								int t;
-								sscanf(token, "%d/%d/%d", &v, &t, &n);
-								v--;
-								t--;
-								n--;
-								mesh.AddPoint(vertex[v].m_x, vertex[v].m_y, vertex[v].m_z);
-								mesh.AddNormal(dFloat32(normal[n].m_x), dFloat32(normal[n].m_y), dFloat32(normal[n].m_z));
-								mesh.AddUV0(dFloat32(uv[t].m_x), dFloat32(uv[t].m_y));
-								mesh.AddMaterial(materialId);
-							} else {
-								dAssert(0);
-							}
-
-							ptr = strstr(ptr, token);
-							ptr += strlen(token);
-						}
-					} while (*token);
-					mesh.EndPolygon();
-					index = int (strlen(line));
-				} else {
-					dAssert(0);
-				}
-			}
-		}
-		mesh.EndBuild();
-		delete[] uv;
-		delete[] normal;
-		delete[] vertex;
-		fclose(file);
-
-		mesh.ApplyTransform(&convertMatrix[0][0]);
-		mesh.CalculateVertexNormals(20.0f * dDegreeToRad);
-		DemoMesh* const visualMesh = new DemoMesh(mesh.GetMesh());
-
-		DemoEntity* const entity = new DemoEntity(dGetIdentityMatrix(), NULL);
-		entity->SetMesh(visualMesh, dGetIdentityMatrix());
-		visualMesh->Release();
-		return entity;
-	}
-	return NULL;
 }
