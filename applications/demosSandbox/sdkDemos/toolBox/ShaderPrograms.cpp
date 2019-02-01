@@ -22,29 +22,38 @@ ShaderPrograms::ShaderPrograms(void)
 
 ShaderPrograms::~ShaderPrograms(void)
 {
+	if (m_solidColor) {
+		glDeleteShader(m_solidColor);
+	}
+	if (m_decalEffect) {
+		glDeleteShader(m_decalEffect);
+	}
+	if (m_diffuseEffect) {
+		glDeleteShader(m_diffuseEffect);
+	}
+	if (m_skinningDiffuseEffect) {
+		glDeleteShader(m_skinningDiffuseEffect);
+	}
 }
 
 bool ShaderPrograms::CreateAllEffects()
 {
-	m_solidColor = CreateShaderEffect ("SolidColor");
-	m_decalEffect = CreateShaderEffect ("TextureDecal");
-	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse");
-	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse");
+//	m_solidColor = CreateShaderEffect ("SolidColor");
+//	m_decalEffect = CreateShaderEffect ("TextureDecal");
+//	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse");
+//	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse");
+	m_solidColor = CreateShaderEffect ("TextureDecal");
 
-
-//glUseProgram(m_skinningDiffuseEffect);
-//GLuint matrixPalleteID; 
-//matrixPalleteID = glGetUniformLocation(m_skinningDiffuseEffect, "matrixPallete1"); 
-
-	if (m_solidColor && m_decalEffect && m_diffuseEffect && m_skinningDiffuseEffect) {
-		return true;
-	} else {
-		m_solidColor = 0;
-		m_decalEffect = 0;
-		m_diffuseEffect = 0;
-		m_skinningDiffuseEffect = 0;
-		return false;
-	}
+//	if (m_solidColor && m_decalEffect && m_diffuseEffect && m_skinningDiffuseEffect) {
+//		return true;
+//	} else {
+//		m_solidColor = 0;
+//		m_decalEffect = 0;
+//		m_diffuseEffect = 0;
+//		m_skinningDiffuseEffect = 0;
+//		return false;
+//	}
+	return true;
 }
 
 
@@ -71,21 +80,16 @@ void ShaderPrograms::LoadShaderCode (const char* const filename, char* const buf
 GLuint ShaderPrograms::CreateShaderEffect (const char* const name)
 {
 	GLint state;
-	GLuint program;
-	GLuint pixelShader; 
-	GLuint vertexShader; 
-	
-	
-	const char *vPtr;
-	char tmpName[128];
+	char tmpName[256];
 	char buffer[1024 * 64];
 
-	vPtr = buffer;
-	program = glCreateProgram();
+	const char* const vPtr = buffer;
+	GLuint program = glCreateProgram();
 
 	sprintf (tmpName, "shaders/%s.vs", name);
 	LoadShaderCode (tmpName, buffer);
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
 	glShaderSource(vertexShader, 1, &vPtr, NULL);
 	glCompileShader(vertexShader);
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &state); 
@@ -98,7 +102,8 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const name)
 
 	sprintf (tmpName, "shaders/%s.ps", name);
 	LoadShaderCode (tmpName, buffer);
-	pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
+
 	glShaderSource(pixelShader, 1, &vPtr, NULL);
 	glCompileShader(pixelShader);
 	glGetShaderiv(pixelShader, GL_COMPILE_STATUS, &state); 
@@ -110,7 +115,13 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const name)
 
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &state);   
-	_ASSERTE (state == GL_TRUE);
-	return program;
+	dAssert (state == GL_TRUE);
 
+	glValidateProgram(program);
+	glGetProgramiv(program,  GL_VALIDATE_STATUS, &state);   
+	dAssert (state == GL_TRUE);
+
+	glDeleteShader(pixelShader);
+	glDeleteShader(vertexShader);
+	return program;
 }

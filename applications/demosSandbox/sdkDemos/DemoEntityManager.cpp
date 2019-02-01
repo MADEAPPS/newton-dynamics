@@ -991,7 +991,7 @@ void DemoEntityManager::CalculateFPS(dFloat timestep)
 void DemoEntityManager::CreateSkyBox()
 {
 	if (!m_sky) {
-		m_sky = new SkyBox();
+		m_sky = new SkyBox(m_shadeCache.m_solidColor);
 		Append(m_sky);
 	}
 }

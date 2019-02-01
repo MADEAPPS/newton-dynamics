@@ -24,8 +24,9 @@
 //////////////////////////////////////////////////////////////////////
 
 
-SkyBox::SkyBox()
+SkyBox::SkyBox(GLuint shader)
 	:DemoEntity (dGetIdentityMatrix(), NULL)
+	,m_shader(shader)
 	,m_size(0.0f)
 {
 	dFloat boxsize;
@@ -54,6 +55,9 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
+
+	glUseProgram(m_shader);
+	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -90,7 +94,6 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(GLfloat(m_size.m_x),  -GLfloat(m_size.m_y),  GLfloat(m_size.m_z));
 	glEnd();
 
-
 	// back
 	glBindTexture(GL_TEXTURE_2D, m_textures[2]);
 	glBegin(GL_QUADS);
@@ -99,7 +102,6 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f( GLfloat(m_size.m_x), -GLfloat(m_size.m_y), GLfloat(m_size.m_z));
 	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-GLfloat(m_size.m_x), -GLfloat(m_size.m_y), GLfloat(m_size.m_z));
 	glEnd();
-
 
 	// top
 	glBindTexture(GL_TEXTURE_2D, m_textures[4]);
@@ -123,9 +125,10 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 	glEnable(GL_DEPTH_TEST);
 	glEnable (GL_LIGHTING);
 
+	glUseProgram(0);
+
 	// render the rest of the hierarchy
 	glPopMatrix();
-
 }
 	
 SkyBox::~SkyBox()

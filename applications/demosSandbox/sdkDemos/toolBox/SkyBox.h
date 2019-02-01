@@ -25,15 +25,15 @@ class DemoEntityManager;
 class SkyBox: public DemoEntity
 {
 	public:
-	SkyBox();
+	SkyBox(GLuint shader);
 	~SkyBox();
 
 	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
 
 	private:
 	dVector m_size;
+	GLuint m_shader;
 	GLuint m_textures[6];
-
 };
 
 #endif 
