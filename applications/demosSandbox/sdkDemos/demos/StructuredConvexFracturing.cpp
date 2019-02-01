@@ -103,6 +103,9 @@ static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFractur
 	
 	dAssert (NewtonCollisionGetType(fracturedCompoundCollision) == SERIALIZE_ID_FRACTURED_COMPOUND);
 
+	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+	dAssert (scene);
+
 	visualMesh->RemoveAll();
 	for (void* segment = NewtonFracturedCompoundMeshPartGetFirstSegment(mainMesh); segment; segment = NewtonFracturedCompoundMeshPartGetNextSegment (segment)) {
 		DemoSubMesh* const subMesh = visualMesh->AddSubMesh();
@@ -111,6 +114,7 @@ static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFractur
 		int indexCount = NewtonFracturedCompoundMeshPartGetIndexCount (segment); 
 
 		subMesh->m_textureHandle = AddTextureRef ((GLuint)material);
+		subMesh->m_shader = scene->GetShaderCache().m_diffuseEffect;
 
 		subMesh->AllocIndexData (indexCount);
 		subMesh->m_indexCount = NewtonFracturedCompoundMeshPartGetIndexStream (fracturedCompoundCollision, mainMesh, segment, (int*)subMesh->m_indexes); 
@@ -118,7 +122,6 @@ static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFractur
 
 	visualMesh->OptimizeForRender();
 }
-
 
 static void AddMeshVertexwData (DemoMesh* const visualMesh, NewtonFracturedCompoundMeshPart* const fractureMesh, const NewtonCollision* const fracturedCompoundCollision)
 {

@@ -23,8 +23,6 @@ dInitRtti(DemoBezierCurve);
 
 #define USING_DISPLAY_LIST
 
-
-
 #if defined(__APPLE__)
 // NOTE: displaylists are horribly slow on OSX
 // they cut the framerate in half
@@ -66,14 +64,15 @@ void DemoMeshInterface::SetVisible (bool visibilityFlag)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 DemoSubMesh::DemoSubMesh ()
-	:m_indexCount(0)
+	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
+	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
+	,m_specular(1.0f, 1.0f, 1.0f, 1.0f)
+	,m_textureName()
+	,m_shiness(64.0f)
+	,m_indexCount(0)
 	,m_indexes(NULL)
 	,m_textureHandle(0)
-	,m_shiness(80.0f)
-	,m_ambient (0.8f, 0.8f, 0.8f, 1.0f)
-	,m_diffuse (0.8f, 0.8f, 0.8f, 1.0f)
-	,m_specular (1.0f, 1.0f, 1.0f, 1.0f)
-	,m_opacity(1.0f)
+	,m_shader(0)
 {
 }
 
@@ -115,6 +114,7 @@ void DemoSubMesh::Render() const
 
 void DemoSubMesh::OptimizeForRender(const DemoMesh* const mesh) const
 {
+	glUseProgram(m_shader);
 	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
 	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
 	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
@@ -137,8 +137,8 @@ void DemoSubMesh::OptimizeForRender(const DemoMesh* const mesh) const
 		glNormal3f (GLfloat(normal[index * 3 + 0]), GLfloat(normal[index * 3 + 1]), GLfloat(normal[index * 3 + 2])); 
 		glVertex3f(GLfloat(vertex[index * 3 + 0]), GLfloat(vertex[index * 3 + 1]), GLfloat(vertex[index * 3 + 2]));
 	}
-
 	glEnd();
+	glUseProgram(0);
 }
 
 void DemoSubMesh::AllocIndexData (int indexCount)
@@ -232,6 +232,13 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode,
 			segment->m_diffuse = material->GetDiffuseColor();
 			segment->m_specular = material->GetSpecularColor();
 			segment->SetOpacity(material->GetOpacity());
+
+			if (segment->m_opacity > 0.999f) {
+				segment->m_shader = shaderCache.m_diffuseEffect;
+			} else {
+				//dAssert (0);
+				segment->m_shader = shaderCache.m_diffuseEffect;
+			}
 		}
 
 		segment->AllocIndexData (indexCount);
@@ -243,10 +250,8 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode,
 	}
 	NewtonMeshEndHandle (mesh, meshCookie); 
 
-//	if (!hasModifiers) {
-		// see if this mesh can be optimized
-		OptimizeForRender ();
-//	}
+	// see if this mesh can be optimized
+	OptimizeForRender ();
 }
 
 DemoMesh::DemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache)
@@ -286,6 +291,8 @@ DemoMesh::DemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache)
 		// for 16 bit indices meshes
 		//NewtonMeshMaterialGetIndexStreamShort (mesh, meshCookie, handle, (short int*)segment->m_indexes); 
 
+		segment->m_shader = shaderCache.m_diffuseEffect;
+
 		// for 32 bit indices mesh
 		NewtonMeshMaterialGetIndexStream (mesh, meshCookie, handle, (int*)segment->m_indexes); 
 	}
@@ -322,6 +329,7 @@ DemoMesh::DemoMesh(const DemoMesh& mesh, const ShaderPrograms& shaderCache)
 		segment->m_specular = srcSegment.m_specular;
 		segment->m_textureHandle = srcSegment.m_textureHandle;
 		segment->m_textureName = srcSegment.m_textureName;
+		segment->m_shader = srcSegment.m_shader;
 		if (segment->m_textureHandle) {
 			AddTextureRef (srcSegment.m_textureHandle);
 		}
@@ -398,6 +406,12 @@ DemoMesh::DemoMesh(const char* const name, const ShaderPrograms& shaderCache, co
 
 		segment->m_textureHandle = (GLuint)material;
 		segment->SetOpacity(opacity);
+
+		if (segment->m_opacity > 0.999f) {
+			segment->m_shader = shaderCache.m_diffuseEffect;
+		} else {
+			dAssert (0);
+		}
 
 		segment->AllocIndexData (indexCount);
 		NewtonMeshMaterialGetIndexStream (mesh, geometryHandle, handle, (int*)segment->m_indexes); 
@@ -653,7 +667,7 @@ void DemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 	}
 }
 
-void  DemoMesh::OptimizeForRender()
+void DemoMesh::OptimizeForRender()
 {
 	// first make sure the previous optimization is removed
 	ResetOptimization();

@@ -18,6 +18,30 @@ class DemoEntity;
 class ShaderPrograms;
 class DemoEntityManager;
 
+class DemoSubMesh
+{
+	public:
+	DemoSubMesh();
+	~DemoSubMesh();
+
+	void Render() const;
+	void AllocIndexData(int indexCount);
+	void OptimizeForRender(const DemoMesh* const mesh) const;
+
+	void SetOpacity(dFloat opacity);
+
+	dVector m_ambient;
+	dVector m_diffuse;
+	dVector m_specular;
+	dString  m_textureName;
+	dFloat m_opacity;
+	dFloat m_shiness;
+	int m_indexCount;
+	unsigned m_shader;
+	unsigned m_textureHandle;
+	unsigned *m_indexes;
+};
+
 class DemoMeshInterface: public dClassInfo  
 {
 	public:
@@ -37,30 +61,6 @@ class DemoMeshInterface: public dClassInfo
 
 	dString m_name;
 	bool m_isVisible;
-};
-
-class DemoSubMesh
-{
-	public:
-	DemoSubMesh ();
-	~DemoSubMesh ();
-
-	void Render() const;
-	void AllocIndexData (int indexCount);
-	void OptimizeForRender(const DemoMesh* const mesh) const;
-	
-	void SetOpacity(dFloat opacity);
-
-	int m_indexCount;
-	unsigned *m_indexes;
-	unsigned m_textureHandle;
-
-	dFloat m_shiness;
-	dVector m_ambient;
-	dVector m_diffuse;
-	dVector m_specular;
-	dFloat m_opacity;
-	dString  m_textureName;
 };
 
 class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
@@ -103,7 +103,6 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	dFloat* m_normal;
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
-	unsigned m_shader;
 };
 
 class DemoSkinMesh: public DemoMeshInterface
@@ -125,7 +124,6 @@ class DemoSkinMesh: public DemoMeshInterface
 	protected: 
 	void BuildSkin ();
 	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
-
 
 	DemoMesh* m_mesh;
 	DemoEntity* m_root; 
