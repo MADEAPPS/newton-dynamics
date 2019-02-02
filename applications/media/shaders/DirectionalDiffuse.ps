@@ -1,48 +1,53 @@
 #version 120
 // standard normal diretional light one terxture pixel shader
-//varying vec4 diffuse;
-//varying vec4 ambient;
-//varying vec3 normal;
-//varying vec3 lightDir;
-//varying vec3 halfVector;
-//varying vec4 textureColorOnOff;
-//uniform sampler2D tex;
 
-varying vec2 texCoord;
 uniform sampler2D texture;
+
+varying vec3 normal;
+varying vec3 position;
+
+vec3 CalculateDirectionalLight()
+{
+	vec3 ambient = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission); 
+
+	// calculate diffuse contribution  
+	vec3 diffuse = vec3(gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse); 
+
+	// calculate specular contribution  
+	vec3 specular = vec3(gl_LightSource[0].specular * gl_FrontMaterial.specular);
+
+	// calculate specular shininess
+	float shininess = gl_FrontMaterial.shininess ;
+
+	// normalize interpolated normal
+	vec3 norm = normalize (normal);
+
+	// calculate light direction
+	vec3 lighDir = normalize (gl_LightSource[0].position.xyz);
+
+
+   //vec3  dl = gl_LightSource[0].diffuse .rgb * gl_FrontMaterial.diffuse.rgb ;
+   //vec3  al = gl_LightSource[0].ambient .rgb * gl_FrontMaterial.ambient.rgb + gl_FrontMaterial.emission.rgb ;
+   //vec3  sl = gl_LightSource[0].specular.rgb * gl_FrontMaterial.specular.rgb ;
+   //vec3  tx = texture2D ( texture, gl_TexCoord[0].st ).rgb ;
+   //float sh = gl_FrontMaterial.shininess ;
+   //vec3 n = normalize ( normal ) ;
+   //vec3 d = tx * ( dl * max ( dot ( n, lightDir), 0.0 ) + al ) ;
+   //vec3 s = sl *  pow ( max ( dot ( n, normalize ( halfVector ) ), 0.0 ), sh ) ;
+   //gl_FragColor = vec4 ( min ( d + s, 1.0) , 1.0 ) ;
+
+	return (diffuse * max (dot(norm, lighDir), 0.0) + ambient);
+}
 
 void main()
 {
-//	vec3 n;
-//	vec3 halfV;
-//	vec3 viewV;
-//	vec3 ldir;
-//	float NdotL;
-//	float NdotHV;
-//	vec4 color = ambient;
-//	
-//	// a fragment shader can't write a verying variable, hence we need
-//	// a new variable to store the normalized interpolated normal 
-//	n = normalize(normal);
-//	
-//	// compute the dot product between normal and ldir 
-//	NdotL = max(dot(n,lightDir),0.0);
-//
-//	if (NdotL > 0.0) {
-//		halfV = normalize(halfVector);
-//		NdotHV = max(dot(n,halfV),0.0);
-//		color += gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
-//		color += diffuse * NdotL;
-//	}
-//		
-//	color = (texture2D(tex, gl_TexCoord[0].st) * textureColorOnOff + (vec4 (1.0, 1.0, 1.0, 1.0) - textureColorOnOff)) * color;
-//	gl_FragColor = color;
+	// get texture color
+	vec3 texColor = vec3 (texture2D(texture, gl_TexCoord[0].st));
 
-	//vec4 color = texture2D(texture, gl_TexCoord[0].st);
+	vec3 directionaLight = CalculateDirectionalLight();
 
-	// check if the shader is been called
-	//vec4 color = vec4 (1.0, 0.0, 0.0, 1.0);
-	vec4 color = texture2D (texture, texCoord);
-	gl_FragColor = color;
+	vec3 color = texColor * directionaLight;
+
+	gl_FragColor = vec4 (color, 1.0);
 }
 
