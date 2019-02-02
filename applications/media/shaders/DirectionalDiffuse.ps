@@ -1,5 +1,5 @@
 #version 120
-// standard normal diretional light one terxture pixel shader
+// standard normal directional light one texture pixel shader
 
 uniform sampler2D texture;
 
@@ -40,8 +40,8 @@ void main()
 	// get texture color
 	vec3 texColor = vec3 (texture2D(texture, gl_TexCoord[0].st));
 
-	vec3 lightIntensity = PhongDirectionalShading();
-	//vec3 lightIntensity = PhongDirectionalShading() + GouraudPointLightShading(1);
+	//vec3 lightIntensity = PhongDirectionalShading();
+	vec3 lightIntensity = PhongDirectionalShading() + GouraudPointLightShading(1);
 	
 	vec3 color = texColor * lightIntensity;
 
