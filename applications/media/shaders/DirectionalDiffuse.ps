@@ -40,7 +40,9 @@ void main()
 	// get texture color
 	vec3 texColor = vec3 (texture2D(texture, gl_TexCoord[0].st));
 
-	vec3 lightIntensity = PhongDirectionalShading() + GouraudPointLightShading(1);
+	vec3 lightIntensity = PhongDirectionalShading();
+	//vec3 lightIntensity = PhongDirectionalShading() + GouraudPointLightShading(1);
+	
 	vec3 color = texColor * lightIntensity;
 
 	float opacity = gl_FrontMaterial.diffuse.w;
