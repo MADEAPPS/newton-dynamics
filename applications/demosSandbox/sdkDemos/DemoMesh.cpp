@@ -1133,7 +1133,8 @@ NewtonMesh* DemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatr
 void DemoSkinMesh::Render (DemoEntityManager* const scene)
 {
 	BuildSkin ();
-
+	m_mesh->Render (scene);
+/*
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1149,6 +1150,7 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 	glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
 	glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
+*/
 }
 
 void DemoSkinMesh::BuildSkin ()
