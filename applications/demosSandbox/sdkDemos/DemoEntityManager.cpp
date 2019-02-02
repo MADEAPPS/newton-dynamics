@@ -1377,13 +1377,13 @@ void DemoEntityManager::RenderScene()
 	dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
 	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
 	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
-	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
+	glMaterialf(GL_FRONT, GL_SHININESS, 0.0);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	// set just one directional light
-	GLfloat lightDiffuse0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
-	GLfloat lightAmbient0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
-	GLfloat lightSpecular0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
+	GLfloat lightDiffuse0[] = { 0.8f, 0.8f, 0.8f, 0.0 };
+	GLfloat lightAmbient0[] = { 0.2f, 0.2f, 0.2f, 0.0 };
+	GLfloat lightSpecular0[] = { 1.0f, 1.0f, 1.0f, 0.0 };
 	GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0 };
 	
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);

@@ -116,7 +116,7 @@ void DemoSubMesh::OptimizeForRender(const DemoMesh* const mesh) const
 {
 	glUseProgram(m_shader);
 //	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
-	
+
 	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
 	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
 	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
