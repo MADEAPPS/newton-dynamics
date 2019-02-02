@@ -115,11 +115,11 @@ void DemoSubMesh::Render() const
 void DemoSubMesh::OptimizeForRender(const DemoMesh* const mesh) const
 {
 	glUseProgram(m_shader);
-	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
-
-	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
+//	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
+	
 	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
 	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
+	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
 	glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(m_shiness));
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	if (m_textureHandle) {

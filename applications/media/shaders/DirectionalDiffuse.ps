@@ -8,42 +8,51 @@ varying vec3 position;
 
 vec3 CalculateDirectionalLight()
 {
-	vec3 ambient = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission); 
-
-	// calculate diffuse contribution  
-	vec3 diffuse = vec3(gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse); 
-
-	// calculate specular contribution  
-	vec3 specular = vec3(gl_LightSource[0].specular * gl_FrontMaterial.specular);
-
-	// calculate specular shininess
-	float shininess = gl_FrontMaterial.shininess ;
-
-	// normalize interpolated normal
 	vec3 norm = normalize (normal);
-
-	// calculate light direction
 	vec3 lighDir = normalize (gl_LightSource[0].position.xyz);
+	vec3 specularDir = normalize (-position);
+	vec3 refectionDir = reflect (lighDir, normal);
+
+	vec3 diffuseCoeff = vec3(gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse); 
+	vec3 specularCoeff = vec3(gl_LightSource[0].specular * gl_FrontMaterial.specular);
+
+	vec3 ambientColor = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission); 
+	vec3 specularColor = specularCoeff * pow (max (dot (refectionDir, specularDir), 0.0), gl_FrontMaterial.shininess);
 
 
-   //vec3  dl = gl_LightSource[0].diffuse .rgb * gl_FrontMaterial.diffuse.rgb ;
-   //vec3  al = gl_LightSource[0].ambient .rgb * gl_FrontMaterial.ambient.rgb + gl_FrontMaterial.emission.rgb ;
-   //vec3  sl = gl_LightSource[0].specular.rgb * gl_FrontMaterial.specular.rgb ;
-   //vec3  tx = texture2D ( texture, gl_TexCoord[0].st ).rgb ;
-   //float sh = gl_FrontMaterial.shininess ;
-   //vec3 n = normalize ( normal ) ;
-   //vec3 d = tx * ( dl * max ( dot ( n, lightDir), 0.0 ) + al ) ;
-   //vec3 s = sl *  pow ( max ( dot ( n, normalize ( halfVector ) ), 0.0 ), sh ) ;
-   //gl_FragColor = vec4 ( min ( d + s, 1.0) , 1.0 ) ;
-
-	return (diffuse * max (dot(norm, lighDir), 0.0) + ambient);
+	//return vec3 (0.0, 0.0, 0.0);
+	return ambientColor;
+	//return specularColor;
+	//return diffuseCoeff * max (dot(norm, lighDir), 0.0);
+	//return diffuseCoeff * max (dot(norm, lighDir), 0.0) + ambientColor;
+	//return diffuseCoeff * max (dot(norm, lighDir), 0.0) + ambientColor + specularColor;
 }
+
+vec3 CalculatePositionalLight(int index)
+{
+	vec3 norm = normalize (normal);
+	vec3 lighDir = normalize (gl_LightSource[index].position.xyz);
+	vec3 specularDir = normalize (-position);
+	vec3 refectionDir = reflect (lighDir, normal);
+
+	vec3 ambientColor = vec3(gl_LightSource[index].ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission); 
+	vec3 diffuseCoeff = vec3(gl_LightSource[index].diffuse * gl_FrontMaterial.diffuse); 
+	vec3 specularCoeff = vec3(gl_LightSource[index].specular * gl_FrontMaterial.specular);
+	vec3 specularColor = specularCoeff * pow (max (dot (refectionDir, specularDir), 0.0), gl_FrontMaterial.shininess);
+
+	//return ambientColor;
+	return specularColor;
+	//return diffuseCoeff * max (dot(norm, lighDir), 0.0);
+	//return diffuseCoeff * max (dot(norm, lighDir), 0.0) + ambientColor + specularColor;
+}
+
 
 void main()
 {
 	// get texture color
 	vec3 texColor = vec3 (texture2D(texture, gl_TexCoord[0].st));
 
+	//vec3 directionaLight = CalculateDirectionalLight() + CalculatePositionalLight(1);
 	vec3 directionaLight = CalculateDirectionalLight();
 
 	vec3 color = texColor * directionaLight;
