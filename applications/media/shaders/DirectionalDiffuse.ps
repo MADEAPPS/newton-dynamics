@@ -19,7 +19,6 @@ vec3 CalculateDirectionalLight()
 	vec3 ambientColor = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient + gl_FrontMaterial.emission); 
 	vec3 specularColor = specularCoeff * pow (max (dot (refectionDir, specularDir), 0.0), gl_FrontMaterial.shininess);
 
-
 	//return vec3 (0.0, 0.0, 0.0);
 	return ambientColor;
 	//return specularColor;

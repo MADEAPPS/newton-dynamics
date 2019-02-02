@@ -1382,7 +1382,7 @@ void DemoEntityManager::RenderScene()
 
 	// set just one directional light
 	GLfloat lightDiffuse0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
-	GLfloat lightAmbient0[] = { 1.0f, 1.0f, 1.0f, 0.0 };
+	GLfloat lightAmbient0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
 	GLfloat lightSpecular0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
 	GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0 };
 	
