@@ -38,8 +38,8 @@ class ShaderPrograms
 	bool CreateAllEffects();
 
 	private:
-	GLuint CreateShaderEffect (const char* const name);
 	void LoadShaderCode (const char* const name, char* const buffer);
+	GLuint CreateShaderEffect (const char* const vertexShader, const char* const pixelShader);
 
 	public:
 	GLuint m_solidColor;

@@ -42,8 +42,9 @@ bool ShaderPrograms::CreateAllEffects()
 //	m_decalEffect = CreateShaderEffect ("TextureDecal");
 //	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse");
 
-	m_solidColor = CreateShaderEffect ("TextureDecal");
-	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse");
+	m_solidColor = CreateShaderEffect ("TextureDecal", "TextureDecal");
+	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
+	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
 
 //	if (m_solidColor && m_decalEffect && m_diffuseEffect && m_skinningDiffuseEffect) {
 //		return true;
@@ -78,7 +79,7 @@ void ShaderPrograms::LoadShaderCode (const char* const filename, char* const buf
 	buffer[size + 1] = 0;
 }
 
-GLuint ShaderPrograms::CreateShaderEffect (const char* const name)
+GLuint ShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, const char* const pixelShaderName)
 {
 	GLint state;
 	char tmpName[256];
@@ -87,7 +88,7 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const name)
 	const char* const vPtr = buffer;
 	GLuint program = glCreateProgram();
 
-	sprintf (tmpName, "shaders/%s.vs", name);
+	sprintf (tmpName, "shaders/%s.vs", vertexShaderName);
 	LoadShaderCode (tmpName, buffer);
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -101,7 +102,7 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const name)
 	glAttachShader(program, vertexShader);
 
 
-	sprintf (tmpName, "shaders/%s.ps", name);
+	sprintf (tmpName, "shaders/%s.ps", pixelShaderName);
 	LoadShaderCode (tmpName, buffer);
 	GLuint pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
 

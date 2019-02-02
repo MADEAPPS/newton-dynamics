@@ -194,7 +194,6 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode,
 //	matrix = (matrix.Inverse4x4()).Transpose();
 //	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat), m_normal, 3 * sizeof (dFloat), m_vertexCount);
 
-//	bool hasModifiers = false;
 	dTree<dScene::dTreeNode*, dCRCTYPE> materialMap;
 	for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink (meshNode, ptr)) {
 		dScene::dTreeNode* const node = scene->GetNodeFromLink(ptr);
@@ -203,8 +202,6 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode,
 			dMaterialNodeInfo* const material = (dMaterialNodeInfo*)info;
 			dCRCTYPE id = material->GetId();
 			materialMap.Insert(node, id);
-//		} else if (info->IsType(dGeometryNodeModifierInfo::GetRttiType())) {
-//			hasModifiers = true;
 		}
 	}
 
@@ -918,7 +915,7 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	}
 }
 
-DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<DemoEntity*, dScene::dTreeNode*>& boneMap)
+DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<DemoEntity*, dScene::dTreeNode*>& boneMap, const ShaderPrograms& shaderCache)
 	:DemoMeshInterface()
 	,m_mesh((DemoMesh*)owner->GetMesh())
 	,m_root(owner)
@@ -931,6 +928,14 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	,m_weightcount(0)
 	,m_nodeCount(0)
 {
+	int skinShader = shaderCache.m_skinningDiffuseEffect;
+	for (DemoMesh::dListNode* node = m_mesh->GetFirst(); node; node = node->GetNext()) {
+		DemoSubMesh& segment = node->GetInfo();
+		segment.m_shader = skinShader;
+	}
+	m_mesh->OptimizeForRender ();
+
+
 	while (m_root->GetParent()) {
 		m_root = m_root->GetParent();
 	}
