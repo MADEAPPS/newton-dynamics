@@ -522,6 +522,15 @@ origin1.m_posit.m_z = 2.0f;
 referenceModel->ResetMatrix(*scene, referenceModel->GetCurrentMatrix() * origin1);
 scene->Append(referenceModel);
 
+dMatrix xxxx(origin1);
+for (int i = 0; i < 10; i ++) {
+	xxxx.m_posit.m_x += 2;
+	dMatrix xxxx1(xxxx);
+	for (int j = 0; j < 10; j ++) {
+		xxxx1.m_posit.m_z -= 2;
+		animationManager->CreateHuman("whiteman.ngd", xxxx1);
+	}
+}
 	
 	origin.m_posit = dVector(-4.0f, 1.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
