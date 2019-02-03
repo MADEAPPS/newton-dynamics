@@ -1093,13 +1093,23 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 
 
 	glUseProgram(m_shader);
-	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 
 	int count = CalculateMatrixPalette(bindMatrix);
-	//glUniformMatrix4fv(matrixPalette, count, TRUE, bindMatrix___);
-	glUniformMatrix4fv(matrixPalette, count, TRUE, &bindMatrix[0][0][0]);
-//	glUniformMatrix4fv(matrixPalette, count, FALSE, &bindMatrix[0][0][0]);
+	GLfloat* const glMatrixPallete = dAlloca (GLfloat, 16 * count);
+	for (int i = 0; i < count; i ++) {
+		const dMatrix& src = bindMatrix[i];
+		GLfloat* dst = &glMatrixPallete[i * 16];
+		for (int j = 0; j < 4; j ++) {
+			for (int k = 0; k < 4; k ++) {
+				dst[j * 4 + k] = src[j][k];
+				dst[j * 4 + k] = 0.0;
+			}
+		}
+	}
+
+//	glUniformMatrix4fv(matrixPalette, count, TRUE, glMatrixPallete);
+	glUniformMatrix4fv(matrixPalette, count, FALSE, glMatrixPallete);
 
 	m_mesh->m_optimizedOpaqueDiplayList = glGenLists(1);
 	glNewList(m_mesh->m_optimizedOpaqueDiplayList, GL_COMPILE);
@@ -1124,19 +1134,8 @@ DemoSkinMesh::~DemoSkinMesh()
 
 void DemoSkinMesh::OptimizeForRender(const DemoSubMesh& segment) const
 {
-//	segment.OptimizeForRender(m_mesh);
-
-//	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
-//	int count = CalculateMatrixPalette(bindMatrix);
-
 	glUseProgram(m_shader);
-
-	glUseProgram(segment.m_shader);
 	glUniform1i(glGetUniformLocation(segment.m_shader, "texture"), 0);
-
-	//int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-	//glUniformMatrix4fv(matrixPalette, count, TRUE, bindMatrix___);
-	//glUniformMatrix4fv(matrixPalette, count, TRUE, &bindMatrix[0][0][0]);
 
 	glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
 	glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
@@ -1232,7 +1231,7 @@ NewtonMesh* DemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatr
 
 void DemoSkinMesh::Render (DemoEntityManager* const scene)
 {
-#if 0
+#if 1
 	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
 	int count = CalculateMatrixPalette(bindMatrix);
 
