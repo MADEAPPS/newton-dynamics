@@ -123,6 +123,8 @@ class DemoSkinMesh: public DemoMeshInterface
 
 	protected: 
 	void BuildSkin ();
+
+	void OptimizeForRender(const DemoSubMesh& segment) const;
 	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
 
 	DemoMesh* m_mesh;
@@ -135,6 +137,7 @@ class DemoSkinMesh: public DemoMeshInterface
 	dWeightBoneIndex* m_weighIndex;
 	int m_weightcount;
 	int m_nodeCount; 
+	int m_shader;
 };
 
 class DemoBezierCurve: public DemoMeshInterface

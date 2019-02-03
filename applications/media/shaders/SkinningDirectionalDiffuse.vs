@@ -15,7 +15,7 @@ uniform sampler2D texture;
 varying vec3 normal;
 varying vec3 position;
 
-//uniform mat4 matrixPallete[128];
+uniform mat4 matrixPallete[128];
 //attribute vec4 bonesIndices;
 //attribute vec4 bonesWeights;
 //attribute vec4 textureEnableOnOff;
@@ -25,7 +25,6 @@ varying vec3 position;
 //varying vec3 normal;
 //varying vec3 lightDir;
 //varying vec3 halfVector;
-//varying vec4 textureColorOnOff;
 
 void main()
 {
@@ -34,7 +33,7 @@ void main()
 	ivec4 IntBoneIndex = ivec4(bonesIndices);
 
 	// first transform the normal into eye space and normalize the result 
-//	normal = normalize(gl_NormalMatrix * gl_Normal);
+	//normal = normalize(gl_NormalMatrix * gl_Normal);
 	vec4 tmpNormal = vec4 (gl_Normal[0], gl_Normal[1], gl_Normal[2], 0);
 	tmpNormal = normalize(matrixPallete[IntBoneIndex[0]] * tmpNormal);
 	tmpNormal = gl_ModelViewMatrix * tmpNormal;
@@ -53,13 +52,8 @@ void main()
 
 	vec4 posit = vec4 (0, 0, 0, 0);	
 	for (int i = 0; i < 4; i++) {
-		// this iofail		
 		posit += matrixPallete[IntBoneIndex[i]] * gl_Vertex * bonesWeights[i];
 	}
-
-	textureColorOnOff = textureEnableOnOff; 
-	gl_TexCoord[0] = gl_MultiTexCoord0;	
-	gl_Position = gl_ModelViewProjectionMatrix * posit;
 */
 
 	// get normal in camera space
@@ -69,8 +63,7 @@ void main()
 	position = vec3 (gl_ModelViewMatrix * gl_Vertex);
 
 	// get position is perective space
-//	gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_TexCoord[0] = vec4 (0.0, 0.0, 0.0, 0.0);
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 } 
 
