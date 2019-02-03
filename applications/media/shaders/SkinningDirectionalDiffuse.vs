@@ -18,7 +18,6 @@ varying vec3 position;
 attribute vec4 boneWeights;
 attribute ivec4 boneIndices;
 uniform mat4 matrixPallete[128];
-//uniform mat4 matrixPallete[50];
 
 void main()
 {
@@ -34,8 +33,6 @@ void main()
 	weightedNormal = normalize (weightedNormal);
 
 	normal = gl_NormalMatrix * weightedNormal;
-
-	// get position is camera space
 	position = vec3 (gl_ModelViewMatrix * weightedPosition);
 
 	gl_TexCoord[0] = gl_MultiTexCoord0;

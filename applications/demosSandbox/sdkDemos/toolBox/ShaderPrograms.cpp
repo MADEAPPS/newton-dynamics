@@ -84,6 +84,7 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, c
 	GLint state;
 	char tmpName[256];
 	char buffer[1024 * 64];
+	char errorLog[1024 * 64];
 
 	const char* const vPtr = buffer;
 	GLuint program = glCreateProgram();
@@ -97,7 +98,8 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, c
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &state); 
 	if (state != GL_TRUE ) {
 		GLsizei length;  
-		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, buffer);
+		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, errorLog);
+		dTrace ((errorLog));
 	}
 	glAttachShader(program, vertexShader);
 
@@ -111,7 +113,8 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, c
 	glGetShaderiv(pixelShader, GL_COMPILE_STATUS, &state); 
 	if (state != GL_TRUE ) {
 		GLsizei length;  
-		glGetShaderInfoLog(pixelShader, sizeof (buffer), &length, buffer);
+		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, errorLog);
+		dTrace((errorLog));
 	}
 	glAttachShader(program, pixelShader);
 

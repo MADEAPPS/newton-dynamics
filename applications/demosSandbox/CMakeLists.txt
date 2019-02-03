@@ -40,6 +40,7 @@ endif ()
 include_directories(../../sdk/thirdParty/glfw/)
 include_directories(../../sdk/thirdParty/imgui/)
 include_directories(../../sdk/thirdParty/glfw/include/glfw/)
+#include_directories(../../sdk/thirdParty/glatter/include/)
 include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 add_executable(${projectName} ${CPP_SOURCE})
 
