@@ -123,8 +123,9 @@ class DemoSkinMesh: public DemoMeshInterface
 
 	protected: 
 	void BuildSkin ();
-
+	
 	void OptimizeForRender(const DemoSubMesh& segment) const;
+	int CalculateMatrixPalette(dMatrix* const bindMatrix) const;
 	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
 
 	DemoMesh* m_mesh;
