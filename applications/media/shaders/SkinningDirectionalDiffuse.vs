@@ -14,6 +14,7 @@ uniform sampler2D texture;
 
 varying vec3 normal;
 varying vec3 position;
+
 attribute vec4 boneWeights;
 attribute ivec4 boneIndices;
 uniform mat4 matrixPallete[128];
@@ -29,16 +30,14 @@ void main()
 		weightedPosition += matrixPallete[boneIndices[i]] * gl_Vertex * boneWeights[i];
 	}
 	weightedPosition.w = 1.0;
-
 	weightedNormal = normalize (weightedNormal);
+
 	normal = gl_NormalMatrix * weightedNormal;
 
 	// get position is camera space
 	position = vec3 (gl_ModelViewMatrix * weightedPosition);
 
-	// get position is perective space
 	gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-//	gl_Position = gl_ModelViewProjectionMatrix * weightedPosition;
+	gl_Position = gl_ModelViewProjectionMatrix * weightedPosition;
 } 
 
