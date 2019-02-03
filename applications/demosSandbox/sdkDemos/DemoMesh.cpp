@@ -1099,6 +1099,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	int count = CalculateMatrixPalette(bindMatrix);
 	//glUniformMatrix4fv(matrixPalette, count, TRUE, bindMatrix___);
 	glUniformMatrix4fv(matrixPalette, count, TRUE, &bindMatrix[0][0][0]);
+//	glUniformMatrix4fv(matrixPalette, count, FALSE, &bindMatrix[0][0][0]);
 
 	m_mesh->m_optimizedOpaqueDiplayList = glGenLists(1);
 	glNewList(m_mesh->m_optimizedOpaqueDiplayList, GL_COMPILE);
@@ -1231,7 +1232,7 @@ NewtonMesh* DemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatr
 
 void DemoSkinMesh::Render (DemoEntityManager* const scene)
 {
-#if 1
+#if 0
 	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
 	int count = CalculateMatrixPalette(bindMatrix);
 
