@@ -1009,6 +1009,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 				if (vertexWeight >= weight[vertexIndex][3]) {
 					weight[vertexIndex][3] = vertexWeight;
 					skinBone[vertexIndex].m_boneIndex[3] = boneIndex;
+
 					for (int j = 2; j >= 0; j --) {
 						if (weight[vertexIndex][j] < weight[vertexIndex][j + 1]) {
 							dSwap (weight[vertexIndex][j], weight[vertexIndex][j + 1]);
@@ -1097,18 +1098,13 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 
 	int count = CalculateMatrixPalette(bindMatrix);
 	GLfloat* const glMatrixPallete = dAlloca (GLfloat, 16 * count);
-	for (int i = 0; i < count; i ++) {
-		const dMatrix& src = bindMatrix[i];
-		GLfloat* dst = &glMatrixPallete[i * 16];
-		for (int j = 0; j < 4; j ++) {
-			for (int k = 0; k < 4; k ++) {
-				dst[j * 4 + k] = src[j][k];
-//				dst[j * 4 + k] = 0.0;
-			}
-		}
-	}
+	ConvertToGlMatrix(count, bindMatrix, glMatrixPallete);
 
-//	glUniformMatrix4fv(matrixPalette, count, TRUE, glMatrixPallete);
+//int xxx0;
+//int xxx1;
+//glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &xxx0);
+//glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &xxx1);
+
 	glUniformMatrix4fv(matrixPalette, count, FALSE, glMatrixPallete);
 	dAssert (glGetError() == GL_NO_ERROR);
 
@@ -1165,9 +1161,9 @@ void DemoSkinMesh::OptimizeForRender(const DemoSubMesh& segment) const
 
 		const dVector& weights = m_weights[index];
 		const dWeightBoneIndex& boneIndex = m_weighIndex[index];
-		glVertexAttribI4i(boneIndices, boneIndex.m_boneIndex[0], boneIndex.m_boneIndex[1], boneIndex.m_boneIndex[2], boneIndex.m_boneIndex[3]);
-		glVertexAttrib4f(boneWeights, weights[0], weights[1], weights[2], weights[3]);
 		glTexCoord2f(GLfloat(uv[index * 2 + 0]), GLfloat(uv[index * 2 + 1]));
+		glVertexAttrib4f(boneWeights, weights[0], weights[1], weights[2], weights[3]);
+		glVertexAttribI4i(boneIndices, boneIndex.m_boneIndex[0], boneIndex.m_boneIndex[1], boneIndex.m_boneIndex[2], boneIndex.m_boneIndex[3]);
 		glNormal3f(GLfloat(normal[index * 3 + 0]), GLfloat(normal[index * 3 + 1]), GLfloat(normal[index * 3 + 2]));
 		glVertex3f(GLfloat(vertex[index * 3 + 0]), GLfloat(vertex[index * 3 + 1]), GLfloat(vertex[index * 3 + 2]));
 	}
@@ -1200,7 +1196,22 @@ int DemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 			stack++;
 		}
 	}
+
 	return count;
+}
+
+void DemoSkinMesh::ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const
+{
+	for (int i = 0; i < count; i++) {
+		const dMatrix& src = bindMatrix[i];
+		GLfloat* dst = &glMatrices[i * 16];
+		for (int j = 0; j < 4; j++) {
+			for (int k = 0; k < 4; k++) {
+				//dst[j * 4 + k] = src[k][j];
+				dst[j * 4 + k] = src[j][k];
+			}
+		}
+	}
 }
 
 dGeometryNodeSkinClusterInfo* DemoSkinMesh::FindSkinModifier(dScene* const scene, dScene::dTreeNode* const node) const
@@ -1235,12 +1246,12 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 #if 1
 	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
 	int count = CalculateMatrixPalette(bindMatrix);
+	GLfloat* const glMatrixPallete = dAlloca(GLfloat, 16 * count);
+	ConvertToGlMatrix(count, bindMatrix, glMatrixPallete);
 
 	glUseProgram(m_shader);
 	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-	//glUniformMatrix4fv(matrixPalette, count, TRUE, bindMatrix___);
-	glUniformMatrix4fv(matrixPalette, count, TRUE, &bindMatrix[0][0][0]);
-	
+	glUniformMatrix4fv(matrixPalette, count, FALSE, glMatrixPallete);
 	glCallList(m_mesh->m_optimizedOpaqueDiplayList);
 
 #else

@@ -126,6 +126,7 @@ class DemoSkinMesh: public DemoMeshInterface
 	
 	void OptimizeForRender(const DemoSubMesh& segment) const;
 	int CalculateMatrixPalette(dMatrix* const bindMatrix) const;
+	void ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
 	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
 
 	DemoMesh* m_mesh;

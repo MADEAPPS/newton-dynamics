@@ -18,6 +18,7 @@ varying vec3 position;
 attribute vec4 boneWeights;
 attribute ivec4 boneIndices;
 uniform mat4 matrixPallete[128];
+//uniform mat4 matrixPallete[50];
 
 void main()
 {
