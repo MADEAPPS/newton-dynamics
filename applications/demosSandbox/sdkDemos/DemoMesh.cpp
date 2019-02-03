@@ -1103,13 +1103,14 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		for (int j = 0; j < 4; j ++) {
 			for (int k = 0; k < 4; k ++) {
 				dst[j * 4 + k] = src[j][k];
-				dst[j * 4 + k] = 0.0;
+//				dst[j * 4 + k] = 0.0;
 			}
 		}
 	}
 
 //	glUniformMatrix4fv(matrixPalette, count, TRUE, glMatrixPallete);
 	glUniformMatrix4fv(matrixPalette, count, FALSE, glMatrixPallete);
+	dAssert (glGetError() == GL_NO_ERROR);
 
 	m_mesh->m_optimizedOpaqueDiplayList = glGenLists(1);
 	glNewList(m_mesh->m_optimizedOpaqueDiplayList, GL_COMPILE);
@@ -1134,7 +1135,7 @@ DemoSkinMesh::~DemoSkinMesh()
 
 void DemoSkinMesh::OptimizeForRender(const DemoSubMesh& segment) const
 {
-	glUseProgram(m_shader);
+//	glUseProgram(m_shader);
 	glUniform1i(glGetUniformLocation(segment.m_shader, "texture"), 0);
 
 	glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
@@ -1239,8 +1240,9 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	//glUniformMatrix4fv(matrixPalette, count, TRUE, bindMatrix___);
 	glUniformMatrix4fv(matrixPalette, count, TRUE, &bindMatrix[0][0][0]);
-
+	
 	glCallList(m_mesh->m_optimizedOpaqueDiplayList);
+
 #else
 	BuildSkin ();
 
