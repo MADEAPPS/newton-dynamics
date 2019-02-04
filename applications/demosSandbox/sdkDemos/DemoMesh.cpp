@@ -1105,7 +1105,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 //glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &xxx0);
 //glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &xxx1);
 
-	glUniformMatrix4fv(matrixPalette, count, FALSE, glMatrixPallete);
+	glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
 	dAssert (glGetError() == GL_NO_ERROR);
 
 	m_mesh->m_optimizedOpaqueDiplayList = glGenLists(1);
@@ -1250,7 +1250,7 @@ void DemoSkinMesh::Render (DemoEntityManager* const scene)
 
 	glUseProgram(m_shader);
 	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-	glUniformMatrix4fv(matrixPalette, count, FALSE, glMatrixPallete);
+	glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
 	glCallList(m_mesh->m_optimizedOpaqueDiplayList);
 
 #else
