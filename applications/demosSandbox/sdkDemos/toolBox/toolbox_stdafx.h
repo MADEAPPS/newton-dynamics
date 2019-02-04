@@ -78,6 +78,7 @@ typedef long long unsigned64;
 	#include <unistd.h>
 	#include <time.h>
 
+	#include <glatter.h>
 	#include <GL/glu.h>
 	#include <GL/gl.h>
 	#include <imgui.h>
