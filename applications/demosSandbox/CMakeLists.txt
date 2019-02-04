@@ -71,7 +71,7 @@ if(MSVC)
 endif(MSVC)
 
 if (UNIX)
-    target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw glatter GL GLU glfw dl pthread)
+    target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw glatter GL GLU GLEW dl pthread)
 
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
