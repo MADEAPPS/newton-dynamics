@@ -1163,7 +1163,7 @@ void DemoSkinMesh::OptimizeForRender(const DemoSubMesh& segment) const
 		const dWeightBoneIndex& boneIndex = m_weighIndex[index];
 		glTexCoord2f(GLfloat(uv[index * 2 + 0]), GLfloat(uv[index * 2 + 1]));
 		glVertexAttrib4f(boneWeights, weights[0], weights[1], weights[2], weights[3]);
-		glVertexAttribI4i(boneIndices, boneIndex.m_boneIndex[0], boneIndex.m_boneIndex[1], boneIndex.m_boneIndex[2], boneIndex.m_boneIndex[3]);
+		glVertexAttrib4f(boneIndices, GLfloat(boneIndex.m_boneIndex[0]), GLfloat(boneIndex.m_boneIndex[1]), GLfloat(boneIndex.m_boneIndex[2]), GLfloat(boneIndex.m_boneIndex[3]));
 		glNormal3f(GLfloat(normal[index * 3 + 0]), GLfloat(normal[index * 3 + 1]), GLfloat(normal[index * 3 + 2]));
 		glVertex3f(GLfloat(vertex[index * 3 + 0]), GLfloat(vertex[index * 3 + 1]), GLfloat(vertex[index * 3 + 2]));
 	}
@@ -1207,7 +1207,6 @@ void DemoSkinMesh::ConvertToGlMatrix(int count, const dMatrix* const bindMatrix,
 		GLfloat* dst = &glMatrices[i * 16];
 		for (int j = 0; j < 4; j++) {
 			for (int k = 0; k < 4; k++) {
-				//dst[j * 4 + k] = src[k][j];
 				dst[j * 4 + k] = src[j][k];
 			}
 		}

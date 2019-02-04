@@ -16,26 +16,28 @@ varying vec3 normal;
 varying vec3 position;
 
 attribute vec4 boneWeights;
-attribute ivec4 boneIndices;
+attribute vec4 boneIndices;
 uniform mat4 matrixPallete[128];
 
 void main()
 {
 	vec3 weightedNormal = vec3 (0.0, 0.0, 0.0);	
-	vec4 weightedPosition = vec4 (0.0, 0.0, 0.0, 1.0);	
+	vec4 weightedVertex = vec4 (0.0, 0.0, 0.0, 1.0);	
 
-	vec4 n = vec4(gl_Normal.x, gl_Normal.y, gl_Normal.z, 0.0);
+	vec4 pointVertex = gl_Vertex;
+	vec4 pointNormal = vec4(gl_Normal.x, gl_Normal.y, gl_Normal.z, 0.0);
 	for (int i = 0; i < 4; i++) {
-		weightedNormal += vec3 (matrixPallete[boneIndices[i]] * n * boneWeights[i]);
-		weightedPosition += matrixPallete[boneIndices[i]] * gl_Vertex * boneWeights[i];
+		int matrixIndex = int (boneIndices[i]);
+		weightedVertex += matrixPallete[matrixIndex] * pointVertex * boneWeights[i];
+		weightedNormal += vec3 (matrixPallete[matrixIndex] * pointNormal * boneWeights[i]);
 	}
-	weightedPosition.w = 1.0;
+	weightedVertex.w = 1.0;
 	weightedNormal = normalize (weightedNormal);
 
 	normal = gl_NormalMatrix * weightedNormal;
-	position = vec3 (gl_ModelViewMatrix * weightedPosition);
+	position = vec3 (gl_ModelViewMatrix * weightedVertex);
 
 	gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * weightedPosition;
+	gl_Position = gl_ModelViewProjectionMatrix * weightedVertex;
 } 
 
