@@ -28,7 +28,7 @@ enum dRigType
 
 struct dSkeletonRigDefinition
 {
-	char* m_name;
+	const char* m_name;
 	dRigType m_type;
 };
 
