@@ -52,6 +52,8 @@ class DemoMeshInterface: public dClassInfo
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
+	virtual DemoMeshInterface* Clone() { dAssert(0); return NULL; }
+
 	virtual void RenderTransparency () const = 0;
 	virtual void Render (DemoEntityManager* const scene) = 0;
 	virtual void RenderNormals () = 0;
@@ -72,6 +74,8 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ShaderPrograms& shaderCache);
 	DemoMesh(const char* const name, const ShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 	DemoMesh(const char* const name, const ShaderPrograms& shaderCache, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
+
+	virtual DemoMeshInterface* Clone() { AddRef(); return this;}
 
 	using dClassInfo::operator new;
 	using dClassInfo::operator delete;
@@ -123,6 +127,8 @@ class DemoSkinMesh: public DemoMeshInterface
 
 	protected: 
 	void BuildSkin ();
+
+	virtual DemoMeshInterface* Clone();
 	
 	void OptimizeForRender(const DemoSubMesh& segment) const;
 	int CalculateMatrixPalette(dMatrix* const bindMatrix) const;

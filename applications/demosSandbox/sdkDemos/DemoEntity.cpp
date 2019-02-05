@@ -94,13 +94,10 @@ DemoEntity::DemoEntity(const DemoEntity& copyFrom)
 	,m_curRotation(copyFrom.m_curRotation)
 	,m_nextRotation(copyFrom.m_nextRotation)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
-	,m_mesh(copyFrom.m_mesh)
+	,m_mesh(copyFrom.m_mesh ? copyFrom.m_mesh->Clone() : NULL)
 	,m_userData(NULL)
 	,m_lock(0)
 {
-	if (m_mesh) {
-		m_mesh->AddRef();
-	}
 }
 
 DemoEntity::~DemoEntity(void)
@@ -116,7 +113,6 @@ dBaseHierarchy* DemoEntity::CreateClone () const
 {
 	return new DemoEntity(*this);
 }
-
 
 DemoEntity::UserData* DemoEntity::GetUserData ()
 {
@@ -140,9 +136,6 @@ void DemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix,
 
 		scene->Lock(ent->m_lock);
 		ent->SetMatrixUsafe(rot, transform.m_posit);
-//		if (ent->m_userData) {
-//			ent->m_userData->OnTransformCallback(*scene);
-//		}
 		scene->Unlock(ent->m_lock);
 	}
 }

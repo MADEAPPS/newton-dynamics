@@ -468,12 +468,14 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 		return controller;
 	}
 
-	dAnimIKController* CreateHuman(const char* const fileName, const dMatrix& origin)
+//	dAnimIKController* CreateHuman(const char* const fileName, const dMatrix& origin)
+	dAnimIKController* CreateHuman(DemoEntity* const model, const dMatrix& origin)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 
 		//DemoEntity* const xxxx0 = DemoEntity::LoadNGD_mesh("skintest.ngd", scene->GetNewton());
-		DemoEntity* const character = DemoEntity::LoadNGD_mesh(fileName, GetWorld(), scene->GetShaderCache());
+//		DemoEntity* const character = DemoEntity::LoadNGD_mesh(fileName, GetWorld(), scene->GetShaderCache());
+		DemoEntity* const character = (DemoEntity*)model->CreateClone();
 		character->SetNameID("dommyRoot");
 		character->ResetMatrix(*scene, character->GetCurrentMatrix() * origin);
 		scene->Append(character);
@@ -513,7 +515,12 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	dMatrix origin1 (origin);
 	InverseKinematicAnimationManager* const animationManager = new InverseKinematicAnimationManager(scene);
-	dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+
+	dPointer<DemoEntity> humanModel (DemoEntity::LoadNGD_mesh("whiteman.ngd", scene->GetNewton(), scene->GetShaderCache()));
+//	DemoEntity(const DemoEntity& copyFrom);
+
+	//dAnimIKController* const human = animationManager->CreateHuman("whiteman.ngd", origin1);
+	dAnimIKController* const human = animationManager->CreateHuman(&(*humanModel), origin1);
 	//dAnimIKController* const human = animationManager->CreateHuman("skintest.ngd", origin1);
 	
 
@@ -528,7 +535,7 @@ for (int i = 0; i < 10; i ++) {
 	dMatrix xxxx1(xxxx);
 	for (int j = 0; j < 10; j ++) {
 		xxxx1.m_posit.m_z -= 2;
-		animationManager->CreateHuman("whiteman.ngd", xxxx1);
+		animationManager->CreateHuman(&(*humanModel), xxxx1);
 	}
 }
 	

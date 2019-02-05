@@ -1129,6 +1129,11 @@ DemoSkinMesh::~DemoSkinMesh()
 	}
 }
 
+DemoMeshInterface* DemoSkinMesh::Clone()
+{
+	return m_mesh->Clone();
+}
+
 void DemoSkinMesh::OptimizeForRender(const DemoSubMesh& segment) const
 {
 //	glUseProgram(m_shader);
