@@ -131,6 +131,8 @@ typedef long long unsigned64;
 #include <dList.h>
 #include <dTree.h>
 #include <dRtti.h>
+#include <dArray.h>
+#include <dPointer.h>
 #include <dClassInfo.h>
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>

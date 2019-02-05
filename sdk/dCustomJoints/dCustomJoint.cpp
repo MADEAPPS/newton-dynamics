@@ -375,24 +375,22 @@ void dCustomJoint::Deserialize (NewtonSerializeCallback callback, void* const us
 	dAssert (0);
 }
 
-void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix)
+void dCustomJoint::dDebugDisplay::DrawFrame(const dMatrix& matrix, dFloat scale)
 {
 	dVector o0(matrix.m_posit);
 
-	dFloat size = m_debugScale;
-	dVector x(matrix.m_posit + matrix.RotateVector(dVector(size, 0.0f, 0.0f, 0.0f)));
+	dVector x(matrix.m_posit + matrix.RotateVector(dVector(scale, 0.0f, 0.0f, 0.0f)));
 	SetColor(dVector (1.0f, 0.0f, 0.0f));
 	DrawLine (matrix.m_posit, x);
 
-	dVector y(matrix.m_posit + matrix.RotateVector(dVector(0.0f, size, 0.0f, 0.0f)));
+	dVector y(matrix.m_posit + matrix.RotateVector(dVector(0.0f, scale, 0.0f, 0.0f)));
 	SetColor(dVector (0.0f, 1.0f, 0.0f));
 	DrawLine (matrix.m_posit, y);
 
-	dVector z(matrix.m_posit + matrix.RotateVector(dVector(0.0f, 0.0f, size, 0.0f)));
+	dVector z(matrix.m_posit + matrix.RotateVector(dVector(0.0f, 0.0f, scale, 0.0f)));
 	SetColor(dVector (0.0f, 0.0f, 1.0f));
 	DrawLine (matrix.m_posit, z);
 }
-
 
 void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, const dMatrix& matrix1) const
 {
@@ -408,7 +406,6 @@ void dCustomJoint::SubmitLinearRows(int activeRows, const dMatrix& matrix0, cons
 		}
 	}
 }
-
 
 void dCustomJoint::SetJointForceCalculation(bool mode)
 {
@@ -433,7 +430,6 @@ const dVector& dCustomJoint::GetTorque1() const
 { 
 	return m_torque1;
 }
-
 
 void dCustomJoint::CalculateJointForce()
 {

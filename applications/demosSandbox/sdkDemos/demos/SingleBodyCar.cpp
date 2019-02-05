@@ -262,10 +262,9 @@ return;
 		dAssert(tireMesh->IsType(DemoMesh::GetRttiType()));
 		//dAssert (tirePart->GetMeshMatrix().TestIdentity());
 		const dMatrix& meshMatrix = tirePart->GetMeshMatrix();
-		dVector* const temp = new dVector[tireMesh->m_vertexCount];
+		dArray<dVector> temp (tireMesh->m_vertexCount);
 		meshMatrix.TransformTriplex(&temp[0].m_x, sizeof (dVector), tireMesh->m_vertex, 3 * sizeof (dFloat), tireMesh->m_vertexCount);
 		NewtonCollision* const collision = NewtonCreateConvexHull(world, tireMesh->m_vertexCount, &temp[0].m_x, sizeof (dVector), 0, 0, NULL);
-		delete[] temp;
 
 		// get the location of this tire relative to the car chassis
 		dMatrix tireMatrix(tirePart->CalculateGlobalMatrix(vehEntity));
@@ -297,13 +296,11 @@ return;
 		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
 
-		dFloat* const temp = new dFloat[mesh->m_vertexCount * 3];
+		dArray<dFloat> temp(mesh->m_vertexCount * 3);
 		meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
 		NewtonCollision* const shape = NewtonCreateConvexHull(world, mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
-		delete[] temp;
 		return shape;
 	}
-
 
 	DemoEntity* const LoadModel_ndg(const char* const modelName)
 	{
@@ -370,7 +367,6 @@ return;
 
 		// set entity world location
 		vehicleEntity->ResetMatrix(*scene, location);
-return NULL;
 
 		// make chassis collision shape;
 		NewtonCollision* const chassisCollision = CreateChassisCollision(vehicleEntity, world);
@@ -415,6 +411,7 @@ return NULL;
 		// destroy chassis collision shape 
 		NewtonDestroyCollision(chassisCollision);
 
+
 		// add Tires
 		dFloat width;
 		dFloat radio;
@@ -425,6 +422,7 @@ return NULL;
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
 		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
+return NULL;
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();

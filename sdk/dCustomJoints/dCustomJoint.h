@@ -125,7 +125,9 @@ class dCustomJoint: public dCustomAlloc
 		void SetScale(dFloat scale) {m_debugScale = scale;}
 
 		const dMatrix& GetCameraMatrix() const {return m_cameraMatrix;}
-		CUSTOM_JOINTS_API void DrawFrame(const dMatrix& matrix);
+		void DrawFrame(const dMatrix& matrix) {DrawFrame (matrix, m_debugScale);}
+
+		CUSTOM_JOINTS_API void DrawFrame(const dMatrix& matrix, dFloat scale);
 
 		dMatrix m_cameraMatrix;
 		dFloat m_debugScale;

@@ -17,6 +17,7 @@ class dArray
 {
 	public:
 	dArray();
+	dArray(int size);
 	~dArray();
 
 	T& operator[] (int i);
@@ -30,13 +31,21 @@ class dArray
 	mutable T* m_data;
 };
 
-
 template<class T>
 dArray<T>::dArray()
 	:m_capacity(0)
 	,m_data(NULL)
 {
 }
+
+template<class T>
+dArray<T>::dArray(int size)
+	:m_capacity(0)
+	,m_data(NULL)
+{
+	Resize(size);
+}
+
 
 template<class T>
 dArray<T>::~dArray()
@@ -77,7 +86,6 @@ template<class T>
 void dArray <T>::Resize(int size) const
 {
 	if (size >= m_capacity) {
-		//size = dMax(size, 16);
 		T* const newArray = new T[size];
 		if (m_data) {
 			for (int i = 0; i < m_capacity; i++) {
@@ -88,7 +96,6 @@ void dArray <T>::Resize(int size) const
 		m_data = newArray;
 		m_capacity = size;
 	} else if (size < m_capacity) {
-		//size = dMax(size, 16);
 		T* const newArray = new T[size];
 		if (m_data) {
 			for (int i = 0; i < size; i++) {
