@@ -117,6 +117,7 @@ class DemoSkinMesh: public DemoMeshInterface
 		int m_boneIndex[4];
 	};
 
+	DemoSkinMesh(const DemoSkinMesh& clone);
 	DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<DemoEntity*, dScene::dTreeNode*>& boneMap, const ShaderPrograms& shaderCache);
 	~DemoSkinMesh();
 
@@ -136,7 +137,7 @@ class DemoSkinMesh: public DemoMeshInterface
 	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
 
 	DemoMesh* m_mesh;
-	DemoEntity* m_root; 
+//	DemoEntity* m_root; 
 	DemoEntity* m_entity; 
 	dFloat* m_vertex;
 	dFloat* m_normal;

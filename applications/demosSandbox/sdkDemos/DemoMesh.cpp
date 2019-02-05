@@ -912,10 +912,28 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	}
 }
 
+DemoSkinMesh::DemoSkinMesh(const DemoSkinMesh& clone)
+	:DemoMeshInterface(clone)
+	,m_mesh((DemoMesh*)clone.m_mesh->Clone())
+//	,m_root(owner)
+//	,m_entity(owner)
+	,m_vertex(NULL)
+	,m_normal(NULL)
+	,m_weights(NULL)
+	,m_bindingMatrixArray(NULL)
+	,m_weighIndex(NULL)
+	,m_weightcount(0)
+	,m_nodeCount(0)
+//	,m_shader(shaderCache.m_skinningDiffuseEffect)
+{
+
+
+}
+
 DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<DemoEntity*, dScene::dTreeNode*>& boneMap, const ShaderPrograms& shaderCache)
 	:DemoMeshInterface()
-	,m_mesh((DemoMesh*)owner->GetMesh())
-	,m_root(owner)
+	,m_mesh((DemoMesh*)owner->GetMesh()->Clone())
+//	,m_root(owner)
 	,m_entity(owner)
 	,m_vertex(NULL)
 	,m_normal(NULL)
@@ -926,11 +944,13 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	,m_nodeCount(0)
 	,m_shader(shaderCache.m_skinningDiffuseEffect)
 {
-	while (m_root->GetParent()) {
-		m_root = m_root->GetParent();
-	}
-	
-	m_mesh->AddRef();
+//	while (m_root->GetParent()) {
+//		m_root = m_root->GetParent();
+//	}
+//	m_mesh->AddRef();
+
+dAssert(0);
+/*
 	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
 	dAssert (meshInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
 
@@ -1085,7 +1105,6 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	delete[] weight;
 	delete[] skinBone;
 
-
 	for (DemoMesh::dListNode* node = m_mesh->GetFirst(); node; node = node->GetNext()) {
 		DemoSubMesh& segment = node->GetInfo();
 		segment.m_shader = m_shader;
@@ -1115,6 +1134,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		OptimizeForRender(segment);
 	}
 	glEndList();
+*/
 }
 
 DemoSkinMesh::~DemoSkinMesh()
@@ -1178,6 +1198,9 @@ void DemoSkinMesh::OptimizeForRender(const DemoSubMesh& segment) const
 
 int DemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 {
+	dAssert(0);
+	return 0;
+/*
 	int stack = 1;
 	DemoEntity* pool[32];
 	dMatrix parentMatrix[32];
@@ -1203,6 +1226,7 @@ int DemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 	}
 
 	return count;
+*/
 }
 
 void DemoSkinMesh::ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const
