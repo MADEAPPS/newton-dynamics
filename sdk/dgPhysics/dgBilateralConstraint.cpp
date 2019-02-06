@@ -451,11 +451,13 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				const dgJacobianPair& Jt = row[k].m_Jt;
 
 				#if 1
+				//calculate internal centripetal each sub step 
 				const dgVector& centripetal0(bodyOmega0.CrossProduct(bodyOmega0.CrossProduct(m_r0[k])));
 				const dgVector& centripetal1(bodyOmega1.CrossProduct(bodyOmega1.CrossProduct(m_r1[k])));
 				const dgVector centripetalAccel(Jt.m_jacobianM0.m_linear * centripetal0 + Jt.m_jacobianM1.m_linear * centripetal1);
 				dgFloat32 relCentr = -centripetalAccel.AddHorizontal().GetScalar();
 				#else			
+				//interpolate internal centripetal each sub step 
 				dgFloat32 relCentr = params->m_firstPassCoefFlag ? rhs[k].m_deltaAccel : rhs[k].m_coordenateAccel;
 				//dgVector accel(bodyVeloc0 * bodyOmega0.CrossProduct(Jt.m_jacobianM0.m_linear) + bodyOmega0 * bodyOmega0.CrossProduct(Jt.m_jacobianM0.m_angular) +
 				//			   bodyVeloc1 * bodyOmega1.CrossProduct(Jt.m_jacobianM1.m_linear) + bodyOmega1 * bodyOmega1.CrossProduct(Jt.m_jacobianM1.m_angular));
