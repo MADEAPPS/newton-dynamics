@@ -31,19 +31,19 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 //	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
-	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
+	dVector origin (-40.0f, 40.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.25f, 0.25f, 0.5f, 0.0f);
-size = size.Scale (2.0f);
+	size = size.Scale (2.0f);
 
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	for (int i = 0; i < 20; i ++) {
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
