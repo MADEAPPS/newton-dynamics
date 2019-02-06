@@ -73,7 +73,9 @@ void ShaderPrograms::LoadShaderCode (const char* const filename, char* const buf
 	
 	size = ftell (file);
 	fseek (file, 0, SEEK_SET); 
-	fread (buffer, size, 1, file);
+	size_t error = fread (buffer, size, 1, file);
+	// for GCC shit
+	dAssert (error); error = 0;
 	fclose (file);
 	buffer[size] = 0;
 	buffer[size + 1] = 0;

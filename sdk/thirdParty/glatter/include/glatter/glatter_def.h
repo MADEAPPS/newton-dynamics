@@ -312,7 +312,11 @@ Printable get_prs(size_t sz, void* obj)
         sz = 16;
 
     for (size_t i=0; i<sz; i++) {
-        _snprintf(&ret.data[i*3], sizeof(ret)-3*i-1," %02x", (unsigned char) *(((char*)obj)+i) );
+		#ifdef GLATTER_WGL
+			_snprintf(&ret.data[i*3], sizeof(ret)-3*i-1," %02x", (unsigned char) *(((char*)obj)+i) );
+		#else 
+			snprintf(&ret.data[i*3], sizeof(ret)-3*i-1," %02x", (unsigned char) *(((char*)obj)+i) );
+		#endif
     }
     
     ret.data[0     ] = '[';
