@@ -576,6 +576,35 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 }
 
 
+static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
+{
+	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 4.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
+	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	dMatrix matrix;
+	NewtonBodyGetMatrix(parent, &matrix[0][0]);
+	NewtonBody* child = NULL;
+	dVector size(0.25f, 0.25f, 2.0f, .0f);
+
+	matrix.m_posit.m_x += 0.22f;
+	matrix.m_posit.m_z += size.m_z / 2.0f - 0.1f;
+
+	int count = 1;
+	for (int i = 0; i < count; i++) {
+		child = CreateBox(scene, matrix.m_posit, size);
+
+		NewtonBodyGetMatrix(child, &matrix[0][0]);
+		dMatrix hingeMatrix(matrix);
+		hingeMatrix.m_posit.m_z -= (size.m_z / 2.0f - 0.1f);
+		dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, child, parent);
+		hinge->EnableMotor(true, 10.0f);
+
+		parent = child;
+		matrix.m_posit.m_x += size.m_x;
+		matrix.m_posit.m_z += size.m_z - 0.2f;
+	}
+}
+
 static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 {
     // make a reel static
@@ -1335,8 +1364,10 @@ void StandardJoints (DemoEntityManager* const scene)
 
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 30.0f));
 
-	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+
+	AddHingeMotor(scene, dVector(-15.0f, 0.0f, -15.0f));
 
 #if 0
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));

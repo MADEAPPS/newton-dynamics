@@ -212,7 +212,6 @@ void dCustomJoint::Destructor (const NewtonJoint* me)
 	delete joint;
 }
 
-
 void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex)
 {
 	// get the pointer to the joint class
@@ -228,7 +227,6 @@ void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 		}
 	}
 }
-
 
 void dCustomJoint::Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData)
 {
