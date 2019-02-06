@@ -578,18 +578,20 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 
 static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 {
-	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 4.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
+	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 8.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
 	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	dMatrix matrix;
 	NewtonBodyGetMatrix(parent, &matrix[0][0]);
 	NewtonBody* child = NULL;
-	dVector size(0.25f, 0.25f, 2.0f, .0f);
+	dVector size(0.25f, 0.25f, 1.5f, .0f);
 
 	matrix.m_posit.m_x += 0.22f;
 	matrix.m_posit.m_z += size.m_z / 2.0f - 0.1f;
 
-	int count = 1;
+	dFloat rpm = 5.0f;
+
+	int count = 4;
 	for (int i = 0; i < count; i++) {
 		child = CreateBox(scene, matrix.m_posit, size);
 
@@ -597,7 +599,8 @@ static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 		dMatrix hingeMatrix(matrix);
 		hingeMatrix.m_posit.m_z -= (size.m_z / 2.0f - 0.1f);
 		dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, child, parent);
-		hinge->EnableMotor(true, 10.0f);
+		hinge->EnableMotor(true, rpm);
+		hinge->SetFriction(10000.0f);
 
 		parent = child;
 		matrix.m_posit.m_x += size.m_x;
