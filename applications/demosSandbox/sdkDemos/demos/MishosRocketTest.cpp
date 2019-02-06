@@ -111,12 +111,10 @@ void MishosHingeTest(DemoEntityManager* const scene)
 
 	// Make rocket core body...
 	NewtonCollision* const CoreShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 60.0f, 1, &offset[0][0]);
-//	NewtonCollision* const CoreShape = NewtonCreateSphere(world, 5.0f, 1, &offset[0][0]);
 	NewtonCollision* const CoreCompound = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(CoreCompound);
 	NewtonCompoundCollisionAddSubCollision(CoreCompound, CoreShape);
 	NewtonCompoundCollisionEndAddRemove(CoreCompound);
-//	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, -30.0f, 0.0f));
 	dMatrix matrixCore(0.0f, 0.0f, 1.5708f, dVector(0.0f, 0.0f, 0.0f));
 	
 	DemoMesh* const geometryCore = new DemoMesh("Core Mesh", scene->GetShaderCache(), CoreCompound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
@@ -132,14 +130,12 @@ void MishosHingeTest(DemoEntityManager* const scene)
 
 	// Make payload ...  
 	NewtonCollision* const PayloadShape = NewtonCreateCylinder(world, 5.0f, 5.0f, 10.0f, 1, &offset[0][0]);
-	//NewtonCollision* const PayloadShape = NewtonCreateSphere(world, 5.0f, 1, &offset[0][0]);
 	NewtonCollision* const PayloadCompound = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(PayloadCompound);
 	NewtonCompoundCollisionAddSubCollision(PayloadCompound, PayloadShape);
 	NewtonCompoundCollisionEndAddRemove(PayloadCompound);
-//	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 5.0f, 0.0f));
+
 	dMatrix matrixPayload(0.0f, 0.0f, 1.5708f, dVector(0.0f, 35.0f, 0.0f));
-	
 	DemoMesh* const geometryPayload = new DemoMesh("Payload Stage", scene->GetShaderCache(), PayloadCompound, "metalblu.tga", "metalblu.tga", "metalblu.tga");
 	NewtonBody* const PayloadBody = CreateSimpleSolid(scene, geometryPayload, PayloadMass, matrixPayload, PayloadCompound, 0);
 	//NewtonBodySetForceAndTorqueCallback(PayloadBody, ApplyGravityForce);
@@ -170,22 +166,13 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	NewtonBodyGetMatrix(PayloadBody, &mSourceMatrix[0][0]);
 	dCustomHinge* pHinge = NULL;
 	pHinge = new dCustomHinge(mSourceMatrix, PayloadBody, CoreBody);
-//	pHinge->EnableMotor(false, 0.0);
-//	pHinge->SetAsSpringDamper(false, 0.0, 0.0, 0.0);
-//	pHinge->EnableLimits(true);
-//	pHinge->SetLimits(0.0, 0.0);
-//	new dCustomBallAndSocket(mSourceMatrix, PayloadBody, CoreBody);
+	pHinge->EnableMotor(false, 0.0);
+	pHinge->SetAsSpringDamper(false, 0.0, 0.0, 0.0);
+	pHinge->EnableLimits(true);
+	pHinge->SetLimits(0.0, 0.0);
 
-	// place camera into position and rotate towards objects
-//	dMatrix camMatrix(dGetIdentityMatrix());
-//	dQuaternion dqRotY(dVector(0.0f, 1.0f, 0.0f), 90.0f * 3.141592f / 180.0f);
-//	dQuaternion rot(camMatrix);
-//	dVector origin(0.0, 0.0f, 120.0f, 0.0f);
-//	scene->SetCameraMatrix(rot*dqRotY, origin);
 	dVector origin(matrixCore.m_posit);
 	origin.m_x -= 120.0f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
-
-	NewtonSerializeToFile(scene->GetNewton(), "RocketLaunchFar.bin", NULL, NULL);
 }
