@@ -74,12 +74,12 @@
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles
 //#define DEFAULT_SCENE	40			// basic player controller
-#define DEFAULT_SCENE	41			// animated player controller
+//#define DEFAULT_SCENE	41			// animated player controller
 //#define DEFAULT_SCENE	42			// advanced player controller
 //#define DEFAULT_SCENE	43			// cloth patch			
 //#define DEFAULT_SCENE	44			// soft bodies	
 //#define DEFAULT_SCENE	45			// joe's joint test
-//#define DEFAULT_SCENE	46			// Misho's Hinge Test
+#define DEFAULT_SCENE	46			// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
