@@ -52,7 +52,7 @@ class DemoMeshInterface: public dClassInfo
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
-	virtual DemoMeshInterface* Clone() { dAssert(0); return NULL; }
+	virtual DemoMeshInterface* Clone(DemoEntity* const owner) { dAssert(0); return NULL; }
 
 	virtual void RenderTransparency () const = 0;
 	virtual void Render (DemoEntityManager* const scene) = 0;
@@ -75,7 +75,7 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	DemoMesh(const char* const name, const ShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 	DemoMesh(const char* const name, const ShaderPrograms& shaderCache, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
 
-	virtual DemoMeshInterface* Clone() { AddRef(); return this;}
+	virtual DemoMeshInterface* Clone(DemoEntity* const owner) { AddRef(); return this;}
 
 	using dClassInfo::operator new;
 	using dClassInfo::operator delete;
@@ -117,7 +117,7 @@ class DemoSkinMesh: public DemoMeshInterface
 		int m_boneIndex[4];
 	};
 
-	DemoSkinMesh(const DemoSkinMesh& clone);
+	DemoSkinMesh(const DemoSkinMesh& clone, DemoEntity* const owner);
 	DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<DemoEntity*, dScene::dTreeNode*>& boneMap, const ShaderPrograms& shaderCache);
 	~DemoSkinMesh();
 
@@ -127,24 +127,15 @@ class DemoSkinMesh: public DemoMeshInterface
 	NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected: 
-	void BuildSkin ();
-
-	virtual DemoMeshInterface* Clone();
-	
-	void OptimizeForRender(const DemoSubMesh& segment) const;
+	virtual DemoMeshInterface* Clone(DemoEntity* const owner);
 	int CalculateMatrixPalette(dMatrix* const bindMatrix) const;
 	void ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
 	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
+	void OptimizeForRender(const DemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const;
 
 	DemoMesh* m_mesh;
-//	DemoEntity* m_root; 
 	DemoEntity* m_entity; 
-	dFloat* m_vertex;
-	dFloat* m_normal;
-	dVector* m_weights;
 	dMatrix* m_bindingMatrixArray;
-	dWeightBoneIndex* m_weighIndex;
-	int m_weightcount;
 	int m_nodeCount; 
 	int m_shader;
 };

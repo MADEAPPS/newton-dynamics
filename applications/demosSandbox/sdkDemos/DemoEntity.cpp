@@ -94,10 +94,11 @@ DemoEntity::DemoEntity(const DemoEntity& copyFrom)
 	,m_curRotation(copyFrom.m_curRotation)
 	,m_nextRotation(copyFrom.m_nextRotation)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
-	,m_mesh(copyFrom.m_mesh ? copyFrom.m_mesh->Clone() : NULL)
+	,m_mesh(NULL)
 	,m_userData(NULL)
 	,m_lock(0)
 {
+	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : NULL;
 }
 
 DemoEntity::~DemoEntity(void)
