@@ -5829,6 +5829,20 @@ void NewtonBodySetFreezeState(const NewtonBody* const bodyPtr, int state)
 	body->SetFreeze(state ? true : false);
 }
 
+int NewtonBodyGetGyroscopicTorque(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	return body->GetGyroMode() ? 1 : 0;
+}
+
+void NewtonBodySetGyroscopicTorque(const NewtonBody* const bodyPtr, int state)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	body->SetGyroMode(state ? true : false);
+}
+
 /*!
   Set the auto-activation mode for this body.
 

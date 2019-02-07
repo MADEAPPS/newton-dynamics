@@ -575,12 +575,11 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	return accNorm.GetScalar();
 }
 
-
 dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const
 {
 	dgJacobian velocStep;
 	
-	if (body->m_gyroTorqueOnOverload) {
+	if (body->m_gyroTorqueOn) {
 		dgVector dtHalf(timestep * dgVector::m_half);
 		dgMatrix matrix(body->m_gyroRotation, dgVector::m_wOne);
 		dgVector localOmega(matrix.UnrotateVector(body->m_omega));
@@ -722,8 +721,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			const dgVector& gyroTorque0 = constraint->m_body0->m_gyroTorque;
 			const dgVector& gyroTorque1 = constraint->m_body1->m_gyroTorque;
 
-			dgAssert(constraint->m_body0->m_gyroTorqueOnOverload || (gyroTorque0.DotProduct(gyroTorque0).GetScalar() == dgFloat32(0.0f)));
-			dgAssert(constraint->m_body1->m_gyroTorqueOnOverload || (gyroTorque1.DotProduct(gyroTorque1).GetScalar() == dgFloat32(0.0f)));
+			dgAssert(constraint->m_body0->m_gyroTorqueOn || (gyroTorque0.DotProduct(gyroTorque0).GetScalar() == dgFloat32(0.0f)));
+			dgAssert(constraint->m_body1->m_gyroTorqueOn || (gyroTorque1.DotProduct(gyroTorque1).GetScalar() == dgFloat32(0.0f)));
 			for (dgInt32 j = 0; j < jointInfo->m_pairCount; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[pairStart + j];
 				const dgLeftHandSide* const row = &leftHandSide[pairStart + j];

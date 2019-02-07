@@ -155,6 +155,9 @@ class dgBody
 	bool GetAutoSleep () const;
 	void SetAutoSleep (bool state);
 
+	bool GetGyroMode() const;
+	void SetGyroMode(bool state);
+	
 	dgCollisionInstance* GetCollision () const;
 	dgBodyMasterList::dgListNode* GetMasterList() const;
 
@@ -283,7 +286,6 @@ class dgBody
 			dgUnsigned32 m_collideWithLinkedBodies	: 1;
 			dgUnsigned32 m_transformIsDirty			: 1;
 			dgUnsigned32 m_gyroTorqueOn				: 1;
-			dgUnsigned32 m_gyroTorqueOnOverload		: 1;
 		};
 	};
 
@@ -556,6 +558,15 @@ DG_INLINE void dgBody::SetSleepState (bool state)
 	m_equilibrium = state;
 }
 
+DG_INLINE bool dgBody::GetGyroMode() const
+{
+	return m_gyroTorqueOn;
+}
+
+DG_INLINE void dgBody::SetGyroMode(bool state)
+{
+	m_gyroTorqueOn = state;
+}
 
 DG_INLINE bool dgBody::IsCollidable() const
 {

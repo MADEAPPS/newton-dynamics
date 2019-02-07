@@ -931,6 +931,9 @@ extern "C" {
 	NEWTON_API int  NewtonBodyGetFreezeState(const NewtonBody* const body);
 	NEWTON_API void NewtonBodySetFreezeState (const NewtonBody* const body, int state);
 
+	NEWTON_API int NewtonBodyGetGyroscopicTorque(const NewtonBody* const body);
+	NEWTON_API void NewtonBodySetGyroscopicTorque(const NewtonBody* const body, int state);
+
 	NEWTON_API void NewtonBodySetDestructorCallback (const NewtonBody* const body, NewtonBodyDestructor callback);
 	NEWTON_API NewtonBodyDestructor NewtonBodyGetDestructorCallback (const NewtonBody* const body);
 

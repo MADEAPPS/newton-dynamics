@@ -253,10 +253,9 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
 
+	
 	m_gyroRotation = m_rotation;
-//	m_gyroTorque = m_omega.CrossProduct(CalculateAngularMomentum());
 	m_gyroTorque = dgVector::m_zero;
-	m_gyroTorqueOnOverload = m_gyroTorqueOn;
 
 	m_externalForce += m_impulseForce;
 	m_externalTorque += m_impulseTorque;

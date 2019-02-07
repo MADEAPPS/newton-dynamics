@@ -50,11 +50,11 @@ static NewtonBody* DzhanibekovEffect(DemoEntityManager* const scene, const dVect
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), dzhanibekovShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const dzhanibekovBody = CreateSimpleSolid(scene, geometry, 10.0f, matrix, dzhanibekovShape, 0);
 
+	NewtonBodySetGyroscopicTorque(dzhanibekovBody, 1);
 	NewtonBodySetMassProperties(dzhanibekovBody, 10.0f, dzhanibekovShape);
 
 	dFloat m, x, y, z;
 	NewtonBodyGetMass(dzhanibekovBody, &m, &x, &y, &z);
-//NewtonBodySetMassMatrix(dzhanibekovBody, m, x, x, x);
 
 	NewtonBodySetOmega(dzhanibekovBody, &omega[0]);
 
@@ -87,6 +87,7 @@ static NewtonBody* FrisbeePreccesion(DemoEntityManager* const scene, const dVect
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
 
+	NewtonBodySetGyroscopicTorque(ball, 1);
 	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
 
 	dFloat m, Ixx, Iyy, Izz;
@@ -123,6 +124,8 @@ static NewtonBody* PhiTop(DemoEntityManager* const scene, const dVector& posit, 
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0);
 
+	// the PhiTop spisn too fast and gytor trque add to much energy, they require hget simulation rate  
+	NewtonBodySetGyroscopicTorque(ball, 1);
 	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
 
 	dFloat m, Ixx, Iyy, Izz;
@@ -141,7 +144,6 @@ static NewtonBody* PhiTop(DemoEntityManager* const scene, const dVector& posit, 
 	return ball;
 }
 
-
 static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& posit, dFloat omega, dFloat radio)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -155,6 +157,8 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 	matrix.m_posit.m_w = 1.0f;
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), ballShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const ball = CreateSimpleSolid(scene, geometry, 10.0f, matrix, ballShape, 0, true);
+
+	NewtonBodySetGyroscopicTorque(ball, 1);
 	NewtonBodySetMassProperties(ball, 10.0f, ballShape);
 	
 	dFloat m, Ixx, Iyy, Izz;
@@ -200,6 +204,8 @@ static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector
 
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
 	NewtonBody* const wheelBody = CreateSimpleSolid(scene, geometry, 10.0f, matrix, flyWheelShape, 0);
+
+	NewtonBodySetGyroscopicTorque(wheelBody, 1);
 	NewtonBodySetMassProperties(wheelBody, 10.0f, flyWheelShape);
 
 	dFloat m;
@@ -256,7 +262,9 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 	matrix.m_posit = posit;
 	matrix.m_posit.m_w = 1.0f;
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), cone, "smilli.tga", "smilli.tga", "smilli.tga");
-	NewtonBody* const gyroTop = CreateSimpleSolid(scene, geometry, 10.0f, matrix, cone, 0, true);
+	NewtonBody* const gyroTop = CreateSimpleSolid(scene, geometry, 10.0f, matrix, cone, 0);
+
+	NewtonBodySetGyroscopicTorque(gyroTop, 1);
 	NewtonBodySetMassProperties(gyroTop, 10.0f, cone);
 
 	dFloat m, Ixx, Iyy, Izz;
@@ -342,10 +350,12 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	// place a toy tops
 	const int topsCount = 4;
 	const dFloat spacing = 3.0f;
-	for (int i = 0; i < topsCount; i ++) {
-		PrecessingTop(scene, dVector(0.0f, 0.5f, -spacing * i - spacing, 1.0f));
-//		PhiTop(scene, dVector(8.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 10.0f + 10.0f, 1.0f);
-//		TippeTop(scene, dVector(-6.0f, 0.3f, -spacing * i - spacing, 1.0f), 0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < topsCount; i++) {
+		for (int j = 0; j < topsCount; j++) {
+			PrecessingTop(scene, dVector(spacing * j, 0.5f, -spacing * i - spacing, 1.0f));
+		}
+		PhiTop(scene, dVector(30.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 5.0f + 10.0f, 1.0f);
+		//TippeTop(scene, dVector(-6.0f, 0.3f, -spacing * i - spacing, 1.0f), 0.0f, 0.0f, 0.0f);
 	}
 
 	// place camera into position
