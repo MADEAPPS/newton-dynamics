@@ -282,6 +282,8 @@ class dgBody
 			dgUnsigned32 m_continueCollisionMode	: 1;
 			dgUnsigned32 m_collideWithLinkedBodies	: 1;
 			dgUnsigned32 m_transformIsDirty			: 1;
+			dgUnsigned32 m_gyroTorqueOn				: 1;
+			dgUnsigned32 m_gyroTorqueOnOverload		: 1;
 		};
 	};
 
@@ -423,13 +425,11 @@ DG_INLINE void dgBody::SetOmegaNoSleep(const dgVector& omega)
 	m_omega = omega;
 }
 
-
 DG_INLINE void dgBody::SetOmega (const dgVector& omega)
 {
 	SetOmegaNoSleep(omega);
 	m_equilibrium = false;
 }
-
 
 DG_INLINE dgVector dgBody::GetVelocityAtPoint (const dgVector& point) const
 {
@@ -446,7 +446,6 @@ DG_INLINE void dgBody::SetVelocity (const dgVector& velocity)
 	SetVelocityNoSleep(velocity);
 	m_equilibrium = false;
 }
-
 
 DG_INLINE const dgMatrix& dgBody::GetMatrix() const
 {

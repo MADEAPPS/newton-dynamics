@@ -828,7 +828,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 			internalForces[i].m_linear = dgVector::m_zero;
 			internalForces[i].m_angular = dgVector::m_zero;
 		}
-
 	} else {
 		for (dgInt32 i = 1; i < bodyCount; i++) {
 			dgBody* const body = bodyArray[i].m_body;
@@ -844,6 +843,13 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 			internalForces[i].m_linear = dgVector::m_zero;
 			internalForces[i].m_angular = dgVector::m_zero;
+		}
+	}
+	if (bodyCount >= 2) {
+		for (dgInt32 i = 1; i < bodyCount; i++) {
+			dgBody* const body = bodyArray[i].m_body;
+			body->m_gyroTorqueOnOverload = 1;
+			body->m_gyroTorque = body->m_omega.CrossProduct(body->CalculateAngularMomentum());
 		}
 	}
 
