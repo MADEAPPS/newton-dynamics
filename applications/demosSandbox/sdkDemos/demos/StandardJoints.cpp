@@ -578,7 +578,7 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 
 static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 {
-	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 8.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
+	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 10.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
 	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	dMatrix matrix;
@@ -589,9 +589,9 @@ static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 	matrix.m_posit.m_x += 0.22f;
 	matrix.m_posit.m_z += size.m_z / 2.0f - 0.1f;
 
-	dFloat rpm = 5.0f;
+	dFloat rpm = 3.0f;
+	int count = 10;
 
-	int count = 4;
 	for (int i = 0; i < count; i++) {
 		child = CreateBox(scene, matrix.m_posit, size);
 
@@ -599,8 +599,9 @@ static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 		dMatrix hingeMatrix(matrix);
 		hingeMatrix.m_posit.m_z -= (size.m_z / 2.0f - 0.1f);
 		dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, child, parent);
-		hinge->EnableMotor(true, rpm);
-		hinge->SetFriction(10000.0f);
+
+		hinge->EnableMotor(true, rpm + (i&1 ? -2.0f : 2.0f));
+		hinge->SetFriction(1.0e6f);
 
 		parent = child;
 		matrix.m_posit.m_x += size.m_x;
@@ -1370,7 +1371,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 
-	AddHingeMotor(scene, dVector(-15.0f, 0.0f, -15.0f));
+	AddHingeMotor(scene, dVector(-15.0f, 0.0f, 0.0f));
 
 #if 0
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
@@ -1379,6 +1380,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+//	AddHingeMotor(scene, dVector(-15.0f, 0.0f, 0.0f));
 	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
 	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
@@ -1395,8 +1397,8 @@ void StandardJoints (DemoEntityManager* const scene)
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
-	//dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin (-30.0f, 5.0f, -10.0f, 0.0f);
+	dVector origin (-30.0f, 7.0f, 0.0f, 0.0f);
+	//dVector origin (-30.0f, 5.0f, -10.0f, 0.0f);
 	//dVector origin(-30.0f, 5.0f, 32.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
