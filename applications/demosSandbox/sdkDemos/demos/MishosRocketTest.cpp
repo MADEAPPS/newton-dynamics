@@ -105,8 +105,8 @@ void MishosHingeTest(DemoEntityManager* const scene)
 	dFloat CoreMass = 979452.0f;
 	dFloat PayloadMass = 979452.0f;
 
-	CoreMass = 1.0f;
-	PayloadMass = 1.0f;
+//	CoreMass = 1.0f;
+//	PayloadMass = 1.0f;
 
 
 	// Make rocket core body...
