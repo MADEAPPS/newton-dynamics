@@ -845,7 +845,9 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 			internalForces[i].m_angular = dgVector::m_zero;
 		}
 	}
-	if (bodyCount >= 2) {
+
+	const dgInt32 jointCount = cluster->m_jointCount;
+	if (jointCount <= 1) {
 		for (dgInt32 i = 1; i < bodyCount; i++) {
 			dgBody* const body = bodyArray[i].m_body;
 			body->m_gyroTorqueOnOverload = 1;
@@ -867,7 +869,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowStart];
 
 	dgInt32 rowCount = 0;
-	const dgInt32 jointCount = cluster->m_jointCount;
 	for (dgInt32 i = 0; i < jointCount; i++) {
 		dgJointInfo* const jointInfo = &constraintArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
