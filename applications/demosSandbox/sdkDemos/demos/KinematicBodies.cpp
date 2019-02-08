@@ -35,8 +35,8 @@ class PhantomPlacement: public DemoEntity
 
 		m_solideMesh = (DemoMesh*)cowEntity->GetMesh();
 		m_solideMesh->AddRef();
-		m_redMesh = CreatePhantomMesh (scene, shape, dVector (1.0f, 0.0f, 0.0f, 0.5f)); 
-        m_blueMesh = CreatePhantomMesh (scene, shape, dVector (0.0f, 0.5f, 0.0f, 0.5f)); 
+		m_redMesh = CreatePhantomMesh (scene, shape, dVector (1.0f, 0.0f, 0.0f, 1.0f)); 
+        m_blueMesh = CreatePhantomMesh (scene, shape, dVector (0.0f, 0.5f, 0.0f, 1.0f)); 
 		SetMesh (m_redMesh, dGetIdentityMatrix());
 		
 		NewtonBodySetUserData (m_phantom, this);
@@ -486,7 +486,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
-	AddStaticMesh (scene);
+//	AddStaticMesh (scene);
 
 	// create a system for object placement
 	new dKinematicPlacementManager (scene);
@@ -496,19 +496,26 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	location.m_x += 0.0f;
 	location.m_z += 0.0f;
 
+
+DemoEntity* const entity = DemoEntity::LoadNGD_mesh("cow.ngd", scene->GetNewton(), scene->GetShaderCache());
+dAssert(entity);
+scene->Append(entity);
+
+
+
 	int count = 3;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 	// place camera into position
 	dQuaternion rot;

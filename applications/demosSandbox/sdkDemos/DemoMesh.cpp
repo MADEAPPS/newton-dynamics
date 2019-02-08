@@ -395,11 +395,7 @@ DemoMesh::DemoMesh(const char* const name, const ShaderPrograms& shaderCache, co
 		segment->m_textureHandle = (GLuint)material;
 		segment->SetOpacity(opacity);
 
-		if (segment->m_opacity > 0.999f) {
-			segment->m_shader = shaderCache.m_diffuseEffect;
-		} else {
-			dAssert (0);
-		}
+		segment->m_shader = shaderCache.m_diffuseEffect;
 
 		segment->AllocIndexData (indexCount);
 		NewtonMeshMaterialGetIndexStream (mesh, geometryHandle, handle, (int*)segment->m_indexes); 

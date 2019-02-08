@@ -13,6 +13,7 @@
 #include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoEntityManager.h"
+#include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 
@@ -38,7 +39,7 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 	const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 	const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
 
-	//now core 3.14 can have per collision user data
+	//now core 3.14 can have per rampCollision user data
 	const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 	const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 
@@ -56,18 +57,57 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 	}
 }
 
+void LoadRampScene (DemoEntityManager* const scene)
+{
+	dVector tableSize(40.0f, 0.25f, 40.0f, 0.0f);
+
+	NewtonWorld* const world = scene->GetNewton();
+	NewtonCollision* const rampCollision = CreateConvexCollision(world, dGetIdentityMatrix(), tableSize, _BOX_PRIMITIVE, 0);
+
+	DemoMesh* const rampMesh = new DemoMesh("ramp", scene->GetShaderCache(), rampCollision, "wood_3.tga", "wood_3.tga", "wood_3.tga");
+
+	dMatrix matrix = dRollMatrix(30.0f * dDegreeToRad);
+	matrix.m_posit.m_x = 0.0f;
+	matrix.m_posit.m_z = 0.0f;
+	matrix.m_posit.m_y = 9.0f;
+	NewtonBody* const tableBody = CreateSimpleSolid(scene, rampMesh, 0.0f, matrix, rampCollision, 0);
+	NewtonBodySetMassProperties(tableBody, 0.0f, NewtonBodyGetCollision(tableBody));
+	NewtonBodySetMaterialGroupID(tableBody, 0);
+	rampMesh->Release();
+	NewtonDestroyCollision(rampCollision);
+
+
+	dVector size (0.8f, 0.25f, 0.5f, 0.0f);
+	dMatrix shapeMatrix (dGetIdentityMatrix());
+	NewtonCollision* const collision = CreateConvexCollision(world, shapeMatrix, size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dFloat startElevation = 100.0f;
+
+	matrix.m_posit.m_z -= 15.0f;
+	matrix.m_posit.m_x += 15.0f;
+	dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+
+	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;
+	for (int i = 0; i < 10; i++) {
+		CreateSimpleSolid(scene, geometry, 1.0, matrix, collision, 0);
+		matrix.m_posit.m_z += 2;
+	}
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
 
 void Friction (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
 
-
 	// load the scene from a ngd file format
-	char fileName[2048];
-	dGetWorkingFileName ("frictionDemo.ngd", fileName);
-	scene->LoadScene (fileName);
+	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 
+	// load Ramp scene
+	LoadRampScene (scene);
 
 	// set a default material call back
 	NewtonWorld* const world = scene->GetNewton();
@@ -110,7 +150,7 @@ void Friction (DemoEntityManager* const scene)
 
 	// place camera into position
 	dQuaternion rot;
-	dVector origin (-70.0f, 10.0f, 0.0f, 0.0f);
+	dVector origin (-35.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");

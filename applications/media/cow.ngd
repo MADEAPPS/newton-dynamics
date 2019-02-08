@@ -1,37 +1,13 @@
 <?xml version="1.0" ?>
 <alchemedia>
-    <header description="alchemedia file format" revision="100" />
+    <header description="alchemedia file format" revision="105" />
     <nodes count="8">
         <dRootNodeInfo>
-            <dNodeInfo name="rootNode" />
-            <childrenNodes count="5" indices="1 2 3 4 5" />
+            <dNodeInfo name="rootNode"  nodeID="0"/>
+            <childrenNodes count="1" indices="5" />
         </dRootNodeInfo>
-        <dCameraNodeInfo>
-            <dNodeInfo name="viewport0" />
-            <position x="0.000000" y="0.000000" z="0.000000" />
-            <rotation pitch="30.000000" yaw="30.000000" />
-            <parentNodes count="1" indices="0" />
-        </dCameraNodeInfo>
-        <dCameraNodeInfo>
-            <dNodeInfo name="viewport1" />
-            <position x="0.000000" y="0.000000" z="0.000000" />
-            <rotation pitch="30.000000" yaw="30.000000" />
-            <parentNodes count="1" indices="0" />
-        </dCameraNodeInfo>
-        <dCameraNodeInfo>
-            <dNodeInfo name="viewport2" />
-            <position x="0.000000" y="0.000000" z="0.000000" />
-            <rotation pitch="30.000000" yaw="30.000000" />
-            <parentNodes count="1" indices="0" />
-        </dCameraNodeInfo>
-        <dCameraNodeInfo>
-            <dNodeInfo name="viewport3" />
-            <position x="0.000000" y="0.000000" z="0.000000" />
-            <rotation pitch="30.000000" yaw="30.000000" />
-            <parentNodes count="1" indices="0" />
-        </dCameraNodeInfo>
         <dSceneNodeInfo>
-            <dNodeInfo name="VIFS02" />
+            <dNodeInfo name="VIFS02" nodeID="5"/>
             <color float4="0.750000 0.750000 0.000000 0.000000" />
             <transform position="0.000000 1.071069 0.000000 1.000000" eulerAngles="-0.000000 -0.000000 -0.000000 0.000000" localScale="80.000000 80.000000 80.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
             <parentNodes count="1" indices="0" />
@@ -39,7 +15,7 @@
         </dSceneNodeInfo>
         <dMeshNodeInfo>
             <dGeometryNodeInfo>
-                <dNodeInfo name="VIFS02_mesh" />
+                <dNodeInfo name="VIFS02_mesh" nodeID="6" />
                 <pivotMatrix float16="1.000000 -0.000000 0.000000 0.000000 0.000000 1.000000 -0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000002 0.002019 0.001540 1.000000" />
             </dGeometryNodeInfo>
             <points>
@@ -59,7 +35,7 @@
             <childrenNodes count="1" indices="7" />
         </dMeshNodeInfo>
         <dMaterialNodeInfo id="0">
-            <dNodeInfo name="default_0" />
+            <dNodeInfo name="default_0" nodeID="7" />
             <ambient textureId="-1" color="0.500000 0.500000 0.500000 1.000000" />
             <diffuse textureId="-1" color="0.500000 0.500000 0.500000 1.000000" />
             <specular textureId="-1" color="0.000158 0.000158 0.000158 1.000000" />
