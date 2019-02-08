@@ -578,7 +578,7 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 
 static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 {
-	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 10.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
+	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 4.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
 	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	dMatrix matrix;
@@ -601,7 +601,7 @@ static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 		dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, child, parent);
 
 		hinge->EnableMotor(true, rpm + (i&1 ? -2.0f : 2.0f));
-		hinge->SetFriction(1.0e6f);
+		hinge->SetFriction(1.0e4f);
 
 		parent = child;
 		matrix.m_posit.m_x += size.m_x;
@@ -1356,7 +1356,6 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//	Add6DOF(scene, dVector(-20.0f, 0.0f, 32.0f));
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
@@ -1366,38 +1365,36 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 //	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
 
+// joint with problems
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 30.0f));
 
-//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+
+#if 1
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
+//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
-
-	AddHingeMotor(scene, dVector(-15.0f, 0.0f, 0.0f));
-
-#if 0
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
-	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
-	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
+//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
-	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-//	AddHingeMotor(scene, dVector(-15.0f, 0.0f, 0.0f));
-	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
-	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
-	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
-	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 13.0f));
-//	AddDoubleHinge(scene, dVector (-20.0f, 0.0f, 17.0f));
-	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
-	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
-	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
-
-//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+//	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+////	AddHingeMotor(scene, dVector(-15.0f, 0.0f, 0.0f));
+//	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
+//	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
+//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 11.0f));
+//	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 13.0f));
+////	AddDoubleHinge(scene, dVector (-20.0f, 0.0f, 17.0f));
+//	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
+//	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
+//	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
+//
+////	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
 #endif
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
-	dVector origin (-30.0f, 7.0f, 0.0f, 0.0f);
+	dVector origin (-50.0f, 7.0f, 0.0f, 0.0f);
 	//dVector origin (-30.0f, 5.0f, -10.0f, 0.0f);
 	//dVector origin(-30.0f, 5.0f, 32.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
