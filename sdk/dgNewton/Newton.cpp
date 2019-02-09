@@ -3023,6 +3023,8 @@ void NewtonConvexCollisionCalculateBuoyancyAcceleration (const NewtonCollision* 
 	
 	dgVector origin (shapeOrigin);
 	dgVector gravity (gravityVector);
+	origin = origin & dgVector::m_triplexMask;
+	gravity = gravity & dgVector::m_triplexMask;
 	dgVector plane (fluidPlane[0], fluidPlane[1], fluidPlane[2], fluidPlane[3]);
 
 	dgVector force;
@@ -3129,6 +3131,11 @@ int NewtonUserMeshCollisionContinuousOverlapTest (const NewtonUserMeshCollisionC
 
 	dgVector q0 (collideDescData->m_boxP0);
 	dgVector q1 (collideDescData->m_boxP1);
+
+	p0 = p0 & dgVector::m_triplexMask;
+	p1 = p1 & dgVector::m_triplexMask;
+	q0 = q0 & dgVector::m_triplexMask;
+	q1 = q1 & dgVector::m_triplexMask;
 
 	dgVector box0 (p0 - q1);
 	dgVector box1 (p1 - q0);

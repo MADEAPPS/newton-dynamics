@@ -1282,7 +1282,6 @@ void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location,
 {
 	DemoEntity* const entity = DemoEntity::LoadNGD_mesh ("lumber.ngd", scene->GetNewton(), scene->GetShaderCache());
 
-
 	dTree<NewtonCollision*, DemoMesh*> filter;
 	NewtonWorld* const world = scene->GetNewton();
 

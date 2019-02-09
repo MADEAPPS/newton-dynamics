@@ -164,6 +164,7 @@ void dgCollisionUserMesh::GetCollidingFacesContinue(dgPolygonMeshDesc* const dat
 
 		dgInt32 normalIndex = data->GetNormalIndex(indexArray, indexCount);
 		dgVector faceNormal(&vertex[normalIndex * stride]);
+		faceNormal = faceNormal & dgVector::m_triplexMask;
 		dgFloat32 dist = data->PolygonBoxRayDistance(faceNormal, indexCount, indexArray, stride, vertex, ray);
 
 		const dgInt32 faceIndexCount = data->GetFaceIndexCount(indexCount);
@@ -198,8 +199,9 @@ void dgCollisionUserMesh::GetCollidingFacesContinue(dgPolygonMeshDesc* const dat
 				for (dgInt32 j = 0; j < indexCount; j++) {
 					dgInt32 index = vertexFaceIndex[j];
 					dgVector q(&vertex[index * stride]);
-					//dgVector p (matrix.TransformVector(q));
-					dgVector p(matrix.TransformVector(scale * dgVector(&vertex[index * stride])));
+					q = q & dgVector::m_triplexMask;
+					//dgVector p(matrix.TransformVector(scale * dgVector(&vertex[index * stride])));
+					dgVector p(matrix.TransformVector(scale * q));
 					triplex[j].m_x = p.m_x;
 					triplex[j].m_y = p.m_y;
 					triplex[j].m_z = p.m_z;
@@ -237,6 +239,7 @@ void dgCollisionUserMesh::GetCollidingFacesDescrete(dgPolygonMeshDesc* const dat
 
 		dgInt32 normalIndex = data->GetNormalIndex(indexArray, indexCount);
 		dgVector faceNormal(&vertex[normalIndex * stride]);
+		faceNormal = faceNormal & dgVector::m_triplexMask;
 		dgFloat32 dist = data->PolygonBoxDistance(faceNormal, indexCount, indexArray, stride, vertex);
 
 		const dgInt32 faceIndexCount = data->GetFaceIndexCount(indexCount);
@@ -271,8 +274,9 @@ void dgCollisionUserMesh::GetCollidingFacesDescrete(dgPolygonMeshDesc* const dat
 				for (dgInt32 j = 0; j < indexCount; j++) {
 					dgInt32 index = vertexFaceIndex[j];
 					dgVector q(&vertex[index * stride]);
-					//dgVector p (matrix.TransformVector(q));
-					dgVector p(matrix.TransformVector(scale * dgVector(&vertex[index * stride])));
+					q = q & dgVector::m_triplexMask; 
+					//dgVector p(matrix.TransformVector(scale * dgVector(&vertex[index * stride])));
+					dgVector p(matrix.TransformVector(scale * q));
 					triplex[j].m_x = p.m_x;
 					triplex[j].m_y = p.m_y;
 					triplex[j].m_z = p.m_z;

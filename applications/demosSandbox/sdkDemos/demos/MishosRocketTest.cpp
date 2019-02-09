@@ -74,7 +74,7 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 
 		// Nominal object distance at the beginning is 35, so we will subtract that here to get to zero as a starting point.
 		//printf("Object distance: %f  local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]);
-		dTrace(("Object distance: %f local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]));
+		//dTrace(("Object distance: %f local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]));
 	}
 
 
