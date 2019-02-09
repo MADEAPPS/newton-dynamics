@@ -436,113 +436,6 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 	}
 };
 
-/*
-void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments)
-{
-    dFloat height = 1.0f;
-    dFloat width = 4.0f;
-
-    dVector size (width, height, width);
-    NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
-	
-    for (int i=0; i < numSegments; i++)
-	{
-        dFloat height = 1.0f;
-        dFloat width = 0.5f;
-
-        dVector size (width, height, width);
-        NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * dFloat(i+1), 0.0f, 0.0f), size);
-
-        dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
-        dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
-        JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
-
-		if (animSpeed != 0.0f) {
-			joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numSegments); // animated      
-	}
-
-        parent = child;
-	}
-}*/
-
-
-static void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
-	const int numArms = 1,
-	const dFloat torsoHeight = 1.0f, 
-	const dFloat torsoWidth = 4.0f, 
-	const dFloat randomness = 0.0f, 
-	const dFloat armHeight = 1.0f, 
-	const dFloat armWidth = 0.5f,
-	const int pickMe = -1)
-{
-    dFloat height = torsoHeight;
-    dFloat width = torsoWidth;
-
-    dVector size (width, height, width);
-    NewtonBody* torso = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
-	dMatrix torsoMatrix; 
-	NewtonBodyGetMatrix (torso, (dFloat*) &torsoMatrix);
-
-	int bodyIndex = 0;
-	NewtonBody* pickBody = 0;
-	for (int j=0; j < numArms; j++)
-	{
-		dFloat angle = dFloat(j) / dFloat(numArms) * dPi*2.0f;
-		dMatrix armRotation = dPitchMatrix(angle);
-		dMatrix armTransform = armRotation * torsoMatrix;
-		
-		NewtonBody* parent = torso;
-		int numBodies = numSegments;
-		if (randomness > 0.0f) numBodies += int (dGaussianRandom (dFloat(numSegments)) + 0.5f);
-		for (int i=0; i < numBodies; i++)
-		{
-			dFloat height = armHeight;
-			dFloat width = armWidth;
-
-			dVector size (width, height, width);
-			dVector pos (0.0f,  height * dFloat(i + (numArms>1 ? 2 : 1)), 0.0f, 0.0f);
-			NewtonBody* child = CreateBox (scene, pos, size);
-			
-			dMatrix bodyMatrix; 
-			NewtonBodyGetMatrix (child, (dFloat*) &bodyMatrix);
-			bodyMatrix = bodyMatrix * armTransform;
-			NewtonBodySetMatrix (child, (dFloat*) &bodyMatrix);
-
-			dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
-			dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
-			if (parent == torso) 
-			{
-				matrix1.m_posit.m_y += height;
-				matrix1 = matrix1 * armRotation;
-			}
-			if (randomness > 0.0f)
-			{
-				dMatrix rotation =  dPitchMatrix(dGaussianRandom  (dPi) * randomness);
-				rotation = rotation * dYawMatrix(dGaussianRandom  (dPi) * randomness);
-				rotation = rotation * dYawMatrix(dGaussianRandom  (dPi) * randomness);
-				matrix0 = matrix0 * rotation;
-			}
-			JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
-
-			if (animSpeed != 0.0f) {
-				joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numBodies); // animated      
-			}
-
-			parent = child;
-			if (bodyIndex == pickMe) {
-				pickBody = child;
-			}
-			bodyIndex++;
-		}
-	}
-
-	if (pickBody)
-	{
-		dMatrix matrix;
-		NewtonBodyGetMatrix(pickBody, &matrix[0][0]);
-		new dCustomBallAndSocket(matrix, pickBody);
-	}
-}
 
 static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -1356,16 +1249,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  10.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
-//	AddJoesLimitJoint (scene, dVector(-24.0f, 0.0f, -15.0f));
-
-// joints still with problems
+//	joints still with problems
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 30.0f));
 
