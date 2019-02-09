@@ -18,12 +18,12 @@
 #include "OpenGlUtil.h"
 
 
-static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size)
+static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size, const char* const textName = "smilli.tga")
 {
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-   	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+   	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, textName, textName, textName);
 
     dFloat mass = 1.0f;
     dMatrix matrix (dGetIdentityMatrix());
@@ -593,7 +593,7 @@ static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 	int count = 10;
 
 	for (int i = 0; i < count; i++) {
-		child = CreateBox(scene, matrix.m_posit, size);
+		child = CreateBox(scene, matrix.m_posit, size, "wood_1.tga");
 
 		NewtonBodyGetMatrix(child, &matrix[0][0]);
 		dMatrix hingeMatrix(matrix);
@@ -1376,7 +1376,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-	AddHingeMotor(scene, dVector(0.0f, 0.0f, 0.0f));
+	AddHingeMotor(scene, dVector(0.0f, 0.0f, -20.0f));
 	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 	AddSlider (scene, dVector (-20.0f, 0.0f, 7.0f));
 	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 9.0f)));
@@ -1386,8 +1386,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
-
-//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
 #endif
     // place camera into position
