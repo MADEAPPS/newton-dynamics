@@ -217,10 +217,8 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-dTrace (("%f\n", m_angularOmega));
 	}
 }
-
 
 void dCustomSlidingContact::Debug(dDebugDisplay* const debugDisplay) const
 {

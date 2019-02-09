@@ -126,21 +126,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 			count++;
 		}
 		if (count) {
-#if 0
-			dgBodyInfo* const bodyArrayPtr = &world->m_bodiesMemory[0];
-			for (dgInt32 i = count - 1; i >= 0; i --) {
-				const dgBodyCluster* const cluster = &m_clusterData[i];
-				for (dgInt32 j = 1; j < cluster->m_bodyCount; j ++) {
-					const dgBodyInfo* const bodyInfo = &bodyArrayPtr[cluster->m_bodyStart + j];
-					dgSkeletonContainer* const skeleton = bodyInfo->m_body->GetSkeleton();
-					if (skeleton) {
-						dgSwap(m_clusterData[count - 1], m_clusterData[i]);
-						count --;
-						break;
-					}
-				}
-			} 
-#endif
 			if (count) {
 				CalculateReactionForcesParallel(&m_clusterData[index], count, timestep);
 				index += count;

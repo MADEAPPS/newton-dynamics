@@ -982,7 +982,6 @@ void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matri
 	}
 }
 
-
 void SetAutoSleepMode (NewtonWorld* const world, int mode)
 {
 	mode = mode ? 0 : 1;
@@ -990,7 +989,6 @@ void SetAutoSleepMode (NewtonWorld* const world, int mode)
 		NewtonBodySetAutoSleep (body, mode);
 	}
 }
-
 
 class CollsionTreeFaceMap
 {
@@ -1283,6 +1281,7 @@ NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, con
 void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location, int shapeid)
 {
 	DemoEntity* const entity = DemoEntity::LoadNGD_mesh ("lumber.ngd", scene->GetNewton(), scene->GetShaderCache());
+
 
 	dTree<NewtonCollision*, DemoMesh*> filter;
 	NewtonWorld* const world = scene->GetNewton();
