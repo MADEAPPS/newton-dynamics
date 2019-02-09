@@ -649,15 +649,10 @@ dNodeInfo* dScene::GetInfoFromNode(dTreeNode* const node) const
 
 dNodeInfo* dScene::CloneNodeInfo(dTreeNode* const node) const
 {
-	dAssert (0);
-	return NULL;
-/*
 	dNodeInfo* const info = node->GetInfo().GetNode();
 	dNodeInfo* const clone = info->MakeCopy();
-	dAssert (clone->GetUniqueID() != info->GetUniqueID());
 	dAssert (clone->GetTypeId() == info->GetTypeId()) ;
 	return clone;
-*/
 }
 
 dScene::dTreeNode* dScene::FindTextureByTextId(dTreeNode* const parentNode, dCRCTYPE textId) const

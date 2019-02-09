@@ -85,13 +85,17 @@ void dCustomSlidingContact::EnableAngularLimits(bool state)
 	m_options.m_option2 = state;
 }
 
+void dCustomSlidingContact::SetAngularFriction(dFloat friction)
+{
+	m_angularFriction = dAbs (friction);
+}
+
 void dCustomSlidingContact::SetAsAngularSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
 	m_angularSpring = spring;
 	m_angularDamper = damper;
 	m_options.m_option3 = state;
 	m_angularSpringDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
-	
 }
 
 void dCustomSlidingContact::SetAngularLimits(dFloat minDist, dFloat maxDist)
@@ -213,6 +217,7 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 		NewtonUserJointSetRowAcceleration(m_joint, -m_angularOmega / timestep);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+dTrace (("%f\n", m_angularOmega));
 	}
 }
 

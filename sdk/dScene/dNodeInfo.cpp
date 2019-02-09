@@ -52,7 +52,6 @@ dNodeInfo::dNodeInfo(const dNodeInfo& me)
 	,m_uniqueID(me.m_uniqueID)
 	,m_editorFlags(me.m_editorFlags)
 {
-	dAssert (0);
 }
 
 dNodeInfo::~dNodeInfo(void)

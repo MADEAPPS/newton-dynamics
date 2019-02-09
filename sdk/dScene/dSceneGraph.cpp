@@ -188,8 +188,6 @@ void dSceneGraph::SetNodeInfo (dNodeInfo* const newInfo, dTreeNode* const node)
 	newInfo->AddRef();
 	dGraphNode& graphNode = node->GetInfo();
 	dNodeInfo* const oldInfo = graphNode.m_nodeInfo;
-dAssert (0);
-//	newInfo->SetUniqueID(oldInfo->GetNodeID());
 	oldInfo->Release();
 	graphNode.m_nodeInfo = newInfo;
 }

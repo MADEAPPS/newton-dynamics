@@ -51,12 +51,12 @@ static SERVO_VEHICLE_DEFINITION inverseKinematicsRidParts[] =
 	{"fl_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "frontTire"},
 	{"rr_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
 	{"rl_tire",		"tireShape",			 64.0f, SERVO_VEHICLE_DEFINITION::m_tirePart, "rearTire"},
-	{"lift_1",		"convexHull",			 50.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
-	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"lift_4",		"convexHull",			 20.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"lift_1",		"convexHull",			 50.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
+//	{"lift_2",		"convexHull",			 40.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+//	{"lift_3",		"convexHull",			 30.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+//	{"lift_4",		"convexHull",			 20.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+//	{"left_teeth",  "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"right_teeth", "convexHullAggregate",	 10.0f, SERVO_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 class dLifterUserData: public DemoEntity::UserData
@@ -155,6 +155,9 @@ class ServoInputManager: public dCustomInputManager
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
+		if (!m_player[m_currentPlayer % m_playersCount]) {
+			return ;
+		}
 		dLifterUserData::InputRecord inputs;
 		DemoEntity* const entity = (DemoEntity*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 		dLifterUserData* const lifterData = (dLifterUserData*)(entity->GetUserData());
@@ -200,6 +203,10 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
+		if (!m_player[m_currentPlayer % m_playersCount]) {
+			return;
+		}
+
 		DemoCamera* const camera = m_scene->GetCamera();
 		DemoEntity* const entity = (DemoEntity*)m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
@@ -444,11 +451,13 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 	{
 		//ServoEntityModel* const lifterData = (ServoEntityModel*)controller->GetUserData();
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
+		if (!lifterData) {
+			return;
+		}
 
+		dFloat brakeTorque = 10000.0f;
 		if (lifterData->m_engineJoint) {
 			dFloat engineRPM = 0.0f;
-			dFloat brakeTorque = 2000.0f;
-
 			if (lifterData->m_inputs.m_throttleValue > 0) {
 				brakeTorque = 0.0f;
 				engineRPM = -lifterData->m_maxEngineSpeed;
@@ -459,11 +468,12 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 			// apply DC engine torque
 			lifterData->m_engineMotor->SetSpeed(engineRPM);
+		}
 
-			// apply breaks
-			//for (int i = 0; i < lifterData->m_tractionTiresCount; i++) {
-			//	lifterData->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
-			//}
+		//apply breaks
+		if (lifterData->m_frontTiresJoints[0] && lifterData->m_frontTiresJoints[1]) {
+			lifterData->m_frontTiresJoints[0]->SetAngularFriction(brakeTorque);
+			lifterData->m_frontTiresJoints[1]->SetAngularFriction(brakeTorque);
 		}
 
 		// update steering wheels
@@ -474,6 +484,8 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			} else if (lifterData->m_inputs.m_steerValue < 0) {
 				steeringAngle = -30.0f * dDegreeToRad;
 			}
+			lifterData->m_rearTireJoints[0]->SetAngularFriction(brakeTorque);
+			lifterData->m_rearTireJoints[1]->SetAngularFriction(brakeTorque);
 			lifterData->m_rearTireJoints[0]->SetTargetSteerAngle(steeringAngle);
 			lifterData->m_rearTireJoints[1]->SetTargetSteerAngle(steeringAngle);
 		}
@@ -820,6 +832,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		// add the root bone to the articulation manager
 		dCustomTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
 
+
 		// add engine
 		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
 		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
@@ -936,11 +949,11 @@ void ServoJoints (DemoEntityManager* const scene)
 	// place heavy load to show reproduce black bird dream problems
 	matrix.m_posit.m_x += 2.0f;	
 	matrix.m_posit.m_z -= 2.0f;	
-	MakeHeavyLoad (scene, matrix);
+//	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 10.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 
 //	origin.m_x -= 5.0f;
 	origin.m_y += 2.0f;
