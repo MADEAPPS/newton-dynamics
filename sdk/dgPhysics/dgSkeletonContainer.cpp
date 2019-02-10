@@ -970,8 +970,8 @@ void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0
 {
 	const dgFloat32 sor = 1.125f;
 	const dgFloat32 tol2 = 0.25f;
-//	const dgInt32 maxIterCount = 64;
-const dgInt32 maxIterCount = 32;
+	const dgInt32 maxIterCount = 64;
+//const dgInt32 maxIterCount = 32;
 	const dgInt32 size = m_auxiliaryRowCount;
 	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
 	dgCheckAligment(invDiag1);
@@ -1043,9 +1043,9 @@ const dgInt32 maxIterCount = 32;
 		}
 	}
 
-//if (passes >= maxIterCount){
-//dgTrace(("%d %d %f\n", size, passes, dgSqrt (tolerance)));
-//}
+if (passes >= maxIterCount){
+dgTrace(("%d %d %f\n", size, passes, dgSqrt (tolerance)));
+}
 
 }
 
