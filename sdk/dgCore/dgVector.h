@@ -49,7 +49,7 @@ class dgTemplateVector
 //		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (T(0.0f))
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (ptr[3])
 	{
-		dAssert (0);
+		dgAssert (0);
 		//dgAssert (dgCheckVector ((*this)));
 	}
 
