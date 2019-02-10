@@ -1411,10 +1411,16 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
 
-	ArticulatedEntityModel robotModel(scene, "robot.ngd");
+	DemoEntity* xxxx = DemoEntity::LoadNGD_mesh ("excavator.ngd", scene->GetNewton(), scene->GetShaderCache());
+	scene->Append(xxxx);
+/*
+	ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)robotModel.CreateClone();
+	scene->Append(vehicleModel);
+
+	ArticulatedEntityModel robotModel(scene, "excavator.ngd");
 	dCustomTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
-/*
+
 	matrix.m_posit.m_z += 4.0f;
 
 	// add some object to play with
