@@ -281,7 +281,7 @@ void DemoEntity::RenderBone() const
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 
-		glColor3f(1.0f, 0.0f, 0.0f);
+		glColor3f(0.5f, 0.5f, 0.5f);
 		glBegin(GL_LINES);
 		for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
 			const dVector& posit = child->m_matrix.m_posit;

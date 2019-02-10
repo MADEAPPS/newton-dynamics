@@ -81,20 +81,38 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 
 struct dPasiveRagDollDefinition
 {
+	struct dPasiveRagDollJointLimitx
+	{
+		dFloat m_minTwistAngle;
+		dFloat m_maxTwistAngle;
+		dFloat m_coneAngle;
+	};
+
+	struct dPasiveRagDollFrameMatrix
+	{
+		dFloat m_pitch;
+		dFloat m_yaw;
+		dFloat m_roll;
+	};
+
 	char m_boneName[32];
 	char m_shapeType[32];
 	dFloat m_mass;
 	dFloat m_radius;
+	dFloat m_friction;
+	dPasiveRagDollJointLimitx m_jointLimits;
+	dPasiveRagDollFrameMatrix m_frameBasics;
 };
 
 static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
 	{ "mixamorig:Hips", "rootCapsule", 30.0f, 0.1f},
 
-	{ "mixamorig:LeftUpLeg", "capsule", 20.0f, 0.07f},
-	{ "mixamorig:LeftLeg", "capsule", 15.0f, 0.06f},
+	{ "mixamorig:LeftUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:LeftLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 
-	{ "mixamorig:RightUpLeg", "capsule", 20.0f, 0.07f},
+	{ "mixamorig:RightUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:RightLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 
 };
 
@@ -304,22 +322,31 @@ class CrashDummyManager: public dCustomTransformManager
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
-		
-//		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix (definition.m_framePitch * dDegreeToRad) * dYawMatrix (definition.m_frameYaw * dDegreeToRad) * dRollMatrix (definition.m_frameRoll * dDegreeToRad));
-		dMatrix pinAndPivotInGlobalSpace (dGetIdentityMatrix());
+	
+//		dMatrix pinAndPivotInGlobalSpace (dGetIdentityMatrix());
+//		pinAndPivotInGlobalSpace.m_front = dVector (0.0f, 0.0f, -1.0f, 0.0);
+//		pinAndPivotInGlobalSpace.m_up = dVector (-1.0f, 0.0f, 0.0f, 0.0);
+//		pinAndPivotInGlobalSpace.m_right = pinAndPivotInGlobalSpace.m_front.CrossProduct(pinAndPivotInGlobalSpace.m_up);
+//dVector xxx0;
+//dVector xxx1;
+//pinAndPivotInGlobalSpace.GetEulerAngles(xxx0, xxx1);
+
+		dPasiveRagDollDefinition::dPasiveRagDollFrameMatrix frameAngle (definition.m_frameBasics);
+		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
 //		dMatrix parentRollMatrix (dRollMatrix (definition.m_parentRollOffset * dDegreeToRad) * pinAndPivotInGlobalSpace);
 		dMatrix parentRollMatrix (dGetIdentityMatrix () * pinAndPivotInGlobalSpace);
 
+		dPasiveRagDollDefinition::dPasiveRagDollJointLimitx jointLimits (definition.m_jointLimits);
 		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, bone, parent);
 		joint->EnableCone(true);
-//		joint->SetConeFriction(definition.m_frictionTorque);
-//		joint->SetConeLimits(definition.m_coneAngle * dDegreeToRad);
+		joint->SetConeFriction(definition.m_friction);
+		joint->SetConeLimits(jointLimits.m_coneAngle * dDegreeToRad);
 
 		joint->EnableTwist(true);
-//		joint->SetTwistFriction(definition.m_frictionTorque);
-//		joint->SetTwistLimits(definition.m_minTwistAngle * dDegreeToRad, definition.m_maxTwistAngle * dDegreeToRad);
+		joint->SetTwistFriction(definition.m_friction);
+		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 	}
 
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
