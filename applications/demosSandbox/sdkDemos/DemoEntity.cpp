@@ -277,19 +277,21 @@ const dMatrix& DemoEntity::GetRenderMatrix () const
 
 void DemoEntity::RenderBone() const
 {
-	glDisable(GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
+	if (GetParent()) {
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
 
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glBegin(GL_LINES);
-	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		const dVector& posit = child->m_matrix.m_posit;
-		glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
-		glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glBegin(GL_LINES);
+		for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+			const dVector& posit = child->m_matrix.m_posit;
+			glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
+			glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
+		}
+
+		glEnd();
+		glEnable(GL_LIGHTING);
 	}
-
-	glEnd();
-	glEnable(GL_LIGHTING);
 }
 
 void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
@@ -312,7 +314,7 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 		glPopMatrix();
 	}
 
-//	RenderBone();
+	RenderBone();
 
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
 		child->Render(timestep, scene);
