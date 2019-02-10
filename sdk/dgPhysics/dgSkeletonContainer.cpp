@@ -1043,9 +1043,9 @@ void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0
 		}
 	}
 
-if (passes >= maxIterCount){
-dgTrace(("%d %d %f\n", size, passes, dgSqrt (tolerance)));
-}
+//if (passes >= maxIterCount){
+//dgTrace(("%d %d %f\n", size, passes, dgSqrt (tolerance)));
+//}
 
 }
 
