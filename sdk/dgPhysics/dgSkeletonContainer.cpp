@@ -1000,7 +1000,7 @@ void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0
 #ifdef _DEBUG 
 		passes++;
 #endif
-		dgAssert ((dgUnsigned32 (x) & 0x0f) == 0);
+		dgAssert ((dgUnsigned64 (x) & 0x0f) == 0);
 		for (dgInt32 j = 0; j < size; j++) {
 
 			const dgFloat32* const row = &matrix[base];
