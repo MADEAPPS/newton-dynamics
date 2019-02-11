@@ -69,15 +69,14 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 		NewtonBodyGetPosition(body1, &positionVector[0]);
 		bodyVectors[1] = matrix.UntransformVector(positionVector);
 
-		dVector diff = bodyVectors[1] - bodyVectors[0];
-		dFloat distance = dSqrt(diff.DotProduct3(diff));
-
+		//dVector diff = bodyVectors[1] - bodyVectors[0];
+		//dFloat distance = dSqrt(diff.DotProduct3(diff));
 		// Nominal object distance at the beginning is 35, so we will subtract that here to get to zero as a starting point.
 		//printf("Object distance: %f  local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]);
 		//dTrace(("Object distance: %f local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]));
 	}
 
-
+#ifdef _DEBUG
 	dVector posit0(0.0f);
 	dVector posit1(0.0f);
 	NewtonBodyGetPosition(body, &posit0[0]);
@@ -88,6 +87,7 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	dVector veloc;
 	NewtonBodyGetVelocity(body1, &veloc[0]);
 	dTrace(("d(%f) v(%f %f %f)\n", distance, veloc[0], veloc[1], veloc[2]));
+#endif
 
 	// Apply torque only to the Core object
 	NewtonBodyAddTorque(body, &torque.m_x);
