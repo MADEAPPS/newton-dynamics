@@ -9,8 +9,6 @@
 * freely
 */
 
-
-
 #include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
@@ -102,8 +100,6 @@ static void AddNonUniformScaledPrimitives(DemoEntityManager* const scene, dFloat
 	NewtonDestroyCollision(collision);
 }
 
-
-
 static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* const collision, DemoEntityManager* const scene, const dMatrix& location, const dVector& scale)
 {
 	// now make a scale version of the same model
@@ -112,7 +108,7 @@ static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* co
 	dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 	// since the render does no handle scale, we will made a duplicated mesh with the scale baked in
-	DemoMesh* const scaledMesh =  new DemoMesh (*mesh);
+	DemoMesh* const scaledMesh =  new DemoMesh (*mesh, scene->GetShaderCache());
 	// now scale the vertex list 
 	for (int i = 0 ; i < mesh->m_vertexCount; i ++) {
 		scaledMesh->m_vertex[i * 3 + 0] *= scale.m_x;
@@ -254,7 +250,6 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	matrix.m_posit.m_w = 1.0f;
 
 	DemoEntity* const teaPot = DemoEntity::LoadNGD_mesh("teapot.ngd", world, scene->GetShaderCache());
-	//DemoEntity* const teaPot = DemoEntity::LoadNGD_mesh("box.ngd", world);
 
 	NewtonCollision* const staticCollision = CreateCollisionTree (world, teaPot, 0, true);
 	CreateScaleStaticMesh(teaPot, staticCollision, scene, matrix, dVector(1.0f, 1.0f, 1.0f, 0.0f));

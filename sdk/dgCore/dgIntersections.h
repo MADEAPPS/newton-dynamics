@@ -374,8 +374,11 @@ class dgFastAABBInfo: public dgObb
 		pin = pin & dgVector::m_triplexMask;
 		origin = origin & dgVector::m_triplexMask;
 
+		dgVector pin1 (&vertexArray[indexArray[1] * stride]);
+		pin1 = pin1 & dgVector::m_triplexMask;
+
 		faceMatrix[0] = faceNormal;
-		faceMatrix[1] = dgVector (&vertexArray[indexArray[1] * stride]) - origin;
+		faceMatrix[1] = pin1 - origin;
 		faceMatrix[1] = faceMatrix[1].Normalize();
 		faceMatrix[2] = faceMatrix[0].CrossProduct(faceMatrix[1]);
 		faceMatrix[3] = origin | dgVector::m_wOne; 
