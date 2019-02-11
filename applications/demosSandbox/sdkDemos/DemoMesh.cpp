@@ -928,16 +928,19 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	DemoEntity* pool[32];
 	dMatrix parentMatrix[32];
 
-	dMatrix* const bindMatrix = dAlloca (dMatrix, 2048);
-	DemoEntity** const entityArray = dAlloca (DemoEntity*, 2048);
+//	dMatrix* const bindMatrix = dAlloca (dMatrix, 2048);
+//	DemoEntity** const entityArray = dAlloca (DemoEntity*, 2048);
+	dArray<dMatrix> bindMatrix(2048);
+	dArray<DemoEntity*> entityArray(2048);
 
 	pool[0] = root;
 	parentMatrix[0] = dGetIdentityMatrix();
 	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
 
 	const int boneCount = boneMap.GetCount() + 1024;
-	int* const boneClusterRemapIndex = dAlloca (int, boneCount);
-	memset (boneClusterRemapIndex, -1, boneCount * sizeof (int));
+//	int* const boneClusterRemapIndex = dAlloca (int, boneCount);
+	dArray<int> boneClusterRemapIndex (boneCount);
+	memset (&boneClusterRemapIndex[0], -1, boneCount * sizeof (int));
 	while (stack) {
 		stack--;
 		DemoEntity* const entity = pool[stack];
@@ -945,6 +948,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 
 		entityArray[entityCount] = entity;
 		bindMatrix[entityCount] = shapeBindMatrix * boneMatrix.Inverse();
+		dAssert (entityCount < 2048);
 
 		dTree<const dGeometryNodeSkinClusterInfo*, DemoEntity*>::dTreeNode* const clusterNode = nodeClusterEnumerator.Find(entity);
 		if (clusterNode) {
@@ -963,12 +967,14 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 
 	m_nodeCount = entityCount;
 	m_bindingMatrixArray = new dMatrix[m_nodeCount];
-	memcpy(m_bindingMatrixArray, bindMatrix, entityCount * sizeof (dMatrix));
+	memcpy(m_bindingMatrixArray, &bindMatrix[0], entityCount * sizeof (dMatrix));
 
-	dVector* const weight = dAlloca (dVector, m_mesh->m_vertexCount);
-	dWeightBoneIndex* const skinBone = dAlloca(dWeightBoneIndex, m_mesh->m_vertexCount);
-	memset (weight, 0, m_mesh->m_vertexCount * sizeof (dVector));
-	memset (skinBone, -1, m_mesh->m_vertexCount * sizeof (dWeightBoneIndex));
+//	dVector* const weight = dAlloca (dVector, m_mesh->m_vertexCount);
+//	dWeightBoneIndex* const skinBone = dAlloca(dWeightBoneIndex, m_mesh->m_vertexCount);
+	dArray<dVector> weight (m_mesh->m_vertexCount);
+	dArray<dWeightBoneIndex> skinBone (m_mesh->m_vertexCount);
+	memset (&weight[0], 0, m_mesh->m_vertexCount * sizeof (dVector));
+	memset (&skinBone[0], -1, m_mesh->m_vertexCount * sizeof (dWeightBoneIndex));
 
 	int vCount = 0;
 	for (iter.Begin(); iter; iter++) {
@@ -1022,9 +1028,11 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 		}
 	}
 
-	dVector* const pointWeights = dAlloca(dVector, m_mesh->m_vertexCount);
-	dWeightBoneIndex* const pointSkinBone = dAlloca(dWeightBoneIndex, m_mesh->m_vertexCount);
-	memset(pointSkinBone, 0, m_mesh->m_vertexCount * sizeof(dWeightBoneIndex));
+//	dVector* const pointWeights = dAlloca(dVector, m_mesh->m_vertexCount);
+//	dWeightBoneIndex* const pointSkinBone = dAlloca(dWeightBoneIndex, m_mesh->m_vertexCount);
+	dArray<dVector> pointWeights (m_mesh->m_vertexCount);
+	dArray<dWeightBoneIndex> pointSkinBone(m_mesh->m_vertexCount);
+	memset(&pointSkinBone[0], 0, m_mesh->m_vertexCount * sizeof(dWeightBoneIndex));
 
 	dList<int> pendingVertices;
 	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
@@ -1066,9 +1074,9 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	glUseProgram(m_shader);
 	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 
-	int count = CalculateMatrixPalette(bindMatrix);
+	int count = CalculateMatrixPalette(&bindMatrix[0]);
 	GLfloat* const glMatrixPallete = dAlloca (GLfloat, 16 * count);
-	ConvertToGlMatrix(count, bindMatrix, glMatrixPallete);
+	ConvertToGlMatrix(count, &bindMatrix[0], glMatrixPallete);
 
 //int xxx0;
 //int xxx1;
@@ -1082,7 +1090,7 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	glNewList(m_mesh->m_optimizedOpaqueDiplayList, GL_COMPILE);
 	for (DemoMesh::dListNode* node = m_mesh->GetFirst(); node; node = node->GetNext()) {
 		const DemoSubMesh& segment = node->GetInfo();
-		OptimizeForRender(segment, pointWeights, pointSkinBone);
+		OptimizeForRender(segment, &pointWeights[0], &pointSkinBone[0]);
 	}
 	glEndList();
 }
