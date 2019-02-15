@@ -41,7 +41,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// box stacks
+#define DEFAULT_SCENE	8			// box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -66,7 +66,7 @@
 //#define DEFAULT_SCENE	30			// articulated joints
 //#define DEFAULT_SCENE	31			// six axis manipulator
 //#define DEFAULT_SCENE	32			// hexapod Robot
-#define DEFAULT_SCENE	33			// basic rag doll
+//#define DEFAULT_SCENE	33			// basic rag doll
 //#define DEFAULT_SCENE	34			// dynamic rag doll
 //#define DEFAULT_SCENE	35			// basic Car
 //#define DEFAULT_SCENE	36			// single body vehicle
@@ -349,7 +349,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 
@@ -585,10 +585,19 @@ void DemoEntityManager::Cleanup ()
 			break;
 		}
 	}
+
 #ifdef _DEBUG
-	strcat(plugInPath, "/newtonPlugins/debug");
+	#ifdef _NEWTON_USE_DOUBLE
+		strcat(plugInPath, "/newtonPlugins/debug_double");
+	#else
+		strcat(plugInPath, "/newtonPlugins/debug");
+	#endif
 #else
-	strcat(plugInPath, "/newtonPlugins/release");
+	#ifdef _NEWTON_USE_DOUBLE
+		strcat(plugInPath, "/newtonPlugins/release_double");
+	#else
+		strcat(plugInPath, "/newtonPlugins/release");
+	#endif
 #endif
 	NewtonLoadPlugins(m_world, plugInPath);
 

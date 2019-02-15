@@ -1091,7 +1091,8 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 	dgAssert (face->m_incidentFace > 0);
 
 	dgBigVector normalAverage (FaceNormal (face, pool, strideInBytes));
-	dgFloat64 dot = normalAverage.DotProduct3(normalAverage);
+	dgAssert (normalAverage.m_w == dgFloat32 (0.0f));
+	dgFloat64 dot = normalAverage.DotProduct(normalAverage).GetScalar();
 	if (dot > dgFloat64 (1.0e-12f)) {
 		dgInt32 testPointsCount = 1;
 		dot = dgFloat64 (1.0f) / sqrt (dot);
@@ -1802,7 +1803,7 @@ dgBigPlane dgPolyhedra::EdgePlane (dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgB
 	const dgBigVector& p2 = pool[i2];
 
 	dgBigPlane plane (p0, p1, p2);
-	dgFloat64 mag = sqrt (plane.DotProduct3(plane));
+	dgFloat64 mag = sqrt (plane.DotProduct(plane & dgBigPlane::m_triplexMask).GetScalar());
 	if (mag < dgFloat64 (1.0e-12f)) {
 		mag = dgFloat64 (1.0e-12f);
 	}

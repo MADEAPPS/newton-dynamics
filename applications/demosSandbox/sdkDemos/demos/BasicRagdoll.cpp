@@ -477,7 +477,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dCustomTransformController::dSkeletonBone* const rootBone = ragdoll->GetRoot ();
 	dMatrix rootMatrix; 
 	NewtonBodyGetMatrix(rootBone->m_body, &rootMatrix[0][0]);
-	new dCustom6dof (rootMatrix, rootBone->m_body);
+//	new dCustom6dof (rootMatrix, rootBone->m_body);
 
 	int count = 3;
 	for (int x = 0; x < count; x ++) {
