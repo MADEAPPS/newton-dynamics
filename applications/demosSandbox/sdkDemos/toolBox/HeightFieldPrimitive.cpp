@@ -321,7 +321,6 @@ freq *= 0.5f;
 		memset (attibutes, 0, width * height * sizeof (char));
 		NewtonCollision* collision = NewtonCreateHeightFieldCollision (scene->GetNewton(), width, height, 1, 0, elevation, attibutes, 1.0f, cellSize, cellSize, 0);
 
-
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
 		NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
 #endif
@@ -353,8 +352,6 @@ freq *= 0.5f;
 
 		// in newton 300 collision are instance, you need to ready it after you create a body, if you want to male call on the instance
 		collision = NewtonBodyGetCollision(terrainBody);
-
-
 #if 0
 		// uncomment this to test horizontal displacement
 		unsigned short* const horizontalDisplacemnet = new unsigned short[size * size];
