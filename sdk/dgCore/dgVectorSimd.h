@@ -541,7 +541,8 @@ class dgBigVector
 
 	DG_INLINE dgFloat64 GetScalar() const
 	{
-		return m_x;
+		//return m_x;
+		return _mm_cvtsd_f64(m_typeLow);
 	}
 
 	DG_INLINE dgBigVector operator+ (const dgBigVector& A) const
