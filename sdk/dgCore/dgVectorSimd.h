@@ -788,8 +788,6 @@ class dgBigVector
 	// return dot 4d dot product
 	DG_INLINE dgBigVector DotProduct(const dgBigVector &A) const
 	{
-//		dgFloat64 val(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
-//		return dgBigVector(val, val, val, val);
 		return (*this * A).AddHorizontal();
 	}
 
