@@ -1042,7 +1042,6 @@ static int xxxx;
 //		dgTrace(("%d %d %f\n", size, passes, dgSqrt (tolerance)));
 //	}
 #endif
-
 tolerance = 0;
 	if (tolerance > tol2) {
 		dgFloat32* const r0 = dgAlloca(dgFloat32, size);
@@ -1148,13 +1147,14 @@ tolerance = 0;
 			numScalar = num1Scalar;
 		}
 	}
-
-//dgTrace(("%d ", xxxx));
-//for (dgInt32 i = 0; i < size; i++) {
-//dgTrace(("%f ", x[i]));
-//}
-//dgTrace(("\n"));
-//xxxx++;
+/*
+dgTrace(("%d ", xxxx));
+for (dgInt32 i = 0; i < size; i++) {
+dgTrace(("%f ", x[i]));
+}
+dgTrace(("\n"));
+*/
+xxxx++;
 }
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const
