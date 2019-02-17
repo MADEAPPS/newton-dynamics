@@ -970,8 +970,8 @@ void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0
 {
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
-//	const dgInt32 maxIterCount = 64;
-const dgInt32 maxIterCount = 16;
+	const dgInt32 maxIterCount = 64;
+//const dgInt32 maxIterCount = 0;
 //	const dgInt32 size = m_auxiliaryRowCount;
 	dgInt32 size = m_auxiliaryRowCount;
 
@@ -993,12 +993,17 @@ const dgInt32 maxIterCount = 16;
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 	const dgFloat32* const invDiag = invDiag1;
 
+#ifdef _DEBUG 
 	dgInt32 passes = 0;
+#endif
+
 	const dgInt32 size1 = size - 8;
 	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+#ifdef _DEBUG 
+		passes++;
+#endif
 		dgInt32 base = 0;
 		tolerance = dgFloat32(0.0f);
-		passes++;
 		dgAssert ((dgUnsigned64 (x) & 0x0f) == 0);
 		for (dgInt32 j = 0; j < size; j++) {
 			const dgFloat32* const row = &matrix[base];
@@ -1039,28 +1044,97 @@ const dgInt32 maxIterCount = 16;
 	}
 #endif
 
-	if (passes >= maxIterCount) {
+	if (tolerance > tol2) {
 /*
 		dgFloat32* const r0 = dgAlloca(dgFloat32, size);
 		dgFloat32* const z0 = dgAlloca(dgFloat32, size);
+		dgFloat32* const p0 = dgAlloca(dgFloat32, size);
+		dgFloat32* const q0 = dgAlloca(dgFloat32, size);
+		dgFloat32* const mask = dgAlloca(dgFloat32, size);
+
+		for (dgInt32 j = 0; j < size; j++) {
+			const dgFloat32 f = x[j];
+			const int index = normalIndex[j];
+			const dgFloat32 coefficient = index ? x[j + index] : 1.0f;
+			const dgFloat32 l = low[j] * coefficient;
+			const dgFloat32 h = high[j] * coefficient;
+			mask[j] = (f > h) ? 0.0f : ((f < l) ? dgFloat32 (0.0f) : dgFloat32 (1.0f));
+		}
 
 		dgInt32 base = 0;
 		for (dgInt32 j = 0; j < size; j++) {
+			dgFloat32 acc = b[j];
 			const dgFloat32* const row = &matrix[base];
-			dgVector acc(dgVector::m_zero);
-			if (size >= 8) {
-				const dgInt32 size1 = size - 8;
-				for (dgInt32 i = 0; i < size1; i += 8) {
+			for (dgInt32 i = 0; i < size; i ++) {
+				acc -= row[i] * x[i] * mask[i];
+			}
+			r0[j] = acc;
+			z0[j] = invDiag[j] * acc * mask[j];
+			p0[j] = z0[j];
+			base += size;
+		}
+
+		tolerance = dgFloat32 (10.0f);
+		for (dgInt32 m = 0; (m < 32) && (tolerance > tol2); m++) {
+			base = 0;
+			tolerance = dgFloat32(0.0f);
+			for (dgInt32 j = 0; j < size; j++) {
+				dgVector acc(dgVector::m_zero);
+				const dgFloat32* const row = &matrix[base];
+				for (dgInt32 k = 0; k <= size1; k += 8) {
 					dgVector tmp0(&row[k]);
 					dgVector tmp1(&row[k + 4]);
-					acc = acc + tmp0 * (dgVector&)x[k] + tmp1 * (dgVector&)x[k + 4];
+					const dgVector& p00 = (dgVector&)p0[k];
+					const dgVector& p01 = (dgVector&)p0[k + 4];
+					acc = acc + tmp0 * p00 + tmp1 * p01;
+				}
+				dgFloat32 accScalar = acc.AddHorizontal().GetScalar();
+				for (dgInt32 k = size & (-8); k < size; k++) {
+					accScalar = accScalar + p0[k] * row[k];
+				}
+				q0[j] = accScalar;
+				base += size;
+			}
+
+			dgVector num(dgVector::m_zero);
+			dgVector den(dgVector::m_zero);
+			for (dgInt32 k = 0; k <= size1; k += 8) {
+				const dgVector& r00 = (dgVector&)r0[k];
+				const dgVector& r01 = (dgVector&)r0[k + 4];
+				const dgVector& z00 = (dgVector&)z0[k];
+				const dgVector& z01 = (dgVector&)z0[k + 4];
+				num = num + r00 * z00 + r01 * z01;
+
+				const dgVector& p00 = (dgVector&)p0[k];
+				const dgVector& p01 = (dgVector&)p0[k + 4];
+				const dgVector& q00 = (dgVector&)q0[k];
+				const dgVector& q01 = (dgVector&)q0[k + 4];
+				den = den + p00 * q00 + p01 * q01;
+			}
+			dgFloat32 numScalar = num.AddHorizontal().GetScalar();
+			dgFloat32 denScalar = den.AddHorizontal().GetScalar();
+			for (dgInt32 k = size & (-8); k < size; k++) {
+				denScalar = denScalar + p0[k] * q0[k];
+				numScalar = numScalar + r0[k] * z0[k];
+			}
+			dgAssert(denScalar > dgFloat32(0.0f));
+			dgFloat32 alpha = numScalar / denScalar;
+
+			for (dgInt32 j = 0; j < size; j++) {
+				if (mask[j]) {
+					dgFloat32 f = x[j] + alpha * p0[j];
 				}
 			}
 
+			for (dgInt32 j = 0; j < size; j++) {
+				x[j] = x[j] + alpha * p0[j];
+				r0[j] = r0[j] - alpha * q0[j];
+				z0[j] = invDiag[j] * r0[j] * mask[j];
+				tolerance += r0[j] * r0[j] * mask[j];
+			}
 		}
 */
 	}
-
 }
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const
