@@ -52,7 +52,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	{
 		public:
 		TransparentHeap()
-			:dUpHeap <TransparentMesh, dFloat>(256)
+			:dUpHeap <TransparentMesh, dFloat>(2048)
 		{
 		}
 	};
