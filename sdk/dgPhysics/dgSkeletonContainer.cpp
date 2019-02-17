@@ -966,20 +966,17 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 	accel[m_nodeCount - 1].m_joint = zero;
 }
 
-void dgSkeletonContainer::SolveLcp(dgFloat32* const x, const dgFloat32* const x0, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
+void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, dgFloat32* const x, const dgFloat32* const x0, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
 	const dgInt32 maxIterCount = 64;
 //const dgInt32 maxIterCount = 0;
-//	const dgInt32 size = m_auxiliaryRowCount;
-	dgInt32 size = m_auxiliaryRowCount;
 
 	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
-	dgCheckAligment(invDiag1);
+	dgCheckAligment16(invDiag1);
 
 	dgInt32 stride = 0;
-	const dgFloat32* const matrix = m_massMatrix11; 
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
 		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]): 1.0f;
@@ -1246,8 +1243,34 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		}
 		b[i] -= r;
 	}
-	SolveLcp(u, u0, b, low, high, normalIndex);
 
+/*
+const dgInt32 xxxx = 2;
+dgFloat32 uu[xxxx];
+dgFloat32 uu0[xxxx];
+dgFloat32 bb[xxxx];
+dgFloat32 low_[xxxx];
+dgFloat32 high_[xxxx];
+dgInt32 normalIndex_[xxxx];
+dgFloat32 matrix[xxxx][xxxx];
+uu0[0] = 0.0f;
+uu0[1] = 0.0f;
+bb[0] = 2.0f;
+bb[1] = 2.0f;
+low_[0] = -1.e10f;
+low_[1] = -1.e10f;
+high_[0] = 1.e10f;
+high_[1] = 1.e10f;
+matrix[0][0] = 2.0f;
+matrix[0][1] = 1.0f;
+matrix[1][0] = 1.0f;
+matrix[1][1] = 2.0f;
+normalIndex_[0] = 0;
+normalIndex_[0] = 0;
+SolveLcp(xxxx, &matrix[0][0], uu, uu0, bb, low_, high_, normalIndex);
+*/
+
+	SolveLcp(m_auxiliaryRowCount, m_massMatrix11, u, u0, b, low, high, normalIndex);
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
 		f[primaryCount + i] = s;
