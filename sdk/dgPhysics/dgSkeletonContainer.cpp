@@ -966,8 +966,9 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 	accel[m_nodeCount - 1].m_joint = zero;
 }
 
-void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
+void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
+static int xxxx;
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
 	const dgInt32 maxIterCount = 64;
@@ -979,17 +980,16 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
-		const dgFloat32 coefficient = index ? x[i + index]: 1.0f;
+		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]): 1.0f;
 		const dgFloat32 l = low[i] * coefficient;
 		const dgFloat32 h = high[i] * coefficient;
-		x[i] = dgClamp(x[i], l, h);
+		x[i] = dgClamp(x0[i], l, h) - x0[i];
 		invDiag1[i] = dgFloat32(1.0f) / matrix[stride + i];
 		stride += size;
 	}
 
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 	const dgFloat32* const invDiag = invDiag1;
-
 #ifdef _DEBUG 
 	dgInt32 passes = 0;
 #endif
@@ -1007,9 +1007,9 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			for (dgInt32 j = 0; j <= size1; j += 8) {
 				dgVector tmp0 (&row[j]);
 				dgVector tmp1 (&row[j + 4]);
-				const dgVector& x0 = (dgVector&)x[j];
-				const dgVector& x1 = (dgVector&)x[j + 4];
-				acc = acc + tmp0 * x0 + tmp1 * x1;
+				const dgVector& x00 = (dgVector&)x[j];
+				const dgVector& x01 = (dgVector&)x[j + 4];
+				acc = acc + tmp0 * x00 + tmp1 * x01;
 			}
 			dgFloat32 r = b[i] - acc.AddHorizontal().GetScalar();
 			for (dgInt32 j = size & (-8); j < size; j ++) {
@@ -1017,10 +1017,10 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			}
 			
 			dgFloat32 f = (r + row[i] * x[i]) * invDiag[i];
-			f = x[i] + (f - x[i]) * sor;
+			f = x[i] + (f - x[i]) * sor + x0[i];
 
 			const int index = normalIndex[i];
-			const dgFloat32 coefficient = index ? x[i + index]: 1.0f;
+			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]): 1.0f;
 			const dgFloat32 l = low[i] * coefficient;
 			const dgFloat32 h = high[i] * coefficient;
 
@@ -1032,14 +1032,15 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 				x[i] = f;
 				tolerance += r * r;
 			}
+			x[i] -= x0[i];
 			base += size;
 		}
 	}
 
 #ifdef _DEBUG 
-	if (passes >= maxIterCount){
+//	if (passes >= maxIterCount){
 //		dgTrace(("%d %d %f\n", size, passes, dgSqrt (tolerance)));
-	}
+//	}
 #endif
 
 tolerance = 0;
@@ -1147,6 +1148,13 @@ tolerance = 0;
 			numScalar = num1Scalar;
 		}
 	}
+
+//dgTrace(("%d ", xxxx));
+//for (dgInt32 i = 0; i < size; i++) {
+//dgTrace(("%f ", x[i]));
+//}
+//dgTrace(("\n"));
+//xxxx++;
 }
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const
@@ -1154,16 +1162,10 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
 	dgFloat32* const u = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);
-//	dgFloat32* const u0 = dgAlloca(dgFloat32, m_auxiliaryRowCount);
+	dgFloat32* const u0 = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const low = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const high = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgInt32* const normalIndex = dgAlloca(dgInt32, m_auxiliaryRowCount);
-	dgCheckAligment16(f);
-	dgCheckAligment16(u);
-	dgCheckAligment16(b);
-	dgCheckAligment16(low);
-	dgCheckAligment16(high);
-	dgCheckAligment16(normalIndex);
 
 	dgInt32 primaryIndex = 0;
 	dgInt32 auxiliaryIndex = 0;
@@ -1191,7 +1193,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			b[auxiliaryIndex] = -dgFloat32(accelSpatial[primaryDof + j]);
 
 			normalIndex[auxiliaryIndex] = 0;
-			u[auxiliaryIndex] = rhs->m_force;
+			u0[auxiliaryIndex] = rhs->m_force;
 			low[auxiliaryIndex] = rhs->m_lowerBoundFrictionCoefficent;
 			high[auxiliaryIndex] = rhs->m_upperBoundFrictionCoefficent;
 			auxiliaryIndex++;
@@ -1218,7 +1220,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			b[auxiliaryIndex] = rhs->m_coordenateAccel - acc.AddHorizontal().GetScalar();
 			
 			normalIndex[auxiliaryIndex] = 0;
-			u[auxiliaryIndex] = rhs->m_force;
+			u0[auxiliaryIndex] = rhs->m_force;
 			low[auxiliaryIndex] = rhs->m_lowerBoundFrictionCoefficent;
 			high[auxiliaryIndex] = rhs->m_upperBoundFrictionCoefficent;
 			auxiliaryIndex++;
@@ -1249,7 +1251,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			dgAssert(rhs->m_normalForceIndex <= auxiliaryDof);
 
 			normalIndex[auxiliaryIndex] = (rhs->m_normalForceIndex < 0) ? 0 : rhs->m_normalForceIndex - i;
-			u[auxiliaryIndex] = rhs->m_force;
+			u0[auxiliaryIndex] = rhs->m_force;
 			low[auxiliaryIndex] = rhs->m_lowerBoundFrictionCoefficent;
 			high[auxiliaryIndex] = rhs->m_upperBoundFrictionCoefficent;
 			auxiliaryIndex++;
@@ -1264,33 +1266,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		}
 		b[i] -= r;
 	}
+	SolveLcp(m_auxiliaryRowCount, m_massMatrix11, u0, u, b, low, high, normalIndex);
 
-
-const dgInt32 xxxx = 2;
-dgFloat32 uu[xxxx];
-dgFloat32 bb[xxxx];
-dgFloat32 low_[xxxx];
-dgFloat32 high_[xxxx];
-dgInt32 normalIndex_[xxxx];
-dgFloat32 matrix[xxxx][xxxx];
-uu[0] = 0.0f;
-uu[1] = 0.0f;
-bb[0] = 2.0f;
-bb[1] = 2.0f;
-low_[0] = -1.e10f;
-low_[1] = -1.e10f;
-high_[0] = 1.e10f;
-high_[1] = 1.e10f;
-matrix[0][0] = 2.0f;
-matrix[0][1] = 1.0f;
-matrix[1][0] = 1.0f;
-matrix[1][1] = 2.0f;
-normalIndex_[0] = 0;
-normalIndex_[0] = 0;
-//SolveLcp(xxxx, &matrix[0][0], uu, bb, low_, high_, normalIndex);
-
-
-	SolveLcp(m_auxiliaryRowCount, m_massMatrix11, u, b, low, high, normalIndex);
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
 		f[primaryCount + i] = s;
