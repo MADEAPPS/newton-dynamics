@@ -471,7 +471,7 @@ static void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 
 static void AddHingeMotor(DemoEntityManager* const scene, const dVector& origin)
 {
-	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 4.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
+	NewtonBody* parent = CreateBox(scene, origin + dVector(-0.8f, 6.0f, 0.0f, 0.0f), dVector(0.2f, 0.2f, 0.2f));
 	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	dMatrix matrix;
