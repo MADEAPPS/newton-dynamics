@@ -61,7 +61,7 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-#define DEFAULT_SCENE	28          // standard joints
+//#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// servo joints
 //#define DEFAULT_SCENE	30			// articulated joints
 //#define DEFAULT_SCENE	31			// six axis manipulator
@@ -73,7 +73,7 @@
 //#define DEFAULT_SCENE	37			// David Gravel multi body car
 //#define DEFAULT_SCENE	38			// super Car
 //#define DEFAULT_SCENE	39			// heavy vehicles
-//#define DEFAULT_SCENE	40			// basic player controller
+#define DEFAULT_SCENE	40			// basic player controller
 //#define DEFAULT_SCENE	41			// animated player controller
 //#define DEFAULT_SCENE	42			// advanced player controller
 //#define DEFAULT_SCENE	43			// cloth patch			

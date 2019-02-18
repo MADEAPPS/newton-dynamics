@@ -33,6 +33,7 @@ class BasicPlayerEntity: public DemoEntity
 		InputRecord()
 		{
 			memset (this, 0, sizeof (InputRecord));
+			m_cameraMode = 1;
 		}
 		
 		dFloat m_headinAngle;
@@ -147,8 +148,6 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	}
 };
 
-
-
 // we recommend using and input manage to control input for all games
 class BasicPlayerInputManager: public dCustomInputManager
 {
@@ -197,7 +196,7 @@ class BasicPlayerInputManager: public dCustomInputManager
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
 	{
-		dAssert(0);
+//		dAssert(0);
 		/*
 		BasicPlayerEntity::InputRecord inputs;
 
@@ -319,9 +318,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "playground.ngd", true);
-	CreateLevelMesh (scene, "castle.ngd", true);
+	//CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
@@ -352,7 +351,8 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	location.m_posit.m_x += 5.0f;
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
-	int count = 1;
+
+	int count = 0;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
