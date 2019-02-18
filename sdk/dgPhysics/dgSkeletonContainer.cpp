@@ -1020,8 +1020,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 
 			if (f > h) {
 				x[i] = h;
-			}
-			else if (f < l) {
+			} else if (f < l) {
 				x[i] = l;
 			} else {
 				x[i] = f;
