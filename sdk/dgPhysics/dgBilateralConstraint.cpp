@@ -312,7 +312,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 #ifdef _DEBUG
 		dgVector accel(omega0 * omega0.CrossProduct(jacobian0.m_angular) + omega1 * omega1.CrossProduct(jacobian1.m_angular));
 		dgFloat32 relCentr = -accel.AddHorizontal().GetScalar();
-		dgAssert (dgAbs(relCentr) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbs(relCentr) < dgFloat32 (1.0e-1f));
 #endif
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
