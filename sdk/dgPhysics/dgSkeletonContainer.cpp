@@ -981,9 +981,9 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
 		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
-		const dgFloat32 l = low[i] * coefficient;
-		const dgFloat32 h = high[i] * coefficient;
-		x[i] = dgClamp(x0[i], l, h) - x0[i];
+		const dgFloat32 l = low[i] * coefficient - x0[i];
+		const dgFloat32 h = high[i] * coefficient - x0[i];;
+		x[i] = dgClamp(dgFloat32 (0.0f), l, h);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[stride + i];
 		stride += size;
 	}
@@ -991,8 +991,10 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 	const dgFloat32* const invDiag = invDiag1;
 
+	dgInt32 iterCount = 0;
 	const dgInt32 size1 = size - 8;
 	for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
+		iterCount++;
 		dgInt32 base = 0;
 		tolerance = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < size; i++) {
@@ -1010,14 +1012,14 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 				r -= row[j] * x[j];
 			}
 
-			dgFloat32 f = (r + row[i] * x[i]) * invDiag[i];
-			f = x[i] + (f - x[i]) * sor + x0[i];
-
 			const int index = normalIndex[i];
 			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
-			const dgFloat32 l = low[i] * coefficient;
-			const dgFloat32 h = high[i] * coefficient;
+			const dgFloat32 l = low[i] * coefficient - x0[i];
+			const dgFloat32 h = high[i] * coefficient - x0[i];
 
+			//dgFloat32 f = (r + row[i] * x[i]) * invDiag[i];
+			//f = x[i] + (f - x[i]) * sor;
+			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
 			if (f > h) {
 				x[i] = h;
 			} else if (f < l) {
@@ -1026,10 +1028,11 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 				x[i] = f;
 				tolerance += r * r;
 			}
-			x[i] -= x0[i];
 			base += size;
 		}
 	}
+
+//dgTrace(("%d %f\n", iterCount, dgSqrt(tolerance)));
 }
 
 #else
@@ -1047,9 +1050,9 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
 		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]): 1.0f;
-		const dgFloat32 l = low[i] * coefficient;
-		const dgFloat32 h = high[i] * coefficient;
-		x[i] = dgClamp(x0[i], l, h) - x0[i];
+		const dgFloat32 l = low[i] * coefficient - x0[i];
+		const dgFloat32 h = high[i] * coefficient - x0[i];
+		x[i] = dgClamp(dgFloat32(0.0f), l, h);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[stride + i];
 		stride += size;
 	}
@@ -1057,8 +1060,10 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 	const dgFloat32* const invDiag = invDiag1;
 
+	dgInt32 iterCount = 0;
 	const dgInt32 size1 = size - 8;
 	for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
+		iterCount++;
 		dgInt32 base = 0;
 		tolerance = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < size; i++) {
@@ -1076,14 +1081,14 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 				r -= row[j] * x[j];
 			}
 			
-			dgFloat32 f = (r + row[i] * x[i]) * invDiag[i];
-			f = x[i] + (f - x[i]) * sor + x0[i];
-
 			const int index = normalIndex[i];
 			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]): 1.0f;
-			const dgFloat32 l = low[i] * coefficient;
-			const dgFloat32 h = high[i] * coefficient;
+			const dgFloat32 l = low[i] * coefficient - x0[i];
+			const dgFloat32 h = high[i] * coefficient - x0[i];
 
+			//dgFloat32 f = (r + row[i] * x[i]) * invDiag[i];
+			//f = x[i] + (f - x[i]) * sor;
+			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
 			if (f > h) {
 				x[i] = h;
 			} else if (f < l) {
@@ -1092,11 +1097,11 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 				x[i] = f;
 				tolerance += r * r;
 			}
-			x[i] -= x0[i];
 			base += size;
 		}
 	}
 
+//tolerance = 0;
 	if (tolerance > tol2) {
 		dgFloat32* const r0 = dgAlloca(dgFloat32, size);
 		dgFloat32* const z0 = dgAlloca(dgFloat32, size);
@@ -1113,8 +1118,8 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			const dgFloat32 f = x[i];
 			const int index = normalIndex[i];
 			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
-			const dgFloat32 l = low[i] * coefficient;
-			const dgFloat32 h = high[i] * coefficient;
+			const dgFloat32 l = low[i] * coefficient - x0[i];
+			const dgFloat32 h = high[i] * coefficient - x0[i];
 
 			mask[i] = (f > h) ? 0.0f : ((f < l) ? dgFloat32 (0.0f) : dgFloat32 (1.0f));
 			r0[i] = dgFloat32 (0.0f);
@@ -1141,6 +1146,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 		dgAssert(numScalar >= dgFloat32(0.0f));
 
 		for (dgInt32 k = 0; (k < 32) && (numScalar > tol2); k++) {
+			iterCount++;
 			base = 0;
 			for (dgInt32 i = 0; i < size; i++) {
 				dgVector acc(dgVector::m_zero);
@@ -1180,18 +1186,18 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 				if (mask[i]) {
 					const int index = normalIndex[i];
 					const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
-					const dgFloat32 l = low[i] * coefficient;
-					const dgFloat32 h = high[i] * coefficient;
+					const dgFloat32 l = low[i] * coefficient - x0[i];
+					const dgFloat32 h = high[i] * coefficient - x0[i];
 
-					dgFloat32 f = x[i] + alpha * p0[i] + x0[i];
+					dgFloat32 f = x[i] + alpha * p0[i];
 					if (f < l) {
 						dgAssert (dgAbs (p0[i]) > dgFloat32 (1e-6f));
 						campIndex = i;
-						alpha = (l - x[i] - x0[i]) / p0[i];
+						alpha = (l - x[i]) / p0[i];
 					} else if (f > h) {
 						dgAssert (dgAbs (p0[i]) > dgFloat32 (1e-6f));
 						campIndex = i;
-						alpha = (h - x[i] - x0[i]) / p0[i];
+						alpha = (h - x[i]) / p0[i];
 					}
 				}
 			}
@@ -1248,7 +1254,9 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 				numScalar = num1Scalar;
 			}
 		}
+		tolerance = numScalar;
 	}
+dgTrace(("%d %f\n", iterCount, dgSqrt(tolerance)));
 }
 #endif
 
