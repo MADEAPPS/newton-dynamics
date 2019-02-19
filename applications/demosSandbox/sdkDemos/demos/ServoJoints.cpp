@@ -949,19 +949,16 @@ void ServoJoints (DemoEntityManager* const scene)
 	// place heavy load to show reproduce black bird dream problems
 	matrix.m_posit.m_x += 2.0f;	
 	matrix.m_posit.m_z -= 2.0f;	
-	MakeHeavyLoad (scene, matrix);
+//	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
 	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-
 	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-
 	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-
-
+	
 //	origin.m_x -= 5.0f;
 	origin.m_y += 2.0f;
 	origin.m_z -= 4.0f;

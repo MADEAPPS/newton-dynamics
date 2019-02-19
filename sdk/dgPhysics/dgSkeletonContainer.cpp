@@ -966,10 +966,12 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 	accel[m_nodeCount - 1].m_joint = zero;
 }
 
-#if 1
 // Old solver more stable but less accurate and slower
 void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
+//dgFloat32* const xxxxx = dgAlloca(dgFloat32, size);
+//SolveLcp_new(size, matrix, x0, xxxxx, b, low, high, normalIndex);
+
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
 	const dgInt32 maxIterCount = 64;
@@ -1017,8 +1019,6 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			const dgFloat32 l = low[i] * coefficient - x0[i];
 			const dgFloat32 h = high[i] * coefficient - x0[i];
 
-			//dgFloat32 f = (r + row[i] * x[i]) * invDiag[i];
-			//f = x[i] + (f - x[i]) * sor;
 			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
 			if (f > h) {
 				x[i] = h;
@@ -1031,19 +1031,31 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			base += size;
 		}
 	}
-
+/*
 //dgTrace(("%d %f\n", iterCount, dgSqrt(tolerance)));
+static int xxxxxxx;
+dgTrace(("%d\n", xxxxxxx++));
+for (dgInt32 i = 0; i < size; i++) {
+dgTrace(("%f ", xxxxx[i]));
+}
+dgTrace(("\n"));
+for (dgInt32 i = 0; i < size; i++) {
+	dgTrace(("%f ", x[i]));
+}
+dgTrace(("\n"));
+*/
 }
 
-#else
 // New solver faster more accurate but less stable, needs more testing
-void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
+void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
+	const dgInt32 maxIterCount = 8;
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
-	const dgInt32 maxIterCount = 8;
 
+	dgFloat32* const mask = dgAlloca(dgFloat32, size);
 	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
+	dgCheckAligment16(mask);
 	dgCheckAligment16(invDiag1);
 
 	dgInt32 stride = 0;
@@ -1053,6 +1065,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 		const dgFloat32 l = low[i] * coefficient - x0[i];
 		const dgFloat32 h = high[i] * coefficient - x0[i];
 		x[i] = dgClamp(dgFloat32(0.0f), l, h);
+		mask[i] = dgFloat32 (1.0f);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[stride + i];
 		stride += size;
 	}
@@ -1091,11 +1104,14 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
 			if (f > h) {
 				x[i] = h;
+				mask[i] = dgFloat32 (0.0f);
 			} else if (f < l) {
 				x[i] = l;
+				mask[i] = dgFloat32 (0.0f);
 			} else {
 				x[i] = f;
 				tolerance += r * r;
+				mask[i] = dgFloat32 (1.0f);
 			}
 			base += size;
 		}
@@ -1107,25 +1123,15 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 		dgFloat32* const z0 = dgAlloca(dgFloat32, size);
 		dgFloat32* const p0 = dgAlloca(dgFloat32, size);
 		dgFloat32* const q0 = dgAlloca(dgFloat32, size);
-		dgFloat32* const mask = dgAlloca(dgFloat32, size);
 		dgCheckAligment16(r0);
 		dgCheckAligment16(z0);
 		dgCheckAligment16(p0);
 		dgCheckAligment16(q0);
-		dgCheckAligment16(mask);
 
-		for (dgInt32 i = 0; i < size; i++) {
-			const dgFloat32 f = x[i];
-			const int index = normalIndex[i];
-			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
-			const dgFloat32 l = low[i] * coefficient - x0[i];
-			const dgFloat32 h = high[i] * coefficient - x0[i];
-
-			mask[i] = (f > h) ? 0.0f : ((f < l) ? dgFloat32 (0.0f) : dgFloat32 (1.0f));
-			r0[i] = dgFloat32 (0.0f);
-			z0[i] = dgFloat32 (0.0f);
-			p0[i] = dgFloat32 (0.0f);
-		}
+		memset (r0, 0, size * sizeof (dgFloat32));
+		memset (z0, 0, size * sizeof (dgFloat32));
+		memset (p0, 0, size * sizeof (dgFloat32));
+		memset (q0, 0, size * sizeof (dgFloat32));
 
 		dgInt32 base = 0;
 		dgFloat32 numScalar = dgFloat32(0.0f);
@@ -1149,20 +1155,22 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			iterCount++;
 			base = 0;
 			for (dgInt32 i = 0; i < size; i++) {
-				dgVector acc(dgVector::m_zero);
-				const dgFloat32* const row = &matrix[base];
-				for (dgInt32 j = 0; j <= size1; j += 8) {
-					dgVector tmp0(&row[j]);
-					dgVector tmp1(&row[j + 4]);
-					const dgVector& p00 = (dgVector&)p0[j];
-					const dgVector& p01 = (dgVector&)p0[j + 4];
-					acc = acc + tmp0 * p00 + tmp1 * p01;
+				if (mask[i]) { 
+					dgVector acc(dgVector::m_zero);
+					const dgFloat32* const row = &matrix[base];
+					for (dgInt32 j = 0; j <= size1; j += 8) {
+						dgVector tmp0(&row[j]);
+						dgVector tmp1(&row[j + 4]);
+						const dgVector& p00 = (dgVector&)p0[j];
+						const dgVector& p01 = (dgVector&)p0[j + 4];
+						acc = acc + tmp0 * p00 + tmp1 * p01;
+					}
+					dgFloat32 accScalar = acc.AddHorizontal().GetScalar();
+					for (dgInt32 j = size & (-8); j < size; j++) {
+						accScalar = accScalar + p0[j] * row[j];
+					}
+					q0[i] = accScalar;
 				}
-				dgFloat32 accScalar = acc.AddHorizontal().GetScalar();
-				for (dgInt32 j = size & (-8); j < size; j++) {
-					accScalar = accScalar + p0[j] * row[j];
-				}
-				q0[i] = accScalar;
 				base += size;
 			}
 
@@ -1212,8 +1220,9 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 
 			if (campIndex >= 0) {
 				r0[campIndex] = dgFloat32(0.0f);
-				z0[campIndex] = dgFloat32(0.0f);;
+				z0[campIndex] = dgFloat32(0.0f);
 				p0[campIndex] = dgFloat32(0.0f);
+				q0[campIndex] = dgFloat32(0.0f);
 				mask[campIndex] = dgFloat32(0.0f);
 
 				k = 0;
@@ -1256,9 +1265,9 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 		}
 		tolerance = numScalar;
 	}
-dgTrace(("%d %f\n", iterCount, dgSqrt(tolerance)));
+//dgTrace(("%d %f\n", iterCount, dgSqrt(tolerance)));
 }
-#endif
+
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const
 {
@@ -1370,6 +1379,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		b[i] -= r;
 	}
 	SolveLcp(m_auxiliaryRowCount, m_massMatrix11, u0, u, b, low, high, normalIndex);
+//	SolveLcp_new(m_auxiliaryRowCount, m_massMatrix11, u0, u, b, low, high, normalIndex);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
