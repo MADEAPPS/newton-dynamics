@@ -969,9 +969,6 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 // Old solver more stable but less accurate and slower
 void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
-//dgFloat32* const xxxxx = dgAlloca(dgFloat32, size);
-//SolveLcp_new(size, matrix, x0, xxxxx, b, low, high, normalIndex);
-
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
 	const dgInt32 maxIterCount = 64;
@@ -1031,19 +1028,6 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			base += size;
 		}
 	}
-/*
-//dgTrace(("%d %f\n", iterCount, dgSqrt(tolerance)));
-static int xxxxxxx;
-dgTrace(("%d\n", xxxxxxx++));
-for (dgInt32 i = 0; i < size; i++) {
-dgTrace(("%f ", xxxxx[i]));
-}
-dgTrace(("\n"));
-for (dgInt32 i = 0; i < size; i++) {
-	dgTrace(("%f ", x[i]));
-}
-dgTrace(("\n"));
-*/
 }
 
 // New solver faster more accurate but less stable, needs more testing
@@ -1119,19 +1103,19 @@ void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matr
 
 //tolerance = 0;
 	if (tolerance > tol2) {
-		dgFloat32* const r0 = dgAlloca(dgFloat32, size);
-		dgFloat32* const z0 = dgAlloca(dgFloat32, size);
-		dgFloat32* const p0 = dgAlloca(dgFloat32, size);
-		dgFloat32* const q0 = dgAlloca(dgFloat32, size);
-		dgCheckAligment16(r0);
-		dgCheckAligment16(z0);
-		dgCheckAligment16(p0);
-		dgCheckAligment16(q0);
+		dgFloat32* const r = dgAlloca(dgFloat32, size);
+		dgFloat32* const delta_x = dgAlloca(dgFloat32, size);
+		dgFloat32* const delta_r = dgAlloca(dgFloat32, size);
+		dgFloat32* const precond_x = dgAlloca(dgFloat32, size);
+		dgCheckAligment16(r);
+		dgCheckAligment16(precond_x);
+		dgCheckAligment16(delta_x);
+		dgCheckAligment16(delta_r);
 
-		memset (r0, 0, size * sizeof (dgFloat32));
-		memset (z0, 0, size * sizeof (dgFloat32));
-		memset (p0, 0, size * sizeof (dgFloat32));
-		memset (q0, 0, size * sizeof (dgFloat32));
+		memset (r, 0, size * sizeof (dgFloat32));
+		memset (precond_x, 0, size * sizeof (dgFloat32));
+		memset (delta_x, 0, size * sizeof (dgFloat32));
+		memset (delta_r, 0, size * sizeof (dgFloat32));
 
 		dgInt32 base = 0;
 		dgFloat32 numScalar = dgFloat32(0.0f);
@@ -1142,10 +1126,10 @@ void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matr
 				for (dgInt32 j = 0; j < size; j ++) {
 					acc -= row[j] * x[j] * mask[j];
 				}
-				r0[i] = acc;
-				z0[i] = invDiag[i] * acc * mask[i];
-				p0[i] = z0[i];
-				numScalar += r0[i] * z0[i];
+				r[i] = acc;
+				precond_x[i] = invDiag[i] * acc * mask[i];
+				delta_x[i] = precond_x[i];
+				numScalar += r[i] * precond_x[i];
 			}
 			base += size;
 		}
@@ -1161,30 +1145,30 @@ void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matr
 					for (dgInt32 j = 0; j <= size1; j += 8) {
 						dgVector tmp0(&row[j]);
 						dgVector tmp1(&row[j + 4]);
-						const dgVector& p00 = (dgVector&)p0[j];
-						const dgVector& p01 = (dgVector&)p0[j + 4];
-						acc = acc + tmp0 * p00 + tmp1 * p01;
+						const dgVector& delta_x0 = (dgVector&)delta_x[j];
+						const dgVector& delta_x1 = (dgVector&)delta_x[j + 4];
+						acc = acc + tmp0 * delta_x0 + tmp1 * delta_x1;
 					}
 					dgFloat32 accScalar = acc.AddHorizontal().GetScalar();
 					for (dgInt32 j = size & (-8); j < size; j++) {
-						accScalar = accScalar + p0[j] * row[j];
+						accScalar = accScalar + delta_x[j] * row[j];
 					}
-					q0[i] = accScalar;
+					delta_r[i] = accScalar;
 				}
 				base += size;
 			}
 
 			dgVector den(dgVector::m_zero);
 			for (dgInt32 j = 0; j <= size1; j += 8) {
-				const dgVector& p00 = (dgVector&)p0[j];
-				const dgVector& p01 = (dgVector&)p0[j + 4];
-				const dgVector& q00 = (dgVector&)q0[j];
-				const dgVector& q01 = (dgVector&)q0[j + 4];
-				den = den + p00 * q00 + p01 * q01;
+				const dgVector& delta_x0 = (dgVector&)delta_x[j];
+				const dgVector& delta_x1 = (dgVector&)delta_x[j + 4];
+				const dgVector& delta_r0 = (dgVector&)delta_r[j];
+				const dgVector& delta_r1 = (dgVector&)delta_r[j + 4];
+				den = den + delta_x0 * delta_r0 + delta_x1 * delta_r1;
 			}
 			dgFloat32 denScalar = den.AddHorizontal().GetScalar();
 			for (dgInt32 j = size & (-8); j < size; j++) {
-				denScalar = denScalar + p0[j] * q0[j];
+				denScalar = denScalar + delta_x[j] * delta_r[j];
 			}
 			dgAssert(denScalar > dgFloat32(0.0f));
 			dgFloat32 alpha = numScalar / denScalar;
@@ -1197,32 +1181,32 @@ void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matr
 					const dgFloat32 l = low[i] * coefficient - x0[i];
 					const dgFloat32 h = high[i] * coefficient - x0[i];
 
-					dgFloat32 f = x[i] + alpha * p0[i];
+					dgFloat32 f = x[i] + alpha * delta_x[i];
 					if (f < l) {
-						dgAssert (dgAbs (p0[i]) > dgFloat32 (1e-6f));
+						dgAssert (dgAbs (delta_x[i]) > dgFloat32 (1e-6f));
 						campIndex = i;
-						alpha = (l - x[i]) / p0[i];
+						alpha = (l - x[i]) / delta_x[i];
 					} else if (f > h) {
-						dgAssert (dgAbs (p0[i]) > dgFloat32 (1e-6f));
+						dgAssert (dgAbs (delta_x[i]) > dgFloat32 (1e-6f));
 						campIndex = i;
-						alpha = (h - x[i]) / p0[i];
+						alpha = (h - x[i]) / delta_x[i];
 					}
 				}
 			}
 
 			dgFloat32 num1Scalar = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < size; i++) {
-				x[i] = x[i] + alpha * p0[i];
-				r0[i] = r0[i] - alpha * q0[i];
-				z0[i] = invDiag[i] * r0[i] * mask[i];
-				num1Scalar += r0[i] * z0[i];
+				x[i] = x[i] + alpha * delta_x[i];
+				r[i] = r[i] - alpha * delta_r[i];
+				precond_x[i] = invDiag[i] * r[i] * mask[i];
+				num1Scalar += r[i] * precond_x[i];
 			}
 
 			if (campIndex >= 0) {
-				r0[campIndex] = dgFloat32(0.0f);
-				z0[campIndex] = dgFloat32(0.0f);
-				p0[campIndex] = dgFloat32(0.0f);
-				q0[campIndex] = dgFloat32(0.0f);
+				r[campIndex] = dgFloat32(0.0f);
+				precond_x[campIndex] = dgFloat32(0.0f);
+				delta_x[campIndex] = dgFloat32(0.0f);
+				delta_r[campIndex] = dgFloat32(0.0f);
 				mask[campIndex] = dgFloat32(0.0f);
 
 				k = 0;
@@ -1235,10 +1219,10 @@ void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matr
 						for (dgInt32 j = 0; j < size; j++) {
 							acc -= row[j] * x[j] * mask[j];
 						}
-						r0[i] = acc;
-						z0[i] = invDiag[i] * acc * mask[i];
-						p0[i] = z0[i];
-						numScalar += r0[i] * z0[i];
+						r[i] = acc;
+						precond_x[i] = invDiag[i] * acc * mask[i];
+						delta_x[i] = precond_x[i];
+						numScalar += r[i] * precond_x[i];
 					}
 					base += size;
 				}
@@ -1249,15 +1233,15 @@ void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matr
 					dgAssert(numScalar >= dgFloat32(0.0f));
 					dgVector beta(num1Scalar / numScalar);
 					for (dgInt32 i = 0; i <= size1; i += 8) {
-						dgVector& p00 = (dgVector&)p0[i];
-						dgVector& p01 = (dgVector&)p0[i + 4];
-						const dgVector& z00 = (dgVector&)z0[i];
-						const dgVector& z01 = (dgVector&)z0[i + 4];
-						p00 = z00 + p00 * beta;
-						p01 = z01 + p01 * beta;
+						dgVector& delta_x0 = (dgVector&)delta_x[i];
+						dgVector& delta_x1 = (dgVector&)delta_x[i + 4];
+						const dgVector& precond_x0 = (dgVector&)precond_x[i];
+						const dgVector& precond_x1 = (dgVector&)precond_x[i + 4];
+						delta_x0 = precond_x0 + delta_x0 * beta;
+						delta_x1 = precond_x1 + delta_x1 * beta;
 					}
 					for (dgInt32 i = size & (-8); i < size; i++) {
-						p0[i] = z0[i] + p0[i] * beta.GetScalar();
+						delta_x[i] = precond_x[i] + delta_x[i] * beta.GetScalar();
 					}
 				}
 				numScalar = num1Scalar;
