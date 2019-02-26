@@ -1413,6 +1413,8 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	DemoEntity* xxxx = DemoEntity::LoadNGD_mesh ("excavator.ngd", scene->GetNewton(), scene->GetShaderCache());
 	scene->Append(xxxx);
+
+	xxxx->ResetMatrix(*scene, matrix);
 /*
 	ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)robotModel.CreateClone();
 	scene->Append(vehicleModel);
@@ -1433,7 +1435,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 //	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 //	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 */
-	origin.m_x -= 5.0f;
+	origin.m_x -= 15.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);

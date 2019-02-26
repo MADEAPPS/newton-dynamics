@@ -33,53 +33,53 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0			// using NewtonMesh tool
-//#define DEFAULT_SCENE	1			// coefficients of friction
-//#define DEFAULT_SCENE	2			// coefficients of restitution
-//#define DEFAULT_SCENE	3			// gyroscope precession
-//#define DEFAULT_SCENE	4			// closest distance
-//#define DEFAULT_SCENE	5			// primitive collision
-//#define DEFAULT_SCENE	6 			// kinematic bodies
-//#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// box stacks
-//#define DEFAULT_SCENE	9			// simple level mesh collision
-//#define DEFAULT_SCENE	10			// optimized level mesh collision
-//#define DEFAULT_SCENE	11			// height field Collision
-//#define DEFAULT_SCENE	12			// infinite user plane collision
-//#define DEFAULT_SCENE	13			// user height field Collision
-//#define DEFAULT_SCENE	14			// compound Collision
-//#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
-//#define DEFAULT_SCENE	16			// uniform Scaled Collision
-//#define DEFAULT_SCENE	17			// non uniform Scaled Collision
-//#define DEFAULT_SCENE	18			// scaled mesh collision
-//#define DEFAULT_SCENE	19			// continuous collision
-//#define DEFAULT_SCENE	20			// paper wall continuous collision
-//#define DEFAULT_SCENE	21			// puck slide continuous collision
-//#define DEFAULT_SCENE	22			// simple convex decomposition
-//#define DEFAULT_SCENE	23			// scene Collision
-//#define DEFAULT_SCENE	24          // simple boolean operators 
-//#define DEFAULT_SCENE	25			// simple convex fracturing 
-//#define DEFAULT_SCENE	26			// structured convex fracturing 
-//#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	28          // standard joints
-#define DEFAULT_SCENE	29			// servo joints
-//#define DEFAULT_SCENE	30			// articulated joints
-//#define DEFAULT_SCENE	31			// six axis manipulator
-//#define DEFAULT_SCENE	32			// hexapod Robot
-//#define DEFAULT_SCENE	33			// basic rag doll
-//#define DEFAULT_SCENE	34			// dynamic rag doll
-//#define DEFAULT_SCENE	35			// basic Car
-//#define DEFAULT_SCENE	36			// single body vehicle
-//#define DEFAULT_SCENE	37			// David Gravel multi body car
-//#define DEFAULT_SCENE	38			// super Car
-//#define DEFAULT_SCENE	39			// heavy vehicles
-//#define DEFAULT_SCENE	40			// basic player controller
-//#define DEFAULT_SCENE	41			// animated player controller
-//#define DEFAULT_SCENE	42			// advanced player controller
-//#define DEFAULT_SCENE	43			// cloth patch			
-//#define DEFAULT_SCENE	44			// soft bodies	
-//#define DEFAULT_SCENE	45			// joe's joint test
-//#define DEFAULT_SCENE	46			// Misho's Hinge Test
+//#define DEFAULT_SCENE	0		// using NewtonMesh tool
+//#define DEFAULT_SCENE	1		// coefficients of friction
+//#define DEFAULT_SCENE	2		// coefficients of restitution
+//#define DEFAULT_SCENE	3		// gyroscope precession
+//#define DEFAULT_SCENE	4		// closest distance
+//#define DEFAULT_SCENE	5		// primitive collision
+//#define DEFAULT_SCENE	6		// kinematic bodies
+//#define DEFAULT_SCENE	7		// primitive convex cast 
+//#define DEFAULT_SCENE	8		// box stacks
+//#define DEFAULT_SCENE	9		// simple level mesh collision
+//#define DEFAULT_SCENE	10		// optimized level mesh collision
+//#define DEFAULT_SCENE	11		// height field Collision
+//#define DEFAULT_SCENE	12		// infinite user plane collision
+//#define DEFAULT_SCENE	13		// user height field Collision
+//#define DEFAULT_SCENE	14		// compound Collision
+//#define DEFAULT_SCENE	15		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	16		// uniform Scaled Collision
+//#define DEFAULT_SCENE	17		// non uniform Scaled Collision
+//#define DEFAULT_SCENE	18		// scaled mesh collision
+//#define DEFAULT_SCENE	19		// continuous collision
+//#define DEFAULT_SCENE	20		// paper wall continuous collision
+//#define DEFAULT_SCENE	21		// puck slide continuous collision
+//#define DEFAULT_SCENE	22		// simple convex decomposition
+//#define DEFAULT_SCENE	23		// scene Collision
+//#define DEFAULT_SCENE	24		// simple boolean operators 
+//#define DEFAULT_SCENE	25		// simple convex fracturing 
+//#define DEFAULT_SCENE	26		// structured convex fracturing 
+//#define DEFAULT_SCENE	27		// multi ray casting using the threading Job scheduler
+//#define DEFAULT_SCENE	28		// standard joints
+//#define DEFAULT_SCENE	29		// servo joints
+#define DEFAULT_SCENE	30		// articulated joints
+//#define DEFAULT_SCENE	31		// six axis manipulator
+//#define DEFAULT_SCENE	32		// hexapod Robot
+//#define DEFAULT_SCENE	33		// basic rag doll
+//#define DEFAULT_SCENE	34		// dynamic rag doll
+//#define DEFAULT_SCENE	35		// basic Car
+//#define DEFAULT_SCENE	36		// single body vehicle
+//#define DEFAULT_SCENE	37		// David Gravel multi body car
+//#define DEFAULT_SCENE	38		// super Car
+//#define DEFAULT_SCENE	39		// heavy vehicles
+//#define DEFAULT_SCENE	40		// basic player controller
+//#define DEFAULT_SCENE	41		// animated player controller
+//#define DEFAULT_SCENE	42		// advanced player controller
+//#define DEFAULT_SCENE	43		// cloth patch			
+//#define DEFAULT_SCENE	44		// soft bodies	
+//#define DEFAULT_SCENE	45		// joe's joint test
+//#define DEFAULT_SCENE	46		// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
