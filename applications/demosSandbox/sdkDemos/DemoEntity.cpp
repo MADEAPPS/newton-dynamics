@@ -314,7 +314,7 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 		glPopMatrix();
 	}
 
-	RenderBone();
+//	RenderBone();
 
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
 		child->Render(timestep, scene);
