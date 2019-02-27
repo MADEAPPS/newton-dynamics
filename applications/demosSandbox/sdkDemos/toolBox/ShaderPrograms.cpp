@@ -18,6 +18,7 @@ ShaderPrograms::ShaderPrograms(void)
 	m_decalEffect = 0;
 	m_diffuseEffect = 0;
 	m_skinningDiffuseEffect = 0;
+	m_diffuseNoTextureEffect = 0;
 }
 
 ShaderPrograms::~ShaderPrograms(void)
@@ -31,6 +32,9 @@ ShaderPrograms::~ShaderPrograms(void)
 	if (m_diffuseEffect) {
 		glDeleteShader(m_diffuseEffect);
 	}
+	if (m_diffuseNoTextureEffect) {
+		glDeleteShader(m_diffuseNoTextureEffect);
+	}
 	if (m_skinningDiffuseEffect) {
 		glDeleteShader(m_skinningDiffuseEffect);
 	}
@@ -38,26 +42,12 @@ ShaderPrograms::~ShaderPrograms(void)
 
 bool ShaderPrograms::CreateAllEffects()
 {
-//	m_solidColor = CreateShaderEffect ("SolidColor");
-//	m_decalEffect = CreateShaderEffect ("TextureDecal");
-//	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse");
-
 	m_solidColor = CreateShaderEffect ("TextureDecal", "TextureDecal");
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
 	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
-
-//	if (m_solidColor && m_decalEffect && m_diffuseEffect && m_skinningDiffuseEffect) {
-//		return true;
-//	} else {
-//		m_solidColor = 0;
-//		m_decalEffect = 0;
-//		m_diffuseEffect = 0;
-//		m_skinningDiffuseEffect = 0;
-//		return false;
-//	}
+	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");
 	return true;
 }
-
 
 void ShaderPrograms::LoadShaderCode (const char* const filename, char* const buffer)
 {

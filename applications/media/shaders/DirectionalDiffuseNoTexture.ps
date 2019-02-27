@@ -1,0 +1,51 @@
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+#version 120
+
+varying vec3 normal;
+varying vec3 position;
+
+vec3 PhongDirectionalShading()
+{
+	vec3 norm = normalize (normal);
+	vec3 lighDir = normalize (gl_LightSource[0].position.xyz);
+	vec3 specularDir = normalize (-position);
+	vec3 refectionDir = -reflect (lighDir, normal);
+
+	vec3 ambientCoeff = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
+	vec3 diffuseCoeff = vec3(gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse); 
+	vec3 specularCoeff = vec3(gl_LightSource[0].specular * gl_FrontMaterial.specular);
+
+	vec3 ambientColor = ambientCoeff + vec3(gl_FrontMaterial.emission); 
+	vec3 diffuseColor = diffuseCoeff * max (dot(norm, lighDir), 0.0);
+	vec3 specularColor = specularCoeff * pow (max (dot (refectionDir, specularDir), 0.1), gl_FrontMaterial.shininess);
+
+	//return vec3 (specularColor);
+	return vec3 (ambientColor + diffuseColor + specularColor);
+}
+
+vec3 GouraudPointLightShading(int index)
+{
+	vec3 norm = normalize (normal);
+	vec3 lighDir = normalize (gl_LightSource[index].position.xyz - position);
+
+	vec3 diffuseCoeff = vec3(gl_LightSource[index].diffuse * gl_FrontMaterial.diffuse); 
+	vec3 diffuseColor = diffuseCoeff * max (dot(norm, lighDir), 0.0);
+	return diffuseColor;
+}
+
+void main()
+{
+	vec3 color = PhongDirectionalShading() + GouraudPointLightShading(1);
+	float opacity = gl_FrontMaterial.diffuse.w;
+	gl_FragColor = vec4 (color, opacity);
+}
+

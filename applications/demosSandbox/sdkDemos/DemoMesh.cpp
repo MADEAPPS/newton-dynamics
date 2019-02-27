@@ -221,11 +221,16 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode,
 			segment->m_specular = material->GetSpecularColor();
 			segment->SetOpacity(material->GetOpacity());
 
-			if (segment->m_opacity > 0.999f) {
+			if (segment->m_textureHandle) {
+				
+			//if (segment->m_opacity > 0.999f) {
+			//	segment->m_shader = shaderCache.m_diffuseEffect;
+			//} else {
+			//	segment->m_shader = shaderCache.m_diffuseEffect;
+			//}
 				segment->m_shader = shaderCache.m_diffuseEffect;
 			} else {
-				//dAssert (0);
-				segment->m_shader = shaderCache.m_diffuseEffect;
+				segment->m_shader = shaderCache.m_diffuseNoTextureEffect;
 			}
 		}
 
