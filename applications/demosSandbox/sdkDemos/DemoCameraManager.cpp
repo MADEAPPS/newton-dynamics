@@ -272,15 +272,14 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 					NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 
 					// change this to make the grabbing stronger or weaker
-					const dFloat gfactor = 500.0f;
-
-					const dFloat angularFritionAccel = gfactor;
-					const dFloat linearFrictionAccel = gfactor * dMax (dAbs (DEMO_GRAVITY), dFloat(10.0f));
+					//const dFloat gfactor = 500.0f;
+					const dFloat angularFritionAccel = 50.0f;
+					const dFloat linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat(10.0f));
 					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
 
 					m_pickJoint = new DemoCameraPickBodyJoint (body, posit, this);
 					// set this to 1 for full matrix control
-					m_pickJoint->SetPickMode (1);
+					m_pickJoint->SetPickMode (2);
 
 					m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
 					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
