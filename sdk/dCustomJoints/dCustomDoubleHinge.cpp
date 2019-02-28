@@ -262,9 +262,9 @@ void dCustomDoubleHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix&
 	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &rollMatrix.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	if (m_options.m_option5) {
-		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
-		dFloat alphaRollError = -(eulers[2] + rollOmega * timestep) / (timestep * timestep);
-		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
+//		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
+//		dFloat alphaRollError = -(eulers[2] + rollOmega * timestep) / (timestep * timestep);
+//		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
 	}
 
 	if (m_options.m_option3) {
