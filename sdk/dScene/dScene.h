@@ -163,7 +163,7 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual int GetNodeLRU (dTreeNode* const node) const;
 
 	DSCENE_API virtual void NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCallback* const visualContext);
-	DSCENE_API virtual void SceneToNewtonWorld (NewtonWorld* world, dList<NewtonBody*>& loadedBodies);
+	DSCENE_API virtual void SceneToNewtonWorld (NewtonWorld* const world, dList<NewtonBody*>& loadedBodies);
 
 	DSCENE_API virtual void DeleteDuplicateTextures();
 	DSCENE_API virtual void DeleteDuplicateMaterials();
