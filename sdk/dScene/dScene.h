@@ -168,10 +168,9 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual void DeleteDuplicateTextures();
 	DSCENE_API virtual void DeleteDuplicateMaterials();
 	DSCENE_API virtual void DeleteDuplicateGeometries();
-
-	DSCENE_API void RegisterClasses();
 	
 	protected:
+	DSCENE_API void RegisterClasses();
 	DSCENE_API virtual dTreeNode* GetCacheNode (const char* const cacheName);
 
 	int m_revision;

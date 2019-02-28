@@ -316,11 +316,11 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 
 	// should spins very slowly, with a tilt angle of 30 degrees
 	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -8.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
-
-	// spin twice as fast
+	
+	// should spins slowly, tweice preccesing speed.
 	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -6.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
 
-	// should spins very slowly
+	// spin twice as fast, slow preccesion 
 	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -4.0f, 1.0f), 100.0f, 0.6f, 0.3f, 0.0f);
 
 	// should just flops
