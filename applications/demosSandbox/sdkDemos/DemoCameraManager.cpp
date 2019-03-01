@@ -273,7 +273,7 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 
 					// change this to make the grabbing stronger or weaker
 					//const dFloat gfactor = 500.0f;
-					const dFloat angularFritionAccel = 50.0f;
+					const dFloat angularFritionAccel = 10.0f;
 					const dFloat linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat(10.0f));
 					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
 

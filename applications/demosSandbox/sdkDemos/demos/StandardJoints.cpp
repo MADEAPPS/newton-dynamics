@@ -296,7 +296,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 //	dVector omega (0.0f, 10.0f, 100.0f, 0.0f);
 
 	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 2.0f, 0.0f), 1.0f, 0.5f);
-	NewtonBodySetGyroscopicTorque(box1, 1);
+//	NewtonBodySetGyroscopicTorque(box1, 1);
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	matrix = dYawMatrix (dPi * 0.5f) * matrix; 
 	NewtonBodySetMatrix(box1, &matrix[0][0]);
