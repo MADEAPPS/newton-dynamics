@@ -605,7 +605,6 @@ void  PhysicsBodyDestructor (const NewtonBody* body)
 	//	delete primitive;
 }
 
-
 // add force and torque to rigid body
 void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int threadIndex)
 {
@@ -621,7 +620,6 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 	dVector force (dir.Scale (mass * DEMO_GRAVITY));
 	NewtonBodySetForce (body, &force.m_x);
 }
-
 
 void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex)
 {

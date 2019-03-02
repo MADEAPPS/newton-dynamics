@@ -280,23 +280,58 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	joint1->SetRollLimits(-rollLimit, rollLimit);
 	joint1->SetPitchLimits(-pitchLimit, pitchLimit);
 	//joint1->DisableRotationX();
-
 }
+
+
+// add force and torque to rigid body
+static void ApplyGravityForce____(const NewtonBody* body, dFloat timestep, int threadIndex)
+{
+/*
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+	dVector dir(0.0f, 1.0f, 0.0f);
+	//	dVector dir(1.0f, 0.0f, 0.0f);
+	//mass = 0.0f;
+	dVector force(dir.Scale(mass * DEMO_GRAVITY));
+	NewtonBodySetForce(body, &force.m_x);
+*/
+
+	dMatrix matrix;
+	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	dVector sideVector(matrix.m_front.CrossProduct(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
+	dVector gyroTorque((sideVector.Normalize()).Scale(1.0f));
+	
+	NewtonBodySetTorque(body, &gyroTorque.m_x);
+
+	dMatrix inertia;
+	dVector omega(0.0f);
+	NewtonBodyGetOmega(body, &omega[0]);
+	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
+	dVector angularMomentum (inertia.RotateVector(omega));
+//	dTrace(("w (%f %f %f)\n", omega[0], omega[1], omega[2]));
+	dTrace(("L (%f %f %f)\n", angularMomentum[0], angularMomentum[1], angularMomentum[2]));
+}
+
 
 static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size(1.0f, 1.0f, 1.0f);
 
-	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
-	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
+//	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
+//	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	dMatrix matrix;
 	dVector damp(0.0f);
-	dVector omega(0.0f, 15.0f, 50.0f, 0.0f);
+	dVector omega(0.0f, 0.0f, 30.0f, 0.0f);
+//	dVector omega(0.0f, 15.0f, 50.0f, 0.0f);
 //	dVector omega (0.0f, 10.0f, 100.0f, 0.0f);
 
 	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 2.0f, 0.0f), 1.0f, 0.5f);
-//	NewtonBodySetGyroscopicTorque(box1, 1);
+	NewtonBodySetGyroscopicTorque(box1, 1);
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	matrix = dYawMatrix (dPi * 0.5f) * matrix; 
 	NewtonBodySetMatrix(box1, &matrix[0][0]);
@@ -305,14 +340,18 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodySetLinearDamping(box1, 0.0f);
 	NewtonBodySetAngularDamping(box1, &damp[0]);
 
+	NewtonBodySetForceAndTorqueCallback(box1, ApplyGravityForce____);
+
+
 	//	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
+	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, NULL);
+//	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
 //	joint1->SetHardMiddleAxis(0);
 //	joint1->EnableLimits(false);
 //	joint1->SetLimits(-5.0f * dPi, 2.0f * dPi);
-
 #if 0
+
 	NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.0f, 0.0f), 1.0f, 0.5f);
 	NewtonBodySetGyroscopicTorque(box1, 0);
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
