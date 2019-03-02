@@ -303,7 +303,7 @@ static void ApplyGravityForce____(const NewtonBody* body, dFloat timestep, int t
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 	dVector sideVector(matrix.m_front.CrossProduct(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
-	dVector gyroTorque((sideVector.Normalize()).Scale(1.0f));
+	dVector gyroTorque((sideVector.Normalize()).Scale(5.0f));
 	
 	NewtonBodySetTorque(body, &gyroTorque.m_x);
 
@@ -313,7 +313,7 @@ static void ApplyGravityForce____(const NewtonBody* body, dFloat timestep, int t
 	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
 	dVector angularMomentum (inertia.RotateVector(omega));
 //	dTrace(("w (%f %f %f)\n", omega[0], omega[1], omega[2]));
-	dTrace(("L (%f %f %f)\n", angularMomentum[0], angularMomentum[1], angularMomentum[2]));
+	dTrace(("w(%f %f %f) L(%f %f %f)\n", omega[0], omega[1], omega[2], angularMomentum[0], angularMomentum[1], angularMomentum[2]));
 }
 
 
@@ -345,7 +345,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 
 	//	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, NULL);
+//	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, NULL);
 //	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
 //	joint1->SetHardMiddleAxis(0);
 //	joint1->EnableLimits(false);
