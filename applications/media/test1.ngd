@@ -1,0 +1,182 @@
+<?xml version="1.0" ?>
+<NewtonGameDynamnics>
+    <header description="Newton Dynamnics 3.00, universal file format" revision="105" />
+    <nodes count="16">
+        <dRootNodeInfo>
+            <dNodeInfo name="rootNode" nodeID="0" editorFlags="0" />
+            <childrenNodes count="5" indices="1 3 6 10 14" />
+        </dRootNodeInfo>
+        <dSceneCacheInfo cacheId="-3320094658024126097">
+            <dNodeInfo name="dMaterialCache" nodeID="1" editorFlags="0" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="1" indices="2" />
+        </dSceneCacheInfo>
+        <dMaterialNodeInfo id="0">
+            <dNodeInfo name="material" nodeID="2" editorFlags="0" />
+            <ambient textureId="-1" color="0.8 0.8 0.8 1" />
+            <diffuse textureId="-1" color="0.8 0.8 0.8 1" />
+            <specular textureId="-1" color="0 0 0 1" />
+            <emissive textureId="-1" color="0 0 0 1" />
+            <shininess float="0.000000" />
+            <opacity float="1.000000" />
+            <parentNodes count="4" indices="1 4 8 12" />
+        </dMaterialNodeInfo>
+        <dSceneCacheInfo cacheId="-7649022316178375635">
+            <dNodeInfo name="dGeometryCache" nodeID="3" editorFlags="0" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="3" indices="4 8 12" />
+        </dSceneCacheInfo>
+        <dMeshNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="visual Mesh" nodeID="4" editorFlags="0" />
+            </dGeometryNodeInfo>
+            <points controlPointBaseCount="4">
+                <position float4="4" floats="172.87 0 -176.283 0 -172.87 0 -176.283 0 -172.87 0 176.283 0 172.87 0 176.283 0" />
+                <normal float3="1" floats="0 1 0" />
+            </points>
+            <polygons count="1" faceIndexCount="4">
+                <faceMaterial index="0" />
+                <position index="0 1 2 3" />
+                <normal index="0 0 0 0" />
+            </polygons>
+            <parentNodes count="2" indices="3 6" />
+            <childrenNodes count="1" indices="2" />
+        </dMeshNodeInfo>
+        <dCollisionTreeNodeInfo>
+            <dCollisionNodeInfo shapeId="0">
+                <dNodeInfo name="Tree collision" nodeID="5" editorFlags="0" />
+                <offsetMatrix float16="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+                <geometricInertia float4="0 0 0 0" />
+                <geometricCenterAndVolume float4="0 0 0 0" />
+            </dCollisionNodeInfo>
+            <points controlPointBaseCount="4">
+                <position float4="4" floats="172.87 0 -176.283 0 -172.87 0 -176.283 0 -172.87 0 176.283 0 172.87 0 176.283 0" />
+                <normal float3="1" floats="0 1 0" />
+            </points>
+            <polygons count="1" faceIndexCount="4">
+                <faceMaterial index="0" />
+                <position index="0 1 2 3" />
+                <normal index="0 0 0 0" />
+            </polygons>
+            <parentNodes count="1" indices="7" />
+        </dCollisionTreeNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="sceneNode" nodeID="6" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 0 0 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="2" indices="4 7" />
+        </dSceneNodeInfo>
+        <dRigidbodyNodeInfo>
+            <dNodeInfo name="rigidBody" nodeID="7" editorFlags="0">
+                <variables>
+                    <string name="rigidBodyType" value="default gravity" />
+                </variables>
+            </dNodeInfo>
+            <massMatrix float4="0 0 0 0" />
+            <centerOfMass float3="0 0 0" />
+            <velocity float3="0 0 0" />
+            <omega float3="0 0 0" />
+            <internalDamp float4="0 0 0 0" />
+            <parentNodes count="1" indices="6" />
+            <childrenNodes count="1" indices="5" />
+        </dRigidbodyNodeInfo>
+        <dMeshNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="visual Mesh" nodeID="8" editorFlags="0" />
+            </dGeometryNodeInfo>
+            <points controlPointBaseCount="8">
+                <position float4="8" floats="-1 -0.5 -2 0 1 -0.5 -2 0 1 0.5 -2 0 -1 0.5 -2 0 -1 -0.5 2 0 -1 0.5 2 0 1 0.5 2 0 1 -0.5 2 0" />
+                <normal float3="6" floats="-1 0 0 0 -1 0 0 0 -1 0 0 1 0 1 0 1 0 0" />
+            </points>
+            <polygons count="6" faceIndexCount="4 4 4 4 4 4">
+                <faceMaterial index="0 0 0 0 0 0" />
+                <position index="0 1 7 4 0 3 2 1 0 4 5 3 1 2 6 7 2 3 5 6 4 7 6 5" />
+                <normal index="1 1 1 1 2 2 2 2 0 0 0 0 5 5 5 5 4 4 4 4 3 3 3 3" />
+            </polygons>
+            <parentNodes count="2" indices="3 10" />
+            <childrenNodes count="1" indices="2" />
+        </dMeshNodeInfo>
+        <dCollisionConvexHullNodeInfo>
+            <dCollisionNodeInfo shapeId="0">
+                <dNodeInfo name="convexHull collision" nodeID="9" editorFlags="0" />
+                <offsetMatrix float16="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+                <geometricInertia float4="1.41667 1.66667 0.416667 1" />
+                <geometricCenterAndVolume float4="0 0 0 1" />
+            </dCollisionNodeInfo>
+            <pointCloud count="8" float4="1 -0.5 -2 0 -1 -0.5 -2 0 1 0.5 -2 0 -1 0.5 -2 0 -1 -0.5 2 0 1 -0.5 2 0 -1 0.5 2 0 1 0.5 2 0" />
+            <parentNodes count="1" indices="11" />
+        </dCollisionConvexHullNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="sceneNode" nodeID="10" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="0 2 -2 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="2" indices="8 11" />
+        </dSceneNodeInfo>
+        <dRigidbodyNodeInfo>
+            <dNodeInfo name="rigidBody" nodeID="11" editorFlags="0">
+                <variables>
+                    <string name="rigidBodyType" value="default gravity" />
+                </variables>
+            </dNodeInfo>
+            <massMatrix float4="1.41667 1.66667 0.416667 1" />
+            <centerOfMass float3="0 0 0" />
+            <velocity float3="1 0 2" />
+            <omega float3="0 0 0" />
+            <internalDamp float4="0 0 0 0" />
+            <parentNodes count="1" indices="10" />
+            <childrenNodes count="1" indices="9" />
+        </dRigidbodyNodeInfo>
+        <dMeshNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="visual Mesh" nodeID="12" editorFlags="0" />
+            </dGeometryNodeInfo>
+            <points controlPointBaseCount="8">
+                <position float4="8" floats="-1 -0.5 -2 0 1 -0.5 -2 0 1 0.5 -2 0 -1 0.5 -2 0 -1 -0.5 2 0 -1 0.5 2 0 1 0.5 2 0 1 -0.5 2 0" />
+                <normal float3="6" floats="-1 0 0 0 -1 0 0 0 -1 0 0 1 0 1 0 1 0 0" />
+            </points>
+            <polygons count="6" faceIndexCount="4 4 4 4 4 4">
+                <faceMaterial index="0 0 0 0 0 0" />
+                <position index="0 1 7 4 0 3 2 1 0 4 5 3 1 2 6 7 2 3 5 6 4 7 6 5" />
+                <normal index="1 1 1 1 2 2 2 2 0 0 0 0 5 5 5 5 4 4 4 4 3 3 3 3" />
+            </polygons>
+            <parentNodes count="2" indices="3 14" />
+            <childrenNodes count="1" indices="2" />
+        </dMeshNodeInfo>
+        <dCollisionConvexHullNodeInfo>
+            <dCollisionNodeInfo shapeId="0">
+                <dNodeInfo name="convexHull collision" nodeID="13" editorFlags="0" />
+                <offsetMatrix float16="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+                <geometricInertia float4="1.41667 1.66667 0.416667 1" />
+                <geometricCenterAndVolume float4="0 0 0 1" />
+            </dCollisionNodeInfo>
+            <pointCloud count="8" float4="1 -0.5 -2 0 -1 -0.5 -2 0 1 0.5 -2 0 -1 0.5 -2 0 -1 -0.5 2 0 1 -0.5 2 0 -1 0.5 2 0 1 0.5 2 0" />
+            <parentNodes count="1" indices="15" />
+        </dCollisionConvexHullNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="sceneNode" nodeID="14" editorFlags="0" />
+            <color float4="0.75 0.75 0 0" />
+            <transform position="4 2 2 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="2" indices="12 15" />
+        </dSceneNodeInfo>
+        <dRigidbodyNodeInfo>
+            <dNodeInfo name="rigidBody" nodeID="15" editorFlags="0">
+                <variables>
+                    <string name="rigidBodyType" value="default gravity" />
+                </variables>
+            </dNodeInfo>
+            <massMatrix float4="1.41667 1.66667 0.416667 1" />
+            <centerOfMass float3="0 0 0" />
+            <velocity float3="1 0 2" />
+            <omega float3="0 0 0" />
+            <internalDamp float4="0 0 0 0" />
+            <parentNodes count="1" indices="14" />
+            <childrenNodes count="1" indices="13" />
+        </dRigidbodyNodeInfo>
+    </nodes>
+</NewtonGameDynamnics>
