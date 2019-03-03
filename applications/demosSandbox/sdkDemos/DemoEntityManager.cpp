@@ -579,7 +579,7 @@ void DemoEntityManager::Cleanup ()
 		GetModuleFileNameA(NULL, plugInPath, 256);
 	#endif
 
-	for (int i = int(strlen(plugInPath) - 1); i; i--) {
+	for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
 		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
 			plugInPath[i] = 0;
 			break;
