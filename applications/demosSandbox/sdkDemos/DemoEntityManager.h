@@ -214,12 +214,10 @@ class DemoEntityManager: public dList <DemoEntity*>
 	friend class DemoListenerManager;
 };
 
-
 inline NewtonWorld* DemoEntityManager::GetNewton() const
 {
 	return m_world;
 }
-
 
 // for simplicity we are not going to run the demo in a separate thread at this time
 // this confuses many user int thinking it is more complex than it really is  

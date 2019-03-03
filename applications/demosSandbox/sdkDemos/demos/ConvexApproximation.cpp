@@ -169,7 +169,7 @@ return;
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-//	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
+//	ExportScene (scene->GetNewton(), "test1.ngd");
 
 	origin.m_y += 10.0f;
 	scene->SetCameraMatrix(rot, origin);

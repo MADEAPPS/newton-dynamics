@@ -153,6 +153,6 @@ void Friction (DemoEntityManager* const scene)
 	dVector origin (-35.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-//	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
+//	ExportScene (scene->GetNewton(), "test1.ngd");
 }
 

@@ -372,7 +372,7 @@ void CompoundCollision (DemoEntityManager* const scene)
 //origin.m_x += 20.0f;	
 //origin.m_z += 20.0f;	
 	scene->SetCameraMatrix(rot, origin);
-	//ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
+	//ExportScene (scene->GetNewton(), "test1.ngd");
 }
 
 

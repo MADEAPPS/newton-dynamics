@@ -161,7 +161,7 @@ return;
 //	NewtonMeshDestroy(boxCruzUnion);
 	NewtonMeshDestroy(boxCruzIntersection);
 
-//	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
+//	ExportScene (scene->GetNewton(), "test1.ngd");
 
 	origin.m_y += 10.0f;
 	scene->SetCameraMatrix(rot, origin);

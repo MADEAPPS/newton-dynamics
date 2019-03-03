@@ -217,7 +217,7 @@ void MultiRayCast (DemoEntityManager* const scene)
 	dVector origin (-30.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-	//ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
+	//ExportScene (scene->GetNewton(), "test1.ngd");
 }
 
 

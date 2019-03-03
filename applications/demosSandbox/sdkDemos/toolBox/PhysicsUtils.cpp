@@ -1217,8 +1217,11 @@ class MakeViualMesh: public dScene::dSceneExportCallback
 	NewtonWorld* m_world;
 };
 
-void ExportScene (NewtonWorld* const world, const char* const fileName)
+void ExportScene (NewtonWorld* const world, const char* const name)
 {
+	char fileName[2048];
+	dGetWorkingFileName(name, fileName);
+
 	MakeViualMesh context (world);
 	dScene testScene (world);
 	testScene.NewtonWorldToScene (world, &context);
