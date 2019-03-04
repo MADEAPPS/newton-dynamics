@@ -25,6 +25,7 @@ class KinematiocListener: public dCustomListener
 		dVector m_omega;
 		dVector m_veloc;
 		NewtonBody* m_plaform;
+		dTree<int, NewtonBody*> m_cargo;
 	};
 
 	public:
@@ -32,19 +33,38 @@ class KinematiocListener: public dCustomListener
 		:dCustomListener(scene->GetNewton(), "Kinematic demo")
 		,m_platformList()
 	{
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* const boxShape = NewtonCreateBox(world, 1.0f, 1.0f, 1.6f, 0, NULL);
+		m_whiteBox = new DemoMesh("platform", scene->GetShaderCache(), boxShape, "smilli.tga", "smilli.tga", "smilli.tga");
+		m_redBox = new DemoMesh("platform", scene->GetShaderCache(), boxShape, "smilli.tga", "smilli.tga", "smilli.tga");
+		NewtonDestroyCollision(boxShape);
+
+		for (DemoMesh::dListNode* ptr = m_redBox->GetFirst(); ptr; ptr = ptr->GetNext()) {
+			DemoSubMesh* const subMesh = &ptr->GetInfo();
+			subMesh->m_diffuse.m_x = 1.0f;
+			subMesh->m_diffuse.m_y = 0.0f;
+			subMesh->m_diffuse.m_z = 0.0f;
+			subMesh->m_diffuse.m_w = 1.0f;
+		}
+		m_redBox->OptimizeForRender();
 	}
 	
 	~KinematiocListener()
 	{
+		m_redBox->Release();
+		m_whiteBox->Release();
+		
 	}
 
 	void PreUpdate(dFloat timestep) 
 	{
 		for (dList<KinematicPlatform>::dListNode* ptr = m_platformList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			const KinematicPlatform& entry = ptr->GetInfo();
+			KinematicPlatform& entry = ptr->GetInfo();
 
 			NewtonBodySetOmega(entry.m_plaform, &entry.m_omega[0]);
 			NewtonBodySetVelocity(entry.m_plaform, &entry.m_veloc[0]);
+
+			UpdateBodies(entry);
 		}
 	}
 
@@ -61,7 +81,44 @@ class KinematiocListener: public dCustomListener
 	{
 		KinematicPlatform& entry = AddPlatform(location);
 		entry.m_omega = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		SetTransparent(entry);
+	}
 
+	private: 
+	void UpdateBodies(KinematicPlatform& entry)
+	{
+		dTree<int, NewtonBody*>::Iterator iter (entry.m_cargo);
+		for (iter.Begin(); iter; iter ++) {
+			iter.GetNode()->GetInfo() = 0;
+		}
+
+		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(entry.m_plaform); joint; joint = NewtonBodyGetNextContactJoint(entry.m_plaform, joint)) {
+			NewtonBody* const body0 = NewtonJointGetBody0(joint);
+			NewtonBody* const body1 = NewtonJointGetBody1(joint);
+			NewtonBody* const cargoBody = (body0 == entry.m_plaform) ? body1 : body0;
+			dTree<int, NewtonBody*>::dTreeNode* node = entry.m_cargo.Find(cargoBody); 
+			if (!node) {
+				node = entry.m_cargo.Insert(0, cargoBody);
+				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(cargoBody);
+				entity->SetMesh(m_redBox, entity->GetMeshMatrix());
+			}
+			node->GetInfo() = 1;
+		}
+
+		for (iter.Begin(); iter; ) {
+			dTree<int, NewtonBody*>::dTreeNode* const node = iter.GetNode();
+			iter++;
+			if (node->GetInfo() == 0) {
+				NewtonBody* const cargoBody = node->GetKey();
+				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(cargoBody);
+				entity->SetMesh(m_whiteBox, entity->GetMeshMatrix());
+				entry.m_cargo.Remove(node);
+			}
+		}
+	}
+
+	void SetTransparent(KinematicPlatform& entry)
+	{
 		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(entry.m_plaform);
 
 		DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
@@ -73,7 +130,6 @@ class KinematiocListener: public dCustomListener
 		mesh->OptimizeForRender();
 	}
 
-	private: 
 	KinematicPlatform& AddPlatform(const dMatrix& location)
 	{
 		NewtonWorld* const world = GetWorld();
@@ -106,8 +162,8 @@ class KinematiocListener: public dCustomListener
 		return entry;
 	}
 
-
-
+	DemoMesh* m_redBox;
+	DemoMesh* m_whiteBox;
 	dList<KinematicPlatform> m_platformList;
 };
 
@@ -133,8 +189,9 @@ void KinematicBodies (DemoEntityManager* const scene)
 	// add some dynamic bodies 
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	dVector size(1.0f, 1.0f, 1.6f, 0.0f);
-	int count = 3;
-	AddPrimitiveArray(scene, 1.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+	int countx = 2;
+	int countz = 2;
+	AddPrimitiveArray(scene, 1.0f, location.m_posit, size, countx, countz, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
