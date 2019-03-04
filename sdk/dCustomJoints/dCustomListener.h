@@ -18,14 +18,13 @@
 class dCustomListener: public dCustomAlloc
 {
 	public:
-	dCustomListener(NewtonWorld* const world, const char* const listenerName);
-	virtual ~dCustomListener();
+	CUSTOM_JOINTS_API dCustomListener(NewtonWorld* const world, const char* const listenerName);
+	CUSTOM_JOINTS_API virtual ~dCustomListener();
 
 	NewtonWorld* GetWorld() const {return m_world;}
-
-	virtual void OnBodyDestroy (NewtonBody* const body) {};
 	virtual void PreUpdate (dFloat timestep) {};
 	virtual void PostUpdate (dFloat timestep) {};
+	virtual void OnBodyDestroy(NewtonBody* const body) {};
 
 	private:
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);

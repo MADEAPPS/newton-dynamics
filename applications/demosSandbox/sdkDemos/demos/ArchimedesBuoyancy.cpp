@@ -102,21 +102,47 @@ class MyTriggerManager: public dCustomTriggerManager
 
 	void CreateBuoyancyTrigger (const dMatrix& matrix, NewtonCollision* const convexShape)
 	{
-		dCustomTriggerController* const controller = CreateTrigger (matrix, convexShape, NULL);
-		BuoyancyForce* const buoyancyForce = new BuoyancyForce (controller);
-		controller->SetUserData (buoyancyForce);
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		dCustomTriggerController* const trigger = CreateTrigger (matrix, convexShape, NULL);
+		NewtonBody* const triggerBody = trigger->GetBody();
+
+		NewtonBodySetTransformCallback(triggerBody, DemoEntity::TransformCallback);
+		DemoMesh* const geometry = new DemoMesh("pool", scene->GetShaderCache(), convexShape, "", "", "");
+		DemoEntity* const entity = new DemoEntity(matrix, NULL);
+		scene->Append(entity);
+		entity->SetMesh(geometry, dGetIdentityMatrix());
+		NewtonBodySetUserData(triggerBody, entity);
+
+		for (DemoMesh::dListNode* ptr = geometry->GetFirst(); ptr; ptr = ptr->GetNext()) {
+			DemoSubMesh* const subMesh = &ptr->GetInfo();
+			subMesh->SetOpacity(0.7f);
+			subMesh->m_diffuse.m_x = 0.0f;
+			subMesh->m_diffuse.m_y = 0.0f;
+			subMesh->m_diffuse.m_z = 1.0f;
+			subMesh->m_diffuse.m_z = 1.0f;
+		}
+		geometry->OptimizeForRender();
+
+		geometry->Release();
+
+//		BuoyancyForce* const buoyancyForce = new BuoyancyForce (controller);
+//		controller->SetUserData (buoyancyForce);
 	}
 
 	void DestroyController (dCustomTriggerController* const controller)
 	{
-		TriggerCallback* const userData = (TriggerCallback*) controller->GetUserData();
-		delete userData;
-		dCustomTriggerManager::DestroyController (controller);
+		dAssert(0);
+//		TriggerCallback* const userData = (TriggerCallback*) controller->GetUserData();
+//		delete userData;
+//		dCustomTriggerManager::DestroyController (controller);
 	}
 	
-
 	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
 	{
+		dAssert(0);
+/*
 		TriggerCallback* const callback = (TriggerCallback*) me->GetUserData();
 		switch (event) 
 		{
@@ -138,6 +164,7 @@ class MyTriggerManager: public dCustomTriggerManager
 				break;
 			}
 		}
+*/
 	}
 };
 
@@ -146,7 +173,6 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-
 
 	// load the mesh 
 	CreateLevelMesh (scene, "swimmingPool.ngd", true);
@@ -173,7 +199,6 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	dQuaternion rot (camMatrix);
 	dVector origin (-20.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 

@@ -18,11 +18,12 @@
 #define D_CUSTOM_TRIGGER_MANAGER_H_
 
 #include "dCustomJointLibraryStdAfx.h"
-#include "dCustomControllerManager.h"
+//#include "dCustomControllerManager.h"
+#include "dCustomListener.h"
 
 
 #define TRIGGER_PLUGIN_NAME				"__triggerManager__"
-
+/*
 // a trigger is volume of space that is there to send a message to other objects when and object enter of leave the trigger region  
 // they are not visible and do not collide with bodies, but the generate contacts
 class dCustomTriggerController: public dCustomControllerBase
@@ -43,6 +44,40 @@ class dCustomTriggerController: public dCustomControllerBase
 };
 
 class dCustomTriggerManager: public dCustomControllerManager<dCustomTriggerController> 
+*/
+
+
+class dCustomTriggerController
+{
+	public:
+	dCustomTriggerController()
+		:m_manifest()
+	{
+	}
+
+	~dCustomTriggerController()
+	{
+//		dAssert(0);
+		dTrace(("complete the trigger\n"));
+//		NewtonDestroyBody(m_body);
+	}
+
+	NewtonBody* GetBody() const {return m_kinematicBody; }
+
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+
+	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+
+	private:
+	void* m_userData;
+	NewtonBody* m_kinematicBody;
+	dTree<NewtonBody*, NewtonBody*> m_manifest;
+	friend class dCustomTriggerManager;
+};
+
+
+class dCustomTriggerManager: public dCustomListener
 {
 	public:
 	enum dTriggerEventType
@@ -72,8 +107,8 @@ class dCustomTriggerManager: public dCustomControllerManager<dCustomTriggerContr
 	void UpdateTrigger (dCustomTriggerController* const controller);
 	static void UpdateTrigger (NewtonWorld* const world, void* const context, int threadIndex);
 
+	dList<dCustomTriggerController> m_triggerList;
 	unsigned m_lock;
-	friend class dCustomTriggerController;
 };
 
 

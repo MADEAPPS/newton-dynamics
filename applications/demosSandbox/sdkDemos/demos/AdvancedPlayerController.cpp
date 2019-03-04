@@ -51,6 +51,8 @@ class TriggerManager: public dCustomTriggerManager
 
 	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
 	{
+		dAssert(0);
+/*
 		// send this message to the entity
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(visitor);
 		if (entity) {
@@ -74,6 +76,7 @@ class TriggerManager: public dCustomTriggerManager
 			// pass the controller pointer as the user data of this massage
 			entity->MessageHandler(me->GetBody(), message, (void*)me);
 		}
+*/
 	}
 	AdvancePlayerControllerManager* m_playerManager;
 };
@@ -163,6 +166,8 @@ class AdvancePlayerEntity: public DemoEntity
 
 	virtual void MessageHandler (NewtonBody* const sender, int message, void* const data)
 	{
+		dAssert(0);
+/*
 		switch (message) 
 		{
 			//a player can be in multiple triggers at the same time, it is important to see what trigger this is
@@ -188,6 +193,7 @@ class AdvancePlayerEntity: public DemoEntity
 				break;
 			}
 		}
+*/
 	}
 
 	InputRecord	m_inputs;
@@ -567,6 +573,8 @@ class PlaformEntityEntity: public DemoEntity
 
 	virtual void MessageHandler (NewtonBody* const sender, int message, void* const data)
 	{
+		dAssert(0);
+/*
 		DemoEntity::MessageHandler (sender, message, data);
 		switch (message) 
 		{
@@ -591,6 +599,7 @@ class PlaformEntityEntity: public DemoEntity
 				break;
 			}
 		}
+*/
 	}
 	FerryDriver* m_driver;
 };
@@ -739,6 +748,8 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 
 static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
+	dAssert(0);
+/*
 	NewtonWorld* const world = scene->GetNewton();
 	DemoEntityManager::dListNode* const bridgeNodes = scene->GetLast();
 	LoadScene(scene, name, location);
@@ -806,6 +817,7 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 			scene->RemoveEntity(entity);
 		}
 	}
+*/
 }
 
 /*
