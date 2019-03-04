@@ -53,7 +53,6 @@ class KinematiocListener: public dCustomListener
 	{
 		m_redBox->Release();
 		m_whiteBox->Release();
-		
 	}
 
 	void PreUpdate(dFloat timestep) 
@@ -80,7 +79,7 @@ class KinematiocListener: public dCustomListener
 	void CreateKinematicTransparentPlatform(const dMatrix& location)
 	{
 		KinematicPlatform& entry = AddPlatform(location);
-		entry.m_omega = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		entry.m_omega = dVector(0.0f, 0.2f, 0.0f, 0.0f);
 		SetTransparent(entry);
 	}
 

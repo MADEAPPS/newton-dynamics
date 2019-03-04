@@ -355,7 +355,8 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 					body->m_sleeping = true;
 					body->m_autoSleep = true;
 				}
-				body->m_equilibrium = true;
+				//body->m_equilibrium = true;
+				body->m_equilibrium = (body->m_omega.DotProduct(body->m_omega).GetScalar() < dgFloat32 (1.0e-6f)) && (body->m_veloc.DotProduct(body->m_veloc).GetScalar() < dgFloat32(1.0e-4f));
 
 				// update collision matrix by calling the transform callback for all kinematic bodies
 				if (body->GetBroadPhase()) {
