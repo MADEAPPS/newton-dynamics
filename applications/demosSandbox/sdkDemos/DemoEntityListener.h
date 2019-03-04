@@ -13,18 +13,17 @@
 #define __DEMO_ENTITY_LISTENER_H__
 
 #include "toolbox_stdafx.h"
-#include "DemoListenerBase.h"
+#include "dCustomListener.h"
 
-
-class DemoEntityListener: public DemoListenerBase
+class DemoEntityListener: public dCustomListener
 {
 	public:
 	DemoEntityListener(DemoEntityManager* const scene);
 	~DemoEntityListener();
 
 	private:
-	virtual void PreUpdate (const NewtonWorld* const world, dFloat timestep);
-	virtual void PostUpdate (const NewtonWorld* const world, dFloat timestep);
+	virtual void PreUpdate (dFloat timestep);
+	virtual void PostUpdate (dFloat timestep);
 
 	static void PreUpdateKernel (NewtonWorld* const world, void* const userData, int threadIndex);
 	static void PostUpdateKernel (NewtonWorld* const world, void* const userData, int threadIndex);

@@ -95,8 +95,6 @@ class MyTriggerManager: public dCustomTriggerManager
 		dFloat m_waterToSolidVolumeRatio;
 	};
 
-
-
 	MyTriggerManager(NewtonWorld* const world)
 		:dCustomTriggerManager(world)
 	{
@@ -142,7 +140,6 @@ class MyTriggerManager: public dCustomTriggerManager
 		}
 	}
 };
-
 
 
 void AlchimedesBuoyancy(DemoEntityManager* const scene)

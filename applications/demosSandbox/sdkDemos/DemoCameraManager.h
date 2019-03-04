@@ -19,7 +19,6 @@
 
 #include "toolbox_stdafx.h"
 #include "DemoEntity.h"
-#include "DemoListenerBase.h"
 
 class DemoCamera;
 class DemoCameraPickBodyJoint;

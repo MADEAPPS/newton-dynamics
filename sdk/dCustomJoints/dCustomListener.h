@@ -9,29 +9,30 @@
 * freely
 */
 
-#ifndef __DEMO_LISTENER_BASE_MANAGER_H__
-#define __DEMO_LISTENER_BASE_MANAGER_H__
+#ifndef __DCUSTUM_LISTENER_H__
+#define __DCUSTUM_LISTENER_H__
 
-#include "toolbox_stdafx.h"
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomAlloc.h"
 
-class DemoEntityManager;
-
-class DemoListenerBase
+class dCustomListener: public dCustomAlloc
 {
 	public:
-	DemoListenerBase(DemoEntityManager* const scene, const char* const listenerName);
-	virtual ~DemoListenerBase();
-	
-	virtual void PreUpdate (const NewtonWorld* const world, dFloat timestep) = 0;
-	virtual void PostUpdate (const NewtonWorld* const world, dFloat timestep) = 0;
+	dCustomListener(NewtonWorld* const world, const char* const listenerName);
+	virtual ~dCustomListener();
 
-	virtual void OnBodyDestroy (NewtonBody* const body);
+	NewtonWorld* GetWorld() const {return m_world;}
+
+	virtual void OnBodyDestroy (NewtonBody* const body) {};
+	virtual void PreUpdate (dFloat timestep) {};
+	virtual void PostUpdate (dFloat timestep) {};
 
 	private:
+	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void PreUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void PostUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
-	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
+	NewtonWorld* m_world;
 };
 
 #endif

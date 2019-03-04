@@ -60,8 +60,7 @@ static void BuildTower(DemoEntityManager* const scene, dFloat spacing, dFloat se
 					inpx = ((-((n+1) - 1)*spacingbetween) + (-((n+1) - 1) * ((towerboxcount)* wdt))) + (dCos(((360 / towerboxcount) * ct2) * dDegreeToRad) * rayon);
 					inpz = dSin(((360 / towerboxcount) * ct2) * dDegreeToRad) * rayon;
 					RollAngle = (ct2 * (360 / towerboxcount));
-				}
-				else {
+				} else {
 					inpx = ((-((n+1) - 1)*spacingbetween) + (-((n+1) - 1) * ((towerboxcount)* wdt))) + (dCos((((360.0f / towerboxcount) * ct2) + (360.0f / towerboxcount / 2)) * dDegreeToRad) * rayon);
 					inpz = dSin((((360.0f / towerboxcount) * ct2) + (360.0f / towerboxcount / 2)) * dDegreeToRad) * rayon;
 					RollAngle = ((ct2 * (360.0f / towerboxcount)) + (360.0f / towerboxcount / 2));

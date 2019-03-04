@@ -40,7 +40,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AnimatedPlayer.cpp" />
@@ -65,6 +64,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\Hexapod.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\JoesJointTest.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ObjectPlacement.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MishosRocketTest.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
@@ -111,7 +111,6 @@
     <ClInclude Include="..\..\sdkDemos\DemoEntity.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h" />
-    <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h" />
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />

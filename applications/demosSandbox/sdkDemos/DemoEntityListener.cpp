@@ -16,7 +16,7 @@
 
 
 DemoEntityListener::DemoEntityListener(DemoEntityManager* const scene)
-	:DemoListenerBase (scene, "entityListener")
+	:dCustomListener (scene->GetNewton(), "entityListener")
 {
 }
 
@@ -62,8 +62,9 @@ void DemoEntityListener::PostUpdateKernel (NewtonWorld* const world, void* const
 	}
 }
 
-void DemoEntityListener::PreUpdate (const NewtonWorld* const world, dFloat timestep)
+void DemoEntityListener::PreUpdate (dFloat timestep)
 {
+	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 	scene->m_currentListenerTimestep = timestep;
@@ -75,8 +76,9 @@ void DemoEntityListener::PreUpdate (const NewtonWorld* const world, dFloat times
 	NewtonSyncThreadJobs(world);
 }
 
-void DemoEntityListener::PostUpdate (const NewtonWorld* const world, dFloat timestep)
+void DemoEntityListener::PostUpdate (dFloat timestep)
 {
+	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 	scene->m_currentListenerTimestep = timestep;

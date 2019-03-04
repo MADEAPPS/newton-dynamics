@@ -75,9 +75,6 @@
     <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -153,9 +150,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp">
-      <Filter>mainLogic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
@@ -191,6 +185,12 @@
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\ShaderPrograms.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ObjectPlacement.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp">
+      <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -231,9 +231,6 @@
       <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h">
-      <Filter>mainLogic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h">
       <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h">
