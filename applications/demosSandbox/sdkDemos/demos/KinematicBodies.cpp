@@ -189,8 +189,8 @@ void KinematicBodies (DemoEntityManager* const scene)
 	// add some dynamic bodies 
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	dVector size(1.0f, 1.0f, 1.6f, 0.0f);
-	int countx = 2;
-	int countz = 2;
+	int countx = 1;
+	int countz = 1;
 	AddPrimitiveArray(scene, 1.0f, location.m_posit, size, countx, countz, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	dQuaternion rot;

@@ -1224,7 +1224,8 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 					//const dgInt32 kinematicTest1 = kinematicTest0 && !((isBody0Kinematic && body0->IsCollidable()) || (isBody0Kinematic && body1->IsCollidable()));
 					//const dgInt32 collisionTest = kinematicTest1 && !(body0->m_equilibrium & body1->m_equilibrium);
 
-					const dgInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody0Kinematic && body1->IsCollidable())));
+					//const dgInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody0Kinematic && body1->IsCollidable())));
+					const dgInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody1Kinematic && body1->IsCollidable())));
 					const dgInt32 collisionTest = kinematicTest && !(body0->m_equilibrium & body1->m_equilibrium);
 					if (collisionTest) {
 						const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
