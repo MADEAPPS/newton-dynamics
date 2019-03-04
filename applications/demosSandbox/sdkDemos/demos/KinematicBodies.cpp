@@ -61,6 +61,16 @@ class KinematiocListener: public dCustomListener
 	{
 		KinematicPlatform& entry = AddPlatform(location);
 		entry.m_omega = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+
+		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(entry.m_plaform);
+
+		DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+
+		for (DemoMesh::dListNode* ptr = mesh->GetFirst(); ptr; ptr = ptr->GetNext()) {
+			DemoSubMesh* const subMesh = &ptr->GetInfo();
+			subMesh->SetOpacity(0.7f);
+		}
+		mesh->OptimizeForRender();
 	}
 
 	private: 
