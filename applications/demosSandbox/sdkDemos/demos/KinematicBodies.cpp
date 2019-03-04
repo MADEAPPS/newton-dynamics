@@ -20,9 +20,17 @@
 
 class KinematiocListener: public dCustomListener
 {
+	struct KinematicPlatform
+	{
+		dVector m_omega;
+		dVector m_veloc;
+		NewtonBody* m_plaform;
+	};
+
 	public:
 	KinematiocListener(DemoEntityManager* const scene)
 		:dCustomListener(scene->GetNewton(), "Kinematic demo")
+		,m_platformList()
 	{
 	}
 	
@@ -32,21 +40,36 @@ class KinematiocListener: public dCustomListener
 
 	void PreUpdate(dFloat timestep) 
 	{
-		dVector omega (0.0f, 1.0f, 0.0f, 0.0f);
-		NewtonBodySetOmega(m_platform, &omega[0]);
+		for (dList<KinematicPlatform>::dListNode* ptr = m_platformList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			const KinematicPlatform& entry = ptr->GetInfo();
+
+			NewtonBodySetOmega(entry.m_plaform, &entry.m_omega[0]);
+			NewtonBodySetVelocity(entry.m_plaform, &entry.m_veloc[0]);
+		}
 	}
 
 	virtual void PostUpdate(dFloat timestep) 
 	{
-		NewtonBodyIntegrateVelocity (m_platform, timestep);
+		for (dList<KinematicPlatform>::dListNode* ptr = m_platformList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			const KinematicPlatform& entry = ptr->GetInfo();
+
+			NewtonBodyIntegrateVelocity (entry.m_plaform, timestep);
+		}
 	}
 
-	void CreateKinematicPlatform(const dMatrix& location)
+	void CreateKinematicTransparentPlatform(const dMatrix& location)
+	{
+		KinematicPlatform& entry = AddPlatform(location);
+		entry.m_omega = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	}
+
+	private: 
+	KinematicPlatform& AddPlatform(const dMatrix& location)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
-		NewtonCollision* const box = NewtonCreateBox(world, 4.0f, 0.25f, 3.0f, 0, NULL);
+		NewtonCollision* const box = NewtonCreateBox(world, 5.0f, 0.25f, 4.0f, 0, NULL);
 		NewtonBody* const body = NewtonCreateKinematicBody(world, box, &location[0][0]);
 
 		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
@@ -65,11 +88,17 @@ class KinematiocListener: public dCustomListener
 
 		NewtonDestroyCollision(box);
 
-		m_platform = body;
+		KinematicPlatform& entry = m_platformList.Append()->GetInfo();
+		entry.m_plaform = body;
+		entry.m_veloc = dVector(0.0f);
+		entry.m_omega = dVector(0.0f);
+
+		return entry;
 	}
 
-//	dList<NewtonBody*> m_platformList;
-	NewtonBody* m_platform;
+
+
+	dList<KinematicPlatform> m_platformList;
 };
 
 void KinematicBodies (DemoEntityManager* const scene)
@@ -87,8 +116,15 @@ void KinematicBodies (DemoEntityManager* const scene)
 	location.m_posit = origin;
 
 	location.m_posit.m_x += 15.0f;
-	location.m_posit.m_y -= 4.5f;
-	kinematicListener->CreateKinematicPlatform(location);
+	location.m_posit.m_y -= 4.25f;
+	kinematicListener->CreateKinematicTransparentPlatform(location);
+
+
+	// add some dynamic bodies 
+	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
+	dVector size(1.0f, 1.0f, 1.6f, 0.0f);
+	int count = 3;
+	AddPrimitiveArray(scene, 1.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
