@@ -26,7 +26,7 @@
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	union cpuInfo
 	{
 		int m_data[4];
