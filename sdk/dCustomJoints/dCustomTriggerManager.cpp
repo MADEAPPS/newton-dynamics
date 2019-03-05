@@ -22,6 +22,7 @@ dCustomTriggerManager::dCustomTriggerManager(NewtonWorld* const world)
 	,m_triggerList()
 	,m_timestep(0.0f)
 	,m_lock(0)
+	,m_lru(0)
 {
 }
 
@@ -93,11 +94,7 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 	NewtonBody* const triggerBody = controller->GetBody();
 	dTree<unsigned,NewtonBody*>& manifest = controller->m_manifest;
 
-	dTree<unsigned, NewtonBody*>::Iterator iter(manifest);
-	for (iter.Begin(); iter; iter++) {
-		iter.GetNode()->GetInfo() = 0;
-	}
-
+	m_lru++;
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (triggerBody); joint; joint = NewtonBodyGetNextContactJoint (triggerBody, joint)) {
 		dAssert (NewtonJointIsActive (joint));
 		//int isActive = NewtonJointIsActive (joint);
@@ -108,22 +105,22 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 		dTree<unsigned, NewtonBody*>::dTreeNode* node = manifest.Find(cargoBody); 
 
 		if (!node) {
-			unsigned val = 0;
 			dCustomScopeLock lock(&m_lock);
-			node = manifest.Insert(val, cargoBody);
+			node = manifest.Insert(m_lru, cargoBody);
 //			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(cargoBody);
 //			entity->SetMesh(m_redBox, entity->GetMeshMatrix());
 			EventCallback (controller, m_enterTrigger, cargoBody);
 		} else {
 			EventCallback (controller, m_inTrigger, cargoBody);
 		}
-		node->GetInfo() = 1;
+		node->GetInfo() = m_lru;
 	}
 
+	dTree<unsigned, NewtonBody*>::Iterator iter(manifest);
 	for (iter.Begin(); iter;) {
 		dTree<unsigned, NewtonBody*>::dTreeNode* const node = iter.GetNode();
 		iter++;
-		if (node->GetInfo() == 0) {
+		if (node->GetInfo() != m_lru) {
 			NewtonBody* const cargoBody = node->GetKey();
 			EventCallback (controller, m_exitTrigger, cargoBody);
 

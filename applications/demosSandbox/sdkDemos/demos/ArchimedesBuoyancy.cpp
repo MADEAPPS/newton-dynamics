@@ -71,10 +71,9 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				cog = matrix.TransformVector (cog);
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
 
-				
 				dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
-				dFloat fluidDentity = 1.0f / (m_waterToSolidVolumeRatio * shapeVolume);
-				dFloat viscosity = 0.995f;
+				dFloat fluidDentity = 1.4f / (m_waterToSolidVolumeRatio * shapeVolume);
+				dFloat viscosity = 0.99f;
 
 				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &cog[0], &gravity[0], &m_plane[0], fluidDentity, viscosity, &accelPerUnitMass[0], &torquePerUnitMass[0]);
 
@@ -121,7 +120,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 		for (DemoMesh::dListNode* ptr = geometry->GetFirst(); ptr; ptr = ptr->GetNext()) {
 			DemoSubMesh* const subMesh = &ptr->GetInfo();
-			subMesh->SetOpacity(0.5f);
+			subMesh->SetOpacity(0.25f);
 			subMesh->m_diffuse.m_x = 0.0f;
 			subMesh->m_diffuse.m_y = 0.0f;
 			subMesh->m_diffuse.m_z = 1.0f;

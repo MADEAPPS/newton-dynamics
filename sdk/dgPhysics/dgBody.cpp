@@ -407,7 +407,7 @@ dgConstraint* dgBody::GetNextContact(dgConstraint* const joint) const
 			dgConstraint* const joint1 = node->GetInfo().m_joint;
 			dgAssert (joint1);
 			if (joint1 && (joint1->GetId() == dgConstraint::m_contactConstraint)) {
-				dgContact* const contactJoint = (dgContact*) joint;
+				dgContact* const contactJoint = (dgContact*) joint1;
 				if (contactJoint->m_contactActive) {
 					return joint1;
 				}

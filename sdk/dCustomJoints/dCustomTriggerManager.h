@@ -100,6 +100,7 @@ class dCustomTriggerManager: public dCustomListener
 	dList<dCustomTriggerController> m_triggerList;
 	dFloat m_timestep;
 	unsigned m_lock;
+	unsigned m_lru;
 };
 
 
