@@ -25,18 +25,19 @@ class KinematiocListener: public dCustomListener
 		dVector m_omega;
 		dVector m_veloc;
 		NewtonBody* m_plaform;
-		dTree<int, NewtonBody*> m_cargo;
+		dTree<unsigned, NewtonBody*> m_cargo;
 	};
 
 	public:
 	KinematiocListener(DemoEntityManager* const scene)
 		:dCustomListener(scene->GetNewton(), "Kinematic demo")
 		,m_platformList()
+		,m_lru(0)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const boxShape = NewtonCreateBox(world, 1.0f, 1.0f, 1.6f, 0, NULL);
-		m_whiteBox = new DemoMesh("platform", scene->GetShaderCache(), boxShape, "smilli.tga", "smilli.tga", "smilli.tga");
 		m_redBox = new DemoMesh("platform", scene->GetShaderCache(), boxShape, "smilli.tga", "smilli.tga", "smilli.tga");
+		m_whiteBox = new DemoMesh("platform", scene->GetShaderCache(), boxShape, "smilli.tga", "smilli.tga", "smilli.tga");
 		NewtonDestroyCollision(boxShape);
 
 		for (DemoMesh::dListNode* ptr = m_redBox->GetFirst(); ptr; ptr = ptr->GetNext()) {
@@ -57,6 +58,7 @@ class KinematiocListener: public dCustomListener
 
 	void PreUpdate(dFloat timestep) 
 	{
+		m_lru++;
 		for (dList<KinematicPlatform>::dListNode* ptr = m_platformList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			KinematicPlatform& entry = ptr->GetInfo();
 
@@ -71,7 +73,6 @@ class KinematiocListener: public dCustomListener
 	{
 		for (dList<KinematicPlatform>::dListNode* ptr = m_platformList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			const KinematicPlatform& entry = ptr->GetInfo();
-
 			NewtonBodyIntegrateVelocity (entry.m_plaform, timestep);
 		}
 	}
@@ -100,28 +101,24 @@ class KinematiocListener: public dCustomListener
 	private: 
 	void UpdateBodies(KinematicPlatform& entry)
 	{
-		dTree<int, NewtonBody*>::Iterator iter (entry.m_cargo);
-		for (iter.Begin(); iter; iter ++) {
-			iter.GetNode()->GetInfo() = 0;
-		}
-
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(entry.m_plaform); joint; joint = NewtonBodyGetNextContactJoint(entry.m_plaform, joint)) {
 			NewtonBody* const body0 = NewtonJointGetBody0(joint);
 			NewtonBody* const body1 = NewtonJointGetBody1(joint);
 			NewtonBody* const cargoBody = (body0 == entry.m_plaform) ? body1 : body0;
-			dTree<int, NewtonBody*>::dTreeNode* node = entry.m_cargo.Find(cargoBody); 
+			dTree<unsigned, NewtonBody*>::dTreeNode* node = entry.m_cargo.Find(cargoBody); 
 			if (!node) {
-				node = entry.m_cargo.Insert(0, cargoBody);
+				node = entry.m_cargo.Insert(m_lru, cargoBody);
 				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(cargoBody);
 				entity->SetMesh(m_redBox, entity->GetMeshMatrix());
 			}
-			node->GetInfo() = 1;
+			node->GetInfo() = m_lru;
 		}
 
+		dTree<unsigned, NewtonBody*>::Iterator iter(entry.m_cargo);
 		for (iter.Begin(); iter; ) {
-			dTree<int, NewtonBody*>::dTreeNode* const node = iter.GetNode();
+			dTree<unsigned, NewtonBody*>::dTreeNode* const node = iter.GetNode();
 			iter++;
-			if (node->GetInfo() == 0) {
+			if (node->GetInfo() != m_lru) {
 				NewtonBody* const cargoBody = node->GetKey();
 				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(cargoBody);
 				entity->SetMesh(m_whiteBox, entity->GetMeshMatrix());
@@ -159,12 +156,6 @@ class KinematiocListener: public dCustomListener
 		geometry->Release();
 
 		NewtonBodySetUserData(body, entity);
-
-		// players must have weight, otherwise they are infinitely strong when they collide
-//		NewtonCollision* const shape = NewtonBodyGetCollision(m_body);
-//		NewtonBodySetMassProperties(m_body, mass, shape);
-//		NewtonBodySetCollidable(m_body, true);
-
 		NewtonDestroyCollision(box);
 
 		KinematicPlatform& entry = m_platformList.Append()->GetInfo();
@@ -175,9 +166,10 @@ class KinematiocListener: public dCustomListener
 		return entry;
 	}
 
+	dList<KinematicPlatform> m_platformList;
 	DemoMesh* m_redBox;
 	DemoMesh* m_whiteBox;
-	dList<KinematicPlatform> m_platformList;
+	unsigned m_lru;
 };
 
 void KinematicBodies (DemoEntityManager* const scene)
