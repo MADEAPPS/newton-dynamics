@@ -582,7 +582,7 @@ void DemoEntityManager::Cleanup ()
 		GetModuleFileNameA(NULL, plugInPath, 256);
 	#endif
 
-	for (int i = int(strlen(plugInPath) - 1); i; i--) {
+	for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
 		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
 			plugInPath[i] = 0;
 			break;
@@ -590,16 +590,24 @@ void DemoEntityManager::Cleanup ()
 	}
 
 #ifdef _DEBUG
-	#ifdef _NEWTON_USE_DOUBLE
-		strcat(plugInPath, "/newtonPlugins/debug_double");
+	#ifdef __linux__
+		strcat(plugInPath, "newtonPlugins");
 	#else
-		strcat(plugInPath, "/newtonPlugins/debug");
+		#ifdef _NEWTON_USE_DOUBLE
+			strcat(plugInPath, "/newtonPlugins/debug_double");
+		#else
+			strcat(plugInPath, "/newtonPlugins/debug");
+		#endif
 	#endif
 #else
-	#ifdef _NEWTON_USE_DOUBLE
-		strcat(plugInPath, "/newtonPlugins/release_double");
+	#ifdef __linux__
+		strcat(plugInPath, "newtonPlugins");
 	#else
-		strcat(plugInPath, "/newtonPlugins/release");
+		#ifdef _NEWTON_USE_DOUBLE
+			strcat(plugInPath, "/newtonPlugins/release_double");
+		#else
+			strcat(plugInPath, "/newtonPlugins/release");
+		#endif
 	#endif
 #endif
 	NewtonLoadPlugins(m_world, plugInPath);
