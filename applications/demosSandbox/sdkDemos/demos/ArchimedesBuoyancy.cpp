@@ -8,7 +8,7 @@
 #include "OpenGlUtil.h"
 
 
-class MyTriggerManager: public dCustomTriggerManager
+class BuoyancyTriggerManager: public dCustomTriggerManager
 {
 	public:
 	class TriggerCallback
@@ -95,8 +95,12 @@ class MyTriggerManager: public dCustomTriggerManager
 		dFloat m_waterToSolidVolumeRatio;
 	};
 
-	MyTriggerManager(NewtonWorld* const world)
+	BuoyancyTriggerManager(NewtonWorld* const world)
 		:dCustomTriggerManager(world)
+	{
+	}
+
+	~BuoyancyTriggerManager()
 	{
 	}
 
@@ -117,7 +121,7 @@ class MyTriggerManager: public dCustomTriggerManager
 
 		for (DemoMesh::dListNode* ptr = geometry->GetFirst(); ptr; ptr = ptr->GetNext()) {
 			DemoSubMesh* const subMesh = &ptr->GetInfo();
-			subMesh->SetOpacity(0.7f);
+			subMesh->SetOpacity(0.5f);
 			subMesh->m_diffuse.m_x = 0.0f;
 			subMesh->m_diffuse.m_y = 0.0f;
 			subMesh->m_diffuse.m_z = 1.0f;
@@ -127,22 +131,19 @@ class MyTriggerManager: public dCustomTriggerManager
 
 		geometry->Release();
 
-//		BuoyancyForce* const buoyancyForce = new BuoyancyForce (controller);
-//		controller->SetUserData (buoyancyForce);
+		BuoyancyForce* const buoyancyForce = new BuoyancyForce (trigger);
+		trigger->SetUserData (buoyancyForce);
 	}
-
-	void DestroyController (dCustomTriggerController* const controller)
+	
+	void DestroyTrigger (dCustomTriggerController* const trigger)
 	{
-		dAssert(0);
-//		TriggerCallback* const userData = (TriggerCallback*) controller->GetUserData();
-//		delete userData;
-//		dCustomTriggerManager::DestroyController (controller);
+		TriggerCallback* const userData = (TriggerCallback*) trigger->GetUserData();
+		delete userData;
+		dCustomTriggerManager::DestroyTrigger (trigger);
 	}
 	
 	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
 	{
-		dAssert(0);
-/*
 		TriggerCallback* const callback = (TriggerCallback*) me->GetUserData();
 		switch (event) 
 		{
@@ -164,7 +165,6 @@ class MyTriggerManager: public dCustomTriggerManager
 				break;
 			}
 		}
-*/
 	}
 };
 
@@ -179,7 +179,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 
 
 	// add a trigger Manager to the world
-	MyTriggerManager* const triggerManager = new MyTriggerManager(scene->GetNewton());
+	BuoyancyTriggerManager* const triggerManager = new BuoyancyTriggerManager(scene->GetNewton());
 
 	dMatrix triggerLocation (dGetIdentityMatrix());
 	triggerLocation.m_posit.m_x =  17.0f;

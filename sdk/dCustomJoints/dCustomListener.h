@@ -24,13 +24,15 @@ class dCustomListener: public dCustomAlloc
 	NewtonWorld* GetWorld() const {return m_world;}
 	virtual void PreUpdate (dFloat timestep) {};
 	virtual void PostUpdate (dFloat timestep) {};
-	virtual void OnBodyDestroy(NewtonBody* const body) {};
+
+	virtual void OnDestroy () {};
+	virtual void OnDestroyBody(NewtonBody* const body) {};
 
 	private:
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void PreUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void PostUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
-	static void OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
+	static void OnDestroyBody (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
 	NewtonWorld* m_world;
 };
 

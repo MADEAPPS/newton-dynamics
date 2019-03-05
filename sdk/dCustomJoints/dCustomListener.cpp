@@ -20,7 +20,7 @@ dCustomListener::dCustomListener(NewtonWorld* const world, const char* const lis
 	NewtonWorldListenerSetDestructorCallback (world, listener, Destroy);
 	NewtonWorldListenerSetPreUpdateCallback (world, listener, PreUpdate);
 	NewtonWorldListenerSetPostUpdateCallback (world, listener, PostUpdate);
-	NewtonWorldListenerSetBodyDestroyCallback (world, listener, OnBodyDestroy);
+	NewtonWorldListenerSetBodyDestroyCallback (world, listener, OnDestroyBody);
 }
 
 dCustomListener::~dCustomListener()
@@ -30,6 +30,7 @@ dCustomListener::~dCustomListener()
 void dCustomListener::Destroy(const NewtonWorld* const world, void* const listenerUserData)
 {
 	dCustomListener* const me = (dCustomListener*)listenerUserData;
+	me->OnDestroy();
 	delete me;
 }
 
@@ -47,9 +48,9 @@ void dCustomListener::PostUpdate (const NewtonWorld* const world, void* const li
 	me->PostUpdate(timestep);
 }
 
-void dCustomListener::OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body)
+void dCustomListener::OnDestroyBody (const NewtonWorld* const world, void* const listener, NewtonBody* const body)
 {
 	dCustomListener* const me = (dCustomListener*) NewtonWorldGetListenerUserData(world, listener);
 	dAssert (me->m_world == world);
-	me->OnBodyDestroy(body);
+	me->OnDestroyBody(body);
 }
