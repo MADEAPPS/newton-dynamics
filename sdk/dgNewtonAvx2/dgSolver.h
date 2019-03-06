@@ -29,9 +29,11 @@
 #include <immintrin.h>
 #endif
 
-#define DG_SOA_WORD_GROUP_SIZE	8 
+
 
 #ifdef _NEWTON_USE_DOUBLE
+#define DG_SOA_WORD_GROUP_SIZE	8 
+
 DG_MSC_AVX_ALIGMENT
 class dgSoaFloat
 {
@@ -172,6 +174,8 @@ class dgSoaFloat
 } DG_GCC_AVX_ALIGMENT;
 
 #else 
+
+#define DG_SOA_WORD_GROUP_SIZE	8 
 
 DG_MSC_AVX_ALIGMENT
 class dgSoaFloat
