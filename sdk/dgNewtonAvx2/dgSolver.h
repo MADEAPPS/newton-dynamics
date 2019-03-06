@@ -68,12 +68,6 @@ class dgSoaFloat
 		:m_low(_mm256_i64gather_pd(&baseAddr->m_f[0], index.m_lowInt, 8))
 		,m_high(_mm256_i64gather_pd(&baseAddr->m_f[0], index.m_highInt, 8))
 	{
-		//const dgInt64* const offsets = index.m_i;
-		//const dgFloat32* const ptr = baseAddr->m_f;
-		//dgSoaFloat& tmp = *this;
-		//for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
-		//	tmp[i] = ptr[offsets[i]];
-		//}
 	}
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)

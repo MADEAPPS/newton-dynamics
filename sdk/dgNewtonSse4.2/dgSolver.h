@@ -74,11 +74,8 @@
 
 		DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
 		{
-			dgSoaFloat& tmp = *this;
-			const dgInt64* const offsets = index.m_i;
-			const dgFloat32* const ptr = baseAddr->m_f;
 			for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
-				tmp[i] = ptr[offsets[i]];
+				m_f[i] = baseAddr->m_f[index.m_i[i]];
 			}
 		}
 
@@ -224,11 +221,8 @@
 
 		DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
 		{
-			dgSoaFloat& tmp = *this;
-			const dgInt32* const offsets = index.m_i;
-			const dgFloat32* const ptr = baseAddr->m_f;
 			for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
-				tmp[i] = ptr[offsets[i]];
+				m_f[i] = baseAddr->m_f[index.m_i[i]];
 			}
 		}
 
