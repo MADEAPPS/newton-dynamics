@@ -64,6 +64,16 @@ class dgSoaFloat
 	{
 	}
 
+	DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
+	{
+		dgSoaFloat& tmp = *this;
+		const dgInt64* const offsets = index.m_i;
+		const dgFloat32* const ptr = baseAddr->m_f;
+		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
+			tmp[i] = ptr[offsets[i]];
+		}
+	}
+
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
 		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
@@ -110,7 +120,6 @@ class dgSoaFloat
 
 	DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
 	{
-		//return _mm256_cmp_ps (m_type, A.m_type, _CMP_LT_OQ);
 		return dgSoaFloat(_mm256_cmp_pd(m_low, A.m_low, _CMP_LT_OQ), _mm256_cmp_pd(m_high, A.m_high, _CMP_LT_OQ));
 	}
 
@@ -191,6 +200,17 @@ class dgSoaFloat
 		: m_type(_mm256_loadu2_m128(&high.m_x, &low.m_x))
 	{
 	}
+
+	DG_INLINE dgSoaFloat (const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
+	{
+		dgSoaFloat& tmp = *this;
+		const dgInt32* const offsets = index.m_i;
+		const dgFloat32* const ptr = baseAddr->m_f;
+		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i ++) {
+			tmp[i] = ptr[offsets[i]];
+		}
+	}
+
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
@@ -277,6 +297,7 @@ class dgSoaFloat
 	union
 	{
 		__m256 m_type;
+		__m256i m_typeInt;
 		dgInt32 m_i[DG_SOA_WORD_GROUP_SIZE];
 		dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
 	};

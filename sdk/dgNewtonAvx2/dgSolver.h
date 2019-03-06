@@ -64,6 +64,18 @@ class dgSoaFloat
 	{
 	}
 
+	DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
+		:m_low(_mm256_i64gather_pd(&baseAddr->m_f[0], index.m_lowInt, 8))
+		,m_high(_mm256_i64gather_pd(&baseAddr->m_f[0], index.m_highInt, 8))
+	{
+		//const dgInt64* const offsets = index.m_i;
+		//const dgFloat32* const ptr = baseAddr->m_f;
+		//dgSoaFloat& tmp = *this;
+		//for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
+		//	tmp[i] = ptr[offsets[i]];
+		//}
+	}
+
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
 		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
@@ -110,7 +122,6 @@ class dgSoaFloat
 
 	DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
 	{
-		//return _mm256_cmp_ps (m_type, A.m_type, _CMP_LT_OQ);
 		return dgSoaFloat(_mm256_cmp_pd(m_low, A.m_low, _CMP_LT_OQ), _mm256_cmp_pd(m_high, A.m_high, _CMP_LT_OQ));
 	}
 
@@ -151,11 +162,15 @@ class dgSoaFloat
 
 	union
 	{
-		//__m256d m_type;
 		struct
 		{
 			__m256d m_low;
 			__m256d m_high;
+		};
+		struct
+		{
+			__m256i m_lowInt;
+			__m256i m_highInt;
 		};
 		dgInt64 m_i[DG_SOA_WORD_GROUP_SIZE];
 		dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
@@ -189,6 +204,11 @@ class dgSoaFloat
 
 	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
 		:m_type(_mm256_loadu2_m128(&high.m_x, &low.m_x))
+	{
+	}
+
+	DG_INLINE dgSoaFloat (const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
+		:m_type(_mm256_i32gather_ps(&baseAddr->m_f[0], index.m_typeInt, 4))
 	{
 	}
 
@@ -231,11 +251,6 @@ class dgSoaFloat
 		return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
 	}
 
-	DG_INLINE dgSoaFloat LoadIndirect(const dgSoaFloat* const baseAddr, const dgSoaFloat& index, const dgSoaFloat& mask) const
-	{
-		return _mm256_mask_i32gather_ps(m_type, &baseAddr->m_f[0], index.m_typeInt, mask.m_type, 4);
-	}
-
 	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
 	{
 		return _mm256_cmp_ps (m_type, A.m_type, _CMP_GT_OQ);
@@ -266,7 +281,7 @@ class dgSoaFloat
 		return _mm256_max_ps (m_type, A.m_type);
 	}
 
-	DG_INLINE float AddHorizontal() const
+	DG_INLINE dgFloat32 AddHorizontal() const
 	{
 		__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 		__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
@@ -384,7 +399,8 @@ class dgSolver: public dgParallelBodySolver
 
 	DG_INLINE void SortWorkGroup(dgInt32 base) const;
 	DG_INLINE void TransposeRow (dgSoaMatrixElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
-	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const;
+//	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const;
+	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const;
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 
 	dgSoaFloat m_soaOne;
