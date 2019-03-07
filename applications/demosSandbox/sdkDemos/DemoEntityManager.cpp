@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	3		// gyroscope precession
 //#define DEFAULT_SCENE	4		// closest distance
 //#define DEFAULT_SCENE	5		// primitive collision
-#define DEFAULT_SCENE	6		// kinematic bodies
+//#define DEFAULT_SCENE	6		// kinematic bodies
 //#define DEFAULT_SCENE	7		// Object Placement
 //#define DEFAULT_SCENE	8		// primitive convex cast 
 //#define DEFAULT_SCENE	9		// box stacks
@@ -63,7 +63,7 @@
 //#define DEFAULT_SCENE	27		// structured convex fracturing 
 //#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	29		// standard joints
-//#define DEFAULT_SCENE	30		// servo joints
+#define DEFAULT_SCENE	30		// servo joints
 //#define DEFAULT_SCENE	31		// articulated joints
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
@@ -347,7 +347,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-	m_workerThreads = 4;
+//	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
