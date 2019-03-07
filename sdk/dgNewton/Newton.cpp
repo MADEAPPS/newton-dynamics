@@ -2998,7 +2998,6 @@ void NewtonConvexCollisionCalculateInertialMatrix(const NewtonCollision* convexC
   @param *gravityVector pointer to an array of floats containing the gravity vector.
   @param fluidPlane fixme
   @param fluidDensity fluid density.
-  @param fluidViscosity fluid linear viscosity (resistance to linear translation).
   @param accel fixme
   @param alpha fixme
 
@@ -3015,7 +3014,7 @@ void NewtonConvexCollisionCalculateInertialMatrix(const NewtonCollision* convexC
 
   See also: ::NewtonConvexCollisionCalculateVolume
 */
-void NewtonConvexCollisionCalculateBuoyancyAcceleration (const NewtonCollision* const convexCollision, const dFloat* const matrix, const dFloat* const shapeOrigin, const dFloat* const gravityVector, const dFloat* const fluidPlane, dFloat fluidDensity, dFloat fluidViscosity, dFloat* const accel, dFloat* const alpha)
+void NewtonConvexCollisionCalculateBuoyancyAcceleration (const NewtonCollision* const convexCollision, const dFloat* const matrix, const dFloat* const shapeOrigin, const dFloat* const gravityVector, const dFloat* const fluidPlane, dFloat fluidDensity, dFloat* const accel, dFloat* const alpha)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
@@ -3029,7 +3028,7 @@ void NewtonConvexCollisionCalculateBuoyancyAcceleration (const NewtonCollision* 
 
 	dgVector force;
 	dgVector torque;
-	instance->CalculateBuoyancyAcceleration (dgMatrix (matrix), origin, gravity, plane, fluidDensity, fluidViscosity, force, torque);
+	instance->CalculateBuoyancyAcceleration (dgMatrix (matrix), origin, gravity, plane, fluidDensity, force, torque);
 
 	accel[0] = force.m_x;
 	accel[1] = force.m_y;

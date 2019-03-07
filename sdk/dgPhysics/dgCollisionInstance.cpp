@@ -632,20 +632,17 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 }
 
 
-void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& origin, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& unitForce, dgVector& unitTorque)
+void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& origin, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgVector& unitForce, dgVector& unitTorque)
 {
 	dgMatrix globalMatrix (m_localMatrix * matrix);
 
-	unitForce = dgVector (dgFloat32 (0.0f));
-	unitTorque = dgVector (dgFloat32 (0.0f));
+	unitForce = dgVector::m_zero;
+	unitTorque = dgVector::m_zero;
 	dgVector volumeIntegral (m_childShape->CalculateVolumeIntegral (globalMatrix, fluidPlane, *this));
 	if (volumeIntegral.m_w > dgFloat32 (0.0f)) {
 		dgVector buoyanceCenter (volumeIntegral - origin);
 
-		dgVector force (gravity.Scale (-fluidDensity * volumeIntegral.m_w));
-		dgVector torque (buoyanceCenter.CrossProduct(force));
-
-		unitForce += force;
-		unitTorque += torque;
+		unitForce = gravity.Scale (-fluidDensity * volumeIntegral.m_w);
+		unitTorque = buoyanceCenter.CrossProduct(unitForce);
 	}
 }

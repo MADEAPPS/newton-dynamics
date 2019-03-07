@@ -126,10 +126,9 @@ void dNewtonCollision::CalculateAABB (const dFloat* const matrix, dFloat* const 
 
 void dNewtonCollision::CalculateBuoyancyAcceleration (const dFloat* const matrix, const dFloat* const shapeOrigin, const dFloat* const gravityVector, const dFloat* const fluidPlane, dFloat fluidDensity, dFloat fluidViscosity, dFloat* const accel, dFloat* const alpha)
 {
-	NewtonConvexCollisionCalculateBuoyancyAcceleration (m_shape, matrix, shapeOrigin, gravityVector, fluidPlane, fluidDensity, fluidViscosity, accel, alpha);
+//	NewtonConvexCollisionCalculateBuoyancyAcceleration (m_shape, matrix, shapeOrigin, gravityVector, fluidPlane, fluidDensity, fluidViscosity, accel, alpha);
+	NewtonConvexCollisionCalculateBuoyancyAcceleration(m_shape, matrix, shapeOrigin, gravityVector, fluidPlane, fluidDensity, accel, alpha);
 }
-
-
 
 
 dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world, dLong collisionMask)

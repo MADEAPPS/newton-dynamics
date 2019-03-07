@@ -4,9 +4,7 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
-
 #include "OpenGlUtil.h"
-
 
 class BuoyancyTriggerManager: public dCustomTriggerManager
 {
@@ -47,8 +45,14 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			,m_waterToSolidVolumeRatio(0.9f)
 		{
 			// get the fluid plane for the upper face of the trigger volume
-			//NewtonBody* const body = m_controller->GetBody();
-			m_plane = dVector (0.0f, 1.0f, 0.0f, 1.5f);
+			NewtonBody* const body = m_controller->GetBody();
+			NewtonWorld* const world = NewtonBodyGetWorld(body);
+
+			dMatrix matrix;
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, 20.0f, matrix.m_posit.m_z, 0.0f), 40.0f));
+			//m_plane = dVector (0.0f, 1.0f, 0.0f, floor.m_y);
+			m_plane = dVector(0.0f, 1.0f, 0.0f, -1.0f);
 		}
 
 		void OnInside(NewtonBody* const visitor)
@@ -72,18 +76,24 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
 
 				dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
-				dFloat fluidDentity = 1.4f / (m_waterToSolidVolumeRatio * shapeVolume);
-				dFloat viscosity = 0.99f;
+				dFloat fluidDentity = 1.0f / (m_waterToSolidVolumeRatio * shapeVolume);
 
-				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &cog[0], &gravity[0], &m_plane[0], fluidDentity, viscosity, &accelPerUnitMass[0], &torquePerUnitMass[0]);
+				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &cog[0], &gravity[0], &m_plane[0], fluidDentity, &accelPerUnitMass[0], &torquePerUnitMass[0]);
 
 				dVector force (accelPerUnitMass.Scale (mass));
 				dVector torque (torquePerUnitMass.Scale (mass));
 
 				dVector omega(0.0f); 
+				dVector veloc(0.0f);
+
 				NewtonBodyGetOmega(visitor, &omega[0]);
-				omega = omega.Scale (viscosity);
+				NewtonBodyGetVelocity (visitor, &veloc[0]);
+
+				omega = omega.Scale(0.999f);
+				veloc = veloc.Scale(0.999f);
+
 				NewtonBodySetOmega(visitor, &omega[0]);
+				NewtonBodySetVelocity(visitor, &veloc[0]);
 
 				NewtonBodyAddForce (visitor, &force[0]);
 				NewtonBodyAddTorque (visitor, &torque[0]);
@@ -201,37 +211,6 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
-/*
-	//test buoyancy on scaled collisions
-	dVector plane (0.0f, 1.0f, 0.0f, 0.0f);
-	dMatrix L1 (dPitchMatrix(30.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
-	NewtonCollision* xxx0 = NewtonCreateCompoundCollision(scene->GetNewton(), 0);
-	NewtonCompoundCollisionBeginAddRemove(xxx0);
-	NewtonCollision* xxxx0 = NewtonCreateBox(scene->GetNewton(), 1.0f, 2.0f, 1.0f, 0, &L1[0][0]);
-	NewtonCompoundCollisionAddSubCollision(xxx0, xxxx0);
-	NewtonCompoundCollisionEndAddRemove(xxx0);
-
-	NewtonCollision* xxx1 = NewtonCreateCompoundCollision(scene->GetNewton(), 0);
-	NewtonCollision* xxxx1 = NewtonCreateBox(scene->GetNewton(), 1.0f, 1.0f, 1.0f, 0, &L1[0][0]);
-	NewtonCompoundCollisionAddSubCollision(xxx1, xxxx1);
-	NewtonCompoundCollisionEndAddRemove(xxx1);
-	NewtonCollisionSetScale(xxx1, 1.0f, 2.0f, 1.0f);
-
-	//dMatrix m (dPitchMatrix(45.0f * dDegreeToRad) * dYawMatrix(40.0f * dDegreeToRad) * dRollMatrix(70.0f * dDegreeToRad));
-	dMatrix m (dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
-
-	dVector gravity (0.0f, 0.0f, -9.8f, 0.0f);
-	dVector cog0 (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector accelPerUnitMass0;
-	dVector torquePerUnitMass0;
-	NewtonConvexCollisionCalculateBuoyancyAcceleration (xxx0, &m[0][0], &cog0[0], &gravity[0], &plane[0], 1.0f, 0.1f, &accelPerUnitMass0[0], &torquePerUnitMass0[0]);
-
-	dVector cog1 (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector accelPerUnitMass1;
-	dVector torquePerUnitMass1;
-	NewtonConvexCollisionCalculateBuoyancyAcceleration (xxx1, &m[0][0], &cog1[0], &gravity[0], &plane[0], 1.0f, 0.1f, &accelPerUnitMass1[0], &torquePerUnitMass1[0]);
-*/
-
 	int count = 5;
 	dVector size (1.0f, 0.25f, 0.5f);
 	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
@@ -245,15 +224,5 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
-/*
-for (NewtonBody* bodyPtr = NewtonWorldGetFirstBody(scene->GetNewton()); bodyPtr; bodyPtr = NewtonWorldGetNextBody(scene->GetNewton(), bodyPtr)) {
-	NewtonCollision* collision = NewtonBodyGetCollision(bodyPtr);
-	if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
-		NewtonCollisionSetScale (collision, 0.5f, 0.5f, 0.5f);
-	}
-}
-*/
-
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
