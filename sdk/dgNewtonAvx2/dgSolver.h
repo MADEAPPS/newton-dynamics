@@ -174,7 +174,7 @@ class dgSoaFloat
 } DG_GCC_AVX_ALIGMENT;
 
 #else 
-#if 0
+#if 1
 #define DG_SOA_WORD_GROUP_SIZE	8 
 class dgSoaFloat
 {
