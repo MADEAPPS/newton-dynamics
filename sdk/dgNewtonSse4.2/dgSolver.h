@@ -65,13 +65,6 @@
 		{
 		}
 
-		DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
-//			: m_low(_mm_set_ps(dgFloat32(low[3]), dgFloat32(low[2]), dgFloat32(low[1]), dgFloat32(low[0])))
-//			, m_high(_mm_set_ps(dgFloat32(high[3]), dgFloat32(high[2]), dgFloat32(high[1]), dgFloat32(high[0])))
-		{
-			dgAssert(0);
-		}
-
 		DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
 		{
 			for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {

@@ -18,7 +18,7 @@
 
 class DemoEntityManager;
 
-DemoMesh* CreateVisualPlaneMesh (const dVector& plane, int shader);
+DemoMesh* CreateVisualPlaneMesh (const dVector& plane, DemoEntityManager* const scene);
 NewtonCollision* CreateInfinitePlane (NewtonWorld* const world, const dVector& planeEquation);
 
 

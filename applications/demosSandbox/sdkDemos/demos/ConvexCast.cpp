@@ -364,7 +364,7 @@ static void AddUserDefineStaticMesh(DemoEntityManager* const scene)
 	NewtonBody* const body = NewtonCreateDynamicBody(scene->GetNewton(), planeCollision, &matrix[0][0]);
 
 	// create a visual mesh
-	DemoMesh* const mesh = CreateVisualPlaneMesh (planeEquation, scene->GetShaderCache().m_diffuseEffect);
+	DemoMesh* const mesh = CreateVisualPlaneMesh (planeEquation, scene);
 	DemoEntity* const entity = new DemoEntity(matrix, NULL);
 
 	NewtonCollisionGetMatrix(planeCollision, &matrix[0][0]);
