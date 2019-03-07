@@ -155,6 +155,8 @@ class ServoInputManager: public dCustomInputManager
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
+		dAssert (0);
+/*
 		if (!m_player[m_currentPlayer % m_playersCount]) {
 			return ;
 		}
@@ -193,6 +195,7 @@ class ServoInputManager: public dCustomInputManager
 #endif
 #endif
 		lifterData->SetInput(inputs);
+*/
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
@@ -203,6 +206,9 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
+		dAssert(0);
+		/*
+
 		if (!m_player[m_currentPlayer % m_playersCount]) {
 			return;
 		}
@@ -229,6 +235,7 @@ class ServoInputManager: public dCustomInputManager
 		}
 
 		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
+*/
 	}
 
 	void OnEndUpdate(dFloat timestepInSecunds)
@@ -449,6 +456,8 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
+		dAssert(0);
+		/*
 		//ServoEntityModel* const lifterData = (ServoEntityModel*)controller->GetUserData();
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 		if (!lifterData) {
@@ -508,6 +517,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		if (lifterData->m_paletteJoints[1]) {
 			lifterData->m_paletteJoints[1]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
 		}
+*/
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -668,6 +678,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	dCustomWheel* LinkFrontTireJoint(dCustomTransformController* const controller, NewtonBody* const chassis, NewtonBody* const tire)
 	{
+		dAssert(0);
+		return NULL;
+		/*
+
 		dCustomWheel* const wheel = LinkTireJoint(chassis, tire);
 
 		// link traction tire to the engine using a differential gear
@@ -689,10 +703,14 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up.Scale(-1.0f), engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
 
 		return wheel;
+*/
 	}
 
 	void ConnectBodyPart(dCustomTransformController* const controller, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
 	{
+		dAssert(0);
+		/*
+
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 
 		if (jointArticulation == "") {
@@ -738,10 +756,14 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		} else {
 			dAssert(0);
 		}
+*/
 	}
 
 	dCustomTransformController::dSkeletonBone* CreateEngineNode(dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const chassisBone)
 	{
+		dAssert(0);
+		return NULL;
+		/*
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = NewtonCreateCylinder(world, 0.125f, 0.125f, 0.75f, 0, NULL);
 
@@ -783,6 +805,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		engineJoint->EnableLimits(false);
 		engineJoint->EnableLimits1(false);
 		return controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
+*/
 	}
 
 	dCustomMotor* CreateEngineMotor(dCustomTransformController* const controller, dCustomDoubleHinge* const engineJoint)
@@ -797,6 +820,9 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	dCustomTransformController* CreateForklift(const dMatrix& location, const char* const filename, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
 	{
+		dAssert(0);
+		return NULL;
+		/*
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
@@ -879,6 +905,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			}
 		}
 		return controller;
+*/
 	}
 };
 
@@ -924,6 +951,9 @@ void ServoJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+return;
+
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);

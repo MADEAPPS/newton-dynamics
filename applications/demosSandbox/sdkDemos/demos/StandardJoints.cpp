@@ -362,6 +362,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 //	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, NULL);
 	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
+	joint1;
 //	joint1->EnableLimits(false);
 //	joint1->SetLimits(-5.0f * dPi, 2.0f * dPi);
 
@@ -381,6 +382,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 // link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	dCustomDoubleHinge* const joint2 = new dCustomDoubleHinge(matrix, box2, box0);
+	joint2;
 //	joint2->EnableLimits1(true);
 //	joint2->EnableLimits1(false);
 //	joint2->SetLimits1 (-3.0f * dPi, 5.0f * dPi);

@@ -140,6 +140,10 @@ class CrashDummyManager: public dCustomTransformManager
 //	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	static int OnBoneAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
+		dAssert(0);
+		return 0;
+		/*
+
 		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
 		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
@@ -155,6 +159,7 @@ class CrashDummyManager: public dCustomTransformManager
 		}
 
 		return 1;
+*/
 	}
 
 	void GetDimentions(DemoEntity* const bodyPart, dVector& origin, dVector& size) const
@@ -373,6 +378,10 @@ class CrashDummyManager: public dCustomTransformManager
 
 	dCustomTransformController* CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
 	{
+		dAssert(0);
+		return NULL;
+		/*
+
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
@@ -441,6 +450,7 @@ class CrashDummyManager: public dCustomTransformManager
 		NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
 
 		return controller;
+		*/
 	}
 
 	int m_material;
@@ -450,6 +460,10 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+return;
+
+/*
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
@@ -501,4 +515,5 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	origin.m_y += 3.0f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
+*/
 }

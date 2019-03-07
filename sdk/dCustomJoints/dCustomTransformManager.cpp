@@ -16,7 +16,7 @@
 
 
 dCustomTransformManager::dCustomTransformManager(NewtonWorld* const world, const char* const name)
-	:dCustomControllerManager<dCustomTransformController>(world, name)
+	:dCustomListener(world, name)
 {
 }
 
@@ -24,12 +24,17 @@ dCustomTransformManager::~dCustomTransformManager()
 {
 }
 
-dCustomTransformController* dCustomTransformManager::CreateTransformController ()
+
+dCustomTransformController* dCustomTransformManager::CreateTransformController()
 {
-	dCustomTransformController* const controller = (dCustomTransformController*) CreateController();
-	controller->Init ();
-	return controller;
+	dAssert (0);
+//	dCustomTransformController* const controller = (dCustomTransformController*)CreateController();
+//	controller->Init();
+//	return controller;
+	return NULL;
 }
+
+/*
 
 dCustomTransformController::dCustomTransformController()
 	:m_collisionAggregate(NULL)
@@ -139,3 +144,4 @@ dCustomJoint* dCustomTransformController::dSkeletonBone::FindJoint() const
 	}
 	return NULL;
 }
+*/

@@ -16,12 +16,12 @@
 #define D_CUSTOM_ARTICULATED_TRANSFORM_MANAGER_H_
 
 #include "dCustomJointLibraryStdAfx.h"
-#include "dCustomControllerManager.h"
+//#include "dCustomControllerManager.h"
+#include "dCustomListener.h"
 
-//#define D_HIERACHICAL_CONTROLLER_MAX_BONES	64
 
 #define HIERACHICAL_ARTICULATED_PLUGIN_NAME	"__articulatedTransformManager__"
-
+/*
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
 class dCustomTransformController: public dCustomControllerBase
 {
@@ -55,17 +55,57 @@ class dCustomTransformController: public dCustomControllerBase
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	dList<dSkeletonBone> m_bones;
+//	dList<dSkeletonBone> m_bones;
+	dSkeletonBone m_root;
 	void* m_collisionAggregate;
 	bool m_calculateLocalTransform;
 	friend class dCustomTransformManager;
 };
+*/
 
-class dCustomTransformManager: public dCustomControllerManager<dCustomTransformController> 
+
+class dSkeletonBone: public dList<dSkeletonBone>
+{
+	public:
+	dSkeletonBone()
+		:dList<dSkeletonBone>()
+	{
+		dAssert(0);
+	}
+
+	~dSkeletonBone()
+	{
+		dAssert(0);
+	}
+
+	dMatrix m_bindMatrix;
+	NewtonBody* m_body;
+	dSkeletonBone* m_parent;
+//	dCustomTransformController* m_controller;
+	CUSTOM_JOINTS_API dCustomJoint* FindJoint() const;
+};
+
+class dCustomTransformController: public dSkeletonBone
+{
+	public:
+	dCustomTransformController()
+	{
+		dAssert (0);
+	}
+
+	~dCustomTransformController()
+	{
+		dAssert (0);
+	}
+};
+
+//class dCustomTransformManager: public dCustomControllerManager<dCustomTransformController> 
+class dCustomTransformManager: public dCustomListener
 {
 	public:
 	CUSTOM_JOINTS_API dCustomTransformManager(NewtonWorld* const world, const char* const name = HIERACHICAL_ARTICULATED_PLUGIN_NAME);
 	CUSTOM_JOINTS_API virtual ~dCustomTransformManager();
+
 
 	CUSTOM_JOINTS_API virtual dCustomTransformController* CreateTransformController ();
 
@@ -73,8 +113,25 @@ class dCustomTransformManager: public dCustomControllerManager<dCustomTransformC
 	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const = 0;
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
+	protected:
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep)
+	{
+		dAssert (0);
+	}
+
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep)
+	{
+		dAssert (0);	
+	}
+
+	CUSTOM_JOINTS_API virtual void OnDestroy()
+	{
+		dAssert (0);
+	}
+
 	private: 
-	friend class dCustomTransformController;
+//	friend class dCustomTransformController;
+	dList<dCustomTransformController> m_controllersList;
 };
 
 
