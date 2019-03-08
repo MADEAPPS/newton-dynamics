@@ -68,26 +68,32 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				NewtonBodyGetMatrix (visitor, &matrix[0][0]);
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
 				
+				// calculate the volume and center of mass of the shape under teh water surface 
 				dFloat volume = NewtonConvexCollisionCalculateBuoyancyVolume (collision, &matrix[0][0], &m_plane[0], &cenyterOfPreasure[0]);
 				if (volume > 0.0f) {
+					// if some part of teh shape si under water, calculate the bouyancy force base on 
+					// Archemides buoyancy principle, which is the bouyancy force is equal to the 
+					// weight of the fluid displaced by the volume under water. 
 					dVector cog(0.0f);
 					const dFloat viscousDrag = 0.997f;
 					const dFloat solidDentityFactor = 1.35f;
 
+					// calculate the ratio of volumes an use it calculate a density equivalent
 					dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
 					dFloat density = mass * solidDentityFactor /shapeVolume;
 
 					dFloat displacedMass = density * volume;
-
 					NewtonBodyGetCentreOfMass(visitor, &cog[0]);
 					cenyterOfPreasure -= matrix.TransformVector(cog);
 
+					// now with the mass and center of mass of the volume under water, calculate bouyancy force and torque
 					dVector force (dFloat(0.0f), dFloat(-DEMO_GRAVITY * displacedMass), dFloat(0.0f), dFloat(0.0f));
 					dVector torque (cenyterOfPreasure.CrossProduct(force));
 
 					NewtonBodyAddForce (visitor, &force[0]);
 					NewtonBodyAddTorque (visitor, &torque[0]);
 
+					// apply a fake viscuos drag to damp the under water motion 
 					dVector omega(0.0f);
 					dVector veloc(0.0f);
 					NewtonBodyGetOmega(visitor, &omega[0]);
@@ -117,6 +123,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
+		// create a large summing pool, usin a trigger volume 
 		dCustomTriggerController* const trigger = CreateTrigger (matrix, convexShape, NULL);
 		NewtonBody* const triggerBody = trigger->GetBody();
 
@@ -152,6 +159,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 	
 	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
 	{
+		// each trigger has it own callback for some effect 
 		TriggerCallback* const callback = (TriggerCallback*) me->GetUserData();
 		switch (event) 
 		{
