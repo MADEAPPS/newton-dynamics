@@ -226,14 +226,11 @@ void dgCollisionConvex::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector
 	p1 = (origin + size) & dgVector::m_triplexMask;
 }
 
-
-
 void dgCollisionConvex::CalculateInertia (void* userData, int indexCount, const dgFloat32* const faceVertex, int faceId)
 {
 	dgPolyhedraMassProperties& localData = *((dgPolyhedraMassProperties*) userData);
 	localData.AddInertiaAndCrossFace(indexCount, faceVertex);
 }
-
 
 dgFloat32 dgCollisionConvex::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
 {
@@ -242,17 +239,17 @@ dgFloat32 dgCollisionConvex::CalculateMassProperties (const dgMatrix& offset, dg
 	return localData.MassProperties (centerOfMass, inertia, crossInertia);
 }
 
-
 void dgCollisionConvex::MassProperties ()
 {
-	m_centerOfMass.m_w = dgCollisionConvex::CalculateMassProperties (dgGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
-	if (m_centerOfMass.m_w < DG_MAX_MIN_VOLUME) {
-		m_centerOfMass.m_w = DG_MAX_MIN_VOLUME;
+	dgFloat32 volume = dgCollisionConvex::CalculateMassProperties (dgGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
+	if (volume < DG_MAX_MIN_VOLUME) {
+		volume = DG_MAX_MIN_VOLUME;
 	}
-	dgFloat32 invVolume = dgFloat32 (1.0f) / m_centerOfMass.m_w;
+	dgFloat32 invVolume = dgFloat32 (1.0f) / volume;
 	m_inertia = m_inertia.Scale (invVolume);
 	m_crossInertia = m_crossInertia.Scale (invVolume);
 	m_centerOfMass = m_centerOfMass.Scale (invVolume);
+	m_centerOfMass.m_w = volume;
 
 	// complete the calculation 
 	dgCollision::MassProperties ();
@@ -347,8 +344,6 @@ dgFloat32 dgCollisionConvex::GetBoxMaxRadius () const
 	return m_boxMaxRadius;
 } 
 
-
-
 dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& globalPlane, const dgCollisionInstance& parentScale) const
 {
 	dgPlane localPlane (globalMatrix.UntransformPlane (globalPlane));
@@ -392,8 +387,6 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatri
 	return cg;
 }
 
-
-
 dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const 
 {
 	dgInt8 mark[DG_MAX_EDGE_COUNT];
@@ -424,7 +417,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	dgPolyhedraMassProperties localData;
 	dgConvexSimplexEdge* capEdge = NULL;
 
-	dgVector cg (dgFloat32 (0.0f)); 
+	dgVector cg (dgVector::m_zero); 
 	memset (mark, 0, sizeof (mark));
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 		if (!mark[i]) {
@@ -468,7 +461,6 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 			}
 		}
 	}
-
 
 	if (capEdge) {
 		dgInt32 count = 0;

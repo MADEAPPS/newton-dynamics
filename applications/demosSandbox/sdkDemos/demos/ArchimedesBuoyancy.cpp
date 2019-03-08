@@ -59,7 +59,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			dFloat Iyy;
 			dFloat Izz;
 			dFloat mass;
-			
+
 			NewtonBodyGetMass(visitor, &mass, &Ixx, &Iyy, &Izz);
 			if (mass > 0.0f) {
 				dMatrix matrix;
@@ -71,11 +71,11 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				dFloat volume = NewtonConvexCollisionCalculateBuoyancyVolume (collision, &matrix[0][0], &m_plane[0], &cenyterOfPreasure[0]);
 				if (volume > 0.0f) {
 					dVector cog(0.0f);
-					const dFloat waterDentity = 1.2f;
 					const dFloat viscousDrag = 0.997f;
+					const dFloat solidDentityFactor = 1.35f;
 
 					dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
-					dFloat density = mass * waterDentity /shapeVolume;
+					dFloat density = mass * solidDentityFactor /shapeVolume;
 
 					dFloat displacedMass = density * volume;
 
@@ -211,7 +211,6 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
 	int count = 5;
-//	int count = 1;
 	dVector size (1.0f, 0.25f, 0.5f);
 	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
@@ -221,7 +220,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

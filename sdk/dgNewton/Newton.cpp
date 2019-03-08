@@ -3014,25 +3014,10 @@ void NewtonConvexCollisionCalculateInertialMatrix(const NewtonCollision* convexC
 dFloat NewtonConvexCollisionCalculateBuoyancyVolume (const NewtonCollision* const convexCollision, const dFloat* const matrix, const dFloat* const fluidPlane, dFloat* const centerOfBuoyancy)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-
 	dgCollisionInstance* const instance = (dgCollisionInstance*)convexCollision;
-	
-//	dgVector origin (shapeOrigin);
-//	dgVector gravity (gravityVector);
-//	origin = origin & dgVector::m_triplexMask;
-//	gravity = gravity & dgVector::m_triplexMask;
 	dgVector plane (fluidPlane[0], fluidPlane[1], fluidPlane[2], fluidPlane[3]);
 
-//	dgVector force;
-//	dgVector torque;
 	dgVector com (instance->CalculateBuoyancyVolume (dgMatrix (matrix), plane));
-
-//	accel[0] = force.m_x;
-//	accel[1] = force.m_y;
-//	accel[2] = force.m_z;
-//	alpha[0] = torque.m_x;
-//	alpha[1] = torque.m_y;
-//	alpha[2] = torque.m_z;
 	centerOfBuoyancy[0] = com[0];
 	centerOfBuoyancy[1] = com[1];
 	centerOfBuoyancy[2] = com[2];
