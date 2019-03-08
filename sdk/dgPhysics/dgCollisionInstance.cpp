@@ -632,17 +632,3 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 }
 
 
-void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& origin, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgVector& unitForce, dgVector& unitTorque)
-{
-	dgMatrix globalMatrix (m_localMatrix * matrix);
-
-	unitForce = dgVector::m_zero;
-	unitTorque = dgVector::m_zero;
-	dgVector volumeIntegral (m_childShape->CalculateVolumeIntegral (globalMatrix, fluidPlane, *this));
-	if (volumeIntegral.m_w > dgFloat32 (0.0f)) {
-		dgVector buoyanceCenter (volumeIntegral - origin);
-
-		unitForce = gravity.Scale (-fluidDensity * volumeIntegral.m_w);
-		unitTorque = buoyanceCenter.CrossProduct(unitForce);
-	}
-}

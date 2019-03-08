@@ -414,13 +414,10 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	}
 
 	if (positive == m_vertexCount) {
-		return dgVector (dgFloat32 (0.0f));
+		return dgVector::m_zero;
 	}
 
 	if (negative == m_vertexCount) {
-		//dgVector volume (this->GetVolume());
-		//volume.m_w = m_simplexVolume;
-		//return volume;
 		return m_centerOfMass;
 	}
 
