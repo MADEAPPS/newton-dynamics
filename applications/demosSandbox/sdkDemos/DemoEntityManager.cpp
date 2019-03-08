@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
 //#define DEFAULT_SCENE	15		// compound Collision
-#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// scaled mesh collision
@@ -63,7 +63,7 @@
 //#define DEFAULT_SCENE	27		// structured convex fracturing 
 //#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	29		// standard joints
-//#define DEFAULT_SCENE	30		// servo joints
+#define DEFAULT_SCENE	30		// servo joints
 //#define DEFAULT_SCENE	31		// articulated joints
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot

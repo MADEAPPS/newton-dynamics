@@ -155,7 +155,7 @@ class ServoInputManager: public dCustomInputManager
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
-		dAssert (0);
+		dTrace(("Fix this shit\n"));
 /*
 		if (!m_player[m_currentPlayer % m_playersCount]) {
 			return ;
@@ -206,7 +206,7 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
-		dAssert(0);
+		dTrace(("Fix this shit\n"));
 		/*
 
 		if (!m_player[m_currentPlayer % m_playersCount]) {
@@ -951,8 +951,6 @@ void ServoJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-return;
 
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
@@ -967,6 +965,9 @@ return;
 
 	//  create a skeletal transform controller for controlling rag doll
 	ServoVehicleManagerManager* const vehicleManager = new ServoVehicleManagerManager (scene);
+
+dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+return;
 
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);

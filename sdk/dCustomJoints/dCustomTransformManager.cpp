@@ -25,7 +25,7 @@ dCustomTransformManager::~dCustomTransformManager()
 }
 
 
-dCustomTransformController* dCustomTransformManager::CreateTransformController()
+dCustomTransformController* dCustomTransformManager::CreateTransformController(NewtonBody* const bone, const dMatrix& bindMatrix)
 {
 	dAssert (0);
 //	dCustomTransformController* const controller = (dCustomTransformController*)CreateController();
@@ -33,6 +33,34 @@ dCustomTransformController* dCustomTransformManager::CreateTransformController()
 //	return controller;
 	return NULL;
 }
+
+void dCustomTransformManager::PreUpdate(dFloat timestep)
+{
+	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
+		dCustomTransformController* const controller = &node->GetInfo();
+		OnPreUpdate(controller, timestep, 0);
+	}
+}
+
+void dCustomTransformManager::PostUpdate(dFloat timestep)
+{
+	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
+		dCustomTransformController* const controller = &node->GetInfo();
+		dAssert(0);
+//		OnPostUpdate(controller, timestep, 0);
+	}
+}
+
+void dCustomTransformManager::OnDestroy()
+{
+	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; ) {
+		dCustomTransformController* const controller = &node->GetInfo();
+		node = node->GetNext();
+		dAssert(0);
+//		DestroyTrigger(&controller);
+	}
+}
+
 
 /*
 

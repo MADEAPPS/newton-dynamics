@@ -51,8 +51,8 @@ class dCustomTransformController: public dCustomControllerBase
 	
 	protected:
 	CUSTOM_JOINTS_API void Init ();
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+
+	
 	
 	private:
 //	dList<dSkeletonBone> m_bones;
@@ -106,28 +106,16 @@ class dCustomTransformManager: public dCustomListener
 	CUSTOM_JOINTS_API dCustomTransformManager(NewtonWorld* const world, const char* const name = HIERACHICAL_ARTICULATED_PLUGIN_NAME);
 	CUSTOM_JOINTS_API virtual ~dCustomTransformManager();
 
-
-	CUSTOM_JOINTS_API virtual dCustomTransformController* CreateTransformController ();
+	CUSTOM_JOINTS_API virtual dCustomTransformController* CreateTransformController (NewtonBody* const bone, const dMatrix& bindMatrix);
 
 	CUSTOM_JOINTS_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
 	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const = 0;
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
 	protected:
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep)
-	{
-		dAssert (0);
-	}
-
-	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep)
-	{
-		dAssert (0);	
-	}
-
-	CUSTOM_JOINTS_API virtual void OnDestroy()
-	{
-		dAssert (0);
-	}
+	CUSTOM_JOINTS_API virtual void OnDestroy();
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep);
 
 	private: 
 //	friend class dCustomTransformController;
