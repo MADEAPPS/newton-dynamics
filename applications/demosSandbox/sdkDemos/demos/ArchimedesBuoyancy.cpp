@@ -53,6 +53,18 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			m_plane = dVector (0.0f, 1.0f, 0.0f, -floor.m_y);
 		}
 
+		void OnEnter(NewtonBody* const visitor)
+		{
+			// make some random density, and store on the collision shape for more interesting effect. 
+			dFloat density = 1.1f + dGaussianRandom (0.4f);
+			NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
+
+			NewtonCollisionMaterial collisionMaterial;
+			NewtonCollisionGetMaterial (collision, &collisionMaterial);
+			collisionMaterial.m_userParam[0]= density;
+			NewtonCollisionSetMaterial (collision, &collisionMaterial);
+		}
+
 		void OnInside(NewtonBody* const visitor)
 		{
 			dFloat Ixx;
@@ -68,15 +80,20 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				NewtonBodyGetMatrix (visitor, &matrix[0][0]);
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
 				
-				// calculate the volume and center of mass of the shape under teh water surface 
+				// calculate the volume and center of mass of the shape under the water surface 
 				dFloat volume = NewtonConvexCollisionCalculateBuoyancyVolume (collision, &matrix[0][0], &m_plane[0], &cenyterOfPreasure[0]);
 				if (volume > 0.0f) {
-					// if some part of teh shape si under water, calculate the bouyancy force base on 
-					// Archemides buoyancy principle, which is the bouyancy force is equal to the 
+					// if some part of the shape si under water, calculate the buoyancy force base on 
+					// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
 					// weight of the fluid displaced by the volume under water. 
 					dVector cog(0.0f);
 					const dFloat viscousDrag = 0.997f;
-					const dFloat solidDentityFactor = 1.35f;
+					//const dFloat solidDentityFactor = 1.35f;
+
+					// Get the body density form the collision material.
+					NewtonCollisionMaterial collisionMaterial;
+					NewtonCollisionGetMaterial(collision, &collisionMaterial);
+					const dFloat solidDentityFactor = collisionMaterial.m_userParam[0];
 
 					// calculate the ratio of volumes an use it calculate a density equivalent
 					dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
@@ -93,7 +110,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					NewtonBodyAddForce (visitor, &force[0]);
 					NewtonBodyAddTorque (visitor, &torque[0]);
 
-					// apply a fake viscuos drag to damp the under water motion 
+					// apply a fake viscous drag to damp the under water motion 
 					dVector omega(0.0f);
 					dVector veloc(0.0f);
 					NewtonBodyGetOmega(visitor, &omega[0]);
@@ -123,7 +140,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		// create a large summing pool, usin a trigger volume 
+		// create a large summing pool, using a trigger volume 
 		dCustomTriggerController* const trigger = CreateTrigger (matrix, convexShape, NULL);
 		NewtonBody* const triggerBody = trigger->GetBody();
 
@@ -218,14 +235,14 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
-	int count = 5;
-	dVector size (1.0f, 0.25f, 0.5f);
+	int count = 6;
+	dVector size (1.0f, 0.5f, 0.5f);
 	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
