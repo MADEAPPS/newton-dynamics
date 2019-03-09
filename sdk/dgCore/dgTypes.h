@@ -506,16 +506,19 @@ class dgFloatExceptions
 	~dgFloatExceptions();
 
 	private:
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
 	dgUnsigned32 m_mask;
+#endif
 };
-
 
 class dgSetPrecisionDouble 
 {
 	public:
 	dgSetPrecisionDouble();
 	~dgSetPrecisionDouble();
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
 	dgInt32 m_mask; 
+	#endif
 };
 
 DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
