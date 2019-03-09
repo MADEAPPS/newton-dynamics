@@ -661,8 +661,12 @@ class dgScopeSpinPause
 
 #ifdef _MACOSX_VER
 #include <sys/time.h>
-#define CLOCK_REALTIME 0
-#define CLOCK_MONOTONIC 0
+#ifndef CLOCK_REALTIME
+	#define CLOCK_REALTIME 0
+#endif
+#ifndef CLOCK_MONOTONIC
+	#define CLOCK_MONOTONIC 0
+#endif
 //clock_gettime is not implemented on OSX
 DG_INLINE int clock_gettime(int /*clk_id*/, struct timespec* t) {
     struct timeval now;
