@@ -330,63 +330,99 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 {
 	dVector size(1.0f, 1.0f, 1.0f);
 
-	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 4.0f, 0.0f));
+	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(0.25f, 0.25f, 5.0f, 0.0f));
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
-	dMatrix matrix;
-	dVector damp(0.0f);
-//	dVector omega(0.0f, 0.0f, 30.0f, 0.0f);
-	dVector omega1(0.0f, 2.0f, 50.0f, 0.0f);
-	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 2.0f, 0.0f), 1.0f, 0.5f);
-	DemoEntity* const boxEntity1 = ((DemoEntity*) NewtonBodyGetUserData(box1));
+	{
+		dMatrix matrix;
+		dVector damp(0.0f);
+	//	dVector omega(0.0f, 0.0f, 30.0f, 0.0f);
+		dVector omega1(0.0f, 2.0f, 50.0f, 0.0f);
+		NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 2.5f, 0.0f), 1.0f, 0.5f);
+		DemoEntity* const boxEntity1 = ((DemoEntity*) NewtonBodyGetUserData(box1));
 
-	//NewtonBodySetGyroscopicTorque(box1, 1);
-	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	matrix = dYawMatrix (dPi * 0.5f) * matrix; 
-	NewtonBodySetMatrix(box1, &matrix[0][0]);
+		//NewtonBodySetGyroscopicTorque(box1, 1);
+		NewtonBodyGetMatrix(box1, &matrix[0][0]);
+		matrix = dYawMatrix (dPi * 0.5f) * matrix; 
+		NewtonBodySetMatrix(box1, &matrix[0][0]);
 	
-	boxEntity1->ResetMatrix (*scene, matrix);
-	NewtonBodySetOmega(box1, &omega1[0]);
-	NewtonBodySetLinearDamping(box1, 0.0f);
-	NewtonBodySetAngularDamping(box1, &damp[0]);
+		boxEntity1->ResetMatrix (*scene, matrix);
+		NewtonBodySetOmega(box1, &omega1[0]);
+		NewtonBodySetLinearDamping(box1, 0.0f);
+		NewtonBodySetAngularDamping(box1, &damp[0]);
 
-//	dFloat Ixx;
-//	dFloat Iyy;
-//	dFloat Izz;
-//	dFloat mass;
-//	NewtonBodyGetMass(box1, &mass, &Ixx, &Iyy, &Izz);
-//	NewtonBodySetMassMatrix(box1, mass, Ixx, Ixx, Ixx);
-//	NewtonBodySetForceAndTorqueCallback(box1, ApplyGravityForce____);
+	//	dFloat Ixx;
+	//	dFloat Iyy;
+	//	dFloat Izz;
+	//	dFloat mass;
+	//	NewtonBodyGetMass(box1, &mass, &Ixx, &Iyy, &Izz);
+	//	NewtonBodySetMassMatrix(box1, mass, Ixx, Ixx, Ixx);
+	//	NewtonBodySetForceAndTorqueCallback(box1, ApplyGravityForce____);
+		
+		//	// link the two boxes
+		NewtonBodyGetMatrix(box1, &matrix[0][0]);
+		dCustomDoubleHinge* const joint = new dCustomDoubleHinge(matrix, box1, box0);
+		joint->EnableLimits(false);
+		joint->SetLimits(-30.0f * dPi, 10.0f * dPi);
+	}
 
-	//	// link the two boxes
-	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-//	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, NULL);
-	dCustomDoubleHinge* const joint1 = new dCustomDoubleHinge(matrix, box1, box0);
-	joint1;
-//	joint1->EnableLimits(false);
-//	joint1->SetLimits(-5.0f * dPi, 2.0f * dPi);
+	{
+		dMatrix matrix;
+		dVector damp(0.0f);
+		dVector omega2 (0.0f, 10.0f, 100.0f, 0.0f);
+		NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.5f, 0.0f), 1.0f, 0.5f);
+		DemoEntity* const boxEntity2 = ((DemoEntity*) NewtonBodyGetUserData(box2));
+		//NewtonBodySetGyroscopicTorque(box1, 0);
+		NewtonBodyGetMatrix(box2, &matrix[0][0]);
+		matrix = dYawMatrix(dPi * 0.5f) * matrix;
+		NewtonBodySetMatrix(box2, &matrix[0][0]);
+		boxEntity2->ResetMatrix (*scene, matrix);
+		NewtonBodySetOmega(box2, &omega2[0]);
+		NewtonBodySetLinearDamping(box2, 0.0f);
+		NewtonBodySetAngularDamping(box2, &damp[0]);
 
-#if 1
-	dVector omega2 (0.0f, 10.0f, 100.0f, 0.0f);
-	NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -2.0f, 0.0f), 1.0f, 0.5f);
-	DemoEntity* const boxEntity2 = ((DemoEntity*) NewtonBodyGetUserData(box2));
-	NewtonBodySetGyroscopicTorque(box1, 0);
-	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	matrix = dYawMatrix(dPi * 0.5f) * matrix;
-	NewtonBodySetMatrix(box2, &matrix[0][0]);
-	boxEntity2->ResetMatrix (*scene, matrix);
-	NewtonBodySetOmega(box2, &omega2[0]);
-	NewtonBodySetLinearDamping(box2, 0.0f);
-	NewtonBodySetAngularDamping(box2, &damp[0]);
+		NewtonBodyGetMatrix(box2, &matrix[0][0]);
+		dCustomDoubleHinge* const joint = new dCustomDoubleHinge(matrix, box2, box0);
+		joint->EnableLimits1(true);
+		joint->SetLimits1 (-10.0f * dPi, 15.0f * dPi);
+	}
 
-// link the two boxes
-	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	dCustomDoubleHinge* const joint2 = new dCustomDoubleHinge(matrix, box2, box0);
-	joint2;
-//	joint2->EnableLimits1(true);
-//	joint2->EnableLimits1(false);
-//	joint2->SetLimits1 (-3.0f * dPi, 5.0f * dPi);
-#endif
+	{
+		dMatrix matrix;
+		dVector damp(0.0f);
+		NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, -0.85f, 0.0f), 1.0f, 0.5f);
+		DemoEntity* const boxEntity2 = ((DemoEntity*)NewtonBodyGetUserData(box2));
+		//NewtonBodySetGyroscopicTorque(box1, 0);
+		NewtonBodyGetMatrix(box2, &matrix[0][0]);
+		matrix = dYawMatrix(dPi * 0.5f) * matrix;
+		NewtonBodySetMatrix(box2, &matrix[0][0]);
+		boxEntity2->ResetMatrix(*scene, matrix);
+		NewtonBodySetLinearDamping(box2, 0.0f);
+		NewtonBodySetAngularDamping(box2, &damp[0]);
+
+		NewtonBodyGetMatrix(box2, &matrix[0][0]);
+		dCustomDoubleHinge* const joint = new dCustomDoubleHinge(matrix, box2, box0);
+		joint->SetAsSpringDamper(true, 0.7f, 80.0f, 0.0f);
+	}
+
+	{
+		dMatrix matrix;
+		dVector damp(0.0f);
+		NewtonBody* const box2 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 0.84f, 0.0f), 1.0f, 0.5f);
+		DemoEntity* const boxEntity2 = ((DemoEntity*)NewtonBodyGetUserData(box2));
+		//NewtonBodySetGyroscopicTorque(box1, 0);
+		NewtonBodyGetMatrix(box2, &matrix[0][0]);
+		matrix = dYawMatrix(dPi * 0.5f) * matrix;
+		NewtonBodySetMatrix(box2, &matrix[0][0]);
+		boxEntity2->ResetMatrix(*scene, matrix);
+		NewtonBodySetLinearDamping(box2, 0.0f);
+		NewtonBodySetAngularDamping(box2, &damp[0]);
+
+		NewtonBodyGetMatrix(box2, &matrix[0][0]);
+		dCustomDoubleHinge* const joint = new dCustomDoubleHinge(matrix, box2, box0);
+		joint->SetFriction(10.0f);
+		joint->SetFriction1(10.0f);
+	}
 }
 
 class JoesRagdollJoint: public dCustomBallAndSocket

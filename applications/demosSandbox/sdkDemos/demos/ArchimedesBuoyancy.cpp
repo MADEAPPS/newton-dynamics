@@ -103,7 +103,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					NewtonBodyGetCentreOfMass(visitor, &cog[0]);
 					cenyterOfPreasure -= matrix.TransformVector(cog);
 
-					// now with the mass and center of mass of the volume under water, calculate bouyancy force and torque
+					// now with the mass and center of mass of the volume under water, calculate buoyancy force and torque
 					dVector force (dFloat(0.0f), dFloat(-DEMO_GRAVITY * displacedMass), dFloat(0.0f), dFloat(0.0f));
 					dVector torque (cenyterOfPreasure.CrossProduct(force));
 
