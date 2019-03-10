@@ -49,8 +49,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	} info;
 
 	// check for instruction set support (sse4.2 and fmad3)
-//	__cpuid(info.m_data, 1);
-//	return ((info.m_ecx & (1 << 12)) && (info.m_ecx & (1 << 20))) ? TRUE : FALSE;
-	return FALSE;
+	__cpuid(info.m_data, 1);
+	return ((info.m_ecx & (1 << 12)) && (info.m_ecx & (1 << 20))) ? TRUE : FALSE;
 }
 #endif

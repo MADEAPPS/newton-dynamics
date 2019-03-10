@@ -33,8 +33,8 @@
 #include "dgCollisionDeformableMesh.h"
 
 #define DG_CCD_EXTRA_CONTACT_COUNT		(8 * 3)
-//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(64)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(64)
+//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
 
@@ -208,9 +208,11 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 
 	// add bilateral joints to the joint array
 	for (dgBilateralConstraintList::dgListNode* node = jointList.GetFirst(); node; node = node->GetNext()) {
-		dgConstraint* const contact = node->GetInfo();
-		baseJointArray[jointCount].m_joint = contact;
+		dgConstraint* const joint = node->GetInfo();
+		if (joint->GetBody0()->m_invMass.m_w || joint->GetBody1()->m_invMass.m_w) {
+			baseJointArray[jointCount].m_joint = joint;
 		jointCount++;
+	}
 	}
 
 	// form all disjoints sets
