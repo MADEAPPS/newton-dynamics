@@ -280,7 +280,7 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const {}
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
-	CUSTOM_JOINTS_API virtual void Deserialize (NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void Deserialize (NewtonSerializeCallback callback, void* const userData);
 	
 	CUSTOM_JOINTS_API void SetBodiesCollisionState (int state);
 	CUSTOM_JOINTS_API int GetBodiesCollisionState () const;
