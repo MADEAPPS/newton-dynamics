@@ -31,6 +31,16 @@ enum PrimitiveType
 };
 
 
+class MakeViualMesh : public dScene::dSceneExportCallback
+{
+	public:
+	MakeViualMesh(NewtonWorld* const world);
+	NewtonMesh* CreateVisualMesh(NewtonBody* const body, char* const name, int maxNameSize) const;
+	NewtonWorld* m_world;
+};
+
+
+
 void ExportScene (NewtonWorld* const world, const char* const fileName);
 
 class DemoMesh;

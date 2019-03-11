@@ -1194,26 +1194,19 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const n
 }
 
 
-class MakeViualMesh: public dScene::dSceneExportCallback
+MakeViualMesh::MakeViualMesh (NewtonWorld* const world)
+	:m_world (world)
 {
-	public: 
-	MakeViualMesh (NewtonWorld* const world)
-		:m_world (world)
-	{
-	}
+}
 
-	NewtonMesh* CreateVisualMesh (NewtonBody* const body, char* const name, int maxNameSize) const
-	{
-		// here the use should take the user data from the body create newtonMesh form it and return that back
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
-
-		sprintf (name, "visual Mesh");
-		return mesh;
-	}
-
-	NewtonWorld* m_world;
-};
+NewtonMesh* MakeViualMesh::CreateVisualMesh (NewtonBody* const body, char* const name, int maxNameSize) const
+{
+	// here the use should take the user data from the body create newtonMesh form it and return that back
+	NewtonCollision* const collision = NewtonBodyGetCollision(body);
+	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
+	sprintf (name, "visual Mesh");
+	return mesh;
+}
 
 void ExportScene (NewtonWorld* const world, const char* const name)
 {

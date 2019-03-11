@@ -22,6 +22,7 @@
 //#endif
 
 bool dGetOpenFileName (char* const fileName, int maxSize);
+bool dGetSaveFileName(char* const fileName, int maxSize);
 
 //#ifdef __cplusplus 
 //}

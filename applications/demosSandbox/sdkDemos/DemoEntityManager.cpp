@@ -718,7 +718,7 @@ void DemoEntityManager::ShowMainMenuBar()
 				mainMenu = 2;
 			}
 			if (ImGui::MenuItem("Save", "")) {
-				dAssert (0);
+				mainMenu = 3;
 			}
 			ImGui::Separator();
 
@@ -834,7 +834,6 @@ void DemoEntityManager::ShowMainMenuBar()
 			m_currentScene = -1;
 			char fileName[1024];
 			if (dGetOpenFileName(fileName, 1024)) {
-
 				Cleanup();
 				ApplyMenuOptions();
 				LoadScene (fileName);
@@ -851,11 +850,14 @@ void DemoEntityManager::ShowMainMenuBar()
 
 		case 3:
 		{
-//			Cleanup();
-//			ApplyMenuOptions();
-//			ResetTimer();
-//			m_currentScene = -1;
-			dAssert (0);
+			m_currentScene = -1;
+			char fileName[1024];
+			if (dGetSaveFileName(fileName, 1024)) {
+				MakeViualMesh context(m_world);
+				dScene testScene(m_world);
+				testScene.NewtonWorldToScene(m_world, &context);
+				testScene.Serialize(fileName);
+			}
 			break;
 		}
 
