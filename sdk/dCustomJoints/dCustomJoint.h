@@ -109,9 +109,9 @@ class dCustomJoint: public dCustomAlloc
 		public:
 		dDebugDisplay (const dMatrix& cameraMatrix) 
 			:m_cameraMatrix(cameraMatrix)
+			,m_debugScale(1.0f)
 			,m_width(0)
 			,m_height(0)
-			,m_debugScale(1.0f)
 		{
 		}
 		virtual ~dDebugDisplay () {}
