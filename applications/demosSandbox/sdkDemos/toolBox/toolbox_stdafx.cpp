@@ -63,8 +63,6 @@ dFloat dGaussianRandom (dFloat amp)
 void dGetWorkingFileName (const char* const name, char* const outPathName)
 {
 	#if defined (_MSC_VER)
-
-		//GetAplicationDirectory (appPath);
 		char appPath [256];
 		GetModuleFileNameA(NULL, appPath, sizeof (appPath));
 		strlwr (appPath);

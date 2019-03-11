@@ -192,6 +192,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\FileBrowser.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
@@ -240,6 +243,9 @@
       <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\ShaderPrograms.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\FileBrowser.h">
       <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>

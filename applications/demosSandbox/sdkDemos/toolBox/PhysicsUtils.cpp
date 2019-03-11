@@ -1226,7 +1226,6 @@ void ExportScene (NewtonWorld* const world, const char* const name)
 	testScene.Serialize (fileName);
 }
 
-
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
 {
 	dFloat mass;

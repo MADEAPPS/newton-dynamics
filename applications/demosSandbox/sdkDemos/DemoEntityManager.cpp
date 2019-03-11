@@ -14,6 +14,7 @@
 #include "DemoMesh.h"
 #include "DemoEntity.h"
 #include "DemoCamera.h"
+#include "FileBrowser.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
@@ -22,7 +23,6 @@
 #include "DemoCameraManager.h"
 #include "DemoEntityListener.h"
 #include "DemoCameraManager.h"
-
 #include "dHighResolutionTimer.h"
 
 #ifdef _MACOSX_VER
@@ -33,7 +33,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// using NewtonMesh tool
+#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
 //#define DEFAULT_SCENE	3		// gyroscope precession
@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
 //#define DEFAULT_SCENE	15		// compound Collision
-#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// scaled mesh collision
@@ -704,25 +704,24 @@ void DemoEntityManager::ShowMainMenuBar()
 		if (ImGui::BeginMenu("File")) {
 			m_suspendPhysicsUpdate = true;
 
-			//if (ImGui::MenuItem("About", "")) {
-			//	dAssert (0);
-			//}
-			//ImGui::Separator();
 			if (ImGui::MenuItem("Preferences", "")) {
 				dAssert (0);
 			}
 			ImGui::Separator();
+
 			if (ImGui::MenuItem("New", "")) {
 				mainMenu = 1;
 			}
 			ImGui::Separator();
+
 			if (ImGui::MenuItem("Open", "")) {
-				dAssert (0);
+				mainMenu = 2;
 			}
 			if (ImGui::MenuItem("Save", "")) {
 				dAssert (0);
 			}
 			ImGui::Separator();
+
 			if (ImGui::MenuItem("Serialize", "")) {
 				//mainMenu = 2;
 				dAssert (0);
@@ -821,6 +820,7 @@ void DemoEntityManager::ShowMainMenuBar()
 	{
 		case 1:
 		{
+			// menu new 
 			Cleanup();
 			ApplyMenuOptions();
 			ResetTimer();
@@ -830,15 +830,38 @@ void DemoEntityManager::ShowMainMenuBar()
 
 		case 2:
 		{
-			Cleanup();
-			ApplyMenuOptions();
-			ResetTimer();
+			// open Scene
 			m_currentScene = -1;
+			char fileName[1024];
+			if (dGetOpenFileName(fileName, 1024)) {
+
+				Cleanup();
+				ApplyMenuOptions();
+				LoadScene (fileName);
+				ResetTimer();
+
+				//MakeViualMesh context(m_world);
+				//dScene testScene(m_world);
+				//testScene.Deserialize(fileName);
+				//dList<NewtonBody*> loadedBodies;
+				//testScene.SceneToNewtonWorld(m_world, loadedBodies);
+			}
+			break;
+		}
+
+		case 3:
+		{
+//			Cleanup();
+//			ApplyMenuOptions();
+//			ResetTimer();
+//			m_currentScene = -1;
+			dAssert (0);
 			break;
 		}
 
 		default:
 		{
+			// load a demo 
 			if (m_currentScene != -1) {
 				Cleanup();
 				m_demosSelection[m_currentScene].m_launchDemoCallback(this);
