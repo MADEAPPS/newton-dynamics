@@ -1229,6 +1229,7 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 
 void DemoEntityManager::SerializedPhysicScene(const char* const name)
 {
+//	NewtonSerializeToFile(m_world, name, NULL, NULL);
 	NewtonSerializeToFile(m_world, name, BodySerialization, NULL);
 }
 
