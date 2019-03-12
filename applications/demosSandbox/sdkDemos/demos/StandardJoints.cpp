@@ -362,10 +362,11 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 		//	// link the two boxes
 		NewtonBodyGetMatrix(box1, &matrix[0][0]);
 		dCustomDoubleHinge* const joint = new dCustomDoubleHinge(matrix, box1, box0);
-		joint->EnableLimits(false);
-		joint->SetLimits(-30.0f * dPi, 10.0f * dPi);
+		//joint->EnableLimits(false);
+		//joint->SetLimits(-30.0f * dPi, 10.0f * dPi);
 	}
 
+#if 0
 	{
 		dMatrix matrix;
 		dVector damp(0.0f);
@@ -423,6 +424,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 		joint->SetFriction(10.0f);
 		joint->SetFriction1(10.0f);
 	}
+#endif
 }
 
 class JoesRagdollJoint: public dCustomBallAndSocket
@@ -1347,7 +1349,8 @@ void StandardJoints (DemoEntityManager* const scene)
 //	joints still with problems
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 
-#if 1
+	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
+#if 0
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1369,8 +1372,8 @@ void StandardJoints (DemoEntityManager* const scene)
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
-	dVector origin (-50.0f, 7.0f, 0.0f, 0.0f);
-//	dVector origin(-30.0f, 7.0f, 30.0f, 0.0f);
+//	dVector origin (-50.0f, 7.0f, 0.0f, 0.0f);
+	dVector origin(-30.0f, 7.0f, 20.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 
