@@ -723,11 +723,10 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			if (ImGui::MenuItem("Serialize", "")) {
-				//mainMenu = 2;
-				dAssert (0);
+				mainMenu = 4;
 			}
 			if (ImGui::MenuItem("Deserialize", "")) {
-				dAssert (0);
+				mainMenu = 5;
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit", "")) {
@@ -833,8 +832,8 @@ void DemoEntityManager::ShowMainMenuBar()
 			// open Scene
 			m_currentScene = -1;
 			char fileName[1024];
-			if (dGetOpenFileName(fileName, 1024)) {
-				Cleanup();
+			Cleanup();
+			if (dGetOpenFileNameNgd(fileName, 1024)) {
 				ApplyMenuOptions();
 				LoadScene (fileName);
 				ResetTimer();
@@ -852,11 +851,35 @@ void DemoEntityManager::ShowMainMenuBar()
 		{
 			m_currentScene = -1;
 			char fileName[1024];
-			if (dGetSaveFileName(fileName, 1024)) {
+			if (dGetSaveFileNameNgd(fileName, 1024)) {
 				MakeViualMesh context(m_world);
 				dScene testScene(m_world);
 				testScene.NewtonWorldToScene(m_world, &context);
 				testScene.Serialize(fileName);
+			}
+			break;
+		}
+
+		case 5:
+		{
+			// open Scene
+			m_currentScene = -1;
+			char fileName[1024];
+			Cleanup();
+			if (dGetOpenFileNameSerialization(fileName, 1024)) {
+				ApplyMenuOptions();
+				DeserializedPhysicScene(fileName);
+				ResetTimer();
+			}
+			break;
+		}
+
+		case 4:
+		{
+			m_currentScene = -1;
+			char fileName[1024];
+			if (dGetSaveFileNameSerialization(fileName, 1024)) {
+				SerializedPhysicScene(fileName);
 			}
 			break;
 		}
@@ -1160,7 +1183,6 @@ void DemoEntityManager::BodySerialization (NewtonBody* const body, void* const b
 	serializeCallback (serializeHandle, bodyIndentification, size);
 }
 
-
 void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const bodyUserData, NewtonDeserializeCallback deserializecallback, void* const serializeHandle)
 {
 	int size;
@@ -1203,6 +1225,24 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	DemoMeshInterface* const mesh = node->GetInfo();
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
+}
+
+void DemoEntityManager::SerializedPhysicScene(const char* const name)
+{
+	NewtonSerializeToFile(m_world, name, BodySerialization, NULL);
+}
+
+void DemoEntityManager::DeserializedPhysicScene(const char* const name)
+{
+	// add the sky
+	CreateSkyBox();
+
+	dQuaternion rot;
+	dVector origin(-30.0f, 10.0f, 10.0f, 0.0f);
+	SetCameraMatrix(rot, origin);
+
+	dTree <DemoMeshInterface*, const void*> cache;
+	NewtonDeserializeFromFile(m_world, name, BodyDeserialization, &cache);
 }
 
 int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
@@ -1449,8 +1489,6 @@ void DemoEntityManager::RenderScene()
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
 	glEnable(GL_LIGHT1);
-
-
 
 	// Setup matrix
 	glMatrixMode(GL_PROJECTION);

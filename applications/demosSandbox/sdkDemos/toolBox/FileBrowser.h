@@ -17,16 +17,11 @@
 #ifndef _D_FILE_BROWSER_H_
 #define _D_FILE_BROWSER_H_
 
-//#ifdef __cplusplus 
-//extern "C" {
-//#endif
+bool dGetOpenFileNameNgd (char* const fileName, int maxSize);
+bool dGetSaveFileNameNgd(char* const fileName, int maxSize);
 
-bool dGetOpenFileName (char* const fileName, int maxSize);
-bool dGetSaveFileName(char* const fileName, int maxSize);
-
-//#ifdef __cplusplus 
-//}
-//#endif 
+bool dGetOpenFileNameSerialization(char* const fileName, int maxSize);
+bool dGetSaveFileNameSerialization(char* const fileName, int maxSize);
 
 
 #endif 

@@ -18,7 +18,7 @@
 
 #include "FileBrowser.h"
 
-bool dGetOpenFileName (char* const fileName, int maxSize)
+bool dGetOpenFileNameNgd (char* const fileName, int maxSize)
 {
 #ifdef _WIN32 
 	OPENFILENAME ofn;
@@ -37,7 +37,7 @@ bool dGetOpenFileName (char* const fileName, int maxSize)
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
-	ofn.lpstrFilter = "newton files\0*.ngd\0";
+	ofn.lpstrFilter = "newton xml files *.ngd\0*.ngd\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = "Newton Dynamics demos";
 	ofn.nMaxFileTitle = 0;
@@ -50,7 +50,40 @@ bool dGetOpenFileName (char* const fileName, int maxSize)
 #endif
 }
 
-bool dGetSaveFileName(char* const fileName, int maxSize)
+bool dGetOpenFileNameSerialization(char* const fileName, int maxSize)
+{
+#ifdef _WIN32 
+	OPENFILENAME ofn;
+	// open a file name
+	char appPath[256];
+	GetModuleFileNameA(NULL, appPath, sizeof (appPath));
+	_strlwr(appPath);
+
+	char* const end = strstr(appPath, "applications");
+	end[0] = 0;
+	strcat(appPath, "applications\\media");
+
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof (ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFile = fileName;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = maxSize;
+	ofn.lpstrFilter = "newton serialized file *.bin\0*.bin\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = "Newton Dynamics demos";
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = appPath;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	bool state = GetOpenFileName(&ofn) ? true : false;
+	return state;
+#else
+	return false;
+#endif
+}
+
+bool dGetSaveFileNameNgd(char* const fileName, int maxSize)
 {
 #ifdef _WIN32 
 	OPENFILENAME ofn;
@@ -69,15 +102,63 @@ bool dGetSaveFileName(char* const fileName, int maxSize)
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
-	ofn.lpstrFilter = "newton files\0*.ngd\0";
+	ofn.lpstrFilter = "newton xml files *.ngd\0*.ngd\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = "Newton Dynamics demos";
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-	return GetSaveFileName(&ofn) ? true : false;
+	bool state = GetSaveFileName(&ofn) ? true : false;
+	if (state) {
+		char* const ext = strrchr(fileName, '.');
+		if (!ext) {
+			strcat(fileName, ".ngd");
+		}
+	}
+	return state;
+
 #else
 	return false;
 #endif
+}
+
+bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
+{
+#ifdef _WIN32 
+	OPENFILENAME ofn;
+	// open a file name
+	char appPath[256];
+	GetModuleFileNameA(NULL, appPath, sizeof(appPath));
+	_strlwr(appPath);
+
+	char* const end = strstr(appPath, "applications");
+	end[0] = 0;
+	strcat(appPath, "applications\\media");
+
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFile = fileName;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = maxSize;
+	ofn.lpstrFilter = "newton serialized file *.bin\0*.bin\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = "Newton Dynamics demos";
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = appPath;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	bool state = GetSaveFileName(&ofn) ? true : false;
+	if (state) {
+		char* const ext = strrchr (fileName, '.');
+		if (!ext) {
+			strcat (fileName, ".bin");
+		}
+	}
+	return state;
+#else
+	return false;
+#endif
+
 }
