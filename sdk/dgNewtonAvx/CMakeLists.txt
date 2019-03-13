@@ -40,8 +40,10 @@ else()
 	target_compile_options(${projectName} PRIVATE -mavx)
 endif()
 
-#install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
-#install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+install(TARGETS ${projectName}
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 add_custom_command(
 	TARGET ${projectName} POST_BUILD
