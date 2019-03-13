@@ -1520,6 +1520,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 					}
 					break;
 				}
+				default:;
 			}
 		}
 		if (contactJoint->m_isNewContact) {
