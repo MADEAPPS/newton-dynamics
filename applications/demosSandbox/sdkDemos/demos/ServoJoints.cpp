@@ -155,7 +155,7 @@ class ServoInputManager: public dCustomInputManager
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
-		dTrace(("Fix this shit\n"));
+		dTrace(("sorry servo joints demo temporarilly disabled\n"));
 /*
 		if (!m_player[m_currentPlayer % m_playersCount]) {
 			return ;
@@ -456,7 +456,8 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
-		dAssert(0);
+		//dAssert(0);
+		dTrace(("sorry servo joints demo temporarilly disabled\n"));
 		/*
 		//ServoEntityModel* const lifterData = (ServoEntityModel*)controller->GetUserData();
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
@@ -820,9 +821,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	dCustomTransformController* CreateForklift(const dMatrix& location, const char* const filename, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
 	{
-		dAssert(0);
-		return NULL;
-		/*
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
@@ -832,14 +830,17 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 		// plane the model at its location
 		vehicleModel->ResetMatrix(*scene, location);
-		dCustomTransformController* const controller = CreateTransformController();
 
+		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
+		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
+
+//		dCustomTransformController* const controller = CreateController(rootBody, entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
+		dCustomTransformController* const controller = CreateController(rootBody, dGetIdentityMatrix());
+/*
 		controller->SetSelfCollision(0);
 		controller->SetUserData(vehicleModel);
 		controller->SetCalculateLocalTransforms(true);
 
-		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
-		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
 
 		// move the center of mass a lithe to the back, and lower
 		dVector com(0.0f);
@@ -904,8 +905,8 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 				stackIndex++;
 			}
 		}
-		return controller;
 */
+		return controller;
 	}
 };
 
@@ -966,15 +967,15 @@ void ServoJoints (DemoEntityManager* const scene)
 	//  create a skeletal transform controller for controlling rag doll
 	ServoVehicleManagerManager* const vehicleManager = new ServoVehicleManagerManager (scene);
 
-dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-return;
-
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
-	matrix.m_posit.m_y += 1.5f;
+	matrix.m_posit.m_y += 0.5f;
 	
 	// load a the mesh of the articulate vehicle
 	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
+
+dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+#if 0
 	inputManager->AddPlayer(forklift);
 
 	// place heavy load to show reproduce black bird dream problems
@@ -983,17 +984,17 @@ return;
 //	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-	
-//	origin.m_x -= 5.0f;
+//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+#endif	
+	origin.m_x += 0.0f;
 	origin.m_y += 2.0f;
-	origin.m_z -= 4.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -45.0f * dDegreeToRad);  
+	origin.m_z += 6.0f;
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 90.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
 }
 

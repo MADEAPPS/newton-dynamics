@@ -25,13 +25,12 @@ dCustomTransformManager::~dCustomTransformManager()
 }
 
 
-dCustomTransformController* dCustomTransformManager::CreateTransformController(NewtonBody* const bone, const dMatrix& bindMatrix)
+dCustomTransformController* dCustomTransformManager::CreateController(NewtonBody* const body, const dMatrix& bindMatrix)
 {
-	dAssert (0);
-//	dCustomTransformController* const controller = (dCustomTransformController*)CreateController();
-//	controller->Init();
-//	return controller;
-	return NULL;
+	dCustomTransformController* const controller = &m_controllersList.Append()->GetInfo();
+	controller->m_body = body;
+	controller->m_bindMatrix = bindMatrix;
+	return controller;
 }
 
 void dCustomTransformManager::PreUpdate(dFloat timestep)
@@ -44,11 +43,10 @@ void dCustomTransformManager::PreUpdate(dFloat timestep)
 
 void dCustomTransformManager::PostUpdate(dFloat timestep)
 {
-	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
-		dCustomTransformController* const controller = &node->GetInfo();
-		dAssert(0);
+//	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
+//		dCustomTransformController* const controller = &node->GetInfo();
 //		OnPostUpdate(controller, timestep, 0);
-	}
+//	}
 }
 
 void dCustomTransformManager::OnDestroy()
@@ -56,11 +54,15 @@ void dCustomTransformManager::OnDestroy()
 	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; ) {
 		dCustomTransformController* const controller = &node->GetInfo();
 		node = node->GetNext();
-		dAssert(0);
-//		DestroyTrigger(&controller);
+		DestroyController (controller);
 	}
 }
 
+void dCustomTransformManager::DestroyController (dCustomTransformController* const controller)
+{
+	dList<dCustomTransformController>::dListNode* const node = m_controllersList.GetNodeFromInfo(*controller);
+	m_controllersList.Remove(node);
+}
 
 /*
 

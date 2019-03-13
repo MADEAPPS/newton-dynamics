@@ -69,13 +69,17 @@ class dSkeletonBone: public dList<dSkeletonBone>
 	public:
 	dSkeletonBone()
 		:dList<dSkeletonBone>()
+		,m_bindMatrix(dGetIdentityMatrix())
+		,m_body(NULL)
+		,m_parent(NULL)
 	{
-		dAssert(0);
 	}
 
 	~dSkeletonBone()
 	{
-		dAssert(0);
+		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+			dAssert (0);
+		}
 	}
 
 	dMatrix m_bindMatrix;
@@ -89,13 +93,12 @@ class dCustomTransformController: public dSkeletonBone
 {
 	public:
 	dCustomTransformController()
+		:dSkeletonBone()
 	{
-		dAssert (0);
 	}
 
 	~dCustomTransformController()
 	{
-		dAssert (0);
 	}
 };
 
@@ -106,7 +109,8 @@ class dCustomTransformManager: public dCustomListener
 	CUSTOM_JOINTS_API dCustomTransformManager(NewtonWorld* const world, const char* const name = HIERACHICAL_ARTICULATED_PLUGIN_NAME);
 	CUSTOM_JOINTS_API virtual ~dCustomTransformManager();
 
-	CUSTOM_JOINTS_API virtual dCustomTransformController* CreateTransformController (NewtonBody* const bone, const dMatrix& bindMatrix);
+	CUSTOM_JOINTS_API virtual dCustomTransformController* CreateController (NewtonBody* const bone, const dMatrix& bindMatrix);
+	CUSTOM_JOINTS_API virtual void DestroyController (dCustomTransformController* const controller);
 
 	CUSTOM_JOINTS_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
 	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const = 0;

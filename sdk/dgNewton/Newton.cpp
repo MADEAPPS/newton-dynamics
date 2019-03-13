@@ -4910,7 +4910,7 @@ void NewtonBodyGetPosition(const NewtonBody* const bodyPtr, dFloat* const posPtr
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	const dgVector & rot = body->GetPosition();
+	const dgVector& rot = body->GetPosition();
 	posPtr[0] = rot.m_x;
 	posPtr[1] = rot.m_y;
 	posPtr[2] = rot.m_z;
@@ -4939,7 +4939,7 @@ void NewtonBodyGetRotation(const NewtonBody* const bodyPtr, dFloat* const rotPtr
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	dgQuaternion rot = body->GetRotation();
+	const dgQuaternion& rot = body->GetRotation();
 	rotPtr[0] = rot.m_x;
 	rotPtr[1] = rot.m_y;
 	rotPtr[2] = rot.m_z;
@@ -4987,9 +4987,6 @@ void  NewtonBodyAddForce(const NewtonBody* const bodyPtr, const dFloat* const ve
 
 	body->AddForce (vector);
 }
-
-
-
 
 /*!
   Get the net force applied to a rigid body after the last NewtonUpdate.
