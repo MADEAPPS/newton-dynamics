@@ -77,8 +77,8 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	,m_contactPruningTolereance(world->GetContactMergeTolerance())
 	,m_broadphaseLru(0)
 	,m_isNewContact(1)
-	,m_skeletonSelftCollision(1)
 	,m_skeletonIntraCollision(1)
+	,m_skeletonSelftCollision(1)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 	m_maxDOF = 0;
