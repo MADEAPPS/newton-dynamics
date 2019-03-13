@@ -99,8 +99,8 @@ dgContact::dgContact(dgContact* const clone)
 	,m_contactPruningTolereance(clone->m_contactPruningTolereance)
 	,m_broadphaseLru(clone->m_broadphaseLru)
 	,m_isNewContact(clone->m_isNewContact)
-	,m_skeletonSelftCollision(clone->m_skeletonSelftCollision)
 	,m_skeletonIntraCollision(clone->m_skeletonIntraCollision)
+	,m_skeletonSelftCollision(clone->m_skeletonSelftCollision)
 {
 	dgAssert((((dgUnsigned64) this) & 15) == 0);
 	m_body0 = clone->m_body0;

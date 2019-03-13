@@ -711,7 +711,7 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 {
 	dgInt32 stride = strideInBytes / sizeof (dgFloat32);
 
-	dgMatrix inertia (CalculateInertiaMatrix());
+	//dgMatrix inertia (CalculateInertiaMatrix());
 
 	dgVector impulse (dgFloat32 (0.0f));
 	dgVector angularImpulse (dgFloat32 (0.0f));
