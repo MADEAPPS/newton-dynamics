@@ -27,6 +27,11 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 
 project(NewtonSDK)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Don't use e.g. GNU extension (like -std=gnu++11) for portability
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (NEWTON_DOUBLE_PRECISION)
 	add_definitions(-D_NEWTON_USE_DOUBLE)
@@ -55,7 +60,7 @@ endif ()
 #check for MAC
 if(APPLE)
   add_definitions(-D_MACOSX_VER)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions")
 endif(APPLE)
 
 #check for UNIX
