@@ -624,6 +624,18 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 				skeleton1->AddSelfCollisionJoint(contactJoint);
 			}
 		}
+	} else if (constraint->IsBilateral() && !constraint->m_isInSkeleton && (constraint->m_solverModel == 3)) {
+		dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
+		dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
+		if (skeleton0 || skeleton1) {
+			if (skeleton0 && !skeleton1) {
+				constraint->m_isInSkeletonLoop = true;
+				skeleton0->AddSelfCollisionJoint(constraint);
+			} else if (skeleton1 && !skeleton0) {
+				constraint->m_isInSkeletonLoop = true;
+				skeleton1->AddSelfCollisionJoint(constraint);
+			}
+		}
 	}
 
 	jointInfo->m_pairCount = dof;

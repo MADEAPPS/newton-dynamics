@@ -341,7 +341,6 @@ dgWorld::~dgWorld()
 	delete m_broadPhase;
 }
 
-
 void dgWorld::DestroyAllBodies()
 {
 	dgBodyMasterList& me = *this;
@@ -353,7 +352,6 @@ void dgWorld::DestroyAllBodies()
 		delete ptr->GetInfo();
 	}
 	ikList.RemoveAll();
-
 
 	dgSkeletonList& skelList = *this;
 	dgSkeletonList::Iterator iter(skelList);
@@ -1355,7 +1353,9 @@ void dgWorld::UpdateSkeletons()
 										loopCount++;
 									}
 
-								} else if ((constraint1->m_solverModel != 2) && loopCount < (sizeof (loopJoints) / sizeof(loopJoints[0]))) {
+								//} else if ((constraint1->m_solverModel != 2) && loopCount < (sizeof (loopJoints) / sizeof(loopJoints[0]))) {
+								  } else if ((constraint1->m_solverModel == 1) && (loopCount < (sizeof (loopJoints) / sizeof(loopJoints[0])))) {
+									dgAssert (constraint1->m_solverModel != 0);
 									loopJoints[loopCount] = (dgBilateralConstraint*)constraint1;
 									loopCount++;
 								}
