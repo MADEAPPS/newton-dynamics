@@ -23,12 +23,6 @@ if (UNIX)
 	else(NEWTON_BUILD_SHARED_LIBS)
 	   add_library(${projectName} STATIC ${CPP_SOURCE})
 	endif(NEWTON_BUILD_SHARED_LIBS)
-
-        target_include_directories(
-                      ${projectName} PUBLIC
-                      # Headers used from source/build location:
-                      "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-        )
 endif(UNIX)
 
 if (MSVC)
@@ -39,6 +33,11 @@ if (MSVC)
          set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
       endif()
 endif(MSVC)
+
+target_include_directories(${projectName} PUBLIC .)
+if (NEWTON_BUILD_PROFILER)
+    target_link_libraries (${projectName} dTimeTracker)
+endif()
 
 install(TARGETS ${projectName}
        LIBRARY DESTINATION lib

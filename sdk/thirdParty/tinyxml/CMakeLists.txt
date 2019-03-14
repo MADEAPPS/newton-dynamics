@@ -19,3 +19,7 @@ file(GLOB CPP_SOURCE *.cpp)
 file(GLOB HEADERS *.h)
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
+target_include_directories(${projectName} PUBLIC .)
+if(UNIX)
+    target_compile_options(${projectName} PRIVATE -fPIC)
+endif()

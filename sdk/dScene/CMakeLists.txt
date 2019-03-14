@@ -34,16 +34,8 @@ else(NEWTON_BUILD_SHARED_LIBS)
     add_library(${projectName} STATIC ${CPP_SOURCE})
 endif(NEWTON_BUILD_SHARED_LIBS)
 
-target_link_libraries (${projectName} newton dContainers dMath dCustomJoints tinyxml)
-
-if(UNIX)
-    target_include_directories(
-                        ${projectName} PUBLIC
-                        # Headers used from source/build location:
-                        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-    )
-endif(UNIX)
-
+target_include_directories(${projectName} PUBLIC . ../dAnimation)
+target_link_libraries (${projectName} newton dContainers dMath tinyxml)
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dTimeTracker)
 endif()
