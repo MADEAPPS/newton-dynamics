@@ -834,14 +834,13 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
 		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
 
-//		dCustomTransformController* const controller = CreateController(rootBody, entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
+
 		dCustomTransformController* const controller = CreateController(rootBody, dGetIdentityMatrix());
-/*
-		controller->SetSelfCollision(0);
+
+		//controller->SetSelfCollision(0);
 		controller->SetUserData(vehicleModel);
 		controller->SetCalculateLocalTransforms(true);
-
-
+/*
 		// move the center of mass a lithe to the back, and lower
 		dVector com(0.0f);
 		NewtonBodyGetCentreOfMass(rootBody, &com[0]);

@@ -45,9 +45,6 @@ class dCustomTransformController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone);
 
 	CUSTOM_JOINTS_API void SetSelfCollision(bool selfCollsion);
-
-	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
-	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}
 	
 	protected:
 	CUSTOM_JOINTS_API void Init ();
@@ -85,9 +82,13 @@ class dSkeletonBone: public dList<dSkeletonBone>
 		//}
 	}
 
+	void* GetUserData() const { return m_userData; }
+	void SetUserData(void* const data) { m_userData = data; }
+
 	dMatrix m_bindMatrix;
 	NewtonBody* m_body;
 	dSkeletonBone* m_parent;
+	void* m_userData; 
 //	dCustomTransformController* m_controller;
 	CUSTOM_JOINTS_API dCustomJoint* FindJoint() const;
 };
@@ -104,6 +105,9 @@ class dCustomTransformController: public dSkeletonBone
 	~dCustomTransformController()
 	{
 	}
+
+	void SetCalculateLocalTransforms(bool val) { m_calculateLocalTransform = val; }
+	bool GetCalculateLocalTransforms() const { return m_calculateLocalTransform; }
 
 	private:
 	void PostUpdate(dCustomTransformManager* const manager, dFloat timestep) const;

@@ -7890,7 +7890,7 @@ void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMatrix matrix(aligmentMatrix);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-	meshEffect->BoxMapping (front, side, top);
+	meshEffect->BoxMapping (front, side, top, matrix);
 }
 
 void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial, const dFloat* const aligmentMatrix)
