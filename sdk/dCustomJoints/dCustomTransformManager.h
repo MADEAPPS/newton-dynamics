@@ -64,6 +64,8 @@ class dCustomTransformController: public dCustomControllerBase
 */
 
 
+class dCustomTransformManager;
+
 class dSkeletonBone: public dList<dSkeletonBone>
 {
 	public:
@@ -77,9 +79,10 @@ class dSkeletonBone: public dList<dSkeletonBone>
 
 	~dSkeletonBone()
 	{
-		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dAssert (0);
-		}
+		dAssert (!GetCount());
+		//for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+		//	dAssert (0);
+		//}
 	}
 
 	dMatrix m_bindMatrix;
@@ -94,12 +97,20 @@ class dCustomTransformController: public dSkeletonBone
 	public:
 	dCustomTransformController()
 		:dSkeletonBone()
+		,m_calculateLocalTransform(true)
 	{
 	}
 
 	~dCustomTransformController()
 	{
 	}
+
+	private:
+	void PostUpdate(dCustomTransformManager* const manager, dFloat timestep) const;
+
+	bool m_calculateLocalTransform;
+
+	friend class dCustomTransformManager;
 };
 
 //class dCustomTransformManager: public dCustomControllerManager<dCustomTransformController> 

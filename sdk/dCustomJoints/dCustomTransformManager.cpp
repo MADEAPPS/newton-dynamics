@@ -24,7 +24,6 @@ dCustomTransformManager::~dCustomTransformManager()
 {
 }
 
-
 dCustomTransformController* dCustomTransformManager::CreateController(NewtonBody* const body, const dMatrix& bindMatrix)
 {
 	dCustomTransformController* const controller = &m_controllersList.Append()->GetInfo();
@@ -43,10 +42,11 @@ void dCustomTransformManager::PreUpdate(dFloat timestep)
 
 void dCustomTransformManager::PostUpdate(dFloat timestep)
 {
-//	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
-//		dCustomTransformController* const controller = &node->GetInfo();
-//		OnPostUpdate(controller, timestep, 0);
-//	}
+	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
+		dCustomTransformController* const controller = &node->GetInfo();
+		//OnPostUpdate(controller, timestep, 0);
+		controller->PostUpdate(this, timestep);
+	}
 }
 
 void dCustomTransformManager::OnDestroy()
@@ -98,40 +98,6 @@ void dCustomTransformController::PreUpdate(dFloat timestep, int threadIndex)
 	manager->OnPreUpdate(this, timestep, threadIndex);
 }
 
-void dCustomTransformController::PostUpdate(dFloat timestep, int threadIndex)
-{
-	if (m_calculateLocalTransform && m_bones.GetCount()) {
-
-		dAssert(m_bones.GetCount() == 1);
-		dCustomTransformManager* const manager = (dCustomTransformManager*) GetManager();
-
-		dMatrix parentMatrixPool[128];
-		dList<dSkeletonBone>::dListNode* stackPool[128];
-
-		int stack = 1;
-		stackPool[0] = m_bones.GetFirst();
-		parentMatrixPool[0] = dGetIdentityMatrix();
-
-		while (stack) {
-			dMatrix matrix;
-			stack --;
-
-			dMatrix parentMatrix (parentMatrixPool[stack]);
-			dList<dSkeletonBone>::dListNode* const node = stackPool[stack];
-
-			const dSkeletonBone& bone = node->GetInfo();
-			NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
-			manager->OnUpdateTransform (&bone, matrix * parentMatrix * bone.m_bindMatrix);
-
-			parentMatrix = matrix.Inverse();
-			for (dList<dSkeletonBone>::dListNode* ptrNode = bone.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
-				parentMatrixPool[stack] = parentMatrix;
-				stackPool[stack] = ptrNode;
-				stack ++;
-			}
-		}
-	}
-}
 
 dCustomTransformController::dSkeletonBone* dCustomTransformController::AddBone (NewtonBody* const boneBody, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
 {
@@ -175,3 +141,36 @@ dCustomJoint* dCustomTransformController::dSkeletonBone::FindJoint() const
 	return NULL;
 }
 */
+
+
+//void dCustomTransformController::PostUpdate(dFloat timestep, int threadIndex)
+void dCustomTransformController::PostUpdate(dCustomTransformManager* const manager, dFloat timestep) const
+{
+	if (m_calculateLocalTransform) {
+
+		dMatrix parentMatrixPool[128];
+		const dSkeletonBone* stackPool[128];
+
+		int stack = 1;
+		stackPool[0] = this;
+		parentMatrixPool[0] = dGetIdentityMatrix();
+
+		while (stack) {
+			dMatrix matrix;
+			stack--;
+
+			dMatrix parentMatrix(parentMatrixPool[stack]);
+			const dSkeletonBone* const bone = stackPool[stack];
+
+			NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
+			manager->OnUpdateTransform(bone, matrix * parentMatrix * bone->m_bindMatrix);
+
+			parentMatrix = matrix.Inverse();
+			for (dList<dSkeletonBone>::dListNode* ptrNode = bone->GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+				parentMatrixPool[stack] = parentMatrix;
+				stackPool[stack] = &ptrNode->GetInfo();
+				stack++;
+			}
+		}
+	}
+}
