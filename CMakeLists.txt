@@ -27,6 +27,11 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 
 project(NewtonSDK)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Don't use e.g. GNU extension (like -std=gnu++11) for portability
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (NEWTON_DOUBLE_PRECISION)
 	add_definitions(-D_NEWTON_USE_DOUBLE)
@@ -55,7 +60,7 @@ endif ()
 #check for MAC
 if(APPLE)
   add_definitions(-D_MACOSX_VER)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions")
 endif(APPLE)
 
 #check for UNIX
@@ -84,17 +89,13 @@ if (UNIX)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
-    add_definitions(-march=native -fPIC)
-
     set(NEWTON_GENERATE_DLL OFF CACHE BOOL "" FORCE)
     set(NEWTON_STATIC_RUNTIME_LIBRARIES OFF CACHE BOOL "" FORCE)
     set(NEWTON_BUILD_PROFILER OFF CACHE BOOL "" FORCE)
 
-else (UNIX)
-    set(CMAKE_INSTALL_LIBDIR "${PROJECT_BINARY_DIR}/build/lib")
-    set(CMAKE_INSTALL_BINDIR "${PROJECT_BINARY_DIR}/build/bin")
-    set(CMAKE_INSTALL_INCLUDEDIR "${PROJECT_BINARY_DIR}/build/include")
-endif (UNIX)
+elseif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "build" CACHE PATH "" FORCE)
+endif ()
 
 if (MSVC)
 	message ("build visual studio projects")

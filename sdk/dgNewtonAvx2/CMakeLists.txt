@@ -40,8 +40,10 @@ else()
 	target_compile_options(${projectName} PRIVATE -mavx2)
 endif()
 
-#install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
-#install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+install(TARGETS ${projectName}
+       LIBRARY DESTINATION lib
+       ARCHIVE DESTINATION lib
+       RUNTIME DESTINATION bin)
 
 add_custom_command(
 	TARGET ${projectName} POST_BUILD
