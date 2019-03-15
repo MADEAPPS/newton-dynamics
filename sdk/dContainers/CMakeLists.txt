@@ -23,12 +23,6 @@ if(NEWTON_BUILD_SHARED_LIBS)
         add_definitions(-D_DCONTAINERS_EXPORT)
     endif(MSVC)
     add_library(${projectName} SHARED ${CPP_SOURCE})
-
-    target_link_libraries (${projectName} newton)
-
-    if (NEWTON_BUILD_PROFILER)
-        target_link_libraries (${projectName} dTimeTracker)
-    endif()
 else(NEWTON_BUILD_SHARED_LIBS)
     if (MSVC)
         add_definitions(-D_NEWTON_STATIC_LIB)
@@ -37,15 +31,10 @@ else(NEWTON_BUILD_SHARED_LIBS)
     add_library(${projectName} STATIC ${CPP_SOURCE})
 endif(NEWTON_BUILD_SHARED_LIBS)
 
-target_link_libraries (${projectName} newton)
-
-if(UNIX)
-    target_include_directories(
-                        ${projectName} PUBLIC
-                        # Headers used from source/build location:
-                        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-    )
-endif(UNIX)
+target_include_directories(${projectName} PUBLIC . ../dMath)
+if (NEWTON_BUILD_PROFILER)
+    target_link_libraries (${projectName} dTimeTracker)
+endif()
 
 if (MSVC)
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)

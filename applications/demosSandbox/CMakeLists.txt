@@ -43,26 +43,23 @@ include_directories(../../sdk/thirdParty/glfw/include/glfw/)
 include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 add_executable(${projectName} ${CPP_SOURCE})
 
+target_link_libraries (${projectName} dNewton dScene dVehicle glfw imgui glatter)
+if (NEWTON_BUILD_PROFILER)
+    target_link_libraries (${projectName} dTimeTracker)
+endif ()
+
 if(MSVC)
     if(NEWTON_BUILD_SHARED_LIBS)
         add_definitions(-D_DSCENE_DLL)
         add_definitions(-D_DCONTAINERS_DLL)
-        target_link_libraries (${projectName} newton dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml glfw imgui glatter glu32 opengl32)
-        if (NEWTON_BUILD_PROFILER)
-            target_link_libraries (${projectName} dTimeTracker)
-        endif ()
     else(NEWTON_BUILD_SHARED_LIBS)
         add_definitions(-D_NEWTON_STATIC_LIB)
         add_definitions(-D_DVEHICLE_STATIC_LIB)
         add_definitions(-D_CNEWTON_STATIC_LIB)
         add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
-
-        target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml glfw imgui glatter glu32 opengl32)
-
-        if (NEWTON_BUILD_PROFILER)
-            target_link_libraries (${projectName} dTimeTracker)
-        endif ()
     endif(NEWTON_BUILD_SHARED_LIBS)
+
+    target_link_libraries (${projectName} glu32 opengl32)
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
 		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yutoolbox_stdafx.h")
@@ -72,7 +69,7 @@ if(MSVC)
 endif(MSVC)
 
 if (UNIX)
-    target_link_libraries (${projectName} newton dgCore dgPhysics dMath dContainers dCustomJoints dScene dNewton dVehicle dCustomJoints tinyxml imgui glfw glatter GL GLU dl X11 pthread)
+    target_link_libraries (${projectName} GL GLU dl X11 pthread)
 
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")

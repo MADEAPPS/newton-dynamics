@@ -21,6 +21,7 @@ option("NEWTON_WITH_AVX_PLUGIN" "adding avx parallel solver (forces shared libs)
 option("NEWTON_WITH_AVX2_PLUGIN" "adding avx parallel solver (forces shared libs)" OFF)
 #option("NEWTON_WITH_DX12_PLUGIN" "adding direct compute 12 parallel solver" OFF)
 option("NEWTON_BUILD_SHARED_LIBS" "Build shared library" OFF)
+option("NEWTON_BUILD_CORE_ONLY" "Build the core newton library only" OFF)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
@@ -86,6 +87,8 @@ if (UNIX)
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
     endif()
 
+    add_compile_options(-msse3)
+
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
@@ -130,9 +133,17 @@ if (MSVC)
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
 endif()
 
+if(NEWTON_BUILD_SANDBOX_DEMOS)
+  set(NEWTON_BUILD_CORE_ONLY OFF)
+endif()
+
 if(NEWTON_WITH_SSE4_PLUGIN OR NEWTON_WITH_AVX_PLUGIN OR NEWTON_WITH_AVX2_PLUGIN)
   # If building any of the plugins, then switch to shared libraries.
   set(NEWTON_BUILD_SHARED_LIBS ON)
+endif()
+
+if(NEWTON_BUILD_PROFILER)
+	add_definitions(-D_DG_USE_PROFILER)
 endif()
 
 add_subdirectory(sdk)
@@ -166,33 +177,5 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
         endif(NOT_OpenGL_FOUND)
         
       endif(UNIX)
-endif()
-
-add_dependencies (dgPhysics dgCore)
-add_dependencies (dContainers dMath)
-add_dependencies (newton dgCore dgPhysics)
-add_dependencies (dAnimation dMath dContainers)
-add_dependencies (dCustomJoints dMath dContainers)
-add_dependencies (dNewton newton dMath dContainers dCustomJoints)
-add_dependencies (dVehicle newton dMath dContainers dCustomJoints)
-
-if (NEWTON_BUILD_PROFILER)
-	add_definitions(-D_DG_USE_PROFILER)
-        add_dependencies (newton dTimeTracker)
-        add_dependencies (dNewton dTimeTracker)
-        add_dependencies (dVehicle dTimeTracker)
-        add_dependencies (dAnimation dTimeTracker)
-        add_dependencies (dContainers dTimeTracker)
-        add_dependencies (dCustomJoints dTimeTracker)
-endif ()
-
-if (NEWTON_BUILD_SANDBOX_DEMOS)
-	add_dependencies (demosSandbox newton dMath dScene dNewton dContainers dVehicle dCustomJoints tinyxml imgui glatter)
-    if (MSVC)
-		add_dependencies (demosSandbox glfw)
-		if (NEWTON_BUILD_PROFILER)
-			add_dependencies (demosSandbox dTimeTracker)
-		endif (NEWTON_BUILD_PROFILER)
-    endif (MSVC)
 endif()
 

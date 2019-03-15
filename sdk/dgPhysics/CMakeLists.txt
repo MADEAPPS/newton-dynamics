@@ -28,12 +28,6 @@ if (UNIX)
 	else(NEWTON_BUILD_SHARED_LIBS)
 	   add_library(${projectName} STATIC ${CPP_SOURCE})
 	endif(NEWTON_BUILD_SHARED_LIBS)
-
-        target_include_directories(
-                         ${projectName} PUBLIC
-                         # Headers used from source/build location:
-                         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-        )
 endif(UNIX)
 
 if (MSVC)
@@ -45,6 +39,8 @@ if (MSVC)
    endif()
 endif(MSVC)
 
+target_include_directories(${projectName} PUBLIC . ../dgMeshUtil)
+target_link_libraries(${projectName} dgCore)
 
 install(TARGETS ${projectName}
        LIBRARY DESTINATION lib
