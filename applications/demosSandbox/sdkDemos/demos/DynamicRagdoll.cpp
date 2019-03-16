@@ -19,6 +19,8 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
+
+#if 0
 #define DEMO_MUSCLE_STRENGTH	10.0f
 
 struct dRagDollConfig
@@ -395,8 +397,6 @@ class dAnimationBalanceController: public dAnimIDBlendNode
 	}
 };
 
-
-
 class dAnimationAnkleJoint: public dAnimIDRigForwardDynamicLimb
 {
 	public:
@@ -454,7 +454,6 @@ class dAnimationAnkleJoint: public dAnimIDRigForwardDynamicLimb
 	dFloat m_offsetAngle;
 };
 
-
 class dAnimationToeJoint : public dAnimIDRigForwardDynamicLimb
 {
 	public:
@@ -511,9 +510,7 @@ class dAnimationToeJoint : public dAnimIDRigForwardDynamicLimb
 	dFloat m_offsetAngle;
 };
 
-
-
-class BalancingDummyManager : public dAnimIDManager
+class DynamicRagdollManager: public dAnimIDManager
 {
 	public:
 
@@ -543,20 +540,20 @@ class BalancingDummyManager : public dAnimIDManager
 	};
 
 
-	BalancingDummyManager(DemoEntityManager* const scene)
+	DynamicRagdollManager(DemoEntityManager* const scene)
 		:dAnimIDManager(scene->GetNewton())
 		,m_currentRig(NULL)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~BalancingDummyManager()
+	~DynamicRagdollManager()
 	{
 	}
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		BalancingDummyManager* const me = (BalancingDummyManager*)context;
+		DynamicRagdollManager* const me = (DynamicRagdollManager*)context;
 		if (me->m_currentRig) {
 			DemoEntity* const entiry = (DemoEntity*) NewtonBodyGetUserData(me->m_currentRig->GetNewtonBody());
 			dAnimationCharacterUserData* const controlData = (dAnimationCharacterUserData*) entiry->GetUserData();
@@ -806,12 +803,18 @@ xxxx1->ResetMatrix(*scene, matrix1);
 	dAnimIDController* m_currentRig;
 };
 
+#endif
+
 void DynamicRagDoll(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+	return;
+
+/*
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
-	BalancingDummyManager* const robotManager = new BalancingDummyManager(scene);
+	DynamicRagdollManager* const manager = new DynamicRagdollManager(scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
@@ -828,13 +831,14 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 //	origin.m_posit.m_y = 2.1f;
 	origin.m_posit.m_y = 3.0f;
 	for (int i = 0; i < count; i++) {
-		robotManager->CreateRagDoll(scene, origin);
-		//robotManager->CreateRagDoll (scene, origin1);
+		manager->CreateRagDoll(scene, origin);
+		//manager->CreateRagDoll (scene, origin1);
 		origin.m_posit.m_x += 1.0f;
 	}
 
 	origin.m_posit = dVector(-4.0f, 3.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
+*/
 }
 
 

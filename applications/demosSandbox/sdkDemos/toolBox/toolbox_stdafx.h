@@ -198,11 +198,11 @@ typedef long long unsigned64;
 #include <dAnimationStdAfx.h>
 
 #include <dAnimIKManager.h>
+/*
 #include <dAnimIK3dofJoint.h>
 #include <dAnimIKBlendNodePose.h>
 #include <dAnimIKBlendNodeRoot.h>
 #include <dAnimIKBlendNodeTake.h>
-
 #include <dAnimIDManager.h>
 #include <dAnimIDRigLimb.h>
 #include <dAnimIDRigJoint.h>
@@ -213,6 +213,7 @@ typedef long long unsigned64;
 #include <dAnimIDBlendNodeRoot.h>
 #include <dAnimIDBlendNodeTwoWay.h>
 #include <dAnimIDRigForwardDynamicLimb.h>
+*/
 
 /*
 #ifdef _NEWTON_USE_DOUBLE

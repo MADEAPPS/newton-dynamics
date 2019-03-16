@@ -64,7 +64,7 @@ static dSkeletonRigDefinition inverseKinematicsRidParts[] =
 };
 
 
-
+#if 0
 class InverseKinematicAnimationManager: public dAnimIKManager
 {
 	public:
@@ -501,10 +501,16 @@ class InverseKinematicAnimationManager: public dAnimIKManager
 	dTree<dAnimTakeData*, dString> m_animCache;
 };
 
+#endif
+
 void AnimatedPlayerController(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+	return;
+
+#if 0
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 	dMatrix origin (dGetIdentityMatrix());
@@ -537,6 +543,7 @@ for (int i = 0; i < 10; i ++) {
 	
 	origin.m_posit = dVector(-4.0f, 1.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
+#endif
 }
 
 

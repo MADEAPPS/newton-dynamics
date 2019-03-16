@@ -63,12 +63,12 @@
 //#define DEFAULT_SCENE	27		// structured convex fracturing 
 //#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	29		// standard joints
-#define DEFAULT_SCENE	30		// servo joints
+//#define DEFAULT_SCENE	30		// servo joints
 //#define DEFAULT_SCENE	31		// articulated joints
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
 //#define DEFAULT_SCENE	34		// basic rag doll
-//#define DEFAULT_SCENE	35		// dynamic rag doll
+#define DEFAULT_SCENE	35		// dynamic rag doll
 //#define DEFAULT_SCENE	36		// basic Car
 //#define DEFAULT_SCENE	37		// single body vehicle
 //#define DEFAULT_SCENE	38		// David Gravel multi body car
