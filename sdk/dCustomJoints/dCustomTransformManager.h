@@ -66,11 +66,12 @@ class dCustomTransformManager;
 class dSkeletonBone: public dList<dSkeletonBone>
 {
 	public:
+//	dSkeletonBone(dSkeletonBone* const parent, NewtonBody* const body, const dMatrix& bindMatrix)
 	dSkeletonBone()
 		:dList<dSkeletonBone>()
-		,m_bindMatrix(dGetIdentityMatrix())
-		,m_body(NULL)
-		,m_parent(NULL)
+//		,m_bindMatrix(bindMatrix)
+//		,m_body(body)
+//		,m_parent(parent)
 	{
 	}
 
@@ -81,7 +82,7 @@ class dSkeletonBone: public dList<dSkeletonBone>
 		//	dAssert (0);
 		//}
 	}
-
+	
 	void* GetUserData() const { return m_userData; }
 	void SetUserData(void* const data) { m_userData = data; }
 

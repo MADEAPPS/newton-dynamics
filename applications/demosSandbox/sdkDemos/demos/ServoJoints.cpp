@@ -834,13 +834,12 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
 		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
 
-
 		dCustomTransformController* const controller = CreateController(rootBody, dGetIdentityMatrix());
 
 		//controller->SetSelfCollision(0);
 		controller->SetUserData(vehicleModel);
 		controller->SetCalculateLocalTransforms(true);
-/*
+
 		// move the center of mass a lithe to the back, and lower
 		dVector com(0.0f);
 		NewtonBodyGetCentreOfMass(rootBody, &com[0]);
@@ -855,29 +854,29 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		dLifterUserData* const lifterData = new dLifterUserData(vehicleModel);
 		vehicleModel->SetUserData(lifterData);
 
-		// add the root bone to the articulation manager
-		dCustomTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
-
+//		// add the root bone to the articulation manager
+//		dCustomTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
 
 		// add engine
-		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
-		lifterData->m_engineMotor = CreateEngineMotor(controller, lifterData->m_engineJoint);
+//		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
+//		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
+//		lifterData->m_engineMotor = CreateEngineMotor(controller, lifterData->m_engineJoint);
 
 		// set power parameter for a simple DC engine
-		lifterData->m_maxEngineSpeed = 20.0f;
-		lifterData->m_engineMotor->SetTorque(3000.0f);
+//		lifterData->m_maxEngineSpeed = 20.0f;
+//		lifterData->m_engineMotor->SetTorque(3000.0f);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		dCustomTransformController::dSkeletonBone* parentBones[32];
+
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = chassisBone;
+			parentBones[stackIndex] = controller;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
-
+/*
 		dList<dCustomJoint*> cycleLinks;
 		while (stackIndex) {
 			stackIndex--;
