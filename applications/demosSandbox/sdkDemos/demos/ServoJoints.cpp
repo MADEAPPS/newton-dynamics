@@ -445,9 +445,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
-		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(bone->m_body);
+		NewtonBody* const body = bone->GetBody();
+		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
 		if (ent) {
-			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
 			dQuaternion rot(localMatrix);
 			ent->SetMatrix(*scene, rot, localMatrix.m_posit);
@@ -679,10 +680,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 	dCustomWheel* LinkFrontTireJoint(dCustomTransformController* const controller, NewtonBody* const chassis, NewtonBody* const tire)
 	{
-		dAssert(0);
-		return NULL;
-		/*
-
 		dCustomWheel* const wheel = LinkTireJoint(chassis, tire);
 
 		// link traction tire to the engine using a differential gear
@@ -704,14 +701,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up.Scale(-1.0f), engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
 
 		return wheel;
-*/
 	}
 
 	void ConnectBodyPart(dCustomTransformController* const controller, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
 	{
-		dAssert(0);
-		/*
-
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 
 		if (jointArticulation == "") {
@@ -757,18 +750,14 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		} else {
 			dAssert(0);
 		}
-*/
 	}
 
 	dCustomTransformController::dSkeletonBone* CreateEngineNode(dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const chassisBone)
 	{
-		dAssert(0);
-		return NULL;
-		/*
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = NewtonCreateCylinder(world, 0.125f, 0.125f, 0.75f, 0, NULL);
 
-		NewtonBody* const chassis = chassisBone->m_body;
+		NewtonBody* const chassis = chassisBone->GetBody();
 
 		// create the rigid body that will make this bone
 		dMatrix engineMatrix;
@@ -806,7 +795,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		engineJoint->EnableLimits(false);
 		engineJoint->EnableLimits1(false);
 		return controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
-*/
 	}
 
 	dCustomMotor* CreateEngineMotor(dCustomTransformController* const controller, dCustomDoubleHinge* const engineJoint)
@@ -854,17 +842,14 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		dLifterUserData* const lifterData = new dLifterUserData(vehicleModel);
 		vehicleModel->SetUserData(lifterData);
 
-//		// add the root bone to the articulation manager
-//		dCustomTransformController::dSkeletonBone* const chassisBone = controller->AddRoot(rootBody, dGetIdentityMatrix());
-
 		// add engine
-//		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-//		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->FindJoint();
-//		lifterData->m_engineMotor = CreateEngineMotor(controller, lifterData->m_engineJoint);
+		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, controller);
+		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->GetParentJoint();
+		lifterData->m_engineMotor = CreateEngineMotor(controller, lifterData->m_engineJoint);
 
 		// set power parameter for a simple DC engine
-//		lifterData->m_maxEngineSpeed = 20.0f;
-//		lifterData->m_engineMotor->SetTorque(3000.0f);
+		lifterData->m_maxEngineSpeed = 20.0f;
+		lifterData->m_engineMotor->SetTorque(3000.0f);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
@@ -876,7 +861,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
-/*
+
 		dList<dCustomJoint*> cycleLinks;
 		while (stackIndex) {
 			stackIndex--;
@@ -889,9 +874,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 					NewtonBody* const bone = CreateBodyPart(entity, definition[i]);
 
 					// connect this body part to its parent with a vehicle joint
-					ConnectBodyPart(controller, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
+					NewtonBody* const parentBody = parentBone->GetBody();
+					ConnectBodyPart(controller, parentBody, bone, definition[i].m_articulationName, cycleLinks);
 
-					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBone->m_body)).Inverse());
+					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 					parentBone = controller->AddBone(bone, bindMatrix, parentBone);
 					break;
 				}
@@ -903,7 +889,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 				stackIndex++;
 			}
 		}
-*/
+
 		return controller;
 	}
 };
