@@ -102,7 +102,7 @@ class dCustomTransformManager: public dCustomListener
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep);
 
 	private: 
-	dList<dCustomTransformController> m_controllersList;
+	dList<dCustomTransformController> m_controllerList;
 };
 
 

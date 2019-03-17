@@ -89,7 +89,7 @@ dCustomTransformManager::~dCustomTransformManager()
 
 dCustomTransformController* dCustomTransformManager::CreateController(NewtonBody* const body, const dMatrix& bindMatrix)
 {
-	dCustomTransformController* const controller = &m_controllersList.Append()->GetInfo();
+	dCustomTransformController* const controller = &m_controllerList.Append()->GetInfo();
 	controller->m_body = body;
 	controller->m_bindMatrix = bindMatrix;
 	return controller;
@@ -97,7 +97,7 @@ dCustomTransformController* dCustomTransformManager::CreateController(NewtonBody
 
 void dCustomTransformManager::PreUpdate(dFloat timestep)
 {
-	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
+	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
 		dCustomTransformController* const controller = &node->GetInfo();
 		OnPreUpdate(controller, timestep, 0);
 	}
@@ -105,7 +105,7 @@ void dCustomTransformManager::PreUpdate(dFloat timestep)
 
 void dCustomTransformManager::PostUpdate(dFloat timestep)
 {
-	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; node = node->GetNext()) {
+	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
 		dCustomTransformController* const controller = &node->GetInfo();
 		//OnPostUpdate(controller, timestep, 0);
 		controller->PostUpdate(this, timestep);
@@ -114,7 +114,7 @@ void dCustomTransformManager::PostUpdate(dFloat timestep)
 
 void dCustomTransformManager::OnDestroy()
 {
-	for (dList<dCustomTransformController>::dListNode* node = m_controllersList.GetFirst(); node; ) {
+	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; ) {
 		dCustomTransformController* const controller = &node->GetInfo();
 		node = node->GetNext();
 		DestroyController (controller);
@@ -123,8 +123,8 @@ void dCustomTransformManager::OnDestroy()
 
 void dCustomTransformManager::DestroyController (dCustomTransformController* const controller)
 {
-	dList<dCustomTransformController>::dListNode* const node = m_controllersList.GetNodeFromInfo(*controller);
-	m_controllersList.Remove(node);
+	dList<dCustomTransformController>::dListNode* const node = m_controllerList.GetNodeFromInfo(*controller);
+	m_controllerList.Remove(node);
 }
 
 /*

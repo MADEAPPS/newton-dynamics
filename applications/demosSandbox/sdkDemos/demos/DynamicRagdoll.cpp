@@ -802,17 +802,72 @@ xxxx1->ResetMatrix(*scene, matrix1);
 
 	dAnimIDController* m_currentRig;
 };
-
 #endif
+
+class DynamicRagdollManager: public dAnimationModelManager
+{
+	public:
+/*
+	class dAnimationCharacterUserData: public DemoEntity::UserData
+	{
+		public:
+		dAnimationCharacterUserData(dAnimIDController* const rig, dAnimIDBlendNodeTwoWay* const walk, dAnimationBipeHipController* const posture)
+			:DemoEntity::UserData()
+			, m_rig(rig)
+			, m_walk(walk)
+			, m_posture(posture)
+			, m_hipHigh(0.0f)
+			, m_walkSpeed(0.0f)
+		{
+			}
+
+		void OnRender(dFloat timestep) const
+		{
+		}
+
+//		dAnimIDController* m_rig;
+//		dAnimIDBlendNodeTwoWay* m_walk;
+//		dAnimationBipeHipController* m_posture;
+//		dFloat m_hipHigh;
+//		dFloat m_walkSpeed;
+	};
+*/
+
+	DynamicRagdollManager(DemoEntityManager* const scene)
+		:dAnimationModelManager(scene->GetNewton())
+//		, m_currentRig(NULL)
+	{
+//		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~DynamicRagdollManager()
+	{
+	}
+
+	void SelfBalacingExperiment_1(const dVector& location)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("selfbalance_01.ngd", GetWorld(), scene->GetShaderCache());
+
+		dMatrix matrix0(model->GetCurrentMatrix());
+		matrix0.m_posit = location;
+		//matrix0.m_posit.m_x += 5.0f;
+		//matrix0.m_posit.m_z += 2.0f;
+		model->ResetMatrix(*scene, matrix0);
+
+		scene->Append(model);
+
+	}
+};
+
 
 void DynamicRagDoll(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-	return;
+//	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+//	return;
 
-/*
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 	DynamicRagdollManager* const manager = new DynamicRagdollManager(scene);
 
@@ -822,10 +877,12 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
 
 
-	int count = 10;
-	count = 1;
-
-	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
+	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
+	origin.m_posit.m_y = 1.2f;
+	manager->SelfBalacingExperiment_1(origin.m_posit);
+/*
+//	int count = 10;
+//	count = 1;
 //origin = dGetIdentityMatrix();
 	origin.m_posit.m_x = 2.0f;
 //	origin.m_posit.m_y = 2.1f;
@@ -835,10 +892,11 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 		//manager->CreateRagDoll (scene, origin1);
 		origin.m_posit.m_x += 1.0f;
 	}
-
-	origin.m_posit = dVector(-4.0f, 3.0f, 0.0f, 1.0f);
-	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 */
+	origin.m_posit.m_x = -3.0f;
+	origin.m_posit.m_y = 1.0f;
+	origin.m_posit.m_z = 0.0f;
+	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
 
 

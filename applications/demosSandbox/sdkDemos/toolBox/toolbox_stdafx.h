@@ -196,9 +196,10 @@ typedef long long unsigned64;
 #include <dNewtonMesh.h>
 
 #include <dAnimationStdAfx.h>
+#include <dAnimationModelManager.h>
 
-#include <dAnimIKManager.h>
 /*
+#include <dAnimIKManager.h>
 #include <dAnimIK3dofJoint.h>
 #include <dAnimIKBlendNodePose.h>
 #include <dAnimIKBlendNodeRoot.h>
