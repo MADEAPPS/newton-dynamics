@@ -30,6 +30,7 @@ class dMousePickClass
 		,m_param (1.0f)
 		,m_body(NULL)
 	{
+		m_hitBody = false;
 	}
 
 	// implement a ray cast pre-filter
@@ -45,6 +46,13 @@ class dMousePickClass
 		}
 
 		return (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) ? 1 : 0;
+	}
+
+	static bool GetLastHit (dVector& posit, dVector& normal) 
+	{
+		posit = m_lastPoint;
+		normal = m_lastNormal;
+		return m_hitBody;
 	}
 
 	static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
@@ -67,19 +75,30 @@ class dMousePickClass
 			data->m_body = body;
 		}
 
-
 		if (intersetParam < data->m_param) {
 			data->m_param = intersetParam;
 			data->m_normal = dVector (normal[0], normal[1], normal[2]);
 		}
+
 		return intersetParam;
 	}
 
 	dVector m_normal;
 	dFloat m_param;
 	const NewtonBody* m_body;
+	static bool m_hitBody;
+	static dVector m_lastPoint;
+	static dVector m_lastNormal;
 };
 
+bool dMousePickClass::m_hitBody;
+dVector dMousePickClass::m_lastPoint;
+dVector dMousePickClass::m_lastNormal;
+
+bool GetLastHit (dVector& posit, dVector& normal)
+{
+	return dMousePickClass::GetLastHit(posit, normal);
+}
 
 dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 {
@@ -1259,6 +1278,12 @@ NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, con
 {
 	dMousePickClass rayCast;
 	NewtonWorldRayCast(nWorld, &origin[0], &end[0], dMousePickClass::RayCastFilter, &rayCast, dMousePickClass::RayCastPrefilter, 0);
+
+	if (rayCast.m_param < 1.0f) {
+		dMousePickClass::m_hitBody = true;
+		dMousePickClass::m_lastPoint = origin + (end - origin).Scale (rayCast.m_param);
+		dMousePickClass::m_lastNormal = rayCast.m_normal;
+	}
 
 	if (rayCast.m_body) {
 		positionOut = origin + (end - origin).Scale (rayCast.m_param);

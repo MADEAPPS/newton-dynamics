@@ -256,6 +256,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
 	,m_solveLargeIslandInParallel(false)
+	,m_showRaycastHit(false)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -791,6 +792,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show aabb", &m_showAABB);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
+			ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
 			ImGui::Checkbox("show normal forces", &m_showNormalForces);
 			ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
 			ImGui::Checkbox("show body frame", &m_showBodyFrame);
@@ -1532,6 +1534,10 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showContactPoints) {
 		RenderContactPoints (m_world);
+	}
+
+	if (m_showRaycastHit) {
+		RenderRayCastHit(m_world);
 	}
 
 	if (m_showBodyFrame) {

@@ -266,6 +266,25 @@ void RenderContactPoints (NewtonWorld* const world)
 	glPointSize(1.0f);
 }
 
+void RenderRayCastHit(NewtonWorld* const world)
+{
+	dVector point;
+	dVector normal;
+	if (GetLastHit (point, normal)) { 
+
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+
+		glPointSize(8.0f);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glBegin(GL_POINTS);
+		// if we are display debug info we need to block other threads from writing the data at the same time
+		glVertex3f(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
+		glEnd();
+		glPointSize(1.0f);
+	}
+}
+
 
 void RenderNormalForces (NewtonWorld* const world)
 {

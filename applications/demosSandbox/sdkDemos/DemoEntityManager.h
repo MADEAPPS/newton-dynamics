@@ -211,6 +211,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
 	bool m_solveLargeIslandInParallel;
+	bool m_showRaycastHit;
 
 	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;
