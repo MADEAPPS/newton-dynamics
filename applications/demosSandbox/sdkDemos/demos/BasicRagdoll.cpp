@@ -478,10 +478,9 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dCustomTransformController* const ragdoll = manager->CreateRagDoll(matrix, &(*ragDollModel), skeletonRagDoll, sizeof(skeletonRagDoll) / sizeof(skeletonRagDoll[0]));
 
 	// attach this ragdoll to world with a fix joint
-//	dCustomTransformController::dSkeletonBone* const rootBone = ragdoll->GetRoot ();
 	dMatrix rootMatrix; 
 	NewtonBodyGetMatrix(ragdoll->GetBody(), &rootMatrix[0][0]);
-//	new dCustom6dof (rootMatrix, rootBone->m_body);
+	new dCustom6dof (rootMatrix, ragdoll->GetBody());
 
 	int count = 3;
 	for (int x = 0; x < count; x ++) {
