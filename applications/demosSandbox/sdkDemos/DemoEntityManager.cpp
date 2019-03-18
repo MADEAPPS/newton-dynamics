@@ -67,8 +67,8 @@
 //#define DEFAULT_SCENE	31		// articulated joints
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
-//#define DEFAULT_SCENE	34		// basic rag doll
-#define DEFAULT_SCENE	35		// dynamic rag doll
+#define DEFAULT_SCENE	34		// basic rag doll
+//#define DEFAULT_SCENE	35		// dynamic rag doll
 //#define DEFAULT_SCENE	36		// basic Car
 //#define DEFAULT_SCENE	37		// single body vehicle
 //#define DEFAULT_SCENE	38		// David Gravel multi body car
