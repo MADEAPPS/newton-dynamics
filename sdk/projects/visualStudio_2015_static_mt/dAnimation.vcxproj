@@ -35,26 +35,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dAnimation\dAnimAcyclicJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimAcyclicSolver.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDController.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDManager.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodePose.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodeRoot.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDBlendNodeTwoWay.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDBlendNode.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDRigEffector.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDRigForwardDynamicLimb.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDRigHinge.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDRigJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIDRigLimb.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIK3dofJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNode.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodePose.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeRoot.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIKBlendNodeTake.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIKController.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationJoint.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationJointRoot.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationModelManager.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -65,36 +48,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\dAnimation\dAnimIKManager.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimIKRigJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimPose.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dAnimation\dAnimAcyclicJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimAcyclicSolver.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDController.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDManager.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodePose.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodeRoot.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDBlendNodeTwoWay.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDRigKinematicLoopJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDBlendNode.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDRigEffector.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDRigForwardDynamicLimb.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDRigHinge.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDRigJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIDRigLimb.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationJoint.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationJointRoot.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationModelManager.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIK3d0fJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIK3dofJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNode.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodePose.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeRoot.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIKBlendNodeTake.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIKController.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIKManager.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimIkRigJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimPose.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EA56552E-746B-4B3A-BF92-004E6A2068EF}</ProjectGuid>
