@@ -1363,6 +1363,12 @@ void SetKinematicPose(NewtonBody* const body, const dMatrix& matrix1, dFloat tim
 	dQuaternion q1(matrix1);
 
 	dVector omega(q0.CalcAverageOmega(q1, OneOverDt));
+//	const dFloat maxOmega = 10.0f;
+//	dFloat mag2 = omega.DotProduct3(omega);
+//	if (mag2 > maxOmega) {
+//		omega = omega.Normalize().Scale(maxOmega);
+//	}
+
 	dVector veloc ((matrix1.m_posit - matrix0.m_posit).Scale (OneOverDt));
 
 	NewtonBodySetVelocity(body, &veloc[0]);
