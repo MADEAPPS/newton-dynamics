@@ -91,7 +91,8 @@ class KinematiocListener: public dCustomListener
 	void CreateKinematicSolidPlatform(const dMatrix& location)
 	{
 		KinematicPlatform& entry = AddPlatform(location);
-		entry.m_omega = dVector(0.0f, -0.5f, 0.0f, 0.0f);
+		//entry.m_omega = dVector(0.0f, -0.5f, 0.0f, 0.0f);
+		entry.m_veloc = dVector(0.0f, 0.0f, 1.0f, 0.0f);
 		
 		// this is what make the trigger solid like a static body
 		NewtonCollision* const collision = NewtonBodyGetCollision(entry.m_plaform);
@@ -192,13 +193,13 @@ void KinematicBodies (DemoEntityManager* const scene)
 	kinematicListener->CreateKinematicSolidPlatform(location);
 
 	location.m_posit.m_z += 10.0f;
-	kinematicListener->CreateKinematicTransparentPlatform(location);
+//	kinematicListener->CreateKinematicTransparentPlatform(location);
 
 	// add some dynamic bodies 
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	dVector size(1.0f, 1.0f, 1.6f, 0.0f);
-	int countx = 5;
-	int countz = 5;
+	int countx = 1;
+	int countz = 1;
 	AddPrimitiveArray(scene, 1.0f, location.m_posit, size, countx, countz, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	dQuaternion rot;

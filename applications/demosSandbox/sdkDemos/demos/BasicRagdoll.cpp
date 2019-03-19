@@ -111,8 +111,8 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 	{ "mixamorig:LeftUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:LeftLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 
-	{ "mixamorig:RightUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:RightLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
+//	{ "mixamorig:RightUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+//	{ "mixamorig:RightLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 
 };
 

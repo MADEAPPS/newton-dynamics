@@ -5985,8 +5985,6 @@ void NewtonBodySetOmega(const NewtonBody* const bodyPtr, const dFloat* const ome
 	body->SetOmega (vector);
 }
 
-
-
 void NewtonBodySetOmegaNoSleep(const NewtonBody* const bodyPtr, const dFloat* const omega)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -5995,7 +5993,6 @@ void NewtonBodySetOmegaNoSleep(const NewtonBody* const bodyPtr, const dFloat* co
 	dgVector vector(omega[0], omega[1], omega[2], dgFloat32(0.0f));
 	body->SetOmegaNoSleep(vector);
 }
-
 
 /*!
   Get the global angular velocity of the body.

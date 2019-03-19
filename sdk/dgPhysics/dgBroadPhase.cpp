@@ -348,15 +348,15 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 
 				// kinematic bodies are always sleeping (skip collision with kinematic bodies)
+				bool isMoving = (body->m_omega.DotProduct(body->m_omega).GetScalar() < dgFloat32 (1.0e-6f)) && (body->m_veloc.DotProduct(body->m_veloc).GetScalar() < dgFloat32(1.0e-4f));
 				if (body->IsCollidable()) {
 					body->m_sleeping = false;
 					body->m_autoSleep = false;
 				} else {
-					body->m_sleeping = true;
+					body->m_sleeping = isMoving;
 					body->m_autoSleep = true;
 				}
-				//body->m_equilibrium = true;
-				body->m_equilibrium = (body->m_omega.DotProduct(body->m_omega).GetScalar() < dgFloat32 (1.0e-6f)) && (body->m_veloc.DotProduct(body->m_veloc).GetScalar() < dgFloat32(1.0e-4f));
+				body->m_equilibrium = isMoving;
 
 				// update collision matrix by calling the transform callback for all kinematic bodies
 				if (body->GetBroadPhase()) {
@@ -1192,7 +1192,6 @@ bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const
 	return ret;
 }
 
-
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
 	dgAssert(body0);
@@ -1315,6 +1314,7 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 
 	dgAssert (leafNode->IsLeafNode());
 	dgBody* const body0 = leafNode->GetBody();
+
 	const dgVector boxP0 (body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dgVector boxP1 (body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 
