@@ -348,15 +348,16 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 
 				// kinematic bodies are always sleeping (skip collision with kinematic bodies)
-				bool isMoving = (body->m_omega.DotProduct(body->m_omega).GetScalar() < dgFloat32 (1.0e-6f)) && (body->m_veloc.DotProduct(body->m_veloc).GetScalar() < dgFloat32(1.0e-4f));
+				bool isResting = (body->m_omega.DotProduct(body->m_omega).GetScalar() < dgFloat32 (1.0e-6f)) && (body->m_veloc.DotProduct(body->m_veloc).GetScalar() < dgFloat32(1.0e-4f));
 				if (body->IsCollidable()) {
 					body->m_sleeping = false;
 					body->m_autoSleep = false;
 				} else {
-					body->m_sleeping = isMoving;
 					body->m_autoSleep = true;
+					body->m_sleeping = isResting;
+					descriptor->m_fullScan = !isResting;
 				}
-				body->m_equilibrium = isMoving;
+				body->m_equilibrium = isResting;
 
 				// update collision matrix by calling the transform callback for all kinematic bodies
 				if (body->GetBroadPhase()) {
@@ -1319,6 +1320,7 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 	const dgVector boxP1 (body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 
 	const bool test0 = body0 ? (body0->GetInvMass().m_w != dgFloat32(0.0f)) : true;
+
 	while (stack) {
 		stack--;
 		dgBroadPhaseNode* const rootNode = pool[stack];

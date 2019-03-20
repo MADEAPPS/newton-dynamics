@@ -65,10 +65,10 @@ class KinematiocListener: public dCustomListener
 		for (dList<KinematicPlatform>::dListNode* ptr = m_platformList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			KinematicPlatform& entry = ptr->GetInfo();
 
-			// set the platform angula velocity
+			// set the platform angular velocity
 			NewtonBodySetOmega(entry.m_plaform, &entry.m_omega[0]);
 
-			// calcualte the speed alon a circualat path
+			// calculate the speed alone a circular path
 			dMatrix matrix;
 			NewtonBodyGetMatrix(entry.m_plaform, &matrix[0][0]);
 			dVector dir(matrix.m_posit - entry.m_origin);
@@ -213,7 +213,7 @@ void KinematicBodies (DemoEntityManager* const scene)
 	kinematicListener->CreateKinematicSolidPlatform(location, 4.0f);
 
 	location.m_posit.m_z += 10.0f;
-//	kinematicListener->CreateKinematicTransparentPlatform(location, -5.0f);
+	kinematicListener->CreateKinematicTransparentPlatform(location, -5.0f);
 
 	// add some dynamic bodies 
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
