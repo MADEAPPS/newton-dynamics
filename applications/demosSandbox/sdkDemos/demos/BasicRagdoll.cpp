@@ -108,9 +108,8 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
 	{ "mixamorig:Hips", "rootCapsule", 30.0f, 0.1f},
 
-	{ "mixamorig:LeftUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:LeftLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
-
+//	{ "mixamorig:LeftUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+//	{ "mixamorig:LeftLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 //	{ "mixamorig:RightUpLeg", "capsule", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
 //	{ "mixamorig:RightLeg", "capsule", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 
@@ -184,12 +183,12 @@ class CrashDummyManager: public dCustomTransformManager
 		origin.m_w = 1.0f;
 	}
 
-
+/*
 	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) const
 	{
 		dAssert (0);
 		return NULL;
-/*
+
 		dVector size(0.0f);
 		dVector origin(0.0f);
 		dMatrix matrix (dGetIdentityMatrix());
@@ -198,7 +197,6 @@ class CrashDummyManager: public dCustomTransformManager
 		matrix.m_posit.m_y = definition.m_shape_y;
 		matrix.m_posit.m_z = definition.m_shape_z;
 		return NewtonCreateSphere(GetWorld(), definition.m_radio, 0, &matrix[0][0]);
-*/
 	}
 
 	NewtonCollision* MakeBox(DemoEntity* const bodyPart) const
@@ -276,26 +274,29 @@ class CrashDummyManager: public dCustomTransformManager
 		matrix.m_posit.m_w = 1.0f;
 		return NewtonCreateCapsule(GetWorld(), radio, radio, height, 0, &matrix[0][0]);
 	}
+*/
 	
 	NewtonBody* CreateRagDollBodyPart (DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) 
 	{
-		NewtonCollision* shape = NULL;
-		if (!strcmp (definition.m_shapeType, "sphere")) {
-			shape = MakeSphere (bodyPart, definition);
-		} else if (!strcmp (definition.m_shapeType, "capsule")) {
-			shape = MakeCapsule(bodyPart, definition);
-		} else if (!strcmp (definition.m_shapeType, "box")) {
-			shape = MakeBox (bodyPart);
-		} else if (!strcmp(definition.m_shapeType, "rootCapsule")) {
-			shape = MakeRootCapsule(bodyPart, definition);
-		} else {
-			shape = MakeConvexHull(bodyPart);
-		}
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
+		//NewtonCollision* shape = NULL;
+		//if (!strcmp (definition.m_shapeType, "sphere")) {
+		//	shape = MakeSphere (bodyPart, definition);
+		//} else if (!strcmp (definition.m_shapeType, "capsule")) {
+		//	shape = MakeCapsule(bodyPart, definition);
+		//} else if (!strcmp (definition.m_shapeType, "box")) {
+		//	shape = MakeBox (bodyPart);
+		//} else if (!strcmp(definition.m_shapeType, "rootCapsule")) {
+		//	shape = MakeRootCapsule(bodyPart, definition);
+		//} else {
+		//	shape = MakeConvexHull(bodyPart);
+		//}
 
 		// calculate the bone matrix
 		dMatrix matrix (bodyPart->CalculateGlobalMatrix());
-
-		NewtonWorld* const world = GetWorld();
+			
 
 		// create the rigid body that will make this bone
 		NewtonBody* const bone = NewtonCreateDynamicBody (world, shape, &matrix[0][0]);
