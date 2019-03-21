@@ -49,6 +49,7 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 	{ "mixamorig:Spine", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:Spine1", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:Spine2", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:Neck", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
 
 	{ "mixamorig:LeftUpLeg", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:LeftLeg", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},

@@ -396,7 +396,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			entity->m_matrix = matrix;
 			entity->SetNameID(sceneInfo->GetName());
 			const char* const name = entity->GetName().GetStr();
-			if (strstr(name, "Capsule")) {
+			if (strstr(name, "Capsule") || strstr(name, "Sphere")) {
 				entity->m_isVisible = false;
 				dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
 			}
@@ -478,7 +478,25 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 	shapeArray[0] = NULL;
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
 		const char* const name = child->GetName().GetStr();
-		if (strstr (name, "Capsule")) {
+
+		if (strstr (name, "Sphere")) {
+			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+			// go over the vertex array and find and collect all vertices's weighted by this bone.
+			dFloat* const array = mesh->m_vertex;
+			dVector extremes(0.0f);
+			for (int i = 0; i < mesh->m_vertexCount; i++) {
+				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			}
+
+			dMatrix matrix(child->GetCurrentMatrix());
+			shapeArray[count] = NewtonCreateSphere(world, extremes.m_x, 0, &matrix[0][0]);
+			count++;
+			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+
+		} else if (strstr (name, "Capsule")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 			// go over the vertex array and find and collect all vertices's weighted by this bone.
