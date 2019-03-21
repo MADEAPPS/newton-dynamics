@@ -49,19 +49,27 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 	{ "mixamorig:Spine", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:Spine1", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:Spine2", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
+
 	{ "mixamorig:Neck", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
+
+	{ "mixamorig:LeftArm", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:LeftForeArm", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 0.0f, -90.0f}},
+	
+	{ "mixamorig:RightArm", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:RightForeArm", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 00.0f, 90.0f}},
 
 	{ "mixamorig:LeftUpLeg", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:LeftLeg", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
+
 	{ "mixamorig:RightUpLeg", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
 	{ "mixamorig:RightLeg", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 };
 
 
-class CrashDummyManager: public dCustomTransformManager
+class PassiveRagdollManager: public dCustomTransformManager
 {
 	public: 
-	CrashDummyManager (DemoEntityManager* const scene)
+	PassiveRagdollManager (DemoEntityManager* const scene)
 		:dCustomTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
@@ -78,22 +86,20 @@ class CrashDummyManager: public dCustomTransformManager
 	{
 	}
 
-//	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	static int OnBoneAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
-		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
-		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		const dCustomTransformController::dSkeletonBone* const bone0 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-		const dCustomTransformController::dSkeletonBone* const bone1 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
-
-//		dAssert(0);
-		dAssert (bone0);
-		dAssert (bone1);
-//		if (bone0->m_controller && bone1->m_controller) {
-//			return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
-//		}
+//		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+//		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+//		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+//		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+//		const dCustomTransformController::dSkeletonBone* const bone0 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+//		const dCustomTransformController::dSkeletonBone* const bone1 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+//
+//		dAssert (bone0);
+//		dAssert (bone1);
+////		if (bone0->m_controller && bone1->m_controller) {
+////			return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
+////		}
 		return 1;
 	}
 
@@ -165,7 +171,6 @@ class CrashDummyManager: public dCustomTransformManager
 		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
-//		dMatrix parentRollMatrix (dRollMatrix (definition.m_parentRollOffset * dDegreeToRad) * pinAndPivotInGlobalSpace);
 		dMatrix parentRollMatrix (dGetIdentityMatrix () * pinAndPivotInGlobalSpace);
 
 		dPasiveRagDollDefinition::dPasiveRagDollJointLimitx jointLimits (definition.m_jointLimits);
@@ -294,7 +299,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dPointer<DemoEntity> ragDollModel (DemoEntity::LoadNGD_mesh("whiteman.ngd", scene->GetNewton(), scene->GetShaderCache()));
 
 	//  create a skeletal transform controller for controlling rag doll
-	CrashDummyManager* const manager = new CrashDummyManager (scene);
+	PassiveRagdollManager* const manager = new PassiveRagdollManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());
@@ -310,7 +315,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	// attach this ragdoll to world with a fix joint
 	dMatrix rootMatrix; 
 	NewtonBodyGetMatrix(ragdoll->GetBody(), &rootMatrix[0][0]);
-//	new dCustom6dof (rootMatrix, ragdoll->GetBody());
+	//new dCustom6dof (rootMatrix, ragdoll->GetBody());
 
 	int count = 6;
 	for (int x = 0; x < count; x ++) {
