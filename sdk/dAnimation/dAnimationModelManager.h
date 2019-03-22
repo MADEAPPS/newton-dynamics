@@ -14,6 +14,7 @@
 #define __D_ANIMATION_MODEL_ANAGER_H__
 
 #include "dAnimationStdAfx.h"
+//#include "dAnimationJoint.h"
 #include "dAnimationJointRoot.h"
 
 #define D_ANIMATION_MODEL_MANAGER	"__dAnimationModelManager__"

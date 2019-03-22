@@ -844,7 +844,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 	{
 	}
 
-	void SelfBalacingExperiment_1(const dVector& location)
+	void DynamicsRagdollExperiment_1(const dVector& location)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("selfbalance_01.ngd", GetWorld(), scene->GetShaderCache());
@@ -879,7 +879,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y = 1.2f;
-	manager->SelfBalacingExperiment_1(origin.m_posit);
+	manager->DynamicsRagdollExperiment_1(origin.m_posit);
 /*
 //	int count = 10;
 //	count = 1;

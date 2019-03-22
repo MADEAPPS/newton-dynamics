@@ -69,36 +69,86 @@ class dAnimAcyclicJoint: public dContainersAlloc
 };
 */
 
+class dAnimationJoint;
+class dAnimationJointChildren: public dList<dAnimationJoint*>
+{
+};
 
-class dAnimationJoint: public dList<dAnimationJoint>
+class dAnimationJoint: public dCustomAlloc
 {
 	public:
-	dAnimationJoint()
-		:dList<dAnimationJoint>()
-		,m_bindMatrix(dGetIdentityMatrix())
-		,m_body(NULL)
-		,m_parent(NULL)
-	{
-	}
+	dAnimationJoint(NewtonBody* const body, dAnimationJoint* const parent);
+	virtual ~dAnimationJoint();
+	
+	dAnimationJoint* GetParent() const;
+	const dMatrix& GetBindMatrix() const;
 
-	~dAnimationJoint()
-	{
-	}
+	void* GetUserData() const;
+	void SetUserData(void* const data);
+	
+	dAnimationJointChildren& GetChidren();
+	const dAnimationJointChildren& GetChidren() const;
 
-	NewtonBody* GetBody() const { return m_body; }
-	const dMatrix& GetBindMatrix() const { return m_bindMatrix; }
-
-	void* GetUserData() const { return m_userData; }
-	void SetUserData(void* const data) { m_userData = data; }
-
-	CUSTOM_JOINTS_API dCustomJoint* GetParentJoint() const;
+	virtual NewtonBody* GetBody() const;
 
 	protected:
 	dMatrix m_bindMatrix;
+	void* m_userData;
 	NewtonBody* m_body;
 	dAnimationJoint* m_parent;
-	void* m_userData;
+	dAnimationJointChildren m_children;
 };
+
+inline dAnimationJoint::dAnimationJoint(NewtonBody* const body, dAnimationJoint* const parent)
+	:dCustomAlloc()
+	,m_bindMatrix(dGetIdentityMatrix())
+	,m_userData(NULL)
+	,m_body(m_body)
+	,m_parent(parent)
+	,m_children()
+{
+}
+
+inline dAnimationJoint::~dAnimationJoint()
+{
+}
+
+inline dAnimationJoint* dAnimationJoint::GetParent() const
+{
+	return m_parent;
+}
+
+inline const dMatrix& dAnimationJoint::GetBindMatrix() const
+{ 
+	return m_bindMatrix; 
+}
+
+inline void* dAnimationJoint::GetUserData() const 
+{ 
+	return m_userData; 
+}
+
+inline void dAnimationJoint::SetUserData(void* const data) 
+{ 
+	m_userData = data; 
+}
+
+inline NewtonBody* dAnimationJoint::GetBody() const
+{ 
+	return m_body; 
+}
+
+
+inline const dAnimationJointChildren& dAnimationJoint::GetChidren() const
+{ 
+	return m_children; 
+}
+
+inline dAnimationJointChildren& dAnimationJoint::GetChidren()
+{
+	return m_children; 
+}
+
 
 #endif
 

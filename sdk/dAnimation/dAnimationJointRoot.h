@@ -20,8 +20,8 @@
 class dAnimationJointRoot: public dAnimationJoint
 {
 	public:
-	dAnimationJointRoot()
-		:dAnimationJoint()
+	dAnimationJointRoot(NewtonBody* const body)
+		:dAnimationJoint(body, NULL)
 		,m_calculateLocalTransform(true)
 	{
 	}
